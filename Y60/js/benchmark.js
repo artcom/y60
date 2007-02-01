@@ -24,7 +24,7 @@ var window = new RenderWindow();
 window.resize(WINDOW_SIZE[0], WINDOW_SIZE[1]);
 window.position = [0,0]
 window.decorations = false;
-window.multisamplingFactor = MULTISAMPLING;
+window.multisamples = MULTISAMPLING;
 window.scene = new Scene(arguments[0]);
 window.swapInterval = 0;
 

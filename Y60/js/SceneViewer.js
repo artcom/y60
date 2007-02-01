@@ -460,7 +460,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.renderWhileSleep = false;
 
         // You could turn on multisampling here, if you like
-        //window.multisamplingFactor = 8;
+        //window.multisamples = 2;
 
         self.setupWindow(window, _mySetDefaultRenderingCap);
         var myScene;

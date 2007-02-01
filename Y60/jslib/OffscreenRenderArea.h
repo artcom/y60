@@ -86,8 +86,8 @@ class OffscreenRenderArea : public y60::OffscreenBuffer,
         virtual void handle(y60::EventPtr theEvent);
 
         // IGLContextManager
-        virtual void activateGLContext() {};
-        virtual void deactivateGLContext() {}; 
+        virtual void activateGLContext() {}
+        virtual void deactivateGLContext() {}
 
         // AbstractRenderWindow
         virtual void initDisplay();

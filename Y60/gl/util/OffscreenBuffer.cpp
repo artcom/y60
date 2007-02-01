@@ -31,150 +31,8 @@ using namespace dom;
 
 namespace y60 {
 
-void checkFramebufferStatus();
-
-OffscreenBuffer::OffscreenBuffer(bool theUseGLFramebufferObject) :
-    _myUseGLFramebufferObject(theUseGLFramebufferObject),
-    _myFrameBufferObjectId(0), _myDepthBufferId(0), _myColorBufferId(0)
-{}
-
-void OffscreenBuffer::activate(ImagePtr theImage) {
-    if (_myUseGLFramebufferObject) {
-        bindOffscreenFrameBuffer(theImage);
-    }
-}
-
-void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag) {
-    if (_myUseGLFramebufferObject) {
-#ifdef GL_EXT_framebuffer_object
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-#endif
-        glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
-#ifdef GL_EXT_framebuffer_object
-        if (IS_SUPPORTED(glGenerateMipmapEXT) && theImage->get<ImageMipmapTag>()) {
-            AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
-            glGenerateMipmapEXT(GL_TEXTURE_2D);
-        }
-#endif
-    } else {
-        copyFrameBufferToTexture(theImage);
-        if (theCopyToImageFlag) {
-            copyFrameBufferToImage(theImage);
-        }
-    }
- 
-    // cleanly unbind the texture
-    if (_myUseGLFramebufferObject) {
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-}
-
-
-void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
-    AC_TRACE << "OffscreenBuffer::copyFrameBufferToImage";
-
-#ifdef GL_EXT_framebuffer_object
-    if (_myUseGLFramebufferObject) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObjectId);
-    }
-#endif
- 
-    PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getRasterEncoding());
-    myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(theImage->getInternalEncoding());
-
-    AC_DEBUG << "pixelformat " << theImage->get<RasterPixelFormatTag>();
-    AC_DEBUG << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
-
-    glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
-                myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
-                theImage->getRasterPtr()->pixels().begin());        
-
-#ifdef DUMP_BUFFER
-    PixelEncoding myEncoding;
-    switch(long(myPixelEncodingInfo.bytesPerPixel)) {
-      case 1:
-          myEncoding = GRAY;
-          break;
-      case 3:
-          myEncoding = RGB;
-          break;
-      case 4:
-          myEncoding = RGBA;
-          break;
-    }
-
-    PLPixelFormat pf;
-    mapPixelEncodingToFormat(myEncoding, pf);
-
-    std::string myFilename("buffer.png");
-    PLAnyBmp myBmp;    
-    myBmp.Create( theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), pf, 
-                  theImage->getRasterPtr()->pixels().begin(),
-                  theImage->get<ImageWidthTag>() * myPixelEncodingInfo.bytesPerPixel);
-    PLPNGEncoder myEncoder;
-    myEncoder.MakeFileFromBmp(myFilename.c_str(), &myBmp);               
-#endif
-
-    // texture is already uploaded, either by bindTexture(..) or
-    // by copyFrameBufferToTexture(..) VS/UH
-    //theImage->getRasterValueNode()->bumpVersion(); 
-
-#ifdef GL_EXT_framebuffer_object
-    if (_myUseGLFramebufferObject) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    }
-#endif
-}
-
-void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theImage) {
-    glBindTexture (GL_TEXTURE_2D, theImage->ensureTextureId() );
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
-            0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
-    glBindTexture (GL_TEXTURE_2D, 0);
-}
-
-void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage) {
-#ifdef GL_EXT_framebuffer_object
-    if (!_myFrameBufferObjectId) {
-        glGenFramebuffersEXT(1, &_myFrameBufferObjectId);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObjectId);
-
-        _myColorBufferId = theImage->ensureTextureId();
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-            GL_TEXTURE_2D, _myColorBufferId, 0);
-        
-        // we need a depth buffer as well
-        glGenRenderbuffersEXT(1, &_myDepthBufferId);
-        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBufferId);
-        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 
-                theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
-
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-                GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, _myDepthBufferId);
-
-    } else {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObjectId);
-
-        // If the target image changed between two frames the framebuffer texture needs
-        // to be bound again
-        if (theImage->ensureTextureId() != _myColorBufferId) {
-            _myColorBufferId = theImage->ensureTextureId(); 
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                GL_TEXTURE_2D, _myColorBufferId, 0);            
-        }
-    }
-
-    checkFramebufferStatus();
-#else
-    throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);
-#endif
-}
-
-void
-checkFramebufferStatus() {
+static void checkFramebufferStatus()
+{
     GLenum myStatus;
     myStatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 
@@ -223,6 +81,219 @@ checkFramebufferStatus() {
     if (!isOK) {
         throw OffscreenRendererException(os.str(), PLUS_FILE_LINE);
     }
+}
+
+
+OffscreenBuffer::OffscreenBuffer(bool theUseFBO) :
+    _myUseFBO(theUseFBO),
+    _myBlitFilter(GL_NEAREST)
+{
+    _myFrameBufferObject[0] = _myFrameBufferObject[1] = 0;
+    _myColorBuffer[0] = _myColorBuffer[1] = 0;
+    _myDepthBuffer[0] = _myDepthBuffer[1] = 0;
+}
+
+
+void OffscreenBuffer::activate(ImagePtr theImage, unsigned theSamples)
+{
+    if (_myUseFBO) {
+        bindOffscreenFrameBuffer(theImage, theSamples);
+    }
+}
+
+
+void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag)
+{
+#ifdef GL_EXT_framebuffer_object
+    if (_myUseFBO) {
+        if (_myFrameBufferObject[1]) {
+            // blit multisample buffer to texture
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+
+            unsigned myWidth = theImage->get<ImageWidthTag>();
+            unsigned myHeight = theImage->get<ImageHeightTag>();
+            glBlitFramebufferEXT(0, 0, myWidth, myHeight,
+                                 0, 0, myWidth, myHeight,
+                                 GL_COLOR_BUFFER_BIT, _myBlitFilter);
+
+            // restore
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+            glDrawBuffer(GL_BACK);
+        } else {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        }
+
+        if (IS_SUPPORTED(glGenerateMipmapEXT) && theImage->get<ImageMipmapTag>()) {
+            AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
+            glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
+            glGenerateMipmapEXT(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+    else
+#endif
+    {
+        glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
+        glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
+                0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>());
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    if (theCopyToImageFlag) {
+        copyToImage(theImage);
+    }
+}
+
+
+void OffscreenBuffer::copyToImage(ImagePtr theImage)
+{
+    AC_TRACE << "OffscreenBuffer::copyToImage";
+
+#ifdef GL_EXT_framebuffer_object
+    if (_myUseFBO) {
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+    }
+#endif
+ 
+    PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getRasterEncoding());
+    myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(theImage->getInternalEncoding());
+
+    AC_DEBUG << "pixelformat " << theImage->get<RasterPixelFormatTag>();
+    AC_DEBUG << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
+
+    glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
+                myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
+                theImage->getRasterPtr()->pixels().begin());        
+
+#ifdef DUMP_BUFFER
+    PixelEncoding myEncoding;
+    switch(long(myPixelEncodingInfo.bytesPerPixel)) {
+      case 1:
+          myEncoding = GRAY;
+          break;
+      case 3:
+          myEncoding = RGB;
+          break;
+      case 4:
+          myEncoding = RGBA;
+          break;
+    }
+
+    PLPixelFormat pf;
+    mapPixelEncodingToFormat(myEncoding, pf);
+
+    std::string myFilename("buffer.png");
+    PLAnyBmp myBmp;    
+    myBmp.Create( theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), pf, 
+                  theImage->getRasterPtr()->pixels().begin(),
+                  theImage->get<ImageWidthTag>() * myPixelEncodingInfo.bytesPerPixel);
+    PLPNGEncoder myEncoder;
+    myEncoder.MakeFileFromBmp(myFilename.c_str(), &myBmp);               
+#endif
+
+#ifdef GL_EXT_framebuffer_object
+    if (_myUseFBO) {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+#endif
+}
+
+
+void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSamples)
+{
+#ifdef GL_EXT_framebuffer_object
+    if (!_myFrameBufferObject[0]) {
+
+        if (theSamples >= 1) {
+
+            /*
+             * setup multisample framebuffer
+             */
+            unsigned myWidth = theImage->get<ImageWidthTag>();
+            unsigned myHeight = theImage->get<ImageHeightTag>();
+            AC_DEBUG << "Using FBO multisampling samples=" << theSamples << " size=" << myWidth << "x" << myHeight;
+
+            // color buffer
+            glGenRenderbuffersEXT(1, &_myColorBuffer[1]);
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
+                    theSamples, GL_RGB8,
+                    myWidth, myHeight);
+            checkOGLError(PLUS_FILE_LINE);
+
+            // depth buffer
+            glGenRenderbuffersEXT(1, &_myDepthBuffer[1]);
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer[1]);
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
+                    theSamples, GL_DEPTH_COMPONENT24,
+                    myWidth, myHeight);
+            checkOGLError(PLUS_FILE_LINE);
+
+            // multisample framebuffer
+            glGenFramebuffersEXT(1, &_myFrameBufferObject[1]);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                    GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+                    GL_RENDERBUFFER_EXT, _myDepthBuffer[1]);
+            checkOGLError(PLUS_FILE_LINE);
+        }
+
+        /*
+         * setup render-to-texture framebuffer
+         */
+
+        // framebuffer
+        glGenFramebuffersEXT(1, &_myFrameBufferObject[0]);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+
+        // color buffer
+        _myColorBuffer[0] = theImage->ensureTextureId();
+        glBindTexture(GL_TEXTURE_2D, _myColorBuffer[0]);
+
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                GL_TEXTURE_2D, _myColorBuffer[0], 0);
+        checkOGLError(PLUS_FILE_LINE);
+
+        if (theSamples == 0) {
+            // depth buffer
+            glGenRenderbuffersEXT(1, &_myDepthBuffer[0]);
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 
+                    theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
+            checkOGLError(PLUS_FILE_LINE);
+
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+                    GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
+            checkOGLError(PLUS_FILE_LINE);
+        }
+
+        checkFramebufferStatus();
+    } else {
+
+        // bind FBO
+        if (theSamples >= 1) {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+        } else {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        }
+
+        // If the target image changed between two frames the framebuffer texture needs
+        // to be bound again
+        if (theImage->ensureTextureId() != _myColorBuffer[0]) {
+            AC_DEBUG << "Re-binding texture";
+            _myColorBuffer[0] = theImage->ensureTextureId(); 
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                GL_TEXTURE_2D, _myColorBuffer[0], 0);            
+        }
+    }
+#else
+    throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);
+#endif
 }
 
 }

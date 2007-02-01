@@ -81,8 +81,7 @@ SDLWindow::SDLWindow() :
     _myStandardCursor(0),
     _myAutoPauseFlag(false),
     _mySwapInterval(0),
-    _myLastSwapCounter(0),
-    _myMultiSampleSize(0)
+    _myLastSwapCounter(0)
 {
     setGLContext(GLContextPtr(new GLContext()));
 }
@@ -520,33 +519,33 @@ void SDLWindow::ensureSDLSubsystem() {
         SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 16 );*/
         SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-        if (_myMultiSampleSize) {
+        unsigned mySamples = AbstractRenderWindow::getMultisamples();
+        if (mySamples >= 1) {
+            AC_DEBUG << "Requesting multisampling=" << mySamples;
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, _myMultiSampleSize);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mySamples);
         }
     }
 }
 
 void
-SDLWindow::setMultisampling(unsigned theSize) {
+SDLWindow::setMultisamples(unsigned theSampleSize) {
     if (SDL_WasInit(SDL_INIT_VIDEO)) {
         AC_WARNING << "Sorry, setting the multisampling size will take no effect after the sdl window has been initialized!";
         return;
     }
-
-    _myMultiSampleSize = theSize;
+    AbstractRenderWindow::setMultisamples(theSampleSize);
 }
 
 unsigned
-SDLWindow::getMultisampling() {
+SDLWindow::getMultisamples() {
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-        return _myMultiSampleSize;
+        return AbstractRenderWindow::getMultisamples();
     } else {
         int mySize;
         SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &mySize);
         return unsigned(mySize);
     }
-
 }
 
 void SDLWindow::setShowMouseCursor(bool theShowMouseCursor) {

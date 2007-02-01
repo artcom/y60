@@ -95,6 +95,13 @@ namespace jslib {
         virtual void setRenderingCaps(unsigned int theRenderingCaps);
         unsigned int getRenderingCaps();
 
+        void setMultisamples(unsigned theSamples) {
+            _myMultisamples = theSamples;
+        }
+        unsigned getMultisamples() const {
+            return _myMultisamples;
+        }
+
         std::string getGLVersionString();
         std::string getGLVendorString();
         std::string getGLRendererString();
@@ -271,15 +278,17 @@ namespace jslib {
         JSErrorReporter      _myErrorReporter;
         inet::RequestManager _myRequestManager;
 
-        unsigned int _myRenderingCaps;
+        unsigned int         _myRenderingCaps;
+        unsigned int         _myMultisamples;
 
-        double                 _myElapsedTime;
+        double               _myElapsedTime;
 
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
 
         void setGLContext(y60::GLContextPtr theContext) {
             _myGLContext = theContext;
         }
+
     private:
         AbstractRenderWindow();
         void ensureScene();

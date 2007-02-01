@@ -23,9 +23,9 @@
 
     window = new RenderWindow();
     if (operatingSystem() == "Linux") {
-        window.multisamplingFactor = 4;
+        window.multisamples = 4;
     } else {
-        window.multisamplingFactor = 8;
+        window.multisamples = 8;
     }
 
     var ourShow = new SceneViewer(arguments);

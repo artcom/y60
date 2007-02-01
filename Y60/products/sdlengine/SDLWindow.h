@@ -116,8 +116,8 @@ namespace y60 {
             int getSwapInterval();
 
             // Sets the number of multisampling samples (e.g. 1, 2, 4, 8)
-            void setMultisampling(unsigned theSize);
-            unsigned getMultisampling();
+            virtual void setMultisamples(unsigned theSampleSize);
+            virtual unsigned getMultisamples();
 
             //////////////////////////////////////////////////////////////////////////
 
@@ -165,7 +165,6 @@ namespace y60 {
             SDL_Surface * _myScreen;
             unsigned    _mySwapInterval;
             unsigned    _myLastSwapCounter;
-            unsigned    _myMultiSampleSize;
     };
 
 }

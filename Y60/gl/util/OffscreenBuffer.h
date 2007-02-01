@@ -24,56 +24,56 @@ namespace y60 {
         public:        
             /**
             * Allows Offscreen rendering into a texture.
-            * Renders by default into the framebuffers back buffer
-            * Renders into an off screen framebuffer using the 
-            * EXT_framebuffer_object GL extension if 
-            * my rendercaps include y60::FRAMEBUFFER_SUPPORT
+            * Renders to an FBO by default but can fall-back to
+            * backbuffer rendering.
             */
-            OffscreenBuffer(bool theUseGLFramebufferObject = true);
+            OffscreenBuffer(bool theUseFBO = true);
             virtual ~OffscreenBuffer() {}
 
             /**
             * activate the image as render target and initializes FBO 
             * if necessary  
             */
-            void activate(asl::Ptr<Image, dom::ThreadingModel> theImage); 
+            void activate(asl::Ptr<Image, dom::ThreadingModel> theImage,
+                          unsigned theSamples = 1); 
+
             /**
-            * 
             * deactivates the image as render target   
-            * @param theCopyToImageFlag if true 
-            * the underlying raster value is ignored
-            * else the texture is copied into the raster.
+            * @param theCopyToImageFlag copy result to image raster.
             */
             void deactivate(asl::Ptr<Image, dom::ThreadingModel> theImage, 
                     bool theCopyToImageFlag = false); 
 
+        protected:
             /**
             * set to true if you want to render on a offscreen EXT_framebuffer_object
             * if false we render on the framebuffers back buffer
             */
-            inline void setUseGLFramebufferObject(bool theFlag) {
-                _myUseGLFramebufferObject = theFlag;
+            inline void setUseFBO(bool theFlag) {
+                _myUseFBO = theFlag;
             }
-            inline bool getUseGLFramebufferObject() {
-                return _myUseGLFramebufferObject;
+            inline bool getUseFBO() {
+                return _myUseFBO;
             }
 
-        protected:
-            void copyFrameBufferToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
+            void copyToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
+
         private:
             void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
-            void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);
+            void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture,
+                                          unsigned theSamples = 0);
             
-            bool _myUseGLFramebufferObject;
+            bool     _myUseFBO;
+            unsigned _myBlitFilter;
 
-            // OpenGl id of the frame buffer object
-            unsigned _myFrameBufferObjectId; 
+            // OpenGL id of frame buffer object
+            unsigned _myFrameBufferObject[2];
 
-            // OpenGl id of the offscreen depth buffer 
-            unsigned _myDepthBufferId;
+            // OpenGL id(s) of color buffer
+            unsigned _myColorBuffer[2];
 
-            // OpenGl id of the offscreen color buffer
-            unsigned _myColorBufferId;
+            // OpenGL id(s) of depth buffer 
+            unsigned _myDepthBuffer[2];
     };
 }
 

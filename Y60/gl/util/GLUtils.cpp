@@ -49,7 +49,7 @@ namespace y60 {
                     default:
                         myErrorString = "no description found, but the number is valid";
                         break;
-                };
+                }
             }
             throw OpenGLException("OpenGL error: #(" + asl::as_string(err) + ") " +
                 myErrorString, theLocation);
@@ -820,8 +820,14 @@ void * aglGetProcAddress (char * pszProc)
             SET_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
         }
 #endif
+#ifdef GL_EXT_framebuffer_blit
+        if (queryOGLExtension("GL_EXT_framebuffer_blit")) {
+            SET_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXT, glBlitFramebufferEXT);
+        }
+#endif
 #ifdef GL_EXT_framebuffer_multisample
         if (queryOGLExtension("GL_EXT_framebuffer_multisample")) {
+            SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXT, glRenderbufferStorageMultisampleEXT);
         }
 #endif
 

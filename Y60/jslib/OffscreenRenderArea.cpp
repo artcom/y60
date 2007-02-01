@@ -30,7 +30,7 @@ OffscreenRenderArea::create() {
 }
 
 OffscreenRenderArea::OffscreenRenderArea() :
-    AbstractRenderWindow(JSApp::ShellErrorReporter),
+    OffscreenBuffer(), AbstractRenderWindow(JSApp::ShellErrorReporter),
     _myWidth(0),
     _myHeight(0)
 {
@@ -46,7 +46,6 @@ OffscreenRenderArea::OffscreenRenderArea() :
     }
 }
 
-
 OffscreenRenderArea::~OffscreenRenderArea() {
 }
 
@@ -60,16 +59,18 @@ void OffscreenRenderArea::initDisplay() {
 
 void
 OffscreenRenderArea::activate() {
+    AC_TRACE << "OffscreenRenderArea::activate";
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::activate has no canvas / image to render... ignoring";
         return;
     }
-    y60::OffscreenBuffer::activate(myTexture);
+    y60::OffscreenBuffer::activate(myTexture, getMultisamples());
 }
 
 void
 OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
+    AC_TRACE << "OffscreenRenderArea::deactivate";
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::deactivate has no canvas / image to render... ignoring";
@@ -94,7 +95,7 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
         _myScene->updateAllModified();
     }
 
-    y60::OffscreenBuffer::activate(myTexture);
+    activate(); //y60::OffscreenBuffer::activate(myTexture);
     clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     {
@@ -104,7 +105,7 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
         postRender();
     }
 
-    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
+    deactivate(theCopyToImageFlag);
 }
 
 void
@@ -115,19 +116,17 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
     ImagePtr myImage = theImageNode->getFacade<Image>();
     ResizeableRasterPtr myRaster = myImage->getRasterPtr();
 
-    if (myRaster->width() != getWidth() ||
-        myRaster->height() != getHeight())
-    {
+    if (myRaster->width() != getWidth() || myRaster->height() != getHeight()) {
         myRaster->resize(getWidth(), getHeight());
     }
 
-    copyFrameBufferToImage( myImage );
+    OffscreenBuffer::copyToImage(myImage);
 }
 
 void
 OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
-    OffscreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
+    OffscreenBuffer::setUseFBO(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
 }
 
 void

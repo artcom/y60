@@ -46,6 +46,7 @@ namespace jslib {
         _myEventListener(0),
         _myJSContext(0),
         _myRenderingCaps(~0), // enable all (~)
+        _myMultisamples(0),
         _myErrorReporter(theErrorReporter),
         _myFixedDeltaT(0.0),
         _myStartTime(-1.0), _myElapsedTime(0.0),

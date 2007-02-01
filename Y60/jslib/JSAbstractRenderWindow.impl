@@ -888,6 +888,7 @@ JSPropertySpec * JSAbstractRenderWindow<DERIVED>::BaseProperties() {
         {"glExtensionStrings",PROP_glExtensionStrings,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
         {"fixedFrameTime",  PROP_fixedFrameTime,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
         {"fps",             PROP_fps,               JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
+        {"multisamples",    PROP_multisamples,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
         {"wireframe",       PROP_wireframe,         JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"drawnormals",     PROP_drawnormals,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"lighting",        PROP_lighting,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -989,6 +990,9 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
             return JS_TRUE;
         case PROP_fps:
             *vp = as_jsval(cx, theNative.getFrameRate());
+            return JS_TRUE;
+        case PROP_multisamples:
+            *vp = as_jsval(cx, theNative.getMultisamples());
             return JS_TRUE;
         default:
             JS_ReportError(cx,"JSAbstractRenderWindow::getProperty: index %d out of range", theID);
@@ -1094,6 +1098,11 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
             {
                 typedef void (DERIVED::*MyMethod)(const double &);
                 return Method<DERIVED>::call((MyMethod)&DERIVED::setFixedDeltaT, cx, obj, 1, vp, &dummy);
+            }
+        case PROP_multisamples:
+            {
+                typedef void (DERIVED::*MyMethod)(unsigned);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::setMultisamples, cx, obj, 1, vp, &dummy);
             }
         default:
             JS_ReportError(cx,"JSAbstractRenderWindow::setPropertySwitch: index %d out of range", theID);

@@ -307,7 +307,6 @@ JSRenderWindow::Properties() {
         {"screenSize",          PROP_screenSize,         JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"position",            PROP_position,           JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
         {"swapInterval",        PROP_swapInterval,       JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"multisamplingFactor", PROP_multisamplingFactor,       JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -346,9 +345,6 @@ JSRenderWindow::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
         case PROP_swapInterval:
             *vp = as_jsval(cx, myObj.getNative().getSwapInterval());
             return JS_TRUE;
-        case PROP_multisamplingFactor:
-            *vp = as_jsval(cx, myObj.getNative().getMultisampling());
-            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
     }
@@ -381,8 +377,6 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
             return Method<SDLWindow>::call(&SDLWindow::setPosition, cx, obj, 1, vp, &dummy);
         case PROP_swapInterval:
             return Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
-        case PROP_multisamplingFactor:
-            return Method<SDLWindow>::call(&SDLWindow::setMultisampling, cx, obj, 1, vp, &dummy);
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }

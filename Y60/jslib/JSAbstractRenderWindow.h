@@ -35,6 +35,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             PROP_height,
             PROP_fixedFrameTime,
             PROP_fps,
+            PROP_multisamples,
             // renderer information
             PROP_renderingCaps,
             PROP_glVersionString,
