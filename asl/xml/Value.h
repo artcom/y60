@@ -1606,6 +1606,8 @@ namespace dom {
         ProtoMap _myPrototypes;
     };
 
+    typedef asl::Ptr<ValueFactory> ValueFactoryPtr;
+
     extern void registerStandardTypes(ValueFactory & theFactory);
 
     /* @} */
