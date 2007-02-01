@@ -120,6 +120,8 @@ class ASSDriver :
         asl::Unsigned64              _myIDCounter;
 
         dom::NodePtr                 _myTransform;
+        dom::NodePtr                 _myEventSchema;
+        asl::Ptr<dom::ValueFactory>  _myValueFactory;
 };
 
 }

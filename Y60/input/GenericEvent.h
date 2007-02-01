@@ -19,17 +19,21 @@ namespace y60 {
 
 class GenericEvent : public Event {
     public:
-        GenericEvent(const std::string & theCallback = std::string(""));
+        GenericEvent(const std::string & theCallback = std::string(""),
+                     const dom::NodePtr & theSchemaDoc = dom::NodePtr(0),
+                     const dom::ValueFactoryPtr & theValueFactory = dom::ValueFactoryPtr(0) );
+
         GenericEvent(const dom::NodePtr & theNode);
 
         virtual EventPtr copy() const {
             return EventPtr( new GenericEvent( * this ) );
         }
 
+        dom::NodePtr getDocument() const;
         dom::NodePtr getNode() const;
         virtual dom::NodePtr asNode() const;
     private:
-        dom::NodePtr _myNode;
+        dom::NodePtr _myDocument;
 };
 
 typedef asl::Ptr<GenericEvent> GenericEventPtr;

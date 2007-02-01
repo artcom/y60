@@ -12,31 +12,48 @@
 
 namespace y60 {
 
-GenericEvent::GenericEvent(const std::string & theCallback) :
+GenericEvent::GenericEvent(const std::string & theCallback, 
+                           const dom::NodePtr & theSchemaDoc,
+                           const dom::ValueFactoryPtr & theValueFactory) :
     Event( GENERIC ),
-    _myNode( new dom::Element("generic") )
+    _myDocument( new dom::Document() )
 {
-    _myNode->appendAttribute("when", double( when ));
+
+
+    if ( theValueFactory ) {
+        _myDocument->setValueFactory( theValueFactory );
+    }
+    if ( theSchemaDoc ) {
+        _myDocument->addSchema( * theSchemaDoc, "" );
+    }
+
+    _myDocument->appendChild( dom::NodePtr( new dom::Element("generic")) );
+    _myDocument->firstChild()->appendAttribute("when", double( when ));
     if ( ! theCallback.empty()) {
-        _myNode->appendAttribute("callback", theCallback);
+        _myDocument->firstChild()->appendAttribute("callback", theCallback);
     }
 }
 
 GenericEvent::GenericEvent(const dom::NodePtr & theNode) :
     Event( GENERIC ),
-    _myNode( theNode )
+    _myDocument( new dom::Document() )
 {
-    _myNode->appendAttribute("when", double( when ));
+    _myDocument->appendChild( theNode );
 }
 
 dom::NodePtr
 GenericEvent::asNode() const {
-    return _myNode;
+    return _myDocument->firstChild();
 }
 
 dom::NodePtr 
 GenericEvent::getNode() const {
-    return _myNode;
+    return _myDocument->firstChild();
+}
+
+dom::NodePtr 
+GenericEvent::getDocument() const {
+    return _myDocument;
 }
 
 }

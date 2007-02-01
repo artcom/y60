@@ -30,6 +30,8 @@
 using namespace asl;
 using namespace y60;
 
+extern std::string oureventxsd;
+
 const unsigned char myMagicToken( 255 ); 
 
 static const char * RAW_RASTER = "ASSRawRaster";
@@ -55,11 +57,17 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 30 ),
     _myPower(1),
-    _myIDCounter( 0 )
+    _myIDCounter( 0 ),
+    _myEventSchema( new dom::Document( oureventxsd ) ),
+    _myValueFactory( new dom::ValueFactory() )
+
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
     setState(SYNCHRONIZING);
+
+    registerStandardTypes( * _myValueFactory );
+    registerSomTypes( * _myValueFactory );
 }
 
 ASSDriver::~ASSDriver() {
@@ -337,10 +345,12 @@ y60::GenericEventPtr
 ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
         const Vector2f & thePosition, const Matrix4f & theTransform)
 {
-    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
-    myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", theID);
-    myEvent->getNode()->appendAttribute<std::string>("type", theType);
-    myEvent->getNode()->appendAttribute<Vector2f>("raw_position", thePosition);
+    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema, _myValueFactory));
+    dom::NodePtr myNode = myEvent->getNode();
+    
+    myNode->appendAttribute<Unsigned64>("cursor_id", theID);
+    myNode->appendAttribute<std::string>("type", theType);
+    myNode->appendAttribute<Vector2f>("raw_position", thePosition);
     Vector4f myHPosition;
     myHPosition[0] = thePosition[0];
     myHPosition[1] = thePosition[1];
@@ -351,7 +361,7 @@ ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
     my3DPosition[0] = myHPosition[0];
     my3DPosition[1] = myHPosition[1];
     my3DPosition[2] = myHPosition[2];
-    myEvent->getNode()->appendAttribute<Vector3f>("position3D", my3DPosition);
+    myNode->appendAttribute<Vector3f>("position3D", my3DPosition);
     return myEvent;
 }
 
