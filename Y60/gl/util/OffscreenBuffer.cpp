@@ -153,8 +153,8 @@ void OffscreenBuffer::copyToImage(ImagePtr theImage)
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
-        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
-        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        //glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
     }
 #endif
  
