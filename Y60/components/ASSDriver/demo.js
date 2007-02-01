@@ -234,7 +234,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.onMouseButton( theButton, theState, theX, theY);
     }
     self.onASSEvent = function( theNode ) {
-        print("event " + theNode.type + " at position: " + theNode.position3D );
+        if ( theNode.type != "move") {
+            print("event " + theNode.type + " at position: " + theNode.position3D );
+        }
     }
 
 }

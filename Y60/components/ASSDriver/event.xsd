@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- example node
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  cursor_id="19"
+                  type="move"
+                  raw_position="[9.22574,7.24158]"
+                  position3D="[44.8317,-15.4852,0]"/>
+    -->
+    <xs:simpleType name="Vector3f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:element name="generic">
+        <xs:complexType>
+            <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="callback" type="xs:string"/>
+            <xs:attribute name="cursor_id" type="xs:unsignedLong"/>
+            <xs:attribute name="type" type="xs:string"/>
+            <xs:attribute name="raw_position" type="Vector2f"/>
+            <xs:attribute name="position3D" type="Vector3f"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
