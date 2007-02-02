@@ -133,7 +133,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
        return _myRenderWindow.scene;
    }
 
-   self.setScene = function(theScene, theCanvas) {
+   self.setScene = function(theScene, theCanvas, theSwitchNodeFlag) {
        var myStatus = _myRenderWindow.setSceneAndCanvas(theScene, theCanvas);
        if (!myStatus) {
            throw new Exception("Could not load model", fileline());
@@ -142,7 +142,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
            self.prepareScene(null, null);
        } else {
            var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
-           self.prepareScene(theScene, myCanvas);
+           self.prepareScene(theScene, myCanvas, theSwitchNodeFlag);
        }
    }
 
@@ -661,7 +661,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myTSwitchNodes;
     }
 
-    self.prepareScene = function (theScene, theCanvas) {
+    self.prepareScene = function (theScene, theCanvas, theSwitchNodeFlag) {
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
@@ -682,8 +682,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             } else {
                 self.setCanvas(_myRenderWindow.canvas);
             }
-
-            collectAllSwitchNodes(theScene);
+            if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
+                collectAllSwitchNodes(theScene);
+            }
 
         } else {
             Logger.trace("prepareScene has no scene");

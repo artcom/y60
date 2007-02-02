@@ -446,7 +446,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps & (~theCapability);
     }
-    self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene) {
+    self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
         if (window == null) {
             window = new RenderWindow();
@@ -477,7 +477,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             myScene.setup();
         }
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        self.setScene(myScene, myCanvas);
+        self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();
 
         // Turn on sync to V-Blank
