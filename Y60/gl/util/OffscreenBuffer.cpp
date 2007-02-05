@@ -1,5 +1,4 @@
 //============================================================================
-//
 // Copyright (C) 2005-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
@@ -125,6 +124,7 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag)
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         }
 
+        // generate mipmap levels
         if (IS_SUPPORTED(glGenerateMipmapEXT) && theImage->get<ImageMipmapTag>()) {
             AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
             glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
@@ -135,9 +135,17 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag)
     else
 #endif
     {
+        // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
                 0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>());
+
+        // generate mipmap levels
+        if (IS_SUPPORTED(glGenerateMipmapEXT) && theImage->get<ImageMipmapTag>()) {
+            AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
+            glGenerateMipmapEXT(GL_TEXTURE_2D);
+        }
+
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -149,12 +157,15 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag)
 
 void OffscreenBuffer::copyToImage(ImagePtr theImage)
 {
-    AC_TRACE << "OffscreenBuffer::copyToImage";
+    AC_TRACE << "OffscreenBuffer::copyToImage id=" << theImage->get<IdTag>();
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
-        //glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if multisampling is enabled
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        } else {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        }
     }
 #endif
  
