@@ -207,7 +207,11 @@ void OffscreenBuffer::copyToImage(ImagePtr theImage)
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if multisampling is enabled
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        } else {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        }
     }
 #endif
 }
