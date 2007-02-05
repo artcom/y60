@@ -10,9 +10,7 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas) {
-    const DUMP_IMAGE = false;
-
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas, theUseFBOFlag) {
     this.overlays getter = function() {
         return _myCanvas.firstChild.childNode("overlays"); 
     }
@@ -56,10 +54,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         self.image = theImage;    
         self.image.name = "Offscreen Buffer";
         // Flip vertically since framebuffer content is upside-down
-        var myMirrorMatrix = new Matrix4f;
-        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-        self.image.matrix.postMultiply(myMirrorMatrix);
-
+        /* var myMirrorMatrix = new Matrix4f;
+           myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+           self.image.matrix.postMultiply(myMirrorMatrix);
+        */
+        
         // Create canvas for offscreen render area
         if (theCanvas) {
             _myCanvas = theCanvas;
@@ -81,6 +80,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
 
         // Setup offscreen render area
         _myOffscreenRenderArea = new OffscreenRenderArea();
+        if (theUseFBOFlag) {
+            _myOffscreenRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
+            _myOffscreenRenderArea.multisamples = 8;
+        }
+
         _myOffscreenRenderArea.scene = window.scene;
         _myOffscreenRenderArea.canvas = _myCanvas;
         print(_myOffscreenRenderArea.width + "x" + _myOffscreenRenderArea.height);
@@ -109,6 +113,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
         self.image.matrix.makeIdentity();
         self.image.matrix.postMultiply(myMirrorMatrix);
+        
     }
     
     this.setBody = function(theNode) {
@@ -125,25 +130,34 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myCanvas.firstChild.camera = self.camera.id;
     }
 
-    this.render = function() {
+    this.render = function(theReadbackFlag) {
+        if (theReadbackFlag == undefined) {
+            theReadbackFlag = false;
+        }
+
         var myVisibleNodes = [];
-        for (var i = 0; i < window.scene.world.childNodesLength(); ++i) {
-            var myNode = window.scene.world.childNode(i);
-            if (myNode.visible && !isOffscreenNode(myNode) && myNode.nodeName != "light") {
-                myNode.visible = false;
-                myVisibleNodes.push(myNode);
+        var myIsWorld = false;
+        if (_myOffscreenNodes.length == 1 && _myOffscreenNodes[0].nodeName == "world") {
+            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
+        } else {  
+            for (var i = 0; i < window.scene.world.childNodesLength(); ++i) {
+                var myNode = window.scene.world.childNode(i);
+                if (myNode.visible && !isOffscreenNode(myNode) && myNode.nodeName != "light") {
+                    myNode.visible = false;
+                    myVisibleNodes.push(myNode);
+                }
+            }
+
+            offscreenVisible(true);
+            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
+            offscreenVisible(false);
+
+            for (var i = 0; i < myVisibleNodes.length; ++i) {
+                myVisibleNodes[i].visible = true;
             }
         }
-        offscreenVisible(true);
-        _myOffscreenRenderArea.renderToCanvas(DUMP_IMAGE);
-        offscreenVisible(false);
-
-        for (var i = 0; i < myVisibleNodes.length; ++i) {
-            myVisibleNodes[i].visible = true;
-        }
-
-        if (DUMP_IMAGE) {
-            saveImage(this.image, "test.png");
+        if (theReadbackFlag) {
+            saveImage(this.image, "dump_"+this.image.id+".png");
         }
     }
 
