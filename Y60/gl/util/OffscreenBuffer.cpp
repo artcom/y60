@@ -218,6 +218,9 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
 #ifdef GL_EXT_framebuffer_object
     if (!_myFrameBufferObject[0]) {
 
+        /*
+         * create FBO
+         */
         if (theSamples >= 1) {
 
             /*
@@ -225,7 +228,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
              */
             unsigned myWidth = theImage->get<ImageWidthTag>();
             unsigned myHeight = theImage->get<ImageHeightTag>();
-            AC_DEBUG << "Using FBO multisampling samples=" << theSamples << " size=" << myWidth << "x" << myHeight;
+            AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup multisample framebuffer multisampling samples=" << theSamples << " size=" << myWidth << "x" << myHeight;
 
             // color buffer
             glGenRenderbuffersEXT(1, &_myColorBuffer[1]);
@@ -256,21 +259,21 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         /*
          * setup render-to-texture framebuffer
          */
+        _myColorBuffer[0] = theImage->ensureTextureId();
+        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup RTT framebuffer, textureID=" << _myColorBuffer[0];
 
         // framebuffer
         glGenFramebuffersEXT(1, &_myFrameBufferObject[0]);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
 
         // color buffer
-        _myColorBuffer[0] = theImage->ensureTextureId();
         glBindTexture(GL_TEXTURE_2D, _myColorBuffer[0]);
-
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
                 GL_TEXTURE_2D, _myColorBuffer[0], 0);
         checkOGLError(PLUS_FILE_LINE);
 
         if (theSamples == 0) {
-            // depth buffer
+            // depth buffer (only necessary when not multisampling)
             glGenRenderbuffersEXT(1, &_myDepthBuffer[0]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
             glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 
@@ -285,21 +288,27 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         checkFramebufferStatus();
     } else {
 
-        // bind FBO
+        /*
+         * bind FBO
+         */
+
+        // rebind texture if target image has changed
+        if (theImage->ensureTextureId() != _myColorBuffer[0]) {
+            _myColorBuffer[0] = theImage->ensureTextureId(); 
+            AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer re-binding textureID=" << _myColorBuffer[0];
+
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                GL_TEXTURE_2D, _myColorBuffer[0], 0);            
+            checkOGLError(PLUS_FILE_LINE);
+            // leave it bound, will be overwritten shortly
+        }
+
         if (theSamples >= 1) {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
             glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
         } else {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
-        }
-
-        // If the target image changed between two frames the framebuffer texture needs
-        // to be bound again
-        if (theImage->ensureTextureId() != _myColorBuffer[0]) {
-            AC_DEBUG << "Re-binding texture";
-            _myColorBuffer[0] = theImage->ensureTextureId(); 
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                GL_TEXTURE_2D, _myColorBuffer[0], 0);            
         }
     }
 #else

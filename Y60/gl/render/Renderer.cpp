@@ -1227,7 +1227,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                     glDisable(GL_ALPHA_TEST);
                     CHECK_OGL_ERROR;
 
-                    int i = 0;
+                    //int i = 0;
                     bool currentMaterialHasAlpha = false;
                     for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
                         if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
