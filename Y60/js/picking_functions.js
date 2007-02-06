@@ -85,6 +85,11 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         }
     }
 
+    obj.pickPointOnPlane = function( theScreenX, theScreenY, thePlane) {
+        var myRay = getCameraToScreenRay( theScreenX, theScreenY);
+        return intersection( myRay, thePlane );
+    }
+
     obj.pickBodyBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixelY, theSphereRadius, theRootNode)
     {
         var myClosestBody = null;

@@ -913,6 +913,10 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             myStatus = ObjectObjectResultFunction((LineSegmentLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
+            typedef bool (*LineSegmentLineSegmentIntersection)(const LineSegment<LineNumber> &, const asl::LineSegment<LineNumber> &, Point3<LineNumber> &);
+            myStatus = ObjectObjectResultFunction((LineSegmentLineSegmentIntersection)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
+
             // Box / Frustum
             typedef bool (*BoxFrustumIntersection)(const Box3<TriangleNumber>&, const Frustum &);
             myStatus = ObjectObjectFunction((BoxFrustumIntersection)&intersection, cx, myObj0, myObj1, rval);

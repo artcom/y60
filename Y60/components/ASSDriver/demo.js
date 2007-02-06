@@ -42,8 +42,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myGroup = null;
     var _myDisplaySize3D = null;
     var _myBoxShape = null;
-    var _myMarkerGroup = null;
-    var _myBox
+
+    var _myLastEventTime = 0;
 
     var _myLastFrameTime = 0.0;
     //////////////////////////////////////////////////////////////////////
@@ -234,9 +234,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.onMouseButton( theButton, theState, theX, theY);
     }
     self.onASSEvent = function( theNode ) {
-        if ( theNode.type != "move") {
-            print("event " + theNode.type + " at position: " + theNode.position3D );
-        }
+        print("event " + theNode.type + " at position: " + theNode.position3D +
+                " dt: " + (theNode.when - _myLastEventTime));
+        _myLastEventTime = theNode.when;
     }
 
 }
