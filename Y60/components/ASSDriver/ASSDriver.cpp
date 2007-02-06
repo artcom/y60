@@ -43,6 +43,11 @@ static const char * DriverStateStrings[] = {
     ""
 };
 
+#ifdef OSX
+#undef verify
+#endif
+
+
 IMPLEMENT_ENUM( DriverState, DriverStateStrings );
 
 

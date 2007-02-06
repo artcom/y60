@@ -151,7 +151,7 @@ static void BitsPerByte(void)
     bpb = 8;
 }
 
-int main(int argc, char **argv)
+int my2main(int argc, char **argv)
 {
     int sizeof_char, sizeof_short, sizeof_int, sizeof_int64, sizeof_long,
         sizeof_float, sizeof_double, sizeof_word, sizeof_dword;

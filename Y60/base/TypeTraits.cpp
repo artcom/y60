@@ -9,6 +9,9 @@
 //============================================================================
 
 #include "TypeTraits.h"
+#ifdef OSX
+#undef verify
+#endif
 
 IMPLEMENT_ENUM(y60::TypeId, y60::TypeIdStrings);
 

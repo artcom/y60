@@ -829,8 +829,8 @@ js_map_atom(JSHashEntry *he, intN i, void *arg)
 }
 
 #ifdef DEBUG
-jsrefcount js_atom_map_count;
-jsrefcount js_atom_map_hash_table_count;
+jsrefcount js_atom_map_count = 0;
+jsrefcount js_atom_map_hash_table_count = 0;
 #endif
 
 JS_FRIEND_API(JSBool)

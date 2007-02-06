@@ -222,6 +222,10 @@ public:
         ENSURE(!isDirectory("../../testdir/a"));
 //        ENSURE(isDirectory("../../testdir/.svn"));
 
+		std::string myAppDir = getAppDirectory();
+		DPRINT(myAppDir);
+        ENSURE(isDirectory(myAppDir));
+
         // last modified stuff
         std::string myFile = "../../dates.tst";
         writeFile(myFile, "foo");
@@ -248,8 +252,6 @@ public:
             DPRINT(myTime);
             ENSURE_EQUAL(myTime, getLastModified(myFile));
         }
-
-        
     }
 };
 

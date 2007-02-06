@@ -44,6 +44,11 @@
 #include <unistd.h>
 #include <utime.h>
 #endif
+#ifdef OSX
+    #include <Types.h>
+    #include <Files.h>
+    #include <Processes.h>
+#endif
 
 #define DB(x) // x
 
@@ -516,30 +521,52 @@ namespace asl {
         return myAppDirectory+"/";
     }
 
-std::string getAppDirectory() {
-    std::string strAppDirectory;
+    std::string getAppDirectory() {
+        std::string strAppDirectory;
 #ifdef WIN32
-    char szAppPath[MAX_PATH] = "";
+        char szAppPath[MAX_PATH] = "";
 
-    ::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-    // Extract directory
-    strAppDirectory = Path(szAppPath, Locale).toUTF8();
-    strAppDirectory = strAppDirectory.substr(0, strAppDirectory.rfind("\\"));
+        ::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
+        // Extract directory
+        strAppDirectory = Path(szAppPath, Locale).toUTF8();
+        strAppDirectory = strAppDirectory.substr(0, strAppDirectory.rfind("\\"));
 #else
-    char buffer[256];
-    char appPath[4096];
-    snprintf(buffer, sizeof(buffer), "/proc/%d/exe", getpid());
-    int myBufferSize = readlink(buffer, appPath, sizeof(appPath)-1); // room for nul char
-    if (myBufferSize < 0) { 
-        throw GetAppDirectoryFailed(std::string("readlink failed for '") + buffer + "'", PLUS_FILE_LINE);
-    }
-    appPath[myBufferSize] = 0;
-    strAppDirectory = std::string(getDirectoryPart(Path(appPath, Locale).toUTF8()));
-#endif
-    return strAppDirectory;
-}
+#ifdef LINUX
+        char buffer[256];
+        char appPath[4096];
+        snprintf(buffer, sizeof(buffer), "/proc/%d/exe", getpid());
+        int myBufferSize = readlink(buffer, appPath, sizeof(appPath)-1); // room for nul char
+        if (myBufferSize < 0) { 
+            throw GetAppDirectoryFailed(std::string("readlink failed for '") + buffer + "'", PLUS_FILE_LINE);
+        }
+        appPath[myBufferSize] = 0;
+        strAppDirectory = std::string(getDirectoryPart(Path(appPath, Locale).toUTF8()));
+#else
+#ifdef OSX
+        CFBundleRef myAppsBundle = CFBundleGetMainBundle();
+        if (myAppsBundle == NULL) throw GetAppDirectoryFailed(std::string("CFBundleGetMainBundle failed") 
+                , PLUS_FILE_LINE);
 
-std::string 
+        //        CFURLRef myBundleURL = CFBundleCopyExecutableURL(myAppsBundle);
+        CFURLRef myBundleURL = CFBundleCopyBundleURL(myAppsBundle);
+        if (myBundleURL == NULL) throw GetAppDirectoryFailed(std::string("CFBundleCopyBundleURL failed, error=") 
+                , PLUS_FILE_LINE);
+
+        CFStringRef myPath = CFURLCopyFileSystemPath(myBundleURL,  kCFURLPOSIXPathStyle);
+        CFRelease(myBundleURL);
+        char * myPathCP = NewPtr(CFStringGetLength(myPath)+1);
+        CFStringGetCString(myPath, myPathCP, CFStringGetLength(myPath)+1, kCFStringEncodingUTF8);
+        strAppDirectory = myPathCP;
+        CFRelease(myPath);
+        DisposePtr(myPathCP);
+        return strAppDirectory; 
+#endif
+#endif
+#endif
+        return strAppDirectory;
+    }
+
+    std::string 
 getCWD() {
 #ifdef WIN32    
     return std::string(_getcwd( NULL, 0 ));
