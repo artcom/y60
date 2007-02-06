@@ -203,7 +203,8 @@ namespace y60 {
             myTexture->setTextureManager(theTextureManager);
             _myTextures.push_back(myTexture);
             ImagePtr myImage = myTexture->getImage();
-            if (myImage) {
+            //AC_DEBUG << "addTexture triggering image upload imgId=" << myImage->get<IdTag>() << " texId=" << myImage->getGraphicsId();
+            if (myImage && myImage->getGraphicsId() == 0) {
                 myImage->triggerUpload();
             }
         } else {

@@ -240,8 +240,14 @@ DEF_PROC_ADDRESS( PFNGLCOPYTEXSUBIMAGE3DPROC, glCopyTexSubImage3D );
 #ifdef GL_EXT_framebuffer_object
 DEF_PROC_ADDRESS( PFNGLGENRENDERBUFFERSEXTPROC, glGenRenderbuffersEXT );
 #define glGenRenderbuffersEXT _ac_glGenRenderbuffersEXT
+DEF_PROC_ADDRESS( PFNGLDELETERENDERBUFFERSEXTPROC, glDeleteRenderbuffersEXT );
+#define glDeleteRenderbuffersEXT _ac_glDeleteRenderbuffersEXT
+
 DEF_PROC_ADDRESS( PFNGLGENFRAMEBUFFERSEXTPROC, glGenFramebuffersEXT );
 #define glGenFramebuffersEXT _ac_glGenFramebuffersEXT
+DEF_PROC_ADDRESS( PFNGLDELETEFRAMEBUFFERSEXTPROC, glDeleteFramebuffersEXT );
+#define glDeleteFramebuffersEXT _ac_glDeleteFramebuffersEXT
+
 DEF_PROC_ADDRESS( PFNGLBINDFRAMEBUFFEREXTPROC, glBindFramebufferEXT );
 #define glBindFramebufferEXT _ac_glBindFramebufferEXT
 DEF_PROC_ADDRESS( PFNGLBINDRENDERBUFFEREXTPROC, glBindRenderbufferEXT );

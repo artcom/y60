@@ -810,7 +810,11 @@ void * aglGetProcAddress (char * pszProc)
         if (queryOGLExtension("GL_EXT_framebuffer_object")) {
             //these are not all but just those needed in OffScreenRenderArea
             SET_PROC_ADDRESS( PFNGLGENRENDERBUFFERSEXTPROC, glGenRenderbuffersEXT );
+            SET_PROC_ADDRESS( PFNGLDELETERENDERBUFFERSEXTPROC, glDeleteRenderbuffersEXT );
+
             SET_PROC_ADDRESS( PFNGLGENFRAMEBUFFERSEXTPROC, glGenFramebuffersEXT );
+            SET_PROC_ADDRESS( PFNGLDELETEFRAMEBUFFERSEXTPROC, glDeleteFramebuffersEXT );
+
             SET_PROC_ADDRESS( PFNGLBINDFRAMEBUFFEREXTPROC, glBindFramebufferEXT );
             SET_PROC_ADDRESS( PFNGLBINDRENDERBUFFEREXTPROC, glBindRenderbufferEXT );
             SET_PROC_ADDRESS( PFNGLFRAMEBUFFERTEXTURE2DEXTPROC, glFramebufferTexture2DEXT );

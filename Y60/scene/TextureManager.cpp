@@ -70,6 +70,7 @@ namespace y60 {
     }
     void
     TextureManager::unbindTextures() {
+        AC_DEBUG << "TextureManager::unbindTextures";
         unsigned myImageCount = _myImageList->childNodesLength();
         for (unsigned i = 0; i < myImageCount; ++i) {
             dom::NodePtr myImageNode = _myImageList->childNode(i);
@@ -179,7 +180,7 @@ namespace y60 {
 
     void TextureManager::unbindTexture(Image * theImage) {
         // Delegate to my ResourceManager
-        AC_TRACE << "Unbinding Texture " << theImage->get<TextureIdTag>();
+        //AC_TRACE << "Unbinding Texture " << theImage->get<TextureIdTag>();
         theImage->removeTextureFromResourceManager();
         //_myResourceManager->unbindTexture(theImage);
     }

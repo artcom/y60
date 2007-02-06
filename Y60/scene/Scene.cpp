@@ -1321,7 +1321,7 @@ namespace y60 {
     }
 
     void
-        Scene::collectReferences(NodePtr theNode, std::set<string> & theReferences) {
+    Scene::collectReferences(NodePtr theNode, std::set<string> & theReferences) {
         for (unsigned i = 0; i < theNode->attributes().length(); ++i) {
             NodePtr myAttribute = theNode->attributes().item(i);
             if (myAttribute->nodeValueTypeName() == "IDREF") {

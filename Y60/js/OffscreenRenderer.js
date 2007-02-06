@@ -52,7 +52,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         }
 
         self.image = theImage;    
-        self.image.name = "Offscreen Buffer";
+        self.image.name = "OffscreenBuffer_Image";
+
         // Flip vertically since framebuffer content is upside-down
         /* var myMirrorMatrix = new Matrix4f;
            myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
@@ -76,6 +77,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
             window.scene.canvases.appendChild(_myCanvas);
             _myCanvas.firstChild.camera = self.camera.id;
         }
+        _myCanvas.name = "OffscreenBuffer_Canvas";
         _myCanvas.target = self.image.id;
 
         // Setup offscreen render area
@@ -87,7 +89,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
 
         _myOffscreenRenderArea.scene = window.scene;
         _myOffscreenRenderArea.canvas = _myCanvas;
-        print(_myOffscreenRenderArea.width + "x" + _myOffscreenRenderArea.height);
+        //print(_myOffscreenRenderArea.width + "x" + _myOffscreenRenderArea.height);
 
         _myOffscreenRenderArea.eventListener = _myOffscreenRenderArea;
     }

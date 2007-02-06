@@ -80,6 +80,7 @@ namespace y60 {
     Image::~Image() {
         if (_myRessourceManager) {
             _myRessourceManager->unbindTexture(this);
+            unbind();
         }
     }
 
@@ -221,6 +222,7 @@ namespace y60 {
 
     void 
     Image::uploadTexture() {
+        AC_DEBUG << "uploadTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         ensureResourceManager();
         if (_myReuseRaster) { 
             _myRessourceManager->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
@@ -321,6 +323,8 @@ namespace y60 {
 
     dom::ResizeableRasterPtr
     Image::setRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth) {
+        //AC_DEBUG << "setRasterValue '" << get<NameTag>() << "' id=" << get<IdTag>();
+
         // Remove existing raster
         if (getNode().childNodes().size()) {
             getNode().childNodes().clear();
@@ -362,6 +366,7 @@ namespace y60 {
 
     void 
     Image::triggerUpload() {
+        //AC_DEBUG << "triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         _myReuseRaster = false;
         TextureIdTag::Plug::getValuePtr()->setDirty();
     }
@@ -373,11 +378,13 @@ namespace y60 {
 
     void 
     Image::removeTextureFromResourceManager() {
-        if (_myTextureId) {
-            ensureResourceManager();
-            _myRessourceManager->unbindTexture(this);
-            unbind();
+        //AC_DEBUG << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        if (_myTextureId == 0) {
+            return;
         }
+        ensureResourceManager();
+        _myRessourceManager->unbindTexture(this);
+        unbind();
     }
 
     TextureWrapMode
@@ -398,7 +405,12 @@ namespace y60 {
 
     void 
     Image::unbind() {
+        //AC_DEBUG << "unbind '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        if (_myTextureId == 0) {
+            return;
+        }
         _myTextureId = 0;
+        set<TextureIdTag>(_myTextureId);
         TextureIdTag::Plug::getValuePtr()->setDirty();
     }
 

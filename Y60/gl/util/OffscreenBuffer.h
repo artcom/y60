@@ -60,10 +60,14 @@ namespace y60 {
 
         private:
             void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
+
+            void reset();
+
             void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture,
                                           unsigned theSamples = 0);
             
             bool     _myUseFBO;
+            unsigned _myImageNodeVersion;
             unsigned _myBlitFilter;
 
             // OpenGL id of frame buffer object

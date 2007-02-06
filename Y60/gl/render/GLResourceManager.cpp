@@ -52,11 +52,10 @@ namespace y60 {
 
     unsigned
     GLResourceManager::setupTexture(ImagePtr theImage) {
-        AC_DEBUG << "setupTexture(" << theImage->get<NameTag>() << ")";
+        AC_DEBUG << "setupTexture '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>();
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         if (theImage->isUploaded()) {
-            AC_TRACE << "setupTexture('" << theImage->get<NameTag>() << "') called on an already setup texture" << endl;
             unbindTexture(&*theImage);
         }
 
@@ -101,30 +100,30 @@ namespace y60 {
 
     void
     GLResourceManager::unbindTexture(Image * theImage) {
-        AC_TRACE << "unbindTexture " << theImage->get<NameTag>();
-        if (hasGLContext()) {
-            unsigned myId = theImage->getGraphicsId();
-            if (myId) {
-                glDeleteTextures(1, &myId);
-                CHECK_OGL_ERROR;
-                theImage->unbind();
+        if (!hasGLContext()) {
+            return;
+        }
 
-                // adjust texmem usage
-                unsigned int myTopLevelTextureSize = theImage->getMemUsed();
-                //PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
-                //if (myPixelEncoding.compressedFlag) {
-                if (theImage->get<ImageMipmapTag>()) {
-                    _myTextureMemUsage -= myTopLevelTextureSize/3;
-                }
-                _myTextureMemUsage -= myTopLevelTextureSize;
-            }
+        unsigned myId = theImage->getGraphicsId();
+        AC_DEBUG << "unbindTexture '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>() << " texId=" << myId;
+        if (myId) {
+            glDeleteTextures(1, &myId);
+            CHECK_OGL_ERROR;
+            theImage->unbind();
 
-            unsigned int myBufferId = theImage->getPixelBufferId();
-            if (IS_SUPPORTED(glDeleteBuffersARB) && myBufferId) {
-                glDeleteBuffersARB(1, &myBufferId);
-                theImage->setPixelBufferId(0);
-                CHECK_OGL_ERROR;
+            // adjust texmem usage
+            unsigned int myTopLevelTextureSize = theImage->getMemUsed();
+            if (theImage->get<ImageMipmapTag>()) {
+                _myTextureMemUsage -= myTopLevelTextureSize/3;
             }
+            _myTextureMemUsage -= myTopLevelTextureSize;
+        }
+
+        unsigned int myBufferId = theImage->getPixelBufferId();
+        if (IS_SUPPORTED(glDeleteBuffersARB) && myBufferId) {
+            glDeleteBuffersARB(1, &myBufferId);
+            theImage->setPixelBufferId(0);
+            CHECK_OGL_ERROR;
         }
     }
 
@@ -193,11 +192,9 @@ namespace y60 {
             theImage->set<ImageDepthTag>(myDepth);
         }
 
-        bool myMipmapFlag = theImage->get<ImageMipmapTag>();
-
-        AC_DEBUG << "setupSingleTexture: name='"<<theImage->get<NameTag>()<<"',id='" <<
-            theImage->get<IdTag>()<<"',gfxid='" << theTextureId << "',size=" <<
-            myWidth << "x" << myHeight << "x" << myDepth << endl;
+        AC_DEBUG << "setupSingleTexture '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>() <<
+            " texId=" << theTextureId <<
+            " size=" << myWidth << "x" << myHeight << "x" << myDepth;
 
         if (myDepth == 1) {
             // 2D-Texture
@@ -231,6 +228,7 @@ namespace y60 {
         setupPixelTransfer(theImage);
 
         // disable mipmap for compressed textures
+        bool myMipmapFlag = theImage->get<ImageMipmapTag>();
         if (myPixelEncoding.compressedFlag && myMipmapFlag) {
             AC_DEBUG << "disabling mipmap for compressed texture: " << theImage->get<NameTag>() << endl;
             theImage->set<ImageMipmapTag>(false);
@@ -311,8 +309,8 @@ namespace y60 {
             unsigned int myTexWidth = nextPowerOfTwo(myWidth);
             unsigned int myTexHeight = nextPowerOfTwo(myHeight / myDepth);
             unsigned int myTexDepth = nextPowerOfTwo(myDepth);
-            AC_DEBUG << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
-            AC_DEBUG << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
+            AC_TRACE << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
+            AC_TRACE << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
 
             if (myDepth == 1) {
                 AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;

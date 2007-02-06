@@ -78,11 +78,12 @@ namespace y60 {
 
             void unbind();
             void removeTextureFromResourceManager();
+
+            // PBO usage
             virtual bool usePixelBuffer() const;
             void setPixelBufferId(unsigned theId) {
                 _myPixelBufferId = theId;
             }
-
             unsigned getPixelBufferId() const {
                 return _myPixelBufferId;
             }
