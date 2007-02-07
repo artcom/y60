@@ -265,7 +265,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         unsigned myWidth = asl::nextPowerOfTwo(theImage->get<ImageWidthTag>());
         unsigned myHeight = asl::nextPowerOfTwo(theImage->get<ImageHeightTag>());
 
-        if (theSamples >= 1) {
+        if (IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) && theSamples >= 1) {
 
             /*
              * setup multisample framebuffer

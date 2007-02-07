@@ -11,11 +11,16 @@
 use("Y60JSSL.js");
 
 function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas, theUseFBOFlag) {
+
     this.overlays getter = function() {
         return _myCanvas.firstChild.childNode("overlays"); 
     }
 
     this.underlays getter = function() {
+        if (!_myCanvas.firstChild.childNode("underlays")) {
+            var myUnderlayNode = new Node("<underlays/>");
+            _myCanvas.firstChild.appendChild(myUnderlayNode.firstChild);
+        }
         return _myCanvas.firstChild.childNode("underlays"); 
     }
 
@@ -84,7 +89,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myOffscreenRenderArea = new OffscreenRenderArea();
         if (theUseFBOFlag) {
             _myOffscreenRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
-            _myOffscreenRenderArea.multisamples = 8;
+            _myOffscreenRenderArea.multisamples = 0;
         }
 
         _myOffscreenRenderArea.scene = window.scene;
@@ -115,7 +120,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
         self.image.matrix.makeIdentity();
         self.image.matrix.postMultiply(myMirrorMatrix);
-        
     }
     
     this.setBody = function(theNode) {
