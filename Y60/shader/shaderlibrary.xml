@@ -1279,7 +1279,7 @@
     </shader>
      <shader id="s131" name="blur" cost="10">
        <supports>
-            <feature class="textures" values="[blur]"/>
+            <feature class="textures" values="[blur,blur]"/>
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>

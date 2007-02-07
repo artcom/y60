@@ -104,8 +104,6 @@ float4 mainFragment(v2f IN,
 
 #ifndef NOSHADOW
     color.xyz = myShadow.a * myShadow.rgb + (1-myShadow.a) * color.xyz;
-    //color.xyz = 0.5 * color.xyz + 0.5 * myShadow.rgb;
-    //    color.xyz = myShadow.rgb;
 #endif
 
     return color;
