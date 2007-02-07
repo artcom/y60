@@ -27,7 +27,7 @@ namespace y60 {
             * Renders to an FBO by default but can fall-back to
             * backbuffer rendering.
             */
-            OffscreenBuffer(bool theUseFBO = true);
+            OffscreenBuffer();
             virtual ~OffscreenBuffer() {}
 
             /**
@@ -49,10 +49,8 @@ namespace y60 {
             * set to true if you want to render on a offscreen EXT_framebuffer_object
             * if false we render on the framebuffers back buffer
             */
-            inline void setUseFBO(bool theFlag) {
-                _myUseFBO = theFlag;
-            }
-            inline bool getUseFBO() {
+            void setUseFBO(bool theFlag);
+            inline bool getUseFBO() const {
                 return _myUseFBO;
             }
 

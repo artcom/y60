@@ -78,6 +78,7 @@ namespace y60 {
         setupTextureParams(theImage, getTextureType(theImage));
         glPopAttrib();
         CHECK_OGL_ERROR;
+
         return myId;
     }
     
@@ -154,7 +155,7 @@ namespace y60 {
 
     void
     GLResourceManager::setTexturePriority(Image * theImage, float thePriority) {
-        unsigned myTextureId = theImage->ensureTextureId();
+        unsigned myTextureId = theImage->getGraphicsId();
         glPrioritizeTextures(1, &myTextureId, &thePriority);
     }
 
@@ -363,6 +364,8 @@ namespace y60 {
     void
     GLResourceManager::update2DTexture(ImagePtr theImage) {
 
+        AC_DEBUG << "GLResourceManager::update2DTexture '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>();
+
         GLsizei myWidth  = theImage->get<ImageWidthTag>();
         GLsizei myHeight = theImage->get<ImageHeightTag>();
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
@@ -423,7 +426,7 @@ namespace y60 {
         GLsizei myDepth  = theImage->get<ImageDepthTag>();
         void * myImageData = theImage->getRasterPtr()->pixels().begin();
 
-        glBindTexture(GL_TEXTURE_3D, theImage->ensureTextureId());
+        glBindTexture(GL_TEXTURE_3D, theImage->getGraphicsId());
 
         if (myPixelEncoding.compressedFlag) {
             glCompressedTexSubImage3DARB(GL_TEXTURE_3D, 0,
@@ -491,7 +494,7 @@ namespace y60 {
     GLResourceManager::setupCubemap(ImagePtr theImage, unsigned theTextureId)
     {
         unsigned int myId = theTextureId;
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myId);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, theTextureId);
         CHECK_OGL_ERROR;
 
         glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -569,13 +572,15 @@ namespace y60 {
         glPopAttrib();
         CHECK_OGL_ERROR;
 
-        return myId;
+        return theTextureId;
     }
 
     void
     GLResourceManager::updateCubemap(ImagePtr theImage) {
 
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, theImage->ensureTextureId());
+        AC_DEBUG << "GLResourceManager::updateCubemap '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>();
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, theImage->getGraphicsId());
         CHECK_OGL_ERROR;
 
         const asl::Vector2i myTileVec = theImage->get<ImageTileTag>();

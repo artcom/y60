@@ -405,10 +405,10 @@ namespace y60 {
 
     void 
     Image::unbind() {
-        //AC_DEBUG << "unbind '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         if (_myTextureId == 0) {
             return;
         }
+        AC_DEBUG << "Image::unbind '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         _myTextureId = 0;
         set<TextureIdTag>(_myTextureId);
         TextureIdTag::Plug::getValuePtr()->setDirty();

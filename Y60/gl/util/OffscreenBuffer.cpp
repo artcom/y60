@@ -84,12 +84,24 @@ static void checkFramebufferStatus()
 }
 
 
-OffscreenBuffer::OffscreenBuffer(bool theUseFBO) :
-    _myUseFBO(theUseFBO),
+OffscreenBuffer::OffscreenBuffer() :
+    _myUseFBO(true),
     _myImageNodeVersion(0),
     _myBlitFilter(GL_NEAREST)
 {
     reset();
+}
+
+
+void OffscreenBuffer::setUseFBO(bool theUseFlag)
+{
+#ifdef GL_EXT_framebuffer_object
+    if (!IS_SUPPORTED(glGenFramebuffersEXT)) {
+        AC_WARNING << "OffscreenBuffer::setUseFBO: OpenGL framebuffer extension is not supported";
+        theUseFlag = false;
+    }
+#endif
+    _myUseFBO = theUseFlag;
 }
 
 
@@ -172,8 +184,8 @@ void OffscreenBuffer::copyToImage(ImagePtr theImage)
     PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getRasterEncoding());
     myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(theImage->getInternalEncoding());
 
-    AC_DEBUG << "pixelformat " << theImage->get<RasterPixelFormatTag>();
-    AC_DEBUG << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
+    AC_TRACE << "pixelformat " << theImage->get<RasterPixelFormatTag>();
+    AC_TRACE << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
 
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
