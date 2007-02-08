@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas, theUseFBOFlag) {
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas, theUseFBOFlag, theMultisamples) {
     var self = this;
     
     self.overlays getter = function() {
@@ -88,8 +88,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         // Setup offscreen render area
         _myOffscreenRenderArea = new OffscreenRenderArea();
         if (theUseFBOFlag) {
+            
             _myOffscreenRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
-            _myOffscreenRenderArea.multisamples = 0;
+            if (theMultisamples) {
+                _myOffscreenRenderArea.multisamples = theMultisamples;
+            } else {
+                _myOffscreenRenderArea.multisamples = 0;
+            }
         }
 
         _myOffscreenRenderArea.scene = window.scene;
