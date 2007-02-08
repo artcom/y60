@@ -162,7 +162,9 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
                 myParent = theParent;
             }
         } else {
-            myParent = theScene.overlays;
+            // myParent = theScene.overlays;
+            myParent = theScene.canvases.firstChild.firstChild.firstChild;
+            Logger.info("Appending Overlay to first canvas in the scene.");
         }
 
         _myNode = myParent.appendChild(new Node("<overlay/>").firstChild);
