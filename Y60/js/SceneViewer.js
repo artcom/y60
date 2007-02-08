@@ -27,7 +27,6 @@ use("LightManager.js");
 use("DebugVisual.js");
 use("AnimationManager.js");
 use("ImageManager.js");
-use("OverlayManager.js");
 use("Timer.js");
 use("Configurator.js");
 use("shutter.js");
@@ -103,11 +102,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.getImageManager = function() {
         Logger.warning("ImageManager is deprecated.");
         return _myImageManager;
-    }
-
-    self.getOverlayManager = function() {
-        Logger.warning("OverlayManager is deprecated.");
-        return _myOverlayManager;
     }
 
     self.setSplashScreen = function(theFlag) {
@@ -500,9 +494,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // [CH]: Deprecated, should be removed someday
         _myImageManager = new ImageManager(self);
 
-        // [CH]: Deprecated, should be removed someday
-        _myOverlayManager = new OverlayManager(self.getScene(), myViewport);
-
         _myConfigurator = new Configurator(self, SETTINGS_FILE_NAME);
 
         if (theWindowTitle != null) {
@@ -626,7 +617,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myDebugVisual           = null;
     var _myAnimationManager      = null;
     var _myImageManager          = null;
-    var _myOverlayManager        = null;
     var _myScreenShotCounter     = 0;
     var _myEdgeBlending          = false;
     var _myEdgeBlendingAreaWidth = 50;

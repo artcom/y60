@@ -91,7 +91,7 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         myWhiteImage.src = "shadertex/one_white_pixel.png";
         myWhiteImage.resize = "scale";
 
-        _myBackground = new ImageOverlay(_myEventReceiver.getOverlayManager(), myWhiteImage);
+        _myBackground = new ImageOverlay(_myEventReceiver.getScene(), myWhiteImage);
         _myBackground.position = new Vector2f(0, 0);
         _myBackground.width  = window.width;
         _myBackground.height = window.height;
@@ -100,7 +100,7 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         var myCrossHairImage = _myEventReceiver.getImageManager().getImageNode("TouchScreenCrossHair");
         myCrossHairImage.src = CROSSHAIR_TEXTURE;
 
-        _myCrossHair = new ImageOverlay(_myEventReceiver.getOverlayManager(), myCrossHairImage);
+        _myCrossHair = new ImageOverlay(_myEventReceiver.getScene(), myCrossHairImage);
         _myCrossHair.position = new Vector2f(0, 0);
         _myCrossHair.width  = 128;
         _myCrossHair.height = 128;
@@ -134,8 +134,8 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         _myFollowMode         = theFlag;
 
         if (theFlag) {
-            _myEventReceiver.getOverlayManager().moveToTop(_myBackground);
-            _myEventReceiver.getOverlayManager().moveToTop(_myCrossHair);
+            _myBackground.moveToTop();
+            _myCrossHair.moveToTop();
             _myMessageTop = "FOLLOW MODE: Drag the cross-hair to test touchscreen calibration";
         } else {
             _myMessageTop = "";
@@ -147,8 +147,8 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
     }
 
     obj.startCalibration = function() {
-        _myEventReceiver.getOverlayManager().moveToTop(_myBackground);
-        _myEventReceiver.getOverlayManager().moveToTop(_myCrossHair);
+        _myBackground.moveToTop();
+        _myCrossHair.moveToTop();
 
         _myCrossHair.visible   = true;
         _myBackground.visible  = true;

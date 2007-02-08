@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: DemoModellingRendex.js,v $
-//   $Author: pavel $
-//   $Revision: 1.4 $
-//   $Date: 2004/11/18 16:20:47 $
-//
-//
-//=============================================================================
 
 if (__main__ == undefined) var __main__ = "DemoModellingRendex";
 
@@ -98,9 +90,9 @@ DemoModellingRendexApp.prototype.Constructor = function(self, theArguments) {
         window.setTextColor([0.2,0.2,1,1]);
 
         var myTextImage = self.getImageManager().getImageNode("infobox");
-        _myTextOverlay = self.getOverlayManager().create("infobox", myTextImage.id, true);
-        self.getOverlayManager().setApplyMode(_myTextOverlay.name, "decal");
-        self.getOverlayManager().setBackgroundColor(_myTextOverlay.name, new Vector4f(0.8,0.8,1,0.6));
+        _myTextOverlay = new ImageOverlay(window.getScene(), myTextImage.id, [0,0]);
+        _myTextOverlay.texture.applymode = "decal";
+        _myTextOverlay.color = new Vector4f(0.8,0.8,1,0.6);
 
         var myTextSize = window.renderTextAsImage(myTextImage, "Press Ctrl-Q to quit.", "Arial", 300, 0);
         _myTextOverlay.width  = myTextSize.x;

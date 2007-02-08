@@ -56,7 +56,7 @@ TouchScreenTest.prototype.Constructor = function(obj, theSceneFile, theShaderLib
         myBackgroundImage.src = 'shadertex/ac_logo.png';
         myBackgroundImage.resize = "scale";
 
-        var myBackground = obj.getOverlayManager().create("TestBackground", myBackgroundImage.id, true);
+        var myBackground = new ImageOverlay(obj.SceneViewer.getScene(), myBackgroundImage);
         myBackground.position = new Vector2f(0, 0);
         myBackground.width  = renderer.width;
         myBackground.height = renderer.height;
