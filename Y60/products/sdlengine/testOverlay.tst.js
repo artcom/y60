@@ -7,20 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: OverlayManager.js,v $
-//   $Author: martin $
-//   $Revision: 1.43 $
-//   $Date: 2005/04/29 13:37:56 $
-//
-//
-//=============================================================================
 
 // TODO:
 // - Test parent handling
 
 use("UnitTest.js");
-use("OverlayManager.js");
 use("Overlay.js");
 use("Y60JSSL.js");
 

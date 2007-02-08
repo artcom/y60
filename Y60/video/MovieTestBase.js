@@ -81,7 +81,7 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
             delete _myMovie;
             _myMovie = 0;
         }
-        _myMovie = new MovieOverlay(Public.getOverlayManager(), 
+        _myMovie = new MovieOverlay(window.scene, 
                 "../../video/testmovies/"+theMovieName,
                 new Vector2f(80, 60), null, false, null, _myDecoderName);
         

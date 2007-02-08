@@ -173,7 +173,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
         window.scene.update(Scene.IMAGES);
 
 
-        _myOverlay = new ImageOverlay(self.getOverlayManager(), myImage);
+        _myOverlay = new ImageOverlay(window.scene, myImage);
         _myOverlay.width  = myImage.width;
         _myOverlay.height = myImage.height;
         _myOverlay.color = new Vector4f(1,1,1,1.0);

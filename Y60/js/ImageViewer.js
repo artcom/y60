@@ -533,7 +533,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myCaptureNode.id = createUniqueId();
             _myCaptureNode.playmode = "play";
             _myCaptureNode.src = theURL;
-            _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myCaptureNode);
+            _myMovieOverlay = new MovieOverlay(window.scene, _myCaptureNode);
         }
 
         if (_myFullSizeMode) {

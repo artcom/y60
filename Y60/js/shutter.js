@@ -85,18 +85,18 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             }
         }
 
-        _myLeftOverlay   = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
-        _myRightOverlay  = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
-        _myTopOverlay    = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
-        _myBottomOverlay = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
+        _myLeftOverlay   = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
+        _myRightOverlay  = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
+        _myTopOverlay    = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
+        _myBottomOverlay = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
 
-        _myInteractiveOverlay   = new ImageOverlay(theSceneViewer.getOverlayManager(), _myInteractivePixelImage);
+        _myInteractiveOverlay   = new ImageOverlay(theSceneViewer.getScene(), _myInteractivePixelImage);
 
         // cursor
         var myCursorImage = theSceneViewer.getImageManager().getImageNode("ShutterCursor");
         myCursorImage.src = CURSOR_IMAGE;
 
-        _myCursor = new ImageOverlay(theSceneViewer.getOverlayManager(), myCursorImage);
+        _myCursor = new ImageOverlay(theSceneViewer.getScene(), myCursorImage);
         _myCursor.width = CURSOR_SIZE;
         _myCursor.height = CURSOR_SIZE;
         _myCursor.visible = true;

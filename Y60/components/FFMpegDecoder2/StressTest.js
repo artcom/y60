@@ -18,8 +18,6 @@
 
 use("SceneTester.js");
 use("ImageManager.js");
-use("OverlayManager.js");
-
 
 var _myMovieMaterial;
 var _myMovieImage;

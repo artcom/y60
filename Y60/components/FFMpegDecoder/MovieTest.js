@@ -70,7 +70,7 @@ function FFMpegTest(theArguments) {
             _myMovie = 0;
         }
         print ("Starting test: "+theName);
-        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
+        var myMovie = new MovieOverlay(window.scene, theFile,
                 new Vector2f(300, 70), null, theUseSound, null, "y60FFMpegDecoder");
         myMovie.playspeed = 1;
         myMovie.loopcount = 1;

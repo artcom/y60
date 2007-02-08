@@ -112,7 +112,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
         myImage.src = "shadertex/on_screen_display.rgb";
         myImage.resize = "pad";
 
-        var myBoxOverlay = new ImageOverlay(theSceneViewer.getOverlayManager(), myImage);
+        var myBoxOverlay = new ImageOverlay(theSceneViewer.getScene(), myImage);
         myBoxOverlay.width  = BOX_WIDTH;
         myBoxOverlay.height = BOX_HEIGHT;
         myBoxOverlay.position = new Vector2f((window.width - myBoxOverlay.width) / 2,

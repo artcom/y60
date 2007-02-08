@@ -93,7 +93,7 @@ DemoRendererExtensionApp.prototype.Constructor = function(self, theArguments) {
         window.setTextColor([0.2,0.2,1,1]);
 
         var myTextImage = self.getImageManager().getImageNode("infobox");
-        _myTextOverlay = new ImageOverlay(self.getOverlayManager(), myTextImage);
+        _myTextOverlay = new ImageOverlay(window.scene, myTextImage);
         _myTextOverlay.applyMode = "decal";
         _myTextOverlay.color = new Vector4f(0.8,0.8,1,0.6);
 
