@@ -65,7 +65,7 @@ namespace y60 {
                                           unsigned theSamples = 0);
             
             bool     _myUseFBO;
-            unsigned _myImageNodeVersion;
+            asl::Unsigned64 _myImageNodeVersion;
             unsigned _myBlitFilter;
 
             // OpenGL id of frame buffer object
