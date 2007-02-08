@@ -60,7 +60,7 @@ namespace y60 {
 
     void
     MaterialBase::doTheUpdate() {
-        AC_INFO << "MaterialBase::doTheUpdate!" << endl;
+        AC_DEBUG << "MaterialBase::doTheUpdate!" << endl;
     }
 
     bool
@@ -184,7 +184,7 @@ namespace y60 {
                                 string myTextureName = mySamplerNode->getAttributeString("name");
                                 dom::NodePtr myTextureNode = myShaderTextures->childNodeByAttribute("texture","name",myTextureName);
                                 if (myTextureNode) {
-                                    AC_INFO << " loading default texture " << myTextureIndex << " " << myTextureName << endl;
+                                    AC_DEBUG << " loading default texture " << myTextureIndex << " " << myTextureName << endl;
                                     addTexture(myTextureNode, theTextureManager);
                                 }
                             }
@@ -360,7 +360,7 @@ namespace y60 {
                 }
             }
             if (_myTexGenFlag) {
-                AC_INFO << "TexGen enabled for material " << get<NameTag>();
+                AC_DEBUG << "TexGen enabled for material " << get<NameTag>();
             }
         } else {
             AC_DEBUG << "No such feature '" << MAPPING_FEATURE << "' for material " << get<NameTag>();
