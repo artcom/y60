@@ -48,8 +48,8 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
     PLBYTE ** pDstLineArray = theDestination->GetLineArray();
 
     unsigned myBytesPerPixel    = theSource->GetBitsPerPixel() / 8;
-    unsigned mySrcBytesPerLine  = myBytesPerPixel * (theSource->GetWidth() - 1);
-    unsigned myDestBytesPerLine = myBytesPerPixel * (_myNewWidth - 1);
+    unsigned mySrcBytesPerLine  = myBytesPerPixel * theSource->GetWidth();
+    unsigned myDestBytesPerLine = myBytesPerPixel * _myNewWidth;
     unsigned mySourceHeight     = theSource->GetHeight();
     
     int myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;    
