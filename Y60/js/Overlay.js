@@ -162,8 +162,15 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
                 myParent = theParent;
             }
         } else {
-            // myParent = theScene.overlays;
-            myParent = theScene.canvases.firstChild.firstChild.firstChild;
+            var myFirstCanvas = theScene.dom.childNode("canvases").firstChild;
+            if (!myFirstCanvas) {
+                throw new Exception("theScene has no canvas", fileline());
+            }
+            var myViewport = myFirstCanvas.childNode("viewport");
+            if (!myViewport) {
+                throw new Exception("the primary canvas has no viewports", fileline());
+            }
+            myParent = myViewport.childNode("overlays");
             Logger.info("Appending Overlay to first canvas in the scene.");
         }
 
@@ -223,6 +230,7 @@ function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
     function setup() {
         var myMaterialId = createUniqueId();
         _myMaterial = Node.createElement('material');
+        
         theScene.materials.appendChild(_myMaterial);
 
         _myMaterial.id = myMaterialId;
