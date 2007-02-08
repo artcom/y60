@@ -243,7 +243,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
 
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] && theImage->getNode().nodeVersion() != _myImageNodeVersion) {
-        AC_DEBUG << "tearing down FBO since Image has changed " << theImage->getNode().nodeVersion() << " != " << _myImageNodeVersion;
+        AC_DEBUG << "Tearing down FBO since Image has changed " << theImage->getNode().nodeVersion() << " != " << _myImageNodeVersion;
 
         glDeleteFramebuffersEXT(2, &_myFrameBufferObject[0]);
         glDeleteRenderbuffersEXT(2, &_myColorBuffer[0]);
@@ -265,7 +265,11 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         unsigned myWidth = asl::nextPowerOfTwo(theImage->get<ImageWidthTag>());
         unsigned myHeight = asl::nextPowerOfTwo(theImage->get<ImageHeightTag>());
 
-        if (IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) && theSamples >= 1) {
+        if (theSamples >= 1 && !(IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) && IS_SUPPORTED(glBlitFramebufferEXT))) {
+            AC_WARNING << "Multisampling requested but not supported, turning it off";
+            theSamples = 0;
+        }
+        if (theSamples >= 1) {
 
             /*
              * setup multisample framebuffer
@@ -334,7 +338,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         /*
          * bind FBO
          */
-        if (theSamples >= 1) {
+        if (_myFrameBufferObject[1]) {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
             glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
         } else {
