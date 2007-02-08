@@ -587,8 +587,13 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 
                     // TODO: Find the best formula (use vrml exporter in cinema for reference results)
                     // Suggested formula: shininess = (specular_width + (1 - specular_height) * 128) / 2
-                    float myShininess = (mySpecularWidth + (1 - mySpecularHeight) * 128) / 2;
+                    // (VS) Lets try: SpecularHeight scales the color -> is something like brightness
+                    //                SpecularWidth sharpens the highlight 
+                    //                  (OpenGL: 0 -> large hightlight, 128 -> small highlight
+                    float myShininess = 128.0 - mySpecularWidth * 128;
                     setPropertyValue<float>(_myMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
+                    mySpecularColor *= mySpecularHeight;
+                    mySpecularColor[3] = 1.0;
                     setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::SPECULAR_PROPERTY, mySpecularColor);
                 }
             }
