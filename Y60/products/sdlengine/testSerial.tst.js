@@ -153,8 +153,18 @@ SerialUnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySerialDevice.printPacketStatistic();
         obj.mySerialDevice.close();
 
+        if (operatingSystem() == "OSX") {
+            print("##### WARNING: Serial device not yet supported on OSX");
+            return;
+        }
+
         obj.mySerialDevice = new SerialDevice(0);
         obj.mySerialDevice.open();
+        if (!obj.mySerialDevice.isOpen) {
+            print("### WARNING: serial device open failed, probably no serial device attached!");
+            return;
+        }
+
         obj.mySerialDevice.setPacketFormat(255, 254, 2, SerialDevice.CHECKSUM_CHECKING);
         obj.mySerialDevice.printPacketFormat();
         obj.mySerialDevice.setNoisy(true);

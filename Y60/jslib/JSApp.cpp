@@ -1282,16 +1282,16 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the name of the operating system");
-    DOC_RVAL("Win32, Linux or MacOsX", DOC_TYPE_STRING);
+    DOC_RVAL("WIN32, LINUX or OSX", DOC_TYPE_STRING);
     DOC_END;
 #ifdef WIN32
-    string myOsName("Win32");
+    string myOsName("WIN32");
 #endif
 #ifdef LINUX
-    string myOsName("Linux");
+    string myOsName("LINUX");
 #endif
 #ifdef OSX
-    string myOsName("MacOsX");
+    string myOsName("OSX");
 #endif
     *rval = as_jsval(cx, myOsName);
     return JS_TRUE;

@@ -30,7 +30,7 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        if (operatingSystem() == "Win32") {
+        if (operatingSystem() == "WIN32") {
             obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2");
     		ENSURE('obj.myReturnCode == 2');
             obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat 3");
@@ -39,9 +39,9 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
     		ENSURE('obj.myReturnCode == -1');
             obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2", false);
     		ENSURE('obj.myReturnCode == 0');
-        } else if (operatingSystem() == "Linux") {
+        } else if (operatingSystem() == "LINUX") {
             ENSURE('"pickytests" == "pickytests"');
-        } else if (operatingSystem() == "MacOsX") {
+        } else if (operatingSystem() == "OSX") {
             ENSURE('"pickytests" == "pickytests"');
         }
         
