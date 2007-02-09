@@ -69,7 +69,7 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
         
         // Repeat the fist column (to prevent texture repeat artefacts)
         if (myRemainingBytes >= (myBytesPerPixel * 2)) {
-            memcpy(pDstLine + myDestBytesPerLine, pSrcLine, myBytesPerPixel);
+            memcpy(pDstLine + myDestBytesPerLine - myBytesPerPixel, pSrcLine, myBytesPerPixel);
         }
 
         // Pad the remaining columns with black pixels (to improve compression ratios)        
