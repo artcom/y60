@@ -59,7 +59,11 @@ namespace y60 {
             //AC_PRINT << "ENV: " << std::string(myUsageString ? myUsageString: "not defined") << " -> " << myVBOUsage;
             if (myVBOUsage &&
                 (queryOGLExtension("GL_ARB_vertex_buffer_object", true) ||
-                 queryOGLExtension("GL_EXT_vertex_buffer_object", true)))
+                 queryOGLExtension("GL_EXT_vertex_buffer_object", true))
+#ifdef OSX // TODO PORT - disabled VBOs
+				&& false
+#endif				 
+				 )
             {
                 _myType = VERTEX_STORAGE_IS_VBO_VECTOR;
                 return;

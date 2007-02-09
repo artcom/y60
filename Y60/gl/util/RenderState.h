@@ -47,26 +47,7 @@ namespace y60 {
 
     class RenderState {
         public:
-            RenderState() :
-                _myWireframeFlag(false),
-                _myLightingFlag(true),
-                _myBackfaceCullingFlag(false),
-                _myFlatShadingFlag(false),
-                _myTexturingFlag(true),
-                _myIgnoreDepthFlag(false),
-                _myDepthWritesFlag(true),
-                _myPolygonOffsetFlag(false),
-                _myBlendFlag(false),
-                _myAlphaTestFlag(true),
-                _myScissorTestFlag(false),
-                _myFrontFaceCCWFlag(true),
-                _myCullFaces(GL_BACK),
-                _myEnabledClippingPlanes(0),
-                _myScissorParams(0,0,1,1)
-            {
-                init();
-            }
-
+            RenderState();
             void init();
 
             RENDERSTATE_GETTER_SETTER(Wireframe);

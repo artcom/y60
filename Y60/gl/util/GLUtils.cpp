@@ -549,6 +549,9 @@ namespace y60 {
     x = (p) wglGetProcAddress( #x ); \
     if (!x) { \
         x = Missing_ ## x; \
+        AC_DEBUG << "GL Extension missing:" << #x << endl; \
+    } else { \
+        AC_DEBUG << "GL Extension available:" << #x << endl; \
     }
 #endif
 
@@ -557,6 +560,9 @@ namespace y60 {
     _ac_ ## x = (p) glXGetProcAddressARB((const GLubyte*) #x ); \
     if (!x) { \
         x = Missing_ ## x; \
+        AC_DEBUG << "GL Extension missing:" << #x << endl; \
+    } else { \
+        AC_DEBUG << "GL Extension available:" << #x << endl; \
     }
 #endif
 
