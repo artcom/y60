@@ -90,7 +90,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.getCurrentTime = function(){
         return _myCurrentTime;
     }
-
+    self.statisticColor setter = function(theColor) {
+        _myStatisticColor = theColor;
+    }
     self.current_time getter = function() {
         return _myCurrentTime;
     }
@@ -557,7 +559,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         for (var i = 0; i < myText.length; ++i) {
             window.setTextColor([0,0,0,1]);
             window.renderText([window.width - 201, 19 + (i * 15)], myText[i], "Screen13");
-            window.setTextColor([1,1,1,1]);
+            window.setTextColor(_myStatisticColor);
             window.renderText([window.width - 200.8, 19.2 + (i * 15)], myText[i], "Screen13");
         }
     }
@@ -634,4 +636,5 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myMemoryMeter           = null;
     var _myOnScreenStatistics    = 0;
     var _myVideoRecorder         = null;
+    var _myStatisticColor        = [1,1,1,1];
 }

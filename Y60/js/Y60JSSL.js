@@ -276,6 +276,10 @@ function getDescendantByName(theNode, theName, doDeepSearch) {
     return getDescendantByAttribute(theNode, "name", theName, doDeepSearch);
 }
 
+function getDescendantsByName(theNode, theName, doDeepSearch) {
+    return getDescendantsByAttribute(theNode, "name", theName, doDeepSearch);
+}
+
 // Recursivly searches theNode for the first element that has theAttribute.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
