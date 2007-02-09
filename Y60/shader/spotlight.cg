@@ -109,42 +109,40 @@ float4 mainFragment(vert2frag IN,
     for(int i = 0; i < AC_SPOT_LIGHTS.length ; ++i) {
         // calculate spot cone
         float3 L = normalize(AC_SPOT_LIGHTS[i] - tempPosition);
-        myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
+        //myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
 
         // calculate diffuse term
 	    float NdotL = dot(N, L);
-        
         if (NdotL > 0.0f) {
             float spotEffect    = dot(normalize(AC_SPOT_LIGHTS_DIRECTION[i]), normalize(-L));
             float myCosCutoff   = cos(radians(AC_SPOT_LIGHTS_CUTOFF[i]/2));
             float myCosPenumbra = cos(radians(AC_SPOT_LIGHTS_CUTOFF[i]/2 + penumbra));
 
             float myInnerCutoff = min(myCosPenumbra, myCosCutoff);
-
             if (spotEffect > myInnerCutoff) {
                 float mySpotEffectExponent = pow(spotEffect, AC_SPOT_LIGHTS_EXPONENT[i]);
-                myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
+                //myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
+                myLightDistance = distance(AC_SPOT_LIGHTS[i], tempPosition);
                
                 float mySpotDiffuse = mySpotEffectExponent * NdotL;
                 float myAttenuation = 1/(1+AC_SPOT_LIGHTS_ATTENUATION[i]*myLightDistance);
-                
-                float4 myLightingTerm = float4(mySpotDiffuse)*AC_SPOT_LIGHTS_DIFFUSE_COLOR[i]*myAttenuation*diffuse;
+                float myLightingTerm = max(0, mySpotDiffuse * myAttenuation);
 
                 float myOuterCutoff = max(myCosCutoff, myCosPenumbra);
-
                 if (spotEffect < myOuterCutoff) {
                     float myLerpRange = myInnerCutoff - myOuterCutoff; 
                     float myWeight = (spotEffect-myOuterCutoff)/myLerpRange;
-                    myLightingTerm*=lerp(1, 0, myWeight); 
+                    myLightingTerm *= lerp(1, 0, myWeight); 
                 }
 
+                float4 myLightColor = AC_SPOT_LIGHTS_DIFFUSE_COLOR[i] * myLightingTerm;
 #ifdef PAINT
-                myDiffuse += myLightingTerm*myColor0;
+                myDiffuse += myLightColor * myColor0;
 #if PAINT==2
-                myDiffuse += myLightingTerm*myColor1;
+                myDiffuse += myLightColor * myColor1;
 #endif
 #else
-                myDiffuse += myLightingTerm;
+                myDiffuse += myLightColor;
 #endif
             }
         }
