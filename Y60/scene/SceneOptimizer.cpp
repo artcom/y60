@@ -112,6 +112,7 @@ namespace y60 {
         // Fourth step: Remove unused shapes
         AC_INFO << "  Removing unused shapes...";
         removeUnusedShapes();
+        AC_INFO << "  optimizing done...";
     }
 
     void
@@ -160,36 +161,38 @@ namespace y60 {
         for (unsigned i = 0; i < myVertexData->childNodesLength(); ++i) {
             NodePtr mySrcVertexData = myVertexData->childNode(i);
             RoleMap::const_iterator it = theRoles.find(mySrcVertexData->getAttributeString(NAME_ATTRIB));
-
             // Skip unused vertex data
             if (it == theRoles.end()) {
                 continue;
             }
 
-            const string & myRole = it->second;
-            NodePtr myDstVertexData = theSuperShape->getVertexData(mySrcVertexData->nodeName(), myRole);
-            TypeId myTypeId;
-            myTypeId.fromString(mySrcVertexData->nodeName());
-            //= TypeId(getEnumFromString(mySrcVertexData->nodeName(), TypeIdStrings));
-            switch (myTypeId) {
-                case VECTOR_OF_VECTOR2F:
-                    theVertexDataOffsets[myRole] = copyVertexData<Vector2f>(mySrcVertexData, myDstVertexData);
-                    break;
-                case VECTOR_OF_VECTOR3F:
-                    if (myRole == "position") {
-                        theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theMatrix);
-                    } else if (myRole == "normal") {
-                        theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theMatrix, true);
-                    } else {
-                        theVertexDataOffsets[myRole] = copyVertexData<Vector3f>(mySrcVertexData, myDstVertexData);
-                    }
-                    break;
-                case VECTOR_OF_VECTOR4F:
-                    theVertexDataOffsets[myRole] = copyVertexData<Vector4f>(mySrcVertexData, myDstVertexData);
-                    break;
-                default:
-                    throw NotYetImplemented(string("Can not copy vertex data with type ") +
-                                         getStringFromEnum(myTypeId, TypeIdStrings), PLUS_FILE_LINE);
+            vector<string> myRoles = it->second;
+            for (unsigned j = 0; j < myRoles.size(); j++) {
+                const string & myRole = myRoles[j];
+                NodePtr myDstVertexData = theSuperShape->getVertexData(mySrcVertexData->nodeName(), myRole);
+                TypeId myTypeId;
+                myTypeId.fromString(mySrcVertexData->nodeName());
+                //= TypeId(getEnumFromString(mySrcVertexData->nodeName(), TypeIdStrings));
+                switch (myTypeId) {
+                    case VECTOR_OF_VECTOR2F:
+                        theVertexDataOffsets[myRole] = copyVertexData<Vector2f>(mySrcVertexData, myDstVertexData);
+                        break;
+                    case VECTOR_OF_VECTOR3F:
+                        if (myRole == "position") {
+                            theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theMatrix);
+                        } else if (myRole == "normal") {
+                            theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theMatrix, true);
+                        } else {
+                            theVertexDataOffsets[myRole] = copyVertexData<Vector3f>(mySrcVertexData, myDstVertexData);
+                        }
+                        break;
+                    case VECTOR_OF_VECTOR4F:
+                        theVertexDataOffsets[myRole] = copyVertexData<Vector4f>(mySrcVertexData, myDstVertexData);
+                        break;
+                    default:
+                        throw NotYetImplemented(string("Can not copy vertex data with type ") +
+                                            getStringFromEnum(myTypeId, TypeIdStrings), PLUS_FILE_LINE);
+                }
             }
         }
     }
@@ -281,7 +284,7 @@ namespace y60 {
                 for (unsigned j = 0; j < myPrimitives->childNode(i)->childNodesLength(); ++j) {
                     string myName = myPrimitives->childNode(i)->childNode(j)->getAttributeString(VERTEX_DATA_ATTRIB);
                     string myRole = myPrimitives->childNode(i)->childNode(j)->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
-                    myRoles[myName] = myRole;
+                    myRoles[myName].push_back(myRole);
                 }
             }
             Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();

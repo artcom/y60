@@ -290,6 +290,7 @@ namespace y60 {
     Scene::optimize(dom::NodePtr theRootNode) {
         SceneOptimizer myOptimizer(*this);
         myOptimizer.run(theRootNode);
+        //save("optimizedScene.x60", false);
         update(SHAPES|WORLD);
     }
 

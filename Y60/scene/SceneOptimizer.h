@@ -26,7 +26,7 @@ namespace y60 {
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;
-            typedef std::map<std::string, std::string> RoleMap;
+            typedef std::map<std::string, std::vector<std::string> > RoleMap;
 
             struct PrimitiveCache {
                 PrimitiveCache(dom::NodePtr thePrimitive) : _myPrimitives(thePrimitive)
