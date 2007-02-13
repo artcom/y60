@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-if ((operatingSystem() == "Linux" || operatingSystem() == "MacOsX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") == 1) {
+if ((operatingSystem() == "LINUX" || operatingSystem() == "OSX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") == 1) {
     plug("PowermateInputExtension");
 }
 

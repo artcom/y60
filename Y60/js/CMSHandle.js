@@ -170,7 +170,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
             _myRequestManager.performRequest( myPresentationRequest );
             myPresentationRequest.verifyPeer = false;
-            myPresentationRequest.verbose = false;
+            myPresentationRequest.verbose = true;
             while ( _myRequestManager.activeCount ) {
                 _myRequestManager.handleRequests();
                 msleep( 10 );

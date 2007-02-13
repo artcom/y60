@@ -96,8 +96,8 @@ OffscreenBuffer::OffscreenBuffer() :
 void OffscreenBuffer::setUseFBO(bool theUseFlag)
 {
 #ifdef GL_EXT_framebuffer_object
-    if (!IS_SUPPORTED(glGenFramebuffersEXT)) {
-        AC_WARNING << "OffscreenBuffer::setUseFBO: OpenGL framebuffer extension is not supported";
+    if (theUseFlag && !IS_SUPPORTED(glGenFramebuffersEXT)) {
+        AC_WARNING << "OpenGL FBO rendering requested but not supported, falling back to backbuffer rendering";
         theUseFlag = false;
     }
 #endif

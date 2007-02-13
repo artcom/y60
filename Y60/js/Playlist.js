@@ -196,7 +196,7 @@ Playlist.prototype.Constructor = function(self) {
             }
         }
         if (theUrl.search(/\.mov$/i)  != -1) {
-            if (operatingSystem() == "Linux" || theSeekableFlag) {
+            if (operatingSystem() == "LINUX" || theSeekableFlag) {
                 myDecoderHint = "y60FFMpegDecoder1";
             } else {
                 myDecoderHint = "y60QuicktimeDecoder";
@@ -204,7 +204,7 @@ Playlist.prototype.Constructor = function(self) {
         }
         if (theUrl.search(/\.wmv$/i)  != -1 ||
             theUrl.search(/\.avi$/i)  != -1) {
-            if (operatingSystem() == "Linux") {
+            if (operatingSystem() == "LINUX") {
                 myDecoderHint = "y60FFMpegDecoder2";
             } else {
                 myDecoderHint = "y60WMVDecoder";

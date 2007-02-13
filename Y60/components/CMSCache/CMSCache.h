@@ -91,10 +91,13 @@ class CMSCache {
 
         dom::NodePtr _myPresentationDocument;
         dom::DocumentPtr _myStatusDocument;
+
+        dom::NodePtr     _myReportNode;
+        unsigned         _myReportNodeVersion;
+
         dom::NodePtr     _myAssetReportNode;
         dom::NodePtr     _myStalledFilesNode;
         std::map<std::string, dom::NodePtr> _myAssets;
-
 
         bool _myVerboseFlag;
         bool _myCleanupFlag;
@@ -110,6 +113,3 @@ class CMSCache {
 
 }
 #endif
-
-
-

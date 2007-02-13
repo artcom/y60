@@ -34,7 +34,7 @@ use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
 
-//if (operatingSystem() == "Win32") {
+//if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
 //}
 //plug("y60FFMpegDecoder1");

@@ -1,4 +1,3 @@
-
 //=============================================================================
 // Copyright (C) 1993-2005, ART+COM AG Berlin
 //
@@ -8,21 +7,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: sv.js,v $
-//   $Author: valentin $
-//   $Revision: 1.23 $
-//   $Date: 2005/04/25 14:59:10 $
-//
-//
-//=============================================================================
 
  try {
     use("Exception.js");
     use("SceneViewer.js");
 
     window = new RenderWindow();
-    if (operatingSystem() == "Linux") {
+    print(operatingSystem());
+    if (operatingSystem() == "LINUX") {
         window.multisamples = 4;
     } else {
         window.multisamples = 8;

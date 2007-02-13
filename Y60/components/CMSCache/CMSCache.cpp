@@ -48,12 +48,17 @@ CMSCache::CMSCache(const string & theLocalPath,
      _myMaxRequestCount( 1 ),
      _mySessionCookie(theSessionCookie)
 {
-    dom::NodePtr myReport = dom::NodePtr( new dom::Element("report") );
-    _myStatusDocument->appendChild( myReport );
+    _myReportNodeVersion = 0;
+    _myReportNode = dom::NodePtr( new dom::Element("report") );
+    _myReportNode->appendAttribute("version", as_string(_myReportNodeVersion));
+    _myStatusDocument->appendChild( _myReportNode );
+
     _myAssetReportNode = dom::NodePtr( new dom::Element("assets") );
-    myReport->appendChild( _myAssetReportNode );
+    _myReportNode->appendChild( _myAssetReportNode );
+
     _myStalledFilesNode = dom::NodePtr( new dom::Element("stalledfiles") );
-    myReport->appendChild( _myStalledFilesNode );
+    _myReportNode->appendChild( _myStalledFilesNode );
+
     //dumpPresentationToFile("dump.txt");
 }
 
@@ -314,19 +319,25 @@ dom::NodePtr
 CMSCache::getStatusReport() {
     // update asset report
     StatusMsg myStatusMsg("","","");
+    bool myModifiedFlag = false;
     while (_myRequestThread && _myRequestThread->popStatusMsg(myStatusMsg)) {
-       std::map<std::string, dom::NodePtr>::iterator it = _myAssets.find(myStatusMsg.path);
-       if (it == _myAssets.end()) {
+        std::map<std::string, dom::NodePtr>::iterator it = _myAssets.find(myStatusMsg.path);
+        if (it == _myAssets.end()) {
             AC_WARNING << myStatusMsg.path << " not found in asset list";
-       } else {
+        } else {
+            myModifiedFlag = true;
             if (it->second->getAttribute(myStatusMsg.attribute)) {
                 it->second->getAttribute(myStatusMsg.attribute)->nodeValue(myStatusMsg.value);
             } else {
                 it->second->appendAttribute(myStatusMsg.attribute, myStatusMsg.value);
             }
-       }
+        }
     }
-    
+
+    if (myModifiedFlag) {
+        _myReportNode->getAttribute("version")->nodeValue(as_string(_myReportNodeVersion++));
+    }
+
     return _myStatusDocument;
 }
 

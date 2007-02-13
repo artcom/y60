@@ -52,7 +52,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         if (thePixelFormat == undefined) {
             thePixelFormat = "rgba";
         }
-        
+
         if (theImage == undefined) {
             theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
         }
@@ -90,7 +90,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         if (theUseFBOFlag) {
             
             _myOffscreenRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
-            if (theMultisamples) {
+            if (isFinite(theMultisamples)) {
                 _myOffscreenRenderArea.multisamples = theMultisamples;
             } else {
                 _myOffscreenRenderArea.multisamples = 0;

@@ -255,8 +255,8 @@ jsval as_jsval(JSContext *cx, dom::ValuePtr theValue) {
     JSVAL_FROM_VECTORVALUE(dom::AccessibleVector);
     JSVAL_FROM_VECTORVALUE(dom::ResizeableRaster);
 
-    AC_WARNING << " as_jsval:: using string conversion for type " << theValue->getTypeInfo().name()
-               << " value as string " << theValue->getString();
+    AC_DEBUG << " as_jsval:: using string conversion for type " << theValue->getTypeInfo().name()
+             << " value as string " << theValue->getString();
     return as_jsval(cx, theValue->getString());
 }
 
@@ -276,8 +276,8 @@ bool convertFrom(JSContext *cx, jsval theValue, const std::string & theTypeName,
             return true;
         }
     }
-    AC_WARNING << " convertFrom:: using string conversion for type " << theTypeName
-               << " value as string " << as_string(cx, theValue);
+    AC_DEBUG << " convertFrom:: using string conversion for type " << theTypeName
+             << " value as string " << as_string(cx, theValue);
 
     theValuePtr = dom::ValuePtr(new dom::StringValue(as_string(cx, theValue), 0));
     return true;
