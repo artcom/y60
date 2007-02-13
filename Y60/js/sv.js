@@ -13,7 +13,6 @@
     use("SceneViewer.js");
 
     window = new RenderWindow();
-    print(operatingSystem());
     if (operatingSystem() == "LINUX") {
         window.multisamples = 4;
     } else {
