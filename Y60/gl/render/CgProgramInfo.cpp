@@ -52,7 +52,6 @@ namespace y60 {
 
     void
     assertCg(const std::string & theWhere, const CGcontext theCgContext) {
-#if 0
         CGerror myCgError = cgGetError();
         if (myCgError == CG_COMPILER_ERROR && theCgContext) {
             throw RendererException(std::string("Cg compile error: ") + cgGetLastListing(theCgContext),
@@ -60,7 +59,6 @@ namespace y60 {
         } else if (myCgError != CG_NO_ERROR) {
             throw RendererException(cgGetErrorString(myCgError), theWhere);
         }
- #endif
     }
 
 #ifdef DEBUG
@@ -146,8 +144,8 @@ namespace y60 {
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                     asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
                     &(*_myCachedCompilerArgs.begin()));
+            assertCg(PLUS_FILE_LINE, _myContext);
         }
-        assertCg(PLUS_FILE_LINE, _myContext);
 
         DBP2(START_TIMER(CgProgramInfo_processParameters));
         processParameters();
@@ -155,6 +153,7 @@ namespace y60 {
 
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_compileProgram));
         cgCompileProgram(_myCgProgramID);
+        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
