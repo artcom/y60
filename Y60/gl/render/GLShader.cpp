@@ -296,6 +296,12 @@ namespace y60 {
             // XXX glMultMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
+            
+            // hardwired env color for texture blend mode 'blend', changed default from black(OpenGL) to
+            // white, seems to be a better default for blend formula, can  be exposed in a 2nd step (VS)            
+            GLfloat myEnv_color[] = {1,1,1,1};
+            glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myEnv_color); 
+
 #if 1
             // UH: there's no test for this (e.g. material with three point sprite textures)
             // but IMHO the other code is wrong. For the given case it would enable
@@ -530,7 +536,6 @@ namespace y60 {
             bool mustRestoreMatrix = false;
 
             glActiveTexture(asGLTextureRegister(myTexUnit));
-
             MaterialBase::TexGenMode myModes = myTexGenModes[myTexUnit];
             MaterialBase::TexGenParams myParams = myTexGenParams[myTexUnit];
 

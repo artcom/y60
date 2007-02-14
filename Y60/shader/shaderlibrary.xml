@@ -973,6 +973,55 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
+    <shader id="s283" name="singletex_doubleprojective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="texcoord" values="[uv_map,frontal_projection, frontal_projection]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>                
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s284" name="doubletex_doubleprojective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[paint,paint,paint,paint]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,frontal_projection,frontal_projection]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                 <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>                
+                <vector2f name="texcoord1"/>                
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
     <shader id="s29" name="generic_tripletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint,paint]"/>
