@@ -91,48 +91,46 @@ float4 mainFragment(vert2frag IN,
 
 #ifdef PAINT
     float4 myColor0 = tex2D(tex0, IN.texCoord0);
-    myDiffuse = ambient * myColor0; 
+    myDiffuse       = myColor0; 
 #if PAINT==2
     float4 myColor1 = tex2D(tex1, IN.texCoord1);
-    myDiffuse += ambient * myColor1; 
+    myDiffuse       += myColor1; 
 #endif
 #else
-    myDiffuse  = ambient*diffuse; 
+    myDiffuse  = diffuse;
 #endif // PAINT
-    
+
+    myDiffuse = myDiffuse * ambient; 
+   
     float3 N = IN.worldNormal;
 
     // spot lights
     float3 tempPosition = IN.homPosition2.xyz;
     
-    float myLightDistance = 0.0f;
     for(int i = 0; i < AC_SPOT_LIGHTS.length ; ++i) {
         // calculate spot cone
         float3 L = normalize(AC_SPOT_LIGHTS[i] - tempPosition);
-        //myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
 
         // calculate diffuse term
 	    float NdotL = dot(N, L);
         if (NdotL > 0.0f) {
-            float spotEffect    = dot(normalize(AC_SPOT_LIGHTS_DIRECTION[i]), normalize(-L));
-            float myCosCutoff   = cos(radians(AC_SPOT_LIGHTS_CUTOFF[i]/2));
-            float myCosPenumbra = cos(radians(AC_SPOT_LIGHTS_CUTOFF[i]/2 + penumbra));
+            float mySpotEffect  = dot(normalize(AC_SPOT_LIGHTS_DIRECTION[i]), normalize(-L));
+            float mySpotAngle   = degrees(acos(mySpotEffect));
+            float myCutoff      = AC_SPOT_LIGHTS_CUTOFF[i] / 2;
+            float myPenumbra    = myCutoff + penumbra;
 
-            float myInnerCutoff = min(myCosPenumbra, myCosCutoff);
-            if (spotEffect > myInnerCutoff) {
-                float mySpotEffectExponent = pow(spotEffect, AC_SPOT_LIGHTS_EXPONENT[i]);
-                //myLightDistance = distance((AC_SPOT_LIGHTS[i]).xyz, tempPosition); //IN.objectPosition.xyz);
-                myLightDistance = distance(AC_SPOT_LIGHTS[i], tempPosition);
-               
-                float mySpotDiffuse = mySpotEffectExponent * NdotL;
-                float myAttenuation = 1/(1+AC_SPOT_LIGHTS_ATTENUATION[i]*myLightDistance);
-                float myLightingTerm = max(0, mySpotDiffuse * myAttenuation);
+            float myOuterCutoff = max(myPenumbra, myCutoff);
+            if (mySpotAngle < myOuterCutoff) {
+                mySpotEffect            = pow(mySpotEffect, AC_SPOT_LIGHTS_EXPONENT[i]);
+                float mySpotDiffuse     = mySpotEffect * NdotL;
+                float myLightDistance   = distance(AC_SPOT_LIGHTS[i], tempPosition);
+                float myAttenuation     = 1 / (1 + AC_SPOT_LIGHTS_ATTENUATION[i] * myLightDistance);
+                float myLightingTerm    = max(0, mySpotDiffuse * myAttenuation);
 
-                float myOuterCutoff = max(myCosCutoff, myCosPenumbra);
-                if (spotEffect < myOuterCutoff) {
-                    float myLerpRange = myInnerCutoff - myOuterCutoff; 
-                    float myWeight = (spotEffect-myOuterCutoff)/myLerpRange;
-                    myLightingTerm *= lerp(1, 0, myWeight); 
+                float myInnerCutoff = min(myCutoff, myPenumbra);
+                if (mySpotAngle > myInnerCutoff) {
+                    float myWeight = (myOuterCutoff - mySpotAngle) / (myOuterCutoff - myInnerCutoff);
+                    myLightingTerm *= smoothstep(0, 1, myWeight);
                 }
 
                 float4 myLightColor = AC_SPOT_LIGHTS_DIFFUSE_COLOR[i] * myLightingTerm;
@@ -149,11 +147,5 @@ float4 mainFragment(vert2frag IN,
     }
    
     float myFogFactor = exp2(-abs(IN.fogExponent));
-    
-    // use fog
-    float4 myReturn = lerp(fogColor, myDiffuse, myFogFactor);
-
-    // float4 myReturn = myDiffuse; 
-    // myReturn.a = 1.0f;
-    return myReturn;
+    return lerp(fogColor, myDiffuse, myFogFactor);
 }
