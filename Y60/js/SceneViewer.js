@@ -199,31 +199,31 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (!theAltFlag) {
             switch (theKey) {
                 case 'n':
-                    window.drawnormals = !window.drawnormals;
-                    print("Normals: " + (window.drawnormals ? "on" : "off"));
+                    self.getActiveViewport().drawnormals = !self.getActiveViewport().drawnormals;
+                    print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));
                     break;
                 case 'm':
                     self.nextMover();
                     break;
                 case 'F':
-                    window.flatshading = !window.flatshading;
-                    print("Flatshading: " + (window.flatshading ? "on" : "off"));
+                    self.getActiveViewport().flatshading = !self.getActiveViewport().flatshading;
+                    print("Flatshading: " + (self.getActiveViewport().flatshading ? "on" : "off"));
                     break;
                 case 'w':
-                    window.wireframe = !window.wireframe;
-                    print("Wireframe: " + (window.wireframe ? "on" : "off"));
+                    self.getActiveViewport().wireframe = !self.getActiveViewport().wireframe;
+                    print("Wireframe: " + (self.getActiveViewport().wireframe ? "on" : "off"));
                     break;
                 case 'b':
-                    window.backfaceCulling = !window.backfaceCulling;
-                    print("Backface culling: " + (window.backfaceCulling ? "on" : "off"));
+                    self.getActiveViewport().backfaceCulling = !self.getActiveViewport().backfaceCulling;
+                    print("Backface culling: " + (self.getActiveViewport().backfaceCulling ? "on" : "off"));
                     break;
                 case 'c':
-                    window.culling = !window.culling;
-                    print("Culling: " + (window.culling ? "on" : "off"));
+                    self.getActiveViewport().culling = !self.getActiveViewport().culling;
+                    print("Culling: " + (self.getActiveViewport().culling ? "on" : "off"));
                     break;
                 case 'C':
-                    window.debugCulling = !window.debugCulling;
-                    print("Debug culling: " + (window.debugCulling ? "on" : "off"));
+                    self.getActiveViewport().debugCulling = !self.getActiveViewport().debugCulling;
+                    print("Debug culling: " + (self.getActiveViewport().debugCulling ? "on" : "off"));
                     break;
                 case 'V':
                     self.autoClicker.enabled = !self.autoClicker.enabled;
@@ -296,8 +296,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("glow: " + (self.glow ? "on" : "off"));
                     break;
                 case "t":
-                    window.texturing = !window.texturing;
-                    print("Texturing: " + (window.texturing ? "on" : "off"));
+                    self.getActiveViewport().texturing = !self.getActiveViewport().texturing;
+                    print("Texturing: " + (self.getActiveViewport().texturing ? "on" : "off"));
                     break;
                 case '[-]':
                     if (window.camera.hfov) { // persp camera

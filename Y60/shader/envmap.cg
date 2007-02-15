@@ -33,7 +33,7 @@ struct vert2frag {
     float3 worldNormal   : TEXCOORD3;
     float3 reflectVector : TEXCOORD4;
     float3 refractVector : TEXCOORD5;
-    float4 lighting      : TEXCOORD6;
+    //float4 lighting      : TEXCOORD6;
     float4 primaryColor    : COLOR0;
     float reflectionFactor : COLOR1;
 };

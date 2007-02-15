@@ -31,6 +31,7 @@
 
 // profiling
 #ifdef PROFILING_LEVEL_NORMAL
+#warning PROFILING_LEVEL_NORMAL is enabled
 #define DBP(x)  x
 #else
 #define DBP(x) // x
@@ -39,6 +40,7 @@
 // more profiling
 //#define PROFILING_LEVEL_FULL
 #ifdef PROFILING_LEVEL_FULL
+#warning PROFILING_LEVEL_FULL is enabled
 #define DBP2(x)  x
 #else
 #define DBP2(x) // x
@@ -109,12 +111,12 @@ namespace y60 {
     }
 
     void CgProgramInfo::createAndCompileProgram() {
-        AC_DEBUG << "reloadProgram " << _myPathName.c_str();
+        AC_DEBUG << "createAndCompileProgram " << _myPathName.c_str();
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
 
         if (_myCgProgramString.empty()) {
             AC_DEBUG << "loading from file";
-            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
+            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_loadFromFile));
 
             // create null terminated array of null terminated strings
             for (int i=0; i < _myShader._myCompilerArgs.size(); ++i) {
@@ -122,6 +124,7 @@ namespace y60 {
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
             _myCachedCompilerArgs.push_back(0);
+
             DBP2(START_TIMER(CgProgramInfo_cgCreateProgramFromFile));
             _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
                     _myPathName.c_str(),
@@ -130,14 +133,14 @@ namespace y60 {
                     &(*_myCachedCompilerArgs.begin()));
             DBP2(STOP_TIMER(CgProgramInfo_cgCreateProgramFromFile));
 
-            assertCg("CgProgramInfo::reloadProgram - createProgram", _myContext);
+            assertCg(PLUS_FILE_LINE, _myContext);
 
             //DK: we cannot keep a compiled version
             //    because unsized arrays of size 0 are completely gone after compilation
             _myCgProgramString = cgGetProgramString(_myCgProgramID, CG_PROGRAM_SOURCE);
 
         } else {
-            AC_DEBUG << "destroying and reloading from string "; // << _myCgProgramString;
+            AC_DEBUG << "destroying and reloading from string";
             DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_destroyReload));
 
             cgDestroyProgram(_myCgProgramID);
@@ -159,7 +162,7 @@ namespace y60 {
     void
     CgProgramInfo::load() {
         cgGLLoadProgram(_myCgProgramID);
-        assertCg("CgProgramInfo::load()", _myContext);
+        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
@@ -181,14 +184,12 @@ namespace y60 {
             CGtype myParameterType    = cgGetParameterType(myParam);
             AC_TRACE << "processing " << myParamName;
 
-            assertCg(PLUS_FILE_LINE, _myContext);
-
-            // scan for reserved GL_ prefix in uniform parameters
-            if (myParamName.compare(0, 3, "GL_") == 0) {
+            if (myParamName.compare(0, 3, "GL_") == 0) { // scan for reserved GL_ prefix in uniform parameters
                 if (myParamVariability != CG_UNIFORM) {
                     throw RendererException ("Error in " + _myPathName + ": Parameter " + myParamName
                             + " not uniform.", "CgProgramInfo::processParameters()");
                 }
+
                 CGGLenum myParamTransform = CG_GL_MATRIX_IDENTITY;
                 string myParamBase = myParamName;
                 if (myParamName.substr(myParamName.length()-2) == "_I") {
@@ -217,8 +218,7 @@ namespace y60 {
                 }
                 _myGlParams.push_back(
                         CgProgramGlParam(myParamName, myParam, myParamType, myParamTransform));
-            } else if (myParamName.compare(0, 3, "AC_") == 0) {
-            // scan for reserved AC_ prefix
+            } else if (myParamName.compare(0, 3, "AC_") == 0) { // scan for reserved AC_ prefix
                 if (myParamVariability != CG_UNIFORM) {
                     throw RendererException ("Error in " + _myPathName + ": Parameter " + myParamName
                             + " not uniform.", "CgProgramInfo::processParameters()");
@@ -232,7 +232,6 @@ namespace y60 {
                             ": CG Auto Parameter " + myParamName + " unknown.",
                             "CgProgramInfo::processParameters()");
                 }
-
 
                 if (myParameterType == CG_ARRAY) /* && cgGetArraySize(myParam, 0) == 0)*/ {
                     int myArraySize = _myUnsizedArrayAutoParamSizes[myParamID];
@@ -268,7 +267,6 @@ namespace y60 {
             }
             assertCg(PLUS_FILE_LINE, _myContext);
         }
-        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
@@ -318,10 +316,10 @@ namespace y60 {
             }
             LightSourcePtr myLightSource = myLight->getLightSource();
             switch (myLightSource->getType()) {
-                case POSITIONAL :
+                case POSITIONAL:
                     ++myPositionalLightCount;
                     break;
-                case DIRECTIONAL :
+                case DIRECTIONAL:
                     ++myDirectionalLightCount;
                     break;
                 case SPOT:
@@ -338,10 +336,8 @@ namespace y60 {
         bool myReload = false;
 
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
-        int myLightType = POSITIONAL_LIGHTS;
-        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
+        if (myReload == false && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
-            //unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
             if (myLastCount != myPositionalLightCount) {
                 DBP2(COUNT(CgProgramInfo_posLightCount_differ));
                 DBP2(COUNT_N(CgProgramInfo_posLightCountLast, myLastCount));
@@ -352,9 +348,7 @@ namespace y60 {
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
 
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
-        myLightType = DIRECTIONAL_LIGHTS;
-        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
-            // unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+        if (myReload == false && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
             if (myLastCount != myDirectionalLightCount)  {
                 DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
@@ -366,10 +360,7 @@ namespace y60 {
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
         
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
-        myLightType = SPOT_LIGHTS;
-
-        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
-            // unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+        if (myReload == false && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
             if (myLastCount != mySpotLightCount)  {
                 DBP2(COUNT(CgProgramInfo_spotLightCount_differ));
@@ -380,26 +371,29 @@ namespace y60 {
         }
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
 
-        if (_myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end()) {
+        if (myReload == false && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end()) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
-            //            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
             if (myLastCount != theMaterial.getTextureCount()) {
                 myReload = true;
             }
         }
 
         if (myReload) {
-            // AC_INFO << "reload required";
-            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             //change unsized array sizes here
+            AC_DEBUG << "Cg program reload required";
+
+            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
+            AC_DEBUG << "#of positional lights:" << myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = myPositionalLightCount;
 
+            AC_DEBUG << "#of directional lights:" << myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
 
+            AC_DEBUG << "#of spot lights:" << mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_SPECULAR_COLOR] = mySpotLightCount;
@@ -408,6 +402,7 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = mySpotLightCount;
 
+            AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureCount();
             _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureCount();
 
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
@@ -417,8 +412,8 @@ namespace y60 {
             START_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             cgGLLoadProgram(_myCgProgramID);
             STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
+            assertCg(PLUS_FILE_LINE, _myContext);
 
-            AC_DEBUG << "reloaded Cg program";
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             enableProfile();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
@@ -428,6 +423,7 @@ namespace y60 {
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
             enableTextures();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
+            assertCg(PLUS_FILE_LINE, _myContext);
         }
 
         return myReload;
@@ -720,7 +716,7 @@ namespace y60 {
             case SAMPLERCUBE:
                 {
                     unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
-                    if (myTextureIndex  < theMaterial.getTextureCount()) {
+                    if (myTextureIndex < theMaterial.getTextureCount()) {
                         const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
                         AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
                         cgGLSetTextureParameter( theCgParameter, myTexture.getId());
@@ -761,7 +757,7 @@ namespace y60 {
                 throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                         + " should be FLOAT3 or FLOAT4.", "CgProgramInfo::setCgVectorParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgVectorParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -779,7 +775,7 @@ namespace y60 {
                 throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                         + " should be FLOAT3 or FLOAT4.", "CgProgramInfo::setCgVectorParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgVectorParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -791,7 +787,7 @@ namespace y60 {
                     + " should be FLOAT4x4.", "CgProgramInfo::setCgVectorParameter()");
         }
         cgGLSetMatrixParameterfc(theParam._myParameter, theValue.getData());
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgMatrixParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -809,7 +805,7 @@ namespace y60 {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT3[].", "CgProgramInfo::setCgArrayVector3fParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgArrayVector3fParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -826,7 +822,7 @@ namespace y60 {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT4[].", "CgProgramInfo::setCgArrayVector4fParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgArrayVector4fParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -846,7 +842,7 @@ namespace y60 {
                 cgSetParameter1f(myElement, theValue[i]);
             }
         }
-        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgUnsizedArrayParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -866,7 +862,7 @@ namespace y60 {
                 cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
             }
         }
-        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgUnsizedArrayParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -884,7 +880,7 @@ namespace y60 {
             //AC_TRACE << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
-        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
+        assertCg(string("setCgUnsizedArrayParameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -893,7 +889,7 @@ namespace y60 {
         CHECK_OGL_ERROR;
         DB(AC_TRACE << "binding " << _myShader._myEntryFunction << ":" <<_myCgProgramID << endl;)
         cgGLBindProgram(_myCgProgramID);
-        ASSERTCG(string("CgProgramInfo::bind()") + _myPathName, _myContext);
+        assertCg(string("CgProgramInfo::bind() ") + _myPathName, _myContext);
     }
 
     void

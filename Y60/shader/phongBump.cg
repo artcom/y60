@@ -1,74 +1,111 @@
-// blinn-phong shading using normal maps
+//=============================================================================
+// Copyright (C) 2003-2007 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
 
 struct a2v {
-float4 Position : POSITION; //in object space 
-float3 Normal : NORMAL; //in object space 
-float2 TexCoord : TEXCOORD0;
+    float4 Position : POSITION; // in object space 
+    float4 normal   : NORMAL;   // in object space
+    float4 texCoord0 : TEXCOORD0;
+    float4 tangent   : TEXCOORD1;
 }; 
 
-struct v2f {
-float4 Position : POSITION; //in projection space 
-float3 TexCoord0 : TEXCOORD0;
-float3 LightDirection : TEXCOORD1; //in tangent space 
-float3 HalfAngleVector : TEXCOORD2; //in tangent space
+struct vert2frag {
+    float4 homPosition : POSITION;
+    float3 texCoord0   : TEXCOORD0;
+    float3 tangent     : TEXCOORD4;
+    float3 binormal    : TEXCOORD5;
+    float3 normal      : TEXCOORD6;
+    float3 worldPosition : TEXCOORD7;
 }; 
 
-
-float3 compress(float3 v) {
-    return 0.5 * v + 0.5;
-}
 
 float3 expand(float3 v) {
     return 2.0 * (v - 0.5);
 }
 
-float4 compress(float4 v) {
-    return 0.5 * v + 0.5;
-}
 
-float4 expand(float4 v) {
-    return 2.0 * (v - 0.5);
-}
-
-v2f mainVertex(a2v IN,
+vert2frag mainVertex(a2v IN,
         uniform float4x4 GL_MODELVIEW_PROJECTION,
-        uniform float4 lightPosition, //in object space 
-        uniform float4 eyePosition ) //in object space 
+        uniform float4x4 AC_OBJECTWORLD,
+        uniform float4x4 AC_OBJECTWORLD_IT,
+        uniform float4x4 AC_TEXTURE_MATRICES[])
 { 
-    v2f OUT; // pass texture coordinates for
-    OUT.Position = mul(GL_MODELVIEW_PROJECTION, IN.Position);
-    OUT.TexCoord0.xy = IN.TexCoord.xy;
-    OUT.LightDirection.xyz = normalize(lightPosition - IN.Position);
-    float3 viewVector = normalize(eyePosition.xyz - IN.Position.xyz);
-    OUT.HalfAngleVector.xyz = normalize(OUT.LightDirection.xyz + viewVector);
+    vert2frag OUT;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0);
+    OUT.worldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
+
+    float3 N = normalize(mul(AC_OBJECTWORLD_IT, IN.normal).xyz);
+    float3 T = normalize(mul(AC_OBJECTWORLD_IT, IN.tangent).xyz); // tangent
+    OUT.tangent = T;
+    OUT.binormal = normalize(cross(N,T));
+    OUT.normal = N;
+
     return OUT;
 }
 
-float4 mainFragment(v2f IN,
-                    uniform sampler2D ground,
-                    uniform sampler2D normalMap,
-                    uniform float4 ambient,
-                    uniform float4 diffuse,
-                    uniform float4 specular,
-                    uniform float shininess
-                    ) : COLOR
-{ 
-    float4 myGroundColor = tex2D(ground, IN.TexCoord0).rgba;
-    float3 myNormal = normalize(tex2D(normalMap, IN.TexCoord0).xyz);
 
-    float3 myAmbient = ambient.xyz;
+float4 mainFragment(vert2frag IN,
+        uniform sampler2D colorMap,
+        uniform sampler2D normalMap,
+        uniform float3 AC_CAMERA_POSITION,
+        uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float3 AC_DIRECTIONAL_LIGHTS[],
+        uniform float4 ambient,
+        uniform float4 diffuse,
+        uniform float4 specular,
+        uniform float shininess) : COLOR
+{
+    float4 myColor = ambient;
+    float4 myDiffuseTexColor = diffuse * tex2D(colorMap, IN.texCoord0);
 
-    float diffuseLight = max(dot(myNormal, IN.LightDirection),0);
-    float3 myDiffuse = diffuse.xyz * diffuseLight;
+    float3x3 TBN = float3x3(IN.tangent, IN.binormal, IN.normal);
 
-    float specularLight = pow(max(dot(myNormal, expand(IN.HalfAngleVector)),0), shininess);
+    float3 N = expand(tex2D(normalMap, IN.texCoord0).rgb);
+    float3 P = IN.worldPosition;
+    float3 V = normalize(AC_CAMERA_POSITION - P);
 
-    if (diffuseLight <= 0) specularLight = 0;
-    float3 mySpecular = specular.xyz * specularLight;
+    float3 L;
+    float diffuseTerm, specularTerm;
 
-    float4 color;
-    color.xyz = (myAmbient + myDiffuse + mySpecular) * myGroundColor;
-    color.w = 1;
-    return color;
+    /*
+     * directional light
+     */
+    for (int i = 0; i < AC_DIRECTIONAL_LIGHTS.length; ++i) {
+
+        L = mul(TBN, AC_DIRECTIONAL_LIGHTS[i]);
+        diffuseTerm = saturate(dot(L, N));
+        myColor += myDiffuseTexColor * diffuseTerm;
+
+        if (diffuseTerm > 0.0) {
+            float3 R = 2 * dot(N, L) * N - L;
+            specularTerm = pow(max(dot(R, V), 0), shininess);
+            myColor += specular * specularTerm;
+        }
+    }
+
+    /*
+     * positional light
+     */
+    for (int i = 0; i < AC_POSITIONAL_LIGHTS.length; ++i) {
+
+        L = mul(TBN, AC_POSITIONAL_LIGHTS[i] - P);
+        diffuseTerm = saturate(dot(L, N));
+        myColor += myDiffuseTexColor * diffuseTerm;
+
+        if (diffuseTerm > 0.0) {
+            float3 R = 2 * dot(N, L) * N - L;
+            specularTerm = pow(max(dot(R, V), 0), shininess);
+            myColor += specular * specularTerm;
+        }
+    }
+
+    return myColor;
 }
-

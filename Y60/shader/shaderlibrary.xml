@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <shaders>
-    <shader id="s0" name="phongbump" cost="100">
+    <shader id="s0" name="phongPaintBump" cost="100">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="lighting" values="[phong]"/>
             <feature class="textures" values="[paint,bump]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="texcoord" values="[uv_map,uv_map]"/>
         </supports>
         <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
             <properties>
-                 <sampler2d name="ground">0</sampler2d>
+                 <sampler2d name="colorMap">0</sampler2d>
                  <sampler2d name="normalMap">1</sampler2d>
                  <vector4f name="diffuse">[1,1,1,1]</vector4f>
                  <vector4f name="specular">[1,1,1,1]</vector4f>
@@ -18,36 +18,12 @@
             </properties>
         </fragmentshader>
         <vertexshader profile="VP20" file="phongBump.cg" entryfunction="mainVertex">
-            <properties>
-                 <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
-                 <vector4f name="eyePosition">[0.0, 1.0, 2.0, 1.0]</vector4f>
-            </properties>
+            <properties/>
             <vertexparameters>
                  <vector3f name="normal"/>
                  <vector3f name="position"/>
                  <vector2f name="texcoord0"/>
-            </vertexparameters>
-         </vertexshader>
-    </shader>
-    <shader id="s1" name="bump" cost="100">
-        <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[bump]"/>
-        </supports>
-        <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
-            <properties>
-                 <sampler2d name="bump0">0</sampler2d>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-        </fragmentshader>
-        <vertexshader profile="VP30" file="phongBump.cg" entryfunction="mainVertex">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector3f name="normal"/>
-                <vector3f name="position"/>
-                <vector2f name="texcoord0"/>
-                <vector3f name="texcoord1" function="tangent"/>
+                 <vector2f name="texcoord1"/>
             </vertexparameters>
          </vertexshader>
     </shader>
