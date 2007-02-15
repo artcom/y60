@@ -190,7 +190,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         if (theReadbackFlag || _myScreenshotName) {
             var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id+".png";
             
-            saveImage(self.image, myFilename);
+            saveImageFiltered(self.image, myFilename, ["flip"], [[]]);
             _myScreenshotName = null;
         }
     }
