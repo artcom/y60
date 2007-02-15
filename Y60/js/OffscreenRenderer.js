@@ -32,7 +32,19 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     self.canvas getter = function() {
         return _myCanvas;
     }
-        
+      
+    self.camera getter = function() {
+        return _myCamera;
+    }
+
+    self.camera setter = function(theCamera) {
+        _myCamera = theCamera;
+        if (self.canvas) {
+            self.canvas.firstChild.camera = theCamera.id;
+        }
+    }
+    
+
     function setup(theSize, theCanvas) {
         //add our own camera
         if (theCamera == undefined) {
@@ -101,7 +113,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myOffscreenRenderArea.canvas = _myCanvas;
         _myOffscreenRenderArea.eventListener = self;
     }
-   
+  
+    self.saveScreenshot = function(theFilename) {
+        _myScreenshotName = theFilename;
+    }
+
     self.onPreViewport = function(theViewport) {
     }
 
@@ -164,15 +180,18 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
             }
 
             offscreenVisible(true);
-            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
+            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag || _myScreenshotName);
             offscreenVisible(false);
 
             for (var i = 0; i < myVisibleNodes.length; ++i) {
                 myVisibleNodes[i].visible = true;
             }
         }
-        if (theReadbackFlag) {
-            saveImage(self.image, "dump_"+self.image.id+".png");
+        if (theReadbackFlag || _myScreenshotName) {
+            var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id+".png";
+            
+            saveImage(self.image, myFilename);
+            _myScreenshotName = null;
         }
     }
 
@@ -195,12 +214,14 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         }
     }
 
-    self.camera                = null;
     self.image                 = null;
     var _myOffscreenRenderArea = null;
     var _myHiddenNodes         = [];
     var _myOffscreenNodes      = [];
     var _myCanvas              = null;
+    var _myCamera              = null;
+    var _myScreenshotName      = null;
+
     setup(theSize, theCanvas);
     
 
