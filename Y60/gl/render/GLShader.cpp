@@ -275,7 +275,7 @@ namespace y60 {
             }
             unsigned myId = myTexture.getImage()->ensureTextureId(); 
 
-            AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
+            AC_TRACE << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
             TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
             // [VS;DS;UH] someone please explain this
@@ -595,7 +595,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
+        AC_TRACE << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
         DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
             enableTextureProjection( theMaterial, theViewport, theCamera );

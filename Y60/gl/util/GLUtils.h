@@ -24,20 +24,30 @@
     #undef max
 #endif
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX)
 	#define AC_USE_X11
 #endif
 
+#if defined(OSX)
+	#define AC_USE_OSX_CGL
+	#define AC_USE_NSGL
+#endif
+
 #ifdef OSX
+#ifdef AC_USE_OSX_CGL
 #define Cursor X11_Cursor
 #include <X11/X.h>
 #undef Cursor
 #endif
+#endif
 
 #ifdef AC_USE_OSX_CGL
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
-	#include <OpenGL/glext.h>
+	//#include <OpenGL/gl.h>
+	//#include <OpenGL/glu.h>
+	//#include <OpenGL/glext.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+	#include <GL/glext.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>

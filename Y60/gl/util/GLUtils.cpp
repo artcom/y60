@@ -570,13 +570,13 @@ namespace y60 {
 
 // see http://developer.apple.com/qa/qa2001/qa1188.html for details
 
-#ifdef _AC_USE_NSGL_
+#ifdef AC_USE_NSGL
 
 #include <mach-o/dyld.h>
 #include <stdlib.h>
 #include <string.h>
 
-void * NSGLGetProcAddress (const GLubyte *name)
+void * NSGLGetProcAddress (const char * name)
 {
   NSSymbol symbol;
   char * symbolName;
@@ -595,6 +595,9 @@ void * NSGLGetProcAddress (const GLubyte *name)
     _ac_ ## x = (p)  NSGLGetProcAddress( #x ); \
     if (!x) { \
         x = Missing_ ## x; \
+        AC_DEBUG << "GL Extension missing:" << #x << endl; \
+    } else { \
+        AC_DEBUG << "GL Extension available:" << #x << endl; \
     }
 
 #else

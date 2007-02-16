@@ -803,7 +803,8 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     } else {
         AC_WARNING << "setSwapInterval(): wglSwapInterval not supported.";
     }
-#else
+#endif
+#ifdef AC_USE_X11
     if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI)) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working
@@ -826,6 +827,17 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     } else {
         AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not supported";
         _mySwapInterval = 0;
+    }
+#endif
+#ifdef AC_USE_OSX_CGL
+    const long myInterval = theInterval;  
+    CGLError myError = CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapRectangle, &myInterval);
+    if (myError != 0) {
+        AC_WARNING << "Cannot set swap interval, error=" << CGLErrorString(myError) << ", " <<
+            "Vertical sync must must be set to 'application controlled' " <<
+            "in driver settings. Using " << _mySwapInterval;
+    } else {
+        _mySwapInterval = theInterval;
     }
 #endif
 }

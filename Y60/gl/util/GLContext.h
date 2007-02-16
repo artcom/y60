@@ -30,7 +30,9 @@
 #include "RenderState.h"
 
 #ifdef AC_USE_OSX_CGL
-	#include <OpenGL/gliContext.h>
+//	#include <OpenGL/gliContext.h>
+	#include <OpenGL/OpenGL.h>
+	#include <OpenGL/CGLTypes.h>
 #endif
 
 #include <vector>
@@ -68,7 +70,8 @@ namespace y60 {
             GLXContext  _myGLXContext;
     #endif
 	#ifdef AC_USE_OSX_CGL
-			GLIContext           _myGLIContext;
+			//GLIContext           _myGLIContext;
+			CGLContextObj       _myCGLContext;
 	#endif
             RenderStatePtr _myStateCache;
     };

@@ -44,7 +44,7 @@ namespace y60 {
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)  
 #endif
 #ifdef AC_USE_OSX_CGL
-		: _myGLIContext(0)
+		: _myCGLContext(0)
 #endif
     { 
         _myStateCache = RenderStatePtr(new RenderState());
@@ -87,7 +87,14 @@ namespace y60 {
             return false;
         }
 #endif
-        return true;
+#ifdef AC_USE_OSX_CGL
+        CGLError myError = CGLSetCurrentContext(_myCGLContext);
+        if (myError != 0) {
+            AC_ERROR << "could not make opengl context current, CGL error code = "<< CGLErrorString(myError) << endl;
+            return false;
+        }
+#endif
+         return true;
     }
 
     bool GLContext::isActive() {
@@ -98,7 +105,7 @@ namespace y60 {
         return (_myDisplay && _myDrawable && _myGLXContext);
 #endif
 #ifdef AC_USE_OSX_CGL
-		return (_myGLIContext); 
+		return (_myCGLContext); 
 #endif
     }
     
