@@ -315,17 +315,24 @@ SceneExporter::writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
     if (_myExportedShapes.find(myNodeId) == _myExportedShapes.end()) {
         return myBodyBuilder;
     }
+    
+    y60::WorldBuilderBasePtr myParentBuilder = theTransformBuilder;
+    bool myTransformFlag = theTransformFlag;
+    std::string myBaseName = getString(theNode->GetName());
 
     std::vector<std::string> myShapeIdList = _myExportedShapes[myNodeId];
     for (unsigned i = 0; i < myShapeIdList.size(); ++i) {
         std::string myShapeId = myShapeIdList[i];
-        myBodyBuilder = y60::BodyBuilderPtr(new y60::BodyBuilder(myShapeId, getString(theNode->GetName())));
+        myBodyBuilder = y60::BodyBuilderPtr(new y60::BodyBuilder(myShapeId, myBaseName));
 
         // Append selections
-        theTransformBuilder->appendObject(*myBodyBuilder);
-        if (theTransformFlag) {
+        myParentBuilder->appendObject(*myBodyBuilder);
+        if (myTransformFlag) {
             exportTransformation(*myBodyBuilder, theNode);
         }
+        myParentBuilder = myBodyBuilder;
+        myTransformFlag = false;
+        myBaseName += "_";
     }
     return myBodyBuilder;
 }
@@ -458,7 +465,9 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
                             y60::WorldBuilderBasePtr & theParentBuilder,
                             bool theTransformFlag,
                             bool theForceFrontBackFacing) {
-    StatusSetText("Exporting '" + getTreeName(theNode) + "'");
+    const String myTreeName =  getTreeName(theNode);
+    std::string myName = getString(theNode->GetName());
+    StatusSetText("Exporting '" + myTreeName + "'");
     LONG myNodeId = theNode->GetNodeID();
     LONG myNodeType = theNode->GetType();
 
