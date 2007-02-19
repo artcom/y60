@@ -33,7 +33,9 @@ namespace y60 {
             virtual void load(y60::IShaderLibrary & theShaderLibrary);
             virtual void unload();
             virtual bool isLoaded() const { return false; };
-
+            virtual bool isSupported() const {
+                return true;
+            }
             const ShaderFeatureSet & getFeatureSet() const;
 
             const MaterialType & getType() const;

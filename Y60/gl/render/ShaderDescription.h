@@ -24,6 +24,7 @@ namespace y60 {
         std::string                      _myEntryFunction;
         std::vector<std::string>         _myCompilerArgs; 
         y60::VertexRegisterFlags         _myVertexRegisterFlags;
+        y60::VectorOfString              _myPossibleProfileNames;
     };
 
 #if 0

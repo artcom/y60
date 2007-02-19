@@ -31,8 +31,11 @@
 namespace y60 {
     class SkinAndBonesShader : public CGShader {
         public:
-            SkinAndBonesShader(const dom::NodePtr theShaderLibrary) :
-    			CGShader(theShaderLibrary), _myBoundingBoxNode(0) {}
+            SkinAndBonesShader(const dom::NodePtr theShaderLibrary,
+                               const std::string & theVertexProfileName,
+                               const std::string & theFragmentProfileName) 
+            : CGShader(theShaderLibrary, theVertexProfileName, theFragmentProfileName), _myBoundingBoxNode(0) {}
+
             virtual ~SkinAndBonesShader() {}
 
             void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial);

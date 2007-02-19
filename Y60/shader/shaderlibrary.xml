@@ -1229,7 +1229,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profiles="[arbvp1,vp40]" files="[glow.cg]" entryfunctions="[mainVertex]">
+        <vertexshader profiles="[vp40]" files="[glow.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1237,7 +1237,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[arbfp1,fp40]" files="[glow.cg]" entryfunctions="[mainFragment]">
+        <fragmentshader profiles="[fp40]" files="[glow.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
                 <sampler2d name="blurKernel">1</sampler2d>
@@ -1332,7 +1332,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profiles="[arbvp1,vp40]" files="[blur.cg]" entryfunctions="[mainVertex]">
+        <vertexshader profiles="[vp40]" files="[blur.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1340,7 +1340,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[arbfp1,fp40]" files="[blur.cg]" entryfunctions="[mainFragment]">
+        <fragmentshader profiles="[fp40]" files="[blur.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
                 <sampler2d name="blurKernel">1</sampler2d>

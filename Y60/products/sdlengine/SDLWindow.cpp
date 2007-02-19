@@ -828,7 +828,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
 #endif
 #ifdef AC_USE_OSX_CGL
     const long myInterval = theInterval;  
-    CGLError myError = CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapRectangle, &myInterval);
+    CGLError myError = CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &myInterval);
     if (myError != 0) {
         AC_WARNING << "Cannot set swap interval, error=" << CGLErrorString(myError) << ", " <<
             "Vertical sync must must be set to 'application controlled' " <<

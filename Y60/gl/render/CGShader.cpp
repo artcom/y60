@@ -46,11 +46,14 @@ using namespace y60;
 
 namespace y60 {
 
-    CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode) {
+    CGShader::CGShader(const dom::NodePtr theNode, 
+                      const std::string & theVertexProfileName,
+                      const std::string & theFragmentProfileName) : GLShader(theNode)
+   {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
         if (myShaderNode) {
-            loadShaderProperties(myShaderNode, _myVertexShader);
+            loadShaderProperties(myShaderNode, _myVertexShader, theVertexProfileName);
             loadParameters(myShaderNode, _myVertexShader);
         } else {
             throw ShaderException(string("CGShader::CGShader() - missing node ")+ VERTEX_SHADER_NODE_NAME +
@@ -59,7 +62,7 @@ namespace y60 {
 
         myShaderNode = theNode->childNode(FRAGMENT_SHADER_NODE_NAME);
         if (myShaderNode) {
-            loadShaderProperties(myShaderNode, _myFragmentShader);
+            loadShaderProperties(myShaderNode, _myFragmentShader, theFragmentProfileName);
         } else {
             throw ShaderException(string("CGShader::CGShader() - missing node ")+ FRAGMENT_SHADER_NODE_NAME +
                     " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
@@ -156,62 +159,34 @@ namespace y60 {
 
     void
     CGShader::loadShaderProperties(const dom::NodePtr theShaderNode,
-            ShaderDescription & theShader)
+            ShaderDescription & theShader,
+            const std::string & theProfileName)
     {
-         GLShader::loadShaderProperties(theShaderNode, theShader);
+        GLShader::loadShaderProperties(theShaderNode, theShader);
         
-        // select profile to use from latest engine profile or environment variable
-
-        std::string myShaderProfileName;
-        if (theShaderNode->nodeName() == VERTEX_SHADER_NODE_NAME) {
-            if (asl::get_environment_var("AC_VERTEX_SHADER_PROFILE", myShaderProfileName)) {
-                int myShaderProfile = asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings); // just for parameter check
-            } else {
-                if (ShaderLibrary::GLisReady()) {
-                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
-                    myShaderProfileName = cgGetProfileString(myShaderProfile);
-                } else {
-                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile" << endl;
-                    myShaderProfileName = "arbvp1";
-                }
-            }
-        } else if (theShaderNode->nodeName() == FRAGMENT_SHADER_NODE_NAME) {
-            if (asl::get_environment_var("AC_FRAGMENT_SHADER_PROFILE", myShaderProfileName)) {
-                int myShaderProfile = asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings); // just for parameter check
-            } else {
-                if (ShaderLibrary::GLisReady()) {
-                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
-                    myShaderProfileName = cgGetProfileString(myShaderProfile);
-                } else {
-                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile" << endl;
-                    myShaderProfileName = "arbfp1";
-                }
-            }
-        } else {
-            throw ShaderException("unknown shader type", PLUS_FILE_LINE);
-        }
-        AC_DEBUG << "Engine wants shader profile:" << myShaderProfileName; 
-        
-const VectorOfString myProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
+        theShader._myPossibleProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
         int myProfileIndex = -1;
-        for (int i=0; i<myProfileNames.size();++i) {
-            if (myProfileNames[i] == myShaderProfileName) {
+        for (int i=0; i<theShader._myPossibleProfileNames.size();++i) {
+            if (theShader._myPossibleProfileNames[i] == theProfileName) {
                 myProfileIndex = i;
                 break;
             }
         }
-        if ((myProfileIndex >= 0) && (myProfileIndex < myProfileNames.size())) {
+        if ((myProfileIndex >= 0) && (myProfileIndex < theShader._myPossibleProfileNames.size())) {
         } else {
-            throw ShaderException(std::string("Engine profile does not match any given profile in shader description, library node =")+
-                                   asl::as_string(*theShaderNode), PLUS_FILE_LINE);
+            // throw ShaderException(std::string("Engine profile does not match any given profile in shader description, library node =")+
+            //                       asl::as_string(*theShaderNode), PLUS_FILE_LINE);
+            AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
+            theShader._myProfile = NO_PROFILE;
+            return;
         }
-        AC_DEBUG << "profile '" << myShaderProfileName << "' has index "<< myProfileIndex << " in shader description"; 
-        theShader._myProfile = ShaderProfile(asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings));
+        AC_DEBUG << "profile '" << theProfileName << "' has index "<< myProfileIndex << " in shader description"; 
+        theShader._myProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
 
         // now select matching file parameters; either one file for all profiles or exactly one per profile are allowed
         const VectorOfString myFilenames = theShaderNode->getAttributeValue<VectorOfString>(CG_FILES_PROPERTY);
         int myFileIndex = 0;
-        if (myProfileNames.size() == myFilenames.size()) {
+        if (theShader._myPossibleProfileNames.size() == myFilenames.size()) {
             myFileIndex = myProfileIndex;
         } else  {
             if (myFilenames.size() != 1) {
@@ -232,7 +207,7 @@ const VectorOfString myProfileNames = theShaderNode->getAttributeValue<VectorOfS
         // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
         int myEntryIndex = 0;
         const VectorOfString myEntryFunctions = theShaderNode->getAttributeValue<VectorOfString>(CG_ENTRY_FUNCTIONS_PROPERTY);
-        if (myProfileNames.size() != myEntryFunctions.size()) {
+        if (theShader._myPossibleProfileNames.size() == myEntryFunctions.size()) {
             myEntryIndex = myProfileIndex;
         } else  {
             if (myEntryFunctions.size() != 1) {
@@ -254,7 +229,7 @@ const VectorOfString myProfileNames = theShaderNode->getAttributeValue<VectorOfS
         if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
             const VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
             int myCompilerArgsIndex = 0;
-            if (myProfileNames.size() == myCompilerArgs.size()) {
+            if (theShader._myPossibleProfileNames.size() == myCompilerArgs.size()) {
                 myCompilerArgsIndex = myProfileIndex;
             } else  {
                 if (myCompilerArgs.size() != 1) {

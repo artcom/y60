@@ -29,7 +29,9 @@
 namespace y60 {
     class CGShader : public GLShader {
         public:
-            CGShader(const dom::NodePtr theNode);
+            CGShader(const dom::NodePtr theNode,
+                     const std::string & theVertexProfileName,
+                     const std::string & theFragmentProfileName);
             virtual ~CGShader();
             virtual void compile(IShaderLibrary & theShaderLibrary);
             virtual void load(IShaderLibrary & theShaderLibrary);
@@ -54,10 +56,14 @@ namespace y60 {
                     const Body & theBody,
                     const Camera & theCamera); 
             void bindOverlayParams(const MaterialBase & theMaterial);
+            bool isSupported() const {
+                return _myVertexShader._myProfile && _myFragmentShader._myProfile;
+            }
 
         protected:
             void loadShaderProperties(const dom::NodePtr theShaderNode,
-                                      ShaderDescription & theShader);
+                    ShaderDescription & theShader,
+                    const std::string & theProfileName);
 
         private:
             void processCompilerArgs(std::vector<std::string> & theArgs, const std::string & theArgList);

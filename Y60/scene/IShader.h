@@ -84,6 +84,8 @@ namespace y60 {
     class IShaderLibrary {
     public:
         virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
+        virtual const std::string & getVertexProfileName() = 0;
+        virtual const std::string & getFragmentProfileName() = 0;
     };
     typedef asl::Ptr<IShaderLibrary>   IShaderLibraryPtr;
 

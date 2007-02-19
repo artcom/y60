@@ -33,8 +33,15 @@ namespace y60 {
             ShaderLibrary();
             virtual ~ShaderLibrary();
 
-            void load(const std::string & theLibraryFileName);
-            void load(const dom::NodePtr theNode);
+            void load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName); 
+            void load(const std::string & theLibraryFileName) {
+                load(theLibraryFileName,"","");
+            }
+
+            void load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName);
+            void load(const dom::NodePtr theNode) {
+                load(theNode,"","");
+            }
             void reload();
             virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
             const GLShaderVector & getShaders() const { return _myShaders; };
@@ -47,14 +54,22 @@ namespace y60 {
             static bool GLisReady() {
                 return _myGLisReadyFlag;
             }
-         private:
+            virtual const std::string & getVertexProfileName() {
+                return _myVertexProfileName;
+            }
+            virtual const std::string & getFragmentProfileName() {
+                return _myFragmentProfileName;
+            }
+        private:
             void loadAllShaders();
             GLShaderVector  _myShaders;
             static bool _myGLisReadyFlag;
 #ifndef _AC_NO_CG_
-		    CGcontext       _myCgContext;
+            CGcontext       _myCgContext;
+            std::string _myVertexProfileName;
+            std::string _myFragmentProfileName;
 #endif
-     };
+    };
 
     typedef asl::Ptr<ShaderLibrary> ShaderLibraryPtr;
 

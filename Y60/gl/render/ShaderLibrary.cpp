@@ -37,6 +37,7 @@
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <asl/string_functions.h>
+#include <asl/os_functions.h>
 
 
 using namespace std;
@@ -74,10 +75,11 @@ namespace y60 {
 	}
 #endif
 
-    void
-    ShaderLibrary::load(const std::string & theLibraryFileName) {
+   void
+    ShaderLibrary::load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName) {
         AC_DEBUG << "Loading shader library: " << theLibraryFileName;
-        asl::PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
+
+         asl::PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
         string myShaderLibraryFileName = myPackageManager->searchFile(theLibraryFileName);
         if (myShaderLibraryFileName.empty()) {
             throw ShaderLibraryException(string("Could not find library '") + theLibraryFileName + "' in " +
@@ -101,7 +103,7 @@ namespace y60 {
         myShaderLibraryXml.addSchema(mySchema,"");
         myShaderLibraryXml.parse(myShaderLibraryStr);
 
-        load(myShaderLibraryXml.childNode(SHADER_LIST_NAME));
+        load(myShaderLibraryXml.childNode(SHADER_LIST_NAME), theVertexProfileName, theFragmentProfileName);
         AC_INFO << "Loaded Shaderlibrary " + myShaderLibraryFileName;
     }
 
@@ -116,8 +118,47 @@ namespace y60 {
     }
 
     void
-    ShaderLibrary::load(const dom::NodePtr theNode) {
-        for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
+    ShaderLibrary::load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName) {
+        
+        AC_TRACE << "Library wants profile '" << theVertexProfileName << "' as vertex shader profile" << endl;
+        AC_TRACE << "Library wants profile '" << theFragmentProfileName << "' as fragment shader profile" << endl;
+  
+        // determine vertex shader profile name according to following priority:
+        // 1) function args, 2) environment var. 3) ask Cg library
+        if (theVertexProfileName == "") {
+            if (!asl::get_environment_var("AC_VERTEX_SHADER_PROFILE", _myVertexProfileName)) {
+                if (ShaderLibrary::GLisReady()) {
+                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
+                    _myVertexProfileName = cgGetProfileString(myShaderProfile);
+                } else {
+                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile" << endl;
+                    _myVertexProfileName = "arbvp1";
+                }
+            }
+        } else {
+            _myVertexProfileName = theVertexProfileName;
+        }
+
+        if (theFragmentProfileName == "") {
+            if (!asl::get_environment_var("AC_FRAGMENT_SHADER_PROFILE", _myFragmentProfileName)) {
+                if (ShaderLibrary::GLisReady()) {
+                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+                    _myFragmentProfileName = cgGetProfileString(myShaderProfile);
+                } else {
+                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile" << endl;
+                    _myFragmentProfileName = "arbfp1";
+                }
+            }
+        } else {
+            _myFragmentProfileName = theFragmentProfileName;
+        }
+
+        AC_INFO << "Engine wants profile '" << _myVertexProfileName << "' as vertex shader profile" << endl;
+        AC_INFO << "Engine wants profile '" << _myFragmentProfileName << "' as fragment shader profile" << endl;
+        int myVertexShaderProfile = asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
+        int myFragmentShaderProfile = asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
+        
+       for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
             const dom::NodePtr theShaderNode = theNode->childNode("shader", i);
             GLShaderPtr myGLShader(0);
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
@@ -127,13 +168,17 @@ namespace y60 {
 #ifndef _AC_NO_CG_
 		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) &&
                      theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
-                myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode));
+                myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
             } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
-                myGLShader = GLShaderPtr(new CGShader(theShaderNode));
+                myGLShader = GLShaderPtr(new CGShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
             }
 #endif
             if (myGLShader) {
+                if (myGLShader->isSupported()) {
                 _myShaders.push_back(myGLShader);
+                } else {
+                    AC_WARNING << "CG Shader '"<< theShaderNode->getAttributeString("name") << "' is not supported by engine profiles " << _myVertexProfileName << "/"<< _myFragmentProfileName;
+                }
             } else {
                 throw ShaderException(string("Can't determine shader type for shader with id '") +
                     theShaderNode->getAttributeString(ID_ATTRIB) + "'",PLUS_FILE_LINE);
