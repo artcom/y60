@@ -68,7 +68,14 @@ namespace asl {
     operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector) {
         theStream << "[";
         for (unsigned i = 0; i < theStringVector.size(); ++i) {
-            theStream << theStringVector[i];
+            const std::string & myString = theStringVector[i];
+            for (int j = 0; j < myString.size();++j) {
+                const char & c = myString[j];
+                if (c == '[' || c==']' || c==',' || c=='\\') {
+                    theStream << '\\';
+                }
+                theStream << c;
+            }
             if (i < theStringVector.size() - 1) {
                 theStream << ",";
             }
@@ -93,18 +100,23 @@ namespace asl {
             std::string myElement;
             do {
                 theStream >> myChar;
-                if (myChar == ']' && theStringVector.empty() && myElement.empty()) {
-                    //empty vector of strings
-                    break;
-                }
-                if ((myChar == ',') || (myChar == ']')) {
-                    theStringVector.push_back(myElement);
-                    myElement.clear();
-                    if (myChar == ']') {
+                if (myChar =='\\') {
+                    theStream >> myChar;
+                    myElement+=myChar;
+                } else {
+                    if (myChar == ']' && theStringVector.empty() && myElement.empty()) {
+                        //empty vector of strings
                         break;
                     }
-                } else {
-                    myElement += myChar;
+                    if ((myChar == ',') || (myChar == ']')) {
+                        theStringVector.push_back(myElement);
+                        myElement.clear();
+                        if (myChar == ']') {
+                            break;
+                        }
+                    } else {
+                        myElement += myChar;
+                    }
                 }
             } while ( ! theStream.eof());
 

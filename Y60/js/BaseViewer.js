@@ -709,11 +709,4 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     self.arguments = parseArguments(theArguments);
-
-    var myShaderLibrary = self.getShaderLibrary();
-    if (myShaderLibrary) {
-        GLResourceManager.loadShaderLibrary(myShaderLibrary);
-    } else {
-        // Logger.warning("No Shaderlibrary found. Reload manually");
-    }
 }

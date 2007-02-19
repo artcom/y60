@@ -46,10 +46,10 @@ namespace y60 {
     static const char * FEATURE_DROPPED            = "drop_feature";
 
      //=== Cg specific property name ===============================================
-    static const char * CG_FILE_PROPERTY           = "file";
-    static const char * CG_PROFILE_PROPERTY        = "profile";
-    static const char * CG_ENTRY_FUNCTION_PROPERTY = "entryfunction";
-    static const char * CG_COMPILERARGS_PROPERTY   = "compilerargs";
+    static const char * CG_FILES_PROPERTY           = "files";
+    static const char * CG_PROFILES_PROPERTY        = "profiles";
+    static const char * CG_ENTRY_FUNCTIONS_PROPERTY = "entryfunctions";
+    static const char * CG_COMPILERARGS2_PROPERTY   = "compilerargs";
 
     //=== VertexParameter names ===============================================
     static const char * VERTEXPARAM_PASS_THROUGH   = "pass_through";

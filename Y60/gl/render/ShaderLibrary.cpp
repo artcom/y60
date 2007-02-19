@@ -47,6 +47,7 @@ using namespace dom;
 #define DB(x) //x
 
 namespace y60 {
+    bool ShaderLibrary::_myGLisReadyFlag = false;
 
 	ShaderLibrary::ShaderLibrary()
 #ifndef _AC_NO_CG_

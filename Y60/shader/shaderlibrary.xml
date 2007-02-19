@@ -6,7 +6,7 @@
             <feature class="textures" values="[paint,bump]"/>
             <feature class="texcoord" values="[uv_map,uv_map]"/>
         </supports>
-        <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[phongBump.cg]" entryfunctions="[mainFragment]">
             <properties>
                  <sampler2d name="colorMap">0</sampler2d>
                  <sampler2d name="normalMap">1</sampler2d>
@@ -17,7 +17,7 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP20" file="phongBump.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[phongBump.cg]" entryfunctions="[mainVertex]">
             <properties/>
             <vertexparameters>
                  <vector3f name="normal"/>
@@ -378,7 +378,7 @@
             <feature class="texcoord" values="[uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="water.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[water.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vector4f name="Wave1Params">[0.18, 0.18, 0.4, 1]</vector4f>
                 <vector4f name="Wave1Direction" >[0, 0, -1, 0]</vector4f>
@@ -396,7 +396,7 @@
                 <vector3f  name="position"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="water.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[water.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
                 <sampler2d name="waterTex1">0</sampler2d>
                 <vector3f name="diffuse">[1,1,1]</vector3f>
@@ -413,7 +413,7 @@
             <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="water.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[water.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vector4f name="Wave1Params">[0.18, 0.18, 0.4, 1]</vector4f>
                 <vector4f name="Wave1Direction" >[0, 0, -1, 0]</vector4f>
@@ -433,7 +433,7 @@
                 <vector3f  name="position"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="water.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[water.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
                 <sampler2d name="waterTex1">0</sampler2d>
                 <sampler2d name="waterTex2">1</sampler2d>
@@ -451,7 +451,7 @@
             <feature class="texcoord" values="[uv_map]"/>
             <feature class="lighting" values="[toon]"/>
         </supports>
-        <fragmentshader profile="FP30" file="toon2.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[toon2.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <vector4f name="ambient">[0.8,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0,0,1]</vector4f>
@@ -461,7 +461,7 @@
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="toon2.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[toon2.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -477,7 +477,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[reflective]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]">
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -489,7 +489,7 @@
                  <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
@@ -502,7 +502,7 @@
             <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
-        <vertexshader profile="VP30" file="carpaint.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[DPAINT]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -517,7 +517,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="carpaint.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
@@ -532,7 +532,7 @@
             <feature class="texcoord" values="[reflective,reflective]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
-        <vertexshader profile="VP30" file="carpaint.cg" entryfunction="mainVertex" compilerargs="-DPAINT, -DNO_OCCLUSION">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DNO_OCCLUSION]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -544,7 +544,7 @@
                 <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="carpaint.cg" entryfunction="mainFragment" compilerargs="-DPAINT, -DNO_OCCLUSION">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DNO_OCCLUSION]]'>
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <samplerCUBE name="emissiveEnvTex">1</samplerCUBE>
@@ -558,7 +558,7 @@
             <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT=2]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -573,7 +573,7 @@
                  <vector2f name="texcoord1"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2, -DTEXGEN0={texcoord[0]}">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT=2,-DTEXGEN0={texcoord\[0\]}]]'>
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <sampler2d name="emissiveTex">1</sampler2d>
@@ -604,7 +604,7 @@
             <feature class="texcoord" values="[uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="wind.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[wind.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vector4f name="WindParams">[0.18, 0.18, 0.1, 1]</vector4f>
                 <vector4f name="WindDirection" >[-2, 1, 0, 0]</vector4f>
@@ -615,7 +615,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="wind.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[wind.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
                 <sampler2d name="paintTex">0</sampler2d>
             </properties>
@@ -628,7 +628,7 @@
             <feature class="texcoord" values="[uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="wave_2d.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[wave_2d.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
                 <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
@@ -641,7 +641,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="wave_2d.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[wave_2d.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
                 <sampler2d name="paintTex">0</sampler2d>
             </properties>
@@ -652,7 +652,7 @@
             <feature class="physics" values="[wave_1d]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="wave_1d.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[wave_1d.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
                 <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
@@ -664,7 +664,7 @@
                 <vector4f name="color"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="wave_1d.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[wave_1d.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
             </properties>
         </fragmentshader>
@@ -676,7 +676,7 @@
             <feature class="physics" values="[skin]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP40" file="SkinAndBones.cg" entryfunction="mainVertex" compilerargs="">
+        <vertexshader profiles="[arbvp1,vp40]" files="[SkinAndBones-ARB1.cg,SkinAndBones.cg]" entryfunctions="[mainVertex]" compilerargs='[[-profileopts,MaxLocalParams=256],[]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -695,7 +695,7 @@
                  <vector4f name="joint_indices_1" register="texcoord4"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP40" file="SkinAndBones.cg" entryfunction="mainFragment" compilerargs="">
+        <fragmentshader profiles="[arbfp1,fp40]" files="[SkinAndBones.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
             </properties>
@@ -708,7 +708,7 @@
             <feature class="texcoord" values="[uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="hexwisp.cg" entryfunction="main" compilerargs="-DCONST">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[hexwisp.cg]" entryfunctions="[main]" compilerargs='[[-DCONST]]'>
             <properties>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
                 <vector2f name="mirrorpoint">[0,0]</vector2f>
@@ -722,7 +722,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="hexwisp.cg" entryfunction="mainFragment" compilerargs="-DCONST">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[hexwisp.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DCONST]]'>
             <properties>
                 <sampler2d name="paintTex">0</sampler2d>
                 <sampler2d name="wispTex">1</sampler2d>
@@ -735,7 +735,7 @@
             <feature class="texcoord" values="[uv_map,reflective]"/>
             <feature class="lighting" values="[phong]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT, -DPHONG_SPECULAR">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DPHONG_SPECULAR]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -748,7 +748,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT, -DPHONG_SPECULAR">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DPHONG_SPECULAR]]'>
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
@@ -762,7 +762,7 @@
             <feature class="texcoord" values="[uv_map,reflective]"/>
             <feature class="lighting" values="[blinn]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -775,7 +775,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
@@ -789,7 +789,7 @@
             <feature class="lighting" values="[blinn]"/>
             <feature class="texcoord" values="[reflective]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]">
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -802,7 +802,7 @@
                  <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
@@ -815,7 +815,7 @@
             <feature class="lighting" values="[phong]"/>
             <feature class="texcoord" values="[reflective]"/>
         </supports>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPHONG_SPECULAR">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPHONG_SPECULAR]]'>
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -829,7 +829,7 @@
                  <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPHONG_SPECULAR">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPHONG_SPECULAR]]'>
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
@@ -1053,7 +1053,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP30" file="hdr.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[hdr.cg]" entryfunctions="[mainVertex]">
             <properties>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
                 <vector2f name="hdr">[0,1]</vector2f>
@@ -1064,7 +1064,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="hdr.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[hdr.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
             </properties>
@@ -1077,7 +1077,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP30" file="antialias.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[antialias.cg]" entryfunctions="[mainVertex]">
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
@@ -1089,7 +1089,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="antialias.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[antialias.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
             </properties>
@@ -1102,7 +1102,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[uv_map]"/>
         </supports>
-        <vertexshader profile="VP30" file="accumulation.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[accumulation.cg]" entryfunctions="[mainVertex]">
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
@@ -1115,7 +1115,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="accumulation.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[accumulation.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
@@ -1135,13 +1135,13 @@
             <feature class="textures" values="[paint,paint]"/>
             <feature class="texcoord" values="[uv_map, *]"/>
         </supports>
-        <vertexshader profile="VP30" file="voxelUnlit.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[voxelUnlit.cg]" entryfunctions="[mainVertex]">
             <vertexparameters>
                  <vector4f name="position"/>
                  <vector3f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="voxelUnlit.cg" entryfunction="mainFragmentTF" compilerargs="">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[voxelUnlit.cg]" entryfunctions="[mainFragmentTF]">
             <properties>
                 <sampler3d name="theDataTex">0</sampler3d>
                 <sampler2d name="theTransferTable">1</sampler2d>
@@ -1158,13 +1158,13 @@
             <feature class="textures" values="[paint]"/>
             <feature class="texcoord" values="[uv_map]"/>
         </supports>
-        <vertexshader profile="VP30" file="voxelUnlit.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[voxelUnlit.cg]" entryfunctions="[mainVertex]">
             <vertexparameters>
                  <vector4f name="position"/>
                  <vector3f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="voxelUnlit.cg" entryfunction="mainFragmentBW" compilerargs="">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[voxelUnlit.cg]" entryfunctions="[mainFragmentBW]">
             <properties>
                 <sampler3d name="theDataTex">0</sampler3d>
                 <float name="theAlphaFactor">1.0</float>
@@ -1200,7 +1200,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP30" file="particles.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[particles.cg]" entryfunctions="[mainVertex]">
             <properties>
                 <vector4f name="gravity">[0,0,0,0]</vector4f>
                 <vector3f name="size">[16,0,64]</vector3f>
@@ -1217,7 +1217,7 @@
                  <vector4f name="texcoord2"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="particles.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[particles.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler3d name="tex">0</sampler3d>
             </properties>
@@ -1229,7 +1229,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP40" file="glow.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp40]" files="[glow.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1237,7 +1237,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP40" file="glow.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp40]" files="[glow.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
                 <sampler2d name="blurKernel">1</sampler2d>
@@ -1255,7 +1255,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="vertexparams" values="[nightgrinder]"/>
         </supports>
-        <vertexshader profile="VP30" file="ng_fragment_lighting.cg" entryfunction="mainVertex" compilerargs="-DHAS_LIGHTMAP">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[ng_fragment_lighting.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DHAS_LIGHTMAP]]'>
             <properties>
 <!--           <vector4f name="diffuse">[0,0,0,0]</vector4f><vector4f name="ambient">[0,0,0,0]</vector4f> -->
                 <vector2f name="nearFar">[20.0, 15.0]</vector2f>
@@ -1268,7 +1268,7 @@
                  <vector4f name="texcoord2"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="ng_fragment_lighting.cg" entryfunction="mainFragment" compilerargs="-DHAS_LIGHTMAP">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[ng_fragment_lighting.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DHAS_LIGHTMAP]]'>
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
@@ -1282,7 +1282,7 @@
             <feature class="textures" values="[flow]"/>
             <feature class="texcoord" values="[*,*]"/>
         </supports>
-        <vertexshader profile="VP30" file="flow.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[flow.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1291,7 +1291,7 @@
                  <vector2f name="texcoord1"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="flow.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[flow.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
@@ -1308,7 +1308,7 @@
             <feature class="textures" values="[splat]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP30" file="splat.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[splat.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1316,7 +1316,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="splat.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[splat.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <vector3f name="gausscolor">[0,0,0]</vector3f>
@@ -1332,7 +1332,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP40" file="blur.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp40]" files="[blur.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1340,7 +1340,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP40" file="blur.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp40]" files="[blur.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
                 <sampler2d name="blurKernel">1</sampler2d>
@@ -1356,7 +1356,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <vertexshader profile="VP30" file="fade.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[fade.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1364,7 +1364,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="fade.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[fade.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <vector4f name="offset">[0,0,0,0]</vector4f>
@@ -1378,7 +1378,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="option" values="[nightvision]"/>
         </supports>
-        <vertexshader profile="VP30" file="nightvision.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[nightvision.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1386,7 +1386,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="nightvision.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[nightvision.cg]" entryfunctions="[mainFragment]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
@@ -1398,7 +1398,7 @@
             <feature class="lighting" values="[lambert]"/>
             <feature class="option" values="[spotlight]"/>
         </supports>
-        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]">
             <properties>
             </properties>
             <vertexparameters>
@@ -1406,7 +1406,7 @@
                  <vector4f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]">
             <properties>
               <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>  	 
                 <float name="penumbra">0.0</float> 	 
@@ -1421,7 +1421,7 @@
             <feature class="lighting" values="[lambert]"/>
             <feature class="option" values="[spotlight]"/>
         </supports>
-        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT]]'>
             <properties>
               <float name="penumbra">0.0</float>  	 
               <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f> 	 
@@ -1433,7 +1433,7 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
             </properties>
@@ -1446,7 +1446,7 @@
             <feature class="lighting" values="[lambert]"/>
             <feature class="option" values="[spotlight]"/>
         </supports>
-        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2">
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT=2]]'>
             <properties>
             </properties>
             <vertexparameters>
@@ -1456,7 +1456,7 @@
                  <vector2f name="texcoord1"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT=2]]'>
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
@@ -1472,7 +1472,7 @@
             <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
             <feature class="texcoord" values="[uv_map,uv_map,planar_projection]"/>
         </supports>
-        <fragmentshader profile="FP30" file="snow.cg" entryfunction="mainFragment">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[snow.cg]" entryfunctions="[mainFragment]">
             <properties>
                  <sampler2d name="ground">0</sampler2d>
                  <sampler2d name="snow">1</sampler2d>
@@ -1486,7 +1486,7 @@
                  <float name="shininess">1.0</float>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP20" file="snow.cg" entryfunction="mainVertex">
+        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[snow.cg]" entryfunctions="[mainVertex]">
             <properties>
                  <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
             </properties>

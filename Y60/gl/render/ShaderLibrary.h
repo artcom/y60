@@ -41,9 +41,16 @@ namespace y60 {
 #ifndef _AC_NO_CG_
             CGcontext getCgContext();
 #endif
+            static void setGLisReadyFlag(bool theFlag=true) {
+                _myGLisReadyFlag = theFlag;
+            }
+            static bool GLisReady() {
+                return _myGLisReadyFlag;
+            }
          private:
             void loadAllShaders();
             GLShaderVector  _myShaders;
+            static bool _myGLisReadyFlag;
 #ifndef _AC_NO_CG_
 		    CGcontext       _myCgContext;
 #endif

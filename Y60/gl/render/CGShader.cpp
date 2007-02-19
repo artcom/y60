@@ -22,6 +22,7 @@
 #include <y60/GLUtils.h>
 #include <y60/NodeNames.h>
 #include <asl/PackageManager.h>
+#include <asl/os_functions.h>
 
 using namespace std;
 using namespace asl;
@@ -129,7 +130,7 @@ namespace y60 {
     CGShader::getVertexRegisterFlags() const {
         return _myVertexShader._myVertexRegisterFlags;
     }
-
+#if 0
     // converts a comma-delimted list of compiler args ("-DFOO, -DBar") to
     // a null-terminated array of null-terminated args.
     void
@@ -151,13 +152,124 @@ namespace y60 {
             theArgs.push_back (myRestArgString);
         }
     }
+#endif
 
     void
     CGShader::loadShaderProperties(const dom::NodePtr theShaderNode,
             ShaderDescription & theShader)
     {
-        GLShader::loadShaderProperties(theShaderNode, theShader);
+         GLShader::loadShaderProperties(theShaderNode, theShader);
+        
+        // select profile to use from latest engine profile or environment variable
 
+        std::string myShaderProfileName;
+        if (theShaderNode->nodeName() == VERTEX_SHADER_NODE_NAME) {
+            if (asl::get_environment_var("AC_VERTEX_SHADER_PROFILE", myShaderProfileName)) {
+                int myShaderProfile = asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings); // just for parameter check
+            } else {
+                if (ShaderLibrary::GLisReady()) {
+                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
+                    myShaderProfileName = cgGetProfileString(myShaderProfile);
+                } else {
+                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile" << endl;
+                    myShaderProfileName = "arbvp1";
+                }
+            }
+        } else if (theShaderNode->nodeName() == FRAGMENT_SHADER_NODE_NAME) {
+            if (asl::get_environment_var("AC_FRAGMENT_SHADER_PROFILE", myShaderProfileName)) {
+                int myShaderProfile = asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings); // just for parameter check
+            } else {
+                if (ShaderLibrary::GLisReady()) {
+                    CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+                    myShaderProfileName = cgGetProfileString(myShaderProfile);
+                } else {
+                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile" << endl;
+                    myShaderProfileName = "arbfp1";
+                }
+            }
+        } else {
+            throw ShaderException("unknown shader type", PLUS_FILE_LINE);
+        }
+        AC_DEBUG << "Engine wants shader profile:" << myShaderProfileName; 
+        
+const VectorOfString myProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
+        int myProfileIndex = -1;
+        for (int i=0; i<myProfileNames.size();++i) {
+            if (myProfileNames[i] == myShaderProfileName) {
+                myProfileIndex = i;
+                break;
+            }
+        }
+        if ((myProfileIndex >= 0) && (myProfileIndex < myProfileNames.size())) {
+        } else {
+            throw ShaderException(std::string("Engine profile does not match any given profile in shader description, library node =")+
+                                   asl::as_string(*theShaderNode), PLUS_FILE_LINE);
+        }
+        AC_DEBUG << "profile '" << myShaderProfileName << "' has index "<< myProfileIndex << " in shader description"; 
+        theShader._myProfile = ShaderProfile(asl::getEnumFromString(myShaderProfileName, ShaderProfileStrings));
+
+        // now select matching file parameters; either one file for all profiles or exactly one per profile are allowed
+        const VectorOfString myFilenames = theShaderNode->getAttributeValue<VectorOfString>(CG_FILES_PROPERTY);
+        int myFileIndex = 0;
+        if (myProfileNames.size() == myFilenames.size()) {
+            myFileIndex = myProfileIndex;
+        } else  {
+            if (myFilenames.size() != 1) {
+                throw ShaderException("bad number of program file names, must be one or match number of profiles", PLUS_FILE_LINE);
+            }
+        }
+
+        if (myFilenames.size() > myFileIndex) {
+            theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilenames[myFileIndex]);
+            if (theShader._myFilename.empty()) {
+                throw ShaderException(string("Could not find cg-shader '") + myFilenames[myFileIndex] + "' in " +
+                        AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+            }
+         } else {
+            throw ShaderException("bad number of program file names", PLUS_FILE_LINE);
+         }    
+        
+        // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
+        int myEntryIndex = 0;
+        const VectorOfString myEntryFunctions = theShaderNode->getAttributeValue<VectorOfString>(CG_ENTRY_FUNCTIONS_PROPERTY);
+        if (myProfileNames.size() != myEntryFunctions.size()) {
+            myEntryIndex = myProfileIndex;
+        } else  {
+            if (myEntryFunctions.size() != 1) {
+                throw ShaderException("bad number of entry function names, must be one or match number of profiles", PLUS_FILE_LINE);
+            }
+        }
+
+        if (myEntryFunctions.size() > myEntryIndex) {
+            theShader._myEntryFunction = myEntryFunctions[myEntryIndex];
+            if (theShader._myEntryFunction.empty()) {
+                throw ShaderException("Empty entry function name provided in shader library", PLUS_FILE_LINE);
+            }
+         } else {
+            throw ShaderException("bad number of entry function names", PLUS_FILE_LINE);
+         }    
+        
+
+        // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
+        if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
+            const VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
+            int myCompilerArgsIndex = 0;
+            if (myProfileNames.size() == myCompilerArgs.size()) {
+                myCompilerArgsIndex = myProfileIndex;
+            } else  {
+                if (myCompilerArgs.size() != 1) {
+                    throw ShaderException("bad number of compiler arg sets, must be one or match number of profiles", PLUS_FILE_LINE);
+                }
+            }
+
+            if (myCompilerArgs.size() > myCompilerArgsIndex) {
+                theShader._myCompilerArgs = myCompilerArgs[myCompilerArgsIndex];
+            } else {
+                throw ShaderException("bad number of compiler arg sets", PLUS_FILE_LINE);
+            }    
+        }    
+#if 0
+        //old:
         string myFilename = theShaderNode->getAttributeString(CG_FILE_PROPERTY);
         theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilename);
         if (theShader._myFilename.empty()) {
@@ -172,6 +284,7 @@ namespace y60 {
             processCompilerArgs(theShader._myCompilerArgs,
                     theShaderNode->getAttributeString(CG_COMPILERARGS_PROPERTY));
         }
+#endif
     }
 
     bool
@@ -182,7 +295,7 @@ namespace y60 {
             return ( ! _myFragmentShader._myFilename.empty());
         } else {
             throw ShaderException(string("Unknown Shadertype : ") + as_string(theShadertype) ,
-                                    "CgMaterial::hasShader()" );
+                    "CgMaterial::hasShader()" );
         }
     }
 

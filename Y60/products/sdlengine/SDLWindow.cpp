@@ -216,7 +216,6 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             theTargetHeight = getHeight();
             AC_DEBUG << "keeping height=" << theTargetHeight;
         }
-#ifndef OSX // TODO PORT
 #ifdef AC_USE_X11
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version);
@@ -225,7 +224,6 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             XSync(wminfo.info.x11.display, true);
             wminfo.info.x11.unlock_func();
         }
-#endif
 #endif
 
         if (_myScene) {
@@ -239,14 +237,12 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
         }
 
-#ifndef OSX // TODO PORT
 #ifdef AC_USE_X11
         if (SDL_GetWMInfo(&wminfo) >= 0) {
             wminfo.info.x11.lock_func();
             XSync(wminfo.info.x11.display, true);
             wminfo.info.x11.unlock_func();
         }
-#endif
 #endif
         // if we are resetting the video mode (e.g. Fullscreen toggle), then the GL context
         // will be lost. Reinit GL and setup the textures again
@@ -316,6 +312,7 @@ SDLWindow::initDisplay() {
 
     // retrieve standard cursor
     _myStandardCursor =  SDL_GetCursor();
+    ShaderLibrary::setGLisReadyFlag(true);
 }
 
 void

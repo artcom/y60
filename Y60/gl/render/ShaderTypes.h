@@ -17,14 +17,14 @@ namespace y60 {
     enum ShaderProfile {ARBVP1, ARBFP1, VP40, FP40, VP30, FP30, VP20, FP20 };
 
     static const char * ShaderProfileStrings[] = {
-        "ARBVP1",
-        "ARBFP1",
-        "VP40",
-        "FP40",
-        "VP30",
-        "FP30",
-        "VP20",
-        "FP20",
+        "arbvp1",
+        "arbfp1",
+        "vp40",
+        "fp40",
+        "vp30",
+        "fp30",
+        "vp20",
+        "fp20",
         0
     };
 
