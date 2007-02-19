@@ -20,6 +20,7 @@
 
 #include "SceneExporter.h"
 
+#include "AnimationExporter.h"
 #include "ShapeExporter.h"
 #include "MaterialExporter.h"
 #include "Exceptions.h"
@@ -42,6 +43,8 @@
 #include <fstream>
 
 #define LIMIT_LIGHTS
+
+using namespace std;
 
 SceneExporter::SceneExporter(bool theBinaryFlag) :
     _myObjectCount(0), _myBinaryFlag(theBinaryFlag)
@@ -565,6 +568,10 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
             break;
     }
 
+    // export animation if any exists
+    AnimationExporter myAnimationExporter(*_mySceneBuilder,_myDocument);
+//    myAnimationExporter.exportGlobal(theNode, theParentBuilder->getId());
+    myAnimationExporter.exportCharacter(theNode, theParentBuilder->getId());
 
     return true;
 }
