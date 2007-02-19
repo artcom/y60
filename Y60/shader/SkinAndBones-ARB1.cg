@@ -1,0 +1,116 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: SkinAndBones.cg,v $
+//   $Author: ulrich $
+//   $Revision: 1.11 $
+//   $Date: 2004/09/07 13:08:02 $
+//
+//  Description: environment mapping shader
+//=============================================================================
+
+#define JOINT_VECTOR_COUNT 186
+//#define JOINT_VECTOR_COUNT 82
+
+struct app2vert {
+    float3 Position  : POSITION;
+    float3 Normal    : NORMAL;
+    float2 TexCoord  : TEXCOORD0;
+    float4 Weights0   : TEXCOORD1;
+    float4 Indices0   : TEXCOORD2;
+    float4 Weights1   : TEXCOORD3;
+    float4 Indices1   : TEXCOORD4;
+};
+
+struct vert2frag {
+    float4 homPosition   : POSITION;
+    float2 texCoord0     : TEXCOORD0;
+    float4 primColor     : COLOR0;
+};
+
+vert2frag mainVertex(app2vert IN,
+                     uniform float4   BoneMatrix[JOINT_VECTOR_COUNT],
+                     uniform float4   diffuse,
+                     uniform float4   ambient,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 AC_OBJECTWORLD,
+                     uniform float4x4 AC_OBJECTWORLD_IT //,
+                     //uniform float3   AC_DIRECTIONAL_LIGHTS[],
+                     //uniform float4   AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
+                     //uniform float3   AC_POSITIONAL_LIGHTS[],
+                     //uniform float4   AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
+                     //uniform float4   AC_AMBIENT_LIGHT_COLOR
+                     )
+{
+    vert2frag OUT;
+    float3 myNetPosition = 0;
+    float3 myNetNormal   = 0;
+/*
+    int i;
+    for (i = 0; i < 4; i++) {
+        float myIndex = IN.Indices0[i] * 3;
+        float3x4 myModel = float3x4(BoneMatrix[myIndex + 0],
+                                    BoneMatrix[myIndex + 1],
+                                    BoneMatrix[myIndex + 2]);
+
+        float3 myBonePosition = mul(myModel, float4(IN.Position, 1));
+
+        float3x3 myRotate = float3x3(myModel[0].xyz,
+                                     myModel[1].xyz,
+                                     myModel[2].xyz);
+        float3 myBoneNormal = mul(myRotate, IN.Normal);
+        myNetPosition += IN.Weights0[i] * myBonePosition;
+        myNetNormal   += IN.Weights0[i] * myBoneNormal;
+    }
+    for (i = 0; i < 4; i++) {
+        float myIndex = IN.Indices1[i] * 3;
+        float3x4 myModel = float3x4(BoneMatrix[myIndex + 0],
+                                    BoneMatrix[myIndex + 1],
+                                    BoneMatrix[myIndex + 2]);
+
+        float3 myBonePosition = mul(myModel, float4(IN.Position, 1));
+
+        float3x3 myRotate = float3x3(myModel[0].xyz,
+                                     myModel[1].xyz,
+                                     myModel[2].xyz);
+        float3 myBoneNormal = mul(myRotate, IN.Normal);
+        myNetPosition += IN.Weights1[i] * myBonePosition;
+        myNetNormal   += IN.Weights1[i] * myBoneNormal;
+    }
+*/
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, float4(myNetPosition, 1));
+    OUT.texCoord0   = IN.TexCoord;
+
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, float4(myNetPosition,1)).xyz;
+    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, float4(myNetNormal,1)).xyz);
+
+    float4 myDiffuse = float4(0,0,0,1);
+/*
+    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
+        myDiffuse  += max(0, dot(AC_DIRECTIONAL_LIGHTS[i], myWorldNormal)) * AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i];
+    }
+
+    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+        float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+        myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i];
+    }
+
+    OUT.primColor = myDiffuse*diffuse + AC_AMBIENT_LIGHT_COLOR*ambient;
+*/
+    OUT.primColor = diffuse;
+    return OUT;
+}
+
+float4 mainFragment(vert2frag   IN,
+                    uniform sampler2D decalTex
+                    ): COLOR
+{
+    return tex2D(decalTex, IN.texCoord0) * IN.primColor;
+}
