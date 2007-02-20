@@ -74,6 +74,12 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         if (_myLastTime == null) {
             _myLastTime = theTime;
         }
+
+        if (!_myNodeToFollow) {
+            Logger.warning("No node to follow specified.");
+            return;
+        }
+
         var myDeltaTime = theTime - _myLastTime;
         _myLastTime = theTime;
         
