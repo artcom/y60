@@ -177,8 +177,13 @@ namespace y60 {
          * Load shader library from file.
          * Previously loaded library is dropped and replaced with the newly loaded one.
          * @param theShaderLibraryFile Shader library filename.
+         * @param the Cg vertex shader profile name.
+         * @param the Cg fragment shader profile name.
+         * @param theShaderLibraryFile Shader library filename.
          */
-        void loadShaderLibrary(const std::string & theShaderLibraryFile);
+        void loadShaderLibrary(const std::string & theShaderLibraryFile,
+             const std::string & theVertexProfileName,
+             const std::string & theFragmentProfileName);
 
         /**
          * Return pointer to shader library.

@@ -37,12 +37,28 @@ static JSBool
 loadShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a given shader library.");
     DOC_PARAM("theFileName", "Filename of the shaderlibrary to load", DOC_TYPE_STRING);
+    DOC_PARAM("theVertexProfileName", "(optional) name of Cg vertex shader profile", DOC_TYPE_STRING);
+    DOC_PARAM("theFragmentProfileName", "(optional) name of Cg fragment shader profile", DOC_TYPE_STRING);
     DOC_END;
     try {
-        std::string theShaderLibFile;
-        convertFrom(cx,argv[0],theShaderLibFile);
+        std::string myShaderLibFile;
+        std::string myVertexProfileName;
+        std::string myFragmentProfileName;
 
-        GLResourceManager::get().loadShaderLibrary(asl::expandEnvironment(theShaderLibFile));
+        switch(argc) {
+            case 3:
+                convertFrom(cx,argv[1],myVertexProfileName);
+                convertFrom(cx,argv[2],myFragmentProfileName);
+            case 1:
+                convertFrom(cx,argv[0],myShaderLibFile);
+            break;
+            default:
+                JS_ReportError(cx,"JSGLResourceManager::loadShaderLibrary: number of arguments is %d, must be 1 oder 3", argc);
+                return JS_FALSE;
+        }
+
+        GLResourceManager::get().loadShaderLibrary(
+                    asl::expandEnvironment(myShaderLibFile), myVertexProfileName, myFragmentProfileName);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

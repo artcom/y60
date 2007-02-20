@@ -159,11 +159,14 @@ namespace y60 {
         glPrioritizeTextures(1, &myTextureId, &thePriority);
     }
 
-    void GLResourceManager::loadShaderLibrary(const std::string & theShaderLibraryFile) {
+    void GLResourceManager::loadShaderLibrary(const std::string & theShaderLibraryFile,
+                                              const std::string & theVertexProfileName,
+                                              const std::string & theFragmentProfileName)
+    {
         if (!_myShaderLibrary) {
             _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
         }
-        _myShaderLibrary->load(theShaderLibraryFile);
+        _myShaderLibrary->load(theShaderLibraryFile, theVertexProfileName, theFragmentProfileName);
 
     }
 
