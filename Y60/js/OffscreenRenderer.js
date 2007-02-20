@@ -46,16 +46,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     
 
     function setup(theSize, theCanvas) {
-        //add our own camera
-        if (theCamera == undefined) {
-            self.camera = window.camera.cloneNode(true);
-            self.camera.name = "OffscreenBuffer_Camera";
-            adjustNodeIds(self.camera);
-            self.camera = window.scene.world.appendChild(self.camera);
-        } else {
-            self.camera = theCamera;
-        }
-
         // Get target image for offscreen rendering
         if (theSize == undefined) {
             theSize = [window.width, window.height];
@@ -68,7 +58,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         if (theImage == undefined) {
             theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
         }
-
         self.image = theImage;    
         self.image.name = "OffscreenBuffer_Image";
 
@@ -112,6 +101,17 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myOffscreenRenderArea.scene = window.scene;
         _myOffscreenRenderArea.canvas = _myCanvas;
         _myOffscreenRenderArea.eventListener = self;
+
+        // setup camera
+        if (theCamera == undefined) {
+            var myCamera = window.camera.cloneNode(true);
+            myCamera.name = "OffscreenBuffer_Camera";
+            adjustNodeIds(myCamera);
+            window.scene.world.appendChild(myCamera);
+            self.camera = myCamera;
+        } else {
+            self.camera = theCamera;
+        }
     }
   
     self.saveScreenshot = function(theFilename) {
@@ -223,6 +223,4 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     var _myScreenshotName      = null;
 
     setup(theSize, theCanvas);
-    
-
 }

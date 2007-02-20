@@ -214,16 +214,16 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Wireframe: " + (self.getActiveViewport().wireframe ? "on" : "off"));
                     break;
                 case 'b':
-                    self.getActiveViewport().backfaceCulling = !self.getActiveViewport().backfaceCulling;
-                    print("Backface culling: " + (self.getActiveViewport().backfaceCulling ? "on" : "off"));
+                    self.getActiveViewport().backfaceculling = !self.getActiveViewport().backfaceculling;
+                    print("Backface culling: " + (self.getActiveViewport().backfaceculling ? "on" : "off"));
                     break;
                 case 'c':
                     self.getActiveViewport().culling = !self.getActiveViewport().culling;
                     print("Culling: " + (self.getActiveViewport().culling ? "on" : "off"));
                     break;
                 case 'C':
-                    self.getActiveViewport().debugCulling = !self.getActiveViewport().debugCulling;
-                    print("Debug culling: " + (self.getActiveViewport().debugCulling ? "on" : "off"));
+                    self.getActiveViewport().debugculling = !self.getActiveViewport().debugculling;
+                    print("Debug culling: " + (self.getActiveViewport().debugculling ? "on" : "off"));
                     break;
                 case 'V':
                     self.autoClicker.enabled = !self.autoClicker.enabled;

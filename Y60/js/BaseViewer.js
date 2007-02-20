@@ -107,6 +107,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myRenderWindow;
     }
 
+    self.setActiveViewport = function(theViewport) {
+        _activeViewport = theViewport;
+    }
     self.getActiveViewport = function() {
         return _activeViewport;
     }
@@ -151,14 +154,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             theMoverFactory = MoverBase;
         }
         var myNewMover = new theMoverFactory(theViewport);
-        var myViewportId = getViewportIndex(theViewport);
+        var myViewportId = getViewportId(theViewport);
         _myViewportMovers[myViewportId] = myNewMover;
         myNewMover.setMoverObject(myNewMover.getViewportCamera());
         return myNewMover;
     }
 
     self.getMover = function(theViewport) {
-        var myIndex = getViewportIndex(theViewport);
+        var myIndex = getViewportId(theViewport);
         if (myIndex in _myViewportMovers) {
             return _myViewportMovers[myIndex];
         } else {
@@ -172,7 +175,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.nextMover = function(theViewport) {
-        var myViewportId = getViewportIndex(theViewport);
+        var myViewportId = getViewportId(theViewport);
 
     	if (_myMoverFactories.length == 0) {
     	    return;
@@ -250,7 +253,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
         if (!theViewport) {
-            theViewport = getSingleViewport();
+            theViewport = self.getActiveViewport(); //getSingleViewport();
         }
         theViewport.camera = theCamera.id;
 
@@ -558,7 +561,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
 
-    function getViewportIndex(theViewport) {
+    function getViewportId(theViewport) {
         if (theViewport) {
             return theViewport.id;
         }
