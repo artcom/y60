@@ -208,8 +208,11 @@ MAKE_SCOPE_TIMER(switchMaterial);
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
-            myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport, _myPreviousMaterial);
-
+            if (myShader) { 
+                myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport, _myPreviousMaterial);
+            } else {
+                AC_ERROR << "Material has no shader, material id = " << theMaterial.get<IdTag>();
+            }
             CHECK_OGL_ERROR;
         }
 

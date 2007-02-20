@@ -30,6 +30,19 @@ const IMAGE_COUNT  = 1000;
 const IMAGE_1 = "../../../../shader/shadertex/ac_logo.png";
 const IMAGE_2 = "../../../../shader/shadertex/hatch.jpg";
 
+var myShaderLibrary = "../../../../shader/shaderlibrary.xml";
+if (myShaderLibrary) {
+    Logger.info("loading shader lib:"+myShaderLibrary);
+    if (operatingSystem() != "OSX") {
+        GLResourceManager.loadShaderLibrary(myShaderLibrary,"vp40", "fp40");
+    } else {
+        GLResourceManager.loadShaderLibrary(myShaderLibrary,"arbvp1", "arbfp1");
+    }
+} else {
+    Logger.warning("No Shaderlibrary found. Reload manually");
+}
+
+
 var window     = new RenderWindow();
 window.fixedFrameTime = 0.04;
 

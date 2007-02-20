@@ -6,6 +6,11 @@ else
 fi
 
 PLUGIN_DIR="$PRO/lib"
+UNAME=`uname`
+if [ $UNAME == "Darwin" ]; then
+    echo "#### WARNING: js tests disabled on OSX"
+    exit 0
+fi
 
 UNAME=`uname -o`
 PLATFORM=LINUX
