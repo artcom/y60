@@ -16,20 +16,23 @@ fi
 shift
 shift
 
-APPLICATION=acgtkshell
-if [ "$DEBUG" == "1" ] ; then
-    APPLICATION=acgtkshellDBG
+APPLICATION="acgtkshell"
+if [ "$DEBUG" == "1" ]; then
+    APPLICATION="${APPLICATION}DBG"
 fi
 
-SCRIPT="$BASEDIR/SCRIPTS/rendergirl.js"
+SCRIPTS="${BASEDIR}/SCRIPTS"
+if [ ! -d ${SCRIPTS} ]; then
+    SCRIPTS="${PRO}/src/Y60/products/rendergirl/SCRIPTS"
+fi
+SCRIPT="${SCRIPTS}/rendergirl.js"
 
-BASENAME=${MODELNAME%.*}
-
+#BASENAME=${MODELNAME%.*}
 #if [ -e ${BASENAME}.js ]; then
 #    SCRIPT=${BASENAME}.js
 #fi
 
-COMMAND="$APPLICATION -I SCRIPTS;$PRO/src/Y60/js;$PRO/lib $SCRIPT $MODELNAME $SHADERLIB $*"
+COMMAND="${APPLICATION} -I ${SCRIPTS};${PRO}/src/Y60/js;${PRO}/lib ${SCRIPT} ${MODELNAME} ${SHADERLIB} $*"
 echo $COMMAND
 $COMMAND
 exit $?
