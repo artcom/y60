@@ -509,14 +509,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _mySplashScreen.position = new Vector2f((window.width - _mySplashScreen.width) / 2,
                                                     (window.height - _mySplashScreen.height) / 2);
         }
-        print("loading shader lib");
-        var myShaderLibrary = self.getShaderLibrary();
-        if (myShaderLibrary) {
-            GLResourceManager.loadShaderLibrary(myShaderLibrary);
-        } else {
-            // Logger.warning("No Shaderlibrary found. Reload manually");
-        }
-     }
+    }
 
     self.createShutter = function() {
         if (!_myShutter) {
