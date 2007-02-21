@@ -706,8 +706,14 @@ namespace y60 {
 
                 unsigned mySrcHeight = myWord.surface->h;
                 unsigned mySrcWidth  = myWord.surface->w;
-                if (mySrcHeight + myYPos > mySurfaceHeight-_myBottomPadding) {
-                    mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
+
+                if (mySurfaceHeight > (_myBottomPadding + myYPos)) {
+                    if (mySrcHeight + myYPos > mySurfaceHeight-_myBottomPadding) {
+                        mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
+                    }
+                } else {
+                    mySrcHeight = 0;
+                    AC_TRACE << "SDLTextRenderer::createTextSurface: surface too small for text";
                 }
 
                 mySrcWidth = asl::minimum(mySrcWidth, unsigned(_myTextureSurface->w - myXPos));
