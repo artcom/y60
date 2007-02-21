@@ -1,9 +1,0 @@
-<AudioConfig latency="0.1" sampleRate="48000" priorityClass="SCHED_OTHER" priority="MAX">
-        <SoundOut id="SoundOut" numChannels="2" 
-                    timeSource="true" volume="1.0"/> 
-        <StereoMixer id="Mixer">
-            <Output channel="0" dest="SoundOut.0"/> 
-            <Output channel="1" dest="SoundOut.1"/> 
-        </StereoMixer> 
-</AudioConfig>
-
