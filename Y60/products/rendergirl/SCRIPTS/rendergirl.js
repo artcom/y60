@@ -56,6 +56,8 @@ var ourAllowedOptions = {
 //=================================================
 
 ourHandler.on_mainWindow_realize = function() {
+    print("loading shader library");
+    GLResourceManager.loadShaderLibrary("shaderlibrary.xml");
 }
 
 //=================================================
