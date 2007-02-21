@@ -33,8 +33,9 @@ namespace y60 {
         public:
 
             virtual IShaderLibraryPtr getShaderLibrary() const = 0;
+#if 0
             virtual void loadShaderLibrary(const std::string & theShaderLibraryFile)  = 0;
-        
+#endif    
             virtual void updateTextureData(ImagePtr theImage) = 0;
             virtual void updateTextureParams(ImagePtr theImage) = 0;
 

@@ -715,13 +715,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     var myShaderLibrary = self.getShaderLibrary();
     if (myShaderLibrary) {
-        Logger.info("loading shader lib:"+myShaderLibrary);
-         if (operatingSystem() != "OSX") {
-            GLResourceManager.loadShaderLibrary(myShaderLibrary,"vp40", "fp40");
-        } else {
-            GLResourceManager.loadShaderLibrary(myShaderLibrary,"arbvp1", "arbfp1");
-        }
+        GLResourceManager.prepareShaderLibrary(myShaderLibrary);
     } else {
-        Logger.warning("No Shaderlibrary found. Reload manually");
+        Logger.warning("No Shaderlibrary name given found, default library will be loaded");
     }
 }

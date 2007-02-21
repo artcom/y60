@@ -18,7 +18,7 @@ print("   Window-Size:   " + WINDOW_SIZE);
 print("   Multisampling: " + MULTISAMPLING);
 print("   USE_CG:        " + (USE_CG ? "true" : "false"));
 
-GLResourceManager.loadShaderLibrary("shaderlibrary" + (USE_CG ? ".xml" : "_nocg.xml"));
+GLResourceManager.prepareShaderLibrary("shaderlibrary" + (USE_CG ? ".xml" : "_nocg.xml"));
 
 var window = new RenderWindow();
 window.resize(WINDOW_SIZE[0], WINDOW_SIZE[1]);

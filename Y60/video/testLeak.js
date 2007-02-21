@@ -27,16 +27,7 @@ const START_FRAMES = 199;
 const END_FRAMES   = 200;
 
 var myShaderLibrary = "../../../../shader/shaderlibrary.xml";
-if (myShaderLibrary) {
-    Logger.info("loading shader lib:"+myShaderLibrary);
-    if (operatingSystem() != "OSX") {
-        GLResourceManager.loadShaderLibrary(myShaderLibrary,"vp40", "fp40");
-    } else {
-        GLResourceManager.loadShaderLibrary(myShaderLibrary,"arbvp1", "arbfp1");
-    }
-} else {
-    Logger.warning("No Shaderlibrary found. Reload manually");
-}
+GLResourceManager.prepareShaderLibrary(myShaderLibrary);
 
 var window     = new RenderWindow();
 window.fixedFrameTime = 0.04;

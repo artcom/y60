@@ -170,6 +170,25 @@ namespace y60 {
 
     }
 
+    void GLResourceManager::loadShaderLibrary() {
+        if (!_myShaderLibrary) {
+            _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
+        }
+        _myShaderLibrary->load();
+
+    }
+    void GLResourceManager::prepareShaderLibrary(const std::string & theShaderLibraryFile,
+                                              const std::string & theVertexProfileName,
+                                              const std::string & theFragmentProfileName)
+    {
+        if (!_myShaderLibrary) {
+            _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
+        }
+        _myShaderLibrary->prepare(theShaderLibraryFile, theVertexProfileName, theFragmentProfileName);
+
+    }
+
+
     IShaderLibraryPtr
     GLResourceManager::getShaderLibrary() const {
         return _myShaderLibrary;

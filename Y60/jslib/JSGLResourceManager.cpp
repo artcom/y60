@@ -63,6 +63,37 @@ loadShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+prepareShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets name and optional parameters for a given shader library; loading will take place automatically after window creation.");
+    DOC_PARAM("theFileName", "Filename of the shaderlibrary to load", DOC_TYPE_STRING);
+    DOC_PARAM("theVertexProfileName", "(optional) name of Cg vertex shader profile", DOC_TYPE_STRING);
+    DOC_PARAM("theFragmentProfileName", "(optional) name of Cg fragment shader profile", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        std::string myShaderLibFile;
+        std::string myVertexProfileName;
+        std::string myFragmentProfileName;
+
+        switch(argc) {
+            case 3:
+                convertFrom(cx,argv[1],myVertexProfileName);
+                convertFrom(cx,argv[2],myFragmentProfileName);
+            case 1:
+                convertFrom(cx,argv[0],myShaderLibFile);
+            break;
+            default:
+                JS_ReportError(cx,"JSGLResourceManager::loadShaderLibrary: number of arguments is %d, must be 1 oder 3", argc);
+                return JS_FALSE;
+        }
+
+        GLResourceManager::get().prepareShaderLibrary(
+                    asl::expandEnvironment(myShaderLibFile), myVertexProfileName, myFragmentProfileName);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
 JSFunctionSpec *
 JSGLResourceManager::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -77,8 +108,9 @@ JSGLResourceManager::Functions() {
 JSFunctionSpec *
 JSGLResourceManager::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
-        // name                    native          nargs
-        {"loadShaderLibrary",     loadShaderLibrary,     1},
+        // name                   native               nargs
+        {"loadShaderLibrary",     loadShaderLibrary,    3},
+        {"prepareShaderLibrary",  prepareShaderLibrary, 3},
         {0}
     };
     return myFunctions;

@@ -1,3 +1,13 @@
+//=============================================================================
+// Copyright (C) 1993-2005, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
 #ifndef AC_Y60_SHADER_LIBRARY_INCLUDED
 #define AC_Y60_SHADER_LIBRARY_INCLUDED
 
@@ -33,10 +43,33 @@ namespace y60 {
             ShaderLibrary();
             virtual ~ShaderLibrary();
 
-            void load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName); 
+            void load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName);
+
+            void prepare(const std::string & theShaderLibraryName,
+                         std::string theVertexProfileName,
+                         std::string theFragmentProfileName)
+            {
+                _myShaderLibraryNames.push_back(theShaderLibraryName);
+                _myVertexProfileNames.push_back(theVertexProfileName);
+                _myFragmentProfileNames.push_back(theFragmentProfileName);
+            }
+            
             void load(const std::string & theLibraryFileName) {
                 load(theLibraryFileName,"","");
             }
+            void load() {
+                if (_myShaderLibraryNames.size() == 0) {
+                    _myShaderLibraryNames.push_back("shaderlibrary.xml");
+                    _myVertexProfileNames.push_back("");
+                    _myFragmentProfileNames.push_back("");
+                }
+                 for (int i = 0; i < _myShaderLibraryNames.size(); ++i) { 
+                    load(_myShaderLibraryNames[i], _myVertexProfileNames[i], _myFragmentProfileNames[i]);
+                }
+                _myShaderLibraryNames.clear();
+                _myVertexProfileNames.clear();
+                _myFragmentProfileNames.clear();
+             }
 
             void load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName);
             void load(const dom::NodePtr theNode) {
@@ -66,6 +99,9 @@ namespace y60 {
             static bool _myGLisReadyFlag;
 #ifndef _AC_NO_CG_
             CGcontext       _myCgContext;
+            std::vector<std::string> _myShaderLibraryNames;
+            std::vector<std::string> _myVertexProfileNames;
+            std::vector<std::string> _myFragmentProfileNames;
             std::string _myVertexProfileName;
             std::string _myFragmentProfileName;
 #endif

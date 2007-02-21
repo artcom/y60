@@ -1,0 +1,51 @@
+#! /bin/bash
+
+if [ $# -lt 1 ]; then
+    echo "Usage: `basename $0` <modelname> [<shaderlibrary>] [<arguments> ...]"
+    exit 1
+fi
+MODELNAME="$1"
+shift
+
+# determine shader library
+if [ "$USE_CG" == "1" ] ; then
+    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary.xml"
+else
+    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary_nocg.xml"
+fi
+if [ ! -f "$SHADERLIB" ]; then
+    echo "Shaderlibrary '$SHADERLIB' not found"
+    exit 1
+fi
+
+APPLICATION="$PRO/bin/y60"
+if [ "$DEBUG" == "VG" ]; then
+    if [ -x `which valgrind` ]; then
+        APPLICATION="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes ${APPLICATION}DBG"
+    else
+        APPLICATION="${APPLICATION}DBG"
+    fi
+elif [ "$DEBUG" == "vc" ]; then
+    echo Visual Studio Debuger Setup
+    echo --------------------------------------------------------------------------------------
+    echo $PRO/bin/y60DBG.exe
+    echo $ARGS
+    echo `cmd /C cd`
+    echo --------------------------------------------------------------------------------------
+    exit 0
+elif [ "$DEBUG" == "1" ] ; then
+    APPLICATION="${APPLICATION}DBG"
+fi
+
+SCRIPT="$PRO/src/Y60/js/sv.js"
+BASENAME="${MODELNAME%.*}"
+if [ -e ${BASENAME}.js ]; then
+    SCRIPT=${BASENAME}.js
+fi
+
+ARGS="-I $PRO/lib;$PRO/src/Y60/js;$PRO/src/Y60/shader $SCRIPT $MODELNAME $SHADERLIB $*"
+COMMAND="$APPLICATION $ARGS"
+
+echo $COMMAND
+$COMMAND
+exit $?

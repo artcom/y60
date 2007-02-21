@@ -257,7 +257,7 @@ namespace y60 {
         if (_myTextureManager->getResourceManager()) {
             if (!_myTextureManager->getResourceManager()->getShaderLibrary()) {
                 // If no shaderlibrary has been set, yet, add a default library.
-                _myTextureManager->getResourceManager()->loadShaderLibrary("shaderlibrary.xml");
+                //_myTextureManager->getResourceManager()->loadShaderLibrary();
             }
         } else {
             AC_WARNING << "Scene::setupShaderLibrary(): No resource manager found.";

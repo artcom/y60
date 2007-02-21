@@ -63,7 +63,7 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
-#if MAYA_API_VERSION < 700 || MAYA_API_VERSION > 800
+#if MAYA_API_VERSION < 700 || MAYA_API_VERSION > 850
     #error "Y60 Maya exporter not yet released for this Maya version"
 #endif
 #ifdef LINUX
