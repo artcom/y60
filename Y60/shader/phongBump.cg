@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+
 struct a2v {
     float4 Position : POSITION; // in object space 
     float4 normal   : NORMAL;   // in object space
@@ -64,7 +65,6 @@ float4 mainFragment(vert2frag IN,
         uniform float shininess) : COLOR
 {
     float4 myColor = ambient;
-    float4 myDiffuseTexColor = diffuse * tex2D(colorMap, IN.texCoord0);
 
     float3x3 TBN = float3x3(IN.tangent, IN.binormal, IN.normal);
 
@@ -82,12 +82,12 @@ float4 mainFragment(vert2frag IN,
 
         L = mul(TBN, AC_DIRECTIONAL_LIGHTS[i]);
         diffuseTerm = saturate(dot(L, N));
-        myColor += myDiffuseTexColor * diffuseTerm;
+        myColor += diffuse * float4(diffuseTerm, diffuseTerm, diffuseTerm, 1);
 
         if (diffuseTerm > 0.0) {
             float3 R = 2 * dot(N, L) * N - L;
             specularTerm = pow(max(dot(R, V), 0), shininess);
-            myColor += specular * specularTerm;
+            myColor += specular * float4(specularTerm, specularTerm, specularTerm, 1);
         }
     }
 
@@ -98,14 +98,18 @@ float4 mainFragment(vert2frag IN,
 
         L = mul(TBN, AC_POSITIONAL_LIGHTS[i] - P);
         diffuseTerm = saturate(dot(L, N));
-        myColor += myDiffuseTexColor * diffuseTerm;
+        myColor += diffuse * float4(diffuseTerm, diffuseTerm, diffuseTerm, 1);
 
         if (diffuseTerm > 0.0) {
             float3 R = 2 * dot(N, L) * N - L;
             specularTerm = pow(max(dot(R, V), 0), shininess);
-            myColor += specular * specularTerm;
+            myColor += specular * float4(specularTerm, specularTerm, specularTerm, 1);
         }
     }
+
+    // blend
+    float4 myTexColor = tex2D(colorMap, IN.texCoord0);
+    myColor *= myTexColor; // MODULATE
 
     return myColor;
 }

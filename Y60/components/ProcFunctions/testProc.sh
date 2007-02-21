@@ -8,17 +8,17 @@ PLUGIN_DIR="$PRO/lib"
 # shaderlib
 #
 if [ "$USE_CG" == "1" ]; then
-SHADERLIB="$Y60_DIR/shader/shaderlibrary.xml"
+    SHADERLIB="$Y60_DIR/shader/shaderlibrary.xml"
 else
-SHADERLIB="$Y60_DIR/shader/shaderlibrary_nocg.xml"
+    SHADERLIB="$Y60_DIR/shader/shaderlibrary_nocg.xml"
 fi
 
 #
 # debug or release mode
 #
-SHELL="acxpshellOPT"
+SHELL="y60"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
-    SHELL="acxpshellDBG"
+    SHELL="${SHELL}DBG"
 fi
 
 APP="$APP_DIR/testProcFunctions.tst.js"
