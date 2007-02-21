@@ -66,6 +66,17 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
         self.image.matrix.postMultiply(myMirrorMatrix);  
         
+        // setup camera
+        if (theCamera == undefined) {
+            var myCamera = window.camera.cloneNode(true);
+            myCamera.name = "OffscreenBuffer_Camera";
+            adjustNodeIds(myCamera);
+            window.scene.world.appendChild(myCamera);
+            self.camera = myCamera;
+        } else {
+            self.camera = theCamera;
+        }
+
         // Create canvas for offscreen render area
         if (theCanvas) {
             _myCanvas = theCanvas;
@@ -101,17 +112,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myOffscreenRenderArea.scene = window.scene;
         _myOffscreenRenderArea.canvas = _myCanvas;
         _myOffscreenRenderArea.eventListener = self;
-
-        // setup camera
-        if (theCamera == undefined) {
-            var myCamera = window.camera.cloneNode(true);
-            myCamera.name = "OffscreenBuffer_Camera";
-            adjustNodeIds(myCamera);
-            window.scene.world.appendChild(myCamera);
-            self.camera = myCamera;
-        } else {
-            self.camera = theCamera;
-        }
     }
   
     self.saveScreenshot = function(theFilename) {
