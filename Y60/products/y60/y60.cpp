@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include <y60/jssettings.h>
-#include "SDLApp.h"
+#include <y60/SDLApp.h>"
 
 #include "SDL/SDL.h"
 
