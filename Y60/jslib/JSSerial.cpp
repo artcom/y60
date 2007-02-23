@@ -236,7 +236,7 @@ static JSBool
 readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Reads binary data from serial device");
     DOC_PARAM_OPT("theSize", "Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
-    DOC_RVAL("Bufferdata", DOC_TYPE_STRING);
+    DOC_RVAL("Bufferdata", DOC_TYPE_BLOCK);
     DOC_END;
     try {
         if (argc > 1) {
