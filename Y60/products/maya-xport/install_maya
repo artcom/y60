@@ -14,9 +14,34 @@ if [ -z $MAYA_SDK ]; then
     echo "### ERROR: MAYA_SDK is not set"
     exit 1
 fi
-
+echo $OS
 SCRIPT_DIR=""
-if [ "$OS" == "Windows_NT" ] ; then
+
+# old version:
+#if [ "$OS" == "Windows_NT" ] ; then
+#    cp -vf $PRO/lib/libeay32.dll "$MAYA_SDK/bin/"
+#    cp -vf $PRO/lib/libcurl.dll "$MAYA_SDK/bin/"
+#    cp -vf $PRO/lib/pthreadVC.dll "$MAYA_SDK/bin/"
+#    cp -vf $PRO/lib/ssleay32.dll "$MAYA_SDK/bin/"
+
+#    mkdir -p $MAYA_SDK/plug-ins
+#    mkdir -p $MAYA_SDK/scripts/others
+#    cp -vf o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MAYA_SDK/bin/plug-ins/mayaY60export.mll"
+#    SCRIPT_DIR="$MAYA_SDK/scripts/others"
+#else
+#    if [ -z $MAYA_VERSION ]; then
+#        echo "### WARNING: MAYA_VERSION is not set"
+#    fi
+#
+#    DIR="$HOME/maya/${MAYA_VERSION}"
+#    mkdir -p "${DIR}/plug-ins"
+#
+#    cp -vf o.ANT.LINUX.${VARIANT}/libmayaY60-export${VARIANT}.so ${DIR}/plug-ins/mayaY60-export.so
+#    SCRIPT_DIR="${DIR}/scripts"
+#fi
+
+case `uname` in
+CYGWIN*)
     cp -vf $PRO/lib/libeay32.dll "$MAYA_SDK/bin/"
     cp -vf $PRO/lib/libcurl.dll "$MAYA_SDK/bin/"
     cp -vf $PRO/lib/pthreadVC.dll "$MAYA_SDK/bin/"
@@ -26,7 +51,8 @@ if [ "$OS" == "Windows_NT" ] ; then
     mkdir -p $MAYA_SDK/scripts/others
     cp -vf o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MAYA_SDK/bin/plug-ins/mayaY60export.mll"
     SCRIPT_DIR="$MAYA_SDK/scripts/others"
-else
+    ;;
+Linux*)
     if [ -z $MAYA_VERSION ]; then
         echo "### WARNING: MAYA_VERSION is not set"
     fi
@@ -36,7 +62,23 @@ else
 
     cp -vf o.ANT.LINUX.${VARIANT}/libmayaY60-export${VARIANT}.so ${DIR}/plug-ins/mayaY60-export.so
     SCRIPT_DIR="${DIR}/scripts"
-fi
+    ;;
+Darwin*)
+    if [ -z $MAYA_VERSION ]; then
+        MAYA_VERSION="8.5"
+        echo "### WARNING: MAYA_VERSION is not set, assuming $MAYA_VERSION"
+    fi
+
+    DIR="/Users/Shared/Autodesk/maya/${MAYA_VERSION}"
+
+    cp -vf o.ANT.OSX.${VARIANT}/libmayaY60-export${VARIANT}.bundle ${DIR}/plug-ins/mayaY60export.bundle
+    SCRIPT_DIR="${DIR}/scripts"
+    ;;
+*)
+        echo "### ERROR: unknown operating system"
+        exit 1
+    ;;
+esac
 
 SCRIPTS=`ls *.mel`
 echo "### INFO: Installing scripts to $SCRIPT_DIR"
