@@ -102,7 +102,7 @@ public class GppLinker extends AbstractLdLinker {
      *            linker argument
      */
     public String decorateLinkerOption(StringBuffer buf, String arg) {
-//System.out.println("GppLinker.decorateLinkerOption arg="+arg);
+//System.out.println("----> GppLinker.decorateLinkerOption entry arg="+arg+", buf="+buf);
         String decoratedArg = arg;
         if (arg.length() > 1 && arg.charAt(0) == '-') {
             switch (arg.charAt(1)) {
@@ -124,20 +124,20 @@ public class GppLinker extends AbstractLdLinker {
                 default :
                     boolean known = false;
                     for (int i = 0; i < linkerOptions.length; i++) {
-//System.out.println("GppLinker.decorateLinkerOption linkerOptions[i]="+linkerOptions[i]+", arg="+arg);
+//System.out.println("GppLinker.decorateLinkerOption linkerOptions["+i+"]="+linkerOptions[i]+", arg="+arg);
                         //if (linkerOptions[i].equals(arg)) {
 						String myOption = linkerOptions[i];
 						int myLength =  myOption.length();
+                        String myArg = arg;
 						if (arg.length() > myLength) {
-							String myArg =arg.substring(0,myLength);
+							myArg =arg.substring(0,myLength);
+                        }
 //System.out.println("GppLinker.decorateLinkerOption myOption = "+myOption+", myArg="+myArg);
-                        	if (myOption.equals(myArg)) {
-//System.out.println("GppLinker.decorateLinkerOption comparison true");
-                            	known = true;
-
-                            	break;
-                        	}
-						}
+                      	if (myOption.equals(myArg)) {
+//System.out.println("GppLinker.decorateLinkerOption comparison true, option know");
+                           	known = true;
+                           	break;
+                       	}
                     }
                     if (!known) {
                         buf.setLength(0);
@@ -148,7 +148,7 @@ public class GppLinker extends AbstractLdLinker {
                     break;
             }
         }
-//System.out.println("GppLinker.decorateLinkerOption decoratedArg="+decoratedArg);
+//System.out.println("<<< GppLinker.decorateLinkerOption decoratedArg="+decoratedArg+",buf="+buf);
         return decoratedArg;
     }
     /**

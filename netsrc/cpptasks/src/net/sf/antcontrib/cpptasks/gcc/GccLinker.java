@@ -54,6 +54,20 @@ public class GccLinker extends AbstractLdLinker {
             String outputSuffix, boolean isLibtool, GccLinker libtoolLinker) {
         super(command, "-dumpversion", extensions, ignoredExtensions,
                 outputPrefix, outputSuffix, isLibtool, libtoolLinker);
+//System.out.println("-----------------------GccLinker");
+//System.out.println("cmd="+command);
+
+//System.out.print("extensions=");
+//for (int i = 0; i < extensions.length; ++i) System.out.print(extensions[i]+",");
+//System.out.println();
+
+//System.out.println("ignoredExtensions=");
+//for (int i = 0; i < ignoredExtensions.length; ++i) System.out.print(ignoredExtensions[i]+",");
+//System.out.println();
+
+//System.out.println("outputPrefix="+outputPrefix);
+//System.out.println("outputSuffix="+outputSuffix);
+//System.out.println("isLibtool="+isLibtool);
     }
     protected void addImpliedArgs(boolean debug, LinkType linkType, Vector args) {
         super.addImpliedArgs(debug, linkType, args);
@@ -77,7 +91,7 @@ public class GccLinker extends AbstractLdLinker {
      *            linker argument
      */
     public String decorateLinkerOption(StringBuffer buf, String arg) {
-// System.out.println("GccLinker.decorateLinkerOption"+buf);
+ //System.out.println("GccLinker.decorateLinkerOption"+buf);
         String decoratedArg = arg;
         if (arg.length() > 1 && arg.charAt(0) == '-') {
             switch (arg.charAt(1)) {
@@ -99,12 +113,15 @@ public class GccLinker extends AbstractLdLinker {
                 default :
                     boolean known = false;
                     for (int i = 0; i < linkerOptions.length; i++) {
-  //System.out.println("GccLinker.decorateLinkerOption linkerOptions[i]="+linkerOptions[i]+", arg="+arg);
+//System.out.println("GccLinker.decorateLinkerOption linkerOptions[i]="+linkerOptions[i]+", arg="+arg);
                         //if (linkerOptions[i].equals(arg)) {
 						String myOption = linkerOptions[i];
 						int myLength =  myOption.length();
 						if (arg.length() > myLength) {
-							String myArg =arg.substring(0,myLength);
+                            String myArg = arg;
+                            if (arg.length() > myLength) {
+                                myArg =arg.substring(0,myLength);
+                            }
 //System.out.println("GccLinker.decorateLinkerOption myOption = "+myOption+", myArg="+myArg);
                         	if (myOption.equals(myArg)) {
 //System.out.println("GccLinker.decorateLinkerOption comparison true");
@@ -198,6 +215,7 @@ public class GccLinker extends AbstractLdLinker {
         return libDirs;
     }
     public Linker getLinker(LinkType type) {
+//System.out.println("----------------------------------------GccLinker.getLinker");
         if (type.isStaticLibrary()) {
             return GccLibrarian.getInstance();
         }
