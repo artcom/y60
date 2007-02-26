@@ -317,6 +317,7 @@ SDLWindow::initDisplay() {
     _myStandardCursor =  SDL_GetCursor();
     ShaderLibrary::setGLisReadyFlag(true);
     GLResourceManager::get().loadShaderLibrary();
+    getGLContext()->getStateCache()->init();
 }
 
 void

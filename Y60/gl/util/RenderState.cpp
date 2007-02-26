@@ -40,8 +40,8 @@ namespace y60 {
         _myEnabledClippingPlanes(0),
         _myScissorParams(0,0,1,1)
     {
-#ifndef OSX // TODO PORT
-        init();
+#ifndef OSX
+        init(); // on OSX, we need to initialize after we have a valid GL context
 #endif
     }
 

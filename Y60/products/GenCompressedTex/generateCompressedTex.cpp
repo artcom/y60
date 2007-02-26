@@ -10,21 +10,28 @@
 // specific, prior written permission of ART+COM AG Berlin.
 
 #include <y60/GLUtils.h>
+#include <y60/SDLWindow.h>"
+#include <y60/GLResourcemanager.h>"
+#include "SDL/SDL.h"
+
 #include <y60/PixelEncoding.h>
 #include <y60/TextureCompressor.h>
 #include <y60/I60Header.h>
 #include <y60/PLFilterResizePadded.h>
 
+#if 0
 #ifdef OSX
 	#include <GLUT/glut.h>
 #else
 	#include <GL/glut.h>
+#endif
 #endif
 
 #include <asl/Arguments.h>
 #include <asl/numeric_functions.h>
 #include <asl/file_functions.h>
 #include <asl/MappedBlock.h>
+#include <asl/os_functions.h>
 
 #include <dom/Nodes.h>
 
@@ -105,6 +112,8 @@ printHelp() {
          << "S3TC_DXT3, S3TC_DXT5, NONE" << endl;
 }
 
+#if 0
+
 bool
 initExtensions() {
     int missingRequiredExtension = 0;
@@ -122,6 +131,8 @@ initExtensions() {
     }
     return true;
 }
+
+#endif
 
 template <class TX>
 bool
@@ -504,11 +515,26 @@ int main(int argc, char *argv[]) {
 
 
     // create context to let OpenGL do the work
-    glutCreateWindow("Compressor");
+   //  glutCreateWindow("Compressor");
 
-    if (initExtensions () ) {
-        try {
-            if (mySourceFiles.size() == 0) {
+
+//    if (initExtensions () ) {
+    if (SDL_Init(SDL_INIT_NOPARACHUTE) == -1) { // prevents SDL from catching fatal signals
+        AC_FATAL << SDL_GetError() << endl;
+        exit(1);
+    } else {
+       try {
+           //myApp.setProgramName(ourArguments.getProgramName());
+           //rv = myApp.run(myFilename, myIncludePath, myScriptArgs);
+           //std::string myProPath;
+           //if (asl::get_environment_var("PRO", myProPath)) {
+           //     y60::GLResourceManager::get().prepareShaderLibrary(myProPath+"/src/Y60/shader/shaderlibrary.xml","","");
+           //}
+           asl::Ptr<y60::SDLWindow> myWindow = y60::SDLWindow::create();
+           //myWindow->initDisplay();
+           myWindow->activateGLContext();
+        
+           if (mySourceFiles.size() == 0) {
                 cerr << "Warning: No images to process!\n";
             }
 
@@ -566,6 +592,7 @@ int main(int argc, char *argv[]) {
             cerr << "### ERROR: Unknown exception occured." << endl;
             return -1;
         }
+        SDL_Quit();
     }
     return 0;
 }
