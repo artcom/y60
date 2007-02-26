@@ -192,7 +192,7 @@ namespace y60 {
             GLOBAL_PRIMITIVE_TAG::Plug::template dependsOn<GlobalMatrixTag>(*this);
 
             asl::Ptr<DERIVED_FACADE, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<DERIVED_FACADE>(getSelf());
-            GLOBAL_PRIMITIVE_TAG::Plug::getValuePtr()->template dom::Field::setCalculatorFunction(
+            GLOBAL_PRIMITIVE_TAG::Plug::getValuePtr()->dom::Field::template setCalculatorFunction(
                     mySelf, & DERIVED_FACADE::recalculateGlobalPrimitive);
         }
     }
