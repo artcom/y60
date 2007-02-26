@@ -531,7 +531,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         DBP2(
             unsigned long myPrimitiveCount = myPrimitive.size();
-            AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount=" << myPrimitiveCount << " primType=" << myPrimitive.getType() << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
+            AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount="
+                     << myPrimitiveCount << " primType=" << myPrimitive.getType()
+                     << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
             static unsigned long myMaxPrimitiveCount = 0;
             if (myPrimitiveCount > myMaxPrimitiveCount) {
                 myMaxPrimitiveCount = myPrimitiveCount;
@@ -760,7 +762,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                         float theSize,
                         const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theSize,theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         glBegin(GL_POINTS);
             glVertex3fv(thePoint.begin());
@@ -892,7 +894,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         glBegin(GL_LINE_STRIP);
         asl::Vector3f myLastPos;
         for (unsigned i = 0; i < thePath.getNumElements(); ++i) {
-            const LineSegmentPtr mySegment = thePath.getElement(i);
+            const LineSegment3fPtr mySegment = thePath.getElement(i);
             if (i == 0 || !asl::almostEqual(mySegment->origin, myLastPos)) {
                 // discontinuous
                 if (i > 0) {
@@ -988,12 +990,13 @@ MAKE_SCOPE_TIMER(switchMaterial);
         bool myOverlapFrustumFlag = true;
         const Frustum & myFrustum = theViewport->get<ViewportFrustumTag>();
         {
+
             DBP(MAKE_SCOPE_TIMER(createRenderList_cull));
             if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
                 if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
                     return;
                 }
-            }
+            } 
         }
 
         // Collect clipping planes and scissoring
@@ -1006,8 +1009,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             DBP(MAKE_SCOPE_TIMER(createRenderList_lod));
-            createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, theOverlapFrustumFlag, theClippingPlanes, theScissorBox);
+            createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts,
+                    theCamera, theEyeSpaceTransform, theViewport, theOverlapFrustumFlag,
+                    theClippingPlanes, theScissorBox);
             return;
         }
 
@@ -1050,8 +1054,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
         {
             DBP(MAKE_SCOPE_TIMER(createRenderList_recurse));
             for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-                createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
-                        theViewport, myOverlapFrustumFlag, theClippingPlanes, theScissorBox);
+                createRenderList(theNode->childNode(i), theBodyParts, theCamera,
+                        theEyeSpaceTransform, theViewport, myOverlapFrustumFlag,
+                        theClippingPlanes, theScissorBox);
             }
         }
     }
@@ -1067,18 +1072,18 @@ MAKE_SCOPE_TIMER(switchMaterial);
             return;
         }
 
-        dom::NodePtr myGeometryNode;
+        dom::NodePtr myPlaneNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
             // XXX Workaround for Bug 91
             //if ( ! myPlaneIds[i].empty()) {
-                myGeometryNode = theNode->getElementById( myPlaneIds[i] );
-                if (!myGeometryNode) {
+                myPlaneNode = theNode->getElementById( myPlaneIds[i] );
+                if (!myPlaneNode) {
                     throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
                         "' for node " + theNode->nodeName() + " with id '" +
                         theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
                 }
-                GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
-                theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
+                PlanePtr myPlane = myPlaneNode->getFacade<Plane>();
+                theClippingPlanes.push_back( myPlane->get<GlobalPlaneTag>());
             //}
         }
     }
@@ -1193,8 +1198,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
                     Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
                     asl::Box2f myScissorBox;
                     myScissorBox.makeFull();
-                    createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
-                            theViewport, true, std::vector<asl::Planef>(), myScissorBox);
+                    createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera,
+                            myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
+                            myScissorBox);
                 }
 
                 // (3) render skybox
@@ -1249,6 +1255,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
                 // turn fog off again
                 glDisable(GL_FOG);
+
+                // (8) render analytic geometry
+                renderAnalyticGeometry( theViewport);
             }
         }
 
@@ -1811,4 +1820,48 @@ MAKE_SCOPE_TIMER(switchMaterial);
         }
         glPopMatrix();
     }
+
+    void 
+    Renderer::renderAnalyticGeometry( ViewportPtr theViewport) {
+        const Frustum & myFrustum = theViewport->get<ViewportFrustumTag>();
+        bool myOverlapFrustumFlag = true;
+
+        MAKE_SCOPE_TIMER(renderAnalyticGeometry);
+        Matrix4f myMatrix;
+        myMatrix.makeIdentity();
+
+        std::vector<dom::NodePtr> & myAnalyticGeometry = _myScene->getAnalyticGeometry();
+        //AC_PRINT << "draw " << myAnalyticGeometry.size() << " primitives";
+        for (unsigned i = 0; i < myAnalyticGeometry.size(); ++i) {
+            dom::NodePtr myNode = myAnalyticGeometry[i];
+            TransformHierarchyFacadePtr myFacade( myNode->getFacade<TransformHierarchyFacade>());
+
+            // [DS] perform culling: Some primitives can't be culled with bounding boxes, e.g
+            // planes, lines, rays. They would result in infinite large boxes, which breaks stuff like
+            // automatic near-far-plane adjustment.
+            if (theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
+                if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                    continue;
+                }
+            }
+
+            if (myAnalyticGeometry[i]->nodeName() == PLANE_NODE_NAME) {
+                PlanePtr myFacade( myNode->getFacade<Plane>());
+                Planef myPlane = myFacade->get<GlobalPlaneTag>();
+                // TODO: intersect with frustum and visualize something ...
+            } else if (myAnalyticGeometry[i]->nodeName() == POINT_NODE_NAME) {
+                PointPtr myFacade( myNode->getFacade<Point>());
+                draw( asVector(myFacade->get<GlobalPointTag>()), myFacade->get<ColorTag>(),
+                      myMatrix, myFacade->get<AG::PointSizeTag>(), "");
+            } else if (myAnalyticGeometry[i]->nodeName() == VECTOR_NODE_NAME) {
+                VectorPtr myFacade( myNode->getFacade<Vector>());
+                asl::LineSegment<float> myLineSegment( myFacade->get<GlobalMatrixTag>().getTranslation(),
+                                           myFacade->get<GlobalVectorTag>() );
+                draw( myLineSegment, myFacade->get<ColorTag>(),
+                      myMatrix, myFacade->get<AG::LineWidthTag>(), "");
+                // TODO: draw arrow head
+            }
+        }
+    }
+
 }

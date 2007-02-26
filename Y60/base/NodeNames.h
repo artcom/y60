@@ -26,6 +26,8 @@
 #ifndef _ac_y60_NodeNames_h_
 #define _ac_y60_NodeNames_h_
 
+#include <string>
+
 namespace y60 {
 
     //=== Som basic type names ==============================================================
@@ -90,7 +92,20 @@ namespace y60 {
     static const char * CANVAS_LIST_NAME          = "canvases";
     static const char * CANVAS_NODE_NAME          = "canvas";
     static const char * VIEWPORT_NODE_NAME        = "viewport";
-    static const char * GEOMETRY_NODE_NAME        = "geometry";
+
+    //=== Analytic Geometry ==========================================================
+    static const char * POINT_NODE_NAME        = "point";
+    static const char * VECTOR_NODE_NAME       = "vector";
+
+    /*
+    static const char * LINE_NODE_NAME         = "line";
+    static const char * RAY_NODE_NAME          = "ray";
+    */
+    static const char * LINE_SEGMENT_NODE_NAME = "linesegment";
+
+    static const char * PLANE_NODE_NAME        = "plane";
+
+    bool isAnalyticGeometry(const std::string & theNodeName );
 
     //=== Attribute names ============================================================
     static const char * ID_ATTRIB                   = "id";
@@ -260,8 +275,11 @@ namespace y60 {
     static const char * CAPTURE_NORM_ATTRIB         = "norm";
     static const char * CAPTURE_DEVICE_ATTRIB       = "device";
 
-    static const char * GEOMETRY_PLANE_ATTRIB       = "plane";
-    static const char * GEOMETRY_GLOBAL_PLANE_ATTRIB = "globalplane";
+    static const char * GEOMETRY_COLOR_ATTRIB        = "color";
+    static const char * GEOMETRY_LINE_WIDTH_ATTRIB   = "linewidth";
+    static const char * GEOMETRY_POINT_SIZE_ATTRIB   = "pointsize";
+    static const char * GEOMETRY_VALUE_ATTRIB        = "value";
+    static const char * GEOMETRY_GLOBAL_VALUE_ATTRIB = "globalvalue";
 
     //=== Attribute constants ============================================================
     static const char * POSITION_ROLE               = "position";

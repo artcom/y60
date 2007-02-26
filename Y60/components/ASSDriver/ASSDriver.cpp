@@ -60,8 +60,8 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myDenoisedRaster(dom::ValuePtr(0)),
     _myScene(0),
     _myNoiseThreshold( 15 ),
-    _myComponentThreshold( 30 ),
-    _myPower(1),
+    _myComponentThreshold( 5 ),
+    _myPower(2),
     _myIDCounter( 0 ),
     _myEventSchema( new dom::Document( oureventxsd ) ),
     _myValueFactory( new dom::ValueFactory() )
@@ -91,7 +91,7 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 }
 
 void
-ASSDriver::synchronize() {
+ASSDriver::synchronize(EventPtrList & theEventList ) {
     // XXX not reentrant safe ... even two ASSDrivers cause problems
     // TODO: refactor
     static int myLineStart = -1;
@@ -139,6 +139,7 @@ ASSDriver::synchronize() {
                 myMagicTokenFlag = false;
                 allocateGridBuffers();
                 setState( RUNNING );
+                theEventList.push_back( createSyncEvent() );
                 return;
             } else {
                 myMaxLine = _myBuffer[i + 1];
@@ -246,8 +247,10 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
                                    RasterHandle & theOutput,
                                    const unsigned char theThreshold)
 {
-    const y60::RasterOfGRAY * myInput = dom::dynamic_cast_Value<y60::RasterOfGRAY>( & * (theInput.value) );
-    y60::RasterOfGRAY * myOutput = dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
+    const y60::RasterOfGRAY * myInput =
+            dom::dynamic_cast_Value<y60::RasterOfGRAY>( & * (theInput.value) );
+    y60::RasterOfGRAY * myOutput =
+            dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
     std::transform( myInput->begin(), myInput->end(),
             myOutput->begin(),
             ThresholdWithPow<asl::gray<unsigned char> >( theThreshold, _myPower ));
@@ -280,7 +283,8 @@ ASSDriver::computeCursorPositions( const BlobListPtr & theROIs) {
         _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
                                     myBox[Box2i::MAX][0], myBox[Box2i::MAX][1], myMomentAnalysis);
 
-        Vector2f myPosition = Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]) + myMomentAnalysis.result.center;
+        Vector2f myPosition = Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1])
+                + myMomentAnalysis.result.center;
 
         //AC_PRINT << "center: " << myPosition;
         _myPositions.push_back( myPosition );
@@ -326,13 +330,15 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
 
             Unsigned64 myID( myOldIDs[ myMinDistIdx ] );
             _myCursorIDs.push_back( myID );
-            theEventList.push_back( createEvent( myID, "move", _myPositions[i], myTransform ));
+            theEventList.push_back( createEvent( myID, "move", _myPositions[i],
+                    myTransform ));
         } else {
             // new cursor: get new label
             //AC_PRINT << "=== new cursor ===";
             Unsigned64 myNewID( _myIDCounter++ );
             _myCursorIDs.push_back( myNewID );
-            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i], myTransform ));
+            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i],
+                    myTransform ));
         }
     }
 
@@ -341,7 +347,8 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
             //AC_PRINT << "=== cursor " << i << " removed ===";
 
             Unsigned64 myID( myOldIDs[ i ] );
-            theEventList.push_back( createEvent( myID, "remove", thePreviousPositions[i], myTransform ));
+            theEventList.push_back( createEvent( myID, "remove",
+                    thePreviousPositions[i], myTransform ));
         }
     }
 }
@@ -350,10 +357,11 @@ y60::GenericEventPtr
 ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
         const Vector2f & thePosition, const Matrix4f & theTransform)
 {
-    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema, _myValueFactory));
+    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
+            _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
     
-    myNode->appendAttribute<Unsigned64>("cursor_id", theID);
+    myNode->appendAttribute<Unsigned64>("id", theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector2f>("raw_position", thePosition);
     Vector4f myHPosition;
@@ -370,6 +378,18 @@ ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
     return myEvent;
 }
 
+y60::GenericEventPtr
+ASSDriver::createSyncEvent() {
+    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
+            _myValueFactory));
+    dom::NodePtr myNode = myEvent->getNode();
+
+    myNode->appendAttribute<Unsigned64>("id", _myIDCounter++);
+    myNode->appendAttribute<std::string>("type", "configure");
+    myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
+    return myEvent;
+}
+
 void
 ASSDriver::setState( DriverState theState ) {
     _myState = theState;
@@ -377,6 +397,9 @@ ASSDriver::setState( DriverState theState ) {
         case SYNCHRONIZING:
             _myGridSize = Vector2i(0, 0);
             _myBuffer.clear();
+            break;
+        case RUNNING:
+
             break;
         default:
             break;
@@ -424,6 +447,10 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myTransform );
         return;
     }
+    if (thePropertyName == "eventSchema") {
+        theReturnValue.set( _myEventSchema );
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -459,12 +486,12 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "regions property is read only";
         return;
     }
-    if (thePropertyName == "velocities") {
-        AC_ERROR << "velocities property is read only";
-        return;
-    }
     if (thePropertyName == "transform") {
         _myTransform = thePropertyValue.get<dom::NodePtr>();
+        return;
+    }
+    if (thePropertyName == "eventSchema") {
+        AC_ERROR << "eventSchema property is read only";
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
@@ -472,6 +499,7 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
 
 void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
+    AC_PRINT << "TODO: onUpdateSettings";
 }
 
 y60::EventPtrList 
@@ -486,7 +514,7 @@ ASSDriver::poll() {
     y60::EventPtrList myEventList;
     switch (_myState) {
         case SYNCHRONIZING:
-            synchronize();
+            synchronize( myEventList );
             break;
         case RUNNING:
             readSensorValues( myEventList );

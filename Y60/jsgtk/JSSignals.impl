@@ -106,3 +106,4 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal3<R, P0, P1
     template bool convertFrom(JSContext *cx, jsval theValue, \
             asl::Ptr<sigc::signal3<R, P0, P1, P2> > & theOwner);
 }
+/* vim: set filetype=cpp : */

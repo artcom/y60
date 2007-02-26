@@ -217,3 +217,4 @@ JSGenericLine<NATIVE_LINE>::initClass(JSContext *cx, JSObject *theGlobalObject) 
 
 }
 
+/* vim: set filetype=cpp : */

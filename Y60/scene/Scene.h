@@ -213,6 +213,9 @@ namespace y60 {
             LightVector & getLights() {
                 return _myLights;
             }
+            std::vector<dom::NodePtr> & getAnalyticGeometry() {
+                return _myAnalyticGeometry;
+            }
 
             const Statistics getStatistics() const;
 
@@ -374,7 +377,9 @@ namespace y60 {
             TextureManagerPtr        _myTextureManager;
             AnimationManager         _myAnimationManager;
 
-            LightVector              _myLights;
+            LightVector               _myLights;
+            std::vector<dom::NodePtr> _myAnalyticGeometry;
+
             dom::DocumentPtr         _mySceneDom;
             Statistics               _myStatistics;
 

@@ -149,6 +149,8 @@ namespace y60 {
                            const asl::Point3f & theRTBK, const asl::Point3f & theLBBK,
                            const asl::Vector4f & theColor, asl::Vector4f theBackColor = asl::Vector4f(0,0,0,0));
 
+            void renderAnalyticGeometry( y60::ViewportPtr theViewport);
+
             /// setup immediate draw
             void preDraw(const asl::Vector4f & theColor,
                          const asl::Matrix4f & theTransformation,

@@ -1112,3 +1112,4 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
 
 }
 
+/* vim: set filetype=cpp : */

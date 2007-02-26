@@ -138,30 +138,37 @@ namespace y60 {
     typedef asl::Ptr<JointFacade, dom::ThreadingModel> JointFacadePtr;
 
     inline void registerSceneFacades(dom::FacadeFactoryPtr theFactory) {
-        theFactory->registerPrototype("scene", dom::FacadePtr(new Scene(dom::Node::Prototype)));
-        theFactory->registerPrototype("world", dom::FacadePtr(new WorldFacade(dom::Node::Prototype)));
-        theFactory->registerPrototype("body", dom::FacadePtr(new Body(dom::Node::Prototype)));
-        theFactory->registerPrototype("transform", dom::FacadePtr(new TransformFacade(dom::Node::Prototype)));
-        theFactory->registerPrototype("lod", dom::FacadePtr(new LodFacade(dom::Node::Prototype)));
-        theFactory->registerPrototype("light", dom::FacadePtr(new Light(dom::Node::Prototype)));
-        theFactory->registerPrototype("lightsource", dom::FacadePtr(new LightSource(dom::Node::Prototype)));
-        theFactory->registerPrototype("properties", dom::FacadePtr(new LightPropertiesFacade(dom::Node::Prototype)), "lightsource");
-        theFactory->registerPrototype("camera", dom::FacadePtr(new Camera(dom::Node::Prototype)));
-        theFactory->registerPrototype("projector", dom::FacadePtr(new Projector(dom::Node::Prototype)));
-        theFactory->registerPrototype("joint", dom::FacadePtr(new JointFacade(dom::Node::Prototype)));
-        theFactory->registerPrototype("canvas", dom::FacadePtr(new Canvas(dom::Node::Prototype)));
-        theFactory->registerPrototype("viewport", dom::FacadePtr(new Viewport(dom::Node::Prototype)));
-        theFactory->registerPrototype("overlay", dom::FacadePtr(new Overlay(dom::Node::Prototype)));
-        theFactory->registerPrototype("texture", dom::FacadePtr(new Texture(dom::Node::Prototype)));
-        theFactory->registerPrototype("image", dom::FacadePtr(new Image(dom::Node::Prototype)));
-        theFactory->registerPrototype("movie", dom::FacadePtr(new Movie(dom::Node::Prototype)));
-        theFactory->registerPrototype("capture", dom::FacadePtr(new Capture(dom::Node::Prototype)));
-        theFactory->registerPrototype("shape", dom::FacadePtr(new Shape(dom::Node::Prototype)));
-        theFactory->registerPrototype("include", dom::FacadePtr(new IncludeFacade(dom::Node::Prototype)));
-        theFactory->registerPrototype("material", dom::FacadePtr(new MaterialBase(dom::Node::Prototype)));
-        theFactory->registerPrototype("properties", dom::FacadePtr(new MaterialPropertiesFacade(dom::Node::Prototype)), "material");
-        theFactory->registerPrototype("requires", dom::FacadePtr(new MaterialRequirementFacade(dom::Node::Prototype)), "material");
-        theFactory->registerPrototype("geometry", dom::FacadePtr(new Geometry(dom::Node::Prototype)));
+        theFactory->registerPrototype(SCENE_ROOT_NAME, dom::FacadePtr(new Scene(dom::Node::Prototype)));
+        theFactory->registerPrototype(WORLD_NODE_NAME, dom::FacadePtr(new WorldFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(BODY_NODE_NAME, dom::FacadePtr(new Body(dom::Node::Prototype)));
+        theFactory->registerPrototype(TRANSFORM_NODE_NAME, dom::FacadePtr(new TransformFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(LOD_NODE_NAME, dom::FacadePtr(new LodFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(LIGHT_NODE_NAME, dom::FacadePtr(new Light(dom::Node::Prototype)));
+        theFactory->registerPrototype(LIGHTSOURCE_NODE_NAME, dom::FacadePtr(new LightSource(dom::Node::Prototype)));
+        theFactory->registerPrototype(PROPERTY_LIST_NAME, dom::FacadePtr(new LightPropertiesFacade(dom::Node::Prototype)),
+                LIGHTSOURCE_NODE_NAME);
+        theFactory->registerPrototype(CAMERA_NODE_NAME, dom::FacadePtr(new Camera(dom::Node::Prototype)));
+        theFactory->registerPrototype(PROJECTOR_NODE_NAME, dom::FacadePtr(new Projector(dom::Node::Prototype)));
+        theFactory->registerPrototype(JOINT_NODE_NAME, dom::FacadePtr(new JointFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(CANVAS_NODE_NAME, dom::FacadePtr(new Canvas(dom::Node::Prototype)));
+        theFactory->registerPrototype(VIEWPORT_NODE_NAME, dom::FacadePtr(new Viewport(dom::Node::Prototype)));
+        theFactory->registerPrototype(OVERLAY_NODE_NAME, dom::FacadePtr(new Overlay(dom::Node::Prototype)));
+        theFactory->registerPrototype(TEXTURE_NODE_NAME, dom::FacadePtr(new Texture(dom::Node::Prototype)));
+        theFactory->registerPrototype(IMAGE_NODE_NAME, dom::FacadePtr(new Image(dom::Node::Prototype)));
+        theFactory->registerPrototype(MOVIE_NODE_NAME, dom::FacadePtr(new Movie(dom::Node::Prototype)));
+        theFactory->registerPrototype(CAPTURE_NODE_NAME, dom::FacadePtr(new Capture(dom::Node::Prototype)));
+        theFactory->registerPrototype(SHAPE_NODE_NAME, dom::FacadePtr(new Shape(dom::Node::Prototype)));
+        theFactory->registerPrototype(INCLUDE_NODE_NAME, dom::FacadePtr(new IncludeFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(MATERIAL_NODE_NAME, dom::FacadePtr(new MaterialBase(dom::Node::Prototype)));
+        theFactory->registerPrototype(PROPERTY_LIST_NAME, dom::FacadePtr(new MaterialPropertiesFacade(dom::Node::Prototype)),
+                MATERIAL_NODE_NAME);
+        theFactory->registerPrototype(REQUIRES_LIST_NAME, dom::FacadePtr(new MaterialRequirementFacade(dom::Node::Prototype)),
+                MATERIAL_NODE_NAME);
+
+        //=== Analytic Geometry Nodes =========================================
+        theFactory->registerPrototype(PLANE_NODE_NAME, dom::FacadePtr(new Plane(dom::Node::Prototype)));
+        theFactory->registerPrototype(POINT_NODE_NAME, dom::FacadePtr(new Point(dom::Node::Prototype)));
+        theFactory->registerPrototype(VECTOR_NODE_NAME, dom::FacadePtr(new Vector(dom::Node::Prototype)));
     }
 
 /*

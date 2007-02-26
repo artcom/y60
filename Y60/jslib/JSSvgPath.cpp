@@ -328,7 +328,7 @@ namespace jslib {
             return JS_FALSE;
         }
 
-        asl::LineSegmentPtr myElement = myNative->getElement(myIndex);
+        asl::LineSegment3fPtr myElement = myNative->getElement(myIndex);
         if (!myElement) {
             *rval = JSVAL_NULL;
         } else {

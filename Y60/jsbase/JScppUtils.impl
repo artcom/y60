@@ -53,3 +53,4 @@ bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
 }
 
 }
+/* vim: set filetype=cpp : */

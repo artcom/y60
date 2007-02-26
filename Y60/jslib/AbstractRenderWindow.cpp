@@ -60,7 +60,7 @@ namespace jslib {
         GLContextRegistry::get().registerContext(_mySelf);
     }
 
-    AbstractRenderWindow :: ~AbstractRenderWindow() {
+    AbstractRenderWindow::~AbstractRenderWindow() {
         GLContextRegistry::get().unregisterContext(_mySelf);
     }
 

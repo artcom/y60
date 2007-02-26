@@ -3181,25 +3181,109 @@ Joints are exported from maya and usually will not be edited by hand.</xs:docume
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="geometry" substitutionGroup="SceneGraphNode">
+
+    <!-- Nodes for analytic geometry within the scene graph -->
+   <xs:element name="AnalyticGeometryNode" type="AnalyticGeometryNodeType" substitutionGroup="SceneGraphNode">
         <xs:annotation>
-            <xs:documentation>Node for abstract analytic geometry, like planes, spheres, boxes and points.
-Currently it only implements a plane which can be used to specify clipping planes.</xs:documentation>
+            <xs:documentation>Base class for analytic geometry nodes.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="SceneGraphNodeType">
-                    <xs:attribute name="plane" type="Planef">
+                <xs:extension base="SceneGraphNodeType"/>
+            </xs:complexContent>
+        </xs:complexType>                
+    </xs:element>
+    <xs:complexType name="AnalyticGeometryNodeType">
+        <xs:complexContent>
+            <xs:extension base="SceneGraphNodeType">
+                <xs:attribute name="pointsize" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>Point size.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="linewidth" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>Line width.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="color" type="Vector4f">
+                    <xs:annotation>
+                        <xs:documentation>Color.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="plane" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Node for geometric planes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="AnalyticGeometryNodeType">
+                    <xs:attribute name="value" type="Planef">
                         <xs:annotation>
-                            <xs:documentation>Special orientation exported from maya for correct animation and rotiation of joints.</xs:documentation>
+                            <xs:documentation>Native plane value.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-
-
-
-
+    <xs:element name="point" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Node for geometric points.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="AnalyticGeometryNodeType">
+                    <xs:attribute name="value" type="Point3f">
+                        <xs:annotation>
+                            <xs:documentation>Native point value.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Node for geometric vectors.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="AnalyticGeometryNodeType">
+                    <xs:attribute name="value" type="Vector3f">
+                        <xs:annotation>
+                            <xs:documentation>Native vector value.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="linesegment" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Node for geometric vectors.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="AnalyticGeometryNodeType">
+                    <xs:attribute name="value" type="LineSegmentf">
+                        <xs:annotation>
+                            <xs:documentation>Native vector value.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>
+
+
+
+
+
+
+
+

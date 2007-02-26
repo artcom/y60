@@ -114,6 +114,7 @@ Viewport::getProjectionMatrix(asl::Matrix4f & theProjection) const {
                     myCamera->get<HfovTag>(), myCamera->get<OrthoWidthTag>(), myAspect);
     
     myFrustum.get().getProjectionMatrix(theProjection);
+
     if (get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
         theProjection.rotateZ(float(asl::PI_2));
     }

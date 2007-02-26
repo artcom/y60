@@ -30,3 +30,4 @@ void ResultConverter<T>::storeResult(JSCallArgs & theJSArgs, const T & theResult
 }
 
 }
+/* vim: set filetype=cpp : */

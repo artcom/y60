@@ -85,7 +85,7 @@ class ASSDriver :
         virtual y60::EventPtrList poll();
     private:
         void setState( DriverState theState );
-        void synchronize();
+        void synchronize(EventPtrList & theEventList);
         void allocateGridBuffers();
         RasterHandle allocateRaster(const std::string & theName);
         void readSensorValues(y60::EventPtrList & theEventList);
@@ -97,6 +97,7 @@ class ASSDriver :
                     const std::vector<asl::Vector2f> & thePreviousPositions );
         y60::GenericEventPtr createEvent( asl::Unsigned64 theID, const std::string & theType,
                 const asl::Vector2f & thePosition, const asl::Matrix4f & theTransform);
+        y60::GenericEventPtr createSyncEvent();
 
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;

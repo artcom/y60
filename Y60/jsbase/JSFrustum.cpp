@@ -60,12 +60,12 @@ JSFrustum::ConstIntProperties() {
 JSPropertySpec *
 JSFrustum::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"left", PROP_left, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"right", PROP_right, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"top", PROP_top, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"bottom", PROP_bottom, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"near", PROP_near, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"far", PROP_far, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"left", PROP_left, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"right", PROP_right, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"top", PROP_top, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"bottom", PROP_bottom, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"near", PROP_near, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"far", PROP_far, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"left_plane", PROP_left_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"right_plane", PROP_right_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"top_plane", PROP_top_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -139,8 +139,50 @@ JSFrustum::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
 // setproperty handling
 JSBool
 JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     switch (theID) {
-        case 0:
+        case PROP_left:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setLeft(myValue);
+                return JS_TRUE;
+            }
+        case PROP_right:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setRight(myValue);
+                return JS_TRUE;
+            }
+        case PROP_top:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setTop(myValue);
+                return JS_TRUE;
+            }
+        case PROP_bottom:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setBottom(myValue);
+                return JS_TRUE;
+            }
+        case PROP_near:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setNear(myValue);
+                return JS_TRUE;
+            }
+        case PROP_far:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setFar(myValue);
+                return JS_TRUE;
+            }
         default:
             JS_ReportError(cx,"JSFrustum::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;

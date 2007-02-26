@@ -234,11 +234,14 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.onMouseButton( theButton, theState, theX, theY);
     }
     self.onASSEvent = function( theNode ) {
-        print("event " + theNode.type + " at position: " + theNode.position3D +
-                " dt: " + (theNode.when - _myLastEventTime));
+        if (theNode.type == "configure") {
+            print("event " + theNode.type + " grid size: " + theNode.grid_size);
+        } else {
+            print("event " + theNode.type + " at position: " + theNode.position3D +
+                    " dt: " + (theNode.when - _myLastEventTime));
+        }
         _myLastEventTime = theNode.when;
     }
-
 }
 
 if (__main__ == "ASSDriverTest") {

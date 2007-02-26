@@ -680,6 +680,7 @@ namespace y60 {
             Matrix4f myInitialMatrix;
             myInitialMatrix.makeIdentity();
             _myLights.clear();
+            _myAnalyticGeometry.clear();
             updateTransformHierachy(getWorldRoot(), myInitialMatrix);
         }
     }
@@ -817,6 +818,8 @@ namespace y60 {
                     import(myInclude->get<IncludeSrcTag>(), AppPackageManager::get().getPtr(), theNode);
                 }
             }
+        } else if ( isAnalyticGeometry( theNode->nodeName() ) ) {
+            _myAnalyticGeometry.push_back( theNode );
         }
 
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
@@ -929,7 +932,7 @@ namespace y60 {
     };
 
     bool
-    Scene::intersectWorld(const LineSegment<float> & theStick,
+    Scene::intersectWorld(const asl::LineSegment<float> & theStick,
                           IntersectionInfoVector & theIntersections)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_LineSegment);
@@ -970,7 +973,7 @@ namespace y60 {
         return visitBodys(myVisitor, theRootNode);
     }
     bool
-    Scene::intersectBodies(dom::NodePtr theRootNode, const LineSegment<float> & theStick,
+    Scene::intersectBodies(dom::NodePtr theRootNode, const asl::LineSegment<float> & theStick,
                           IntersectionInfoVector & theIntersections)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_LineSegment);

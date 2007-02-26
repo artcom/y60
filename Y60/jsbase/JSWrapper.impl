@@ -337,3 +337,4 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
 }
 
 }
+/* vim: set filetype=cpp : */
