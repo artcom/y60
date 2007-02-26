@@ -84,8 +84,8 @@ namespace y60 {
         _myShapes.clear();
         if (!theRootNode) {
             theRootNode = _myScene.getWorldRoot();
-        } else if (theRootNode->nodeName() != "transform") {
-            throw asl::Exception("Only transform nodes are allowed as root node for scene optimizer", PLUS_FILE_LINE);
+        } else if (theRootNode->nodeName() != "transform" && theRootNode->nodeName() != "body") {
+            throw asl::Exception("Only transform or body nodes are allowed as root node for scene optimizer", PLUS_FILE_LINE);
         }
 
         // First step: Remove invisible nodes
