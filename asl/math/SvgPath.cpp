@@ -171,7 +171,7 @@ namespace asl {
 
         for (unsigned i = 0; i < _myElements.size(); ++i) {
 
-            LineSegmentPtr myElement = _myElements[i];
+            LineSegment3fPtr myElement = _myElements[i];
             Vector3f myNearest = asl::nearest(*myElement, asPoint(thePos));
             float myDistance = distance(myNearest, thePos);
             if (myNearestDistance < 0.0f || myDistance < myNearestDistance) {
@@ -196,7 +196,7 @@ namespace asl {
         PathNormal myNormal;
         myNormal.nearest = nearest(thePos);
         if (myNormal.nearest.path) {
-            LineSegmentPtr myElement = _myElements[myNormal.nearest.element];
+            LineSegment3fPtr myElement = _myElements[myNormal.nearest.element];
             Vector3f myForward = myElement->end - myElement->origin;
             myNormal.normal = normalized(cross(theUpVector, myForward));
         }
@@ -223,7 +223,7 @@ namespace asl {
 
             for (unsigned i = 0; i < _myElements.size(); ++i) {
 
-                LineSegmentPtr myElement = _myElements[i];
+                LineSegment3fPtr myElement = _myElements[i];
                 Vector3f myElementVector = myElement->end - myElement->origin;
                 float myElementLength = magnitude(myElementVector);
 
@@ -257,7 +257,7 @@ namespace asl {
 
             for (unsigned i = 0; i < _myElements.size(); ++i) {
 
-                LineSegmentPtr myElement = _myElements[i];
+                LineSegment3fPtr myElement = _myElements[i];
                 Vector3f myElementVector = myElement->end - myElement->origin;
                 float myElementLength = magnitude(myElementVector);
 
@@ -417,7 +417,7 @@ namespace asl {
         _myBezierSegments.push_back( theSpline );
         
         if ( theSpline->isLineSegment() ) {
-            LineSegmentPtr myElement( new LineSegment<float>( theSpline->getStart(), theSpline->getEnd()));
+            LineSegment3fPtr myElement( new LineSegment<float>( theSpline->getStart(), theSpline->getEnd()));
             _myElements.push_back( myElement );
             _myLength += magnitude(difference(myElement->end, myElement->origin));
         } else {
@@ -426,7 +426,7 @@ namespace asl {
             Point3f myP = theSpline->evaluate(0.0f);
             for (unsigned i = 1; i <= MAX_SPLINE_SEGMENTS; ++i) {
                 Point3f myP1 = theSpline->evaluate(i / (float) MAX_SPLINE_SEGMENTS);
-                LineSegmentPtr myElement( new LineSegment<float>(myP, myP1));
+                LineSegment3fPtr myElement( new LineSegment<float>(myP, myP1));
 
                 _myElements.push_back( myElement );
                 _myLength += magnitude(difference(myElement->end, myElement->origin));
@@ -666,7 +666,7 @@ namespace asl {
 
         while (1) {
 
-            LineSegmentPtr myElement = _myElements[myElementIndex];
+            LineSegment3fPtr myElement = _myElements[myElementIndex];
             if (!myFirstFlag && !almostEqual(myElement->origin, myLastPos)) {
                 // discontinuous
                 myPath->move(myElement->origin);
@@ -759,7 +759,7 @@ namespace asl {
             if (i > 0) {
                 os << ",";
             }
-            LineSegmentPtr myLineSegment = thePath.getElement(i);
+            LineSegment3fPtr myLineSegment = thePath.getElement(i);
             if (myLineSegment) {
                 os << *myLineSegment;
             }

@@ -236,7 +236,8 @@ namespace asl {
 
     /* @} */
 
-typedef Ptr< LineSegment<float> > LineSegmentPtr; // a little bit dirty ... should be LineSegmentfPtr
+    typedef Ptr< LineSegment<float> > LineSegment3fPtr;
+
 
 }
 

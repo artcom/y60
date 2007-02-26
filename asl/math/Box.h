@@ -37,7 +37,7 @@ namespace asl {
     /*! @addtogroup aslmath */
     /* @{ */
 
-    /** An axis aligned two dimensional box formerly know as rectangle.
+    /** An axis aligned two dimensional box formerly known as rectangle.
      * A Box2 is defined by a min and a max point. Because the box is axis
      * aligned that is all it needs to define its position and size.
      */

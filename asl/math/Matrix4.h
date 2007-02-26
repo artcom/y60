@@ -1499,7 +1499,7 @@ unknown:
     }
 
     template <class Number>
-    Vector3<Number> transformedNormal(const Vector3<Number> & v, const Matrix4<Number> & m) {
+    Vector3<Number> transformedVector(const Vector3<Number> & v, const Matrix4<Number> & m) {
         if (m.getType() == Matrix4<Number>::IDENTITY ||
             m.getType() == Matrix4<Number>::TRANSLATING ||
            (m.getType() == Matrix4<Number>::SCALING && m[0][0] == m[1][1] && m[1][1] == m[2][2]))
@@ -1532,7 +1532,12 @@ unknown:
 
         myAdjointTransposed.setType(Matrix4<Number>::LINEAR);
 
-        return normalized(asVector(asPoint(v) * myAdjointTransposed));
+        return asVector(asPoint(v) * myAdjointTransposed);
+    }
+
+    template <class Number>
+    Vector3<Number> transformedNormal(const Vector3<Number> & v, const Matrix4<Number> & m) {
+        return normalized( transformedVector(v, m));
     }
 
     template<class Number>

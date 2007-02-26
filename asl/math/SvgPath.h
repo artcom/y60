@@ -136,11 +136,11 @@ namespace asl {
         }
 
         /// Get element.
-        LineSegmentPtr getElement(unsigned theIndex) const {
+        LineSegment3fPtr getElement(unsigned theIndex) const {
             if (theIndex >= 0 && theIndex < _myElements.size()) {
                 return _myElements[theIndex];
             }
-            return LineSegmentPtr(0);
+            return LineSegment3fPtr(0);
         }
 
         unsigned getNumBezierSegments() const  {
@@ -236,7 +236,7 @@ namespace asl {
 
         float _myLength;
         std::vector< BSplinePtr > _myBezierSegments; // contains the whole path as bezier segments
-        std::vector< LineSegmentPtr > _myElements;   // contains the sampled path as line segments
+        std::vector< LineSegment3fPtr > _myElements;   // contains the sampled path as line segments
         Vector3f _myOrigin;
         float _mySegmentLength;
         unsigned _myNumSegments;

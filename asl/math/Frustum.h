@@ -43,7 +43,8 @@ class Frustum {
                 double theNear, double theFar, ProjectionType=PERSPECTIVE);
         
         virtual ~Frustum();
-        void updateCorners(float theNearPlane, float theFarPlane, float theHFov, float theOrthoWidth, float theAspectRatio);
+        void updateCorners(float theNearPlane, float theFarPlane, float theHFov,
+                           float theOrthoWidth, float theAspectRatio);
         bool getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const;
 
         // values suitable for glFrustum()
@@ -54,6 +55,13 @@ class Frustum {
         double getNear() const;
         double getFar() const;
         
+        void setLeft(const double & theValue);
+        void setRight(const double & theValue);
+        void setTop(const double & theValue);
+        void setBottom(const double & theValue);
+        void setNear(const double & theValue);
+        void setFar(const double & theValue);
+
         ProjectionType getType() const;
 
         void updatePlanes(const asl::Matrix4f & theCameraTransform, const asl::Matrix4f & theCameraTransformI);

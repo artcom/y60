@@ -70,13 +70,13 @@ Frustum::updateCorners(float theNearPlane, float theFarPlane, float theHFov, flo
 
         setSymmetricPerspective(theHFov, myVFov, theNearPlane, theFarPlane);
         DB(cerr << "Renderer::setPerspective() " << "nearplane: " << theNearPlane <<
-                " farplane: " << theFarPlane << " fovy: " << myVFov << " ar: " <<
+                " farplane: " << theFarPlane << " fovy: " << myVFov << " aspect: " <<
                 theAspectRatio << endl);
     } else {
         float myHeight =  theOrthoWidth / theAspectRatio;
         setSymmetricOrtho(theOrthoWidth, myHeight, theNearPlane, theFarPlane);
         DB(cerr << "Renderer::setPerspective() " << "nearplane: " << theNearPlane <<
-                " farplane: " << theFarPlane << " width: " << theOrthoWidth << " ar: " <<
+                " farplane: " << theFarPlane << " width: " << theOrthoWidth << " aspect: " <<
                 theAspectRatio << endl);
     }
 }
@@ -238,6 +238,31 @@ Frustum::getNear() const {
 double
 Frustum::getFar() const {
     return _myFar;
+}
+
+void
+Frustum::setLeft(const double & theValue) {
+     _myLeft = theValue;
+}
+void
+Frustum::setRight(const double & theValue){
+     _myRight = theValue;
+}
+void
+Frustum::setTop(const double & theValue) {
+     _myTop = theValue;
+}
+void
+Frustum::setBottom(const double & theValue) {
+     _myBottom = theValue;
+}
+void
+Frustum::setNear(const double & theValue) {
+     _myNear = theValue;
+}
+void
+Frustum::setFar(const double & theValue) {
+     _myFar = theValue;
 }
 
 
