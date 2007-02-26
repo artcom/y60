@@ -122,6 +122,11 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     self.BaseViewer.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
+        
+var myRootNode =  getDescendantByAttribute(window.scene.world, "name", "MB_feld", true);        
+if (myRootNode) {
+    print(myRootNode.boundingbox);
+}
         self.BaseViewer.onFrame(theTime);
         _myCurrentTime = theTime;
         if (_myShutter) {
@@ -250,7 +255,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                         _myOnScreenStatistics = 0;
                     }
                     window.printStatistics();
-                    print("  Scene size     " + window.scene.getWorldSize(window.camera).toFixed(1) + "m");
+                    var myCamera    = window.scene.dom.getElementById(window.canvas.childNode(0).camera);                    
+                    print("  Scene size     " + window.scene.getWorldSize(myCamera).toFixed(1) + "m");
                     break;
                 case 'S':
                     self.getScene().save("saved_scene.x60", false);
