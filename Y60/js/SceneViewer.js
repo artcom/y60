@@ -121,12 +121,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.BaseViewer.onFrame = self.onFrame;
-    self.onFrame = function(theTime) {
-        
-var myRootNode =  getDescendantByAttribute(window.scene.world, "name", "MB_feld", true);        
-if (myRootNode) {
-    print(myRootNode.boundingbox);
-}
+    self.onFrame = function(theTime) {        
         self.BaseViewer.onFrame(theTime);
         _myCurrentTime = theTime;
         if (_myShutter) {
