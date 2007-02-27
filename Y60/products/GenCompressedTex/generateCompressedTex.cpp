@@ -11,7 +11,7 @@
 
 #include <y60/GLUtils.h>
 #include <y60/SDLWindow.h>"
-#include <y60/GLResourcemanager.h>"
+#include <y60/GLResourceManager.h>"
 #include "SDL/SDL.h"
 
 #include <y60/PixelEncoding.h>
