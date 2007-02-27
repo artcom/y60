@@ -60,9 +60,9 @@ namespace y60 {
             if (myVBOUsage &&
                 (queryOGLExtension("GL_ARB_vertex_buffer_object", true) ||
                  queryOGLExtension("GL_EXT_vertex_buffer_object", true))
-#ifdef OSX // TODO PORT - disabled VBOs
-				&& false
-#endif				 
+//#ifdef OSX // TODO PORT - disabled VBOs
+//				&& false
+//#endif				 
 				 )
             {
                 _myType = VERTEX_STORAGE_IS_VBO_VECTOR;
