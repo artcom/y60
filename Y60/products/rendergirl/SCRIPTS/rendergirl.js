@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -32,6 +32,7 @@ var ourMainWindow        = null;
 var ourPreferenceDialog  = null;
 var ourCameraPopup       = null;
 var ourAnimationManager  = null;
+var ourWindowState = {width: 800, height: 600, position: [0, 0]};
 
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
@@ -56,8 +57,7 @@ var ourAllowedOptions = {
 //=================================================
 
 ourHandler.on_mainWindow_realize = function() {
-    print("loading shader library");
-    GLResourceManager.loadShaderLibrary("shaderlibrary.xml");
+    print("on_mainWindow_realize");
 }
 
 //=================================================
@@ -191,7 +191,6 @@ ourHandler.on_coordinate_system_activate = function(theMenuItem) {
     window.queue_draw();
 }
 
-var ourWindowState = {width: 800, height: 600, position: [0, 0]};
 ourHandler.on_fullscreen_activate = function(theMenuItem) {
     if (theMenuItem.active) {
         ourGlade.get_widget("main_toolbar").hide();
@@ -532,15 +531,30 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     BaseViewer.prototype.Constructor(self, theArguments);
     self.BaseViewer = [];
 
+    self.BaseViewer.setupWindow = self.setupWindow;
+    self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCap) {
+
+        self.BaseViewer.setupWindow(theRenderWindow, theSetDefaultRenderingCap);
+
+        var myShaderLibrary = self.getShaderLibrary();
+        if (myShaderLibrary) {
+            print("Preparing shaderlibrary '" + myShaderLibrary + "'");
+            GLResourceManager.prepareShaderLibrary(myShaderLibrary);
+        }
+        GLResourceManager.prepareShaderLibrary("shaderlibrary.xml");
+    }
+
     self.loadModel = function( theFilename ) {
-        self.setModelName(theFilename);
-        
+
+        print("Loading model '" + theFilename + "'");
+
         var myScene;
         if (theFilename == null) {
             myScene = new Scene();
             theFilename = "empty scene";
         } else {
             myScene = new Scene(theFilename);
+            self.setModelName(theFilename);
         }
 
         myScene.setup();  
@@ -564,6 +578,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onFrame = function(theTime) {
+
         if (RenderTest) {
             RenderTest.onFrame(theTime);
         }
@@ -612,7 +627,6 @@ Viewer.prototype.Constructor = function(self, theArguments) {
                 break;
         }
     }
-
 
     self.onPostRender = function() {
         if (RenderTest) {
@@ -697,10 +711,13 @@ function main(argv) {
         ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
         ourHandler.isLoaded = false;
 
+        print("Creating window");
         window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
         ourGlade.get_widget("renderbox").add(window);
         window.show();
         ourMainWindow.show();
+
+        print("Creating Viewer");
         ourViewer = new Viewer(ourHandler.arguments);
         ourMainWindow.signal_key_press_event.connect(ourViewer, "onKeyDown");
         ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
@@ -726,7 +743,8 @@ function main(argv) {
         ourAnimationManager = new GtkAnimationManager(ourViewer);
 
         ourViewer.loadModel( ourViewer.getModelName());
-        
+        //ourViewer.loadModel(null);
+
         /*
         var myScene = new Scene(ourViewer.getModelName());
         myScene.setup();
@@ -759,4 +777,3 @@ function setupGUI() {
 if (main(arguments) != 0 || GtkMain.exitCode != 0) {
     exit(1);
 };
-

@@ -47,18 +47,23 @@ loadShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 
         switch(argc) {
             case 3:
-                convertFrom(cx,argv[1],myVertexProfileName);
                 convertFrom(cx,argv[2],myFragmentProfileName);
+                // fall-through
+            case 2:
+                convertFrom(cx,argv[1],myVertexProfileName);
+                // fall-through
             case 1:
                 convertFrom(cx,argv[0],myShaderLibFile);
-            break;
-            default:
-                JS_ReportError(cx,"JSGLResourceManager::loadShaderLibrary: number of arguments is %d, must be 1 oder 3", argc);
-                return JS_FALSE;
+                break;
         }
 
-        GLResourceManager::get().loadShaderLibrary(
-                    asl::expandEnvironment(myShaderLibFile), myVertexProfileName, myFragmentProfileName);
+        if (argc == 0) {
+            GLResourceManager::get().loadShaderLibrary();
+        } else {
+            GLResourceManager::get().loadShaderLibrary(
+                        asl::expandEnvironment(myShaderLibFile), myVertexProfileName, myFragmentProfileName);
+        }
+
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

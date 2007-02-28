@@ -275,5 +275,4 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     var _myOCSCookie = null;
 
     setup();
-
 }

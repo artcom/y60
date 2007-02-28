@@ -1,23 +1,12 @@
-/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+//=============================================================================
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSnumeric: test_numeric_functions.tst.cpp,v $
-//
-//   $Revision: 1.17 $
-//
-// Description: Test for Request
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-*/
+//=============================================================================
 
 #include "RenderArea.h"
 
@@ -28,6 +17,7 @@
 #include <y60/JSApp.h>
 #include <y60/ScopedGLContext.h>
 #include <y60/EventDispatcher.h>
+#include <y60/GLResourceManager.h>
 
 #include <glade/glade.h>
 #include <gtk/gtkgl.h>
@@ -56,7 +46,7 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     GdkGLConfig * myGLConfig = gdk_gl_config_new_by_mode(
                 GdkGLConfigMode(GDK_GL_MODE_RGBA | GDK_GL_MODE_DEPTH | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_ALPHA));
     if (myGLConfig == 0) {
-        throw asl::Exception("can't init gl",PLUS_FILE_LINE);
+        throw asl::Exception("can't init GL",PLUS_FILE_LINE);
     }
 
     // If another render area is supplied as constructor paramter, this render area is uses as
@@ -65,7 +55,7 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     if (theContext) {
         myGdkGLContext = theContext->getGdkGlContext();
         if (!myGdkGLContext) {
-            throw asl::Exception("RenderArea: Failed to get gdk gl context from shared render area.", PLUS_FILE_LINE);
+            throw asl::Exception("RenderArea: Failed to get gdk GL context from shared render area.", PLUS_FILE_LINE);
         }
         setGLContext(theContext->getGLContext());
     } else {
@@ -95,6 +85,8 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     y60::EventDispatcher::get().addSource(&_myEventAdapter);
     y60::EventDispatcher::get().addSink(this);
     // TODO: createRenderer(theOtherRenderer);
+
+    ShaderLibrary::setGLisReadyFlag(true);
 }
 
 RenderArea::~RenderArea() {
@@ -408,6 +400,7 @@ RenderArea::createTTFRenderer() {
 
 void
 RenderArea::initDisplay() {
+    GLResourceManager::get().loadShaderLibrary();
 }
 
 }

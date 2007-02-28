@@ -175,8 +175,8 @@ namespace y60 {
             _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
         }
         _myShaderLibrary->load();
-
     }
+
     void GLResourceManager::prepareShaderLibrary(const std::string & theShaderLibraryFile,
                                               const std::string & theVertexProfileName,
                                               const std::string & theFragmentProfileName)
@@ -185,7 +185,6 @@ namespace y60 {
             _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
         }
         _myShaderLibrary->prepare(theShaderLibraryFile, theVertexProfileName, theFragmentProfileName);
-
     }
 
 

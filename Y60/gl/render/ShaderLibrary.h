@@ -43,39 +43,28 @@ namespace y60 {
             ShaderLibrary();
             virtual ~ShaderLibrary();
 
-            void load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName);
-
             void prepare(const std::string & theShaderLibraryName,
-                         std::string theVertexProfileName,
-                         std::string theFragmentProfileName)
+                    std::string theVertexProfileName,
+                    std::string theFragmentProfileName)
             {
                 _myShaderLibraryNames.push_back(theShaderLibraryName);
                 _myVertexProfileNames.push_back(theVertexProfileName);
                 _myFragmentProfileNames.push_back(theFragmentProfileName);
             }
-            
+
+            void load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName);
             void load(const std::string & theLibraryFileName) {
                 load(theLibraryFileName,"","");
             }
-            void load() {
-                if (_myShaderLibraryNames.size() == 0) {
-                    _myShaderLibraryNames.push_back("shaderlibrary.xml");
-                    _myVertexProfileNames.push_back("");
-                    _myFragmentProfileNames.push_back("");
-                }
-                 for (int i = 0; i < _myShaderLibraryNames.size(); ++i) { 
-                    load(_myShaderLibraryNames[i], _myVertexProfileNames[i], _myFragmentProfileNames[i]);
-                }
-                _myShaderLibraryNames.clear();
-                _myVertexProfileNames.clear();
-                _myFragmentProfileNames.clear();
-             }
+            void load();
 
             void load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName);
             void load(const dom::NodePtr theNode) {
                 load(theNode,"","");
             }
+
             void reload();
+
             virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
             const GLShaderVector & getShaders() const { return _myShaders; };
 #ifndef _AC_NO_CG_
@@ -108,7 +97,6 @@ namespace y60 {
     };
 
     typedef asl::Ptr<ShaderLibrary> ShaderLibraryPtr;
-
 
 } // namespace y60
 

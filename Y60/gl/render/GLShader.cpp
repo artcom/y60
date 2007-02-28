@@ -498,7 +498,7 @@ namespace y60 {
 
         // projector projection matrix
         Vector4f myPoTSize(theTexture.getImage()->get<ImageWidthTag>(),
-                        theTexture.getImage()->get<ImageHeightTag>(), 0, 1);
+                        theTexture.getImage()->get<ImageHeightTag>(), 0.0f, 1.0f);
         const Matrix4f & myImageMatrix = theTexture.getImage()->get<ImageMatrixTag>();
         Vector4f mySize = myPoTSize * myImageMatrix;
         float myAspect( mySize[0] / mySize[1] );

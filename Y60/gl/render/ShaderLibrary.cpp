@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,16 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: ShaderLibrary.cpp,v 1.9 2005/04/24 00:41:18 pavel Exp $
-//   $RCSfile: ShaderLibrary.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.9 $
-//   $Date: 2005/04/24 00:41:18 $
-//
-//
-//
-//=============================================================================
 
 #include "ShaderLibrary.h"
 #include "ShaderLibrary_xsd.h"
@@ -68,6 +58,7 @@ namespace y60 {
         assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()", _myCgContext);
 #endif
     }
+
 #ifndef _AC_NO_CG_
     CGcontext
 	ShaderLibrary::getCgContext() {
@@ -75,15 +66,15 @@ namespace y60 {
 	}
 #endif
 
-   void
+    void
     ShaderLibrary::load(const std::string & theLibraryFileName, std::string theVertexProfileName, std::string theFragmentProfileName) {
-        AC_DEBUG << "Loading shader library: " << theLibraryFileName;
+        AC_DEBUG << "ShaderLibrary::load: Loading shader library '" << theLibraryFileName << "'";
 
-         asl::PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
+        asl::PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
         string myShaderLibraryFileName = myPackageManager->searchFile(theLibraryFileName);
         if (myShaderLibraryFileName.empty()) {
             throw ShaderLibraryException(string("Could not find library '") + theLibraryFileName + "' in " +
-                AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+                    AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
         }
         myPackageManager->add(asl::getDirectoryPart(theLibraryFileName));
 
@@ -91,7 +82,7 @@ namespace y60 {
         asl::readFile(myShaderLibraryFileName, myShaderLibraryStr);
         if (myShaderLibraryStr.empty()) {
             throw ShaderLibraryException(string("Could not load library '") + myShaderLibraryFileName + "'",
-                PLUS_FILE_LINE);
+                    PLUS_FILE_LINE);
         }
         dom::Document myShaderLibraryXml;
         asl::Ptr<dom::ValueFactory> myFactory = asl::Ptr<dom::ValueFactory>(new dom::ValueFactory());
@@ -119,10 +110,10 @@ namespace y60 {
 
     void
     ShaderLibrary::load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName) {
-        
+
         AC_TRACE << "Library wants profile '" << theVertexProfileName << "' as vertex shader profile" << endl;
         AC_TRACE << "Library wants profile '" << theFragmentProfileName << "' as fragment shader profile" << endl;
-  
+
         // determine vertex shader profile name according to following priority:
         // 1) function args, 2) environment var. 3) ask Cg library
         if (theVertexProfileName == "") {
@@ -157,8 +148,8 @@ namespace y60 {
         AC_INFO << "Engine wants profile '" << _myFragmentProfileName << "' as fragment shader profile" << endl;
         int myVertexShaderProfile = asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
         int myFragmentShaderProfile = asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
-        
-       for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
+
+        for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
             const dom::NodePtr theShaderNode = theNode->childNode("shader", i);
             GLShaderPtr myGLShader(0);
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
@@ -166,8 +157,8 @@ namespace y60 {
                 myGLShader = GLShaderPtr(new FFShader(theShaderNode));
             }
 #ifndef _AC_NO_CG_
-		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) &&
-                     theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
+            else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) &&
+                    theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
                 myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
             } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new CGShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
@@ -175,15 +166,30 @@ namespace y60 {
 #endif
             if (myGLShader) {
                 if (myGLShader->isSupported()) {
-                _myShaders.push_back(myGLShader);
+                    _myShaders.push_back(myGLShader);
                 } else {
-                    AC_WARNING << "CG Shader '"<< theShaderNode->getAttributeString("name") << "' is not supported by engine profiles " << _myVertexProfileName << "/"<< _myFragmentProfileName;
+                    AC_WARNING << "Cg Shader '"<< theShaderNode->getAttributeString("name") << "' is not supported by engine profiles " << _myVertexProfileName << "/"<< _myFragmentProfileName;
                 }
             } else {
                 throw ShaderException(string("Can't determine shader type for shader with id '") +
-                    theShaderNode->getAttributeString(ID_ATTRIB) + "'",PLUS_FILE_LINE);
+                        theShaderNode->getAttributeString(ID_ATTRIB) + "'",PLUS_FILE_LINE);
             }
         }
+    }
+
+    void
+    ShaderLibrary::load() {
+        if (_myShaderLibraryNames.size() == 0) {
+            _myShaderLibraryNames.push_back("shaderlibrary.xml");
+            _myVertexProfileNames.push_back("");
+            _myFragmentProfileNames.push_back("");
+        }
+        for (unsigned i = 0; i < _myShaderLibraryNames.size(); ++i) { 
+            load(_myShaderLibraryNames[i], _myVertexProfileNames[i], _myFragmentProfileNames[i]);
+        }
+        _myShaderLibraryNames.clear();
+        _myVertexProfileNames.clear();
+        _myFragmentProfileNames.clear();
     }
 
     IShaderPtr
