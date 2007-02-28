@@ -143,7 +143,12 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
                 var mySplitText = this.active_text.split(" | ");
                 _myCurrentCharacter = mySplitText[0];
                 _myCurrentClip      = mySplitText[1];
-                _mySlider.setLimits(getDescendantByName(window.scene.characters, _myCurrentClip, true));
+                //print("character clip: "+ _myCurrentClip);
+                var myClip = getDescendantByName(window.scene.characters, _myCurrentClip, true);
+                if (myClip && myClip.childNodes.length > 0) {
+                    _mySlider.setLimits(myClip.childNode(0));
+                }
+                //_mySlider.setLimits(getDescendantByName(window.scene.characters, _myCurrentClip, true));
             }
         }
 

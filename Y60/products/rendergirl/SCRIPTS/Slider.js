@@ -85,6 +85,7 @@ AnimationSlider.prototype.Constructor = function(self, theGtkSlider) {
                 _myLoopFlag = true;
             }
         }
+        
         self.setBegin(myStart);
         self.setEnd(myEnd);
     }
