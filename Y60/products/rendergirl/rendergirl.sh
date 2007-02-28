@@ -1,22 +1,19 @@
 #! /bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Usage: `basename $0` <model> [<shaderlibrary>]"
-    exit 1
+if [ $# -gt 0 ]; then
+    MODELNAME="$1"
+    shift
 fi
 
-MODELNAME="$1"
-shift
-
-if [ $# -eq 0 ]; then
+if [ $# -gt 0 ]; then
+    SHADERLIB="$1"
+    shift
+else
     if [ "$USE_CG" == "1" ] ; then
         SHADERLIB="$PRO/src/Y60/shader/shaderlibrary.xml"
     else
     	SHADERLIB="$PRO/src/Y60/shader/shaderlibrary_nocg.xml"
     fi
-else
-    SHADERLIB="$1"
-    shift
 fi
 
 APPLICATION="acgtkshell"
