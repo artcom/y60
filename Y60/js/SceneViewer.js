@@ -130,7 +130,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myVideoRecorder) {
             _myVideoRecorder.onFrame(theTime);
         }
-        var myCanvas = self.getRenderWindow().canvas;
+        var myCanvas = self.getActiveViewport().parentNode; //self.getRenderWindow().canvas;
         if (myCanvas) {
             for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {
                 var myMover = self.getMover(myCanvas.childNode('viewport'));
@@ -250,7 +250,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                         _myOnScreenStatistics = 0;
                     }
                     window.printStatistics();
-                    var myCamera    = window.scene.dom.getElementById(window.canvas.childNode(0).camera);                    
+                    var myCamera    = self.getActiveCamera(); //window.scene.dom.getElementById(window.canvas.childNode(0).camera);
                     print("  Scene size     " + window.scene.getWorldSize(myCamera).toFixed(1) + "m");
                     break;
                 case 'S':
@@ -301,33 +301,35 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Texturing: " + (self.getActiveViewport().texturing ? "on" : "off"));
                     break;
                 case '[-]':
-                    if (window.camera.hfov) { // persp camera
-                        var myHfov = window.camera.hfov;
+                    var myCamera = self.getActiveCamera();
+                    if (myCamera.hfov) { // persp camera
+                        var myHfov = myCamera.hfov;
                         if (myHfov < 5) {
                             myHfov += 0.1;
                         } else if (myHfov < 175) {
                             myHfov += 5;
                         }
-                        window.camera.hfov = myHfov;
+                        myCamera.hfov = myHfov;
                         print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     } else {  // ortho camera
-                        window.camera.width *= 1.1;
-                        print("Zoom to width " + window.camera.width);
+                        myCamera.width *= 1.1;
+                        print("Zoom to width " + myCamera.width);
                     }
                     break;
                 case '[+]':
-                    if (window.camera.hfov) { // persp camera
-                        myHfov = window.camera.hfov;
+                    var myCamera = self.getActiveCamera();
+                    if (myCamera.hfov) { // persp camera
+                        myHfov = myCamera.hfov;
                         if (myHfov > 5) {
                             myHfov -= 5;
                         } else if (myHfov > 0.1) {
                             myHfov -= 0.1;
                         }
-                        window.camera.hfov = myHfov;
+                        myCamera.hfov = myHfov;
                         print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     } else {  // ortho camera
-                        window.camera.width /= 1.1;
-                        print("Zoom to width " + window.camera.width);
+                        myCamera.width /= 1.1;
+                        print("Zoom to width " + myCamera.width);
                     }
                     break;
                 case 'u':
@@ -346,16 +348,17 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 case '7':
                 case '8':
                 case '9':
-                    window.camera = self.setActiveCamera(Number(theKey));
-                    print("Active camera: " + window.camera.name);
+                    //window.camera = self.setActiveCamera(Number(theKey));
+                    self.setActiveCamera(Number(theKey));
+                    print("Active camera: " + self.getActiveCamera().name);
                     break;
                 case ".":
                     self.nextCamera();
-                    print("Active camera: " + window.camera.name);
+                    print("Active camera: " + self.getActiveCamera().name);
                     break;
                 case ",":
                     self.prevCamera();
-                    print("Active camera: " + window.camera.name);
+                    print("Active camera: " + self.getActiveCamera().name);
                     break;
                 case "e":
                     reuse();
@@ -443,6 +446,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps & (~theCapability);
     }
+
     self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
         if (window == null) {

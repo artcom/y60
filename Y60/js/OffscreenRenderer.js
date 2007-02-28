@@ -122,15 +122,19 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     }
 
     self.appendOverlay = function(theNode) {
-        _myCanvas.firstChild.childNode("overlays").appendChild(theNode);
+        //_myCanvas.firstChild.childNode("overlays").appendChild(theNode);
+        self.overlays.appendChild(theNode);
     }
 
     self.appendUnderlay = function(theNode) {
+        /*
         if( !_myCanvas.firstChild.childNode("underlays") ) {
             var myUnderlayNode = new Node("<underlays/>");
             _myCanvas.firstChild.appendChild(myUnderlayNode.firstChild);
         }
         _myCanvas.firstChild.childNode("underlays").appendChild(theNode);
+        */
+        self.underlays.appendChild(theNode);
     }
 
     self.setImage = function(theImage) {

@@ -1,12 +1,38 @@
 <?xml version="1.0"?>
 <shaders>
-    <shader id="s0" name="phongPaintBump" cost="100">
+    <shader id="s0" name="phongBump" cost="100">
+        <supports>
+            <feature class="lighting" values="[phong]"/>
+            <feature class="textures" values="[bump]"/>
+            <feature class="texcoord" values="[uv_map,uv_map]"/>
+        </supports>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[phongBump.cg]" entryfunctions="[mainFragment]">
+            <properties>
+                 <sampler2d name="normalMap">0</sampler2d>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="specular">[1,1,1,1]</vector4f>
+                 <vector4f name="ambient">[1,1,1,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[phongBump.cg]" entryfunctions="[mainVertex]">
+            <properties/>
+            <vertexparameters>
+                 <vector3f name="normal"/>
+                 <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+         </vertexshader>
+    </shader>
+    <shader id="s1" name="phongPaintBump" cost="100">
         <supports>
             <feature class="lighting" values="[phong]"/>
             <feature class="textures" values="[paint,bump]"/>
             <feature class="texcoord" values="[uv_map,uv_map]"/>
         </supports>
-        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[phongBump.cg]" entryfunctions="[mainFragment]">
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[phongBump.cg]" entryfunctions="[mainFragment]" compilerargs="[[-DPAINT]]">
             <properties>
                  <sampler2d name="colorMap">0</sampler2d>
                  <sampler2d name="normalMap">1</sampler2d>
@@ -17,7 +43,7 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[phongBump.cg]" entryfunctions="[mainVertex]">
+        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[phongBump.cg]" entryfunctions="[mainVertex]" compilerargs="[[-DPAINT]]">
             <properties/>
             <vertexparameters>
                  <vector3f name="normal"/>

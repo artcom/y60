@@ -114,6 +114,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _activeViewport;
     }
 
+    self.getActiveCamera = function() {
+        var myViewport = self.getActiveViewport();
+        return myViewport.getElementById(myViewport.camera);
+    }
+
     self.attachWindow = function(theRenderWindow) {
         _myRenderWindow = theRenderWindow;
         // register our event listener
@@ -196,7 +201,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // switch mover
         var myNewMover = self.setMover(_myMoverFactories[myNextMoverIndex], theViewport);
         print("Activated Mover: " + myNewMover.name);
-
     }
 
     self.setAutoNearFarPlane = function(theFlag) {
@@ -552,6 +556,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.__defineGetter__('drawFrustums', function() { return _myDrawCameraFrustumFlag; });
     self.__defineSetter__('drawFrustums', function(theFlag) { _myDrawCameraFrustumFlag = theFlag; });
 
+
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {
             return _myRenderWindow.canvas.childNode("viewport");
@@ -560,12 +565,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return null;
     }
 
-
     function getViewportId(theViewport) {
         if (theViewport) {
             return theViewport.id;
         }
-        return getSingleViewport().id;
+        return self.getActiveViewport().id; //getSingleViewport().id;
     }
 
     function parseArguments(theArguments) {

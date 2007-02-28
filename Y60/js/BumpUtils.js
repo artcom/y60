@@ -85,11 +85,27 @@ function calculateAndAppendTangents(theShape) {
 }
 
 
-function setupBumpMap(theScene, theBodyOrShape, theImage) {
+function getOrCreateImage(theScene, theImage)
+{
+    var myImage = null;
+    if (typeof(theImage) == "string") {
+        myImage = Modelling.createImage(theScene, theImage);
+        myImage.id = createUniqueId();
+        myImage.mipmap = 1;
+    } else {
+        myImage = theImage;
+    }
+
+    return myImage;
+}
+
+
+function setupBumpMap(theScene, theBodyOrShape, theNormalMap, theBaseMap) {
 
     var myShape = null;
     if (typeof(theBodyOrShape) != "object") {
-        Logger.error("theBodyOrShape must be an object");
+        Logger.error("setupBumpMap: theBodyOrShape must be an object");
+        return;
     }
     if ("shape" in theBodyOrShape) {
         myShape = theBodyOrShape.getElementById(theBodyOrShape.shape); // body
@@ -97,9 +113,13 @@ function setupBumpMap(theScene, theBodyOrShape, theImage) {
         myShape = theBodyOrShape; // shape
     }
 
-    /*
-     * add tangents to shape
-     */
+    if (theNormalMap == null) {
+        Logger.error("setupBumpMap: theNormalMap must be given");
+        return;
+    }
+    // theBaseMap is optional
+
+    // add tangents to shape
     calculateAndAppendTangents(myShape);
 
     /*
@@ -110,19 +130,35 @@ function setupBumpMap(theScene, theBodyOrShape, theImage) {
 
     // tweak requirements for normalmapping
     myMaterial.requires.lighting = "[100[phong]]";
-    myMaterial.requires.textures = "[100[paint,bump]]";
+    if (theBaseMap) {
+        myMaterial.requires.textures = "[100[paint,bump]]";
+    } else {
+        myMaterial.requires.textures = "[100[bump]]";
+    }
     myMaterial.requires.texcoord = "[100[uv_map,uv_map]]";
 
-    // add normal map
-    var myImage = null;
-    if (typeof(theImage) == "string") {
-        myImage = Modelling.createImage(theScene, theImage);
-    } else {
-        myImage = theImage;
+    // add base map
+    var myTexturesNode = myMaterial.childNode("textures");
+    if (theBaseMap) {
+        var myImage = getOrCreateImage(theScene, theBaseMap);
+        if (myTexturesNode.childNodesLength() < 1) {
+            var myTexture = new Node("<texture/>").firstChild;
+            myTexture.image = myImage.id;
+            myTexturesNode.appendChild(myTexture);
+        } else {
+            myTexturesNode.childNode(0).image = myImage.id;
+        }
     }
-    myImage.mipmap = 1;
 
-    var myTexture = new Node("<texture/>").firstChild;
-    myTexture.image = myImage.id;
-    myMaterial.childNode("textures").appendChild(myTexture);
+    // add normal map
+    if (theNormalMap) {
+        var myImage = getOrCreateImage(theScene, theNormalMap);
+        if (myTexturesNode.childNodesLength() < 1) {
+            var myTexture = new Node("<texture/>").firstChild;
+            myTexture.image = myImage.id;
+            myTexturesNode.appendChild(myTexture);
+        } else {
+            myTexturesNode.childNode(myTexturesNode.childNodesLength()-1).image = myImage.id;
+        }
+    }
 }

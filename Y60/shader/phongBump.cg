@@ -39,7 +39,7 @@ vert2frag mainVertex(a2v IN,
 { 
     vert2frag OUT;
 
-    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position); // ftransform
     OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0);
     OUT.worldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
 
@@ -54,21 +54,29 @@ vert2frag mainVertex(a2v IN,
 
 
 float4 mainFragment(vert2frag IN,
+#ifdef PAINT
         uniform sampler2D colorMap,
+#endif
         uniform sampler2D normalMap,
         uniform float3 AC_CAMERA_POSITION,
-        uniform float3 AC_POSITIONAL_LIGHTS[],
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
+        uniform float3 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
+        uniform float3 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
+        uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float3 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
+        uniform float3 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
         uniform float4 ambient,
         uniform float4 diffuse,
         uniform float4 specular,
         uniform float shininess) : COLOR
 {
     float4 myColor = ambient;
+    myColor.a += diffuse.a + specular.a;
 
     float3x3 TBN = float3x3(IN.tangent, IN.binormal, IN.normal);
 
-    float3 N = expand(tex2D(normalMap, IN.texCoord0).rgb);
+    float4 Ntex = tex2D(normalMap, IN.texCoord0);
+    float3 N = normalize(expand(Ntex.rgb));
     float3 P = IN.worldPosition;
     float3 V = normalize(AC_CAMERA_POSITION - P);
 
@@ -82,12 +90,12 @@ float4 mainFragment(vert2frag IN,
 
         L = mul(TBN, AC_DIRECTIONAL_LIGHTS[i]);
         diffuseTerm = saturate(dot(L, N));
-        myColor += diffuse * float4(diffuseTerm, diffuseTerm, diffuseTerm, 1);
+        myColor.rgb += diffuse.rgb * AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
         if (diffuseTerm > 0.0) {
             float3 R = 2 * dot(N, L) * N - L;
             specularTerm = pow(max(dot(R, V), 0), shininess);
-            myColor += specular * float4(specularTerm, specularTerm, specularTerm, 1);
+            myColor.rgb += specular.rgb * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * specularTerm;
         }
     }
 
@@ -98,18 +106,23 @@ float4 mainFragment(vert2frag IN,
 
         L = mul(TBN, AC_POSITIONAL_LIGHTS[i] - P);
         diffuseTerm = saturate(dot(L, N));
-        myColor += diffuse * float4(diffuseTerm, diffuseTerm, diffuseTerm, 1);
+        myColor.rgb += diffuse.rgb * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
         if (diffuseTerm > 0.0) {
             float3 R = 2 * dot(N, L) * N - L;
             specularTerm = pow(max(dot(R, V), 0), shininess);
-            myColor += specular * float4(specularTerm, specularTerm, specularTerm, 1);
+            myColor.rgb += specular.rgb * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * specularTerm;
         }
     }
 
-    // blend
+#ifdef PAINT
+    // blend with base texture
     float4 myTexColor = tex2D(colorMap, IN.texCoord0);
     myColor *= myTexColor; // MODULATE
+#endif
+
+    // modulate with normalmap alpha
+    myColor *= Ntex.a;
 
     return myColor;
 }

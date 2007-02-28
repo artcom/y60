@@ -59,7 +59,7 @@ namespace inet {
         }
 
         if (bind(fd,(struct sockaddr*)&_myLocalEndpoint,sizeof(_myLocalEndpoint))<0) {
-            throw SocketException("UDPSocket::init:can`t bind socket ");
+            throw SocketException("UDPSocket::init:can't bind socket ");
         }
     }
 
@@ -72,6 +72,7 @@ namespace inet {
 #endif                
         fromsize=sizeof(_myLocalEndpoint);
 
+        // UH: this doesn't look right, we're overwriting our _myLocalEndpoint...
         int bytesread;
         if ((bytesread=recvfrom(fd, (char*)data, maxlen, 0, (struct sockaddr*)&_myLocalEndpoint, &fromsize))>=0) {
             if (thehost) 
@@ -103,16 +104,7 @@ namespace inet {
 
     void UDPSocket::reset() 
     { 
-#if 1
         close();
-#else
-#ifndef WIN32
-        ::close(fd);
-#else
-        closesocket(fd);
-#endif                
-        fd = -1;
-#endif
         open();
     }
 
