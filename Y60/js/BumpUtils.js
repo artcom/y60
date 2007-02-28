@@ -141,7 +141,7 @@ function setupBumpMap(theScene, theBodyOrShape, theNormalMap, theBaseMap) {
     var myTexturesNode = myMaterial.childNode("textures");
     if (theBaseMap) {
         var myImage = getOrCreateImage(theScene, theBaseMap);
-        if (myTexturesNode.childNodesLength() < 1) {
+        if (myTexturesNode.childNodesLength() == 0) {
             var myTexture = new Node("<texture/>").firstChild;
             myTexture.image = myImage.id;
             myTexturesNode.appendChild(myTexture);
@@ -153,7 +153,7 @@ function setupBumpMap(theScene, theBodyOrShape, theNormalMap, theBaseMap) {
     // add normal map
     if (theNormalMap) {
         var myImage = getOrCreateImage(theScene, theNormalMap);
-        if (myTexturesNode.childNodesLength() < 1) {
+        if (theBaseMap || myTexturesNode.childNodesLength() == 0) {
             var myTexture = new Node("<texture/>").firstChild;
             myTexture.image = myImage.id;
             myTexturesNode.appendChild(myTexture);
