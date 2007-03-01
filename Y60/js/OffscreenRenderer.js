@@ -68,7 +68,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         
         // setup camera
         if (theCamera == undefined) {
-            var myCamera = window.camera.cloneNode(true);
+            Logger.info("Camera undefined, using the camera of the first viewport of the first canvas");
+            var myCanvas = window.scene.canvases.childNode("canvas", 0);
+            var myViewport = myCanvas.childNode("viewport", 0);
+            var myCameraId = myViewport.getAttribute("camera");
+            var myCamera = myViewport.getElementById(myCameraId).cloneNode(true);
             myCamera.name = "OffscreenBuffer_Camera";
             adjustNodeIds(myCamera);
             window.scene.world.appendChild(myCamera);

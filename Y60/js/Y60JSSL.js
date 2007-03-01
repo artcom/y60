@@ -732,23 +732,25 @@ function setWorldPosition(theBody, theWorldPosition) {
     theBody.position = product(theWorldPosition, myT);
 }
 
-function transformClipToWorld(theClipPos, theCamera) {
-    var myProjectionMatrix = new Matrix4f(window.projectionmatrix);
+function transformClipToWorld(theClipPos, theViewport) {
+    var myProjectionMatrix = new Matrix4f(theViewport.projectionmatrix);
     myProjectionMatrix.invert();
-    myProjectionMatrix.postMultiply(theCamera.globalmatrix);
+    var myCamera = theViewport.getElementById(theViewport.camera);
+    myProjectionMatrix.postMultiply(myCamera.globalmatrix);
     return product(theClipPos, myProjectionMatrix);
 }
 
-function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera) {
+function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport) {
     var myPosX = 2 * theScreenPixelX / window.width  - 1;
     var myPosY = - (2 * theScreenPixelY / window.height - 1);
     var myScreenPos = new Point3f(myPosX, myPosY, -1);
-    return transformClipToWorld(myScreenPos, theCamera);
+    return transformClipToWorld(myScreenPos, theViewport);
 }
 
-function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera) {
-    var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera);
-    var myRay = new Ray(theCamera.position, myScreenPos);
+function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theViewport) {
+    var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport);
+    var myCamera = theViewport.getElementById(theViewport.camera);
+    var myRay = new Ray(myCamera.position, myScreenPos);
     return intersection(myRay, new Planef(new Vector3f(0,0,-1), theZ));
 }
 
