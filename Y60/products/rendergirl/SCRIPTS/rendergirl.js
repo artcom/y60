@@ -275,25 +275,25 @@ ourHandler.on_walk_mover_activate = function(theMenuItem) {
 }
 
 ourHandler.on_zoom_in_activate = function() {
-    var myHfov = window.camera.hfov;
+    var myHfov = window.camera.frustum.hfov;
     if (myHfov > 5) {
         myHfov -= 5;
     } else if (myHfov > 0.1) {
         myHfov -= 0.1;
     }
-    window.camera.hfov = myHfov;
+    window.camera.frustum.hfov = myHfov;
     ourStatusBar.set("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (HFOV: " + myHfov.toFixed(1) + ")");
     window.queue_draw();
 }
 
 ourHandler.on_zoom_out_activate = function() {
-    var myHfov = window.camera.hfov;
+    var myHfov = window.camera.frustum.hfov;
     if (myHfov < 5) {
         myHfov += 0.1;
     } else if (myHfov < 175) {
         myHfov += 5;
     }
-    window.camera.hfov = myHfov;
+    window.camera.frustum.hfov = myHfov;
     ourStatusBar.set("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (HFOV: " + myHfov.toFixed(1) + ")");
     window.queue_draw();
 }

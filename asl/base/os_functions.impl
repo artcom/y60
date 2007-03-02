@@ -25,3 +25,4 @@ namespace asl {
         }
     }
 };
+/* vim: set filetype=cpp : */

@@ -329,7 +329,7 @@ JSMatrix::Properties() {
     return myProperties;
 }
 
-#define DEFINE_MATRIXTYPE(NAME) { #NAME, PROP_ ## NAME , asl::Matrix4f::NAME }
+#define DEFINE_MATRIXTYPE(NAME) { #NAME, PROP_ ## NAME , asl::NAME }
 
 JSConstIntPropertySpec *
 JSMatrix::ConstIntProperties() {

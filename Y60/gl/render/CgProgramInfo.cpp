@@ -575,7 +575,10 @@ namespace y60 {
                 case VIEWPROJECTION:
                     {
                         Matrix4f myMatrix = theCamera.get<InverseGlobalMatrixTag>();
-                        myMatrix.postMultiply(theViewport.get<ProjectionMatrixTag>());
+                        //myMatrix.postMultiply(theViewport.get<ProjectionMatrixTag>()); XXX
+                        Matrix4f myProjectionMatrix;
+                        theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
+                        myMatrix.postMultiply(myProjectionMatrix);
                         setCgMatrixParameter(curParam, myMatrix);
                         break;
                     }

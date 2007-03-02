@@ -501,10 +501,13 @@ namespace y60 {
                         theTexture.getImage()->get<ImageHeightTag>(), 0.0f, 1.0f);
         const Matrix4f & myImageMatrix = theTexture.getImage()->get<ImageMatrixTag>();
         Vector4f mySize = myPoTSize * myImageMatrix;
-        float myAspect( mySize[0] / mySize[1] );
-        Frustum myFrustum;
-        myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
-                myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), myAspect);
+        float myAspect( mySize[0] / mySize[1] ); // XXX this aspect allready contains the image matrix
+                                                 //     use the texture matrix if you need another transformation
+        myProjector->updateFrustum( theTexture.get<ResizePolicyTag>(), myAspect );
+        const Frustum & myFrustum = myProjector->get<FrustumTag>();
+        // XXX myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
+        //        myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), myAspect);
+
         Matrix4f myProjectionMatrix;
         myFrustum.getProjectionMatrix( myProjectionMatrix );
         theMatrix.assign(theCamera.get<y60::GlobalMatrixTag>());

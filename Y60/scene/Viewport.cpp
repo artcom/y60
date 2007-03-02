@@ -98,42 +98,15 @@ Viewport::getHeight(unsigned & theHeight) const {
     return false;
 }
 
-bool 
-Viewport::getProjectionMatrix(asl::Matrix4f & theProjection) const {
-    // TODO: optimize by checking version counters
-    const dom::NodePtr myCameraNode = getNode().getElementById(get<CameraTag>()); 
-    const CameraPtr & myCamera = myCameraNode->getFacade<Camera>();
-    float myAspect = float(get<ViewportWidthTag>())/float(get<ViewportHeightTag>());
-    if (get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
-        myAspect = 1.0f/myAspect;
-    }
-    dom::NodePtr myFrustumNode = dom::NamedNodeMap::getNamedItem(VIEWPORT_FRUSTUM_ATTRIB); 
-    dom::Node::WritableValue<Frustum> myFrustum(myFrustumNode);  
-    
-    myFrustum.get().updateCorners(myCamera->get<NearPlaneTag>(), myCamera->get<FarPlaneTag>(),
-                    myCamera->get<HfovTag>(), myCamera->get<OrthoWidthTag>(), myAspect);
-    
-    myFrustum.get().getProjectionMatrix(theProjection);
-
-    if (get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
-        theProjection.rotateZ(float(asl::PI_2));
-    }
-    return true;
-}
-
 void 
-Viewport::updateClippingPlanes() {
-    // TODO: optimize by checking version counters
-    const dom::NodePtr myCameraNode = getNode().getElementById(get<CameraTag>()); 
-    const CameraPtr & myCamera = myCameraNode->getFacade<Camera>();
+Viewport::applyAspectToCamera() {
+    dom::NodePtr myCameraNode = getNode().getElementById( get<CameraTag>() );
+    if (myCameraNode) {
+        CameraPtr myCamera = myCameraNode->getFacade<Camera>();
 
-    dom::NodePtr myFrustumNode = dom::NamedNodeMap::getNamedItem(VIEWPORT_FRUSTUM_ATTRIB); 
-    dom::Node::WritableValue<Frustum> myFrustum(myFrustumNode);  
-    
-    myFrustum.get().updateCorners(myCamera->get<NearPlaneTag>(), myCamera->get<FarPlaneTag>(),
-                    myCamera->get<HfovTag>(), myCamera->get<OrthoWidthTag>(), 
-                    float(get<ViewportWidthTag>())/float(get<ViewportHeightTag>()));
-    myFrustum.get().updatePlanes(myCamera->get<GlobalMatrixTag>(), myCamera->get<InverseGlobalMatrixTag>());
+        myCamera->updateFrustum( get<ResizePolicyTag>(),
+                float( get<ViewportWidthTag>() ) / float( get<ViewportHeightTag>()));
+    }
 }
 
 }

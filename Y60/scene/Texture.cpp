@@ -34,7 +34,8 @@ namespace y60 {
         TextureApplyModeTag::Plug(theNode),
         TextureSpriteTag::Plug(theNode),
 		TextureMatrixTag::Plug(theNode),
-        dom::FacadeAttributePlug<TextureImageTag>(this)
+        dom::FacadeAttributePlug<TextureImageTag>(this),
+        ResizePolicyTag::Plug( theNode )
     {
     }
 

@@ -24,47 +24,118 @@
 #include "Matrix4.h"
 #include "Box.h"
 
+#include <asl/Enum.h>
+
 namespace asl {
 
+/** @relates Frustum */
 DEFINE_EXCEPTION(FrustumException, asl::Exception);
     
+/** @relates Frustum */
+enum ProjectionTypeEnum {
+    PERSPECTIVE,
+    ORTHONORMAL,
+    ProjectionTypeEnum_MAX
+};
+
+/** @relates Frustum */
+DEFINE_ENUM( ProjectionType, ProjectionTypeEnum );
+
+/** @relates Frustum
+ * The resize olicy is used to change the aspect ratio of the frustum if the viewports
+ * or projective textures aspect changes.
+ *
+ * NO_ADAPTION - Dont change the frustum aspect, use this in conjunction with onResize
+ *               for weird setups.
+ * ADAPT_VERTICAL - adapt the vertical size of the frustum. (default)
+ * ADAPT_HORIZONTAL - adapt the horizontal size of the frustum.
+ */
+enum ResizePolicyEnum {
+    NO_ADAPTION,
+    ADAPT_VERTICAL, // 
+    ADAPT_HORIZONTAL, // ... the other way round
+    ResizePolicyEnum_MAX
+};
+
+DEFINE_ENUM(ResizePolicy, ResizePolicyEnum);   
+
+/** This class models perspective and orthonormal viewing volumes. */
 class Frustum {
     public:
-        enum ProjectionType {
-            PERSPECTIVE,
-            ORTHO
-        };
         Frustum();
-        Frustum(double theLeft, double theRight, 
-                double theBottom, double theTop,  
-                double theNear, double theFar, ProjectionType=PERSPECTIVE);
-        Frustum(double theX, // HFov or Width
-                double theY, // VFov or Height 
-                double theNear, double theFar, ProjectionType=PERSPECTIVE);
+        Frustum(const Frustum & otherFrustum);
+        Frustum(float theLeft, float theRight, 
+                float theBottom, float theTop,  
+                float theNear, float theFar, ProjectionType=PERSPECTIVE);
+        Frustum(float theX, // HFov or Width
+                float theY, // VFov or Height 
+                float theNear, float theFar, ProjectionType=PERSPECTIVE);
         
         virtual ~Frustum();
+        /*
         void updateCorners(float theNearPlane, float theFarPlane, float theHFov,
                            float theOrthoWidth, float theAspectRatio);
-        bool getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const;
-
-        // values suitable for glFrustum()
-        double getLeft() const;
-        double getRight() const;
-        double getTop() const;
-        double getBottom() const;
-        double getNear() const;
-        double getFar() const;
-        
-        void setLeft(const double & theValue);
-        void setRight(const double & theValue);
-        void setTop(const double & theValue);
-        void setBottom(const double & theValue);
-        void setNear(const double & theValue);
-        void setFar(const double & theValue);
+        */
 
         ProjectionType getType() const;
+        void setType( ProjectionType theProjection);
 
-        void updatePlanes(const asl::Matrix4f & theCameraTransform, const asl::Matrix4f & theCameraTransformI);
+        /** Return the width of the frustum on the near plane */
+        float getWidth() const;
+        /** Set the width of the frustum on the near plane */
+        void setWidth( const float & theWidth);
+        /** Return the height of the frustum on the near plane */
+        float getHeight() const;
+        /** Set the height of the frustum on the near plane */
+        void setHeight( const float & theHeight);
+
+        /** Get the horizontal field of view in degrees. Throws an exception
+         *  if the frustum isn't perspective */
+        float getHFov() const;
+        /** Set the horizontal field of view in degrees. The frustum is switched
+         * to perspective mode automatically*/
+        void setHFov(const float & theFOV );
+        /** Get the vertical field of view in degrees. Throws an exception
+         *  if the frustum isn't perspective */
+        float getVFov() const;
+        /** Set the vertical field of view in degrees. The frustum is switched
+         * to perspective mode automatically*/
+        void setVFov(const float & theFOV );
+
+        void setHShift(const float & theShift);
+        float getHShift() const;
+        void setVShift(const float & theShift);
+        float getVShift() const;
+
+
+        void setSymmetricPerspective(float theHFov, float theVFov, float theNear, float theFar);
+        void setSymmetricOrtho(float theWidth, float theHeight, float theNear, float theFar);
+        void changeAspectRatio( ResizePolicy thePolicy, float theNewAspect);
+
+        bool getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const;
+        Matrix4f getProjectionMatrix() const;
+
+        void updatePlanes(const asl::Matrix4f & theCameraTransform,
+                          const asl::Matrix4f & theCameraTransformI);
+
+        void getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF, 
+                        asl::Point3f & theRTF, asl::Point3f & theLBF,
+                        asl::Point3f & theLTBK, asl::Point3f & theRBBK, 
+                        asl::Point3f & theRTBK, asl::Point3f & theLBBK) const;
+
+        // values suitable for glFrustum()
+        const float & getLeft() const;
+        void setLeft(const float & theValue);
+        const float & getRight() const;
+        void setRight(const float & theValue);
+        const float & getTop() const;
+        void setTop(const float & theValue);
+        const float & getBottom() const;
+        void setBottom(const float & theValue);
+        const float & getNear() const;
+        void setNear(const float & theValue);
+        const float & getFar() const;
+        void setFar(const float & theValue);
 
         const asl::Plane<float> & getLeftPlane() const;
         const asl::Plane<float> & getRightPlane() const;
@@ -73,25 +144,26 @@ class Frustum {
         const asl::Plane<float> & getNearPlane() const;
         const asl::Plane<float> & getFarPlane() const;
 
-        void getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF, 
-                        asl::Point3f & theRTF, asl::Point3f & theLBF,
-                        asl::Point3f & theLTBK, asl::Point3f & theRBBK, 
-                        asl::Point3f & theRTBK, asl::Point3f & theLBBK) const;
 
+        // [DS] Used only by stream operators. Maybe we should make them private and make the
+        // operators our friends
+        typedef asl::FixedVector<6, float> TupleT;
+        TupleT asTuple() const;
+        void fromTuple(const TupleT & theTuple);
     protected:
     private:
-        void setSymmetricPerspective(double theHFov, double theVFov, double theNear, double theFar);
-        void setSymmetricOrtho(double theWidth, double theHeight, double theNear, double theFar);
 
         asl::Vector3f constructPlaneNormal(const asl::Vector3f & v1, 
                                            const asl::Vector3f & v2, 
                                            const asl::Matrix4f & T);
-        double _myLeft;
-        double _myRight;
-        double _myBottom;
-        double _myTop;
-        double _myNear;
-        double _myFar;
+
+
+        float _myLeft;
+        float _myRight;
+        float _myBottom;
+        float _myTop;
+        float _myNear;
+        float _myFar;
         ProjectionType _myProjectionType;
 
         asl::Plane<float> _myLeftPlane;

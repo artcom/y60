@@ -732,11 +732,10 @@ function setWorldPosition(theBody, theWorldPosition) {
     theBody.position = product(theWorldPosition, myT);
 }
 
-function transformClipToWorld(theClipPos, theViewport) {
-    var myProjectionMatrix = new Matrix4f(theViewport.projectionmatrix);
+function transformClipToWorld(theClipPos, theCamera) {
+    var myProjectionMatrix = new Matrix4f(theCamera.frustum.projectionmatrix);
     myProjectionMatrix.invert();
-    var myCamera = theViewport.getElementById(theViewport.camera);
-    myProjectionMatrix.postMultiply(myCamera.globalmatrix);
+    myProjectionMatrix.postMultiply(theCamera.globalmatrix);
     return product(theClipPos, myProjectionMatrix);
 }
 
@@ -744,7 +743,7 @@ function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport) {
     var myPosX = 2 * theScreenPixelX / window.width  - 1;
     var myPosY = - (2 * theScreenPixelY / window.height - 1);
     var myScreenPos = new Point3f(myPosX, myPosY, -1);
-    return transformClipToWorld(myScreenPos, theViewport);
+    return transformClipToWorld(myScreenPos, theViewport.getElementById( theViewport.camera ));
 }
 
 function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theViewport) {

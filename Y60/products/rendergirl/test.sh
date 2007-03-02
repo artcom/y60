@@ -61,7 +61,9 @@ if [ ! -z $VG ]; then
     APP="valgrind --tool=${TOOL} ${TOOLARGS} ${APP}"
     echo "VALGRINDING:${APP}"
 fi
-${APP} -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60 shaderlibrary.xml
+CMD="${APP} -I \"SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib\" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60 shaderlibrary.xml"
+echo $CMD
+$CMD
 
 # compare resulting images
 for BASELINE_IMAGE in BASELINE_IMAGES/* ; do
