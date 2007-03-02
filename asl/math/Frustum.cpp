@@ -7,22 +7,6 @@
 using namespace std;
 
 #define DB(x) // x
-
-static const char * ProjectionTypeStrings[] = {
-    "perspective",
-    "orthonormal",
-    ""
-};
-IMPLEMENT_ENUM( asl::ProjectionType, ProjectionTypeStrings);
-
-static const char * ResizePolicyStrings[] = {
-    "no_adaption",
-    "adapt_vertical",
-    "adapt_horizontal",
-    ""
-};
-IMPLEMENT_ENUM( asl::ResizePolicy, ResizePolicyStrings);
-
 namespace asl { 
 
 Frustum::Frustum() :
@@ -34,23 +18,11 @@ Frustum::Frustum() :
     _myFar(0),
     _myProjectionType(PERSPECTIVE)
 {
-    setSymmetricPerspective(54.0, 54.0, 0.1, 10000);
 }
 
-Frustum::Frustum( const Frustum & otherFrustum ) :
-    _myLeft( otherFrustum._myLeft),
-    _myRight( otherFrustum._myRight),
-    _myTop( otherFrustum._myTop),
-    _myBottom( otherFrustum._myBottom),
-    _myNear( otherFrustum._myNear),
-    _myFar( otherFrustum._myFar),
-    _myProjectionType( otherFrustum._myProjectionType)
-{
-}
-
-Frustum::Frustum(float theLeft, float theRight,
-        float theBottom, float theTop,
-        float theNear, float theFar, ProjectionType theProjectionType) :
+Frustum::Frustum(double theLeft, double theRight,
+        double theBottom, double theTop,
+        double theNear, double theFar, ProjectionType theProjectionType) :
     _myLeft(theLeft),
     _myRight(theRight),
     _myBottom(theBottom),
@@ -61,7 +33,7 @@ Frustum::Frustum(float theLeft, float theRight,
 {
 }
 
-Frustum::Frustum(float theX, float theY, float theNear, float theFar, ProjectionType theProjectionType) {
+Frustum::Frustum(double theX, double theY, double theNear, double theFar, ProjectionType theProjectionType) {
     if (theProjectionType == PERSPECTIVE) {
         setSymmetricPerspective(theX, theY, theNear, theFar);
     } else {
@@ -73,35 +45,44 @@ Frustum::~Frustum() {
 }
 
 void 
-Frustum::changeAspectRatio( ResizePolicy thePolicy, float theNewAspect) {
-    float myOldWidth  = _myRight - _myLeft;
-    float myOldHeight = _myTop - _myBottom;
-    float myOldAspect = myOldWidth / myOldHeight;
+Frustum::updateCorners(float theNearPlane, float theFarPlane, float theHFov, float theOrthoWidth, float theAspectRatio) {
+    if (theNearPlane == 0.0f) {
+        theNearPlane = 0.1f;
+    }
+    if (theFarPlane == 0.0f) {
+        theFarPlane = 1000.0f;
+    }
 
-    switch (thePolicy) {
-        case ADAPT_VERTICAL:
-            {
-                float myNewHeight = myOldWidth / theNewAspect;
-                float myScale = myNewHeight / myOldHeight;
-                _myBottom *= myScale;
-                _myTop *= myScale;
-            }
-            break;
-        case ADAPT_HORIZONTAL:
-            {
-                float myNewWidth = myOldHeight * theNewAspect;
-                float myScale = myNewWidth / myOldWidth;
-                _myLeft *= myScale;
-                _myRight *= myScale;
-            }
-            break;
-        case NO_ADAPTION:
-            break;
-    };
+    bool isPerpective = theHFov > 0.0f;
+    bool isOrtho = theOrthoWidth > 0.0f;
+    if (isPerpective && isOrtho) {
+        throw FrustumException("Camera has hfov AND width attributes",
+                PLUS_FILE_LINE);
+    }
+    if (!isPerpective && !isOrtho) {
+        throw FrustumException("Camera has neither hfov NOR width attributes",
+                PLUS_FILE_LINE);
+    }
+
+    if (isPerpective) {
+        float myVFov = float(asl::degFromRad(2.0f *
+                    atan( 1.0f / theAspectRatio * tan(asl::radFromDeg(theHFov) * 0.5f))));
+
+        setSymmetricPerspective(theHFov, myVFov, theNearPlane, theFarPlane);
+        DB(cerr << "Renderer::setPerspective() " << "nearplane: " << theNearPlane <<
+                " farplane: " << theFarPlane << " fovy: " << myVFov << " aspect: " <<
+                theAspectRatio << endl);
+    } else {
+        float myHeight =  theOrthoWidth / theAspectRatio;
+        setSymmetricOrtho(theOrthoWidth, myHeight, theNearPlane, theFarPlane);
+        DB(cerr << "Renderer::setPerspective() " << "nearplane: " << theNearPlane <<
+                " farplane: " << theFarPlane << " width: " << theOrthoWidth << " aspect: " <<
+                theAspectRatio << endl);
+    }
 }
 
 void
-Frustum::setSymmetricPerspective(float theHFov, float theVFov, float theNear, float theFar) {
+Frustum::setSymmetricPerspective(double theHFov, double theVFov, double theNear, double theFar) {
     _myRight  = tan( radFromDeg( theHFov * 0.5 ) ) * theNear;
     _myLeft   = - _myRight;
     _myTop    = tan( radFromDeg( theVFov * 0.5 ) ) * theNear;
@@ -112,14 +93,14 @@ Frustum::setSymmetricPerspective(float theHFov, float theVFov, float theNear, fl
 }
 
 void
-Frustum::setSymmetricOrtho(float theWidth, float theHeight, float theNear, float theFar) {
+Frustum::setSymmetricOrtho(double theWidth, double theHeight, double theNear, double theFar) {
     _myRight  = theWidth/2;
     _myLeft   = - _myRight;
     _myTop    = theHeight/2;
     _myBottom = - _myTop;
     _myNear   = theNear;
     _myFar    = theFar;
-    _myProjectionType = ORTHONORMAL;
+    _myProjectionType = ORTHO;
 }
 
 // See OpenGL Red Book Appendix F page 674
@@ -137,24 +118,17 @@ Frustum::getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const {
 
                 0.0f, 0.0f, float(-2.0 * _myFar * _myNear / (_myFar - _myNear)), 0.0f);
         return true;
-    } else if (_myProjectionType == ORTHONORMAL) {
+    } else if (_myProjectionType == ORTHO) {
         // corrected version - don't trust the red book, trust me! 
         theProjectionMatrix.assign(float(2.0 / (_myRight - _myLeft)), 0.0f, 0.0f, 0.0f,
                 0.0f, float(2.0 / (_myTop - _myBottom)), 0.0f, 0.0f,
                 0.0f, 0.0f, float(-2.0f/(_myFar - _myNear)), 0.0f,
                 float(-(_myRight+_myLeft) / (_myRight-_myLeft)),
                 float(-(_myTop+_myBottom) / (_myTop-_myBottom)),
-                float(-(_myFar + _myNear) / (_myFar - _myNear)), 1.0f, AFFINE);
+                float(-(_myFar + _myNear) / (_myFar - _myNear)), 1.0f, Matrix4f::AFFINE);
         return true;
     }
     return false;
-}
-
-Matrix4f
-Frustum::getProjectionMatrix() const {
-    Matrix4f myMatrix;
-    getProjectionMatrix( myMatrix );
-    return myMatrix;
 }
 
 void
@@ -206,13 +180,9 @@ Frustum::updatePlanes(const Matrix4f & theCameraTransform, const Matrix4f & theC
 
 }
 
-ProjectionType
+Frustum::ProjectionType
 Frustum::getType() const {
     return _myProjectionType;
-}
-void 
-Frustum::setType( ProjectionType theProjection) {
-    _myProjectionType = theProjection;
 }
 
 const Plane<float> &
@@ -245,168 +215,56 @@ Frustum::getFarPlane() const {
     return _myFarPlane;
 }
 
-const float &
+double
 Frustum::getLeft() const {
     return _myLeft;
 }
-const float &
+double
 Frustum::getRight() const {
     return _myRight;
 }
-const float &
+double
 Frustum::getTop() const {
     return _myTop;
 }
-const float &
+double
 Frustum::getBottom() const {
     return _myBottom;
 }
-const float &
+double
 Frustum::getNear() const {
     return _myNear;
 }
-const float &
+double
 Frustum::getFar() const {
     return _myFar;
 }
 
 void
-Frustum::setLeft(const float & theValue) {
+Frustum::setLeft(const double & theValue) {
      _myLeft = theValue;
 }
 void
-Frustum::setRight(const float & theValue){
+Frustum::setRight(const double & theValue){
      _myRight = theValue;
 }
 void
-Frustum::setTop(const float & theValue) {
+Frustum::setTop(const double & theValue) {
      _myTop = theValue;
 }
 void
-Frustum::setBottom(const float & theValue) {
+Frustum::setBottom(const double & theValue) {
      _myBottom = theValue;
 }
 void
-Frustum::setNear(const float & theValue) {
-     if (_myProjectionType == PERSPECTIVE) {
-        float myScale = theValue / _myNear;
-        _myRight *= myScale;
-        _myLeft *= myScale;
-
-     }
+Frustum::setNear(const double & theValue) {
      _myNear = theValue;
 }
 void
-Frustum::setFar(const float & theValue) {
+Frustum::setFar(const double & theValue) {
      _myFar = theValue;
 }
 
-float
-Frustum::getWidth() const {
-    return _myRight - _myLeft;
-}
-
-void 
-Frustum::setWidth( const float & theWidth) {
-    float myShift = 0.0;
-    if ( ! almostEqual( getWidth(), 0 )) {
-        myShift = getHShift();
-    }
-    _myLeft = ( - myShift - 0.5 ) * theWidth;
-    _myRight = ( - myShift + 0.5) * theWidth;
-}
-
-float
-Frustum::getHeight() const {
-    return _myTop - _myBottom;
-}
-
-void 
-Frustum::setHeight( const float & theHeight) {
-    float myShift = 0.0;
-    if ( ! almostEqual( getHeight(), 0 )) {
-        myShift = getVShift();
-    }
-    _myBottom = ( - myShift - 0.5) * theHeight;
-    _myTop = ( - myShift + 0.5) * theHeight;
-}
-
-float
-Frustum::getHFov() const {
-    if (_myProjectionType == PERSPECTIVE ) {
-        float myHfov =  degFromRad( atan2( _myRight , _myNear ) ) -
-                        degFromRad( atan2( _myLeft, _myNear ));
-        return myHfov;
-    } else {
-        throw FrustumException("Field of view requested on orthonormal frustum.",
-                PLUS_FILE_LINE );
-    }
-}
-
-void 
-Frustum::setHFov(const float & theFOV ) {
-    // TODO: apply shift
-    AC_PRINT << "h shift: " << getHShift();
-    _myRight  = tan( radFromDeg( theFOV * 0.5 ) ) * _myNear;
-    _myLeft   = - _myRight;
-    _myProjectionType = PERSPECTIVE;
-}
-
-float
-Frustum::getVFov() const {
-    if (_myProjectionType == PERSPECTIVE ) {
-        float myVfov =  degFromRad( atan2( _myTop , _myNear ) ) -
-                        degFromRad( atan2( _myBottom, _myNear ));
-        return myVfov;
-    } else {
-        throw FrustumException("Field of view requested on orthonormal frustum.",
-                PLUS_FILE_LINE );
-    }
-}
-
-void 
-Frustum::setVFov(const float & theFOV ) {
-    // TODO: apply shift
-    AC_PRINT << "v shift: " << getVShift();
-    _myTop    = tan( radFromDeg( theFOV * 0.5 ) ) * _myNear;
-    _myBottom = - _myTop;
-    _myProjectionType = PERSPECTIVE;
-}
-
-
-
-void 
-Frustum::setHShift(const float & theShift) {
-    float myWidth = getWidth();
-    float myOffset = theShift * myWidth;
-    _myRight =  0.5 * myWidth - myOffset;
-    _myLeft = - 0.5 * myWidth - myOffset;
-}
-
-float
-Frustum::getHShift() const {
-    if ( almostEqual( getWidth(), 0) ) {
-        throw FrustumException("Can not compute horizontal shift. Frustum width is zero.",
-                PLUS_FILE_LINE);
-    }
-    float myWidth = getWidth();
-    return  - (_myLeft + 0.5 * myWidth) / myWidth;
-}
-void 
-Frustum::setVShift(const float & theShift) {
-    float myHeight = getHeight();
-    float myOffset = theShift * myHeight;
-    _myTop =  0.5 * myHeight - myOffset;
-    _myBottom = - 0.5 * myHeight - myOffset;
-}
-float
-Frustum::getVShift() const {
-    if ( almostEqual( getHeight(), 0) ) {
-        throw FrustumException("Can not compute vertical shift. Frustum height is zero.",
-                PLUS_FILE_LINE);
-    }
-    return  - (_myBottom + 0.5 * getHeight()) / getHeight();
-}
 
 bool
 intersection(const asl::Box3f & theBox, const Frustum & theFrustum) {
@@ -494,56 +352,18 @@ Frustum::getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF,
     intersection(_myLeftPlane,  _myBottomPlane, _myFarPlane, theLBBK);
 }
 
-
-Frustum::TupleT 
-Frustum::asTuple() const {
-    TupleT myTuple;
-    myTuple[0] = _myLeft;
-    myTuple[1] = _myRight;
-    myTuple[2] = _myBottom;
-    myTuple[3] = _myTop;
-    myTuple[4] = _myNear;
-    myTuple[5] = _myFar;
-    return myTuple;
-}
-
-void 
-Frustum::fromTuple(const TupleT & theTuple) {
-    _myLeft   = theTuple[0];
-    _myRight  = theTuple[1];
-    _myBottom = theTuple[2];
-    _myTop    = theTuple[3];
-    _myNear   = theTuple[4];
-    _myFar    = theTuple[5];
-}
-
-
 std::ostream & operator << (std::ostream & os, const Frustum & theFrustum) {
-    /*
-    return os << "[" << theFrustum.getType() <<
+    return os << "[" << (theFrustum.getType()==Frustum::PERSPECTIVE ? "PERSP:" : "ORTHO:") <<
                  "," << theFrustum.getLeft() <<
                  "," << theFrustum.getRight() <<
                  "," << theFrustum.getTop() <<
                  "," << theFrustum.getBottom() <<
                  "," << theFrustum.getNear() <<
                  "," << theFrustum.getFar() << "]";
-                 */
-    os << theFrustum.getType();
-    os << theFrustum.asTuple();
-    return os;
 }
 
 std::istream & operator>>(std::istream & is, Frustum & theFrustum) {
-    //throw asl::Exception("Frustum istream operator not yet implemented", PLUS_FILE_LINE);
-    ProjectionType myType;
-    is >> myType;
-
-    Frustum::TupleT myTuple;
-    is >> myTuple;
-
-    theFrustum.setType( myType );
-    theFrustum.fromTuple( myTuple );
-    return is;
+    throw asl::Exception("Frustum istream operator not yet implemented", PLUS_FILE_LINE);
 }
 
 

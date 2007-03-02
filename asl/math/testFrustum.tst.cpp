@@ -174,17 +174,6 @@ public:
 
         testBoxIntersection(theFrustum, false, false, false, true);
     }
-
-    void testAsymmetricFrustum(Frustum theFrustum) {
-        ENSURE( theFrustum.getHShift() == 0);
-        float myOldHeight = theFrustum.getHeight();
-        ENSURE( theFrustum.getVShift() == 0);
-        theFrustum.setVShift( 0.5 );
-        ENSURE( theFrustum.getHeight() == myOldHeight );
-        theFrustum.setHShift( 0.75 );
-        ENSURE( theFrustum.getVShift() == 0.5);
-        ENSURE( theFrustum.getHShift() == 0.75);
-    }
        
     void run() {
         Frustum myFrustum(-1,1,-1,1,1,5);
@@ -195,41 +184,8 @@ public:
         ENSURE (almostEqual(Point3f(1,1,-1), Point3f(1,1,-1)*myProjection));
         ENSURE (almostEqual(Point3f(-0.2f, -0.2f, 1.0f), Point3f(-1.0f,-1.0f,-5.0f)*myProjection));
 
-
         testPlanes(myFrustum);
         testCorners(myFrustum);
-
-        testAsymmetricFrustum( myFrustum );
-        Frustum myFrustum2(-0.5, 0.5, -0.5, 0.5, 1, 5);
-        testAsymmetricFrustum( myFrustum2 );
-
-        Frustum myAsymFrustum( -0.5, 0.5, -1.0, 0.0, 1, 5);
-        ENSURE( myAsymFrustum.getVShift() == 0.5);
-
-        myAsymFrustum.setHeight( 5.0 );
-        ENSURE( myAsymFrustum.getHeight() == 5.0);
-        ENSURE( myAsymFrustum.getVShift() == 0.5);
-
-        myAsymFrustum.setVShift( 1.0 );
-        ENSURE( myAsymFrustum.getHeight() == 5.0 );
-        ENSURE( myAsymFrustum.getVShift() == 1.0 );
-
-
-        myAsymFrustum.setVShift( 1.0 );
-        ENSURE( myAsymFrustum.getVShift() == 1.0);
-
-        myAsymFrustum.setHeight(25.0);
-        myAsymFrustum.setVShift( 10.0 );
-        ENSURE( myAsymFrustum.getVShift() == 10.0);
-        ENSURE( myAsymFrustum.getHeight() == 25.0);
-        ENSURE( myAsymFrustum.getVShift() == 10.0);
-        myAsymFrustum.setHeight(50.0);
-        ENSURE( myAsymFrustum.getHeight() == 50.0);
-        ENSURE( myAsymFrustum.getVShift() == 10.0);
-
-        myAsymFrustum.setVShift( 0 );
-        testAsymmetricFrustum( myAsymFrustum );
-        
     }
     
 };

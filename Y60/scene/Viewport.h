@@ -40,7 +40,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ViewportTopTag,             int,           VIEWPORT_TOP_ATTRIB,             0);
     DEFINE_ATTRIBUT_TAG(ViewportHeightTag,          unsigned,      VIEWPORT_HEIGHT_ATTRIB,          0);
     DEFINE_ATTRIBUT_TAG(ViewportWidthTag,           unsigned,      VIEWPORT_WIDTH_ATTRIB,           0);
-
+    DEFINE_ATTRIBUT_TAG(ProjectionMatrixTag,        asl::Matrix4f, PROJECTIONMATRIX_ATTRIB,         asl::Matrix4f::Identity());
     DEFINE_ATTRIBUT_TAG(ViewportBackfaceCullingTag, bool,          VIEWPORT_BACKFACECULLING_ATTRIB, true);
     DEFINE_ATTRIBUT_TAG(ViewportWireframeTag,       bool,          VIEWPORT_WIREFRAME_ATTRIB,       false);
     DEFINE_ATTRIBUT_TAG(ViewportLightingTag,        bool,          VIEWPORT_LIGHTING_ATTRIB,        true);
@@ -50,6 +50,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ViewportTexturingTag,       bool,          VIEWPORT_TEXTURING_ATTRIB,       true);
     DEFINE_ATTRIBUT_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false);
     DEFINE_ATTRIBUT_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false);
+    DEFINE_ATTRIBUT_TAG(ViewportFrustumTag,         asl::Frustum,  VIEWPORT_FRUSTUM_ATTRIB,         TYPE());
 
     class Viewport :
         public dom::Facade,
@@ -72,7 +73,8 @@ namespace y60 {
         public dom::DynamicAttributePlug<ViewportLeftTag, Viewport>,
         public dom::DynamicAttributePlug<ViewportHeightTag, Viewport>,
         public dom::DynamicAttributePlug<ViewportWidthTag, Viewport>,
-        public ResizePolicyTag::Plug
+        public dom::DynamicAttributePlug<ProjectionMatrixTag, Viewport>,
+        public dom::FacadeAttributePlug<ViewportFrustumTag>
     {
         public:
             Viewport(dom::Node & theNode) :
@@ -96,20 +98,22 @@ namespace y60 {
                   dom::DynamicAttributePlug<ViewportLeftTag, Viewport>(this, &Viewport::getLeft),
                   dom::DynamicAttributePlug<ViewportHeightTag, Viewport>(this, &Viewport::getHeight),
                   dom::DynamicAttributePlug<ViewportWidthTag, Viewport>(this, &Viewport::getWidth),
-                  ResizePolicyTag::Plug( theNode )
+                  dom::DynamicAttributePlug<ProjectionMatrixTag, Viewport>(this, &Viewport::getProjectionMatrix),
+                  dom::FacadeAttributePlug<ViewportFrustumTag>(this)
               {
               }
             IMPLEMENT_DYNAMIC_FACADE(Viewport);
+            void updateClippingPlanes();
             /// returns the distance between bottom of viewport and bottom of
             //  canvas. Suitable for glViewport.
             int getLower() const; 
-            void applyAspectToCamera();
         private:
+            bool getProjectionMatrix(asl::Matrix4f & theProjection) const;
             bool getTop(int & theTop) const;
             bool getLeft(int & theLeft) const;
             bool getHeight(unsigned & theHeight) const;
             bool getWidth(unsigned & theWidth) const;
-
+            bool getFrustum(asl::Frustum & theFrustum) const;
     };
 
     typedef asl::Ptr<Viewport, dom::ThreadingModel> ViewportPtr;

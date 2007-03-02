@@ -171,7 +171,7 @@ function pickBody(theX, theY) {
     var myPosY = - (2 * (theY-myViewport.top) / myViewport.height - 1);
     var myClipNearPos = new Point3f(myPosX, myPosY, -1);
     var myClipFarPos = new Point3f(myPosX, myPosY, +1);
-    var myProjectionMatrix = window.camera.frustum.projectionmatrix;
+    var myProjectionMatrix = myViewport.projectionmatrix;
     myProjectionMatrix.invert();
     myProjectionMatrix.postMultiply(window.camera.globalmatrix);
 

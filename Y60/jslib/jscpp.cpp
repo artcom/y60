@@ -238,11 +238,6 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSPerlinNoise::initClass(cx, theGlobalObject)) {
         return false;
     }
-    /*
-    if (!JSEnum<asl::MatrixType>::initClass(cx, theGlobalObject)) {
-        return false;
-    }   
-    */
     if (!JSEnum<y60::BlendEquation>::initClass(cx, theGlobalObject)) {
         return false;
     }   
@@ -261,13 +256,7 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSEnum<y60::VertexBufferUsage>::initClass(cx, theGlobalObject)) {
         return false;
     }
-    if (!JSEnum<asl::ResizePolicy>::initClass(cx, theGlobalObject)) {
-        return false;
-    }
     if (!JSEnum<y60::ImageType>::initClass(cx, theGlobalObject)) {
-        return false;
-    }
-    if (!JSEnum<asl::ProjectionType>::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSBitset<y60::RenderStyles>::initClass(cx, theGlobalObject)) {

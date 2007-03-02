@@ -12,7 +12,6 @@
 #define _Y60_ACXPSHELL_JSFRUSTUM_INCLUDED_
 
 #include "JSWrapper.h"
-#include "JSEnum.h"
 
 #include <asl/Vector234.h>
 #include <asl/numeric_functions.h>
@@ -39,24 +38,15 @@ public:
         PROP_bottom,
         PROP_near,
         PROP_far,
-
-        PROP_type,
-        PROP_width,
-        PROP_height,
-        PROP_hfov,
-        PROP_vfov,
-
         PROP_left_plane,
         PROP_right_plane,
         PROP_top_plane,
         PROP_bottom_plane,
         PROP_near_plane,
         PROP_far_plane,
-        
-        PROP_projectionmatrix,
 
         PROP_PERSPECTIVE,
-        PROP_ORTHONORMAL,
+        PROP_ORTHO,
         PROP_END
     };
     static JSPropertySpec * Properties();

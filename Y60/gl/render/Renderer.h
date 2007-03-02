@@ -105,12 +105,12 @@ namespace y60 {
                       float theWidth = 1.0f,
                       const std::string & theRenderStyles = "");
 
-            void renderFrustum(dom::NodePtr theProjectiveNode );
+            void renderFrustum(dom::NodePtr theProjectiveNode, const float & theAspect );
        private:
             void setupRenderState(ViewportPtr theViewport);
 
             void bindViewMatrix(y60::CameraPtr theCamera);
-            void setProjection(ViewportPtr theViewport, y60::CameraPtr theCamera);
+            void setProjection(ViewportPtr theViewport);
             void rotateBillboard(const Body & theBody, const Camera & theCamera);
 
             GLenum getPrimitiveGLType(PrimitiveType theType) const;
@@ -137,6 +137,8 @@ namespace y60 {
             void renderBoundingBox(const asl::Box3f & theBox);
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
 
+            void renderFrustum(const ViewportPtr & theViewport);
+
             void renderOverlays(const Viewport & theViewport,
                                 const std::string & theRootNodeName);
             void renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha = 1);
@@ -147,7 +149,7 @@ namespace y60 {
                            const asl::Point3f & theRTBK, const asl::Point3f & theLBBK,
                            const asl::Vector4f & theColor, asl::Vector4f theBackColor = asl::Vector4f(0,0,0,0));
 
-            void renderAnalyticGeometry( y60::ViewportPtr theViewport, CameraPtr theCamera);
+            void renderAnalyticGeometry( y60::ViewportPtr theViewport);
 
             /// setup immediate draw
             void preDraw(const asl::Vector4f & theColor,

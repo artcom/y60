@@ -924,8 +924,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
             *vp = as_jsval(cx, theNative.getHeight());
             return JS_TRUE;
         case PROP_projectionmatrix:
-            //*vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ProjectionMatrixTag>());
-            AC_WARNING << "JSAbstractRenderWindow property 'projectionmatrix' is deprecated.";
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ProjectionMatrixTag>());
             return JS_TRUE;
         case PROP_camera:
             {

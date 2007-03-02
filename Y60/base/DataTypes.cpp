@@ -155,7 +155,6 @@ namespace y60 {
 
         theFactory.registerPrototype("TextureUsage", dom::ValuePtr(new dom::SimpleValue<y60::TextureUsage>(y60::TextureUsage(PAINT),0)));        
         theFactory.registerPrototype("ImageType", dom::ValuePtr(new dom::SimpleValue<y60::ImageType>(y60::ImageType(SINGLE),0)));        
-        theFactory.registerPrototype("ResizePolicy", dom::ValuePtr(new dom::SimpleValue<asl::ResizePolicy>(asl::ResizePolicy(asl::ADAPT_VERTICAL),0)));        
 
     }
 

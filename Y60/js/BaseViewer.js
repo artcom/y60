@@ -384,8 +384,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                     myNearPlane = myWorldSize / 10000.0;
                     myFarPlane = myWorldSize * 2.0;
                 }
-                myCamera.frustum.near = myNearPlane;
-                myCamera.frustum.far = myFarPlane;
+                myCamera.nearplane = myNearPlane;
+                myCamera.farplane = myFarPlane;
             }
         }
         _myLightManager.onPreViewport(theViewport);

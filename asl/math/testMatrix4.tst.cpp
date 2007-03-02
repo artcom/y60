@@ -263,7 +263,7 @@ class Matrix4UnitTest : public UnitTest {
 
         }
 
-        void testMatrixMultiplication(Matrix4<T> a, Matrix4<T> b, MatrixType theType) {
+        void testMatrixMultiplication(Matrix4<T> a, Matrix4<T> b, typename Matrix4<T>::MatrixType theType) {
             if (ourPerformanceTest) {
                 testMultiplyPerformance(a, b);
             }
@@ -317,7 +317,7 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix2(myMatrix1);
 
             ENSURE_MSG(almostEqual(myMatrix1, myMatrix2), "Testing copy constructor");
-            ENSURE_MSG(myMatrix1.getType() == UNKNOWN, "Test getType()");
+            ENSURE_MSG(myMatrix1.getType() == Matrix4<T>::UNKNOWN, "Test getType()");
         }
 
         void testQuaternionConstructor() {
@@ -328,7 +328,7 @@ class Matrix4UnitTest : public UnitTest {
                 Matrix4<T> myMatrix(myQuat);
                 myExpectedMatrix.makeZRotating(T(PI));
                 ENSURE_MSG(almostEqual(myMatrix, myExpectedMatrix), "Testing build matrix from quaternion");
-                ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+                ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Test getType()");
             }
             {
                 Quaternion<T> myQuat(Vector3<T>(5.0, 0.0, 0.0), float(0.123));
@@ -368,7 +368,7 @@ class Matrix4UnitTest : public UnitTest {
 
         void testStaticIdentity() {
             const Matrix4<T> & myIdentity = Matrix4<T>::Identity();
-            ENSURE(myIdentity.getType() == IDENTITY);
+            ENSURE(myIdentity.getType() == Matrix4<T>::IDENTITY);
             Matrix4<T> myMatrix;
             myMatrix.makeIdentity();
             ENSURE(almostEqual(myMatrix, myIdentity));
@@ -378,7 +378,7 @@ class Matrix4UnitTest : public UnitTest {
 
         void testAssign() {
             Matrix4<T> myMatrix;
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, LINEAR);
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::LINEAR);
             for (unsigned i = 0; i < 4; ++i) {
                 Vector4<T> myExpectedResult(T(i * 4), T(i * 4 + 1),
                     T(i * 4 + 2), T(i * 4 + 3));
@@ -386,7 +386,7 @@ class Matrix4UnitTest : public UnitTest {
                     "Testing assign");
             }
 
-            ENSURE_MSG(myMatrix.getType() == LINEAR, "Testing assign");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::LINEAR, "Testing assign");
         }
 
         void setMatrix(Matrix4<T> & a, const Matrix4<T> & b) {
@@ -399,89 +399,89 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myGeneratedMatrix;
             // Identity
             myMatrix.assign(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing auto classification: identity");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing auto classification: identity");
 
             // X_ROTATING
             myGeneratedMatrix.makeXRotating(T(0.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Testing auto classification: X_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Testing auto classification: X_ROTATING");
             myGeneratedMatrix.makeXRotating(T(5.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Testing auto classification: X_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Testing auto classification: X_ROTATING");
             myGeneratedMatrix.makeXRotating(T(-0.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Testing auto classification: X_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Testing auto classification: X_ROTATING");
             myGeneratedMatrix.makeXRotating(T(-5.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Testing auto classification: X_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Testing auto classification: X_ROTATING");
 
             // Y_ROTATING
             myGeneratedMatrix.makeYRotating(T(0.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Testing auto classification: Y_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Testing auto classification: Y_ROTATING");
             myGeneratedMatrix.makeYRotating(T(4.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Testing auto classification: Y_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Testing auto classification: Y_ROTATING");
             myGeneratedMatrix.makeYRotating(T(-1.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Testing auto classification: Y_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Testing auto classification: Y_ROTATING");
             myGeneratedMatrix.makeYRotating(T(-4.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Testing auto classification: Y_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Testing auto classification: Y_ROTATING");
 
             // Z_ROTATING
             myGeneratedMatrix.makeZRotating(T(2.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Testing auto classification: Z_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Testing auto classification: Z_ROTATING");
             myGeneratedMatrix.makeZRotating(T(6.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Testing auto classification: Z_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Testing auto classification: Z_ROTATING");
             myGeneratedMatrix.makeZRotating(T(-2.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Testing auto classification: Z_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Testing auto classification: Z_ROTATING");
             myGeneratedMatrix.makeZRotating(T(-6.123));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Testing auto classification: Z_ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Testing auto classification: Z_ROTATING");
 
             // ROTATING
             myGeneratedMatrix.makeRotating(normalized(Vector3<T>(T(0.123), T(1.23), T(2.34))), T(4.321));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Testing auto classification: ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Testing auto classification: ROTATING");
             myGeneratedMatrix.makeRotating(normalized(Vector3<T>(T(2.123), T(-1.23), T(0))), T(1.321));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Testing auto classification: ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Testing auto classification: ROTATING");
             myGeneratedMatrix.makeRotating(normalized(Vector3<T>(T(0), T(-1.23), T(-1))), T(-4.321));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Testing auto classification: ROTATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Testing auto classification: ROTATING");
             myGeneratedMatrix.makeRotating(normalized(Vector3<T>(T(0), T(-1.23), T(-1))), T(-4.321));
             myGeneratedMatrix.scale(Vector3<T>(T(1.5), T(0.5), T(1.414)));
             setMatrix(myMatrix, myGeneratedMatrix);
-            ENSURE_MSG(myMatrix.getType() == LINEAR, "Testing auto classification: LINEAR");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::LINEAR, "Testing auto classification: LINEAR");
 
             // SCALING
             myMatrix.assign(-1,0,0,0,0,2,0,0,0,0,0.5,0,0,0,0,1);
-            ENSURE_MSG(myMatrix.getType() == SCALING, "Testing auto classification: SCALING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::SCALING, "Testing auto classification: SCALING");
 
             // LINEAR
             myMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,0,0,0,1);
-            ENSURE_MSG(myMatrix.getType() == LINEAR, "Testing auto classification: LINEAR");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::LINEAR, "Testing auto classification: LINEAR");
 
             // TRANSLATING
             myMatrix.assign(1,0,0,0,0,1,0,0,0,0,1,0,-2,T(-5.1),T(0.8),1);
-            ENSURE_MSG(myMatrix.getType() == TRANSLATING, "Testing auto classification: TRANSLATING");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::TRANSLATING, "Testing auto classification: TRANSLATING");
 
             // AFFINE
             myMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,12,13,14,1);
-            ENSURE_MSG(myMatrix.getType() == AFFINE, "Testing auto classification: AFFINE");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Testing auto classification: AFFINE");
 
             // UNKNOWN
             myMatrix.assign(0,1,2,110,4,5,6,20,8,9,10,23,12,13,14,16);
-            ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Testing auto classification: UNKNOWN");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Testing auto classification: UNKNOWN");
         }
 
         void testGetData() {
             Matrix4<T> myMatrix;
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, UNKNOWN);
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::UNKNOWN);
             const T * myData = myMatrix.getData();
 
             for (unsigned i = 0; i < 16; ++i) {
@@ -493,15 +493,15 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix;
             for (unsigned i = 0; i < 4; ++i) {
                 myMatrix.assignRow(i, Vector4<T>(1,2,3,4));
-                ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Testing assignRow()");
+                ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Testing assignRow()");
                 ENSURE_MSG(almostEqual(myMatrix.getRow(i), Vector4<T>(1,2,3,4)), "Testing get/assignRow()");
                 myMatrix.makeIdentity();
 
                 myMatrix.assignColumn(i, Vector4<T>(5,6,7,8));
                 if (i != 3) {
-                    ENSURE_MSG(myMatrix.getType() == AFFINE, "Testing assignColumn()");
+                    ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Testing assignColumn()");
                 } else {
-                    ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Testing assignColumn()");
+                    ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Testing assignColumn()");
                 }
                 ENSURE_MSG(almostEqual(myMatrix.getColumn(i), Vector4<T>(5,6,7,8)), "Testing get/assignColumn()");
                 myMatrix.makeIdentity();
@@ -510,73 +510,73 @@ class Matrix4UnitTest : public UnitTest {
 
         void testGetType() {
             Matrix4<T> myMatrix;
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, IDENTITY);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::IDENTITY);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "identity", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, X_ROTATING);
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::X_ROTATING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "x_rotating", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Y_ROTATING);
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::Y_ROTATING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "y_rotating", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Z_ROTATING);
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::Z_ROTATING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "z_rotating", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, ROTATING);
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::ROTATING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "rotating", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, SCALING);
-            ENSURE_MSG(myMatrix.getType() == SCALING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::SCALING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::SCALING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "scaling", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, LINEAR);
-            ENSURE_MSG(myMatrix.getType() == LINEAR, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::LINEAR);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::LINEAR, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "linear", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, TRANSLATING);
-            ENSURE_MSG(myMatrix.getType() == TRANSLATING, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::TRANSLATING);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::TRANSLATING, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "translating", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, AFFINE);
-            ENSURE_MSG(myMatrix.getType() == AFFINE, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::AFFINE);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "affine", "Testing getTypeString()");
 
-            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, UNKNOWN);
-            ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Testing getType()");
+            myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::UNKNOWN);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Testing getType()");
             ENSURE_MSG(myMatrix.getTypeString() == "unknown", "Testing getTypeString()");
         }
 
         void testMakeIdentityScalingTranslating() {
             {
                 Matrix4<T> myMatrix;
-                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, UNKNOWN);
+                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::UNKNOWN);
                 myMatrix.makeIdentity();
-                ENSURE_MSG(myMatrix.getType() == IDENTITY, "Test makeIdentity()");
+                ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Test makeIdentity()");
                 Matrix4<T> myIdentity;
-                myIdentity.assign(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1, IDENTITY);
+                myIdentity.assign(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1, Matrix4<T>::IDENTITY);
                 ENSURE_MSG(almostEqual(myMatrix, myIdentity), "Test makeIdentity()");
             }
             {
                 Matrix4<T> myMatrix;
-                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, UNKNOWN);
+                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::UNKNOWN);
                 myMatrix.makeScaling(Vector3<T>(-1, 2, 3));
-                ENSURE_MSG(myMatrix.getType() == SCALING, "Test makeScaling()");
+                ENSURE_MSG(myMatrix.getType() == Matrix4<T>::SCALING, "Test makeScaling()");
                 Matrix4<T> myScaling;
-                myScaling.assign(-1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1, TRANSLATING);
+                myScaling.assign(-1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1, Matrix4<T>::TRANSLATING);
                 ENSURE_MSG(almostEqual(myMatrix, myScaling), "Test makeScaling()");
             }
             {
                 Matrix4<T> myMatrix;
-                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, UNKNOWN);
+                myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, Matrix4<T>::UNKNOWN);
                 myMatrix.makeTranslating(Vector3<T>(3, 2, -1));
-                ENSURE_MSG(myMatrix.getType() == TRANSLATING, "Test makeTranslating()");
+                ENSURE_MSG(myMatrix.getType() == Matrix4<T>::TRANSLATING, "Test makeTranslating()");
                 Matrix4<T> myTranslating;
-                myTranslating.assign(1,0,0,0,0,1,0,0,0,0,1,0,3,2,-1,1, TRANSLATING);
+                myTranslating.assign(1,0,0,0,0,1,0,0,0,0,1,0,3,2,-1,1, Matrix4<T>::TRANSLATING);
                 ENSURE_MSG(almostEqual(myMatrix, myTranslating), "Test makeTranslating()");
             }
         }
@@ -631,10 +631,10 @@ class Matrix4UnitTest : public UnitTest {
             myExpectedResult.makeIdentity();
 
             myMatrix.makeXRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Test getType()");
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeXRotating");
             myMatrix.makeXRotating(T(2.0 * PI));
-            ENSURE_MSG(myMatrix.getType() == X_ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::X_ROTATING, "Test getType()");
             ENSURE(almostEqual(myMatrix, myExpectedResult));
             myMatrix.makeXRotating(T(PI_4));
             myExpectedResult.rotateX(T(PI_4));
@@ -642,10 +642,10 @@ class Matrix4UnitTest : public UnitTest {
             myExpectedResult.makeIdentity();
 
             myMatrix.makeYRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Test getType()");
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeYRotating");
             myMatrix.makeYRotating(T(2.0 * PI));
-            ENSURE_MSG(myMatrix.getType() == Y_ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Y_ROTATING, "Test getType()");
             ENSURE(almostEqual(myMatrix, myExpectedResult));
             myMatrix.makeYRotating(T(PI_4));
             myExpectedResult.rotateY(T(PI_4));
@@ -653,10 +653,10 @@ class Matrix4UnitTest : public UnitTest {
             myExpectedResult.makeIdentity();
 
             myMatrix.makeZRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Test getType()");
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeZRotating");
             myMatrix.makeZRotating(T(2.0 * PI));
-            ENSURE_MSG(myMatrix.getType() == Z_ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::Z_ROTATING, "Test getType()");
             ENSURE(almostEqual(myMatrix, myExpectedResult));
             myMatrix.makeZRotating(T(PI_4));
             myExpectedResult.rotateZ(T(PI_4));
@@ -664,16 +664,16 @@ class Matrix4UnitTest : public UnitTest {
             myExpectedResult.makeIdentity();
 
             myMatrix.makeRotating(Vector3<T>(1, 0, 0), T(0.123));
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Test getType()");
             myExpectedResult.makeXRotating(T(0.123));
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Test getType()");
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeRotating");
             myMatrix.makeRotating(Vector3<T>(1.0, 2.0, 3.0), T(2 * PI));
             myExpectedResult.makeRotating(Vector3<T>(1.0, 2.0, 3.0), 0);
             ENSURE(almostEqual(myMatrix, myExpectedResult));
 
             myMatrix.makeXYZRotating(Vector3<T>(1,2,3));
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Test getType()");
         }
 
         void testRotateXYZ() {
@@ -686,10 +686,10 @@ class Matrix4UnitTest : public UnitTest {
             myExpectedResult.rotateY(3);
             myExpectedResult.rotateZ(4);
             ENSURE(almostEqual(myMatrix, myExpectedResult));
-            ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::ROTATING, "Test getType()");
         }
 
-        void testScaleHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testScaleHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -706,28 +706,28 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix1;
 
             myMatrix1.makeIdentity();
-            testScaleHelper(myMatrix1, SCALING);
+            testScaleHelper(myMatrix1, Matrix4<T>::SCALING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testScaleHelper(myMatrix1, SCALING);
+            testScaleHelper(myMatrix1, Matrix4<T>::SCALING);
             myMatrix1.makeXRotating(T(1.234));
-            testScaleHelper(myMatrix1, LINEAR);
+            testScaleHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeYRotating(T(1.234));
-            testScaleHelper(myMatrix1, LINEAR);
+            testScaleHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeZRotating(T(1.234));
-            testScaleHelper(myMatrix1, LINEAR);
+            testScaleHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testScaleHelper(myMatrix1, LINEAR);
+            testScaleHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testScaleHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testScaleHelper(myMatrix1, LINEAR);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testScaleHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testScaleHelper(myMatrix1, UNKNOWN);
+            testScaleHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testScaleHelper(myMatrix1, Matrix4<T>::LINEAR);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testScaleHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testScaleHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
-        void testTranslateHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testTranslateHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -744,25 +744,25 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix1;
 
             myMatrix1.makeIdentity();
-            testTranslateHelper(myMatrix1, TRANSLATING);
+            testTranslateHelper(myMatrix1, Matrix4<T>::TRANSLATING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testTranslateHelper(myMatrix1, AFFINE);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
             myMatrix1.makeXRotating(T(1.234));
-            testTranslateHelper(myMatrix1, AFFINE);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
             myMatrix1.makeYRotating(T(1.234));
-            testTranslateHelper(myMatrix1, AFFINE);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
             myMatrix1.makeZRotating(T(1.234));
-            testTranslateHelper(myMatrix1, AFFINE);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testTranslateHelper(myMatrix1, AFFINE);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testTranslateHelper(myMatrix1, TRANSLATING);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testTranslateHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testScaleHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testScaleHelper(myMatrix1, UNKNOWN);
+            testTranslateHelper(myMatrix1, Matrix4<T>::TRANSLATING);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testTranslateHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testScaleHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testScaleHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
         void testEasyMatrixAccess() {
@@ -773,15 +773,15 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.setTranslation(Vector3<T>(1,2,3));
             ENSURE_MSG(almostEqual(myMatrix.getRow(3), Vector4<T>(1,2,3,1)), "Test setTranslation()");
             ENSURE_MSG(almostEqual(myMatrix.getTranslation(), Vector3<T>(1,2,3)), "Test getTranslation()");
-            ENSURE_MSG(myMatrix.getType() == TRANSLATING, "Test setTranslation() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::TRANSLATING, "Test setTranslation() classification");
             myMatrix.setTranslation(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == TRANSLATING, "Test setTranslation() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::TRANSLATING, "Test setTranslation() classification");
             myMatrix.makeScaling(Vector3<T>(2,2,2));
             myMatrix.setTranslation(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == AFFINE, "Test setTranslation() classification");
-            myMatrix.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Test setTranslation() classification");
+            myMatrix.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
             myMatrix.setTranslation(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Test setTranslation() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Test setTranslation() classification");
 
             // setScale() / getScale()
             myMatrix.makeIdentity();
@@ -790,25 +790,25 @@ class Matrix4UnitTest : public UnitTest {
             myReference.assign(1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1);
             ENSURE_MSG(almostEqual(myMatrix, myReference), "Test setScale()");
             ENSURE_MSG(almostEqual(myMatrix.getScale(), Vector3<T>(1,2,3)), "Test getScale()");
-            ENSURE_MSG(myMatrix.getType() == SCALING, "Test setScale() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::SCALING, "Test setScale() classification");
             myMatrix.setScale(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == SCALING, "Test setScale() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::SCALING, "Test setScale() classification");
             myMatrix.makeTranslating(Vector3<T>(2,2,2));
             myMatrix.setScale(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == AFFINE, "Test setScale() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Test setScale() classification");
             myMatrix.makeTranslating(Vector3<T>(2,2,2));
             myMatrix.rotateX(1);
             myMatrix.setScale(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == AFFINE, "Test setScale() classification");
-            myMatrix.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::AFFINE, "Test setScale() classification");
+            myMatrix.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
             myMatrix.setScale(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == UNKNOWN, "Test setScale() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::UNKNOWN, "Test setScale() classification");
             myMatrix.makeYRotating(1);
             myMatrix.setScale(Vector3<T>(3,2,1));
-            ENSURE_MSG(myMatrix.getType() == LINEAR, "Test setScale() classification");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::LINEAR, "Test setScale() classification");
         }
 
-        void testRotateXHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testRotateXHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -825,28 +825,28 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix1;
 
             myMatrix1.makeIdentity();
-            testRotateXHelper(myMatrix1, X_ROTATING);
+            testRotateXHelper(myMatrix1, Matrix4<T>::X_ROTATING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testRotateXHelper(myMatrix1, LINEAR);
+            testRotateXHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeXRotating(T(1.234));
-            testRotateXHelper(myMatrix1, X_ROTATING);
+            testRotateXHelper(myMatrix1, Matrix4<T>::X_ROTATING);
             myMatrix1.makeYRotating(T(1.234));
-            testRotateXHelper(myMatrix1, ROTATING);
+            testRotateXHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeZRotating(T(1.234));
-            testRotateXHelper(myMatrix1, ROTATING);
+            testRotateXHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testRotateXHelper(myMatrix1, ROTATING);
+            testRotateXHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testRotateXHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testRotateXHelper(myMatrix1, LINEAR);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testRotateXHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testRotateXHelper(myMatrix1, UNKNOWN);
+            testRotateXHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testRotateXHelper(myMatrix1, Matrix4<T>::LINEAR);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testRotateXHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testRotateXHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
-        void testRotateYHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testRotateYHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -863,28 +863,28 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix1;
 
             myMatrix1.makeIdentity();
-            testRotateYHelper(myMatrix1, Y_ROTATING);
+            testRotateYHelper(myMatrix1, Matrix4<T>::Y_ROTATING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testRotateYHelper(myMatrix1, LINEAR);
+            testRotateYHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeXRotating(T(1.234));
-            testRotateYHelper(myMatrix1, ROTATING);
+            testRotateYHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeYRotating(T(1.234));
-            testRotateYHelper(myMatrix1, Y_ROTATING);
+            testRotateYHelper(myMatrix1, Matrix4<T>::Y_ROTATING);
             myMatrix1.makeZRotating(T(1.234));
-            testRotateYHelper(myMatrix1, ROTATING);
+            testRotateYHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testRotateYHelper(myMatrix1, ROTATING);
+            testRotateYHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testRotateYHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testRotateYHelper(myMatrix1, LINEAR);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testRotateYHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testRotateYHelper(myMatrix1, UNKNOWN);
+            testRotateYHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testRotateYHelper(myMatrix1, Matrix4<T>::LINEAR);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testRotateYHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testRotateYHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
-        void testRotateZHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testRotateZHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -901,28 +901,28 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix1;
 
             myMatrix1.makeIdentity();
-            testRotateZHelper(myMatrix1, Z_ROTATING);
+            testRotateZHelper(myMatrix1, Matrix4<T>::Z_ROTATING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testRotateZHelper(myMatrix1, LINEAR);
+            testRotateZHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeXRotating(T(1.234));
-            testRotateZHelper(myMatrix1, ROTATING);
+            testRotateZHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeYRotating(T(1.234));
-            testRotateZHelper(myMatrix1, ROTATING);
+            testRotateZHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeZRotating(T(1.234));
-            testRotateZHelper(myMatrix1, Z_ROTATING);
+            testRotateZHelper(myMatrix1, Matrix4<T>::Z_ROTATING);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testRotateZHelper(myMatrix1, ROTATING);
+            testRotateZHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testRotateZHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testRotateZHelper(myMatrix1, LINEAR);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testRotateZHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testRotateZHelper(myMatrix1, UNKNOWN);
+            testRotateZHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testRotateZHelper(myMatrix1, Matrix4<T>::LINEAR);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testRotateZHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testRotateZHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
-        void testRotateHelper(Matrix4<T> & theMatrix1, MatrixType theType) {
+        void testRotateHelper(Matrix4<T> & theMatrix1, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myMatrix2;
             Matrix4<T> myMatrix3;
             myMatrix2.assign(theMatrix1);
@@ -938,25 +938,25 @@ class Matrix4UnitTest : public UnitTest {
         void testRotate() {
             Matrix4<T> myMatrix1;
             myMatrix1.makeIdentity();
-            testRotateHelper(myMatrix1, ROTATING);
+            testRotateHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeScaling(Vector3<T>(3, 2, 1));
-            testRotateHelper(myMatrix1, LINEAR);
+            testRotateHelper(myMatrix1, Matrix4<T>::LINEAR);
             myMatrix1.makeXRotating(T(1.234));
-            testRotateHelper(myMatrix1, ROTATING);
+            testRotateHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeYRotating(T(1.234));
-            testRotateHelper(myMatrix1, ROTATING);
+            testRotateHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeZRotating(T(1.234));
-            testRotateHelper(myMatrix1, ROTATING);
+            testRotateHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeRotating(Vector3<T>(2,3,4), T(1.234));
-            testRotateHelper(myMatrix1, ROTATING);
+            testRotateHelper(myMatrix1, Matrix4<T>::ROTATING);
             myMatrix1.makeTranslating(Vector3<T>(-2,-3,4));
-            testRotateHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,LINEAR);
-            testRotateHelper(myMatrix1, LINEAR);
-            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,AFFINE);
-            testRotateHelper(myMatrix1, AFFINE);
-            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
-            testRotateHelper(myMatrix1, UNKNOWN);
+            testRotateHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,0,0,0,1,Matrix4<T>::LINEAR);
+            testRotateHelper(myMatrix1, Matrix4<T>::LINEAR);
+            myMatrix1.assign(1,2,3,0,4,5,6,0,7,8,9,0,1,2,3,1,Matrix4<T>::AFFINE);
+            testRotateHelper(myMatrix1, Matrix4<T>::AFFINE);
+            myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,Matrix4<T>::UNKNOWN);
+            testRotateHelper(myMatrix1, Matrix4<T>::UNKNOWN);
         }
 
         void testPostMultiply() {
@@ -979,81 +979,81 @@ class Matrix4UnitTest : public UnitTest {
             myScalingMatrix.makeScaling(Vector3<T>(T(0.12),T(2.1),T(1.2)));
 
             Matrix4<T> myLinearMatrix;
-            myLinearMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,0,0,0,1, LINEAR);
+            myLinearMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,0,0,0,1, Matrix4<T>::LINEAR);
 
             Matrix4<T> myTranslatingMatrix;
             myTranslatingMatrix.makeTranslating(Vector3<T>(T(3.12),T(4.1),T(5.2)));
 
             Matrix4<T> myAffineMatrix;
-            myAffineMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,12,13,14,1, AFFINE);
+            myAffineMatrix.assign(0,1,2,0,4,5,6,0,8,9,10,0,12,13,14,1, Matrix4<T>::AFFINE);
 
             Matrix4<T> myUnknownMatrix;
-            myUnknownMatrix.assign(0,1,2,110,4,5,6,20,8,9,10,23,12,13,14,1, UNKNOWN);
+            myUnknownMatrix.assign(0,1,2,110,4,5,6,20,8,9,10,23,12,13,14,1, Matrix4<T>::UNKNOWN);
 
-            testMatrixMultiplication(myIdentityMatrix,  myIdentityMatrix, IDENTITY);
+            testMatrixMultiplication(myIdentityMatrix,  myIdentityMatrix, Matrix4<T>::IDENTITY);
 
-            testMatrixMultiplication(myIdentityMatrix,  myXRotatingMatrix, X_ROTATING);
-            testMatrixMultiplication(myXRotatingMatrix, myXRotatingMatrix, X_ROTATING);
+            testMatrixMultiplication(myIdentityMatrix,  myXRotatingMatrix, Matrix4<T>::X_ROTATING);
+            testMatrixMultiplication(myXRotatingMatrix, myXRotatingMatrix, Matrix4<T>::X_ROTATING);
 
-            testMatrixMultiplication(myIdentityMatrix,  myYRotatingMatrix, Y_ROTATING);
-            testMatrixMultiplication(myXRotatingMatrix, myYRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myYRotatingMatrix, myYRotatingMatrix, Y_ROTATING);
+            testMatrixMultiplication(myIdentityMatrix,  myYRotatingMatrix, Matrix4<T>::Y_ROTATING);
+            testMatrixMultiplication(myXRotatingMatrix, myYRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myYRotatingMatrix, myYRotatingMatrix, Matrix4<T>::Y_ROTATING);
 
-            testMatrixMultiplication(myIdentityMatrix,  myZRotatingMatrix, Z_ROTATING);
-            testMatrixMultiplication(myXRotatingMatrix, myZRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myYRotatingMatrix, myZRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myZRotatingMatrix, myZRotatingMatrix, Z_ROTATING);
+            testMatrixMultiplication(myIdentityMatrix,  myZRotatingMatrix, Matrix4<T>::Z_ROTATING);
+            testMatrixMultiplication(myXRotatingMatrix, myZRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myYRotatingMatrix, myZRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myZRotatingMatrix, myZRotatingMatrix, Matrix4<T>::Z_ROTATING);
 
-            testMatrixMultiplication(myIdentityMatrix,  myRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myXRotatingMatrix, myRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myYRotatingMatrix, myRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myZRotatingMatrix, myRotatingMatrix, ROTATING);
-            testMatrixMultiplication(myRotatingMatrix,  myRotatingMatrix, ROTATING);
+            testMatrixMultiplication(myIdentityMatrix,  myRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myXRotatingMatrix, myRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myYRotatingMatrix, myRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myZRotatingMatrix, myRotatingMatrix, Matrix4<T>::ROTATING);
+            testMatrixMultiplication(myRotatingMatrix,  myRotatingMatrix, Matrix4<T>::ROTATING);
 
-            testMatrixMultiplication(myIdentityMatrix,  myScalingMatrix, SCALING);
-            testMatrixMultiplication(myXRotatingMatrix, myScalingMatrix, LINEAR);
-            testMatrixMultiplication(myYRotatingMatrix, myScalingMatrix, LINEAR);
-            testMatrixMultiplication(myZRotatingMatrix, myScalingMatrix, LINEAR);
-            testMatrixMultiplication(myRotatingMatrix,  myScalingMatrix, LINEAR);
-            testMatrixMultiplication(myScalingMatrix,   myScalingMatrix, SCALING);
+            testMatrixMultiplication(myIdentityMatrix,  myScalingMatrix, Matrix4<T>::SCALING);
+            testMatrixMultiplication(myXRotatingMatrix, myScalingMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myYRotatingMatrix, myScalingMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myZRotatingMatrix, myScalingMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myRotatingMatrix,  myScalingMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myScalingMatrix,   myScalingMatrix, Matrix4<T>::SCALING);
 
-            testMatrixMultiplication(myIdentityMatrix,  myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myXRotatingMatrix, myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myYRotatingMatrix, myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myZRotatingMatrix, myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myRotatingMatrix,  myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myScalingMatrix,   myLinearMatrix, LINEAR);
-            testMatrixMultiplication(myLinearMatrix,    myLinearMatrix, LINEAR);
+            testMatrixMultiplication(myIdentityMatrix,  myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myXRotatingMatrix, myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myYRotatingMatrix, myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myZRotatingMatrix, myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myRotatingMatrix,  myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myScalingMatrix,   myLinearMatrix, Matrix4<T>::LINEAR);
+            testMatrixMultiplication(myLinearMatrix,    myLinearMatrix, Matrix4<T>::LINEAR);
 
-            testMatrixMultiplication(myIdentityMatrix,    myTranslatingMatrix, TRANSLATING);
-            testMatrixMultiplication(myXRotatingMatrix,   myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myYRotatingMatrix,   myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myZRotatingMatrix,   myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myRotatingMatrix,    myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myScalingMatrix,     myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myLinearMatrix,      myTranslatingMatrix, AFFINE);
-            testMatrixMultiplication(myTranslatingMatrix, myTranslatingMatrix, TRANSLATING);
+            testMatrixMultiplication(myIdentityMatrix,    myTranslatingMatrix, Matrix4<T>::TRANSLATING);
+            testMatrixMultiplication(myXRotatingMatrix,   myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myYRotatingMatrix,   myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myZRotatingMatrix,   myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myRotatingMatrix,    myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myScalingMatrix,     myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myLinearMatrix,      myTranslatingMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myTranslatingMatrix, myTranslatingMatrix, Matrix4<T>::TRANSLATING);
 
-            testMatrixMultiplication(myIdentityMatrix,    myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myXRotatingMatrix,   myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myYRotatingMatrix,   myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myZRotatingMatrix,   myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myRotatingMatrix,    myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myScalingMatrix,     myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myLinearMatrix,      myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myTranslatingMatrix, myAffineMatrix, AFFINE);
-            testMatrixMultiplication(myAffineMatrix,      myAffineMatrix, AFFINE);
+            testMatrixMultiplication(myIdentityMatrix,    myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myXRotatingMatrix,   myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myYRotatingMatrix,   myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myZRotatingMatrix,   myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myRotatingMatrix,    myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myScalingMatrix,     myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myLinearMatrix,      myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myTranslatingMatrix, myAffineMatrix, Matrix4<T>::AFFINE);
+            testMatrixMultiplication(myAffineMatrix,      myAffineMatrix, Matrix4<T>::AFFINE);
 
-            testMatrixMultiplication(myIdentityMatrix,    myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myXRotatingMatrix,   myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myYRotatingMatrix,   myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myZRotatingMatrix,   myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myRotatingMatrix,    myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myScalingMatrix,     myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myLinearMatrix,      myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myTranslatingMatrix, myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myAffineMatrix,      myUnknownMatrix, UNKNOWN);
-            testMatrixMultiplication(myUnknownMatrix,     myUnknownMatrix, UNKNOWN);
+            testMatrixMultiplication(myIdentityMatrix,    myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myXRotatingMatrix,   myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myYRotatingMatrix,   myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myZRotatingMatrix,   myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myRotatingMatrix,    myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myScalingMatrix,     myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myLinearMatrix,      myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myTranslatingMatrix, myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myAffineMatrix,      myUnknownMatrix, Matrix4<T>::UNKNOWN);
+            testMatrixMultiplication(myUnknownMatrix,     myUnknownMatrix, Matrix4<T>::UNKNOWN);
         }
 
         void testAsterixOperator() {
@@ -1089,7 +1089,7 @@ class Matrix4UnitTest : public UnitTest {
                 Point3<T>(myResult.begin())), "Testing point * matrix");
         }
 
-        void testTransposeHelper(Matrix4<T> & theMatrix, MatrixType theType) {
+        void testTransposeHelper(Matrix4<T> & theMatrix, typename Matrix4<T>::MatrixType theType) {
             Matrix4<T> myTransposed;
             myTransposed.assign(theMatrix);
             myTransposed.transpose();
@@ -1106,34 +1106,34 @@ class Matrix4UnitTest : public UnitTest {
         void testTranspose() {
             Matrix4<T> myMatrix;
             myMatrix.makeIdentity();
-            testTransposeHelper(myMatrix, IDENTITY);
+            testTransposeHelper(myMatrix, Matrix4<T>::IDENTITY);
 
             myMatrix.makeScaling(Vector3<T>(2,3,4));
-            testTransposeHelper(myMatrix, SCALING);
+            testTransposeHelper(myMatrix, Matrix4<T>::SCALING);
 
             myMatrix.makeTranslating(Vector3<T>(2,3,4));
-            testTransposeHelper(myMatrix, UNKNOWN);
+            testTransposeHelper(myMatrix, Matrix4<T>::UNKNOWN);
 
             myMatrix.makeXRotating(T(1.234));
-            testTransposeHelper(myMatrix, X_ROTATING);
+            testTransposeHelper(myMatrix, Matrix4<T>::X_ROTATING);
 
             myMatrix.makeYRotating(T(3.234));
-            testTransposeHelper(myMatrix, Y_ROTATING);
+            testTransposeHelper(myMatrix, Matrix4<T>::Y_ROTATING);
 
             myMatrix.makeZRotating(T(-1.234));
-            testTransposeHelper(myMatrix, Z_ROTATING);
+            testTransposeHelper(myMatrix, Matrix4<T>::Z_ROTATING);
 
             myMatrix.makeRotating(normalized(Vector3<T>(1,2,3)), T(-2.234));
-            testTransposeHelper(myMatrix, ROTATING);
+            testTransposeHelper(myMatrix, Matrix4<T>::ROTATING);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, LINEAR);
-            testTransposeHelper(myMatrix, LINEAR);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, Matrix4<T>::LINEAR);
+            testTransposeHelper(myMatrix, Matrix4<T>::LINEAR);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
-            testTransposeHelper(myMatrix, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
+            testTransposeHelper(myMatrix, Matrix4<T>::UNKNOWN);
 
-            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, UNKNOWN);
-            testTransposeHelper(myMatrix, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, Matrix4<T>::UNKNOWN);
+            testTransposeHelper(myMatrix, Matrix4<T>::UNKNOWN);
         }
 
 
@@ -1231,13 +1231,13 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeRotating(normalized(Vector3<T>(1,2,3)), T(-2.234));
             testInvertClassifyHelper(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, LINEAR);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, Matrix4<T>::LINEAR);
             testInvertClassifyHelper(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
             testInvertClassifyHelper(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, Matrix4<T>::UNKNOWN);
             testInvertClassifyHelper(myMatrix);
         }
 
@@ -1319,13 +1319,13 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeRotating(normalized(Vector3<T>(1,2,3)), T(-2.234));
             testInvertPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, LINEAR);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, Matrix4<T>::LINEAR);
             testInvertPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
             testInvertPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, Matrix4<T>::UNKNOWN);
             testInvertPerformance(myMatrix);
         }
 
@@ -1365,13 +1365,13 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeRotating(normalized(Vector3<T>(1,2,3)), T(-2.234));
             testMultiplyMatrixPV(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, LINEAR);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, Matrix4<T>::LINEAR);
             testMultiplyMatrixPV(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
             testMultiplyMatrixPV(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, Matrix4<T>::UNKNOWN);
             testMultiplyMatrixPV(myMatrix);
         }
 
@@ -1453,13 +1453,13 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeRotating(normalized(Vector3<T>(1,2,3)), T(-2.234));
             testMultiplyPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, LINEAR);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,0,11,0,0,0,0,1, Matrix4<T>::LINEAR);
             testMultiplyPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
             testMultiplyPerformance(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, UNKNOWN);
+            myMatrix.assign(1,2,3,0,15,6,7,8,9,0,11,12,13,14,15, 16, Matrix4<T>::UNKNOWN);
             testMultiplyPerformance(myMatrix);
         }
 
@@ -1817,43 +1817,43 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeIdentity();
 
             myMatrix.makeScaling(Vector3<T>(1, 1, 1));
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with makeScaling");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with makeScaling");
 
             myMatrix.makeTranslating(Vector3<T>(0, 0, 0));
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with translating");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with translating");
 
             myMatrix.makeXRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with makeXRotating");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with makeXRotating");
 
             myMatrix.makeYRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with makeYRotating");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with makeYRotating");
 
             myMatrix.makeZRotating(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with makeZRotating");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with makeZRotating");
 
             myMatrix.makeRotating(Vector3<T>(1,1,1), 0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with makeRotating");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with makeRotating");
 
             myMatrix.scale(Vector3<T>(1, 1, 1));
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with scale");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with scale");
 
             myMatrix.translate(Vector3<T>(0, 0, 0));
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with translate");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with translate");
 
             myMatrix.rotateX(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with rotateX");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with rotateX");
 
             myMatrix.rotateY(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with rotateY");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with rotateY");
 
             myMatrix.rotateZ(0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with rotateZ");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with rotateZ");
 
             myMatrix.rotateXYZ(Vector3<T>(0,0,0));
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with rotateXYZ");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with rotateXYZ");
 
             myMatrix.rotate(Vector3<T>(1,1,1), 0);
-            ENSURE_MSG(myMatrix.getType() == IDENTITY, "Testing invariance with rotate");
+            ENSURE_MSG(myMatrix.getType() == Matrix4<T>::IDENTITY, "Testing invariance with rotate");
         }
 
         void testTransformedNormalHelper(const Matrix4<T> & theMatrix) {
@@ -1908,7 +1908,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.scale(Vector3<T>(1,2,3));
             testTransformedNormalHelper(myMatrix);
 
-            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, AFFINE);
+            myMatrix.assign(1,2,3,0,15,6,7,0,9,10,11,0,-10,20,30,1, Matrix4<T>::AFFINE);
             testTransformedNormalHelper(myMatrix);
 
             //The transformedNormal method does not work with arbitrary unknown matrices

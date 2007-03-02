@@ -11,13 +11,11 @@
 #include "JSVector.h"
 #include "JSFrustum.h"
 #include "JSPlane.h"
-#include "JSMatrix.h"
 #include "JSWrapper.impl"
 
 #include <iostream>
 
 using namespace std;
-using namespace asl;
 
 namespace jslib {
 
@@ -46,14 +44,14 @@ JSFrustum::Functions() {
     return myFunctions;
 }
 
-#define DEFINE_FLAG(NAME) { #NAME, PROP_ ## NAME , asl::NAME }
+#define DEFINE_FLAG(NAME) { #NAME, PROP_ ## NAME , asl::Frustum::NAME }
 
 JSConstIntPropertySpec *
 JSFrustum::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         DEFINE_FLAG(PERSPECTIVE),
-        DEFINE_FLAG(ORTHONORMAL),
+        DEFINE_FLAG(ORTHO),
         {0}
     };
     return myProperties;
@@ -68,22 +66,12 @@ JSFrustum::Properties() {
         {"bottom", PROP_bottom, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"near", PROP_near, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"far", PROP_far, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-
-        {"hfov", PROP_hfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"vfov", PROP_vfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"width", PROP_width, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"height", PROP_height, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-
-        {"type", PROP_type, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-
         {"left_plane", PROP_left_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"right_plane", PROP_right_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"top_plane", PROP_top_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"bottom_plane", PROP_bottom_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"near_plane", PROP_near_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"far_plane", PROP_far_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-
-        {"projectionmatrix", PROP_projectionmatrix, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -142,24 +130,6 @@ JSFrustum::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
             case PROP_far_plane:
                 *vp = as_jsval(cx, getNative().getFarPlane());
                 return JS_TRUE;
-            case PROP_projectionmatrix:
-                *vp = as_jsval(cx, getNative().getProjectionMatrix());
-                return JS_TRUE;
-            case PROP_width:
-                *vp = as_jsval(cx, getNative().getWidth());
-                return JS_TRUE;
-            case PROP_height:
-                *vp = as_jsval(cx, getNative().getHeight());
-                return JS_TRUE;
-            case PROP_hfov:
-                *vp = as_jsval(cx, getNative().getHFov());
-                return JS_TRUE;
-            case PROP_vfov:
-                *vp = as_jsval(cx, getNative().getVFov());
-                return JS_TRUE;
-            case PROP_type:
-                *vp = as_jsval(cx, getNative().getType());
-                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSFrustum::getProperty: index %d out of range", theID);
                 return JS_FALSE;
@@ -211,42 +181,6 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
                 double myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setFar(myValue);
-                return JS_TRUE;
-            }
-        case PROP_width:
-            {
-                double myValue;
-                convertFrom(cx, * vp, myValue);
-                myObj.getNative().setWidth(myValue);
-                return JS_TRUE;
-            }
-        case PROP_height:
-            {
-                double myValue;
-                convertFrom(cx, * vp, myValue);
-                myObj.getNative().setHeight(myValue);
-                return JS_TRUE;
-            }
-        case PROP_hfov:
-            {
-                double myValue;
-                convertFrom(cx, * vp, myValue);
-                myObj.getNative().setHFov(myValue);
-                return JS_TRUE;
-            }
-        case PROP_vfov:
-            {
-                double myValue;
-                convertFrom(cx, * vp, myValue);
-                myObj.getNative().setVFov(myValue);
-                return JS_TRUE;
-            }
-        case PROP_type:
-            {
-                ProjectionType myProjection;
-                convertFrom(cx, * vp, myProjection);
-                AC_PRINT << "====== setting type: " << myProjection;
-                myObj.getNative().setType(myProjection);
                 return JS_TRUE;
             }
         default:

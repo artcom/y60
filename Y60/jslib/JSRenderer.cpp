@@ -159,11 +159,9 @@ static JSBool
 drawFrustum(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Draws a Frustum");
     DOC_PARAM("theProjectiveNode", "A camera or projector node", DOC_TYPE_NODE);
-    /*
     DOC_PARAM("theAspect", "The aspect of the frustum. This is determined by "
               "the viewport in case of a camera and by the aspect of texture "
               "when using projective textures.", DOC_TYPE_VECTOR4F);
-    */
     DOC_END;
 
     try {
@@ -173,13 +171,11 @@ drawFrustum(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             return JS_FALSE;
         }
 
-        /*
         float myAspect;
         if ( ! convertFrom(cx, argv[1], myAspect)) {
             JS_ReportError(cx, "argument 1 must be a float");
             return JS_FALSE;
         }
-        */
 
 
         JSRenderer::NATIVE * myNative = 0;
@@ -187,8 +183,7 @@ drawFrustum(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             JS_ReportError(cx, "JSRenderer::drawFrustum: self is not a Renderer");
             return JS_FALSE;
         }
-        //myNative->renderFrustum(myNode, myAspect);
-        myNative->renderFrustum( myNode );
+        myNative->renderFrustum(myNode, myAspect);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

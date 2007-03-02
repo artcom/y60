@@ -24,41 +24,24 @@
 
 namespace y60 {
 
-    DEFINE_ATTRIBUT_TAG(FrustumTag,       asl::Frustum, FRUSTUM_ATTRIB, asl::Frustum());
     //                  theTagName        theType  theAttributeName      theDefault
-    // XXX [DS] these attributes are here for backward compatibility only ...
-    // please use the frustum tag instead
-    /*
     DEFINE_ATTRIBUT_TAG(HfovTag,          float,   HORIZONTAL_FOV_ATTRIB, 54.0f);
     DEFINE_ATTRIBUT_TAG(OrthoWidthTag,    float,   ORTHO_WIDTH_ATTRIB,    0.0f);
     DEFINE_ATTRIBUT_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f);
     DEFINE_ATTRIBUT_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f);
-*/
 
     class ProjectiveNode : 
         public TransformHierarchyFacade,
-        public FrustumTag::Plug
-        // [DS] backward compatibility
-        /*
-        public dom::DynamicAttributePlug<HfovTag, ProjectiveNode>,
-        public dom::DynamicAttributePlug<OrthoWidthTag, ProjectiveNode>,
-        public dom::DynamicAttributePlug<NearPlaneTag, ProjectiveNode>,
-        public dom::DynamicAttributePlug<FarPlaneTag, ProjectiveNode>
-        */
+        public HfovTag::Plug,
+        public OrthoWidthTag::Plug,
+        public NearPlaneTag::Plug,
+        public FarPlaneTag::Plug
     {
         public:
             ProjectiveNode(dom::Node & theNode); 
             ~ProjectiveNode(); 
 
             IMPLEMENT_FACADE(ProjectiveNode);
-
-            bool getHFov(float & theValue) const;
-            bool getWidth(float & theValue) const;
-            bool getNearPlane(float & theValue) const;
-            bool getFarPlane(float & theValue) const;
-
-            //asl::Frustum & getFrustum();
-            void updateFrustum(asl::ResizePolicy thePolicy, float theNewAspect );
     };
 
     typedef asl::Ptr<ProjectiveNode, dom::ThreadingModel> ProjectiveNodePtr;
