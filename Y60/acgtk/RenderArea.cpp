@@ -8,12 +8,21 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <y60/GLUtils.h>
+
+#ifdef OSX
+#undef check
+#undef notify
+#undef verify
+#undef nil
+#undef DestroyNotify
+#endif
+
 #include "RenderArea.h"
 
 #include <asl/file_functions.h>
 #include <asl/os_functions.h>
 #include <asl/Exception.h>
-#include <y60/GLUtils.h>
 #include <y60/JSApp.h>
 #include <y60/ScopedGLContext.h>
 #include <y60/EventDispatcher.h>
