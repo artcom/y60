@@ -124,13 +124,14 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return product(theWorldPos, myProjectionMatrix);
     }
 
-    obj.transformClipToWorld = function(theClipPos) {
-        return transformClipToWorld(theClipPos, _myRenderWindow.camera);
+    obj.
+    transformClipToWorld = function(theClipPos,theScreenPixelX,theScreenPixelY) {
+        return transformClipToWorld(theClipPos, obj.getViewportAt(theScreenPixelX, theScreenPixelY));
     }
 
 
     function getScreenPos(theScreenPixelX, theScreenPixelY) {
-        return transformScreenToWorld(theScreenPixelX, theScreenPixelY, _myRenderWindow.camera);
+        return transformScreenToWorld(theScreenPixelX, theScreenPixelY, obj.getViewportAt(theScreenPixelX, theScreenPixelY));
     }
 
     function getCameraPos() {
@@ -148,7 +149,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
         var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
         var myFarEyePos = new Point3f(myPosX, myPosY, 1);
-        var myFarPos = obj.transformClipToWorld(myFarEyePos);
+        var myFarPos = obj.transformClipToWorld(myFarEyePos, theScreenPixelX, theScreenPixelY);
 
         var myViewRay = new Ray(myScreenPos, myFarPos);
         // print (myViewRay);
@@ -163,10 +164,10 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
 
         var myEyePos = new Point3f(myPosX, myPosY, 1);
-        var myFarPos = obj.transformClipToWorld(myEyePos);
+        var myFarPos = obj.transformClipToWorld(myEyePos, theScreenPixelX, theScreenPixelY);
 
         myEyePos = new Point3f(myPosX, myPosY, -1);
-        var myNearPos = obj.transformClipToWorld(myEyePos);
+        var myNearPos = obj.transformClipToWorld(myEyePos, theScreenPixelX, theScreenPixelY);
     
         var myViewLineSegment = new LineSegment(myNearPos, myFarPos);
         //print (myViewLineSegment);
@@ -187,7 +188,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
         var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
         var myFarPlanePos = new Point3f(myPosX, myPosY, 1);
-        myFarPlanePos = obj.transformClipToWorld(myFarPlanePos);
+        myFarPlanePos = obj.transformClipToWorld(myFarPlanePos, theScreenPixelX, theScreenPixelY);
 
         //print("ScreenP " + myScreenPos + " FarPlaneP " + myFarPlanePos);
         var mySphere = new Sphere(myScreenPos, theSphereRadius);
