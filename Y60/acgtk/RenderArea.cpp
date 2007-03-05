@@ -8,9 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/GLUtils.h>
 
 #ifdef OSX
+#include <y60/GLUtils.h>
 #undef check
 #undef notify
 #undef verify
@@ -27,6 +27,7 @@
 #include <y60/ScopedGLContext.h>
 #include <y60/EventDispatcher.h>
 #include <y60/GLResourceManager.h>
+#include <y60/GLUtils.h>
 
 #include <glade/glade.h>
 #include <gtk/gtkgl.h>
