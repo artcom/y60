@@ -52,19 +52,22 @@ namespace y60 {
 
     bool
     setAlpha(dom::Node * theNode, float theAlpha) {
-
         if (theNode->nodeName() == "body") {
             AC_DEBUG << "Fetching shape from body: " << *theNode;
             theNode = &*theNode->getElementById(theNode->getAttributeString("shape"));
         }
 
         dom::Node * myShapeNode;
+        dom::NodePtr myMaterial;
+        
         if (theNode->nodeName() == "shape") {
             myShapeNode = theNode;
-        } else if (theNode->nodeName() == "element") {
+            myMaterial = theNode->getElementById(theNode->childNode("primitives",0)->childNode("elements",0)->getAttributeString("material"));
+        } else if (theNode->nodeName() == "elements") {
             AC_DEBUG << "Parent of element: " << *(theNode->parentNode());
             AC_DEBUG << "Grand-parent of element: " << *(theNode->parentNode()->parentNode());
             myShapeNode = theNode->parentNode()->parentNode();
+            myMaterial = theNode->getElementById(theNode->getAttributeString("material"));
         } else {
             AC_ERROR << "Unsupported node type '" << theNode->nodeName() << "'";
             return false;
@@ -77,40 +80,90 @@ namespace y60 {
             return false;
         }
 
-        // XXX check material requirements either of all elements or only the given element
-        // if 'vertexparams=color' is found then do the code below
-        // else modify either 'surfacecolor' or alpha values of 'ambient', 'diffuse' etc.
-
-        dom::NodePtr myColorsNode = myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR4F_NAME, NAME_ATTRIB, COLOR_ROLE);
-        if (!myColorsNode) {
-            AC_WARNING << "Shape '" << myShape->get<NameTag>() << "' has no vertex colors";
+        dom::NodePtr myVertexParamColorNode;
+        if( myMaterial ) {
+            myVertexParamColorNode = myMaterial->childNode("requires",0)->childNodeByAttribute(FEATURE_NODE_NAME, NAME_ATTRIB, "vertexparams");
+        } else {
+            AC_ERROR << "sth is wrong when you don't find the material";
             return false;
         }
-
-        VectorOfVector4f & myColors = myColorsNode->firstChild()->nodeValueRefOpen<VectorOfVector4f>();
-        if (theNode->nodeName() == "shape") {
-            // set all vertex colors
-            for (unsigned i = 0; i < myColors.size(); ++i) {
-                myColors[i][3] = theAlpha;
-            }
-        } else {
-            // set only vertices that this element uses
-            dom::NodePtr myColorIndicesNode = theNode->childNodeByAttribute("indices", "role", "color");
-            if (myColorIndicesNode) {
-                VectorOfUnsignedInt myColorIndices = myColorIndicesNode->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
-                for (unsigned i = 0; i < myColorIndices.size(); ++i) {
-                    myColors[myColorIndices[i]][3] = theAlpha;
+        
+        // XXX go through all elements of that shape
+        
+        if( myVertexParamColorNode ) {
+            VectorOfRankedFeature myVertexParam = myVertexParamColorNode->firstChild()->nodeValueRef<VectorOfRankedFeature>();
+            if( myVertexParam[0]._myFeature[0] == "color") {
+                dom::NodePtr myColorsNode = myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR4F_NAME, NAME_ATTRIB, COLOR_ROLE);
+                if (!myColorsNode) {
+                    AC_WARNING << "Shape '" << myShape->get<NameTag>() << "' has no vertex colors";
+                    return false;
                 }
-                myColorIndicesNode->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
-            } else {
-                AC_WARNING << "Element has no vertex color indices";
+                
+                VectorOfVector4f & myColors = myColorsNode->firstChild()->nodeValueRefOpen<VectorOfVector4f>();
+                if (theNode->nodeName() == "shape") {
+                    // set all vertex colors
+                    for (unsigned i = 0; i < myColors.size(); ++i) {
+                        myColors[i][3] = theAlpha;
+                    }
+                } else {
+                    // set only vertices that this element uses
+                    dom::NodePtr myColorIndicesNode = theNode->childNodeByAttribute("indices", "role", "color");
+                    if (myColorIndicesNode) {
+                        VectorOfUnsignedInt myColorIndices = myColorIndicesNode->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
+                        for (unsigned i = 0; i < myColorIndices.size(); ++i) {
+                            myColors[myColorIndices[i]][3] = theAlpha;
+                        }
+                        myColorIndicesNode->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
+                    } else {
+                        AC_WARNING << "Element has no vertex color indices";
+                    }
+                }
+                myColorsNode->firstChild()->nodeValueRefClose<VectorOfVector4f>();
+                
+                return true;
             }
+            
+        } else {
+            return setAlphaByChangingMaterialColor(myMaterial, theAlpha);
         }
-        myColorsNode->firstChild()->nodeValueRefClose<VectorOfVector4f>();
-
-        return true;
+        return false;
     }
 
+    bool
+    setAlphaByChangingMaterialColor(dom::NodePtr theMaterial, float theAlpha) {
+
+        dom::NodePtr myVertexParamColorNode = theMaterial->childNode("requires",0)->childNodeByAttribute(FEATURE_NODE_NAME, NAME_ATTRIB, "lighting");
+        VectorOfRankedFeature myVertexParam = myVertexParamColorNode->firstChild()->nodeValueRef<VectorOfRankedFeature>();
+        if( myVertexParam[0]._myFeature[0] == "unlit") {
+            dom::NodePtr mySurfaceColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "surfacecolor");
+            Vector4f & mySurfaceColor = mySurfaceColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+            mySurfaceColor[3] = theAlpha;
+            mySurfaceColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+        } else {
+            dom::NodePtr myDiffuseColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "diffuse");
+            Vector4f & myDiffuseColor = myDiffuseColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+            myDiffuseColor[3] = theAlpha;
+            myDiffuseColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            
+            dom::NodePtr myAmbientColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "ambient");
+            Vector4f & myAmbientColor = myAmbientColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+            myAmbientColor[3] = theAlpha;
+            myAmbientColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            
+            dom::NodePtr mySpecularColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "specular");
+            Vector4f & mySpecularColor = mySpecularColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+            mySpecularColor[3] = theAlpha;
+            mySpecularColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            
+            dom::NodePtr myEmissiveColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "emissive");
+            Vector4f & myEmissiveColor = myEmissiveColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+            myEmissiveColor[3] = theAlpha;
+            myEmissiveColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            
+        }
+        return true;
+    }
+    
     dom::NodePtr
     createCanvas(ScenePtr theScene, const std::string & theCanvasName) {
         CanvasBuilder myCanvas(theCanvasName);

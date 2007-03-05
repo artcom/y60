@@ -79,7 +79,8 @@ dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShape
 
 /// Set node alpha value. Node can be a body or a shape.
 bool setAlpha(dom::Node * theNode, float theAlpha);
-
+bool setAlphaByChangingMaterialColor(dom::NodePtr theMaterial, float theAlpha);
+    
 /**
  * Creates a canvas in the scene given in theScene
  * @param theScene Scene to create canvas in
