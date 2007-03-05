@@ -37,6 +37,7 @@
 
 #include <y60/BodyBuilder.h>
 #include <y60/LightSourceBuilder.h>
+#include <y60/NodeNames.h>
 
 #include <stdio.h>
 #include <iostream>
@@ -45,6 +46,7 @@
 #define LIMIT_LIGHTS
 
 using namespace std;
+using namespace y60;
 
 SceneExporter::SceneExporter(bool theBinaryFlag) :
     _myObjectCount(0), _myBinaryFlag(theBinaryFlag)
@@ -283,7 +285,8 @@ y60::WorldBuilderBasePtr
 SceneExporter::writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
                          BaseObject * theNode,
                          bool theTransformFlag,
-                         bool theForceFrontBackFacing)
+                         bool theForceFrontBackFacing,
+                         const string & theNameAppendix)
 {
     // We use the pointer to the node object as unique id, because cinema
     // does not provide this little service
@@ -321,7 +324,7 @@ SceneExporter::writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
     
     y60::WorldBuilderBasePtr myParentBuilder = theTransformBuilder;
     bool myTransformFlag = theTransformFlag;
-    std::string myBaseName = getString(theNode->GetName());
+    std::string myBaseName = getString(theNode->GetName()) + theNameAppendix;
 
     std::vector<std::string> myShapeIdList = _myExportedShapes[myNodeId];
     for (unsigned i = 0; i < myShapeIdList.size(); ++i) {
@@ -467,7 +470,8 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
 	                        BaseObject * & theNode,
                             y60::WorldBuilderBasePtr & theParentBuilder,
                             bool theTransformFlag,
-                            bool theForceFrontBackFacing) {
+                            bool theForceFrontBackFacing,
+                            const std::string & theNameAppendix) {
     const String myTreeName =  getTreeName(theNode);
     std::string myName = getString(theNode->GetName());
     StatusSetText("Exporting '" + myTreeName + "'");
@@ -512,7 +516,7 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
                     LONG myInstancedNodeType = myLinkedObject->GetType();
                     if (myInstancedNodeType != Onull) {
                         writeObject(theParentBuilder, myLinkedObject, 
-                                    theParentBuilder, false, theForceFrontBackFacing);
+                                    theParentBuilder, false, theForceFrontBackFacing, "_instance");
                     }
                 }
 
@@ -564,15 +568,16 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
         */
         default:
             // Export polygon objects
-            theParentBuilder = writeBody(theTransformBuilder, theNode, theTransformFlag, theForceFrontBackFacing);
+            theParentBuilder = writeBody(theTransformBuilder, theNode, theTransformFlag, theForceFrontBackFacing, theNameAppendix);
             break;
     }
-
-    // export animation if any exists
-    AnimationExporter myAnimationExporter(*_mySceneBuilder,_myDocument);
-//    myAnimationExporter.exportGlobal(theNode, theParentBuilder->getId());
-    myAnimationExporter.exportCharacter(theNode, theParentBuilder->getId());
-
+    
+    if (theParentBuilder && theParentBuilder->getNode()) {
+        // export animation if any exists
+        AnimationExporter myAnimationExporter(*_mySceneBuilder,_myDocument);
+    //    myAnimationExporter.exportGlobal(theNode, theParentBuilder->getId());
+        myAnimationExporter.exportCharacter(theNode, theParentBuilder->getId());
+    }
     return true;
 }
 

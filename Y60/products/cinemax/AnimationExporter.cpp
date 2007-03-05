@@ -73,14 +73,16 @@ AnimationExporter::~AnimationExporter() {
 
 void
 AnimationExporter::exportCharacter(BaseObject * theNode, const std::string & theNodeId) {
-    std::string myName = getString(theNode->GetName());
-    CharacterBuilder myCharacterBuilder(myName);
-    _mySceneBuilder.appendCharacter(myCharacterBuilder);
+    CTrack* myFirstTrack = theNode->GetFirstCTrack();
+    if (myFirstTrack) {
+        std::string myName = getString(theNode->GetName());
+        CharacterBuilder myCharacterBuilder(myName);
+        _mySceneBuilder.appendCharacter(myCharacterBuilder);
 
-    ClipBuilderPtr myClipBuilder(new ClipBuilder(myName));
-    myCharacterBuilder.appendClip(*myClipBuilder);
-    exportGlobal(theNode, theNodeId, myClipBuilder);
-
+        ClipBuilderPtr myClipBuilder(new ClipBuilder(myName));
+        myCharacterBuilder.appendClip(*myClipBuilder);
+        exportGlobal(theNode, theNodeId, myClipBuilder);
+    }
 }
 
 void

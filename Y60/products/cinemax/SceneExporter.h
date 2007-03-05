@@ -66,7 +66,8 @@ class SceneExporter : public SceneSaverData {
   	                     BaseObject * & theNode,
                          y60::WorldBuilderBasePtr & theParentBuilder,
                          bool theTransformFlag = true,
-                         bool theForceFrontBackFacing = false);
+                         bool theForceFrontBackFacing = false,
+                         const std::string & theNameAppendix = "");
 
         void writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
 	                      BaseObject * theNode,
@@ -76,7 +77,8 @@ class SceneExporter : public SceneSaverData {
         y60::WorldBuilderBasePtr writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
                                            BaseObject * theNode,
                                            bool theTransformFlag = true,
-                                           bool theForceFrontBackFacing = false);
+                                           bool theForceFrontBackFacing = false,
+                                           const std::string & theNameAppendix = "");
 
         y60::WorldBuilderBasePtr writeLight(y60::WorldBuilderBasePtr theTransformBuilder,
                                             BaseObject * theNode);
