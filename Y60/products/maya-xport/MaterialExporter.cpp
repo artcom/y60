@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2000-2006, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -29,6 +29,7 @@
 #include <asl/numeric_functions.h>
 #include <asl/Dashboard.h>
 #include <asl/Matrix4.h>
+#include <asl/PackageManager.h>
 
 #include <maya/MGlobal.h>
 #include <maya/MObject.h>
@@ -137,11 +138,19 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         getConnectedNode(myImagePlug, myImageNode);
     }
 
+		/*
+		MPlug myBumpPlug = MFnDependencyNode(theBumpNode).findPlug("bumpValue");
+		*/
+
     MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
     MString myFileName;
     myFilenamePlug.getValue(myFileName);
-    std::string myStrippedFileName = findRelativeFilePath(myFileName.asChar());
+    std::string myRelativeFileName = findRelativeFilePath(myFileName.asChar());
+    //AC_ERROR << myRelativeFileName;
+   
+		//std::string myRelativeFileName = getStrippedTextureFilename(myFilenamePlug);
 
+		
     // color gain = scale
     Vector4f myColorScale(1,1,1,theColorGainAlpha);
     MPlug myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainR");
@@ -198,13 +207,13 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         myWrapMode = CLAMP;
     }
 
-    //AC_DEBUG << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
+    //AC_DEBUG << "stripped filename=" << myRelativeFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
-        myStrippedFileName, theUsageMode, myCreateMipmapsFlag,
+        myRelativeFileName, theUsageMode, myCreateMipmapsFlag,
         myColorScale, myColorOffset, SINGLE, myWrapMode, "");
 
-
+		
     // texture matrix
     asl::Matrix4f myTextureMatrix;
     myTextureMatrix.makeIdentity();
@@ -412,6 +421,8 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
     TextureUsage myUsage         = y60::BUMP;
     TextureWrapMode myWrapMode   = y60::REPEAT;
 
+		
+		
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theBumpNode).name().asChar(),
         myFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
@@ -1041,7 +1052,10 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
     if (_myBaseDirectory[_myBaseDirectory.length()-1] != '/') {
         _myBaseDirectory += '/';
     }
-
+    
+		PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
+		myPackageManager->add(_myBaseDirectory);
+		
     AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory << ", was:" << theDirectory;
 }
 
