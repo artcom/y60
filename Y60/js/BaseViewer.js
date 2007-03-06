@@ -322,6 +322,51 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    self.applyMaterialTable = function(theFilename) {
+        if (!_myMaterialTable) {
+            if (!theFilename) {
+                theFilename = "materialtable.xml";
+            }
+            var myDoc = new Node();
+            if (!fileExists(theFilename)) {
+                Logger.info(theFilename+" does not exist. Could not apply MaterialTable");
+                return new Node("<materialtable/>").firstChild; 
+            }
+            myDoc.parseFile(theFilename);
+            if (myDoc.firstChild && myDoc.firstChild.nodeName == "materialtable") {
+                _myMaterialTable = myDoc.firstChild;    
+            } else {
+                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to conain a valid xml-structure.")
+                return new Node("<materialtable/>").firstChild; 
+            }
+        }
+    
+        for (var i=0; i<_myMaterialTable.childNodesLength(); ++i) {
+            var myNode = _myMaterialTable.childNode(i);
+            var myMaterial = getDescendantByName(_myMaterials, myNode.name, true);
+            if (myMaterial) {
+                mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
+                Logger.info("setting "+myMaterial.name+" to table value.");
+            } else {
+                // in case of materialswitches
+                var mySwitchNode = getDescendantByName(self.getScene().world, myNode.name, true);                 
+                if (mySwitchNode) {
+                    Logger.info("switchnode found in materialtable:"+mySwitchNode.name);   
+                    var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
+                    var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
+                    myMaterial = mySwitchNode.getElementById(myMaterialId);
+                    mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
+                }
+            }
+        }
+        return _myMaterialTable;
+    }
+
+    function mergeMaterialProperties(theTargetMaterial, theTableNode) {
+        theTargetMaterial.removeChild(theTargetMaterial.childNode("properties"));
+        theTargetMaterial.appendChild(theTableNode.cloneNode(true));
+    }
+
     self.recollectSwitchNodes = function() {
         collectAllSwitchNodes(self.getScene());
     }
@@ -549,6 +594,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySwitchNodes  = new Array();
     var _myMSwitchNodes = new Array();
     var _myTSwitchNodes = new Array();
+    var _myMaterialTable = null;
     var _myDrawCameraFrustumFlag = false;
 
     self.__defineGetter__('_myPicking', function() { return _myPicking; });

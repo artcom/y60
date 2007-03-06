@@ -33,6 +33,7 @@ var ourPreferenceDialog  = null;
 var ourCameraPopup       = null;
 var ourAnimationManager  = null;
 var ourWindowState = {width: 800, height: 600, position: [0, 0]};
+var ourMaterialTable     = null;
 
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
@@ -86,9 +87,12 @@ ourHandler.on_include_activate = function() {
         myIncludeNode.src = myFilename;
         window.scene.world.appendChild(myIncludeNode);
         window.scene.update(Scene.WORLD);
+        ourViewer.lastSwitched = {};
     }
     ourViewer.recollectSwitchNodes(); 
     ourViewer.setupSwitchNodeMenu();
+    ourMaterialTable = ourViewer.applyMaterialTable();
+
     window.pause = false;
 }
 
@@ -355,6 +359,27 @@ ourHandler.on_material_dlg_save_clicked = function() {
     window.pause = isPaused;
 }
 
+ourHandler.on_material_dlg_save_table_clicked = function() {
+    var myMaterial = getSelectedMaterial();
+    var myMaterialName = myMaterial.name;
+    if ("mswitch_"+myMaterial.name in ourViewer.lastSwitched) {
+        myMaterialName = ourViewer.lastSwitched["mswitch_"+myMaterial.name];
+    }
+    
+    Logger.info("appending active properties for: "+myMaterial.name+" to materialtable as: "+myMaterialName);
+    
+    var myNode = getDescendantByName(ourMaterialTable, myMaterialName, true);
+    if (myNode) {
+        myNode.parentNode.removeChild(myNode);
+    }
+
+    var myNewNode = new Node("<material name=\""+myMaterialName+"\"/>").firstChild;
+    myNewNode.appendChild(myMaterial.childNode("properties").cloneNode(true));
+    
+    ourMaterialTable.appendChild(myNewNode);
+    ourMaterialTable.saveFile("materialtable.xml");
+}
+
 ourHandler.on_material_dlg_load_clicked = function() {
     var isPaused = window.pause;
     window.pause = true;
@@ -545,7 +570,6 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.loadModel = function( theFilename ) {
-
         print("Loading model '" + theFilename + "'");
 
         var myScene;
@@ -572,6 +596,9 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             ourViewer.getLightManager().enableSunlight(true);
             ourStatusBar.set("Opened scene: " + theFilename + ". Default lighting is enabled.");
         } 
+
+        ourMaterialTable = ourViewer.applyMaterialTable();
+        ourViewer.lastSwitched = {};
 
         setupGUI();
         window.queue_draw();
@@ -723,6 +750,8 @@ function main(argv) {
         ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
         ourMainWindow.signal_delete_event.connect(ourHandler, "on_quit_activate");
         ourViewer.setupWindow(window);
+        
+        ourViewer.lastSwitched = {};
 
         /*
         self.setModelName(myFilename);

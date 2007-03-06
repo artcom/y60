@@ -142,6 +142,12 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                 _myHandlers[i].setActiveChildByName( theName );
             }
         }
+    
+        if (_myHandlers.length > 0) {
+            // remember last switched material for use in materialtable
+            Logger.info("onSwitchNodeSwitched: "+theName+" switchName: "+_myHandlers[0].switchName);
+            ourViewer.lastSwitched[_myHandlers[0].switchName] = theName;
+        }
     }
 
     obj.finalize = function() {
@@ -169,7 +175,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     var _myTearOff = null;
     var _myChildren = {};
     var _mySignalHandlers = {};
-
+    
     setup();
 }
 
