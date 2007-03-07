@@ -1142,7 +1142,8 @@ MAKE_SCOPE_TIMER(switchMaterial);
     void
     Renderer::render(ViewportPtr theViewport) {
         MAKE_SCOPE_TIMER(render);
-
+        _myRenderedUnderlays = false;
+        
         // Setup viewport, parameters are in screen space
         glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
                    theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
@@ -1497,7 +1498,11 @@ MAKE_SCOPE_TIMER(switchMaterial);
     }
 
     void
-    Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) {
+    Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) { 
+        if (_myRenderedUnderlays) {
+            return;
+        }
+
         // Get Material
         const dom::NodePtr & myWorldNode = _myScene->getWorldRoot();
         WorldFacadePtr myWorld = myWorldNode->getFacade<WorldFacade>();
@@ -1666,7 +1671,8 @@ MAKE_SCOPE_TIMER(switchMaterial);
         glMatrixMode(GL_MODELVIEW);
 
         glPopAttrib();
-
+        
+        _myRenderedUnderlays = true;
     }
 
     void

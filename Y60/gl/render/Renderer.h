@@ -185,6 +185,9 @@ namespace y60 {
             VertexRegisterFlags  _myLastVertexRegisterFlags;
             const MaterialBase * _myPreviousMaterial;
             Body const *         _myPreviousBody;
+
+            // needed to avoid skybox/underlays interferences
+            bool _myRenderedUnderlays;
 };
 
     typedef asl::Ptr<Renderer> RendererPtr;
