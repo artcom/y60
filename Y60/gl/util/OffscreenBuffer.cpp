@@ -16,18 +16,10 @@
 #include <asl/Logger.h>
 #include <asl/numeric_functions.h>
 
-//#define DUMP_BUFFER
-#ifdef DUMP_BUFFER
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <paintlib/plpngenc.h>
-#include <paintlib/pltiffenc.h>
-#include <paintlib/planybmp.h>
-#endif
 
 using namespace std;
 using namespace dom;
+
 
 namespace y60 {
 
@@ -190,32 +182,9 @@ void OffscreenBuffer::copyToImage(ImagePtr theImage)
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());        
+    CHECK_OGL_ERROR;
 
-#ifdef DUMP_BUFFER
-    PixelEncoding myEncoding;
-    switch(long(myPixelEncodingInfo.bytesPerPixel)) {
-      case 1:
-          myEncoding = GRAY;
-          break;
-      case 3:
-          myEncoding = RGB;
-          break;
-      case 4:
-          myEncoding = RGBA;
-          break;
-    }
-
-    PLPixelFormat pf;
-    mapPixelEncodingToFormat(myEncoding, pf);
-
-    std::string myFilename("buffer.png");
-    PLAnyBmp myBmp;    
-    myBmp.Create( theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), pf, 
-                  theImage->getRasterPtr()->pixels().begin(),
-                  theImage->get<ImageWidthTag>() * myPixelEncodingInfo.bytesPerPixel);
-    PLPNGEncoder myEncoder;
-    myEncoder.MakeFileFromBmp(myFilename.c_str(), &myBmp);               
-#endif
+    theImage->triggerUpload();
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {

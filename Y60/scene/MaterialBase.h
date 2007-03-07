@@ -171,10 +171,7 @@ namespace y60 {
 
             bool getDepthBufferWrite() const;
             void setDepthBufferWrite(const bool theFlag);
-            
-            // performe depth buffer test
-            bool getDepthBufferTest() const;
-            
+
             // texgen parameters
             void updateParams();
 

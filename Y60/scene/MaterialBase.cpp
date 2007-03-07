@@ -245,14 +245,6 @@ namespace y60 {
         myPropFacade->set<TargetBuffersTag>(mySet);
     }
 
-    bool
-    MaterialBase::getDepthBufferTest() const {
-        if (getNode().getAttribute(DEPTH_TEST_ATTRIB)) {
-            return getNode().getAttributeValue<bool>(DEPTH_TEST_ATTRIB);
-        }
-        return true;
-    }
-
     void
     MaterialBase::updateParams() {
 

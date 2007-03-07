@@ -38,6 +38,7 @@ var ourMaterialTable     = null;
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
 var ourMaterialComboBox  = null;
+var ourLastMaterial      = null;
 
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
@@ -58,7 +59,6 @@ var ourAllowedOptions = {
 //=================================================
 
 ourHandler.on_mainWindow_realize = function() {
-    print("on_mainWindow_realize");
 }
 
 //=================================================
@@ -387,7 +387,7 @@ ourHandler.on_material_dlg_load_clicked = function() {
      
     if (!myFilename) {
         window.pause = isPaused;
-        ourStatusBar.set("Invalid or Incomplete Filename");
+        ourStatusBar.set("Invalid or incomplete Filename");
         return;
     }    
 
@@ -448,8 +448,10 @@ ourHandler.on_material_editor_activate = function() {
     }
 
     // enable first element
-    if (i>0) {
-        ourMaterialComboBox.active_text = myLabelsArray[0];
+    if (myLabelsArray.length > 0) {
+        var myMaterial = (ourLastMaterial != null ? ourLastMaterial : myLabelsArray[0]);
+        //print("Material:" + myMaterial);
+        ourMaterialComboBox.active_text = myMaterial;
     }
   
     myMaterialEditor.show();
@@ -738,13 +740,11 @@ function main(argv) {
         ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
         ourHandler.isLoaded = false;
 
-        print("Creating window");
         window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
         ourGlade.get_widget("renderbox").add(window);
         window.show();
         ourMainWindow.show();
 
-        print("Creating Viewer");
         ourViewer = new Viewer(ourHandler.arguments);
         ourMainWindow.signal_key_press_event.connect(ourViewer, "onKeyDown");
         ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");

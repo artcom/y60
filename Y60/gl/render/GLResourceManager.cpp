@@ -416,13 +416,13 @@ namespace y60 {
         }
 #endif
 
+        DB(AC_DEBUG << "GLResourceManager::update2DTexture subloading " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec << " compr=" << myPixelEncoding.compressedFlag << " image=" << (void*)myImageData);
         if (myPixelEncoding.compressedFlag) {
             glCompressedTexSubImage2DARB(GL_TEXTURE_2D, 0,
                     0, 0, myWidth, myHeight,
                     myPixelEncoding.externalformat,
                     theImage->getMemUsed(), myImageData);
         } else {
-            DB(AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec);
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                     0, 0, myWidth, myHeight,
                     myPixelEncoding.externalformat,

@@ -14,26 +14,29 @@
 #include <asl/Exception.h>
 #include <asl/Block.h>
 
+#include <y60/Image.h>
+
 #include <paintlib/planydec.h>
 
 namespace y60 {
-    
+ 
     enum GLSourceBuffer {
         FRAME_BUFFER,
         DEPTH_BUFFER
     };   
 
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
-    class BufferAdaptor {
+    class BufferAdapter {
         public:
-            BufferAdaptor(unsigned theWidth, unsigned theHeight, unsigned theComponents);
-            virtual ~BufferAdaptor();
+            BufferAdapter(unsigned theWidth, unsigned theHeight, unsigned theComponents);
+            virtual ~BufferAdapter();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
 
             asl::Block & getBlock();
             unsigned getWidth() const;
             unsigned getHeight() const;
             unsigned getComponents() const;
+            unsigned getBufferFormat(GLSourceBuffer theSourceBuffer) const;
         protected:
             void alloc(const unsigned myMemorySize);
         private:
@@ -61,15 +64,26 @@ namespace y60 {
 #define PL_FT_SGI    15
 */
     
-    class BufferToFile : public BufferAdaptor{
+    class BufferToFile : public BufferAdapter {
         public:
-            BufferToFile (unsigned theWidth, unsigned theHeight, unsigned theComponents);
+            BufferToFile(const std::string & theFilename, unsigned theFormat,
+                         unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferToFile();
-            bool saveBufferAsImage(unsigned theFormat, const std::string & theFileName);
-            
+            virtual void performAction(GLSourceBuffer theSourceBuffer);
+        private:
+            std::string _myFilename;
+            unsigned _myFormat;
     };
-    
+ 
+    class BufferToImage : public BufferAdapter {
+        public:
+            BufferToImage(ImagePtr theImage, bool theCopyToRasterFlag);
+            virtual ~BufferToImage();
+            virtual void performAction(GLSourceBuffer theSourceBuffer);
+        private:
+            ImagePtr _myImage;
+            bool _myCopyToRasterFlag;
+    };
 }
 
 #endif // _ac_render_GLBufferAdapter_h_
-

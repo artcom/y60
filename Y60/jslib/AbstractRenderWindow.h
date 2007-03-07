@@ -194,8 +194,11 @@ namespace jslib {
 
         void addExtension(y60::IRendererExtensionPtr theExtension);
 
-        /// saves framebuffer to file
+        /// save framebuffer to file
         void saveBuffer(const std::string & theFilename);
+
+        /// copy framebuffer to Image texture (and optionally to Image raster).
+        void copyBufferToImage(dom::NodePtr & theImage, bool theCopyToRasterFlag = false);
 
         void setJSContext(JSContext * cx);
 
@@ -245,7 +248,7 @@ namespace jslib {
          * - else does a regular render with clear/pre/render/post/swap
          */
         void renderFrame();
-        
+
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);
         virtual void preViewport(const dom::NodePtr & theViewport);

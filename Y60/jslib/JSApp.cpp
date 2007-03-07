@@ -552,6 +552,7 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Copy pixels from one image to another");

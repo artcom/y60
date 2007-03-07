@@ -47,7 +47,7 @@ function updateMaterialEditor() {
                 mySlider.setRange(0.0,1.0);
             }
             
-            var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
+            var myProperty = getDescendantByName(mySelectedMaterial, myChildNode.name, true);
             mySlider.value = myProperty.firstChild.nodeValue;
        
             mySlider.show();
@@ -71,6 +71,9 @@ function updateMaterialEditor() {
             myActiveFloatValue++;
         }
     }
+
+    ourLastMaterial = mySelectedMaterial;
+    //print("Last material:" + ourLastMaterial);
 }
 
 function updateMaterial(thePropertyName, theValue) {
@@ -114,4 +117,3 @@ function updateColorElement(theNode) {
                    ","+(myColorPicker.color[3].toFixed(2))+
                    "] ";
 }
-

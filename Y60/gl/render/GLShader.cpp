@@ -169,16 +169,18 @@ namespace y60 {
         glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
 
-        // line smooth, line width
+        // line smooth
         if (myMaterialPropFacade->get<LineSmoothTag>()) {
             glEnable(GL_LINE_SMOOTH);
         } else {
             glDisable(GL_LINE_SMOOTH);
         }
 
+        // line width
         float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
         glLineWidth(myLineWidth);
 
+        // point size
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
         if (IS_SUPPORTED(glPointParameterfARB)) {
@@ -186,6 +188,7 @@ namespace y60 {
             glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
         }
 
+        // blend function
         const VectorOfBlendFunction & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
         if (myBlendFunction.size() == 2) {
 #if 0
@@ -214,6 +217,7 @@ namespace y60 {
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
         }
 
+        // blend equation
         if (IS_SUPPORTED(glBlendEquation)) {
             const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
@@ -230,6 +234,16 @@ namespace y60 {
 
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
+        // depth test
+        dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
+        if (myDepthTestProp) {
+            bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
+            if (myDepthTest) {
+                glEnable(GL_DEPTH_TEST);
+            } else {
+                glDisable(GL_DEPTH_TEST);
+            }
+        }
 
         // line stipple
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
@@ -238,7 +252,7 @@ namespace y60 {
             glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
         }
 
-
+        // point attenuation
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
         if (IS_SUPPORTED(glPointParameterfARB) && myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,

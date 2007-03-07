@@ -237,24 +237,37 @@ namespace jslib {
 
     void
     AbstractRenderWindow::saveBuffer(const std::string & theFilename) {
-        BufferToFile myBufferWriter( _myCanvas->getFacade<Canvas>()->getWidth(),
-                _myCanvas->getFacade<Canvas>()->getHeight(), 4);
-        myBufferWriter.performAction(FRAME_BUFFER);
+
         // see GLBufferAdapter.h for possible format consts
+        unsigned myFormat = PL_FT_PNG;
         string myExt = toUpperCase(theFilename.substr(theFilename.rfind('.')+1));
         if (myExt == "JPG") {
-            myBufferWriter.saveBufferAsImage(PL_FT_JPEG, theFilename);
+            myFormat = PL_FT_JPEG;
         } else if (myExt == "BMP") {
-            myBufferWriter.saveBufferAsImage(PL_FT_WINBMP, theFilename);
+            myFormat = PL_FT_WINBMP;
         } else if (myExt == "TIFF" || myExt == "TIF") {
-            myBufferWriter.saveBufferAsImage(PL_FT_TIFF, theFilename);
+            myFormat = PL_FT_TIFF;
         } else {
             if (myExt != "PNG") {
                 AC_WARNING << "AbstractRenderWindow::saveBuffer: Unknown extension " << myExt << ". Saving as png.";
             }
-            myBufferWriter.saveBufferAsImage(PL_FT_PNG, theFilename);
+            myFormat = PL_FT_PNG;
         }
+
+        BufferToFile myBufferWriter(theFilename, myFormat,
+                _myCanvas->getFacade<Canvas>()->getWidth(),
+                _myCanvas->getFacade<Canvas>()->getHeight(), 4);
+        myBufferWriter.performAction(FRAME_BUFFER);
     }
+
+    void
+    AbstractRenderWindow::copyBufferToImage(dom::NodePtr & theImageNode, bool theCopyToRasterFlag) {
+
+        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
+        BufferToImage myBufferWriter(myImage, theCopyToRasterFlag);
+        myBufferWriter.performAction(FRAME_BUFFER);
+    }
+
 
     void
     AbstractRenderWindow::setJSContext(JSContext * cx) {

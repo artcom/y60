@@ -46,5 +46,6 @@ namespace y60 {
                                                                             // Sphere mapped coords are not supported yet ... 
                                                                             // see also OGL Redbook p.413 ff
     static const char * TARGETBUFFERS_PROPERTY     = "targetbuffers";
+    static const char * DEPTHTEST_PROPERTY         = "depthtest";
 } // namespace
 #endif
