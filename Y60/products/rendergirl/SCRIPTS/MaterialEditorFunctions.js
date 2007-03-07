@@ -72,7 +72,7 @@ function updateMaterialEditor() {
         }
     }
 
-    ourLastMaterial = mySelectedMaterial;
+    ourLastMaterial = mySelectedMaterial.name;
     //print("Last material:" + ourLastMaterial);
 }
 
