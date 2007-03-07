@@ -79,7 +79,7 @@ JSAbstractRenderWindow<DERIVED>::copyBufferToImage(JSContext *cx, JSObject *obj,
     DOC_PARAM("theImage", "", DOC_TYPE_NODE);
     DOC_PARAM_OPT("theCopyToRasterFlag", "", DOC_TYPE_BOOLEAN, "false");
     DOC_END;
-    typedef void (DERIVED::*MyMethod)(dom::NodePtr, bool);
+    typedef void (DERIVED::*MyMethod)(dom::NodePtr &, bool);
     return Method<DERIVED>::call((MyMethod)&DERIVED::copyBufferToImage,cx,obj,argc,argv,rval);
 }
 
