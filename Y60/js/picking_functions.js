@@ -26,10 +26,10 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myViewportCount = theCanvas.childNodesLength("viewport");
         for (var i= myViewportCount-1; i >= 0; --i) {
             var myViewport = theCanvas.childNode("viewport",i);
-            if (myViewport.top < theScreenPixelY &&
-                myViewport.height + myViewport.top > theScreenPixelY &&
-                myViewport.left < theScreenPixelX &&
-                myViewport.left + myViewport.width > theScreenPixelX)
+            if (myViewport.top <= theScreenPixelY &&
+                myViewport.height + myViewport.top >= theScreenPixelY &&
+                myViewport.left <= theScreenPixelX &&
+                myViewport.left + myViewport.width >= theScreenPixelX)
             {
                 return myViewport;
             }
