@@ -261,10 +261,12 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::copyBufferToImage(dom::NodePtr & theImageNode, bool theCopyToRasterFlag) {
+    AbstractRenderWindow::copyBufferToImage(dom::NodePtr & theImageNode,
+                                            const asl::Vector2i & theOffset,
+                                            bool theCopyToRasterFlag) {
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        BufferToImage myBufferWriter(myImage, theCopyToRasterFlag);
+        BufferToImage myBufferWriter(myImage, theOffset, theCopyToRasterFlag);
         myBufferWriter.performAction(FRAME_BUFFER);
     }
 

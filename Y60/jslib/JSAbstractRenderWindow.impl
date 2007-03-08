@@ -66,7 +66,7 @@ template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves a screenshot to a given file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "Filename to save to", DOC_TYPE_STRING);
     DOC_END;
     typedef void (DERIVED::*MyMethod)(const std::string & );
     return Method<DERIVED>::call((MyMethod)&DERIVED::saveBuffer,cx,obj,argc,argv,rval);
@@ -76,10 +76,11 @@ template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::copyBufferToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Copy framebuffer to Image texture (and optionally to Image raster)");
-    DOC_PARAM("theImage", "", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theCopyToRasterFlag", "", DOC_TYPE_BOOLEAN, "false");
+    DOC_PARAM("theImage", "Image node", DOC_TYPE_NODE);
+    DOC_PARAM("theOffset", "Read offset in framebuffer", DOC_TYPE_VECTOR2I);
+    DOC_PARAM("theCopyToRasterFlag", "Copy to raster instead of direcly to texture?", DOC_TYPE_BOOLEAN);
     DOC_END;
-    typedef void (DERIVED::*MyMethod)(dom::NodePtr &, bool);
+    typedef void (DERIVED::*MyMethod)(dom::NodePtr &, const asl::Vector2i &, bool);
     return Method<DERIVED>::call((MyMethod)&DERIVED::copyBufferToImage,cx,obj,argc,argv,rval);
 }
 
@@ -97,12 +98,13 @@ JSAbstractRenderWindow<DERIVED>::getRenderer(JSContext *cx, JSObject *obj, uintN
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+
 template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::setSceneAndCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("set the scene and canvas to render");
-    DOC_PARAM("theScene", "the Scene to render", DOC_TYPE_OBJECT);
-    DOC_PARAM("theCanvas", "canvas node to render to. If omitted, use the first canvas", DOC_TYPE_OBJECT);
+    DOC_PARAM("theScene", "Scene to render", DOC_TYPE_OBJECT);
+    DOC_PARAM("theCanvas", "Canvas node to render to. If omitted, use the first canvas", DOC_TYPE_OBJECT);
     DOC_RVAL("bSuccess", DOC_TYPE_OBJECT);
     DOC_END;
     try {

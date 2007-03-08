@@ -198,7 +198,7 @@ namespace jslib {
         void saveBuffer(const std::string & theFilename);
 
         /// copy framebuffer to Image texture (and optionally to Image raster).
-        void copyBufferToImage(dom::NodePtr & theImage, bool theCopyToRasterFlag = false);
+        void copyBufferToImage(dom::NodePtr & theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag = false);
 
         void setJSContext(JSContext * cx);
 

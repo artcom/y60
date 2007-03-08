@@ -77,11 +77,12 @@ namespace y60 {
  
     class BufferToImage : public BufferAdapter {
         public:
-            BufferToImage(ImagePtr theImage, bool theCopyToRasterFlag);
+            BufferToImage(ImagePtr theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag);
             virtual ~BufferToImage();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
         private:
             ImagePtr _myImage;
+            asl::Vector2i _myOffset;
             bool _myCopyToRasterFlag;
     };
 }

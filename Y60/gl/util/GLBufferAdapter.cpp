@@ -183,9 +183,9 @@ namespace y60 {
     }        
 
     // ----------------------------------------------------------------------------------------    
-    BufferToImage::BufferToImage(ImagePtr theImage, bool theCopyToRasterFlag) :
+    BufferToImage::BufferToImage(ImagePtr theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag) :
         BufferAdapter(theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), 4),
-        _myImage(theImage), _myCopyToRasterFlag(theCopyToRasterFlag)
+        _myImage(theImage), _myOffset(theOffset), _myCopyToRasterFlag(theCopyToRasterFlag)
     {
     }
 
@@ -206,7 +206,7 @@ namespace y60 {
             PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(_myImage->getRasterEncoding());
             myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(_myImage->getInternalEncoding());
 
-            glReadPixels(0,0, getWidth(),getHeight(),
+            glReadPixels(_myOffset[0],_myOffset[1], getWidth(),getHeight(),
                     myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                     _myImage->getRasterPtr()->pixels().begin());
             CHECK_OGL_ERROR;
@@ -217,7 +217,7 @@ namespace y60 {
 
             // copy framebuffer to texture
             glBindTexture(GL_TEXTURE_2D, _myImage->ensureTextureId());
-            glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, 0,0, getWidth(),getHeight());
+            glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, _myOffset[0],_myOffset[1], getWidth(),getHeight());
             CHECK_OGL_ERROR;
 
             // generate mipmap levels
