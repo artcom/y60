@@ -9,6 +9,7 @@
 //=============================================================================
 use("BaseViewer.js");
 use("PreferenceDialog.js");
+use("SceneViewerDialog.js");
 use("DebugVisual.js");
 use("ClassicTrackballMover.js");
 use("FlyMover.js");
@@ -30,6 +31,7 @@ var ourGlade             = null;
 var ourViewer            = null;
 var ourMainWindow        = null;
 var ourPreferenceDialog  = null;
+var ourSceneViewerDialog = null;
 var ourCameraPopup       = null;
 var ourAnimationManager  = null;
 var ourWindowState = {width: 800, height: 600, position: [0, 0]};
@@ -60,6 +62,7 @@ var ourAllowedOptions = {
 
 ourHandler.on_mainWindow_realize = function() {
 }
+
 
 //=================================================
 // File Menu Item Handlers
@@ -153,6 +156,17 @@ ourHandler.on_preferences_activate = function() {
 //=================================================
 // View Menu Item Handlers
 //=================================================
+
+ourHandler.on_scene_activate = function() {
+	ourSceneViewerDialog.show();
+}
+
+
+ourHandler.on_normals_activate = function(theMenuItem) {
+		window.drawnormals = theMenuItem.active;
+    ourStatusBar.set("Normals " + (theMenuItem.active ? "on" : "off"));
+    window.queue_draw();
+}
 
 ourHandler.on_wireframe_activate = function(theMenuItem) {
     window.wireframe = theMenuItem.active;
@@ -733,14 +747,16 @@ function main(argv) {
         ourGlade            = new Glade(GLADE_FILE);
         ourMainWindow       = ourGlade.get_widget("mainWindow");
 
-        ourPreferenceDialog = new PreferenceDialog(ourGlade);
-        ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
-
         ourGlade.autoconnect(ourHandler, ourMainWindow);
         ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
         ourHandler.isLoaded = false;
 
+				ourPreferenceDialog = new PreferenceDialog(ourGlade, ourHandler);
+				ourSceneViewerDialog= new SceneViewerDialog(ourGlade, ourHandler);
+        ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
+				
         window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
+        
         ourGlade.get_widget("renderbox").add(window);
         window.show();
         ourMainWindow.show();
@@ -771,7 +787,7 @@ function main(argv) {
         ourViewer.registerMover(WalkMover);
         ourAnimationManager = new GtkAnimationManager(ourViewer);
 
-        ourViewer.loadModel( ourViewer.getModelName());
+        ourViewer.loadModel(ourViewer.getModelName());
         //ourViewer.loadModel(null);
 
         /*

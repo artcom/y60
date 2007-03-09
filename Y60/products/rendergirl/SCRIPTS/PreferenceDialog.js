@@ -10,20 +10,27 @@
 
 const PREFERENCE_FILE_NAME = "preference.xml";
 
-const PREFERENCE_NAMES = ["background_color", "headlight", "sunlight", "daytime", "window_width", "window_height", "skymap"];
+const PREFERENCE_NAMES = ["background_color", "headlight", "sunlight", 
+													"daytime", "window_width", "window_height", "skymap", 
+													"fog_disabled", "fog_linear", "fog_exponential", 
+													"range_start", "range_end", "fog_density", 
+													"fog_color", "fog_type_exp", "fog_type_exp2"];
 
 function PreferenceDialog(theGladeHandle, theViewer) {
     this.Constructor(this, theGladeHandle, theViewer);
 }
 
-PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewer) {
 
+
+PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandler, theViewer) {
+	
+		var _myHandler						 = theHandler;
     var _myGladeHandle         = theGladeHandle;
     var _myViewer              = theViewer;
     var _myDialog              = _myGladeHandle.get_widget("dlgPreferences");
     var _myPreferenceDocument  = null;
     var _myWidgets             = [];
-
+		
     function setup() {
         for (var i in PREFERENCE_NAMES) {
             var myName = PREFERENCE_NAMES[i];
@@ -32,7 +39,7 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewe
                 print("### ERROR: Could not find widget: " + myName);
             }
         }
-
+				print(_myViewer);
         _myDialog.signal_response.connect(self, "onResponse");
         loadPreferences();
     }
@@ -42,12 +49,83 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewe
     self.show = function() {
         _myDialog.show();
     }
+    
+    //=================================================
+		//
+		//  Gtk Signal Handlers
+		//
+		//=================================================
+		
+		_myHandler.on_fog_disabled = function() {
+		  	ourGlade.get_widget("fog_start_box").hide();
+		  	ourGlade.get_widget("fog_end_box").hide();
+		  	ourGlade.get_widget("fog_density_box").hide();
+		  	ourGlade.get_widget("fog_color_box").hide();
+		  	ourGlade.get_widget("fog_type_box").hide();
+		}
+
+		_myHandler.on_fog_linear = function() {
+		  	ourGlade.get_widget("fog_start_box").show();
+		  	ourGlade.get_widget("fog_end_box").show();
+		  	ourGlade.get_widget("fog_density_box").hide();
+		  	ourGlade.get_widget("fog_color_box").show();
+		  	ourGlade.get_widget("fog_type_box").hide();
+		}
+
+		_myHandler.on_fog_exponential = function() {
+		  	ourGlade.get_widget("fog_start_box").hide();
+		  	ourGlade.get_widget("fog_end_box").hide();
+		  	ourGlade.get_widget("fog_density_box").show();
+		  	ourGlade.get_widget("fog_color_box").show();
+		  	ourGlade.get_widget("fog_type_box").show();
+		}
+		
+		_myHandler.on_range_start = function() {
+				ourGlade.get_widget("range_start_label").text=_myWidgets.range_start.value.toFixed(2);
+		}
+		
+		_myHandler.on_range_end = function() {
+				ourGlade.get_widget("range_end_label").text=_myWidgets.range_end.value.toFixed(2);
+		}
+		
+		_myHandler.on_fog_density = function() {
+				ourGlade.get_widget("fog_density_label").text=_myWidgets.fog_density.value.toFixed(2);
+		}
+		
+		//=================================================
 
     self.apply = function() {
         window.canvas.backgroundcolor = _myWidgets.background_color.color;
         _myGladeHandle.get_widget("headlight1").active = _myWidgets.headlight.active;
         _myGladeHandle.get_widget("sunlight1").active = _myWidgets.sunlight.active;
-
+				
+				if (_myWidgets.fog_disabled.active) {
+					window.scene.world.fogmode = "";
+					_myHandler.on_fog_disabled();
+				} else if (_myWidgets.fog_linear.active) {
+					window.scene.world.fogmode = "linear";
+        	window.scene.world.fogcolor = _myWidgets.fog_color.color;
+        	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
+        	window.scene.world.fogdensity = _myWidgets.fog_density.value;
+        	_myHandler.on_fog_linear();
+        	
+				} else if (_myWidgets.fog_exponential.active) {
+					if(_myWidgets.fog_type_exp.active) {
+						window.scene.world.fogmode = "exp";
+					} else {
+						window.scene.world.fogmode = "exp2";
+					}
+        	window.scene.world.fogcolor = _myWidgets.fog_color.color;
+        	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
+        	window.scene.world.fogdensity = _myWidgets.fog_density.value;
+        	_myHandler.on_fog_exponential();
+        	
+				}
+				
+				_myHandler.on_range_start();
+        _myHandler.on_range_end();
+				_myHandler.on_fog_density();
+				
         ourViewer.getLightManager().setSunPosition(_myWidgets.daytime.value);
         ourMainWindow.resize(_myWidgets.window_width.value, _myWidgets.window_height.value);
 
