@@ -59,7 +59,7 @@ var window = new RenderWindow();
 
 var myOverlay = new ImageOverlay(window.scene, myFilename, [0,0]);
 myOverlay.position = [300, 100];
-window.canvas.backgroundcolor = [0.5,0.5,0.5];
+window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
 glurImage(myOverlay.image);
 
 
