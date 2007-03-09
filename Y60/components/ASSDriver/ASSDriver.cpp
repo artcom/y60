@@ -67,8 +67,12 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myValueFactory( new dom::ValueFactory() )
 
 {
+    // XXX [DS] make things configurable
     _mySerialPort = getSerialDevice(0);
+    //_mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
+    //_mySerialPort->open( 921600, 8, SerialDevice::NO_PARITY, 1, false);
+    AC_PRINT << "baud rate: " << 16 * 57600;
     setState(SYNCHRONIZING);
 
     registerStandardTypes( * _myValueFactory );
@@ -105,6 +109,7 @@ ASSDriver::synchronize(EventPtrList & theEventList ) {
                 myMaxLine = _myBuffer[i];
                 myMagicTokenFlag = false;
                 myLineStart = i;
+                AC_PRINT << "Got line start";
                 break;
             } else if (_myBuffer[i] == myMagicToken) {
                 myMagicTokenFlag = true;
@@ -117,6 +122,7 @@ ASSDriver::synchronize(EventPtrList & theEventList ) {
             if (_myBuffer[i] == myMagicToken) {
                 myLineEnd = i;
                 _myGridSize[0] = myLineEnd - myLineStart - 1;
+                AC_PRINT << "Got line end";
                 break;
             }
         }

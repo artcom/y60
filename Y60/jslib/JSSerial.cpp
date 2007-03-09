@@ -528,18 +528,24 @@ JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         }
 
         unsigned myPortNumber = 0;
-        if (!convertFrom(cx, argv[0], myPortNumber)) {
-            JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (PortNumber)");
+        string myDeviceName;
+        if (convertFrom(cx, argv[0], myPortNumber)) {
+            if (myPortNumber == 999) {
+                OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
+                myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+            } else {
+                OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
+                myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+            }
+        } else if (convertFrom(cx, argv[0], myDeviceName)) {
+            OWNERPTR myNewSerial = OWNERPTR(getSerialDeviceByName( myDeviceName ));
+            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+        } else {
+            JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (port number)"
+                                " or a string (device name).");
             return JS_FALSE;
         }
 
-        if (myPortNumber == 999) {
-            OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
-            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
-        } else {
-            OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
-            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
-        }
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (PortNumber) %d",ClassName(), argc);
         return JS_FALSE;

@@ -8,18 +8,12 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: SerialDeviceFactory.h,v $
-//
-//     $Author: david $
-//
-//   $Revision: 1.2 $
-//
-//=============================================================================
 
 
 #ifndef ASL_SERIAL_DEVICE_FACTORY_INCLUDED
 #define ASL_SERIAL_DEVICE_FACTORY_INCLUDED
+
+#include <string>
 
 namespace asl {
 
@@ -28,6 +22,7 @@ namespace asl {
     // This function creates a new serial device. Don't forget to delete
     // it when you're done with it.
     SerialDevice * getSerialDevice(unsigned int theIndex);
+    SerialDevice * getSerialDeviceByName(const std::string & theDevice);
 }
 
 #endif // ASL_SERIAL_DEVICE_FACTORY_INCLUDED

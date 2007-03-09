@@ -141,10 +141,16 @@ class Enum {
         typedef ENUM Native;
         Enum() {};
         Enum( ENUM theValue ) : _myValue(theValue) {} 
+        Enum( const Enum & theOther ) : _myValue(theOther._myValue) {} 
         
         /** Assignment operator for native enum values. */
         void operator=(ENUM theValue) {
             _myValue = theValue;
+        }
+
+        /** Assignment operator. */
+        void operator=(const Enum & theOther) {
+            _myValue = theOther._myValue;
         }
 
         /** Conversion operator for native enum values. */

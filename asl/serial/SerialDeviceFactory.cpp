@@ -8,14 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: SerialDeviceFactory.cpp,v $
-//
-//     $Author: david $
-//
-//   $Revision: 1.1 $
-//
-//=============================================================================
 
 #include "SerialDeviceFactory.h"
 
@@ -40,4 +32,11 @@ getSerialDevice(unsigned int theIndex) {
 #endif
 }
 
+SerialDevice * getSerialDeviceByName(const std::string & theDevice) {
+#ifdef WIN32
+    return new ComPort( theDevice );
+#else
+    return new TTYPort( theDevice );
+#endif
+}
 }

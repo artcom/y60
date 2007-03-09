@@ -278,9 +278,13 @@ TTYPort::convertBaudRate(unsigned int theBaudRate) {
         case 230400:
             return B230400;
         default:
+            // [DS] AFAIK you can pass any value. These constants are for convinience only
+            return theBaudRate;
+            /*
             throw SerialPortException(string("Can not set device to ") +
                     asl::as_string(theBaudRate) + " bps",
                     PLUS_FILE_LINE);
+        */
     }
 }
 
