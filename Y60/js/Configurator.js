@@ -235,6 +235,14 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
     }
 
+    obj.getSettingsFile = function() {
+        if (_mySettingsFile) {
+            return _mySettingsFile;
+        } else {
+            throw new Exception("No settingsfile found (Configurator.js)", fileline());
+        }
+    }
+
     obj.setSettingsFile = function(theSettingsFile) {
         setup(obj, theSceneViewer, theSettingsFile);
     }
