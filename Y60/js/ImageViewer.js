@@ -656,7 +656,7 @@ try {
     if (__main__ == "ImageViewer") {
         var ourImageViewerApp = new ImageViewerApp(arguments);
         ourImageViewerApp.setup(800, 600, "ImageViewer");
-        window.backgroundColor = [0.5,0.5,0.5];
+        window.canvas.backgroundcolor = [0.5,0.5,0.5];
         ourImageViewerApp.go();
     }
 } catch (ex) {

@@ -44,7 +44,7 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewe
     }
 
     self.apply = function() {
-        window.backgroundColor = _myWidgets.background_color.color;
+        window.canvas.backgroundcolor = _myWidgets.background_color.color;
         _myGladeHandle.get_widget("headlight1").active = _myWidgets.headlight.active;
         _myGladeHandle.get_widget("sunlight1").active = _myWidgets.sunlight.active;
 

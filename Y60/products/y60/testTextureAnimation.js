@@ -66,7 +66,7 @@ TextAnimationTestApp.prototype.Constructor = function(obj, theSceneFile, theShad
 try {
     var ourTextAnimationTestApp = new TextAnimationTestApp(arguments[0], arguments[1]);    
     ourTextAnimationTestApp.setup(800, 600, "Sail away");   
-    window.backgroundColor= [0.8, 0.9, 1];        
+    window.canvas.backgroundcolor = [0.8, 0.9, 1];        
     ourTextAnimationTestApp.go();
 } catch (ex) {
     print("-----------------------------------------------------------------------------------------");

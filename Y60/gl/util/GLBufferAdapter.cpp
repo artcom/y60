@@ -200,7 +200,7 @@ namespace y60 {
         }
 
         if (_myCopyToRasterFlag) {
-            AC_DEBUG << "BufferToImage::performAction copy framebuffer to Image raster";
+            AC_DEBUG << "BufferToImage::performAction copy to raster Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " size=" << getWidth() << "x" << getHeight();
 
             // copy framebuffer to Image raster
             PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(_myImage->getRasterEncoding());
@@ -213,7 +213,7 @@ namespace y60 {
 
             _myImage->triggerUpload();
         } else {
-            AC_DEBUG << "BufferToImage::performAction copy framebuffer to Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " texid=" << _myImage->getGraphicsId() << " size=" << getWidth() << "x" << getHeight();
+            AC_DEBUG << "BufferToImage::performAction copy to texture Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " texid=" << _myImage->getGraphicsId() << " size=" << getWidth() << "x" << getHeight();
 
             // copy framebuffer to texture
             glBindTexture(GL_TEXTURE_2D, _myImage->ensureTextureId());

@@ -48,7 +48,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
         }
 
         if (self.enabled) {
-            var myBackgroundColor = window.backgroundColor;
+            var myBackgroundColor = window.canvas.backgroundcolor;
             var myBrightness = (myBackgroundColor[0] + myBackgroundColor[1] + myBackgroundColor[2]) / 3;
             var myTextColor = [1,1,1,1];
             if (myBrightness > 0.5) {

@@ -7,17 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: GlurViewer.js,v $
-//   $Author: david $
-//   $Revision: 1.6 $
-//   $Date: 2005/03/23 17:48:44 $
-//
-//
-//=============================================================================
 
 use("Overlay.js");
-
 plug("GlurFilter");
 
 if (arguments.length < 1) {
@@ -68,7 +59,7 @@ var window = new RenderWindow();
 
 var myOverlay = new ImageOverlay(window.scene, myFilename, [0,0]);
 myOverlay.position = [300, 100];
-window.backgroundColor = [0.5,0.5,0.5];
+window.canvas.backgroundcolor = [0.5,0.5,0.5];
 glurImage(myOverlay.image);
 
 

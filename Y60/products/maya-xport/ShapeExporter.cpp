@@ -261,7 +261,7 @@ ShapeExporter::outputPrimitives(y60::ShapeBuilder & theShapeBuilder,
     }
 
     try {
-        DB_Y(cerr << "ShapeExporter::outputPrimitives: mesh = "<< _myMesh->name().asChar()<<", myFaceCount = "<<myFaceCount<<endl);
+        //DB_Y(cerr << "ShapeExporter::outputPrimitives: mesh = "<< _myMesh->name().asChar()<<", myFaceCount = "<<myFaceCount<<endl);
         unsigned myUVSetWarningCount = 0;
         for (unsigned i = 0; i < myFaceCount; i++) {
             unsigned myVertexCountPerFace = _myMesh->polygonVertexCount(i, & myStatus);
