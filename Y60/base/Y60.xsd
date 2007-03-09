@@ -10,6 +10,12 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="Frustum">
+        <xs:annotation>
+            <xs:documentation>Type to specify a frustum that is used to compute the projection matrix.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="Quaternionf">
         <xs:annotation>
             <xs:documentation>Type for quaternions with float values.
@@ -396,6 +402,13 @@ The first two numbers in brackets represent the width and height of the raster.
 
 Example:
 [256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="ResizePolicy">
+        <xs:annotation>
+             <xs:documentation>Specifies how viewports and projective textures reshape the frustum
+if their size changes.</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -993,7 +1006,7 @@ This element can contain any number of canvas elements.</xs:documentation>
         <xs:annotation>
             <xs:documentation>OpenGl render area.
 Webster: A canvas is a piece of cloth backed or framed as a surface for a painting.
-Normally, there is just one canvas, with one viewport, with one camera rendering throw this viewport.
+Normally, there is just one canvas, with one viewport, with one camera rendering through this viewport.
 But a canvas can have multiple viewports. And there can be multiple canvases, too.
 Multiple canvases can be used for multi-view rendering of a scene, as it is used in Modelling Programs.
 A canvas can be used as texture for a material in the future.</xs:documentation>
@@ -1144,6 +1157,12 @@ Debug culling is disabled by default.</xs:documentation>
             <xs:attribute name="glow" type="xs:boolean">
                 <xs:annotation>
                     <xs:documentation>Turns rendering of glow on/off.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="resizepolicy" type="ResizePolicy">
+                <xs:annotation>
+                    <xs:documentation>This setting controls how the camera frustum is reshaped when the
+aspect of the viewport changes.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -2457,12 +2476,6 @@ and contains the reference to an image node.</xs:documentation>
                     <xs:documentation>Id of the image node referenced by this texture</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="projector" type="xs:IDREF">
-                <xs:annotation>
-                    <xs:documentation>reference to a projector node that specifies the frustum
-for projective texturing</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="applymode" type="TextureApplyMode">
                 <xs:annotation>
                     <xs:documentation>Defines how the texture is applied (blended) with the texture or color below
@@ -2487,6 +2500,18 @@ They are useful for particle rendering (snowflakes, etc.)</xs:documentation>
                     <xs:documentation>Defines a texture-coordinate matrix.
 All texture coordinates will be multiplied with this matrix.
 useful to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="projector" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Reference to a projector node that specifies the frustum
+for projective texturing</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="resizepolicy" type="ResizePolicy">
+                <xs:annotation>
+                    <xs:documentation>In case of projective textures this setting controls how
+the projector frustum is reshaped when the aspect of the texture changes.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
@@ -3028,28 +3053,9 @@ Several bodies can use the same skeleton. (e.g. for an army of marching soldiers
     <xs:complexType name="ProjectiveNodeType">
         <xs:complexContent>
             <xs:extension base="SceneGraphNodeType">
-                <xs:attribute name="hfov" type="xs:float">
+                <xs:attribute name="frustum" type="Frustum">
                     <xs:annotation>
-                        <xs:documentation>The horizontal field of view of the camera in degrees.
-The default is 54.4 degree, which is similar to the field of view of the eyes.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="width" type="xs:float">
-                    <xs:annotation>
-                        <xs:documentation>If this attribute is nonzero, the camera will be used in ortoghonal mode.
-The attribute then defines the width of the frustrum in GL/database units.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="nearplane" type="xs:float">
-                    <xs:annotation>
-                        <xs:documentation>Distance to the nearplane in units.
-Only objects beyond the nearplane will be rendered.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="farplane" type="xs:float">
-                    <xs:annotation>
-                        <xs:documentation>Distance to the farplane in units.
-Only objects closer than the farplane will be rendered.</xs:documentation>
+                        <xs:documentation>Specifies the projection properties for this node.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
             </xs:extension>

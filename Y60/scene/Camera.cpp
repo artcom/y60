@@ -23,12 +23,61 @@ namespace y60 {
     
     ProjectiveNode::ProjectiveNode(dom::Node & theNode) 
         : TransformHierarchyFacade(theNode),
-        HfovTag::Plug(theNode),
-        OrthoWidthTag::Plug(theNode),
-        NearPlaneTag::Plug(theNode),
-        FarPlaneTag::Plug(theNode)
+        FrustumTag::Plug(theNode)
+
+/*
+        dom::DynamicAttributePlug<HfovTag, ProjectiveNode>(this, & ProjectiveNode::getHfov),
+        dom::DynamicAttributePlug<OrthoWidthTag, ProjectiveNode>(this, & ProjectiveNode::getOrthoWidth),
+        dom::DynamicAttributePlug<NearPlaneTag, ProjectiveNode>(this, & ProjectiveNode::getNearPlane),
+        dom::DynamicAttributePlug<FarPlaneTag, ProjectiveNode>(this, & ProjectiveNode::getFarPlane)
+    */
     {}
     ProjectiveNode::~ProjectiveNode() {}
+
+    bool 
+    ProjectiveNode::getHFov(float & theValue) const {
+        float myVal = get<FrustumTag>().getHFov();
+        if (myVal != theValue) {
+            theValue = myVal;
+            return true;
+        }
+        return false;
+    }
+    bool
+    ProjectiveNode::getWidth(float & theValue) const {
+        float myVal = get<FrustumTag>().getWidth();
+        if (myVal != theValue) {
+            theValue = myVal;
+            return true;
+        }
+        return false;
+    }
+    bool
+    ProjectiveNode::getNearPlane(float & theValue) const {
+        float myVal = get<FrustumTag>().getNear();
+        if (myVal != theValue) {
+            theValue = myVal;
+            return true;
+        }
+        return false;
+    }
+    bool
+    ProjectiveNode::getFarPlane(float & theValue) const {
+        float myVal = get<FrustumTag>().getFar();
+        if (myVal != theValue) {
+            theValue = myVal;
+            return true;
+        }
+        return false;
+    }
+
+    void 
+    ProjectiveNode::updateFrustum(asl::ResizePolicy thePolicy, float theNewAspect ) {
+        asl::Frustum myFrustum = get<FrustumTag>();
+        myFrustum.changeAspectRatio( thePolicy, theNewAspect );
+        myFrustum.updatePlanes(get<GlobalMatrixTag>(), get<InverseGlobalMatrixTag>());
+        set<FrustumTag>( myFrustum ); // XXX [DS] Ain't nice ... writable values would come in handy here
+    }
 
     Camera::Camera(dom::Node & theNode) : ProjectiveNode( theNode ) {}
 

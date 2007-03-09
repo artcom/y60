@@ -3,6 +3,8 @@
 
 #include "TransformBuilderBase.h"
 
+#include <asl/Frustum.h>
+
 namespace y60 {
 
     class CameraBuilder : public TransformBuilderBase {
@@ -11,7 +13,10 @@ namespace y60 {
             virtual ~CameraBuilder();
 
             void setHFov(const float theViewingAngle);
+            void setShift( float theHShift, float theVShift);
         private:
+            void getFrustum( asl::Frustum & theFrustum );
+            void setFrustum( const asl::Frustum & theFrustum );
     };
 
     typedef asl::Ptr<CameraBuilder>    CameraBuilderPtr;

@@ -168,10 +168,12 @@ namespace y60 {
     static const char * CLASS_ATTRIB                = "class";
     static const char * VALUES_ATTRIB               = "values";
     static const char * COST_ATTRIB                 = "cost";
+    /*
     static const char * HORIZONTAL_FOV_ATTRIB       = "hfov";
     static const char * ORTHO_WIDTH_ATTRIB          = "width";
     static const char * FAR_PLANE_ATTRIB            = "farplane";
     static const char * NEAR_PLANE_ATTRIB           = "nearplane";
+    */
     static const char * CAMERA_ATTRIB               = "camera";
     static const char * LIGHT_SOURCE_ATTRIB         = "lightsource";
     static const char * SPOTLIGHT_CUTOFF_ATTRIB     = "cutoff";
@@ -218,8 +220,10 @@ namespace y60 {
     static const char * VIEWPORT_GLOW_ATTRIB        = "glow";
     static const char * VIEWPORT_CULLING_ATTRIB     = "culling";
     static const char * VIEWPORT_DEBUGCULLING_ATTRIB= "debugculling";
-    static const char * VIEWPORT_FRUSTUM_ATTRIB     = "frustum";
     static const char * PROJECTIONMATRIX_ATTRIB     = "projectionmatrix";
+
+    static const char * FRUSTUM_ATTRIB              = "frustum";
+    static const char * RESIZE_POLICY_ATTRIB        = "resizepolicy";
 
     static const char * OVERLAY_VISIBLE_ATTRIB      = "visible";
     static const char * OVERLAY_ALPHA_ATTRIB        = "alpha";

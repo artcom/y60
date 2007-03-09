@@ -480,7 +480,7 @@ namespace asl {
 
     void
     SvgPath::transformPathElements() {
-        if (_myMatrix.getType() != Matrix4f::IDENTITY) {
+        if (_myMatrix.getType() != IDENTITY) {
             for (unsigned i = 0; i < _myElements.size(); ++i) {
                 (*_myElements[i]) = product(  (*_myElements[i]), _myMatrix );
             }

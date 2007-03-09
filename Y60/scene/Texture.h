@@ -67,6 +67,7 @@ namespace y60 {
         public TextureApplyModeTag::Plug,
         public TextureSpriteTag::Plug,
         public TextureMatrixTag::Plug,
+        public ResizePolicyTag::Plug,
         public dom::FacadeAttributePlug<TextureImageTag>
     {
         public:

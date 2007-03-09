@@ -25,6 +25,7 @@
 
 #include "NodeNames.h"
 #include <dom/AttributePlug.h>
+#include <asl/Frustum.h>
 #include <asl/Box.h>
 #include <asl/Singleton.h>
 #include <asl/string_functions.h>
@@ -35,6 +36,9 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(NameTag,         std::string,   NAME_ATTRIB,     "JohnDoe");
     DEFINE_ATTRIBUT_TAG(VisibleTag,      bool,          VISIBLE_ATTRIB,  true);
     DEFINE_ATTRIBUT_TAG(Position2DTag,   asl::Vector2f, POSITION_ATTRIB, asl::Vector2f(0.f,0.f));
+    
+    // used by textures and viewports
+    DEFINE_ATTRIBUT_TAG(ResizePolicyTag, asl::ResizePolicy, RESIZE_POLICY_ATTRIB, asl::ADAPT_VERTICAL);
 
     struct IdTag : public asl::Singleton<IdTag> {
         typedef std::string TYPE;

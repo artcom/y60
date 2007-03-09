@@ -91,42 +91,42 @@ class JSBitset : public JSWrapper<BITSET> {
                 if (argc == 2) {
                     JSObject * myObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[0]);
                     if (!myObject) {
-                        JS_ReportError(cx,"JSQuaternion::Constructor: argument #1 must be a normalized Vector3f");
+                        JS_ReportError(cx,"JSBitset::Constructor: argument #1 must be a normalized Vector3f");
                         return JS_FALSE;
                     }
                     jsdouble myNumber;
                     if (JS_ValueToNumber(cx,argv[1],&myNumber) && !JSDOUBLE_IS_NaN(myNumber)) {
                         // construct from axis and angle
-                        myNewQuaternion = asl::Quaternion<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), Number(myNumber));
+                        myNewBitset = asl::Bitset<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), Number(myNumber));
                     } else {
                         JSObject * mySecondObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
                         if (mySecondObject) {
                             // Given two normalized Vectors, compute the quaternion between them
-                            myNewQuaternion = asl::Quaternion<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), JSVector<asl::Vector3<Number> >::getNativeRef(cx,mySecondObject));
+                            myNewBitset = asl::Bitset<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), JSVector<asl::Vector3<Number> >::getNativeRef(cx,mySecondObject));
                         } else {
-                            JS_ReportError(cx,"JSQuaternion::Constructor: argument #2 must be a float or a Vector3f");
+                            JS_ReportError(cx,"JSBitset::Constructor: argument #2 must be a float or a Vector3f");
                             return JS_FALSE;
                         }
                     }
-                    myNewObject = new JSQuaternion(myNewValue);
+                    myNewObject = new JSBitset(myNewValue);
                 } else if (argc == 1) {
-                    // construct from one Quaternion
+                    // construct from one Bitset
                     if (JSVAL_IS_VOID(argv[0])) {
-                        JS_ReportError(cx,"JSQuaternion::Constructor: need one argument");
+                        JS_ReportError(cx,"JSBitset::Constructor: need one argument");
                         return JS_FALSE;
                     }
 
                     asl::Vector4<Number> myVector4;
 
-                    if (convertFrom(cx, argv[0], myNewQuaternion)) {
-                        myNewObject = new JSQuaternion(myNewValue);
+                    if (convertFrom(cx, argv[0], myNewBitset)) {
+                        myNewObject = new JSBitset(myNewValue);
 
                     } else if (convertFrom(cx, argv[0], myVector4)) {
-                        myNewQuaternion = asl::Quaternion<Number>(myVector4);
-                        myNewObject = new JSQuaternion(myNewValue);
+                        myNewBitset = asl::Bitset<Number>(myVector4);
+                        myNewObject = new JSBitset(myNewValue);
 
                     } else {
-                        JS_ReportError(cx,"JSQuaternion::Constructor: argument #1 must be a Quaternion or a Vector4");
+                        JS_ReportError(cx,"JSBitset::Constructor: argument #1 must be a Bitset or a Vector4");
                         return JS_FALSE;
                     }
 
@@ -135,12 +135,12 @@ class JSBitset : public JSWrapper<BITSET> {
                     for (int i = 0; i < 4 ;++i) {
                         jsdouble myNumber;
                         if (!JS_ValueToNumber(cx,argv[i],&myNumber) && !JSDOUBLE_IS_NaN(myNumber)) {
-                            JS_ReportError(cx,"JSQuaternion::Constructor: argument #%d must be a float", i);
+                            JS_ReportError(cx,"JSBitset::Constructor: argument #%d must be a float", i);
                             return JS_FALSE;
                         }
-                        myNewQuaternion[i] = float(myNumber);
+                        myNewBitset[i] = float(myNumber);
                     }
-                    myNewObject = new JSQuaternion(myNewValue);
+                    myNewObject = new JSBitset(myNewValue);
                 } else {
                     */
                     JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0,1 or 2, got %d",ClassName(), argc);

@@ -617,6 +617,7 @@ namespace y60 {
             ""
     };
     DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum);   
+
 }
 
 #endif

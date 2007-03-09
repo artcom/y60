@@ -515,10 +515,15 @@ namespace y60 {
                         theTexture.getImage()->get<ImageHeightTag>(), 0.0f, 1.0f);
         const Matrix4f & myImageMatrix = theTexture.getImage()->get<ImageMatrixTag>();
         Vector4f mySize = myPoTSize * myImageMatrix;
-        float myAspect( mySize[0] / mySize[1] );
-        Frustum myFrustum;
-        myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
-                myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), myAspect);
+        float myAspect( mySize[0] / mySize[1] ); // XXX [DS ]this aspect allready contains the image matrix
+                                                 // TODO: think about the texture matrix...
+                                                        
+        myProjector->updateFrustum( theTexture.get<ResizePolicyTag>(), myAspect );
+
+        const Frustum & myFrustum = myProjector->get<FrustumTag>();
+        // XXX myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
+        //        myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), myAspect);
+
         Matrix4f myProjectionMatrix;
         myFrustum.getProjectionMatrix( myProjectionMatrix );
         theMatrix.assign(theCamera.get<y60::GlobalMatrixTag>());
@@ -570,6 +575,7 @@ namespace y60 {
                             glMatrixMode( GL_TEXTURE );
 
                             const Texture & myTexture = theMaterial.getTexture( myTexUnit );
+
                             const std::string & myProjectorId = myTexture.get<TextureProjectorIdTag>();
                             if ( ! myProjectorId.empty() ) {
                                 Matrix4f myTextureMatrix;

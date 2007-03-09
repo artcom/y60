@@ -254,9 +254,9 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myClipNearPos = new Point3f(myPosX, myPosY, -1);
         var myClipFarPos = new Point3f(myPosX, myPosY, +1);
 
-        var myProjectionMatrix = myViewport.projectionmatrix;
-        myProjectionMatrix.invert();
         var myCamera = obj.getViewportCamera();
+        var myProjectionMatrix = myCamera.frustum.projectionmatrix;
+        myProjectionMatrix.invert();
         myProjectionMatrix.postMultiply(myCamera.globalmatrix);
 
     	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);

@@ -21,15 +21,16 @@
 #include <y60/NodeNames.h>
 #include <dom/Nodes.h>
 
+using namespace asl;
+
 namespace y60 {
     CameraBuilder::CameraBuilder(const std::string & theName) :
         TransformBuilderBase(CAMERA_NODE_NAME, theName)
     {
         dom::NodePtr myNode = getNode();
         if (!myNode->hasFacade()) {
-            myNode->appendAttribute(HORIZONTAL_FOV_ATTRIB, "54.0");
-            myNode->appendAttribute(NEAR_PLANE_ATTRIB, "0.1");
-            myNode->appendAttribute(FAR_PLANE_ATTRIB, "10000");
+            Frustum myFrustum(54.0f, 54.0f, 0.1f, 10000.0f);
+            myNode->appendAttribute(FRUSTUM_ATTRIB, asl::as_string( myFrustum ) );
         }
     }
 
@@ -38,10 +39,42 @@ namespace y60 {
 
     void
     CameraBuilder::setHFov(const float theViewingAngle) {
+        Frustum myFrustum;
+        getFrustum( myFrustum );
+
+        myFrustum.setHFov( theViewingAngle );
+
+        setFrustum( myFrustum );
+    }
+
+    void
+    CameraBuilder::setShift(float theHShift, float theVShift) {
+        Frustum myFrustum;
+        getFrustum( myFrustum );
+
+        myFrustum.setHShift( theHShift );
+        myFrustum.setVShift( theVShift );
+
+        setFrustum( myFrustum );
+    }
+
+    void
+    CameraBuilder::getFrustum( Frustum & theFrustum ) {
         if (getNode()->hasFacade()) {
-            getNode()->getFacade<Camera>()->set<HfovTag>(theViewingAngle);
+            theFrustum = getNode()->getFacade<Camera>()->get<FrustumTag>();
         } else {
-            getNode()->getAttribute(HORIZONTAL_FOV_ATTRIB)->nodeValue(asl::as_string(theViewingAngle));
+            std::string myStr = getNode()->getAttribute(FRUSTUM_ATTRIB)->nodeValue();
+            theFrustum = asl::as<Frustum>( myStr );
         }
+    }
+
+    void
+    CameraBuilder::setFrustum(const Frustum & theFrustum) {
+        if (getNode()->hasFacade()) {
+            getNode()->getFacade<Camera>()->set<FrustumTag>( theFrustum );
+        } else {
+            getNode()->getAttribute(FRUSTUM_ATTRIB)->nodeValue(asl::as_string( theFrustum ));
+        }
+    
     }
 }

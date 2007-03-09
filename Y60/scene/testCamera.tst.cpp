@@ -80,7 +80,7 @@ class CameraUnitTest : public UnitTest {
             ENSURE(myCameraNode->getAttribute("scale")->nodeValue() == "[1,1,1]");
             DPRINT(myCameraNode->getAttribute("orientation")->nodeValue());
             ENSURE(myCameraNode->getAttribute("orientation")->nodeValue() == "[0,0,0,1]");
-            ENSURE(myCameraNode->getAttribute("hfov")->nodeValue() == "45");
+            // XXX ENSURE(myCameraNode->getAttribute("hfov")->nodeValue() == "45");
         }
 };
 

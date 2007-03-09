@@ -11,11 +11,13 @@
 #include "JSVector.h"
 #include "JSFrustum.h"
 #include "JSPlane.h"
+#include "JSMatrix.h"
 #include "JSWrapper.impl"
 
 #include <iostream>
 
 using namespace std;
+using namespace asl;
 
 namespace jslib {
 
@@ -29,7 +31,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = asl::as_string(JSFrustum::getJSWrapper(cx,obj).getNative());
-*rval = as_jsval(cx, myStringRep);
+    * rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -44,14 +46,14 @@ JSFrustum::Functions() {
     return myFunctions;
 }
 
-#define DEFINE_FLAG(NAME) { #NAME, PROP_ ## NAME , asl::Frustum::NAME }
+#define DEFINE_FLAG(NAME) { #NAME, PROP_ ## NAME , asl::NAME }
 
 JSConstIntPropertySpec *
 JSFrustum::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         DEFINE_FLAG(PERSPECTIVE),
-        DEFINE_FLAG(ORTHO),
+        DEFINE_FLAG(ORTHONORMAL),
         {0}
     };
     return myProperties;
@@ -66,12 +68,22 @@ JSFrustum::Properties() {
         {"bottom", PROP_bottom, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"near", PROP_near, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"far", PROP_far, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+
+        {"hfov", PROP_hfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"vfov", PROP_vfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"width", PROP_width, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"height", PROP_height, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+
+        {"type", PROP_type, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+
         {"left_plane", PROP_left_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"right_plane", PROP_right_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"top_plane", PROP_top_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"bottom_plane", PROP_bottom_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"near_plane", PROP_near_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"far_plane", PROP_far_plane, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+
+        {"projectionmatrix", PROP_projectionmatrix, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -130,6 +142,24 @@ JSFrustum::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
             case PROP_far_plane:
                 *vp = as_jsval(cx, getNative().getFarPlane());
                 return JS_TRUE;
+            case PROP_projectionmatrix:
+                *vp = as_jsval(cx, getNative().getProjectionMatrix());
+                return JS_TRUE;
+            case PROP_width:
+                *vp = as_jsval(cx, getNative().getWidth());
+                return JS_TRUE;
+            case PROP_height:
+                *vp = as_jsval(cx, getNative().getHeight());
+                return JS_TRUE;
+            case PROP_hfov:
+                *vp = as_jsval(cx, getNative().getHFov());
+                return JS_TRUE;
+            case PROP_vfov:
+                *vp = as_jsval(cx, getNative().getVFov());
+                return JS_TRUE;
+            case PROP_type:
+                *vp = as_jsval(cx, getNative().getType());
+                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSFrustum::getProperty: index %d out of range", theID);
                 return JS_FALSE;
@@ -183,6 +213,41 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
                 myObj.getNative().setFar(myValue);
                 return JS_TRUE;
             }
+        case PROP_width:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setWidth(myValue);
+                return JS_TRUE;
+            }
+        case PROP_height:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setHeight(myValue);
+                return JS_TRUE;
+            }
+        case PROP_hfov:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setHFov(myValue);
+                return JS_TRUE;
+            }
+        case PROP_vfov:
+            {
+                double myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setVFov(myValue);
+                return JS_TRUE;
+            }
+        case PROP_type:
+            {
+                ProjectionType myProjection;
+                convertFrom(cx, * vp, myProjection);
+                myObj.getNative().setType(myProjection);
+                return JS_TRUE;
+            }
         default:
             JS_ReportError(cx,"JSFrustum::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
@@ -206,6 +271,10 @@ JSFrustum::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     if (argc == 0) {
         // construct empty
         myNewObject = new JSFrustum(myNewValue);
+    } else if (argc == 1) {
+        if ( convertFrom(cx, argv[0], myNewFrustum ) ) {
+            myNewObject = new JSFrustum( myNewValue );
+        }
     } else {
         JS_ReportError(cx,"Constructor for %s not yet implemented!",ClassName());
     }
@@ -226,6 +295,20 @@ JSFrustum::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClass;
 
 }
+
+bool convertFrom(JSContext *cx, jsval theValue, JSFrustum::NativeValuePtr & theValuePtr) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<asl::Frustum>::Class()) {
+                theValuePtr = JSClassTraits<asl::Frustum>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 bool convertFrom(JSContext *cx, jsval theValue, asl::Frustum & theFrustum) {
     if (JSVAL_IS_OBJECT(theValue)) {

@@ -120,7 +120,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     obj.transformWorldToClip = function(theWorldPos) {
         var myProjectionMatrix = new Matrix4f(_myRenderWindow.camera.globalmatrix);
         myProjectionMatrix.invert();
-        myProjectionMatrix.postMultiply(_myRenderWindow.projectionmatrix);
+        myProjectionMatrix.postMultiply(_myRenderWindow.camera.frustum.projectionmatrix);
         return product(theWorldPos, myProjectionMatrix);
     }
 

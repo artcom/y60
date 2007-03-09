@@ -133,6 +133,12 @@ SceneExporter::writeCamera(y60::WorldBuilderBasePtr theTransformBuilder, CameraO
     myCameraBuilder->setHFov(asl::degFromRad(2.0f *
         (atan(theNode->GetAperture() / (2.0f * theNode->GetFocus())))));
 
+    BaseContainer * myContainer = theNode->GetDataInstance();
+    if (myContainer) {
+        Real myXOffset = myContainer->GetReal(CAMERAOBJECT_FILM_OFFSET_X);
+        Real myYOffset = myContainer->GetReal(CAMERAOBJECT_FILM_OFFSET_Y);
+        myCameraBuilder->setShift( myXOffset, myYOffset );
+    }
     return myCameraBuilder;
 }
 

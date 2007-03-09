@@ -306,7 +306,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
             myScreenAlignedMatrix.assign(myRightVec[0], myRightVec[1], myRightVec[2], 0,
                     myCamUpVector[0],myCamUpVector[1],myCamUpVector[2],0,
                     myCamViewVector[0],myCamViewVector[1],myCamViewVector[2],0,
-                    0,0,0,1, Matrix4<float>::ROTATING);
+                    0,0,0,1, ROTATING);
             glMultMatrixf(myScreenAlignedMatrix.getData());
         }
         glTranslatef( - myPivot[0], - myPivot[1], - myPivot[2]);
@@ -579,22 +579,22 @@ MAKE_SCOPE_TIMER(switchMaterial);
                   Vector4f(1.0, 0.5, 0.5, 1.0));
     }
 
+    /*
     void
-    Renderer::renderFrustum(const ViewportPtr & theViewport) {
+    Renderer::renderFrustum(const CameraPtr & theCamera) {
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
 
-        theViewport->get<ViewportFrustumTag>().getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
+        theCamera->get<FrustumTag>().getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   Vector4f(0.5, 1.0, 0.5, 1.0), Vector4f(1.0, 0.5, 0.0, 1.0));
     }
+    */
 
     void
-    Renderer::renderFrustum( dom::NodePtr theProjectiveNode, const float & theAspect) {
-        Frustum myFrustum;
+    Renderer::renderFrustum( dom::NodePtr theProjectiveNode ) {
         ProjectiveNodePtr myProjector = theProjectiveNode->getFacade<ProjectiveNode>();
-        myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
-                myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), theAspect);
+        Frustum myFrustum = myProjector->get<FrustumTag>(); // XXX superfluous copy
 
         Point3f myCamPos = myProjector->get<PositionTag>();
         Point3f myLTF, myRBF, myRTF, myLBF;
@@ -928,9 +928,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         // compensate for field of view (90° results in factor=1)
         float myZoomAdjustment = 0.0f;
-        float myFOV = theCamera->get<HfovTag>();
+        float myFOV = theCamera->get<FrustumTag>().getHFov();
         if (myFOV < 180.0f) {
-            myZoomAdjustment = float(tan(radFromDeg(theCamera->get<HfovTag>()/2.0f)));
+            myZoomAdjustment = float(tan(radFromDeg( myFOV / 2.0f)));
         }
 
         // apply lodscale
@@ -988,7 +988,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         // Check culling
         bool myOverlapFrustumFlag = true;
-        const Frustum & myFrustum = theViewport->get<ViewportFrustumTag>();
+        const Frustum & myFrustum = theCamera->get<FrustumTag>();
         {
 
             DBP(MAKE_SCOPE_TIMER(createRenderList_cull));
@@ -1176,9 +1176,11 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
             if (theViewport->get<ViewportCullingTag>()) {
                 if (theViewport->get<ViewportDebugCullingTag>()) {
-                    renderFrustum(theViewport);
+                    renderFrustum( myCameraNode );
                 } else {
-                    theViewport->updateClippingPlanes();
+                    //theViewport->updateClippingPlanes();
+                    // XXX Good place to do the aspect correction
+                    theViewport->applyAspectToCamera();
                 }
             }
 
@@ -1186,7 +1188,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
             glLoadIdentity();
             CHECK_OGL_ERROR;
 
-            setProjection(theViewport);
+            setProjection(theViewport, myCamera);
             CHECK_OGL_ERROR;
 
             // don't render anything if world isn't visible
@@ -1258,7 +1260,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 glDisable(GL_FOG);
 
                 // (8) render analytic geometry
-                renderAnalyticGeometry( theViewport);
+                renderAnalyticGeometry( theViewport, myCamera );
             }
         }
 
@@ -1284,10 +1286,14 @@ MAKE_SCOPE_TIMER(switchMaterial);
     }
 
     void
-    Renderer::setProjection(ViewportPtr theViewport) {
+    Renderer::setProjection(ViewportPtr theViewport, CameraPtr theCamera) {
         glMatrixMode(GL_PROJECTION);
-        DB(AC_TRACE << "setting proj matrix to " << theViewport->get<ProjectionMatrixTag>() << endl);
-        glLoadMatrixf(static_cast<const GLfloat *>(theViewport->get<ProjectionMatrixTag>().getData()));
+        const Frustum & myFrustum = theCamera->get<FrustumTag>();
+        Matrix4f myProjectionMatrix = myFrustum.getProjectionMatrix();
+        DB(AC_TRACE << "setting proj matrix to " << myProjectionMatrix << endl);
+        //AC_PRINT << "Renderer::setProjection(): setting frustum: " << myFrustum << endl;
+        //AC_PRINT << "Renderer::setProjection(): setting proj matrix to " << myProjectionMatrix << endl;
+        glLoadMatrixf(static_cast<const GLfloat *>(myProjectionMatrix.getData()));
         glMatrixMode(GL_MODELVIEW);
     }
 
@@ -1538,7 +1544,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         GLfloat rgba[4] = { 1.0, 1.0, 1.0, 1.0 };
         glColor4fv(rgba);
 
-        const float mySize = theCamera->get<FarPlaneTag>() / 2;
+        const float mySize = theCamera->get<FrustumTag>().getFar() / 2;
         DB(AC_TRACE << "drawing skybox. Size=" << mySize << endl;);
         //glDepthMask(GL_FALSE);
         _myState->setDepthWrites(false);
@@ -1828,8 +1834,8 @@ MAKE_SCOPE_TIMER(switchMaterial);
     }
 
     void 
-    Renderer::renderAnalyticGeometry( ViewportPtr theViewport) {
-        const Frustum & myFrustum = theViewport->get<ViewportFrustumTag>();
+    Renderer::renderAnalyticGeometry( ViewportPtr theViewport, CameraPtr theCamera) {
+        const Frustum & myFrustum = theCamera->get<FrustumTag>();
         bool myOverlapFrustumFlag = true;
 
         MAKE_SCOPE_TIMER(renderAnalyticGeometry);

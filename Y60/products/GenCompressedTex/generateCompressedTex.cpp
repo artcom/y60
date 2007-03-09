@@ -10,9 +10,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 
 #include <y60/GLUtils.h>
-#include <y60/SDLWindow.h>"
-#include <y60/GLResourceManager.h>"
-#include "SDL/SDL.h"
+#include <y60/SDLWindow.h>
+#include <y60/GLResourceManager.h>
 
 #include <y60/PixelEncoding.h>
 #include <y60/TextureCompressor.h>
@@ -40,6 +39,8 @@
 #include <paintlib/Filter/plfilterflip.h>
 #include <paintlib/Filter/plfiltercrop.h>
 #include <paintlib/plpngenc.h>
+
+#include <SDL/SDL.h>
 
 using namespace std;
 using namespace asl;

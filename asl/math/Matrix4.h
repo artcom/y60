@@ -27,26 +27,112 @@
 #include "Point234.h"
 #include "numeric_functions.h"
 
+#include <asl/Enum.h>
+
 namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
 
-    static const char * MatrixTypeStrings[] =
-    {
-        "identity",
-        "x_rotating",
-        "y_rotating",
-        "z_rotating",
-        "rotating",
-        "scaling",
-        "orthogonal",
-        "linear",
-        "translating",
-        "affine",
-        "unknown",
-        0
-    };
+    /** @relates Matrix4
+     * - Identity: @f[ I = \left( \begin{array}{cccc}
+     *                           1 & 0 & 0 & 0 \\
+     *                           0 & 1 & 0 & 0 \\
+     *                           0 & 0 & 1 & 0 \\
+     *                           0 & 0 & 0 & 1 \\
+     *                      \end{array} \right) @f]
+     *
+     * All rotations are performed clockwise.
+     *  - X rotating: @f[ M_{XRot} = \left( \begin{array}{cccc}
+     *                          1 &  0            & 0            & 0 \\
+     *                          0 &  \cos(\alpha) & \sin(\alpha) & 0 \\
+     *                          0 & -\sin(\alpha) & \cos(\alpha) & 0 \\
+     *                          0 &  0            & 0            & 1 \\
+     *                    \end{array} \right) @f]
+     *
+     * - Y rotating: @f[ M_{YRot} = \left( \begin{array}{cccc}
+     *                        \cos(\alpha) & 0 & -\sin(\alpha) & 0 \\
+     *                        0            & 1 &  0            & 0 \\
+     *                        \sin(\alpha) & 0 &  \cos(\alpha) & 0 \\
+     *                        0            & 0 &  0            & 1 \\
+     *                   \end{array} \right) @f]
+     *
+     * - Z rotating: @f[ M_{ZRot} = \left( \begin{array}{cccc}
+     *                      \cos(\alpha)  & \sin(\alpha) & 0 & 0 \\
+     *                      -\sin(\alpha) & \cos(\alpha) & 0 & 0 \\
+     *                      0             & 0            & 1 & 0 \\
+     *                      0             & 0            & 0 & 1 \\
+     *                   \end{array} \right) @f]
+     *
+     * - Rotating:
+     *   Any combination of X, Y and Z rotating matrices
+     *
+     * - Scaling: @f[ M_{Scale} = \left( \begin{array}{cccc}
+     *                      ? & 0 & 0 & 0 \\
+     *                      0 & ? & 0 & 0 \\
+     *                      0 & 0 & ? & 0 \\
+     *                      0 & 0 & 0 & 1 \\
+     *                   \end{array} \right) @f]
+     *
+     * - Orthogonal:  @f[ M_{ortho} = \left( \begin{array}{cccc}
+     *                      ? & ? & ? & 0 \\
+     *                      ? & ? & ? & 0 \\
+     *                      ? & ? & ? & 0 \\
+     *                      0 & 0 & 0 & 1 \\
+     *                   \end{array} \right) @f]
+     *     - a matrix is orthogonal if @f$ MM^T = I @f$ where @f$M^T@f$ is
+     *       the transpose of @f$M@f$ and @f$I@f$ is the identity matrix.
+     *     - scaling * rotating = orthogonal
+     *     - orthogonal * orthogonal = orthogonal
+     *
+     * - Linear: @f[ M_{linear} = \left( \begin{array}{cccc}
+     *                    ? & ? & ? & 0 \\
+     *                    ? & ? & ? & 0 \\
+     *                    ? & ? & ? & 0 \\
+     *                    0 & 0 & 0 & 1 \\
+     *               \end{array} \right) @f]
+     *     - linear * linear = linear
+     *
+     * - Translating: M_{Trans} = @f[ \left( \begin{array}{cccc}
+     *                          1 & 0 & 0 & 0 \\
+     *                          0 & 1 & 0 & 0 \\
+     *                          0 & 0 & 1 & 0 \\
+     *                          ? & ? & ? & 1 \\
+     *                    \end{array} \right) @f]
+     *
+     * - Affine: @f[ M_{Affine} = \left( \begin{array}{cccc}
+     *                      ? & ? & ? & 0 \\
+     *                      ? & ? & ? & 0 \\
+     *                      ? & ? & ? & 0 \\
+     *                      ? & ? & ? & 1 \\
+     *               \end{array} \right) @f]
+     *     - affine * affine = affine
+     *
+     *  - Unknown: @f[ M = \left( \begin{array}{cccc}
+     *                      ? & ? & ? & ? \\
+     *                      ? & ? & ? & ? \\
+     *                      ? & ? & ? & ? \\
+     *                      ? & ? & ? & ? \\
+     *                 \end{array} \right) @f]
+     */
+     // Make sure to add a string to MatrixTypeStrings[] in the cpp file for each enum
+     enum MatrixTypeEnum {
+         IDENTITY,
+         X_ROTATING,
+         Y_ROTATING,
+         Z_ROTATING,
+         ROTATING,
+         SCALING,
+         ORTHOGONAL,
+         LINEAR,
+         TRANSLATING,
+         AFFINE,
+         UNKNOWN,
+         MatrixTypeEnum_MAX
+     };
+
+     DEFINE_ENUM( MatrixType, MatrixTypeEnum );
+
 
     template <class Number>
     class Matrix4 : protected Matrix4Base<Number> {
@@ -90,102 +176,6 @@ namespace asl {
         // avoids gcc 3.2 warning about implicit
         typedef typename Matrix4Base<Number>::Row Row;
         typedef typename Matrix4Base<Number>::Column Column;
-
-        /**
-         * - Identity: @f[ I = \left( \begin{array}{cccc}
-         *                           1 & 0 & 0 & 0 \\
-         *                           0 & 1 & 0 & 0 \\
-         *                           0 & 0 & 1 & 0 \\
-         *                           0 & 0 & 0 & 1 \\
-         *                      \end{array} \right) @f]
-         *
-         * All rotations are performed clockwise.
-         *  - X rotating: @f[ M_{XRot} = \left( \begin{array}{cccc}
-         *                          1 &  0            & 0            & 0 \\
-         *                          0 &  \cos(\alpha) & \sin(\alpha) & 0 \\
-         *                          0 & -\sin(\alpha) & \cos(\alpha) & 0 \\
-         *                          0 &  0            & 0            & 1 \\
-         *                    \end{array} \right) @f]
-         *
-         * - Y rotating: @f[ M_{YRot} = \left( \begin{array}{cccc}
-         *                        \cos(\alpha) & 0 & -\sin(\alpha) & 0 \\
-         *                        0            & 1 &  0            & 0 \\
-         *                        \sin(\alpha) & 0 &  \cos(\alpha) & 0 \\
-         *                        0            & 0 &  0            & 1 \\
-         *                   \end{array} \right) @f]
-         *
-         * - Z rotating: @f[ M_{ZRot} = \left( \begin{array}{cccc}
-         *                      \cos(\alpha)  & \sin(\alpha) & 0 & 0 \\
-         *                      -\sin(\alpha) & \cos(\alpha) & 0 & 0 \\
-         *                      0             & 0            & 1 & 0 \\
-         *                      0             & 0            & 0 & 1 \\
-         *                   \end{array} \right) @f]
-         *
-         * - Rotating:
-         *   Any combination of X, Y and Z rotating matrices
-         *
-         * - Scaling: @f[ M_{Scale} = \left( \begin{array}{cccc}
-         *                      ? & 0 & 0 & 0 \\
-         *                      0 & ? & 0 & 0 \\
-         *                      0 & 0 & ? & 0 \\
-         *                      0 & 0 & 0 & 1 \\
-         *                   \end{array} \right) @f]
-         *
-         * - Orthogonal:  @f[ M_{ortho} = \left( \begin{array}{cccc}
-         *                      ? & ? & ? & 0 \\
-         *                      ? & ? & ? & 0 \\
-         *                      ? & ? & ? & 0 \\
-         *                      0 & 0 & 0 & 1 \\
-         *                   \end{array} \right) @f]
-         *     - a matrix is orthogonal if @f$ MM^T = I @f$ where @f$M^T@f$ is
-         *       the transpose of @f$M@f$ and @f$I@f$ is the identity matrix.
-         *     - scaling * rotating = orthogonal
-         *     - orthogonal * orthogonal = orthogonal
-         *
-         * - Linear: @f[ M_{linear} = \left( \begin{array}{cccc}
-         *                    ? & ? & ? & 0 \\
-         *                    ? & ? & ? & 0 \\
-         *                    ? & ? & ? & 0 \\
-         *                    0 & 0 & 0 & 1 \\
-         *               \end{array} \right) @f]
-         *     - linear * linear = linear
-         *
-         * - Translating: M_{Trans} = @f[ \left( \begin{array}{cccc}
-         *                          1 & 0 & 0 & 0 \\
-         *                          0 & 1 & 0 & 0 \\
-         *                          0 & 0 & 1 & 0 \\
-         *                          ? & ? & ? & 1 \\
-         *                    \end{array} \right) @f]
-         *
-         * - Affine: @f[ M_{Affine} = \left( \begin{array}{cccc}
-         *                      ? & ? & ? & 0 \\
-         *                      ? & ? & ? & 0 \\
-         *                      ? & ? & ? & 0 \\
-         *                      ? & ? & ? & 1 \\
-         *               \end{array} \right) @f]
-         *     - affine * affine = affine
-         *
-         *  - Unknown: @f[ M = \left( \begin{array}{cccc}
-         *                      ? & ? & ? & ? \\
-         *                      ? & ? & ? & ? \\
-         *                      ? & ? & ? & ? \\
-         *                      ? & ? & ? & ? \\
-         *                 \end{array} \right) @f]
-         */
-         // Make sure to add a string to MatrixTypeStrings[] for each enum
-        enum MatrixType {
-            IDENTITY,
-            X_ROTATING,
-            Y_ROTATING,
-            Z_ROTATING,
-            ROTATING,
-            SCALING,
-            ORTHOGONAL,
-            LINEAR,
-            TRANSLATING,
-            AFFINE,
-            UNKNOWN
-        };
 
 
         static const Matrix4<Number> & Identity() {
@@ -331,7 +321,7 @@ namespace asl {
 		}
 
         std::string getTypeString() const {
-            return getStringFromEnum(_myType, asl::MatrixTypeStrings);
+            return _myType.asString();
         }
 
         void makeIdentity() {
@@ -1371,32 +1361,32 @@ unknown:
 
    template <class Number>
    void multiply(const Point3<Number> & p, const Matrix4<Number> & m, Point3<Number> & myResult) {
-        if (m.getType() == Matrix4<Number>::IDENTITY) {
+        if (m.getType() == IDENTITY) {
             //myResult = p;
             myResult[0] = p[0];
             myResult[1] = p[1];
             myResult[2] = p[2];
             return;
         }
-        if (m.getType() == Matrix4<Number>::TRANSLATING) {
+        if (m.getType() == TRANSLATING) {
             myResult[0] = p[0] + m[3][0];
             myResult[1] = p[1] + m[3][1];
             myResult[2] = p[2] + m[3][2];
             return;
         }
-        if (m.getType() == Matrix4<Number>::SCALING) {
+        if (m.getType() == SCALING) {
             myResult[0] = p[0] * m[0][0];
             myResult[1] = p[1] * m[1][1];
             myResult[2] = p[2] * m[2][2];
             return;
         }
-        if (m.getType() <= Matrix4<Number>::LINEAR) {
+        if (m.getType() <= LINEAR) {
             myResult[0] = p[0] * m[0][0] + p[1] * m[1][0] + p[2] * m[2][0];
             myResult[1] = p[0] * m[0][1] + p[1] * m[1][1] + p[2] * m[2][1];
             myResult[2] = p[0] * m[0][2] + p[1] * m[1][2] + p[2] * m[2][2];
             return;
         }
-        if (m.getType() == Matrix4<Number>::AFFINE) {
+        if (m.getType() == AFFINE) {
             myResult[0] = p[0] * m[0][0] + p[1] * m[1][0] + p[2] * m[2][0] + m[3][0];
             myResult[1] = p[0] * m[0][1] + p[1] * m[1][1] + p[2] * m[2][1] + m[3][1];
             myResult[2] = p[0] * m[0][2] + p[1] * m[1][2] + p[2] * m[2][2] + m[3][2];
@@ -1438,32 +1428,32 @@ unknown:
 
     template <class Number>
     void multiply(const Vector4<Number> & v, const Matrix4<Number> & m, Vector4<Number> & myResult) {
-        if (m.getType() == Matrix4<Number>::IDENTITY) {
+        if (m.getType() == IDENTITY) {
             myResult = v;
             return;
         }
-        if (m.getType() == Matrix4<Number>::TRANSLATING) {
+        if (m.getType() == TRANSLATING) {
             myResult[0] = v[0] + v[3] * m[3][0];
             myResult[1] = v[1] + v[3] * m[3][1];
             myResult[2] = v[2] + v[3] * m[3][2];
             myResult[3] = v[3];
             return;
         }
-        if (m.getType() == Matrix4<Number>::SCALING) {
+        if (m.getType() == SCALING) {
             myResult[0] = v[0] * m[0][0];
             myResult[1] = v[1] * m[1][1];
             myResult[2] = v[2] * m[2][2];
             myResult[3] = v[3];
             return;
         }
-        if (m.getType() <= Matrix4<Number>::LINEAR) {
+        if (m.getType() <= LINEAR) {
             myResult[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0];
             myResult[1] = v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1];
             myResult[2] = v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2];
             myResult[3] = v[3];
             return;
         }
-        if (m.getType() == Matrix4<Number>::AFFINE) {
+        if (m.getType() == AFFINE) {
             myResult[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0] + v[3] * m[3][0];
             myResult[1] = v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1] + v[3] * m[3][1];
             myResult[2] = v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2] + v[3] * m[3][2];
@@ -1500,14 +1490,14 @@ unknown:
 
     template <class Number>
     Vector3<Number> transformedVector(const Vector3<Number> & v, const Matrix4<Number> & m) {
-        if (m.getType() == Matrix4<Number>::IDENTITY ||
-            m.getType() == Matrix4<Number>::TRANSLATING ||
-           (m.getType() == Matrix4<Number>::SCALING && m[0][0] == m[1][1] && m[1][1] == m[2][2]))
+        if (m.getType() == IDENTITY ||
+            m.getType() == TRANSLATING ||
+           (m.getType() == SCALING && m[0][0] == m[1][1] && m[1][1] == m[2][2]))
         {
             return v;
         }
 
-        if (m.getType() <= Matrix4<Number>::ROTATING) {
+        if (m.getType() <= ROTATING) {
             return asVector(asPoint(v) * m);
         }
 
@@ -1530,7 +1520,7 @@ unknown:
         myAdjointTransposed[3][2] = 0;
         myAdjointTransposed[3][3] = 1;
 
-        myAdjointTransposed.setType(Matrix4<Number>::LINEAR);
+        myAdjointTransposed.setType(LINEAR);
 
         return asVector(asPoint(v) * myAdjointTransposed);
     }
@@ -1603,7 +1593,7 @@ unknown:
 
     template<class Number>
     std::ostream & printMatrix( std::ostream & os, const asl::Matrix4<Number> & theMatrix) {
-        os << MatrixTypeStrings[theMatrix.getType()];
+        os << theMatrix.getType();
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printVector(os, theMatrix.getBase(),
                     os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
@@ -1621,6 +1611,7 @@ unknown:
                                const char theEndToken = ']',
                                const char theDelimiter = ',')
     {
+        /*
         std::string myMatrixType;
         char c;
         // 1. we need to parse things like a_translating, so check for first '[' for the end of matrix typesstrings
@@ -1639,6 +1630,8 @@ unknown:
         } else {
             theMatrix._myType = asl::Matrix4<Number>::UNKNOWN;
         }
+        */
+        is >> theMatrix._myType;
         return parseVector(is, theMatrix.getBase(), theStartToken, theEndToken, theDelimiter);
     }
 

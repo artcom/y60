@@ -289,7 +289,7 @@ namespace asl {
                        myUpVector[0],     myUpVector[1],     myUpVector[2],     0,
                        -theViewVector[0], -theViewVector[1], -theViewVector[2], 0,
                        0, 0, 0, 1,
-                       asl::Matrix4f::ROTATING);
+                       asl::ROTATING);
         asl::Quaternionf   myOrientation;
         asl::Vector3f myPosition;
         myMatrix.decompose(myUpVector, myRightVector, myOrientation, myPosition);
