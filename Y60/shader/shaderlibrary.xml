@@ -782,6 +782,36 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s24a" name="phong_brakes" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,reflective]"/>
+            <feature class="lighting" values="[phong]"/>
+        </supports>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap_brakes.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DPHONG_SPECULAR]]'>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap_brakes.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DPHONG_SPECULAR]]'>
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <sampler2d name="brakeOneTex">2</sampler2d>
+                <sampler2d name="brakeTwoTex">3</sampler2d>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            		<float name="strength">0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
     <shader id="s24b" name="blinn_painted_environment" cost="10" >
         <supports>
             <feature class="textures" values="[paint,paint]"/>
