@@ -104,6 +104,7 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
 					_myHandler.on_fog_disabled();
 				} else if (_myWidgets.fog_linear.active) {
 					window.scene.world.fogmode = "linear";
+					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
         	window.scene.world.fogdensity = _myWidgets.fog_density.value;
@@ -115,6 +116,7 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
 					} else {
 						window.scene.world.fogmode = "exp2";
 					}
+					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
         	window.scene.world.fogdensity = _myWidgets.fog_density.value;
