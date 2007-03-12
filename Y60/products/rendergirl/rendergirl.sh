@@ -16,7 +16,7 @@ else
     fi
 fi
 
-APPLICATION="acgtkshell.exe"
+APPLICATION="acgtkshell"
 if [ "$DEBUG" == "1" ]; then
     APPLICATION="${APPLICATION}DBG"
 fi
