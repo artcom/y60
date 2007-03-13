@@ -95,7 +95,7 @@ JSConsoleView::Functions() {
 JSPropertySpec *
 JSConsoleView::Properties() {
     static JSPropertySpec myProperties[] = {
-        //{"buffer", PROP_buffer, JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"scrollback", PROP_scrollback, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -119,11 +119,9 @@ JSConsoleView::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        /*
-        case PROP_buffer:
-            *vp = as_jsval(cx, theNative.get_buffer()->get_text());
+        case PROP_scrollback:
+            *vp = as_jsval(cx, theNative.getScrollback());
             return JS_TRUE;
-        */
         case 0:
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
@@ -134,15 +132,13 @@ JSConsoleView::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        /*
-        case PROP_buffer:
+        case PROP_scrollback:
             try {
-                Glib::ustring theText;
-                convertFrom(cx, *vp, theText);
-                theNative.get_buffer()->set_text(theText);
+                unsigned myLineCount;
+                convertFrom(cx, *vp, myLineCount);
+                theNative.setScrollback(myLineCount);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
-        */
         case 0:
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);

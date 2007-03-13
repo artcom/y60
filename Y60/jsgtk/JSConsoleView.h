@@ -37,7 +37,8 @@ class JSConsoleView : public JSWrapper<acgtk::ConsoleView, asl::Ptr<acgtk::Conso
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            PROP_END = JSBASE::PROP_END
+            PROP_scrollback = JSBASE::PROP_END,
+            PROP_END
         };
 
         static JSPropertySpec * Properties();
