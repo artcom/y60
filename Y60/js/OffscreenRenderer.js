@@ -14,12 +14,16 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     var self = this;
     
     self.overlays getter = function() {
+        if (!_myViewport.childNode("overlays")) {
+            var myNode = new Node("<overlays/>");
+            _myViewport.appendChild(myNode.firstChild);
+        }
         return _myViewport.childNode("overlays"); 
     }
 
     self.underlays getter = function() {
         if (!_myViewport.childNode("underlays")) {
-            var myUnderlayNode = new Node("<underlays/>");
+            var myNode = new Node("<underlays/>");
             _myViewport.appendChild(myUnderlayNode.firstChild);
         }
         return _myViewport.childNode("underlays"); 
