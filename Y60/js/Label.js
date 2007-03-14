@@ -121,6 +121,7 @@ function LabelBase(Public, Protected, theScene,
             _myChildLabel = new ImageLabel(theScene, theSource, [0, 0], theStyle, Public.node);
             _myChildLabel.color = new Vector4f(1,1,1,1);
         }
+        return _myChildLabel;
     }
 
     Public.setImage = function(theSource) {
