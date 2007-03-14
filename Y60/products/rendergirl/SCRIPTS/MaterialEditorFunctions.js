@@ -53,6 +53,8 @@ function updateMaterialEditor() {
             mySlider.show();
             myLabel.show();
             myValue.show();
+            
+            myValue.text = myProperty.firstChild.nodeValue.toFixed(3);
             myLabel.text = " "+myChildNode.name;
 
             eval("ourHandler.on_float_slider"+myActiveFloatValue+"_value_changed = function() {\n"+
