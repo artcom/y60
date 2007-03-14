@@ -188,11 +188,28 @@ float4 mainFragment(vert2frag   IN,
     float4 myBaseColor = myDecalTexel;
 #endif // LIGHTING
 
-    // blend with environment intensity
-    //float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
-    //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvTexel, myEnvIntensity);
 
-    return float4((myBaseColor.rgb + myEnvTexel) + mySpecColor.rgb, myDecalTexel.a)+(myBrakeOneTex*strength*myBrakeOneTex.a);
+     												
+		float myBrakeOneVal = 1 - abs(min(strength * 2 - 1, 0));
+    float myBrakeTwoVal = max(strength * 2 - 1, 0);
+
+		return float4(
+											// light without brakes
+    									  (myBaseColor.rgb * (1 - myBrakeOneTex.a * myBrakeOneVal * (1 - myBrakeTwoVal)) * (1 - myBrakeTwoTex.a * myBrakeTwoVal))									
+    									
+    									// brakes
+    									+  (myBrakeOneTex.rgb * myBrakeOneTex.a * myBrakeOneVal) * (1 -  myBrakeTwoVal)
+    								  +  (myBrakeTwoTex.rgb * myBrakeTwoTex.a * myBrakeTwoVal)
+    									
+    									// reflection overall
+    									+  (mySpecColor.rgb + myEnvTexel) * 0.8
+    									
+    									// less reflection for brakes when active
+    									-  (mySpecColor.rgb + myEnvTexel) * 0.5 * (myBrakeOneTex.a * myBrakeOneVal) * (1 - myBrakeTwoVal)
+    									-  (mySpecColor.rgb + myEnvTexel) * 0.5 * (myBrakeTwoTex.a * myBrakeTwoVal)
+    												
+    									 , myDecalTexel.a);
+
 
     // Old code
     //float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
