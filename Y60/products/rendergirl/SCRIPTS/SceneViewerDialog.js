@@ -13,9 +13,8 @@ function SceneViewerDialog(theGladeHandle, theViewer) {
     this.Constructor(this, theGladeHandle, theViewer);
 }
 
-SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHandler, theViewer) {
+SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theViewer) {
 	
-		var _myHandler						 = theHandler;
     var _myGladeHandle         = theGladeHandle;
     var _myViewer              = theViewer;
     var _myDialog              = _myGladeHandle.get_widget("dlgSceneViewer");
@@ -23,6 +22,8 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHand
     var _myListScheme 				 = new ACColumnRecord(5);
     var _myListStore 					 = new ListStore(_myListScheme);
     var _myTreeView						 = _myGladeHandle.get_widget("treeViewer");
+    var _mySearchField				 = _myGladeHandle.get_widget("search_field");
+    
     
     var _myBaseNode						 = null;
 		
@@ -45,7 +46,7 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHand
 		//
 		//=================================================
 		
-		_myHandler.on_go_button = function() {
+		ourHandler.on_go_button = function() {
 			 var myRow = _myTreeView.selected_row;
 			 if(myRow) {
 			 		var myChildNode = getDescendantByName(_myBaseNode,myRow.get_value(2),false);
@@ -59,19 +60,17 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHand
 			 }
 		}
 		
-		_myHandler.on_back_button = function() {
+		ourHandler.on_back_button = function() {
 			 if (_myBaseNode.id == window.scene.world.id) {
 			 		return;
 			 }
 			 var parentNode = _myBaseNode.parentNode;
 			 if(parentNode) {
-			 		_myGladeHandle.get_widget("main_label").text = (parentNode.id == window.scene.world.id) ? "World" : parentNode.name;
-			 		_myBaseNode = parentNode;
-			 		parseChildNodes();	
+			 		self.setBaseNode(parentNode);
 			 }
 		}
 		
-		_myHandler.on_visibility_button = function() {
+		ourHandler.on_visibility_button = function() {
 			var myRow = _myTreeView.selected_row;
 			if(myRow) {
 			 		var myChildNode = getDescendantByName(_myBaseNode,myRow.get_value(2),false);
@@ -81,6 +80,22 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHand
 			 		}
 			 }
 		}
+		
+		
+		ourHandler.on_search_button = function() {
+			var myNode = getDescendantByName(window.scene.dom, _mySearchField.text, true);
+			if(myNode) {
+					var myParentNode = myNode.parentNode;
+					self.setBaseNode(myParentNode);
+					var myParentNodeName = (myParentNode.id == window.scene.world.id) ? "World" : myParentNode.name;
+					_myGladeHandle.get_widget("main_label").text = myNode.name + " found in " + myParentNodeName;
+					
+					
+			} else {
+					_myGladeHandle.get_widget("main_label").text = "not found!";
+			}
+		}
+		
 		
 		//=================================================
 	
@@ -97,9 +112,16 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theHand
     	}
     }
 
+		self.setBaseNode = function(theBaseNode) {
+				_myBaseNode = theBaseNode;
+				_myGladeHandle.get_widget("main_label").text = (theBaseNode.id == window.scene.world.id) ? "World" : theBaseNode.name;
+				parseChildNodes();
+				
+				
+		}
+		
     self.show = function() {
-    		_myBaseNode = window.scene.world;
-    		parseChildNodes();
+    		
         _myDialog.show();
         
     }
