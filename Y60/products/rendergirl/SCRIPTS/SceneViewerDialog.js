@@ -120,10 +120,9 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theView
 				
 		}
 		
+		
     self.show = function() {
-    		
         _myDialog.show();
-        
     }
 
     self.onResponse = function(theResponse) {

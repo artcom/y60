@@ -175,6 +175,24 @@ ourHandler.on_open_activate = function(theArguments) {
 }
 
 
+ourHandler.on_load_patch_activate = function() {
+    var isPaused = window.pause;
+    window.pause = true;
+    var myFilename = getFilenameDialog("Load Patch", FileChooserDialog.ACTION_OPEN);
+    
+    if (myFilename) {
+        if(fileExists(myFilename)) {
+            		print("Using patch '"+myFilename+"'");
+		    			
+		    				use(myFilename);
+
+		    				ourPatchObject = new Patch();
+		    }
+    }
+    
+    window.pause = isPaused;
+}
+
 
 ourHandler.on_save_screenshot_activate = function(theArguments) {
     var myFilename = theArguments;
@@ -640,7 +658,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             myScene = new Scene(theFilename);
             self.setModelName(theFilename);
             if(fileExists("SCRIPTS/Patch.js")) {
-            		print("Using patch 'Patch.js'");
+            		print("Using patch 'Patch.js' in SCRIPTS directory");
 		    				use("Patch.js");
 		    				ourPatchObject = new Patch();
 		    		}
