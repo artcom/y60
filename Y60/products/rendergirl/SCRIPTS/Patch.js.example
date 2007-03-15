@@ -1,4 +1,3 @@
-
 function Patch() {
         this.Constructor(this);
 }
@@ -11,5 +10,13 @@ Patch.prototype.Constructor = function(self) {
         
         self.onFrame = function(theTime) {
         	
-        }  
+        }
+        
+        self.onPostRender = function() {
+        	
+        }
+        
+        self.onPreRender = function() {
+        
+        }
 }

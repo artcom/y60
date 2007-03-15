@@ -640,6 +640,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             myScene = new Scene(theFilename);
             self.setModelName(theFilename);
             if(fileExists("SCRIPTS/Patch.js")) {
+            		print("Using patch 'Patch.js'");
 		    				use("Patch.js");
 		    				ourPatchObject = new Patch();
 		    		}
@@ -728,10 +729,20 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
+		self.onPreRender = function() {        
+        if(ourPatchObject && typeof(ourPatchObject.onPreRender)=="function") {
+    				ourPatchObject.onPreRender();
+    		}
+		}
+
     self.onPostRender = function() {
         if (RenderTest) {
             RenderTest.onPostRender();
         }
+        
+        if(ourPatchObject && typeof(ourPatchObject.onPostRender)=="function") {
+    				ourPatchObject.onPostRender();
+    		}
     }
 
     self.setupSwitchNodeMenu = function() {
