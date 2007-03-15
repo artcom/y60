@@ -128,3 +128,11 @@ function playSound(theFilename, theVolume, theLoopFlag) {
 
     return null;
 }
+
+function preloadSound(theFilename) {
+    if (!ourSoundController) {
+        initSoundController();
+    }
+
+    ourSoundController.preloadSound(theFilename);
+}
