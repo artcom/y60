@@ -21,10 +21,8 @@ function PreferenceDialog(theGladeHandle, theViewer) {
 }
 
 
+PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewer) {
 
-PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandler, theViewer) {
-	
-		var _myHandler						 = theHandler;
     var _myGladeHandle         = theGladeHandle;
     var _myViewer              = theViewer;
     var _myDialog              = _myGladeHandle.get_widget("dlgPreferences");
@@ -39,7 +37,6 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
                 print("### ERROR: Could not find widget: " + myName);
             }
         }
-				print(_myViewer);
         _myDialog.signal_response.connect(self, "onResponse");
         loadPreferences();
     }
@@ -49,50 +46,6 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
     self.show = function() {
         _myDialog.show();
     }
-    
-    //=================================================
-		//
-		//  Gtk Signal Handlers
-		//
-		//=================================================
-		
-		_myHandler.on_fog_disabled = function() {
-		  	ourGlade.get_widget("fog_start_box").hide();
-		  	ourGlade.get_widget("fog_end_box").hide();
-		  	ourGlade.get_widget("fog_density_box").hide();
-		  	ourGlade.get_widget("fog_color_box").hide();
-		  	ourGlade.get_widget("fog_type_box").hide();
-		}
-
-		_myHandler.on_fog_linear = function() {
-		  	ourGlade.get_widget("fog_start_box").show();
-		  	ourGlade.get_widget("fog_end_box").show();
-		  	ourGlade.get_widget("fog_density_box").hide();
-		  	ourGlade.get_widget("fog_color_box").show();
-		  	ourGlade.get_widget("fog_type_box").hide();
-		}
-
-		_myHandler.on_fog_exponential = function() {
-		  	ourGlade.get_widget("fog_start_box").hide();
-		  	ourGlade.get_widget("fog_end_box").hide();
-		  	ourGlade.get_widget("fog_density_box").show();
-		  	ourGlade.get_widget("fog_color_box").show();
-		  	ourGlade.get_widget("fog_type_box").show();
-		}
-		
-		_myHandler.on_range_start = function() {
-				ourGlade.get_widget("range_start_label").text=_myWidgets.range_start.value.toFixed(2);
-		}
-		
-		_myHandler.on_range_end = function() {
-				ourGlade.get_widget("range_end_label").text=_myWidgets.range_end.value.toFixed(2);
-		}
-		
-		_myHandler.on_fog_density = function() {
-				ourGlade.get_widget("fog_density_label").text=_myWidgets.fog_density.value.toFixed(2);
-		}
-		
-		//=================================================
 
     self.apply = function() {
         window.canvas.backgroundcolor = _myWidgets.background_color.color;
@@ -101,14 +54,14 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
 				
 				if (_myWidgets.fog_disabled.active) {
 					window.scene.world.fogmode = "";
-					_myHandler.on_fog_disabled();
+					ourHandler.on_fog_disabled();
 				} else if (_myWidgets.fog_linear.active) {
 					window.scene.world.fogmode = "linear";
 					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
         	window.scene.world.fogdensity = _myWidgets.fog_density.value;
-        	_myHandler.on_fog_linear();
+        	ourHandler.on_fog_linear();
         	
 				} else if (_myWidgets.fog_exponential.active) {
 					if(_myWidgets.fog_type_exp.active) {
@@ -116,17 +69,18 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theHandl
 					} else {
 						window.scene.world.fogmode = "exp2";
 					}
+					
 					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogcolor = _myWidgets.fog_color.color;
         	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
         	window.scene.world.fogdensity = _myWidgets.fog_density.value;
-        	_myHandler.on_fog_exponential();
+        	ourHandler.on_fog_exponential();
         	
 				}
 				
-				_myHandler.on_range_start();
-        _myHandler.on_range_end();
-				_myHandler.on_fog_density();
+				ourHandler.on_range_start();
+        ourHandler.on_range_end();
+				ourHandler.on_fog_density();
 				
         ourViewer.getLightManager().setSunPosition(_myWidgets.daytime.value);
         ourMainWindow.resize(_myWidgets.window_width.value, _myWidgets.window_height.value);

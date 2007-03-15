@@ -42,6 +42,8 @@ var ourStatusBar         = null;
 var ourMaterialComboBox  = null;
 var ourLastMaterial      = null;
 
+var ourPatchObject			 = null;
+
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
 //=================================================
@@ -63,6 +65,44 @@ var ourAllowedOptions = {
 ourHandler.on_mainWindow_realize = function() {
 }
 
+//   Signal Handlers for Preference Dialog
+//
+//=================================================
+ourHandler.on_fog_disabled = function() {
+  	ourGlade.get_widget("fog_start_box").hide();
+  	ourGlade.get_widget("fog_end_box").hide();
+  	ourGlade.get_widget("fog_density_box").hide();
+  	ourGlade.get_widget("fog_color_box").hide();
+  	ourGlade.get_widget("fog_type_box").hide();
+}
+
+ourHandler.on_fog_linear = function() {
+  	ourGlade.get_widget("fog_start_box").show();
+  	ourGlade.get_widget("fog_end_box").show();
+  	ourGlade.get_widget("fog_density_box").hide();
+  	ourGlade.get_widget("fog_color_box").show();
+  	ourGlade.get_widget("fog_type_box").hide();
+}
+
+ourHandler.on_fog_exponential = function() {
+  	ourGlade.get_widget("fog_start_box").hide();
+  	ourGlade.get_widget("fog_end_box").hide();
+  	ourGlade.get_widget("fog_density_box").show();
+  	ourGlade.get_widget("fog_color_box").show();
+  	ourGlade.get_widget("fog_type_box").show();
+}
+
+ourHandler.on_range_start = function() {
+		ourGlade.get_widget("range_start_label").text=ourGlade.get_widget("range_start").value.toFixed(2);
+}
+
+ourHandler.on_range_end = function() {
+		ourGlade.get_widget("range_end_label").text=ourGlade.get_widget("range_end").value.toFixed(2);
+}
+
+ourHandler.on_fog_density = function() {
+		ourGlade.get_widget("fog_density_label").text=ourGlade.get_widget("fog_density").value.toFixed(2);
+}
 
 //=================================================
 // File Menu Item Handlers
@@ -77,6 +117,7 @@ ourHandler.on_new_activate = function() {
     ourViewer.setCanvas(myCanvas);
     ourStatusBar.set("New scene");
     setupGUI();
+    ourSceneViewerDialog.setBaseNode(window.scene.world);
     window.queue_draw();
 }
 
@@ -95,7 +136,7 @@ ourHandler.on_include_activate = function() {
     ourViewer.recollectSwitchNodes(); 
     ourViewer.setupSwitchNodeMenu();
     ourMaterialTable = ourViewer.applyMaterialTable();
-
+		ourSceneViewerDialog.setBaseNode(window.scene.world);
     window.pause = false;
 }
 
@@ -129,6 +170,7 @@ ourHandler.on_open_activate = function(theArguments) {
     if (myFilename) {
         ourViewer.loadModel( myFilename );
     }
+    ourSceneViewerDialog.setBaseNode(window.scene.world);
     window.pause = isPaused;
 }
 
@@ -467,8 +509,10 @@ ourHandler.on_material_editor_activate = function() {
         //print("Material:" + myMaterial);
         ourMaterialComboBox.active_text = myMaterial;
     }
-  
+  	
+  	
     myMaterialEditor.show();
+    
 }
 
 //=================================================
@@ -595,6 +639,10 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         } else {
             myScene = new Scene(theFilename);
             self.setModelName(theFilename);
+            if(fileExists("SCRIPTS/Patch.js")) {
+		    				use("Patch.js");
+		    				ourPatchObject = new Patch();
+		    		}
         }
 
         myScene.setup();  
@@ -617,6 +665,11 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         ourViewer.lastSwitched = {};
 
         setupGUI();
+        
+        if(ourPatchObject && typeof(ourPatchObject.onSceneLoaded)=="function") {
+    				ourPatchObject.onSceneLoaded();
+    		}
+        
         window.queue_draw();
     }
 
@@ -625,6 +678,10 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         if (RenderTest) {
             RenderTest.onFrame(theTime);
         }
+        
+        if(ourPatchObject && typeof(ourPatchObject.onFrame)=="function") {
+    				ourPatchObject.onFrame(theTime);
+    		}
 
         ourStatusBar.onFrame();
 
@@ -743,6 +800,10 @@ function setupCameraComboBox() {
 
 function main(argv) {
     try {
+    		
+    	
+    		
+    	
         GtkMain.exitCode    = 0;
         ourGlade            = new Glade(GLADE_FILE);
         ourMainWindow       = ourGlade.get_widget("mainWindow");
@@ -751,7 +812,7 @@ function main(argv) {
         ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
         ourHandler.isLoaded = false;
 
-				ourPreferenceDialog = new PreferenceDialog(ourGlade, ourHandler);
+				ourPreferenceDialog = new PreferenceDialog(ourGlade);
 				ourSceneViewerDialog= new SceneViewerDialog(ourGlade, ourHandler);
         ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
 				
