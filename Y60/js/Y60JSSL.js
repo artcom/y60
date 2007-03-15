@@ -644,7 +644,7 @@ function trim(theString) {
     {
         backIndex--;
     }
-    return frontIndex >= backIndex ? "" : theString.substring(frontIndex, (backIndex + 1));
+    return frontIndex > backIndex ? "" : theString.substring(frontIndex, (backIndex + 1));
 }
 function nextPowerOfTwo(n) {
     var myPowerOfTwo = 1;
