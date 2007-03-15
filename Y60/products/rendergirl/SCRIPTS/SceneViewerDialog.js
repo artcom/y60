@@ -23,6 +23,7 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theView
     var _myListStore 					 = new ListStore(_myListScheme);
     var _myTreeView						 = _myGladeHandle.get_widget("treeViewer");
     var _mySearchField				 = _myGladeHandle.get_widget("search_field");
+   
     
     
     var _myBaseNode						 = null;
@@ -95,7 +96,6 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theView
 					_myGladeHandle.get_widget("main_label").text = "not found!";
 			}
 		}
-		
 		
 		//=================================================
 	

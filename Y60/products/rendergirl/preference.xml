@@ -1,5 +1,5 @@
 <preferences>
-    <background_color value="[0,0,0,1]"/>
+    <background_color value="[0.645167,0.645167,0.645167,1]"/>
     <headlight value="1"/>
     <sunlight value="1"/>
     <daytime value="0"/>
@@ -11,8 +11,8 @@
     <fog_exponential value="0"/>
     <range_start value="0"/>
     <range_end value="0.43859649122807015"/>
-    <fog_density value="0.14035087719298245"/>
-    <fog_color value="[0.0560922,1,0.343023,1]"/>
-    <fog_type_exp value="0"/>
-    <fog_type_exp2 value="1"/>
+    <fog_density value="0.3157894736842105"/>
+    <fog_color value="[0,0,0,1]"/>
+    <fog_type_exp value="1"/>
+    <fog_type_exp2 value="0"/>
 </preferences>

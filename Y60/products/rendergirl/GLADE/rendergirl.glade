@@ -1663,6 +1663,8 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
+			  <signal name="focus_in_event" handler="on_text_edit" last_modification_time="Thu, 15 Mar 2007 15:06:44 GMT"/>
+			  <signal name="focus_out_event" handler="on_text_edit_end" last_modification_time="Thu, 15 Mar 2007 15:06:57 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -3848,6 +3850,8 @@ Version: xx.xx
 		  <property name="invisible_char" translatable="yes">*</property>
 		  <property name="activates_default">False</property>
 		  <signal name="editing_done" handler="on_search_button" last_modification_time="Thu, 15 Mar 2007 08:53:21 GMT"/>
+		  <signal name="focus_in_event" handler="on_text_edit" last_modification_time="Thu, 15 Mar 2007 15:00:35 GMT"/>
+		  <signal name="focus_out_event" handler="on_text_edit_end" last_modification_time="Thu, 15 Mar 2007 15:00:30 GMT"/>
 		</widget>
 	      </child>
 	    </widget>

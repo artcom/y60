@@ -36,6 +36,7 @@ var ourCameraPopup       = null;
 var ourAnimationManager  = null;
 var ourWindowState = {width: 800, height: 600, position: [0, 0]};
 var ourMaterialTable     = null;
+var ourScenePaused			 = null;
 
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
@@ -617,6 +618,19 @@ ourHandler.on_walkmover_toggled = function(theButton) {
     if (theButton.active) {
         ourGlade.get_widget("walk_mover").active = true;
     }
+}
+
+//=================================================
+// General Handlers
+//=================================================
+
+ourHandler.on_text_edit = function() {
+		ourScenePaused = window.pause;
+		window.pause = true;
+}
+
+ourHandler.on_text_edit_end = function() {
+		window.pause = ourScenePaused;
 }
 
 //=================================================
