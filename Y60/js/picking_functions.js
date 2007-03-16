@@ -126,7 +126,8 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
 
     obj.
     transformClipToWorld = function(theClipPos,theScreenPixelX,theScreenPixelY) {
-        return transformClipToWorld(theClipPos, obj.getViewportAt(theScreenPixelX, theScreenPixelY));
+	var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        return transformClipToWorld(theClipPos, myViewport.getElementById(myViewport.camera));
     }
 
 
