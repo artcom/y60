@@ -199,6 +199,7 @@ namespace y60 {
             glReadBuffer(GL_BACK);
         }
 
+        GLuint myTextureID = _myImage->ensureTextureId();
         if (_myCopyToRasterFlag) {
             AC_DEBUG << "BufferToImage::performAction copy to raster Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " size=" << getWidth() << "x" << getHeight();
 
@@ -212,11 +213,11 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             _myImage->triggerUpload();
-        } else {
-            AC_DEBUG << "BufferToImage::performAction copy to texture Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " texid=" << _myImage->getGraphicsId() << " size=" << getWidth() << "x" << getHeight();
+        } else if (myTextureID > 0) {
+            AC_DEBUG << "BufferToImage::performAction copy to texture Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " texid=" << myTextureID << " size=" << getWidth() << "x" << getHeight();
 
             // copy framebuffer to texture
-            glBindTexture(GL_TEXTURE_2D, _myImage->ensureTextureId());
+            glBindTexture(GL_TEXTURE_2D, myTextureID);
             glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, _myOffset[0],_myOffset[1], getWidth(),getHeight());
             CHECK_OGL_ERROR;
 
@@ -228,6 +229,8 @@ namespace y60 {
             }
 
             glBindTexture(GL_TEXTURE_2D, 0);
+        } else {
+            AC_DEBUG << "BufferToImage::performAction Image '" << _myImage->get<NameTag>() << "' has no valid texid";
         }
     }
 }

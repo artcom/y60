@@ -11,6 +11,7 @@
 use("Y60JSSL.js");
 
 
+// XXX all of this should go once the proper flag in Maya 'ac_occlusion' is used...
 function setupOcclusionMaterials(theScene) {
 
     var myRegex = new RegExp(".*shadowmap.*");
@@ -18,30 +19,43 @@ function setupOcclusionMaterials(theScene) {
     var myMaterials = theScene.materials;
     for (var i = 0; i < myMaterials.childNodes.length; ++i) {
         var myMaterial = myMaterials.childNode(i);
+
+        // XXX these are from the BMW Welt project
         if (myMaterial.name == "lack" || myMaterial.name.search(/_shadowmapM/) != -1) {
-            Logger.info("Skipping material '" + myMaterial.name + "'");
+            Logger.info("Skipping material '" + myMaterial.name + "': name blacklisted");
             continue;
         }
 
         var myTextures = myMaterial.childNode("textures");
         if (myTextures.childNodes.length <= 1) {
-            Logger.info("Skipping material '" + myMaterial.name + "'");
+            Logger.info("Skipping material '" + myMaterial.name + "': only one texture");
             continue;
         }
 
-        var myTexUsage = getDescendantByName(myMaterial.childNode("requires"), "textures");
+        var myRequiresNode = myMaterial.childNode("requires");
+        var myTexUsage = getDescendantByName(myRequiresNode, "textures");
         if (!myTexUsage) {
             continue;
         }
-        var myVectorOfRankedFeature = parseVectorOfRankedFeature(myTexUsage.firstChild.nodeValue);
+        var myTexUsageFeature = parseVectorOfRankedFeature(myTexUsage.firstChild.nodeValue);
+
+        var myTexCoords = getDescendantByName(myRequiresNode, "texcoord");
+        if (!myTexCoords) {
+            continue;
+        }
+        var myTexCoordsFeature = parseVectorOfRankedFeature(myTexCoords.firstChild.nodeValue);
+        if (myTexCoordsFeature[0].features[myTexCoordsFeature[0].features.length-1] != "reflective") {
+            Logger.info("Skipping material '" + myMaterial.name + "': last texture is not reflective");
+            continue;
+        }
 
         var myTexture = myTextures.childNode(0);
         var myImage = myTexture.getElementById(myTexture.image);
         if (myRegex.exec(myImage.src)) {
-            myVectorOfRankedFeature[0].features[0] = "occlusion";
+            myTexUsageFeature[0].features[0] = "occlusion";
 
             Logger.warning("Setup material '" + myMaterial.name + "' for occlusion mapping");
-            myTexUsage.firstChild.nodeValue = stringVectorOfRankedFeature(myVectorOfRankedFeature);
+            myTexUsage.firstChild.nodeValue = stringVectorOfRankedFeature(myTexUsageFeature);
 
             window.scene.update(Scene.MATERIALS);
             //print(myMaterial);
