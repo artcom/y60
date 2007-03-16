@@ -72,11 +72,14 @@ SceneViewerDialog.prototype.Constructor = function(self, theGladeHandle, theView
 		}
 		
 		ourHandler.on_visibility_button = function() {
+			
 			var myRow = _myTreeView.selected_row;
 			if(myRow) {
 			 		var myChildNode = getDescendantByName(_myBaseNode,myRow.get_value(2),false);
 			 		if(myChildNode) {
+			 			
 			 			myChildNode.visible = !myChildNode.visible;
+			 			
 			 			myRow.set_value(4, myChildNode.visible ? "visible" : "invisible");
 			 		}
 			 }
