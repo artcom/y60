@@ -631,6 +631,7 @@ ourHandler.on_text_edit = function() {
 
 ourHandler.on_text_edit_end = function() {
 		window.pause = ourScenePaused;
+		window.queue_draw();
 }
 
 //=================================================
