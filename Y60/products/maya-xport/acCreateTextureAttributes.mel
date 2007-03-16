@@ -11,6 +11,11 @@ global proc acCreateTextureAttributes() {
             addAttr -ln ac_mipmaps -at bool $currentNode;
             $myResult = 1;
         }
+        if ( ! `attributeExists acOcclusionMap $currentNode`) {
+            print("Adding occlusion toggle to " + $currentNode + ".\n");
+            addAttr -ln ac_occlusion -at bool $currentNode;
+            $myResult = 1;
+        }
     }
 
     if ($myResult == "0") {

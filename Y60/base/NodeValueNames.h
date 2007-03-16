@@ -347,6 +347,7 @@ namespace y60 {
     static const char * TEXTURE_USAGE_ENVIRONMENT  = "environment";
     static const char * TEXTURE_USAGE_DISPLACEMENT = "displacement";
     static const char * TEXTURE_USAGE_EMISSIVE     = "emissive";
+    static const char * TEXTURE_USAGE_OCCLUSION    = "occlusion";
     static const char * TEXTURE_USAGE_GLOW         = "glow";
     static const char * TEXTURE_USAGE_FLOW         = "flow";
     static const char * TEXTURE_USAGE_SPLAT        = "splat";
@@ -361,6 +362,7 @@ namespace y60 {
         ENVIRONMENT,
         DISPLACEMENT,
         EMISSIVE,
+        OCCLUSION,
         GLOW,
         FLOW,
         SPLAT,
@@ -368,7 +370,6 @@ namespace y60 {
         FADE,
         TextureUsageEnum_MAX
     };
-
 
     static const char * TextureUsageStrings[] = {
         TEXTURE_USAGE_PAINT,
@@ -378,6 +379,7 @@ namespace y60 {
         TEXTURE_USAGE_ENVIRONMENT,
         TEXTURE_USAGE_DISPLACEMENT,
         TEXTURE_USAGE_EMISSIVE,
+        TEXTURE_USAGE_OCCLUSION,
         TEXTURE_USAGE_GLOW,
         TEXTURE_USAGE_FLOW,
         TEXTURE_USAGE_SPLAT,

@@ -297,16 +297,8 @@ namespace y60 {
     void
     Scene::loadMaterial(NodePtr theMaterialNode) {
         DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
-		map<string, bool> myPropertyNames;
-		NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
-		if (myPropertiesNode) {
-			for (unsigned i = 0; i < myPropertiesNode->childNodesLength(); ++i) {
-				myPropertyNames[myPropertiesNode->childNode(i)->getAttributeString("name")] = false;
-				const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
-			}
-		}
         MaterialBasePtr myMaterial = theMaterialNode->getFacade<MaterialBase>();
-//		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
+
 		IShaderPtr myShader;
 		if (getShaderLibrary()) {
 			// 2. ask shaderlib for shaderdefinition
@@ -324,27 +316,43 @@ namespace y60 {
 		myMaterial->setShader(myShader);
 		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
 			endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
-		if (myShader) {
-			for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
-				// default the material property with the shader default, only if the material
-				// does not have a property
-				unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();
-				for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
-					dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
-						myPropertyNode->nodeName() != "#comment") {
-						const std::string & myProp = myPropertyNode->getAttributeString("name");
-						if (myPropertyNames.find(myPropertyNode->getAttributeString("name")) ==
-							myPropertyNames.end()) {
-							myMaterial->mergeProperties(myPropertyNode);
-						}
-					}
-				}
-			}
+
+        if (myShader) {
+            typedef map<string,bool> PropertyUsedMap;
+            PropertyUsedMap myPropertyNames;
+
+            NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
+            if (myPropertiesNode) {
+                // remove sampler2d and samplerCUBE properties since they may change with the new shader
+                for (int i = myPropertiesNode->childNodesLength()-1; i >= 0; --i) {
+                    NodePtr myPropertyNode = myPropertiesNode->childNode(i);
+                    const std::string & myPropName = myPropertyNode->getAttributeString("name");
+                    if (myPropertyNode->nodeName() == "sampler2d" || myPropertyNode->nodeName() == "samplerCUBE") {
+                        AC_DEBUG << "Removing property '" << myPropName << "'";
+                        myPropertiesNode->removeChild(myPropertyNode);
+                    } else {
+                        myPropertyNames[myPropName] = false;
+                    }
+                }
+            }
+
+            for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
+                // default property with the shader default, unless the material already has that property
+                myPropertiesNode = myShader->getPropertyNode(i);
+                for (unsigned j = 0; j < myPropertiesNode->childNodesLength(); ++j) {
+                    dom::NodePtr myPropertyNode  = myPropertiesNode->childNode(j);
+                    if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE && myPropertyNode->nodeName() != "#comment") {
+                        const std::string & myPropName = myPropertyNode->getAttributeString("name");
+                        if (myPropertyNames.find(myPropName) == myPropertyNames.end()) {
+                            myMaterial->mergeProperties(myPropertyNode);
+                        }
+                    }
+                }
+            }
         }
 		myMaterial->load(_myTextureManager);
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
-//        _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
     }
     
     void

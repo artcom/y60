@@ -21,6 +21,7 @@ use("Playlist.js");
 use("Glow.js");
 use("SwitchNodeHandler.js");
 use("AutoClicker.js");
+use("OcclusionUtils.js");
 
 
 function BaseViewer(theArguments) {
@@ -735,9 +736,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             } else {
                 self.setCanvas(_myRenderWindow.canvas);
             }
+
             if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
                 collectAllSwitchNodes(theScene);
             }
+
+            setupOcclusionMaterials(theScene);
 
         } else {
             Logger.trace("prepareScene has no scene");
@@ -752,8 +756,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myImages = null;
         }
     }
-
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //

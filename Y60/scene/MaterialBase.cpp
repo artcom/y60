@@ -118,18 +118,20 @@ namespace y60 {
 
     void
     MaterialBase::mergeProperties(const dom::NodePtr & theShaderPropertyNode) {
+
         if ( ! theShaderPropertyNode) {
             AC_WARNING << "No properties found!" << endl;
             return;
         }
 
         MaterialPropertiesFacadePtr myReqFacade = getChild<MaterialPropertiesTag>();
-        const Facade::PropertyMap & myPropertyMap = myReqFacade->getProperties();
+        //const Facade::PropertyMap & myPropertyMap = myReqFacade->getProperties();
         
         dom::NodePtr myMaterialProperty = 
             myReqFacade->getProperty(theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
 
         if (!myMaterialProperty) {
+            //AC_PRINT << "no such prop; shaderNode=" << *theShaderPropertyNode;
             // the shader has properties not in the material liste, add'em
             if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
                 theShaderPropertyNode->nodeName() != "#comment") 
@@ -138,6 +140,7 @@ namespace y60 {
                                 theShaderPropertyNode->cloneNode(Node::DEEP));
             }
         } else {
+            //AC_PRINT << "MaterialBase::mergeProperties materialProp=" << *myMaterialProperty;
             // set the value of the material with the shaders value
             myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
         }

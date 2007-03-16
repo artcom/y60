@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003-2005 ART+COM AG Berlin
+// Copyright (C) 2003-2007 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,43 +8,64 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#define LIGHTING
+
+// texture coordinates
+#ifdef OCCLUSION
+    #define OCCLUSION_TEXCOORD TEXCOORD0
+#ifdef PAINT
+    #define PAINT_TEXCOORD     TEXCOORD1
+#if PAINT==2
+    #define PAINT2_TEXCOORD    TEXCOORD2
+#endif
+#endif
+#else // WITHOUT OCCLUSION
+#ifdef PAINT
+    #define PAINT_TEXCOORD  TEXCOORD0
+#if PAINT==2
+    #define PAINT2_TEXCOORD TEXCOORD1
+#endif
+#endif
+#endif // OCCLUSION
+
 
 struct app2vert {
     float4 Position         : POSITION;
     float4 Normal           : NORMAL;
+#ifdef OCCLUSION
+    float2 occlusionTexCoord : OCCLUSION_TEXCOORD;
+#endif
 #ifdef PAINT
-    float2 texCoord0        : TEXCOORD0;
-#ifdef PAINT==2
-    float2 texCoord1        : TEXCOORD1;
+    float2 paintTexCoord   : PAINT_TEXCOORD;
+#if PAINT==2
+    float2 paint2TexCoord  : PAINT2_TEXCOORD;
 #endif
 #endif
 };
 
+
 struct vert2frag {
     float4 homPosition   : POSITION;
+#ifdef OCCLUSION
+    float2 occlusionTexCoord : OCCLUSION_TEXCOORD;
+#endif
 #ifdef PAINT
-    float2 texCoord0     : TEXCOORD0;
-#ifdef PAINT==2
-    float2 texCoord1     : TEXCOORD1;
+    float2 paintTexCoord  : PAINT_TEXCOORD;
+#if PAINT==2
+    float2 paint2TexCoord : PAINT2_TEXCOORD;
 #endif
 #endif
-    float3 worldPosition : TEXCOORD2;
-    float3 worldNormal   : TEXCOORD3;
-    float3 reflectVector : TEXCOORD4;
-    float3 refractVector : TEXCOORD5;
-    //float4 lighting      : TEXCOORD6;
-    float4 primaryColor    : COLOR0;
-    float reflectionFactor : COLOR1;
+    float3 worldPosition : TEXCOORD3;
+    float3 worldNormal   : TEXCOORD4;
+    float3 reflectVector : TEXCOORD5;
+    float3 refractVector : TEXCOORD6;
 };
+
 
 vert2frag mainVertex(app2vert IN,
         uniform float4x4 GL_MODELVIEW_PROJECTION,
         uniform float4x4 AC_OBJECTWORLD_IT,
         uniform float4x4 AC_OBJECTWORLD,
-        uniform float3 AC_CAMERA_POSITION,
-        uniform float4 diffuse,
-        uniform float reflectivity
+        uniform float3 AC_CAMERA_POSITION
         )
 {
     vert2frag OUT;
@@ -60,19 +81,15 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
-    OUT.reflectionFactor = reflectivity;
 
-#ifdef PAINT
-    OUT.texCoord0 = IN.texCoord0;
-#if PAINT==2
-    OUT.texCoord1 = IN.texCoord1;
+#ifdef OCCLUSION
+    OUT.occlusionTexCoord = IN.occlusionTexCoord;
 #endif
-#endif // PAINT
-
-#ifdef LIGHTING
-    OUT.primaryColor = diffuse; //float4(1,1,1,1);
-#else
-    OUT.primaryColor = float4(0,0,0,0); // should be vertex color
+#ifdef PAINT
+    OUT.paintTexCoord = IN.paintTexCoord;
+#if PAINT==2
+    OUT.paint2TexCoord = IN.paint2TexCoord;
+#endif
 #endif
 
     return OUT;
@@ -80,6 +97,9 @@ vert2frag mainVertex(app2vert IN,
 
 
 float4 mainFragment(vert2frag   IN,
+#ifdef OCCLUSION
+        uniform sampler2D occlusionTex,
+#endif
 #ifdef PAINT
         uniform sampler2D decalTex,
 #if PAINT==2
@@ -96,38 +116,44 @@ float4 mainFragment(vert2frag   IN,
         uniform float4 diffuse,
         uniform float4 specular,
 #ifdef PHONG_SPECULAR        
-        uniform float shininess
+        uniform float shininess,
 #else
         uniform float eccentricity,
-        uniform float specularrolloff 
+        uniform float specularrolloff,
 #endif        
+        uniform float reflectivity
         ) : COLOR
 {
-    float3 myEnvTexel = texCUBE(envTex, IN.reflectVector).rgb * IN.reflectionFactor;;
+#ifdef OCCLUSION
+    float4 myOcclusionTexel = tex2D(occlusionTex, IN.occlusionTexCoord);
+#endif
+
+    float4 myBaseColor;
 #ifdef PAINT
-    float4 myDecalTexel = tex2D(decalTex, IN.texCoord0);
+    myBaseColor = tex2D(decalTex, IN.paintTexCoord);
 #if PAINT==2
-    float4 myEmissiveTexel = tex2D(emissiveTex, IN.texCoord1);
-    myEnvTexel.rgb = lerp(myEmissiveTexel.rgb, myEnvTexel, (1-myEmissiveTexel.a));
+    float4 myBaseColor2 = tex2D(emissiveTex, IN.paint2TexCoord);
+    myBaseColor *= myBaseColor2;
 #endif
 #else
-    float4 myDecalTexel = IN.primaryColor;
-#endif // PAINT
+    myBaseColor = diffuse;
+#endif
 
-    float4 mySpecColor = float4(0,0,0,0);
-#ifdef LIGHTING
-    float4 myDiffuseColor = float4(0,0,0,0);
+    float3 myEnvTexel = texCUBE(envTex, IN.reflectVector).rgb * reflectivity;
+
+    float4 myLightDiffuse = float4(0,0,0,0);
+    float4 myLightSpecular = float4(0,0,0,0);
 
     float3 P = IN.worldPosition;
     float3 N = normalize(IN.worldNormal);
     float3 V = normalize(AC_CAMERA_POSITION - P);
 
-    for (int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
+    for (int i = 0; i < AC_DIRECTIONAL_LIGHTS.length; ++i) {
         float3 L = normalize(AC_DIRECTIONAL_LIGHTS[i]);
 
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
+        myLightDiffuse += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
 
         // specular term
 #ifdef LIGHTING_TWOSIDED
@@ -142,17 +168,17 @@ float4 mainFragment(vert2frag   IN,
             float3 H = normalize(L + V);
             float specularTerm = 2.5 * specularrolloff * pow(max(dot(N, H), 0), 1/pow(eccentricity,2.5));
 #endif
-            mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
+            myLightSpecular += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
 
-    for (int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+    for (int i = 0; i < AC_POSITIONAL_LIGHTS.length; ++i) {
 
         float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
 
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
+        myLightDiffuse += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
 
         // specular term
 #ifdef LIGHTING_TWOSIDED
@@ -167,51 +193,20 @@ float4 mainFragment(vert2frag   IN,
             float3 H = normalize(L + V);
             float specularTerm = 2.5 * specularrolloff * pow(max(dot(N, H), 0), 1/pow(eccentricity, 2.5));
 #endif
-            mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
+            myLightSpecular += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
 
-    mySpecColor *= specular;
-    float4 myBaseColor = ambient + myDiffuseColor * diffuse * myDecalTexel;
-
-#else
-    float4 myBaseColor = myDecalTexel;
-#endif // LIGHTING
+    float4 myBlendColor = ambient + myLightDiffuse * diffuse * myBaseColor + myLightSpecular * specular;
 
     // blend with environment intensity
     //float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
-    //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvTexel, myEnvIntensity);
+    //myBlendedColor = lerp(myBlendColor.rgb, myEnvTexel, myEnvIntensity);
 
-    return float4((myBaseColor.rgb + myEnvTexel) + mySpecColor.rgb, myDecalTexel.a);
+    myBlendColor = float4(myBlendColor.rgb + myEnvTexel, myBaseColor.a);
+#ifdef OCCLUSION
+    myBlendColor.rgb *= myOcclusionTexel.rgb;
+#endif
 
-    // Old code
-    //float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
-
-    //return float4(myBlendedColor + mySpecColor.rgb, myBaseColor.a);
-
-    // *************** Some debug options *********************
-
-    // Base color
-    //return myBaseColor;
-
-    // Base + Specular color
-    //return myBaseColor + mySpecColor;
-
-    // Enviroment map mit fresneleffect
-    //return float4(myEnvTexel, 1);
-
-    // Base plus environment
-    //return float4((myBaseColor.rgb + myEnvTexel), myDecalTexel.a);
-
-    // Blended color
-    //return float4(myBlendedColor, 1);
-
-    // Enviroment map
-    //return texCUBE(envTex, IN.reflectVector);
-
-    // Environment Intensität
-    //return float4(myEnvIntensity, myEnvIntensity, myEnvIntensity, 1);
-
-    //  Fresneleffect und Reflectivity
-    //return float4(IN.reflectionFactor, IN.reflectionFactor,IN.reflectionFactor,1);
+    return myBlendColor;
 }

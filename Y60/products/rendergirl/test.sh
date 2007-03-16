@@ -61,7 +61,9 @@ if [ ! -z $VG ]; then
     APP="valgrind --tool=${TOOL} ${TOOLARGS} ${APP}"
     echo "VALGRINDING:${APP}"
 fi
-CMD="${APP} -I 'SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib' ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60 shaderlibrary.xml"
+
+INCLUDE_PATH="SCRIPTS;${PRO}/src/Y60/js;${PRO}/src/Y60/shader;${PRO}/lib"
+CMD="${APP} -I ${INCLUDE_PATH} ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60 shaderlibrary.xml"
 echo $CMD
 $CMD
 

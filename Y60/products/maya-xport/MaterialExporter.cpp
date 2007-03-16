@@ -105,7 +105,7 @@ void
 MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                     y60::MaterialBuilder & theBuilder,
                                     y60::SceneBuilder & theSceneBuilder,
-                                    const TextureUsage & theUsageMode,
+                                    TextureUsage theUsageMode,
                                     const MayaBlendMode theBlendMode,
                                     float theColorGainAlpha)
 {
@@ -440,7 +440,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
                                        const MObject & theEnvCubeNode,
                                        y60::MaterialBuilder & theBuilder,
                                        y60::SceneBuilder & theSceneBuilder,
-                                       const TextureUsage & theUsageMode)
+                                       TextureUsage theUsageMode)
 {
     AC_DEBUG << "MaterialExporter::exportEnvCubeTexture(" << MFnDependencyNode(theShaderNode).name().asChar() << ", usage=" << theUsageMode << ")";
 
@@ -550,7 +550,7 @@ MaterialExporter::exportTextures(const MFnMesh * theMesh, const MObject & theSha
                                  y60::MaterialBuilder & theBuilder,
                                  y60::SceneBuilder & theSceneBuilder,
                                  const std::string & thePlugName,
-                                 const TextureUsage & theUsageMode,
+                                 TextureUsage theUsageMode,
                                  const std::string & theColorGainPropertyName,
                                  float theColorGainAlpha)
 {
@@ -585,7 +585,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
                              y60::MaterialBuilder & theBuilder,
                              y60::SceneBuilder & theSceneBuilder,
                              const char * thePlugName,
-                             const TextureUsage & theUsageMode,
+                             TextureUsage theUsageMode,
                              const std::string & theColorGainPropertyName,
                              float theColorGainAlpha)
 {
@@ -611,6 +611,16 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
         hasTextures = true;
 
         MObject myTextureNode(myPlugArray[0].node());
+
+        if (theUsageMode == PAINT) {
+            bool myOcclusionMapFlag = false;
+            getCustomAttribute(myTextureNode, "ac_occlusion", myOcclusionMapFlag);
+            if (myOcclusionMapFlag) {
+                AC_DEBUG << "MaterialExporter::exportMaps Found occlusionMapFlag on texture '" << thePlugName << "'";
+                theUsageMode = y60::OCCLUSION;
+            }
+        }
+
         MFn::Type myTextureType = myTextureNode.apiType();
         //AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
         switch (myTextureType) {
@@ -635,8 +645,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
                 break;
             default:
                 throw ExportException(std::string("Unsupported type of map plug: ") +
-                        myPlugArray[0].node().apiTypeStr(),
-                        "MaterialExporter::exportMaps()");
+                        myPlugArray[0].node().apiTypeStr(), "MaterialExporter::exportMaps()");
         }
 
         // check texture alpha, set material transparency if set

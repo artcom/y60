@@ -119,7 +119,7 @@ namespace y60 {
         asl::Unsigned16 myKey = 0;
         if (theMaterial.get<TransparencyTag>()) {
             const asl::Box3f & myBoundingBox = theShape.get<BoundingBoxTag>();
-            float myZIndicator = (- 1.0 *  (myBoundingBox.getCenter() * theEyeSpaceTransform))[2];
+            float myZIndicator = (-1.0f * (myBoundingBox.getCenter() * theEyeSpaceTransform))[2];
             if (myZIndicator > theFar) {
                 myZIndicator = float(theFar);
             } else if (myZIndicator < theNear) {

@@ -107,7 +107,7 @@ class MaterialExporter {
         bool exportMaps(const MFnMesh * theMesh, const MObject & theShaderNode,
                         y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                         const char * thePlugName,
-                        const y60::TextureUsage & theUsageMode,
+                        y60::TextureUsage theUsageMode,
                         const std::string & theColorGainPropertyName,
                         float theColorGainAlpha);
 #if 0
@@ -120,7 +120,7 @@ class MaterialExporter {
         bool exportTextures(const MFnMesh * theMesh, const MObject & theShaderNode,
                             y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                             const std::string & thePlugName,
-                            const y60::TextureUsage & theUsageMode,
+                            y60::TextureUsage theUsageMode,
                             const std::string & theColorGainPropertyName,
                             float theColorGainAlpha);
         bool exportBumpMaps(const MFnMesh * theMesh, const MObject & theShaderNode,
@@ -138,13 +138,13 @@ class MaterialExporter {
         void exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                y60::MaterialBuilder & theBuilder,
                                y60::SceneBuilder & theSceneBuilder,
-                               const y60::TextureUsage & theUsageMode,
+                               y60::TextureUsage theUsageMode,
                                const MayaBlendMode theBlendMode,
                                float theColorGainAlpha);
         void exportEnvCubeTexture(const MObject & theShaderNode, const MObject & theEnvCubeNode,
                                   y60::MaterialBuilder & theBuilder,
                                   y60::SceneBuilder & theSceneBuilder,
-                                  const y60::TextureUsage & theUsageMode);
+                                  y60::TextureUsage theUsageMode);
         void exportLayeredTexture(const MFnMesh * theMesh, const MObject & theTextureNode,
                 y60::MaterialBuilder & theBuilder,
                 y60::SceneBuilder & theSceneBuilder,
