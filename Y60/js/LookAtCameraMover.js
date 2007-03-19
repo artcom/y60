@@ -46,16 +46,32 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         _myNodeToFollow = theNode;
     }
 
+    obj.getNodeToFollow = function() {
+        return _myNodeToFollow;
+    }
+
     obj.setEyePositionOffset = function(theOffset) {
         _myEyePositionOffset = theOffset;
+    }
+
+    obj.getEyePositionOffset = function() {
+        return _myEyePositionOffset;
     }
 
     obj.setLookAtPositionOffset = function(theOffset) {
         _myLookAtOffset = theOffset;
     }
 
+    obj.getLookAtPositionOffset = function() {
+        return _myLookAtOffset;
+    }
+
     obj.setSpringStrength = function(theSpringStrength) {
         _mySpringStrength = theSpringStrength;
+    }
+       
+    obj.getSpringStrength = function() {
+        return _mySpringStrength;
     }
        
     obj.setOrientation = function(theOrientation) {
