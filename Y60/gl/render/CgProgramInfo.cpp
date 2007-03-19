@@ -723,13 +723,12 @@ namespace y60 {
                         const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
                         AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
                         cgGLSetTextureParameter( theCgParameter, myTexture.getId());
-                        DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
-                                << " , glid : " << myTexture.getId()
-                                << " , property : " << thePropertyName
+                        DB(AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
+                                << ", texid=" << myTexture.getId() << ", property=" << thePropertyName
                                 << " to parameter : "<< cgGetParameterName(theCgParameter) << endl);
                     } else {
-                        throw ShaderException(string("Texture Index ") + as_string(myTextureIndex) +
-                                " not found. Material (" + theMaterial.get<IdTag>() + ") has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
+                        throw ShaderException(string("Texture index ") + as_string(myTextureIndex) +
+                                " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
                                 "CgProgramInfo::setCgMaterialParameter()");
                     }
                     break;

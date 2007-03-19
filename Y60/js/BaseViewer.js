@@ -324,6 +324,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     self.applyMaterialTable = function(theFilename) {
+
+        // load-or-create material table
         if (!_myMaterialTable) {
             if (!theFilename) {
                 theFilename = "materialtable.xml";
@@ -337,35 +339,59 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (myDoc.firstChild && myDoc.firstChild.nodeName == "materialtable") {
                 _myMaterialTable = myDoc.firstChild;    
             } else {
-                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to conain a valid xml-structure.")
+                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to contain a valid xml-structure.")
                 return new Node("<materialtable/>").firstChild; 
             }
         }
-    
+
+        // merge materials
         for (var i=0; i<_myMaterialTable.childNodesLength(); ++i) {
             var myNode = _myMaterialTable.childNode(i);
             var myMaterial = getDescendantByName(_myMaterials, myNode.name, true);
             if (myMaterial) {
+                Logger.info("Setting "+myMaterial.name+" to table value.");
                 mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
-                Logger.info("setting "+myMaterial.name+" to table value.");
             } else {
                 // in case of materialswitches
-                var mySwitchNode = getDescendantByName(self.getScene().world, myNode.name, true);                 
-                if (mySwitchNode) {
-                    Logger.info("switchnode found in materialtable:"+mySwitchNode.name);   
+                var mySwitchNode = getDescendantByName(self.getScene().world, myNode.name, true);
+                if (!mySwitchNode) {
+                    continue;
+                }
+                if (mySwitchNode.nodeName == "body") {
+                    Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
                     var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
                     myMaterial = mySwitchNode.getElementById(myMaterialId);
                     mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
+                } else {
+                    Logger.warning("Switchnode is not a body: "+mySwitchNode.name);
                 }
             }
         }
+
         return _myMaterialTable;
     }
 
     function mergeMaterialProperties(theTargetMaterial, theTableNode) {
-        theTargetMaterial.removeChild(theTargetMaterial.childNode("properties"));
-        theTargetMaterial.appendChild(theTableNode.cloneNode(true));
+
+        //theTargetMaterial.removeChild(theTargetMaterial.childNode("properties"));
+        //theTargetMaterial.appendChild(theTableNode.cloneNode(true));
+
+        var myTargetProperties = theTargetMaterial.childNode("properties");
+        for (var i = 0; i < theTableNode.childNodes.length; ++i) {
+            var myNode = theTableNode.childNode(i);
+            if (myNode.nodeName.search(/sampler/) != -1) {
+                // skip samplers
+                continue;
+            }
+
+            var myTargetProperty = getDescendantByName(myTargetProperties, myNode.name);
+            if (myTargetProperty) {
+                // remove property before replacing it
+                myTargetProperties.removeChild(myTargetProperty);
+            }
+            myTargetProperties.appendChild(myNode.cloneNode(true));
+        }
     }
 
     self.recollectSwitchNodes = function() {

@@ -133,8 +133,9 @@ float4 mainFragment(vert2frag   IN,
     myBaseColor = tex2D(decalTex, IN.paintTexCoord);
 #if PAINT==2
     float4 myBaseColor2 = tex2D(emissiveTex, IN.paint2TexCoord);
-    myBaseColor *= myBaseColor2;
+    myBaseColor *= myBaseColor2; // modulate
 #endif
+    myBaseColor *= diffuse;
 #else
     myBaseColor = diffuse;
 #endif
@@ -197,13 +198,10 @@ float4 mainFragment(vert2frag   IN,
         }
     }
 
-    float4 myBlendColor = ambient + myLightDiffuse * diffuse * myBaseColor + myLightSpecular * specular;
+    float4 myBlendColor;
+    myBlendColor = ambient + myLightDiffuse * myBaseColor + myLightSpecular * specular;
 
-    // blend with environment intensity
-    //float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
-    //myBlendedColor = lerp(myBlendColor.rgb, myEnvTexel, myEnvIntensity);
-
-    myBlendColor = float4(myBlendColor.rgb + myEnvTexel, myBaseColor.a);
+    myBlendColor = float4(myBlendColor.rgb * myBaseColor.a + myEnvTexel, myBaseColor.a);
 #ifdef OCCLUSION
     myBlendColor.rgb *= myOcclusionTexel.rgb;
 #endif

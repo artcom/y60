@@ -14,8 +14,6 @@ use("Y60JSSL.js");
 // XXX all of this should go once the proper flag in Maya 'ac_occlusion' is used...
 function setupOcclusionMaterials(theScene) {
 
-    var myRegex = new RegExp(".*shadowmap.*");
-
     var myMaterials = theScene.materials;
     for (var i = 0; i < myMaterials.childNodes.length; ++i) {
         var myMaterial = myMaterials.childNode(i);
@@ -51,7 +49,7 @@ function setupOcclusionMaterials(theScene) {
 
         var myTexture = myTextures.childNode(0);
         var myImage = myTexture.getElementById(myTexture.image);
-        if (myRegex.exec(myImage.src)) {
+        if (myImage.src.search(/shadowmap/) != -1) {
             myTexUsageFeature[0].features[0] = "occlusion";
 
             Logger.warning("Setup material '" + myMaterial.name + "' for occlusion mapping");

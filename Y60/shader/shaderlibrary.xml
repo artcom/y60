@@ -613,7 +613,7 @@
             <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DOCCLUSION]]'>
+        <vertexshader profiles="[vp30,vp40]" files="[envmap.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DOCCLUSION]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -627,7 +627,7 @@
                  <vector2f name="texcoord1"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DOCCLUSION]]'>
+        <fragmentshader profiles="[fp30,fp40]" files="[envmap.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DOCCLUSION]]'>
             <properties>
                 <sampler2d name="occlusionTex">0</sampler2d>
                 <sampler2d name="decalTex">1</sampler2d>
