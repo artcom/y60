@@ -143,7 +143,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         myLoginRequest.post("__ac_name=" + _myConfig.username +
                             "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
         myLoginRequest.verifyPeer = false;
-        myLoginRequest.verbose = true;
+        myLoginRequest.verbose = _myZopeVerbosityFlag;
         _myRequestManager.performRequest( myLoginRequest );
 
         while ( _myRequestManager.activeCount ) {
@@ -172,7 +172,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
             _myRequestManager.performRequest( myPresentationRequest );
             myPresentationRequest.verifyPeer = false;
-            myPresentationRequest.verbose = true;
+            myPresentationRequest.verbose = _myCMSVerbosityFlag;
             while ( _myRequestManager.activeCount ) {
                 _myRequestManager.handleRequests();
                 msleep( 10 );
@@ -216,6 +216,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         _myLocalPath = expandEnvironment(myCMSConfig.localdir);
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
         _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
+
         if ( "localfallback" in myZopeConfig &&
              myZopeConfig.localfallback.length )
         {
