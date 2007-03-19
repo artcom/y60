@@ -190,9 +190,9 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/\.divx$/i) != -1 ||
             theUrl.search(/\.m2v$/i) != -1 ) {
             if (theSeekableFlag) {                
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "y60FFMpegDecoder1";
             } else {
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "y60FFMpegDecoder1";
             }
         }
         if (theUrl.search(/\.mov$/i)  != -1) {

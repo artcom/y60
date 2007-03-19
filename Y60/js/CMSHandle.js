@@ -105,8 +105,10 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         }
         var myCMSConfig  = _myConfig.childNode("cmscache", 0);
         var myUsername   = _myConfig.username;
-        if ("domain" in myCMSConfig && myCMSConfig.domain.length) {
-             myUsername += "@" + myCMSConfig.domain;
+        if ("domain" in myCMSConfig && 
+            myCMSConfig.domain.length && 
+            String(myCMSConfig.backend).toUpperCase() == "OCS") {
+            myUsername += "@" + myCMSConfig.domain;
         }
 
         _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
