@@ -78,9 +78,20 @@ class PackageManager {
             it is relative and must be defined inside a package.
             @param thePackageName is the name of a package,
             package names are stored just as you enter them by calling add.
+            @returns the opened file as a asl::ReadableStream or null if not found.
+        */
+        Ptr<ReadableStream> readStream(const std::string & theRelativePath,
+                                    const std::string & thePackageName = "");
+        /// opens a file located at theRelativePath.
+        /** Searches theRelativePath in either thePackageName or all packages.
+            and reads the entire file into a block if found.
+            @param theRelativePath is the path to the file requested,
+            it is relative and must be defined inside a package.
+            @param thePackageName is the name of a package,
+            package names are stored just as you enter them by calling add.
             @returns the opened file as a asl::ReadableBlock or null if not found.
         */
-        Ptr<ReadableBlock> openFile(const std::string & theRelativePath,
+        Ptr<ReadableBlock> readFile(const std::string & theRelativePath,
                                     const std::string & thePackageName = "");
 
         /// findFiles lists the files in theRelativePath.
@@ -100,7 +111,7 @@ class PackageManager {
         /// searches for a file.
         /**
             @deprecated backward compatibility for asl::searchFile(), use
-                    asl::PackageManager::openFile instead.
+                    asl::PackageManager::readFile instead.
             @returns the path to a file or an empty string if not found.
             If the file was found inside a container (e.g. zip-file), then
             the zip file will be part of the path.

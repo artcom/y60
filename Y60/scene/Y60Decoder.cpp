@@ -21,6 +21,9 @@
 #include <asl/Logger.h>
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>
+#include <asl/MappedBlock.h>
+
+using namespace asl;
 
 namespace y60 {
     std::string
@@ -64,7 +67,11 @@ namespace y60 {
         if (myBinaryFlag) {
             myFileSize = theStream.size();
             double myLoadTime = asl::Time() - loadStart;
-            AC_INFO << "  Mapped File size: " << myFileSize << " bytes ";
+            if (dynamic_cast<asl::MappedBlock*>(&theStream)) {
+                AC_INFO << "  Mapped Block size " << myFileSize << " bytes ";
+            } else  {
+                AC_INFO << "  Readable Stream size: " << myFileSize << " bytes ";
+            }
             parseStart.setNow();
             theDocument->debinarize(theStream);
 

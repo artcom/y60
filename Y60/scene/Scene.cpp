@@ -168,7 +168,7 @@ namespace y60 {
         if (theFilename.empty() || theFilename == "null") {
             return load(0, "empty scene", theNotifier, useSchema);
         } else {
-            asl::Ptr<ReadableBlock> mySource = thePackageManager->openFile(theFilename);
+            asl::Ptr<ReadableStream> mySource = thePackageManager->readStream(theFilename);
             if (!mySource) {
                 throw IOError(std::string("Can not open or read scene file '") + theFilename + "'", PLUS_FILE_LINE);
             }
@@ -1187,7 +1187,8 @@ namespace y60 {
             theRoot = getWorldRoot();
         }
 
-        asl::Ptr<ReadableBlock> mySource = thePackageManager->openFile(theFilename);
+        // asl::Ptr<ReadableStream> mySource = thePackageManager->readFile(theFilename);
+        asl::Ptr<ReadableStream> mySource = thePackageManager->readStream(theFilename);
         if (!mySource) {
             AC_ERROR << "Could not open include file '" << theFilename + "'. So I will ignore it.";
             return;

@@ -243,13 +243,13 @@ ReadFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         }
         asl::Ptr<ReadableBlock> myBlock;
         if (argc == 1) {
-            myBlock = JSApp::getPackageManager()->openFile(myFilename);
+            myBlock = JSApp::getPackageManager()->readFile(myFilename);
         } else {
             if ( ! convertFrom(cx, argv[1], myPackage)) {
                 JS_ReportError(cx, "readFile(): argument #2 must be a string (package path)");
                 return JS_FALSE;
             }
-            myBlock = JSApp::getPackageManager()->openFile(myFilename, myPackage);
+            myBlock = JSApp::getPackageManager()->readFile(myFilename, myPackage);
         }
         if (myBlock) {
             string myContent(myBlock->strbegin(), myBlock->strend());
@@ -530,9 +530,9 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         }
         asl::Ptr<asl::ReadableBlock> myReadableBlock;
         if (argc == 1) {
-            myReadableBlock = JSApp::getPackageManager()->openFile(myRelativePath);
+            myReadableBlock = JSApp::getPackageManager()->readFile(myRelativePath);
         } else {
-            myReadableBlock = JSApp::getPackageManager()->openFile(myRelativePath, myPackageName);
+            myReadableBlock = JSApp::getPackageManager()->readFile(myRelativePath, myPackageName);
         }
 
         if (myReadableBlock) {

@@ -78,6 +78,10 @@ DirectoryPackage::findFile(const std::string & theRelativePath) const {
     return "";
 }
 
+Ptr<ReadableStream>
+DirectoryPackage::getStream(const std::string & theRelativePath) {
+    return Ptr<ReadableStream>(new ReadableFile(getAbsolutePath(theRelativePath)));
+}
 Ptr<ReadableBlock>
 DirectoryPackage::getFile(const std::string & theRelativePath) {
     return Ptr<ReadableBlock>(new ConstMappedBlock(getAbsolutePath(theRelativePath)));

@@ -120,7 +120,7 @@ namespace y60 {
         for (unsigned i = 0; i < myFilenames.size(); ++i) {
             asl::Ptr<ReadableBlock> myBlock;
             if (thePackageManager) {
-                myBlock = thePackageManager->openFile(myFilenames[i]);
+                myBlock = thePackageManager->readFile(myFilenames[i]);
             }
             // fall back to simply try to open the file
             AC_DEBUG << myBlock << " filename='" << myFilenames[i] << "'";

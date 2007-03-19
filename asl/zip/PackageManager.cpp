@@ -125,8 +125,18 @@ PackageManager::findPackage(const std::string & theRelativePath,
     return IPackagePtr(0);
 }
 
+Ptr<ReadableStream>
+PackageManager::readStream(const std::string & theRelativePath,
+                         const std::string & thePackage)
+{
+    IPackagePtr myPackage = findPackage(theRelativePath, thePackage);
+    if (myPackage) {
+        return myPackage->getStream(theRelativePath);
+    }
+    return Ptr<ReadableStream>(0);
+}
 Ptr<ReadableBlock>
-PackageManager::openFile(const std::string & theRelativePath,
+PackageManager::readFile(const std::string & theRelativePath,
                          const std::string & thePackage)
 {
     IPackagePtr myPackage = findPackage(theRelativePath, thePackage);

@@ -29,6 +29,7 @@ class DirectoryPackage : public IPackage {
         const std::string & getPath() const { return _myDirectory; };
         FileList getFileList(const std::string & theSubDir = "", bool theRecurseFlag = false);
         std::string findFile(const std::string & theRelativePath) const;
+        Ptr<ReadableStream> getStream(const std::string & theRelativePath);
         Ptr<ReadableBlock> getFile(const std::string & theRelativePath);
 
     private:

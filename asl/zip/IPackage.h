@@ -50,7 +50,10 @@ class IPackage {
         /// returns absolute path to contained file or empty.
         virtual std::string findFile(const std::string & theRelativePath) const = 0;
 
-        /// opens a contained file.
+        /// opens a stream to a contained file.
+        virtual Ptr<ReadableStream> getStream(const std::string & theRelativePath) = 0;
+        
+        /// get the contents of a contained file.
         virtual Ptr<ReadableBlock> getFile(const std::string & theRelativePath) = 0;
 };
 

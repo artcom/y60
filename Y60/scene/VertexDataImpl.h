@@ -53,11 +53,20 @@ namespace y60 {
             const std::vector<T> & mySource = 
                 theVertexDataNode->dom::Node::nodeValueRef<std::vector<T> >();
 
-            _myData.reserve(theEndIndex - theBeginIndex);
+            unsigned count = theEndIndex - theBeginIndex;
+            unsigned mySize = _myData.size(); 
+            
+            _myData.resize(mySize + count);
 
-            for (unsigned i = theBeginIndex; i < theEndIndex; ++i) {
-                _myData.push_back(mySource[theIndices[i]]);
+            lock(true, false);
+            for (unsigned i = 0; i < count; ++i) {
+                _myData[mySize+i] = mySource[theIndices[i+theBeginIndex]];
             }        
+            unlock();
+
+//            for (unsigned i = theBeginIndex; i < theEndIndex; ++i) {
+//                _myData.push_back(mySource[theIndices[i]]);
+//            }        
         }
         // write back vertex data to dom source arrays
         void unload(const VectorOfUnsignedInt & theIndices,

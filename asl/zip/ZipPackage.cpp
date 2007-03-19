@@ -78,4 +78,9 @@ ZipPackage::getFile(const std::string & theRelativePath) {
     return _myZipReader.getFile(theRelativePath);
 }
 
+Ptr<ReadableStream>
+ZipPackage::getStream(const std::string & theRelativePath) {
+    return _myZipReader.getFile(theRelativePath);
+}
+
 }

@@ -421,7 +421,7 @@ namespace dom {
             return pos;
         }
         if (new_pos > pos) {
-readSystemLiteral:
+            readSystemLiteral:
             // read SystemLiteral
             int syslit_start_pos = read_whitespace(is, new_pos);
             int syslit_end_pos = read_quoted_text(is, syslit_start_pos);
