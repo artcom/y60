@@ -30,7 +30,7 @@
 using namespace asl;
 using namespace y60;
 
-extern std::string oureventxsd;
+namespace y60 {
 
 const unsigned char myMagicToken( 255 ); 
 
@@ -62,21 +62,18 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
     _myPower(2),
-    _myIDCounter( 0 ),
+    _myIDCounter( 0 )/*,
     _myEventSchema( new dom::Document( oureventxsd ) ),
-    _myValueFactory( new dom::ValueFactory() )
+    _myValueFactory( new dom::ValueFactory() )*/
 
 {
     // XXX [DS] make things configurable
-    _mySerialPort = getSerialDevice(0);
-    //_mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
+    //_mySerialPort = getSerialDevice(0);
+    _mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
     //_mySerialPort->open( 921600, 8, SerialDevice::NO_PARITY, 1, false);
-    AC_PRINT << "baud rate: " << 16 * 57600;
     setState(SYNCHRONIZING);
 
-    registerStandardTypes( * _myValueFactory );
-    registerSomTypes( * _myValueFactory );
 }
 
 ASSDriver::~ASSDriver() {
@@ -95,7 +92,7 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 }
 
 void
-ASSDriver::synchronize(EventPtrList & theEventList ) {
+ASSDriver::synchronize() {
     // XXX not reentrant safe ... even two ASSDrivers cause problems
     // TODO: refactor
     static int myLineStart = -1;
@@ -145,7 +142,7 @@ ASSDriver::synchronize(EventPtrList & theEventList ) {
                 myMagicTokenFlag = false;
                 allocateGridBuffers();
                 setState( RUNNING );
-                theEventList.push_back( createSyncEvent() );
+                createSyncEvent( _myIDCounter ++ );
                 return;
             } else {
                 myMaxLine = _myBuffer[i + 1];
@@ -184,11 +181,10 @@ ASSDriver::allocateRaster(const std::string & theName) {
 }
 
 void
-ASSDriver::readSensorValues(y60::EventPtrList & theEventList) {
+ASSDriver::readSensorValues() {
     //AC_PRINT << "====";
     //AC_PRINT << "pre buf size: " << _myBuffer.size();
     bool myNewDataFlag = false;
-    y60::EventPtrList myEventList;
     while ( _myGridSize[0] + 2 < _myBuffer.size() ) {
         if ( _myBuffer[0] != myMagicToken ) {
             AC_PRINT << "Sync error.";
@@ -211,7 +207,7 @@ ASSDriver::readSensorValues(y60::EventPtrList & theEventList) {
             //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
             _myLastFrameTime = myTime;
 
-            processSensorValues(theEventList, myDeltaT);
+            processSensorValues( myDeltaT );
         }
         myNewDataFlag = true;
     }
@@ -232,12 +228,12 @@ struct ThresholdWithPow {
         if (a.get() < _myThreshold.get()) {
             return PixelT(0);
         } else {
-            return PixelT( ipow(int(a.get()), _myPower) /  ipow(255, _myPower - 1));
+            return PixelT( (unsigned char)(pow(a.get(), _myPower) /  pow(255, _myPower - 1)));
         }
     }
 
     PixelT _myThreshold;
-    int _myPower;
+    float _myPower;
 };
 
 template <class RASTER>
@@ -264,7 +260,7 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
 }
 
 void
-ASSDriver::processSensorValues(y60::EventPtrList & theEventList, double theDeltaT ) {
+ASSDriver::processSensorValues( double theDeltaT ) {
     createThresholdedRaster( _myRawRaster, _myDenoisedRaster, _myNoiseThreshold );
 
     BlobListPtr myROIs = connectedComponents( _myDenoisedRaster.raster, _myComponentThreshold);
@@ -272,7 +268,7 @@ ASSDriver::processSensorValues(y60::EventPtrList & theEventList, double theDelta
     std::vector<Vector2f> myPreviousPositions( _myPositions );
 
     computeCursorPositions( myROIs );
-    correlatePositions( theEventList, myPreviousPositions );
+    correlatePositions( myPreviousPositions );
 
 }
 
@@ -301,8 +297,7 @@ ASSDriver::computeCursorPositions( const BlobListPtr & theROIs) {
 }
 
 void 
-ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
-        const std::vector<asl::Vector2f> & thePreviousPositions )
+ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPositions )
 {
 
     typedef TransformHierarchyFacade THF;
@@ -336,15 +331,15 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
 
             Unsigned64 myID( myOldIDs[ myMinDistIdx ] );
             _myCursorIDs.push_back( myID );
-            theEventList.push_back( createEvent( myID, "move", _myPositions[i],
-                    myTransform ));
+            createEvent( myID, "move", _myPositions[i],
+                    applyTransform( _myPositions[i], myTransform) );
         } else {
             // new cursor: get new label
             //AC_PRINT << "=== new cursor ===";
             Unsigned64 myNewID( _myIDCounter++ );
             _myCursorIDs.push_back( myNewID );
-            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i],
-                    myTransform ));
+            createEvent( myNewID, "add", _myPositions[i],
+                    applyTransform( _myPositions[i], myTransform ));
         }
     }
 
@@ -353,47 +348,10 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
             //AC_PRINT << "=== cursor " << i << " removed ===";
 
             Unsigned64 myID( myOldIDs[ i ] );
-            theEventList.push_back( createEvent( myID, "remove",
-                    thePreviousPositions[i], myTransform ));
+            createEvent( myID, "remove", thePreviousPositions[i],
+                    applyTransform( thePreviousPositions[i], myTransform ));
         }
     }
-}
-
-y60::GenericEventPtr
-ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
-        const Vector2f & thePosition, const Matrix4f & theTransform)
-{
-    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    myNode->appendAttribute<Unsigned64>("id", theID);
-    myNode->appendAttribute<std::string>("type", theType);
-    myNode->appendAttribute<Vector2f>("raw_position", thePosition);
-    Vector4f myHPosition;
-    myHPosition[0] = thePosition[0];
-    myHPosition[1] = thePosition[1];
-    myHPosition[2] = 0.0;
-    myHPosition[3] = 1.0;
-    myHPosition = myHPosition * theTransform;
-    Vector3f my3DPosition;
-    my3DPosition[0] = myHPosition[0];
-    my3DPosition[1] = myHPosition[1];
-    my3DPosition[2] = myHPosition[2];
-    myNode->appendAttribute<Vector3f>("position3D", my3DPosition);
-    return myEvent;
-}
-
-y60::GenericEventPtr
-ASSDriver::createSyncEvent() {
-    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-
-    myNode->appendAttribute<Unsigned64>("id", _myIDCounter++);
-    myNode->appendAttribute<std::string>("type", "configure");
-    myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
-    return myEvent;
 }
 
 void
@@ -405,7 +363,6 @@ ASSDriver::setState( DriverState theState ) {
             _myBuffer.clear();
             break;
         case RUNNING:
-
             break;
         default:
             break;
@@ -453,10 +410,6 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myTransform );
         return;
     }
-    if (thePropertyName == "eventSchema") {
-        theReturnValue.set( _myEventSchema );
-        return;
-    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -496,10 +449,6 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         _myTransform = thePropertyValue.get<dom::NodePtr>();
         return;
     }
-    if (thePropertyName == "eventSchema") {
-        AC_ERROR << "eventSchema property is read only";
-        return;
-    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -508,8 +457,25 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
     AC_PRINT << "TODO: onUpdateSettings";
 }
 
-y60::EventPtrList 
-ASSDriver::poll() {
+Vector3f 
+ASSDriver::applyTransform( const Vector2f & theRawPosition,
+                           const asl::Matrix4f & theTransform )
+{
+    Vector4f myHPosition;
+    myHPosition[0] = theRawPosition[0];
+    myHPosition[1] = theRawPosition[1];
+    myHPosition[2] = 0.0;
+    myHPosition[3] = 1.0;
+    myHPosition = myHPosition * theTransform;
+    Vector3f my3DPosition;
+    my3DPosition[0] = myHPosition[0];
+    my3DPosition[1] = myHPosition[1];
+    my3DPosition[2] = myHPosition[2];
+    return my3DPosition;    
+}
+
+void 
+ASSDriver::processInput() {
     std::vector<unsigned char> myBuffer;
     size_t myByteCount = _mySerialPort->peek();
     myBuffer.resize( myByteCount );
@@ -517,20 +483,17 @@ ASSDriver::poll() {
 
     _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
 
-    y60::EventPtrList myEventList;
+    AC_PRINT << "Got " << myByteCount << " bytes.";
+
     switch (_myState) {
         case SYNCHRONIZING:
-            synchronize( myEventList );
+            synchronize();
             break;
         case RUNNING:
-            readSensorValues( myEventList );
+            readSensorValues();
             break;
     }
-    return myEventList;
 }
 
-extern "C"
-EXPORT asl::PlugInBase* ASSDriver_instantiatePlugIn(asl::DLHandle myDLHandle) {
-    return new ASSDriver(myDLHandle);
-}
+} // end of namespace y60
 

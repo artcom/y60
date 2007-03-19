@@ -50,8 +50,9 @@ struct RasterHandle {
 class ASSDriver :
     public asl::PlugInBase,
     public jslib::IScriptablePlugin,
-    public y60::IRendererExtension,
-    public y60::IEventSource
+    public y60::IRendererExtension/*,
+    public y60::IEventSource // XXX move to derived
+    */
 
 {
     public:
@@ -70,40 +71,48 @@ class ASSDriver :
         void onPostRender(jslib::AbstractRenderWindow * theRenderer);
 
         // IScriptablePlugin
-        void onGetProperty(const std::string & thePropertyName,
+        virtual void onGetProperty(const std::string & thePropertyName,
                            PropertyValue & theReturnValue) const;
-        void onSetProperty(const std::string & thePropertyName,
+        virtual void onSetProperty(const std::string & thePropertyName,
                            const PropertyValue & thePropertyValue);
-        void onUpdateSettings(dom::NodePtr theSettings);
+        virtual void onUpdateSettings(dom::NodePtr theSettings);
         
-        const char * ClassName() {
+        /*
+        virtual const char * ClassName() { // XXX will be removed
             static const char * myClassName = "ASSDriver";
             return myClassName;
         }
 
         // IEventSource
         virtual y60::EventPtrList poll();
+*/
+    protected:
+        void processInput();
+        virtual void createEvent( asl::Unsigned64 theID, const std::string & theType,
+                const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D) = 0;
+        virtual void createSyncEvent(asl::Unsigned64 theID) = 0;
+
+        asl::Vector2i  _myGridSize;
     private:
         void setState( DriverState theState );
-        void synchronize(EventPtrList & theEventList);
+        void synchronize();
         void allocateGridBuffers();
         RasterHandle allocateRaster(const std::string & theName);
-        void readSensorValues(y60::EventPtrList & theEventList);
-        void processSensorValues(y60::EventPtrList & theEventList, double theDeltaT);
+        void readSensorValues();
+        void processSensorValues( double theDeltaT);
         void createThresholdedRaster(RasterHandle & theInput, RasterHandle & theOutput,
                                      const unsigned char theThreshold);
         void computeCursorPositions( const BlobListPtr & theROIs);
-        void correlatePositions( y60::EventPtrList & theEventList,
-                    const std::vector<asl::Vector2f> & thePreviousPositions );
-        y60::GenericEventPtr createEvent( asl::Unsigned64 theID, const std::string & theType,
-                const asl::Vector2f & thePosition, const asl::Matrix4f & theTransform);
-        y60::GenericEventPtr createSyncEvent();
+        void correlatePositions( const std::vector<asl::Vector2f> & thePreviousPositions );
+
+        asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
+                                      const asl::Matrix4f & theTransform );
+
 
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;
         DriverState    _myState;
 
-        asl::Vector2i  _myGridSize;
         unsigned       _mySyncLostCounter;
 
         RasterHandle _myRawRaster;
@@ -121,8 +130,13 @@ class ASSDriver :
         asl::Unsigned64              _myIDCounter;
 
         dom::NodePtr                 _myTransform;
+
+        /*
+        // XXX move to derived class
         dom::NodePtr                 _myEventSchema;
         asl::Ptr<dom::ValueFactory>  _myValueFactory;
+        y60::EventPtrList            _myEvents;
+        */
 };
 
 }
