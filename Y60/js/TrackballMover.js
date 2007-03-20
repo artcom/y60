@@ -106,7 +106,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     obj.pan = function(theDeltaX, theDeltaY) {
         var myScreenTranslation;
         var myCamera = obj.getViewportCamera();
-        if(myCamera.hfov == 0) {
+        if(myCamera.frustum.hfov == 0) {
             // ortho camera
             var myOrthoHeight = (obj.getViewport().height / obj.getViewport().width  ) * myCamera.width;
             myScreenTranslation = new Vector3f(myCamera.width * theDeltaX,

@@ -302,14 +302,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case '[-]':
                     var myCamera = self.getActiveCamera();
-                    if (myCamera.hfov) { // persp camera
-                        var myHfov = myCamera.hfov;
+                    if (myCamera.frustum.hfov) { // persp camera
+                        var myHfov = myCamera.frustum.hfov;
                         if (myHfov < 5) {
                             myHfov += 0.1;
                         } else if (myHfov < 175) {
                             myHfov += 5;
                         }
-                        myCamera.hfov = myHfov;
+                        myCamera.frustum.hfov = myHfov;
                         print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     } else {  // ortho camera
                         myCamera.width *= 1.1;
@@ -318,14 +318,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case '[+]':
                     var myCamera = self.getActiveCamera();
-                    if (myCamera.hfov) { // persp camera
-                        myHfov = myCamera.hfov;
+                    if (myCamera.frustum.hfov) { // persp camera
+                        myHfov = myCamera.frustum.hfov;
                         if (myHfov > 5) {
                             myHfov -= 5;
                         } else if (myHfov > 0.1) {
                             myHfov -= 0.1;
                         }
-                        myCamera.hfov = myHfov;
+                        myCamera.frustum.hfov = myHfov;
                         print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     } else {  // ortho camera
                         myCamera.width /= 1.1;
