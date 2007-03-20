@@ -37,7 +37,7 @@ namespace y60 {
 
     BufferAdapter::BufferAdapter (unsigned theWidth, unsigned theHeight, unsigned theComponents) :
                 _myWidth(theWidth), _myHeight(theHeight), _myComponents(theComponents) {
-        alloc(_myWidth * _myHeight * _myComponents);
+        //alloc(_myWidth * _myHeight * _myComponents);
     }
     BufferAdapter::~BufferAdapter() {
     }
@@ -48,7 +48,7 @@ namespace y60 {
     }
         
     asl::Block &
-    BufferAdapter::getBlock(){
+    BufferAdapter::getBlock() {
         return _myData;
     }
 
@@ -104,6 +104,8 @@ namespace y60 {
         if (theSourceBuffer == FRAME_BUFFER) {
             glReadBuffer(GL_BACK);
         }
+
+        alloc(_myWidth * _myHeight * _myComponents);
         glReadPixels(0, 0, _myWidth, _myHeight, myFormat, GL_UNSIGNED_BYTE, _myData.begin());
     }
 

@@ -306,7 +306,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         switch (myPlaylist.getMediaHintFromURL(myFilename)) {
             case AUDIO_MEDIA:
                 print("Media: audio");
-                if (OS == "Win32" && !_myWMAPlugged) {
+                if (OS == "WIN32" && !_myWMAPlugged) {
                     plug("y60WMADecoder");
                     _myWMAPlugged = true;
                 }
@@ -314,18 +314,16 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             case CAPTURE_MEDIA:
                 print("Media: Capture Video");
                 if (!_myVideoCapturePlugged &&
-                        (myFilename.search(/^video:\/\//i) != -1 ||
-                         myFilename.search(/^dshow:\/\//i) != -1) )
-                        {
-                            if (OS == "Linux") {
-                                plug("y60DC1394");
-                                print("plugged dc1394");
-                            } else {
-                                plug("y60DShowCapture");
-                                plug("y60DShowCapture");
-                            }
-                            _myVideoCapturePlugged  = true;
-                        }
+                    (myFilename.search(/^video:\/\//i) != -1 || myFilename.search(/^dshow:\/\//i) != -1) ) {
+                    if (OS == "LINUX") {
+                        plug("y60DC1394");
+                        print("plugged dc1394");
+                    } else {
+                        plug("y60DShowCapture");
+                        print("plugged y60DShowCapture");
+                    }
+                    _myVideoCapturePlugged  = true;
+                }
                 break;
         }
 
