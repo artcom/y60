@@ -29,12 +29,17 @@ float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
                     uniform sampler2D tex1) : COLOR
 {
-    float4 myScaledColor = float4(0.30, 0.59, 0.11, 1.0) * tex2D(tex0, IN.texCoord0);
-    float4 myNoise       = tex2D(tex1, IN.texCoord0);
-    float myStripes      = sin(IN.texCoord0.g*4000.0);
+    float4 myScaledColor   = tex2D(tex0, float2(IN.texCoord0.x, 1-IN.texCoord0.y));
+    float4 myOriginalImage = tex2D(tex1, float2(IN.texCoord0.x, 1-IN.texCoord0.y));
+    
+    myScaledColor += float4(myOriginalImage.rgb, 0.0);
+    myScaledColor *= 0.6;
+    myScaledColor *= float4(0.30, 0.59, 0.11, 1.0);  
+
+    float myStripes = sin(IN.texCoord0.g*4000.0);
     
     float myLuminance = 1 - (myScaledColor.r + myScaledColor.g + myScaledColor.b);
-    float4 myReturn = float4(myLuminance, myLuminance, myLuminance+0.05, 1.0) * 1.4 - float4(1.0, 1.0, 1.0, 0.0) + myNoise + float4(float3(myScaledColor.a), 0.0); 
+    float4 myReturn = float4(myLuminance, myLuminance, myLuminance+0.05, 1.0) * 1.4 - float4(1.0, 1.0, 1.0, 0.0) + float4(float3(myScaledColor.a*1.5), 0.0); 
     return myReturn + (myStripes * 0.015 + 0.015);
 }
 
