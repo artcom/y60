@@ -765,9 +765,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
                 collectAllSwitchNodes(theScene);
+                setupOcclusionMaterials(theScene);
             }
-
-            setupOcclusionMaterials(theScene);
 
         } else {
             Logger.trace("prepareScene has no scene");

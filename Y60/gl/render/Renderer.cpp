@@ -1341,7 +1341,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 if (myActiveLightCount >= myMaxLights) {
                     static bool myAlreadyWarned = false;
                     if (!myAlreadyWarned) {
-                        AC_WARNING << "Only " << int(myMaxLights) << " hardware light sources supported by OpenGL";
+                        AC_WARNING << "Max. " << int(myMaxLights) << " hardware light sources supported by OpenGL; active=" << myLights.size();
                         myAlreadyWarned = true;
                     }
                     break;

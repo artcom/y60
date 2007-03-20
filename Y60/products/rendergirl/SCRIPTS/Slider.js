@@ -75,6 +75,9 @@ AnimationSlider.prototype.Constructor = function(self, theGtkSlider) {
         _myLoopFlag  = false;
         for (var i = 0; i < theAnimationNode.childNodes.length; ++i) {
             var myAnimation = theAnimationNode.childNode(i);
+            if (!myAnimation) {
+                continue;
+            }
             if (myAnimation.begin < myStart) {
                 myStart = myAnimation.begin;
             }

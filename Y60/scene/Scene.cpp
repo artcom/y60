@@ -323,12 +323,13 @@ namespace y60 {
 
             NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
             if (myPropertiesNode) {
-                // remove sampler2d and samplerCUBE properties since they may change with the new shader
+                // remove sampler properties since they may change with the new shader
                 for (int i = myPropertiesNode->childNodesLength()-1; i >= 0; --i) {
                     NodePtr myPropertyNode = myPropertiesNode->childNode(i);
+                    const std::string & myPropTagName = myPropertyNode->nodeName();
                     const std::string & myPropName = myPropertyNode->getAttributeString("name");
-                    if (myPropertyNode->nodeName() == "sampler2d" || myPropertyNode->nodeName() == "samplerCUBE") {
-                        AC_DEBUG << "Removing property '" << myPropName << "'";
+                    if (myPropTagName == "sampler1d" || myPropTagName == "sampler2d" || myPropTagName == "samplerCUBE") {
+                        AC_DEBUG << "Removing sampler property '" << myPropName << "'";
                         myPropertiesNode->removeChild(myPropertyNode);
                     } else {
                         myPropertyNames[myPropName] = false;

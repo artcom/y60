@@ -460,9 +460,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // set the window behavior while sleeping
         window.renderWhileSleep = false;
 
-        // You could turn on multisampling here, if you like
-        //window.multisamples = 2;
-
         self.setupWindow(window, _mySetDefaultRenderingCap);
         var myScene;
         if (theScene) {
@@ -480,7 +477,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();
-
 
         // Turn on sync to V-Blank
         window.swapInterval = 1;

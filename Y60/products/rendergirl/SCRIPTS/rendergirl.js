@@ -36,14 +36,14 @@ var ourCameraPopup       = null;
 var ourAnimationManager  = null;
 var ourWindowState = {width: 800, height: 600, position: [0, 0]};
 var ourMaterialTable     = null;
-var ourScenePaused			 = null;
+var ourScenePaused       = null;
 
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
 var ourMaterialComboBox  = null;
 var ourLastMaterial      = null;
 
-var ourPatchObject			 = null;
+var ourPatchObject       = null;
 
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
@@ -179,21 +179,20 @@ ourHandler.on_open_activate = function(theArguments) {
 ourHandler.on_load_patch_activate = function() {
     var isPaused = window.pause;
     window.pause = true;
-    var myFilename = getFilenameDialog("Load Patch", FileChooserDialog.ACTION_OPEN);
-    
-    if (myFilename) {
-        if(fileExists(myFilename)) {
-            		print("Using patch '"+myFilename+"'");
-		    			
-		    				use(myFilename);
 
-		    				ourPatchObject = new Patch();
-		    }
-    }
+    var myFilename = getFilenameDialog("Load Patch", FileChooserDialog.ACTION_OPEN);
+    loadPatch(myFilename);
     
     window.pause = isPaused;
 }
 
+function loadPatch(theFilename) {
+    if (theFilename && fileExists(theFilename)) {
+        print("Loading patch '"+theFilename+"'");
+        use(theFilename);
+        ourPatchObject = new Patch();
+    }
+}
 
 ourHandler.on_save_screenshot_activate = function(theArguments) {
     var myFilename = theArguments;
@@ -672,11 +671,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         } else {
             myScene = new Scene(theFilename);
             self.setModelName(theFilename);
-            if(fileExists("SCRIPTS/Patch.js")) {
-            		print("Using patch 'Patch.js' in SCRIPTS directory");
-		    				use("Patch.js");
-		    				ourPatchObject = new Patch();
-		    		}
+            loadPatch("Patch.js");
         }
 
         myScene.setup();  
@@ -700,9 +695,9 @@ Viewer.prototype.Constructor = function(self, theArguments) {
 
         setupGUI();
         
-        if(ourPatchObject && typeof(ourPatchObject.onSceneLoaded)=="function") {
-    				ourPatchObject.onSceneLoaded();
-    		}
+        if (ourPatchObject && typeof(ourPatchObject.onSceneLoaded)=="function") {
+            ourPatchObject.onSceneLoaded(myScene);
+        }
         
         window.queue_draw();
     }
@@ -713,9 +708,9 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             RenderTest.onFrame(theTime);
         }
         
-        if(ourPatchObject && typeof(ourPatchObject.onFrame)=="function") {
-    				ourPatchObject.onFrame(theTime);
-    		}
+        if (ourPatchObject && typeof(ourPatchObject.onFrame)=="function") {
+            ourPatchObject.onFrame(theTime);
+        }
 
         ourStatusBar.onFrame();
 
@@ -762,20 +757,20 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-		self.onPreRender = function() {        
+    self.onPreRender = function() {        
         if(ourPatchObject && typeof(ourPatchObject.onPreRender)=="function") {
-    				ourPatchObject.onPreRender();
-    		}
-		}
+            ourPatchObject.onPreRender();
+        }
+    }
 
     self.onPostRender = function() {
         if (RenderTest) {
             RenderTest.onPostRender();
         }
-        
+
         if(ourPatchObject && typeof(ourPatchObject.onPostRender)=="function") {
-    				ourPatchObject.onPostRender();
-    		}
+            ourPatchObject.onPostRender();
+        }
     }
 
     self.setupSwitchNodeMenu = function() {
