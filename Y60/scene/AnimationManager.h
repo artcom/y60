@@ -59,7 +59,7 @@ namespace y60 {
 
             dom::NodePtr findAnimatedValue(dom::NodePtr theNode,
                     const std::string & theAttributeRef,
-                    AnimationBase::VectorComponent & myVectorComponent);
+                    AnimationBase::AttributeComponent & myAttributeComponent);
     };
 }
 

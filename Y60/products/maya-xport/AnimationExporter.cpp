@@ -367,7 +367,7 @@ AnimationExporter::exportGlobal(const MFnDagNode & theDagNode, const std::string
     exportAnimation<AcBool>(theDagNode, "visibility", theNodeId, "visible", &doNotConvert);
 
     if (theDagNode.object().apiType() == MFn::kCamera) {
-        exportAnimation<float>(theDagNode, "focalLength", theNodeId, "hfov", &doNotConvert);
+        exportAnimation<float>(theDagNode, "focalLength", theNodeId, "frustum.hfov", &doNotConvert);
     }
 }
 

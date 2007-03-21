@@ -36,12 +36,13 @@ namespace y60 {
 
     class AnimationBase {
         public:
-            enum VectorComponent {
+            enum AttributeComponent {
                 SCALAR = -1,
                 X,
                 Y,
                 Z,
-                W
+                W,
+                HFOV
             };
 
             AnimationBase(dom::NodePtr theNode, bool theAngleAnimation);

@@ -26,6 +26,7 @@
 
 #include <asl/Exception.h>
 #include <asl/string_functions.h>
+#include <asl/Frustum.h>
 
 #include <dom/Nodes.h>
 #include <asl/begin_end.h>
@@ -76,6 +77,30 @@ namespace y60 {
             dom::NodePtr     _myAnimatedAttribute;
             unsigned         _myAnimatedIndex;
             T                _myPreviousValue;
+    };
+
+    template <>
+    class AnimationValueSetter<float, asl::Frustum> {
+        public:
+        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned) 
+            : _myAnimatedAttribute(theAnimatedValue)
+        {
+            const asl::Frustum & myAnimatedAttributeValue = 
+                    _myAnimatedAttribute->dom::Node::nodeValueRef<asl::Frustum>();
+            _myPreviousValue  = myAnimatedAttributeValue.getHFov();
+        }
+        void setValue(const float & theNewValue) {
+            if (!(theNewValue == _myPreviousValue)) {
+                dom::Node::WritableValue<asl::Frustum> myAnimatedAttributeLock(_myAnimatedAttribute);
+                asl::Frustum & myAnimatedAttributeValue = myAnimatedAttributeLock.get();
+                myAnimatedAttributeValue.setHFov( theNewValue );
+                _myPreviousValue  = theNewValue;
+            }
+        }
+
+         private:
+            dom::NodePtr     _myAnimatedAttribute;
+            float            _myPreviousValue;
     };
 
     template<>
@@ -159,23 +184,8 @@ namespace y60 {
                     setToEndValue();
                     return false;
                 }
-#if 1
                 _myValueSetter.setValue(asl::interpolate(myValues[myLowerIndex],
                             myValues[myUpperIndex], myAlpha));
-#else
-                // deprecated since the switch to quaternions
-                if (isAngleAnimation() && axisFlip(myValues[myLowerIndex], myValues[myUpperIndex])) {
-                    if (myAlpha < 0.5 ) {
-                        _myValueSetter.setValue(myValues[myLowerIndex]);
-                    } else {
-                        _myValueSetter.setValue(myValues[myUpperIndex]);
-                    }
-                } else {
-                    _myValueSetter.setValue(asl::interpolate(myValues[myLowerIndex],
-                                              myValues[myUpperIndex],
-                                              myAlpha));
-                }
-#endif
                 return true;
             }
 
