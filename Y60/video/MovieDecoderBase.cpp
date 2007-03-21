@@ -33,10 +33,6 @@ namespace y60 {
         return "";
     }
 
-    double MovieDecoderBase::getAudioVideoDelay() const {
-        return 0.0;
-    }
-
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
         AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime 
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 

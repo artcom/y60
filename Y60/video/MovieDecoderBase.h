@@ -51,11 +51,6 @@ namespace y60 {
                     asl::ReadableStream * theStream = 0);
 
             /**
-             * @return the time that audio is behind video in seconds
-             */
-            virtual double getAudioVideoDelay() const; 
-
-            /**
              *
              * @param theSystemTime used for calculation of delta t in free running mode.
              *                      Should be increasing constantly over time. May be ignored
