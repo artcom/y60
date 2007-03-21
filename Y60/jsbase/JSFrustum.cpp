@@ -69,6 +69,9 @@ JSFrustum::Properties() {
         {"near", PROP_near, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"far", PROP_far, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
 
+        {"hshift", PROP_hshift, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"vshift", PROP_vshift, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+
         {"hfov", PROP_hfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"vfov", PROP_vfov, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"width", PROP_width, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -157,6 +160,12 @@ JSFrustum::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
             case PROP_vfov:
                 *vp = as_jsval(cx, getNative().getVFov());
                 return JS_TRUE;
+            case PROP_hshift:
+                *vp = as_jsval(cx, getNative().getHShift());
+                return JS_TRUE;
+            case PROP_vshift:
+                *vp = as_jsval(cx, getNative().getVShift());
+                return JS_TRUE;
             case PROP_type:
                 *vp = as_jsval(cx, getNative().getType());
                 return JS_TRUE;
@@ -173,72 +182,86 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
     switch (theID) {
         case PROP_left:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setLeft(myValue);
                 return JS_TRUE;
             }
         case PROP_right:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setRight(myValue);
                 return JS_TRUE;
             }
         case PROP_top:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setTop(myValue);
                 return JS_TRUE;
             }
         case PROP_bottom:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setBottom(myValue);
                 return JS_TRUE;
             }
         case PROP_near:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setNear(myValue);
                 return JS_TRUE;
             }
         case PROP_far:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setFar(myValue);
                 return JS_TRUE;
             }
         case PROP_width:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setWidth(myValue);
                 return JS_TRUE;
             }
         case PROP_height:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setHeight(myValue);
                 return JS_TRUE;
             }
         case PROP_hfov:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setHFov(myValue);
                 return JS_TRUE;
             }
         case PROP_vfov:
             {
-                double myValue;
+                float myValue;
                 convertFrom(cx, * vp, myValue);
                 myObj.getNative().setVFov(myValue);
+                return JS_TRUE;
+            }
+        case PROP_hshift:
+            {
+                float myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setHShift(myValue);
+                return JS_TRUE;
+            }
+        case PROP_vshift:
+            {
+                float myValue;
+                convertFrom(cx, * vp, myValue);
+                myObj.getNative().setVShift(myValue);
                 return JS_TRUE;
             }
         case PROP_type:

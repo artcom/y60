@@ -43,6 +43,8 @@ public:
         PROP_type,
         PROP_width,
         PROP_height,
+        PROP_hshift,
+        PROP_vshift,
         PROP_hfov,
         PROP_vfov,
 
