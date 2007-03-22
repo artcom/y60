@@ -87,7 +87,6 @@ public:
     }
     static
     JSObject * Construct(JSContext *cx, const asl::Frustum & theFrustum) {
-        // JSFrustum::NativeValuePtr myValue(new dom::SimpleValue<asl::Frustum >(theFrustum, 0));
         JSFrustum::NativeValuePtr myValue(new dom::ValueWrapper<asl::Frustum >::Type(theFrustum, 0));
         return Base::Construct(cx, myValue, 0);
     }

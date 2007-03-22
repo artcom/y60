@@ -21,6 +21,7 @@
 #define _scene_Camera_h_
 
 #include "TransformHierarchyFacade.h"
+#include <y60/FrustumValue.h>
 
 namespace y60 {
 

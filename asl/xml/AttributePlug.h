@@ -221,6 +221,9 @@ namespace dom {
 
             static void ensureSchemaVsFacade(const Node & theNode, NodePtr theAttribute) {
                 if (!ValueHelper<VALUE, WRAPPER>::checkValueType(theAttribute->nodeValueWrapperPtr())) {
+                    AC_PRINT << "*nodeValueWrapperPtr :" << typeid(*theAttribute->nodeValueWrapperPtr()).name();
+                    AC_PRINT << "nodeValueWrapperPtr :" << typeid(theAttribute->nodeValueWrapperPtr()).name();
+                    AC_PRINT << "WRAPPER :" << typeid(WRAPPER).name();
                     throw SchemaVsFacadeTypeMismatch(std::string("Attribute '") + TAG::getName() +
                                                      "' has incompatible schema type in node:\n" +
                                                      asl::as_string(theNode), PLUS_FILE_LINE);

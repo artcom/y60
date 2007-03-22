@@ -10,6 +10,7 @@
 
 #include "DataTypes.h"
 #include "NodeValueNames.h"
+#include "FrustumValue.h"
 
 namespace y60 {
 
@@ -85,7 +86,7 @@ namespace y60 {
         theFactory.registerPrototype("Matrix4d", dom::ValuePtr(new dom::SimpleValue<asl::Matrix4d>(asl::Matrix4d(),0)));
 
         theFactory.registerPrototype("Quaternionf", dom::ValuePtr(new dom::SimpleValue<asl::Quaternionf>(asl::Quaternionf(),0)));
-        theFactory.registerPrototype("Frustum", dom::ValuePtr(new dom::SimpleValue<asl::Frustum>(asl::Frustum(),0)));
+        theFactory.registerPrototype("Frustum", dom::ValuePtr(new dom::FrustumValue(asl::Frustum(),0)));
 
         theFactory.registerPrototype("Planef", dom::ValuePtr(new dom::SimpleValue<asl::Planef>(asl::Planef(),0)));
 
@@ -166,4 +167,6 @@ namespace y60 {
         registerSomImageTypes(theFactory);
         registerEnumBitsetTypes(theFactory);        
     }
+
 }
+

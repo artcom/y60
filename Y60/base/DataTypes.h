@@ -6,20 +6,6 @@
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//============================================================================
-//
-//   $Id: DataTypes.h,v 1.2 2005/04/08 17:34:41 david Exp $
-//   $RCSfile: DataTypes.h,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/08 17:34:41 $
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-// (CVS log at the bottom of this file)
-//
 //=============================================================================
 
 #ifndef _ac_y60_DataTypes_h_
@@ -54,7 +40,6 @@ namespace y60 {
 }
 
 namespace dom {
-
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::AcBool, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BlendFunction, SimpleValue);
 
@@ -104,7 +89,6 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::LineSegment<double>, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Ray<double>, SimpleValue);
 
-    DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Frustum, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Plane<float>, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Sphere<float>, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Triangle<float>, SimpleValue);

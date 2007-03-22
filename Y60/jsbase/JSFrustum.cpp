@@ -14,10 +14,13 @@
 #include "JSMatrix.h"
 #include "JSWrapper.impl"
 
+#include <y60/DataTypes.h>
+
 #include <iostream>
 
 using namespace std;
 using namespace asl;
+using namespace dom;
 
 namespace jslib {
 
@@ -288,7 +291,7 @@ JSFrustum::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         return JS_FALSE;
     }
     JSFrustum * myNewObject = 0;
-    JSFrustum::NativeValuePtr myNewValue = JSFrustum::NativeValuePtr(new dom::SimpleValue<asl::Frustum>(0));
+    JSFrustum::NativeValuePtr myNewValue = JSFrustum::NativeValuePtr(new FrustumValue(0));
     asl::Frustum & myNewFrustum = myNewValue->openWriteableValue(); // we close it only on success, otherwise we trash it anyway
 
     if (argc == 0) {
