@@ -19,6 +19,7 @@
 #include <asl/linearAlgebra.h>
 #include <asl/Frustum.h>
 #include <dom/Value.h>
+#include <y60/FrustumValue.h>
 
 namespace jslib {
 
