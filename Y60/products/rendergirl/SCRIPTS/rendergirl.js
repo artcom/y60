@@ -15,8 +15,8 @@ use("ClassicTrackballMover.js");
 use("FlyMover.js");
 use("WalkMover.js");
 use("GUIUtils.js");
-use("SwitchNodeMenu.js");
 use("MaterialEditorFunctions.js");
+use("SwitchNodeMenu.js");
 
 var ourHandler           = {};
 
@@ -44,6 +44,8 @@ var ourMaterialComboBox  = null;
 var ourLastMaterial      = null;
 
 var ourPatchObject       = null;
+
+var ourSwitchNodeMenu    = null;
 
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
@@ -94,15 +96,15 @@ ourHandler.on_fog_exponential = function() {
 }
 
 ourHandler.on_range_start = function() {
-		ourGlade.get_widget("range_start_label").text=ourGlade.get_widget("range_start").value.toFixed(2);
+	ourGlade.get_widget("range_start_label").text=ourGlade.get_widget("range_start").value.toFixed(2);
 }
 
 ourHandler.on_range_end = function() {
-		ourGlade.get_widget("range_end_label").text=ourGlade.get_widget("range_end").value.toFixed(2);
+	ourGlade.get_widget("range_end_label").text=ourGlade.get_widget("range_end").value.toFixed(2);
 }
 
 ourHandler.on_fog_density = function() {
-		ourGlade.get_widget("fog_density_label").text=ourGlade.get_widget("fog_density").value.toFixed(2);
+	ourGlade.get_widget("fog_density_label").text=ourGlade.get_widget("fog_density").value.toFixed(2);
 }
 
 //=================================================
@@ -137,7 +139,7 @@ ourHandler.on_include_activate = function() {
     ourViewer.recollectSwitchNodes(); 
     ourViewer.setupSwitchNodeMenu();
     ourMaterialTable = ourViewer.applyMaterialTable();
-		ourSceneViewerDialog.setBaseNode(window.scene.world);
+	ourSceneViewerDialog.setBaseNode(window.scene.world);
     window.pause = false;
 }
 
@@ -172,7 +174,9 @@ ourHandler.on_open_activate = function(theArguments) {
         ourViewer.loadModel( myFilename );
     }
     ourSceneViewerDialog.setBaseNode(window.scene.world);
+
     window.pause = isPaused;
+     
 }
 
 
@@ -223,7 +227,7 @@ ourHandler.on_scene_activate = function() {
 
 
 ourHandler.on_normals_activate = function(theMenuItem) {
-		window.drawnormals = theMenuItem.active;
+	window.drawnormals = theMenuItem.active;
     ourStatusBar.set("Normals " + (theMenuItem.active ? "on" : "off"));
     window.queue_draw();
 }
@@ -430,10 +434,15 @@ ourHandler.on_material_dlg_save_clicked = function() {
         myNode.saveFile(myFilename, false);
     }
 
+	
     window.pause = isPaused;
 }
 
+
 ourHandler.on_material_dlg_save_table_clicked = function() {
+	var isPaused = window.pause;
+    window.pause = true;
+    
     var myMaterial = getSelectedMaterial();
     var myMaterialName = myMaterial.name;
     if ("mswitch_"+myMaterial.name in ourViewer.lastSwitched) {
@@ -443,8 +452,10 @@ ourHandler.on_material_dlg_save_table_clicked = function() {
     Logger.info("appending active properties for: "+myMaterial.name+" to materialtable as: "+myMaterialName);
     
     var myNode = getDescendantByName(ourMaterialTable, myMaterialName, true);
+    var myParentNode = myNode.parentNode;
+
     if (myNode) {
-        myNode.parentNode.removeChild(myNode);
+        myParentNode.removeChild(myNode);
     }
 
     var myNewNode = new Node("<material name=\""+myMaterialName+"\"/>").firstChild;
@@ -452,6 +463,8 @@ ourHandler.on_material_dlg_save_table_clicked = function() {
     
     ourMaterialTable.appendChild(myNewNode);
     ourMaterialTable.saveFile("materialtable.xml");
+    
+    window.pause = isPaused;
 }
 
 ourHandler.on_material_dlg_load_clicked = function() {
@@ -528,9 +541,7 @@ ourHandler.on_material_editor_activate = function() {
         ourMaterialComboBox.active_text = myMaterial;
     }
   	
-  	
     myMaterialEditor.show();
-    
 }
 
 //=================================================
@@ -781,6 +792,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
         _mySwitchNodeMenu = new SwitchNodeMenu();
         _mySwitchNodeMenu.setup( self );
+        ourSwitchNodeMenu = _mySwitchNodeMenu;
     }
 
 /*

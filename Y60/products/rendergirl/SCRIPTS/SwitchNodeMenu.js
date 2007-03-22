@@ -79,7 +79,6 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                     return;
                 }
             }
-
             return;
         }
                     
@@ -118,7 +117,9 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
 
         var myFunctionString = 'this.onSwitchNodeSwitched(\'' + theNode.name + '\');';
         obj['_myGtkSwitchNodeHandler_'+theNode.name] = new Function (myFunctionString);
-    
+        
+        
+        
         _mySignalHandlers[ theNode.name ] =
             myItem.signal_activate.connect( obj, "_myGtkSwitchNodeHandler_" + theNode.name);
 
@@ -148,6 +149,8 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             Logger.info("onSwitchNodeSwitched: "+theName+" switchName: "+_myHandlers[0].switchName);
             ourViewer.lastSwitched[_myHandlers[0].switchName] = theName;
         }
+        
+        updateMaterialEditor();
     }
 
     obj.finalize = function() {
@@ -258,6 +261,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         var mySwitchNodes  = theViewer.getSwitchNodes();
         var myMSwitchNodes = theViewer.getMaterialSwitchNodes();
         var myTSwitchNodes = theViewer.getTextureSwitchNodes();
+        
         Logger.info("Geometry switches found: " + mySwitchNodes.length);
         Logger.info("Material switches found: " + myMSwitchNodes.length);
         Logger.info("Texture switches found: " + myTSwitchNodes.length);
@@ -266,6 +270,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         if ( myMSwitchNodes.length > 0) {
             myMSwitchNodes.sort(sortSwitchNodes);
             for (var i = 0; i < myMSwitchNodes.length; ++i) {
+                
                 _myHandlers.push( new GtkSwitchNodeGroupHandler( myMSwitchNodes[i],
                                             _mySwitchNodeMenu ) );
             }            

@@ -79,8 +79,12 @@ function updateMaterialEditor() {
 }
 
 function updateMaterial(thePropertyName, theValue) {
+	var isPaused = window.pause;
+    window.pause = true;
+    
     var myMaterial = getSelectedMaterial();
     var myPropertyNode = getDescendantByName(myMaterial.childNode("properties"), thePropertyName);
+    
     if (myPropertyNode.nodeName == "vector4f") {
         var myColorPicker = ourGlade.get_widget(thePropertyName+"_color");
 
@@ -92,12 +96,15 @@ function updateMaterial(thePropertyName, theValue) {
             "] ";
 
         myPropertyNode.firstChild.nodeValue = myColorPicker.color;
+        
     } else if (myPropertyNode.nodeName == "float") {
         myPropertyNode.firstChild.nodeValue = theValue;
     }
+    window.pause = isPaused;
 }
 
 function updateColorElement(theNode) {
+	
     var myColorPicker = ourGlade.get_widget(theNode.name+"_color");
    
     // colorpicker
