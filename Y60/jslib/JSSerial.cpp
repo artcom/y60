@@ -107,7 +107,8 @@ open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
         JSSerial::getJSWrapper(cx,obj).openNative().open(myBaudRate, myBits,
-            SerialDevice::ParityMode(myParity), myStopBits, myHwHandshake);
+            SerialDevice::ParityMode(SerialDevice::ParityModeEnum(myParity)),
+            myStopBits, myHwHandshake);
         JSSerial::getJSWrapper(cx,obj).closeNative();
 
         return JS_TRUE;

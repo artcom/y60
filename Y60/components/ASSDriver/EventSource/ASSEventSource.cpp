@@ -54,14 +54,18 @@ ASSEventSource::createEvent( Unsigned64 theID, const std::string & theType,
 }
 
 void
-ASSEventSource::createSyncEvent( Unsigned64 theID ) {
+ASSEventSource::createTransportLayerEvent( Unsigned64 theID,
+    const std::string & theType)
+{
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
     myNode->appendAttribute<Unsigned64>("id", theID );
-    myNode->appendAttribute<std::string>("type", "configure");
-    myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
+    myNode->appendAttribute<std::string>("type", theType);
+    if ( theType == "configure" ) {
+        myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
+    }
     _myEvents.push_back( myEvent );
 }
 

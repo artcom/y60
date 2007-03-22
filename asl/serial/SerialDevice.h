@@ -18,6 +18,7 @@
 #ifndef ASL_SERIAL_DEVICE_INCLUDED
 #define ASL_SERIAL_DEVICE_INCLUDED
 
+#include <asl/Enum.h>
 #include <asl/Exception.h>
 #include <string>
 
@@ -30,11 +31,14 @@ namespace asl {
             virtual ~SerialDevice();
 
             /// Parity.
-            enum ParityMode {
+            enum ParityModeEnum {
                 NO_PARITY,
                 EVEN_PARITY,
-                ODD_PARITY
+                ODD_PARITY,
+                ParityModeEnum_MAX
             };
+
+            DEFINE_ENUM( ParityMode, ParityModeEnum );
 
             /// Status line bits.
             enum StatusBits {

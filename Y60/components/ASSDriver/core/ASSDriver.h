@@ -28,12 +28,15 @@
 namespace y60 {
 
 enum DriverStateEnum {
+    NO_SERIAL_PORT,
     SYNCHRONIZING,
     RUNNING,
     DriverStateEnum_MAX
 };
 
 DEFINE_ENUM( DriverState, DriverStateEnum );
+
+DEFINE_EXCEPTION( ASSException, asl::Exception );
 
 typedef dom::ValueWrapper<y60::RasterOfGRAY>::Type::ACCESS_TYPE Raster;
 typedef asl::Ptr<Raster, dom::ThreadingModel> RasterPtr;
@@ -50,16 +53,11 @@ struct RasterHandle {
 class ASSDriver :
     public asl::PlugInBase,
     public jslib::IScriptablePlugin,
-    public y60::IRendererExtension/*,
-    public y60::IEventSource // XXX move to derived
-    */
-
+    public y60::IRendererExtension
 {
     public:
 		ASSDriver (asl::DLHandle theDLHandle);
 		virtual ~ASSDriver();
-
-//   		void initClasses(JSContext * theContext, JSObject *theGlobalObject);
 
         // IRendererExtension
         void onStartup(jslib::AbstractRenderWindow * theWindow) {}
@@ -77,20 +75,12 @@ class ASSDriver :
                            const PropertyValue & thePropertyValue);
         virtual void onUpdateSettings(dom::NodePtr theSettings);
         
-        /*
-        virtual const char * ClassName() { // XXX will be removed
-            static const char * myClassName = "ASSDriver";
-            return myClassName;
-        }
-
-        // IEventSource
-        virtual y60::EventPtrList poll();
-*/
     protected:
         void processInput();
         virtual void createEvent( asl::Unsigned64 theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D) = 0;
-        virtual void createSyncEvent(asl::Unsigned64 theID) = 0;
+        virtual void createTransportLayerEvent(asl::Unsigned64 theID,
+                                               const std::string & theType) = 0;
 
         asl::Vector2i  _myGridSize;
     private:
@@ -108,9 +98,10 @@ class ASSDriver :
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
 
+        void readDataFromPort();
+        void scanForSerialPort();
+        void freeSerialPort();
 
-        std::vector<unsigned char> _myBuffer;
-        asl::SerialDevice * _mySerialPort;
         DriverState    _myState;
 
         unsigned       _mySyncLostCounter;
@@ -131,12 +122,27 @@ class ASSDriver :
 
         dom::NodePtr                 _myTransform;
 
-        /*
-        // XXX move to derived class
-        dom::NodePtr                 _myEventSchema;
-        asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        y60::EventPtrList            _myEvents;
-        */
+        // Transport Layer Members
+        // will be refactored into a separate class, when 
+        // we go for ethernet
+        std::vector<unsigned char> _myBuffer;
+        asl::SerialDevice * _mySerialPort;
+
+        int  _myLineStart;
+        int  _myLineEnd;
+        int  _myMaxLine;
+        bool _myMagicTokenFlag;
+        int  _myPortScanCountDown;
+
+        bool _myUseUSBFlag; // used by the linux implementation, because
+                            // USB TTYs have a diffrent naming scheme
+        int  _myPortNum;
+        int  _myBaudRate;
+        int  _myBitsPerSerialWord;
+        int  _myStopBits;
+        bool _myHandshakingFlag;
+        asl::SerialDevice::ParityMode _myParity;
+        
 };
 
 }

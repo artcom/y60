@@ -21,6 +21,16 @@
 
 namespace asl {
 
+    static const char * ParityModeStrings[] = {
+        "no_parity",
+        "even_parity",
+        "odd_parity",
+        ""
+    };
+
+    IMPLEMENT_ENUM( SerialDevice::ParityMode, ParityModeStrings );
+    
+
     SerialDevice::SerialDevice(const std::string & theDeviceName) :
         _isOpen(false),
         _myNoisyFlag(false),

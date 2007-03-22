@@ -37,7 +37,7 @@ class ASSEventSource : public ASSDriver,
     protected:
         void createEvent( asl::Unsigned64 theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D);
-        void createSyncEvent(asl::Unsigned64 theID );
+        void createTransportLayerEvent(asl::Unsigned64 theID, const std::string & theType );
     private:
         dom::NodePtr                 _myEventSchema;
         asl::Ptr<dom::ValueFactory>  _myValueFactory;

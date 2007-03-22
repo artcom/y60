@@ -27,6 +27,7 @@
 #endif
 
 
+using namespace std;
 using namespace asl;
 using namespace y60;
 
@@ -38,6 +39,7 @@ static const char * RAW_RASTER = "ASSRawRaster";
 static const char * FILTERED_RASTER = "ASSFilteredRaster";
 
 static const char * DriverStateStrings[] = {
+    "no_serial_port",
     "synchronizing",
     "running",
     ""
@@ -62,21 +64,33 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
     _myPower(2),
-    _myIDCounter( 0 )/*,
-    _myEventSchema( new dom::Document( oureventxsd ) ),
-    _myValueFactory( new dom::ValueFactory() )*/
-
+    _myIDCounter( 0 ),
+    _myLineStart( -1 ),
+    _myLineEnd( -1 ),
+    _myMaxLine( 0 ),
+    _myMagicTokenFlag( false ),
+    _myUseUSBFlag( false ),
+    _myPortNum( -1 ),
+    _mySerialPort( 0 ),
+    _myBaudRate( 9600 ),
+    _myBitsPerSerialWord( 8 ),
+    _myParity( SerialDevice::NO_PARITY ),
+    _myStopBits( 1 ),
+    _myHandshakingFlag( false ),
+    _myPortScanCountDown( 0 )
 {
     // XXX [DS] make things configurable
     //_mySerialPort = getSerialDevice(0);
-    _mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
-    _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
+    //_mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
+    //_mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
     //_mySerialPort->open( 921600, 8, SerialDevice::NO_PARITY, 1, false);
-    setState(SYNCHRONIZING);
+
+    setState(NO_SERIAL_PORT);
 
 }
 
 ASSDriver::~ASSDriver() {
+    freeSerialPort();
     AC_PRINT << "ASSDriver stats:";
     AC_PRINT << "    sync errors: " << _mySyncLostCounter;
 }
@@ -93,32 +107,26 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 
 void
 ASSDriver::synchronize() {
-    // XXX not reentrant safe ... even two ASSDrivers cause problems
-    // TODO: refactor
-    static int myLineStart = -1;
-    static int myLineEnd   = -1;
-    static int myMaxLine = 0;
-    static bool myMagicTokenFlag = false;
     // first look for the beginning of a line
-    if (myLineStart < 0) {
+    if (_myLineStart < 0) {
         for (unsigned i = 0; i < _myBuffer.size(); ++i) {
-            if (myMagicTokenFlag) {
-                myMaxLine = _myBuffer[i];
-                myMagicTokenFlag = false;
-                myLineStart = i;
+            if (_myMagicTokenFlag) {
+                _myMaxLine = _myBuffer[i];
+                _myMagicTokenFlag = false;
+                _myLineStart = i;
                 AC_PRINT << "Got line start";
                 break;
             } else if (_myBuffer[i] == myMagicToken) {
-                myMagicTokenFlag = true;
+                _myMagicTokenFlag = true;
             }
         }
     }
     // then find the end of that line and determine the number of columns
-    if (myLineStart >= 0 && myLineEnd < 0) {
-        for (unsigned i = myLineStart + 1; i < _myBuffer.size(); ++i) {
+    if (_myLineStart >= 0 && _myLineEnd < 0) {
+        for (unsigned i = _myLineStart + 1; i < _myBuffer.size(); ++i) {
             if (_myBuffer[i] == myMagicToken) {
-                myLineEnd = i;
-                _myGridSize[0] = myLineEnd - myLineStart - 1;
+                _myLineEnd = i;
+                _myGridSize[0] = _myLineEnd - _myLineStart - 1;
                 AC_PRINT << "Got line end";
                 break;
             }
@@ -127,25 +135,20 @@ ASSDriver::synchronize() {
 
     // now scan for the maximum line number to determine the number of rows
     if (_myGridSize[0] > 0 && _myGridSize[1] == 0) {
-        ASSURE( _myBuffer[ myLineEnd ] == myMagicToken );
-        for (unsigned i = myLineEnd; i < _myBuffer.size(); i += _myGridSize[0] + 2) {
+        ASSURE( _myBuffer[ _myLineEnd ] == myMagicToken );
+        for (unsigned i = _myLineEnd; i < _myBuffer.size(); i += _myGridSize[0] + 2) {
             ASSURE( _myBuffer[i] == myMagicToken );
-            if (_myBuffer[i + 1] == 1 && myMaxLine > 0) {
-                _myGridSize[1] = myMaxLine;
+            if (_myBuffer[i + 1] == 1 && _myMaxLine > 0) {
+                _myGridSize[1] = _myMaxLine;
                 AC_PRINT << "Grid size: " << _myGridSize;
                 _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + i);
                 ASSURE(_myBuffer.front() == myMagicToken);
-                // reset the statics so we could resynchronize ... at least in theory
-                myLineStart = -1;
-                myLineEnd = -1;
-                myMaxLine = 0;
-                myMagicTokenFlag = false;
                 allocateGridBuffers();
                 setState( RUNNING );
-                createSyncEvent( _myIDCounter ++ );
+                createTransportLayerEvent( _myIDCounter ++, "configure" );
                 return;
             } else {
-                myMaxLine = _myBuffer[i + 1];
+                _myMaxLine = _myBuffer[i + 1];
             }
         }
     }
@@ -189,6 +192,7 @@ ASSDriver::readSensorValues() {
         if ( _myBuffer[0] != myMagicToken ) {
             AC_PRINT << "Sync error.";
             _mySyncLostCounter++;
+            createTransportLayerEvent( _myIDCounter++, "lost_sync" ); 
             setState( SYNCHRONIZING );
             return;
         }
@@ -358,7 +362,14 @@ void
 ASSDriver::setState( DriverState theState ) {
     _myState = theState;
     switch ( _myState ) {
+        case NO_SERIAL_PORT:
+            freeSerialPort();
+            break;
         case SYNCHRONIZING:
+            _myLineStart = -1;
+            _myLineEnd = -1;
+            _myMaxLine = 0;
+            _myMagicTokenFlag = false;
             _myGridSize = Vector2i(0, 0);
             _myBuffer.clear();
             break;
@@ -452,9 +463,53 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
+
+template <class T>
+void
+getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue ) {
+    dom::NodePtr myNode = theSettings->childNode( theName );
+    if ( ! myNode ) {
+        throw asl::Exception(string("No node named '") + theName + 
+                "' found in configuration: '" +
+                as_string( * theSettings ), PLUS_FILE_LINE);
+    }
+
+    if ( myNode->childNodesLength() != 1 ) {
+        throw asl::Exception(string("Configuration node '") + theName +
+            "' must have exactly one child.", PLUS_FILE_LINE);
+    }
+    if ( myNode->childNode("#text") ) {
+        theValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
+    } else {
+        throw asl::Exception(string("Node '") + myNode->nodeName() + 
+        "' does not have a text child." , PLUS_FILE_LINE);
+    }
+}
+
 void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
-    AC_PRINT << "TODO: onUpdateSettings";
+
+    dom::NodePtr mySettings(0);
+    if ( theSettings->nodeName() == "settings") {
+        mySettings = theSettings->childNode("ASSDriver", 0);
+    } else if ( theSettings->nodeName() == "ASSDriver" ) {
+        mySettings = theSettings;
+    }
+    
+    if ( ! mySettings ) {
+        throw ASSException(
+            std::string("Could not find ASSDriver node in settings document: ") +
+            as_string( * theSettings), PLUS_FILE_LINE );
+    }
+
+
+    getConfigSetting( mySettings, "SerialPort", _myPortNum );
+    getConfigSetting( mySettings, "UseUSB", _myUseUSBFlag );
+    getConfigSetting( mySettings, "BaudRate", _myBaudRate );
+    getConfigSetting( mySettings, "BitsPerWord", _myBitsPerSerialWord );
+    getConfigSetting( mySettings, "Parity", _myParity );
+    getConfigSetting( mySettings, "StopBits", _myStopBits );
+    getConfigSetting( mySettings, "Handshaking", _myHandshakingFlag );
 }
 
 Vector3f 
@@ -476,22 +531,83 @@ ASSDriver::applyTransform( const Vector2f & theRawPosition,
 
 void 
 ASSDriver::processInput() {
-    std::vector<unsigned char> myBuffer;
-    size_t myByteCount = _mySerialPort->peek();
-    myBuffer.resize( myByteCount );
-    _mySerialPort->read( reinterpret_cast<char*>(& ( * myBuffer.begin())), myByteCount );
-
-    _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
-
-    AC_PRINT << "Got " << myByteCount << " bytes.";
-
     switch (_myState) {
+        case NO_SERIAL_PORT:
+            scanForSerialPort();
+            break;
         case SYNCHRONIZING:
+            readDataFromPort();
             synchronize();
             break;
         case RUNNING:
+            readDataFromPort();
             readSensorValues();
             break;
+    }
+}
+
+void
+ASSDriver::readDataFromPort() {
+    try {
+        std::vector<unsigned char> myBuffer;
+        size_t myByteCount = _mySerialPort->peek();
+        myBuffer.resize( myByteCount );
+        _mySerialPort->read( reinterpret_cast<char*>(& ( * myBuffer.begin())), myByteCount );
+
+        _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
+    } catch (const SerialPortException & ex) {
+        AC_WARNING << "Serial port is gone to market: " << ex;
+        createTransportLayerEvent( _myIDCounter ++, "lost_communication" );
+        setState(NO_SERIAL_PORT);
+    }
+}
+
+void
+ASSDriver::scanForSerialPort() {
+    if ( _myPortScanCountDown == 0) {
+        if (_myPortNum >= 0 ) {
+#ifdef WIN32
+            _mySerialPort = getSerialDevice( _myPortNum );
+#endif
+#ifdef LINUX
+            if (_myUseUSBFlag) {
+                string myDeviceName("/dev/ttyUSB");
+                myDeviceName += as_string( _myPortNum );
+                if ( fileExists( myDeviceName ) ) {
+                    _mySerialPort = getSerialDeviceByName( myDeviceName );
+                }
+            } else {
+                _mySerialPort = getSerialDevice( _myPortNum );
+            }
+#endif
+#ifdef OSX
+            // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/ttyUSB-[devid]
+            // where [devid] is a string that is flashed into the FTDI chip. I'll
+            // check that the other day.
+            AC_PRINT << "TODO: implement device name handling for FTDI USB->Serial "
+                     << "virtual TTYs.";
+#endif
+
+            if (_mySerialPort) {
+                // TODO: make baudrate, &c a setting
+                _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
+                        _myParity, _myStopBits, _myHandshakingFlag);
+                setState( SYNCHRONIZING );
+            }
+        } else {
+            AC_PRINT << "scanForSerialPort() No port configured.";
+        }
+        _myPortScanCountDown = 30;
+    } else {
+        _myPortScanCountDown -= 1;
+    }
+}
+
+void
+ASSDriver::freeSerialPort() {
+    if (_mySerialPort) {
+        delete _mySerialPort;
+        _mySerialPort = 0;
     }
 }
 

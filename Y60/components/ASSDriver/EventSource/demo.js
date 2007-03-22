@@ -46,6 +46,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myLastEventTime = 0;
 
     var _myLastFrameTime = 0.0;
+
+    var _mySettings = null;
     //////////////////////////////////////////////////////////////////////
     //
     // public members
@@ -59,14 +61,19 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.resize(theWidth, theHeight);
         _myDriver = plug("ASSEventSource");
         window.addExtension(_myDriver);
-        //self.registerSettingsListener( _myDriver, "ASSDriver" );
+        self.registerSettingsListener( _myDriver, "ASSDriver" );
 
         _myDriver.noiseThreshold = 15;
         _myDriver.componentThreshold = 5;
         _myDriver.gainPower = 2;
 
-        print("setup done");
         window.camera.position.z = 400;
+
+        _mySettings = Node.createDocument();
+        _mySettings.parseFile("settings.xml");
+
+        //_myDriver.onUpdateSettings( _mySettings );
+        print("setup done");
     }
 
     function createDisplay(theRaster) {
@@ -112,7 +119,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         var myOriginMarker = Modelling.createBody(_myGroup, myOriginMarkerShape.id );
         myOriginMarker.position.y = _myDisplaySize3D.y;
         myOriginMarker.position.z = 1;
-        myOriginMarker.scale = new Vector3f(3 / DISPLAY_SCALE, 3 / DISPLAY_SCALE , 3 / DISPLAY_SCALE);
+        myOriginMarker.scale = new Vector3f(3 / DISPLAY_SCALE, 3 / DISPLAY_SCALE ,
+            3 / DISPLAY_SCALE);
 
         _myCrosshairShape = Modelling.createCrosshair(window.scene, myWhiteMaterial.id, 
                                                  1, 2, "Crosshair"); 
@@ -157,7 +165,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         while (_myMarkers.length < myPositions.length) {
             var myNewMarker = Modelling.createBody(_myGroup, _myCrosshairShape.id );
             myNewMarker.position.z = 1;
-            myNewMarker.scale = new Vector3f(3 / DISPLAY_SCALE , 3 / DISPLAY_SCALE, 3 / DISPLAY_SCALE);
+            myNewMarker.scale = new Vector3f(3 / DISPLAY_SCALE , 3 / DISPLAY_SCALE,
+                    3 / DISPLAY_SCALE);
             _myMarkers.push( myNewMarker );
 
             if (myBBoxFlag) {
@@ -234,8 +243,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.onMouseButton( theButton, theState, theX, theY);
     }
     self.onASSEvent = function( theNode ) {
-        if (theNode.type == "configure") {
+        if (theNode.type == "configure" ) {
             print("event " + theNode.type + " grid size: " + theNode.grid_size);
+        } else if ( theNode.type == "lost_communication" ||
+            theNode.type == "lost_sync" )
+        {
+            print("event " + theNode.type );
         } else {
             print("event " + theNode.type + " at position: " + theNode.position3D +
                     " dt: " + (theNode.when - _myLastEventTime));
