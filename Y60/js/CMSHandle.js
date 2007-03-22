@@ -113,7 +113,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             String(myCMSConfig.backend).toUpperCase() == "OCS") {
             myUsername += "@" + myCMSConfig.domain;
         }
-        print("_myPresentation :  " + _myPresentation)
         _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
                             myCMSConfig.backend, myUsername, _myConfig.password, _myOCSCookie );
         _myCMSCache.verbose = _myCMSVerbosityFlag;
