@@ -72,21 +72,14 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myUseUSBFlag( false ),
     _myPortNum( -1 ),
     _mySerialPort( 0 ),
-    _myBaudRate( 9600 ),
+    _myBaudRate( 57600 ),
     _myBitsPerSerialWord( 8 ),
     _myParity( SerialDevice::NO_PARITY ),
     _myStopBits( 1 ),
     _myHandshakingFlag( false ),
     _myPortScanCountDown( 0 )
 {
-    // XXX [DS] make things configurable
-    //_mySerialPort = getSerialDevice(0);
-    //_mySerialPort = getSerialDeviceByName("/dev/ttyUSB0");
-    //_mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
-    //_mySerialPort->open( 921600, 8, SerialDevice::NO_PARITY, 1, false);
-
     setState(NO_SERIAL_PORT);
-
 }
 
 ASSDriver::~ASSDriver() {

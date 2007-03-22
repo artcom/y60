@@ -43,7 +43,7 @@ use("VideoRecorder.js");
 if (window == undefined) var window   = null;
 if (renderer == undefined) var renderer = null;
 
-var SETTINGS_FILE_NAME = "settings.xml";
+var SETTINGS_FILE_NAMES = ["settings.xml", "CONFIG/settings.xml" ];
 
 function SceneViewer(theArguments) {
     this.Constructor(this, theArguments);
@@ -498,7 +498,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // [CH]: Deprecated, should be removed someday
         _myImageManager = new ImageManager(self);
 
-        _myConfigurator = new Configurator(self, SETTINGS_FILE_NAME);
+        var mySettingsFile = "";
+        for (var i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
+            if ( fileExists( SETTINGS_FILE_NAMES[i] )) {
+                mySettingsFile = SETTINGS_FILE_NAMES[i];
+                break;
+            }
+        }
+        _myConfigurator = new Configurator(self, mySettingsFile);
 
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
