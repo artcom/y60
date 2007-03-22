@@ -18,7 +18,8 @@ extern std::string oureventxsd;
 namespace y60 {
 
 ASSEventSource::ASSEventSource(DLHandle theHandle) :
-    ASSDriver( theHandle ),
+    asl::PlugInBase( theHandle ),
+    ASSDriver( /*theHandle */),
     _myEventSchema( new dom::Document( oureventxsd ) ),
     _myValueFactory( new dom::ValueFactory() )
 
@@ -39,14 +40,14 @@ ASSEventSource::poll() {
 
 
 void
-ASSEventSource::createEvent( Unsigned64 theID, const std::string & theType,
+ASSEventSource::createEvent( int theID, const std::string & theType,
         const Vector2f & theRawPosition, const Vector3f & thePosition3D)
 {
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
     
-    myNode->appendAttribute<Unsigned64>("id", theID);
+    myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector2f>("raw_position", theRawPosition);
     myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
@@ -54,14 +55,14 @@ ASSEventSource::createEvent( Unsigned64 theID, const std::string & theType,
 }
 
 void
-ASSEventSource::createTransportLayerEvent( Unsigned64 theID,
+ASSEventSource::createTransportLayerEvent( int theID,
     const std::string & theType)
 {
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
-    myNode->appendAttribute<Unsigned64>("id", theID );
+    myNode->appendAttribute<int>("id", theID );
     myNode->appendAttribute<std::string>("type", theType);
     if ( theType == "configure" ) {
         myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);

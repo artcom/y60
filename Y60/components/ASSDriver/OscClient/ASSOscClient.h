@@ -12,37 +12,47 @@
 #define ASS_EVENT_SOURCE_INCLUDED
 
 #include <y60/ASSDriver.h>
+#include <asl/UDPConnection.h>
+
+#include <oscpack/osc/OscOutboundPacketStream.h>
 
 namespace y60 {
 
-class ASSEventSource : public asl::PlugInBase,
-                       public ASSDriver,
-                       public y60::IEventSource
-{
+typedef asl::Ptr<inet::UDPConnection> UDPConnectionPtr;
+
+class ASSOscClient : public ASSDriver {
     public:
-        ASSEventSource(asl::DLHandle theHandle);
-        virtual y60::EventPtrList poll();
+        ASSOscClient();
+        void poll();
 
 
         const char * ClassName() {
-            static const char * myClassName = "ASSEventSource";
+            static const char * myClassName = "ASSOscClient";
             return myClassName;
         }
 
-        virtual void onGetProperty(const std::string & thePropertyName,
-                           PropertyValue & theReturnValue) const;
-        virtual void onSetProperty(const std::string & thePropertyName,
-                           const PropertyValue & thePropertyValue);
-        // TODO virtual void onUpdateSettings(dom::NodePtr theSettings);
+        enum {
+            BUFFER_SIZE = 1024
+        };
+
+        virtual void onUpdateSettings( dom::NodePtr theSettings );
 
     protected:
         void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D);
         void createTransportLayerEvent(int theID, const std::string & theType );
     private:
-        dom::NodePtr                 _myEventSchema;
-        asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        y60::EventPtrList            _myEvents;
+
+        void connectToServer();
+
+        char myBuffer[ BUFFER_SIZE ];
+        osc::OutboundPacketStream _myOSCStream;
+
+        UDPConnectionPtr _myConnection;
+        int              _myClientPort;
+        int              _myServerPort;
+        std::string      _myServerAddress;
+        int              _myReconnectCounter;
 };
 
 } // end of namespace y60

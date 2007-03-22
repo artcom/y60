@@ -31,13 +31,6 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-namespace y60 {
-
-const unsigned char myMagicToken( 255 ); 
-
-static const char * RAW_RASTER = "ASSRawRaster";
-static const char * FILTERED_RASTER = "ASSFilteredRaster";
-
 static const char * DriverStateStrings[] = {
     "no_serial_port",
     "synchronizing",
@@ -45,16 +38,24 @@ static const char * DriverStateStrings[] = {
     ""
 };
 
+IMPLEMENT_ENUM( y60::DriverState, DriverStateStrings );
+
+namespace y60 {
+
+const unsigned char myMagicToken( 255 ); 
+
+static const char * RAW_RASTER = "ASSRawRaster";
+static const char * FILTERED_RASTER = "ASSFilteredRaster";
+
 #ifdef OSX
 #undef verify
 #endif
 
 
-IMPLEMENT_ENUM( DriverState, DriverStateStrings );
 
 
-ASSDriver::ASSDriver(DLHandle theDLHandle) :
-    PlugInBase(theDLHandle),
+ASSDriver::ASSDriver(/*DLHandle theDLHandle*/) :
+/*    PlugInBase(theDLHandle),*/
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
     _mySyncLostCounter(0),
@@ -307,7 +308,7 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
 
 
     std::vector<bool> myCorrelationFlags(thePreviousPositions.size(), false);
-    std::vector<Unsigned64> myOldIDs( _myCursorIDs );
+    std::vector<int> myOldIDs( _myCursorIDs );
     _myCursorIDs.clear();
     for (unsigned i = 0; i < _myPositions.size(); ++i) {
         float myMinDistance = FLT_MAX;
@@ -326,14 +327,14 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
             // cursor moved: copy label from previous analysis
             myCorrelationFlags[myMinDistIdx] = true;
 
-            Unsigned64 myID( myOldIDs[ myMinDistIdx ] );
+            int myID( myOldIDs[ myMinDistIdx ] );
             _myCursorIDs.push_back( myID );
             createEvent( myID, "move", _myPositions[i],
                     applyTransform( _myPositions[i], myTransform) );
         } else {
             // new cursor: get new label
             //AC_PRINT << "=== new cursor ===";
-            Unsigned64 myNewID( _myIDCounter++ );
+            int myNewID( _myIDCounter++ );
             _myCursorIDs.push_back( myNewID );
             createEvent( myNewID, "add", _myPositions[i],
                     applyTransform( _myPositions[i], myTransform ));
@@ -344,7 +345,7 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
         if ( ! myCorrelationFlags[i]) {
             //AC_PRINT << "=== cursor " << i << " removed ===";
 
-            Unsigned64 myID( myOldIDs[ i ] );
+            int myID( myOldIDs[ i ] );
             createEvent( myID, "remove", thePreviousPositions[i],
                     applyTransform( thePreviousPositions[i], myTransform ));
         }
@@ -457,44 +458,10 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
 }
 
 
-template <class T>
-void
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue ) {
-    dom::NodePtr myNode = theSettings->childNode( theName );
-    if ( ! myNode ) {
-        throw asl::Exception(string("No node named '") + theName + 
-                "' found in configuration: '" +
-                as_string( * theSettings ), PLUS_FILE_LINE);
-    }
-
-    if ( myNode->childNodesLength() != 1 ) {
-        throw asl::Exception(string("Configuration node '") + theName +
-            "' must have exactly one child.", PLUS_FILE_LINE);
-    }
-    if ( myNode->childNode("#text") ) {
-        theValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
-    } else {
-        throw asl::Exception(string("Node '") + myNode->nodeName() + 
-        "' does not have a text child." , PLUS_FILE_LINE);
-    }
-}
-
 void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
-    dom::NodePtr mySettings(0);
-    if ( theSettings->nodeName() == "settings") {
-        mySettings = theSettings->childNode("ASSDriver", 0);
-    } else if ( theSettings->nodeName() == "ASSDriver" ) {
-        mySettings = theSettings;
-    }
-    
-    if ( ! mySettings ) {
-        throw ASSException(
-            std::string("Could not find ASSDriver node in settings document: ") +
-            as_string( * theSettings), PLUS_FILE_LINE );
-    }
-
+    dom::NodePtr mySettings = getASSSettings( theSettings );
 
     getConfigSetting( mySettings, "SerialPort", _myPortNum );
     getConfigSetting( mySettings, "UseUSB", _myUseUSBFlag );
@@ -603,6 +570,29 @@ ASSDriver::freeSerialPort() {
         _mySerialPort = 0;
     }
 }
+
+
+dom::NodePtr
+getASSSettings(dom::NodePtr theSettings) {
+    dom::NodePtr mySettings(0);
+    if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+        if (theSettings->childNode(0)->nodeName() == "settings") {
+            mySettings = theSettings->childNode(0)->childNode("ASSDriver", 0);
+        }
+    } else if ( theSettings->nodeName() == "settings") {
+        mySettings = theSettings->childNode("ASSDriver", 0);
+    } else if ( theSettings->nodeName() == "ASSDriver" ) {
+        mySettings = theSettings;
+    }
+    
+    if ( ! mySettings ) {
+        throw ASSException(
+            std::string("Could not find ASSDriver node in settings: ") +
+            as_string( * theSettings), PLUS_FILE_LINE );
+    }
+    return mySettings;
+}
+
 
 } // end of namespace y60
 

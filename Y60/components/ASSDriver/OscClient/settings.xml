@@ -1,0 +1,15 @@
+<settings>
+    <ASSDriver>
+        <SerialPort>0</SerialPort>
+        <UseUSB>true</UseUSB>
+        <BaudRate>57600</BaudRate>
+        <BitsPerWord>8</BitsPerWord>
+        <Parity>no_parity</Parity>
+        <StopBits>1</StopBits>
+        <Handshaking>false</Handshaking>
+
+        <ServerAddress>127.0.0.1</ServerAddress>
+        <ServerPort>7000</ServerPort>
+        <ClientPort>7001</ClientPort>
+    </ASSDriver>
+</settings>

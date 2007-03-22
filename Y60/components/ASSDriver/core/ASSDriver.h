@@ -51,12 +51,12 @@ struct RasterHandle {
 };
 
 class ASSDriver :
-    public asl::PlugInBase,
+    /*public asl::PlugInBase,*/
     public jslib::IScriptablePlugin,
     public y60::IRendererExtension
 {
     public:
-		ASSDriver (asl::DLHandle theDLHandle);
+		ASSDriver (/*asl::DLHandle theDLHandle*/);
 		virtual ~ASSDriver();
 
         // IRendererExtension
@@ -77,9 +77,9 @@ class ASSDriver :
         
     protected:
         void processInput();
-        virtual void createEvent( asl::Unsigned64 theID, const std::string & theType,
+        virtual void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D) = 0;
-        virtual void createTransportLayerEvent(asl::Unsigned64 theID,
+        virtual void createTransportLayerEvent(int theID,
                                                const std::string & theType) = 0;
 
         asl::Vector2i  _myGridSize;
@@ -98,10 +98,6 @@ class ASSDriver :
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
 
-        void readDataFromPort();
-        void scanForSerialPort();
-        void freeSerialPort();
-
         DriverState    _myState;
 
         unsigned       _mySyncLostCounter;
@@ -117,14 +113,18 @@ class ASSDriver :
 
         std::vector<asl::Vector2f>   _myPositions;
         std::vector<asl::Box2f>      _myRegions;
-        std::vector<asl::Unsigned64> _myCursorIDs;
-        asl::Unsigned64              _myIDCounter;
+        std::vector<int> _myCursorIDs;
+        int              _myIDCounter;
 
         dom::NodePtr                 _myTransform;
 
-        // Transport Layer Members
+        // Transport Layer Members:
         // will be refactored into a separate class, when 
         // we go for ethernet
+        void readDataFromPort();
+        void scanForSerialPort();
+        void freeSerialPort();
+
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;
 
@@ -144,5 +144,32 @@ class ASSDriver :
         asl::SerialDevice::ParityMode _myParity;
         
 };
+
+
+//=== Configuration Helpers ========================
+
+dom::NodePtr getASSSettings(dom::NodePtr theSettings);
+
+template <class T>
+void
+getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue ) {
+    dom::NodePtr myNode = theSettings->childNode( theName );
+    if ( ! myNode ) {
+        throw asl::Exception(std::string("No node named '") + theName + 
+                "' found in configuration: '" +
+                as_string( * theSettings ), PLUS_FILE_LINE);
+    }
+
+    if ( myNode->childNodesLength() != 1 ) {
+        throw asl::Exception(std::string("Configuration node '") + theName +
+            "' must have exactly one child.", PLUS_FILE_LINE);
+    }
+    if ( myNode->childNode("#text") ) {
+        theValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
+    } else {
+        throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
+        "' does not have a text child." , PLUS_FILE_LINE);
+    }
+}
 
 }
