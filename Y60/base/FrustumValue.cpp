@@ -14,6 +14,7 @@ namespace dom {
 void 
 FrustumValue::binarize(asl::WriteableStream & theDest) const {
     const asl::Frustum & myValue = getValue();
+
     theDest.appendData(myValue.getLeft());
     theDest.appendData(myValue.getRight());
     theDest.appendData(myValue.getBottom());
@@ -27,24 +28,27 @@ FrustumValue::binarize(asl::WriteableStream & theDest) const {
 asl::AC_SIZE_TYPE 
 FrustumValue::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
     asl::Frustum & myValue = openWriteableValue();
-    float myFloat;
+    float myLeft, myRight, myBottom, myTop, myNear, myFar;
 
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setLeft(myFloat);
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setRight(myFloat);
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setBottom(myFloat);
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setTop(myFloat);
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setNear(myFloat);
-    thePos = theSource.readData(myFloat, thePos);
-    myValue.setFar(myFloat);
+    thePos = theSource.readData(myLeft, thePos);
+    thePos = theSource.readData(myRight, thePos);
+    thePos = theSource.readData(myBottom, thePos);
+    thePos = theSource.readData(myTop, thePos);
+    thePos = theSource.readData(myNear, thePos);
+    thePos = theSource.readData(myFar, thePos);
 
     asl::ProjectionType myType;
     thePos = theSource.readData(myType, thePos);
     myValue.setType(myType);
+
+    // must set these values after type is set
+    // eventually the order should be changed so that 'type' is first
+    myValue.setLeft(myLeft);
+    myValue.setRight(myRight);
+    myValue.setBottom(myBottom);
+    myValue.setTop(myTop);
+    myValue.setNear(myNear);
+    myValue.setFar(myFar);
 
     closeWriteableValue();
     return thePos;
