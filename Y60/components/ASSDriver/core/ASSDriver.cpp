@@ -64,7 +64,7 @@ ASSDriver::ASSDriver(/*DLHandle theDLHandle*/) :
     _myScene(0),
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
-    _myPower(2),
+    _myPower(2.0f),
     _myIDCounter( 0 ),
     _myLineStart( -1 ),
     _myLineEnd( -1 ),
@@ -219,14 +219,14 @@ ASSDriver::readSensorValues() {
 
 template <class PixelT>
 struct ThresholdWithPow {
-    ThresholdWithPow(const PixelT & theThreshold, int thePower) :
+    ThresholdWithPow(const PixelT & theThreshold, float thePower) :
         _myThreshold( theThreshold ),
         _myPower( thePower) {}
     PixelT operator () (const PixelT & a) {
         if (a.get() < _myThreshold.get()) {
             return PixelT(0);
         } else {
-            return PixelT( (unsigned char)(pow(a.get(), _myPower) /  pow(255, _myPower - 1)));
+            return PixelT( (unsigned char)(pow(float(a.get()), _myPower) /  pow(255.0f, _myPower - 1)));
         }
     }
 
@@ -439,7 +439,7 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         return;
     }
     if (thePropertyName == "gainPower") {
-        _myPower = thePropertyValue.get<int>();
+        _myPower = thePropertyValue.get<float>();
         return;
     }
     if (thePropertyName == "positions") {

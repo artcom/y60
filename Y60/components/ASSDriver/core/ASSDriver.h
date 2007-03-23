@@ -109,7 +109,7 @@ class ASSDriver :
         asl::Time   _myLastFrameTime;
         unsigned char _myComponentThreshold;
         unsigned char _myNoiseThreshold;
-        int           _myPower;
+        float         _myPower;
 
         std::vector<asl::Vector2f>   _myPositions;
         std::vector<asl::Box2f>      _myRegions;
