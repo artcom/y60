@@ -29,5 +29,9 @@
     #define XP_UNIX    
 #endif
 
+#ifdef OSX
+    #define XP_UNIX    
+#endif
+
 #endif
 
