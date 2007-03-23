@@ -109,6 +109,7 @@ class Frustum {
         void setVShift(const float & theShift);
         float getVShift() const;
 
+        void set(float theLeft, float theRight, float theBottom, float theTop, float theNear, float theFar);
 
         void setSymmetricPerspective(float theHFov, float theVFov, float theNear, float theFar);
         void setSymmetricOrtho(float theWidth, float theHeight, float theNear, float theFar);

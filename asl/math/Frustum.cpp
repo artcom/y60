@@ -157,6 +157,16 @@ Frustum::setSymmetricOrtho(float theWidth, float theHeight, float theNear, float
     _myProjectionType = ORTHONORMAL;
 }
 
+void
+Frustum::set(float theLeft, float theRight, float theBottom, float theTop, float theNear, float theFar) {
+    _myLeft   = theLeft;
+    _myRight  = theRight;
+    _myBottom = theBottom;
+    _myTop    = theTop;
+    _myNear   = theNear;
+    _myFar    = theFar;
+}
+
 // See OpenGL Red Book Appendix F page 674
 // and errata @ www.woo.com/errata.html
 bool
@@ -330,7 +340,6 @@ Frustum::setNear(const float & theValue) {
         _myLeft *= myScale;
         _myTop *= myScale;
         _myBottom *= myScale;
-
      }
      _myNear = theValue;
 }

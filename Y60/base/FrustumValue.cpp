@@ -36,19 +36,11 @@ FrustumValue::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYP
     thePos = theSource.readData(myTop, thePos);
     thePos = theSource.readData(myNear, thePos);
     thePos = theSource.readData(myFar, thePos);
+    myValue.set(myLeft, myRight, myBottom, myTop, myNear, myFar);
 
     asl::ProjectionType myType;
     thePos = theSource.readData(myType, thePos);
     myValue.setType(myType);
-
-    // must set these values after type is set
-    // eventually the order should be changed so that 'type' is first
-    myValue.setLeft(myLeft);
-    myValue.setRight(myRight);
-    myValue.setBottom(myBottom);
-    myValue.setTop(myTop);
-    myValue.setNear(myNear);
-    myValue.setFar(myFar);
 
     closeWriteableValue();
     return thePos;
