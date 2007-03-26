@@ -25,6 +25,10 @@ function setupOcclusionMaterials(theScene) {
         }
 
         var myTextures = myMaterial.childNode("textures");
+        if (!myTextures) {
+            Logger.info("Skipping material '" + myMaterial.name + "': no texture");
+            continue;
+        }
         if (myTextures.childNodes.length <= 1) {
             Logger.info("Skipping material '" + myMaterial.name + "': only one texture");
             continue;

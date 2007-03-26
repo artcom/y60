@@ -148,7 +148,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
            throw new Exception("Could not load model", fileline());
        }
        if (!theScene) {
-           self.prepareScene(null, null);
+           self.prepareScene(null, null, theSwitchNodeFlag);
        } else {
            var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
            self.prepareScene(theScene, myCanvas, theSwitchNodeFlag);
