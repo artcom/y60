@@ -33,7 +33,7 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
-plug("NagiosPlugin");
+// plug("NagiosPlugin");
 
 //if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
@@ -512,8 +512,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             window.title = theWindowTitle;
         }
 
-        _myNagiosPlugin = new NagiosPlugin();
-        window.addExtension(_myNagiosPlugin);
+        //_myNagiosPlugin = new NagiosPlugin();
+        //window.addExtension(_myNagiosPlugin);
 
         if (_mySplashScreenFlag) {
             _mySplashScreen = new ImageOverlay(window.scene, "shadertex/ac_logo.png", [0, 0]);
