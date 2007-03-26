@@ -46,7 +46,7 @@ AssetRequest::AssetRequest(RequestThread * theParent,
         }
         addHttpHeaderAsDate("If-Modified-Since", myLastModified);
     }
-    //setVerbose(true);
+    setVerbose(true);
     //setTimeoutParams(100, 60);
     
 }
