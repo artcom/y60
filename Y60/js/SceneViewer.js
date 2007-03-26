@@ -33,6 +33,7 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
+plug("y60Nagios");
 
 //if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
@@ -511,6 +512,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             window.title = theWindowTitle;
         }
 
+        _myNagiosPlugin = new NagiosPlugin();
+        window.addExtension(_myNagiosPlugin);
+
         if (_mySplashScreenFlag) {
             _mySplashScreen = new ImageOverlay(window.scene, "shadertex/ac_logo.png", [0, 0]);
             _mySplashScreen.name = "splashscreen";
@@ -641,5 +645,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myMemoryMeter           = null;
     var _myOnScreenStatistics    = 0;
     var _myVideoRecorder         = null;
+    var _myNagiosPlugin          = null;
     var _myStatisticColor        = [1,1,1,1];
 }
