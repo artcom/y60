@@ -33,7 +33,7 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
-plug("y60Nagios");
+plug("NagiosPlugin");
 
 //if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
