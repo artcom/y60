@@ -28,7 +28,7 @@ class StatusServer : public asl::ConduitServer<asl::TCPPolicy> {
         static asl::Signed32 readFrameTimeout();
     private:
         StatusServer(asl::TCPPolicy::Handle theHandle);
-        void sendSlowly(const std::string theData);
+        void sendString(const std::string theData);
         void sendResponseHeader(int theResponseCode);
         void sendResponseHeader(int theResponseCode, const std::string & theCharset);
         void sendResponseBody(const std::string & theBody);

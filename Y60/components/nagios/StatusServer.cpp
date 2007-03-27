@@ -27,11 +27,8 @@ StatusServer::StatusServer(TCPPolicy::Handle theHandle) : ConduitServer<TCPPolic
 {}; 
 
 void 
-StatusServer::sendSlowly(const std::string theData) {
-    for (int i = 0; i < theData.length(); ++i) {
-        this->sendData(&theData[i], 1);
-        msleep(1);
-    }
+StatusServer::sendString(const std::string theData) {
+    this->sendData(theData.c_str(), theData.length());
 }
 
 void 
@@ -43,16 +40,16 @@ void
 StatusServer::sendResponseHeader(int theResponseCode, const std::string & theCharset) {
     std::stringstream myDate;
     myDate << Time();
-    sendSlowly("HTTP/1.1 "+as_string(theResponseCode)+"\n");
-    sendSlowly("Date: "+myDate.str()+"\n");
-    sendSlowly("Server: ASL Conduit\n");
-    sendSlowly("Content-Type: text/plain; charset="+theCharset+"\n");
+    sendString("HTTP/1.1 "+as_string(theResponseCode)+"\n");
+    sendString("Date: "+myDate.str()+"\n");
+    sendString("Server: ASL Conduit\n");
+    sendString("Content-Type: text/plain; charset="+theCharset+"\n");
 }
 
 void 
 StatusServer::sendResponseBody(const std::string & theBody) {
-    sendSlowly("Content-Length: "+as_string(theBody.length())+"\n\n");
-    sendSlowly(theBody);
+    sendString("Content-Length: "+as_string(theBody.length())+"\n\n");
+    sendString(theBody);
 }
 
 std::string 

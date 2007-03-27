@@ -69,7 +69,7 @@ class ThreadedConduit : protected Conduit<POLICY> {
              Remember: processData is called in a tight loop in its own thread. On the one hand, 
              this permits the use of blocking i/o calls without slowing the main application. On the
              other hand, if you return immediately, you will waste CPU time (busy waiting). 
-          @returns false if the connection should be terminated.
+          @returns true if the connection should be terminated.
           @code Example: a simple conduit which sends everything back.
           
 virtual bool processData() {
@@ -114,6 +114,7 @@ virtual bool processData() {
             } catch (ConduitException & ex) {
                 AC_ERROR << ex;
             }
+            mySelf->disconnect();
             pthread_cleanup_pop(0);
             pthread_setcancelstate(myOldCancelState,0);
             return (void*)static_cast<ptrdiff_t>(myResult);

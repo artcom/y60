@@ -97,7 +97,7 @@ void* PlugInManager :: getFunction(DLHandle theHandle, const std::string & theSy
 asl::Ptr<PlugInBase> PlugInManager :: loadPlugIn(const std::string & theName) {
     string myFilename = searchFile(getPlugInFileName(theName), _mySearchPath);
     if (myFilename.empty()) {
-        throw PlugInException(string("PlugIn '") +theName+"' not found in search path '"+ _mySearchPath +"'", PLUS_FILE_LINE);
+        throw PlugInException(string("PlugIn '") +getPlugInFileName(theName)+"' not found in search path '"+ _mySearchPath +"'", PLUS_FILE_LINE);
     }
     AC_INFO << "Plugging '" << myFilename << "'" << endl;
 #ifdef WIN32
