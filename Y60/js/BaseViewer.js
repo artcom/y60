@@ -569,7 +569,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myNagiosPlugin = new NagiosPlugin();
         _myNagiosPlugin.port = thePort;
         _myRenderWindow.addExtension(_myNagiosPlugin);
-        return _myNagiosPlugin.port;
+        return _myNagiosPlugin;
     }
 
     self.onAxis = function( theDevice, theAxis, theValue) {

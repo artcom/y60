@@ -71,8 +71,8 @@ StatusServer::processData() {
         std::string myURL = getUrl(s);
         if (myURL == "status") {
             asl::Time t;
-            long long myElapsed = t.millis() - StatusServer::readTick();
-            if (myElapsed > 5000) {
+            asl::Signed64 myElapsed = t.millis() - StatusServer::readTick();
+            if (myElapsed > _myFrameTimeout) {
                 sendResponseHeader(500);
             } else {
                 sendResponseHeader(200);
@@ -87,7 +87,7 @@ StatusServer::processData() {
     return true;
 }
 
-long long StatusServer::_myTick(0);
+asl::Signed64 StatusServer::_myTick(0);
 asl::ReadWriteLock StatusServer::_myTickLock;
 
 void
@@ -96,12 +96,25 @@ StatusServer::writeTick() {
     Time t;
     _myTick = t.millis();
 }
-long long
+asl::Signed64
 StatusServer::readTick() {
     ScopeLocker myLock(_myTickLock, false);
     return _myTick;
 }
 
+asl::Signed32 StatusServer::_myFrameTimeout(100);
+asl::ReadWriteLock StatusServer::_myFrameTimeoutLock;
+
+void
+StatusServer::writeFrameTimeout(asl::Signed32 theTimeout) {
+    ScopeLocker myLock(_myFrameTimeoutLock, true);
+    _myFrameTimeout = theTimeout;
+}
+asl::Signed32
+StatusServer::readFrameTimeout() {
+    ScopeLocker myLock(_myFrameTimeoutLock, false);
+    return _myFrameTimeout;
+}
 }
 
 

@@ -23,7 +23,9 @@ class StatusServer : public asl::ConduitServer<asl::TCPPolicy> {
     public:
         static asl::ConduitServer<asl::TCPPolicy>::Ptr create(asl::TCPPolicy::Handle theHandle);
         static void writeTick();
-        static long long readTick();
+        static asl::Signed64 readTick();
+        static void writeFrameTimeout(asl::Signed32);
+        static asl::Signed32 readFrameTimeout();
     private:
         StatusServer(asl::TCPPolicy::Handle theHandle);
         void sendSlowly(const std::string theData);
@@ -33,8 +35,11 @@ class StatusServer : public asl::ConduitServer<asl::TCPPolicy> {
         std::string getUrl(const std::string & theRequest);
         virtual bool processData();
 
-        static long long _myTick;
+        static asl::Signed64 _myTick;
         static asl::ReadWriteLock _myTickLock;
+
+        static asl::Signed32 _myFrameTimeout;
+        static asl::ReadWriteLock _myFrameTimeoutLock;
 };
 
 }
