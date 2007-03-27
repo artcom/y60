@@ -267,6 +267,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case 'N':
                     var myPlugin = self.enableNagios(2349);
+                    myPlugin.timeout = 5000;
                     print("Nagios plugin listening on port "+myPlugin.port+", frame timeout is "+myPlugin.timeout+" ms");
                     break;
                 case "sys req":
