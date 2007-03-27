@@ -23,7 +23,6 @@ use("SwitchNodeHandler.js");
 use("AutoClicker.js");
 use("OcclusionUtils.js");
 
-
 function BaseViewer(theArguments) {
     this.Constructor(this, theArguments);
 }
@@ -565,6 +564,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myHeartbeatThrober.use(true, theFrequency, theHeartbeatfile);
     }
 
+    self.enableNagios = function(thePort) {
+        plug("NagiosPlugin");
+        _myNagiosPlugin = new NagiosPlugin();
+        _myRenderWindow.addExtension(_myNagiosPlugin);
+    }
+
     self.onAxis = function( theDevice, theAxis, theValue) {
         var myMover = self.getMover(self.getActiveViewport());
         if (myMover) {
@@ -615,6 +620,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     var _mySkyboxMaterialId      = null;
     var _myHeartbeatThrober      = null;
+    var _myNagiosPlugin          = null;
     var _myPicking               = null;
     var _myAutoClicker           = null;
     

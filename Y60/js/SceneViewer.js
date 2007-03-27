@@ -266,6 +266,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 case 'X':
                     print(window.scene.world);
                     break;
+                case 'N':
+                    self.enableNagios(2349);
+                    print("Nagios plugin listening on port 2349");
+                    break;
                 case "sys req":
                 case "print screen":
                     var myDate = new Date();
@@ -511,10 +515,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
         }
-
-        //_myNagiosPlugin = new NagiosPlugin();
-        //window.addExtension(_myNagiosPlugin);
-
         if (_mySplashScreenFlag) {
             _mySplashScreen = new ImageOverlay(window.scene, "shadertex/ac_logo.png", [0, 0]);
             _mySplashScreen.name = "splashscreen";
@@ -623,6 +623,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    .          switch to next camera");
          print("    #          draw camera frustums");
          print("   0-9         switch to camera number 0-9");
+         print("    N          start Nagios plugin");
          print("    h          print this help");
     }
 
@@ -645,6 +646,5 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myMemoryMeter           = null;
     var _myOnScreenStatistics    = 0;
     var _myVideoRecorder         = null;
-    var _myNagiosPlugin          = null;
     var _myStatisticColor        = [1,1,1,1];
 }
