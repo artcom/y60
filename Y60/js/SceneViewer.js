@@ -33,7 +33,6 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
-// plug("NagiosPlugin");
 
 //if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
@@ -267,8 +266,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print(window.scene.world);
                     break;
                 case 'N':
-                    self.enableNagios(2349);
-                    print("Nagios plugin listening on port 2349");
+                    var myPort = self.enableNagios(2349);
+                    print("Nagios plugin listening on port "+myPort);
                     break;
                 case "sys req":
                 case "print screen":

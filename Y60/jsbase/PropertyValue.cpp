@@ -21,6 +21,7 @@ namespace y60 {
 
 template int PropertyValue::get() const;
 template unsigned PropertyValue::get() const;
+template asl::Unsigned16 PropertyValue::get() const;
 template char PropertyValue::get() const;
 template unsigned char PropertyValue::get() const;
 template bool PropertyValue::get() const;
@@ -43,6 +44,7 @@ template asl::Box3f PropertyValue::get() const;
 
 template bool PropertyValue::get(int& theReturnValue) const;
 template bool PropertyValue::get(unsigned& theReturnValue) const;
+template bool PropertyValue::get(asl::Unsigned16& theReturnValue) const;
 template bool PropertyValue::get(char & theReturnValue) const;
 template bool PropertyValue::get(unsigned char & theReturnValue) const;
 template bool PropertyValue::get(bool& theReturnValue) const;
@@ -65,6 +67,7 @@ template bool PropertyValue::get(std::vector<asl::Box2f> & theReturnValue) const
 
 template void PropertyValue::set(const int & theValue);
 template void PropertyValue::set(const unsigned & theValue);
+template void PropertyValue::set(const asl::Unsigned16 & theValue);
 template void PropertyValue::set(const char & theValue);
 template void PropertyValue::set(const unsigned char & theValue);
 template void PropertyValue::set(const bool & theValue);

@@ -49,6 +49,11 @@ using namespace y60;
         void onPreRender(AbstractRenderWindow * theRenderer);
         void onPostRender(AbstractRenderWindow * theRenderer);
 
+        void onGetProperty(const std::string & thePropertyName,
+                         PropertyValue & theReturnValue) const;
+
+        void onSetProperty(const std::string & thePropertyName,
+                         const PropertyValue & thePropertyValue);
 		const char * ClassName() {
 		    static const char * myClassName = "NagiosPlugin";
 		    return myClassName;
@@ -57,20 +62,24 @@ using namespace y60;
 		void onUpdateSettings(dom::NodePtr theSettings) { }
 
     private:
-        ConduitAcceptor<TCPPolicy> _myStatusServer;
+        asl::Ptr<ConduitAcceptor<TCPPolicy> > _myStatusServer;
+        asl::Unsigned16 _myPort;
     };
 
 NagiosPlugin :: NagiosPlugin(DLHandle theDLHandle) :
     PlugInBase(theDLHandle),
     IRendererExtension("NagiosPlugin"),
-    _myStatusServer(TCPPolicy::Endpoint("INADDR_ANY",2346), StatusServer::create)
+    _myPort(2346),
+    _myStatusServer(0)
 {
 }
 
 void
 NagiosPlugin :: onStartup(jslib::AbstractRenderWindow * theWindow) {
     inet::initSockets();
-    _myStatusServer.start();
+    _myStatusServer = asl::Ptr<ConduitAcceptor<TCPPolicy> >(
+            new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort), StatusServer::create)); 
+    _myStatusServer->start();
 }
 
 bool
@@ -93,6 +102,28 @@ NagiosPlugin :: onPreRender(AbstractRenderWindow * theRenderer) {
 
 void
 NagiosPlugin :: onPostRender(AbstractRenderWindow * theRenderer) {
+}
+
+void
+NagiosPlugin::onGetProperty(const std::string & thePropertyName,
+                 PropertyValue & theReturnValue) const
+{
+    if (thePropertyName == "port") {
+        theReturnValue.set<asl::Unsigned16>(_myPort);
+    } else {
+        //cerr << "### WARNING: Unknown property: " << thePropertyName << endl;
+    }
+}
+
+void
+NagiosPlugin::onSetProperty(const std::string & thePropertyName,
+                 const PropertyValue & thePropertyValue)
+{
+    if (thePropertyName == "port") {
+        _myPort = thePropertyValue.get<asl::Unsigned16>();
+    } else {
+        cerr << "### WARNING: Unknown property: " << thePropertyName << endl;
+    }
 }
 
 extern "C"
