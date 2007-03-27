@@ -70,6 +70,7 @@ class myLowercaseServer : public ConduitServer<POLICY> {
                 std::string s(&myInputBuffer[0], myInputBuffer.size());
                 transform(s.begin(), s.end(), s.begin(), ::tolower);
                 this->sendData(s.c_str(),s.length());
+                return true;
             }
             return true;
         }

@@ -79,6 +79,7 @@ StatusServer::processData() {
             sendResponseHeader(404);
             sendResponseBody("not found");
         }
+        this->disconnect();
         return false;
     }
     return true;

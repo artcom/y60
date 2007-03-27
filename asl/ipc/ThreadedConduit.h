@@ -114,7 +114,6 @@ virtual bool processData() {
             } catch (ConduitException & ex) {
                 AC_ERROR << ex;
             }
-            mySelf->disconnect();
             pthread_cleanup_pop(0);
             pthread_setcancelstate(myOldCancelState,0);
             return (void*)static_cast<ptrdiff_t>(myResult);
