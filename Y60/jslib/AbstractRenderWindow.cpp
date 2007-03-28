@@ -517,11 +517,11 @@ namespace jslib {
                 jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onPreViewport", 1, argv, &rval);
             }
         } catch (const asl::Exception & ex) {
-            AC_ERROR << "ASL exception caught in Y60Render::preViewport(): " << ex;
+            AC_ERROR << "ASL exception caught in AbstractRenderWindow::preViewport(): " << ex;
         } catch (const std::exception & ex) {
-            AC_ERROR << "std::exception caught in Y60Render::preViewport(): " << ex.what();
+            AC_ERROR << "std::exception caught in AbstractRenderWindow::preViewport(): " << ex.what();
         } catch (...) {
-            AC_ERROR << "Unknown exception in Y60Render::preViewport()";
+            AC_ERROR << "Unknown exception in AbstractRenderWindow::preViewport()";
         }
     }
 
@@ -578,11 +578,11 @@ namespace jslib {
                 }
             }
         } catch (const asl::Exception & ex) {
-            AC_ERROR << "ASL exception caught in Y60Render::postRender(): " << ex;
+            AC_ERROR << "ASL exception caught in AbstractRenderWindow::postRender(): " << ex;
         } catch (const exception & ex) {
-            AC_ERROR << "std::exception caught in Y60Render::postRender(): " << ex.what();
+            AC_ERROR << "std::exception caught in AbstractRenderWindow::postRender(): " << ex.what();
         } catch (...) {
-            AC_ERROR << "Unknown exception in Y60Render::postRender()";
+            AC_ERROR << "Unknown exception in AbstractRenderWindow::postRender()";
         }
     }
 

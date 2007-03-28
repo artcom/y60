@@ -31,16 +31,16 @@ RequestThread::RequestThread(const std::string & theLocalPath,
                       const std::string & theUserAgent,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
                       unsigned int theMaxRequestCount) :
-        _myLocalPath(theLocalPath), 
-        _myUsername(theUsername), 
-        _myPassword(thePassword), 
-        _myUserAgent(theUserAgent), 
-        _myOutdatedAssets(theOutdatedAssets),
-        _myMaxRequestCount(theMaxRequestCount),
-        _remainingCount(theOutdatedAssets.size())
-    {
-        fillRequestQueue();
-    };
+    _myLocalPath(theLocalPath), 
+    _myUsername(theUsername), 
+    _myPassword(thePassword), 
+    _myUserAgent(theUserAgent), 
+    _myOutdatedAssets(theOutdatedAssets),
+    _myMaxRequestCount(theMaxRequestCount),
+    _remainingCount(theOutdatedAssets.size())
+{
+    fillRequestQueue();
+};
 
 
 int 
@@ -48,6 +48,7 @@ RequestThread::getRemainingCount() const {
     asl::ScopeLocker(_remainingCountLock, false);
     return _remainingCount;
 }
+
 void 
 RequestThread::setRemainingCount(unsigned int theNewCount) {
     asl::ScopeLocker(_remainingCountLock, true);
@@ -129,7 +130,7 @@ RequestThread::fillRequestQueue() {
 
 void
 RequestThread::addAssetRequest(const std::string & thePath, const std::string & theURI) {
-    // AC_PRINT << "Fetching " << _myLocalPath + "/" + thePath;
+    AC_INFO << "Fetching " << _myLocalPath + "/" + thePath;
     AssetRequestPtr myRequest;
     if (_myUserAgent.empty()) {
         myRequest = AssetRequestPtr(new AssetRequest( this, thePath, theURI, _myLocalPath, _myCookieJar));

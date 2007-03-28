@@ -82,11 +82,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _myConfigurator.removeListener(theListener);
     }
 
-    self.setPBufferSize = function(theWidth, theHeight) {
-        _myPBufferHeight = theHeight;
-        _myPBufferWidth = theWidth;
-    }
-
     self.getCurrentTime = function(){
         return _myCurrentTime;
     }
@@ -272,19 +267,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case "sys req":
                 case "print screen":
-                    var myDate = new Date();
-                    var myFilename = "";
-                    while (1) {
-                        myFilename = "screenshot-";
-                        myFilename += String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
-                        myFilename += "-" + _myScreenShotCounter + ".png";
-                        if (!fileExists(myFilename)) {
-                            break;
-                        }
-                        _myScreenShotCounter++;
-                    }
-                    print("Saving screenshot as '" + myFilename + "'");
-                    window.saveBuffer(myFilename);
+                    screenShot();
                     break;
                 case "PRINT SCREEN":
                 case "SYS REQ":
@@ -595,7 +578,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     function printHelp() {
          print("Scene Viewer Keys:");
-         print("  print        create screenshot named screenshot + date + counter, as png image");
+         print("  print        write screenshot as png image to the current directory");
          print("  shift-print  enables/disables video recorder");
          print("    w          toggle wireframe");
          print("    F          toggle flatshading");
@@ -627,15 +610,37 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    h          print this help");
     }
 
+    function screenShot(theBasename) {
+        if (theBasename == undefined) {
+            theBasename = "screenshot";
+        }
+
+        var myDate = new Date();
+        myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
+
+        var myFilename = "";
+        while (1) {
+            myFilename = theBasename + "-";
+            myFilename += myDate;
+            myFilename += "-" + _myScreenshotCount + ".png";
+            if (!fileExists(myFilename)) {
+                break;
+            }
+            ++_myScreenshotCount;
+        }
+        print("Saving screenshot as '" + myFilename + "'");
+        window.saveBuffer(myFilename);
+    }
+
     var _myFullscreen            = false;
 
     var _myConfigurator          = null;
     var _myDebugVisual           = null;
     var _myAnimationManager      = null;
     var _myImageManager          = null;
-    var _myScreenShotCounter     = 0;
-    var _myPBufferHeight         = 0;
-    var _myPBufferWidth          = 0;
+
+    var _myScreenshotCount = 0;
+
     var _myCurrentTime           = 0;
     var _myTimer                 = new AutoTimer("SceneViewer Timer");
     var _mySplashScreen          = null;

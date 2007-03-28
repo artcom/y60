@@ -686,14 +686,6 @@ SDLWindow::mainLoop() {
             isOnTop = (myTopWindow == myRenderGirlWindow);
         }
 #endif
-        // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
-        if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
-            jsval argv[1], rval;
-            argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
-            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
-        }
-
-        onFrame();
 
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
@@ -702,6 +694,15 @@ SDLWindow::mainLoop() {
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
         STOP_TIMER(handleRequests);
+
+        // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
+        if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
+            jsval argv[1], rval;
+            argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
+        }
+
+        onFrame();
 
         if (_myRenderer && _myRenderer->getCurrentScene()) {
             renderFrame();

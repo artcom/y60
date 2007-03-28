@@ -41,14 +41,11 @@ AssetRequest::AssetRequest(RequestThread * theParent,
     if (fileExists(_myLocalFile)) {
         time_t myLastModified = getLastModified(_myLocalFile);
         if (_myLocalPath == "C_produktion/1_inhalte/IMG/emptypath.png") {
-            //setVerbose(true);
             AC_DEBUG << "If-modified-Since " << myLastModified << " for " << _myLocalPath; 
         }
         addHttpHeaderAsDate("If-Modified-Since", myLastModified);
     }
-    setVerbose(true);
     //setTimeoutParams(100, 60);
-    
 }
 
 size_t
