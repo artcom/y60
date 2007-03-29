@@ -33,19 +33,17 @@ float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex5,
                     uniform sampler2D tex6,
                     uniform sampler2D tex7,
-                    uniform float4 weights0,
-                    uniform float4 weights1,
                     uniform float4 surfacecolor) : COLOR
 {
     float4 myResult =
-        tex2D(tex0, IN.texCoord) * 0.125 + //weights0[0] +
-        tex2D(tex1, IN.texCoord) * 0.125 + //weights0[1] +
-        tex2D(tex2, IN.texCoord) * 0.125 + //weights0[2] +
-        tex2D(tex3, IN.texCoord) * 0.125 + //weights0[3] +
-        tex2D(tex4, IN.texCoord) * 0.125 + //weights1[0] +
-        tex2D(tex5, IN.texCoord) * 0.125 + //weights1[1] +
-        tex2D(tex6, IN.texCoord) * 0.125 + //weights1[2] +
-        tex2D(tex7, IN.texCoord) * 0.125; //weights1[3];
+        tex2D(tex0, IN.texCoord) * 0.125 + 
+        tex2D(tex1, IN.texCoord) * 0.125 +
+        tex2D(tex2, IN.texCoord) * 0.125 +
+        tex2D(tex3, IN.texCoord) * 0.125 +
+        tex2D(tex4, IN.texCoord) * 0.125 +
+        tex2D(tex5, IN.texCoord) * 0.125 +
+        tex2D(tex6, IN.texCoord) * 0.125 +
+        tex2D(tex7, IN.texCoord) * 0.125;
 
     return myResult * surfacecolor;
 }

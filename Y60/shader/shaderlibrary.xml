@@ -1217,8 +1217,6 @@
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-                <vector4f name="weights0">[1,1,1,1]</vector4f>
-                <vector4f name="weights1">[1,1,1,1]</vector4f>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
