@@ -163,6 +163,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
             _myViewport = window.canvas.childNode("viewport", 0).cloneNode(false);
             adjustNodeIds(_myViewport);
             _myViewport.name = "OffscreenBuffer_Viewport";
+            _myViewport.position = [0, 0];
+            _myViewport.size     = [1, 1];
 
             // clone first canvas
             _myCanvas = window.canvas.cloneNode(false);
