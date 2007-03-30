@@ -419,6 +419,7 @@ JSBox3f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 }
                 (myNewBox3f)[i] = JSClassTraits<asl::Vector3<Number> >::getNativeRef(cx,myObject);
             }
+            myNewBox3f.makeCorrect();
             myNewObject=new JSBox3f(myNewValue);
         } else if (argc == 1) {
             // construct from one Box3f
