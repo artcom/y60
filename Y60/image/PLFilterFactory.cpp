@@ -20,6 +20,7 @@
 //=============================================================================
 
 #include "PLFilterFactory.h"
+#include "PLFilterGaussianBlur.h"
 
 #include <paintlib/Filter/plfiltergrayscale.h>
 #include <paintlib/Filter/plfiltervideoinvert.h>
@@ -40,6 +41,7 @@
 #include <paintlib/Filter/plfilterresizehamming.h>
 #include <paintlib/Filter/plfilterintensity.h>
 #include <paintlib/Filter/plfiltercrop.h>
+
 
 #include <iostream>
 
@@ -161,7 +163,7 @@ PaintLibFilterFactory::PaintLibFilterFactory() {
     _add("grayscale",           new FilterFactory0<PLFilterGrayscale>);
     _add("videoinvert",         new FilterFactory0<PLFilterVideoInvert>);
     _add("flip",                new FilterFactory0<PLFilterFlip>);
-    _add("fliprgb",              new FilterFactory0<PLFilterFlipRGB>);
+    _add("fliprgb",             new FilterFactory0<PLFilterFlipRGB>);
     _add("getalpha",            new FilterFactory0<PLFilterGetAlpha>);
     _add("mirror",              new FilterFactory0<PLFilterMirror>);;
 
@@ -176,6 +178,7 @@ PaintLibFilterFactory::PaintLibFilterFactory() {
     _add("quantize",            new FilterFactory2<PLFilterQuantize,int,int>);
 
     _add("threshold",           new FilterFactory3<PLFilterThreshold,int,int,int>);
+    _add("gaussianblur",        new FilterFactory3<PLFilterGaussianBlur, double, int,int>);
     _add("resizegaussian",      new FilterFactory3<PLFilterResizeGaussian,int,int,double>);
     _add("resizehamming",       new FilterFactory3<PLFilterResizeHamming,int,int,double>);
     _add("intensity",           new FilterFactory3<PLFilterIntensity,double,PLBYTE,double>);
