@@ -132,7 +132,6 @@ class ASSDriver :
         int  _myLineEnd;
         int  _myMaxLine;
         bool _myMagicTokenFlag;
-        int  _myPortScanCountDown;
 
         bool _myUseUSBFlag; // used by the linux implementation, because
                             // USB TTYs have a diffrent naming scheme

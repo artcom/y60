@@ -54,8 +54,7 @@ static const char * FILTERED_RASTER = "ASSFilteredRaster";
 
 
 
-ASSDriver::ASSDriver(/*DLHandle theDLHandle*/) :
-/*    PlugInBase(theDLHandle),*/
+ASSDriver::ASSDriver() :
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
     _mySyncLostCounter(0),
@@ -77,8 +76,7 @@ ASSDriver::ASSDriver(/*DLHandle theDLHandle*/) :
     _myBitsPerSerialWord( 8 ),
     _myParity( SerialDevice::NO_PARITY ),
     _myStopBits( 1 ),
-    _myHandshakingFlag( false ),
-    _myPortScanCountDown( 0 )
+    _myHandshakingFlag( false )
 {
     setState(NO_SERIAL_PORT);
 }
@@ -310,6 +308,7 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
     std::vector<bool> myCorrelationFlags(thePreviousPositions.size(), false);
     std::vector<int> myOldIDs( _myCursorIDs );
     _myCursorIDs.clear();
+    //AC_PRINT << "positions: " << _myPositions.size();
     for (unsigned i = 0; i < _myPositions.size(); ++i) {
         float myMinDistance = FLT_MAX;
         int myMinDistIdx  = -1;
@@ -512,6 +511,7 @@ ASSDriver::readDataFromPort() {
         std::vector<unsigned char> myBuffer;
         size_t myByteCount = _mySerialPort->peek();
         myBuffer.resize( myByteCount );
+        //AC_PRINT << "=== Got " << myByteCount << " bytes.";
         _mySerialPort->read( reinterpret_cast<char*>(& ( * myBuffer.begin())), myByteCount );
 
         _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
@@ -524,42 +524,37 @@ ASSDriver::readDataFromPort() {
 
 void
 ASSDriver::scanForSerialPort() {
-    if ( _myPortScanCountDown == 0) {
-        if (_myPortNum >= 0 ) {
+    if (_myPortNum >= 0 ) {
 #ifdef WIN32
-            _mySerialPort = getSerialDevice( _myPortNum );
+        _mySerialPort = getSerialDevice( _myPortNum );
 #endif
 #ifdef LINUX
-            if (_myUseUSBFlag) {
-                string myDeviceName("/dev/ttyUSB");
-                myDeviceName += as_string( _myPortNum );
-                if ( fileExists( myDeviceName ) ) {
-                    _mySerialPort = getSerialDeviceByName( myDeviceName );
-                }
-            } else {
-                _mySerialPort = getSerialDevice( _myPortNum );
-            }
-#endif
-#ifdef OSX
-            // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/ttyUSB-[devid]
-            // where [devid] is a string that is flashed into the FTDI chip. I'll
-            // check that the other day.
-            AC_PRINT << "TODO: implement device name handling for FTDI USB->Serial "
-                     << "virtual TTYs.";
-#endif
-
-            if (_mySerialPort) {
-                // TODO: make baudrate, &c a setting
-                _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
-                        _myParity, _myStopBits, _myHandshakingFlag);
-                setState( SYNCHRONIZING );
+        if (_myUseUSBFlag) {
+            string myDeviceName("/dev/ttyUSB");
+            myDeviceName += as_string( _myPortNum );
+            if ( fileExists( myDeviceName ) ) {
+                _mySerialPort = getSerialDeviceByName( myDeviceName );
             }
         } else {
-            AC_PRINT << "scanForSerialPort() No port configured.";
+            _mySerialPort = getSerialDevice( _myPortNum );
         }
-        _myPortScanCountDown = 30;
+#endif
+#ifdef OSX
+        // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/ttyUSB-[devid]
+        // where [devid] is a string that is flashed into the FTDI chip. I'll
+        // check that the other day.
+        AC_PRINT << "TODO: implement device name handling for FTDI USB->Serial "
+            << "virtual TTYs.";
+#endif
+
+        if (_mySerialPort) {
+            // TODO: make baudrate, &c a setting
+            _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
+                    _myParity, _myStopBits, _myHandshakingFlag);
+            setState( SYNCHRONIZING );
+        }
     } else {
-        _myPortScanCountDown -= 1;
+        AC_PRINT << "scanForSerialPort() No port configured.";
     }
 }
 

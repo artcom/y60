@@ -122,7 +122,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         myOriginMarker.scale = new Vector3f(3 / DISPLAY_SCALE, 3 / DISPLAY_SCALE ,
             3 / DISPLAY_SCALE);
 
-        _myCrosshairShape = Modelling.createCrosshair(window.scene, myWhiteMaterial.id, 
+        _myCrosshairShape = Modelling.createCrosshair(window.scene, myRedMaterial.id, 
                                                  1, 2, "Crosshair"); 
 
         var myOldId = _myMaterial.childNode("textures", 0).childNode(0).image;
@@ -228,11 +228,11 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                 print("noise threshold: " + _myDriver.noiseThreshold);
                 break;
             case 'm':
-                _myDriver.gainPower += 1;
+                _myDriver.gainPower += 0.1;
                 print("gain power: " + _myDriver.gainPower);
                 break;
             case 'n':
-                _myDriver.gainPower -= 1;
+                _myDriver.gainPower -= 0.1;
                 print("gain power: " + _myDriver.gainPower);
                 break;
         }

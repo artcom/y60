@@ -40,6 +40,7 @@
     <xs:element name="generic">
         <xs:complexType>
             <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="simulation_time" type="xs:double"/>
             <xs:attribute name="callback" type="xs:string"/>
             <xs:attribute name="id" type="xs:ID"/>
             <xs:attribute name="type" type="xs:string"/>

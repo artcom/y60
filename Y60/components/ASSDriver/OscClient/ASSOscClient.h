@@ -52,7 +52,6 @@ class ASSOscClient : public ASSDriver {
         int              _myClientPort;
         int              _myServerPort;
         std::string      _myServerAddress;
-        int              _myReconnectCounter;
 };
 
 } // end of namespace y60

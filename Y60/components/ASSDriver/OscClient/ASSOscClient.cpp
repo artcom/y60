@@ -24,17 +24,25 @@ ASSOscClient::ASSOscClient() :
     _myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
     _myServerPort( 7000 ),
-    _myServerAddress("127.0.0.1"),
-    _myReconnectCounter( 0 )
+    _myServerAddress("127.0.0.1")
 {
 }
 
 
 void
 ASSOscClient::poll() {
+
+    //AC_PRINT << "==== poll ====";
+
     _myOSCStream.Clear();
 
     _myOSCStream << osc::BeginBundleImmediate;
+
+    if ( ! _myConnection ) {
+        connectToServer();
+        // if(running)
+        createTransportLayerEvent( 0, "configure");
+    }
 
     processInput();
 
@@ -52,20 +60,14 @@ ASSOscClient::poll() {
                 _myConnection = UDPConnectionPtr( 0 );
             }
         }
-    } else {
-        connectToServer();
     }
+    //AC_PRINT << "==== done ====";
 }
 
 void
 ASSOscClient::connectToServer() {
-    if ( _myReconnectCounter == 0) {
-        _myConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
-        _myConnection->connect( getHostAddress( _myServerAddress.c_str() ), _myServerPort);
-        _myReconnectCounter = 30;
-    } else {
-        _myReconnectCounter -= 1;
-    }
+    _myConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
+    _myConnection->connect( getHostAddress( _myServerAddress.c_str() ), _myServerPort);
 }
 
 
@@ -74,6 +76,7 @@ void
 ASSOscClient::createEvent( int theID, const std::string & theType,
         const Vector2f & theRawPosition, const Vector3f & thePosition3D)
 {
+    //AC_PRINT << "createEvent: " << theType;
     std::string myAddress("/");
     myAddress += theType;
     _myOSCStream << osc::BeginMessage( myAddress.c_str() )
@@ -110,7 +113,6 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     if ( myClientPort != _myClientPort ) {
         _myClientPort = myClientPort;
         _myConnection = UDPConnectionPtr( 0 );
-        _myReconnectCounter = 0;
     }
 
     int myServerPort;
@@ -118,7 +120,6 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     if ( myServerPort != _myServerPort ) {
         _myServerPort = myServerPort;
         _myConnection = UDPConnectionPtr( 0 );
-        _myReconnectCounter = 0;
     }
 
     std::string myServerAddress;
@@ -126,7 +127,6 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     if ( myServerAddress != _myServerAddress ) {
         _myServerAddress = myServerAddress;
         _myConnection = UDPConnectionPtr( 0 );
-        _myReconnectCounter = 0;
     }
 }
 
