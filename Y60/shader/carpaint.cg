@@ -25,7 +25,7 @@ struct app2vert {
 
 struct vert2frag {
     float4 homPosition   : POSITION;
-#ifndef NO_OCCLUSION    
+#ifdef OCCLUSION    
     float2 texCoord0     : TEXCOORD0;
 #endif
     float3 worldPosition : TEXCOORD2;
@@ -59,7 +59,7 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
-#ifndef NO_OCCLUSION
+#ifdef OCCLUSION
     OUT.texCoord0    = IN.texCoord0;
 #endif    
     OUT.primaryColor = diffuse;
@@ -71,8 +71,8 @@ vert2frag mainVertex(app2vert IN,
 
 
 float4 mainFragment(vert2frag   IN,
-#ifndef NO_OCCLUSION
-        uniform sampler2D decalTex,
+#ifdef OCCLUSION
+        uniform sampler2D occlusionTex,
 #endif
         uniform samplerCUBE envTex,
         uniform samplerCUBE emissiveEnvTex,
@@ -99,11 +99,6 @@ float4 mainFragment(vert2frag   IN,
 {
     float4 myEnvTexel       = texCUBE(envTex, IN.reflectVector);
     float4 myEmissiveTexel  = texCUBE(emissiveEnvTex, IN.reflectVector);
-#ifdef NO_OCCLUSION
-    float myOcclusionTexel = 1.0;
-#else
-    float myOcclusionTexel = tex2D(decalTex, IN.texCoord0).r;
-#endif
 
     float4 myDiffuseColor   = float4(0,0,0,0);
     float4 mySpecColor      = float4(0,0,0,0);
@@ -160,7 +155,12 @@ float4 mainFragment(vert2frag   IN,
     float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
     float3 myBlendedColor = lerp(myBaseColor.rgb, float3(1), myEnvIntensity);
 
+#ifdef OCCLUSION
+    float myOcclusionTexel = tex2D(occlusionTex, IN.texCoord0).r;
     return float4(myBlendedColor.rgb * myOcclusionTexel, 1);
+#else
+    return float4(myBlendedColor.rgb, 1);
+#endif
 
     // *************** Some debug options *********************
 

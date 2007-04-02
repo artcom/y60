@@ -212,7 +212,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     }
     
     function findOcclusionMap(theMaterial) {
-if (1) {
+/*
             var myTexturesNode = theMaterial.childNode("textures");
             for (var i = 0; i < myTexturesNode.childNodesLength(); ++i) {
                 var myTexture = myTexturesNode.childNode(i);
@@ -223,20 +223,17 @@ if (1) {
             }
             
             return null;
-}
-//TODO: activate after changing envlack shader [jb]
-if (0) {
-            var mySampler2d = getDescendantByName(theMaterial, "occlusionTex", true);
-            if (mySampler2d) {
-                var myIndex = mySampler2d.childNode("#text").nodeValue;
-                var myTexturesNode = theMaterial.childNode("textures");
-                if (myIndex !== null && myIndex < myTexturesNode.childNodesLength("texture")) {
-                    return myTexturesNode.childNode(myIndex, "texture");
-                }
+*/
+        var mySampler2d = getDescendantByName(theMaterial, "occlusionTex", true);
+        if (mySampler2d) {
+            var myIndex = mySampler2d.childNode("#text").nodeValue;
+            var myTexturesNode = theMaterial.childNode("textures");
+            if (myIndex !== null && myIndex < myTexturesNode.childNodesLength("texture")) {
+                return myTexturesNode.childNode("texture", myIndex);
             }
-            
-            return null;
-}        
+        }
+
+        return null;
     }
         
     function prependFeature(theFeatureList, theValue) {
@@ -304,7 +301,7 @@ if (0) {
 
         var myOldTargetMat = findTargetMaterial();
         if (!myOldTargetMat) {
-            return;
+            return false;
         }
 
         //save the occlusion map (if there is one) before replacing the textures
@@ -348,22 +345,12 @@ if (0) {
             } else {
                 //add occlusion map and adjust the requirements
                 myNewTargetMat.childNode("textures").insertBefore(myOcclusionMap,
-                    myNewTargetMat.childNode("textures").firstChild);
+                        myNewTargetMat.childNode("textures").firstChild);
                 var myRequires = myNewTargetMat.childNode('requires');
-if (1) {
-                getDescendantByName(myRequires, 'textures').childNode("#text").nodeValue = 
-                    prependFeature(mySwitchMat.requires.textures, "paint");
-}
-if (0) {
-    //the new way. to be activated [jb]
                 getDescendantByName(myRequires, 'textures').childNode("#text").nodeValue = 
                     prependFeature(mySwitchMat.requires.textures, "occlusion");
-                //add occlusionTex property
-                myNewTargetMat.childNode('properties').appendChild(
-                    new Node('<sampler2d name="occlusionTex">0</sampler2d>'));
-}
                 getDescendantByName(myRequires, 'texcoord').childNode("#text").nodeValue = 
-                    prependFeature(mySwitchMat.requires.texcoord, "uv_map");
+                        prependFeature(mySwitchMat.requires.texcoord, "uv_map");
             }
         }
 

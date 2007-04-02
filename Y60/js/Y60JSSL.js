@@ -883,4 +883,69 @@ function createMirrorCamera(theCamera, thePlane) {
 function lerp(t, v, w) {
     return v + t *(w-v);
 }
-    
+
+
+/*
+ * RankedFeature conversion
+ */
+function stringRankedFeature(theRankedFeature) {
+
+    if (theRankedFeature == null) {
+        return "";
+    }
+
+    var myString = theRankedFeature.rank + "[";
+    for (var i = 0; i < theRankedFeature.features.length; ++i) {
+        if (i > 0) {
+            myString += ",";
+        }
+        myString += theRankedFeature.features[i];
+    }
+    myString += "]";
+
+    return myString;
+}
+
+function parseRankedFeature(theString) {
+
+    var myRegex = new RegExp("^\([0-9]*\)\\[\(.*\)\\]$");
+    var myMatch = myRegex.exec(theString);
+    if (!myMatch || myMatch.length != 3) {
+        return null;
+    }
+
+    var myRank = new Number(myMatch[1]);
+    var myFeatures = myMatch[2].split(",");
+    var myRankedFeature = {rank:myRank, features:myFeatures};
+    //print(theString, stringRankedFeature(myRankedFeature));
+
+    return myRankedFeature;
+}
+
+
+/*
+ * VectorOfRankedFeature conversion
+ */
+function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
+
+    if (theVectorOfRankedFeature == null) {
+        return "";
+    }
+
+    var myString = "[";
+    for (var i = 0; i < theVectorOfRankedFeature.length; ++i) {
+        myString += stringRankedFeature(theVectorOfRankedFeature[i]);
+    }
+    myString += "]";
+
+    return myString;
+}
+
+function parseVectorOfRankedFeature(theVectorOfString) {
+    var myVectorOfRankedFeature = [];
+    for (var i = 0; i < theVectorOfString.length; ++i) {
+        var myRankedFeature = theVectorOfString[i];
+        myVectorOfRankedFeature.push(parseRankedFeature(myRankedFeature));
+    }
+    return myVectorOfRankedFeature;
+}

@@ -21,7 +21,7 @@ use("Playlist.js");
 use("Glow.js");
 use("SwitchNodeHandler.js");
 use("AutoClicker.js");
-use("OcclusionUtils.js");
+//use("OcclusionUtils.js"); // XXX disabled, no longer needed
 
 function BaseViewer(theArguments) {
     this.Constructor(this, theArguments);
@@ -773,7 +773,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
                 collectAllSwitchNodes(theScene);
-                setupOcclusionMaterials(theScene);
+                //setupOcclusionMaterials(theScene); // XXX disabled, no longer needed
             }
 
         } else {

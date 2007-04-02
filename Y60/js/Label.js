@@ -45,9 +45,12 @@ function LabelBase(Public, Protected, theScene,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.setText = function(theText, theStyle) {
+
         if (theText == "") {
             theText = " ";
         }
+        //print("ImageOverlayBase.setText t='" + theText + "'");
+
         var myStyle = null;
         if (theStyle) {
             myStyle = clone(theStyle);

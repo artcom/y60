@@ -164,6 +164,28 @@
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
+    <shader id="s5a" name="occlusion_phong" cost="120">
+        <supports>
+            <feature class="textures" values="[occlusion]"/>
+            <feature class="lighting" values="[phong]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
     <shader id="s6" name="lambert" cost="120">
         <supports>
             <feature class="lighting" values="[lambert]"/>
@@ -522,13 +544,13 @@
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s150" name="carpaint" cost="10" >
+    <shader id="s150" name="occlusion_carpaint" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,paint,emissive]"/>
+            <feature class="textures" values="[occlusion,paint,emissive]"/>
             <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
-        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[DPAINT]]'>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT,-DOCCLUSION]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -543,22 +565,22 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT]]'>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT,-DOCCLUSION]]'>
             <properties>
-                <sampler2d name="decalTex">0</sampler2d>
+                <sampler2d name="occlusionTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
                 <samplerCUBE name="emissiveEnvTex">2</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s151" name="carpaint_no_occlusion" cost="10" >
+    <shader id="s151" name="carpaint" cost="10" >
         <supports>
             <feature class="textures" values="[paint,emissive]"/>
             <feature class="texcoord" values="[reflective,reflective]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
-        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DNO_OCCLUSION]]'>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[carpaint.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -570,7 +592,7 @@
                 <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DNO_OCCLUSION]]'>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[carpaint.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT]]'>
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <samplerCUBE name="emissiveEnvTex">1</samplerCUBE>
