@@ -75,7 +75,7 @@ void multAndStore(PLPixel32 & theResult, PLPixel32 * theSource, int theScale ) {
     theResult.SetR(theResult.GetR() + (((theSource->GetR() * theScale)) / 256));
     theResult.SetG(theResult.GetG() + (((theSource->GetG() * theScale)) / 256));
     theResult.SetB(theResult.GetB() + (((theSource->GetB() * theScale)) / 256));
-    theResult.SetA(theResult.GetA() + (((theSource->GetA() * theScale)) / 256));
+    theResult.SetA(theSource->GetA());
 }
 template<>
 void multAndStore(PLPixel24& theResult, PLPixel24 * theSource, int theScale ) { 
@@ -181,18 +181,6 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
             theDestination->SetPixel(x,y,myColor);                
         }
     }
-
-	// copy source alpha in destination
-	for (int y=0; y < myDestHeight; ++y) {
-	    for(int x=0; x<myDestWidth; ++x) {
-            PIXELTYPE myPixelSrc;
-            getPix<PIXELTYPE>(theSource, x,y, myPixelSrc);
-            PIXELTYPE myPixelDest;
-            getPix<PIXELTYPE>(theDestination, x,y, myPixelDest);
-			copyAlpha(myPixelSrc, myPixelDest);
-            theDestination->SetPixel(x,y,myPixelDest);                
-		}
-	}
 
 	delete myTempBmp;
 } 

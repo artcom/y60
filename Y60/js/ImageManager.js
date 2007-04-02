@@ -50,6 +50,11 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
     }
 }
 
+function blurImage(theImageNode, theRadius) {
+    var mySize = getImageSize(theImageNode);
+    applyImageFilter(theImageNode, "gaussianblur", [theRadius, mySize.x, mySize.y]);
+}
+
 function getImageSize(theImage) {
     if (theImage.src=="" && theImage.childNodes.length == 0) {
         print("### ERROR: src attribute must be set, before getting size for image: "+ theImage.id);
