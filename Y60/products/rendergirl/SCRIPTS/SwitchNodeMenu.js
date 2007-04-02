@@ -75,7 +75,6 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                             myGroupItem = myItem;
                         }
                     }
-                    
                     return;
                 }
             }
@@ -150,7 +149,10 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             ourViewer.lastSwitched[_myHandlers[0].switchName] = theName;
         }
         
-        updateMaterialEditor();
+        if (ourMaterialComboBox != null) {
+            updateMaterialEditor();
+        }
+        
     }
 
     obj.finalize = function() {
@@ -325,6 +327,5 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
     var _mySwitchNodeMenu = null;
     var _mySwitchNodeMenuItem = null;
     var _mySeparatorItems = [];
-
     var _myHandlers = [];
 }
