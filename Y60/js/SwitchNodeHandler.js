@@ -212,18 +212,6 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     }
     
     function findOcclusionMap(theMaterial) {
-/*
-            var myTexturesNode = theMaterial.childNode("textures");
-            for (var i = 0; i < myTexturesNode.childNodesLength(); ++i) {
-                var myTexture = myTexturesNode.childNode(i);
-                var myImage = theMaterial.getElementById(myTexture.image);
-                if (myImage.src.search(/shadowmap/i) != -1) {
-                    return myTexture;
-                }
-            }
-            
-            return null;
-*/
         var mySampler2d = getDescendantByName(theMaterial, "occlusionTex", true);
         if (mySampler2d) {
             var myIndex = mySampler2d.childNode("#text").nodeValue;
