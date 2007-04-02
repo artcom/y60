@@ -40,11 +40,6 @@ using namespace std;
 using namespace asl;
 
 
-template<class PIXELTYPE>
-void copyAlpha(PIXELTYPE& theSrc, PIXELTYPE& theDest ) {}
-template<>
-void copyAlpha(PLPixel32& theSrc, PLPixel32& theDest ) {theDest.SetA(theSrc.GetA()); }
-
 
 template<class PIXELTYPE>
 void getPix(PLBmpBase * pBmpSource, int theX, int theY, PIXELTYPE& theResult);
@@ -71,28 +66,28 @@ void clearPixel(PLPixel8& theResult ) { theResult.Set(0); }
 template<class PIXELTYPE>
 void multAndStore(PIXELTYPE& theResult, PIXELTYPE * theSource, int theScale );
 template<>
-void multAndStore(PLPixel32 & theResult, PLPixel32 * theSource, int theScale ) { 
-    theResult.SetR(theResult.GetR() + (((theSource->GetR() * theScale)) / 256));
-    theResult.SetG(theResult.GetG() + (((theSource->GetG() * theScale)) / 256));
-    theResult.SetB(theResult.GetB() + (((theSource->GetB() * theScale)) / 256));
-    theResult.SetA(theSource->GetA());
+void multAndStore(PLPixel32 & theResult, PLPixel32 * theSource, int theScale ) {
+    theResult.SetR(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255));
+    theResult.SetG(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255));
+    theResult.SetB(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255));
+    theResult.SetA(minimum(theResult.GetA() + (((theSource->GetA() * theScale)+128) / 256), 255));
 }
 template<>
 void multAndStore(PLPixel24& theResult, PLPixel24 * theSource, int theScale ) { 
-    theResult.SetR(theResult.GetR() + ((theSource->GetR() * theScale) / 256));
-    theResult.SetG(theResult.GetG() + ((theSource->GetG() * theScale) / 256));
-    theResult.SetB(theResult.GetB() + ((theSource->GetB() * theScale) / 256));
+    theResult.SetR(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255));
+    theResult.SetG(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255));
+    theResult.SetB(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255));
 
 }
 template<>
 void multAndStore(PLPixel16& theResult, PLPixel16 * theSource, int theScale ) { 
-    theResult.SetR(theResult.GetR() + ((theSource->GetR() * theScale) / 256));
-    theResult.SetG(theResult.GetG() + ((theSource->GetG() * theScale) / 256));
-    theResult.SetB(theResult.GetB() + ((theSource->GetB() * theScale) / 256));
+    theResult.SetR(minimum(theResult.GetR() + ((theSource->GetR() * theScale) / 256), 255));
+    theResult.SetG(minimum(theResult.GetG() + ((theSource->GetG() * theScale) / 256), 255));
+    theResult.SetB(minimum(theResult.GetB() + ((theSource->GetB() * theScale) / 256), 255));
 }
 template<>
 void multAndStore(PLPixel8 & theResult, PLPixel8 * theSource, int theScale ) { 
-    theResult.Set(theResult.Get() + ((theSource->Get() * theScale) / 256));
+    theResult.Set(minimum(theResult.Get() + ((theSource->Get() * theScale) / 256), 255));
 }
 
 template <class PIXELTYPE>
@@ -181,7 +176,6 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
             theDestination->SetPixel(x,y,myColor);                
         }
     }
-
 	delete myTempBmp;
 } 
 
@@ -238,7 +232,11 @@ void PLFilterGaussianBlur::calcKernel() const
             mySum += myFloatKernel[myIntRadius-i];
         }
     }
+    unsigned myKernelSum = 0;
     for (int i=0; i<_myKernelWidth; ++i) {
         _myKernel[i] = int(myFloatKernel[i]*256/mySum+0.5);
+        myKernelSum += _myKernel[i];
     }
+    int myDiff = 256 - myKernelSum;
+    _myKernel[myIntRadius] += myDiff;
 }
