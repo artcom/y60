@@ -674,7 +674,7 @@ static FT_Error Load_Glyph( TTF_Font* font, Uint16 ch, c_glyph* cached, int want
 	}
 
 	/* We're done, mark this glyph cached */
-	cached->cached = ch;
+	//cached->cached = ch; // this causes a leak - don't know why
 
 	return 0;
 }
