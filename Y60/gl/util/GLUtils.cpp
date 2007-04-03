@@ -431,10 +431,16 @@ namespace y60 {
     GLenum
     asGLLightEnum(unsigned theLightNum) {
 #if 1
-        if (theLightNum <= 7) {
+        static GLint myMaxLights = 0;
+        if (myMaxLights == 0) {
+            glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
+        }
+
+        if (theLightNum <= myMaxLights) {
             return GL_LIGHT0 + theLightNum;
         }
-        throw GlLightOutOfRangeException("too many light sources",PLUS_FILE_LINE);
+        throw GlLightOutOfRangeException(string("too many light sources, max :").c_str() + 
+                                         asl::as_string(myMaxLights) + ", used:" + asl::as_string(theLightNum),PLUS_FILE_LINE);
 #else
         switch (theLightNum) {
             case 0 :
