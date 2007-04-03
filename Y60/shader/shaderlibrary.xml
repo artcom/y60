@@ -75,6 +75,28 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
+    <shader id="s2a" name="occlusion_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[occlusion]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
     <shader id="s2.5" name="LambertColor" cost="120">
         <supports>
             <feature class="lighting" values="[lambert]"/>

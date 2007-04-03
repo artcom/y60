@@ -471,7 +471,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             if (!myNode.parentNode.parentNode.isSameNode(theMaterialNode)) {
                 myNode.image = theNewId;
             } else {
-                Logger.warning("Skipping reference material.");
+                Logger.debug("Skipping reference material.");
             }
         }
     }
