@@ -85,6 +85,9 @@ namespace jslib {
         void setPause(bool aPause);
         bool getPause() const;
 
+        void setForceFullGC(bool theForceFullGC);
+        bool getForceFullGC() const;
+
         long setTimeout(const std::string & myCommand, float myMilliseconds);
         void clearTimeout(long myTimeoutId);
         long setInterval(const std::string & myCommand, float myMilliseconds);
@@ -302,6 +305,7 @@ namespace jslib {
         double            _myStartTime;
         double            _myPauseTime;
         bool              _myPauseFlag;
+        bool              _myForceFullGC;
 
     };
 

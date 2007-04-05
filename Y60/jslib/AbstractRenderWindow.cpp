@@ -50,7 +50,8 @@ namespace jslib {
         _myErrorReporter(theErrorReporter),
         _myFixedDeltaT(0.0),
         _myStartTime(-1.0), _myElapsedTime(0.0),
-        _myPauseTime(0.0), _myPauseFlag(false)
+        _myPauseTime(0.0), _myPauseFlag(false),
+        _myForceFullGC(false)
         {
         }
 
@@ -306,7 +307,17 @@ namespace jslib {
     AbstractRenderWindow::getPause() const {
         return _myPauseFlag;
     }
+    
+    void 
+    AbstractRenderWindow::setForceFullGC(bool theForceFullGC) {
+        _myForceFullGC = theForceFullGC;
+    }
 
+    bool 
+    AbstractRenderWindow::getForceFullGC() const {
+        return _myForceFullGC;
+    }
+    
     long
     AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds) {
         return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds);

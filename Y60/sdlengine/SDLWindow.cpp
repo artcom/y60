@@ -710,7 +710,11 @@ SDLWindow::mainLoop() {
 
         if (_myJSContext) {
             MAKE_SCOPE_TIMER(gc);
-            JS_GC(_myJSContext);
+            if (getForceFullGC()) {
+                JS_GC(_myJSContext);
+            } else {
+                JS_MaybeGC(_myJSContext);
+            }
         }
 
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();

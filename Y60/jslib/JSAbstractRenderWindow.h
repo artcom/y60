@@ -26,6 +26,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
 
         enum PropertyNumbers {
             PROP_BEGIN = -128,
+            PROP_forceFullGC,
             PROP_pause,
             PROP_eventListener,
             PROP_scene,
