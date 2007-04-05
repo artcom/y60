@@ -52,7 +52,7 @@ namespace y60 {
                 }
             }
             throw OpenGLException("OpenGL error: #(" + asl::as_string(err) + ") " +
-                myErrorString, theLocation);
+                    myErrorString, theLocation);
             if (err != GL_INVALID_OPERATION) {  // XXX: Do we really need this?
                 checkOGLError(theLocation);     // [DS] no, we don't get here anyway ... see throw above
             }
@@ -175,16 +175,16 @@ namespace y60 {
         GLenum myTexWrapMode;
         switch(theWrapMode) {
             case CLAMP:
-               myTexWrapMode = GL_CLAMP;
-               break;
+                myTexWrapMode = GL_CLAMP;
+                break;
             case CLAMP_TO_EDGE:
-               myTexWrapMode = GL_CLAMP_TO_EDGE;
-               break;
+                myTexWrapMode = GL_CLAMP_TO_EDGE;
+                break;
             case REPEAT:
-               myTexWrapMode = GL_REPEAT;
-               break;
+                myTexWrapMode = GL_REPEAT;
+                break;
             default:
-               throw GlTextureFunctionException("Unknown texture wrap mode.", PLUS_FILE_LINE);
+                throw GlTextureFunctionException("Unknown texture wrap mode.", PLUS_FILE_LINE);
         }
         return myTexWrapMode;
     }
@@ -194,13 +194,13 @@ namespace y60 {
         GLenum myTexSampleFilter;
         switch(theSampleFilter) {
             case LINEAR:
-               myTexSampleFilter = theMipmapsFlag ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
-               break;
+                myTexSampleFilter = theMipmapsFlag ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+                break;
             case NEAREST:
-               myTexSampleFilter = theMipmapsFlag ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
-               break;
+                myTexSampleFilter = theMipmapsFlag ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+                break;
             default:
-               throw GlTextureFunctionException("Unknown texture mag filter mode.", PLUS_FILE_LINE);
+                throw GlTextureFunctionException("Unknown texture mag filter mode.", PLUS_FILE_LINE);
         }
         return myTexSampleFilter;
     }
@@ -209,17 +209,17 @@ namespace y60 {
     asGLTextureFunc(TextureApplyMode theApplyMode) {
         switch(theApplyMode) {
             case MODULATE:
-               return GL_MODULATE;
+                return GL_MODULATE;
             case DECAL:
-               return GL_DECAL;
+                return GL_DECAL;
             case REPLACE:
-               return GL_REPLACE;
+                return GL_REPLACE;
             case BLEND:
-               return GL_BLEND;
+                return GL_BLEND;
             case ADD:
-               return GL_ADD;
+                return GL_ADD;
             default:
-               throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
+                throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
         }
         return GLenum(0);
     }
@@ -302,7 +302,7 @@ namespace y60 {
             case TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT3_EXT: return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             case TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT: return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
             default:
-               throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
+                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
         }
         return GLenum(0);
     };
@@ -363,7 +363,7 @@ namespace y60 {
             case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT;
             default:
-               throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
+                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
         }
         return TextureInternalFormat(0);
     };
@@ -427,10 +427,8 @@ namespace y60 {
     }
 
     DEFINE_EXCEPTION(GlLightOutOfRangeException, asl::Exception);
-
     GLenum
     asGLLightEnum(unsigned theLightNum) {
-#if 1
         static GLint myMaxLights = 0;
         if (myMaxLights == 0) {
             glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
@@ -439,72 +437,29 @@ namespace y60 {
         if (theLightNum <= myMaxLights) {
             return GL_LIGHT0 + theLightNum;
         }
-        throw GlLightOutOfRangeException(string("too many light sources, max :").c_str() + 
-                                         asl::as_string(myMaxLights) + ", used:" + asl::as_string(theLightNum),PLUS_FILE_LINE);
-#else
-        switch (theLightNum) {
-            case 0 :
-                return GL_LIGHT0;
-            case 1 :
-                return GL_LIGHT1;
-            case 2 :
-                return GL_LIGHT2;
-            case 3 :
-                return GL_LIGHT3;
-            case 4 :
-                return GL_LIGHT4;
-            case 5 :
-                return GL_LIGHT5;
-            case 6 :
-                return GL_LIGHT6;
-            case 7 :
-                return GL_LIGHT7;
-            default :
-                throw GlLightOutOfRangeException("too many light sources",PLUS_FILE_LINE);
-        }
-#endif
+        throw GlLightOutOfRangeException(string("light source out of range: ") + asl::as_string(theLightNum) + ", max: " + asl::as_string(myMaxLights),PLUS_FILE_LINE);
     }
 
     DEFINE_EXCEPTION(GlPlaneOutOfRangeException, asl::Exception);
     GLenum
     asGLClippingPlaneId(unsigned thePlaneNum) {
-#if 1
         if (thePlaneNum <= 5) {
             return GL_CLIP_PLANE0 + thePlaneNum;
         }
-        throw GlPlaneOutOfRangeException(
-                std::string("too many Clipping Planes, max index = 5, got ") +
-                asl::as_string(thePlaneNum), PLUS_FILE_LINE);
-#else
-        switch (thePlaneNum) {
-            case 0 :
-                return GL_CLIP_PLANE0;
-            case 1 :
-                return GL_CLIP_PLANE1;
-            case 2 :
-                return GL_CLIP_PLANE2;
-            case 3 :
-                return GL_CLIP_PLANE3;
-            case 4 :
-                return GL_CLIP_PLANE4;
-            case 5 :
-                return GL_CLIP_PLANE5;
-            default :
-                throw GlPlaneOutOfRangeException(
-                        std::string("too many Clipping Planes, max index = 5, got ") +
-                        asl::as_string(thePlaneNum), PLUS_FILE_LINE);
-        }
-#endif
+        throw GlPlaneOutOfRangeException(string("clipping plane out of range: ") + asl::as_string(thePlaneNum), PLUS_FILE_LINE);
     }
 
     DEFINE_EXCEPTION(GlTextureOutOfRangeException, asl::Exception);
-
     GLenum
     asGLTextureRegister(unsigned theIndex) {
-        if (theIndex <= 7) {
+        static GLint myMaxTextureUnits = 8;
+        if (myMaxTextureUnits == 0) {
+            glGetIntegerv(GL_MAX_TEXTURE_UNITS, &myMaxTextureUnits);
+        }
+        if (theIndex < myMaxTextureUnits) {
             return GL_TEXTURE0 + theIndex;
         }
-        throw GlTextureOutOfRangeException("Primitive uses more texture units than implemented", PLUS_FILE_LINE);
+        throw GlTextureOutOfRangeException(string("texture unit out of range: ") + asl::as_string(theIndex) + ", max: " + asl::as_string(myMaxTextureUnits),PLUS_FILE_LINE);
     }
 
     GLenum
@@ -527,8 +482,7 @@ namespace y60 {
             case TEXCOORD7_REGISTER:
                 return GL_TEXTURE7;
             default:
-                throw GlTextureOutOfRangeException(std::string("Cannot convert texture register ") +
-                    asl::as_string(theRegister) + " to gl register.", PLUS_FILE_LINE);
+                throw GlTextureOutOfRangeException(std::string("texture register out of range: ") + asl::as_string(theRegister), PLUS_FILE_LINE);
         }
         return GL_TEXTURE0;
     }
@@ -584,17 +538,17 @@ namespace y60 {
 
 void * NSGLGetProcAddress (const char * name)
 {
-  NSSymbol symbol;
-  char * symbolName;
-  /* prepend a '_' for the Unix C symbol mangling convention */
-  symbolName = (char*) malloc(strlen((const char*)name) + 2);
-  strcpy(symbolName+1, (const char*)name);
-  symbolName[0] = '_';
-  symbol = NULL;
-  if (NSIsSymbolNameDefined(symbolName))
-    symbol = NSLookupAndBindSymbol(symbolName);
-  free(symbolName);
-  return symbol ? NSAddressOfSymbol(symbol) : NULL;
+    NSSymbol symbol;
+    char * symbolName;
+    /* prepend a '_' for the Unix C symbol mangling convention */
+    symbolName = (char*) malloc(strlen((const char*)name) + 2);
+    strcpy(symbolName+1, (const char*)name);
+    symbolName[0] = '_';
+    symbol = NULL;
+    if (NSIsSymbolNameDefined(symbolName))
+        symbol = NSLookupAndBindSymbol(symbolName);
+    free(symbolName);
+    return symbol ? NSAddressOfSymbol(symbol) : NULL;
 }
 
 #define SET_PROC_ADDRESS(p,x) \
@@ -609,7 +563,7 @@ void * NSGLGetProcAddress (const char * name)
 #else
 
 // Apple AGL Version
- #include <Carbon/Carbon.h>
+#include <Carbon/Carbon.h>
 
 CFBundleRef gBundleRefOpenGL = NULL;
 
@@ -788,8 +742,10 @@ void * aglGetProcAddress (char * pszProc)
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FARBPROC, glMultiTexCoord3fARB );
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FVARBPROC, glMultiTexCoord3fvARB );
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
-            SET_PROC_ADDRESS( PFNGLACTIVETEXTUREPROC,glActiveTexture );
+            SET_PROC_ADDRESS( PFNGLACTIVETEXTUREPROC, glActiveTexture );
             SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture );
+        } else {
+            //throw OpenGLException(string("GL_ARB_multitexture not supported but mandatory"), PLUS_FILE_LINE);
         }
 
         // DS: for some reason this extension is not in the nvidia extension list but I've
@@ -915,7 +871,6 @@ void * aglGetProcAddress (char * pszProc)
                 break;
             default:
              throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
-
         }
         return myResult;
     }

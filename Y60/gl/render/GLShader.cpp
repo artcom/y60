@@ -41,7 +41,6 @@
 #include <y60/glExtensions.h>
 #include <y60/GLUtils.h>
 
-//#include <asl/file_functions.h>
 #include <asl/string_functions.h>
 #include <asl/Logger.h>
 
@@ -264,55 +263,53 @@ namespace y60 {
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
         unsigned myTextureCount = theMaterial.getTextureCount();
 
-        // AC_TRACE << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
+        AC_TRACE << "GLShader::enableTextures material id=" << theMaterial.get<IdTag>() << " name=" << theMaterial.get<NameTag>() << " count=" << myTextureCount;
 
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
+            y60::ImagePtr myImage = myTexture.getImage();
+            //AC_TRACE << "GLShader::enableTextures image id=" << myImage->get<IdTag>() << " name=" << myImage->get<NameTag>() << " src=" << myImage->get<ImageSourceTag>();
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
 
             GLenum myTextureType = 0;
-            switch (myTexture.getImage()->getType()) {
+            switch (myImage->getType()) {
             case SINGLE:
-                myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+                myTextureType = myImage->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
                 break;
             case CUBEMAP:
                 myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
                 break;
             default:
                 throw ShaderException(string("Invalid image type in material '") + theMaterial.get<NameTag>() + "'", PLUS_FILE_LINE);
-                break;
             }
-            unsigned myId = myTexture.getImage()->ensureTextureId(); 
 
-            AC_TRACE << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
+            unsigned myId = myImage->ensureTextureId(); 
+            //AC_TRACE << "GLShader::enableTextures unit=" << hex << myTexUnit << dec << " texid=" << myId;
 
             // [VS;DS;UH] someone please explain this
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glBindTexture(myTextureType, myTexture.getId());
+                glBindTexture(myTextureType, myId);
                 glEnable(myTextureType);
 
                 // trigger wrapmode and min/mag filter update
                 // by calling GLResourceManager::updateTextureParams
-                myTexture.getImage()->get<TextureParamChangedTag>();
+                myImage->get<TextureParamChangedTag>();
             }
 
-
             // load texture matrix
-            asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
+            asl::Matrix4f myMatrix = myImage->get<ImageMatrixTag>();
             myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
-            // XXX glMultMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
-
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
             
             // hardwired env color for texture blend mode 'blend', changed default from black(OpenGL) to
-            // white, seems to be a better default for blend formula, can  be exposed in a 2nd step (VS)            
+            // white, seems to be a better default for blend formula, can be exposed in a 2nd step (VS)            
             GLfloat myEnv_color[] = {1,1,1,1};
             glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myEnv_color); 
 
@@ -371,6 +368,7 @@ namespace y60 {
         // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
         for (unsigned i = 0; i < myTextureCount; ++i) {
             const y60::Texture & myTexture = theMaterial.getTexture(i);
+            const y60::ImagePtr & myImage = myTexture.getImage();
             TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
             // Fixed Function Shaders only support paint & skybox usage
@@ -378,11 +376,10 @@ namespace y60 {
                 glActiveTexture(asGLTextureRegister(i));
                 glClientActiveTexture(asGLTextureRegister(i));
 
-#if 1
                 GLenum myTextureType;
-                switch (myTexture.getImage()->getType()) {
+                switch (myImage->getType()) {
                     case SINGLE :
-                        if (myTexture.getImage()->get<ImageDepthTag>()==1) {
+                        if (myImage->get<ImageDepthTag>()==1) {
                             myTextureType = GL_TEXTURE_2D;
                         } else {
                             myTextureType = GL_TEXTURE_3D;
@@ -393,29 +390,10 @@ namespace y60 {
                         break;
                     default :
                         throw ShaderException(std::string("Unknown texture type '")+
-                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                                myImage->get<NameTag>() + "'", PLUS_FILE_LINE);
                 }
                 glBindTexture(myTextureType, 0);
                 glDisable(myTextureType);
-#else
-                switch (myTexture.getImage()->getType()) {
-                    case SINGLE :
-                        break;
-                    case CUBEMAP :
-                        glDisable(GL_TEXTURE_CUBE_MAP_ARB);
-                        break;
-                    default :
-                        throw ShaderException(std::string("Unknown texture type '")+
-                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
-                }
-                if (myTexture.getImage()->get<ImageDepthTag>()==1) {
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    glDisable(GL_TEXTURE_2D);
-                } else {
-                    glBindTexture(GL_TEXTURE_3D, 0);
-                    glDisable(GL_TEXTURE_3D);
-                }
-#endif
             }
         }
         glDisable(GL_POINT_SPRITE_ARB);

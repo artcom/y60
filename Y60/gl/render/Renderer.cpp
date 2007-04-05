@@ -1638,9 +1638,6 @@ MAKE_SCOPE_TIMER(switchMaterial);
             return;
         }
 
-#if 0
-        AC_PRINT << "name=" << theViewport.get<NameTag>() << " pos=" << theViewport.get<Position2DTag>() << " size=" << theViewport.get<Size2DTag>() << " pixel=" << theViewport.get<ViewportLeftTag>() << "," << theViewport.get<ViewportTopTag>() << "," << theViewport.getLower() << " " << theViewport.get<ViewportWidthTag>() << "x" << theViewport.get<ViewportHeightTag>();
-#endif
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -1684,12 +1681,18 @@ MAKE_SCOPE_TIMER(switchMaterial);
     void
     Renderer::renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha) {
 
+#if 0
         if (theOverlayNode->nodeType() != dom::Node::ELEMENT_NODE) {
             return;
         }
+#endif
         const y60::Overlay & myOverlay = *(theOverlayNode->getFacade<y60::Overlay>());
+        if (myOverlay.get<VisibleTag>() == false) {
+            return;
+        }
+
         float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
-        if (!myOverlay.get<VisibleTag>() || myAlpha <= 0.0f) {
+        if (myAlpha <= 0.0f) {
             return;
         }
 
@@ -1714,16 +1717,14 @@ MAKE_SCOPE_TIMER(switchMaterial);
         float myWidth  = myOverlay.get<WidthTag>();
         float myHeight = myOverlay.get<HeightTag>();
 
-        if (myWidth > 0.0f && myHeight > 0.0f && myAlpha > 0.0f) {
+        if (myWidth > 0.0f && myHeight > 0.0f) {
 
             const std::string & myMaterialId = myOverlay.get<MaterialTag>();
             if (myMaterialId.empty() == false) {
                 MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
-
-                //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
-                DB(AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl);
                 if (!myMaterial) {
                     AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
+                    // UH: missing glPopMatrix()
                     return;
                 }
 
