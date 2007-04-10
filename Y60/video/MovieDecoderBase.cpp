@@ -106,6 +106,9 @@ namespace y60 {
     void MovieDecoderBase::setEOF(bool theEndOfFileFlag) {
         _myEndOfFileFlag = theEndOfFileFlag;
         if (_myEndOfFileFlag && _myMovie->get<FrameCountTag>() == -1) {
+            if (_myMovie->get<CurrentFrameTag>() == 0) {
+                throw asl::Exception("no decodable video stream found. (are width and height both multiples of two?) ", PLUS_FILE_LINE);
+            }
             _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());            
         }
     }
