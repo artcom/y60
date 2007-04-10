@@ -1052,6 +1052,8 @@ public:
                                            const DOMString & theAttributeName,
                                            const DOMString & theAttributeValue,
                                            int theIndex = 0);
+        void  getNodesByTagName(const DOMString & theElementName,
+                                  std::vector<NodePtr> & theResults) const;
         void  getNodesByAttribute(const DOMString & theElementName,
                                   const DOMString & theAttributeName,
                                   const DOMString & theAttributeValue,

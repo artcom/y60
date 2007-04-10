@@ -1060,6 +1060,22 @@ Node::getNodesByAttribute(const DOMString & theElementName,
     }
 }
 
+void
+Node::getNodesByTagName(const DOMString & theElementName,
+                        std::vector<NodePtr> & theResults) const
+{
+    for (int i = 0; i < childNodes().length(); ++i) {
+        const NodePtr myChild = childNode(i);
+        if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
+            const DOMString & myElementName  = myChild->nodeName();
+            if (myElementName == theElementName) {
+                theResults.push_back(myChild);
+            }
+            myChild->getNodesByTagName(theElementName, theResults );
+        }
+    }
+}
+
 const NodePtr
 Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
     for (int i = 0; i < childNodes().length(); ++i) {

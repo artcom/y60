@@ -602,6 +602,7 @@ saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     } HANDLE_CPP_EXCEPTION;
 }
+
 static JSBool
 childNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a child node of this node");
@@ -648,6 +649,7 @@ childNodesLength(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     JS_ReportError(cx,"JSNode::childNodesLength: wrong number of parameters: %d, 0 or 1 expected", argc);
     return JS_FALSE;
 }
+
 static JSBool
 getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds a node in the whole document by its id.");
@@ -657,6 +659,7 @@ getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_PARAM("Id attribute name", "", DOC_TYPE_STRING);
     DOC_RVAL("The found node, or null", DOC_TYPE_NODE);
     DOC_END;
+
     dom::DOMString myId;
     dom::DOMString myIdAttribute = "id";
     dom::NodePtr myNode;
@@ -675,32 +678,66 @@ getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     *rval = as_jsval(cx, myRetNode);
     return JS_TRUE;
 }
+
+static JSBool
+getNodesByTagName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
+    DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
+    DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
+    DOC_END;
+    dom::DOMString myElementName;
+    dom::NodePtr myNode;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
+
+    std::vector<dom::NodePtr> myResults;
+    if (argc == 1) {
+        convertFrom(cx, argv[0], myElementName);
+        myNode->getNodesByTagName(myElementName, myResults);
+    } else {
+        JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 1 expected", argc);
+        return JS_FALSE;            
+    }
+    
+    *rval = as_jsval(cx, myResults);
+    return JS_TRUE;
+}
+
 static JSBool
 getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
     DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
-    DOC_PARAM("theAttributeName", "", DOC_TYPE_STRING);
-    DOC_PARAM("theAttributeValue", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theAttributeName", "", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theAttributeValue", "", DOC_TYPE_STRING, "");
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
     dom::DOMString myElementName;
     dom::DOMString myAttributeName;
-    dom::DOMString myAttributeValue;
+    dom::DOMString myAttributeValue = "";
     dom::NodePtr myNode;
     convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
-    if (argc == 3) {
-        convertFrom(cx, argv[0], myElementName);
-        convertFrom(cx, argv[1], myAttributeName);
-        convertFrom(cx, argv[2], myAttributeValue);
-    } else {
-        JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 expected", argc);
-        return JS_FALSE;
-    }
+
     std::vector<dom::NodePtr> myResults;
-    myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myResults);
+    switch (argc) {
+        case 3:
+            convertFrom(cx, argv[2], myAttributeValue);
+        case 2:
+            convertFrom(cx, argv[1], myAttributeName);
+            convertFrom(cx, argv[0], myElementName);
+            myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myResults);
+            break;
+        case 1:
+            convertFrom(cx, argv[0], myElementName);
+            myNode->getNodesByTagName(myElementName, myResults);
+            break;
+        default:
+            JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 expected", argc);
+            return JS_FALSE;            
+    }
+    
     *rval = as_jsval(cx, myResults);
     return JS_TRUE;
 }
+
 static JSBool
 getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Retrieves an attribute value by name.");
@@ -721,6 +758,7 @@ addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::addEventListener, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 removeEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Removes an event listeners from the default group");
@@ -730,6 +768,7 @@ removeEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::removeEventListener, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sends an event into the dom event model");
@@ -737,6 +776,7 @@ dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::dispatchEvent, cx, obj, argc, argv, rval);
 }
+
 JSBool
 debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("prints debug information about the value.");
@@ -746,34 +786,36 @@ debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     myNode->nodeValueWrapperPtr()->printPrecursorGraph();
     return JS_TRUE;
 }
+
 JSFunctionSpec *
 JSNode::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
-        /* name         native          nargs    */
-        {"insertBefore",     insertBefore,    2},
-        {"replaceChild",     replaceChild,    2},
-        {"removeChild",      removeChild,     1},
-        {"appendChild",      appendChild,     1},
-        {"hasChildNodes",    hasChildNodes,   1},
-        {"cloneNode",        cloneNode,       1},
-        {"toString",         toString,        0},
-        {"isSameNode",       isSameNode,      1},
-        {"addSchema",        addSchema,       2},
-        {"useFactories",     useFactories,    1},
-        {"parse",            parse,           1},
-        {"parseFile",        parseFile,       1},
-        {"saveFile",         saveFile,        2},
-        {"debinarizeFile",   debinarizeFile,  1},
-        {"childNode",        childNode,       2},
-        {"childNodesLength", childNodesLength,1},
-        {"getElementById",   getElementById,  2},
-        {"getNodesByAttribute",   getNodesByAttribute,  3},
-        {"getAttribute",     getAttribute,    1},
-        {"addEventListener",     addEventListener,       3},
-        {"removeEventListener",  removeEventListener,    3},
-        {"dispatchEvent",        dispatchEvent,          3},
-        {"debugValue",        debugValue,         0},
+        /* name                 native               nargs    */
+        {"insertBefore",        insertBefore,        2},
+        {"replaceChild",        replaceChild,        2},
+        {"removeChild",         removeChild,         1},
+        {"appendChild",         appendChild,         1},
+        {"hasChildNodes",       hasChildNodes,       1},
+        {"cloneNode",           cloneNode,           1},
+        {"toString",            toString,            0},
+        {"isSameNode",          isSameNode,          1},
+        {"addSchema",           addSchema,           2},
+        {"useFactories",        useFactories,        1},
+        {"parse",               parse,               1},
+        {"parseFile",           parseFile,           1},
+        {"saveFile",            saveFile,            2},
+        {"debinarizeFile",      debinarizeFile,      1},
+        {"childNode",           childNode,           2},
+        {"childNodesLength",    childNodesLength,    1},
+        {"getElementById",      getElementById,      2},
+        {"getNodesByAttribute", getNodesByAttribute, 3},
+        {"getNodesByTagName",   getNodesByTagName,   1},
+        {"getAttribute",        getAttribute,        1},
+        {"addEventListener",    addEventListener,    3},
+        {"removeEventListener", removeEventListener, 3},
+        {"dispatchEvent",       dispatchEvent,       3},
+        {"debugValue",          debugValue,          0},
        {0}
     };
     return myFunctions;
@@ -834,6 +876,7 @@ createElement(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_END;
     return createNode(dom::Node::ELEMENT_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createDocumentFragment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a document fragment node.");
@@ -841,6 +884,7 @@ createDocumentFragment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     DOC_END;
     return createNode(dom::Node::DOCUMENT_FRAGMENT_NODE, 0, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createTextNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a text node.");
@@ -849,6 +893,7 @@ createTextNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_END;
     return createNode(dom::Node::TEXT_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createComment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a comment node.");
@@ -857,6 +902,7 @@ createComment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_END;
     return createNode(dom::Node::COMMENT_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createCDATASection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a CDATA section node.");
@@ -865,6 +911,7 @@ createCDATASection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     DOC_END;
     return createNode(dom::Node::CDATA_SECTION_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createProcessingInstruction(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a processing instruction node.");
@@ -874,6 +921,7 @@ createProcessingInstruction(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     DOC_END;
     return createNode(dom::Node::PROCESSING_INSTRUCTION_NODE, 2, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a attribute node.");
@@ -882,6 +930,7 @@ createAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_END;
     return createNode(dom::Node::ATTRIBUTE_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createEntityReference(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a entitiy reference node.");
@@ -890,6 +939,7 @@ createEntityReference(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     DOC_END;
     return createNode(dom::Node::ENTITY_REFERENCE_NODE, 1, cx, obj, argc, argv, rval);
 }
+
 static JSBool
 createDocument(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a new document node");
@@ -897,6 +947,7 @@ createDocument(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_END;
     return createNode(dom::Node::DOCUMENT_NODE, 0, cx, obj, argc, argv, rval);
 }
+
 JSFunctionSpec *
 JSNode::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
