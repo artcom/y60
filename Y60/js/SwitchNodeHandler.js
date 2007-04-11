@@ -400,7 +400,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         // find the transform node with the texture references first
         var myReferenceNode = getDescendantByName(window.scene.world, "textureswitches", true);
         if (!myReferenceNode) {
-            Logger.error("Could not find reference node for textureswitches");
+            Logger.info("Could not find reference node for textureswitches");
             return;
         }
        
