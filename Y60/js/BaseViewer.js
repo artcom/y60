@@ -108,6 +108,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.setActiveViewport = function(theViewport) {
+        Logger.info("Active viewport is name=" + theViewport.name + " id=" + theViewport.id);
         _activeViewport = theViewport;
     }
     self.getActiveViewport = function() {

@@ -36,7 +36,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     self.canvas getter = function() {
         return _myCanvas;
     }
-      
+ 
+    self.viewport getter = function() {
+        return _myViewport;
+    }
+
     self.camera setter = function(theCamera) {
         _myCamera = theCamera;
         _myViewport.camera = theCamera.id;
@@ -202,6 +206,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         // Setup target
         _myCanvas.target = self.image.id;
         _myViewport.camera = self.camera.id;
+        //_myViewport.wireframe = true;
 
         // Setup offscreen render area
         _myOffscreenRenderArea = new OffscreenRenderArea();
