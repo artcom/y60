@@ -569,6 +569,28 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+     <xs:element name="rasterofrgb_float">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue, with 32bit float accuracy.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGB_FLOAT"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofrgba_float">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue/alpha, with 32 bit float accuracy</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGBA_FLOAT"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
      <xs:element name="rasterofrgb_half">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -2549,6 +2571,16 @@ the projector frustum is reshaped when the aspect of the texture changes.</xs:do
             <xs:element ref="rasterofabgr">
                 <xs:annotation>
                     <xs:documentation>Contains runlength encoded pixel data of type abgr</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+             <xs:element ref="rasterofrgb_float">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgb with 32 bit float pixel values</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofrgba_float">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgba with 32 bit float pixel values</xs:documentation>
                 </xs:annotation>
             </xs:element>
              <xs:element ref="rasterofrgb_half">

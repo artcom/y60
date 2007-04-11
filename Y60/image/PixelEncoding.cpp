@@ -119,6 +119,8 @@ getInternalPixelFormat(PixelEncoding theEncoding) {
         case y60::S3TC_DXT5:               return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         case y60::RGBA_HALF:               return TEXTURE_IFMT_RGBA_HALF;
         case y60::RGB_HALF:                return TEXTURE_IFMT_RGB_HALF;
+        case y60::RGBA_FLOAT:              return TEXTURE_IFMT_RGBA_FLOAT;
+        case y60::RGB_FLOAT:               return TEXTURE_IFMT_RGB_FLOAT;
         default:
             throw asl::Exception(std::string("Unsupported texture pixelformat ") +
                     asl::getStringFromEnum(theEncoding, y60::PixelEncodingString), PLUS_FILE_LINE);

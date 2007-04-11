@@ -212,7 +212,8 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
 
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] && theImage->getNode().nodeVersion() != _myImageNodeVersion) {
-        AC_DEBUG << "Tearing down FBO since Image has changed " << theImage->getNode().nodeVersion() << " != " << _myImageNodeVersion;
+        AC_DEBUG << "Tearing down FBO since Image has changed " 
+                << theImage->getNode().nodeVersion() << " != " << _myImageNodeVersion;
 
         glDeleteFramebuffersEXT(2, &_myFrameBufferObject[0]);
         glDeleteRenderbuffersEXT(2, &_myColorBuffer[0]);
@@ -243,13 +244,17 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             /*
              * setup multisample framebuffer
              */
+            int myMaxSamples;
+            glGetIntegerv(GL_MAX_SAMPLES_EXT, &myMaxSamples);
+            AC_DEBUG << "OffscreenBuffer: Max samples= " << myMaxSamples;
             AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup multisample framebuffer multisampling samples=" << theSamples << " size=" << myWidth << "x" << myHeight;
 
             // color buffer
             glGenRenderbuffersEXT(1, &_myColorBuffer[1]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
+            TextureInternalFormat myImageFormat = theImage->getInternalEncoding();
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
-                    theSamples, GL_RGB8,
+                    theSamples, asGLTextureInternalFormat(myImageFormat),
                     myWidth, myHeight);
             checkOGLError(PLUS_FILE_LINE);
 
