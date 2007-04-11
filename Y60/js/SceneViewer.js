@@ -249,8 +249,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("  Scene size     " + window.scene.getWorldSize(myCamera).toFixed(1) + "m");
                     break;
                 case 'S':
-                    // self.getScene().save("saved_scene.x60", false);
-                    self.getScene().world.saveFile("saved_world.x60", false);
+                    self.getScene().save("saved_scene.x60", false);
                     print("Saved scene to: saved_scene.x60");
                     break;
                 case 'f':
