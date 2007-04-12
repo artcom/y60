@@ -1041,6 +1041,7 @@ void
 Node::getNodesByAttribute(const DOMString & theElementName,
                           const DOMString & theAttributeName,
                           const DOMString & theAttributeValue,
+                          bool theDeepSearchFlag,                          
                           std::vector<NodePtr> & theResults) const
 {
     for (int i = 0; i < childNodes().length(); ++i) {
@@ -1054,14 +1055,17 @@ Node::getNodesByAttribute(const DOMString & theElementName,
                     theResults.push_back(myChild);
                 }
             }
-            myChild->getNodesByAttribute(theElementName, theAttributeName,
-                                         theAttributeValue, theResults );
+            if (theDeepSearchFlag) {
+                myChild->getNodesByAttribute(theElementName, theAttributeName,
+                                             theAttributeValue, theDeepSearchFlag, theResults );
+            }
         }
     }
 }
 
 void
 Node::getNodesByTagName(const DOMString & theElementName,
+                        bool theDeepSearchFlag,
                         std::vector<NodePtr> & theResults) const
 {
     for (int i = 0; i < childNodes().length(); ++i) {
@@ -1071,7 +1075,9 @@ Node::getNodesByTagName(const DOMString & theElementName,
             if (myElementName == theElementName) {
                 theResults.push_back(myChild);
             }
-            myChild->getNodesByTagName(theElementName, theResults );
+            if (theDeepSearchFlag) {
+                myChild->getNodesByTagName(theElementName, theDeepSearchFlag, theResults );
+            }
         }
     }
 }

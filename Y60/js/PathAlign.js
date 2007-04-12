@@ -172,7 +172,9 @@ function test_PathAlign() {
         var mySvgFile = readFileAsString(SVG_FILE);
         var mySvgNode = new Node(mySvgFile);
 
-        var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        //var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        var myPaths = mySvgNode.getNodesByTagName("path", true);
+        
         myPath = new SvgPath(myPaths[6].d);
     } else {
         const __PATHALIGN_TESTS = [

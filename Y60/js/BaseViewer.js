@@ -150,7 +150,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
        if (!theScene) {
            self.prepareScene(null, null, theSwitchNodeFlag);
        } else {
-           var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
+           //var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
+           var myCanvas = theCanvas ? theCanvas : theScene.dom.getNodesByTagName("canvas")[0];
            self.prepareScene(theScene, myCanvas, theSwitchNodeFlag);
        }
    }
@@ -217,12 +218,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var myViewport = theCanvasNode.childNode('viewport');
             _myLightManager.setupHeadlight(myViewport);
         }
-        _activeViewport = getDescendantByTagName(_myRenderWindow.canvas, 'viewport');
+        //_activeViewport = getDescendantByTagName(_myRenderWindow.canvas, 'viewport');
+        _activeViewport = _myRenderWindow.canvas.getNodesByTagName('viewport')[0];
     }
 
     self.setCanvasByIndex = function(theIndex) {
-        var myCanvasRoot = getDescendantByTagName(_myRenderWindow.scene.dom, "canvases", true);
-        var myDefaultCamera = getDescendantByTagName(_myRenderWindow.scene.dom, "camera", true);
+        //var myCanvasRoot = getDescendantByTagName(_myRenderWindow.scene.dom, "canvases", true);
+        var myCanvasRoot = _myRenderWindow.scene.dom.getNodesByTagName("canvases")[0];
+        //var myDefaultCamera = getDescendantByTagName(_myRenderWindow.scene.dom, "camera", true);
+        var myDefaultCamera = _myRenderWindow.scene.dom.getNodesByTagName("camera")[0];
         if (myCanvasRoot.childNodes.length > theIndex) {
             self.setCanvas(myCanvasRoot.childNodes[theIndex]);
         } else {
@@ -360,7 +364,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (mySwitchNode.nodeName == "body") {
                     Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
-                    var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
+                    //var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
+                    var myMaterialId = myShape.getNodesByTagName("primitives", true)[0].firstChild.material; 
                     myMaterial = mySwitchNode.getElementById(myMaterialId);
                     mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
                 } else {
@@ -694,7 +699,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     // is called before first scene update
     self.preprocessScene = function(theScene) {
         // find all movienodes with no decoderhint and try to set it
-        var myMovies = getDescendantsByTagName(theScene.images, "movie", false);
+        //var myMovies = getDescendantsByTagName(theScene.images, "movie", false);
+        var myMovies = theScene.images.getNodesByTagName("movie", false);
+
         if (myMovies) {
             for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {
                 var myMovie = myMovies[myMovieIndex];
@@ -753,7 +760,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.prepareScene = function (theScene, theCanvas, theSwitchNodeFlag) {
         if (theScene) {
             // Cache main scene nodes for fast access
-            var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
+            //var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
+            var myWorlds    = theScene.dom.getNodesByTagName("worlds", false)[0];
+            
             _myWorld        = theScene.world;
             _myMaterials    = theScene.materials;
             _myLightSources = theScene.lightsources;

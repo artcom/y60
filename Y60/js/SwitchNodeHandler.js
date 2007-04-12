@@ -275,7 +275,9 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                     Logger.warning("Could not find shape with id: " + myShapeId);
                     return false;
                 }
-                var myElement = getDescendantByTagName(myShape, "elements", true);
+                //var myElement = getDescendantByTagName(myShape, "elements", true);
+                var myElement = myShape.getNodesByTagName("elements", true)[0];
+                
                 mySwitchMat = myElement.getElementById(myElement.material);
             }
         }

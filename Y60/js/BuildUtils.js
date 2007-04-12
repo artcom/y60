@@ -64,7 +64,9 @@ function buildMaterialNode(theMaterialName,
     myMaterialNode.id = createUniqueId(); //"m" + theMaterialName;
     myMaterialNode.name = theMaterialName;
 
-    var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
+//    var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
+    var myMaterialParent = window.scene.dom.getNodesByTagName("materials", true)[0];
+    
     myMaterialParent.appendChild(myMaterialNode);
 
     if (theDiffuseColor == undefined) {
@@ -110,7 +112,9 @@ function buildUnlitTextureMaterialNode(theName, theImageId) {
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theName;
     myMaterialNode.name = theName;
-    var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
+    //var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
+    var myMaterialParent = window.scene.dom.getNodesByTagName("materials", true)[0];
+    
     myMaterialParent.appendChild(myMaterialNode);
     var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
     myMaterialNode.requires.appendChild(myTextureFeatures);
@@ -158,7 +162,8 @@ function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theV
     var myPropertyDoc = new Node(myPropertyString);
     var myPropertyNode = myPropertyDoc.childNodes[0];
 
-    var myPropertiesNode = getDescendantByTagName(theMaterialNode, "properties", false);
+    //var myPropertiesNode = getDescendantByTagName(theMaterialNode, "properties", false);
+    var myPropertiesNode = theMaterialNode.getNodesByTagName("properties", false);
     if (!myPropertiesNode) {
         var myPropertiesString = "<properties/>";
         var myPropertiesDoc = new Node(myPropertiesString);
@@ -173,7 +178,9 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     var myRequirementString = "<feature name='" + theRequirementClass + "'>" + theRequirementValue + "</feature>";
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
-    var myRequiresDocNode = getDescendantByTagName(theMaterialNode, "requires", false);
+    //var myRequiresDocNode = getDescendantByTagName(theMaterialNode, "requires", false);
+    var myRequiresDocNode = theMaterialNode.getNodesByTagName("requires", false)[0];
+    
     if (!myRequiresDocNode) {
         var myRequiresString = "<requires/>";
         var myRequiresDoc = new Node(myRequiresString);

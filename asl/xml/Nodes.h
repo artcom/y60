@@ -1053,10 +1053,12 @@ public:
                                            const DOMString & theAttributeValue,
                                            int theIndex = 0);
         void  getNodesByTagName(const DOMString & theElementName,
-                                  std::vector<NodePtr> & theResults) const;
+                                bool theDeepSearchFlag,
+                                std::vector<NodePtr> & theResults) const;
         void  getNodesByAttribute(const DOMString & theElementName,
                                   const DOMString & theAttributeName,
                                   const DOMString & theAttributeValue,
+                                  bool theDeepSearchFlag,
                                   std::vector<NodePtr> & theResults) const;
 
         const NodePtr getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) const;

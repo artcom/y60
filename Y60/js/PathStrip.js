@@ -294,7 +294,9 @@ function test_PathStrip() {
     } else {
         var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg")); //svg-logo-001.svg");
         var mySvgNode = new Node(mySvgFile);
-        var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        //var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        var myPaths = mySvgNode.getNodesByTagName("path", true);
+        
         myPath = new SvgPath(myPaths[6].d, 100);
         myWidth = 20.0;
 

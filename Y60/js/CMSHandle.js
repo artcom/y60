@@ -139,6 +139,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     function fetchPresentation() {
+        
         _myPresentation = Node.createDocument();
         var myErrorOccurred = false;
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
@@ -205,6 +206,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                                     _myLocalFallback+"'.", fileline());
             }
         } else {
+
             _myPresentation.parse( myPresentationRequest.responseString );
             _myPresentation.saveFile( _myLocalFallback );
         }
@@ -245,7 +247,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         {
             _myVersionTag = myZopeConfig.versiontag;
         }
-
         if ( _mySyncFlag ) {
             fetchPresentation();
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {

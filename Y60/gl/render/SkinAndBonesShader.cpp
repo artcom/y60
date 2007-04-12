@@ -60,7 +60,7 @@ namespace y60 {
         }
 
         vector<NodePtr> myElements;
-        myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, theMaterial.get<IdTag>(), myElements);
+        myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, theMaterial.get<IdTag>(), true, myElements);
 
         Node * myShape;
         string myShapeId;
@@ -81,7 +81,7 @@ namespace y60 {
         _myBoundingBoxNode = myShape->getFacade()->getNamedItem(BOUNDING_BOX_ATTRIB);
 
         vector<NodePtr> mySkeletons;
-        myWorldsNode->getNodesByAttribute(BODY_NODE_NAME, BODY_SHAPE_ATTRIB, myShapeId, mySkeletons);
+        myWorldsNode->getNodesByAttribute(BODY_NODE_NAME, BODY_SHAPE_ATTRIB, myShapeId, true, mySkeletons);
 
         if (mySkeletons.size() > 1) {
             throw SkinAndBonesShaderException(string("More than one skeletons use the shape ") + myShapeId, PLUS_FILE_LINE);

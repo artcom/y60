@@ -348,6 +348,7 @@ function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch)
 // Recursivly searches theNode for all elements that have theAttribute with value theValue.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
+    Logger.warning("Legacy call 'getDescendantsByAttribute', use 'getNodesByAttribute' of theNode instead for cpp implementation, \nbut caution you get an array!");        
     var myResult = new Array();
     try {
         if (!theValue || !theNode) {
@@ -373,6 +374,8 @@ function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch
 }
 
 function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
+    Logger.warning("Legacy call 'getDescendantsByAttributeName', use 'getNodesByAttribute' of theNode instead for cpp implementation, \nbut caution you get an array!");    
+    getNodesByAttribute
     var myResult = new Array();
     try {
         if (!theNode) {
@@ -399,6 +402,7 @@ function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
 
 // Recursivly search for the first element by tagname
 function getDescendantByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
+    Logger.warning("Legacy call 'getDescendantByTagName' , use 'getNodesByTagName' of theNode instead for cpp implementation, \nbut caution you get an array!");    
     if (caseInsensitive == undefined) {
         caseInsensitive = false;
     }
@@ -437,6 +441,8 @@ function getDescendantByTagName(theNode, theTagName, doDeepSearch, caseInsensiti
 
 // Recursivly search for all elements by tagname
 function getDescendantsByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
+    Logger.warning("Legacy call 'getDescendantsByTagName', use 'getNodesByTagName' of theNode instead for cpp implementation, \nbut caution you get an array!");
+    
     if (caseInsensitive == undefined) {
         caseInsensitive = false;
     }

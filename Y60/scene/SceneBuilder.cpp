@@ -165,7 +165,7 @@ namespace y60 {
     {
         dom::NodePtr myImages = getNode()->childNode(IMAGE_LIST_NAME);
         std::vector<dom::NodePtr> myResults;
-        myImages->getNodesByAttribute(IMAGE_NODE_NAME, IMAGE_SRC_ATTRIB, theImageName, myResults);
+        myImages->getNodesByAttribute(IMAGE_NODE_NAME, IMAGE_SRC_ATTRIB, theImageName, true, myResults);
         for(int i = 0; i < myResults.size(); i++) {
             dom::NodePtr myChildNode = myResults[i];
             const asl::Vector4f & myColorScale = myChildNode->getAttributeValue<asl::Vector4f>(IMAGE_COLOR_SCALE_ATTRIB);

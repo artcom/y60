@@ -21,9 +21,12 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     
     var _myScene        = theScene;
     var _myWorld        = theWorld;
-    var _myLightSources = getDescendantByTagName(theScene.dom,'lightsources', false);
+    //var _myLightSources = getDescendantByTagName(theScene.dom,'lightsources', false);
+    var _myLightSources = theScene.dom.getNodesByTagName('lightsources', false)[0];
 
-    var _myLights = getDescendantsByTagName(theWorld,'light', true);
+    //var _myLights = getDescendantsByTagName(theWorld,'light', true);
+    var _myLights = theWorld.getNodesByTagName('light', true);
+    
     var _myLightCursor = 0;
 
     var _myViewportHeadlights    = [];
@@ -89,7 +92,9 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             // obj.setupHeadlight(myViewport);
         }
         var activeLightsFound = false;
-        _myLights = getDescendantsByTagName(_myWorld, "light", true);
+        //_myLights = getDescendantsByTagName(_myWorld, "light", true);
+        _myLights = _myWorld.getNodesByTagName("light", true);
+        
         for (var i=0; i < _myLights.length; ++i) {
             if (_myLights[i].visible) {
                 activeLightsFound = true;

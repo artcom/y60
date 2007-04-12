@@ -178,7 +178,9 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     function pickIntersection(theScreenPixelX, theScreenPixelY) {
     //    var myCameraToScreenRay = getCameraToScreenRay(theScreenPixelX, theScreenPixelY);
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
-        var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        //var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        var myWorld = _myRenderWindow.scene.dom.getNodesByTagName( "world", true)[0];
+        
         return nearestIntersection(myWorld, myLineSegment);
     }
 

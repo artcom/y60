@@ -683,6 +683,7 @@ static JSBool
 getNodesByTagName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
     DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theDeepSearchFlag", "", DOC_TYPE_BOOLEAN, "");
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
     dom::DOMString myElementName;
@@ -690,11 +691,15 @@ getNodesByTagName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
 
     std::vector<dom::NodePtr> myResults;
-    if (argc == 1) {
+    if (argc == 1 || argc == 2) {
+        bool myDeepSearchFlag = true;
+        if (argc == 2) {
+            convertFrom(cx, argv[1], myDeepSearchFlag);            
+        }
         convertFrom(cx, argv[0], myElementName);
-        myNode->getNodesByTagName(myElementName, myResults);
+        myNode->getNodesByTagName(myElementName, myDeepSearchFlag, myResults);
     } else {
-        JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 1 expected", argc);
+        JS_ReportError(cx,"JSNode::getNodesByTagName: wrong number of parameters: %d, 1 or 2 expected", argc);
         return JS_FALSE;            
     }
     
@@ -706,7 +711,8 @@ static JSBool
 getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
     DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
-    DOC_PARAM_OPT("theAttributeName", "", DOC_TYPE_STRING, "");
+    DOC_PARAM("theAttributeName", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theDeepSearchFlag (default is true)", "", DOC_TYPE_BOOLEAN, "");    
     DOC_PARAM_OPT("theAttributeValue", "", DOC_TYPE_STRING, "");
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
@@ -714,23 +720,22 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     dom::DOMString myAttributeName;
     dom::DOMString myAttributeValue = "";
     dom::NodePtr myNode;
+    bool myDeepSearchFlag = true;    
     convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
 
     std::vector<dom::NodePtr> myResults;
     switch (argc) {
+        case 4:
+            convertFrom(cx, argv[3], myAttributeValue);
         case 3:
-            convertFrom(cx, argv[2], myAttributeValue);
+            convertFrom(cx, argv[1], myDeepSearchFlag);                        
         case 2:
-            convertFrom(cx, argv[1], myAttributeName);
+            convertFrom(cx, argv[2], myAttributeName);
             convertFrom(cx, argv[0], myElementName);
-            myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myResults);
-            break;
-        case 1:
-            convertFrom(cx, argv[0], myElementName);
-            myNode->getNodesByTagName(myElementName, myResults);
+            myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myDeepSearchFlag, myResults);
             break;
         default:
-            JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 expected", argc);
+            JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 or 4 expected", argc);
             return JS_FALSE;            
     }
     
