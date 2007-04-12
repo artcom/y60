@@ -92,7 +92,9 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             function() { return ( _myCMSCache ? _myCMSCache.statusReport : null ) } );
 
     obj.__defineGetter__('localFallback',
-            function() { return (_mySyncFlag ? _myLocalFallback : null) } );
+            function() { return _myLocalFallback; } );
+
+    obj.__defineGetter__('syncFlag', function() { return _mySyncFlag; } );
 
     obj.__defineGetter__('assetDir', function() { return _myLocalPath; } );
 
