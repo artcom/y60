@@ -269,22 +269,34 @@ function adjustNodeIds(theNode) {
 
 //searches for a descendant of theNode (must be in DOM below theNode)
 function getDescendantById(theNode, theId, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
 
 function getDescendantByName(theNode, theName, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
 
 function getDescendantsByName(theNode, theName, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     return theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
 }
 
 // Recursivly searches theNode for the first element that has theAttribute.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -292,6 +304,9 @@ function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
 // Recursivly searches theNode for the first element that has theAttribute with value theValue.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -299,21 +314,33 @@ function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch)
 // Recursivly searches theNode for all elements that have theAttribute with value theValue.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     return theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
 }
 
 function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     return theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
 }
 
 // Recursivly search for the first element by tagname
-function getDescendantByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
+function getDescendantByTagName(theNode, theTagName, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
 
 // Recursivly search for all elements by tagname
-function getDescendantsByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
+function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
+    if (doDeepSearch == undefined || !doDeepSearch) {
+        doDeepSearch = false;
+    }
     return theNode.getNodesByTagName(theTagName, doDeepSearch);        
 }
 
