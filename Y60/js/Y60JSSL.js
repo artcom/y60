@@ -269,214 +269,52 @@ function adjustNodeIds(theNode) {
 
 //searches for a descendant of theNode (must be in DOM below theNode)
 function getDescendantById(theNode, theId, doDeepSearch) {
-    return getDescendantByAttribute(theNode, "id", theId, doDeepSearch);
+    var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);    
+    return myResult.length == 0 ? null:myResult[0];
 }
 
 function getDescendantByName(theNode, theName, doDeepSearch) {
-    return getDescendantByAttribute(theNode, "name", theName, doDeepSearch);
+    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
+    return myResult.length == 0 ? null:myResult[0];
 }
 
 function getDescendantsByName(theNode, theName, doDeepSearch) {
-    return getDescendantsByAttribute(theNode, "name", theName, doDeepSearch);
+    return theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
 }
 
 // Recursivly searches theNode for the first element that has theAttribute.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
-    try {
-        if (!theAttribute || !theNode) {
-            return null;
-        }
-        if (theNode.nodeType==Node.ELEMENT_NODE) {
-            if (theAttribute in theNode) {
-                return theNode;
-            }
-        }
-        var myChildren = theNode.childNodes;
-        for (var i = 0; i < myChildren.length; ++i) {
-            if (myChildren[i].nodeType == Node.ELEMENT_NODE) {
-                if (doDeepSearch) {
-                    var myNode = getDescendantByAttributeName(myChildren[i], theAttribute, doDeepSearch);
-                    if (myNode) {
-                        return myNode;
-                    }
-                } else if (theAttribute in myChildren[i]) {
-                    return myChildren[i];
-                }
-
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantByAttributeName():\n'+ex);
-    }
-    return null;
+    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
+    return myResult.length == 0 ? null:myResult[0];
 }
 
 // Recursivly searches theNode for the first element that has theAttribute with value theValue.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    try {
-        if (!theValue || !theNode) {
-            return null;
-        }
-        if (theNode.nodeType==Node.ELEMENT_NODE) {
-            if (theNode.getAttribute(theAttribute) == theValue) {
-                return theNode;
-            }
-        }
-        var myChildren = theNode.childNodes;
-        for (var n = 0; n < myChildren.length; ++n) {
-            if (myChildren[n].nodeType == Node.ELEMENT_NODE) {
-
-                if (doDeepSearch) {
-                    var myNode = getDescendantByAttribute(myChildren[n], theAttribute, theValue, doDeepSearch);
-                    if (myNode) {
-                        return myNode;
-                    }
-                } else if (myChildren[n].getAttribute(theAttribute) == theValue) {
-                    return myChildren[n];
-                }
-
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantByAttribute():\n'+ex);
-    }
-    return null;
+    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
+    return myResult.length == 0 ? null:myResult[0];
 }
 
 // Recursivly searches theNode for all elements that have theAttribute with value theValue.
 // Can search deep or shallow depending on the value of doDeepSearch
 function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    Logger.warning("Legacy call 'getDescendantsByAttribute', use 'getNodesByAttribute' of theNode instead for cpp implementation, \nbut caution you get an array!");        
-    var myResult = new Array();
-    try {
-        if (!theValue || !theNode) {
-            return null;
-        }
-        var myNumberOfChildren = theNode.childNodes.length;
-        for (var i = 0; i < myNumberOfChildren; ++i) {
-            var myChild = theNode.childNodes[i];
-            if (myChild.nodeType == Node.ELEMENT_NODE) {
-                if (myChild.getAttribute(theAttribute) == theValue) {
-                    myResult = myResult.concat(myChild);
-                }
-
-                if (doDeepSearch) {
-                    myResult = myResult.concat(getDescendantsByAttribute(myChild, theAttribute, theValue, doDeepSearch));
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantsByAttribute():\n'+ex);
-    }
-    return myResult;
+    return theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
 }
 
 function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
-    Logger.warning("Legacy call 'getDescendantsByAttributeName', use 'getNodesByAttribute' of theNode instead for cpp implementation, \nbut caution you get an array!");    
-    getNodesByAttribute
-    var myResult = new Array();
-    try {
-        if (!theNode) {
-            return null;
-        }
-        var myNumberOfChildren = theNode.childNodes.length;
-        for (var i = 0; i < myNumberOfChildren; ++i) {
-            var myChild = theNode.childNodes[i];
-            if (myChild.nodeType == Node.ELEMENT_NODE) {
-                if (myChild.getAttribute(theAttribute)) {
-                    myResult = myResult.concat(myChild);
-                }
-
-                if (doDeepSearch) {
-                    myResult = myResult.concat(getDescendantsByAttributeName(myChild, theAttribute, doDeepSearch));
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantsByAttributeName():\n'+ex);
-    }
-    return myResult;
+    return theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
 }
 
 // Recursivly search for the first element by tagname
 function getDescendantByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
-    Logger.warning("Legacy call 'getDescendantByTagName' , use 'getNodesByTagName' of theNode instead for cpp implementation, \nbut caution you get an array!");    
-    if (caseInsensitive == undefined) {
-        caseInsensitive = false;
-    }
-    try {
-        if (!theTagName || !theNode) {
-            return null;
-        }
-        if (caseInsensitive) {
-            theTagName = String(theTagName).toLowerCase();
-        }
-
-        for (var n = 0; n < theNode.childNodes.length; n++) {
-            var myChildNode = theNode.childNodes[n];
-            if (caseInsensitive) {
-                var myChildNodeName = String(myChildNode.nodeName).toLowerCase();
-                if (myChildNodeName == theTagName) {
-                    return myChildNode;
-                }
-            } else if (myChildNode.nodeName == theTagName) {
-                return myChildNode;
-            }
-
-            if (doDeepSearch) {
-                var myResult = getDescendantByTagName(myChildNode, theTagName, doDeepSearch, caseInsensitive);
-
-                if (myResult) {
-                    return myResult;
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantByTagName():\n' + ex);
-    }
-    return null;
+    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);    
+    return myResult.length == 0 ? null:myResult[0];
 }
 
 // Recursivly search for all elements by tagname
 function getDescendantsByTagName(theNode, theTagName, doDeepSearch, caseInsensitive) {
-    Logger.warning("Legacy call 'getDescendantsByTagName', use 'getNodesByTagName' of theNode instead for cpp implementation, \nbut caution you get an array!");
-    
-    if (caseInsensitive == undefined) {
-        caseInsensitive = false;
-    }
-    var myResults = new Array();
-    try {
-        if (!theTagName || !theNode) {
-            return null;
-        }
-        if (caseInsensitive) {
-            theTagName = String(theTagName).toLowerCase();
-        }
-
-        for (var n = 0; n < theNode.childNodes.length; n++) {
-            var myChildNode = theNode.childNodes[n];
-            if (caseInsensitive) {
-                var myChildNodeName = String(myChildNode.nodeName).toLowerCase();
-                if (myChildNodeName == theTagName) {
-                    myResults = myResults.concat(myChildNode);
-                }
-            } else if (myChildNode.nodeName == theTagName) {
-                myResults = myResults.concat(myChildNode);
-            }
-
-            if (doDeepSearch) {
-                var myChildResults = getDescendantsByTagName(myChildNode, theTagName, doDeepSearch, caseInsensitive);
-                if (myChildResults) {
-                    myResults = myResults.concat(myChildResults);
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getDescendantsByTagName():\n' + ex);
-    }
-    return myResults;
+    return theNode.getNodesByTagName(theTagName, doDeepSearch);        
 }
 
 function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
@@ -955,3 +793,4 @@ function parseVectorOfRankedFeature(theVectorOfString) {
     }
     return myVectorOfRankedFeature;
 }
+

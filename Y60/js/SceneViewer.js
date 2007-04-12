@@ -462,8 +462,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             self.preprocessScene(myScene);
             myScene.setup();
         }
-        //var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        var myCanvas = myScene.dom.getNodesByTagName('canvas', true)[0];
+        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         
         self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();

@@ -238,8 +238,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);
-        //var myTextures = getDescendantByTagName(myMaterial, "textures", false);
-        var myTextures = myMaterial.getNodesByTagName("textures", false)[0];
+        var myTextures = getDescendantByTagName(myMaterial, "textures", false);
         
         _myTextureCount = myTextures.childNodesLength();
         if (thePrebuildFlag) {
@@ -309,8 +308,7 @@ function test_PathText() {
         var mySvgNode = new Node(mySvgFile);
 
         var mySvgPaths = []
-        //var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
-        var myPaths = mySvgNode.getNodesByTagName("path", true);
+        var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
         
         for (var i = 0; i < myPaths.length; ++i) {
             mySvgPaths.push(new SvgPath(myPaths[i].d));

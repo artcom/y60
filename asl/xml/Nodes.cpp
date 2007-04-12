@@ -1049,7 +1049,7 @@ Node::getNodesByAttribute(const DOMString & theElementName,
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const NodePtr myAttribute      = myChild->getAttribute(theAttributeName);
             const DOMString & myElementName  = myChild->nodeName();
-            if (myAttribute && myElementName == theElementName) {
+            if (myAttribute && (theElementName == "" || myElementName == theElementName)) {
                 const DOMString & myElementValue = myAttribute->nodeValue();
                 if (theAttributeValue == "" || myElementValue == theAttributeValue) {
                     theResults.push_back(myChild);

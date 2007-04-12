@@ -712,8 +712,8 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
     DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
     DOC_PARAM("theAttributeName", "", DOC_TYPE_STRING);
-    DOC_PARAM_OPT("theDeepSearchFlag (default is true)", "", DOC_TYPE_BOOLEAN, "");    
     DOC_PARAM_OPT("theAttributeValue", "", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theDeepSearchFlag (default is true)", "", DOC_TYPE_BOOLEAN, "");    
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
     dom::DOMString myElementName;
@@ -726,11 +726,11 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     std::vector<dom::NodePtr> myResults;
     switch (argc) {
         case 4:
-            convertFrom(cx, argv[3], myAttributeValue);
+            convertFrom(cx, argv[3], myDeepSearchFlag);                        
         case 3:
-            convertFrom(cx, argv[1], myDeepSearchFlag);                        
+            convertFrom(cx, argv[2], myAttributeValue);
         case 2:
-            convertFrom(cx, argv[2], myAttributeName);
+            convertFrom(cx, argv[1], myAttributeName);
             convertFrom(cx, argv[0], myElementName);
             myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myDeepSearchFlag, myResults);
             break;

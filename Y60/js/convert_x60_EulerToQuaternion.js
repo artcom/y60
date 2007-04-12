@@ -22,10 +22,9 @@ function convertFile(theFilename) {
     print("convert file : " + theFilename);
     var myXmlDoc = Node.createDocument();
     myXmlDoc.parseFile(theFilename);
-    //var myWorld = getDescendantByTagName(myXmlDoc.childNode(0), "world", true);
-    var myWorld = myXmlDoc.childNode(0).getNodesByTagName( "world", true)[0];
+    var myWorld = getDescendantByTagName(myXmlDoc.childNode(0), "world", true);
+
     var myNodes = getDescendantsByAttributeName(myWorld, "orientation", true);
-    print(myNodes.length);
     for (var myNodeIndex = 0; myNodeIndex < myNodes.length; myNodeIndex++) {
         var myOrientation = stringToArray(myNodes[myNodeIndex].orientation);
         print(myOrientation);

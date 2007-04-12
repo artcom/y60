@@ -368,8 +368,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     }
 
     Protected.onMaterialChange = function() {
-        //_myTextures = getDescendantByTagName(Public.material, "textures", false);
-        _myTextures = Public.material.getNodesByTagName("textures", false)[0];
+        _myTextures = getDescendantByTagName(Public.material, "textures", false);
         
         if (_myTextures.childNodes.length != 1) {
             throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextures.childNodes.length, fileline());
@@ -379,8 +378,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     }
 
     Protected.addTexture = function(theImageId) {
-        //_myTextures = getDescendantByTagName(Public.material, "textures", false);
-        _myTextures = Public.material.getNodesByTagName("textures", false)[0];
+        _myTextures = getDescendantByTagName(Public.material, "textures", false);
         if (!_myTextures) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
         }
@@ -655,8 +653,7 @@ function removeOverlay(theOverlayNode) {
         if (myMaterialNode) {
 
             // Remove images
-            //var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
-            var myTextures = myMaterialNode.getNodesByTagName("textures", false)[0];
+            var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
             
             if (myTextures) {
                 for (var i = 0; i < myTextures.childNodes.length; ++i) {
