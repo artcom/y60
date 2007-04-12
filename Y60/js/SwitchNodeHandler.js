@@ -212,9 +212,9 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     }
     
     function findOcclusionMap(theMaterial) {
-        var mySampler2d = getDescendantByName(theMaterial, "occlusionTex", true);
-        if (mySampler2d) {
-            var myIndex = mySampler2d.childNode("#text").nodeValue;
+        var mySampler2d = theMaterial.getNodesByAttribute("", "name", "occlusionTex");
+        if (mySampler2d.length == 1) {
+            var myIndex = mySampler2d[0].childNode("#text").nodeValue;
             var myTexturesNode = theMaterial.childNode("textures");
             if (myIndex !== null && myIndex < myTexturesNode.childNodesLength("texture")) {
                 return myTexturesNode.childNode("texture", myIndex);
@@ -442,8 +442,8 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             // calculate textures offset
             var myTextureOffset = myTexturesLength - myNewTexturesLength;
             if (myTextureOffset < 0) {
-                Logger.error("Textureswitching error. The Switchnode has " +myNewTexturesLength+
-                             " textures while the original Material has " + myTexturesLength);
+                Logger.error("TSwitchnode material '"+Public.switchName+"' has " +myNewTexturesLength+
+                             " textures while the original material '"+myMaterial.name+"' has " + myTexturesLength);
                 return;
             }
     
