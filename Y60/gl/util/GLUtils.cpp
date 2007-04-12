@@ -289,8 +289,8 @@ namespace y60 {
             case TEXTURE_IFMT_RGBA16: return GL_RGBA16;
             case TEXTURE_IFMT_RGBA_HALF: return GL_RGBA16F_ARB;
             case TEXTURE_IFMT_RGB_HALF: return GL_RGB16F_ARB;
-            case TEXTURE_IFMT_RGBA_FLOAT: return GL_RGBA32F_ARB;
-            case TEXTURE_IFMT_RGB_FLOAT: return GL_RGB32F_ARB;
+            case TEXTURE_IFMT_RGBA_FLOAT: return GL_RGBA_FLOAT32_ATI;
+            case TEXTURE_IFMT_RGB_FLOAT: return GL_RGB_FLOAT32_ATI;
             case TEXTURE_IFMT_COMPRESSED_RGB_ARB: return GL_COMPRESSED_RGB_ARB;
             case TEXTURE_IFMT_COMPRESSED_RGBA_ARB: return GL_COMPRESSED_RGBA_ARB;
             case TEXTURE_IFMT_COMPRESSED_ALPHA_ARB: return GL_COMPRESSED_ALPHA_ARB;
@@ -350,8 +350,8 @@ namespace y60 {
             case GL_RGBA16: return TEXTURE_IFMT_RGBA16;
             case GL_RGBA16F_ARB: return TEXTURE_IFMT_RGBA_HALF;
             case GL_RGB16F_ARB: return TEXTURE_IFMT_RGB_HALF;
-            case GL_RGBA32F_ARB: return TEXTURE_IFMT_RGBA_FLOAT;
-            case GL_RGB32F_ARB: return TEXTURE_IFMT_RGB_FLOAT;
+            case GL_RGBA_FLOAT32_ATI: return TEXTURE_IFMT_RGBA_FLOAT;
+            case GL_RGB_FLOAT32_ATI: return TEXTURE_IFMT_RGB_FLOAT;
             case GL_COMPRESSED_RGB_ARB: return TEXTURE_IFMT_COMPRESSED_RGB_ARB;
             case GL_COMPRESSED_RGBA_ARB: return TEXTURE_IFMT_COMPRESSED_RGBA_ARB;
             case GL_COMPRESSED_ALPHA_ARB: return TEXTURE_IFMT_COMPRESSED_ALPHA_ARB;

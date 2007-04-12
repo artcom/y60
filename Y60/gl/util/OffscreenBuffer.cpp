@@ -209,7 +209,6 @@ void OffscreenBuffer::reset()
 void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSamples)
 {
 #ifdef GL_EXT_framebuffer_object
-
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] && theImage->getNode().nodeVersion() != _myImageNodeVersion) {
         AC_DEBUG << "Tearing down FBO since Image has changed " 
@@ -223,7 +222,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
     }
 
     if (!_myFrameBufferObject[0]) {
-
         /*
          * create FBO
          */
@@ -252,6 +250,8 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             // color buffer
             glGenRenderbuffersEXT(1, &_myColorBuffer[1]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
+//            theImage->getNode().getAttribute(TEXTURE_MIN_FILTER_ATTRIB)->nodeValue("nearest");
+//            theImage->getNode().getAttribute(TEXTURE_MAG_FILTER_ATTRIB)->nodeValue("nearest");
             TextureInternalFormat myImageFormat = theImage->getInternalEncoding();
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
                     theSamples, asGLTextureInternalFormat(myImageFormat),
@@ -281,8 +281,9 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
          */
         _myImageNodeVersion = theImage->getNode().nodeVersion();
         _myColorBuffer[0] = theImage->ensureTextureId();
-        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup RTT framebuffer, nodeVersion=" << _myImageNodeVersion << " textureID=" << _myColorBuffer[0];
 
+        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup RTT framebuffer, nodeVersion=" << _myImageNodeVersion << " textureID=" << _myColorBuffer[0];
+        
         // framebuffer
         glGenFramebuffersEXT(1, &_myFrameBufferObject[0]);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);

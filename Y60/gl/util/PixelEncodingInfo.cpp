@@ -40,8 +40,8 @@ namespace y60 {
             case y60::S3TC_DXT5:               return PixelEncodingInfo(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 1, true, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
             case y60::RGBA_HALF:               return PixelEncodingInfo(GL_RGBA16F_ARB, 8, false, GL_RGBA, GL_HALF_FLOAT_ARB);
             case y60::RGB_HALF:                return PixelEncodingInfo(GL_RGB16F_ARB, 6, false, GL_RGB, GL_HALF_FLOAT_ARB);
-            case y60::RGBA_FLOAT:              return PixelEncodingInfo(GL_RGBA32F_ARB, 16, false, GL_RGBA, GL_FLOAT);
-            case y60::RGB_FLOAT:               return PixelEncodingInfo(GL_RGB32F_ARB, 12, false, GL_RGB, GL_FLOAT);
+            case y60::RGBA_FLOAT:              return PixelEncodingInfo(GL_RGBA_FLOAT32_ATI, 16, false, GL_RGBA, GL_FLOAT);
+            case y60::RGB_FLOAT:               return PixelEncodingInfo(GL_RGB_FLOAT32_ATI, 12, false, GL_RGB, GL_FLOAT);
             default:
                 throw GLUtilException(string("Unsupported texture pixelformat ") +
                         asl::getStringFromEnum(theEncoding, y60::PixelEncodingString), PLUS_FILE_LINE);
