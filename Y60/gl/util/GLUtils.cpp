@@ -906,9 +906,8 @@ void * aglGetProcAddress (char * pszProc)
     getLatestCgProfileString() {
         CGprofile myVertexProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
         CGprofile myFragmentProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
-        
-        return string("Vertex profile: ") + cgGetProfileString(myVertexProfile) + 
-           ", Fragment profile: " + cgGetProfileString(myFragmentProfile);
+
+        return string(cgGetProfileString(myVertexProfile)) + "/" + string(cgGetProfileString(myFragmentProfile));
     }
 #endif
 }

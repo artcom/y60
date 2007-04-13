@@ -45,6 +45,89 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
+    <shader id="s2a" name="occlusion_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[occlusion]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s16a" name="lambert_occlusion_paint_env" cost="10" >
+        <supports>
+            <feature class="textures" values="[occlusion,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s24a" name="phong_occlusion_env" cost="10" >
+        <supports>
+            <feature class="textures" values="[occlusion,paint]"/>
+            <feature class="texcoord" values="[uv_map,reflective]"/>
+            <feature class="lighting" values="[phong]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s24b" name="phong_brakes" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,reflective]"/>
+            <feature class="lighting" values="[phong]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
     <shader id="s25" name="tex2_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint]"/>
@@ -429,9 +512,9 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    <shader id="s150" name="pseudo_carpaint" cost="10" >
+    <shader id="s150" name="pseudo_occlusion_carpaint" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,paint,emissive]"/>
+            <feature class="textures" values="[occlusion,paint,emissive]"/>
             <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
@@ -451,7 +534,7 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    <shader id="s151" name="pseudo_carpaint_no_occlusion" cost="10" >
+    <shader id="s151" name="pseudo_carpaint" cost="10" >
         <supports>
             <feature class="textures" values="[paint,emissive]"/>
             <feature class="texcoord" values="[reflective,reflective]"/>
@@ -910,25 +993,6 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-        <shader id="s137" name="snow" cost="100">
-        <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[paint,paint,bump,bump]"/>
-            <feature class="texcoord" values="[uv_map]"/>
-        </supports>
-        <fixedfunctionshader>
-            <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                <vector3f name="position"/>
-                <vector2f name="texcoord0"/>
-                <vector2f name="texcoord1"/>
-                <vector3f name="color"/>                
-            </vertexparameters>
-         </fixedfunctionshader>
-    </shader>
     <shader id="s134" name="spotlight_no_texture" cost="10">
        <supports>
             <feature class="lighting" values="[lambert]"/>
@@ -995,6 +1059,28 @@
                 <vector2f name="texcoord1"/>
             </vertexparameters>
          </fixedfunctionshader>
+    </shader>
+    <shader id="s137" name="pseudo_snowstreet" cost="100">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,planar_projection]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[1,1,1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="specular">[1,1,1,1]</vector4f>
+                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                 <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                 <vector3f name="normal"/>
+                 <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
     </shader>
 </shaders>
 

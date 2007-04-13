@@ -14,10 +14,12 @@ namespace y60 {
 
     enum MaterialType { CG_MATERIAL, FIXED_FUNCTION_MATERIAL };
     enum ShaderType { NO_SHADER_TYPE, FRAGMENT_SHADER, VERTEX_SHADER };
-    enum ShaderProfile {NO_PROFILE, ARBVP1, ARBFP1, VP40, FP40, VP30, FP30, VP20, FP20 };
+    enum ShaderProfile {NO_PROFILE, GLSLV, GLSLF, ARBVP1, ARBFP1, VP40, FP40, VP30, FP30, VP20, FP20 };
 
     static const char * ShaderProfileStrings[] = {
         "no-profile",
+        "glslv",
+        "glslf",
         "arbvp1",
         "arbfp1",
         "vp40",

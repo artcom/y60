@@ -264,10 +264,10 @@ namespace asl {
         thePathVector.clear();
         std::string mySearchPath = expandEnvironment(theDelimitedPaths);
 
-#ifdef LINUX
-        static const char * myDelimiters = ";:";
-#else
+#ifdef WIN32
         static const char * myDelimiters = ";";
+#else
+        static const char * myDelimiters = ";:";
 #endif
 
         // XXX maybe use splitString from string_functions.cpp

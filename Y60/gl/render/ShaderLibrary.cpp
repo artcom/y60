@@ -95,7 +95,7 @@ namespace y60 {
         myShaderLibraryXml.parse(myShaderLibraryStr);
 
         load(myShaderLibraryXml.childNode(SHADER_LIST_NAME), theVertexProfileName, theFragmentProfileName);
-        AC_INFO << "Loaded Shaderlibrary " + myShaderLibraryFileName;
+        AC_INFO << "Loaded Shaderlibrary " << myShaderLibraryFileName;
     }
 
     void
@@ -111,18 +111,17 @@ namespace y60 {
     void
     ShaderLibrary::load(const dom::NodePtr theNode, std::string theVertexProfileName, std::string theFragmentProfileName) {
 
-        AC_TRACE << "Library wants profile '" << theVertexProfileName << "' as vertex shader profile" << endl;
-        AC_TRACE << "Library wants profile '" << theFragmentProfileName << "' as fragment shader profile" << endl;
+        AC_TRACE << "Library wants vertex profile '" << theVertexProfileName << "', fragment profile '" << theFragmentProfileName << "'";
 
         // determine vertex shader profile name according to following priority:
         // 1) function args, 2) environment var. 3) ask Cg library
         if (theVertexProfileName == "") {
-            if (!asl::get_environment_var("AC_VERTEX_SHADER_PROFILE", _myVertexProfileName)) {
+            if (!asl::get_environment_var("Y60_VERTEX_SHADER_PROFILE", _myVertexProfileName)) {
                 if (ShaderLibrary::GLisReady()) {
                     CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
                     _myVertexProfileName = cgGetProfileString(myShaderProfile);
                 } else {
-                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile" << endl;
+                    AC_ERROR << "Could not determine vertex shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile";
                     _myVertexProfileName = "arbvp1";
                 }
             }
@@ -131,12 +130,12 @@ namespace y60 {
         }
 
         if (theFragmentProfileName == "") {
-            if (!asl::get_environment_var("AC_FRAGMENT_SHADER_PROFILE", _myFragmentProfileName)) {
+            if (!asl::get_environment_var("Y60_FRAGMENT_SHADER_PROFILE", _myFragmentProfileName)) {
                 if (ShaderLibrary::GLisReady()) {
                     CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
                     _myFragmentProfileName = cgGetProfileString(myShaderProfile);
                 } else {
-                    AC_ERROR << "Could not determine availalable shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile" << endl;
+                    AC_ERROR << "Could not determine fragment shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile";
                     _myFragmentProfileName = "arbfp1";
                 }
             }
@@ -144,8 +143,8 @@ namespace y60 {
             _myFragmentProfileName = theFragmentProfileName;
         }
 
-        AC_INFO << "Engine wants profile '" << _myVertexProfileName << "' as vertex shader profile" << endl;
-        AC_INFO << "Engine wants profile '" << _myFragmentProfileName << "' as fragment shader profile" << endl;
+        AC_INFO << "Engine wants vertex profile '" << _myVertexProfileName << "', fragment profile '" << _myFragmentProfileName << "'";
+
         int myVertexShaderProfile = asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
         int myFragmentShaderProfile = asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
 
