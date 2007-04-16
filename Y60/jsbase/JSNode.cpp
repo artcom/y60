@@ -16,6 +16,7 @@
 #include "JSWrapper.impl"
 
 #include "JSBox.h"
+#include "JSBox2f.h"
 #include "JSTriangle.h"
 #include "JSLine.h"
 #include "JSMatrix.h"
@@ -213,6 +214,7 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(Planef);
         REGISTER_BYREFERENCE_CONVERTER(Frustum);
         REGISTER_BYREFERENCE_CONVERTER(Box3f);
+        REGISTER_BYREFERENCE_CONVERTER(Box2f);
         REGISTER_BYREFERENCE_CONVERTER(Triangle<TriangleNumber>);
         // XXX: The following lines introduce a dependency from jsbase to y60::base. 
         REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);

@@ -31,7 +31,7 @@ class GenericEvent : public Event {
 
         dom::NodePtr getDocument() const;
         dom::NodePtr getNode() const;
-        virtual dom::NodePtr asNode() const;
+        virtual dom::NodePtr asNode();
     private:
         dom::NodePtr _myDocument;
 };

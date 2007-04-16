@@ -51,9 +51,6 @@ static const char * FILTERED_RASTER = "ASSFilteredRaster";
 #undef verify
 #endif
 
-
-
-
 ASSDriver::ASSDriver() :
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
@@ -63,7 +60,7 @@ ASSDriver::ASSDriver() :
     _myScene(0),
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
-    _myPower(2.0f),
+    _myGainPower(2.0f),
     _myIDCounter( 0 ),
     _myLineStart( -1 ),
     _myLineEnd( -1 ),
@@ -76,7 +73,8 @@ ASSDriver::ASSDriver() :
     _myBitsPerSerialWord( 8 ),
     _myParity( SerialDevice::NO_PARITY ),
     _myStopBits( 1 ),
-    _myHandshakingFlag( false )
+    _myHandshakingFlag( false ),
+    _myReceiveBuffer(256)
 {
     setState(NO_SERIAL_PORT);
 }
@@ -90,6 +88,7 @@ ASSDriver::~ASSDriver() {
 bool
 ASSDriver::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
     _myScene = theWindow->getCurrentScene();
+    // TODO: reallocate rasters
     return true;
 }
 
@@ -101,25 +100,25 @@ void
 ASSDriver::synchronize() {
     // first look for the beginning of a line
     if (_myLineStart < 0) {
-        for (unsigned i = 0; i < _myBuffer.size(); ++i) {
+        for (unsigned i = 0; i < _myFrameBuffer.size(); ++i) {
             if (_myMagicTokenFlag) {
-                _myMaxLine = _myBuffer[i];
+                _myMaxLine = _myFrameBuffer[i];
                 _myMagicTokenFlag = false;
                 _myLineStart = i;
-                AC_PRINT << "Got line start";
+                //AC_PRINT << "Got line start";
                 break;
-            } else if (_myBuffer[i] == myMagicToken) {
+            } else if (_myFrameBuffer[i] == myMagicToken) {
                 _myMagicTokenFlag = true;
             }
         }
     }
     // then find the end of that line and determine the number of columns
     if (_myLineStart >= 0 && _myLineEnd < 0) {
-        for (unsigned i = _myLineStart + 1; i < _myBuffer.size(); ++i) {
-            if (_myBuffer[i] == myMagicToken) {
+        for (unsigned i = _myLineStart + 1; i < _myFrameBuffer.size(); ++i) {
+            if (_myFrameBuffer[i] == myMagicToken) {
                 _myLineEnd = i;
                 _myGridSize[0] = _myLineEnd - _myLineStart - 1;
-                AC_PRINT << "Got line end";
+                //AC_PRINT << "Got line end";
                 break;
             }
         }
@@ -127,20 +126,21 @@ ASSDriver::synchronize() {
 
     // now scan for the maximum line number to determine the number of rows
     if (_myGridSize[0] > 0 && _myGridSize[1] == 0) {
-        ASSURE( _myBuffer[ _myLineEnd ] == myMagicToken );
-        for (unsigned i = _myLineEnd; i < _myBuffer.size(); i += _myGridSize[0] + 2) {
-            ASSURE( _myBuffer[i] == myMagicToken );
-            if (_myBuffer[i + 1] == 1 && _myMaxLine > 0) {
+        ASSURE( _myFrameBuffer[ _myLineEnd ] == myMagicToken );
+        for (unsigned i = _myLineEnd; i < _myFrameBuffer.size(); i += _myGridSize[0] + 2) {
+            ASSURE( _myFrameBuffer[i] == myMagicToken );
+            if (_myFrameBuffer[i + 1] == 1 && _myMaxLine > 0) {
                 _myGridSize[1] = _myMaxLine;
-                AC_PRINT << "Grid size: " << _myGridSize;
-                _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + i);
-                ASSURE(_myBuffer.front() == myMagicToken);
+                //AC_PRINT << "Grid size: " << _myGridSize;
+                _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + i);
+                ASSURE(_myFrameBuffer.front() == myMagicToken);
                 allocateGridBuffers();
-                setState( RUNNING );
+                _myReceiveBuffer.resize( getBytesPerFrame() );
                 createTransportLayerEvent( _myIDCounter ++, "configure" );
+                setState( RUNNING );
                 return;
             } else {
-                _myMaxLine = _myBuffer[i + 1];
+                _myMaxLine = _myFrameBuffer[i + 1];
             }
         }
     }
@@ -148,6 +148,7 @@ ASSDriver::synchronize() {
 
 void
 ASSDriver::allocateGridBuffers() {
+    _myRasterNames.clear();
     _myRawRaster = allocateRaster(RAW_RASTER);
     _myDenoisedRaster = allocateRaster(FILTERED_RASTER);
 }
@@ -159,13 +160,18 @@ ASSDriver::allocateRaster(const std::string & theName) {
         if (myImage) {
             myImage->getFacade<y60::Image>()->createRaster( 
                     _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+            _myRasterNames.push_back( theName );
             return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
         } else {
             ImageBuilder myImageBuilder(theName, false);
             _myScene->getSceneBuilder()->appendImage(myImageBuilder);
             y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
             myImage->set<y60::IdTag>( theName );
+            myImage->set<y60::NameTag>( theName );
             myImage->createRaster( _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+
+            _myRasterNames.push_back( theName );
+
             return RasterHandle( myImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr());
         }
     } else {
@@ -178,25 +184,24 @@ ASSDriver::allocateRaster(const std::string & theName) {
 void
 ASSDriver::readSensorValues() {
     //AC_PRINT << "====";
-    //AC_PRINT << "pre buf size: " << _myBuffer.size();
+    //AC_PRINT << "pre buf size: " << _myFrameBuffer.size();
     bool myNewDataFlag = false;
-    while ( _myGridSize[0] + 2 < _myBuffer.size() ) {
-        if ( _myBuffer[0] != myMagicToken ) {
+    while ( _myGridSize[0] + 2 < _myFrameBuffer.size() ) {
+        if ( _myFrameBuffer[0] != myMagicToken ) {
             AC_PRINT << "Sync error.";
             _mySyncLostCounter++;
             createTransportLayerEvent( _myIDCounter++, "lost_sync" ); 
             setState( SYNCHRONIZING );
             return;
         }
-        int myRowIdx = _myBuffer[1] - 1;
+        int myRowIdx = _myFrameBuffer[1] - 1;
         //AC_PRINT << "Got row: " << myRowIdx;
 
         unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
                     myRowIdx * _myGridSize[0];
-        std::copy(_myBuffer.begin() + 2, _myBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
-        //*(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 254;
+        std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
 
-        _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + _myGridSize[0] + 2);
+        _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
         if ( myRowIdx == _myGridSize[1] - 1) {
             asl::Time myTime;
             double myDeltaT = myTime - _myLastFrameTime;
@@ -212,24 +217,24 @@ ASSDriver::readSensorValues() {
         _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
         
     }
-    //AC_PRINT << "post buf size: " << _myBuffer.size();
+    //AC_PRINT << "post buf size: " << _myFrameBuffer.size();
 }
 
 template <class PixelT>
 struct ThresholdWithPow {
     ThresholdWithPow(const PixelT & theThreshold, float thePower) :
         _myThreshold( theThreshold ),
-        _myPower( thePower) {}
+        _myGainPower( thePower) {}
     PixelT operator () (const PixelT & a) {
         if (a.get() < _myThreshold.get()) {
             return PixelT(0);
         } else {
-            return PixelT( (unsigned char)(pow(float(a.get()), _myPower) /  pow(255.0f, _myPower - 1)));
+            return PixelT( (unsigned char)(pow(float(a.get()), _myGainPower) /  pow(255.0f, _myGainPower - 1)));
         }
     }
 
     PixelT _myThreshold;
-    float _myPower;
+    float _myGainPower;
 };
 
 template <class RASTER>
@@ -251,7 +256,7 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
     std::transform( myInput->begin(), myInput->end(),
             myOutput->begin(),
-            ThresholdWithPow<asl::gray<unsigned char> >( theThreshold, _myPower ));
+            ThresholdWithPow<asl::gray<unsigned char> >( theThreshold, _myGainPower ));
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
 }
 
@@ -329,14 +334,16 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
             int myID( myOldIDs[ myMinDistIdx ] );
             _myCursorIDs.push_back( myID );
             createEvent( myID, "move", _myPositions[i],
-                    applyTransform( _myPositions[i], myTransform) );
+                    applyTransform( _myPositions[i], myTransform),
+                    _myRegions[i] );
         } else {
             // new cursor: get new label
             //AC_PRINT << "=== new cursor ===";
             int myNewID( _myIDCounter++ );
             _myCursorIDs.push_back( myNewID );
             createEvent( myNewID, "add", _myPositions[i],
-                    applyTransform( _myPositions[i], myTransform ));
+                    applyTransform( _myPositions[i], myTransform),
+                    _myRegions[i]);
         }
     }
 
@@ -346,7 +353,8 @@ ASSDriver::correlatePositions( const std::vector<asl::Vector2f> & thePreviousPos
 
             int myID( myOldIDs[ i ] );
             createEvent( myID, "remove", thePreviousPositions[i],
-                    applyTransform( thePreviousPositions[i], myTransform ));
+                    applyTransform( thePreviousPositions[i], myTransform ),
+                    _myRegions[i]);
         }
     }
 }
@@ -364,14 +372,14 @@ ASSDriver::setState( DriverState theState ) {
             _myMaxLine = 0;
             _myMagicTokenFlag = false;
             _myGridSize = Vector2i(0, 0);
-            _myBuffer.clear();
+            _myFrameBuffer.clear();
             break;
         case RUNNING:
             break;
         default:
             break;
     }
-    AC_PRINT << theState << " ...";
+    //AC_PRINT << "ASSDriver::setState() " << theState << " ...";
 }
 
 void
@@ -390,14 +398,6 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( myMagicToken );
         return;
     }
-    if (thePropertyName == "componentThreshold") {
-        theReturnValue.set( _myComponentThreshold );
-        return;
-    }
-    if (thePropertyName == "noiseThreshold") {
-        theReturnValue.set( _myNoiseThreshold );
-        return;
-    }
     if (thePropertyName == "positions") {
         theReturnValue.set( _myPositions );
         return;
@@ -406,12 +406,12 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myRegions );
         return;
     }
-    if (thePropertyName == "gainPower") {
-        theReturnValue.set( _myPower );
-        return;
-    }
     if (thePropertyName == "transform") {
         theReturnValue.set( _myTransform );
+        return;
+    }
+    if (thePropertyName == "rasterNames") {
+        theReturnValue.set( _myRasterNames );
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
@@ -429,18 +429,6 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "maxOccuringValue property is read only";
         return;
     }
-    if (thePropertyName == "componentThreshold") {
-        _myComponentThreshold = thePropertyValue.get<unsigned char>();
-        return;
-    }
-    if (thePropertyName == "noiseThreshold") {
-        _myNoiseThreshold = thePropertyValue.get<unsigned char>();
-        return;
-    }
-    if (thePropertyName == "gainPower") {
-        _myPower = thePropertyValue.get<float>();
-        return;
-    }
     if (thePropertyName == "positions") {
         AC_ERROR << "positions property is read only";
         return;
@@ -453,6 +441,10 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         _myTransform = thePropertyValue.get<dom::NodePtr>();
         return;
     }
+    if (thePropertyName == "rasterNames") {
+        AC_ERROR << "rasterNames property is read only";
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -462,13 +454,24 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
     dom::NodePtr mySettings = getASSSettings( theSettings );
 
-    getConfigSetting( mySettings, "SerialPort", _myPortNum );
-    getConfigSetting( mySettings, "UseUSB", _myUseUSBFlag );
-    getConfigSetting( mySettings, "BaudRate", _myBaudRate );
-    getConfigSetting( mySettings, "BitsPerWord", _myBitsPerSerialWord );
-    getConfigSetting( mySettings, "Parity", _myParity );
-    getConfigSetting( mySettings, "StopBits", _myStopBits );
-    getConfigSetting( mySettings, "Handshaking", _myHandshakingFlag );
+    getConfigSetting( mySettings, "ComponentThreshold", _myComponentThreshold, 5 );
+    getConfigSetting( mySettings, "NoiseThreshold", _myNoiseThreshold, 15 );
+    getConfigSetting( mySettings, "GainPower", _myGainPower, 2.0f );
+
+    bool myPortConfigChanged = false;
+    myPortConfigChanged |= getConfigSetting( mySettings, "SerialPort", _myPortNum, -1 );
+    myPortConfigChanged |= getConfigSetting( mySettings, "UseUSB", _myUseUSBFlag, false );
+    myPortConfigChanged |= getConfigSetting( mySettings, "BaudRate", _myBaudRate, 57600 );
+    myPortConfigChanged |= getConfigSetting( mySettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
+    myPortConfigChanged |=
+            getConfigSetting( mySettings, "Parity", _myParity, SerialDevice::NO_PARITY );
+    myPortConfigChanged |= getConfigSetting( mySettings, "StopBits", _myStopBits, 1 );
+    myPortConfigChanged |= getConfigSetting( mySettings, "Handshaking", _myHandshakingFlag, false );
+
+    if (myPortConfigChanged) {
+        //AC_PRINT << "Serial port configuration changed.";
+        setState( NO_SERIAL_PORT );
+    }
 }
 
 Vector3f 
@@ -508,15 +511,21 @@ ASSDriver::processInput() {
 void
 ASSDriver::readDataFromPort() {
     try {
-        std::vector<unsigned char> myBuffer;
-        size_t myByteCount = _mySerialPort->peek();
-        myBuffer.resize( myByteCount );
-        //AC_PRINT << "=== Got " << myByteCount << " bytes.";
-        _mySerialPort->read( reinterpret_cast<char*>(& ( * myBuffer.begin())), myByteCount );
+        size_t myByteCount = _myReceiveBuffer.size();
 
-        _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
+        // [DS] If the serial port is removed a non-blocking read returns EAGAIN
+        // for some reason. Peek throws an exception which is just what we want.
+        _mySerialPort->peek();
+        
+        _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
+                myByteCount );
+
+        //AC_PRINT << "=== Got " << myByteCount << " bytes.";
+
+        _myFrameBuffer.insert( _myFrameBuffer.end(),
+                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myByteCount );
     } catch (const SerialPortException & ex) {
-        AC_WARNING << "Serial port is gone to market: " << ex;
+        AC_WARNING << ex;
         createTransportLayerEvent( _myIDCounter ++, "lost_communication" );
         setState(NO_SERIAL_PORT);
     }
@@ -540,15 +549,14 @@ ASSDriver::scanForSerialPort() {
         }
 #endif
 #ifdef OSX
-        // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/ttyUSB-[devid]
+        // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/tty.usbserial-[devid]
         // where [devid] is a string that is flashed into the FTDI chip. I'll
         // check that the other day.
-        AC_PRINT << "TODO: implement device name handling for FTDI USB->Serial "
+        AC_PRINT << "TODO: implement device name handling for FTDI USB->RS232 "
             << "virtual TTYs.";
 #endif
 
         if (_mySerialPort) {
-            // TODO: make baudrate, &c a setting
             _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
                     _myParity, _myStopBits, _myHandshakingFlag);
             setState( SYNCHRONIZING );
@@ -588,6 +596,11 @@ getASSSettings(dom::NodePtr theSettings) {
     return mySettings;
 }
 
+size_t
+ASSDriver::getBytesPerFrame() {
+    // line format: <start> <lineno> <databytes>
+    return (1 + 1 + _myGridSize[0]) * _myGridSize[1];
+}
 
 } // end of namespace y60
 

@@ -56,7 +56,8 @@ ASSOscClient::poll() {
             try {
                 _myConnection->send( _myOSCStream.Data(), _myOSCStream.Size() );
             } catch (const inet::SocketException & ex) {
-                AC_WARNING << "Connection lost: " << ex;
+                AC_WARNING << "Failed to connect to " << _myServerAddress << " at port "
+                           << _myServerPort << ": " << ex;
                 _myConnection = UDPConnectionPtr( 0 );
             }
         }
@@ -74,8 +75,10 @@ ASSOscClient::connectToServer() {
 
 void
 ASSOscClient::createEvent( int theID, const std::string & theType,
-        const Vector2f & theRawPosition, const Vector3f & thePosition3D)
+        const Vector2f & theRawPosition, const Vector3f & thePosition3D,
+        const asl::Box2f & theROI)
 {
+    // TODO send ROI?
     //AC_PRINT << "createEvent: " << theType;
     std::string myAddress("/");
     myAddress += theType;
@@ -109,21 +112,21 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     dom::NodePtr mySettings = getASSSettings( theSettings );
 
     int myClientPort;
-    getConfigSetting( mySettings, "ClientPort", myClientPort );
+    getConfigSetting( mySettings, "ClientPort", myClientPort, 7001 );
     if ( myClientPort != _myClientPort ) {
         _myClientPort = myClientPort;
         _myConnection = UDPConnectionPtr( 0 );
     }
 
     int myServerPort;
-    getConfigSetting( mySettings, "ServerPort", myServerPort );
+    getConfigSetting( mySettings, "ServerPort", myServerPort, 7000 );
     if ( myServerPort != _myServerPort ) {
         _myServerPort = myServerPort;
         _myConnection = UDPConnectionPtr( 0 );
     }
 
     std::string myServerAddress;
-    getConfigSetting( mySettings, "ServerAddress", myServerAddress );
+    getConfigSetting( mySettings, "ServerAddress", myServerAddress, string("127.0.0.1") );
     if ( myServerAddress != _myServerAddress ) {
         _myServerAddress = myServerAddress;
         _myConnection = UDPConnectionPtr( 0 );

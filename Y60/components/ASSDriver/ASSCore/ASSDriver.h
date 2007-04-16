@@ -51,7 +51,6 @@ struct RasterHandle {
 };
 
 class ASSDriver :
-    /*public asl::PlugInBase,*/
     public jslib::IScriptablePlugin,
     public y60::IRendererExtension
 {
@@ -78,9 +77,12 @@ class ASSDriver :
     protected:
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
-                const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D) = 0;
+                const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
+                const asl::Box2f & theROI) = 0;
         virtual void createTransportLayerEvent(int theID,
                                                const std::string & theType) = 0;
+
+        size_t getBytesPerFrame();
 
         asl::Vector2i  _myGridSize;
     private:
@@ -104,12 +106,14 @@ class ASSDriver :
 
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
+        std::vector<std::string> _myRasterNames;
+
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
-        unsigned char _myComponentThreshold;
-        unsigned char _myNoiseThreshold;
-        float         _myPower;
+        int _myComponentThreshold;
+        int _myNoiseThreshold;
+        float         _myGainPower;
 
         std::vector<asl::Vector2f>   _myPositions;
         std::vector<asl::Box2f>      _myRegions;
@@ -125,7 +129,7 @@ class ASSDriver :
         void scanForSerialPort();
         void freeSerialPort();
 
-        std::vector<unsigned char> _myBuffer;
+        std::vector<unsigned char> _myFrameBuffer;
         asl::SerialDevice * _mySerialPort;
 
         int  _myLineStart;
@@ -141,7 +145,7 @@ class ASSDriver :
         int  _myStopBits;
         bool _myHandshakingFlag;
         asl::SerialDevice::ParityMode _myParity;
-        
+        std::vector<unsigned char> _myReceiveBuffer;
 };
 
 
@@ -150,13 +154,17 @@ class ASSDriver :
 dom::NodePtr getASSSettings(dom::NodePtr theSettings);
 
 template <class T>
-void
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue ) {
+bool
+getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue,
+                 const T & theDefault)
+{
     dom::NodePtr myNode = theSettings->childNode( theName );
     if ( ! myNode ) {
-        throw asl::Exception(std::string("No node named '") + theName + 
-                "' found in configuration: '" +
-                as_string( * theSettings ), PLUS_FILE_LINE);
+        AC_WARNING << "No node named '" << theName << "' found in configuration. "
+                   << "Adding default value '" << theDefault << "'";
+        myNode = theSettings->appendChild( dom::NodePtr( new dom::Element( theName )));
+        dom::NodePtr myTextNode = myNode->appendChild( dom::NodePtr( new dom::Text() ));
+        myTextNode->nodeValue( asl::as_string( theDefault ));
     }
 
     if ( myNode->childNodesLength() != 1 ) {
@@ -164,11 +172,25 @@ getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theV
             "' must have exactly one child.", PLUS_FILE_LINE);
     }
     if ( myNode->childNode("#text") ) {
-        theValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
+        T myNewValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
+        if (myNewValue != theValue) {
+            theValue =  myNewValue;
+            return true;
+        } else {
+            return false;
+        }
     } else {
         throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
-        "' does not have a text child." , PLUS_FILE_LINE);
+                "' does not have a text child." , PLUS_FILE_LINE);
     }
+}
+
+template <class Enum>
+bool
+getConfigSetting(dom::NodePtr theSettings, const std::string & theName, Enum & theValue,
+                 typename Enum::Native theDefault)
+{
+    return getConfigSetting( theSettings, theName, theValue, Enum( theDefault ));
 }
 
 }

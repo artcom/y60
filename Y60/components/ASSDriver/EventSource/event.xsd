@@ -12,21 +12,24 @@
                   id="23"
                   type="add"
                   raw_position="[9.22574,7.24158]"
-                  position3D="[44.8317,-15.4852,0]"/>
+                  position3D="[44.8317,-15.4852,0]"
+                  roi="[[0,0][1,1]]"/>
 
          <generic when="1.17026e+09"
                   callback="onASSEvent"
                   id="23"
                   type="move"
                   raw_position="[9.22574,7.24158]"
-                  position3D="[44.8317,-15.4852,0]"/>
+                  position3D="[44.8317,-15.4852,0]"
+                  roi="[[0,0][1,1]]"/>
 
          <generic when="1.17026e+09"
                   callback="onASSEvent"
                   id="23"
                   type="remove"
                   raw_position="[9.22574,7.24158]"
-                  position3D="[44.8317,-15.4852,0]"/>
+                  position3D="[44.8317,-15.4852,0]"
+                  roi="[[0,0][1,1]]"/>
     -->
     <xs:simpleType name="Vector3f">
         <xs:restriction base="xs:string"/>
@@ -35,6 +38,9 @@
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
     <xs:simpleType name="Vector2i">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Box2f">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
     <xs:element name="generic">
@@ -47,6 +53,7 @@
             <xs:attribute name="raw_position" type="Vector2f"/>
             <xs:attribute name="position3D" type="Vector3f"/>
             <xs:attribute name="grid_size" type="Vector2i"/>
+            <xs:attribute name="roi" type="Box2f"/>
         </xs:complexType>
     </xs:element>
 

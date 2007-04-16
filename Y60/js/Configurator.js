@@ -246,6 +246,9 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     obj.setSettingsFile = function(theSettingsFile) {
         setup(obj, theSceneViewer, theSettingsFile);
     }
+    obj.saveSettings = function() {
+        _mySettings.saveFile(_mySettingsFile);
+    }
 
     obj.removeListener = function(theListener) {
         for (var i=_myListeners.length-1; i >= 0; --i) {
@@ -326,7 +329,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 if (theShiftFlag) {
                     restoreSettings();
                 } else {
-                    _mySettings.saveFile(_mySettingsFile);
+                    obj.saveSettings();
                     displayMessage("Settings saved to " + _mySettingsFile);
                 }
                 break;

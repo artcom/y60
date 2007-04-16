@@ -42,7 +42,12 @@ GenericEvent::GenericEvent(const dom::NodePtr & theNode) :
 }
 
 dom::NodePtr
-GenericEvent::asNode() const {
+GenericEvent::asNode() {
+    if ( ! _myDocument->firstChild()->getAttribute("simulation_time") ) {
+        _myDocument->firstChild()->appendAttribute("simulation_time", simulation_time);
+    } else {
+        _myDocument->firstChild()->getAttribute("simulation_time")->nodeValueAssign(simulation_time);
+    }
     return _myDocument->firstChild();
 }
 

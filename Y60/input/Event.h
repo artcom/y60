@@ -48,6 +48,7 @@ namespace y60 {
 
         const Type type;
         asl::Time when;
+        double simulation_time;
         void * source; 
 
         virtual EventPtr copy() const {

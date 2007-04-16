@@ -618,6 +618,7 @@ namespace jslib {
     void
     AbstractRenderWindow::handle(y60::EventPtr theEvent) {
         MAKE_SCOPE_TIMER(handleEvents);
+        theEvent->simulation_time = _myElapsedTime;
         for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
             string myName = (*i)->getName() + "::handle";
             try {
@@ -672,7 +673,7 @@ namespace jslib {
             y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
 
             try {
-                jsval argv[7], rval;
+                jsval argv[8], rval;
                 argv[0] = as_jsval(_myJSContext, myKeyEvent.keyString);
                 argv[1] = as_jsval(_myJSContext, myKeyEvent.type == y60::Event::KEY_DOWN);
                 argv[2] = as_jsval(_myJSContext, 0); // TODO: mouse X POS
@@ -680,6 +681,9 @@ namespace jslib {
                 argv[4] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_SHIFT) !=0));
                 argv[5] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_CTRL) !=0));
                 argv[6] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_ALT) !=0));
+
+                argv[7] = as_jsval(_myJSContext, theEvent.simulation_time);
+
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 7, argv, &rval);
             } catch (const asl::Exception & ex) {
                 AC_ERROR << "ASL exception caught in AbstractRenderWindow::onKey(): " << ex;
@@ -695,7 +699,7 @@ namespace jslib {
     AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseButton")) {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-            jsval argv[4], rval;
+            jsval argv[5], rval;
             argv[0] = as_jsval(_myJSContext, myMouseEvent.button);
             argv[1] = as_jsval(_myJSContext, myMouseEvent.type == y60::Event::MOUSE_BUTTON_DOWN);
             if (getOrientation() == PORTRAIT_ORIENTATION) {
@@ -706,6 +710,8 @@ namespace jslib {
                 argv[3] = as_jsval(_myJSContext, myMouseEvent.position[1]);
             }
 
+            argv[4] = as_jsval(_myJSContext, theEvent.simulation_time);
+
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseButton", 4, argv, &rval);
         }
     }
@@ -714,7 +720,7 @@ namespace jslib {
     AbstractRenderWindow::onMouseMotion(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseMotion")) {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-            jsval argv[2], rval;
+            jsval argv[3], rval;
             if (getOrientation() == PORTRAIT_ORIENTATION) {
                 argv[0] = as_jsval(_myJSContext, myMouseEvent.position[1]);
                 argv[1] = as_jsval(_myJSContext, getWidth() - myMouseEvent.position[0]);
@@ -722,6 +728,8 @@ namespace jslib {
                 argv[0] = as_jsval(_myJSContext, myMouseEvent.position[0]);
                 argv[1] = as_jsval(_myJSContext, myMouseEvent.position[1]);
             }
+
+            argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
 
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseMotion", 2, argv, &rval);
         }
@@ -731,10 +739,12 @@ namespace jslib {
     AbstractRenderWindow::onMouseWheel(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseWheel")) {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-            jsval argv[2], rval;
+            jsval argv[3], rval;
 
             argv[0] = as_jsval(_myJSContext, myMouseEvent.delta[0]);
             argv[1] = as_jsval(_myJSContext, myMouseEvent.delta[1]);
+
+            argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
 
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseWheel", 2, argv, &rval);
         }
@@ -744,10 +754,13 @@ namespace jslib {
     AbstractRenderWindow::onAxis(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onAxis")) {
             y60::AxisEvent & myAxisEvent = dynamic_cast<y60::AxisEvent&>(theEvent);
-            jsval argv[3], rval;
+            jsval argv[4], rval;
             argv[0] = as_jsval(_myJSContext, myAxisEvent.device);
             argv[1] = as_jsval(_myJSContext, myAxisEvent.axis);
             argv[2] = as_jsval(_myJSContext, myAxisEvent.value);
+
+            argv[3] = as_jsval(_myJSContext, theEvent.simulation_time);
+
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onAxis", 3, argv, &rval);
         }
     }
@@ -757,7 +770,7 @@ namespace jslib {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onTouch")) {
             y60::TouchEvent & myEvent = dynamic_cast<y60::TouchEvent&>(theEvent);
 
-            jsval argv[5], rval;
+            jsval argv[6], rval;
             int nargs = 0;
             argv[nargs++] = as_jsval(_myJSContext, myEvent.device);
             argv[nargs++] = as_jsval(_myJSContext, myEvent.position[0]);
@@ -765,6 +778,9 @@ namespace jslib {
             argv[nargs++] = as_jsval(_myJSContext, myEvent.size[0]);
             argv[nargs++] = as_jsval(_myJSContext, myEvent.size[1]);
             argv[nargs++] = as_jsval(_myJSContext, myEvent.intensity);
+
+            argv[nargs++] = as_jsval(_myJSContext, theEvent.simulation_time);
+
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onTouch", nargs, argv, &rval);
         }
     }
@@ -773,9 +789,12 @@ namespace jslib {
     AbstractRenderWindow::onResize(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onResize")) {
             y60::WindowEvent & myWindowEvent = dynamic_cast<y60::WindowEvent&>(theEvent);
-            jsval argv[2], rval;
+            jsval argv[3], rval;
             argv[0] = as_jsval(_myJSContext, myWindowEvent.width);
             argv[1] = as_jsval(_myJSContext, myWindowEvent.height);
+
+            argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
+            
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onResize", 2, argv, &rval);
         }
     }
@@ -784,7 +803,7 @@ namespace jslib {
     AbstractRenderWindow::onButton(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onButton")) {
             y60::ButtonEvent & myButtonEvent = dynamic_cast<y60::ButtonEvent&>(theEvent);
-            jsval argv[3], rval;
+            jsval argv[4], rval;
             argv[0] = as_jsval(_myJSContext, myButtonEvent.device);
             argv[1] = as_jsval(_myJSContext, myButtonEvent.button);
             if (myButtonEvent.type == y60::Event::BUTTON_UP) {
@@ -792,6 +811,9 @@ namespace jslib {
             } else {
                 argv[2] = as_jsval(_myJSContext, 1);
             }
+
+            argv[3] = as_jsval(_myJSContext, theEvent.simulation_time);
+
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onButton", 3, argv, &rval);
         }
     }
