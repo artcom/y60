@@ -267,4 +267,15 @@ namespace asl {
 
         return myDestinationSize;
     }
+    
+    std::string getNextLine(int& theCurPos, const string& theString) {
+        int myCRPos = theString.find("\n", theCurPos);
+        if (myCRPos == string::npos) {
+            return "";
+        } else {
+            string myNextLine = theString.substr(theCurPos, myCRPos-theCurPos);
+            theCurPos = myCRPos+1;
+            return myNextLine;
+        }    
+    }
 }

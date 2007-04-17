@@ -225,6 +225,12 @@ namespace asl {
     void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const char * theCodeTable = cb66);
     unsigned base64ToBin(const std::string & theSource, unsigned char * theDest, unsigned int maxLength);
 
+    // Returns the line in theString starting at theCurPos and ending in \n. 
+    // After the call, theCurPos points to the start of the next line in the
+    // string. 
+    // Rudimentary, but very helpful when parsing line-based files.
+    std::string getNextLine(int& theCurPos, const std::string& theString);
+
     /* @} */
 
 } //Namespace asl
