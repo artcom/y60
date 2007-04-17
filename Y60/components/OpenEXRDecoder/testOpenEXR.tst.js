@@ -62,8 +62,10 @@ OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
         }
 
         window.onMouseMotion = function(theX, theY) {
-            obj.myHDRWindow.x = theX / window.width * 2; // scale
-            obj.myHDRWindow.y = (window.height - theY) * -2/ window.height; // bias
+            if (obj.myHDRWindow) {
+                obj.myHDRWindow.x = theX / window.width * 2; // scale
+                obj.myHDRWindow.y = (window.height - theY) * -2/ window.height; // bias
+            }
         }
         window.go();
     }

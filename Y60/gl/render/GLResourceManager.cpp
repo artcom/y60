@@ -314,6 +314,7 @@ namespace y60 {
             }
         }
 
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (myPixelEncoding.compressedFlag) {
             if (myDepth == 1) {
                 glCompressedTexImage2DARB(GL_TEXTURE_2D, 0,

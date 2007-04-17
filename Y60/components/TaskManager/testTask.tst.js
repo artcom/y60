@@ -41,7 +41,7 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         }
         return myWindows;
     }
-    function testApplication(theApplication, theWindowName, theWindowCount) {
+    function testApplication(theApplication, theWindowName) {
         print(">>>  Test Application: '" + theApplication);
         print("Open tasks");
         obj.myTask  = new Task(theApplication);
@@ -49,9 +49,9 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myTask2 = new Task("C:/WINDOWS/notepad.exe", "C:/WINDOWS", false);
         msleep(TEST_SPEED);
 
-        ENSURE('obj.myTask.windows.length == ' + theWindowCount);
-        ENSURE('obj.myTask1.windows.length == 1');
-        ENSURE('obj.myTask2.windows.length == 1');
+        ENSURE('obj.myTask.windows.length > 0');
+        ENSURE('obj.myTask1.windows.length > 0');
+        ENSURE('obj.myTask2.windows.length > 0');
         obj.myWindows = getTaskWindowsWithTimeout(obj.myTask, 2000);
         ENSURE('obj.myWindows.length > 0');
         obj.myWindow = obj.myTask.windows[0];
@@ -137,8 +137,9 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         msleep(TEST_SPEED);
 
         print("Add external window to main task");
+        var myWindowCount = obj.myTask.windows.length;
         obj.myTask.addExternalWindow(obj.myTaskWindow3.windowname);
-        ENSURE('obj.myTask.windows.length == ' + (theWindowCount + 1));
+        ENSURE('obj.myTask.windows.length == ' + (myWindowCount + 1));
         msleep(TEST_SPEED);
 
         print("Close all windows belonging to first task");
@@ -161,7 +162,7 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         try {
-            testApplication("C:/WINDOWS/System32/calc.exe", "Rechner", 2);
+            testApplication("C:/WINDOWS/System32/calc.exe", "Rechner");
             //testApplication("C:/WINDOWS/notepad.exe");
             //testApplication("C:/Programme/Mozilla Firefox/firefox.exe -k http://himmel.artcom.de");
             //testApplication("C:/Programme/Internet Explorer/iexplore.exe http://himmel.artcom.de");
