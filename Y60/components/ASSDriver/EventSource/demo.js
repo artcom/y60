@@ -34,22 +34,11 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
     SceneViewer.prototype.Constructor(self, theArguments);
     var Base = [];
-    var _myMaterial = null;
-    var _myMarkers = [];
-    var _myRegions = [];
-    var _myGotDataFlag = false;
-    var _myDriver = null;
-    var _myCrosshairShape = null;
-    var _myGroup = null;
-    var _myDisplaySize3D = null;
-    var _myBoxShape = null;
-
     var _myLastEventTime = 0;
-
-    var _myLastFrameTime = 0.0;
-
     var _myASSManager = null;
     var _myDummyAppContainer = null;
+
+    var _myWorldCross = null;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -60,7 +49,10 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
-        Base.setup(theWidth, theHeight, false, theTitle);
+        Base.setup(theWidth, theHeight, true, theTitle);
+        //window.position = [0, 0];
+        window.decorations = false;
+
         window.resize(theWidth, theHeight);
 
         _myDummyAppContainer = Modelling.createTransform( window.scene.world );
@@ -68,11 +60,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDummyAppContainer.scale = [DISPLAY_SCALE, DISPLAY_SCALE, 1];
 
         _myASSManager = new ASSManager( self, _myDummyAppContainer );
-        _myDriver = ASSManager.driver;
 
         self.getConfigurator().saveSettings();
 
-        window.camera.position.z = 400;
+        window.camera.frustum.type = ProjectionType.orthonormal;
+        window.camera.frustum.width = 400;
+        window.camera.position.z = 40;
     }
 
     Base.onFrame = self.onFrame;
@@ -92,10 +85,19 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         if (theNode.type == "configure" ) {
             _myASSManager.valueColor = new Vector4f(0,0,1,1);
             //print("event " + theNode.type + " grid size: " + theNode.grid_size);
-        } else if ( theNode.type == "lost_communication" || theNode.type == "lost_sync" )
-        {
+        } else if ( theNode.type == "lost_communication" || theNode.type == "lost_sync" ) {
             //print("event " + theNode.type );
         } else {
+            if ( ! _myWorldCross ) {
+                var myShape = window.scene.world.getElementById("XXX");
+                if (myShape) {
+                    _myWorldCross = Modelling.createBody( window.scene.world, myShape.id );
+                    _myWorldCross.position.z = 5; // XXX
+                }
+            }
+            if ( _myWorldCross ) {
+                _myWorldCross.position = new Vector3f( theNode.position3D );
+            }
             //print("event " + theNode.type + " at position: " + theNode.position3D +
             //        " dt: " + (theNode.when - _myLastEventTime));
         }
@@ -107,7 +109,8 @@ if (__main__ == "ASSDriverTest") {
     try {
         var ourASSDriverTestApp = new ASSDriverTestApp(
                 [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
-        ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
+        //ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
+        ourASSDriverTestApp.setup(1400, 1050, "ASSDriverTest");
         ourASSDriverTestApp.go();
     } catch (ex) {
         print("-------------------------------------------------------------------------------");

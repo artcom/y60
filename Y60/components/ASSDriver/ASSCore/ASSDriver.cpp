@@ -131,7 +131,9 @@ ASSDriver::synchronize() {
             ASSURE( _myFrameBuffer[i] == myMagicToken );
             if (_myFrameBuffer[i + 1] == 1 && _myMaxLine > 0) {
                 _myGridSize[1] = _myMaxLine;
-                //AC_PRINT << "Grid size: " << _myGridSize;
+                _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
+                _myPoTSize[1] = nextPowerOfTwo( _myGridSize[1] );
+                AC_PRINT << "Grid size: " << _myGridSize;
                 _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + i);
                 ASSURE(_myFrameBuffer.front() == myMagicToken);
                 allocateGridBuffers();
@@ -159,7 +161,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
         dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(theName);
         if (myImage) {
             myImage->getFacade<y60::Image>()->createRaster( 
-                    _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+                    _myPoTSize[0], _myPoTSize[1], 1, y60::GRAY);
             _myRasterNames.push_back( theName );
             return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
         } else {
@@ -168,14 +170,14 @@ ASSDriver::allocateRaster(const std::string & theName) {
             y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
             myImage->set<y60::IdTag>( theName );
             myImage->set<y60::NameTag>( theName );
-            myImage->createRaster( _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+            myImage->createRaster( _myPoTSize[0], _myPoTSize[1], 1, y60::GRAY);
 
             _myRasterNames.push_back( theName );
 
             return RasterHandle( myImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr());
         }
     } else {
-        RasterHandle myHandle(createRasterValue(y60::GRAY, _myGridSize[0], _myGridSize[1]));
+        RasterHandle myHandle(createRasterValue(y60::GRAY, _myPoTSize[0], _myPoTSize[1]));
         return myHandle;
                 
     }
@@ -197,8 +199,9 @@ ASSDriver::readSensorValues() {
         int myRowIdx = _myFrameBuffer[1] - 1;
         //AC_PRINT << "Got row: " << myRowIdx;
 
+        size_t byteCount = (_myFrameBuffer.begin() + 2 + _myGridSize[0]) - (_myFrameBuffer.begin() + 2);
         unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
-                    myRowIdx * _myGridSize[0];
+                    myRowIdx * _myPoTSize[0];
         std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
 
         _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);

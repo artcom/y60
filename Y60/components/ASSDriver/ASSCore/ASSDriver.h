@@ -85,6 +85,7 @@ class ASSDriver :
         size_t getBytesPerFrame();
 
         asl::Vector2i  _myGridSize;
+        asl::Vector2i  _myPoTSize;
     private:
         void setState( DriverState theState );
         void synchronize();

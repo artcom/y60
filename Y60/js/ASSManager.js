@@ -8,16 +8,16 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-function ASSManager(theViewer, theParentTransform, theDecorationZOffset) {
-    this.Constructor(this, theViewer, theParentTransform, theDecorationZOffset);
+function ASSManager(theViewer, theParentTransform) {
+    this.Constructor(this, theViewer, theParentTransform );
 }
 
 ASSManager.driver = null;
 
 const ASS_CROSSHAIR_SCALE = 0.15;
+const DECORATION_Z_OFFSET = 0.1;
 
-ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
-                                            theDecorationZOffset)
+ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform, theDecorationZOffset)
 {
     self.onUpdateSettings = function( theSettings ) {
 
@@ -37,7 +37,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
             var myOldScale = new Vector3f( _myGroup.scale );
             _myGroup.scale = _mySettings.childNode("SensorScale").childNode("#text");
             var myMirrorXFlag = new Number( _mySettings.childNode("MirrorX").childNode("#text"));
-            var mySize = product( myOldScale, _myGridSize3d);
+            var mySize = product( myOldScale, difference( _myGridSize3d, new Vector3f(1,1,1)));
             if (myMirrorXFlag != 0) {
                 _myGroup.scale.x *= -1;
             }
@@ -74,22 +74,25 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
             } else if (theEventNode.type == "add") {
                 //print("add");
                 var myNewMarker = Modelling.createBody(_myGroup, _myCursorShape.id );
-                myNewMarker.position.z = _myDecorationZOffset;
                 myNewMarker.scale = new Vector3f(ASS_CROSSHAIR_SCALE, ASS_CROSSHAIR_SCALE,
                         ASS_CROSSHAIR_SCALE);
                 myNewMarker.name = "ASSCursor" + theEventNode.id;
                 myNewMarker.id = "ASSCursor" + theEventNode.id;
+                myNewMarker.position.z = DECORATION_Z_OFFSET; // XXX
+                myNewMarker.visible = true; // XXX
 
                 var myROIBox = Modelling.createBody( _myGroup, _myROIBoxShape.id );
-                myROIBox.position.z = _myDecorationZOffset;
                 myROIBox.name = "ASSROI" + theEventNode.id;
                 myROIBox.id = "ASSROI" + theEventNode.id;
+                myROIBox.position.z = DECORATION_Z_OFFSET; // XXX
+                myROIBox.visible = true; // XXX
 
                 moveMarkerAndBox( myNewMarker, myROIBox, theEventNode);
             } else if (theEventNode.type == "move") {
                 //print("move");
                 var myMarker = _myGroup.getElementById("ASSCursor" + theEventNode.id);
                 var myROIBox = _myGroup.getElementById("ASSROI" + theEventNode.id);
+                //print ("position: " + theEventNode.position3D + " raw: " + theEventNode.raw_position);
                 if (myMarker && myROIBox) {
                     moveMarkerAndBox( myMarker, myROIBox, theEventNode);
                 }
@@ -125,28 +128,34 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     self.valueColor getter = function() {
         var myRasterNames = _myDriver.rasterNames;
         if (myRasterNames.length == 0) {
-            Logger.warning("Can not get valueColor. " + 
-                    "Materials have not been created.");
+            Logger.warning("Can not get valueColor. Materials have not been created.");
         } else {
             var myMaterial = _myScene.world.getElementById( myRasterNames[0] + "Material" );
             return myMaterial.properties.surfacecolor;
         }
     }
 
+    self.transform getter = function() {
+        return _myGroup;
+    }
+    self.driver getter = function() {
+        return _myDriver;
+    }
+
     function moveMarkerAndBox( theMarker, theROIBox, theEvent) {
         const myPixelCenterOffset = 0.5;
         var myRawPosition = theEvent.raw_position;
-        theMarker.position.x = myRawPosition.x + myPixelCenterOffset;
-        theMarker.position.y = _myGridSize3d.y - myRawPosition.y - myPixelCenterOffset;
+        theMarker.position.x = myRawPosition.x;
+        theMarker.position.y = myRawPosition.y;
 
         var myROI = theEvent.roi;
-        theROIBox.position.x = myROI.center.x;
-        theROIBox.position.y = _myGridSize3d.y - myROI.center.y;
+        theROIBox.position.x = myROI.center.x - 0.5; // integer coordinate correction
+        theROIBox.position.y = myROI.center.y - 0.5;
         theROIBox.scale.x = myROI.size.x;
         theROIBox.scale.y = myROI.size.y;
     }
 
-    function setup( theParent, theDecorationZ ) {
+    function setup( theParent) {
         if ( ! ASSManager.driver ) {
             ASSManager.driver = plug("ASSEventSource");
         }
@@ -167,10 +176,6 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         _myGroup.name = "ASSSensorDisplay";
         _myDriver.transform = _myGroup;
 
-        if (theDecorationZ != undefined) {
-            _myDecorationZOffset = theDecorationZ;
-        }
-
         setupDisplay();
     }
 
@@ -179,13 +184,17 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         _myFrameMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
                             "ASSFrame", true, false, 1, [1, 1, 1, 1]);        
         _myFrameMaterial.properties.surfacecolor = [1, 1, 1, 1];
+        _myFrameMaterial.transparent = true;
 
         _myOriginMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
                             "ASSOrigin", true, false, 1, [1, 1, 1, 1]);        
         _myOriginMaterial.properties.surfacecolor = [1, 0.56, 0, 1];
+        _myOriginMaterial.transparent = true;
 
         _myOriginShape = Modelling.createCrosshair(_myScene, _myOriginMaterial.id, 
                                                  1, 2, "ASSOrigin"); 
+        _myOriginShape.renderstyle.polygon_offset = true;
+        _myOriginShape.renderstyle.ignore_depth = true;
 
         _myCursorMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
                             "ASSCursorMaterial", true, false, 1, [1, 1, 1, 1]);        
@@ -194,9 +203,13 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
 
         _myCursorShape = Modelling.createCrosshair(_myScene, _myCursorMaterial.id, 
                                                  1, 2, "ASSCursor"); 
+        _myCursorShape.renderstyle.polygon_offset = true;
+        _myCursorShape.renderstyle.ignore_depth = true;
     
         _myROIBoxShape = Modelling.createQuad(_myScene, _myCursorMaterial.id, [-0.5, -0.5, 0],
                     [0.5, 0.5, 0.0]);
+        _myROIBoxShape.renderstyle.polygon_offset = true;
+        _myROIBoxShape.renderstyle.ignore_depth = true;
         _myROIBoxShape.childNode("primitives", 0).childNode(0).type = "lineloop";
         _myROIBoxShape.name = "ASSROIBox";
     }
@@ -216,8 +229,8 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                 myMaterial.transparent = true;
             }
 
-            var myXScale = myRaster.width / nextPowerOfTwo( myRaster.width );
-            var myYScale = myRaster.height / nextPowerOfTwo( myRaster.height );
+            var myXScale = _myGridSize.x / myRaster.width;
+            var myYScale = _myGridSize.y / myRaster.height;
             myRaster.matrix.makeScaling( new Vector3f( myXScale, myYScale, 1));
             var myColorScale = 255 / _myDriver.maxOccuringValue;
             myRaster.color_scale = new Vector4f(myColorScale, myColorScale, myColorScale, 1);
@@ -229,24 +242,33 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     }
 
     function onConfigure( theEvent ) {
-        setupValueMaterials();
 
+        _myGridSize = new Vector2f( theEvent.grid_size );
         _myGridSize3d = new Vector3f( theEvent.grid_size.x, theEvent.grid_size.y, 0);
+
+        setupValueMaterials();
+        createWireGrid();
+
+        var myPixelCenterOffset = new Vector3f(-0.5, -0.5, 0);
+
+        var myTopRight = sum( _myGridSize3d, myPixelCenterOffset);
 
         if ( _myFrameShape ) {
             _myFrameShape.parentNode.removeChild( _myFrameShape );
         }
-        _myFrameShape = Modelling.createQuad(_myScene, _myFrameMaterial.id, [0,0,0],
-                                             _myGridSize3d);
+        _myFrameShape = Modelling.createQuad(_myScene, _myFrameMaterial.id, myPixelCenterOffset,
+                                             myTopRight);
         _myFrameShape.childNode("primitives", 0).childNode(0).type = "lineloop";
+        _myFrameShape.renderstyle.polygon_offset = true;
+        _myFrameShape.renderstyle.ignore_depth = true;
         _myFrameShape.name = "ASSFrame";
 
         if ( _mySensorFrame ) {
             _mySensorFrame.shape = _myFrameShape.id;
         } else {
             _mySensorFrame =  Modelling.createBody( _myGroup, _myFrameShape.id );
-            _mySensorFrame.position.z = _myDecorationZOffset;
             _mySensorFrame.name = "ASSSensorFrame";
+            _mySensorFrame.position.z = DECORATION_Z_OFFSET; // XXX
         }
 
         if ( _mySensorValueShape ) {
@@ -254,28 +276,87 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         }
 
         var myValueMaterialId = getMaterialIdForValueDisplay();
-        _mySensorValueShape = Modelling.createQuad(_myScene, myValueMaterialId, [0,0,0],
-                                                   _myGridSize3d);
+        _mySensorValueShape = Modelling.createQuad(_myScene, myValueMaterialId, myPixelCenterOffset,
+                                                   myTopRight);
         _mySensorValueShape.name = "ASSSensorValues";
 
         if ( _mySensorValueDisplay ) {
             _mySensorValueDisplay.shape = _mySensorValueShape.id;
         } else {
             _mySensorValueDisplay =  Modelling.createBody( _myGroup, _mySensorValueShape.id );
+            _mySensorValueDisplay.position.y = _myGridSize3d.y - 1; //myTopRight.y;
+            _mySensorValueDisplay.scale.y *= -1;
             _mySensorValueDisplay.name = "ASSSensorValueDisplay";
         }
 
         if ( ! _myOriginMarker ) {
             _myOriginMarker = Modelling.createBody( _myGroup, _myOriginShape.id );
-            _myOriginMarker.position.z = 2 * _myDecorationZOffset;
             _myOriginMarker.scale = new Vector3f( ASS_CROSSHAIR_SCALE,
                     ASS_CROSSHAIR_SCALE, ASS_CROSSHAIR_SCALE );
             _myOriginMarker.name = "ASSOrigin";
+            _myOriginMarker.position.z = DECORATION_Z_OFFSET; // XXX
         }
 
         if (_mySettings) {
             self.onUpdateSettings( _mySettings );
         }
+    }
+
+    function createWireGrid() {
+
+        if (_myWireGridShape) {
+            _myWireGridShape.parentNode.removeChild( _myWireGridShape );
+        }
+        
+        var _myWireGridShape = Node.createElement("shape");
+        _myScene.shapes.appendChild( _myWireGridShape );
+
+        _myWireGridShape.name = "ASSWireGrid";
+
+        var myVertexDataNode = Node.createElement("vertexdata");
+        _myWireGridShape.appendChild( myVertexDataNode );
+
+        var myPositions = Node.createElement("vectorofvector3f");
+        myVertexDataNode.appendChild( myPositions );
+        myPositions.name = "position";
+        
+        var myVertices = new Array();
+        var i;
+        for (i = 0; i < _myGridSize3d.x; ++i) {
+            myVertices.push( new Vector3f( i, -0.5, 0) );
+            myVertices.push( new Vector3f( i, _myGridSize3d.y - 0.5, 0) );
+        }
+        for (i = 0; i < _myGridSize3d.y; ++i) {
+            myVertices.push( new Vector3f( -0.5, i, 0) );
+            myVertices.push( new Vector3f( _myGridSize3d.x - 0.5, i, 0) );
+        }
+        myPositions.appendChild( Node.createTextNode( "[" + myVertices + "]"));
+        
+        var myPrimitivesNode = Node.createElement("primitives");
+        _myWireGridShape.appendChild( myPrimitivesNode );
+
+        var myElements = Node.createElement("elements");
+        myPrimitivesNode.appendChild( myElements );
+        myElements.type = "lines";
+        myElements.material = _myOriginMaterial.id; // XXX
+
+        var myIndicesNode = Node.createElement("indices");
+        myElements.appendChild( myIndicesNode );
+        myIndicesNode.vertexdata = "position";
+        myIndicesNode.role = "position";
+
+        var myIndices = new Array();
+        for (i = 0; i < myVertices.length; ++i) {
+            myIndices.push( i );
+        }
+        myIndicesNode.appendChild( Node.createTextNode( "[" + myIndices + "]"));
+
+        if (_myWireGrid) {
+            _myWireGrid.shape = _myWireGridShape.id;
+        } else {
+            _myWireGrid = Modelling.createBody( _myGroup, _myWireGridShape.id );
+        }
+        
     }
 
     function getMaterialIdForValueDisplay() {
@@ -311,17 +392,19 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     var _myROIBoxShape = null;
     var _myCursorMaterial = null;
     var _myCursorShape = null;
-    var _myDecorationZOffset = 0.15;
 
     var _myGridSize3d = new Vector3f(1, 1, 1);
+    var _myGridSize =  new Vector3f(1, 1, 1);
     var _myFrameShape = null;
     var _mySensorFrame = null;
     var _mySensorValueShape = null;
     var _mySensorValueDisplay = null;
+    var _myWireGridShape = null;
+    var _myWireGrid = null;
 
     var _myInitialSettingsLoaded = false;
 
-    setup(theParentTransform, theDecorationZOffset);
+    setup(theParentTransform);
 }
 
 
