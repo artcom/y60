@@ -22,7 +22,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
 
     SceneViewer.prototype.Constructor(obj, theArguments);
 
-    obj.SceneViewer = [];
+    obj.SceneViewer = {};
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     // public members
@@ -94,7 +94,9 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     }
 
 
+    obj.SceneViewer.onPostRender = obj.onPostRender; 
     obj.onPostRender = function() {
+        obj.SceneViewer.onPostRender();
         try {
             if (_myOutputImageName) {
                 ++obj.myFrameCount;

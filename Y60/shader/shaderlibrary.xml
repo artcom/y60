@@ -1651,4 +1651,36 @@
             </vertexparameters>
          </vertexshader>
     </shader>
+    <shader id="s138" name="snowstreet" cost="100">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,frontal_projection]"/>
+        </supports>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[snow.cg]" entryfunctions="[mainFragment]">
+            <properties>
+                 <sampler2d name="ground">0</sampler2d>
+                 <sampler2d name="snow">1</sampler2d>
+                 <sampler2d name="shadow">2</sampler2d>
+                 <sampler2d name="normalMap">3</sampler2d>
+                 <sampler2d name="sparkleMap">4</sampler2d>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="specular">[1,1,1,1]</vector4f>
+                 <vector4f name="ambient">[1,1,1,1]</vector4f>
+                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                 <float name="shininess">1.0</float>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[arbvp1,vp20,vp30,vp40]" files="[snow.cg]" entryfunctions="[mainVertex]">
+            <properties>
+                 <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
+            </properties>
+            <vertexparameters>
+                 <vector3f name="normal"/>
+                 <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+         </vertexshader>
+    </shader>
 </shaders>

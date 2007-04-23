@@ -368,7 +368,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Optimizing scene...");
                     window.scene.optimize();
                     break;
-                case '#':
+                case '[/]':
                     self.drawFrustums = ! self.drawFrustums;
                     print("Draw frustums: " + (self.drawFrustums ? "On" : "Off"));
                     break;
@@ -605,7 +605,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    -          decrease zoom factor");
          print("    ,          switch to previous camera");
          print("    .          switch to next camera");
-         print("    #          draw camera frustums");
+         print(" NumPad-/      draw camera frustums");
          print("   0-9         switch to camera number 0-9");
          print("    N          start Nagios plugin");
          print("    h          print this help");
