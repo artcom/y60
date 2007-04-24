@@ -49,8 +49,11 @@ private:
                         myFader->_myCurrentFrame<lastFrame;
                         ++(myFader->_myCurrentFrame))
                 {
-                    float myFadePercent = (myFader->_myCurrentFrame - 
-                            myFader->_myFadeBeginFrame)/myFadeDuration;
+                    float myFadePercent = 1.0;
+                    if (myFadeDuration) {
+                        myFadePercent = (myFader->_myCurrentFrame - 
+                                         myFader->_myFadeBeginFrame)/myFadeDuration;
+                    }
                     myFader->_myCurrentVolume = myFader->_myBeginVolume+
                             myFadePercent*myVolumeDiff;
                     for (int myChannel = 0; myChannel<theBuffer.getNumChannels(); 
