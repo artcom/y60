@@ -159,7 +159,7 @@ namespace jslib {
         jsval dummy;
         switch (theID) {
         case PROP_volume:
-            return Method<NATIVE>::call(&NATIVE::getVolume, cx, obj, 1, vp, &dummy);
+            return Method<NATIVE>::call(&NATIVE::setVolume, cx, obj, 1, vp, &dummy);
         case PROP_size:
             return Method<NATIVE>::call(&NATIVE::setGrainSize, cx, obj, 1, vp, &dummy);
         case PROP_sizejitter:
