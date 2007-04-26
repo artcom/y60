@@ -18,12 +18,52 @@
 #include "Path.h"
 #include "Assure.h"
 #include "Logger.h"
+#include "error_functions.h"
 #ifdef LINUX
 #include <glib.h>
 #endif
 
+#ifdef WIN32
+
+BOOL IsWin2kSP4OrLater() 
+{
+   OSVERSIONINFOEX osvi;
+   DWORDLONG dwlConditionMask = 0;
+   int op=VER_GREATER_EQUAL;
+
+   // Initialize the OSVERSIONINFOEX structure.
+
+   ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+   osvi.dwMajorVersion = 5;
+   osvi.dwMinorVersion = 0;
+   osvi.wServicePackMajor = 4;
+   osvi.wServicePackMinor = 0;
+
+   // Initialize the condition mask.
+
+   VER_SET_CONDITION( dwlConditionMask, VER_MAJORVERSION, op );
+   VER_SET_CONDITION( dwlConditionMask, VER_MINORVERSION, op );
+   VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMAJOR, op );
+   VER_SET_CONDITION( dwlConditionMask, VER_SERVICEPACKMINOR, op );
+
+   // Perform the test.
+
+   return VerifyVersionInfo(
+      &osvi, 
+      VER_MAJORVERSION | VER_MINORVERSION | 
+      VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+      dwlConditionMask);
+}
+int getMultibyteToWideCharFlags() {
+    static int myFlags = IsWin2kSP4OrLater() ? MB_ERR_INVALID_CHARS : 0;
+    return myFlags;
+}
+#endif
 
 namespace asl {
+
+DEFINE_EXCEPTION(UnicodeException, Exception);    
 
 Path::Path() {
 #ifndef OSX
@@ -87,12 +127,18 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
 #elif WIN32
             {
                 // convert from UTF8 to WideChars
-                AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theString, -1, 0, 0);
+                AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, getMultibyteToWideCharFlags(), theString, -1, 0, 0);
+                if (myWCharSize == 0) {
+                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+                }
                 LPWSTR myWChars = new WCHAR[myWCharSize];
-                MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theString, -1, myWChars, myWCharSize);
+                MultiByteToWideChar(CP_UTF8, getMultibyteToWideCharFlags(), theString, -1, myWChars, myWCharSize);
 
                 // convert from WideChars to current codepage
                 AC_SIZE_TYPE myLocaleSize = WideCharToMultiByte(CP_ACP, 0, myWChars, -1, 0, 0, 0, 0);
+                if (myLocaleSize == 0) {
+                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+                }
                 _myLocaleChars = static_cast<char *>(malloc(myLocaleSize));
                 WideCharToMultiByte(CP_ACP, 0, myWChars, -1, _myLocaleChars, myLocaleSize, 0, 0);
 
@@ -151,17 +197,22 @@ Path::toUTF8() const {
 	}
 	return myResult;
 #elif WIN32
-    // TODO: convert locale to UTF8
     if (_myLocaleChars == 0) {
         return std::string();
     }
     // convert from active codepage to WideChars
-    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, _myLocaleChars, -1, 0, 0);
+    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_ACP, getMultibyteToWideCharFlags(), _myLocaleChars, -1, 0, 0);
+    if (myWCharSize == 0) {
+        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+    }
     LPWSTR myWChars = new WCHAR[myWCharSize];
-    MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, _myLocaleChars, -1, myWChars, myWCharSize);
+    MultiByteToWideChar(CP_ACP, getMultibyteToWideCharFlags(), _myLocaleChars, -1, myWChars, myWCharSize);
 
     // convert from WideChars to UTF8
     AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
+    if (myUTF8Size == 0) {
+        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+    }
     char * myUTF8Chars = new char[myUTF8Size];
     WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
     
@@ -175,7 +226,7 @@ Path::toUTF8() const {
     }
     gchar * myUTF = g_filename_to_utf8(_myLocaleChars, -1, 0, 0, 0);
     if ( ! myUTF) {
-        throw asl::Exception(std::string("Failed to convert filename '") + _myLocaleChars  +
+        throw UnicodeException(std::string("Failed to convert filename '") + _myLocaleChars  +
                 "' to UTF8.", PLUS_FILE_LINE);
     }
     std::string myUTF8String(myUTF);
