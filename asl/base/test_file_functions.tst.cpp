@@ -191,7 +191,7 @@ class file_functions_UnitTest : public UnitTest {
             std::string mySource = "source.txt";
             std::string myDestination = "destination.txt";
 
-            writeFile(mySource, "test_file_functions.txt.cpp - perform_copy - Test Data");
+            writeFile(mySource, "test_file_functions.txt.cpp - perform_move - Test Data");
             int mySourceSize = getFileSize(mySource);
             deleteFile(myDestination);
 

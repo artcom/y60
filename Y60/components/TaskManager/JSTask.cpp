@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003-2004, ART+COM AG Berlin
+// Copyright (C) 2003-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: JSTask.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.12 $
-//   $Date: 2005/04/28 17:12:56 $
-//
-//
 //=============================================================================
 
 #include "JSTask.h"
@@ -91,21 +83,21 @@ namespace jslib {
         return myProperties;
     }
 
-JSPropertySpec *
-JSTask::StaticProperties() {
-    static JSPropertySpec myProperties[] = {
-        {0}
-    };
-    return myProperties;
-}
-    
-JSFunctionSpec *
-JSTask::StaticFunctions() {
-    static JSFunctionSpec myFunctions[] = {
-        {0}
-    };
-    return myFunctions;
-}
+    JSPropertySpec *
+    JSTask::StaticProperties() {
+        static JSPropertySpec myProperties[] = {
+            {0}
+        };
+        return myProperties;
+    }
+
+    JSFunctionSpec *
+    JSTask::StaticFunctions() {
+        static JSFunctionSpec myFunctions[] = {
+            {0}
+        };
+        return myFunctions;
+    }
 
     // getproperty handling
     JSBool
@@ -170,7 +162,6 @@ JSTask::StaticFunctions() {
             }
         }
 
-
         string myPath = "";
         if (argc > 1 && !JSVAL_IS_VOID(argv[1]) && !convertFrom(cx, argv[1], myPath)) {
             JS_ReportError(cx,"JSTask::Constructor: bad argument #2, must be a string (path)");
@@ -214,7 +205,7 @@ JSTask::StaticFunctions() {
             {0}
         };
         return myProperties;
-    };
+    }
 
     JSObject *
     JSTask::initClass(JSContext *cx, JSObject *theGlobalObject) {
@@ -233,7 +224,6 @@ JSTask::StaticFunctions() {
         JSObject * myObject = JSTask::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
     }
-    
-    template jsval as_jsval(JSContext *cx, const std::vector<JSTaskWindow::OWNERPTR> & theVector);
 
+    template jsval as_jsval(JSContext *cx, const std::vector<JSTaskWindow::OWNERPTR> & theVector);
 }

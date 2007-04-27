@@ -16,9 +16,9 @@ fi
 #
 # debug or release mode
 #
-SHELL="acxpshellOPT"
+SHELL="y60"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
-    SHELL="acxpshellDBG"
+    SHELL="${SHELL}DBG"
 fi
 
 APP="$APP_DIR/testTask.tst.js"

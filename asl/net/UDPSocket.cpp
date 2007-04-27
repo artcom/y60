@@ -1,6 +1,5 @@
 //=============================================================================
-//
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 //
 // These coded instructions, statements, and computer programs contain
@@ -9,19 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: UDPSocket.cpp,v $
-//
-//     $Author: pavel $
-//
-//   $Revision: 1.11 $
-//
-// Description: 
-//
-//    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
-//
-//
-//============================================================================
 
 #include "UDPSocket.h"
 #include "SocketException.h"
@@ -55,38 +41,39 @@ namespace inet {
 
         int broadcast = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST,(char*) &broadcast, sizeof(broadcast)) < 0) {
-            throw SocketException("UDPSocket::init: can't setsockopt ");
+            throw SocketException("UDPSocket::open: Can't set broadcast flag");
         }
 
-        if (bind(fd,(struct sockaddr*)&_myLocalEndpoint,sizeof(_myLocalEndpoint))<0) {
-            throw SocketException("UDPSocket::init:can't bind socket ");
+        if (bind(fd, (struct sockaddr*)&_myLocalEndpoint, sizeof(_myLocalEndpoint)) < 0) {
+            AC_TRACE << "UDPSocket::open: Failed to bind to " << hex << ntohl(_myLocalEndpoint.sin_addr.s_addr) << dec << ":" << ntohs(_myLocalEndpoint.sin_port);
+            throw SocketException("UDPSocket::open: Can't bind socket");
         }
     }
 
     unsigned UDPSocket::receiveFrom(asl::Unsigned32* thehost, asl::Unsigned16 * theport, void *data, const int maxlen)
     {
 #ifdef WIN32    
-        int fromsize;
+        int peerAddrSize;
 #else
-        unsigned int fromsize;
+        unsigned int peerAddrSize;
 #endif                
-        fromsize=sizeof(_myLocalEndpoint);
+        peerAddrSize=sizeof(_myLocalEndpoint);
 
-        // UH: this doesn't look right, we're overwriting our _myLocalEndpoint...
-        int bytesread;
-        if ((bytesread=recvfrom(fd, (char*)data, maxlen, 0, (struct sockaddr*)&_myLocalEndpoint, &fromsize))>=0) {
+        struct sockaddr_in peerAddr;
+        int bytesRead;
+        if ((bytesRead=recvfrom(fd, (char*)data, maxlen, 0, (struct sockaddr*)&peerAddr, &peerAddrSize))>=0) {
             if (thehost) 
-                *thehost = ntohl(_myLocalEndpoint.sin_addr.s_addr);
+                *thehost = ntohl(peerAddr.sin_addr.s_addr);
             if (theport)
-                *theport = ntohs(_myLocalEndpoint.sin_port);
+                *theport = ntohs(peerAddr.sin_port);
         }
         else {
             if (errno!=OS_SOCKET_ERROR(EWOULDBLOCK))
                 throw SocketException("UDPSocket::ReadFrom failed");
         }
-        AC_TRACE << "received from (network byte order)" << _myLocalEndpoint.sin_addr.s_addr << ":" 
-            << _myLocalEndpoint.sin_port;
-        return bytesread;
+        AC_TRACE << "Received " << bytesRead << " from " << hex << ntohl(peerAddr.sin_addr.s_addr) << dec << ":" << ntohs(peerAddr.sin_port);
+
+        return bytesRead;
     }
 
     unsigned UDPSocket::sendTo(asl::Unsigned32 thehost, asl::Unsigned16 theport, const void *data, unsigned len)
@@ -94,8 +81,7 @@ namespace inet {
         setRemoteAddr(thehost, theport);
 
         int byteswritten;
-        AC_TRACE << "Sending to (network byte order)" << _myRemoteEndpoint.sin_addr.s_addr << ":" 
-            << _myRemoteEndpoint.sin_port;
+        AC_TRACE << "Sending to " << hex << _myRemoteEndpoint.sin_addr.s_addr << dec << ":" << _myRemoteEndpoint.sin_port;
         if ((byteswritten=sendto(fd, (char*)data, len, 0, (struct sockaddr*)&_myRemoteEndpoint, sizeof(_myRemoteEndpoint)))!=len) {
             throw SocketException("UDPSocket::SendTo failed");
         }
@@ -107,5 +93,4 @@ namespace inet {
         close();
         open();
     }
-
 }

@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: Task.cpp,v $
-//   $Author: valentin $
-//   $Revision: 1.14 $
-//   $Date: 2005/03/08 10:20:39 $
-//
-//
 //=============================================================================
 
 #include "Task.h"
@@ -31,6 +23,7 @@ using namespace std;
 
 // This allows windows to be set to foreground by other processes
 BOOL a = SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (LPVOID)0, SPIF_SENDWININICHANGE | SPIF_UPDATEINIFILE);
+
 namespace y60 {
 
     string getWindowName(HWND theWindowHandle) {
@@ -39,7 +32,7 @@ namespace y60 {
         return string(myWindowName);
     }
 
-    std::string getLastError() {
+    string getLastError() {
         LPVOID lpMsgBuf;
         FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -54,8 +47,9 @@ namespace y60 {
         );
 
         char myMessage[255];
-        strcpy(myMessage, (LPCSTR)lpMsgBuf);
+        strncpy(myMessage, (LPCSTR)lpMsgBuf, sizeof(myMessage)-1);
         LocalFree(lpMsgBuf);
+
         return string(myMessage);
     }
 
@@ -63,7 +57,7 @@ namespace y60 {
         _myProcessInfo.dwThreadId = GetCurrentThreadId();
     }
 
-    Task::Task(std::string theCommand, std::string thePath, bool theShowFlag) {
+    Task::Task(string theCommand, string thePath, bool theShowFlag) {
         DB(cerr << "Create task: " << theCommand << " in path: " << thePath << " state: " << (theShowFlag ? "shown":"hidden") << endl;)
 
         STARTUPINFO myStartupInfo =
@@ -73,10 +67,12 @@ namespace y60 {
             0, STARTF_USESHOWWINDOW, (theShowFlag ? SW_SHOWDEFAULT : SW_MINIMIZE),
             0, NULL, NULL, NULL, NULL
         };
+
         string myCWD(".");
         if (thePath.size() > 0) {
             myCWD = thePath;
         }
+
         bool myResult = CreateProcess(
             NULL, &theCommand[0],
             NULL, NULL, TRUE, 0,
@@ -117,7 +113,7 @@ namespace y60 {
     }   
 
     void
-    Task::addExternalWindow(std::string theWindowName) {
+    Task::addExternalWindow(string theWindowName) {
         HWND myHandle = FindWindow(0, theWindowName.c_str());
         if (myHandle) {
             _myExternalWindows.push_back(myHandle);
@@ -171,11 +167,8 @@ namespace y60 {
         if (myResult == WAIT_FAILED) {
             throw asl::Exception("Sorry, unknown error, while waiting for a task to take input.", PLUS_FILE_LINE);
         }
-        if (myResult == 0 ) {
-        	cout << "Alles super" << endl;
-        }
         if (myResult == WAIT_TIMEOUT ) {
-        	cout << "timeout reached" << endl;
+        	AC_ERROR << "Task::waitForInputIdle: timeout reached";
         }
         return (myResult == 0); // alles super
     }
@@ -197,7 +190,7 @@ namespace y60 {
                 }
             }
         }
-                                                        
+
         return myActiveWindow;
     }    
 
@@ -215,20 +208,20 @@ namespace y60 {
     }
 
     void 
-    Task::captureDesktop(std::string theFilename) {
+    Task::captureDesktop(string theFilename) {
         TaskWindow myDesktop(GetDesktopWindow());
         myDesktop.capture(theFilename);
     }
 
-    std::string
+    string
     Task::getActiveWindowName() const {
         return getWindowName(getActiveWindow());
     }
 
-    std::vector<TaskWindowPtr>
+    vector<TaskWindowPtr>
     Task::getWindows() const {
         // TODO: Recycle windows
-        std::vector<TaskWindowPtr> myWindows;
+        vector<TaskWindowPtr> myWindows;
         collectWindows();
         for (unsigned i = 0; i < _myTaskWindows.size(); ++i) {
             myWindows.push_back(TaskWindowPtr(new TaskWindow(_myTaskWindows[i])));

@@ -81,4 +81,3 @@ namespace y60 {
 }
 
 #endif
-

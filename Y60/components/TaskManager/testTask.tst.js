@@ -41,12 +41,17 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         }
         return myWindows;
     }
+
     function testApplication(theApplication, theWindowName) {
         print(">>>  Test Application: '" + theApplication);
+
+        var myWindowsPath = getFolderPath("WINDOWS");
+        print("Windows path=" + myWindowsPath);
+
         print("Open tasks");
         obj.myTask  = new Task(theApplication);
-        obj.myTask1 = new Task("C:/WINDOWS/notepad.exe", "C:/WINDOWS", false);
-        obj.myTask2 = new Task("C:/WINDOWS/notepad.exe", "C:/WINDOWS", false);
+        obj.myTask1 = new Task(myWindowsPath + "/notepad.exe", myWindowsPath, false);
+        obj.myTask2 = new Task(myWindowsPath + "/notepad.exe", myWindowsPath, false);
         msleep(TEST_SPEED);
 
         ENSURE('obj.myTask.windows.length > 0');
@@ -124,7 +129,7 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         msleep(TEST_SPEED);
 
         print("Create external window");
-        var myTask3 = new Task("C:/WINDOWS/notepad.exe");
+        var myTask3 = new Task(myWindowsPath + "/notepad.exe");
         msleep(TEST_SPEED);
         obj.myWindows = getTaskWindowsWithTimeout(myTask3, 2000);
         ENSURE('obj.myWindows.length > 0');        
@@ -162,9 +167,8 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         try {
-            testApplication("C:/WINDOWS/System32/calc.exe", "Rechner");
-            //testApplication("C:/WINDOWS/notepad.exe");
-            //testApplication("C:/Programme/Mozilla Firefox/firefox.exe -k http://himmel.artcom.de");
+            testApplication(getFolderPath("SYSTEM") + "/calc.exe", "Rechner");
+            //testApplication(getFolderPath("PROGRAM_FILES") + "/Mozilla Firefox/firefox.exe -k http://himmel.artcom.de");
             //testApplication("C:/Programme/Internet Explorer/iexplore.exe http://himmel.artcom.de");
         } catch (ex) {
             FAILURE("Exception caught");

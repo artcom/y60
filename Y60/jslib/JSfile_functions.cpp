@@ -278,8 +278,26 @@ GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 }
 
 static JSBool
+CopyFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Copies the source file to the destination");
+    DOC_PARAM("theSource", "The source file path", DOC_TYPE_STRING);
+    DOC_PARAM("theTarget", "The destination file path", DOC_TYPE_STRING);
+    DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        std::string mySource;
+        std::string myTarget;
+        convertFrom(cx, argv[0], mySource);
+        convertFrom(cx, argv[1], myTarget);
+        *rval = as_jsval(cx, asl::copyFile(mySource, myTarget));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Moves the given file");
+    DOC_BEGIN("Moves the source file to the destination");
     DOC_PARAM("theSource", "The source file path", DOC_TYPE_STRING);
     DOC_PARAM("theTarget", "The destination file path", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
@@ -560,6 +578,7 @@ JSFileFunctions::Functions() {
         {"getDirectoryPart",       GetDirectoryPart, 1},
         {"getExtensionPart",       GetExtensionPart, 1},
         {"deleteFile",             DeleteFile,  1},
+        {"copyFile",               CopyFile,    2},
         {"moveFile",               MoveFile,    2},
         {"fileExists",             FileExists,  1},
         {"includePath",            IncludePath, 1},

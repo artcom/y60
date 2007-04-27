@@ -39,7 +39,7 @@
 
 #define DOC_RVAL(DESCRIPTION, TYPE) \
         reinterpret_cast<jslib::FunctionDescription*>(obj)->return_value = DESCRIPTION; \
-        reinterpret_cast<jslib::FunctionDescription*>(obj)->return_type = DocTypeDescription[TYPE];
+        reinterpret_cast<jslib::FunctionDescription*>(obj)->return_type = jslib::DocTypeDescription[TYPE];
 
 #define DOC_RESET \
         describeFunctionParameter(reinterpret_cast<jslib::FunctionDescription*>(obj), "", "", DOC_TYPE_INTERN, "");

@@ -1,6 +1,5 @@
 //============================================================================
-//
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,17 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: ProcFunctionsPlugIn.cpp,v $
-//
-//     $Author: valentin $
-//
-//   $Revision: 1.0 $
-//
-// Description:
-//
-//=============================================================================
-
 
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
