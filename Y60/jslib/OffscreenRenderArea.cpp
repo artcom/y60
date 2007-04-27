@@ -58,14 +58,14 @@ void OffscreenRenderArea::initDisplay() {
 }
 
 void
-OffscreenRenderArea::activate() {
+OffscreenRenderArea::activate(unsigned theCubemapFace) {
     AC_TRACE << "OffscreenRenderArea::activate";
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::activate has no canvas / image to render... ignoring";
         return;
     }
-    y60::OffscreenBuffer::activate(myTexture, getMultisamples());
+    y60::OffscreenBuffer::activate(myTexture, getMultisamples(), theCubemapFace);
 }
 
 void
@@ -80,7 +80,7 @@ OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
 }
 
 void
-OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
+OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemapFace) {
     AC_TRACE << "OffscreenRenderArea::renderToCanvas copyToImage=" << theCopyToImageFlag;
     MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
 
@@ -95,7 +95,7 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
         _myScene->updateAllModified();
     }
 
-    activate(); //y60::OffscreenBuffer::activate(myTexture);
+    activate(theCubemapFace); //y60::OffscreenBuffer::activate(myTexture);
     clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     {

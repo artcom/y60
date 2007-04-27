@@ -41,13 +41,20 @@ renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_END;
     
     try {
-        ensureParamCount(argc, 0, 1);
+        ensureParamCount(argc, 0, 2);
 
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
         if (argc > 0) {
             bool myCopyToImageFlag;
             convertFrom(cx, argv[0], myCopyToImageFlag);
+            if (argc > 1) {
+                unsigned myCubemapFace;
+                convertFrom(cx, argv[1], myCubemapFace);
+                myNative->renderToCanvas(myCopyToImageFlag, myCubemapFace);
+                return JS_TRUE;
+            }
             myNative->renderToCanvas(myCopyToImageFlag);
         } else {
             myNative->renderToCanvas();
@@ -116,11 +123,26 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 static JSBool
 activate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Activate as render target.");
+    DOC_PARAM_OPT("theCubemapFace", 
+                  "The cubemap face index. To fill a dynamic cubemap, call activate and render one time for each face.", 
+                  DOC_TYPE_INTEGER, 0);
     DOC_END;
+    ensureParamCount(argc, 0, 1);
     try {
         OffscreenRenderArea * mySelf;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        mySelf->activate();
+        
+        if (argc == 0) {
+            mySelf->activate();
+            return JS_TRUE;
+        }
+        
+        unsigned myCubemapFace;
+        if (!convertFrom(cx, argv[0], myCubemapFace)) {
+            JS_ReportError(cx, "OffscreenRenderArea::activate(): argument #0 must be an unsigned int.");
+            return JS_FALSE;
+        }
+        mySelf->activate(myCubemapFace);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -156,7 +178,7 @@ JSOffscreenRenderArea::Functions() {
         {"setWidth",             setWidth,             1},
         {"setHeight",            setHeight,            1},
         {"downloadFromViewport", downloadFromViewport, 1},
-        {"activate",             activate,             0},
+        {"activate",             activate,             1},
         {"deactivate",           deactivate,           1},
         {0}
     };

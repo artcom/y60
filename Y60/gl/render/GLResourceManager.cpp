@@ -24,14 +24,6 @@ using namespace asl;
 
 namespace y60 {
     const unsigned int CUBEMAP_SIDES = 6;
-    const GLenum ourCubeMapFaces[] = {
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB,  /// <behind
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB,  /// <right
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB,  /// <front
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB,  /// <left
-        GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB,  /// <top
-        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB,  /// <bottom
-    };
 
     int
     GLResourceManager::getMaxTextureSize(int theDimensions) const {
@@ -572,17 +564,16 @@ namespace y60 {
 
             // load texture
             if (myPixelEncoding.compressedFlag) {
-                glCompressedTexImage2DARB(ourCubeMapFaces[i], 0,
+                glCompressedTexImage2DARB(asGLCubemapFace(i), 0,
                                           myPixelEncoding.internalformat,
                                           myTileWidth, myTileHeight, 0,
                                           myTileSize, myTile);
             } else {
-                glTexImage2D(ourCubeMapFaces[i], 0,
+                glTexImage2D(asGLCubemapFace(i), 0,
                              myPixelEncoding.internalformat,
                              myTileWidth, myTileHeight, 0,
                              myPixelEncoding.externalformat,
                              myPixelEncoding.pixeltype, myTile);
-
             }
             CHECK_OGL_ERROR;
         }
@@ -633,13 +624,13 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             if (myPixelEncoding.compressedFlag) {
-                glCompressedTexSubImage2DARB(ourCubeMapFaces[i], 0,
+                glCompressedTexSubImage2DARB(asGLCubemapFace(i), 0,
                         0, 0,
                         myTileWidth, myTileHeight,
                         myPixelEncoding.externalformat,
                         myTileSize, myTile);
             } else {
-                glTexSubImage2D(ourCubeMapFaces[i], 0,
+                glTexSubImage2D(asGLCubemapFace(i), 0,
                         0, 0,
                         myTileWidth, myTileHeight,
                         myPixelEncoding.externalformat,

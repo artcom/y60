@@ -415,6 +415,16 @@ namespace y60 {
         ImageTypeEnum_MAX
     };
 
+    enum CubemapFacesEnum {
+        CUBEMAP_BEHIND,
+        CUBEMAP_RIGHT,
+        CUBEMAP_FRONT,
+        CUBEMAP_LEFT,
+        CUBEMAP_TOP,
+        CUBEMAP_BOTTOM
+    };
+
+
     static const char * ImageTypeStrings[] = {
         IMAGE_TYPE_SINGLE,
         IMAGE_TYPE_CUBEMAP,

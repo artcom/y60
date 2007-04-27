@@ -13,6 +13,7 @@
 #include "PixelEncodingInfo.h"
 
 #include <y60/Image.h>
+#include <y60/GLResourceManager.h>
 #include <asl/Logger.h>
 #include <asl/numeric_functions.h>
 
@@ -97,10 +98,10 @@ void OffscreenBuffer::setUseFBO(bool theUseFlag)
 }
 
 
-void OffscreenBuffer::activate(ImagePtr theImage, unsigned theSamples)
+void OffscreenBuffer::activate(ImagePtr theImage, unsigned theSamples, unsigned theCubmapFace)
 {
     if (_myUseFBO) {
-        bindOffscreenFrameBuffer(theImage, theSamples);
+        bindOffscreenFrameBuffer(theImage, theSamples, theCubmapFace);
     }
 }
 
@@ -206,7 +207,7 @@ void OffscreenBuffer::reset()
 }
 
 
-void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSamples)
+void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSamples, unsigned theCubemapFace)
 {
 #ifdef GL_EXT_framebuffer_object
     // rebind texture if target image has changed
@@ -238,7 +239,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             theSamples = 0;
         }
         if (theSamples >= 1) {
-
+            AC_PRINT << "multisample";
             /*
              * setup multisample framebuffer
              */
@@ -250,12 +251,10 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             // color buffer
             glGenRenderbuffersEXT(1, &_myColorBuffer[1]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
-//            theImage->getNode().getAttribute(TEXTURE_MIN_FILTER_ATTRIB)->nodeValue("nearest");
-//            theImage->getNode().getAttribute(TEXTURE_MAG_FILTER_ATTRIB)->nodeValue("nearest");
             TextureInternalFormat myImageFormat = theImage->getInternalEncoding();
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
-                    theSamples, asGLTextureInternalFormat(myImageFormat),
-                    myWidth, myHeight);
+                                                theSamples, asGLTextureInternalFormat(myImageFormat),
+                                                myWidth, myHeight);
             checkOGLError(PLUS_FILE_LINE);
 
             // depth buffer
@@ -285,13 +284,32 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer setup RTT framebuffer, nodeVersion=" << _myImageNodeVersion << " textureID=" << _myColorBuffer[0];
         
         // framebuffer
+
         glGenFramebuffersEXT(1, &_myFrameBufferObject[0]);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+        checkOGLError(PLUS_FILE_LINE);
+
+        asl::Vector2i myTile = theImage->get<ImageTileTag>();
 
         // color buffer
-        glBindTexture(GL_TEXTURE_2D, _myColorBuffer[0]);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                GL_TEXTURE_2D, _myColorBuffer[0], 0);
+        switch (theImage->getType()) {
+            case SINGLE:
+                AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer: attaching 2D texture";
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                          GL_TEXTURE_2D, _myColorBuffer[0], 0);
+                checkOGLError(PLUS_FILE_LINE);
+                break;
+            case CUBEMAP:
+                attachCubemapFace(theCubemapFace);
+                // for depth buffer (see below) the face dimensions are needed
+                // and not the dimension of the whole cubemap
+                myWidth = theImage->get<ImageWidthTag>() / myTile[0];
+                myHeight = theImage->get<ImageHeightTag>() / myTile[1];
+                break;
+            default:
+                throw TextureException(std::string("Unknown texture type '")+
+                        theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
+        }
         checkOGLError(PLUS_FILE_LINE);
 
         if (theSamples == 0) {
@@ -299,9 +317,8 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             glGenRenderbuffersEXT(1, &_myDepthBuffer[0]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
             glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 
-                    myWidth, myHeight);
+                                     myWidth, myHeight);
             checkOGLError(PLUS_FILE_LINE);
-
             glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
                     GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
             checkOGLError(PLUS_FILE_LINE);
@@ -309,7 +326,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
 
         checkFramebufferStatus();
     } else {
-
         /*
          * bind FBO
          */
@@ -318,6 +334,9 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
         } else {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
+            if (theImage->getType() == CUBEMAP) {
+                attachCubemapFace(theCubemapFace);
+            }
         }
     }
 #else
@@ -325,4 +344,13 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
 #endif
 }
 
+    void OffscreenBuffer::attachCubemapFace(unsigned theCubemapFace) {
+        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer: attaching cubemap face " << theCubemapFace;
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                  asGLCubemapFace(theCubemapFace),
+                                  _myColorBuffer[0], 0);
+        checkOGLError(PLUS_FILE_LINE);
+    }
+
 }
+

@@ -10,7 +10,8 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas, theUseFBOFlag, theMultisamples) {
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, 
+                           theCanvas, theUseFBOFlag, theMultisamples) {
     var self = this;
     
     self.overlays getter = function() {
@@ -24,7 +25,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
     self.underlays getter = function() {
         if (!_myViewport.childNode("underlays")) {
             var myNode = new Node("<underlays/>");
-            _myViewport.appendChild(myUnderlayNode.firstChild);
+            _myViewport.appendChild(myNode.firstChild);
         }
         return _myViewport.childNode("underlays"); 
     }
@@ -61,11 +62,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         self.image = theImage;
         _myCanvas.target = self.image.id;
 
-        // Flip vertically since framebuffer content is upside-down
-        var myMirrorMatrix = new Matrix4f;
-        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-        self.image.matrix.makeIdentity();
-        self.image.matrix.postMultiply(myMirrorMatrix);
+        // Flip vertically since framebuffer content is upsid e-down
+        if (!theUseFBOFlag) {
+            var myMirrorMatrix = new Matrix4f;
+            myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+            self.image.matrix.makeIdentity();
+            self.image.matrix.postMultiply(myMirrorMatrix);
+        }
     }
 
     self.setBody = function(theNode) {
@@ -77,9 +80,12 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         _myHiddenNodes.push(theNode);
     }
 
-    self.render = function(theReadbackFlag) {
+    self.render = function(theReadbackFlag, theCubemapFace) {
         if (theReadbackFlag == undefined) {
             theReadbackFlag = false;
+        }
+        if (theCubemapFace == undefined) {
+            theCubemapFace = 0;
         }
 
         if (_myOffscreenNodes.length == 1 && _myOffscreenNodes[0].nodeName == "world") {
@@ -98,7 +104,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
             }
 
             offscreenVisible(true);
-            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag || _myScreenshotName);
+            _myOffscreenRenderArea.renderToCanvas(theReadbackFlag || _myScreenshotName, theCubemapFace);
             offscreenVisible(false);
 
             for (var i = 0; i < myVisibleNodes.length; ++i) {
@@ -107,7 +113,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         }
 
         if (theReadbackFlag || _myScreenshotName) {
-            var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id+".png";
+            var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id + "face" + theCubemapFace +".png";
             
             saveImageFiltered(self.image, myFilename, ["flip"], [[]]);
             _myScreenshotName = null;
@@ -155,9 +161,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanv
         self.image.name = "OffscreenBuffer_Image";
 
         // Flip vertically since framebuffer content is upside-down
-        var myMirrorMatrix = new Matrix4f;
-        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-        self.image.matrix.postMultiply(myMirrorMatrix);  
+        if (!theUseFBOFlag) {
+            var myMirrorMatrix = new Matrix4f;
+            myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+            self.image.matrix.postMultiply(myMirrorMatrix);  
+        }
 
         // Setup canvas and viewport
         if (theCanvas == undefined) {

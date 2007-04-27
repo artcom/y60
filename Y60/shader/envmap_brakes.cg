@@ -60,6 +60,9 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
+#ifdef YFLIP
+    OUT.reflectVector.y = -OUT.reflectVector.y; // needed for dynamic cubemaps
+#endif
     OUT.reflectionFactor = reflectivity;
 
 #ifdef PAINT

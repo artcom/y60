@@ -244,6 +244,29 @@ namespace y60 {
         return GLenum(0);
     }
 
+    DEFINE_EXCEPTION(GlCubemapIndexOutOfRange, asl::Exception);
+    GLenum
+    asGLCubemapFace(unsigned theFace) {
+        switch (theFace) {
+            case CUBEMAP_BEHIND: 
+                return GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
+            case CUBEMAP_RIGHT:
+                return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
+            case CUBEMAP_FRONT:
+                return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB;
+            case CUBEMAP_LEFT:
+                return GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB;
+            case CUBEMAP_TOP:
+                return GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB;
+            case CUBEMAP_BOTTOM:
+                return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
+            default:
+                throw GlCubemapIndexOutOfRange("Cubemap face index must be within 0 <= i <= 5 !", PLUS_FILE_LINE);
+        }
+        return GLenum(0);
+    };
+
+
     DEFINE_EXCEPTION(GLTextureUnknownInternalFormat, asl::Exception);
 
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat) {

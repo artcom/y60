@@ -47,7 +47,7 @@ namespace jslib {
              * the underlying raster value is ignored
              * else the texture is copied into the raster.
              */
-            void renderToCanvas(bool theCopyToImageFlag = false); 
+            void renderToCanvas(bool theCopyToImageFlag = false, unsigned theCubemapFace = 0); 
 
             /**
              * sets my canvas (calling base function)
@@ -95,7 +95,7 @@ namespace jslib {
             //TODO make some stuff from AbstractRenderWindow private
 
             // activates the offscreen buffer as render target
-            void activate(); 
+            void activate(unsigned theCubemapFace = 0); 
             void deactivate(bool theCopyToImageFlag = false);
 
         protected:

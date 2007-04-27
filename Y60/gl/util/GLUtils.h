@@ -357,6 +357,7 @@ namespace y60 {
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);
     GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
+    GLenum asGLCubemapFace(unsigned theFace);
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
 

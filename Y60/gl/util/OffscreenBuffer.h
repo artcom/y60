@@ -35,14 +35,14 @@ namespace y60 {
             * if necessary  
             */
             void activate(asl::Ptr<Image, dom::ThreadingModel> theImage,
-                          unsigned theSamples = 1); 
+                          unsigned theSamples = 1, unsigned theCubemapFace = 0); 
 
             /**
             * deactivates the image as render target   
             * @param theCopyToImageFlag copy result to image raster.
             */
             void deactivate(asl::Ptr<Image, dom::ThreadingModel> theImage, 
-                    bool theCopyToImageFlag = false); 
+                            bool theCopyToImageFlag = false); 
 
         protected:
             /**
@@ -62,7 +62,8 @@ namespace y60 {
             void reset();
 
             void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture,
-                                          unsigned theSamples = 0);
+                                          unsigned theSamples = 0, unsigned theCubemapFace = 0);
+            void attachCubemapFace(unsigned theCubemapFace);
             
             bool     _myUseFBO;
             asl::Unsigned64 _myImageNodeVersion;
