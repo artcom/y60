@@ -383,7 +383,16 @@ namespace asl {
     }
 
     bool
-    moveFile(const std::string& theOldFileName, const std::string & theNewFileName) {
+    copyFile(const std::string & theOldFileName, const std::string & theNewFileName) {
+        asl::Block myContent;
+        if (!readFile(theOldFileName, myContent)) {
+            return false;
+        }
+        return writeFile(theNewFileName, myContent);
+    }
+
+    bool
+    moveFile(const std::string & theOldFileName, const std::string & theNewFileName) {
         Path myOldFileName(theOldFileName, UTF8);
         Path myNewFileName(theNewFileName, UTF8);
         LAST_ERROR_TYPE myError = 0;
@@ -567,15 +576,15 @@ namespace asl {
     }
 
     std::string 
-getCWD() {
+    getCWD() {
 #ifdef WIN32    
-    return std::string(_getcwd( NULL, 0 ));
+        return std::string(_getcwd( NULL, 0 ));
 #else
-    char myBuffer[1024];
-    getcwd( myBuffer, 1024);
-    return std::string(myBuffer);
+        char myBuffer[1024];
+        getcwd( myBuffer, 1024);
+        return std::string(myBuffer);
 #endif    
-}
+    }
 
 // TODO: deal with degenerate cases like "C:\" or "/" (root)
 std::string 

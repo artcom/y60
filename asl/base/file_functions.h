@@ -135,6 +135,7 @@ bool writeFile(const std::string& theFileName, const std::string & theContent);
 bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
 
 bool deleteFile(const std::string& theFileName);
+bool copyFile(const std::string& theOldFileName, const std::string & theNewFileName);
 bool moveFile(const std::string& theOldFileName, const std::string & theNewFileName);
 bool setLastModified(const std::string & theFilename, time_t theModificationDate);
 time_t getLastModified(const std::string & theFilename);

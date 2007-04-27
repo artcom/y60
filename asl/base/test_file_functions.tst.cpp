@@ -8,15 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSfile: test_file_functions.tst.cpp,v $
-//
-//   $Revision: 1.6 $
-//
-// Description: unit test for file functions
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "file_functions.h"
@@ -35,9 +26,9 @@ class file_functions_UnitTest : public UnitTest {
         void run() {
             const string testFileName = "file_functions_UnitTest.testoutput";
             const string testContent = "blafasel";
-            
+
             perform_putget(testFileName, testContent);
-            
+
             perform_putget(testFileName, 0);
             perform_putget(testFileName, 1);
             perform_putget(testFileName, 65536-1);
@@ -46,15 +37,18 @@ class file_functions_UnitTest : public UnitTest {
             perform_putget(testFileName, 2*65536-1);
             perform_putget(testFileName, 2*65536);
             perform_putget(testFileName, 2*65536+1);
-    
+
             perform_putget(testFileName, 20*65536-1);
             perform_putget(testFileName, 20*65536);
             perform_putget(testFileName, 20*65536+1);
-            
+
             perform_filename_func();
             perform_uri_func();
-         }
-        
+
+            perform_copy();
+            perform_move();
+        }
+
         void perform_uri_func() {
             ENSURE(getFilenamePart("http://www.artcom.de/foo/bar")=="bar");
             ENSURE(getFilenamePart("http://www.artcom.de/etc/")=="");
@@ -64,7 +58,7 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getDirectoryPart("http://www.artcom.de/etc/")=="/etc/");
             DPRINT(getDirectoryPart("http://www.artcom.de/passwd"));
             ENSURE(getDirectoryPart("http://www.artcom.de/passwd")=="/");
-            
+
             ENSURE(getExtension("http://www.artcom.de/index.html")=="html");
             ENSURE(getExtension("http://root:pass:www.artcom.de/index.html")=="html");
             ENSURE(getExtension("http://www.artcom.de/index")=="");
@@ -97,7 +91,6 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getDirectoryPart("/foo")=="/");
             ENSURE(getDirectoryPart("passwd")=="./");
             ENSURE(getDirectoryPart("C:/WinNT/sux")=="C:/WinNT/");
-
 
             ENSURE(getParentDirectory("C:/WinNT/sux/")=="C:/WinNT/");
             ENSURE(getParentDirectory("C:/WinNT/sux")=="C:/WinNT/");
@@ -156,7 +149,7 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(fileExists(testFileName));
             ENSURE(getFileSize(testFileName) == testContent.size());
         }
-         void perform_putget_binary(const string & testFileName, int contentSize) {
+        void perform_putget_binary(const string & testFileName, int contentSize) {
             DPRINT2("Test with content of size", contentSize);
             Block largeTestContent;
             largeTestContent.resize(contentSize);
@@ -165,7 +158,7 @@ class file_functions_UnitTest : public UnitTest {
             }
             perform_putget(testFileName, largeTestContent); 
         }
-       void perform_putget(const string & testFileName, const asl::ResizeableBlock & testContent) {
+        void perform_putget(const string & testFileName, const asl::ResizeableBlock & testContent) {
             ENSURE(writeFile(testFileName,testContent));
             asl::Block fromFile;
             ENSURE(readFile(testFileName,fromFile));
@@ -174,95 +167,130 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(fileExists(testFileName));
             ENSURE(getFileSize(testFileName) == testContent.size());
         }
+
+        void perform_copy() {
+            DPRINT("perform_copy");
+
+            std::string mySource = "source.txt";
+            std::string myDestination = "destination.txt";
+
+            writeFile(mySource, "test_file_functions.txt.cpp - perform_copy - Test Data");
+            deleteFile(myDestination);
+
+            ENSURE(copyFile(mySource, myDestination));
+            ENSURE(fileExists(mySource) && fileExists(myDestination));
+            ENSURE(getFileSize(mySource) == getFileSize(myDestination));
+
+            ENSURE(deleteFile(mySource));
+            ENSURE(deleteFile(myDestination));
+        }
+
+        void perform_move() {
+            DPRINT("perform_move");
+
+            std::string mySource = "source.txt";
+            std::string myDestination = "destination.txt";
+
+            writeFile(mySource, "test_file_functions.txt.cpp - perform_copy - Test Data");
+            int mySourceSize = getFileSize(mySource);
+            deleteFile(myDestination);
+
+            ENSURE(moveFile(mySource, myDestination));
+            ENSURE(fileExists(mySource) == false && fileExists(myDestination));
+            ENSURE(getFileSize(myDestination) == mySourceSize);
+
+            ENSURE(deleteFile(mySource) == false);
+            ENSURE(deleteFile(myDestination));
+        }
 };
 
 class DirectoryTest : public UnitTest {
-public:
-    DirectoryTest() : UnitTest("DirectoryTest") {  }
-    void run() {
-        DIR * myDirHandle = opendir(".");
-        struct dirent *dir_entry;
+    public:
+        DirectoryTest() : UnitTest("DirectoryTest") {  }
+        void run() {
+            DIR * myDirHandle = opendir(".");
+            struct dirent *dir_entry;
 
-        ENSURE(myDirHandle);
-        bool myFoundUpDirFlag = false;
-        bool myFoundCurDirFlag = false;
+            ENSURE(myDirHandle);
+            bool myFoundUpDirFlag = false;
+            bool myFoundCurDirFlag = false;
 
-        while((dir_entry = readdir(myDirHandle)) != NULL) {
-            if (std::string("..") == dir_entry->d_name) {
-                myFoundUpDirFlag = true;
+            while((dir_entry = readdir(myDirHandle)) != NULL) {
+                if (std::string("..") == dir_entry->d_name) {
+                    myFoundUpDirFlag = true;
+                }
+                if (std::string(".") == dir_entry->d_name) {
+                    myFoundCurDirFlag = true;
+                }
+
+                DPRINT(dir_entry->d_name);
             }
-            if (std::string(".") == dir_entry->d_name) {
-                myFoundCurDirFlag = true;
+            ENSURE_MSG(myFoundUpDirFlag, " found up dir entry");
+            ENSURE_MSG(myFoundCurDirFlag, " found current dir entry");
+            closedir(myDirHandle);
+
+            // use getdir utility function instead
+
+            vector<string> myDirEntries = getDirectoryEntries(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
+            std::sort(myDirEntries.begin(), myDirEntries.end());
+
+            ENSURE(myDirEntries.size() == 5);
+            //        ENSURE_MSG(myDirEntries[0] == ".svn "found dir .svn, ;-)");
+            ENSURE_MSG(myDirEntries[1] == "a" , "found dir a");
+            ENSURE_MSG(myDirEntries[2] == "b" , "found dir b");
+            ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
+            ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
+
+            ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
+            ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
+
+            ENSURE(isDirectory("."));
+            ENSURE(isDirectory("../../testdir/"));
+            ENSURE(!isDirectory("nonexistingdir"));
+            ENSURE(!isDirectory("../../testdir/a"));
+            //        ENSURE(isDirectory("../../testdir/.svn"));
+
+            std::string myAppDir = getAppDirectory();
+            DPRINT(myAppDir);
+            ENSURE(isDirectory(myAppDir));
+
+            // last modified stuff
+            std::string myFile = "../../dates.tst";
+            writeFile(myFile, "foo");
+
+            time_t myZeroTime = 0;
+            tm myTimeStruct = *localtime(&myZeroTime);
+            {
+                myTimeStruct.tm_year = 100;
+                myTimeStruct.tm_mon = 1;
+
+                time_t myTime = mktime(&myTimeStruct);  
+                setLastModified(myFile, myTime); 
+
+                DPRINT(myTime);
+                ENSURE_EQUAL(myTime, getLastModified(myFile));
             }
+            {
+                myTimeStruct.tm_year = 100;
+                myTimeStruct.tm_mon = 7;
 
-            DPRINT(dir_entry->d_name);
+                time_t myTime = mktime(&myTimeStruct);  
+                setLastModified(myFile, myTime); 
+
+                DPRINT(myTime);
+                ENSURE_EQUAL(myTime, getLastModified(myFile));
+            }
         }
-        ENSURE_MSG(myFoundUpDirFlag, " found up dir entry");
-        ENSURE_MSG(myFoundCurDirFlag, " found current dir entry");
-        closedir(myDirHandle);
-
-        // use getdir utility function instead
-
-        vector<string> myDirEntries = getDirectoryEntries(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
-        std::sort(myDirEntries.begin(), myDirEntries.end());
-
-        ENSURE(myDirEntries.size() == 5);
-//        ENSURE_MSG(myDirEntries[0] == ".svn "found dir .svn, ;-)");
-        ENSURE_MSG(myDirEntries[1] == "a" , "found dir a");
-        ENSURE_MSG(myDirEntries[2] == "b" , "found dir b");
-        ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
-        ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
-
-        ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
-        ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
-
-        ENSURE(isDirectory("."));
-        ENSURE(isDirectory("../../testdir/"));
-        ENSURE(!isDirectory("nonexistingdir"));
-        ENSURE(!isDirectory("../../testdir/a"));
-//        ENSURE(isDirectory("../../testdir/.svn"));
-
-		std::string myAppDir = getAppDirectory();
-		DPRINT(myAppDir);
-        ENSURE(isDirectory(myAppDir));
-
-        // last modified stuff
-        std::string myFile = "../../dates.tst";
-        writeFile(myFile, "foo");
-        
-        time_t myZeroTime = 0;
-        tm myTimeStruct = *localtime(&myZeroTime);
-        {
-            myTimeStruct.tm_year = 100;
-            myTimeStruct.tm_mon = 1;
-
-            time_t myTime = mktime(&myTimeStruct);  
-            setLastModified(myFile, myTime); 
-
-            DPRINT(myTime);
-            ENSURE_EQUAL(myTime, getLastModified(myFile));
-        }
-        {
-            myTimeStruct.tm_year = 100;
-            myTimeStruct.tm_mon = 7;
-
-            time_t myTime = mktime(&myTimeStruct);  
-            setLastModified(myFile, myTime); 
-
-            DPRINT(myTime);
-            ENSURE_EQUAL(myTime, getLastModified(myFile));
-        }
-    }
 };
 
 class MyTestSuite : public UnitTestSuite {
-public:
-    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
-    void setup() {
-        UnitTestSuite::setup(); // called to print a launch message
-        addTest(new file_functions_UnitTest);
-        addTest(new DirectoryTest);
-   }
+    public:
+        MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
+        void setup() {
+            UnitTestSuite::setup(); // called to print a launch message
+            addTest(new file_functions_UnitTest);
+            addTest(new DirectoryTest);
+        }
 };
 
 
@@ -273,7 +301,7 @@ int main(int argc, char *argv[]) {
     mySuite.run();
 
     cerr << ">> Finished test suite '" << argv[0] << "'"
-         << ", return status = " << mySuite.returnStatus() << endl;
+        << ", return status = " << mySuite.returnStatus() << endl;
 
     return mySuite.returnStatus();
 
