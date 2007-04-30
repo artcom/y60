@@ -13,7 +13,7 @@
 #include "PixelEncodingInfo.h"
 
 #include <y60/Image.h>
-#include <y60/GLResourceManager.h>
+#include <y60/Texture.h>
 #include <asl/Logger.h>
 #include <asl/numeric_functions.h>
 
