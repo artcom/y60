@@ -63,12 +63,12 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         _myCanvas.target = self.image.id;
 
         // Flip vertically since framebuffer content is upsid e-down
-        if (!theUseFBOFlag) {
+        //if (!theUseFBOFlag) {
             var myMirrorMatrix = new Matrix4f;
             myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
             self.image.matrix.makeIdentity();
             self.image.matrix.postMultiply(myMirrorMatrix);
-        }
+        //}
     }
 
     self.setBody = function(theNode) {
@@ -133,7 +133,9 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     }
 
     self.appendOverlay = function(theNode) {
-        //Logger.error("OffscreenRenderer.appendOverlay is deprecated, use obj.overlays.appendChild");
+        //Logger.error("OffscreenRenderer.appendOverlay is deprecated,
+        //use obj.overlays.appendChild");
+        //print("overlay " + self.overlays + " " + theNode);
         self.overlays.appendChild(theNode);
     }
 
@@ -161,11 +163,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         self.image.name = "OffscreenBuffer_Image";
 
         // Flip vertically since framebuffer content is upside-down
-        if (!theUseFBOFlag) {
+        //if (!theUseFBOFlag) {
             var myMirrorMatrix = new Matrix4f;
             myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
             self.image.matrix.postMultiply(myMirrorMatrix);  
-        }
+            //}
 
         // Setup canvas and viewport
         if (theCanvas == undefined) {
