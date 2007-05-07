@@ -112,6 +112,7 @@ namespace y60 {
         // Fourth step: Remove unused shapes
         AC_INFO << "  Removing unused shapes...";
         removeUnusedShapes();
+        _myShapes.clear();
         AC_INFO << "  optimizing done...";
     }
 
