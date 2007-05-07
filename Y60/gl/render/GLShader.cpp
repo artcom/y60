@@ -563,6 +563,7 @@ namespace y60 {
 
 
                         }
+                        // TODO: will this work if a material has more than one projective texture?
                         glMatrixMode( GL_MODELVIEW );
                         glPushMatrix();
                         glLoadIdentity();
@@ -593,11 +594,6 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_TRACE << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
-        DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
-        if (theMaterial.hasTexGen()) {
-            enableTextureProjection( theMaterial, theViewport, theCamera );
-        }
     }
 
     const ShaderFeatureSet &

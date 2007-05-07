@@ -384,12 +384,13 @@ MAKE_SCOPE_TIMER(switchMaterial);
             glPushMatrix();
         }
         glMatrixMode( GL_MODELVIEW );
-        if (myBodyHasChanged || myMaterialHasChanged) {
-            DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
-            //DBP2(START_TIMER(renderBodyPart_getShader));
-            IShaderPtr myShader = myMaterial.getShader();
-            //DBP2(STOP_TIMER(renderBodyPart_getShader));
-            if (myShader) {
+        
+        IShaderPtr myShader = myMaterial.getShader();
+        if (myShader) {
+            if (myMaterial.hasTexGen()) {
+                myShader->enableTextureProjection( myMaterial, theViewport, theCamera );
+            }
+            if (myBodyHasChanged || myMaterialHasChanged) {
                 DBP2(MAKE_SCOPE_TIMER(renderBodyPart_bindBodyParams));
                 myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
                 CHECK_OGL_ERROR;
