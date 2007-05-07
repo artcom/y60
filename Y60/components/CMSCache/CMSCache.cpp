@@ -46,6 +46,7 @@ CMSCache::CMSCache(const string & theLocalPath,
      _myVerboseFlag( false ),
      _myBackendType( theBackendType ),
      _myMaxRequestCount( 1 ),
+     _myCleanupFlag(false),
      _mySessionCookie(theSessionCookie)
 {
     _myReportNodeVersion = 0;
