@@ -50,9 +50,12 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
     }
 }
 
-function blurImage(theImageNode, theRadius) {
+function blurImage(theImageNode, theRadius, theSigma) {
     var mySize = getImageSize(theImageNode);
-    applyImageFilter(theImageNode, "gaussianblur", [theRadius, mySize.x, mySize.y]);
+    if( theSigma == null ) {
+        theSigma = 1.0;
+    }
+    applyImageFilter(theImageNode, "gaussianblur", [theRadius, mySize.x, mySize.y, theSigma]);
 }
 
 function getImageSize(theImage) {
