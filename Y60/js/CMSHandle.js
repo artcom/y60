@@ -214,8 +214,23 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     function setup() {
         _myConfigDoc = Node.createDocument();
-        _myConfigDoc.parseFile( _myConfigFile );
-        _myConfig = _myConfigDoc.childNode("cmsconfig");
+        _myConfigDoc.parseFile(_myConfigFile);
+        
+        if (_myConfigDoc.childNodesLength() > 1) {
+            var myDevelopmentSystem = (expandEnvironment("${PRO}")?true:false);
+            if (myDevelopmentSystem) {
+                _myConfig = getDescendantByAttribute(_myConfigDoc, "location", "artcom", true);
+                Logger.info("using local CMS Configuration -> location=\"artcom\"");
+            } else {
+                _myConfig = getDescendantByAttribute(_myConfigDoc, "location", "onSite", true);
+                Logger.info("using final CMS Configuration -> location=\"onSite\"");
+            } 
+        }
+        
+        if (!_myConfig) {
+            _myConfig = _myConfigDoc.childNode("cmsconfig");
+        }
+
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myCMSConfig = _myConfig.childNode("cmscache", 0);
 
