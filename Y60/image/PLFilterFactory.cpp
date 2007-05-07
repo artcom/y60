@@ -178,11 +178,11 @@ PaintLibFilterFactory::PaintLibFilterFactory() {
     _add("quantize",            new FilterFactory2<PLFilterQuantize,int,int>);
 
     _add("threshold",           new FilterFactory3<PLFilterThreshold,int,int,int>);
-    _add("gaussianblur",        new FilterFactory3<PLFilterGaussianBlur, double, int,int>);
     _add("resizegaussian",      new FilterFactory3<PLFilterResizeGaussian,int,int,double>);
     _add("resizehamming",       new FilterFactory3<PLFilterResizeHamming,int,int,double>);
     _add("intensity",           new FilterFactory3<PLFilterIntensity,double,PLBYTE,double>);
 
+    _add("gaussianblur",        new FilterFactory4<PLFilterGaussianBlur, double, int,int, double>);
     _add("crop",                new FilterFactory4<PLFilterCrop, int, int, int, int>);
 }
 

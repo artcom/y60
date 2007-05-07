@@ -27,26 +27,28 @@
 #include <paintlib/Filter/plfilter.h>
 
 #include <vector>
+#include <asl/Logger.h>
 class PLBmp;
 
 typedef std::vector<int> KernelVec;
 
 class PLFilterGaussianBlur : public PLFilter {
     public:
-        PLFilterGaussianBlur(double theRadius, unsigned theRealWidth, unsigned theRealHeight) :
-		   _myRadius(theRadius), _myRealWidth(theRealWidth), _myRealHeight(theRealHeight)
-		{
-			calcKernel();
-		}
-        virtual ~PLFilterGaussianBlur() {};
-        virtual void Apply(PLBmpBase * theSource, PLBmp * theDestination) const;
-
-    private:
-        void calcKernel() const;
+        PLFilterGaussianBlur(double theRadius, unsigned theRealWidth, unsigned theRealHeight, double theSigma=1.0) :
+            _myRadius(theRadius), _myRealWidth(theRealWidth), _myRealHeight(theRealHeight), _mySigma(theSigma)
+        {
+            calcKernel();
+        }
+    virtual ~PLFilterGaussianBlur() {};
+    virtual void Apply(PLBmpBase * theSource, PLBmp * theDestination) const;
     
-        mutable double _myRadius;
-        mutable int _myKernelWidth;
-        mutable KernelVec _myKernel;
+    private:
+    void calcKernel() const;
+    
+    mutable double _mySigma;
+    mutable double _myRadius;
+    mutable int _myKernelWidth;
+    mutable KernelVec _myKernel;
 		unsigned _myRealWidth;
 		unsigned _myRealHeight;
 };

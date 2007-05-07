@@ -130,10 +130,10 @@ namespace y60 {
             if (!myBlock) {
                 if (thePackageManager) {
                     throw ImageLoaderException(std::string("image file '") + myFilenames[i] + "' not found in " +
-                        thePackageManager->getSearchPath(), PLUS_FILE_LINE);
+                                               thePackageManager->getSearchPath(), PLUS_FILE_LINE);
                 } else {
                     throw ImageLoaderException(std::string("image file '") + myFilenames[i] + "' not found in " +
-                        "current directory.", PLUS_FILE_LINE);
+                                               "current directory.", PLUS_FILE_LINE);
                 }
             }
             myBlocks.push_back(myBlock);

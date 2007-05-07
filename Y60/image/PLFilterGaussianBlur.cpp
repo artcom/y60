@@ -93,7 +93,7 @@ void multAndStore(PLPixel8 & theResult, PLPixel8 * theSource, int theScale ) {
 template <class PIXELTYPE>
 void
 gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & theKernel, double theRadius, 
-			 unsigned theRealWidth, unsigned theRealHeight) {    
+			 unsigned theRealWidth, unsigned theRealHeight, double theSigma) {    
     int myIntRadius = int(ceil(double(theRadius)));
 
     unsigned mySrcHeight = theSource->GetHeight();
@@ -182,32 +182,32 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
 void
 PLFilterGaussianBlur::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     int myIntRadius = int(ceil(double(_myRadius)));
-	bool myRecalcKernelFlag = false;
-	if (theSource->GetWidth() <= myIntRadius*2) {
-		_myRadius = (theSource->GetWidth() / 2) -1;
-    	myIntRadius = int(ceil(double(_myRadius)));
-		myRecalcKernelFlag = true;
-	}
-	if (theSource->GetHeight() <= myIntRadius*2) {
-		_myRadius = (theSource->GetHeight() / 2) -1;
-		myRecalcKernelFlag = true;
-	}
-	if (myRecalcKernelFlag) {
+    bool myRecalcKernelFlag = false;
+    if (theSource->GetWidth() <= myIntRadius*2) {
+        _myRadius = (theSource->GetWidth() / 2) -1;
+        myIntRadius = int(ceil(double(_myRadius)));
+        myRecalcKernelFlag = true;
+    }
+    if (theSource->GetHeight() <= myIntRadius*2) {
+        _myRadius = (theSource->GetHeight() / 2) -1;
+        myRecalcKernelFlag = true;
+    }
+    if (myRecalcKernelFlag) {
 		AC_WARNING << "Radius to high -> set to " << _myRadius << " and recalculate kernel";
 		calcKernel();
-	}
+    }
 	switch (theSource->GetBitsPerPixel()) {
         case 32:
-            gaussianblur<PLPixel32>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight);
+            gaussianblur<PLPixel32>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         case 24:
-            gaussianblur<PLPixel24>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight);
+            gaussianblur<PLPixel24>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         case 16:
-            gaussianblur<PLPixel16>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight);
+            gaussianblur<PLPixel16>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         case 8:
-			gaussianblur<PLPixel8>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight);
+			gaussianblur<PLPixel8>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         default:
             throw (PLTextException (PL_ERRFORMAT_NOT_SUPPORTED, "Unsupported."));
@@ -215,17 +215,25 @@ PLFilterGaussianBlur::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
         
 }
 
+
 void PLFilterGaussianBlur::calcKernel() const
 {
-    int myIntRadius = int(ceil(double(_myRadius)));    
+    int myIntRadius = int(ceil(double(_myRadius)));
+    double mySigma = _mySigma;
+    double mySigma22 = 2*mySigma*mySigma;
+    double mySigmaPi2 = 2*PI*mySigma;
+    double mySqrtSigmaPi = sqrt(mySigmaPi2);
     _myKernelWidth = myIntRadius*2+1;
     std::vector<double> myFloatKernel;
     myFloatKernel.resize(_myKernelWidth);
-	_myKernel.clear();
+    _myKernel.clear();
     _myKernel.resize(_myKernelWidth);
     double mySum = 0;
     for (int i=0; i<= myIntRadius; ++i) {
-        myFloatKernel[myIntRadius+i] = exp(-i*double(i/_myRadius)-1)/sqrt(2*PI);
+        
+        // triangle kernel -- myFloatKernel[myIntRadius+i] = (0.5+0.5*i/myIntRadius)/(0.75*myIntRadius); // exp(-i*double(i/_myRadius)-1)/sqrt(2*PI);
+        // original gauus without sigma --  myFloatKernel[myIntRadius+i] = exp(-i*double(i/_myRadius)-1)/sqrt(2*PI);
+        myFloatKernel[myIntRadius+i] = exp((-i*double(i/_myRadius)-1)/mySigma22)/mySqrtSigmaPi;
         myFloatKernel[myIntRadius-i] = myFloatKernel[myIntRadius+i];
         mySum += myFloatKernel[myIntRadius+i];
         if (i != 0) {
@@ -239,4 +247,5 @@ void PLFilterGaussianBlur::calcKernel() const
     }
     int myDiff = 256 - myKernelSum;
     _myKernel[myIntRadius] += myDiff;
+
 }
