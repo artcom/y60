@@ -78,6 +78,9 @@ namespace y60 {
                                         const Body & theBody,
                                         const Camera & theCamera) = 0;
             virtual void bindOverlayParams(const MaterialBase & theMaterial) = 0;
+            virtual void enableTextureProjection(const MaterialBase & theMaterial,
+                                         const Viewport & theViewport,
+                                         const Camera & theCamera) = 0;
     };
     typedef asl::Ptr<IShader, dom::ThreadingModel> IShaderPtr;
 
