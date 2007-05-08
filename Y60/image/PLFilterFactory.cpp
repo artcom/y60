@@ -49,6 +49,8 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
+namespace y60 {
+
 template<class T>
 class FilterFactory0 :
     public IPaintLibFilterFactory
@@ -141,7 +143,7 @@ private:
     PLFilterRotate::AngleType _myAngleType;
 };
 
-Ptr<PLFilter> PaintLibFilterFactory :: createFilter(
+asl::Ptr<PLFilter> PaintLibFilterFactory :: createFilter(
     const string & theFilterName,
     const VectorOfFloat & theParameters
 ) {
@@ -149,7 +151,7 @@ Ptr<PLFilter> PaintLibFilterFactory :: createFilter(
     if (iter != _myFactories.end()) {
         return (iter->second)->createFilter(theParameters);
     }
-    return Ptr<PLFilter>(0);
+    return asl::Ptr<PLFilter>(0);
 }
 
 void PaintLibFilterFactory :: addFilterFactory(
@@ -184,5 +186,7 @@ PaintLibFilterFactory::PaintLibFilterFactory() {
 
     _add("gaussianblur",        new FilterFactory4<PLFilterGaussianBlur, double, int,int, double>);
     _add("crop",                new FilterFactory4<PLFilterCrop, int, int, int, int>);
+}
+
 }
 
