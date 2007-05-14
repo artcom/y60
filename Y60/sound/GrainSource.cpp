@@ -34,6 +34,7 @@ GrainSource::GrainSource(const std::string& theName,
     _myGrainPositionJitter(0),
     _myRatio(1.),
     _myRatioJitter(0.),
+    _myAbsoluteFrames(0),
     _myGrainOffset(0),
     _myLastBuffersize(0),
     _myAudioDataFrames(0)
@@ -128,7 +129,8 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         _myGrainOffset += myRateFrames; // proceed to next grain
     }
     //    AC_TRACE << "GrainSource::deliverData: applying volume fader";
-    _myVolumeFader->apply(theBuffer, 0);
+    _myVolumeFader->apply(theBuffer, _myAbsoluteFrames);
+    _myAbsoluteFrames += myNumFrames;
 }
 
 
@@ -278,6 +280,12 @@ float GrainSource::getTransposition() const {
 void GrainSource::setVolume(float theVolume) {
     AutoLocker<ThreadLock> myLocker(_myLock);
     _myVolumeFader->setVolume(theVolume,0);
+}
+
+void GrainSource::fadeToVolume(float theVolume, float theTime) {
+    ASSURE(theVolume <= 1.0);
+    AutoLocker<ThreadLock> myLocker(_myLock);
+    _myVolumeFader->setVolume(theVolume, unsigned(theTime*getSampleRate()));
 }
 
 float GrainSource::getVolume() const {

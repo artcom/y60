@@ -66,12 +66,22 @@ namespace jslib {
         return JS_TRUE;
     }
 
+    static JSBool
+    fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Fading to a specified volume over a given duration.");
+        DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
+        DOC_PARAM("theDuration", "", DOC_TYPE_FLOAT);
+        DOC_END;
+        return Method<JSGrainSource::NATIVE>::call(&JSGrainSource::NATIVE::fadeToVolume,cx,obj,argc,argv,rval);
+    }
+
     JSFunctionSpec * 
     JSGrainSource::Functions() {
         static JSFunctionSpec myFunctions[] = {
             // name                  native            nargs
             {"enable",               enable,           0},
             {"disable",              disable,          0},
+            {"fadeToVolume",         fadeToVolume,     2},
             {"loadSoundFile",        loadSoundFile,    1},
             {0}
         };

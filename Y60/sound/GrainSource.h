@@ -82,6 +82,7 @@ namespace y60 {
         float getRatioJitter() const;
 
         void setVolume(float theVolume);
+        void fadeToVolume(float theVolume, float theTime);
         float getVolume() const;
 
     private:
@@ -99,6 +100,8 @@ namespace y60 {
         float    _myRatio;                  // transposition ratio
         float    _myRatioJitter;    
         // XXXX panning stuff
+
+        asl::Unsigned64 _myAbsoluteFrames;
         
         // some effect(-functors) to operate on the audio buffers
         asl::VolumeFaderPtr    _myVolumeFader;
