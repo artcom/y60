@@ -123,6 +123,10 @@ NagiosPlugin::onSetProperty(const std::string & thePropertyName,
 {
     if (thePropertyName == "port") {
         _myPort = thePropertyValue.get<asl::Unsigned16>();
+        if (_myPort == 0 && _myStatusServer) {
+            AC_INFO << "stopping nagios plugin";
+            _myStatusServer->stop();
+        }
     } else if (thePropertyName == "timeout") {
         StatusServer::writeFrameTimeout(thePropertyValue.get<asl::Signed32>());
     } else {
