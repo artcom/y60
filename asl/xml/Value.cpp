@@ -9,16 +9,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // Parts of the code (C) 2000 Pavel Mayer, written 22.-31.12.2000
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSfile: Value.cpp,v $
-//
-//   $Revision: 1.7 $
-//
-// Description: tiny fast XML-Parser and DOM
-//
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "Value.h"
