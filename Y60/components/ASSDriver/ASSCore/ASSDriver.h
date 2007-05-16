@@ -24,6 +24,7 @@
 #include <y60/GenericEvent.h>
 
 #include <iostream>
+#include <deque>
 
 namespace y60 {
 
@@ -50,12 +51,91 @@ struct RasterHandle {
     RasterPtr raster;
 };
 
+#define MAX_HISTORY_LENGTH 5
+
+struct Cursor {
+    Cursor(const asl::Vector2f & thePos, const asl::Box2f & theBox) :
+            position( thePos ), 
+            roi( theBox),
+            previousSum(0.0),
+            firstDerivative(0.0)
+    {
+        previousRoi.makeEmpty();
+    }
+
+    float getAverageFirstDerivative() const {
+        if ( ! firstDerivativeHistory.empty()) {
+            float mySum = 0.0;
+            for (unsigned i = 0; i < firstDerivativeHistory.size(); ++i) {
+                mySum += fabs(firstDerivativeHistory[i]) / (firstDerivativeHistory.size() - i);
+            }
+            return mySum / firstDerivativeHistory.size();
+        }
+        return 0.0;
+    }
+ 
+    float getAverageMaxGradient() const {
+        return getAverageFromHistory(maxGradientHistory);
+    }
+    
+    float getAverageSecondDerivative() const {
+        return getAverageFromHistory(secondDerivativeHistory);
+    }
+    
+    float getAverageFromHistory(const std::deque<float> & theHistory) const {
+        if ( ! theHistory.empty()) {
+            float mySum = 0.0;
+            for (unsigned i = 0; i < theHistory.size(); ++i) {
+                mySum += fabs(theHistory[i]);// / (theHistory.size() - i);
+            }
+            return mySum / theHistory.size();
+        }
+        return 0.0;
+
+    }
+    
+    float getAbsoluteDerivativeSum() {
+        float mySum = 0.0;
+        for (unsigned i = 0; i < firstDerivativeHistory.size(); ++i) {
+            mySum += fabs(firstDerivativeHistory[i]);// / (theHistory.size() - i);
+        }
+        return mySum;
+    }
+    
+    float getDerivativeSum() {
+        float mySum = 0.0;
+        for (unsigned i = 1; i < firstDerivativeHistory.size(); ++i) {
+            mySum += (firstDerivativeHistory[i]<firstDerivativeHistory[i-1])? -1:1;// / (theHistory.size() - i);
+        }
+        return mySum;
+    }
+
+    asl::Vector2f position;
+    asl::Box2f    roi;
+    asl::Box2f    previousRoi;
+    float         intensity;
+    float         previousIntensity;
+
+    float firstDerivative;
+
+
+    std::deque<float> maxGradientHistory;
+    std::deque<float> firstDerivativeHistory;
+    std::deque<float> secondDerivativeHistory;
+    std::deque<float> proximityHistory;
+
+
+    float previousSum;
+};
+
+typedef std::map<int, Cursor> CursorMap;
+
 class ASSDriver :
     public jslib::IScriptablePlugin,
     public y60::IRendererExtension
 {
     public:
-		ASSDriver (/*asl::DLHandle theDLHandle*/);
+		ASSDriver();
 		virtual ~ASSDriver();
 
         // IRendererExtension
@@ -93,13 +173,19 @@ class ASSDriver :
         RasterHandle allocateRaster(const std::string & theName);
         void readSensorValues();
         void processSensorValues( double theDeltaT);
-        void createThresholdedRaster(RasterHandle & theInput, RasterHandle & theOutput,
-                                     const unsigned char theThreshold);
-        void computeCursorPositions( const BlobListPtr & theROIs);
-        void correlatePositions( const std::vector<asl::Vector2f> & thePreviousPositions );
+        void updateDerivedRasters();
+        void updateCursors( double theDeltaT);
+        void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT);
+        void computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster);
+        float matchProximityPattern(const CursorMap::iterator & theCursorIt);
+        void computeCursorPositions( std::vector<asl::Vector2f> & theCurrentPositions,
+                                     const BlobListPtr & theROIs);
+        void correlatePositions( const std::vector<asl::Vector2f> & thePreviousPositions, 
+                                 const BlobListPtr theROIs);
 
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
+        asl::Matrix4f getTransormationMatrix();
 
         DriverState    _myState;
 
@@ -107,21 +193,24 @@ class ASSDriver :
 
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
+        RasterHandle _myGradientRaster; // XXX unused
+        RasterHandle _myMomentRaster;
         std::vector<std::string> _myRasterNames;
 
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
+        float       _myRunTime;
         int _myComponentThreshold;
         int _myNoiseThreshold;
         float         _myGainPower;
 
-        std::vector<asl::Vector2f>   _myPositions;
-        std::vector<asl::Box2f>      _myRegions;
-        std::vector<int> _myCursorIDs;
+        CursorMap        _myCursors;
         int              _myIDCounter;
 
         dom::NodePtr                 _myTransform;
+
+        float _myTweakVal; // XXX
 
         // Transport Layer Members:
         // will be refactored into a separate class, when 

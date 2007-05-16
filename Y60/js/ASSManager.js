@@ -16,6 +16,7 @@ ASSManager.driver = null;
 
 const ASS_CROSSHAIR_SCALE = 0.15;
 const DECORATION_Z_OFFSET = 0.1;
+const TOUCH_LIFE_TIME = 1.0;
 
 ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform, theDecorationZOffset)
 {
@@ -67,6 +68,24 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         }
     }
 
+    self.onFrame = function( theTime ) {
+        var myDeltaT = theTime - _myLastFrameTime;
+
+        if ( _myGroup.visible ) {
+            if ( _myTouchList.length > 0) {
+                for (var i = _myTouchList.length - 1; i >= 0; --i ) {
+                    _myTouchList[i].timer -= myDeltaT;
+                    if ( _myTouchList[i].timer <= 0 ) {
+                        _myGroup.removeChild( _myGroup.getElementById( _myTouchList[i].id ) );
+                        _myTouchList.splice( i, 1);
+                    }
+                }
+            }
+        }
+
+        _myLastFrameTime = theTime;
+    }
+
     self.onASSEvent = function( theEventNode ) {
         if (_myGroup.visible) {
             if (theEventNode.type == "configure") {
@@ -96,6 +115,16 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                 if (myMarker && myROIBox) {
                     moveMarkerAndBox( myMarker, myROIBox, theEventNode);
                 }
+            } else if ( theEventNode.type == "touch") {
+                //print("touch");
+
+                var myTouchMarker = Modelling.createBody( _myGroup, _myTouchMarkerShape.id );
+                myTouchMarker.position.xy = theEventNode.raw_position;
+                myTouchMarker.position.z = DECORATION_Z_OFFSET;
+
+                myTouchMarker.scale = new Vector3f(ASS_CROSSHAIR_SCALE, ASS_CROSSHAIR_SCALE,
+                        ASS_CROSSHAIR_SCALE);
+                _myTouchList.push( {id: myTouchMarker.id, timer: TOUCH_LIFE_TIME } );
             }
         }
         if (theEventNode.type == "remove") {
@@ -149,10 +178,10 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         theMarker.position.y = myRawPosition.y;
 
         var myROI = theEvent.roi;
-        theROIBox.position.x = myROI.center.x - 0.5; // integer coordinate correction
-        theROIBox.position.y = myROI.center.y - 0.5;
-        theROIBox.scale.x = myROI.size.x;
-        theROIBox.scale.y = myROI.size.y;
+        theROIBox.position.x = myROI.center.x/* - 0.5*/; // integer coordinate correction
+        theROIBox.position.y = myROI.center.y/* - 0.5*/;
+        theROIBox.scale.x = myROI.size.x + 1;
+        theROIBox.scale.y = myROI.size.y + 1;
     }
 
     function setup( theParent) {
@@ -212,6 +241,18 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         _myROIBoxShape.renderstyle.ignore_depth = true;
         _myROIBoxShape.childNode("primitives", 0).childNode(0).type = "lineloop";
         _myROIBoxShape.name = "ASSROIBox";
+
+        _myTouchMarkerMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
+                            "ASSTouchMarkerMaterial", true, false, 1, [1, 1, 1, 1]);        
+
+        _myTouchMarkerMaterial.properties.surfacecolor = [1, 1, 1, 1];
+
+
+        _myTouchMarkerShape = Modelling.createCrosshair(_myScene, _myTouchMarkerMaterial.id, 
+                                                 2, 2, "ASSTouchMarker"); 
+        _myTouchMarkerShape.renderstyle.polygon_offset = true;
+        _myTouchMarkerShape.renderstyle.ignore_depth = true;
+
     }
 
 
@@ -393,6 +434,10 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     var _myCursorMaterial = null;
     var _myCursorShape = null;
 
+    var _myTouchList = new Array();
+    var _myTouchMarkerMaterial = null;
+    var _myTouchMarkerShape = null;
+
     var _myGridSize3d = new Vector3f(1, 1, 1);
     var _myGridSize =  new Vector3f(1, 1, 1);
     var _myFrameShape = null;
@@ -403,6 +448,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     var _myWireGrid = null;
 
     var _myInitialSettingsLoaded = false;
+    var _myLastFrameTime = 0;
 
     setup(theParentTransform);
 }

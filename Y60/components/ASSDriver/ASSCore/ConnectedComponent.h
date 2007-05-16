@@ -17,6 +17,7 @@
 
 #include <dom/Value.h>
 
+#include <vector>
 #include <list>
 #include <map>
 
@@ -45,6 +46,7 @@ typedef asl::Ptr<Blob> BlobPtr;
 
 class Blob {
     public:
+        Blob() {}
         Blob(RunPtr theRun);
         ~Blob();
         RunList & getRuns();
@@ -60,7 +62,7 @@ class Blob {
 };
 
 
-typedef std::list<BlobPtr> BlobList;
+typedef std::vector<BlobPtr> BlobList;
 typedef asl::Ptr<BlobList> BlobListPtr;
 typedef std::map<int, BlobPtr> ComponentMap;
 

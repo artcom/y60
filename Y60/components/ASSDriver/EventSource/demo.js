@@ -71,6 +71,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
+
+        _myASSManager.onFrame( theTime );
     }
 
     Base.onMouseButton = self.onMouseButton;
