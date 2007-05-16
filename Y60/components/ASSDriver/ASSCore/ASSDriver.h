@@ -58,9 +58,23 @@ struct Cursor {
             position( thePos ), 
             roi( theBox),
             previousSum(0.0),
-            firstDerivative(0.0)
+            firstDerivative(0.0),
+            lastTouchTime(0.0),
+            intensity(0.0)
     {
         previousRoi.makeEmpty();
+    }
+
+    float getMinIntensity() {
+        if ( ! intensityHistory.empty()) {
+            float myMin = INT_MAX;
+            for (unsigned i = 0; i < intensityHistory.size(); ++i) {
+                myMin = asl::minimum(myMin, intensityHistory[i]);
+            }
+            return myMin;
+        }
+        return intensity;
+
     }
 
     float getAverageFirstDerivative() const {
@@ -115,14 +129,14 @@ struct Cursor {
     asl::Box2f    previousRoi;
     float         intensity;
     float         previousIntensity;
-
-    float firstDerivative;
+    float         firstDerivative;
+    double        lastTouchTime;
 
 
     std::deque<float> maxGradientHistory;
     std::deque<float> firstDerivativeHistory;
     std::deque<float> secondDerivativeHistory;
-    std::deque<float> proximityHistory;
+    std::deque<float> intensityHistory;
 
 
     float previousSum;
@@ -201,14 +215,16 @@ class ASSDriver :
 
         asl::Time   _myLastFrameTime;
         float       _myRunTime;
-        int _myComponentThreshold;
-        int _myNoiseThreshold;
-        float         _myGainPower;
+        int         _myComponentThreshold;
+        int         _myNoiseThreshold;
+        float       _myTouchThreshold;
+        float       _myGainPower;
+        double      _myMinTouchInterval;
 
-        CursorMap        _myCursors;
-        int              _myIDCounter;
+        CursorMap   _myCursors;
+        int         _myIDCounter;
 
-        dom::NodePtr                 _myTransform;
+        dom::NodePtr _myTransform;
 
         float _myTweakVal; // XXX
 

@@ -73,7 +73,9 @@ ASSDriver::ASSDriver() :
     _myScene(0),
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
+    _myTouchThreshold( 200 ),
     _myGainPower(2.0f),
+    _myMinTouchInterval( 0.25 ),
     _myIDCounter( 0 ),
     _myLineStart( -1 ),
     _myLineEnd( -1 ),
@@ -382,7 +384,7 @@ N sqr(const N & n) {
     return n * n;
 }
 
-
+/*
 float
 ASSDriver::matchProximityPattern(const CursorMap::iterator & theCursorIt) {
     
@@ -406,7 +408,7 @@ ASSDriver::matchProximityPattern(const CursorMap::iterator & theCursorIt) {
     }
     return myDifference;
 }
-
+*/
 void 
 ASSDriver::updateCursors(double theDeltaT) {
  y60::RasterOfGRAY & myDenoisedRaster = *
@@ -434,17 +436,26 @@ void
 ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
     
     float myFirstDerivative = (theCursorIt->second.intensity - theCursorIt->second.previousIntensity) /theDeltaT;
+    //float myFirstDerivative = (theCursorIt->second.intensity - theCursorIt->second.getMinIntensity()) /theDeltaT;
     theCursorIt->second.firstDerivative = myFirstDerivative; 
     
     float myTouch = 0;
-    if( myFirstDerivative > 200.0 ) {
+    if ( myFirstDerivative > _myTouchThreshold  &&
+        _myRunTime - theCursorIt->second.lastTouchTime > _myMinTouchInterval)
+    {
         myTouch = theCursorIt->second.intensity;   
         //AC_PRINT << "touched me! at " << _myRunTime;
+        theCursorIt->second.lastTouchTime = _myRunTime;
         createEvent( theCursorIt->first, "touch", theCursorIt->second.position,
                 applyTransform(theCursorIt->second.position, getTransormationMatrix() ),
                 theCursorIt->second.roi );
     }
-    
+   
+    theCursorIt->second.intensityHistory.push_back( theCursorIt->second.intensity );
+    if( theCursorIt->second.intensityHistory.size() > MAX_HISTORY_LENGTH ) {
+            theCursorIt->second.intensityHistory.pop_front();
+        }
+
     cout << _myRunTime << "\t" << theCursorIt->second.intensity << "\t" << myFirstDerivative*0.1 << "\t" << myTouch << endl;
 
 }
@@ -656,6 +667,7 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
     getConfigSetting( mySettings, "ComponentThreshold", _myComponentThreshold, 5 );
     getConfigSetting( mySettings, "NoiseThreshold", _myNoiseThreshold, 15 );
     getConfigSetting( mySettings, "GainPower", _myGainPower, 2.0f );
+    getConfigSetting( mySettings, "TouchThreshold", _myTouchThreshold, 200.0f );
     getConfigSetting( mySettings, "TweakVal", _myTweakVal, 1.5f );
 
     bool myPortConfigChanged = false;
