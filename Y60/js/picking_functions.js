@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+
 function Picking(theRenderWindow) {
     this.Constructor(this, theRenderWindow);
 }
@@ -84,6 +85,20 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
             return null;
         }
     }
+    
+    obj.pickBodyByWorldPos = function(theWorldPos) {
+        var myCameraPos = getCameraPos();
+        var myLineSegment = new LineSegment(myCameraPos, theWorldPos);
+        var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        
+        var myIntersection = nearestIntersection(myWorld, myLineSegment);
+        if (myIntersection) {
+            return myIntersection.info.body;
+        } else {
+            return null;
+        }
+    }
+
 
     obj.pickPointOnPlane = function( theScreenX, theScreenY, thePlane) {
         var myRay = getCameraToScreenRay( theScreenX, theScreenY);
