@@ -57,10 +57,10 @@ struct Cursor {
     Cursor(const asl::Vector2f & thePos, const asl::Box2f & theBox) :
             position( thePos ), 
             roi( theBox),
-            previousSum(0.0),
             firstDerivative(0.0),
             lastTouchTime(0.0),
-            intensity(0.0)
+            intensity(0.0),
+            previousIntensity(0.0)
     {
         previousRoi.makeEmpty();
     }
@@ -139,7 +139,6 @@ struct Cursor {
     std::deque<float> intensityHistory;
 
 
-    float previousSum;
 };
 
 typedef std::map<int, Cursor> CursorMap;
@@ -217,7 +216,8 @@ class ASSDriver :
         float       _myRunTime;
         int         _myComponentThreshold;
         int         _myNoiseThreshold;
-        float       _myTouchThreshold;
+        float       _myIntensityThreshold;
+        float       _myFirstDerivativeThreshold;
         float       _myGainPower;
         double      _myMinTouchInterval;
 
@@ -225,8 +225,6 @@ class ASSDriver :
         int         _myIDCounter;
 
         dom::NodePtr _myTransform;
-
-        float _myTweakVal; // XXX
 
         // Transport Layer Members:
         // will be refactored into a separate class, when 
@@ -252,6 +250,8 @@ class ASSDriver :
         bool _myHandshakingFlag;
         asl::SerialDevice::ParityMode _myParity;
         std::vector<unsigned char> _myReceiveBuffer;
+
+        int _myDumpValuesFlag;
 };
 
 

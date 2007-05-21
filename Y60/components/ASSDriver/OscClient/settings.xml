@@ -11,5 +11,6 @@
         <ServerAddress>127.0.0.1</ServerAddress>
         <ServerPort>7000</ServerPort>
         <ClientPort>7001</ClientPort>
+        <TouchThreshold step="5">200</TouchThreshold>
     </ASSDriver>
 </settings>

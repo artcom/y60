@@ -17,6 +17,7 @@ ASSManager.driver = null;
 const ASS_CROSSHAIR_SCALE = 0.15;
 const DECORATION_Z_OFFSET = 0.1;
 const TOUCH_LIFE_TIME = 1.0;
+const VERBOSE_EVENTS = false;
 
 ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform, theDecorationZOffset)
 {
@@ -89,9 +90,14 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     self.onASSEvent = function( theEventNode ) {
         if (_myGroup.visible) {
             if (theEventNode.type == "configure") {
+                if ( VERBOSE_EVENTS ) {
+                    print("ASSManager::onASSEvent: configure");
+                }
                 onConfigure( theEventNode );
             } else if (theEventNode.type == "add") {
-                //print("add");
+                if ( VERBOSE_EVENTS ) {
+                    print("ASSManager::onASSEvent: add");
+                }
                 var myNewMarker = Modelling.createBody(_myGroup, _myCursorShape.id );
                 myNewMarker.scale = new Vector3f(ASS_CROSSHAIR_SCALE, ASS_CROSSHAIR_SCALE,
                         ASS_CROSSHAIR_SCALE);
@@ -108,7 +114,9 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
 
                 moveMarkerAndBox( myNewMarker, myROIBox, theEventNode);
             } else if (theEventNode.type == "move") {
-                //print("move");
+                if ( VERBOSE_EVENTS ) {
+                    print("ASSManager::onASSEvent: move");
+                }
                 var myMarker = _myGroup.getElementById("ASSCursor" + theEventNode.id);
                 var myROIBox = _myGroup.getElementById("ASSROI" + theEventNode.id);
                 //print ("position: " + theEventNode.position3D + " raw: " + theEventNode.raw_position);
@@ -116,8 +124,9 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                     moveMarkerAndBox( myMarker, myROIBox, theEventNode);
                 }
             } else if ( theEventNode.type == "touch") {
-                //print("touch");
-
+                if ( VERBOSE_EVENTS ) {
+                    print("ASSManager::onASSEvent: touch at " + theEventNode.raw_position);
+                }
                 var myTouchMarker = Modelling.createBody( _myGroup, _myTouchMarkerShape.id );
                 myTouchMarker.position.xy = theEventNode.raw_position;
                 myTouchMarker.position.z = DECORATION_Z_OFFSET;
@@ -128,7 +137,9 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
             }
         }
         if (theEventNode.type == "remove") {
-            //print("remove");
+            if ( VERBOSE_EVENTS ) {
+                print("ASSManager::onASSEvent: remove");
+            }
             var myOldMarker = _myGroup.getElementById("ASSCursor" + theEventNode.id);
             if (myOldMarker) {
                 _myGroup.removeChild( myOldMarker );
@@ -178,8 +189,8 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         theMarker.position.y = myRawPosition.y;
 
         var myROI = theEvent.roi;
-        theROIBox.position.x = myROI.center.x/* - 0.5*/; // integer coordinate correction
-        theROIBox.position.y = myROI.center.y/* - 0.5*/;
+        theROIBox.position.x = myROI.center.x;
+        theROIBox.position.y = myROI.center.y;
         theROIBox.scale.x = myROI.size.x + 1;
         theROIBox.scale.y = myROI.size.y + 1;
     }
