@@ -229,6 +229,7 @@ ASSDriver::readSensorValues() {
             double myDeltaT = myTime - _myLastFrameTime;
             //AC_PRINT << "dt: " <<  myDeltaT;
             // XXX
+            //cout << "deltaT " << myDeltaT << endl;
             myDeltaT = 1.0 / 25.0;
 
             _myRunTime += myDeltaT;

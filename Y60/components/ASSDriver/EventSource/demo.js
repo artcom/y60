@@ -12,11 +12,14 @@ if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
 use("ASSManager.js");
+use("Button.js");
 
 const DISPLAY_SCALE = 20;
 const X_MIRROR = false;
 const Y_MIRROR = true;
 const ORIENTATION = 0.5 * Math.PI;
+
+var ourButtons = new Array();
 
 window = new RenderWindow();
 
@@ -39,20 +42,24 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myDummyAppContainer = null;
 
     var _myWorldCross = null;
-
+    
+    var _mySmallButton = null;
+    var _myMediumButton = null;
+    var _myLargeButton = null;
+    var _myPicking     = null;
     //////////////////////////////////////////////////////////////////////
     //
     // public members
     //
     //////////////////////////////////////////////////////////////////////
-
+   
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
-        Base.setup(theWidth, theHeight, true, theTitle);
+        Base.setup(theWidth, theHeight, false, theTitle);
         //window.position = [0, 0];
         window.decorations = false;
-
+        _myPicking = new Picking(window);
         window.resize(theWidth, theHeight);
 
         _myDummyAppContainer = Modelling.createTransform( window.scene.world );
@@ -66,6 +73,28 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.type = ProjectionType.orthonormal;
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
+        
+        _mySmallButton = buildButton(_myDummyAppContainer, 
+                                     "TEX/playbutton.png", "TEX/playbutton_selected.png", 
+                                        "SmallButton",
+                                        new Vector3f(0,0,0), 
+                                        self.pressedSmall, 
+                                        "8smallID", TOGGLE_BUTTON);
+//        _myMediumButton= buildButton(_myDummyAppContainer, 
+//                                     "TEX/playbutton.png", "TEX/playbutton.png", 
+//                                        "MediumButton",
+//                                        new Vector3f(30,0,0), 
+//                                        self.pressedMedium, 
+//                                        "8mediumID");
+//        _myLargeButton= buildButton(_myDummyAppContainer, 
+//                                     "TEX/playbutton.png", "TEX/playbutton.png", 
+//                                     "LargeButton",
+//                                      new Vector3f(50,0,0), 
+//                                        self.pressedLarge, 
+//                                        "8largeID");
+        
+        _mySmallButton.body.position = new Vector3f(7,0,0);        
+        ourButtons.push(_mySmallButton);
     }
 
     Base.onFrame = self.onFrame;
@@ -78,6 +107,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.onMouseButton = self.onMouseButton;
     self.onMouseButton = function( theButton, theState, theX, theY ) {
         Base.onMouseButton( theButton, theState, theX, theY);
+        
     }
 
     self.onASSEvent = function( theNode ) {
@@ -89,6 +119,24 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             //print("event " + theNode.type + " grid size: " + theNode.grid_size);
         } else if ( theNode.type == "lost_communication" || theNode.type == "lost_sync" ) {
             //print("event " + theNode.type );
+        } else if ( theNode.type == "touch") {
+            var myBody = _myPicking.pickBodyByWorldPos(theNode.position3D);
+            if(myBody) {
+                //print("body picked " + myBody);
+                _mySmallButton.press();
+                //pressButtonByName(myBody.id);
+            }
+            //       var myState = MOUSE_DOWN;
+            //for(var i=0; i<ourButtons.length; i++) {
+            //    if (ourButtons[i].onMouseButton(myState, theX, theY)) {
+            //        Logger.info(ourButtons[i], theX, theY);
+            //        break;
+            //    } 
+            //}
+            
+            //_myLargeButton.position = new Vector3f( theNode.position3D );    
+            //print("pos " + theNode.position3D + " node " + theNode);
+               
         } else {
             if ( ! _myWorldCross ) {
                 var myShape = window.scene.world.getElementById("XXX");
@@ -105,6 +153,35 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         }
         _myLastEventTime = theNode.when;
     }
+    
+    self.pressedSmall = function() {
+        
+        print("pressed small");   
+    }
+    self.pressedMedium = function() {
+        print("pressed medium");   
+    }
+    self.pressedLarge = function() {
+        print("pressed large");   
+    }
+    
+    ///////////////////////////////////////////////////////
+    // private funtions 
+    ///////////////////////////////////////////////////////
+    
+    function buildButton(theGroupNode, theFileName, thePressedFileName, 
+                     theName, thePosition, theFunctionPtr, theTestID, theType, theSize) 
+    {
+        //print("Utils::buildButton: theType = " + theType);
+        var myButton = new Button(theFileName, thePressedFileName, theName, theTestID, theType, theSize);
+        myButton.body.position = new Vector3f(thePosition.x, thePosition.y, thePosition.z);
+        myButton.onClick = theFunctionPtr;
+        theGroupNode.appendChild(myButton.body);
+        return myButton;
+    }
+    
+    
+    
 }
 
 if (__main__ == "ASSDriverTest") {
