@@ -227,6 +227,7 @@ ASSDriver::readSensorValues() {
 
             asl::Time myTime;
             double myDeltaT = myTime - _myLastFrameTime;
+            //AC_PRINT << "dt: " <<  myDeltaT;
             // XXX
             myDeltaT = 1.0 / 25.0;
 

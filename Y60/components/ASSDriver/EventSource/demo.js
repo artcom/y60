@@ -61,7 +61,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myASSManager = new ASSManager( self, _myDummyAppContainer );
 
-        self.getConfigurator().saveSettings();
+        //self.getConfigurator().saveSettings();
 
         window.camera.frustum.type = ProjectionType.orthonormal;
         window.camera.frustum.width = 400;
