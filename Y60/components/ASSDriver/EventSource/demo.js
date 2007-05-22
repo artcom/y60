@@ -122,21 +122,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         } else if ( theNode.type == "touch") {
             var myBody = _myPicking.pickBodyByWorldPos(theNode.position3D);
             if(myBody) {
-                //print("body picked " + myBody);
                 _mySmallButton.press();
-                //pressButtonByName(myBody.id);
             }
-            //       var myState = MOUSE_DOWN;
-            //for(var i=0; i<ourButtons.length; i++) {
-            //    if (ourButtons[i].onMouseButton(myState, theX, theY)) {
-            //        Logger.info(ourButtons[i], theX, theY);
-            //        break;
-            //    } 
-            //}
-            
-            //_myLargeButton.position = new Vector3f( theNode.position3D );    
-            //print("pos " + theNode.position3D + " node " + theNode);
-               
         } else {
             if ( ! _myWorldCross ) {
                 var myShape = window.scene.world.getElementById("XXX");
@@ -156,7 +143,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     
     self.pressedSmall = function() {
         
-        print("pressed small");   
+        //print("pressed small");   
     }
     self.pressedMedium = function() {
         print("pressed medium");   
