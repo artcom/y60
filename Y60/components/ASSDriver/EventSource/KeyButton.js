@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-function Button(theIcon, thePressedIcon, theName, theTestID, theType, theSize) {
+function KeyButton(theIcon, thePressedIcon, theName, theTestID, theType, theSize) {
     this.Constructor(this, theIcon, thePressedIcon, theName, theTestID, theType, theSize);
 }
 
@@ -21,21 +21,21 @@ const STATE_UNPRESSED = "unpressed";
 const TOGGLE_BUTTON = "togglebutton";
 const PUSH_BUTTON = "pushbutton";
 
-Button.prototype.Constructor = function(Public, 
-                                        theIcon, 
-                                        thePressedIcon, 
-                                        theName,
-                                        theTestID,
-                                        theType,
-                                        theSize) {
+KeyButton.prototype.Constructor = function(Public, 
+                                           theMaterial, 
+                                           thePressedMaterial, 
+                                           theName,
+                                           theTestID,
+                                           theType,
+                                           theSize) {
    
-    var _myMaterial = null;
-    var _myPressedMaterial = null;
+    var _myMaterial = theMaterial;
+    var _myPressedMaterial = thePressedMaterial;
     var _myQuad = null;
     var _myPressedQuad = null;
     var _myBody = null;
     var _myName = theName;
-    var _myImageSize = null;
+    var _myImageSize = theSize;
     var _myState = STATE_UNPRESSED;
     var _myTestID = theTestID;
     var _myType = PUSH_BUTTON;
@@ -68,7 +68,7 @@ Button.prototype.Constructor = function(Public,
     }
        
     Public.press = function() {
-        //print("Button::press(): name : " + theName + " , _myState = " + _myState + " _myType = " + _myType);
+        //print("KeyButton::press(): name : " + theName + " , _myState = " + _myState + " _myType = " + _myType);
         if (_myType == TOGGLE_BUTTON) {
             if (_myState == STATE_UNPRESSED) {
                 _myState = STATE_PRESSED;
@@ -103,22 +103,6 @@ Button.prototype.Constructor = function(Public,
     }
     
     
-    function createImageAndMaterial( theFile ) {
-        var myImage = null;
-        var myImageSize = null;
-        var myMaterial = null;
-        myImage =  Modelling.createImage(window.scene, theFile);
-        myImage.resize = "pad";
-        myImageSize = getImageSize(myImage);
-        myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myImage);
-        //   addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
-        myMaterial.transparent = true;
-        myMaterial.name = theFile;
-        myMaterial.properties.targetbuffers.depth = false;
-        
-        return {image:  myImage, size: myImageSize, material: myMaterial}; 
-    }
-    
     ////////////////////////////////////////
     // Cstor 
     ////////////////////////////////////////
@@ -127,28 +111,8 @@ Button.prototype.Constructor = function(Public,
         _myType = theType;
     }
     
-    if ( theIcon in ourMaterials) {
-        _myMaterial = ourMaterials[theIcon];
-        _myImageSize = getIconSize(_myMaterial);
-    } else {
-//        Logger.warning("creating material for icon=" + theIcon);
-        var myImageMaterial = createImageAndMaterial(theIcon);
-        _myImageSize = myImageMaterial.size;
-        _myMaterial = myImageMaterial.material;
-        ourMaterials[theIcon] = _myMaterial;
-    }
 
     
-    if ( thePressedIcon in ourMaterials) {
-        _myPressedMaterial = ourMaterials[thePressedIcon];
-        _myImageSize = getIconSize(_myPressedMaterial);
-    } else {
-//        Logger.warning("creating material for pressed icon=" + thePressedIcon);
-        var myImageMaterial = createImageAndMaterial(thePressedIcon);
-        _myImageSize = myImageMaterial.size;
-        _myPressedMaterial = myImageMaterial.material;
-        ourMaterials[thePressedIcon] = _myPressedMaterial;
-    }
     if(theSize != undefined) {
         _myImageSize = theSize;
     }
@@ -166,5 +130,5 @@ Button.prototype.Constructor = function(Public,
     //_myBody.visible = false;
     _myBody.insensible = false;
     //_myBody.testID = _myTestID;
-    //ourShow.registerButton(Public);
+    //ourShow.registerKeyButton(Public);
 }

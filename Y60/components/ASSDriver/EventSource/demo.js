@@ -12,20 +12,43 @@ if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
 use("ASSManager.js");
-use("Button.js");
+use("KeyButton.js");
+use("BuildUtils.js");
+use("SoundController.js");
 
 const DISPLAY_SCALE = 20;
 const X_MIRROR = false;
 const Y_MIRROR = true;
 const ORIENTATION = 0.5 * Math.PI;
 
+const PLOT_DATAFILE = "/tmp/ttt.plot"
+const FONT_NAME = "Trixie";
+const FONT_FILE = "FONTS/TxPl____.ttf"; 
+const FONT_SIZE = 18;
+const SUBMIT_FONT_SIZE = 16;
+const DEFAULT_FONT_COLOR = [1.0, 1.0, 1.0, 1.0];
+
+var DISPLAY_SIZE = new Vector2f(100,20);
+var SUBMIT_SIZE = new Vector2f(90,20);
+const TYPE_SOUND = "SOUNDS/typewriter.wav";
+const KEYSIZE_OFFSET = 0.9;
+var KEYSIZE = new Vector2f(19,21);
+const KEYS = [["q", "w", "e", "r", "t", "y","u", "i","o", "p"],
+              ["a", "s", "d", "f", "g", "h","j", "k","l"],
+              ["z", "x", "c", "v", "b", "n","m"]];
+
 var ourButtons = new Array();
+var ourFontCache = [];
+
+var ourTypedText = "test";
 
 window = new RenderWindow();
 
 function ASSDriverTestApp(theArguments) {
     this.Constructor(this, theArguments);
 }
+
+
 
 ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
@@ -40,13 +63,15 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myLastEventTime = 0;
     var _myASSManager = null;
     var _myDummyAppContainer = null;
-
+    var _myButtonGroupNode = null;
     var _myWorldCross = null;
     
-    var _mySmallButton = null;
-    var _myMediumButton = null;
-    var _myLargeButton = null;
     var _myPicking     = null;
+
+    var _myDisplayImage = null;
+    var _myDisplayMaterial = null;
+    var _myDisplayBody = null;
+    
     //////////////////////////////////////////////////////////////////////
     //
     // public members
@@ -73,28 +98,15 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.type = ProjectionType.orthonormal;
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
+
+        loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
+        loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
         
-        _mySmallButton = buildButton(_myDummyAppContainer, 
-                                     "TEX/playbutton.png", "TEX/playbutton_selected.png", 
-                                        "SmallButton",
-                                        new Vector3f(0,0,0), 
-                                        self.pressedSmall, 
-                                        "8smallID", TOGGLE_BUTTON);
-//        _myMediumButton= buildButton(_myDummyAppContainer, 
-//                                     "TEX/playbutton.png", "TEX/playbutton.png", 
-//                                        "MediumButton",
-//                                        new Vector3f(30,0,0), 
-//                                        self.pressedMedium, 
-//                                        "8mediumID");
-//        _myLargeButton= buildButton(_myDummyAppContainer, 
-//                                     "TEX/playbutton.png", "TEX/playbutton.png", 
-//                                     "LargeButton",
-//                                      new Vector3f(50,0,0), 
-//                                        self.pressedLarge, 
-//                                        "8largeID");
-        
-        _mySmallButton.body.position = new Vector3f(7,0,0);        
-        ourButtons.push(_mySmallButton);
+        _myButtonGroupNode = buildGroupNode("ButtonGroup", _myDummyAppContainer);
+        buildKeyboard();
+        buildDisplay();
+        buildSubmitButton();
+        buildBackspace();
     }
 
     Base.onFrame = self.onFrame;
@@ -121,8 +133,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             //print("event " + theNode.type );
         } else if ( theNode.type == "touch") {
             var myBody = _myPicking.pickBodyByWorldPos(theNode.position3D);
-            if(myBody) {
-                _mySmallButton.press();
+            if(myBody) {                
+                for(var i=0; i<ourButtons.length; ++i ) {
+                    if (myBody.id == ourButtons[i].body.id) {
+                        ourButtons[i].press();
+                        ourTypedText += myBody.name;
+                    }
+                }
             }
         } else {
             if ( ! _myWorldCross ) {
@@ -142,39 +159,185 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     }
     
     self.pressedSmall = function() {
-        
-        //print("pressed small");   
+        playSound(TYPE_SOUND, 0.8, 0);
+        var myDisplayImage = createTextAsImage(ourTypedText, 
+                                               FONT_NAME, FONT_SIZE,
+                                               DISPLAY_SIZE);
+        _myDisplayMaterial.childNode("textures").firstChild.image = myDisplayImage.id;
+        print("text: " + ourTypedText);   
     }
-    self.pressedMedium = function() {
-        print("pressed medium");   
+
+    self.submit = function() {
+        copyFile(PLOT_DATAFILE, ourTypedText + ".plot");
     }
-    self.pressedLarge = function() {
-        print("pressed large");   
+
+    self.backspace = function() {
+        ourTypedText = ourTypedText.substring(0, ourTypedText.length-1);
     }
-    
+
     ///////////////////////////////////////////////////////
     // private funtions 
     ///////////////////////////////////////////////////////
+    
+    function loadFont(theFontName, theFont, theSize) {
+        var myFontCacheName = theFontName + "_" + theSize;
+        if (!(myFontCacheName in ourFontCache)) {
+            window.loadTTF(theFontName, theFont, theSize);
+            ourFontCache[myFontCacheName] = true;
+        }
+    }
+
     
     function buildButton(theGroupNode, theFileName, thePressedFileName, 
                      theName, thePosition, theFunctionPtr, theTestID, theType, theSize) 
     {
         //print("Utils::buildButton: theType = " + theType);
-        var myButton = new Button(theFileName, thePressedFileName, theName, theTestID, theType, theSize);
+        var myButton = new KeyButton(theFileName, thePressedFileName, theName, theTestID, theType, theSize);
         myButton.body.position = new Vector3f(thePosition.x, thePosition.y, thePosition.z);
         myButton.onClick = theFunctionPtr;
         theGroupNode.appendChild(myButton.body);
         return myButton;
     }
+
+    function createTextAsImage(theText, theFontName, theFontSize, 
+                               theSize, thePosition, theColor, theUseCacheFlag) 
+    {
     
+        if (!thePosition) {
+            thePosition = new Vector2i(0,0);
+        }
+        if (!theColor) {
+            theColor = DEFAULT_FONT_COLOR;
+        }
+        window.setTracking(0.0);
+        //window.setLineHeight(18.4);
+        //window.setMaxFontFittingSize(0);
+        window.setTextColor(theColor);
+        
+
+        var myImageNode = null;
+        var myTextSize = null;
+        var myIdentifier = null;
+        var myText = new String(theText);
+
+        myImageNode = Node.createElement("image");
+        myImageNode.resize = "pad";
+        myImageNode.wrapmode = "clamp_to_edge"
+        myImageNode.mipmap = false;
+        window.scene.images.appendChild(myImageNode);
+        myTextSize = window.renderTextAsImage( myImageNode, theText, 
+                                               theFontName + "_" + theFontSize, 
+                                               theSize.x, theSize.y, thePosition);
+        var myMatrix = new Matrix4f();
+        myMatrix.makeScaling(new Vector3f(myTextSize.x / myImageNode.width, 
+                                          myTextSize.y / myImageNode.height, 1));
+        myImageNode.matrix = myMatrix;
+        
+        return myImageNode;
+    }
+
+    function createShapeAndBody( theSize, thePosition, theMaterial, theName, theVisibilityFlag ) {
+        var myQuad = Modelling.createQuad(window.scene, theMaterial.id, 
+                                          [-theSize.x/2, -theSize.y/2, 0],
+                                          [theSize.x/2, theSize.y/2, 0]);
+        var myBody = Modelling.createBody(window.scene.world, myQuad.id);
+        myBody.position = thePosition;
+        myBody.name = theName;
+        myBody.insensible = true;
+        myBody.visible = theVisibilityFlag;
+        return myBody;
+    }
+
+    function buildKeyboard() {
+        var myPosition = new Vector3f(-2,2,0);
+        for(var i=0; i<KEYS.length; i++) {
+            for(var j=0; j<KEYS[i].length; j++) {
+                var myString = KEYS[i][j];
+                myPosition.x += KEYSIZE_OFFSET;
+                buildKey(myPosition, myString);
+            }
+            myPosition.y -= 0.9;
+            myPosition.x = -2 + (i*KEYSIZE_OFFSET/2);
+        }
+    }
     
-    
+    function buildKey(thePosition, theString) {
+        var myKeyButtonImage = createTextAsImage(theString, 
+                                                 FONT_NAME, FONT_SIZE,
+                                                 KEYSIZE);
+        
+        //saveImage(myKeyButtonImage, "keybutton.png");
+        var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
+        myKeyMaterial.transparent = true;
+        
+        var myButton = buildButton(_myDummyAppContainer, 
+                                   myKeyMaterial, myKeyMaterial, 
+                                   theString,
+                                   thePosition, 
+                                   self.pressedSmall, 
+                                   "8smallID", TOGGLE_BUTTON, KEYSIZE);
+        
+        ourButtons.push(myButton);
+    }
+
+
+    function buildDisplay() {
+        _myDisplayImage = createTextAsImage("", //ourTypedText, 
+                                            FONT_NAME, FONT_SIZE,
+                                            DISPLAY_SIZE);
+
+        _myDisplayMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myDisplayImage);
+        _myDisplayMaterial.transparent = true;
+
+        _myDisplayBody = createShapeAndBody(DISPLAY_SIZE, new Vector3f(0,4,0), _myDisplayMaterial, "Display", true);
+        //print("displaybody " + _myDisplayBody);
+        _myDisplayBody.scale = new Vector3f(0.05,0.05,1.0);
+        _myDummyAppContainer.appendChild(_myDisplayBody);
+    }
+
+    function buildSubmitButton() {
+        var myKeyButtonImage = createTextAsImage("submit", 
+                                                 FONT_NAME, SUBMIT_FONT_SIZE,
+                                                 SUBMIT_SIZE);
+        
+        //saveImage(myKeyButtonImage, "keybutton.png");
+        var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
+        myKeyMaterial.transparent = true;
+        
+        var myButton = buildButton(_myDummyAppContainer, 
+                                   myKeyMaterial, myKeyMaterial, 
+                                   "submit",
+                                   new Vector3f(0,-2,0), 
+                                   self.submit, 
+                                   "8smallID", TOGGLE_BUTTON, SUBMIT_SIZE);
+        
+        ourButtons.push(myButton);
+    }
+
+    function buildBackspace() {
+        var myKeyButtonImage = createTextAsImage("backspace", 
+                                                 FONT_NAME, SUBMIT_FONT_SIZE,
+                                                 SUBMIT_SIZE);
+        
+        //saveImage(myKeyButtonImage, "keybutton.png");
+        var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
+        myKeyMaterial.transparent = true;
+        
+        var myButton = buildButton(_myDummyAppContainer, 
+                                   myKeyMaterial, myKeyMaterial, 
+                                   "backspace",
+                                   new Vector3f(4,-2,0), 
+                                   self.backspace, 
+                                   "8smallID", TOGGLE_BUTTON, SUBMIT_SIZE);
+        
+        ourButtons.push(myButton);
+    }
 }
 
 if (__main__ == "ASSDriverTest") {
     try {
         var ourASSDriverTestApp = new ASSDriverTestApp(
-                [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+            [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
         //ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
         ourASSDriverTestApp.setup(1400, 1050, "ASSDriverTest");
         ourASSDriverTestApp.go();
