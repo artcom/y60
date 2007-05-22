@@ -88,7 +88,9 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     
     obj.pickBodyByWorldPos = function(theWorldPos) {
         var myCameraPos = getCameraPos();
-        var myLineSegment = new LineSegment(myCameraPos, theWorldPos);
+        var myRay = new Ray(myCameraPos, difference( theWorldPos, myCameraPos) );
+        var myFarPos = intersection( myRay, _myRenderWindow.camera.frustum.far_plane );
+        var myLineSegment = new LineSegment(myCameraPos, myFarPos);
         var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
         
         var myIntersection = nearestIntersection(myWorld, myLineSegment);
