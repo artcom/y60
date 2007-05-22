@@ -35,14 +35,15 @@ float4 mainFragment(vert2frag IN,
 {
     float4 myScaledColor   = tex2D(tex0, float2(IN.texCoord0.x, 1-IN.texCoord0.y));
     float4 myOriginalColor = tex2D(tex1, float2(IN.texCoord0.x, 1-IN.texCoord0.y));
-    
-    float myLuminance = (myScaledColor.r + myScaledColor.g + myScaledColor.b) / 3.0;
+
+    // red channel is fog/background
+    float myLuminance = (myScaledColor.g + myScaledColor.b) / 2.0;
     float myOriginalLuminance = (myOriginalColor.r + myOriginalColor.g + myOriginalColor.b) / 3.0;
 
-    float myHeat = myScaledColor.a - myOriginalLuminance * 0.1 + 0.25;
+    float myHeat = myLuminance * myScaledColor.a - myOriginalLuminance * 0.01 + 0.25;
     float4 myReturn = float4(myHeat, myHeat, myHeat+0.05, 0.0);
 
-    myReturn += float4(myLuminance + myOriginalLuminance * 0.25);
+    myReturn += float4(lerp(0.4, 0.1, myScaledColor.r) + myOriginalLuminance * 0.75);
     myReturn = contrast(myReturn, 1.4, 0.5);
 
     float myStripes = sin(IN.texCoord0.g * 4000.0) * 0.015 + 0.015;
