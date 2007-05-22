@@ -78,7 +78,7 @@ KeyButton.prototype.Constructor = function(Public,
                 _myBody.shape = _myQuad.id;
             }
         } 
-        Public.onClick();
+        Public.onClick(Public);
     }
 
     Public.getSize = function() {

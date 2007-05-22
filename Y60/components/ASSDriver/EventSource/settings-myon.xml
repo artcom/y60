@@ -11,7 +11,7 @@
         <NoiseThreshold>15</NoiseThreshold>
         <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
-        <DumpValues min="0" max="1" step="1">0</DumpValues>
+        <DumpValues min="0" max="1" step="1">1</DumpValues>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <SerialPort>0</SerialPort>
         <UseUSB min="0" max="1">0</UseUSB>
