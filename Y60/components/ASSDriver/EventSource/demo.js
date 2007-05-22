@@ -28,10 +28,10 @@ const FONT_SIZE = 18;
 const SUBMIT_FONT_SIZE = 16;
 const DEFAULT_FONT_COLOR = [1.0, 1.0, 1.0, 1.0];
 
-var DISPLAY_SIZE = new Vector2f(200,20);
+var DISPLAY_SIZE = new Vector2f(300,40);
 var SUBMIT_SIZE = new Vector2f(90,20);
 const TYPE_SOUND = "SOUNDS/typewriter.wav";
-const KEYSIZE_OFFSET = 1.15;
+const KEYSIZE_OFFSET = 1.2;
 var KEYSIZE = new Vector2f(19,21);
 const KEYS = [["q", "w", "e", "r", "t", "y","u", "i","o", "p"],
               ["a", "s", "d", "f", "g", "h","j", "k","l"],
@@ -107,11 +107,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         //print(_myButtonGroupNode);
         _myButtonGroupNode.name = "ButtonGroup";
         _myButtonGroupNode.orientation.assignFromEuler(new Vector3f( 0, 0, Math.PI) );
-        _myButtonGroupNode.position.y += 1.5; 
+        _myButtonGroupNode.position.y += 1.5;
+        _myButtonGroupNode.position.x += 5.5; 
         buildKeyboard();
         buildDisplay();
         buildSubmitButton();
         buildBackspace();
+        buildSpacebar();
     }
 
     Base.onFrame = self.onFrame;
@@ -206,9 +208,10 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     {
         //print("Utils::buildButton: theType = " + theType);
         var myButton = new KeyButton(theFileName, thePressedFileName, theName, theTestID, theType, theSize);
-        myButton.body.position = new Vector3f(thePosition.x, thePosition.y, thePosition.z);
+        myButton.position = new Vector3f(thePosition.x, thePosition.y, thePosition.z);
         myButton.onClick = theFunctionPtr;
         theGroupNode.appendChild(myButton.body);
+        theGroupNode.appendChild(myButton.borderbody);
         return myButton;
     }
 
@@ -269,7 +272,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                 myPosition.x += KEYSIZE_OFFSET;
                 buildKey(myPosition, myString);
             }
-            myPosition.y -= 1.15;
+            myPosition.y -= KEYSIZE_OFFSET;
             myPosition.x = -2 + (i*KEYSIZE_OFFSET/2);
         }
     }
@@ -281,7 +284,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         
         //saveImage(myKeyButtonImage, "keybutton.png");
         var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
-        myKeyMaterial.transparent = true;
+        //myKeyMaterial.transparent = true;
         
         var myButton = buildButton(_myButtonGroupNode, 
                                    myKeyMaterial, myKeyMaterial, 
@@ -293,6 +296,26 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         ourButtons.push(myButton);
     }
 
+    function buildSpacebar() {
+        var myKeyButtonImage = createTextAsImage("   space", 
+                                                 FONT_NAME, SUBMIT_FONT_SIZE,
+                                                 SUBMIT_SIZE);
+        
+        //saveImage(myKeyButtonImage, "keybutton.png");
+        var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
+        //myKeyMaterial.transparent = true;
+        
+        var myButton = buildButton(_myButtonGroupNode, 
+                                   myKeyMaterial, myKeyMaterial, 
+                                   " ",
+                                   new Vector3f(4,-3.7,0), 
+                                   self.pressedKey, 
+                                   "8smallID", TOGGLE_BUTTON, SUBMIT_SIZE);
+        
+        ourButtons.push(myButton);
+    
+    }
+
 
     function buildDisplay() {
         _myDisplayImage = createTextAsImage("", //ourTypedText, 
@@ -302,7 +325,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDisplayMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myDisplayImage);
         _myDisplayMaterial.transparent = true;
 
-        _myDisplayBody = createShapeAndBody(DISPLAY_SIZE, new Vector3f(0,1,0), _myDisplayMaterial, "Display", true);
+        _myDisplayBody = createShapeAndBody(DISPLAY_SIZE, new Vector3f(5,2.5,0), _myDisplayMaterial, "Display", true);
         //print("displaybody " + _myDisplayBody);
         _myDisplayBody.scale = new Vector3f(0.05,0.05,1.0);
         _myButtonGroupNode.appendChild(_myDisplayBody);
@@ -315,12 +338,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         
         //saveImage(myKeyButtonImage, "keybutton.png");
         var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
-        myKeyMaterial.transparent = true;
+        //myKeyMaterial.transparent = true;
         
         var myButton = buildButton(_myButtonGroupNode, 
                                    myKeyMaterial, myKeyMaterial, 
                                    "submit",
-                                   new Vector3f(0,-4,0), 
+                                   new Vector3f(12,0,0), 
                                    self.submit, 
                                    "8smallID", TOGGLE_BUTTON, SUBMIT_SIZE);
         
@@ -334,12 +357,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         
         //saveImage(myKeyButtonImage, "keybutton.png");
         var myKeyMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myKeyButtonImage);
-        myKeyMaterial.transparent = true;
+        //myKeyMaterial.transparent = true;
         
         var myButton = buildButton(_myButtonGroupNode, 
                                    myKeyMaterial, myKeyMaterial, 
                                    "backspace",
-                                   new Vector3f(4.5,-4,0), 
+                                   new Vector3f(12,-2,0), 
                                    self.backspace, 
                                    "8smallID", TOGGLE_BUTTON, SUBMIT_SIZE);
         

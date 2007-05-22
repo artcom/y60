@@ -21,6 +21,8 @@ const STATE_UNPRESSED = "unpressed";
 const TOGGLE_BUTTON = "togglebutton";
 const PUSH_BUTTON = "pushbutton";
 
+const BORDER_SIZE = 2;
+
 KeyButton.prototype.Constructor = function(Public, 
                                            theMaterial, 
                                            thePressedMaterial, 
@@ -31,11 +33,15 @@ KeyButton.prototype.Constructor = function(Public,
    
     var _myMaterial = theMaterial;
     var _myPressedMaterial = thePressedMaterial;
+    var _myBorderMaterial = null;
+    var _myBorderQuad = null;
     var _myQuad = null;
     var _myPressedQuad = null;
     var _myBody = null;
+    var _myBorderBody = null;
     var _myName = theName;
     var _myImageSize = theSize;
+    var _myImageBorderSize = null;
     var _myState = STATE_UNPRESSED;
     var _myTestID = theTestID;
     var _myType = PUSH_BUTTON;
@@ -47,11 +53,21 @@ KeyButton.prototype.Constructor = function(Public,
     Public.body getter = function() {
         return _myBody;
     }
+
+    Public.borderbody getter = function() {
+        return _myBorderBody;
+    }
     
     Public.state getter = function() {
         return _myState;
     }
 
+    Public.position setter = function(thePosition) {
+        _myBody.position = thePosition;
+        _myBorderBody.position = thePosition;
+        _myBorderBody.position.z = thePosition.z - 1;
+    }
+    
     Public.body setter = function(theBody) {
         _myBody = theBody;
     }
@@ -113,22 +129,34 @@ KeyButton.prototype.Constructor = function(Public,
     
 
     
-    if(theSize != undefined) {
-        _myImageSize = theSize;
-    }
-    //print("##### name :" + theName + " -> size: " + _myImageSize);
-    //Logger.warning("creating button " + _myName + "  " + _myImageSize);
+    _myImageSize = new Vector2f(theSize);
+    _myImageBorderSize = new Vector2f(_myImageSize.x + BORDER_SIZE, _myImageSize.y + BORDER_SIZE);
+        
+    
+    _myBorderMaterial = Modelling.createUnlitTexturedMaterial(window.scene, "",
+                                                              "BorderMaterial", true, false, 1, [1, 1, 1, 1]);
+    _myBorderMaterial.properties.surfacecolor = [1,1,1,1];
+    //print(_myBorderMaterial);
     _myQuad = Modelling.createQuad(window.scene, _myMaterial.id,
                                    [-_myImageSize.x/2.0, -_myImageSize.y/2.0,0],
                                    [_myImageSize.x/2.0,_myImageSize.y/2.0,0]);
+    _myBorderQuad = Modelling.createQuad(window.scene, _myBorderMaterial.id,
+                                         [-_myImageBorderSize.x/2.0, -_myImageBorderSize.y/2.0,0],
+                                         [_myImageBorderSize.x/2.0,_myImageBorderSize.y/2.0,0]);
+
     _myPressedQuad = Modelling.createQuad(window.scene, _myPressedMaterial.id,
                                           [-_myImageSize.x/2.0,-_myImageSize.y/2.0,0],
                                           [_myImageSize.x/2.0,_myImageSize.y/2.0,0]);
+    
+    _myBorderBody = Modelling.createBody(window.scene.world, _myBorderQuad.id);
     _myBody = Modelling.createBody(window.scene.world, _myQuad.id);
     _myBody.name = _myName;
+    _myBorderBody.name = _myName + "border";
     _myBody.scale = new Vector3f(0.05,0.05,1.0);
+    _myBorderBody.scale = new Vector3f(0.05,0.05,1.0);
     //_myBody.visible = false;
     _myBody.insensible = false;
+    _myBorderBody.insensible = false;
     //_myBody.testID = _myTestID;
     //ourShow.registerKeyButton(Public);
 }
