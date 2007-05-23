@@ -44,8 +44,13 @@ MachOBacktrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
 //    cerr << "MachOBacktrace::trace()" << endl;
     theStack.clear();
 
-    NativeFrame * myFrame;
-    __asm__ volatile("lwz %0,0(r1)" : "=r" (myFrame));
+    NativeFrame * myFrame(0);
+    // XXX PPC
+    //__asm__ volatile("lwz %0,0(r1)" : "=r" (myFrame));
+    // TODO: port to i386
+    if ( ! myFrame ) { // XXX
+        return;    
+    }
     int i;
     std::vector<StackFrame> myStack;
     for (i = 0; ((i < theMaxDepth) && (myFrame != 0)); i++,
