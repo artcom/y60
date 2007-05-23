@@ -15,7 +15,7 @@
 #include <string>
 
 struct StackFrameBase {
-    unsigned frame;
+    ptrdiff_t frame;
     std::string name;
 };
 
