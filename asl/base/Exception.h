@@ -41,6 +41,8 @@
 #ifndef _included_asl_ExceptionBase_
 #define _included_asl_ExceptionBase_
 
+#include "StackTrace.h"
+
 #include <iostream>
 #include <string>
 
@@ -72,9 +74,17 @@ namespace asl {
         virtual const char * name() const {
             return _name;
         }
+        virtual const StackTrace & stack() const {
+            return _myStackTrace;
+        }
         void appendWhat(const std::string & whatelse) {
             _what += "\n"+whatelse;
         }
+
+
+        static void initExceptionBehaviour();
+        static void dumpStackTrace( bool theFlag );
+        static bool getDumpStackTraceFlag();
     protected:
         virtual void set(const std::string & what,
                          const std::string & where,
@@ -89,6 +99,10 @@ namespace asl {
         mutable std::string _what;
         mutable std::string _where;
         mutable const char * _name;
+
+        mutable StackTrace _myStackTrace;
+
+        static bool _ourDumpStackTraceFlag;
     };
 
 	std::string file_string(const char* file_name);
