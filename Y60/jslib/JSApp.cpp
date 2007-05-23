@@ -1440,6 +1440,9 @@ JSApp::run(const std::string & theScriptFilename,
            const std::string & theIncludePath,
            const std::vector<std::string> & theScriptArgs)
 {
+
+    Exception::initExceptionBehaviour();
+
     JSObject *glob;
     JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection
     int result;
