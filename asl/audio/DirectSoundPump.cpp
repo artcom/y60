@@ -15,6 +15,7 @@
 #include "DSMessages.h"
 
 #include <asl/Logger.h>
+#include <asl/os_functions.h>
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
 #include <asl/Assure.h>
@@ -28,6 +29,7 @@
 #include <sstream>
 #include <string.h>
 
+#include <atlconv.h>
 #include <mmsystem.h>
 #include <Mmreg.h>
 #include <Ks.h>
@@ -36,13 +38,36 @@
 using namespace std;
 
 namespace asl {
+	typedef map<string,LPGUID> SoundDeviceMap;
+
+	BOOL CALLBACK enumerateDSSoundCards(LPGUID theId, 
+				LPSTR theDescription,
+				LPSTR theDriverName, 
+				LPVOID theStorage )
+	{
+		LPGUID myIdPtr = NULL;
+
+		SoundDeviceMap * myMap = static_cast<SoundDeviceMap*>(theStorage);
+		if (theId != NULL)  {
+			if ((myIdPtr = (LPGUID)malloc(sizeof(GUID))) == NULL) {
+				return true;
+	        }
+		    memcpy(myIdPtr, theId, sizeof(GUID));
+	    }
+
+		(*myMap)[std::string((LPCTSTR)theDescription)] = myIdPtr;
+		return true;
+    }
 
 void dumpDSCaps(const DSCAPS& theDSCaps);
 
 DirectSoundPump::~DirectSoundPump () {
     AC_INFO << "DirectSoundPump::~DirectSoundPump";
+
     Pump::stop();
     closeOutput();
+
+
     if (_myNumUnderruns > 0) {
         AC_WARNING << "DirectSoundPump had " << _myNumUnderruns << " underruns.";
     }
@@ -71,19 +96,59 @@ DirectSoundPump::DirectSoundPump ()
       _myPrimaryBuffer(NULL),
       _myWriteCursor(0),
       _myNumUnderruns(0),
-      _myFramesPlayed(0)
+      _myFramesPlayed(0),
+	  _mySoundCardId(NULL)
 {
     AC_INFO << "DirectSoundPump::DirectSoundPump";
 
     _myFramesPerBuffer = unsigned(getLatency() * getNativeSampleRate())*2;
 
-    setDeviceName("DirectSound default device");
-    
-    setCardName("");
+	string myDeviceName = "DirectSound default device";//default";
+    get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);    
+    AC_DEBUG << "DirectSound Device name: \"" << myDeviceName << "\"";
+    setDeviceName(myDeviceName);
 
-    openOutput();
+
+	setCardName("");
+
+	handleDeviceSelection();
+
 //    dumpState();
     start();
+}
+
+void
+DirectSoundPump::handleDeviceSelection() {
+	unsigned myDeviceNum = 0;
+	get_environment_var_as("Y60_SOUND_DEVICE_NUM", myDeviceNum);    
+    AC_DEBUG << "DirectSound Device num: \"" << myDeviceNum << "\"";
+	SoundDeviceMap mySoundCardMap;
+	if (FAILED(DirectSoundEnumerate((LPDSENUMCALLBACK)enumerateDSSoundCards, (LPVOID)&mySoundCardMap))) {
+		AC_WARNING << "Sorry, an error occured while enumerating sounddevices";
+    }
+	if (myDeviceNum > mySoundCardMap.size()-1) {
+		AC_WARNING << "Sorry, Y60_SOUND_DEVICE_NUM: " << myDeviceNum << " invalid, there are only " 
+			       << mySoundCardMap.size()-1 << " sounddevices";
+	}
+	SoundDeviceMap::iterator myBegin = mySoundCardMap.begin();
+	SoundDeviceMap::iterator myEnd = mySoundCardMap.end();
+	unsigned myCounter = 0;
+	for (;myBegin !=  myEnd; myBegin++) {
+		AC_DEBUG <<  "Audio device: " << myBegin->first << " -> " << &myBegin->second;
+		if (myCounter == myDeviceNum) {
+			_mySoundCardId = myBegin->second;
+			AC_DEBUG <<  "    use Audio device: " << myBegin->first;
+		}
+		myCounter++;
+	}
+	openOutput();
+	
+	myBegin = mySoundCardMap.begin();
+	myEnd = mySoundCardMap.end();
+	for (;myBegin !=  myEnd; myBegin++) {
+		free(myBegin->second);
+	}
+
 }
 
 void
@@ -95,7 +160,7 @@ DirectSoundPump::openOutput() {
     }
     HRESULT theRetVal;
 
-    theRetVal = DirectSoundCreate8(NULL, &_myDS, NULL);
+    theRetVal = DirectSoundCreate8(_mySoundCardId, &_myDS, NULL);
     checkDSRetVal(theRetVal, PLUS_FILE_LINE);
 
     // Determine window. This stuff is mostly bullshit because SetCooperativeLevel 
@@ -173,7 +238,7 @@ void DirectSoundPump::initPrimaryBuffer() {
 
     ZeroMemory(&dsbdesc, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize        = sizeof(DSBUFFERDESC);
-    dsbdesc.dwFlags       = DSBCAPS_PRIMARYBUFFER; // all panning, mixing, etc done by synth
+    dsbdesc.dwFlags       = DSBCAPS_PRIMARYBUFFER | DSBCAPS_GLOBALFOCUS; // all panning, mixing, etc done by synth
     dsbdesc.dwBufferBytes = 0;
     dsbdesc.lpwfxFormat   = NULL;
     theRetVal = _myDS->CreateSoundBuffer( &dsbdesc, &_myPrimaryBuffer, NULL);
@@ -234,7 +299,7 @@ void DirectSoundPump::initSecondaryBuffer() {
     dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
 
     dsbdesc.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLPOSITIONNOTIFY | 
-            DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_STICKYFOCUS;
+            DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_STICKYFOCUS | DSBCAPS_GLOBALFOCUS;
     dsbdesc.dwBufferBytes = _myFramesPerBuffer*getOutputBytesPerFrame();
     dsbdesc.lpwfxFormat = (LPWAVEFORMATEX)myWF; 
  
