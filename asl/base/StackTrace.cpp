@@ -30,6 +30,8 @@ StackTracer<TRACE_POLICY>::print(ostream & os) const {
 template class StackTracer<GlibcBacktrace>;
 #elif defined( OSX )
 template class StackTracer<MachOBacktrace>;
+#elif defined( WIN32 )
+template class StackTracer<Win32Backtrace>;
 #endif
 
 } // end of namespace 

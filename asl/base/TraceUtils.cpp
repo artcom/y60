@@ -12,7 +12,10 @@
 #include "TraceUtils.h"
 
 #include <string>
+
+#ifndef WIN32
 #include <cxxabi.h>
+#endif
 
 using namespace std;
 
@@ -45,5 +48,11 @@ beautify(const std::string & theSymbol) {
     return myResult;
 }
 
+#else
+
+std::string 
+beautify(const std::string & theSymbol) {
+    return theSymbol;
+}
 #endif
 
