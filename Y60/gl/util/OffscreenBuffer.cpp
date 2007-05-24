@@ -239,7 +239,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
             theSamples = 0;
         }
         if (theSamples >= 1) {
-            AC_PRINT << "multisample";
             /*
              * setup multisample framebuffer
              */
