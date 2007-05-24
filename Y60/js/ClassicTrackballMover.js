@@ -97,7 +97,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         setupTrackball(null);
     }
 
-    obj.setTrackedBody = function(theCenter) {
+    obj.setTrackedBody = function(theBody) {
         setupTrackball(theBody);
     }
 
