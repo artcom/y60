@@ -53,10 +53,9 @@ class Win32Backtrace {
 
 
 		static void trace(std::vector<StackFrame> & theStack, int theMaxDepth);
-        //static bool stack_trace(std::ostream&, CONTEXT *, unsigned skip = 0, const char * fmt = default_fmt());
-		static bool stack_trace(std::ostream&, std::vector<StackFrame> & theStack, unsigned skip = 1, const char * fmt = default_fmt()); 	
+		static bool stack_trace(std::vector<StackFrame> & theStack, unsigned skip = 1, const char * fmt = default_fmt()); 	
 		
-		static bool stack_trace(std::ostream&, Win32Backtrace&, std::vector<StackFrame> & theStack, CONTEXT *, 
+		static bool stack_trace(Win32Backtrace&, std::vector<StackFrame> & theStack, CONTEXT *, 
 								unsigned skip = 1, const char * fmt = default_fmt());	
 	
 		static bool get_line_from_addr (HANDLE, unsigned, unsigned *, IMAGEHLP_LINE *);

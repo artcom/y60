@@ -12,9 +12,13 @@
 #ifndef STACK_TRACE_INCLUDED
 #define STACK_TRACE_INCLUDED
 
+#ifdef LINUX
 #include "GlibcBacktrace.h"
+#elif defined( OSX )
 #include "MachOBacktrace.h"
+#elif defined( WIN32 )
 #include "Win32Backtrace.h"
+#endif
 
 #include <iostream>
 #include <vector>

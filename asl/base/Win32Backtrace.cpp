@@ -19,7 +19,6 @@
 #include <malloc.h> 
 #include <tlhelp32.h>
 #include <iostream>
-//#include <winbase.h>
 #pragma comment (lib, "dbghelp")
 
 using namespace std;
@@ -87,8 +86,7 @@ Win32Backtrace::~Win32Backtrace()
 
 void 
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-    std::stringstream ss(std::ios::out);		
-    Win32Backtrace::stack_trace(ss, theStack, 1);	
+    Win32Backtrace::stack_trace(theStack, 1);	
 }
 
 /////////////////////////////////////////////
@@ -145,7 +143,7 @@ static DWORD WINAPI tproc(void * pv)
 
 
 bool 
-Win32Backtrace::stack_trace(std::ostream& os, std::vector<StackFrame> & theStack, unsigned skip, const char * fmt)
+Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip, const char * fmt)
 {
 	if (!fmt) return false;
 
@@ -205,7 +203,7 @@ Win32Backtrace::stack_trace(std::ostream& os, std::vector<StackFrame> & theStack
 		
 	// now it can print stack	
 	Win32Backtrace backtracer(0); 
-	stack_trace(os, backtracer, theStack, &ctx, skip, fmt);
+	stack_trace(backtracer, theStack, &ctx, skip, fmt);
 	
 	return true;
 }
@@ -603,7 +601,7 @@ unsigned Win32Backtrace::fileline (char * buf, unsigned len, unsigned * pline, u
 
 
 bool 
-Win32Backtrace::stack_trace(std::ostream& os, Win32Backtrace& sym, std::vector<StackFrame> & theStack, 
+Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theStack, 
 							CONTEXT * pctx, unsigned skip, const char * fmt)
 {	
 	if (!sym.stack_first(pctx)) 
@@ -614,7 +612,7 @@ Win32Backtrace::stack_trace(std::ostream& os, Win32Backtrace& sym, std::vector<S
 	char fbuf[512] = {0};
 	char sbuf[512] = {0};
 
-	os << std::dec;
+	//os << std::dec;
 	
 	//std::cout << "skip " << skip << std::endl;
 	do
@@ -636,38 +634,38 @@ Win32Backtrace::stack_trace(std::ostream& os, Win32Backtrace& sym, std::vector<S
 					switch (c)
 					{
 					case 'm':							
-						os << (sym.module(buf, sizeof(buf)) ? buf : "?.?");
+						//os << (sym.module(buf, sizeof(buf)) ? buf : "?.?");
 						break;
 					case 'f':
 						if (!pf) 							
 							pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
-						os << pf;	
+						//os << pf;	
 						myItem.frame = (ptrdiff_t)pf;
 						break;
 					case 'l':
-						if (!pf) 							
+						/*if (!pf) 							
 							pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
 						if (*(p + 1) == 'd') { os << ld; ++p; }
-						else os << ln;							
+						else os << ln;	*/						
 						break;
 					case 's':
 						if	(!ps)
 							ps = sym.symbol(sbuf, sizeof(sbuf), &sd) ? sbuf : "?()";
-						if (*(p + 1) == 'd') { os << sd; ++p; }
-						else os << ps;
+						//if (*(p + 1) == 'd') { os << sd; ++p; }
+						//else os << ps;
 						myItem.name = ps;
 						break;
 					case '%':
-						os << '%';
+						//os << '%';
 						break;
 					default:
-						os << '%' << c;	// prints unknown format's argument
+						//os << '%' << c;	// prints unknown format's argument
 						break;
 					}
 				}
 				else
 				{
-					os << *p;
+					//os << *p;
 				}
 			}
 			theStack.push_back(myItem);
@@ -679,7 +677,8 @@ Win32Backtrace::stack_trace(std::ostream& os, Win32Backtrace& sym, std::vector<S
 	}
 
 	
-	while (os.good() && sym.stack_next());
+	//while (os.good() && sym.stack_next());
+	while (sym.stack_next());
 	return true;
 }
         
