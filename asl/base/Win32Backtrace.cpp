@@ -33,7 +33,7 @@
 #include "Win32Backtrace.h"
 #include "TraceUtils.h"
 
-
+/*
 #include <crtdbg.h>
 #include <malloc.h> 
 #include <tlhelp32.h>
@@ -81,7 +81,7 @@ BOOL __stdcall My_ReadProcessMemory (HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuf
 }
 
 
-
+*/
 namespace asl {
 
 /** \brief nothing to note
@@ -92,6 +92,7 @@ namespace asl {
  * if trace exceptions for windows don't work in some cases - 
  * this might be a good starting point
 */
+	/*
 Win32Backtrace::Win32Backtrace (unsigned address) 
 	: m_address(address), m_ok(false), m_pframe(0)
 {
@@ -103,14 +104,15 @@ Win32Backtrace::~Win32Backtrace()
 	delete m_pframe;
 }
 
-
+*/
 void 
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-    Win32Backtrace::stack_trace(theStack, 1); // skip the first frame	
+	//    Win32Backtrace::stack_trace(theStack, 1); // skip the first frame	
 }
 
 /////////////////////////////////////////////
 // prints a current thread's stack
+/*
 struct current_context : CONTEXT
 {
 	HANDLE	thread;	 
@@ -590,6 +592,6 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 	return true;
 }
         
-
+*/
 }
 
