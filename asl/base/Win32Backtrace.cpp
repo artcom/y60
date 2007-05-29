@@ -9,6 +9,25 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
+/*
+ Copyright (c) 2002
+ Author: Konstantin Boukreev
+ E-mail: konstantin@mail.primorye.ru 
+ Created: 16.01.2002 12:07:21
+ Version: 1.0.0
+
+ Permission to use, copy, modify, distribute and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+ provided that the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear
+ in supporting documentation.  Konstantin Boukreev makes no representations
+ about the suitability of this software for any purpose.
+ It is provided "as is" without express or implied warranty.
+
+ set of classes for working with win32 structured exception in C++.
+ the example of using Symbol Handler and Debugging service API for printing a call stack's info  
+*/
+
 
 
 #include "Win32Backtrace.h"
@@ -33,12 +52,6 @@ using namespace std;
 #define VERIFY(x) (x)
 #endif //_DEBUG
 
-//#define WORK_AROUND_SRCLINE_BUG
-//
-//#ifdef _DEBUG
-////#if 1
-//// #define SYM_ENGINE_TRACE_SPIN_COUNT
-//#endif //_DEBUG
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -71,7 +84,14 @@ BOOL __stdcall My_ReadProcessMemory (HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuf
 
 namespace asl {
 
-	
+/** \brief nothing to note
+ * if you encounter any problems here, I found some more interesting aspects:
+ * http://nedbatchelder.com/blog/20051006T065335.html
+ * http://www.codeproject.com/threads/StackWalker.asp
+ * http://www.codeproject.com/cpp/exception.asp
+ * if trace exceptions for windows don't work in some cases - 
+ * this might be a good starting point
+*/
 Win32Backtrace::Win32Backtrace (unsigned address) 
 	: m_address(address), m_ok(false), m_pframe(0)
 {
@@ -91,7 +111,6 @@ Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
 
 /////////////////////////////////////////////
 // prints a current thread's stack
-
 struct current_context : CONTEXT
 {
 	HANDLE	thread;	 
@@ -107,20 +126,13 @@ static DWORD WINAPI tproc(void * pv)
 		// Konstantin, 14.01.2002 17:21:32
 		// must wait in spin lock until main thread will leave a ResumeThread (must return back to user context)
 		unsigned debug_only = 0;
-		while (p->signal) 
-		{		
+		while (p->signal) {		
 			if (!SwitchToThread())
 				Sleep(20); // forces switch to another thread 
 			++debug_only;
 		}
-		#ifdef SYM_ENGINE_TRACE_SPIN_COUNT
-		char s[256];
-		wsprintf(s, "sym_engine::tproc, spin count %u\n", debug_only);
-		OutputDebugString(s);
-		#endif;
 		
-		if (-1 == SuspendThread(p->thread)) 
-		{
+		if (-1 == SuspendThread(p->thread)) {
 			p->signal  = -1;
 			__leave;
 		}
@@ -147,8 +159,6 @@ Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 {
 	
 	// attempts to get current thread's context
-
-	
 	current_context ctx;
 	memset(&ctx, 0, sizeof current_context);
 
@@ -168,34 +178,21 @@ Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 	HANDLE worker = CreateThread(0, 0, tproc, &ctx, CREATE_SUSPENDED, &dummy);	
 	_ASSERTE(worker);
 
-	if (worker)
-	{
+	if (worker) {
 		 VERIFY(SetThreadPriority(worker, THREAD_PRIORITY_ABOVE_NORMAL)); //  THREAD_PRIORITY_HIGHEST
-		if (-1 != ResumeThread(worker))
-		{
-			unsigned debug_only = 0;
+		if (-1 != ResumeThread(worker)) {
 										// Konstantin, 14.01.2002 17:21:32
 			ctx.signal = 0;				// only now the worker thread can get this thread context
-			while (!ctx.signal)
-				++debug_only; // wait in spin		
-			/*#ifdef 
-			char s[256];
-			wsprintf(s, "sym_engine::stack_trace, spin count %u\n", debug_only);
-			OutputDebugString(s);
-			#endif*/
-		}			
-		else
-		{
+			while (!ctx.signal);
+		} else {
 			VERIFY(TerminateThread(worker, 0));
 		}
-
 		VERIFY(CloseHandle(worker));		
 	}
 	
 	VERIFY(CloseHandle(ctx.thread));
 
-	if (ctx.signal == -1)
-	{
+	if (ctx.signal == -1) {
 		_ASSERTE(0);
 		return false;
 	}
@@ -265,7 +262,8 @@ Win32Backtrace::guard::~guard()
 	clear(); 
 }
 
-bool Win32Backtrace::guard::init()
+bool 
+Win32Backtrace::guard::init()
 {	
 	if (!m_ref) 
 	{
@@ -301,8 +299,7 @@ bool Win32Backtrace::guard::init()
 							m_ref = 0;
 							for (unsigned i = 0; i < cb / sizeof (HMODULE); ++i)
 							{								
-								if (!load_module(hProc, pmod[i]))
-								{
+								if (!load_module(hProc, pmod[i])) {
 								//	m_ref = -1;
 								//	break;
 									_ASSERTE(0);
@@ -459,19 +456,6 @@ Win32Backtrace::stack_next  ()
 	return true;
 }
 
-//unsigned Win32Backtrace::module(char * buf, unsigned len)
-//{
-//	if (!len || !buf || IsBadWritePtr(buf, len))
-//		return 0;
-//
-//	if (!check())
-//		return 0;
-//
-//	HANDLE hProc = SymGetProcessHandle();
-//	HMODULE hMod = (HMODULE)SymGetModuleBase (hProc, m_address);
-//	if (!hMod) return 0;
-//	return get_module_basename(hMod, buf, len);	
-//}
 
 
 bool 
@@ -502,42 +486,6 @@ Win32Backtrace::get_line_from_addr (HANDLE hProc, unsigned addr, unsigned * pdis
     return 0 != SymGetLineFromAddr (hProc, addr, (DWORD *) pdisplacement, pLine);
 	#endif
 }
-
-
-//unsigned 
-//Win32Backtrace::get_module_basename (HMODULE hMod, char * buf, unsigned len)
-//{
-//	char filename[MAX_PATH];
-//	DWORD r = GetModuleFileNameA(hMod, filename, MAX_PATH);
-//	if (!r) return 0;
-//	
-//	char * p = 0;
-//
-//	// Find the last '\' mark.
-//	int i = r - 1;
-//	for (; i >= 0; i--)
-//	{	
-//		if (filename[i] == '\\') 
-//		{
-//			p = &filename[i + 1]; 
-//			break;
-//		} 
-//	}
-//
-//	if (!p)
-//	{
-//		i = 0;
-//		p = filename;
-//	}
-//	
-//	
-//	len = (len - 1 < r - i - 1) ? len - 1 : r - i - 1;
-////	len = min(len - 1, r - i - 1);
-//	memcpy(buf, p, len);
-//	buf[len] = 0;
-//	return len;
-//}
-
 
 
 unsigned Win32Backtrace::symbol(char * buf, unsigned len, unsigned * pdisplacement)
