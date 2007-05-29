@@ -86,7 +86,7 @@ Win32Backtrace::~Win32Backtrace()
 
 void 
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-    Win32Backtrace::stack_trace(theStack, 1);	
+    Win32Backtrace::stack_trace(theStack, 1); // skip the first frame	
 }
 
 /////////////////////////////////////////////
@@ -143,10 +143,9 @@ static DWORD WINAPI tproc(void * pv)
 
 
 bool 
-Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip, const char * fmt)
+Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 {
-	if (!fmt) return false;
-
+	
 	// attempts to get current thread's context
 
 	
@@ -203,7 +202,7 @@ Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip, c
 		
 	// now it can print stack	
 	Win32Backtrace backtracer(0); 
-	stack_trace(backtracer, theStack, &ctx, skip, fmt);
+	stack_trace(backtracer, theStack, &ctx, skip);
 	
 	return true;
 }
@@ -460,19 +459,19 @@ Win32Backtrace::stack_next  ()
 	return true;
 }
 
-unsigned Win32Backtrace::module(char * buf, unsigned len)
-{
-	if (!len || !buf || IsBadWritePtr(buf, len))
-		return 0;
-
-	if (!check())
-		return 0;
-
-	HANDLE hProc = SymGetProcessHandle();
-	HMODULE hMod = (HMODULE)SymGetModuleBase (hProc, m_address);
-	if (!hMod) return 0;
-	return get_module_basename(hMod, buf, len);	
-}
+//unsigned Win32Backtrace::module(char * buf, unsigned len)
+//{
+//	if (!len || !buf || IsBadWritePtr(buf, len))
+//		return 0;
+//
+//	if (!check())
+//		return 0;
+//
+//	HANDLE hProc = SymGetProcessHandle();
+//	HMODULE hMod = (HMODULE)SymGetModuleBase (hProc, m_address);
+//	if (!hMod) return 0;
+//	return get_module_basename(hMod, buf, len);	
+//}
 
 
 bool 
@@ -505,39 +504,39 @@ Win32Backtrace::get_line_from_addr (HANDLE hProc, unsigned addr, unsigned * pdis
 }
 
 
-unsigned 
-Win32Backtrace::get_module_basename (HMODULE hMod, char * buf, unsigned len)
-{
-	char filename[MAX_PATH];
-	DWORD r = GetModuleFileNameA(hMod, filename, MAX_PATH);
-	if (!r) return 0;
-	
-	char * p = 0;
-
-	// Find the last '\' mark.
-	int i = r - 1;
-	for (; i >= 0; i--)
-	{	
-		if (filename[i] == '\\') 
-		{
-			p = &filename[i + 1]; 
-			break;
-		} 
-	}
-
-	if (!p)
-	{
-		i = 0;
-		p = filename;
-	}
-	
-	
-	len = (len - 1 < r - i - 1) ? len - 1 : r - i - 1;
-//	len = min(len - 1, r - i - 1);
-	memcpy(buf, p, len);
-	buf[len] = 0;
-	return len;
-}
+//unsigned 
+//Win32Backtrace::get_module_basename (HMODULE hMod, char * buf, unsigned len)
+//{
+//	char filename[MAX_PATH];
+//	DWORD r = GetModuleFileNameA(hMod, filename, MAX_PATH);
+//	if (!r) return 0;
+//	
+//	char * p = 0;
+//
+//	// Find the last '\' mark.
+//	int i = r - 1;
+//	for (; i >= 0; i--)
+//	{	
+//		if (filename[i] == '\\') 
+//		{
+//			p = &filename[i + 1]; 
+//			break;
+//		} 
+//	}
+//
+//	if (!p)
+//	{
+//		i = 0;
+//		p = filename;
+//	}
+//	
+//	
+//	len = (len - 1 < r - i - 1) ? len - 1 : r - i - 1;
+////	len = min(len - 1, r - i - 1);
+//	memcpy(buf, p, len);
+//	buf[len] = 0;
+//	return len;
+//}
 
 
 
@@ -602,7 +601,7 @@ unsigned Win32Backtrace::fileline (char * buf, unsigned len, unsigned * pline, u
 
 bool 
 Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theStack, 
-							CONTEXT * pctx, unsigned skip, const char * fmt)
+							CONTEXT * pctx, unsigned skip)
 {	
 	if (!sym.stack_first(pctx)) 
 		return false;
@@ -612,9 +611,6 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 	char fbuf[512] = {0};
 	char sbuf[512] = {0};
 
-	//os << std::dec;
-	
-	//std::cout << "skip " << skip << std::endl;
 	do
 	{
 		if (!skip)
@@ -625,59 +621,23 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 			char *   pf	= 0;
 			char *   ps = 0;
 			
-			for (char * p = (char *)fmt; *p; ++p)
-			{				
-				if (*p == '%')
-				{
-					++p; // skips '%'
-					char c = *p;
-					switch (c)
-					{
-					case 'm':							
-						//os << (sym.module(buf, sizeof(buf)) ? buf : "?.?");
-						break;
-					case 'f':
-						if (!pf) 							
-							pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
-						//os << pf;	
-						myItem.frame = (ptrdiff_t)pf;
-						break;
-					case 'l':
-						/*if (!pf) 							
-							pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
-						if (*(p + 1) == 'd') { os << ld; ++p; }
-						else os << ln;	*/						
-						break;
-					case 's':
-						if	(!ps)
-							ps = sym.symbol(sbuf, sizeof(sbuf), &sd) ? sbuf : "?()";
-						//if (*(p + 1) == 'd') { os << sd; ++p; }
-						//else os << ps;
-						myItem.name = ps;
-						break;
-					case '%':
-						//os << '%';
-						break;
-					default:
-						//os << '%' << c;	// prints unknown format's argument
-						break;
-					}
-				}
-				else
-				{
-					//os << *p;
-				}
+			if (!pf) {							
+				pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
 			}
+			myItem.frame = (ptrdiff_t)pf;
+			
+			if	(!ps) {
+				ps = sym.symbol(sbuf, sizeof(sbuf), &sd) ? sbuf : "?()";
+			}
+			myItem.name = ps;
 			theStack.push_back(myItem);
+
 		}
 		else
 		{
 			--skip;
 		}
 	}
-
-	
-	//while (os.good() && sym.stack_next());
 	while (sym.stack_next());
 	return true;
 }
