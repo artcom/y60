@@ -76,7 +76,7 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         return _myLookAtPosition;
     }
     
-    obj.update = function(theTime) {
+    obj.update = function(theTime, theDeltaT) {
         if (_myLastTime == null) {
             _myLastTime = theTime;
         }
@@ -85,8 +85,9 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
             Logger.warning("No node to follow specified.");
             return;
         }
+        
+        var myDeltaTime = theDeltaT ? theDeltaT : (theTime - _myLastTime);
 
-        var myDeltaTime = theTime - _myLastTime;
         _myLastTime = theTime;
         
         var myRotationMatrix = null;
