@@ -25,17 +25,6 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     const CAMERA_UP_DIRECTION    = new Vector3f(0,1,0);
     const CAMERA_RIGHT_DIRECTION = cross(CAMERA_FRONT_DIRECTION, CAMERA_UP_DIRECTION);
     
-    var _myCamera       = theCamera;
-    var _myNodeToFollow = theNodeToFollow;
-
-    var _myLookAtPosition    = new Vector3f(0,0,0);
-    var _myLookAtOffset      = new Vector3f(0,0,0);
-    var _myEyePositionOffset = new Vector3f(10,2,0);
-    var _myOrientation       = null;
-
-    var _mySpringStrength = 1;
-    var _myLastTime = null;
-
     obj.setup = function() {      
         obj.reset();
     }
@@ -68,6 +57,7 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
 
     obj.setSpringStrength = function(theSpringStrength) {
         _mySpringStrength = theSpringStrength;
+        _mySpringCoef     = calcSpringCoef(theSpringStrength);
     }
        
     obj.getSpringStrength = function() {
@@ -99,8 +89,6 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         var myDeltaTime = theTime - _myLastTime;
         _myLastTime = theTime;
         
-        // var myMatrix = _myNodeToFollow.globalmatrix;
-
         var myRotationMatrix = null;
         if (_myOrientation) {
             myRotationMatrix = new Matrix4f(_myOrientation);
@@ -108,31 +96,55 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
             myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
         }
 
-        //var myNodePosition = _myNodeToFollow.boundingbox.center;
-        var myNodePosition = _myNodeToFollow.globalmatrix.getRow(3).xyz;
+        var myNodePosition   = _myNodeToFollow.globalmatrix.getRow(3).xyz;
+        var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
+        var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
 
+        // old code
         if ( isFinite(_mySpringStrength) ) {
             var myMotionFactor = _mySpringStrength * myDeltaTime;
             if (myMotionFactor > 1) {
                 myMotionFactor = 1;
             }
-
-            var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
             var myDistance = difference(myEyePosition, _myCamera.position);
             _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
 
-            var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
             myDistance = difference(myLookAtPosition, _myLookAtPosition);
             _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
         } else {
-            _myCamera.position = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
-            _myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
+            _myCamera.position = myEyePosition;
+            _myLookAtPosition = myLookAtPosition;
         }
+
+        // new code
+        //if (isFinite(_mySpringStrength)) {
+        //    _mySpringCoef = Math.atan(_mySpringStrength * myDeltaTime * PI_2) / PI_2;
+        //} else {
+        //    _mySpringCoef = 1.0;
+        //}
+        //_myCamera.position = sum(product(_myCamera.position, (1 - _mySpringCoef)), product(myEyePosition, _mySpringCoef));
+        //_myLookAtPosition  = sum(product(_myLookAtPosition, (1 - _mySpringCoef)), product(myLookAtPosition, _mySpringCoef));
 
         // calc orientation
         var myViewVector = normalized(difference(_myLookAtPosition, _myCamera.position));
         _myCamera.orientation = getOrientationFromDirection(myViewVector, CAMERA_UP_DIRECTION);
     }
     
+    function calcSpringCoef(theSpringStrength) {
+        return Math.atan(theSpringStrength * 0.1) / PI_2;
+    }
+
+    var _myCamera       = theCamera;
+    var _myNodeToFollow = theNodeToFollow;
+
+    var _myLookAtPosition    = new Vector3f(0,0,0);
+    var _myLookAtOffset      = new Vector3f(0,0,0);
+    var _myEyePositionOffset = new Vector3f(10,2,0);
+    var _myOrientation       = null;
+
+    var _mySpringStrength = 1;
+    var _mySpringCoef = calcSpringCoef(_mySpringStrength);
+    var _myLastTime = null;
+
     obj.setup();
 }
