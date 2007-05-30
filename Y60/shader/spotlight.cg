@@ -100,8 +100,12 @@ float4 mainFragment(vert2frag IN,
     myDiffuse  = diffuse;
 #endif // PAINT
 
+#ifdef IGNORE_AMBIENT
+    myDiffuse = float4(0.0, 0.0, 0.0, 1.0); 
+#else
     myDiffuse = myDiffuse * ambient; 
-   
+#endif // IGNORE_AMBIENT
+
     float3 N = IN.worldNormal;
 
     // spot lights

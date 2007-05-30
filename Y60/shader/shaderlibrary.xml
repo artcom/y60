@@ -1619,6 +1619,79 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s134b" name="spotlight_no_texture_no_ambient" cost="10">
+       <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight_no_ambient]"/>
+        </supports>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DIGNORE_AMBIENT]]'>
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DIGNORE_AMBIENT]]'>
+            <properties>
+              <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>  	 
+                <float name="penumbra">0.0</float> 	 
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s135b" name="spotlight_one_texture_no_ambient" cost="10">
+       <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="texcoord" values="[*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight_no_ambient]"/>
+        </supports>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT, -DIGNORE_AMBIENT]]'>
+            <properties>
+              <float name="penumbra">0.0</float>  	 
+              <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f> 	 
+              <float name="fogDensity">0.0</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT, -DIGNORE_AMBIENT]]'>
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s136b" name="spotlight_two_textures_no_ambient" cost="10">
+       <supports>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[*,*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight_no_ambient]"/>
+        </supports>
+        <vertexshader profiles="[arbvp1,vp30,vp40]" files="[spotlight.cg]" entryfunctions="[mainVertex]" compilerargs='[[-DPAINT=2, -DIGNORE_AMBIENT]]'>
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[arbfp1,fp30,fp40]" files="[spotlight.cg]" entryfunctions="[mainFragment]" compilerargs='[[-DPAINT=2, -DIGNORE_AMBIENT]]'>
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>  	 
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
     <shader id="s137" name="snowstreet" cost="100">
         <supports>
             <feature class="lighting" values="[lambert]"/>
