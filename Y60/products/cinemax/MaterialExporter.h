@@ -20,6 +20,8 @@
 #ifndef _ac_c4d_MaterialExporter_h_
 #define _ac_c4d_MaterialExporter_h_
 
+#include "Exceptions.h"
+
 #include "c4d_include.h"
 
 #include <y60/MaterialBuilder.h>

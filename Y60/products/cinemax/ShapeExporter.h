@@ -20,9 +20,7 @@
 #ifndef _ac_c4d_ShapeExporter_h_
 #define _ac_c4d_ShapeExporter_h_
 
-#include "c4d_include.h"
 #include "MaterialExporter.h"
-
 #include <asl/linearAlgebra.h>
 
 #include <string>

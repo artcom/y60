@@ -17,11 +17,8 @@
 //
 //=============================================================================
 
-#include "CinemaHelpers.h"
 #include "ShapeExporter.h"
-#include "MaterialExporter.h"
-
-#include "Exceptions.h"
+#include "CinemaHelpers.h"
 
 #include <y60/ElementBuilder.h>
 #include <y60/SceneBuilder.h>

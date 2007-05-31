@@ -10,7 +10,6 @@
 
 #include "MaterialExporter.h"
 
-#include "Exceptions.h"
 #include "CinemaHelpers.h"
 
 #include <asl/Matrix4.h>
@@ -19,7 +18,7 @@
 #include <y60/PropertyNames.h>
 #include <y60/Image.h>
 
-#if API_VERSION >= 8500
+#if C4D_API_VERSION >= 8500
 #include <Xbitmap.h>
 #endif
 
@@ -145,7 +144,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         if (theMaterialBuilder->isMovie(myTextureFilename)) {
             LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
             unsigned myLoopCount = 0;
-#if API_VERSION >= 8500
+#if C4D_API_VERSION >= 8500
             switch(myTimeMode) {
                 case BITMAPSHADER_TIMING_MODE_SIMPLE:
                     myLoopCount = 1;

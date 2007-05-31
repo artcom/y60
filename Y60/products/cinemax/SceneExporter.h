@@ -20,7 +20,6 @@
 #ifndef _ac_c4d_SceneExporter_h_
 #define _ac_c4d_SceneExporter_h_
 
-#include "c4d_include.h"
 
 #include <stddef.h>
 #include <string>
@@ -31,6 +30,8 @@
 #include <y60/WorldBuilder.h>
 #include <y60/TransformBuilder.h>
 #include <y60/CameraBuilder.h>
+
+#include "c4d_include.h"
 
 class ShapeExporter;
 class MaterialExporter;

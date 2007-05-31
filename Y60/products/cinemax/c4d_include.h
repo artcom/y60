@@ -29,6 +29,7 @@
 #undef min
 #undef max
 
+#undef API_VERSION
 #include <c4d.h>
 #undef offsetof
 

@@ -17,10 +17,10 @@
 //
 //=============================================================================
 
-#include "CinemaHelpers.h"
-
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>
+
+#include "CinemaHelpers.h"
 
 using namespace asl;
 

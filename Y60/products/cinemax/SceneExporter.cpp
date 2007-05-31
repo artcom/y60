@@ -22,8 +22,6 @@
 
 #include "AnimationExporter.h"
 #include "ShapeExporter.h"
-#include "MaterialExporter.h"
-#include "Exceptions.h"
 #include "CinemaHelpers.h"
 #include "res/c4d_symbols.h"
 #include "res/Facxmlexport.h"
