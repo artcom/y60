@@ -14,7 +14,8 @@
 
 #include "TraceUtils.h"
 
-/*
+#define _WINSOCKAPI_ // prevent winsock.h #include's
+
 #include <crtdbg.h>
 #if _MSC_VER > 1000 
 #pragma once
@@ -90,7 +91,7 @@
 
 #include <imagehlp.h>
 #include <ostream>
-*/
+
 #include <vector>
 #include <string>
 
@@ -113,7 +114,7 @@ class Win32Backtrace {
     
 	private:
         Win32Backtrace();
-		/*
+		
 		Win32Backtrace (unsigned);
 		~Win32Backtrace();
 
@@ -158,7 +159,7 @@ class Win32Backtrace {
 				bool load_module(HANDLE, HMODULE);
 				int  m_ref;
 		};
-		*/
+		
 };
 
 }
