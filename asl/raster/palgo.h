@@ -645,6 +645,17 @@ struct MomentResults {
     Vector2<float> minor_dir;
 };
 
+inline
+asl::Vector2f
+direction_vector( float theAngle ) {
+    return Vector2f( cos( theAngle ), sin( theAngle ));
+}
+
+inline
+asl::Vector2f
+orthonormal_vector( const Vector2f & v) {
+    return Vector2f( v[1], - v[0] );
+}
 
 template <class RASTER>
 bool analyseMoments(const RASTER & mat, MomentResults & mom)
@@ -681,7 +692,7 @@ bool analyseMoments(const RASTER & mat, MomentResults & mom)
 
     mom.center = Vector2<float>(xc,yc);
     mom.major_angle = major_axis_angle;
-    // TODO mom.major_dir = direction_vector(major_axis_angle);
+    mom.major_dir = direction_vector(major_axis_angle);
     // TODO mom.minor_dir = mom.major_dir.ortho();
     // TODO mom.minor_angle = angle_of(mom.minor_dir);
     
