@@ -32,7 +32,21 @@ enum DriverStateEnum {
     NO_SERIAL_PORT,
     SYNCHRONIZING,
     RUNNING,
+    CONFIGURING,
     DriverStateEnum_MAX
+};
+
+enum CommandState {
+    SEND_CONFIG_COMMANDS,
+    WAIT_FOR_RESPONSE,
+    WAIT_FOR_EXIT
+};
+
+enum CommandResponse {
+    RESPONSE_NONE,
+    RESPONSE_OK,
+    RESPONSE_ERROR,
+    RESPONSE_TIMEOUT
 };
 
 DEFINE_ENUM( DriverState, DriverStateEnum );
@@ -54,8 +68,10 @@ struct RasterHandle {
 #define MAX_HISTORY_LENGTH 5
 
 struct Cursor {
-    Cursor(const asl::Vector2f & thePos, const asl::Box2f & theBox) :
-            position( thePos ), 
+    Cursor(const asl::MomentResults & theMomentResult, const asl::Box2f & theBox) :
+            position( theMomentResult.center ), 
+            major_direction( theMomentResult.major_dir ),
+            minor_direction( theMomentResult.minor_dir ),
             roi( theBox),
             firstDerivative(0.0),
             lastTouchTime(0.0),
@@ -65,66 +81,9 @@ struct Cursor {
         previousRoi.makeEmpty();
     }
 
-    float getMinIntensity() {
-        if ( ! intensityHistory.empty()) {
-            float myMin = INT_MAX;
-            for (unsigned i = 0; i < intensityHistory.size(); ++i) {
-                myMin = asl::minimum(myMin, intensityHistory[i]);
-            }
-            return myMin;
-        }
-        return intensity;
-
-    }
-
-    float getAverageFirstDerivative() const {
-        if ( ! firstDerivativeHistory.empty()) {
-            float mySum = 0.0;
-            for (unsigned i = 0; i < firstDerivativeHistory.size(); ++i) {
-                mySum += fabs(firstDerivativeHistory[i]) / (firstDerivativeHistory.size() - i);
-            }
-            return mySum / firstDerivativeHistory.size();
-        }
-        return 0.0;
-    }
- 
-    float getAverageMaxGradient() const {
-        return getAverageFromHistory(maxGradientHistory);
-    }
-    
-    float getAverageSecondDerivative() const {
-        return getAverageFromHistory(secondDerivativeHistory);
-    }
-    
-    float getAverageFromHistory(const std::deque<float> & theHistory) const {
-        if ( ! theHistory.empty()) {
-            float mySum = 0.0;
-            for (unsigned i = 0; i < theHistory.size(); ++i) {
-                mySum += fabs(theHistory[i]);// / (theHistory.size() - i);
-            }
-            return mySum / theHistory.size();
-        }
-        return 0.0;
-
-    }
-    
-    float getAbsoluteDerivativeSum() {
-        float mySum = 0.0;
-        for (unsigned i = 0; i < firstDerivativeHistory.size(); ++i) {
-            mySum += fabs(firstDerivativeHistory[i]);// / (theHistory.size() - i);
-        }
-        return mySum;
-    }
-    
-    float getDerivativeSum() {
-        float mySum = 0.0;
-        for (unsigned i = 1; i < firstDerivativeHistory.size(); ++i) {
-            mySum += (firstDerivativeHistory[i]<firstDerivativeHistory[i-1])? -1:1;// / (theHistory.size() - i);
-        }
-        return mySum;
-    }
-
     asl::Vector2f position;
+    asl::Vector2f major_direction;
+    asl::Vector2f minor_direction;
     asl::Box2f    roi;
     asl::Box2f    previousRoi;
     float         intensity;
@@ -133,9 +92,6 @@ struct Cursor {
     double        lastTouchTime;
 
 
-    std::deque<float> maxGradientHistory;
-    std::deque<float> firstDerivativeHistory;
-    std::deque<float> secondDerivativeHistory;
     std::deque<float> intensityHistory;
 
 
@@ -166,7 +122,11 @@ class ASSDriver :
         virtual void onSetProperty(const std::string & thePropertyName,
                            const PropertyValue & thePropertyValue);
         virtual void onUpdateSettings(dom::NodePtr theSettings);
-        
+        JSFunctionSpec * Functions();
+
+        void performTara();
+        void callibrateTransmissionLevels();
+
     protected:
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
@@ -191,10 +151,11 @@ class ASSDriver :
         void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT);
         void computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster);
         float matchProximityPattern(const CursorMap::iterator & theCursorIt);
-        void computeCursorPositions( std::vector<asl::Vector2f> & theCurrentPositions,
+        void computeCursorPositions( std::vector<asl::MomentResults> & theCurrentPositions,
                                      const BlobListPtr & theROIs);
-        void correlatePositions( const std::vector<asl::Vector2f> & thePreviousPositions, 
+        void correlatePositions( const std::vector<asl::MomentResults> & theCurrentPositions, 
                                  const BlobListPtr theROIs);
+
 
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
@@ -206,7 +167,6 @@ class ASSDriver :
 
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
-        RasterHandle _myGradientRaster; // XXX unused
         RasterHandle _myMomentRaster;
         std::vector<std::string> _myRasterNames;
 
@@ -232,6 +192,10 @@ class ASSDriver :
         void readDataFromPort();
         void scanForSerialPort();
         void freeSerialPort();
+        void sendCommand( const std::string & theCommand );
+        CommandResponse getCommandResponse();
+        void handleConfigurationCommand();
+        void queueCommand( const char * theCommand );
 
         std::vector<unsigned char> _myFrameBuffer;
         asl::SerialDevice * _mySerialPort;
@@ -252,6 +216,10 @@ class ASSDriver :
         std::vector<unsigned char> _myReceiveBuffer;
 
         int _myDumpValuesFlag;
+
+        std::list<std::string> _myCommandQueue;
+        CommandState _myConfigureState;
+        double       _myLastCommandTime;
 };
 
 

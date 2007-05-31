@@ -17,6 +17,7 @@
 #include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
 #include <y60/AbstractRenderWindow.h>
+#include <y60/JSScriptablePlugin.h>
 
 #include <iostream>
 
@@ -30,15 +31,24 @@
 using namespace std;
 using namespace asl;
 using namespace y60;
+using namespace jslib;
 
 static const char * DriverStateStrings[] = {
     "no_serial_port",
     "synchronizing",
     "running",
+    "configuring",
     ""
 };
 
 IMPLEMENT_ENUM( y60::DriverState, DriverStateStrings );
+
+const char * CMD_ENTER_CONFIG_MODE = "x";
+const char * CMD_QUERY_CONFIG_MODE = "c98";
+const char * CMD_LEAVE_CONFIG_MODE = "c99";
+
+const char * CMD_CALLIBRATE_TRANSMISSION_LEVEL = "c01";
+const char * CMD_PERFORM_TARA = "c02";
 
 namespace y60 {
 
@@ -47,7 +57,10 @@ const unsigned char myMagicToken( 255 );
 static const char * RAW_RASTER = "ASSRawRaster";
 static const char * FILTERED_RASTER = "ASSFilteredRaster";
 static const char * MOMENT_RASTER = "ASSMomentRaster";
-static const char * GRADIENT_RASTER = "ASSGradientRaster";
+
+const std::string OK_STRING("OK");
+const std::string ERROR_STRING("ERR");
+const double COMMAND_TIMEOUT( 0.2 );
 
 #ifdef OSX
 #undef verify
@@ -57,10 +70,26 @@ Box2f
 asBox2f( const Box2i & theBox ) {
     return Box2f( Vector2f( theBox[Box2i::MIN][0], theBox[Box2i::MIN][1]),
                 Vector2f( theBox[Box2i::MAX][0], theBox[Box2i::MAX][1]));
-    
 }
 
 
+//XXX
+void dumpBuffer(std::vector<unsigned char> & theBuffer) {
+    cerr << "buffer: '";
+    for (unsigned i = 0; i < theBuffer.size(); ++i) {
+        cerr << theBuffer[i];
+    }
+    cerr << "'" << endl;
+}
+// XXX
+void fillBufferWithString(std::vector<unsigned char> & theBuffer, const char * theString) {
+    string myString( theString );
+    for (unsigned i = 0; i < myString.size(); ++i) {
+        theBuffer.push_back( myString[i] );
+    }
+    AC_PRINT << "================";
+    dumpBuffer( theBuffer );
+}
 
 ASSDriver::ASSDriver() :
     IRendererExtension("ASSDriver"),
@@ -68,7 +97,6 @@ ASSDriver::ASSDriver() :
     _mySyncLostCounter(0),
     _myRawRaster(dom::ValuePtr(0)),
     _myDenoisedRaster(dom::ValuePtr(0)),
-    _myGradientRaster(dom::ValuePtr(0)),
     _myMomentRaster(dom::ValuePtr(0)),
     _myScene(0),
     _myNoiseThreshold( 15 ),
@@ -90,7 +118,8 @@ ASSDriver::ASSDriver() :
     _myStopBits( 1 ),
     _myHandshakingFlag( false ),
     _myReceiveBuffer(256),
-    _myDumpValuesFlag( 0 )
+    _myDumpValuesFlag( 0 ),
+    _myLastCommandTime( asl::Time() )
 {
     setState(NO_SERIAL_PORT);
 }
@@ -170,7 +199,6 @@ ASSDriver::allocateGridBuffers() {
     _myRawRaster = allocateRaster(RAW_RASTER);
     _myDenoisedRaster = allocateRaster(FILTERED_RASTER);
     _myMomentRaster = allocateRaster(MOMENT_RASTER);
-    _myGradientRaster = allocateRaster(GRADIENT_RASTER);
 }
 
 RasterHandle
@@ -325,22 +353,7 @@ ASSDriver::updateDerivedRasters()
             myMomentRaster.begin(),
             Power<gray<unsigned char> >( _myGainPower));
 
-    y60::RasterOfGRAY & myGradientRaster = *
-        dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myGradientRaster.value) );
- 
-    for (unsigned i = 0; i < myGradientRaster.vsize()-1; ++i) {
-        for (unsigned j = 0; j < myGradientRaster.hsize()-1; ++j) {
-            unsigned myIndex = i*myDenoisedRaster.vsize() + j;
-            unsigned char myDiffY = abs( int(myDenoisedRaster[myIndex].get()) -
-                                         int(myDenoisedRaster[myIndex+myDenoisedRaster.hsize()].get() ));
-            unsigned char myDiffX = abs( int(myDenoisedRaster[myIndex].get()) - 
-                                         int(myDenoisedRaster[myIndex+1].get() ));
-            myGradientRaster[myIndex] = maximum(myDiffX, myDiffY);
-        }
-    }
-
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
-    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myGradientRaster.value) );
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myMomentRaster.value) );
 
 }
@@ -352,14 +365,14 @@ ASSDriver::processSensorValues( double theDeltaT ) {
 
     BlobListPtr myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
 
-    std::vector<Vector2f> myCurrentPositions;
+    std::vector<MomentResults> myCurrentPositions;
     computeCursorPositions( myCurrentPositions, myROIs);
     correlatePositions( myCurrentPositions, myROIs );
     updateCursors(theDeltaT);
 }
 
 void
-ASSDriver::computeCursorPositions( std::vector<Vector2f> & theCurrentPositions, 
+ASSDriver::computeCursorPositions( std::vector<MomentResults> & theCurrentPositions, 
                                    const BlobListPtr & theROIs)
 {
     typedef subraster<gray<unsigned char> > SubRaster;
@@ -370,9 +383,10 @@ ASSDriver::computeCursorPositions( std::vector<Vector2f> & theCurrentPositions,
         _myMomentRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
                                     myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
 
-        Vector2f myPosition = Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1])
-                + myMomentAnalysis.result.center;
+        MomentResults myResult = myMomentAnalysis.result;
+        myResult.center += Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]);
 
+        AC_PRINT << "major angle: " << myMomentAnalysis.result.major_angle << " major dir: " << myMomentAnalysis.result.major_dir;
         /*
         AC_PRINT << "moment: w: " << myMomentAnalysis.result.w 
                  << " l: " << myMomentAnalysis.result.l
@@ -380,7 +394,7 @@ ASSDriver::computeCursorPositions( std::vector<Vector2f> & theCurrentPositions,
                  << " minor dir: " << myMomentAnalysis.result.minor_dir;
                  */
 
-        theCurrentPositions.push_back( myPosition );
+        theCurrentPositions.push_back( myResult );
     }
 
 }
@@ -398,9 +412,6 @@ ASSDriver::updateCursors(double theDeltaT) {
     y60::RasterOfGRAY & myRawRaster = *
         dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
-    y60::RasterOfGRAY & myGradientRaster = *
-        dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myGradientRaster.value) );
-
     CursorMap::iterator myCursorIt = _myCursors.begin();
     for(; myCursorIt != _myCursors.end(); ++myCursorIt) {
         computeIntensity(myCursorIt, myRawRaster);
@@ -409,8 +420,6 @@ ASSDriver::updateCursors(double theDeltaT) {
     }
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
-    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myGradientRaster.value) );
-
 }
 
 void
@@ -506,7 +515,7 @@ ASSDriver::getTransormationMatrix() {
 }
 
 void 
-ASSDriver::correlatePositions( const std::vector<Vector2f> & theCurrentPositions,
+ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
                                const BlobListPtr theROIs)
 {
 
@@ -523,7 +532,7 @@ ASSDriver::correlatePositions( const std::vector<Vector2f> & theCurrentPositions
             if ( find( myCorrelatedIds.begin(), myCorrelatedIds.end(), myCursorIt->first ) ==
                     myCorrelatedIds.end())
             {
-                float myDistance = magnitude( myCursorIt->second.position - theCurrentPositions[i]);
+                float myDistance = magnitude( myCursorIt->second.position - theCurrentPositions[i].center);
                 if (myDistance < myMinDistance) {
                     myMinDistance = myDistance;
                     myMinDistIt = myCursorIt;
@@ -532,23 +541,25 @@ ASSDriver::correlatePositions( const std::vector<Vector2f> & theCurrentPositions
         }
         const float DISTANCE_THRESHOLD = 2.0;
         if (myMinDistIt != _myCursors.end() && myMinDistance < DISTANCE_THRESHOLD) {
-            // cursor moved: copy label from previous analysis
+            // cursor moved
             myCorrelatedIds.push_back( myMinDistIt->first );
-            myMinDistIt->second.position = theCurrentPositions[i];
+            myMinDistIt->second.position = theCurrentPositions[i].center;
+            myMinDistIt->second.major_direction = theCurrentPositions[i].major_dir;
+            myMinDistIt->second.minor_direction = theCurrentPositions[i].minor_dir;
 
             myMinDistIt->second.previousRoi = myMinDistIt->second.roi;
             myMinDistIt->second.roi = asBox2f( myROIs[i]->bbox() );
-            createEvent( myMinDistIt->first, "move", theCurrentPositions[i],
-                    applyTransform( theCurrentPositions[i], myTransform),
+            createEvent( myMinDistIt->first, "move", theCurrentPositions[i].center,
+                    applyTransform( theCurrentPositions[i].center, myTransform),
                     asBox2f( myROIs[i]->bbox()) );
         } else {
-            // new cursor: get new label
+            // new cursor
             int myNewID( _myIDCounter++ );
             _myCursors.insert( make_pair( myNewID, Cursor( theCurrentPositions[i],
                     asBox2f( myROIs[i]->bbox()) )));
             myCorrelatedIds.push_back( myNewID );
-            createEvent( myNewID, "add", theCurrentPositions[i],
-                    applyTransform( theCurrentPositions[i], myTransform),
+            createEvent( myNewID, "add", theCurrentPositions[i].center,
+                    applyTransform( theCurrentPositions[i].center, myTransform),
                     asBox2f( myROIs[i]->bbox() ));
         }
     }
@@ -560,6 +571,7 @@ ASSDriver::correlatePositions( const std::vector<Vector2f> & theCurrentPositions
         if ( find( myCorrelatedIds.begin(), myCorrelatedIds.end(), myIt->first ) ==
                 myCorrelatedIds.end())
         {
+            // cursor removed
             myOutdatedCursorIds.push_back( myIt->first );
             createEvent( myIt->first, "remove", myIt->second.position,
                     applyTransform( myIt->second.position, myTransform ),
@@ -570,8 +582,6 @@ ASSDriver::correlatePositions( const std::vector<Vector2f> & theCurrentPositions
     for (unsigned i = 0; i < myOutdatedCursorIds.size(); ++i) {
         _myCursors.erase( myOutdatedCursorIds[i] );
     }
-
-
 }
 
 void
@@ -591,6 +601,10 @@ ASSDriver::setState( DriverState theState ) {
             break;
         case RUNNING:
             break;
+        case CONFIGURING:
+            _myConfigureState = SEND_CONFIG_COMMANDS;
+            sendCommand( CMD_ENTER_CONFIG_MODE );
+            break;
         default:
             break;
     }
@@ -599,6 +613,26 @@ ASSDriver::setState( DriverState theState ) {
 
 void
 ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
+}
+
+void
+ASSDriver::sendCommand( const std::string & theCommand ) {
+    try {
+        if (_mySerialPort) {
+            //AC_PRINT << "Sending command: '" << theCommand << "'";
+            std::string myCommand( theCommand );
+            myCommand.append("\r");
+            _mySerialPort->write( myCommand.c_str(), myCommand.size() );
+            _myLastCommandTime = asl::Time();
+        } else {
+            AC_WARNING << "Can not send command. No serial port.";
+            setState( NO_SERIAL_PORT );
+        }
+    } catch (const SerialPortException & ex) {
+        AC_WARNING << ex;
+        createTransportLayerEvent( _myIDCounter ++, "lost_communication" );
+        setState(NO_SERIAL_PORT);
+    }
 }
 
 void
@@ -708,6 +742,10 @@ ASSDriver::processInput() {
             readDataFromPort();
             readSensorValues();
             break;
+        case CONFIGURING:
+            readDataFromPort();
+            handleConfigurationCommand();
+            break;
     }
 }
 
@@ -763,7 +801,11 @@ ASSDriver::scanForSerialPort() {
         if (_mySerialPort) {
             _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
                     _myParity, _myStopBits, _myHandshakingFlag);
-            setState( SYNCHRONIZING );
+            if ( _myCommandQueue.empty() ) {
+                setState( SYNCHRONIZING );
+            } else {
+                setState( CONFIGURING );
+            }
         }
     } else {
         AC_PRINT << "scanForSerialPort() No port configured.";
@@ -804,6 +846,131 @@ size_t
 ASSDriver::getBytesPerFrame() {
     // line format: <start> <lineno> <databytes>
     return (1 + 1 + _myGridSize[0]) * _myGridSize[1];
+}
+
+void
+ASSDriver::handleConfigurationCommand() {
+    //dumpBuffer( _myFrameBuffer );
+    CommandResponse myResponse = getCommandResponse();
+    switch (_myConfigureState) {
+        case SEND_CONFIG_COMMANDS:
+            //AC_PRINT << "SEND_CONFIG_COMMANDS";
+            if (myResponse == RESPONSE_OK) {
+                sendCommand( _myCommandQueue.front() );
+                _myCommandQueue.pop_front();
+                if (_myCommandQueue.empty()) {
+                    _myConfigureState = WAIT_FOR_RESPONSE;
+                }
+            } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
+                AC_ERROR << "Failed to enter config mode.";
+                _myCommandQueue.clear();
+                setState( SYNCHRONIZING );
+            }
+            break;
+        case WAIT_FOR_RESPONSE:
+            //AC_PRINT << "WAIT_FOR_RESPONSE";
+            if (myResponse == RESPONSE_OK) {
+                sendCommand( CMD_LEAVE_CONFIG_MODE );
+                _myConfigureState = WAIT_FOR_EXIT;
+            } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
+                AC_ERROR << "Failed to configure sensor hardware.";
+                setState( SYNCHRONIZING );
+            }
+            break;
+        case WAIT_FOR_EXIT:
+            //AC_PRINT << "WAIT_FOR_EXIT";
+            if (myResponse == RESPONSE_OK) {
+                setState( SYNCHRONIZING );
+            } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
+                AC_ERROR << "Failed to leave config mode.";
+                setState( SYNCHRONIZING );
+            }
+            break;
+    }
+}
+
+CommandResponse 
+ASSDriver::getCommandResponse() {
+    string myString( (char*)& ( * _myFrameBuffer.begin()), _myFrameBuffer.size());
+    string::size_type myPos = myString.find(OK_STRING);
+    if (myPos != string::npos && myPos + OK_STRING.size() + 2 <= myString.size()) {
+        string::size_type myEnd = minimum( myPos + OK_STRING.size() + 2, _myFrameBuffer.size());
+        _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
+        return RESPONSE_OK;
+    }
+    myPos = myString.find(ERROR_STRING);
+    if (myPos != string::npos  && myPos + ERROR_STRING.size() + 2 + 2 <= myString.size()) {
+        unsigned myErrorCode = as<unsigned>( myString.substr( myPos + ERROR_STRING.size(), 2 ));
+        AC_ERROR << "Errorcode: " << myErrorCode;
+        string::size_type myEnd = minimum( myPos + ERROR_STRING.size() + 2 + 2, _myFrameBuffer.size());
+        _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
+        return RESPONSE_ERROR;
+    }
+
+    if ( asl::Time() - _myLastCommandTime > COMMAND_TIMEOUT) {
+        return RESPONSE_TIMEOUT;
+    }
+    return RESPONSE_NONE;
+}
+
+
+void 
+ASSDriver::performTara() {
+    //AC_PRINT << "ASSDriver::performTara()";
+    queueCommand( CMD_PERFORM_TARA );
+}
+
+void 
+ASSDriver::callibrateTransmissionLevels() {
+    //AC_PRINT << "ASSDriver::callibrateTransmissionLevels()";
+    queueCommand( CMD_CALLIBRATE_TRANSMISSION_LEVEL );
+}
+
+void
+ASSDriver::queueCommand( const char * theCommand ) {
+    _myCommandQueue.push_back( string( theCommand ));
+    if (_myState != CONFIGURING && _myState != NO_SERIAL_PORT) {
+        setState( CONFIGURING );
+    }
+}
+
+static JSBool
+PerformTara(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
+    if (myNative) {
+        myNative->performTara();
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+
+static JSBool
+CallibrateTransmissionLevels(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
+    if (myNative) {
+        myNative->callibrateTransmissionLevels();
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+
+
+JSFunctionSpec * 
+ASSDriver::Functions() {
+    static JSFunctionSpec myFunctions[] = {
+        {"performTara", PerformTara, 0},
+        {"callibrateTransmissionLevels", CallibrateTransmissionLevels, 0},
+        {0}
+    };
+    return myFunctions;
 }
 
 } // end of namespace y60

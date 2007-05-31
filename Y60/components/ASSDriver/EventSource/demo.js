@@ -92,6 +92,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDummyAppContainer.scale = [DISPLAY_SCALE, DISPLAY_SCALE, 1];
 
         _myASSManager = new ASSManager( self, _myDummyAppContainer );
+        //_myASSManager.driver.performTara(); // XXX
+        //_myASSManager.driver.callibrateTransmissionLevels(); // XXX
 
         //self.getConfigurator().saveSettings();
 
