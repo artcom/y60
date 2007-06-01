@@ -20,9 +20,12 @@ StackTracer<TRACE_POLICY>::size() const {
 template <class TRACE_POLICY>
 ostream & 
 StackTracer<TRACE_POLICY>::print(ostream & os) const {
-    for (unsigned i = 0; i < _myStack.size(); ++i) {
+	for (unsigned i = 0; i < _myStack.size(); ++i) {
         os << "#" << i << " " << beautify( _myStack[i].name ) << endl;
     }
+	if( _myStack.size() == 0 ) {
+		os << "no symbols found" << endl;	
+	}
     return os;
 }
 

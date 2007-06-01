@@ -71,7 +71,6 @@
 #pragma warning(disable:4512)		// assignment operator could not be generated
 #pragma warning(disable:4310)		// cast truncates constant value
 
-#undef max
 
 
 #include <eh.h>
@@ -90,6 +89,8 @@
 #include <ostream>
 #include <vector>
 
+#undef max
+#undef RGB
 
 
 namespace asl {

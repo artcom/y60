@@ -30,12 +30,25 @@ public:
     void run() {
         StackTrace myStack;
         // if this fails because of optimization just change it to greater zero
-        ENSURE( myStack.size() == 7 );
+#ifdef LINUX
+		ENSURE( myStack.size() == 7 );
+#ifndef DEBUG
+#elif WIN32
+		ENSURE( myStack.size() == 8 );
+#endif
+#endif
+
         DPRINT( myStack );
         ENSURE_EXCEPTION( throwAndTrace(), asl::Exception );
         
 		asl::Exception myException("Alles Ok!", PLUS_FILE_LINE);
-        ENSURE( myException.stack().size() == 8 );
+#ifdef LINUX
+		ENSURE( myException.stack().size() == 8 );
+#ifndef DEBUG
+#elif WIN32
+		ENSURE( myException.stack().size() == 9 );
+#endif
+#endif
         DPRINT( Exception::getDumpStackTraceFlag() );
         DPRINT( myException );
         Exception::dumpStackTrace( true );
