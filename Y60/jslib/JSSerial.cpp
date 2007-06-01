@@ -268,6 +268,33 @@ readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+static JSBool
+writeBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Writes data to the serial device");
+    DOC_PARAM("theData", "Bytes to write", DOC_TYPE_BLOCK);
+    DOC_END;
+    try {
+        if (argc != 1) {
+            JS_ReportError(cx, "JSSerial::write(): Wrong number of arguments, "
+                               "expected one (Bytes to write), got %d.", argc);
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "JSSerial::write(): Argument #0 is undefined");
+            return JS_FALSE;
+        }
+
+        asl::Ptr<asl::Block> myData(new Block());
+        if (!convertFrom(cx, argv[0], myData)) {
+            JS_ReportError(cx, "JSSerial::write(): Argument #1 must be a Block (Bytes to write)");
+            return JS_FALSE;
+        }
+
+        JSSerial::getJSWrapper(cx,obj).openNative().write((const char*)myData->begin(), myData->size());
+        JSSerial::getJSWrapper(cx,obj).closeNative();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 static JSBool
 write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -452,6 +479,7 @@ JSSerial::Functions() {
         {"readBlock",            readBlock,               1},
         {"peek",                 peek,                    0},
         {"write",                write,                   1},
+        {"writeBlock",           writeBlock,              1},        
         {"receivePacket",        receivePacket,           0},
         {"setPacketFormat",      setPacketFormat,         4},
         {"sendPacket",           sendPacket,              1},
@@ -467,7 +495,7 @@ JSPropertySpec *
 JSSerial::Properties() {
     static JSPropertySpec myProperties[] = {
         {"isOpen", PROP_isOpen, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        {"status", PROP_status, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"status", PROP_status, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
