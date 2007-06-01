@@ -78,7 +78,7 @@ asBox2f( const Box2i & theBox ) {
 void dumpBuffer(std::vector<unsigned char> & theBuffer) {
     if ( ! theBuffer.empty()) {
         cerr << "buffer: '";
-        unsigned myMax = asl::minimum( theBuffer.size(), unsigned(80));
+        unsigned myMax = asl::minimum( unsigned(theBuffer.size()), unsigned(80));
         for (unsigned i = 0; i < myMax; ++i) {
             cerr << theBuffer[i];
         }
