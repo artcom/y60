@@ -33,7 +33,6 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
 
         _myWatchedValuePos = new Vector2i(
                 theSettings.childNode("WatchedValue").childNode("#text").nodeValue);
-        print("watchedValPos: " + _myWatchedValuePos);
 
         if (_myGroup) {
             _myGroup.visible = new Number( _mySettings.childNode("ShowASSData").childNode("#text") );
@@ -113,7 +112,8 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
 
     self.onPostRender = function() {
         if (_myWatchedValueBody.visible) {
-            window.renderText([50, 50], "value: " + self.watchedValue, "Screen15");
+            window.renderText([50, 50], "value" + _myWatchedValuePos + 
+                    ": " + self.watchedValue, "Screen15");
         }
     }
 
@@ -311,7 +311,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         print("creating shape");
         _myWatchedValueMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
                             "ASSWatchedValueMaterial", true, false, 1, [1, 1, 1, 1]);        
-        _myWatchedValueMaterial.properties.surfacecolor = [0, 0, 1, 1];
+        _myWatchedValueMaterial.properties.surfacecolor = [0, 0.5, 0, 1];
 
         _myWatchedValueShape = Modelling.createCrosshair(_myScene, _myWatchedValueMaterial.id, 
                                                  1, 2, "ASSWatchedValueMarker"); 

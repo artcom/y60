@@ -60,7 +60,7 @@ static const char * MOMENT_RASTER = "ASSMomentRaster";
 
 const std::string OK_STRING("OK");
 const std::string ERROR_STRING("ERR");
-const double COMMAND_TIMEOUT( 0.2 );
+const double COMMAND_TIMEOUT( 5 );
 
 #ifdef OSX
 #undef verify
@@ -75,11 +75,14 @@ asBox2f( const Box2i & theBox ) {
 
 //XXX
 void dumpBuffer(std::vector<unsigned char> & theBuffer) {
-    cerr << "buffer: '";
-    for (unsigned i = 0; i < theBuffer.size(); ++i) {
-        cerr << theBuffer[i];
+    if ( ! theBuffer.empty()) {
+        cerr << "buffer: '";
+        unsigned myMax = asl::minimum( theBuffer.size(), unsigned(80));
+        for (unsigned i = 0; i < myMax; ++i) {
+            cerr << theBuffer[i];
+        }
+        cerr << "'" << endl;
     }
-    cerr << "'" << endl;
 }
 // XXX
 void fillBufferWithString(std::vector<unsigned char> & theBuffer, const char * theString) {
@@ -626,11 +629,11 @@ void
 ASSDriver::sendCommand( const std::string & theCommand ) {
     try {
         if (_mySerialPort) {
-            //AC_PRINT << "Sending command: '" << theCommand << "'";
+            AC_PRINT << "Sending command: '" << theCommand << "'";
             std::string myCommand( theCommand );
             myCommand.append("\r");
             _mySerialPort->write( myCommand.c_str(), myCommand.size() );
-            _myLastCommandTime = asl::Time();
+            _myLastCommandTime = double( asl::Time() );
         } else {
             AC_WARNING << "Can not send command. No serial port.";
             setState( NO_SERIAL_PORT );
@@ -870,19 +873,23 @@ ASSDriver::handleConfigurationCommand() {
                     _myConfigureState = WAIT_FOR_RESPONSE;
                 }
             } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
-                AC_ERROR << "Failed to enter config mode.";
+                AC_ERROR << "Failed to enter config mode: " 
+                         << (myResponse == RESPONSE_TIMEOUT ? "timeout" : "error");
                 _myCommandQueue.clear();
                 setState( SYNCHRONIZING );
             }
             break;
         case WAIT_FOR_RESPONSE:
             //AC_PRINT << "WAIT_FOR_RESPONSE";
-            if (myResponse == RESPONSE_OK) {
+            if (myResponse == RESPONSE_OK ) {
                 sendCommand( CMD_LEAVE_CONFIG_MODE );
                 _myConfigureState = WAIT_FOR_EXIT;
             } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
-                AC_ERROR << "Failed to configure sensor hardware.";
-                setState( SYNCHRONIZING );
+                AC_ERROR << "Failed to configure sensor hardware: "
+                         << (myResponse == RESPONSE_TIMEOUT ? "timeout" : "error");
+                sendCommand( CMD_LEAVE_CONFIG_MODE );
+                _myConfigureState = WAIT_FOR_EXIT;
+                //setState( SYNCHRONIZING );
             }
             break;
         case WAIT_FOR_EXIT:
@@ -904,18 +911,20 @@ ASSDriver::getCommandResponse() {
     if (myPos != string::npos && myPos + OK_STRING.size() + 2 <= myString.size()) {
         string::size_type myEnd = minimum( myPos + OK_STRING.size() + 2, _myFrameBuffer.size());
         _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
+        AC_PRINT << "Got 'OK'";
         return RESPONSE_OK;
     }
     myPos = myString.find(ERROR_STRING);
     if (myPos != string::npos  && myPos + ERROR_STRING.size() + 2 + 2 <= myString.size()) {
         unsigned myErrorCode = as<unsigned>( myString.substr( myPos + ERROR_STRING.size(), 2 ));
-        AC_ERROR << "Errorcode: " << myErrorCode;
+        AC_ERROR << "Got 'ERR': errorcode: " << myErrorCode;
         string::size_type myEnd = minimum( myPos + ERROR_STRING.size() + 2 + 2, _myFrameBuffer.size());
         _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
         return RESPONSE_ERROR;
     }
 
-    if ( asl::Time() - _myLastCommandTime > COMMAND_TIMEOUT) {
+    if ( double(asl::Time()) - _myLastCommandTime > COMMAND_TIMEOUT) {
+        AC_PRINT << "Got timeout";
         return RESPONSE_TIMEOUT;
     }
     return RESPONSE_NONE;
