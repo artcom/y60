@@ -124,6 +124,7 @@ void Sound::seek (Time thePosition)
     AC_DEBUG << "Sound::seek()";
     bool myIsPlaying = isPlaying();
     _mySampleSink->stop();
+    float myOldVolume = _mySampleSink->getVolume();
     // Forget the old sample sink. It'll fade out and then destroy itself.
     _mySampleSink = Pump::get().createSampleSink(_myURI);
 
@@ -136,6 +137,7 @@ void Sound::seek (Time thePosition)
     _myDecoder->seek(thePosition);
     
     _mySampleSink->setCurrentTime(thePosition);
+    _mySampleSink->setVolume(myOldVolume);
     _myLockedSelf = _mySelf.lock();
     if (myIsPlaying) {
         update(0.1);
