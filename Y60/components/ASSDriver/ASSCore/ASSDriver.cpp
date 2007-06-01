@@ -250,6 +250,13 @@ ASSDriver::readSensorValues() {
                     myRowIdx * _myPoTSize[0];
         std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
 
+
+        /*
+        int myPixel = _myGridSize[0] * (_myGridSize[1] / 2) + (_myGridSize[0] / 2);
+        AC_PRINT << "value: " << int(*(_myRawRaster.raster->pixels().begin() +
+                    myPixel));
+        */
+
         _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
         if ( myRowIdx == _myGridSize[1] - 1) {
 
@@ -386,7 +393,7 @@ ASSDriver::computeCursorPositions( std::vector<MomentResults> & theCurrentPositi
         MomentResults myResult = myMomentAnalysis.result;
         myResult.center += Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]);
 
-        AC_PRINT << "major angle: " << myMomentAnalysis.result.major_angle << " major dir: " << myMomentAnalysis.result.major_dir;
+        //AC_PRINT << "major angle: " << myMomentAnalysis.result.major_angle << " major dir: " << myMomentAnalysis.result.major_dir;
         /*
         AC_PRINT << "moment: w: " << myMomentAnalysis.result.w 
                  << " l: " << myMomentAnalysis.result.l
@@ -693,6 +700,7 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
     getConfigSetting( mySettings, "IntensityThreshold", _myIntensityThreshold, 9.0f );
     getConfigSetting( mySettings, "FirstDerivativeThreshold", _myFirstDerivativeThreshold, 25.0f );
     getConfigSetting( mySettings, "DumpValues", _myDumpValuesFlag, 0 );
+    getConfigSetting( mySettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
 
     bool myPortConfigChanged = false;
     myPortConfigChanged |= getConfigSetting( mySettings, "SerialPort", _myPortNum, -1 );

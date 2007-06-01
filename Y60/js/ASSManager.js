@@ -31,6 +31,10 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                     myMaterialId;
         }
 
+        _myWatchedValuePos = new Vector2i(
+                theSettings.childNode("WatchedValue").childNode("#text").nodeValue);
+        print("watchedValPos: " + _myWatchedValuePos);
+
         if (_myGroup) {
             _myGroup.visible = new Number( _mySettings.childNode("ShowASSData").childNode("#text") );
             _myGroup.position = _mySettings.childNode("SensorPosition").childNode("#text");
@@ -65,8 +69,28 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                             _myGroup.position;
                 }
             }
+            if ( _myWatchedValueShape ) {
+                if (_myWatchedValuePos.x >= 0 && _myWatchedValuePos.y >= 0 ) {
+                    if ( ! _myWatchedValueBody ) {
+                        _myWatchedValueBody = Modelling.createBody(_myGroup, 
+                                _myWatchedValueShape.id );
+                    }
+
+                    _myWatchedValueBody.scale = new Vector3f(ASS_CROSSHAIR_SCALE,
+                            ASS_CROSSHAIR_SCALE, ASS_CROSSHAIR_SCALE);
+                    _myWatchedValueBody.visible = true;
+                    _myWatchedValueBody.position.x = _myWatchedValuePos.x;
+                    _myWatchedValueBody.position.y = _myWatchedValuePos.y;
+                    _myWatchedValueBody.position.z = DECORATION_Z_OFFSET; // XXX
+                } else {
+                    if ( _myWatchedValueBody ) {
+                        _myWatchedValueBody.visible = false;
+                    }
+                }
+            }
             _myInitialSettingsLoaded = true;
         }
+
     }
 
     self.onFrame = function( theTime ) {
@@ -85,6 +109,12 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         }
 
         _myLastFrameTime = theTime;
+    }
+
+    self.onPostRender = function() {
+        if (_myWatchedValueBody.visible) {
+            window.renderText([50, 50], "value: " + self.watchedValue, "Screen15");
+        }
     }
 
     self.onASSEvent = function( theEventNode ) {
@@ -110,7 +140,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
                 myROIBox.name = "ASSROI" + theEventNode.id;
                 myROIBox.id = "ASSROI" + theEventNode.id;
                 myROIBox.position.z = DECORATION_Z_OFFSET; // XXX
-                myROIBox.visible = true; // XXX
+                myROIBox.visible = false; // XXX
 
                 moveMarkerAndBox( myNewMarker, myROIBox, theEventNode);
             } else if (theEventNode.type == "move") {
@@ -181,6 +211,20 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     self.driver getter = function() {
         return _myDriver;
     }
+    self.watchedValuePos getter = function() {
+        return _myWatchedValuePos;
+    }
+    self.watchedValuePos setter = function(thePos) {
+        _myWatchedValuePos = thePos;
+    }
+    self.watchedValue getter = function() {
+        if (_myRawRaster && _myWatchedValuePos.x >= 0 && _myWatchedValuePos.y >= 0) {
+            var myValue =  new Number( _myRawRaster.getPixel( _myWatchedValuePos.x,
+                _myWatchedValuePos.y)[0] * 255);
+                return myValue.toFixed(0);
+        }
+        return -1;
+    }
 
     function moveMarkerAndBox( theMarker, theROIBox, theEvent) {
         const myPixelCenterOffset = 0.5;
@@ -201,10 +245,6 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         }
         _myDriver = ASSManager.driver;
 
-        _myWindow.addExtension( ASSManager.driver );
-        _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
-        _myViewer.registerSettingsListener( self, "ASSDriver" );
-
         var myParent = _myScene.world;
         if ( theParent != undefined ) {
             myParent = theParent;
@@ -217,6 +257,11 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         _myDriver.transform = _myGroup;
 
         setupDisplay();
+
+        _myWindow.addExtension( ASSManager.driver );
+        _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
+        _myViewer.registerSettingsListener( self, "ASSDriver" );
+
     }
 
     function setupDisplay() {
@@ -255,7 +300,6 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
 
         _myTouchMarkerMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
                             "ASSTouchMarkerMaterial", true, false, 1, [1, 1, 1, 1]);        
-
         _myTouchMarkerMaterial.properties.surfacecolor = [1, 1, 1, 1];
 
 
@@ -264,6 +308,15 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         _myTouchMarkerShape.renderstyle.polygon_offset = true;
         _myTouchMarkerShape.renderstyle.ignore_depth = true;
 
+        print("creating shape");
+        _myWatchedValueMaterial = Modelling.createUnlitTexturedMaterial(_myScene, "",
+                            "ASSWatchedValueMaterial", true, false, 1, [1, 1, 1, 1]);        
+        _myWatchedValueMaterial.properties.surfacecolor = [0, 0, 1, 1];
+
+        _myWatchedValueShape = Modelling.createCrosshair(_myScene, _myWatchedValueMaterial.id, 
+                                                 1, 2, "ASSWatchedValueMarker"); 
+        _myWatchedValueShape.renderstyle.polygon_offset = true;
+        _myWatchedValueShape.renderstyle.ignore_depth = true;
     }
 
 
@@ -340,6 +393,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
             _mySensorValueDisplay.position.z = -1.5; // XXX
             _mySensorValueDisplay.scale.y *= -1;
             _mySensorValueDisplay.name = "ASSSensorValueDisplay";
+            _mySensorValueDisplay.visible = true; // XXX
         }
 
         if ( ! _myOriginMarker ) {
@@ -353,6 +407,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         if (_mySettings) {
             self.onUpdateSettings( _mySettings );
         }
+        _myRawRaster = _myScene.images.getElementById("ASSRawRaster").firstChild.firstChild.nodeValue;
     }
 
     function createWireGrid() {
@@ -462,6 +517,11 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
     var _myInitialSettingsLoaded = false;
     var _myLastFrameTime = 0;
 
+    var _myRawRaster = null;
+    var _myWatchedValuePos = new Vector2i(-1, -1);
+    var _myWatchedValueMaterial = null;
+    var _myWatchedValueShape = null;
+    var _myWatchedValueBody = null;
     setup(theParentTransform);
 }
 

@@ -11,10 +11,12 @@
         <NoiseThreshold>15</NoiseThreshold>
         <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
-        <DumpValues min="0" max="1" step="1">1</DumpValues>
+        <MinTouchInterval step="0.01">0.2</MinTouchInterval>
+        <WatchedValue min="-1" step="1">[16,0]</WatchedValue>
+        <DumpValues min="0" max="1" step="1">0</DumpValues>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <SerialPort>0</SerialPort>
-        <UseUSB min="0" max="1">0</UseUSB>
+        <UseUSB min="0" max="1">1</UseUSB>
         <BaudRate>57600</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
         <Parity>no_parity</Parity>

@@ -111,11 +111,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.orientation.assignFromEuler(new Vector3f( 0, 0, Math.PI) );
         _myButtonGroupNode.position.y += 1.5;
         _myButtonGroupNode.position.x += 5.5; 
+        /* XXX
         buildKeyboard();
         buildDisplay();
         buildSubmitButton();
         buildBackspace();
         buildSpacebar();
+        */
     }
 
     Base.onFrame = self.onFrame;
@@ -123,6 +125,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
 
         _myASSManager.onFrame( theTime );
+    }
+
+    Base.onPostRender = self.onPostRender;
+    self.onPostRender = function() {
+        Base.onPostRender();
+
+        _myASSManager.onPostRender();
     }
 
     Base.onMouseButton = self.onMouseButton;
@@ -197,7 +206,10 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         playSound(TYPE_SOUND, 0.8, 0);
         //copyFile(PLOT_DATAFILE, ourTypedText + ".plot");
         var myString = readFileAsString(PLOT_DATAFILE);
+        ourTypedText = ourTypedText.replace(/ /g, "_");
         writeStringToFile("TESTDATA/" + ourTypedText + ".plot",  myString);
+        ourTypedText = "";
+        redraw();
     }
 
     self.backspace = function() {
@@ -346,7 +358,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                                             DISPLAY_SIZE);
 
         _myDisplayMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myDisplayImage);
-        _myDisplayMaterial.transparent = true;
+        //_myDisplayMaterial.transparent = true;
 
         _myDisplayBody = createShapeAndBody(DISPLAY_SIZE, new Vector3f(5,2.5,0), _myDisplayMaterial, "Display", true);
         //print("displaybody " + _myDisplayBody);

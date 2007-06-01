@@ -1,5 +1,13 @@
 <settings>
     <ASSDriver>
+        <GainPower>2</GainPower>
+        <ComponentThreshold>10.00000</ComponentThreshold>
+        <NoiseThreshold>15</NoiseThreshold>
+        <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
+        <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
+        <MinTouchInterval step="0.01">0.2</MinTouchInterval>
+        <DumpValues min="0" max="1" step="1">0</DumpValues>
+        <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <SerialPort>0</SerialPort>
         <UseUSB>true</UseUSB>
         <BaudRate>57600</BaudRate>
@@ -8,8 +16,8 @@
         <StopBits>1</StopBits>
         <Handshaking>false</Handshaking>
 
-        <ServerAddress>127.0.0.1</ServerAddress>
-        <ServerPort>7000</ServerPort>
+        <ServerAddress>10.1.2.220</ServerAddress>
+        <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
         <TouchThreshold step="5">200</TouchThreshold>
     </ASSDriver>
