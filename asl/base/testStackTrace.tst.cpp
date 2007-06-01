@@ -33,8 +33,8 @@ public:
         ENSURE( myStack.size() == 7 );
         DPRINT( myStack );
         ENSURE_EXCEPTION( throwAndTrace(), asl::Exception );
-
-        asl::Exception myException("Alles Ok!", PLUS_FILE_LINE);
+        
+		asl::Exception myException("Alles Ok!", PLUS_FILE_LINE);
         ENSURE( myException.stack().size() == 8 );
         DPRINT( Exception::getDumpStackTraceFlag() );
         DPRINT( myException );

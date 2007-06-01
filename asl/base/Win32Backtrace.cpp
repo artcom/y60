@@ -33,6 +33,9 @@
 #include "Win32Backtrace.h"
 #include "TraceUtils.h"
 
+
+
+
 #include <malloc.h> 
 #include <tlhelp32.h>
 #include <iostream>
@@ -105,7 +108,7 @@ Win32Backtrace::~Win32Backtrace()
 
 void 
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-	//    Win32Backtrace::stack_trace(theStack, 1); // skip the first frame	
+    Win32Backtrace::stack_trace(theStack, 1); // skip the first frame	
 }
 
 /////////////////////////////////////////////

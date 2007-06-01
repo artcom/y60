@@ -86,14 +86,10 @@
 
 #include <stdio.h>
 
-
-
-
 #include <imagehlp.h>
 #include <ostream>
-
 #include <vector>
-#include <string>
+
 
 
 namespace asl {
@@ -140,7 +136,6 @@ class Win32Backtrace {
 		STACKFRAME *	m_pframe;
 		CONTEXT *		m_pctx;
 	
-       
 		class guard
 		{	
 			private:
