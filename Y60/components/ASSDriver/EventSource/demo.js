@@ -131,6 +131,27 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         
     }
 
+    Base.onKey = self.onKey;
+    self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+
+        switch( theKey ) {
+            case '1':
+                if ( theState ) {
+                    print("Callibrate transmission levels.");
+                    _myASSManager.driver.callibrateTransmissionLevels();
+                }
+                break;
+            case '2':
+                if ( theState ) {
+                    print("Perform tara.");
+                    _myASSManager.driver.performTara();
+                }
+                break;
+            default:
+                Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
+        }
+    }
+
     self.onASSEvent = function( theNode ) {
 
         _myASSManager.onASSEvent( theNode );

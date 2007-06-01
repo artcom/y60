@@ -337,6 +337,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theParentTransform,
         } else {
             _mySensorValueDisplay =  Modelling.createBody( _myGroup, _mySensorValueShape.id );
             _mySensorValueDisplay.position.y = _myGridSize3d.y - 1; //myTopRight.y;
+            _mySensorValueDisplay.position.z = -1.5; // XXX
             _mySensorValueDisplay.scale.y *= -1;
             _mySensorValueDisplay.name = "ASSSensorValueDisplay";
         }
