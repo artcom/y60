@@ -13,6 +13,7 @@
 #include <asl/Logger.h>
 #include <asl/SerialDeviceFactory.h>
 #include <asl/Assure.h>
+#include <asl/numeric_functions.h>
 
 #include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
