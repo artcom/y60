@@ -354,6 +354,9 @@ main(int argc, char* argv[] ) {
         }
     }
 
+
+    asl::Exception::initExceptionBehaviour();
+    
     WatchDog myHasso;
     bool mySuccess = myHasso.init(myConfigDoc);
     if (mySuccess) {
