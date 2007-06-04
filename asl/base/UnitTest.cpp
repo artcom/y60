@@ -232,6 +232,7 @@ void
 UnitTestSuite::run() {
     try {
         try {
+            asl::Exception::initExceptionBehaviour();
             setup();
         } catch (std::exception & e) {
             std::cerr << TTYRED << "## A std::exception occured during setup of test suite '"
