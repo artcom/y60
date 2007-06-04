@@ -284,7 +284,7 @@ namespace asl {
         private:
             static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
     };
-
+#if 0
     DBP2(
     template <class TheThreadingModel>
     void printList(ReferenceCounter<TheThreadingModel> * theHead) {
@@ -295,6 +295,7 @@ namespace asl {
         std::cerr << 0 << std::endl;
     }
     )
+#endif
 
     // This is *non thread-safe* fast free-list using version of the allocator
     // It is probably the fastest you can get
