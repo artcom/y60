@@ -10,7 +10,6 @@
 //==============================================================================
 
 #include "MachOBacktrace.h"
-#include "Logger.h"
 
 #include <dlfcn.h>
 #include <iostream>
