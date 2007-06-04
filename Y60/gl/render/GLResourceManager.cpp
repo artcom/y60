@@ -321,9 +321,14 @@ namespace y60 {
             }
         } else {
             // calculate texture width/height/depth
-            unsigned int myTexWidth = nextPowerOfTwo(myWidth);
-            unsigned int myTexHeight = nextPowerOfTwo(myHeight / myDepth);
-            unsigned int myTexDepth = nextPowerOfTwo(myDepth);
+            unsigned int myTexWidth = myWidth;
+            unsigned int myTexHeight = myHeight / myDepth;
+            unsigned int myTexDepth = myDepth;
+            if (theImage->get<ImageResizeTag>() != IMAGE_RESIZE_NONE) {
+                myTexWidth = nextPowerOfTwo(myWidth);
+                myTexHeight = nextPowerOfTwo(myHeight / myDepth);
+                myTexDepth = nextPowerOfTwo(myDepth);
+            }
             AC_TRACE << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
             AC_TRACE << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
 

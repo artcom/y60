@@ -552,6 +552,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode = Node.createElement("movie");
             window.scene.images.appendChild(_myMovieNode);
             _myMovieNode.name = "IVMovieNode";
+            _myMovieNode.resize="none";
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
