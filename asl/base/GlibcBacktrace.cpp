@@ -31,7 +31,7 @@ GlibcBacktrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
 
     char ** mySymbols = backtrace_symbols(myBuffer, myDepth);
 
-    for (int i = myDepth - 1; i >= 0; --i) {
+    for (int i = 0; i < myDepth; ++i) {
         StackFrame myItem;
         myItem.frame = (ptrdiff_t)myBuffer[i];
         string mySymbol( mySymbols[i] );
