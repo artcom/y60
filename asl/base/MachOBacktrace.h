@@ -27,16 +27,13 @@ namespace asl {
  */
 class MachOBacktrace {
     public:
-        struct MachOFrame : public StackFrameBase {
-            unsigned caller;
-            unsigned offset;
-        };
-        typedef MachOFrame StackFrame;
+        typedef StackFrameBase StackFrame;
 
         static void trace(std::vector<StackFrame> & theStack, int theMaxDepth);
 
     private:
         MachOBacktrace();
+        static std::string getFunctionName( void * theReturnAddress);
 };
 
 }
