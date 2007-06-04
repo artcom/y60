@@ -429,6 +429,7 @@ JSBox3f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 return JS_FALSE;
             }
             if (JSA_GetClass(cx,myArgument) == Class()) {
+                myNewBox3f = getJSWrapper(cx, myArgument).getNative();
                 myNewObject=new JSBox3f(myNewValue);
             }
         } else {
