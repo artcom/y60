@@ -73,11 +73,7 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
         *rval = as_jsval(cx, myBuffer);
         return JS_TRUE;
-    } catch(inet::SocketException &) {
-        // TODO, must be reworked once we can throw exception into javascript
-        *rval = -1;
-        return JS_TRUE;
-    }
+    } HANDLE_CPP_EXCEPTION
 }
 
 static JSBool
@@ -98,11 +94,7 @@ readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         myBuffer->resize(myBytesRead);
         *rval = as_jsval(cx, myBuffer);
         return JS_TRUE;
-    } catch(inet::SocketException &) {
-        // TODO, must be reworked once we can throw exception into javascript
-        *rval = -1;
-        return JS_TRUE;
-    }
+    } HANDLE_CPP_EXCEPTION
 }
 
 static JSBool
@@ -162,11 +154,7 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         *rval = as_jsval(cx, myBytesWritten);
 
         return JS_TRUE;
-    } catch(inet::SocketException &) {
-        // TODO, must be reworked once we can throw exception into javascript
-        *rval = -1;
-        return JS_TRUE;
-    }
+    }  HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -230,11 +218,7 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             myTCPClientSocket->connect();
             return JS_TRUE;
         }
-    } catch(inet::SocketException &) {
-        // TODO, must be reworked once we can throw exception into javascript
-        *rval = -1;
-        return JS_TRUE;
-    }
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
