@@ -112,7 +112,9 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             }
         }
 
-        if (theReadbackFlag || _myScreenshotName) {
+        // doing a readback does *not* mean saving it to disk...
+        //if (theReadbackFlag || _myScreenshotName) {
+        if (_myScreenshotName) {
             var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id + "face" + theCubemapFace +".png";
             
             saveImageFiltered(self.image, myFilename, ["flip"], [[]]);
