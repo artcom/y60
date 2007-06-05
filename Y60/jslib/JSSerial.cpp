@@ -15,6 +15,7 @@
 
 #include <asl/SerialDeviceFactory.h>
 #include <asl/DebugPort.h>
+#include <asl/numeric_functions.h>
 #include <iostream>
 
 using namespace std;
@@ -30,7 +31,7 @@ const unsigned DEFAULT_PARITY       = unsigned(SerialDevice::NO_PARITY);
 const unsigned DEFAULT_STOP_BITS    = 1;
 const bool     DEFAULT_HW_HANDSHAKE = false;
 
-const unsigned READ_BUFFER_SIZE     = 1024;
+const size_t READ_BUFFER_SIZE     = 1024;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -209,23 +210,25 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        size_t myReadBytes = READ_BUFFER_SIZE;
+        size_t myBytesWanted = READ_BUFFER_SIZE;
         if (argc == 1) {
-             if (!convertFrom(cx, argv[0], myReadBytes)) {
+             if (!convertFrom(cx, argv[0], myBytesWanted)) {
                 JS_ReportError(cx, "JSSerial::read(): Argument #1 must be a unsigned (bytes to read)");
                 return JS_FALSE;
             }
         }
 
-
+        
         string myResult;
         char myBuffer[READ_BUFFER_SIZE];
-
+        size_t myBytesRead = 0;
         do {
-            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myReadBytes);
+            myBytesRead = asl::minimum(myBytesWanted - myResult.size(), READ_BUFFER_SIZE);
+            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myBytesRead);
             JSSerial::getJSWrapper(cx,obj).closeNative();
-            myResult.append(myBuffer, myReadBytes);
-        } while (myReadBytes == READ_BUFFER_SIZE);
+            myResult.append(myBuffer, myBytesRead );
+        } while (myBytesRead == READ_BUFFER_SIZE && // true if more data is waiting to be read
+                 myResult.size() < myBytesWanted);  // true if we have more space in our myResult buffer
 
         *rval = as_jsval(cx, myResult);
 
@@ -241,27 +244,29 @@ readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         if (argc > 1) {
-            JS_ReportError(cx, "JSSerial::read(): Wrong number of arguments, expected one or none, got %d.", argc);
+            JS_ReportError(cx, "JSSerial::readBlock(): Wrong number of arguments, expected one or none, got %d.", argc);
             return JS_FALSE;
         }
 
-        size_t myReadBytes = READ_BUFFER_SIZE;
+        size_t myBytesWanted = READ_BUFFER_SIZE;
         if (argc == 1) {
-             if (!convertFrom(cx, argv[0], myReadBytes)) {
-                JS_ReportError(cx, "JSSerial::read(): Argument #1 must be a unsigned (bytes to read)");
+             if (!convertFrom(cx, argv[0], myBytesWanted)) {
+                JS_ReportError(cx, "JSSerial::readBlock(): Argument #1 must be a unsigned (bytes to read)");
                 return JS_FALSE;
             }
         }
 
-
+        
         asl::Ptr<asl::Block> myResult(new Block());
         char myBuffer[READ_BUFFER_SIZE];
-
+        size_t myBytesRead = 0;
         do {
-            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myReadBytes);
+            myBytesRead = asl::minimum(myBytesWanted - myResult->size(), READ_BUFFER_SIZE);
+            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myBytesRead);
             JSSerial::getJSWrapper(cx,obj).closeNative();
-            myResult->append(myBuffer, myReadBytes);
-        } while (myReadBytes == READ_BUFFER_SIZE);
+            myResult->append(myBuffer, myBytesRead );
+        } while (myBytesRead == READ_BUFFER_SIZE && // true if more data is waiting to be read
+                 myResult->size() < myBytesWanted);  // true if we have more space in our myResult buffer
 
         *rval = as_jsval(cx, myResult);
 
