@@ -126,6 +126,7 @@ class ASSDriver :
 
         void performTara();
         void callibrateTransmissionLevels();
+        void queryConfigMode();
 
     protected:
         void processInput();

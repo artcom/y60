@@ -111,6 +111,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.orientation.assignFromEuler(new Vector3f( 0, 0, Math.PI) );
         _myButtonGroupNode.position.y += 1.5;
         _myButtonGroupNode.position.x += 5.5; 
+
         /* XXX
         buildKeyboard();
         buildDisplay();
@@ -154,6 +155,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                 if ( theState ) {
                     print("Perform tara.");
                     _myASSManager.driver.performTara();
+                }
+                break;
+            case '3':
+                if ( theState ) {
+                    print("Query config mode");
+                    _myASSManager.driver.queryConfigMode();
                 }
                 break;
             default:

@@ -769,6 +769,7 @@ ASSDriver::readDataFromPort() {
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
         _mySerialPort->peek();
+        //AC_PRINT << "bytes: " << _mySerialPort->peek();
         
         //AC_PRINT << "bytes: " << myByteCount;
         _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
@@ -778,6 +779,7 @@ ASSDriver::readDataFromPort() {
 
         _myFrameBuffer.insert( _myFrameBuffer.end(),
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myByteCount );
+        //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
         createTransportLayerEvent( _myIDCounter ++, "lost_communication" );
@@ -909,6 +911,7 @@ CommandResponse
 ASSDriver::getCommandResponse() {
     string myString( (char*)& ( * _myFrameBuffer.begin()), _myFrameBuffer.size());
     string::size_type myPos = myString.find(OK_STRING);
+    //AC_PRINT << "getCommandResponse(): '" << myString << "'";
     if (myPos != string::npos && myPos + OK_STRING.size() + 2 <= myString.size()) {
         string::size_type myEnd = minimum( myPos + OK_STRING.size() + 2, _myFrameBuffer.size());
         _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
@@ -942,6 +945,12 @@ void
 ASSDriver::callibrateTransmissionLevels() {
     //AC_PRINT << "ASSDriver::callibrateTransmissionLevels()";
     queueCommand( CMD_CALLIBRATE_TRANSMISSION_LEVEL );
+}
+
+void
+ASSDriver::queryConfigMode() {
+    //AC_PRINT << "ASSDriver::queryConfigMode()";
+    queueCommand( CMD_QUERY_CONFIG_MODE );
 }
 
 void
@@ -980,12 +989,27 @@ CallibrateTransmissionLevels(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
     return JS_TRUE;
 }
 
+static JSBool
+QueryConfigMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
+    if (myNative) {
+        myNative->queryConfigMode();
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+
 
 JSFunctionSpec * 
 ASSDriver::Functions() {
     static JSFunctionSpec myFunctions[] = {
         {"performTara", PerformTara, 0},
         {"callibrateTransmissionLevels", CallibrateTransmissionLevels, 0},
+        {"queryConfigMode", QueryConfigMode, 0},
         {0}
     };
     return myFunctions;

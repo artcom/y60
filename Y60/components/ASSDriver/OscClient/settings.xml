@@ -9,14 +9,14 @@
         <DumpValues min="0" max="1" step="1">0</DumpValues>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <SerialPort>0</SerialPort>
-        <UseUSB>true</UseUSB>
+        <UseUSB>0</UseUSB>
         <BaudRate>57600</BaudRate>
         <BitsPerWord>8</BitsPerWord>
         <Parity>no_parity</Parity>
         <StopBits>1</StopBits>
         <Handshaking>false</Handshaking>
 
-        <ServerAddress>10.1.2.220</ServerAddress>
+        <ServerAddress>10.1.3.84</ServerAddress>
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
         <TouchThreshold step="5">200</TouchThreshold>
