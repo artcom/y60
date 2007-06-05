@@ -48,6 +48,10 @@ namespace asl {
 // #define SINGLE_CPU
 
 #define X_NEW_PTR
+    template <class ThreadingModel, class Allocator>
+    std::ostream & operator<<(std::ostream & os, const CollectablePtrBase<ThreadingModel, Allocator>* & thePtr) {
+        return os << (void*)thePtr;
+    }
 
 template <int N, class ThreadingModel>
 class TestClassBase : public CollectableAllocated<ThreadingModel, CollectablePtrAllocator<ThreadingModel> > {
@@ -364,16 +368,16 @@ public:
         typedef TestClassBase<N, MultiProcessor> BaseN;
         typedef TestClassDerived<N, MultiProcessor> DerivedN;
         ENSURE(BaseN::_theInstanceCount_ == 0);
-        std::vector<CollectablePtr<DerivedN> > myVec;
+        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN> > > myVec;
         for (int i = 0; i < 1000; ++i) {
             myVec.push_back(CollectablePtr<DerivedN>(new DerivedN ));
         }
         ENSURE(BaseN::_theInstanceCount_ == 1000);
 
-        std::vector<CollectablePtr<DerivedN> > otherBaseVec;
+        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN> >  > otherBaseVec;
         otherBaseVec = myVec;
 
-        std::vector<CollectablePtr<BaseN> > myBaseVec(1000);
+        std::vector<CollectablePtr<BaseN>, CollectableContainerAllocator<CollectablePtr<BaseN> >  > myBaseVec(1000);
 
         std::copy(myVec.begin(),myVec.end(),myBaseVec.begin());
         ENSURE(equal(myBaseVec.begin(), myBaseVec.end(), otherBaseVec.begin()));
@@ -493,9 +497,9 @@ public:
     void run() {
 
 #if DEBUG_VARIANT
-        const int myTestCount = 10000;
+        const int myTestCount = 1000;
 #else
-        const int myTestCount = 1000000;
+        const int myTestCount = 100000;
 #endif
         std::vector<MakeCollectable<int, Threading>*> myNativePtrs(myTestCount);
         for (int i = 0; i < myTestCount; ++i) {
@@ -540,11 +544,10 @@ public:
     PtrUnitPerfTest() : TemplateUnitTest("PtrUnitPerfTest-",asl::as_string(N).c_str()) {  }
     void run() {
 #if DEBUG_VARIANT
-        //const int repeatCount = 10000;
+        const int repeatCount = 1000;
 #else
-        //const int repeatCount = 1000000;
+        const int repeatCount = 100000;
 #endif
-        const int repeatCount = 100;
         typedef TestClassBase<N, ThreadingModel> BaseN;
         typedef TestClassDerived<N, ThreadingModel> DerivedN;
         for (int f = 0; f < 4; ++f) {
@@ -590,11 +593,269 @@ public:
        getDashboard().reset();
     }
 };
+
+template <class T>
+class RangeSetUnitTest : public TemplateUnitTest {
+public:
+    RangeSetUnitTest(const char * theTemplateArgument, const T & theFirstValue) 
+    : TemplateUnitTest("RangeSetUnitTest",theTemplateArgument), firstValue(theFirstValue) {  }
+    
+    enum {myTestSize = 20};
+
+    set<T> mySet;
+    RangeSet<T> myRange;
+    std::vector<T> v;
+
+    T firstValue;
+
+    bool checkContent() {
+        bool rVal = true;
+        for (int i = 0; i < v.size();++i) {
+            std::cerr << "|"<< setw(2) << i;
+        }
+        std::cerr << std::endl;
+        for (int i = 0; i < v.size();++i) {
+            bool existsInSet = mySet.count(v[i])==1; 
+            bool existsInRange = myRange.contains(v[i]);
+            bool equallyExists =( existsInSet== existsInRange);
+            if (!equallyExists) rVal=false;
+            std::cerr << "|";
+            if (existsInSet) { cerr << "S"; } else cerr << "-";
+            if (existsInRange) { cerr << "R"; } else cerr << "-";
+        }
+        std::cerr << std::endl;
+        std::cerr << myRange << endl;
+        return rVal; 
+    }
+
+    bool checkIterating() {
+        T rIter;
+        for (typename set<T>::iterator it = mySet.begin(); it != mySet.end(); ++it) {
+            if (it == mySet.begin()) {
+                ENSURE(myRange.getFirst(rIter));
+            }
+            ENSURE(rIter == *it);
+            //DPRINT(rIter);
+            //DPRINT(*it);
+            typename set<T>::iterator it2 = it;
+            ++it2;
+            if (it2 != mySet.end()) {
+                ENSURE(myRange.advance(rIter));
+            } else {
+                ENSURE(!myRange.advance(rIter));
+            }
+        }
+        ENSURE(myRange.size() == mySet.size());
+    } 
+
+    bool insertTest(const T & bgn, const T & end) {
+        checkIterating();
+        bool exists = false;
+        for (T n = bgn; n < end; ++n) {
+            if (mySet.count(n) > 0) {
+                exists = true;
+            }
+        }
+        if (!exists) {
+            for (T n = bgn; n < end; ++n) {
+                mySet.insert(n);
+            }
+        }
+
+        bool existsInRange = !myRange.insert(bgn, end);
+        ENSURE(existsInRange == exists);
+        return checkContent() && (existsInRange == exists);
+    }
+    bool removeTest(const T & bgn, const T & end) {
+        checkIterating();
+        bool exists = true;
+        for (T n = bgn; n < end; ++n) {
+            if (mySet.count(n) == 0) {
+                exists = false;
+            }
+        }
+        if (exists) {
+            for (T n = bgn; n < end; ++n) {
+                mySet.erase(n);
+            }
+        }
+
+        bool existsInRange = myRange.remove(bgn, end);
+        ENSURE(existsInRange == exists);
+        return checkContent() && (existsInRange == exists);
+    }
+
+    void run() {
+        
+        for (int i=0; i< myTestSize;++i) {
+            v.push_back(firstValue++);
+        }
+
+        ENSURE(insertTest(v[7],v[8]));
+        ENSURE(insertTest(v[1],v[3]));
+        ENSURE(insertTest(v[8],v[9]));
+        ENSURE(insertTest(v[6],v[7]));
+        ENSURE(insertTest(v[3],v[5]));
+        
+        ENSURE(insertTest(v[13],v[15]));
+        ENSURE(insertTest(v[13],v[15]));
+        ENSURE(insertTest(v[13],v[14]));
+        ENSURE(insertTest(v[14],v[15]));
+        ENSURE(insertTest(v[1],v[16]));
+        
+        ENSURE(insertTest(v[5],v[6]));
+        ENSURE(insertTest(v[0],v[1]));
+        ENSURE(insertTest(v[9],v[13]));
+        ENSURE(insertTest(v[15],v[19]));
+        
+        ENSURE(removeTest(v[18],v[19]));
+        ENSURE(removeTest(v[0],v[1]));
+        ENSURE(removeTest(v[15],v[18]));
+        ENSURE(removeTest(v[1],v[5]));
+        ENSURE(removeTest(v[7],v[8]));
+        ENSURE(removeTest(v[8],v[10]));
+        ENSURE(removeTest(v[5],v[6]));
+        ENSURE(removeTest(v[6],v[7]));
+        ENSURE(removeTest(v[11],v[15]));
+        ENSURE(removeTest(v[10],v[11]));
+        
+    }
+};
+template <class T>
+class RangeSetPerfTest : public TemplateUnitTest {
+public:
+    RangeSetPerfTest(const char * theTemplateArgument, const T & theFirstValue) 
+    : TemplateUnitTest("RangeSetUnitTest",theTemplateArgument), firstValue(theFirstValue) {  }
+    
+    enum {myTestSize = 20};
+
+    set<T> mySet;
+    RangeSet<T> myRange;
+    std::vector<T> v;
+
+    T firstValue;
+    void run() {
+        const int n = 10000;
+        std::vector<long> myRandom;
+        for (int i = 0; i< n; ++i){
+            myRandom.push_back(i);
+        }
+        for (int i = 0; i< n; ++i) {
+            std::swap(myRandom[abs(random())%n], myRandom[abs(random())%n]);    
+        }
+
+        for (int f = 0; f < 40; ++f)
+        {
+            {
+                MAKE_SCOPE_TIMER(RangeSetPerfTest);
+
+                START_TIMER(set_linear_forward_insert);
+                for (int i = 0; i< n; ++i) {
+                    mySet.insert(firstValue+i);
+                }
+                STOP_TIMER_N(set_linear_forward_insert,n);
+                ENSURE(mySet.size() == n);
+
+                START_TIMER(set_linear_forward_erase);
+                for (int i = 0; i< n; ++i) {
+                    mySet.erase(firstValue+i);
+                }
+                STOP_TIMER_N(set_linear_forward_erase,n);
+                ENSURE(mySet.size() == 0);
+
+
+                START_TIMER(set_linear_reverse_insert);
+                for (int i = n-1; i >=0 ; --i) {
+                    mySet.insert(firstValue+i);
+                }
+                STOP_TIMER_N(set_linear_reverse_insert,n);
+                ENSURE(mySet.size() == n);
+
+                START_TIMER(set_linear_reverse_erase);
+                for (int i = n-1; i >=0 ; --i) {
+                    mySet.erase(firstValue+i);
+                }
+                STOP_TIMER_N(set_linear_reverse_erase,n);
+                ENSURE(mySet.size() == 0);
+
+
+                START_TIMER(set_random_insert);
+                for (int i = n-1; i >=0 ; --i) {
+                    mySet.insert(firstValue+myRandom[i]);
+                }
+                STOP_TIMER_N(set_random_insert,n);
+                ENSURE(mySet.size() == n);
+
+                START_TIMER(set_random_erase);
+                for (int i = n-1; i >=0 ; --i) {
+                    mySet.erase(firstValue+myRandom[i]);
+                }
+                STOP_TIMER_N(set_random_erase,n);
+                ENSURE(mySet.size() == 0);
+// now RangeSet
+
+                START_TIMER(range_linear_forward_insert);
+                for (int i = 0; i< n; ++i) {
+                    myRange.insert(firstValue+i);
+                }
+                STOP_TIMER_N(range_linear_forward_insert,n);
+                ENSURE(myRange.size() == n);
+
+                START_TIMER(range_linear_forward_remove);
+                for (int i = 0; i< n; ++i) {
+                    myRange.remove(firstValue+i);
+                }
+                STOP_TIMER_N(range_linear_forward_remove,n);
+                ENSURE(myRange.size() == 0);
+
+
+                START_TIMER(range_linear_reverse_insert);
+                for (int i = n-1; i >=0 ; --i) {
+                    myRange.insert(firstValue+i);
+                }
+                STOP_TIMER_N(range_linear_reverse_insert,n);
+                ENSURE(myRange.size() == n);
+
+                START_TIMER(range_linear_reverse_remove);
+                for (int i = n-1; i >=0 ; --i) {
+                    myRange.remove(firstValue+i);
+                }
+                STOP_TIMER_N(range_linear_reverse_remove,n);
+                ENSURE(myRange.size() == 0);
+
+
+                START_TIMER(range_random_insert);
+                for (int i = n-1; i >=0 ; --i) {
+                    myRange.insert(firstValue+myRandom[i]);
+                }
+                STOP_TIMER_N(range_random_insert,n);
+                ENSURE(myRange.size() == n);
+
+                START_TIMER(range_random_remove);
+                for (int i = n-1; i >=0 ; --i) {
+                    myRange.remove(firstValue+myRandom[i]);
+                }
+                STOP_TIMER_N(range_random_remove,n);
+                ENSURE(myRange.size() == 0);
+
+           }
+            getDashboard().cycle();
+        }
+        getDashboard().print(std::cerr);
+        getDashboard().reset();
+
+    }
+};
+
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
+        addTest(new RangeSetPerfTest<int>("int", 0));
+#if 1
+        addTest(new RangeSetUnitTest<int>("int", 0));
+        addTest(new RangeSetUnitTest<CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*>("CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*", 0));
         addTest(new PtrUnitTest<0,SingleThreaded>);
         addTest(new PtrLinkTest<0,SingleThreaded>);
         PtrUnitTest<0,SingleProcessor> * mySingleProcessorTest = new PtrUnitTest<0,SingleProcessor>();
@@ -629,6 +890,7 @@ public:
         delete mySingleProcessorPrefTest;
 #endif        
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
+#endif
     }
 };
 
