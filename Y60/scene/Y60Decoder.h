@@ -49,6 +49,7 @@ class Y60Decoder : public ISceneDecoder {
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier);
     private:
         void loadXmlFile(asl::ReadableStream & theXmlSource, bool theBinaryFlag);
+        void removeComments(dom::NodePtr theNode);
 };
 
 typedef asl::Ptr<Y60Decoder> Y60DecoderPtr;

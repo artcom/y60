@@ -88,6 +88,10 @@ namespace y60 {
             if (!theDocument) {
                 throw Y60DecodeException("### ERROR while parsing scene file", PLUS_FILE_LINE);
             }
+    
+            for (unsigned i=0; i<(*theDocument).childNodesLength(); ++i) { 
+                removeComments((*theDocument).childNode(i));
+            }
         }
 
         asl::Time processingEnd;
@@ -101,5 +105,17 @@ namespace y60 {
         AC_INFO << "  Total XML processing time: " << myProcessingTime << " sec, "
             << long(myFileSize/myProcessingTime/1024)<<" kb/sec";
         return true;
+    }
+
+    void
+    Y60Decoder::removeComments(dom::NodePtr theNode) {
+        for (unsigned i=0; i<theNode->childNodesLength(); ++i) {
+            if (theNode->childNode(i)->hasChildNodes()) {
+                removeComments(theNode->childNode(i));
+            } else if (theNode->childNode(i)->nodeType() == dom::Node::COMMENT_NODE) {
+                AC_INFO << "removing comment node: " << *(theNode->childNode(i));
+                theNode->removeChild(theNode->childNode(i));
+            }
+        }
     }
 }
