@@ -62,6 +62,8 @@
 #include <map>
 #include <set>
 #include <deque>
+#include <algorithm>
+#include <new>
 
 #define DBP(x) // x
 #define DB2(x) //  x
@@ -752,7 +754,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         pointer allocate(size_type n, const void * = 0)
         { 
             if (n > this->max_size())
-                std::__throw_bad_alloc();
+                throw std::bad_alloc();
 
             return static_cast<T *>(::operator new(n * sizeof(T)));
         }
@@ -818,7 +820,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         pointer allocate(size_type n, const void * = 0)
         { 
             if (n > this->max_size())
-                std::__throw_bad_alloc();
+                throw std::bad_alloc();
 
             return static_cast<T *>(::operator new(n * sizeof(T)));
         }

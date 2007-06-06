@@ -29,6 +29,8 @@
 
 #include "string_functions.h"
 
+#include <stdlib.h>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -628,7 +630,7 @@ public:
         return rVal; 
     }
 
-    bool checkIterating() {
+    void checkIterating() {
         T rIter;
         for (typename set<T>::iterator it = mySet.begin(); it != mySet.end(); ++it) {
             if (it == mySet.begin()) {
@@ -741,7 +743,7 @@ public:
             myRandom.push_back(i);
         }
         for (int i = 0; i< n; ++i) {
-            std::swap(myRandom[abs(random())%n], myRandom[abs(random())%n]);    
+            std::swap(myRandom[abs(rand())%n], myRandom[abs(rand())%n]);    
         }
 
         for (int f = 0; f < 40; ++f)
