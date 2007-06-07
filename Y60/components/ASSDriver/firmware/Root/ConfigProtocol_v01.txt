@@ -1,0 +1,37 @@
+Protocol:
+
+from PC:
+  X[CR]  Enter config mode
+  from controller:
+    Instroctions bla bla, several [CR][LF]
+    OK[CR][LF]
+
+from PC:
+  C98[CR]  Check if in config mode
+  from controller:
+    if in config mode:
+      OK[CR][LF]
+    if not in config mode:
+      [NOTHING]
+
+
+from PC (while in config mode):
+  C01[CR]  Command: Calibrate transmission level
+  from controller:
+    if succeeded:
+      OK[CR][LF]
+    if failed:
+      ERR01[CR][LF]
+
+from PC (while in config mode):
+  C02[CR]  Command: tara
+  from controller:
+    if succeeded:
+      OK[CR][LF]
+    if failed:
+      ERR02[CR][LF]
+
+from PC (while in config mode):
+  C99[CR]  Command: exit config mode
+  from controller:
+      OK[CR][LF]
