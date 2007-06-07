@@ -258,8 +258,8 @@ ASSDriver::getBytesPerStatusLine() {
     if (_myFirmwareVersion < 0) {
         return MAX_STATUS_LINE_LENGTH;
     } else if ( _myFirmwareVersion < BEST_VERSION ) {
-        // three tokens: version width height
-        return 3 * BYTES_PER_STATUS_TOKEN + 2;
+        // one token: version
+        return BYTES_PER_STATUS_TOKEN + 2;
     } else {
         // nine tokens: version status id mode framerate width height framenumber checksum
         return 9 * BYTES_PER_STATUS_TOKEN + 2;
@@ -278,8 +278,12 @@ ASSDriver::parseStatusLine() {
         //AC_PRINT << "Firmware version: " << _myFirmwareVersion;
         Vector2i myGridSize;
         if ( _myFirmwareVersion < BEST_VERSION ) {
+	    /*
             myGridSize[0] = readStatusToken( myIt, 'W' );
             myGridSize[1] = readStatusToken( myIt, 'H' );
+	    */
+	    myGridSize[0] = 20;
+	    myGridSize[1] = 10;
         } else {
             _myFirmwareStatus = readStatusToken( myIt, 'S' );
             _myControllerId = readStatusToken( myIt, 'I' );
@@ -319,7 +323,8 @@ ASSDriver::readSensorValues() {
                 AC_PRINT << "No MAGIC_TOKEN: '" << int( _myFrameBuffer[0] );
             }
             if ( _myFrameBuffer[1] != _myExpectedLine) {
-                AC_PRINT << "No lineo: " << int( _myExpectedLine );
+                AC_PRINT << "Expected line number " << int( _myExpectedLine )
+			 << " got " << int(_myFrameBuffer[1]);
             }
             if ( _myFrameBuffer[0] != MAGIC_TOKEN ||
                     _myFrameBuffer[1] != _myExpectedLine)
