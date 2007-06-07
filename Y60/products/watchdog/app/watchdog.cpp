@@ -22,7 +22,6 @@
 
 #include "watchdog.h"
 #include "system_functions.h"
-
 #include "Projector.h"
 
 #include <dom/Nodes.h>
@@ -32,6 +31,7 @@
 #include <asl/Exception.h>
 #include <asl/Arguments.h>
 #include <asl/Time.h>
+
 
 #ifdef WIN32
 #include <windows.h>
@@ -52,7 +52,6 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"", ""}
 };
 
-
 WatchDog::WatchDog()
     : _myWatchFrequency(30),
       _myAppToWatch(_myLogger),
@@ -60,11 +59,15 @@ WatchDog::WatchDog()
       _myRebootTimeInSecondsToday(-1),
       _myHaltTimeInSecondsToday(-1),
       _myUDPCommandListenerThread(0)
-{}
+{
+    _mySplashScreen = SDLSplashScreen::getInstance();
+}
 
 void
 WatchDog::arm() {
-
+    if (_mySplashScreen->isEnabled())
+            _mySplashScreen->show();
+        
 #ifdef WIN32
     // allow the foreground window to be set instead of blinking in the taskbar
     // see q97925
@@ -111,7 +114,10 @@ WatchDog::watch() {
                 asl::msleep(500);
             }
         }
-
+        
+        if (_mySplashScreen->isEnabled())
+            _mySplashScreen->hide();
+                
         // Main loop
         while (true) {
             bool myRestarted = false;
@@ -122,9 +128,8 @@ WatchDog::watch() {
             } else {
                 myReturnString = "Application paused.";
             }
-            
+      
             while (myRestarted == false && _myAppToWatch.getProcessResult() == WAIT_TIMEOUT) {
-
                 // update projector state
                 for (unsigned i = 0; i < _myProjectors.size(); ++i) {
                     _myProjectors[i]->update();
@@ -140,17 +145,24 @@ WatchDog::watch() {
                 checkForHalt();
                 checkForReboot();
             }
-
+            
+            if (_mySplashScreen->isEnabled())
+                    _mySplashScreen->show();
+                    
             _myAppToWatch.shutdown();
+
             _myLogger.logToFile(_myAppToWatch.getFilename() + string(" exited: ") + myReturnString + "\nRestarting application.");
 
             unsigned myRestartDelay = _myAppToWatch.getRestartDelay();
+            
             if (!_myAppToWatch.paused()) {
+                
                 cerr << "Watchdog - Restarting application in " << myRestartDelay << " seconds" << endl;
                 for (unsigned i = 0; i < myRestartDelay * 2; ++i) {
                     cerr << ".";
                     asl::msleep(500);
                 }
+                
                 cerr << endl;
             } else {
                 cerr << "Watchdog - Application is currently paused" << endl;
@@ -158,6 +170,9 @@ WatchDog::watch() {
                     asl::msleep(1000);
                 }
             }
+            
+            if (_mySplashScreen->isEnabled())
+                _mySplashScreen->hide();
         }
     } catch (const asl::Exception & ex) {
         cerr << "### Exception: " << ex << endl;
@@ -190,7 +205,6 @@ WatchDog::checkForHalt() {
         }
     }
 }
-
 
 void
 WatchDog::dumpWinError(const string& theErrorLocation) {
@@ -288,12 +302,35 @@ WatchDog::init(dom::Document & theConfigDoc) {
             }
 
             // Setup application
-            if (myConfigNode->childNode("Application")) {            
+            if (myConfigNode->childNode("Application")) { 
+                const dom::NodePtr & myApplicationNode = myConfigNode->childNode("Application");
+                       
                 if (!_myAppToWatch.setup(myConfigNode->childNode("Application"))) {
                     return false;
                 }
-            }
+                
+                // WaitingScreen setup
+                if (myApplicationNode->childNode("WaitingScreenBMP")) {
+                    std::string myWaitingScreenPath = (*myApplicationNode->childNode("WaitingScreenBMP"))("#text").nodeValue();
+                    int myWaitingScreenPosX = 0;
+                    int myWaitingScreenPosY = 0;
+
+                    if (myApplicationNode->childNode("WaitingScreenPosX")) {
+                        int myValue = atoi(((*myApplicationNode->childNode("WaitingScreenPosX"))("#text").nodeValue()).c_str());
+                        myWaitingScreenPosX = myValue;
+                    }
+
+                    if (myApplicationNode->childNode("WaitingScreenPosY")) {
+                        int myValue = atoi(((*myApplicationNode->childNode("WaitingScreenPosY"))("#text").nodeValue()).c_str());
+                        myWaitingScreenPosY = myValue;
+                    }
+                    
+                    _mySplashScreen->enable(myWaitingScreenPath, myWaitingScreenPosX, myWaitingScreenPosY);
+                    
+                }
+            } 
         }
+        
     } catch (const asl::Exception & ex) {
         cerr << "### Exception: " << ex;
     } catch (...) {
@@ -302,8 +339,6 @@ WatchDog::init(dom::Document & theConfigDoc) {
     }
     return true;
 }
-
-
 
 void
 printUsage() {
@@ -336,7 +371,6 @@ main(int argc, char* argv[] ) {
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
 #endif
 
-
     ourArguments.addAllowedOptions(ourAllowedOptions);
     if (!ourArguments.parse(argc, argv)) {
         return 0;
@@ -354,22 +388,14 @@ main(int argc, char* argv[] ) {
         }
     }
 
-
     asl::Exception::initExceptionBehaviour();
     
     WatchDog myHasso;
     bool mySuccess = myHasso.init(myConfigDoc);
+
     if (mySuccess) {
         myHasso.arm();
         myHasso.watch();
     }
     exit(-1);
 }
-
-#ifdef WIN32
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-            LPSTR lpCmdLine, int nCmdShow)
-{
-    return main(__argc, __argv);
-}
-#endif

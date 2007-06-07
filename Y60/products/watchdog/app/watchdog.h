@@ -23,6 +23,7 @@
 #include "Logger.h"
 #include "Application.h"
 #include "UDPCommandListenerThread.h"
+#include "SDLSplashScreen.h"
 
 #include <vector>
 #include <string>
@@ -42,22 +43,23 @@ public:
     bool watch();
 
 private:
-    Logger           _myLogger;
-    std::string      _myLogFilename;
-    int              _myWatchFrequency;
-
-    Application      _myAppToWatch;
+    Logger              _myLogger;
+    std::string         _myLogFilename;
+    int                 _myWatchFrequency;
+    
+    Application         _myAppToWatch;
+    SDLSplashScreen *  _mySplashScreen;
 
     UDPCommandListenerThread * _myUDPCommandListenerThread;
     
     std::vector<Projector *> _myProjectors;
-    bool             _myPowerUpProjectorsOnStartup;
+    bool                _myPowerUpProjectorsOnStartup;
 
-    void             dumpWinError(const std::string& theErrorLocation);
-    void             checkForReboot();
-    void             checkForHalt();
-    long             _myRebootTimeInSecondsToday;
-    long             _myHaltTimeInSecondsToday;
+    void                dumpWinError(const std::string& theErrorLocation);
+    void                checkForReboot();
+    void                checkForHalt();
     
-    bool             _myApplicationPaused;
+    long                _myRebootTimeInSecondsToday;
+    long                _myHaltTimeInSecondsToday;
+    bool                _myApplicationPaused;
 };

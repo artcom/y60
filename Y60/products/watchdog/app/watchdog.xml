@@ -61,6 +61,11 @@
         </Heartbeat>-->
         <WaitDuringStartup>0</WaitDuringStartup>
         <WaitDuringRestart>10</WaitDuringRestart>
+        
+        <WaitingScreenBMP>c:/bmw.bmp</WaitingScreenBMP>
+        <WaitingScreenPosX>0</WaitingScreenPosX>
+        <WaitingScreenPosY>0</WaitingScreenPosY>
+        
         <Memory_Threshold>100000</Memory_Threshold>
         <!--<RestartDay>Monday</RestartDay>-->
         <RestartTime>12:02</RestartTime>
