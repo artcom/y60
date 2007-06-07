@@ -21,6 +21,8 @@
 #include <y60/JSScriptablePlugin.h>
 
 #include <iostream>
+#include <algorithm>
+#include <ctype.h>
 
 #ifdef LINUX
 #   include <values.h>
@@ -53,15 +55,22 @@ const char * CMD_PERFORM_TARA = "c02";
 
 namespace y60 {
 
-const unsigned char myMagicToken( 255 ); 
+const unsigned char MAGIC_TOKEN( 255 );
+
 
 static const char * RAW_RASTER = "ASSRawRaster";
 static const char * FILTERED_RASTER = "ASSFilteredRaster";
 static const char * MOMENT_RASTER = "ASSMomentRaster";
 
-const std::string OK_STRING("OK");
-const std::string ERROR_STRING("ERR");
-const double COMMAND_TIMEOUT( 5 );
+const std::string OK_STRING("\r\nOK\r\n");
+const std::string ERROR_STRING("\r\nERR");
+const double COMMAND_TIMEOUT( 10 );
+
+const unsigned int BEST_VERSION( 260 );
+
+const unsigned int MAX_NUM_STATUS_TOKENS( 9 );
+const unsigned int BYTES_PER_STATUS_TOKEN( 5 );
+const unsigned int MAX_STATUS_LINE_LENGTH( MAX_NUM_STATUS_TOKENS * BYTES_PER_STATUS_TOKEN + 2 );
 
 #ifdef OSX
 #undef verify
@@ -77,12 +86,19 @@ asBox2f( const Box2i & theBox ) {
 //XXX
 void dumpBuffer(std::vector<unsigned char> & theBuffer) {
     if ( ! theBuffer.empty()) {
-        cerr << "buffer: '";
+        cerr << "=========== buffer: " << endl;
         unsigned myMax = asl::minimum( unsigned(theBuffer.size()), unsigned(80));
-        for (unsigned i = 0; i < myMax; ++i) {
-            cerr << theBuffer[i];
+        cerr.setf( std::ios::hex, std::ios::basefield );
+        cerr.setf( std::ios::showbase );
+        for (unsigned i = 0; i < /*myMax*/ theBuffer.size(); ++i) {
+            if (theBuffer[i] == 0xff) {
+                cerr << endl;
+            }
+            cerr << int(theBuffer[i]) << " ";
         }
-        cerr << "'" << endl;
+        cerr.unsetf( std::ios::hex );
+        cerr.unsetf( std::ios::showbase );
+        cerr << endl << "==================" << endl;
     }
 }
 // XXX
@@ -109,9 +125,6 @@ ASSDriver::ASSDriver() :
     _myGainPower(2.0f),
     _myMinTouchInterval( 0.25 ),
     _myIDCounter( 0 ),
-    _myLineStart( -1 ),
-    _myLineEnd( -1 ),
-    _myMaxLine( 0 ),
     _myMagicTokenFlag( false ),
     _myUseUSBFlag( false ),
     _myPortNum( -1 ),
@@ -123,7 +136,17 @@ ASSDriver::ASSDriver() :
     _myHandshakingFlag( false ),
     _myReceiveBuffer(256),
     _myDumpValuesFlag( 0 ),
-    _myLastCommandTime( asl::Time() )
+    _myLastCommandTime( asl::Time() ),
+    _myExpectedLine( 0 ),
+    _myFirmwareVersion(-1),
+    _myFirmwareStatus(-1),
+    _myControllerId(-1),
+    _myFirmwareMode(-1),
+    _myFramerate(-1),
+    _myFrameNo(-1),
+    _myChecksum(-1)
+
+
 {
     setState(NO_SERIAL_PORT);
 }
@@ -147,52 +170,30 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 
 void
 ASSDriver::synchronize() {
-    // first look for the beginning of a line
-    if (_myLineStart < 0) {
+    if ( ! _myMagicTokenFlag ) {
         for (unsigned i = 0; i < _myFrameBuffer.size(); ++i) {
-            if (_myMagicTokenFlag) {
-                _myMaxLine = _myFrameBuffer[i];
-                _myMagicTokenFlag = false;
-                _myLineStart = i;
-                //AC_PRINT << "Got line start";
-                break;
-            } else if (_myFrameBuffer[i] == myMagicToken) {
+            if (_myFrameBuffer[i] == MAGIC_TOKEN) {
+                //AC_PRINT << "Found MAGIC_TOKEN.";
                 _myMagicTokenFlag = true;
-            }
-        }
-    }
-    // then find the end of that line and determine the number of columns
-    if (_myLineStart >= 0 && _myLineEnd < 0) {
-        for (unsigned i = _myLineStart + 1; i < _myFrameBuffer.size(); ++i) {
-            if (_myFrameBuffer[i] == myMagicToken) {
-                _myLineEnd = i;
-                _myGridSize[0] = _myLineEnd - _myLineStart - 1;
-                //AC_PRINT << "Got line end";
+                if ( i > 0) {
+                    _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + i);
+                    if ( ! _myFrameBuffer.empty() ) {
+                        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN); 
+                    }
+                }
                 break;
             }
         }
     }
-
-    // now scan for the maximum line number to determine the number of rows
-    if (_myGridSize[0] > 0 && _myGridSize[1] == 0) {
-        ASSURE( _myFrameBuffer[ _myLineEnd ] == myMagicToken );
-        for (unsigned i = _myLineEnd; i < _myFrameBuffer.size(); i += _myGridSize[0] + 2) {
-            ASSURE( _myFrameBuffer[i] == myMagicToken );
-            if (_myFrameBuffer[i + 1] == 1 && _myMaxLine > 0) {
-                _myGridSize[1] = _myMaxLine;
-                _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
-                _myPoTSize[1] = nextPowerOfTwo( _myGridSize[1] );
-                AC_PRINT << "Grid size: " << _myGridSize;
-                _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + i);
-                ASSURE(_myFrameBuffer.front() == myMagicToken);
-                allocateGridBuffers();
-                _myReceiveBuffer.resize( getBytesPerFrame() );
-                createTransportLayerEvent( _myIDCounter ++, "configure" );
-                setState( RUNNING );
-                return;
-            } else {
-                _myMaxLine = _myFrameBuffer[i + 1];
-            }
+    if ( _myMagicTokenFlag && _myFrameBuffer.size() > 1) {
+        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
+        if (_myFrameBuffer[1] == 0) {
+            //AC_PRINT << "Found status line.";
+            setState(RUNNING);
+        } else {
+            //AC_PRINT << "Found data line: " << int(_myFrameBuffer[1]);
+            _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + 1);
+            _myMagicTokenFlag = false;
         }
     }
 }
@@ -233,58 +234,142 @@ ASSDriver::allocateRaster(const std::string & theName) {
     }
 }
 
+uint16_t
+ASSDriver::readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken ) {
+    if ( * theIt != theToken ) {
+        throw ASSException(string("Failed to parse status token '") + theToken + "'. Got '" +
+                char(* theIt) + "'", PLUS_FILE_LINE );
+    }
+    theIt += 1;
+    //string myNumber(theIt, theIt + 4);
+    istringstream myStream;
+    myStream.setf( std::ios::hex, std::ios::basefield );
+    myStream.str(string( theIt, theIt + 4 ));
+    //AC_PRINT << "=== parsing '" << myStream.str() << "'";
+    theIt += 4;
+    uint16_t myNumber;
+    myStream >>  myNumber;
+    return myNumber;
+}
+
+
+unsigned
+ASSDriver::getBytesPerStatusLine() {
+    if (_myFirmwareVersion < 0) {
+        return MAX_STATUS_LINE_LENGTH;
+    } else if ( _myFirmwareVersion < BEST_VERSION ) {
+        // three tokens: version width height
+        return 3 * BYTES_PER_STATUS_TOKEN + 2;
+    } else {
+        // nine tokens: version status id mode framerate width height framenumber checksum
+        return 9 * BYTES_PER_STATUS_TOKEN + 2;
+    }
+}
+
+void
+ASSDriver::parseStatusLine() {
+    //AC_PRINT << "==== parseStatusLine()";
+    //dumpBuffer(_myFrameBuffer);
+    if ( _myFrameBuffer.size() >= getBytesPerStatusLine() ) {
+        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
+        ASSURE( _myFrameBuffer[1] == _myExpectedLine );
+        std::vector<unsigned char>::iterator myIt = _myFrameBuffer.begin() + 2;
+        _myFirmwareVersion = readStatusToken( myIt, 'V' );
+        //AC_PRINT << "Firmware version: " << _myFirmwareVersion;
+        Vector2i myGridSize;
+        if ( _myFirmwareVersion < BEST_VERSION ) {
+            myGridSize[0] = readStatusToken( myIt, 'W' );
+            myGridSize[1] = readStatusToken( myIt, 'H' );
+        } else {
+            _myFirmwareStatus = readStatusToken( myIt, 'S' );
+            _myControllerId = readStatusToken( myIt, 'I' );
+            _myFirmwareMode = readStatusToken( myIt, 'M' );
+            _myFramerate = readStatusToken( myIt, 'F' );
+            myGridSize[0] = readStatusToken( myIt, 'W' );
+            myGridSize[1] = readStatusToken( myIt, 'H' );
+            _myFrameNo = readStatusToken( myIt, 'N' );
+            _myChecksum = readStatusToken( myIt, 'C' );
+        }
+        _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
+        _myExpectedLine = 1;
+
+        if ( _myGridSize != myGridSize ) {
+            _myGridSize = myGridSize;
+            _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
+            _myPoTSize[1] = nextPowerOfTwo( _myGridSize[1] );
+            AC_PRINT << "Grid size: " << _myGridSize;
+            ASSURE(_myFrameBuffer.front() == MAGIC_TOKEN);
+            allocateGridBuffers();
+            _myReceiveBuffer.resize( getBytesPerFrame() );
+            createTransportLayerEvent( _myIDCounter ++, "configure" );
+        }
+    }
+}
+
 void
 ASSDriver::readSensorValues() {
-    //AC_PRINT << "====";
-    //AC_PRINT << "pre buf size: " << _myFrameBuffer.size();
-    bool myNewDataFlag = false;
-    while ( _myGridSize[0] + 2 < _myFrameBuffer.size() ) {
-        if ( _myFrameBuffer[0] != myMagicToken ) {
-            AC_PRINT << "Sync error.";
-            _mySyncLostCounter++;
-            createTransportLayerEvent( _myIDCounter++, "lost_sync" ); 
-            setState( SYNCHRONIZING );
-            return;
+    while ( _myFrameBuffer.size() >= ( _myExpectedLine == 0 ? 
+                getBytesPerStatusLine() : _myGridSize[0] + 2 ))
+    {
+        //dumpBuffer( _myFrameBuffer );
+        if ( _myExpectedLine == 0 ) {
+            parseStatusLine();
+        } else {
+            if ( _myFrameBuffer[0] != MAGIC_TOKEN) {
+                AC_PRINT << "No MAGIC_TOKEN: '" << int( _myFrameBuffer[0] );
+            }
+            if ( _myFrameBuffer[1] != _myExpectedLine) {
+                AC_PRINT << "No lineo: " << int( _myExpectedLine );
+            }
+            if ( _myFrameBuffer[0] != MAGIC_TOKEN ||
+                    _myFrameBuffer[1] != _myExpectedLine)
+            {
+                AC_PRINT << "Sync error.";
+                _mySyncLostCounter++;
+                createTransportLayerEvent( _myIDCounter++, "lost_sync" ); 
+                setState( SYNCHRONIZING );
+                return;
+            }
+            int myRowIdx = _myFrameBuffer[1] - 1;
+            //AC_PRINT << "Got row: " << myRowIdx;
+
+            size_t byteCount = (_myFrameBuffer.begin() + 2 + _myGridSize[0]) - (_myFrameBuffer.begin() + 2);
+            unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
+                myRowIdx * _myPoTSize[0];
+            std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+
+            _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
+
+            if ( myRowIdx == _myGridSize[1] - 1) {
+                asl::Time myTime;
+                double myDeltaT = myTime - _myLastFrameTime;
+                //AC_PRINT << "dt: " <<  myDeltaT;
+                // XXX
+                myDeltaT = 1.0 / 25.0;
+
+                _myRunTime += myDeltaT;
+                _myLastFrameTime = myTime;
+
+                processSensorValues( myDeltaT );
+                if (_myScene) {
+                    _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
+                }
+                _myExpectedLine = 0;
+            } else {
+                _myExpectedLine += 1;
+            }
         }
-        int myRowIdx = _myFrameBuffer[1] - 1;
-        //AC_PRINT << "Got row: " << myRowIdx;
-
-        size_t byteCount = (_myFrameBuffer.begin() + 2 + _myGridSize[0]) - (_myFrameBuffer.begin() + 2);
-        unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
-                    myRowIdx * _myPoTSize[0];
-        std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
-
-
-        /*
-        int myPixel = _myGridSize[0] * (_myGridSize[1] / 2) + (_myGridSize[0] / 2);
-        AC_PRINT << "value: " << int(*(_myRawRaster.raster->pixels().begin() +
-                    myPixel));
-        */
-
-        _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
-        if ( myRowIdx == _myGridSize[1] - 1) {
-
-            asl::Time myTime;
-            double myDeltaT = myTime - _myLastFrameTime;
-            //AC_PRINT << "dt: " <<  myDeltaT;
-            // XXX
-            //cout << "deltaT " << myDeltaT << endl;
-            myDeltaT = 1.0 / 25.0;
-
-            _myRunTime += myDeltaT;
-            //cout << _myRunTime << "\t" << myDeltaT << endl; // XXX
-
-            //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
-            _myLastFrameTime = myTime;
-
-            processSensorValues( myDeltaT );
-        }
-        myNewDataFlag = true;
     }
-
-    if (myNewDataFlag && _myScene) {
-        _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
-        
+    if ( ! _myCommandQueue.empty() ) {
+        if (_myFirmwareVersion >= 0) {
+            if (_myFirmwareVersion >= BEST_VERSION) {
+                setState( CONFIGURING );
+            } else {
+                AC_WARNING << "Hardware commands not supported in this firmware version ("
+                           << _myFirmwareVersion << ")";
+                _myCommandQueue.clear();
+            }
+        }
     }
     //AC_PRINT << "post buf size: " << _myFrameBuffer.size();
 }
@@ -603,14 +688,12 @@ ASSDriver::setState( DriverState theState ) {
             freeSerialPort();
             break;
         case SYNCHRONIZING:
-            _myLineStart = -1;
-            _myLineEnd = -1;
-            _myMaxLine = 0;
             _myMagicTokenFlag = false;
             _myGridSize = Vector2i(0, 0);
             _myFrameBuffer.clear();
             break;
         case RUNNING:
+            _myExpectedLine = 0;
             break;
         case CONFIGURING:
             _myConfigureState = SEND_CONFIG_COMMANDS;
@@ -655,7 +738,7 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         return;
     }
     if (thePropertyName == "maxOccuringValue") {
-        theReturnValue.set( myMagicToken );
+        theReturnValue.set( MAGIC_TOKEN - 1 );
         return;
     }
     if (thePropertyName == "transform") {
@@ -764,21 +847,21 @@ ASSDriver::processInput() {
 void
 ASSDriver::readDataFromPort() {
     try {
-        size_t myByteCount = _myReceiveBuffer.size();
+        size_t myMaxBytes = _myReceiveBuffer.size();
 
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
         _mySerialPort->peek();
         //AC_PRINT << "bytes: " << _mySerialPort->peek();
         
-        //AC_PRINT << "bytes: " << myByteCount;
+        //AC_PRINT << "bytes: " << myMaxBytes;
         _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
-                myByteCount );
+                myMaxBytes );
 
         //AC_PRINT << "=== Got " << myByteCount << " bytes.";
 
         _myFrameBuffer.insert( _myFrameBuffer.end(),
-                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myByteCount );
+                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
         //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
@@ -859,7 +942,7 @@ getASSSettings(dom::NodePtr theSettings) {
 size_t
 ASSDriver::getBytesPerFrame() {
     // line format: <start> <lineno> <databytes>
-    return (1 + 1 + _myGridSize[0]) * _myGridSize[1];
+    return (1 + 1 + _myGridSize[0]) * _myGridSize[1] + MAX_STATUS_LINE_LENGTH;
 }
 
 void
@@ -870,10 +953,15 @@ ASSDriver::handleConfigurationCommand() {
         case SEND_CONFIG_COMMANDS:
             //AC_PRINT << "SEND_CONFIG_COMMANDS";
             if (myResponse == RESPONSE_OK) {
-                sendCommand( _myCommandQueue.front() );
-                _myCommandQueue.pop_front();
-                if (_myCommandQueue.empty()) {
-                    _myConfigureState = WAIT_FOR_RESPONSE;
+                if ( ! _myCommandQueue.empty()) {
+                    sendCommand( _myCommandQueue.front() );
+                    _myCommandQueue.pop_front();
+                    if (_myCommandQueue.empty()) {
+                        _myConfigureState = WAIT_FOR_RESPONSE;
+                    }
+                } else {
+                    sendCommand( CMD_LEAVE_CONFIG_MODE );
+                    _myConfigureState = WAIT_FOR_EXIT;
                 }
             } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
                 AC_ERROR << "Failed to enter config mode: " 
@@ -910,19 +998,23 @@ ASSDriver::handleConfigurationCommand() {
 CommandResponse 
 ASSDriver::getCommandResponse() {
     string myString( (char*)& ( * _myFrameBuffer.begin()), _myFrameBuffer.size());
+    transform( myString.begin(), myString.end(), myString.begin(), ::toupper);
     string::size_type myPos = myString.find(OK_STRING);
     //AC_PRINT << "getCommandResponse(): '" << myString << "'";
-    if (myPos != string::npos && myPos + OK_STRING.size() + 2 <= myString.size()) {
-        string::size_type myEnd = minimum( myPos + OK_STRING.size() + 2, _myFrameBuffer.size());
+    if (myPos != string::npos ) {
+        string::size_type myEnd = myPos + OK_STRING.size() - 2;
         _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
         AC_PRINT << "Got 'OK'";
         return RESPONSE_OK;
     }
+
     myPos = myString.find(ERROR_STRING);
-    if (myPos != string::npos  && myPos + ERROR_STRING.size() + 2 + 2 <= myString.size()) {
+    if (myPos != string::npos && myPos + ERROR_STRING.size() + 2 + 2 <= myString.size() &&
+        myString[ myPos + ERROR_STRING.size() + 2 ] == '\r' && 
+        myString[ myPos + ERROR_STRING.size() + 2 + 1 ] == '\n') {
         unsigned myErrorCode = as<unsigned>( myString.substr( myPos + ERROR_STRING.size(), 2 ));
         AC_ERROR << "Got 'ERR': errorcode: " << myErrorCode;
-        string::size_type myEnd = minimum( myPos + ERROR_STRING.size() + 2 + 2, _myFrameBuffer.size());
+        string::size_type myEnd = myPos + ERROR_STRING.size() + 2;
         _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
         return RESPONSE_ERROR;
     }
@@ -956,9 +1048,6 @@ ASSDriver::queryConfigMode() {
 void
 ASSDriver::queueCommand( const char * theCommand ) {
     _myCommandQueue.push_back( string( theCommand ));
-    if (_myState != CONFIGURING && _myState != NO_SERIAL_PORT) {
-        setState( CONFIGURING );
-    }
 }
 
 static JSBool

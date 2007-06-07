@@ -147,6 +147,8 @@ class ASSDriver :
         RasterHandle allocateRaster(const std::string & theName);
         void readSensorValues();
         void processSensorValues( double theDeltaT);
+        uint16_t readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
+        void parseStatusLine();
         void updateDerivedRasters();
         void updateCursors( double theDeltaT);
         void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT);
@@ -161,9 +163,9 @@ class ASSDriver :
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
         asl::Matrix4f getTransormationMatrix();
+        unsigned getBytesPerStatusLine();
 
         DriverState    _myState;
-
         unsigned       _mySyncLostCounter;
 
         RasterHandle _myRawRaster;
@@ -187,6 +189,22 @@ class ASSDriver :
 
         dom::NodePtr _myTransform;
 
+        int _myDumpValuesFlag;
+
+        std::list<std::string> _myCommandQueue;
+        CommandState _myConfigureState;
+        double       _myLastCommandTime;
+
+        // Controller Status
+        // TODO: expose to JavaScript
+        int _myFirmwareVersion;
+        int _myFirmwareStatus;
+        int _myControllerId;
+        int _myFirmwareMode;
+        int _myFramerate;
+        int _myFrameNo;
+        int _myChecksum;
+
         // Transport Layer Members:
         // will be refactored into a separate class, when 
         // we go for ethernet
@@ -201,10 +219,8 @@ class ASSDriver :
         std::vector<unsigned char> _myFrameBuffer;
         asl::SerialDevice * _mySerialPort;
 
-        int  _myLineStart;
-        int  _myLineEnd;
-        int  _myMaxLine;
         bool _myMagicTokenFlag;
+        int _myExpectedLine;
 
         bool _myUseUSBFlag; // used by the linux implementation, because
                             // USB TTYs have a diffrent naming scheme
@@ -216,11 +232,6 @@ class ASSDriver :
         asl::SerialDevice::ParityMode _myParity;
         std::vector<unsigned char> _myReceiveBuffer;
 
-        int _myDumpValuesFlag;
-
-        std::list<std::string> _myCommandQueue;
-        CommandState _myConfigureState;
-        double       _myLastCommandTime;
 };
 
 
