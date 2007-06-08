@@ -1639,8 +1639,10 @@ MAKE_SCOPE_TIMER(switchMaterial);
             return;
         }
 
-        glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+        _myState->setBackfaceCulling( false );
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -1741,6 +1743,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 }
                 // force depth buffer deactivation
                 RenderStyles myOverlayRenderStyle(BIT(IGNORE_DEPTH) | BIT(NO_DEPTH_WRITES));
+
                 enableRenderStyles(myOverlayRenderStyle, &(*myMaterial));
                 MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
