@@ -136,6 +136,8 @@ ASSDriver::ASSDriver() :
     _myHandshakingFlag( false ),
     _myReceiveBuffer(256),
     _myDumpValuesFlag( 0 ),
+    _myLastFrameTime( asl::Time() ),
+    _myRunTime(0.0),
     _myLastCommandTime( asl::Time() ),
     _myExpectedLine( 0 ),
     _myFirmwareVersion(-1),
@@ -145,6 +147,7 @@ ASSDriver::ASSDriver() :
     _myFramerate(-1),
     _myFrameNo(-1),
     _myChecksum(-1)
+
 
 
 {
@@ -234,7 +237,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
     }
 }
 
-uint16_t
+unsigned
 ASSDriver::readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken ) {
     if ( * theIt != theToken ) {
         throw ASSException(string("Failed to parse status token '") + theToken + "'. Got '" +
@@ -247,7 +250,7 @@ ASSDriver::readStatusToken( std::vector<unsigned char>::iterator & theIt, const 
     myStream.str(string( theIt, theIt + 4 ));
     //AC_PRINT << "=== parsing '" << myStream.str() << "'";
     theIt += 4;
-    uint16_t myNumber;
+    unsigned myNumber;
     myStream >>  myNumber;
     return myNumber;
 }

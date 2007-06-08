@@ -147,7 +147,7 @@ class ASSDriver :
         RasterHandle allocateRaster(const std::string & theName);
         void readSensorValues();
         void processSensorValues( double theDeltaT);
-        uint16_t readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
+        unsigned readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
         void parseStatusLine();
         void updateDerivedRasters();
         void updateCursors( double theDeltaT);
@@ -176,7 +176,7 @@ class ASSDriver :
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
-        float       _myRunTime;
+        double       _myRunTime;
         int         _myComponentThreshold;
         int         _myNoiseThreshold;
         float       _myIntensityThreshold;
