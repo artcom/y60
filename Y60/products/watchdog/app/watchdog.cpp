@@ -115,8 +115,8 @@ WatchDog::watch() {
             }
         }
         
-        if (_mySplashScreen->isEnabled())
-            _mySplashScreen->hide();
+        //if (_mySplashScreen->isEnabled())
+        //    _mySplashScreen->hide();
                 
         // Main loop
         while (true) {
@@ -171,8 +171,8 @@ WatchDog::watch() {
                 }
             }
             
-            if (_mySplashScreen->isEnabled())
-                _mySplashScreen->hide();
+            //if (_mySplashScreen->isEnabled())
+            //    _mySplashScreen->hide();
         }
     } catch (const asl::Exception & ex) {
         cerr << "### Exception: " << ex << endl;
@@ -311,7 +311,7 @@ WatchDog::init(dom::Document & theConfigDoc) {
                 
                 // WaitingScreen setup
                 if (myApplicationNode->childNode("WaitingScreenBMP")) {
-                    std::string myWaitingScreenPath = (*myApplicationNode->childNode("WaitingScreenBMP"))("#text").nodeValue();
+                    std::string myWaitingScreenPath = asl::expandEnvironment((*myApplicationNode->childNode("WaitingScreenBMP"))("#text").nodeValue());
                     int myWaitingScreenPosX = 0;
                     int myWaitingScreenPosY = 0;
 
