@@ -215,7 +215,8 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             var mySettingsDom = new Node();
             mySettingsDom.parseFile(_mySettingsFile);
             _mySettings = mySettingsDom.firstChild;
-            var myHostSettingsFile = "settings-" + hostname() + ".xml";
+            var myHostname = hostname().split(".")[0]; //make sure we don't get a FQ name
+            var myHostSettingsFile = "settings-" + myHostname + ".xml";
             if (fileExists(myHostSettingsFile)) {
                 print("Merging settings with '" + myHostSettingsFile + "'");
                 mergeHostSpecificSettings(myHostSettingsFile);
