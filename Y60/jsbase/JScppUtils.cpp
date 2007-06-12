@@ -139,7 +139,12 @@ as_jsval(JSContext *cx, const char * theU8String) {
     AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
     if (myWCharSize == 0) {
         DWORD myLastError = GetLastError();
-        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
+        ostringstream os;
+        os << errorDescription(myLastError) << " '" << theU8String << "' hex:";
+        for (unsigned i = 0; i < strlen(theU8String); ++i) {
+            os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
+        }
+        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE); 
     }
     LPWSTR myWChars = new WCHAR[myWCharSize];
     MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
@@ -149,7 +154,12 @@ as_jsval(JSContext *cx, const char * theU8String) {
 #else
     gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,0);
     if ( ! myUTF16) {
-        throw jslib::UnicodeException("Failed to convert UTF8 to UTF16.", PLUS_FILE_LINE);
+        ostringstream os;
+        os << "Failed to convert UTF8 to UTF16. '" << theU8String << "' hex:";
+        for (unsigned i = 0; i < strlen(theU8String); ++i) {
+            os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
+        }
+        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE); 
     }
     
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
