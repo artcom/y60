@@ -955,6 +955,10 @@ namespace jslib {
     {
         _myRenderer->getTextManager().setColor(theTextColor);
     }
+    const asl::Vector4f &
+    AbstractRenderWindow::getTextColor() {
+        return _myRenderer->getTextManager().getColor();
+    }
 
     const asl::Vector2i & AbstractRenderWindow::getTextCursorPosition() const
     {

@@ -101,6 +101,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
 
+        window.canvas.backgroundcolor = [1,1,0,1];
+
         loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
         loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
         
@@ -112,6 +114,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.position.y += 1.5;
         _myButtonGroupNode.position.x += 5.5; 
 
+        _myASSManager.textColor = [0,0,0,1];
         /* XXX
         buildKeyboard();
         buildDisplay();
@@ -124,21 +127,17 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
-
-        _myASSManager.onFrame( theTime );
     }
 
     Base.onPostRender = self.onPostRender;
     self.onPostRender = function() {
         Base.onPostRender();
-
-        _myASSManager.onPostRender();
     }
 
     Base.onMouseButton = self.onMouseButton;
     self.onMouseButton = function( theButton, theState, theX, theY ) {
         Base.onMouseButton( theButton, theState, theX, theY);
-        
+        print( "mouse pos: " + theX + " " + theY);
     }
 
     Base.onKey = self.onKey;
@@ -178,6 +177,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         } else if ( theNode.type == "lost_communication" || theNode.type == "lost_sync" ) {
             //print("event " + theNode.type );
         } else if ( theNode.type == "touch") {
+            /*
             var myBody = _myPicking.pickBodyByWorldPos(theNode.position3D);
             if(myBody) {                
                 for(var i=0; i<ourButtons.length; ++i ) {
@@ -186,6 +186,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                     }
                 }
             }
+            */
         } else {
             if ( ! _myWorldCross ) {
                 var myShape = window.scene.world.getElementById("XXX");
@@ -197,8 +198,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             if ( _myWorldCross ) {
                 _myWorldCross.position = new Vector3f( theNode.position3D );
             }
-            //print("event " + theNode.type + " at position: " + theNode.position3D +
-            //        " dt: " + (theNode.when - _myLastEventTime));
+            print("event " + theNode.type + " at position: " + theNode.position3D );
         }
         _myLastEventTime = theNode.when;
     }

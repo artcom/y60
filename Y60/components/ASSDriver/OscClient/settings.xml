@@ -6,8 +6,11 @@
         <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
-        <DumpValues min="0" max="1" step="1">0</DumpValues>
+
+        <ProbePosition min="-1" step="1">[2.00000,3.00000]</ProbePosition>
+        <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
+
         <SerialPort>0</SerialPort>
         <UseUSB>0</UseUSB>
         <BaudRate>57600</BaudRate>

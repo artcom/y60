@@ -162,8 +162,13 @@ class ASSDriver :
 
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
-        asl::Matrix4f getTransormationMatrix();
+        asl::Matrix4f getTransformationMatrix();
         unsigned getBytesPerStatusLine();
+
+        void drawGrid();
+        void drawMarkers();
+        void drawCircle( const asl::Vector2f & thePosition, float theRadius,
+                         unsigned theSubdivision, const asl::Vector4f & theColor);
 
         DriverState    _myState;
         unsigned       _mySyncLostCounter;
@@ -187,13 +192,28 @@ class ASSDriver :
         CursorMap   _myCursors;
         int         _myIDCounter;
 
-        dom::NodePtr _myTransform;
+        struct TouchEvent {
+            TouchEvent(double theBirthTime, const asl::Vector2f & thePosition) :
+                    birthTime( theBirthTime ), position( thePosition ) {}
+            double   birthTime;
+            asl::Vector2f position;
+        };
+        std::vector<TouchEvent> _myTouchHistory;
 
-        int _myDumpValuesFlag;
+        dom::NodePtr _myOverlay;
+
+        int _myDebugTouchEventsFlag;
+        asl::Vector2f _myProbePosition;
 
         std::list<std::string> _myCommandQueue;
         CommandState _myConfigureState;
         double       _myLastCommandTime;
+
+        asl::Vector4f _myGridColor;
+        asl::Vector4f _myCursorColor;
+        asl::Vector4f _myTouchColor;
+        asl::Vector4f _myTextColor;
+        asl::Vector4f _myProbeColor;
 
         // Controller Status
         // TODO: expose to JavaScript

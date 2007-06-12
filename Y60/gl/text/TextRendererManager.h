@@ -40,6 +40,7 @@ namespace y60 {
             void addText(const asl::Vector2f & thePos, const std::string & theString,
                     const std::string & theFont);
             void setColor(const asl::Vector4f & theTextColor);
+            const asl::Vector4f & getColor();
             void setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding);
 	        void setIndentation(int theIndentation);
             void setVTextAlignment(TextRenderer::TextAligment theVAlignment);

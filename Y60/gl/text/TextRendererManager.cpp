@@ -120,6 +120,10 @@ namespace y60 {
             _myTTFRenderer->setColor(theTextColor);
         }
     }
+    const asl::Vector4f & 
+    TextRendererManager::getColor() {
+        return _myBitmapRenderer.getColor();
+    }
 
 	void
 	TextRendererManager::setVTextAlignment(TextRenderer::TextAligment theVAlignment) {

@@ -19,6 +19,7 @@
 #include <y60/PixelEncoding.h>
 #include <y60/AbstractRenderWindow.h>
 #include <y60/JSScriptablePlugin.h>
+#include <y60/Overlay.h>
 
 #include <iostream>
 #include <algorithm>
@@ -71,6 +72,8 @@ const unsigned int BEST_VERSION( 260 );
 const unsigned int MAX_NUM_STATUS_TOKENS( 9 );
 const unsigned int BYTES_PER_STATUS_TOKEN( 5 );
 const unsigned int MAX_STATUS_LINE_LENGTH( MAX_NUM_STATUS_TOKENS * BYTES_PER_STATUS_TOKEN + 2 );
+
+const float TOUCH_MARKER_LIFE_TIME( 1.0 );
 
 #ifdef OSX
 #undef verify
@@ -135,10 +138,18 @@ ASSDriver::ASSDriver() :
     _myStopBits( 1 ),
     _myHandshakingFlag( false ),
     _myReceiveBuffer(256),
-    _myDumpValuesFlag( 0 ),
+    _myDebugTouchEventsFlag( 0 ),
     _myLastFrameTime( asl::Time() ),
     _myRunTime(0.0),
     _myLastCommandTime( asl::Time() ),
+    _myProbePosition( -1, -1),
+
+    _myGridColor(0.5, 0.5, 0, 1.0),
+    _myCursorColor(0.5, 0.5, 0, 1.0),
+    _myTouchColor(1.0, 1.0, 1.0, 1.0),
+    _myTextColor(1.0, 1.0, 1.0, 1.0),
+    _myProbeColor(0.0, 0.75, 0.0, 1.0),
+
     _myExpectedLine( 0 ),
     _myFirmwareVersion(-1),
     _myFirmwareStatus(-1),
@@ -147,9 +158,6 @@ ASSDriver::ASSDriver() :
     _myFramerate(-1),
     _myFrameNo(-1),
     _myChecksum(-1)
-
-
-
 {
     setState(NO_SERIAL_PORT);
 }
@@ -542,8 +550,9 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
         //AC_PRINT << "touched me! at " << _myRunTime;
         theCursorIt->second.lastTouchTime = _myRunTime;
         createEvent( theCursorIt->first, "touch", theCursorIt->second.position,
-                applyTransform(theCursorIt->second.position, getTransormationMatrix() ),
+                applyTransform(theCursorIt->second.position, getTransformationMatrix() ),
                 theCursorIt->second.roi );
+        _myTouchHistory.push_back( TouchEvent(_myRunTime, theCursorIt->second.position ));
     }
    
     theCursorIt->second.intensityHistory.push_back( theCursorIt->second.intensity );
@@ -551,7 +560,7 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
             theCursorIt->second.intensityHistory.pop_front();
         }
 
-    if (_myDumpValuesFlag) {
+    if (_myDebugTouchEventsFlag) {
         cout << _myRunTime << "\t" << theCursorIt->second.intensity << "\t" << myFirstDerivative*0.1 << "\t" << myTouch
             << "\t" << theCursorIt->second.position[0] << endl;
     }
@@ -607,11 +616,21 @@ ASSDriver::computeIntensity(CursorMap::iterator & theCursorIt, const y60::Raster
 }
 
 asl::Matrix4f
-ASSDriver::getTransormationMatrix() {
-    typedef TransformHierarchyFacade THF;
+ASSDriver::getTransformationMatrix() {
     Matrix4f myTransform;
-    if (_myTransform) {
-        myTransform = _myTransform->getFacade<THF>()->get<GlobalMatrixTag>();
+    if (_myOverlay ) {
+        const y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
+        const Vector2f & myPosition = myOverlay.get<Position2DTag>();
+        const Vector2f & myScale = myOverlay.get<Scale2DTag>();
+        const float & myOrientation = myOverlay.get<Rotation2DTag>();
+
+        myTransform.makeIdentity();
+
+        myTransform.translate( Vector3f( 0.5, 0.5, 0));
+
+        myTransform.scale( Vector3f( myScale[0], myScale[1], 0));
+        myTransform.translate( Vector3f( myPosition[0], myPosition[1], 0));
+        myTransform.rotateZ( myOrientation );
     } else {
         myTransform.makeIdentity();
     }
@@ -623,7 +642,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                                const BlobListPtr theROIs)
 {
 
-    Matrix4f myTransform = getTransormationMatrix();
+    Matrix4f myTransform = getTransformationMatrix();
 
     const BlobList & myROIs = * theROIs;
 
@@ -714,7 +733,117 @@ ASSDriver::setState( DriverState theState ) {
 }
 
 void
+ASSDriver::drawGrid() {
+    glColor4fv( _myGridColor.begin() );
+    glBegin( GL_LINES );
+    for (unsigned i = 0; i < _myGridSize[0]; ++i) {
+        glVertex2f(i, 0.0);
+        glVertex2f(i, _myGridSize[1] - 1);
+    }
+    for (unsigned i = 0; i < _myGridSize[1]; ++i) {
+        glVertex2f( 0.0, i);
+        glVertex2f( _myGridSize[0] - 1, i);
+    }
+    glEnd();
+}
+
+
+void
+ASSDriver::drawCircle( const Vector2f & thePosition, float theRadius,
+                       unsigned theSubdivision, const Vector4f & theColor)
+{
+    float myStep = 2 * PI / theSubdivision;
+
+    glColor4fv( theColor.begin() );
+    glBegin( GL_LINE_LOOP );
+    for (unsigned i = 0; i < theSubdivision; ++i) {
+        Vector2f myPosition( theRadius * sin( i * myStep ), theRadius * cos( i * myStep ));
+        glVertex2fv( (myPosition + thePosition).begin() );
+    }
+    glEnd();
+}
+
+void
+ASSDriver::drawMarkers() {
+    // draw origin
+    drawCircle( Vector2f(0.0, 0.0), 0.15, 36, _myGridColor );
+
+    // draw cursors
+    CursorMap::iterator myIt = _myCursors.begin();
+    for (; myIt != _myCursors.end(); ++myIt ) {
+        drawCircle( myIt->second.position, 0.15, 36, _myCursorColor );
+    }
+
+    // draw touch history
+    if ( ! _myTouchHistory.empty() ) {
+        //std::vector<TouchEvent>::reverse_iterator myIt = _myTouchHistory.rbegin();
+        std::vector<TouchEvent>::iterator myIt = _myTouchHistory.begin();
+        while ( myIt != _myTouchHistory.end() ) {
+            if (_myRunTime - myIt->birthTime > TOUCH_MARKER_LIFE_TIME) {
+                myIt = _myTouchHistory.erase( myIt );
+            } else {
+                drawCircle( myIt->position, 0.20, 36, _myTouchColor);
+                myIt += 1;
+            }
+        }
+    }
+
+    // draw value probe
+    if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
+        drawCircle( _myProbePosition, 0.15, 36, _myProbeColor);
+    }
+}
+
+
+
+void
 ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
+    if ( _myScene && _myOverlay) {
+        glPushAttrib( GL_ALL_ATTRIB_BITS );
+        glMatrixMode( GL_PROJECTION );
+        glPushMatrix();
+        glLoadIdentity();
+
+        dom::Node * myOverlayList = _myOverlay->parentNode();
+        if ( ! myOverlayList ) {
+            throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
+        }
+        dom::Node * myViewportNode = myOverlayList->parentNode();
+        if ( ! myViewportNode ) {
+            throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
+        }
+        y60::ViewportPtr myViewport = myViewportNode->getFacade<y60::Viewport>();
+
+        gluOrtho2D(0.0, myViewport->get<ViewportWidthTag>(), myViewport->get<ViewportHeightTag>(), 0.0);
+
+        glMatrixMode( GL_MODELVIEW );
+        glPushMatrix();
+        glLoadMatrixf( static_cast<const GLfloat*>( getTransformationMatrix().getData()));
+
+        glDisable( GL_DEPTH_TEST );
+
+        drawGrid();
+        drawMarkers();
+
+        glPopMatrix();
+
+        if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
+            unsigned char myValue = * (_myRawRaster.raster->pixels().begin() +
+                int(_myProbePosition[1]) * _myPoTSize[0] + int(_myProbePosition[0]));
+
+            const Vector4f & myOldColor = theWindow->getTextColor();
+            theWindow->setTextColor( _myTextColor );
+            theWindow->renderText( Vector2f( 50, 50 ), string("Value") +
+                    as_string(_myProbePosition) + " = " + as_string(int(myValue)), "Screen15");
+            theWindow->setTextColor( myOldColor );
+        }
+        
+
+        glMatrixMode( GL_PROJECTION );
+        glPopMatrix();
+        glMatrixMode( GL_MODELVIEW );
+        glPopAttrib();
+    }
 }
 
 void
@@ -745,16 +874,32 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myGridSize );
         return;
     }
-    if (thePropertyName == "maxOccuringValue") {
-        theReturnValue.set( MAGIC_TOKEN - 1 );
-        return;
-    }
-    if (thePropertyName == "transform") {
-        theReturnValue.set( _myTransform );
+    if (thePropertyName == "overlay") {
+        theReturnValue.set( _myOverlay );
         return;
     }
     if (thePropertyName == "rasterNames") {
         theReturnValue.set( _myRasterNames );
+        return;
+    }
+    if (thePropertyName == "gridColor") {
+        theReturnValue.set( _myGridColor );
+        return;
+    }
+    if (thePropertyName == "cursorColor") {
+        theReturnValue.set( _myCursorColor );
+        return;
+    }
+    if (thePropertyName == "touchColor") {
+        theReturnValue.set( _myTouchColor );
+        return;
+    }
+    if (thePropertyName == "textColor") {
+        theReturnValue.set( _myTextColor );
+        return;
+    }
+    if (thePropertyName == "probeColor") {
+        theReturnValue.set( _myProbeColor );
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
@@ -768,18 +913,35 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "gridSize property is read only";
         return;
     }
-    if (thePropertyName == "maxOccuringValue") {
-        AC_ERROR << "maxOccuringValue property is read only";
-        return;
-    }
-    if (thePropertyName == "transform") {
-        _myTransform = thePropertyValue.get<dom::NodePtr>();
+    if (thePropertyName == "overlay") {
+        _myOverlay = thePropertyValue.get<dom::NodePtr>();
         return;
     }
     if (thePropertyName == "rasterNames") {
         AC_ERROR << "rasterNames property is read only";
         return;
     }
+    if (thePropertyName == "gridColor") {
+        _myGridColor = thePropertyValue.get<Vector4f>();
+        return;
+    }
+    if (thePropertyName == "cursorColor") {
+        _myCursorColor = thePropertyValue.get<Vector4f>();
+        return;
+    }
+    if (thePropertyName == "touchColor") {
+        _myTouchColor = thePropertyValue.get<Vector4f>();
+        return;
+    }
+    if (thePropertyName == "textColor") {
+        _myTextColor = thePropertyValue.get<Vector4f>();
+        return;
+    }
+    if (thePropertyName == "probeColor") {
+        _myProbeColor = thePropertyValue.get<Vector4f>();
+        return;
+    }
+
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -794,7 +956,8 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
     getConfigSetting( mySettings, "GainPower", _myGainPower, 2.0f );
     getConfigSetting( mySettings, "IntensityThreshold", _myIntensityThreshold, 9.0f );
     getConfigSetting( mySettings, "FirstDerivativeThreshold", _myFirstDerivativeThreshold, 25.0f );
-    getConfigSetting( mySettings, "DumpValues", _myDumpValuesFlag, 0 );
+    getConfigSetting( mySettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
+    getConfigSetting( mySettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
     getConfigSetting( mySettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
 
     bool myPortConfigChanged = false;

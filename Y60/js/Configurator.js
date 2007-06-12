@@ -211,7 +211,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     function setup(obj, theSceneViewer, theSettingsFile) {
         _mySettingsFile = theSettingsFile;
         if (fileExists(_mySettingsFile)) {
-            print("Parsing settings from '" + _mySettingsFile + "'");
+            //print("Parsing settings from '" + _mySettingsFile + "'");
             var mySettingsDom = new Node();
             mySettingsDom.parseFile(_mySettingsFile);
             _mySettings = mySettingsDom.firstChild;

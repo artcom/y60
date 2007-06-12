@@ -56,6 +56,7 @@ namespace y60 {
             
             }
             void setColor(const asl::Vector4f & theTextColor);
+            const asl::Vector4f & getColor();
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
             void setCursor(asl::Vector2i thePosition);
             void setIndentation(int theIndent);

@@ -130,6 +130,7 @@ namespace jslib {
         }
 
         void setTextColor(const asl::Vector4f & theTextColor);
+        const asl::Vector4f & getTextColor();
 
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
                 const std::string & theString, const std::string & theFont,

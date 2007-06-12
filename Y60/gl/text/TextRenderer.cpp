@@ -77,6 +77,10 @@ namespace y60 {
     TextRenderer::setColor(const asl::Vector4f & theTextColor) {
         _myCurrentTextColor = theTextColor;
     }
+    const asl::Vector4f &
+    TextRenderer::getColor() {
+        return _myCurrentTextColor;
+    }
 
     void
     TextRenderer::setPadding(int theTop, int theBottom, int theLeft, int theRight) {
