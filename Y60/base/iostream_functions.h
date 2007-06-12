@@ -85,10 +85,10 @@ namespace asl {
     operator << (std::ostream & theStream, const y60::VectorOfFloat & theVector);
 
     std::ostream &
-    operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector);
+    operator << (std::ostream & theStream, const y60::VectorOfString & theStringVector);
 
     std::istream &
-    operator >> (std::istream & theStream, std::vector<std::string> & theStringVector);
+    operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 
     std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);

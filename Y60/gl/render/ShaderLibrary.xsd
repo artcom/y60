@@ -1,0 +1,297 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="Point3f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector3f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector4f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2i">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector2i">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector3f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector4f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfFloat">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfString">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVectorOfString">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Matrix4f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:element name="properties">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="float"/>
+                <xs:element ref="point3f"/>
+                <xs:element ref="vector2f"/>
+                <xs:element ref="vector3f"/>
+                <xs:element ref="vector4f"/>
+                <xs:element ref="matrix4f"/>
+                <xs:element ref="vectorofvector2f"/>
+                <xs:element ref="vectorofvector4f"/>
+                <xs:element ref="vectoroffloat"/>
+                <xs:element ref="vectorofstring"/>
+                <xs:element ref="sampler1d"/>
+                <xs:element ref="sampler2d"/>
+                <xs:element ref="sampler3d"/>
+                <xs:element ref="samplerCUBE"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="textures">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="texture"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="texture">
+        <xs:complexType>
+            <xs:attribute name="src" type="xs:string"/>
+            <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="applymode" type="xs:string"/>
+            <xs:attribute name="wrapmode" type="xs:string"/>
+            <xs:attribute name="alpha" type="xs:int"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="float">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:float">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sampler1d">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sampler2d">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sampler3d">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector2f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector2f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector4f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector4f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectoroffloat">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfFloat">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofstring">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfString">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="samplerCUBE">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector4f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector4f">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="matrix4f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Matrix4f">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="point3f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Point3f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector2f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector2f">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector3f">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector3f">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="shaders">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="shader"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="shader">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="supports"/>
+                <xs:element ref="fragmentshader"/>
+                <xs:element ref="vertexshader"/>
+                <xs:element ref="fixedfunctionshader"/>
+                <xs:element ref="textures"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="id" type="xs:ID"/>
+            <xs:attribute name="cost" type="xs:float"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="supports">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="feature"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="feature">
+        <xs:complexType>
+            <xs:attribute name="class" type="xs:IDREF"/>
+            <xs:attribute name="values" type="VectorOfString"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="CgShader">
+        <xs:attribute name="profiles" type="VectorOfString"/>
+        <xs:attribute name="files" type="VectorOfString"/>
+        <xs:attribute name="entryfunctions" type="VectorOfString"/>
+        <xs:attribute name="compilerargs" type="VectorOfVectorOfString" use="optional"/>
+    </xs:complexType>
+    <xs:element name="fragmentshader">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:element ref="properties"/>
+            </xs:sequence>
+            <xs:simpleContent>
+                <xs:extension base="CgShader"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vertexshader">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:element ref="properties"/>
+                <xs:element ref="vertexparameters"/>
+            </xs:sequence>
+            <xs:simpleContent>
+                <xs:extension base="CgShader"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="fixedfunctionshader">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:element ref="properties"/>
+                <xs:element ref="vertexparameters"/>
+            </xs:sequence>
+            <xs:simpleContent>
+                <xs:extension base="CgShader"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vertexparameters">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="vector2f"/>
+                <xs:element ref="vector3f"/>
+                <xs:element ref="vector4f"/>
+                <xs:element ref="float"/>
+                <xs:element ref="sampler2d"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

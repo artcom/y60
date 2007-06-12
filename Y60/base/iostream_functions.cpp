@@ -65,17 +65,19 @@ namespace asl {
     }
 
     std::ostream &
-    operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector) {
+    operator << (std::ostream & theStream, const y60::VectorOfString & theStringVector) {
         theStream << "[";
         for (unsigned i = 0; i < theStringVector.size(); ++i) {
             const std::string & myString = theStringVector[i];
+            theStream << "`";
             for (int j = 0; j < myString.size();++j) {
                 const char & c = myString[j];
-                if (c == '[' || c==']' || c==',' || c=='\\') {
+                if (c == '`' || c == '[' || c == ']' || c == ',' || c == '\\') {
                     theStream << '\\';
                 }
                 theStream << c;
             }
+            theStream << "`";
             if (i < theStringVector.size() - 1) {
                 theStream << ",";
             }
@@ -84,47 +86,50 @@ namespace asl {
         return theStream;
     }
 
-    /**
-     * @error Bugzilla 91
-     */
     std::istream &
-    operator >> (std::istream & theStream, std::vector<std::string> & theStringVector) {
-            char myChar;
-            theStream >> myChar;
+    operator >> (std::istream & theStream, y60::VectorOfString & theStringVector) {
+        char myChar;
+        theStream >> myChar;
 
-            if (myChar != '[') {
+        if (myChar != '[') {
+            theStream.setstate(std::ios::failbit);
+            return theStream;
+        }
+
+        std::string myElement;
+        bool myStartFlag   = false;
+        bool myElementFlag = false;
+        do {
+            theStream >> myChar;
+            if ((myChar == ']' || myChar == ',') && !myStartFlag) {
+                if (myElementFlag) {
+                    theStringVector.push_back(myElement);
+                    myElement.clear();
+                }
+                if (myChar == ']') {
+                    break;
+                }
+            } else if (myChar != '`' && myStartFlag) {
+                if (myChar == '\\') {
+                    theStream >> myChar;
+                }
+                myElement += myChar;
+            } else if (myChar == '`') {
+                myStartFlag = !myStartFlag;
+                if (myStartFlag) {
+                    myElementFlag = true;
+                }
+            } else {
                 theStream.setstate(std::ios::failbit);
                 return theStream;
             }
+        } while (!theStream.eof());
 
-            std::string myElement;
-            do {
-                theStream >> myChar;
-                if (myChar =='\\') {
-                    theStream >> myChar;
-                    myElement+=myChar;
-                } else {
-                    if (myChar == ']' && theStringVector.empty() && myElement.empty()) {
-                        //empty vector of strings
-                        break;
-                    }
-                    if ((myChar == ',') || (myChar == ']')) {
-                        theStringVector.push_back(myElement);
-                        myElement.clear();
-                        if (myChar == ']') {
-                            break;
-                        }
-                    } else {
-                        myElement += myChar;
-                    }
-                }
-            } while ( ! theStream.eof());
+        if (myChar != ']') {
+            theStream.setstate(std::ios::failbit);
+        }
 
-            if (myChar != ']') {
-                theStream.setstate(std::ios::failbit);
-            }
-
-            return theStream;
+        return theStream;
     }
 
     std::ostream &

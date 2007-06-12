@@ -213,8 +213,8 @@ exportCurve(MFnDagNode & theDagNode, WorldBuilderBase & theParentTransform, Scen
                         SURFACE_COLOR_PROPERTY, myLineColor);
         setPropertyValue<float>(myMaterialBuilder.getNode(), "float",
                         LINEWIDTH_PROPERTY, myLineWidth);
-        setPropertyValue<VectorOfString>(myMaterialBuilder.getNode(), "vectorofstring",
-                        BLENDFUNCTION_PROPERTY, asl::as<VectorOfString>(myBlendFunction.asChar()));
+        setPropertyValue<VectorOfBlendFunction>(myMaterialBuilder.getNode(), "vectorofblendfunction",
+                        BLENDFUNCTION_PROPERTY, asl::as<VectorOfBlendFunction>(myBlendFunction.asChar()));
         ourMaterialMap[myMaterialKey] = myMaterialId;
     } else {
         myMaterialId = myIt->second;

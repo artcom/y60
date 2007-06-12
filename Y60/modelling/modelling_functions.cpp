@@ -592,8 +592,8 @@ namespace y60 {
     void
     appendBlendFunction(MaterialBuilder & theMaterialBuilder) {
         string myBlendFunction = "[src_alpha, one_minus_src_alpha]";
-        setPropertyValue<VectorOfString>(theMaterialBuilder.getNode(), "vectorofstring",
-            BLENDFUNCTION_PROPERTY, asl::as<VectorOfString>(myBlendFunction));
+        setPropertyValue<VectorOfBlendFunction>(theMaterialBuilder.getNode(), "vectorofblendfunction",
+            BLENDFUNCTION_PROPERTY, asl::as<VectorOfBlendFunction>(myBlendFunction));
     }
 
     dom::NodePtr

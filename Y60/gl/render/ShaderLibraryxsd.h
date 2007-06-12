@@ -25,6 +25,7 @@
 #ifndef AC_GL_RENDERER_SHADERLIBRARY_XSD_INCLUDED
 #define AC_GL_RENDERER_SHADERLIBRARY_XSD_INCLUDED
 
-extern const char * ourShaderLibrary_xsd;
+#include <string>
+extern std::string ourShaderLibraryxsd;
 
 #endif

@@ -9,7 +9,7 @@
 //============================================================================
 
 #include "ShaderLibrary.h"
-#include "ShaderLibrary_xsd.h"
+#include "ShaderLibraryxsd.h"
 #include "FFShader.h"
 
 #ifndef _AC_NO_CG_
@@ -89,7 +89,7 @@ namespace y60 {
         dom::registerStandardTypes(*myFactory);
         registerSomTypes(*myFactory);
         myShaderLibraryXml.setValueFactory(myFactory);
-        dom::Document mySchema(ourShaderLibrary_xsd);
+        dom::Document mySchema(ourShaderLibraryxsd);
 
         myShaderLibraryXml.addSchema(mySchema,"");
         myShaderLibraryXml.parse(myShaderLibraryStr);

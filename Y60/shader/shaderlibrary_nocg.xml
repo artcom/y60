@@ -2,40 +2,40 @@
 <shaders>
     <shader id="s1" name="tex_phong" cost="120">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s2" name="dbl_tex_phong" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -43,194 +43,194 @@
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s2a" name="occlusion_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[occlusion]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="textures" values="[`occlusion`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s16a" name="lambert_occlusion_paint_env" cost="10" >
+    <shader id="s16a" name="lambert_occlusion_paint_env" cost="10">
         <supports>
-            <feature class="textures" values="[occlusion,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`occlusion`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
-                 <vector2f name="texcoord1"/>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
-    <shader id="s24a" name="phong_occlusion_env" cost="10" >
+    <shader id="s24a" name="phong_occlusion_env" cost="10">
         <supports>
-            <feature class="textures" values="[occlusion,paint]"/>
-            <feature class="texcoord" values="[uv_map,reflective]"/>
-            <feature class="lighting" values="[phong]"/>
+            <feature class="textures" values="[`occlusion`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`phong`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
-    <shader id="s24b" name="phong_brakes" cost="10" >
+    <shader id="s24b" name="phong_brakes" cost="10">
         <supports>
-            <feature class="textures" values="[paint,paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,reflective]"/>
-            <feature class="lighting" values="[phong]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`phong`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
     <shader id="s25" name="tex2_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s3" name="LambertColorTex" cost="120">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>
-            <feature class="vertexparams" values="[color]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="color"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s2.5" name="LambertColor" cost="120">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="vertexparams" values="[color]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="color"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s4" name="doubletex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s5" name="tripletex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
@@ -238,142 +238,142 @@
                 <vector2f name="texcoord1"/>
                 <vector2f name="texcoord2"/>
             </vertexparameters>
-         </fixedfunctionshader>
-     </shader>
-     <shader id="s6" name="lambert" cost="120">
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s6" name="lambert" cost="120">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s7" name="unlittex" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s8pp" name="unlitDualtexProj" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,*]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s8ppp" name="lambertDualtexProj" cost="120">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,*]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s9pp" name="unlitTripletexProj" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,*]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s9ppp" name="lambertTripletexProj" cost="120">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,*]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s8" name="unlitmultitex" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s10" name="unlittripletex" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -381,431 +381,430 @@
                 <vector2f name="texcoord1"/>
                 <vector2f name="texcoord2"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s11" name="unlit" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
+            <feature class="lighting" values="[`unlit`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s11b" name="unlitcolor" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="vertexparams" values="[color]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector4f name="color"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s11c" name="unlitcolortex" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="vertexparams" values="[color]"/>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector4f name="color"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s12" name="water" cost="1">
-         <supports>
-             <feature class="physics" values="[waves]"/>
-             <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
-             <feature class="lighting" values="[lambert]"/>
-         </supports>
+        <supports>
+            <feature class="physics" values="[`waves`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s13" name="background" cost="100">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="texcoord" values="[reflective]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`reflective`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s14" name="pseudo_chrome" cost="10">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[reflective]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`reflective`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector3f name="normal"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s15" name="pseudo_chrometex" cost="10" >
+    <shader id="s15" name="pseudo_chrometex" cost="10">
         <supports>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,reflective]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">0.5</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">0.5</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s150" name="pseudo_occlusion_carpaint" cost="10" >
+    <shader id="s150" name="pseudo_occlusion_carpaint" cost="10">
         <supports>
-            <feature class="textures" values="[occlusion,paint,emissive]"/>
-            <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`occlusion`,`paint`,`emissive`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s151" name="pseudo_carpaint" cost="10" >
+    <shader id="s151" name="pseudo_carpaint" cost="10">
         <supports>
-            <feature class="textures" values="[paint,emissive]"/>
-            <feature class="texcoord" values="[reflective,reflective]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`emissive`]"/>
+            <feature class="texcoord" values="[`reflective`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s16" name="pseudo_glassdbltex" cost="10" >
+    <shader id="s16" name="pseudo_glassdbltex" cost="10">
         <supports>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s17" name="skybox" cost="100">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[skybox]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`skybox`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s18" name="pseudo_paintbump" cost="120">
         <supports>
-            <feature class="textures" values="[paint,bump]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[`paint`,`bump`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s19" name="pseudo_bump" cost="120">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[bump]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`bump`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s20" name="unlitwind" cost="120">
         <supports>
-            <feature class="physics" values="[wind]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="physics" values="[`wind`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
                 <vector4f name="WindParams">[0.18, 0.18, 0.1, 1]</vector4f>
-                <vector4f name="WindDirection" >[2, 1, 0, 0]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="WindDirection">[2, 1, 0, 0]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s21" name="unlit_wave_2d" cost="220">
         <supports>
-            <feature class="physics" values="[wave_2d]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="physics" values="[`wave_2d`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
                 <vector4f name="WaveParams">[1, 0, 0, 0]</vector4f>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector3f name="normal"/>
                 <vector4f name="color"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s22" name="unlit_wave_1d" cost="120">
         <supports>
-            <feature class="physics" values="[wave_1d]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="physics" values="[`wave_1d`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
                 <vector4f name="WaveParams">[1, 0, 0, 0]</vector4f>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector3f name="normal"/>
                 <vector4f name="color"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
-    <shader id="s23" name="SkinAndBones" cost="10" >
+    <shader id="s23" name="SkinAndBones" cost="10">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="physics" values="[skin]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="physics" values="[`skin`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
     <shader id="s24" name="hexwisp" cost="400">
-            <supports>
-                <feature class="physics" values="[hexwisp]"/>
-                <feature class="textures" values="[paint,paint]"/>
-                <feature class="texcoord" values="[uv_map,uv_map]"/>
-                <feature class="lighting" values="[lambert]"/>
-            </supports>
-            <fixedfunctionshader>
-               <properties>
-                   <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-                   <vector2f name="mirrorpoint">[0,0]</vector2f>
-                   <vectorofvector2f name="wisppos">[[3,3]]</vectorofvector2f>
-                    <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                    <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                    <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                    <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                    <float name="shininess">1.0</float>
-               </properties>
-               <vertexparameters>
-                   <vector3f name="normal"/>
-                   <vector3f name="position"/>
-                   <vector4f name="color"/>
-                   <vector2f name="texcoord0"/>
-                </vertexparameters>
-            </fixedfunctionshader>
-
-    </shader>
-    <shader id="s26" name="voxel_plasma" cost="400">
-            <supports>
-                <feature class="textures" values="[paint]"/>
-                <feature class="texcoord" values="[uv_map]"/>
-                <feature class="lighting" values="[unlit]"/>
-                <feature class="autotexcoords" values="[eye_linear_3d]" />
-            </supports>
-            <fixedfunctionshader>
-               <properties>
-                    <vectorofstring name="blendfunction">[one, one_minus_src_alpha]</vectorofstring>
-                    <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                    <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                    <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                    <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                    <float name="shininess">1.0</float>
-               </properties>
-               <vertexparameters>
-                   <vector3f name="position"/>
-                </vertexparameters>
-            </fixedfunctionshader>
-    </shader>
-    <shader id="s27" name="single_tex_eye_linear" cost="400">
-            <supports>
-                <feature class="textures" values="[paint]"/>
-                <feature class="lighting" values="[unlit]"/>
-                <feature class="autotexcoords" values="[eye_linear_2d]" />
-                <feature class="texcoord" values="[uv_map]"/>
-            </supports>
-            <fixedfunctionshader>
-               <properties>
-                    <vectorofstring name="blendfunction">[one, one_minus_src_alpha]</vectorofstring>
-                    <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                    <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                    <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                    <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                    <float name="shininess">1.0</float>
-               </properties>
-               <vertexparameters>
-                   <vector3f name="position"/>
-                </vertexparameters>
-            </fixedfunctionshader>
-    </shader>
-    <shader id="s28" name="quadrupletex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map, uv_map]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="physics" values="[`hexwisp`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vector2f name="mirrorpoint">[0,0]</vector2f>
+                <vectorofvector2f name="wisppos">[[3,3]]</vectorofvector2f>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s26" name="voxel_plasma" cost="400">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="autotexcoords" values="[`eye_linear_3d`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vectorofstring name="blendfunction">[`one`,`one_minus_src_alpha`]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s27" name="single_tex_eye_linear" cost="400">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="autotexcoords" values="[`eye_linear_2d`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vectorofstring name="blendfunction">[`one`,`one_minus_src_alpha`]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s28" name="quadrupletex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
@@ -814,135 +813,135 @@
                 <vector2f name="texcoord2"/>
                 <vector2f name="texcoord3"/>
             </vertexparameters>
-         </fixedfunctionshader>
-     </shader>
+        </fixedfunctionshader>
+    </shader>
     <shader id="s29" name="generictex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[*]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s30" name="plasmatex_unlit" cost="120">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="texcoord" values="[*]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[one,one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`one`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s31" name="generic_dualtex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[*,*]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s32" name="generic_tripletex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[*,*,*]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s33" name="generic_quadrupletex_lambert" cost="120">
         <supports>
-            <feature class="textures" values="[paint,paint,paint,paint]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[*,*,*,*]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`,`*`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <!-- dummy voxel shader; does nothing usefull -->
     <shader id="s123" name="VoxelColored" cost="9">
         <supports>
-            <feature class="voxels" values="[colored]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map, *]"/>
+            <feature class="voxels" values="[`colored`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
         </supports>
         <fixedfunctionshader>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="texcoord0"/>
+                <vector4f name="position"/>
+                <vector3f name="texcoord0"/>
             </vertexparameters>
             <properties>
                 <sampler3d name="theDataTex">0</sampler3d>
@@ -951,19 +950,19 @@
                 <float name="theScaleCorrection">1.0</float>
                 <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
             </properties>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s124" name="VoxelGray" cost="9">
         <supports>
-            <feature class="voxels" values="[gray]"/>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="voxels" values="[`gray`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
         <fixedfunctionshader>
             <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="texcoord0"/>
+                <vector4f name="position"/>
+                <vector3f name="texcoord0"/>
             </vertexparameters>
             <properties>
                 <sampler3d name="theDataTex">0</sampler3d>
@@ -971,116 +970,115 @@
                 <float name="theScaleCorrection">1.0</float>
                 <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
             </properties>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s125" name="unlitmulticolortex" cost="120">
         <supports>
-            <feature class="lighting" values="[unlit]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="vertexparams" values="[color]"/>            
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
-                <vector3f name="color"/>                
+                <vector3f name="color"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s134" name="spotlight_no_texture" cost="10">
-       <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="option" values="[spotlight]"/>
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s135" name="spotlight_one_texture" cost="10">
-       <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="texcoord" values="[*]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="option" values="[spotlight]"/>
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s136" name="spotlight_two_textures" cost="10">
-       <supports>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[*,*]"/>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="option" values="[spotlight]"/>
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
-                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-             </properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
             </vertexparameters>
-         </fixedfunctionshader>
+        </fixedfunctionshader>
     </shader>
     <shader id="s137" name="pseudo_snowstreet" cost="100">
         <supports>
-            <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,planar_projection]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`planar_projection`]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
-                 <vector4f name="ambient">[1,1,1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vector4f name="specular">[1,1,1,1]</vector4f>
-                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
-                 <float name="shininess">1.0</float>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
             </properties>
             <vertexparameters>
-                 <vector3f name="normal"/>
-                 <vector3f name="position"/>
-                 <vector2f name="texcoord0"/>
-                 <vector2f name="texcoord1"/>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
 </shaders>
-

@@ -83,11 +83,11 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
 		SUCCESS("added Schema");
 		obj.myDocument.parse(
 			"<root>"
-			+"	<vofi foo='[1,2,3]'/>\n"
-			+"	<vofs foo='[one,two,three]'/>\n"
-			+"	<vofv2f foo='[[0.1,0.2], [2,3]]'/>\n"
-			+"	<vofs foo='[]'/>\n"
-			+"	<vofs foo='[,23,foo,,bar,]'/>\n"
+			+"	<vofi foo=\"[1,2,3]\"/>\n"
+			+"	<vofs foo=\"[`one`,`two`,`three`]\"/>\n"
+			+"	<vofv2f foo=\"[[0.1,0.2], [2,3]]\"/>\n"
+			+"	<vofs foo=\"[]\"/>\n"
+			+"	<vofs foo=\"[``,`23`,`foo`,``,`bar`,``]\"/>\n"
 			+"</root>\n"
 			);
         obj.myVectorOfInt = obj.myDocument.firstChild.childNode(0).foo;

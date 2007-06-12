@@ -62,6 +62,20 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 ENSURE(myVector[1][1] == 3);
                 
             }
+
+            {
+                std::string myString = "[[``,`foo`],[],[``]]";
+
+                std::vector<y60::VectorOfString> myVector = as< std::vector<y60::VectorOfString> >(myString);
+        
+                ENSURE(myVector[0].size() == 2);
+                ENSURE(myVector[0][0] == "");
+                ENSURE(myVector[0][1] == "foo");
+                ENSURE(myVector[1].size() == 0);
+                ENSURE(myVector[2].size() == 1);
+                ENSURE(myVector[2][0] == "");
+                ENSURE(myVector.size() == 3);
+            }
         }
 };
 
