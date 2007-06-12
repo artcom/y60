@@ -19,8 +19,12 @@
 
 #include "SDLSplashScreen.h"
 
+#include <paintlib/planydec.h>
+#include <paintlib/planybmp.h>
+
 #include <SDL/SDL_getenv.h>
 #include <sstream>
+#include <iostream>
 
 SDLSplashScreen * SDLSplashScreen::_instance = 0;
 
@@ -44,24 +48,65 @@ SDLSplashScreen::isEnabled() {
 }
 
 void
-SDLSplashScreen::enable(const std::string& theBMPFilePath, int theXPos, int theYPos) {    
-    std::stringstream myEnvText;
+SDLSplashScreen::enable(const std::string& theBMPFilePath, int theXPos, int theYPos) {
+    try {
+        // setting up environment for SDL window offset
+        std::stringstream myEnvText;
+        myEnvText << "SDL_VIDEO_WINDOW_POS=" << theXPos << "," << theYPos;
+        putenv(myEnvText.str().c_str());
+        
+        // decoding image to PLAnyBmp
+        PLAnyPicDecoder myDecoder;
+        PLAnyBmp myBmp;
+        myDecoder.MakeBmpFromFile (theBMPFilePath.c_str(), &myBmp);
+        myDecoder.Close();
+        
+        int myWidth  = myBmp.GetWidth();
+        int myHeight = myBmp.GetHeight();
+        int myBitsPerPixel = myBmp.GetBitsPerPixel();
     
-    myEnvText << "SDL_VIDEO_WINDOW_POS=" << theXPos << "," << theYPos;
-    putenv(myEnvText.str().c_str());
-    
-    _myImage = SDL_LoadBMP(theBMPFilePath.c_str());
-    
-    if(_myImage!=NULL) 
+        #if SDL_BYTEORDER == SDL_BIG_ENDIAN
+          int rmask = 0xff000000;
+          int gmask = 0x00ff0000;
+          int bmask = 0x0000ff00;
+          int amask = 0x000000ff;
+        #else
+          int rmask = 0x000000ff;
+          int gmask = 0x0000ff00;
+          int bmask = 0x00ff0000;
+          int amask = 0xff000000;
+        #endif
+        
+        // setting up SDL_Surface
+        _myImage = SDL_CreateRGBSurface(SDL_SWSURFACE, myWidth, myHeight, 32, rmask, gmask, bmask, amask);
+        SDL_PixelFormat * mySurfaceFormat = _myImage->format;
+        
+        Uint8     * mySurfacePixel;
+        Uint32      myPixelColor;
+        
+        // setting surface pixels
+        if (myBitsPerPixel == 24) {
+            PLPixel24 * myBmpPixel;
+            PLPixel24 ** myBmpPixels = myBmp.GetLineArray24();
+            setSurfacePixels(myBmpPixel, myBmpPixels, _myImage, myHeight, myWidth);
+        } else {
+            PLPixel32 * myBmpPixel;
+            PLPixel32 ** myBmpPixels = myBmp.GetLineArray32();
+            setSurfacePixels(myBmpPixel, myBmpPixels, _myImage, myHeight, myWidth);
+        }
+        
         _myEnabled = true;
+    } catch(...) {
+        disable();   
+    }
 }
 
 void
 SDLSplashScreen::disable() {
     if (_myShown)
         hide();
-        
-    if (_myEnabled)
+    
+    if (_myEnabled)    
         SDL_FreeSurface(_myImage);
         
     _myEnabled = false;
@@ -95,4 +140,20 @@ SDLSplashScreen::hide() {
     SDL_Quit();
     
     _myShown = false;
+}
+
+template <class T>
+void
+SDLSplashScreen::setSurfacePixels(T * theBmpPixel, T ** thePixels, SDL_Surface * theSurface, int theHeight, int theWidth) {
+    Uint8     * mySurfacePixel;
+    Uint32      myPixelColor;
+    
+    for(int y = 0; y < theHeight; y++) {
+        for(int x = 0; x < theWidth; x++) {
+            theBmpPixel = &thePixels[y][x];
+            myPixelColor = SDL_MapRGB(theSurface->format, theBmpPixel->GetR(), theBmpPixel->GetG(), theBmpPixel->GetB());
+            mySurfacePixel = (Uint8 *)theSurface->pixels + y * theSurface->pitch + x * 4;
+            *(Uint32 *)mySurfacePixel = myPixelColor;
+        }
+    }
 }

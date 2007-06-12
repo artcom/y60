@@ -309,9 +309,10 @@ WatchDog::init(dom::Document & theConfigDoc) {
                     return false;
                 }
                 
+		
                 // WaitingScreen setup
-                if (myApplicationNode->childNode("WaitingScreenBMP")) {
-                    std::string myWaitingScreenPath = asl::expandEnvironment((*myApplicationNode->childNode("WaitingScreenBMP"))("#text").nodeValue());
+                if (myApplicationNode->childNode("WaitingScreenImage")) {
+                    std::string myWaitingScreenPath = asl::expandEnvironment((*myApplicationNode->childNode("WaitingScreenImage"))("#text").nodeValue());
                     int myWaitingScreenPosX = 0;
                     int myWaitingScreenPosY = 0;
 

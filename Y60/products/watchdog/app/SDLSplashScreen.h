@@ -39,6 +39,9 @@ class SDLSplashScreen {
         SDLSplashScreen();
         
     private:
+        template <class T>
+        void setSurfacePixels(T * theBmpPixel, T ** thePixels, SDL_Surface * theSurface, int theHeight, int theWidth);
+        
         static SDLSplashScreen * _instance;
         
         SDL_Surface* _myImage;

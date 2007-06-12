@@ -62,7 +62,7 @@
         <WaitDuringStartup>0</WaitDuringStartup>
         <WaitDuringRestart>10</WaitDuringRestart>
         
-        <WaitingScreenBMP>c:/bmw.bmp</WaitingScreenBMP>
+        <WaitingScreenImage>c:/bmw.png</WaitingScreenImage>
         <WaitingScreenPosX>0</WaitingScreenPosX>
         <WaitingScreenPosY>0</WaitingScreenPosY>
         
