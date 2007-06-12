@@ -136,15 +136,10 @@ namespace asl {
     ComPort::read(char * theBuffer, size_t & theSize) {
         DB(cerr << "_myBuffer at start    :" << _myBuffer << endl);
         size_t mySize = asl::maximum(theSize, READ_BUFFER_SIZE);
-#if 0
-        asl::Block myTmpBuffer(theSize);
-        readFromDevice(myTmpBuffer.begin(), mySize);
-        myTmpBuffer.resize(mySize);
-#else
         asl::Block myTmpBuffer(mySize);
         readFromDevice(myTmpBuffer.begin(), mySize);
         myTmpBuffer.resize(mySize);
-#endif
+
         _myBuffer.append(myTmpBuffer);
         DB(cerr << "_myBuffer post readDev:" << _myBuffer << endl);
         size_t myReadBytes = 0;

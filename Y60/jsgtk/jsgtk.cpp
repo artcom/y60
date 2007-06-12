@@ -464,8 +464,8 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::VButtonBox );
     TRY_DYNAMIC_CAST(Gtk::TearoffMenuItem );
     TRY_DYNAMIC_CAST(Gtk::SeparatorMenuItem );
-    TRY_DYNAMIC_CAST(Gtk::CheckMenuItem );
     TRY_DYNAMIC_CAST(Gtk::RadioMenuItem );
+    TRY_DYNAMIC_CAST(Gtk::CheckMenuItem );
     TRY_DYNAMIC_CAST(Gtk::MenuItem );
     TRY_DYNAMIC_CAST(Gtk::EventBox );
     TRY_DYNAMIC_CAST(Gtk::SpinButton );
@@ -605,9 +605,9 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::SeparatorMenuItem>(cx, myArgument, theTarget)) {
                 return true;
-            } else if (castFrom<Gtk::CheckMenuItem>(cx, myArgument, theTarget)) {
-                return true;
             } else if (castFrom<Gtk::RadioMenuItem>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::CheckMenuItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::MenuItem>(cx, myArgument, theTarget)) {
                 return true;
