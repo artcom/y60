@@ -101,7 +101,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
 
-        window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
+        //window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
 
         loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
         loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
@@ -115,13 +115,11 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.position.x += 5.5; 
 
         //_myASSManager.textColor = [0,0,0,1];
-        /* XXX
         buildKeyboard();
         buildDisplay();
         buildSubmitButton();
         buildBackspace();
         buildSpacebar();
-        */
     }
 
     Base.onFrame = self.onFrame;
@@ -177,8 +175,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         } else if ( theNode.type == "lost_communication" || theNode.type == "lost_sync" ) {
             //print("event " + theNode.type );
         } else if ( theNode.type == "touch") {
-            /*
-            var myBody = _myPicking.pickBodyByWorldPos(theNode.position3D);
+            var myBody = _myPicking.pickBody(theNode.position3D.x, theNode.position3D.y);
             if(myBody) {                
                 for(var i=0; i<ourButtons.length; ++i ) {
                     if (myBody.id == ourButtons[i].body.id) {
@@ -186,7 +183,6 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
                     }
                 }
             }
-            */
         } else {
             if ( ! _myWorldCross ) {
                 var myShape = window.scene.world.getElementById("XXX");
@@ -198,7 +194,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             if ( _myWorldCross ) {
                 _myWorldCross.position = new Vector3f( theNode.position3D );
             }
-            print("event " + theNode.type + " at position: " + theNode.position3D );
+            //print("event " + theNode.type + " at position: " + theNode.position3D );
         }
         _myLastEventTime = theNode.when;
     }
