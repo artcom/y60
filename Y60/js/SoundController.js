@@ -104,7 +104,7 @@ function setSeekOffset(theSound, theSeekOffset) {
     }
 }
 
-function playSound(theFilename, theVolume, theLoopFlag) {
+function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
     if (!ourSoundController) {
         initSoundController();
     }
@@ -117,9 +117,14 @@ function playSound(theFilename, theVolume, theLoopFlag) {
         theLoopFlag = false;
     }
 
+    if (theSeekOffset == undefined) {
+        theSeekOffset = 0.0;
+    }
+
     try {
         var mySound = new Sound(theFilename, theLoopFlag);
         mySound.volume = theVolume;
+        mySound.seek(theSeekOffset * mySound.duration);
         mySound.play();
         return mySound;
     } catch (ex) {
