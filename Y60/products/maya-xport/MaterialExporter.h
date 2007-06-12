@@ -148,6 +148,7 @@ class MaterialExporter {
         void exportLayeredTexture(const MFnMesh * theMesh, const MObject & theTextureNode,
                 y60::MaterialBuilder & theBuilder,
                 y60::SceneBuilder & theSceneBuilder,
+                y60::TextureUsage theUsageMode,
                 const std::string & theColorGainPropertyName,
                 float theColorGainAlpha);
 

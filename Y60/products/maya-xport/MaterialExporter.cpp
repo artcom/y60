@@ -123,6 +123,16 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         }
     );
 
+    // occlusion usage
+    if (theUsageMode == PAINT) {
+        bool myOcclusionMapFlag = false;
+        getCustomAttribute(theTextureNode, "ac_occlusion", myOcclusionMapFlag);
+        if (myOcclusionMapFlag) {
+            AC_DEBUG << "MaterialExporter::exportFileTexture Found ac_occlusion on texture '" << myTextureName << "'";
+            theUsageMode = y60::OCCLUSION;
+        }
+    }
+
     // texture mapping
     MObject myImageNode = theTextureNode;
     string myTextureMapping = getTextureMappingType(theTextureNode);
@@ -138,21 +148,14 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         getConnectedNode(myImagePlug, myImageNode);
     }
 
-		/*
-		MPlug myBumpPlug = MFnDependencyNode(theBumpNode).findPlug("bumpValue");
-		*/
-
     MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
     MString myFileName;
     myFilenamePlug.getValue(myFileName);
     std::string myRelativeFileName = findRelativeFilePath(myFileName.asChar());
-    //AC_ERROR << myRelativeFileName;
-   
-		//std::string myRelativeFileName = getStrippedTextureFilename(myFilenamePlug);
 
-		
     // color gain = scale
     Vector4f myColorScale(1,1,1,theColorGainAlpha);
+
     MPlug myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainR");
     myColorGainPlug.getValue(myColorScale[0]);
     myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainG");
@@ -160,13 +163,23 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainB");
     myColorGainPlug.getValue(myColorScale[2]);
 
-    Vector4f myColorOffset(0,0,0,0);
+    // UH: for some reason this doesn't work
+    //MPlug myAlphaGainPlug = MFnDependencyNode(theTextureNode).findPlug("alphaGain");
+    //myAlphaGainPlug.getValue(myColorScale[3]);
+
+    // color offset = bias
+    Vector4f myColorBias(0,0,0,0);
+
     MPlug myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetR");
-    myColorOffsetPlug.getValue(myColorOffset[0]);
+    myColorOffsetPlug.getValue(myColorBias[0]);
     myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetG");
-    myColorOffsetPlug.getValue(myColorOffset[1]);
+    myColorOffsetPlug.getValue(myColorBias[1]);
     myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetB");
-    myColorOffsetPlug.getValue(myColorOffset[2]);
+    myColorOffsetPlug.getValue(myColorBias[2]);
+
+    // ... and neither does this
+    //MPlug myAlphaOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("alphaOffset");
+    //myAlphaOffsetPlug.getValue(myColorBias[3]);
 
     // get custom attributes
     bool myCreateMipmapsFlag = true;
@@ -207,11 +220,11 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         myWrapMode = CLAMP;
     }
 
-    //AC_DEBUG << "stripped filename=" << myRelativeFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
+    AC_DEBUG << "stripped filename=" << myRelativeFileName << " Scale=" << myColorScale << ", Bias=" << myColorBias;
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
         myRelativeFileName, theUsageMode, myCreateMipmapsFlag,
-        myColorScale, myColorOffset, SINGLE, myWrapMode, "");
+        myColorScale, myColorBias, SINGLE, myWrapMode, "");
 
 		
     // texture matrix
@@ -481,6 +494,7 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
         const MObject & theMultiTextureNode,
         y60::MaterialBuilder & theBuilder,
         y60::SceneBuilder & theSceneBuilder,
+        y60::TextureUsage theUsageMode,
         const std::string & theColorGainPropertyName,
         float theColorGainAlpha)
 {
@@ -612,21 +626,12 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
 
         MObject myTextureNode(myPlugArray[0].node());
 
-        if (theUsageMode == PAINT) {
-            bool myOcclusionMapFlag = false;
-            getCustomAttribute(myTextureNode, "ac_occlusion", myOcclusionMapFlag);
-            if (myOcclusionMapFlag) {
-                AC_DEBUG << "MaterialExporter::exportMaps Found occlusionMapFlag on texture '" << thePlugName << "'";
-                theUsageMode = y60::OCCLUSION;
-            }
-        }
-
         MFn::Type myTextureType = myTextureNode.apiType();
         //AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
         switch (myTextureType) {
             case MFn::kLayeredTexture:
                 exportLayeredTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
-                                     theColorGainPropertyName, theColorGainAlpha);
+                                     theUsageMode, theColorGainPropertyName, theColorGainAlpha);
                 break;
             case MFn::kProjection:
             case MFn::kFileTexture:
@@ -713,6 +718,8 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     // transparency, alpha
     MColor myTransparency = MFnLambertShader(theShaderNode).transparency(& myStatus);
     float myAlpha = 1.0f - myTransparency.r; // UH: what? alpha from transparency red?!?
+    // Problem here is that myAlpha is used for diffuse.a as well as color_scale.a
+    // so the final alpha is: diffuse.a * color_scale.a * texture.a
 
     // ambient color
     MColor myAmbientColor = MFnLambertShader(theShaderNode).ambientColor(& myStatus);
@@ -731,11 +738,11 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     // texture
     try {
         if (exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "color",
-                           y60::PAINT, y60::DIFFUSE_PROPERTY, myAlpha)) {
+                           y60::PAINT, y60::DIFFUSE_PROPERTY, 1.0)) {
             // assume color=[1,1,1,1] when using texture
             myColor = MColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
-        exportBumpMaps(theMesh, theShaderNode, theBuilder, theSceneBuilder, myAlpha);
+        exportBumpMaps(theMesh, theShaderNode, theBuilder, theSceneBuilder, 1.0);
     } catch(asl::Exception & ex) {
         ex; // avoid unreferenced variable warning
         DB(AC_TRACE << ex);
@@ -747,7 +754,6 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     if (myStatus == MStatus::kFailure) {
         throw ExportException("Could not get diffuse coefficient from node", "MaterialExporter::exportLambertFeatures");
     }
-    //setPropertyValue<float>(theBuilder.getNode(), "float", "diffuseCoeff", myDiffuseCoeff); // UH experimental
 
     myColor = myAmbientColor + (myColor - myAmbientColor) * myDiffuseCoeff;
     asl::Vector4f myDiffuseColor = asl::Vector4f(myColor.r, myColor.g, myColor.b, myAlpha);
@@ -1071,7 +1077,7 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
 std::string
 MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
 
-    AC_DEBUG << "MaterialExporter::findRelativeFilePath " << theFileName;
+    AC_TRACE << "MaterialExporter::findRelativeFilePath " << theFileName;
 
     std::string myFileName = theFileName;
 #ifndef WIN32
