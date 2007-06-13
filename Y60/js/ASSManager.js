@@ -139,8 +139,10 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         setupValueMaterials();
 
         var myMaterial = _myScene.world.getElementById( getMaterialIdForValueDisplay() );
-        _myValueOverlay = new ImageOverlay( _myScene, 
-                _myScene.world.getElementById( myMaterial.childNode("textures").firstChild.image ));
+        if ( ! _myValueOverlay) {
+            _myValueOverlay = new ImageOverlay( _myScene, 
+                    _myScene.world.getElementById( myMaterial.childNode("textures").firstChild.image ));
+        }
         _myDriver.overlay = _myValueOverlay.node;
 
         if (_mySettings) {
