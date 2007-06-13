@@ -24,7 +24,10 @@
 //=============================================================================
 
 #include "net.h"
+#include "SocketException.h"
+
 #include <asl/string_functions.h>
+#include <asl/Logger.h>
 
 #include <algorithm>
 
@@ -47,16 +50,18 @@ namespace inet {
          
         err = WSAStartup( wVersionRequested, &wsaData );
         if ( err != 0 ) {
-            // TODO: Tell the user that we could not find a usable 
-            // WinSock DLL.
-            return;
+            AC_WARNING << getSocketErrorMessage(err) << ". inet::initSockets()"; 
+            //throw SocketException(err, "No appropriate winsock DLL found.");
         }
     #endif
     }
     
     void terminateSockets() {
     #ifdef WIN32
-        int theErr = WSACleanup();   
+        if ( WSACleanup() != 0 ) {
+            int err = getLastSocketError();
+            throw SocketException(err, "inet::terminateSockets()");
+        }
     #endif 
     }
 

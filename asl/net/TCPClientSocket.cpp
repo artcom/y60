@@ -24,6 +24,8 @@
 //============================================================================
 
 #include "TCPClientSocket.h"
+#include "net.h"
+
 #include <asl/Logger.h>
 #include <asl/Time.h>
 
@@ -49,10 +51,11 @@ namespace inet {
     void TCPClientSocket::connect()
     {
         open();
-        if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) != 0 )
-            {
-                throw SocketException("TCPClientSocket::ConnectSocket: can't connect");
-            }
+        
+        if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) != 0 ) {
+            int err = getLastSocketError();
+            throw SocketException(err, "TCPClientSocket::ConnectSocket()");
+        }
     }
 
     int TCPClientSocket::retry(int n)

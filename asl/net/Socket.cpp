@@ -63,11 +63,16 @@ namespace inet {
     }
 
     void Socket::close() {
-        // TODO: error handling.
         if (isValid()) {
+            int rc;
 #ifdef WIN32        
-            closesocket(fd);
-#else            
+            rc = closesocket(fd);
+            if (rc == SOCKET_ERROR) {
+                int err = getLastSocketError();
+                throw SocketException(err, "Socket::close() failed.");
+            }
+#else
+        // TODO: error handling.
             ::close(fd);
 #endif
             fd = -1;
@@ -84,7 +89,7 @@ namespace inet {
         {
             int err = getLastSocketError();
             if ( err != OS_SOCKET_ERROR(EWOULDBLOCK))
-                throw SocketException(err, "Socket::Receive failed");
+                throw SocketException(err, "Socket::receive() failed");
         }
 
         return 0;
@@ -95,7 +100,8 @@ namespace inet {
         int byteswritten;
         if ((byteswritten=::send(fd, (char*)data, len, 0)) != len)
         {
-            throw SocketException("Socket::write() failed.");
+            int err = getLastSocketError();
+            throw SocketException(err, "Socket::write() failed.");
         }
         return byteswritten;
     }
@@ -130,10 +136,13 @@ namespace inet {
         delete[] buf;
         return rc;
 #else
+        //TODO: Bug #564
         u_long theBytesInBuffer;
         rc = ioctlsocket(fd, FIONREAD, &theBytesInBuffer);
+
         if (rc == SOCKET_ERROR) {
-            throw SocketException("Socket::peek() failed.");
+            int err = getLastSocketError();
+            throw SocketException(err, "Socket::peek() failed.");
         }
         return min(theBytesInBuffer, n);  // For compatibility with the linux version.
 #endif
@@ -180,7 +189,8 @@ namespace inet {
         }
         int theRC = ioctlsocket(fd, FIONBIO, &theFlag);
         if (theRC == SOCKET_ERROR) {
-            throw SocketException("Socket::setBlockingMode failed");
+            int err = getLastSocketError();
+            throw SocketException(err, "Socket::setBlockingMode failed");
         }
 #endif
     }

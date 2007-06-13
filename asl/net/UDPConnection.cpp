@@ -26,6 +26,7 @@
 
 #include "UDPConnection.h"
 #include "SocketException.h"
+#include "net.h"
 
 #include <errno.h>
 #ifndef WIN32
@@ -42,12 +43,11 @@ namespace inet {
     {
         setRemoteAddr(thehost, theport);
 
-        if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
-        {
-            return true;
+        if ( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) != 0 ) {
+            int err = getLastSocketError();
+            throw SocketException(err, "UDPConnection::Connect()");
         }
-        throw SocketException("UDPConnection::Connect: can't connect");
-        return false;
+        return true;
     }
 
 }
