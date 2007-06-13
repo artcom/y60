@@ -1,9 +1,9 @@
 <settings>
     <ASSDriver>
         <ShowASSData min="0" max="1">1.00000</ShowASSData>
-        <SensorPosition step="1">[1443.80000,778]</SensorPosition>
+        <SensorPosition step="1">[1443.8,788.00000]</SensorPosition>
         <SensorOrientation step="1.5707963">0</SensorOrientation>
-        <SensorScale step="0.1">[74.28000,73.68]</SensorScale>
+        <SensorScale step="0.1">[74.28,74.28]</SensorScale>
         <MirrorX min="0" max="1">1.00000</MirrorX>
         <MirrorY min="0" max="1">1.00000</MirrorY>
         <GainPower>2</GainPower>
@@ -16,7 +16,7 @@
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <SerialPort>0</SerialPort>
-        <UseUSB min="0" max="1">0</UseUSB>
+        <UseUSB min="0" max="1">1</UseUSB>
         <BaudRate>57600</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
         <Parity>no_parity</Parity>
