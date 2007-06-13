@@ -799,6 +799,13 @@ ASSDriver::drawMarkers() {
 void
 ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
     if ( _myScene && _myOverlay) {
+        y60::OverlayPtr myOverlay = _myOverlay->getFacade<y60::Overlay>();
+
+        if ( ! myOverlay->get<VisibleTag>() ) {
+            return;
+        }
+
+            
         glPushAttrib( GL_ALL_ATTRIB_BITS );
         glMatrixMode( GL_PROJECTION );
         glPushMatrix();
@@ -1069,11 +1076,7 @@ ASSDriver::scanForSerialPort() {
         if (_mySerialPort) {
             _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
                     _myParity, _myStopBits, _myHandshakingFlag);
-            if ( _myCommandQueue.empty() ) {
-                setState( SYNCHRONIZING );
-            } else {
-                setState( CONFIGURING );
-            }
+            setState( SYNCHRONIZING );
         }
     } else {
         AC_PRINT << "scanForSerialPort() No port configured.";

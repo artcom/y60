@@ -101,7 +101,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
 
-        //window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
+        //window.canvas.backgroundcolor = [1,1,1,1];
 
         loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
         loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
@@ -125,6 +125,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
+        _myASSManager.valueColor = [0, 0, 1, 1];
     }
 
     Base.onPostRender = self.onPostRender;
