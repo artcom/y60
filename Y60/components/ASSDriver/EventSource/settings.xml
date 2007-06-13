@@ -6,6 +6,7 @@
         <SensorScale step="0.1">[74.28,74.28]</SensorScale>
         <MirrorX min="0" max="1">1.00000</MirrorX>
         <MirrorY min="0" max="1">1.00000</MirrorY>
+        <ClampToScreen min="0" max="1">1</ClampToScreen>
         <GainPower>2</GainPower>
         <ComponentThreshold>10.00000</ComponentThreshold>
         <NoiseThreshold>15</NoiseThreshold>
