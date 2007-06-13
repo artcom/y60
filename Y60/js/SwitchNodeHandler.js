@@ -235,6 +235,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     }
     
     function getTexcoordCount(theMaterialNode) {
+        
         var myRequires = theMaterialNode.childNode('requires');
         var myFeatureList = getDescendantByName(myRequires, 'texcoord').childNode("#text").nodeValue;
         var myCount = 0;
@@ -260,6 +261,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             var myChild = Public.node.childNode( i );
             if (myChild.name.indexOf(theMaterialCode) != -1) {
                 var myShapeId = "";
+                
                 if (myChild.nodeName == "body") {
                     myShapeId = myChild.shape;
                 } else if ((myChild.nodeName == "transform")

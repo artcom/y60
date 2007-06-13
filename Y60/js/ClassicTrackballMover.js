@@ -67,12 +67,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     obj.name = "ClassicTrackballMover";
 
     obj.setup = function() {
-        var myTrackballBody = obj.getMoverObject().parentNode;
-        if (myTrackballBody.nodeName == "world") {
-            setupTrackball(null);
-        } else {
-            setupTrackball(myTrackballBody);
-        }
+        setupTrackball(null);
     }
 
     obj.Mover.onMouseButton = obj.onMouseButton;
@@ -80,13 +75,8 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
         if (theButton == LEFT_BUTTON && theState == BUTTON_DOWN) {
             if (obj.getDoubleLeftButtonFlag()) {
-                var myTrackedBody = obj.getMoverObject().parentNode;
-
                 var myPickedBody = pickBody(theX, theY);
-                if (myPickedBody) {
-                    myTrackedBody = myPickedBody;
-                }
-                setupTrackball(myTrackedBody);
+                setupTrackball(myPickedBody);
             }
             _myTrackBallCenter = getTrackballCenter();
         }
@@ -194,7 +184,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myGlobalPosition = obj.getMoverObject().globalmatrix.getTranslation();
         var myRotation = obj.getMoverObject().globalmatrix.getRotation();
         var myRadiusVector = normalized(difference(myGlobalPosition, _myTrackBallCenter));
-
+        
         if (obj.getMoverObject().globalmatrix.getRow(1).y > 0) {
             _myTrackballOrientation.x = - Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z);
@@ -202,6 +192,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             _myTrackballOrientation.x = Math.PI + Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z) - Math.PI;
         }
+        
         calculateTrackball();
     }
 
@@ -211,6 +202,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myY = myTrackballRadius * Math.sin(- _myTrackballOrientation.x);
         var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_myTrackballOrientation.y);
         var myGlobalMatrix = new Matrix4f(Quaternionf.createFromEuler(_myTrackballOrientation));
+        
         myGlobalMatrix.translate(sum(_myTrackBallCenter, new Vector3f(myX, myY, myZ)));
         var myParentMatrix = new Matrix4f(obj.getMoverObject().parentNode.globalmatrix);
         myParentMatrix.invert();
@@ -223,14 +215,15 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
 
     // Returns center in global coordinates
     function getTrackballCenter() {
+        var myPos = null;
         if (_myCenteredFlag) {
-            return new Point3f(0,0,0);
+            myPos =  new Point3f(0,0,0);
         }
-        if (_myFixedCenter) {
-            return _myTrackBallCenter;
+        else if (_myFixedCenter) {
+            myPos =  _myTrackBallCenter;
         }
-        if (_myTrackballBody) {
-            return _myTrackballBody.boundingbox.center;
+        else if (_myTrackballBody) {
+            myPos =  _myTrackballBody.boundingbox.center;
         } else {
             var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
             var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
@@ -240,14 +233,18 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             if (myIntersection) {
                 myTrackballRadius = myIntersection.distance;
             }
-            return sum(myPosition, product(myViewVector, myTrackballRadius));
+            myPos =  sum(myPosition, product(myViewVector, myTrackballRadius));
         }
+        
+        return myPos;
     }
 
     function pickBody(theX, theY) {
         // TODO: This is not portrait orientation aware.
         // Implement function:
         // window.screenToWorldSpace(theX, theY, NEAR_PLANE);
+        var myPickedBody = null;
+        
         var myViewport = obj.getViewport();
         var myPosX = 2 * (theX-myViewport.left) / myViewport.width  - 1;
         var myPosY = - (2 * (theY-myViewport.top) / myViewport.height - 1);
@@ -265,10 +262,11 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
         var myIntersection = nearestIntersection(obj.getWorld(), myMouseRay);
         if (myIntersection) {
-            //print("  -> You picked trackball object: " + myIntersection.info.body.name);
-            return myIntersection.info.body;
+            myPickedBody = myIntersection.info.body;
         } else {
-            return obj.getMoverObject().parentNode;
+            myPickedBody = window.scene.world;
         }
+        //print("  -> You picked trackball object: " + myPickedBody);
+        return myPickedBody;
     }
 }

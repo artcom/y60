@@ -60,10 +60,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         return _myAutoClicker;
     }
-            
+    
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
     }
+    
     self.getModelName = function() {
         return _myModelName;
     }

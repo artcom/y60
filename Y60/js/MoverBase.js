@@ -12,7 +12,6 @@ if ((operatingSystem() == "LINUX" || operatingSystem() == "OSX") && expandEnviro
     plug("PowermateInputExtension");
 }
 
-
 var LEFT_BUTTON   = 1;
 var MIDDLE_BUTTON = 3;
 var RIGHT_BUTTON  = 2;
@@ -50,11 +49,12 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         if (theMoverObject == null) {
             return;
         }
-
+        
         // store initial position for reset
         _myInitialPosition    = theMoverObject.position.value;
         _myInitialOrientation = new Quaternionf(theMoverObject.orientation);
         _myMoverObject = theMoverObject;
+
         obj.reset();
     }
 
@@ -152,6 +152,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     obj.reset = function() {        
         _myMoverObject.position    = _myInitialPosition;
         _myMoverObject.orientation = _myInitialOrientation;
+      
         obj.setup();        
     }
 
