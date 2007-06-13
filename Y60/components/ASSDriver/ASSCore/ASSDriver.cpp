@@ -157,7 +157,9 @@ ASSDriver::ASSDriver() :
     _myFirmwareMode(-1),
     _myFramerate(-1),
     _myFrameNo(-1),
-    _myChecksum(-1)
+    _myChecksum(-1),
+    _myClampToScreenFlag(false),
+    _myWindow( 0 )
 {
     setState(NO_SERIAL_PORT);
 }
@@ -170,6 +172,7 @@ ASSDriver::~ASSDriver() {
 
 bool
 ASSDriver::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
+    _myWindow = theWindow;
     _myScene = theWindow->getCurrentScene();
     // TODO: reallocate rasters
     return true;
@@ -966,6 +969,7 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
     getConfigSetting( mySettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
     getConfigSetting( mySettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
     getConfigSetting( mySettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
+    getConfigSetting( mySettings, "ClampToScreen", _myClampToScreenFlag, 0);
 
     bool myPortConfigChanged = false;
     myPortConfigChanged |= getConfigSetting( mySettings, "SerialPort", _myPortNum, -1 );
@@ -997,6 +1001,11 @@ ASSDriver::applyTransform( const Vector2f & theRawPosition,
     my3DPosition[0] = myHPosition[0];
     my3DPosition[1] = myHPosition[1];
     my3DPosition[2] = myHPosition[2];
+    if ( _myWindow && _myClampToScreenFlag ) {
+        y60::CanvasPtr myCanvas = _myWindow->getCanvas()->getFacade<y60::Canvas>();
+        my3DPosition[0] = clamp( my3DPosition[0], 0.0f, float(myCanvas->getWidth()) );
+        my3DPosition[1] = clamp( my3DPosition[1], 0.0f, float(myCanvas->getHeight()) );
+    }
     return my3DPosition;    
 }
 

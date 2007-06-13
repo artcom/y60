@@ -179,6 +179,7 @@ class ASSDriver :
         std::vector<std::string> _myRasterNames;
 
         y60::ScenePtr _myScene;
+        jslib::AbstractRenderWindow *  _myWindow;
 
         asl::Time   _myLastFrameTime;
         double       _myRunTime;
@@ -202,6 +203,7 @@ class ASSDriver :
 
         dom::NodePtr _myOverlay;
 
+        int _myClampToScreenFlag;
         int _myDebugTouchEventsFlag;
         asl::Vector2f _myProbePosition;
 
