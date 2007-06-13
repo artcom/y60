@@ -280,6 +280,7 @@ js_InitGC(JSRuntime *rt, uint32 maxbytes)
     }
     rt->gcLocksHash = NULL;     /* create lazily */
     rt->gcMaxBytes = maxbytes;
+    rt->gcObjects = 0;
     return JS_TRUE;
 }
 
@@ -535,6 +536,7 @@ retry:
         flagp = js_GetGCThingFlags(thing);
     }
     *flagp = (uint8)flags;
+    rt->gcObjects++;
     rt->gcBytes += sizeof(JSGCThing) + sizeof(uint8);
     cx->newborn[flags & GCF_TYPEMASK] = thing;
 
@@ -1320,6 +1322,9 @@ restart:
 
                 JS_ASSERT(rt->gcBytes >= sizeof(JSGCThing) + sizeof(uint8));
                 rt->gcBytes -= sizeof(JSGCThing) + sizeof(uint8);
+
+                rt->gcObjects--;
+
             }
             if (++flagp == split)
                 flagp += GC_THINGS_SIZE;

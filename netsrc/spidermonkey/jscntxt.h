@@ -77,6 +77,7 @@ struct JSRuntime {
     JSGCThing           *gcFreeList;
     jsrefcount          gcDisabled;
     uint32              gcBytes;
+    uint32              gcObjects;
     uint32              gcLastBytes;
     uint32              gcMaxBytes;
     uint32              gcLevel;

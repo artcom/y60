@@ -1678,7 +1678,17 @@ JS_MaybeGC(JSContext *cx)
          * JS_malloc than we were told to allocate by JS_NewRuntime.
          */
         JS_GC(cx);
-    }
+    } 
+}
+
+JS_PUBLIC_API(JSBool)
+JS_IncrementalGC(JSContext *cx, uint32 maxObjects)
+{
+    JSRuntime *rt;
+
+    rt = cx->runtime;
+    JS_GC(cx);
+    return JS_TRUE;
 }
 
 JS_PUBLIC_API(JSGCCallback)
