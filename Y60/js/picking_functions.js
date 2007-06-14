@@ -114,22 +114,29 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         if (myCollisions) {
             if (myCollisions.length > 0) {
                 var body = myCollisions[0].body;
-                var myCameraPos = getCameraPos();
-
-                var myClosestDistance = distance(body.globalmatrix.getTranslation(),myCameraPos);
+                var myClosestDistance = myCollisions[0].collisions[0].min.t;
+                for (var jj = 0; jj <  myCollisions[0].collisions.length; jj++) {
+                    var myDistance = myCollisions[0].collisions[jj].min.t;
+                    if (myDistance < myClosestDistance) {
+                        myClosestDistance = myDistance;
+                    }
+                }
                 var myClosestBody = body;
                 for(var i=1;i<myCollisions.length;++i) {
                     body = myCollisions[i].body;
-                    var myDistance = distance(body.globalmatrix.getTranslation(),myCameraPos);
-                    if (myDistance < myClosestDistance) {
-                        myClosestDistance = myDistance;
-                        myClosestBody = body;
+                    for (var jj = 0; jj <  myCollisions[i].collisions.length; jj++) {
+                        var myDistance = myCollisions[i].collisions[jj].min.t;
+                        if (myDistance < myClosestDistance) {
+                            myClosestDistance = myDistance;
+                            myClosestBody = body;
+                        }
                     }
                 }
             }
         }
         return myClosestBody;
     }
+    
     /*******************************************************/
     /**    Private Methods                                **/
     /*******************************************************/
