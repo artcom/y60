@@ -17,6 +17,7 @@
 
           The UDP packets containing the commands can be send via cygwin as follows:
             echo -n <command> | nc -w 1 -u <host> 2346
+          or see whistle.py for a python implementation of UDP Broadcast
 
           The commands are passed to all connected projectors and are observed by those projectors
           that support the given command.          
