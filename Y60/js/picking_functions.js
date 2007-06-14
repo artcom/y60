@@ -116,11 +116,11 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
                 var body = myCollisions[0].body;
                 var myCameraPos = getCameraPos();
 
-                var myClosestDistance = distance(body.position,myCameraPos);
+                var myClosestDistance = distance(body.globalmatrix.getTranslation(),myCameraPos);
                 var myClosestBody = body;
                 for(var i=1;i<myCollisions.length;++i) {
                     body = myCollisions[i].body;
-                    var myDistance = distance(body.position,myCameraPos);
+                    var myDistance = distance(body.globalmatrix.getTranslation(),myCameraPos);
                     if (myDistance < myClosestDistance) {
                         myClosestDistance = myDistance;
                         myClosestBody = body;
