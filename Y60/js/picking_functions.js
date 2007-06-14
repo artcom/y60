@@ -113,10 +113,11 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myCollisions = obj.pickCollisionsBySweepingSphereFromBodies(theScreenPixelX, theScreenPixelY, theSphereRadius, theRootNode);
         if (myCollisions) {
             if (myCollisions.length > 0) {
+                var myCameraPos = getCameraPos();
                 var body = myCollisions[0].body;
-                var myClosestDistance = myCollisions[0].collisions[0].min.t;
+                var myClosestDistance = distance(myCameraPos, myCollisions[0].collisions[0].min.sphereCenter);;
                 for (var jj = 0; jj <  myCollisions[0].collisions.length; jj++) {
-                    var myDistance = myCollisions[0].collisions[jj].min.t;
+                    var myDistance = distance(myCameraPos, myCollisions[0].collisions[jj].min.sphereCenter);
                     if (myDistance < myClosestDistance) {
                         myClosestDistance = myDistance;
                     }
@@ -125,7 +126,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
                 for(var i=1;i<myCollisions.length;++i) {
                     body = myCollisions[i].body;
                     for (var jj = 0; jj <  myCollisions[i].collisions.length; jj++) {
-                        var myDistance = myCollisions[i].collisions[jj].min.t;
+                        var myDistance =  distance(myCameraPos, myCollisions[i].collisions[jj].min.sphereCenter);
                         if (myDistance < myClosestDistance) {
                             myClosestDistance = myDistance;
                             myClosestBody = body;
