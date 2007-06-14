@@ -14,16 +14,16 @@
 #include <asl/Logger.h>
 #include <y60/jssettings.h>
 #include <y60/JSVector.h>
-#include "jsapi.h"
-#include "jsprf.h"
-#include "jsparse.h"
-#include "jsscan.h"
-#include "jsemit.h"
-#include "jsscript.h"
-#include "jsarena.h"
-#include "jscntxt.h"
-#include "jsdbgapi.h"
-#include "jsscope.h"
+#include <jsapi.h>
+#include <jsprf.h>
+#include <jsparse.h>
+#include <jsscan.h>
+#include <jsemit.h>
+#include <jsscript.h>
+#include <jsarena.h>
+#include <jscntxt.h>
+#include <jsdbgapi.h>
+#include <jsscope.h>
 
 #include <errno.h>
 
