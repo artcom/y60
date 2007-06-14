@@ -41,28 +41,37 @@ using namespace std;
 
 namespace inet {
     void initSockets() {
-    #ifdef WIN32
+#ifdef WIN32
         WORD wVersionRequested;
         WSADATA wsaData;
         int err;
-         
+
         wVersionRequested = MAKEWORD( 2, 2 );
          
         err = WSAStartup( wVersionRequested, &wsaData );
         if ( err != 0 ) {
-            AC_WARNING << getSocketErrorMessage(err) << ". inet::initSockets()"; 
-            //throw SocketException(err, "No appropriate winsock DLL found.");
+            throw SocketException(err, "inet::initSockets()");
         }
-    #endif
+        
+        if (LOBYTE( wsaData.wVersion ) != 2 ||
+            HIBYTE( wsaData.wVersion ) != 2 )
+        {
+            throw SocketException("No appropriate winsock DLL version found. inet::initSockets()");
+        }
+#endif
     }
     
     void terminateSockets() {
-    #ifdef WIN32
+#ifdef WIN32
+
+        //WSACleanup() deregisters the Winsock 2 DLL (Ws2_32.dll)
         if ( WSACleanup() != 0 ) {
             int err = getLastSocketError();
-            throw SocketException(err, "inet::terminateSockets()");
+            AC_WARNING << getSocketErrorMessage(err) << ". inet::terminateSockets()";
+            //TODO: activate this exception when bug #565 is fixed [jb]
+            //throw SocketException(err, "inet::terminateSockets()");
         }
-    #endif 
+#endif 
     }
 
     int 
