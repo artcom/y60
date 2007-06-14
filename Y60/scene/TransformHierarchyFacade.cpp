@@ -57,6 +57,7 @@ namespace y60 {
         CullableTag::Plug(theNode),
         ClippingPlanesTag::Plug(theNode),
         ScissorTag::Plug(theNode),
+        StickyTag::Plug(theNode),
         dom::FacadeAttributePlug<BoundingBoxTag>(this),
         dom::FacadeAttributePlug<GlobalMatrixTag>(this),
         dom::FacadeAttributePlug<LocalMatrixTag>(this),

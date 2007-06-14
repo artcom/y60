@@ -49,6 +49,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true);
     DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString());
     DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "");
+    DEFINE_ATTRIBUT_TAG(StickyTag,           bool,             STICKY_ATTRIB,            false);
 
     class TransformHierarchyFacade :
         public dom::Facade,
@@ -64,6 +65,7 @@ namespace y60 {
         public CullableTag::Plug,
         public ClippingPlanesTag::Plug,
         public ScissorTag::Plug,
+        public StickyTag::Plug,
         public dom::FacadeAttributePlug<BoundingBoxTag>,
         public dom::FacadeAttributePlug<GlobalMatrixTag>,
         public dom::FacadeAttributePlug<LocalMatrixTag>,

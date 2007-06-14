@@ -116,6 +116,7 @@ namespace y60 {
     static const char * WIDTH_ATTRIB                = "width";
     static const char * HEIGHT_ATTRIB               = "height";
     static const char * DEPTH_ATTRIB                = "depth";
+    static const char * STICKY_ATTRIB               = "sticky";
 
     static const char * MATERIAL_REF_ATTRIB         = "material";
     static const char * PARAM_TYPE_ATTRIB           = "type";

@@ -2990,11 +2990,10 @@ from position/orientation/size attributes. You can directly manipulate it during
                 <xs:documentation>The axis-aligned bounding box of element in world-space.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="frozen" type="xs:boolean">
+        <xs:attribute name="sticky" type="xs:boolean">
             <xs:annotation>
-                <xs:documentation>An optimization flag for static parts of the scene. If a part of the scene is frozen, the node and its
-child node will not be looked at any more after the first traversal through the scene.
-You can set the static part of very large scenes (e.g. houses, landscape) frozen to improve rendering performance.</xs:documentation>
+                <xs:documentation>A flag for the scene optimizer that prevents the node from being optimized.
+Child nodes will still be optimized tho.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="visible" type="xs:boolean">
