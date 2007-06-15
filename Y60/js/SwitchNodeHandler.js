@@ -8,6 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+function matchNodeName(theChildNode, theName, theSubStringFlag, theIgnoreCaseFlag) {
+    var searchName = theIgnoreCaseFlag ? theName.toLowerCase() : theName;
+    var nodeName = theIgnoreCaseFlag ? theChildNode.name.toLowerCase() : theChildNode.name;
+    Logger.trace("matching "+nodeName+" with "+searchName);
+    if (theSubStringFlag) {
+        return (nodeName.indexOf(searchName) != -1);
+    } else {
+        return (searchName == nodeName);
+    }
+}
+
 
 function SwitchNodeHandlerBase( Public, Protected, theNode ) {
 
@@ -94,11 +105,10 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
         Public.activeChild.visible = true;
     }
 
-    Public.setActiveChildByName = function(theName, theSubnameFlag) {
+    Public.setActiveChildByName = function(theName, theSubnameFlag, theIgnoreCaseFlag) {
         Public.activeChild.visible = false;
         for (var i = 0; i < Public.childCount; ++i) {
-            if ((Public.node.childNode(i).name == theName) 
-                 || (theSubnameFlag && Public.node.childNode(i).name.indexOf(theName) != -1)) 
+            if (matchNodeName(Public.node.childNode(i), theName, theSubnameFlag, theIgnoreCaseFlag))
             {
                 Public.activeIndex = i;
                 Logger.debug("setting "+Public.node.name+" to "+theName);
@@ -134,12 +144,12 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         Public.activeIndex = theIndex;
     }
     
-    Public.setActiveChildByName = function(theName, theSubnameFlag) {
+    Public.setActiveChildByName = function(theName, theSubnameFlag, theIgnoreCaseFlag) {
         for (var i=0; i<Public.childCount; ++i) {
             var myChildNode = Public.node.childNode(i);
-            if ((myChildNode.name == theName) 
-                 || (theSubnameFlag && myChildNode.name.indexOf(theName) != -1)) 
+            if (matchNodeName(myChildNode, theName, theSubnameFlag, theIgnoreCaseFlag))
             {
+                Logger.debug("setting "+Public.node.name+" to "+theName);
                 setMaterial(myChildNode.name);
                 Public.activeIndex = i;
                 break;
