@@ -291,41 +291,8 @@ namespace asl {
 
     DWORD
     ComPort::convertBaudRate(unsigned int theBaudRate) {
-        switch (theBaudRate) {
-            case 110:
-                return CBR_110;
-            case 19200:
-                return CBR_19200;
-            case 300:
-                return CBR_300;
-            case 38400:
-                return CBR_38400;
-            case 600:
-                return CBR_600;
-            case 56000:
-                return CBR_56000;
-            case 1200:
-                return CBR_1200;
-            case 57600:
-                return CBR_57600;
-            case 2400:
-                return CBR_2400;
-            case 115200:
-                return CBR_115200;
-            case 4800:
-                return CBR_4800;
-            case 128000:
-                return CBR_128000;
-            case 9600:
-                return CBR_9600;
-            case 256000:
-                return CBR_256000;
-            case 14400:
-                return CBR_14400;
-            default:
-                throw SerialPortException(string("Can not set device to ") + asl::as_string(theBaudRate) + " bps",
-                                       PLUS_FILE_LINE);
-        }
+        // On Win32 you can just pass the actual baudrate [DS]
+        return theBaudRate;
     }
 
     BYTE

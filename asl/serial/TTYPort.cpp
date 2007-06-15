@@ -240,6 +240,7 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
 
 int
 TTYPort::convertBaudRate(unsigned int theBaudRate) {
+#ifdef LINUX
     switch (theBaudRate) {
         case 50:
             return B50;
@@ -271,21 +272,75 @@ TTYPort::convertBaudRate(unsigned int theBaudRate) {
             return B19200;
         case 38400:
             return B38400;
+#ifdef B57600
         case 57600:
             return B57600;
+#endif
+#ifdef B115200
         case 115200:
             return B115200;
+#endif
+#ifdef B230400
         case 230400:
             return B230400;
+#endif
+#ifdef B460800
+        case 460800:
+            return B460800;
+#endif
+#ifdef B500000
+        case 500000:
+            return B500000;
+#endif
+#ifdef B576000
+        case 576000:
+            return B576000;
+#endif
+#ifdef B921600
+        case 921600:
+            return B921600;
+#endif
+#ifdef B1000000
+        case 1000000:
+            return B1000000;
+#endif
+#ifdef B1152000
+        case 1152000:
+            return B1152000;
+#endif
+#ifdef B1500000
+        case 1500000:
+            return B1500000;
+#endif
+#ifdef B2000000
+        case 2000000:
+            return B2000000;
+#endif
+#ifdef B2500000
+        case 2500000:
+            return B2500000;
+#endif
+#ifdef B3000000
+        case 3000000:
+            return B3000000;
+#endif
+#ifdef B3500000
+        case 3500000:
+            return B3500000;
+#endif
+#ifdef B4000000
+        case 4000000:
+            return B4000000;
+#endif
         default:
-            // [DS] AFAIK you can pass any value. These constants are for convinience only
-            return theBaudRate;
-            /*
             throw SerialPortException(string("Can not set device to ") +
                     asl::as_string(theBaudRate) + " bps",
                     PLUS_FILE_LINE);
-        */
     }
+#else // not Linux, Mac OS X that is
+    // On Mac OS X you can just pass the actual baudrate [DS]
+    return theBaudRate;
+#endif
 }
 
 int
@@ -303,7 +358,6 @@ TTYPort::convertDataBits(unsigned int theDataBits) {
             throw SerialPortException(string("Can not handle ") + as_string(theDataBits) +
                                    " data bits.", PLUS_FILE_LINE);
     }
-
 }
 
 int
@@ -341,5 +395,23 @@ TTYPort::convertHandShaking(bool theFlag) {
     return 0;
 }
 
+#if \
+! defined( B57600 ) || \
+! defined( B115200 ) || \
+! defined( B230400 ) || \
+! defined( B460800 ) || \
+! defined( B500000 ) || \
+! defined( B576000 ) || \
+! defined( B921600 ) || \
+! defined( B1000000 ) || \
+! defined( B1152000 ) || \
+! defined( B1500000 ) || \
+! defined( B2000000 ) || \
+! defined( B2500000 ) || \
+! defined( B3000000 ) || \
+! defined( B3500000 ) || \
+! defined( B4000000 )
+#   warning "High baudrates are not defined. If on Linux update your libc."
+#endif
 
 } // end of namespace asl
