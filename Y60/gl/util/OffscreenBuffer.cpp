@@ -85,6 +85,9 @@ OffscreenBuffer::OffscreenBuffer() :
     reset();
 }
 
+OffscreenBuffer::~OffscreenBuffer() {
+    AC_DEBUG << "OffscreenBuffer:dtor called."; 
+}
 
 void OffscreenBuffer::setUseFBO(bool theUseFlag)
 {
@@ -231,8 +234,12 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage, unsigned theSa
         // Once we support non-power-of-two textures this should be replaced with the actual
         // texture size (should come from Image/Texture object so that NPOT support is handled
         // properly)
-        unsigned myWidth = asl::nextPowerOfTwo(theImage->get<ImageWidthTag>());
-        unsigned myHeight = asl::nextPowerOfTwo(theImage->get<ImageHeightTag>());
+        unsigned myWidth = theImage->get<ImageWidthTag>();
+        unsigned myHeight = theImage->get<ImageHeightTag>();
+        if (theImage->get<ImageResizeTag>() == IMAGE_RESIZE_PAD) { 
+            myWidth = asl::nextPowerOfTwo(theImage->get<ImageWidthTag>());
+            myHeight = asl::nextPowerOfTwo(theImage->get<ImageHeightTag>());
+        }
 
         if (theSamples >= 1 && !(IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) && IS_SUPPORTED(glBlitFramebufferEXT))) {
             AC_WARNING << "Multisampling requested but not supported, turning it off";

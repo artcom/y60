@@ -28,7 +28,7 @@ namespace y60 {
             * backbuffer rendering.
             */
             OffscreenBuffer();
-            virtual ~OffscreenBuffer() {}
+            virtual ~OffscreenBuffer();
 
             /**
             * activate the image as render target and initializes FBO 

@@ -101,6 +101,7 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
                  || (theSubnameFlag && Public.node.childNode(i).name.indexOf(theName) != -1)) 
             {
                 Public.activeIndex = i;
+                Logger.debug("setting "+Public.node.name+" to "+theName);
                 break;
             }
         }
@@ -503,6 +504,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         for (var i=0; i<_mySwitches.childNodesLength(); ++i) {
             myNode = _mySwitches.childNode(i);
             if (myNode.name.indexOf(theSubName) != -1) {
+                Logger.debug("setting "+Public.node.name+" to "+theSubName);
                 switchTexture(myNode);
                 break;
             }

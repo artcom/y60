@@ -160,6 +160,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
 
         if (theImage == undefined) {
             theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
+            theImage.resize = "none"; // use non-power of two textures
         }
         self.image = theImage;    
         self.image.name = "OffscreenBuffer_Image";

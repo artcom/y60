@@ -207,7 +207,7 @@ namespace y60 {
         }
 
         AC_DEBUG << "setupSingleTexture '" << theImage->get<NameTag>() << "' id=" << theImage->get<IdTag>() <<
-            " texId=" << theTextureId <<
+            " texId=" << theTextureId << " src='" << theImage->get<ImageSourceTag>() << "' " <<
             " size=" << myWidth << "x" << myHeight << "x" << myDepth;
 
         if (myDepth == 1) {

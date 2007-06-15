@@ -254,6 +254,7 @@ namespace y60 {
         void setupTextureParams(ImagePtr theImage, GLenum theTextureType);
 
         unsigned long _myTextureMemUsage;
+        unsigned long _myVertexMemUsage;
         ShaderLibraryPtr _myShaderLibrary;
     };
 }

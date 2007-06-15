@@ -4,7 +4,7 @@ from socket import *
 from socket import SOL_SOCKET, SO_BROADCAST
 UDP_PORT=2346
 
-if (len(sys.argv) != 2):
+if (len(sys.argv) < 2):
     print "Usage: %s <string> - broadcasts <string> to port %d" % (sys.argv[0], UDP_PORT)
     sys.exit(1)
 
