@@ -30,8 +30,6 @@ public:
     {}
 
     virtual void run() {
-        initSockets();
-
         int serverPort = 2342;
         UDPSocket myUDPClient = UDPSocket(INADDR_ANY, 2343);
         unsigned long inHostAddress = getHostAddress("localhost");

@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: testConduit.tst.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.20 $
-//   $Date: 2005/04/26 15:52:45 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
 
 #include "ConduitServer.h"
 
@@ -250,7 +241,6 @@ public:
         get_environment_var_as("AC_TEST_PORT_START", myTestPort);
         AC_PRINT << "Using port " << myTestPort << " for tests";
 
-        inet::initSockets();
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));

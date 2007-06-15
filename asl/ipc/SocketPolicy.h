@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SocketPolicy.h,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2004/10/17 16:12:10 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
 
 #ifndef __asl_SocketPolicy_included
 #define __asl_SocketPolicy_included

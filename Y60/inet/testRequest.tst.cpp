@@ -95,7 +95,7 @@ class RequestTest : public UnitTest {
         
         void run() {
             const int PORT = 2346;
-            inet::initSockets();
+
             ConduitAcceptor<TCPPolicy> myTestAcceptor(TCPPolicy::Endpoint("localhost",PORT), TestServer::create);
             myTestAcceptor.start();
             std::string myServer = "http://localhost:"+as_string(PORT);

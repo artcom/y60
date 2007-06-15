@@ -76,7 +76,6 @@ NagiosPlugin :: NagiosPlugin(DLHandle theDLHandle) :
 
 void
 NagiosPlugin :: onStartup(jslib::AbstractRenderWindow * theWindow) {
-    inet::initSockets();
     _myStatusServer = asl::Ptr<ConduitAcceptor<TCPPolicy> >(
             new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort), StatusServer::create)); 
     _myStatusServer->start();

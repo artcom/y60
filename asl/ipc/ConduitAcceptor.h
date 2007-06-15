@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ConduitAcceptor.h,v $
-//   $Author: pavel $
-//   $Revision: 1.9 $
-//   $Date: 2005/04/24 00:30:18 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
 
 
 #ifndef __asl_ConduitAcceptor_included

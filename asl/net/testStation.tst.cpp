@@ -40,8 +40,9 @@ class StationTest : public TemplateUnitTest {
         StationTest() : TemplateUnitTest("StationTest-",asl::as_string(1).c_str()) {  }
         void run() {
 
+            inet::initSockets();
+
             try {
-                inet::initSockets();
 
                 Station myStation;
 
@@ -124,6 +125,9 @@ class StationTest : public TemplateUnitTest {
                 cerr << ex << endl;
                 FAILURE("Exception");
             }
+
+            inet::terminateSockets();
+
         }
 };
 

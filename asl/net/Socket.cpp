@@ -50,11 +50,13 @@ namespace inet {
         : fd(-1),
           _myLocalEndpoint(thehost, theport)
     {
+        initSockets();
     }
 
     Socket::~Socket()
     {
         close();
+        terminateSockets();
     }
 
     void Socket::setRemoteAddr(asl::Unsigned32 myhost, Unsigned16 myport)

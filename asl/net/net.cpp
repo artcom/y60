@@ -48,6 +48,7 @@ namespace inet {
 
         wVersionRequested = MAKEWORD( 2, 2 );
          
+        AC_DEBUG << "Calling WSAStartup().";
         err = WSAStartup( wVersionRequested, &wsaData );
         if ( err != 0 ) {
             throw SocketException(err, "inet::initSockets()");
@@ -63,13 +64,10 @@ namespace inet {
     
     void terminateSockets() {
 #ifdef WIN32
-
-        //WSACleanup() deregisters the Winsock 2 DLL (Ws2_32.dll)
+        AC_DEBUG << "Calling WSACleanup().";
         if ( WSACleanup() != 0 ) {
             int err = getLastSocketError();
-            AC_WARNING << getSocketErrorMessage(err) << ". inet::terminateSockets()";
-            //TODO: activate this exception when bug #565 is fixed [jb]
-            //throw SocketException(err, "inet::terminateSockets()");
+            throw SocketException(err, "inet::terminateSockets()");
         }
 #endif 
     }

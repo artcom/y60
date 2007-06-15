@@ -7,16 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: TCPPolicy.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.5 $
-//   $Date: 2005/01/05 15:47:52 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
-
 
 #include "TCPPolicy.h"
 
@@ -35,6 +25,8 @@ namespace asl {
 
 TCPPolicy::Handle 
 TCPPolicy::connectTo(Endpoint theRemoteEndpoint) {
+    inet::initSockets();
+    
     Handle myHandle = socket(AF_INET,SOCK_STREAM,0);   
     if (myHandle == INVALID_SOCKET) {
         throw ConduitException(string("TCPPolicy::ctor: create - ") + 
@@ -48,9 +40,34 @@ TCPPolicy::connectTo(Endpoint theRemoteEndpoint) {
     return myHandle;
 }
 
+void
+TCPPolicy::disconnect(Handle & theHandle) {
+    SocketPolicy::disconnect(theHandle);
+    inet::terminateSockets();
+}
+
+void 
+TCPPolicy::stopListening(Handle theHandle) {
+    SocketPolicy::stopListening(theHandle);
+    inet::terminateSockets();
+}
+
+
+TCPPolicy::Handle 
+TCPPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 
+        int theTimeout) {
+    Handle myHandle = SocketPolicy::createOnConnect(theListenHandle, theMaxConnectionCount, theTimeout);
+    if (myHandle > 0) {
+        inet::initSockets();
+    }
+    
+    return myHandle;
+}
 
 TCPPolicy::Handle
 TCPPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) {
+    inet::initSockets();
+
     Handle myHandle=socket(AF_INET,SOCK_STREAM,0);    
     
     int myReuseSocketFlag = 1;

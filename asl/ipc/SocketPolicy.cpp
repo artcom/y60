@@ -7,16 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SocketPolicy.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/24 00:30:18 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
-
 
 #include "SocketPolicy.h"
 

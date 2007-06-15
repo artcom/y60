@@ -172,7 +172,6 @@ UDPCommandListenerThread::run() {
 
 
     try {
-        initSockets();
         UDPSocket myUDPServer(INADDR_ANY, _myUDPPort);
 
         while (true) {

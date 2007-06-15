@@ -230,7 +230,6 @@ setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 }
 
 JSSocket::~JSSocket() {
-    inet::terminateSockets();
 }
 
 JSFunctionSpec *
@@ -327,11 +326,6 @@ JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
-    }
-    static bool myInitializedFlag = false;
-    if (!myInitializedFlag) {
-        inet::initSockets();
-        myInitializedFlag = true;
     }
 
     JSSocket * myNewObject = 0;

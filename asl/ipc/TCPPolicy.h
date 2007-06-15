@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: TCPPolicy.h,v $
-//   $Author: martin $
-//   $Revision: 1.3 $
-//   $Date: 2004/10/17 16:12:10 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
 
 #ifndef __asl_TCPPolicy_included
 #define __asl_TCPPolicy_included
@@ -39,6 +30,11 @@ class TCPPolicy : public SocketPolicy {
 
         // Acceptor methods
         static Handle startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount);
+
+        static void disconnect(Handle & theHandle);
+        static void stopListening(Handle theHandle);
+        static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 
+                int theTimeout);
 };
 /* @} */
 }

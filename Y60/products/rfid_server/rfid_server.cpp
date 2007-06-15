@@ -198,8 +198,6 @@ int main( int argc, char *argv[])  {
 
 
     try {
-        initSockets();
-
         // ---
         // --- create reader instance
         // ---
