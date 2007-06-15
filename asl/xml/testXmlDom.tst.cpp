@@ -1216,8 +1216,8 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
 #if 1
-        //addTest(new XmlDomUnitTest);
-        //addTest(new XmlDomEventsUnitTest);
+        addTest(new XmlDomUnitTest);
+        addTest(new XmlDomEventsUnitTest);
         addTest(new XmlSchemaUnitTest);
 #endif
         //addTest(new XmlPatchUnitTest);

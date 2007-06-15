@@ -2052,6 +2052,10 @@ dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
 
 NodePtr
 dom::Node::appendChild(NodePtr theNewChild) {
+    if ( ! theNewChild ) {
+       return NodePtr(0); 
+    }
+
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
         for (int i = 0; i < theNewChild->childNodesLength();++i) {
