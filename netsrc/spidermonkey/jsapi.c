@@ -1645,7 +1645,13 @@ JS_MarkGCThing(JSContext *cx, void *thing, const char *name, void *arg)
     JS_ASSERT(cx->runtime->gcThread == js_CurrentThreadId());
 #endif
 
-    GC_MARK(cx, thing, name, arg);
+#ifdef GC_MARK_DEBUG_tobias
+    fprintf(stderr, "Externally called JS_MarkGCThing at %p!\n",thing);
+#endif
+    // XXX: without knowing the type, we have to treat the jsval as an object.
+    // check whether this is correct!
+    JS_ASSERT(JSVAL_IS_OBJECT((jsval)thing));
+    GC_MARK(cx, OBJECT_TO_JSVAL((JSObject*)thing), name, arg);
 }
 
 JS_PUBLIC_API(void)
@@ -1668,17 +1674,20 @@ JS_MaybeGC(JSContext *cx)
     uint32 bytes, lastBytes;
 
     rt = cx->runtime;
-    bytes = rt->gcBytes;
-    lastBytes = rt->gcLastBytes;
-    if ((bytes > 8192 && bytes > lastBytes + lastBytes / 2) ||
-        rt->gcMallocBytes > rt->gcMaxBytes) {
+    if (rt->gcMallocBytes > rt->gcMaxBytes) {
+        JS_GC(cx);
+    } else if (bytes > 8192) {
         /*
          * Run the GC if we have half again as many bytes of GC-things as
          * the last time we GC'd, or if we have malloc'd more bytes through
          * JS_malloc than we were told to allocate by JS_NewRuntime.
          */
-        JS_GC(cx);
-    } 
+        if (rt->gcBytes > rt->gcLastBytes + rt->gcLastBytes / 2) {
+            JS_GC(cx);
+        } else {
+            JS_AdaptiveGC(cx);
+        }
+    }
 }
 
 JS_PUBLIC_API(JSBool)
@@ -1686,9 +1695,45 @@ JS_IncrementalGC(JSContext *cx, uint32 maxObjects)
 {
     JSRuntime *rt;
 
+    if (cx->runtime->gcDisabled) {
+        fprintf(stderr, "gc disabled!\n");
+        return JS_FALSE;
+    }
+
+    if (cx->stackPool.current == &cx->stackPool.first)
+        JS_FinishArenaPool(&cx->stackPool);
+    JS_FinishArenaPool(&cx->codePool);
+    JS_FinishArenaPool(&cx->tempPool);
+
+    js_IncrementalGC(cx, 0 | GC_INTERRUPT_AFTER_MARK, maxObjects, maxObjects);
+
     rt = cx->runtime;
-    JS_GC(cx);
-    return JS_TRUE;
+    return (!rt->gcRootsMarked &&
+            (rt->gcGreyListPtr == rt->gcGreyListBase) &&
+            (rt->gcFirstUnsweptArena == NULL));
+}
+
+JS_PUBLIC_API(JSBool)
+JS_AdaptiveGC(JSContext *cx)
+{
+    JSRuntime *rt;
+    rt = cx->runtime;
+
+    if (rt->gcDisabled) {
+        fprintf(stderr, "gc disabled!\n");
+        return JS_FALSE;
+    }
+
+    if (cx->stackPool.current == &cx->stackPool.first)
+        JS_FinishArenaPool(&cx->stackPool);
+    JS_FinishArenaPool(&cx->codePool);
+    JS_FinishArenaPool(&cx->tempPool);
+
+    js_AdaptiveGC(cx, 0);
+
+    return (!rt->gcRootsMarked &&
+            (rt->gcGreyListPtr == rt->gcGreyListBase) &&
+            (rt->gcFirstUnsweptArena == NULL));
 }
 
 JS_PUBLIC_API(JSGCCallback)
@@ -3928,6 +3973,8 @@ JS_SetRegExpInput(JSContext *cx, JSString *input, JSBool multiline)
 
     CHECK_REQUEST(cx);
     /* No locking required, cx is thread-private and input must be live. */
+    JS_ASSERT(JS_FALSE);
+    GC_GREY(cx, STRING_TO_JSVAL(input), "regexp input", NULL);
     res = &cx->regExpStatics;
     res->input = input;
     res->multiline = multiline;

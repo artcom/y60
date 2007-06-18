@@ -41,6 +41,23 @@
 #include "jspubtd.h"
 #include "jsdhash.h"
 
+//#define GC_DEBUG
+//#define GC_DEBUG_verbose
+
+//#define GC_STATS
+//#define GC_STATS_verbose
+
+#ifdef DEBUG
+//#define GC_MARK_DEBUG_tobias
+//#define GC_SWEEP_DEBUG_tobias
+//#define GC_FINALIZE_DEBUG_tobias
+//#define GC_FREE_DEBUG_tobias
+#endif
+
+#ifdef GC_MARK_DEBUG_tobias
+//#define GC_MARK_DEBUG_tobias_verbose
+#endif
+
 JS_BEGIN_EXTERN_C
 
 /* GC thing type indexes. */
@@ -55,9 +72,10 @@ JS_BEGIN_EXTERN_C
 
 /* GC flag definitions, must fit in 8 bits (type index goes in the low bits). */
 #define GCF_TYPEMASK    JS_BITMASK(GCX_NTYPES_LOG2)
-#define GCF_MARK        JS_BIT(GCX_NTYPES_LOG2)
+#define GCF_SCANNED     JS_BIT(GCX_NTYPES_LOG2)
 #define GCF_FINAL       JS_BIT(GCX_NTYPES_LOG2 + 1)
-#define GCF_LOCKSHIFT   (GCX_NTYPES_LOG2 + 2)   /* lock bit shift and mask */
+#define GCF_LOCKSHIFT   (GCX_NTYPES_LOG2 + 3)   /* lock bit shift and mask */
+#define GCF_REACHED     JS_BIT(GCX_NTYPES_LOG2 + 2) /* gc state not marked but to be examined */
 #define GCF_LOCKMASK    (JS_BITMASK(8 - GCF_LOCKSHIFT) << GCF_LOCKSHIFT)
 #define GCF_LOCK        JS_BIT(GCF_LOCKSHIFT)   /* lock request bit in API */
 
@@ -94,6 +112,8 @@ struct JSGCLockHashEntry {
 #else
 #define GC_POKE(cx, oldval) ((cx)->runtime->gcPoke = JSVAL_IS_GCTHING(oldval))
 #endif
+
+#define GC_GREY(cx, newval, name, arg) (JS_ASSERT(arg==NULL), js_AppendToGreyList(cx, newval, arg))
 
 extern intN
 js_ChangeExternalStringFinalizer(JSStringFinalizeOp oldop,
@@ -140,35 +160,25 @@ js_MarkAtom(JSContext *cx, JSAtom *atom, void *arg);
     JS_END_MACRO
 
 extern void
-js_MarkGCThing(JSContext *cx, void *thing, void *arg);
+js_MarkValue(JSContext *cx, jsval val, void *arg);
+
+extern void
+js_AppendToGreyList(JSContext *cx, jsval val, void *arg);
 
 #ifdef GC_MARK_DEBUG
 
 typedef struct GCMarkNode GCMarkNode;
 
 struct GCMarkNode {
-    void        *thing;
+    jsval       thing;
     const char  *name;
     GCMarkNode  *next;
     GCMarkNode  *prev;
 };
 
-#define GC_MARK(_cx, _thing, _name, _prev)                                    \
-    JS_BEGIN_MACRO                                                            \
-        GCMarkNode _node;                                                     \
-        _node.thing = _thing;                                                 \
-        _node.name  = _name;                                                  \
-        _node.next  = NULL;                                                   \
-        _node.prev  = _prev;                                                  \
-        if (_prev) ((GCMarkNode *)(_prev))->next = &_node;                    \
-        js_MarkGCThing(_cx, _thing, &_node);                                  \
-    JS_END_MACRO
-
-#else  /* !GC_MARK_DEBUG */
-
-#define GC_MARK(cx, thing, name, prev)   js_MarkGCThing(cx, thing, NULL)
-
 #endif /* !GC_MARK_DEBUG */
+
+#define GC_MARK(cx, value, name, prev)   js_MarkValue(cx, value, NULL)
 
 /*
  * Flags to modify how a GC marks and sweeps:
@@ -178,19 +188,30 @@ struct GCMarkNode {
  *                      malloc failure or runtime GC-thing limit.
  *   GC_LAST_CONTEXT    Called from js_DestroyContext for last JSContext in a
  *                      JSRuntime, when it is imperative that rt->gcPoke gets
- *                      cleared early in js_GC, if it is set.
+ *                      cleared early in js_GC, if it is set. 
+ *                      implies ~GC_INTERRUPT_AFTER_MARK and overrides it.
  *   GC_ALREADY_LOCKED  rt->gcLock is already held on entry to js_GC, and kept
  *                      on return to its caller.
+ *   GC_INTERRUPT_AFTER_MARK
+ *                      in incremental gc mode, return after mark phase has
+ *                      finished. this is supposed to reduce latency.
  */
 #define GC_KEEP_ATOMS       0x1
 #define GC_LAST_CONTEXT     0x2
 #define GC_ALREADY_LOCKED   0x4
+#define GC_INTERRUPT_AFTER_MARK 0x8
 
 extern void
 js_ForceGC(JSContext *cx, uintN gcflags);
 
 extern void
 js_GC(JSContext *cx, uintN gcflags);
+
+extern void
+js_AdaptiveGC(JSContext *cx, uintN gcflags);
+
+void
+js_IncrementalGC(JSContext *cx, uintN gcflags, uint32 maxMarkObjects, uint32 minSweepObjects);
 
 #ifdef JS_GCMETER
 

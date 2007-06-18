@@ -2723,6 +2723,7 @@ js_SetProperty(JSContext *cx, JSObject *obj, jsid id, jsval *vp)
     if (SPROP_HAS_VALID_SLOT(sprop, scope)) {
         GC_POKE(cx, pval);
         LOCKED_OBJ_SET_SLOT(obj, slot, *vp);
+        GC_GREY(cx, *vp, "jij", NULL);
     }
     JS_UNLOCK_SCOPE(cx, scope);
     return JS_TRUE;
@@ -3579,7 +3580,7 @@ js_Mark(JSContext *cx, JSObject *obj, void *arg)
                             id, js_getter_str);
 #endif
                 GC_MARK(cx,
-                        JSVAL_TO_GCTHING((jsval) sprop->getter),
+                        (jsval) sprop->getter,
                         buf,
                         arg);
             }
@@ -3589,7 +3590,7 @@ js_Mark(JSContext *cx, JSObject *obj, void *arg)
                             id, js_setter_str);
 #endif
                 GC_MARK(cx,
-                        JSVAL_TO_GCTHING((jsval) sprop->setter),
+                        (jsval) sprop->setter,
                         buf,
                         arg);
             }
@@ -3694,6 +3695,7 @@ js_SetRequiredSlot(JSContext *cx, JSObject *obj, uint32 slot, jsval v)
     }
 
     obj->slots[slot] = v;
+    GC_GREY(cx, v, "set required slot rval", NULL);
     JS_UNLOCK_OBJ(cx, obj);
 }
 

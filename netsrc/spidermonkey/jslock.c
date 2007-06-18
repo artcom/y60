@@ -596,6 +596,7 @@ js_GetSlotThreadSafe(JSContext *cx, JSObject *obj, uint32 slot)
 
     js_LockObj(cx, obj);
     v = obj->slots[slot];
+    GC_GREY(cx, v);
 
     /*
      * Test whether cx took ownership of obj's scope during js_LockObj.
@@ -644,6 +645,7 @@ js_SetSlotThreadSafe(JSContext *cx, JSObject *obj, uint32 slot, jsval v)
     if ((scope->ownercx && ClaimScope(scope, cx)) ||
         CX_THREAD_IS_RUNNING_GC(cx)) {
         obj->slots[slot] = v;
+        GC_GREY(cx, v);
         return;
     }
 
@@ -654,6 +656,7 @@ js_SetSlotThreadSafe(JSContext *cx, JSObject *obj, uint32 slot, jsval v)
     if (js_CompareAndSwap(&tl->owner, 0, me)) {
         if (scope == OBJ_SCOPE(obj)) {
             obj->slots[slot] = v;
+            GC_GREY(cx, v);
             if (!js_CompareAndSwap(&tl->owner, me, 0)) {
                 /* Assert that scope locks never revert to flyweight. */
                 JS_ASSERT(scope->ownercx != cx);
@@ -668,12 +671,14 @@ js_SetSlotThreadSafe(JSContext *cx, JSObject *obj, uint32 slot, jsval v)
     }
     else if (Thin_RemoveWait(ReadWord(tl->owner)) == me) {
         obj->slots[slot] = v;
+        GC_GREY(cx, v);
         return;
     }
 #endif
 
     js_LockObj(cx, obj);
     obj->slots[slot] = v;
+    GC_GREY(cx, v);
 
     /*
      * Same drill as above, in js_GetSlotThreadSafe.  Note that we cannot

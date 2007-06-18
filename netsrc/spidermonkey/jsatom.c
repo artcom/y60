@@ -372,6 +372,7 @@ js_atom_marker(JSHashEntry *he, intN i, void *arg)
         (args->gcflags & GC_KEEP_ATOMS)) {
         atom->flags |= ATOM_MARK;
         key = ATOM_KEY(atom);
+        GC_GREY((JSContext *)args->data, key, "atom_marker", NULL);
         if (JSVAL_IS_GCTHING(key))
             args->mark(JSVAL_TO_GCTHING(key), args->data);
     }
@@ -458,6 +459,7 @@ js_AtomizeHashedKey(JSContext *cx, jsval key, JSHashNumber keyHash, uintN flags)
     }
 
     atom = (JSAtom *)he;
+    GC_GREY(cx, ATOM_KEY(atom), "atomize hashed key rval", NULL);
     atom->flags |= flags;
     cx->lastAtom = atom;
 out:
@@ -546,6 +548,7 @@ js_AtomizeDouble(JSContext *cx, jsdouble d, uintN flags)
             atom = NULL;
             goto out;
         }
+        GC_GREY(cx, key, "atomize double key", NULL);
     }
 
     atom = (JSAtom *)he;
@@ -609,6 +612,7 @@ js_AtomizeString(JSContext *cx, JSString *str, uintN flags)
             atom = NULL;
             goto out;
         }
+        GC_GREY(cx, key, "atomized string", NULL);
     }
 
     atom = (JSAtom *)he;
@@ -792,6 +796,7 @@ js_IndexAtom(JSContext *cx, JSAtom *atom, JSAtomList *al)
                 JS_HashTableRawAdd(al->table, hep, atom->number, atom, NULL);
             if (!ale)
                 return NULL;
+            GC_GREY(cx, ATOM_KEY(atom), "index atom key", NULL);
         }
 
         ALE_SET_INDEX(ale, al->count++);

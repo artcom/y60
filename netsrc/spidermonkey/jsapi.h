@@ -632,6 +632,9 @@ JS_MaybeGC(JSContext *cx);
 extern JS_PUBLIC_API(JSBool)
 JS_IncrementalGC(JSContext *cx, uint32 maxObjects);
 
+extern JS_PUBLIC_API(JSBool)
+JS_AdaptiveGC(JSContext *cx);
+
 extern JS_PUBLIC_API(JSGCCallback)
 JS_SetGCCallback(JSContext *cx, JSGCCallback cb);
 

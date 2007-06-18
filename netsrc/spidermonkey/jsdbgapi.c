@@ -280,7 +280,7 @@ js_MarkWatchPoints(JSRuntime *rt)
     for (wp = (JSWatchPoint *)rt->watchPointList.next;
          wp != (JSWatchPoint *)&rt->watchPointList;
          wp = (JSWatchPoint *)wp->links.next) {
-        MARK_SCOPE_PROPERTY(wp->sprop);
+        //MARK_SCOPE_PROPERTY(wp->sprop);
     }
 }
 

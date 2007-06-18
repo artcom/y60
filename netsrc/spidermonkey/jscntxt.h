@@ -78,6 +78,26 @@ struct JSRuntime {
     jsrefcount          gcDisabled;
     uint32              gcBytes;
     uint32              gcObjects;
+    uint32              gcLiveObjects; // the number of live objects is stored here at the of mark phase.
+
+    uint32              gcNewObjects; // since last call to gc();
+    uint32              gcNewObjectsSinceSweep; // since last sweep
+    uint32              gcInterruptionsInLastMarkPhase;
+    uint32              gcInterruptionsInThisSweepPhase;
+
+    double              gcAvgObjects;
+    uint32              gcAvgObjectSamples;
+
+    double              gcAvgLiveObjects;
+    uint32              gcLiveSamples;
+
+    double              gcAvgAllocRate;
+    uint32              gcAllocRateSamples;
+
+    JSArena             *gcFirstUnsweptArena;
+
+    JSBool              gcRootsMarked;
+
     uint32              gcLastBytes;
     uint32              gcMaxBytes;
     uint32              gcLevel;
@@ -86,6 +106,13 @@ struct JSRuntime {
     JSPackedBool        gcRunning;
     JSGCCallback        gcCallback;
     uint32              gcMallocBytes;
+
+    jsval               *gcGreyListBase;
+    // points to first free entry
+    jsval               *gcGreyListPtr;
+    // points to first byte beyond allocated region
+    jsval               *gcGreyListLimit;
+
 #ifdef JS_GCMETER
     JSGCStats           gcStats;
 #endif

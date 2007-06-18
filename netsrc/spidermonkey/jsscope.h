@@ -309,9 +309,10 @@ struct JSScopeProperty {
 
 #define SPROP_SET(cx,sprop,obj,obj2,vp)                                       \
     (((sprop)->attrs & JSPROP_SETTER)                                         \
-     ? js_InternalGetOrSet(cx, obj, (sprop)->id,                              \
+     ? ( ( MARK_SCOPE_PROPERTY(sprop) ), \
+       js_InternalGetOrSet(cx, obj, (sprop)->id,                              \
                            OBJECT_TO_JSVAL((sprop)->setter), JSACC_WRITE,     \
-                           1, vp, vp)                                         \
+                           1, vp, vp))                                        \
      : ((sprop)->attrs & JSPROP_GETTER)                                       \
      ? (JS_ReportErrorNumber(cx, js_GetErrorMessage, NULL,                    \
                              JSMSG_GETTER_ONLY, NULL), JS_FALSE)              \
@@ -360,8 +361,10 @@ js_RemoveScopeProperty(JSContext *cx, JSScope *scope, jsid id);
 
 extern void
 js_ClearScope(JSContext *cx, JSScope *scope);
+	
+#define MARK_SCOPE_PROPERTY(sprop)      (js_MarkScopeProperty(cx, sprop))
 
-#define MARK_SCOPE_PROPERTY(sprop)      ((sprop)->flags |= SPROP_MARK)
+extern uint8 js_MarkScopeProperty(JSContext *cx, JSScopeProperty *sprop);
 
 extern void
 js_SweepScopeProperties(JSRuntime *rt);

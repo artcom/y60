@@ -53,6 +53,25 @@
 #include "jsscope.h"
 #include "jsstr.h"
 
+uint8 js_MarkScopeProperty(JSContext *cx, JSScopeProperty *sprop)
+{
+   if (JSVAL_IS_GCTHING(ID_TO_VALUE(sprop->id)))
+   {
+       GC_MARK_ATOM(cx, (JSAtom *)sprop->id, NULL);
+   }
+
+   if (sprop->attrs & JSPROP_GETTER)
+   {
+       GC_MARK(cx, (jsval) sprop->getter, "blah", NULL);
+   }
+   if ((sprop->attrs & JSPROP_SETTER))
+   {
+       GC_MARK(cx, (jsval) sprop->setter, "blur", NULL);
+   }
+   sprop->flags |= SPROP_MARK;
+   return 1;
+}
+
 JSScope *
 js_GetMutableScope(JSContext *cx, JSObject *obj)
 {
@@ -1155,6 +1174,7 @@ js_AddScopeProperty(JSContext *cx, JSScope *scope, jsid id,
             SPROP_STORE_PRESERVING_COLLISION(spp, sprop);
         scope->entryCount++;
         scope->lastProp = sprop;
+
         CHECK_ANCESTOR_LINE(scope, JS_FALSE);
         if (!overwriting) {
             JS_RUNTIME_METER(cx->runtime, liveScopeProps);
@@ -1172,6 +1192,8 @@ js_AddScopeProperty(JSContext *cx, JSScope *scope, jsid id,
         if (!scope->table && scope->entryCount >= SCOPE_HASH_THRESHOLD)
             (void) CreateScopeTable(scope);
     }
+
+    if ( (*js_GetGCThingFlags(JSVAL_TO_GCTHING(OBJECT_TO_JSVAL(scope->object)))) & GCF_SCANNED) { MARK_SCOPE_PROPERTY(sprop); }
 
     METER(adds);
     return sprop;
@@ -1448,8 +1470,12 @@ js_SweepScopeProperties(JSRuntime *rt)
     PropTreeKidsChunk *chunk, *nextChunk;
     uintN i;
 
+    uint32 totalLiveCount = 0;
+    uint32 totalSweepCount = 0;
+    uint32 sweepCount = 0;
+
 #ifdef DEBUG_brendan
-    uint32 livePropCapacity, totalLiveCount = 0;
+    uint32 livePropCapacity = 0;
     static FILE *logfp;
     if (!logfp)
         logfp = fopen("/tmp/proptree.stats", "a");
@@ -1498,6 +1524,7 @@ js_SweepScopeProperties(JSRuntime *rt)
     while ((a = *ap) != NULL) {
         limit = (JSScopeProperty *) a->avail;
         liveCount = 0;
+        sweepCount = 0;
         for (sprop = (JSScopeProperty *) a->base; sprop < limit; sprop++) {
             /* If the id is null, sprop is already on the freelist. */
             if (sprop->id == JSVAL_NULL)
@@ -1509,6 +1536,12 @@ js_SweepScopeProperties(JSRuntime *rt)
                 liveCount++;
                 continue;
             }
+
+            sweepCount++;
+ 
+#ifdef GC_SWEEP_DEBUG_tobias_verbose
+            fprintf(stderr, "deleting property %x\n", sprop->id);
+#endif
 
             /* Ok, sprop is garbage to collect: unlink it from its parent. */
             RemovePropertyTreeChild(rt, sprop);
@@ -1543,6 +1576,12 @@ js_SweepScopeProperties(JSRuntime *rt)
             JS_RUNTIME_UNMETER(rt, livePropTreeNodes);
         }
 
+        totalLiveCount += liveCount;
+        totalSweepCount += sweepCount;
+#ifdef GC_MARK_DEBUG_tobias
+        fprintf(stderr, "js_SweepScopeProperties: liveCount = %d, sweepCount = %d\n", liveCount, sweepCount);
+#endif
+
         /* If a contains no live properties, return it to the malloc heap. */
         if (liveCount == 0) {
             for (sprop = (JSScopeProperty *) a->base; sprop < limit; sprop++)
@@ -1556,6 +1595,10 @@ js_SweepScopeProperties(JSRuntime *rt)
             ap = &a->next;
         }
     }
+
+#ifdef GC_MARK_DEBUG_tobias
+    printf("js_SweepScopeProperties: TotalLiveCount = %d, TotalSweepCount = %d\n", totalLiveCount, totalSweepCount);
+#endif
 
 #ifdef DEBUG_brendan
     fprintf(logfp, " arenautil %g%%\n",

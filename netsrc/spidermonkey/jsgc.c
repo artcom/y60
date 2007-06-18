@@ -169,6 +169,63 @@ typedef struct JSGCPageInfo {
 
 #define FIRST_THING_PAGE(a)     (((a)->base + GC_FLAGS_SIZE) & ~GC_PAGE_MASK)
 
+
+#ifdef GC_STATS
+
+#ifdef WIN32
+#include <windows.h>
+#include <mmsystem.h>
+
+#define js_get_cycles(x) get_cycles(x)
+
+#else
+#ifdef OSX
+#include <Carbon/Carbon.h>
+#endif
+#include <sys/time.h>
+#include <unistd.h>
+#endif
+
+typedef uint64 cycles_t;
+
+#define USE_TIME_OF_DAY  
+
+#ifdef LINUX
+#    if defined __x86_64__
+inline
+cycles_t
+js_get_cycles() {
+    cycles_t ret;
+    uint32 a = 0;
+    uint32 d = 0; 
+    asm volatile("rdtsc" : "=a" (a), "=d" (d)); 
+    (ret) = ((uint64)a) | (((uint64)d)<<32); 
+    return ret;
+}
+#    endif
+#    if defined __i386__
+inline
+cycles_t
+js_get_cycles() {
+    cycles_t ret = 0;
+    __asm__ __volatile__("rdtsc" : "=A" (ret));
+    return ret;
+}
+#    endif
+#endif
+#ifdef OSX
+
+#include <mach/mach_time.h>
+
+inline
+cycles_t
+js_get_cycles() {
+    return mach_absolute_time();
+}
+
+#endif
+#endif
+
 static JSGCThing *
 gc_new_arena(JSArenaPool *pool)
 {
@@ -220,7 +277,7 @@ js_IsAboutToBeFinalized(JSContext *cx, void *thing)
 {
     uint8 flags = *js_GetGCThingFlags(thing);
 
-    return !(flags & (GCF_MARK | GCF_LOCKMASK | GCF_FINAL));
+    return ((flags & GCF_SCANNED) && !(flags & (GCF_REACHED | GCF_LOCKMASK | GCF_FINAL)));
 }
 
 typedef void (*GCFinalizeOp)(JSContext *cx, JSGCThing *thing);
@@ -252,6 +309,8 @@ js_ChangeExternalStringFinalizer(JSStringFinalizeOp oldop,
 #define GC_ROOTS_SIZE   256
 #define GC_FINALIZE_LEN 1024
 
+#define GC_INITIAL_GREYLIST_LENGTH 1024
+
 JSBool
 js_InitGC(JSRuntime *rt, uint32 maxbytes)
 {
@@ -280,6 +339,29 @@ js_InitGC(JSRuntime *rt, uint32 maxbytes)
     }
     rt->gcLocksHash = NULL;     /* create lazily */
     rt->gcMaxBytes = maxbytes;
+ 
+     rt->gcGreyListBase = (jsval*)malloc(GC_INITIAL_GREYLIST_LENGTH*sizeof(jsval));
+     rt->gcGreyListPtr = rt->gcGreyListBase;
+     rt->gcGreyListLimit = rt->gcGreyListBase + GC_INITIAL_GREYLIST_LENGTH;
+ 
+     rt->gcObjects = 0;
+     rt->gcAvgObjects = 0;
+
+     rt->gcLiveObjects = 0;
+
+     rt->gcNewObjects = 0;
+ 
+     rt->gcAvgLiveObjects = 0;
+     rt->gcLiveSamples = 0;
+ 
+     rt->gcAvgAllocRate = 0;
+     rt->gcAllocRateSamples = 0;
+ 
+     rt->gcInterruptionsInLastMarkPhase = 0;
+     rt->gcInterruptionsInThisSweepPhase = 0;
+ 
+     rt->gcRootsMarked = JS_FALSE;
+ 
     rt->gcObjects = 0;
     return JS_TRUE;
 }
@@ -536,7 +618,31 @@ retry:
         flagp = js_GetGCThingFlags(thing);
     }
     *flagp = (uint8)flags;
+
+/*
+     jsval v;
+     if ((flags & GCF_TYPEMASK) == GCX_DOUBLE) {
+         v = DOUBLE_TO_JSVAL(thing);
+     } else if ((flags & GCF_TYPEMASK) == GCX_STRING) {
+         v = STRING_TO_JSVAL(thing);
+     } else if ((flags & GCF_TYPEMASK) == GCX_MUTABLE_STRING) {
+         v = STRING_TO_JSVAL(thing);
+     } else if ((flags & GCF_TYPEMASK) == GCX_EXTERNAL_STRING) {
+         v = STRING_TO_JSVAL(thing);
+     } else {
+         v = OBJECT_TO_JSVAL(thing);
+     }
+     fprintf(stderr, "new object %p\n", v);
+     GC_GREY(cx, v, "new object", NULL);
+*/
+
+     // must be marked. we can't append a newborn thing to the grey list - we don't know its type yet.
+     // doing this makes us crash even in compatibility mode. find out why!
+     //*flagp |= GCF_SCANNED;
+     // XXX TODO make newborn objects gc'able.
+
     rt->gcObjects++;
+    rt->gcNewObjects++;
     rt->gcBytes += sizeof(JSGCThing) + sizeof(uint8);
     cx->newborn[flags & GCF_TYPEMASK] = thing;
 
@@ -547,6 +653,10 @@ retry:
     thing->next = NULL;
     thing->flagp = NULL;
     JS_UNLOCK_GC(rt);
+
+#ifdef GC_MARK_DEBUG_tobias_verbose
+    fprintf(stderr, "allocating %p\n", thing);
+#endif
     return thing;
 }
 
@@ -617,6 +727,8 @@ js_LockGCThingRT(JSRuntime *rt, void *thing)
         }
     } else {
         METER(rt->gcStats.stuck++);
+        fprintf(stderr, "js_LockGCThingRT: we are stuck :-(\n");
+        JS_ASSERT(JS_FALSE);
     }
 
     METER(rt->gcStats.lock++);
@@ -783,7 +895,7 @@ gc_mark_atom_key_thing(void *thing, void *arg)
 {
     JSContext *cx = (JSContext *) arg;
 
-    GC_MARK(cx, thing, "atom", NULL);
+    GC_GREY(cx, OBJECT_TO_JSVAL(thing), "atom", NULL);
 }
 
 void
@@ -806,12 +918,12 @@ js_MarkAtom(JSContext *cx, JSAtom *atom, void *arg)
             JS_snprintf(name, sizeof name, "<%x>", key);
         }
 #endif
-        GC_MARK(cx, JSVAL_TO_GCTHING(key), name, arg);
+        GC_GREY(cx, key, "atom key", NULL);
     }
 }
 
 void
-js_MarkGCThing(JSContext *cx, void *thing, void *arg)
+js_MarkValue(JSContext *cx, jsval val, void *arg)
 {
     uint8 flags, *flagp;
     JSRuntime *rt;
@@ -824,8 +936,12 @@ js_MarkGCThing(JSContext *cx, void *thing, void *arg)
     JSScopeProperty *sprop;
 #endif
 
-    if (!thing)
-        return;
+    void *thing;
+
+    JS_ASSERT(!JSVAL_IS_VOID(val) && !JSVAL_IS_INT(val) && (val != JSVAL_NULL) && !JSVAL_IS_BOOLEAN(val) && JSVAL_IS_GCTHING(val));
+
+    thing = JSVAL_TO_GCTHING(val);
+    JS_ASSERT(thing);
 
     flagp = js_GetGCThingFlags(thing);
     flags = *flagp;
@@ -835,10 +951,21 @@ js_MarkGCThing(JSContext *cx, void *thing, void *arg)
         gc_dump_thing(thing, flags, arg, stderr);
 #endif
 
-    if (flags & GCF_MARK)
-        return;
+    JS_ASSERT(!(*flagp & GCF_SCANNED) || (*flagp & GCF_REACHED));
 
-    *flagp |= GCF_MARK;
+    *flagp |= GCF_REACHED;
+
+    if (flags & GCF_SCANNED) {
+        return;
+    }
+
+#ifdef GC_MARK_DEBUG_tobias_verbose
+    fprintf(stderr, " marking jsval %p with arg %p\n", val, arg);
+#endif
+
+    *flagp |= GCF_SCANNED;
+    JS_ASSERT(*flagp & GCF_REACHED);
+
     rt = cx->runtime;
     METER(if (++rt->gcStats.depth > rt->gcStats.maxdepth)
               rt->gcStats.maxdepth = rt->gcStats.depth);
@@ -913,7 +1040,7 @@ js_MarkGCThing(JSContext *cx, void *thing, void *arg)
                     strcpy(name, "**UNKNOWN OBJECT MAP ENTRY**");
                 }
 #endif
-                GC_MARK(cx, JSVAL_TO_GCTHING(v), name, arg);
+                GC_GREY(cx, v, "object property", arg);
             }
         }
         break;
@@ -926,14 +1053,94 @@ js_MarkGCThing(JSContext *cx, void *thing, void *arg)
 #endif
 
       case GCX_MUTABLE_STRING:
-        str = (JSString *)thing;
+        str = JSVAL_TO_STRING(val);
+        // XXX how to determine type the right way? This should work, too:
+        //str = (JSString *)thing;
+
         if (JSSTRING_IS_DEPENDENT(str))
-            GC_MARK(cx, JSSTRDEP_BASE(str), "base", arg);
+            GC_GREY(cx, STRING_TO_JSVAL(JSSTRDEP_BASE(str)), "base", arg);
         break;
     }
 
 out:
     METER(rt->gcStats.depth--);
+}
+
+void
+js_AppendToGreyList(JSContext *cx, jsval val, void *arg) {
+
+    void *thing;
+    uint8 *flagp;
+    JSRuntime *rt;
+    //JS_ASSERT(!JSVAL_IS_VOID(thing));
+    // void objects are passed by locked_obj_set_slot from within js_DefineNativeProperty.
+
+    //JS_ASSERT(JSVAL_IS_GCTHING(thing));
+    // non-gcthings are passed to OBJ_SET_SLOT in e.g. js_InitBooleanClass
+
+
+    if (JSVAL_IS_NULL(val) || JSVAL_IS_VOID(val) || JSVAL_IS_INT(val) || JSVAL_IS_BOOLEAN(val) || !JSVAL_IS_GCTHING(val)) {
+
+#ifdef GC_MARK_DEBUG_tobias_verbose
+        fprintf(stderr, " warning: tried to append non-gcthing ");
+
+	if (!val) {
+            fprintf(stderr, " (jsval)null\n");
+        } else if (JSVAL_IS_OBJECT(val)) {
+            printObj(cx, JSVAL_TO_OBJECT(val));
+        } else if (JSVAL_IS_NULL(val)) {
+	    fprintf(stderr, " (JS_NULL)\n");
+        } else if (JSVAL_IS_VOID(val)) {
+	    fprintf(stderr, " void\n");
+        } else if (JSVAL_IS_INT(val)) {
+	    fprintf(stderr, " number %d\n",JSVAL_TO_INT(val));
+        } else if (JSVAL_IS_BOOLEAN(val)) {
+	    fprintf(stderr, " %s\n",JSVAL_TO_BOOLEAN(val)?"true":"false");
+        } else {
+	    fprintf(stderr, " UNKNOWN jsval %p\n",val);
+        }
+#endif
+        return;
+    }
+
+    thing = JSVAL_TO_GCTHING(val);
+    JS_ASSERT(thing);
+
+    flagp = js_GetGCThingFlags(thing);
+
+    if (!cx->runtime->gcPoke) {
+       cx->runtime->gcPoke = JS_TRUE;
+#ifdef GC_MARK_DEBUG_tobias
+       printf("GC Poke.\n");
+#endif
+    }
+
+    if (!(*flagp & GCF_REACHED)) {
+
+        // never append disposable objects to grey list.
+        JS_ASSERT(!(*flagp & GCF_SCANNED));
+
+        *flagp |= GCF_REACHED;
+
+        rt = cx->runtime;
+
+        if (rt->gcGreyListPtr == rt->gcGreyListLimit) {
+            uint32 oldLength = rt->gcGreyListPtr - rt->gcGreyListBase;
+            uint32 newLength = oldLength * 2;
+
+            fprintf(stderr, "resizing grey list to %d entries\n", newLength);
+
+            rt->gcGreyListBase = realloc(rt->gcGreyListBase, newLength*sizeof(jsval));
+            rt->gcGreyListLimit = rt->gcGreyListBase + newLength;
+
+            rt->gcGreyListPtr = rt->gcGreyListBase + oldLength;
+        }
+
+#ifdef GC_MARK_DEBUG_tobias_verbose
+        fprintf(stderr, "appending jsval %p to grey list at position %d\n", thing, rt->gcGreyListPtr - rt->gcGreyListBase);
+#endif
+        *(rt->gcGreyListPtr++) = val;
+    }
 }
 
 JS_STATIC_DLL_CALLBACK(JSDHashOperator)
@@ -969,7 +1176,7 @@ gc_root_marker(JSDHashTable *table, JSDHashEntryHdr *hdr, uint32 num, void *arg)
         JS_ASSERT(root_points_to_gcArenaPool);
 #endif
 
-        GC_MARK(cx, JSVAL_TO_GCTHING(v), rhe->name ? rhe->name : "root", NULL);
+        GC_GREY(cx, v, rhe->name ? rhe->name : "root", NULL);
     }
     return JS_DHASH_NEXT;
 }
@@ -981,7 +1188,7 @@ gc_lock_marker(JSDHashTable *table, JSDHashEntryHdr *hdr, uint32 num, void *arg)
     void *thing = (void *)lhe->thing;
     JSContext *cx = (JSContext *)arg;
 
-    GC_MARK(cx, thing, "locked object", NULL);
+    GC_GREY(cx, OBJECT_TO_JSVAL(thing), "locked object", NULL);
     return JS_DHASH_NEXT;
 }
 
@@ -989,12 +1196,50 @@ void
 js_ForceGC(JSContext *cx, uintN gcflags)
 {
     uintN i;
+    JSRuntime *rt;
+    JSArena *a;
+    uint8 flags, *flagp, *split;
+    JSGCThing *thing, *limit;
 
     for (i = 0; i < GCX_NTYPES; i++)
         cx->newborn[i] = NULL;
     cx->lastAtom = NULL;
-    cx->runtime->gcPoke = JS_TRUE;
-    js_GC(cx, gcflags);
+
+    rt = cx->runtime;
+   
+    // clear gc state:
+    // set all black and grey objects white
+    for (a = &rt->gcArenaPool.first; a; a = a->next) {
+        flagp = (uint8 *) a->base;
+        split = (uint8 *) FIRST_THING_PAGE(a);
+        limit = (JSGCThing *) a->avail;
+        for (thing = (JSGCThing *) split; thing < limit; thing++) {
+            if (((jsuword)thing & GC_PAGE_MASK) == 0) {
+                flagp++;
+                thing++;
+            }
+            flags = *flagp;
+            // all reached objects must have been scanned, all others must not.
+            JS_ASSERT(((flags & GCF_SCANNED) && (flags & GCF_REACHED)) ||
+                (!(flags & GCF_SCANNED) && !(flags & GCF_REACHED)));
+
+            if ((flags & GCF_REACHED)) {
+                // black or grey
+                *flagp &= ~(GCF_SCANNED|GCF_REACHED);
+            }
+            if (++flagp == split)
+                flagp += GC_THINGS_SIZE;
+        }
+    }
+    rt->gcPoke = JS_TRUE;
+    // reset sweep state:
+    rt->gcFirstUnsweptArena = NULL;
+    // ensure roots will be marked again:
+    rt->gcRootsMarked = JS_FALSE;
+    // clear grey list:
+    rt->gcGreyListPtr = rt->gcGreyListBase;
+
+    js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     JS_ArenaFinish();
 }
 
@@ -1004,13 +1249,36 @@ js_ForceGC(JSContext *cx, uintN gcflags)
                                                                               \
         for (_vp = vec, _end = _vp + len; _vp < _end; _vp++) {                \
             _v = *_vp;                                                        \
-            if (JSVAL_IS_GCTHING(_v))                                         \
-                GC_MARK(cx, JSVAL_TO_GCTHING(_v), name, NULL);                \
+            if (JSVAL_IS_GCTHING(_v) && (_v != JSVAL_NULL))                   \
+                GC_GREY(cx, _v, name, NULL);                                  \
         }                                                                     \
     JS_END_MACRO
 
+// returns true when finished
+JSBool js_IterateGreyList(JSContext *cx, uint32 *maxObjects) {
+
+    while (*maxObjects > 0 && cx->runtime->gcGreyListPtr > cx->runtime->gcGreyListBase) {
+        jsval thisOne = *(--cx->runtime->gcGreyListPtr);
+#ifdef GC_MARK_DEBUG_tobias_verbose
+        fprintf(stderr, "js_GC: taking jsval %p from greylist entry %d\n", thisOne, cx->runtime->gcGreyListPtr-cx->runtime->gcGreyListBase);
+#endif
+        js_MarkValue(cx, thisOne, NULL);
+
+        (*maxObjects)--;
+    }
+    return (cx->runtime->gcGreyListPtr == cx->runtime->gcGreyListBase);
+}
+
+void js_GC(JSContext *cx, uintN gcflags)
+{
+#ifdef GC_DEBUG
+    fprintf(stderr, "doing a full gc:\n");
+#endif
+    js_IncrementalGC(cx, gcflags, 2000000000, 2000000000);
+}
+
 void
-js_GC(JSContext *cx, uintN gcflags)
+js_IncrementalGC(JSContext *cx, uintN gcflags, uint32 maxMarkObjects, uint32 minSweepObjects)
 {
     JSRuntime *rt;
     JSContext *iter, *acx;
@@ -1026,6 +1294,8 @@ js_GC(JSContext *cx, uintN gcflags)
     jsword currentThread;
     uint32 requestDebit;
 #endif
+    unsigned long myCount = 0;
+    uint32 markCounter;
 
     rt = cx->runtime;
 #ifdef JS_THREADSAFE
@@ -1041,6 +1311,9 @@ js_GC(JSContext *cx, uintN gcflags)
      */
     if ((rt->state != JSRTS_UP || rt->gcDisabled) &&
         !(gcflags & GC_LAST_CONTEXT)) {
+#ifdef GC_DEBUG
+        fprintf(stderr, "aborting 1\n");
+#endif
         return;
     }
 
@@ -1049,8 +1322,12 @@ js_GC(JSContext *cx, uintN gcflags)
      * is the last context).  Invoke the callback regardless.
      */
     if (rt->gcCallback) {
-        if (!rt->gcCallback(cx, JSGC_BEGIN) && !(gcflags & GC_LAST_CONTEXT))
+        if (!rt->gcCallback(cx, JSGC_BEGIN) && !(gcflags & GC_LAST_CONTEXT)) {
+#ifdef GC_DEBUG
+            fprintf(stderr, "aborting 2\n");
+#endif
             return;
+        }
     }
 
     /* Lock out other GC allocator and collector invocations. */
@@ -1062,6 +1339,9 @@ js_GC(JSContext *cx, uintN gcflags)
         METER(rt->gcStats.nopoke++);
         if (!(gcflags & GC_ALREADY_LOCKED))
             JS_UNLOCK_GC(rt);
+#ifdef GC_DEBUG
+        fprintf(stderr, "aborting 3\n");
+#endif
         return;
     }
     METER(rt->gcStats.poke++);
@@ -1076,6 +1356,9 @@ js_GC(JSContext *cx, uintN gcflags)
                   rt->gcStats.maxlevel = rt->gcLevel);
         if (!(gcflags & GC_ALREADY_LOCKED))
             JS_UNLOCK_GC(rt);
+#ifdef GC_DEBUG
+        fprintf(stderr, "aborting 4\n");
+#endif
         return;
     }
 
@@ -1129,6 +1412,9 @@ js_GC(JSContext *cx, uintN gcflags)
             rt->requestCount += requestDebit;
         if (!(gcflags & GC_ALREADY_LOCKED))
             JS_UNLOCK_GC(rt);
+#ifdef GC_DEBUG
+        fprintf(stderr, "aborting 5\n");
+#endif
         return;
     }
 
@@ -1146,8 +1432,12 @@ js_GC(JSContext *cx, uintN gcflags)
     rt->gcLevel++;
     METER(if (rt->gcLevel > rt->gcStats.maxlevel)
               rt->gcStats.maxlevel = rt->gcLevel);
-    if (rt->gcLevel > 1)
+    if (rt->gcLevel > 1) {
+#ifdef GC_DEBUG
+        fprintf(stderr, "aborting 6\n");
+#endif
         return;
+    }
 
 #endif /* !JS_THREADSAFE */
 
@@ -1177,13 +1467,44 @@ js_GC(JSContext *cx, uintN gcflags)
 restart:
     rt->gcNumber++;
 
+    if (rt->gcFirstUnsweptArena) {
+#ifdef GC_MARK_DEBUG_tobias
+       fprintf(stderr, "js_GC: we're in an interrupted sweep phase. continuing...\n");
+#endif
+       goto finalize;
+    }
+
+mark:
+
     /*
      * Mark phase.
      */
-    JS_DHashTableEnumerate(&rt->gcRootsHash, gc_root_marker, cx);
-    if (rt->gcLocksHash)
-        JS_DHashTableEnumerate(rt->gcLocksHash, gc_lock_marker, cx);
-    js_MarkAtomState(&rt->atomState, gcflags, gc_mark_atom_key_thing, cx);
+
+    markCounter = maxMarkObjects;
+
+    if (!rt->gcRootsMarked) {
+        JS_DHashTableEnumerate(&rt->gcRootsHash, gc_root_marker, cx);
+        if (rt->gcLocksHash)
+            JS_DHashTableEnumerate(rt->gcLocksHash, gc_lock_marker, cx);
+        js_MarkAtomState(&rt->atomState, gcflags, gc_mark_atom_key_thing, cx);
+        rt->gcRootsMarked = JS_TRUE;
+    }
+
+#ifdef GC_MARK_DEBUG_tobias
+    fprintf(stderr, "js_GC: scanning up to %d objects from grey list of length %d...\n", maxMarkObjects, rt->gcGreyListPtr - rt->gcGreyListBase);
+#endif
+    if (!js_IterateGreyList(cx, &markCounter)) {
+#ifdef GC_DEBUG_verbose
+        fprintf(stderr, "js_GC: aborting GC due to timeout (before marking stacks)\n");
+#endif
+        rt->gcInterruptionsInLastMarkPhase++;
+        goto out;
+    } else {
+#ifdef GC_MARK_DEBUG_tobias
+        fprintf(stderr, "js_GC: mark phase part 1 finished. marking stacks...\n");
+#endif
+    }
+
     iter = NULL;
     while ((acx = js_ContextIterator(rt, JS_TRUE, &iter)) != NULL) {
         /*
@@ -1203,11 +1524,11 @@ restart:
         for (fp = chain; fp; fp = chain = chain->dormantNext) {
             do {
                 if (fp->callobj)
-                    GC_MARK(cx, fp->callobj, "call object", NULL);
+                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->callobj), "call object", NULL);
                 if (fp->argsobj)
-                    GC_MARK(cx, fp->argsobj, "arguments object", NULL);
+                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->argsobj), "arguments object", NULL);
                 if (fp->varobj)
-                    GC_MARK(cx, fp->varobj, "variables object", NULL);
+                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->varobj), "variables object", NULL);
                 if (fp->script) {
                     js_MarkScript(cx, fp->script, NULL);
                     if (fp->spbase) {
@@ -1223,7 +1544,9 @@ restart:
                         GC_MARK_JSVALS(cx, nslots, fp->spbase, "operand");
                     }
                 }
-                GC_MARK(cx, fp->thisp, "this", NULL);
+                //fprintf(stderr, "marking %p with arg NULL!\n", fp->thisp);
+                GC_GREY(cx, OBJECT_TO_JSVAL(fp->thisp), "this", NULL);
+                //fprintf(stderr, "finished marking %p.\n", fp->thisp);
                 if (fp->argv) {
                     nslots = fp->argc;
                     if (fp->fun && fp->fun->nargs > nslots)
@@ -1231,12 +1554,12 @@ restart:
                     GC_MARK_JSVALS(cx, nslots, fp->argv, "arg");
                 }
                 if (JSVAL_IS_GCTHING(fp->rval))
-                    GC_MARK(cx, JSVAL_TO_GCTHING(fp->rval), "rval", NULL);
+                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->rval), "rval", NULL);
                 if (fp->vars)
                     GC_MARK_JSVALS(cx, fp->nvars, fp->vars, "var");
-                GC_MARK(cx, fp->scopeChain, "scope chain", NULL);
+                GC_GREY(cx, OBJECT_TO_JSVAL(fp->scopeChain), "scope chain", NULL);
                 if (fp->sharpArray)
-                    GC_MARK(cx, fp->sharpArray, "sharp array", NULL);
+                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->sharpArray), "sharp array", NULL);
 
                 if (fp->objAtomMap) {
                     JSAtom **vector, *atom;
@@ -1257,23 +1580,24 @@ restart:
             acx->fp->dormantNext = NULL;
 
         /* Mark other roots-by-definition in acx. */
-        GC_MARK(cx, acx->globalObject, "global object", NULL);
-        GC_MARK(cx, acx->newborn[GCX_OBJECT], "newborn object", NULL);
-        GC_MARK(cx, acx->newborn[GCX_STRING], "newborn string", NULL);
-        GC_MARK(cx, acx->newborn[GCX_DOUBLE], "newborn double", NULL);
-        GC_MARK(cx, acx->newborn[GCX_MUTABLE_STRING], "newborn mutable string",
-                NULL);
+        // NB: newborns may be null, GC_MARK doesn't accept null anymore.
+        // so, push values over the grey list (tobias);
+        GC_GREY(cx, OBJECT_TO_JSVAL(acx->globalObject), "global object", NULL);
+        GC_GREY(cx, OBJECT_TO_JSVAL(acx->newborn[GCX_OBJECT]), "newborn object", NULL);
+        GC_GREY(cx, OBJECT_TO_JSVAL(acx->newborn[GCX_STRING]), "newborn string", NULL);
+        GC_GREY(cx, OBJECT_TO_JSVAL(acx->newborn[GCX_DOUBLE]), "newborn double", NULL);
+        GC_GREY(cx, OBJECT_TO_JSVAL(acx->newborn[GCX_MUTABLE_STRING]), "newborn mutable string", NULL);
         for (i = GCX_EXTERNAL_STRING; i < GCX_NTYPES; i++)
-            GC_MARK(cx, acx->newborn[i], "newborn external string", NULL);
+            GC_GREY(cx, OBJECT_TO_JSVAL(acx->newborn[i]), "newborn external string", NULL);
         if (acx->lastAtom)
             GC_MARK_ATOM(cx, acx->lastAtom, NULL);
 #if JS_HAS_EXCEPTIONS
         if (acx->throwing && JSVAL_IS_GCTHING(acx->exception))
-            GC_MARK(cx, JSVAL_TO_GCTHING(acx->exception), "exception", NULL);
+            GC_GREY(cx, acx->exception, "exception", NULL);
 #endif
 #if JS_HAS_LVALUE_RETURN
         if (acx->rval2set && JSVAL_IS_GCTHING(acx->rval2))
-            GC_MARK(cx, JSVAL_TO_GCTHING(acx->rval2), "rval2", NULL);
+            GC_GREY(cx, acx->rval2, "rval2", NULL);
 #endif
 
         for (sh = acx->stackHeaders; sh; sh = sh->down) {
@@ -1283,18 +1607,34 @@ restart:
         }
     }
 
-    if (rt->gcCallback)
-        (void) rt->gcCallback(cx, JSGC_MARK_END);
+    if (!js_IterateGreyList(cx, &markCounter)) {
+#ifdef GC_MARK_DEBUG_tobias
+        fprintf(stderr, "js_GC: aborting GC in mark phase part 2 due to timeout\n");
+#endif
+        rt->gcInterruptionsInLastMarkPhase++;
+        goto out;
+    } else {
+#ifdef GC_SWEEP_DEBUG_tobias
+        fprintf(stderr, "js_GC: mark phase part 2 finished. preparing to sweep...\n");
+#endif
+    }
 
     /*
      * Sweep phase.
-     * Finalize as we sweep, outside of rt->gcLock, but with rt->gcRunning set
-     * so that any attempt to allocate a GC-thing from a finalizer will fail,
-     * rather than nest badly and leave the unmarked newborn to be swept.
      */
     js_SweepAtomState(&rt->atomState);
     js_SweepScopeProperties(rt);
-    for (a = rt->gcArenaPool.first.next; a; a = a->next) {
+
+    i = 0;
+
+    rt->gcLiveObjects = 0;
+
+    for (a = &rt->gcArenaPool.first; a; a = a->next) {
+
+#ifdef GC_SWEEP_DEBUG_tobias
+        fprintf(stderr, "sweeping arena %d\n", i);
+#endif
+
         flagp = (uint8 *) a->base;
         split = (uint8 *) FIRST_THING_PAGE(a);
         limit = (JSGCThing *) a->avail;
@@ -1304,12 +1644,127 @@ restart:
                 thing++;
             }
             flags = *flagp;
-            if (flags & GCF_MARK) {
-                *flagp &= ~GCF_MARK;
+
+#ifdef GC_SWEEP_DEBUG_tobias
+            if ( ( (flags & GCF_SCANNED) && !(flags & GCF_REACHED)) ||
+                (!(flags & GCF_SCANNED) && (flags & GCF_REACHED))) {
+                fprintf(stderr, "Okay, grey list should be empty, but jsval %p in arena %d is %s %s %s %s\n", thing, i,
+                       (flags & GCF_REACHED ? "grey":""),
+                       (flags & GCF_SCANNED ? "marked":""),
+                       (flags & GCF_LOCKMASK ? "locked":""),
+                       (flags & GCF_FINAL ? "finalized":"")
+                       );
+            }
+#endif
+
+            // all reached objects must have been scanned, all others must not.
+            JS_ASSERT(((flags & GCF_SCANNED) && (flags & GCF_REACHED)) ||
+                (!(flags & GCF_SCANNED) && !(flags & GCF_REACHED)));
+
+            if ((flags & GCF_SCANNED) && (flags & GCF_REACHED)) {
+                *flagp &= ~(GCF_SCANNED|GCF_REACHED);
+                rt->gcLiveObjects++;
             } else if (!(flags & (GCF_LOCKMASK | GCF_FINAL))) {
+                // mark all unreached objects for deletion.
+                *flagp |= GCF_SCANNED;
+            } else {
+                // object is not scanned and not reached and (locked or finalized).
+                rt->gcLiveObjects++;
+            }
+            if (++flagp == split)
+                flagp += GC_THINGS_SIZE;
+        }
+        i++;
+    }
+
+    // emit mark phase end callback only after unused objects have been
+    // marked for deletion, i.e. that have been "sweeped", but not finalized yet.
+
+    if (rt->gcCallback)
+        (void) rt->gcCallback(cx, JSGC_MARK_END);
+
+    rt->gcRootsMarked = JS_FALSE;
+
+#ifdef GC_SWEEP_DEBUG_tobias
+    fprintf(stderr, "Sweep phase finished. Live Objects now = %d\n", rt->gcLiveObjects);
+#endif
+
+
+    JS_ASSERT(!rt->gcFirstUnsweptArena);
+
+    rt->gcFirstUnsweptArena = &rt->gcArenaPool.first;
+
+    if ((gcflags & GC_INTERRUPT_AFTER_MARK) && (gcflags & GC_LAST_CONTEXT) == 0) {
+        rt->gcInterruptionsInThisSweepPhase++;
+        goto out;
+    }
+
+finalize:
+
+    /**
+     * finalization phase. finalize all objects that are scanned but not reached.
+     * Finalize outside of rt->gcLock, but with rt->gcRunning set
+     * so that any attempt to allocate a GC-thing from a finalizer will fail,
+     * rather than nest badly and leave the unmarked newborn to be swept.
+     *
+     */
+
+#ifdef GC_FINALIZE_DEBUG_tobias
+    i = 0;
+    a = &rt->gcArenaPool.first;
+    while (a->next) {
+        if (rt->gcFirstUnsweptArena == a) {
+            break;
+        }
+        i++;
+        a = a->next;
+    }
+
+    fprintf(stderr, "starting to finalize from arena %d\n", i);
+#endif
+
+    ap = &rt->gcArenaPool.first.next;
+    a = *ap;
+
+    for (;  rt->gcFirstUnsweptArena && (myCount < minSweepObjects); rt->gcFirstUnsweptArena = rt->gcFirstUnsweptArena->next) {
+
+#ifdef GC_FINALIZE_DEBUG_tobias
+        fprintf(stderr, "now finalizing things in arena %d\n", i);
+#endif
+
+        flagp = (uint8 *) rt->gcFirstUnsweptArena->base;
+        split = (uint8 *) FIRST_THING_PAGE(rt->gcFirstUnsweptArena);
+        limit = (JSGCThing *) rt->gcFirstUnsweptArena->avail;
+        for (thing = (JSGCThing *) split; thing < limit; thing++) {
+            if (((jsuword)thing & GC_PAGE_MASK) == 0) {
+                flagp++;
+                thing++;
+            }
+            flags = *flagp;
+
+            if ((flags & GCF_SCANNED) && !(flags & (GCF_REACHED | GCF_LOCKMASK | GCF_FINAL))) {
+
                 /* Call the finalizer with GCF_FINAL ORed into flags. */
                 type = flags & GCF_TYPEMASK;
                 finalizer = gc_finalizers[type];
+
+#ifdef GC_FINALIZE_DEBUG_tobias_verbose
+                if (type == GCX_OBJECT) {
+                    fprintf(stderr, "finalizing object %p\n", thing);
+                    //printObj(cx, thing);
+                    fprintf(stderr, "\n");
+                } else if (type == GCX_STRING) {
+                    fprintf(stderr, "finalizing string ");
+                    printString(thing);
+                } else if (type == GCX_DOUBLE) {
+                    fprintf(stderr, "finalizing double value %g\n", *JSVAL_TO_DOUBLE((jsval)thing));
+                } else if (type == GCX_MUTABLE_STRING) {
+
+                    fprintf(stderr, "finalizing mutable string @%p ",thing);
+                    printString(thing);
+                }
+#endif
+
                 if (finalizer) {
                     *flagp = (uint8)(flags | GCF_FINAL);
                     if (type >= GCX_EXTERNAL_STRING)
@@ -1325,26 +1780,58 @@ restart:
 
                 rt->gcObjects--;
 
+                myCount++;
+                if ((myCount == minSweepObjects) && (rt->gcFirstUnsweptArena->next != NULL)) {
+                    rt->gcInterruptionsInThisSweepPhase++;
+#ifdef GC_FINALIZE_DEBUG_tobias
+                    fprintf(stderr, "interrupted finalization in arena %d\n", i);
+#endif
+                }
+
             }
             if (++flagp == split)
                 flagp += GC_THINGS_SIZE;
         }
+#ifdef GC_FINALIZE_DEBUG_tobias
+        i++;
+#endif
     }
 
     /*
      * Free phase.
      * Free any unused arenas and rebuild the JSGCThing freelist.
      */
+
+#ifdef GC_FREE_DEBUG_tobias
+    fprintf(stderr," Starting free phase...\n");
+
+    if (rt->gcLiveObjects != rt->gcObjects) {
+        fprintf(stderr, "js_GC: lastLiveObjects = %d, gcObjects = %d\n", lastLiveObjects, rt->gcObjects);
+    }
+#endif
+
     ap = &rt->gcArenaPool.first.next;
     a = *ap;
-    if (!a)
+    if (!a) {
+#ifdef GC_FREE_DEBUG_tobias
+        fprintf(stderr, "nothing to free.\n");
+#endif
         goto out;
+    }
+
     all_clear = JS_TRUE;
     flp = oflp = &rt->gcFreeList;
     *flp = NULL;
     METER(rt->gcStats.freelen = 0);
 
+#ifdef GC_FREE_DEBUG_tobias
+    i = 0;
+#endif
+
     do {
+#ifdef GC_FREE_DEBUG_tobias
+            fprintf(stderr, "freeing things in arena %d\n", i);
+#endif
         flagp = (uint8 *) a->base;
         split = (uint8 *) FIRST_THING_PAGE(a);
         limit = (JSGCThing *) a->avail;
@@ -1366,6 +1853,12 @@ restart:
         }
 
         if (all_clear) {
+#ifdef GC_FREE_DEBUG_tobias
+            fprintf(stderr, "destroying arena %d\n", i);
+#endif
+            if (a == rt->gcFirstUnsweptArena) {
+                rt->gcFirstUnsweptArena = a->next;
+            };
             JS_ARENA_DESTROY(&rt->gcArenaPool, a, ap);
             flp = oflp;
             METER(rt->gcStats.afree++);
@@ -1374,6 +1867,9 @@ restart:
             all_clear = JS_TRUE;
             oflp = flp;
         }
+#ifdef GC_FREE_DEBUG_tobias
+        i++;
+#endif
     } while ((a = *ap) != NULL);
 
     /* Terminate the new freelist. */
@@ -1382,17 +1878,26 @@ restart:
     if (rt->gcCallback)
         (void) rt->gcCallback(cx, JSGC_FINALIZE_END);
 
+#ifdef GC_FREE_DEBUG_tobias
+    fprintf(stderr, "js_GC: free phase finished.\n");
+#endif
+
+    rt->gcPoke = JS_FALSE;
+
 out:
     JS_LOCK_GC(rt);
     if (rt->gcLevel > 1) {
         rt->gcLevel = 1;
         JS_UNLOCK_GC(rt);
+#ifdef GC_DEBUG
+        fprintf(stderr, "js_GC: this gc was recursive. Restarting GC.\n");
+#endif
         goto restart;
     }
     js_EnablePropertyCache(cx);
     rt->gcLevel = 0;
     rt->gcLastBytes = rt->gcBytes;
-    rt->gcPoke = rt->gcRunning = JS_FALSE;
+    rt->gcRunning = JS_FALSE;
 
 #ifdef JS_THREADSAFE
     /* If we were invoked during a request, pay back the temporary debit. */
@@ -1411,4 +1916,99 @@ out:
         if (gcflags & GC_ALREADY_LOCKED)
             JS_LOCK_GC(rt);
     }
+#ifdef GC_MARK_DEBUG_tobias
+    fprintf(stderr, "js_GC: done for now.\n\n");
+#endif
 }
+
+void js_AdaptiveGC(JSContext *cx, uintN gcflags)
+{
+    uint32 maxCycles, cyclesForSweep, maxMarkObjects, minSweepObjects;
+    jsdouble throttle = 0.5;
+    JSRuntime *rt = cx->runtime;
+    JSBool inMarkPhaseBefore, inMarkPhaseAfter;
+#ifdef GC_STATS
+    cycles_t startTime, endTime;
+    char outstring[1024];
+#endif
+
+    inMarkPhaseBefore = (!rt->gcFirstUnsweptArena);
+
+    // calculate an estimate for the optimal number of gc calls between two cycles.
+    // depends on the ratio of avg live objects to avg allocation rate.
+
+    maxCycles = rt->gcAvgAllocRate > 1 ?  rt->gcAvgLiveObjects / rt->gcAvgAllocRate / throttle + 1 : 1;
+    maxMarkObjects = maxCycles > 1? (rt->gcAvgAllocRate + rt->gcAvgObjects / maxCycles) : (gcflags & GC_LAST_CONTEXT? 2000000000 : 2 * rt->gcAvgAllocRate);
+
+    rt->gcAvgAllocRate = (rt->gcAvgAllocRate * rt->gcAllocRateSamples + rt->gcNewObjects) / (rt->gcAllocRateSamples + 1);
+
+    if (rt->gcAllocRateSamples < maxCycles * 3) {
+        rt->gcAllocRateSamples++;
+    } else if (maxCycles && (rt->gcAllocRateSamples > maxCycles * 3)) {
+        rt->gcAllocRateSamples--;
+    }
+    rt->gcNewObjects = 0;
+
+    cyclesForSweep = maxCycles - rt->gcInterruptionsInLastMarkPhase;
+    if (cyclesForSweep < 1) {
+        cyclesForSweep = 1;
+    }
+
+    minSweepObjects = rt->gcAvgAllocRate + (rt->gcAvgAllocRate * rt->gcInterruptionsInLastMarkPhase + (rt->gcAvgObjects - rt->gcAvgLiveObjects) ) / cyclesForSweep;
+    if (maxCycles <= 1) {
+        minSweepObjects = rt->gcObjects;
+    }
+
+    JS_ASSERT(minSweepObjects > 0);
+
+#ifdef GC_STATS
+    sprintf(outstring, "cyc = %2d, maxCyc = %3d, #obj = %6d, avg #live obj = %6.1f, alloc rate = %6.1f. M %5d, S %5d",
+            rt->gcInterruptionsInLastMarkPhase + rt->gcInterruptionsInThisSweepPhase, maxCycles, rt->gcObjects, rt->gcAvgLiveObjects, rt->gcAvgAllocRate, maxMarkObjects, minSweepObjects);
+#endif
+
+#ifdef GC_STATS
+    startTime = js_get_cycles();
+#endif
+    js_IncrementalGC(cx, gcflags | GC_INTERRUPT_AFTER_MARK, maxMarkObjects, minSweepObjects);
+#ifdef GC_STATS
+    endTime = js_get_cycles();
+    fprintf(stderr, "js_AdaptiveGC: %s: %s, duration=%u\n", inMarkPhaseBefore?"M":"S", outstring, (uint32)(endTime-startTime));
+#endif
+
+    inMarkPhaseAfter = (!rt->gcFirstUnsweptArena);
+
+    if (rt->gcLiveObjects) {
+
+        rt->gcAvgLiveObjects = (rt->gcAvgLiveObjects * rt->gcLiveSamples + rt->gcLiveObjects) / (rt->gcLiveSamples + 1);
+
+        if (rt->gcLiveSamples < maxCycles) {
+            rt->gcLiveSamples++;
+        } else if (maxCycles > 0 && rt->gcLiveSamples > maxCycles) {
+            rt->gcLiveSamples--;
+        }
+    }
+
+    if (inMarkPhaseBefore && !inMarkPhaseAfter) {
+        // mark phase finished.
+
+#ifdef GC_STATS_verbose
+        fprintf(stderr, "mark phase finished after %d interruptions.\n", rt->gcInterruptionsInLastMarkPhase);
+#endif
+
+        rt->gcAvgObjects = (rt->gcAvgObjects * rt->gcAvgObjectSamples + rt->gcObjects) / (rt->gcAvgObjectSamples + 1);
+        if (rt->gcAvgObjectSamples < maxCycles * 10) {
+            rt->gcAvgObjectSamples++;
+        } else if (maxCycles > 0 && (rt->gcAvgObjectSamples > maxCycles * 10)) {
+            rt->gcAvgObjectSamples--;
+        }
+    }
+
+    if (!inMarkPhaseBefore && inMarkPhaseAfter) {
+        // finalize phase finished.
+#ifdef GC_STATS_verbose
+        fprintf(stderr, "finalize phase finished after %d interruptions.\n", rt->gcInterruptionsInThisSweepPhase);
+#endif
+        rt->gcInterruptionsInLastMarkPhase = 0;
+        rt->gcInterruptionsInThisSweepPhase = 0;
+    }
+};
