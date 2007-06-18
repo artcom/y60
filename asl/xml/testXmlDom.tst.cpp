@@ -40,6 +40,30 @@ using namespace std;
 using namespace dom;
 using namespace asl;
 
+class XmlDomCloneNodeUnitTest : public UnitTest {
+    public:
+        XmlDomCloneNodeUnitTest() : UnitTest("XmlDomCloneNodeUnitTest") {  }
+        void run() {
+            try {
+                dom::Node myElemNode(dom::Node::ELEMENT_NODE, "elem", 0);
+                myElemNode.appendChild(dom::Element("elemchild"));
+                dom::NodePtr myClonedNode = myElemNode.cloneNode(dom::Node::DEEP);
+                ENSURE(myClonedNode->nodeType() == dom::Node::ELEMENT_NODE);
+                ENSURE(myClonedNode->nodeName() == "elem");
+                ENSURE(myClonedNode->childNodesLength() == 1);
+                ENSURE(myClonedNode->firstChild()->parentNode()->nodeName() == "elem");
+            }
+            catch (asl::Exception & e) {
+                std::cerr << "#### failure:" << e << std::endl;
+                FAILURE("Exception");
+            }
+            catch (...) {
+                std::cerr << "#### unknown exception occured" <<  std::endl;
+                FAILURE("unknown Exception");
+            }
+        }
+};
+
 class XmlDomUnitTest : public UnitTest {
     public:
         XmlDomUnitTest() : UnitTest("XmlDomUnitTest") {  }
@@ -1215,11 +1239,11 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-#if 1
+
         addTest(new XmlDomUnitTest);
+        addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
-        addTest(new XmlSchemaUnitTest);
-#endif
+        //addTest(new XmlSchemaUnitTest);
         //addTest(new XmlPatchUnitTest);
     }
 };

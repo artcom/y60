@@ -43,7 +43,7 @@ SingletonManager::destroyAllSingletons() {
 //        cerr << "  --- Already gone" << endl;
         return;
     }
-    cerr << "Destroying singletons." << endl;
+//    cerr << "Destroying singletons." << endl;
     mySingletonManagerDestroyed = true;
     _mySingletonMap.clear();
 

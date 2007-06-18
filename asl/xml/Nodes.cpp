@@ -1282,6 +1282,7 @@ NodePtr
 dom::Node::cloneNode(CloneDepth depth, Node * theParent) const {
     if (depth == DEEP) {
         NodePtr myResult(new Node(*this, theParent));
+        myResult->self(NodeWeakPtr(myResult));
         //myResult->_myParent = theParent;
         return myResult;
     }
