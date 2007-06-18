@@ -75,7 +75,7 @@ StatusServer::processData() {
             } else {
                 sendResponseHeader(200);
             }
-            sendResponseBody(string("rev: ")+asl::ourRevision+", perf: "+asl::as_string(myElapsed));
+            sendResponseBody(string("Y60 rev: ")+asl::ourRevision+", perf: "+asl::as_string(myElapsed));
         } else if (myURL == "revision") {
             sendResponseHeader(200);
             sendResponseBody(asl::ourRevision);
