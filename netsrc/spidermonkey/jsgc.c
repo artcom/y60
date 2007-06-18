@@ -1128,7 +1128,9 @@ js_AppendToGreyList(JSContext *cx, jsval val, void *arg) {
             uint32 oldLength = rt->gcGreyListPtr - rt->gcGreyListBase;
             uint32 newLength = oldLength * 2;
 
+#ifdef GC_MARK_DEBUG_tobias
             fprintf(stderr, "resizing grey list to %d entries\n", newLength);
+#endif
 
             rt->gcGreyListBase = realloc(rt->gcGreyListBase, newLength*sizeof(jsval));
             rt->gcGreyListLimit = rt->gcGreyListBase + newLength;
@@ -1207,7 +1209,6 @@ js_ForceGC(JSContext *cx, uintN gcflags)
 
     rt = cx->runtime;
 
-    /*
     // clear gc state:
     // set all black and grey objects white
     for (a = &rt->gcArenaPool.first; a; a = a->next) {
@@ -1235,7 +1236,6 @@ js_ForceGC(JSContext *cx, uintN gcflags)
     rt->gcRootsMarked = JS_FALSE;
     // clear grey list:
     rt->gcGreyListPtr = rt->gcGreyListBase;
-    */
 
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
