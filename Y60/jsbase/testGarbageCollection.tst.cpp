@@ -104,7 +104,7 @@ public:
         for (char **fileName = filenames; *fileName; fileName++) {
             init();
             runTestScript(*fileName);
-            cleanup(true);
+            cleanup(false);
             fprintf(outfile, "%s\t%d\n", *fileName, rt->gcObjects);
         }
         fclose(outfile);
@@ -127,12 +127,12 @@ public:
             init();
             checkInit();
             runTestScript(fileName);
-            cleanup(true);
+            cleanup(false);
             checkCleanup(magicNumber);
 
             init();
             runTestScript(fileName);
-            cleanup(false);
+            cleanup(true);
             checkCleanup(magicNumber);
         }
     }
@@ -156,19 +156,16 @@ public:
         // actually, we don't check anything here.
     }
 
-    void cleanup(bool force = true) {
+    void cleanup(bool incremental = false) {
         JS_ClearScope(cx, globalObject);
 
-	if (!force) {
-            // XXX überleg dir dazu mal nen Kommentar, Tobi.
-	    for (int i = 0; i < 2; i++) {
-		int j = 1000;
-		while (!(JS_IncrementalGC(cx, 1000)) && --j > 0);
-		ENSURE_MSG((j >= 0), "GC cycles < 1000");
-	    };
-	} else {
-	    JS_GC(cx);
+	if (incremental) {
+            int j = 10000;
+	    while (!(JS_IncrementalGC(cx, 100)) && --j > 0);
+	    ENSURE_MSG((j >= 0), "GC cycles < 1000");
 	}
+        // finally, do a full forced gc to get rid of newborns and the like.
+        JS_GC(cx);
     }
 
     void checkCleanup(unsigned theFinalObjectCount) {
