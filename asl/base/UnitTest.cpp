@@ -24,8 +24,12 @@
 #include "console_functions.h"
 
 #ifdef WIN32
-#include <windows.h>
-#include <io.h>
+#   include <windows.h>
+#   include <io.h>
+#endif
+
+#ifndef WIN32
+#   include "signal_functions.h"
 #endif
 
 using namespace std;
@@ -233,6 +237,9 @@ UnitTestSuite::run() {
     try {
         try {
             asl::Exception::initExceptionBehaviour();
+#ifndef WIN32
+            asl::initSignalHandling();
+#endif
             setup();
         } catch (std::exception & e) {
             std::cerr << TTYRED << "## A std::exception occured during setup of test suite '"

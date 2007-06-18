@@ -34,6 +34,9 @@
 #include <asl/Logger.h>
 #include <asl/Revision.h>
 #include <asl/numeric_functions.h>
+#ifndef WIN32
+#   include <asl/signal_functions.h>
+#endif
 
 #include <js/jsapi.h>
 #include <js/jsprf.h>
@@ -1442,6 +1445,10 @@ JSApp::run(const std::string & theScriptFilename,
 {
 
     Exception::initExceptionBehaviour();
+#ifndef WIN32
+    asl::initSignalHandling();
+#endif
+
 
     JSObject *glob;
     JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection

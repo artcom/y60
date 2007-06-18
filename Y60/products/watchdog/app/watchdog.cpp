@@ -31,6 +31,9 @@
 #include <asl/Exception.h>
 #include <asl/Arguments.h>
 #include <asl/Time.h>
+#ifndef WIN32
+#   include <asl/signal_functions.h>
+#endif
 
 
 #ifdef WIN32
@@ -390,6 +393,9 @@ main(int argc, char* argv[] ) {
     }
 
     asl::Exception::initExceptionBehaviour();
+#ifndef WIN32
+    asl::initSignalHandling();
+#endif
     
     WatchDog myHasso;
     bool mySuccess = myHasso.init(myConfigDoc);
