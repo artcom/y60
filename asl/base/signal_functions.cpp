@@ -10,6 +10,10 @@ using namespace std;
 
 namespace asl {
 
+#ifdef OSX
+typedef sig_t sighandler_t;
+#endif
+
 void traceAndReraiseSignal(int theSignal);
 
 void initSignalHandling() {
