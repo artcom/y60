@@ -49,7 +49,7 @@ extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Extend the Box to minimally include a given point/box.");
     DOC_PARAM("theExtensionPoint", "a point defining the resulting extension", DOC_TYPE_POINT3F);
     DOC_RESET;
-    DOC_PARAM("theExtensionBox", "a box defining the resulting extension", DOC_TYPE_POINT3F);
+    DOC_PARAM("theExtensionBox", "a box defining the resulting extension", DOC_TYPE_BOX3F);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {

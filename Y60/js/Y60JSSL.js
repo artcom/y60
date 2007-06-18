@@ -399,6 +399,41 @@ function getDescendantByNameChecked(theNode, theName, theDeepFlag) {
     return myResult;
 }
 
+function removeAttributeByName(theNode, theAttributeName) {
+    var myCopyNode   = Node.createElement(theNode.nodeName);
+    var myAttributes = theNode.attributes;
+    for (var j = 0; j < myAttributes.length; ++j) {
+        var myName = myAttributes[j].nodeName;
+        if (myName != theAttributeName) {
+            myCopyNode[myName] = theNode[myName];
+        }
+    }
+    var myChildNodesLength = theNode.childNodesLength();
+    for (var j = myChildNodesLength - 1; j >= 0; --j) {
+        myCopyNode.appendChild(theNode.childNode(j));
+    }
+    var myParentNode = theNode.parentNode;
+    if (myParentNode) {
+        myParentNode.appendChild(myCopyNode);
+        myParentNode.removeChild(theNode);
+    }
+    return myCopyNode;
+}
+
+function removeAllAttributes(theNode) {
+    var myCopyNode   = Node.createElement(theNode.nodeName);
+    var myChildNodesLength = theNode.childNodesLength();
+    for (var j = myChildNodesLength - 1; j >= 0; --j) {
+        myCopyNode.appendChild(theNode.childNode(j));
+    }
+    var myParentNode = theNode.parentNode;
+    if (myParentNode) {
+        myParentNode.appendChild(myCopyNode);
+        myParentNode.removeChild(theNode);
+    }
+    return myCopyNode;
+}
+
 function getPropertyValue() {
     var myNode = getDescendantByName(thePropertiesNode, theProperty);
     if (!myNode) {
