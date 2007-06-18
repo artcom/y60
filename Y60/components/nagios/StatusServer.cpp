@@ -12,6 +12,7 @@
 
 #include "StatusServer.h"
 #include <asl/string_functions.h>
+#include <asl/Revision.h>
 
 using namespace asl;
 using namespace std;
@@ -74,7 +75,10 @@ StatusServer::processData() {
             } else {
                 sendResponseHeader(200);
             }
-            sendResponseBody(asl::as_string(myElapsed));
+            sendResponseBody(string("rev: ")+asl::ourRevision+", perf: "+asl::as_string(myElapsed));
+        } else if (myURL == "revision") {
+            sendResponseHeader(200);
+            sendResponseBody(asl::ourRevision);
         } else {
             sendResponseHeader(404);
             sendResponseBody("not found");
