@@ -68,6 +68,18 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     obj.synchronize = function() {
+        if ( _mySyncFlag ) {
+            fetchPresentation();
+        } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
+            Logger.warning("CMS synchronization disabled.");
+            Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
+            _myPresentation = Node.createDocument();
+            _myPresentation.parseFile( _myLocalFallback );
+        } else {
+            throw new Exception("Local fallback presentation file not found at '" +
+                    _myLocalFallback+"'.", fileline());
+        }
+
         ensureCMSCache();
 
         if ( _mySyncFlag ) {
@@ -139,7 +151,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     function fetchPresentation() {
-        
+
         _myPresentation = Node.createDocument();
         var myErrorOccurred = false;
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
@@ -167,6 +179,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             if (_myVersionTag && _myVersionTag.length) {
                 myRequestURI += "?versionTag=" + _myVersionTag;
             }
+
+            Logger.debug("Sending request '" + myRequestURI + "'");
             var myPresentationRequest = new Request( myRequestURI, _myUserAgent );
             var myCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
             verboseZope("Login request cookies:");
@@ -238,42 +252,21 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
         _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
 
-        if ( "localfallback" in myZopeConfig &&
-             myZopeConfig.localfallback.length )
-        {
+        if ( "localfallback" in myZopeConfig && myZopeConfig.localfallback.length ) {
             _myLocalFallback = myZopeConfig.localfallback;
-
         }
 
-        if ("useragent" in _myConfig &&
-            _myConfig.useragent.length)
-        {
+        if ("useragent" in _myConfig && _myConfig.useragent.length) {
             _myUserAgent = _myConfig.useragent;
         }
 
-        if ("sync" in _myConfig &&
-            _myConfig.sync)
-        {
+        if ("sync" in _myConfig && _myConfig.sync) {
             _mySyncFlag = Number(_myConfig.sync) > 0;
         }
 
-        if ("versiontag" in myZopeConfig &&
-            myZopeConfig.versiontag)
-        {
+        if ("versiontag" in myZopeConfig && myZopeConfig.versiontag) {
             _myVersionTag = myZopeConfig.versiontag;
         }
-        if ( _mySyncFlag ) {
-            fetchPresentation();
-        } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
-           Logger.warning("CMS synchronization disabled.");
-           Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
-            _myPresentation = Node.createDocument();
-            _myPresentation.parseFile( _myLocalFallback );
-        } else {
-            throw new Exception("Local fallback presentation file not found at '" +
-                                _myLocalFallback+"'.", fileline());
-        }
-
     }
 
     function verboseZope( theMessage ) {
