@@ -616,7 +616,7 @@ SceneExporter::exportCamera(const MFnDagNode & theDagNode, WorldBuilderBase & th
     if (isVisible(theDagNode) || myCameraName == "perspShape") {
         CameraBuilder myCameraBuilder(myCameraName);
 
-        float myHFov = asl::degFromRad(myMCamera.horizontalFieldOfView());
+        float myHFov = float(asl::degFromRad(myMCamera.horizontalFieldOfView()));
         myCameraBuilder.setHFov(myHFov);
         myCameraId = theParentTransform.appendObject(myCameraBuilder);
 

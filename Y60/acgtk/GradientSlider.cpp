@@ -33,8 +33,8 @@ GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
         if (_mySelectedColor) {
             mySelectedCenter = _mySelectedColor->getAttributeValue<int>("value");
             mySelectedWidth = _mySelectedColor->getAttributeValue<int>("width");
-            int myXStart = convertValueToScreenPos(mySelectedCenter - 0.25 * mySelectedWidth);
-            int myXEnd = convertValueToScreenPos(mySelectedCenter + 0.25 * mySelectedWidth);
+            int myXStart = convertValueToScreenPos(float(mySelectedCenter) - 0.25f * float(mySelectedWidth));
+            int myXEnd = convertValueToScreenPos(float(mySelectedCenter) + 0.25f * float(mySelectedWidth));
 
             _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0, 
                     myXEnd - myXStart, get_allocation().get_height());
@@ -44,14 +44,14 @@ GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
         for (unsigned i = 0; i < _myTransferFunction->childNodesLength(); ++i) {
             if (_myTransferFunction->childNode(i) != _mySelectedColor) {
                 myCenter = _myTransferFunction->childNode(i)->getAttributeValue<int>("value");
-                drawMarker(myCenter, get_style()->get_black_gc());
+                drawMarker(float(myCenter), get_style()->get_black_gc());
             }
         }
         if (_mySelectedColor) {
-            drawMarker(mySelectedCenter, get_style()->get_black_gc(), get_style()->get_white_gc());
-            drawMarker(mySelectedCenter + 0.25 * mySelectedWidth, get_style()->get_white_gc(),
+            drawMarker(float(mySelectedCenter), get_style()->get_black_gc(), get_style()->get_white_gc());
+            drawMarker(float(mySelectedCenter) + 0.25f * float(mySelectedWidth), get_style()->get_white_gc(),
                     get_style()->get_black_gc());
-            drawMarker(mySelectedCenter - 0.25 * mySelectedWidth, get_style()->get_white_gc(),
+            drawMarker(float(mySelectedCenter) - 0.25f * float(mySelectedWidth), get_style()->get_white_gc(),
                     get_style()->get_black_gc());
         }
     }
@@ -82,9 +82,9 @@ GradientSlider::on_button_press_event(GdkEventButton * theEvent) {
     if (_mySelectedColor) {
         int myCenter = _mySelectedColor->getAttributeValue<int>("value");
         int myWidth = _mySelectedColor->getAttributeValue<int>("width");
-        int myCenterMarkerPos = convertValueToScreenPos(myCenter);
-        int myLeftMarkerPos = convertValueToScreenPos(myCenter -  0.25 * myWidth);
-        int myRightMarkerPos = convertValueToScreenPos(myCenter + 0.25 * myWidth);
+        int myCenterMarkerPos = convertValueToScreenPos(float(myCenter));
+        int myLeftMarkerPos = convertValueToScreenPos(float(myCenter) -  0.25f * float(myWidth));
+        int myRightMarkerPos = convertValueToScreenPos(float(myCenter) + 0.25f * float(myWidth));
         if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
             _myState = CHANGE_WIDTH_LEFT;
         } else if (intersectWithMarker(theEvent, myRightMarkerPos)) {
@@ -98,7 +98,7 @@ GradientSlider::on_button_press_event(GdkEventButton * theEvent) {
         for (unsigned i = 0; i < _myTransferFunction->childNodesLength("color"); ++i) {
             if (_myTransferFunction->childNode(i) != _mySelectedColor) {
                 int myCenter = _myTransferFunction->childNode(i)->getAttributeValue<int>("value");
-                if (intersectWithMarker(theEvent, convertValueToScreenPos( myCenter ))) {
+                if (intersectWithMarker(theEvent, convertValueToScreenPos(float(myCenter)))) {
                     _myState = CHANGE_SELECTION;
                     _mySelectionCandidate = _myTransferFunction->childNode(i);
                 }
@@ -112,7 +112,7 @@ bool
 GradientSlider::on_button_release_event(GdkEventButton * theEvent) {
     if (_myState == CHANGE_SELECTION && _mySelectionCandidate) {
         int myCenter = _mySelectionCandidate->getAttributeValue<int>("value");
-        if (intersectWithMarker(theEvent, convertValueToScreenPos( myCenter ))) {
+        if (intersectWithMarker(theEvent, convertValueToScreenPos(float(myCenter)))) {
             _mySelectedColor = _mySelectionCandidate;
             _mySelectionChangedSignal.emit();
             queue_draw();
@@ -230,7 +230,7 @@ GradientSlider::convertScreenPosToValue(const int & theScreenPos) {
 
 bool
 GradientSlider::intersectWithMarker(GdkEventButton * theEvent, int theMarkerPos) {
-    float myHTriangleBase = 0.5 * get_allocation().get_height();
+    float myHTriangleBase = 0.5f * get_allocation().get_height();
     if (theEvent->x > (theMarkerPos - myHTriangleBase) &&
         theEvent->x < (theMarkerPos + myHTriangleBase))
     {

@@ -63,7 +63,7 @@ bool
 CWRuler::on_button_press_event(GdkEventButton * theEvent) {
     //cerr << "CWRuler::on_button_press_event()" << endl;
 
-    float myHWindowWidth = 0.5 * _myWindowWidth;
+    float myHWindowWidth = 0.5f * _myWindowWidth;
 
 
     if (_myMode == MODE_CENTER_WIDTH) {
@@ -162,7 +162,7 @@ CWRuler::on_expose_event(GdkEventExpose * theEvent) {
     _myWindow->clear();
 
     if (_myMode == MODE_CENTER_WIDTH) {
-        float myHWindowWidth = 0.5 * _myWindowWidth;
+        float myHWindowWidth = 0.5f * _myWindowWidth;
 
         int myXStart = convertValueToScreenPos(_myWindowCenter - myHWindowWidth);
         int myXEnd = convertValueToScreenPos(_myWindowCenter + myHWindowWidth);
@@ -218,7 +218,7 @@ CWRuler::convertScreenPosToValue(const int & theScreenPos) {
 
 bool
 CWRuler::intersectWithMarker(GdkEventButton * theEvent, int theMarkerPos) {
-    float myHTriangleBase = 0.5 * get_allocation().get_height();
+    float myHTriangleBase = 0.5f * get_allocation().get_height();
     if (theEvent->x > (theMarkerPos - myHTriangleBase) &&
         theEvent->x < (theMarkerPos + myHTriangleBase))
     {

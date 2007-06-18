@@ -175,10 +175,6 @@ public:
         myVector.push_back(asl::Vector3d(1,2,3));
         myVector.push_back(asl::Vector3d(4,5,6));
         addTest(new XmlVectorValueUnitTest<VectorOfVector3d>("VectorOfVector3d",myVector));
-
-        // [DS] try to trigger bug 91 ... to be continued
-        //y60::VectorOfString myEmptyStringVector;
-        //addTest(new XmlVectorValueUnitTest<y60::VectorOfString>("VectorOfString",myEmptyStringVector));
    
         std::string myFeatureString = "[10[bla,blub],11[huhu],23[none]]";
         y60::VectorOfRankedFeature myFeatureVector = asl::as<y60::VectorOfRankedFeature>(myFeatureString);

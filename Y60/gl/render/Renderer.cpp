@@ -403,12 +403,6 @@ MAKE_SCOPE_TIMER(switchMaterial);
         const RenderStyles & myPrimitveStyle = myPrimitive.getRenderStyles();
         const RenderStyles & myShapeStyle    = myShape.get<RenderStyleTag>();
 
-        // if there are primitive-level styles, use them instead of the shape level
-#if 0 // disabled because of bug#91
-        if ( !myShapeStyle.empty() && !myPrimitveStyle.empty()) {
-            AC_WARNING << "Primitive styles overridding shape style. Style accumulation not implemented yet";
-        }
-#endif
         const RenderStyles & myRenderStyles  = myPrimitveStyle.any() ? myPrimitveStyle : myShapeStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
 
@@ -1075,17 +1069,14 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         dom::NodePtr myPlaneNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
-            // XXX Workaround for Bug 91
-            //if ( ! myPlaneIds[i].empty()) {
-                myPlaneNode = theNode->getElementById( myPlaneIds[i] );
-                if (!myPlaneNode) {
-                    throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
-                        "' for node " + theNode->nodeName() + " with id '" +
-                        theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
-                }
-                PlanePtr myPlane = myPlaneNode->getFacade<Plane>();
-                theClippingPlanes.push_back( myPlane->get<GlobalPlaneTag>());
-            //}
+            myPlaneNode = theNode->getElementById( myPlaneIds[i] );
+            if (!myPlaneNode) {
+                throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
+                    "' for node " + theNode->nodeName() + " with id '" +
+                    theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
+            }
+            PlanePtr myPlane = myPlaneNode->getFacade<Plane>();
+            theClippingPlanes.push_back( myPlane->get<GlobalPlaneTag>());
         }
     }
 
