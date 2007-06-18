@@ -1209,6 +1209,7 @@ js_ForceGC(JSContext *cx, uintN gcflags)
 
     rt = cx->runtime;
 
+    /*
     // clear gc state:
     // set all black and grey objects white
     for (a = &rt->gcArenaPool.first; a; a = a->next) {
@@ -1236,6 +1237,7 @@ js_ForceGC(JSContext *cx, uintN gcflags)
     rt->gcRootsMarked = JS_FALSE;
     // clear grey list:
     rt->gcGreyListPtr = rt->gcGreyListBase;
+    */
 
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
