@@ -895,7 +895,7 @@ gc_mark_atom_key_thing(void *thing, void *arg)
 {
     JSContext *cx = (JSContext *) arg;
 
-    GC_GREY(cx, OBJECT_TO_JSVAL(thing), "atom", NULL);
+    GC_MARK(cx, OBJECT_TO_JSVAL(thing), "atom", NULL);
 }
 
 void
@@ -1058,7 +1058,7 @@ js_MarkValue(JSContext *cx, jsval val, void *arg)
         //str = (JSString *)thing;
 
         if (JSSTRING_IS_DEPENDENT(str))
-            GC_GREY(cx, STRING_TO_JSVAL(JSSTRDEP_BASE(str)), "base", arg);
+            GC_MARK(cx, STRING_TO_JSVAL(JSSTRDEP_BASE(str)), "base", arg);
         break;
     }
 
@@ -1206,7 +1206,8 @@ js_ForceGC(JSContext *cx, uintN gcflags)
     cx->lastAtom = NULL;
 
     rt = cx->runtime;
-   
+
+    /*
     // clear gc state:
     // set all black and grey objects white
     for (a = &rt->gcArenaPool.first; a; a = a->next) {
@@ -1219,10 +1220,6 @@ js_ForceGC(JSContext *cx, uintN gcflags)
                 thing++;
             }
             flags = *flagp;
-            // all reached objects must have been scanned, all others must not.
-            JS_ASSERT(((flags & GCF_SCANNED) && (flags & GCF_REACHED)) ||
-                (!(flags & GCF_SCANNED) && !(flags & GCF_REACHED)));
-
             if ((flags & GCF_REACHED)) {
                 // black or grey
                 *flagp &= ~(GCF_SCANNED|GCF_REACHED);
@@ -1238,7 +1235,9 @@ js_ForceGC(JSContext *cx, uintN gcflags)
     rt->gcRootsMarked = JS_FALSE;
     // clear grey list:
     rt->gcGreyListPtr = rt->gcGreyListBase;
+    */
 
+    js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     JS_ArenaFinish();
 }
@@ -1250,7 +1249,7 @@ js_ForceGC(JSContext *cx, uintN gcflags)
         for (_vp = vec, _end = _vp + len; _vp < _end; _vp++) {                \
             _v = *_vp;                                                        \
             if (JSVAL_IS_GCTHING(_v) && (_v != JSVAL_NULL))                   \
-                GC_GREY(cx, _v, name, NULL);                                  \
+                GC_MARK(cx, _v, name, NULL);                                  \
         }                                                                     \
     JS_END_MACRO
 
@@ -1524,11 +1523,11 @@ mark:
         for (fp = chain; fp; fp = chain = chain->dormantNext) {
             do {
                 if (fp->callobj)
-                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->callobj), "call object", NULL);
+                    GC_MARK(cx, OBJECT_TO_JSVAL(fp->callobj), "call object", NULL);
                 if (fp->argsobj)
-                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->argsobj), "arguments object", NULL);
+                    GC_MARK(cx, OBJECT_TO_JSVAL(fp->argsobj), "arguments object", NULL);
                 if (fp->varobj)
-                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->varobj), "variables object", NULL);
+                    GC_MARK(cx, OBJECT_TO_JSVAL(fp->varobj), "variables object", NULL);
                 if (fp->script) {
                     js_MarkScript(cx, fp->script, NULL);
                     if (fp->spbase) {
@@ -1554,12 +1553,12 @@ mark:
                     GC_MARK_JSVALS(cx, nslots, fp->argv, "arg");
                 }
                 if (JSVAL_IS_GCTHING(fp->rval))
-                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->rval), "rval", NULL);
+                    GC_MARK(cx, OBJECT_TO_JSVAL(fp->rval), "rval", NULL);
                 if (fp->vars)
                     GC_MARK_JSVALS(cx, fp->nvars, fp->vars, "var");
                 GC_GREY(cx, OBJECT_TO_JSVAL(fp->scopeChain), "scope chain", NULL);
                 if (fp->sharpArray)
-                    GC_GREY(cx, OBJECT_TO_JSVAL(fp->sharpArray), "sharp array", NULL);
+                    GC_MARK(cx, OBJECT_TO_JSVAL(fp->sharpArray), "sharp array", NULL);
 
                 if (fp->objAtomMap) {
                     JSAtom **vector, *atom;
@@ -1593,11 +1592,11 @@ mark:
             GC_MARK_ATOM(cx, acx->lastAtom, NULL);
 #if JS_HAS_EXCEPTIONS
         if (acx->throwing && JSVAL_IS_GCTHING(acx->exception))
-            GC_GREY(cx, acx->exception, "exception", NULL);
+            GC_MARK(cx, acx->exception, "exception", NULL);
 #endif
 #if JS_HAS_LVALUE_RETURN
         if (acx->rval2set && JSVAL_IS_GCTHING(acx->rval2))
-            GC_GREY(cx, acx->rval2, "rval2", NULL);
+            GC_MARK(cx, acx->rval2, "rval2", NULL);
 #endif
 
         for (sh = acx->stackHeaders; sh; sh = sh->down) {
