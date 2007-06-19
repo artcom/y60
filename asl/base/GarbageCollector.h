@@ -100,9 +100,9 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 
     // This class manages a set of T using a vector of ranges. It is about ten times faster than std::set for
     // consecutive linear order insertion and deletion for ranges of any size, and as fast a std::set for up to
-    // 10000 random insertions and deletion out of a set of 10000 elements. With 100000 random insertion it is ten
-    // times slower.
-    // However, in any case it requires much less memory than std::set, in extreme cases it requires only four words
+    // 10000 random insertions and deletion out of a set of 10000 elements. With 100000 random insertions it is ten
+    // times slower. For sets smaller than 1000 elements insertion and deletion it is much faster for any usage pattern.
+    // And in any case it requires less memory than std::set, in extreme cases it requires only four words
     // to store a range of arbitrary size.
     template <class T>
     class RangeSet {
@@ -346,9 +346,11 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         typedef std::set<CollectablePtrBase<ThreadingModel, Allocator>*> PtrSet;
 #else
         typedef RangeSet<CollectablePtrBase<ThreadingModel, Allocator>*> PtrSet;
+        typedef RangeSet<void*> HeapMemSet;
 #endif
-        PtrSet myPtrs;
+        PtrSet myPtrs; // contains Ptrs to all CollectablePtrs contained in this object
         CollectorColor myColor;
+        
 
         std::ostream & print(std::ostream & os) const {
             os << "ObjDesc@" << (void*)this<<" ->"<<myNativePtr<<"["<<mySize<<"] smart="<< smartCount
@@ -376,9 +378,19 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 
     };     
     template <class ThreadingModel, class Allocator>
-    std::ostream & operator<<(std::ostream & os, const ObjectDescriptor<ThreadingModel, Allocator> & theColor) {
-        return theColor.print(os);
+    std::ostream & operator<<(std::ostream & os, const ObjectDescriptor<ThreadingModel, Allocator> & theDescriptor) {
+        return theDescriptor.print(os);
     }
+    template <class ThreadingModel, class Allocator>
+    std::ostream & operator<<(std::ostream & os, const ObjectDescriptor<ThreadingModel, Allocator> * theDescriptor) {
+        if (theDescriptor) {
+            return theDescriptor->print(os);
+        }
+        else {
+            return os << "0";
+        }
+    }
+
 
     template <class Threading> class CollectablePtrAllocator;
   
@@ -435,6 +447,31 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
             return (char*)s1 < (char*)s2;
         }
     };
+
+    struct MemKey {
+        MemKey(void * theMemory, unsigned theSize) : myMemory(theMemory), mySize(theSize) {}
+        MemKey(const MemKey & theKey) :  myMemory(theKey.myMemory), mySize(theKey.mySize) {}
+        MemKey & operator=(const MemKey & theKey) {
+            myMemory=theKey.myMemory;
+            mySize=theKey.mySize;
+        }
+
+        void * myMemory;
+        unsigned mySize;
+    };
+    
+    struct LessThanMemKey
+    {
+        bool operator()(const MemKey & s1,
+                        const MemKey & s2) const
+        {
+            return (char*)s1.myMemory < (char*)s2.myMemory;
+        }
+    };
+
+    template <class ThreadingModel, class RefCountAllocator>
+    struct CollectableWeakPtrBase;
+ 
     template <class T,
               class ThreadingModel=MultiProcessor,
               class RefCountAllocator=CollectablePtrAllocator<ThreadingModel> >
@@ -445,10 +482,12 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
     template <class ThreadingModel, class Allocator>
     struct Collector : public Singleton<Collector<ThreadingModel, Allocator> > {
         typedef std::map<void *, ObjectDescriptor<ThreadingModel, Allocator>*> CollectableObjectMap;
+        typedef std::map<MemKey, ObjectDescriptor<ThreadingModel, Allocator>*,LessThanMemKey> DependendMemoryMap;
         typedef std::set<CollectablePtrBase<ThreadingModel, Allocator>*,
                          LessThanCollectablePtrBase<ThreadingModel, Allocator> > RootedObjectMap;
 
         CollectableObjectMap ourCollectableMap;
+        DependendMemoryMap ourMemoryMap;
         RootedObjectMap ourRootedObjectMap;
         unsigned numObjectsInUse;
        
@@ -487,7 +526,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
   
         // called to find if a new CollectablePtr is part of a collectable container object
-        ObjectDescriptor<ThreadingModel, Allocator> * findLocation(void * thePtrLocation)
+        ObjectDescriptor<ThreadingModel, Allocator> * findLocationInObject(void * thePtrLocation)
         {
            if (ourCollectableMap.size() == 0) {
                DBP2(std::cerr << "findLocationInObject: empty list, obj not found" <<  std::endl);
@@ -510,7 +549,37 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
            DBP2(std::cerr << "findLocationInObject: not found" <<  std::endl);
            return 0;
        }
-        // called to find if a new CollectablePtr is part of a collectable container object
+        ObjectDescriptor<ThreadingModel, Allocator> * findLocationInDependendMemory(void * theLocation)
+        {
+           if (ourMemoryMap.size() == 0) {
+               DBP2(std::cerr << "findLocationInDependendMemory: empty list, obj not found" <<  std::endl);
+               return 0;
+           }
+           ;
+           typename DependendMemoryMap::iterator notLessThanThePtrLocation = ourMemoryMap.upper_bound(MemKey(theLocation,0));
+           --notLessThanThePtrLocation;
+           DBP2(std::cerr << "findLocationInDependendMemory: theLocation="<< theLocation <<  std::endl);
+           DBP2(std::cerr << "findLocationInDependendMemory: notLessThanThePtrLocation="<< (void*)&*notLessThanThePtrLocation <<  std::endl);
+           DBP2(std::cerr << "findLocationInDependendMemory: ourMemoryMap.end()="<< (void*)(&*ourMemoryMap.end()) <<  std::endl);
+           if (notLessThanThePtrLocation != ourMemoryMap.end()) {
+               char * myMemoryLocation = (char*)notLessThanThePtrLocation->first.myMemory;
+               if ((char*)theLocation >= myMemoryLocation &&
+                   (char*)theLocation <  myMemoryLocation + notLessThanThePtrLocation->first.mySize) {
+                    DBP2(std::cerr << "findLocationInDependendMemory: found" <<  std::endl);
+                   return notLessThanThePtrLocation->second;
+               }
+           }
+           DBP2(std::cerr << "findLocationInDependendMemory: not found" <<  std::endl);
+           return 0;
+       }
+        ObjectDescriptor<ThreadingModel, Allocator> * findLocation(void * thePtrLocation) {
+            ObjectDescriptor<ThreadingModel, Allocator> * myResult = findLocationInObject(thePtrLocation);
+            if (!myResult) {
+                myResult = findLocationInDependendMemory(thePtrLocation);
+            }
+            return myResult;
+        }
+         // search the object map 
         bool findObject(Collectable<ThreadingModel, Allocator> * theObject) {
            DBP2(std::cerr << "findObject: theObject="<< theObject <<  std::endl);
             typename CollectableObjectMap::iterator it = ourCollectableMap.find(theObject);
@@ -647,13 +716,15 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 #ifdef USE_STD_SET
                 for (typename ObjectDescriptor<ThreadingModel, Allocator>::PtrSet::iterator pit=getInfo(it).myPtrs.begin();
                         pit!=getInfo(it).myPtrs.end(); ++pit) {
-                    std::cerr << "---- @"<< (void*)(*pit) << ", +"<< (char*)(*pit) - (char*)(it->first)<< std::endl;
+                    int myOffset = (char*)(*pit) - (char*)(it->first);
+                    std::cerr << "---- @"<< (void*)(*pit) << ", "<<(myOffset>=0 ? "+":"") << myOffset<< std::endl;
                 }
 #else
                 CollectablePtrBase<ThreadingModel, Allocator> * myElem;
                 if (getInfo(it).myPtrs.getFirst(myElem)) {
                     do {
-                        std::cerr << "---- @"<< (void*)(myElem) << ", +"<< (char*)(myElem) - (char*)(it->first)<< std::endl;
+                        int myOffset = (char*)(myElem) - (char*)(it->first);
+                        std::cerr << "---- @"<< (void*)(myElem) << ", "<< ((myOffset>=0) ? "+" : "") << myOffset<<", "<< myElem->myDescriptorPtr <<std::endl;
                     } while (getInfo(it).myPtrs.advance(myElem));
                 }
 #endif
@@ -787,7 +858,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         operator!=(const StandardContainerAllocator<T> &, const StandardContainerAllocator<T> &)
         { return false; }
 
-    template<typename T>
+    template<typename T, class ThreadingModel, class Allocator=CollectablePtrAllocator<ThreadingModel> >
     class CollectableContainerAllocator {
     public:
         typedef size_t     size_type;
@@ -798,16 +869,40 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         typedef const T & const_reference;
         typedef T        value_type;
 
+        typedef ObjectDescriptor<ThreadingModel, Allocator> _ObjectDescriptor; 
+        typedef Collector<ThreadingModel, Allocator> _Collector;
+        typedef CollectableWeakPtrBase<ThreadingModel, Allocator> _CollectableWeakPtrBase;
+
         template<typename T1>
             struct rebind
-            { typedef CollectableContainerAllocator<T1> other; };
+            { typedef CollectableContainerAllocator<T1,ThreadingModel,Allocator> other; };
 
-        CollectableContainerAllocator() throw() { }
+        
+        //_Descriptor * myObjectDescriptor;
+        _CollectableWeakPtrBase myObjectWeakPtr;
+        
+        _ObjectDescriptor * getObjectDescriptor() const {
+            return myObjectWeakPtr.getDescriptorPtr();
+        };
+        void setObjectDescriptor(_ObjectDescriptor * theObjectDescriptor) {
+            myObjectWeakPtr = _CollectableWeakPtrBase(theObjectDescriptor);
+        }
 
-        CollectableContainerAllocator(const CollectableContainerAllocator&) throw() { }
+        CollectableContainerAllocator() throw() {
+            setObjectDescriptor(_Collector::get().findLocation(this)); 
+            DBP(std::cerr << "CollectableContainerAllocator() @"<< (void*)this<< ", getObjectDescriptor()=" << getObjectDescriptor() << std::endl);
+        }
+
+        CollectableContainerAllocator(const CollectableContainerAllocator &) throw() {
+            setObjectDescriptor(_Collector::get().findLocation(this)); 
+            DBP(std::cerr << "CollectableContainerAllocator(&) @"<< (void*)this<< ", getObjectDescriptor()=" << getObjectDescriptor() << std::endl);
+        }
 
         template<typename T1>
-        CollectableContainerAllocator(const CollectableContainerAllocator<T1>&) throw() { }
+        CollectableContainerAllocator(const CollectableContainerAllocator<T1,ThreadingModel, Allocator>&) throw() {
+            setObjectDescriptor(_Collector::get().findLocation(this)); 
+            DBP(std::cerr << "CollectableContainerAllocator<T1>() @"<< (void*)this<< ", getObjectDescriptor()=" << getObjectDescriptor() << std::endl);
+        }
 
         ~CollectableContainerAllocator() throw() { }
 
@@ -815,19 +910,35 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 
         const_pointer address(const_reference theValue) const { return &theValue; }
 
-        // NB: n is permitted to be 0.  The C++ standard says nothing
+        // n is permitted to be 0.  The C++ standard says nothing
         // about what the return value is when n == 0.
         pointer allocate(size_type n, const void * = 0)
         { 
             if (n > this->max_size())
                 throw std::bad_alloc();
+            unsigned mySize = n * sizeof(T);
+            void * myMemory = ::operator new(mySize);
 
-            return static_cast<T *>(::operator new(n * sizeof(T)));
+            if (getObjectDescriptor() && n) {
+                typename _Collector::DependendMemoryMap & myMap = _Collector::get().ourMemoryMap;
+                myMap[MemKey(myMemory, mySize)]=getObjectDescriptor();
+            }
+            return static_cast<T *>(myMemory);
         }
 
         // thePtr is not permitted to be a null pointer.
-        void deallocate(pointer thePtr, size_type) {
-            ::operator delete(thePtr);
+        void deallocate(pointer theDoomed, size_type theSize) {
+           DBP(std::cerr << "CollectableContainerAllocator::deallocate: @"<< theDoomed << ", size=" << theSize << std::endl);
+           typename _Collector::DependendMemoryMap & myMap = _Collector::get().ourMemoryMap;
+           typename _Collector::DependendMemoryMap::iterator mySelf = myMap.find(MemKey(theDoomed, theSize)); 
+           if (mySelf != myMap.end()) {
+                // TODO: check if size fits
+               myMap.erase(mySelf);
+               DBP(std::cerr << "CollectableContainerAllocator::deallocate: mySelf deleted" << std::endl);
+           } else {
+               DBP(std::cerr << "CollectableContainerAllocator::deallocate: mySelf not in map" << std::endl);
+           }
+           ::operator delete(theDoomed);
         }
 
         size_type max_size() const throw() {
@@ -843,18 +954,17 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
     };
 
-    template<typename T>
+    template<typename T,typename ThreadingModel,typename Allocator>
         inline bool
-        operator==(const CollectableContainerAllocator<T> &, const CollectableContainerAllocator<T> &)
+        operator==(const CollectableContainerAllocator<T,ThreadingModel, Allocator> &, const CollectableContainerAllocator<T,ThreadingModel, Allocator> &)
         { return true; }
 
-    template<typename T>
+    template<typename T,typename ThreadingModel,typename Allocator>
         inline bool
-        operator!=(const CollectableContainerAllocator<T> &, const CollectableContainerAllocator<T> &)
+        operator!=(const CollectableContainerAllocator<T,ThreadingModel, Allocator> &, const CollectableContainerAllocator<T,ThreadingModel, Allocator> &)
         { return false; }
 
 
-  // _myRefCountPtr remains
   template <class ThreadingModel, class Allocator>
     struct CollectablePtrBase { // non-template base for all CollectablePtr
         CollectablePtrBase(ObjectDescriptor<ThreadingModel, Allocator> * theDescriptor, void * theNativePtr)
@@ -969,35 +1079,35 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         inline void dispose(bool forced) {
 			DBP(std::cerr<<"CollectablePtrBase::dispose() this = "<<(void*)this<<std::endl);
             DBP2(std::cerr<<"CollectablePtrBase::dispose() myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
- 			if (myDescriptorPtr) {
-                DBP2(std::cerr<<"CollectablePtrBase::dispose before = "<<*myDescriptorPtr<<std::endl);
-                if (myDescriptorPtr->myNativePtr) {
-                    Collectable<ThreadingModel, Allocator>* myNativeSavePtr = (Collectable<ThreadingModel, Allocator>*)myDescriptorPtr->myNativePtr;
-                    myDescriptorPtr->myNativePtr = 0;
+            // make dispose() reentrant because *this can be deleted due to chain effects
+            ObjectDescriptor<ThreadingModel, Allocator> * savedDescriptorPtr = myDescriptorPtr;
+ 			if (savedDescriptorPtr) {
+                DBP2(std::cerr<<"CollectablePtrBase::dispose before = "<<savedDescriptorPtr<<std::endl);
+                if (savedDescriptorPtr->myNativePtr) {
+                    Collectable<ThreadingModel, Allocator>* myNativeSavePtr = (Collectable<ThreadingModel, Allocator>*)savedDescriptorPtr->myNativePtr;
+                    savedDescriptorPtr->myNativePtr = 0;
                     delete myNativeSavePtr;
                 }
-                if (forced) {
+                if (forced && savedDescriptorPtr) {
                     // dispose has been forced by sweep and not by refcount
                     // our destructor will run later so we will not dispose the descriptor yet
-                    DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening1) = "<<*myDescriptorPtr<<std::endl);
-                    while (myDescriptorPtr->smartCount) { // turn other eventually existing smart refs into weak refs
-                        myDescriptorPtr->smartCount.decrement_and_test();
-                        DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening2) = "<<*myDescriptorPtr<<std::endl);
-                        myDescriptorPtr->weakCount.increment();
-                        DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening3) = "<<*myDescriptorPtr<<std::endl);
+                    DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening1) descr= "<<(void*)savedDescriptorPtr<<savedDescriptorPtr<<std::endl);
+                    while (savedDescriptorPtr->smartCount) { // turn other eventually existing smart refs into weak refs
+                        savedDescriptorPtr->smartCount.decrement_and_test();
+                        DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening2) descr = "<<(void*)savedDescriptorPtr<<std::endl);
+                        savedDescriptorPtr->weakCount.increment();
+                        DBP2(std::cerr<<"CollectablePtrBase::dispose (weakening3) descr = "<<savedDescriptorPtr<<std::endl);
                     }
                 } else {
-                    DBP2(std::cerr<<"CollectablePtrBase::dispose middle = "<<*myDescriptorPtr<<std::endl);
-                    if (myDescriptorPtr->weakCount.decrement_and_test()) {
-                        DBP2(std::cerr<<"CollectablePtrBase::dispose free myDescriptorPtr: "<<*myDescriptorPtr<<std::endl);
+                    DBP2(std::cerr<<"CollectablePtrBase::dispose middle = "<<savedDescriptorPtr<<std::endl);
+                    if (savedDescriptorPtr->weakCount.decrement_and_test()) {
+                        DBP2(std::cerr<<"CollectablePtrBase::dispose free savedDescriptorPtr: "<<savedDescriptorPtr<<std::endl);
                         // play nice & thread-safe in case another thread will call
                         // reference() while we are unreference
-                        ObjectDescriptor<ThreadingModel, Allocator> * savePtr = myDescriptorPtr;
-                        myDescriptorPtr = 0;
-                        delete savePtr;
+                        delete savedDescriptorPtr;
                         //Allocator::free(savePtr);
                     } else {
-                        DBP2(std::cerr<<"CollectablePtrBase::dispose after = "<<*myDescriptorPtr<<std::endl);
+                        DBP2(std::cerr<<"CollectablePtrBase::dispose after = "<<*savedDescriptorPtr<<std::endl);
                     }
                 }
             }
@@ -1033,6 +1143,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         typedef ThreadingModel ThreadingModelType;
         typedef RefCountAllocator RefCountAllocatorType;
         typedef CollectablePtrBase<ThreadingModel, RefCountAllocator> Base;
+        typedef CollectablePtr<C, ThreadingModel, RefCountAllocator> Self;
+        typedef CollectableContainerAllocator<Self, ThreadingModel, RefCountAllocator> StdContainerAllocator;
 
         explicit CollectablePtr(C * nativePtr = 0) : CollectablePtrBase<ThreadingModel, RefCountAllocator>(0, nativePtr) {
             Base::registerWithContainer();
@@ -1121,11 +1233,11 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         
     public:
         bool operator==(const CollectableWeakPtr<C, ThreadingModel, RefCountAllocator> & otherPtr) const {
-            return Base::myDescriptorPtr == otherPtr.myDescriptorPtr;
+            return Base::getDescriptorPtr() == otherPtr.getDescriptorPtr();
         }
 
         bool operator!=(const CollectableWeakPtr<C, ThreadingModel, RefCountAllocator> & otherPtr) const {
-            return Base::myDescriptorPtr != otherPtr.myDescriptorPtr;
+            return Base::getDescriptorPtr() != otherPtr.getDescriptorPtr();
         }
     
     private:
@@ -1141,169 +1253,265 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
     };
 
+    template <class ThreadingModel, class RefCountAllocator>
+    struct CollectableWeakPtrBase { // non-T-template base for all CollectablePtr
+        
+        CollectableWeakPtrBase() :
+            myDescriptorPtr(0)
+        {};
+
+        explicit CollectableWeakPtrBase(const CollectablePtrBase<ThreadingModel, RefCountAllocator> & otherPtr) :
+            myDescriptorPtr(otherPtr.myDescriptorPtr)
+        {
+            reference();
+        }
+        explicit CollectableWeakPtrBase(ObjectDescriptor<ThreadingModel, RefCountAllocator> * theDescriptorPtr) :
+            myDescriptorPtr(theDescriptorPtr)
+        {
+            reference();
+        }
+        ~CollectableWeakPtrBase() {
+            DBP2(std::cerr<<"~CollectableWeakPtrBase() = "<<(void*)this<<std::endl);
+            unreference();
+        }
+
+        inline const CollectableWeakPtrBase & operator=(const CollectableWeakPtrBase & otherPtr) {
+            if (this != & otherPtr) {
+                unreference();
+                myDescriptorPtr = otherPtr.myDescriptorPtr;
+                reference();
+            }
+            return *this;
+        }
+
+        operator bool() const {
+            return isValid();
+        }
+
+        inline ObjectDescriptor<ThreadingModel, RefCountAllocator> * getDescriptorPtr() const {
+            return myDescriptorPtr;
+        }
+
+        // only use for debugging and tests
+        inline long getRefCount() const {
+            if (myDescriptorPtr) {
+                return myDescriptorPtr->smartCount;
+            }
+            return 0;
+        }
+        inline long getWeakCount() const {
+            if (myDescriptorPtr) {
+                return myDescriptorPtr->weakCount;
+            }
+            return 0;
+        }
+
+        inline bool isValid() const {
+            if (myDescriptorPtr && myDescriptorPtr->smartCount != 0) {
+                return true;
+            }
+            return false;
+        }
+
+    private:
+        ObjectDescriptor<ThreadingModel, RefCountAllocator> * myDescriptorPtr;
+
+
+        inline void reference() {
+            DBP2(std::cerr<<"CollectableWeakPtrBase::reference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
+            if (myDescriptorPtr) {
+                DBP2(std::cerr<<"CollectableWeakPtrBase::reference before = "<<*myDescriptorPtr<<std::endl);
+                myDescriptorPtr->weakCount.increment();
+                DBP2(std::cerr<<"CollectableWeakPtrBase::reference after = "<<*myDescriptorPtr<<std::endl);
+            }
+        }
+
+        inline void unreference() {
+            DBP2(std::cerr<<"CollectableWeakPtrBase::unreference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
+            if (myDescriptorPtr) {
+                DBP2(std::cerr<<"CollectableWeakPtrBase::unreference  before = "<<*myDescriptorPtr<<std::endl);
+                if (myDescriptorPtr->weakCount == 0) {
+                    throw InternalCorruption("weakCount already 0 on weakPtr unreferencing", PLUS_FILE_LINE);
+                }
+                if (myDescriptorPtr->weakCount.decrement_and_test())
+                {
+                    DBP2(std::cerr<<"CollectableWeakPtrBase::unreference  after(1) = "<<*myDescriptorPtr<<std::endl);
+                    DBP2(std::cerr<<"Ptr: CollectableWeakPtrBase calling free on myDescriptorPtr"<<std::endl);
+                    //RefCountAllocator::free(myDescriptorPtr);
+                    delete myDescriptorPtr;
+                } else {
+                    DBP2(std::cerr<<"CollectableWeakPtrBase::unreference  after(2) = "<<*myDescriptorPtr<<std::endl);
+                }
+                myDescriptorPtr = 0;
+            }
+        }
+
+    public:
+        bool operator==(const CollectableWeakPtrBase & otherPtr) const {
+            return myDescriptorPtr == otherPtr.myDescriptorPtr;
+        }
+        bool operator!=(const CollectableWeakPtrBase & otherPtr) const {
+            return myDescriptorPtr != otherPtr.myDescriptorPtr;
+        }
+   private:
+        // do not allow comparison with other types and forbid comparison of bool results
+        template<class D, class SomeThreadingModel, class SomeRefCountAllocator>
+            bool operator==(const CollectableWeakPtr<D, SomeThreadingModel, SomeRefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D, class SomeThreadingModel, class SomeRefCountAllocator>
+            bool operator!=(const CollectableWeakPtr<D, SomeThreadingModel, SomeRefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D, class SomeThreadingModel, class SomeRefCountAllocator>
+            bool operator==(const Ptr<D, SomeThreadingModel, SomeRefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D, class SomeThreadingModel, class SomeRefCountAllocator>
+            bool operator!=(const Ptr<D, SomeThreadingModel, SomeRefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+    };
+
+	
+
     template <class T,
               class ThreadingModel,
               class RefCountAllocator>
-    class CollectableWeakPtr {
+    class CollectableWeakPtr : public CollectableWeakPtrBase<ThreadingModel, RefCountAllocator> {
+        typedef CollectableWeakPtrBase<ThreadingModel, RefCountAllocator> Base;
         friend class CollectablePtr<T, ThreadingModel, RefCountAllocator>;
-        public:
-            CollectableWeakPtr() :
-                myDescriptorPtr(0)
-            {};
+    public:
+        CollectableWeakPtr() : Base(0) { };
 
-            CollectableWeakPtr(const CollectablePtr<T, ThreadingModel, RefCountAllocator> & theSmartPtr) :
-                myDescriptorPtr(theSmartPtr.getDescriptorPtr())
-            {
-                reference();
-            };
+        CollectableWeakPtr(const CollectablePtr<T, ThreadingModel, RefCountAllocator> & theSmartPtr) :
+            Base(theSmartPtr.getDescriptorPtr()) { }; 
 
+        CollectableWeakPtr(const CollectableWeakPtr & otherWeakPtr) :
+            Base(otherWeakPtr.getDescriptorPtr()) { }
 
-            CollectableWeakPtr(const CollectableWeakPtr & otherWeakPtr) :
-                myDescriptorPtr(otherWeakPtr.myDescriptorPtr)
-            {
-                reference();
-            }
-            explicit CollectableWeakPtr(const CollectablePtrBase<ThreadingModel, RefCountAllocator> & otherPtr) :
-                myDescriptorPtr(otherPtr.myDescriptorPtr)
-            {
-                reference();
-            }
-             explicit CollectableWeakPtr(ObjectDescriptor<ThreadingModel, RefCountAllocator> * theDescriptorPtr) :
-                myDescriptorPtr(theDescriptorPtr)
-            {
-                reference();
-            }
-            ~CollectableWeakPtr() {
-                DBP2(std::cerr<<"~CollectableWeakPtr() = "<<(void*)this<<std::endl);
-                unreference();
-            }
+        explicit CollectableWeakPtr(const CollectablePtrBase<ThreadingModel, RefCountAllocator> & otherPtr) :
+            Base(otherPtr.getDescriptorPtr()) { }
 
-            inline const CollectableWeakPtr & operator=(const CollectableWeakPtr & otherPtr) {
-                if (this != & otherPtr) {
-                    unreference();
-                    myDescriptorPtr = otherPtr.myDescriptorPtr;
-                    reference();
-                }
-                return *this;
-            }
+        explicit CollectableWeakPtr(ObjectDescriptor<ThreadingModel, RefCountAllocator> * theDescriptorPtr) :
+            Base(theDescriptorPtr) { }
 
-            operator bool() const {
-                return isValid();
-            }
+        ~CollectableWeakPtr() {
+            DBP2(std::cerr<<"~CollectableWeakPtr() = "<<(void*)this<<std::endl);
+        }
 
-            inline ObjectDescriptor<ThreadingModel, RefCountAllocator> * getDescriptorPtr() const {
-                return myDescriptorPtr;
-            }
+        inline const CollectableWeakPtr & operator=(const CollectableWeakPtr & otherPtr) {
+            Base::operator=(otherPtr);
+            return *this;
+        }
+        operator bool() const {
+            return Base::isValid();
+        }
 
-            inline CollectablePtr<T, ThreadingModel, RefCountAllocator> lock() {
-                if (isValid()) {
-                    try {
-                        return CollectablePtr<T, ThreadingModel, RefCountAllocator>(myDescriptorPtr, 0);
-                    } catch (BadWeakPtrException&) {
-                        std::cerr << "BadWeakPtrException: refCount=" << getRefCount() << 
-                                ", weakCount=" << getWeakCount() << std::endl;
-                    }
-                }
-                return CollectablePtr<T, ThreadingModel, RefCountAllocator>(0);
-            }
-
-            inline const CollectablePtr<T, ThreadingModel, RefCountAllocator> lock() const {
-                if (isValid()) {
-                    try {
-                        return CollectablePtr<T, ThreadingModel, RefCountAllocator>(myDescriptorPtr, 0);
-                    } catch (BadWeakPtrException&) {
-                        std::cerr << "BadWeakPtrException: refCount=" << getRefCount() << 
-                                ", weakCount=" << getWeakCount() << std::endl;
-                    }
-                }
-                return CollectablePtr<T, ThreadingModel, RefCountAllocator>(0);
-            }
-
-            // only use for debugging and tests
-            inline long getRefCount() const {
-                if (myDescriptorPtr) {
-                    return myDescriptorPtr->smartCount;
-                }
-                return 0;
-            }
-            inline long getWeakCount() const {
-                if (myDescriptorPtr) {
-                    return myDescriptorPtr->weakCount;
-                }
-                return 0;
-            }
-
-        private:
-            ObjectDescriptor<ThreadingModel, RefCountAllocator> * myDescriptorPtr;
-
-            inline bool isValid() const {
-                if (myDescriptorPtr && myDescriptorPtr->smartCount != 0) {
-                    return true;
-                }
-                return false;
-            }
-
-
-            inline void reference() {
-                DBP2(std::cerr<<"CollectableWeakPtr::reference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
-                if (myDescriptorPtr) {
-                    DBP2(std::cerr<<"CollectableWeakPtr::reference before = "<<*myDescriptorPtr<<std::endl);
-                    myDescriptorPtr->weakCount.increment();
-                    DBP2(std::cerr<<"CollectableWeakPtr::reference after = "<<*myDescriptorPtr<<std::endl);
+        inline ObjectDescriptor<ThreadingModel, RefCountAllocator> * getDescriptorPtr() const {
+            return Base::getDescriptorPtr();
+        }
+        
+        inline CollectablePtr<T, ThreadingModel, RefCountAllocator> lock() {
+            if (Base::isValid()) {
+                try {
+                    return CollectablePtr<T, ThreadingModel, RefCountAllocator>(Base::getDescriptorPtr(), 0);
+                } catch (BadWeakPtrException&) {
+                    std::cerr << "BadWeakPtrException: refCount=" << Base::getRefCount() << 
+                        ", weakCount=" << Base::getWeakCount() << std::endl;
                 }
             }
+            return CollectablePtr<T, ThreadingModel, RefCountAllocator>(0);
+        }
 
-            inline void unreference() {
-                DBP2(std::cerr<<"CollectableWeakPtr::unreference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
-                if (myDescriptorPtr) {
-                    DBP2(std::cerr<<"CollectableWeakPtr::unreference  before = "<<*myDescriptorPtr<<std::endl);
-                    if (myDescriptorPtr->weakCount == 0) {
-                        throw InternalCorruption("weakCount already 0 on weakPtr unreferencing", PLUS_FILE_LINE);
-                    }
-                    if (myDescriptorPtr->weakCount.decrement_and_test())
-                    {
-                        DBP2(std::cerr<<"CollectableWeakPtr::unreference  after(1) = "<<*myDescriptorPtr<<std::endl);
-                        DBP2(std::cerr<<"Ptr: CollectableWeakPtr calling free on myDescriptorPtr"<<std::endl);
-                        //RefCountAllocator::free(myDescriptorPtr);
-                        delete myDescriptorPtr;
-                    } else {
-                        DBP2(std::cerr<<"CollectableWeakPtr::unreference  after(2) = "<<*myDescriptorPtr<<std::endl);
-                    }
-					myDescriptorPtr = 0;
+        inline const CollectablePtr<T, ThreadingModel, RefCountAllocator> lock() const {
+            if (Base::isValid()) {
+                try {
+                    return CollectablePtr<T, ThreadingModel, RefCountAllocator>(Base::myDescriptorPtr, 0);
+                } catch (BadWeakPtrException&) {
+                    std::cerr << "BadWeakPtrException: refCount=" << Base::getRefCount() << 
+                        ", weakCount=" << Base::getWeakCount() << std::endl;
                 }
             }
+            return CollectablePtr<T, ThreadingModel, RefCountAllocator>(0);
+        }
+        
+        // only use for debugging and tests
+        inline long getRefCount() const {
+            return Base::getRefCount();
+        }
+        inline long getWeakCount() const {
+            return Base::getWeakCount();
+        }
+        inline bool isValid() const {
+            return Base::isValid();
+        }
 
-           public:
-                bool operator==(const CollectableWeakPtr & otherPtr) const {
-                    return myDescriptorPtr == otherPtr.myDescriptorPtr;
+#if 0
+    private:
+        ObjectDescriptor<ThreadingModel, RefCountAllocator> * myDescriptorPtr;
+
+
+        inline void reference() {
+            DBP2(std::cerr<<"CollectableWeakPtr::reference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
+            if (myDescriptorPtr) {
+                DBP2(std::cerr<<"CollectableWeakPtr::reference before = "<<*myDescriptorPtr<<std::endl);
+                myDescriptorPtr->weakCount.increment();
+                DBP2(std::cerr<<"CollectableWeakPtr::reference after = "<<*myDescriptorPtr<<std::endl);
+            }
+        }
+
+        inline void unreference() {
+            DBP2(std::cerr<<"CollectableWeakPtr::unreference myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
+            if (myDescriptorPtr) {
+                DBP2(std::cerr<<"CollectableWeakPtr::unreference  before = "<<*myDescriptorPtr<<std::endl);
+                if (myDescriptorPtr->weakCount == 0) {
+                    throw InternalCorruption("weakCount already 0 on weakPtr unreferencing", PLUS_FILE_LINE);
                 }
-                bool operator!=(const CollectableWeakPtr & otherPtr) const {
-                    return myDescriptorPtr != otherPtr.myDescriptorPtr;
+                if (myDescriptorPtr->weakCount.decrement_and_test())
+                {
+                    DBP2(std::cerr<<"CollectableWeakPtr::unreference  after(1) = "<<*myDescriptorPtr<<std::endl);
+                    DBP2(std::cerr<<"Ptr: CollectableWeakPtr calling free on myDescriptorPtr"<<std::endl);
+                    //RefCountAllocator::free(myDescriptorPtr);
+                    delete myDescriptorPtr;
+                } else {
+                    DBP2(std::cerr<<"CollectableWeakPtr::unreference  after(2) = "<<*myDescriptorPtr<<std::endl);
                 }
-                bool operator==(const Ptr<T, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    return myDescriptorPtr == otherPtr.myDescriptorPtr;
-                }
-                bool operator!=(const Ptr<T, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    return myDescriptorPtr != otherPtr.myDescriptorPtr;
-                }
-           private:
-                // do not allow comparison with other types and forbid comparison of bool results
-                template<class D>
-                bool operator==(const CollectableWeakPtr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator!=(const CollectableWeakPtr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator==(const Ptr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator!=(const Ptr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
+                myDescriptorPtr = 0;
+            }
+        }
+#endif
+    public:
+        bool operator==(const CollectableWeakPtr & otherPtr) const {
+            return Base::getDescriptorPtr() == otherPtr.getDescriptorPtr();
+        }
+        bool operator!=(const CollectableWeakPtr & otherPtr) const {
+            return Base::getDescriptorPtr() != otherPtr.getDescriptorPtr();
+        }
+        bool operator==(const Ptr<T, ThreadingModel, RefCountAllocator> & otherPtr) const {
+            return Base::getDescriptorPtr() == otherPtr.getDescriptorPtr();
+        }
+        bool operator!=(const Ptr<T, ThreadingModel, RefCountAllocator> & otherPtr) const {
+            return Base::getDescriptorPtr() != otherPtr.getDescriptorPtr();
+        }
+    private:
+        // do not allow comparison with other types and forbid comparison of bool results
+        template<class D>
+            bool operator==(const CollectableWeakPtr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D>
+            bool operator!=(const CollectableWeakPtr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D>
+            bool operator==(const Ptr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
+        template<class D>
+            bool operator!=(const Ptr<D, ThreadingModel, RefCountAllocator> & otherPtr) const {
+                throw Forbidden(JUST_FILE_LINE);
+            }
     };
 
 

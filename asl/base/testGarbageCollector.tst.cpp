@@ -149,7 +149,10 @@ public:
     virtual const char * getName() {
         return "TestClassLink";
     }
-    CollectablePtr<TestClassLink<N,ThreadingModel>, ThreadingModel> myDLink;
+    typedef TestClassLink<N, ThreadingModel> Base;
+    typedef CollectablePtr<Base, ThreadingModel> BaseGCPtr;
+    BaseGCPtr myDLink;
+    std::vector<BaseGCPtr, typename BaseGCPtr::StdContainerAllocator> myDVector;
 };
 
 
@@ -362,24 +365,25 @@ public:
     }
 };
 
-template <int N>
+template <int N, class ThreadingModel = asl::MultiProcessor>
 class PtrUnitTest2 : public TemplateUnitTest {
 public:
     PtrUnitTest2() : TemplateUnitTest("PtrUnitTest2-",asl::as_string(N).c_str()) {  }
     void run() {
-        typedef TestClassBase<N, MultiProcessor> BaseN;
-        typedef TestClassDerived<N, MultiProcessor> DerivedN;
+        typedef CollectablePtrAllocator<ThreadingModel> Allocator;
+        typedef TestClassBase<N, ThreadingModel> BaseN;
+        typedef TestClassDerived<N, ThreadingModel> DerivedN;
         ENSURE(BaseN::_theInstanceCount_ == 0);
-        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN> > > myVec;
+        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN>,ThreadingModel,Allocator> > myVec;
         for (int i = 0; i < 1000; ++i) {
             myVec.push_back(CollectablePtr<DerivedN>(new DerivedN ));
         }
         ENSURE(BaseN::_theInstanceCount_ == 1000);
 
-        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN> >  > otherBaseVec;
+        std::vector<CollectablePtr<DerivedN>, CollectableContainerAllocator<CollectablePtr<DerivedN>,ThreadingModel,Allocator> > otherBaseVec;
         otherBaseVec = myVec;
 
-        std::vector<CollectablePtr<BaseN>, CollectableContainerAllocator<CollectablePtr<BaseN> >  > myBaseVec(1000);
+        std::vector<CollectablePtr<BaseN>, CollectableContainerAllocator<CollectablePtr<BaseN>,ThreadingModel,Allocator> > myBaseVec(1000);
 
         std::copy(myVec.begin(),myVec.end(),myBaseVec.begin());
         ENSURE(equal(myBaseVec.begin(), myBaseVec.end(), otherBaseVec.begin()));
@@ -440,9 +444,13 @@ public:
             if (i>0) myVec[i]->myLink1 = myVec[i-1];
             if (i<COUNT-1) myVec[i]->myLink2 = myVec[i+1];
             myVec[i]->myDLink = myVec[i];
+            myVec[i]->myDLink = myVec[i];
+            myVec[i]->myDVector.push_back(myVec[i]);
         }
         DPRINT(" Done Crosslinks");
+        MyCollector::get().printObjectMap();
         unsigned inUse = MyCollector::get().markAllUsedObjects();
+        MyCollector::get().printObjectMap();
         ENSURE(inUse == COUNT);
         DPRINT(inUse);
 
@@ -552,22 +560,27 @@ public:
 #endif
         typedef TestClassBase<N, ThreadingModel> BaseN;
         typedef TestClassDerived<N, ThreadingModel> DerivedN;
+        typedef CollectablePtr<DerivedN, ThreadingModel> DerivedPtr;
+        typedef CollectablePtr<BaseN, ThreadingModel> BasePtr;
+        
+        typedef std::vector<BasePtr, CollectableContainerAllocator<BasePtr, ThreadingModel> > BaseVector;
+        typedef std::vector<DerivedPtr, CollectableContainerAllocator<DerivedPtr, ThreadingModel> > DerivedVector;
         for (int f = 0; f < 4; ++f) {
            {
                MAKE_SCOPE_TIMER(PtrUnitPerfTest);
                ENSURE(BaseN::_theInstanceCount_ == 0);
-               std::vector<CollectablePtr<DerivedN, ThreadingModel> > myVec;
+               DerivedVector myVec;
                for (int i = 0; i < repeatCount; ++i) {
-                   myVec.push_back(CollectablePtr<DerivedN, ThreadingModel>(new DerivedN ));
+                   myVec.push_back(DerivedPtr(new DerivedN ));
                }
                ENSURE(BaseN::_theInstanceCount_ == repeatCount);
 
                START_TIMER(vector_copy1);
-               std::vector<CollectablePtr<DerivedN, ThreadingModel> > otherBaseVec;
+               DerivedVector otherBaseVec;
                otherBaseVec = myVec;
                STOP_TIMER_N(vector_copy1,repeatCount);
 
-               std::vector<CollectablePtr<BaseN, ThreadingModel> > myBaseVec(repeatCount);
+               BaseVector myBaseVec(repeatCount);
 
                START_TIMER(vector_copy2);
                std::copy(myVec.begin(),myVec.end(),myBaseVec.begin());
@@ -854,12 +867,13 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new RangeSetPerfTest<int>("int", 0));
-#if 1
-        addTest(new RangeSetUnitTest<int>("int", 0));
-        addTest(new RangeSetUnitTest<CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*>("CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*", 0));
         addTest(new PtrUnitTest<0,SingleThreaded>);
         addTest(new PtrLinkTest<0,SingleThreaded>);
+        addTest(new PtrUnitTest2<0>);
+#if 1
+        addTest(new RangeSetPerfTest<int>("int", 0));
+        addTest(new RangeSetUnitTest<int>("int", 0));
+        addTest(new RangeSetUnitTest<CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*>("CollectablePtrBase<SingleThreaded, CollectablePtrAllocator<SingleThreaded> >*", 0));
         PtrUnitTest<0,SingleProcessor> * mySingleProcessorTest = new PtrUnitTest<0,SingleProcessor>();
 #ifdef SINGLE_CPU
         addTest(mySingleProcessorTest);
@@ -880,7 +894,6 @@ public:
         //addTest(new AllocatorUnitTest<0,MultiProcessor,PtrThreadSpecificFreeListAllocator>("PtrThreadSpecificFreeListAllocator"));
         //addTest(new AllocatorUnitTest<0,MultiProcessor,SpinLockedPtrFreeListAllocator>("SpinLockedPtrFreeListAllocator"));
         //addTest(new AllocatorUnitTest<0,MultiProcessor,PtrThreadSpecificFreeListChunkAllocator>("PtrThreadSpecificFreeListChunkAllocator"));
-        addTest(new PtrUnitTest2<0>);
         //addTest(new PtrMultiThreadTest(get_argc(), get_argv()));
 #endif
 
