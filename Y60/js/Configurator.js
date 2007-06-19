@@ -64,11 +64,21 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             mySetting = mySection.appendChild(Node.createElement(theSetting));
         }
 
-        mySetting.nodeValue = theValue;
+        mySetting.firstChild.nodeValue = theValue;
 
         if (theHostFlag) {
             mySetting.override = "hostname";
         }
+    }
+
+    obj.restoreSettings = function() {
+        for (var i = 0; i < _myMergedSettings.childNodes.length; ++i) {
+            var myChild = _myMergedSettings.childNode(i);
+            for (var j = 0; j < myChild.childNodes.length; ++j) {
+                myChild.childNode(j).firstChild.nodeValue = _myOriginalMergedSettings.childNode(i).childNode(j).firstChild;
+            }
+        }
+        notifyListeners();
     }
 
     obj.saveSettings = function(theAdditionalCommonFile, theAdditionalHostFile, theCommonFlag, theHostFlag) {
@@ -234,7 +244,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             case "$":
             case "tab":
                 if (theShiftFlag) {
-                    restoreSettings();
+                    obj.restoreSettings();
                     displayMessage("Original Settings restored.");
                 } else {
                     obj.saveSettings();
@@ -464,16 +474,6 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 myListener.obj.onUpdateSettings(_myMergedSettings);
             }
         }
-    }
-
-    function restoreSettings() {
-        for (var i = 0; i < _myMergedSettings.childNodes.length; ++i) {
-            var myChild = _myMergedSettings.childNode(i);
-            for (var j = 0; j < myChild.childNodes.length; ++j) {
-                myChild.childNode(j).firstChild.nodeValue = _myOriginalSettings.childNode(i).childNode(j).firstChild;
-            }
-        }
-        notifyListeners();
     }
 
     function updateOnScreenDisplay() {
