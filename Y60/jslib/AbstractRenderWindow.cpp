@@ -51,7 +51,7 @@ namespace jslib {
         _myFixedDeltaT(0.0),
         _myStartTime(-1.0), _myElapsedTime(0.0),
         _myPauseTime(0.0), _myPauseFlag(false),
-        _myForceFullGC(true)
+        _myForceFullGC(false)
         {
         }
 

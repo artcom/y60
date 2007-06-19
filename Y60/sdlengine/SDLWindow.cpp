@@ -714,7 +714,7 @@ SDLWindow::mainLoop() {
             if (getForceFullGC()) {
                 JS_GC(_myJSContext);
             } else {
-                JS_MaybeGC(_myJSContext);
+                JS_AdaptiveGC(_myJSContext);
             }
         }
 
