@@ -6,6 +6,7 @@
         <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
+        <ClampToScreen step="1">0</ClampToScreen>
 
         <ProbePosition min="-1" step="1">[2.00000,3.00000]</ProbePosition>
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
@@ -19,7 +20,7 @@
         <StopBits>1</StopBits>
         <Handshaking>false</Handshaking>
 
-        <ServerAddress>10.1.2.220</ServerAddress>
+        <ServerAddress>127.0.0.1</ServerAddress>
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
         <TouchThreshold step="5">200</TouchThreshold>
