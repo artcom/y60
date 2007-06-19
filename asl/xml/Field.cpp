@@ -297,6 +297,9 @@ namespace dom {
         // [CH]: This is not neccessary, because ensureDependencies only updates precursors, not the dependents.
         // This might also be the reason, why in some rare cases, the dependency network does not work.
         //ensureDependencies();
+		if (_myImmediateCB) {
+	        const_cast<Field*>(this)->_myImmediateCB->callback();
+		}
         if (_myCalculator && !_isRecalculating) {
             //AC_WARNING << "onSetValue: you should not set dependent values manually, only in recalculate callback";
         }

@@ -144,6 +144,13 @@ namespace y60 {
          */
         void setTexturePriority(Image * theImage, float thePriority);
 
+
+        /**
+         * Check if the new image fits in current uploaded GL texture.
+         * @param theImage Image to update.
+         */
+        bool imageMatchesGLTexture(ImagePtr theImage) const;
+		
         /**
          * Updates the texture data.
          * This function re-uploads the Image pixels to the GL texture memory.

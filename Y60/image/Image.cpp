@@ -72,7 +72,7 @@ namespace y60 {
         _myRefCount(0),
         _myTextureId(0), 
         _myPixelBufferId(0),
-        _myReuseRaster(false),
+        _myTextureUploaded(false),
         _myRessourceManager(0)
     {
     }
@@ -123,6 +123,8 @@ namespace y60 {
         TextureIdTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureUpdate);
         ImageInternalFormatTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageFormatUpdate);
 
+		ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
+
         dom::ValuePtr myRasterValue = getRasterValue();
         if (myRasterValue) {
             PixelEncoding myEncoding = PixelEncoding(getEnumFromString(
@@ -144,13 +146,14 @@ namespace y60 {
     Image::registerDependenciesForRasterValueUpdate() {        
         if (getNode()) {
             dom::ValuePtr myRasterValue = getRasterValue();
-            myRasterValue->registerPrecursor(ImageSourceTag::Plug::getValuePtr());
+            //myRasterValue->registerPrecursor(ImageSourceTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageResizeTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterParamsTag::Plug::getValuePtr());
             myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()), 
                 &Image::load);
             myRasterValue->setClean();
+
         }
     }
 
@@ -224,7 +227,7 @@ namespace y60 {
     Image::uploadTexture() {
         AC_DEBUG << "uploadTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         ensureResourceManager();
-        if (_myReuseRaster) { 
+        if (_myTextureUploaded && _myRessourceManager->imageMatchesGLTexture(dynamic_cast_Ptr<Image>(getSelf()))) { 
             _myRessourceManager->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
         } else {
             if (_myTextureId) {
@@ -233,7 +236,7 @@ namespace y60 {
             }
             _myTextureId = _myRessourceManager->setupTexture(dynamic_cast_Ptr<Image>(getSelf()));
             set<TextureIdTag>(_myTextureId);
-            _myReuseRaster = true;
+            _myTextureUploaded = true;
         }
     }
 
@@ -345,7 +348,7 @@ namespace y60 {
         // We have to reconnect the dependency graph, because the value has changed
         registerDependenciesForRasterValueUpdate();        
 
-        _myReuseRaster = false;
+        //_myTextureUploaded = false;
         return dynamic_cast_Ptr<dom::ResizeableRaster>(theRaster);
     }
 
@@ -367,13 +370,13 @@ namespace y60 {
     void 
     Image::triggerUpload() {
         //AC_DEBUG << "triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        _myReuseRaster = false;
+        _myTextureUploaded = false;
         TextureIdTag::Plug::getValuePtr()->setDirty();
     }
 
     bool 
     Image::isUploaded() const {
-        return _myReuseRaster;
+        return _myTextureUploaded;
     }
 
     void 

@@ -57,6 +57,8 @@ namespace y60 {
             virtual void setTexturePriority(Image * theImage, float thePriority) = 0;
             virtual unsigned setupTexture(ImagePtr theImage) = 0;
             virtual int getMaxTextureSize(int theDimensions) const = 0;
+			virtual bool imageMatchesGLTexture(ImagePtr theImage) const  = 0;
+
             //virtual void rebindTexture(ImagePtr theImage) = 0;
 
     };

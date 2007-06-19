@@ -120,6 +120,36 @@ namespace y60 {
         }
     }
 
+    bool 
+	GLResourceManager::imageMatchesGLTexture(ImagePtr theImage) const{
+		// get current uploaded image size
+        glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
+
+		GLint myUploadedWidth          = -1;
+		GLint myUploadedHeight         = -1;
+		GLint myUploadedInternalFormat = -1;
+		GLint myUploadedMinFilter      = -1;
+
+		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT, &myUploadedInternalFormat);
+
+		glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
+		
+        CHECK_OGL_ERROR;
+        unsigned int myWidth = theImage->get<ImageWidthTag>();
+        unsigned int myHeight = theImage->get<ImageHeightTag>();
+        PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
+
+		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
+		return theImage->get<ImageMipmapTag>() == myOpenGLMipMapSetting &&
+			   myWidth == myUploadedWidth && myHeight == myUploadedHeight && 
+			   myPixelEncoding.internalformat == myUploadedInternalFormat;
+	}
+
     void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
         if (! theImage->getRasterPtr()) {
@@ -421,10 +451,13 @@ namespace y60 {
                     myPixelEncoding.externalformat,
                     theImage->getMemUsed(), myImageData);
         } else {
+        CHECK_OGL_ERROR;
+
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                     0, 0, myWidth, myHeight,
                     myPixelEncoding.externalformat,
                     myPixelEncoding.pixeltype, myImageData);
+        CHECK_OGL_ERROR;
         }
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB

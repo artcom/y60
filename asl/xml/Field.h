@@ -78,7 +78,7 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Field, InfiniteRecursion, Exception);
         DEFINE_NESTED_EXCEPTION(Field, InvalidNullPointerPassed, Exception);
 
-        Field() : _isDirty(true), _hasOutdatedDependencies(true), _isRecalculating(false), _isReconnecting(false) {}        
+        Field() : _isDirty(true), _hasOutdatedDependencies(true), _isRecalculating(false), _isReconnecting(false), _myImmediateCB(0) {}        
         virtual ~Field();
         
         // This should only be called by ValueFactory and FacadeAttributePlug, could be private, as soon as we have
@@ -130,6 +130,19 @@ namespace dom {
             _myCalculator = CallBackPtr(new CallBack<CALCULATOR>(theCalculator, theCalculateFunction));
         }
 
+		template <class OBJECT>
+        void setImmediateCallBack(asl::Ptr<OBJECT, ThreadingModel> theObject, void (OBJECT::*theFunction)()) {
+            if (!theObject) {
+                AC_ERROR << "Field::setImmediateCallBack: theObject is null";
+                throw InvalidNullPointerPassed(JUST_FILE_LINE);
+            }
+            if (!theFunction) {
+                AC_ERROR << "Field::setImmediateCallBack: theFunction is null";
+                throw InvalidNullPointerPassed(JUST_FILE_LINE);
+            }
+            _myImmediateCB = CallBackPtr(new CallBack<OBJECT>(theObject, theFunction));
+        }
+
         void setReconnectFunction(CallBackPtr theCallBack);
 
         void transferDependenciesFrom(Field & theField);
@@ -165,6 +178,7 @@ namespace dom {
         FieldWeakPtr              _mySelf;
         CallBackPtr               _myCalculator;
         CallBackPtr               _myConnector;
+        CallBackPtr               _myImmediateCB;
     };
     /* @} */
 } //Namespace dom

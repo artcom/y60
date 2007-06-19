@@ -232,7 +232,7 @@ namespace y60 {
             void convertToPLBmp(PLAnyBmp & theBitmap);
             void convertFromPLBmp(PLAnyBmp & theBitmap);
 
-            bool                          _myReuseRaster;
+            bool                          _myTextureUploaded;
             unsigned                      _myTextureId;
             unsigned                      _myPixelBufferId;
 

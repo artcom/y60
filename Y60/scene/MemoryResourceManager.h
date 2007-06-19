@@ -50,7 +50,7 @@ class MemoryResourceManager : public ResourceManager {
          */
         void unbindTexture(Image * theImage) {}
         void updateTextureParams(ImagePtr theImage) {};
-
+		bool imageMatchesGLTexture(ImagePtr theImage) const { return true; }
         unsigned setupTexture(ImagePtr theImage) {return 0;}
         IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }
 
