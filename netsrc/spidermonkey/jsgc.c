@@ -1240,6 +1240,8 @@ js_ForceGC(JSContext *cx, uintN gcflags)
     */
 
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
+
+    rt->gcPoke = JS_TRUE;
     js_GC(cx, gcflags & ~GC_INTERRUPT_AFTER_MARK);
     JS_ArenaFinish();
 }
@@ -1813,72 +1815,69 @@ finalize:
 
     ap = &rt->gcArenaPool.first.next;
     a = *ap;
-    if (!a) {
-#ifdef GC_FREE_DEBUG_tobias
-        fprintf(stderr, "nothing to free.\n");
-#endif
-        goto out;
-    }
+    if (a) {
 
-    all_clear = JS_TRUE;
-    flp = oflp = &rt->gcFreeList;
-    *flp = NULL;
-    METER(rt->gcStats.freelen = 0);
+
+        all_clear = JS_TRUE;
+        flp = oflp = &rt->gcFreeList;
+        *flp = NULL;
+        METER(rt->gcStats.freelen = 0);
 
 #ifdef GC_FREE_DEBUG_tobias
-    i = 0;
+        i = 0;
 #endif
 
-    do {
+        do {
 #ifdef GC_FREE_DEBUG_tobias
-            fprintf(stderr, "freeing things in arena %d\n", i);
+                fprintf(stderr, "freeing things in arena %d\n", i);
 #endif
-        flagp = (uint8 *) a->base;
-        split = (uint8 *) FIRST_THING_PAGE(a);
-        limit = (JSGCThing *) a->avail;
-        for (thing = (JSGCThing *) split; thing < limit; thing++) {
-            if (((jsuword)thing & GC_PAGE_MASK) == 0) {
-                flagp++;
-                thing++;
+            flagp = (uint8 *) a->base;
+            split = (uint8 *) FIRST_THING_PAGE(a);
+            limit = (JSGCThing *) a->avail;
+            for (thing = (JSGCThing *) split; thing < limit; thing++) {
+                if (((jsuword)thing & GC_PAGE_MASK) == 0) {
+                    flagp++;
+                    thing++;
+                }
+                if (*flagp != GCF_FINAL) {
+                    all_clear = JS_FALSE;
+                } else {
+                    thing->flagp = flagp;
+                    *flp = thing;
+                    flp = &thing->next;
+                    METER(rt->gcStats.freelen++);
+                }
+                if (++flagp == split)
+                    flagp += GC_THINGS_SIZE;
             }
-            if (*flagp != GCF_FINAL) {
-                all_clear = JS_FALSE;
-            } else {
-                thing->flagp = flagp;
-                *flp = thing;
-                flp = &thing->next;
-                METER(rt->gcStats.freelen++);
-            }
-            if (++flagp == split)
-                flagp += GC_THINGS_SIZE;
-        }
 
-        if (all_clear) {
+            if (all_clear) {
 #ifdef GC_FREE_DEBUG_tobias
-            fprintf(stderr, "destroying arena %d\n", i);
+                fprintf(stderr, "destroying arena %d\n", i);
 #endif
-            if (a == rt->gcFirstUnsweptArena) {
-                rt->gcFirstUnsweptArena = a->next;
-            };
-            JS_ARENA_DESTROY(&rt->gcArenaPool, a, ap);
-            flp = oflp;
+                if (a == rt->gcFirstUnsweptArena) {
+                    rt->gcFirstUnsweptArena = a->next;
+                };
+                JS_ARENA_DESTROY(&rt->gcArenaPool, a, ap);
+                flp = oflp;
             METER(rt->gcStats.afree++);
-        } else {
-            ap = &a->next;
-            all_clear = JS_TRUE;
-            oflp = flp;
-        }
+            } else {
+                ap = &a->next;
+                all_clear = JS_TRUE;
+                oflp = flp;
+            }
 #ifdef GC_FREE_DEBUG_tobias
-        i++;
+            i++;
 #endif
-    } while ((a = *ap) != NULL);
-
-    /* Terminate the new freelist. */
-    *flp = NULL;
+        } while ((a = *ap) != NULL);
+        
+        /* Terminate the new freelist. */
+        *flp = NULL;
+    }
 
     if (rt->gcCallback)
         (void) rt->gcCallback(cx, JSGC_FINALIZE_END);
-
+    
 #ifdef GC_FREE_DEBUG_tobias
     fprintf(stderr, "js_GC: free phase finished.\n");
 #endif
