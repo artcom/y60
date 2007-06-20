@@ -89,7 +89,15 @@ void PLJPEGDecoder::Open (PLDataSource * pDataSrc)
 //      jpeg_save_markers(&cinfo, JPEG_COM, 0xFFFF);     // also comment even though not really EXIF
 
     jpeg_read_header (&cinfo, true);
-    m_pExifData->ReadData(&cinfo);
+	try{
+		m_pExifData->ReadData(&cinfo);
+	} catch (const PLTextException & e) {
+		if ( e.GetCode() == PL_ERRBAD_EXIF) {
+			PLPicDecoder::Trace (3,"Paintlib warning: EXIF not understood, but i continue.");
+		} else {
+			throw e;
+		}
+	}
 
     int DestBPP = 32;
     bool bIsGreyscale = false;
