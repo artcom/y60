@@ -1,0 +1,70 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+struct app2vert {
+    float4 Position  : POSITION;
+    float4 Normal    : NORMAL;
+    float4 texCoord0 : TEXCOORD0;
+};
+
+struct vert2frag {
+    float4 homPosition    : POSITION;
+    float2 texCoord0      : TEXCOORD0;
+    float4 objectPosition : TEXCOORD3;
+    float4 objectNormal   : TEXCOORD4;
+    float3 worldNormal    : TEXCOORD5;
+    float4 homPosition2   : TEXCOORD6;
+};
+
+vert2frag mainVertex(app2vert IN,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_MODELVIEW,
+                     uniform float4x4 AC_OBJECTWORLD_IT,
+                     uniform float4x4 AC_OBJECTWORLD,
+                     uniform float4x4 GL_TEXTURE,
+                     uniform float fogDensity)
+{
+    vert2frag OUT;
+    
+    OUT.worldNormal    = normalize(mul(AC_OBJECTWORLD_IT, IN.Normal).xyz);
+    OUT.homPosition    = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.homPosition2   = mul(AC_OBJECTWORLD, IN.Position); 
+    
+    OUT.objectPosition = IN.Position;
+    OUT.objectNormal   = IN.Normal;
+    
+    OUT.texCoord0      = mul(GL_TEXTURE, IN.texCoord0).xy;
+    
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform float2 center,
+                    uniform sampler2D tex0) : COLOR
+{
+    // XXX TODO: implement this function:
+    float2 texCoord1;
+
+    float2 distance = IN.texCoord0 - center;
+    float absDistance = sqrt(dot(distance, distance))*30;
+
+    float cosDistance;
+    if (absDistance < (3.14159265)) {
+        cosDistance = (sin(absDistance - (3.14159265/2))+1)/2;
+    } else {
+        cosDistance = 1;
+    }
+    distance *= cosDistance;
+
+    texCoord1 = (center + distance);
+
+    float4 myColor0 = tex2D(tex0, texCoord1);
+    return myColor0;
+}

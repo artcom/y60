@@ -1788,4 +1788,26 @@
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
+    <shader id="s141" name="tex_zoom" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`lens`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`zoom.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`zoom.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <vector2f name="center">[0.0,0.0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
