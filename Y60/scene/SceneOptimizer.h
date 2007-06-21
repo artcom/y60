@@ -28,37 +28,39 @@ namespace y60 {
             typedef std::map<std::string, unsigned> VertexDataMap;
             typedef std::map<std::string, std::vector<std::string> > RoleMap;
 
-            struct PrimitiveCache {
-                PrimitiveCache(dom::NodePtr thePrimitive) : _myPrimitives(thePrimitive)
-                {}
+            class PrimitiveCache {
+                public:
+                    PrimitiveCache(dom::NodePtr thePrimitive) : _myPrimitives(thePrimitive)
+                    {}
+                    dom::NodePtr getIndex(const std::string & theName, const std::string & theRole);
 
-                dom::NodePtr getIndex(const std::string & theName, const std::string & theRole);
-
-                dom::NodePtr _myPrimitives;
-                typedef std::map<std::string, dom::NodePtr> NodeMap;
-                NodeMap _myIndices;
+                private:
+                    dom::NodePtr _myPrimitives;
+                    typedef std::map<std::string, dom::NodePtr> NodeMap;
+                    NodeMap _myIndices;
             };
             typedef asl::Ptr<PrimitiveCache> PrimitiveCachePtr;
 
-            struct SuperShape {
-                SuperShape(Scene & theScene, const std::string & theRenderStyle);
+            class SuperShape {
+                public:
+                    SuperShape(Scene & theScene);
+                    dom::NodePtr getVertexData(const std::string & theType, const std::string & theName);
+                    PrimitiveCachePtr getPrimitive(const std::string & theType, const std::string & theMaterialRef, const RenderStyles & theRenderStyles);
+                    std::string getShapeId() const;
+                    dom::NodePtr _myShape;
 
-                dom::NodePtr getVertexData(const std::string & theType, const std::string & theName);
-                PrimitiveCachePtr getPrimitive(const std::string & theType, const std::string & theMaterialRef);
-                std::string getShapeId() const;
-
-                dom::NodePtr _myShape;
-                std::map<std::string, PrimitiveCachePtr> _myPrimitiveMap;
-                std::map<std::string, dom::NodePtr> _myVertexDataMap;
+                private:
+                    std::map<std::string, PrimitiveCachePtr> _myPrimitiveMap;
+                    std::map<std::string, dom::NodePtr> _myVertexDataMap;
             };
-
             typedef asl::Ptr<SuperShape> SuperShapePtr;
 
+            void runNode(dom::NodePtr theRootNode = dom::NodePtr(0));
             void mergeChildWithParent(dom::NodePtr theNode);
             void cleanupScene(dom::NodePtr theNode);
-            void mergeVertexData(const Shape & theShape, SuperShapePtr theSuperShape, const asl::Matrix4f & theMatrix,
-                const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
-            void mergePrimitives(const Shape & theShape, SuperShapePtr theSuperShape, bool theFlipFlag, VertexDataMap & theVertexDataOffsets);
+            void mergeVertexData(const Shape & theShape, bool theFlipFlag, const asl::Matrix4f & theMatrix,
+                                 const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
+            void mergePrimitives(const Shape & theShape, bool theFlipFlag, VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles);
             bool mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theMatrix);
             void removeInvisibleNodes(dom::NodePtr theNode);
             void collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds);
@@ -67,13 +69,16 @@ namespace y60 {
             template <class T>
             unsigned copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData);
             unsigned transformVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData,
-                asl::Matrix4f theMatrix, bool theNormalFlag = false);
+                                         bool theFlipFlag, asl::Matrix4f theMatrix, bool theNormalFlag = false);
 
             Scene & _myScene;
 
             typedef std::map<std::string, SuperShapePtr> SuperShapeMap;
             SuperShapeMap _myShapes;
+            SuperShapePtr _mySuperShape;
 
+            typedef std::vector<dom::NodePtr> NodeVector;
+            NodeVector _myStickyNodes;
     };
 
     template <class T>
@@ -93,7 +98,5 @@ namespace y60 {
         return myOffset;
     }
 }
-
-
 
 #endif
