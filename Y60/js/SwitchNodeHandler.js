@@ -490,35 +490,23 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         }
     }
     
-    Public.setActiveChildByName = function(theName, theSubnameFlag) {
+    Public.setActiveChildByName = function(theName, theSubnameFlag, theIgnoreCaseFlag) {
         if (!_mySwitches) {
             return;
         }
-        
-        if (theSubnameFlag) {
-            Public.setActiveChildBySubName(theName);
-            return;
-        }
-    
-        var myNode = getDescendantByName(_mySwitches, theName, true);
-        if (!myNode) {
-            Logger.error("Could not find corresponding texture reference for: " + theName);
-            return;
-        }
 
-        switchTexture(myNode);
-    }
-    
-    Public.setActiveChildBySubName = function(theSubName) {
-        var myNode = null;
         for (var i=0; i<_mySwitches.childNodesLength(); ++i) {
-            myNode = _mySwitches.childNode(i);
-            if (myNode.name.indexOf(theSubName) != -1) {
-                Logger.debug("setting "+Public.node.name+" to "+theSubName);
+            var myNode = _mySwitches.childNode(i);
+            if (matchNodeName(myNode, theName, theSubnameFlag, theIgnoreCaseFlag)) {
+                Logger.warning("setting "+Public.node.name+" to "+theName);
                 switchTexture(myNode);
                 break;
             }
         }
+    }
+    
+    Public.setActiveChildBySubName = function(theSubName, theIgnoreCaseFlag) {
+        Public.setActiveChildByName(theSubName, true, theIgnoreCaseFlag);
     }
 
     var _mySwitches = null;
