@@ -416,7 +416,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
     // All collectable objects should be derived from collectableobject
     // to ensure the proper destructor can be called on finalizing
     template <class ThreadingModel, class Allocator>
-    struct Collectable {
+    class Collectable {
+    public:
         Collectable() {
             DBP2(std::cerr << "Collectable() @" << (void*)this << std::endl);
         };

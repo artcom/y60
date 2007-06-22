@@ -882,7 +882,7 @@ public:
 #endif        
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
-#if 1
+#if 0
         // TODO: adapt all these nifty allocators to support the WeakPtr stuff
         addTest(new AllocatorUnitTest<0,SingleThreaded,CollectablePtrAllocator<SingleThreaded> >("SingleThreaded"));
         addTest(new AllocatorUnitTest<0,SingleProcessor,CollectablePtrAllocator<SingleProcessor> >("SingleProcessor"));
