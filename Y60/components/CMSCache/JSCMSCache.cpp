@@ -37,6 +37,10 @@ static JSBool
 synchronize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::synchronize,cx,obj,argc,argv,rval);
 }
+static JSBool
+setProxy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::setProxy,cx,obj,argc,argv,rval);
+}
 
 static JSBool
 isSynchronized(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -67,6 +71,7 @@ JSCMSCache::Functions() {
         {"synchronize",        synchronize,               0},
         {"isSynchronized",     isSynchronized,            0},
         {"testConsistency",    testConsistency,           0},
+        {"setProxy",           setProxy,                  1},
         {0}
     };
     return myFunctions;

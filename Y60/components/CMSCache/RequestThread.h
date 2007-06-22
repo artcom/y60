@@ -36,6 +36,7 @@ class RequestThread : public asl::PosixThread {
                       const std::string & theUsername, 
                       const std::string & thePassword,
                       const std::string & theUserAgent,
+                      const std::string & theProxy,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
                       unsigned int theMaxRequestCount);
 
@@ -72,6 +73,7 @@ class RequestThread : public asl::PosixThread {
         unsigned int _myMaxRequestCount;
         std::string _myUserAgent;
         std::string _myLocalPath;
+        std::string _myProxy;
         std::string _myUsername;
         std::string _myPassword;
         std::map<std::string,std::string> _myCookieJar;

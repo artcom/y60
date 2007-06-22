@@ -47,7 +47,8 @@ CMSCache::CMSCache(const string & theLocalPath,
      _myBackendType( theBackendType ),
      _myMaxRequestCount( 1 ),
      _myCleanupFlag(false),
-     _mySessionCookie(theSessionCookie)
+     _mySessionCookie(theSessionCookie),
+     _myProxy("")
 {
     _myReportNodeVersion = 0;
     _myReportNode = dom::NodePtr( new dom::Element("report") );
@@ -137,6 +138,11 @@ CMSCache::collectExternalAssetList() {
 }
 
 void
+CMSCache::setProxy(const std::string & theProxy) {
+    _myProxy = theProxy;
+}
+
+void
 CMSCache::collectAssets(dom::NodePtr theParent) {
     for (unsigned i = 0; i < theParent->childNodesLength(); ++i) {
         dom::NodePtr myChild = theParent->childNode( i );
@@ -184,7 +190,7 @@ CMSCache::synchronize() {
         std::vector<std::pair<std::string, std::string> > myOutdatedAssets;
         collectOutdatedAssets(myOutdatedAssets);
         _myRequestThread = RequestThreadPtr(new RequestThread(_myLocalPath, _myUsername, _myPassword, 
-                    _myUserAgent, myOutdatedAssets, _myMaxRequestCount));
+                    _myUserAgent, _myProxy, myOutdatedAssets, _myMaxRequestCount));
         // fillRequestQueue();
         AC_INFO << "forking";
         _myRequestThread->fork();

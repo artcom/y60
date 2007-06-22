@@ -132,6 +132,7 @@ namespace inet {
             Request();
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const ;
             std::string         _myURL;
+            std::string         _myProxy;
             std::string         _myUserAgent;
             CURL *              _myCurlHandle;
             unsigned            _myLowSpeedLimit;

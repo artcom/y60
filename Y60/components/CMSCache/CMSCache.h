@@ -61,6 +61,8 @@ class CMSCache {
         bool getCleanupFlag() const { return _myCleanupFlag; }
         void setCleanupFlag(bool theFlag) { _myCleanupFlag = theFlag; }
 
+        void setProxy(const std::string & theProxy);
+
         unsigned getMaxRequestCount() const { return _myMaxRequestCount; }
         void setMaxRequestCount(unsigned theMaxCount) { _myMaxRequestCount = theMaxCount; }
 
@@ -108,6 +110,7 @@ class CMSCache {
         std::string _myLocalPath;
         std::string _myUsername;
         std::string _myPassword;
+        std::string _myProxy;
 
 };
 

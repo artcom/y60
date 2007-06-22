@@ -112,7 +112,8 @@ namespace inet {
 
     void
     Request::setProxy(const std::string & theProxyServer, bool theTunnelFlag) {
-        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROXY, theProxyServer.c_str());
+        _myProxy = theProxyServer;
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROXY, _myProxy.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPPROXYTUNNEL, theTunnelFlag);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);

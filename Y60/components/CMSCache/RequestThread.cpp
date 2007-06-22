@@ -29,12 +29,14 @@ RequestThread::RequestThread(const std::string & theLocalPath,
                       const std::string & theUsername, 
                       const std::string & thePassword,
                       const std::string & theUserAgent,
+                      const std::string & theProxy,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
                       unsigned int theMaxRequestCount) :
     _myLocalPath(theLocalPath), 
     _myUsername(theUsername), 
     _myPassword(thePassword), 
-    _myUserAgent(theUserAgent), 
+    _myUserAgent(theUserAgent),
+    _myProxy(theProxy),
     _myOutdatedAssets(theOutdatedAssets),
     _myMaxRequestCount(theMaxRequestCount),
     _remainingCount(theOutdatedAssets.size())
@@ -139,6 +141,9 @@ RequestThread::addAssetRequest(const std::string & thePath, const std::string & 
     }
     if ( ! _myUsername.empty() ) {
         myRequest->setCredentials(_myUsername, _myPassword, DIGEST);
+    }
+    if (! _myProxy.empty()) {
+        myRequest->setProxy(_myProxy,0);
     }
     // myRequest->setVerbose(true);
     _myAssetRequests.insert(make_pair(thePath, myRequest));

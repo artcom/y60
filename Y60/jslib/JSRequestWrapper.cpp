@@ -105,6 +105,15 @@ setCookie(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<inet::Request>::call(&inet::Request::setCookie,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+setProxy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets a HTTP Proxy.");
+    DOC_PARAM("theProxyHost", "", DOC_TYPE_STRING);
+    DOC_PARAM("theTunnelFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::setProxy,cx,obj,argc,argv,rval);
+}
+
 
 static JSBool
 getTimeFromHTTPDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -148,7 +157,8 @@ JSRequestWrapper::Functions() {
         {"getAllResponseHeaders", getAllResponseHeaders,   1},
         {"setTimeoutParams",  setTimeoutParams,    2},
         {"setCredentials",    setCredentials,      2},
-        {"setCookie",    setCookie,      1},
+        {"setCookie",         setCookie,      1},
+        {"setProxy",          setProxy,       2},
         {0}
     };
     return myFunctions;
