@@ -82,6 +82,7 @@ namespace y60 {
 
     void
     SceneOptimizer::run(dom::NodePtr theRootNode) {
+        //AC_PRINT << "Running optimizer";
         AC_INFO << "Running Scene optimizer";
         if (!theRootNode) {
             theRootNode = _myScene.getWorldRoot();
@@ -137,6 +138,42 @@ namespace y60 {
     }
 
     void
+    SceneOptimizer::transformToParent(dom::NodePtr theParent, dom::NodePtr theChild) {
+        //XXX: just curious why theChild->parentNode() doesn't work
+        //if (theChild) {
+        //    AC_PRINT << "theChild node exists: '" << theChild->nodeName() << "'";
+        //} else {
+        //    AC_PRINT << "theChild node doesn't exist";
+        //}
+
+        //if (theParent) {
+        //    AC_PRINT << "theParent exists: '" << theParent->nodeName() << "'";
+        //} else {
+        //    AC_PRINT << "theParent doesn't exist";
+        //}
+
+        //if (theChild->parentNode()) {
+        //    AC_PRINT << "parentNode exists: '" << theChild->parentNode()->nodeName() << "'";
+        //} else {
+        //    AC_PRINT << "parentNode doesn't exist";
+        //}
+
+        // get the inverse localmatrix of the parent
+        TransformHierarchyFacadePtr myFacade = theParent->getFacade<TransformHierarchyFacade>();
+        asl::Matrix4f myMatrix               = asl::inverse(myFacade->get<LocalMatrixTag>());
+        asl::Vector3f myScale;
+        asl::Vector3f myShear;
+        asl::Quaternionf myOrientation;
+        asl::Vector3f myPosition;
+        myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+
+        // transform the node
+        theChild->getAttribute(SCALE_ATTRIB)->nodeValueAssign<asl::Vector3f>(myScale);
+        theChild->getAttribute(ORIENTATION_ATTRIB)->nodeValueAssign<asl::Quaternionf>(myOrientation);
+        theChild->getAttribute(POSITION_ATTRIB)->nodeValueAssign<asl::Vector3f>(myPosition);
+    }
+
+    void
     SceneOptimizer::cleanupScene(dom::NodePtr theNode) {
         unsigned myNumChildren = theNode->childNodesLength();
         for (signed i = myNumChildren - 1; i >= 0; --i) {
@@ -153,7 +190,7 @@ namespace y60 {
             std::string myParentNodeName = theNode->nodeName();
             std::string myNodeName       = myChild->nodeName();
 
-            //XXX: commented out, until it has been tested
+            //XXX: untested
             //// make an included world node a transform node
             //// and merge it with its include node
             //if (myNodeName == WORLD_NODE_NAME && myParentNodeName == INCLUDE_NODE_NAME) {
@@ -188,24 +225,42 @@ namespace y60 {
                 theNode->removeChild(myChild);
             }
 
-            //XXX: commented out, until it has been tested
-            ////TODO: merge nodes with their single child
+            //XXX: untested
+            //// merge nodes with their single child
             //if (myNumChildren == 1) {
             //    // include or transform node => becomes child node
             //    if (myParentNodeName == INCLUDE_NODE_NAME || myNodeName == TRANSFORM_NODE_NAME) {
-            //        // transform child node with the child nodes globalmatrix and the parent nodes inverse global matrix
+            //        transformToParent(theNode, myChild);
+
             //        // replace the parent node with the child node
+            //        theNode->parentNode()->replaceChild(myChild, theNode);
             //    }
 
             //    // light or camera or projector node => takeover children of transform nodes
-            //    else if (myParentNodeName == LIGHT_NODE_NAME || myParentNodeName == CAMERA_NODE_NAME || myParentNodeName == PROJECTOR_NODE_NAME) {
-            //        // transform child node with the child nodes globalmatrix and the parent nodes inverse global matrix
-            //        // append the children of the child node to the parent node and remove the child node
+            //    else if ((myParentNodeName == LIGHT_NODE_NAME || myParentNodeName == CAMERA_NODE_NAME || myParentNodeName == PROJECTOR_NODE_NAME) &&
+            //             myNodeName == TRANSFORM_NODE_NAME) {
+            //        unsigned myNumGrandChildren = myChild->childNodesLength();
+            //        for (unsigned j = 0; j < myNumGrandChildren; ++j) {
+            //            dom::NodePtr myGrandChild = myChild->childNode(j);
+            //            transformToParent(myChild, myGrandChild);
+
+            //            // append the grandchild to the parent
+            //            theNode->appendChild(myGrandChild);
+            //        }
+
+            //        // remove the child node
+            //        theNode->removeChild(myChild);
             //    }
 
-            //    // world node with worlds parent or body node without children => do nothing
+            //    // world node with worlds parent or
+            //    // body node without children or
+            //    // light/camera/projector node with light/camera/projector child node
+            //    // => do nothing
             //    else if (myParentNodeName == WORLD_NODE_NAME && theNode->parentNode()->nodeName() == WORLD_LIST_NAME ||
-            //             myParentNodeName == BODY_NODE_NAME && myNumGrandChildren == 0) {
+            //             myParentNodeName == BODY_NODE_NAME && myNumGrandChildren == 0 ||
+            //             (myParentNodeName == LIGHT_NODE_NAME || myParentNodeName == CAMERA_NODE_NAME || myParentNodeName == PROJECTOR_NODE_NAME) &&
+            //             (      myNodeName == LIGHT_NODE_NAME ||       myNodeName == CAMERA_NODE_NAME ||       myNodeName == PROJECTOR_NODE_NAME))
+            //    {
             //        // allowed, but nothing to do
             //    }
 
@@ -336,17 +391,17 @@ namespace y60 {
             myAttribute->nodeValueRefClose<RenderStyles>();
 
             PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myElementType, myMaterialRef, myRenderStyles);
-            unsigned myNumSrcElements = mySrcElements->childNodesLength();
+            unsigned myNumSrcElements       = mySrcElements->childNodesLength();
             for (unsigned j = 0; j < myNumSrcElements; ++j) {
                 dom::NodePtr mySrcIndex = mySrcElements->childNode(j);
-                std::string myName = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
-                std::string myRole = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+                std::string myName      = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
+                std::string myRole      = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
                 dom::NodePtr myDstIndex = myDstElements->getIndex(myName, myRole);
 
                 const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
-                VectorOfUnsignedInt & myDst = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
-                unsigned myOffset = myDst.size();
-                unsigned myVertexDataOffset = theVertexDataOffsets[myRole];
+                VectorOfUnsignedInt & myDst       = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
+                unsigned myOffset                 = myDst.size();
+                unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
 
                 // Triangulate quads
                 if (mySrcElements->getAttributeString(PROPERTY_TYPE_ATTRIB) == PRIMITIVE_TYPE_QUADS) {
@@ -448,13 +503,10 @@ namespace y60 {
         for (signed i = myNumChildren - 1; i >= 0; --i) {
             dom::NodePtr myChild = theNode->childNode(i);
             std::string myChildNodeName = myChild->nodeName();
-            if (myChild->getAttributeValue<bool>(VISIBLE_ATTRIB) ||
-                myChildNodeName == CAMERA_NODE_NAME ||
-                myChildNodeName == LIGHT_NODE_NAME ||
-                myChildNodeName == PROJECTOR_NODE_NAME) {
-                removeInvisibleNodes(myChild);
-            } else {
+            if (!myChild->getAttributeValue<bool>(VISIBLE_ATTRIB) && !myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
                 theNode->removeChild(myChild);
+            } else {
+                removeInvisibleNodes(myChild);
             }
         }
     }

@@ -58,6 +58,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             theScene.update(Scene.ALL);
         }
         _mySunLight.visible = false;
+        _mySunLight.sticky  = true;
 
         // =================================
         //
@@ -84,6 +85,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                 Logger.trace("Found Headlight: " + myHeadLight);
             }
             myHeadLight.visible = false;
+            myHeadLight.sticky  = true;
             _myViewportHeadlights[myViewport.id] = myHeadLight;
             _myViewportHeadlightsEnabled[myViewport.id] = true;
 

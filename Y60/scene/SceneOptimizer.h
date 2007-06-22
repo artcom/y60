@@ -21,7 +21,6 @@ namespace y60 {
     class SceneOptimizer {
         public:
             SceneOptimizer(Scene & theScene);
-
             void run(dom::NodePtr theRootNode = dom::NodePtr(0));
 
         private:
@@ -65,6 +64,7 @@ namespace y60 {
             void removeInvisibleNodes(dom::NodePtr theNode);
             void collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds);
             void removeUnusedShapes();
+            void transformToParent(dom::NodePtr theParent, dom::NodePtr theChild);
 
             template <class T>
             unsigned copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData);
