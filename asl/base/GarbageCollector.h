@@ -427,7 +427,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
     };
     
     template <class ThreadingModel, class Allocator>
-    struct CollectableAllocated;
+    class CollectableAllocated;
   
     template <class T, class ThreadingModel, class Allocator=CollectablePtrAllocator<ThreadingModel> >
     struct MakeCollectable : public CollectableAllocated<ThreadingModel, Allocator> {
@@ -689,7 +689,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
                 }
 #else
                 CollectablePtrBase<ThreadingModel, Allocator> * myElem;
-                if (getInfo(it).myPtrs.getFirst(myElem)) {
+                if (myDescriptorSaver.getDescriptorPtr()->myNativePtr && myDescriptorSaver.getDescriptorPtr()->myPtrs.getFirst(myElem)) {
                     do {
                         if (myElem->getDescriptorPtr() &&
                             myElem->getDescriptorPtr()->myNativePtr &&
@@ -701,7 +701,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
                             DBP2(std::cerr << "-- sweepUnused: myElem="<< (void*)(myElem) << " , not disposing" << std::endl);
                         }
                         DBP2(std::cerr << "sweepUnused: loop end it in weakptr "<< (void*)(myDescriptorSaver.getDescriptorPtr()) << std::endl);
-                    } while (getInfo(it).myPtrs.advance(myElem));
+                    } while (myDescriptorSaver.getDescriptorPtr()->myNativePtr && myDescriptorSaver.getDescriptorPtr()->myPtrs.advance(myElem));
                 }
 #endif
                  DBP2(std::cerr << "- sweepUnused: inner loop done: (&*it)="<< (void*)(&*it) << std::endl);

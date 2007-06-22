@@ -882,7 +882,8 @@ public:
 #endif        
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
-#if 0
+// the windows release build fails when running under ant
+#ifndef WIN32
         // TODO: adapt all these nifty allocators to support the WeakPtr stuff
         addTest(new AllocatorUnitTest<0,SingleThreaded,CollectablePtrAllocator<SingleThreaded> >("SingleThreaded"));
         addTest(new AllocatorUnitTest<0,SingleProcessor,CollectablePtrAllocator<SingleProcessor> >("SingleProcessor"));
