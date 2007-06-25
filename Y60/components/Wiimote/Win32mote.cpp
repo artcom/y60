@@ -24,9 +24,9 @@ using namespace std;
 namespace y60 {
 
 Win32mote::Win32mote() : HIDDevice(),
+                         PosixThread(InputReportListener),
                          _myEventSchema( new dom::Document( oureventxsd ) ),
-                         _myValueFactory( new dom::ValueFactory() )
-
+                         _myValueFactory( new dom::ValueFactory())
 {
 	 // Add all Wii buttons to the our internal list
     _myButtons.push_back(Button("1",		0x0002));
@@ -43,12 +43,13 @@ Win32mote::Win32mote() : HIDDevice(),
             
     _myInputListening = false;
     
-    _myListenerThreadId = -1;
-    _myListenerThread = NULL;
+    //_myListenerThreadId = -1;
+    //_myListenerThread = NULL;
     
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
 
+    
 }
 
 Button
@@ -73,22 +74,47 @@ Win32mote::setButtons(int code) {
 }
 
     
-GenericEventPtr
-Win32mote::createEvent( int theID, const std::string & theType, asl::Vector3i & theMotionData)
-{
+void
+Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
     
     myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", theType);
-    myNode->appendAttribute<Vector3i>("motiondata", theMotionData);
-    return myEvent;
+    myNode->appendAttribute<std::string>("type", string("infrareddata"));
     
+    bool myGotDataFlag = false;
+    for (unsigned i = 0; i < 4; ++i) {
+    cout << "pos " << i << " " << theIRData[i] << endl;
+        if (theIRData[i][0] != 1023 && theIRData[i][1] != 1023) {
+            //myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
+            //myNode->appendAttribute<int>("irposition0", 0);
+            myGotDataFlag = true;
+            break;
+
+        }
+    }
+
+    if (myGotDataFlag) {
+        _myEventQueue->push( myEvent );
+    }
 }
 
-GenericEventPtr
-Win32mote::createEvent( int theID, const std::string & theType, std::string & theButtonName, bool thePressedState)
+void
+Win32mote::createEvent( int theID, asl::Vector3i & theMotionData) {
+    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
+            _myValueFactory));
+    dom::NodePtr myNode = myEvent->getNode();
+    
+    myNode->appendAttribute<int>("id", theID);
+    myNode->appendAttribute<std::string>("type", string("motiondata"));
+    myNode->appendAttribute<Vector3i>("motiondata", theMotionData);
+    
+    _myEventQueue->push( myEvent );
+}
+
+void
+Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedState)
 {
     
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
@@ -97,134 +123,216 @@ Win32mote::createEvent( int theID, const std::string & theType, std::string & th
     
     
     myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", theType);
+    //myNode->appendAttribute("type", "button");
     myNode->appendAttribute<std::string>("buttonname", theButtonName);
     myNode->appendAttribute<bool>("pressed", thePressedState);
        
-    return myEvent;
-    
+    _myEventQueue->push( myEvent );
 }
 
+Vector2i
+parseIRData( const unsigned char * theBuffer, unsigned theOffset) {
+    Vector2i myIRPos(0,0);
+    myIRPos[0] = theBuffer[theOffset];
+    myIRPos[1] = theBuffer[theOffset + 1];
+    myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
+    myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
     
+    int mySizeHint( theBuffer[ theOffset + 2] & 0x0f );
 
-unsigned CALLBACK Win32mote::InputReportListener(void * param)
-{
-	Win32mote * myDevice = reinterpret_cast<Win32mote*>(param);
+    return myIRPos;
+}
 
-	while (myDevice->_myInputListening)
-	{
-		unsigned char myInputReport[256];
-		ZeroMemory(myInputReport, 256);
-		
-		DWORD result, bytes_read;
-		
-		// Issue a read request
-		if (myDevice->m_read_handle != INVALID_HANDLE_VALUE)
-		{
-			result = ReadFile(myDevice->m_read_handle, 
-				myInputReport, 
-				myDevice->m_capabilities.InputReportByteLength, 
-				&bytes_read, 
-				(LPOVERLAPPED)&myDevice->m_hid_overlapped);																						  
-		}
-	 
-		// Wait for read to finish
-		result = WaitForSingleObject(myDevice->m_event_object, 300);
 
-		ResetEvent(myDevice->m_event_object);
-
-		// If the wait didn't result in a sucessful read, try again
-		if (result != WAIT_OBJECT_0)
-			continue;
-
-		if (INPUT_REPORT_BUTTONS == myInputReport[0])
-		{
-        int key_state = Util::GetInt2(myInputReport, 1);
-        
-        vector<Button> changed = myDevice->setButtons(key_state);
-        cout << "buttons changes " << changed.size();
+#if 0
+void
+Win32mote::handleButtonEvents( const unsigned char * theInputReport ) {
+    int key_state = Util::GetInt2(theInputReport, 1);
+    vector<Button> myChangedButtons = setButtons(key_state);
+    for( unsigned i=0; i < myChangedButtons.size(); ++i) {
+        Button myButton = myChangedButtons[i];
+        createEvent( m_controller_id, myButton.getName(), myButton.pressed());
     }
-		else if (INPUT_REPORT_MOTION == myInputReport[0])
-		{
-			Vector3i m(myInputReport[3] - 128, myInputReport[4] - 128, myInputReport[5] - 128);
-      
-			int key_state = Util::GetInt2(myInputReport, 1);
-			vector<Button> changed = myDevice->setButtons(key_state);
-      
-			myDevice->_myLastMotion = m;
-    }
-		else if (0x21 == myInputReport[0]) // reading calibration data
-		{
-			 Vector3i zero_point(myInputReport[6] - 128, myInputReport[7] - 128, myInputReport[8] - 128);
-			 myDevice->_myZeroPoint = zero_point;
-			 Vector3i one_g_point(myInputReport[10] - 128, myInputReport[11] - 128, myInputReport[12] - 128);
-			 myDevice->_myOneGPoint = one_g_point;
-		}
-	}
+}
 
-	return 0;
+void
+Win32mote::handleMotionEvents( const unsigned char * theInputReport ) {
+    Vector3i m(theInputReport[3] - 128, theInputReport[4] - 128, theInputReport[5] - 128);
+    _myLastMotion = m;
+    createEvent( m_controller_id, m);
+}
+
+void
+Win32mote::handleIREvents( const unsigned char * theInputReport ) {
+    Vector2i myIRPositions[4];
+    myIRPositions[0] = parseIRData( theInputReport, 6);
+    myIRPositions[1] = parseIRData( theInputReport, 9);
+    myIRPositions[2] = parseIRData( theInputReport, 12);
+    myIRPositions[3] = parseIRData( theInputReport, 15);
+
+    //cout << "pos " << myIRPositions[0] << endl;
+    createEvent( m_controller_id, myIRPositions );
+}
+
+#endif
+void
+Win32mote::InputReportListener(PosixThread & theThread)
+{
+    Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
+
+    while (myDevice._myInputListening) {
+        unsigned char myInputReport[256];
+        ZeroMemory(myInputReport, 256);
+
+        DWORD result, bytes_read;
+
+        // Issue a read request
+        if (myDevice.m_read_handle != INVALID_HANDLE_VALUE) {
+            result = ReadFile(myDevice.m_read_handle, 
+                    myInputReport, 
+                    myDevice.m_capabilities.InputReportByteLength, 
+                    &bytes_read, 
+                    (LPOVERLAPPED)&myDevice.m_hid_overlapped);																						  
+        }
+
+        // Wait for read to finish
+        result = WaitForSingleObject(myDevice.m_event_object, 300);
+
+        ResetEvent(myDevice.m_event_object);
+
+        // If the wait didn't result in a sucessful read, try again
+        if (result != WAIT_OBJECT_0) {
+            continue;
+        }
+
+        if (INPUT_REPORT_BUTTONS == myInputReport[0]) {
+
+            myDevice._myLock->lock();
+
+            //myDevice.handleButtonEvents( myInputReport );
+
+            myDevice._myLock->unlock();
+        } else if (INPUT_REPORT_MOTION == myInputReport[0]) {
+
+            
+            Vector3i m(myInputReport[3] - 128, myInputReport[4] - 128, myInputReport[5] - 128);
+            int key_state = Util::GetInt2(myInputReport, 1);
+            myDevice._myLastMotion = m;
+
+
+            myDevice._myLock->lock();
+
+            myDevice.createEvent( myDevice.m_controller_id, m);
+            vector<Button> myChangedButtons = myDevice.setButtons(key_state);
+            for( unsigned i=0; i < myChangedButtons.size(); ++i) {
+                Button myButton = myChangedButtons[i];
+                myDevice.createEvent(myDevice.m_controller_id, myButton.getName(), myButton.pressed());
+            }
+
+            myDevice._myLock->unlock();
+
+            //myDevice.handleButtonEvents( myInputReport );
+            //myDevice.handleMotionEvents( myInputReport );
+
+            
+
+        } else if (0x21 == myInputReport[0]) {
+            Vector3i zero_point(myInputReport[6] - 128, myInputReport[7] - 128, myInputReport[8] - 128);
+            myDevice._myZeroPoint = zero_point;
+            Vector3i one_g_point(myInputReport[10] - 128, myInputReport[11] - 128, myInputReport[12] - 128);
+            myDevice._myOneGPoint = one_g_point;
+            
+        } else if (INPUT_REPORT_IR == myInputReport[0]) {
+            //int myX1 = myInputReport
+            //cout << myInputReport << endl;
+
+            myDevice._myLock->lock();
+            
+    int key_state = Util::GetInt2(myInputReport, 1);
+    vector<Button> myChangedButtons = myDevice.setButtons(key_state);
+    for( unsigned i=0; i < myChangedButtons.size(); ++i) {
+        Button myButton = myChangedButtons[i];
+        myDevice.createEvent( myDevice.m_controller_id, myButton.getName(), myButton.pressed());
+    }
+
+    Vector3i m(myInputReport[3] - 128, myInputReport[4] - 128, myInputReport[5] - 128);
+    myDevice._myLastMotion = m;
+    myDevice.createEvent( myDevice.m_controller_id, m);
+
+    Vector2i myIRPositions[4];
+    myIRPositions[0] = parseIRData( myInputReport, 6);
+    myIRPositions[1] = parseIRData( myInputReport, 9);
+    myIRPositions[2] = parseIRData( myInputReport, 12);
+    myIRPositions[3] = parseIRData( myInputReport, 15);
+
+    //cout << "pos " << myIRPositions[0] << endl;
+    myDevice.createEvent( myDevice.m_controller_id, myIRPositions );
+
+//
+//            myDevice.handleIREvents( myInputReport );
+//            myDevice.handleButtonEvents( myInputReport );
+            //myDevice.handleMotionEvents( myInputReport );
+
+            myDevice._myLock->unlock();
+
+        }
+    }
+
 }
 
 
-bool Win32mote::startListening()
-{
-	printf("Started listening: %i", m_controller_id);
+void Win32mote::startListening() {
+    AC_PRINT << "Started listening: " << m_controller_id;
 
-  
-	_myInputListening = true;
-	_myListenerThread = (HANDLE)_beginthreadex(
-		0, 
-		0, 
-		InputReportListener, 
-		this, 
-		0, 
-		&_myListenerThreadId); 
-
-	printf("Created thread: %i", _myListenerThreadId);
-
-	return false;
+    _myInputListening = true;
+    fork();
 }
 
     
-bool Win32mote::stopListening()
+void Win32mote::stopListening()
 {
-	printf("Stopped listening: %i", m_controller_id);
+    AC_PRINT << "Stopped listening: " << m_controller_id;
 
-	_myInputListening = false;
+    _myInputListening = false;
 
-	WaitForSingleObject(m_event_object, 300);
+    join();
 
-	// Needs to clean up thread -- Heap corruption exception?
-	//CloseHandle(_myListenerThread);
-	_myListenerThread = NULL;
-
-	return true;
 }
 
 
-std::vector<Win32mote>
+std::vector<Win32motePtr>
 Win32mote::discover() {
-    vector<Win32mote> wiimotes = HIDDevice::ConnectToHIDDevices<Win32mote>();
+    vector<Win32motePtr> wiimotes = HIDDevice::ConnectToHIDDevices<Win32mote>();
+    /*
     if( wiimotes.size() > 0 ) {
         for(unsigned i=0; i<wiimotes.size(); ++i){
-            wiimotes[i].startListening();
+            wiimotes[i]->startListening();
         }
         cout << "wiimotes found " << wiimotes.size() << endl;
     } else {
         cout << "no wiimotes found " << endl;
     }
+    */
     return wiimotes;
 }
 
 void Win32mote::close()
 {
-	if (isListening())
+	if (isActive()) {
 		stopListening();
+    }
 
-	CloseHandle(_myListenerThread);
+	//CloseHandle(_myListenerThread);
 	CloseHandle(m_device_handle);
 	CloseHandle(m_read_handle);
 	CloseHandle(m_write_handle);
 }
 
+void
+Win32mote::setEventQueue( asl::Ptr<std::queue<y60::GenericEventPtr> > theQueue,
+               asl::Ptr<asl::ThreadLock> theLock)
+{
+    _myLock = theLock;
+    _myEventQueue = theQueue;
+}
 }

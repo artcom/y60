@@ -23,18 +23,25 @@
 #include <dom/Nodes.h>
 #include <y60/GenericEvent.h>
 #include <y60/Scene.h>
+#include <asl/PosixThread.h>
+#include <asl/ThreadLock.h>
+
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <math.h>
 
 #pragma once
 
 const static char INPUT_REPORT_BUTTONS		= 0x30;
-const static char OUTPUT_REPORT_SET_MOTION	= 0x12;
+const static char INPUT_REPORT_IR         = 0x33;
+const static char OUTPUT_REPORT_SET       	= 0x12;
 const static char OUTPUT_WRITE_DATA			= 0x16;
 const static char OUTPUT_READ_DATA			= 0x17;
 const static char INPUT_REPORT_MOTION		= 0x31;
+const static char IR_ENABLE             = 0x13;
+const static char OUTPUT_REPORT_IR      = 0x04;
 
 const static char INPUT_READ_DATA			= 0x21;
 const static char INPUT_WRITE_DATA			= 0x22;
@@ -44,30 +51,42 @@ const static char INPUT_WRITE_DATA			= 0x22;
 namespace y60 {
             
     class Win32mote :
-        public HIDDevice
+        public HIDDevice,
+        public asl::PosixThread
     { 
     public:
         Win32mote();
-        ~Win32mote() {}
+        ~Win32mote() {
+            close();
+        }
 
-        static std::vector<Win32mote> discover();
-        void close();
+        void setEventQueue( asl::Ptr<std::queue<y60::GenericEventPtr> > theQueue,
+                            asl::Ptr<asl::ThreadLock> theLock);
 
-        y60::GenericEventPtr createEvent( int theID, const std::string & theType, std::string & theButtonName, bool thePressedState);
-        y60::GenericEventPtr createEvent( int theID, const std::string & theType, asl::Vector3i & theMotionData);
+        static std::vector<asl::Ptr< Win32mote, dom::ThreadingModel> > discover();
+
         asl::Vector3i getLastMotionData() const { return _myLastMotion; }
 
         Button getButton(std::string label);
         std::vector<Button> getButtons() const { return _myButtons; }
         
+        void startListening();
+        void stopListening();
+
+        //void handleButtonEvents( const unsigned char * theInputReport );
+        //void handleMotionEvents( const unsigned char * theInputReport );
+        //void handleIREvents( const unsigned char * theInputReport );
+
     protected:
         
+        void createEvent( int theID, std::string & theButtonName, bool thePressedState);
+        void createEvent( int theID, asl::Vector3i & theMotionData);
+        void createEvent( int theID, const asl::Vector2i theIRData[4] );
     
-        bool startListening();
-        bool stopListening();
-        bool isListening() const { return _myListenerThread != NULL; }
-        
-        static unsigned CALLBACK Win32mote::InputReportListener(void * param);
+        //asl::Vector2i parseIRData(const unsigned char * theBuffer, unsigned theOffset);
+        void close();
+                
+        static void Win32mote::InputReportListener(PosixThread & theThread); 
 
         std::vector<Button> setButtons(int code);
         std::vector<Button>	_myButtons;
@@ -80,8 +99,12 @@ namespace y60 {
         asl::Ptr<dom::ValueFactory>  _myValueFactory;
         
         bool			_myInputListening;
-        unsigned int _myListenerThreadId;
-        HANDLE _myListenerThread;
+        //unsigned int _myListenerThreadId;
+        //HANDLE _myListenerThread;
+        //PosixThread _myThread;
+
+        asl::Ptr< std::queue<y60::GenericEventPtr> > _myEventQueue;
+        asl::Ptr< asl::ThreadLock > _myLock;
         
     };
     typedef asl::Ptr<Win32mote, dom::ThreadingModel> Win32motePtr;

@@ -178,7 +178,7 @@ public:
 class Util
 {
 public:
-	static int GetInt2(unsigned char * report, int offset)
+	static int GetInt2(const unsigned char * report, int offset)
 	{
 		int ret = 0;
 
@@ -189,7 +189,7 @@ public:
 		return ret;
 	}
 
-	static int GetInt4(unsigned char * report, int offset)
+	static int GetInt4(const unsigned char * report, int offset)
 	{
 		int ret = 0;
 

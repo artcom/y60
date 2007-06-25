@@ -3,6 +3,9 @@
 
 // May be used and modified freely as long as this message is left intact
 
+#include <asl/Ptr.h>
+#include <dom/Nodes.h>
+
 #include "stdafx.h"
 
 #include <wtypes.h>
@@ -54,9 +57,9 @@ public:
 
 	/* This function is templated in order to support instantiation of subclassed versions of Wiimote */
 	template <class T>
-	static std::vector<T> ConnectToHIDDevices()
+	static std::vector<asl::Ptr<T, dom::ThreadingModel> > ConnectToHIDDevices()
 	{
-		std::vector<T> devices;
+      std::vector<asl::Ptr<T, dom::ThreadingModel> > devices;
 
 		HANDLE WriteHandle = 0, DeviceHandle = 0;
 
@@ -109,22 +112,22 @@ public:
 			if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID)
 			{
 				// If the vendor and product IDs match, we've found a wiimote 
-				T device;
+          asl::Ptr<T, dom::ThreadingModel> device( new T() );
 
-				device.m_device_path_name = detailData->DevicePath;
-				device.m_device_handle = DeviceHandle;
+				device->m_device_path_name = detailData->DevicePath;
+				device->m_device_handle = DeviceHandle;
 
 				// Register to receive device notifications.
 				// RegisterForDeviceNotifications();
 
-				GetDeviceCapabilities(device);
+				GetDeviceCapabilities(*device);
 
-				device.m_write_handle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+				device->m_write_handle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
 					(LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
 
-				PrepareForOverlappedTransfer(device, detailData);
+				PrepareForOverlappedTransfer(*device, detailData);
 
-				device.m_controller_id = devices.size() + 1;
+				device->m_controller_id = devices.size();
 				devices.push_back(device);
 			}
 			else

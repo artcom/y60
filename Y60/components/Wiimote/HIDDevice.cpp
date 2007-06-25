@@ -44,21 +44,60 @@ void HIDDevice::GetDeviceCapabilities(HIDDevice & device)
 	HidD_FreePreparsedData(PreparsedData);
 }
 
-void HIDDevice::WriteOutputReport(char out_bytes[])
-{
-	char	output_report[256];
-	DWORD	bytes_written = 0;
-	ULONG	result;
+void HIDDevice::WriteOutputReport(char out_bytes[]) {
+    char	output_report[256];
+    DWORD	bytes_written = 0;
+    ULONG	result;
 
-	memcpy(output_report, out_bytes, 256);
+    memset(output_report, 0, 256);
+    memcpy(output_report, out_bytes, 256);
 
-	if (m_write_handle != INVALID_HANDLE_VALUE)
-		result = WriteFile(m_write_handle, output_report, m_capabilities.OutputReportByteLength, &bytes_written, NULL);
+    if (m_write_handle != INVALID_HANDLE_VALUE) {
+        result = WriteFile(m_write_handle, output_report, m_capabilities.OutputReportByteLength,
+                           &bytes_written, NULL);
+    }
 
-  //cout << " write done " << endl;
-	if (!result)
-		throw exception(); // If we can't write to the device, we're not really connected
+    //cout << " write done " << endl;
+    if (!result) {
+        // If we can't write to the device, we're not really connected
+        throw asl::Exception("Failed to send outgoing report", PLUS_FILE_LINE);
+    }
 }
+
+
+#if 0
+void
+HIDDevice::sendOutputReport( const unsigned char * theData, unsigned long theAddress, unsigned char theSize) {
+	unsigned char cmd[22];
+	//unsigned long addr = CFSwapInt32HostToBig(address);
+	unsigned long addr = theAddress;
+
+	int i;
+	for(i=0 ; i < theSize ; i++) {
+		cmd[i+6] = theData[i];
+	}
+	for(; i < 16; i++) {
+		cmd[i+6]= 0;
+	}
+	
+	cmd[0] = 0x16;
+	cmd[1] = (addr >> 24) & 0xFF;
+	cmd[2] = (addr >> 16) & 0xFF;
+	cmd[3] = (addr >>  8) & 0xFF;
+	cmd[4] = (addr >>  0) & 0xFF;
+	cmd[5] = theSize;
+	
+	// and of course the vibration flag, as usual
+	//if (isVibrationEnabled)	cmd[1] |= 0x01;
+	
+	data = cmd;
+	
+    // XXX send  data!
+	//return [self sendCommand:cmd length:22];
+
+}
+#endif
+
 
 //void HIDDevice::RegisterForDeviceNotifications(HIDDevice & device)
 //{

@@ -48,45 +48,45 @@ using namespace std;
 // }
 
 
-int main( int argc, char* argv[] )
-{
+// int main( int argc, char* argv[] )
+// {
 
-    y60::Wiimote myDriver;
-    //myDriver.setLEDs(1, 1, 0, 1);
-    //myDr
-    unsigned myNumWiimotes = myDriver.getNumWiimotes();
-    for(unsigned i=0; i<myNumWiimotes; ++i) {
-        myDriver.setRumble(i,false);
-        myDriver.setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
-    }
-    myDriver.requestMotionData();
-    bool quit = false;
-    while (!quit)
-    {
-        y60::EventPtrList myEvents = myDriver.poll();
-        for(unsigned i=0 ; i < myEvents.size(); ++i) {
-            y60::GenericEventPtr myGEvent = dynamic_cast_Ptr<y60::GenericEvent>( myEvents[i] );
-            if ( ! myGEvent ) {
-                cerr << "CAST FAILED" << endl;
-            }
-            dom::NodePtr myEvent = myGEvent->getNode();
+//     y60::Wiimote myDriver;
+//     //myDriver.setLEDs(1, 1, 0, 1);
+//     //myDr
+//     unsigned myNumWiimotes = myDriver.getNumWiimotes();
+//     for(unsigned i=0; i<myNumWiimotes; ++i) {
+//         myDriver.setRumble(i,false);
+//         myDriver.setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
+//     }
+//     myDriver.requestMotionData();
+//     bool quit = false;
+//     while (!quit)
+//     {
+//         y60::EventPtrList myEvents = myDriver.poll();
+//         for(unsigned i=0 ; i < myEvents.size(); ++i) {
+//             y60::GenericEventPtr myGEvent = dynamic_cast_Ptr<y60::GenericEvent>( myEvents[i] );
+//             if ( ! myGEvent ) {
+//                 cerr << "CAST FAILED" << endl;
+//             }
+//             dom::NodePtr myEvent = myGEvent->getNode();
             
-            if(myEvent->getAttributeString("type") == "button" && myEvent->getAttributeString("buttonname") == "Home") {
-                if( myEvent->getAttributeValue<bool>("pressed") == true) {
-                    quit = true;
-                }
-            }
-            if(myEvent->getAttributeString("type") == "button" && myEvent->getAttributeString("buttonname") == "B") {
-                cout << *myEvent << endl;
-                myDriver.setRumble(myEvent->getAttributeValue<int>("id"), myEvent->getAttributeValue<bool>("pressed"));
-            }
-        }
+//             if(myEvent->getAttributeString("type") == "button" && myEvent->getAttributeString("buttonname") == "Home") {
+//                 if( myEvent->getAttributeValue<bool>("pressed") == true) {
+//                     quit = true;
+//                 }
+//             }
+//             if(myEvent->getAttributeString("type") == "button" && myEvent->getAttributeString("buttonname") == "B") {
+//                 cout << *myEvent << endl;
+//                 myDriver.setRumble(myEvent->getAttributeValue<int>("id"), myEvent->getAttributeValue<bool>("pressed"));
+//             }
+//         }
         
-    }
-    for(unsigned i=0; i<myNumWiimotes; ++i) {
-        myDriver.setLEDs(i, 0,0,0,0);
-        myDriver.setRumble(i, false);
-    }
+//     }
+//     for(unsigned i=0; i<myNumWiimotes; ++i) {
+//         myDriver.setLEDs(i, 0,0,0,0);
+//         myDriver.setRumble(i, false);
+//     }
 
-	return 0;
-}
+// 	return 0;
+// }
