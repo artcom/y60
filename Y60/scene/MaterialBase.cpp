@@ -64,7 +64,7 @@ namespace y60 {
     }
 
     bool
-    MaterialBase::reloadRequired() const {
+    MaterialBase::reloadRequired() const{
         MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
             return false;
@@ -74,15 +74,16 @@ namespace y60 {
 
     int
     MaterialBase::getGroup1Hash() const {
-        /*static bool myToggle = false;
-        myToggle = !myToggle;
-        return myToggle ? 0:1;*/
         return getChild<MaterialPropertiesTag>()->get<MaterialPropGroup1HashTag>();
     }
 
     bool 
     MaterialBase::rebindRequired() {
-        if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
+		// force childnodes to reconnect
+        forceRebindChild<MaterialPropertiesTag>();
+        forceRebindChild<MaterialRequirementTag>();
+
+		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
             _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
             return true;
         } else {
