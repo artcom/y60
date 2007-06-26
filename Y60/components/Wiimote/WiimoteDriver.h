@@ -46,9 +46,9 @@ namespace y60 {
                     // XXX set LEDs to controller id (binary) ;-)
                     setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
                 }
-                requestMotionData();
+                //requestMotionData();
                 //requestButtonData();
-                //requestInfraredData();
+                requestInfraredData();
             }  
         
         ~WiimoteDriver() {
@@ -71,27 +71,6 @@ namespace y60 {
                 myEvents.push_back( _myEventQueue->front() );
                 _myEventQueue->pop();
             }
-
-            _myLock->unlock();
-#if 0
-            for (int i = 0; i < _myIOHandles.size(); ++i) {
-                asl::Vector3i m = _myIOHandles[i]->getLastMotionData();
-                //cerr << (*_myIOHandles[i].createEvent(i, "motiondata", m)->getNode()) << endl;
-                myEvents.push_back( _myIOHandles[i]->createEvent(i, "motiondata", m) );
-                    
-                std::vector<Button> myButtonList = _myIOHandles[i]->getButtons();
-                for( unsigned button=0; button < myButtonList.size(); ++button) {
-                    Button myButton = myButtonList[button];
-                    if( myButton.hasChanged() ) {
-                        myEvents.push_back( _myIOHandles[i]->createEvent(i, "button", myButton.getName(), myButton.pressed()));
-                    }
-                }
-                //cout << "wiimote index " << i << " motion " << (int)m.x << " "
-                //     << (int)m.y << " " << (int)m.z << endl;
-
-                
-            }
-#endif
             return myEvents;
         }
 

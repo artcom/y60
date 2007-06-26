@@ -32,6 +32,11 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
     SceneViewer.prototype.Constructor(self, theArguments);
     var Base = [];
+
+    var _myBody = null;
+    var _myLowPassedDownVector = new Vector3f( 0, 1, 0 );
+    var _myOrientationVector = null;
+    
     
     //////////////////////////////////////////////////////////////////////
     //
@@ -46,14 +51,26 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         //window.position = [0, 0];
         window.decorations = false;
         window.resize(theWidth, theHeight);
-        print("setup");
         myWiimote = plug("Wiimote");
-        print("plugged wiimote");
+
+
+        _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
+        _myBody.scale = new Vector3f(5, 5,5);
+
+
+        _myOrientationVector = Node.createElement("vector");
+        window.scene.world.appendChild( _myOrientationVector );
+
+        _myOrientationVector.color = new Vector4f(1,1,1,1);
+        _myOrientationVector.scale = [1,1,1];
+        
     }
 
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
+
+        //_myBody.orientation.assignFromEuler( new Vector3f( 0, 0.1 * theTime, 0));
     }
 
     Base.onPostRender = self.onPostRender;
@@ -67,11 +84,6 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         print( "mouse pos: " + theX + " " + theY);
     }
 
-    Base.onKey = self.onKey;
-    self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-
-     }
-
     self.onWiiEvent = function( theNode ) {
         //print(theNode);
 
@@ -84,10 +96,26 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             myWiimote.setRumble( theNode.id, theNode.pressed );
         }
         
-        if (theNode.type == "infrareddata") {
-            print(theNode);
+        if (theNode.type == "motiondata") {
+            //print(theNode);
+            
+            var myDownVector = new Vector3f( theNode.motiondata.x, theNode.motiondata.y,
+                                              theNode.motiondata.z );
+
+
+            myDownVector = normalized( myDownVector );
+
+
+            _myLowPassedDownVector = normalized( sum( product( _myLowPassedDownVector, 0.9),
+                                          product( myDownVector, 0.1) ) );
+
+
+            _myOrientationVector.value = _myLowPassedDownVector;
+
+            //print("down: " + _myLowPassedDownVector + " magnitude: " + magnitude( _myLowPassedDownVector ));
+            _myBody.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
         }
- 
+22 
     }
     
 
@@ -102,10 +130,11 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
 if (__main__ == "WiimoteTest") {
     try {
-        var ourWiimoteTestApp = new WiimoteTestApp(
-            [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+        var ourWiimoteTestApp = new WiimoteTestApp(arguments);
+        //var ourWiimoteTestApp = new WiimoteTestApp(
+        //    [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
         //ourWiimoteTestApp.setup(600, 600, "WiimoteTest");
-        ourWiimoteTestApp.setup(1400, 1050, "WiimoteTest");
+        ourWiimoteTestApp.setup(1400, 1050, "Wiimote");
         ourWiimoteTestApp.go();
     } catch (ex) {
         print("-------------------------------------------------------------------------------");

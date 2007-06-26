@@ -4,6 +4,9 @@
     <xs:simpleType name="Vector3i">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="Vector2i">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="generic">
         <xs:complexType>
             <xs:attribute name="when" type="xs:double"/>
@@ -13,6 +16,7 @@
             <xs:attribute name="type" type="xs:string"/>
             <xs:attribute name="motiondata" type="Vector3i"/>
             <xs:attribute name="buttonname" type="xs:string"/>
+            <xs:attribute name="pressed" type="xs:boolean"/>
             <xs:attribute name="irposition0" type="Vector2i"/>
             <xs:attribute name="irposition1" type="Vector2i"/>
             <xs:attribute name="irposition2" type="Vector2i"/>

@@ -85,10 +85,8 @@ Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
     
     bool myGotDataFlag = false;
     for (unsigned i = 0; i < 4; ++i) {
-    cout << "pos " << i << " " << theIRData[i] << endl;
         if (theIRData[i][0] != 1023 && theIRData[i][1] != 1023) {
-            //myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
-            //myNode->appendAttribute<int>("irposition0", 0);
+            myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
             myGotDataFlag = true;
             break;
 
@@ -96,7 +94,7 @@ Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
     }
 
     if (myGotDataFlag) {
-        _myEventQueue->push( myEvent );
+        _myEventVector.push_back( myEvent );
     }
 }
 
@@ -110,7 +108,7 @@ Win32mote::createEvent( int theID, asl::Vector3i & theMotionData) {
     myNode->appendAttribute<std::string>("type", string("motiondata"));
     myNode->appendAttribute<Vector3i>("motiondata", theMotionData);
     
-    _myEventQueue->push( myEvent );
+    _myEventVector.push_back( myEvent );
 }
 
 void
@@ -123,11 +121,11 @@ Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedS
     
     
     myNode->appendAttribute<int>("id", theID);
-    //myNode->appendAttribute("type", "button");
+    myNode->appendAttribute("type", "button");
     myNode->appendAttribute<std::string>("buttonname", theButtonName);
     myNode->appendAttribute<bool>("pressed", thePressedState);
        
-    _myEventQueue->push( myEvent );
+    _myEventVector.push_back( myEvent );
 }
 
 Vector2i
@@ -144,7 +142,6 @@ parseIRData( const unsigned char * theBuffer, unsigned theOffset) {
 }
 
 
-#if 0
 void
 Win32mote::handleButtonEvents( const unsigned char * theInputReport ) {
     int key_state = Util::GetInt2(theInputReport, 1);
@@ -157,7 +154,8 @@ Win32mote::handleButtonEvents( const unsigned char * theInputReport ) {
 
 void
 Win32mote::handleMotionEvents( const unsigned char * theInputReport ) {
-    Vector3i m(theInputReport[3] - 128, theInputReport[4] - 128, theInputReport[5] - 128);
+    // swizzle vector from xzy-order to y60-order (xyz)
+    Vector3i m(theInputReport[3] - 128, theInputReport[5] - 128,  - (theInputReport[4] - 128) );
     _myLastMotion = m;
     createEvent( m_controller_id, m);
 }
@@ -174,7 +172,6 @@ Win32mote::handleIREvents( const unsigned char * theInputReport ) {
     createEvent( m_controller_id, myIRPositions );
 }
 
-#endif
 void
 Win32mote::InputReportListener(PosixThread & theThread)
 {
@@ -209,31 +206,19 @@ Win32mote::InputReportListener(PosixThread & theThread)
 
             myDevice._myLock->lock();
 
-            //myDevice.handleButtonEvents( myInputReport );
+            myDevice.handleButtonEvents( myInputReport );
 
             myDevice._myLock->unlock();
         } else if (INPUT_REPORT_MOTION == myInputReport[0]) {
 
             
-            Vector3i m(myInputReport[3] - 128, myInputReport[4] - 128, myInputReport[5] - 128);
-            int key_state = Util::GetInt2(myInputReport, 1);
-            myDevice._myLastMotion = m;
-
-
             myDevice._myLock->lock();
 
-            myDevice.createEvent( myDevice.m_controller_id, m);
-            vector<Button> myChangedButtons = myDevice.setButtons(key_state);
-            for( unsigned i=0; i < myChangedButtons.size(); ++i) {
-                Button myButton = myChangedButtons[i];
-                myDevice.createEvent(myDevice.m_controller_id, myButton.getName(), myButton.pressed());
-            }
+
+            myDevice.handleButtonEvents( myInputReport );
+            myDevice.handleMotionEvents( myInputReport );
 
             myDevice._myLock->unlock();
-
-            //myDevice.handleButtonEvents( myInputReport );
-            //myDevice.handleMotionEvents( myInputReport );
-
             
 
         } else if (0x21 == myInputReport[0]) {
@@ -246,33 +231,16 @@ Win32mote::InputReportListener(PosixThread & theThread)
             //int myX1 = myInputReport
             //cout << myInputReport << endl;
 
-            myDevice._myLock->lock();
             
-    int key_state = Util::GetInt2(myInputReport, 1);
-    vector<Button> myChangedButtons = myDevice.setButtons(key_state);
-    for( unsigned i=0; i < myChangedButtons.size(); ++i) {
-        Button myButton = myChangedButtons[i];
-        myDevice.createEvent( myDevice.m_controller_id, myButton.getName(), myButton.pressed());
-    }
+            myDevice.handleIREvents( myInputReport );
+            myDevice.handleButtonEvents( myInputReport );
+            myDevice.handleMotionEvents( myInputReport );
 
-    Vector3i m(myInputReport[3] - 128, myInputReport[4] - 128, myInputReport[5] - 128);
-    myDevice._myLastMotion = m;
-    myDevice.createEvent( myDevice.m_controller_id, m);
-
-    Vector2i myIRPositions[4];
-    myIRPositions[0] = parseIRData( myInputReport, 6);
-    myIRPositions[1] = parseIRData( myInputReport, 9);
-    myIRPositions[2] = parseIRData( myInputReport, 12);
-    myIRPositions[3] = parseIRData( myInputReport, 15);
-
-    //cout << "pos " << myIRPositions[0] << endl;
-    myDevice.createEvent( myDevice.m_controller_id, myIRPositions );
-
-//
-//            myDevice.handleIREvents( myInputReport );
-//            myDevice.handleButtonEvents( myInputReport );
-            //myDevice.handleMotionEvents( myInputReport );
-
+            myDevice._myLock->lock();
+            for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
+                myDevice._myEventQueue->push(myDevice._myEventVector[i]);
+            }
+            myDevice._myEventVector.clear();
             myDevice._myLock->unlock();
 
         }

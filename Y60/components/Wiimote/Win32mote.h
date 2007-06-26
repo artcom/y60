@@ -73,9 +73,9 @@ namespace y60 {
         void startListening();
         void stopListening();
 
-        //void handleButtonEvents( const unsigned char * theInputReport );
-        //void handleMotionEvents( const unsigned char * theInputReport );
-        //void handleIREvents( const unsigned char * theInputReport );
+        void handleButtonEvents( const unsigned char * theInputReport );
+        void handleMotionEvents( const unsigned char * theInputReport );
+        void handleIREvents( const unsigned char * theInputReport );
 
     protected:
         
@@ -104,7 +104,9 @@ namespace y60 {
         //PosixThread _myThread;
 
         asl::Ptr< std::queue<y60::GenericEventPtr> > _myEventQueue;
+        std::vector<y60::GenericEventPtr> _myEventVector;
         asl::Ptr< asl::ThreadLock > _myLock;
+        
         
     };
     typedef asl::Ptr<Win32mote, dom::ThreadingModel> Win32motePtr;
