@@ -1925,6 +1925,7 @@ js_NewFunction(JSContext *cx, JSObject *funobj, JSNative native, uintN nargs,
         OBJ_SET_PARENT(cx, funobj, parent);
     } else {
         funobj = js_NewObject(cx, &js_FunctionClass, NULL, parent);
+        GC_GREY(cx, OBJECT_TO_JSVAL(funobj), "blah", NULL);
         if (!funobj) {
             JS_free(cx, fun);
             return NULL;
@@ -1961,6 +1962,7 @@ js_CloneFunctionObject(JSContext *cx, JSObject *funobj, JSObject *parent)
 
     JS_ASSERT(OBJ_GET_CLASS(cx, funobj) == &js_FunctionClass);
     newfunobj = js_NewObject(cx, &js_FunctionClass, funobj, parent);
+    GC_GREY(cx, OBJECT_TO_JSVAL(newfunobj), "cloneFunction", NULL);
     if (!newfunobj)
         return NULL;
     fun = (JSFunction *) JS_GetPrivate(cx, funobj);

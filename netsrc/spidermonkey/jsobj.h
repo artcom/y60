@@ -147,7 +147,7 @@ struct JSObject {
 #define LOCKED_OBJ_GET_SLOT(obj,slot) \
     (OBJ_CHECK_SLOT(obj, slot), (obj)->slots[slot])
 #define LOCKED_OBJ_SET_SLOT(obj,slot,value) \
-    (OBJ_CHECK_SLOT(obj, slot), js_AppendToGreyList(cx, value, NULL), (obj)->slots[slot] = (value))
+    (OBJ_CHECK_SLOT(obj, slot), (js_AppendToGreyListMaybe(cx, value, NULL, (obj))), (obj)->slots[slot] = (value))
 #define LOCKED_OBJ_GET_PROTO(obj) \
     JSVAL_TO_OBJECT(LOCKED_OBJ_GET_SLOT(obj, JSSLOT_PROTO))
 #define LOCKED_OBJ_GET_CLASS(obj) \

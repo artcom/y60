@@ -163,6 +163,9 @@ extern void
 js_MarkValue(JSContext *cx, jsval val, void *arg);
 
 extern void
+js_AppendToGreyListMaybe(JSContext *cx, jsval val, void *arg, JSObject *obj);
+
+extern void
 js_AppendToGreyList(JSContext *cx, jsval val, void *arg);
 
 #ifdef GC_MARK_DEBUG

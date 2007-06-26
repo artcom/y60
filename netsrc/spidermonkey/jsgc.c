@@ -1067,6 +1067,13 @@ out:
 }
 
 void
+js_AppendToGreyListMaybe(JSContext *cx, jsval val, void *arg, JSObject *obj) {
+    if (*js_GetGCThingFlags(obj) & GCF_SCANNED) {
+        js_AppendToGreyList(cx, val, arg);
+    }
+}
+
+void
 js_AppendToGreyList(JSContext *cx, jsval val, void *arg) {
 
     void *thing;

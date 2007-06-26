@@ -1784,6 +1784,7 @@ js_Interpret(JSContext *cx, jsval *result)
                  */
                 ok = js_AddRoot(cx, &propobj->slots[JSSLOT_PARENT],
                                 "propobj->parent");
+                GC_GREY(cx, propobj->slots[JSSLOT_PARENT], "parent", NULL);
                 if (!ok)
                     goto out;
 
@@ -1848,6 +1849,7 @@ js_Interpret(JSContext *cx, jsval *result)
                  * finalizer.
                  */
                 propobj->slots[JSSLOT_PARENT] = OBJECT_TO_JSVAL(obj);
+                js_AppendToGreyListMaybe(cx, OBJECT_TO_JSVAL(obj), "sth in interpreter", propobj);
                 goto enum_next_property;
             }
 
