@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     
-    <xs:simpleType name="Vector3i">
+    <xs:simpleType name="Vector3f">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
     <xs:simpleType name="Vector2i">
@@ -14,7 +14,7 @@
             <xs:attribute name="callback" type="xs:string"/>
             <xs:attribute name="id" type="xs:ID"/>
             <xs:attribute name="type" type="xs:string"/>
-            <xs:attribute name="motiondata" type="Vector3i"/>
+            <xs:attribute name="motiondata" type="Vector3f"/>
             <xs:attribute name="buttonname" type="xs:string"/>
             <xs:attribute name="pressed" type="xs:boolean"/>
             <xs:attribute name="irposition0" type="Vector2i"/>

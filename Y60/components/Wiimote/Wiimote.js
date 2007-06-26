@@ -115,7 +115,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             //print("down: " + _myLowPassedDownVector + " magnitude: " + magnitude( _myLowPassedDownVector ));
             _myBody.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
         }
-22 
+
     }
     
 

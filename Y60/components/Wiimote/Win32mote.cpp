@@ -26,7 +26,10 @@ namespace y60 {
 Win32mote::Win32mote() : HIDDevice(),
                          PosixThread(InputReportListener),
                          _myEventSchema( new dom::Document( oureventxsd ) ),
-                         _myValueFactory( new dom::ValueFactory())
+                         _myValueFactory( new dom::ValueFactory()),
+                         _myLeftPoint( -1 ),
+                         _myLowPassedOrientation(0, 1, 0),
+                         _myOrientation( 0 )
 {
 	 // Add all Wii buttons to the our internal list
     _myButtons.push_back(Button("1",		0x0002));
@@ -58,7 +61,8 @@ Win32mote::getButton(std::string label) {
         if (_myButtons[i].getName().compare(label) == 0)
             return _myButtons[i];
     }
-    throw exception();
+    throw asl::Exception(string("Could not find button with label '") + label + "'",
+    										 PLUS_FILE_LINE);
 }
     
     
@@ -94,21 +98,21 @@ Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
     }
 
     if (myGotDataFlag) {
-        _myEventVector.push_back( myEvent );
+        _myEventQueue->push( myEvent );
     }
 }
 
 void
-Win32mote::createEvent( int theID, asl::Vector3i & theMotionData) {
+Win32mote::createEvent( int theID, asl::Vector3f & theMotionData) {
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
     
     myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", string("motiondata"));
-    myNode->appendAttribute<Vector3i>("motiondata", theMotionData);
+    myNode->appendAttribute<Vector3f>("motiondata", theMotionData);
     
-    _myEventVector.push_back( myEvent );
+    _myEventQueue->push( myEvent );
 }
 
 void
@@ -125,7 +129,7 @@ Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedS
     myNode->appendAttribute<std::string>("buttonname", theButtonName);
     myNode->appendAttribute<bool>("pressed", thePressedState);
        
-    _myEventVector.push_back( myEvent );
+    _myEventQueue->push( myEvent );
 }
 
 Vector2i
@@ -155,8 +159,34 @@ Win32mote::handleButtonEvents( const unsigned char * theInputReport ) {
 void
 Win32mote::handleMotionEvents( const unsigned char * theInputReport ) {
     // swizzle vector from xzy-order to y60-order (xyz)
-    Vector3i m(theInputReport[3] - 128, theInputReport[5] - 128,  - (theInputReport[4] - 128) );
+    Vector3f m(theInputReport[3] - 128, theInputReport[5] - 128,  - (theInputReport[4] - 128) );
     _myLastMotion = m;
+
+    _myLowPassedOrientation = 0.9 * _myLowPassedOrientation + 0.1 * _myLastMotion;
+
+    // XXX maybe swizzled!!!
+    float myAbsX = abs( _myLowPassedOrientation[0] );
+    float myAbsZ = abs( _myLowPassedOrientation[2] );
+
+    if (_myOrientation == 0 || _myOrientation == 2) {
+        myAbsX -= 5;
+    }
+
+    if (_myOrientation == 1 || _myOrientation == 3) {
+        myAbsZ -= 5;
+    }
+
+    if (myAbsZ >= myAbsX) {
+        if (myAbsZ > 5) {
+            // XXX see above
+            _myOrientation = (_myLowPassedOrientation[2] > 128)?0:2;
+        }
+    } else {
+        if (myAbsX > 5) {
+            _myOrientation = (_myLowPassedOrientation[0] > 128)?3:1;
+        }
+    }
+
     createEvent( m_controller_id, m);
 }
 
@@ -168,6 +198,59 @@ Win32mote::handleIREvents( const unsigned char * theInputReport ) {
     myIRPositions[2] = parseIRData( theInputReport, 12);
     myIRPositions[3] = parseIRData( theInputReport, 15);
 
+    float ox(0);
+    float oy(0);
+
+    if (myIRPositions[0][0] < 1023 && myIRPositions[1][0] < 1023) {
+        int myLeftIndex = _myLeftPoint;
+        int myRightIndex;
+        if (_myLeftPoint == -1) {
+			switch (_myOrientation) {
+				case 0:
+                    myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
+                    break;
+				case 1:
+                    myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
+                    break;
+				case 2:
+                    myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
+                    break;
+				case 3:
+                    myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
+                    break;
+			}
+			_myLeftPoint = myLeftIndex;
+		}
+		myRightIndex = 1 - myLeftIndex;
+        
+		float dx = myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0];
+		float dy = myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1];
+		
+		float d = sqrt( dx * dx + dy * dy);
+		
+		
+		// normalized distance between bright spots
+		dx /= d;
+		dy /= d;
+		
+		float angle = atan2(dy, dx);
+		
+		float cx = (myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0 - 1;
+		float cy = (myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0 - .75;
+		
+		ox = -dy * cy - dx * cx;
+		oy = -dx * cy + dy * cx;
+
+        AC_PRINT << "x: " << ox << " y: " << oy;
+
+    } else {
+        // not tracking anything
+		ox = oy = -100;
+		if ( _myLeftPoint != -1) {
+			_myLeftPoint = -1;
+		}
+    }
+
     //cout << "pos " << myIRPositions[0] << endl;
     createEvent( m_controller_id, myIRPositions );
 }
@@ -177,6 +260,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
 {
     Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
+    
     while (myDevice._myInputListening) {
         unsigned char myInputReport[256];
         ZeroMemory(myInputReport, 256);
@@ -199,6 +283,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
 
         // If the wait didn't result in a sucessful read, try again
         if (result != WAIT_OBJECT_0) {
+        		//AC_PRINT << "unsucessful read";
             continue;
         }
 
@@ -222,28 +307,30 @@ Win32mote::InputReportListener(PosixThread & theThread)
             
 
         } else if (0x21 == myInputReport[0]) {
-            Vector3i zero_point(myInputReport[6] - 128, myInputReport[7] - 128, myInputReport[8] - 128);
+            Vector3f zero_point(myInputReport[6] - 128, myInputReport[7] - 128, myInputReport[8] - 128);
             myDevice._myZeroPoint = zero_point;
-            Vector3i one_g_point(myInputReport[10] - 128, myInputReport[11] - 128, myInputReport[12] - 128);
+            Vector3f one_g_point(myInputReport[10] - 128, myInputReport[11] - 128, myInputReport[12] - 128);
             myDevice._myOneGPoint = one_g_point;
             
         } else if (INPUT_REPORT_IR == myInputReport[0]) {
             //int myX1 = myInputReport
             //cout << myInputReport << endl;
-
             
+            myDevice._myLock->lock();
             myDevice.handleIREvents( myInputReport );
             myDevice.handleButtonEvents( myInputReport );
             myDevice.handleMotionEvents( myInputReport );
 
-            myDevice._myLock->lock();
-            for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
-                myDevice._myEventQueue->push(myDevice._myEventVector[i]);
-            }
-            myDevice._myEventVector.clear();
+           
+            // for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
+//                 myDevice._myEventQueue->push(myDevice._myEventVector[i]);
+//             }
+//             myDevice._myEventVector.clear();
             myDevice._myLock->unlock();
 
-        }
+        } else {
+        	AC_PRINT << "unknown report" << ios::hex << myInputReport[0] << 	ios::dec;
+      	}
     }
 
 }

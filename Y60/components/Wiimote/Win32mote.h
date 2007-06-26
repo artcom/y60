@@ -65,7 +65,7 @@ namespace y60 {
 
         static std::vector<asl::Ptr< Win32mote, dom::ThreadingModel> > discover();
 
-        asl::Vector3i getLastMotionData() const { return _myLastMotion; }
+        asl::Vector3f getLastMotionData() const { return _myLastMotion; }
 
         Button getButton(std::string label);
         std::vector<Button> getButtons() const { return _myButtons; }
@@ -80,7 +80,7 @@ namespace y60 {
     protected:
         
         void createEvent( int theID, std::string & theButtonName, bool thePressedState);
-        void createEvent( int theID, asl::Vector3i & theMotionData);
+        void createEvent( int theID, asl::Vector3f & theMotionData);
         void createEvent( int theID, const asl::Vector2i theIRData[4] );
     
         //asl::Vector2i parseIRData(const unsigned char * theBuffer, unsigned theOffset);
@@ -91,22 +91,22 @@ namespace y60 {
         std::vector<Button> setButtons(int code);
         std::vector<Button>	_myButtons;
 
-        asl::Vector3i		_myLastMotion;
-        asl::Vector3i		_myZeroPoint;
-        asl::Vector3i		_myOneGPoint;
+        asl::Vector3f		_myLastMotion;
+        asl::Vector3f		_myZeroPoint;
+        asl::Vector3f		_myOneGPoint;
         
         dom::NodePtr                 _myEventSchema;
         asl::Ptr<dom::ValueFactory>  _myValueFactory;
         
         bool			_myInputListening;
-        //unsigned int _myListenerThreadId;
-        //HANDLE _myListenerThread;
-        //PosixThread _myThread;
 
         asl::Ptr< std::queue<y60::GenericEventPtr> > _myEventQueue;
-        std::vector<y60::GenericEventPtr> _myEventVector;
+        //std::vector<y60::GenericEventPtr> _myEventVector;
         asl::Ptr< asl::ThreadLock > _myLock;
         
+        int _myLeftPoint;
+        asl::Vector3f _myLowPassedOrientation;
+        int _myOrientation;
         
     };
     typedef asl::Ptr<Win32mote, dom::ThreadingModel> Win32motePtr;

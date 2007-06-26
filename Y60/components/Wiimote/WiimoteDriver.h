@@ -71,7 +71,11 @@ namespace y60 {
                 myEvents.push_back( _myEventQueue->front() );
                 _myEventQueue->pop();
             }
+            
+            _myLock->unlock();
+
             return myEvents;
+            
         }
 
 
