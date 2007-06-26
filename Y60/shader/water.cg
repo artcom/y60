@@ -72,7 +72,6 @@ vert2frag main(
             )
 {
     vert2frag OUT;
-
     float mySine1, myCosine1;
     float4 myNearPlanePos = mul(AC_OBJECTWORLD, IN.Position); // set in JS to cover the near plane.
 
@@ -173,6 +172,7 @@ float4 mainFragment(vert2frag IN,
 #else
     float3 myNormal = normalize(IN.eyeSpaceNormal);
 
+    // this helps the debug windows test testCGShader.exe ;-)
     // diffuse term
     float3 myLightDirection = normalize(IN.lightVec);
     float diffuseLight = dot(myNormal.xyz, myLightDirection);
