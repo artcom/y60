@@ -77,11 +77,15 @@ namespace y60 {
         void handleMotionEvents( const unsigned char * theInputReport );
         void handleIREvents( const unsigned char * theInputReport );
 
+        int getControllerID() const { return m_controller_id; }
+        std::string getDeviceName() const { return m_device_path_name; }
+        
     protected:
         
         void createEvent( int theID, std::string & theButtonName, bool thePressedState);
         void createEvent( int theID, asl::Vector3f & theMotionData);
-        void createEvent( int theID, const asl::Vector2i theIRData[4] );
+        void createEvent( int theID, const asl::Vector2i theIRData[4],
+                          const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle );
     
         //asl::Vector2i parseIRData(const unsigned char * theBuffer, unsigned theOffset);
         void close();

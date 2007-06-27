@@ -44,13 +44,13 @@ void HIDDevice::GetDeviceCapabilities(HIDDevice & device)
 	HidD_FreePreparsedData(PreparsedData);
 }
 
-void HIDDevice::WriteOutputReport(char out_bytes[]) {
+void HIDDevice::WriteOutputReport(char out_bytes[], unsigned theNumBytes) {
     char	output_report[256];
     DWORD	bytes_written = 0;
     ULONG	result;
 
     memset(output_report, 0, 256);
-    memcpy(output_report, out_bytes, 256);
+    memcpy(output_report, out_bytes, theNumBytes);
 
     if (m_write_handle != INVALID_HANDLE_VALUE) {
         result = WriteFile(m_write_handle, output_report, m_capabilities.OutputReportByteLength,

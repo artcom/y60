@@ -6,6 +6,8 @@
 #ifndef __WIIMOTE_UTILS__
 #define __WIIMOTE_UTILS__
 
+#include <asl/Vector234.h>
+
 #include <iostream>
 #include <string>
 
@@ -205,5 +207,24 @@ public:
 	}
 };
 
+enum WiiEventType {
+    WII_BUTTON,
+    WII_MOTION,
+    WII_INFRARED
+};
+
+struct WiiEvent {
+    WiiEventType type;
+    // Button data
+    const char * buttonName;
+    bool         pressed;
+
+    // motion data
+    asl::Vector3f acceleration;
+
+    // infrared
+    asl::Vector2i irPositions[4];
+    asl::Vector2f screenPosition;
+};
 
 #endif // __WIIMOTE_UTILS__

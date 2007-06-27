@@ -21,6 +21,7 @@
 #include "Win32mote.h"
 #include <vector>
 #include <queue>
+#include <map>
 
 namespace y60 {
 
@@ -36,10 +37,14 @@ namespace y60 {
         WiimoteDriver(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle),
                                                    y60::IEventSource(),
                                                    _myEventQueue( new std::queue<y60::GenericEventPtr>() ),
-                                                   _myLock( new asl::ThreadLock() )
+                                                   _myLock( new asl::ThreadLock()),
+                                                   _myRequestMode ( INFRARED )
             {
                 _myIOHandles = IOHANDLE::discover();
+                AC_PRINT << "discover" << _myIOHandles.size();
                 for (unsigned i = 0; i < _myIOHandles.size(); ++i) {
+                    _myBluetoothMap.insert(std::make_pair(_myIOHandles[i]->getControllerID(),
+                                                          _myIOHandles[i]->getDeviceName()));
                     _myIOHandles[i]->setEventQueue( _myEventQueue, _myLock );
                     _myIOHandles[i]->startListening();
 
@@ -62,7 +67,7 @@ namespace y60 {
 
 
         virtual y60::EventPtrList poll() {
-
+            
             y60::EventPtrList myEvents;
 
             _myLock->lock();
@@ -89,84 +94,90 @@ namespace y60 {
             if (led4) out |= 0x80;
             
             char rpt[2] = { 0x11, out };
-            _myIOHandles[theIndex]->WriteOutputReport(rpt);
+            _myIOHandles[theIndex]->WriteOutputReport(rpt, 2);
         }
 
         
         void setRumble(int theIndex, bool on) {
             char rpt[2] = { 0x13, on ? 0x01 : 0x00 };
-            _myIOHandles[theIndex]->WriteOutputReport(rpt);
+            if( _myRequestMode == INFRARED ) {
+                rpt[1] |= 0x04;
+            }
+            _myIOHandles[theIndex]->WriteOutputReport(rpt, 2);
         }
 
         void requestButtonData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char set_motion_report[] = { OUTPUT_REPORT_SET , 0x00, INPUT_REPORT_BUTTONS };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report);
+                char set_motion_report[3] = { OUTPUT_REPORT_SET , 0x00, INPUT_REPORT_BUTTONS };
+                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
             }
-        
+            _myRequestMode = BUTTON;
         }
 
         void requestInfraredData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char set_ir_report[] = {  0x13, 0x04 };
-                char set_ir_report2[] = { 0x1a, 0x04 };
-                _myIOHandles[i]->WriteOutputReport(set_ir_report);
+                char set_ir_report[2] = {  0x13, 0x04 };
+                char set_ir_report2[2] = { 0x1a, 0x04 };
+                set_ir_report[1] |= 0x01;
+                _myIOHandles[i]->WriteOutputReport(set_ir_report, 2);
                 asl::msleep(10);
-                _myIOHandles[i]->WriteOutputReport(set_ir_report2);
+                _myIOHandles[i]->WriteOutputReport(set_ir_report2, 2);
                 asl::msleep(10);
 
                 // Write 0x08 to register 0xb00030
                 //16 MM FF FF FF SS DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD
-                char write_register[] = {0x16, 0x04,
+                char write_register[7] = {0x16, 0x04,
                                          0xb0, 0x00, 0x30, // address
                                          0x01,             // size
                                          0x01 };           // data
-                _myIOHandles[i]->WriteOutputReport( write_register );
+                _myIOHandles[i]->WriteOutputReport( write_register, 7 );
                 asl::msleep(10);
                 //Write Sensitivity Block 1 to registers at 0xb00000
                 //Write Sensitivity Block 2 to registers at 0xb0001a 
-                char sensivity_setting_block1[] = {0x16, 0x04,
+                char sensivity_setting_block1[15] = {0x16, 0x04,
                                                    0xb0, 0x00, 0x00, // address
                                                    0x09,             // size
                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00, 0xC0 }; // data
-                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block1);
+                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block1, 15);
                 asl::msleep(10);
                 
-                char sensivity_setting_block2[] = {0x16, 0x04,
+                char sensivity_setting_block2[8] = {0x16, 0x04,
                                                    0xb0, 0x00, 0x1a,  // address
                                                    0x02,               // size
                                                    0x40, 0x00 };      // data
-                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block2);
+                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block2, 8);
                 asl::msleep(10);
                 
-                 char write_register2[] = {0x16, 0x04,
+                 char write_register2[7] = {0x16, 0x04,
                                          0xb0, 0x00, 0x30, // address
                                          0x01,             // size
                                          0x08 };           // data
-                _myIOHandles[i]->WriteOutputReport( write_register2 );
+                _myIOHandles[i]->WriteOutputReport( write_register2, 7 );
                 asl::msleep(10);
-                char ir_mode_setting[] = { 0x16, 0x04,
+                char ir_mode_setting[7] = { 0x16, 0x04,
                                             0xb0, 0x00, 0x33, // adress
                                             0x01,             // size
                                             0x03};            // data (extended mode ... for now)
-                _myIOHandles[i]->WriteOutputReport(ir_mode_setting);
+                _myIOHandles[i]->WriteOutputReport(ir_mode_setting, 7);
 
 
                 
-                char set_motion_report[] = { OUTPUT_REPORT_SET, 0x00, 0x33 };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report);
+                char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, 0x33 };
+                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
             }
+            _myRequestMode = INFRARED;
         
         }
         
         void requestMotionData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char calibration_report[] = { OUTPUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
-                _myIOHandles[i]->WriteOutputReport(calibration_report);
+                char calibration_report[7] = { OUTPUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
+                _myIOHandles[i]->WriteOutputReport(calibration_report, 7);
             
-                char set_motion_report[] = { OUTPUT_REPORT_SET, 0x00, INPUT_REPORT_MOTION };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report);
+                char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, INPUT_REPORT_MOTION };
+                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
             }
+            _myRequestMode = MOTION;
         }
 
         unsigned getNumWiimotes() const { return _myIOHandles.size(); }
@@ -200,10 +211,13 @@ namespace y60 {
             return myClassName;
         }
     private:
-     
+
+        std::map<int, std::string> _myBluetoothMap;
         asl::Ptr<std::queue<y60::GenericEventPtr> > _myEventQueue;
         asl::Ptr<asl::ThreadLock> _myLock;
-        
+
+        enum REQUEST_MODE { BUTTON, MOTION, INFRARED };
+        REQUEST_MODE _myRequestMode;
     };
     
 #ifdef WIN32

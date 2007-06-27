@@ -7,6 +7,9 @@
     <xs:simpleType name="Vector2i">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="Vector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="generic">
         <xs:complexType>
             <xs:attribute name="when" type="xs:double"/>
@@ -21,6 +24,8 @@
             <xs:attribute name="irposition1" type="Vector2i"/>
             <xs:attribute name="irposition2" type="Vector2i"/>
             <xs:attribute name="irposition3" type="Vector2i"/>
-         </xs:complexType>
+            <xs:attribute name="screenposition" type="Vector2f"/>
+            <xs:attribute name="angle" type="xs:float"/>
+        </xs:complexType>
     </xs:element>
 </xs:schema>

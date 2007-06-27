@@ -36,7 +36,13 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     var _myBody = null;
     var _myLowPassedDownVector = new Vector3f( 0, 1, 0 );
     var _myOrientationVector = null;
-    
+    var _myAngleVector = null;
+    var _myCrosshair = null;
+
+    var _myPicking = null;
+    var _myLastPosition = null;;
+    var _myPickedBody = null;
+    var _myPlane = null;
     
     //////////////////////////////////////////////////////////////////////
     //
@@ -56,14 +62,19 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
         _myBody.scale = new Vector3f(5, 5,5);
-
+        
 
         _myOrientationVector = Node.createElement("vector");
         window.scene.world.appendChild( _myOrientationVector );
-
         _myOrientationVector.color = new Vector4f(1,1,1,1);
         _myOrientationVector.scale = [1,1,1];
+       
+        _myPlane = new Planef(new Vector3f(0,0,1), 0);
         
+        _myCrosshair = new ImageOverlay(window.scene, "tex/pointer.png", [0,0], window.scene.overlays);
+        _myCrosshair.position = [window.width/2.0, window.height/2.0];
+
+        _myPicking = new Picking(window);
     }
 
     Base.onFrame = self.onFrame;
@@ -86,21 +97,37 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
     self.onWiiEvent = function( theNode ) {
         //print(theNode);
-
+        if('screenposition' in theNode && _myPickedBody) {
+            _myPickedBody.position = _myPicking.pickPointOnPlane(_myLastPosition.x, _myLastPosition.y, _myPlane);
+        }
+        
         if (theNode.type == "button" && theNode.buttonname == "Home" && theNode.pressed == 0) {
             print("Got quit from controller " + theNode.id);
             print("Going home ... good bye!");
             exit( 0 );
         }
-        if (theNode.type == "button" && theNode.buttonname == "B") {
+        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 1) {
+            print("dragging");
+            if(!_myPickedBody) {
+                _myPickedBody = _myPicking.pickBody(_myLastPosition.x, _myLastPosition.y);
+            } 
+            print(_myPickedBody);
+        }
+        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 0) {
+            print("releasing");
+            _myPickedBody = null;
+        }
+        
+        if (theNode.type == "button" && theNode.buttonname == "A") {
             myWiimote.setRumble( theNode.id, theNode.pressed );
         }
+        
         
         if (theNode.type == "motiondata") {
             //print(theNode);
             
             var myDownVector = new Vector3f( theNode.motiondata.x, theNode.motiondata.y,
-                                              theNode.motiondata.z );
+                                             theNode.motiondata.z );
 
 
             myDownVector = normalized( myDownVector );
@@ -114,6 +141,13 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
             //print("down: " + _myLowPassedDownVector + " magnitude: " + magnitude( _myLowPassedDownVector ));
             _myBody.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
+        }
+
+        if (theNode.type == "infrareddata") {
+            var myPosition = new Vector2f(window.width - ((theNode.screenposition.x * window.width/2.0) + window.width/2.0),
+                                          (theNode.screenposition.y * window.height/2.0) + window.height/2.0 );
+            _myCrosshair.position = myPosition;
+            _myLastPosition = myPosition;
         }
 
     }

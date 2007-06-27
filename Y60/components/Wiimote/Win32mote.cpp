@@ -79,7 +79,8 @@ Win32mote::setButtons(int code) {
 
     
 void
-Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
+Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4],
+                        const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
@@ -91,6 +92,8 @@ Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4] ) {
     for (unsigned i = 0; i < 4; ++i) {
         if (theIRData[i][0] != 1023 && theIRData[i][1] != 1023) {
             myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
+            myNode->appendAttribute<Vector2f>(string("screenposition"), theNormalizedScreenCoordinates);
+            myNode->appendAttribute<float>(string("angle"), theAngle);
             myGotDataFlag = true;
             break;
 
@@ -200,7 +203,9 @@ Win32mote::handleIREvents( const unsigned char * theInputReport ) {
 
     float ox(0);
     float oy(0);
-
+    Vector2f myNormalizedScreenCoordinates(0.0f, 0.0f);
+    float angle = 0.0;
+    
     if (myIRPositions[0][0] < 1023 && myIRPositions[1][0] < 1023) {
         int myLeftIndex = _myLeftPoint;
         int myRightIndex;
@@ -233,26 +238,33 @@ Win32mote::handleIREvents( const unsigned char * theInputReport ) {
 		dx /= d;
 		dy /= d;
 		
-		float angle = atan2(dy, dx);
-		
+		angle = atan2(dy, dx);
+
+    //AC_PRINT << angle-3.14159;
+    
 		float cx = (myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0 - 1;
 		float cy = (myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0 - .75;
 		
 		ox = -dy * cy - dx * cx;
 		oy = -dx * cy + dy * cx;
 
-        AC_PRINT << "x: " << ox << " y: " << oy;
+    myNormalizedScreenCoordinates[0] = ox;
+    myNormalizedScreenCoordinates[1] = oy;
+    
+    //AC_PRINT << "x: " << ox << " y: " << oy;
 
     } else {
         // not tracking anything
-		ox = oy = -100;
-		if ( _myLeftPoint != -1) {
-			_myLeftPoint = -1;
-		}
+        ox = oy = -100;
+        if ( _myLeftPoint != -1) {
+            _myLeftPoint = -1;
+        }
+        //myNormalizedScreenCoordinates[0] = ox;
+        //myNormalizedScreenCoordinates[1] = oy;
     }
-
+    
     //cout << "pos " << myIRPositions[0] << endl;
-    createEvent( m_controller_id, myIRPositions );
+    createEvent( m_controller_id, myIRPositions, myNormalizedScreenCoordinates, angle );
 }
 
 void
@@ -260,7 +272,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
 {
     Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
-    
+    //AC_PRINT << myDevice.m_controller_id;
     while (myDevice._myInputListening) {
         unsigned char myInputReport[256];
         ZeroMemory(myInputReport, 256);
@@ -274,7 +286,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
                     myDevice.m_capabilities.InputReportByteLength, 
                     &bytes_read, 
                     (LPOVERLAPPED)&myDevice.m_hid_overlapped);																						  
-        }
+        }  
 
         // Wait for read to finish
         result = WaitForSingleObject(myDevice.m_event_object, 300);
@@ -283,7 +295,6 @@ Win32mote::InputReportListener(PosixThread & theThread)
 
         // If the wait didn't result in a sucessful read, try again
         if (result != WAIT_OBJECT_0) {
-        		//AC_PRINT << "unsucessful read";
             continue;
         }
 
@@ -319,7 +330,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
             myDevice._myLock->lock();
             myDevice.handleIREvents( myInputReport );
             myDevice.handleButtonEvents( myInputReport );
-            myDevice.handleMotionEvents( myInputReport );
+            //myDevice.handleMotionEvents( myInputReport ); // this definitly crashes the thread
 
            
             // for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
@@ -329,7 +340,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
             myDevice._myLock->unlock();
 
         } else {
-        	AC_PRINT << "unknown report" << ios::hex << myInputReport[0] << 	ios::dec;
+            //AC_PRINT << "unknown report " << myDevice.m_controller_id << "  " << ios::hex << myInputReport[0] << 	ios::dec;
       	}
     }
 
@@ -358,6 +369,7 @@ void Win32mote::stopListening()
 std::vector<Win32motePtr>
 Win32mote::discover() {
     vector<Win32motePtr> wiimotes = HIDDevice::ConnectToHIDDevices<Win32mote>();
+    AC_PRINT << wiimotes[0]->m_device_path_name;
     /*
     if( wiimotes.size() > 0 ) {
         for(unsigned i=0; i<wiimotes.size(); ++i){

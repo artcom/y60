@@ -53,7 +53,7 @@ public:
 	static void PrepareForOverlappedTransfer(HIDDevice & device, PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData);
 	static void GetDeviceCapabilities(HIDDevice & device);
 	
-	void WriteOutputReport(char out_bytes[]);
+	void WriteOutputReport(char out_bytes[], unsigned theNumBytes);
 
 	/* This function is templated in order to support instantiation of subclassed versions of Wiimote */
 	template <class T>
