@@ -16,8 +16,6 @@
 
 #include <iostream>
 
-extern std::string oureventxsd;
-
 using namespace asl;
 using namespace std;
 
@@ -25,8 +23,6 @@ namespace y60 {
 
 Win32mote::Win32mote() : HIDDevice(),
                          PosixThread(InputReportListener),
-                         _myEventSchema( new dom::Document( oureventxsd ) ),
-                         _myValueFactory( new dom::ValueFactory()),
                          _myLeftPoint( -1 ),
                          _myLowPassedOrientation(0, 1, 0),
                          _myOrientation( 0 )
@@ -49,9 +45,6 @@ Win32mote::Win32mote() : HIDDevice(),
     //_myListenerThreadId = -1;
     //_myListenerThread = NULL;
     
-    registerStandardTypes( * _myValueFactory );
-    registerSomTypes( * _myValueFactory );
-
     
 }
 
@@ -81,6 +74,7 @@ Win32mote::setButtons(int code) {
 void
 Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4],
                         const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
+    /*
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
@@ -99,14 +93,15 @@ Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4],
 
         }
     }
+    */
 
-    if (myGotDataFlag) {
-        _myEventQueue->push( myEvent );
-    }
+
+    _myEventQueue->push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
 }
 
 void
 Win32mote::createEvent( int theID, asl::Vector3f & theMotionData) {
+    /*
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
@@ -114,14 +109,16 @@ Win32mote::createEvent( int theID, asl::Vector3f & theMotionData) {
     myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", string("motiondata"));
     myNode->appendAttribute<Vector3f>("motiondata", theMotionData);
+    */
     
-    _myEventQueue->push( myEvent );
+    _myEventQueue->push( WiiEvent(theID, theMotionData) );
 }
 
 void
 Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedState)
 {
     
+    /*
     y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
                                                    _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
@@ -131,8 +128,9 @@ Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedS
     myNode->appendAttribute("type", "button");
     myNode->appendAttribute<std::string>("buttonname", theButtonName);
     myNode->appendAttribute<bool>("pressed", thePressedState);
+    */
        
-    _myEventQueue->push( myEvent );
+    _myEventQueue->push( WiiEvent( theID, theButtonName, thePressedState ) );
 }
 
 Vector2i
@@ -330,7 +328,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
             myDevice._myLock->lock();
             myDevice.handleIREvents( myInputReport );
             myDevice.handleButtonEvents( myInputReport );
-            //myDevice.handleMotionEvents( myInputReport ); // this definitly crashes the thread
+            myDevice.handleMotionEvents( myInputReport );
 
            
             // for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
@@ -396,7 +394,7 @@ void Win32mote::close()
 }
 
 void
-Win32mote::setEventQueue( asl::Ptr<std::queue<y60::GenericEventPtr> > theQueue,
+Win32mote::setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
                asl::Ptr<asl::ThreadLock> theLock)
 {
     _myLock = theLock;

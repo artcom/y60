@@ -17,11 +17,14 @@
 #include <asl/ThreadLock.h>
 #include <y60/IEventSource.h>
 #include <y60/IScriptablePlugin.h>
+#include <y60/GenericEvent.h>
 
 #include "Win32mote.h"
 #include <vector>
 #include <queue>
 #include <map>
+
+extern std::string oureventxsd;
 
 namespace y60 {
 
@@ -36,7 +39,9 @@ namespace y60 {
         
         WiimoteDriver(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle),
                                                    y60::IEventSource(),
-                                                   _myEventQueue( new std::queue<y60::GenericEventPtr>() ),
+                                                   _myEventSchema( new dom::Document( oureventxsd ) ),
+                                                   _myValueFactory( new dom::ValueFactory()),
+                                                   _myEventQueue( new std::queue<WiiEvent>() ),
                                                    _myLock( new asl::ThreadLock()),
                                                    _myRequestMode ( INFRARED )
             {
@@ -51,6 +56,10 @@ namespace y60 {
                     // XXX set LEDs to controller id (binary) ;-)
                     setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
                 }
+
+                registerStandardTypes( * _myValueFactory );
+                registerSomTypes( * _myValueFactory );
+
                 //requestMotionData();
                 //requestButtonData();
                 requestInfraredData();
@@ -63,9 +72,6 @@ namespace y60 {
             }
         }
                
-        
-
-
         virtual y60::EventPtrList poll() {
             
             y60::EventPtrList myEvents;
@@ -73,14 +79,42 @@ namespace y60 {
             _myLock->lock();
 
             while ( ! _myEventQueue->empty() ) {
-                myEvents.push_back( _myEventQueue->front() );
+                const WiiEvent & myWiiEvent = _myEventQueue->front();
+                y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
+                            _myValueFactory));
+                dom::NodePtr myNode = myEvent->getNode();
+                myNode->appendAttribute<int>("id", myWiiEvent.id);
+                if (myWiiEvent.type == WII_BUTTON) {
+
+                    myNode->appendAttribute("type", "button");
+                    myNode->appendAttribute<std::string>("buttonname", myWiiEvent.buttonname);
+                    myNode->appendAttribute<bool>("pressed", myWiiEvent.pressed);
+
+                } else if (myWiiEvent.type == WII_MOTION ) {
+                    myNode->appendAttribute<std::string>("type", std::string("motiondata"));
+                    myNode->appendAttribute<asl::Vector3f>("motiondata", myWiiEvent.acceleration);
+                } else if (myWiiEvent.type == WII_INFRARED ) {
+
+                    myNode->appendAttribute<std::string>("type", std::string("infrareddata"));
+
+                    for (unsigned i = 0; i < 4; ++i) {
+                        if (myWiiEvent.irPositions[i][0] != 1023 && myWiiEvent.irPositions[i][1] != 1023) {
+                            myNode->appendAttribute<asl::Vector2i>(std::string("irposition") + asl::as_string(i),
+                                        myWiiEvent.irPositions[i]);
+                            //myNode->appendAttribute<float>(string("angle"), theAngle);
+                        }
+                    }
+                    myNode->appendAttribute<asl::Vector2f>(std::string("screenposition"),
+                            myWiiEvent.screenPosition);
+                } else {
+                    throw asl::Exception("unhandled event type", PLUS_FILE_LINE);
+                }
+                myEvents.push_back( myEvent );
                 _myEventQueue->pop();
             }
             
             _myLock->unlock();
-
             return myEvents;
-            
         }
 
 
@@ -213,8 +247,11 @@ namespace y60 {
     private:
 
         std::map<int, std::string> _myBluetoothMap;
-        asl::Ptr<std::queue<y60::GenericEventPtr> > _myEventQueue;
+        asl::Ptr<std::queue<WiiEvent> > _myEventQueue;
         asl::Ptr<asl::ThreadLock> _myLock;
+        dom::NodePtr                 _myEventSchema;
+        asl::Ptr<dom::ValueFactory>  _myValueFactory;
+        
 
         enum REQUEST_MODE { BUTTON, MOTION, INFRARED };
         REQUEST_MODE _myRequestMode;

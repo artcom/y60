@@ -21,7 +21,6 @@
 #include <asl/Vector234.h>
 #include <asl/Ptr.h>
 #include <dom/Nodes.h>
-#include <y60/GenericEvent.h>
 #include <y60/Scene.h>
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
@@ -60,7 +59,7 @@ namespace y60 {
             close();
         }
 
-        void setEventQueue( asl::Ptr<std::queue<y60::GenericEventPtr> > theQueue,
+        void setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
                             asl::Ptr<asl::ThreadLock> theLock);
 
         static std::vector<asl::Ptr< Win32mote, dom::ThreadingModel> > discover();
@@ -99,12 +98,9 @@ namespace y60 {
         asl::Vector3f		_myZeroPoint;
         asl::Vector3f		_myOneGPoint;
         
-        dom::NodePtr                 _myEventSchema;
-        asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        
         bool			_myInputListening;
 
-        asl::Ptr< std::queue<y60::GenericEventPtr> > _myEventQueue;
+        asl::Ptr< std::queue<WiiEvent> > _myEventQueue;
         //std::vector<y60::GenericEventPtr> _myEventVector;
         asl::Ptr< asl::ThreadLock > _myLock;
         

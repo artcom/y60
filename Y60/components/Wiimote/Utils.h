@@ -213,11 +213,38 @@ enum WiiEventType {
     WII_INFRARED
 };
 
-struct WiiEvent {
+class WiiEvent {
+    public:
+    // Ctor for button events
+    WiiEvent(unsigned theID, const std::string & theName, bool thePressedFlag) :
+        id( theID ),
+        type( WII_BUTTON ),
+        buttonname( theName ),
+        pressed( thePressedFlag ) {}
+
+    // Ctor for motion events
+    WiiEvent(unsigned theID, const asl::Vector3f & theAcceleration) :
+        id( theID ),
+        type( WII_MOTION ),
+        acceleration( theAcceleration ) {}
+
+    // Ctor for ir data
+    WiiEvent(unsigned theID, const asl::Vector2i theIRData[4], const asl::Vector2f & theScreenPosition ) :
+        id( theID ),
+        type( WII_INFRARED ),
+        screenPosition( theScreenPosition )
+    {
+        for (unsigned i = 0; i < 4; ++i) {
+            irPositions[i] = theIRData[i];
+        }
+    }
+
+    unsigned id;
+
     WiiEventType type;
     // Button data
-    const char * buttonName;
-    bool         pressed;
+    std::string buttonname;
+    bool        pressed;
 
     // motion data
     asl::Vector3f acceleration;
