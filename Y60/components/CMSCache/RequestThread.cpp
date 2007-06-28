@@ -42,7 +42,9 @@ RequestThread::RequestThread(const std::string & theLocalPath,
     _myMaxRequestCount(theMaxRequestCount),
     _remainingCount(theOutdatedAssets.size())
 {
-    addToCookieJar(theSessionCookie);
+    if (!theSessionCookie.empty()) {
+        addToCookieJar(theSessionCookie);
+    }
     fillRequestQueue();
 };
 

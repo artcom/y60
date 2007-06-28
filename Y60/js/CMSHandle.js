@@ -134,7 +134,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         } else {
             Logger.info("Logging on with user :" + myUsername);
             _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
-                                myCMSConfig.backend, myUsername, _myConfig.password, null );
+                                myCMSConfig.backend, myUsername, _myConfig.password, "" );
         }
         if ('proxy' in _myConfig && _myConfig.proxy) {
             _myCMSCache.setProxy(_myConfig.proxy);
@@ -240,9 +240,9 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                 msleep( 10 );
             }
             if ( myCookieRequest.responseCode != 200 ) {
-                Logger.error("Failed to get repository cookie. Server response code " +
-                                    myCookieRequest.responseCode + ".");
-                myErrorOccurred = true;
+                Logger.warning("Failed to get repository cookie. Server response code " +
+                                    myCookieRequest.responseCode + 
+                                    ". Proceeding without cookie (may create many sessions during CMS sync!).");
             } else {
                 _myOCSCookie = myCookieRequest.responseString;
             }

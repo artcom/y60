@@ -69,52 +69,6 @@ CMSCache::~CMSCache() {
         _myRequestThread->join();
     }
 }
-/*
-void
-CMSCache::login() {
-    switch ( _myBackendType ) {
-        case OCS:
-            //loginOCS();
-            break;
-        case SVN:
-            // nothing to do here for svn ...
-            // we just send our credentials with each request
-            break;
-        default:
-            AC_ERROR << "Unknown backend type '" << _myBackendType << "'";
-    }
-}
-*/
-/*
-void
-CMSCache::loginOCS() {
-    VERBOSE_PRINT << "Using OCS backend with credentials:" << _myUsername << ", " << _myPassword;
-    std::string someAsset = _myAssets.begin()->second->getAttributeString("uri");
-
-    //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
-    RequestPtr myLoginRequest(new Request( someAsset, "Wget/1.10.2"));
-    // just do a head request ... no need to download the whole asset now.
-    myLoginRequest->head();
-    myLoginRequest->setCredentials(_myUsername, _myPassword, DIGEST);
-    //myLoginRequest->setVerbose(true);
-
-    _myRequestManager.performRequest(myLoginRequest);
-
-    int myRunningCount = 0;
-    do {
-        myRunningCount = _myRequestManager.handleRequests();
-        asl::msleep(10);
-    } while (myRunningCount);
-
-    if (myLoginRequest->getResponseCode() != 200 ||
-            myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-        throw CMSCacheException("Login failed for user '" + _myUsername +
-                "' at URL '" + someAsset + "'.", PLUS_FILE_LINE);
-    }
-
-    _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
-}
-*/
 void
 CMSCache::collectExternalAssetList() {
     if ( ! _myPresentationDocument || _myPresentationDocument->childNodesLength() == 0 ) {
@@ -185,7 +139,6 @@ CMSCache::synchronize() {
         */
         AC_INFO << "creating request thread";
 
-// theAsset->getAttributeString("path"), theAsset->getAttributeString("uri")
     
         std::vector<std::pair<std::string, std::string> > myOutdatedAssets;
         collectOutdatedAssets(myOutdatedAssets);
@@ -196,58 +149,6 @@ CMSCache::synchronize() {
         _myRequestThread->fork();
     }
 }
-#if 0
-bool
-CMSCache::testConsistency() {
-    cerr << "Testing CMS Consistency..." << endl;
-
-    _myAssets.clear();
-    collectExternalAssetList();
-    std::map<std::string, dom::NodePtr>::iterator it = _myAssets.begin();
-    /*
-    if (!_myUsername.empty() && !_myPassword.empty()) {
-        login();
-    }
-    */
-
-    unsigned myExistingAssetCount = 0;
-    std::vector<dom::NodePtr> myMissingAssets;
-
-    for (; it != _myAssets.end(); it++) {
-        string myPath = it->second->getAttributeString("uri");
-        //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
-        RequestPtr myRequest(new Request(myPath, "Wget/1.10.2"));
-        myRequest->setCookie(_mySessionCookie, true);
-        myRequest->head();
-        myRequest->setCredentials(_myUsername, _myPassword, DIGEST);
-        _myRequestManager.performRequest(myRequest);
-        int myRunningCount = 0;
-        do {
-            myRunningCount = _myRequestManager.handleRequests();
-            asl::msleep(10);
-        } while (myRunningCount);
-
-        if (myRequest->getResponseCode() == 200) {
-            myExistingAssetCount++;
-        } else {
-            myMissingAssets.push_back(it->second);
-        }
-        cerr << ".";
-    }
-    cerr << endl;
-
-    cout << "Results: " << endl;
-    cout << "  Existing Assets: " << myExistingAssetCount << endl;    
-    cout << "  Missing Assets: " << myMissingAssets.size() << endl << endl;    
-    for (unsigned i = 0; i < myMissingAssets.size(); ++i) {
-        cout << "Missing Asset #" << i + 1 << ":" << endl;
-        cout << "    name: " << myMissingAssets[i]->getAttributeString("name") << endl;
-        cout << "    path: " << myMissingAssets[i]->getAttributeString("path") << endl;
-    }
-
-    return (myMissingAssets.size() == 0);
-}
-#endif
 void
 CMSCache::collectOutdatedAssets(std::vector<std::pair<std::string, std::string> > & theOutdatedAssets) {
 
