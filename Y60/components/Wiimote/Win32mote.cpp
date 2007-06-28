@@ -14,6 +14,17 @@
 #include "Win32mote.h"
 #include "Utils.h"
 
+extern "C" {
+// This file is in the Windows DDK available from Microsoft.
+//#include "hidsdi.h"
+//#include "setupapi.h"
+#include <dbt.h>
+}
+
+#include <wtypes.h>
+#include <initguid.h>
+#include <process.h>
+
 #include <iostream>
 
 using namespace asl;
@@ -21,13 +32,12 @@ using namespace std;
 
 namespace y60 {
 
-Win32mote::Win32mote() : HIDDevice(),
-                         PosixThread(InputReportListener),
-                         _myLeftPoint( -1 ),
-                         _myLowPassedOrientation(0, 1, 0),
-                         _myOrientation( 0 )
+Win32mote::Win32mote() : //HIDDevice(),
+                         WiiRemote(InputReportListener),
+                         _myEventObject(NULL)
 {
 	 // Add all Wii buttons to the our internal list
+    /*
     _myButtons.push_back(Button("1",		0x0002));
     _myButtons.push_back(Button("2",		0x0001));
     _myButtons.push_back(Button("A",		0x0008));
@@ -41,6 +51,7 @@ Win32mote::Win32mote() : HIDDevice(),
     _myButtons.push_back(Button("Left",	0x0100));
             
     _myInputListening = false;
+    */
     
     //_myListenerThreadId = -1;
     //_myListenerThread = NULL;
@@ -48,248 +59,31 @@ Win32mote::Win32mote() : HIDDevice(),
     
 }
 
-Button
-Win32mote::getButton(std::string label) {
-    for (int i = 0; i < _myButtons.size(); i++) {
-        if (_myButtons[i].getName().compare(label) == 0)
-            return _myButtons[i];
-    }
-    throw asl::Exception(string("Could not find button with label '") + label + "'",
-    										 PLUS_FILE_LINE);
-}
-    
-    
-std::vector<Button>
-Win32mote::setButtons(int code) {
-    std::vector<Button> changed_state;
-    for (int i = 0; i < _myButtons.size(); i++) {
-        if (_myButtons[i].setCode(code))
-            changed_state.push_back(_myButtons[i]);
-    }
-    
-    return changed_state;
-}
-
-    
-void
-Win32mote::createEvent( int theID, const asl::Vector2i theIRData[4],
-                        const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", string("infrareddata"));
-    
-    bool myGotDataFlag = false;
-    for (unsigned i = 0; i < 4; ++i) {
-        if (theIRData[i][0] != 1023 && theIRData[i][1] != 1023) {
-            myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
-            myNode->appendAttribute<Vector2f>(string("screenposition"), theNormalizedScreenCoordinates);
-            myNode->appendAttribute<float>(string("angle"), theAngle);
-            myGotDataFlag = true;
-            break;
-
-        }
-    }
-    */
-
-
-    _myEventQueue->push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
-}
-
-void
-Win32mote::createEvent( int theID, asl::Vector3f & theMotionData) {
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", string("motiondata"));
-    myNode->appendAttribute<Vector3f>("motiondata", theMotionData);
-    */
-    
-    _myEventQueue->push( WiiEvent(theID, theMotionData) );
-}
-
-void
-Win32mote::createEvent( int theID, std::string & theButtonName, bool thePressedState)
-{
-    
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-                                                   _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute("type", "button");
-    myNode->appendAttribute<std::string>("buttonname", theButtonName);
-    myNode->appendAttribute<bool>("pressed", thePressedState);
-    */
-       
-    _myEventQueue->push( WiiEvent( theID, theButtonName, thePressedState ) );
-}
-
-Vector2i
-parseIRData( const unsigned char * theBuffer, unsigned theOffset) {
-    Vector2i myIRPos(0,0);
-    myIRPos[0] = theBuffer[theOffset];
-    myIRPos[1] = theBuffer[theOffset + 1];
-    myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
-    myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
-    
-    int mySizeHint( theBuffer[ theOffset + 2] & 0x0f );
-
-    return myIRPos;
-}
-
-
-void
-Win32mote::handleButtonEvents( const unsigned char * theInputReport ) {
-    int key_state = Util::GetInt2(theInputReport, 1);
-    vector<Button> myChangedButtons = setButtons(key_state);
-    for( unsigned i=0; i < myChangedButtons.size(); ++i) {
-        Button myButton = myChangedButtons[i];
-        createEvent( m_controller_id, myButton.getName(), myButton.pressed());
-    }
-}
-
-void
-Win32mote::handleMotionEvents( const unsigned char * theInputReport ) {
-    // swizzle vector from xzy-order to y60-order (xyz)
-    Vector3f m(theInputReport[3] - 128, theInputReport[5] - 128,  - (theInputReport[4] - 128) );
-    _myLastMotion = m;
-
-    _myLowPassedOrientation = 0.9 * _myLowPassedOrientation + 0.1 * _myLastMotion;
-
-    // XXX maybe swizzled!!!
-    float myAbsX = abs( _myLowPassedOrientation[0] );
-    float myAbsZ = abs( _myLowPassedOrientation[2] );
-
-    if (_myOrientation == 0 || _myOrientation == 2) {
-        myAbsX -= 5;
-    }
-
-    if (_myOrientation == 1 || _myOrientation == 3) {
-        myAbsZ -= 5;
-    }
-
-    if (myAbsZ >= myAbsX) {
-        if (myAbsZ > 5) {
-            // XXX see above
-            _myOrientation = (_myLowPassedOrientation[2] > 128)?0:2;
-        }
-    } else {
-        if (myAbsX > 5) {
-            _myOrientation = (_myLowPassedOrientation[0] > 128)?3:1;
-        }
-    }
-
-    createEvent( m_controller_id, m);
-}
-
-void
-Win32mote::handleIREvents( const unsigned char * theInputReport ) {
-    Vector2i myIRPositions[4];
-    myIRPositions[0] = parseIRData( theInputReport, 6);
-    myIRPositions[1] = parseIRData( theInputReport, 9);
-    myIRPositions[2] = parseIRData( theInputReport, 12);
-    myIRPositions[3] = parseIRData( theInputReport, 15);
-
-    float ox(0);
-    float oy(0);
-    Vector2f myNormalizedScreenCoordinates(0.0f, 0.0f);
-    float angle = 0.0;
-    
-    if (myIRPositions[0][0] < 1023 && myIRPositions[1][0] < 1023) {
-        int myLeftIndex = _myLeftPoint;
-        int myRightIndex;
-        if (_myLeftPoint == -1) {
-			switch (_myOrientation) {
-				case 0:
-                    myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
-                    break;
-				case 1:
-                    myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
-                    break;
-				case 2:
-                    myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
-                    break;
-				case 3:
-                    myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
-                    break;
-			}
-			_myLeftPoint = myLeftIndex;
-		}
-		myRightIndex = 1 - myLeftIndex;
-        
-		float dx = myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0];
-		float dy = myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1];
-		
-		float d = sqrt( dx * dx + dy * dy);
-		
-		
-		// normalized distance between bright spots
-		dx /= d;
-		dy /= d;
-		
-		angle = atan2(dy, dx);
-
-    //AC_PRINT << angle-3.14159;
-    
-		float cx = (myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0 - 1;
-		float cy = (myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0 - .75;
-		
-		ox = -dy * cy - dx * cx;
-		oy = -dx * cy + dy * cx;
-
-    myNormalizedScreenCoordinates[0] = ox;
-    myNormalizedScreenCoordinates[1] = oy;
-    
-    //AC_PRINT << "x: " << ox << " y: " << oy;
-
-    } else {
-        // not tracking anything
-        ox = oy = -100;
-        if ( _myLeftPoint != -1) {
-            _myLeftPoint = -1;
-        }
-        //myNormalizedScreenCoordinates[0] = ox;
-        //myNormalizedScreenCoordinates[1] = oy;
-    }
-    
-    //cout << "pos " << myIRPositions[0] << endl;
-    createEvent( m_controller_id, myIRPositions, myNormalizedScreenCoordinates, angle );
-}
-
 void
 Win32mote::InputReportListener(PosixThread & theThread)
 {
     Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
-    //AC_PRINT << myDevice.m_controller_id;
-    while (myDevice._myInputListening) {
+    //AC_PRINT << myDevice._myControllerId;
+    while (myDevice.getListeningFlag()) {
         unsigned char myInputReport[256];
         ZeroMemory(myInputReport, 256);
 
         DWORD result, bytes_read;
 
         // Issue a read request
-        if (myDevice.m_read_handle != INVALID_HANDLE_VALUE) {
-            result = ReadFile(myDevice.m_read_handle, 
+        if (myDevice._myReadHandle != INVALID_HANDLE_VALUE) {
+            result = ReadFile(myDevice._myReadHandle, 
                     myInputReport, 
-                    myDevice.m_capabilities.InputReportByteLength, 
+                    myDevice._myCapabilities.InputReportByteLength, 
                     &bytes_read, 
-                    (LPOVERLAPPED)&myDevice.m_hid_overlapped);																						  
+                    (LPOVERLAPPED)&myDevice._myHIDOverlap);																						  
         }  
 
         // Wait for read to finish
-        result = WaitForSingleObject(myDevice.m_event_object, 300);
+        result = WaitForSingleObject(myDevice._myEventObject, 300);
 
-        ResetEvent(myDevice.m_event_object);
+        ResetEvent(myDevice._myEventObject);
 
         // If the wait didn't result in a sucessful read, try again
         if (result != WAIT_OBJECT_0) {
@@ -316,9 +110,9 @@ Win32mote::InputReportListener(PosixThread & theThread)
             
 
         } else if (0x21 == myInputReport[0]) {
-            Vector3f zero_point(myInputReport[6] - 128, myInputReport[7] - 128, myInputReport[8] - 128);
+            Vector3f zero_point(myInputReport[6] - 128.0f, myInputReport[7] - 128.0f, myInputReport[8] - 128.0f);
             myDevice._myZeroPoint = zero_point;
-            Vector3f one_g_point(myInputReport[10] - 128, myInputReport[11] - 128, myInputReport[12] - 128);
+            Vector3f one_g_point(myInputReport[10] - 128.0f, myInputReport[11] - 128.0f, myInputReport[12] - 128.0f);
             myDevice._myOneGPoint = one_g_point;
             
         } else if (INPUT_REPORT_IR == myInputReport[0]) {
@@ -358,66 +152,158 @@ Win32mote::InputReportListener(PosixThread & theThread)
             AC_PRINT << "=========================================\n";
             
         } else {
-            //AC_PRINT << "unknown report " << myDevice.m_controller_id << "  " << ios::hex << myInputReport[0] << 	ios::dec;
+            //AC_PRINT << "unknown report " << myDevice._myControllerId << "  " << ios::hex << myInputReport[0] << 	ios::dec;
       	}
     }
 
 }
 
-
-void Win32mote::startListening() {
-    AC_PRINT << "Started listening: " << m_controller_id;
-
-    _myInputListening = true;
-    fork();
-}
-
-    
-void Win32mote::stopListening()
-{
-    AC_PRINT << "Stopped listening: " << m_controller_id;
-
-    _myInputListening = false;
-
-    join();
-
-}
-
-
-std::vector<Win32motePtr>
-Win32mote::discover() {
-    vector<Win32motePtr> wiimotes = HIDDevice::ConnectToHIDDevices<Win32mote>();
-    AC_PRINT << wiimotes[0]->m_device_path_name;
-    /*
-    if( wiimotes.size() > 0 ) {
-        for(unsigned i=0; i<wiimotes.size(); ++i){
-            wiimotes[i]->startListening();
-        }
-        cout << "wiimotes found " << wiimotes.size() << endl;
-    } else {
-        cout << "no wiimotes found " << endl;
-    }
-    */
-    return wiimotes;
-}
-
-void Win32mote::close()
-{
-	if (isActive()) {
-		stopListening();
-    }
-
+void
+Win32mote::closeDevice() {
 	//CloseHandle(_myListenerThread);
-	CloseHandle(m_device_handle);
-	CloseHandle(m_read_handle);
-	CloseHandle(m_write_handle);
+	CloseHandle(_myDeviceHandle);
+	CloseHandle(_myReadHandle);
+	CloseHandle(_myWriteHandle);
+}
+
+
+std::vector<WiiRemotePtr>
+Win32mote::discover() {
+
+    std::vector<WiiRemotePtr> myDevices;
+
+    HANDLE WriteHandle = 0, DeviceHandle = 0;
+
+    HANDLE hDevInfo;
+
+    HIDD_ATTRIBUTES						Attributes;
+    SP_DEVICE_INTERFACE_DATA			devInfoData;
+    int									MemberIndex = 0;
+    LONG								Result;	
+    GUID								HidGuid;
+    PSP_DEVICE_INTERFACE_DETAIL_DATA	detailData;
+
+    ULONG Required = 0;
+    ULONG Length = 0;
+    detailData = NULL;
+    DeviceHandle = NULL;
+
+    HidD_GetHidGuid(&HidGuid);	
+
+    hDevInfo = SetupDiGetClassDevs(&HidGuid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
+
+    devInfoData.cbSize = sizeof(devInfoData);
+    MemberIndex = 0;
+
+    do {
+        // Got any more devices?
+        Result = SetupDiEnumDeviceInterfaces (hDevInfo, 0, &HidGuid, MemberIndex,	&devInfoData);
+
+        if (Result == 0)
+            break;
+
+        // Call once to get the needed buffer length
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, NULL, 0, &Length, NULL);
+        detailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(Length);
+        detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+        // After allocating, call again to get data
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length, 
+                &Required, NULL);
+
+        cout << "device '" << detailData->DevicePath << "'" << endl;
+        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+                (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
+
+        Attributes.Size = sizeof(Attributes);
+
+        Result = HidD_GetAttributes(DeviceHandle, &Attributes);
+
+        if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
+            // If the vendor and product IDs match, we've found a wiimote 
+            Win32motePtr myDevice( new Win32mote() );
+
+            myDevice->_myDevicePath = detailData->DevicePath;
+            myDevice->_myDeviceHandle = DeviceHandle;
+
+            // Register to receive device notifications.
+            // RegisterForDeviceNotifications();
+
+            GetDeviceCapabilities(*myDevice);
+
+            myDevice->_myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+                    (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
+
+            PrepareForOverlappedTransfer(*myDevice, detailData);
+
+            myDevice->_myControllerId = myDevices.size();
+            //WiiRemotePtr myPtr( myDevice );
+            myDevices.push_back( myDevice );
+        } else {
+            CloseHandle(DeviceHandle);
+        }
+
+        free(detailData);
+
+        MemberIndex = MemberIndex + 1;
+    } while (true);
+
+    SetupDiDestroyDeviceInfoList(hDevInfo);
+
+    return myDevices;
 }
 
 void
-Win32mote::setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
-               asl::Ptr<asl::ThreadLock> theLock)
+Win32mote::PrepareForOverlappedTransfer(Win32mote & device,
+                                        PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData)
 {
-    _myLock = theLock;
-    _myEventQueue = theQueue;
+	// Get a handle to the device for the overlapped ReadFiles.
+	device._myReadHandle = CreateFile (detailData->DevicePath, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE,
+                                     (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+
+	// Get an event object for the overlapped structure.
+	if (device._myEventObject == 0)
+	{
+      string empty = _T("");
+      device._myEventObject = CreateEvent (NULL, TRUE, TRUE, empty.c_str());
+      device._myHIDOverlap.hEvent = device._myEventObject;
+      device._myHIDOverlap.Offset = 0;
+      device._myHIDOverlap.OffsetHigh = 0;
+	}
 }
+
+void
+Win32mote::GetDeviceCapabilities(Win32mote & device) {
+	//Get the Capabilities structure for the device.
+	PHIDP_PREPARSED_DATA PreparsedData;
+
+	HidD_GetPreparsedData(device._myDeviceHandle, &PreparsedData);
+	HidP_GetCaps(PreparsedData, &device._myCapabilities);
+	HidD_FreePreparsedData(PreparsedData);
 }
+
+void 
+Win32mote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
+    char	output_report[256];
+    DWORD	bytes_written = 0;
+    ULONG	result;
+
+    memset(output_report, 0, 256);
+    memcpy(output_report, out_bytes, theNumBytes);
+
+    if (_myWriteHandle != INVALID_HANDLE_VALUE) {
+        result = WriteFile(_myWriteHandle, output_report, _myCapabilities.OutputReportByteLength,
+                           &bytes_written, NULL);
+    }
+
+    //cout << " write done " << endl;
+    if (!result) {
+        // If we can't write to the device, we're not really connected
+        throw asl::Exception("Failed to send outgoing report", PLUS_FILE_LINE);
+    }
+}
+
+
+
+
+} // end of namespace

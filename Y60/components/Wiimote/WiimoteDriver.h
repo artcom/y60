@@ -29,51 +29,56 @@ extern std::string oureventxsd;
 namespace y60 {
 
      
-    template<class IOHANDLE>
-    class WiimoteDriver :
-        public asl::PlugInBase,
-        public jslib::IScriptablePlugin,
-        public y60::IEventSource
-    { 
-        public:
-        
+class WiimoteDriver :
+    public asl::PlugInBase,
+    public jslib::IScriptablePlugin,
+    public y60::IEventSource
+{ 
+    public:
+
         WiimoteDriver(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle),
-                                                   y60::IEventSource(),
-                                                   _myEventSchema( new dom::Document( oureventxsd ) ),
-                                                   _myValueFactory( new dom::ValueFactory()),
-                                                   _myEventQueue( new std::queue<WiiEvent>() ),
-                                                   _myLock( new asl::ThreadLock()),
-                                                   _myRequestMode ( INFRARED )
-            {
-                _myIOHandles = IOHANDLE::discover();
-                AC_PRINT << "discover" << _myIOHandles.size();
-                for (unsigned i = 0; i < _myIOHandles.size(); ++i) {
-                    _myBluetoothMap.insert(std::make_pair(_myIOHandles[i]->getControllerID(),
-                                                          _myIOHandles[i]->getDeviceName()));
-                    _myIOHandles[i]->setEventQueue( _myEventQueue, _myLock );
-                    _myIOHandles[i]->startListening();
+        y60::IEventSource(),
+        _myEventSchema( new dom::Document( oureventxsd ) ),
+        _myValueFactory( new dom::ValueFactory()),
+        _myEventQueue( new std::queue<WiiEvent>() ),
+        _myLock( new asl::ThreadLock()),
+        _myRequestMode ( INFRARED )
+    {
+#ifdef WIN32
+        _myIOHandles = Win32mote::discover();
+#elif defined( LINUX )
+        _myIOHandles = Liimote::discover();
+#elif defined( OSX )
+        // TODO
+#endif
+        AC_PRINT << "discover" << _myIOHandles.size();
+        for (unsigned i = 0; i < _myIOHandles.size(); ++i) {
+            _myBluetoothMap.insert(std::make_pair(_myIOHandles[i]->getControllerID(),
+                        _myIOHandles[i]->getDeviceName()));
+            _myIOHandles[i]->setEventQueue( _myEventQueue, _myLock );
+            _myIOHandles[i]->startThread();
 
-                    // XXX set LEDs to controller id (binary) ;-)
-                    setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
-                }
+            // XXX set LEDs to controller id (binary) ;-)
+            setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
+        }
 
-                registerStandardTypes( * _myValueFactory );
-                registerSomTypes( * _myValueFactory );
+        registerStandardTypes( * _myValueFactory );
+        registerSomTypes( * _myValueFactory );
 
-                //requestMotionData();
-                //requestButtonData();
-                requestInfraredData();
-            }  
-        
+        //requestMotionData();
+        //requestButtonData();
+        requestInfraredData();
+    }  
+
         ~WiimoteDriver() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
                 setLEDs(i, 0,0,0,0);
                 setRumble(i, false);
             }
         }
-               
+
         virtual y60::EventPtrList poll() {
-            
+
             y60::EventPtrList myEvents;
 
             _myLock->lock();
@@ -100,7 +105,7 @@ namespace y60 {
                     for (unsigned i = 0; i < 4; ++i) {
                         if (myWiiEvent.irPositions[i][0] != 1023 && myWiiEvent.irPositions[i][1] != 1023) {
                             myNode->appendAttribute<asl::Vector2i>(std::string("irposition") + asl::as_string(i),
-                                        myWiiEvent.irPositions[i]);
+                                    myWiiEvent.irPositions[i]);
                             //myNode->appendAttribute<float>(string("angle"), theAngle);
                         }
                     }
@@ -112,123 +117,122 @@ namespace y60 {
                 myEvents.push_back( myEvent );
                 _myEventQueue->pop();
             }
-            
+
             _myLock->unlock();
             return myEvents;
         }
 
         void requestStatusReport(int theIndex) {
-            char status_report[2] = { 0x15, 0x00 };
+            unsigned char status_report[2] = { 0x15, 0x00 };
             //if( _myRequestMode == INFRARED ) {
             //    rpt[1] |= 0x04;
             //}
-            _myIOHandles[theIndex]->WriteOutputReport(status_report, 2);
+            _myIOHandles[theIndex]->sendOutputReport(status_report, 2);
         }
-        
+
         void setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4) {
             char out = 0;
-            
+
             if (led1) out |= 0x10;
             if (led2) out |= 0x20;
             if (led3) out |= 0x40;
             if (led4) out |= 0x80;
-            
-            char rpt[2] = { 0x11, out };
-            _myIOHandles[theIndex]->WriteOutputReport(rpt, 2);
+
+            unsigned char rpt[2] = { 0x11, out };
+            _myIOHandles[theIndex]->sendOutputReport(rpt, 2);
         }
 
-        
+
         void setRumble(int theIndex, bool on) {
-            char rpt[2] = { 0x13, on ? 0x01 : 0x00 };
+            unsigned char rpt[2] = { 0x13, on ? 0x01 : 0x00 };
             if( _myRequestMode == INFRARED ) {
                 rpt[1] |= 0x04;
             }
-            _myIOHandles[theIndex]->WriteOutputReport(rpt, 2);
+            _myIOHandles[theIndex]->sendOutputReport(rpt, 2);
         }
 
         void requestButtonData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char set_motion_report[3] = { OUTPUT_REPORT_SET , 0x00, INPUT_REPORT_BUTTONS };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
+                unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET , 0x00, INPUT_REPORT_BUTTONS };
+                _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
             }
             _myRequestMode = BUTTON;
         }
 
         void requestInfraredData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char set_ir_report[2] = {  0x13, 0x04 };
-                char set_ir_report2[2] = { 0x1a, 0x04 };
+                unsigned char set_ir_report[2] = {  0x13, 0x04 };
+                unsigned char set_ir_report2[2] = { 0x1a, 0x04 };
                 set_ir_report[1] |= 0x01;
-                _myIOHandles[i]->WriteOutputReport(set_ir_report, 2);
+                _myIOHandles[i]->sendOutputReport(set_ir_report, 2);
                 asl::msleep(10);
-                _myIOHandles[i]->WriteOutputReport(set_ir_report2, 2);
+                _myIOHandles[i]->sendOutputReport(set_ir_report2, 2);
                 asl::msleep(10);
 
                 // Write 0x08 to register 0xb00030
                 //16 MM FF FF FF SS DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD
-                char write_register[7] = {0x16, 0x04,
-                                         0xb0, 0x00, 0x30, // address
-                                         0x01,             // size
-                                         0x01 };           // data
-                _myIOHandles[i]->WriteOutputReport( write_register, 7 );
+                unsigned char write_register[7] = {0x16, 0x04,
+                    0xb0, 0x00, 0x30, // address
+                    0x01,             // size
+                    0x01 };           // data
+                _myIOHandles[i]->sendOutputReport( write_register, 7 );
                 asl::msleep(10);
                 //Write Sensitivity Block 1 to registers at 0xb00000
                 //Write Sensitivity Block 2 to registers at 0xb0001a 
-                char sensivity_setting_block1[15] = {0x16, 0x04,
-                                                   0xb0, 0x00, 0x00, // address
-                                                   0x09,             // size
-                                                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00, 0xC0 }; // data
-                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block1, 15);
+                unsigned char sensivity_setting_block1[15] = {0x16, 0x04,
+                    0xb0, 0x00, 0x00, // address
+                    0x09,             // size
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00, 0xC0 }; // data
+                _myIOHandles[i]->sendOutputReport(sensivity_setting_block1, 15);
                 asl::msleep(10);
-                
-                char sensivity_setting_block2[8] = {0x16, 0x04,
-                                                   0xb0, 0x00, 0x1a,  // address
-                                                   0x02,               // size
-                                                   0x40, 0x00 };      // data
-                _myIOHandles[i]->WriteOutputReport(sensivity_setting_block2, 8);
+
+                unsigned char sensivity_setting_block2[8] = {0x16, 0x04,
+                    0xb0, 0x00, 0x1a,  // address
+                    0x02,               // size
+                    0x40, 0x00 };      // data
+                _myIOHandles[i]->sendOutputReport(sensivity_setting_block2, 8);
                 asl::msleep(10);
-                
-                 char write_register2[7] = {0x16, 0x04,
-                                         0xb0, 0x00, 0x30, // address
-                                         0x01,             // size
-                                         0x08 };           // data
-                _myIOHandles[i]->WriteOutputReport( write_register2, 7 );
+
+                unsigned char write_register2[7] = {0x16, 0x04,
+                    0xb0, 0x00, 0x30, // address
+                    0x01,             // size
+                    0x08 };           // data
+                _myIOHandles[i]->sendOutputReport( write_register2, 7 );
                 asl::msleep(10);
-                char ir_mode_setting[7] = { 0x16, 0x04,
-                                            0xb0, 0x00, 0x33, // adress
-                                            0x01,             // size
-                                            0x03};            // data (extended mode ... for now)
-                _myIOHandles[i]->WriteOutputReport(ir_mode_setting, 7);
+                unsigned char ir_mode_setting[7] = { 0x16, 0x04,
+                    0xb0, 0x00, 0x33, // adress
+                    0x01,             // size
+                    0x03};            // data (extended mode ... for now)
+                _myIOHandles[i]->sendOutputReport(ir_mode_setting, 7);
 
 
-                
-                char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, 0x33 };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
+
+                unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, 0x33 };
+                _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
             }
             _myRequestMode = INFRARED;
-        
+
         }
-        
+
         void requestMotionData() {
             for (int i = 0; i < _myIOHandles.size(); ++i) {
-                char calibration_report[7] = { OUTPUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
-                _myIOHandles[i]->WriteOutputReport(calibration_report, 7);
-            
-                char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, INPUT_REPORT_MOTION };
-                _myIOHandles[i]->WriteOutputReport(set_motion_report, 3);
+                unsigned char calibration_report[7] = { OUTPUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
+                _myIOHandles[i]->sendOutputReport(calibration_report, 7);
+
+                unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, INPUT_REPORT_MOTION };
+                _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
             }
             _myRequestMode = MOTION;
         }
 
         unsigned getNumWiimotes() const { return _myIOHandles.size(); }
-        std::vector<asl::Ptr<IOHANDLE, dom::ThreadingModel> > _myIOHandles;
 
         void onSetProperty(const std::string & thePropertyName,
-                           const PropertyValue & thePropertyValue)
+                const PropertyValue & thePropertyValue)
         {
         }
         void onGetProperty(const std::string & thePropertyName,
-                           PropertyValue & theReturnValue) const
+                PropertyValue & theReturnValue) const
         {
         }
         void onUpdateSettings(dom::NodePtr theSettings) {
@@ -247,7 +251,7 @@ namespace y60 {
         static JSBool SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        
+
         const char * ClassName() {
             static const char * myClassName = "Wiimote";
             return myClassName;
@@ -259,20 +263,22 @@ namespace y60 {
         asl::Ptr<asl::ThreadLock> _myLock;
         dom::NodePtr                 _myEventSchema;
         asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        
+
 
         enum REQUEST_MODE { BUTTON, MOTION, INFRARED };
         REQUEST_MODE _myRequestMode;
-    };
-    
+
+        std::vector<WiiRemotePtr> _myIOHandles;
+};
+
 #ifdef WIN32
-    typedef WiimoteDriver<Win32mote> Wiimote;
+typedef WiimoteDriver Wiimote;
 
 #elif LINUX
 
 #endif
 
-    typedef asl::Ptr<Wiimote, dom::ThreadingModel> WiimotePtr;
+typedef asl::Ptr<Wiimote, dom::ThreadingModel> WiimotePtr;
 }
 #endif // _Y60_WIIMOTE_DRIVER_INCLUDED_
 

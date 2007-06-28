@@ -17,9 +17,8 @@ using namespace jslib;
 
 namespace y60 {
 
-template <class IOHANDLE>
 JSBool
-WiimoteDriver<IOHANDLE>::SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+WiimoteDriver::SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
     DOC_BEGIN("");
     DOC_END;
    
@@ -40,9 +39,8 @@ WiimoteDriver<IOHANDLE>::SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsv
 }
 
 
-template <class IOHANDLE>
 JSBool
-WiimoteDriver<IOHANDLE>::RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+WiimoteDriver::RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
     DOC_BEGIN("");
     DOC_END;
    
@@ -60,9 +58,8 @@ WiimoteDriver<IOHANDLE>::RequestStatusReport(JSContext *cx, JSObject *obj, uintN
 }
 
     
-template <class IOHANDLE>
 JSBool
-WiimoteDriver<IOHANDLE>::SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+WiimoteDriver::SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
     DOC_BEGIN("");
     DOC_END;
    
