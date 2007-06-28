@@ -127,8 +127,15 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             String(myCMSConfig.backend).toUpperCase() == "OCS") {
             myUsername += "@" + myCMSConfig.domain;
         }
-        _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
-                            myCMSConfig.backend, myUsername, _myConfig.password, _myOCSCookie );
+        if (_myOCSCookie) {
+            Logger.info("using repository cookie:" + _myOCSCookie);
+            _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
+                                myCMSConfig.backend, "", "", _myOCSCookie );
+        } else {
+            Logger.info("Logging on with user :" + myUsername);
+            _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
+                                myCMSConfig.backend, myUsername, _myConfig.password, null );
+        }
         if ('proxy' in _myConfig && _myConfig.proxy) {
             _myCMSCache.setProxy(_myConfig.proxy);
         }
@@ -153,10 +160,23 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         }
     }
 
+    function initRequest(theRequest) {
+        theRequest.verifyPeer = false;
+        theRequest.verbose = _myZopeVerbosityFlag;
+        theRequest.addHttpHeader("Pragma",""); // remove default "no-cache" pragma
+        if ('proxy' in _myConfig && _myConfig.proxy) {
+            theRequest.setProxy(_myConfig.proxy);
+        }
+        for (var i = 0; i < _myZopeCookies.length; ++i) {
+            verboseZope("   " + _myZopeCookies[i]);
+            theRequest.setCookie( _myZopeCookies[i] );
+        }
+    }
+
     function fetchPresentation() {
 
         _myPresentation = Node.createDocument();
-        var myCookies = [];
+        _myZopeCookies = [];
         
         var myErrorOccurred = false;
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
@@ -165,12 +185,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                                         _myUserAgent );
             myLoginRequest.post("__ac_name=" + _myConfig.username +
                                 "&__ac_password=" + _myConfig.password);
-            myLoginRequest.verifyPeer = false;
-            myLoginRequest.verbose = _myZopeVerbosityFlag;
-            if ('proxy' in _myConfig && _myConfig.proxy) {
-                myLoginRequest.addHttpHeader("Pragma:",""); // remove default "no-cache" pragma
-                myLoginRequest.setProxy(_myConfig.proxy);
-            }
+            initRequest(myLoginRequest);
             _myRequestManager.performRequest( myLoginRequest );
 
             while ( _myRequestManager.activeCount ) {
@@ -189,7 +204,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                     Logger.error("No ZOPE cookie in server response.");
                     myErrorOccurred = true;
                 } else {
-                    myCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
+                    _myZopeCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
                 }
             }
         }
@@ -201,18 +216,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
             Logger.debug("Sending request '" + myRequestURI + "'");
             var myPresentationRequest = new Request( myRequestURI, _myUserAgent );
-            verboseZope("Login request cookies:");
-            for (var i = 0; i < myCookies.length; ++i) {
-                verboseZope("   " + myCookies[i]);
-                myPresentationRequest.setCookie( myCookies[i] );
-            }
-
-            if ('proxy' in _myConfig && _myConfig.proxy) {
-                myPresentationRequest.addHttpHeader("Pragma:",""); // remove default "no-cache" pragma
-                myPresentationRequest.setProxy(_myConfig.proxy);
-            }
-            myPresentationRequest.verifyPeer = false;
-            myPresentationRequest.verbose = _myCMSVerbosityFlag;
+            initRequest(myPresentationRequest);
             _myRequestManager.performRequest( myPresentationRequest );
             while ( _myRequestManager.activeCount ) {
                 _myRequestManager.handleRequests();
@@ -224,9 +228,25 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                                     myPresentationRequest.responseCode + ".");
                 myErrorOccurred = true;
             }
-            //_myOCSCookie = myPresentationRequest.getResponseHeader("Set-Cookie");
         }
-
+        // now get repository cookie
+        if (!myErrorOccurred) {
+            var myRequestURI = myZopeConfig.baseurl + "/Theme_Pool/getRepositoryCookie";
+            var myCookieRequest = new Request( myRequestURI, _myUserAgent );
+            initRequest(myCookieRequest);
+            _myRequestManager.performRequest( myCookieRequest );
+            while ( _myRequestManager.activeCount ) {
+                _myRequestManager.handleRequests();
+                msleep( 10 );
+            }
+            if ( myCookieRequest.responseCode != 200 ) {
+                Logger.error("Failed to get repository cookie. Server response code " +
+                                    myCookieRequest.responseCode + ".");
+                myErrorOccurred = true;
+            } else {
+                _myOCSCookie = myCookieRequest.responseString;
+            }
+        }
         if ( myErrorOccurred ) {
             if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
                 Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -305,6 +325,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     var _myCMSCache = null;
     var _myUserAgent = null;
     var _myVersionTag = null;
+    var _myZopeCookies = null;
     var _myOCSCookie = null;
 
     setup();

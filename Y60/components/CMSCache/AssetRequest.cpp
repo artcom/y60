@@ -37,6 +37,7 @@ AssetRequest::AssetRequest(RequestThread * theParent,
     }
     _myLocalFile = theBaseDir + "/" + _myLocalPath;
     _myPartialFile = theBaseDir + "/" + _myLocalPath+".partial";
+    setVerbose(false);
     verifyPeer(false); // don't bother to authenticate server, just encrypt
     if (fileExists(_myLocalFile)) {
         time_t myLastModified = getLastModified(_myLocalFile);

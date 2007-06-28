@@ -28,6 +28,7 @@ namespace y60 {
 RequestThread::RequestThread(const std::string & theLocalPath, 
                       const std::string & theUsername, 
                       const std::string & thePassword,
+                      const std::string & theSessionCookie,
                       const std::string & theUserAgent,
                       const std::string & theProxy,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
@@ -41,6 +42,7 @@ RequestThread::RequestThread(const std::string & theLocalPath,
     _myMaxRequestCount(theMaxRequestCount),
     _remainingCount(theOutdatedAssets.size())
 {
+    addToCookieJar(theSessionCookie);
     fillRequestQueue();
 };
 
