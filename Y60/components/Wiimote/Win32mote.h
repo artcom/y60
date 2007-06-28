@@ -45,6 +45,8 @@ const static char OUTPUT_REPORT_IR      = 0x04;
 const static char INPUT_READ_DATA			= 0x21;
 const static char INPUT_WRITE_DATA			= 0x22;
 
+const static char INPUT_REPORT_STATUS  = 0x20;
+
 
 
 namespace y60 {

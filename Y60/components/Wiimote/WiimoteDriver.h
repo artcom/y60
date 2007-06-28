@@ -117,7 +117,13 @@ namespace y60 {
             return myEvents;
         }
 
-
+        void requestStatusReport(int theIndex) {
+            char status_report[2] = { 0x15, 0x00 };
+            //if( _myRequestMode == INFRARED ) {
+            //    rpt[1] |= 0x04;
+            //}
+            _myIOHandles[theIndex]->WriteOutputReport(status_report, 2);
+        }
         
         void setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4) {
             char out = 0;
@@ -232,6 +238,7 @@ namespace y60 {
             static JSFunctionSpec myFunctions[] = {
                 {"setRumble", SetRumble, 2},
                 {"setLEDs", SetLEDs, 5},
+                {"requestStatusReport", RequestStatusReport, 1},
                 {0}
             };
             return myFunctions;
@@ -239,7 +246,8 @@ namespace y60 {
 
         static JSBool SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-    
+        static JSBool RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        
         const char * ClassName() {
             static const char * myClassName = "Wiimote";
             return myClassName;

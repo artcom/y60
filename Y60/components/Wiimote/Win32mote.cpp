@@ -336,7 +336,27 @@ Win32mote::InputReportListener(PosixThread & theThread)
 //             }
 //             myDevice._myEventVector.clear();
             myDevice._myLock->unlock();
-
+        } else if( INPUT_REPORT_STATUS == myInputReport[0]) {
+            AC_PRINT << "\n============= status report =============";
+            double batteryLevel = (double)myInputReport[6];
+            batteryLevel /= (double)0xC0;
+            AC_PRINT << " Battery Level              : " << batteryLevel;
+            std::string extension = (myInputReport[3] & 0x02) ? "yes" : "no";
+            AC_PRINT << " Extension Controller       : " << extension;
+            std::string speaker = (myInputReport[3] & 0x04) ? "yes" : "no";
+            AC_PRINT << " Speaker enabled            : " << speaker;
+            std::string reporting = (myInputReport[3] & 0x08) ? "yes" : "no";
+            AC_PRINT << " Continuous reports enabled : " << reporting;
+            std::string led0 = (myInputReport[3] & 0x10) ? "yes" : "no";
+            AC_PRINT << " LED 1 enabled              : " << led0;
+            std::string led1 = (myInputReport[3] & 0x20) ? "yes" : "no";
+            AC_PRINT << " LED 2 enabled              : " << led1;
+            std::string led2 = (myInputReport[3] & 0x40) ? "yes" : "no";
+            AC_PRINT << " LED 3 enabled              : " << led2;
+            std::string led3 = (myInputReport[3] & 0x80) ? "yes" : "no";
+            AC_PRINT << " LED 4 enabled              : " << led3;
+            AC_PRINT << "=========================================\n";
+            
         } else {
             //AC_PRINT << "unknown report " << myDevice.m_controller_id << "  " << ios::hex << myInputReport[0] << 	ios::dec;
       	}

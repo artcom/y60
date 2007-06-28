@@ -39,6 +39,27 @@ WiimoteDriver<IOHANDLE>::SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsv
     return JS_TRUE;
 }
 
+
+template <class IOHANDLE>
+JSBool
+WiimoteDriver<IOHANDLE>::RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<Wiimote> myNative = getNativeAs<Wiimote>(cx, obj);
+
+    int myId;
+    convertFrom(cx, argv[0], myId );
+
+    if (myNative) {
+        myNative->requestStatusReport(myId);
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+
+    
 template <class IOHANDLE>
 JSBool
 WiimoteDriver<IOHANDLE>::SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
