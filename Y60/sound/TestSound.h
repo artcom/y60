@@ -16,6 +16,7 @@
 #include <asl/UnitTest.h>
 
 #include "SoundManager.h"
+#include "TestGrainSource.h"
 #include <asl/Pump.h>
 
 #include <asl/numeric_functions.h>
@@ -645,6 +646,7 @@ class SoundTestSuite : public UnitTestSuite {
 #endif
 //            addTest(new TestLeak(mySoundManager));
 //            addTest(new MemLeakStressTest(mySoundManager, 5*60));
+
         }
 
     private:

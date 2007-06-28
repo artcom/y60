@@ -63,6 +63,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     ASSURE(getNumChannels() == theBuffer.getNumChannels());
     ASSURE(_mySampleRate == theBuffer.getSampleRate());
     ASSURE(_myGrainSize >= 1);
+
     theBuffer.clear();
 
     unsigned myNumFrames = theBuffer.getNumFrames();
