@@ -47,7 +47,9 @@ vert2frag mainVertex(app2vert IN,
 
 float4 mainFragment(vert2frag IN,
                     uniform float2 center,
-//                    uniform float2 scale,
+                    uniform float size,
+                    uniform float slope,
+                    uniform float maxzoom,
                     uniform sampler2D tex0) : COLOR
 {
     // XXX TODO: implement this function:
@@ -55,13 +57,13 @@ float4 mainFragment(vert2frag IN,
 
     float2 distance = (IN.texCoord0 - center);
 //    distance *= scale;
-    float absDistance = sqrt(dot(distance, distance))*30 - 3;
+    float absDistance = sqrt(dot(distance, distance));
 
     float cosDistance;
-    if (absDistance < 0) {
-        cosDistance = 0.2;
-    } else if (absDistance < (3.14159265)) {
-        cosDistance = 0.2 + (-cos(absDistance)/2 + 0.5)*0.8;
+    if (absDistance < size) {
+        cosDistance = 1/maxzoom;
+    } else if ((absDistance - size) < 3.14159265 * slope) {
+        cosDistance = 1/maxzoom + (-cos((absDistance - size) / slope)/2 + 0.5)*(1-1/maxzoom);
     } else {
         cosDistance = 1;
     }

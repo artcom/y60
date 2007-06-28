@@ -1807,6 +1807,9 @@
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <vector2f name="center">[0.0,0.0]</vector2f>
+                <float name="size">0.1</float>
+                <float name="slope">0.02</float>
+                <float name="maxzoom">2.5</float>
             </properties>
         </fragmentshader>
     </shader>
