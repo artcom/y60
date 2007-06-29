@@ -1325,12 +1325,14 @@ namespace y60 {
 
         collectReferences(mySceneNode.childNode(CANVAS_LIST_NAME), myReferences);
         collectReferences(getWorldRoot(), myReferences);
-
         removeUnreferencedNodes(getNode().childNode(LIGHTSOURCE_LIST_NAME), myReferences);
         removeUnreferencedNodes(getShapesRoot(), myReferences);
+
         collectReferences(getShapesRoot(), myReferences);
         removeUnreferencedNodes(getMaterialsRoot(), myReferences);
+
         collectReferences(getMaterialsRoot(), myReferences);
+        collectReferences(getCanvasRoot(), myReferences);
         removeUnreferencedNodes(getImagesRoot(), myReferences);
     }
 
@@ -1383,7 +1385,7 @@ namespace y60 {
     }
 
     void
-        Scene::removeUnreferencedNodes(NodePtr theNode, const std::set<string> & theReferences) {
+    Scene::removeUnreferencedNodes(NodePtr theNode, const std::set<string> & theReferences) {
         vector<NodePtr> myNodesToRemove;
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             NodePtr myChild = theNode->childNode(i);
@@ -1391,6 +1393,7 @@ namespace y60 {
             if (myId) {
                 if (theReferences.find(myId->nodeValue()) == theReferences.end()) {
                     myNodesToRemove.push_back(myChild);
+                    AC_INFO << "Scene::removeUnreferencedNodes is removing node with id: " << myId->nodeValue();
                 }
             }
         }
