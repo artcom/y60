@@ -173,8 +173,6 @@ class AudioBuffer: public AudioBufferBase {
 //                      << "theSrcNumFrames=" << theSrcNumFrames << ", "
 //                      << "theDestNumFrames=" << theDestNumFrames;
             ASSURE(theSrcBuffer.getNumChannels() == getNumChannels());
-            ASSURE(theSrcNumFrames-theSrcStartFrame >= numFrames);
-            ASSURE(theDestStartFrame + numFrames <= theDestNumFrames);
             
             SAMPLE * curOutSample = begin() + theDestStartFrame*getNumChannels();
             const SAMPLE * curInSample = mySrcBuffer->begin() + theSrcStartFrame*getNumChannels();
@@ -184,32 +182,27 @@ class AudioBuffer: public AudioBufferBase {
             }
         }
 
-        void copyFrames(unsigned theDestStartFrame, 
-			const AudioBufferBase& theSrcBuffer,
-                        unsigned theSrcStartFrame, 
-			unsigned numFrames)
+        void copyFrames(unsigned theDestStartFrame, const AudioBufferBase& theSrcBuffer,
+                        unsigned theSrcStartFrame, unsigned numFrames)
         {
             ASSURE_MSG(_numChannels != 0,
-                       "AudioBuffer::copyFrames called but _numChannels=0 "
-		       "(forgot init?)");
-
-            const AudioBuffer<SAMPLE>* mySrcBuffer = 	
-	        getBufferFromInterface(theSrcBuffer);
-
-	    ASSURE(getNumFrames()-theDestStartFrame >= numFrames);
-	    ASSURE(mySrcBuffer->getNumFrames()-theSrcStartFrame >= numFrames);
-
+                    "AudioBuffer::copyFrames called but _numChannels=0 (forgot init?)");
+            const AudioBuffer<SAMPLE>* mySrcBuffer = getBufferFromInterface(theSrcBuffer);
             unsigned myDestStartSample = theDestStartFrame*getNumChannels();
-            unsigned mySrcStartSample = 
-		theSrcStartFrame*mySrcBuffer->getNumChannels();
+            unsigned mySrcStartSample = theSrcStartFrame*mySrcBuffer->getNumChannels();
             unsigned numBytes = numFrames*getBytesPerFrame();
-            
-	    SAMPLE * curOutSample = begin()+myDestStartSample;
+//            std::cerr << "copyFrames: myDestStartSample = " << myDestStartSample
+//                    << ", mySrcStartSample = " << mySrcStartSample
+//                    << ", numBytes = " << numBytes << std::endl;
+//            std::cerr << "copyFrames: mySrcBuffer: " << *mySrcBuffer <<std::endl;
+
+            ASSURE(theSrcBuffer.getNumFrames() - theSrcStartFrame >= numFrames);
+            ASSURE(theDestStartFrame + numFrames <= getNumFrames());
+
+            SAMPLE * curOutSample = begin()+myDestStartSample;
             const SAMPLE * curInSample = mySrcBuffer->begin()+mySrcStartSample;
             ASSURE (mySrcBuffer->getNumChannels() == getNumChannels());
-            
-	    memcpy(begin()+myDestStartSample, 
-	           mySrcBuffer->begin()+mySrcStartSample, numBytes);
+            memcpy(begin()+myDestStartSample, mySrcBuffer->begin()+mySrcStartSample, numBytes);
         }
 
         void convert(void * theReadPtr, SampleFormat theSrcSampleFormat, 
