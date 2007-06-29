@@ -32,11 +32,12 @@
 
 #pragma once
 
-
+#ifdef WIN32
 extern "C" {
-#include "hidsdi.h"
-#include "setupapi.h"
+#   include "hidsdi.h"
+#   include "setupapi.h"
 }
+#endif
 
 namespace y60 {
             

@@ -72,62 +72,16 @@ WiiRemote::setButtons(int code) {
 void
 WiiRemote::createEvent( int theID, const asl::Vector2i theIRData[4],
                         const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", string("infrareddata"));
-    
-    bool myGotDataFlag = false;
-    for (unsigned i = 0; i < 4; ++i) {
-        if (theIRData[i][0] != 1023 && theIRData[i][1] != 1023) {
-            myNode->appendAttribute<Vector2i>(string("irposition") + asl::as_string(i), theIRData[i]);
-            myNode->appendAttribute<Vector2f>(string("screenposition"), theNormalizedScreenCoordinates);
-            myNode->appendAttribute<float>(string("angle"), theAngle);
-            myGotDataFlag = true;
-            break;
-
-        }
-    }
-    */
-
-
     _myEventQueue->push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
 }
 
 void
 WiiRemote::createEvent( int theID, asl::Vector3f & theMotionData) {
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-            _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute<std::string>("type", string("motiondata"));
-    myNode->appendAttribute<Vector3f>("motiondata", theMotionData);
-    */
-    
     _myEventQueue->push( WiiEvent(theID, theMotionData) );
 }
 
 void
-WiiRemote::createEvent( int theID, std::string & theButtonName, bool thePressedState)
-{
-    
-    /*
-    y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
-                                                   _myValueFactory));
-    dom::NodePtr myNode = myEvent->getNode();
-    
-    
-    myNode->appendAttribute<int>("id", theID);
-    myNode->appendAttribute("type", "button");
-    myNode->appendAttribute<std::string>("buttonname", theButtonName);
-    myNode->appendAttribute<bool>("pressed", thePressedState);
-    */
-       
+WiiRemote::createEvent( int theID, const std::string & theButtonName, bool thePressedState) {
     _myEventQueue->push( WiiEvent( theID, theButtonName, thePressedState ) );
 }
 
