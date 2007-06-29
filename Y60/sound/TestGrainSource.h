@@ -38,14 +38,12 @@ class GrainSourceStressTest : public UnitTest {
 
     av_register_all(); // never forget :)
 
-    for (unsigned i = 1; i <= 200; i++) {
+    for (unsigned i = 1; i <= 10; i++) {
       unsigned myGrainSize = 2*i;
       unsigned myGrainRate = i;
 
       std::string mySoundFile = "../../testfiles/ShutterClick.wav";
 
-      try {
-        
 	GrainSourcePtr myGrainSource = 
 	  GrainSourcePtr(new GrainSource("aGrainSource", 
 					 mySampleFormat,
@@ -60,14 +58,11 @@ class GrainSourceStressTest : public UnitTest {
 	delete myDecoder;
 
 	Pump::get().addSampleSource(myGrainSource);
-
-	//myGrainSource->enable();
-	// 	  msleep(10);
-	//myGrainSource->disable();
+	
+	myGrainSource->enable();
+	msleep(10);
+	myGrainSource->disable();
 	ENSURE(true);
-      } catch (...) {
-	throw;
-      }
     }
   }
 };

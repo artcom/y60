@@ -51,7 +51,7 @@ GrainSource::GrainSource(const std::string& theName,
 
 
 GrainSource::~GrainSource() {
-    //    AC_DEBUG << "~GrainSource end (" << _myName << ")";
+    AC_DEBUG << "~GrainSource end (" << _myName << ")";
 }
 
 //
@@ -59,7 +59,7 @@ GrainSource::~GrainSource() {
 //
 void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    //    AC_DEBUG << "GrainSource::deliverData();";
+    AC_DEBUG << "GrainSource::deliverData();";
     ASSURE(getNumChannels() == theBuffer.getNumChannels());
     ASSURE(_mySampleRate == theBuffer.getSampleRate());
     ASSURE(_myGrainSize >= 1);
@@ -71,24 +71,31 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     _myGrainOffset -= _myLastBuffersize;
     _myLastBuffersize = myNumFrames;
     
-    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     // copy samples overlapping from the last buffer to current frame buffer
-    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, myNumFrames);
+    AC_TRACE << "GrainSource::deliverData(): copying overlap buffer frames";
+//    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, myNumFrames);
+    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, 
+		    	 std::min(_myOverlapBuffer->getNumFrames(),myNumFrames));
     // save remaining sample data to tmp buffer
     AudioBufferPtr myTmpBuffer = AudioBufferPtr(0);
     if (myNumFrames < _myOverlapBuffer->getNumFrames()) {
+	AC_TRACE << "GrainSource::deliverData(): creating temp buffer";
         myTmpBuffer = AudioBufferPtr(_myOverlapBuffer->partialClone(myNumFrames, _myOverlapBuffer->getNumFrames()-1));
     }
 
     // resize overlap buffer to fit to new grainsize if needed
     unsigned myMaxGrainFrames = (unsigned)((_myGrainSize + _myGrainSizeJitter) * mySamplesPerMS);
     if (myMaxGrainFrames > _myOverlapBuffer->getNumFrames() - myNumFrames) {
+	AC_TRACE << "GrainSource::deliverData(): resizing overlap buffer";
         _myOverlapBuffer->resize(myMaxGrainFrames);
     }
+    AC_TRACE << "GrainSource::deliverData(): clearing overlap buffer";
     _myOverlapBuffer->clear();
 
     // copy tmp to beginning of overlap buffer
     if (myTmpBuffer) {
+	AC_TRACE << "GrainSource::deliverData(): copying temp to overlap";
         _myOverlapBuffer->copyFrames(0u, *myTmpBuffer, 0u, myTmpBuffer->getNumFrames());
     }
 
@@ -108,28 +115,28 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         }
  
         // get grain from audio data
-        //        AC_TRACE << "GrainSource::deliverData: creating grain audiobuffer";
+        AC_TRACE << "GrainSource::deliverData: creating grain audiobuffer";
         AudioBufferPtr myGrain = AudioBufferPtr(_myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceilf(myGrainFrames * myJitteredRatio))));
-        //        AC_TRACE << "GrainSource::deliverData: applying resampler";
+	AC_TRACE << "GrainSource::deliverData: applying resampler";
         _myResampler->setTargetFrames(myGrainFrames);
         _myResampler->apply(*myGrain,0);
         _myWindowFunction->setOverlapFactor((float)_myGrainRate/(float)_myGrainSize);
-        //        AC_TRACE << "GrainSource::deliverData: applying window function";
+	AC_TRACE << "GrainSource::deliverData: applying window function";
         _myWindowFunction->apply(*myGrain,0);
-        //        AC_TRACE << "GrainSource::deliverData: calculating remaining frames and overlap frames";
+        AC_TRACE << "GrainSource::deliverData: calculating remaining frames and overlap frames";
         unsigned myRemainingFrames = myNumFrames - _myGrainOffset;
         unsigned myToBufferFrames = (myGrainFrames > myRemainingFrames) ? myRemainingFrames : myGrainFrames;
         unsigned myToOverlapFrames = myGrainFrames - myToBufferFrames;
 
         // add contents to the frame buffer
-        //        AC_TRACE << "GrainSource::deliverData: adding grains";
+        AC_TRACE << "GrainSource::deliverData: adding grains";
         theBuffer.partialAdd(_myGrainOffset, *myGrain, 0u, myToBufferFrames);
         // add rest (if any) to the overlap buffer
-        //        AC_TRACE << "GrainSource::deliverData: adding rest to overlap buffer";
+        AC_TRACE << "GrainSource::deliverData: adding rest to overlap buffer";
         _myOverlapBuffer->partialAdd(0u, *myGrain, myToBufferFrames, myToOverlapFrames);
         _myGrainOffset += myRateFrames; // proceed to next grain
     }
-    //    AC_TRACE << "GrainSource::deliverData: applying volume fader";
+    AC_TRACE << "GrainSource::deliverData: applying volume fader";
     _myVolumeFader->apply(theBuffer, _myAbsoluteFrames);
     _myAbsoluteFrames += myNumFrames;
 }
