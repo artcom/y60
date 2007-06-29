@@ -506,6 +506,10 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         if (IEventSourcePtr myEventSource = dynamic_cast_Ptr<IEventSource>(myPlugIn)) {
             AC_INFO << myPluginName << ": as EventSource" << endl;
             y60::EventDispatcher::get().addSource(&*myEventSource);
+            IScriptablePluginPtr myScriptablePlugin = dynamic_cast_Ptr<IScriptablePlugin>( myPlugIn );
+            if (myScriptablePlugin) {
+                * rval = as_jsval(cx, myScriptablePlugin);
+            }
         }
         if (IDecoderPtr myDecoder = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
             AC_INFO << myPluginName << ": as Decoder" << endl;
@@ -1449,46 +1453,56 @@ JSApp::run(const std::string & theScriptFilename,
     asl::initSignalHandling();
 #endif
 
+    int result( -1 );
+    try {
 
-    JSObject *glob;
-    JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection
-    int result;
 
-    gErrFile = stderr;
-    gOutFile = stderr;
+        JSObject *glob;
+        JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection
 
-    ourJSContext = JS_NewContext(rt, 8192);
-    if (!ourJSContext) {
-        AC_FATAL << "JS_NewContext failed!";
-        return 1;
+        gErrFile = stderr;
+        gOutFile = stderr;
+
+        ourJSContext = JS_NewContext(rt, 8192);
+        if (!ourJSContext) {
+            AC_FATAL << "JS_NewContext failed!";
+            return 1;
+        }
+
+        ourIncludeGuard.clear();
+
+        JS_SetErrorReporter(ourJSContext, ShellErrorReporter);
+
+        glob = JS_NewObject(ourJSContext, &global_class, NULL, NULL);
+        if (!glob)
+            return 1;
+
+        if (!JS_DefineFunctions(ourJSContext, glob, glob_functions)) {
+            return 1;
+        }
+
+        if (!initClasses(ourJSContext, glob)) {
+            return 1;
+        }
+
+        createFunctionDocumentation("GlobalFunctions", glob_functions);
+
+        ourTopScriptFilename = theScriptFilename;
+        result = processArguments(ourJSContext, glob, ourTopScriptFilename, theIncludePath, theScriptArgs);
+
+        JS_ClearScope(ourJSContext, glob);
+        JS_GC(ourJSContext);
+        JS_DestroyContext(ourJSContext);
+        JS_DestroyRuntime(rt);
+        ourLoadedPlugIns.clear();
+    } catch (const asl::Exception & e) {
+        AC_ERROR << "Unhandled asl::Exception: " << e << endl;
+    } catch (const std::exception & e) {
+        AC_ERROR << "Unhandled std::exception: " << e.what() << endl;
+    } catch (...) {
+        AC_ERROR << "Unhandled exception: " << endl;
     }
 
-    ourIncludeGuard.clear();
-
-    JS_SetErrorReporter(ourJSContext, ShellErrorReporter);
-
-    glob = JS_NewObject(ourJSContext, &global_class, NULL, NULL);
-    if (!glob)
-        return 1;
-
-    if (!JS_DefineFunctions(ourJSContext, glob, glob_functions)) {
-        return 1;
-    }
-
-    if (!initClasses(ourJSContext, glob)) {
-        return 1;
-    }
-
-    createFunctionDocumentation("GlobalFunctions", glob_functions);
-
-    ourTopScriptFilename = theScriptFilename;
-    result = processArguments(ourJSContext, glob, ourTopScriptFilename, theIncludePath, theScriptArgs);
-
-    JS_ClearScope(ourJSContext, glob);
-    JS_GC(ourJSContext);
-    JS_DestroyContext(ourJSContext);
-    JS_DestroyRuntime(rt);
-    ourLoadedPlugIns.clear();
     return result;
 }
 
