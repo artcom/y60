@@ -71,8 +71,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         if ( _mySyncFlag ) {
             fetchPresentation();
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
-            Logger.warning("CMS synchronization disabled.");
-            Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
+            Logger.info("CMS synchronization disabled.");
+            Logger.info("Using local fallback presentation file '" + _myLocalFallback + "'.");
             _myPresentation = Node.createDocument();
             _myPresentation.parseFile( _myLocalFallback );
         } else {
@@ -107,6 +107,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             function() { return _myLocalFallback; } );
 
     obj.__defineGetter__('syncFlag', function() { return _mySyncFlag; } );
+    
+    obj.__defineSetter__('syncFlag', function(theFlag) { _mySyncFlag=theFlag; } );
 
     obj.__defineGetter__('assetDir', function() { return _myLocalPath; } );
 
@@ -174,7 +176,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     function fetchPresentation() {
-
+        Logger.info ("Fetching presentation.xml");
         _myPresentation = Node.createDocument();
         _myZopeCookies = [];
         
