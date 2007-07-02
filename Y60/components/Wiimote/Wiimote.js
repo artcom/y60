@@ -77,7 +77,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
         _myBody.scale = new Vector3f(5, 5,5);
-        _myBody.insensible = true;
+        //_myBody.insensible = true;
 
         _myOrientationVector = Node.createElement("vector");
         window.scene.world.appendChild( _myOrientationVector );
@@ -198,6 +198,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         }
 
         if (theNode.type == "infrareddata") {
+            
             var myPosition = new Vector2f(window.width - ((theNode.screenposition.x * window.width/2.0) + window.width/2.0),
                                           (theNode.screenposition.y * window.height/2.0) + window.height/2.0 );
             _myCrosshair.position = myPosition;

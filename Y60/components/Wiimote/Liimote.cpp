@@ -99,7 +99,17 @@ Liimote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
     unsigned char buf[SEND_BUFFER_SIZE];
 
     buf[0] = 0x50 | 0x02;
+    
     memcpy(buf+1, out_bytes, theNumBytes);
+
+    // cout.setf( std::ios::hex, std::ios::basefield );
+//     for(unsigned i=0; i<theNumBytes+1; ++i) {
+//         cout << "0x" << (int)buf[i] << ", ";
+//     }
+//     cout.unsetf( std::ios::hex );
+
+//     cout << endl;
+    
     /*
     if (!(flags & SEND_RPT_NO_RUMBLE)) {
         buf[2] |= wiimote->led_rumble_state & 0x01;

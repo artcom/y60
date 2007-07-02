@@ -86,7 +86,7 @@ class WiimoteDriver :
         enum REQUEST_MODE { BUTTON, MOTION, INFRARED };
         REQUEST_MODE _myRequestMode;
 
-        std::vector<WiiRemotePtr> _myIOHandles;
+        std::vector<WiiRemotePtr> _myWiimotes;
 };
 
 typedef asl::Ptr<WiimoteDriver> WiimotePtr;

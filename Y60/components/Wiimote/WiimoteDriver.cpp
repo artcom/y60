@@ -27,18 +27,18 @@ WiimoteDriver::WiimoteDriver(asl::DLHandle theDLHandle) :
     _myRequestMode ( INFRARED )
 {
 #ifdef WIN32
-    _myIOHandles = Win32mote::discover();
+    _myWiimotes = Win32mote::discover();
 #elif defined( LINUX )
-    _myIOHandles = Liimote::discover();
+    _myWiimotes = Liimote::discover();
 #elif defined( OSX )
     // TODO
 #endif
-    AC_PRINT << "Found " << _myIOHandles.size() << " Wii controller" << (_myIOHandles.size() != 1 ? "s" : "" );
-    for (unsigned i = 0; i < _myIOHandles.size(); ++i) {
-        //_myBluetoothMap.insert(std::make_pair(_myIOHandles[i]->getControllerID(),
-        //            _myIOHandles[i]->getDeviceName()));
-        _myIOHandles[i]->setEventQueue( _myEventQueue, _myLock );
-        _myIOHandles[i]->startThread();
+    AC_PRINT << "Found " << _myWiimotes.size() << " Wii controller" << (_myWiimotes.size() != 1 ? "s" : "" );
+    for (unsigned i = 0; i < _myWiimotes.size(); ++i) {
+        //_myBluetoothMap.insert(std::make_pair(_myWiimotes[i]->getControllerID(),
+        //            _myWiimotes[i]->getDeviceName()));
+        _myWiimotes[i]->setEventQueue( _myEventQueue, _myLock );
+        _myWiimotes[i]->startThread();
 
         // XXX set LEDs to controller id (binary) ;-)
         setLEDs(i, i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
@@ -53,7 +53,7 @@ WiimoteDriver::WiimoteDriver(asl::DLHandle theDLHandle) :
 }  
 
 WiimoteDriver::~WiimoteDriver() {
-    for (int i = 0; i < _myIOHandles.size(); ++i) {
+    for (int i = 0; i < _myWiimotes.size(); ++i) {
         setLEDs(i, 0,0,0,0);
         setRumble(i, false);
     }
@@ -83,7 +83,7 @@ WiimoteDriver::poll() {
         } else if (myWiiEvent.type == WII_INFRARED ) {
 
             myNode->appendAttribute<std::string>("type", std::string("infrareddata"));
-
+            
             for (unsigned i = 0; i < 4; ++i) {
                 if (myWiiEvent.irPositions[i][0] != 1023 && myWiiEvent.irPositions[i][1] != 1023) {
                     myNode->appendAttribute<asl::Vector2i>(std::string("irposition") + asl::as_string(i),
@@ -110,7 +110,7 @@ WiimoteDriver::requestStatusReport(int theIndex) {
     //if( _myRequestMode == INFRARED ) {
     //    rpt[1] |= 0x04;
     //}
-    _myIOHandles[theIndex]->sendOutputReport(status_report, 2);
+    _myWiimotes[theIndex]->sendOutputReport(status_report, 2);
 }
 
 void
@@ -123,7 +123,7 @@ WiimoteDriver::setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4)
     if (led4) out |= 0x80;
 
     unsigned char rpt[2] = { 0x11, out };
-    _myIOHandles[theIndex]->sendOutputReport(rpt, 2);
+    _myWiimotes[theIndex]->sendOutputReport(rpt, 2);
 }
 
 
@@ -133,69 +133,77 @@ WiimoteDriver::setRumble(int theIndex, bool on) {
     if( _myRequestMode == INFRARED ) {
         rpt[1] |= 0x04;
     }
-    _myIOHandles[theIndex]->sendOutputReport(rpt, 2);
+    _myWiimotes[theIndex]->sendOutputReport(rpt, 2);
 }
 
 void
 WiimoteDriver::requestButtonData() {
-    for (int i = 0; i < _myIOHandles.size(); ++i) {
+    for (int i = 0; i < _myWiimotes.size(); ++i) {
         unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET , 0x00, INPUT_REPORT_BUTTONS };
-        _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
+        _myWiimotes[i]->sendOutputReport(set_motion_report, 3);
     }
     _myRequestMode = BUTTON;
 }
 
 void
 WiimoteDriver::requestInfraredData() {
-    for (int i = 0; i < _myIOHandles.size(); ++i) {
+    for (int i = 0; i < _myWiimotes.size(); ++i) {
         unsigned char set_ir_report[2] = {  0x13, 0x04 };
         unsigned char set_ir_report2[2] = { 0x1a, 0x04 };
         set_ir_report[1] |= 0x01;
-        _myIOHandles[i]->sendOutputReport(set_ir_report, 2);
+        _myWiimotes[i]->sendOutputReport(set_ir_report, 2);
         asl::msleep(10);
-        _myIOHandles[i]->sendOutputReport(set_ir_report2, 2);
+        _myWiimotes[i]->sendOutputReport(set_ir_report2, 2);
         asl::msleep(10);
 
         // Write 0x08 to register 0xb00030
         //16 MM FF FF FF SS DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD DD
-        unsigned char write_register[7] = {0x16, 0x04,
+        unsigned char write_register[22] = {0x16, 0x04,
             0xb0, 0x00, 0x30, // address
             0x01,             // size
-            0x01 };           // data
-        _myIOHandles[i]->sendOutputReport( write_register, 7 );
+            0x01, 0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00};           // data
+        _myWiimotes[i]->sendOutputReport( write_register, 22 );
         asl::msleep(10);
         //Write Sensitivity Block 1 to registers at 0xb00000
         //Write Sensitivity Block 2 to registers at 0xb0001a 
-        unsigned char sensivity_setting_block1[15] = {0x16, 0x04,
+        unsigned char sensivity_setting_block1[22] = {0x16, 0x04,
             0xb0, 0x00, 0x00, // address
             0x09,             // size
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00, 0xC0 }; // data
-        _myIOHandles[i]->sendOutputReport(sensivity_setting_block1, 15);
+            0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0xaa, 0x00, 0x64,
+        //0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00, 0xC0,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00}; // data
+        
+        _myWiimotes[i]->sendOutputReport(sensivity_setting_block1, 22);
         asl::msleep(10);
 
-        unsigned char sensivity_setting_block2[8] = {0x16, 0x04,
+        unsigned char sensivity_setting_block2[22] = {0x16, 0x04,
             0xb0, 0x00, 0x1a,  // address
             0x02,               // size
-            0x40, 0x00 };      // data
-        _myIOHandles[i]->sendOutputReport(sensivity_setting_block2, 8);
+            //0x40, 0x00,
+            0x63, 0x03,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};      // data
+        _myWiimotes[i]->sendOutputReport(sensivity_setting_block2, 22);
         asl::msleep(10);
 
-        unsigned char write_register2[7] = {0x16, 0x04,
+        unsigned char write_register2[22] = {0x16, 0x04,
             0xb0, 0x00, 0x30, // address
             0x01,             // size
-            0x08 };           // data
-        _myIOHandles[i]->sendOutputReport( write_register2, 7 );
+            0x08,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};           // data
+        _myWiimotes[i]->sendOutputReport( write_register2, 22 );
         asl::msleep(10);
-        unsigned char ir_mode_setting[7] = { 0x16, 0x04,
+        unsigned char ir_mode_setting[22] = { 0x16, 0x04,
             0xb0, 0x00, 0x33, // adress
             0x01,             // size
-            0x03};            // data (extended mode ... for now)
-        _myIOHandles[i]->sendOutputReport(ir_mode_setting, 7);
+            0x03,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};            // data (extended mode ... for now)
+        _myWiimotes[i]->sendOutputReport(ir_mode_setting, 22);
 
-
-
+        
+        
         unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, 0x33 };
-        _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
+        _myWiimotes[i]->sendOutputReport(set_motion_report, 3);
     }
     _myRequestMode = INFRARED;
 
@@ -203,19 +211,19 @@ WiimoteDriver::requestInfraredData() {
 
 void
 WiimoteDriver::requestMotionData() {
-    for (int i = 0; i < _myIOHandles.size(); ++i) {
+    for (int i = 0; i < _myWiimotes.size(); ++i) {
         unsigned char calibration_report[7] = { OUTPUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
-        _myIOHandles[i]->sendOutputReport(calibration_report, 7);
+        _myWiimotes[i]->sendOutputReport(calibration_report, 7);
 
         unsigned char set_motion_report[3] = { OUTPUT_REPORT_SET, 0x00, INPUT_REPORT_MOTION };
-        _myIOHandles[i]->sendOutputReport(set_motion_report, 3);
+        _myWiimotes[i]->sendOutputReport(set_motion_report, 3);
     }
     _myRequestMode = MOTION;
 }
 
 unsigned
 WiimoteDriver::getNumWiimotes() const {
-    return _myIOHandles.size(); 
+    return _myWiimotes.size(); 
 }
 
 void 

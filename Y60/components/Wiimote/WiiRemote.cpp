@@ -69,6 +69,8 @@ WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
         _myOneGPoint = one_g_point;
 
     } else if (INPUT_REPORT_IR == theBuffer[theOffset]) {
+        //AC_PRINT << "irdatareport";
+        
         _myLock->lock();
         handleIREvents( myAddress );
         handleButtonEvents( myAddress );
@@ -147,14 +149,21 @@ WiiRemote::createEvent( int theID, const std::string & theButtonName, bool thePr
 }
 
 Vector2i
-parseIRData( const unsigned char * theBuffer, unsigned theOffset) {
+parseIRData( const unsigned char * theBuffer, unsigned theOffset, int & theSizeHint) {
     Vector2i myIRPos(0,0);
-    myIRPos[0] = theBuffer[theOffset];
-    myIRPos[1] = theBuffer[theOffset + 1];
-    myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
-    myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
+
+    myIRPos[0] = ((uint16_t)theBuffer[theOffset+2] & 0x30)<<4 | (uint16_t)theBuffer[theOffset];
+    myIRPos[1] = ((uint16_t)theBuffer[theOffset+2] & 0xC0)<<2 |
+				                  (uint16_t)theBuffer[theOffset+1];
+    theSizeHint = theBuffer[theOffset+2] & 0x0F;
+
     
-    int mySizeHint( theBuffer[ theOffset + 2] & 0x0f );
+    // myIRPos[0] = theBuffer[theOffset];
+//     myIRPos[1] = theBuffer[theOffset + 1];
+//     myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
+//     myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
+    
+//     int mySizeHint( theBuffer[ theOffset + 2] & 0x0f );
 
     return myIRPos;
 }
@@ -207,66 +216,74 @@ WiiRemote::handleMotionEvents( const unsigned char * theInputReport ) {
 void
 WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
     Vector2i myIRPositions[4];
-    myIRPositions[0] = parseIRData( theInputReport, 6);
-    myIRPositions[1] = parseIRData( theInputReport, 9);
-    myIRPositions[2] = parseIRData( theInputReport, 12);
-    myIRPositions[3] = parseIRData( theInputReport, 15);
+    int mySizeHint[4];
+    myIRPositions[0] = parseIRData( theInputReport, 6, mySizeHint[0]);
+    myIRPositions[1] = parseIRData( theInputReport, 9, mySizeHint[1]);
+    myIRPositions[2] = parseIRData( theInputReport, 12, mySizeHint[2]);
+    myIRPositions[3] = parseIRData( theInputReport, 15, mySizeHint[3]);
 
+    //AC_PRINT << myIRPositions[0] << "  " << myIRPositions[1] << "  " << myIRPositions[2] << "  " << myIRPositions[3];
+    //AC_PRINT << mySizeHint[0] << "  " << mySizeHint[1] << "  " << mySizeHint[2] << "  " << mySizeHint[3];
     float ox(0);
     float oy(0);
     Vector2f myNormalizedScreenCoordinates(0.0f, 0.0f);
     float angle = 0.0;
+
     
-    if (myIRPositions[0][0] < 1023 && myIRPositions[1][0] < 1023) {
+    
+    if (mySizeHint[0] < 15 && mySizeHint[1] < 15) {
         int myLeftIndex = _myLeftPoint;
         int myRightIndex;
         if (_myLeftPoint == -1) {
-			switch (_myOrientation) {
-				case 0:
-                    myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
-                    break;
-				case 1:
-                    myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
-                    break;
-				case 2:
-                    myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
-                    break;
-				case 3:
-                    myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
-                    break;
-			}
-			_myLeftPoint = myLeftIndex;
-		}
-		myRightIndex = 1 - myLeftIndex;
+            // found IR cursor
+            switch (_myOrientation) {
+            case 0:
+                myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
+                break;
+            case 1:
+                myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
+                break;
+            case 2:
+                myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
+                break;
+            case 3:
+                myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
+                break;
+            }
+            _myLeftPoint = myLeftIndex;
+        }
+        myRightIndex = 1 - myLeftIndex;
+        //AC_PRINT << myLeftIndex;
         
-		float dx = float( myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0]);
-		float dy = float( myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1]);
+        float dx = float( myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0]);
+        float dy = float( myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1]);
 		
-		float d = sqrt( dx * dx + dy * dy);
+        float d = sqrt( dx * dx + dy * dy);
 		
 		
-		// normalized distance between bright spots
-		dx /= d;
-		dy /= d;
+        // normalized distance between bright spots
+        dx /= d;
+        dy /= d;
 		
-		angle = atan2(dy, dx);
+        angle = atan2(dy, dx);
 
-    //AC_PRINT << angle-3.14159;
+        //AC_PRINT << angle;
     
-		float cx = float( myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0f - 1.0f;
-		float cy = float( myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0f - .75f;
+        float cx = float( myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0f - 1.0f;
+        float cy = float( myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0f - .75f;
 		
-		ox = -dy * cy - dx * cx;
-		oy = -dx * cy + dy * cx;
+        ox = -dy * cy - dx * cx;
+        oy = -dx * cy + dy * cx;
 
-    myNormalizedScreenCoordinates[0] = ox;
-    myNormalizedScreenCoordinates[1] = oy;
+        myNormalizedScreenCoordinates[0] = ox;
+        myNormalizedScreenCoordinates[1] = oy;
     
-    //AC_PRINT << "x: " << ox << " y: " << oy;
+        //AC_PRINT << "x: " << ox << " y: " << oy;
 
     } else {
         // not tracking anything
         ox = oy = -100;
+        // lost IR cursor
         if ( _myLeftPoint != -1) {
             _myLeftPoint = -1;
         }
