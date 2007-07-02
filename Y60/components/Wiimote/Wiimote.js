@@ -154,7 +154,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                     }
                 }
             } 
-            print(_myPickedBody);
+            print("Picked body: " + _myPickedBody);
         }
         if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 0) {
             _myPickedBody = null;
