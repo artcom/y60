@@ -46,11 +46,10 @@ namespace y60 {
         public WiiRemote
     { 
     public:
+        
         Win32mote(unsigned theId);
-        virtual ~Win32mote() {
-            stopThread();
-        };
-
+        virtual ~Win32mote();
+            
         static std::vector<WiiRemotePtr> discover();
 
         std::string getDeviceName() const { return _myDevicePath; }

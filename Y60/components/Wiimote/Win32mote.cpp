@@ -73,7 +73,7 @@ Win32mote::InputReportListener(PosixThread & theThread)
             continue;
         }
         
-        myDevice.dispatchInputReport(myInputReport, 1);
+        myDevice.dispatchInputReport(myInputReport, 0);
         /*
         if (INPUT_REPORT_BUTTONS == myInputReport[0]) {
 
@@ -183,91 +183,6 @@ Win32mote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
     }
 }
 
-std::vector<WiiRemotePtr>
-Win32mote::discover() {
-
-    std::vector<WiiRemotePtr> myDevices;
-
-    HANDLE WriteHandle = 0, DeviceHandle = 0;
-
-    HANDLE hDevInfo;
-
-    HIDD_ATTRIBUTES						Attributes;
-    SP_DEVICE_INTERFACE_DATA			devInfoData;
-    int									MemberIndex = 0;
-    LONG								Result;	
-    GUID								HidGuid;
-    PSP_DEVICE_INTERFACE_DETAIL_DATA	detailData;
-
-    ULONG Required = 0;
-    ULONG Length = 0;
-    detailData = NULL;
-    DeviceHandle = NULL;
-
-    HidD_GetHidGuid(&HidGuid);	
-
-    hDevInfo = SetupDiGetClassDevs(&HidGuid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
-
-    devInfoData.cbSize = sizeof(devInfoData);
-    MemberIndex = 0;
-
-    do {
-        // Got any more devices?
-        Result = SetupDiEnumDeviceInterfaces (hDevInfo, 0, &HidGuid, MemberIndex,	&devInfoData);
-
-        if (Result == 0)
-            break;
-
-        // Call once to get the needed buffer length
-        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, NULL, 0, &Length, NULL);
-        detailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(Length);
-        detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
-
-        // After allocating, call again to get data
-        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length, 
-                &Required, NULL);
-
-        cout << "device '" << detailData->DevicePath << "'" << endl;
-        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
-                (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
-
-        Attributes.Size = sizeof(Attributes);
-
-        Result = HidD_GetAttributes(DeviceHandle, &Attributes);
-
-        if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
-            // If the vendor and product IDs match, we've found a wiimote 
-            Win32motePtr myDevice( new Win32mote( myDevices.size() ) );
-
-            myDevice->_myDevicePath = detailData->DevicePath;
-            myDevice->_myDeviceHandle = DeviceHandle;
-
-            // Register to receive device notifications.
-            // RegisterForDeviceNotifications();
-
-            GetDeviceCapabilities(*myDevice);
-
-            myDevice->_myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
-                    (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
-
-            PrepareForOverlappedTransfer(*myDevice, detailData);
-
-            //myDevice->_myControllerId = myDevices.size();
-            //WiiRemotePtr myPtr( myDevice );
-            myDevices.push_back( myDevice );
-        } else {
-            CloseHandle(DeviceHandle);
-        }
-
-        free(detailData);
-
-        MemberIndex = MemberIndex + 1;
-    } while (true);
-
-    SetupDiDestroyDeviceInfoList(hDevInfo);
-
-    return myDevices;
-}
 
 std::vector<WiiRemotePtr>
 Win32mote::discover() {

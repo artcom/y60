@@ -77,7 +77,7 @@ WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
     } else if( INPUT_REPORT_STATUS == theBuffer[theOffset]) {
         printStatus(myAddress);
     } else {
-        throw WiiException("unknown report", PLUS_FILE_LINE);
+        //throw WiiException(string("Unknown report") + as_string( int( theBuffer[theOffset])), PLUS_FILE_LINE);
     }
 
 }
@@ -106,8 +106,8 @@ WiiRemote::setButtons(int code) {
 
 void
 WiiRemote::printStatus(const unsigned char * theBuffer) {
-    unsigned batteryByte = 5;
-    unsigned infoByte    = 2;
+    unsigned batteryByte = 6;
+    unsigned infoByte    = 3;
     AC_PRINT << "\n============= status report =============";
     double batteryLevel = (double)theBuffer[batteryByte];
     batteryLevel /= (double)0xC0;
