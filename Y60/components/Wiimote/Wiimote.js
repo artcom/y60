@@ -77,7 +77,6 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
         _myBody.scale = new Vector3f(5, 5,5);
-        //_myBody.insensible = true;
 
         _myOrientationVector = Node.createElement("vector");
         window.scene.world.appendChild( _myOrientationVector );

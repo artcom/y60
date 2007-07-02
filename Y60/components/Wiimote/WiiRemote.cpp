@@ -152,18 +152,17 @@ Vector2i
 parseIRData( const unsigned char * theBuffer, unsigned theOffset, int & theSizeHint) {
     Vector2i myIRPos(0,0);
 
-    myIRPos[0] = ((uint16_t)theBuffer[theOffset+2] & 0x30)<<4 | (uint16_t)theBuffer[theOffset];
-    myIRPos[1] = ((uint16_t)theBuffer[theOffset+2] & 0xC0)<<2 |
-				                  (uint16_t)theBuffer[theOffset+1];
-    theSizeHint = theBuffer[theOffset+2] & 0x0F;
+//    myIRPos[0] = ((uint16_t)theBuffer[theOffset+2] & 0x30)<<4 | (uint16_t)theBuffer[theOffset];
+//    myIRPos[1] = ((uint16_t)theBuffer[theOffset+2] & 0xC0)<<2 |
+//				                  (uint16_t)theBuffer[theOffset+1];
 
     
-    // myIRPos[0] = theBuffer[theOffset];
-//     myIRPos[1] = theBuffer[theOffset + 1];
-//     myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
-//     myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
-    
-//     int mySizeHint( theBuffer[ theOffset + 2] & 0x0f );
+     myIRPos[0] = theBuffer[theOffset];
+     myIRPos[1] = theBuffer[theOffset + 1];
+     myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
+     myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
+
+    theSizeHint = theBuffer[theOffset+2] & 0x0F;
 
     return myIRPos;
 }
