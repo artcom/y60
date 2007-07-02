@@ -498,7 +498,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         for (var i=0; i<_mySwitches.childNodesLength(); ++i) {
             var myNode = _mySwitches.childNode(i);
             if (matchNodeName(myNode, theName, theSubnameFlag, theIgnoreCaseFlag)) {
-                Logger.warning("setting "+Public.node.name+" to "+theName);
+                Logger.debug("setting "+Public.node.name+" to "+theName);
                 switchTexture(myNode);
                 break;
             }
