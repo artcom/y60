@@ -38,16 +38,17 @@ const static char INPUT_WRITE_DATA          = 0x22;
 
 const static char INPUT_REPORT_STATUS  = 0x20;
 
-
-
 static const int WIIMOTE_VENDOR_ID = 0x057E;
 static const int WIIMOTE_PRODUCT_ID = 0x0306;
+
+static const int RECV_BUFFER_SIZE( 256 ); // TODO: probably 23 is enough
+static const int SEND_BUFFER_SIZE( 256 );
 
 class WiiRemote :
         public asl::PosixThread
 {
     public:
-        WiiRemote(PosixThread::WorkFunc theThreadFunction);
+        WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId);
         virtual ~WiiRemote();
 
         void setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
@@ -61,7 +62,8 @@ class WiiRemote :
         
         void startThread();
         void stopThread();
-
+        
+        static void printStatus(const unsigned char * theBuffer);
         int getControllerID() const { return _myControllerId; }
 
         virtual std::string getDeviceName() const = 0;
@@ -69,6 +71,8 @@ class WiiRemote :
     protected:
         virtual void closeDevice() = 0;
 
+        void dispatchInputReport(const unsigned char * theBuffer, int theOffset);
+        
         void handleButtonEvents( const unsigned char * theInputReport );
         void handleMotionEvents( const unsigned char * theInputReport );
         void handleIREvents( const unsigned char * theInputReport );
@@ -97,6 +101,8 @@ class WiiRemote :
 
         int             _myControllerId;
 
+    private:
+        WiiRemote();
 };
 
 typedef asl::Ptr<WiiRemote> WiiRemotePtr;

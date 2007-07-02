@@ -46,7 +46,7 @@ namespace y60 {
         public WiiRemote
     { 
     public:
-        Win32mote();
+        Win32mote(unsigned theId);
         virtual ~Win32mote() {
             stopThread();
         };
@@ -76,6 +76,7 @@ namespace y60 {
         static void PrepareForOverlappedTransfer(Win32mote & device, PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData);
         static void GetDeviceCapabilities(Win32mote & device);
 
+        Win32mote();
     };
     typedef asl::Ptr<Win32mote> Win32motePtr;
     

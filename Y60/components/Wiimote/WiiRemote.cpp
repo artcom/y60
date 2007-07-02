@@ -17,12 +17,12 @@ using namespace asl;
 
 namespace y60 {
 
-WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction) : //HIDDevice(),
+WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) : 
                          PosixThread(theThreadFunction),
-//                         _myEventObject(NULL),
                          _myLeftPoint( -1 ),
                          _myLowPassedOrientation(0, 1, 0),
-                         _myOrientation( 0 )
+                         _myOrientation( 0 ),
+                         _myControllerId( theId )
 {
 	 // Add all Wii buttons to the our internal list
     _myButtons.push_back(Button("1",		0x0002));
@@ -46,13 +46,49 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction) : //HIDDevice(),
 WiiRemote::~WiiRemote() {
 }
 
+void 
+WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
+
+    const unsigned char * myAddress = theBuffer + theOffset;
+    if (INPUT_REPORT_BUTTONS == theBuffer[theOffset]) {
+        _myLock->lock();
+
+        handleButtonEvents( myAddress );
+
+        _myLock->unlock();
+    } else if (INPUT_REPORT_MOTION == theBuffer[theOffset]) {
+        _myLock->lock();
+        handleButtonEvents( myAddress );
+        handleMotionEvents( myAddress );
+        _myLock->unlock();
+    } else if (0x21 == theBuffer[theOffset]) {
+        // XXX TODO find out how to use it
+        Vector3f zero_point(theBuffer[6] - 128.0f, theBuffer[7] - 128.0f, theBuffer[8] - 128.0f);
+        _myZeroPoint = zero_point;
+        Vector3f one_g_point(theBuffer[10] - 128.0f, theBuffer[11] - 128.0f, theBuffer[12] - 128.0f);
+        _myOneGPoint = one_g_point;
+
+    } else if (INPUT_REPORT_IR == theBuffer[theOffset]) {
+        _myLock->lock();
+        handleIREvents( myAddress );
+        handleButtonEvents( myAddress );
+        handleMotionEvents( myAddress );
+        _myLock->unlock();
+    } else if( INPUT_REPORT_STATUS == theBuffer[theOffset]) {
+        printStatus(myAddress);
+    } else {
+        throw WiiException("unknown report", PLUS_FILE_LINE);
+    }
+
+}
+
 Button
 WiiRemote::getButton(std::string label) {
     for (int i = 0; i < _myButtons.size(); i++) {
         if (_myButtons[i].getName().compare(label) == 0)
             return _myButtons[i];
     }
-    throw asl::Exception(string("Could not find button with label '") + label + "'",
+    throw WiiException(string("Could not find button with label '") + label + "'",
     										 PLUS_FILE_LINE);
 }
     
@@ -68,6 +104,31 @@ WiiRemote::setButtons(int code) {
     return changed_state;
 }
 
+void
+WiiRemote::printStatus(const unsigned char * theBuffer) {
+    unsigned batteryByte = 5;
+    unsigned infoByte    = 2;
+    AC_PRINT << "\n============= status report =============";
+    double batteryLevel = (double)theBuffer[batteryByte];
+    batteryLevel /= (double)0xC0;
+    AC_PRINT << " Battery Level              : " << batteryLevel;
+    std::string extension = (theBuffer[infoByte] & 0x02) ? "yes" : "no";
+    AC_PRINT << " Extension Controller       : " << extension;
+    std::string speaker = (theBuffer[infoByte] & 0x04) ? "yes" : "no";
+    AC_PRINT << " Speaker enabled            : " << speaker;
+    std::string reporting = (theBuffer[infoByte] & 0x08) ? "yes" : "no";
+    AC_PRINT << " Continuous reports enabled : " << reporting;
+    std::string led0 = (theBuffer[infoByte] & 0x10) ? "yes" : "no";
+    AC_PRINT << " LED 1 enabled              : " << led0;
+    std::string led1 = (theBuffer[infoByte] & 0x20) ? "yes" : "no";
+    AC_PRINT << " LED 2 enabled              : " << led1;
+    std::string led2 = (theBuffer[infoByte] & 0x40) ? "yes" : "no";
+    AC_PRINT << " LED 3 enabled              : " << led2;
+    std::string led3 = (theBuffer[infoByte] & 0x80) ? "yes" : "no";
+    AC_PRINT << " LED 4 enabled              : " << led3;
+    AC_PRINT << "=========================================\n";
+           
+}
     
 void
 WiiRemote::createEvent( int theID, const asl::Vector2i theIRData[4],
@@ -220,7 +281,6 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
 
 void 
 WiiRemote::startThread() {
-    AC_PRINT << "Starting thread: " << _myControllerId;
     _myInputListening = true;
     fork();
 }
@@ -229,7 +289,6 @@ WiiRemote::startThread() {
 void
 WiiRemote::stopThread() {
     if (isActive()) {
-        AC_PRINT << "Stopped thread: " << _myControllerId;
         _myInputListening = false;
         join();
     }

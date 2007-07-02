@@ -17,11 +17,6 @@ using namespace jslib;
 
 namespace y60 {
 
-
-
-
-
-
 WiimoteDriver::WiimoteDriver(asl::DLHandle theDLHandle) :
     asl::PlugInBase(theDLHandle),
     y60::IEventSource(),
@@ -38,7 +33,7 @@ WiimoteDriver::WiimoteDriver(asl::DLHandle theDLHandle) :
 #elif defined( OSX )
     // TODO
 #endif
-    AC_PRINT << "discover" << _myIOHandles.size();
+    AC_PRINT << "Found " << _myIOHandles.size() << " Wii controller" << (_myIOHandles.size() != 1 ? "s" : "" );
     for (unsigned i = 0; i < _myIOHandles.size(); ++i) {
         //_myBluetoothMap.insert(std::make_pair(_myIOHandles[i]->getControllerID(),
         //            _myIOHandles[i]->getDeviceName()));
@@ -99,7 +94,7 @@ WiimoteDriver::poll() {
             myNode->appendAttribute<asl::Vector2f>(std::string("screenposition"),
                     myWiiEvent.screenPosition);
         } else {
-            throw asl::Exception("unhandled event type", PLUS_FILE_LINE);
+            throw WiiException("unhandled event type", PLUS_FILE_LINE);
         }
         myEvents.push_back( myEvent );
         _myEventQueue->pop();

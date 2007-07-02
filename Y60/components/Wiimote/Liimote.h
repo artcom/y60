@@ -13,17 +13,33 @@
 
 #include "WiiRemote.h"
 
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/hci.h>
+
 namespace y60 {
 
 class Liimote : public WiiRemote {
     public:
+        Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName);
+        virtual ~Liimote();
         virtual std::string getDeviceName() const;
         virtual void sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes);
+
         static std::vector<WiiRemotePtr> discover();
+        static void inputListener( asl::PosixThread & theThread );
+
     protected:
         virtual void closeDevice();
 
+        bdaddr_t _myBDAddress;
+        uint8_t  _myBTClass[3];
+        std::string _myName;
+
+        int _myCtlSocket;
+        int _myIntSocket; // What's that?
 };
+
+typedef asl::Ptr<Liimote> LiimotePtr;
 
 } // end of namespace
 

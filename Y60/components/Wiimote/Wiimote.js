@@ -9,6 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+const MOVIE_DEMO = false;
 
 if (__main__ == undefined) var __main__ = "WiimoteTest";
 
@@ -55,6 +56,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     var _myMovieControlFlag = false;
     var _myCurrentMovieImage = null;
     
+    var _myWiimote = null;
+
     //////////////////////////////////////////////////////////////////////
     //
     // public members
@@ -68,7 +71,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         //window.position = [0, 0];
         window.decorations = false;
         window.resize(theWidth, theHeight);
-        myWiimote = plug("Wiimote");
+        _myWiimote = plug("Wiimote");
+        print("wiimote: " + _myWiimote);
 
 
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
@@ -87,24 +91,26 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myPicking = new Picking(window);
 
-        for( var i=0; i<2; i++) {
-            _myMovieImage[i] = self.getImageManager().createMovie("../../../../testmodels/movies/testshot.mpg", "y60FFMpegDecoder1");
-            _myMovieImage[i].name = "MovieTexture" + i;
-            _myMovieImage[i].src = "testshot.mpg";
-            
-            _myMovieImage[i].playmode = "play";
-            _myMovieImage[i].audio = false;
-            _myMovieImage[i].loopcount = 0;
-            
-            _myMovieMaterial[i] = Modelling.createUnlitTexturedMaterial(window.scene, _myMovieImage[i]);  
-            _myMovieQuad[i] = Modelling.createQuad(window.scene, _myMovieMaterial[i].id, [-MOVIE_WIDTH/2,-MOVIE_HEIGHT/2,0], 
-                                                [MOVIE_WIDTH/2,MOVIE_HEIGHT/2,0]);
-            _myMovieBody[i] = Modelling.createBody(window.scene.world, _myMovieQuad[i].id);
-            _myMovieBody[i].name = "movie"+i;
-            _myMovieBody[i].position.y = 1;
-            _myMovieBody[i].position.x = -.7 + i*1.2;
+        if (MOVIE_DEMO) {
+            for( var i=0; i<2; i++) {
+                _myMovieImage[i] = self.getImageManager().createMovie("../../../../testmodels/movies/testshot.mpg", "y60FFMpegDecoder1");
+                _myMovieImage[i].name = "MovieTexture" + i;
+                _myMovieImage[i].src = "testshot.mpg";
+
+                _myMovieImage[i].playmode = "play";
+                _myMovieImage[i].audio = false;
+                _myMovieImage[i].loopcount = 0;
+
+                _myMovieMaterial[i] = Modelling.createUnlitTexturedMaterial(window.scene, _myMovieImage[i]);  
+                _myMovieQuad[i] = Modelling.createQuad(window.scene, _myMovieMaterial[i].id, [-MOVIE_WIDTH/2,-MOVIE_HEIGHT/2,0], 
+                        [MOVIE_WIDTH/2,MOVIE_HEIGHT/2,0]);
+                _myMovieBody[i] = Modelling.createBody(window.scene.world, _myMovieQuad[i].id);
+                _myMovieBody[i].name = "movie"+i;
+                _myMovieBody[i].position.y = 1;
+                _myMovieBody[i].position.x = -.7 + i*1.2;
+            }
         }
-            
+
         
     }
 
@@ -155,11 +161,11 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         }
         
         if (theNode.type == "button" && theNode.buttonname == "A") {
-            myWiimote.setRumble( theNode.id, theNode.pressed );
+            _myWiimote.setRumble( theNode.id, theNode.pressed );
         }
 
         if (theNode.type == "button" && theNode.buttonname == "+" && theNode.pressed == 0) {
-            myWiimote.requestStatusReport( theNode.id );
+            _myWiimote.requestStatusReport( theNode.id );
         }
         
         if (theNode.type == "motiondata") {
@@ -181,7 +187,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             //print("down: " + _myLowPassedDownVector + " magnitude: " + magnitude( _myLowPassedDownVector ));
             _myBody.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
 
-            if(_myMovieControlFlag && _myCurrentMovieImage) {
+            if(MOVIE_DEMO && _myMovieControlFlag && _myCurrentMovieImage) {
                 if( _myLowPassedDownVector.z > 0 ) {
                     _myCurrentMovieImage.playspeed = 1 + _myLowPassedDownVector.z;
                 } else {
@@ -199,14 +205,14 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         }
 
         // media system control :)
-        if (theNode.type == "button" && theNode.buttonname == "1" && theNode.pressed == 1) {
+        if (MOVIE_DEMO && theNode.type == "button" && theNode.buttonname == "1" && theNode.pressed == 1) {
             if( _myCurrentMovieImage.playmode == "pause" ){
                 _myCurrentMovieImage.playmode = "play";
             } else {
                 _myCurrentMovieImage.playmode = "pause";
             }
         }
-        if (theNode.type == "button" && theNode.buttonname == "2" && theNode.pressed == 1) {
+        if (MOVIE_DEMO && theNode.type == "button" && theNode.buttonname == "2" && theNode.pressed == 1) {
             _myMovieControlFlag = !_myMovieControlFlag;
             if(_myCurrentMovieImage) {
                 _myCurrentMovieImage.playspeed = 1.0;
@@ -220,7 +226,6 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     // private funtions 
     ///////////////////////////////////////////////////////
 
-    var myWiimote = null;
 
 }
 
