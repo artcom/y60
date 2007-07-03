@@ -9,7 +9,7 @@
 //=============================================================================
 
 use("SceneViewer.js");
-use("UnitTest.js");
+// use("UnitTest.js");
 use("OffscreenRenderer.js");
 use("Exception.js");
 
@@ -64,11 +64,37 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         return myImageFilename;
     }
 
-    obj.saveTestImage = function() {
+    Base.getActiveViewport = obj.getActiveViewport;
+    obj.getActiveViewport = function() {
+        if (_myOffscreenRenderer) {
+            return _myOffscreenRenderer.viewport;
+        } else {
+            return Base.getActiveViewport();
+        }
+    }
+
+    obj.getRenderer = function() {
+        if (_myOffscreenRenderer) {
+            return _myOffscreenRenderer.renderarea.getRenderer();
+        } else {
+            return window.getRenderer();
+        }
+    }
+
+    Base.getRenderWindow = obj.getRenderWindow;
+    obj.getRenderWindow = function() {
+        if (_myOffscreenRenderer) {
+            return _myOffscreenRenderer.renderarea;
+        } else {
+            return window;
+        }
+    }
+
+    obj.saveTestImage = function(theCount) {
         var myImageFilename = obj.getTestImageName();
         print("Writing test image to file: " + myImageFilename);
         if (_myOffscreenFlag) {
-            var myImage = Modelling.createImage(window.scene, _myWindowSize[0], _myWindowSize[1], "rgba");
+            var myImage = Modelling.createImage(window.scene, window.width, window.height, "rgba");
             myImage.resize = "none";
 
             var myCanvas = window.scene.canvases.firstChild;
@@ -85,19 +111,51 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             }
             var myCamera = window.scene.dom.getElementById(myViewport.camera);
 
-            var myOffscreenRenderer = new OffscreenRenderer(_myWindowSize, myCamera, "rgba", myImage, myClonedCanvas, true, 0);
-            myOffscreenRenderer.setBody(window.scene.world);
+            _myOffscreenRenderer = new OffscreenRenderer([window.width, window.height], myCamera, "rgba", myImage, myClonedCanvas, true, 0);
+            _myOffscreenRenderer.setBody(window.scene.world);
+            ourShow.activeWindow = _myOffscreenRenderer.renderarea;
 
-            var myOffscreenLight = myOffscreenRenderer.camera.childNode("light");
-            myOffscreenLight.visible = true;
-            myOffscreenRenderer.render(true);
-            myOffscreenLight.visible = false;
-            saveImageFiltered(myOffscreenRenderer.image, myImageFilename, ["flip"], [[]]);
+            _myOffscreenRenderer.onPreViewport = ourShow.onPreViewport;
+            _myOffscreenRenderer.onPostViewport = ourShow.onPostViewport;
+            _myOffscreenRenderer.onPreRender = ourShow.onPreRender;
+            _myOffscreenRenderer.onPostRender = ourShow.onPostRender;
+
+            registerHeadlights(myClonedCanvas);
+            _myOffscreenRenderer.render(true);
+            deregisterHeadlights(myClonedCanvas);
+            
+            var myCameras = window.scene.cameras;
+            var myAspect = myViewport.width / myViewport.height;
+
+            saveImageFiltered(_myOffscreenRenderer.image, myImageFilename, ["flip"], [[]]);
 
             window.scene.canvases.removeChild(myClonedCanvas);
             window.scene.images.removeChild(myImage);
+            
+            _myOffscreenRenderer = null;
         } else {
             window.saveBuffer(myImageFilename);
+        }
+    }
+
+    function registerHeadlights(theClonedCanvas) {
+        var myLightmanager = ourShow.getLightManager();
+        for (var i=0; i<theClonedCanvas.childNodesLength(); ++i) {
+            var myViewport = theClonedCanvas.childNode(i);
+            var myCamera = myViewport.getElementById(myViewport.camera);
+            
+            for(var j=0; j<myCamera.childNodesLength(); ++j) {
+                var myHeadlight = myCamera.childNode(j);
+                myLightmanager.registerHeadlightWithViewport(myViewport, myHeadlight);
+            }
+        }
+    }
+    
+    function deregisterHeadlights(theClonedCanvas) {
+        var myLightmanager = ourShow.getLightManager();
+        for (var i=0; i<theClonedCanvas.childNodesLength(); ++i) {
+            var myViewport = theClonedCanvas.childNode(i);
+            myLightmanager.deregisterHeadlightFromViewport(myViewport);
         }
     }
 
@@ -128,8 +186,9 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     Base.onPostRender = obj.onPostRender; 
     obj.onPostRender = function() {
         Base.onPostRender();
+        // avoid calling of this block when rendering test offscreen
         try {
-            if (_myOutputImageName) {
+            if (_myOutputImageName && !_myOffscreenRenderer) {
                 ++obj.myFrameCount;
                 if (obj.myFrameCount > obj.MAX_FRAME_COUNT) {
                     if (!_myOutputImageName) {
@@ -169,7 +228,6 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         }
         Base.setup(theWidth, theHeight, false, "Scene Tester");
         window.position = [0,0];
-        _myWindowSize = [theWidth, theHeight];
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +241,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     var _myOutputSuffix         = null;
     var _myOffscreenFlag        = false;
     var _mySaveLoadFlag         = true;
-    var _myWindowSize           = null;
+    var _myOffscreenRenderer    = null;
 
     for (var i = 0; i < theArguments.length; ++i) {
         var myArgument = theArguments[i];
