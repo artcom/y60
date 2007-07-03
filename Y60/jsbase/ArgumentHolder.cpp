@@ -100,6 +100,7 @@ namespace jslib {
     template struct ResultConverter<asl::Vector3<double> >;
     template struct ResultConverter<asl::Vector4<double> >;
     template struct ResultConverter<std::vector<asl::Vector3<float> > >;
+    template struct ResultConverter<asl::Quaternion<float> >;
     template struct ResultConverter<dom::NodePtr>;
     template struct ResultConverter<dom::ValuePtr>;
 }
