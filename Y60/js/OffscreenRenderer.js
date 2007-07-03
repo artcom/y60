@@ -59,6 +59,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     }
 
     self.setImage = function(theImage) {
+        if (!theImage) {
+            _myCanvas.target = "";
+            return;
+        }
+        
         self.image = theImage;
         _myCanvas.target = self.image.id;
 
