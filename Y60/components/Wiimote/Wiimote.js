@@ -72,7 +72,6 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         window.decorations = false;
         window.resize(theWidth, theHeight);
         _myWiimote = plug("Wiimote");
-        print("wiimote: " + _myWiimote);
 
 
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");

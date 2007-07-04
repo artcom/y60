@@ -23,7 +23,7 @@ class Liimote : public WiiRemote {
         Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName);
         virtual ~Liimote();
         virtual std::string getDeviceName() const;
-        virtual void sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes);
+        virtual void send(unsigned char out_bytes[], unsigned theNumBytes);
 
         static std::vector<WiiRemotePtr> discover();
         static void inputListener( asl::PosixThread & theThread );

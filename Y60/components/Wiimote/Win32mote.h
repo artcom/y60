@@ -54,7 +54,7 @@ namespace y60 {
 
         std::string getDeviceName() const { return _myDevicePath; }
         
-        void sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes);
+        void send(unsigned char out_bytes[], unsigned theNumBytes);
     protected:
         
         void closeDevice();

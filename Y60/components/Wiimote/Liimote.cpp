@@ -94,8 +94,7 @@ Liimote::getDeviceName() const {
 }
 
 void 
-Liimote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
-    // TODO
+Liimote::send(unsigned char out_bytes[], unsigned theNumBytes) {
     unsigned char buf[SEND_BUFFER_SIZE];
 
     buf[0] = 0x50 | 0x02;
@@ -128,7 +127,6 @@ Liimote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
 
 void 
 Liimote::closeDevice() {
-    AC_PRINT << "TODO: close devices ... find out how";
     if (close( _myCtlSocket ) ) {
         throw WiiException("Failed to close control socket.", PLUS_FILE_LINE);
     }
@@ -152,6 +150,7 @@ Liimote::inputListener( asl::PosixThread & theThread ) {
 
         int myResult = poll( & myPollSet, 1, 100 );
         if ( myResult == 0) {
+            // timeout
             continue;
         } else if ( myResult == -1) {
             throw WiiException(string("Error in poll(): ") + strerror( errno ), PLUS_FILE_LINE);

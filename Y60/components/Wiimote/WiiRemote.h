@@ -22,16 +22,25 @@
 
 namespace y60 {
 
+// Wii infos:
+// http://www.wiibrew.org/
+// http://www.wiili.org
 
 // TODO: rename and refactor mercilessly
-const static char INPUT_REPORT_BUTTONS      = 0x30;
-const static char INPUT_REPORT_IR         = 0x33;
-const static char OUTPUT_REPORT_SET         = 0x12;
-const static char OUTPUT_WRITE_DATA         = 0x16;
-const static char OUTPUT_READ_DATA          = 0x17;
-const static char INPUT_REPORT_MOTION       = 0x31;
-const static char IR_ENABLE             = 0x13;
-const static char OUTPUT_REPORT_IR      = 0x04;
+const static char OUT_SET_LEDS           = 0x11;
+const static char OUT_DATA_REPORT_MODE   = 0x12;
+const static char OUT_IR_CMAERA_ENABLE   = 0x13;
+// ... more ...
+const static char OUT_IR_CMAERA_ENABLE_2 = 0x1a;
+
+const static char OUT_WRITE_DATA         = 0x16;
+const static char OUT_READ_DATA          = 0x17;
+
+const static char INPUT_REPORT_BUTTONS      = 0x30; // just the buttons
+const static char INPUT_REPORT_MOTION       = 0x31; // buttons and accelerometer
+const static char INPUT_REPORT_IR           = 0x33; // buttons, accelerometer and IR data
+
+const static char IR_CAMERA_ENABLE_BIT      = 0x04; // XXX not an output report ... this is the payload for IR camera enable (one and two)
 
 const static char INPUT_READ_DATA           = 0x21;
 const static char INPUT_WRITE_DATA          = 0x22;
@@ -41,8 +50,8 @@ const static char INPUT_REPORT_STATUS  = 0x20;
 static const int WIIMOTE_VENDOR_ID = 0x057E;
 static const int WIIMOTE_PRODUCT_ID = 0x0306;
 
-static const int RECV_BUFFER_SIZE( 256 ); // TODO: probably 23 is enough
-static const int SEND_BUFFER_SIZE( 256 );
+static const int RECV_BUFFER_SIZE( 23 );
+static const int SEND_BUFFER_SIZE( 23 );
 
 class WiiRemote :
         public asl::PosixThread
@@ -67,9 +76,30 @@ class WiiRemote :
         int getControllerID() const { return _myControllerId; }
 
         virtual std::string getDeviceName() const = 0;
-        virtual void sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) = 0;
+        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes) = 0;
+        void sendOutputReport(unsigned char theOutputReport[], unsigned theNumBytes);
+
+
+        void setRumble( bool theFlag);
+        bool isRumbling() const;
+
+        void setLED(int theIndex, bool theFlag);
+        void setLEDs(bool theLED0, bool theLED1, bool theLED2, bool theLED3 );
+        bool isLedOn(int i) const;
+
+        void setContinousReportFlag( bool theFlag );
+        bool getContinousReportFlag() const;
+
+        void writeMemoryOrRegister(uint32_t theAddress, unsigned char * theData,
+                                   unsigned theNumBytes, bool theWriteRegisterFlag);
+
+        // TODO: implement memory/ register read
+
     protected:
         virtual void closeDevice() = 0;
+
+        void setLEDState();
+        void addContinousReportBit( unsigned char * theOutputReport );
 
         void dispatchInputReport(const unsigned char * theBuffer, int theOffset);
         
@@ -100,6 +130,10 @@ class WiiRemote :
         int _myOrientation;
 
         int             _myControllerId;
+
+        bool _myRumbleFlag;
+        bool _myLEDState[4];
+        bool _myContinousReportFlag;
 
     private:
         WiiRemote();

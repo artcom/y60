@@ -163,7 +163,7 @@ Win32mote::GetDeviceCapabilities(Win32mote & device) {
 }
 
 void 
-Win32mote::sendOutputReport(unsigned char out_bytes[], unsigned theNumBytes) {
+Win32mote::send(unsigned char out_bytes[], unsigned theNumBytes) {
     char	output_report[256];
     DWORD	bytes_written = 0;
     ULONG	result;

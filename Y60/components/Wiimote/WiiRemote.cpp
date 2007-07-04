@@ -11,6 +11,7 @@
 #include "WiiRemote.h"
 
 #include <asl/Logger.h>
+#include <asl/Assure.h>
 
 using namespace std;
 using namespace asl;
@@ -18,11 +19,13 @@ using namespace asl;
 namespace y60 {
 
 WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) : 
-                         PosixThread(theThreadFunction),
-                         _myLeftPoint( -1 ),
-                         _myLowPassedOrientation(0, 1, 0),
-                         _myOrientation( 0 ),
-                         _myControllerId( theId )
+    PosixThread(theThreadFunction),
+    _myLeftPoint( -1 ),
+    _myLowPassedOrientation(0, 1, 0),
+    _myOrientation( 0 ),
+    _myControllerId( theId ),
+    _myRumbleFlag( false ),
+    _myInputListening( false )
 {
 	 // Add all Wii buttons to the our internal list
     _myButtons.push_back(Button("1",		0x0002));
@@ -38,9 +41,6 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) :
     _myButtons.push_back(Button("Left",	0x0100));
             
     _myInputListening = false;
-    
-    //_myListenerThreadId = -1;
-    //_myListenerThread = NULL;
 }
 
 WiiRemote::~WiiRemote() {
@@ -152,15 +152,10 @@ Vector2i
 parseIRData( const unsigned char * theBuffer, unsigned theOffset, int & theSizeHint) {
     Vector2i myIRPos(0,0);
 
-//    myIRPos[0] = ((uint16_t)theBuffer[theOffset+2] & 0x30)<<4 | (uint16_t)theBuffer[theOffset];
-//    myIRPos[1] = ((uint16_t)theBuffer[theOffset+2] & 0xC0)<<2 |
-//				                  (uint16_t)theBuffer[theOffset+1];
-
-    
-     myIRPos[0] = theBuffer[theOffset];
-     myIRPos[1] = theBuffer[theOffset + 1];
-     myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
-     myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
+    myIRPos[0] = theBuffer[theOffset];
+    myIRPos[1] = theBuffer[theOffset + 1];
+    myIRPos[1] |= ( (theBuffer[theOffset + 2] >> 6) << 8);
+    myIRPos[0] |= ( ((theBuffer[theOffset + 2] & 0x30) >> 4) << 8);
 
     theSizeHint = theBuffer[theOffset+2] & 0x0F;
 
@@ -325,5 +320,97 @@ WiiRemote::setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
     _myEventQueue = theQueue;
 }
 
+void 
+WiiRemote::setRumble( bool theFlag) {
+    _myRumbleFlag = theFlag;
+    // There is no explicit output report to control the rumbler. Instead
+    // bit zero of the first payload byte of every output report contains
+    // the rumbler state. So we abuse the LED output report to set the 
+    // rumble bit.
+    setLEDState();
+}
+
+bool 
+WiiRemote::isRumbling() const {
+    return _myRumbleFlag;
+}
+
+void 
+WiiRemote::setLED(int theIndex, bool theFlag) {
+    _myLEDState[ theIndex ] = theFlag;
+    setLEDState();
+}
+
+void 
+WiiRemote::setLEDs(bool theLED0, bool theLED1, bool theLED2, bool theLED3 ) {
+    _myLEDState[ 0 ] = theLED0;
+    _myLEDState[ 1 ] = theLED1;
+    _myLEDState[ 2 ] = theLED2;
+    _myLEDState[ 3 ] = theLED3;
+    setLEDState();
+}
+
+bool
+WiiRemote::isLedOn(int i) const {
+    return _myLEDState[i];
+}
+
+void
+WiiRemote::setLEDState() {
+    unsigned char myLedReport[2] = { OUT_SET_LEDS, 0x00 };
+
+    myLedReport[1] |= _myLEDState[0] ? 0x10 : 0x00;
+    myLedReport[1] |= _myLEDState[1] ? 0x20 : 0x00;
+    myLedReport[1] |= _myLEDState[2] ? 0x40 : 0x00;
+    myLedReport[1] |= _myLEDState[3] ? 0x80 : 0x00;
+
+    sendOutputReport( myLedReport, 2 );
+}
+
+void 
+WiiRemote::sendOutputReport(unsigned char theOutputReport[], unsigned theNumBytes) {
+    // preserve current state ... add the rumble bit
+    theOutputReport[1] |= _myRumbleFlag ? 0x01 : 0x00;
+
+    send( theOutputReport, theNumBytes );
+}
+
+void 
+WiiRemote::setContinousReportFlag( bool theFlag ) {
+    _myContinousReportFlag = theFlag;
+}
+
+bool 
+WiiRemote::getContinousReportFlag() const {
+    return _myContinousReportFlag;
+}
+
+void
+WiiRemote::addContinousReportBit( unsigned char * theOutputReport ) {
+    ASSURE( theOutputReport[0] == OUT_DATA_REPORT_MODE );
+    theOutputReport[1] |= _myContinousReportFlag ? 0x04 : 0x00;
+}
+
+void 
+WiiRemote::writeMemoryOrRegister(uint32_t theAddress, unsigned char * theData,
+                                 unsigned theNumBytes, bool theWriteRegisterFlag)
+{
+    unsigned char myOutputReport[22];
+    memset( myOutputReport, 0, 22);
+
+    myOutputReport[0] = OUT_WRITE_DATA;
+
+    myOutputReport[1] |= theWriteRegisterFlag ? 0x04 : 0x00;
+
+    myOutputReport[2] = (theAddress & 0x00ff0000) >> 16;
+    myOutputReport[3] = (theAddress & 0x0000ff00) >> 8;
+    myOutputReport[4] = (theAddress & 0x000000ff);
+
+    myOutputReport[5] = theNumBytes;
+
+    memcpy( & myOutputReport[6], theData, theNumBytes );
+
+    sendOutputReport( myOutputReport, 16 + 6); // allways send 16 data bytes
+}
 
 } // end of namespace 

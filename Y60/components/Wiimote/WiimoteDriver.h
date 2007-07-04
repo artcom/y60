@@ -53,6 +53,7 @@ class WiimoteDriver :
         void requestStatusReport(int theIndex);
 
         void setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4);
+        void setLED(int theWiimoteIndex, int theLEDIndex, bool theState);
         void setRumble(int theIndex, bool on);
 
         void requestButtonData();
@@ -71,6 +72,7 @@ class WiimoteDriver :
 
         static JSBool SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool SetLED(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
         const char * ClassName();
