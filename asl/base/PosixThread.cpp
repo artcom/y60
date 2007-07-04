@@ -60,6 +60,13 @@ threadFunc (void * This) {
          <<myThread->getThreadID()<< endl);
     try {
         myThread->run();
+    } catch (const asl::Exception & e) {
+        myThread->_myIsActive = false;
+        AC_ERROR << "PosixThread: Unhandled asl::Exception in thread with id " <<
+                myThread->getThreadID() << endl;
+        AC_ERROR << e;
+        AC_ERROR << "Rethrowing." << endl;
+        throw;
     } catch (const std::exception & e) {
         myThread->_myIsActive = false;
         AC_ERROR << "PosixThread: Unhandled std::exception in thread with id " <<
@@ -69,7 +76,7 @@ threadFunc (void * This) {
         throw;
     } catch (...) {
         myThread->_myIsActive = false;
-        AC_ERROR << "PosixThread: Unhandled exception in thread with id " <<
+        AC_ERROR << "PosixThread: Unhandled, unknown exception in thread with id " <<
                 myThread->getThreadID() << endl;
         AC_ERROR << "Rethrowing." << endl;
         throw;

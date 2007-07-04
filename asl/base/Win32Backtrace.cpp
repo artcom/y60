@@ -389,7 +389,7 @@ bool Win32Backtrace::guard::load_module(HANDLE hProcess, HMODULE hMod)
 	if (!GetModuleFileNameA(hMod, filename, MAX_PATH))
 		return false;
 	
-	HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+	HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 	if (hFile == INVALID_HANDLE_VALUE) return false;
 
 	// "Debugging Applications" John Robbins	
@@ -398,9 +398,10 @@ bool Win32Backtrace::guard::load_module(HANDLE hProcess, HMODULE hMod)
     if (!SymLoadModule(hProcess, hFile, filename, 0, (DWORD)hMod, 0) && 
 		ERROR_SUCCESS != GetLastError())
 	{
+		CloseHandle(hFile);
 		return false;
 	}
-	
+	CloseHandle(hFile);
 	return true;
 }
 
