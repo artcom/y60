@@ -1,12 +1,19 @@
 @echo off
 
-set MAYA_VERSION=7.0
-set MAYA_PATH=%ProgramFiles%\Alias\Maya%MAYA_VERSION%
-set INSTALL_PATH=%ProgramFiles%\ART+COM\mayaY60export
-set MODULE_FILE=%MAYA_PATH%\modules\mayaY60export.txt
+IF NOT DEFINED MAYA_VERSION (
+    set MAYA_VERSION=8.5
+    ECHO Maya version not set, defaulting to %MAYA_VERSION%.
+)
 
-if NOT EXIST %MAYA_PATH% (
-    ECHO Maya not found in default path %MAYA_PATH%
+IF NOT DEFINED MAYA_SDK (
+    set MAYA_SDK=%ProgramFiles%\Autodesk\Maya%MAYA_VERSION%
+)
+
+set INSTALL_PATH=%ProgramFiles%\ART+COM\mayaY60export
+set MODULE_FILE=%MAYA_SDK%\modules\mayaY60export.txt
+
+if NOT EXIST %MAYA_SDK% (
+    ECHO Maya not found in default path %MAYA_SDK%
     EXIT 1
 )
 
@@ -15,9 +22,9 @@ MKDIR %INSTALL_PATH%\plug-ins
 MKDIR %INSTALL_PATH%\scripts
 
 echo Installing mayaY60-Exporter files from balthasar...
-copy /Y \\balthasar\dist\mayaY60-export_setup\scripts\* "%ProgramFiles%\ART+COM\mayaY60export\scripts"
-copy /Y \\balthasar\dist\mayaY60-export_setup\plug-ins\* "%ProgramFiles%\ART+COM\mayaY60export\plug-ins"
-copy /Y \\balthasar\dist\mayaY60-export_setup\*.dll "%MAYA_PATH%\bin"
+XCOPY /Y \\balthasar\dist\mayaY60-export_setup\scripts\* "%ProgramFiles%\ART+COM\mayaY60export\scripts"
+XCOPY /Y \\balthasar\dist\mayaY60-export_setup\plug-ins\* "%ProgramFiles%\ART+COM\mayaY60export\plug-ins"
+XCOPY /Y \\balthasar\dist\mayaY60-export_setup\*.dll "%MAYA_SDK%\bin"
 
 ECHO Creating module file %MODULE_FILE%
 ECHO + mayaY60export %MAYA_VERSION% %INSTALL_PATH% > %MODULE_FILE%
