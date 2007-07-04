@@ -54,14 +54,20 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
     // check for system halt command configuration
     if (theConfigNode->childNode("SystemHalt")) {
         const dom::NodePtr & mySystemHaltNode = theConfigNode->childNode("SystemHalt");
-        _myPowerDownProjectorsOnHalt = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
+        const dom::NodePtr & myAttribute = mySystemHaltNode->getAttribute("powerDownProjectors");
+        if (myAttribute) {
+            _myPowerDownProjectorsOnHalt = asl::as<bool>(myAttribute->nodeValue());
+        }
         _mySystemHaltCommand = mySystemHaltNode->getAttributeString("command");
         AC_DEBUG <<"_mySystemHaltCommand: " << _mySystemHaltCommand;
     }
     // check for system reboot command configuration
     if (theConfigNode->childNode("SystemReboot")) {
         const dom::NodePtr & mySystemRebootNode = theConfigNode->childNode("SystemReboot");
-        _myShutterCloseProjectorsOnReboot = asl::as<bool>(mySystemRebootNode->getAttribute("shutterCloseProjectors")->nodeValue());
+        const dom::NodePtr & myAttribute = mySystemRebootNode->getAttribute("shutterCloseProjectors");
+        if (myAttribute) {
+            _myShutterCloseProjectorsOnReboot = asl::as<bool>(myAttribute->nodeValue());
+        }
         _mySystemRebootCommand = mySystemRebootNode->getAttributeString("command");
         AC_DEBUG <<"_mySystemRebootCommand: " << _mySystemRebootCommand;
         AC_DEBUG <<"_myShutterCloseProjectorsOnReboot: " << _myShutterCloseProjectorsOnReboot;
@@ -75,7 +81,10 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
     // check for application stop command configuration
     if (theConfigNode->childNode("StopApplication")) {
         const dom::NodePtr & myStopAppNode = theConfigNode->childNode("StopApplication");
-        _myShutterCloseProjectorsOnStop = asl::as<bool>(myStopAppNode->getAttribute("shutterCloseProjectors")->nodeValue());
+        const dom::NodePtr & myAttribute = myStopAppNode->getAttribute("shutterCloseProjectors");
+        if (myAttribute) {
+            _myShutterCloseProjectorsOnStop = asl::as<bool>(myAttribute->nodeValue());
+        }
         _myStopAppCommand = myStopAppNode->getAttributeString("command");
         AC_DEBUG <<"_myStopAppCommand: " << _myStopAppCommand;
         AC_DEBUG <<"_myShutterCloseProjectorsOnStop: " << _myShutterCloseProjectorsOnStop;
@@ -128,7 +137,7 @@ UDPCommandListenerThread::controlProjector(const std::string & theCommand)
 {
     if (_myProjectors.size() == 0) {
         cerr << "No projectors configured, ignoring '" << theCommand << "'" << endl;
-        return true;
+        return false;
     }
 
     bool myCommandHandled = true;
