@@ -25,7 +25,9 @@ enum WiiEventType {
     WII_MOTION,
     WII_INFRARED,
     WII_LOST_CONNECTION,
-    WII_STATUS
+    WII_STATUS,
+    WII_FOUND_IR_CURSOR,
+    WII_LOST_IR_CURSOR
 };
 
 class WiiEvent {

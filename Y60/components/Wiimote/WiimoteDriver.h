@@ -19,6 +19,7 @@
 // TODO
 #endif
 
+#include "WiiScanner.h"
 #include "WiiEvent.h"
 
 #include <asl/Ptr.h>
@@ -74,6 +75,7 @@ class WiimoteDriver :
         WiiReportMode _myDefaultReportMode;
 
         std::vector<WiiRemotePtr> _myWiimotes;
+        y60::WiiScanner                _myScanner;
 };
 
 typedef asl::Ptr<WiimoteDriver> WiimotePtr;

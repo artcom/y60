@@ -61,6 +61,9 @@ WiimoteDriver::poll() {
         AC_PRINT << "Lost connection: " << _myWiimotes[ myLostWiiIds[i] ]->getDeviceName(); 
         _myWiimotes.erase( _myWiimotes.begin() + myLostWiiIds[i] );
     }
+    
+    // TODO: poll scanner
+
     return myEvents;
 }
 

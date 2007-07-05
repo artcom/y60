@@ -212,26 +212,26 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
         int myLeftIndex = _myLeftPoint;
         int myRightIndex;
         if (_myLeftPoint == -1) {
-            // found IR cursor
+            _myEventQueue.push( WiiEvent(_myControllerId, WII_FOUND_IR_CURSOR));
             switch (_myOrientation) {
-            case 0:
-                myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
-                break;
-            case 1:
-                myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
-                break;
-            case 2:
-                myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
-                break;
-            case 3:
-                myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
-                break;
+                case 0:
+                    myLeftIndex = (myIRPositions[0][0] < myIRPositions[1][0]) ? 0 : 1;
+                    break;
+                case 1:
+                    myLeftIndex = (myIRPositions[0][1] > myIRPositions[1][1]) ? 0 : 1;
+                    break;
+                case 2:
+                    myLeftIndex = (myIRPositions[0][0] > myIRPositions[1][0]) ? 0 : 1;
+                    break;
+                case 3:
+                    myLeftIndex = (myIRPositions[0][1] < myIRPositions[1][1]) ? 0 : 1;
+                    break;
             }
             _myLeftPoint = myLeftIndex;
         }
         myRightIndex = 1 - myLeftIndex;
         //AC_PRINT << myLeftIndex;
-        
+
         float dx = float( myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0]);
         float dy = float( myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1]);
 		
@@ -258,10 +258,11 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
         //AC_PRINT << "x: " << ox << " y: " << oy;
 
     } else {
-        // not tracking anything
         ox = oy = -100;
-        // lost IR cursor
         if ( _myLeftPoint != -1) {
+            // TODO: sometimes the IR cursor is lost for a short intervall (one frame)
+            //       filtering required
+            _myEventQueue.push( WiiEvent(_myControllerId, WII_LOST_IR_CURSOR));
             _myLeftPoint = -1;
         }
     }
@@ -527,6 +528,10 @@ WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> &
                 myNode->appendAttribute<bool>("led1", myWiiEvent.leds[1]);
                 myNode->appendAttribute<bool>("led2", myWiiEvent.leds[2]);
                 myNode->appendAttribute<bool>("led3", myWiiEvent.leds[3]);
+            } else if (myWiiEvent.type == WII_FOUND_IR_CURSOR) {
+                myNode->appendAttribute<string>("type", string("found_ir_cursor"));
+            } else if (myWiiEvent.type == WII_LOST_IR_CURSOR) {
+                myNode->appendAttribute<string>("type", string("lost_ir_cursor"));
             } else {
                 throw WiiException("unhandled event type", PLUS_FILE_LINE);
             }

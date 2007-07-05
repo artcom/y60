@@ -56,6 +56,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     var _myMovieControlFlag = false;
     var _myCurrentMovieImage = null;
     
+    var _myCurrentCursorOwner = null;
+
     var _myWiimote = null;
 
     //////////////////////////////////////////////////////////////////////
@@ -141,7 +143,9 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             print("Going home ... good bye!");
             exit( 0 );
         }
-        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 1) {
+        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 1
+            && theNode.id == _myCurrentCursorOwner)
+        {
             if(!_myPickedBody) {
                 _myPickedBody = _myPicking.pickBody(_myLastPosition.x, _myLastPosition.y);
                 if(_myPickedBody) {
@@ -212,12 +216,23 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             print("LED 4              : " + theNode.led3);
         }
 
-        if (theNode.type == "infrareddata") {
+        if (theNode.type == "infrareddata" && theNode.id == _myCurrentCursorOwner) {
             
             var myPosition = new Vector2f(window.width - ((theNode.screenposition.x * window.width/2.0) + window.width/2.0),
                                           (theNode.screenposition.y * window.height/2.0) + window.height/2.0 );
             _myCrosshair.position = myPosition;
             _myLastPosition = myPosition;
+        }
+
+        if (theNode.type == "lost_ir_cursor") {
+            _myCrosshair.visible = false;
+            _myCurrentCursorOwner = null;
+        }
+        if (theNode.type == "found_ir_cursor") {
+            if (_myCurrentCursorOwner == null) {
+                _myCurrentCursorOwner = theNode.id;
+                _myCrosshair.visible = true;
+            }
         }
 
         // media system control :)
