@@ -193,6 +193,23 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                 }
                 //print("playspeed" + _myMovieImage.playspeed);
             }
+
+        }
+
+        if (theNode.type == "lost_connection") {
+            print("Wii controller with id " + theNode.id + " is gone.");
+        }
+
+        if( theNode.type == "status") {
+            print("============ STATUS =============");
+            print("Battery level      : " + theNode.battery_level);
+            print("Extension connected: " + theNode.extension);
+            print("Speaker enabled    : " + theNode.speaker_enabled);
+            print("Continous reporting: " + theNode.continous_reports);
+            print("LED 1              : " + theNode.led0);
+            print("LED 2              : " + theNode.led1);
+            print("LED 3              : " + theNode.led2);
+            print("LED 4              : " + theNode.led3);
         }
 
         if (theNode.type == "infrareddata") {

@@ -33,7 +33,7 @@ using namespace std;
 namespace y60 {
 
 Win32mote::Win32mote(unsigned theId) : //HIDDevice(),
-                         WiiRemote(InputReportListener, theId),
+                         WiiRemote(inputReportListener, theId),
                          _myEventObject(NULL)
 {
 }
@@ -43,7 +43,7 @@ Win32mote::~Win32mote() {
 }
 
 void
-Win32mote::InputReportListener(PosixThread & theThread)
+Win32mote::inputReportListener(PosixThread & theThread)
 {
     Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
@@ -74,59 +74,11 @@ Win32mote::InputReportListener(PosixThread & theThread)
         }
         
         myDevice.dispatchInputReport(myInputReport, 0);
-        /*
-        if (INPUT_REPORT_BUTTONS == myInputReport[0]) {
-
-            myDevice._myLock->lock();
-
-            myDevice.handleButtonEvents( myInputReport );
-
-            myDevice._myLock->unlock();
-        } else if (INPUT_REPORT_MOTION == myInputReport[0]) {
-
-            
-            myDevice._myLock->lock();
-
-
-            myDevice.handleButtonEvents( myInputReport );
-            myDevice.handleMotionEvents( myInputReport );
-
-            myDevice._myLock->unlock();
-            
-
-        } else if (0x21 == myInputReport[0]) {
-            Vector3f zero_point(myInputReport[6] - 128.0f, myInputReport[7] - 128.0f, myInputReport[8] - 128.0f);
-            myDevice._myZeroPoint = zero_point;
-            Vector3f one_g_point(myInputReport[10] - 128.0f, myInputReport[11] - 128.0f, myInputReport[12] - 128.0f);
-            myDevice._myOneGPoint = one_g_point;
-            
-        } else if (INPUT_REPORT_IR == myInputReport[0]) {
-            //int myX1 = myInputReport
-            //cout << myInputReport << endl;
-            
-            myDevice._myLock->lock();
-            myDevice.handleIREvents( myInputReport );
-            myDevice.handleButtonEvents( myInputReport );
-            myDevice.handleMotionEvents( myInputReport );
-
-           
-            // for(unsigned i=0; i<myDevice._myEventVector.size(); ++i) {
-//                 myDevice._myEventQueue->push(myDevice._myEventVector[i]);
-//             }
-//             myDevice._myEventVector.clear();
-            myDevice._myLock->unlock();
-        } else if( INPUT_REPORT_STATUS == myInputReport[0]) {
-            printStatus(myInputReport, 1);
-        } else {
-            //AC_PRINT << "unknown report " << myDevice._myControllerId << "  " << ios::hex << myInputReport[0] << 	ios::dec;
-      	}
-        */
     }
 }
 
 void
 Win32mote::closeDevice() {
-	//CloseHandle(_myListenerThread);
 	CloseHandle(_myDeviceHandle);
 	CloseHandle(_myReadHandle);
 	CloseHandle(_myWriteHandle);
@@ -240,6 +192,7 @@ Win32mote::discover() {
             // If the vendor and product IDs match, we've found a wiimote 
             Win32motePtr myDevice( new Win32mote( myDevices.size() ) );
 
+            // TODO: move this stuff to Win32mote CTor
             myDevice->_myDevicePath = detailData->DevicePath;
             myDevice->_myDeviceHandle = DeviceHandle;
 
@@ -252,9 +205,9 @@ Win32mote::discover() {
                     (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
 
             PrepareForOverlappedTransfer(*myDevice, detailData);
+            
+            myDevice._isConnected = true;
 
-            //myDevice->_myControllerId = myDevices.size();
-            //WiiRemotePtr myPtr( myDevice );
             myDevices.push_back( myDevice );
         } else {
             CloseHandle(DeviceHandle);

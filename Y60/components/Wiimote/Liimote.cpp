@@ -18,9 +18,12 @@
 #include <errno.h>
 #include <poll.h>
 
+using namespace asl;
 using namespace std;
 
 namespace y60 {
+
+const bool DUMP_OUTPUT_REPORTS( false );
 
 const int MAX_BT_INQUIRY( 256 );
 const int WIIMOTE_NAME_LENGTH( 32 );
@@ -38,7 +41,7 @@ const int INT_PSM(19);
 
 
 Liimote::Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName) :
-    WiiRemote( inputListener, theId ),
+    WiiRemote( inputReportListener, theId ),
     _myName( theName ),
     _myCtlSocket( -1 ),
     _myIntSocket( -1 )
@@ -82,6 +85,9 @@ Liimote::Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char 
         throw WiiException(string("Failed to connect to interrupt socket: ") + strerror( errno ),
                     PLUS_FILE_LINE);
     }
+
+    _isConnected = true;
+
 }
 
 Liimote::~Liimote() {
@@ -90,38 +96,40 @@ Liimote::~Liimote() {
 
 std::string 
 Liimote::getDeviceName() const { 
-    return _myName; 
+    char myAddressString[19];
+    ba2str( & _myBDAddress, myAddressString);
+    return string(myAddressString) + " " + _myName; 
+}
+
+void
+dumpOutputReport(unsigned char theOutputReport[], unsigned theNumBytes) {
+    cout.setf( std::ios::hex, std::ios::basefield );
+    for(unsigned i=0; i<theNumBytes+1; ++i) {
+        cout << "0x" << (int)theOutputReport[i] << ", ";
+    }
+    cout.unsetf( std::ios::hex );
+    cout << endl;
 }
 
 void 
-Liimote::send(unsigned char out_bytes[], unsigned theNumBytes) {
-    unsigned char buf[SEND_BUFFER_SIZE];
+Liimote::send(unsigned char theOutputReport[], unsigned theNumBytes) {
+    unsigned char myBuffer[SEND_BUFFER_SIZE];
 
-    buf[0] = 0x50 | 0x02;
-    
-    memcpy(buf+1, out_bytes, theNumBytes);
+    myBuffer[0] = 0x50 | 0x02;
 
-    // cout.setf( std::ios::hex, std::ios::basefield );
-//     for(unsigned i=0; i<theNumBytes+1; ++i) {
-//         cout << "0x" << (int)buf[i] << ", ";
-//     }
-//     cout.unsetf( std::ios::hex );
+    memcpy(myBuffer+1, theOutputReport, theNumBytes);
 
-//     cout << endl;
-    
-    /*
-    if (!(flags & SEND_RPT_NO_RUMBLE)) {
-        buf[2] |= wiimote->led_rumble_state & 0x01;
+    if (DUMP_OUTPUT_REPORTS) {
+        dumpOutputReport( myBuffer, theNumBytes + 1);
     }
-*/
-    if (write(_myCtlSocket, buf, theNumBytes+1) != (ssize_t)(theNumBytes+1)) {
+
+    if (write(_myCtlSocket, myBuffer, theNumBytes + 1) != (ssize_t)(theNumBytes + 1)) {
+        // TODO: handle HUP
         throw WiiException("failed to send output report", PLUS_FILE_LINE);
     }
-   /*
-   else if (verify_handshake(wiimote)) {
-        return -1;
-    }
-*/
+    //else if (verify_handshake(wiimote)) {
+    //    return -1;
+    //}
 
 }
 
@@ -136,36 +144,57 @@ Liimote::closeDevice() {
 }
 
 void 
-Liimote::inputListener( asl::PosixThread & theThread ) {
-    Liimote & myDevice = dynamic_cast<Liimote&>( theThread );
+Liimote::inputReportListener( PosixThread & theThread ) {
+    try {
+        Liimote & myDevice = dynamic_cast<Liimote&>( theThread );
 
-    pollfd myPollSet;
-    myPollSet.fd = myDevice._myIntSocket;
-    myPollSet.events = POLLIN | POLLPRI;
-    myPollSet.revents = 0;
+        pollfd myPollSet;
+        myPollSet.fd = myDevice._myIntSocket;
+        myPollSet.events = POLLIN | POLLPRI;
 
-    unsigned char myBuffer[ RECV_BUFFER_SIZE ];
+        unsigned char myBuffer[ RECV_BUFFER_SIZE ];
 
-    while (myDevice.getListeningFlag()) {
+        while (myDevice.getListeningFlag()) {
 
-        int myResult = poll( & myPollSet, 1, 100 );
-        if ( myResult == 0) {
-            // timeout
-            continue;
-        } else if ( myResult == -1) {
-            throw WiiException(string("Error in poll(): ") + strerror( errno ), PLUS_FILE_LINE);
-        }
+            if ( myDevice.isConnected() ) {
+                myPollSet.revents = 0;
+                int myResult = poll( & myPollSet, 1, 100 );
+                if ( myResult == 0) {
+                    // timeout
+                    continue;
+                } else if ( myResult == -1) {
+                    throw WiiException(string("Error in poll(): ") + strerror( errno ), PLUS_FILE_LINE);
+                }
 
-        int myBytesReceived = read( myDevice._myIntSocket, myBuffer, RECV_BUFFER_SIZE );
-        if (( myBytesReceived == -1 ) || ( myBytesReceived == 0)) {
-            AC_ERROR << "Failed to read from interrupt socket. byte: " << int(myBuffer[0]);
-            throw WiiException("Failed to read from interrupt socket", PLUS_FILE_LINE);
-        } else {
-            if (myBuffer[0] != ( BT_TRANS_DATA | BT_PARAM_INPUT )) {
-                AC_ERROR << "Received invalid packet type.";
+                if (myPollSet.revents & POLLERR && myPollSet.revents & POLLHUP) {
+                    myDevice.disconnect();
+                } else if (myPollSet.revents & POLLIN || myPollSet.revents & POLLPRI) {
+
+                    int myBytesReceived = read( myDevice._myIntSocket, myBuffer, RECV_BUFFER_SIZE );
+                    if (( myBytesReceived == -1 ) || ( myBytesReceived == 0)) {
+                        throw WiiException(string("Failed to read from interrupt socket: ") +
+                                strerror( errno ) , PLUS_FILE_LINE);
+                    } else {
+                        if (myBuffer[0] != ( BT_TRANS_DATA | BT_PARAM_INPUT )) {
+                            AC_ERROR << "Received invalid packet type.";
+                        }
+                        myDevice.dispatchInputReport(myBuffer, 1);
+                    }
+                }
+            } else {
+                // waiting for shutdown
+                msleep( 10 );
             }
-            myDevice.dispatchInputReport(myBuffer, 1);
         }
+    } catch (const asl::Exception & ex) {
+        AC_ERROR << "asl::Exception in wiimote listener thread: " << ex;
+        throw;
+    } catch (const std::exception & ex) {
+        AC_ERROR << "std::exception in wiimote listener thread: " << ex.what();
+        throw;
+    } catch (...) {
+        AC_ERROR << "Unknown exception in wiimote listener thread";
+        throw;
     }
 }
 
@@ -205,6 +234,7 @@ Liimote::discover() {
         }
 
         char myNameBuffer[WIIMOTE_NAME_LENGTH];
+        char myAddressString[19];
         for (int i = 0; i < myDeviceCount; ++i) {
             if (hci_remote_name( mySocket, & myDeviceList[i].bdaddr, WIIMOTE_NAME_LENGTH,
                         myNameBuffer, 5000))
@@ -218,8 +248,8 @@ Liimote::discover() {
             {
                 continue;
             }
-            cerr << "name: " << myNameBuffer << endl;
             LiimotePtr myWii( new Liimote(myDeviceList[i], myDevices.size(), myNameBuffer) );
+            AC_PRINT << myWii->getDeviceName();
             myDevices.push_back( myWii );
             
 
@@ -234,6 +264,9 @@ Liimote::discover() {
             hci_close_dev( mySocket );
         }
         throw;
+    }
+    if (myDeviceList) {
+        free( myDeviceList );
     }
     return myDevices;
 }

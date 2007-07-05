@@ -42,24 +42,20 @@ extern "C" {
 namespace y60 {
             
     class Win32mote :
-        //public HIDDevice,
         public WiiRemote
     { 
     public:
-        
         Win32mote(unsigned theId);
         virtual ~Win32mote();
             
+        std::string getDeviceName() const { return _myDevicePath; }
+        void send(unsigned char theOutputReport[], unsigned theNumBytes);
+
         static std::vector<WiiRemotePtr> discover();
 
-        std::string getDeviceName() const { return _myDevicePath; }
-        
-        void send(unsigned char out_bytes[], unsigned theNumBytes);
     protected:
-        
+        static void Win32mote::inputReportListener(PosixThread & theThread); 
         void closeDevice();
-                
-        static void Win32mote::InputReportListener(PosixThread & theThread); 
 
         std::string     _myDevicePath;
 
@@ -69,7 +65,6 @@ namespace y60 {
         HANDLE          _myWriteHandle;
         HANDLE          _myEventObject;
         OVERLAPPED      _myHIDOverlap;
-//        LPOVERLAPPED    m_lp_overlap; Huh? unused ...
 
     private:
         static void PrepareForOverlappedTransfer(Win32mote & device, PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData);

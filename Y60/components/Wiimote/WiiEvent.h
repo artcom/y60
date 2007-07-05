@@ -14,14 +14,27 @@
 #include <string>
 #include <asl/Vector234.h>
 
+enum WiiReportMode {
+    BUTTON,
+    MOTION,
+    INFRARED
+};
+
 enum WiiEventType {
     WII_BUTTON,
     WII_MOTION,
-    WII_INFRARED
+    WII_INFRARED,
+    WII_LOST_CONNECTION,
+    WII_STATUS
 };
 
 class WiiEvent {
     public:
+    // Ctor for connection events
+    WiiEvent(unsigned theID, WiiEventType theEvent) :
+        id( theID ),
+        type( theEvent ) {}
+
     // Ctor for button events
     WiiEvent(unsigned theID, const std::string & theName, bool thePressedFlag) :
         id( theID ),
@@ -46,6 +59,21 @@ class WiiEvent {
         }
     }
 
+    // Ctor for status reports
+    WiiEvent(unsigned theID, uint8_t theBatteryLevel, uint8_t theStatusBits ) :
+        id( theID ),
+        type(WII_STATUS)
+    {
+        batteryLevel = float(theBatteryLevel) / float(0xC0);
+        extensionConnected = theStatusBits & 0x02;
+        speakerEnabled = theStatusBits & 0x04;
+        continousReports = theStatusBits & 0x08;
+        leds[0] = theStatusBits & 0x10;
+        leds[1] = theStatusBits & 0x20;
+        leds[2] = theStatusBits & 0x40;
+        leds[3] = theStatusBits & 0x80;
+    }
+
     unsigned id;
 
     WiiEventType type;
@@ -59,6 +87,13 @@ class WiiEvent {
     // infrared
     asl::Vector2i irPositions[4];
     asl::Vector2f screenPosition;
+
+    // status report
+    float batteryLevel;
+    bool  extensionConnected;
+    bool  speakerEnabled;
+    bool  continousReports;
+    bool  leds[4];
 };
 
 #endif // Y60_WII_EVENT_INCLUDED

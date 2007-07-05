@@ -22,13 +22,14 @@ class Liimote : public WiiRemote {
     public:
         Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName);
         virtual ~Liimote();
+
         virtual std::string getDeviceName() const;
-        virtual void send(unsigned char out_bytes[], unsigned theNumBytes);
+        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes);
 
         static std::vector<WiiRemotePtr> discover();
-        static void inputListener( asl::PosixThread & theThread );
 
     protected:
+        static void inputReportListener( asl::PosixThread & theThread );
         virtual void closeDevice();
 
         bdaddr_t _myBDAddress;
@@ -36,7 +37,7 @@ class Liimote : public WiiRemote {
         std::string _myName;
 
         int _myCtlSocket;
-        int _myIntSocket; // What's that?
+        int _myIntSocket;
 };
 
 typedef asl::Ptr<Liimote> LiimotePtr;

@@ -13,6 +13,8 @@
 #include <asl/Logger.h>
 #include <asl/Assure.h>
 
+#include <y60/GenericEvent.h>
+
 using namespace std;
 using namespace asl;
 
@@ -25,7 +27,13 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) :
     _myOrientation( 0 ),
     _myControllerId( theId ),
     _myRumbleFlag( false ),
-    _myInputListening( false )
+    _myInputListening( false ),
+    _isConnected( false ),
+    _myReportMode( BUTTON ),
+    _myContinousReportFlag( false ),
+    _myEventSchema( new dom::Document( oureventxsd ) ),
+    _myValueFactory( new dom::ValueFactory())
+
 {
 	 // Add all Wii buttons to the our internal list
     _myButtons.push_back(Button("1",		0x0002));
@@ -40,7 +48,10 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) :
     _myButtons.push_back(Button("Right", 0x0200));
     _myButtons.push_back(Button("Left",	0x0100));
             
-    _myInputListening = false;
+    registerStandardTypes( * _myValueFactory );
+    registerSomTypes( * _myValueFactory );
+
+    startThread();
 }
 
 WiiRemote::~WiiRemote() {
@@ -51,16 +62,16 @@ WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
 
     const unsigned char * myAddress = theBuffer + theOffset;
     if (INPUT_REPORT_BUTTONS == theBuffer[theOffset]) {
-        _myLock->lock();
+        _myLock.lock();
 
         handleButtonEvents( myAddress );
 
-        _myLock->unlock();
+        _myLock.unlock();
     } else if (INPUT_REPORT_MOTION == theBuffer[theOffset]) {
-        _myLock->lock();
+        _myLock.lock();
         handleButtonEvents( myAddress );
         handleMotionEvents( myAddress );
-        _myLock->unlock();
+        _myLock.unlock();
     } else if (0x21 == theBuffer[theOffset]) {
         // XXX TODO find out how to use it
         Vector3f zero_point(theBuffer[6] - 128.0f, theBuffer[7] - 128.0f, theBuffer[8] - 128.0f);
@@ -69,17 +80,17 @@ WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
         _myOneGPoint = one_g_point;
 
     } else if (INPUT_REPORT_IR == theBuffer[theOffset]) {
-        //AC_PRINT << "irdatareport";
-        
-        _myLock->lock();
+        _myLock.lock();
         handleIREvents( myAddress );
         handleButtonEvents( myAddress );
         handleMotionEvents( myAddress );
-        _myLock->unlock();
+        _myLock.unlock();
     } else if( INPUT_REPORT_STATUS == theBuffer[theOffset]) {
-        printStatus(myAddress);
+        _myLock.lock();
+        _myEventQueue.push( WiiEvent(_myControllerId, myAddress[6], myAddress[3]));
+        _myLock.unlock();
     } else {
-        //throw WiiException(string("Unknown report") + as_string( int( theBuffer[theOffset])), PLUS_FILE_LINE);
+        // TODO: handle more response types
     }
 
 }
@@ -107,45 +118,19 @@ WiiRemote::setButtons(int code) {
 }
 
 void
-WiiRemote::printStatus(const unsigned char * theBuffer) {
-    unsigned batteryByte = 6;
-    unsigned infoByte    = 3;
-    AC_PRINT << "\n============= status report =============";
-    double batteryLevel = (double)theBuffer[batteryByte];
-    batteryLevel /= (double)0xC0;
-    AC_PRINT << " Battery Level              : " << batteryLevel;
-    std::string extension = (theBuffer[infoByte] & 0x02) ? "yes" : "no";
-    AC_PRINT << " Extension Controller       : " << extension;
-    std::string speaker = (theBuffer[infoByte] & 0x04) ? "yes" : "no";
-    AC_PRINT << " Speaker enabled            : " << speaker;
-    std::string reporting = (theBuffer[infoByte] & 0x08) ? "yes" : "no";
-    AC_PRINT << " Continuous reports enabled : " << reporting;
-    std::string led0 = (theBuffer[infoByte] & 0x10) ? "yes" : "no";
-    AC_PRINT << " LED 1 enabled              : " << led0;
-    std::string led1 = (theBuffer[infoByte] & 0x20) ? "yes" : "no";
-    AC_PRINT << " LED 2 enabled              : " << led1;
-    std::string led2 = (theBuffer[infoByte] & 0x40) ? "yes" : "no";
-    AC_PRINT << " LED 3 enabled              : " << led2;
-    std::string led3 = (theBuffer[infoByte] & 0x80) ? "yes" : "no";
-    AC_PRINT << " LED 4 enabled              : " << led3;
-    AC_PRINT << "=========================================\n";
-           
-}
-    
-void
 WiiRemote::createEvent( int theID, const asl::Vector2i theIRData[4],
                         const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
-    _myEventQueue->push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
+    _myEventQueue.push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
 }
 
 void
 WiiRemote::createEvent( int theID, asl::Vector3f & theMotionData) {
-    _myEventQueue->push( WiiEvent(theID, theMotionData) );
+    _myEventQueue.push( WiiEvent(theID, theMotionData) );
 }
 
 void
 WiiRemote::createEvent( int theID, const std::string & theButtonName, bool thePressedState) {
-    _myEventQueue->push( WiiEvent( theID, theButtonName, thePressedState ) );
+    _myEventQueue.push( WiiEvent( theID, theButtonName, thePressedState ) );
 }
 
 Vector2i
@@ -216,8 +201,6 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
     myIRPositions[2] = parseIRData( theInputReport, 12, mySizeHint[2]);
     myIRPositions[3] = parseIRData( theInputReport, 15, mySizeHint[3]);
 
-    //AC_PRINT << myIRPositions[0] << "  " << myIRPositions[1] << "  " << myIRPositions[2] << "  " << myIRPositions[3];
-    //AC_PRINT << mySizeHint[0] << "  " << mySizeHint[1] << "  " << mySizeHint[2] << "  " << mySizeHint[3];
     float ox(0);
     float oy(0);
     Vector2f myNormalizedScreenCoordinates(0.0f, 0.0f);
@@ -281,11 +264,8 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
         if ( _myLeftPoint != -1) {
             _myLeftPoint = -1;
         }
-        //myNormalizedScreenCoordinates[0] = ox;
-        //myNormalizedScreenCoordinates[1] = oy;
     }
     
-    //cout << "pos " << myIRPositions[0] << endl;
     createEvent( _myControllerId, myIRPositions, myNormalizedScreenCoordinates, angle );
 }
 
@@ -310,14 +290,6 @@ WiiRemote::stopThread() {
 bool 
 WiiRemote::getListeningFlag() const {
     return _myInputListening;
-}
-
-void
-WiiRemote::setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
-               asl::Ptr<asl::ThreadLock> theLock)
-{
-    _myLock = theLock;
-    _myEventQueue = theQueue;
 }
 
 void 
@@ -372,7 +344,9 @@ WiiRemote::sendOutputReport(unsigned char theOutputReport[], unsigned theNumByte
     // preserve current state ... add the rumble bit
     theOutputReport[1] |= _myRumbleFlag ? 0x01 : 0x00;
 
-    send( theOutputReport, theNumBytes );
+    if ( _isConnected ) {
+        send( theOutputReport, theNumBytes );
+    }
 }
 
 void 
@@ -411,6 +385,157 @@ WiiRemote::writeMemoryOrRegister(Unsigned32 theAddress, unsigned char * theData,
     memcpy( & myOutputReport[6], theData, theNumBytes );
 
     sendOutputReport( myOutputReport, 16 + 6); // allways send 16 data bytes
+}
+
+bool 
+WiiRemote::isConnected() const {
+    return _isConnected;
+}
+
+void 
+WiiRemote::disconnect() {
+    _isConnected = false;
+    _myLock.lock();
+    _myEventQueue.push( WiiEvent( _myControllerId, WII_LOST_CONNECTION ));
+    _myLock.unlock();
+}
+
+void 
+WiiRemote::setReportMode( WiiReportMode theReportMode ) {
+    switch (theReportMode) {
+        case BUTTON:
+            requestButtonData();
+            break;
+        case MOTION:
+            requestMotionData();
+            break;
+        case INFRARED:
+            requestInfraredData();
+            break;
+    }
+    _myReportMode = theReportMode;
+}
+
+WiiReportMode 
+WiiRemote::getReportMode() const {
+    return _myReportMode;
+}
+
+void
+WiiRemote::requestButtonData() {
+    unsigned char myReportMode[3] = { OUT_DATA_REPORT_MODE , 0x00, INPUT_REPORT_BUTTONS };
+    addContinousReportBit( myReportMode );
+    sendOutputReport(myReportMode, 3);
+}
+
+void
+WiiRemote::requestMotionData() {
+    unsigned char myCalibrationReport[7] = { OUT_READ_DATA, 0x00, 0x00, 0x00, 0x16, 0x00, 0x0F };
+    sendOutputReport(myCalibrationReport, 7);
+
+    unsigned char myReportMode[3] = { OUT_DATA_REPORT_MODE, 0x00, INPUT_REPORT_MOTION };
+    addContinousReportBit( myReportMode );
+    sendOutputReport(myReportMode, 3);
+}
+
+void
+WiiRemote::requestInfraredData() {
+    unsigned char myIRCameraEnable[2] = {  OUT_IR_CMAERA_ENABLE, IR_CAMERA_ENABLE_BIT};
+    sendOutputReport(myIRCameraEnable, 2);
+    msleep(10);
+
+    unsigned char myIRCameraEnable2[2] = { OUT_IR_CMAERA_ENABLE_2, IR_CAMERA_ENABLE_BIT};
+    sendOutputReport(myIRCameraEnable2, 2);
+    msleep(10);
+
+    // sorry for the unimaginative variable name, but nobody seems to know
+    // what this is for [DS]
+    unsigned char myUnknownPurposeByte( 0x01 );
+    writeMemoryOrRegister( 0xb00030, & myUnknownPurposeByte, 1, true);
+    msleep(10);
+
+    unsigned char mySensitivitySetting1[9] = { 0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0xaa, 0x00, 0x64 };
+    writeMemoryOrRegister( 0xb00000, mySensitivitySetting1, 9, true);
+    msleep(10);
+
+    unsigned char mySensitivitySetting2[2] = {0x63, 0x03};
+    writeMemoryOrRegister( 0xb0001a, mySensitivitySetting2, 2, true);
+    msleep(10);
+
+    myUnknownPurposeByte = 0x08;
+    writeMemoryOrRegister( 0xb00030, & myUnknownPurposeByte, 1, true);
+    msleep(10);
+
+    unsigned char myIRModeSetting = 0x03;
+    writeMemoryOrRegister( 0xb00033, & myIRModeSetting, 1, true);
+    msleep(10);
+
+    unsigned char myIRDataFormat[3] = { OUT_DATA_REPORT_MODE, 0x00, INPUT_REPORT_IR};
+    addContinousReportBit( myIRDataFormat );
+    sendOutputReport(myIRDataFormat, 3);
+    msleep(10);
+}
+
+void
+WiiRemote::requestStatusReport() {
+    unsigned char myStatusInformationRequest[2] = { OUT_STATUS_REQUEST, 0x00 };
+    sendOutputReport(myStatusInformationRequest, 2);
+}
+
+void 
+WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> & theLostWiiIds ) {
+    if ( _myLock.nonblock_lock() == 0) {
+
+        while ( ! _myEventQueue.empty() ) {
+            const WiiEvent & myWiiEvent = _myEventQueue.front();
+            y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
+                        _myValueFactory));
+            dom::NodePtr myNode = myEvent->getNode();
+            myNode->appendAttribute<int>("id", myWiiEvent.id);
+            if (myWiiEvent.type == WII_BUTTON) {
+
+                myNode->appendAttribute("type", "button");
+                myNode->appendAttribute<string>("buttonname", myWiiEvent.buttonname);
+                myNode->appendAttribute<bool>("pressed", myWiiEvent.pressed);
+
+            } else if (myWiiEvent.type == WII_MOTION ) {
+                myNode->appendAttribute<string>("type", string("motiondata"));
+                myNode->appendAttribute<Vector3f>("motiondata", myWiiEvent.acceleration);
+            } else if (myWiiEvent.type == WII_INFRARED ) {
+
+                myNode->appendAttribute<string>("type", string("infrareddata"));
+
+                for (unsigned i = 0; i < 4; ++i) {
+                    if (myWiiEvent.irPositions[i][0] != 1023 && myWiiEvent.irPositions[i][1] != 1023) {
+                        myNode->appendAttribute<Vector2i>(string("irposition") + as_string(i),
+                                myWiiEvent.irPositions[i]);
+                        //myNode->appendAttribute<float>(string("angle"), theAngle);
+                    }
+                }
+                myNode->appendAttribute<Vector2f>(string("screenposition"),
+                        myWiiEvent.screenPosition);
+            } else if (myWiiEvent.type == WII_LOST_CONNECTION) {
+                myNode->appendAttribute<string>("type", string("lost_connection"));
+                theLostWiiIds.push_back( myWiiEvent.id );
+            } else if (myWiiEvent.type == WII_STATUS) {
+                myNode->appendAttribute<string>("type", string("status"));
+                myNode->appendAttribute<float>("battery_level", myWiiEvent.batteryLevel);
+                myNode->appendAttribute<bool>("extension", myWiiEvent.extensionConnected);
+                myNode->appendAttribute<bool>("speaker_enabled", myWiiEvent.speakerEnabled);
+                myNode->appendAttribute<bool>("continous_reports", myWiiEvent.continousReports);
+                myNode->appendAttribute<bool>("led0", myWiiEvent.leds[0]);
+                myNode->appendAttribute<bool>("led1", myWiiEvent.leds[1]);
+                myNode->appendAttribute<bool>("led2", myWiiEvent.leds[2]);
+                myNode->appendAttribute<bool>("led3", myWiiEvent.leds[3]);
+            } else {
+                throw WiiException("unhandled event type", PLUS_FILE_LINE);
+            }
+            theEventList.push_back( myEvent );
+            _myEventQueue.pop();
+        }
+
+        _myLock.unlock();
+    }
 }
 
 } // end of namespace 

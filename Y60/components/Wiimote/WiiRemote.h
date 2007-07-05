@@ -18,8 +18,12 @@
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 
+#include <y60/DataTypes.h>
+#include <y60/IEventSource.h>
 
 #include <queue>
+
+extern std::string oureventxsd;
 
 namespace y60 {
 
@@ -31,6 +35,7 @@ namespace y60 {
 const static char OUT_SET_LEDS           = 0x11;
 const static char OUT_DATA_REPORT_MODE   = 0x12;
 const static char OUT_IR_CMAERA_ENABLE   = 0x13;
+const static char OUT_STATUS_REQUEST     = 0x15;
 // ... more ...
 const static char OUT_IR_CMAERA_ENABLE_2 = 0x1a;
 
@@ -61,25 +66,18 @@ class WiiRemote :
         WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId);
         virtual ~WiiRemote();
 
-        void setEventQueue( asl::Ptr<std::queue<WiiEvent> > theQueue,
-                            asl::Ptr<asl::ThreadLock> theLock);
-
-
         asl::Vector3f getLastMotionData() const { return _myLastMotion; }
 
         Button getButton(std::string label);
         std::vector<Button> getButtons() const { return _myButtons; }
         
-        void startThread();
-        void stopThread();
         
-        static void printStatus(const unsigned char * theBuffer);
+        void setReportMode( WiiReportMode theReportMode );
+        WiiReportMode getReportMode() const;
+        
         int getControllerID() const { return _myControllerId; }
 
         virtual std::string getDeviceName() const = 0;
-        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes) = 0;
-        void sendOutputReport(unsigned char theOutputReport[], unsigned theNumBytes);
-
 
         void setRumble( bool theFlag);
         bool isRumbling() const;
@@ -88,21 +86,27 @@ class WiiRemote :
         void setLEDs(bool theLED0, bool theLED1, bool theLED2, bool theLED3 );
         bool isLedOn(int i) const;
 
+        void requestStatusReport();
+
         void setContinousReportFlag( bool theFlag );
         bool getContinousReportFlag() const;
 
         void writeMemoryOrRegister(asl::Unsigned32 theAddress, unsigned char * theData,
                                    unsigned theNumBytes, bool theWriteRegisterFlag);
 
-    // TODO: implement memory/ register read
+        // TODO: implement memory/ register read
+
+        bool isConnected() const;
+        void disconnect();
+
+        void pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> & theLostWiiIds );
 
     protected:
         virtual void closeDevice() = 0;
+        void startThread();
+        void stopThread();
 
         void setLEDState();
-        void addContinousReportBit( unsigned char * theOutputReport );
-
-        void dispatchInputReport(const unsigned char * theBuffer, int theOffset);
         
         void handleButtonEvents( const unsigned char * theInputReport );
         void handleMotionEvents( const unsigned char * theInputReport );
@@ -113,11 +117,19 @@ class WiiRemote :
         void createEvent( int theID, const asl::Vector2i theIRData[4],
                           const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle );
     
+        void requestButtonData();
+        void requestInfraredData();
+        void requestMotionData();
+
+        void dispatchInputReport(const unsigned char * theBuffer, int theOffset);
+        void addContinousReportBit( unsigned char * theOutputReport );
+        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes) = 0;
+        void sendOutputReport(unsigned char theOutputReport[], unsigned theNumBytes);
+
         bool getListeningFlag() const;
-        asl::Ptr< std::queue<WiiEvent> > _myEventQueue;
-        asl::Ptr< asl::ThreadLock > _myLock;
 
         std::vector<Button> setButtons(int code);
+
         std::vector<Button> _myButtons;
 
         asl::Vector3f       _myLastMotion;
@@ -136,6 +148,15 @@ class WiiRemote :
         bool _myLEDState[4];
         bool _myContinousReportFlag;
 
+        bool _isConnected;
+
+        WiiReportMode _myReportMode;
+
+        asl::ThreadLock      _myLock;
+        std::queue<WiiEvent> _myEventQueue;
+
+        dom::NodePtr                    _myEventSchema;
+        asl::Ptr<dom::ValueFactory>     _myValueFactory;
     private:
         WiiRemote();
 };

@@ -26,6 +26,16 @@
             <xs:attribute name="irposition3" type="Vector2i"/>
             <xs:attribute name="screenposition" type="Vector2f"/>
             <xs:attribute name="angle" type="xs:float"/>
+
+            <!-- Status Report Attributes -->
+            <xs:attribute name="battery_level"     type="xs:float"/>
+            <xs:attribute name="extension"         type="xs:boolean"/>
+            <xs:attribute name="speaker_enabled"   type="xs:boolean"/>
+            <xs:attribute name="continous_reports" type="xs:boolean"/>
+            <xs:attribute name="led0"              type="xs:boolean"/>
+            <xs:attribute name="led1"              type="xs:boolean"/>
+            <xs:attribute name="led2"              type="xs:boolean"/>
+            <xs:attribute name="led3"              type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

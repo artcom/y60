@@ -27,14 +27,10 @@
 #include <asl/ThreadLock.h>
 #include <y60/IEventSource.h>
 #include <y60/IScriptablePlugin.h>
-#include <y60/GenericEvent.h>
-#include <y60/DataTypes.h>
 
 #include <vector>
 #include <queue>
 #include <map>
-
-extern std::string oureventxsd;
 
 namespace y60 {
 
@@ -50,15 +46,12 @@ class WiimoteDriver :
         ~WiimoteDriver();
         virtual y60::EventPtrList poll();
 
-        void requestStatusReport(int theIndex);
+        void requestStatusReport(unsigned theId);
+        void requestStatusReport();
 
         void setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4);
         void setLED(int theWiimoteIndex, int theLEDIndex, bool theState);
         void setRumble(int theIndex, bool on);
-
-        void requestButtonData();
-        void requestInfraredData();
-        void requestMotionData();
 
         unsigned getNumWiimotes() const;
 
@@ -76,17 +69,9 @@ class WiimoteDriver :
         static JSBool RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
         const char * ClassName();
+
     private:
-
-        //std::map<int, std::string>      _myBluetoothMap;
-        asl::Ptr<std::queue<WiiEvent> > _myEventQueue;
-        asl::Ptr<asl::ThreadLock>       _myLock;
-        dom::NodePtr                    _myEventSchema;
-        asl::Ptr<dom::ValueFactory>     _myValueFactory;
-
-
-        enum REQUEST_MODE { BUTTON, MOTION, INFRARED };
-        REQUEST_MODE _myRequestMode;
+        WiiReportMode _myDefaultReportMode;
 
         std::vector<WiiRemotePtr> _myWiimotes;
 };
