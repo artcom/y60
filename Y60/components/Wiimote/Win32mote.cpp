@@ -206,7 +206,7 @@ Win32mote::discover() {
 
             PrepareForOverlappedTransfer(*myDevice, detailData);
             
-            myDevice._isConnected = true;
+            myDevice->_isConnected = true;
 
             myDevices.push_back( myDevice );
         } else {

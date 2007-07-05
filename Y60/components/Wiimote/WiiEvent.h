@@ -60,7 +60,7 @@ class WiiEvent {
     }
 
     // Ctor for status reports
-    WiiEvent(unsigned theID, uint8_t theBatteryLevel, uint8_t theStatusBits ) :
+    WiiEvent(unsigned theID, asl::Unsigned8 theBatteryLevel, asl::Unsigned8 theStatusBits ) :
         id( theID ),
         type(WII_STATUS)
     {
