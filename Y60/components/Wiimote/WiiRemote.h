@@ -18,6 +18,7 @@
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 
+
 #include <queue>
 
 namespace y60 {
@@ -90,10 +91,10 @@ class WiiRemote :
         void setContinousReportFlag( bool theFlag );
         bool getContinousReportFlag() const;
 
-        void writeMemoryOrRegister(uint32_t theAddress, unsigned char * theData,
+        void writeMemoryOrRegister(asl::Unsigned32 theAddress, unsigned char * theData,
                                    unsigned theNumBytes, bool theWriteRegisterFlag);
 
-        // TODO: implement memory/ register read
+    // TODO: implement memory/ register read
 
     protected:
         virtual void closeDevice() = 0;

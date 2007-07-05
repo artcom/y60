@@ -168,7 +168,7 @@ WiimoteDriver::requestInfraredData() {
         unsigned char mySensitivitySetting2[2] = {0x63, 0x03};
         _myWiimotes[i]->writeMemoryOrRegister(0xb0001a, mySensitivitySetting2, 2, true);
 
-        unsigned char myUnknownPurposeByte = 0x08;
+        myUnknownPurposeByte = 0x08;
         _myWiimotes[i]->writeMemoryOrRegister( 0xb00030, & myUnknownPurposeByte, 1, true);
 
         unsigned char myIRModeSetting = 0x03;

@@ -392,7 +392,7 @@ WiiRemote::addContinousReportBit( unsigned char * theOutputReport ) {
 }
 
 void 
-WiiRemote::writeMemoryOrRegister(uint32_t theAddress, unsigned char * theData,
+WiiRemote::writeMemoryOrRegister(Unsigned32 theAddress, unsigned char * theData,
                                  unsigned theNumBytes, bool theWriteRegisterFlag)
 {
     unsigned char myOutputReport[22];
