@@ -284,8 +284,7 @@ namespace y60 {
 
         unsigned mySrcSize = mySrc.size();
         if (theNormalFlag) {
-            float myScaleSign = theMatrix[0][0] * theMatrix[1][1] * theMatrix[2][2];
-            myScaleSign = theFlipFlag ? -1.f : 1.f;
+            float myScaleSign = theFlipFlag ? -1.f : 1.f;
             for (unsigned j = 0; j < mySrcSize; ++j) {
                 myDst[myOffset + j] = transformedNormal(mySrc[j], theMatrix) * myScaleSign;
             }
@@ -369,9 +368,11 @@ namespace y60 {
 
             // get element type
             std::string myElementType = mySrcElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+            
             if (myElementType == PRIMITIVE_TYPE_QUADS) {
                 myElementType = PRIMITIVE_TYPE_TRIANGLES;
             }
+            
 
             // get element material ref
             std::string myMaterialRef = mySrcElements->getAttributeString(MATERIAL_REF_ATTRIB);
@@ -383,11 +384,13 @@ namespace y60 {
             }
             RenderStyles & myRenderStyles = myAttribute->nodeValueRefOpen<RenderStyles>();
             bool myFlipFlag               = theFlipFlag;
-            if (myRenderStyles[BACK] && myRenderStyles.count() == 1) {
+            /*
+            if (myRenderStyles[BACK] && !myRenderStyles[FRONT]) {
                 myRenderStyles[BACK]  = false;
                 myRenderStyles[FRONT] = true;
                 myFlipFlag            = !myFlipFlag;
             }
+            */
             myAttribute->nodeValueRefClose<RenderStyles>();
 
             PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myElementType, myMaterialRef, myRenderStyles);
@@ -403,7 +406,7 @@ namespace y60 {
                 unsigned myOffset                 = myDst.size();
                 unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
 
-                // Triangulate quads
+                //// Triangulate quads
                 if (mySrcElements->getAttributeString(PROPERTY_TYPE_ATTRIB) == PRIMITIVE_TYPE_QUADS) {
                     myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
                     unsigned mySrcSize = mySrc.size();
@@ -480,7 +483,12 @@ namespace y60 {
             }
             asl::Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();
             myMatrix.postMultiply(theInitialMatrix);
-            bool myFlipFlag = ((myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2]) < 0);
+
+            const asl::Vector3f & myXVector = asl::asVector3(myMatrix[0][0]);
+            const asl::Vector3f & myYVector = asl::asVector3(myMatrix[1][0]);
+            const asl::Vector3f & myZVector = asl::asVector3(myMatrix[2][0]);
+
+            bool myFlipFlag = dot(myXVector, cross(myYVector, myZVector)) < 0;
             RenderStyles myRenderStyles = myShape.get<RenderStyleTag>();
 
             if (_mySuperShape == 0) {
