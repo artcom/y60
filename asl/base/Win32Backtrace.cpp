@@ -99,13 +99,13 @@ Win32Backtrace::Win32Backtrace (unsigned address)
 Win32Backtrace::~Win32Backtrace()
 {
 //	if (m_ok) guard::instance().clear();
-	delete m_pframe;
+	//delete m_pframe;
 }
 
 
 void 
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-    Win32Backtrace::stack_trace(theStack, 0); // skip the first frame	
+    //Win32Backtrace::stack_trace(theStack, 0); // skip the first frame	
 }
 
 /////////////////////////////////////////////
@@ -390,7 +390,10 @@ bool Win32Backtrace::guard::load_module(HANDLE hProcess, HMODULE hMod)
 		return false;
 	
 	HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
-	if (hFile == INVALID_HANDLE_VALUE) return false;
+	if (hFile == INVALID_HANDLE_VALUE) { 
+		CloseHandle(hFile);
+		return false;
+	}
 
 	// "Debugging Applications" John Robbins	
     // For whatever reason, SymLoadModule can return zero, but it still loads the modules. Sheez.
