@@ -10,15 +10,22 @@
 
 #include "WiiScanner.h"
 #include "Utils.h"
-#include "Liimote.h" // XXX
 
 #include <asl/Logger.h>
 
 #ifdef LINUX
+#include "Liimote.h" // XXX
 #   include <bluetooth/bluetooth.h>
 #   include <bluetooth/hci.h>
 #   include <bluetooth/hci_lib.h>
 #   include <bluetooth/l2cap.h>
+#elif WIN32
+// XXX
+extern "C" {
+#   include "hidsdi.h"
+#   include "setupapi.h"
+}
+#include "Win32mote.h"
 #endif
 
 
@@ -182,6 +189,84 @@ WiiScanner::collectNewWiiControllers() {
         hci_close_dev( mySocket );
     }
 }
+#elif WIN32
+void
+WiiScanner::collectNewWiiControllers() {
+    HANDLE WriteHandle = 0, DeviceHandle = 0;
+
+    HANDLE hDevInfo;
+
+    HIDD_ATTRIBUTES						Attributes;
+    SP_DEVICE_INTERFACE_DATA			devInfoData;
+    int									MemberIndex = 0;
+    LONG								Result;	
+    GUID								HidGuid;
+    PSP_DEVICE_INTERFACE_DETAIL_DATA	detailData;
+
+    ULONG Required = 0;
+    ULONG Length = 0;
+    detailData = NULL;
+    DeviceHandle = NULL;
+
+    HidD_GetHidGuid(&HidGuid);	
+
+    hDevInfo = SetupDiGetClassDevs(&HidGuid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
+
+    devInfoData.cbSize = sizeof(devInfoData);
+    MemberIndex = 0;
+
+    do {
+        // Got any more devices?
+        Result = SetupDiEnumDeviceInterfaces (hDevInfo, 0, &HidGuid, MemberIndex,	&devInfoData);
+
+        if (Result == 0) {
+            break;
+        }
+        // Call once to get the needed buffer length
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, NULL, 0, &Length, NULL);
+        detailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(Length);
+        detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+        // After allocating, call again to get data
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length, 
+                                                 &Required, NULL);
+        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+                                  (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
+
+        Attributes.Size = sizeof(Attributes);
+        
+        Result = HidD_GetAttributes(DeviceHandle, &Attributes);
+    
+        if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
+            vector<WiiRemotePtr> myNewWiis;
+            set<string>::iterator myIt = _myKnownWiiIds.find( detailData->DevicePath);
+            if (myIt == _myKnownWiiIds.end() ) {
+                Win32motePtr myWii( new Win32mote(detailData, DeviceHandle) );
+                myNewWiis.push_back( myWii );
+                _myKnownWiiIds.insert( detailData->DevicePath );
+            }
+            
+            _myLock.lock();
+            for (unsigned i = 0; i < myNewWiis.size(); ++i) {
+                _myNewWiiQueue.push( myNewWiis[i] );
+            }
+            while ( ! _myLostConnectionIdQueue.empty() ) {
+                AC_PRINT << "==== removing wii";
+                _myKnownWiiIds.erase( _myLostConnectionIdQueue.front() );
+                _myLostConnectionIdQueue.pop();
+            }
+            _myLock.unlock();
+        } else {
+            CloseHandle(DeviceHandle);
+        }
+        
+        free(detailData);
+        MemberIndex = MemberIndex + 1;
+        
+    } while(true);
+    SetupDiDestroyDeviceInfoList(hDevInfo);
+}
+    
 #endif
 
 } // end of namespace

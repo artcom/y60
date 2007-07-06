@@ -79,6 +79,13 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
         _myBody.scale = new Vector3f(5, 5,5);
 
+        
+        var myClone = _myBody.cloneNode(true);
+        createNewIds(myClone);
+        myClone.position.x += 2;
+        myClone.name = "clone";
+        window.scene.world.appendChild(myClone);
+        
         _myOrientationVector = Node.createElement("vector");
         window.scene.world.appendChild( _myOrientationVector );
         _myOrientationVector.color = new Vector4f(1,1,1,1);
@@ -235,6 +242,9 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             }
         }
 
+        if( theNode.type == "found_wii") {
+        }
+        
         // media system control :)
         if (MOVIE_DEMO && theNode.type == "button" && theNode.buttonname == "1" && theNode.pressed == 1) {
             if( _myCurrentMovieImage.playmode == "pause" ){
@@ -257,7 +267,12 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     // private funtions 
     ///////////////////////////////////////////////////////
 
-
+    function createNewIds(theNode) {
+        theNode.id = createUniqueId();
+        for (var i = 0; i < theNode.childNodesLength(); ++i) {
+            createNewIds(theNode.childNode(i));
+        }
+    }
 }
 
 

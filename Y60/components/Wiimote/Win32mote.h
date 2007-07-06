@@ -45,10 +45,10 @@ namespace y60 {
         public WiiRemote
     { 
     public:
-        Win32mote(unsigned theId);
+        Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData, HANDLE & theDevice);
         virtual ~Win32mote();
             
-        static std::vector<WiiRemotePtr> discover();
+        //static std::vector<WiiRemotePtr> discover();
 
     protected:
         void send(unsigned char theOutputReport[], unsigned theNumBytes);
@@ -62,9 +62,11 @@ namespace y60 {
         HANDLE          _myEventObject;
         OVERLAPPED      _myHIDOverlap;
 
+        LPCTSTR _myDevicePath;
+        
     private:
-        static void PrepareForOverlappedTransfer(Win32mote & device, PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData);
-        static void GetDeviceCapabilities(Win32mote & device);
+        void PrepareForOverlappedTransfer();
+        void GetDeviceCapabilities();
 
         Win32mote();
     };

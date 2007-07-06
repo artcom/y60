@@ -32,10 +32,28 @@ using namespace std;
 
 namespace y60 {
 
-Win32mote::Win32mote(unsigned theId) : //HIDDevice(),
-                         WiiRemote(inputReportListener, theId),
-                         _myEventObject(NULL)
+Win32mote::Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA	& theDeviceData, HANDLE & theDeviceHandle) : 
+    WiiRemote(inputReportListener),
+    _myEventObject(NULL)
 {
+
+    _myDevicePath = theDeviceData->DevicePath;
+    _myDeviceHandle = theDeviceHandle;
+    
+    // Register to receive device notifications.
+    // RegisterForDeviceNotifications();
+    
+    GetDeviceCapabilities();
+    
+    _myWriteHandle = CreateFile(_myDevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+                                (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
+
+    // TODO  do error handling here!!!
+    
+    PrepareForOverlappedTransfer();
+    
+    _isConnected = true;
+    
     startThread();
 }
 
@@ -46,35 +64,46 @@ Win32mote::~Win32mote() {
 void
 Win32mote::inputReportListener(PosixThread & theThread)
 {
-    Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
+    try {
+        Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
-    //AC_PRINT << myDevice._myControllerId;
-    unsigned char myInputReport[RECV_BUFFER_SIZE];
-    while (myDevice.getListeningFlag()) {
-        ZeroMemory(myInputReport, RECV_BUFFER_SIZE);
+        //AC_PRINT << myDevice._myControllerId;
+        unsigned char myInputReport[RECV_BUFFER_SIZE];
+        while (myDevice.getListeningFlag()) {
+            ZeroMemory(myInputReport, RECV_BUFFER_SIZE);
 
-        DWORD result, bytes_read;
+            DWORD result, bytes_read;
 
-        // Issue a read request
-        if (myDevice._myReadHandle != INVALID_HANDLE_VALUE) {
-            result = ReadFile(myDevice._myReadHandle, 
-                    myInputReport, 
-                    myDevice._myCapabilities.InputReportByteLength, 
-                    &bytes_read, 
-                    (LPOVERLAPPED)&myDevice._myHIDOverlap);																						  
-        }  
+            // Issue a read request
+            if (myDevice._myReadHandle != INVALID_HANDLE_VALUE) {
+                result = ReadFile(myDevice._myReadHandle, 
+                                  myInputReport, 
+                                  myDevice._myCapabilities.InputReportByteLength, 
+                                  &bytes_read, 
+                                  (LPOVERLAPPED)&myDevice._myHIDOverlap);																						  
+            }  
 
-        // Wait for read to finish
-        result = WaitForSingleObject(myDevice._myEventObject, 300);
+            // Wait for read to finish
+            result = WaitForSingleObject(myDevice._myEventObject, 300);
 
-        ResetEvent(myDevice._myEventObject);
+            ResetEvent(myDevice._myEventObject);
 
-        // If the wait didn't result in a sucessful read, try again
-        if (result != WAIT_OBJECT_0) {
-            continue;
-        }
+            // If the wait didn't result in a sucessful read, try again
+            if (result != WAIT_OBJECT_0) {
+                continue;
+            }
         
-        myDevice.dispatchInputReport(myInputReport, 0);
+            myDevice.dispatchInputReport(myInputReport, 0);
+        }
+    } catch (const asl::Exception & ex) {
+        AC_ERROR << "asl::Exception in wiimote listener thread: " << ex;
+        throw;
+    } catch (const std::exception & ex) {
+        AC_ERROR << "std::exception in wiimote listener thread: " << ex.what();
+        throw;
+    } catch (...) {
+        AC_ERROR << "Unknown exception in wiimote listener thread";
+        throw;
     }
 }
 
@@ -87,31 +116,30 @@ Win32mote::closeDevice() {
 
 
 void
-Win32mote::PrepareForOverlappedTransfer(Win32mote & device,
-                                        PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData)
+Win32mote::PrepareForOverlappedTransfer()
 {
 	// Get a handle to the device for the overlapped ReadFiles.
-	device._myReadHandle = CreateFile (detailData->DevicePath, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE,
-                                     (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-
-	// Get an event object for the overlapped structure.
-	if (device._myEventObject == 0)
-	{
-      string empty = _T("");
-      device._myEventObject = CreateEvent (NULL, TRUE, TRUE, empty.c_str());
-      device._myHIDOverlap.hEvent = device._myEventObject;
-      device._myHIDOverlap.Offset = 0;
-      device._myHIDOverlap.OffsetHigh = 0;
-	}
+    _myReadHandle = CreateFile (_myDevicePath, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE,
+                                (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+    
+    // Get an event object for the overlapped structure.
+    if (_myEventObject == 0)
+    {
+        string empty = _T("");
+        _myEventObject = CreateEvent (NULL, TRUE, TRUE, empty.c_str());
+        _myHIDOverlap.hEvent = _myEventObject;
+        _myHIDOverlap.Offset = 0;
+        _myHIDOverlap.OffsetHigh = 0;
+    }
 }
 
 void
-Win32mote::GetDeviceCapabilities(Win32mote & device) {
+Win32mote::GetDeviceCapabilities() {
 	//Get the Capabilities structure for the device.
 	PHIDP_PREPARSED_DATA PreparsedData;
 
-	HidD_GetPreparsedData(device._myDeviceHandle, &PreparsedData);
-	HidP_GetCaps(PreparsedData, &device._myCapabilities);
+	HidD_GetPreparsedData(_myDeviceHandle, &PreparsedData);
+	HidP_GetCaps(PreparsedData, &_myCapabilities);
 	HidD_FreePreparsedData(PreparsedData);
 }
 
@@ -136,9 +164,10 @@ Win32mote::send(unsigned char out_bytes[], unsigned theNumBytes) {
     }
 }
 
-
+#if 0
 std::vector<WiiRemotePtr>
 Win32mote::discover() {
+
 
     std::vector<WiiRemotePtr> myDevices;
 
@@ -222,8 +251,9 @@ Win32mote::discover() {
     SetupDiDestroyDeviceInfoList(hDevInfo);
 
     return myDevices;
-}
 
+}
+#endif
 
 
 

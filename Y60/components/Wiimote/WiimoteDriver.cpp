@@ -68,7 +68,7 @@ WiimoteDriver::poll() {
                     _myValueFactory));
         dom::NodePtr myNode = myEvent->getNode();
         myNode->appendAttribute<string>("id", myNewWiis[i]->getControllerID());
-        myNode->appendAttribute<string>("type", "found_wii");
+        myNode->appendAttribute<string>("type", std::string("found_wii"));
         myEvents.push_back( myEvent );
     }
     
