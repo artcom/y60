@@ -11,15 +11,51 @@ void uart0_init(void){
 #define UART_BAUD_CALC_DS( theBaudRate, theClock) \
     ( (theClock) / ((theBaudRate) * 8l) - 1)
 
-	//double speed mode: U2X = 1
-    UBRR0H = (uint8_t)(UART_BAUD_CALC_DS( UART0_BAUD_RATE,F_CPU ) >> 8);
-    UBRR0L = (uint8_t)UART_BAUD_CALC_DS( UART0_BAUD_RATE,F_CPU );
-    // turn on double speed
-    UCSR0A = _BV(U2X0);
-    // Enable receiver and transmitter, also turn on RX complete interrupt
-    UCSR0B = _BV(RXCIE0) | _BV(RXEN0) | _BV(TXEN0);
-    //asynchronous 8N1
-    UCSR0C = (3 << UCSZ00);
+   if((g_DIPSwitch&_BV(DIP_ETHERNET_PORT)) == 0){
+    	//double speed mode: U2X = 1
+//        UBRR0H = (uint8_t)(UART_BAUD_CALC_DS( UART0_BAUD_RATE_HS,F_CPU ) >> 8);
+//        UBRR0L = (uint8_t)UART_BAUD_CALC_DS( UART0_BAUD_RATE_HS,F_CPU );
+        switch(g_BaudRateFactor){
+            case 0:
+                UBRR0H = 0;
+                UBRR0L = (F_CPU/(UART0_BAUD_RATE_HS*8)-1) & 0xFF;
+                break;
+            case 1:
+                UBRR0H = 0;
+                UBRR0L = (F_CPU/(2*UART0_BAUD_RATE_HS*8)-1) & 0xFF;
+                break;
+            case 2:
+                UBRR0H = 0;
+                UBRR0L = (F_CPU/(4*UART0_BAUD_RATE_HS*8)-1) & 0xFF;
+                break;
+            case 3:
+                UBRR0H = 0;
+                UBRR0L = (F_CPU/(8*UART0_BAUD_RATE_HS*8)-1) & 0xFF;
+                break;
+            case 4:
+                UBRR0H = 0;
+                UBRR0L = (F_CPU/(16*UART0_BAUD_RATE_HS*8)-1) & 0xFF;
+                break;
+        }
+        // turn on double speed
+        UCSR0A = _BV(U2X0);
+        // Enable receiver and transmitter, also turn on RX complete interrupt
+        UCSR0B = _BV(RXCIE0) | _BV(RXEN0) | _BV(TXEN0);
+        //asynchronous 8N1
+        UCSR0C = (3 << UCSZ00);
+        g_UART_mode = HS;
+    }else{
+    	//double speed mode: U2X = 1
+        UBRR0H = (uint8_t)(UART_BAUD_CALC_DS( UART0_BAUD_RATE_LS,F_CPU ) >> 8);
+        UBRR0L = (uint8_t)UART_BAUD_CALC_DS( UART0_BAUD_RATE_LS,F_CPU );
+        // turn on double speed
+        UCSR0A = _BV(U2X0);
+        // Enable receiver and transmitter, also turn on RX complete interrupt
+        UCSR0B = _BV(RXCIE0) | _BV(RXEN0) | _BV(TXEN0);
+        //asynchronous 8N1
+        UCSR0C = (3 << UCSZ00);
+        g_UART_mode = LS;
+    }
 }
 
 int uart0_putchar(char c, FILE *stream){

@@ -7,65 +7,99 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//#define OLDBOARD
-
 
 #ifndef _DEFINES_H_
 #define _DEFINES_H_
 
-#ifndef OLDBOARD
 #define F_CPU 14745600
-#else
-#define F_CPU 16000000
-#endif
 
 //=== Configuration ==========================================================
+
+#define VERSION    1
+#define SUBVERSION 5
+
+#define DEFAULT_ID                    0
+#define DEFAULT_MATRIX_WIDTH          20
+#define DEFAULT_MATRIX_HEIGTH         10
+#define DEFAULT_SCAN_FREQUENCY        21  //Hz (max 100Hz, min 16Hz)
+#define DEFAULT_VOLTAGE_TRANSMITTER   106 //=5V *21,2(*1/V)
+#define DEFAULT_BAUD_RATE             0   //0 = 57600bps
+                                          //1 = 115200bps
+                                          //2 = 230400bps
+                                          //3 = 460800bps
+                                          //4 = 921600bps
+
+
+//=== Don't change anything below this line! =================================
 
 #define MAX_MATRIX_WIDTH  40
 #define MAX_MATRIX_HEIGTH 25
 
-#define DEFAULT_MATRIX_WIDTH  20 //user definable: range 1-MAX_MATRIX_WIDTH
-#define DEFAULT_MATRIX_HEIGTH 10 //user definable: range 1-MAX_MATRIX_HEIGTH
+#define MIN_SCAN_FREQUENCY 16//Hz (lower frequencies don't work as g_scanPeriod is 16-bit integer)
+#define MAX_SCAN_FREQUENCY 100//Hz (additional restrictions apply!)
 
-#define VERSION    1
-#define SUBVERSION 4
-
-#define ID 1
+#define UART0_BAUD_RATE_LS 9600
+#define UART0_BAUD_RATE_HS 57600 //will be scaled by factors 2, 4, 8, 16 up to 921600 bps
+#define UART0_MAX_BAUD_RATE_FACTOR 4
 
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
+#define MIN_DELTA_T_ROW  1500 //us
 
-#define UART0_BAUD_RATE 57600
+#define VZERO   10
 
-
-#define SCAN_FREQUENCY    21//Hz (max 30Hz, min 16Hz)
-
-
-#define VZERO   10 //don't change!
+#define NUMBER_OF_STATUS_BITS 47*10 //adjust to actual number of transmitted status bytes per frame
 
 #define ABS_MODE 1
 #define REL_MODE 2
 
-#define ERROR_T_LEVEL1 1
-#define ERROR_T_LEVEL2 2
-#define ERROR_CPLD     4
-#define ERROR_IIC      8
-#define ERROR_TBUFFER  16
 
+#define ERROR_T_LEVEL1    _BV(0)
+#define ERROR_T_LEVEL2    _BV(1)
+#define ERROR_CPLD        _BV(2)
+#define ERROR_IIC         _BV(3)
+#define ERROR_TBUFFER     _BV(4)
+#define ERROR_PARAMETERS  _BV(5)
+
+
+//DIP Switch Functions
+#define DIP_AUTO_SWITCH_TO_REL_MODE   0
+#define DIP_ETHERNET_PORT             6 //if on USB-UART operates at low speed (9600bps)
+#define DIP_EEPROM_LOCK               7
+
+
+//EEPROM Map
+#define EEPROM_LOC_FORMAT_ENTRY        0x00 //2 bytes
+
+#define EEPROM_LOC_VOLTAGE_TRANSMITTER 0x02
+#define EEPROM_LOC_MATRIX_WIDTH        0x03
+#define EEPROM_LOC_MATRIX_HEIGTH       0x04
+#define EEPROM_LOC_SCAN_FREQUENCY      0x05
+#define EEPROM_LOC_BAUD_RATE           0x06
+#define EEPROM_LOC_ID                  0x07
+
+#define EEPROM_FORMAT_KEY 0x1234
 
 uint8_t g_matrixWidth;
 uint8_t g_matrixHeigth;
+uint8_t g_scanFrequency;
 uint8_t g_ID;
 uint8_t g_mode;
 uint8_t g_status;
 uint8_t g_errorState;
 uint8_t g_mainTimer;
+uint8_t g_DIPSwitch;
+uint8_t g_UARTBytesReceived, g_arg1, g_arg2;
+uint8_t g_BaudRateFactor;
+uint8_t g_UART_mode;
+#define LS 0
+#define HS 1
+
 
 #define LENGTH_STATUS_MSG 2+9*5
 
 
 //=== Pin Configuration =====================================================
-#ifndef OLDBOARD
 //CPLD
 #define    PORT_CLK_EN    PORTA
 #define    DDR_CLK_EN     DDRA
@@ -131,61 +165,6 @@ uint8_t g_mainTimer;
 #define    SNC_IN        PE6
 
 
-#else
-//CPLD
-#define    PORT_CLK_EN    PORTC
-#define    DDR_CLK_EN     DDRC
-#define    CLK_EN         PC0
-
-#define    PORT_SS2       PORTB
-#define    DDR_SS2        DDRB
-#define    SS2            PB6
-
-#define    PORT_SS3       PORTA
-#define    DDR_SS3        DDRA
-#define    SS3            PA0
-
-#define    PORT_SM_EN     PORTA
-#define    DDR_SM_EN      DDRA
-#define    SM_EN          PA1
-
-#define    PORT_SM_EN_FB  PORTA
-#define    DDR_SM_EN_FB   DDRA
-#define    PIN_SM_EN_FB   PINA
-#define    SM_EN_FB       PA2
-
-//LEDs
-#define    PORT_LED       PORTG
-#define    DDR_LED        DDRG
-#define    LED_R          PG4
-#define    LED_G          PG3
-
-//AUX
-#define    PORT_AUX0      PORTC
-#define    DDR_AUX0       DDRC
-#define    AUX0           PC7
-
-#define    PORT_AUX1      PORTC
-#define    DDR_AUX1       DDRC
-#define    AUX1           PC6
-
-//PC1 is CLK of line shift register
-//PC2 is Data of line shift register
-#define    PORT_TR_DATA   PORTC
-#define    DDR_TR_DATA    DDRC
-#define    TR_DATA        PC2
-#define    PORT_TR_CLK    PORTC
-#define    DDR_TR_CLK     DDRC
-#define    TR_CLK         PC1
-
-//12V Generator
-#define    PORT_HVSHDN    PORTF
-#define    DDR_HVSHDN     DDRF
-#define    HVSHDN         PF2
-
-#endif
-
-
 //=== Macros ================================================================
 #define UART_BAUD_CALC( theBaudRate, theClock) \
     ( (theClock) / ((theBaudRate) * 16l) - 1)
@@ -237,6 +216,7 @@ void    triggerRowReadout(void);
 void    SPIdummyRead(void);
 void    performReceiverCalibration(void);
 void    configSpecialScanMode(uint8_t);
+uint8_t setScanParameter(uint8_t, uint8_t, uint8_t);
 int8_t  setDACValue(uint8_t);
 void    pause1us(void);
 void    EEPROM_write(uint16_t uiAddress, uint8_t ucData);

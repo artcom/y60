@@ -31,8 +31,8 @@ uint8_t  g_rowTransmissionBuffer[TBUFFER_SIZE];
 
 uint8_t  g_SPICounter, g_currentRow, g_rowReceptionComplete=0;
 
-uint16_t g_scanTime = 1000000/SCAN_FREQUENCY; //(1000000us)
-uint16_t g_deltaT   = (1000000/SCAN_FREQUENCY/(DEFAULT_MATRIX_HEIGTH+1))+1; //(1000000us)
+uint16_t g_scanPeriod;
+uint16_t g_deltaTRow;
 uint16_t g_FrameNumber;
 
 uint8_t  g_mainTimer2=0, g_readState=0;
@@ -41,22 +41,34 @@ uint8_t  g_SystemCalibrated=0, g_TaraRequest=0;
 
 uint8_t  g_ConfigMode=0, g_NextCommand=0;
 
-uint8_t  g_DIPSwitch;
+uint8_t  g_maxMinLevelRequest=0, g_XYLevelRequest=0, g_maxLevel, g_minLevel, g_XYLevel;
+
 
 uint16_t ADCValue_C0, ADCValue_C1;
 
 
 FILE    g_uart0_str = FDEV_SETUP_STREAM(uart0_putchar, uart0_getchar, _FDEV_SETUP_RW);
 
-const char configWelcomeMsg[] PROGMEM = "\nCommands:\nC01: Auto-calibrate transmission level \
-\nC02: Tara and switch to relative mode \
-\nC03: Print current error state \
-\nC98: Just replies 'ok' \
-\nC99: Resume normal operation\n@";//must be terminated with '@'!
+const char configWelcomeMsg[] PROGMEM = "\nCommands:\
+\nC01      Auto-calibrate transmission level\
+\nC02      Tara and switch to relative mode\
+\nC03      Print current error state\
+\nC04      Clear error state\
+\nC05      Print ID\
+\nC06      Print (HS)Baud rate\
+\nC11      Display max/min values\
+\nC12 x,y  Display value of x/y-position\
+\nC21 w    Set width\
+\nC22 h    Set heigth\
+\nC23 f    Set scan frequency\
+\nC24 b    Set Baud rate factor (0-4)\
+\nC98      Just replies 'ok'\
+\nC99      Resume normal operation\n\
+@";//must be terminated with '@'!
 
 
 void init(void) {
-uint8_t i;
+uint8_t i, i2;
     //init LEDs
 	DDR_LED |= _BV(LED_R);
 	PORT_LED &= ~_BV(LED_R);
@@ -99,13 +111,6 @@ uint8_t i;
 	DDR_TR_DATA  |= _BV(TR_DATA);  //Data
 
 
-    //===  init UART ==================
-	uart0_init();
-	stdout = &g_uart0_str;
-    PORT_CTS |= _BV(CTS); //toggle CTS to force FTDI chip to flush buffer
-    DDR_CTS |= _BV(CTS);
-
-
     //user timer1 for main system time
     TCCR1B = _BV(WGM12) | 1; //mode4: CTC, no prescaling
 	OCR1A = (F_CPU/10000)-1; //approx. 10000Hz
@@ -119,7 +124,7 @@ uint8_t i;
 
 
     //init TWI
-    TWBR = 12; //f = 369KHz
+    TWBR = 12; //f = 369KHz approx.
     TWCR = _BV(TWEN);
 
 
@@ -128,17 +133,47 @@ uint8_t i;
     ADCSRA = _BV(ADEN) | 7;              //prescaler = 128
 
 
-    //wait a couple of us to allow CPLD to start up
-    for(i=0; i<20; i++){
-        PAUSE_1_US()
+    //===  init UART ==================
+	//uart0_init(); //do that call later when main timer interrupt is running as this functions needs access to DIP switches
+	stdout = &g_uart0_str;
+    PORT_CTS |= _BV(CTS); //toggle CTS to force FTDI chip to flush buffer
+    DDR_CTS |= _BV(CTS);
+
+
+    //wait approx 4 ms to allow CPLD to start up
+    for(i=0; i<15; i++){
+        for(i2=0; i2<255; i2++){
+            PAUSE_1_US()
+        }
     }
 
+    //check if EEPROM contains stored values; if not write default values
+    if(EEPROM_read(EEPROM_LOC_FORMAT_ENTRY) != (EEPROM_FORMAT_KEY&0xFF)  ||  EEPROM_read(EEPROM_LOC_FORMAT_ENTRY+1) != (EEPROM_FORMAT_KEY>>8)){
+        EEPROM_write(EEPROM_LOC_FORMAT_ENTRY, (EEPROM_FORMAT_KEY&0xFF));
+        EEPROM_write(EEPROM_LOC_FORMAT_ENTRY+1, (EEPROM_FORMAT_KEY>>8));
 
-    g_ID = ID;
-    g_matrixWidth = DEFAULT_MATRIX_WIDTH;
-    g_matrixHeigth = DEFAULT_MATRIX_HEIGTH;
-    g_mode = ABS_MODE;
+        EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, DEFAULT_VOLTAGE_TRANSMITTER);
+        EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, DEFAULT_MATRIX_WIDTH);
+        EEPROM_write(EEPROM_LOC_MATRIX_HEIGTH, DEFAULT_MATRIX_HEIGTH);
+        EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, DEFAULT_SCAN_FREQUENCY);
+        EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
+        EEPROM_write(EEPROM_LOC_ID, DEFAULT_ID);
+    }
+
+    setScanParameter(EEPROM_read(EEPROM_LOC_MATRIX_WIDTH), \
+                     EEPROM_read(EEPROM_LOC_MATRIX_HEIGTH), \
+                     EEPROM_read(EEPROM_LOC_SCAN_FREQUENCY));
+    //ADD: Check for errors...
+
+    g_BaudRateFactor = EEPROM_read(EEPROM_LOC_BAUD_RATE);
+    if( g_BaudRateFactor > UART0_MAX_BAUD_RATE_FACTOR){
+        EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
+        g_BaudRateFactor = DEFAULT_BAUD_RATE;
+    }
+
+    g_ID = EEPROM_read(EEPROM_LOC_ID);
     g_errorState = 0;
+    g_mode = ABS_MODE;
 
 	//turn off all transmitters by shifting 0 to all transmitters
 	for(i=0; i<=MAX_MATRIX_HEIGTH; i++){
@@ -149,9 +184,58 @@ uint8_t i;
     configScanOscillator();
     //ADD: handle CPLD error
 
+
     //=== fire ======================
     sei();
 }
+
+
+uint8_t setScanParameter(uint8_t w, uint8_t h, uint8_t f){
+uint16_t my_scanPeriod, my_deltaTRow;
+uint32_t bw;
+
+    if(w < 1  ||  w > MAX_MATRIX_WIDTH){
+        g_errorState |= ERROR_PARAMETERS;
+        return 1;
+    }
+
+    if(h < 1  ||  h > MAX_MATRIX_HEIGTH){
+        g_errorState |= ERROR_PARAMETERS;
+        return 1;
+    }
+
+    if(f < MIN_SCAN_FREQUENCY  ||  f > MAX_SCAN_FREQUENCY){
+        g_errorState |= ERROR_PARAMETERS;
+        return 1;
+    }
+
+    //check if sample time per row is sufficient
+    my_scanPeriod = 1000000/f; //(1000000us)
+    my_deltaTRow  = (1000000/f/(h+1))+1; //(1000000us)
+    if(my_deltaTRow < MIN_DELTA_T_ROW){
+        g_errorState |= ERROR_PARAMETERS;
+        return 1;
+    }
+
+    //check required bandwidth
+    bw = (uint32_t)w*h*f*10 + NUMBER_OF_STATUS_BITS;
+    bw += bw/10; //10% increase to have some buffer
+    if(bw > (uint32_t)UART0_BAUD_RATE_HS*(1<<g_BaudRateFactor)){
+        g_errorState |= ERROR_PARAMETERS;
+        return 1;
+    }
+
+    //set new values
+    g_scanPeriod = my_scanPeriod;
+    g_deltaTRow = my_deltaTRow;
+    g_matrixWidth = w;
+    g_matrixHeigth = h;
+    g_mode = ABS_MODE;
+
+    g_errorState &= ~ERROR_PARAMETERS;
+    return 0;
+}
+
 
 
 //=== interrupt routines ==============
@@ -171,15 +255,15 @@ uint8_t v0, v1;
 	//read state = 2: take measurement and transfer values
 	if(g_readState == 0){
 		scanCounter = 0;
-		targetTime = g_deltaT;
+		targetTime = g_deltaTRow;
 		g_readState = 1;
 	}else{
 		if(scanCounter >= targetTime){
-			if(scanCounter >= g_scanTime){
+			if(scanCounter >= g_scanPeriod){
 				scanCounter = 0;
-				targetTime = g_deltaT;
+				targetTime = g_deltaTRow;
 			}else{
-				targetTime += g_deltaT;
+				targetTime += g_deltaTRow;
 			}
 			g_readState = 1;
 		}
@@ -200,16 +284,16 @@ uint8_t v0, v1;
         if((ADCSRA&_BV(ADSC)) == 0){
             switch(ADCcounter){
                 case 0:
-                    //channel 0: 12V*0,32
+                    //channel 0:
                     v0 = ADCL;
                     v1 = ADCH;
-                    ADCValue_C0 = (v1<<8)|v0;
+                    ADCValue_C0 = (v1<<8)|v0; //Vtransmitter (82,82/V)
                     break;
                 case 2:
                     //channnel 1:
                     v0 = ADCL;
                     v1 = ADCH;
-                    ADCValue_C1 = (v1<<8)|v0;
+                    ADCValue_C1 = (v1<<8)|v0;//VCC (163,48/V)
                     break;
                 default:
                     ;
@@ -457,13 +541,16 @@ uint8_t  v1, i, F1;
 uint16_t autoCalTimer;
 uint16_t checksum;
 uint8_t  tVoltage;
-uint8_t  maxLevelRequest=0, maxLevel;
 #ifdef TEST_MODE
 uint8_t  testBuffer[10];
 #endif
 
 
     init();
+    //wait until timer interrupt has been called
+    g_mainTimer = 0;
+    while(g_mainTimer < 2);
+    uart0_init();
 
 
 #ifdef TEST_MODE
@@ -475,9 +562,9 @@ uint8_t  testBuffer[10];
     DDR_HVSHDN |= _BV(HVSHDN);
     PORT_HVSHDN &= ~_BV(HVSHDN);
     //set DAC value
-    //e = setDACValue(106); //5V*21,2*1(V)
-    v1 = EEPROM_read(0x00);
-    if(v1 == 0xFF){
+    //e = setDACValue(106); //5V*21,2(*1/V)
+    v1 = EEPROM_read(EEPROM_LOC_VOLTAGE_TRANSMITTER);
+    if(v1 == 0xFF){//EEPROM obviously not formatted
         v1 = 106;
     }
     setDACValue(v1);
@@ -490,9 +577,8 @@ uint8_t  testBuffer[10];
         //  [...]
     }
 
-
 	//initialize scanning
-	autoCalTimer = 2*1000; //2sec; automated calibration 2 seconds after power up
+	autoCalTimer = 4*1000; //4sec; automated calibration 4 seconds after power up
 	g_mainTimer = 0;
 
 	g_currentRow = 0; //start scan with row 0
@@ -500,7 +586,7 @@ uint8_t  testBuffer[10];
 
     configSpecialScanMode(g_matrixHeigth);
 
-    F1 = 50/g_matrixHeigth;//exact weight might vary to g_matrixHeigth (for now it's g_matrixHeigth/50)
+    F1 = 50/g_matrixHeigth;//exact weight might vary to g_matrixHeigth (for now it's 50/g_matrixHeigth)
 
     PORT_CLK_EN |= _BV(CLK_EN); //CLK_EN ->high to enable outputs
 
@@ -526,16 +612,29 @@ uint8_t  testBuffer[10];
 		if(g_rowReceptionComplete){
 			g_rowReceptionComplete = 0;
 
-            if(maxLevelRequest == 2){
+            if(g_maxMinLevelRequest == 2){
                 if(g_currentRow < g_matrixHeigth){
     	    	    for(ix=0; ix<g_matrixWidth; ix++){
                         v1 = g_rowBuffer[ix];
-                        if(v1 > maxLevel){
-                            maxLevel = v1;
+                        if(v1 > g_maxLevel){
+                            g_maxLevel = v1;
+                        }
+                        if(v1 < g_minLevel){
+                            g_minLevel = v1;
                         }
                     }
-                }else{
-                    maxLevelRequest = 0;
+                }else{//don't include last row (average scan)
+                    g_maxMinLevelRequest = 0;
+                }
+            }
+
+            if(g_XYLevelRequest == 1){
+                if(g_currentRow < g_matrixHeigth){
+                    if(g_currentRow == g_arg2){
+                        g_XYLevel = g_rowBuffer[g_arg1];
+                    }
+                }else{//don't include last row (average scan)
+                    g_XYLevelRequest = 0;
                 }
             }
 
@@ -573,6 +672,7 @@ uint8_t  testBuffer[10];
 	        	//print current ADC value
     	    	if(g_currentRow == 0){
 		        	fprintf(stdout, "\n");
+                    //fprintf(stdout, "%4.u ", ADCValue_C0);
     	    	}
         		if(g_currentRow < 10){
                     //copy values
@@ -596,63 +696,67 @@ uint8_t  testBuffer[10];
 #endif
 #ifndef TEST_MODE
     		   	//line is ready to send to host
-                if(g_currentRow < g_matrixHeigth){//don't send average sample
-                    //copy bytes to TX buffer
-                    sendByte(255);
-                    sendByte(g_currentRow+1);
-                    for(ix=0; ix<g_matrixWidth; ix++){
-                        //limit byte value to range 0-254
-                        v1 = g_rowBuffer[ix];
-                        if(v1 > 254){
-                            v1 = 254;
+                //send via UART only if UART high speed mode is enabled
+                if(g_UART_mode == HS){
+                    if(g_currentRow < g_matrixHeigth){//don't send average sample
+                        //copy bytes to TX buffer
+                        sendByte(255);
+                        sendByte(g_currentRow+1);
+                        for(ix=0; ix<g_matrixWidth; ix++){
+                            //limit byte value to range 0-254
+                            v1 = g_rowBuffer[ix];
+                            if(v1 > 254){
+                                v1 = 254;
+                            }
+                            sendByte(v1);
+                            checksum += v1;
                         }
-                        sendByte(v1);
-                        checksum += v1;
-                    }
-                }else{//send info bytes
-                    g_FrameNumber++;//increment frame number
+                    }else{//send info bytes
+                        g_FrameNumber++;//increment frame number
 #ifdef SEND_STATUS_BYTES
-                    //send header bytes
-                    sendByte(255);
-                    sendByte(0);
-                    //send version
-                    sendByte('V');
-                    sendInt(VERSION);
-                    sendInt(SUBVERSION);
-                    //send status
-                    sendByte('S');
-                    sendInt(0);
-                    sendInt(g_status);
-                    //send ID
-                    sendByte('I');
-                    sendInt(0);
-                    sendInt(g_ID);
-                    //send mode
-                    sendByte('M');
-                    sendInt(0);
-                    sendInt(g_mode);
-                    //send scan frequency
-                    sendByte('F');
-                    sendInt(0);
-                    sendInt(SCAN_FREQUENCY);
-                    //send width
-                    sendByte('W');
-                    sendInt(0);
-                    sendInt(g_matrixWidth);
-                    //send heigth
-                    sendByte('H');
-                    sendInt(0);
-                    sendInt(g_matrixHeigth);
-                    //send frame number
-                    sendByte('N');
-                    sendInt(g_FrameNumber>>8);
-                    sendInt(g_FrameNumber&255);
-                    //send check sum
-                    sendByte('C');
-                    sendInt(checksum>>8);
-                    sendInt(checksum&255);
-                    checksum = 0;
+                        //send header bytes
+                        sendByte(255);
+                        sendByte(0);
+                        //send version
+                        sendByte('V');
+                        sendInt(VERSION);
+                        sendInt(SUBVERSION);
+                        //send status
+                        sendByte('S');
+                        sendInt(0);
+                        sendInt(g_status);
+                        //send ID
+                        sendByte('I');
+                        sendInt(0);
+                        sendInt(g_ID);
+                        //send mode
+                        sendByte('M');
+                        sendInt(0);
+                        sendInt(g_mode);
+                        //send scan frequency
+                        sendByte('F');
+                        sendInt(0);
+                        sendInt(g_scanFrequency);
+                        //send width
+                        sendByte('W');
+                        sendInt(0);
+                        sendInt(g_matrixWidth);
+                        //send heigth
+                        sendByte('H');
+                        sendInt(0);
+                        sendInt(g_matrixHeigth);
+                        //send frame number
+                        sendByte('N');
+                        sendInt(g_FrameNumber>>8);
+                        sendInt(g_FrameNumber&255);
+                        //send check sum
+                        sendByte('C');
+                        sendInt(checksum>>8);
+                        sendInt(checksum&255);
+                        checksum = 0;
+                        //make sure that correct number of bytes is in header file (NUMBER_OF_STATUS_BITS)
 #endif
+                    }
                 }
 #endif
             }
@@ -661,9 +765,10 @@ uint8_t  testBuffer[10];
         	if(g_currentRow >= (g_matrixHeigth+1)){
     	    	g_currentRow = 0;
 
-                if(maxLevelRequest == 1){
-                    maxLevelRequest = 2;
-                    maxLevel = 0;
+                if(g_maxMinLevelRequest == 1){
+                    g_maxMinLevelRequest = 2;
+                    g_maxLevel = 0;
+                    g_minLevel = 255;
                 }
             }
 
@@ -700,19 +805,19 @@ uint8_t  testBuffer[10];
             tVoltage = 255;
             setDACValue(tVoltage);
             //get maximum levels
-            maxLevelRequest = 1;
+            g_maxMinLevelRequest = 1;
             g_TaraRequest = 3; //switch to next state
         }else if(g_TaraRequest == 3){
-            if(maxLevelRequest == 0){
+            if(g_maxMinLevelRequest == 0){
                 //check if level is below 250
-                if(maxLevel < 250){
-                    if(maxLevel > 200){
+                if(g_maxLevel < 250){
+                    if(g_maxLevel > 200){
                         //-->voltage found
                         //store value in EEPROM
-                        EEPROM_write(0x0000, tVoltage);
+                        EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, tVoltage);
                         g_errorState &= ~(ERROR_T_LEVEL2 | ERROR_T_LEVEL1);
                         g_TaraRequest = 4; //switch to next state
-                    }else{ //if maxLevel is close to 0: search failed!
+                    }else{ //if g_maxLevel is close to 0: search failed!
                         g_errorState |= ERROR_T_LEVEL1;
                         g_TaraRequest = 4; //switch to next state
                     }
@@ -722,7 +827,7 @@ uint8_t  testBuffer[10];
                         tVoltage -= 5;
                         setDACValue(tVoltage);
                         //get maximum levels
-                        maxLevelRequest = 1;
+                        g_maxMinLevelRequest = 1;
                     }else{
                         //failed!
                         g_errorState |= ERROR_T_LEVEL2;
@@ -738,17 +843,19 @@ uint8_t  testBuffer[10];
             g_TaraRequest = 0;
         }
 
-//        //trigger automatic calibration a few seconds after start-up
-//        while(g_mainTimer > 0){
-//            g_mainTimer--;
-//            if(autoCalTimer > 0){
-//                autoCalTimer--;
-//                if(autoCalTimer == 1){
-//                    g_TaraRequest = 1;
-//                    autoCalTimer = 0;
-//                }
-//            }
-//        }
+        //trigger automatic calibration a few seconds after start-up
+        while(g_mainTimer > 0){
+            g_mainTimer--;
+            if(autoCalTimer > 0){
+                autoCalTimer--;
+                if(autoCalTimer == 1){
+                    if((g_DIPSwitch&_BV(DIP_AUTO_SWITCH_TO_REL_MODE)) != 0){
+                        g_TaraRequest = 1;
+                    }
+                    autoCalTimer = 0;
+                }
+            }
+        }
 	}
 
     return 0;
@@ -765,21 +872,39 @@ uint8_t i, j, c;
 #define LF 10
 
 #define recBufferSize 10
-static uint8_t recBuffer[recBufferSize], recBufferFilled=0;
+static uint8_t recBuffer[recBufferSize];
 
 //das muss noch in den Programm-Speicher!!
 #define C01  1
 #define C02  2
 #define C03  3
-#define C98  4
-#define C99  5
-#define NrOfCMDs 5
+#define C04  4
+#define C05  5
+#define C06  6
+#define C11  7
+#define C12  8
+#define C21  9
+#define C22  10
+#define C23  11
+#define C24  12
+#define C98  13
+#define C99  14
+#define NrOfCMDs 14
 #define CMDLength 3 //for now, all commands have to be 3 characters long!
 
 uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                              {"C01"},      \
                              {"C02"},      \
                              {"C03"},      \
+                             {"C04"},      \
+                             {"C05"},      \
+                             {"C06"},      \
+                             {"C11"},      \
+                             {"C12"},      \
+                             {"C21"},      \
+                             {"C22"},      \
+                             {"C23"},      \
+                             {"C24"},      \
                              {"C98"},      \
                              {"C99"}};
 
@@ -788,7 +913,7 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
     if((c&_BV(FE0)) != 0){
         //framing error occured; ignore byte
         //clear receive buffer
-        recBufferFilled=0;
+        g_UARTBytesReceived=0;
         //dummy read to clear RXC0
         c = UDR0;
         return;
@@ -802,18 +927,23 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
         return;
     }
 
+    //ignore space
+    if(c == ' '){
+        return;
+    }
+
     if(c != CR){
         //convert all to capital characters
         if(c>'a' && c<'z'){
             c -= 'a'-'A';
         }
         //add to receive buffer if in valid range, and there is no buffer overrun
-        if(c>0x20 && c<=90 && recBufferFilled<recBufferSize){
-            recBuffer[recBufferFilled] = c;
-            recBufferFilled++;
+        if(c >= 32  &&  c <= 90  &&  g_UARTBytesReceived < recBufferSize){
+            recBuffer[g_UARTBytesReceived] = c;
+            g_UARTBytesReceived++;
         }else{
             //clear receive buffer
-            recBufferFilled=0;
+            g_UARTBytesReceived=0;
         }
         return;
     }
@@ -821,15 +951,15 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
     //CR received; parse received bytes
     if(g_ConfigMode == 0){
         //wait for start command ('x')
-        if(recBufferFilled >= 1){
-            //check if previous byte was an 'x'
-            if(recBuffer[recBufferFilled-1] == 'X'){
+        if(g_UARTBytesReceived == 1){
+            //check received byte is an 'x'
+            if(recBuffer[0] == 'X'){
                 //change to config mode
                 g_ConfigMode = 1;
             }
         }
     }else{
-        if(recBufferFilled == CMDLength){
+        if(g_UARTBytesReceived >= CMDLength){
             //check if buffer matches one command of command list
             for(j=0; j<NrOfCMDs; j++){
                 for(i=0; i<CMDLength; i++){
@@ -842,15 +972,105 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                 }
             }
             if(j<NrOfCMDs){
-                if(g_NextCommand == 0){//there is nothing pending; ADD err msg. here later
-                    g_NextCommand = j+1;
+                j++; //adjust offset 1
+                if(g_NextCommand == 0){//begin executing new command
+
+                    //check if command has arguments
+                    if(j == C12){//C12 has two arguments (x,y position)
+                        //first get x position
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                        //then get y position
+                        g_arg2 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg2 = g_arg2*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    if(j == C21){//C21 has one argument (width/number of columns)
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    if(j == C22){//C22 has one argument (heigth/number of rows)
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    if(j == C23){//C23 has one argument (scan frequency)
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    if(j == C24){//C24 has one argument (baud rate factor)
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    g_NextCommand = j;
+
+                }else{
+                    //previous command is still pending, so ignore new command
+                    //ADD err msg. here later
                 }
             }
         }
     }
 
     //clear receive buffer
-    recBufferFilled=0;
+    g_UARTBytesReceived=0;
 }
 
 
@@ -876,7 +1096,6 @@ static uint16_t pointer1=0;
                 pointer1 = 0;
             }else{
                 uart0_putchar(e, stdout);
-                //g_H++;
             }
         }else if(g_ConfigMode == 2){//wait for command
             switch(g_NextCommand){
@@ -889,15 +1108,112 @@ static uint16_t pointer1=0;
                     g_ConfigMode = 5;//wait until calibration done
                     break;
                 case C03: //print current error state
-                    fprintf(stdout, "Err%02X\n", g_errorState);
+                    fprintf(stdout, "\nErr%02X\n", g_errorState);
+                    g_NextCommand = 0;
+                    break;
+                case C04: //clear error state
+                    g_errorState = 0;
+                    fprintf(stdout, "\nOK\n");
+                    g_NextCommand = 0;
+                    break;
+                case C05: //print current ID
+                    fprintf(stdout, "\n%u\n", g_ID);
+                    g_NextCommand = 0;
+                    break;
+                case C06: //print current (HS)Baud rate
+                    fprintf(stdout, "\n%u (", g_BaudRateFactor);
+                    switch(g_BaudRateFactor){
+                        case 0: fprintf(stdout, "57600bps)\n"); break;
+                        case 1: fprintf(stdout, "115200bps)\n"); break;
+                        case 2: fprintf(stdout, "230400bps)\n"); break;
+                        case 3: fprintf(stdout, "460800bps)\n"); break;
+                        case 4: fprintf(stdout, "921600bps)\n"); break;
+                    }
+                    g_NextCommand = 0;
+                    break;
+                case C11: //print max/min values
+                    g_maxMinLevelRequest = 1;
+                    g_ConfigMode = 6;
+                    break;
+                case C12: //print x/y values
+                    g_XYLevelRequest = 1;
+                    g_ConfigMode = 7;
+                    break;
+                case C21: //set width/number of columns
+                    //first check if locked (switch 8 on)
+                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                        fprintf(stdout, "\nDevice is locked!\n");
+                    }else{
+                        if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_WIDTH){
+                            fprintf(stdout, "\nOut of range\n");
+                        }else{
+                            if(setScanParameter(g_arg1, g_matrixHeigth, g_scanFrequency) == 0){
+                                EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, g_arg1);
+                                fprintf(stdout, "\nOK\n");
+                            }else{
+                                fprintf(stdout, "\nOut of range\n");
+                            }
+                        }
+                    }
+                    g_NextCommand = 0;
+                    break;
+                case C22: //set heigth/number of rows
+                    //first check if locked (switch 8 on)
+                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                        fprintf(stdout, "\nDevice is locked!\n");
+                    }else{
+                        if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_HEIGTH){
+                            fprintf(stdout, "\nOut of range\n");
+                        }else{
+                            if(setScanParameter(g_matrixWidth, g_arg1, g_scanFrequency) == 0){
+                                EEPROM_write(EEPROM_LOC_MATRIX_HEIGTH, g_arg1);
+                                fprintf(stdout, "\nOK\n");
+                            }else{
+                                fprintf(stdout, "\nOut of range\n");
+                            }
+                        }
+                    }
+                    g_NextCommand = 0;
+                    break;
+                case C23: //set scan frequency
+                    //first check if locked (switch 8 on)
+                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                        fprintf(stdout, "\nDevice is locked!\n");
+                    }else{
+                        if(g_arg1 < MIN_SCAN_FREQUENCY  ||  g_arg1 > MAX_SCAN_FREQUENCY){
+                            fprintf(stdout, "\nOut of range\n");
+                        }else{
+                            if(setScanParameter(g_matrixWidth, g_matrixHeigth, g_arg1) == 0){
+                                EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, g_arg1);
+                                fprintf(stdout, "\nOK\n");
+                            }else{
+                                fprintf(stdout, "\nOut of range\n");
+                            }
+                        }
+                    }
+                    g_NextCommand = 0;
+                    break;
+                case C24: //set baud rate factor
+                    //first check if locked (switch 8 on)
+                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                        fprintf(stdout, "\nDevice is locked!\n");
+                    }else{
+                        if(g_arg1 > UART0_MAX_BAUD_RATE_FACTOR){
+                            fprintf(stdout, "\nOut of range\n");
+                        }else{
+                            EEPROM_write(EEPROM_LOC_BAUD_RATE, g_arg1);
+                            fprintf(stdout, "\nWill be applied after restart.\n");
+                            fprintf(stdout, "OK\n");
+                        }
+                    }
                     g_NextCommand = 0;
                     break;
                 case C98: //reply with "OK"
-                    fprintf(stdout, "OK\n");
+                    fprintf(stdout, "\nOK\n");
                     g_NextCommand = 0;
                     break;
                 case C99: //exit config mode
-                    fprintf(stdout, "OK\n");
+                    fprintf(stdout, "\nOK\n");
                     g_NextCommand = 0;
                     g_ConfigMode = 0;// exit config mode
                     break;
@@ -907,10 +1223,30 @@ static uint16_t pointer1=0;
         }else if(g_ConfigMode == 5){//wait for calibration to be done
             if(g_TaraRequest == 0){
                 if((g_errorState&(ERROR_T_LEVEL2|ERROR_T_LEVEL1)) == 0){
-                    fprintf(stdout, "OK\n");
+                    fprintf(stdout, "\nOK\n");
                 }else{
-                    fprintf(stdout, "Err%02X\n", g_errorState);
+                    fprintf(stdout, "\nErr%02X\n", g_errorState);
                 }
+                g_NextCommand = 0;
+                g_ConfigMode = 2;// return to config mode
+            }
+        }else if(g_ConfigMode == 6){//print min/max values
+            if(g_maxMinLevelRequest == 0){
+                fprintf(stdout, "%3.u  %3.u\n", g_maxLevel, g_minLevel);
+                g_maxMinLevelRequest = 1;
+            }
+            //stop if next byte is received
+            if(g_UARTBytesReceived != 0){
+                g_NextCommand = 0;
+                g_ConfigMode = 2;// return to config mode
+            }
+        }else if(g_ConfigMode == 7){//print x/y value
+            if(g_XYLevelRequest == 0){
+                fprintf(stdout, "%3.u\n", g_XYLevel);
+                g_XYLevelRequest = 1;
+            }
+            //stop if next byte is received
+            if(g_UARTBytesReceived != 0){
                 g_NextCommand = 0;
                 g_ConfigMode = 2;// return to config mode
             }
