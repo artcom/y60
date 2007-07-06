@@ -25,14 +25,6 @@ namespace y60 {
 
 const bool DUMP_OUTPUT_REPORTS( false );
 
-const int MAX_BT_INQUIRY( 256 );
-const int WIIMOTE_NAME_LENGTH( 32 );
-const char * WIIMOTE_NAME("Nintendo RVL-CNT-01");
-
-const uint8_t WIIMOTE_CLASS_0( 0x04 );
-const uint8_t WIIMOTE_CLASS_1( 0x25 );
-const uint8_t WIIMOTE_CLASS_2( 0x00 );
-
 const int BT_TRANS_DATA( 0xA0 );
 const int BT_PARAM_INPUT( 0x01 );
 
@@ -40,16 +32,16 @@ const int CTL_PSM(17);
 const int INT_PSM(19);
 
 
-Liimote::Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName) :
-    WiiRemote( inputReportListener, theId ),
-    _myName( theName ),
+Liimote::Liimote(bdaddr_t * theBTAddress ) :
+    WiiRemote( inputReportListener ),
     _myCtlSocket( -1 ),
     _myIntSocket( -1 )
 {
-    bacpy( & _myBDAddress, & theDeviceInfo.bdaddr );
-    for (int i = 0; i < 3; ++i) {
-        _myBTClass[i] = theDeviceInfo.dev_class[i];
-    }
+    bacpy( & _myBDAddress, theBTAddress );
+    char myAddressString[19];
+    ba2str( & _myBDAddress, myAddressString);
+
+    setId( myAddressString);
 
 	sockaddr_l2 myCtrlRemoteAddr;
     sockaddr_l2 myIntRemoteAddr;
@@ -88,17 +80,11 @@ Liimote::Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char 
 
     _isConnected = true;
 
+    startThread();
 }
 
 Liimote::~Liimote() {
     stopThread();
-}
-
-std::string 
-Liimote::getDeviceName() const { 
-    char myAddressString[19];
-    ba2str( & _myBDAddress, myAddressString);
-    return string(myAddressString) + " " + _myName; 
 }
 
 void
@@ -198,6 +184,7 @@ Liimote::inputReportListener( PosixThread & theThread ) {
     }
 }
 
+#if 0
 std::vector<WiiRemotePtr> 
 Liimote::discover() {
     std::vector<WiiRemotePtr> myDevices;
@@ -270,5 +257,7 @@ Liimote::discover() {
     }
     return myDevices;
 }
+
+#endif
 
 } // end of namespace

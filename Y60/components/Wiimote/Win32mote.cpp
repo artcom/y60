@@ -36,6 +36,7 @@ Win32mote::Win32mote(unsigned theId) : //HIDDevice(),
                          WiiRemote(inputReportListener, theId),
                          _myEventObject(NULL)
 {
+    startThread();
 }
 
 Win32mote::~Win32mote() {

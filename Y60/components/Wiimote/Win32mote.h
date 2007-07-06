@@ -48,16 +48,12 @@ namespace y60 {
         Win32mote(unsigned theId);
         virtual ~Win32mote();
             
-        std::string getDeviceName() const { return _myDevicePath; }
-        void send(unsigned char theOutputReport[], unsigned theNumBytes);
-
         static std::vector<WiiRemotePtr> discover();
 
     protected:
+        void send(unsigned char theOutputReport[], unsigned theNumBytes);
         static void Win32mote::inputReportListener(PosixThread & theThread); 
         void closeDevice();
-
-        std::string     _myDevicePath;
 
         HIDP_CAPS       _myCapabilities;
         HANDLE          _myDeviceHandle;

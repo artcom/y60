@@ -20,21 +20,20 @@ namespace y60 {
 
 class Liimote : public WiiRemote {
     public:
-        Liimote(const inquiry_info & theDeviceInfo, unsigned theId, const char * theName);
+        Liimote(bdaddr_t * theBTAddress );
         virtual ~Liimote();
 
-        virtual std::string getDeviceName() const;
-        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes);
 
         static std::vector<WiiRemotePtr> discover();
 
     protected:
+        virtual void send(unsigned char theOutputReport[], unsigned theNumBytes);
         static void inputReportListener( asl::PosixThread & theThread );
         virtual void closeDevice();
 
         bdaddr_t _myBDAddress;
-        uint8_t  _myBTClass[3];
-        std::string _myName;
+        //uint8_t  _myBTClass[3];
+        //std::string _myName;
 
         int _myCtlSocket;
         int _myIntSocket;

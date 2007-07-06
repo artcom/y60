@@ -12,40 +12,32 @@
 
 #include <y60/JSScriptablePlugin.h>
 #include <y60/Documentation.h>
+#include <y60/GenericEvent.h>
 
 using namespace std;
 using namespace asl;
 using namespace jslib;
+
+extern std::string oureventxsd;
 
 namespace y60 {
 
 WiimoteDriver::WiimoteDriver(DLHandle theDLHandle) :
     PlugInBase(theDLHandle),
     y60::IEventSource(),
-    _myDefaultReportMode ( INFRARED )
+    _myDefaultReportMode ( INFRARED ),
+    _myEventSchema( new dom::Document( oureventxsd ) ),
+    _myValueFactory( new dom::ValueFactory())
 {
-#ifdef WIN32
-    _myWiimotes = Win32mote::discover();
-#elif defined( LINUX )
-    _myWiimotes = Liimote::discover();
-#elif defined( OSX )
-    // TODO
-#endif
-    AC_PRINT << "Found " << _myWiimotes.size() << " Wii controller"
-             << (_myWiimotes.size() != 1 ? "s." : "." );
-    for (unsigned i = 0; i < _myWiimotes.size(); ++i) {
-
-        // XXX set LEDs to controller id (binary) ;-)
-        _myWiimotes[i]->setLEDs(i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
-        _myWiimotes[i]->setReportMode( _myDefaultReportMode ); // XXX
-    }
-
+    registerStandardTypes( * _myValueFactory );
+    registerSomTypes( * _myValueFactory );
 }  
 
 WiimoteDriver::~WiimoteDriver() {
-    for (int i = 0; i < _myWiimotes.size(); ++i) {
-        _myWiimotes[i]->setLEDs(0,0,0,0);
-        _myWiimotes[i]->setRumble(false);
+    DeviceMap::iterator myIt = _myWiimotes.begin();
+    for (; myIt != _myWiimotes.end(); ++myIt) {
+        myIt->second->setLEDs(0,0,0,0);
+        myIt->second->setRumble(false);
     }
 }
 
@@ -53,34 +45,60 @@ y60::EventPtrList
 WiimoteDriver::poll() {
     y60::EventPtrList myEvents;
 
-    std::vector<unsigned> myLostWiiIds;
-    for (unsigned i = 0; i < _myWiimotes.size(); ++i) {
-        _myWiimotes[i]->pollEvents( myEvents, myLostWiiIds );
+    std::vector<string> myLostWiiIds;
+    DeviceMap::iterator myIt = _myWiimotes.begin();
+    for (; myIt != _myWiimotes.end(); ++myIt) {
+        myIt->second->pollEvents( myEvents, myLostWiiIds );
     }
     for (unsigned i = 0; i < myLostWiiIds.size(); ++i) {
-        AC_PRINT << "Lost connection: " << _myWiimotes[ myLostWiiIds[i] ]->getDeviceName(); 
-        _myWiimotes.erase( _myWiimotes.begin() + myLostWiiIds[i] );
+        _myWiimotes.erase( myLostWiiIds[i] );
+    }
+
+    std::vector<WiiRemotePtr> myNewWiis;
+    _myScanner.poll( myNewWiis, myLostWiiIds );
+
+    for (unsigned i = 0; i < myNewWiis.size(); ++i) {
+        myNewWiis[i]->setLEDs(i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
+        myNewWiis[i]->setReportMode( _myDefaultReportMode ); // XXX
+
+        _myWiimotes.insert( std::make_pair( myNewWiis[i]->getControllerID(), myNewWiis[i] ) );
+        AC_PRINT << "WiimoteDriver::poll() new Wii " << myNewWiis[i]->getControllerID(); 
+
+        y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
+                    _myValueFactory));
+        dom::NodePtr myNode = myEvent->getNode();
+        myNode->appendAttribute<string>("id", myNewWiis[i]->getControllerID());
+        myNode->appendAttribute<string>("type", "found_wii");
+        myEvents.push_back( myEvent );
     }
     
-    // TODO: poll scanner
-
     return myEvents;
 }
 
-void
-WiimoteDriver::setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4) {
-    _myWiimotes[ theIndex ]->setLEDs( led1, led2, led3, led4);
+
+WiiRemotePtr
+WiimoteDriver::getWiiById( const std::string & theId ) {
+    DeviceMap::iterator myIt = _myWiimotes.find( theId );
+    if (myIt == _myWiimotes.end()) {
+        throw WiiException(string("Unknown id '") + theId + "'", PLUS_FILE_LINE );
+    }
+    return myIt->second;
 }
 
 void
-WiimoteDriver::setLED(int theWiimoteIndex, int theLEDIndex, bool theState) {
-    _myWiimotes[ theWiimoteIndex ]->setLED( theLEDIndex, theState);
+WiimoteDriver::setLEDs(const string &theId, bool led1, bool led2, bool led3, bool led4) {
+    getWiiById(theId)->setLEDs( led1, led2, led3, led4);
+}
+
+void
+WiimoteDriver::setLED(const string & theId, int theLEDIndex, bool theState) {
+    getWiiById(theId)->setLED( theLEDIndex, theState);
 }
 
 
 void
-WiimoteDriver::setRumble(int theIndex, bool theFlag) {
-    _myWiimotes[theIndex]->setRumble( theFlag );
+WiimoteDriver::setRumble(const string & theId, bool theFlag) {
+    getWiiById( theId )->setRumble( theFlag );
 }
 
 unsigned
@@ -89,14 +107,15 @@ WiimoteDriver::getNumWiimotes() const {
 }
 
 void
-WiimoteDriver::requestStatusReport(unsigned theId) {
-    _myWiimotes[theId]->requestStatusReport();
+WiimoteDriver::requestStatusReport(const string & theId) {
+    getWiiById( theId )->requestStatusReport();
 }
 
 void
 WiimoteDriver::requestStatusReport() {
-    for (unsigned i = 0; i < _myWiimotes.size(); ++i) {
-        _myWiimotes[i]->requestStatusReport();
+    DeviceMap::iterator myIt( _myWiimotes.begin() );
+    for (; myIt != _myWiimotes.end(); ++myIt) {
+        myIt->second->requestStatusReport();
     }
 }
 
@@ -139,7 +158,7 @@ WiimoteDriver::SetRumble(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
    
     Ptr<WiimoteDriver> myNative = getNativeAs<WiimoteDriver>(cx, obj);
 
-    int myId;
+    string myId;
     convertFrom(cx, argv[0], myId );
 
     bool myFlag;
@@ -161,7 +180,7 @@ WiimoteDriver::RequestStatusReport(JSContext *cx, JSObject *obj, uintN argc, jsv
    
     Ptr<WiimoteDriver> myNative = getNativeAs<WiimoteDriver>(cx, obj);
 
-    int myId;
+    string myId;
     if (argc == 1) {
         convertFrom(cx, argv[0], myId );
     }
@@ -186,16 +205,16 @@ WiimoteDriver::SetLEDs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
    
     Ptr<WiimoteDriver> myNative = getNativeAs<WiimoteDriver>(cx, obj);
 
-    int myId;
+    string myId;
     convertFrom(cx, argv[0], myId );
 
-    int myLED0;
+    bool myLED0;
     convertFrom(cx, argv[1], myLED0 );
-    int myLED1;
+    bool myLED1;
     convertFrom(cx, argv[2], myLED1 );
-    int myLED2;
+    bool myLED2;
     convertFrom(cx, argv[3], myLED2 );
-    int myLED3;
+    bool myLED3;
     convertFrom(cx, argv[4], myLED3 );
 
     if (myNative) {
@@ -213,7 +232,7 @@ WiimoteDriver::SetLED(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
    
     Ptr<WiimoteDriver> myNative = getNativeAs<WiimoteDriver>(cx, obj);
 
-    int myId;
+    string myId;
     convertFrom(cx, argv[0], myId );
 
     int myLEDIndex;

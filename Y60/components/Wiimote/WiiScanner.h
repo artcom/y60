@@ -11,11 +11,14 @@
 #ifndef Y60_WII_SCANNER_INCLUDED
 #define Y60_WII_SCANNER_INCLUDED
 
+#include "WiiRemote.h"
+
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 
 #include <vector>
 #include <queue>
+#include <set>
 #include <string>
 
 namespace y60 {
@@ -25,13 +28,18 @@ class WiiScanner : public asl::PosixThread {
         WiiScanner();
         ~WiiScanner();
 
-        void poll(std::vector<std::string> & theNewWiimoteIds );
+        void poll(std::vector<y60::WiiRemotePtr> & theNewWiis,
+                  const std::vector<std::string> & theLostWiiIds );
     private:
+        void collectNewWiiControllers();
         static void scan(asl::PosixThread & theThread);
 
         asl::ThreadLock _myLock;
-        std::queue<std::string> _myQueue;
+        std::queue<WiiRemotePtr> _myNewWiiQueue;
+        std::queue<std::string> _myLostConnectionIdQueue;
+        std::set<std::string>   _myKnownWiiIds;
         bool _isScanning;
+        
 };
 
 }

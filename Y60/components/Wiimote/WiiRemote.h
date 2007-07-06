@@ -23,8 +23,6 @@
 
 #include <queue>
 
-extern std::string oureventxsd;
-
 namespace y60 {
 
 // Wii infos:
@@ -63,7 +61,7 @@ class WiiRemote :
         public asl::PosixThread
 {
     public:
-        WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId);
+        WiiRemote(PosixThread::WorkFunc theThreadFunction );
         virtual ~WiiRemote();
 
         asl::Vector3f getLastMotionData() const { return _myLastMotion; }
@@ -75,9 +73,7 @@ class WiiRemote :
         void setReportMode( WiiReportMode theReportMode );
         WiiReportMode getReportMode() const;
         
-        int getControllerID() const { return _myControllerId; }
-
-        virtual std::string getDeviceName() const = 0;
+        const std::string & getControllerID() const { return _myControllerId; }
 
         void setRumble( bool theFlag);
         bool isRumbling() const;
@@ -99,9 +95,10 @@ class WiiRemote :
         bool isConnected() const;
         void disconnect();
 
-        void pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> & theLostWiiIds );
+        void pollEvents( y60::EventPtrList & theEventList, std::vector<std::string> & theLostWiiIds );
 
     protected:
+        void setId( const char * theId);
         virtual void closeDevice() = 0;
         void startThread();
         void stopThread();
@@ -112,9 +109,9 @@ class WiiRemote :
         void handleMotionEvents( const unsigned char * theInputReport );
         void handleIREvents( const unsigned char * theInputReport );
 
-        void createEvent( int theID, const std::string & theButtonName, bool thePressedState);
-        void createEvent( int theID, asl::Vector3f & theMotionData);
-        void createEvent( int theID, const asl::Vector2i theIRData[4],
+        void createEvent( const std::string & theButtonName, bool thePressedState);
+        void createEvent( asl::Vector3f & theMotionData);
+        void createEvent( const asl::Vector2i theIRData[4],
                           const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle );
     
         void requestButtonData();
@@ -142,7 +139,7 @@ class WiiRemote :
         asl::Vector3f _myLowPassedOrientation;
         int _myOrientation;
 
-        int             _myControllerId;
+        std::string             _myControllerId;
 
         bool _myRumbleFlag;
         bool _myLEDState[4];

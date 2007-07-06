@@ -47,12 +47,12 @@ class WiimoteDriver :
         ~WiimoteDriver();
         virtual y60::EventPtrList poll();
 
-        void requestStatusReport(unsigned theId);
+        void requestStatusReport(const std::string & theId);
         void requestStatusReport();
 
-        void setLEDs(int theIndex, bool led1, bool led2, bool led3, bool led4);
-        void setLED(int theWiimoteIndex, int theLEDIndex, bool theState);
-        void setRumble(int theIndex, bool on);
+        void setLEDs(const std::string & theId, bool led1, bool led2, bool led3, bool led4);
+        void setLED(const std::string & theId, int theLEDIndex, bool theState);
+        void setRumble(const std::string & theId, bool on);
 
         unsigned getNumWiimotes() const;
 
@@ -72,10 +72,16 @@ class WiimoteDriver :
         const char * ClassName();
 
     private:
+        WiiRemotePtr getWiiById( const std::string & theId );
+
         WiiReportMode _myDefaultReportMode;
 
-        std::vector<WiiRemotePtr> _myWiimotes;
+        typedef std::map<std::string, WiiRemotePtr> DeviceMap;
+        DeviceMap _myWiimotes;
         y60::WiiScanner                _myScanner;
+
+        dom::NodePtr                    _myEventSchema;
+        asl::Ptr<dom::ValueFactory>     _myValueFactory;
 };
 
 typedef asl::Ptr<WiimoteDriver> WiimotePtr;

@@ -25,6 +25,7 @@ enum WiiEventType {
     WII_MOTION,
     WII_INFRARED,
     WII_LOST_CONNECTION,
+    WII_FOUND,
     WII_STATUS,
     WII_FOUND_IR_CURSOR,
     WII_LOST_IR_CURSOR
@@ -33,25 +34,25 @@ enum WiiEventType {
 class WiiEvent {
     public:
     // Ctor for connection events
-    WiiEvent(unsigned theID, WiiEventType theEvent) :
+    WiiEvent(const std::string & theID, WiiEventType theEvent) :
         id( theID ),
         type( theEvent ) {}
 
     // Ctor for button events
-    WiiEvent(unsigned theID, const std::string & theName, bool thePressedFlag) :
+    WiiEvent(const std::string & theID, const std::string & theName, bool thePressedFlag) :
         id( theID ),
         type( WII_BUTTON ),
         buttonname( theName ),
         pressed( thePressedFlag ) {}
 
     // Ctor for motion events
-    WiiEvent(unsigned theID, const asl::Vector3f & theAcceleration) :
+    WiiEvent(const std::string & theID, const asl::Vector3f & theAcceleration) :
         id( theID ),
         type( WII_MOTION ),
         acceleration( theAcceleration ) {}
 
     // Ctor for ir data
-    WiiEvent(unsigned theID, const asl::Vector2i theIRData[4], const asl::Vector2f & theScreenPosition ) :
+    WiiEvent(const std::string & theID, const asl::Vector2i theIRData[4], const asl::Vector2f & theScreenPosition ) :
         id( theID ),
         type( WII_INFRARED ),
         screenPosition( theScreenPosition )
@@ -62,7 +63,7 @@ class WiiEvent {
     }
 
     // Ctor for status reports
-    WiiEvent(unsigned theID, asl::Unsigned8 theBatteryLevel, asl::Unsigned8 theStatusBits ) :
+    WiiEvent(const std::string & theID, asl::Unsigned8 theBatteryLevel, asl::Unsigned8 theStatusBits ) :
         id( theID ),
         type(WII_STATUS)
     {
@@ -76,7 +77,7 @@ class WiiEvent {
         leds[3] = theStatusBits & 0x80;
     }
 
-    unsigned id;
+    std::string id;
 
     WiiEventType type;
     // Button data

@@ -18,14 +18,15 @@
 using namespace std;
 using namespace asl;
 
+extern std::string oureventxsd;
+
 namespace y60 {
 
-WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) : 
+WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction ) :
     PosixThread(theThreadFunction),
     _myLeftPoint( -1 ),
     _myLowPassedOrientation(0, 1, 0),
     _myOrientation( 0 ),
-    _myControllerId( theId ),
     _myRumbleFlag( false ),
     _myInputListening( false ),
     _isConnected( false ),
@@ -51,7 +52,6 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction, unsigned theId) :
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
 
-    startThread();
 }
 
 WiiRemote::~WiiRemote() {
@@ -118,19 +118,19 @@ WiiRemote::setButtons(int code) {
 }
 
 void
-WiiRemote::createEvent( int theID, const asl::Vector2i theIRData[4],
+WiiRemote::createEvent( const asl::Vector2i theIRData[4],
                         const asl::Vector2f & theNormalizedScreenCoordinates, const float & theAngle ) {
-    _myEventQueue.push( WiiEvent( theID, theIRData, theNormalizedScreenCoordinates ) );
+    _myEventQueue.push( WiiEvent( getControllerID(), theIRData, theNormalizedScreenCoordinates ) );
 }
 
 void
-WiiRemote::createEvent( int theID, asl::Vector3f & theMotionData) {
-    _myEventQueue.push( WiiEvent(theID, theMotionData) );
+WiiRemote::createEvent( asl::Vector3f & theMotionData) {
+    _myEventQueue.push( WiiEvent(getControllerID(), theMotionData) );
 }
 
 void
-WiiRemote::createEvent( int theID, const std::string & theButtonName, bool thePressedState) {
-    _myEventQueue.push( WiiEvent( theID, theButtonName, thePressedState ) );
+WiiRemote::createEvent( const std::string & theButtonName, bool thePressedState) {
+    _myEventQueue.push( WiiEvent( getControllerID(), theButtonName, thePressedState ) );
 }
 
 Vector2i
@@ -147,14 +147,13 @@ parseIRData( const unsigned char * theBuffer, unsigned theOffset, int & theSizeH
     return myIRPos;
 }
 
-
 void
 WiiRemote::handleButtonEvents( const unsigned char * theInputReport ) {
     int key_state = Util::GetInt2(theInputReport, 1);
     vector<Button> myChangedButtons = setButtons(key_state);
     for( unsigned i=0; i < myChangedButtons.size(); ++i) {
         Button myButton = myChangedButtons[i];
-        createEvent( _myControllerId, myButton.getName(), myButton.pressed());
+        createEvent( myButton.getName(), myButton.pressed());
     }
 }
 
@@ -189,7 +188,7 @@ WiiRemote::handleMotionEvents( const unsigned char * theInputReport ) {
         }
     }
 
-    createEvent( _myControllerId, m);
+    createEvent(m);
 }
 
 void
@@ -267,7 +266,7 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
         }
     }
     
-    createEvent( _myControllerId, myIRPositions, myNormalizedScreenCoordinates, angle );
+    createEvent( myIRPositions, myNormalizedScreenCoordinates, angle );
 }
 
 
@@ -484,7 +483,7 @@ WiiRemote::requestStatusReport() {
 }
 
 void 
-WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> & theLostWiiIds ) {
+WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<std::string> & theLostWiiIds ) {
     if ( _myLock.nonblock_lock() == 0) {
 
         while ( ! _myEventQueue.empty() ) {
@@ -492,7 +491,7 @@ WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> &
             y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
                         _myValueFactory));
             dom::NodePtr myNode = myEvent->getNode();
-            myNode->appendAttribute<int>("id", myWiiEvent.id);
+            myNode->appendAttribute<string>("id", myWiiEvent.id);
             if (myWiiEvent.type == WII_BUTTON) {
 
                 myNode->appendAttribute("type", "button");
@@ -541,6 +540,11 @@ WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<unsigned> &
 
         _myLock.unlock();
     }
+}
+
+void
+WiiRemote::setId( const char * theId) {
+    _myControllerId = theId;
 }
 
 } // end of namespace 
