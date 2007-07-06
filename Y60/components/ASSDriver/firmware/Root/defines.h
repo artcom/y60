@@ -21,7 +21,7 @@
 #define DEFAULT_ID                    0
 #define DEFAULT_MATRIX_WIDTH          20
 #define DEFAULT_MATRIX_HEIGTH         10
-#define DEFAULT_SCAN_FREQUENCY        21  //Hz (max 100Hz, min 16Hz)
+#define DEFAULT_SCAN_FREQUENCY        20  //Hz (max 100Hz, min 16Hz)
 #define DEFAULT_VOLTAGE_TRANSMITTER   106 //=5V *21,2(*1/V)
 #define DEFAULT_BAUD_RATE             0   //0 = 57600bps
                                           //1 = 115200bps

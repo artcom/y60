@@ -147,6 +147,9 @@ uint8_t i, i2;
         }
     }
 
+    g_errorState = 0;
+    g_mode = ABS_MODE;
+
     //check if EEPROM contains stored values; if not write default values
     if(EEPROM_read(EEPROM_LOC_FORMAT_ENTRY) != (EEPROM_FORMAT_KEY&0xFF)  ||  EEPROM_read(EEPROM_LOC_FORMAT_ENTRY+1) != (EEPROM_FORMAT_KEY>>8)){
         EEPROM_write(EEPROM_LOC_FORMAT_ENTRY, (EEPROM_FORMAT_KEY&0xFF));
@@ -160,10 +163,7 @@ uint8_t i, i2;
         EEPROM_write(EEPROM_LOC_ID, DEFAULT_ID);
     }
 
-    setScanParameter(EEPROM_read(EEPROM_LOC_MATRIX_WIDTH), \
-                     EEPROM_read(EEPROM_LOC_MATRIX_HEIGTH), \
-                     EEPROM_read(EEPROM_LOC_SCAN_FREQUENCY));
-    //ADD: Check for errors...
+    g_ID = EEPROM_read(EEPROM_LOC_ID);
 
     g_BaudRateFactor = EEPROM_read(EEPROM_LOC_BAUD_RATE);
     if( g_BaudRateFactor > UART0_MAX_BAUD_RATE_FACTOR){
@@ -171,9 +171,13 @@ uint8_t i, i2;
         g_BaudRateFactor = DEFAULT_BAUD_RATE;
     }
 
-    g_ID = EEPROM_read(EEPROM_LOC_ID);
-    g_errorState = 0;
-    g_mode = ABS_MODE;
+    i = setScanParameter(EEPROM_read(EEPROM_LOC_MATRIX_WIDTH), \
+                         EEPROM_read(EEPROM_LOC_MATRIX_HEIGTH), \
+                         EEPROM_read(EEPROM_LOC_SCAN_FREQUENCY));
+    if(i == 1){
+        g_errorState |= ERROR_PARAMETERS;
+    }
+
 
 	//turn off all transmitters by shifting 0 to all transmitters
 	for(i=0; i<=MAX_MATRIX_HEIGTH; i++){
@@ -195,17 +199,14 @@ uint16_t my_scanPeriod, my_deltaTRow;
 uint32_t bw;
 
     if(w < 1  ||  w > MAX_MATRIX_WIDTH){
-        g_errorState |= ERROR_PARAMETERS;
         return 1;
     }
 
     if(h < 1  ||  h > MAX_MATRIX_HEIGTH){
-        g_errorState |= ERROR_PARAMETERS;
         return 1;
     }
 
     if(f < MIN_SCAN_FREQUENCY  ||  f > MAX_SCAN_FREQUENCY){
-        g_errorState |= ERROR_PARAMETERS;
         return 1;
     }
 
@@ -213,15 +214,13 @@ uint32_t bw;
     my_scanPeriod = 1000000/f; //(1000000us)
     my_deltaTRow  = (1000000/f/(h+1))+1; //(1000000us)
     if(my_deltaTRow < MIN_DELTA_T_ROW){
-        g_errorState |= ERROR_PARAMETERS;
         return 1;
     }
 
     //check required bandwidth
     bw = (uint32_t)w*h*f*10 + NUMBER_OF_STATUS_BITS;
     bw += bw/10; //10% increase to have some buffer
-    if(bw > (uint32_t)UART0_BAUD_RATE_HS*(1<<g_BaudRateFactor)){
-        g_errorState |= ERROR_PARAMETERS;
+    if(bw > (((uint32_t)UART0_BAUD_RATE_HS)<<g_BaudRateFactor)){
         return 1;
     }
 
@@ -230,6 +229,7 @@ uint32_t bw;
     g_deltaTRow = my_deltaTRow;
     g_matrixWidth = w;
     g_matrixHeigth = h;
+    g_scanFrequency = f;
     g_mode = ABS_MODE;
 
     g_errorState &= ~ERROR_PARAMETERS;
@@ -342,7 +342,7 @@ uint8_t v0, v1;
                     //toggle green LED
                     PORT_LED ^= _BV(LED_G);
                     if((PORT_LED&_BV(LED_G)) == 0){
-                        sc3=180; //make off period shorter
+                        sc3=180; //off period is shorter
                     }
                 }
             sc3++;
@@ -1141,7 +1141,7 @@ static uint16_t pointer1=0;
                     break;
                 case C21: //set width/number of columns
                     //first check if locked (switch 8 on)
-                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_WIDTH){
@@ -1159,7 +1159,7 @@ static uint16_t pointer1=0;
                     break;
                 case C22: //set heigth/number of rows
                     //first check if locked (switch 8 on)
-                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_HEIGTH){
@@ -1177,7 +1177,7 @@ static uint16_t pointer1=0;
                     break;
                 case C23: //set scan frequency
                     //first check if locked (switch 8 on)
-                    if((g_DIPSwitch&&_BV(DIP_EEPROM_LOCK)) != 0){
+                    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 < MIN_SCAN_FREQUENCY  ||  g_arg1 > MAX_SCAN_FREQUENCY){
@@ -1202,6 +1202,7 @@ static uint16_t pointer1=0;
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             EEPROM_write(EEPROM_LOC_BAUD_RATE, g_arg1);
+                            g_BaudRateFactor = g_arg1;
                             fprintf(stdout, "\nWill be applied after restart.\n");
                             fprintf(stdout, "OK\n");
                         }
