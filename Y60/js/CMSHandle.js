@@ -53,7 +53,7 @@ try {
 ========================================================*/
 
 plug("y60CMSCache");
-use("SoapWdsl.js");
+use("SoapWsdl.js");
 
 function CMSHandle( theConfigFile) {
     this.Constructor(this, theConfigFile);
