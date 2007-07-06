@@ -53,6 +53,7 @@ try {
 ========================================================*/
 
 plug("y60CMSCache");
+use("SoapWdsl.js");
 
 function CMSHandle( theConfigFile) {
     this.Constructor(this, theConfigFile);
@@ -69,7 +70,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     obj.synchronize = function() {
         if ( _mySyncFlag ) {
-            fetchPresentation();
+            fetchPresentation(); 
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
             Logger.info("CMS synchronization disabled.");
             Logger.info("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -96,8 +97,11 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         if ( !_mySyncFlag ) {
             return true;
         }
-
-        return _myCMSCache.isSynchronized();
+        var myRetVal = _myCMSCache.isSynchronized();
+        if (myRetVal && _myOCSCookie) {
+            logout();
+        }
+        return myRetVal;
     }
 
     obj.__defineGetter__('statusReport',
@@ -164,7 +168,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     function initRequest(theRequest) {
         theRequest.verifyPeer = false;
-        theRequest.verbose = _myZopeVerbosityFlag;
+        theRequest.verbose = false; // _myZopeVerbosityFlag; XXX
         theRequest.addHttpHeader("Pragma",""); // remove default "no-cache" pragma
         if ('proxy' in _myConfig && _myConfig.proxy) {
             theRequest.setProxy(_myConfig.proxy);
@@ -175,8 +179,49 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         }
     }
 
+    function login() {
+        var myCMSConfig  = _myConfig.childNode("cmscache", 0);
+        if (String(myCMSConfig.backend).toUpperCase() != "OCS") {
+            return true;
+        }
+        var myParams = new SOAPClientParameters();
+        myParams.add('username','y60');
+        myParams.add('password','acclienty60');
+        var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+                "RemoteLoginManagerService","RemoteLoginManager", "login", myParams, null );
+        if (myResponse.responseCode > 299) {
+            Logger.warning("Could not retrieve session cookie from OCS:" + myResponse.responseCode);
+            Logger.info(myResponse.responseString);
+            return false;
+        }
+        var allCookies = myResponse.getAllResponseHeaders("Set-Cookie");
+        for (var i = 0; i < allCookies.length; ++i) {
+            if (allCookies[i].substr(0,11) == "JSESSIONID=") {
+                _myOCSCookie = allCookies[i];
+                Logger.info("Retreived session cookie from OCS:" + _myOCSCookie);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function logout() {
+        if (_myOCSCookie) {
+            var myParams = new SOAPClientParameters();
+            var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+                    "RemoteLoginManagerService","RemoteLoginManager", "logout", myParams, [ _myOCSCookie ]);
+            if (myResponse.responseCode > 299) {
+                Logger.warning("Could not logout from OCS:" + myResponse.responseCode);
+                Logger.info(myResponse.responseString);
+                return false;
+            }
+            _myOCSCookie = null;
+        }
+        return true;
+    }
     function fetchPresentation() {
         Logger.info ("Fetching presentation.xml");
+        // msleep(Math.random()*10*1000); XXX
         _myPresentation = Node.createDocument();
         _myZopeCookies = [];
         
@@ -233,20 +278,9 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         }
         // now get repository cookie
         if (!myErrorOccurred) {
-            var myRequestURI = myZopeConfig.baseurl + "/Theme_Pool/getRepositoryCookie";
-            var myCookieRequest = new Request( myRequestURI, _myUserAgent );
-            initRequest(myCookieRequest);
-            _myRequestManager.performRequest( myCookieRequest );
-            while ( _myRequestManager.activeCount ) {
-                _myRequestManager.handleRequests();
-                msleep( 10 );
-            }
-            if ( myCookieRequest.responseCode != 200 ) {
-                Logger.warning("Failed to get repository cookie. Server response code " +
-                                    myCookieRequest.responseCode + 
-                                    ". Proceeding without cookie (may create many sessions during CMS sync!).");
-            } else {
-                _myOCSCookie = myCookieRequest.responseString;
+            if (!login()) {
+                Logger.error("Failed to get repository cookie - aborting sync");
+                myErrorOccurred = true;
             }
         }
         if ( myErrorOccurred ) {
