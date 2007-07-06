@@ -14,18 +14,21 @@
 #include <asl/Logger.h>
 
 #ifdef LINUX
-#include "Liimote.h" // XXX
+#   include "Liimote.h"
+
 #   include <bluetooth/bluetooth.h>
 #   include <bluetooth/hci.h>
 #   include <bluetooth/hci_lib.h>
 #   include <bluetooth/l2cap.h>
+#   include <errno.h>
+
 #elif WIN32
-// XXX
+
 extern "C" {
 #   include "hidsdi.h"
 #   include "setupapi.h"
 }
-#include "Win32mote.h"
+#   include "Win32mote.h"
 #endif
 
 
@@ -42,6 +45,8 @@ const char * WIIMOTE_NAME("Nintendo RVL-CNT-01");
 const uint8_t WIIMOTE_CLASS_0( 0x04 );
 const uint8_t WIIMOTE_CLASS_1( 0x25 );
 const uint8_t WIIMOTE_CLASS_2( 0x00 );
+
+const int MAX_CONSECUTIVE_TIMEOUTS( 5 );
 #endif
 
 
@@ -49,12 +54,18 @@ WiiScanner::WiiScanner() :
     PosixThread( scan ),
     _isScanning( true )
 {
+    init();
     fork();
 }
 
 WiiScanner::~WiiScanner() {
     _isScanning = false;
+    AC_PRINT << "Waiting for scanner thread shutdown ...";
     join();
+    if (_mySocket != -1) {
+        hci_close_dev( _mySocket );
+        _mySocket = -1;
+    }
 }
 
 void
@@ -70,12 +81,12 @@ WiiScanner::poll(vector<WiiRemotePtr> & theNewWiis, const vector<string> & theLo
         }
     } else {
         _myLock.lock();
+        for (unsigned i = 0; i < theLostWiiIds.size(); ++i) {
+            _myLostConnectionIdQueue.push( theLostWiiIds[i] );
+        }
         while ( ! _myNewWiiQueue.empty() ) {
             theNewWiis.push_back( _myNewWiiQueue.front() );
             _myNewWiiQueue.pop();
-        }
-        for (unsigned i = 0; i < theLostWiiIds.size(); ++i) {
-            _myLostConnectionIdQueue.push( theLostWiiIds[i] );
         }
         _myLock.unlock();
     }
@@ -101,27 +112,45 @@ WiiScanner::scan( asl::PosixThread & theThread ) {
     }
 }
 
+void
+WiiScanner::init() {
 #ifdef LINUX
+
+    // TODO: handle more than one BT interface
+    _myDeviceId = hci_get_route( NULL );
+    if (_myDeviceId == -1) {
+        throw WiiException(string("No bluetooth interface found") +
+                strerror( errno ), PLUS_FILE_LINE);
+    }
+    _mySocket = hci_open_dev( _myDeviceId );
+    if ( _mySocket == -1) {
+        throw WiiException(string("Failed to open bluetooth device: ") +
+                strerror( errno ), PLUS_FILE_LINE);
+    }
+
+#endif
+}
+
 // TODO: clean up this mess
 void
 WiiScanner::collectNewWiiControllers() {
+#ifdef LINUX
     inquiry_info * myDeviceList(0);
-    int mySocket(-1);
     try {
-
-        // TODO: handle more than one BT interface
-        int myDeviceId = hci_get_route( NULL );
-        if (myDeviceId == -1) {
-            throw WiiException("No bluetooth interface found", PLUS_FILE_LINE);
-        }
-        int myDeviceCount = hci_inquiry( myDeviceId, 2, MAX_BT_INQUIRY, 0,
+        int myTimeout = 2; // * 1.28s
+        int myDeviceCount = hci_inquiry( _myDeviceId, myTimeout, MAX_BT_INQUIRY, 0,
                 & myDeviceList, IREQ_CACHE_FLUSH);
 
         if (myDeviceCount == -1) {
-            throw WiiException("Failed to inquire bluetooth devices", PLUS_FILE_LINE);
+            // XXX sometimes we get "Device or resource busy"
+            // TODO do something similar to the timeout handling
+            /*
+            throw WiiException(string("Failed to inquire bluetooth devices: ") +
+                    strerror( errno) , PLUS_FILE_LINE);
+            */
         }
 
-        if (myDeviceCount == 0) {
+        if (myDeviceCount <= 0) {
             // clean up
             if (myDeviceList) {
                 free( myDeviceList );
@@ -129,35 +158,47 @@ WiiScanner::collectNewWiiControllers() {
             return;
         }
 
-        mySocket = hci_open_dev( myDeviceId );
-        if ( mySocket == -1) {
-            throw WiiException("Failed to open bluetooth device.", PLUS_FILE_LINE);
-        }
 
         char myNameBuffer[WIIMOTE_NAME_LENGTH];
         char myAddressString[19];
         vector<WiiRemotePtr> myNewWiis;
         for (int i = 0; i < myDeviceCount; ++i) {
-            if (hci_remote_name( mySocket, & myDeviceList[i].bdaddr, WIIMOTE_NAME_LENGTH,
-                        myNameBuffer, 5000))
+            myTimeout = 5000; // in ms (?)
+            if (hci_remote_name( _mySocket, & myDeviceList[i].bdaddr, WIIMOTE_NAME_LENGTH,
+                        myNameBuffer, myTimeout) < 0)
             {
-                throw WiiException("Failed to read bluetooth device name.", PLUS_FILE_LINE);
-            }
-            if (myDeviceList[i].dev_class[0] != WIIMOTE_CLASS_0 ||
-                myDeviceList[i].dev_class[1] != WIIMOTE_CLASS_1 || 
-                myDeviceList[i].dev_class[2] != WIIMOTE_CLASS_2 ||
-                strncmp( myNameBuffer, WIIMOTE_NAME, WIIMOTE_NAME_LENGTH))
-            {
-                continue;
-            }
-            char myBTAddressCStr[19];
-            ba2str( & myDeviceList[i].bdaddr, myBTAddressCStr );
-            string myBTAddress( myBTAddressCStr );
-            set<string>::iterator myIt = _myKnownWiiIds.find( myBTAddress);
-            if (myIt == _myKnownWiiIds.end() ) {
-                LiimotePtr myWii( new Liimote(& myDeviceList[i].bdaddr ) );
-                myNewWiis.push_back( myWii );
-                _myKnownWiiIds.insert( myBTAddress );
+                if (errno == ETIMEDOUT) {
+                    if (_myConsecutiveTimeouts < MAX_CONSECUTIVE_TIMEOUTS) {
+                        AC_WARNING << "Failed to read bluetooth device name. Got timeout. Retrying...";
+                        _myConsecutiveTimeouts += 1;
+                    } else {
+                        throw WiiException(string("Failed to read bluetooth device name. Got ") +
+                                as_string(MAX_CONSECUTIVE_TIMEOUTS) + " timeouts. Bailing out.",
+                                PLUS_FILE_LINE);
+                    }
+                } else {
+                    throw WiiException(string("Failed to read bluetooth device name: ") +
+                            strerror( errno ), PLUS_FILE_LINE);
+                }
+            } else {
+                _myConsecutiveTimeouts = 0;
+
+                if (myDeviceList[i].dev_class[0] != WIIMOTE_CLASS_0 ||
+                        myDeviceList[i].dev_class[1] != WIIMOTE_CLASS_1 || 
+                        myDeviceList[i].dev_class[2] != WIIMOTE_CLASS_2 ||
+                        strncmp( myNameBuffer, WIIMOTE_NAME, WIIMOTE_NAME_LENGTH))
+                {
+                    continue;
+                }
+                char myBTAddressCStr[19];
+                ba2str( & myDeviceList[i].bdaddr, myBTAddressCStr );
+                string myBTAddress( myBTAddressCStr );
+                set<string>::iterator myIt = _myKnownWiiIds.find( myBTAddress );
+                if (myIt == _myKnownWiiIds.end() ) {
+                    LiimotePtr myWii( new Liimote(& myDeviceList[i].bdaddr ) );
+                    myNewWiis.push_back( myWii );
+                    _myKnownWiiIds.insert( myBTAddress );
+                }
             }
         }
 
@@ -166,7 +207,6 @@ WiiScanner::collectNewWiiControllers() {
             _myNewWiiQueue.push( myNewWiis[i] );
         }
         while ( ! _myLostConnectionIdQueue.empty() ) {
-            AC_PRINT << "==== removing wii";
             _myKnownWiiIds.erase( _myLostConnectionIdQueue.front() );
             _myLostConnectionIdQueue.pop();
         }
@@ -177,21 +217,12 @@ WiiScanner::collectNewWiiControllers() {
         if (myDeviceList) {
             free( myDeviceList );
         }
-        if (mySocket != -1) {
-            hci_close_dev( mySocket );
-        }
         throw;
     }
     if (myDeviceList) {
         free( myDeviceList );
     }
-    if (mySocket != -1) {
-        hci_close_dev( mySocket );
-    }
-}
 #elif WIN32
-void
-WiiScanner::collectNewWiiControllers() {
     HANDLE WriteHandle = 0, DeviceHandle = 0;
 
     HANDLE hDevInfo;
@@ -265,9 +296,8 @@ WiiScanner::collectNewWiiControllers() {
         
     } while(true);
     SetupDiDestroyDeviceInfoList(hDevInfo);
+#endif
 }
     
-#endif
-
 } // end of namespace
 

@@ -31,6 +31,7 @@ class WiiScanner : public asl::PosixThread {
         void poll(std::vector<y60::WiiRemotePtr> & theNewWiis,
                   const std::vector<std::string> & theLostWiiIds );
     private:
+        void init();
         void collectNewWiiControllers();
         static void scan(asl::PosixThread & theThread);
 
@@ -39,6 +40,12 @@ class WiiScanner : public asl::PosixThread {
         std::queue<std::string> _myLostConnectionIdQueue;
         std::set<std::string>   _myKnownWiiIds;
         bool _isScanning;
+
+#ifdef LINUX
+        int _myDeviceId;
+        int _mySocket;
+        int _myConsecutiveTimeouts;
+#endif
         
 };
 

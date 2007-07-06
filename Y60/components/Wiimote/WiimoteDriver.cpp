@@ -51,6 +51,7 @@ WiimoteDriver::poll() {
         myIt->second->pollEvents( myEvents, myLostWiiIds );
     }
     for (unsigned i = 0; i < myLostWiiIds.size(); ++i) {
+        //AC_PRINT << "Lost Wii Remote " << myLostWiiIds[i]; 
         _myWiimotes.erase( myLostWiiIds[i] );
     }
 
@@ -58,11 +59,13 @@ WiimoteDriver::poll() {
     _myScanner.poll( myNewWiis, myLostWiiIds );
 
     for (unsigned i = 0; i < myNewWiis.size(); ++i) {
-        myNewWiis[i]->setLEDs(i+1 & (1<<0) ,i+1 & (1<<1),i+1 & (1<<2),i+1 & (1<<3));
+        int myWiiNum = _myWiimotes.size() + 1;
+        myNewWiis[i]->setLEDs(myWiiNum & (1<<0) , myWiiNum & (1<<1),
+                              myWiiNum & (1<<2), myWiiNum & (1<<3));
         myNewWiis[i]->setReportMode( _myDefaultReportMode ); // XXX
 
         _myWiimotes.insert( std::make_pair( myNewWiis[i]->getControllerID(), myNewWiis[i] ) );
-        AC_PRINT << "WiimoteDriver::poll() new Wii " << myNewWiis[i]->getControllerID(); 
+        //AC_PRINT << "Found Wii Remote " << myNewWiis[i]->getControllerID(); 
 
         y60::GenericEventPtr myEvent( new GenericEvent("onWiiEvent", _myEventSchema,
                     _myValueFactory));

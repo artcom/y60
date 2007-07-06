@@ -18,6 +18,69 @@ plug("y60FFMpegDecoder1");
 
 window = new RenderWindow();
 
+function WiiRemote(theId, theApp, theMasterWii) {
+    this.Constructor(this, theId, theApp, theMasterWii);
+}
+
+
+
+WiiRemote.prototype.Constructor = function(self, theId, theApp, theMasterWii) {
+    var _myBody = null;
+    var _myCursor = null;
+    var _myLowpassedUpVector = new Vector3f(0, 1, 0);
+    setup();
+
+    function setup() {
+        _myBody = theMasterWii.cloneNode();
+        _myBody.id = theId;
+        window.scene.world.appendChild( _myBody );
+        _myBody.visible = true;
+        _myBody.insensible = false;
+
+        _myCursor = new ImageOverlay(window.scene, "tex/pointer.png", [0,0], window.scene.overlays);
+        _myCursor.visible = false;
+    }
+    self.finalize = function() {
+        window.scene.world.removeChild( _myBody );
+        _myCursor.removeFromScene();
+    }
+    self.handleEvent = function( theEvent ) {
+        switch (theEvent.type) {
+            case "motiondata":
+                var myUpVector = normalized( new Vector3f( theEvent.motiondata.x, theEvent.motiondata.y,
+                        theEvent.motiondata.z ));
+                _myLowpassedUpVector = normalized( sum( product( _myLowpassedUpVector, 0.9),
+                                          product( myUpVector, 0.1) ) );
+                _myBody.orientation = new Quaternionf( _myLowpassedUpVector, new Vector3f(0, 1, 0) );
+                break;
+            case "found_ir_cursor":
+                _myCursor.visible = true;
+                break;
+            case "lost_ir_cursor":
+                _myCursor.visible = false;
+                break;
+            case "infrareddata":
+                var myPosition = new Vector2f(window.width - ((theEvent.screenposition.x * window.width/2.0) + window.width/2.0),
+                        (theEvent.screenposition.y * window.height/2.0) + window.height/2.0 );
+                _myCursor.position = myPosition;
+                break;
+            case "button":
+                handleButton( theEvent );
+                break;
+        }
+    }
+
+    self.__defineSetter__('position', function( thePos ) {
+        _myBody.position = thePos;
+    });
+
+    function handleButton( theEvent ) {
+        print("button " + theEvent.buttonname + (theEvent.pressed ? " pressed " : " released ")
+                + " on Wii " + theEvent.id );
+    }
+
+}
+
 function WiimoteTestApp(theArguments) {
     this.Constructor(this, theArguments);
 }
@@ -38,7 +101,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     const MOVIE_WIDTH = 1;
     const MOVIE_HEIGHT = 0.66;
     
-    var _myBody = null;
+    var _myMasterWii = null;
+    var _myWiiCount = 0;
     var _myLowPassedDownVector = new Vector3f( 0, 1, 0 );
     var _myOrientationVector = null;
     var _myAngleVector = null;
@@ -58,7 +122,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     
     var _myCurrentCursorOwner = null;
 
-    var _myWiimote = null;
+    var _myWiimoteDriver = null;
+    var _myWiimotes = {};
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -73,13 +138,16 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         //window.position = [0, 0];
         window.decorations = false;
         window.resize(theWidth, theHeight);
-        _myWiimote = plug("Wiimote");
+        _myWiimoteDriver = plug("Wiimote");
 
 
-        _myBody = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
-        _myBody.scale = new Vector3f(5, 5,5);
+        _myMasterWii = getDescendantByAttribute(window.scene.world, "name", "wii_controller");
+        _myMasterWii.scale = new Vector3f(5, 5, 5);
+        _myMasterWii.visible = false;
+        _myMasterWii.insensible = true;
 
-        
+
+        /*
         var myClone = _myBody.cloneNode(true);
         createNewIds(myClone);
         myClone.position.x += 2;
@@ -90,11 +158,12 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         window.scene.world.appendChild( _myOrientationVector );
         _myOrientationVector.color = new Vector4f(1,1,1,1);
         _myOrientationVector.scale = [1,1,1];
+        */
         
         _myPlane = new Planef(new Vector3f(0,0,1), 0);
         
-        _myCrosshair = new ImageOverlay(window.scene, "tex/pointer.png", [0,0], window.scene.overlays);
-        _myCrosshair.position = [window.width/2.0, window.height/2.0];
+        //_myCrosshair = new ImageOverlay(window.scene, "tex/pointer.png", [0,0], window.scene.overlays);
+        //_myCrosshair.position = [window.width/2.0, window.height/2.0];
 
         _myPicking = new Picking(window);
 
@@ -125,7 +194,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
 
-        //_myBody.orientation.assignFromEuler( new Vector3f( 0, 0.1 * theTime, 0));
+        //_myMasterWii.orientation.assignFromEuler( new Vector3f( 0, 0.1 * theTime, 0));
     }
 
     Base.onPostRender = self.onPostRender;
@@ -139,19 +208,88 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         print( "mouse pos: " + theX + " " + theY);
     }
 
-    self.onWiiEvent = function( theNode ) {
-        //print(theNode);
-        if('screenposition' in theNode && _myPickedBody) {
-            _myPickedBody.position = _myPicking.pickPointOnPlane(_myLastPosition.x, _myLastPosition.y, _myPlane);
+    self.getWiimoteDriver = function() {
+        return _myWiimoteDriver;
+    }
+
+
+    function updateTargetPositions() {
+        if ( _myWiiCount > 0) {
+            var mySpacePerWii = 1;
+            var myStartPos = mySpacePerWii * (_myWiiCount - 1) * -0.5;
+            var i = 0;
+            for (var myWii in _myWiimotes) {
+                _myWiimotes[myWii].position = new Vector3f( myStartPos + i * mySpacePerWii, 0, 0 );
+                i++;
+            }
         }
-        
-        if (theNode.type == "button" && theNode.buttonname == "Home" && theNode.pressed == 0) {
-            print("Got quit from controller " + theNode.id);
+    }
+
+    self.onWiiEvent = function( theEvent ) {
+        //print(theEvent);
+
+        if (theEvent.type == "button" && theEvent.buttonname == "Home" && theEvent.pressed == 0) {
+            print("Got quit from controller " + theEvent.id);
             print("Going home ... good bye!");
             exit( 0 );
         }
-        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 1
-            && theNode.id == _myCurrentCursorOwner)
+
+        switch (theEvent.type) {
+            case "found_wii":
+                _myWiiCount += 1;
+                _myWiimotes[ theEvent.id ] = new WiiRemote( theEvent.id, self, _myMasterWii );
+                updateTargetPositions();
+                break;
+            case "lost_connection":
+                _myWiiCount -= 1;
+                _myWiimotes[ theEvent.id ].finalize();
+                delete _myWiimotes[ theEvent.id ];
+                updateTargetPositions();
+                break;
+            default:
+                if ( theEvent.id in _myWiimotes ) {
+                    _myWiimotes[ theEvent.id ].handleEvent( theEvent );
+                } else {
+                    Logger.error("Received event for unknown Wii remote.");
+                }
+        }
+
+        return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if('screenposition' in theEvent && _myPickedBody) {
+            _myPickedBody.position = _myPicking.pickPointOnPlane(_myLastPosition.x, _myLastPosition.y, _myPlane);
+        }
+        
+        if (theEvent.type == "button" && theEvent.buttonname == "B" && theEvent.pressed == 1
+            && theEvent.id == _myCurrentCursorOwner)
         {
             if(!_myPickedBody) {
                 _myPickedBody = _myPicking.pickBody(_myLastPosition.x, _myLastPosition.y);
@@ -165,23 +303,23 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             } 
             print("Picked body: " + _myPickedBody);
         }
-        if (theNode.type == "button" && theNode.buttonname == "B" && theNode.pressed == 0) {
+        if (theEvent.type == "button" && theEvent.buttonname == "B" && theEvent.pressed == 0) {
             _myPickedBody = null;
         }
         
-        if (theNode.type == "button" && theNode.buttonname == "A") {
-            _myWiimote.setRumble( theNode.id, theNode.pressed );
+        if (theEvent.type == "button" && theEvent.buttonname == "A") {
+            _myWiimoteDriver.setRumble( theEvent.id, theEvent.pressed );
         }
 
-        if (theNode.type == "button" && theNode.buttonname == "+" && theNode.pressed == 0) {
-            _myWiimote.requestStatusReport( theNode.id );
+        if (theEvent.type == "button" && theEvent.buttonname == "+" && theEvent.pressed == 0) {
+            _myWiimoteDriver.requestStatusReport( theEvent.id );
         }
         
-        if (theNode.type == "motiondata") {
-            //print(theNode);
+        if (theEvent.type == "motiondata") {
+            //print(theEvent);
             
-            var myDownVector = new Vector3f( theNode.motiondata.x, theNode.motiondata.y,
-                                             theNode.motiondata.z );
+            var myDownVector = new Vector3f( theEvent.motiondata.x, theEvent.motiondata.y,
+                                             theEvent.motiondata.z );
 
 
             myDownVector = normalized( myDownVector );
@@ -191,10 +329,10 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                                           product( myDownVector, 0.1) ) );
 
 
-            _myOrientationVector.value = _myLowPassedDownVector;
+            //_myOrientationVector.value = _myLowPassedDownVector;
 
             //print("down: " + _myLowPassedDownVector + " magnitude: " + magnitude( _myLowPassedDownVector ));
-            _myBody.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
+            //_myMasterWii.orientation = new Quaternionf( _myLowPassedDownVector, new Vector3f(0, 1, 0) );
 
             if(MOVIE_DEMO && _myMovieControlFlag && _myCurrentMovieImage) {
                 if( _myLowPassedDownVector.z > 0 ) {
@@ -207,37 +345,37 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         }
 
-        if (theNode.type == "lost_connection") {
-            print("Wii controller with id " + theNode.id + " is gone.");
+        if (theEvent.type == "lost_connection") {
+            print("Wii controller with id " + theEvent.id + " is gone.");
         }
 
-        if( theNode.type == "status") {
+        if( theEvent.type == "status") {
             print("============ STATUS =============");
-            print("Battery level      : " + theNode.battery_level);
-            print("Extension connected: " + theNode.extension);
-            print("Speaker enabled    : " + theNode.speaker_enabled);
-            print("Continous reporting: " + theNode.continous_reports);
-            print("LED 1              : " + theNode.led0);
-            print("LED 2              : " + theNode.led1);
-            print("LED 3              : " + theNode.led2);
-            print("LED 4              : " + theNode.led3);
+            print("Battery level      : " + theEvent.battery_level);
+            print("Extension connected: " + theEvent.extension);
+            print("Speaker enabled    : " + theEvent.speaker_enabled);
+            print("Continous reporting: " + theEvent.continous_reports);
+            print("LED 1              : " + theEvent.led0);
+            print("LED 2              : " + theEvent.led1);
+            print("LED 3              : " + theEvent.led2);
+            print("LED 4              : " + theEvent.led3);
         }
 
-        if (theNode.type == "infrareddata" && theNode.id == _myCurrentCursorOwner) {
+        if (theEvent.type == "infrareddata" && theEvent.id == _myCurrentCursorOwner) {
             
-            var myPosition = new Vector2f(window.width - ((theNode.screenposition.x * window.width/2.0) + window.width/2.0),
-                                          (theNode.screenposition.y * window.height/2.0) + window.height/2.0 );
+            var myPosition = new Vector2f(window.width - ((theEvent.screenposition.x * window.width/2.0) + window.width/2.0),
+                                          (theEvent.screenposition.y * window.height/2.0) + window.height/2.0 );
             _myCrosshair.position = myPosition;
             _myLastPosition = myPosition;
         }
 
-        if (theNode.type == "lost_ir_cursor") {
+        if (theEvent.type == "lost_ir_cursor") {
             _myCrosshair.visible = false;
             _myCurrentCursorOwner = null;
         }
-        if (theNode.type == "found_ir_cursor") {
+        if (theEvent.type == "found_ir_cursor") {
             if (_myCurrentCursorOwner == null) {
-                _myCurrentCursorOwner = theNode.id;
+                _myCurrentCursorOwner = theEvent.id;
                 _myCrosshair.visible = true;
             }
         }
@@ -246,14 +384,14 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         }
         
         // media system control :)
-        if (MOVIE_DEMO && theNode.type == "button" && theNode.buttonname == "1" && theNode.pressed == 1) {
+        if (MOVIE_DEMO && theEvent.type == "button" && theEvent.buttonname == "1" && theEvent.pressed == 1) {
             if( _myCurrentMovieImage.playmode == "pause" ){
                 _myCurrentMovieImage.playmode = "play";
             } else {
                 _myCurrentMovieImage.playmode = "pause";
             }
         }
-        if (MOVIE_DEMO && theNode.type == "button" && theNode.buttonname == "2" && theNode.pressed == 1) {
+        if (MOVIE_DEMO && theEvent.type == "button" && theEvent.buttonname == "2" && theEvent.pressed == 1) {
             _myMovieControlFlag = !_myMovieControlFlag;
             if(_myCurrentMovieImage) {
                 _myCurrentMovieImage.playspeed = 1.0;
@@ -291,6 +429,7 @@ if (__main__ == "WiimoteTest") {
         exit(1);
     }
 }
+
 
 
 
