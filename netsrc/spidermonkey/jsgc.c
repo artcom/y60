@@ -459,10 +459,59 @@ js_FinishGC(JSRuntime *rt)
 JSBool
 js_AddRoot(JSContext *cx, void *rp, const char *name)
 {
-    JSBool ok = js_AddRootRT(cx->runtime, rp, name);
-    if (!ok)
-        JS_ReportOutOfMemory(cx);
-    return ok;
+    JSArena *a;
+    jsuword firstpage;
+    JSBool root_points_to_gcArenaPool = JS_FALSE;
+    JSObject *obj;
+    jsval *vp, *end;
+    uint32 nslots;
+    jsval v = *(jsval*)rp;
+    JSString *str;
+
+    for (a = cx->runtime->gcArenaPool.first.next; a; a = a->next) {
+        firstpage = FIRST_THING_PAGE(a);
+        if (JS_UPTRDIFF(JSVAL_TO_GCTHING(v), firstpage) < a->avail - firstpage) {
+            root_points_to_gcArenaPool = JS_TRUE;
+            break;
+        }
+    }
+
+    if (root_points_to_gcArenaPool) {
+        JSBool ok = js_AddRootRT(cx->runtime, rp, name);
+        if (!ok)
+            JS_ReportOutOfMemory(cx);
+        return ok;
+    } else {
+        fprintf(stderr, "WARNING: adding root (%s @%p) to context which does NOT own it!!!\n", name, rp);
+        
+        if (JSVAL_IS_NULL(v)) {
+            // do nothing
+        } else if (JSVAL_IS_OBJECT(v)) {
+            obj = JSVAL_TO_OBJECT(v);
+            vp = obj->slots;
+            if (!vp) {
+                /* If obj->slots is null, obj must be a newborn. */
+                JS_ASSERT(!obj->map);
+            } else {
+                nslots = (obj->map->ops->mark)
+                         ? obj->map->ops->mark(cx, obj, NULL)
+                         : JS_MIN(obj->map->freeslot, obj->map->nslots);
+                for (end = vp + nslots; vp < end; vp++) {
+                    v = *vp;
+                    if (JSVAL_IS_GCTHING(v)) {
+                        GC_GREY(cx, v, "object property", NULL);
+                    }
+                }
+            }
+        } else if (JSVAL_IS_STRING(v)) {
+            str = JSVAL_TO_STRING(v);
+            // XXX how to determine type the right way? This should work, too:
+            //str = (JSString *)thing;
+            if (JSSTRING_IS_DEPENDENT(str))
+                GC_MARK(cx, STRING_TO_JSVAL(JSSTRDEP_BASE(str)), "base", NULL);
+        }
+        return JS_TRUE;
+    }
 }
 
 JSBool
@@ -470,6 +519,24 @@ js_AddRootRT(JSRuntime *rt, void *rp, const char *name)
 {
     JSBool ok;
     JSGCRootHashEntry *rhe;
+
+    JSArena *a;
+    jsuword firstpage;
+    JSBool root_points_to_gcArenaPool = JS_FALSE;
+    jsval v = *(jsval*)rp;
+
+    for (a = rt->gcArenaPool.first.next; a; a = a->next) {
+        firstpage = FIRST_THING_PAGE(a);
+        if (JS_UPTRDIFF(JSVAL_TO_GCTHING(v), firstpage) < a->avail - firstpage) {
+            root_points_to_gcArenaPool = JS_TRUE;
+            break;
+        }
+    }
+    if (!root_points_to_gcArenaPool) {
+        fprintf(stderr, "WARNING: adding root (%s @%p) to runtime which does NOT own it!!!\n", name, rp);
+        return JS_TRUE;
+    }
+
 
     /*
      * Due to the long-standing, but now removed, use of rt->gcLock across the
