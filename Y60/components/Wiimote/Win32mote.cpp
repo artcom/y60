@@ -36,20 +36,22 @@ Win32mote::Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA	& theDeviceData, HANDLE & 
     WiiRemote(inputReportListener),
     _myEventObject(NULL)
 {
-
+		
     _myDevicePath = theDeviceData->DevicePath;
     _myDeviceHandle = theDeviceHandle;
     
+    setId( _myDevicePath);
     // Register to receive device notifications.
     // RegisterForDeviceNotifications();
     
     GetDeviceCapabilities();
-    
     _myWriteHandle = CreateFile(_myDevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
                                 (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
-
-    // TODO  do error handling here!!!
-    
+    if (_myWriteHandle == INVALID_HANDLE_VALUE) {
+        //AC_PRINT << "win32 cstor invalid write handle";
+        throw WiiException("write handle invalid" ,  PLUS_FILE_LINE);    
+    }
+        
     PrepareForOverlappedTransfer();
     
     _isConnected = true;
@@ -65,9 +67,10 @@ void
 Win32mote::inputReportListener(PosixThread & theThread)
 {
     try {
+        
         Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
-        //AC_PRINT << myDevice._myControllerId;
+        AC_PRINT << myDevice._myControllerId;
         unsigned char myInputReport[RECV_BUFFER_SIZE];
         while (myDevice.getListeningFlag()) {
             ZeroMemory(myInputReport, RECV_BUFFER_SIZE);

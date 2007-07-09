@@ -62,10 +62,12 @@ WiiScanner::~WiiScanner() {
     _isScanning = false;
     AC_PRINT << "Waiting for scanner thread shutdown. This may take a couple of seconds ...";
     join();
+#ifdef LINUX
     if (_mySocket != -1) {
         hci_close_dev( _mySocket );
         _mySocket = -1;
     }
+#endif
 }
 
 void
@@ -98,7 +100,7 @@ WiiScanner::scan( asl::PosixThread & theThread ) {
         WiiScanner & mySelf = dynamic_cast<WiiScanner&>( theThread );
 
         while (mySelf._isScanning) {
-            mySelf.collectNewWiiControllers();
+        			mySelf.collectNewWiiControllers();
         }
     } catch (const asl::Exception & ex) {
         AC_ERROR << "asl::Exception in wiimote scanner thread: " << ex;
@@ -264,12 +266,14 @@ WiiScanner::collectNewWiiControllers() {
     do {
         // Got any more devices?
         Result = SetupDiEnumDeviceInterfaces (hDevInfo, 0, &HidGuid, MemberIndex,	&devInfoData);
-
-        if (Result == 0) {
+       
+        if( !Result ){
             break;
         }
+        
         // Call once to get the needed buffer length
         Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, NULL, 0, &Length, NULL);
+        
         detailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(Length);
         detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
@@ -278,12 +282,41 @@ WiiScanner::collectNewWiiControllers() {
                                                  &Required, NULL);
         DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
                                   (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
-
+        
         Attributes.Size = sizeof(Attributes);
         
         Result = HidD_GetAttributes(DeviceHandle, &Attributes);
-    
+          
+        
         if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
+            // --------
+//        PHIDP_PREPARSED_DATA PreparsedData;
+//        HIDP_CAPS       _myCapabilities;
+//	    HidD_GetPreparsedData(DeviceHandle, &PreparsedData);
+//	    HidP_GetCaps(PreparsedData, &_myCapabilities);
+//	    HidD_FreePreparsedData(PreparsedData);
+//    
+//        //AC_PRINT << "winscanner " << detailData->DevicePath;
+//        HANDLE myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+//                                    (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
+//        DWORD myRetVal = GetLastError();
+//        if (myRetVal) {
+//            LPVOID myMessageBuffer;
+//            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+//                          FORMAT_MESSAGE_IGNORE_INSERTS, NULL, myRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//                          (LPTSTR) & myMessageBuffer, 0, NULL);
+//            string myErrorString;
+//            myErrorString.append((LPTSTR) myMessageBuffer);
+//            LocalFree(myMessageBuffer);
+//            SetLastError(0);
+//            throw WiiException(myErrorString, PLUS_FILE_LINE);
+//        }
+//        if(myWriteHandle == INVALID_HANDLE_VALUE) {
+//            //CloseHandle(myWriteHandle);
+//            AC_PRINT << "invalid write handle";
+//            break;   
+//        }
+        
             vector<WiiRemotePtr> myNewWiis;
             set<string>::iterator myIt = _myKnownWiiIds.find( detailData->DevicePath);
             if (myIt == _myKnownWiiIds.end() ) {
