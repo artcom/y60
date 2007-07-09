@@ -147,6 +147,7 @@ WiiScanner::collectNewWiiControllers() {
             // Sometimes the inquiry fails with "device or resource busy". This probably
             // happens when the system hci daemon performs a inquiry. So we handle this 
             // gracefully.
+            // This seems to happen more often with low batteries
             if (_myConsecutiveInquiryFailures < MAX_CONSECUTIVE_ERRORS) {
                 AC_WARNING << "Failed to inquire bluetooth devices. Retrying...";
                 _myConsecutiveInquiryFailures += 1;
@@ -178,6 +179,7 @@ WiiScanner::collectNewWiiControllers() {
                         myNameBuffer, myTimeout) < 0)
             {
                 if (errno == ETIMEDOUT || errno == EIO) {
+                    // This seems to happen more often with low batteries
                     if (_myConsecutiveTimeouts < MAX_CONSECUTIVE_ERRORS) {
                         if (errno == ETIMEDOUT ) {
                             AC_WARNING << "Failed to read bluetooth device name. Got timeout. Retrying...";
