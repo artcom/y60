@@ -49,6 +49,7 @@ namespace y60 {
         virtual void pauseCapture();
     private:
         DShowGraph *      _myGraph;
+        bool              _myDeinterlaceFlag;
     };
 /* @} */
 }
