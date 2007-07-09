@@ -28,6 +28,11 @@ WiiRemote.prototype.Constructor = function(self, theId, theApp, theMasterWii) {
     var _myBody = null;
     var _myCursor = null;
     var _myLowpassedUpVector = new Vector3f(0, 1, 0);
+    var _myPickedBody = null;
+    var _myRumbleWii = null;
+
+    var _myApp = theApp;
+    var _myDriver = theApp.getWiimoteDriver();
     setup();
 
     function setup() {
@@ -60,9 +65,13 @@ WiiRemote.prototype.Constructor = function(self, theId, theApp, theMasterWii) {
                 _myCursor.visible = false;
                 break;
             case "infrareddata":
-                var myPosition = new Vector2f(window.width - ((theEvent.screenposition.x * window.width/2.0) + window.width/2.0),
+                var myPosition = new Vector2f(window.width - ((theEvent.screenposition.x *
+                        window.width/2.0) + window.width/2.0),
                         (theEvent.screenposition.y * window.height/2.0) + window.height/2.0 );
                 _myCursor.position = myPosition;
+                if ( _myPickedBody ) {
+                    _myPickedBody.position = _myApp.pickPointOnPlane( myPosition );
+                }
                 break;
             case "button":
                 handleButton( theEvent );
@@ -73,10 +82,39 @@ WiiRemote.prototype.Constructor = function(self, theId, theApp, theMasterWii) {
     self.__defineSetter__('position', function( thePos ) {
         _myBody.position = thePos;
     });
+    self.__defineSetter__('rumble', function( theFlag ) {
+        _myDriver.setRumble(_myBody.id, theFlag);
+    });
+    self.__defineGetter__('id', function() {
+        return _myBody.id;
+    });
 
     function handleButton( theEvent ) {
         print("button " + theEvent.buttonname + (theEvent.pressed ? " pressed " : " released ")
                 + " on Wii " + theEvent.id );
+        if (theEvent.buttonname == "A") {
+            if (_myCursor.visible && theEvent.pressed) {
+                var myBody = _myApp.pickBody( _myCursor.position );
+                if (myBody) {
+                    _myRumbleWii = _myApp.getWiiById( myBody.id );
+                    if (_myRumbleWii) {
+                        _myRumbleWii.rumble = true;
+                    }
+                }
+            } else if ( ! theEvent.pressed ) {
+                if (_myRumbleWii) {
+                    _myRumbleWii.rumble = false;
+                    _myRumbleWii = null;
+                }
+            }
+        }
+        if (theEvent.buttonname == "B") {
+            if (_myCursor.visible && theEvent.pressed) {
+                _myPickedBody = _myApp.pickBody( _myCursor.position );
+            } else if ( ! theEvent.pressed ) {
+                _myPickedBody = null;
+            }
+        }
     }
 
 }
@@ -256,34 +294,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         return;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
         if('screenposition' in theEvent && _myPickedBody) {
             _myPickedBody.position = _myPicking.pickPointOnPlane(_myLastPosition.x, _myLastPosition.y, _myPlane);
         }
@@ -398,9 +409,22 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             }
         }
         
+        */
     }
     
+    self.getWiimoteDriver = function() {
+        return _myWiimoteDriver;
+    }
 
+    self.pickBody = function ( thePosition ) {
+        return _myPicking.pickBody( thePosition.x, thePosition.y);
+    }
+    self.pickPointOnPlane = function ( thePosition ) {
+        return _myPicking.pickPointOnPlane(thePosition.x, thePosition.y, _myPlane);
+    }
+    self.getWiiById = function ( theId ) {
+        return _myWiimotes[ theId ];
+    }
     ///////////////////////////////////////////////////////
     // private funtions 
     ///////////////////////////////////////////////////////

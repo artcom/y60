@@ -45,6 +45,7 @@ class WiiScanner : public asl::PosixThread {
         int _myDeviceId;
         int _mySocket;
         int _myConsecutiveTimeouts;
+        int _myConsecutiveInquiryFailures;
 #endif
         
 };

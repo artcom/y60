@@ -46,7 +46,7 @@ const uint8_t WIIMOTE_CLASS_0( 0x04 );
 const uint8_t WIIMOTE_CLASS_1( 0x25 );
 const uint8_t WIIMOTE_CLASS_2( 0x00 );
 
-const int MAX_CONSECUTIVE_TIMEOUTS( 5 );
+const int MAX_CONSECUTIVE_ERRORS( 5 );
 #endif
 
 
@@ -60,7 +60,7 @@ WiiScanner::WiiScanner() :
 
 WiiScanner::~WiiScanner() {
     _isScanning = false;
-    AC_PRINT << "Waiting for scanner thread shutdown ...";
+    AC_PRINT << "Waiting for scanner thread shutdown. This may take a couple of seconds ...";
     join();
     if (_mySocket != -1) {
         hci_close_dev( _mySocket );
@@ -142,12 +142,20 @@ WiiScanner::collectNewWiiControllers() {
                 & myDeviceList, IREQ_CACHE_FLUSH);
 
         if (myDeviceCount == -1) {
-            // XXX sometimes we get "Device or resource busy"
-            // TODO do something similar to the timeout handling
-            /*
-            throw WiiException(string("Failed to inquire bluetooth devices: ") +
-                    strerror( errno) , PLUS_FILE_LINE);
-            */
+            // Sometimes the inquiry fails with "device or resource busy". This probably
+            // happens when the system hci daemon performs a inquiry. So we handle this 
+            // gracefully.
+            if (_myConsecutiveInquiryFailures < MAX_CONSECUTIVE_ERRORS) {
+                AC_WARNING << "Failed to inquire bluetooth devices. Retrying...";
+                _myConsecutiveInquiryFailures += 1;
+                sleep( 2 ); // wait a while
+            } else {
+                throw WiiException(string("Failed to inquire bluetooth devices.") +
+                        "Bailing out.",
+                        PLUS_FILE_LINE);
+            }
+        } else {
+            _myConsecutiveInquiryFailures = 0;
         }
 
         if (myDeviceCount <= 0) {
@@ -167,13 +175,18 @@ WiiScanner::collectNewWiiControllers() {
             if (hci_remote_name( _mySocket, & myDeviceList[i].bdaddr, WIIMOTE_NAME_LENGTH,
                         myNameBuffer, myTimeout) < 0)
             {
-                if (errno == ETIMEDOUT) {
-                    if (_myConsecutiveTimeouts < MAX_CONSECUTIVE_TIMEOUTS) {
-                        AC_WARNING << "Failed to read bluetooth device name. Got timeout. Retrying...";
+                if (errno == ETIMEDOUT || errno == EIO) {
+                    if (_myConsecutiveTimeouts < MAX_CONSECUTIVE_ERRORS) {
+                        if (errno == ETIMEDOUT ) {
+                            AC_WARNING << "Failed to read bluetooth device name. Got timeout. Retrying...";
+                        } else if (errno == EIO) {
+                            AC_WARNING << "Failed to read bluetooth device name. Got IO error. Retrying...";
+                        }
                         _myConsecutiveTimeouts += 1;
                     } else {
                         throw WiiException(string("Failed to read bluetooth device name. Got ") +
-                                as_string(MAX_CONSECUTIVE_TIMEOUTS) + " timeouts. Bailing out.",
+                                as_string(MAX_CONSECUTIVE_ERRORS) + " consecutive timeouts." +
+                                "Bailing out.",
                                 PLUS_FILE_LINE);
                     }
                 } else {
@@ -222,7 +235,9 @@ WiiScanner::collectNewWiiControllers() {
     if (myDeviceList) {
         free( myDeviceList );
     }
+
 #elif WIN32
+
     HANDLE WriteHandle = 0, DeviceHandle = 0;
 
     HANDLE hDevInfo;
