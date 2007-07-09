@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/***************************************************************************\
 
  2007-07-05 (ms):
   Ported to Y60 DOM, upgraded some parts to SOAP1.1 and deleted the rest.
@@ -125,7 +125,7 @@ theParams.toXml()+
 
     Logger.info("invoking "+theOperation+" at "+myAddressNode.location);
 	var xmlHttp = new Request(myAddressNode.location);
-    xmlHttp.verbose=true;
+    // xmlHttp.verbose = true;
     xmlHttp.post(soapRequest);
 	var soapAction = ((ns.lastIndexOf("/") != ns.length - 1) ? ns + "/" : ns) + theOperation;
 	xmlHttp.addHttpHeader("SOAPAction", soapAction);
