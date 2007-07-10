@@ -77,12 +77,9 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     }
 
     self.setBody = function(theNode) {
+        theNode.sticky = true;
         _myOffscreenNodes.push(theNode);
         self.render();
-    }
-
-    self.addHiddenNode = function(theNode) {
-        _myHiddenNodes.push(theNode);
     }
 
     self.render = function(theReadbackFlag, theCubemapFace) {
@@ -260,7 +257,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
 
     self.image                 = null;
     var _myOffscreenRenderArea = null;
-    var _myHiddenNodes         = [];
     var _myOffscreenNodes      = [];
 
     var _myCanvas         = null;

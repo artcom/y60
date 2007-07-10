@@ -46,25 +46,31 @@ namespace y60 {
                     dom::NodePtr getVertexData(const std::string & theType, const std::string & theName);
                     PrimitiveCachePtr getPrimitive(const std::string & theType, const std::string & theMaterialRef, const RenderStyles & theRenderStyles);
                     std::string getShapeId() const;
-                    dom::NodePtr _myShape;
+                    dom::NodePtr getShapeNode();
 
                 private:
                     std::map<std::string, PrimitiveCachePtr> _myPrimitiveMap;
                     std::map<std::string, dom::NodePtr> _myVertexDataMap;
+                    dom::NodePtr _myShapeNode;
             };
             typedef asl::Ptr<SuperShape> SuperShapePtr;
 
-            void runNode(dom::NodePtr theRootNode = dom::NodePtr(0));
+            void runNode(dom::NodePtr & theRootNode = dom::NodePtr(0));
             void mergeChildWithParent(dom::NodePtr theNode);
-            void cleanupScene(dom::NodePtr theNode);
-            void mergeVertexData(const Shape & theShape, bool theFlipFlag, const asl::Matrix4f & theMatrix,
+            void cleanupScene(dom::NodePtr & theNode);
+            void mergeVertexData(const dom::NodePtr & theVertexData, bool theFlipFlag, const asl::Matrix4f & theMatrix,
                                  const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
-            void mergePrimitives(const Shape & theShape, bool theFlipFlag, VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles);
+            void mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag, VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles);
             bool mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theMatrix);
             void removeInvisibleNodes(dom::NodePtr theNode);
+            void pinAnimatedNodes(dom::NodePtr theRootNode);
+            void pinBodiesWithSameShapes(dom::NodePtr theRootNode);
+            void collectIds(dom::NodePtr theNode, std::set<std::string> & theIds);
             void collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds);
             void removeUnusedShapes();
-            void transformToParent(dom::NodePtr theParent, dom::NodePtr theChild);
+            void transformToParent(dom::NodePtr theNode);
+            void convertToTransformNode(dom::NodePtr & theNode);
+            bool hasUnstickyChildren(dom::NodePtr theNode);
 
             template <class T>
             unsigned copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData);
@@ -72,6 +78,7 @@ namespace y60 {
                                          bool theFlipFlag, asl::Matrix4f theMatrix, bool theNormalFlag = false);
 
             Scene & _myScene;
+            dom::NodePtr _myRootNode;
 
             typedef std::map<std::string, SuperShapePtr> SuperShapeMap;
             SuperShapeMap _myShapes;

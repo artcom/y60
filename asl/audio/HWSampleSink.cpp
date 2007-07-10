@@ -76,7 +76,7 @@ void HWSampleSink::play() {
         changeState(RUNNING);
         AudioTimeSource::run();
     } else {
-        AC_DEBUG << "HWSampleSink::play: Play received when alredy playing. Ignored.";
+        AC_DEBUG << "HWSampleSink::play: Play received when already playing. Ignored.";
     }
 }
 
@@ -225,11 +225,11 @@ unsigned HWSampleSink::getNumUnderruns() const {
 }
 
 void HWSampleSink::dumpState() {
-    AC_DEBUG << "HWSampleSink '" << _myName << "' state:";
-    AC_DEBUG << "  Sample rate: " << SampleSource::_mySampleRate;
-    AC_DEBUG << "  Sample format: " << _mySampleFormat;
-    AC_DEBUG << "  Number of channels: " << _numChannels;
-    AC_DEBUG << string("State: ")+stateToString(_myState);
+    AC_TRACE << "HWSampleSink '" << _myName << "' state:";
+    AC_TRACE << "  Sample rate: " << SampleSource::_mySampleRate;
+    AC_TRACE << "  Sample format: " << _mySampleFormat;
+    AC_TRACE << "  Number of channels: " << _numChannels;
+    AC_TRACE << "  State: " + stateToString(_myState);
 }
 
 void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {

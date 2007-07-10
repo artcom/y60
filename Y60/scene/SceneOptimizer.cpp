@@ -13,6 +13,7 @@
 #include "TransformBuilder.h"
 #include <asl/Logger.h>
 #include <y60/NodeNames.h>
+#include <y60/modelling_functions.h>
 
 namespace y60 {
 
@@ -21,15 +22,11 @@ namespace y60 {
     {}
 
     SceneOptimizer::SuperShape::SuperShape(Scene & theScene) {
-        RenderStyles myDefaultRenderStyles;
-        myDefaultRenderStyles.set(FRONT);
-        myDefaultRenderStyles.set(BACK);
-
-        _myShape = theScene.getShapesRoot()->appendChild(dom::Element(SHAPE_NODE_NAME));
-        _myShape->appendAttribute(NAME_ATTRIB, "Supershape");
-        _myShape->appendAttribute(ID_ATTRIB, IdTag::getDefault());
-        _myShape->appendChild(dom::Element(VERTEX_DATA_NAME));
-        _myShape->appendChild(dom::Element(PRIMITIVE_LIST_NAME));
+        _myShapeNode = theScene.getShapesRoot()->appendChild(dom::Element(SHAPE_NODE_NAME));
+        _myShapeNode->appendAttribute(NAME_ATTRIB, "Supershape");
+        _myShapeNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
+        _myShapeNode->appendChild(dom::Element(VERTEX_DATA_NAME));
+        _myShapeNode->appendChild(dom::Element(PRIMITIVE_LIST_NAME));
     }
 
     dom::NodePtr
@@ -38,7 +35,7 @@ namespace y60 {
             dom::Element myNewVertexData(theType);
             myNewVertexData.appendAttribute(NAME_ATTRIB, theName);
             myNewVertexData.appendChild(dom::Text("[]"));
-            _myVertexDataMap[theName] = _myShape->childNode(VERTEX_DATA_NAME)->appendChild(myNewVertexData);
+            _myVertexDataMap[theName] = _myShapeNode->childNode(VERTEX_DATA_NAME)->appendChild(myNewVertexData);
         }
 
         return _myVertexDataMap[theName];
@@ -53,8 +50,8 @@ namespace y60 {
             myNewElements.appendAttribute(PRIMITIVE_TYPE_ATTRIB, theType);
             myNewElements.appendAttribute(MATERIAL_REF_ATTRIB, theMaterial);
             myNewElements.appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
-            dom::NodePtr myPrimitive = _myShape->childNode(PRIMITIVE_LIST_NAME)->appendChild(myNewElements);
-            _myPrimitiveMap[myKey] = PrimitiveCachePtr(new PrimitiveCache(myPrimitive));
+            dom::NodePtr myPrimitive = _myShapeNode->childNode(PRIMITIVE_LIST_NAME)->appendChild(myNewElements);
+            _myPrimitiveMap[myKey]   = PrimitiveCachePtr(new PrimitiveCache(myPrimitive));
         }
 
         return _myPrimitiveMap[myKey];
@@ -62,7 +59,12 @@ namespace y60 {
 
     std::string
     SceneOptimizer::SuperShape::getShapeId() const {
-        return _myShape->getAttributeString(ID_ATTRIB);
+        return _myShapeNode->getAttributeString(ID_ATTRIB);
+    }
+
+    dom::NodePtr
+    SceneOptimizer::SuperShape::getShapeNode() {
+        return _myShapeNode;
     }
 
     dom::NodePtr
@@ -82,193 +84,215 @@ namespace y60 {
 
     void
     SceneOptimizer::run(dom::NodePtr theRootNode) {
-        //AC_PRINT << "Running optimizer";
         AC_INFO << "Running Scene optimizer";
+
         if (!theRootNode) {
             theRootNode = _myScene.getWorldRoot();
         }
-        _myStickyNodes.push_back(theRootNode);
 
-        // check whether the given root node is of the transform hierarchy
+        // Check whether the given root node is of the transform hierarchy
+        TransformHierarchyFacadePtr myFacade(0);
         try {
-            theRootNode->getFacade<TransformHierarchyFacade>();
+            myFacade = theRootNode->getFacade<TransformHierarchyFacade>();
         } catch (...) {
             throw;
         }
+        _myRootNode = theRootNode;
+        _myStickyNodes.push_back(_myRootNode);
 
-        // remove invisible nodes
+        // Remove invisible nodes
         AC_INFO << "  Removing invisible nodes...";
-        removeInvisibleNodes(theRootNode);
+        removeInvisibleNodes(_myRootNode);
 
-        // optimize all sticky nodes until the list is empty
+        // Set nodes with animations on it to sticky
+        AC_INFO << "  Set animated nodes sticky...";
+        pinAnimatedNodes(_myRootNode);
+
+        // Pin body nodes that reference the same shape node (memory friendly)
+        //XXX: commented out for now, maybe add a switch to be able to turn it off,
+        //     but it's not that useful anyway
+        //pinBodiesWithSameShapes(_myRootNode);
+
+        // Optimize all sticky nodes until the list is empty
         while (!_myStickyNodes.empty()) {
             dom::NodePtr myRootNode = _myStickyNodes[0];
+            if (hasUnstickyChildren(myRootNode)) {
+                runNode(myRootNode);
+            } else {
+                unsigned myNumChildren = myRootNode->childNodesLength();
+                for (unsigned i = 0; i < myNumChildren; ++i) {
+                    dom::NodePtr myChildNode = myRootNode->childNode(i);
+                    _myStickyNodes.push_back(myChildNode);
+                }
+            }
+
             _myStickyNodes.erase(_myStickyNodes.begin());
-            runNode(myRootNode);
         }
 
-        // remove unused shapes
+        // Remove empty transforms and
+        // merge transforms with single childs with their child
+        AC_INFO << "  Cleanup scene...";
+        cleanupScene(_myRootNode);
+
+        // Remove unused shapes
         AC_INFO << "  Removing unused shapes...";
         removeUnusedShapes();
-        AC_INFO << "  optimizing done...";
+        AC_INFO << "  Optimizing done!";
     }
 
     void
-    SceneOptimizer::runNode(dom::NodePtr theRootNode) {
-        // reset the supershape
+    SceneOptimizer::runNode(dom::NodePtr & theRootNode) {
+        // Reset the supershape
         _mySuperShape = SuperShapePtr(0);
 
-        // merge all bodies into one superbody
+        // Merge all bodies into one superbody
         AC_INFO << "  Merging bodies...";
         asl::Matrix4f myInitialMatrix = theRootNode->getFacade<TransformHierarchyFacade>()->get<InverseGlobalMatrixTag>();
         mergeBodies(theRootNode, myInitialMatrix);
 
-        // remove empty transforms and
-        // merge transforms with single childs with their child
-        AC_INFO << "  Cleanup Scene...";
-        cleanupScene(theRootNode);
-
-        // create a superbody and append the supershape
+        // Create a superbody and append the supershape
+        // or reuse the rootnode, if it is a body
         if (_mySuperShape != 0) {
-            dom::NodePtr mySuperBody;
-            mySuperBody = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
-            mySuperBody->appendAttribute(NAME_ATTRIB, "Optimized Body");
-            mySuperBody->appendAttribute(BODY_SHAPE_ATTRIB, _mySuperShape->getShapeId());
+            AC_INFO << "  Append superbody/supershape...";
+            if (theRootNode->nodeName() == BODY_NODE_NAME) {
+                // Don't change the referenced shape of a sticky body node
+                // some code might stop working then
+                AC_INFO << "    Reusing the referenced shape.";
+                dom::NodePtr myShapeNode = _myScene.getShapesRoot()->getChildElementById(theRootNode->getAttributeString(BODY_SHAPE_ATTRIB), ID_ATTRIB);
+                for (signed i = myShapeNode->childNodesLength() - 1; i >= 0; --i) {
+                    myShapeNode->removeChild(myShapeNode->childNode(i));
+                }
+                for (unsigned i = 0; i < _mySuperShape->getShapeNode()->childNodesLength(); ++i) {
+                    myShapeNode->appendChild(_mySuperShape->getShapeNode()->childNode(i)->cloneNode());
+                }
+            } else {
+                AC_INFO << "    Creating a new shape.";
+                dom::NodePtr mySuperBody                 = createBody(theRootNode, _mySuperShape->getShapeId());
+                TransformHierarchyFacadePtr myBodyFacade = mySuperBody->getFacade<TransformHierarchyFacade>();
+                myBodyFacade->set<NameTag>("Optimized Body");
+            }
         }
     }
 
     void
-    SceneOptimizer::transformToParent(dom::NodePtr theParent, dom::NodePtr theChild) {
-        //XXX: just curious why theChild->parentNode() doesn't work
-        //if (theChild) {
-        //    AC_PRINT << "theChild node exists: '" << theChild->nodeName() << "'";
-        //} else {
-        //    AC_PRINT << "theChild node doesn't exist";
-        //}
+    SceneOptimizer::transformToParent(dom::NodePtr theNode) {
+        dom::NodePtr myParentNode = theNode->parentNode()->self().lock();
 
-        //if (theParent) {
-        //    AC_PRINT << "theParent exists: '" << theParent->nodeName() << "'";
-        //} else {
-        //    AC_PRINT << "theParent doesn't exist";
-        //}
-
-        //if (theChild->parentNode()) {
-        //    AC_PRINT << "parentNode exists: '" << theChild->parentNode()->nodeName() << "'";
-        //} else {
-        //    AC_PRINT << "parentNode doesn't exist";
-        //}
-
-        // get the inverse localmatrix of the parent
-        TransformHierarchyFacadePtr myFacade = theParent->getFacade<TransformHierarchyFacade>();
-        asl::Matrix4f myMatrix               = asl::inverse(myFacade->get<LocalMatrixTag>());
+        // Get the inverse localmatrix of the node
+        TransformHierarchyFacadePtr myFacade       = theNode->getFacade<TransformHierarchyFacade>();
+        TransformHierarchyFacadePtr myParentFacade = myParentNode->getFacade<TransformHierarchyFacade>();
+        asl::Matrix4f myMatrix                     = asl::product(myFacade->get<LocalMatrixTag>(), myParentFacade->get<LocalMatrixTag>());
         asl::Vector3f myScale;
         asl::Vector3f myShear;
         asl::Quaternionf myOrientation;
         asl::Vector3f myPosition;
         myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
 
-        // transform the node
-        theChild->getAttribute(SCALE_ATTRIB)->nodeValueAssign<asl::Vector3f>(myScale);
-        theChild->getAttribute(ORIENTATION_ATTRIB)->nodeValueAssign<asl::Quaternionf>(myOrientation);
-        theChild->getAttribute(POSITION_ATTRIB)->nodeValueAssign<asl::Vector3f>(myPosition);
+        // Transform the node
+        myFacade->set<ScaleTag>(myScale);
+        myFacade->set<OrientationTag>(myOrientation);
+        myFacade->set<PositionTag>(myPosition);
     }
 
     void
-    SceneOptimizer::cleanupScene(dom::NodePtr theNode) {
+    SceneOptimizer::cleanupScene(dom::NodePtr & theNode) {
         unsigned myNumChildren = theNode->childNodesLength();
         for (signed i = myNumChildren - 1; i >= 0; --i) {
             dom::NodePtr myChild = theNode->childNode(i);
 
-            // don't clean up when sticky
-            if (myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
-                return;
-            }
-
-            // search depth first
+            // Search depth first
             cleanupScene(myChild);
+        }
 
-            std::string myParentNodeName = theNode->nodeName();
-            std::string myNodeName       = myChild->nodeName();
+        dom::NodePtr myParentNode    = theNode->parentNode()->self().lock();
+        std::string myParentNodeName = myParentNode->nodeName();
+        std::string myNodeName       = theNode->nodeName();
 
-            //XXX: untested
-            //// make an included world node a transform node
-            //// and merge it with its include node
-            //if (myNodeName == WORLD_NODE_NAME && myParentNodeName == INCLUDE_NODE_NAME) {
-            //    // create a new transform node
-            //    y60::TransformBuilder myTransform(myChild->getAttributeString(NAME_ATTRIB));
-            //    dom::NodePtr myTransformNode = myTransform.getNode();
+        // Remove empty transforms, includes and worlds
+        unsigned myCurNumChildren = theNode->childNodesLength();
+        if (myCurNumChildren == 0 && !theNode->getAttributeValue<bool>(STICKY_ATTRIB) &&
+            (myNodeName == TRANSFORM_NODE_NAME || myNodeName == INCLUDE_NODE_NAME || myNodeName == WORLD_NODE_NAME)) {
+            myParentNode->removeChild(theNode);
+            return;
+        }
 
-            //    // cycle through all transform node attributes
-            //    unsigned myNumTransformAttributes = myTransformNode->attributesLength();
-            //    for (unsigned j = 0; j < myNumTransformAttributes; ++j) {
-            //        dom::NodePtr myTransformAttributeNode = myTransformNode->getAttribute(j);
-            //        std::string myAttributeName           = myTransformAttributeNode->nodeName();
-            //        dom::NodePtr myWorldAttributeNode     = myChild->getAttribute(myAttributeName);
-            //        if (myWorldAttributeNode) {
-            //            myTransformAttributeNode->nodeValue(myWorldAttributeNode->nodeValue());
-            //        } else {
-            //            throw asl::Exception("A world node doesn't know about the attribute '" + myAttributeName + "'",  PLUS_FILE_LINE);
-            //        }
-            //    }
+        // Make an included world node a transform node
+        if (myNodeName == WORLD_NODE_NAME) {
+            if (myParentNodeName == INCLUDE_NODE_NAME && !theNode->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                convertToTransformNode(theNode);
+            }
+        }
 
-            //    // remove world and append transform
-            //    theNode->replaceChild(myTransformNode, myChild);
-            //}
+        // Make an include node a transform node
+        // when it doesn't have a world node as child
+        else if (myNodeName == INCLUDE_NODE_NAME) {
+            if (!theNode->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                bool myConvertFlag = true;
+                for (unsigned i = 0; i < myCurNumChildren; ++i) {
+                    dom::NodePtr myChild = theNode->childNode(i);
+                    if (myChild->nodeName() == WORLD_NODE_NAME) {
+                        myConvertFlag = false;
+                    }
+                }
+                if (myConvertFlag) {
+                    convertToTransformNode(theNode);
+                }
+            }
+        }
 
-            // remove empty transforms, includes and worlds
-            unsigned myNumGrandChildren = myChild->childNodesLength();
-            if (myNumGrandChildren == 0 &&
-                (myNodeName == TRANSFORM_NODE_NAME ||
-                 myNodeName == INCLUDE_NODE_NAME ||
-                 myNodeName == WORLD_NODE_NAME))
-            {
-                theNode->removeChild(myChild);
+        // Merge nodes with their single child
+        if (theNode->childNodesLength() == 1) {
+            // Read the node name once more, since it could've been changed above
+            std::string myParentNodeName = myParentNode->nodeName();
+            std::string myNodeName       = theNode->nodeName();
+            dom::NodePtr myChildNode     = theNode->childNode(0);
+            std::string myChildNodeName  = myChildNode->nodeName();
+            unsigned myNumGrandChildren  = myChildNode->childNodesLength();
+
+            // Include or transform node => becomes child node
+            if (myNodeName == INCLUDE_NODE_NAME || myNodeName == TRANSFORM_NODE_NAME) {
+                if (!theNode->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                    transformToParent(myChildNode);
+
+                    // Replace the parent node with the child node
+                    myParentNode->replaceChild(myChildNode, theNode);
+                }
             }
 
-            //XXX: untested
-            //// merge nodes with their single child
-            //if (myNumChildren == 1) {
-            //    // include or transform node => becomes child node
-            //    if (myParentNodeName == INCLUDE_NODE_NAME || myNodeName == TRANSFORM_NODE_NAME) {
-            //        transformToParent(theNode, myChild);
+            // Light or camera or projector node => takeover children of transform nodes
+            else if ((myNodeName == LIGHT_NODE_NAME || myNodeName == CAMERA_NODE_NAME || myNodeName == PROJECTOR_NODE_NAME) &&
+                     myChildNodeName == TRANSFORM_NODE_NAME)
+            {
+                if (!myChildNode->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                    for (signed j = myNumGrandChildren - 1; j >= 0; --j) {
+                        dom::NodePtr myGrandChild = myChildNode->childNode(j);
+                        transformToParent(myGrandChild);
 
-            //        // replace the parent node with the child node
-            //        theNode->parentNode()->replaceChild(myChild, theNode);
-            //    }
+                        // Append the grandchild to the parent
+                        theNode->appendChild(myGrandChild);
+                    }
 
-            //    // light or camera or projector node => takeover children of transform nodes
-            //    else if ((myParentNodeName == LIGHT_NODE_NAME || myParentNodeName == CAMERA_NODE_NAME || myParentNodeName == PROJECTOR_NODE_NAME) &&
-            //             myNodeName == TRANSFORM_NODE_NAME) {
-            //        unsigned myNumGrandChildren = myChild->childNodesLength();
-            //        for (unsigned j = 0; j < myNumGrandChildren; ++j) {
-            //            dom::NodePtr myGrandChild = myChild->childNode(j);
-            //            transformToParent(myChild, myGrandChild);
+                    // Remove the child node
+                    theNode->removeChild(myChildNode);
+                }
+            }
 
-            //            // append the grandchild to the parent
-            //            theNode->appendChild(myGrandChild);
-            //        }
+            // World node with worlds parent or
+            // body node without children or
+            // light/camera/projector node with light/camera/projector child node
+            // => do nothing
+            else if (myNodeName == WORLD_NODE_NAME && myParentNodeName == WORLD_LIST_NAME ||
+                     myNodeName == BODY_NODE_NAME && myNumGrandChildren == 0 ||
+                     (myNodeName == LIGHT_NODE_NAME || myNodeName == CAMERA_NODE_NAME || myNodeName == PROJECTOR_NODE_NAME) &&
+                     (myChildNodeName == LIGHT_NODE_NAME || myChildNodeName == CAMERA_NODE_NAME || myChildNodeName == PROJECTOR_NODE_NAME))
+            {
+                // Allowed, but nothing to do
+            }
 
-            //        // remove the child node
-            //        theNode->removeChild(myChild);
-            //    }
-
-            //    // world node with worlds parent or
-            //    // body node without children or
-            //    // light/camera/projector node with light/camera/projector child node
-            //    // => do nothing
-            //    else if (myParentNodeName == WORLD_NODE_NAME && theNode->parentNode()->nodeName() == WORLD_LIST_NAME ||
-            //             myParentNodeName == BODY_NODE_NAME && myNumGrandChildren == 0 ||
-            //             (myParentNodeName == LIGHT_NODE_NAME || myParentNodeName == CAMERA_NODE_NAME || myParentNodeName == PROJECTOR_NODE_NAME) &&
-            //             (      myNodeName == LIGHT_NODE_NAME ||       myNodeName == CAMERA_NODE_NAME ||       myNodeName == PROJECTOR_NODE_NAME))
-            //    {
-            //        // allowed, but nothing to do
-            //    }
-
-            //    // unknown or unallowed configuration => exception
-            //    else {
-            //        throw asl::Exception("Unknown configuration: '" + myParentNodeName + "' node with child '" + myNodeName + "' node", PLUS_FILE_LINE);
-            //    }
-            //}
+            // Unknown or unallowed configuration => exception
+            else {
+                throw asl::Exception("Unknown configuration: '" + myParentNodeName + "' node with child '" + myNodeName + "' node", PLUS_FILE_LINE);
+            }
         }
     }
 
@@ -298,11 +322,11 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::mergeVertexData(const Shape & theShape, bool theFlipFlag, const asl::Matrix4f & theMatrix,
+    SceneOptimizer::mergeVertexData(const dom::NodePtr & theVertexData, bool theFlipFlag, const asl::Matrix4f & theMatrix,
                                     const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets) {
-        dom::NodePtr myVertexData = theShape.getNode().childNode(VERTEX_DATA_NAME);
-        for (unsigned i = 0; i < myVertexData->childNodesLength(); ++i) {
-            dom::NodePtr mySrcVertexData = myVertexData->childNode(i);
+        unsigned myNumVertexData = theVertexData->childNodesLength();
+        for (unsigned i = 0; i < myNumVertexData; ++i) {
+            dom::NodePtr mySrcVertexData = theVertexData->childNode(i);
 
             // Skip unused vertex data
             RoleMap::const_iterator it = theRoles.find(mySrcVertexData->getAttributeString(NAME_ATTRIB));
@@ -318,39 +342,39 @@ namespace y60 {
                 TypeId myTypeId;
                 myTypeId.fromString(mySrcVertexData->nodeName());
 
-                // position
+                // Position
                 if (myRole == POSITION_ROLE && myTypeId == VECTOR_OF_VECTOR3F) {
                     theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theFlipFlag, theMatrix);
                 }
 
-                // normal
+                // Normal
                 else if (myRole == NORMAL_ROLE && myTypeId == VECTOR_OF_VECTOR3F) {
                     theVertexDataOffsets[myRole] = transformVertexData(mySrcVertexData, myDstVertexData, theFlipFlag, theMatrix, true);
                 }
 
-                // color
+                // Color
                 else if (myRole == COLOR_ROLE && myTypeId == VECTOR_OF_VECTOR4F) {
                     theVertexDataOffsets[myRole] = copyVertexData<asl::Vector4f>(mySrcVertexData, myDstVertexData);
                 }
 
-                // texcoords
+                // Texcoords
                 else if ((myRole == TEXCOORD0_ROLE || myRole == TEXCOORD1_ROLE || myRole == TEXCOORD2_ROLE || myRole == TEXCOORD3_ROLE ||
                           myRole == TEXCOORD4_ROLE || myRole == TEXCOORD5_ROLE || myRole == TEXCOORD6_ROLE || myRole == TEXCOORD7_ROLE) &&
                          myTypeId == VECTOR_OF_VECTOR2F) {
                     theVertexDataOffsets[myRole] = copyVertexData<asl::Vector2f>(mySrcVertexData, myDstVertexData);
                 }
 
-                // joint weights
+                // Joint weights
                 else if ((myRole == JOINT_WEIGHTS_ROLE_0 || myRole == JOINT_WEIGHTS_ROLE_1) && myTypeId == VECTOR_OF_VECTOR4F) {
                     theVertexDataOffsets[myRole] = copyVertexData<asl::Vector4f>(mySrcVertexData, myDstVertexData);
                 }
 
-                // joint indices
+                // Joint indices
                 else if ((myRole == JOINT_INDICES_ROLE_0 || myRole == JOINT_INDICES_ROLE_1) && myTypeId == VECTOR_OF_VECTOR4F) {
                     theVertexDataOffsets[myRole] = copyVertexData<asl::Vector4i>(mySrcVertexData, myDstVertexData);
                 }
 
-                // not yet implemented
+                // Not yet implemented
                 else {
                     throw asl::NotYetImplemented(std::string("Can not copy vertex data with role '") + myRole + "' and type '" +
                                                  getStringFromEnum(myTypeId, TypeIdStrings) + "'", PLUS_FILE_LINE);
@@ -360,144 +384,150 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::mergePrimitives(const Shape & theShape, bool theFlipFlag, VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles) {
-        dom::NodePtr myPrimitives = theShape.getNode().childNode(PRIMITIVE_LIST_NAME);
+    SceneOptimizer::mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag,
+                                    VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles) {
+        // Get element type
+        std::string myElementType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+        if (myElementType == PRIMITIVE_TYPE_QUADS) {
+            myElementType = PRIMITIVE_TYPE_TRIANGLES;
+        }
 
-        for (unsigned i = 0; i < myPrimitives->childNodesLength(); ++i) {
-            dom::NodePtr mySrcElements = myPrimitives->childNode(i);
+        // Get element material ref
+        std::string myMaterialRef = theElements->getAttributeString(MATERIAL_REF_ATTRIB);
 
-            // get element type
-            std::string myElementType = mySrcElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
-            
-            if (myElementType == PRIMITIVE_TYPE_QUADS) {
-                myElementType = PRIMITIVE_TYPE_TRIANGLES;
-            }
-            
+        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myElementType, myMaterialRef, theRenderStyles);
+        unsigned myNumSrcElements       = theElements->childNodesLength();
+        for (unsigned j = 0; j < myNumSrcElements; ++j) {
+            dom::NodePtr mySrcIndex = theElements->childNode(j);
+            std::string myName      = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
+            std::string myRole      = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+            dom::NodePtr myDstIndex = myDstElements->getIndex(myName, myRole);
 
-            // get element material ref
-            std::string myMaterialRef = mySrcElements->getAttributeString(MATERIAL_REF_ATTRIB);
+            const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
+            VectorOfUnsignedInt & myDst       = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
+            unsigned myOffset                 = myDst.size();
+            unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
 
-            // get element renderstyles
-            dom::NodePtr myAttribute = mySrcElements->getAttribute(RENDER_STYLE_ATTRIB);
-            if (!myAttribute) {
-                myAttribute = mySrcElements->appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
-            }
-            RenderStyles & myRenderStyles = myAttribute->nodeValueRefOpen<RenderStyles>();
-            bool myFlipFlag               = theFlipFlag;
-            /*
-            if (myRenderStyles[BACK] && !myRenderStyles[FRONT]) {
-                myRenderStyles[BACK]  = false;
-                myRenderStyles[FRONT] = true;
-                myFlipFlag            = !myFlipFlag;
-            }
-            */
-            myAttribute->nodeValueRefClose<RenderStyles>();
-
-            PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myElementType, myMaterialRef, myRenderStyles);
-            unsigned myNumSrcElements       = mySrcElements->childNodesLength();
-            for (unsigned j = 0; j < myNumSrcElements; ++j) {
-                dom::NodePtr mySrcIndex = mySrcElements->childNode(j);
-                std::string myName      = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
-                std::string myRole      = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
-                dom::NodePtr myDstIndex = myDstElements->getIndex(myName, myRole);
-
-                const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
-                VectorOfUnsignedInt & myDst       = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
-                unsigned myOffset                 = myDst.size();
-                unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
-
-                //// Triangulate quads
-                if (mySrcElements->getAttributeString(PROPERTY_TYPE_ATTRIB) == PRIMITIVE_TYPE_QUADS) {
-                    myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
-                    unsigned mySrcSize = mySrc.size();
-                    for (unsigned k = 0; k < mySrcSize; k += 4) {
-                        if (myFlipFlag) {
-                            myDst[myOffset++] = mySrc[k + 0] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 2] + myVertexDataOffset;
-                        } else {
-                            myDst[myOffset++] = mySrc[k + 0] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 2] + myVertexDataOffset;
-                            myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
-                        }
-                    }
-                } else {
-                    unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(mySrcElements));
-                    myDst.resize(mySrc.size() + myOffset);
-
-                    unsigned mySrcSize = mySrc.size();
-                    if (myFlipFlag) {
-                        for (unsigned k = 0; k < mySrcSize; ++k) {
-                            unsigned mySrcIndex = k + myVerticesPerPrimitive - 2 * (k % myVerticesPerPrimitive) - 1;
-                            myDst[myOffset + k] = mySrc[mySrcIndex] + myVertexDataOffset;
-                        }
+            // Triangulate quads
+            if (theElements->getAttributeString(PROPERTY_TYPE_ATTRIB) == PRIMITIVE_TYPE_QUADS) {
+                myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
+                unsigned mySrcSize = mySrc.size();
+                for (unsigned k = 0; k < mySrcSize; k += 4) {
+                    if (theFlipFlag) {
+                        myDst[myOffset++] = mySrc[k + 0] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 2] + myVertexDataOffset;
                     } else {
-                        for (unsigned k = 0; k < mySrcSize; ++k) {
-                            myDst[myOffset + k] = mySrc[k] + myVertexDataOffset;
-                        }
+                        myDst[myOffset++] = mySrc[k + 0] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 1] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 2] + myVertexDataOffset;
+                        myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
                     }
                 }
-
-                myDstIndex->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
+            } else {
+                unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
+                myDst.resize(mySrc.size() + myOffset);
+                unsigned mySrcSize = mySrc.size();
+                if (theFlipFlag) {
+                    for (unsigned k = 0; k < mySrcSize; ++k) {
+                        //unsigned mySrcIndex = k + myVerticesPerPrimitive - 2 * (k % myVerticesPerPrimitive) - 1;
+                        //myDst[myOffset + k] = mySrc[mySrcIndex] + myVertexDataOffset;
+                        myDst[myOffset + k] = mySrc[mySrcSize - 1 - k] + myVertexDataOffset;
+                    }
+                } else {
+                    for (unsigned k = 0; k < mySrcSize; ++k) {
+                        myDst[myOffset + k] = mySrc[k] + myVertexDataOffset;
+                    }
+                }
             }
+
+            myDstIndex->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
         }
     }
 
     bool
     SceneOptimizer::mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theInitialMatrix) {
-        // Search depth first, to avoid removing parents with unmerged children
+        // Search depth first
         unsigned myNumChildren = theNode->childNodesLength();
         for (signed i = myNumChildren - 1; i >= 0; --i) {
             dom::NodePtr myChild = theNode->childNode(i);
             if (myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
                 _myStickyNodes.push_back(myChild);
-            } else if (mergeBodies(myChild, theInitialMatrix)) {
-                theNode->removeChild(myChild);
+            } else {
+                if (mergeBodies(myChild, theInitialMatrix)) {
+                    if (myChild->childNodesLength() == 0) {
+                        // Remove the merged body if it has no children
+                        theNode->removeChild(myChild);
+                    } else {
+                        // Otherwise change it to a transform node
+                        convertToTransformNode(theNode);
+                    }
+                }
             }
         }
 
+        // Merge the shape into the supershape
         if (theNode->nodeName() == BODY_NODE_NAME) {
             BodyPtr myBody = theNode->getFacade<Body>();
             AC_INFO << "    Merge body: " + myBody->get<NameTag>();
             Shape & myShape = myBody->getShape();
-            RoleMap myRoles;
 
-            // Collect vertexdata used by primitives
-            dom::NodePtr myPrimitives = myShape.getNode().childNode(PRIMITIVE_LIST_NAME);
-            unsigned myNumElements = myPrimitives->childNodesLength();
-            for (unsigned i = 0; i < myNumElements; ++i) {
-                dom::NodePtr myElement = myPrimitives->childNode(i);
-                unsigned myNumIndices  = myElement->childNodesLength();
-                for (unsigned j = 0; j < myNumIndices; ++j) {
-                    dom::NodePtr myIndices = myElement->childNode(j);
-                    std::string myName     = myIndices->getAttributeString(VERTEX_DATA_ATTRIB);
-                    std::string myRole     = myIndices->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
-                    myRoles[myName].push_back(myRole);
-                }
-            }
-            asl::Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();
-            myMatrix.postMultiply(theInitialMatrix);
-
-            const asl::Vector3f & myXVector = asl::asVector3(myMatrix[0][0]);
-            const asl::Vector3f & myYVector = asl::asVector3(myMatrix[1][0]);
-            const asl::Vector3f & myZVector = asl::asVector3(myMatrix[2][0]);
-
-            bool myFlipFlag = dot(myXVector, cross(myYVector, myZVector)) < 0;
-            RenderStyles myRenderStyles = myShape.get<RenderStyleTag>();
-
+            // Initialize the supershape if it isn't yet
             if (_mySuperShape == 0) {
                 _mySuperShape = SuperShapePtr(new SuperShape(_myScene));
             }
 
-            VertexDataMap myVertexDataOffsets;
-            mergeVertexData(myShape, myFlipFlag, myMatrix, myRoles, myVertexDataOffsets);
-            mergePrimitives(myShape, myFlipFlag, myVertexDataOffsets, myRenderStyles);
+            // Calculate the appropriate matrix
+            asl::Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();
+            myMatrix.postMultiply(theInitialMatrix);
+
+            // Calculate the flip flag for the normals
+            const asl::Vector3f & myXVector = asl::asVector3(myMatrix[0][0]);
+            const asl::Vector3f & myYVector = asl::asVector3(myMatrix[1][0]);
+            const asl::Vector3f & myZVector = asl::asVector3(myMatrix[2][0]);
+            bool myNormalFlipFlag           = dot(myXVector, cross(myYVector, myZVector)) < 0;
+
+            // Get shape renderstyles
+            RenderStyles myShapeRenderStyles = myShape.get<RenderStyleTag>();
+
+            // Collect vertexdata used by primitives
+            dom::NodePtr myVertexData   = myShape.getNode().childNode(VERTEX_DATA_NAME);
+            dom::NodePtr myPrimitives   = myShape.getNode().childNode(PRIMITIVE_LIST_NAME);
+            unsigned myNumElements      = myPrimitives->childNodesLength();
+            for (unsigned i = 0; i < myNumElements; ++i) {
+                dom::NodePtr myElements = myPrimitives->childNode(i);
+
+                // Merge vertex data
+                RoleMap myRoles;
+                unsigned myNumIndices = myElements->childNodesLength();
+                for (unsigned j = 0; j < myNumIndices; ++j) {
+                    dom::NodePtr myIndices = myElements->childNode(j);
+                    std::string myName     = myIndices->getAttributeString(VERTEX_DATA_ATTRIB);
+                    std::string myRole     = myIndices->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+                    myRoles[myName].push_back(myRole);
+                }
+                VertexDataMap myVertexDataOffsets;
+                mergeVertexData(myVertexData, myNormalFlipFlag, myMatrix, myRoles, myVertexDataOffsets);
+
+                // Merge primitives
+                RenderStyles myElementsRenderStyles;
+                dom::NodePtr myRenderStyleAttr = myElements->getAttribute(RENDER_STYLE_ATTRIB);
+                if (!myRenderStyleAttr) {
+                    myElementsRenderStyles = myShapeRenderStyles;
+                }
+                bool myRewindFlag                     = myNormalFlipFlag;
+                if (myElementsRenderStyles[BACK] && !myElementsRenderStyles[FRONT]) {
+                    myElementsRenderStyles[BACK]  = false;
+                    myElementsRenderStyles[FRONT] = true;
+                    myRewindFlag                  = !myRewindFlag;
+                }
+                mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementsRenderStyles);
+            }
 
             return true;
         }
@@ -507,15 +537,118 @@ namespace y60 {
 
     void
     SceneOptimizer::removeInvisibleNodes(dom::NodePtr theNode) {
-        unsigned myNumChildren = theNode->childNodesLength();
+        dom::NodePtr mySceneNode      = _myScene.getSceneDom()->firstChild();
+        dom::NodePtr myAnimationsNode = mySceneNode->childNode(ANIMATION_LIST_NAME);
+        dom::NodePtr myCharactersNode = mySceneNode->childNode(CHARACTER_LIST_NAME);
+        unsigned myNumChildren   = theNode->childNodesLength();
         for (signed i = myNumChildren - 1; i >= 0; --i) {
             dom::NodePtr myChild = theNode->childNode(i);
-            std::string myChildNodeName = myChild->nodeName();
             if (!myChild->getAttributeValue<bool>(VISIBLE_ATTRIB) && !myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                // Collect Ids of all contained nodes
+                std::set<std::string> myNodeIds;
+                collectIds(myChild, myNodeIds);
+
+                // Remove the animations on all nodes of the collected ids, if available
+                for (std::set<std::string>::const_iterator it = myNodeIds.begin(); it != myNodeIds.end(); it++) {
+                    std::vector<dom::NodePtr> myAnimationNodes;
+
+                    // Search animations
+                    myAnimationsNode->getNodesByAttribute(ANIMATION_NODE_NAME,
+                                                          ANIM_NODEREF_ATTRIB,
+                                                          *it,
+                                                          true,
+                                                          myAnimationNodes);
+
+                    // Search character animations
+                    myCharactersNode->getNodesByAttribute(ANIMATION_NODE_NAME,
+                                                          ANIM_NODEREF_ATTRIB,
+                                                          *it,
+                                                          true,
+                                                          myAnimationNodes);
+
+                    // Remove the animations
+                    for (unsigned j = 0; j < myAnimationNodes.size(); ++j) {
+                        myAnimationNodes[j]->parentNode()->removeChild(myAnimationNodes[j]);
+                    }
+                }
+
+                // Then remove the node itself
                 theNode->removeChild(myChild);
             } else {
+                // Continue recursing into the tree
                 removeInvisibleNodes(myChild);
             }
+        }
+    }
+
+    void
+    SceneOptimizer::pinAnimatedNodes(dom::NodePtr theRootNode) {
+        // Get all animation nodes
+        dom::NodePtr mySceneNode = _myScene.getSceneDom()->firstChild();
+        std::vector<dom::NodePtr> myAnimationNodes;
+        mySceneNode->getNodesByTagName(ANIMATION_NODE_NAME, true, myAnimationNodes);
+
+        // Collect animated nodes
+        std::set<std::string> myNodeIds;
+        for (unsigned i = 0; i < myAnimationNodes.size(); ++i) {
+            myNodeIds.insert(myAnimationNodes[i]->getAttributeString(ANIM_NODEREF_ATTRIB));
+        }
+
+        // Set animated nodes and their parent to sticky
+        dom::NodePtr myWorldNode = _myScene.getWorldRoot();
+        for (std::set<std::string>::const_iterator it = myNodeIds.begin(); it != myNodeIds.end(); it++) {
+            dom::NodePtr myNode   = myWorldNode->getElementById(*it, ID_ATTRIB);
+            if (myNode) {
+                TransformHierarchyFacadePtr myFacade = myNode->getFacade<TransformHierarchyFacade>();
+                myFacade->set<StickyTag>(true);
+
+                dom::NodePtr myParent                      = myNode->parentNode()->self().lock();
+                TransformHierarchyFacadePtr myParentFacade = myParent->getFacade<TransformHierarchyFacade>();
+                myParentFacade->set<StickyTag>(true);
+            }
+        }
+    }
+
+    void
+    SceneOptimizer::pinBodiesWithSameShapes(dom::NodePtr theRootNode) {
+        // Get all body nodes
+        std::vector<dom::NodePtr> myBodyNodes;
+        theRootNode->getNodesByTagName(BODY_NODE_NAME, true, myBodyNodes);
+
+        // Collect referenced shape nodes
+        typedef std::pair<std::string, dom::NodePtr> ShapeMapPair;
+        typedef std::multimap<std::string, dom::NodePtr> ShapeMap;
+        ShapeMap myShapeMap;
+        for (unsigned i = 0; i < myBodyNodes.size(); ++i) {
+            myShapeMap.insert(ShapeMapPair(myBodyNodes[i]->getAttributeString(BODY_SHAPE_ATTRIB), myBodyNodes[i]));
+        }
+
+        // Set body nodes that reference the same shape to sticky
+        typedef std::set<std::string> ShapeMapKeys;
+        ShapeMapKeys myShapeMapKeys;
+        for (ShapeMap::const_iterator it = myShapeMap.begin(); it != myShapeMap.end(); ++it) {
+            myShapeMapKeys.insert((*it).first);
+        }
+
+        for (ShapeMapKeys::iterator it = myShapeMapKeys.begin(); it != myShapeMapKeys.end(); ++it) {
+            if (myShapeMap.count(*it) > 1) {
+                std::pair<ShapeMap::iterator, ShapeMap::iterator> myRange = myShapeMap.equal_range(*it);
+                for (ShapeMap::iterator j = myRange.first; j != myRange.second; ++j) {
+                    dom::NodePtr myNode = (*j).second;
+                    TransformHierarchyFacadePtr myFacade = myNode->getFacade<TransformHierarchyFacade>();
+                    myFacade->set<StickyTag>(true);
+                }
+            }
+        }
+    }
+
+    void
+    SceneOptimizer::collectIds(dom::NodePtr theNode, std::set<std::string> & theIds) {
+        theIds.insert(theNode->getAttributeString(ID_ATTRIB));
+
+        unsigned myNumChildren = theNode->childNodesLength();
+        for (unsigned i = 0; i < myNumChildren; ++i) {
+            collectIds(theNode->childNode(i), theIds);
         }
     }
 
@@ -545,4 +678,48 @@ namespace y60 {
             }
         }
     }
+
+    void
+    SceneOptimizer::convertToTransformNode(dom::NodePtr & theNode) {
+        // Create a new transform node
+        y60::TransformBuilder myTransform(theNode->getAttributeString(NAME_ATTRIB));
+        dom::NodePtr myTransformNode = myTransform.getNode();
+
+        // Cycle through all transform node attributes
+        unsigned myNumTransformAttributes = myTransformNode->attributesLength();
+        for (unsigned i = 0; i < myNumTransformAttributes; ++i) {
+            dom::NodePtr myTransformAttributeNode = myTransformNode->getAttribute(i);
+            std::string myAttributeName           = myTransformAttributeNode->nodeName();
+            dom::NodePtr myAttributeNode          = theNode->getAttribute(myAttributeName);
+            if (myAttributeNode) {
+                myTransformAttributeNode->nodeValue(myAttributeNode->nodeValue());
+            } else {
+                throw asl::Exception("A '" + theNode->nodeName() + "' node doesn't know about the attribute '" + myAttributeName + "'",  PLUS_FILE_LINE);
+            }
+        }
+
+        // Append the node's children to the transform
+        unsigned myNumChildren = theNode->childNodesLength();
+        for (signed i = myNumChildren - 1; i >= 0; --i) {
+            dom::NodePtr myChild = theNode->childNode(i);
+            myTransformNode->appendChild(myChild);
+        } 
+
+        // Remove the node and append transform
+        theNode->parentNode()->replaceChild(myTransformNode, theNode);
+        theNode = myTransformNode;
+    }
+
+    bool
+    SceneOptimizer::hasUnstickyChildren(dom::NodePtr theNode) {
+        unsigned myNumChildren = theNode->childNodesLength();
+        for (unsigned i = 0; i < myNumChildren; ++i) {
+            dom::NodePtr myChild = theNode->childNode(i);
+            if (!myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
+

@@ -288,7 +288,8 @@ function getDescendantsByName(theNode, theName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
-    return theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
+    return myResult;
 }
 
 // Recursivly searches theNode for the first element that has theAttribute.
@@ -317,14 +318,16 @@ function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
-    return theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
+    return myResult;
 }
 
 function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
-    return theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
+    return myResult;
 }
 
 // Recursivly search for the first element by tagname
@@ -341,7 +344,8 @@ function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
-    return theNode.getNodesByTagName(theTagName, doDeepSearch);        
+    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);        
+    return myResult;
 }
 
 function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
@@ -855,4 +859,6 @@ function parseVectorOfRankedFeature(theVectorOfString) {
     }
     return myVectorOfRankedFeature;
 }
+
+
 

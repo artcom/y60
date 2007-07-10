@@ -129,7 +129,7 @@ namespace y60 {
     AnimationBase::calcIndicies(int & theLowerIndex, int & theUpperIndex, double & theAlpha,
                   const double & theTime, const int & theValueSize)
     {
-        AC_DEBUG << "AnimationBase::calcIndicies name=" << _myNode->getAttributeString(NAME_ATTRIB) << " t=" << theTime << " start=" << (_myBegin + _myIn);
+        AC_TRACE << "AnimationBase::calcIndicies name=" << _myNode->getAttributeString(NAME_ATTRIB) << " t=" << theTime << " start=" << (_myBegin + _myIn);
 
         // Animation has not started, yet.
         if (theTime < (_myBegin + _myIn)) {

@@ -296,8 +296,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (theTile == undefined) {
             theTile = new Vector2i(1,6);
         }
-        var mySkyboxMaterial = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
-        if (mySkyboxMaterial) {
+        if (_mySkyboxMaterialId) {
+            var mySkyboxMaterial = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
             var mySkyboxImage = mySkyboxMaterial.getElementById(mySkyboxMaterial.childNode("textures").firstChild.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
@@ -305,10 +305,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();
-            var mySkyboxImageString =
-                '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" mipmap="0" wrapmode="repeat" tile="' + theTile + '"/>\n';
-            var mySkyboxImageDoc = new Node(mySkyboxImageString);
-            var mySkyboxImage = mySkyboxImageDoc.firstChild;
+
+            var mySkyboxImage      = Node.createElement("image");
+            mySkyboxImage.name     = theFileName;
+            mySkyboxImage.id       = myImageId;
+            mySkyboxImage.src      = theFileName;
+            mySkyboxImage.type     = "cubemap";
+            mySkyboxImage.mipmap   = 0;
+            mySkyboxImage.wrapmode = "repeat";
+            mySkyboxImage.tile     = theTile;
+
             _myRenderWindow.scene.images.appendChild(mySkyboxImage);
             self.addSkyBoxFromImage(mySkyboxImage);
         }
@@ -395,8 +401,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.recollectSwitchNodes = function() {
-        collectAllSwitchNodes(self.getScene());
+    self.recollectSwitchNodes = function(theNode) {
+        collectAllSwitchNodes(theNode);
     }
 
     self.onExit = function() {
@@ -443,8 +449,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onPreViewport = function(theViewport) {
-        var myCamera = theViewport.getElementById(theViewport.camera);
-        if (myCamera) {
+        if (theViewport.camera != "") {
+            var myCamera = theViewport.getElementById(theViewport.camera);
             // calculate near/far planes from world size and distance camera-world
             var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
             if (self.getMover(theViewport)) {
@@ -729,15 +735,17 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    function collectAllSwitchNodes( theScene ) {
-        _mySwitchNodes = new Array();
+    function collectAllSwitchNodes(theNode) {
+        _mySwitchNodes  = new Array();
         _myMSwitchNodes = new Array();
         _myTSwitchNodes = new Array();
     
-        var mySceneNode = theScene.dom;
-        var myWorld = mySceneNode.childNode("worlds").childNode("world");
-        collectSwitchNodes( myWorld );
-        collectSwitchNodes( mySceneNode.childNode("materials") );
+        if (theNode == null) {
+            collectSwitchNodes(window.scene.world);
+        } else {
+            collectSwitchNodes(theNode);
+        }
+        collectSwitchNodes(window.scene.materials);
     }
 
     self.getSwitchNodes = function() {
@@ -776,7 +784,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
 
             if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
-                collectAllSwitchNodes(theScene);
+                collectAllSwitchNodes();
                 //setupOcclusionMaterials(theScene); // XXX disabled, no longer needed
             }
 
