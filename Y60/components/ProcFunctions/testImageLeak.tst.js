@@ -59,7 +59,7 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = getProcessMemoryUsage();
                 obj.myMemoryDifff =  myUsedMemory - _myStartMemory;
-                obj.AllowedMemoryUsage = 3*1024*1024;//3000000;
+                obj.AllowedMemoryUsage = 4*1024*1024;//3000000;
 
                 print("Memory at first image construction time : " + _myStartMemory);
                 print("Memory at app end                       : " + myUsedMemory);
