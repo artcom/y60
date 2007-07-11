@@ -87,21 +87,22 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::run(dom::NodePtr theRootNode) {
+    SceneOptimizer::run(const dom::NodePtr & theRootNode) {
         AC_INFO << "Running Scene optimizer";
 
-        if (!theRootNode) {
-            theRootNode = _myScene.getWorldRoot();
+        _myRootNode = theRootNode;
+
+        if (! _myRootNode) {
+             _myRootNode = _myScene.getWorldRoot();
         }
 
         // Check whether the given root node is of the transform hierarchy
         TransformHierarchyFacadePtr myFacade(0);
         try {
-            myFacade = theRootNode->getFacade<TransformHierarchyFacade>();
+            myFacade =  _myRootNode->getFacade<TransformHierarchyFacade>();
         } catch (...) {
             throw;
         }
-        _myRootNode = theRootNode;
         _myStickyNodes.push_back(_myRootNode);
 
         // Remove invisible nodes
@@ -649,7 +650,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::collectIds(dom::NodePtr & theNode, std::set<std::string> & theIds) {
+    SceneOptimizer::collectIds(const dom::NodePtr & theNode, std::set<std::string> & theIds) {
         theIds.insert(theNode->getAttributeString(ID_ATTRIB));
 
         unsigned myNumChildren = theNode->childNodesLength();
@@ -659,7 +660,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::collectShapeIds(dom::NodePtr & theNode, std::set<std::string> & theIds) {
+    SceneOptimizer::collectShapeIds(const dom::NodePtr & theNode, std::set<std::string> & theIds) {
         if (theNode->nodeName() == BODY_NODE_NAME) {
             theIds.insert(theNode->getAttributeString(BODY_SHAPE_ATTRIB));
         }

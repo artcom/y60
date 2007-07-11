@@ -22,7 +22,7 @@ namespace y60 {
         public:
             SceneOptimizer(Scene & theScene);
             void run();
-            void run(dom::NodePtr theRootNode);
+            void run(const dom::NodePtr & theRootNode);
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;
@@ -66,8 +66,8 @@ namespace y60 {
             void removeInvisibleNodes(dom::NodePtr & theNode);
             void pinAnimatedNodes(dom::NodePtr & theRootNode);
             void pinBodiesWithSameShapes(dom::NodePtr & theRootNode);
-            void collectIds(dom::NodePtr & theNode, std::set<std::string> & theIds);
-            void collectShapeIds(dom::NodePtr & theNode, std::set<std::string> & theIds);
+            void collectIds(const dom::NodePtr & theNode, std::set<std::string> & theIds);
+            void collectShapeIds(const dom::NodePtr & theNode, std::set<std::string> & theIds);
             void removeUnusedShapes();
             void transformToParent(dom::NodePtr & theNode);
             void convertToTransformNode(dom::NodePtr & theNode);
