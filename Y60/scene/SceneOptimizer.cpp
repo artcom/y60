@@ -13,7 +13,6 @@
 #include "TransformBuilder.h"
 #include <asl/Logger.h>
 #include <y60/NodeNames.h>
-#include <y60/modelling_functions.h>
 
 namespace y60 {
 
@@ -88,7 +87,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::run(dom::NodePtr theRootNode) {
+    SceneOptimizer::run(dom::NodePtr & theRootNode) {
         AC_INFO << "Running Scene optimizer";
 
         if (!theRootNode) {
@@ -146,7 +145,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::runNode(dom::NodePtr theRootNode) {
+    SceneOptimizer::runNode(dom::NodePtr & theRootNode) {
         // Reset the supershape
         _mySuperShape = SuperShapePtr(0);
 
@@ -172,15 +171,17 @@ namespace y60 {
                 }
             } else {
                 AC_INFO << "    Creating a new shape.";
-                dom::NodePtr mySuperBody                 = createBody(theRootNode, _mySuperShape->getShapeId());
-                TransformHierarchyFacadePtr myBodyFacade = mySuperBody->getFacade<TransformHierarchyFacade>();
-                myBodyFacade->set<NameTag>("Optimized Body");
+                dom::NodePtr myBodyNode = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
+                myBodyNode->appendAttribute(NAME_ATTRIB, "Optimized Body");
+                myBodyNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
+                myBodyNode->appendAttribute(BODY_SHAPE_ATTRIB, _mySuperShape->getShapeId());
+                myBodyNode->appendAttribute(STICKY_ATTRIB, "0");
             }
         }
     }
 
     void
-    SceneOptimizer::transformToParent(dom::NodePtr theNode) {
+    SceneOptimizer::transformToParent(dom::NodePtr & theNode) {
         dom::NodePtr myParentNode = theNode->parentNode()->self().lock();
 
         // Get the inverse localmatrix of the node
@@ -303,8 +304,8 @@ namespace y60 {
 
     // Specialization for positions and normals
     unsigned
-    SceneOptimizer::transformVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData,
-                                        bool theFlipFlag, asl::Matrix4f theMatrix, bool theNormalFlag) {
+    SceneOptimizer::transformVertexData(dom::NodePtr & theSrcVertexData, dom::NodePtr & theDstVertexData,
+                                        bool theFlipFlag, const asl::Matrix4f & theMatrix, bool theNormalFlag) {
         const VectorOfVector3f & mySrc = theSrcVertexData->firstChild()->nodeValueRef<VectorOfVector3f>();
         VectorOfVector3f & myDst       = theDstVertexData->firstChild()->nodeValueRefOpen<VectorOfVector3f>();
         unsigned myOffset              = myDst.size();
@@ -456,7 +457,7 @@ namespace y60 {
     }
 
     bool
-    SceneOptimizer::mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theInitialMatrix) {
+    SceneOptimizer::mergeBodies(dom::NodePtr & theNode, const asl::Matrix4f & theInitialMatrix) {
         // Search depth first
         unsigned myNumChildren = theNode->childNodesLength();
         for (signed i = myNumChildren - 1; i >= 0; --i) {
@@ -541,7 +542,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::removeInvisibleNodes(dom::NodePtr theNode) {
+    SceneOptimizer::removeInvisibleNodes(dom::NodePtr & theNode) {
         dom::NodePtr mySceneNode      = _myScene.getSceneDom()->firstChild();
         dom::NodePtr myAnimationsNode = mySceneNode->childNode(ANIMATION_LIST_NAME);
         dom::NodePtr myCharactersNode = mySceneNode->childNode(CHARACTER_LIST_NAME);
@@ -587,7 +588,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::pinAnimatedNodes(dom::NodePtr theRootNode) {
+    SceneOptimizer::pinAnimatedNodes(dom::NodePtr & theRootNode) {
         // Get all animation nodes
         dom::NodePtr mySceneNode = _myScene.getSceneDom()->firstChild();
         std::vector<dom::NodePtr> myAnimationNodes;
@@ -615,7 +616,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::pinBodiesWithSameShapes(dom::NodePtr theRootNode) {
+    SceneOptimizer::pinBodiesWithSameShapes(dom::NodePtr & theRootNode) {
         // Get all body nodes
         std::vector<dom::NodePtr> myBodyNodes;
         theRootNode->getNodesByTagName(BODY_NODE_NAME, true, myBodyNodes);
@@ -648,7 +649,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::collectIds(dom::NodePtr theNode, std::set<std::string> & theIds) {
+    SceneOptimizer::collectIds(dom::NodePtr & theNode, std::set<std::string> & theIds) {
         theIds.insert(theNode->getAttributeString(ID_ATTRIB));
 
         unsigned myNumChildren = theNode->childNodesLength();
@@ -658,7 +659,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds) {
+    SceneOptimizer::collectShapeIds(dom::NodePtr & theNode, std::set<std::string> & theIds) {
         if (theNode->nodeName() == BODY_NODE_NAME) {
             theIds.insert(theNode->getAttributeString(BODY_SHAPE_ATTRIB));
         }
@@ -716,7 +717,7 @@ namespace y60 {
     }
 
     bool
-    SceneOptimizer::hasUnstickyChildren(dom::NodePtr theNode) {
+    SceneOptimizer::hasUnstickyChildren(dom::NodePtr & theNode) {
         unsigned myNumChildren = theNode->childNodesLength();
         for (unsigned i = 0; i < myNumChildren; ++i) {
             dom::NodePtr myChild = theNode->childNode(i);

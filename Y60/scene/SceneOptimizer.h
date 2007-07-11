@@ -22,7 +22,7 @@ namespace y60 {
         public:
             SceneOptimizer(Scene & theScene);
             void run();
-            void run(dom::NodePtr theRootNode);
+            void run(dom::NodePtr & theRootNode);
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;
@@ -30,7 +30,7 @@ namespace y60 {
 
             class PrimitiveCache {
                 public:
-                    PrimitiveCache(dom::NodePtr thePrimitive) : _myPrimitives(thePrimitive)
+                    PrimitiveCache(dom::NodePtr & thePrimitive) : _myPrimitives(thePrimitive)
                     {}
                     dom::NodePtr getIndex(const std::string & theName, const std::string & theRole);
 
@@ -56,27 +56,27 @@ namespace y60 {
             };
             typedef asl::Ptr<SuperShape> SuperShapePtr;
 
-            void runNode(dom::NodePtr theRootNode);
-            void mergeChildWithParent(dom::NodePtr theNode);
+            void runNode(dom::NodePtr & theRootNode);
             void cleanupScene(dom::NodePtr & theNode);
             void mergeVertexData(const dom::NodePtr & theVertexData, bool theFlipFlag, const asl::Matrix4f & theMatrix,
                                  const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
-            void mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag, VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles);
-            bool mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theMatrix);
-            void removeInvisibleNodes(dom::NodePtr theNode);
-            void pinAnimatedNodes(dom::NodePtr theRootNode);
-            void pinBodiesWithSameShapes(dom::NodePtr theRootNode);
-            void collectIds(dom::NodePtr theNode, std::set<std::string> & theIds);
-            void collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds);
+            void mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag, VertexDataMap & theVertexDataOffsets,
+                                 const RenderStyles & theRenderStyles);
+            bool mergeBodies(dom::NodePtr & theNode, const asl::Matrix4f & theMatrix);
+            void removeInvisibleNodes(dom::NodePtr & theNode);
+            void pinAnimatedNodes(dom::NodePtr & theRootNode);
+            void pinBodiesWithSameShapes(dom::NodePtr & theRootNode);
+            void collectIds(dom::NodePtr & theNode, std::set<std::string> & theIds);
+            void collectShapeIds(dom::NodePtr & theNode, std::set<std::string> & theIds);
             void removeUnusedShapes();
-            void transformToParent(dom::NodePtr theNode);
+            void transformToParent(dom::NodePtr & theNode);
             void convertToTransformNode(dom::NodePtr & theNode);
-            bool hasUnstickyChildren(dom::NodePtr theNode);
+            bool hasUnstickyChildren(dom::NodePtr & theNode);
 
             template <class T>
-            unsigned copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData);
-            unsigned transformVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData,
-                                         bool theFlipFlag, asl::Matrix4f theMatrix, bool theNormalFlag = false);
+            unsigned copyVertexData(dom::NodePtr & theSrcVertexData, dom::NodePtr & theDstVertexData);
+            unsigned transformVertexData(dom::NodePtr & theSrcVertexData, dom::NodePtr & theDstVertexData,
+                                         bool theFlipFlag, const asl::Matrix4f & theMatrix, bool theNormalFlag = false);
 
             Scene & _myScene;
             dom::NodePtr _myRootNode;
@@ -91,7 +91,7 @@ namespace y60 {
 
     template <class T>
     unsigned
-    SceneOptimizer::copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData) {
+    SceneOptimizer::copyVertexData(dom::NodePtr & theSrcVertexData, dom::NodePtr & theDstVertexData) {
         const std::vector<T> & mySrc = theSrcVertexData->firstChild()->dom::Node::nodeValueRef<std::vector<T> >();
         std::vector<T> & myDst = theDstVertexData->firstChild()->dom::Node::nodeValueRefOpen<std::vector<T> >();
         unsigned myOffset = myDst.size();
