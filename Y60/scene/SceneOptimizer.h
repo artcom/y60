@@ -21,7 +21,8 @@ namespace y60 {
     class SceneOptimizer {
         public:
             SceneOptimizer(Scene & theScene);
-            void run(dom::NodePtr theRootNode = dom::NodePtr(0));
+            void run();
+            void run(dom::NodePtr theRootNode);
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;
@@ -55,7 +56,7 @@ namespace y60 {
             };
             typedef asl::Ptr<SuperShape> SuperShapePtr;
 
-            void runNode(dom::NodePtr & theRootNode = dom::NodePtr(0));
+            void runNode(dom::NodePtr theRootNode);
             void mergeChildWithParent(dom::NodePtr theNode);
             void cleanupScene(dom::NodePtr & theNode);
             void mergeVertexData(const dom::NodePtr & theVertexData, bool theFlipFlag, const asl::Matrix4f & theMatrix,

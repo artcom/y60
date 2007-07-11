@@ -83,6 +83,11 @@ namespace y60 {
     }
 
     void
+    SceneOptimizer::run() {
+        run(_myScene.getWorldRoot());
+    }
+
+    void
     SceneOptimizer::run(dom::NodePtr theRootNode) {
         AC_INFO << "Running Scene optimizer";
 
@@ -141,7 +146,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::runNode(dom::NodePtr & theRootNode) {
+    SceneOptimizer::runNode(dom::NodePtr theRootNode) {
         // Reset the supershape
         _mySuperShape = SuperShapePtr(0);
 
