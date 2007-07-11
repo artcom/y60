@@ -25,6 +25,8 @@ namespace y60 {
             void run(const dom::NodePtr & theRootNode);
 
         private:
+            SceneOptimizer();
+
             typedef std::map<std::string, unsigned> VertexDataMap;
             typedef std::map<std::string, std::vector<std::string> > RoleMap;
 
