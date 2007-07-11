@@ -22,7 +22,7 @@ namespace y60 {
         public:
             SceneOptimizer(Scene & theScene);
             void run();
-            void run(dom::NodePtr & theRootNode);
+            void run(dom::NodePtr theRootNode);
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;

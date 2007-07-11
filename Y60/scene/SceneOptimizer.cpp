@@ -87,7 +87,7 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::run(dom::NodePtr & theRootNode) {
+    SceneOptimizer::run(dom::NodePtr theRootNode) {
         AC_INFO << "Running Scene optimizer";
 
         if (!theRootNode) {
