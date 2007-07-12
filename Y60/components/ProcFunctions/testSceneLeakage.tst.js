@@ -4,7 +4,7 @@ use("ImageManager.js");
 use("Overlay.js");
 
 const OBJECTS_PER_FRAME = 30;
-
+const ALLOWED_MEMORY_INCREASE = 2500; // in KB
 function createObjects(theTime) {
     var myPos = Math.sin(theTime) * 3;
     for (var i = 0; i < OBJECTS_PER_FRAME; ++i) {
@@ -63,7 +63,7 @@ window.onFrame = function(theTime) {
             exit(1);
         }
         var myMemoryIncrease = (myMemory - ourInitialMemory) / 1024;
-        if (myMemoryIncrease > 550) {
+        if (myMemoryIncrease > ALLOWED_MEMORY_INCREASE) {
             Logger.error("Memory usage increased by: " + myMemoryIncrease + " KB");
             exit(1);
         } else {
