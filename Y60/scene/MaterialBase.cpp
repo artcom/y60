@@ -80,8 +80,8 @@ namespace y60 {
     bool 
     MaterialBase::rebindRequired() {
 		// force childnodes to reconnect
-        //forceRebindChild<MaterialPropertiesTag>();
-        //forceRebindChild<MaterialRequirementTag>();
+        forceRebindChild<MaterialPropertiesTag>();
+        forceRebindChild<MaterialRequirementTag>();
 
 		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
             _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
