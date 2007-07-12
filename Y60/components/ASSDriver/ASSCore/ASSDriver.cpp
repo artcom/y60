@@ -37,6 +37,8 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
+static const unsigned NO_DATA_TIMEOUT = 1;
+
 static const char * DriverStateStrings[] = {
     "no_serial_port",
     "synchronizing",
@@ -159,7 +161,9 @@ ASSDriver::ASSDriver() :
     _myFrameNo(-1),
     _myChecksum(-1),
     _myClampToScreenFlag(false),
-    _myWindow( 0 )
+    _myWindow( 0 ),
+    _myByteCount(0),
+    _myLastComTestTime(0)
 {
     setState(NO_SERIAL_PORT);
 }
@@ -1018,7 +1022,7 @@ ASSDriver::processInput() {
             break;
         case SYNCHRONIZING:
             readDataFromPort();
-            synchronize();
+            //synchronize();
             break;
         case RUNNING:
             readDataFromPort();
@@ -1035,11 +1039,20 @@ void
 ASSDriver::readDataFromPort() {
     try {
         size_t myMaxBytes = _myReceiveBuffer.size();
-
+        double myCurrentTimeStamp = asl::Time();
+        if (myCurrentTimeStamp - _myLastComTestTime > NO_DATA_TIMEOUT) {
+            _myLastComTestTime = myCurrentTimeStamp;
+            if (_myByteCount == 0 ) {
+                AC_WARNING << "ASSDriver lost communication";
+                throw SerialPortException("CommuncationLost", PLUS_FILE_LINE);
+            } else {
+                _myByteCount = 0;
+            }
+        }
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
-        _mySerialPort->peek();
-        //AC_PRINT << "bytes: " << _mySerialPort->peek();
+        _myByteCount += _mySerialPort->peek();
+        AC_DEBUG << "bytes: " << _myByteCount;
         
         //AC_PRINT << "bytes: " << myMaxBytes;
         _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
@@ -1047,10 +1060,13 @@ ASSDriver::readDataFromPort() {
 
         //AC_PRINT << "=== Got " << myByteCount << " bytes.";
 
-        _myFrameBuffer.insert( _myFrameBuffer.end(),
-                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
+        //_myFrameBuffer.insert( _myFrameBuffer.end(),
+        //        _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
+       
         //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {
+        //AC_PRINT << " lost serialport: "<<_myPortNum;
+        
         AC_WARNING << ex;
         createTransportLayerEvent( _myIDCounter ++, "lost_communication" );
         setState(NO_SERIAL_PORT);
@@ -1060,8 +1076,11 @@ ASSDriver::readDataFromPort() {
 void
 ASSDriver::scanForSerialPort() {
     if (_myPortNum >= 0 ) {
+        _myLastComTestTime = asl::Time();
+        _myByteCount = 0;        
 #ifdef WIN32
         _mySerialPort = getSerialDevice( _myPortNum );
+        //AC_PRINT << " got serial device: "<<_myPortNum;
 #endif
 #ifdef LINUX
         if (_myUseUSBFlag) {
@@ -1083,9 +1102,14 @@ ASSDriver::scanForSerialPort() {
 #endif
 
         if (_mySerialPort) {
-            _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
-                    _myParity, _myStopBits, _myHandshakingFlag);
-            setState( SYNCHRONIZING );
+            try {
+                _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
+                        _myParity, _myStopBits, _myHandshakingFlag);
+                setState( SYNCHRONIZING );
+            } catch (const SerialPortException & ex) {
+                freeSerialPort();
+                //AC_PRINT << " lost serialport: "<<_myPortNum;
+            }
         }
     } else {
         AC_PRINT << "scanForSerialPort() No port configured.";

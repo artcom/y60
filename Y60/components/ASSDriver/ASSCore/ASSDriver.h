@@ -253,7 +253,8 @@ class ASSDriver :
         bool _myHandshakingFlag;
         asl::SerialDevice::ParityMode _myParity;
         std::vector<unsigned char> _myReceiveBuffer;
-
+        unsigned _myByteCount;
+        double   _myLastComTestTime;
 };
 
 
