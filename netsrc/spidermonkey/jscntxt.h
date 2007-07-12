@@ -117,6 +117,8 @@ struct JSRuntime {
     JSGCStats           gcStats;
 #endif
 
+    const char          *gcLastErrorString;
+
     /* Literal table maintained by jsatom.c functions. */
     JSAtomState         atomState;
 

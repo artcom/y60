@@ -482,11 +482,16 @@ js_AddRoot(JSContext *cx, void *rp, const char *name)
             JS_ReportOutOfMemory(cx);
         return ok;
     } else {
-        fprintf(stderr, "WARNING: adding root (%s @%p) to context which does NOT own it!!!\n", name, rp);
-        
+
         if (JSVAL_IS_NULL(v)) {
             // do nothing
         } else if (JSVAL_IS_OBJECT(v)) {
+
+            if (cx->runtime->gcLastErrorString != name) {
+                fprintf(stderr, "WARNING: adding root object (%s @%p) to context which does NOT own it!!!\n", name, rp);
+                cx->runtime->gcLastErrorString = name;
+            }
+
             obj = JSVAL_TO_OBJECT(v);
             vp = obj->slots;
             if (!vp) {
