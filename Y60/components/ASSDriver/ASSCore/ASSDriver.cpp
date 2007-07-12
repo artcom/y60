@@ -1022,7 +1022,7 @@ ASSDriver::processInput() {
             break;
         case SYNCHRONIZING:
             readDataFromPort();
-            //synchronize();
+            synchronize();
             break;
         case RUNNING:
             readDataFromPort();
@@ -1060,8 +1060,8 @@ ASSDriver::readDataFromPort() {
 
         //AC_PRINT << "=== Got " << myByteCount << " bytes.";
 
-        //_myFrameBuffer.insert( _myFrameBuffer.end(),
-        //        _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
+        _myFrameBuffer.insert( _myFrameBuffer.end(),
+                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
        
         //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {

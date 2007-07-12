@@ -12,7 +12,7 @@
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
 
-        <SerialPort>0</SerialPort>
+        <SerialPort>4</SerialPort>
         <UseUSB>0</UseUSB>
         <BaudRate>57600</BaudRate>
         <BitsPerWord>8</BitsPerWord>
