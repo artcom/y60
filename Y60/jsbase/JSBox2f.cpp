@@ -327,6 +327,7 @@ JSBox2f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     if (argc == 0) {
         // construct empty
         myNewObject=new JSBox2f(myNewValue);
+        myNewBox2f.makeEmpty();
     } else {
         if (argc == 2) {
             // construct from two points
@@ -338,6 +339,7 @@ JSBox2f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 }
                 (myNewBox2f)[i] = JSClassTraits<asl::Vector2<Number> >::getNativeRef(cx,myObject);
             }
+            myNewBox2f.makeCorrect();
             myNewObject=new JSBox2f(myNewValue);
         } else if (argc == 1) {
             // construct from one Box2f

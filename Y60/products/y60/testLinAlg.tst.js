@@ -500,14 +500,20 @@ BoxUnitTest.prototype.Constructor = function(obj, theName) {
 		obj.p3 = new Point2f(-1, -1.1);
 		obj.v1 = new Vector2f(2.2, 3.3);
 		SUCCESS("initialized");
-		/*
 		// Constructor tests
 		{
+            obj.b1 = new Box2f();
+			ENSURE('obj.b1.isEmpty');
+
 			obj.b1 = new Box2f(obj.p0, obj.p1);
+			ENSURE('almostEqual(obj.b1.min, obj.p0)');
+			ENSURE('almostEqual(obj.b1.max, obj.p1)');
+			obj.b1 = new Box2f(obj.p1, obj.p0);
 			ENSURE('almostEqual(obj.b1.min, obj.p0)');
 			ENSURE('almostEqual(obj.b1.max, obj.p1)');
 		}
 
+		/*
 		// Test get/set min / max / center
 		{
 			obj.b1 = new Box2f(obj.p0, obj.p1);
@@ -523,9 +529,10 @@ BoxUnitTest.prototype.Constructor = function(obj, theName) {
 			obj.b1.sizeVector = obj.v1;
 			ENSURE('almostEqual(obj.b1.sizeVector,obj.v1)');
 		}
+        */
 		// test extendBy
 		{
-			obj.b1.makeEmpty();
+            obj.b1 = new Box2f();
 			obj.b1.extendBy(obj.p0);
 			ENSURE('almostEqual(obj.b1.min, obj.p0)');
 			ENSURE('almostEqual(obj.b1.max,obj. p0)');
@@ -554,6 +561,7 @@ BoxUnitTest.prototype.Constructor = function(obj, theName) {
 			ENSURE('obj.b1.hasPosition');
 			ENSURE('obj.b1.hasSize');
 		}
+        /*
 
 		// test contains
 		{
