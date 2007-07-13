@@ -26,6 +26,7 @@ namespace y60 {
     class IResourceManager;
     class IScene {
         public:
+            virtual ~IScene();
             virtual const IResourceManager * getResourceManager() const = 0;
             virtual IResourceManager * getResourceManager() = 0;        
     };
