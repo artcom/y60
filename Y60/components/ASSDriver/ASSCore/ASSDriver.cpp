@@ -37,7 +37,7 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-static const unsigned NO_DATA_TIMEOUT = 1;
+static const unsigned NO_DATA_TIMEOUT = 30;
 
 static const char * DriverStateStrings[] = {
     "no_serial_port",
