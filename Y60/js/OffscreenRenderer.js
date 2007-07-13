@@ -68,12 +68,10 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         _myCanvas.target = self.image.id;
 
         // Flip vertically since framebuffer content is upsid e-down
-        //if (!theUseFBOFlag) {
-            var myMirrorMatrix = new Matrix4f;
-            myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-            self.image.matrix.makeIdentity();
-            self.image.matrix.postMultiply(myMirrorMatrix);
-        //}
+        var myMirrorMatrix = new Matrix4f;
+        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+        self.image.matrix.makeIdentity();
+        self.image.matrix.postMultiply(myMirrorMatrix);
     }
 
     self.setBody = function(theNode) {

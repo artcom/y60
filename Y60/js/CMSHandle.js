@@ -55,11 +55,11 @@ try {
 plug("y60CMSCache");
 use("SoapWsdl.js");
 
-function CMSHandle( theConfigFile) {
-    this.Constructor(this, theConfigFile);
+function CMSHandle(theConfigFile, theLocation) {
+    this.Constructor(this, theConfigFile, theLocation);
 }
 
-CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
+CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
 
     obj.getPresentation = function() {
         return _myPresentation;
@@ -302,16 +302,11 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     function setup() {
         _myConfigDoc = Node.createDocument();
         _myConfigDoc.parseFile(_myConfigFile);
-        
-        if (_myConfigDoc.childNodesLength() > 1) {
-            var myDevelopmentSystem = (expandEnvironment("${PRO}")?true:false);
-            if (myDevelopmentSystem) {
-                _myConfig = getDescendantByAttribute(_myConfigDoc, "location", "artcom", true);
-                Logger.info("using local CMS Configuration -> location=\"artcom\"");
-            } else {
-                _myConfig = getDescendantByAttribute(_myConfigDoc, "location", "onSite", true);
-                Logger.info("using final CMS Configuration -> location=\"onSite\"");
-            } 
+
+        print("CMSHandle.setup loc=" + theLocation);
+        if (theLocation && _myConfigDoc.childNodesLength() > 1) {
+            _myConfig = getDescendantByAttribute(_myConfigDoc, "location", theLocation, true);
+            Logger.warning("Using CMS config location='" + theLocation + "'");
         }
         
         if (!_myConfig) {
