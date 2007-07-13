@@ -80,14 +80,16 @@ namespace y60 {
     bool 
     MaterialBase::rebindRequired() {
 		// force childnodes to reconnect
-        /*MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
-		if (myPropFacade) {
-	        forceRebindChild<MaterialPropertiesTag>();
-		}
-        MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
-		if (myReqFacade) {
-	        forceRebindChild<MaterialRequirementTag>();
-		}*/
+		if (getNode()) {
+            MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
+    		if (myPropFacade) {
+    	        forceRebindChild<MaterialPropertiesTag>();
+    		}
+            MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
+    		if (myReqFacade) {
+    	        forceRebindChild<MaterialRequirementTag>();
+    		}
+    	}
 
 		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
             _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
