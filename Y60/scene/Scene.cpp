@@ -708,15 +708,16 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
             if (myMaterial) {
-                // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
-                if (myMaterial->rebindRequired()) {
-                    myMaterialRebindFlag = true;
-                }
-
 				if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
                 }
-                
+                 // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
+                if (myMaterial->rebindRequired()) {
+                    myMaterialRebindFlag = true;
+                    reloadMaterial(myMaterialNode, myMaterial);
+                }
+
+               
             } else {
                 const std::string myMaterialId = myMaterialNode->getAttributeString("id");
                 AC_TRACE << "could not find material " << myMaterialId << ", loading";
