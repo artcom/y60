@@ -156,7 +156,7 @@ namespace y60 {
             //virtual void update(TextureManagerPtr theTextureManager, const dom::NodePtr theImages);
 
             const MaterialParameterVector & getVertexParameters() const;
-            virtual bool reloadRequired() const;
+            virtual bool reloadRequired();
             virtual bool rebindRequired();
             int getGroup1Hash() const;
 

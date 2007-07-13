@@ -714,7 +714,6 @@ namespace y60 {
                  // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
                 if (myMaterial->rebindRequired()) {
                     myMaterialRebindFlag = true;
-                    reloadMaterial(myMaterialNode, myMaterial);
                 }
 
                
