@@ -23,6 +23,7 @@
 #define DEFAULT_MATRIX_HEIGTH         10
 #define DEFAULT_SCAN_FREQUENCY        20  //Hz (max 100Hz, min 16Hz)
 #define DEFAULT_VOLTAGE_TRANSMITTER   106 //=5V *21,2(*1/V)
+#define DEFAULT_GRID_SPACING          100 //mm
 #define DEFAULT_BAUD_RATE             0   //0 = 57600bps
                                           //1 = 115200bps
                                           //2 = 230400bps
@@ -42,13 +43,16 @@
 #define UART0_BAUD_RATE_HS 57600 //will be scaled by factors 2, 4, 8, 16 up to 921600 bps
 #define UART0_MAX_BAUD_RATE_FACTOR 4
 
+#define MIN_GRID_SPACING  10 //mm
+#define MAX_GRID_SPACING 200 //mm
+
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
 #define MIN_DELTA_T_ROW  1500 //us
 
 #define VZERO   10
 
-#define NUMBER_OF_STATUS_BITS 47*10 //adjust to actual number of transmitted status bytes per frame
+#define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
 
 #define ABS_MODE 1
 #define REL_MODE 2
@@ -76,27 +80,28 @@
 #define EEPROM_LOC_MATRIX_HEIGTH       0x04
 #define EEPROM_LOC_SCAN_FREQUENCY      0x05
 #define EEPROM_LOC_BAUD_RATE           0x06
-#define EEPROM_LOC_ID                  0x07
+#define EEPROM_LOC_GRID_SPACING        0x07
+#define EEPROM_LOC_ID                  0x08
 
 #define EEPROM_FORMAT_KEY 0x1234
 
 uint8_t g_matrixWidth;
 uint8_t g_matrixHeigth;
 uint8_t g_scanFrequency;
+uint8_t g_gridSpacing;
 uint8_t g_ID;
 uint8_t g_mode;
 uint8_t g_status;
 uint8_t g_errorState;
 uint8_t g_mainTimer;
 uint8_t g_DIPSwitch;
-uint8_t g_UARTBytesReceived, g_arg1, g_arg2;
+uint8_t g_UARTBytesReceived, g_arg1, g_arg2, g_PMinX,  g_PMinY, g_PMaxX,  g_PMaxY;
 uint8_t g_BaudRateFactor;
 uint8_t g_UART_mode;
+uint8_t g_T1[256];
 #define LS 0
 #define HS 1
 
-
-#define LENGTH_STATUS_MSG 2+9*5
 
 
 //=== Pin Configuration =====================================================
@@ -214,7 +219,8 @@ void    activateNextLine(void);
 void    activateTransmitter(uint8_t);
 void    triggerRowReadout(void);
 void    SPIdummyRead(void);
-void    performReceiverCalibration(void);
+void    performReceiverTara(void);
+void    switchToAbsoluteMode(void);
 void    configSpecialScanMode(uint8_t);
 uint8_t setScanParameter(uint8_t, uint8_t, uint8_t);
 int8_t  setDACValue(uint8_t);
