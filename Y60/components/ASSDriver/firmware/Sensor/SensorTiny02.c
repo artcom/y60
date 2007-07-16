@@ -27,6 +27,12 @@ turn on relative mode:
    1. turn on CLK signal w/o. interruption for 20ms to switch to relative mode
    2. turn off CLK signal for 80 ms
 
+
+FUSE SETTINGS:
+- Brown-out detection disabled
+- Int. RC Osc. 8MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms
+all others off
+
 */
 
 
@@ -63,9 +69,9 @@ turn on relative mode:
 #define ADC_CONFIGURATION1()\
 	ADMUX = _BV(REFS1) | 6; // 1.1 V reference; channel 2+, Channel 3-, gain=1
 
-//#define ADC_CONFIGURATION2()\
-//	ADMUX = _BV(REFS2) | _BV(REFS1) | 2; // 2.56 V reference; channel 2+
-
+/*#define ADC_CONFIGURATION2()\
+	ADMUX = _BV(REFS2) | _BV(REFS1) | 2; // 2.56 V reference; channel 2+
+*/
 
 //=== Globals ================================================================
 
@@ -217,7 +223,7 @@ ISR( TIM0_COMPA_vect ) {
     			g_requestCalibration = 0;
     			g_lineCounter = 0; //after calibration read out sequence starts with line 0
                 g_mode = REL_MODE;
-
+/*
                     // start storage of new calibration values in EEPROM
                     g_EEPROMState = 1;
                     // wait for completion of previous write (actually there should be no write going on!)
@@ -228,6 +234,7 @@ ISR( TIM0_COMPA_vect ) {
                     EEDR = g_NumberOfLines; //ucData
                     asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE
                     asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE
+*/
             }
         }
 
