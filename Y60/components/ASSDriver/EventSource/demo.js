@@ -115,11 +115,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.position.x += 5.5; 
 
         //_myASSManager.textColor = [0,0,0,1];
+        /*
         buildKeyboard();
         buildDisplay();
         buildSubmitButton();
         buildBackspace();
         buildSpacebar();
+        */
     }
 
     Base.onFrame = self.onFrame;

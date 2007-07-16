@@ -275,13 +275,18 @@ unsigned
 ASSDriver::getBytesPerStatusLine() {
     if (_myFirmwareVersion < 0) {
         return MAX_STATUS_LINE_LENGTH;
-    } else if ( _myFirmwareVersion < BEST_VERSION ) {
+    } else if ( _myFirmwareVersion < 260 ) {
         // one token: version
         return BYTES_PER_STATUS_TOKEN + 2;
-    } else {
+    } else if ( _myFirmwareVersion == 260 ) {
         // nine tokens: version status id mode framerate width height framenumber checksum
         return 9 * BYTES_PER_STATUS_TOKEN + 2;
+    } else if ( _myFirmwareVersion == 261 ) {
+        // nine tokens: version status id mode framerate width height gridspacing framenumber checksum
+        return 10 * BYTES_PER_STATUS_TOKEN + 2;
     }
+    AC_WARNING << "Unknown firmware version: " << _myFirmwareVersion;
+    return MAX_STATUS_LINE_LENGTH;
 }
 
 void
@@ -295,20 +300,30 @@ ASSDriver::parseStatusLine() {
         _myFirmwareVersion = readStatusToken( myIt, 'V' );
         //AC_PRINT << "Firmware version: " << _myFirmwareVersion;
         Vector2i myGridSize;
-        if ( _myFirmwareVersion < BEST_VERSION ) {
-	    /*
-            myGridSize[0] = readStatusToken( myIt, 'W' );
-            myGridSize[1] = readStatusToken( myIt, 'H' );
-	    */
-	    myGridSize[0] = 20;
-	    myGridSize[1] = 10;
-        } else {
+        if ( _myFirmwareVersion < 260 ) {
+            /*
+               myGridSize[0] = readStatusToken( myIt, 'W' );
+               myGridSize[1] = readStatusToken( myIt, 'H' );
+             */
+            myGridSize[0] = 20;
+            myGridSize[1] = 10;
+        } else if (_myFirmwareVersion == 260 ) {
             _myFirmwareStatus = readStatusToken( myIt, 'S' );
             _myControllerId = readStatusToken( myIt, 'I' );
             _myFirmwareMode = readStatusToken( myIt, 'M' );
             _myFramerate = readStatusToken( myIt, 'F' );
             myGridSize[0] = readStatusToken( myIt, 'W' );
             myGridSize[1] = readStatusToken( myIt, 'H' );
+            _myFrameNo = readStatusToken( myIt, 'N' );
+            _myChecksum = readStatusToken( myIt, 'C' );
+        } else if ( _myFirmwareVersion == 261 ) {
+            _myFirmwareStatus = readStatusToken( myIt, 'S' );
+            _myControllerId = readStatusToken( myIt, 'I' );
+            _myFirmwareMode = readStatusToken( myIt, 'M' );
+            _myFramerate = readStatusToken( myIt, 'F' );
+            myGridSize[0] = readStatusToken( myIt, 'W' );
+            myGridSize[1] = readStatusToken( myIt, 'H' );
+            _myGridSpacing = readStatusToken( myIt, 'G' );
             _myFrameNo = readStatusToken( myIt, 'N' );
             _myChecksum = readStatusToken( myIt, 'C' );
         }

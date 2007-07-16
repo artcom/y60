@@ -226,6 +226,7 @@ class ASSDriver :
         int _myFramerate;
         int _myFrameNo;
         int _myChecksum;
+        int _myGridSpacing;
 
         // Transport Layer Members:
         // will be refactored into a separate class, when 
