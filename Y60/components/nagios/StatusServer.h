@@ -24,8 +24,12 @@ class StatusServer : public asl::ConduitServer<asl::TCPPolicy> {
         static asl::ConduitServer<asl::TCPPolicy>::Ptr create(asl::TCPPolicy::Handle theHandle);
         static void writeTick();
         static asl::Signed64 readTick();
+
         static void writeFrameTimeout(asl::Signed32);
         static asl::Signed32 readFrameTimeout();
+
+        static void writeStatusText(const std::string & theStatusText);
+        static std::string readStatusText();
     private:
         StatusServer(asl::TCPPolicy::Handle theHandle);
         void sendString(const std::string theData);
@@ -40,6 +44,9 @@ class StatusServer : public asl::ConduitServer<asl::TCPPolicy> {
 
         static asl::Signed32 _myFrameTimeout;
         static asl::ReadWriteLock _myFrameTimeoutLock;
+
+        static std::string _myStatusText;
+        static asl::ReadWriteLock _myStatusTextLock;
 };
 
 }

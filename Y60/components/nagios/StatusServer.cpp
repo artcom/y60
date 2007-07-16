@@ -24,8 +24,9 @@ StatusServer::create(TCPPolicy::Handle theHandle) {
     return ConduitServer<TCPPolicy>::Ptr(new StatusServer(theHandle));
 }
     
-StatusServer::StatusServer(TCPPolicy::Handle theHandle) : ConduitServer<TCPPolicy>(theHandle) 
-{}; 
+StatusServer::StatusServer(TCPPolicy::Handle theHandle) : ConduitServer<TCPPolicy>(theHandle)
+{
+}; 
 
 void 
 StatusServer::sendString(const std::string theData) {
@@ -75,7 +76,13 @@ StatusServer::processData() {
             } else {
                 sendResponseHeader(200);
             }
-            sendResponseBody(string("Y60 rev: ")+asl::ourRevision+", perf: "+asl::as_string(myElapsed));
+            std::string myText =  string("rev: ")+asl::ourRevision;
+            std::string myStatusText = readStatusText();
+            if (!myStatusText.empty()) {
+                myText += ", "+myStatusText;
+            }
+            myText += ", perf: "+asl::as_string(myElapsed);
+            sendResponseBody(myText);
         } else if (myURL == "revision") {
             sendResponseHeader(200);
             sendResponseBody(asl::ourRevision);
@@ -106,6 +113,8 @@ StatusServer::readTick() {
 
 asl::Signed32 StatusServer::_myFrameTimeout(100);
 asl::ReadWriteLock StatusServer::_myFrameTimeoutLock;
+std::string StatusServer::_myStatusText("Y60");
+asl::ReadWriteLock StatusServer::_myStatusTextLock;
 
 void
 StatusServer::writeFrameTimeout(asl::Signed32 theTimeout) {
@@ -116,6 +125,18 @@ asl::Signed32
 StatusServer::readFrameTimeout() {
     ScopeLocker myLock(_myFrameTimeoutLock, false);
     return _myFrameTimeout;
+}
+
+void
+StatusServer::writeStatusText(const std::string & theStatusText) {
+    ScopeLocker myLock(_myStatusTextLock, true);
+    _myStatusText = theStatusText;
+}
+
+std::string
+StatusServer::readStatusText() {
+    ScopeLocker myLock(_myStatusTextLock, false);
+    return _myStatusText;
 }
 }
 
