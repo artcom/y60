@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2006, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,6 +9,7 @@
 //============================================================================
 
 #include "ConnectedComponent.h"
+#include "TransportLayer.h"
 
 #include <asl/SerialDevice.h>
 #include <asl/Enum.h>
@@ -27,43 +28,6 @@
 #include <deque>
 
 namespace y60 {
-
-enum DriverStateEnum {
-    NO_SERIAL_PORT,
-    SYNCHRONIZING,
-    RUNNING,
-    CONFIGURING,
-    DriverStateEnum_MAX
-};
-
-enum CommandState {
-    SEND_CONFIG_COMMANDS,
-    WAIT_FOR_RESPONSE,
-    WAIT_FOR_EXIT
-};
-
-enum CommandResponse {
-    RESPONSE_NONE,
-    RESPONSE_OK,
-    RESPONSE_ERROR,
-    RESPONSE_TIMEOUT
-};
-
-DEFINE_ENUM( DriverState, DriverStateEnum );
-
-DEFINE_EXCEPTION( ASSException, asl::Exception );
-
-typedef dom::ValueWrapper<y60::RasterOfGRAY>::Type::ACCESS_TYPE Raster;
-typedef asl::Ptr<Raster, dom::ThreadingModel> RasterPtr;
-
-struct RasterHandle {
-    RasterHandle(dom::ValuePtr theValue) :
-        value( theValue ),
-        raster( dynamic_cast_Ptr<Raster>( theValue ) )
-    {}
-    dom::ValuePtr value;
-    RasterPtr raster;
-};
 
 #define MAX_HISTORY_LENGTH 5
 
@@ -93,7 +57,6 @@ struct Cursor {
 
 
     std::deque<float> intensityHistory;
-
 
 };
 
@@ -128,27 +91,24 @@ class ASSDriver :
         void callibrateTransmissionLevels();
         void queryConfigMode();
 
+        void allocateGridBuffers(const asl::Vector2i & theGridSize,
+                RasterPtr & theRawRaster);
+        void processSensorValues();
+
+        virtual void createTransportLayerEvent( const std::string & theType) = 0;
     protected:
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
                 const asl::Box2f & theROI) = 0;
-        virtual void createTransportLayerEvent(int theID,
-                                               const std::string & theType) = 0;
 
         size_t getBytesPerFrame();
 
         asl::Vector2i  _myGridSize;
         asl::Vector2i  _myPoTSize;
+        int            _myIDCounter;
     private:
-        void setState( DriverState theState );
-        void synchronize();
-        void allocateGridBuffers();
         RasterHandle allocateRaster(const std::string & theName);
-        void readSensorValues();
-        void processSensorValues( double theDeltaT);
-        unsigned readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
-        void parseStatusLine();
         void updateDerivedRasters();
         void updateCursors( double theDeltaT);
         void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT);
@@ -158,20 +118,18 @@ class ASSDriver :
                                      const BlobListPtr & theROIs);
         void correlatePositions( const std::vector<asl::MomentResults> & theCurrentPositions, 
                                  const BlobListPtr theROIs);
+        void triggerUpload( const char * theRasterId );
+        void queueCommand( const char * theCommand );
 
 
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
         asl::Matrix4f getTransformationMatrix();
-        unsigned getBytesPerStatusLine();
 
         void drawGrid();
         void drawMarkers();
         void drawCircle( const asl::Vector2f & thePosition, float theRadius,
                          unsigned theSubdivision, const asl::Vector4f & theColor);
-
-        DriverState    _myState;
-        unsigned       _mySyncLostCounter;
 
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
@@ -183,6 +141,7 @@ class ASSDriver :
 
         asl::Time   _myLastFrameTime;
         double       _myRunTime;
+
         int         _myComponentThreshold;
         int         _myNoiseThreshold;
         float       _myIntensityThreshold;
@@ -191,7 +150,6 @@ class ASSDriver :
         double      _myMinTouchInterval;
 
         CursorMap   _myCursors;
-        int         _myIDCounter;
 
         struct TouchEvent {
             TouchEvent(double theBirthTime, const asl::Vector2f & thePosition) :
@@ -207,100 +165,13 @@ class ASSDriver :
         int _myDebugTouchEventsFlag;
         asl::Vector2f _myProbePosition;
 
-        std::list<std::string> _myCommandQueue;
-        CommandState _myConfigureState;
-        double       _myLastCommandTime;
-
         asl::Vector4f _myGridColor;
         asl::Vector4f _myCursorColor;
         asl::Vector4f _myTouchColor;
         asl::Vector4f _myTextColor;
         asl::Vector4f _myProbeColor;
 
-        // Controller Status
-        // TODO: expose to JavaScript
-        int _myFirmwareVersion;
-        int _myFirmwareStatus;
-        int _myControllerId;
-        int _myFirmwareMode;
-        int _myFramerate;
-        int _myFrameNo;
-        int _myChecksum;
-        int _myGridSpacing;
-
-        // Transport Layer Members:
-        // will be refactored into a separate class, when 
-        // we go for ethernet
-        void readDataFromPort();
-        void scanForSerialPort();
-        void freeSerialPort();
-        void sendCommand( const std::string & theCommand );
-        CommandResponse getCommandResponse();
-        void handleConfigurationCommand();
-        void queueCommand( const char * theCommand );
-
-        std::vector<unsigned char> _myFrameBuffer;
-        asl::SerialDevice * _mySerialPort;
-
-        bool _myMagicTokenFlag;
-        int _myExpectedLine;
-
-        bool _myUseUSBFlag; // used by the linux implementation, because
-                            // USB TTYs have a diffrent naming scheme
-        int  _myPortNum;
-        int  _myBaudRate;
-        int  _myBitsPerSerialWord;
-        int  _myStopBits;
-        bool _myHandshakingFlag;
-        asl::SerialDevice::ParityMode _myParity;
-        std::vector<unsigned char> _myReceiveBuffer;
-        unsigned _myByteCount;
-        double   _myLastComTestTime;
+        TransportLayerPtr _myTransportLayer;
 };
 
-
-//=== Configuration Helpers ========================
-
-dom::NodePtr getASSSettings(dom::NodePtr theSettings);
-
-template <class T>
-bool
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue,
-                 const T & theDefault)
-{
-    dom::NodePtr myNode = theSettings->childNode( theName );
-    if ( ! myNode ) {
-        AC_WARNING << "No node named '" << theName << "' found in configuration. "
-                   << "Adding default value '" << theDefault << "'";
-        myNode = theSettings->appendChild( dom::NodePtr( new dom::Element( theName )));
-        dom::NodePtr myTextNode = myNode->appendChild( dom::NodePtr( new dom::Text() ));
-        myTextNode->nodeValue( asl::as_string( theDefault ));
-    }
-
-    if ( myNode->childNodesLength() != 1 ) {
-        throw asl::Exception(std::string("Configuration node '") + theName +
-            "' must have exactly one child.", PLUS_FILE_LINE);
-    }
-    if ( myNode->childNode("#text") ) {
-        T myNewValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
-        if (myNewValue != theValue) {
-            theValue =  myNewValue;
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
-                "' does not have a text child." , PLUS_FILE_LINE);
-    }
-}
-
-template <class Enum>
-bool
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, Enum & theValue,
-                 typename Enum::Native theDefault)
-{
-    return getConfigSetting( theSettings, theName, theValue, Enum( theDefault ));
-}
-
-}
+} // end of namespace
