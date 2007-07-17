@@ -37,11 +37,11 @@ class ASSOscClient : public ASSDriver {
 
         virtual void onUpdateSettings( dom::NodePtr theSettings );
 
+        void createTransportLayerEvent( const std::string & theType );
     protected:
         void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
                 const asl::Box2f & theROI);
-        void createTransportLayerEvent(int theID, const std::string & theType );
     private:
 
         void connectToServer();

@@ -41,7 +41,7 @@ ASSOscClient::poll() {
     if ( ! _myConnection ) {
         connectToServer();
         // if(running)
-        createTransportLayerEvent( 0, "configure");
+        createTransportLayerEvent("configure");
     }
 
     processInput();
@@ -90,11 +90,11 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
 }
 
 void
-ASSOscClient::createTransportLayerEvent( int theID, const std::string & theType) {
+ASSOscClient::createTransportLayerEvent( const std::string & theType) {
     std::string myAddress("/");
     myAddress += theType;
     _myOSCStream << osc::BeginMessage( myAddress.c_str() )
-        << theID;
+        << _myIDCounter++;
 
     if (theType == "configure") {
         _myOSCStream << _myGridSize[0] << _myGridSize[1];

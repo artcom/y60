@@ -57,14 +57,13 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
 }
 
 void
-ASSEventSource::createTransportLayerEvent( int theID,
-    const std::string & theType)
+ASSEventSource::createTransportLayerEvent( const std::string & theType)
 {
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
-    myNode->appendAttribute<int>("id", theID );
+    myNode->appendAttribute<int>("id", _myIDCounter++ );
     myNode->appendAttribute<std::string>("type", theType);
     if ( theType == "configure" ) {
         myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
