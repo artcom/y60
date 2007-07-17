@@ -303,10 +303,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         _myConfigDoc = Node.createDocument();
         _myConfigDoc.parseFile(_myConfigFile);
 
-        print("CMSHandle.setup loc=" + theLocation);
         if (theLocation && _myConfigDoc.childNodesLength() > 1) {
             _myConfig = getDescendantByAttribute(_myConfigDoc, "location", theLocation, true);
-            Logger.warning("Using CMS config location='" + theLocation + "'");
         }
         
         if (!_myConfig) {
