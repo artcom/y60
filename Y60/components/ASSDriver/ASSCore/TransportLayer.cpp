@@ -60,16 +60,23 @@ TransportLayer::TransportLayer(ASSDriver * theDriver, const dom::NodePtr & theSe
     _myFirmwareMode( -1 ),
     _myFramerate( -1 ),
     _myFrameNo( -1 ),
-    _myChecksum( -1 ),
+    _myChecksum( 0 ),
     _mySyncLostCounter( 0 ),
-    _myStatusDumpedFlag( false ),
+    _myDeviceLostCounter( 0 ),
+    _myChecksumErrorCounter( 0 ),
+    _myReceivedFrames( 0 ),
+    _myFirstFrameFlag( true ),
     _myLastCommandTime( asl::Time() )
 {
 }
 
 TransportLayer::~TransportLayer() {
-    AC_PRINT << "TransportLayer stats:";
-    AC_PRINT << "    sync errors: " << _mySyncLostCounter;
+    AC_PRINT << "=== ASS Transport Layer Stats =========" << endl
+             << "Frames received       : " << _myReceivedFrames << endl
+             << "Synchronization errors: " << _mySyncLostCounter << endl
+             << "Device lost           : " << _myDeviceLostCounter << endl
+             << "Checksum errors       : " << _myChecksumErrorCounter << endl
+             << "=======================================";
 }
 
 void 
@@ -150,9 +157,12 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
         std::vector<unsigned char>::iterator myIt = _myFrameBuffer.begin() + 2;
         _myFirmwareVersion = readStatusToken( myIt, 'V' );
         Vector2i myGridSize;
+        unsigned myChecksum;
+        bool myHasChecksumFlag = true;
         if ( _myFirmwareVersion < 260 ) {
             myGridSize[0] = 20;
             myGridSize[1] = 10;
+            myHasChecksumFlag = false;
         } else if (_myFirmwareVersion == 260 ) {
             _myFirmwareStatus = readStatusToken( myIt, 'S' );
             _myControllerId = readStatusToken( myIt, 'I' );
@@ -161,7 +171,7 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
             myGridSize[0] = readStatusToken( myIt, 'W' );
             myGridSize[1] = readStatusToken( myIt, 'H' );
             _myFrameNo = readStatusToken( myIt, 'N' );
-            _myChecksum = readStatusToken( myIt, 'C' );
+            myChecksum = readStatusToken( myIt, 'C' );
         } else if ( _myFirmwareVersion == 261 ) {
             _myFirmwareStatus = readStatusToken( myIt, 'S' );
             _myControllerId = readStatusToken( myIt, 'I' );
@@ -171,24 +181,48 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
             myGridSize[1] = readStatusToken( myIt, 'H' );
             _myGridSpacing = readStatusToken( myIt, 'G' );
             _myFrameNo = readStatusToken( myIt, 'N' );
-            _myChecksum = readStatusToken( myIt, 'C' );
+            myChecksum = readStatusToken( myIt, 'C' );
         } else {
             throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
                     PLUS_FILE_LINE );
         }
 
-        // TODO: verify checksum
-       
-        _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
-        _myExpectedLine = 1;
-
-            
         if ( _myGridSize != myGridSize ) {
             _myGridSize = myGridSize;
             ASSURE(_myFrameBuffer.front() == MAGIC_TOKEN);
             _myDriver->allocateGridBuffers( _myGridSize, theTargetRaster );
             _myReceiveBuffer.resize( getBytesPerFrame() );
         }
+
+        //AC_PRINT << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
+        if (_myFirstFrameFlag ) {
+            dumpControllerStatus();
+            _myFirstFrameFlag = false;
+        } else {
+            if ( myHasChecksumFlag ) {
+                if (_myChecksum == myChecksum) {
+                    //AC_PRINT << "Checksum OK.";
+                    _myDriver->processSensorValues();
+                } else {
+                    AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
+                    _myChecksumErrorCounter += 1;
+                }
+            }
+        }
+        _myChecksum = 0;
+       
+        _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
+        _myExpectedLine = 1;
+    }
+}
+
+void
+TransportLayer::addLineToChecksum(std::vector<unsigned char>::const_iterator theLineIt,
+                                  std::vector<unsigned char>::const_iterator theEnd )
+{
+    while ( theLineIt != theEnd) {
+        _myChecksum +=  * theLineIt;
+        theLineIt++;
     }
 }
 
@@ -200,24 +234,11 @@ TransportLayer::readSensorValues( RasterPtr theTargetRaster ) {
         //dumpBuffer( _myFrameBuffer );
         if ( _myExpectedLine == 0 ) {
             parseStatusLine(theTargetRaster);
-            if ( ! _myStatusDumpedFlag ) {
-                dumpControllerStatus();
-                _myStatusDumpedFlag = true;
-            }
         } else {
-            /*
-            if ( _myFrameBuffer[0] != MAGIC_TOKEN) {
-                AC_PRINT << "No MAGIC_TOKEN: '" << int( _myFrameBuffer[0] );
-            }
-            if ( _myFrameBuffer[1] != _myExpectedLine) {
-                AC_PRINT << "Expected line number " << int( _myExpectedLine )
-			 << " got " << int(_myFrameBuffer[1]);
-            }
-            */
             if ( _myFrameBuffer[0] != MAGIC_TOKEN ||
-                    _myFrameBuffer[1] != _myExpectedLine)
+                 _myFrameBuffer[1] != _myExpectedLine)
             {
-                AC_PRINT << "Sync error.";
+                AC_WARNING << "Sync error.";
                 _mySyncLostCounter++;
                 _myDriver->createTransportLayerEvent( "lost_sync" ); 
                 setState( SYNCHRONIZING );
@@ -228,15 +249,17 @@ TransportLayer::readSensorValues( RasterPtr theTargetRaster ) {
 
             size_t byteCount = (_myFrameBuffer.begin() + 2 + _myGridSize[0]) - (_myFrameBuffer.begin() + 2);
             unsigned char * myRowPtr = theTargetRaster->pixels().begin() +
-                myRowIdx * theTargetRaster->width(); // XXX was _myPoTSize[0]
+                myRowIdx * theTargetRaster->width();
             std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+
+            addLineToChecksum(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0]);
 
             _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
 
             if ( myRowIdx == _myGridSize[1] - 1) {
-                _myDriver->processSensorValues();
-                
+                //_myDriver->processSensorValues();
                 _myExpectedLine = 0;
+                _myReceivedFrames += 1;
             } else {
                 _myExpectedLine += 1;
             }
@@ -297,10 +320,12 @@ TransportLayer::setState( DriverState theState ) {
             closeConnection();
             break;
         case SYNCHRONIZING:
+            sendCommand( CMD_LEAVE_CONFIG_MODE ); // XXX
             _myMagicTokenFlag = false;
             _myGridSize = Vector2i(-1, -1);
             _myFrameBuffer.clear();
-            _myStatusDumpedFlag = false;
+            _myFirstFrameFlag = true;
+            _myChecksum = 0;
             break;
         case RUNNING:
             _myExpectedLine = 0;
@@ -403,19 +428,15 @@ TransportLayer::getCommandResponse() {
 void
 TransportLayer::sendCommand( const std::string & theCommand ) {
     try {
-        //if (_mySerialPort) {
-            AC_PRINT << "Sending command: '" << theCommand << "'";
-            std::string myCommand( theCommand );
-            myCommand.append("\r");
-            writeData( myCommand.c_str(), myCommand.size() );
-            _myLastCommandTime = double( asl::Time() );
-        //} else {
-        //    AC_WARNING << "Can not send command. No serial port.";
-        //    setState( NO_SERIAL_PORT );
-        //}
+        AC_PRINT << "Sending command: '" << theCommand << "'";
+        std::string myCommand( theCommand );
+        myCommand.append("\r");
+        writeData( myCommand.c_str(), myCommand.size() );
+        _myLastCommandTime = double( asl::Time() );
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
         _myDriver->createTransportLayerEvent( "lost_communication" );
+        _myDeviceLostCounter++;
         setState(NOT_CONNECTED);
     }
 }
@@ -475,16 +496,31 @@ TransportLayer::getLastChecksum() const {
 
 void 
 TransportLayer::dumpControllerStatus() const {
-    AC_PRINT << "=== Controller Status =================";
-    AC_PRINT << "Firmware version: " << _myFirmwareVersion;
-    AC_PRINT << "Controller Id   : " << _myControllerId;
-    AC_PRINT << "FirmwareMode    : " << _myFirmwareMode;
-    AC_PRINT << "Framerate       : " << _myFramerate;
-    AC_PRINT << "Grid size       : " << _myGridSize;
-    AC_PRINT << "Grid spacing    : " << _myGridSpacing;
-    AC_PRINT << "Frame number    : " << _myFrameNo;
-    AC_PRINT << "Checksum        : " << _myChecksum;
-    AC_PRINT << "=======================================";
+    AC_PRINT << "=== ASS Controller Status =============" << endl
+             << "Firmware version : " << _myFirmwareVersion << endl
+             << "Controller Id    : " << _myControllerId << endl
+             << "Firmware mode    : " << _myFirmwareMode 
+                    << " (" << getFirmwareModeName(_myFirmwareMode) << ")" << endl
+             << "Framerate        : " << _myFramerate << endl
+             << "Grid size        : " << _myGridSize << endl
+             << "Grid spacing     : " << _myGridSpacing << endl
+             << "Last frame number: " << _myFrameNo << endl
+             //<< "Checksum         : " << _myChecksum << endl
+             << "=======================================";
+}
+
+const char *
+TransportLayer::getFirmwareModeName(unsigned theId) const {
+    switch (theId) {
+        case 1:
+            return "absolute";
+        case 2:
+            return "relative";
+        default:
+            break;
+    }
+    AC_WARNING << "Unknown firmware mode " << theId;
+    return "unknown";
 }
 
 } // end of namespace

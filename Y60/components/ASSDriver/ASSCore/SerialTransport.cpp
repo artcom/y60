@@ -98,6 +98,24 @@ SerialTransport::establishConnection() {
         if (_mySerialPort) {
             _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
                     _myParity, _myStopBits, _myHandshakingFlag);
+            /*
+            if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
+                AC_PRINT << "after open: RTS is on";
+            } else {
+                AC_PRINT << "after open: RTS is off";
+            }
+
+            AC_PRINT << "setting RTS";
+            */
+            _mySerialPort->setStatusLine( SerialDevice::RTS);
+
+            /*
+            if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
+                AC_PRINT << "RTS is on";
+            } else {
+                AC_PRINT << "RTS is off";
+            }
+            */
             setState( SYNCHRONIZING );
         }
     } else {
@@ -139,6 +157,7 @@ SerialTransport::readData() {
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
         _myDriver->createTransportLayerEvent( "lost_communication" );
+        _myDeviceLostCounter++;
         setState(NOT_CONNECTED);
     }
 }
@@ -157,6 +176,23 @@ void
 SerialTransport::closeConnection() {
     //AC_PRINT << "SerialTransport::closeConnection()";
     if (_mySerialPort) {
+        //AC_PRINT << "Disabling RTS";
+        // XXX this disables both RTS and DTR ... the current (Win32) API does not permit to
+        //     retrive the current state of the outbound lines...
+        try {
+            _mySerialPort->setStatusLine( 0 );
+        } catch ( const asl::SerialPortException & ex ) {
+            AC_WARNING << "Failed to disable RTS line: " << ex;
+        }
+
+        /*
+        if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
+            AC_PRINT << "RTS is on";
+        } else {
+            AC_PRINT << "RTS is off";
+        }
+        */
+
         delete _mySerialPort;
         _mySerialPort = 0;
     }

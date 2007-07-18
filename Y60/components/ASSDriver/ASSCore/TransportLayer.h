@@ -80,6 +80,10 @@ class TransportLayer {
         void parseStatusLine(RasterPtr & theTargetRaster);
         void readSensorValues( RasterPtr theTargetRaster );
         void synchronize();
+        const char * getFirmwareModeName(unsigned theId) const;
+
+        void addLineToChecksum(std::vector<unsigned char>::const_iterator theLineIt,
+                               std::vector<unsigned char>::const_iterator theEnd );
 
         virtual void establishConnection() = 0;
         virtual void readData() = 0;
@@ -111,9 +115,12 @@ class TransportLayer {
         int _myFrameNo;
         int _myChecksum;
 
-        bool _myStatusDumpedFlag;
+        bool _myFirstFrameFlag;
 
-        unsigned       _mySyncLostCounter;
+        unsigned _mySyncLostCounter;
+        unsigned _myDeviceLostCounter;
+        unsigned _myReceivedFrames;    
+        unsigned _myChecksumErrorCounter;
     private:
         TransportLayer();
 

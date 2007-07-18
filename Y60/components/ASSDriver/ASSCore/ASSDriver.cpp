@@ -618,83 +618,56 @@ ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
     }
 }
 
+// XXX: These macros might be worth publishing [DS]
+#define GET_PROP( theName, theVar )    \
+    if (thePropertyName == #theName) { \
+        theReturnValue.set( theVar );  \
+        return;                        \
+    }
+    
+#define RO_PROP( theName ) \
+    if (thePropertyName == #theName) { \
+        AC_ERROR << "Property '" << #theName << "' is read only."; \
+        return; \
+    }
+
+#define SET_PROP( theName, theVar ) \
+    if (thePropertyName == #theName) { \
+        thePropertyValue.get( theVar ); \
+        return; \
+    }
+
 void
 ASSDriver::onGetProperty(const std::string & thePropertyName,
         PropertyValue & theReturnValue) const
 {
-    if (thePropertyName == "gridSize") {
-        theReturnValue.set( _myGridSize );
-        return;
-    }
-    if (thePropertyName == "overlay") {
-        theReturnValue.set( _myOverlay );
-        return;
-    }
-    if (thePropertyName == "rasterNames") {
-        theReturnValue.set( _myRasterNames );
-        return;
-    }
-    if (thePropertyName == "gridColor") {
-        theReturnValue.set( _myGridColor );
-        return;
-    }
-    if (thePropertyName == "cursorColor") {
-        theReturnValue.set( _myCursorColor );
-        return;
-    }
-    if (thePropertyName == "touchColor") {
-        theReturnValue.set( _myTouchColor );
-        return;
-    }
-    if (thePropertyName == "textColor") {
-        theReturnValue.set( _myTextColor );
-        return;
-    }
-    if (thePropertyName == "probeColor") {
-        theReturnValue.set( _myProbeColor );
-        return;
-    }
-    AC_ERROR << "Unknown property '" << thePropertyName << "'";
+    GET_PROP( gridSize, _myGridSize );
+    GET_PROP( overlay, _myOverlay );
+    GET_PROP( rasterNames, _myRasterNames );
+
+    GET_PROP( gridColor, _myGridColor );
+    GET_PROP( cursorColor, _myCursorColor );
+    GET_PROP( touchColor, _myTouchColor );
+    GET_PROP( textColor, _myTextColor );
+    GET_PROP( probeColor, _myProbeColor );
+
+    AC_ERROR << "Unknown property '" << thePropertyName << "'.";
 }
 
 void
 ASSDriver::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
-    if (thePropertyName == "gridSize") {
-        AC_ERROR << "gridSize property is read only";
-        return;
-    }
-    if (thePropertyName == "overlay") {
-        _myOverlay = thePropertyValue.get<dom::NodePtr>();
-        return;
-    }
-    if (thePropertyName == "rasterNames") {
-        AC_ERROR << "rasterNames property is read only";
-        return;
-    }
-    if (thePropertyName == "gridColor") {
-        _myGridColor = thePropertyValue.get<Vector4f>();
-        return;
-    }
-    if (thePropertyName == "cursorColor") {
-        _myCursorColor = thePropertyValue.get<Vector4f>();
-        return;
-    }
-    if (thePropertyName == "touchColor") {
-        _myTouchColor = thePropertyValue.get<Vector4f>();
-        return;
-    }
-    if (thePropertyName == "textColor") {
-        _myTextColor = thePropertyValue.get<Vector4f>();
-        return;
-    }
-    if (thePropertyName == "probeColor") {
-        _myProbeColor = thePropertyValue.get<Vector4f>();
-        return;
-    }
+    RO_PROP( gridSize );
+    SET_PROP( overlay, _myOverlay );
+    RO_PROP( rasterNames );
+    SET_PROP( gridColor, _myGridColor );
+    SET_PROP( cursorColor, _myCursorColor );
+    SET_PROP( touchColor, _myTouchColor );
+    SET_PROP( textColor, _myTextColor );
+    SET_PROP( probeColor, _myProbeColor );
 
-    AC_ERROR << "Unknown property '" << thePropertyName << "'";
+    AC_ERROR << "Unknown property '" << thePropertyName << "'.";
 }
 
 

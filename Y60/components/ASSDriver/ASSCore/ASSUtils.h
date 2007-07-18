@@ -33,6 +33,7 @@ DEFINE_EXCEPTION( ASSException, asl::Exception );
 
 dom::NodePtr getASSSettings(dom::NodePtr theSettings);
 
+// XXX: The config functions might be worth publishing [DS]
 template <class T>
 bool
 getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue,
