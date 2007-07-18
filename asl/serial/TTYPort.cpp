@@ -149,7 +149,7 @@ TTYPort::setStatusLine(unsigned theStatusMask) {
     if (theStatusMask & RTS) {
         myStatus |= TIOCM_RTS;
     }
-    if (ioctl(_myPortHandle, TIOCMSET, myStatus) < 0) {
+    if (ioctl(_myPortHandle, TIOCMSET, & myStatus) < 0) {
         throw SerialPortException(string("Unable to set status bits on device '") +
             getDeviceName() + "': " + strerror(errno), PLUS_FILE_LINE);
     }
@@ -163,7 +163,7 @@ TTYPort::getStatusLine() {
     }
 
     int myStatus = 0;
-    if (ioctl(_myPortHandle, TIOCMGET, &myStatus) < 0) {
+    if (ioctl(_myPortHandle, TIOCMGET, & myStatus) < 0) {
         throw SerialPortException(string("Unable to get status bits on device '") +
             getDeviceName() + "': " + strerror(errno), PLUS_FILE_LINE);
     }
@@ -180,6 +180,12 @@ TTYPort::getStatusLine() {
     }
     if (myStatus & TIOCM_CD) {
         myStatusMask |= CD;
+    }
+    if (myStatus & TIOCM_RTS) {
+        myStatusMask |= RTS;
+    }
+    if (myStatus & TIOCM_DTR) {
+        myStatusMask |= DTR;
     }
     if (isNoisy()) {
         cerr << "TTYPort::peek(): status mask=0x" << hex << myStatusMask << dec << endl;

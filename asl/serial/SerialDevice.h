@@ -42,12 +42,12 @@ namespace asl {
 
             /// Status line bits.
             enum StatusBits {
-                CTS = 0x01,    ///< Clear To Send
-                DSR = 0x02,    ///< Data Set Ready
-                RI = 0x04,     ///< Ring Indicator
-                CD = 0x08,     ///< Carrier Detect
-                DTR = 0x10,    ///< Data Terminal Ready
-                RTS = 0x20,    ///< Request To Send
+                CTS = 0x01,    //< Clear To Send
+                DSR = 0x02,    //< Data Set Ready
+                RI = 0x04,     //< Ring Indicator
+                CD = 0x08,     //< Carrier Detect
+                DTR = 0x10,    //< Data Terminal Ready
+                RTS = 0x20,    //< Request To Send
             };
 
             /**
