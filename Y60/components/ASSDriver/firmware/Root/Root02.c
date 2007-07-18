@@ -143,6 +143,9 @@ uint8_t i, i2;
 	stdout = &g_uart0_str;
     PORT_CTS |= _BV(CTS); //toggle CTS to force FTDI chip to flush buffer
     DDR_CTS |= _BV(CTS);
+    DDR_RTS &= ~_BV(CTS); //set RTS to input (is used to turn on/off data transmission to host; this feature
+                          //is controlled via DIP switch no. 6
+    g_dataTransmitMode = 0; //normal operation
 
 
     //wait approx 4 ms to allow CPLD to start up
@@ -348,6 +351,7 @@ uint8_t v0, v1;
             ADCSRA |= _BV(ADSC);
 
 
+
             //read in DIP switches
             v0 = ~((PIND&0xF0) | ((PING&0x01)<<3) | ((PING&0x02)<<1) | ((PINC&0x01)<<1) | ((PINC&0x02)>>1));
             //debounce
@@ -355,6 +359,20 @@ uint8_t v0, v1;
                 g_DIPSwitch = v0;
             }
             swBefore = v0;
+
+            //process switch no. 6
+            if((g_DIPSwitch&_BV(DIP_RTS_CONTROL)) == 0){
+                g_dataTransmitMode |= 1; //indicate that data transmission is controlled by RTS
+            }else{
+                g_dataTransmitMode &= ~1;
+            }
+            //also process RTS-line here
+            if((PIN_RTS&_BV(RTS)) != 0){
+                g_dataTransmitMode |= 4;
+            }else{
+                g_dataTransmitMode &= ~4;
+            }
+
 
             //toggle LEDs
             if(g_errorState == 0){
@@ -368,6 +386,7 @@ uint8_t v0, v1;
                 }
             sc2++;
             }
+
 
             if(g_mode == REL_MODE){
                 //turn on green LED
@@ -762,71 +781,74 @@ uint8_t  testBuffer[20];
     	    	}
 #endif
 #ifndef TEST_MODE
-    		   	//line is ready to send to host
-                //send via UART only if UART high speed mode is enabled
-                if(g_UART_mode == HS){
-                    if(g_currentRow < g_matrixHeigth){//don't send average sample
-                        //copy bytes to TX buffer
-                        sendByte(255);
-                        sendByte(g_currentRow+1);
-                        for(ix=0; ix<g_matrixWidth; ix++){
-                            //limit byte value to range 0-254
-                            v1 = g_rowBuffer[ix];
-                            if(v1 > 254){
-                                v1 = 254;
+                //if enabled by corresponding DIP switch transmit only when RTS is passive
+                if((g_dataTransmitMode&(1+4)) != (1+4)){
+        		   	//line is ready to send to host
+                    //send via UART only if UART high speed mode is enabled
+                    if(g_UART_mode == HS){
+                        if(g_currentRow < g_matrixHeigth){//don't send average sample
+                            //copy bytes to TX buffer
+                            sendByte(255);
+                            sendByte(g_currentRow+1);
+                            for(ix=0; ix<g_matrixWidth; ix++){
+                                //limit byte value to range 0-254
+                                v1 = g_rowBuffer[ix];
+                                if(v1 > 254){
+                                    v1 = 254;
+                                }
+                                sendByte(v1);
+                                checksum += v1;
                             }
-                            sendByte(v1);
-                            checksum += v1;
-                        }
-                    }else{//send info bytes
-                        g_FrameNumber++;//increment frame number
+                        }else{//send info bytes
+                            g_FrameNumber++;//increment frame number
 #ifdef SEND_STATUS_BYTES
-                        //send header bytes
-                        sendByte(255);
-                        sendByte(0);
-                        //send version
-                        sendByte('V');
-                        sendInt(VERSION);
-                        sendInt(SUBVERSION);
-                        //send status
-                        sendByte('S');
-                        sendInt(0);
-                        sendInt(g_status);
-                        //send ID
-                        sendByte('I');
-                        sendInt(0);
-                        sendInt(g_ID);
-                        //send mode
-                        sendByte('M');
-                        sendInt(0);
-                        sendInt(g_mode);
-                        //send scan frequency
-                        sendByte('F');
-                        sendInt(0);
-                        sendInt(g_scanFrequency);
-                        //send width
-                        sendByte('W');
-                        sendInt(0);
-                        sendInt(g_matrixWidth);
-                        //send heigth
-                        sendByte('H');
-                        sendInt(0);
-                        sendInt(g_matrixHeigth);
-                        //send grid size
-                        sendByte('G');
-                        sendInt(0);
-                        sendInt(g_gridSpacing);
-                        //send frame number
-                        sendByte('N');
-                        sendInt(g_FrameNumber>>8);
-                        sendInt(g_FrameNumber&255);
-                        //send check sum
-                        sendByte('C');
-                        sendInt(checksum>>8);
-                        sendInt(checksum&255);
-                        checksum = 0;
-                        //make sure that correct number of bytes is in header file (LENGTH_STATUS_MSG)
+                            //send header bytes
+                            sendByte(255);
+                            sendByte(0);
+                            //send version
+                            sendByte('V');
+                            sendInt(VERSION);
+                            sendInt(SUBVERSION);
+                            //send status
+                            sendByte('S');
+                            sendInt(0);
+                            sendInt(g_status);
+                            //send ID
+                            sendByte('I');
+                            sendInt(0);
+                            sendInt(g_ID);
+                            //send mode
+                            sendByte('M');
+                            sendInt(0);
+                            sendInt(g_mode);
+                            //send scan frequency
+                            sendByte('F');
+                            sendInt(0);
+                            sendInt(g_scanFrequency);
+                            //send width
+                            sendByte('W');
+                            sendInt(0);
+                            sendInt(g_matrixWidth);
+                            //send heigth
+                            sendByte('H');
+                            sendInt(0);
+                            sendInt(g_matrixHeigth);
+                            //send grid size
+                            sendByte('G');
+                            sendInt(0);
+                            sendInt(g_gridSpacing);
+                            //send frame number
+                            sendByte('N');
+                            sendInt(g_FrameNumber>>8);
+                            sendInt(g_FrameNumber&255);
+                            //send check sum
+                            sendByte('C');
+                            sendInt(checksum>>8);
+                            sendInt(checksum&255);
+                            checksum = 0;
+                            //make sure that correct number of bytes is in header file (LENGTH_STATUS_MSG)
 #endif
+                         }
                     }
                 }
 #endif
@@ -848,6 +870,27 @@ uint8_t  testBuffer[20];
 //    PORT_AUX0 &= ~_BV(AUX0); //AUX0
 	    }
 
+        //check if system should switch to config mode because of RTS active
+        if((g_dataTransmitMode&1) != 0){
+            if((g_dataTransmitMode&4) != 0){//RTS-line
+                if(g_ConfigMode == 0){
+                    g_ConfigMode = 2;//skip welcome message and directly go to step 2
+                    g_dataTransmitMode |= 2; //indicate that config mode was triggered by RTS line
+                }
+                if(g_ConfigMode == 1){
+                    g_dataTransmitMode &= ~2;//indicate that config mode was started by host meanwhile
+                }
+            }
+        }
+        if((g_dataTransmitMode&(1+4)) != (1+4)){
+            if((g_dataTransmitMode&2) != 0){
+                //switch back to normal operation
+                if(g_ConfigMode == 2){//wait until any config command has been finished any system is idling
+                    g_ConfigMode = 0;
+                    g_dataTransmitMode &= ~2;
+                }
+            }
+        }
 
         handleConfigRequests();
 
@@ -1028,7 +1071,7 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
     }
 
     //CR received; parse received bytes
-    if(g_ConfigMode == 0){
+    if(g_ConfigMode == 0  ||  g_ConfigMode == 2){
         //wait for start command ('x')
         if(g_UARTBytesReceived == 1){
             //check received byte is an 'x'
@@ -1037,7 +1080,9 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                 g_ConfigMode = 1;
             }
         }
-    }else{
+    }
+    
+    if(g_ConfigMode >= 1){
         if(g_UARTBytesReceived >= CMDLength){
             //check if buffer matches one command of command list
             for(j=0; j<NrOfCMDs; j++){

@@ -68,6 +68,7 @@
 
 //DIP Switch Functions
 #define DIP_AUTO_SWITCH_TO_REL_MODE   0
+#define DIP_RTS_CONTROL               5 //to disable/enable control of data transmission via RTS
 #define DIP_ETHERNET_PORT             6 //if on USB-UART operates at low speed (9600bps)
 #define DIP_EEPROM_LOCK               7
 
@@ -98,6 +99,7 @@ uint8_t g_DIPSwitch;
 uint8_t g_UARTBytesReceived, g_arg1, g_arg2, g_PMinX,  g_PMinY, g_PMaxX,  g_PMaxY;
 uint8_t g_BaudRateFactor;
 uint8_t g_UART_mode;
+uint8_t g_dataTransmitMode;
 uint8_t g_T1[256];
 #define LS 0
 #define HS 1
@@ -130,6 +132,11 @@ uint8_t g_T1[256];
 #define    PORT_CTS       PORTE
 #define    DDR_CTS        DDRE
 #define    CTS            PE4
+
+#define    PORT_RTS       PORTE
+#define    PIN_RTS        PINE
+#define    DDR_RTS        DDRE
+#define    RTS            PE5
 
 //LEDs
 #define    PORT_LED       PORTB
