@@ -52,6 +52,14 @@ try {
 </cmsconfig>
 ========================================================*/
 
+/*
+Check Server-Side logs at 
+/opt/oracle/ocs/apps/j2ee/OC4J_Content/application-deployments/content/OC4J_Content_default_island_1/application.log
+
+to debug
+
+*/
+
 plug("y60CMSCache");
 use("SoapWsdl.js");
 
@@ -185,9 +193,23 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
             return true;
         }
         var myParams = new SOAPClientParameters();
-        myParams.add('username','y60');
-        myParams.add('password','acclienty60');
-        var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+        var myUsername = _myConfig.username;
+        var myPassword = _myConfig.password;
+        if ("domain" in myCMSConfig && 
+            myCMSConfig.domain.length && 
+            String(myCMSConfig.backend).toUpperCase() == "OCS") {
+            myUsername += "@" + myCMSConfig.domain;
+        }
+        myParams.add('username', myUsername);
+        myParams.add('password', myPassword);
+
+        // get the WSDL URL from the theme pool
+        var myThemePool = _myPresentation.childNode('presentation').childNode('themepool');
+        var wsdlUrl = myThemePool.server+":"+myThemePool.wsdlport;
+
+        //var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+        //        "RemoteLoginManagerService","RemoteLoginManager", "login", myParams, null );
+        var myResponse = SOAPClient.invoke('http://'+wsdlUrl+'/content/wsdl/RemoteLoginManager.wsdl', 
                 "RemoteLoginManagerService","RemoteLoginManager", "login", myParams, null );
         if (myResponse.responseCode > 299) {
             Logger.warning("Could not retrieve session cookie from OCS:" + myResponse.responseCode);
@@ -276,13 +298,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
                 myErrorOccurred = true;
             }
         }
-        // now get repository cookie
-        if (!myErrorOccurred) {
-            if (!login()) {
-                Logger.error("Failed to get repository cookie - aborting sync");
-                myErrorOccurred = true;
-            }
-        }
         if ( myErrorOccurred ) {
             if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
                 Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -296,6 +311,13 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         } else {
             _myPresentation.parse( myPresentationRequest.responseString );
             _myPresentation.saveFile( _myLocalFallback );
+        }
+        // now get repository cookie
+        if (!myErrorOccurred) {
+            if (!login()) {
+                Logger.error("Failed to get repository cookie - aborting sync");
+                myErrorOccurred = true;
+            }
         }
     }
 

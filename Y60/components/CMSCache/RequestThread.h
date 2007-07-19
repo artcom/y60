@@ -39,7 +39,8 @@ class RequestThread : public asl::PosixThread {
                       const std::string & theUserAgent,
                       const std::string & theProxy,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
-                      unsigned int theMaxRequestCount);
+                      unsigned int theMaxRequestCount,
+                      bool theVerboseFlag);
 
         void addToCookieJar(const std::string & theCookieString);
         int getRemainingCount() const;
@@ -77,6 +78,7 @@ class RequestThread : public asl::PosixThread {
         std::string _myProxy;
         std::string _myUsername;
         std::string _myPassword;
+        bool _myVerboseFlag;
         std::map<std::string,std::string> _myCookieJar;
 
         // mutex-protected members

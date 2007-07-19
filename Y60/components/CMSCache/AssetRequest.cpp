@@ -78,25 +78,21 @@ AssetRequest::onError(CURLcode theCode) {
     }
     _myIsDoneFlag = true;
     Request::onError(theCode);
-    if (getResponseCode() == 401) {
-        AC_ERROR << "Access denied for '" << getURL() << "'.";
-    } else {
-        AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
-        switch (theCode) {
-            case CURLE_URL_MALFORMAT:
-            case CURLE_COULDNT_RESOLVE_HOST:
-            case CURLE_COULDNT_CONNECT:
-            case CURLE_PARTIAL_FILE:
-            case CURLE_OPERATION_TIMEOUTED:
+    switch (theCode) {
+        case CURLE_URL_MALFORMAT:
+        case CURLE_COULDNT_RESOLVE_HOST:
+        case CURLE_COULDNT_CONNECT:
+        case CURLE_PARTIAL_FILE:
+        case CURLE_OPERATION_TIMEOUTED:
             //case CURLE_HTTP_RANGE_ERROR:
             //case CURLE_BAD_PASSWORD_ENTERED:
             //case CURLE_LOGIN_DENIED:
-            case CURLE_GOT_NOTHING:
-            case CURLE_RECV_ERROR:
-            case CURLE_BAD_CONTENT_ENCODING:
-            case CURLE_FILESIZE_EXCEEDED:
-                break;
-        }
+        case CURLE_GOT_NOTHING:
+        case CURLE_RECV_ERROR:
+        case CURLE_BAD_CONTENT_ENCODING:
+        case CURLE_FILESIZE_EXCEEDED:
+            AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
+            break;
     }
 }    
 
@@ -104,6 +100,10 @@ AssetRequest::onError(CURLcode theCode) {
 void 
 AssetRequest::onDone() {
     _myIsDoneFlag = true;
+    if (getResponseCode() >= 399 ) {
+        AC_ERROR << "HTTP Error " << getResponseCode() << " for '" <<  getURL() << "'.";
+        return;
+    }
     if (_myOutputFile) {
         _myOutputFile = asl::Ptr<ofstream>(0);
         deleteFile(_myLocalFile);

@@ -32,7 +32,8 @@ RequestThread::RequestThread(const std::string & theLocalPath,
                       const std::string & theUserAgent,
                       const std::string & theProxy,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
-                      unsigned int theMaxRequestCount) :
+                      unsigned int theMaxRequestCount,
+                      bool theVerboseFlag) :
     _myLocalPath(theLocalPath), 
     _myUsername(theUsername), 
     _myPassword(thePassword), 
@@ -40,6 +41,7 @@ RequestThread::RequestThread(const std::string & theLocalPath,
     _myProxy(theProxy),
     _myOutdatedAssets(theOutdatedAssets),
     _myMaxRequestCount(theMaxRequestCount),
+    _myVerboseFlag(theVerboseFlag),
     _remainingCount(theOutdatedAssets.size())
 {
     if (!theSessionCookie.empty()) {
@@ -149,7 +151,7 @@ RequestThread::addAssetRequest(const std::string & thePath, const std::string & 
     if (! _myProxy.empty()) {
         myRequest->setProxy(_myProxy,0);
     }
-    // myRequest->setVerbose(true);
+    myRequest->setVerbose(_myVerboseFlag);
     _myAssetRequests.insert(make_pair(thePath, myRequest));
     _myRequestManager.performRequest(myRequest);
 }

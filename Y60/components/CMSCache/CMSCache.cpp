@@ -143,7 +143,8 @@ CMSCache::synchronize() {
         std::vector<std::pair<std::string, std::string> > myOutdatedAssets;
         collectOutdatedAssets(myOutdatedAssets);
         _myRequestThread = RequestThreadPtr(new RequestThread(_myLocalPath, _myUsername, _myPassword, 
-                    _mySessionCookie, _myUserAgent, _myProxy, myOutdatedAssets, _myMaxRequestCount));
+                    _mySessionCookie, _myUserAgent, _myProxy, myOutdatedAssets, _myMaxRequestCount,
+                    _myVerboseFlag));
         // fillRequestQueue();
         AC_INFO << "forking";
         _myRequestThread->fork();
