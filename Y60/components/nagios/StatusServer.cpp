@@ -76,7 +76,7 @@ StatusServer::processData() {
             } else {
                 sendResponseHeader(200);
             }
-            std::string myText =  string("rev: ")+asl::ourRevision;
+            std::string myText =  string("Y60 rev: ")+asl::ourRevision;
             std::string myStatusText = readStatusText();
             if (!myStatusText.empty()) {
                 myText += ", "+myStatusText;
