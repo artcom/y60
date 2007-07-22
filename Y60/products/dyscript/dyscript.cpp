@@ -1,6 +1,8 @@
 
 /*
 
+S.M.A.R.T. - (Small?)Smart Multitreaded Application RunTime
+
 What features should a good general purpose rapid application development language have?
 
 - Syntax similiar to C, C++, JAVA, C# etc.
@@ -188,6 +190,22 @@ Performance tests yield the following results:
 
 - the naive approach is overall as fast as the spidermonkey js engine; in some interesting case much faster (8x)
 - C++ native loops and function calls are still 100x faster
+
+==============================================================
+
+
+
+Basics Logical Language Structures:
+
+
+List (of anything)
+Vector
+Sequence
+Alternative
+Option
+Loop
+
+
 
 
 
@@ -505,6 +523,8 @@ namespace dys {
 
     class Statement {
     public:
+        //virtual unsigned int parse(const String & is, unsigned int thePos, Parser & theParser) = 0;
+        //virtual void print(ostream & os, Printer & thePrinter) = 0;
         virtual void exec(Scope * theScope) = 0;
         virtual ~Statement() {};
     };
@@ -1740,7 +1760,7 @@ namespace dys {
 
             // Matrix4f m(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)
             asl::Matrix4f myMatrix;
-            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::Matrix4f::UNKNOWN);
+            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::UNKNOWN);
             asl::Matrix4f myIdentMatrix;
             myIdentMatrix.makeIdentity();
             myProgram.append(StatementPtr(new Declaration("m",ValuePtr(new Value<asl::Matrix4f>(myMatrix)),
@@ -1840,7 +1860,7 @@ namespace dys {
 
             // Matrix4f m(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)
             asl::Matrix4f myMatrix;
-            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::Matrix4f::UNKNOWN);
+            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::UNKNOWN);
             asl::Matrix4f myIdentMatrix;
             myIdentMatrix.makeIdentity();
             myProgram.append(StatementPtr(new Declaration("mm",ValuePtr(new Value<asl::Matrix4f>(myMatrix)),
@@ -2353,7 +2373,40 @@ int program[] = { { ASSIGN, 5000000, "n"}, {IF
 
         int a;
         asl::NanoTime start;
-#if 1
+#if 0
+#if 1 // GCC
+        //fastest:
+        __asm__
+         (
+            "push        %esi\n\t"
+            "mov         %esi, %0 \n\t"
+            "push        %edi  \n\t"
+            "mov         %edi, $0FFFFFFFF\n\t"
+
+            "test        %esi, %esi\n\t"
+            "je          _ready\n\t"
+"_loop:            \n\t"
+            "xor         %edi,%esi\n\t"
+            "dec         %esi\n\t"
+            "je          _ready\n\t"
+
+            "xor         %edi,%esi\n\t"
+            "dec         %esi\n\t"
+            "je          _ready\n\t"
+
+            "xor         %edi,%esi\n\t"
+            "dec         %esi\n\t"
+            "jne          _loop \n\t"
+
+"_ready:     \n\t"
+            "pop edi\n\t"
+            "pop esi\n\t"
+            :
+            "=&a"(theCount):
+            "a"(theCount):
+            "cc"
+        );
+#else
         //fastest:
         __asm {
             push        esi  
@@ -2380,6 +2433,7 @@ _ready:     mov         a, edi
             pop edi
             pop esi
         }
+#endif
 #endif
 #if 0
         __asm {
@@ -2461,8 +2515,32 @@ _ready:      mov         a, edi
 
         int a;
         asl::NanoTime start;
-#if 1
-        __asm {
+#if 0
+#if 1 // gcc
+        __asm__ (
+            "push        %esi  \n\t"
+            "mov         %esi, %0 \n\t"
+            "push        %edi  \n\t"
+            "mov         %edi, $0FFFFFFFF\n\t"
+
+            "test        %esi, %esi\n\t"
+            "je          _ready\n\t"
+"_loop:\n\t"
+            "sub         %esi,1\n\t"
+            "je          _ready\n\t"
+
+            "sub         %esi,1\n\t"
+            "jne          _loop \n\t"
+
+"_ready:     mov         %0, %edi\n\t"
+            "pop %edi\n\t"
+            "pop %esi\n\t" :
+            "=&a"( theCount ):
+            "a"( theCount ):
+            "cc"
+        );
+#else
+         __asm {
             push        esi  
             mov         esi, theCount 
             push        edi  
@@ -2481,6 +2559,7 @@ _ready:     mov         a, edi
             pop edi
             pop esi
         }
+#endif
 #endif
         asl::NanoTime stop;
         cerr << "a = " << a << endl;
@@ -2658,7 +2737,7 @@ _ready:     mov         a, edi
         }
         {
             asl::Matrix4f myMatrix;
-            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::Matrix4f::UNKNOWN);
+            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::UNKNOWN);
             asl::Matrix4f myIdentMatrix;
             myIdentMatrix.makeIdentity();
             asl::NanoTime start;
@@ -2671,7 +2750,7 @@ _ready:     mov         a, edi
         }
         {
             asl::Matrix4f myMatrix;
-            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::Matrix4f::UNKNOWN);
+            myMatrix.assign(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16, asl::UNKNOWN);
             asl::Matrix4f myIdentMatrix = myMatrix;
             //myIdentMatrix.makeIdentity();
             asl::NanoTime start;

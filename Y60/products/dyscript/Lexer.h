@@ -614,7 +614,7 @@ namespace dys {
 
             DEFINITION(CASE, ExactString("case")),
             DEFINITION(DEBUGGER, ExactString("debugger")),
-            DEFINITION(EXPORT, ExactString("export")),
+            DEFINITION(T_EXPORT, ExactString("export")),
             DEFINITION(SUPER, ExactString("super")),
             DEFINITION(DEFAULT, ExactString("default")),
             DEFINITION(EXTENDS, ExactString("extends")),
@@ -710,7 +710,7 @@ namespace dys {
 
         const TokenId CASE;
         const TokenId DEBUGGER;
-        const TokenId EXPORT;
+        const TokenId T_EXPORT;
         const TokenId SUPER;
         const TokenId DEFAULT;
         const TokenId EXTENDS;
