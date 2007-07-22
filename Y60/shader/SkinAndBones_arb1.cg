@@ -16,7 +16,8 @@
 //  Description: environment mapping shader
 //=============================================================================
 
-#define JOINT_VECTOR_COUNT 186
+//#define JOINT_VECTOR_COUNT 196  // This is the correct value!
+#define JOINT_VECTOR_COUNT 196
 //#define JOINT_VECTOR_COUNT 82
 
 struct app2vert {
@@ -52,7 +53,7 @@ vert2frag mainVertex(app2vert IN,
     vert2frag OUT;
     float3 myNetPosition = 0;
     float3 myNetNormal   = 0;
-/*
+
     int i;
     for (i = 0; i < 4; i++) {
         float myIndex = IN.Indices0[i] * 3;
@@ -84,7 +85,7 @@ vert2frag mainVertex(app2vert IN,
         myNetPosition += IN.Weights1[i] * myBonePosition;
         myNetNormal   += IN.Weights1[i] * myBoneNormal;
     }
-*/
+
     OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, float4(myNetPosition, 1));
     OUT.texCoord0   = IN.TexCoord;
 
