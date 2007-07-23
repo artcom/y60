@@ -56,7 +56,8 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         writeStringToFile("settings.xml", COMMON_SETTINGS);
-        writeStringToFile("settings-" + hostname() + ".xml", HOST_SETTINGS);
+        var myHostname = hostname().split(".")[0]; // make sure we don't get a FQ name
+        writeStringToFile("settings-" + myHostname + ".xml", HOST_SETTINGS);
         var myConfigurator = new Configurator(null, "settings.xml");
         obj.mySettings = myConfigurator.getSettings();
         obj.myResult = RESULT;
