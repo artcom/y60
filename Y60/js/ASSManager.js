@@ -75,7 +75,17 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         }
     }
 
+    var _myEventQueues = {};
+
     self.onASSEvent = function( theEventNode ) {
+        if (!(theEventNode.id in _myEventQueues)) {
+            _myEventQueues[theEventNode.id] = new Array();
+        }
+        _myEventQueues[theEventNode.id].push(theEventNode);
+        if (_myEventQueues[theEventNode.id].length > 1000) {
+            _myEventQueues[theEventNode.id].shift();
+        }
+
         if (theEventNode.type == "configure") {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: configure");
@@ -98,6 +108,18 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: remove");
             }
+        }
+    }
+
+    self.getPrecedingEvent = function(theEvent, theNumber) {
+        if (theEvent.id in _myEventQueues) {
+            var thisQueue = _myEventQueues[theEvent.id];
+            if (thisQueue.length > theNumber) {
+                return thisQueue[thisQueue.length - theNumber - 1];
+            }
+            return thisQueue[0];
+        } else {
+            print("Sorry, no event in queue " + theEvent.id);
         }
     }
 
