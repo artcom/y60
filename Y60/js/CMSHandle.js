@@ -76,9 +76,9 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         _myPresentation = thePresentation;
     }
 
-    obj.synchronize = function() {
+    obj.synchronize = function(theRandomWaitDuration) {
         if ( _mySyncFlag ) {
-            fetchPresentation(); 
+            fetchPresentation(theRandomWaitDuration); 
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
             Logger.info("CMS synchronization disabled.");
             Logger.info("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -241,9 +241,11 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         }
         return true;
     }
-    function fetchPresentation() {
+    function fetchPresentation(theRandomWaitDuration) {
         Logger.info ("Fetching presentation.xml");
-        // msleep(Math.random()*10*1000); XXX
+        if (theRandomWaitDuration) {
+            msleep(Math.random()*theRandomWaitDuration*1000);
+        }
         _myPresentation = Node.createDocument();
         _myZopeCookies = [];
         
