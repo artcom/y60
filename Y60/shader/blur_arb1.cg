@@ -32,9 +32,10 @@ float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex,
                     uniform sampler2D blurKernel) : COLOR 
 {
-    float halfKernelSize = (kernelSize-1) * 0.5;
+    float theKernelSize = 4;
+    float halfKernelSize = (theKernelSize-1) * 0.5;
     float2 myTexCoord = float2(IN.texCoord);
-    int myKernelSize = int(kernelSize);
+    int myKernelSize = int(theKernelSize);
     float3 myOutColor = float3(0,0,0);
     if( texelSize.z > 0.0 ) {
         // blur Y
