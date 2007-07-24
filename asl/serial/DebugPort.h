@@ -65,6 +65,10 @@ namespace asl {
                 return _myData.size();
             }
 
+            void flush() {
+                _myData.clear();
+            }
+
             /// Sets the internal status lines.
             void setStatusLine(unsigned theStatusMask) {
                 _myStatusMask = theStatusMask;
