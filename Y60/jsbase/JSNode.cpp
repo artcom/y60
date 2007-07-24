@@ -678,7 +678,7 @@ getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     }
     dom::NodePtr myRetNode = myNode->getElementById(myId, myIdAttribute);
     if (!myRetNode) {
-        AC_WARNING << "JSNode::getElementById: node with id '" << myId << "' not found by node " << *myNode->cloneNode(dom::Node::SHALLOW);
+        AC_DEBUG << "JSNode::getElementById: node with id '" << myId << "' not found by node " << *myNode->cloneNode(dom::Node::SHALLOW);
     }
     *rval = as_jsval(cx, myRetNode);
     return JS_TRUE;
