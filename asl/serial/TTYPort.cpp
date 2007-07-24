@@ -135,6 +135,18 @@ TTYPort::peek() {
     return myResult;
 }
 
+void 
+TTYPort::flush() {
+    if (!isOpen()) {
+        throw SerialPortException(string("Can not peek from device ") + getDeviceName() +
+                               ". Device is not open.", PLUS_FILE_LINE);
+    }
+    if ( tcflush( _myPortHandle, TCIOFLUSH ) ) {
+        throw SerialPortException(string("Failed to flush device ") + getDeviceName() +
+                               ": " + strerror(errno), PLUS_FILE_LINE);
+    }
+}
+
 void
 TTYPort::setStatusLine(unsigned theStatusMask) {
     if (!isOpen()) {

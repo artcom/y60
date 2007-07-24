@@ -38,6 +38,7 @@ class TTYPort : public SerialDevice {
         bool read(char * theBuffer, size_t & theSize);
         void write(const char * theBuffer, size_t theSize);
         unsigned peek();
+        void flush();
 
         void setStatusLine(unsigned theStatusMask);
         unsigned getStatusLine();

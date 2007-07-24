@@ -92,30 +92,16 @@ SerialTransport::establishConnection() {
         // where [devid] is a string that is flashed into the FTDI chip. I'll
         // check that the other day.
         AC_PRINT << "TODO: implement device name handling for FTDI USB->RS232 "
-            << "virtual TTYs.";
+            << "virtual TTYs on Mac OS X.";
 #endif
 
         if (_mySerialPort) {
             _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
                     _myParity, _myStopBits, _myHandshakingFlag);
-            /*
-            if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
-                AC_PRINT << "after open: RTS is on";
-            } else {
-                AC_PRINT << "after open: RTS is off";
-            }
-
-            AC_PRINT << "setting RTS";
-            */
             _mySerialPort->setStatusLine( SerialDevice::RTS);
 
-            /*
-            if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
-                AC_PRINT << "RTS is on";
-            } else {
-                AC_PRINT << "RTS is off";
-            }
-            */
+            _mySerialPort->flush();
+
             setState( SYNCHRONIZING );
         }
     } else {

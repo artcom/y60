@@ -222,6 +222,16 @@ namespace asl {
         return _myBuffer.size();
 #endif
     }
+    void 
+    ComPort::flush() {
+        if (!isOpen()) {
+            throw SerialPortException(string("Can not peek device '") + getDeviceName() +
+                    "'. Device is not open.", PLUS_FILE_LINE);
+        }
+        if ( ! PurgeComm( _myPortHandle, PURGE_RXCLEAR | PURGE_TXCLEAR ) ) {
+            checkError("ComPort::flush()");
+        }
+    }
 
     void
     ComPort::setStatusLine(unsigned theStatusMask) {
