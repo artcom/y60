@@ -132,6 +132,13 @@ peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Flushes IO buffers.");
+    DOC_END;
+    return Method<JSSerial::NATIVE>::call(&JSSerial::NATIVE::flush,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the format for packets send via the serial device");
     DOC_PARAM("theStartByte", "Start byte", DOC_TYPE_INTEGER);
@@ -483,6 +490,7 @@ JSSerial::Functions() {
         {"read",                 read,                    1},
         {"readBlock",            readBlock,               1},
         {"peek",                 peek,                    0},
+        {"flush",                flush,                   0},
         {"write",                write,                   1},
         {"writeBlock",           writeBlock,              1},        
         {"receivePacket",        receivePacket,           0},
