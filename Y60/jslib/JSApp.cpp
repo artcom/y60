@@ -34,6 +34,8 @@
 #include <asl/Logger.h>
 #include <asl/Revision.h>
 #include <asl/numeric_functions.h>
+#include <asl/checksum.h>
+
 #ifndef WIN32
 #   include <asl/signal_functions.h>
 #endif
@@ -1115,6 +1117,32 @@ fromHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     JS_ReportError(cx,"fromHexString: bad number of arguments should be one, got %d", argc);
     return JS_FALSE;
 }
+static JSBool
+checksumFromString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Converts a string into a crc checksum.");
+    DOC_PARAM("theString", "A string", DOC_TYPE_INTEGER);
+    DOC_RVAL("An int representing the checksum", DOC_TYPE_STRING);
+    DOC_END;
+    if (argc == 1) {
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "checksumFromString(): Argument #%d is undefined", 1);
+            return JS_FALSE;
+        }
+
+        string myInputString;
+        if (!convertFrom(cx, argv[0], myInputString)) {
+            JS_ReportError(cx, "checksumFromString(): argument #1 must be a string");
+            return JS_FALSE;
+        }
+        unsigned long myCRC32 = crc32(0L, Z_NULL, 0);
+        appendCRC32(myCRC32, myInputString);
+
+        *rval = as_jsval(cx, myCRC32);
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"checksumFromString: bad number of arguments should be one, got %d", argc);
+    return JS_FALSE;
+}
 
 static JSBool
 asHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1340,6 +1368,7 @@ static JSFunctionSpec glob_functions[] = {
 
     {"fromHexString",   fromHexString,   1},
     {"asHexString",     asHexString,     1},
+    {"checksumFromString",checksumFromString, 1},
     {"urlEncode",       urlEncode,       1},
     {"urlDecode",       urlDecode,       1},
 

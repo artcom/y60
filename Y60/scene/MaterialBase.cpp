@@ -17,8 +17,8 @@
 
 #include <asl/Logger.h> 
 #include <asl/string_functions.h>
+#include <asl/checksum.h>
 
-#include "zlib.h"
 
 #include <algorithm>
 
@@ -382,13 +382,6 @@ namespace y60 {
         MaterialPropertiesFacadePtr mySelf = dynamic_cast_Ptr<MaterialPropertiesFacade>(getSelf());
         MaterialPropGroup1HashTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &MaterialPropertiesFacade::updateGroup1Hash);
         
-    }
-    template<class T>
-    void
-    appendCRC32( unsigned long & theCRC, const T & theValue) {
-        const Bytef * myValuePtr = (const Bytef*)(&theValue);
-        theCRC = crc32(theCRC, myValuePtr, sizeof(T));
-        //AC_PRINT << theValue;
     }
 
     void
