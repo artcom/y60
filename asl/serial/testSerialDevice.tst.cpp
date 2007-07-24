@@ -20,6 +20,7 @@
 #include <asl/UnitTest.h>
 #include <asl/Time.h>
 
+#include "DebugPort.h"
 #include "SerialDevice.h"
 #include "SerialDeviceFactory.h"
 #include "uCCP.h"
@@ -48,6 +49,7 @@ public:
         ENSURE(myPort->isOpen());
         myPort->close();
         ENSURE( ! myPort->isOpen());
+        delete myPort;
         
         // WARNING this test may fail if you have more than 500 serial ports ;-)
         SerialDevice * otherPort = getSerialDevice(500);
@@ -59,6 +61,11 @@ public:
         ENSURE_EXCEPTION(otherPort->read(myBuffer, mySize), SerialPortException);
 
         ENSURE_EXCEPTION(otherPort->close(), SerialPortException);
+        delete otherPort;
+
+        // at least instatiate this thing once ... [DS]
+        SerialDevice * myDebugPort = new DebugPort("Debug Port");
+        delete myDebugPort;
         
     }
 };

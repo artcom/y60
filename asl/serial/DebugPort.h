@@ -19,6 +19,7 @@
 #define ASL_DEBUG_PORT_INCLUDED
 
 #include "SerialDevice.h"
+#include <asl/numeric_functions.h>
 #include <string>
 
 namespace asl {
