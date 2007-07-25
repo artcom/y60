@@ -649,6 +649,9 @@ function transformClipToWorld(theClipPos, theCamera) {
     return product(theClipPos, myProjectionMatrix);
 }
 
+
+// XXX: don't depend on canvas of default "window".
+
 function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport) {
     var myPosX = 2 * theScreenPixelX / window.width  - 1;
     var myPosY = - (2 * theScreenPixelY / window.height - 1);
