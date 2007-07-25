@@ -67,7 +67,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         self.image = theImage;
         _myCanvas.target = self.image.id;
 
-        // Flip vertically since framebuffer content is upsid e-down
+        // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
         self.image.matrix.makeIdentity();
@@ -93,7 +93,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             _myOffscreenNodes[0].visible = true;
             _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
             _myOffscreenNodes[0].visible = myWasVisible;
-        } else {  
+        } else {
             var myVisibleNodes = [];
             for (var i = 0; i < window.scene.world.childNodesLength(); ++i) {
                 var myNode = window.scene.world.childNode(i);
