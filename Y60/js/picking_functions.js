@@ -8,6 +8,24 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+function getViewportAt(theScreenPixelX, theScreenPixelY, theCanvas) {
+    if (!theCanvas) {
+        var errormessage = "no canvas";
+        throw new Exception(errormessage);
+    }
+    var myViewportCount = theCanvas.childNodesLength("viewport");
+    for (var i= myViewportCount-1; i >= 0; --i) {
+        var myViewport = theCanvas.childNode("viewport",i);
+        if (myViewport.top <= theScreenPixelY &&
+            myViewport.height + myViewport.top >= theScreenPixelY &&
+            myViewport.left <= theScreenPixelX &&
+            myViewport.left + myViewport.width >= theScreenPixelX)
+        {
+            return myViewport;
+        }
+    }
+    return null;
+}
 
 function Picking(theRenderWindow) {
     this.Constructor(this, theRenderWindow);
@@ -24,18 +42,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         if (!theCanvas) {
             theCanvas = _myRenderWindow.canvas;
         }
-        var myViewportCount = theCanvas.childNodesLength("viewport");
-        for (var i= myViewportCount-1; i >= 0; --i) {
-            var myViewport = theCanvas.childNode("viewport",i);
-            if (myViewport.top <= theScreenPixelY &&
-                myViewport.height + myViewport.top >= theScreenPixelY &&
-                myViewport.left <= theScreenPixelX &&
-                myViewport.left + myViewport.width >= theScreenPixelX)
-            {
-                return myViewport;
-            }
-        }
-        return null;
+        return getViewportAt(theScreenPixelX, theScreenPixelY, theCanvas);
     }
 
 
@@ -152,12 +159,20 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     obj.
     transformClipToWorld = function(theClipPos,theScreenPixelX,theScreenPixelY) {
         var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+	if (!myViewport) {
+            Logger.error("No viewport for screen coordinates " + theScreenPixelX + ","+theScreenPixelY + " at " + __FILE__ + ":" + __LINE__);
+            throw new Exception("No viewport for screen coordinates " + theScreenPixelX + ","+theScreenPixelY);
+        }
         return transformClipToWorld(theClipPos, myViewport.getElementById(myViewport.camera));
     }
 
 
     function getScreenPos(theScreenPixelX, theScreenPixelY) {
-        return transformScreenToWorld(theScreenPixelX, theScreenPixelY, obj.getViewportAt(theScreenPixelX, theScreenPixelY));
+	var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+	if (!myViewport) {
+             throw new Exception("No viewport for screen coordinates " + theScreenPixelX + ","+theScreenPixelY);
+        }
+        return transformScreenToWorld(theScreenPixelX, theScreenPixelY, myViewport);
     }
 
     function getCameraPos() {
