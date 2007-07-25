@@ -59,7 +59,9 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         return _myQuadShape;
     }
 
-    Public.quad getter = Public.shape;
+    Public.quad getter = function() {
+        return _myQuadShape;
+    }
 
     Public.body getter = function() {
         return _myBody;
