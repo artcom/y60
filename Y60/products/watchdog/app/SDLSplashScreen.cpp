@@ -81,9 +81,6 @@ SDLSplashScreen::enable(const std::string& theBMPFilePath, int theXPos, int theY
         _myImage = SDL_CreateRGBSurface(SDL_SWSURFACE, myWidth, myHeight, 32, rmask, gmask, bmask, amask);
         SDL_PixelFormat * mySurfaceFormat = _myImage->format;
         
-        Uint8     * mySurfacePixel;
-        Uint32      myPixelColor;
-        
         // setting surface pixels
         if (myBitsPerPixel == 24) {
             PLPixel24 * myBmpPixel;

@@ -46,6 +46,7 @@ const char * ourWeekdayMap[] = {
     0
 };
 
+const std::string STARTUP_COUNT_ENV = "AC_STARTUP_COUNT";
 
 Application::Application(Logger & theLogger):
     _myAllowMissingHeartbeats(3), _myHeartbeatFrequency(0), _myPerformECG(false),_myRestartedToday(false),
@@ -54,7 +55,7 @@ Application::Application(Logger & theLogger):
     _myRestartCheck(false), _myMemoryThresholdTimed(0),_myStartTimeInSeconds(0),
     _myMemoryIsFull(false), _myItIsTimeToRestart(false), _myHeartIsBroken(false),
     _myDayChanged(false), _myLogger(theLogger), _myWindowTitle(""), _myApplicationPaused(false),
-    _myRestartDelay(10), _myStartDelay(0)
+    _myRestartDelay(10), _myStartDelay(0), _myStartupCount(0)
 {
 }
 
@@ -71,7 +72,7 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
                 string myEnvironmentValue = myEnvNode->firstChild()->nodeValue();
                 AC_DEBUG <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
                         << " -> " << myEnvironmentValue ;
-                _myEnvironmentVariables.push_back(EnvironmentSetting(myEnviromentVariable, myEnvironmentValue));
+                _myEnvironmentVariables[myEnviromentVariable] = myEnvironmentValue;
             }
         }
     }
@@ -178,15 +179,13 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
 
 void 
 Application::setEnvironmentVariables() {
-    for (int myEnvIndex = 0 ; myEnvIndex != _myEnvironmentVariables.size(); myEnvIndex++) {
-        EnvironmentSetting & myEnvSetting = _myEnvironmentVariables[myEnvIndex];
-        string & myEnviromentVariable = _myEnvironmentVariables[myEnvIndex]._myVariable;
-        string & myEnvironmentValue = _myEnvironmentVariables[myEnvIndex]._myValue;
-        SetEnvironmentVariable(myEnviromentVariable.c_str(), myEnvironmentValue.c_str());
-        _myLogger.logToFile(string("Set environment variable: ") + myEnviromentVariable +
-                            "=" + myEnvironmentValue);
-        cerr << "Set environment variable: " << myEnviromentVariable <<
-                "=" << myEnvironmentValue << endl;
+    std::map<std::string, std::string>::iterator myIter = _myEnvironmentVariables.begin();
+    for( myIter = _myEnvironmentVariables.begin(); myIter != _myEnvironmentVariables.end(); ++myIter ) {
+        SetEnvironmentVariable(myIter->first.c_str(), myIter->second.c_str());
+        _myLogger.logToFile(string("Set environment variable: ") + myIter->first +
+                            "=" + myIter->second);
+        cerr << "Set environment variable: " << myIter->first <<
+                "=" << myIter->second << endl;
 
     }
 }
@@ -254,7 +253,9 @@ Application::checkForRestart() {
 
 void
 Application::launch() {
+    _myEnvironmentVariables[STARTUP_COUNT_ENV] = asl::as_string(++_myStartupCount);
     setEnvironmentVariables();
+
     _myCommandLine = _myFileName + " " + _myArguments;
 
     STARTUPINFO StartupInfo = {
@@ -406,12 +407,24 @@ Application::checkState() {
     if (_myRestartCheck) {
         // get memory available/free
         unsigned myAvailMem = 0;
-#if 1 
-        myAvailMem = asl::getFreeMemory() / 1024;
-#else
         MEMORYSTATUS myMemoryStatus;
         GlobalMemoryStatus (&myMemoryStatus);
-        myAvailMem = myMemoryStatus.dwAvail / 1024; 
+#if 1
+        myAvailMem = asl::getFreeMemory() / 1024;
+#else
+        AC_INFO << "virt free:  " << myMemoryStatus.dwAvailVirtual / 1024;
+        AC_INFO << "virt used:  " << (myMemoryStatus.dwTotalVirtual - myMemoryStatus.dwAvailVirtual) / 1024;
+        AC_INFO << "virt total: " << myMemoryStatus.dwTotalVirtual / 1024;
+        AC_INFO << "child proc: " << asl::getProcessMemoryUsage(_myProcessInfo.dwProcessId) / 1024;
+        AC_INFO << "phy free:   " << myMemoryStatus.dwAvailPhys / 1024;
+        AC_INFO << "phy used:   " << (myMemoryStatus.dwTotalPhys - myMemoryStatus.dwAvailPhys) / 1024;
+        AC_INFO << "phy total:  " << myMemoryStatus.dwTotalPhys / 1024;
+        AC_INFO << "%:          " << myMemoryStatus.dwMemoryLoad;
+        AC_INFO << "---------------------------------------";
+        // NOTE: for MEMORYSTATUS seems to only take the watchdogs
+        // memory usage itself into account, this version explicitly
+        // subtracts the used memory of the watched process from availible memory [jb]
+        myAvailMem = (asl::getFreeMemory() - asl::getProcessMemoryUsage(_myProcessInfo.dwProcessId)) / 1024;
 #endif
         _myMemoryIsFull = (myAvailMem <= _myRestartMemoryThreshold);
         if (_myMemoryIsFull) {

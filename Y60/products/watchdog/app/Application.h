@@ -31,7 +31,7 @@
 
 #include <dom/Nodes.h>
 
-#include <vector>
+#include <map>
 #include <string>
 
 #include <dom/Nodes.h>
@@ -47,12 +47,6 @@ enum RestartMode {
     RESTARTTIME  = 8,
     CHECKMEMORYTIME = 16,
     CHECKTIMEDMEMORYTHRESHOLD = 32
-};
-struct EnvironmentSetting {
-    EnvironmentSetting(std::string theVariable, std::string theValue) 
-        :  _myVariable(theVariable), _myValue(theValue) {}
-    std::string _myVariable;
-    std::string _myValue;
 };
 
 class Application {
@@ -91,7 +85,7 @@ class Application {
         void closeAllThreads();
         void setEnvironmentVariables();
 
-        std::vector<EnvironmentSetting> _myEnvironmentVariables;
+        std::map<std::string, std::string> _myEnvironmentVariables;
 
         std::string      _myFileName;
         std::string      _myArguments;
@@ -130,6 +124,7 @@ class Application {
         
         unsigned         _myStartDelay;
         unsigned         _myRestartDelay;
+        unsigned         _myStartupCount;
 
 };
 #endif // INCL_APPLICATION
