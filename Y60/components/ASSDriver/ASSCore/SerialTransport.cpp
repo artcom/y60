@@ -100,8 +100,6 @@ SerialTransport::establishConnection() {
                     _myParity, _myStopBits, _myHandshakingFlag);
             _mySerialPort->setStatusLine( SerialDevice::RTS);
 
-            _mySerialPort->flush();
-
             setState( SYNCHRONIZING );
         }
     } else {
@@ -131,8 +129,10 @@ SerialTransport::readData() {
         _myNumReceivedBytes += myPendingBytes;
         AC_DEBUG << "bytes received within the last " << NO_DATA_TIMEOUT 
                  << " seconds: " << _myNumReceivedBytes;
-        //AC_PRINT << "SerialTransport::readData() pending bytes: " << myPendingBytes
-        //         << " max: " << myMaxBytes;
+        /*
+        AC_PRINT << "SerialTransport::readData() pending bytes: " << myPendingBytes
+                 << " max: " << myMaxBytes;
+                 */
         
         _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
                 myMaxBytes );

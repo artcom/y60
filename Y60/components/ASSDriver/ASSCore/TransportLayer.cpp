@@ -46,12 +46,15 @@ const unsigned int MAX_NUM_STATUS_TOKENS( 10 );
 const unsigned int BYTES_PER_STATUS_TOKEN( 5 );
 const unsigned int MAX_STATUS_LINE_LENGTH( MAX_NUM_STATUS_TOKENS * BYTES_PER_STATUS_TOKEN + 2 );
 
+// XXX Workaround Bug 595
+DEFINE_EXCEPTION( ASSStatusTokenException, asl::Exception );
+
 TransportLayer::TransportLayer(ASSDriver * theDriver, const dom::NodePtr & theSettingsNode) :
     _mySettings( theSettingsNode ),
     _myDriver( theDriver ),
     _myGridSize(-1, -1),
     _myState( NOT_CONNECTED ),
-    _myReceiveBuffer( 256 ),
+    _myReceiveBuffer( 1024 ),
     _myMagicTokenFlag( false ),
     _myExpectedLine( 0 ),
     _myFirmwareVersion( -1 ),
@@ -81,7 +84,13 @@ TransportLayer::~TransportLayer() {
 
 void 
 TransportLayer::poll( RasterPtr theTargetRaster) {
-    //AC_PRINT << "TransportLayer::poll()";
+    /*
+    static double last = asl::Time();
+    double now = asl::Time();
+    AC_PRINT << "TransportLayer::poll() dt: " << now - last << " state: " << _myState;
+    last = now;
+    */
+
     switch (_myState) {
         case NOT_CONNECTED:
             establishConnection();
@@ -104,7 +113,7 @@ TransportLayer::poll( RasterPtr theTargetRaster) {
 unsigned
 TransportLayer::readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken ) {
     if ( * theIt != theToken ) {
-        throw ASSException(string("Failed to parse status token '") + theToken + "'. Got '" +
+        throw ASSStatusTokenException(string("Failed to parse status token '") + theToken + "'. Got '" +
                 char(* theIt) + "'", PLUS_FILE_LINE );
     }
     theIt += 1;
@@ -151,68 +160,76 @@ void
 TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
     //AC_PRINT << "==== parseStatusLine()";
     //dumpBuffer(_myFrameBuffer);
-    if ( _myFrameBuffer.size() >= getBytesPerStatusLine() ) {
-        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
-        ASSURE( _myFrameBuffer[1] == _myExpectedLine );
-        std::vector<unsigned char>::iterator myIt = _myFrameBuffer.begin() + 2;
-        _myFirmwareVersion = readStatusToken( myIt, 'V' );
-        Vector2i myGridSize;
-        unsigned myChecksum;
-        bool myHasChecksumFlag = true;
-        if ( _myFirmwareVersion < 260 ) {
-            myGridSize[0] = 20;
-            myGridSize[1] = 10;
-            myHasChecksumFlag = false;
-        } else if (_myFirmwareVersion == 260 ) {
-            _myFirmwareStatus = readStatusToken( myIt, 'S' );
-            _myControllerId = readStatusToken( myIt, 'I' );
-            _myFirmwareMode = readStatusToken( myIt, 'M' );
-            _myFramerate = readStatusToken( myIt, 'F' );
-            myGridSize[0] = readStatusToken( myIt, 'W' );
-            myGridSize[1] = readStatusToken( myIt, 'H' );
-            _myFrameNo = readStatusToken( myIt, 'N' );
-            myChecksum = readStatusToken( myIt, 'C' );
-        } else if ( _myFirmwareVersion == 261 ) {
-            _myFirmwareStatus = readStatusToken( myIt, 'S' );
-            _myControllerId = readStatusToken( myIt, 'I' );
-            _myFirmwareMode = readStatusToken( myIt, 'M' );
-            _myFramerate = readStatusToken( myIt, 'F' );
-            myGridSize[0] = readStatusToken( myIt, 'W' );
-            myGridSize[1] = readStatusToken( myIt, 'H' );
-            _myGridSpacing = readStatusToken( myIt, 'G' );
-            _myFrameNo = readStatusToken( myIt, 'N' );
-            myChecksum = readStatusToken( myIt, 'C' );
-        } else {
-            throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
-                    PLUS_FILE_LINE );
-        }
+    try {
+        if ( _myFrameBuffer.size() >= getBytesPerStatusLine() ) {
+            ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
+            ASSURE( _myFrameBuffer[1] == _myExpectedLine );
+            std::vector<unsigned char>::iterator myIt = _myFrameBuffer.begin() + 2;
+            _myFirmwareVersion = readStatusToken( myIt, 'V' );
+            Vector2i myGridSize;
+            unsigned myChecksum;
+            bool myHasChecksumFlag = true;
+            if ( _myFirmwareVersion < 260 ) {
+                myGridSize[0] = 20;
+                myGridSize[1] = 10;
+                myHasChecksumFlag = false;
+            } else if (_myFirmwareVersion == 260 ) {
+                _myFirmwareStatus = readStatusToken( myIt, 'S' );
+                _myControllerId = readStatusToken( myIt, 'I' );
+                _myFirmwareMode = readStatusToken( myIt, 'M' );
+                _myFramerate = readStatusToken( myIt, 'F' );
+                myGridSize[0] = readStatusToken( myIt, 'W' );
+                myGridSize[1] = readStatusToken( myIt, 'H' );
+                _myFrameNo = readStatusToken( myIt, 'N' );
+                myChecksum = readStatusToken( myIt, 'C' );
+            } else if ( _myFirmwareVersion == 261 ) {
+                _myFirmwareStatus = readStatusToken( myIt, 'S' );
+                _myControllerId = readStatusToken( myIt, 'I' );
+                _myFirmwareMode = readStatusToken( myIt, 'M' );
+                _myFramerate = readStatusToken( myIt, 'F' );
+                myGridSize[0] = readStatusToken( myIt, 'W' );
+                myGridSize[1] = readStatusToken( myIt, 'H' );
+                _myGridSpacing = readStatusToken( myIt, 'G' );
+                _myFrameNo = readStatusToken( myIt, 'N' );
+                myChecksum = readStatusToken( myIt, 'C' );
+            } else {
+                throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
+                        PLUS_FILE_LINE );
+            }
 
-        if ( _myGridSize != myGridSize ) {
-            _myGridSize = myGridSize;
-            ASSURE(_myFrameBuffer.front() == MAGIC_TOKEN);
-            _myDriver->allocateGridBuffers( _myGridSize, theTargetRaster );
-            _myReceiveBuffer.resize( getBytesPerFrame() );
-        }
+            if ( _myGridSize != myGridSize ) {
+                _myGridSize = myGridSize;
+                ASSURE(_myFrameBuffer.front() == MAGIC_TOKEN);
+                _myDriver->allocateGridBuffers( _myGridSize, theTargetRaster );
+                _myReceiveBuffer.resize( getBytesPerFrame() );
+            }
 
-        //AC_PRINT << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
-        if (_myFirstFrameFlag ) {
-            dumpControllerStatus();
-            _myFirstFrameFlag = false;
-        } else {
-            if ( myHasChecksumFlag ) {
-                if (_myChecksum == myChecksum) {
-                    //AC_PRINT << "Checksum OK.";
-                    _myDriver->processSensorValues();
-                } else {
-                    AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
-                    _myChecksumErrorCounter += 1;
+            //AC_PRINT << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
+            if (_myFirstFrameFlag ) {
+                dumpControllerStatus();
+                _myFirstFrameFlag = false;
+            } else {
+                if ( myHasChecksumFlag ) {
+                    if (_myChecksum == myChecksum) {
+                        //AC_PRINT << "Checksum OK.";
+                        _myDriver->processSensorValues();
+                    } else {
+                        AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
+                        _myChecksumErrorCounter += 1;
+                    }
                 }
             }
+            _myChecksum = 0;
+
+            _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
+            _myExpectedLine = 1;
         }
-        _myChecksum = 0;
-       
-        _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
-        _myExpectedLine = 1;
+    } catch ( const ASSStatusTokenException & ex) {
+        // XXX Workaround Bug 595
+        AC_WARNING << ex;
+        AC_WARNING << "Workaround for Bug 595. Resync.";
+        _mySyncLostCounter += 1;
+        setState( SYNCHRONIZING );
     }
 }
 

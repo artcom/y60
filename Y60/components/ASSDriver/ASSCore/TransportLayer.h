@@ -113,7 +113,7 @@ class TransportLayer {
         int _myFirmwareMode;
         int _myFramerate;
         int _myFrameNo;
-        int _myChecksum;
+        asl::Unsigned16 _myChecksum;
 
         bool _myFirstFrameFlag;
 
