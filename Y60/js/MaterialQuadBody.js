@@ -1,3 +1,12 @@
+//=============================================================================
+// Copyright (C) 2007, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
 
 function MaterialQuadBody(theScene, theParentNode, theImage, theCoords) {
     this.Constructor(this, theScene, theParentNode, theImage, theCoords);
@@ -10,9 +19,9 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
     var _myMaterial;
 
     if (!theParentNode || !("nodeName" in theParentNode)) {
-	var errorMessage = "need a DOM node to create a MaterialQuadBody!";
-	Logger.error(errorMessage);
-	throw new Exception(errorMessage);
+        var errorMessage = "need a DOM node to create a MaterialQuadBody!";
+        Logger.error(errorMessage);
+        throw new Exception(errorMessage);
     }
 
     if (theImage == undefined) {
@@ -20,29 +29,33 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         Logger.error(errorstring);
         throw new Exception(errorstring);
     } else if (fileExists(theImage)) {
+        // theImage is-a filename
         if (theImage in ourMaterialsHash) {
             _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourMaterialsHash[theImage]);
             _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
         } else {
-            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "hallo", true);
+            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "MQB_Material", false);
             _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
             ourMaterialsHash[theImage] = _myMaterial.childNode("textures", 0).firstChild.image;
         }
     } else if (("id" in theImage) && theParentNode.getElementById(theImage.id)) {
+        // theImage is-a <image> node
         _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage);
         _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
     } else if (theParentNode.getElementById(theImage)) {
+        // theImage is-a image ID
         _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theParentNode.getElementById(theImage));
         _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
     } else {
+        // theImage is-a color
         _myMaterial = Modelling.createColorMaterial(theScene, theImage);
     }
 
-    var _myQuadShape = Modelling.createQuad(theScene, _myMaterial.id, 
-                                            theCoords[0],
-                                            theCoords[1]);
+    var _myQuadShape = Modelling.createQuad(theScene, _myMaterial.id, theCoords[0], theCoords[1]);
+    _myQuadShape.name = "MQB_Shape";
 
     var _myBody = Modelling.createBody(theParentNode, _myQuadShape.id);
+    _myBody.name = "MQB_Body";
 
 
     Public.destruct = function() {
@@ -67,4 +80,3 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         return _myBody;
     }
 }
-
