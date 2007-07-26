@@ -1135,8 +1135,7 @@ checksumFromString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             return JS_FALSE;
         }
         unsigned long myCRC32 = crc32(0L, Z_NULL, 0);
-        appendCRC32(myCRC32, myInputString);
-
+        appendCRC32(myCRC32, myInputString);        
         *rval = as_jsval(cx, myCRC32);
         return JS_TRUE;
     }

@@ -13,7 +13,9 @@
 */
 #ifndef _included_asl_checksum_
 #define _included_asl_checksum_
+
 #include "zlib.h"
+#include <string.h>
 
 namespace asl {    
     template<class T>
@@ -21,6 +23,17 @@ namespace asl {
     appendCRC32( unsigned long & theCRC, const T & theValue) {
         const Bytef * myValuePtr = (const Bytef*)(&theValue);
         theCRC = crc32(theCRC, myValuePtr, sizeof(T));
+    }
+    template <>
+    void
+    appendCRC32<std::string>( unsigned long & theCRC, const std::string & theValue) {
+        const Bytef * myValuePtr = (const Bytef*)( theValue.c_str());
+        theCRC = crc32(theCRC, myValuePtr, theValue.size());
+    }
+    void
+    appendCRC32( unsigned long & theCRC, const char * theValue) {
+        const Bytef * myValuePtr = (const Bytef*)( theValue);
+        theCRC = crc32(theCRC, myValuePtr, strlen(theValue));
     }
 } // end of namespace asl
 #endif
