@@ -335,8 +335,6 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }
 
             myValue += myStep;
-            print("step: " + myStep);
-            print("myValue: " + myStep);
             
             if ("max" in _myNode) {
                 var myMax   = Number(_myNode.max);
