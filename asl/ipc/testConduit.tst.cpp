@@ -266,6 +266,12 @@ class ConduitTest : public TemplateUnitTest {
                 }
                 ENSURE(myReceiveString == myBigString);
             }
+            // check already-is-use behaviour
+            {
+                AcceptorPtr myAcceptor;
+                ENSURE_EXCEPTION(myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
+                        myLowercaseServer<POLICY>::create)), ConduitInUseException);
+            }
 			
             // close the server (also test if the server is cancelable)
             msleep(100);
