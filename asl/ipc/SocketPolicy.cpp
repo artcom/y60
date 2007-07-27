@@ -85,7 +85,13 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
         throw ConduitException(string("SocketPolicy::createOnConnect: ")+
                 getSocketErrorMessage(myLastError), PLUS_FILE_LINE);
     }
-    DB(AC_TRACE << "accept call successful" << endl);  
+    DB(AC_TRACE << "accept call successful" << endl);
+#ifdef SO_NOSIGPIPE // turn off SIGPIPE on systems supporting this socket option    
+    socklen_t boolTrue = 1;
+    if(setsockopt(sockfd, IPPROTO_TCP, SO_NOSIGPIPE, (void *)&boolTrue, sizeof(onoff)) < 0) {
+            infof(data, "Could not set SO_NOSIGPIPE: %s\n", Curl_strerror(conn, Curl_ourerrno()));
+    }
+#endif
     return newFD;
 }
 
@@ -173,8 +179,11 @@ SocketPolicy::sendData(Handle & theHandle, BufferQueue & theOutQueue)
 
     CharBufferPtr myOutBuffer = theOutQueue.front();
     theOutQueue.pop_front();
-    
+#ifdef MSG_NOSIGNAL // prevent SIGPIPE on systems supporting this flag    
     int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), MSG_NOSIGNAL);
+#else
+    int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), 0);
+#endif    
     if (byteswritten < 0)
     {
         int myLastError = getLastSocketError();
