@@ -28,6 +28,7 @@
 #include <string>
 #include <iostream>
 #include <cctype>
+#include <signal.h>
 
 //using namespace std;
 using namespace asl;
@@ -116,6 +117,54 @@ class MessageConduitTest : public TemplateUnitTest {
         AcceptorPtr _myAcceptor;
 };
 
+template<class POLICY>
+class BrokenPipeTest : public TemplateUnitTest {
+    public:
+        typedef asl::Ptr<typename asl::ConduitAcceptor<POLICY> > AcceptorPtr;
+        BrokenPipeTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint) 
+            : TemplateUnitTest("BrokenPipeTest", theTemplateArgument),
+            _myLocalEndpoint(theEndpoint)
+            {  }
+
+        void run() {
+            std::string myBigString;
+            for (int i = 0; i<10000; ++i) {
+                myBigString += as_string(i);
+            }
+            AC_PRINT << "the following might cause 'broken pipe' warnings - this is normal";
+            setSilentSuccess(true);
+            for (int i = 0; i < 1000; ++i) {
+                // start server thread
+                AcceptorPtr myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
+                        myLowercaseServer<POLICY>::create));
+                ENSURE(myAcceptor->start());
+                // start client
+                {
+                    CharBuffer myInputBuffer;
+
+                    typename Conduit<POLICY>::Ptr myClient(new Conduit<POLICY>(_myLocalEndpoint));
+                    ENSURE(myClient);
+                    ENSURE(myClient->sendData(myBigString.c_str(), myBigString.length()));
+                    /*
+                    string myReceiveString;
+                    while (myReceiveString.length() < myBigString.length()  && myClient->isValid()) {
+                        if (myClient->receiveData(myInputBuffer)) {
+                            myReceiveString += string(&myInputBuffer[0], myInputBuffer.size());
+                        }
+                    }
+                    ENSURE(myReceiveString == myBigString);
+                    */
+                }
+                // close the server (also test if the server is cancelable)
+                ENSURE_MSG(myAcceptor->stop(), "Cancelling server thread");
+                myAcceptor = AcceptorPtr(0);
+            }
+            setSilentSuccess(false);
+        }
+     private:
+        typename POLICY::Endpoint _myLocalEndpoint;
+};
+
 template <class POLICY>
 class ConduitTest : public TemplateUnitTest {
     public:
@@ -126,9 +175,6 @@ class ConduitTest : public TemplateUnitTest {
             _myAcceptor(0)  
             {  }
 
-        void setup() {
-            UnitTest::setup();
-        }
         void run() {
             // start server thread
             _myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
@@ -242,6 +288,10 @@ public:
         AC_PRINT << "Using port " << myTestPort << " for tests";
 
         UnitTestSuite::setup(); // called to print a launch message
+        addTest(new BrokenPipeTest<TCPPolicy>("TCPPolicy", 
+                    TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
+        addTest(new BrokenPipeTest<TCPPolicy>("LocalPolicy", 
+                    TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
         addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
@@ -259,6 +309,7 @@ public:
 
 
 int main(int argc, char *argv[]) {
+    sighandler_t myReturnCode = signal( SIGPIPE , (void (*) (int)) &abort );
 
     MyTestSuite mySuite(argv[0], argc, argv);
 

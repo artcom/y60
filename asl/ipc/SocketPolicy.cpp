@@ -174,11 +174,18 @@ SocketPolicy::sendData(Handle & theHandle, BufferQueue & theOutQueue)
     CharBufferPtr myOutBuffer = theOutQueue.front();
     theOutQueue.pop_front();
     
-    int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), 0);
+    int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), MSG_NOSIGNAL);
     if (byteswritten < 0)
     {
-        throw ConduitException(string("SocketPolicy::send failed - ") +
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+        int myLastError = getLastSocketError();
+        switch (myLastError) {
+            case EPIPE:
+                AC_WARNING << "broken pipe: send failed";
+                return false;
+            default:
+                throw ConduitException(string("SocketPolicy::send failed - ") +
+                    getSocketErrorMessage(myLastError), PLUS_FILE_LINE);
+        }
     }
     DB(AC_TRACE << "sent " << byteswritten << " bytes " << endl);
     if (byteswritten < myOutBuffer->size()) {
