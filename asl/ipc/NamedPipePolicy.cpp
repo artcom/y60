@@ -21,6 +21,7 @@
 #include "NamedPipePolicy.h"
 
 #include <asl/error_functions.h>
+#include <asl/string_functions.h>
 #include <asl/Logger.h>
 
 #include <string.h>
@@ -303,13 +304,16 @@ NamedPipePolicy::onWriteCompleted(DWORD theError, DWORD theBytesTransferred, LPO
     switch (theError) {
         case ERROR_SUCCESS :
             break;
+        case ERROR_OPERATION_ABORTED :
+            AC_WARNING << *myHandle << " pipe broken on writing" << endl;
+            return;
         case ERROR_BROKEN_PIPE :
             DBT(*myHandle << " pipe broken on writing" << endl);
             myHandle->isValid = false;
             return;
         default :            
             DBT(*myHandle << "onWriteCompleted failed: " << theError << endl);
-            throw ConduitException(string("NamedPipePolicy::onWriteCompleted - ")+
+            throw ConduitException(string("NamedPipePolicy::onWriteCompleted - [")+asl::as_string(theError)+"] "+
                 errorDescription(theError), PLUS_FILE_LINE);
     }
     DBT(*myHandle << " sent '" << string(&((*myHandle->outBuffer)[0]), theBytesTransferred) << "' Overlap@" << theOverlap << endl);

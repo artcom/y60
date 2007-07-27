@@ -69,16 +69,18 @@ TCPPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) 
     inet::initSockets();
 
     Handle myHandle=socket(AF_INET,SOCK_STREAM,0);    
-    
+   
+#ifndef WIN32    
     int myReuseSocketFlag = 1;
     if (setsockopt(myHandle, SOL_SOCKET, SO_REUSEADDR, (char*)&myReuseSocketFlag, sizeof(myReuseSocketFlag)) != 0) {
         throw ConduitException("can`t set already bound rcv socket to reuse.", PLUS_FILE_LINE);
     }
+#endif    
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
         int myLastError = inet::getLastSocketError();
         if (myLastError == EADDRINUSE) {
-            throw ConduitInUseException(string("TCPPolicy::ctor create"), PLUS_FILE_LINE);
+            throw ConduitInUseException(string("TCPPolicy::startListening while calling ::bind"), PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("TCPPolicy::TCPPolicy bind - ")+
                     inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);

@@ -133,7 +133,12 @@ class BrokenPipeTest : public TemplateUnitTest {
             }
             AC_PRINT << "the following might cause 'broken pipe' warnings - this is normal";
             setSilentSuccess(true);
-            for (int i = 0; i < 1000; ++i) {
+#ifdef WIN32
+            int myIterations = 10; // aborting is VERY slow in windows.
+#else
+            int myIterations = 1000;
+#endif            
+            for (int i = 0; i < myIterations; ++i) {
                 // start server thread
                 AcceptorPtr myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
                         myLowercaseServer<POLICY>::create));
@@ -296,20 +301,20 @@ public:
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new BrokenPipeTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
-        addTest(new BrokenPipeTest<TCPPolicy>("LocalPolicy", 
-                    TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
         addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
 #ifndef WIN32
-        addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
-                    "TestConduit"));
-
-        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit");
-        addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
-                    "TestConduit"));
+        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit1");
+        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit2");
+        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit3");
 #endif   
+        addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
+                    "TestConduit1"));
+        addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
+                    "TestConduit2"));
+        addTest(new BrokenPipeTest<LocalPolicy>("LocalPolicy", "TestConduit3"));
     }
 };
 
