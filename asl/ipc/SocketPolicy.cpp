@@ -88,8 +88,9 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
     DB(AC_TRACE << "accept call successful" << endl);
 #ifdef SO_NOSIGPIPE // turn off SIGPIPE on systems supporting this socket option    
     socklen_t boolTrue = 1;
-    if(setsockopt(sockfd, IPPROTO_TCP, SO_NOSIGPIPE, (void *)&boolTrue, sizeof(onoff)) < 0) {
-            infof(data, "Could not set SO_NOSIGPIPE: %s\n", Curl_strerror(conn, Curl_ourerrno()));
+    if(setsockopt(newFD, SOL_SOCKET, SO_NOSIGPIPE, (void *)&boolTrue, sizeof(boolTrue)) < 0) {
+        throw ConduitException(string("Could not set SO_NOSIGPIPE: ")+
+                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
     }
 #endif
     return newFD;
