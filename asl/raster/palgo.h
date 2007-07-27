@@ -621,7 +621,6 @@ double color_abs (const pixelType& color )
 
 template <class RESULT, class RASTER>
 RESULT moment(int p, int q, const RASTER & image, RESULT init) {
-    int x, y;
     RESULT result = init;
     for (int y = 0; y < image.vsize(); y++) {
         int yp = ipow(y,q);
@@ -678,7 +677,7 @@ bool analyseMoments(const RASTER & mat, MomentResults & mom)
     float cm20 = m20/m00 - xc * xc;
     float cm02 = m02/m00 - yc * yc;
 
-    float major_axis_angle = 0.5 * atan( 2 * cm11 / ( cm20 - cm02));
+    float major_axis_angle = 0.5f * atanf( 2.f * cm11 / ( cm20 - cm02));
 
     //cerr << DBG(xc) << DBG(yc) <<DBG(cm11) <<DBG(cm20) <<DBG(cm02) <<
     //        DBG(major_axis_angle) << endl;
