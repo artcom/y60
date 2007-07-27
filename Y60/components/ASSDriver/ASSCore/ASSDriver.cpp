@@ -64,8 +64,8 @@ const float TOUCH_MARKER_LIFE_TIME( 1.0 );
 
 Box2f
 asBox2f( const Box2i & theBox ) {
-    return Box2f( Vector2f( theBox[Box2i::MIN][0], theBox[Box2i::MIN][1]),
-                Vector2f( theBox[Box2i::MAX][0], theBox[Box2i::MAX][1]));
+    return Box2f( Vector2f( float(theBox[Box2i::MIN][0]), float(theBox[Box2i::MIN][1])),
+                Vector2f( float(theBox[Box2i::MAX][0]), float(theBox[Box2i::MAX][1])));
 }
 
 
@@ -282,7 +282,8 @@ ASSDriver::computeCursorPositions( std::vector<MomentResults> & theCurrentPositi
                                     myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
 
         MomentResults myResult = myMomentAnalysis.result;
-        myResult.center += Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]);
+        myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
+                                     float(myBox[Box2i::MIN][1]));
 
         //AC_PRINT << "major angle: " << myMomentAnalysis.result.major_angle << " major dir: " << myMomentAnalysis.result.major_dir;
         /*
@@ -323,7 +324,8 @@ ASSDriver::updateCursors(double theDeltaT) {
 void
 ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
     
-    float myFirstDerivative = (theCursorIt->second.intensity - theCursorIt->second.previousIntensity) / theDeltaT;
+    float myFirstDerivative = float((theCursorIt->second.intensity -
+            theCursorIt->second.previousIntensity) / theDeltaT);
     //float myFirstDerivative = (theCursorIt->second.intensity - theCursorIt->second.getMinIntensity()) / theDeltaT;
     theCursorIt->second.firstDerivative = myFirstDerivative; 
     
@@ -365,7 +367,7 @@ ASSDriver::computeIntensity(CursorMap::iterator & theCursorIt, const y60::Raster
     myWeight[0] = myPosition[0] - myTopLeft[0];
     myWeight[1] = myPosition[1] - myTopLeft[1];
 
-    float myHeadRoom = 0.3;
+    float myHeadRoom = 0.3f;
     myWeight[0] *= 1 - 2 * myHeadRoom;
     myWeight[0] += myHeadRoom;
     myWeight[1] *= 1 - 2 * myHeadRoom;
@@ -448,9 +450,9 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                 }
             }
         }
-        float myDistanceThreshold = 2.0;
+        float myDistanceThreshold = 2.0f;
         if (_myTransportLayer->getGridSpacing() > 0) {
-            myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
+            myDistanceThreshold *= 100.0f / _myTransportLayer->getGridSpacing();
         }
         //AC_PRINT << "distance threshold: " << myDistanceThreshold;
         if (myMinDistIt != _myCursors.end() && myMinDistance < myDistanceThreshold) {
@@ -502,12 +504,12 @@ ASSDriver::drawGrid() {
     glColor4fv( _myGridColor.begin() );
     glBegin( GL_LINES );
     for (unsigned i = 0; i < _myGridSize[0]; ++i) {
-        glVertex2f(i, 0.0);
-        glVertex2f(i, _myGridSize[1] - 1);
+        glVertex2f(float(i), 0.0);
+        glVertex2f(float(i), float(_myGridSize[1] - 1));
     }
     for (unsigned i = 0; i < _myGridSize[1]; ++i) {
-        glVertex2f( 0.0, i);
-        glVertex2f( _myGridSize[0] - 1, i);
+        glVertex2f( 0.0, float(i));
+        glVertex2f( float(_myGridSize[0] - 1), float(i));
     }
     glEnd();
 }
@@ -517,7 +519,7 @@ void
 ASSDriver::drawCircle( const Vector2f & thePosition, float theRadius,
                        unsigned theSubdivision, const Vector4f & theColor)
 {
-    float myStep = 2 * PI / theSubdivision;
+    float myStep = 2.f * float(PI) / theSubdivision;
 
     glColor4fv( theColor.begin() );
     glBegin( GL_LINE_LOOP );
@@ -531,12 +533,12 @@ ASSDriver::drawCircle( const Vector2f & thePosition, float theRadius,
 void
 ASSDriver::drawMarkers() {
     // draw origin
-    drawCircle( Vector2f(0.0, 0.0), 0.15, 36, _myGridColor );
+    drawCircle( Vector2f(0.0, 0.0), 0.15f, 36, _myGridColor );
 
     // draw cursors
     CursorMap::iterator myIt = _myCursors.begin();
     for (; myIt != _myCursors.end(); ++myIt ) {
-        drawCircle( myIt->second.position, 0.15, 36, _myCursorColor );
+        drawCircle( myIt->second.position, 0.15f, 36, _myCursorColor );
     }
 
     // draw touch history
@@ -547,7 +549,7 @@ ASSDriver::drawMarkers() {
             if (_myRunTime - myIt->birthTime > TOUCH_MARKER_LIFE_TIME) {
                 myIt = _myTouchHistory.erase( myIt );
             } else {
-                drawCircle( myIt->position, 0.20, 36, _myTouchColor);
+                drawCircle( myIt->position, 0.20f, 36, _myTouchColor);
                 myIt += 1;
             }
         }
@@ -555,7 +557,7 @@ ASSDriver::drawMarkers() {
 
     // draw value probe
     if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
-        drawCircle( _myProbePosition, 0.15, 36, _myProbeColor);
+        drawCircle( _myProbePosition, 0.15f, 36, _myProbeColor);
     }
 }
 

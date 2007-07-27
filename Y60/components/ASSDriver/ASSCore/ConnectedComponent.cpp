@@ -31,7 +31,7 @@ Run::Run(int theRow, int theStartCol, int theEndCol ) :
 
 Vector2f
 Run::center() {
-    return Vector2f( _myStartCol + length() * 0.5, _myRow );
+    return Vector2f( _myStartCol + length() * 0.5f, float(_myRow) );
 }
 
 int 
