@@ -306,15 +306,13 @@ public:
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
 #ifndef WIN32
-        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit1");
-        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit2");
-        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit3");
+        deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit");
 #endif   
         addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
-                    "TestConduit1"));
+                    "TestConduit"));
         addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
-                    "TestConduit2"));
-        addTest(new BrokenPipeTest<LocalPolicy>("LocalPolicy", "TestConduit3"));
+                    "TestConduit"));
+        addTest(new BrokenPipeTest<LocalPolicy>("LocalPolicy", "TestConduit"));
     }
 };
 
