@@ -309,7 +309,10 @@ public:
 
 
 int main(int argc, char *argv[]) {
+#ifdef LINUX
+    // enable coredump in case a SIGPIPE gets through (shouldn't happen!)
     sighandler_t myReturnCode = signal( SIGPIPE , (void (*) (int)) &abort );
+#endif
 
     MyTestSuite mySuite(argv[0], argc, argv);
 
