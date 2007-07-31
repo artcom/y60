@@ -41,9 +41,13 @@
 #define _included_asl_GarbageCollector_h_
 
 #include "settings.h"
+#include "RangeSet.h"
 #include "Exception.h"
 #include "string_functions.h"
 #include "Singleton.h"
+
+#include "Time.h"
+#include "Dashboard.h"
 
 #include "AtomicCount.h"
 #include "MemoryPool.h"
@@ -68,6 +72,7 @@
 #define DBP(x) // x
 #define DB2(x) //  x
 #define DBP2(x) //  x
+#define DBT(x)   x
 
 namespace asl {
 
@@ -81,7 +86,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
  
 
     enum CollectorColor { MARK_UNUSED, MARK_UNKNOWN, MARK_IN_USE, IS_ROOT, MARK_LOCKED, MARK_LOCKED_DISPOSED };
-    std::ostream & operator<<(std::ostream & os, CollectorColor theColor) {
+    inline std::ostream & operator<<(std::ostream & os, CollectorColor theColor) {
         switch (theColor) {
             case MARK_UNUSED: os << "MARK_UNUSED"; break;
             case MARK_UNKNOWN: os << "MARK_UNKNOWN"; break;
@@ -93,7 +98,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
         return os;
     }
-#if 1
+#if 0
 
     DEFINE_EXCEPTION(EmptyRange,asl::Exception);
 
@@ -398,10 +403,10 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
     class CollectablePtrHeapAllocator {
         public:
             typedef CollectablePtrAllocator<ThreadingModel> Allocator; 
-            inline static ObjectDescriptor<ThreadingModel, Allocator> * allocate() {
+            inline static ObjectDescriptor<ThreadingModel, Allocator> * allocateCP() {
                 return new ObjectDescriptor<ThreadingModel, Allocator>;
             }
-            inline static void free(ObjectDescriptor<ThreadingModel, Allocator> * anOldPtr) {
+            inline static void freeCP(ObjectDescriptor<ThreadingModel, Allocator> * anOldPtr) {
                 delete anOldPtr;
             }
     };
@@ -415,7 +420,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
   
     // All collectable objects should be derived from collectableobject
     // to ensure the proper destructor can be called on finalizing
-    template <class ThreadingModel, class Allocator>
+    template <class ThreadingModel, class Allocator=CollectablePtrAllocator<ThreadingModel> >
     class Collectable {
     public:
         Collectable() {
@@ -426,7 +431,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         };
     };
     
-    template <class ThreadingModel, class Allocator>
+    template <class ThreadingModel, class Allocator=CollectablePtrAllocator<ThreadingModel> >
     class CollectableAllocated;
   
     template <class T, class ThreadingModel, class Allocator=CollectablePtrAllocator<ThreadingModel> >
@@ -491,6 +496,18 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         DependendMemoryMap ourMemoryMap;
         RootedObjectMap ourRootedObjectMap;
         unsigned numObjectsInUse;
+
+        ~Collector() {
+            printStats(std::cerr);
+            DBT(asl::getDashboard().print(std::cerr));
+        }
+
+       void printStats(std::ostream & os) {
+            os << "------ Collector Stats ------" << std::endl;
+            os << "ourCollectableMap.size() = " << ourCollectableMap.size() << std::endl;
+            os << "ourMemoryMap.size() = " << ourMemoryMap.size() << std::endl;
+            os << "ourRootedObjectMap.size() = " << ourRootedObjectMap.size() << std::endl;
+       }
        
        inline static Collectable<ThreadingModel, Allocator> * getObjectPtr(ObjectDescriptor<ThreadingModel, Allocator> * theInfoPtr) {
            return static_cast<Collectable<ThreadingModel, Allocator>*>(theInfoPtr.nativePtr);
@@ -738,6 +755,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
     public:
        typedef CollectableAllocated<ThreadingModel, Allocator> ObjectAllocator;
        void * operator new(size_t theSize) {
+           DBT(MAKE_SCOPE_TIMER(CollectableAllocated_new));
+
            ++getAllocatedObjectsCounter();
            void * myMemory = ::operator new(theSize);
            DBP(std::cerr << "CollectableAllocator::new: (orig) @"<< myMemory << ", size=" << theSize << std::endl);
@@ -753,6 +772,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
        }
 	   // note: delete is not entirely symmetric with new; new also allocates an ObjectDescriptor
        void operator delete(void * theDoomed, size_t theSize) {
+           DBT(MAKE_SCOPE_TIMER(CollectableAllocated_delete));
            ++getFreedObjectsCounter();
            DBP(std::cerr << "CollectableAllocator::delete: @"<< theDoomed << ", size=" << theSize << std::endl);
            typename Collector<ThreadingModel, Allocator>::CollectableObjectMap & myMap =
@@ -915,6 +935,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         // about what the return value is when n == 0.
         pointer allocate(size_type n, const void * = 0)
         { 
+           DBT(MAKE_SCOPE_TIMER(CollectableContainerAllocator_allocate));
             if (n > this->max_size())
                 throw std::bad_alloc();
             unsigned mySize = n * sizeof(T);
@@ -930,6 +951,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         // thePtr is not permitted to be a null pointer.
         void deallocate(pointer theDoomed, size_type theSize) {
            DBP(std::cerr << "CollectableContainerAllocator::deallocate: @"<< theDoomed << ", size=" << theSize << std::endl);
+           DBT(MAKE_SCOPE_TIMER(CollectableContainerAllocator_deallocate));
            typename _Collector::DependendMemoryMap & myMap = _Collector::get().ourMemoryMap;
            typename _Collector::DependendMemoryMap::iterator mySelf = myMap.find(MemKey(theDoomed, theSize)); 
            if (mySelf != myMap.end()) {
@@ -999,6 +1021,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
   
         // find out if this pointer resides in a managed container 
         void registerWithContainer() {
+           DBT(MAKE_SCOPE_TIMER(CollectablePtrBase_registerWithContainer));
            DBP(std::cerr << "CollectablePtrBase::registerWithContainer: this="<< (void*)this << std::endl);
             ObjectDescriptor<ThreadingModel, Allocator> * myContainer = Collector<ThreadingModel, Allocator>::get().findLocation(this);
             if (myContainer) {
@@ -1025,6 +1048,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
     
         void unregisterWithContainer() {
+           DBT(MAKE_SCOPE_TIMER(CollectablePtrBase_uregisterWithContainer));
            DBP(std::cerr << "CollectablePtrBase::unregisterWithContainer: this="<< (void*)this << std::endl);
             ObjectDescriptor<ThreadingModel, Allocator> * myContainer = Collector<ThreadingModel, Allocator>::get().findLocation(this);
             if (myContainer) {
@@ -1078,6 +1102,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         }
 
         inline void dispose(bool forced) {
+           DBT(MAKE_SCOPE_TIMER(CollectablePtrBase_dispose));
 			DBP(std::cerr<<"CollectablePtrBase::dispose() this = "<<(void*)this<<std::endl);
             DBP2(std::cerr<<"CollectablePtrBase::dispose() myDescriptorPtr = "<<myDescriptorPtr<<std::endl);
             // make dispose() reentrant because *this can be deleted due to chain effects
@@ -1149,6 +1174,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 
         explicit CollectablePtr(C * nativePtr = 0) : CollectablePtrBase<ThreadingModel, RefCountAllocator>(0, nativePtr) {
             Base::registerWithContainer();
+            static_cast<Collectable<ThreadingModel, RefCountAllocator> *>(nativePtr);
         }
         
         explicit CollectablePtr(ObjectDescriptor<ThreadingModel, RefCountAllocator> * theDescriptorPtr, void *) // strange signature to avoid ambiguity
@@ -1428,7 +1454,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         inline const CollectablePtr<T, ThreadingModel, RefCountAllocator> lock() const {
             if (Base::isValid()) {
                 try {
-                    return CollectablePtr<T, ThreadingModel, RefCountAllocator>(Base::myDescriptorPtr, 0);
+                    return CollectablePtr<T, ThreadingModel, RefCountAllocator>(Base::getDescriptorPtr(), 0);
                 } catch (BadWeakPtrException&) {
                     std::cerr << "BadWeakPtrException: refCount=" << Base::getRefCount() << 
                         ", weakCount=" << Base::getWeakCount() << std::endl;
@@ -1521,7 +1547,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
 template<typename T, typename U, class ThreadingModel, class RefCountAllocator>
 asl::CollectablePtr<T,ThreadingModel,RefCountAllocator> static_cast_CollectablePtr(asl::CollectablePtr<U,ThreadingModel,RefCountAllocator> const & r)
 {
-    return asl::CollectablePtr<T,ThreadingModel,RefCountAllocator>(static_cast<T*>(r.getDescriptorPtr()));
+    return asl::CollectablePtr<T,ThreadingModel,RefCountAllocator>(r.getDescriptorPtr(), 0);
 }
 
 template<typename T, typename U, class ThreadingModel, class RefCountAllocator>
