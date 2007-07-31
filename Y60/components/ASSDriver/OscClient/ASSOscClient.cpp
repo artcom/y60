@@ -76,16 +76,18 @@ ASSOscClient::connectToServer() {
 void
 ASSOscClient::createEvent( int theID, const std::string & theType,
         const Vector2f & theRawPosition, const Vector3f & thePosition3D,
-        const asl::Box2f & theROI)
+        const asl::Box2f & theROI, float theIntensity)
 {
     // TODO send ROI?
     //AC_PRINT << "createEvent: " << theType;
     std::string myAddress("/");
     myAddress += theType;
+
+    // theIntensity argument added after MfN Project (TA, MS 2007-07-30)
     _myOSCStream << osc::BeginMessage( myAddress.c_str() )
         << theID
         << thePosition3D[0] << thePosition3D[1] << thePosition3D[2]
-        << osc::EndMessage;
+	<< theIntensity << osc::EndMessage;
 
 }
 

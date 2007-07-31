@@ -39,7 +39,7 @@ class ASSEventSource : public asl::PlugInBase,
     protected:
         void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI);
+                const asl::Box2f & theROI, float intensity);
     private:
         dom::NodePtr                 _myEventSchema;
         asl::Ptr<dom::ValueFactory>  _myValueFactory;

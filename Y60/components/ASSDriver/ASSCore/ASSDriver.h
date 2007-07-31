@@ -100,7 +100,7 @@ class ASSDriver :
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI) = 0;
+                const asl::Box2f & theROI, float intensity) = 0;
 
         size_t getBytesPerFrame();
 

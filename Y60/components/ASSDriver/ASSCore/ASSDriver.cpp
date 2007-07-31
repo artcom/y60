@@ -339,7 +339,7 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
         theCursorIt->second.lastTouchTime = _myRunTime;
         createEvent( theCursorIt->first, "touch", theCursorIt->second.position,
                 applyTransform(theCursorIt->second.position, getTransformationMatrix() ),
-                theCursorIt->second.roi );
+                theCursorIt->second.roi, theCursorIt->second.intensity );
         _myTouchHistory.push_back( TouchEvent(_myRunTime, theCursorIt->second.position ));
     }
    
@@ -466,7 +466,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             myMinDistIt->second.roi = asBox2f( myROIs[i]->bbox() );
             createEvent( myMinDistIt->first, "move", theCurrentPositions[i].center,
                     applyTransform( theCurrentPositions[i].center, myTransform),
-                    asBox2f( myROIs[i]->bbox()) );
+                    asBox2f( myROIs[i]->bbox()), myMinDistIt->second.intensity );
         } else {
             // new cursor
             int myNewID( _myIDCounter++ );
@@ -475,7 +475,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             myCorrelatedIds.push_back( myNewID );
             createEvent( myNewID, "add", theCurrentPositions[i].center,
                     applyTransform( theCurrentPositions[i].center, myTransform),
-                    asBox2f( myROIs[i]->bbox() ));
+                    asBox2f( myROIs[i]->bbox()), myMinDistIt->second.intensity );
         }
     }
 
@@ -490,7 +490,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             myOutdatedCursorIds.push_back( myIt->first );
             createEvent( myIt->first, "remove", myIt->second.position,
                     applyTransform( myIt->second.position, myTransform ),
-                    myIt->second.roi);
+                    myIt->second.roi, myIt->second.intensity);
         }
     }
 
