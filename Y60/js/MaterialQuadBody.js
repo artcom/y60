@@ -12,7 +12,7 @@ function MaterialQuadBody(theScene, theParentNode, theImage, theCoords) {
     this.Constructor(this, theScene, theParentNode, theImage, theCoords);
 }
 
-var ourMaterialsHash = {};
+var ourImageMap = {};
 
 MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNode, theImage, theCoords) {
 
@@ -30,14 +30,14 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         throw new Exception(errorstring);
     } else if (fileExists(theImage)) {
         // theImage is-a filename
-        if (theImage in ourMaterialsHash) {
-            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourMaterialsHash[theImage]);
-            _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
+        print("MQB filename=" + theImage);
+        if (theImage in ourImageMap) {
+            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
         } else {
             _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "MQB_Material", false);
-            _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
-            ourMaterialsHash[theImage] = _myMaterial.childNode("textures", 0).firstChild.image;
+            ourImageMap[theImage] = _myMaterial.getElementById(_myMaterial.childNode("textures", 0).firstChild.image);
         }
+        _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
     } else if (("id" in theImage) && theParentNode.getElementById(theImage.id)) {
         // theImage is-a <image> node
         _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage);
