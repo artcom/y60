@@ -24,6 +24,20 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         throw new Exception(errorMessage);
     }
 
+/* TA 2007-08-01: FIXME
+    var myScene = theParentNode;
+
+    while (myScene.nodeName != "scene") {
+        myScene = myScene.parentNode;
+    }
+
+    // fails:
+    assert(theScene == myScene);
+
+    // works but why:
+    assert(theScene.dom == myScene);
+*/
+
     if (theImage == undefined) {
         var errorstring = "theImage is undefined";
         Logger.error(errorstring);
