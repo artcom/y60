@@ -573,6 +573,7 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         DOC_PARAM_OPT("theColor", "Surfacecolor of the material", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
         DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
         DOC_RESET;
+        DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
         DOC_PARAM_OPT("theImageNode", "Image node to use for as texture", DOC_TYPE_NODE, 0);
         DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "ColorMaterial");
         DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
