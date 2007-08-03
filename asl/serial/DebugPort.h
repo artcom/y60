@@ -20,6 +20,7 @@
 
 #include "SerialDevice.h"
 #include <asl/numeric_functions.h>
+#include <asl/Logger.h>
 #include <string>
 
 namespace asl {
@@ -33,7 +34,8 @@ namespace asl {
 
             void open(unsigned int theBaudRate, unsigned int theDataBits,
                       ParityMode theParityMode, unsigned int theStopBits,
-                      bool theHWHandShakeFlag = false) 
+                      bool theHWHandShakeFlag,
+                      int theMinReadSize, int theInterCharTimeout) 
             {
                 std::cerr << "DebugPort::open() - Opening " << getDeviceName() << " with " << std::endl;
                 std::cerr << "    baudrate:     " << theBaudRate << std::endl;
@@ -41,6 +43,9 @@ namespace asl {
                 std::cerr << "    partity mode: " << theParityMode << std::endl;
                 std::cerr << "    stopbits:     " << theStopBits << std::endl;
                 std::cerr << "    hw handshake: " << theHWHandShakeFlag << std::endl;
+                if ( theMinReadSize != -1 || theInterCharTimeout != -1) {
+                    AC_WARNING << "Blocking mode not implemented for DebugPort.";
+                }
                 isOpen(true);
             }
 

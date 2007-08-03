@@ -25,6 +25,12 @@
 
 namespace asl {
 
+/*! @addtogroup aslserial */
+/* @{ */
+
+/*! Unix implementation of a serial port.
+ * @see SerialDevice
+ */
 class TTYPort : public SerialDevice {
     public:
        TTYPort(const std::string & theDeviceName);
@@ -32,7 +38,8 @@ class TTYPort : public SerialDevice {
 
         void open(unsigned int theBaudRate, unsigned int theDataBits,
                   ParityMode theParityMode, unsigned int theStopBits,
-                  bool theHWHandShakeFlag = false);
+                  bool theHWHandShakeFlag,
+                  int theMinBytesPerRead, int theTimeout);
         void close();
 
         bool read(char * theBuffer, size_t & theSize);
@@ -55,6 +62,8 @@ class TTYPort : public SerialDevice {
 
          
 };
+
+/* @} */
 
 }
 

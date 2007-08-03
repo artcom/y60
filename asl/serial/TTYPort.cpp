@@ -19,6 +19,7 @@
 
 #include <asl/string_functions.h>
 #include <asl/Block.h>
+#include <asl/Logger.h>
 
 #include <unistd.h>
 #include <termios.h>
@@ -47,7 +48,8 @@ TTYPort::~TTYPort() {
 void
 TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
               ParityMode theParityMode, unsigned int theStopBits,
-              bool theHWHandShakeFlag)
+              bool theHWHandShakeFlag,
+              int theMinBytesPerRead, int theTimeout)
 {
     if (isOpen()) {
         throw SerialPortException(string("Can not open device '") + getDeviceName() +
@@ -65,8 +67,21 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
 
     mode_t myOpenMode = O_RDWR | O_NOCTTY;
 
-    // TODO add blocking flag
-    myOpenMode |= O_NONBLOCK;
+    if (theMinBytesPerRead == 0 && theTimeout == 0) {
+        AC_WARNING << "TTYPort::open(): non-blocking";
+        myOpenMode |= O_NONBLOCK;
+    } else {
+        if (theMinBytesPerRead > 255) {
+            AC_WARNING << "TTYPort::open(): theMinBytesPerRead to large. Clamping to 255.";
+            theMinBytesPerRead = 255;
+        }
+        if (theTimeout > 255) {
+            AC_WARNING << "TTYPort::open(): theTimeout to large. Clamping to 255.";
+            theTimeout = 255;
+        }
+        AC_WARNING << "TTYPort::open(): blocking MIN: " << theMinBytesPerRead
+                   << " TIME: " << theTimeout;
+    }
 
     _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode);
     if (_myPortHandle < 0) {
@@ -88,13 +103,11 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     myTermIO.c_iflag = IGNPAR;
     myTermIO.c_oflag = 0;
     myTermIO.c_lflag = 0;
-    myTermIO.c_cc[VMIN] = 0;
 
-    /* TODO
-    if (_isBlocking) {
-        newtio.c_cc[VTIME]=10;  // expect at least one char every second
-    }
-    */
+    myTermIO.c_cc[VMIN] = cc_t(theMinBytesPerRead);
+    myTermIO.c_cc[VTIME]= cc_t(theTimeout);
+
+    AC_WARNING << "VMIN: " << int(myTermIO.c_cc[VMIN]) << " VTIME: " << int(myTermIO.c_cc[VTIME]);
 
     tcflush(_myPortHandle, TCIOFLUSH);
     if (tcsetattr(_myPortHandle, TCSANOW, & myTermIO) != 0) {
@@ -138,7 +151,7 @@ TTYPort::peek() {
 void 
 TTYPort::flush() {
     if (!isOpen()) {
-        throw SerialPortException(string("Can not peek from device ") + getDeviceName() +
+        throw SerialPortException(string("Can not flush device ") + getDeviceName() +
                                ". Device is not open.", PLUS_FILE_LINE);
     }
     if ( tcflush( _myPortHandle, TCIOFLUSH ) ) {
@@ -200,7 +213,7 @@ TTYPort::getStatusLine() {
         myStatusMask |= DTR;
     }
     if (isNoisy()) {
-        cerr << "TTYPort::peek(): status mask=0x" << hex << myStatusMask << dec << endl;
+        cerr << "TTYPort::getStatusLine(): status mask=0x" << hex << myStatusMask << dec << endl;
     }
 
     return myStatusMask;
@@ -246,7 +259,11 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
         cerr << "TTYPort::write(): '" << Block((unsigned char *)theBuffer,
             (unsigned char *)(theBuffer + theSize)) << "'" << endl;
     }
-    size_t myWrittenBytes = ::write(_myPortHandle, theBuffer, theSize);
+    ssize_t myWrittenBytes = ::write(_myPortHandle, theBuffer, theSize);
+    if (/* ! blocking && */ myWrittenBytes == -1 && errno == EAGAIN) {
+        AC_WARNING << "EAGAIN: write() would block.";
+        return;
+    }
 
     if (theSize != myWrittenBytes) {
         throw SerialPortException(string("Can not write ") + as_string(theSize) +

@@ -25,6 +25,12 @@
 
 namespace asl {
 
+    /*! @addtogroup aslserial */
+    /* @{ */
+
+    /*! Win32 implementation of a serial port.
+     * @see SerialDevice
+     */
     class ComPort : public SerialDevice {
         public:
             ComPort(const std::string & theDeviceName);
@@ -32,7 +38,8 @@ namespace asl {
 
             void open(unsigned int theBaudRate, unsigned int theDataBits,
                       ParityMode theParityMode, unsigned int theStopBits,
-                      bool theHWHandShakeFlag = false);
+                      bool theHWHandShakeFlag,
+                      int theMinBytesPerRead, int theTimeout );
             void close();
 
             bool read(char * theBuffer, size_t & theSize);
@@ -46,14 +53,21 @@ namespace asl {
         private:
             ComPort();
             bool readFromDevice(unsigned char * theBuffer, size_t & theSize);
+            bool readBlocking(unsigned char * theBuffer, size_t & theSize);
+            bool readNonBlocking(unsigned char * theBuffer, size_t & theSize);
             void checkError(const std::string & theLocationString);
             DWORD convertBaudRate(unsigned int theBaudRate);
             BYTE convertParity(ParityMode theParity);
             BYTE convertStopBits(unsigned int  theStopBits);
 
-            HANDLE      _myPortHandle;
-            Block       _myBuffer;
+            HANDLE       _myPortHandle;
+            COMMTIMEOUTS _myTimeouts;
+            Block        _myBuffer;
+            bool         _myBlockingFlag;
+            unsigned     _myMinReadBytes;
     };
+
+    /* @} */
 }
 
 #endif

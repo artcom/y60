@@ -19,10 +19,26 @@ namespace asl {
 
     class SerialDevice;
 
-    // This function creates a new serial device. Don't forget to delete
-    // it when you're done with it.
+    /*! @addtogroup aslserial */
+    /* @{ */
+    
+    /*! This function creates a new serial device. The returned object is 
+     * either of type TTYPort (*nix like systems) or ComPort (Win32),
+     * depending on the platform. The application is responsible to delete
+     * the returned object.
+     * @param theIndex Zero based index of serial port (0 gives COM1/ttyS0)
+     */
     SerialDevice * getSerialDevice(unsigned int theIndex);
+    /*! This function creates a new serial device. The returned object is 
+     * either of type TTYPort (*nix like systems) or ComPort (Win32),
+     * depending on the platform. The application is responsible to delete
+     * the returned object.
+     * @param theDevice The name of the device to use. Usefull for stuff like
+     *                  /dev/ttyUSB0
+     */
     SerialDevice * getSerialDeviceByName(const std::string & theDevice);
+
+    /* @} */
 }
 
 #endif // ASL_SERIAL_DEVICE_FACTORY_INCLUDED
