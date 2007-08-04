@@ -253,7 +253,9 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             var lastEqualPosition = myArgument.lastIndexOf('=');
             _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
         }
-        if (myArgument == "offscreen" && operatingSystem() != "OSX") {
+        if (myArgument == "offscreen" && 
+	    operatingSystem() != "OSX" &&
+	    expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1) {
             _myOffscreenFlag = true;
         }
     }
