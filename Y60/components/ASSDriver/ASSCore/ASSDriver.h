@@ -32,6 +32,21 @@ namespace y60 {
 #define MAX_HISTORY_LENGTH 5
 
 struct Cursor {
+    Cursor() :
+            position(0.0, 0.0), 
+            major_direction(0.0, 0.0),
+            minor_direction(0.0, 0.0),
+            firstDerivative(0.0),
+            lastTouchTime(0.0),
+            intensity(0.0),
+            previousIntensity(0.0),
+            motion(0.0,0.0),
+            correlatedPosition(-1)
+    {
+        roi.makeEmpty();
+        previousRoi.makeEmpty();
+    }
+
     Cursor(const asl::MomentResults & theMomentResult, const asl::Box2f & theBox) :
             position( theMomentResult.center ), 
             major_direction( theMomentResult.major_dir ),
@@ -40,7 +55,9 @@ struct Cursor {
             firstDerivative(0.0),
             lastTouchTime(0.0),
             intensity(0.0),
-            previousIntensity(0.0)
+            previousIntensity(0.0),
+            motion(0.0,0.0),
+            correlatedPosition(-1)
     {
         previousRoi.makeEmpty();
     }
@@ -55,8 +72,9 @@ struct Cursor {
     float         firstDerivative;
     double        lastTouchTime;
 
-
     std::deque<float> intensityHistory;
+    asl::Vector2f motion;
+    int correlatedPosition;
 
 };
 
