@@ -38,6 +38,7 @@ class subraster;
 template <class T, class D = AC_OFFSET_TYPE>
 class const_subraster;
 
+// base class, do not use directly
 template <class RASTER>
 class subraster_base_iterator
     : public std::iterator<
@@ -117,6 +118,11 @@ class subraster_base_iterator
         operator void*() const {return static_cast<void*>(_cur);}
 };
 
+
+/// This iterator is the standard iterator type for a subraster container
+/// It uses the origin and the stride from the supplied RASTER class to properly advance
+/// to the next line.
+/// 
 template <class RASTER>
 class subraster_iterator : public subraster_base_iterator<RASTER>
 {
@@ -203,6 +209,7 @@ class subraster_iterator : public subraster_base_iterator<RASTER>
         bool operator!=(const subraster_iterator& it) const { return this->_cur != it._cur; };
 };
 
+/// const version of subraster_iterator
 template <class RASTER>
 class subraster_const_iterator : public subraster_base_iterator<const RASTER>
 {
