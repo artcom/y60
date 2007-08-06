@@ -439,7 +439,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     // populate a map with all distances between existing cursors and new positions 
     typedef std::multimap<float, std::pair<int,int> > DistanceMap;
     DistanceMap myDistanceMap;
-    float myDistanceThreshold = 8.0;
+    float myDistanceThreshold = 4.0;
     if (_myTransportLayer->getGridSpacing() > 0) {
         myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
     }
@@ -448,9 +448,11 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
         myCursorIt->second.correlatedPosition = -1;
         for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
-            float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion 
-                    - theCurrentPositions[i].center);
-            myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first))); 
+            float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion
+                               - theCurrentPositions[i].center);
+            if (myDistance < myDistanceThreshold) {
+                myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first)));
+            }
         }
     }
 
