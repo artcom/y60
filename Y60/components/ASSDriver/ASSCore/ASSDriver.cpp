@@ -439,26 +439,25 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     // populate a map with all distances between existing cursors and new positions 
     typedef std::multimap<float, std::pair<int,int> > DistanceMap;
     DistanceMap myDistanceMap;
-    float myDistanceThreshold = 2.0;
+    float myDistanceThreshold = 8.0;
     if (_myTransportLayer->getGridSpacing() > 0) {
         myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
     }
-    //AC_PRINT << "distance threshold: " << myDistanceThreshold;
-    CursorMap::iterator myMinDistIt  = _myCursors.end();
+    AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
     CursorMap::iterator myCursorIt  = _myCursors.begin();
     for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
         myCursorIt->second.correlatedPosition = -1;
         for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
             float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion 
                     - theCurrentPositions[i].center);
-            if (myDistance <= myDistanceThreshold) {
-                myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first))); 
-            }
+            myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first))); 
         }
     }
 
     // will contain the correlated cursor id at index n for position n or -1 if uncorrelated
     std::vector<int> myCorrelatedPositions(theCurrentPositions.size(), -1);
+
+    AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
 
     // iterate through the distance map and correlate cursors in increasing distance order
     for (DistanceMap::iterator dit = myDistanceMap.begin(); 
@@ -470,11 +469,14 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
         if (_myCursors[myCursorId].correlatedPosition == -1) {
             if (myCorrelatedPositions[myPositionIndex] == -1)  {
                 // correlate
-                myCorrelatedPositions[myPositionIndex] =myCursorId;
+                myCorrelatedPositions[myPositionIndex] = myCursorId;
                 Cursor & myCursor = _myCursors[myCursorId];
                 myCursor.correlatedPosition = myPositionIndex;
 
+                AC_TRACE << "correlated cursor " << myCursorId << " with " << myPositionIndex;
+
                 // update cursor with new position
+                myCursor.motion = theCurrentPositions[myPositionIndex].center - myCursor.position;
                 myCursor.position = theCurrentPositions[myPositionIndex].center;
                 myCursor.major_direction = theCurrentPositions[myPositionIndex].major_dir;
                 myCursor.minor_direction = theCurrentPositions[myPositionIndex].minor_dir;
@@ -485,7 +487,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                 myCursor.roi = asBox2f( myROIs[myPositionIndex]->bbox() );
 
                 // post a move event
-                createEvent( myMinDistIt->first, "move", myCursor.position,
+                createEvent( myCursorId, "move", myCursor.position,
                         applyTransform( myCursor.position, myTransform),
                         myCursor.roi, 0 /*myCursor.intensity*/); // TODO
             }
@@ -499,6 +501,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
         if (myCorrelatedPositions[i] == -1)  {
             // new cursor
             int myNewID( _myIDCounter++ );
+            AC_TRACE << "new cursor " <<myNewID<< " at " << theCurrentPositions[i].center;
             myCorrelatedPositions[i] = myNewID;
             _myCursors.insert( make_pair( myNewID, Cursor( theCurrentPositions[i],
                             asBox2f( myROIs[i]->bbox()) )));
@@ -513,12 +516,13 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     for (CursorMap::iterator myIt = _myCursors.begin(); myIt != _myCursors.end(); ) {
         // advance iterator to allow safe map erase while iterating
         CursorMap::iterator nextIt = myIt;
-        ++nextIt; 
+        ++nextIt;
         if (myIt->second.correlatedPosition == -1) {
             // cursor removed
             createEvent( myIt->first, "remove", myIt->second.position,
                     applyTransform( myIt->second.position, myTransform ),
                     myIt->second.roi, 0 /*myCursor.intensity*/); // TODO
+            AC_TRACE << "removing cursor "<<myIt->first<<" at " << myIt->second.correlatedPosition;
             _myCursors.erase(myIt);
         }
         myIt = nextIt;
@@ -550,7 +554,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                 }
             }
         }
-        float myDistanceThreshold = 2.0f;
+        float myDistanceThreshold = 4.0f;
         if (_myTransportLayer->getGridSpacing() > 0) {
             myDistanceThreshold *= 100.0f / _myTransportLayer->getGridSpacing();
         }

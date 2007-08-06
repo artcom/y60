@@ -54,6 +54,7 @@
             <xs:attribute name="position3D" type="Vector3f"/>
             <xs:attribute name="grid_size" type="Vector2i"/>
             <xs:attribute name="roi" type="Box2f"/>
+            <xs:attribute name="intensity" type="xs:double"/>
         </xs:complexType>
     </xs:element>
 
