@@ -44,16 +44,27 @@ namespace y60 {
     SceneOptimizer::SuperShape::getPrimitive(const std::string & theType, const std::string & theMaterial, const RenderStyles & theRenderStyles) {
         std::string myKey = theType + "_" + theMaterial + "_" + as_string(theRenderStyles);
 
+        PrimitiveCachePtr myPrimitiveCache(0);
         if (_myPrimitiveMap.find(myKey) == _myPrimitiveMap.end()) {
-            dom::Element myNewElements(ELEMENTS_NODE_NAME);
-            myNewElements.appendAttribute(PRIMITIVE_TYPE_ATTRIB, theType);
-            myNewElements.appendAttribute(MATERIAL_REF_ATTRIB, theMaterial);
-            myNewElements.appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
-            dom::NodePtr myPrimitive = _myShapeNode->childNode(PRIMITIVE_LIST_NAME)->appendChild(myNewElements);
-            _myPrimitiveMap[myKey]   = PrimitiveCachePtr(new PrimitiveCache(myPrimitive));
+            dom::Element myPrimitive(ELEMENTS_NODE_NAME);
+            myPrimitive.appendAttribute(PRIMITIVE_TYPE_ATTRIB, theType);
+            myPrimitive.appendAttribute(MATERIAL_REF_ATTRIB, theMaterial);
+            myPrimitive.appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
+            dom::NodePtr myPrimitiveNode = _myShapeNode->childNode(PRIMITIVE_LIST_NAME)->appendChild(myPrimitive);
+            myPrimitiveCache = PrimitiveCachePtr(new PrimitiveCache(myPrimitiveNode));
+            if (theType == PRIMITIVE_TYPE_QUADS) {
+                _myPrimitiveMap[myKey] = myPrimitiveCache;
+            } else if (theType == PRIMITIVE_TYPE_LINE_STRIP) {
+                // nothing to do
+            } else {
+                throw asl::NotYetImplemented(std::string("The optimizer doesn't understand primitives of type '") + theType + "' yet",
+                                             PLUS_FILE_LINE);
+            }
+        } else {
+            myPrimitiveCache = PrimitiveCachePtr(_myPrimitiveMap[myKey]);
         }
 
-        return _myPrimitiveMap[myKey];
+        return myPrimitiveCache;
     }
 
     std::string
@@ -163,7 +174,8 @@ namespace y60 {
                 // Don't change the referenced shape of a sticky body node
                 // some code might stop working then
                 AC_INFO << "    Reusing the referenced shape.";
-                dom::NodePtr myShapeNode = _myScene.getShapesRoot()->getChildElementById(theRootNode->getAttributeString(BODY_SHAPE_ATTRIB), ID_ATTRIB);
+                std::string myBodyId = theRootNode->getAttributeString(BODY_SHAPE_ATTRIB);
+                dom::NodePtr myShapeNode = _myScene.getShapesRoot()->getChildElementById(myBodyId, ID_ATTRIB);
                 for (signed i = myShapeNode->childNodesLength() - 1; i >= 0; --i) {
                     myShapeNode->removeChild(myShapeNode->childNode(i));
                 }
@@ -188,7 +200,8 @@ namespace y60 {
         // Get the inverse localmatrix of the node
         TransformHierarchyFacadePtr myFacade       = theNode->getFacade<TransformHierarchyFacade>();
         TransformHierarchyFacadePtr myParentFacade = myParentNode->getFacade<TransformHierarchyFacade>();
-        asl::Matrix4f myMatrix                     = asl::product(myFacade->get<LocalMatrixTag>(), myParentFacade->get<LocalMatrixTag>());
+        asl::Matrix4f myMatrix                     = asl::product(myFacade->get<LocalMatrixTag>(),
+                                                                  myParentFacade->get<LocalMatrixTag>());
         asl::Vector3f myScale;
         asl::Vector3f myShear;
         asl::Quaternionf myOrientation;
@@ -298,7 +311,8 @@ namespace y60 {
 
             // Unknown or unallowed configuration => exception
             else {
-                throw asl::Exception("Unknown configuration: '" + myParentNodeName + "' node with child '" + myNodeName + "' node", PLUS_FILE_LINE);
+                throw asl::Exception("Unknown configuration: '" + myParentNodeName + "' node with child '" + myNodeName + "' node",
+                                     PLUS_FILE_LINE);
             }
         }
     }
@@ -394,15 +408,15 @@ namespace y60 {
     SceneOptimizer::mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag,
                                     VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles) {
         // Get element type
-        std::string myElementType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
-        if (myElementType == PRIMITIVE_TYPE_QUADS) {
-            myElementType = PRIMITIVE_TYPE_TRIANGLES;
+        std::string myNewPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+        if (myNewPrimitiveType == PRIMITIVE_TYPE_QUADS) {
+            myNewPrimitiveType = PRIMITIVE_TYPE_TRIANGLES;
         }
 
         // Get element material ref
         std::string myMaterialRef = theElements->getAttributeString(MATERIAL_REF_ATTRIB);
 
-        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myElementType, myMaterialRef, theRenderStyles);
+        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles);
         unsigned myNumSrcElements       = theElements->childNodesLength();
         for (unsigned j = 0; j < myNumSrcElements; ++j) {
             dom::NodePtr mySrcIndex = theElements->childNode(j);
@@ -416,7 +430,8 @@ namespace y60 {
             unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
 
             // Triangulate quads
-            if (theElements->getAttributeString(PROPERTY_TYPE_ATTRIB) == PRIMITIVE_TYPE_QUADS) {
+            std::string myOldPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+            if (myOldPrimitiveType == PRIMITIVE_TYPE_QUADS) {
                 myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
                 unsigned mySrcSize = mySrc.size();
                 for (unsigned k = 0; k < mySrcSize; k += 4) {
@@ -436,7 +451,7 @@ namespace y60 {
                         myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
                     }
                 }
-            } else {
+            } else if (myOldPrimitiveType == PRIMITIVE_TYPE_TRIANGLES || myOldPrimitiveType == PRIMITIVE_TYPE_LINE_STRIP) {
                 unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
                 myDst.resize(mySrc.size() + myOffset);
                 unsigned mySrcSize = mySrc.size();
@@ -451,6 +466,9 @@ namespace y60 {
                         myDst[myOffset + k] = mySrc[k] + myVertexDataOffset;
                     }
                 }
+            } else {
+                throw asl::NotYetImplemented(std::string("The optimizer doesn't understand primitives of type '") + myOldPrimitiveType + "' yet",
+                                             PLUS_FILE_LINE);
             }
 
             myDstIndex->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
@@ -701,7 +719,8 @@ namespace y60 {
             if (myAttributeNode) {
                 myTransformAttributeNode->nodeValue(myAttributeNode->nodeValue());
             } else {
-                throw asl::Exception("A '" + theNode->nodeName() + "' node doesn't know about the attribute '" + myAttributeName + "'",  PLUS_FILE_LINE);
+                throw asl::Exception("A '" + theNode->nodeName() + "' node doesn't know about the attribute '" + myAttributeName + "'",
+                                     PLUS_FILE_LINE);
             }
         }
 
