@@ -68,7 +68,6 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     mode_t myOpenMode = O_RDWR | O_NOCTTY;
 
     if (theMinBytesPerRead == 0 && theTimeout == 0) {
-        AC_WARNING << "TTYPort::open(): non-blocking";
         myOpenMode |= O_NONBLOCK;
     } else {
         if (theMinBytesPerRead > 255) {
@@ -79,8 +78,6 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
             AC_WARNING << "TTYPort::open(): theTimeout to large. Clamping to 255.";
             theTimeout = 255;
         }
-        AC_WARNING << "TTYPort::open(): blocking MIN: " << theMinBytesPerRead
-                   << " TIME: " << theTimeout;
     }
 
     _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode);
@@ -106,8 +103,6 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
 
     myTermIO.c_cc[VMIN] = cc_t(theMinBytesPerRead);
     myTermIO.c_cc[VTIME]= cc_t(theTimeout);
-
-    AC_WARNING << "VMIN: " << int(myTermIO.c_cc[VMIN]) << " VTIME: " << int(myTermIO.c_cc[VTIME]);
 
     tcflush(_myPortHandle, TCIOFLUSH);
     if (tcsetattr(_myPortHandle, TCSANOW, & myTermIO) != 0) {
