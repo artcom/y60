@@ -432,7 +432,6 @@ void
 ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
         const BlobListPtr theROIs)
 {
-
     Matrix4f myTransform = getTransformationMatrix();
 
     const BlobList & myROIs = * theROIs;
@@ -467,12 +466,12 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     {
         // check if we already have correlated one of our nodes
         int myPositionIndex = dit->second.first;
-        int myCursorIndex = dit->second.second;
-        if (_myCursors[myCursorIndex].correlatedPosition == -1) {
+        int myCursorId = dit->second.second;
+        if (_myCursors[myCursorId].correlatedPosition == -1) {
             if (myCorrelatedPositions[myPositionIndex] == -1)  {
                 // correlate
-                myCorrelatedPositions[myPositionIndex] =myCursorIndex;
-                Cursor & myCursor = _myCursors[myCursorIndex];
+                myCorrelatedPositions[myPositionIndex] =myCursorId;
+                Cursor & myCursor = _myCursors[myCursorId];
                 myCursor.correlatedPosition = myPositionIndex;
 
                 // update cursor with new position
@@ -500,8 +499,10 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
         if (myCorrelatedPositions[i] == -1)  {
             // new cursor
             int myNewID( _myIDCounter++ );
+            myCorrelatedPositions[i] = myNewID;
             _myCursors.insert( make_pair( myNewID, Cursor( theCurrentPositions[i],
                             asBox2f( myROIs[i]->bbox()) )));
+            _myCursors[myNewID].correlatedPosition = i;
             createEvent( myNewID, "add", theCurrentPositions[i].center,
                     applyTransform( theCurrentPositions[i].center, myTransform),
                     asBox2f( myROIs[i]->bbox() ), 0 /*myCursor.intensity*/); // TODO
