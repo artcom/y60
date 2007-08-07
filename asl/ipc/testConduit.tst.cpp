@@ -35,7 +35,7 @@ using namespace asl;
 using namespace std;
 
 //
-// As simple server which echos back 5-byte strings
+// As simple server which echos back strings
 // converted to lower case. 
 //
 // All we need is a constructor, a static factory method
