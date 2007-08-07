@@ -52,7 +52,7 @@ namespace y60 {
             myPrimitive.appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
             dom::NodePtr myPrimitiveNode = _myShapeNode->childNode(PRIMITIVE_LIST_NAME)->appendChild(myPrimitive);
             myPrimitiveCache = PrimitiveCachePtr(new PrimitiveCache(myPrimitiveNode));
-            if (theType == PRIMITIVE_TYPE_QUADS) {
+            if (theType == PRIMITIVE_TYPE_TRIANGLES) {
                 _myPrimitiveMap[myKey] = myPrimitiveCache;
             } else if (theType == PRIMITIVE_TYPE_LINE_STRIP) {
                 // nothing to do
