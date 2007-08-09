@@ -32,6 +32,8 @@ sub runLocalMakedist($) {
         copyIfMoreRecent("$ENV{PRO}/lib/intl.dll", $theDistDir);
         copyIfMoreRecent("$ENV{PRO}/lib/libgobject-2.0-0.dll", $theDistDir);
         copyIfMoreRecent("$ENV{PRO}/lib/libgmodule-2.0-0.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/freetype6.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/zlib1.dll", $theDistDir);
         copyIfMoreRecent("$ENV{PRO}/build/Installer/uuidgen.exe", $theDistDir);
     }
 
