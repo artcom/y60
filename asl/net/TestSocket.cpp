@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin AG
+// Copyright (C) 1993-2007, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,12 +9,33 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: TestSocket.cpp,v $
+// Description: 
+//    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
-//   $Revision: 1.17 $
+// Last Review:  ms & ab 2007-08-14
 //
+//  review status report: (perfect, ok, fair, poor, disaster, notapp (not applicable))
+//    usefulness              :      ok
+//    formatting              :      ok
+//    documentation           :      fair
+//    test coverage           :      ok
+//    names                   :      ok
+//    style guide conformance :      ok
+//    technological soundness :      ok
+//    dead code               :      ok
+//    readability             :      ok
+//    understandability       :      ok
+//    interfaces              :      ok
+//    confidence              :      ok
+//    integration             :      ok
+//    dependencies            :      ok
+//    error handling          :      ok
+//    logging                 :      notapp
+//    cheesyness              :      ok
 //
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//    overall review status   :      ok
+//
+//    recommendations: move to inner class of *.tst.cpp file 
 */
 
 #include "Socket.h"

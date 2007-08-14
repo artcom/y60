@@ -1,25 +1,41 @@
-//=============================================================================
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 2000-2001, ART+COM AG Berlin
-//
+// Copyright (C) 1993-2007, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: Hop.h,v $
+// Description:  ??
 //
-//     $Author: uzadow $
+// Last Review:  ms & ab 2007-08-14
 //
-//   $Revision: 1.1.1.1 $
+//  review status report: (perfect, ok, fair, poor, disaster, notapp (not applicable))
+//    usefulness              :      poor
+//    formatting              :      ok
+//    documentation           :      poor
+//    test coverage           :      disaster
+//    names                   :      ok
+//    style guide conformance :      fair
+//    technological soundness :      notapp
+//    dead code               :      disaster
+//    readability             :      ok
+//    understandability       :      notapp
+//    interfaces              :      notapp
+//    confidence              :      notapp
+//    integration             :      notapp
+//    dependencies            :      ok
+//    error handling          :      notapp
+//    logging                 :      notapp
+//    cheesyness              :      disaster
 //
+//    overall review status   :      disaster
 //
-// Description: 
-//
-//=============================================================================
+//    recommendations:  delete this class 
+*/
 #ifndef INCL_HOP
 #define INCL_HOP
 
