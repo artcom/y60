@@ -10,6 +10,7 @@
 
 #include "TransportLayer.h"
 #include "ASSDriver.h"
+#include "ASSUtils.h"
 
 #include <asl/Assure.h>
 
@@ -49,9 +50,8 @@ const unsigned int MAX_STATUS_LINE_LENGTH( MAX_NUM_STATUS_TOKENS * BYTES_PER_STA
 // XXX Workaround Bug 595
 DEFINE_EXCEPTION( ASSStatusTokenException, asl::Exception );
 
-TransportLayer::TransportLayer(ASSDriver * theDriver, const dom::NodePtr & theSettingsNode) :
-    _mySettings( theSettingsNode ),
-    _myDriver( theDriver ),
+TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr & theSettings) :
+    asl::PosixThread( threadMain ),
     _myGridSize(-1, -1),
     _myState( NOT_CONNECTED ),
     _myReceiveBuffer( 1024 ),
@@ -69,11 +69,18 @@ TransportLayer::TransportLayer(ASSDriver * theDriver, const dom::NodePtr & theSe
     _myChecksumErrorCounter( 0 ),
     _myReceivedFrames( 0 ),
     _myFirstFrameFlag( true ),
-    _myLastCommandTime( asl::Time() )
+    _myLastCommandTime( asl::Time() ),
+    _myFrameBuffer( 0 ),
+    _myRunningFlag( true ),
+    _myTransportName( theTransportName )
 {
+    getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 100);
+
+    fork();
 }
 
 TransportLayer::~TransportLayer() {
+
     AC_PRINT << "=== ASS Transport Layer Stats =========" << endl
              << "Frames received       : " << _myReceivedFrames << endl
              << "Synchronization errors: " << _mySyncLostCounter << endl
@@ -82,18 +89,31 @@ TransportLayer::~TransportLayer() {
              << "=======================================";
 }
 
+
 void 
-TransportLayer::poll( RasterPtr theTargetRaster) {
-    /*
-    static double last = asl::Time();
-    double now = asl::Time();
-    AC_PRINT << "TransportLayer::poll() dt: " << now - last << " state: " << _myState;
-    last = now;
-    */
+TransportLayer::stopThread() {
+    AC_PRINT << "Waiting for IO thread shutdown.";
+    _myRunningFlag = false;
+    join();
+}
+
+void 
+TransportLayer::poll() {
+
+    _myFrameQueueLock.lock();
+    if (_myFrameQueue.size() > _myEventQueueSize) {
+        AC_WARNING << "Event queue has more than " << _myEventQueueSize << " items. Flushing.";
+        while ( ! _myFrameQueue.empty() ) {
+            _myFrameQueue.pop();
+        }
+    }
+    _myFrameQueueLock.unlock();
 
     switch (_myState) {
         case NOT_CONNECTED:
             establishConnection();
+            // do not use a whole core while waiting for connection
+            msleep( 10 ); 
             break;
         case SYNCHRONIZING:
             readData();
@@ -101,7 +121,7 @@ TransportLayer::poll( RasterPtr theTargetRaster) {
             break;
         case RUNNING:
             readData();
-            readSensorValues(theTargetRaster);
+            readSensorValues();
             break;
         case CONFIGURING:
             readData();
@@ -117,11 +137,9 @@ TransportLayer::readStatusToken( std::vector<unsigned char>::iterator & theIt, c
                 char(* theIt) + "'", PLUS_FILE_LINE );
     }
     theIt += 1;
-    //string myNumber(theIt, theIt + 4);
     istringstream myStream;
     myStream.setf( std::ios::hex, std::ios::basefield );
     myStream.str(string( theIt, theIt + 4 ));
-    //AC_PRINT << "=== parsing '" << myStream.str() << "'";
     theIt += 4;
     unsigned myNumber;
     myStream >>  myNumber;
@@ -157,14 +175,14 @@ TransportLayer::getBytesPerFrame() {
 }
 
 void
-TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
+TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
     //AC_PRINT << "==== parseStatusLine()";
-    //dumpBuffer(_myFrameBuffer);
+    //dumpBuffer(_myTmpBuffer);
     try {
-        if ( _myFrameBuffer.size() >= getBytesPerStatusLine() ) {
-            ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
-            ASSURE( _myFrameBuffer[1] == _myExpectedLine );
-            std::vector<unsigned char>::iterator myIt = _myFrameBuffer.begin() + 2;
+        if ( _myTmpBuffer.size() >= getBytesPerStatusLine() ) {
+            ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN );
+            ASSURE( _myTmpBuffer[1] == _myExpectedLine );
+            std::vector<unsigned char>::iterator myIt = _myTmpBuffer.begin() + 2;
             _myFirmwareVersion = readStatusToken( myIt, 'V' );
             Vector2i myGridSize;
             unsigned myChecksum;
@@ -199,8 +217,7 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
 
             if ( _myGridSize != myGridSize ) {
                 _myGridSize = myGridSize;
-                ASSURE(_myFrameBuffer.front() == MAGIC_TOKEN);
-                _myDriver->allocateGridBuffers( _myGridSize, theTargetRaster );
+                ASSURE(_myTmpBuffer.front() == MAGIC_TOKEN);
                 _myReceiveBuffer.resize( getBytesPerFrame() );
             }
 
@@ -212,7 +229,11 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
                 if ( myHasChecksumFlag ) {
                     if (_myChecksum == myChecksum) {
                         //AC_PRINT << "Checksum OK.";
-                        _myDriver->processSensorValues();
+                        _myFrameQueueLock.lock();
+                        _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameBuffer ));
+                        _myFrameQueueLock.unlock();
+                        // TODO use smart pointers 
+                        _myFrameBuffer = 0;
                     } else {
                         AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
                         _myChecksumErrorCounter += 1;
@@ -221,7 +242,7 @@ TransportLayer::parseStatusLine(RasterPtr & theTargetRaster) {
             }
             _myChecksum = 0;
 
-            _myFrameBuffer.erase( _myFrameBuffer.begin(), myIt);
+            _myTmpBuffer.erase( _myTmpBuffer.begin(), myIt);
             _myExpectedLine = 1;
         }
     } catch ( const ASSStatusTokenException & ex) {
@@ -244,37 +265,42 @@ TransportLayer::addLineToChecksum(std::vector<unsigned char>::const_iterator the
 }
 
 void
-TransportLayer::readSensorValues( RasterPtr theTargetRaster ) {
-    while ( _myFrameBuffer.size() >= ( _myExpectedLine == 0 ? 
+TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
+    while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ? 
                 getBytesPerStatusLine() : _myGridSize[0] + 2 ))
     {
-        //dumpBuffer( _myFrameBuffer );
+        //dumpBuffer( _myTmpBuffer );
         if ( _myExpectedLine == 0 ) {
-            parseStatusLine(theTargetRaster);
+            parseStatusLine(/*theTargetRaster*/);
         } else {
-            if ( _myFrameBuffer[0] != MAGIC_TOKEN ||
-                 _myFrameBuffer[1] != _myExpectedLine)
+            if ( _myTmpBuffer[0] != MAGIC_TOKEN ||
+                 _myTmpBuffer[1] != _myExpectedLine)
             {
                 AC_WARNING << "Sync error.";
                 _mySyncLostCounter++;
-                _myDriver->createTransportLayerEvent( "lost_sync" ); 
+                _myFrameQueueLock.lock();
+                _myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
+                _myFrameQueueLock.unlock();
                 setState( SYNCHRONIZING );
                 return;
             }
-            int myRowIdx = _myFrameBuffer[1] - 1;
+            int myRowIdx = _myTmpBuffer[1] - 1;
             //AC_PRINT << "Got row: " << myRowIdx;
 
-            size_t byteCount = (_myFrameBuffer.begin() + 2 + _myGridSize[0]) - (_myFrameBuffer.begin() + 2);
-            unsigned char * myRowPtr = theTargetRaster->pixels().begin() +
-                myRowIdx * theTargetRaster->width();
-            std::copy(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+            size_t byteCount = (_myTmpBuffer.begin() + 2 + _myGridSize[0]) - (_myTmpBuffer.begin() + 2);
+            if ( ! _myFrameBuffer ) {
+                // TODO use smart pointers 
+                _myFrameBuffer = new unsigned char[ _myGridSize[0] * _myGridSize[1] ];
+                
+            }
+            unsigned char * myRowPtr = _myFrameBuffer + myRowIdx * _myGridSize[0];
+            std::copy(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
 
-            addLineToChecksum(_myFrameBuffer.begin() + 2, _myFrameBuffer.begin() + 2 + _myGridSize[0]);
+            addLineToChecksum(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0]);
 
-            _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + _myGridSize[0] + 2);
+            _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + _myGridSize[0] + 2);
 
             if ( myRowIdx == _myGridSize[1] - 1) {
-                //_myDriver->processSensorValues();
                 _myExpectedLine = 0;
                 _myReceivedFrames += 1;
             } else {
@@ -282,6 +308,7 @@ TransportLayer::readSensorValues( RasterPtr theTargetRaster ) {
             }
         }
     }
+    _myCommandQueueLock.lock();
     if ( ! _myCommandQueue.empty() ) {
         if (_myFirmwareVersion >= 0) {
             if (_myFirmwareVersion >= 260) {
@@ -289,39 +316,42 @@ TransportLayer::readSensorValues( RasterPtr theTargetRaster ) {
             } else {
                 AC_WARNING << "Hardware commands not supported in this firmware version ("
                            << _myFirmwareVersion << ")";
-                _myCommandQueue.clear();
+                while ( ! _myCommandQueue.empty() ) {
+                    _myCommandQueue.pop();
+                }
             }
         }
     }
-    //AC_PRINT << "post buf size: " << _myFrameBuffer.size();
+    _myCommandQueueLock.unlock();
+    //AC_PRINT << "post buf size: " << _myTmpBuffer.size();
 }
 
 
 void
 TransportLayer::synchronize() {
     if ( ! _myMagicTokenFlag ) {
-        for (unsigned i = 0; i < _myFrameBuffer.size(); ++i) {
-            if (_myFrameBuffer[i] == MAGIC_TOKEN) {
+        for (unsigned i = 0; i < _myTmpBuffer.size(); ++i) {
+            if (_myTmpBuffer[i] == MAGIC_TOKEN) {
                 //AC_PRINT << "Found MAGIC_TOKEN.";
                 _myMagicTokenFlag = true;
                 if ( i > 0) {
-                    _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + i);
-                    if ( ! _myFrameBuffer.empty() ) {
-                        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN); 
+                    _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + i);
+                    if ( ! _myTmpBuffer.empty() ) {
+                        ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN); 
                     }
                 }
                 break;
             }
         }
     }
-    if ( _myMagicTokenFlag && _myFrameBuffer.size() > 1) {
-        ASSURE( _myFrameBuffer[0] == MAGIC_TOKEN );
-        if (_myFrameBuffer[1] == 0) {
+    if ( _myMagicTokenFlag && _myTmpBuffer.size() > 1) {
+        ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN );
+        if (_myTmpBuffer[1] == 0) {
             //AC_PRINT << "Found status line.";
             setState(RUNNING);
         } else {
-            //AC_PRINT << "Found data line: " << int(_myFrameBuffer[1]);
-            _myFrameBuffer.erase( _myFrameBuffer.begin(), _myFrameBuffer.begin() + 1);
+            //AC_PRINT << "Found data line: " << int(_myTmpBuffer[1]);
+            _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + 1);
             _myMagicTokenFlag = false;
         }
     }
@@ -337,10 +367,10 @@ TransportLayer::setState( DriverState theState ) {
             closeConnection();
             break;
         case SYNCHRONIZING:
-            sendCommand( CMD_LEAVE_CONFIG_MODE ); // XXX
+            sendCommand( CMD_LEAVE_CONFIG_MODE );
             _myMagicTokenFlag = false;
             _myGridSize = Vector2i(-1, -1);
-            _myFrameBuffer.clear();
+            _myTmpBuffer.clear();
             _myFirstFrameFlag = true;
             _myChecksum = 0;
             break;
@@ -358,20 +388,23 @@ TransportLayer::setState( DriverState theState ) {
 
 void
 TransportLayer::queueCommand( const char * theCommand ) {
-    _myCommandQueue.push_back( string( theCommand ));
+    _myCommandQueueLock.lock();
+    _myCommandQueue.push( string( theCommand ));
+    _myCommandQueueLock.unlock();
 }
 
 void
 TransportLayer::handleConfigurationCommand() {
-    //dumpBuffer( _myFrameBuffer );
+    //dumpBuffer( _myTmpBuffer );
     CommandResponse myResponse = getCommandResponse();
     switch (_myConfigureState) {
         case SEND_CONFIG_COMMANDS:
             //AC_PRINT << "SEND_CONFIG_COMMANDS";
             if (myResponse == RESPONSE_OK) {
+                _myCommandQueueLock.lock();
                 if ( ! _myCommandQueue.empty()) {
                     sendCommand( _myCommandQueue.front() );
-                    _myCommandQueue.pop_front();
+                    _myCommandQueue.pop();
                     if (_myCommandQueue.empty()) {
                         _myConfigureState = WAIT_FOR_RESPONSE;
                     }
@@ -379,10 +412,16 @@ TransportLayer::handleConfigurationCommand() {
                     sendCommand( CMD_LEAVE_CONFIG_MODE );
                     _myConfigureState = WAIT_FOR_EXIT;
                 }
+                _myCommandQueueLock.unlock();
             } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
                 AC_ERROR << "Failed to enter config mode: " 
                          << (myResponse == RESPONSE_TIMEOUT ? "timeout" : "error");
-                _myCommandQueue.clear();
+
+                _myCommandQueueLock.lock();
+                while ( ! _myCommandQueue.empty() ) {
+                    _myCommandQueue.pop();
+                }
+                _myCommandQueueLock.unlock();
                 setState( SYNCHRONIZING );
             }
             break;
@@ -413,13 +452,13 @@ TransportLayer::handleConfigurationCommand() {
 
 CommandResponse 
 TransportLayer::getCommandResponse() {
-    string myString( (char*)& ( * _myFrameBuffer.begin()), _myFrameBuffer.size());
+    string myString( (char*)& ( * _myTmpBuffer.begin()), _myTmpBuffer.size());
     transform( myString.begin(), myString.end(), myString.begin(), ::toupper);
     string::size_type myPos = myString.find(OK_STRING);
     //AC_PRINT << "getCommandResponse(): '" << myString << "'";
     if (myPos != string::npos ) {
         string::size_type myEnd = myPos + OK_STRING.size() - 2;
-        _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
+        _myTmpBuffer.erase( _myTmpBuffer.begin() , _myTmpBuffer.begin() + myEnd );
         AC_PRINT << "Got 'OK'";
         return RESPONSE_OK;
     }
@@ -431,7 +470,7 @@ TransportLayer::getCommandResponse() {
         unsigned myErrorCode = as<unsigned>( myString.substr( myPos + ERROR_STRING.size(), 2 ));
         AC_ERROR << "Got 'ERR': errorcode: " << myErrorCode;
         string::size_type myEnd = myPos + ERROR_STRING.size() + 2;
-        _myFrameBuffer.erase( _myFrameBuffer.begin() , _myFrameBuffer.begin() + myEnd );
+        _myTmpBuffer.erase( _myTmpBuffer.begin() , _myTmpBuffer.begin() + myEnd );
         return RESPONSE_ERROR;
     }
 
@@ -452,7 +491,9 @@ TransportLayer::sendCommand( const std::string & theCommand ) {
         _myLastCommandTime = double( asl::Time() );
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
-        _myDriver->createTransportLayerEvent( "lost_communication" );
+        _myFrameQueueLock.lock();
+        _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
+        _myFrameQueueLock.unlock();
         _myDeviceLostCounter++;
         setState(NOT_CONNECTED);
     }
@@ -521,8 +562,8 @@ TransportLayer::dumpControllerStatus() const {
              << "Framerate        : " << _myFramerate << endl
              << "Grid size        : " << _myGridSize << endl
              << "Grid spacing     : " << _myGridSpacing << endl
-             << "Last frame number: " << _myFrameNo << endl
-             //<< "Checksum         : " << _myChecksum << endl
+             //<< "Last frame number: " << _myFrameNo << endl
+             //<< "Last Checksum    : " << _myChecksum << endl
              << "=======================================";
 }
 
@@ -538,6 +579,30 @@ TransportLayer::getFirmwareModeName(unsigned theId) const {
     }
     AC_WARNING << "Unknown firmware mode " << theId;
     return "unknown";
+}
+
+void 
+TransportLayer::threadMain( asl::PosixThread & theThread ) {
+    TransportLayer & mySelf = dynamic_cast<TransportLayer&>( theThread );
+
+    try {
+        AC_PRINT << "IO thread launched";
+        while (mySelf._myRunningFlag) {
+            mySelf.poll();
+
+        }
+        AC_PRINT << "IO thread done";
+    } catch (const asl::Exception & ex) {
+        AC_ERROR << "asl::Exception in thread: " << ex;
+        throw;
+    } catch (const std::exception & ex ) {
+        AC_ERROR << "std::exception in thread: " << ex.what();
+        throw;
+    } catch (...) {
+        AC_ERROR << "Unknown exception in thread: ";
+        throw;
+        
+    }
 }
 
 } // end of namespace

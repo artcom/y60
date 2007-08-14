@@ -109,12 +109,12 @@ class ASSDriver :
         void callibrateTransmissionLevels();
         void queryConfigMode();
 
-        void allocateGridBuffers(const asl::Vector2i & theGridSize,
-                RasterPtr & theRawRaster);
+        void allocateGridBuffers(const asl::Vector2i & theGridSize);
         void processSensorValues();
 
         virtual void createTransportLayerEvent( const std::string & theType) = 0;
     protected:
+        void copyFrame(unsigned char * theData );
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
@@ -144,6 +144,7 @@ class ASSDriver :
                                       const asl::Matrix4f & theTransform );
         asl::Matrix4f getTransformationMatrix();
 
+        void drawLabel(jslib::AbstractRenderWindow * theWindow, const std::string & theText);
         void drawGrid();
         void drawMarkers();
         void drawCircle( const asl::Vector2f & thePosition, float theRadius,

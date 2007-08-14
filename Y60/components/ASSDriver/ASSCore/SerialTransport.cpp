@@ -24,8 +24,8 @@ static const unsigned NO_DATA_TIMEOUT = 30;
 
 class ASSDriver;
 
-SerialTransport::SerialTransport(ASSDriver * theDriver, const dom::NodePtr & theSettings) :
-    TransportLayer( theDriver, theSettings ),
+SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
+    TransportLayer( "serial", theSettings ),
     _mySerialPort( 0 ),
     _myUseUSBFlag( false ),
     _myPortNum( -1 ),
@@ -38,31 +38,43 @@ SerialTransport::SerialTransport(ASSDriver * theDriver, const dom::NodePtr & the
     _myNumReceivedBytes( 0 )
 
 {
-    onUpdateSettings( theSettings );
+    init( theSettings );
 }
 
 SerialTransport::~SerialTransport() {
+    stopThread();
     closeConnection();
 }
 
+bool 
+SerialTransport::settingsChanged(dom::NodePtr theSettings) {
+    bool myChangedFlag = false;
+
+    myChangedFlag |= settingChanged( theSettings, "TransportLayer", _myTransportName);
+
+    myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
+    myChangedFlag |= settingChanged( theSettings, "UseUSB", _myUseUSBFlag );
+    myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
+    myChangedFlag |= settingChanged( theSettings, "BitsPerWord", _myBitsPerSerialWord );
+    myChangedFlag |= settingChanged( theSettings, "Parity", _myParity );
+    myChangedFlag |= settingChanged( theSettings, "StopBits", _myStopBits );
+    myChangedFlag |= settingChanged( theSettings, "Handshaking", _myHandshakingFlag );
+
+    return myChangedFlag;
+}
+
 void 
-SerialTransport::onUpdateSettings(dom::NodePtr theSettings) {
-    //AC_PRINT << "SerialTransport::onUpdateSettings()";
+SerialTransport::init(dom::NodePtr theSettings) {
+    //AC_PRINT << "SerialTransport::init()";
 
-    bool myPortConfigChanged = false;
-    myPortConfigChanged |= getConfigSetting( theSettings, "SerialPort", _myPortNum, -1 );
-    myPortConfigChanged |= getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
-    myPortConfigChanged |= getConfigSetting( theSettings, "BaudRate", _myBaudRate, 57600 );
-    myPortConfigChanged |= getConfigSetting( theSettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
-    myPortConfigChanged |=
-            getConfigSetting( theSettings, "Parity", _myParity, SerialDevice::NO_PARITY );
-    myPortConfigChanged |= getConfigSetting( theSettings, "StopBits", _myStopBits, 1 );
-    myPortConfigChanged |= getConfigSetting( theSettings, "Handshaking", _myHandshakingFlag, false );
+    getConfigSetting( theSettings, "SerialPort", _myPortNum, -1 );
+    getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
+    getConfigSetting( theSettings, "BaudRate", _myBaudRate, 57600 );
+    getConfigSetting( theSettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
 
-    if (myPortConfigChanged) {
-        //AC_PRINT << "Serial port configuration changed.";
-        setState( NOT_CONNECTED );
-    }
+    getConfigSetting( theSettings, "Parity", _myParity, SerialDevice::NO_PARITY );
+    getConfigSetting( theSettings, "StopBits", _myStopBits, 1 );
+    getConfigSetting( theSettings, "Handshaking", _myHandshakingFlag, false );
 }
 
 
@@ -96,11 +108,18 @@ SerialTransport::establishConnection() {
 #endif
 
         if (_mySerialPort) {
-            _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
-                    _myParity, _myStopBits, _myHandshakingFlag);
-            _mySerialPort->setStatusLine( SerialDevice::RTS);
+            try {
+                _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
+                        _myParity, _myStopBits, _myHandshakingFlag, 0 , 1);
+                _mySerialPort->setStatusLine( SerialDevice::RTS);
 
-            setState( SYNCHRONIZING );
+                setState( SYNCHRONIZING );
+            } catch (const asl::SerialPortException & ex) {
+                if ( _mySerialPort ) {
+                    delete _mySerialPort;
+                    _mySerialPort = 0;
+                }
+            }
         }
     } else {
         AC_PRINT << "scanForSerialPort() No port configured.";
@@ -110,6 +129,7 @@ SerialTransport::establishConnection() {
 void 
 SerialTransport::readData() {
     try {
+        //AC_PRINT << "SerialTransport::readData()";
         size_t myMaxBytes = _myReceiveBuffer.size();
 
         double myCurrentTimeStamp = asl::Time();
@@ -125,8 +145,8 @@ SerialTransport::readData() {
 
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
-        int myPendingBytes = _mySerialPort->peek();
-        _myNumReceivedBytes += myPendingBytes;
+        _mySerialPort->peek();
+
         AC_DEBUG << "bytes received within the last " << NO_DATA_TIMEOUT 
                  << " seconds: " << _myNumReceivedBytes;
         /*
@@ -136,13 +156,17 @@ SerialTransport::readData() {
         
         _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
                 myMaxBytes );
+        _myNumReceivedBytes += myMaxBytes;
 
-        _myFrameBuffer.insert( _myFrameBuffer.end(),
+        _myTmpBuffer.insert( _myTmpBuffer.end(),
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
         //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {
-        AC_WARNING << ex;
-        _myDriver->createTransportLayerEvent( "lost_communication" );
+        //AC_WARNING << ex;
+        //_myDriver->createTransportLayerEvent( "lost_communication" );
+        _myFrameQueueLock.lock();
+        _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
+        _myFrameQueueLock.unlock();
         _myDeviceLostCounter++;
         setState(NOT_CONNECTED);
     }
@@ -168,7 +192,7 @@ SerialTransport::closeConnection() {
         try {
             _mySerialPort->setStatusLine( 0 );
         } catch ( const asl::SerialPortException & ex ) {
-            AC_WARNING << "Failed to disable RTS line: " << ex;
+            //AC_WARNING << "Failed to disable RTS line: " << ex;
         }
 
         /*

@@ -172,6 +172,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myASSManager.onASSEvent( theNode );
 
+
+        print( theNode );
+
         if (theNode.type == "configure" ) {
             _myASSManager.valueColor = new Vector4f(0,0,1,1);
             //print("event " + theNode.type + " grid size: " + theNode.grid_size);

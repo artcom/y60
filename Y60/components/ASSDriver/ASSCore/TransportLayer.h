@@ -14,7 +14,10 @@
 #include "ASSUtils.h"
 
 #include <asl/Ptr.h>
+#include <asl/PosixThread.h>
 #include <dom/Nodes.h>
+
+#include <queue>
 
 namespace y60 {
 
@@ -43,33 +46,48 @@ DEFINE_ENUM( DriverState, DriverStateEnum );
 
 class ASSDriver;
 
-class TransportLayer {
+class TransportLayer :  public asl::PosixThread {
     public:
-        TransportLayer(ASSDriver * theDriver, const dom::NodePtr & theSettingsNode);
+        TransportLayer(const char * theTransportName, const dom::NodePtr & theSettings);
         virtual ~TransportLayer();
 
-        void poll( RasterPtr theTargetRaster);
-        virtual void onUpdateSettings(dom::NodePtr theSettings) = 0;
+        void poll( /*RasterPtr theTargetRaster*/);
+        //virtual void onUpdateSettings(dom::NodePtr theSettings) = 0;
+        virtual bool settingsChanged(dom::NodePtr theSettings) = 0;
 
+
+        void stopThread();
+
+        void lockFrameQueue() {
+            _myFrameQueueLock.lock();    
+        }
+        void unlockFrameQueue() {
+            _myFrameQueueLock.unlock();    
+        }
+        std::queue<ASSEvent> & getFrameQueue() {
+            return _myFrameQueue;
+        }
+
+        void queueCommand( const char * theCommand );
 
         DriverState getState() const;
 
-        CommandResponse getCommandResponse();
-        void queueCommand( const char * theCommand );
-
         const asl::Vector2i & getGridSize() const;
-        int getGridSpacing() const;
+        int getGridSpacing() const; // XXX
         int getFirmwareVersion() const;
         int getFirmwareStatus() const;
         int getControllerId() const;
         int getFirmwareMode() const;
-        int getFramerate() const;
+        int getFramerate() const; // XXX
         int getLastFrameNumber() const;
         int getLastChecksum() const;
 
-        void dumpControllerStatus() const;
 
     protected:
+        static void threadMain( asl::PosixThread & theThread );
+
+        void dumpControllerStatus() const;
+        CommandResponse getCommandResponse();
         void setState( DriverState theState );
         void sendCommand( const std::string & theCommand );
         void handleConfigurationCommand();
@@ -77,8 +95,8 @@ class TransportLayer {
         unsigned readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
         unsigned getBytesPerStatusLine();
         size_t getBytesPerFrame();
-        void parseStatusLine(RasterPtr & theTargetRaster);
-        void readSensorValues( RasterPtr theTargetRaster );
+        void parseStatusLine(/*RasterPtr & theTargetRaster*/);
+        void readSensorValues( /*RasterPtr theTargetRaster*/ );
         void synchronize();
         const char * getFirmwareModeName(unsigned theId) const;
 
@@ -90,20 +108,29 @@ class TransportLayer {
         virtual void writeData(const char * theData, size_t theSize) = 0;
         virtual void closeConnection() = 0;
 
+        std::string    _myTransportName;
+        bool           _myRunningFlag;
         DriverState    _myState;
-        std::vector<unsigned char> _myFrameBuffer;
+        std::vector<unsigned char> _myTmpBuffer;
         std::vector<unsigned char> _myReceiveBuffer;
+        unsigned char * _myFrameBuffer;
+
         asl::Vector2i _myGridSize;
         int           _myGridSpacing;
         bool _myMagicTokenFlag;
         int _myExpectedLine;
 
-        dom::NodePtr _mySettings;
-        ASSDriver * _myDriver;
+        //dom::NodePtr _mySettings;
+        //ASSDriver * _myDriver;
 
-        std::list<std::string> _myCommandQueue; // TODO: use a queue?
+        std::queue<ASSEvent> _myFrameQueue;
+        asl::ThreadLock _myFrameQueueLock;
+
+        std::queue<std::string> _myCommandQueue; // TODO: use a queue?
+        asl::ThreadLock _myCommandQueueLock;
         CommandState _myConfigureState;
         double       _myLastCommandTime;
+        int          _myEventQueueSize;
 
         // Controller Status
         // TODO: expose to JavaScript
@@ -122,7 +149,7 @@ class TransportLayer {
         unsigned _myReceivedFrames;    
         unsigned _myChecksumErrorCounter;
     private:
-        TransportLayer();
+        //TransportLayer();
 
 };
 

@@ -21,12 +21,14 @@ class ASSDriver;
 
 class SerialTransport : public TransportLayer {
     public:
-        SerialTransport(ASSDriver * theDriver, const dom::NodePtr & theSettings);
+        SerialTransport(const dom::NodePtr & theSettings);
         ~SerialTransport();
 
-        void onUpdateSettings(dom::NodePtr theSettings);
 
     protected:
+        virtual bool settingsChanged(dom::NodePtr theSettings);
+        void init(dom::NodePtr theSettings);
+
         void establishConnection();
         void readData();
         void closeConnection();

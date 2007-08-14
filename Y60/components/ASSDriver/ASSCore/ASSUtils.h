@@ -29,6 +29,23 @@ struct RasterHandle {
     RasterPtr raster;
 };
 
+enum ASSEventType {
+    ASS_FRAME,
+    ASS_LOST_SYNC,
+    ASS_LOST_COM
+};
+
+struct ASSEvent {
+    ASSEvent(ASSEventType theType) : type( theType ) {}
+
+    ASSEvent(const asl::Vector2i & theSize, unsigned char * theData) :
+        type( ASS_FRAME ), size( theSize ), data( theData ) {}
+
+    ASSEventType type;
+    asl::Vector2i size;
+    unsigned char * data;
+};
+
 DEFINE_EXCEPTION( ASSException, asl::Exception );
 
 dom::NodePtr getASSSettings(dom::NodePtr theSettings);
@@ -73,6 +90,38 @@ getConfigSetting(dom::NodePtr theSettings, const std::string & theName, Enum & t
 {
     return getConfigSetting( theSettings, theName, theValue, Enum( theDefault ));
 }
+
+
+template <class T>
+bool
+settingChanged(dom::NodePtr theSettings, const std::string & theName, T & theValue) {
+    dom::NodePtr myNode = theSettings->childNode( theName );
+    if ( ! myNode ) {
+        throw ASSException(std::string("No node named '") + theName +
+                "' found in configuration.", PLUS_FILE_LINE);
+    }
+
+    if ( myNode->childNodesLength() != 1 ) {
+        throw asl::Exception(std::string("Configuration node '") + theName +
+            "' must have exactly one child.", PLUS_FILE_LINE);
+    }
+    if ( myNode->childNode("#text") ) {
+        T myNewValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
+        if (myNewValue != theValue) {
+            AC_PRINT << theName << " changed. was: " << theValue << " is: " << myNewValue;
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
+                "' does not have a text child." , PLUS_FILE_LINE);
+    }
+    return true; // avoid a warning
+}
+
+
+
 
 void dumpBuffer(std::vector<unsigned char> & theBuffer);
 void fillBufferWithString(std::vector<unsigned char> & theBuffer, const char * theString);

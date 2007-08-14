@@ -117,9 +117,7 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 }
 
 void
-ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize,
-                               RasterPtr & theRawRaster)
-{
+ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize ) {
     _myGridSize = theGridSize;
 
     _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
@@ -131,7 +129,6 @@ ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize,
     _myMomentRaster = allocateRaster(MOMENT_RASTER);
 
     createTransportLayerEvent( "configure" );
-    theRawRaster = _myRawRaster.raster;
 }
 
 RasterHandle
@@ -668,62 +665,73 @@ ASSDriver::drawMarkers() {
     }
 }
 
-
+void
+ASSDriver::drawLabel(jslib::AbstractRenderWindow * theWindow, const std::string & theText) {
+    const Vector4f & myOldColor = theWindow->getTextColor();
+    theWindow->setTextColor( _myTextColor );
+    theWindow->renderText( Vector2f( 50, 50 ), theText, "Screen15");
+    theWindow->setTextColor( myOldColor );
+}
 
 void
 ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
-    if ( _myScene && _myOverlay) {
-        y60::OverlayPtr myOverlay = _myOverlay->getFacade<y60::Overlay>();
+    if ( _myScene) {
+        if (_myOverlay) {
+            y60::OverlayPtr myOverlay = _myOverlay->getFacade<y60::Overlay>();
 
-        if ( ! myOverlay->get<VisibleTag>() ) {
-            return;
+            if ( ! myOverlay->get<VisibleTag>() ) {
+                return;
+            }
+
+
+            glPushAttrib( GL_ALL_ATTRIB_BITS );
+            glMatrixMode( GL_PROJECTION );
+            glPushMatrix();
+            glLoadIdentity();
+
+            dom::Node * myOverlayList = _myOverlay->parentNode();
+            if ( ! myOverlayList ) {
+                throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
+            }
+            dom::Node * myViewportNode = myOverlayList->parentNode();
+            if ( ! myViewportNode ) {
+                throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
+            }
+            y60::ViewportPtr myViewport = myViewportNode->getFacade<y60::Viewport>();
+
+            gluOrtho2D(0.0, myViewport->get<ViewportWidthTag>(), myViewport->get<ViewportHeightTag>(), 0.0);
+
+            glMatrixMode( GL_MODELVIEW );
+            if (_myTransportLayer) {
+                if ( _myTransportLayer->getState() == RUNNING ) {
+                    glPushMatrix();
+                    glLoadMatrixf( static_cast<const GLfloat*>( getTransformationMatrix().getData()));
+
+                    glDisable( GL_DEPTH_TEST );
+
+                    drawGrid();
+                    drawMarkers();
+
+                    glPopMatrix();
+
+                    if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
+                        unsigned char myValue = * (_myRawRaster.raster->pixels().begin() +
+                                int(_myProbePosition[1]) * _myPoTSize[0] + int(_myProbePosition[0]));
+                        drawLabel(theWindow, string("Value") + as_string(_myProbePosition) +
+                                " = " + as_string(int(myValue)));
+                    }
+                } else {
+                    drawLabel( theWindow, _myTransportLayer->getState().asString());
+                }
+
+            }
+            glMatrixMode( GL_PROJECTION );
+            glPopMatrix();
+            glMatrixMode( GL_MODELVIEW );
+            glPopAttrib();
+        } else {
+            drawLabel( theWindow, "No transport layer");
         }
-
-            
-        glPushAttrib( GL_ALL_ATTRIB_BITS );
-        glMatrixMode( GL_PROJECTION );
-        glPushMatrix();
-        glLoadIdentity();
-
-        dom::Node * myOverlayList = _myOverlay->parentNode();
-        if ( ! myOverlayList ) {
-            throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
-        }
-        dom::Node * myViewportNode = myOverlayList->parentNode();
-        if ( ! myViewportNode ) {
-            throw ASSException("Failed to get owning viewport.", PLUS_FILE_LINE );
-        }
-        y60::ViewportPtr myViewport = myViewportNode->getFacade<y60::Viewport>();
-
-        gluOrtho2D(0.0, myViewport->get<ViewportWidthTag>(), myViewport->get<ViewportHeightTag>(), 0.0);
-
-        glMatrixMode( GL_MODELVIEW );
-        glPushMatrix();
-        glLoadMatrixf( static_cast<const GLfloat*>( getTransformationMatrix().getData()));
-
-        glDisable( GL_DEPTH_TEST );
-
-        drawGrid();
-        drawMarkers();
-
-        glPopMatrix();
-
-        if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
-            unsigned char myValue = * (_myRawRaster.raster->pixels().begin() +
-                int(_myProbePosition[1]) * _myPoTSize[0] + int(_myProbePosition[0]));
-
-            const Vector4f & myOldColor = theWindow->getTextColor();
-            theWindow->setTextColor( _myTextColor );
-            theWindow->renderText( Vector2f( 50, 50 ), string("Value") +
-                    as_string(_myProbePosition) + " = " + as_string(int(myValue)), "Screen15");
-            theWindow->setTextColor( myOldColor );
-        }
-        
-
-        glMatrixMode( GL_PROJECTION );
-        glPopMatrix();
-        glMatrixMode( GL_MODELVIEW );
-        glPopAttrib();
     }
 }
 
@@ -785,15 +793,21 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
     dom::NodePtr mySettings = getASSSettings( theSettings );
 
-    string myTransportName;
-    getConfigSetting( mySettings, "TransportLayer", myTransportName, string("serial") );
-    if ( myTransportName == "serial" ) {
-        _myTransportLayer = TransportLayerPtr( new SerialTransport( this, mySettings ) );
-    } /*else if ( myTransportName == "udp") {
-        TODO: UDP transport layer
-    }*/ else {
-        throw ASSException(string("Unknown transport layer '") + myTransportName + "'",
-                PLUS_FILE_LINE);
+    if ( _myTransportLayer && _myTransportLayer->settingsChanged( mySettings ) ) {
+        _myTransportLayer = TransportLayerPtr( 0 );
+    }
+
+    if ( ! _myTransportLayer ) {
+        string myTransportName;
+        getConfigSetting( mySettings, "TransportLayer", myTransportName, string("serial") );
+        if ( myTransportName == "serial" ) {
+            _myTransportLayer = TransportLayerPtr( new SerialTransport(mySettings) );
+        } /*else if ( myTransportName == "udp") {
+            TODO: UDP transport layer
+        }*/ else {
+            throw ASSException(string("Unknown transport layer '") + myTransportName + "'",
+                    PLUS_FILE_LINE);
+        }
     }
 
     getConfigSetting( mySettings, "ComponentThreshold", _myComponentThreshold, 5 );
@@ -833,10 +847,53 @@ void
 ASSDriver::processInput() {
     
     if (_myTransportLayer) {
-        _myTransportLayer->poll( _myRawRaster.raster );
+        _myTransportLayer->lockFrameQueue();
+        std::queue<ASSEvent> & myFrameQueue = _myTransportLayer->getFrameQueue();
+        while ( ! myFrameQueue.empty() ) {
+            ASSEvent myEvent = myFrameQueue.front();
+            myFrameQueue.pop();
+            switch (myEvent.type) {
+                case ASS_FRAME:
+                    {
+                        if (myEvent.size != _myGridSize ) {
+                            allocateGridBuffers( myEvent.size );
+                        }
+                        copyFrame( myEvent.data );
+                        // TODO use smart pointers 
+                        delete [] myEvent.data;
+                        processSensorValues();
+                    }
+                    break;
+                case ASS_LOST_SYNC:
+                    createTransportLayerEvent("lost_sync");
+                    break;
+                case ASS_LOST_COM:
+                    createTransportLayerEvent("lost_communication");
+                    break;
+            }
+        }
+        _myTransportLayer->unlockFrameQueue();
     } else {
         AC_PRINT << "No TransportLayer";
     }
+}
+
+void
+ASSDriver::copyFrame(unsigned char * theData ) {
+    
+    y60::RasterOfGRAY & myRaster = *
+            dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
+
+
+    unsigned char * myDstPtr = _myRawRaster.raster->pixels().begin();
+    unsigned char * mySrcPtr = theData;
+    for (unsigned y = 0; y < _myGridSize[1]; ++y) {
+        memcpy( myDstPtr, mySrcPtr, _myGridSize[0]);
+        myDstPtr += _myPoTSize[0];
+        mySrcPtr += _myGridSize[0];
+    }
+
+    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 }
 
 void 
