@@ -1,22 +1,42 @@
-//=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+// Copyright (C) 1993-2007, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//   $RCSfile: Conduit.h,v $
-//   $Author: david $
-//   $Revision: 1.12 $
-//   $Date: 2004/11/22 11:03:54 $
+// Description: 
+//     Classes for networked or local communication between processes
 //
-//  Description: Collects statistics about the render state
+// Last Review:  ms 2007-08-15
 //
-//=============================================================================
-
+//  review status report: (perfect, ok, fair, poor, disaster, notapp (not applicable))
+//    usefulness              :      ok
+//    formatting              :      ok
+//    documentation           :      ok
+//    test coverage           :      ok
+//    names                   :      ok
+//    style guide conformance :      ok
+//    technological soundness :      ok
+//    dead code               :      ok
+//    readability             :      ok
+//    understandability       :      fair
+//    interfaces              :      ok
+//    confidence              :      ok
+//    integration             :      ok
+//    dependencies            :      ok
+//    error handling          :      ok
+//    logging                 :      notapp
+//    cheesyness              :      ok
+//
+//    overall review status   :      ok
+//
+//    recommendations: add high-level documentation, improve doxygen documentation 
+*/
 #ifndef __asl_Conduit_included_
 #define __asl_Conduit_included_
 
@@ -32,12 +52,14 @@ namespace asl {
 /*! \addtogroup aslipc */
 /* @{ */
 
+//! Basic Conduit. Can be used as-is for a non-threaded, client conduit. 
 template <class POLICY>
 class Conduit {
     public:
         typedef asl::Ptr<Conduit> Ptr;
         typedef asl::WeakPtr<Conduit> WPtr;
 
+        /// Create a new conduit, connecting to a given remote endpoint
         Conduit(typename POLICY::Endpoint theRemoteEndpoint) : _myValidFlag(false) {
             _myHandle = POLICY::connectTo(theRemoteEndpoint);
             _myValidFlag = true;
@@ -47,18 +69,43 @@ class Conduit {
             disconnect();
         }
 
+        /// disconnect from the remote endpoint 
         void disconnect() {
             if (_myHandle) {
                 POLICY::disconnect(_myHandle);
             }
         }
 
+        /// must be called periodically to handle I/O. 
         virtual bool handleIO(int theTimeout = 0) {
             if (_myValidFlag) {
                 _myValidFlag = POLICY::handleIO(_myHandle, _myInQueue, _myOutQueue, theTimeout); 
             }
             return _myValidFlag;
         }
+        /// Send all outgoing data 
+        virtual bool flush(int theTimeout) {
+            Time myTimer;
+            long long myEndTime = myTimer.millis() + theTimeout;
+            long long myTimeLeft = myEndTime - myTimer.millis();
+            while (!_myOutQueue.empty() && myTimeLeft > 0 ) {
+                handleIO(static_cast<int>(myTimeLeft));
+                myTimer.setNow();
+                long long myTimeLeft = myEndTime - myTimer.millis();
+            }
+            return _myOutQueue.empty();
+        }
+        
+        /// check status of the conduit.
+        ///@returns true if the conduit is still operational, otherwise false.
+        bool isValid() const {
+            return _myValidFlag;
+        }
+
+        /** @name sending and receiving raw data.
+         */
+        //@{
+        
         /// receive raw data (no framing)
         virtual bool receiveData(CharBuffer & theBuffer) {
             if (!handleIO()) {
@@ -90,16 +137,25 @@ class Conduit {
             }
             return true;
         }
+        //@}
 
-        /// sends a string as a block (framing) 
+        /** @name sending and receiving framed data.
+         * Each frame starts with a one-byte (if smaller than 255 octets) or a 5-byte header (0xff + Unsigned32) 
+         * followed by the payload.
+         */
+        //@{
+
+        /// sends a string as a block (framing). 
+        /**The other side should use a framing call to receive the data */
         virtual bool send(const std::string & theString) {
             const unsigned char * myStart = reinterpret_cast<const unsigned char *>(theString.c_str()); 
             return send(Block(myStart, myStart+theString.length()));
         }
         
-        /// sends a string as a block (framing) 
+        /// sends a block of data (framing).
+        /**The other side should use a framing call to receive the data */
         virtual bool send(const ReadableBlock & theBlock) {
-            unsigned long mySize = theBlock.size();
+            asl::Unsigned32 mySize = theBlock.size();
             CharBufferPtr myBuffer(new CharBuffer(mySize+5)); 
             char * myDataPos = 0;
             if (mySize < 0xff) {
@@ -116,19 +172,8 @@ class Conduit {
             return sendData(myBuffer);
         }
 
-        virtual bool flush(int theTimeout) {
-            Time myTimer;
-            long long myEndTime = myTimer.millis() + theTimeout;
-            long long myTimeLeft = myEndTime - myTimer.millis();
-            while (!_myOutQueue.empty() && myTimeLeft > 0 ) {
-                handleIO(static_cast<int>(myTimeLeft));
-                myTimer.setNow();
-                long long myTimeLeft = myEndTime - myTimer.millis();
-            }
-            return _myOutQueue.empty();
-        }
-
-        /// receives a string (framing) 
+        /// receives a string (framing).
+        /**The other side should use a framing call to receive the data */
         virtual bool receive(std::string & myReceivedString, int theTimeout) {
             Time myTimer;
             long long myEndTime = myTimer.millis() + theTimeout;
@@ -142,7 +187,8 @@ class Conduit {
             }
             return hasReceived;
         }
-        /// receives a string 
+        /// receives a string (framing).
+        /**The other side should use a framing call to receive the data */
         virtual bool receive(std::string & myReceivedString) {
             Block myInBlock(0);
             if (receive(myInBlock)) {
@@ -153,7 +199,8 @@ class Conduit {
             return false;
         }
         
-        /// receives a Block of data. The new data is appended to myReceivedBlock
+        /// receives a Block of data (framing).
+        /**The other side should use a framing call to receive the data */
         virtual bool receive(ResizeableBlock & myReceivedBlock) {
             bool dataReceived = false;
             CharBufferPtr myStringBuffer(new CharBuffer(0));
@@ -165,7 +212,7 @@ class Conduit {
                 }
                 char * myStringBegin = &(*myStringBuffer)[0];
                 // peek block size
-                unsigned long myBlockSize = *(reinterpret_cast<unsigned char*>(myStringBegin++));
+                asl::Unsigned32 myBlockSize = *(reinterpret_cast<unsigned char*>(myStringBegin++));
                 int myHeaderSize = 1;
                 if (myBlockSize == 0xFF) {
                     if (myStringBuffer->size() < 1+sizeof(myBlockSize)) {
@@ -173,7 +220,7 @@ class Conduit {
                         // go back for more data
                         continue;
                     }
-                    myBlockSize = *(reinterpret_cast<unsigned long*>(myStringBegin));
+                    myBlockSize = *(reinterpret_cast<asl::Unsigned32*>(myStringBegin));
                     myStringBegin += sizeof(myBlockSize);
                     myHeaderSize = sizeof(myBlockSize)+1;
                 }
@@ -191,10 +238,8 @@ class Conduit {
             }
             return dataReceived;
         }
+        //@}
        
-        bool isValid() const {
-            return _myValidFlag;
-        }
     protected:
         /// create a new conduit using an already connected I/O handle
         Conduit(typename POLICY::Handle theHandle) : _myHandle(theHandle) {

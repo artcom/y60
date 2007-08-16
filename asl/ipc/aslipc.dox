@@ -1,10 +1,18 @@
 
 /** \defgroup aslipc Interprocess Communications (aslipc)
- *  Classes for networked or local communication between processes. Policies determine what protocoll is
+ *
+ *  Classes for networked or local communication between processes. Policies determine what protocol is
  *  used (see ConduitPolicy). Multithreaded servers accept multiple connections to clients.
  *
  *  \image html aslipc.jpg Client-Server interaction with the Conduit classes
  */
+
+/** \defgroup ipcPolicies Policies
+ * @ingroup aslipc
+ *
+ * Specifies what protocol (tcp, named pipes) the conduit should use.
+ */
+
 
 /* vim: set filetype=cpp : */
 

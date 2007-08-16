@@ -35,8 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: change namespace
-//                     explain use of this class
+//    recommendations: change namespace, explain use of this class
 */
 
 #ifndef INCL_INET_ENDPOINT

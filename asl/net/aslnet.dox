@@ -1,0 +1,11 @@
+
+/** \defgroup aslnet Interprocess Communications (aslipc)
+ *
+ *  OS Abstraction Layer for socket API and socket-related convenience functions
+ *
+ *    overall review status :     ok
+ *    recommendation summary: change namespace, remove superflurous classes, 
+ *                            merge net_functions & co, add doxygen group, fix doxygen tags, 
+ *                            clean up tests & test classes 
+ */
+
