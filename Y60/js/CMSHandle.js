@@ -77,8 +77,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
     }
 
     obj.synchronize = function(theRandomWaitDuration) {
-        if ( _mySyncFlag ) {
-            fetchPresentation(theRandomWaitDuration); 
+        if ( _mySyncFlag && _myPresentation === null) {
+            obj.fetchPresentation(theRandomWaitDuration); 
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
             Logger.info("CMS synchronization disabled.");
             Logger.info("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -241,7 +241,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         }
         return true;
     }
-    function fetchPresentation(theRandomWaitDuration) {
+    obj.fetchPresentation = function(theRandomWaitDuration) {
         Logger.info ("Fetching presentation.xml");
         if (theRandomWaitDuration) {
             msleep(Math.random()*theRandomWaitDuration*1000);
