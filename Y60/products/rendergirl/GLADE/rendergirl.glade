@@ -414,7 +414,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Centered Trackball</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">True</property>
+				  <property name="active">False</property>
 				  <property name="group">picking_trackball</property>
 				  <signal name="activate" handler="on_centered_trackball_activate" last_modification_time="Wed, 20 Apr 2005 09:54:39 GMT"/>
 				</widget>
@@ -425,7 +425,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Fly Mover</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">True</property>
+				  <property name="active">False</property>
 				  <property name="group">picking_trackball</property>
 				  <signal name="activate" handler="on_fly_mover_activate" last_modification_time="Tue, 19 Apr 2005 14:35:06 GMT"/>
 				</widget>
@@ -436,7 +436,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Walk Mover</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">True</property>
+				  <property name="active">False</property>
 				  <property name="group">picking_trackball</property>
 				  <signal name="activate" handler="on_walk_mover_activate" last_modification_time="Fri, 24 Jun 2005 16:07:12 GMT"/>
 				</widget>
@@ -647,7 +647,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Body</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">True</property>
+					  <property name="active">False</property>
 					  <property name="group">off1</property>
 					  <signal name="activate" handler="on_bb_body_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
@@ -658,7 +658,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Shape</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">True</property>
+					  <property name="active">False</property>
 					  <property name="group">off1</property>
 					  <signal name="activate" handler="on_bb_shape_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
@@ -669,7 +669,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Hierarchy</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">True</property>
+					  <property name="active">False</property>
 					  <property name="group">off1</property>
 					  <signal name="activate" handler="on_hierarchy_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
