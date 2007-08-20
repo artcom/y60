@@ -276,7 +276,7 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 
 #ifndef GL_EXT_framebuffer_blit
 // XXX these should come from the gl.h header but currently don't (Jan.2007)
-//     also, these seem not to be present on OSX at all as of Aug.2007 -ingo
+//     they do now, at least on current nvidia-glx. revisit. (Aug.2007)
 #define GL_EXT_framebuffer_blit 1
 #define GL_READ_FRAMEBUFFER_EXT         0x8CA8
 #define GL_DRAW_FRAMEBUFFER_EXT         0x8CA9
@@ -285,36 +285,25 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 typedef void (APIENTRYP PFNGLBLITFRAMEBUFFEREXTPROC) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
                             GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
                             GLbitfield mask, GLenum filter);
+#endif
 
 DEF_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT );
 #define glBlitFramebufferEXT _ac_glBlitFramebufferEXT
-#endif
 
 #ifndef GL_EXT_framebuffer_multisample
 // XXX these should come from the gl.h header but currently don't (Jan.2007)
-//     also, these seem not to be present on OSX at all as of Aug.2007 -ingo
+//     they do now, at least on current nvidia-glx. revisit. (Aug.2007)
 #define GL_EXT_framebuffer_multisample 1
 #define GL_RENDERBUFFER_SAMPLES_EXT               0x8CAB
 #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT 0x8D56
 #define GL_MAX_SAMPLES_EXT                        0x8D57
 typedef void (APIENTRYP PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+#endif
 
 DEF_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC, glRenderbufferStorageMultisampleEXT );
 #define glRenderbufferStorageMultisampleEXT _ac_glRenderbufferStorageMultisampleEXT
-#endif
 
-#endif // OSX
-
-#ifdef LINUX
-#ifdef GL_EXT_framebuffer_blit
-DEF_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT );
-#define glBlitFramebufferEXT _ac_glBlitFramebufferEXT
-#endif
-#ifdef GL_EXT_framebuffer_multisample
-DEF_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC, glRenderbufferStorageMultisampleEXT );
-#define glRenderbufferStorageMultisampleEXT _ac_glRenderbufferStorageMultisampleEXT
-#endif
-#endif // LINUX
+#endif // 1
 
 // Swap interval
 #ifdef WIN32
