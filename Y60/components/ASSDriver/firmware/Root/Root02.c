@@ -159,7 +159,15 @@ uint8_t i, i2;
     g_mode = ABS_MODE;
 
     //check if EEPROM contains stored values; if not write default values
-    if(EEPROM_read(EEPROM_LOC_FORMAT_ENTRY) != (EEPROM_FORMAT_KEY&0xFF)  ||  EEPROM_read(EEPROM_LOC_FORMAT_ENTRY+1) != (EEPROM_FORMAT_KEY>>8)){
+    //check format entry
+#define EEPROM_KEY_RETRIES 8
+    for(i=0; i<EEPROM_KEY_RETRIES; i++){
+        if(EEPROM_read(EEPROM_LOC_FORMAT_ENTRY) == (EEPROM_FORMAT_KEY&0xFF)  &&  EEPROM_read(EEPROM_LOC_FORMAT_ENTRY+1) == (EEPROM_FORMAT_KEY>>8)){
+            //key found!
+            break;
+        }
+    }
+    if(i == EEPROM_KEY_RETRIES){
         EEPROM_write(EEPROM_LOC_FORMAT_ENTRY, (EEPROM_FORMAT_KEY&0xFF));
         EEPROM_write(EEPROM_LOC_FORMAT_ENTRY+1, (EEPROM_FORMAT_KEY>>8));
 
@@ -873,22 +881,7 @@ uint8_t  testBuffer[20];
         //check if system should switch to config mode because of RTS active
         if((g_dataTransmitMode&1) != 0){
             if((g_dataTransmitMode&4) != 0){//RTS-line
-                if(g_ConfigMode == 0){
-                    g_ConfigMode = 2;//skip welcome message and directly go to step 2
-                    g_dataTransmitMode |= 2; //indicate that config mode was triggered by RTS line
-                }
-                if(g_ConfigMode == 1){
-                    g_dataTransmitMode &= ~2;//indicate that config mode was started by host meanwhile
-                }
-            }
-        }
-        if((g_dataTransmitMode&(1+4)) != (1+4)){
-            if((g_dataTransmitMode&2) != 0){
-                //switch back to normal operation
-                if(g_ConfigMode == 2){//wait until any config command has been finished any system is idling
-                    g_ConfigMode = 0;
-                    g_dataTransmitMode &= ~2;
-                }
+                g_ConfigMode = 2;//skip welcome message and directly go to step 2
             }
         }
 
