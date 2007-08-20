@@ -820,12 +820,12 @@ void * aglGetProcAddress (char * pszProc)
 #endif
 #ifdef GL_EXT_framebuffer_blit
         if (queryOGLExtension("GL_EXT_framebuffer_blit")) {
-            SET_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXT, glBlitFramebufferEXT);
+            SET_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT);
         }
 #endif
 #ifdef GL_EXT_framebuffer_multisample
         if (queryOGLExtension("GL_EXT_framebuffer_multisample")) {
-            SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXT, glRenderbufferStorageMultisampleEXT);
+            SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC, glRenderbufferStorageMultisampleEXT);
         }
 #endif
 
