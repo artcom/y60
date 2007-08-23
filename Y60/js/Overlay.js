@@ -587,7 +587,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
         } else {
             myImage = Node.createElement("movie");
             myImage.name = theSource;
-            myImage.resize = "pad";
+            myImage.resize = "none";
             myImage.src  = expandEnvironment(theSource);
             theScene.images.appendChild(myImage);
             if (theAudioFlag == undefined) {
