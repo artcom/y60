@@ -618,14 +618,6 @@ namespace y60 {
         myMovie->getRasterPtr()->clear();
 
 
-        if (myMovie->get<ImageResizeTag>() == IMAGE_RESIZE_PAD) { 
-            float myXResize = float(_myFrameWidth) / asl::nextPowerOfTwo(_myFrameWidth);
-            float myYResize = float(_myFrameHeight) / asl::nextPowerOfTwo(_myFrameHeight);
-
-            asl::Matrix4f myMatrix;
-            myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-            myMovie->set<ImageMatrixTag>(myMatrix);
-        }
 
         _myFrameRate = (1.0 / av_q2d(myVCodec->time_base));
         myMovie->set<FrameRateTag>(_myFrameRate);

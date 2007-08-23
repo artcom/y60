@@ -139,6 +139,12 @@ namespace y60 {
         CHECK_OGL_ERROR;
         unsigned int myWidth = theImage->get<ImageWidthTag>();
         unsigned int myHeight = theImage->get<ImageHeightTag>();
+        if (theImage->get<ImageResizeTag>() != IMAGE_RESIZE_NONE) { 
+            // be sure everthing is power of 2, images are always, but movies not!!
+            myWidth = nextPowerOfTwo(theImage->get<ImageWidthTag>());
+            myHeight = nextPowerOfTwo(theImage->get<ImageHeightTag>());
+        }
+
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
 
 		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 

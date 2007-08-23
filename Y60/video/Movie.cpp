@@ -402,6 +402,14 @@ namespace y60 {
          * _myLoadedFilename against ImageSourceTag and finds them to differ.
          */
         _myLoadedFilename = get<ImageSourceTag>();
+        if (get<ImageResizeTag>() == IMAGE_RESIZE_PAD) { 
+            float myXResize = float(get<ImageWidthTag>()) / asl::nextPowerOfTwo(get<ImageWidthTag>());
+            float myYResize = float(get<ImageHeightTag>()) / asl::nextPowerOfTwo(get<ImageHeightTag>());
+
+            asl::Matrix4f myMatrix;
+            myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
+            set<ImageMatrixTag>(myMatrix);
+        }        
     }
 
     bool
