@@ -195,14 +195,6 @@ namespace y60 {
         myMovie->getRasterPtr()->clear();
 
 
-        // Setup size and image matrix
-        float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
-        float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
-
-        asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-        myMovie->set<ImageMatrixTag>(myMatrix);
-
         // framerate
         double myFPS;
         myFPS = (1.0 / av_q2d(_myVStream->codec->time_base));
