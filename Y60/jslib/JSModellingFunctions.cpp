@@ -37,17 +37,25 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     try {
         DOC_BEGIN("Creates a new transform node and adds it to a given parent");
         DOC_PARAM("theParentNode", "A node in the world", DOC_TYPE_NODE);
+        DOC_PARAM("theName", "Name of the transform", DOC_TYPE_STRING);
         DOC_RVAL("The new transform node", DOC_TYPE_NODE);
         DOC_END;
-        ensureParamCount(argc, 1);
+        
+        ensureParamCount(argc, 1, 2);
 
         dom::NodePtr  myParentNode(0);
         if (!convertFrom(cx, argv[0], myParentNode)) {
             JS_ReportError(cx,"CreateTransform: argument 1 is not a node");
             return JS_FALSE;
         }
-
-        dom::NodePtr myResult = createTransform(myParentNode);
+        dom::NodePtr myResult;
+        if (argc == 1) {
+            myResult = createTransform(myParentNode);
+        } else {
+            string myTransformName;
+            convertFrom(cx, argv[1], myTransformName);
+            myResult = createTransform(myParentNode, myTransformName);
+        }
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 

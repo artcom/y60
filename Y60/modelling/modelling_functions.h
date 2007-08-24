@@ -74,7 +74,9 @@ dom::NodePtr createColorMaterial(y60::ScenePtr theScene,
                                  const std::string & theName = "Color",
                                  bool theTransparencyFlag = false);
 
-dom::NodePtr createTransform(dom::NodePtr theParentNode);
+dom::NodePtr createTransform(dom::NodePtr theParentNode,
+                             const std::string & theTransformName = "Transform");
+                             
 dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);
 
 /// Set node alpha value. Node can be a body or a shape.

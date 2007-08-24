@@ -32,12 +32,12 @@ using namespace asl;
 namespace y60 {
 
     dom::NodePtr
-    createTransform(dom::NodePtr theParentNode) {
+    createTransform(dom::NodePtr theParentNode, const std::string & theTransformName) {
         if (!theParentNode) {
               throw asl::Exception("createTransform:: theParentNode is null!");
         }
         WorldBuilderBase myParent(theParentNode);
-        TransformBuilder myTransform("Transform");
+        TransformBuilder myTransform(theTransformName);
         myParent.appendObject(myTransform);
         return myTransform.getNode();
     }
