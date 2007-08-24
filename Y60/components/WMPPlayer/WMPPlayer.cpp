@@ -17,6 +17,10 @@
 //
 //=============================================================================
 
+#define _WIN32_WINNT 0x0501
+#include <windows.h>
+#include <winuser.h>
+
 #include "WMPPlayer.h"
 #include "EventListener.h"
 
@@ -24,6 +28,8 @@
 #include <asl/os_functions.h>
 #include <asl/Time.h>
 #include <y60/JSWrapper.impl>
+
+
 
 
 using namespace std;
@@ -221,14 +227,30 @@ namespace y60 {
         hr = _myWMPSettings->get_volume(&myVolume);
         return float(myVolume) / 100.0;
     }
-
+    
     void
     WMPPlayer::setVolume(double theVolume) {
         long myVolume = long(theVolume * 100);
         HRESULT hr;
         hr = _myWMPSettings->put_volume(myVolume);
     }
-
+    
+    void
+    WMPPlayer::setCurrentPosition(double theStartPosition) {
+        _myWMPControl->put_currentPosition(theStartPosition);
+    }
+    
+    double
+    WMPPlayer::getCurrentPosition() const {
+        if ( ! _myWMPControl) {
+            AC_WARNING << "no control available";
+            return 0;
+        }
+        double myPosition;
+        _myWMPControl->get_currentPosition(&myPosition);
+        return myPosition;
+    }    
+    
     void
     WMPPlayer::play(double theStartPosition) {
         AC_INFO << "WMPPlayer::startMovie at position" << theStartPosition;
@@ -249,6 +271,15 @@ namespace y60 {
     WMPPlayer::pause() {
         AC_INFO << "WMPPlayer::pauseMovie";
         _myWMPControl->pause();
+    }
+
+    void
+    WMPPlayer::setAlpha(float theAlpha) {
+        AC_INFO << "WMPPlayer::setAlpha " << theAlpha;
+        SetWindowLong(_myParentWindow, GWL_EXSTYLE,
+                      GetWindowLong(_myParentWindow, GWL_EXSTYLE) | WS_EX_LAYERED);
+        bool myErrorCode = SetLayeredWindowAttributes(_myParentWindow, 0, int(theAlpha * 255.0f), LWA_ALPHA);
+        AC_DEBUG << "ErrorCode: " <<GetLastError();
     }
 
     string

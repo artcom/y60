@@ -34,7 +34,6 @@
 #include <asl/MappedBlock.h>
 #include <asl/Exception.h>
 
-
 class EventListener;
 namespace y60 {
     DEFINE_EXCEPTION(WindowsMediaPlayerException, asl::Exception);
@@ -62,6 +61,8 @@ namespace y60 {
             void setCanvasSize(const asl::Vector2i & theSize);
             void setVisible(bool theFlag);
             void setVolume(double theVolume);
+            void setCurrentPosition(double theStartPosition);
+            void setAlpha(float theAlpha);
             void setLoopCount(unsigned theLoopCount); //0 == indefinite, 1 or more
 
             void play(double theStartPosition = DBL_MAX);
@@ -73,6 +74,7 @@ namespace y60 {
             asl::Vector2i getCanvasSize() const;
             double getDuration() const;
             double getVolume() const;
+            double getCurrentPosition() const;
             bool isVisible() const;
             unsigned getLoopCount() const;
             std::string getPlayState() const;

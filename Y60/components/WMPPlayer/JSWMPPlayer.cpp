@@ -56,6 +56,14 @@ setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+setAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets alpha value of the window");
+    DOC_PARAM("theAlpha", "", DOC_TYPE_STRING);
+    DOC_END;
+    return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::setAlpha,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Starts playback of the movie at a given position" \
               "If no position is given, it starts at the current position");
@@ -102,6 +110,7 @@ JSWMPPlayer::Functions() {
         {"play",                 play,                    0},
         {"stop",                 stop,                    0},
         {"pause",                pause,                   0},
+        {"setAlpha",                setAlpha,                   1},
         {0}
     };
     return myFunctions;
@@ -127,6 +136,8 @@ JSWMPPlayer::Properties() {
         {"canvassize",     PROP_canvassize, JSPROP_PERMANENT},
         {"state",          PROP_playstate, JSPROP_READONLY | JSPROP_PERMANENT},
         {"volume",         PROP_volume, JSPROP_PERMANENT},
+        {"duration",       PROP_duration, JSPROP_PERMANENT},
+        {"currentposition",PROP_currentposition, JSPROP_PERMANENT},
         {"visible",        PROP_visible, JSPROP_PERMANENT},
         {"loopcount",      PROP_loopcount, JSPROP_PERMANENT},
         {0}
@@ -156,6 +167,9 @@ JSWMPPlayer::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
         case PROP_canvasposition:
             *vp = as_jsval(cx, getNative().getCanvasPosition());
             return JS_TRUE;
+        case PROP_currentposition:
+            *vp = as_jsval(cx, getNative().getCurrentPosition());
+            return JS_TRUE;    
         case PROP_canvassize:
             *vp = as_jsval(cx, getNative().getCanvasSize());
             return JS_TRUE;
@@ -167,6 +181,9 @@ JSWMPPlayer::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
         }
         case PROP_volume:
             *vp = as_jsval(cx, getNative().getVolume());
+            return JS_TRUE;
+        case PROP_duration:
+            *vp = as_jsval(cx, getNative().getDuration());
             return JS_TRUE;
         case PROP_visible:
             *vp = as_jsval(cx, getNative().isVisible());
@@ -206,6 +223,12 @@ JSWMPPlayer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
             openNative().setVolume(myVolume);
             closeNative();
             return JS_TRUE;
+        case PROP_currentposition:
+            double myCurrentPosition;
+            convertFrom(cx, *vp, myCurrentPosition);
+            openNative().setCurrentPosition(myCurrentPosition);
+            closeNative();
+            return JS_TRUE;    
         case PROP_visible:
             bool myVisibilityFlag;
             convertFrom(cx, *vp, myVisibilityFlag);

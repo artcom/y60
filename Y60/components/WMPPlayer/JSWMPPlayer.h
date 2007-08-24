@@ -47,9 +47,11 @@ class JSWMPPlayer : public jslib::JSWrapper<y60::WMPPlayer, asl::Ptr<y60::WMPPla
             PROP_width = -100,
             PROP_height,
             PROP_canvasposition,
+            PROP_currentposition,
             PROP_canvassize,
             PROP_playstate,
             PROP_volume,
+            PROP_duration,
             PROP_visible,
             PROP_loopcount
         };
