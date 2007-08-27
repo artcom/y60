@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLISH_MODULE xmlns="http://clish.sourceforge.net/XMLSchema" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema
+                     http://clish.sourceforge.net/XMLSchema/clish.xsd">
+
+  <COMMAND name="list contexts" help="list javascript contexts">
+    <ACTION builtin="tuttle_list_contexts"/>
+  </COMMAND>
+  
+  <COMMAND name="show context" help="show DETAILs about current context">
+    <ACTION builtin="tuttle_show_context"/>
+  </COMMAND>
+
+  <COMMAND name="set context" help="switch to a different javascript context">
+    <PARAM name="context" ptype="uint" help="context to switch to"/>
+    <ACTION builtin="tuttle_set_context">$context</ACTION>
+  </COMMAND>
+
+</CLISH_MODULE>

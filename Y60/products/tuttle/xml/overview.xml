@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLISH_MODULE xmlns="http://clish.sourceforge.net/XMLSchema" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema
+                     http://clish.sourceforge.net/XMLSchema/clish.xsd">
+
+        <OVERVIEW>
+CONTEXT SENSITIVE HELP
+[?] - Display context sensitive help. This is either a list of possible
+      COMMAND completions with summaries, or the full syntax of the
+      current COMMAND. A subsequent repeat of this key, when a command
+      has been resolved, will display a DETAILed reference.
+
+AUTO-COMPLETION
+The following keys both perform auto-completion for the current COMMAND line.
+If the COMMAND prefix is not unique then the bell will ring and a subsequent
+repeat of the key will display possible completions.
+
+[enter] - Auto-completes, syntax-checks then executes a COMMAND. If there is
+          a syntax error then offending part of the COMMAND line will be
+          highlighted and explained.
+
+[space] - Auto-completes, or if the COMMAND is already resolved inserts a space.
+
+MOVEMENT KEYS
+[CTRL-A] - Move to the start of the line
+[CTRL-E] - Move to the end of the line.
+[up]     - Move to the previous COMMAND line held in history.
+[down]   - Move to the next COMMAND line held in history.
+[left]   - Move the insertion point left one character.
+[right]  - Move the insertion point right one character.
+
+DELETION KEYS
+[CTRL-C]    - Delete the whole line
+[CTRL-D]    - Delete the character to the right on the insertion point.
+[CTRL-K]    - Delete all the characters to the right of the insertion point.
+[backspace] - Delete the character to the left of the insertion point.
+
+ESCAPE SEQUENCES
+!!  - Subsitute the the last COMMAND line.
+!N  - Substitute the Nth COMMAND line (absolute as per 'history' command)
+!-N - Substitute the COMMAND line entered N lines before (relative)
+    </OVERVIEW>
+
+</CLISH_MODULE>

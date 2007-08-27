@@ -1,0 +1,21 @@
+
+This is an experimental javascript debugger, written mostly as
+a proof of concept. The goal is to have breakpoints, tracing,
+in-stack-frame evaluation and possibly non-javascript engine
+debugging features.
+
+You need two externals for now:
+
+clish, the command line processing library
+  (http://clish.sourceforge.net/)
+
+libsigsegv, a segfault handling library
+  (http://libsigsegv.sourceforge.net/)
+
+To build it, hack the Makefile (sorry for that), compute header
+dependencies with "make depend" and build using "make all".
+
+To run it, do "export CLISH_PATH=`pwd`/xml" and run "./tuttle".
+
+If you want to hack on this, there is a slightly useful "make lint".
+

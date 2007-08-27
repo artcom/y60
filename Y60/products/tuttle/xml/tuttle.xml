@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLISH_MODULE xmlns="http://clish.sourceforge.net/XMLSchema" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema
+                     http://clish.sourceforge.net/XMLSchema/clish.xsd">
+
+  <!-- STARTUP -->
+
+  <STARTUP view="tuttle">
+    <DETAIL>
+ART+COM Tuttle Debugger
+    </DETAIL>
+  </STARTUP>
+
+
+  <!-- GLOBAL COMMANDS -->
+
+  <COMMAND name="help" help="print help message">
+    <ACTION builtin="clish_OVERVIEW"/>
+  </COMMAND>
+  
+  <COMMAND name="history" help="show command history">
+    <PARAM name="limit" help="maximum number of items" ptype="uint" default="10"/>
+    <ACTION builtin="clish_history">$limit</ACTION>
+  </COMMAND>
+  
+  <COMMAND name="quit" help="quit debugger">
+    <ACTION builtin="clish_close"/>
+  </COMMAND>
+
+
+  <!-- GLOBAL COMMAND PREFIXES -->
+  
+  <COMMAND name="list" help="list contexts, scripts, breakpoints..."/>
+  
+  <COMMAND name="show" help="show a context, script, breakpoint..."/>
+  
+  <COMMAND name="set" help="set a global parameter"/>
+
+
+  <!-- TOPLEVEL VIEW -->
+
+  <VIEW name="tuttle" prompt="tuttle&gt; ">
+  </VIEW>
+
+</CLISH_MODULE>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLISH_MODULE xmlns="http://clish.sourceforge.net/XMLSchema" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema
+                     http://clish.sourceforge.net/XMLSchema/clish.xsd">
+  
+  <PTYPE name="uint"
+         pattern="[0-9]+"
+         help="unsigned integer"/>
+  
+  <PTYPE name="string"
+         pattern="[^\-]+"
+         help="string"/>
+  
+  <PTYPE name="bool"
+         pattern="true(1) false(0)"
+         help="boolean"/>
+  
+  <PTYPE name="expression"
+         pattern=".*"
+         help="ECMAScript expression"/>
+  
+</CLISH_MODULE>
