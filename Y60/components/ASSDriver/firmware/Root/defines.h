@@ -48,8 +48,7 @@
 
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
-//#define MIN_DELTA_T_ROW  1500 //us
-#define MIN_DELTA_T_ROW  500 //us
+#define MIN_DELTA_T_ROW  750 //us
 
 #define VZERO   10
 

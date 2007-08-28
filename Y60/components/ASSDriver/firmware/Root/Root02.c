@@ -125,9 +125,7 @@ uint8_t i, i2;
 	//=== init SPI ====
 	DDRB |= _BV(PB2) | _BV(PB1) | _BV(PB0);              //MOSI, SCK, and #SS output (#SS must be configured as output pin!)
 	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA) | _BV(SPR0); //sample on falling edge, Speed: 1,8432MHz @ 14.745MHz
-	SPSR |= _BV(SPI2X);
-//	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA); //sample on falling edge, Speed: 3,6864MHz @ 14.745MHz
-
+    SPSR = _BV(SPI2X);
 
     //init TWI
     TWBR = 12; //f = 369KHz approx.
@@ -287,13 +285,12 @@ uint32_t bw;
 
 
 //=== interrupt routines ==============
-// main system timer interrupt (@100us) (duration: appr. 5us)
+// main system timer interrupt (@100us)
 ISR( TIMER1_COMPA_vect ) {
-static uint8_t sc=0, sc2, sc3;
+static uint8_t sctr=0;
 static uint16_t scanCounter=0, targetTime=0;
-static uint8_t ADCcounter=0;
 static uint8_t swBefore;
-uint8_t v0, v1;
+uint8_t v0;
 
 	g_mainTimer2 = 1;// is set every 100us
 
@@ -320,100 +317,52 @@ uint8_t v0, v1;
 
 
     //divide frequency by 10 -->rate 1ms
-	sc++;
-	if(sc >= 10){
-		sc = 0;
+	sctr++;
+	if(sctr >= 10){
+		sctr = 0;
 
-		if(g_mainTimer<255)
+		if(g_mainTimer<255){
 			g_mainTimer++;// is incremented every 1ms
+        }
 
-        //read ADC conversion result
-        //check if conversion is finished
-        if((ADCSRA&_BV(ADSC)) == 0){
-            switch(ADCcounter){
-                case 0:
-                    //channel 0:
-                    v0 = ADCL;
-                    v1 = ADCH;
-                    ADCValue_C0 = (v1<<8)|v0; //Vtransmitter (82,82/V)
-                    break;
-                case 2:
-                    //channnel 1:
-                    v0 = ADCL;
-                    v1 = ADCH;
-                    ADCValue_C1 = (v1<<8)|v0;//VCC (163,48/V)
-                    break;
-                default:
-                    ;
-            }                    
-            //sample 0V between each channel to minimize crosstalk
-            ADCcounter++;
-            if(ADCcounter >= 4){
-                ADCcounter = 0;
-            }
-            if((ADCcounter&1) == 0){
-                ADMUX = (ADMUX&0xE0) | (ADCcounter>>1); //channel 0 or channel 1
-            }else{
-                ADMUX = (ADMUX&0xE0) | 0x1F; //0V
-            }
-            //start next conversion
-            ADCSRA |= _BV(ADSC);
+        //read in DIP switches
+        v0 = ~((PIND&0xF0) | ((PING&0x01)<<3) | ((PING&0x02)<<1) | ((PINC&0x01)<<1) | ((PINC&0x02)>>1));
+        //debounce
+        if(v0 == swBefore){
+            g_DIPSwitch = v0;
+        }
+        swBefore = v0;
+	}
+}
 
 
+ISR( USART0_UDRE_vect ) {
 
-            //read in DIP switches
-            v0 = ~((PIND&0xF0) | ((PING&0x01)<<3) | ((PING&0x02)<<1) | ((PINC&0x01)<<1) | ((PINC&0x02)>>1));
-            //debounce
-            if(v0 == swBefore){
-                g_DIPSwitch = v0;
-            }
-            swBefore = v0;
+    g_PacketCounter--;
+    if(g_PacketCounter > 0){
+		//send next byte
+		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+    }
 
-            //process switch no. 6
-            if((g_DIPSwitch&_BV(DIP_RTS_CONTROL)) == 0){
-                g_dataTransmitMode |= 1; //indicate that data transmission is controlled by RTS
-            }else{
-                g_dataTransmitMode &= ~1;
-            }
-            //also process RTS-line here
-            if((PIN_RTS&_BV(RTS)) != 0){
-                g_dataTransmitMode |= 4;
-            }else{
-                g_dataTransmitMode &= ~4;
-            }
+    g_RTB_Read_Pointer++;
+    if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
+        g_RTB_Read_Pointer = 0;
+    }
+    g_RTB_Filled--;
 
-
-            //toggle LEDs
-            if(g_errorState == 0){
-                //turn off red LED
-                PORT_LED &= ~_BV(LED_R);
-                sc2 = 0;
-            }else{
-                if(sc2 == 0){
-                    //toggle red LED
-                    PORT_LED ^= _BV(LED_R);
-                }
-            sc2++;
-            }
-
-
-            if(g_mode == REL_MODE){
-                //turn on green LED
-                PORT_LED |= _BV(LED_G);
-                sc3 = 0;
-            }else{
-                if(sc3 == 0){
-                    //toggle green LED
-                    PORT_LED ^= _BV(LED_G);
-                    if((PORT_LED&_BV(LED_G)) == 0){
-                        sc3=180; //off period is shorter
-                    }
-                }
-            sc3++;
-            }
+    if(g_PacketCounter == 0){
+        //check if still more bytes then package size are left
+        if(g_RTB_Filled >= TX_PACKET_SIZE){
+            g_PacketCounter = TX_PACKET_SIZE;
+            UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+        }else{
+            UCSR0B &= ~ _BV(UDRIE0); // disable USART interrupt
+            PORT_CTS |= _BV(CTS);
         }
 	}
 }
+
+
 
 
 void sendByte(uint8_t b){
@@ -464,29 +413,6 @@ uint8_t v2;
     }
 }
 
-ISR( USART0_UDRE_vect ) {
-
-    g_RTB_Read_Pointer++;
-    if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
-        g_RTB_Read_Pointer = 0;
-    }
-    g_RTB_Filled--;
-
-    g_PacketCounter--;
-    if(g_PacketCounter > 0){
-		//send next byte
-		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-    }else{
-        //check if still more bytes then package size are left
-        if(g_RTB_Filled >= TX_PACKET_SIZE){
-            g_PacketCounter = TX_PACKET_SIZE;
-            UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-        }else{
-            UCSR0B &= ~ _BV(UDRIE0); // disable USART interrupt
-            PORT_CTS |= _BV(CTS);
-        }
-	}
-}
 
 
 //=== main code ==============
@@ -508,33 +434,6 @@ void triggerRowReadout(void){
 	SPCR |= _BV(SPIE); //enable interrupt
 	SPDR = 0;
 	//rest of process is performed by interrupt calls
-}
-
-
-// receive one byte via SPI (reception complete call)
-ISR( SPI_STC_vect ) {
-uint8_t rec;
-
-	//read byte
-	rec = SPDR;
-
-	//start reading next byte
-	if(g_SPICounter < g_matrixWidth){
-		SPDR = 0;
-	}
-
-	//store received byte
-	g_SPICounter--;
-	g_rowBuffer[g_SPICounter] = rec;
-	g_SPICounter++;
-
-	g_SPICounter++;
-	if(g_SPICounter > g_matrixWidth){
-		//all bytes received
-		SPCR &= ~_BV(SPIE); //disable interrupt
-		g_SPICounter = 0;
-		g_rowReceptionComplete = 1;
-	}
 }
 
 
@@ -630,10 +529,13 @@ uint8_t i;
 
 int main(void) {
 uint8_t  ix, next_row;
-uint8_t  v1;
+uint8_t  v0, v1, e;
 uint16_t autoCalTimer;
 uint16_t checksum;
 uint8_t  tVoltage;
+uint8_t  ADCcounter=0;
+uint8_t  sc2=0, sc3=0;
+
 #ifdef TEST_MODE
 uint8_t  testBuffer[20];
 #endif
@@ -657,10 +559,7 @@ uint8_t  testBuffer[20];
     //set DAC value
     //e = setDACValue(106); //5V*21,2(*1/V)
     v1 = EEPROM_read(EEPROM_LOC_VOLTAGE_TRANSMITTER);
-    if(v1 == 0xFF){//EEPROM obviously not formatted
-        v1 = 106;
-    }
-    setDACValue(v1);
+    e = setDACValue(v1);
   	if((g_errorState&ERROR_IIC) == 0){
 #ifdef TEST_MODE
         fprintf(stdout, "Scan voltage set.\n");
@@ -690,16 +589,42 @@ uint8_t  testBuffer[20];
 
 			//switch to next row
 			next_row = g_currentRow + 1;
-			if(next_row >= (g_matrixHeigth+1)) // +1: ther is one extra row sample that determines average values
+			if(next_row >= (g_matrixHeigth+1)){ // +1: ther is one extra row sample that determines average values
 				next_row = 0;
+            }
 			activateTransmitter(next_row);
 
-			// start reading current row
-			triggerRowReadout();
+			//read in current row (takes approx. 5us per byte // 100us for 20 cols, 200us for 40 cols, 250us for 50 cols //+ interrupt calls!!)
+	        g_SPICounter = 0;
+            //temporarly turn off all interrupts except UART transmission
+            cli();
+            UCSR0B &= ~_BV(RXCIE0);
+            TIMSK &= ~_BV(OCIE1A);
+           	SPDR = 0;//transmit/receive first byte
+            do{
+                //wait for reception complete
+asm (          "sbis 0x0E,7"  );
+asm (          "rjmp .-4"     );
+                //store received byte
+                v1 = SPDR;
+            	SPDR = 0;//transmit/receive next byte
+                //briefly allow UART TX interrupts
+                sei();
+                g_rowBuffer[g_SPICounter] = v1;
+                cli();
+                g_SPICounter++;
+            }while(g_SPICounter < g_matrixWidth);
+            //turn all interrupts back on
+            UCSR0B |= _BV(RXCIE0);
+            TIMSK |= _BV(OCIE1A);
+            sei();
+    		//all bytes received
+    		g_rowReceptionComplete = 1;
+
 		}
 
 
-		//wait until new row is available (duration: up to 250us depending on number of bytes/cols to be read)
+		//wait until new row is available
 		if(g_rowReceptionComplete){
 			g_rowReceptionComplete = 0;
 
@@ -955,16 +880,94 @@ uint8_t  testBuffer[20];
             g_TaraRequest = 0;
         }
 
-        //trigger automatic calibration a few seconds after start-up
-        while(g_mainTimer > 0){
-            g_mainTimer--;
-            if(autoCalTimer > 0){
-                autoCalTimer--;
-                if(autoCalTimer == 1){
-                    if((g_DIPSwitch&_BV(DIP_AUTO_SWITCH_TO_REL_MODE)) != 0){
-                        g_TaraRequest = 1;
+
+        if(g_mainTimer > 0){
+            //read ADC conversion result
+            //check if conversion is finished
+            if((ADCSRA&_BV(ADSC)) == 0){
+                switch(ADCcounter){
+                    case 0:
+                        //channel 0:
+                        v0 = ADCL;
+                        v1 = ADCH;
+                        ADCValue_C0 = (v1<<8)|v0; //Vtransmitter (82,82/V)
+                        break;
+                    case 2:
+                        //channnel 1:
+                        v0 = ADCL;
+                        v1 = ADCH;
+                        ADCValue_C1 = (v1<<8)|v0;//VCC (163,48/V)
+                        break;
+                    default:
+                        ;
+                }                    
+                //sample 0V between each channel to minimize crosstalk
+                ADCcounter++;
+                if(ADCcounter >= 4){
+                    ADCcounter = 0;
+                }
+                if((ADCcounter&1) == 0){
+                    ADMUX = (ADMUX&0xE0) | (ADCcounter>>1); //channel 0 or channel 1
+                }else{
+                    ADMUX = (ADMUX&0xE0) | 0x1F; //0V
+                }
+                //start next conversion
+                ADCSRA |= _BV(ADSC);
+            }
+
+            //process DIP switch no. 6
+            if((g_DIPSwitch&_BV(DIP_RTS_CONTROL)) == 0){
+                g_dataTransmitMode |= 1; //indicate that data transmission is controlled by RTS
+            }else{
+                g_dataTransmitMode &= ~1;
+            }
+            //process RTS-line
+            if((PIN_RTS&_BV(RTS)) != 0){
+                g_dataTransmitMode |= 4;
+            }else{
+                g_dataTransmitMode &= ~4;
+            }
+
+            //toggle LEDs
+            if(g_errorState == 0){
+                //turn off red LED
+                PORT_LED &= ~_BV(LED_R);
+                sc2 = 0;
+            }else{
+                if(sc2 == 0){
+                    //toggle red LED
+                    PORT_LED ^= _BV(LED_R);
+                }
+            sc2++;
+            }
+
+            if(g_mode == REL_MODE){
+                //turn on green LED
+                PORT_LED |= _BV(LED_G);
+                sc3 = 0;
+            }else{
+                if(sc3 == 0){
+                    //toggle green LED
+                    PORT_LED ^= _BV(LED_G);
+                    if((PORT_LED&_BV(LED_G)) == 0){
+                        sc3=180; //off period is shorter
                     }
-                    autoCalTimer = 0;
+                }
+            sc3++;
+            }
+
+
+            //trigger automatic calibration a few seconds after start-up
+            while(g_mainTimer > 0){
+                g_mainTimer--;
+                if(autoCalTimer > 0){
+                    autoCalTimer--;
+                    if(autoCalTimer == 1){
+                        if((g_DIPSwitch&_BV(DIP_AUTO_SWITCH_TO_REL_MODE)) != 0){
+                            g_TaraRequest = 1;
+                        }
+                        autoCalTimer = 0;
+                    }
                 }
             }
         }
