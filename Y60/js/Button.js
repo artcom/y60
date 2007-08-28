@@ -71,12 +71,12 @@ function ButtonBase(Public, Protected, theScene, theId,
         Protected.isPressed = theFlag;
     }
 
-    Public.onMouseButton = function(theState, theX, theY) {
+    Public.onMouseButton = function(theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
                 Public.setPressed(false);
                 Public.onClick(Public);
-            } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY)) {
+            } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
                 Public.setPressed(true);
             }
         }
@@ -99,8 +99,8 @@ function ButtonBase(Public, Protected, theScene, theId,
 
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theState, theX, theY) {
-            if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY)) {
+        Public.onMouseButton = function(theState, theX, theY, theRadius) {
+            if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY, theRadius)) {
                 if (theState == MOUSE_UP && Protected.isPressed) {
                     Public.onClick(this);
                 } else  if (theState == MOUSE_DOWN && !Protected.isPressed) {
@@ -117,11 +117,11 @@ function ButtonBase(Public, Protected, theScene, theId,
 
     Public.setClickOnMouseDown = function() {
         // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theState, theX, theY) {
+        Public.onMouseButton = function(theState, theX, theY, theRadius) {
             if (theState == MOUSE_UP) {
                 Public.setPressed(false);
             } else if (theState == MOUSE_DOWN && Public.enabled && Protected.isVisible(Public.node) &&
-                       !Protected.isPressed && Public.touches(theX, theY))
+                       !Protected.isPressed && Public.touches(theX, theY, theRadius))
             {
                 Public.setPressed(true);
                 Public.onClick(Public);
