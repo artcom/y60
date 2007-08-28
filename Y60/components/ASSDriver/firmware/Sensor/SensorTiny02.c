@@ -354,6 +354,7 @@ uint8_t  ADCvalueREL;
 				j = g_ADCOffset[g_lineCounter];
 				if(j >= ADCreadOut){
 					j = j - ADCreadOut;
+                //j >>= 1;//divide by two to avoid saturation
 					//limit to 8 bits
 					if(j > 255){
 						j = 255;
