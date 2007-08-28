@@ -29,7 +29,7 @@ turn on relative mode:
 
 
 FUSE SETTINGS:
-- Brown-out detection disabled
+- Brown-out detection level at VCC=2.7 V
 - Int. RC Osc. 8MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms
 all others off
 
@@ -69,16 +69,13 @@ all others off
 #define ADC_CONFIGURATION1()\
 	ADMUX = _BV(REFS1) | 6; // 1.1 V reference; channel 2+, Channel 3-, gain=1
 
-/*#define ADC_CONFIGURATION2()\
-	ADMUX = _BV(REFS2) | _BV(REFS1) | 2; // 2.56 V reference; channel 2+
-*/
 
 //=== Globals ================================================================
 
 uint8_t  g_USIactive = IDLE_STATE;
 uint8_t  g_USImark = 0;
 uint8_t  g_USImarkCounter = 0;
-uint8_t  g_nextMode = 0;
+uint8_t  g_nextModeRequest = 0;
 uint8_t  g_mode = ABS_MODE;
 uint8_t  g_USIbreakCounter = 0;
 uint8_t  g_requestCalibration = 0;
@@ -97,8 +94,6 @@ uint8_t  g_EEPROMState = 0;
 uint16_t g_ADCLH;
 uint8_t  g_ADCLHAvailable=0;
 
-//uint8_t  g_H;
-
 
 //=== Prototypes =============================================================
 void    init(void);
@@ -110,35 +105,30 @@ uint8_t EEPROM_read(uint8_t ucAddress);
 //=== Code =============================================================
 void init(void) {
 	//turn on timer0 @ 1ms/1000 Hz (8MHz/(64*125) = 1000Hz)
-    TCCR0B = 3; //prescaler=64
-	OCR0A = 125-1;
-	TCNT0 = 0;
+	OCR0A  = 125-1;
+	TCNT0  = 0;
     TCCR0A = _BV(WGM01); // CTC mode
+    TCCR0B = 3; //prescaler=64
 
     TIMSK |= _BV(OCIE0A); //enable output compare match interrupt
-
 
 
 	//=== turn on ADC           =====
 	ADC_CONFIGURATION1();
 	ADCSRA = _BV(ADEN) | _BV(ADIE) | 5; //turn ADC on; pre-scaler = 32->fs=250kHz -> conversion takes 52us, 4 conversions take 208us
-
 	DIDR0 = _BV(ADC2D) | _BV(ADC3D);
 	//DDRB |= _BV(PB3); //for debuggubg: use PB3 as monitor pin (if so, also inhibit changing the DIDR0 register)
 
 
-
 	//=== prepare timer1
-	OCR1A = 200-1;        //200us time out (pre-scaler=8 --> 1us base) 
+	OCR1A = 40;        //40us time out (pre-scaler=8 --> 1us base) 
     TIMSK |= _BV(OCIE1A); //enable output compare match interrupt
 
 
-
 	//=== turn on USI
-	USICR = _BV(USIOIE) | _BV(USIWM0) | _BV(USICS1) | _BV(USICS0); //three-wire mode, shift on positive edge
 	DDRB &= ~(_BV(PB2)|_BV(PB0));                                  //set CLK and MOSI to input
 	DDRB |= _BV(PB1);
-
+	USICR = _BV(USIOIE) | _BV(USIWM0) | _BV(USICS1) | _BV(USICS0); //three-wire mode, shift on positive edge
 
 
     resetBuffersAndVariables();
@@ -151,7 +141,7 @@ void init(void) {
 
 void resetBuffersAndVariables(void){
 uint8_t i;
-uint16_t o;
+//uint16_t o;
 
 	for(i=0; i<MAX_LINES; i++){
 		g_ADCOffset[i] = 1023;
@@ -165,83 +155,22 @@ uint16_t o;
 
     g_mode = ABS_MODE;
 
-    //check if calibration values are available in EEPROM
-    i = EEPROM_read(0);
-    if(i <= MAX_LINES){
-        g_NumberOfLines = i;
-        for(i=0; i<g_NumberOfLines; i++){
-            o = EEPROM_read((i<<1)+1);
-            o <<= 8;//high byte first
-            o |= EEPROM_read((i<<1)+1+1);
-            if(o>1023){
-                o = 1023; //max. offset
-            }
-    		g_ADCOffset[i] = o;
-        }
-	    g_lineCounter = g_NumberOfLines-1;
-        g_ADC_Calibrated = 1;
-    }
-
-}
-
-
-// timer0 interrupt: main timer interrupt (1ms/1000 Hz)
-ISR( TIM0_COMPA_vect ) {
-
-	if(g_sampleState == 1){
-		//if g_sampleState is 1 this timer interrupt was called 750us after first byte of CLK sequence
-		g_sampleState = 2; //trigger sampling
-	}	
-
-
-	if(g_USImark == 1){
-        if(g_USImarkCounter != 255)
-            g_USImarkCounter++;
-
-        switch(g_USImarkCounter){
-            case   7:   //10ms-10%
-                g_nextMode = ABS_MODE;
-                break;
-            case  15:   //20ms-10%
-                g_nextMode = REL_MODE;
-                break;
-            case  32:   //40ms-10%
-                g_nextMode = CAL_MODE;
-                break;
-            case  60:   //80ms-10%
-                g_nextMode = g_mode;//keep current mode
-            default:
-                ;
-        }
-	}else{
-        if(g_USIbreakCounter < 255)
-            g_USIbreakCounter++;
-
-        if(g_USIbreakCounter == 70){//80ms-10%
-            if(g_mode == CAL_MODE){
-    			g_ADC_Calibrated = 1;
-    			g_requestCalibration = 0;
-    			g_lineCounter = 0; //after calibration read out sequence starts with line 0
-                g_mode = REL_MODE;
-/*
-                    // start storage of new calibration values in EEPROM
-                    g_EEPROMState = 1;
-                    // wait for completion of previous write (actually there should be no write going on!)
-                    while(EECR & _BV(EEPE))
-                        ;
-                    EECR = (0<<EEPM1) | (0<<EEPM0) | _BV(EERIE);//set programming mode and turn on interrupt
-                    EEAR = 0; //ucAddress
-                    EEDR = g_NumberOfLines; //ucData
-                    asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE
-                    asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE
-*/
-            }
-        }
-
-        if(g_USIbreakCounter == 200){//200ms
-            g_USIactive = RESET_REQUEST;
-        }
-    }
+//  //check if calibration values are available in EEPROM
+//  i = EEPROM_read(0);
+//  if(i <= MAX_LINES){
+//      g_NumberOfLines = i;
+//      for(i=0; i<g_NumberOfLines; i++){
+//          o = EEPROM_read((i<<1)+1);
+//          o <<= 8;//high byte first
+//          o |= EEPROM_read((i<<1)+1+1);
+//          if(o>1023){
+//              o = 1023; //max. offset
+//          }
+//  		g_ADCOffset[i] = o;
+//      }
+//      g_lineCounter = g_NumberOfLines-1;
+//      g_ADC_Calibrated = 1;
+//  }
 }
 
 
@@ -250,48 +179,103 @@ ISR( USI_OVF_vect ) {
 	//clear USIOIF flag
 	USISR |= _BV(USIOIF);
 
-
-	if(g_sampleState == 0){//first byte of read-out sequence
-        //configure timer0
-        GTCCR |= _BV(TSM) | _BV(PSR0); //halt all timers during configuration
-		g_sampleState = 1;
-		TCNT0 = (1000-400)/8; //timer 1 interrupt will be called after 400us (125-75)/(8MHz/64)=400us
-        GTCCR &= _BV(TSM); //enable timers
-	}
-
-
 	//clear timer counter 1
 	//turn on timer 1
-	TCNT1 = 0; //ISR is called at 200 --> 200us time out
+	TCNT1 = 0; //ISR will be called when counter reaches 40 --> 40us time out
     TCCR1 = 4; //prescaler=8 -> 1us base
 
     g_USIactive = ACTIVE; //will be set to RESET_REQUEST after 200ms of no USI activity
-    g_USImark = 1; //will be set to 0 when no subsequent byte arrives within the next 200us
-    g_USIbreakCounter = 0; //used to count ms of no USI activity
+    g_USImark = 1;
 }
 
 
 /* timer1 interrupt */
 ISR( TIM1_COMPA_vect ) {
-	//is called when a gap on SCLK is detected (OCR1A is set to 200-1, which corresponds to 200us)
+	//is called when a gap on SCLK is detected (OCR1A is set to 40, which corresponds to 40us of no received byte)
 	//stop timer1
 	TCCR1 = 0;
+
+    g_sampleState = 2; //trigger sampling
 
 	//reset USI-counter (this ensures that next transfer starts with bit 0)
 	USISR &= 240; //=0b11110000  -->clear USI-counter
 
-    if(g_nextMode > 0){
-        if(g_mode != g_nextMode){
-            g_mode = g_nextMode;
+    //check if mode request is pending (by having sent in continuous clock pulses for several ms...)
+    if(g_nextModeRequest > 0){
+        if(g_mode != g_nextModeRequest){
+            g_mode = g_nextModeRequest;
             if(g_mode == CAL_MODE){
                 g_requestCalibration = 1;
             }
         }
-    g_nextMode = 0;
+    g_nextModeRequest = 0;
     }
 
-    g_USImarkCounter = 0; //used to count ms of CLK continuously on
     g_USImark = 0;
+}
+
+
+
+
+// timer0 interrupt: main timer interrupt (1ms/1000 Hz)
+ISR( TIM0_COMPA_vect ) {
+
+	if(g_USImark == 1){
+        g_USIbreakCounter = 0;
+        if(g_USImarkCounter != 255){
+            g_USImarkCounter++;
+        }
+
+        switch(g_USImarkCounter){
+            case   7:   //10ms-10%
+                g_nextModeRequest = ABS_MODE;
+                break;
+            case  15:   //20ms-10%
+                g_nextModeRequest = REL_MODE;
+                break;
+            case  32:   //40ms-10%
+                g_nextModeRequest = CAL_MODE;
+                break;
+            case  60:   //80ms-10%
+                g_nextModeRequest = g_mode;//keep current mode
+                break;
+            default:
+                ;
+        }
+	}
+
+	if(g_USImark == 0){
+        g_USImarkCounter = 0;
+        if(g_USIbreakCounter < 255){
+            g_USIbreakCounter++;
+        }
+
+        switch(g_USIbreakCounter){
+            case   65:   //80ms-10%
+                if(g_mode == CAL_MODE){
+        			g_ADC_Calibrated = 1;
+    	    		g_requestCalibration = 0;
+    		    	g_lineCounter = 0; //after calibration read out sequence starts with line 0
+                    g_mode = REL_MODE;
+//                      // start storage of new calibration values in EEPROM
+//                      g_EEPROMState = 1;
+//                      // wait for completion of previous write (actually there should be no write going on!)
+//                      while(EECR & _BV(EEPE))
+//                          ;
+//                      EECR = (0<<EEPM1) | (0<<EEPM0) | _BV(EERIE);//set programming mode and turn on interrupt
+//                      EEAR = 0; //ucAddress
+//                      EEDR = g_NumberOfLines; //ucData
+//                      asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE
+//                      asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE
+                }
+                break;
+            case   170:   //200ms-10%
+                g_USIactive = RESET_REQUEST;
+                break;
+            default:
+                ;
+        }
+	}
 }
 
 
@@ -303,6 +287,7 @@ uint8_t  th, tl;
 	g_ADCLH = (((uint16_t)th)<<8) | tl;
 	g_ADCLHAvailable = 1;
 }
+
 
 
 int main(void){
@@ -345,7 +330,7 @@ uint8_t  ADCvalueREL;
 			//turn timer0 interrupt back on
     		TIMSK |= _BV(OCIE0A);
 
-			ADCreadOut = (ADCsum>>2); //divide by 4 (normailze the 4 added samples)
+			ADCreadOut = (ADCsum>>2); //divide by 4 (normalize the 4 added samples)
 
             ADCvalueABS = (ADCreadOut>>2); //use top byte for storing absolute value
             //calculate ADCvalueREL
@@ -445,6 +430,7 @@ uint8_t  ADCvalueREL;
 
     return 0;
 }
+
 
 ////////////////////////////////
 void EEPROM_write(uint8_t ucAddress, uint8_t ucData){
