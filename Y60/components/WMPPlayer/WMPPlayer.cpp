@@ -17,10 +17,6 @@
 //
 //=============================================================================
 
-#define _WIN32_WINNT 0x0501
-#include <windows.h>
-#include <winuser.h>
-
 #include "WMPPlayer.h"
 #include "EventListener.h"
 
@@ -271,15 +267,6 @@ namespace y60 {
     WMPPlayer::pause() {
         AC_INFO << "WMPPlayer::pauseMovie";
         _myWMPControl->pause();
-    }
-
-    void
-    WMPPlayer::setAlpha(float theAlpha) {
-        AC_INFO << "WMPPlayer::setAlpha " << theAlpha;
-        SetWindowLong(_myParentWindow, GWL_EXSTYLE,
-                      GetWindowLong(_myParentWindow, GWL_EXSTYLE) | WS_EX_LAYERED);
-        bool myErrorCode = SetLayeredWindowAttributes(_myParentWindow, 0, int(theAlpha * 255.0f), LWA_ALPHA);
-        AC_DEBUG << "ErrorCode: " <<GetLastError();
     }
 
     string

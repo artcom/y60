@@ -56,14 +56,6 @@ setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-setAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets alpha value of the window");
-    DOC_PARAM("theAlpha", "", DOC_TYPE_STRING);
-    DOC_END;
-    return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::setAlpha,cx,obj,argc,argv,rval);
-}
-
-static JSBool
 play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Starts playback of the movie at a given position" \
               "If no position is given, it starts at the current position");
@@ -110,7 +102,6 @@ JSWMPPlayer::Functions() {
         {"play",                 play,                    0},
         {"stop",                 stop,                    0},
         {"pause",                pause,                   0},
-        {"setAlpha",                setAlpha,                   1},
         {0}
     };
     return myFunctions;
