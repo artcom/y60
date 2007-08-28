@@ -33,7 +33,7 @@
 
 //=== Don't change anything below this line! =================================
 
-#define MAX_MATRIX_WIDTH  40
+#define MAX_MATRIX_WIDTH  50//40
 #define MAX_MATRIX_HEIGTH 25
 
 #define MIN_SCAN_FREQUENCY 16//Hz (lower frequencies don't work as g_scanPeriod is 16-bit integer)
@@ -48,7 +48,8 @@
 
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
-#define MIN_DELTA_T_ROW  1500 //us
+//#define MIN_DELTA_T_ROW  1500 //us
+#define MIN_DELTA_T_ROW  500 //us
 
 #define VZERO   10
 

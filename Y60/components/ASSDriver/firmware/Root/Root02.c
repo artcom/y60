@@ -126,6 +126,7 @@ uint8_t i, i2;
 	DDRB |= _BV(PB2) | _BV(PB1) | _BV(PB0);              //MOSI, SCK, and #SS output (#SS must be configured as output pin!)
 	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA) | _BV(SPR0); //sample on falling edge, Speed: 1,8432MHz @ 14.745MHz
 	SPSR |= _BV(SPI2X);
+//	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA); //sample on falling edge, Speed: 3,6864MHz @ 14.745MHz
 
 
     //init TWI
