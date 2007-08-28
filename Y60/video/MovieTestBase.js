@@ -31,15 +31,21 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
     Public.setup = function() {
         Public.setSplashScreen(false);
         Base.setup(320, 200);
-        window.eventListener = this;
-        var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
-        if (myNoisyString == "") {
-            var mySoundManager = new SoundManager();
-            mySoundManager.volume = 0.0;
+        try {
+            window.eventListener = this;
+            var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
+            if (myNoisyString == "") {
+                var mySoundManager = new SoundManager();
+                mySoundManager.volume = 0.0;
+            }
+            window.swapInterval = 0;
+            window.fixedFrameTime = 1.0/25;
+            nextMovie();
+        } catch (e) {
+            print(e);
+            this.assure_msg(false, "Exception caught.");
+            Public.nextTest();
         }
-        window.swapInterval = 0;
-        window.fixedFrameTime = 1.0/25;
-        nextMovie();
     }
 
     Base.onFrame = Public.onFrame;
