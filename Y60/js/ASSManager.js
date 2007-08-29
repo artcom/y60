@@ -8,6 +8,10 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+// i know this must hurt, but i need them (vs)
+use("Button.js")
+use("Overlay.js")
+
 function ASSManager(theViewer) {
     this.Constructor(this, theViewer);
 }
@@ -16,6 +20,8 @@ ASSManager.driver = null;
 
 const VERBOSE_EVENTS = false;
 const QUIT_OSD = true;
+const ENABLE_QUIT_OSD_TIME = 4.0;
+const ENABLE_QUIT_OSD_DISTANCE = 20;//65.0;
 
 ASSManager.prototype.Constructor = function(self, theViewer) {
     function setup() {
@@ -86,6 +92,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     }
 
     var _myEventQueues = {};
+    var _myEventIDMQBs = {};
 
     self.onASSEvent = function( theEventNode ) {
         if (!(theEventNode.id in _myEventQueues)) {
@@ -95,7 +102,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         if (_myEventQueues[theEventNode.id].length > 1000) {
             _myEventQueues[theEventNode.id].shift();
         }
-
+//print(theEventNode);
         if (theEventNode.type == "configure") {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: configure");
@@ -105,17 +112,42 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: add");
             }
+            if (QUIT_OSD) {                    
+                if (!_myQuitCursorEvent) {
+                    _myQuitCursorEvent = theEventNode;
+                    //print("#### added quit cursor");
+                }
+            }
+            //_myEventIDMQBs[theEventNode.id] = new MaterialQuadBody();
+
         } else if (theEventNode.type == "move") {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: move");
             }
+            if (QUIT_OSD) {                    
+                if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
+                    var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
+                    var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
+                    print(myHandTraveled);
+                    if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
+                        if (myHandTraveled < ENABLE_QUIT_OSD_DISTANCE) {
+                            _myQuitOSD.visible = true;
+                        }
+                        _myQuitCursorEvent = null;
+                        //print("#### removed quit cursor after duration " + myTouchDuration);
+                    }
+                }
+            }
+ 
+            //_myEventMQBs[theEventNode.id].body.position = theEventNode.position3D;
+
         } else if ( theEventNode.type == "touch") {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: touch at " + theEventNode.raw_position);
             }
             if (QUIT_OSD) {                    
                 // handle application quit
-                 var myPosition = theNode.position3D;                    
+                 var myPosition = theEventNode.position3D;                    
                 _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
                 _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x, myPosition.y);
                 _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
@@ -125,6 +157,12 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         if (theEventNode.type == "remove") {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: remove");
+            }
+            if (QUIT_OSD) {                    
+                if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
+                    _myQuitCursorEvent = null;
+                    //print("#### removed quit cursor: duration " + myTouchDuration);
+                }
             }
         }
     }
@@ -145,23 +183,17 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         return _myDriver;
     }
     
-    function enableQuitOSD() {
-        if (QUIT_OSD) {                    
-            _myQuitOSD.visible = true;
-        }
-    }
-    
     function buildQuitOSD() {
         const myStyle = {
             color:             asColor("FFFFFF"),
             selectedColor:     asColor("FFFFFF"),
             textColor:         asColor("00FFFF"),
-            font:              "FONTS/BMWRgBd.ttf",
+            font:              "${PRO}/testmodels/fonts/arial.ttf", //"FONTS/BMWRgBd.ttf",
             HTextAlign:        Renderer.LEFT_ALIGNMENT,
             fontsize:          18
         }
         
-        var myOSDSize = new Vector2i(300, 100);
+        var myOSDSize = new Vector2i(300, 80);
         var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
         myImage.src = "shadertex/on_screen_display.rgb";
         myImage.resize = "pad";
@@ -171,26 +203,23 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         _myQuitOSD.height = myOSDSize.y;
         _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
                                              (window.height - _myQuitOSD.height) / 2);
-        _myQuitOSD.visible = true;
+        _myQuitOSD.visible = false;
 
         var myColor = 0.3;
         _myQuitOSD.color = new Vector4f(myColor,myColor,myColor,0.75);
         
-        
         var myButtonSize = new Vector2i(100,100);
-        var myButtonPos = new Vector2f(50,60);
-        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", "Confirm", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        var myButtonPos = new Vector2f(50,25);
+        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", "Quit", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
         _myQuitConfirmButton.onClick = function() {
             exit();
         }
         myStyle.HTextAlign = Renderer.RIGHT_ALIGNMENT,
         myButtonPos.x += myButtonSize.x;
-        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", "Cancel", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", "Continue", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
         _myQuitCancelButton.onClick = function() {
             _myQuitOSD.visible = false;
         }
-        myStyle.HTextAlign = Renderer.CENTER_ALIGNMENT;
-        var myLabel = new Label(window.scene, "Quit ?", myOSDSize, new Vector2i(0,0), myStyle, _myQuitOSD);
     }
     
     function setupValueMaterials() {
@@ -236,6 +265,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         if (_mySettings) {
             self.onUpdateSettings( _mySettings );
         }
+
     }
 
     function getMaterialIdForValueDisplay() {
@@ -342,7 +372,8 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     var _myQuitCancelButton  = null;
     var _myQuitConfirmButton = null;
     var _myQuitOSD = null;
-    setup();
+    var _myQuitCursorEvent = null;
+ setup();
 }
 
 
