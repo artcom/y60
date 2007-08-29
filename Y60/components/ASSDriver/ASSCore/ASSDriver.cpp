@@ -794,6 +794,7 @@ void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
     _mySettings = getASSSettings( theSettings );
+    setupDriver(theSettings);
 }
 
 void
@@ -854,13 +855,22 @@ ASSDriver::applyTransform( const Vector2f & theRawPosition,
 
 void 
 ASSDriver::processInput() {
-    
+
+    MAKE_SCOPE_TIMER(ASSDriver_processInput);
+
     if (_myTransportLayer) {
         _myTransportLayer->lockFrameQueue();
+
         std::queue<ASSEvent> & myFrameQueue = _myTransportLayer->getFrameQueue();
+
+        AC_TRACE << "frame queue size = " << myFrameQueue.size();
+
         while ( ! myFrameQueue.empty() ) {
             ASSEvent myEvent = myFrameQueue.front();
             myFrameQueue.pop();
+
+            AC_TRACE << "popped event " << myEvent;
+
             switch (myEvent.type) {
                 case ASS_FRAME:
                     {
@@ -882,6 +892,7 @@ ASSDriver::processInput() {
             }
         }
         _myTransportLayer->unlockFrameQueue();
+        AC_TRACE << "frame queue size after unlocking = " << myFrameQueue.size();
     } else {
         AC_PRINT << "No TransportLayer";
     }
@@ -935,6 +946,7 @@ ASSDriver::queryConfigMode() {
 
 void
 ASSDriver::queueCommand( const char * theCommand ) {
+    MAKE_SCOPE_TIMER(ASSDriver_queueCommand);
     if (_myTransportLayer) {
         _myTransportLayer->queueCommand( theCommand );
     } else {
