@@ -15,6 +15,7 @@ function ASSManager(theViewer) {
 ASSManager.driver = null;
 
 const VERBOSE_EVENTS = false;
+const QUIT_OSD = true;
 
 ASSManager.prototype.Constructor = function(self, theViewer) {
     function setup() {
@@ -27,6 +28,15 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
         _myViewer.registerSettingsListener( self, "ASSDriver" );
 
+        if (QUIT_OSD) {
+            buildQuitOSD();
+        }
+        
+
+    }
+    self.onMouseButton = function(theButton, theState, theX, theY) {
+        _myQuitCancelButton.onMouseButton(theState, theX, theY);
+        _myQuitConfirmButton.onMouseButton(theState, theX, theY);
     }
 
     self.onUpdateSettings = function( theSettings ) {
@@ -103,6 +113,14 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: touch at " + theEventNode.raw_position);
             }
+            if (QUIT_OSD) {                    
+                // handle application quit
+                 var myPosition = theNode.position3D;                    
+                _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
+                _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x, myPosition.y);
+                _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
+                _myQuitConfirmButton.onMouseButton(MOUSE_UP, myPosition.x, myPosition.y);
+            }
         }
         if (theEventNode.type == "remove") {
             if ( VERBOSE_EVENTS ) {
@@ -126,7 +144,55 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     self.driver getter = function() {
         return _myDriver;
     }
+    
+    function enableQuitOSD() {
+        if (QUIT_OSD) {                    
+            _myQuitOSD.visible = true;
+        }
+    }
+    
+    function buildQuitOSD() {
+        const myStyle = {
+            color:             asColor("FFFFFF"),
+            selectedColor:     asColor("FFFFFF"),
+            textColor:         asColor("00FFFF"),
+            font:              "FONTS/BMWRgBd.ttf",
+            HTextAlign:        Renderer.LEFT_ALIGNMENT,
+            fontsize:          18
+        }
+        
+        var myOSDSize = new Vector2i(300, 100);
+        var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
+        myImage.src = "shadertex/on_screen_display.rgb";
+        myImage.resize = "pad";
 
+        _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImage);
+        _myQuitOSD.width  = myOSDSize.x;
+        _myQuitOSD.height = myOSDSize.y;
+        _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
+                                             (window.height - _myQuitOSD.height) / 2);
+        _myQuitOSD.visible = true;
+
+        var myColor = 0.3;
+        _myQuitOSD.color = new Vector4f(myColor,myColor,myColor,0.75);
+        
+        
+        var myButtonSize = new Vector2i(100,100);
+        var myButtonPos = new Vector2f(50,60);
+        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", "Confirm", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        _myQuitConfirmButton.onClick = function() {
+            exit();
+        }
+        myStyle.HTextAlign = Renderer.RIGHT_ALIGNMENT,
+        myButtonPos.x += myButtonSize.x;
+        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", "Cancel", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        _myQuitCancelButton.onClick = function() {
+            _myQuitOSD.visible = false;
+        }
+        myStyle.HTextAlign = Renderer.CENTER_ALIGNMENT;
+        var myLabel = new Label(window.scene, "Quit ?", myOSDSize, new Vector2i(0,0), myStyle, _myQuitOSD);
+    }
+    
     function setupValueMaterials() {
         var myRasterNames = _myDriver.rasterNames;
         for (var i = 0; i < myRasterNames.length; ++i) {
@@ -244,6 +310,23 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         _myDriver.probeColor = theColor;
     }
 
+    function createTextOverlay(theWidth, theHeight) {
+        var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
+        myImage.src = "shadertex/on_screen_display.rgb";
+        myImage.resize = "pad";
+
+        var myBoxOverlay = new ImageOverlay(theViewer.getScene(), myImage);
+        myBoxOverlay.width  = theWidth;
+        myBoxOverlay.height = theHeight;
+        myBoxOverlay.position = new Vector2f((window.width - myBoxOverlay.width) / 2,
+                                             (window.height - myBoxOverlay.height) / 2);
+        myBoxOverlay.visible = true;
+
+        var myColor = 0.3;
+        myBoxOverlay.color = new Vector4f(myColor,myColor,myColor,0.75);
+        return myBoxOverlay;
+    }
+
 
 
     var _myViewer = theViewer;
@@ -256,7 +339,9 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     var _myInitialSettingsLoaded = false;
 
     var _myValueOverlay = null;
-
+    var _myQuitCancelButton  = null;
+    var _myQuitConfirmButton = null;
+    var _myQuitOSD = null;
     setup();
 }
 
