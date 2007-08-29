@@ -108,6 +108,8 @@ class ASSDriver :
         void performTara();
         void callibrateTransmissionLevels();
         void queryConfigMode();
+        void disconnect();
+        void connect();
 
         void allocateGridBuffers(const asl::Vector2i & theGridSize);
         void processSensorValues();
@@ -150,6 +152,8 @@ class ASSDriver :
         void drawCircle( const asl::Vector2f & thePosition, float theRadius,
                          unsigned theSubdivision, const asl::Vector4f & theColor);
 
+        void setupDriver(dom::NodePtr theSettings);
+
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
         RasterHandle _myMomentRaster;
@@ -191,6 +195,7 @@ class ASSDriver :
         asl::Vector4f _myProbeColor;
 
         TransportLayerPtr _myTransportLayer;
+        dom::NodePtr      _mySettings;
 };
 
 } // end of namespace

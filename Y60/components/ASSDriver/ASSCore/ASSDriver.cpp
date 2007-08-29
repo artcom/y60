@@ -95,7 +95,9 @@ ASSDriver::ASSDriver() :
     _myProbeColor(0.0, 0.75, 0.0, 1.0),
 
     _myClampToScreenFlag(false),
-    _myWindow( 0 )
+    _myWindow( 0 ),
+    _mySettings(dom::NodePtr(0))
+
 {
 }
 
@@ -791,17 +793,24 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
 void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
-    dom::NodePtr mySettings = getASSSettings( theSettings );
+    _mySettings = getASSSettings( theSettings );
+}
 
-    if ( _myTransportLayer && _myTransportLayer->settingsChanged( mySettings ) ) {
+void
+ASSDriver::setupDriver(dom::NodePtr theSettings) {
+    if (!theSettings) {
+        throw ASSException(string("Sorry, setup of assdriver with invalid settings node "),
+                PLUS_FILE_LINE);
+    }
+    if ( _myTransportLayer && _myTransportLayer->settingsChanged( theSettings ) ) {
         _myTransportLayer = TransportLayerPtr( 0 );
     }
 
     if ( ! _myTransportLayer ) {
         string myTransportName;
-        getConfigSetting( mySettings, "TransportLayer", myTransportName, string("serial") );
+        getConfigSetting( theSettings, "TransportLayer", myTransportName, string("serial") );
         if ( myTransportName == "serial" ) {
-            _myTransportLayer = TransportLayerPtr( new SerialTransport(mySettings) );
+            _myTransportLayer = TransportLayerPtr( new SerialTransport(theSettings) );
         } /*else if ( myTransportName == "udp") {
             TODO: UDP transport layer
         }*/ else {
@@ -810,15 +819,15 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
         }
     }
 
-    getConfigSetting( mySettings, "ComponentThreshold", _myComponentThreshold, 5 );
-    getConfigSetting( mySettings, "NoiseThreshold", _myNoiseThreshold, 15 );
-    getConfigSetting( mySettings, "GainPower", _myGainPower, 2.0f );
-    getConfigSetting( mySettings, "IntensityThreshold", _myIntensityThreshold, 9.0f );
-    getConfigSetting( mySettings, "FirstDerivativeThreshold", _myFirstDerivativeThreshold, 25.0f );
-    getConfigSetting( mySettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
-    getConfigSetting( mySettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
-    getConfigSetting( mySettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
-    getConfigSetting( mySettings, "ClampToScreen", _myClampToScreenFlag, 0);
+    getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
+    getConfigSetting( theSettings, "NoiseThreshold", _myNoiseThreshold, 15 );
+    getConfigSetting( theSettings, "GainPower", _myGainPower, 2.0f );
+    getConfigSetting( theSettings, "IntensityThreshold", _myIntensityThreshold, 9.0f );
+    getConfigSetting( theSettings, "FirstDerivativeThreshold", _myFirstDerivativeThreshold, 25.0f );
+    getConfigSetting( theSettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
+    getConfigSetting( theSettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
+    getConfigSetting( theSettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
+    getConfigSetting( theSettings, "ClampToScreen", _myClampToScreenFlag, 0);
 }
 
 Vector3f 
@@ -909,6 +918,16 @@ ASSDriver::callibrateTransmissionLevels() {
 }
 
 void
+ASSDriver::disconnect() {
+    AC_PRINT << "ASSDriver::disconnect()";
+    _myTransportLayer = TransportLayerPtr( 0 );
+}
+void
+ASSDriver::connect() {
+    AC_PRINT << "ASSDriver::connect()";
+    setupDriver( _mySettings );
+}
+void
 ASSDriver::queryConfigMode() {
     //AC_PRINT << "ASSDriver::queryConfigMode()";
     queueCommand( CMD_QUERY_CONFIG_MODE );
@@ -931,6 +950,32 @@ PerformTara(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
     if (myNative) {
         myNative->performTara();
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+static JSBool
+Connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
+    if (myNative) {
+        myNative->connect();
+    } else {
+        assert(myNative);
+    }
+    return JS_TRUE;
+}
+static JSBool
+Disconnect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    DOC_BEGIN("");
+    DOC_END;
+   
+    asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
+    if (myNative) {
+        myNative->disconnect();
     } else {
         assert(myNative);
     }
@@ -969,6 +1014,8 @@ QueryConfigMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 JSFunctionSpec * 
 ASSDriver::Functions() {
     static JSFunctionSpec myFunctions[] = {
+        {"connect", Connect, 0},
+        {"disconnect", Disconnect, 0},
         {"performTara", PerformTara, 0},
         {"callibrateTransmissionLevels", CallibrateTransmissionLevels, 0},
         {"queryConfigMode", QueryConfigMode, 0},
