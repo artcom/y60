@@ -869,7 +869,7 @@ ASSDriver::processInput() {
             ASSEvent myEvent = myFrameQueue.front();
             myFrameQueue.pop();
 
-            AC_TRACE << "popped event " << myEvent;
+            //AC_TRACE << "popped event " << myEvent;
 
             switch (myEvent.type) {
                 case ASS_FRAME:
