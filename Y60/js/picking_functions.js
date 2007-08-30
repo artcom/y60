@@ -145,9 +145,6 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return myClosestBody;
     }
     
-    /*******************************************************/
-    /**    Private Methods                                **/
-    /*******************************************************/
 
     obj.transformWorldToClip = function(theWorldPos) {
         var myProjectionMatrix = new Matrix4f(_myRenderWindow.camera.globalmatrix);
@@ -166,6 +163,9 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return transformClipToWorld(theClipPos, myViewport.getElementById(myViewport.camera));
     }
 
+    /*******************************************************/
+    /**    Private Methods                                **/
+    /*******************************************************/
 
     function getScreenPos(theScreenPixelX, theScreenPixelY) {
 	var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
