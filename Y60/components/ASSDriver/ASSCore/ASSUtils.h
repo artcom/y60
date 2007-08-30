@@ -32,11 +32,15 @@ struct RasterHandle {
 enum ASSEventType {
     ASS_FRAME,
     ASS_LOST_SYNC,
-    ASS_LOST_COM
+    ASS_LOST_COM,
+    ASS_INVALID
 };
+
+static const char *ASSEventTypes[] = { "ASS_FRAME", "ASS_LOST_SYNC", "ASS_LOST_COM", "ASS_INVALID" };
 
 struct ASSEvent {
     ASSEvent(ASSEventType theType) : type( theType ) {}
+    ASSEvent() : type( ASS_INVALID ) {}
 
     ASSEvent(const asl::Vector2i & theSize, unsigned char * theData) :
         type( ASS_FRAME ), size( theSize ), data( theData ) {}
@@ -45,6 +49,11 @@ struct ASSEvent {
     asl::Vector2i size;
     unsigned char * data;
 };
+
+inline std::ostream & operator<<(std::ostream & os, const ASSEvent &theEvent) {
+    os << "ASSEvent " << ASSEventTypes[theEvent.type] << " with size = " << theEvent.size;
+    return os;
+}
 
 DEFINE_EXCEPTION( ASSException, asl::Exception );
 
