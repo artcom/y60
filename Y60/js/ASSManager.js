@@ -89,7 +89,6 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
 
     var _myEventQueues = {};
     var _myEventIDMQBs = {};
-
     self.onASSEvent = function( theEventNode ) {
         if (!(theEventNode.id in _myEventQueues)) {
             _myEventQueues[theEventNode.id] = new Array();
@@ -129,6 +128,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                         _myQuitCursorEvent = null;
                     } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
                         _myQuitOSD.visible = true;
+                        theViewer.addTimedCallback(5.0, disbleOSD);                                    
                     }
                 }
             }
@@ -175,7 +175,10 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     self.driver getter = function() {
         return _myDriver;
     }
-    
+
+    self.disbleOSD = function() {
+        _myQuitOSD.visible = false;        
+    }    
     function buildQuitOSD() {
         const myStyle = {
             color:             asColor("FFFFFF"),
