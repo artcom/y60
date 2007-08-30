@@ -164,6 +164,7 @@ SerialTransport::readData() {
     } catch (const SerialPortException & ex) {
         //AC_WARNING << ex;
         //_myDriver->createTransportLayerEvent( "lost_communication" );
+        MAKE_SCOPE_TIMER(SerialTransport_serialPortException);
         _myFrameQueueLock.lock();
         _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
         _myFrameQueueLock.unlock();

@@ -229,8 +229,10 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                 if ( myHasChecksumFlag ) {
                     if (_myChecksum == myChecksum) {
                         //AC_PRINT << "Checksum OK.";
+			MAKE_SCOPE_TIMER(TransportLayer_parseStatusLine);
                         _myFrameQueueLock.lock();
                         _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameBuffer ));
+                        AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
                         _myFrameQueueLock.unlock();
                         // TODO use smart pointers 
                         _myFrameBuffer = 0;
@@ -401,6 +403,7 @@ TransportLayer::handleConfigurationCommand() {
         case SEND_CONFIG_COMMANDS:
             //AC_PRINT << "SEND_CONFIG_COMMANDS";
             if (myResponse == RESPONSE_OK) {
+                MAKE_SCOPE_TIMER(TransportLayer_handleConfigurationCommand);
                 _myCommandQueueLock.lock();
                 if ( ! _myCommandQueue.empty()) {
                     sendCommand( _myCommandQueue.front() );
@@ -417,6 +420,7 @@ TransportLayer::handleConfigurationCommand() {
                 AC_ERROR << "Failed to enter config mode: " 
                          << (myResponse == RESPONSE_TIMEOUT ? "timeout" : "error");
 
+                MAKE_SCOPE_TIMER(TransportLayer_handleConfigurationCommand2);
                 _myCommandQueueLock.lock();
                 while ( ! _myCommandQueue.empty() ) {
                     _myCommandQueue.pop();
@@ -491,6 +495,7 @@ TransportLayer::sendCommand( const std::string & theCommand ) {
         _myLastCommandTime = double( asl::Time() );
     } catch (const SerialPortException & ex) {
         AC_WARNING << ex;
+	MAKE_SCOPE_TIMER(TransportLayer_sendCommand);
         _myFrameQueueLock.lock();
         _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
         _myFrameQueueLock.unlock();
