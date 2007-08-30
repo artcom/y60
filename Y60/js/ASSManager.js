@@ -127,12 +127,14 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                     if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
                         _myQuitCursorEvent = null;
                     } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
-                        _myQuitOSD.visible = true;
-                        theViewer.addTimedCallback(5.0, disbleOSD);                                    
+                        if(_myQuitOSD.visible == false) {
+                            _myQuitOSD.visible = true;
+                            theViewer.addTimedCallback(5.0, 
+                                function() {_myQuitOSD.visible = false;_myQuitCursorEvent = null; });
+                        }    
                     }
                 }
             }
- 
             //_myEventMQBs[theEventNode.id].body.position = theEventNode.position3D;
 
         } else if ( theEventNode.type == "touch") {
@@ -176,9 +178,6 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         return _myDriver;
     }
 
-    self.disbleOSD = function() {
-        _myQuitOSD.visible = false;        
-    }    
     function buildQuitOSD() {
         const myStyle = {
             color:             asColor("FFFFFF"),

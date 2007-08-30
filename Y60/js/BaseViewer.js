@@ -323,8 +323,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.removeSkyBox = function() {
         _myRenderWindow.scene.world.skyboxmaterial = "";
     }
-    self.addTimedCallback = function(theDuration, theCallFunc, theArguments) {
-        _myTimedCallBacks.push({startTime:millisec(), duration:theDuration, callback:theCallFunc, arguments:theArguments});
+    self.addTimedCallback = function(theDuration, theCallFunc) {
+        _myTimedCallBacks.push({startTime:millisec(), duration:theDuration, callback:theCallFunc});
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -500,7 +500,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         for (var i = 0;i < _myTimedCallBacks.length;i++) {
             var myTimedCallBack = _myTimedCallBacks[i];
             if (millisec() - myTimedCallBack.startTime > myTimedCallBack.duration*1000) {
-                myTimedCallBack.callback(myTimedCallBack.arguments);
+                myTimedCallBack.callback();
                 _myTimedCallBacks.splice(i,1);
             } 
         }
