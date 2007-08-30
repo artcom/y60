@@ -21,7 +21,7 @@ ASSManager.driver = null;
 const VERBOSE_EVENTS = false;
 const QUIT_OSD = true;
 const ENABLE_QUIT_OSD_TIME = 4.0;
-const ENABLE_QUIT_OSD_DISTANCE = 20;//65.0;
+const ENABLE_QUIT_OSD_DISTANCE = 50;//65.0;
 
 ASSManager.prototype.Constructor = function(self, theViewer) {
     function setup() {
@@ -39,10 +39,6 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         }
         
 
-    }
-    self.onMouseButton = function(theButton, theState, theX, theY) {
-        _myQuitCancelButton.onMouseButton(theState, theX, theY);
-        _myQuitConfirmButton.onMouseButton(theState, theX, theY);
     }
 
     self.onUpdateSettings = function( theSettings ) {
@@ -128,13 +124,11 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                 if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
                     var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
                     var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
-                    print(myHandTraveled);
-                    if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
-                        if (myHandTraveled < ENABLE_QUIT_OSD_DISTANCE) {
-                            _myQuitOSD.visible = true;
-                        }
+                    //print(myHandTraveled);
+                    if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
                         _myQuitCursorEvent = null;
-                        //print("#### removed quit cursor after duration " + myTouchDuration);
+                    } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
+                        _myQuitOSD.visible = true;
                     }
                 }
             }
@@ -161,7 +155,6 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if (QUIT_OSD) {                    
                 if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
                     _myQuitCursorEvent = null;
-                    //print("#### removed quit cursor: duration " + myTouchDuration);
                 }
             }
         }
