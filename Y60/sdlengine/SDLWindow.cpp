@@ -473,7 +473,7 @@ void SDLWindow::setVisibility(bool theFlag) {
         if (theFlag) {
             XRaiseWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
         } else {
-            XLowerWindow((wminfo.info.x11.display, wminfo.info.x11.wmwindow);
+            XLowerWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
         }
         XSync(wminfo.info.x11.display, false);
         wminfo.info.x11.unlock_func();
