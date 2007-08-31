@@ -19,5 +19,10 @@
   <PTYPE name="expression"
          pattern=".*"
          help="ECMAScript expression"/>
+
+  <PTYPE name="onoff"
+         pattern="on(on) off(off)"
+         method="select"
+         help="on or off"/>
   
 </CLISH_MODULE>

@@ -7,8 +7,10 @@
 #include <iostream>
 #include <iterator>
 
+#include <js/jsapi.h>
 #include <js/jsfun.h>
 #include <js/jsatom.h>
+#include <js/jscntxt.h>
 #include <js/jsinterp.h>
 #include <js/jsdbgapi.h>
 
@@ -55,6 +57,21 @@ static JSFunctionSpec global_functions[] = {
     {0}
 };
 
+void
+ErrorReporter(JSContext *cx, const char *message, JSErrorReport *report) {
+    if(!report) {
+        cout << message;
+	return;
+    }
+    if(JSREPORT_IS_WARNING(report->flags)) {
+        cout << "WARNING ";
+    }
+    if(JSREPORT_IS_STRICT(report->flags)) {
+        cout << "STRICT ";
+    }
+    cout << message << endl;
+}
+
 // default constructor
 //
 // creates a fresh javascript runtime/context/global.
@@ -64,6 +81,8 @@ Tuttle::Tuttle() :
 {
     JSRuntime *myRuntime = JS_NewRuntime(JS_HEAP_SIZE);
     JSContext *myContext = JS_NewContext(myRuntime, JS_STACK_CHUNK);
+    JS_ToggleOptions(myContext, JSOPTION_STRICT);
+    JS_SetErrorReporter(myContext, ErrorReporter);
     JSObject  *myGlobal  = JS_NewObject(myContext, &global_class, NULL, NULL);
 
     JS_DefineFunctions(myContext, myGlobal, global_functions);
@@ -126,7 +145,7 @@ bool_t Tuttle::listContexts(const clish_shell_t *theShell, const lub_argv_t *the
 bool_t Tuttle::setContext(const clish_shell_t *theShell, const lub_argv_t *theArguments) {
     int n = atoi(lub_argv__get_arg(theArguments, 0));
 
-    if(n >= (int)_myContexts.size()) {
+    if((int)_myContexts.size() >= n || n < 0) {
         cout << "No such context." << endl;
         return BOOL_FALSE;
     }
@@ -170,5 +189,18 @@ bool_t Tuttle::showContext(const clish_shell_t *theShell, const lub_argv_t *theA
         cout << "No context selected." << endl;
     }
 
+    return BOOL_TRUE;
+}
+
+bool_t Tuttle::trace(const clish_shell_t *theShell, const lub_argv_t *theArguments) {
+    const char *arg = lub_argv__get_arg(theArguments, 0);
+    
+    if(0 == strcmp(arg, "on")) {
+        _myCurrentContext->tracefp = stderr;
+    }
+    if(0 == strcmp(arg, "off")) {
+        _myCurrentContext->tracefp = NULL;
+    }
+    
     return BOOL_TRUE;
 }
