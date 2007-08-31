@@ -314,6 +314,70 @@ namespace y60 {
     }
 
     dom::NodePtr
+    createPartialDisk(y60::ScenePtr theScene, const std::string & theMaterialId,
+                      float theRadius, float theStartDegrees, float theSweepDegrees, const std::string & theName)
+    {
+        // normalize sweepAngle
+        if (theSweepDegrees < -360.0) theSweepDegrees = 360.0;
+        if (theSweepDegrees > 360.0)  theSweepDegrees = 360.0;
+
+        // make angles absolute
+        if (theSweepDegrees < 0) {
+            theStartDegrees += theSweepDegrees;
+            theSweepDegrees = -theSweepDegrees;
+        }
+
+        // direction factor (outer vs inner angles)
+        const float myDirectionFactor = (theSweepDegrees >= 180.0 && theSweepDegrees < 360.0) ? -1.0 : +1.0;
+
+        // convert to radians
+        const float myStartRadians = theStartDegrees * ( PI/180 );
+        const float mySweepRadians = theSweepDegrees * ( PI/180 );
+        const float myEndRadians   = myStartRadians + mySweepRadians;
+
+        // positioning
+        asl::Vector3f myPointA( sin(myStartRadians) * theRadius, cos(myStartRadians) * theRadius, 0);
+        asl::Vector3f myPointB( sin(myEndRadians)   * theRadius, cos(myEndRadians)   * theRadius, 0);
+        asl::Vector3f myPointC( 0, 0, 0 );
+        asl::Vector3f myV1 = normalized( myPointA );
+        asl::Vector3f myV2 = normalized( myPointB );
+        asl::Vector3f myU = normalized( myV1 );
+        asl::Vector3f myV = normalized( myV2 - (dot(myV1, myV2) * myV1));
+
+        // tesselation
+        const unsigned myFullCircleSubdivisions = 72;
+        const unsigned myDiskSubdivisions = maximum<unsigned>(1, round<float>(myFullCircleSubdivisions / (2*PI / mySweepRadians)));
+        const unsigned myDiskVertices     = myDiskSubdivisions + 1;
+        const float    myVertexRadians    = (myDiskSubdivisions > 1) ? mySweepRadians / myDiskSubdivisions : mySweepRadians;
+
+        // compute the vertices
+        ShapeBuilder myShapeBuilder(theName);
+        theScene->getSceneBuilder()->appendShape(myShapeBuilder);
+        myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, 1 + myDiskVertices);
+        myShapeBuilder.appendVertexData(POSITION_ROLE, myPointC);
+
+        for(int i = (myDiskVertices - 1); i >= 0; i--) {
+            float myPhi = i * myVertexRadians;
+            asl::Vector3f myVertex(myPointC + theRadius * (cos(myPhi) * myU + myDirectionFactor * sin(myPhi) * myV));
+            myShapeBuilder.appendVertexData(POSITION_ROLE, myVertex);
+        }
+
+        // build the triangle fan
+        ElementBuilder myCircleElementBuilder(PRIMITIVE_TYPE_TRIANGLE_FAN, theMaterialId);
+        myCircleElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 1 + myDiskSubdivisions);
+        myCircleElementBuilder.appendIndex(POSITIONS, 0);
+
+        for (unsigned i = 0; i < myDiskVertices; i++) {
+            myCircleElementBuilder.appendIndex(POSITIONS, 1 + i);
+        }
+        
+        myShapeBuilder.appendElements( myCircleElementBuilder );
+
+        // return the result
+        return myShapeBuilder.getNode();
+    }
+
+    dom::NodePtr
     createDistanceMarkup(ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
                          const std::string & theName)

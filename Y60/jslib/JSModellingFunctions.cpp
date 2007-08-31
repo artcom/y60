@@ -316,6 +316,58 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
     } HANDLE_CPP_EXCEPTION;
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
+{
+    try {
+        DOC_BEGIN("Create an angle markup shape");
+        DOC_PARAM("theScene", "The scene to create the angle inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_PARAM("theRadius", "Radius of the partial disk", DOC_TYPE_FLOAT);
+        DOC_PARAM("theStartDegrees", "Start angle of the partial disk in degrees", DOC_TYPE_FLOAT);
+        DOC_PARAM("theSweepDegrees", "Sweep angle of the partial disk in degrees", DOC_TYPE_FLOAT);
+        DOC_PARAM_OPT("theName", "Name for the trianglefan shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created angle shape", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 5, 6);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        string myMaterialId;
+        convertFrom(cx, argv[1], myMaterialId);
+
+        float myRadius;
+        convertFrom(cx, argv[2], myRadius);
+
+        float myStartAngle;
+        convertFrom(cx, argv[3], myStartAngle);
+
+        float mySweepAngle;
+        convertFrom(cx, argv[4], mySweepAngle);
+
+        string myName;
+        if (argc > 5) {
+            convertFrom(cx, argv[5], myName);
+        }
+
+        dom::NodePtr myResult;
+        switch (argc) {
+            case 5:
+                myResult = createPartialDisk(myScene, myMaterialId, myRadius, myStartAngle, mySweepAngle);
+                break;
+            case 6:
+                myResult = createPartialDisk(myScene, myMaterialId, myRadius, myStartAngle, mySweepAngle, myName);
+                break;
+        }
+        *rval = as_jsval(cx, myResult);
+
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
 static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
 {
     try {
@@ -836,6 +888,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createCrosshair",             CreateCrosshair,             5},
         {"createDistanceMarkup",        CreateDistanceMarkup,        5},
         {"createAngleMarkup",           CreateAngleMarkup,           6},
+        {"createPartialDisk",           CreatePartialDisk,           5},
         {"createTriangleMeshMarkup",    CreateTriangleMeshMarkup,    5},
         {"createLineStrip",             CreateLineStrip,             4},
         {"createQuadStrip",             CreateQuadStrip,             4},
