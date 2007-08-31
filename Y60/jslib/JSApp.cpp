@@ -337,6 +337,27 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+#ifdef DEBUG
+JS_STATIC_DLL_CALLBACK(JSBool)
+Trace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Enables/disables tracing of javascript execution.");
+    DOC_PARAM("theEnable", "Whether to enable or disable tracing.", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        bool myEnable;
+        convertFrom(cx, argv[0], myEnable);
+
+        if(myEnable) {
+            cx->tracefp = stderr;
+        } else {
+            cx->tracefp = NULL;
+        }
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+#endif
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 ReadStdIn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Reads n bytes from stdin or until an EOF.");
@@ -1335,6 +1356,9 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSFunctionSpec glob_functions[] = {
     {"print",             Print,          0},
+#ifdef DEBUG
+    {"trace",             Trace,          1},
+#endif
     {"readStdIn",         ReadStdIn,      1},
     {"use",               Use,            1},
     {"reuse",             Reuse,          0},
