@@ -471,9 +471,9 @@ void SDLWindow::setVisibility(bool theFlag) {
 #ifndef OSX // TODO PORT
         wminfo.info.x11.lock_func();
         if (theFlag) {
-            XMapRaised(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
+            XRaiseWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
         } else {
-            XUnmapWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
+            XLowerWindow((wminfo.info.x11.display, wminfo.info.x11.wmwindow);
         }
         XSync(wminfo.info.x11.display, false);
         wminfo.info.x11.unlock_func();
