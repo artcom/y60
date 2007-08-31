@@ -79,6 +79,9 @@ namespace jslib {
          */
         virtual bool go();
 
+        virtual void setVisibility(bool theFlag);
+        bool getVisibility() const;
+
         JSObject * getEventListener() const;
         void setEventListener(JSObject * theListener);
 
@@ -289,6 +292,7 @@ namespace jslib {
         unsigned int         _myMultisamples;
 
         double               _myElapsedTime;
+        bool                 _myVisiblityFlag;
 
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
 
@@ -307,7 +311,6 @@ namespace jslib {
         double            _myPauseTime;
         bool              _myPauseFlag;
         bool              _myForceFullGC;
-
     };
 
 }

@@ -51,7 +51,8 @@ namespace jslib {
         _myFixedDeltaT(0.0),
         _myStartTime(-1.0), _myElapsedTime(0.0),
         _myPauseTime(0.0), _myPauseFlag(false),
-        _myForceFullGC(false)
+        _myForceFullGC(false),
+        _myVisiblityFlag(true)
         {
         }
 
@@ -81,6 +82,13 @@ namespace jslib {
             //_myScene->createStubs(JSApp::getPackageManager());
             setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
+    }
+    void AbstractRenderWindow::setVisibility(bool theFlag) {
+        AC_WARNING << "AbstractRenderWindow::setVisibility() not implemented.";
+    }
+
+    bool AbstractRenderWindow::getVisibility() const {
+        return _myVisiblityFlag;
     }
 
     y60::ScenePtr &

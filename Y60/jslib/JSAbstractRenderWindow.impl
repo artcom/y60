@@ -893,6 +893,7 @@ JSPropertySpec * JSAbstractRenderWindow<DERIVED>::BaseProperties() {
         {"height",          PROP_height,            JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"forceFullGC",     PROP_forceFullGC,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // boolean
         {"pause",           PROP_pause,             JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // boolean
+        {"visible",         PROP_visible,           JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // boolean
         {"eventListener",   PROP_eventListener,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"canvas",          PROP_canvas,            JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // Node
         {"camera",          PROP_camera,            JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // Node
@@ -926,6 +927,9 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
     switch (theID) {
         case PROP_forceFullGC:
             *vp = as_jsval(cx, theNative.getForceFullGC()); //TODO: remove global
+            return JS_TRUE;            
+        case PROP_visible:
+            *vp = as_jsval(cx, theNative.getVisibility()); 
             return JS_TRUE;
         case PROP_pause:
             *vp = as_jsval(cx, theNative.getPause()); //TODO: remove global
@@ -1030,6 +1034,11 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
             {
                 typedef void (DERIVED::*MyMethod)(bool);
                 return Method<DERIVED>::call((MyMethod)&DERIVED::setForceFullGC, cx, obj, 1, vp, &dummy);
+            }            
+        case PROP_visible:
+            {
+                typedef void (DERIVED::*MyMethod)(bool);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::setVisibility, cx, obj, 1, vp, &dummy);
             }
         case PROP_pause:
             {

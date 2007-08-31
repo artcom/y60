@@ -356,6 +356,7 @@ SDLWindow::resetCursor() {
     }
 }
 
+
 // <CursorDesc data="[]" size="[]", hotSize="[]" />
 void
 SDLWindow::createCursor(dom::NodePtr & theCursorInfo) {
@@ -443,6 +444,43 @@ SDLWindow::getScreenSize(unsigned theScreen) const {
     }
     return asl::Vector2i(myWidth, myHeight);
 }
+void SDLWindow::setVisibility(bool theFlag) {
+    _myVisiblityFlag = theFlag;
+    SDL_SysWMinfo wminfo;
+    SDL_VERSION(&wminfo.version);
+    if (SDL_GetWMInfo(&wminfo) < 0) {
+        AC_ERROR << "SDL_GetWMInfo: " << SDL_GetError() << endl;
+        return;
+    }
+#ifdef WIN32
+    LPCTSTR myRenderGirlWindowName = _myWindowTitle.c_str();
+    HWND myRenderGirlWindow = FindWindow(0, myRenderGirlWindowName);
+    if (myRenderGirlWindow != wminfo.window) {
+        AC_ERROR << "Windows don't match!\n";
+        myRenderGirlWindow = wminfo.window;
+    }
+    if (myRenderGirlWindow) {
+        //ShowWindow(myRenderGirlWindow, theFlag ? SW_SHOW:SW_HIDE);
+        ShowWindow(myRenderGirlWindow, theFlag ? SW_RESTORE:SW_MINIMIZE);
+        if (theFlag) {
+            SetForegroundWindow(myRenderGirlWindow);
+        }
+        
+    }
+#else
+#ifndef OSX // TODO PORT
+        wminfo.info.x11.lock_func();
+        if (theFlag) {
+            XMapRaised(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
+        } else {
+            XUnmapWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
+        }
+        XSync(wminfo.info.x11.display, false);
+        wminfo.info.x11.unlock_func();
+#endif
+#endif        
+    AC_PRINT << "SDLWindow::setVisibility : " << theFlag;
+    }
 
 void SDLWindow::setPosition(asl::Vector2i thePos) {
     _myWindowPosX = thePos[0];

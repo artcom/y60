@@ -65,6 +65,9 @@ namespace y60 {
             /// Get window height.
             virtual int getHeight() const;
 
+            /// Set visibility 
+            void setVisibility(bool theFlag);
+
             /// Set/get window title.
             void setWindowTitle(const std::string & theTitle);
             const std::string & getWindowTitle() const;
