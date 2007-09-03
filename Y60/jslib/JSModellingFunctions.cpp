@@ -264,13 +264,14 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Create an angle markup shape");
-        DOC_PARAM("theScene", "The scene to create the angle inside", DOC_TYPE_SCENE);
-        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_PARAM("theScene", "The scene to create the angle markup in", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shape", DOC_TYPE_STRING);
         DOC_PARAM("theApex", "", DOC_TYPE_VECTOR3F);
         DOC_PARAM("thePointA", "", DOC_TYPE_VECTOR3F);
-        DOC_PARAM("thePointA", "", DOC_TYPE_VECTOR3F);
-        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
-        DOC_RVAL("The new created angle shape", DOC_TYPE_NODE);
+        DOC_PARAM("thePointB", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theOuterAngleFlag", "", DOC_TYPE_BOOLEAN);
+        DOC_PARAM_OPT("theName", "Name for the generated shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The newly created shape", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 6, 7);
@@ -320,14 +321,14 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 {
     try {
-        DOC_BEGIN("Create an angle markup shape");
-        DOC_PARAM("theScene", "The scene to create the angle inside", DOC_TYPE_SCENE);
-        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_BEGIN("Create a partial disk shape");
+        DOC_PARAM("theScene", "The scene to create the disk in", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shape", DOC_TYPE_STRING);
         DOC_PARAM("theRadius", "Radius of the partial disk", DOC_TYPE_FLOAT);
         DOC_PARAM("theStartDegrees", "Start angle of the partial disk in degrees", DOC_TYPE_FLOAT);
         DOC_PARAM("theSweepDegrees", "Sweep angle of the partial disk in degrees", DOC_TYPE_FLOAT);
-        DOC_PARAM_OPT("theName", "Name for the trianglefan shape", DOC_TYPE_STRING, "");
-        DOC_RVAL("The new created angle shape", DOC_TYPE_NODE);
+        DOC_PARAM_OPT("theName", "Name for the generated shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The newly created shape", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 5, 6);
