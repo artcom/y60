@@ -566,9 +566,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.enableHeartbeat = function(theFrequency, theHeartbeatfile) {
         if (_myHeartbeatThrober == null) {
-            _myHeartbeatThrober = new HeartbeatThrober(false, 10, "${TEMP}/heartbeat.xml");
+            _myHeartbeatThrober = new HeartbeatThrober(false, 1, "${TEMP}/heartbeat.xml");
         }
-        _myHeartbeatThrober.use(true, theFrequency, theHeartbeatfile);
+        if(theHeartbeatfile != undefined && theFrequency != undefined) {
+            _myHeartbeatThrober.use(true, theFrequency, theHeartbeatfile);
+        } else {
+            _myHeartbeatThrober.enable(true);
+        }
     }
 
     self.enableNagios = function(thePort) {

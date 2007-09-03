@@ -20,13 +20,16 @@ function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
     var _myLastThrobTime  = -1;
     var _IsEnabled        = theEnableFlag;
     var _myFilename       = theFilename;
+    var _myFirstThrob     = true;
     this.throb = function(theTime) {
         if (_myLastThrobTime == -1) {
             _myLastThrobTime = theTime;
+            _myFirstThrob = true;
         }
         if (_IsEnabled) {
             var myDeltaTime = theTime - _myLastThrobTime;
-            if (myDeltaTime > _myFrequency) {
+            if (myDeltaTime > _myFrequency || _myFirstThrob) {
+                _myFirstThrob = false;
                 var mySecondsSince1970 = Date.parse(Date());
                 var myHeartbeatString =
                     '<heartbeat secondsSince1970="' + mySecondsSince1970 +'" >\n' +
@@ -46,6 +49,7 @@ function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
     
     this.enable = function(theFlag) {
         _IsEnabled = theFlag;
+        _myFirstThrob = true;
     }
 
 }

@@ -177,7 +177,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         return _myDriver;
     }
 
-    self.setOSDInvisible function() {
+    self.setOSDInvisible = function() {
         _myQuitOSD.visible = false;
         _myQuitCursorEvent = null;         
     }
