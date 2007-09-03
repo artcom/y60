@@ -71,6 +71,7 @@ class SimWater :
         int _myFloormapCounter;    
         int _myCubemapCounter;    
 
+        bool _isRunning;
 };
 #endif // Y60_SIM_WATER_INCLUDED
 

@@ -48,7 +48,8 @@ SimWater::SimWater(DLHandle theDLHandle) :
     _myTimeStep( 0.1f ),
     _myViewportSize(0, 0),
     _myFloormapCounter(0),
-    _myCubemapCounter(0)
+    _myCubemapCounter(0),
+    _isRunning( false )
 {
 //    initGLExtensions(0);
 }
@@ -106,7 +107,7 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         return;
     }
     if (thePropertyName == "simulationSize") {
-        theReturnValue.set( Vector2i(SIMULATION_WIDTH, SIMULATION_HEIGHT));
+        theReturnValue.set( _mySimulationSize /*Vector2i(SIMULATION_WIDTH, SIMULATION_HEIGHT)*/);
         return;
     }
     if (thePropertyName == "displaySize") {
@@ -159,6 +160,23 @@ SimWater::onSetProperty(const std::string & thePropertyName,
         _myWaterRepresentation->setDataOffset( _mySimulationOffset );
         return;
     }
+    if (thePropertyName == "simulationSize") {
+        if ( ! _isRunning ) {
+            _mySimulationSize = thePropertyValue.get<Vector2i>();
+            _mySimulationSize += Vector2i(2, 2);
+        } else {
+            AC_WARNING << "simulationSize is only setable immediatly after construction.";
+        }
+        return;
+    }
+    if (thePropertyName == "displaySize") {
+        if ( ! _isRunning ) {
+            _myDisplaySize = thePropertyValue.get<Vector2i>();
+        } else {
+            AC_WARNING << "displaySize is only setable immediatly after construction.";
+        }
+        return;
+    }
     if (thePropertyName == "displayOffset") {
         _myDisplayOffset = thePropertyValue.get<Vector2i>();
         _myWaterRepresentation->setDisplayOffset( _myDisplayOffset );
@@ -195,6 +213,7 @@ SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
             BufferAllocatorPtr( new AGPBufferAllocator ) );
 
     _myStartTime.setNow();
+    _isRunning = true;
 };
 
 void
