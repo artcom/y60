@@ -129,8 +129,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                     } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
                         if(_myQuitOSD.visible == false) {
                             _myQuitOSD.visible = true;
-                            theViewer.addTimedCallback(5.0, 
-                                function() {_myQuitOSD.visible = false;_myQuitCursorEvent = null; });
+                            window.setTimeout("setOSDInvisible", 5.0*1000);                                                
                         }    
                     }
                 }
@@ -178,6 +177,10 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         return _myDriver;
     }
 
+    self.setOSDInvisible function() {
+        _myQuitOSD.visible = false;
+        _myQuitCursorEvent = null;         
+    }
     function buildQuitOSD() {
         const myStyle = {
             color:             asColor("FFFFFF"),

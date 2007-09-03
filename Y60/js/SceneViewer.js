@@ -165,7 +165,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             showStatistics();
         }
     }
-
+self.CB = function() {
+    window.visible = true;
+}
+    
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         var myMover = self.getMover(self.getActiveViewport());
     	if (myMover) {
@@ -193,6 +196,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         if (!theAltFlag) {
             switch (theKey) {
+                case 'u':
+                    window.visible = false;
+                    window.setTimeout("CB", 5.0*1000);                    
+                    break;
                 case 'n':
                     self.getActiveViewport().drawnormals = !self.getActiveViewport().drawnormals;
                     print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));

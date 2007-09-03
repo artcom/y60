@@ -323,9 +323,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.removeSkyBox = function() {
         _myRenderWindow.scene.world.skyboxmaterial = "";
     }
-    self.addTimedCallback = function(theDuration, theCallFunc) {
-        _myTimedCallBacks.push({startTime:millisec(), duration:theDuration, callback:theCallFunc});
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //  RenderWindow callback handlers
@@ -497,13 +494,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onFrame = function(theTime) {
-        for (var i = 0;i < _myTimedCallBacks.length;i++) {
-            var myTimedCallBack = _myTimedCallBacks[i];
-            if (millisec() - myTimedCallBack.startTime > myTimedCallBack.duration*1000) {
-                myTimedCallBack.callback();
-                _myTimedCallBacks.splice(i,1);
-            } 
-        }
         if (_myProfileNode) {
             var myFPS = _myRenderWindow.fps;
             if (myFPS > _myProfileNode.maxfps) {
@@ -648,7 +638,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myTSwitchNodes = new Array();
     var _myMaterialTable = null;
     var _myDrawCameraFrustumFlag = false;
-    var _myTimedCallBacks = [];
 
     self.__defineGetter__('_myPicking', function() { return _myPicking; });
 
