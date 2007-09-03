@@ -479,7 +479,7 @@ void SDLWindow::setVisibility(bool theFlag) {
         wminfo.info.x11.unlock_func();
 #endif
 #endif        
-    AC_PRINT << "SDLWindow::setVisibility : " << theFlag;
+    AC_TRACE << "SDLWindow::setVisibility : " << theFlag;
     }
 
 void SDLWindow::setPosition(asl::Vector2i thePos) {
