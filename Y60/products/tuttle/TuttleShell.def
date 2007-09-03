@@ -1,0 +1,13 @@
+
+#ifndef CLISH_BUILTIN
+#error TuttleShell.def is an internal include.
+#endif
+
+CLISH_BUILTIN(tuttle_print, Print)
+CLISH_BUILTIN(tuttle_load,  Load)
+
+CLISH_BUILTIN(tuttle_list_contexts, ListContexts)
+CLISH_BUILTIN(tuttle_set_context,   SetContext)
+CLISH_BUILTIN(tuttle_show_context,  ShowContext)
+
+CLISH_BUILTIN(tuttle_trace, Trace)

@@ -14,6 +14,8 @@
 #include <js/jsinterp.h>
 #include <js/jsdbgapi.h>
 
+#include <lub/string.h>
+
 using namespace std;
 using namespace tuttle;
 
@@ -63,14 +65,61 @@ ErrorReporter(JSContext *cx, const char *message, JSErrorReport *report) {
         cout << message;
 	return;
     }
+
+    if(report->filename) {
+        cout << report->filename << ":";
+    }
+    if(report->lineno) {
+        cout << report->lineno << ": ";
+    }
+
     if(JSREPORT_IS_WARNING(report->flags)) {
-        cout << "WARNING ";
+        if(JSREPORT_IS_STRICT(report->flags)) {
+            cout << "strict ";
+        }
+        cout << "warning: ";
     }
-    if(JSREPORT_IS_STRICT(report->flags)) {
-        cout << "STRICT ";
-    }
+
     cout << message << endl;
+    
+    if(report->linebuf) {
+        int buflen = strlen(report->linebuf);
+
+        cout << report->linebuf;
+
+        if(report->linebuf[buflen-1] != '\n')
+            cout << endl;
+
+        const char *curchar;
+        for(curchar = report->linebuf; curchar <= report->tokenptr; curchar++) {
+            if(*curchar == '\t') {
+                cout << "        ";
+            } else if (*curchar == ' ') {
+                cout << ' ';
+            } else if (curchar == report->tokenptr) {
+                cout << '^';
+            }
+        }
+
+        cout << endl;        
+    } else {
+        cout << endl;
+    }
+
 }
+
+static JSTrapStatus
+DebuggerTrap(JSContext *theContext, JSScript *theScript, jsbytecode *pc, jsval *rval, void *closure) {
+    cout << "Debugger trap. Failing." << endl;
+    return JSTRAP_ERROR;
+}
+
+static JSTrapStatus
+ThrowTrap(JSContext *theContext, JSScript *theScript, jsbytecode *pc, jsval *rval, void *closure) {
+    cout << "Throw trap. Failing." << endl;
+    return JSTRAP_ERROR;
+}
+
 
 // default constructor
 //
@@ -83,8 +132,13 @@ Tuttle::Tuttle() :
     JSContext *myContext = JS_NewContext(myRuntime, JS_STACK_CHUNK);
     JS_ToggleOptions(myContext, JSOPTION_STRICT);
     JS_SetErrorReporter(myContext, ErrorReporter);
+
+    JS_SetThrowHook(myRuntime, ThrowTrap, NULL);
+    JS_SetDebuggerHandler(myRuntime, DebuggerTrap, NULL);
+
     JSObject  *myGlobal  = JS_NewObject(myContext, &global_class, NULL, NULL);
 
+    JS_InitStandardClasses(myContext, myGlobal);
     JS_DefineFunctions(myContext, myGlobal, global_functions);
 
     _myRuntime = myRuntime;
@@ -104,27 +158,47 @@ void Tuttle::registerContext(JSContext *theContext) {
 }
 
 
-// evaluate an expression in-frame.
-bool_t Tuttle::evaluate(const clish_shell_t *theShell, const lub_argv_t *theArguments) {
-    const char *myCode       = lub_argv__get_arg(theArguments, 0);
+bool_t Tuttle::print(const clish_shell_t *theShell, const lub_argv_t *theArguments) {
+    bool_t result = BOOL_TRUE;
+    char *myCode       = lub_string_dup(lub_argv__get_arg(theArguments, 0));
     const int   myCodeLength = strlen(myCode);
 
+    unsigned i = 0;
+    for(i = 0; i < lub_argv__get_count(theArguments); i++) {
+        cout << i << ": " << lub_argv__get_arg(theArguments, i) << endl;
+    }
+
     JSContext    *myContext = _myCurrentContext;
-    //    JSStackFrame *myFrame   = NULL;
+    jsval rval, prval;
 
-    jsval rval;
+    cout << myCode << endl;
 
-    //    JS_FrameIterator(myContext, &myFrame);
+    if(!JS_EvaluateScript(myContext, _myGlobal, myCode, myCodeLength, "interactor", 1, &rval)) {
+        result = BOOL_FALSE;
+        goto out;
+    } else {
+        Print(myContext, _myGlobal, 1, &rval, &prval);
+    }
 
-    //    if(myFrame) {
-    //        cout << "In-frame evaluation not implemented.\n";
-    //    } else {
-    if(!JS_EvaluateScript(myContext, _myGlobal, myCode, myCodeLength, "interactor", 1, &rval))
-        cout << "ERROR!" << endl;
-       
-    //    }
+ out:
+    if(myCode)
+        lub_string_free(myCode);
+    return result;
+}
 
-        Print(myContext, NULL, 1, &rval, NULL);
+bool_t Tuttle::load(const clish_shell_t *theShell, const lub_argv_t *theArguments) {
+    const char *myFile = lub_argv__get_arg(theArguments, 0);
+    JSContext    *myContext = _myCurrentContext;
+    JSObject *myGlobal = _myGlobal;
+    JSScript *myScript;
+    jsval result;
+    myScript = JS_CompileFile(myContext, myGlobal, myFile);
+    if (myScript) {
+        (void)JS_ExecuteScript(myContext, myGlobal, myScript, &result);
+        JS_DestroyScript(myContext, myScript);
+    } else {
+        cout << "Could not compile." << endl;
+    }
 
     return BOOL_TRUE;
 }

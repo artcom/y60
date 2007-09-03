@@ -6,7 +6,7 @@
 
   <COMMAND name="trace" help="enable/disable interpreter trace">
     <PARAM name="enabled" ptype="onoff" help="whether to enable tracing"/>
-    <ACTION builtin="tuttle_trace">$enabled</ACTION>
+    <ACTION builtin="tuttle_trace">${enabled}</ACTION>
   </COMMAND>
 
 </CLISH_MODULE>

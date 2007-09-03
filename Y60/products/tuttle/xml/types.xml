@@ -20,6 +20,10 @@
          pattern=".*"
          help="ECMAScript expression"/>
 
+  <PTYPE name="filename"
+         pattern=".*"
+         help="filename"/>
+
   <PTYPE name="onoff"
          pattern="on(on) off(off)"
          method="select"

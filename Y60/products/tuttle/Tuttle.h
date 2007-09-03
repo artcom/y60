@@ -19,18 +19,20 @@ namespace tuttle {
         void registerContext(JSContext *);
 
         // commands - debug.xml
-        bool_t evaluate    (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t print (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t load  (const clish_shell_t *theShell, const lub_argv_t *theArguments);
         
         // commands - context.xml
-        bool_t listContexts(const clish_shell_t *theShell, const lub_argv_t *theArguments);
-        bool_t setContext  (const clish_shell_t *theShell, const lub_argv_t *theArguments);
-        bool_t showContext (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t listContexts (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t setContext   (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t showContext  (const clish_shell_t *theShell, const lub_argv_t *theArguments);
 
         // commands - trace.xml
-        bool_t trace       (const clish_shell_t *theShell, const lub_argv_t *theArguments);
+        bool_t trace (const clish_shell_t *theShell, const lub_argv_t *theArguments);
         
     private:
         JSRuntime                *_myRuntime;
+        
         JSContext                *_myCurrentContext;
         std::vector<JSContext *>  _myContexts;
         JSObject                 *_myGlobal;        
