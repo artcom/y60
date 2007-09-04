@@ -325,13 +325,14 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         DOC_PARAM("theScene", "The scene to create the disk in", DOC_TYPE_SCENE);
         DOC_PARAM("theMaterialId", "The id of the material used for the shape", DOC_TYPE_STRING);
         DOC_PARAM("theRadius", "Radius of the partial disk", DOC_TYPE_FLOAT);
+        DOC_PARAM("theSteps", "Tesselation steps for a full circle", DOC_TYPE_INTEGER);
         DOC_PARAM("theStartDegrees", "Start angle of the partial disk in degrees", DOC_TYPE_FLOAT);
         DOC_PARAM("theSweepDegrees", "Sweep angle of the partial disk in degrees", DOC_TYPE_FLOAT);
         DOC_PARAM_OPT("theName", "Name for the generated shape", DOC_TYPE_STRING, "");
         DOC_RVAL("The newly created shape", DOC_TYPE_NODE);
         DOC_END;
 
-        ensureParamCount(argc, 5, 6);
+        ensureParamCount(argc, 6, 7);
 
         y60::ScenePtr myScene(0);
         convertFrom(cx, argv[0], myScene);
@@ -342,24 +343,27 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         float myRadius;
         convertFrom(cx, argv[2], myRadius);
 
+        int mySteps;
+        convertFrom(cx, argv[3], mySteps);
+
         float myStartAngle;
-        convertFrom(cx, argv[3], myStartAngle);
+        convertFrom(cx, argv[4], myStartAngle);
 
         float mySweepAngle;
-        convertFrom(cx, argv[4], mySweepAngle);
+        convertFrom(cx, argv[5], mySweepAngle);
 
         string myName;
         if (argc > 5) {
-            convertFrom(cx, argv[5], myName);
+            convertFrom(cx, argv[6], myName);
         }
 
         dom::NodePtr myResult;
         switch (argc) {
-            case 5:
-                myResult = createPartialDisk(myScene, myMaterialId, myRadius, myStartAngle, mySweepAngle);
-                break;
             case 6:
-                myResult = createPartialDisk(myScene, myMaterialId, myRadius, myStartAngle, mySweepAngle, myName);
+                myResult = createPartialDisk(myScene, myMaterialId, myRadius, mySteps, myStartAngle, mySweepAngle);
+                break;
+            case 7:
+                myResult = createPartialDisk(myScene, myMaterialId, myRadius, mySteps, myStartAngle, mySweepAngle, myName);
                 break;
         }
         *rval = as_jsval(cx, myResult);

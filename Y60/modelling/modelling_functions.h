@@ -113,7 +113,7 @@ createAngleMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
 
 dom::NodePtr
 createPartialDisk(y60::ScenePtr theScene, const std::string & theMaterialId,
-                  float theRadius, float theStartAngle, float theSweepAngle, const std::string & theName = "PartialDiskShape");
+                  float theRadius, int theSteps, float theStartAngle, float theSweepAngle, const std::string & theName = "PartialDiskShape");
 
 dom::NodePtr
 createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMaterialId,

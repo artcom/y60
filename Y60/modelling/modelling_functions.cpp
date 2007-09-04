@@ -315,7 +315,7 @@ namespace y60 {
 
     dom::NodePtr
     createPartialDisk(y60::ScenePtr theScene, const std::string & theMaterialId,
-                      float theRadius, float theStartDegrees, float theSweepDegrees, const std::string & theName)
+                      float theRadius, int theSteps, float theStartDegrees, float theSweepDegrees, const std::string & theName)
     {
         // normalize sweepAngle
         if (theSweepDegrees < -360.0) theSweepDegrees = 360.0;
@@ -345,7 +345,7 @@ namespace y60 {
         asl::Vector3f myV = normalized( myV2 - (dot(myV1, myV2) * myV1));
 
         // tesselation
-        const unsigned myFullCircleSubdivisions = 72;
+        const unsigned myFullCircleSubdivisions = theSteps;
         const unsigned myDiskSubdivisions = maximum<unsigned>(1, round<float>(myFullCircleSubdivisions / (2*PI / mySweepRadians)));
         const unsigned myDiskVertices     = myDiskSubdivisions + 1;
         const float    myVertexRadians    = (myDiskSubdivisions > 1) ? mySweepRadians / myDiskSubdivisions : mySweepRadians;
