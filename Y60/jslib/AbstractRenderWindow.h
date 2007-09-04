@@ -91,9 +91,9 @@ namespace jslib {
         void setForceFullGC(bool theForceFullGC);
         bool getForceFullGC() const;
 
-        long setTimeout(const std::string & myCommand, float myMilliseconds);
+        long setTimeout(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall);
         void clearTimeout(long myTimeoutId);
-        long setInterval(const std::string & myCommand, float myMilliseconds);
+        long setInterval(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall);
         void clearInterval(long myIntervalId);
 
         bool hasCap(unsigned int theCap);

@@ -129,7 +129,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                     } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
                         if(_myQuitOSD.visible == false) {
                             _myQuitOSD.visible = true;
-                            window.setTimeout("setOSDInvisible", 5.0*1000);                                                
+                            window.setTimeout("setOSDInvisible", 5.0*1000, self);     
                         }    
                     }
                 }

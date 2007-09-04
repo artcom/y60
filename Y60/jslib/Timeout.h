@@ -28,10 +28,11 @@ class Timeout {
     public:
         Timeout();
         Timeout(const std::string & theCommand, double theDuration,
-                asl::Time theCurrentTime, bool theIsInterval = false);
+                asl::Time theCurrentTime, bool theIsInterval = false, JSObject * theObjectToCall = 0);
         virtual ~Timeout(); 
         const std::string & getCommand() const; 
         const double getActivationTime() const; 
+        JSObject * Timeout::getObjectToCall() const;                
         bool isInterval() const; 
         void resetInterval(); 
     private:
@@ -39,6 +40,7 @@ class Timeout {
         double           _myDuration;
         double           _myActivationTime;
         bool             _isInterval;
+        JSObject *       _myObjectToCall;
 };
 
 typedef asl::Ptr<Timeout> TimeoutPtr;
@@ -51,7 +53,7 @@ class TimeoutQueue {
         TimeoutQueue();
 
         unsigned long addTimeout(const std::string & theCommand,
-                asl::Time theCurrentTime, double theDuration, bool isInterval = false);
+                asl::Time theCurrentTime, double theDuration, bool isInterval = false, JSObject * theObjectToCall = 0);
         void clearTimeout(unsigned long theId); 
         bool isShowTime(double theTime); 
         TimeoutPtr popTimeout(); 

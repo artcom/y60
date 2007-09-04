@@ -327,16 +327,16 @@ namespace jslib {
     }
     
     long
-    AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds);
+    AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall) {
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, false, theObjectToCall);
     }
     void
     AbstractRenderWindow::clearTimeout(long myTimeoutId) {
         _myTimeoutQueue.clearTimeout(myTimeoutId);
     }
     long
-    AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, true /* isInterval */);
+    AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall) {
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, true, theObjectToCall);
     }
     void
     AbstractRenderWindow::clearInterval(long myIntervalId) {
@@ -416,10 +416,14 @@ namespace jslib {
                 const std::string & myTimeoutCommand = myTimeout->getCommand();
                 try {
                     MAKE_SCOPE_TIMER(onPostViewport);
-                    if (JSA_hasFunction(_myJSContext, _myEventListener, myTimeoutCommand.c_str()))
+                    JSObject * myListener = _myEventListener;
+                    if (myTimeout->getObjectToCall()) {
+                        myListener = myTimeout->getObjectToCall();
+                    }
+                    if (JSA_hasFunction(_myJSContext, myListener, myTimeoutCommand.c_str()))
                     {
                         jsval rval;
-                        jslib::JSA_CallFunctionName(_myJSContext, _myEventListener,
+                        jslib::JSA_CallFunctionName(_myJSContext, myListener,
                                                     myTimeoutCommand.c_str(), 0, 0, &rval);
                     } else {
                         AC_ERROR << "Timeout: Function " << myTimeoutCommand

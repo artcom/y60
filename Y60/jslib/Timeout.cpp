@@ -17,11 +17,12 @@ namespace jslib {
     Timeout::Timeout() {}
 
     Timeout::Timeout(const string & theCommand, double theDuration,
-            asl::Time theCurrentTime, bool theIsInterval)
+            asl::Time theCurrentTime, bool theIsInterval, JSObject * theObjectToCall)
         : _myCommand(theCommand),
           _myDuration(theDuration),
           _isInterval(theIsInterval),
-          _myActivationTime(theCurrentTime + theDuration / 1000.0)
+          _myActivationTime(theCurrentTime + theDuration / 1000.0),
+          _myObjectToCall(theObjectToCall)
         {
         }
 
@@ -29,6 +30,10 @@ namespace jslib {
 
     const string & Timeout::getCommand() const {
         return _myCommand;
+    }
+
+    JSObject * Timeout::getObjectToCall() const {
+        return _myObjectToCall;
     }
 
     const double Timeout::getActivationTime() const {
@@ -46,10 +51,10 @@ namespace jslib {
     TimeoutQueue::TimeoutQueue() {}
 
     unsigned long TimeoutQueue::addTimeout(const string & theCommand,
-            asl::Time theCurrentTime, double theDuration, bool isInterval)
+            asl::Time theCurrentTime, double theDuration, bool isInterval, JSObject * theObjectToCall)
     {
         TimeoutPtr myTimeout(new Timeout(theCommand, theDuration, 
-                    theCurrentTime, isInterval));
+                    theCurrentTime, isInterval, theObjectToCall));
         _myTimeoutMap[ourNextTimeoutId] = myTimeout;
         _myTimeoutQueue.insert(std::pair<double, unsigned long>(myTimeout->getActivationTime(),
                     ourNextTimeoutId));

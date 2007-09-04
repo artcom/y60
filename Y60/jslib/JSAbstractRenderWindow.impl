@@ -29,8 +29,34 @@ JSBool JSAbstractRenderWindow<DERIVED>::setTimeout(JSContext *cx, JSObject *obj,
     DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
     DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
     DOC_END;
-    typedef long (DERIVED::*MyMethod)(const std::string &, float);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setTimeout,cx,obj,argc,argv,rval);
+    
+    if (argc == 2 || argc == 3) {
+        DERIVED * mySelf;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+        
+        std::string myCallback;
+        if (!convertFrom(cx, argv[0], myCallback)) {
+            return JS_FALSE;
+        }        
+        float myMillisec;
+        if (!convertFrom(cx, argv[1], myMillisec)) {
+            return JS_FALSE;
+        }
+        
+        if (argc == 3) {
+            JSObject * myObjectToCall;
+            if (JS_ValueToObject(cx, argv[2], &myObjectToCall)) {
+                long myRetVal = mySelf->setTimeout(myCallback, myMillisec, myObjectToCall);   
+                *rval = as_jsval(cx, myRetVal);
+                 return JS_TRUE;
+            }
+        } else {
+            long myRetVal = mySelf->setTimeout(myCallback, myMillisec, 0);   
+            *rval = as_jsval(cx, myRetVal);
+             return JS_TRUE;
+        }
+    }
+    return JS_FALSE;
 }
 
 template<class DERIVED>
@@ -40,8 +66,33 @@ JSBool JSAbstractRenderWindow<DERIVED>::setInterval(JSContext *cx, JSObject *obj
     DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
     DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
     DOC_END;
-    typedef long (DERIVED::*MyMethod)(const std::string &, float);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setInterval,cx,obj,argc,argv,rval);
+    if (argc == 2 || argc == 3) {
+        DERIVED * mySelf;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+        
+        std::string myCallback;
+        if (!convertFrom(cx, argv[0], myCallback)) {
+            return JS_FALSE;
+        }        
+        float myMillisec;
+        if (!convertFrom(cx, argv[1], myMillisec)) {
+            return JS_FALSE;
+        }
+        
+        if (argc == 3) {
+            JSObject * myObjectToCall;
+            if (JS_ValueToObject(cx, argv[2], &myObjectToCall)) {
+                long myRetVal = mySelf->setInterval(myCallback, myMillisec, myObjectToCall);   
+                *rval = as_jsval(cx, myRetVal);
+                 return JS_TRUE;
+            }
+        } else {
+            long myRetVal = mySelf->setInterval(myCallback, myMillisec, 0);   
+            *rval = as_jsval(cx, myRetVal);
+             return JS_TRUE;
+        }
+    }
+    return JS_FALSE;
 }
 
 template<class DERIVED>
