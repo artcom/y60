@@ -32,7 +32,7 @@ class Timeout {
         virtual ~Timeout(); 
         const std::string & getCommand() const; 
         const double getActivationTime() const; 
-        JSObject * Timeout::getObjectToCall() const;                
+        JSObject * getObjectToCall() const;                
         bool isInterval() const; 
         void resetInterval(); 
     private:
