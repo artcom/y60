@@ -38,8 +38,8 @@ lub_heap_context_compare(const void *clientnode,
     int                           i,delta=0;
     const lub_heap_context_t     *node = clientnode;
     const lub_heap_context_key_t *key  = clientkey;    
-    function_t             *const*node_fn = node->key.backtrace;
-    function_t             *const*key_fn  = key->backtrace;
+    function_t                  **node_fn = node->key.backtrace;
+    function_t                  **key_fn  = key->backtrace;
         
     for(i = lub_heap_frame_count;
         i;
