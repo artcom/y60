@@ -103,7 +103,7 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     if (argc == 1) {
         dom::NodePtr myImageNode;
         if(!convertFrom(cx, argv[0], myImageNode)) {
-            //            JS_ReportError("Need an image node to construct a cairo context.");
+            JS_ReportError("Need an image node to construct a cairo context.");
             return JS_FALSE;
         }
 
