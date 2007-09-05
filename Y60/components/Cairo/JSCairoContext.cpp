@@ -35,6 +35,21 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 // INGO START
+static JSBool
+setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return JS_TRUE;
+}
+
+static JSBool
+getAntialias(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    return JS_TRUE;
+}
+
+static JSBool
+setAntialias(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    return JS_TRUE;
+}
+
 // INGO END
 
 // SEBASTIAN START
@@ -178,4 +193,16 @@ jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext:
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-
+bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTarget) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCairoContext::NATIVE>::Class()) {
+                JSClassTraits<JSCairoContext::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
+                theTarget = &myObj.getNative();
+                return true;
+            }
+        }
+    }
+    return false;
+}

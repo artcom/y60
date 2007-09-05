@@ -71,6 +71,7 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext::NATIVE * theButton);
     
+    bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTarget);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_ */
