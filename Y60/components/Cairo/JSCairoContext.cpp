@@ -16,6 +16,16 @@ using namespace jslib;
 using namespace Cairo;
 
 static JSBool
+checkForErrors(JSContext *theJavascriptContext, Context *theContext) {
+    ErrorStatus myStatus = theContext->get_status();
+    if(myStatus != CAIRO_STATUS_SUCCESS) {
+        JS_ReportError(theJavascriptContext, "cairo error: %s", cairo_status_to_string(myStatus));
+        return JS_FALSE;
+    }
+    return JS_TRUE;
+}
+
+static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -23,6 +33,12 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
+
+// INGO START
+// INGO END
+
+// SEBASTIAN START
+// SEBASTIAN END
 
 
 JSFunctionSpec *
@@ -161,3 +177,5 @@ jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext:
     JSObject * myReturnObject = JSCairoContext::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
+
+
