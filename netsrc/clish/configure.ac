@@ -13,7 +13,6 @@ AC_CONFIG_AUX_DIR(aux_scripts)
 
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE(subdir-objects)
-AM_PROG_CC_C_O
 
 # Checks for programs.
 AC_PROG_CC
