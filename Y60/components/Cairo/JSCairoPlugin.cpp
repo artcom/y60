@@ -15,9 +15,11 @@
 #include "JSCairoContext.h"
 
 namespace y60 {
-    class JSCairoPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+    using namespace jslib;
+
+    class JSCairoPlugin : public asl::PlugInBase, public jslib::IScriptablePlugin {
         public:
-            JSCairoPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+            JSCairoPlugin(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
                 JSCairoContext::initClass(theContext, theGlobalObject);
@@ -32,5 +34,5 @@ namespace y60 {
 
 extern "C"
 EXPORT asl::PlugInBase * Cairo_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSCairoPlugIn(myDLHandle);
+	return new y60::JSCairoPlugin(myDLHandle);
 }
