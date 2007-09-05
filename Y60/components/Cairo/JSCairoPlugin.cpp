@@ -9,10 +9,10 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSCairo.h"
-
 #include <asl/PlugInBase.h>
 #include <y60/IScriptablePlugin.h>
+
+#include "JSCairoContext.h"
 
 namespace y60 {
     class JSCairoPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
@@ -20,7 +20,7 @@ namespace y60 {
             JSCairoPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
-                JSCairo::initClass(theContext, theGlobalObject);
+                JSCairoContext::initClass(theContext, theGlobalObject);
             }
 
             const char * ClassName() {
