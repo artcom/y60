@@ -1,0 +1,12 @@
+Index: clish/configure.ac
+===================================================================
+--- clish.orig/configure.ac	2007-09-05 11:47:14.000000000 +0200
++++ clish/configure.ac	2007-09-05 11:47:20.000000000 +0200
+@@ -13,7 +13,6 @@
+ 
+ AC_CONFIG_HEADERS([config.h])
+ AM_INIT_AUTOMAKE(subdir-objects)
+-AM_PROG_CC_C_O
+ 
+ # Checks for programs.
+ AC_PROG_CC
