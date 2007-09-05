@@ -14,8 +14,8 @@
 
         <TransportLayer>serial</TransportLayer>
         <EventQueueSize>100</EventQueueSize>
-        <SerialPort>4</SerialPort>
-        <UseUSB>0</UseUSB>
+        <SerialPort>0</SerialPort>
+        <UseUSB>1</UseUSB>
         <BaudRate>230400</BaudRate>
         <BitsPerWord>8</BitsPerWord>
         <Parity>no_parity</Parity>

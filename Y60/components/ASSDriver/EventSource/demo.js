@@ -12,7 +12,7 @@ if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
 use("ASSManager.js");
-use("KeyButton.js");
+//use("KeyButton.js");
 use("BuildUtils.js");
 use("SoundController.js");
 
