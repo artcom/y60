@@ -794,7 +794,7 @@ void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
     _mySettings = getASSSettings( theSettings );
-    setupDriver(theSettings);
+    setupDriver(_mySettings);
 }
 
 void
