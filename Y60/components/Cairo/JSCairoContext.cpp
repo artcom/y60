@@ -53,6 +53,212 @@ setAntialias(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
 // INGO END
 
 // SEBASTIAN START
+// function list:
+// cairo_path_t* cairo_copy_path               (cairo_t *cr);
+// cairo_path_t* cairo_copy_path_flat          (cairo_t *cr);
+// void        cairo_path_destroy              (cairo_path_t *path);
+// void        cairo_append_path               (cairo_t *cr,
+//                                              const cairo_path_t *path);
+// void        cairo_get_current_point         (cairo_t *cr,
+//                                              double *x,
+//                                              double *y);
+
+static JSBool
+arc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("arc");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY, myRadius, myAngle1, myAngle2;
+    ensureParamCount(argc, 5);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+    convertFrom(cx, argv[2], myRadius);
+    convertFrom(cx, argv[3], myAngle1);
+    convertFrom(cx, argv[4], myAngle2);
+
+    myContext->arc(myX, myY, myRadius, myAngle1, myAngle2);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+arcNegative(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("arc_negative");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY, myRadius, myAngle1, myAngle2;
+    ensureParamCount(argc, 5);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+    convertFrom(cx, argv[2], myRadius);
+    convertFrom(cx, argv[3], myAngle1);
+    convertFrom(cx, argv[4], myAngle2);
+
+    myContext->arc_negative(myX, myY, myRadius, myAngle1, myAngle2);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+curveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("curve_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX1, myY1, myX2, myY2, myX3, myY3;
+    ensureParamCount(argc, 6);
+    
+    convertFrom(cx, argv[0], myX1);
+    convertFrom(cx, argv[1], myY1);
+    convertFrom(cx, argv[2], myX2);
+    convertFrom(cx, argv[3], myY2);
+    convertFrom(cx, argv[4], myX3);
+    convertFrom(cx, argv[5], myY3);
+
+    myContext->curve_to(myX1, myY1, myX2, myY2, myX3, myY3);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+lineTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("line_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    myContext->line_to(myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+moveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("move_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    myContext->move_to(myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+rectangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("move_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY, myWidth, myHeight;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+    convertFrom(cx, argv[2], myWidth);
+    convertFrom(cx, argv[3], myHeight);
+
+    myContext->rectangle(myX, myY, myWidth, myHeight);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+// void        cairo_glyph_path                (cairo_t *cr,
+//                                              const cairo_glyph_t *glyphs,
+//                                              int num_glyphs);
+// void        cairo_text_path                 (cairo_t *cr,
+//                                              const char *utf8);
+
+static JSBool
+relCurveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("rel_curve_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+   
+    double myX1, myY1, myX2, myY2, myX3, myY3;
+    ensureParamCount(argc, 6);
+    
+    convertFrom(cx, argv[0], myX1);
+    convertFrom(cx, argv[1], myY1);
+    convertFrom(cx, argv[2], myX2);
+    convertFrom(cx, argv[3], myY2);
+    convertFrom(cx, argv[4], myX3);
+    convertFrom(cx, argv[5], myY3);
+    
+    myContext->rel_curve_to(myX1, myY1, myX2, myY2, myX3, myY3);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+relLineTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("rel_line_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    myContext->rel_line_to(myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("rel_move_to");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    myContext->rel_move_to(myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+stroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("cairo_new_path");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+    myContext->stroke();
+    
+    return checkForErrors(cx, myContext); 
+}
+
+
 // SEBASTIAN END
 
 
@@ -62,6 +268,22 @@ JSCairoContext::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        // ingo begin
+        // ingo end
+        
+        // sebastian begin
+        {"stroke",               stroke,                  0},
+        {"arc",                  arc,                     0},
+        {"arcNegative",          arcNegative,             0}, 
+        {"curveTo",              curveTo,                 0},
+        {"lineTo",               lineTo,                  0},
+        {"moveTo",               moveTo,                  0}, 
+        {"rectangle",            rectangle,               0},
+        {"relCurveTo",           relCurveTo,              0},
+        {"relLineTo",            relLineTo,               0},
+        {"relMoveTo",            relMoveTo,               0},
+        {"stroke",               stroke,                  0},
+        // sebastian end
         {0}
     };
     return myFunctions;
@@ -206,3 +428,4 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTar
     }
     return false;
 }
+
