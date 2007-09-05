@@ -6,16 +6,21 @@
 
 #include <js/jsapi.h>
 
+#include "TuttleApplication.h"
+
 namespace tuttle {
 
     class Debugger {
     public:
-        Debugger();
+        Debugger(Application &theApplication);
 
-        JSContext *getContext();
-        JSObject  *getGlobal();
+        JSRuntime *getJavascriptRuntime();
+        JSContext *getJavascriptContext();
+        JSObject  *getJavascriptGlobal();
 
     private:
+        Application              &_myApplication;
+
         JSRuntime                *_myRuntime;
         JSContext                *_myContext;
         JSObject                 *_myGlobal;

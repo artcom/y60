@@ -1,6 +1,8 @@
 
 #include <cassert>
 
+#include <clish/shell.h>
+
 #include "TuttleShell.h"
 
 namespace tuttle {
@@ -13,7 +15,7 @@ namespace tuttle {
                                         const lub_argv_t *theArguments) { \
         void   *myCookie = clish_shell__get_client_cookie(theClish);      \
         Shell  *myShell = reinterpret_cast<Shell*>(myCookie);             \
-        return myShell->command##symbol(theArguments);                    \
+        return myShell->command##symbol(theClish, theArguments);          \
     }
 
 #include "TuttleShell.def"
@@ -53,8 +55,8 @@ namespace tuttle {
     Shell::Shell(Debugger &theDebugger) :
         _myDebugger(theDebugger) {
 
-        _myContext = theDebugger.getContext();
-        _myGlobal  = theDebugger.getGlobal();
+        _myContext = theDebugger.getJavascriptContext();
+        _myGlobal  = theDebugger.getJavascriptGlobal();
     }
 
     // launches the shell in its own thread
@@ -98,7 +100,7 @@ namespace tuttle {
 
 
 #define CLISH_BUILTIN(symbol) \
-    bool_t Shell::command##symbol(const lub_argv_t *theArguments)
+    bool_t Shell::command##symbol(const clish_shell_t *theClish, const lub_argv_t *theArguments)
 
     CLISH_BUILTIN(Print) {
         assert(lub_argv__get_count(theArguments) == 1);
@@ -146,19 +148,28 @@ namespace tuttle {
         return BOOL_TRUE;
     }
 
-    CLISH_BUILTIN(ListContexts) {
-        return BOOL_TRUE;
-    }
-
-    CLISH_BUILTIN(SetContext) {
-        return BOOL_TRUE;
-    }
-
-    CLISH_BUILTIN(ShowContext) {
+    CLISH_BUILTIN(ListScripts) {
         return BOOL_TRUE;
     }
 
     CLISH_BUILTIN(Trace) {
+        const char *arg = lub_argv__get_arg(theArguments, 0);
+        
+        if(0 == strcmp(arg, "on")) {
+            _myContext->tracefp = stderr;
+        }
+        if(0 == strcmp(arg, "off")) {
+            _myContext->tracefp = NULL;
+        }
+        
+        return BOOL_TRUE;
+    }
+
+    CLISH_BUILTIN(Quit) {
+        //        clish_shell_t *myClish = ((clish_shell_t *)theClish);
+        
+        //        clish_shell_close(theClish);
+
         return BOOL_TRUE;
     }
 

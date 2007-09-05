@@ -4,6 +4,8 @@
  xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema
                      http://clish.sourceforge.net/XMLSchema/clish.xsd">
 
+<!--
+
   <COMMAND name="list contexts" help="list javascript contexts">
     <ACTION builtin="tuttle_list_contexts"/>
   </COMMAND>
@@ -16,5 +18,7 @@
     <PARAM name="context" ptype="uint" help="context to switch to"/>
     <ACTION builtin="tuttle_set_context">$context</ACTION>
   </COMMAND>
+
+-->
 
 </CLISH_MODULE>

@@ -16,7 +16,7 @@ ART+COM Tuttle Debugger
   <!-- GLOBAL COMMANDS -->
 
   <COMMAND name="help" help="print help message">
-    <ACTION builtin="clish_OVERVIEW"/>
+    <ACTION builtin="clish_overview"/>
   </COMMAND>
   
   <COMMAND name="history" help="show command history">
@@ -25,7 +25,7 @@ ART+COM Tuttle Debugger
   </COMMAND>
   
   <COMMAND name="quit" help="quit debugger">
-    <ACTION builtin="clish_close"/>
+    <ACTION builtin="tuttle_quit"/>
   </COMMAND>
 
 

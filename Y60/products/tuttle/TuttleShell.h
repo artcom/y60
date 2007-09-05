@@ -20,7 +20,7 @@ namespace tuttle {
         bool_t shutdown(void);
 
 #define CLISH_BUILTIN(name, symbol)                                    \
-        bool_t command##symbol (const lub_argv_t *theArguments);
+        bool_t command##symbol (const clish_shell_t *theClish, const lub_argv_t *theArguments);
 
 #include "TuttleShell.def"
 
@@ -33,8 +33,8 @@ namespace tuttle {
         JSContext *_myContext;
         JSObject  *_myGlobal;
 
-        pthread_t      _myClishThread;
-        pthread_attr_t _myClishThreadAttributes;
+        pthread_t       _myClishThread;
+        pthread_attr_t  _myClishThreadAttributes;
 
     };
 

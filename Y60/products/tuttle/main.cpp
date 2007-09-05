@@ -21,8 +21,9 @@ sigsegv_handler(void *fault_address, int serious)
 int
 main(int argc, char **argv)
 {
-    Debugger myDebugger;
-    Shell    myShell(myDebugger);
+    Application myApplication;
+    Debugger    myDebugger(myApplication);
+    Shell       myShell(myDebugger);
 
     bool_t mySuccess;
 
@@ -30,10 +31,11 @@ main(int argc, char **argv)
   
     mySuccess = myShell.launch();
 
-    sleep(1000);
+    myApplication.run();
 
     sigsegv_deinstall_handler();
   
     return mySuccess ? 0 : 1;
 
 }
+
