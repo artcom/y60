@@ -1,0 +1,32 @@
+Index: clish/clish/shell/shell_close.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ clish/clish/shell/shell_close.c	2007-09-05 11:28:49.000000000 +0200
+@@ -0,0 +1,17 @@
++/*
++ * shell_close.c
++ */
++
++#include "private.h"
++
++void
++clish_close(const clish_shell_t *shell)
++{
++    /* the exception proves the rule... */
++    clish_shell_t *this = (clish_shell_t *)shell;
++    
++    argv = argv; /* not used */
++    this->state = SHELL_STATE_CLOSING;
++}
++
++
+Index: clish/clish/shell/module.am
+===================================================================
+--- clish.orig/clish/shell/module.am	2007-09-05 11:29:20.000000000 +0200
++++ clish/clish/shell/module.am	2007-09-05 11:29:38.000000000 +0200
+@@ -26,4 +26,5 @@
+             clish/shell/shell_startup.c             \
+             clish/shell/shell_tinyrl.c              \
+             clish/shell/shell_tinyxml_read.cpp      \
++            clish/shell/shell_close.c               \
+             clish/shell/private.h
