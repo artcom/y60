@@ -390,8 +390,8 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return checkForErrors(cx, myContext);
 }
 
-    /*
-      XXX: my cairomm doesn't provide this, but the docs say it should. -ingo
+/*
+ XXX: my cairomm doesn't provide this, but the docs say it should. -ingo
 
 static JSBool
 getClipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -409,7 +409,7 @@ getClipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
     return JS_TRUE;
 }
-    */
+*/
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -490,16 +490,44 @@ inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
-
+// MISSING:
 // void        cairo_mask                      (cairo_t *cr,
 //                                              cairo_pattern_t *pattern);
 // void        cairo_mask_surface              (cairo_t *cr,
 //                                              cairo_surface_t *surface,
 //                                              double surface_x,
 //                                              double surface_y);
-// void        cairo_paint                     (cairo_t *cr);
-// void        cairo_paint_with_alpha          (cairo_t *cr,
-//                                              double alpha);
+
+static JSBool
+paint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    myContext->paint();
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+paintWithAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    double myAlpha;
+    convertFrom(cx, argv[0], myAlpha);
+
+    myContext->paint_with_alpha(myAlpha);
+    
+    return checkForErrors(cx, myContext); 
+}
 
 static JSBool
 stroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -566,9 +594,33 @@ inStroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
+static JSBool
+copyPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
 
-// void        cairo_copy_page                 (cairo_t *cr);
-// void        cairo_show_page                 (cairo_t *cr);
+    ensureParamCount(argc, 0);
+
+    myContext->copy_page();
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
+showPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    myContext->show_page();
+
+    return checkForErrors(cx, myContext);
+}
 
 // INGO END
 
@@ -807,10 +859,16 @@ JSCairoContext::Functions() {
         {"getFillExtents",       getFillExtents,          0},
         {"inFill",               inFill,                  2},
 
+        {"paint",                paint,                   0},
+        {"paintWithAlpha",       paintWithAlpha,          1},
+
         {"stroke",               stroke,                  0},
         {"strokePreserve",       strokePreserve,          0},
         {"getStrokeExtents",     getStrokeExtents,        0},
         {"inStroke",             inStroke,                2},
+
+        {"copyPage",             copyPage,                0},
+        {"showPage",             showPage,                0},
 
         // ingo end
         
