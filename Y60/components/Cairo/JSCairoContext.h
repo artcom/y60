@@ -27,6 +27,34 @@ namespace jslib {
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
+            PROP_ANTIALIAS_DEFAULT,
+            PROP_ANTIALIAS_NONE,
+            PROP_ANTIALIAS_GRAY,
+            PROP_ANTIALIAS_SUBPIXEL,
+
+            PROP_LINE_CAP_BUTT,
+            PROP_LINE_CAP_ROUND,
+            PROP_LINE_CAP_SQUARE,
+
+            PROP_LINE_JOIN_MITER,
+            PROP_LINE_JOIN_ROUND,
+            PROP_LINE_JOIN_BEVEL,
+
+            PROP_OPERATOR_CLEAR,
+            PROP_OPERATOR_SOURCE,
+            PROP_OPERATOR_OVER,
+            PROP_OPERATOR_IN,
+            PROP_OPERATOR_OUT,
+            PROP_OPERATOR_ATOP,
+            PROP_OPERATOR_DEST,
+            PROP_OPERATOR_DEST_OVER,
+            PROP_OPERATOR_DEST_IN,
+            PROP_OPERATOR_DEST_OUT,
+            PROP_OPERATOR_DEST_ATOP,
+            PROP_OPERATOR_XOR,
+            PROP_OPERATOR_ADD,
+            PROP_OPERATOR_SATURATE,
+
             PROP_END
         };
         static JSPropertySpec * Properties();
