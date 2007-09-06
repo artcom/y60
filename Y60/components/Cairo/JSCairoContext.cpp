@@ -96,11 +96,11 @@ setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
     ensureParamCount(argc, 3);
 
-    int myR;
+    double myR;
     convertFrom(cx, argv[0], myR);
-    int myG;
+    double myG;
     convertFrom(cx, argv[1], myG);
-    int myB;
+    double myB;
     convertFrom(cx, argv[2], myB);
 
     myContext->set_source_rgb(myR, myG, myB);
@@ -117,13 +117,13 @@ setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
     ensureParamCount(argc, 4);
 
-    int myR;
+    double myR;
     convertFrom(cx, argv[0], myR);
-    int myG;
+    double myG;
     convertFrom(cx, argv[1], myG);
-    int myB;
+    double myB;
     convertFrom(cx, argv[2], myB);
-    int myA;
+    double myA;
     convertFrom(cx, argv[3], myA);
 
     myContext->set_source_rgba(myR, myG, myB, myA);
@@ -256,7 +256,7 @@ setLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
     ensureParamCount(argc, 1);
 
-    int myLineWidth;
+    double myLineWidth;
     convertFrom(cx, argv[0], myLineWidth);
 
     myContext->set_line_width(myLineWidth);
@@ -287,7 +287,7 @@ setMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
     ensureParamCount(argc, 1);
 
-    int myMiterLimit;
+    double myMiterLimit;
     convertFrom(cx, argv[0], myMiterLimit);
 
     myContext->set_miter_limit(myMiterLimit);
