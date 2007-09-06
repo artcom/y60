@@ -11,7 +11,7 @@
 use("SceneViewer.js");
 use("Overlay.js");
 
-plug("RSvg");
+plug("Cairo");
 
 var ourShow = new SceneViewer(arguments);
 var _myImage = null;

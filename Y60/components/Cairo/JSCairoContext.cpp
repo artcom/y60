@@ -345,12 +345,29 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return JS_FALSE;
 }
 
-// MISSING:
-// void        cairo_clip_extents              (cairo_t *cr,
-//                                              double *x1,
-//                                              double *y1,
-//                                              double *x2,
-//                                              double *y2);
+// static JSBool
+// clipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//     Context *myNative(0);
+//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+// 
+//     ensureParamCount(argc, 4);
+// 
+//     double myX1;
+//     convertFrom(cx, argv[0], myX1);
+// 
+//     double myY1;
+//     convertFrom(cx, argv[1], myY1);
+// 
+//     double myX2;
+//     convertFrom(cx, argv[2], myX2);
+// 
+//     double myY2;
+//     convertFrom(cx, argv[3], myY2);
+// 
+//     myNative->clip_extents(myX1, myY1, myX2, myY2);
+// 
+//     return JS_TRUE;
+// }
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -364,17 +381,73 @@ resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_FALSE;
 }
 
-// MISSING:
-// void        cairo_fill                      (cairo_t *cr);
-// void        cairo_fill_preserve             (cairo_t *cr);
-// void        cairo_fill_extents              (cairo_t *cr,
-//                                              double *x1,
-//                                              double *y1,
-//                                              double *x2,
-//                                              double *y2);
-// cairo_bool_t cairo_in_fill                  (cairo_t *cr,
-//                                              double x,
-//                                              double y);
+static JSBool
+fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Context *myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    ensureParamCount(argc, 0);
+
+    myNative->fill();
+
+    return JS_FALSE;
+}
+
+static JSBool
+fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Context *myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    ensureParamCount(argc, 0);
+
+    myNative->fill_preserve();
+
+    return JS_FALSE;
+}
+
+// static JSBool
+// fillExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//     Context *myNative(0);
+//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+// 
+//     ensureParamCount(argc, 4);
+// 
+//     double myX1;
+//     convertFrom(cx, argv[0], myX1);
+// 
+//     double myY1;
+//     convertFrom(cx, argv[1], myY1);
+// 
+//     double myX2;
+//     convertFrom(cx, argv[2], myX2);
+// 
+//     double myY2;
+//     convertFrom(cx, argv[3], myY2);
+// 
+//     myNative->fill_extents(myX1, myY1, myX2, myY2);
+// 
+//     return JS_TRUE;
+// }
+
+static JSBool
+inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Context *myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    ensureParamCount(argc, 4);
+
+    double myX;
+    convertFrom(cx, argv[0], myX);
+
+    double myY;
+    convertFrom(cx, argv[1], myY);
+
+    *rval = myNative->in_fill(myX, myY) ? JSVAL_TRUE : JSVAL_FALSE;
+
+    return JS_TRUE;
+}
+
+
 // void        cairo_mask                      (cairo_t *cr,
 //                                              cairo_pattern_t *pattern);
 // void        cairo_mask_surface              (cairo_t *cr,
@@ -384,16 +457,62 @@ resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 // void        cairo_paint                     (cairo_t *cr);
 // void        cairo_paint_with_alpha          (cairo_t *cr,
 //                                              double alpha);
-// void        cairo_stroke                    (cairo_t *cr);
-// void        cairo_stroke_preserve           (cairo_t *cr);
-// void        cairo_stroke_extents            (cairo_t *cr,
-//                                              double *x1,
-//                                              double *y1,
-//                                              double *x2,
-//                                              double *y2);
-// cairo_bool_t cairo_in_stroke                (cairo_t *cr,
-//                                              double x,
-//                                              double y);
+
+static JSBool
+strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Context *myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    ensureParamCount(argc, 0);
+
+    myNative->stroke_preserve();
+
+    return JS_FALSE;
+}
+
+// static JSBool
+// strokeExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//     Context *myNative(0);
+//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+// 
+//     ensureParamCount(argc, 4);
+// 
+//     double myX1;
+//     convertFrom(cx, argv[0], myX1);
+// 
+//     double myY1;
+//     convertFrom(cx, argv[1], myY1);
+// 
+//     double myX2;
+//     convertFrom(cx, argv[2], myX2);
+// 
+//     double myY2;
+//     convertFrom(cx, argv[3], myY2);
+// 
+//     myNative->stroke_extents(myX1, myY1, myX2, myY2);
+// 
+//     return JS_TRUE;
+// }
+
+static JSBool
+inStroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Context *myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    ensureParamCount(argc, 4);
+
+    double myX;
+    convertFrom(cx, argv[0], myX);
+
+    double myY;
+    convertFrom(cx, argv[1], myY);
+
+    *rval = myNative->in_stroke(myX, myY) ? JSVAL_TRUE : JSVAL_FALSE;
+
+    return JS_TRUE;
+}
+
+
 // void        cairo_copy_page                 (cairo_t *cr);
 // void        cairo_show_page                 (cairo_t *cr);
 
@@ -617,6 +736,34 @@ JSCairoContext::Functions() {
         {"toString",             toString,                0},
 
         // ingo begin
+        {"save",                 save,                    0},
+        {"restore",              restore,                 0},
+        {"setSourceRGB",         setSourceRGB,            3},
+        {"setSourceRGBA",        setSourceRGBA,           4},
+        {"setAntialias",         setAntialias,            1},
+        {"getAntialias",         getAntialias,            0},
+        {"setLineCap",           setLineCap,              1},
+        {"getLineCap",           getLineCap,              0},
+        {"setLineJoin",          setLineJoin,             1},
+        {"getLineJoin",          getLineJoin,             0},
+        {"setLineWidth",         setLineWidth,            1},
+        {"getLineWidth",         getLineWidth,            0},
+        {"setMiterLimit",        setMiterLimit,           1},
+        {"getMiterLimit",        getMiterLimit,           0},
+        {"setOperator",          setOperator,             1},
+        {"getOperator",          getOperator,             0},
+        {"setTolerance",         setTolerance,            1},
+        {"getTolerance",         getTolerance,            0},
+        {"clip",                 clip,                    0},
+        {"clipPreserve",         clipPreserve,            0},
+        {"resetClip",            resetClip,               0},
+
+        {"fill",                 fill,                    0},
+        {"fillPreserve",         fillPreserve,            0},
+        {"inFill",               inFill,                  2},
+        {"strokePreserve",       strokePreserve,          0},
+        {"inStroke",             inStroke,                2},
+
         // ingo end
         
         // sebastian begin
