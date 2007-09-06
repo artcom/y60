@@ -5,6 +5,7 @@
 
 #include <y60/JScppUtils.h>
 #include <y60/JSNode.h>
+#include <y60/JSVector.h>
 
 #include <y60/JSWrapper.impl>
 
@@ -389,29 +390,26 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return checkForErrors(cx, myContext);
 }
 
-// static JSBool
-// clipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Cairo::Context *myContext(0);
-//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-// 
-//     ensureParamCount(argc, 4);
-// 
-//     double myX1;
-//     convertFrom(cx, argv[0], myX1);
-// 
-//     double myY1;
-//     convertFrom(cx, argv[1], myY1);
-// 
-//     double myX2;
-//     convertFrom(cx, argv[2], myX2);
-// 
-//     double myY2;
-//     convertFrom(cx, argv[3], myY2);
-// 
-//     myContext->clip_extents(myX1, myY1, myX2, myY2);
-// 
-//     return JS_TRUE;
-// }
+    /*
+      XXX: my cairomm doesn't provide this, but the docs say it should. -ingo
+
+static JSBool
+getClipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    double myX1, myY1, myX2, myY2;
+    
+    myContext->get_clip_extents(myX1, myY1, myX2, myY2);
+    
+    Vector4d myResult(myX1, myY1, myX2, myY2);
+    *rval = as_jsval(cx, myResult);
+
+    return JS_TRUE;
+}
+    */
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -455,29 +453,22 @@ fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return checkForErrors(cx, myContext);
 }
 
-// static JSBool
-// fillExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Cairo::Context *myContext(0);
-//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-// 
-//     ensureParamCount(argc, 4);
-// 
-//     double myX1;
-//     convertFrom(cx, argv[0], myX1);
-// 
-//     double myY1;
-//     convertFrom(cx, argv[1], myY1);
-// 
-//     double myX2;
-//     convertFrom(cx, argv[2], myX2);
-// 
-//     double myY2;
-//     convertFrom(cx, argv[3], myY2);
-// 
-//     myContext->fill_extents(myX1, myY1, myX2, myY2);
-// 
-//     return JS_TRUE;
-// }
+static JSBool
+getFillExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+     Cairo::Context *myContext(0);
+     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+ 
+     ensureParamCount(argc, 0);
+ 
+     double myX1, myY1, myX2, myY2;
+ 
+     myContext->get_fill_extents(myX1, myY1, myX2, myY2);
+
+     Vector4d myResult(myX1, myY1, myX2, myY2);
+     *rval = as_jsval(cx, myResult);
+ 
+     return JS_TRUE;
+}
 
 static JSBool
 inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -511,6 +502,20 @@ inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 //                                              double alpha);
 
 static JSBool
+stroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    myContext->stroke();
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
 strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -524,29 +529,22 @@ strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return checkForErrors(cx, myContext);
 }
 
-// static JSBool
-// strokeExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Cairo::Context *myContext(0);
-//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-// 
-//     ensureParamCount(argc, 4);
-// 
-//     double myX1;
-//     convertFrom(cx, argv[0], myX1);
-// 
-//     double myY1;
-//     convertFrom(cx, argv[1], myY1);
-// 
-//     double myX2;
-//     convertFrom(cx, argv[2], myX2);
-// 
-//     double myY2;
-//     convertFrom(cx, argv[3], myY2);
-// 
-//     myContext->stroke_extents(myX1, myY1, myX2, myY2);
-// 
-//     return JS_TRUE;
-// }
+static JSBool
+getStrokeExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+    
+    ensureParamCount(argc, 0);
+    
+    double myX1, myY1, myX2, myY2;
+    
+    myContext->get_stroke_extents(myX1, myY1, myX2, myY2);
+    
+    Vector4d myResult(myX1, myY1, myX2, myY2);
+    *rval = as_jsval(cx, myResult);
+    
+    return JS_TRUE;
+}
 
 static JSBool
 inStroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -769,18 +767,6 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext); 
 }
 
-static JSBool
-stroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("cairo_new_path");
-    DOC_END;
-    Cairo::Context * myContext;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-    myContext->stroke();
-    
-    return checkForErrors(cx, myContext); 
-}
-
-
 // SEBASTIAN END
 
 
@@ -810,20 +796,25 @@ JSCairoContext::Functions() {
         {"getOperator",          getOperator,             0},
         {"setTolerance",         setTolerance,            1},
         {"getTolerance",         getTolerance,            0},
+
         {"clip",                 clip,                    0},
         {"clipPreserve",         clipPreserve,            0},
+        //{"getClipExtents",       getClipExtents,          0},
         {"resetClip",            resetClip,               0},
 
         {"fill",                 fill,                    0},
         {"fillPreserve",         fillPreserve,            0},
+        {"getFillExtents",       getFillExtents,          0},
         {"inFill",               inFill,                  2},
+
+        {"stroke",               stroke,                  0},
         {"strokePreserve",       strokePreserve,          0},
+        {"getStrokeExtents",     getStrokeExtents,        0},
         {"inStroke",             inStroke,                2},
 
         // ingo end
         
         // sebastian begin
-        {"stroke",               stroke,                  0},
         {"arc",                  arc,                     0},
         {"arcNegative",          arcNegative,             0}, 
         {"curveTo",              curveTo,                 0},
@@ -833,7 +824,6 @@ JSCairoContext::Functions() {
         {"relCurveTo",           relCurveTo,              0},
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
-        {"stroke",               stroke,                  0},
         // sebastian end
         {0}
     };
