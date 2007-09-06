@@ -42,6 +42,8 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -54,6 +56,8 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -75,6 +79,8 @@ restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -94,6 +100,8 @@ setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -124,6 +132,8 @@ setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -139,6 +149,8 @@ setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -165,6 +177,8 @@ getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -180,6 +194,8 @@ setLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 getLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -192,6 +208,8 @@ getLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -207,6 +225,8 @@ setLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 getLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -219,6 +239,8 @@ getLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 setLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -234,6 +256,8 @@ setLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 getLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -246,6 +270,8 @@ getLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -261,6 +287,8 @@ setMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 getMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -273,6 +301,8 @@ getMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 setOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -288,6 +318,8 @@ setOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 getOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -300,6 +332,8 @@ getOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 setTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -315,6 +349,8 @@ setTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 getTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -327,6 +363,8 @@ getTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 clip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -339,6 +377,8 @@ clip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -375,6 +415,8 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -387,6 +429,8 @@ resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -399,6 +443,8 @@ fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -435,6 +481,8 @@ fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -464,6 +512,8 @@ inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
@@ -500,6 +550,8 @@ strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 inStroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
