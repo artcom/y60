@@ -293,16 +293,18 @@ namespace y60 {
 
     void FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
         // decode audio
-        int myBytesDecoded; // decompressed sample size in bytes
+        int myBytesDecoded = 0; // decompressed sample size in bytes
         unsigned char* myData = thePacket.data;
         unsigned myDataLen = thePacket.size;
         double myTime = thePacket.dts / _myTimeUnitsPerSecond;
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
-            // "avcodec_decode_audio2" needs the buffer size for initialization
+            /*// "avcodec_decode_audio2" needs the buffer size for initialization
             myBytesDecoded = _mySamples.size(); 
             int myLen = avcodec_decode_audio2(_myAStream->codec,
-                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);*/
+            int myLen = avcodec_decode_audio(_myAStream->codec,
+                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);    
             if (myLen < 0 || myBytesDecoded < 0) {
                 AC_WARNING << "av_decode_audio error";
                 break;
