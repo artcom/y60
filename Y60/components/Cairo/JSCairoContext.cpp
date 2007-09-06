@@ -17,9 +17,7 @@ using namespace jslib;
 
 namespace jslib {
 
-    template class JSWrapper<Cairo::Context, Ptr<Cairo::Context>, StaticAccessProtocol>;
-
-}
+template class JSWrapper<Cairo::Context, Ptr<Cairo::Context>, StaticAccessProtocol>;
 
 static JSBool
 checkForErrors(JSContext *theJavascriptContext, Cairo::Context *theContext) {
@@ -953,4 +951,6 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTar
         }
     }
     return false;
+}
+
 }
