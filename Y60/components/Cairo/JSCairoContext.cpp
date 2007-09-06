@@ -15,17 +15,15 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-using namespace Cairo;
-
 namespace jslib {
 
-template class JSWrapper<Context, Ptr<Context>, StaticAccessProtocol>;
+    template class JSWrapper<Cairo::Context, Ptr<Cairo::Context>, StaticAccessProtocol>;
 
 }
 
 static JSBool
-checkForErrors(JSContext *theJavascriptContext, Context *theContext) {
-    ErrorStatus myStatus = theContext->get_status();
+checkForErrors(JSContext *theJavascriptContext, Cairo::Context *theContext) {
+    Cairo::ErrorStatus myStatus = theContext->get_status();
     if(myStatus != CAIRO_STATUS_SUCCESS) {
         JS_ReportError(theJavascriptContext, "cairo error: %s", cairo_status_to_string(myStatus));
         return JS_FALSE;
@@ -46,7 +44,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -58,7 +56,7 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -79,7 +77,7 @@ restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 3);
@@ -98,7 +96,7 @@ setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 4);
@@ -128,7 +126,7 @@ setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -136,14 +134,14 @@ setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     int myAntialias;
     convertFrom(cx, argv[0], myAntialias);
 
-    myNative->set_antialias((Antialias)myAntialias);
+    myNative->set_antialias((Cairo::Antialias)myAntialias);
 
     return JS_TRUE;
 }
 
 static JSBool
 getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -169,7 +167,7 @@ getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -177,14 +175,14 @@ setLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     int myLineCap;
     convertFrom(cx, argv[0], myLineCap);
 
-    myNative->set_line_cap((LineCap)myLineCap);
+    myNative->set_line_cap((Cairo::LineCap)myLineCap);
 
     return JS_TRUE;
 }
 
 static JSBool
 getLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -196,7 +194,7 @@ getLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -204,14 +202,14 @@ setLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     int myLineJoin;
     convertFrom(cx, argv[0], myLineJoin);
 
-    myNative->set_line_join((LineJoin)myLineJoin);
+    myNative->set_line_join((Cairo::LineJoin)myLineJoin);
 
     return JS_TRUE;
 }
 
 static JSBool
 getLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -223,7 +221,7 @@ getLineJoin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 setLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -238,7 +236,7 @@ setLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 getLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -250,7 +248,7 @@ getLineWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -265,7 +263,7 @@ setMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 getMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -277,7 +275,7 @@ getMiterLimit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static JSBool
 setOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -285,14 +283,14 @@ setOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     int myOperator;
     convertFrom(cx, argv[0], myOperator);
 
-    myNative->set_operator((Operator)myOperator);
+    myNative->set_operator((Cairo::Operator)myOperator);
 
     return JS_TRUE;
 }
 
 static JSBool
 getOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -304,7 +302,7 @@ getOperator(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 static JSBool
 setTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 1);
@@ -319,7 +317,7 @@ setTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 getTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -331,7 +329,7 @@ getTolerance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 clip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -343,7 +341,7 @@ clip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -355,7 +353,7 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 // static JSBool
 // clipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Context *myNative(0);
+//     Cairo::Context *myNative(0);
 //     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 // 
 //     ensureParamCount(argc, 4);
@@ -379,7 +377,7 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -391,7 +389,7 @@ resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -403,7 +401,7 @@ fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -415,7 +413,7 @@ fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 // static JSBool
 // fillExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Context *myNative(0);
+//     Cairo::Context *myNative(0);
 //     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 // 
 //     ensureParamCount(argc, 4);
@@ -439,7 +437,7 @@ fillPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 4);
@@ -468,7 +466,7 @@ inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 0);
@@ -480,7 +478,7 @@ strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 // static JSBool
 // strokeExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     Context *myNative(0);
+//     Cairo::Context *myNative(0);
 //     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 // 
 //     ensureParamCount(argc, 4);
@@ -504,7 +502,7 @@ strokePreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 inStroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    Context *myNative(0);
+    Cairo::Context *myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
     ensureParamCount(argc, 4);
@@ -882,33 +880,33 @@ JSConstIntPropertySpec *
 JSCairoContext::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-        {"ANTIALIAS_DEFAULT",  PROP_ANTIALIAS_DEFAULT,  ANTIALIAS_DEFAULT},
-        {"ANTIALIAS_NONE",     PROP_ANTIALIAS_NONE,     ANTIALIAS_NONE},
-        {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     ANTIALIAS_GRAY},
-        {"ANTIALIAS_SUBPIXEL", PROP_ANTIALIAS_SUBPIXEL, ANTIALIAS_SUBPIXEL},
+        {"ANTIALIAS_DEFAULT",  PROP_ANTIALIAS_DEFAULT,  Cairo::ANTIALIAS_DEFAULT},
+        {"ANTIALIAS_NONE",     PROP_ANTIALIAS_NONE,     Cairo::ANTIALIAS_NONE},
+        {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     Cairo::ANTIALIAS_GRAY},
+        {"ANTIALIAS_SUBPIXEL", PROP_ANTIALIAS_SUBPIXEL, Cairo::ANTIALIAS_SUBPIXEL},
         
-        {"LINE_CAP_BUTT",    PROP_LINE_CAP_BUTT,   LINE_CAP_BUTT  },
-        {"LINE_CAP_ROUND",   PROP_LINE_CAP_ROUND,  LINE_CAP_ROUND },
-        {"LINE_CAP_SQUARE",  PROP_LINE_CAP_SQUARE, LINE_CAP_SQUARE},
+        {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      Cairo::LINE_CAP_BUTT  },
+        {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     Cairo::LINE_CAP_ROUND },
+        {"LINE_CAP_SQUARE",    PROP_LINE_CAP_SQUARE,    Cairo::LINE_CAP_SQUARE},
 
-        {"LINE_JOIN_MITER",  PROP_LINE_JOIN_MITER, LINE_JOIN_MITER  },
-        {"LINE_JOIN_ROUND",  PROP_LINE_JOIN_ROUND, LINE_JOIN_ROUND },
-        {"LINE_JOIN_BEVEL",  PROP_LINE_JOIN_BEVEL, LINE_JOIN_BEVEL},
+        {"LINE_JOIN_MITER",    PROP_LINE_JOIN_MITER,    Cairo::LINE_JOIN_MITER  },
+        {"LINE_JOIN_ROUND",    PROP_LINE_JOIN_ROUND,    Cairo::LINE_JOIN_ROUND },
+        {"LINE_JOIN_BEVEL",    PROP_LINE_JOIN_BEVEL,    Cairo::LINE_JOIN_BEVEL},
 
-        {"OPERATOR_CLEAR", PROP_OPERATOR_CLEAR, OPERATOR_CLEAR},
-        {"OPERATOR_SOURCE", PROP_OPERATOR_SOURCE, OPERATOR_SOURCE},
-        {"OPERATOR_OVER", PROP_OPERATOR_OVER, OPERATOR_OVER},
-        {"OPERATOR_IN", PROP_OPERATOR_IN, OPERATOR_IN},
-        {"OPERATOR_OUT", PROP_OPERATOR_OUT, OPERATOR_OUT},
-        {"OPERATOR_ATOP", PROP_OPERATOR_ATOP, OPERATOR_ATOP},
-        {"OPERATOR_DEST", PROP_OPERATOR_DEST, OPERATOR_DEST},
-        {"OPERATOR_DEST_OVER", PROP_OPERATOR_DEST_OVER, OPERATOR_DEST_OVER},
-        {"OPERATOR_DEST_IN", PROP_OPERATOR_DEST_IN, OPERATOR_DEST_IN},
-        {"OPERATOR_DEST_OUT", PROP_OPERATOR_DEST_OUT, OPERATOR_DEST_OUT},
-        {"OPERATOR_DEST_ATOP", PROP_OPERATOR_DEST_ATOP, OPERATOR_DEST_ATOP},
-        {"OPERATOR_XOR", PROP_OPERATOR_XOR, OPERATOR_XOR},
-        {"OPERATOR_ADD", PROP_OPERATOR_ADD, OPERATOR_ADD},
-        {"OPERATOR_SATURATE", PROP_OPERATOR_SATURATE, OPERATOR_SATURATE},
+        {"OPERATOR_CLEAR",     PROP_OPERATOR_CLEAR,     Cairo::OPERATOR_CLEAR},
+        {"OPERATOR_SOURCE",    PROP_OPERATOR_SOURCE,    Cairo::OPERATOR_SOURCE},
+        {"OPERATOR_OVER",      PROP_OPERATOR_OVER,      Cairo::OPERATOR_OVER},
+        {"OPERATOR_IN",        PROP_OPERATOR_IN,        Cairo::OPERATOR_IN},
+        {"OPERATOR_OUT",       PROP_OPERATOR_OUT,       Cairo::OPERATOR_OUT},
+        {"OPERATOR_ATOP",      PROP_OPERATOR_ATOP,      Cairo::OPERATOR_ATOP},
+        {"OPERATOR_DEST",      PROP_OPERATOR_DEST,      Cairo::OPERATOR_DEST},
+        {"OPERATOR_DEST_OVER", PROP_OPERATOR_DEST_OVER, Cairo::OPERATOR_DEST_OVER},
+        {"OPERATOR_DEST_IN",   PROP_OPERATOR_DEST_IN,   Cairo::OPERATOR_DEST_IN},
+        {"OPERATOR_DEST_OUT",  PROP_OPERATOR_DEST_OUT,  Cairo::OPERATOR_DEST_OUT},
+        {"OPERATOR_DEST_ATOP", PROP_OPERATOR_DEST_ATOP, Cairo::OPERATOR_DEST_ATOP},
+        {"OPERATOR_XOR",       PROP_OPERATOR_XOR,       Cairo::OPERATOR_XOR},
+        {"OPERATOR_ADD",       PROP_OPERATOR_ADD,       Cairo::OPERATOR_ADD},
+        {"OPERATOR_SATURATE",  PROP_OPERATOR_SATURATE,  Cairo::OPERATOR_SATURATE},
 
         {0}
     };
