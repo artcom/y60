@@ -19,11 +19,12 @@
 #include <asl/PackageManager.h>
 #include <asl/PlugInManager.h>
 #include <asl/Assure.h>
-
+#include <asl/Dashboard.h>
 #include <string.h>
 
 using namespace dom;
 using namespace std;
+using namespace asl;
 
 #define DB(x) x
 #define DB2(x) // x
@@ -133,7 +134,10 @@ namespace y60 {
 
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
+        asl::Time myTimer1;
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
+        asl::Time myTimer2;
+        
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
         } else {
@@ -154,17 +158,24 @@ namespace y60 {
     
     void 
     Movie::ensureMovieFramecount() {
-        int myFrameCount = get<FrameCountTag>();
-        if (myFrameCount == -1) {
-            int myFrame = -1;
-            while (!_myDecoder->getEOF()) {
-                myFrame++;
-                double myMovieTime = getTimeFromFrame(myFrame);
-                decodeFrame(myMovieTime, myFrame);                                
+        AC_DEBUG<<"Movie::ensureMovieFramecount "<<get<FrameCountTag>();
+        if (get<FrameCountTag>() == -1) {
+            bool myOldAudioflag = get<AudioTag>();
+            set<AudioTag>(false);
+            load(AppPackageManager::get().getPtr()->getSearchPath());      
+            if (get<FrameCountTag>() == -1) {
+                readFrame();      
+                int myFrame = -1;
+                while (!_myDecoder->getEOF()) {
+                    myFrame++;
+                    double myMovieTime = getTimeFromFrame(myFrame);
+                    decodeFrame(myMovieTime, myFrame);                                
+                }
+                _myDecoder->setEOF(false);     
+                _myDecoder->stopMovie();
             }
-            set<FrameCountTag>(myFrame-1);
-            _myDecoder->setEOF(false);     
-            restart(0);       
+            set<AudioTag>(myOldAudioflag);
+            load(AppPackageManager::get().getPtr()->getSearchPath());            
         } 
     }
 
@@ -209,6 +220,9 @@ namespace y60 {
             case PLAY_MODE_PAUSE:
                 // next frame from currentframe attribute in movie node
                 myNextFrame = get<CurrentFrameTag>();
+                if (get<FrameCountTag>() != -1) {
+                    myNextFrame %= get<FrameCountTag>();
+                }
                 while (myNextFrame < 0) {
                     if (get<FrameCountTag>() == -1) {
                         std::string myErrorMsg = string("Movie: ") + get<NameTag>() + " has negative currentframe and a invalid framecount, " + 
@@ -240,6 +254,7 @@ namespace y60 {
 
         DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         if (myNextFrame != _myLastDecodedFrame) {
+            MAKE_SCOPE_TIMER(Movie_readFrame);
             double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
             /*if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {
                 AC_WARNING << "Decoded Time=" << myDecodedTime << " differs from Movie Time=" << myMovieTime << ". Delta=" << myMovieTime-myDecodedTime;
@@ -354,7 +369,7 @@ namespace y60 {
         if (_myDecoder) {
             _myDecoder->stopMovie();
         }
-        //set<CurrentFrameTag>(0);
+        set<CurrentFrameTag>(0);
         _myLastDecodedFrame = UINT_MAX;
         _myCurrentLoopCount = 0;
 
@@ -413,11 +428,14 @@ namespace y60 {
     }
 
     bool
-    Movie::reloadRequired() const {
+    Movie::reloadRequired(){
         bool rc = !_myDecoder || _myLoadedFilename != get<ImageSourceTag>();
         AC_TRACE << "Movie::reloadRequired " << rc
                  << " with _myLoadedFilename=" << _myLoadedFilename
                  << " ImageSourceTag=" << get<ImageSourceTag>();
+        if (_myLoadedFilename != get<ImageSourceTag>()) {
+            set<FrameCountTag>(-1);            
+        }                 
         return rc;
     }
 }

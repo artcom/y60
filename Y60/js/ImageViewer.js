@@ -151,6 +151,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                     case "page down":
                         stepFrame(false);
                         break;
+                    case ".":
+                        seekToOffset(true, 100);
+                        break;
+                    case "/":
+                        seekToOffset(false, 100);
+                        break;        
                     case "h":
                         self.setMessage("ImageViewer help:");
                         self.setMessage("   space           - show/hide text overlay");
@@ -336,7 +342,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
-                var myEnsureFramecount = true;
+                var myEnsureFramecount = false;
                 showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag), myEnsureFramecount);
                 if (_myImageOverlay) {
                     _myImageOverlay.visible = false;
@@ -375,7 +381,17 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
-
+    
+    function seekToOffset(theForwardFlag, theSeekOffset) {
+        if (_myMovieNode && _myMovieOverlay.visible) {
+            _myMovieNode.playmode = "pause";
+            if (theForwardFlag) {
+                _myMovieNode.currentframe += theSeekOffset;
+            } else {
+                _myMovieNode.currentframe -= theSeekOffset;
+            }
+        }
+    }
     function setPlayMode(theKey) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             if (theKey == "s") {
@@ -559,11 +575,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.audio = 1;
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
-            _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
-            
             if (theEnsureFrameCount) {
+                //window.scene.loadMovieFrame(_myMovieNode);
                 window.scene.ensureMovieFramecount(_myMovieNode);
             }
+            _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
+            
 
             //_myMovieOverlay = new MovieOverlay(window.scene, theFilename, [0,0], null, false);//, "GRAY");
             //_myMovieNode= _myMovieOverlay.movie;
