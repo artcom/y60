@@ -967,7 +967,7 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
         cairo_surface_t *myCairoSurface =
             cairo_image_surface_create_for_data(myDataPtr, CAIRO_FORMAT_ARGB32, 
-                                                myImageWidth, myImageHeight, myImageWidth);
+                                                myImageWidth, myImageHeight, myImageWidth*4);
         cairo_t *myCairoContext =
             cairo_create(myCairoSurface);
 
