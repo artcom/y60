@@ -52,6 +52,11 @@ namespace y60 {
          */
         void push_back(VideoMsgPtr theFrame);
         /**
+         * adds theFrame to the front of the queue. Wakes up thread waiting in pop_back or pop_front.
+         * @param theFrame frame to add at the front of the cache
+         */
+        void push_front(VideoMsgPtr theFrame);
+        /**
          * Retrieves the top element of the queue and removes it. If the queue
          * is empty, blocks until an element is there.
          * @throws asl::ThreadSemaphore::ClosedException if close is called while in wait.

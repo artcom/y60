@@ -159,16 +159,18 @@ namespace y60 {
 
         int _myNumFramesDecoded;
         int _myNumIFramesDecoded;
+        int _myDecodedPacketsPerFrame;
         
         //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
         //     calculating this per stream and not per file.
-        int64_t _myTimeUnitsPerSecond;
+        double _myTimeUnitsPerSecond;
        
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
+        
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

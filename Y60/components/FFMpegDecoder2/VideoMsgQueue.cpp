@@ -32,6 +32,15 @@ void VideoMsgQueue::push_back(VideoMsgPtr theFrame) {
     AC_DEBUG << "} push_back";
 }
 
+void VideoMsgQueue::push_front(VideoMsgPtr theFrame) {
+    AC_DEBUG << "push_front {";
+    _myListLock.lock();
+    _myList.push_front(theFrame);
+    _mySemaphore.post();
+    _myListLock.unlock();
+    AC_DEBUG << "} push_front";
+}
+
 VideoMsgPtr VideoMsgQueue::pop_front() {
     AC_DEBUG << "pop_front {";
     _mySemaphore.wait(asl::ThreadSemaphore::WAIT_INFINITE);

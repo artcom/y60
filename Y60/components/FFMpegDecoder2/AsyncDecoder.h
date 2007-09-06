@@ -57,7 +57,7 @@ namespace y60 {
              */
             double getMovieTime(double theSystemTime) {
                 if (!hasAudio()) {
-                    AC_TRACE << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
+                    AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {
                     if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED &&
@@ -72,7 +72,8 @@ namespace y60 {
                                 << _myLastAudioTime+0.5;
                         return _myLastAudioTime+0.5;
                     } else {
-                        AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime();
+                        AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime()
+                                <<"video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
                         _myLastAudioTime = _myAudioSink->getCurrentTime();
                         return _myAudioSink->getCurrentTime();
                     }
@@ -83,7 +84,7 @@ namespace y60 {
              * Pauses the current playback. Audio is paused as well.
              */
             virtual void pauseMovie() {
-                AC_INFO << "pauseMovie";
+                AC_INFO << "AsyncDecoder::pauseMovie";
                 if (_myAudioSink) {            
                     _myAudioSink->pause();
                 }
@@ -114,7 +115,7 @@ namespace y60 {
              * the movie as if it was 
              */
             virtual void stopMovie() {
-                AC_DEBUG << "stopMovie";
+                AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
                 if (_myAudioSink) {            
                     _myAudioSink->stop();
@@ -145,7 +146,7 @@ namespace y60 {
             }
 
             void setState(DecoderState theState) {
-                AC_DEBUG << "State change: " << getStateString(_myState) << " --> " 
+                AC_DEBUG << "AsyncDecoder::setState State change: " << getStateString(_myState) << " --> " 
                         << getStateString(theState);
                 _myState = theState;
             }
