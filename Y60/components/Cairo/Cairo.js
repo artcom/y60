@@ -33,8 +33,8 @@ ourShow.setup = function() {
     myTestOverlay.width = 1024;
     myTestOverlay.height = 768;
 
-    var myRSvg = new RSvg();
-    myRSvg.renderFromFile(myTestOverlay.image, "test2.svg");
+    var myCairo = new CairoContext(myImage);
+    // myRSvg.renderFromFile(myTestOverlay.image, "test2.svg");
     // myRSvg.renderFromFile(myTestOverlay.image, "../../SVGS/popup.svg");
     
     // -- replacing svg content as follows
