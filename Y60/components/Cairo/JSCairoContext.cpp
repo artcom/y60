@@ -6,6 +6,8 @@
 #include <y60/JScppUtils.h>
 #include <y60/JSNode.h>
 
+#include <y60/JSWrapper.impl>
+
 #include "JSCairoContext.h"
 
 using namespace std;
@@ -14,6 +16,12 @@ using namespace y60;
 using namespace jslib;
 
 using namespace Cairo;
+
+namespace jslib {
+
+template class JSWrapper<Context, Ptr<Context>, StaticAccessProtocol>;
+
+}
 
 static JSBool
 checkForErrors(JSContext *theJavascriptContext, Context *theContext) {
@@ -948,4 +956,3 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTar
     }
     return false;
 }
-
