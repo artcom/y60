@@ -16,6 +16,11 @@
 #include <asl/Assure.h>
 #include <asl/numeric_functions.h>
 
+#ifdef ASS_LATENCY_TEST
+#   include <asl/SerialDevice.h>
+#   include <asl/SerialDeviceFactory.h>
+#endif
+
 #include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
 #include <y60/AbstractRenderWindow.h>
@@ -99,9 +104,19 @@ ASSDriver::ASSDriver() :
     _mySettings(dom::NodePtr(0))
 
 {
+#ifdef ASS_LATENCY_TEST
+    _myLatencyTestPort = asl::getSerialDevice( 0 );
+    _myLatencyTestPort->open( 9600, 8, SerialDevice::NO_PARITY, 1, false);
+#endif
 }
 
 ASSDriver::~ASSDriver() {
+#ifdef ASS_LATENCY_TEST
+    if ( _myLatencyTestPort ) {
+        delete _myLatencyTestPort;
+        _myLatencyTestPort = 0;
+    }
+#endif
 }
 
 bool
@@ -853,6 +868,19 @@ ASSDriver::applyTransform( const Vector2f & theRawPosition,
     return my3DPosition;    
 }
 
+#ifdef ASS_LATENCY_TEST
+void
+ASSDriver::toggleLatencyTestPin() {
+    static bool state = true;
+    static double lastTime= 0;
+    double now = asl::Time();
+    AC_PRINT << "DTR: " << state << " dt: " << now - lastTime;
+    _myLatencyTestPort->setStatusLine( state ? SerialDevice::DTR : 0 );
+    state = ! state;
+    lastTime = now;
+}
+#endif
+
 void 
 ASSDriver::processInput() {
 
@@ -881,6 +909,9 @@ ASSDriver::processInput() {
                         // TODO use smart pointers 
                         delete [] myEvent.data;
                         processSensorValues();
+#ifdef ASS_LATENCY_TEST
+                        toggleLatencyTestPin();
+#endif
                     }
                     break;
                 case ASS_LOST_SYNC:

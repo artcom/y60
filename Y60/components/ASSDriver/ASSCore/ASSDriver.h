@@ -31,6 +31,9 @@ namespace y60 {
 
 #define MAX_HISTORY_LENGTH 5
 
+
+//#define ASS_LATENCY_TEST
+
 struct Cursor {
     Cursor() :
             position(0.0, 0.0), 
@@ -196,6 +199,11 @@ class ASSDriver :
 
         TransportLayerPtr _myTransportLayer;
         dom::NodePtr      _mySettings;
+
+#ifdef ASS_LATENCY_TEST
+        void toggleLatencyTestPin();
+        asl::SerialDevice * _myLatencyTestPort;
+#endif
 };
 
 } // end of namespace

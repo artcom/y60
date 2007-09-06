@@ -233,9 +233,9 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                         _myFrameQueueLock.lock();
                         _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameBuffer ));
                         AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
-                        _myFrameQueueLock.unlock();
                         // TODO use smart pointers 
                         _myFrameBuffer = 0;
+                        _myFrameQueueLock.unlock();
                     } else {
                         AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
                         _myChecksumErrorCounter += 1;
@@ -275,9 +275,7 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
         if ( _myExpectedLine == 0 ) {
             parseStatusLine(/*theTargetRaster*/);
         } else {
-            if ( _myTmpBuffer[0] != MAGIC_TOKEN ||
-                 _myTmpBuffer[1] != _myExpectedLine)
-            {
+            if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
                 AC_WARNING << "Sync error.";
                 _mySyncLostCounter++;
                 _myFrameQueueLock.lock();
