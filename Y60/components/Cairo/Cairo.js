@@ -27,27 +27,22 @@ ourShow.setup = function() {
     var myImage = Modelling.createImage(window.scene, 1024, 768, "BGRA");
     myImage.resize = "none";
     
-    new ImageOverlay(window.scene, "test.png", [0,0]); 
-
     var myTestOverlay = new ImageOverlay(window.scene, myImage, [0,0]); 
     myTestOverlay.width = 1024;
     myTestOverlay.height = 768;
 
+    var xc = 128.0;
+    var yc = 128.0;
+    var radius = 100.0;
+    var angle1 = radFromDeg(45.0);
+    var angle2 = radFromDeg(180.0);
+
     var myCairo = new CairoContext(myImage);
-    // myRSvg.renderFromFile(myTestOverlay.image, "test2.svg");
-    // myRSvg.renderFromFile(myTestOverlay.image, "../../SVGS/popup.svg");
-    
-    // -- replacing svg content as follows
-    // var myNode = new Node();
-    // myNode.parseFile("../../SVGS/popup.svg");
-    // 
-    // var myInfotext = myNode.getElementById("infotext");
-    // myInfotext.firstChild.firstChild.nodeValue = "aaa bbb ccc";
-    // 
-    // var myInfotext = myNode.getElementById("nickname");
-    // myInfotext.firstChild.firstChild.nodeValue = "openlaszlo";
-    // 
-    // myRSvg.renderFromNode(myTestOverlay.image, myNode);
+    myCairo.setAntialias(CairoContext.ANTIALIAS_NONE);
+    myCairo.setSourceRGB(255,0,0);
+    myCairo.setLineWidth(10.0);
+    myCairo.arc(xc, yc, radius, angle1, angle2);
+    myCairo.stroke();
 }
 
 try {
