@@ -42,10 +42,11 @@ struct ASSEvent {
     ASSEvent(ASSEventType theType) : type( theType ) {}
     ASSEvent() : type( ASS_INVALID ) {}
 
-    ASSEvent(const asl::Vector2i & theSize, unsigned char * theData) :
-        type( ASS_FRAME ), size( theSize ), data( theData ) {}
+    ASSEvent(const asl::Vector2i & theSize, unsigned frame, unsigned char * theData) :
+        type( ASS_FRAME ), frameno( frame), size( theSize ), data( theData ) {}
 
     ASSEventType type;
+    unsigned     frameno;
     asl::Vector2i size;
     unsigned char * data;
 };

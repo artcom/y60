@@ -872,12 +872,12 @@ ASSDriver::applyTransform( const Vector2f & theRawPosition,
 void
 ASSDriver::toggleLatencyTestPin() {
     static bool state = true;
-    static double lastTime= 0;
-    double now = asl::Time();
+    //static double lastTime= 0;
+    //double now = asl::Time();
     AC_PRINT << "DTR: " << state << " dt: " << now - lastTime;
     _myLatencyTestPort->setStatusLine( state ? SerialDevice::DTR : 0 );
     state = ! state;
-    lastTime = now;
+    //lastTime = now;
 }
 #endif
 
@@ -910,7 +910,9 @@ ASSDriver::processInput() {
                         delete [] myEvent.data;
                         processSensorValues();
 #ifdef ASS_LATENCY_TEST
-                        toggleLatencyTestPin();
+                        if (myEvent.frameno % 16 == 0) {
+                            toggleLatencyTestPin();
+                        }
 #endif
                     }
                     break;

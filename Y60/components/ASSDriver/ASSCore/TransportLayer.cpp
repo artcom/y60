@@ -231,7 +231,8 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                         //AC_PRINT << "Checksum OK.";
 			MAKE_SCOPE_TIMER(TransportLayer_parseStatusLine);
                         _myFrameQueueLock.lock();
-                        _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameBuffer ));
+                        _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameNo,
+                                    _myFrameBuffer ));
                         AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
                         // TODO use smart pointers 
                         _myFrameBuffer = 0;
