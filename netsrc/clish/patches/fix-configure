@@ -1,7 +1,7 @@
 Index: clish/configure.ac
 ===================================================================
---- clish.orig/configure.ac	2007-09-05 11:47:14.000000000 +0200
-+++ clish/configure.ac	2007-09-05 11:47:20.000000000 +0200
+--- clish.orig/configure.ac	2007-09-07 15:54:22.443093415 +0200
++++ clish/configure.ac	2007-09-07 15:55:24.431340299 +0200
 @@ -13,7 +13,6 @@
  
  AC_CONFIG_HEADERS([config.h])
@@ -10,3 +10,12 @@ Index: clish/configure.ac
  
  # Checks for programs.
  AC_PROG_CC
+@@ -21,6 +20,8 @@
+ AC_LIBTOOL_WIN32_DLL
+ AC_PROG_LIBTOOL
+ 
++AM_PROG_CC_C_O
++
+ # needed to handle 64-bit architecture
+ AC_CHECK_SIZEOF(int)
+ AC_CHECK_SIZEOF(long)
