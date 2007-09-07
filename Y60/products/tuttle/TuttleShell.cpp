@@ -166,9 +166,8 @@ namespace tuttle {
     }
 
     CLISH_BUILTIN(Quit) {
-        //        clish_shell_t *myClish = ((clish_shell_t *)theClish);
-        
-        //        clish_shell_close(theClish);
+
+        clish_shell_close(const_cast<clish_shell_t*>(theClish));
 
         return BOOL_TRUE;
     }

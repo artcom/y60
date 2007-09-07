@@ -6,9 +6,9 @@
 
 #include <js/jsapi.h>
 
-#include "TuttleApplication.h"
-
 namespace tuttle {
+
+    class Application; 
 
     class Debugger {
     public:

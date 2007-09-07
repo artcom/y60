@@ -6,6 +6,10 @@
 
 #include <js/jscntxt.h>
 
+#ifdef DEBUG
+#include "TuttleDebugger.h"
+#endif
+
 namespace tuttle {
 
     class Application {
@@ -16,13 +20,17 @@ namespace tuttle {
 
         bool run();
 
-        bool terminate();
+        void terminate();
 
         void setInterval(unsigned long theIntervalUsecs);
 
         JSRuntime *getJavascriptRuntime();
         JSContext *getJavascriptContext();
         JSObject  *getJavascriptGlobal();
+
+#ifdef DEBUG
+        void attachDebugger(Debugger *theDebugger);
+#endif
 
     protected:
         bool initJavascript(JSContext *theContext, JSObject *theGlobal);
@@ -37,6 +45,10 @@ namespace tuttle {
         JSRuntime     *_myRuntime;
         JSContext     *_myContext;
         JSObject      *_myGlobal;
+
+#ifdef DEBUG
+        Debugger      *_myDebugger;
+#endif
     };
 
 }

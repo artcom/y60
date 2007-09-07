@@ -4,6 +4,7 @@
 #include <js/jsapi.h>
 #include <js/jsdbgapi.h>
 
+#include "TuttleApplication.h"
 #include "TuttleDebugger.h"
 
 
@@ -18,6 +19,8 @@ namespace tuttle {
 
     Debugger::Debugger(Application &theApplication) :
 	_myApplication(theApplication) {
+
+        _myApplication.attachDebugger(this);
 
         _myRuntime = _myApplication.getJavascriptRuntime();
         _myContext = _myApplication.getJavascriptContext();

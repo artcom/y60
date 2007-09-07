@@ -41,7 +41,7 @@ namespace tuttle {
 
 
     Application::Application() :
-        _myTerminate(false), _myInterval(100000) {
+        _myTerminate(false), _myInterval(100000), _myDebugger(0) {
 
         JSRuntime *myRuntime = JS_NewRuntime(JS_HEAP_SIZE);        
 
@@ -84,6 +84,16 @@ namespace tuttle {
     bool Application::process() {
         return true;
     }
+
+    void Application::terminate() {
+        _myTerminate = true;
+    }
+
+#ifdef DEBUG
+    void Application::attachDebugger(Debugger *theDebugger) {
+        _myDebugger = theDebugger;
+    }
+#endif
 
     JSRuntime *Application::getJavascriptRuntime() {
         return _myRuntime;

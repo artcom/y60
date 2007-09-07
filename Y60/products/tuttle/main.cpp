@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "TuttleApplication.h"
 #include "TuttleDebugger.h"
 #include "TuttleShell.h"
 
