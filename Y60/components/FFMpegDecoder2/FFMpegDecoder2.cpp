@@ -19,6 +19,17 @@
 #include <asl/Pump.h> //must come before Assure.h
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+
+// remove ffmpeg macros
+#ifdef START_TIMER
+#   undef START_TIMER
+#endif
+#ifdef STOP_TIMER
+#   undef STOP_TIMER
+#endif
+
+
+
 #include <asl/Dashboard.h>
 #include <iostream>
 #include <stdlib.h>
@@ -566,17 +577,13 @@ namespace y60 {
             if(!myFrameDroppedFlag){
                 _myLastVideoFrame = myVideoMsg;
                 // Current frame is in myVideoMsg now. Convert to a format that Y60 can use.
-                START_TIMER(decodeFrame_resize);
                 theTargetRaster->resize(getFrameWidth(), getFrameHeight());
-                STOP_TIMER(decodeFrame_resize);
                 if (myVideoMsg) {
                     AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
                             << ", got=" << (myVideoMsg->getTime()- _myStartTimestamp/_myTimeUnitsPerSecond);
                     theTime = myVideoMsg->getTime() - _myStartTimestamp/_myTimeUnitsPerSecond;
-                    START_TIMER(decodeFrame_memcopy);
                     memcpy(theTargetRaster->pixels().begin(), myVideoMsg->getBuffer(),
                             theTargetRaster->pixels().size());
-                    STOP_TIMER(decodeFrame_memcopy);
                 } else {
                     // TODO: Figure out if/why this happens. Delete?
                     AC_WARNING << "readFrame, empty frame.";
