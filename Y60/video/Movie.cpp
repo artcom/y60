@@ -134,9 +134,7 @@ namespace y60 {
 
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
-        asl::Time myTimer1;
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
-        asl::Time myTimer2;
         
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
@@ -369,7 +367,7 @@ namespace y60 {
         if (_myDecoder) {
             _myDecoder->stopMovie();
         }
-        set<CurrentFrameTag>(0);
+        //set<CurrentFrameTag>(0);
         _myLastDecodedFrame = UINT_MAX;
         _myCurrentLoopCount = 0;
 

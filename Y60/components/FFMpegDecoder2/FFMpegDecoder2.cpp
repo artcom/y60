@@ -109,7 +109,6 @@ namespace y60 {
     void
     FFMpegDecoder2::load(const std::string & theFilename) {
         AC_INFO << "FFMpegDecoder2::load(" << theFilename << ")";
-
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
@@ -299,12 +298,15 @@ namespace y60 {
         double myTime = thePacket.dts / _myTimeUnitsPerSecond;
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
-            /*// "avcodec_decode_audio2" needs the buffer size for initialization
-            myBytesDecoded = _mySamples.size(); 
-            int myLen = avcodec_decode_audio2(_myAStream->codec,
-                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);*/
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(28<<8)+0)
+                // "avcodec_decode_audio2" needs the buffer size for initialization
+                myBytesDecoded = _mySamples.size(); 
+                int myLen = avcodec_decode_audio2(_myAStream->codec,
+                    (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+#else            
             int myLen = avcodec_decode_audio(_myAStream->codec,
                 (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);    
+#endif
             if (myLen < 0 || myBytesDecoded < 0) {
                 AC_WARNING << "av_decode_audio error";
                 break;
@@ -387,6 +389,7 @@ namespace y60 {
                 // try to decode the frame
                 int myLen = avcodec_decode_video(_myVStream->codec, _myFrame,
                         &myFrameCompleteFlag, myPacket->data, myPacket->size);
+                STOP_TIMER(decodeFrame_avcodec_decode);
                 AC_DEBUG <<"FFMpegDecoder2::decodeFrame frame doneflag :  "<< myFrameCompleteFlag<<" len: "<<myLen;
                 AC_DEBUG<< "dts=" << myPacket->dts << ", position=" <<
                         myPacket->pos << ", duration=" << 
@@ -397,7 +400,6 @@ namespace y60 {
                 } else if (myLen < myPacket->size) {
                     AC_ERROR << "---- av_decode_video: Could not decode video in one step";
                 }
-                STOP_TIMER(decodeFrame_avcodec_decode);
                 
                 if(!myFrameCompleteFlag) {
                     // count dropped frames
@@ -538,12 +540,7 @@ namespace y60 {
 
             if (!useLastVideoFrame) {
                 while (true) {
-                    START_TIMER(decodeFrame_msgQueuePop);
-                    asl::Time myTimer1;
                     myVideoMsg = _myMsgQueue.pop_front();
-                    asl::Time myTimer2;
-                    AC_DEBUG << "FFMpegDecoder2::readFrame " << (myTimer2  - myTimer1); 
-                    STOP_TIMER(decodeFrame_msgQueuePop);
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
                         return theTime;
@@ -755,10 +752,7 @@ namespace y60 {
 		AC_DEBUG << "---- try to add frame at " << theTime;
         VideoMsgPtr myVideoFrame = createFrame(theTime);
         convertFrame(theFrame, myVideoFrame->getBuffer());
-        asl::Time myTimer1;
         _myMsgQueue.push_back(myVideoFrame);
-        asl::Time myTimer2;
-        AC_DEBUG << "FFMpegDecoder2::addCacheFrame pushback time: " << (myTimer2  - myTimer1); 
         
         AC_DEBUG << "---- Added Frame to cache, Frame # : "
             << double(theTime - _myStartTimestamp/_myTimeUnitsPerSecond)*_myFrameRate
@@ -816,6 +810,8 @@ namespace y60 {
             //seek to begin of file
             AC_DEBUG<<"seeking to start"<<" starttime: "<< _myStartTimestamp;
             int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_ANY);
+            Movie * myMovie = getMovie();
+            myMovie->set<CurrentFrameTag>(0);
         } else {
             unsigned myLastIFrameOffset;
             if(_myNumIFramesDecoded == 0){
