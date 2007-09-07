@@ -11,6 +11,8 @@
 #ifndef _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
 #define _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
 
+#include <dom/Nodes.h>
+
 #include <y60/JSWrapper.h>
 
 #include <cairomm/cairomm.h>
@@ -99,7 +101,10 @@ namespace jslib {
             return dynamic_cast<JSCairoContext &>(JSCairoContext::getJSWrapper(cx,obj));
         }
 
+        void doTriggerUpload();
+
     private:
+        dom::NodePtr _myImageNode;
     };
 
     template <>

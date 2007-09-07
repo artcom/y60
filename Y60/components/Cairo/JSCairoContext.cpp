@@ -837,6 +837,24 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 // SEBASTIAN END
 
 
+static JSBool
+triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    ensureParamCount(argc, 0);
+
+    JSCairoContext *myContext = reinterpret_cast<JSCairoContext*>(JS_GetPrivate(cx, obj));
+
+    myContext->doTriggerUpload();
+
+    return JS_TRUE;
+}
+
+void
+JSCairoContext::doTriggerUpload() {
+    _myImageNode->getFacade<y60::Image>()->triggerUpload();
+}
+
 JSFunctionSpec *
 JSCairoContext::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -898,6 +916,8 @@ JSCairoContext::Functions() {
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
         // sebastian end
+
+        {"triggerUpload",        triggerUpload,           0},
         {0}
     };
     return myFunctions;
@@ -951,8 +971,10 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     JSCairoContext * myNewObject = 0;
 
+    dom::NodePtr myImageNode;
+
     if (argc == 1) {
-        dom::NodePtr myImageNode;
+
         if(!convertFrom(cx, argv[0], myImageNode)) {
             JS_ReportError(cx, "Need an image node to construct a cairo context.");
             return JS_FALSE;
@@ -978,6 +1000,7 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_FALSE;
     }
     myNewObject = new JSCairoContext(OWNERPTR(newNative), newNative);
+    myNewObject->_myImageNode = myImageNode;
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
