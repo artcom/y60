@@ -401,7 +401,7 @@ namespace y60 {
         } else {
             _myDecoder = myDecoder->instance();
         }
-
+        AC_PRINT<<"hallo";
         _myDecoder->initialize(this);
         _myDecoder->load(myFilename);
         postLoad();

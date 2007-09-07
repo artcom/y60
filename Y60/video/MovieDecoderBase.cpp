@@ -24,6 +24,7 @@ namespace y60 {
     MovieDecoderBase::~MovieDecoderBase() {}
 
     void MovieDecoderBase::initialize(Movie * theMovie) {
+        AC_DEBUG<<"MovieDecoderBase::initialize";
         _myMovie = theMovie;
     }
 
