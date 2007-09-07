@@ -78,6 +78,10 @@ namespace tuttle {
     }
 
     bool Application::handleRequests() {
+        if(_myDebugger) {
+            _myDebugger->handleRequests();
+        }
+
         return true;
     }
 

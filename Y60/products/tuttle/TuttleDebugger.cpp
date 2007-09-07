@@ -45,6 +45,12 @@ namespace tuttle {
         return _myGlobal;
     }
     
+    static JSTrapStatus
+    tuttle_trap_break (JSContext *theContext, JSScript *theScript, jsbytecode *pc, jsval *rval, void *closure) {
+        Debugger *myDebugger = reinterpret_cast<Debugger*>(closure);
+        cout << "Breakpoint trap." << endl;
+        return JSTRAP_CONTINUE;
+    }
 
     static JSTrapStatus
     tuttle_trap_throw (JSContext *theContext, JSScript *theScript, jsbytecode *pc, jsval *rval, void *closure) {
@@ -107,4 +113,13 @@ namespace tuttle {
         }
     }
 
+    void Debugger::applicationHandleRequests() {
+        
+    }
+
+
+    void Debugger::debuggerRequestRoundtrip(Message &theMessage) {
+        _myToApplication.push(theMessage);
+        
+    }
 }

@@ -1,7 +1,7 @@
 
 VARIANT   := DBG
-DEFINES   := -DXP_UNIX -DDEBUG
-LIBRARIES := -lclish -llub -ltinyrl -ltinyxml -lpthread -ljsspidermonkey$(VARIANT)
+DEFINES   := -DXP_UNIX -DDEBUG -D_GNU_SOURCE -D_PTHREADS -DLINUX -DDEBUG_VARIANT
+LIBRARIES := -lclish -llub -ltinyrl -ltinyxml -lpthread -lrt -ljsspidermonkey$(VARIANT) -laslbase$(VARIANT)
 
 PRO_INCLUDES := -I$(PRO)/include
 PRO_LIBDIRS  := -L$(PRO)/lib
