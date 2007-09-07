@@ -160,7 +160,7 @@ namespace y60 {
         if (get<FrameCountTag>() == -1) {
             bool myOldAudioflag = get<AudioTag>();
             set<AudioTag>(false);
-            load(AppPackageManager::get().getPtr()->getSearchPath());      
+            load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
                 readFrame();      
                 int myFrame = -1;
@@ -172,8 +172,10 @@ namespace y60 {
                 _myDecoder->setEOF(false);     
                 _myDecoder->stopMovie();
             }
-            set<AudioTag>(myOldAudioflag);
-            load(AppPackageManager::get().getPtr()->getSearchPath());            
+            if(myOldAudioflag == true) {
+                set<AudioTag>(myOldAudioflag);
+                load(AppPackageManager::get().getPtr()->getSearchPath());            
+            }
         } 
     }
 
