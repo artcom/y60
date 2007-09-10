@@ -48,8 +48,6 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
-// INGO START
-
 static JSBool
 save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -637,10 +635,7 @@ showPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
-// INGO END
-
-// SEBASTIAN START
-// function list:
+// MISSING:
 // cairo_path_t* cairo_copy_path               (cairo_t *cr);
 // cairo_path_t* cairo_copy_path_flat          (cairo_t *cr);
 // void        cairo_path_destroy              (cairo_path_t *path);
@@ -770,6 +765,7 @@ rectangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext); 
 }
 
+// MISSING:
 // void        cairo_glyph_path                (cairo_t *cr,
 //                                              const cairo_glyph_t *glyphs,
 //                                              int num_glyphs);
@@ -834,9 +830,6 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext); 
 }
 
-// SEBASTIAN END
-
-
 static JSBool
 triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -862,7 +855,6 @@ JSCairoContext::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
 
-        // ingo begin
         {"save",                 save,                    0},
         {"restore",              restore,                 0},
         {"setSourceRGB",         setSourceRGB,            3},
@@ -903,9 +895,6 @@ JSCairoContext::Functions() {
         {"copyPage",             copyPage,                0},
         {"showPage",             showPage,                0},
 
-        // ingo end
-        
-        // sebastian begin
         {"arc",                  arc,                     0},
         {"arcNegative",          arcNegative,             0}, 
         {"curveTo",              curveTo,                 0},
@@ -915,7 +904,6 @@ JSCairoContext::Functions() {
         {"relCurveTo",           relCurveTo,              0},
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
-        // sebastian end
 
         {"triggerUpload",        triggerUpload,           0},
         {0}
@@ -984,7 +972,6 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         int myImageWidth = myImage->get<ImageWidthTag>();
         int myImageHeight = myImage->get<ImageHeightTag>();
 
-
         unsigned char *myDataPtr = myImage->getRasterPtr()->pixels().begin();
 
         cairo_surface_t *myCairoSurface =
@@ -999,6 +986,7 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+
     myNewObject = new JSCairoContext(OWNERPTR(newNative), newNative);
     myNewObject->_myImageNode = myImageNode;
 
@@ -1011,11 +999,11 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     return JS_FALSE;
 }
 
-
 JSConstIntPropertySpec *
 JSCairoContext::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
+        // name                id                       value
         {"ANTIALIAS_DEFAULT",  PROP_ANTIALIAS_DEFAULT,  Cairo::ANTIALIAS_DEFAULT},
         {"ANTIALIAS_NONE",     PROP_ANTIALIAS_NONE,     Cairo::ANTIALIAS_NONE},
         {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     Cairo::ANTIALIAS_GRAY},
