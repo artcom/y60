@@ -77,8 +77,7 @@ namespace y60 {
         _myDecodedPacketsPerFrame(0),
         _myBytesPerPixel(1),
         _myLastFrameTime(0)
-    {
-    }
+    {}
 
     FFMpegDecoder2::~FFMpegDecoder2() {
         closeMovie();
@@ -190,7 +189,7 @@ namespace y60 {
 
         _myDecodedPacketsPerFrame = 0; // reset counter 
         decodeFrame();
-        if (hasAudio())
+        if (hasAudio() && getDecodeAudioFlag())
         {
             readAudio();
             AC_INFO << "Start Audio";
@@ -240,7 +239,7 @@ namespace y60 {
                 avcodec_flush_buffers(_myAStream->codec);
             }
 */            
-            if (_myAudioSink) {
+            if (_myAudioSink && getDecodeAudioFlag()) {
                 _myAudioSink->stop();
             }
             _myDemux->clearPacketCache();
@@ -525,7 +524,7 @@ namespace y60 {
                 if (getPlayMode() == y60::PLAY_MODE_PAUSE){
                     if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
                         seek(myStreamTime);
-                        if (hasAudio()) {
+                        if (hasAudio() && getDecodeAudioFlag()) {
                             AC_DEBUG << "seek: set Audio";
                             _myAudioSink->setCurrentTime(theTime);
                             if (getState() == RUN) {
@@ -533,7 +532,7 @@ namespace y60 {
                                 _myAudioSink->play();
                             }
                         }
-                    } else if (hasAudio()) {
+                    } else if (hasAudio()&& getDecodeAudioFlag()) {
                         AC_DEBUG << "video paused no seeking and audio not running-> setcurrenttime: "<<theTime;
                         _myAudioSink->setCurrentTime(theTime);
                     }
@@ -611,7 +610,7 @@ namespace y60 {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
             if (_myMsgQueue.size() >= FRAME_CACHE_SIZE) {
                 // decode the audio...but let the video thread sleep
-                if (hasAudio()) {
+                if (hasAudio() && getDecodeAudioFlag()) {
                     AC_DEBUG<<"---sleeping ---still decode audio";
                     readAudio();
                 }
@@ -632,7 +631,7 @@ namespace y60 {
                 AC_WARNING << "---- Semaphore destroyed while in run. Terminating Thread.";
                 return;
             }
-            if (hasAudio())
+            if (hasAudio()&& getDecodeAudioFlag())
             {
                 AC_DEBUG<<"decode audio";
                 readAudio();
@@ -793,7 +792,7 @@ namespace y60 {
     void FFMpegDecoder2::seek(double theDestTime) {
         AC_DEBUG << "FFMpegDecoder2::seek: Joining FFMpegDecoder Thread"<<" desttime: "<<theDestTime;
         join();
-        if (_myAudioSink) {
+        if (_myAudioSink && getDecodeAudioFlag()) {
             _myAudioSink->stop();
         }
         _myDemux->clearPacketCache();

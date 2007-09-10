@@ -52,6 +52,7 @@ namespace y60 {
     }
 
     asl::Ptr<MovieDecoderBase> QuicktimeDecoder::instance() const {
+        AC_DEBUG<<"QuicktimeDecoder::instance()";
         InitializeQTML(0);
         EnterMovies();
         return asl::Ptr<MovieDecoderBase>(new QuicktimeDecoder(getDLHandle()));
@@ -74,11 +75,12 @@ namespace y60 {
         PixMapHandle myPixMap = GetGWorldPixMap(_myOffScreenWorld);
         DisposeScreenBuffer(myPixMap);
         DisposeGWorld(_myOffScreenWorld);
-
+        MovieDecoderBase::closeMovie();
     }
 
     void
     QuicktimeDecoder::stopMovie() {
+        AC_DEBUG<<"QuicktimeDecoder::stopMovie()";
         _myLastDecodedFrame = UINT_MAX;
         _myInternalMovieTime = 0;
 
@@ -97,6 +99,7 @@ namespace y60 {
 
     void
     QuicktimeDecoder::load(const std::string & theFilename) {
+        AC_DEBUG<<"QuicktimeDecoder::load theFilename: "<<theFilename;
         asl::Time myLoadStartTime;
 
         OSErr                   myErr;
@@ -126,14 +129,12 @@ namespace y60 {
             throw QuicktimeDecoderException(string("Movie ") + theFilename +
                 " could not be loaded, check existence.", PLUS_FILE_LINE);
         }
-
+        
         CloseMovieFile(myFileRefNum);
 
         Rect movieBounds;
         GetMovieBox(_myMovie, &movieBounds);
-
         Movie * myMovie = getMovie();
-
         unsigned myQTTargetPixelFormat;
         // get movie pixelformat
         GWorldPtr myOrigGWorld = NULL;
@@ -141,7 +142,6 @@ namespace y60 {
         PixMapHandle myPortPixMap = myOrigGWorld->portPixMap;
         AllowPurgePixels(myPortPixMap);
         OSType myMoviePixelType = (*myPortPixMap)->pixelFormat;
-
         myQTTargetPixelFormat = myMoviePixelType;
 
         switch (myMoviePixelType) {
@@ -173,19 +173,17 @@ namespace y60 {
         }
 
         QTNewGWorld(&_myOffScreenWorld, myQTTargetPixelFormat, &movieBounds, 0, 0, 0);
-
-        int myFrameCount = getFramecount(_myMovie);
+        unsigned myFrameCount = getFramecount(_myMovie);
         TimeScale ts = GetMovieTimeScale(_myMovie);
         unsigned myDuration = (GetMovieDuration(_myMovie)*1000)/ts;
 
-        unsigned myFrameRate = (unsigned)floor(double(myFrameCount)/ 
-                double((myDuration/1000)));
+        double myFrameRate = myFrameCount*1000/myDuration;
         if (!myFrameRate) {
             throw QuicktimeDecoderException(string("Movie ") + theFilename +
                 ": could not get framecount and framerate.", PLUS_FILE_LINE);
             //myFrameRate = 25;
         }
-
+        AC_DEBUG<<"framerate: "<<myFrameRate;
         myMovie->set<FrameRateTag>(myFrameRate);
 
         TimeValue   myTimeScale = GetMovieTimeScale(_myMovie);
@@ -193,27 +191,18 @@ namespace y60 {
 
         _myFrameTimeStep = (TimeValue)(myTimeScale/ myMovie->get<FrameRateTag>());
 
-        // Setup video size and image matrix
-        float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
-        float myYResize = float(movieBounds.bottom) / asl::nextPowerOfTwo(movieBounds.bottom);
-
-        asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-        myMovie->set<ImageMatrixTag>(myMatrix);
-
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
         myMovie->set<FrameCountTag>(long(myDurationInSeconds * myFrameRate));
 
         SetGWorld(_myOffScreenWorld, NULL);
         SetMovieGWorld(_myMovie, _myOffScreenWorld, NULL);
-
         asl::Time myLoadEndTime;
-        AC_INFO << "Load file:" << theFilename << ", time " << (myLoadEndTime - myLoadStartTime) << "s";
+        AC_DEBUG << "Load file:" << theFilename << ", time " << (myLoadEndTime - myLoadStartTime) << "s";
         
 
     }
 
-    unsigned int
+    unsigned
     QuicktimeDecoder::getFramecount(::Movie theMovie) {
         int      frameCount = 0;
         OSType      whichMediaType = VIDEO_TYPE;

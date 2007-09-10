@@ -91,7 +91,8 @@ namespace y60 {
             MoviePlayMode getPlayMode() const; 
             bool getEOF() const; 
             void setEOF(bool theEndOfFileFlag); 
-
+            void setDecodeAudioFlag(bool theDecodeAudioFlag);
+            
             /**
              * Starts the movie playback at theStartTime.
              * @param theStartTime start time of the movie. Defaults to 0.0
@@ -130,12 +131,14 @@ namespace y60 {
         protected:
             const Movie * getMovie() const;
             Movie * getMovie(); 
+            bool getDecodeAudioFlag() const;
 
         private:
             Movie *        _myMovie;
             bool           _myEndOfFileFlag;
             double         _myMovieTime;
             double         _myLastSystemTime;
+            bool           _myDecodeAudioFlag;
     };
 
     typedef asl::Ptr<MovieDecoderBase> MovieDecoderBasePtr;

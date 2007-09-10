@@ -18,13 +18,12 @@ using namespace std;
 
 namespace y60 {
     MovieDecoderBase::MovieDecoderBase() :
-        _myEndOfFileFlag(false), _myMovieTime(0.0), _myLastSystemTime(-1.0)
+        _myEndOfFileFlag(false), _myMovieTime(0.0), _myLastSystemTime(-1.0), _myDecodeAudioFlag(true)
     {}
 
     MovieDecoderBase::~MovieDecoderBase() {}
 
     void MovieDecoderBase::initialize(Movie * theMovie) {
-        AC_DEBUG<<"MovieDecoderBase::initialize";
         _myMovie = theMovie;
     }
 
@@ -60,9 +59,6 @@ namespace y60 {
                 }
             }
         }
-//        if(_myLastSystemTime == -1){
-//            _myMovieTime = 0;
-//        }
         _myLastSystemTime = theSystemTime;
         AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime 
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 
@@ -74,6 +70,13 @@ namespace y60 {
             const std::string & theFilename)  
     {
         throw asl::NotYetImplemented(JUST_FILE_LINE);
+    }
+    void MovieDecoderBase::setDecodeAudioFlag(bool theDecodeAudioFlag) {
+        _myDecodeAudioFlag = theDecodeAudioFlag;
+    }
+    
+    bool MovieDecoderBase::getDecodeAudioFlag() const {
+        return _myDecodeAudioFlag;
     }
 
     int MovieDecoderBase::getFrameCount() const {

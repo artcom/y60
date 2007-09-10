@@ -56,7 +56,7 @@ namespace y60 {
              *         played back, else theSystemTime
              */
             double getMovieTime(double theSystemTime) {
-                if (!hasAudio()) {
+                if (!hasAudio() || !getDecodeAudioFlag()) {
                     AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {

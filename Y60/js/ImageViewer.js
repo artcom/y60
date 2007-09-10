@@ -342,7 +342,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
-                var myEnsureFramecount = false;
+                var myEnsureFramecount = true;
                 showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag), myEnsureFramecount);
                 if (_myImageOverlay) {
                     _myImageOverlay.visible = false;
@@ -576,14 +576,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             if (theEnsureFrameCount) {
-                //window.scene.loadMovieFrame(_myMovieNode);
                 window.scene.ensureMovieFramecount(_myMovieNode);
             }
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
             
-
-            //_myMovieOverlay = new MovieOverlay(window.scene, theFilename, [0,0], null, false);//, "GRAY");
-            //_myMovieNode= _myMovieOverlay.movie;
         }
 
         if (_myFullSizeMode) {

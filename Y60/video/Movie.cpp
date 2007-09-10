@@ -158,10 +158,9 @@ namespace y60 {
     Movie::ensureMovieFramecount() {
         AC_DEBUG<<"Movie::ensureMovieFramecount "<<get<FrameCountTag>();
         if (get<FrameCountTag>() == -1) {
-            bool myOldAudioflag = get<AudioTag>();
-            set<AudioTag>(false);
             load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
+                _myDecoder->setDecodeAudioFlag(false);
                 readFrame();      
                 int myFrame = -1;
                 while (!_myDecoder->getEOF()) {
@@ -169,12 +168,10 @@ namespace y60 {
                     double myMovieTime = getTimeFromFrame(myFrame);
                     decodeFrame(myMovieTime, myFrame);                                
                 }
-                _myDecoder->setEOF(false);     
-                _myDecoder->stopMovie();
-            }
-            if(myOldAudioflag == true) {
-                set<AudioTag>(myOldAudioflag);
-                load(AppPackageManager::get().getPtr()->getSearchPath());            
+                _myDecoder->setEOF(false);  
+                restart(0);   
+                //_myDecoder->stopMovie();
+                _myDecoder->setDecodeAudioFlag(true);
             }
         } 
     }
@@ -403,7 +400,6 @@ namespace y60 {
         } else {
             _myDecoder = myDecoder->instance();
         }
-        AC_PRINT<<"hallo";
         _myDecoder->initialize(this);
         _myDecoder->load(myFilename);
         postLoad();
