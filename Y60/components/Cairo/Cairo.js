@@ -37,7 +37,8 @@ ourShow.setup = function() {
     var angle1 = radFromDeg(45.0);
     var angle2 = radFromDeg(180.0);
 
-    var myCairo = new CairoContext(myImage);
+    var myCairoSurface = new CairoSurface(myImage);
+    var myCairo = new CairoContext(myCairoSurface);
     myCairo.setAntialias(CairoContext.ANTIALIAS_NONE);
     myCairo.setSourceRGB(255,0,0);
     myCairo.setLineWidth(10.0);
