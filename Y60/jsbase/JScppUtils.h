@@ -141,7 +141,7 @@ JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName);
 
 struct JSConstIntPropertySpec {
     const char      *name;
-    int8            tinyid;
+    intN            tinyid;
     int             value;
 };
 
