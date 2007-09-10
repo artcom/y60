@@ -320,6 +320,7 @@ new file:
         file_name.push_back("../../testdata/testdom3.xml");
         file_name.push_back("../../testdata/formattest.xml");
         file_name.push_back("../../testdata/System Report.xml");
+        file_name.push_back("../../testdata/Nodes.h.xml");
 #endif        
 #ifndef DEBUG_VARIANT        
 		file_name.push_back("../../testdata/big.xml");
