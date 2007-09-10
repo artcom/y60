@@ -353,7 +353,7 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         convertFrom(cx, argv[5], mySweepAngle);
 
         string myName;
-        if (argc > 5) {
+        if (argc > 6) {
             convertFrom(cx, argv[6], myName);
         }
 
