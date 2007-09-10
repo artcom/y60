@@ -86,19 +86,9 @@ enum PropertyNumbers {
     PROP_GDK_ENTER_NOTIFY_MASK,
     PROP_GDK_LEAVE_NOTIFY_MASK,
 
-    // keysyms
-    PROP_GDK_F1,
-    PROP_GDK_F2,
-    PROP_GDK_F3,
-    PROP_GDK_F4,
-    PROP_GDK_F5,
-    PROP_GDK_F6,
-    PROP_GDK_F7,
-    PROP_GDK_F8,
-    PROP_GDK_F9,
-    PROP_GDK_F10,
-    PROP_GDK_F11,
-    PROP_GDK_F12,
+    // keysyms (generated using generate-keysyms.sh)
+#   include "JSGdkKeysymPropertyNumbers.txt"
+
     PROP_END
 };
 
@@ -149,19 +139,9 @@ JSGdkEvent::ConstIntProperties() {
         DEFINE_GDK_PROP(GDK_ENTER_NOTIFY_MASK),
         DEFINE_GDK_PROP(GDK_LEAVE_NOTIFY_MASK),
 
-        // keysyms ...
-        DEFINE_GDK_PROP(GDK_F1),
-        DEFINE_GDK_PROP(GDK_F2),
-        DEFINE_GDK_PROP(GDK_F3),
-        DEFINE_GDK_PROP(GDK_F4),
-        DEFINE_GDK_PROP(GDK_F5),
-        DEFINE_GDK_PROP(GDK_F6),
-        DEFINE_GDK_PROP(GDK_F7),
-        DEFINE_GDK_PROP(GDK_F8),
-        DEFINE_GDK_PROP(GDK_F9),
-        DEFINE_GDK_PROP(GDK_F10),
-        DEFINE_GDK_PROP(GDK_F11),
-        DEFINE_GDK_PROP(GDK_F12),
+        // keysyms (generated using generate-keysyms.sh)
+#       include "JSGdkKeysymPropertyDefinitions.txt"
+
         {0}
     };
     return myProperties;
