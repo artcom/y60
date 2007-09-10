@@ -19,15 +19,15 @@
 
 namespace jslib {
 
-    class JSCairoPattern : public JSWrapper<Cairo::Pattern, asl::Ptr<Cairo::Pattern>, StaticAccessProtocol> {
+    class JSCairoPattern : public JSWrapper<Cairo::RefPtr<Cairo::Pattern>, asl::Ptr< Cairo::RefPtr<Cairo::Pattern> >, StaticAccessProtocol> {
         JSCairoPattern();  // hide default constructor
     public:
 
         virtual ~JSCairoPattern() {
         }
 
-        typedef Cairo::Pattern NATIVE;
-        typedef asl::Ptr<Cairo::Pattern> OWNERPTR;
+        typedef Cairo::RefPtr<Cairo::Pattern> NATIVE;
+        typedef asl::Ptr< Cairo::RefPtr<Cairo::Pattern> > OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 

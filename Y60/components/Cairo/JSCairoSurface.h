@@ -19,15 +19,15 @@
 
 namespace jslib {
 
-    class JSCairoSurface : public JSWrapper<Cairo::Surface, asl::Ptr<Cairo::Surface>, StaticAccessProtocol> {
+    class JSCairoSurface : public JSWrapper<Cairo::RefPtr<Cairo::Surface>, asl::Ptr< Cairo::RefPtr<Cairo::Surface> >, StaticAccessProtocol> {
         JSCairoSurface();  // hide default constructor
     public:
 
         virtual ~JSCairoSurface() {
         }
 
-        typedef Cairo::Surface NATIVE;
-        typedef asl::Ptr<Cairo::Surface> OWNERPTR;
+        typedef Cairo::RefPtr<Cairo::Surface> NATIVE;
+        typedef asl::Ptr< Cairo::RefPtr<Cairo::Surface> > OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 

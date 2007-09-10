@@ -17,11 +17,11 @@ using namespace jslib;
 
 namespace jslib {
 
-template class JSWrapper<Cairo::Surface, Ptr<Cairo::Surface>, StaticAccessProtocol>;
+template class JSWrapper<Cairo::RefPtr<Cairo::Surface>, Ptr< Cairo::RefPtr<Cairo::Surface> >, StaticAccessProtocol>;
 
 static JSBool
-checkForErrors(JSContext *theJavascriptSurface, Cairo::Surface *theSurface) {
-    Cairo::ErrorStatus myStatus = theSurface->get_status();
+checkForErrors(JSContext *theJavascriptSurface, Cairo::RefPtr<Cairo::Surface> *theSurface) {
+    Cairo::ErrorStatus myStatus = (*theSurface)->get_status();
     if(myStatus != CAIRO_STATUS_SUCCESS) {
         JS_ReportError(theJavascriptSurface, "cairo error: %s", cairo_status_to_string(myStatus));
         return JS_FALSE;
@@ -33,7 +33,7 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Cairo::Surface@") + as_string(obj);
+    std::string myStringRep = string("Cairo::RefPtr<Cairo::Surface>@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -139,7 +139,9 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
             cairo_image_surface_create_for_data(myDataPtr, CAIRO_FORMAT_ARGB32, 
                                                 myImageWidth, myImageHeight, myImageWidth*4);
 
-        newNative = new Cairo::Surface(myCairoSurface);
+        Cairo::Surface *myCairommSurface = new Cairo::Surface(myCairoSurface);
+
+        newNative = new Cairo::RefPtr<Cairo::Surface>(myCairommSurface);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

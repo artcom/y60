@@ -18,11 +18,11 @@ using namespace jslib;
 
 namespace jslib {
 
-template class JSWrapper<Cairo::Pattern, Ptr<Cairo::Pattern>, StaticAccessProtocol>;
+template class JSWrapper<Cairo::RefPtr<Cairo::Pattern>, Ptr< Cairo::RefPtr<Cairo::Pattern> >, StaticAccessProtocol>;
 
 static JSBool
-checkForErrors(JSContext *theJavascriptPattern, Cairo::Pattern *thePattern) {
-    Cairo::ErrorStatus myStatus = thePattern->get_status();
+checkForErrors(JSContext *theJavascriptPattern, Cairo::RefPtr<Cairo::Pattern> *thePattern) {
+    Cairo::ErrorStatus myStatus = (*thePattern)->get_status();
     if(myStatus != CAIRO_STATUS_SUCCESS) {
         JS_ReportError(theJavascriptPattern, "cairo error: %s", cairo_status_to_string(myStatus));
         return JS_FALSE;
@@ -34,7 +34,7 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Cairo::Pattern@") + as_string(obj);
+    std::string myStringRep = string("Cairo::RefPtr<Cairo::Pattern>@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -101,12 +101,14 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     if (argc == 1) {
 
-        Cairo::Surface *mySurface;
+        Cairo::RefPtr<Cairo::Surface> *mySurface;
         convertFrom(cx, argv[0], mySurface);
 
-        cairo_pattern_t *myCairoPattern = cairo_pattern_create_for_surface(mySurface->cobj());
+        cairo_pattern_t *myCairoPattern = cairo_pattern_create_for_surface((*mySurface)->cobj());
 
-        newNative = new Cairo::Pattern(myCairoPattern);
+        Cairo::Pattern *myCairommPattern = new Cairo::Pattern(myCairoPattern);
+
+        newNative = new Cairo::RefPtr<Cairo::Pattern>(myCairommPattern);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
