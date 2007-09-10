@@ -78,8 +78,6 @@ restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
-    /*
-      XXX: reference count fiddling
 static JSBool
 getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -89,11 +87,13 @@ getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     
     ensureParamCount(argc, 0);
 
-    *rval = as_jsval((*myContext)->get_target());
+    Cairo::RefPtr<Cairo::Surface> *myTarget
+        = new Cairo::RefPtr<Cairo::Surface>((*myContext)->get_target());
+
+    *rval = as_jsval(cx, myTarget);
     
     return checkForErrors(cx, myContext);
 }
-    */
 
 // MISSING:
 // void        cairo_push_group                (cairo_t *cr);
@@ -147,48 +147,46 @@ setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     return checkForErrors(cx, myContext);
 }
 
-// static JSBool
-// setSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     DOC_BEGIN("");
-//     DOC_END;
-//     Cairo::RefPtr<Cairo::Context> *myContext(0);
-//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-// 
-//     ensureParamCount(argc, 1);
-// 
-//     Cairo::Pattern *myPattern;
-//     convertFrom(cx, argv[0], myPattern);
-// 
-//     (*myContext)->set_source(myPattern);
-// 
-//     return checkForErrors(cx, myContext);
-// }
-// 
-// static JSBool
-// setSourceSurface(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-//     DOC_BEGIN("");
-//     DOC_END;
-//     Cairo::RefPtr<Cairo::Context> *myContext(0);
-//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-// 
-//     ensureParamCount(argc, 3);
-// 
-//     Cairo::Surface *mySurface;
-//     convertFrom(cx, argv[0], mySurface);
-// 
-//     double x;
-//     convertFrom(cx, argv[1], x);
-// 
-//     double y;
-//     convertFrom(cx, argv[2], y);
-// 
-//     (*myContext)->set_source(mySurface, x, y);
-// 
-//     return checkForErrors(cx, myContext);
-// }
+static JSBool
+setSourceSurface(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
 
-    /*
-      XXX: reference count fiddling
+    ensureParamCount(argc, 3);
+
+    Cairo::RefPtr<Cairo::Surface> *mySurface;
+    convertFrom(cx, argv[0], mySurface);
+
+    double x;
+    convertFrom(cx, argv[1], x);
+
+    double y;
+    convertFrom(cx, argv[2], y);
+
+    (*myContext)->set_source(*mySurface, x, y);
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
+setSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Cairo::RefPtr<Cairo::Pattern> *myPattern;
+    convertFrom(cx, argv[0], myPattern);
+
+    (*myContext)->set_source(*myPattern);
+
+    return checkForErrors(cx, myContext);
+}
+
 static JSBool
 getSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -198,11 +196,13 @@ getSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     
     ensureParamCount(argc, 0);
 
-    *rval = as_jsval((*myContext)->get_source());
+    Cairo::RefPtr<Cairo::Pattern> *myPattern
+        = new Cairo::RefPtr<Cairo::Pattern>((*myContext)->get_source());
+
+    *rval = as_jsval(cx, myPattern);
     
     return checkForErrors(cx, myContext);
 }
-    */
 
 static JSBool
 setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -905,10 +905,15 @@ JSCairoContext::Functions() {
 
         {"save",                 save,                    0},
         {"restore",              restore,                 0},
+
+        {"getTarget",            getTarget,               0},
+
         {"setSourceRGB",         setSourceRGB,            3},
         {"setSourceRGBA",        setSourceRGBA,           4},
-        //        {"setSource",            setSource,               1},
-        //        {"setSourceSurface",     setSourceSurface,        1},
+        {"setSourceSurface",     setSourceSurface,        1},
+        {"setSource",            setSource,               1},
+        {"getSource",            getSource,               0},
+
         {"setAntialias",         setAntialias,            1},
         {"getAntialias",         getAntialias,            0},
         {"setLineCap",           setLineCap,              1},
