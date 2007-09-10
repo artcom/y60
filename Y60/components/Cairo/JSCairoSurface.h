@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
-#define _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
+#ifndef _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
+#define _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 
 #include <dom/Nodes.h>
 
@@ -19,53 +19,25 @@
 
 namespace jslib {
 
-    class JSCairoContext : public JSWrapper<Cairo::Context, asl::Ptr<Cairo::Context>, StaticAccessProtocol> {
-        JSCairoContext();  // hide default constructor
+    class JSCairoSurface : public JSWrapper<Cairo::Surface, asl::Ptr<Cairo::Surface>, StaticAccessProtocol> {
+        JSCairoSurface();  // hide default constructor
     public:
 
-        virtual ~JSCairoContext() {
+        virtual ~JSCairoSurface() {
         }
 
-        typedef Cairo::Context NATIVE;
-        typedef asl::Ptr<Cairo::Context> OWNERPTR;
+        typedef Cairo::Surface NATIVE;
+        typedef asl::Ptr<Cairo::Surface> OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "CairoContext";
+            return "CairoSurface";
         }
 
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            PROP_ANTIALIAS_DEFAULT,
-            PROP_ANTIALIAS_NONE,
-            PROP_ANTIALIAS_GRAY,
-            PROP_ANTIALIAS_SUBPIXEL,
-
-            PROP_LINE_CAP_BUTT,
-            PROP_LINE_CAP_ROUND,
-            PROP_LINE_CAP_SQUARE,
-
-            PROP_LINE_JOIN_MITER,
-            PROP_LINE_JOIN_ROUND,
-            PROP_LINE_JOIN_BEVEL,
-
-            PROP_OPERATOR_CLEAR,
-            PROP_OPERATOR_SOURCE,
-            PROP_OPERATOR_OVER,
-            PROP_OPERATOR_IN,
-            PROP_OPERATOR_OUT,
-            PROP_OPERATOR_ATOP,
-            PROP_OPERATOR_DEST,
-            PROP_OPERATOR_DEST_OVER,
-            PROP_OPERATOR_DEST_IN,
-            PROP_OPERATOR_DEST_OUT,
-            PROP_OPERATOR_DEST_ATOP,
-            PROP_OPERATOR_XOR,
-            PROP_OPERATOR_ADD,
-            PROP_OPERATOR_SATURATE,
-
             PROP_END
         };
         static JSPropertySpec * Properties();
@@ -89,7 +61,7 @@ namespace jslib {
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSCairoContext(OWNERPTR theOwner, NATIVE * theNative)
+        JSCairoSurface(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
             { }
 
@@ -97,20 +69,24 @@ namespace jslib {
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
         static void addClassProperties(JSContext * cx, JSObject * theClassProto);
 
-        static JSCairoContext & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSCairoContext &>(JSCairoContext::getJSWrapper(cx,obj));
+        static JSCairoSurface & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSCairoSurface &>(JSCairoSurface::getJSWrapper(cx,obj));
         }
 
+        // XXX hack to allow triggering texture upload -ingo
+        void doTriggerUpload();
+
     private:
+        dom::NodePtr _myImageNode;
     };
 
     template <>
-    struct JSClassTraits<JSCairoContext::NATIVE>
-        : public JSClassTraitsWrapper<JSCairoContext::NATIVE, JSCairoContext> {};
+    struct JSClassTraits<JSCairoSurface::NATIVE>
+        : public JSClassTraitsWrapper<JSCairoSurface::NATIVE, JSCairoSurface> {};
 
-    jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext::NATIVE * theButton);
+    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theButton);
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTarget);
+    bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget);
 }
 
-#endif /* !_Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_ */
+#endif /* !_Y60_CAIRO_JSCAIROSURFACE_INCLUDED_ */

@@ -12,6 +12,8 @@
 #include <y60/IScriptablePlugin.h>
 
 #include "JSCairoContext.h"
+#include "JSCairoPattern.h"
+#include "JSCairoSurface.h"
 
 namespace y60 {
     using namespace jslib;
@@ -22,6 +24,8 @@ namespace y60 {
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
                 JSCairoContext::initClass(theContext, theGlobalObject);
+                JSCairoPattern::initClass(theContext, theGlobalObject);
+                JSCairoSurface::initClass(theContext, theGlobalObject);
             }
 
             const char * ClassName() {

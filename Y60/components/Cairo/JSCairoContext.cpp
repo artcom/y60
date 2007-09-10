@@ -19,6 +19,8 @@
 #include <y60/JSWrapper.impl>
 
 #include "JSCairoContext.h"
+#include "JSCairoPattern.h"
+#include "JSCairoSurface.h"
 
 using namespace std;
 using namespace asl;
@@ -76,8 +78,24 @@ restore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
+    /*
+      XXX: reference count fiddling
+static JSBool
+getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+    
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(myContext->get_target());
+    
+    return checkForErrors(cx, myContext);
+}
+    */
+
 // MISSING:
-// cairo_surface_t* cairo_get_target           (cairo_t *cr);
 // void        cairo_push_group                (cairo_t *cr);
 // void        cairo_push_group_with_content   (cairo_t *cr,
 //                                              cairo_content_t content);
@@ -129,14 +147,62 @@ setSourceRGBA(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     return checkForErrors(cx, myContext);
 }
 
-// MISSING:
-// void        cairo_set_source                (cairo_t *cr,
-//                                              cairo_pattern_t *source);
-// void        cairo_set_source_surface        (cairo_t *cr,
-//                                              cairo_surface_t *surface,
-//                                              double x,
-//                                              double y);
-// cairo_pattern_t* cairo_get_source           (cairo_t *cr);
+// static JSBool
+// setSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//     DOC_BEGIN("");
+//     DOC_END;
+//     Cairo::Context *myContext(0);
+//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+// 
+//     ensureParamCount(argc, 1);
+// 
+//     Cairo::Pattern *myPattern;
+//     convertFrom(cx, argv[0], myPattern);
+// 
+//     myContext->set_source(myPattern);
+// 
+//     return checkForErrors(cx, myContext);
+// }
+// 
+// static JSBool
+// setSourceSurface(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//     DOC_BEGIN("");
+//     DOC_END;
+//     Cairo::Context *myContext(0);
+//     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+// 
+//     ensureParamCount(argc, 3);
+// 
+//     Cairo::Surface *mySurface;
+//     convertFrom(cx, argv[0], mySurface);
+// 
+//     double x;
+//     convertFrom(cx, argv[1], x);
+// 
+//     double y;
+//     convertFrom(cx, argv[2], y);
+// 
+//     myContext->set_source(mySurface, x, y);
+// 
+//     return checkForErrors(cx, myContext);
+// }
+
+    /*
+      XXX: reference count fiddling
+static JSBool
+getSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::Context *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+    
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(myContext->get_source());
+    
+    return checkForErrors(cx, myContext);
+}
+    */
 
 static JSBool
 setAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -830,24 +896,6 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext); 
 }
 
-static JSBool
-triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    ensureParamCount(argc, 0);
-
-    JSCairoContext *myContext = reinterpret_cast<JSCairoContext*>(JS_GetPrivate(cx, obj));
-
-    myContext->doTriggerUpload();
-
-    return JS_TRUE;
-}
-
-void
-JSCairoContext::doTriggerUpload() {
-    _myImageNode->getFacade<y60::Image>()->triggerUpload();
-}
-
 JSFunctionSpec *
 JSCairoContext::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -859,6 +907,8 @@ JSCairoContext::Functions() {
         {"restore",              restore,                 0},
         {"setSourceRGB",         setSourceRGB,            3},
         {"setSourceRGBA",        setSourceRGBA,           4},
+        //        {"setSource",            setSource,               1},
+        //        {"setSourceSurface",     setSourceSurface,        1},
         {"setAntialias",         setAntialias,            1},
         {"getAntialias",         getAntialias,            0},
         {"setLineCap",           setLineCap,              1},
@@ -905,7 +955,6 @@ JSCairoContext::Functions() {
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
 
-        {"triggerUpload",        triggerUpload,           0},
         {0}
     };
     return myFunctions;
@@ -957,28 +1006,19 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     NATIVE * newNative = 0;
 
-    JSCairoContext * myNewObject = 0;
+    JSCairoContext *myNewObject = 0;
 
-    dom::NodePtr myImageNode;
+    Cairo::Surface *mySurface;
 
     if (argc == 1) {
 
-        if(!convertFrom(cx, argv[0], myImageNode)) {
-            JS_ReportError(cx, "Need an image node to construct a cairo context.");
+        if(!convertFrom(cx, argv[0], mySurface)) {
+            JS_ReportError(cx, "Need a cairo surface to construct a cairo context.");
             return JS_FALSE;
         }
 
-        ImagePtr myImage = myImageNode->getFacade<Image>();
-        int myImageWidth = myImage->get<ImageWidthTag>();
-        int myImageHeight = myImage->get<ImageHeightTag>();
-
-        unsigned char *myDataPtr = myImage->getRasterPtr()->pixels().begin();
-
-        cairo_surface_t *myCairoSurface =
-            cairo_image_surface_create_for_data(myDataPtr, CAIRO_FORMAT_ARGB32, 
-                                                myImageWidth, myImageHeight, myImageWidth*4);
         cairo_t *myCairoContext =
-            cairo_create(myCairoSurface);
+            cairo_create(mySurface->cobj());
 
         newNative = new Cairo::Context(myCairoContext);
 
@@ -988,7 +1028,6 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     myNewObject = new JSCairoContext(OWNERPTR(newNative), newNative);
-    myNewObject->_myImageNode = myImageNode;
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
