@@ -16,6 +16,8 @@ use("ASSManager.js");
 use("BuildUtils.js");
 use("SoundController.js");
 
+const LATENCY_TEST=false;
+
 const DISPLAY_SCALE = 20;
 const X_MIRROR = false;
 const Y_MIRROR = true;
@@ -41,6 +43,9 @@ var ourButtons = new Array();
 var ourFontCache = [];
 
 var ourTypedText = "";
+
+var ourLatencyTestPort = null;
+var ourLastFrameNo = 0;
 
 window = new RenderWindow();
 
@@ -122,6 +127,11 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         buildBackspace();
         buildSpacebar();
         */
+
+        if (LATENCY_TEST) {
+            ourLatencyTestPort = new SerialDevice(0);
+            ourLatencyTestPort.open();
+        }
     }
 
     Base.onFrame = self.onFrame;
@@ -170,10 +180,21 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
     self.onASSEvent = function( theNode ) {
 
+        if (LATENCY_TEST) {
+            if (ourLastFrameNo != theNode.frameno) {
+                if (theNode.frameno % 16 == 0) {
+                    ourLatencyTestPort.status = ourLatencyTestPort.status ? 0 : 0x10;
+                } else {
+            //        ourLatencyTestPort.status = 0;
+                }
+                ourLastFrameNo = theNode.frameno;
+            }
+        }
+
         _myASSManager.onASSEvent( theNode );
 
 
-        print( theNode );
+        //print( theNode );
 
         if (theNode.type == "configure" ) {
             _myASSManager.valueColor = new Vector4f(0,0,1,1);

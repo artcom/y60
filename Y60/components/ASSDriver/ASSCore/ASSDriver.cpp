@@ -268,7 +268,7 @@ ASSDriver::updateDerivedRasters()
 }
 
 void
-ASSDriver::processSensorValues() {
+ASSDriver::processSensorValues(const ASSEvent & theEvent) {
 
     asl::Time myCurrentTime;
     _myRunTime += myCurrentTime - _myLastFrameTime;
@@ -280,8 +280,8 @@ ASSDriver::processSensorValues() {
 
     std::vector<MomentResults> myCurrentPositions;
     computeCursorPositions( myCurrentPositions, myROIs);
-    correlatePositions( myCurrentPositions, myROIs );
-    updateCursors( 1.0 / _myTransportLayer->getFramerate() );
+    correlatePositions( myCurrentPositions, myROIs, theEvent );
+    updateCursors( 1.0 / _myTransportLayer->getFramerate(), theEvent );
 }
 
 void
@@ -319,7 +319,7 @@ N sqr(const N & n) {
 }
 
 void 
-ASSDriver::updateCursors(double theDeltaT) {
+ASSDriver::updateCursors(double theDeltaT, const ASSEvent & theEvent) {
  y60::RasterOfGRAY & myDenoisedRaster = *
         dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
 
@@ -329,7 +329,7 @@ ASSDriver::updateCursors(double theDeltaT) {
     CursorMap::iterator myCursorIt = _myCursors.begin();
     for(; myCursorIt != _myCursors.end(); ++myCursorIt) {
         computeIntensity(myCursorIt, myRawRaster);
-        findTouch(myCursorIt, theDeltaT);
+        findTouch(myCursorIt, theDeltaT, theEvent);
 
     }
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
@@ -337,7 +337,9 @@ ASSDriver::updateCursors(double theDeltaT) {
 }
 
 void
-ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
+ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
+                     const ASSEvent & theEvent)
+{
     
     float myFirstDerivative = float((theCursorIt->second.intensity -
             theCursorIt->second.previousIntensity) / theDeltaT);
@@ -354,7 +356,7 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT) {
         theCursorIt->second.lastTouchTime = _myRunTime;
         createEvent( theCursorIt->first, "touch", theCursorIt->second.position,
                 applyTransform(theCursorIt->second.position, getTransformationMatrix() ),
-                theCursorIt->second.roi, theCursorIt->second.intensity );
+                theCursorIt->second.roi, theCursorIt->second.intensity, theEvent );
         _myTouchHistory.push_back( TouchEvent(_myRunTime, theCursorIt->second.position ));
     }
    
@@ -444,7 +446,7 @@ ASSDriver::getTransformationMatrix() {
 #ifdef PAVELS_CORRELATOR 
 void 
 ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
-        const BlobListPtr theROIs)
+        const BlobListPtr theROIs, const ASSEvent & theEvent)
 {
     Matrix4f myTransform = getTransformationMatrix();
 
@@ -505,7 +507,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                 // post a move event
                 createEvent( myCursorId, "move", myCursor.position,
                         applyTransform( myCursor.position, myTransform),
-                        myCursor.roi, 0 /*myCursor.intensity*/); // TODO
+                        myCursor.roi, 0 /*myCursor.intensity*/, theEvent); // TODO
             }
             // place an "else" block here for code if we want to allow to correlate multiple cursors to the same position,
             // but he have to take care that they will be separated at some later point again
@@ -524,7 +526,8 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             _myCursors[myNewID].correlatedPosition = i;
             createEvent( myNewID, "add", theCurrentPositions[i].center,
                     applyTransform( theCurrentPositions[i].center, myTransform),
-                    asBox2f( myROIs[i]->bbox() ), 0 /*myCursor.intensity*/); // TODO
+                    asBox2f( myROIs[i]->bbox() ), 0 /*myCursor.intensity*/,
+                    theEvent); // TODO
         }
     }
 
@@ -537,7 +540,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             // cursor removed
             createEvent( myIt->first, "remove", myIt->second.position,
                     applyTransform( myIt->second.position, myTransform ),
-                    myIt->second.roi, 0 /*myCursor.intensity*/); // TODO
+                    myIt->second.roi, 0 /*myCursor.intensity*/, theEvent); // TODO
             AC_TRACE << "removing cursor "<<myIt->first<<" at " << myIt->second.correlatedPosition;
             _myCursors.erase(myIt);
         }
@@ -874,7 +877,7 @@ ASSDriver::toggleLatencyTestPin() {
     static bool state = true;
     //static double lastTime= 0;
     //double now = asl::Time();
-    AC_PRINT << "DTR: " << state << " dt: " << now - lastTime;
+    //AC_PRINT << "DTR: " << state;
     _myLatencyTestPort->setStatusLine( state ? SerialDevice::DTR : 0 );
     state = ! state;
     //lastTime = now;
@@ -908,7 +911,7 @@ ASSDriver::processInput() {
                         copyFrame( myEvent.data );
                         // TODO use smart pointers 
                         delete [] myEvent.data;
-                        processSensorValues();
+                        processSensorValues(myEvent);
 #ifdef ASS_LATENCY_TEST
                         if (myEvent.frameno % 16 == 0) {
                             toggleLatencyTestPin();

@@ -19,6 +19,11 @@
 
 #include <queue>
 
+//#define TL_LATENCY_TEST
+#ifdef TL_LATENCY_TEST
+#   include <asl/SerialDevice.h>
+#endif
+
 namespace y60 {
 
 enum DriverStateEnum {
@@ -150,6 +155,10 @@ class TransportLayer :  public asl::PosixThread {
         unsigned _myChecksumErrorCounter;
     private:
         //TransportLayer();
+
+#ifdef TL_LATENCY_TEST
+        asl::SerialDevice * _myLatencyTestPort;
+#endif
 
 };
 

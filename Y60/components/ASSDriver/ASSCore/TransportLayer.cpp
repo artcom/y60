@@ -14,6 +14,10 @@
 
 #include <asl/Assure.h>
 
+#ifdef TL_LATENCY_TEST
+#   include <asl/SerialDeviceFactory.h>
+#endif
+
 using namespace std;
 using namespace asl;
 
@@ -76,10 +80,19 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
 {
     getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 100);
 
+#ifdef TL_LATENCY_TEST
+    _myLatencyTestPort = getSerialDevice(0);
+    _myLatencyTestPort->open(9600, 8, SerialDevice::NO_PARITY, 1, false);
+#endif
     fork();
 }
 
 TransportLayer::~TransportLayer() {
+
+#ifdef TL_LATENCY_TEST
+    _myLatencyTestPort->close();
+    delete _myLatencyTestPort;
+#endif
 
     AC_PRINT << "=== ASS Transport Layer Stats =========" << endl
              << "Frames received       : " << _myReceivedFrames << endl
@@ -215,6 +228,15 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                         PLUS_FILE_LINE );
             }
 
+#ifdef TL_LATENCY_TEST
+            if (_myFrameNo % 16 == 0) {
+                static bool state = false;
+                _myLatencyTestPort->setStatusLine( state ? SerialDevice::DTR : 0 );
+                state = ! state;
+            } else {
+                //_myLatencyTestPort->setStatusLine( 0 );
+            }
+#endif
             if ( _myGridSize != myGridSize ) {
                 _myGridSize = myGridSize;
                 ASSURE(_myTmpBuffer.front() == MAGIC_TOKEN);

@@ -41,7 +41,8 @@ class ASSOscClient : public ASSDriver {
     protected:
         void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI, float theIntensity);
+                const asl::Box2f & theROI, float theIntensity,
+                const ASSEvent & theEvent);
     private:
 
         void connectToServer();

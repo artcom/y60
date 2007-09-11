@@ -76,7 +76,7 @@ ASSOscClient::connectToServer() {
 void
 ASSOscClient::createEvent( int theID, const std::string & theType,
         const Vector2f & theRawPosition, const Vector3f & thePosition3D,
-        const asl::Box2f & theROI, float theIntensity)
+        const asl::Box2f & theROI, float theIntensity, const ASSEvent & theEvent)
 {
     // TODO send ROI?
     //AC_PRINT << "createEvent: " << theType;

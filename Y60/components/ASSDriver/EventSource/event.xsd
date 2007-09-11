@@ -55,6 +55,7 @@
             <xs:attribute name="grid_size" type="Vector2i"/>
             <xs:attribute name="roi" type="Box2f"/>
             <xs:attribute name="intensity" type="xs:double"/>
+            <xs:attribute name="frameno" type="xs:int"/>
         </xs:complexType>
     </xs:element>
 

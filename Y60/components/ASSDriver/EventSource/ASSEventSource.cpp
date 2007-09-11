@@ -42,7 +42,7 @@ ASSEventSource::poll() {
 void
 ASSEventSource::createEvent( int theID, const std::string & theType,
         const Vector2f & theRawPosition, const Vector3f & thePosition3D,
-        const asl::Box2f & theROI, float theIntensity)
+        const asl::Box2f & theROI, float theIntensity, const ASSEvent & theEvent)
 {
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent", _myEventSchema,
             _myValueFactory));
@@ -54,6 +54,7 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
     myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
     myNode->appendAttribute<Box2f>("roi", theROI);
     myNode->appendAttribute<float>("intensity", theIntensity);
+    myNode->appendAttribute<float>("frameno", theEvent.frameno);
     _myEvents.push_back( myEvent );
 }
 

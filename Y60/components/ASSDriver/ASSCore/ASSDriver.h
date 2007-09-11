@@ -115,7 +115,7 @@ class ASSDriver :
         void connect();
 
         void allocateGridBuffers(const asl::Vector2i & theGridSize);
-        void processSensorValues();
+        void processSensorValues(const ASSEvent & theEvent);
 
         virtual void createTransportLayerEvent( const std::string & theType) = 0;
     protected:
@@ -123,7 +123,7 @@ class ASSDriver :
         void processInput();
         virtual void createEvent( int theID, const std::string & theType,
                 const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI, float intensity) = 0;
+                const asl::Box2f & theROI, float intensity, const ASSEvent & theEvent) = 0;
 
         size_t getBytesPerFrame();
 
@@ -133,14 +133,15 @@ class ASSDriver :
     private:
         RasterHandle allocateRaster(const std::string & theName);
         void updateDerivedRasters();
-        void updateCursors( double theDeltaT);
-        void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT);
+        void updateCursors( double theDeltaT, const ASSEvent & theEvent);
+        void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
+                       const ASSEvent & theEvent);
         void computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster);
         float matchProximityPattern(const CursorMap::iterator & theCursorIt);
         void computeCursorPositions( std::vector<asl::MomentResults> & theCurrentPositions,
                                      const BlobListPtr & theROIs);
         void correlatePositions( const std::vector<asl::MomentResults> & theCurrentPositions, 
-                                 const BlobListPtr theROIs);
+                                 const BlobListPtr theROIs, const ASSEvent & theEvent);
         void triggerUpload( const char * theRasterId );
         void queueCommand( const char * theCommand );
 
