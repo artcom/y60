@@ -40,7 +40,7 @@ performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 handleRequests(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Process handle request routines, must be called in a loop, til all 'activeCount' requests are handled.");
+    DOC_BEGIN("Process handle request routines, must be called in a loop, until all 'activeCount' requests are handled.");
     DOC_END;
     return Method<JSRequestManager::NATIVE>::call(&JSRequestManager::NATIVE::handleRequests,cx,obj,argc,argv,rval);
 }
@@ -52,7 +52,7 @@ JSRequestManager::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"performRequest",       performRequest,          1},
-        {"handleRequests",       handleRequests,          0},
+        {"handleRequests",       handleRequests,          1},
         {0}
     };
     return myFunctions;
