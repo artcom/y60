@@ -75,12 +75,16 @@ namespace tuttle {
         
         if(report->filename) {
             cout << report->filename << ":";
+
+            if(report->lineno) {
+                cout << report->lineno << ":";
+            }
+
+            cout << " ";
+        } else {
+            cout << "<unknown location>: ";
         }
 
-        if(report->lineno) {
-            cout << report->lineno << ": ";
-        }
-        
         if(JSREPORT_IS_WARNING(report->flags)) {
             if(JSREPORT_IS_STRICT(report->flags)) {
                 cout << "strict ";
@@ -113,13 +117,8 @@ namespace tuttle {
         }
     }
 
-    void Debugger::applicationHandleRequests() {
+    void Debugger::handleRequests() {
         
     }
 
-
-    void Debugger::debuggerRequestRoundtrip(Message &theMessage) {
-        _myToApplication.push(theMessage);
-        
-    }
 }

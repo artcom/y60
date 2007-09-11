@@ -6,11 +6,11 @@
 
 #include <js/jscntxt.h>
 
-#ifdef DEBUG
-#include "TuttleDebugger.h"
-#endif
-
 namespace tuttle {
+
+#ifdef DEBUG
+    class Debugger;
+#endif
 
     class Application {
 

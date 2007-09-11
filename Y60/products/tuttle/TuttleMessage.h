@@ -1,54 +1,59 @@
 
-#ifndef _TUTTLE_MESSAGE_H_
-#define _TUTTLE_MESSAGE_H_
+#ifndef _TUTTLE_COMMAND_H_
+#define _TUTTLE_COMMAND_H_
+
+#include <lub/argv.h>
+#include <lub/types.h>
+
+#include <clish/shell.h>
+
+#include "TuttleShell.h"
 
 namespace tuttle {
 
-    /*
-    enum MessageType {
-        EVALUATION_REQUEST,
-        EVALUATION_REPLY,
+    typedef bool_t
+        Builtin(Shell               *theShell,
+                const clish_shell_t *theClish,
+                const lub_argv_t    *theArguments,
+                JSTrapStatus        *theTrapStatus);
 
-        EXAMINATION_REQUEST,
-        EXAMINATION_REPLY,
-
-        BREAKPOINT_REQUEST,
-        BREAKPOINT_REPLY,
-
-        WATCHPOINT_REQUEST,
-        WATCHPOINT_REPLY.
-
-        TRACE_STDOUT,
-        TRACE_STDERR,
-        TRACE_WATCH,
-
-        TRAP_THROW,
-        TRAP_DEBUGGER,
-        TRAP_BREAKPOINT,
-
-        CONTINUE,        
-    }
-    */
-
-    class Message {
-    };
-
-    class RoundtripMessage : Message {
-    };
-
-    class EvaluationRequest : RoundtripMessage {
+    class Command {        
     public:
 
-        EvaluationRequest(char *theExpression);
-
-        void setResult(jsval theResult);
+        Command(Builtin  theBuiltin,
+                Shell   *theShell,
+                const clish_shell_t *theClish,
+                const lub_argv_t *theArguments);
+        
+        bool execute(JSTrapStatus *theTrapStatus);
 
     private:
-        char  *_myExpression;
-        jsval  _myResult;
+        Builtin             *_myBuiltin;
 
+        Shell               *_myShell;
+        const clish_shell_t *_myClish;
+        const lub_argv_t    *_myArguments;
+
+        bool_t               _mySuccess;
     };
+
+
+    Command::Command(Builtin  theBuiltin,
+                     Shell   *theShell,
+                     const clish_shell_t *theClish,
+                     const lub_argv_t *theArguments)
+        : _myBuiltin(theBuiltin), _myShell(theShell), _myClish(theClish), _myArguments(theArguments) {
+    }
+    
+    bool
+    Command::execute(JSTrapStatus *theTrapStatus) {
+        *theTrapStatus = JSTRAP_CONTINUE;
+        _mySuccess = _myBuiltin(_myShell, _myClish, _myArguments, theTrapStatus);
+    }
 
 }
 
-#endif /* !_TUTTLE_MESSAGE_H_ */
+
+
+
+#endif /* !_TUTTLE_COMMAND_H_ */

@@ -1,5 +1,6 @@
 
 #include <cassert>
+#include <iostream>
 
 #include <clish/shell.h>
 
@@ -10,13 +11,19 @@ namespace tuttle {
     using namespace std;
 
     // clish command wrappers
-#define CLISH_BUILTIN(name,symbol)                                        \
-    static bool_t tuttle_clish_##symbol(const clish_shell_t *theClish,    \
-                                        const lub_argv_t *theArguments) { \
-        void   *myCookie = clish_shell__get_client_cookie(theClish);      \
-        Shell  *myShell = reinterpret_cast<Shell*>(myCookie);             \
-        return myShell->command##symbol(theClish, theArguments);          \
+#define CLISH_BUILTIN(name,symbol)                                                   \
+    static bool_t tuttle_clish_builtin_##symbol(const clish_shell_t *theClish,       \
+                                                const lub_argv_t    *theArguments) { \
+        void   *myCookie = clish_shell__get_client_cookie(theClish);                 \
+        Shell  *myShell = reinterpret_cast<Shell*>(myCookie);                        \
+        return myShell->command##symbol(theClish, theArguments);                     \
+    }                                                                                \
+    static bool_t tuttle_clish_bouncer_##symbol(const clish_shell_t *theClish,       \
+                                                const lub_argv_t *theArguments) {    \
+        cout << "BOUNCER: " << #name << endl;                                        \
+        return BOOL_TRUE; \
     }
+
 
 #include "TuttleShell.def"
 
@@ -25,7 +32,7 @@ namespace tuttle {
 
     // clish builtin definitions
 #define CLISH_BUILTIN(name,symbol) \
-  { #name, tuttle_clish_##symbol },
+  { #name, tuttle_clish_bouncer_##symbol },
 
     static const clish_shell_builtin_t tuttle_clish_builtins[] = {
 #include "TuttleShell.def"

@@ -6,21 +6,10 @@
 
 #include <js/jsapi.h>
 
-#include <asl/ThreadFifo.h>
-
+#include "TuttleApplication.h"
 #include "TuttleMessage.h"
 
 namespace tuttle {
-
-    using namespace asl;
-
-    class Application;
-
-    enum State {
-        STOPPED,
-        TRAPPED,
-        RUNNING
-    };
 
     class Debugger {
     public:
@@ -30,13 +19,7 @@ namespace tuttle {
         JSContext *getJavascriptContext();
         JSObject  *getJavascriptGlobal();
 
-
-        void applicationHandleRequests();
-
-
-        void debuggerRequestRoundtrip(Message &theMessage);
-        
-
+        void handleRequests();
 
     private:
         Application        &_myApplication;
@@ -44,11 +27,6 @@ namespace tuttle {
         JSRuntime          *_myRuntime;
         JSContext          *_myContext;
         JSObject           *_myGlobal;
-
-        State               _myState;
-
-        ThreadFifo<Message&> _myToApplication;
-        ThreadFifo<Message&> _myToShell;
     };
 
 }

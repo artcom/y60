@@ -1,5 +1,6 @@
 
 #include "TuttleApplication.h"
+#include "TuttleDebugger.h"
 
 #define JS_HEAP_SIZE   (8*1024*1024)
 #define JS_STACK_CHUNK (8*1024)
