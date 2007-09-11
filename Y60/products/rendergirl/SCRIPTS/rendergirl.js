@@ -746,23 +746,25 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     self.onKeyUp = function(theKey) {
         onKey(theKey, false);
     }
+
     function onKey(theKey, theState) {
+        print("onKey: key=" + theKey + " state=" + theState);
         switch (theKey.keyval) {
             case GdkEvent.GDK_F11:
                 if (theState) {
                     ourGlade.get_widget("fullscreen_menuitem").active = false;
                 }
                 break;
-            case 50:
+            case GdkEvent.GDK_Down:
                 self.getMover().onKey("down", theState);
                 break;
-            case 52:
+            case GdkEvent.GDK_Left:
                 self.getMover().onKey("left", theState);
                 break;
-            case 54:
+            case GdkEvent.GDK_Right:
                 self.getMover().onKey("right", theState);
                 break;
-            case 56:
+            case GdkEvent.GDK_Up:
                 self.getMover().onKey("up", theState);
                 break;
         }
@@ -863,8 +865,8 @@ function main(argv) {
         ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
         ourHandler.isLoaded = false;
 
-				ourPreferenceDialog = new PreferenceDialog(ourGlade);
-				ourSceneViewerDialog= new SceneViewerDialog(ourGlade, ourHandler);
+        ourPreferenceDialog = new PreferenceDialog(ourGlade);
+        ourSceneViewerDialog= new SceneViewerDialog(ourGlade, ourHandler);
         ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
 				
         window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
