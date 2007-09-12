@@ -57,7 +57,7 @@ namespace jslib {
     template struct ResultConverter<y60::EventRecorder::Mode>;
 }
 
-#define DB(x) //x
+#define DB(x) x
 
 DEFINE_EXCEPTION(SDLWindowException, asl::Exception);
 

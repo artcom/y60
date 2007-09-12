@@ -1,23 +1,44 @@
 Directory contents:
 
+acgtk/:
+Custom widgets and support code for the Gtk frontend.
+Includes the Gtk implementation of AbstractRenderWindow.
+
 base/:
 
+components/:
+Pluggable Y60 engine components.
+This includes video codecs, bindings for several libraries
+(cairo, nagios monitoring) and input drivers for the WiiMote and ASS.
+
+gl/:
+The OpenGL renderer and associated code.
+
 inet/:
-HTTP Request and RequestManager
+HTTP Request and RequestManager.
 
 js/:
 Y60 project-independent JavaScript Library
 
 jsbase/:
-Javascript bindings for asl
-binding utilities (JSWrapper etc.)
+Javascript bindings for asl.
+Binding utilities (JSWrapper etc).
 
 jslib/:
-Javascript bindings for Y60-objects
+Javascript bindings for various Y60 libraries.
+(Global stuff, modelling functions, logger, scene graph...)
 
 jsgtk/:
+Javascript bindings for GTK/GTKmm.
+
+products/:
+Executable build products.
+(y60, acgtkshell, maya exporter, testing tools...)
 
 sdlengine/:
+SDL-specific code.
+Includes the SDL implementation of AbstractRenderWindow.
 
 scene/:
+Core scene-graph classes.
 
