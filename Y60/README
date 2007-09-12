@@ -1,0 +1,23 @@
+Directory contents:
+
+base/:
+
+inet/:
+HTTP Request and RequestManager
+
+js/:
+Y60 project-independent JavaScript Library
+
+jsbase/:
+Javascript bindings for asl
+binding utilities (JSWrapper etc.)
+
+jslib/:
+Javascript bindings for Y60-objects
+
+jsgtk/:
+
+sdlengine/:
+
+scene/:
+
