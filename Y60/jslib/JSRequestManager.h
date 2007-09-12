@@ -73,6 +73,7 @@ struct JSClassTraits<inet::RequestManager> : public JSClassTraitsWrapper<inet::R
 
 bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::OWNERPTR & theRequest);
 bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE & theRequest);
+bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theRequest);
 
 jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner);
 jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner, JSRequestManager::NATIVE * theManager);

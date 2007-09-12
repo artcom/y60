@@ -42,7 +42,23 @@ static JSBool
 handleRequests(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Process handle request routines, must be called in a loop, until all 'activeCount' requests are handled.");
     DOC_END;
-    return Method<JSRequestManager::NATIVE>::call(&JSRequestManager::NATIVE::handleRequests,cx,obj,argc,argv,rval);
+    ensureParamCount(argc, 0,1);
+    JSRequestManager::NATIVE * myNative = 0;
+    if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+        JS_ReportError(cx, "JSRequestManager::handleRequests: self is not a RequestManager");
+        return JS_FALSE;
+    }
+    if (argc == 0 ) {
+        myNative->handleRequests();
+    } else {
+        bool myBlockingFlag = false;
+        if ( ! convertFrom(cx, argv[1], myBlockingFlag)) {
+            JS_ReportError(cx, "argument 1 must be a bool");
+            return JS_FALSE;
+        }
+        myNative->handleRequests(myBlockingFlag);        
+    }
+    return JS_TRUE;    
 }
 
 JSFunctionSpec *
@@ -152,6 +168,18 @@ bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE & theRe
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRequestManager::NATIVE >::Class()) {
                 theRequest = JSClassTraits<JSRequestManager::NATIVE>::getNativeRef(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theRequest) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRequestManager::NATIVE >::Class()) {
+                theRequest = &(*JSClassTraits<JSRequestManager::NATIVE>::getNativeOwner(cx,myArgument));
                 return true;
             }
         }
