@@ -43,6 +43,9 @@ namespace jslib {
             PROP_ANTIALIAS_GRAY,
             PROP_ANTIALIAS_SUBPIXEL,
 
+            PROP_FILL_RULE_WINDING,
+            PROP_FILL_RULE_EVEN_ODD,
+            
             PROP_LINE_CAP_BUTT,
             PROP_LINE_CAP_ROUND,
             PROP_LINE_CAP_SQUARE,

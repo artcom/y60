@@ -250,6 +250,37 @@ getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 // cairo_fill_rule_t cairo_get_fill_rule       (cairo_t *cr);
 
 static JSBool
+setFillRule(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    int myFillRule;
+    convertFrom(cx, argv[0], myFillRule);
+
+    (*myContext)->set_fill_rule((Cairo::FillRule)myFillRule);
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
+getFillRule(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(cx, (int)(*myContext)->get_fill_rule());
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
 setLineCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -916,6 +947,8 @@ JSCairoContext::Functions() {
 
         {"setAntialias",         setAntialias,            1},
         {"getAntialias",         getAntialias,            0},
+        {"setFillRule",          setFillRule,             1},
+        {"getFillRule",          getFillRule,             0},
         {"setLineCap",           setLineCap,              1},
         {"getLineCap",           getLineCap,              0},
         {"setLineJoin",          setLineJoin,             1},
@@ -1054,6 +1087,9 @@ JSCairoContext::ConstIntProperties() {
         {"ANTIALIAS_NONE",     PROP_ANTIALIAS_NONE,     Cairo::ANTIALIAS_NONE},
         {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     Cairo::ANTIALIAS_GRAY},
         {"ANTIALIAS_SUBPIXEL", PROP_ANTIALIAS_SUBPIXEL, Cairo::ANTIALIAS_SUBPIXEL},
+
+        {"FILL_RULE_WINDING",  PROP_FILL_RULE_WINDING,  Cairo::FILL_RULE_WINDING  },
+        {"FILL_RULE_EVEN_ODD", PROP_FILL_RULE_EVEN_ODD, Cairo::FILL_RULE_EVEN_ODD },
         
         {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      Cairo::LINE_CAP_BUTT  },
         {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     Cairo::LINE_CAP_ROUND },
