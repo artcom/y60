@@ -244,10 +244,6 @@ getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 // void        cairo_get_dash                  (cairo_t *cr,
 //                                              double *dashes,
 //                                              double *offset);
-// enum        cairo_fill_rule_t;
-// void        cairo_set_fill_rule             (cairo_t *cr,
-//                                              cairo_fill_rule_t fill_rule);
-// cairo_fill_rule_t cairo_get_fill_rule       (cairo_t *cr);
 
 static JSBool
 setFillRule(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -598,13 +594,45 @@ inFill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
-// MISSING:
-// void        cairo_mask                      (cairo_t *cr,
-//                                              cairo_pattern_t *pattern);
-// void        cairo_mask_surface              (cairo_t *cr,
-//                                              cairo_surface_t *surface,
-//                                              double surface_x,
-//                                              double surface_y);
+static JSBool
+mask(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Cairo::RefPtr<Cairo::Pattern> *myPattern;
+    convertFrom(cx, argv[0], myPattern);
+
+    (*myContext)->mask(*myPattern);
+    
+    return checkForErrors(cx, myContext);     
+}
+
+static JSBool
+maskSurface(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 3);
+
+    Cairo::RefPtr<Cairo::Surface> *mySurface;
+    convertFrom(cx, argv[0], mySurface);
+
+    double mySurfaceX;
+    convertFrom(cx, argv[1], mySurfaceX);
+
+    double mySurfaceY;
+    convertFrom(cx, argv[2], mySurfaceY);
+
+    (*myContext)->mask(*mySurface, mySurfaceX, mySurfaceY);
+    
+    return checkForErrors(cx, myContext);     
+}
 
 static JSBool
 paint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -971,6 +999,9 @@ JSCairoContext::Functions() {
         {"fillPreserve",         fillPreserve,            0},
         {"getFillExtents",       getFillExtents,          0},
         {"inFill",               inFill,                  2},
+
+        {"mask",                 mask,                    1},
+        {"maskSurface",          maskSurface,             3},
 
         {"paint",                paint,                   0},
         {"paintWithAlpha",       paintWithAlpha,          1},
