@@ -27,6 +27,15 @@ PathAlign.prototype.Constructor = function(self, thePath) {
     self.getPath = function() {
         return _myPath;
     }
+    
+    /// Reset alignment to start from the path beginning.
+    self.resetToStartPos = function() {
+        _myCurrentSegment = 0;
+        _myCurrentPosition = _myPath.getElement(_myCurrentSegment).origin;            
+    }
+    self.getNormalAtCurrentPosition = function() {
+        return _myPath.normal(_myCurrentPosition, new Vector3f(0,0,-1)).normal;
+    }
 
     /// Set start point for path alignment.
     self.setCurrentPosition = function(thePoint) {

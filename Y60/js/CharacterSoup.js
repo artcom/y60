@@ -11,6 +11,7 @@
 //use("Unicode.js");
 use("ShapeBuilder.js");
 use("BuildUtils.js");
+//use("Unicode.js");
 
 plug("GlurFilter");
 
@@ -67,7 +68,8 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
     }
 
     self.createText = function(theText, theSize) {
-        self.createUnicodeText(asUnicodeString(theText), theSize);
+        self.createUnicodeText(theText, theSize);
+        //self.createUnicodeText(asUnicodeString(theText), theSize);
     }
     self.createUnicodeText = function(theText, theSize) {
         if (!(theSize in _myAlphabetMap)) {
@@ -89,7 +91,8 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
             var myFound = window.hasGlyph(myFontName, myChar);
             if (!myFound || myChar == "\n" || myChar == "\r" || myChar == "\t") {
                 // map white space characters to space
-                myChar = asUnicodeString(" ");
+                myChar = " ";
+                //myChar = asUnicodeString(" ");
             }
             var myCharacter = null;
             if (!(myChar in _myAlphabetMap[theSize])) {

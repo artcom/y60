@@ -58,7 +58,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
      * - if given, start at character 'theFirstCharacter'; default is 0.
      * - if given, end at character 'theLastCharacter'; default is last character in text.
      */
-    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag, theFlipFlag) {
+    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag, theFlipFlag, theAutoNewlineFlag) {
         var myXMirror = 1;
         if (theFlipFlag != undefined) {
             myXMirror = theFlipFlag ? -1:1;
@@ -74,6 +74,9 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         }
         if (doTheWrapAroundFlag == undefined) {
             doTheWrapAroundFlag = true;
+        }
+        if (theAutoNewlineFlag == undefined) {
+            theAutoNewlineFlag = false;
         }
         var myAlignedCharacter = _myText.length;
         var myBuildGeometry = false;
@@ -94,7 +97,8 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
 
         var myWidth = 0.0;
-
+        // in case of newlines, we use this offset to move character according to path
+        var myLineOffset = new Vector3f(0,0,0);
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
@@ -106,7 +110,14 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                         myNewLineOffset = 1;
                     }
                 }
-                return i + myNewLineOffset;
+                if (!theAutoNewlineFlag) {
+                    return i + myNewLineOffset;
+                } else {
+                    // do some newline magic
+                    thePathAlign.resetToStartPos();
+                    myLineOffset = product(thePathAlign.getNormalAtCurrentPosition(), myFontMetrics.height);
+                    continue;
+                }
             }
             var myCharacter = _myCharacters[i];
             if (myCharacter == null) {
@@ -176,10 +187,10 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             var myEnd = sum(myStart, myForwardVector);
             var j = i * 4;
             var myPositions = [];
-            myPositions.push(sum(myStart, myBottomOffset));
-            myPositions.push(sum(myEnd, myBottomOffset));
-            myPositions.push(sum(myEnd, myTopOffset));
-            myPositions.push(sum(myStart, myTopOffset));
+            myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));
+            myPositions.push(sum(sum(myEnd, myBottomOffset), myLineOffset));
+            myPositions.push(sum(sum(myEnd, myTopOffset), myLineOffset));
+            myPositions.push(sum(sum(myStart, myTopOffset), myLineOffset));
 
             if (myBuildGeometry) {
                 var myCharacter = _myCharacters[i];
