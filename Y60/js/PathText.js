@@ -12,11 +12,11 @@ use("SceneViewer.js");
 use("CharacterSoup.js");
 use("PathAlign.js");
 
-function PathText(theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
-    this.Constructor(this, theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag);
+function PathText( theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
+    this.Constructor(this, theText, theFontSize, theCharacterSoup, thePrebuildFlag);
 }
 
-PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
+PathText.prototype.Constructor = function(self, theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
 
     self.getLength = function() {
         return _myText.length;
@@ -102,6 +102,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
+                    print("// do some newline magic")
                 // line break
                 var myNewLineOffset = 0;
                 if (_myText.length > i+1) {
@@ -224,7 +225,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
             _myBody = buildBodyNode(myName, _myShape.id);
             _myBody.insensible = true;
-            theSceneViewer.getScene().world.appendChild(_myBody);
+            window.scene.world.appendChild(_myBody);
         }
         return myAlignedCharacter;
     }
@@ -282,11 +283,11 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
             _myShape = myShapeBuilder.buildNode();
             _myShape.name = myName;
-            theSceneViewer.getScene().shapes.appendChild(_myShape);
+            window.scene.shapes.appendChild(_myShape);
 
             _myBody = buildBodyNode(myName, _myShape.id);
             _myBody.insensible = true;
-            theSceneViewer.getScene().world.appendChild(_myBody);
+            window.scene.world.appendChild(_myBody);
         }
 
     }
