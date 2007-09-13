@@ -38,6 +38,41 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+// Surfaces: cairo_surface_t
+
+// MISSING:
+// cairo_surface_t* cairo_surface_create_similar
+//                                             (cairo_surface_t *other,
+//                                              cairo_content_t content,
+//                                              int width,
+//                                              int height);
+// cairo_status_t cairo_surface_status         (cairo_surface_t *surface);
+// void        cairo_surface_finish            (cairo_surface_t *surface);
+// void        cairo_surface_flush             (cairo_surface_t *surface);
+// void        cairo_surface_get_font_options  (cairo_surface_t *surface,
+//                                              cairo_font_options_t *options);
+// cairo_content_t cairo_surface_get_content   (cairo_surface_t *surface);
+// void        cairo_surface_mark_dirty        (cairo_surface_t *surface);
+// void        cairo_surface_mark_dirty_rectangle
+//                                             (cairo_surface_t *surface,
+//                                              int x,
+//                                              int y,
+//                                              int width,
+//                                              int height);
+// void        cairo_surface_set_device_offset (cairo_surface_t *surface,
+//                                              double x_offset,
+//                                              double y_offset);
+// void        cairo_surface_get_device_offset (cairo_surface_t *surface,
+//                                              double *x_offset,
+//                                              double *y_offset);
+// void        cairo_surface_set_fallback_resolution
+//                                             (cairo_surface_t *surface,
+//                                              double x_pixels_per_inch,
+//                                              double y_pixels_per_inch);
+// enum        cairo_surface_type_t;
+// cairo_surface_type_t cairo_surface_get_type (cairo_surface_t *surface);
+
+
 // XXX hack to allow triggering texture upload -ingo
 static JSBool
 triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -52,7 +87,6 @@ triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     return JS_TRUE;
 }
 
-// XXX hack to allow triggering texture upload -ingo
 void
 JSCairoSurface::doTriggerUpload() {
     _myImageNode->getFacade<y60::Image>()->triggerUpload();

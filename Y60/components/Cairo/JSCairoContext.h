@@ -69,6 +69,13 @@ namespace jslib {
             PROP_OPERATOR_ADD,
             PROP_OPERATOR_SATURATE,
 
+            PROP_FONT_SLANT_NORMAL,
+            PROP_FONT_SLANT_ITALIC,
+            PROP_FONT_SLANT_OBLIQUE,
+
+            PROP_FONT_WEIGHT_NORMAL,
+            PROP_FONT_WEIGHT_BOLD,
+
             PROP_END
         };
         static JSPropertySpec * Properties();

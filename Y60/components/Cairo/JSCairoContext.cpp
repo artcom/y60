@@ -50,6 +50,10 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+//
+// Drawing: cairo_t
+//
+
 static JSBool
 save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -527,6 +531,12 @@ resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
+// MISSING:
+// cairo_rectangle_t;
+// cairo_rectangle_list_t;
+// void        cairo_rectangle_list_destroy    (cairo_rectangle_list_t *rectangle_list);
+// cairo_rectangle_list_t* cairo_copy_clip_rectangle_list (cairo_t *cr);
+
 static JSBool
 fill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -760,6 +770,10 @@ showPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
+//
+// Drawing: Paths
+//
+
 // MISSING:
 // cairo_path_t* cairo_copy_path               (cairo_t *cr);
 // cairo_path_t* cairo_copy_path_flat          (cairo_t *cr);
@@ -769,6 +783,9 @@ showPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 // void        cairo_get_current_point         (cairo_t *cr,
 //                                              double *x,
 //                                              double *y);
+// void        cairo_new_path                  (cairo_t *cr);
+// void        cairo_new_sub_path              (cairo_t *cr);
+// void        cairo_close_path                (cairo_t *cr);
 
 static JSBool
 arc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -955,13 +972,143 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext); 
 }
 
+//
+// Drawing: Transformations
+//
+
+// MISSING:
+// void        cairo_translate                 (cairo_t *cr,
+//                                              double tx,
+//                                              double ty);
+// void        cairo_scale                     (cairo_t *cr,
+//                                              double sx,
+//                                              double sy);
+// void        cairo_rotate                    (cairo_t *cr,
+//                                              double angle);
+// void        cairo_transform                 (cairo_t *cr,
+//                                              const cairo_matrix_t *matrix);
+// void        cairo_set_matrix                (cairo_t *cr,
+//                                              const cairo_matrix_t *matrix);
+// void        cairo_get_matrix                (cairo_t *cr,
+//                                              cairo_matrix_t *matrix);
+// void        cairo_identity_matrix           (cairo_t *cr);
+// void        cairo_user_to_device            (cairo_t *cr,
+//                                              double *x,
+//                                              double *y);
+// void        cairo_user_to_device_distance   (cairo_t *cr,
+//                                              double *dx,
+//                                              double *dy);
+// void        cairo_device_to_user            (cairo_t *cr,
+//                                              double *x,
+//                                              double *y);
+// void        cairo_device_to_user_distance   (cairo_t *cr,
+//                                              double *dx,
+//                                              double *dy);
+
+//
+// Drawing: Text
+//
+
+// MISSING:
+//             cairo_glyph_t;
+
+static JSBool
+selectFontFace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 3);
+
+    std::string myFamily;
+    convertFrom(cx, argv[0], myFamily);
+
+    int mySlant;
+    convertFrom(cx, argv[1], mySlant);
+
+    int myWeight;
+    convertFrom(cx, argv[2], myWeight);
+
+    (*myContext)->select_font_face(myFamily, (Cairo::FontSlant)mySlant, (Cairo::FontWeight)myWeight);
+    
+    return checkForErrors(cx, myContext);     
+}
+
+static JSBool
+setFontSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> *myContext(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    double mySize;
+    convertFrom(cx, argv[0], mySize);
+
+    (*myContext)->set_font_size(mySize);
+
+    return checkForErrors(cx, myContext);
+}
+
+// MISSING:
+// void        cairo_set_font_matrix           (cairo_t *cr,
+//                                              const cairo_matrix_t *matrix);
+// void        cairo_get_font_matrix           (cairo_t *cr,
+//                                              cairo_matrix_t *matrix);
+// void        cairo_set_font_options          (cairo_t *cr,
+//                                              const cairo_font_options_t *options);
+// void        cairo_get_font_options          (cairo_t *cr,
+//                                              cairo_font_options_t *options);
+// void        cairo_set_font_face             (cairo_t *cr,
+//                                              cairo_font_face_t *font_face);
+// cairo_font_face_t* cairo_get_font_face      (cairo_t *cr);
+// void        cairo_set_scaled_font           (cairo_t *cr,
+//                                              const cairo_scaled_font_t *scaled_font);
+// cairo_scaled_font_t* cairo_get_scaled_font  (cairo_t *cr);
+// void        cairo_show_text                 (cairo_t *cr,
+//                                              const char *utf8);
+
+static JSBool
+showText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::Context> * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 3);
+
+    std::string myText;
+    convertFrom(cx, argv[0], myText);
+
+    (*myContext)->show_text(myText);
+    
+    return checkForErrors(cx, myContext);     
+}
+
+// void        cairo_show_glyphs               (cairo_t *cr,
+//                                              const cairo_glyph_t *glyphs,
+//                                              int num_glyphs);
+// void        cairo_font_extents              (cairo_t *cr,
+//                                              cairo_font_extents_t *extents);
+// void        cairo_text_extents              (cairo_t *cr,
+//                                              const char *utf8,
+//                                              cairo_text_extents_t *extents);
+// void        cairo_glyph_extents             (cairo_t *cr,
+//                                              const cairo_glyph_t *glyphs,
+//                                              int num_glyphs,
+//                                              cairo_text_extents_t *extents);
+
+
 JSFunctionSpec *
 JSCairoContext::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-
+        
+        // Drawing: cairo_t
         {"save",                 save,                    0},
         {"restore",              restore,                 0},
 
@@ -1014,6 +1161,7 @@ JSCairoContext::Functions() {
         {"copyPage",             copyPage,                0},
         {"showPage",             showPage,                0},
 
+        // Drawing: Paths
         {"arc",                  arc,                     0},
         {"arcNegative",          arcNegative,             0}, 
         {"curveTo",              curveTo,                 0},
@@ -1023,6 +1171,15 @@ JSCairoContext::Functions() {
         {"relCurveTo",           relCurveTo,              0},
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
+
+        // Drawing: Patterns
+
+        // Drawing: Transformations
+
+        // Drawing: Text
+        {"selectFontFace",       selectFontFace,          3},
+        {"setFontSize",          setFontSize,             1},
+        {"showText",             showText,                1},
 
         {0}
     };
@@ -1119,15 +1276,15 @@ JSCairoContext::ConstIntProperties() {
         {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     Cairo::ANTIALIAS_GRAY},
         {"ANTIALIAS_SUBPIXEL", PROP_ANTIALIAS_SUBPIXEL, Cairo::ANTIALIAS_SUBPIXEL},
 
-        {"FILL_RULE_WINDING",  PROP_FILL_RULE_WINDING,  Cairo::FILL_RULE_WINDING  },
-        {"FILL_RULE_EVEN_ODD", PROP_FILL_RULE_EVEN_ODD, Cairo::FILL_RULE_EVEN_ODD },
+        {"FILL_RULE_WINDING",  PROP_FILL_RULE_WINDING,  Cairo::FILL_RULE_WINDING},
+        {"FILL_RULE_EVEN_ODD", PROP_FILL_RULE_EVEN_ODD, Cairo::FILL_RULE_EVEN_ODD},
         
-        {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      Cairo::LINE_CAP_BUTT  },
-        {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     Cairo::LINE_CAP_ROUND },
+        {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      Cairo::LINE_CAP_BUTT},
+        {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     Cairo::LINE_CAP_ROUND},
         {"LINE_CAP_SQUARE",    PROP_LINE_CAP_SQUARE,    Cairo::LINE_CAP_SQUARE},
 
-        {"LINE_JOIN_MITER",    PROP_LINE_JOIN_MITER,    Cairo::LINE_JOIN_MITER  },
-        {"LINE_JOIN_ROUND",    PROP_LINE_JOIN_ROUND,    Cairo::LINE_JOIN_ROUND },
+        {"LINE_JOIN_MITER",    PROP_LINE_JOIN_MITER,    Cairo::LINE_JOIN_MITER},
+        {"LINE_JOIN_ROUND",    PROP_LINE_JOIN_ROUND,    Cairo::LINE_JOIN_ROUND},
         {"LINE_JOIN_BEVEL",    PROP_LINE_JOIN_BEVEL,    Cairo::LINE_JOIN_BEVEL},
 
         {"OPERATOR_CLEAR",     PROP_OPERATOR_CLEAR,     Cairo::OPERATOR_CLEAR},
@@ -1144,6 +1301,13 @@ JSCairoContext::ConstIntProperties() {
         {"OPERATOR_XOR",       PROP_OPERATOR_XOR,       Cairo::OPERATOR_XOR},
         {"OPERATOR_ADD",       PROP_OPERATOR_ADD,       Cairo::OPERATOR_ADD},
         {"OPERATOR_SATURATE",  PROP_OPERATOR_SATURATE,  Cairo::OPERATOR_SATURATE},
+
+        {"FONT_SLANT_NORMAL",  PROP_FONT_SLANT_NORMAL,  Cairo::FONT_SLANT_NORMAL},
+        {"FONT_SLANT_ITALIC",  PROP_FONT_SLANT_ITALIC,  Cairo::FONT_SLANT_ITALIC},
+        {"FONT_SLAND_OBLIQUE", PROP_FONT_SLANT_OBLIQUE, Cairo::FONT_SLANT_OBLIQUE},
+
+        {"FONT_WEIGHT_NORMAL", PROP_FONT_WEIGHT_NORMAL, Cairo::FONT_WEIGHT_NORMAL},
+        {"FONT_WEIGHT_BOLD",   PROP_FONT_WEIGHT_BOLD,   Cairo::FONT_WEIGHT_BOLD},
 
         {0}
     };
