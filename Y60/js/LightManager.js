@@ -242,13 +242,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         updateSunPosition();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // private members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    function createLightSource(theLightSourceName, theType) {
+    obj.createLightSource = function(theLightSourceName, theType) {
         var myLightSourceNode = Node.createElement('lightsource');
         myLightSourceNode.id = createUniqueId();
         _myLightSources.appendChild(myLightSourceNode);
@@ -259,10 +253,16 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         return myLightSourceNode;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // private members
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     function ensureHeadlightSource() {
         var myLightSourceNode = getDescendantByName(_myLightSources, "HeadLightSource");
         if (!myLightSourceNode) {
-            myLightSourceNode = createLightSource("HeadLightSource", "positional");
+            myLightSourceNode = obj.createLightSource("HeadLightSource", "positional");
             myLightSourceNode.properties.ambient = "[0.1,0.1,0.1,1]";
             myLightSourceNode.properties.diffuse = "[1,1,1,1]";
             myLightSourceNode.properties.specular = "[1,1,1,1]";
@@ -274,7 +274,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     function ensureSunLightSource() {
         var myLightSourceNode = getDescendantByName(_myLightSources, "SunLightSource");
         if (!myLightSourceNode) {
-            myLightSourceNode = createLightSource("SunLightSource", "directional");
+            myLightSourceNode = obj.createLightSource("SunLightSource", "directional");
             myLightSourceNode.properties.ambient = "[0.1,0.1,0.1,1]";
             myLightSourceNode.properties.diffuse = "[0.5,0.5,0.5,1]";
             myLightSourceNode.properties.specular = "[0.5,0.5,0.5,1]";

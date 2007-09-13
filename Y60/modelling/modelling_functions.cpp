@@ -188,6 +188,29 @@ namespace y60 {
             WhiteColor());
     }
 
+    dom::NodePtr
+    createPlane(ScenePtr theScene, const std::string & theMaterialId,
+        asl::Vector3f theTopLeftCorner, asl::Vector3f theBottomRightCorner,
+        int theHSubdivision, int theVSubdivision)
+    {
+        float myZ = (theBottomRightCorner[2] - theTopLeftCorner[2]) / 2;
+        asl::Vector3f myXVector(theBottomRightCorner[0] - theTopLeftCorner[0], 0, myZ);
+        asl::Vector3f myYVector(0, theBottomRightCorner[1] - theTopLeftCorner[1], myZ);
+
+        Vector3f myXStep = myXVector * ( 1.0 / theHSubdivision );
+        Vector3f myYStep = myYVector * ( 1.0 / theVSubdivision );
+
+        Vector2f myUStep( 1.0 / theHSubdivision, 0.0);
+        Vector2f myVStep( 0.0, 1.0 / theVSubdivision);
+
+        return createPlane(theScene, theHSubdivision +1, theVSubdivision + 1, "myPlane", theMaterialId,
+            QuadBuilder(),
+            PlanePosition(asPoint(theTopLeftCorner), myXStep, myYStep),
+            ConstNormal(),
+            PlaneUVCoord(Point2f(0.0, 0.0), myUStep, myVStep ),
+            WhiteColor());
+    }
+
 
     dom::NodePtr createCrosshair(ScenePtr theScene, const std::string & theMaterialId,
                                  float theInnerRadius, float theHairLength,

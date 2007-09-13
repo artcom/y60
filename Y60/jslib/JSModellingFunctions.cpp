@@ -140,6 +140,44 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreatePlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Creates a plane");
+        DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
+        DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
+        DOC_PARAM("theTopLeftCorner", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theBottomRightCorner", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theHSubdivision", "", DOC_TYPE_INTEGER);
+        DOC_PARAM("theVSubdivision", "", DOC_TYPE_INTEGER);
+        DOC_RVAL("The plane shape node", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 6);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+        string myMaterialId;
+        convertFrom(cx, argv[1], myMaterialId);
+        Vector3f myTopLeftCorner;
+        convertFrom(cx, argv[2], myTopLeftCorner);
+        Vector3f myBottomRightCorner;
+        convertFrom(cx, argv[3], myBottomRightCorner);
+
+        int myHSub;
+        convertFrom(cx, argv[4], myHSub );
+        int myVSub;
+        convertFrom(cx, argv[5], myVSub );
+
+        dom::NodePtr myResult = createPlane(myScene, myMaterialId,
+                                           myTopLeftCorner, myBottomRightCorner,
+                                           myHSub, myVSub);
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a surface from a unclosed countour, defined by a VectorOfVector2f");
@@ -627,6 +665,99 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Create a phong lit textured material");
+        DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theTextureFilename", "Path of the file to use for as texture", DOC_TYPE_STRING);
+        DOC_PARAM("thePhongProperties", "JSObject with properties: ambientColor, diffuseColor, emissiveColor, specularColor, shininess", DOC_TYPE_BOOLEAN); // TODO: fix type and default
+        DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "PhongMaterial");
+        DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
+        DOC_RVAL("The new created material", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 3, 7);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        dom::NodePtr myResult;
+
+        string myTextureFilename;
+        convertFrom(cx, argv[1], myTextureFilename);
+
+        // parse phong props
+        y60::PhongProperties myPhongProps;
+        if ( JSVAL_IS_OBJECT( argv[2] )) {
+            JSObject * myProps;
+            if (JS_ValueToObject(cx, argv[2], & myProps )) {
+                jsval myValue;
+                JS_GetProperty(cx, myProps, "ambientColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.ambientColor );
+                JS_GetProperty(cx, myProps, "diffuseColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.diffuseColor );
+                JS_GetProperty(cx, myProps, "emissiveColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.emissiveColor );
+                JS_GetProperty(cx, myProps, "specularColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.specularColor );
+                JS_GetProperty(cx, myProps, "shininess", & myValue);
+                convertFrom(cx, myValue, myPhongProps.shininess );
+            } else {
+                // KAPUTT
+            }
+        } else {
+            // KAPUTT
+        }
+
+        string myName;
+        if (argc > 3) {
+            if ( ! convertFrom(cx, argv[3], myName)) {
+                myName = "PhongMaterial";
+            }
+        }
+        
+        bool myTransparencyFlag;
+        if (argc > 4) {
+            convertFrom(cx, argv[4], myTransparencyFlag);
+        }
+        bool mySpriteFlag;
+        if (argc > 5) {
+            convertFrom(cx, argv[5], mySpriteFlag);
+        }
+        unsigned myDepth;
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myDepth);
+        }
+
+        switch (argc) {
+            case 3:
+                myResult = createPhongTexturedMaterial(myScene,myTextureFilename, myName, myPhongProps);
+                break;
+            case 4:
+                myResult = createPhongTexturedMaterial(myScene,myTextureFilename, myName, myPhongProps);
+                break;
+            case 5:
+                myResult = createPhongTexturedMaterial(myScene,myTextureFilename, myName, myPhongProps,
+                        myTransparencyFlag);
+                break;
+            case 6:
+                myResult = createPhongTexturedMaterial(myScene,myTextureFilename, myName, myPhongProps,
+                        myTransparencyFlag, mySpriteFlag);
+                break;
+            case 7:
+                myResult = createPhongTexturedMaterial(myScene,myTextureFilename, myName, myPhongProps,
+                        myTransparencyFlag, mySpriteFlag, myDepth);
+                break;
+
+        }
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Create an unlit textured material");
@@ -889,7 +1020,8 @@ JSModellingFunctions::StaticFunctions() {
         {"createSurface2DFromContour",  CreateSurface2DFromContour,  4},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
-        {"createQuad",                  CreateQuad,                  2},
+        {"createQuad",                  CreateQuad,                  4},
+        {"createPlane",                 CreatePlane,                 6},
         {"createCrosshair",             CreateCrosshair,             5},
         {"createDistanceMarkup",        CreateDistanceMarkup,        5},
         {"createAngleMarkup",           CreateAngleMarkup,           6},
@@ -903,6 +1035,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createLambertMaterial",       CreateLambertMaterial,       3},
         {"createColorMaterial",         CreateColorMaterial,         3},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
+        {"createPhongTexturedMaterial", CreatePhongTexturedMaterial, 7},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {"setAlpha",                    SetAlpha,                    2},
         {0}

@@ -93,6 +93,10 @@ dom::NodePtr createCanvas(y60::ScenePtr theScene, const std::string & theCanvasI
 dom::NodePtr createQuad(y60::ScenePtr theScene, const std::string & theMaterialId,
                         asl::Vector3f theTopLeftCorner, asl::Vector3f theBottomRightCorner);
 
+dom::NodePtr createPlane(ScenePtr theScene, const std::string & theMaterialId,
+        asl::Vector3f theTopLeftCorner, asl::Vector3f theBottomRightCorner,
+        int theHSubdivision, int theVSubdivision);
+
 dom::NodePtr createCrosshair(y60::ScenePtr theScene, const std::string & theMaterialId,
                              float theInnerRadius, float theHairLength,
                              const std::string & theName = "CrosshairShape");
