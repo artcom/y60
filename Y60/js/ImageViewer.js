@@ -52,6 +52,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myMaxMissedFrame     = 0;
     var _myLastFrame          = 0;
     var _myFrameCounter       = 0;
+    var _myTheaterFlag        = false;
     //////////////////////////////////////////////////////////////////////
     //
     // Constructor
@@ -69,9 +70,20 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     // setup
     Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {
+    self.setup = function(theWidth, theHeight, theTitle, theTheaterFlag) {
         self.setSplashScreen(false);
         Base.setup(theWidth, theHeight, false, theTitle);
+        _myTheaterFlag    = theTheaterFlag;        
+        if (_myTheaterFlag) {
+            window.decorations     = false;;
+            window.backgroundColor = [0.0, 0.0, 0.0];            
+            window.position        = [0.0, 0.0];            
+            window.showMouseCursor = false;
+            window.swapInterval    = 2;
+            
+        } else {
+            window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
+        }
         for(var i=1; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
             case "recursive": // would like to use '--recursive' but that is rejected by the acxpshell options
@@ -89,6 +101,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
         updateFileView();
         _myTextOverlay = new Overlay(window.scene, [0,0,0,0.6], [0,0], [200,200]);
+        _myTextOverlay.visible = !_myTheaterFlag;
     }
 
     Base.onKey = self.onKey;
@@ -343,6 +356,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
                 var myEnsureFramecount = true;
+                if (_myTheaterFlag) {
+                    myEnsureFramecount = false;
+                }
                 showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag), myEnsureFramecount);
                 if (_myImageOverlay) {
                     _myImageOverlay.visible = false;
@@ -636,8 +652,29 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         var mySize = getSize();
-        myOverlay.width  = mySize.x * _myZoomFactor;
-        myOverlay.height = mySize.y * _myZoomFactor;
+        if (_myTheaterFlag) {
+            var myRatio = mySize.x/mySize.y;
+            if (myRatio > 1.0) {
+                if (window.width > mySize.x) {
+                    myOverlay.width = window.width * _myZoomFactor;
+                    myOverlay.height = window.width / myRatio * _myZoomFactor;
+                } else {
+                    myOverlay.width = mySize.x * _myZoomFactor;
+                    myOverlay.height = mySize.x / myRatio * _myZoomFactor;
+                }
+            } else {
+                if (window.height > mySize.y) {
+                    myOverlay.width = window.height / myRatio * _myZoomFactor;
+                    myOverlay.height = window.height * _myZoomFactor;
+                } else {
+                    myOverlay.width = mySize.y / myRatio * _myZoomFactor;
+                    myOverlay.height = mySize.y * _myZoomFactor;
+                }
+            }
+        } else {
+            myOverlay.width  = mySize.x * _myZoomFactor;
+            myOverlay.height = mySize.y * _myZoomFactor;
+        }
         myOverlay.position = new Vector2f((window.width - myOverlay.width) / 2,
             (window.height - myOverlay.height) /2);
         myOverlay.position.x -= _myPanning.x;
@@ -666,9 +703,22 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 //
 try {
     if (__main__ == "ImageViewer") {
+        var myWidth = 800;
+        var myHeight = 600;
+        var myTheaterFlag = false;
         var ourImageViewerApp = new ImageViewerApp(arguments);
-        ourImageViewerApp.setup(800, 600, "ImageViewer");
-        window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
+        
+        print(arguments)
+        for (var i = 0; i < arguments.length; ++i) {
+            if (arguments[i].search(/resolution/) != -1) {
+                myWidth = arguments[i + 1];
+                myHeight = arguments[i + 2];
+            }
+            if (arguments[i].search(/theater/) != -1) {
+                myTheaterFlag = arguments[i + 1] == "1" ? true:false;
+            }
+        }
+        ourImageViewerApp.setup(myWidth, myHeight, "ImageViewer", myTheaterFlag);
         ourImageViewerApp.go();
     }
 } catch (ex) {
