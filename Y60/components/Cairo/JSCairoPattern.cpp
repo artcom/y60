@@ -16,8 +16,6 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-namespace jslib {
-
 template class JSWrapper<Cairo::RefPtr<Cairo::Pattern>, Ptr< Cairo::RefPtr<Cairo::Pattern> >, StaticAccessProtocol>;
 
 static JSBool
@@ -262,6 +260,4 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTar
         }
     }
     return false;
-}
-
 }

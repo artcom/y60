@@ -27,8 +27,6 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-namespace jslib {
-
 template class JSWrapper<Cairo::RefPtr<Cairo::Context>, Ptr< Cairo::RefPtr<Cairo::Context> >, StaticAccessProtocol>;
 
 static JSBool
@@ -1172,8 +1170,6 @@ JSCairoContext::Functions() {
         {"relLineTo",            relLineTo,               0},
         {"relMoveTo",            relMoveTo,               0},
 
-        // Drawing: Patterns
-
         // Drawing: Transformations
 
         // Drawing: Text
@@ -1354,6 +1350,4 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTar
         }
     }
     return false;
-}
-
 }
