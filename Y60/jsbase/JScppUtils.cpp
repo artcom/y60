@@ -173,7 +173,6 @@ jsval as_jsval(JSContext *cx, const std::string & theValue) {
     return as_jsval(cx, theValue.c_str());
 }
 
-inline
 jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String) {
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
     return STRING_TO_JSVAL(myString);    
