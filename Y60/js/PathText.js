@@ -102,7 +102,6 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
-                    print("// do some newline magic")
                 // line break
                 var myNewLineOffset = 0;
                 if (_myText.length > i+1) {
@@ -116,7 +115,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                 } else {
                     // do some newline magic
                     thePathAlign.resetToStartPos();
-                    myLineOffset = product(thePathAlign.getNormalAtCurrentPosition(), myFontMetrics.height);
+                    myLineOffset = sum(myLineOffset,product(thePathAlign.getNormalAtCurrentPosition(), myFontMetrics.height));
                     continue;
                 }
             }

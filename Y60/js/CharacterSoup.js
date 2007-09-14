@@ -120,6 +120,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
                     Logger.error("Blit pos < 0");
                     myBlitPos.x = 0;
                 }
+                saveImage(myFontImage, "fontimage.png");
                 blitImage(myTmpImage, myFontImage, myBlitPos);
                 window.scene.images.removeChild(myTmpImage);
 
@@ -153,7 +154,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
 
                 // position of next character
                 _myAlphabetMap[theSize].nextCharSlot.x += nextPowerOfTwo(myMetric.advance); //myCellSize;
-                if (_myAlphabetMap[theSize].nextCharSlot.x > (myFontImage.width - myCellSize)) {
+                if (_myAlphabetMap[theSize].nextCharSlot.x >= (myFontImage.width - myCellSize)) {
                     _myAlphabetMap[theSize].nextCharSlot.x = 0;
                     _myAlphabetMap[theSize].nextCharSlot.y += myCellSize;
                     if (_myAlphabetMap[theSize].nextCharSlot.y > myFontImage.height - (2*myCellSize)) {

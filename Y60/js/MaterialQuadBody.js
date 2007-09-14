@@ -44,7 +44,7 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         throw new Exception(errorstring);
     } else if (fileExists(theImage)) {
         // theImage is-a filename
-        print("MQB filename=" + theImage);
+        // print("MQB filename=" + theImage);
         if (theImage in ourImageMap) {
             _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
         } else {
