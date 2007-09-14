@@ -7,11 +7,9 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-
 // i know this must hurt, but i need them (vs)
 use("Button.js")
 use("Overlay.js")
-
 function ASSManager(theViewer) {
     this.Constructor(this, theViewer);
 }
@@ -87,6 +85,12 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         }
     }
 
+    self.setOSDInvisible = function() {
+        _myQuitOSD.visible = false;
+        _myQuitCursorEvent = null;         
+    }
+ 
+
     var _myEventQueues = {};
     var _myEventIDMQBs = {};
     self.onASSEvent = function( theEventNode ) {
@@ -123,11 +127,11 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
                 if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
                     var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
                     var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
-                    //print(myHandTraveled);
                     if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
                         _myQuitCursorEvent = null;
                     } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
                         if(_myQuitOSD.visible == false) {
+                            _myQuitOSD.moveToTop();
                             _myQuitOSD.visible = true;
                             window.setTimeout("setOSDInvisible", 5.0*1000, self);     
                         }    
@@ -176,12 +180,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     self.driver getter = function() {
         return _myDriver;
     }
-
-    self.setOSDInvisible = function() {
-        _myQuitOSD.visible = false;
-        _myQuitCursorEvent = null;         
-    }
-    function buildQuitOSD() {
+  function buildQuitOSD() {
         const myStyle = {
             color:             asColor("FFFFFF"),
             selectedColor:     asColor("FFFFFF"),
