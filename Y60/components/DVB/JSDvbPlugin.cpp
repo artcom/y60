@@ -13,6 +13,7 @@
 
 #include <asl/PlugInBase.h>
 #include <y60/IScriptablePlugin.h>
+#include <y60/JSWrapper.impl>
 
 namespace y60 {
     class JSDvbPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

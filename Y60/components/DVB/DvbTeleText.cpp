@@ -19,10 +19,16 @@
 #include <asl/Logger.h>
 #include <asl/string_functions.h>
 
+#include <y60/ArgumentHolder.impl>
+
 #define MAX_PES_SIZE (4*1024)
 
 using namespace std;
 using namespace asl;
+
+namespace jslib {
+    template struct ResultConverter<basic_string<Unsigned16> >;
+}
 
 Unsigned16 reverse[] = {
     0x20/*_?*/, 0x20, 0x20, 0x20, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x20/*P?*/, 0x50/*P*/, 0x30/*6*/, 0x30/*6*/, 0x70/*p*/, 0xF0,
@@ -107,16 +113,16 @@ DvbTeleText::stopDecoderThread(){
     _myTeleTextBuffer.clear();
 }
 
-basic_string<Unsigned16>
+basic_string<asl::Unsigned16>
 DvbTeleText::getPage(const unsigned thePageNumber) {
     if (!isActive()) {
-        basic_string<Unsigned16> myEmptyString;
+        basic_string<asl::Unsigned16> myEmptyString;
         return myEmptyString;
     }
 
     AutoLocker<ThreadLock> myLocker(_myLock);
 
-    basic_string<Unsigned16> myReturnString =  _myTeleTextBuffer[thePageNumber];
+    basic_string<asl::Unsigned16> myReturnString =  _myTeleTextBuffer[thePageNumber];
     _myTeleTextBuffer[thePageNumber].clear();
 
     return myReturnString;
