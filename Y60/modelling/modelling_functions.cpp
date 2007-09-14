@@ -697,7 +697,10 @@ namespace y60 {
 
         appendPhongProperties(myMaterialBuilder, thePhongProperties);
         appendBlendFunction(myMaterialBuilder);
-        appendTexture(theScene, myMaterialBuilder, theTextureFilename, theSpriteFlag, theDepth);
+        if ( ! theTextureFilename.empty() ) {
+            appendTexture(theScene, myMaterialBuilder, theTextureFilename,
+                          theSpriteFlag, theDepth);
+        }
 
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
