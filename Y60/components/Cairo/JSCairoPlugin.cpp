@@ -11,9 +11,10 @@
 #include <asl/PlugInBase.h>
 #include <y60/IScriptablePlugin.h>
 
-#include "JSCairoContext.h"
-#include "JSCairoPattern.h"
+#include "JSCairo.h"
+
 #include "JSCairoSurface.h"
+#include "JSCairoPattern.h"
 
 #include "JSCairoFontOptions.h"
 
@@ -25,9 +26,10 @@ namespace y60 {
             JSCairoPlugin(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
-                JSCairoContext::initClass(theContext, theGlobalObject);
-                JSCairoPattern::initClass(theContext, theGlobalObject);
+                JSCairo::initClass(theContext, theGlobalObject);
+
                 JSCairoSurface::initClass(theContext, theGlobalObject);
+                JSCairoPattern::initClass(theContext, theGlobalObject);
 
                 JSCairoFontOptions::initClass(theContext, theGlobalObject);
             }

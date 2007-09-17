@@ -94,32 +94,99 @@ getAntialias(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 static JSBool
 setSubpixelOrder(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return JS_TRUE;
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 1);
+
+    int mySubpixelOrder;
+    convertFrom(cx, argv[0], mySubpixelOrder);
+
+    (*myFontOptions)->set_subpixel_order((Cairo::SubpixelOrder)mySubpixelOrder);
+
+    return checkForErrors(cx, myFontOptions);
 }
 
 static JSBool
 getSubpixelOrder(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(cx, (int)(*myFontOptions)->get_subpixel_order());
+
+    return checkForErrors(cx, myFontOptions);
+
     return JS_TRUE;
 }
 
 static JSBool
 setHintStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return JS_TRUE;
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 1);
+
+    int myHintStyle;
+    convertFrom(cx, argv[0], myHintStyle);
+
+    (*myFontOptions)->set_hint_style((Cairo::HintStyle)myHintStyle);
+
+    return checkForErrors(cx, myFontOptions);
 }
 
 static JSBool
 getHintStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(cx, (int)(*myFontOptions)->get_hint_style());
+
+    return checkForErrors(cx, myFontOptions);
+
     return JS_TRUE;
 }
 
 static JSBool
 setHintMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return JS_TRUE;
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 1);
+
+    int myHintMetrics;
+    convertFrom(cx, argv[0], myHintMetrics);
+
+    (*myFontOptions)->set_hint_metrics((Cairo::HintMetrics)myHintMetrics);
+
+    return checkForErrors(cx, myFontOptions);
 }
 
 static JSBool
 getHintMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return JS_TRUE;
+    DOC_BEGIN("");
+    DOC_END;
+    Cairo::RefPtr<Cairo::FontOptions> *myFontOptions(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myFontOptions);
+
+    ensureParamCount(argc, 0);
+
+    *rval = as_jsval(cx, (int)(*myFontOptions)->get_hint_metrics());
+
+    return checkForErrors(cx, myFontOptions);
 }
 
 

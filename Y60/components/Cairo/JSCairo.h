@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
-#define _Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_
+#ifndef _Y60_CAIRO_JSCAIRO_INCLUDED_
+#define _Y60_CAIRO_JSCAIRO_INCLUDED_
 
 #include <dom/Nodes.h>
 
@@ -19,11 +19,11 @@
 
 namespace jslib {
 
-    class JSCairoContext : public JSWrapper<Cairo::RefPtr<Cairo::Context>, asl::Ptr< Cairo::RefPtr<Cairo::Context> >, StaticAccessProtocol> {
-        JSCairoContext();  // hide default constructor
+    class JSCairo : public JSWrapper<Cairo::RefPtr<Cairo::Context>, asl::Ptr< Cairo::RefPtr<Cairo::Context> >, StaticAccessProtocol> {
+        JSCairo();  // hide default constructor
     public:
 
-        virtual ~JSCairoContext() {
+        virtual ~JSCairo() {
         }
 
         typedef Cairo::RefPtr<Cairo::Context> NATIVE;
@@ -69,12 +69,33 @@ namespace jslib {
             PROP_OPERATOR_ADD,
             PROP_OPERATOR_SATURATE,
 
+            PROP_FONT_TYPE_TOY,
+            PROP_FONT_TYPE_FT,
+            PROP_FONT_TYPE_WIN32,
+            PROP_FONT_TYPE_ATSUI,
+
             PROP_FONT_SLANT_NORMAL,
             PROP_FONT_SLANT_ITALIC,
             PROP_FONT_SLANT_OBLIQUE,
 
             PROP_FONT_WEIGHT_NORMAL,
             PROP_FONT_WEIGHT_BOLD,
+
+            PROP_SUBPIXEL_ORDER_DEFAULT,
+            PROP_SUBPIXEL_ORDER_RGB,
+            PROP_SUBPIXEL_ORDER_BGR,
+            PROP_SUBPIXEL_ORDER_VRGB,
+            PROP_SUBPIXEL_ORDER_VBGR,
+            
+            PROP_HINT_STYLE_DEFAULT,
+            PROP_HINT_STYLE_NONE,
+            PROP_HINT_STYLE_SLIGHT,
+            PROP_HINT_STYLE_MEDIUM,
+            PROP_HINT_STYLE_FULL,
+            
+            PROP_HINT_METRICS_DEFAULT,
+            PROP_HINT_METRICS_OFF,
+            PROP_HINT_METRICS_ON,
 
             PROP_END
         };
@@ -99,7 +120,7 @@ namespace jslib {
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSCairoContext(OWNERPTR theOwner, NATIVE * theNative)
+        JSCairo(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
             { }
 
@@ -107,20 +128,20 @@ namespace jslib {
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
         static void addClassProperties(JSContext * cx, JSObject * theClassProto);
 
-        static JSCairoContext & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSCairoContext &>(JSCairoContext::getJSWrapper(cx,obj));
+        static JSCairo & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSCairo &>(JSCairo::getJSWrapper(cx,obj));
         }
 
     private:
     };
 
     template <>
-    struct JSClassTraits<JSCairoContext::NATIVE>
-        : public JSClassTraitsWrapper<JSCairoContext::NATIVE, JSCairoContext> {};
+    struct JSClassTraits<JSCairo::NATIVE>
+        : public JSClassTraitsWrapper<JSCairo::NATIVE, JSCairo> {};
 
-    jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext::NATIVE * theButton);
+    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theButton);
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTarget);
+    bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theTarget);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_ */

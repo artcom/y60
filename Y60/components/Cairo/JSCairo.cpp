@@ -18,9 +18,10 @@
 
 #include <y60/JSWrapper.impl>
 
-#include "JSCairoContext.h"
-#include "JSCairoPattern.h"
+#include "JSCairo.h"
+
 #include "JSCairoSurface.h"
+#include "JSCairoPattern.h"
 
 using namespace std;
 using namespace asl;
@@ -1100,7 +1101,7 @@ showText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 
 JSFunctionSpec *
-JSCairoContext::Functions() {
+JSCairo::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -1183,7 +1184,7 @@ JSCairoContext::Functions() {
 }
 
 JSPropertySpec *
-JSCairoContext::Properties() {
+JSCairo::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -1191,33 +1192,33 @@ JSCairoContext::Properties() {
 }
 
 JSBool
-JSCairoContext::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSCairo::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoContext::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSCairo::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoContext::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSCairo::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-JSCairoContext::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSCairo::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSCairo::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
 
@@ -1228,7 +1229,7 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     NATIVE * newNative = 0;
 
-    JSCairoContext *myNewObject = 0;
+    JSCairo *myNewObject = 0;
 
     Cairo::RefPtr<Cairo::Surface> *mySurface = 0;
 
@@ -1251,19 +1252,19 @@ JSCairoContext::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_FALSE;
     }
 
-    myNewObject = new JSCairoContext(OWNERPTR(newNative), newNative);
+    myNewObject = new JSCairo(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
 
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSCairoContext::Constructor: bad parameters");
+    JS_ReportError(cx,"JSCairo::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 JSConstIntPropertySpec *
-JSCairoContext::ConstIntProperties() {
+JSCairo::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         // name                id                       value
@@ -1298,12 +1299,33 @@ JSCairoContext::ConstIntProperties() {
         {"OPERATOR_ADD",       PROP_OPERATOR_ADD,       Cairo::OPERATOR_ADD},
         {"OPERATOR_SATURATE",  PROP_OPERATOR_SATURATE,  Cairo::OPERATOR_SATURATE},
 
-        {"FONT_SLANT_NORMAL",  PROP_FONT_SLANT_NORMAL,  Cairo::FONT_SLANT_NORMAL},
-        {"FONT_SLANT_ITALIC",  PROP_FONT_SLANT_ITALIC,  Cairo::FONT_SLANT_ITALIC},
-        {"FONT_SLAND_OBLIQUE", PROP_FONT_SLANT_OBLIQUE, Cairo::FONT_SLANT_OBLIQUE},
+        {"FONT_TYPE_TOY",      PROP_FONT_TYPE_TOY,      Cairo::FONT_TYPE_TOY},
+        {"FONT_TYPE_FT",       PROP_FONT_TYPE_FT,       Cairo::FONT_TYPE_FT},
+        {"FONT_TYPE_WIN32",    PROP_FONT_TYPE_WIN32,    Cairo::FONT_TYPE_WIN32},
+        {"FONT_TYPE_ATSUI",    PROP_FONT_TYPE_ATSUI,    Cairo::FONT_TYPE_ATSUI},
 
-        {"FONT_WEIGHT_NORMAL", PROP_FONT_WEIGHT_NORMAL, Cairo::FONT_WEIGHT_NORMAL},
-        {"FONT_WEIGHT_BOLD",   PROP_FONT_WEIGHT_BOLD,   Cairo::FONT_WEIGHT_BOLD},
+        {"FONT_SLANT_NORMAL",  PROP_FONT_SLANT_NORMAL,          Cairo::FONT_SLANT_NORMAL},
+        {"FONT_SLANT_ITALIC",  PROP_FONT_SLANT_ITALIC,          Cairo::FONT_SLANT_ITALIC},
+        {"FONT_SLAND_OBLIQUE", PROP_FONT_SLANT_OBLIQUE,         Cairo::FONT_SLANT_OBLIQUE},
+
+        {"FONT_WEIGHT_NORMAL", PROP_FONT_WEIGHT_NORMAL,         Cairo::FONT_WEIGHT_NORMAL},
+        {"FONT_WEIGHT_BOLD",   PROP_FONT_WEIGHT_BOLD,           Cairo::FONT_WEIGHT_BOLD},
+        
+        {"SUBPIXEL_ORDER_DEFAULT", PROP_SUBPIXEL_ORDER_DEFAULT, Cairo::SUBPIXEL_ORDER_DEFAULT},
+        {"SUBPIXEL_ORDER_RGB",     PROP_SUBPIXEL_ORDER_RGB,     Cairo::SUBPIXEL_ORDER_RGB},
+        {"SUBPIXEL_ORDER_BGR",     PROP_SUBPIXEL_ORDER_BGR,     Cairo::SUBPIXEL_ORDER_BGR},
+        {"SUBPIXEL_ORDER_VRGB",    PROP_SUBPIXEL_ORDER_VRGB,    Cairo::SUBPIXEL_ORDER_VRGB},
+        {"SUBPIXEL_ORDER_VBGR",    PROP_SUBPIXEL_ORDER_VBGR,    Cairo::SUBPIXEL_ORDER_VBGR},
+
+        {"HINT_STYLE_DEFAULT",     PROP_HINT_STYLE_DEFAULT,     Cairo::HINT_STYLE_DEFAULT},
+        {"HINT_STYLE_NONE",        PROP_HINT_STYLE_NONE,        Cairo::HINT_STYLE_NONE},
+        {"HINT_STYLE_SLIGHT",      PROP_HINT_STYLE_SLIGHT,      Cairo::HINT_STYLE_SLIGHT},
+        {"HINT_STYLE_MEDIUM",      PROP_HINT_STYLE_MEDIUM,      Cairo::HINT_STYLE_MEDIUM},
+        {"HINT_STYLE_FULL",        PROP_HINT_STYLE_FULL,        Cairo::HINT_STYLE_FULL},
+
+        {"HINT_METRICS_DEFAULT",   PROP_HINT_METRICS_DEFAULT,   Cairo::HINT_METRICS_DEFAULT},
+        {"HINT_METRICS_OFF",       PROP_HINT_METRICS_OFF,       Cairo::HINT_METRICS_OFF},
+        {"HINT_METRICS_ON",        PROP_HINT_METRICS_DEFAULT,   Cairo::HINT_METRICS_ON},
 
         {0}
     };
@@ -1311,14 +1333,14 @@ JSCairoContext::ConstIntProperties() {
 };
 
 void
-JSCairoContext::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+JSCairo::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
     createClassModuleDocumentation("cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *
-JSCairoContext::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSCairo::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -1328,23 +1350,23 @@ JSCairoContext::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "JSCairoContext::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "JSCairo::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
 namespace jslib {
-jsval as_jsval(JSContext *cx, JSCairoContext::OWNERPTR theOwner, JSCairoContext::NATIVE * theNative) {
-    JSObject * myReturnObject = JSCairoContext::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theNative) {
+    JSObject * myReturnObject = JSCairo::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCairoContext::NATIVE *& theTarget) {
+bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theTarget) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCairoContext::NATIVE>::Class()) {
-                JSClassTraits<JSCairoContext::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCairo::NATIVE>::Class()) {
+                JSClassTraits<JSCairo::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
                 theTarget = &myObj.getNative();
                 return true;
             }
