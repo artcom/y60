@@ -226,6 +226,7 @@ JSCairoSurface::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClassObject;
 }
 
+namespace jslib {
 jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theNative) {
     JSObject * myReturnObject = JSCairoSurface::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
@@ -244,3 +245,5 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTar
     }
     return false;
 }
+}
+
