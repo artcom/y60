@@ -48,6 +48,9 @@ namespace y60 {
             void registerDependenciesRegistrators();
             Shape & getShape();           
             const Shape & getShape() const;
+
+			ShapePtr getShapePtr();           
+            const ShapePtr getShapePtr() const;           
             double calculateVolume(const Scene & theScene) const;
 
         protected:
