@@ -32,7 +32,7 @@ namespace jslib {
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "CairoContext";
+            return "Cairo";
         }
 
         static JSFunctionSpec * Functions();
