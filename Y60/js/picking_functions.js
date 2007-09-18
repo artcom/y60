@@ -215,7 +215,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return myViewLineSegment;
     }
 
-    function pickIntersection(theScreenPixelX, theScreenPixelY) {
+    obj.pickIntersection = function(theScreenPixelX, theScreenPixelY) {
     //    var myCameraToScreenRay = getCameraToScreenRay(theScreenPixelX, theScreenPixelY);
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
         var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
