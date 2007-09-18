@@ -34,7 +34,6 @@
 //    overall review status  : ok
 //
 //    recommendations:
-//       - make a documentation
 //       - replace existing enums in Y60 with this thing
 //       - try to find a compile-time check instead of run-time verify()
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
