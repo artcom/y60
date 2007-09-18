@@ -42,24 +42,35 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         var errorstring = "theImage is undefined";
         Logger.error(errorstring);
         throw new Exception(errorstring);
-    } else if (fileExists(theImage)) {
-        // theImage is-a filename
-        // print("MQB filename=" + theImage);
-        if (theImage in ourImageMap) {
-            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
-        } else {
-            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "MQB_Material", false);
-            ourImageMap[theImage] = _myMaterial.getElementById(_myMaterial.childNode("textures", 0).firstChild.image);
+    } else if ((theImage instanceof String) || (typeof theImage == "string")) {
+        var myNode = theParentNode.getElementById(theImage);
+        if (myNode) {
+            // theImage is-a image ID
+            if (myNode.nodeName == "image") {
+                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, myNode);
+                _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
+            } else if (myNode.nodeName == "material") {
+                _myMaterial = myNode;
+            }
+        } else if (fileExists(theImage)) {
+            // theImage is-a filename
+            print("MQB filename=" + theImage);
+            if (theImage in ourImageMap) {
+                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
+            } else {
+                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "MQB_Material", false);
+                ourImageMap[theImage] = _myMaterial.getElementById(_myMaterial.childNode("textures", 0).firstChild.image);
+            }
+            _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
         }
-        _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
-    } else if (("id" in theImage) && theParentNode.getElementById(theImage.id)) {
-        // theImage is-a <image> node
-        _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage);
-        _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
-    } else if (theParentNode.getElementById(theImage)) {
-        // theImage is-a image ID
-        _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theParentNode.getElementById(theImage));
-        _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
+    } else if ((theImage instanceof Node)) {
+        if (theImage.nodeName == "image") {
+            // theImage is-a <image> node
+            _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage);
+            _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
+        } else if (theImage.nodeName == "material") {
+            _myMaterial = theImage;
+        }
     } else {
         // theImage is-a color
         _myMaterial = Modelling.createColorMaterial(theScene, theImage);
