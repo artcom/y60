@@ -108,7 +108,7 @@ function findIntersectionsByBoxCenter(theRootNode, myBox) {
 // this function will dispatch according to the type of myLineSegment.
 // it may be a LineSegment or a Ray
 function nearestIntersection(theRootNode, myLineSegment) {
-    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);    
+    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);
     if (myIntersectionInfo) {
         return findNearestIntersection(myIntersectionInfo, myLineSegment.origin);
     }
@@ -175,9 +175,9 @@ function pickBody(theX, theY) {
     myProjectionMatrix.invert();
     myProjectionMatrix.postMultiply(window.camera.globalmatrix);
 
-	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
-	var myWorldFarPos  = product(myClipFarPos, myProjectionMatrix);
+    var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
+    var myWorldFarPos  = product(myClipFarPos, myProjectionMatrix);
     var myMouseRay     = new Ray(myWorldNearPos, myWorldFarPos);
 
-	return nearestIntersection(window.scene.world, myMouseRay);
+    return nearestIntersection(window.scene.world, myMouseRay);
 }
