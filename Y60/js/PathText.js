@@ -56,9 +56,13 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
      * Align this text along given path.
      * - if given, start near 'thePos'; default is start of path.
      * - if given, start at character 'theFirstCharacter'; default is 0.
-     * - if given, end at character 'theLastCharacter'; default is last character in text.
+     * - if given, end at character 'theLastCharacter'; 
+     *   default is last character in text.
      */
-    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag, theFlipFlag, theAutoNewlineFlag) {
+    self.align = function(thePathAlign, thePos, theFirstCharacter, 
+                          theLastCharacter, doTheWrapAroundFlag, theFlipFlag, 
+                          theAutoNewlineFlag) 
+    {
         var myXMirror = 1;
         if (theFlipFlag != undefined) {
             myXMirror = theFlipFlag ? -1:1;
@@ -115,7 +119,10 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                 } else {
                     // do some newline magic
                     thePathAlign.resetToStartPos();
-                    myLineOffset = sum(myLineOffset,product(thePathAlign.getNormalAtCurrentPosition(), myFontMetrics.height));
+                    myLineOffset = 
+                        sum(myLineOffset,
+                            product(thePathAlign.getNormalAtCurrentPosition(), 
+                                    myFontMetrics.height));
                     continue;
                 }
             }
@@ -125,14 +132,16 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             }
 
             // advance
-            myWidth = myCharacter.metric.advance;
+            myWidth = myCharacter.metric.advance;// HACK? - 0.25;
             //print("char=" + myCharacter.unicode + " advance=" + myWidth);
 
             // kerning
-            if (i < (_myText.length-1)) {
+            if (i > 0 && i < (_myText.length-1)) {
                 var myNextCharacter = _myCharacters[i+1];
                 if (myNextCharacter != null) {
-                    var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize), myCharacter.unicode, myNextCharacter.unicode);
+                    var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize), 
+                                                      myCharacter.unicode, 
+                                                      myNextCharacter.unicode);
                     if (myKerning != 0.0) {
                         //print("kern=" + myKerning, "char=" + myCharacter.unicode, "next=" + myNextCharacter.unicode, "advance="+myCharacter.metric.advance);
                     }
@@ -142,7 +151,6 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
 
             myWidth += theCharacterSoup.getTracking() / 64.0;
             //print("advance+kern=" + myWidth);
-
             /*
              * move 'advance+kern' on path but make characters 'advance' wide
              */
@@ -156,7 +164,15 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                 break;
             }
             var myForwardVector = difference(mySegment.end, mySegment.start);
-            myForwardVector = product(normalized(myForwardVector), myCharacter.metric.advance);
+            var padding = theCharacterSoup.getPadding();
+            var paddingVector = product(normalized(myForwardVector),padding);
+            var myAdvanceVector = product(normalized(myForwardVector), 
+                                          myCharacter.metric.advance);
+            var myMinVector = product(normalized(myForwardVector), 
+                                      myCharacter.metric.min.x);
+            var myMaxVector = product(normalized(myForwardVector), 
+                                      myCharacter.metric.max.x+1);
+
             var myLeftVector = normalized(cross(UP_VECTOR, myForwardVector));
 
             // align
@@ -164,14 +180,17 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             switch (_myAlignment) {
                 case TOP_ALIGNMENT:
                     myTop = (myFontMetrics.height - myFontMetrics.ascent);
-                    myBottom = -(myFontMetrics.ascent - myFontMetrics.descent) + myTop;
+                    myBottom = -(myFontMetrics.ascent - myFontMetrics.descent) 
+                               + myTop;
                     break;
                 case BOTTOM_ALIGNMENT:
                     myTop = myFontMetrics.ascent - myFontMetrics.descent;
                     myBottom = 0;
                     break;
                 case CENTER_ALIGNMENT:
-                    myTop = myAlphabetMap.cellsize * 0.5 - (myAlphabetMap.cellsize - myFontMetrics.height) * 0.5;
+                    myTop = myAlphabetMap.cellsize * 0.5 
+                            - (myAlphabetMap.cellsize - myFontMetrics.height) 
+                            * 0.5;
                     myBottom = -myTop;
                     break;
                 case BASELINE_ALIGNMENT:
@@ -179,18 +198,22 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     myBottom = myFontMetrics.descent;
                     break;
             }
-            //print("top=" + myTop, "bottom=" + myBottom, "sum=" + (myTop - myBottom));
-            var myTopOffset = product(myLeftVector, myXMirror*myTop);
-            var myBottomOffset = product(myLeftVector, myXMirror*myBottom);
+            var myTopOffset = product(myLeftVector, 
+                                      myXMirror * myTop + padding);
+            var myBottomOffset = product(myLeftVector, 
+                                         myXMirror * myBottom - padding);
 
-            var myStart = mySegment.start;
-            var myEnd = sum(myStart, myForwardVector);
+            var myStart = difference(sum(mySegment.start,myMinVector),
+                                     paddingVector);
+            var myEnd = sum(mySegment.start,sum(myMaxVector,paddingVector));
             var j = i * 4;
             var myPositions = [];
             myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myTopOffset), myLineOffset));
             myPositions.push(sum(sum(myStart, myTopOffset), myLineOffset));
+
+            //print(myPositions);
 
             if (myBuildGeometry) {
                 var myCharacter = _myCharacters[i];
