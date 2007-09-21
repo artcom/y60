@@ -354,6 +354,12 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 getDescendantByName(myRequires, 'texcoord').childNode("#text").nodeValue = 
                         prependFeature(mySwitchMat.requires.texcoord, "uv_map");
             }
+            //quickfix for missing occlusionmap after more then one switch, cleanup is on it's way [jb]
+            var my2dSampler = getDescendantByName(myNewTargetMat.childNode("properties"), 'occlusionTex');
+            if (!my2dSampler) {
+                var myNode = new Node("<sampler2d name='occlusionTex'>0</sampler2d>");
+                myNewTargetMat.childNode("properties").appendChild(myNode.firstChild);
+            }
         }
 
         //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
