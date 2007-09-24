@@ -44,7 +44,10 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     } else {
         _myGlyphPadding = theGlyphPadding;
     }
-
+    var _myParagraphTopOffset    = 0;
+    var _myParagraphBottomOffset = 0;
+    var _myLineHeight            = 0;
+    
     const CHARACTERS_PER_LINE = 16; // must be power-of-two
 
 
@@ -75,13 +78,9 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
         }
         return _myAlphabetMap[theSize];
     }
-
-
     self.setTracking = function(theTracking) {
         _myTracking = theTracking;
     }
-
-
     self.getTracking = function() {
         return _myTracking;
     }
@@ -90,7 +89,17 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     self.getPadding = function() {
         return _myGlyphPadding;
     }
-
+    
+    self.__defineGetter__('lineheight', function() { return _myLineHeight; } );    
+    self.__defineSetter__('lineheight', function(theLineHeight) { _myLineHeight = theLineHeight; } );    
+    
+    self.setParagraph = function(theTopOffset, theBottomOffset) {
+        _myParagraphTopOffset    = theTopOffset;
+        _myParagraphBottomOffset = theBottomOffset;        
+    }
+    self.getParagraph = function() {
+        return {topoffset:_myParagraphTopOffset, bottomoffset:_myParagraphBottomOffset};
+    }
 
     self.createText = function(theText, theSize) {
         self.createUnicodeText(theText, theSize);
@@ -186,7 +195,6 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                 }
 
                 //saveImage(myTmpImage,""+myChar +"_"+ theSize+"_blurred.png");
-
                 var myFontMetrics = _myAlphabetMap[theSize].fontmetrics;
 
                 //print("char=",myChar," glyphwidth=",myGlyphWidth,

@@ -88,7 +88,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         var myShapeBuilder = null;
         var myElement = null;
         var myUVCoordX = 0;
-
+        var myParagraphInfo = theCharacterSoup.getParagraph();
         if (!_myShape) {
             myBuildGeometry = true;
             myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
@@ -98,7 +98,11 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
 
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myFontMetrics = theCharacterSoup.getFontMetrics(theFontSize);
-        //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
+        //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent, "lineskip=" + myFontMetrics.lineskip);
+        var myLineHeight = theCharacterSoup.lineheight;
+        if (myLineHeight == 0 ) {
+            myLineHeight = myFontMetrics.lineskip;
+        }
 
         var myWidth = 0.0;
         // in case of newlines, we use this offset to move character according to path
@@ -119,10 +123,9 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                 } else {
                     // do some newline magic
                     thePathAlign.resetToStartPos();
-                    myLineOffset = 
-                        sum(myLineOffset,
-                            product(thePathAlign.getNormalAtCurrentPosition(), 
-                                    myFontMetrics.height));
+                    var myLineSkip = myLineHeight;
+                    myLineSkip += myParagraphInfo.topoffset + myParagraphInfo.bottomoffset;  
+                    myLineOffset = sum(myLineOffset,product(thePathAlign.getNormalAtCurrentPosition(), myLineSkip));
                     continue;
                 }
             }
