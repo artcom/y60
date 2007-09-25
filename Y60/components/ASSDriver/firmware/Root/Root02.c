@@ -29,7 +29,7 @@ uint8_t  g_RTB_Write_Pointer=0, g_RTB_Read_Pointer=0, g_RTB_Filled=0, g_PacketCo
 #define TBUFFER_SIZE MAX_MATRIX_WIDTH+TX_PACKET_SIZE+LENGTH_STATUS_MSG //should be large enough to hold all that
 uint8_t  g_rowTransmissionBuffer[TBUFFER_SIZE];
 
-uint8_t  g_SPICounter, g_currentRow, g_rowReceptionComplete=0;
+uint8_t  g_currentRow;
 
 uint16_t g_scanPeriod;
 uint16_t g_deltaTRow;
@@ -124,7 +124,7 @@ uint8_t i, i2;
 
 	//=== init SPI ====
 	DDRB |= _BV(PB2) | _BV(PB1) | _BV(PB0);              //MOSI, SCK, and #SS output (#SS must be configured as output pin!)
-	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA) | _BV(SPR0); //sample on falling edge, Speed: 1,8432MHz @ 14.745MHz
+    SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPHA) | _BV(SPR0); //sample on falling edge, Speed: 3,686MHz @ 14.745MHz
     SPSR = _BV(SPI2X);
 
     //init TWI
@@ -417,10 +417,6 @@ uint8_t v2;
 
 //=== main code ==============
 void SPIdummyRead(void){
-    //make sure that no interrupt driven SPI-communication is going on right now
-    if(g_SPICounter != 0)
-        return;
-
     //send byte
     SPDR = 0;
     //wait for transmission complete
@@ -428,36 +424,17 @@ void SPIdummyRead(void){
 }
 
 
-void triggerRowReadout(void){
-	//start first transmission (and reception at the same time)
-	g_SPICounter = 1;
-	SPCR |= _BV(SPIE); //enable interrupt
-	SPDR = 0;
-	//rest of process is performed by interrupt calls
-}
-
-
 void performReceiverTara(void){
 uint8_t i, ix;
+int8_t  si;
 
-//  This function will only be called when last line is active, so the stuff below is commented out
-//	//select last line
-//	activateFirstLine();
-//	for(i=1; i<g_matrixHeigth; i++){
-//		activateNextLine();
-//    }
 
-	//issue continuous clock pulses for 40ms to request calibration
-	for(i=0,g_mainTimer=0; i<40; ){ //40ms
-		SPIdummyRead();
-		if(g_mainTimer > 0){ // incremented every 1ms
-			g_mainTimer = 0;
-			i++;
-		}
-	}
+    //activate last line to always start sequence from same state
+    activateTransmitter(g_matrixHeigth);
 
-	//stop clock pulses for more than 1ms
-	for(i=0,g_mainTimer=0; i<2; ){ //2ms
+
+	//stop clock pulses for 250ms to indicate calibration request
+	for(i=0,g_mainTimer=0; i<250; ){ //250ms
 		if(g_mainTimer > 0){ // incremented every 1ms
 			g_mainTimer = 0;
 			i++;
@@ -467,24 +444,50 @@ uint8_t i, ix;
 
 	//scan once through all lines
 	g_readState = 0;
-	for(i=0; i<(g_matrixHeigth+1); ){ // +1: include additional average scan
+	for(si=-1; si<(g_matrixHeigth+1); ){ // +1: include additional average scan
 		if(g_readState == 1){
 			g_readState++;
-            activateTransmitter(i);
+            if(si >= 0){
+    			activateTransmitter(si);
+            }else{
+    			activateTransmitter(g_matrixHeigth);// one extra line as receivers ignore
+            }                                       // first line after calibration request
 
-			// read line
-			for(ix=0; ix<g_matrixWidth; ix++)
-				SPIdummyRead();
+			//read in current row
+	        ix = 0;
+            //temporarly turn off all interrupts except UART transmission
+            cli();
+            UCSR0B &= ~_BV(RXCIE0);
+            TIMSK &= ~_BV(OCIE1A);
+            //wait for reception complete
+asm (      "sbis 0x0E,7"  );//SPSR,SPIF
+asm (      "rjmp .-4"     );
+           	SPDR = 0;//transmit/receive first byte
+            do{
+                //wait for reception complete
+asm (          "sbis 0x0E,7"  );//SPSR,SPIF
+asm (          "rjmp .-4"     );
+            	SPDR = 0;//transmit/receive next byte
+                //briefly allow UART TX interrupts
+                sei();
+asm (          "nop"     );
+asm (          "nop"     );
+                cli();
+                ix++;
+            }while(ix < g_matrixWidth);
+            //turn all interrupts back on
+            UCSR0B |= _BV(RXCIE0);
+            TIMSK |= _BV(OCIE1A);
+            sei();
+    		//all bytes received
 
-			i++;
+			si++;
 		}
 	}
-    //wait until last row-read is completed (start of the row read after)
-    while(g_readState != 1);
 
 
-	//stop clock pulses for 80ms to terminate calibration
-	for(i=0,g_mainTimer=0; i<80; ){ //80ms
+	//stop clock pulses for 20ms to terminate calibration
+	for(i=0,g_mainTimer=0; i<20; ){ //20ms
 		if(g_mainTimer > 0){ // incremented every 1ms
 			g_mainTimer = 0;
 			i++;
@@ -503,23 +506,13 @@ uint8_t i, ix;
 void switchToAbsoluteMode(void){
 uint8_t i;
 
-	//issue continuous clock pulses for 10ms to request absolute mode
-	for(i=0,g_mainTimer=0; i<10; ){ //10ms
-		SPIdummyRead();
+	//stop clock pulses for 150ms to request absolute mode
+	for(i=0,g_mainTimer=0; i<150; ){ //150ms
 		if(g_mainTimer > 0){ // incremented every 1ms
 			g_mainTimer = 0;
 			i++;
 		}
 	}
-
-	//stop clock pulses for 80ms to terminate calibration
-	for(i=0,g_mainTimer=0; i<80; ){ //80ms
-		if(g_mainTimer > 0){ // incremented every 1ms
-			g_mainTimer = 0;
-			i++;
-		}
-	}
-
 
     g_mode = ABS_MODE;
 
@@ -528,7 +521,7 @@ uint8_t i;
 
 
 int main(void) {
-uint8_t  ix, next_row;
+uint8_t  ix, next_row, SPICounter, rowReceptionComplete;
 uint8_t  v0, v1, e;
 uint16_t autoCalTimer;
 uint16_t checksum;
@@ -542,7 +535,7 @@ uint8_t  testBuffer[20];
 
 
     init();
-    //wait until timer interrupt has been called
+    //make sure timer interrupt has been called at least twice
     g_mainTimer = 0;
     while(g_mainTimer < 2);
     uart0_init();
@@ -595,38 +588,41 @@ uint8_t  testBuffer[20];
 			activateTransmitter(next_row);
 
 			//read in current row (takes approx. 5us per byte // 100us for 20 cols, 200us for 40 cols, 250us for 50 cols //+ interrupt calls!!)
-	        g_SPICounter = 0;
+	        SPICounter = 0;
             //temporarly turn off all interrupts except UART transmission
             cli();
             UCSR0B &= ~_BV(RXCIE0);
             TIMSK &= ~_BV(OCIE1A);
+            //wait for reception complete
+asm (      "sbis 0x0E,7"  );//SPSR,SPIF
+asm (      "rjmp .-4"     );
            	SPDR = 0;//transmit/receive first byte
             do{
                 //wait for reception complete
-asm (          "sbis 0x0E,7"  );
+asm (          "sbis 0x0E,7"  );//SPSR,SPIF
 asm (          "rjmp .-4"     );
                 //store received byte
                 v1 = SPDR;
             	SPDR = 0;//transmit/receive next byte
                 //briefly allow UART TX interrupts
                 sei();
-                g_rowBuffer[g_SPICounter] = v1;
+                g_rowBuffer[SPICounter] = v1;
                 cli();
-                g_SPICounter++;
-            }while(g_SPICounter < g_matrixWidth);
+                SPICounter++;
+            }while(SPICounter < g_matrixWidth);
             //turn all interrupts back on
             UCSR0B |= _BV(RXCIE0);
             TIMSK |= _BV(OCIE1A);
             sei();
     		//all bytes received
-    		g_rowReceptionComplete = 1;
+    		rowReceptionComplete = 1;
 
 		}
 
 
 		//wait until new row is available
-		if(g_rowReceptionComplete){
-			g_rowReceptionComplete = 0;
+		if(rowReceptionComplete){
+			rowReceptionComplete = 0;
 
             if(g_maxMinLevelRequest == 2){
                 if(g_currentRow < g_matrixHeigth){
@@ -815,14 +811,12 @@ asm (          "rjmp .-4"     );
 
 
         if(g_TaraRequest == 1){
-            if(g_currentRow == g_matrixHeigth){//wait until current scan is complete
-                performReceiverTara();
-                //reset read cycle
-                g_currentRow = g_matrixHeigth; //by this next row will be row 0
-                g_readState = 0;
-                checksum = 0;
-                g_TaraRequest = 0;
-            }
+            performReceiverTara();
+            //reset read cycle
+            g_currentRow = g_matrixHeigth; //by this next row will be row 0
+            g_readState = 0;
+            checksum = 0;
+            g_TaraRequest = 0;
         }
 
         if(g_TaraRequest == 2){
