@@ -8,31 +8,24 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-/*control functions:
+/*
+control functions:
 calibration sequence:
-   1. turn on CLK signal w/o. interruption for 40ms to indicate calibration request
-   2. turn off CLK signal for 2ms
-   3. issue one scan cycle starting with line 0
-   4. turn off CLK signal for 80 ms --> calibrated
+   1. turn off CLK signal for 250ms to indicate calibration request
+   3. issue one scan cycle starting with line -1
+   4. turn off CLK signal for 20 ms --> calibrated
 
 turn on absolute mode:
-   Method 1
-   1. turn on CLK signal w/o. interruption for 10ms to switch to absolute mode
-   2. turn off CLK signal for 80 ms
-
-   Method 2
-   1. turn off CLK signal for 200 ms
+   1. turn off CLK signal for 150 ms
 
 turn on relative mode:
-   1. turn on CLK signal w/o. interruption for 20ms to switch to relative mode
-   2. turn off CLK signal for 80 ms
+   2. turn off CLK signal for 200 ms
 
 
 FUSE SETTINGS:
 - Brown-out detection level at VCC=2.7 V
 - Int. RC Osc. 8MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms
 all others off
-
 */
 
 
@@ -58,10 +51,8 @@ all others off
 #define ABS_MODE 1
 #define REL_MODE 2
 #define CAL_MODE 3
+#define RESET_REQUEST 4
 
-#define RESET_REQUEST 0
-#define IDLE_STATE    1
-#define ACTIVE        2
 
 
 //=== Macros ================================================================
@@ -72,17 +63,15 @@ all others off
 
 //=== Globals ================================================================
 
-uint8_t  g_USIactive = IDLE_STATE;
 uint8_t  g_USImark = 0;
-uint8_t  g_USImarkCounter = 0;
 uint8_t  g_nextModeRequest = 0;
 uint8_t  g_mode = ABS_MODE;
-uint8_t  g_USIbreakCounter = 0;
 uint8_t  g_requestCalibration = 0;
-uint8_t  g_sampleState = 0;
+uint8_t  g_triggerSample = 0;
 uint8_t  g_readOutState = 0;
 uint8_t  g_ADCvalueAvailable = 0;
 uint8_t  g_ADC_Calibrated = 0;
+uint8_t  g_inhibitModeChange = 1;
 
 uint16_t g_ADCOffset[MAX_LINES];
 int16_t  g_ADCOffsetFollow[MAX_LINES];
@@ -121,7 +110,8 @@ void init(void) {
 
 
 	//=== prepare timer1
-	OCR1A = 40;        //40us time out (pre-scaler=8 --> 1us base) 
+	TCCR1 = 0; //stop timer1 for now
+	OCR1A = 175; //350us time out (pre-scaler=16 --> 0.5us base) 
     TIMSK |= _BV(OCIE1A); //enable output compare match interrupt
 
 
@@ -151,9 +141,11 @@ uint8_t i;
     g_requestCalibration = 0;
     g_NumberOfLines = 0;
     g_lineCounter = 0;
-    g_sampleState = 0;
+    g_triggerSample = 0;
 
+    g_nextModeRequest = 0;
     g_mode = ABS_MODE;
+    g_inhibitModeChange = 1;
 
 //  //check if calibration values are available in EEPROM
 //  i = EEPROM_read(0);
@@ -176,42 +168,40 @@ uint8_t i;
 
 /* USI overflow interrupt */
 ISR( USI_OVF_vect ) {
-	//clear USIOIF flag
+	//turn off USI-interrupt and clear USIOIF flag
+   	USICR &= ~_BV(USIOIE);
 	USISR |= _BV(USIOIF);
 
-	//clear timer counter 1
-	//turn on timer 1
-	TCNT1 = 0; //ISR will be called when counter reaches 40 --> 40us time out
-    TCCR1 = 4; //prescaler=8 -> 1us base
+	//clear timer 1 and let it run
+	TCNT1 = 0; //ISR will be called when counter reaches 175 --> 350us time out
+    TCCR1 = 5; //prescaler=16 -> 0.5us base
 
-    g_USIactive = ACTIVE; //will be set to RESET_REQUEST after 200ms of no USI activity
-    g_USImark = 1;
+    g_USImark = 2;
 }
 
 
 /* timer1 interrupt */
+//is called 350 us after first clocked through byte
 ISR( TIM1_COMPA_vect ) {
-	//is called when a gap on SCLK is detected (OCR1A is set to 40, which corresponds to 40us of no received byte)
 	//stop timer1
 	TCCR1 = 0;
 
-    g_sampleState = 2; //trigger sampling
-
 	//reset USI-counter (this ensures that next transfer starts with bit 0)
 	USISR &= 240; //=0b11110000  -->clear USI-counter
+    //turn USI interrupt back on
+   	USICR |= _BV(USIOIE);
 
-    //check if mode request is pending (by having sent in continuous clock pulses for several ms...)
-    if(g_nextModeRequest > 0){
-        if(g_mode != g_nextModeRequest){
+    if(g_nextModeRequest == 0){
+        g_triggerSample = 1; //trigger sampling if no modeRequest is pending
+    }else{
+        if(g_mode != g_nextModeRequest){ //new mode differs from current mode
             g_mode = g_nextModeRequest;
             if(g_mode == CAL_MODE){
                 g_requestCalibration = 1;
             }
         }
-    g_nextModeRequest = 0;
+        g_nextModeRequest = 0;
     }
-
-    g_USImark = 0;
 }
 
 
@@ -219,44 +209,31 @@ ISR( TIM1_COMPA_vect ) {
 
 // timer0 interrupt: main timer interrupt (1ms/1000 Hz)
 ISR( TIM0_COMPA_vect ) {
+static uint8_t  USIbreakCounter = 0, USIbreakSubCounter = 0;
+static uint8_t  USImarkCounter = 0;
 
-	if(g_USImark == 1){
-        g_USIbreakCounter = 0;
-        if(g_USImarkCounter != 255){
-            g_USImarkCounter++;
-        }
+    //clear USImark after more than 1ms of no clock signal
+    if(g_USImark > 0){
+        g_USImark--;
+    }
 
-        switch(g_USImarkCounter){
-            case   7:   //10ms-10%
-                g_nextModeRequest = ABS_MODE;
-                break;
-            case  15:   //20ms-10%
-                g_nextModeRequest = REL_MODE;
-                break;
-            case  32:   //40ms-10%
-                g_nextModeRequest = CAL_MODE;
-                break;
-            case  60:   //80ms-10%
-                g_nextModeRequest = g_mode;//keep current mode
-                break;
-            default:
-                ;
-        }
-	}
 
 	if(g_USImark == 0){
-        g_USImarkCounter = 0;
-        if(g_USIbreakCounter < 255){
-            g_USIbreakCounter++;
-        }
-
-        switch(g_USIbreakCounter){
-            case   65:   //80ms-10%
-                if(g_mode == CAL_MODE){
-        			g_ADC_Calibrated = 1;
-    	    		g_requestCalibration = 0;
-    		    	g_lineCounter = 0; //after calibration read out sequence starts with line 0
-                    g_mode = REL_MODE;
+        USImarkCounter = 0;
+        USIbreakSubCounter++;
+        if(USIbreakSubCounter >= 10){
+            USIbreakSubCounter = 0;
+            //10ms base
+            if(USIbreakCounter < 255){
+                USIbreakCounter++;
+            }
+            switch(USIbreakCounter){
+                case  1:  //20ms-10%
+                    if(g_mode == CAL_MODE){//finish calibration
+                        g_ADC_Calibrated = 1;
+                        g_requestCalibration = 0;
+                        g_lineCounter = 0; //after calibration read out sequence starts with line 0
+                        g_mode = REL_MODE;
 //                      // start storage of new calibration values in EEPROM
 //                      g_EEPROMState = 1;
 //                      // wait for completion of previous write (actually there should be no write going on!)
@@ -267,13 +244,37 @@ ISR( TIM0_COMPA_vect ) {
 //                      EEDR = g_NumberOfLines; //ucData
 //                      asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE
 //                      asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE
-                }
-                break;
-            case   170:   //200ms-10%
-                g_USIactive = RESET_REQUEST;
-                break;
-            default:
-                ;
+                    }
+                    break;
+                case  13:  //150ms-10%
+                    g_nextModeRequest = ABS_MODE;
+                    break;
+                case  18:  //200ms-10%
+                    g_nextModeRequest = REL_MODE;
+                    break;
+                case  23:  //250ms-10%
+                    g_nextModeRequest = CAL_MODE;
+                    break;
+                case  27:  //300ms-10%
+                    g_nextModeRequest = RESET_REQUEST;
+                    break;
+                case  33:  //360ms-10%
+                    resetBuffersAndVariables();
+                    break;
+                default:
+                    ;
+            }
+        }
+	}
+
+    if(g_USImark > 0){
+        USIbreakCounter = 0;
+        USIbreakSubCounter = 0;
+        if(USImarkCounter < 255){
+            USImarkCounter++;
+        }
+        if(USImarkCounter == 10){//after 10 ms
+            g_inhibitModeChange = 0;
         }
 	}
 }
@@ -296,14 +297,16 @@ uint16_t ADCsum, ADCreadOut, j;
 uint8_t  ADCvalueABS;
 uint8_t  ADCvalueREL;
 
+uint8_t  secondCal = 0;
 
     init();
 
+    g_triggerSample = 0;
 
 	//main loop
 	while(1){
 		//check if new sample is requested
-		if(g_sampleState == 2){
+		if(g_triggerSample == 1){
 			//start conversion (average 4 samples)
 			//make sure no conversion is going on
 			while((ADCSRA&_BV(ADSC)) != 0){;}
@@ -374,19 +377,18 @@ uint8_t  ADCvalueREL;
 
 			ADCvalueREL = j; //8 bit value
 
-            g_sampleState = 3;
-		}
 
-
-
-		if(g_sampleState == 3){//process new sample
 			//calibration stuff
 			if(g_requestCalibration > 0){
 				switch(g_requestCalibration){
 				case 1:
 					g_NumberOfLines = 0;
 					g_requestCalibration = 2;
+                    secondCal = 4;                            //XX
 				case 2:
+                    if(ADCreadOut > (1023-ZERO_VALUE)){
+                        ADCreadOut = 1023-ZERO_VALUE;
+                    }
                     j = ADCreadOut + ZERO_VALUE;
 					g_ADCOffset[g_NumberOfLines] = j;
                     g_ADCOffsetFollow[g_NumberOfLines] = 0;
@@ -398,7 +400,7 @@ uint8_t  ADCvalueREL;
 				default:
 					;
 				}
-				g_sampleState = 4; //wait for gap in USI-SCK
+				g_triggerSample = 0; //wait for next sampling
 			}else{
 				//transmit currrent value
                 if(g_mode == REL_MODE){
@@ -407,24 +409,32 @@ uint8_t  ADCvalueREL;
     				USIDR = ADCvalueABS;
                 }
 
+                //do second calibration                      //XX
+                if(secondCal != 0){                          //XX
+                    if(secondCal == 1){                      //XX
+                        if(ADCreadOut > (1023-ZERO_VALUE)){  //XX
+                            ADCreadOut = 1023-ZERO_VALUE;    //XX
+                        }                                    //XX
+                        j = ADCreadOut + ZERO_VALUE;         //XX
+	    				g_ADCOffset[g_lineCounter] = j;      //XX
+                    }                                        //XX
+                    if(g_lineCounter == g_NumberOfLines-1){  //XX
+                        secondCal--;                         //XX
+                    }                                        //XX
+                }                                            //XX
+
 				//change to next line
 				g_lineCounter++;
 				if(g_lineCounter >= g_NumberOfLines){
 					g_lineCounter = 0;
 				}
-				g_sampleState = 4; //wait for gap in USI-SCK
+				g_triggerSample = 0; //wait for next sampling
 			}
 		}
 
-		if(g_sampleState == 4){//process new sample
-            if(g_USImark == 0){
-				g_sampleState = 0; //await next sample
-            }
-        }
 
-        if(g_USIactive == RESET_REQUEST){
+        if(g_mode == RESET_REQUEST){
             resetBuffersAndVariables();
-            g_USIactive = IDLE_STATE;
         }
 	}
 
@@ -492,4 +502,3 @@ uint8_t jk;
         EECR &= ~_BV(EERIE);
     }
 }
-
