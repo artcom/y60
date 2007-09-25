@@ -172,6 +172,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
     } else {
         AC_WARNING << "No scene. Allocating loose rasters.";
         RasterHandle myHandle(createRasterValue(y60::GRAY, _myPoTSize[0], _myPoTSize[1]));
+        myHandle.raster->clear();
         return myHandle;
                 
     }
