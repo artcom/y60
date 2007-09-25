@@ -48,7 +48,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     var _myParagraphBottomOffset = 0;
     var _myLineHeight            = 0;
     
-    const CHARACTERS_PER_LINE = 16; // must be power-of-two
+    const CHARACTERS_PER_LINE = 32; // must be power-of-two
 
 
 

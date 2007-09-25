@@ -107,6 +107,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         var myWidth = 0.0;
         // in case of newlines, we use this offset to move character according to path
         var myLineOffset = new Vector3f(0,0,0);
+        var myNewLineFlag = false;
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
@@ -126,6 +127,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     var myLineSkip = myLineHeight;
                     myLineSkip += myParagraphInfo.topoffset + myParagraphInfo.bottomoffset;  
                     myLineOffset = sum(myLineOffset,product(thePathAlign.getNormalAtCurrentPosition(), myLineSkip));
+                    myNewLineFlag = true;
                     continue;
                 }
             }
@@ -173,6 +175,10 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                                           myCharacter.metric.advance);
             var myMinVector = product(normalized(myForwardVector), 
                                       myCharacter.metric.min.x);
+            // do not use min of glyüh in case of character is first in line
+            if (myNewLineFlag) {
+                myMinVector = new Vector3f(0,0,0);
+            }
             var myMaxVector = product(normalized(myForwardVector), 
                                       myCharacter.metric.max.x+1);
 
@@ -211,12 +217,11 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             var myEnd = sum(mySegment.start,sum(myMaxVector,paddingVector));
             var j = i * 4;
             var myPositions = [];
+
             myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myTopOffset), myLineOffset));
             myPositions.push(sum(sum(myStart, myTopOffset), myLineOffset));
-
-            //print(myPositions);
 
             if (myBuildGeometry) {
                 var myCharacter = _myCharacters[i];
@@ -239,7 +244,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                 myShapeVertexPositions[j + 2] = myPositions[2];
                 myShapeVertexPositions[j + 3] = myPositions[3];
             }
-
+            myNewLineFlag = false;
         }
         if (myBuildGeometry) {
             var myName = "Text_";// + urlEncode(_myText);
