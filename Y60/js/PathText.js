@@ -107,7 +107,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         var myWidth = 0.0;
         // in case of newlines, we use this offset to move character according to path
         var myLineOffset = new Vector3f(0,0,0);
-        var myNewLineFlag = false;
+        var myNewLineFlag = true;
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
