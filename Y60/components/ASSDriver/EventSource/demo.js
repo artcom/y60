@@ -108,8 +108,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         //window.canvas.backgroundcolor = [1,1,1,1];
 
-        loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
-        loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
+        // XXX loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
+        // XXX loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
         
         //_myButtonGroupNode = buildGroupNode("ButtonGroup", _myDummyAppContainer);
         _myButtonGroupNode = Modelling.createTransform( _myDummyAppContainer);
@@ -120,13 +120,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myButtonGroupNode.position.x += 5.5; 
 
         //_myASSManager.textColor = [0,0,0,1];
-        /*
         buildKeyboard();
         buildDisplay();
         buildSubmitButton();
         buildBackspace();
         buildSpacebar();
-        */
+        
 
         if (LATENCY_TEST) {
             ourLatencyTestPort = new SerialDevice(0);
@@ -437,8 +436,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
 if (__main__ == "ASSDriverTest") {
     try {
-        var ourASSDriverTestApp = new ASSDriverTestApp(
-            [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+        var ourASSDriverTestApp = new ASSDriverTestApp(arguments);
         //ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
         ourASSDriverTestApp.setup(1400, 1050, "ASSDriverTest");
         ourASSDriverTestApp.go();
