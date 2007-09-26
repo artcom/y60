@@ -12,7 +12,7 @@ if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
 use("ASSManager.js");
-//use("KeyButton.js");
+use("KeyButton.js");
 use("BuildUtils.js");
 use("SoundController.js");
 
@@ -108,8 +108,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         //window.canvas.backgroundcolor = [1,1,1,1];
 
-        // XXX loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
-        // XXX loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
+        loadFont(FONT_NAME + "_" + FONT_SIZE, FONT_FILE, FONT_SIZE);
+        loadFont(FONT_NAME + "_" + SUBMIT_FONT_SIZE, FONT_FILE, SUBMIT_FONT_SIZE);
         
         //_myButtonGroupNode = buildGroupNode("ButtonGroup", _myDummyAppContainer);
         _myButtonGroupNode = Modelling.createTransform( _myDummyAppContainer);
