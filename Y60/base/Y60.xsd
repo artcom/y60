@@ -881,11 +881,6 @@ It contains descriptions for the scenegraph (worlds), render areas (canvases), m
 lightsources, animations, shapes and images</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:attribute name="revision" type="xs:int">
-                <xs:annotation>
-                    <xs:documentation>Locale SVN revision number of the exporting system's 'pro60' repository.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
             <xs:sequence>
                 <xs:element ref="worlds">
                     <xs:annotation>
@@ -928,6 +923,11 @@ lightsources, animations, shapes and images</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
+            <xs:attribute name="revision" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Locale SVN revision number of the exporting system's 'pro60' repository.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
     <xs:element name="worlds">
@@ -1034,6 +1034,18 @@ Multiple canvases can be used for multi-view rendering of a scene, as it is used
 A canvas can be used as texture for a material in the future.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="viewport">
+                    <xs:annotation>
+                        <xs:documentation>Defines a view into the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="box2f">
+                    <xs:annotation>
+                        <xs:documentation>Defines a rectangular part of the screen. Can be used for scissor tests</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique id for this canvas.
@@ -1066,18 +1078,6 @@ solution might be to use a scaling image matrix of [1,-1,1].
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="viewport">
-                    <xs:annotation>
-                        <xs:documentation>Defines a view into the scene</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element ref="box2f">
-                    <xs:annotation>
-                        <xs:documentation>Defines a rectangular part of the screen. Can be used for scissor tests</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="viewport">
@@ -1089,6 +1089,18 @@ A canvas can have multiple viewport.
 A possible application is edge blending, where you render the same scene into two overlapping viewports.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="underlays">
+                    <xs:annotation>
+                        <xs:documentation>Contains overlay elements, that are rendered below the reset of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="overlays">
+                    <xs:annotation>
+                        <xs:documentation>Contains overlay elements, that are rendered on top of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique id for this viewport.
@@ -1187,18 +1199,6 @@ Debug culling is disabled by default.</xs:documentation>
 aspect of the viewport changes.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="underlays">
-                    <xs:annotation>
-                        <xs:documentation>Contains overlay elements, that are rendered below the reset of the scene</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element ref="overlays">
-                    <xs:annotation>
-                        <xs:documentation>Contains overlay elements, that are rendered on top of the scene</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="box2f">
@@ -1334,6 +1334,13 @@ Each character can do two things: 'walk' and 'sitdown' (clips)
 Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to', etc. (animations)</xs:documentation>
         </xs:annotation>
         <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="clip">
+                    <xs:annotation>
+                        <xs:documentation>A bundle of animation belonging to one clip</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique id for this character.
@@ -1345,13 +1352,6 @@ Usually 'ch' plus a number, such as 'ch0'.</xs:documentation>
                     <xs:documentation>A human readable name for the character.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="clip">
-                    <xs:annotation>
-                        <xs:documentation>A bundle of animation belonging to one clip</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="clip">
@@ -1365,6 +1365,13 @@ Each character can do two things: 'walk' and 'sitdown' (clips)
 Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to', etc. (animations)</xs:documentation>
         </xs:annotation>
         <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="animation">
+                    <xs:annotation>
+                        <xs:documentation>Defines the change of an attibute in the scenegraph over time.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique id for this clip.
@@ -1376,13 +1383,6 @@ Usually 'cl' plus a number, such as 'cl0'.</xs:documentation>
                     <xs:documentation>A human readable name for the clip.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="animation">
-                    <xs:annotation>
-                        <xs:documentation>Defines the change of an attibute in the scenegraph over time.</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="shapes">
@@ -1833,11 +1833,6 @@ Properties are searched within a 'property' node under the node specified by the
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="direction" type="xs:string">
-              <xs:simpleType>
-                <xs:restriction base="xs:string">
-                    <xs:pattern value="forward|reverse|pong"/>
-                </xs:restriction>
-              </xs:simpleType>
               <xs:annotation>
                 <xs:documentation>The direction of the animation.
 Allowed values are:
@@ -1845,6 +1840,11 @@ Allowed values are:
 'reverse'  - Play backward
 'pong'     - Play forward, then backward, than forward, ...</xs:documentation>
               </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="forward|reverse|pong"/>
+                </xs:restriction>
+              </xs:simpleType>
             </xs:attribute>
         </xs:complexType>
     </xs:element>
@@ -2779,102 +2779,92 @@ Possible values are:
         </xs:complexType>
     </xs:element>
 
-
-
-    <xs:element name="binary">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:element type="xs:CDATA"/>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-
+    <xs:element name="binary" type="xs:string"/>
 
     <xs:element name="movie" substitutionGroup="ImageBase">
         <xs:annotation>
             <xs:documentation>Contains attributes and run length encoded pixel-data of a movie-frame</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-
             <xs:complexContent>
                 <xs:extension base="imageType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element ref="binary">
                         </xs:element>
                     </xs:sequence>
-               </xs:extension>
-            </xs:complexContent>
-
-            <xs:attribute name="currentframe" type="xs:int">
-                <xs:annotation>
-                    <xs:documentation>The current frame of the movie</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="framecount" type="xs:int">
-                <xs:annotation>
-                    <xs:documentation>The total framecount of the movie
+                    
+                    <xs:attribute name="currentframe" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation>The current frame of the movie</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="framecount" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation>The total framecount of the movie
 MPEG1 and MPEG2 Movies return -1 as framecount since the number of frames is impossible to determine.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="fps" type="xs:double">
-                <xs:annotation>
-                    <xs:documentation>Frame rate the movie was encoded with.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="playspeed" type="xs:float">
-                <xs:annotation>
-                    <xs:documentation>Sets the playspeed of the movie,
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="fps" type="xs:double">
+                        <xs:annotation>
+                            <xs:documentation>Frame rate the movie was encoded with.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="playspeed" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Sets the playspeed of the movie,
 use values greater one for fast forward and less than minus one for fast reverse.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="cachesize" type="xs:int">
-                <xs:annotation>
-                    <xs:documentation>Number of video frames cached by the movie decoder, during playback.
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="cachesize" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation>Number of video frames cached by the movie decoder, during playback.
 For your information only.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="playmode" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>Sets the playmode of the movie.
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="playmode" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Sets the playmode of the movie.
 
 Possible values are:
 'nodisk'   - No disk inserted or no movie found.
 'play'     - Playing
 'pause'    - Paused. Play will continue at the current time/frame
 'stop'     - Stopped. Play will start at beginnig of the movie, black frame is shown</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="volume" type="xs:float">
-                <xs:annotation>
-                    <xs:documentation>Volume of audio-playback. Default is 1.0</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="avdelay" type="xs:double">
-                <xs:annotation>
-                    <xs:documentation>Number of seconds the audio-track is played after the video-track.
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="volume" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Volume of audio-playback. Default is 1.0</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="avdelay" type="xs:double">
+                        <xs:annotation>
+                            <xs:documentation>Number of seconds the audio-track is played after the video-track.
 Default is zero for ffmpeg and 0.3 for wmv decoding.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="audio" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>Flag to playback movies with audio-track without audio-decoding.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="loopcount" type="xs:unsignedInt">
-                <xs:annotation>
-                    <xs:documentation>Number of loops the movie will play. If set to zero, the movie will run forever</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="decoderhint" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>Use this decoder if available. Otherwise any matching decoder will be used.
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="audio" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation>Flag to playback movies with audio-track without audio-decoding.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="loopcount" type="xs:unsignedInt">
+                        <xs:annotation>
+                            <xs:documentation>Number of loops the movie will play. If set to zero, the movie will run forever</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="decoderhint" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Use this decoder if available. Otherwise any matching decoder will be used.
 Among possible values are:
 'y60FFMpegDecoder'
 'y60QuicktimeDecoder'
 'y60WMVDecoder'
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="capture" substitutionGroup="ImageBase">
@@ -2883,33 +2873,35 @@ Among possible values are:
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="imageType"/>
-            </xs:complexContent>
-            <xs:attribute name="fps" type="xs:double">
-                <xs:annotation>
-                    <xs:documentation>Frame rate the device does deliver.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="playmode" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>Sets the playmode of the device.
+                <xs:extension base="imageType">
+                    <xs:attribute name="fps" type="xs:double">
+                        <xs:annotation>
+                            <xs:documentation>Frame rate the device does deliver.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="playmode" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Sets the playmode of the device.
 
 Possible values are:
 'nodisk'   - No device found.
 'play'     - Playing
 'pause'    - Paused. This is the mostly the same as stopped.
 'stop'     - Stopped. Play will start at beginnig of the movie, black frame is shown</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="device" type="xs:unsignedInt">
-                <xs:annotation>
-                    <xs:documentation>Device ID to capture from. Default is 0 (the first one available).</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:annotation>
-                <xs:documentation>Norm to capture in. Usually PAL. Ignored for non-capable devices.</xs:documentation>
-            </xs:annotation>
-            <xs:attribute name="norm" type="xs:string"/>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="device" type="xs:unsignedInt">
+                        <xs:annotation>
+                            <xs:documentation>Device ID to capture from. Default is 0 (the first one available).</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="norm" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Norm to capture in. Usually PAL. Ignored for non-capable devices.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="SceneGraphNode" type="SceneGraphNodeType" abstract="true">
@@ -3010,17 +3002,21 @@ Child nodes will still be optimized tho.</xs:documentation>
             <xs:annotation>
                 <xs:documentation>Sets up the node as billboard. Use 'axis' or 'point' strings for axis-/point-billboards</xs:documentation>
             </xs:annotation>
-            <xs:restriction base="xs:string">
-                <xs:pattern value="axis|point"/>
-            </xs:restriction>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="axis|point"/>
+                </xs:restriction>
+            </xs:simpleType>
         </xs:attribute>
         <xs:attribute name="sensor" type="xs:string">
             <xs:annotation>
                 <xs:documentation>Sensor nodes can be used to detect, if someone touches it.</xs:documentation>
             </xs:annotation>
-            <xs:restriction base="xs:string">
-                <xs:pattern value="approximation"/>
-            </xs:restriction>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="approximation"/>
+                </xs:restriction>
+            </xs:simpleType>
         </xs:attribute>
         <xs:attribute name="sensorradius" type="xs:float">
             <xs:annotation>
@@ -3157,13 +3153,13 @@ Attributes of the node, such as scale, position and orientation are inherited by
                             </xs:annotation>
                         </xs:element>
                     </xs:sequence>
+                    <xs:attribute name="src" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>source file name.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                 </xs:extension>
             </xs:complexContent>
-            <xs:attribute name="src" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>source file name.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
         </xs:complexType>
     </xs:element>
     <xs:element name="lod" substitutionGroup="SceneGraphNode">
