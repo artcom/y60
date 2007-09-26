@@ -2,14 +2,17 @@
 #ifndef _TUTTLE_DEBUGGER_H_
 #define _TUTTLE_DEBUGGER_H_
 
-#include <vector>
+#include <queue>
 
 #include <js/jsapi.h>
 
-#include "TuttleApplication.h"
-#include "TuttleMessage.h"
+#include <asl/ThreadLock.h>
+#include <asl/ThreadSemaphore.h>
 
 namespace tuttle {
+
+    class Application;
+    class Command;
 
     class Debugger {
     public:
@@ -19,7 +22,13 @@ namespace tuttle {
         JSContext *getJavascriptContext();
         JSObject  *getJavascriptGlobal();
 
-        void handleRequests();
+        void executeCommands ();
+	
+        void execute(Command *theCommand);
+
+        void queuePush(Command *theCommand);
+        bool queueEmpty();
+        Command *queuePop();
 
     private:
         Application        &_myApplication;
@@ -27,6 +36,12 @@ namespace tuttle {
         JSRuntime          *_myRuntime;
         JSContext          *_myContext;
         JSObject           *_myGlobal;
+	
+	std::queue<Command *> _myQueue;
+        asl::ThreadLock       _myQueueLock;
+
+        asl::ThreadSemaphore  _myRequestSemaphore;
+        asl::ThreadSemaphore  _myResultSemaphore;
     };
 
 }

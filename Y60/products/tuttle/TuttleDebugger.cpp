@@ -6,6 +6,7 @@
 
 #include "TuttleApplication.h"
 #include "TuttleDebugger.h"
+#include "TuttleCommand.h"
 
 
 namespace tuttle {
@@ -117,8 +118,44 @@ namespace tuttle {
         }
     }
 
-    void Debugger::handleRequests() {
-        
+    void Debugger::executeCommands() {
+        JSTrapStatus myDummy;
+        bool myWait = false;
+	while(myWait || !queueEmpty()) {
+	    Command *myCommand = queuePop();
+	    myWait = myCommand->execute(&myDummy);
+            _myResultSemaphore.post();
+	}
+    }    
+
+    bool Debugger::queueEmpty() {
+        bool myEmpty;
+        _myQueueLock.lock();
+        myEmpty = _myQueue.empty();
+        _myQueueLock.unlock();
+        return myEmpty;
+    }
+
+    Command *Debugger::queuePop() {
+        Command *myCommand;
+        _myRequestSemaphore.wait();
+        _myQueueLock.lock();
+        myCommand = _myQueue.front();
+        _myQueue.pop();
+        _myQueueLock.unlock();
+        return myCommand;
+    }
+
+    void Debugger::queuePush(Command *theCommand) {
+        _myQueueLock.lock();
+        _myQueue.push(theCommand);
+        _myQueueLock.unlock();
+        _myRequestSemaphore.post();
+    }
+
+    void Debugger::execute(Command *theCommand) {
+        queuePush(theCommand);
+        _myResultSemaphore.wait();
     }
 
 }

@@ -7,11 +7,13 @@
 
 #include <clish/shell.h>
 
-#include "TuttleShell.h"
+#include <js/jsdbgapi.h>
 
 namespace tuttle {
 
-    typedef bool_t
+    class Shell;
+
+    typedef bool
         Builtin(Shell               *theShell,
                 const clish_shell_t *theClish,
                 const lub_argv_t    *theArguments,
@@ -34,26 +36,9 @@ namespace tuttle {
         const clish_shell_t *_myClish;
         const lub_argv_t    *_myArguments;
 
-        bool_t               _mySuccess;
+        bool                 _mySuccess;
     };
 
-
-    Command::Command(Builtin  theBuiltin,
-                     Shell   *theShell,
-                     const clish_shell_t *theClish,
-                     const lub_argv_t *theArguments)
-        : _myBuiltin(theBuiltin), _myShell(theShell), _myClish(theClish), _myArguments(theArguments) {
-    }
-    
-    bool
-    Command::execute(JSTrapStatus *theTrapStatus) {
-        *theTrapStatus = JSTRAP_CONTINUE;
-        _mySuccess = _myBuiltin(_myShell, _myClish, _myArguments, theTrapStatus);
-    }
-
 }
-
-
-
 
 #endif /* !_TUTTLE_COMMAND_H_ */

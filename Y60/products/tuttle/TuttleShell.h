@@ -8,9 +8,10 @@
 
 #include <js/jscntxt.h>
 
-#include "TuttleDebugger.h"
-
 namespace tuttle {
+
+    class Command;
+    class Debugger;
 
     class Shell {
     public:
@@ -18,9 +19,14 @@ namespace tuttle {
 
         bool_t launch(void);
         bool_t shutdown(void);
+	
+	void execute(Command *theCommand);
 
-#define CLISH_BUILTIN(name, symbol)                                    \
-        bool_t command##symbol (const clish_shell_t *theClish, const lub_argv_t *theArguments);
+#define CLISH_BUILTIN(name, symbol)                               \
+        bool command##symbol (Shell               *theShell,      \
+                              const clish_shell_t *theClish,      \
+                              const lub_argv_t    *theArguments,  \
+                              JSTrapStatus        *theTrapStatus);
 
 #include "TuttleShell.def"
 

@@ -4,6 +4,8 @@
 
 #include <clish/shell.h>
 
+#include "TuttleDebugger.h"
+#include "TuttleCommand.h"
 #include "TuttleShell.h"
 
 namespace tuttle {
@@ -11,19 +13,22 @@ namespace tuttle {
     using namespace std;
 
     // clish command wrappers
-#define CLISH_BUILTIN(name,symbol)                                                   \
-    static bool_t tuttle_clish_builtin_##symbol(const clish_shell_t *theClish,       \
-                                                const lub_argv_t    *theArguments) { \
-        void   *myCookie = clish_shell__get_client_cookie(theClish);                 \
-        Shell  *myShell = reinterpret_cast<Shell*>(myCookie);                        \
-        return myShell->command##symbol(theClish, theArguments);                     \
-    }                                                                                \
-    static bool_t tuttle_clish_bouncer_##symbol(const clish_shell_t *theClish,       \
-                                                const lub_argv_t *theArguments) {    \
-        cout << "BOUNCER: " << #name << endl;                                        \
-        return BOOL_TRUE; \
+#define CLISH_BUILTIN(name,symbol)                                                         \
+    static bool tuttle_clish_builtin_##symbol(Shell *theShell,                             \
+                                                const clish_shell_t *theClish,             \
+                                                const lub_argv_t    *theArguments,         \
+						JSTrapStatus *theTrapStatus) {             \
+        return theShell->command##symbol(theShell, theClish, theArguments, theTrapStatus); \
+    }                                                                                      \
+    static bool_t tuttle_clish_bouncer_##symbol(const clish_shell_t *theClish,             \
+                                                const lub_argv_t *theArguments) {          \
+        void    *myCookie = clish_shell__get_client_cookie(theClish);                      \
+        Shell   *myShell = reinterpret_cast<Shell*>(myCookie);                             \
+        Command *myCommand =                                                               \
+            new Command(tuttle_clish_builtin_##symbol, myShell, theClish, theArguments);   \
+        myShell->execute(myCommand);                                                       \
+        return BOOL_TRUE;                                                                  \
     }
-
 
 #include "TuttleShell.def"
 
@@ -85,6 +90,10 @@ namespace tuttle {
         
         return mySuccess ? BOOL_FALSE : BOOL_TRUE;
     }
+    
+    void Shell::execute(Command *theCommand) {
+        _myDebugger.execute(theCommand);
+    }
 
     // XXX: get rid of this
     static JSBool
@@ -107,7 +116,7 @@ namespace tuttle {
 
 
 #define CLISH_BUILTIN(symbol) \
-    bool_t Shell::command##symbol(const clish_shell_t *theClish, const lub_argv_t *theArguments)
+    bool Shell::command##symbol(Shell *theShell, const clish_shell_t *theClish, const lub_argv_t *theArguments, JSTrapStatus *theTrapStatus)
 
     CLISH_BUILTIN(Print) {
         assert(lub_argv__get_count(theArguments) == 1);
@@ -127,8 +136,7 @@ namespace tuttle {
                 return BOOL_FALSE;
         }
         
-        return BOOL_TRUE;
-
+        return true;
     }
 
     CLISH_BUILTIN(Load) {
@@ -152,11 +160,11 @@ namespace tuttle {
 
         JS_DestroyScript(myContext, myScript);
         
-        return BOOL_TRUE;
+        return true;
     }
 
     CLISH_BUILTIN(ListScripts) {
-        return BOOL_TRUE;
+        return true;
     }
 
     CLISH_BUILTIN(Trace) {
@@ -169,14 +177,16 @@ namespace tuttle {
             _myContext->tracefp = NULL;
         }
         
-        return BOOL_TRUE;
+        return true;
     }
 
     CLISH_BUILTIN(Quit) {
 
         clish_shell_close(const_cast<clish_shell_t*>(theClish));
 
-        return BOOL_TRUE;
+        theShell->shutdown();
+
+        return true;
     }
 
 #undef CLISH_BUILTIN
