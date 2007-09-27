@@ -12,11 +12,30 @@
     use("Exception.js");
     use("SceneViewer.js");
 
+    var myArgs = parseArguments(arguments, { "multisamples" : "%s",
+                                             "m"            : "%s" }); 
+    var myMultisampling = 8;
+    if ("multisamples" in myArgs.options) {
+        myMultisampling = Number(myArgs.options.multisamples); 
+    }
+    
+    if ("m" in myArgs.options) {
+        myMultisampling = Number(myArgs.options.m); 
+    }
+
+    if ("help" in myArgs.option) {
+        print("ART+COM SceneViewer Usage: sv filename.[x60/b60] [options]");
+        print("available options:");
+        print(" --help                         - print this help message");
+        print(" --m or --multisamples [number] - specify the Number of multisamples."); 
+        print("                                  Must a be power of two.");
+    }
+
     window = new RenderWindow();
     if (operatingSystem() == "LINUX") {
-        window.multisamples = 4;
+        window.multisamples = Math.min(4, myMultisampling);
     } else {
-        window.multisamples = 8;
+        window.multisamples = myMultisampling;
     }
 
     var ourShow = new SceneViewer(arguments);

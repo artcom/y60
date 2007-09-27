@@ -43,7 +43,7 @@ if [ -e ${BASENAME}.js ]; then
     SCRIPT=${BASENAME}.js
 fi
 
-ARGS="-I $PRO/lib;$PRO/src/Y60/js;$PRO/src/Y60/shader $SCRIPT $MODELNAME $SHADERLIB $*"
+ARGS="-I $PRO/lib;$PRO/src/Y60/js;$PRO/src/Y60/shader $SCRIPT $MODELNAME $SHADERLIB -- $*"
 COMMAND="$APPLICATION $ARGS"
 
 echo $COMMAND
