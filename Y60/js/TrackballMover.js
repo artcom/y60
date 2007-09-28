@@ -186,7 +186,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
             var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
             var myCenterRay  = new Ray(myPosition, myViewVector);
 
-            var myTrackballRadius = 1;
+            var myTrackballRadius = 1.0; //_myTrackball.getSphereRadius();
             var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
             if (myIntersection) {
             	myTrackballRadius = myIntersection.distance;
@@ -203,6 +203,10 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         var myObjectToCenter = difference(myMoverObjectWorldPos, _myTrackballCenter);
         var myPanVector = new Vector3f(dot(myObjectToCenter, myRightVector), dot(myObjectToCenter, myUpVector), 0);
         return myPanVector;
+    }
+
+    obj.setTrackballRadius = function( theRadius ) {
+        _myTrackball.setSphereRadius( theRadius );
     }
 
     obj.set = function(theOrientation, theRadius, thePanVector) {

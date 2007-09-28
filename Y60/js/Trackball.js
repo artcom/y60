@@ -22,6 +22,7 @@ function Trackball() {
 Trackball.prototype.Constructor = function(obj) {
     const SPHERE_RADIUS       = 1.0;   // sphere for quat-based rotation (1=screen-width)
     var _curQuat                = new Quaternionf(0,0,0,1);
+    var _mySphereRadius = SPHERE_RADIUS;
 
     obj.rotate = function(thePrevMousePos, theCurMousePos) {
         var prevVector = projectOnSphere(thePrevMousePos);
@@ -29,6 +30,13 @@ Trackball.prototype.Constructor = function(obj) {
         var moveRotation = getRotationFromMove(prevVector,curVector);
         
         _curQuat = product(moveRotation, _curQuat);
+    }
+
+    obj.setSphereRadius = function( theRadius ) {
+        _mySphereRadius = theRadius;
+    }
+    obj.getSphereRadius = function( theRadius ) {
+        return _mySphereRadius;
     }
 
     obj.getQuaternion = function() {
@@ -39,7 +47,7 @@ Trackball.prototype.Constructor = function(obj) {
     }
 
     function projectOnSphere(theVector) {
-        var rsqr = SPHERE_RADIUS * SPHERE_RADIUS;
+        var rsqr = _mySphereRadius * _mySphereRadius;
         var dsqr = theVector.x * theVector.x + theVector.y * theVector.y;
         var myProjectedVector = new Vector3f(theVector.x, theVector.y, 0);
         // if relatively "inside" sphere project to sphere else on hyperbolic sheet
@@ -59,7 +67,7 @@ Trackball.prototype.Constructor = function(obj) {
         }
         // find the amount of rotation
 		var d = difference(theVector1, theVector0);
-		var t = magnitude(d) /(2.0*SPHERE_RADIUS);
+		var t = magnitude(d) /(2.0*_mySphereRadius);
 		t = clamp(t,-1.0,1.0);
 		var phi = 2.0 * Math.asin(t);
 		return new Quaternionf(myRotAxis, phi); 
