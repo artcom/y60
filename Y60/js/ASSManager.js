@@ -17,7 +17,8 @@ function ASSManager(theViewer) {
 ASSManager.driver = null;
 
 const VERBOSE_EVENTS = false;
-const QUIT_OSD = true;
+var QUIT_OSD = true;
+var OSD_FILE = undefined;
 const ENABLE_QUIT_OSD_TIME = 4.0;
 const ENABLE_QUIT_OSD_DISTANCE = 50;//65.0;
 
@@ -185,35 +186,49 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             color:             asColor("FFFFFF"),
             selectedColor:     asColor("FFFFFF"),
             textColor:         asColor("00FFFF"),
-            font:              "${PRO}/testmodels/fonts/arial.ttf", //"FONTS/BMWRgBd.ttf",
+            font:              "${PRO}/testmodels/fonts/arial.ttf", 
             HTextAlign:        Renderer.LEFT_ALIGNMENT,
             fontsize:          18
         }
         
         var myOSDSize = new Vector2i(300, 80);
         var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
-        myImage.src = "shadertex/on_screen_display.rgb";
+        if (OSD_FILE != undefined) {
+            myImage.src = OSD_FILE;
+        } else {
+            myImage.src = "shadertex/on_screen_display.rgb";
+        }
         myImage.resize = "pad";
 
         _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImage);
-        _myQuitOSD.width  = myOSDSize.x;
-        _myQuitOSD.height = myOSDSize.y;
-        _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
-                                             (window.height - _myQuitOSD.height) / 2);
-        _myQuitOSD.visible = false;
+        var myImageSize = getImageSize(_myQuitOSD.image);
+       _myQuitOSD.visible = false;
 
-        var myColor = 0.3;
-        _myQuitOSD.color = new Vector4f(myColor,myColor,myColor,0.75);
-        
-        var myButtonSize = new Vector2i(100,100);
-        var myButtonPos = new Vector2f(50,25);
-        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", "Quit", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        var myColor = 0.3
+        var myQuitText="";
+        var myContinueText="";
+        if (OSD_FILE == undefined) {
+            _myQuitOSD.color = new Vector4f(myColor,myColor,myColor,0.75);
+            myQuitText = "Quit";
+            myContinueText="Continue";
+            _myQuitOSD.width  = myOSDSize.x;
+            _myQuitOSD.height = myOSDSize.y;
+        } else {
+            _myQuitOSD.width  = myImageSize.x;
+            _myQuitOSD.height = myImageSize.y;
+         }
+       _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
+                                             (window.height - _myQuitOSD.height) / 2);
+         
+        var myButtonSize = new Vector2i((_myQuitOSD.width/2)-10,(_myQuitOSD.height/2)-10);
+        var myButtonPos = new Vector2f(10,10);
+        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", myQuitText, myButtonSize, myButtonPos, myStyle, _myQuitOSD);
         _myQuitConfirmButton.onClick = function() {
             exit();
         }
         myStyle.HTextAlign = Renderer.RIGHT_ALIGNMENT,
         myButtonPos.x += myButtonSize.x;
-        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", "Continue", myButtonSize, myButtonPos, myStyle, _myQuitOSD);
+        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", myContinueText, myButtonSize, myButtonPos, myStyle, _myQuitOSD);
         _myQuitCancelButton.onClick = function() {
             _myQuitOSD.visible = false;
         }
@@ -336,24 +351,6 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     self.probeColor setter = function(theColor) {
         _myDriver.probeColor = theColor;
     }
-
-    function createTextOverlay(theWidth, theHeight) {
-        var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
-        myImage.src = "shadertex/on_screen_display.rgb";
-        myImage.resize = "pad";
-
-        var myBoxOverlay = new ImageOverlay(theViewer.getScene(), myImage);
-        myBoxOverlay.width  = theWidth;
-        myBoxOverlay.height = theHeight;
-        myBoxOverlay.position = new Vector2f((window.width - myBoxOverlay.width) / 2,
-                                             (window.height - myBoxOverlay.height) / 2);
-        myBoxOverlay.visible = true;
-
-        var myColor = 0.3;
-        myBoxOverlay.color = new Vector4f(myColor,myColor,myColor,0.75);
-        return myBoxOverlay;
-    }
-
 
 
     var _myViewer = theViewer;
