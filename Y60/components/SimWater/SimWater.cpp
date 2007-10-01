@@ -20,8 +20,10 @@
 //const int SIMULATION_WIDTH = 480;
 //const int SIMULATION_HEIGHT = 240;
 
-const int SIMULATION_WIDTH = 240;
-const int SIMULATION_HEIGHT = 480;
+//const int SIMULATION_WIDTH = 240;
+//const int SIMULATION_HEIGHT = 480;
+const int SIMULATION_WIDTH = 420;
+const int SIMULATION_HEIGHT = 234;
 
 //const int SIMULATION_WIDTH = 256;
 //const int SIMULATION_HEIGHT = 512;
