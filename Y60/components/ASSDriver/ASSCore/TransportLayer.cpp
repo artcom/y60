@@ -125,8 +125,10 @@ TransportLayer::poll() {
     switch (_myState) {
         case NOT_CONNECTED:
             establishConnection();
-            // do not use a whole core while waiting for connection
-            msleep( 10 ); 
+            if (_myState == NOT_CONNECTED) {
+                // do not use a whole core while waiting for connection
+                msleep( 10 ); 
+	    }
             break;
         case SYNCHRONIZING:
             readData();
