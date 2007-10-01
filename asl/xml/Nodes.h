@@ -141,10 +141,10 @@ namespace dom {
 
     /** Base Class for all XML-Node Types, contains almost everything you use.
      *
-     * The Node class is the base class for alle node types and contains almost
+     * The Node class is the base class for all node types and contains almost
      * all the functionality and all the interfaces for the XML Document Object Model
      * manipulation. It can assume every node type. The derived classes are just
-     * provided for conveniance. It is not possible to determine the Node Type by a
+     * provided for convenience. It is not possible to determine the node type by a
      * dynamic_cast; you have to check use nodeType() instead.
      *
      * Currently implemented node types are:
@@ -157,7 +157,7 @@ namespace dom {
      *  - COMMENT_NODE
      *  - DOCUMENT_NODE,
      *  - DOCUMENT_FRAGMENT_NODE
-     *  - NTITY_REFERENCE_NODE
+     *  - ENTITY_REFERENCE_NODE
      *  - ENTITY_NODE,
      *  - DOCUMENT_TYPE_NODE
      *
@@ -172,7 +172,7 @@ namespace dom {
             // TODO: value and facade factory pointers should be moved to
             // schema; they are all the same for one schema;
             // instead, a pointer to an element-id-registry should be here
-             asl::Ptr<ValueFactory> _myValueFactory;
+            asl::Ptr<ValueFactory> _myValueFactory;
             dom::FacadeFactoryPtr  _myFacadeFactory;
 
             NodePtr                _mySchema;
@@ -191,10 +191,11 @@ namespace dom {
         friend class NodeList;
         friend class NamedNodeMap;
         friend class IDValue;
-    /**
-    used to distinguish different node types;
-    @doc X_NO_NODE and X_END_NODE are no valid nodes
-        */
+
+        /**
+         * used to distinguish different node types;
+         * @doc X_NO_NODE and X_END_NODE are no valid nodes
+         */
         enum NodeType {
             X_NO_NODE = 0,
             ELEMENT_NODE = 1,
@@ -216,14 +217,13 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Node,LoadFileFailed,Exception);
         DEFINE_NESTED_EXCEPTION(Node,SchemaNotParsed,Exception);
         DEFINE_NESTED_EXCEPTION(Node,TypeMismatch,Exception);
-
         DEFINE_NESTED_EXCEPTION(Node,DuplicateIDValue,Exception);
         DEFINE_NESTED_EXCEPTION(Node,IDValueNotRegistered,Exception);
 
         /**@name constructors
             many different way to construct a node type.
             @doc However, you should not need to use them directly;
-            use the constructors of the Node-Derived classes for more
+            use the constructors of the Node-derived classes for more
             safety, readabilty and convenience.
         */
         //@{
@@ -1018,7 +1018,7 @@ public:
             }
         }
 
-        /// returns if node has a facade object; if none exists yet, it is created
+        /// returns whether node has a facade object;
         bool hasFacade() const;
 
         /// returns facade object; if none exists yet, it is created; if it cant be created, an exception is thrown
