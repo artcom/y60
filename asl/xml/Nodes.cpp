@@ -1432,7 +1432,7 @@ dom::Node::parseAll(const String& is) {
     int offset = 0;
     //JB: ignore UTF-8 byte order mark (0xEFBBBF)
     if (is[0]=='\xEF' && is[1]=='\xBB' && is[2]=='\xBF') {
-        AC_DEBUG << "Skipping UTF-8 byte order mark signatur.";
+        AC_DEBUG << "Skipping UTF-8 byte order mark signature.";
         offset = 3;
     }
 
