@@ -106,6 +106,8 @@ namespace inet {
     RequestManager::handleRequests(bool theBlockingFlag) {
         CURLMcode myStatus;
         
+        AC_TRACE << "handleRequests("<<theBlockingFlag<<");";
+
         if (theBlockingFlag) {
             fd_set myReadHandles;
             fd_set myWriteHandles;
