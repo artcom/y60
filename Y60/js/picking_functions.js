@@ -85,7 +85,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
 
 
     obj.pickBody = function(theScreenPixelX, theScreenPixelY) {
-        var myIntersection = pickIntersection(theScreenPixelX, theScreenPixelY);
+        var myIntersection = obj.pickIntersection(theScreenPixelX, theScreenPixelY);
         if (myIntersection) {
             return myIntersection.info.body;
         } else {
