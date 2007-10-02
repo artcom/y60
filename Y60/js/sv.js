@@ -23,7 +23,7 @@
         myMultisampling = Number(myArgs.options.m); 
     }
 
-    if ("help" in myArgs.option) {
+    if ("help" in myArgs.options) {
         print("ART+COM SceneViewer Usage: sv filename.[x60/b60] [options]");
         print("available options:");
         print(" --help                         - print this help message");
