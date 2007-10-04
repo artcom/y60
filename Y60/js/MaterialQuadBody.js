@@ -62,6 +62,8 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
                 ourImageMap[theImage] = _myMaterial.getElementById(_myMaterial.childNode("textures", 0).firstChild.image);
             }
             _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
+        } else {
+            throw new Exception(__FILE__() + ': Material file "'+theImage+'" does not exist.');
         }
     } else if ((theImage instanceof Node)) {
         if (theImage.nodeName == "image") {
