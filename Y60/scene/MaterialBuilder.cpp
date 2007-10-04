@@ -232,39 +232,40 @@ namespace y60 {
 
         float myAlpha = theColorScale[3];
 
-        //TODO: consider also depth when looking for image; however, there is no use case for
-        // using the same image as 3D-Texture with different depth values
-        dom::NodePtr myImage = theSceneBuilder.findImageByFilename_ColorScale_ColorBias(myFileName,
-                                    theColorScale,
-                                    theColorBias);
-
-        if (myImage && allowSharing) {
-            return myImage->getAttributeString(ID_ATTRIB);
-        } else {
-            ImageBuilder myImageBuilder(theName, theCreateMipmapsFlag);
-            const string & myId = theSceneBuilder.appendImage(myImageBuilder);
-
-            myImageBuilder.setColorScale(theColorScale);
-            myImageBuilder.setColorBias(theColorBias);
-            myImageBuilder.setType(theType);
-            myImageBuilder.setDepth(theDepth);
-            myImageBuilder.setWrapMode(theWrapMode);
-
-            if (theType == CUBEMAP) {
-                myImageBuilder.setTiling(Vector2i(1,6));
-            }
-
-            ImageFilter myFilter = lookupFilter(theUsage);
-
-            if (_myInlineTextureFlag || myFilter != NO_FILTER) {
-                myImageBuilder.inlineImage(myFileName, myFilter, theResizeMode);
-            } else {
-                myImageBuilder.createFileReference(myFileName, theResizeMode);
-            }
-            myImageBuilder.setInternalFormat(theInternalFormat);
-
-            return myId;
+        if (allowSharing) {
+            //TODO: consider also depth when looking for image; however, there is no use case for
+            // using the same image as 3D-Texture with different depth values
+            
+            dom::NodePtr myImage = theSceneBuilder.findImageByFilename_ColorScale_ColorBias(myFileName,
+                                                                                            theColorScale,
+                                                                                            theColorBias);
+            if(myImage)
+                return myImage->getAttributeString(ID_ATTRIB);
         }
+
+        ImageBuilder myImageBuilder(theName, theCreateMipmapsFlag);
+        const string & myId = theSceneBuilder.appendImage(myImageBuilder);
+        
+        myImageBuilder.setColorScale(theColorScale);
+        myImageBuilder.setColorBias(theColorBias);
+        myImageBuilder.setType(theType);
+        myImageBuilder.setDepth(theDepth);
+        myImageBuilder.setWrapMode(theWrapMode);
+        
+        if (theType == CUBEMAP) {
+            myImageBuilder.setTiling(Vector2i(1,6));
+        }
+
+        ImageFilter myFilter = lookupFilter(theUsage);
+        
+        if (_myInlineTextureFlag || myFilter != NO_FILTER) {
+            myImageBuilder.inlineImage(myFileName, myFilter, theResizeMode);
+        } else {
+            myImageBuilder.createFileReference(myFileName, theResizeMode);
+        }
+        myImageBuilder.setInternalFormat(theInternalFormat);
+        
+        return myId;
     }
 
 
