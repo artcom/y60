@@ -170,8 +170,6 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
 
         var myImage = self.getImageManager().getImageNode("histogram");
         myImage.src = "overlay.png";
-        window.scene.update(Scene.IMAGES);
-
 
         _myOverlay = new ImageOverlay(window.scene, myImage);
         _myOverlay.width  = myImage.width;
