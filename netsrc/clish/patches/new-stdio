@@ -1,0 +1,212 @@
+Index: clish/clish/shell.h
+===================================================================
+--- clish.orig/clish/shell.h	2007-10-03 00:31:06.000000000 +0200
++++ clish/clish/shell.h	2007-10-03 05:46:58.000000000 +0200
+@@ -229,7 +229,9 @@
+  *----------------- */
+ int
+     clish_shell_spawn_and_wait(const clish_shell_hooks_t *hooks,
+-                               void                      *cookie);
++                               void                      *cookie,
++                               FILE                      *istream,
++                               FILE                      *ostream);
+  /**
+   * This operation causes a separate (POSIX) thread of execution to 
+   * be spawned. This thread becomes responsible for the CLI session.
+@@ -268,17 +270,29 @@
+          * A client specific reference which can be obtained during
+          * a callback by invoking clish_shell__get_client_cookie()
+          */
+-        void *cookie
++        void *cookie,
++        /**
++         * Input stream for the shell.
++         */
++        FILE *istream,
++        /**
++         * Output stream for the shell.
++         */
++        FILE *ostream
+     );
++
+ bool_t
+     clish_shell_spawn_from_file(const clish_shell_hooks_t *hooks,
+                                 void                      *cookie,
+-                                const                char *filename);
++                                const                char *filename,
++                                FILE                      *ostream);
+         
+ clish_shell_t *
+     clish_shell_new(const clish_shell_hooks_t *hooks,
+                     void                      *cookie,
+-                    FILE                      *istream);
++                    FILE                      *istream,
++                    FILE                      *ostream);
++
+ /*-----------------
+  * methods
+  *----------------- */
+Index: clish/clish/shell/shell_new.c
+===================================================================
+--- clish.orig/clish/shell/shell_new.c	2007-10-03 00:32:24.000000000 +0200
++++ clish/clish/shell/shell_new.c	2007-10-03 00:34:00.000000000 +0200
+@@ -10,7 +10,8 @@
+ clish_shell_init(clish_shell_t             *this,
+                  const clish_shell_hooks_t *hooks,
+                  void                      *cookie,
+-                 FILE                      *istream)
++                 FILE                      *istream,
++                 FILE                      *ostream)
+ {
+     /* initialise the tree of views */
+     lub_bintree_init(&this->view_tree,
+@@ -37,7 +38,7 @@
+     this->overview        = NULL;
+     clish_shell_iterator_init(&this->iter);
+     this->tinyrl          = clish_shell_tinyrl_new(istream,
+-                                                   stdout,
++                                                   ostream,
+                                                    0);
+     this->current_file    = NULL;
+ }
+@@ -45,13 +46,14 @@
+ clish_shell_t *
+ clish_shell_new(const clish_shell_hooks_t *hooks,
+                 void                      *cookie,
+-                FILE                      *istream)
++                FILE                      *istream,
++                FILE                      *ostream)
+ {
+     clish_shell_t *this = malloc(sizeof(clish_shell_t));
+ 
+     if(this)
+     {
+-        clish_shell_init(this,hooks,cookie,istream);
++        clish_shell_init(this,hooks,cookie,istream,ostream);
+ 
+         if(hooks->init_fn)
+         {
+Index: clish/clish/shell/shell_spawn.c
+===================================================================
+--- clish.orig/clish/shell/shell_spawn.c	2007-10-03 00:35:06.000000000 +0200
++++ clish/clish/shell/shell_spawn.c	2007-10-03 05:49:41.000000000 +0200
+@@ -30,6 +30,7 @@
+     const clish_shell_hooks_t *hooks;
+     void                      *cookie;
+     FILE                      *istream;
++    FILE                      *ostream;
+     clish_shell_t             *shell;
+     clish_pargv_t             *pargv;
+     char                      *prompt;
+@@ -192,7 +193,8 @@
+     /* create a shell object... */
+     this = context->shell = clish_shell_new(context->hooks,
+                                             context->cookie,
+-                                            context->istream);
++                                            context->istream,
++                                            context->ostream);
+     assert(this);
+ 
+     /*
+@@ -288,7 +290,8 @@
+ _clish_shell_spawn(const pthread_attr_t      *attr,
+                    const clish_shell_hooks_t *hooks,
+                    void                      *cookie,
+-                   FILE                      *istream)
++                   FILE                      *istream,
++                   FILE                      *ostream)
+ {
+     int rtn;
+     context_t *context = malloc(sizeof(context_t));
+@@ -299,6 +302,7 @@
+         context->hooks   = hooks;
+         context->cookie  = cookie;
+         context->istream = istream;
++        context->ostream = ostream;
+         context->shell   = NULL;
+         context->prompt  = NULL;
+         context->pargv   = NULL;
+@@ -320,10 +324,11 @@
+ static int
+ _clish_shell_spawn_and_wait(const clish_shell_hooks_t *hooks,
+                             void                      *cookie,
+-                            FILE                      *file)
++                            FILE                      *istream,
++                            FILE                      *ostream)
+ {
+     void      *result = NULL;
+-    context_t *context = _clish_shell_spawn(NULL,hooks,cookie,file);
++    context_t *context = _clish_shell_spawn(NULL,hooks,cookie,istream,ostream);
+     
+     if(context)
+     {
+@@ -335,22 +340,26 @@
+ /*-------------------------------------------------------- */
+ int 
+ clish_shell_spawn_and_wait(const clish_shell_hooks_t *hooks,
+-                           void                      *cookie)
++                           void                      *cookie,
++                           FILE                      *istream,
++                           FILE                      *ostream)
+ {
+-    return _clish_shell_spawn_and_wait(hooks,cookie,stdin);
++    return _clish_shell_spawn_and_wait(hooks,cookie,istream,ostream);
+ }
+ /*-------------------------------------------------------- */
+ bool_t
+ clish_shell_spawn(pthread_t                 *pthread,
+                   const pthread_attr_t      *attr,
+                   const clish_shell_hooks_t *hooks,
+-                  void                      *cookie)
++                  void                      *cookie,
++                  FILE                      *istream,
++                  FILE                      *ostream)
+ {
+     context_t *context;
+     bool_t     result = BOOL_FALSE;
+     
+     /* spawn the thread... */
+-    context = _clish_shell_spawn(attr,hooks,cookie,stdin);
++    context = _clish_shell_spawn(attr,hooks,cookie,istream,ostream);
+    
+     if(NULL != context)
+     {
+@@ -366,7 +375,8 @@
+ bool_t
+ clish_shell_spawn_from_file(const clish_shell_hooks_t *hooks,
+                             void                      *cookie,
+-                            const char                *filename)
++                            const char                *filename,
++                            FILE                      *ostream)
+ {
+     bool_t result = BOOL_FALSE;
+     if(NULL != filename)
+@@ -375,7 +385,7 @@
+         if (NULL != file)
+         {
+             /* spawn the thread and wait for it to exit */
+-            result = _clish_shell_spawn_and_wait(hooks,cookie,file) ? BOOL_TRUE : BOOL_FALSE;
++            result = _clish_shell_spawn_and_wait(hooks,cookie,file,ostream) ? BOOL_TRUE : BOOL_FALSE;
+     
+             fclose(file);
+         }
+Index: clish/bin/clish.cpp
+===================================================================
+--- clish.orig/bin/clish.cpp	2007-10-03 00:40:11.000000000 +0200
++++ clish/bin/clish.cpp	2007-10-03 05:55:04.000000000 +0200
+@@ -29,13 +29,13 @@
+         while(argc--)
+         {
+             /* run the commands in the file */
+-            result = clish_shell_spawn_from_file(&my_hooks,NULL,argv[i++]);
++            result = clish_shell_spawn_from_file(&my_hooks,NULL,argv[i++],stdout);
+         }
+     }
+     else
+     {
+         /* spawn the shell */
+-        result = clish_shell_spawn_and_wait(&my_hooks,NULL);
++        result = clish_shell_spawn_and_wait(&my_hooks,NULL,stdin,stdout);
+     }
+ 
+     clish_shutdown();
