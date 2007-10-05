@@ -69,7 +69,6 @@ window.onStartMainLoop = function() {
     glurImage(myImageNode);
     window.renderTextAsImage(myImageNode, "hallo welt", "Arial", 200, 100)
     var myTextOverlay = new ImageOverlay(window.scene, myImageNode, [100,100]);
-    window.scene.update(Scene.IMAGES);
     //saveImage(myImageNode, "test.png");
     print(myImageNode.filter_params);
     applyImageFilter(myImageNode, "glur", [1,1,1,1,0.547441,0.452559]);
