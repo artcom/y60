@@ -168,8 +168,9 @@ namespace y60 {
         myImages->getNodesByAttribute(IMAGE_NODE_NAME, IMAGE_SRC_ATTRIB, theImageName, true, myResults);
         for(int i = 0; i < myResults.size(); i++) {
             dom::NodePtr myChildNode = myResults[i];
-            const asl::Vector4f & myColorScale = myChildNode->getAttributeValue<asl::Vector4f>(IMAGE_COLOR_SCALE_ATTRIB);
-            const asl::Vector4f & myColorBias  = myChildNode->getAttributeValue<asl::Vector4f>(IMAGE_COLOR_BIAS_ATTRIB);
+            const asl::Vector4f & myColorScale =  myChildNode->getFacade<Image>()->get<ImageColorScaleTag>();            
+            const asl::Vector4f & myColorBias =  myChildNode->getFacade<Image>()->get<ImageColorBiasTag>();                        
+            
             if (asl::almostEqual(myColorScale, theColorScale) &&
                 asl::almostEqual(myColorBias, theColorBias) )
             {
