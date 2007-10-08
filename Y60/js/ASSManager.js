@@ -10,8 +10,8 @@
 // i know this must hurt, but i need them (vs)
 use("Button.js")
 use("Overlay.js")
-function ASSManager(theViewer) {
-    this.Constructor(this, theViewer);
+function ASSManager(theViewer, theOSDFlag) {
+    this.Constructor(this, theViewer, theOSDFlag);
 }
 
 ASSManager.driver = null;
@@ -22,7 +22,7 @@ var OSD_FILE = undefined;
 const ENABLE_QUIT_OSD_TIME = 4.0;
 const ENABLE_QUIT_OSD_DISTANCE = 50;//65.0;
 
-ASSManager.prototype.Constructor = function(self, theViewer) {
+ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
     function setup() {
         if ( ! ASSManager.driver ) {
             ASSManager.driver = plug("ASSEventSource");
@@ -33,7 +33,15 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
         _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
         _myViewer.registerSettingsListener( self, "ASSDriver" );
 
-        if (QUIT_OSD) {
+
+        if (theOSDFlag == undefined) {
+            _hasQuitOSD = QUIT_OSD;
+        } else {
+            _hasQuitOSD = theOSDFlag;
+        }
+        print("======= has quit osd: " + _hasQuitOSD );
+
+        if (_hasQuitOSD) {
             buildQuitOSD();
         }
         
@@ -112,7 +120,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: add");
             }
-            if (QUIT_OSD) {                    
+            if (_hasQuitOSD) {                    
                 if (!_myQuitCursorEvent) {
                     _myQuitCursorEvent = theEventNode;
                     //print("#### added quit cursor");
@@ -124,7 +132,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: move");
             }
-            if (QUIT_OSD) {                    
+            if (_hasQuitOSD) {                    
                 if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
                     var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
                     var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
@@ -145,7 +153,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: touch at " + theEventNode.raw_position);
             }
-            if (QUIT_OSD) {                    
+            if (_hasQuitOSD) {                    
                 // handle application quit
                  var myPosition = theEventNode.position3D;                    
                 _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
@@ -158,7 +166,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
             if ( VERBOSE_EVENTS ) {
                 print("ASSManager::onASSEvent: remove");
             }
-            if (QUIT_OSD) {                    
+            if (_hasQuitOSD) {                    
                 if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
                     _myQuitCursorEvent = null;
                 }
@@ -367,6 +375,7 @@ ASSManager.prototype.Constructor = function(self, theViewer) {
     var _myQuitConfirmButton = null;
     var _myQuitOSD = null;
     var _myQuitCursorEvent = null;
+    var _hasQuitOSD = false;
  setup();
 }
 

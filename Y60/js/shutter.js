@@ -351,23 +351,28 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
         // XXX UH: what's all this -10 business? it effectively moves the shutter up-and-left... ?!?
         _myLeftOverlay.width  = window.width * _myShutterSize[LEFT_SHUTTER];
         _myLeftOverlay.height = window.height;
-        _myLeftOverlay.position = new Vector2i(-10,-10);
+        //_myLeftOverlay.position = new Vector2i(-10,-10);
+        _myLeftOverlay.position = new Vector2i(0,0);
 
         _myRightOverlay.width  = window.width * _myShutterSize[RIGHT_SHUTTER];
         _myRightOverlay.height = window.height;
-        _myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, -10);
+        //_myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, -10);
+        _myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, 0);
 
         _myTopOverlay.width  = window.width;
         _myTopOverlay.height = window.height * _myShutterSize[TOP_SHUTTER];
-        _myTopOverlay.position = new Vector2i(-10,-10);
+        //_myTopOverlay.position = new Vector2i(-10,-10);
+        _myTopOverlay.position = new Vector2i(0,0);
 
         _myBottomOverlay.width  = window.width;
         _myBottomOverlay.height = window.height * _myShutterSize[BOTTOM_SHUTTER];
-        _myBottomOverlay.position = new Vector2i(-10, window.height - _myBottomOverlay.height);
+        //_myBottomOverlay.position = new Vector2i(-10, window.height - _myBottomOverlay.height);
+        _myBottomOverlay.position = new Vector2i(0, window.height - _myBottomOverlay.height);
 
         _myInteractiveOverlay.width  = window.width;
         _myInteractiveOverlay.height  = window.height;
-        _myInteractiveOverlay.position = new Vector2i(-10,-10);
+        //_myInteractiveOverlay.position = new Vector2i(-10,-10);
+        _myInteractiveOverlay.position = new Vector2i(0,0);
     }
 
     self.setup(SHUTTER_OVERLAY, theCustomShutterFile);
