@@ -158,7 +158,7 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_FALSE;
     }
 
-    NATIVE * newNative = 0;
+    NATIVE * newNative = new NATIVE(0);
 
     JSCairoSurface * myNewObject = 0;
 
@@ -172,18 +172,29 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         }
 
         ImagePtr myImage = myImageNode->getFacade<Image>();
-        int myImageWidth = myImage->get<ImageWidthTag>();
-        int myImageHeight = myImage->get<ImageHeightTag>();
 
-        unsigned char *myDataPtr = myImage->getRasterPtr()->pixels().begin();
+        int myWidth = myImage->get<ImageWidthTag>();
+        int myHeight = myImage->get<ImageHeightTag>();
+        string myPixelFormat = myImage->get<RasterPixelFormatTag>();
 
-        cairo_surface_t *myCairoSurface =
-            cairo_image_surface_create_for_data(myDataPtr, CAIRO_FORMAT_ARGB32, 
-                                                myImageWidth, myImageHeight, myImageWidth*4);
+        unsigned char *myData = myImage->getRasterPtr()->pixels().begin();
 
-        Cairo::Surface *myCairommSurface = new Cairo::Surface(myCairoSurface);
+        int myStride;
+        Cairo::Format myFormat;
 
-        newNative = new Cairo::RefPtr<Cairo::Surface>(myCairommSurface);
+        if (myPixelFormat == "BGRA") {
+            myStride = myWidth * 4;
+            myFormat = Cairo::FORMAT_ARGB32;
+        } else if (myPixelFormat == "RGBA") {
+            myStride = myWidth * 4;
+            myFormat = Cairo::FORMAT_ARGB32;
+        } else {
+            AC_ERROR << "Pixel format not supported by JSCairo: " << myPixelFormat;
+            throw UnsupportedPixelFormat("Pixel format not supported by JSCairo: " + myPixelFormat, PLUS_FILE_LINE)
+;
+        }
+
+        (*newNative) = Cairo::ImageSurface::create(myData, myFormat, myWidth, myHeight, myStride);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

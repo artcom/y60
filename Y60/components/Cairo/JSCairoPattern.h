@@ -38,6 +38,8 @@ namespace jslib {
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
+            PROP_EXTEND_NONE,
+            PROP_EXTEND_REPEAT,
             PROP_END
         };
         static JSPropertySpec * Properties();

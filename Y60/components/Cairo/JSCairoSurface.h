@@ -76,6 +76,8 @@ namespace jslib {
         // XXX hack to allow triggering texture upload -ingo
         void doTriggerUpload();
 
+        DEFINE_EXCEPTION(UnsupportedPixelFormat, asl::Exception);
+
     private:
         dom::NodePtr _myImageNode;
     };
