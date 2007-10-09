@@ -108,6 +108,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         // in case of newlines, we use this offset to move character according to path
         var myLineOffset = new Vector3f(0,0,0);
         var myNewLineFlag = true;
+        var myLineCorrection = new Vector3f(0,0,0);
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
@@ -175,10 +176,6 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                                           myCharacter.metric.advance);
             var myMinVector = product(normalized(myForwardVector), 
                                       myCharacter.metric.min.x);
-            // do not use min of glyüh in case of character is first in line
-            if (myNewLineFlag) {
-                myMinVector = new Vector3f(0,0,0);
-            }
             var myMaxVector = product(normalized(myForwardVector), 
                                       myCharacter.metric.max.x+1);
 
@@ -218,7 +215,14 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             var j = i * 4;
             var myPositions = [];
 
-            myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));
+            // do not use min of glyph in case of character is first in line,
+            // and correct them in the following glyphs also
+            if (myNewLineFlag) {
+                myLineCorrection = new Vector3f(myMinVector);
+            }
+            myStart = difference(myStart, myLineCorrection);
+            myEnd = difference(myEnd, myLineCorrection);
+            myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));            
             myPositions.push(sum(sum(myEnd, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myTopOffset), myLineOffset));
             myPositions.push(sum(sum(myStart, myTopOffset), myLineOffset));
