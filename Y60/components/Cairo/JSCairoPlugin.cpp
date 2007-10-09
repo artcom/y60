@@ -12,11 +12,8 @@
 #include <y60/IScriptablePlugin.h>
 
 #include "JSCairo.h"
-
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
-
-#include "JSCairoFontOptions.h"
 
 namespace y60 {
     using namespace jslib;
@@ -30,8 +27,6 @@ namespace y60 {
 
                 JSCairoSurface::initClass(theContext, theGlobalObject);
                 JSCairoPattern::initClass(theContext, theGlobalObject);
-
-                JSCairoFontOptions::initClass(theContext, theGlobalObject);
             }
 
             const char * ClassName() {
