@@ -27,11 +27,11 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-template class JSWrapper<Cairo::RefPtr<Cairo::Pattern>, Ptr< Cairo::RefPtr<Cairo::Pattern> >, StaticAccessProtocol>;
+template class JSWrapper<cairo_pattern_t, Ptr< cairo_pattern_t >, StaticAccessProtocol>;
 
 static JSBool
-checkForErrors(JSContext *theJavascriptPattern, Cairo::RefPtr<Cairo::Pattern> *thePattern) {
-    Cairo::ErrorStatus myStatus = (*thePattern)->get_status();
+checkForErrors(JSContext *theJavascriptPattern, cairo_pattern_t *thePattern) {
+    cairo_status_t myStatus = cairo_pattern_status(thePattern);
     if(myStatus != CAIRO_STATUS_SUCCESS) {
         JS_ReportError(theJavascriptPattern, "cairo error: %s", cairo_status_to_string(myStatus));
         return JS_FALSE;
@@ -43,7 +43,7 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Cairo::RefPtr<Cairo::Pattern>@") + as_string(obj);
+    std::string myStringRep = string("CairoPattern@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -122,7 +122,7 @@ static JSBool
 setExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    Cairo::RefPtr<Cairo::Pattern> *myPattern(0);
+    cairo_pattern_t *myPattern;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 1);
@@ -130,9 +130,7 @@ setExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     int myExtend;
     convertFrom(cx, argv[0], myExtend);
 
-    cairo_pattern_t *myCairoPattern = (*myPattern)->cobj();
-
-    cairo_pattern_set_extend(myCairoPattern, (cairo_extend_t)myExtend);
+    cairo_pattern_set_extend(myPattern, (cairo_extend_t)myExtend);
 
     return JS_TRUE;
 }
@@ -141,14 +139,12 @@ static JSBool
 getExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    Cairo::RefPtr<Cairo::Pattern> *myPattern(0);
+    cairo_pattern_t *myPattern;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 0);
 
-    cairo_pattern_t *myCairoPattern = (*myPattern)->cobj();
-
-    cairo_extend_t myExtend = cairo_pattern_get_extend(myCairoPattern);
+    cairo_extend_t myExtend = cairo_pattern_get_extend(myPattern);
 
     *rval = as_jsval(cx, (int)myExtend);
 
@@ -164,7 +160,7 @@ static JSBool
 setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    Cairo::RefPtr<Cairo::Pattern> *myPattern(0);
+    cairo_pattern_t *myPattern;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 1);
@@ -178,7 +174,7 @@ setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         myMatrix[3][0], myMatrix[3][1]
     };
 
-    (*myPattern)->set_matrix(myCairoMatrix);
+    cairo_pattern_set_matrix(myPattern, &myCairoMatrix);
 
     return JS_TRUE;
 }
@@ -187,14 +183,14 @@ static JSBool
 getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    Cairo::RefPtr<Cairo::Pattern> *myPattern(0);
+    cairo_pattern_t *myPattern;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 0);
 
     cairo_matrix_t myCairoMatrix;
 
-    (*myPattern)->get_matrix(myCairoMatrix);
+    cairo_pattern_get_matrix(myPattern, &myCairoMatrix);
 
     Matrix4f myMatrix;
     myMatrix[0][0] = myCairoMatrix.xx;
@@ -284,16 +280,16 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_FALSE;
     }
 
-    NATIVE * newNative = new NATIVE(0);
+    NATIVE * newNative;
 
     JSCairoPattern * myNewObject = 0;
 
     if (argc == 1) {
 
-        Cairo::RefPtr<Cairo::Surface> *mySurface;
+        cairo_surface_t *mySurface;
         convertFrom(cx, argv[0], mySurface);
 
-        (*newNative) = Cairo::SurfacePattern::create(*mySurface);
+        newNative = cairo_pattern_create_for_surface(mySurface);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
@@ -316,8 +312,8 @@ JSCairoPattern::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         // name                id                       value
-        {"EXTEND_NONE",   PROP_EXTEND_NONE,   Cairo::EXTEND_NONE},
-        {"EXTEND_REPEAT", PROP_EXTEND_REPEAT, Cairo::EXTEND_REPEAT},
+        {"EXTEND_NONE",   PROP_EXTEND_NONE,   CAIRO_EXTEND_NONE},
+        {"EXTEND_REPEAT", PROP_EXTEND_REPEAT, CAIRO_EXTEND_REPEAT},
         {0}
     };
     return myProperties;

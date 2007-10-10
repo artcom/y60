@@ -25,11 +25,11 @@ using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-template class JSWrapper<Cairo::RefPtr<Cairo::Surface>, Ptr< Cairo::RefPtr<Cairo::Surface> >, StaticAccessProtocol>;
+template class JSWrapper<cairo_surface_t, Ptr< cairo_surface_t >, StaticAccessProtocol>;
 
 static JSBool
-checkForErrors(JSContext *theJavascriptSurface, Cairo::RefPtr<Cairo::Surface> *theSurface) {
-    Cairo::ErrorStatus myStatus = (*theSurface)->get_status();
+checkForErrors(JSContext *theJavascriptSurface, cairo_surface_t *theSurface) {
+    cairo_status_t myStatus = cairo_surface_status(theSurface);
     if(myStatus != CAIRO_STATUS_SUCCESS) {
         JS_ReportError(theJavascriptSurface, "cairo error: %s", cairo_status_to_string(myStatus));
         return JS_FALSE;
@@ -41,7 +41,7 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Cairo::RefPtr<Cairo::Surface>@") + as_string(obj);
+    std::string myStringRep = string("CairoSurface@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -158,7 +158,7 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_FALSE;
     }
 
-    NATIVE * newNative = new NATIVE(0);
+    NATIVE * newNative;
 
     JSCairoSurface * myNewObject = 0;
 
@@ -180,21 +180,21 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         unsigned char *myData = myImage->getRasterPtr()->pixels().begin();
 
         int myStride;
-        Cairo::Format myFormat;
+        cairo_format_t myFormat;
 
         if (myPixelFormat == "BGRA") {
             myStride = myWidth * 4;
-            myFormat = Cairo::FORMAT_ARGB32;
+            myFormat = CAIRO_FORMAT_ARGB32;
         } else if (myPixelFormat == "RGBA") {
             myStride = myWidth * 4;
-            myFormat = Cairo::FORMAT_ARGB32;
+            myFormat = CAIRO_FORMAT_ARGB32;
         } else {
             AC_ERROR << "Pixel format not supported by JSCairo: " << myPixelFormat;
             throw UnsupportedPixelFormat("Pixel format not supported by JSCairo: " + myPixelFormat, PLUS_FILE_LINE)
 ;
         }
 
-        (*newNative) = Cairo::ImageSurface::create(myData, myFormat, myWidth, myHeight, myStride);
+        newNative = cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

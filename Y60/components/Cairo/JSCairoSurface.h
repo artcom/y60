@@ -15,19 +15,20 @@
 
 #include <y60/JSWrapper.h>
 
-#include <cairomm/cairomm.h>
+#include <cairo/cairo.h>
 
 namespace jslib {
 
-    class JSCairoSurface : public JSWrapper<Cairo::RefPtr<Cairo::Surface>, asl::Ptr< Cairo::RefPtr<Cairo::Surface> >, StaticAccessProtocol> {
+    class JSCairoSurface : public JSWrapper<cairo_surface_t, asl::Ptr< cairo_surface_t >, StaticAccessProtocol> {
         JSCairoSurface();  // hide default constructor
     public:
 
         virtual ~JSCairoSurface() {
+            cairo_surface_destroy(_myNative);
         }
 
-        typedef Cairo::RefPtr<Cairo::Surface> NATIVE;
-        typedef asl::Ptr< Cairo::RefPtr<Cairo::Surface> > OWNERPTR;
+        typedef cairo_surface_t NATIVE;
+        typedef asl::Ptr< cairo_surface_t > OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
