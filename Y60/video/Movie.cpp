@@ -157,9 +157,11 @@ namespace y60 {
     void 
     Movie::ensureMovieFramecount() {
         AC_DEBUG<<"Movie::ensureMovieFramecount "<<get<FrameCountTag>();
-        if (get<FrameCountTag>() == -1) {
+        if (get<FrameCountTag>() == -1) {            
             load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
+                MoviePlayMode myPlayMode = MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));            
+                setPlayMode(PLAY_MODE_PLAY);
                 _myDecoder->setDecodeAudioFlag(false);
                 readFrame();      
                 int myFrame = -1;
@@ -172,6 +174,7 @@ namespace y60 {
                 restart(0);   
                 //_myDecoder->stopMovie();
                 _myDecoder->setDecodeAudioFlag(true);
+                setPlayMode(myPlayMode);
             }
         } 
     }
