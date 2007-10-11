@@ -491,24 +491,24 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return checkForErrors(cx, myContext);
 }
 
-static JSBool
-getClipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    cairo_t *myContext;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-
-    ensureParamCount(argc, 0);
-
-    double myX1, myY1, myX2, myY2;
-    
-    cairo_clip_extents(myContext, &myX1, &myY1, &myX2, &myY2);
-    
-    Vector4d myResult(myX1, myY1, myX2, myY2);
-    *rval = as_jsval(cx, myResult);
-
-    return JS_TRUE;
-}
+//static JSBool
+//getClipExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//    DOC_BEGIN("");
+//    DOC_END;
+//    cairo_t *myContext;
+//    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+//
+//    ensureParamCount(argc, 0);
+//
+//    double myX1, myY1, myX2, myY2;
+//    
+//    cairo_clip_extents(myContext, &myX1, &myY1, &myX2, &myY2);
+//    
+//    Vector4d myResult(myX1, myY1, myX2, myY2);
+//    *rval = as_jsval(cx, myResult);
+//
+//    return JS_TRUE;
+//}
 
 static JSBool
 resetClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
