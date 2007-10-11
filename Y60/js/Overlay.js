@@ -645,6 +645,7 @@ function GroupOverlay(theScene, theName, thePosition, theParent) {
 function removeOverlay(theOverlayNode) {
     // Remove children
     while(theOverlayNode.childNodes.length) {
+        print(theOverlayNode.childNodes.length)
         removeOverlay(theOverlayNode.firstChild);
     }
 
@@ -665,11 +666,14 @@ function removeOverlay(theOverlayNode) {
 
             // Remove material node
             myMaterialNode.parentNode.removeChild(myMaterialNode);
+            print("### WARNING: Remove material node " + theOverlayNode.material);
         } else {
             print("### WARNING: Could not remove material node " + theOverlayNode.material);
         }
     }
 
     // Remove overlay node
-    theOverlayNode.parentNode.removeChild(theOverlayNode);
+    if (theOverlayNode.parentNode) {
+        theOverlayNode.parentNode.removeChild(theOverlayNode);
+    }
 }
