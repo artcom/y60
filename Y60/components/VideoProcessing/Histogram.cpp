@@ -32,6 +32,19 @@ namespace y60 {
 
     void 
     Histogram::configure(const dom::Node & theNode) {
+        for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
+            const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
+            const std::string myID = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
+            dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myID);
+            if( myImage ) {
+                if( myName == "sourceimage") {
+                    _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                    //const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+                    //AC_PRINT << "histogram configure " << *myFrame;
+                }
+            }   
+        }       
+
     }
 
 	void 
@@ -46,14 +59,13 @@ namespace y60 {
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[2]]++;
             }
-            AC_PRINT << "rgbraster" << myFrame; 
+
         } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster)) {
             for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
                 redHistogram[(*it)[2]]++;
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[0]]++;
             }
-            AC_PRINT << "bgrraster" << myFrame;
         }
         std::vector<asl::Unsigned64> mySum(3);
         mySum[0] = 0;

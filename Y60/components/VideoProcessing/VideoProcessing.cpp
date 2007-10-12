@@ -111,7 +111,6 @@ namespace y60 {
         if ( _myAlgorithmList.size() > 0 ) {
             for (AlgorithmList::iterator it = _myAlgorithmList.begin(); it != _myAlgorithmList.end(); ++it) {
                 (*it)->onFrame(t);
-                return;
             }
         }
     }

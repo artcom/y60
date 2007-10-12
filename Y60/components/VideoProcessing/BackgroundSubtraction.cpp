@@ -34,7 +34,6 @@ namespace y60 {
     void 
     BackgroundSubtraction::configure(const dom::Node & theNode) {
         
-        AC_PRINT <<" configure " << _myScene; 
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
             const std::string myID = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
@@ -62,14 +61,14 @@ namespace y60 {
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[2]]++;
             }
-            AC_PRINT << "rgbraster ";   
+            
         } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster)) {
             for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
                 redHistogram[(*it)[2]]++;
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[0]]++;
             }
-            AC_PRINT << "bgrraster ";   
+            
         }
 
         std::vector<asl::Unsigned64> mySum(3);
