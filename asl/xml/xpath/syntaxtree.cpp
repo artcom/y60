@@ -11,40 +11,40 @@
 namespace xpath
 {
 
-    extern const string Function::FUNCTIONNAME_LAST = "last";
-    extern const string Function::FUNCTIONNAME_POSITION = "position";
-    extern const string Function::FUNCTIONNAME_COUNT = "count";
-    extern const string Function::FUNCTIONNAME_STARTSWITH = "startswith";
-    extern const string Function::FUNCTIONNAME_CONCAT = "concat";
-    extern const string Function::FUNCTIONNAME_CONTAINS = "contains";
-    extern const string Function::FUNCTIONNAME_SUBSTRING = "substring";
-    extern const string Function::FUNCTIONNAME_SUBSTRING_BEFORE = "substring_before";
-    extern const string Function::FUNCTIONNAME_SUBSTRING_AFTER = "substring_after";
-    extern const string Function::FUNCTIONNAME_NOT = "not";
-    extern const string Function::FUNCTIONNAME_UNKNOWN = " *** unknown function *** ";
+    const string Function::FUNCTIONNAME_LAST = "last";
+    const string Function::FUNCTIONNAME_POSITION = "position";
+    const string Function::FUNCTIONNAME_COUNT = "count";
+    const string Function::FUNCTIONNAME_STARTSWITH = "startswith";
+    const string Function::FUNCTIONNAME_CONCAT = "concat";
+    const string Function::FUNCTIONNAME_CONTAINS = "contains";
+    const string Function::FUNCTIONNAME_SUBSTRING = "substring";
+    const string Function::FUNCTIONNAME_SUBSTRING_BEFORE = "substring_before";
+    const string Function::FUNCTIONNAME_SUBSTRING_AFTER = "substring_after";
+    const string Function::FUNCTIONNAME_NOT = "not";
+    const string Function::FUNCTIONNAME_UNKNOWN = " *** unknown function *** ";
     
-    extern const string Step::AXISNAME_INVALID           (" *** invalid Axis *** ");
-    extern const string Step::AXISNAME_NEXT_SIBLING      ("next-sibling");
-    extern const string Step::AXISNAME_PREVIOUS_SIBLING  ("previous-sibling");
-    extern const string Step::AXISNAME_FOLLOWING_SIBLING ("following-sibling");
-    extern const string Step::AXISNAME_PRECEDING_SIBLING ("preceding-sibling");
-    extern const string Step::AXISNAME_CHILD             ("child");
-    extern const string Step::AXISNAME_PARENT            ("parent");
-    extern const string Step::AXISNAME_DESCENDANT        ("descendant");
-    extern const string Step::AXISNAME_ANCESTOR          ("ancestor");
-    extern const string Step::AXISNAME_FOLLOWING         ("following");
-    extern const string Step::AXISNAME_PRECEDING         ("preceding");
-    extern const string Step::AXISNAME_ANCESTOR_OR_SELF  ("ancestor-or-self");
-    extern const string Step::AXISNAME_DESCENDANT_OR_SELF("descendant-or-self");
-    extern const string Step::AXISNAME_SELF              ("self");
-    extern const string Step::AXISNAME_NAMESPACE         ("namespace");
-    extern const string Step::AXISNAME_ATTRIBUTE         ("attribute");
+    const string Step::AXISNAME_INVALID           (" *** invalid Axis *** ");
+    const string Step::AXISNAME_NEXT_SIBLING      ("next-sibling");
+    const string Step::AXISNAME_PREVIOUS_SIBLING  ("previous-sibling");
+    const string Step::AXISNAME_FOLLOWING_SIBLING ("following-sibling");
+    const string Step::AXISNAME_PRECEDING_SIBLING ("preceding-sibling");
+    const string Step::AXISNAME_CHILD             ("child");
+    const string Step::AXISNAME_PARENT            ("parent");
+    const string Step::AXISNAME_DESCENDANT        ("descendant");
+    const string Step::AXISNAME_ANCESTOR          ("ancestor");
+    const string Step::AXISNAME_FOLLOWING         ("following");
+    const string Step::AXISNAME_PRECEDING         ("preceding");
+    const string Step::AXISNAME_ANCESTOR_OR_SELF  ("ancestor-or-self");
+    const string Step::AXISNAME_DESCENDANT_OR_SELF("descendant-or-self");
+    const string Step::AXISNAME_SELF              ("self");
+    const string Step::AXISNAME_NAMESPACE         ("namespace");
+    const string Step::AXISNAME_ATTRIBUTE         ("attribute");
     
-    extern const string Step::NODETEST_INVALID = " *** invalid node test *** ";
-    extern const string Step::NODETEST_NODE = "node";
-    extern const string Step::NODETEST_COMMENT = "comment";
-    extern const string Step::NODETEST_TEXT = "text";
-    extern const string Step::NODETEST_PI = "processing-instruction";
+    const string Step::NODETEST_INVALID = " *** invalid node test *** ";
+    const string Step::NODETEST_NODE = "node";
+    const string Step::NODETEST_COMMENT = "comment";
+    const string Step::NODETEST_TEXT = "text";
+    const string Step::NODETEST_PI = "processing-instruction";
 
     BinaryExpression::BinaryExpression(BinaryExpression::ExpressionType _type, Expression *_lvalue, Expression *_rvalue)
     {
