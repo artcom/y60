@@ -2,7 +2,11 @@
 #define VALUE_H
 
 #include <stdlib.h>
+#ifdef OSX
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
 
 #include <dom/Nodes.h>
 
