@@ -25,11 +25,10 @@
 using namespace std;
 using namespace asl;
 using namespace y60;
-using namespace jslib;
-
-template class JSWrapper<JSCairoSurfaceWrapper, Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol>;
 
 namespace jslib {
+
+template class JSWrapper<JSCairoSurfaceWrapper, Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol>;
 
 template <>
 void CairoWrapper<cairo_surface_t>::reference() {
@@ -39,8 +38,6 @@ void CairoWrapper<cairo_surface_t>::reference() {
 template <>
 void CairoWrapper<cairo_surface_t>::unreference() {
     cairo_surface_destroy(_myWrapped);
-}
-
 }
 
 template class CairoWrapper<cairo_surface_t>;
@@ -270,7 +267,6 @@ JSCairoSurface::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClassObject;
 }
 
-namespace jslib {
 jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theNative) {
     JSObject * myReturnObject = JSCairoSurface::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
