@@ -324,7 +324,7 @@ namespace xpath {
 
     int parseArgumentList(std::list<Expression*> *arguments, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseArgumentList at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseArgumentList at " << instring.substr(pos);
 #endif
 	do {
 	    Expression *e = 0;
@@ -343,7 +343,7 @@ namespace xpath {
 
     int parsePrimaryExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parsePrimaryExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parsePrimaryExpression at " << instring.substr(pos);
 #endif
 	Function::FunctionType ft;
 	int nw_pos;
@@ -355,21 +355,21 @@ namespace xpath {
 		    return nw_pos+1;
 		}
 	    }
-	    std::cerr << "parse error at " __FILE__ ":" << __LINE__;
+	    AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
 	    return pos;
 	} else if (instring[pos] == '\"') {
 	    if ((nw_pos = read_quoted_text(instring, pos, '\"', '\"')) != pos) {
 #if PARSER_DEBUG_VERBOSITY > 1
-		std::cerr << "pos = " << pos << " nw_pos = " << nw_pos << std::endl;
+		AC_TRACE << "pos = " << pos << " nw_pos = " << nw_pos;
 #endif
 		std::string literalString = instring.substr(pos + 1, nw_pos - pos - 2);
 #if PARSER_DEBUG_VERBOSITY > 1
-		std::cerr << "found literal \"" << literalString << "\"" << std::endl;
+		AC_TRACE << "found literal \"" << literalString << "\"";
 #endif
 		*e = new Literal(literalString);
 		return nw_pos;
 	    } else {
-		std::cerr << "parse error at " __FILE__ ":" << __LINE__;
+		AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
 		return pos;
 	    }
 	} else if (is_digit(instring[pos])) {
@@ -391,7 +391,7 @@ namespace xpath {
 		*e = new Function(ft, arglist);
 		return pos;
 	    }
-	    std::cerr << "parse error at " __FILE__ ":" << __LINE__;
+	    AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
 	    return pos;
 	} else {
 	    Path *p = new Path();
@@ -401,7 +401,7 @@ namespace xpath {
 		*e = p;
 	    } else {
 		// ### parse error / not a primary expression
-		std::cerr << "parse error at " __FILE__ ":" << __LINE__;
+		AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
 	    }
 	    return pos;
 	}
@@ -409,7 +409,7 @@ namespace xpath {
 
     int parseUnionExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseUnionExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseUnionExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parsePrimaryExpression(e, instring, pos)) != pos) {
@@ -436,7 +436,7 @@ namespace xpath {
 
     int parseUnaryExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseUnaryExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseUnaryExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	pos = read_whitespace(instring, pos);
@@ -462,7 +462,7 @@ namespace xpath {
 
     int parseMultExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseMultExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseMultExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseUnaryExpression(e, instring, pos)) != pos) {
@@ -492,7 +492,7 @@ namespace xpath {
 
     int parseAddExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseAddExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseAddExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseMultExpression(e, instring, pos)) != pos) {
@@ -516,7 +516,7 @@ namespace xpath {
 
    int parseRelationalExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseRelationalExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseRelationalExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseAddExpression(e, instring, pos)) != pos) {
@@ -540,25 +540,25 @@ namespace xpath {
 
     int parseEqualityExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseEqualityExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseEqualityExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseRelationalExpression(e, instring, pos)) != pos) {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "parsing success for Relational Expression before " << instring.substr(pos) << std::endl;
+	    AC_TRACE << "parsing success for Relational Expression before " << instring.substr(pos);
 #endif
 	    pos = nw_pos;
 	}
 	pos = read_whitespace(instring, pos);
 	if (instring[pos] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "found EqualityExpression at " << instring.substr(pos) << std::endl;
+	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
 #endif
 	    pos++;
 	    pos = read_whitespace(instring, pos);
 	} else if (instring[pos] == '!' && instring[pos+1] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "found EqualityExpression at " << instring.substr(pos) << std::endl;
+	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
 #endif
 	    pos+=2;
 	    pos = read_whitespace(instring, pos);
@@ -570,9 +570,7 @@ namespace xpath {
 	pos = parseEqualityExpression(&secondE, instring, pos);
 	*e = new BinaryExpression(BinaryExpression::Equal, *e, secondE);
 #if PARSER_DEBUG_VERBOSITY > 1
-	std::cerr << "created equality expression ";
-	(*e)->serializeTo(std::cerr);
-	std::cerr << std::endl;
+	AC_TRACE << "created equality expression " << **e;
 #endif
 	return pos;
     }
@@ -581,7 +579,7 @@ namespace xpath {
 
     int parseAndExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseAndExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseAndExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseEqualityExpression(e, instring, pos)) != pos) {
@@ -603,7 +601,7 @@ namespace xpath {
 
     int parseOrExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseOrExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseOrExpression at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if ((nw_pos = parseAndExpression(e, instring, pos)) != pos) {
@@ -623,14 +621,14 @@ namespace xpath {
 
     int parseExpression(Expression **e, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseExpression at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseExpression at " << instring.substr(pos);
 #endif
 	return parseOrExpression(e, instring, pos);
     }
 
     int parsePredicates(Step &s, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parsePredicates at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parsePredicates at " << instring.substr(pos);
 #endif
 	while (instring[pos] == '[') {
 	    Expression *e;
@@ -651,7 +649,7 @@ namespace xpath {
 
     int parseNodeTest(Step &s, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseNodeTest at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseNodeTest at " << instring.substr(pos);
 #endif
 	int nw_pos;
 	if (instring[pos] == '*') {
@@ -659,7 +657,7 @@ namespace xpath {
 	    return pos+1;
 	} else if ((nw_pos = read_name(instring, pos)) != pos) {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "parseNodeTest: parsed name test " << instring.substr(pos, nw_pos - pos) << std::endl;
+	    AC_TRACE << "parseNodeTest: parsed name test " << instring.substr(pos, nw_pos - pos);
 #endif
 	    if (instring[nw_pos] == '(' && instring[nw_pos+1] == ')') {
 		// it's supposed to be a nodeType test because it's
@@ -667,9 +665,7 @@ namespace xpath {
 		Step::NodeTest myTest = Step::read_NodeTest(instring, pos);
 		s.setNodeTest(myTest);
 #if PARSER_DEBUG_VERBOSITY > 1
-		std::cerr << "parsed node type test into step ";
-		std::cerr << s;
-		std::cerr << std::endl;
+		AC_TRACE << "parsed node type test into step " << s;
 #endif
 		pos = nw_pos + 2;
 	    } else { // it's a name test on the principal node type
@@ -680,7 +676,7 @@ namespace xpath {
 	    return pos;
 	} else { // not a node test
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "parseNodeTest: couldn't parse node test here!" << std::endl;
+	    AC_TRACE << "parseNodeTest: couldn't parse node test here!";
 #endif
 	    return pos;
 	}
@@ -688,7 +684,7 @@ namespace xpath {
 
     int parseStep(Path *p, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseStep at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseStep at " << instring.substr(pos);
 #endif
 	Step::Axis a = Step::Invalid;
 	Step *s;
@@ -727,23 +723,19 @@ namespace xpath {
 	    pos = parseNodeTest(*s, instring, pos);
 	    pos = parsePredicates(*s, instring, pos);
 #if PARSER_DEBUG_VERBOSITY > 1
-	    std::cerr << "parseStep done at " << instring.substr(pos) << " into ";
-	    std::cerr << *s;
-	    std::cerr << std::endl;
+	    AC_TRACE << "parseStep done at " << instring.substr(pos) << " into " << *s;
 #endif
 	}
 	p->appendStep(s);
 #if PARSER_DEBUG_VERBOSITY > 1
-	std::cerr << "path is now ";
-	p->serializeTo(std::cerr);
-	std::cerr << std::endl;
+	AC_TRACE << "path is now "; << *p;
 #endif
 	return pos;
     }
 
     int parseRelativePath(Path *p, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parseRelativePath at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parseRelativePath at " << instring.substr(pos);
 #endif
 	pos = parseStep(p, instring, pos);
 	while (instring[pos] == '/') {
@@ -760,7 +752,7 @@ namespace xpath {
 
     int parsePath(Path *p, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
-	std::cerr << "parsePath at " << instring.substr(pos) << std::endl;
+	AC_TRACE << "parsePath at " << instring.substr(pos);
 #endif
         if (instring[pos] == '/') {
 	    if (instring[pos+1] == '/') {
@@ -785,16 +777,15 @@ namespace xpath {
         xpath::Path *myPath = xpath::parse(path);
 
         if (!myPath) {
-            std::cout << "XPath parse error." << std::endl;
+            AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
             xpath::NodeSetValue *value = myPath->evaluate(theNode);
-            std::cout << "evaluated path " << *myPath << ":\n";
+            AC_INFO << "evaluated path " << *myPath << ":";
             for (int i = 0; i < value->length(); i++) {
-                std::cout << "\tresult " <<i<<": "<< *value->item(i);
-                std::cout << std::endl;
+                AC_INFO << "\tresult " <<i<<": "<< *value->item(i);
             }
-            std::cout << "/evaluated." << std::endl;
+            AC_INFO << "/evaluated.";
 
             NodeSetRef retval = value->takeNodes();
             delete value;

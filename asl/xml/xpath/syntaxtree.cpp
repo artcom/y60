@@ -5,6 +5,7 @@
 
 #include "xpath/syntaxtree.h"
 #include <dom/Nodes.h>
+#include "asl/Logger.h"
 
 #define INTERPRETER_DEBUG
 
@@ -69,8 +70,7 @@ namespace xpath
         {
         if ((left->type()==right->type()) && (right->type() ==Value::NodeSetType))
             {
-                std::cerr << "Not yet implemented.\n";
-                assert(false);
+                AC_ERROR << "Not yet implemented.";
 		return new NullValue();
                 // ## find one pair of string-values of one node each that evaluates to true.
             }
@@ -131,27 +131,26 @@ namespace xpath
 
 #ifdef INTERPRETER_DEBUG
                     if (retval)
-                        std::cerr << "string - nodeset comparison succeeded in expression: " << *this << std::endl;
+                        AC_TRACE << "string - nodeset comparison succeeded in expression: " << *this;
 #endif
                     delete sv; delete nsv;
                     return new BooleanValue(retval);
                 }
                 else if (left->type()==Value::NumberType || right->type()==Value::NumberType)
                 {
-                    std::cerr << "Not yet implemented!\n";
-                    assert(false);
+                    AC_ERROR << "Not yet implemented!";
                     // one nodeset, one number: find one node whose string-value converted to number compares positive
                 }
                 else if (left->type()==Value::BooleanType || right->type()==Value::BooleanType)
                 {
-                    std::cerr << "Not yet implemented!\n";
+                    AC_ERROR << "Not yet implemented!";
                     assert(false);
                     // one nodeset, one boolean: convert both to boolean
                     // return compare(left->toBoolean(), type, right->toBoolean);
                 }
                 else
                 {
-                    std::cerr << "Not yet implemented!\n";
+                    AC_ERROR << "Not yet implemented!";
                     assert(false);
                 }
                 return new NullValue();
@@ -200,7 +199,7 @@ namespace xpath
                 return new BooleanValue(rb && lb);
             else
             {
-                std::cerr << "Not yet implemented!\n";
+                AC_ERROR << "Not yet implemented!";
                 assert(false);
 		return new NullValue();
             }
@@ -226,7 +225,7 @@ namespace xpath
             case Mod:
                 return new NumberValue(rn - ln * floor(rn / ln));
             default:
-                std::cerr << "Not yet implemented.\n";
+                AC_ERROR << "Not yet implemented.";
                 assert(false);
 		return new NullValue();
             };
@@ -308,7 +307,7 @@ namespace xpath
         case Not:
             os << "!";
         default:
-            std::cerr << "Not yet implemented!\n";
+            AC_ERROR << "Not yet implemented!";
             assert(false);
         };
         argument->serializeTo(os);
@@ -416,9 +415,7 @@ namespace xpath
 
                 Value *v = arguments->front()->evaluateExpression(c);
 
-#ifdef INTERPRETER_DEBUG
-                std::cerr << "counting \"" << *(arguments->front()) <<"\"...";
-#endif
+                AC_TRACE << "counting \"" << *(arguments->front()) <<"\"...";
 
                 // convert into a nodeSet
                 NodeSetValue *nsv = dynamic_cast<NodeSetValue*>(v);
@@ -426,18 +423,14 @@ namespace xpath
                 if (!nsv)
                 {
                     delete v;
-#ifdef INTERPRETER_DEBUG
-                    std::cerr << " ... failed: argument not a node-set!\n";
-#endif
+                    AC_WARNING << " ... failed: argument not a node-set!";
                     return new NumberValue(0);
                 }
 
                 // and count the nodeSet
                 int retval = nsv->length();
                 delete nsv;
-#ifdef INTERPRETER_DEBUG
-                std::cerr << " returning: "<<retval<<std::endl;
-#endif
+                AC_TRACE << " returning: "<<retval;
                 return new NumberValue(retval);
             }
 
@@ -445,7 +438,7 @@ namespace xpath
             {
                 if (!arguments || !arguments->size())
                 {
-                    std::cerr << "Warning: " << *this << " called with zero arguments.\n";
+                    AC_WARNING << "Warning: " << *this << " called with zero arguments.";
                     return new NullValue();
                 }
 
@@ -456,7 +449,7 @@ namespace xpath
 
                 if (!secondExpr)
                 {
-                    std::cerr << "Warning: " << *this << " called with only one argument.\n";
+                    AC_WARNING << "Warning: " << *this << " called with only one argument.";
                     return new NullValue();
                 }
 
@@ -495,7 +488,7 @@ namespace xpath
 
                 if (!secondExpr)
                 {
-                    std::cerr << "ERROR: parameter missing to function call " << *this << std::endl;
+                    AC_WARNING << "ERROR: parameter missing to function call " << *this;
                     return new NullValue();
                 }
 
@@ -643,7 +636,7 @@ namespace xpath
 
         case Unknown:
         default:
-            std::cerr << " ** access to unknown function ** ";
+            AC_ERROR << " ** access to unknown function ** ";
             return new BooleanValue(false);
         };
     };
@@ -1028,7 +1021,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 };
             };
 #ifdef INTERPRETER_DEBUG
-            std::cerr << "descendant axis yielded " << resultset->size() << " nodes.\n";
+            AC_TRACE << "descendant axis yielded " << resultset->size() << " nodes.";
 #endif
             break;
         case Self:
@@ -1068,16 +1061,16 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         };
 
 #ifdef INTERPRETER_DEBUG
-        std::cerr << "selected " << resultset->size() << " " << Step::stringForAxis(axis) << " nodes";
-        std::cerr << " of " << origNode->nodeName();
-        if (origNode->parentNode())
-            std::cerr << " inside " << origNode->parentNode()->nodeName();
-        std::cerr << std::endl;
+	AC_TRACE << "selected " << resultset->size() << " " << Step::stringForAxis(axis) << " nodes"
+		 << " of " << origNode->nodeName();
+	if (origNode->parentNode()) {
+	    AC_TRACE << " inside " << origNode->parentNode()->nodeName();
+	}
 #endif
         for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i)
         {
 #ifdef INTERPRETER_DEBUG
-            std::cerr << "evaluating predicate " << *(*i) << " on a set of " << resultset->size() << " nodes:" << std::endl;
+            AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << resultset->size() << " nodes:";
 #endif
             Context subcontext;
             subcontext.size = resultset->size();
@@ -1092,7 +1085,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 if (!v->getValue())
                 {
 #ifdef INTERPRETER_DEBUG
-                    std::cerr << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.\n";
+                    AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
 #endif
                     resultset->erase(j++);
                 }
@@ -1169,7 +1162,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         initialSet->insert(n);
 
 #ifdef INTERPRETER_DEBUG
-        std::cerr<<"initial set contains " << initialSet->size() << "nodes\n";
+        AC_TRACE<<"initial set contains " << initialSet->size() << "nodes.";
 #endif
 
         NodeSetRef result = evaluateAll(initialSet);
@@ -1193,7 +1186,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s)
         {
 #ifdef INTERPRETER_DEBUG
-            std::cerr << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes :" << std::endl;
+            AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes :";
 #endif
 	    NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i)
