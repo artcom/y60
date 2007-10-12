@@ -13,6 +13,7 @@
 #define _ac_VideoProcessing_Algorithm_h_
 
 #include <y60/Image.h>
+#include <y60/Scene.h>
 
 namespace y60 {
 
@@ -23,20 +24,35 @@ namespace y60 {
 	* @ingroup Y60video
 	* video processing interface class 
 	* implement onFrame for processing a frame
-	* input parameters are handled by configure()
+    * implement configure to handle xml-node parameters 
+	* parameters should contain necessary image ids
 	* ouput is handled by result()
 	*/
 	class Algorithm {
 	public:
-		virtual void configure(const dom::Node & theNode) { 
-			AC_WARNING << "Algorithm::configure not implemented. " << theNode;
-		}
+        Algorithm(const std::string & theName) { 
+            _myName = theName;
+        }   
+		virtual void configure(const dom::Node & theNode) = 0; 
+
 		virtual const dom::Node & result() const { 
 			AC_WARNING << "Algorithm::result not implemented.";
 			static dom::Node dummy;
 			return dummy;
 		}
-		virtual void onFrame(dom::ValuePtr theRaster, double t) = 0;
+		virtual void onFrame(double t) = 0;
+        
+        virtual void setScene(const y60::ScenePtr & theScene) {
+            _myScene = theScene;
+        }
+        
+        virtual std::string getAlgorithmName() const {
+            return _myName;
+        }   
+
+    protected:
+        y60::ScenePtr _myScene;
+        std::string _myName;
 	};
 
 	typedef asl::Ptr<Algorithm> AlgorithmPtr;
@@ -46,11 +62,16 @@ namespace y60 {
 
 	class TestAlgorithm : public Algorithm {
 	public:
+        TestAlgorithm(const std::string & theName) : Algorithm( theName )  { }
+
+        void configure(const dom::Node & theNode) {
+            
+        }
 		static std::string getName() { return "test"; }
 
-		void onFrame(dom::ValuePtr theRaster, double t) {
+		void onFrame(double t) {
 			int x = 0, y = 0;
-			const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
+			const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage);
 			std::cout << "raster size " << myFrame->xsize() << "x" << myFrame->ysize() 
 				<< " value " << x << "," << y << " = " 
 				<< int( getRedValue((*myFrame)(x,y)) ) << "," 
@@ -58,6 +79,8 @@ namespace y60 {
 				<< int( getBlueValue((*myFrame)(x,y)) ) 
 				<< std::endl;
 		}
+    private:
+        dom::ValuePtr _mySourceImage;
 	};
 }
 

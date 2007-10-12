@@ -16,9 +16,11 @@ using namespace std;
 
 namespace y60 {
 
-    ColorDetection::ColorDetection() : 
+    ColorDetection::ColorDetection(const std::string & theName) : 
+        Algorithm(theName),
         _myResultNode("result"),
-        _myThreshold(0)
+        _myThreshold(0), 
+        _mySourceRaster(0)
     {}
 
     void 
@@ -32,8 +34,8 @@ namespace y60 {
     }
 
 	void 
-	ColorDetection::onFrame(dom::ValuePtr theRaster, double t) {
-    	const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
+	ColorDetection::onFrame(double t) {
+    	const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
         std::vector<unsigned> myHistogram(360);
         Vector3f myHSV;
 		for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {

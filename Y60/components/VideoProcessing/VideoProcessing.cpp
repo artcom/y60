@@ -8,29 +8,13 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: VideoProcessingExtension.cpp,v $
-//
-//     $Author: pavel $
-//
-//   $Revision: 1.15 $
-//
-// Description:
-//
-//=============================================================================
+
+#include "VideoProcessing.h" 
 
 #include "ShotDetection.h"
 #include "ColorDetection.h"
 #include "Histogram.h"
-#include "Algorithm.h"
-
-#include <y60/JSNode.h>
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
+#include "BackgroundSubtraction.h"
 
 #include <asl/string_functions.h>
 #include <asl/Exception.h>
@@ -41,22 +25,25 @@
 using namespace std;
 using namespace jslib;
 using namespace dom;
+using namespace y60;
+using namespace asl;
 
 namespace y60 {
 
 	/**********************************************************/
 	// Register your Algorithm class here
 	/**********************************************************/
-	#define REGISTER_ALGORITHM(theAlgorithmClass) \
-		if (theName == theAlgorithmClass::getName()) { \
-			return asl::Ptr<Algorithm>(new theAlgorithmClass); \
-		}
+#define REGISTER_ALGORITHM(theAlgorithmClass)               \
+    if (theName == theAlgorithmClass::getName()) {          \
+        return asl::Ptr<Algorithm>(new theAlgorithmClass(theName)); \
+    }
 
 	AlgorithmPtr createAlgorithm(const string & theName) {
-		REGISTER_ALGORITHM(ColorDetection);
+        REGISTER_ALGORITHM(ColorDetection);
 		REGISTER_ALGORITHM(Histogram);
 		REGISTER_ALGORITHM(TestAlgorithm);
 		REGISTER_ALGORITHM(ShotDetectionAlgorithm);
+        REGISTER_ALGORITHM(BackgroundSubtraction); 
 
 		AC_WARNING << "algorithm '" << theName << "' not found.";
 		return asl::Ptr<Algorithm>(0);
@@ -64,43 +51,7 @@ namespace y60 {
 
 	/**********************************************************/
 
-	class VideoProcessingExtension :
-		public asl::PlugInBase,
-		public y60::IRendererExtension,
-		public IScriptablePlugin
-	{
-		public:
-			VideoProcessingExtension(asl::DLHandle theDLHandle);
-
-			void onStartup(jslib::AbstractRenderWindow * theWindow) {};
-			bool onSceneLoaded(jslib::AbstractRenderWindow *) {
-				return true;
-			}
-			void handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {};
-			void onFrame(AbstractRenderWindow * theWindow , double t);
-
-			void onGetProperty(const std::string & thePropertyName, 
-					PropertyValue & theReturnValue) const;
-			void onSetProperty(const std::string & thePropertyName, 
-					const PropertyValue & thePropertyValue);
-
-			void onPreRender(AbstractRenderWindow * theRenderer) {};
-			void onPostRender(AbstractRenderWindow * theRenderer) {};
-
-			const char * ClassName() {
-				static const char * myClassName = "VideoProcessingExtension";
-				return myClassName;
-			}
-
-			void onUpdateSettings(dom::NodePtr theSettings) {
-				AC_PRINT << "New Settings: " << *theSettings << endl;
-			}
-
-		private:
-			ImagePtr _myImage;
-			AlgorithmPtr _myAlgorithm;
-	};
-
+    
 	VideoProcessingExtension :: VideoProcessingExtension(asl::DLHandle theDLHandle) :
 		asl::PlugInBase(theDLHandle),
 		IRendererExtension("VideoProcessingExtension")
@@ -108,60 +59,106 @@ namespace y60 {
 
 	void
 	VideoProcessingExtension::onGetProperty(const std::string & thePropertyName,
-			PropertyValue & theReturnValue) const
+                                            PropertyValue & theReturnValue) const
 	{
 		AC_DEBUG << "onGetProperty " << thePropertyName;
-		if (thePropertyName == "result") {
-			if ( ! _myAlgorithm) {
-				AC_WARNING << "no algorithm set but asked for result. ignored. ";
-				return;
+		if (thePropertyName == "result") {           
+            dom::Element myResultsNode("results");      
+            for (AlgorithmList::const_iterator it = _myAlgorithmList.begin(); it != _myAlgorithmList.end(); ++it) {
+                dom::NodePtr myResultNode = myResultsNode.appendChild((*it)->result());
+                myResultNode->appendAttribute("name", (*it)->getAlgorithmName());    
 			}
-	        
-			AC_DEBUG << "result " << _myAlgorithm->result();
 			//be cool & lazy and return a copy 
-			NodePtr myResult = NodePtr(new Node(_myAlgorithm->result())); 
-			theReturnValue.set<NodePtr>(myResult);
+			theReturnValue.set<NodePtr>(NodePtr(new Node(myResultsNode)));
 		}
 	}
+    
+    void 
+    VideoProcessingExtension::init(y60::ScenePtr theScene) {
+        _myScene = theScene;
+    }   
 
 	void
 	VideoProcessingExtension::onSetProperty(const std::string & thePropertyName,
-			const PropertyValue & thePropertyValue)
+                                            const PropertyValue & thePropertyValue)
 	{
-		AC_DEBUG << "onSetProperty " << thePropertyName;
-	    
-		if (thePropertyName == "algorithm") {
-			_myAlgorithm = createAlgorithm(thePropertyValue.get<string>()); 
+		AC_PRINT << "onSetProperty " << thePropertyName;
+                
+		if (thePropertyName == "configuration") {
+            dom::Node myConfig = *thePropertyValue.get<dom::NodePtr>();           
+            for( unsigned int i=0; i<myConfig.childNodesLength(); i++)  {   
+                    AC_PRINT << "config " << myConfig.childNode("algorithm", i)->getAttribute("name")->nodeValue();
+                    dom::NodePtr myAlgorithmNode = myConfig.childNode("algorithm", i);
+                    const std::string myAlgorithmName = myAlgorithmNode->getAttribute("name")->nodeValue();
+                
+                    AlgorithmPtr myAlgorithm = createAlgorithm(myAlgorithmName); 
+                    if( myAlgorithm ) {
+                        myAlgorithm->setScene(_myScene);
+                        myAlgorithm->configure(*myAlgorithmNode); 
+                    } else {
+                        AC_WARNING << "no algorithm set but got a configuration. ignored. " 
+                                   << thePropertyValue.get<dom::NodePtr>();
+                        return;     
+                    }
+                    _myAlgorithmList.push_back(myAlgorithm);
+            }                      
+            AC_PRINT << "videoprocessingextension :: configuration se prop " << _myScene;
+        }    
+    }           
+        
+    void    
+    VideoProcessingExtension::onFrame(AbstractRenderWindow * theWindow , double t) {
+        if ( _myAlgorithmList.size() > 0 ) {
+            for (AlgorithmList::iterator it = _myAlgorithmList.begin(); it != _myAlgorithmList.end(); ++it) {
+                (*it)->onFrame(t);
+                return;
+            }
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    // JavaScript binding
 
-		} else if (thePropertyName == "configuration") {
-			if ( ! _myAlgorithm) {
-				AC_WARNING << "no algorithm set but got a configuration. ignored. " 
-						<< thePropertyValue.get<dom::NodePtr>();
-				return;
-			}
-			_myAlgorithm->configure(*thePropertyValue.get<dom::NodePtr>()); 
-		} else if (thePropertyName == "sourceimage") {
-			dom::NodePtr myImageNode = thePropertyValue.get<dom::NodePtr>();
-			try {
-				_myImage = myImageNode->getFacade<Image>();
-				AC_PRINT << "### VideoProcessing " << _myImage->get<ImageSourceTag>();
-			} catch (Exception ex) {
-				AC_ERROR << ex;
-			}
-		}
-	}
+    static JSBool Init(JSContext* cx, JSObject* obj, uintN argc, jsval* argv, 
+                       jsval* rval) 
+    {           
+        DOC_BEGIN("");
+        DOC_END;
+        
+        ensureParamCount(argc, 1);
 
-	void
-	VideoProcessingExtension::onFrame(AbstractRenderWindow * theWindow , double t) {
-		if (_myAlgorithm && _myImage) {
-       		double myMovieTime = 0; //_myImage->get<CurrentFrameTag>() / _myImage->get<FrameRateTag>();
-    		_myAlgorithm->onFrame(_myImage->getRasterValue(), myMovieTime);
-            return;
-		}
-	}
+        y60::ScenePtr myScene(0);
+        if (!convertFrom(cx, argv[0], myScene)) {
+            JS_ReportError(cx, "VideoProcessingExtension::init: argument #0 must be a Scene");
+            return JS_FALSE;
+        }
+        VideoProcessingExtensionPtr myNative = getNativeAs<VideoProcessingExtension>(cx, obj);
+        myNative->init(myScene);
+        return JS_TRUE;
+    }
 
-	extern "C"
-	EXPORT asl::PlugInBase* VideoProcessingExtension_instantiatePlugIn(asl::DLHandle myDLHandle) {
-		return new VideoProcessingExtension(myDLHandle);
-	}
+    ///////////////////////////////////////////////////////////////////////////////
+    // IScriptablePlugin
+
+    JSFunctionSpec * VideoProcessingExtension::Functions() {
+        static JSFunctionSpec functions[] = {   
+            {"init", Init, 1},  
+            {0} 
+        };  
+        return functions;
+    }   
+
+    
+    JSFunctionSpec * VideoProcessingExtension::StaticFunctions() {
+        static JSFunctionSpec functions[] = {
+            {0}
+        };
+        return functions;
+    }
+
+
+    extern "C"
+        EXPORT asl::PlugInBase* VideoProcessingExtension_instantiatePlugIn(asl::DLHandle myDLHandle) {
+        return new VideoProcessingExtension(myDLHandle);
+    }
 }

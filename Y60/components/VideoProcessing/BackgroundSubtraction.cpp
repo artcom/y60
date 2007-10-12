@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include "Histogram.h"
+#include "BackgroundSubtraction.h"
 
 using namespace asl;
 using namespace std;
@@ -17,9 +17,9 @@ using namespace dom;
 
 namespace y60 {
 
-    Histogram::Histogram(const std::string theName) : 
+    BackgroundSubtraction::BackgroundSubtraction(const std::string & theName) :
         Algorithm(theName),
-        _myResultNode("result"), 
+        _myResultNode("result"),
         _mySourceRaster(0)
     {
         _myResultNode.appendChild(Element("red"));
@@ -29,13 +29,29 @@ namespace y60 {
         _myResultNode.appendChild(Element("blue"));
         _myResultNode.childNode("blue")->appendChild(Text(""));
     }
+  
 
     void 
-    Histogram::configure(const dom::Node & theNode) {
+    BackgroundSubtraction::configure(const dom::Node & theNode) {
+        
+        AC_PRINT <<" configure " << _myScene; 
+        for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
+            const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
+            const std::string myID = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
+            dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myID);
+            if( myImage ) {
+                if( myName == "sourceimage") {
+                    _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                } else if( myName == "targetimage") {
+                    _myTargetRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                }
+            }
+        }     
     }
 
 	void 
-    Histogram::onFrame(double t) {
+    BackgroundSubtraction::onFrame(double t) {
+        
         std::vector<asl::Unsigned32> redHistogram(256);
         std::vector<asl::Unsigned32> blueHistogram(256);
         std::vector<asl::Unsigned32> greenHistogram(256);
@@ -46,15 +62,16 @@ namespace y60 {
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[2]]++;
             }
-            AC_PRINT << "rgbraster" << myFrame; 
+            AC_PRINT << "rgbraster ";   
         } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster)) {
             for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
                 redHistogram[(*it)[2]]++;
                 greenHistogram[(*it)[1]]++;
                 blueHistogram[(*it)[0]]++;
             }
-            AC_PRINT << "bgrraster" << myFrame;
+            AC_PRINT << "bgrraster ";   
         }
+
         std::vector<asl::Unsigned64> mySum(3);
         mySum[0] = 0;
         mySum[1] = 0;

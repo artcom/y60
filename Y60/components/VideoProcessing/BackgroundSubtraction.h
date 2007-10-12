@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,20 +9,22 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#ifndef _ac_Histogram_h_
-#define _ac_Histogram_h_
+#ifndef _AC_BACKGROUND_SUBTRACTION_H_
+#define _AC_BACKGROUND_SUBTRACTION_H_
 
 #include "Algorithm.h"
 
+
+
 namespace y60 {
 
-	class Histogram : public Algorithm {
+	class BackgroundSubtraction : public Algorithm {
 		public:
-        Histogram(const std::string theName);
+            BackgroundSubtraction(const std::string & theName);
 
-			static std::string getName() { return "histogram"; }
+			static std::string getName() { return "backgroundsubtraction"; }
 		    void onFrame(double t);
-
+            
             void configure(const dom::Node & theNode);
 	        const dom::Node & result() const { 
 		        return _myResultNode;
@@ -31,6 +33,7 @@ namespace y60 {
 		private:
             dom::Element _myResultNode;
             dom::ValuePtr _mySourceRaster;
+            dom::ValuePtr _myTargetRaster;
 	};
 
 }

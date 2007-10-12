@@ -23,11 +23,11 @@ namespace y60 {
 	*/
 	class ShotDetectionAlgorithm : public Algorithm {
 		public:
-			static std::string getName() { return "shot_detection"; }
+			static std::string getName() { return "shot-detection"; }
 
-			ShotDetectionAlgorithm();
+			ShotDetectionAlgorithm(const std::string & theName);
 				       
-		    virtual void onFrame(dom::ValuePtr theRaster, double t);
+		    virtual void onFrame(double t);
 			void configure(const dom::Node & theNode);
 			const dom::Node & result() const;
 
@@ -38,6 +38,7 @@ namespace y60 {
 			double _myThreshold;
 			double _myLastShotTime, _myMinimalShotLength;
 			dom::Element _myResultNode;
+            dom::ValuePtr _mySourceRaster;
 
 			void clearHistogram(int theIndex);    	    
 		    unsigned long intersectHistograms();

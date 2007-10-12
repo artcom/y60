@@ -13,17 +13,21 @@
 
 namespace y60 {
 
-	ShotDetectionAlgorithm::ShotDetectionAlgorithm() : _myResultNode("shots") {
-		_myThreshold = 0.9;
-		_myMinimalShotLength = 1.0;
-		_myLastShotTime = 0;
-		clearHistogram(0);
+	ShotDetectionAlgorithm::ShotDetectionAlgorithm(const std::string & theName) : 
+        Algorithm( theName ),
+        _myResultNode("shots"),
+        _mySourceRaster(0), 
+		_myThreshold(0.9),      
+        _myMinimalShotLength(1.0),
+        _myLastShotTime(0)  
+    {
+    	clearHistogram(0);
 		clearHistogram(1);
 	}
 
 	void 
-    ShotDetectionAlgorithm::onFrame(dom::ValuePtr theRaster, double theTime) {
-    	const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
+    ShotDetectionAlgorithm::onFrame(double theTime) {
+        const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
 		static int n = 0;
 
 		//clear current histogram
@@ -33,7 +37,7 @@ namespace y60 {
 		int myScaled;
 		int myFactors[] = {1, BINS_PER_CHANNEL, BINS_PER_CHANNEL*BINS_PER_CHANNEL };
 		BGRRaster::const_iterator it;
-		for (it = myFrame->begin(); it != myFrame->end(); ++it) {
+        for (it = myFrame->begin(); it != myFrame->end(); ++it) {
 			int myBin = 0;
 			for (int c = 0; c < 3; ++c) {
 				myScaled = (BINS_PER_CHANNEL * int((*it)[c])) / 256;
@@ -96,11 +100,28 @@ namespace y60 {
 	void 
 	ShotDetectionAlgorithm::configure(const dom::Node & theNode) { 
 		try {
-			asl::fromString(theNode["threshold"].nodeValue(), _myThreshold);
-			asl::fromString(theNode["minimal_length"].nodeValue(), _myMinimalShotLength);
-		} catch(asl::Exception ex) {
+            AC_PRINT << "configure scene " << _myScene; 
+            for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
+                const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
+                const std::string myValue = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
+                AC_PRINT << "configure " << myName << " " << myValue;
+                if( myName == "sourceimage") {  
+                    dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);   
+                    if( myImage ) {
+                        _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                        //AC_PRINT << "got source raster" << _mySourceRaster;
+                    }
+                } else if( myName == "threshold" ) {
+                    asl::fromString(theNode["threshold"].nodeValue(), _myThreshold);    
+                } else if( myName == "minimal_length" ) {
+                    asl::fromString(theNode["minimal_length"].nodeValue(), _myMinimalShotLength);   
+                }   
+                
+            }
+        } catch(asl::Exception ex) {
 			AC_ERROR << "could not parse configuration " << theNode;
 		}
+        AC_PRINT << "ShotDetection::configure sourceimage " << _mySourceRaster;
 		AC_PRINT << "ShotDetection::configure threshold " << _myThreshold;
 		AC_PRINT << "ShotDetection::configure min. shot length " << _myMinimalShotLength;
 	}

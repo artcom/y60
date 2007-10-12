@@ -51,15 +51,20 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
         window.addExtension(_myVideoProcessingExtension);
-
+        _myVideoProcessingExtension.init(window.scene);
         createOverlay();
 
-        _myVideoProcessingExtension.algorithm = "shot_detection";
-
-        var myConfig = Node.createElement("shot-config");
-        myConfig.threshold = 0.95;
-        myConfig.minimal_length = 0.5; // secs
+        
+        var myConfig = Node.createElement("algorithms");
+        var myAlgorithmNode = Node.createElement("algorithm");
+        myAlgorithmNode.name = "shot-detection";
+        myConfig.appendChild(myAlgorithmNode);
+        var myImage = window.scene.images.getElementById(_myOverlay.material.childNode("textures").firstChild.image);
+        myAlgorithmNode.appendChild(createProperty("sourceimage", myImage.id));
+        myAlgorithmNode.appendChild(createProperty("threshold", 0.95))
+        myAlgorithmNode.appendChild(createProperty("minimal_length", 0.5))
         _myVideoProcessingExtension.configuration = myConfig;
+        
     }
 
     Base.onKey = self.onKey;
@@ -81,13 +86,16 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         var myResult = _myVideoProcessingExtension.result;
-        var myLength = myResult.childNodes.length;
-
-        if (myLength > _myShotLength) {
-            showHistogram();
-            showShotInfo();
-            _myShotLength = myLength;
+        if( myResult.childNode(0) && myResult.childNode(0).childNodesLength() > 0 ) {
+            print(myResult.childNode(0).childNode(0).childNode("histogram"));
         }
+        //var myLength = myResult.childNodes.length;
+
+//         if (myLength > _myShotLength) {
+//             showHistogram();
+//             showShotInfo();
+//             _myShotLength = myLength;
+//         }
         Base.onFrame(theTime);
 
     }
@@ -106,6 +114,13 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
                 }
             }
         }
+    }
+
+    function createProperty(theName, theValue) {
+        var myProperty = Node.createElement("property");
+        myProperty.name = theName;
+        myProperty.value = theValue;        
+        return myProperty;
     }
 
     function showShotInfo() {
@@ -147,7 +162,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
                 myMaximum = myHistogram[k];
             }
         }
-        for(var k = 0;k < myHistogram.length; ++k) {
+        for(k = 0;k < myHistogram.length; ++k) {
             var j = Math.floor(k % myCellsPerLine);
             var i = Math.floor(k / myCellsPerLine);
             var x = 10 + j*(myCellWidth+5);
@@ -169,7 +184,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     function createOverlay() {
 
         var myImage = self.getImageManager().getImageNode("histogram");
-        myImage.src = "overlay.png";
+        myImage.src = "overlay.jpg";
 
         _myOverlay = new ImageOverlay(window.scene, myImage);
         _myOverlay.width  = myImage.width;
