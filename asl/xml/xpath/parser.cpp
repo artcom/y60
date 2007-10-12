@@ -171,18 +171,21 @@ namespace xpath {
     }
 
     bool is_hex_number(const String & s, unsigned int & r, unsigned int max_value = MAX_CHAR_VALUE) {
-        if (s.size() == 0)
+        if (s.size() == 0) {
             return false;
+	}
         unsigned int result = 0;
         for (unsigned int i = 0; i< s.size();++i) {
             unsigned int num;
             if (hex_to_num(s[i],num)) {
                 result*=16;
                 result+=num;
-            } else
+            } else {
                 return false;
-            if (result > max_value)
+	    }
+            if (result > max_value) {
                 return false;
+	    }
         }
         r = result;
         return true;
@@ -266,8 +269,7 @@ namespace xpath {
         dest=is.substr(pos+1,end_pos-pos-2);
     }
     // returns position past "right" if sequence starts with "left"
-    int read_if_between(const String & is,int pos, const String & left, const String & right)
-    {
+    int read_if_between(const String & is,int pos, const String & left, const String & right) {
         int left_end = read_if_string(is,pos,left);
         if (left_end > pos) {
             int right_begin = is.find(right,left_end);
@@ -279,8 +281,7 @@ namespace xpath {
 
     // utility for previous function to copy what's between into string dest
     void copy_between(const String & is,int pos, const String & left, const String & right,
-        int right_end_pos, String & dest)
-    {
+		      int right_end_pos, String & dest) {
         int begin = pos+left.size();
         dest = is.substr(begin,right_end_pos-begin-right.size());
     }
@@ -296,8 +297,7 @@ namespace xpath {
 
     // read <?target processing_instruction?>
     int read_processing_instruction(const String & is,int pos,
-                                    String & target,String & proc_instr)
-    {
+                                    String & target,String & proc_instr) {
         int new_pos = read_if_between(is,pos,PI_BGN,PI_END);
         if (new_pos > pos) {
             int instr_pos = read_name(is,pos+2);

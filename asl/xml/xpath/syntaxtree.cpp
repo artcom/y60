@@ -130,8 +130,9 @@ namespace xpath
                     };
 
 #ifdef INTERPRETER_DEBUG
-                    if (retval)
+                    if (retval) {
                         AC_TRACE << "string - nodeset comparison succeeded in expression: " << *this;
+		    }
 #endif
                     delete sv; delete nsv;
                     return new BooleanValue(retval);
@@ -161,12 +162,13 @@ namespace xpath
                 {
                     // convert to simplest common type and compare
                     bool retval;
-                    if (left->type()==Value::BooleanType || right->type()==Value::BooleanType)
+                    if (left->type()==Value::BooleanType || right->type()==Value::BooleanType) {
                         retval = equals_as<BooleanValue>(left, right);
-                    else if (left->type()==Value::NumberType || right->type()==Value::NumberType)
+                    } else if (left->type()==Value::NumberType || right->type()==Value::NumberType) {
                         retval = equals_as<NumberValue>(left, right);
-                    else
+                    } else {
                         retval = equals_as<StringValue>(left, right);
+		    }
                     delete left; delete right;
                     return new BooleanValue(retval ^ (type==NotEqual));
                 }
@@ -175,8 +177,7 @@ namespace xpath
                     if (equals_as<NumberValue>(left, right)) {
                         delete left; delete right;
                         return new BooleanValue(type==LEqual||type==GEqual);
-                    }
-                    else { // numbers are different.
+                    } else { // numbers are different.
                         bool retval = ( type==LEqual || type == Less ) ^
                             ( smaller_than_as<NumberValue>(left, right));
                         delete left; delete right;
@@ -193,12 +194,11 @@ namespace xpath
             bool lb = l->getValue();
             delete right; delete r;
             delete left; delete l;
-            if (type==Or)
+            if (type==Or) {
                 return new BooleanValue(rb || lb);
-            else if (type==And)
+            } else if (type==And) {
                 return new BooleanValue(rb && lb);
-            else
-            {
+	    } else {
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
 		return new NullValue();
@@ -235,11 +235,13 @@ namespace xpath
     void BinaryExpression::serializeTo(std::ostream &os)
     {
         BinaryExpression *lv = dynamic_cast<BinaryExpression*>(lvalue);
-        if (lv)
+        if (lv) {
             os << "(";
+	}
         lvalue->serializeTo(os);
-        if (lv)
+        if (lv) {
             os << ")";
+	}
 
         switch(type)
         {
@@ -287,11 +289,13 @@ namespace xpath
             break;
         }
         BinaryExpression *rv = dynamic_cast<BinaryExpression*>(rvalue);
-        if (rv)
+        if (rv) {
             os << "(";
+	}
         rvalue->serializeTo(os);
-        if (rv)
+        if (rv) {
             os << ")";
+	}
     };
 
     void UnaryExpression::serializeTo(std::ostream &os)
@@ -315,15 +319,15 @@ namespace xpath
 
     Value *UnaryExpression::evaluateExpression(const Context &c)
     {
-        if (type==Minus)
-        {
+        if (type==Minus) {
             Value *subvalue = argument->evaluateExpression(c);
             NumberValue *retval = subvalue->toNumber();
             delete subvalue;
             retval->negate();
             return retval;
-        }
-        else assert(false);
+        } else {
+	    assert(false);
+	}
 	return new NullValue();
     }
 
@@ -379,8 +383,7 @@ namespace xpath
 
     Function::~Function()
     {
-        if (arguments)
-            delete arguments;
+	delete arguments;
     }
 
     void Function::serializeTo(std::ostream &os)
@@ -410,8 +413,9 @@ namespace xpath
             return new NumberValue(c.position);
         case Count:
             {
-                if (!arguments)
+                if (!arguments) {
                     return new NumberValue(0);
+		}
 
                 Value *v = arguments->front()->evaluateExpression(c);
 
@@ -420,8 +424,7 @@ namespace xpath
                 // convert into a nodeSet
                 NodeSetValue *nsv = dynamic_cast<NodeSetValue*>(v);
 
-                if (!nsv)
-                {
+                if (!nsv) {
                     delete v;
                     AC_WARNING << " ... failed: argument not a node-set!";
                     return new NumberValue(0);
@@ -430,14 +433,13 @@ namespace xpath
                 // and count the nodeSet
                 int retval = nsv->length();
                 delete nsv;
-                AC_TRACE << " returning: "<<retval;
+                AC_TRACE << " returning: " << retval;
                 return new NumberValue(retval);
             }
 
         case StartsWith:
             {
-                if (!arguments || !arguments->size())
-                {
+                if (!arguments || !arguments->size()) {
                     AC_WARNING << "Warning: " << *this << " called with zero arguments.";
                     return new NullValue();
                 }
@@ -447,8 +449,7 @@ namespace xpath
                 Expression *secondExpr = *(++i);
                 assert(firstExpr);
 
-                if (!secondExpr)
-                {
+                if (!secondExpr) {
                     AC_WARNING << "Warning: " << *this << " called with only one argument.";
                     return new NullValue();
                 }
@@ -462,12 +463,12 @@ namespace xpath
 
         case Concat:
             {
-                if (!arguments || !arguments->size())
+                if (!arguments || !arguments->size()) {
                     return new NullValue();
+		}
 
                 string retval;
-                for (std::list<Expression*>::iterator i = arguments->begin(); i != arguments->end(); ++i)
-                {
+                for (std::list<Expression*>::iterator i = arguments->begin(); i != arguments->end(); ++i) {
                     Value *currentvalue = (*i)->evaluateExpression(c);
                     StringValue *currentstring = currentvalue->toString();
                     retval+=currentstring->getValue();
@@ -479,15 +480,15 @@ namespace xpath
 
         case Contains:
             {
-                if (!arguments || !arguments->size())
+                if (!arguments || !arguments->size()) {
                     return new NullValue();
+		}
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
                 Expression *secondExpr = *(++i);
 
-                if (!secondExpr)
-                {
+                if (!secondExpr) {
                     AC_WARNING << "ERROR: parameter missing to function call " << *this;
                     return new NullValue();
                 }
@@ -511,8 +512,9 @@ namespace xpath
 
         case Substring:
             {
-                if (!arguments || !arguments->size())
+                if (!arguments || !arguments->size()) {
                     return new NullValue();
+		}
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
@@ -520,26 +522,30 @@ namespace xpath
                 Expression *thirdExpr = *(++i);
                 assert(firstExpr);
 
-                if (!secondExpr)
+                if (!secondExpr) {
                     return new NullValue();
+		}
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
                 Value *third = NULL;
-                if (thirdExpr)
+                if (thirdExpr) {
                     third = thirdExpr->evaluateExpression(c);
+		}
 
                 StringValue *firstString = first->toString();
                 NumberValue *secondNumber = second->toNumber();
                 NumberValue *thirdNumber = NULL;
-                if (thirdExpr)
+                if (thirdExpr) {
                     thirdNumber= third->toNumber();
+		}
 
                 delete first;
                 delete second;
 
-                if (third)
+                if (third) {
                     delete third;
+		}
 
                 int secondNumberValue = int(secondNumber->getValue()+0.5);
 
@@ -548,15 +554,17 @@ namespace xpath
                 resultlength = firstString->getValue().length() - secondNumberValue;
 
                 // +1 for the terminating null character
-                if (thirdNumber && thirdNumber->getValue() + 1 < resultlength)
+                if (thirdNumber && thirdNumber->getValue() + 1 < resultlength) {
                     resultlength = int(thirdNumber->getValue()+0.5) + 1;
+		}
 
                 string result = firstString->getValue().substr(secondNumberValue, resultlength);
 
                 delete firstString;
                 delete secondNumber;
-                if (thirdNumber)
+                if (thirdNumber) {
                     delete thirdNumber;
+		}
 
                 StringValue * resultvalue = new StringValue(result);
                 return resultvalue;
@@ -573,8 +581,9 @@ namespace xpath
                 Expression *secondExpr = *(++i);
                 assert(firstExpr);
 
-                if (!secondExpr)
+                if (!secondExpr) {
                     return new NullValue();
+		}
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
@@ -597,15 +606,17 @@ namespace xpath
 
         case SubstringAfter:
             {
-                if (!arguments || !arguments->size())
+                if (!arguments || !arguments->size()) {
                     return new NullValue();
+		}
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
                 Expression *secondExpr = *(++i);
 
-                if (!secondExpr)
+                if (!secondExpr) {
                     return new NullValue();
+		}
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
@@ -785,10 +796,11 @@ namespace xpath
         switch (test)
         {
         case TestPrincipalType:
-            if (nodeTestName.length())
+            if (nodeTestName.length()) {
                 os << nodeTestName;
-            else
+	    } else {
                 os << "*";
+	    }
             break;
         case TestAnyNode:
             os << "node()";
@@ -827,7 +839,7 @@ namespace xpath
 
     Step::~Step()
     {
-	for (std::list<Expression *>::iterator i = predicates.begin(); i != predicates.end(); ++i) delete *i;
+	for (std::list<Expression *>::iterator i = predicates.begin(); i != predicates.end(); ++i) { delete *i; };
     };
 
     const string &Step::stringForAxis(Step::Axis a)
@@ -859,8 +871,9 @@ namespace xpath
         while (i<n && pos < is.size() && is[pos+i] == s[i]) {
             ++i;
         }
-        if (i == s.size())
+        if (i == s.size()) {
             return pos + i;
+	}
         return pos;
     }
 
@@ -953,71 +966,77 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         switch(axis)
         {
         case Child:
-            if (curNode->hasChildNodes())
-                for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling())
-                    if (passesNodeTest(curNode))
+            if (curNode->hasChildNodes()) {
+                for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
+                    if (passesNodeTest(curNode)) {
                         resultset->insert(curNode);
+		    }
+		}
+	    }
             break;
         case Parent:
             curNode = curNode->parentNode();
-            if (curNode && passesNodeTest(curNode))
+            if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             break;
         case Next_Sibling:
             curNode = &*curNode->nextSibling();
-            if (curNode && passesNodeTest(curNode))
+            if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             break;
         case Previous_Sibling:
             curNode = &*curNode->previousSibling();
-            if (curNode && passesNodeTest(curNode))
+            if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             break;
         case Preceding_Sibling:
-            while (curNode = &*curNode->previousSibling())
-                if (passesNodeTest(curNode))
+            while (curNode = &*curNode->previousSibling()) {
+                if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
+		}
+	    }
             break;
         case Following_Sibling:
-            while (curNode = &*curNode->nextSibling())
-                if (passesNodeTest(curNode))
+            while (curNode = &*curNode->nextSibling()) {
+                if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
+		}
+	    }
             break;
         case Descendant_Or_Self:
-            if (passesNodeTest(curNode))
+            if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             /* nobreak; */
         case Descendant:
             {
                 while (true)
                 {
-                    if (curNode->firstChild())
-                    {
+                    if (curNode->firstChild()){
                         curNode = &*curNode->firstChild();
-                    }
-                    else if (curNode == origNode)
+                    } else if (curNode == origNode) {
                         break;
-                    else if (curNode->nextSibling())
-                    {
+                    } else if (curNode->nextSibling()) {
                         curNode = &*curNode->nextSibling();
-                    }
-                    else
-                    {
+                    } else {
                         NodeRef tmp = curNode;
-                        while ((tmp = tmp->parentNode()) != origNode)
-                        {
-                            if (tmp->nextSibling())
-                            {
+                        while ((tmp = tmp->parentNode()) != origNode) {
+                            if (tmp->nextSibling()) {
                                 curNode = &*tmp->nextSibling();
                                 break;
                             }
                         }
-                        if (tmp == origNode)
+                        if (tmp == origNode) {
                             break;
+			}
                     };
 
-                    if (passesNodeTest(curNode))
+                    if (passesNodeTest(curNode)) {
                         resultset->insert(curNode);
+		    }
                 };
             };
 #ifdef INTERPRETER_DEBUG
@@ -1025,8 +1044,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
             break;
         case Self:
-            if (passesNodeTest(curNode))
+            if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             break;
         case Attribute:
             {
@@ -1036,8 +1056,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         resultset->insert(&*map.item(i));
             };
         case Ancestor_Or_Self:
-            if (passesNodeTest(curNode))
+            if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
+	    }
             /* nobreak; */
         case Ancestor:
             if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE)
@@ -1047,12 +1068,15 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                   curNode = curAttr.ownerElement();
                 */
                 curNode = curNode->parentNode();
-                if (passesNodeTest(curNode))
+                if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
+		}
             }
-            while (curNode = curNode->parentNode())
-                if (passesNodeTest(curNode))
+            while (curNode = curNode->parentNode()) {
+                if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
+		}
+	    }
         case Following:
         case Preceding:
         case Invalid:
@@ -1067,23 +1091,20 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 	    AC_TRACE << " inside " << origNode->parentNode()->nodeName();
 	}
 #endif
-        for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i)
-        {
+        for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << resultset->size() << " nodes:";
 #endif
             Context subcontext;
             subcontext.size = resultset->size();
             subcontext.position = 0;
-            for (NodeSet::iterator j = resultset->begin(); j != resultset->end();)
-            {
+            for (NodeSet::iterator j = resultset->begin(); j != resultset->end();) {
                 subcontext.position++;
                 subcontext.currentNode = (*j);
                 Value *tmp = (*i)->evaluateExpression(subcontext);
                 BooleanValue *v = tmp->toBoolean();
                 delete tmp;
-                if (!v->getValue())
-                {
+                if (!v->getValue()) {
 #ifdef INTERPRETER_DEBUG
                     AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
 #endif
@@ -1092,43 +1113,38 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 		else ++j;
                 delete v;
             }
-        };
+        }
 	return resultset;
     };
 
-    void Step::serializeTo(std::ostream &os)
-    {
+    void Step::serializeTo(std::ostream & os) {
         os << stringForAxis(axis);
         os << "::";
         serializeNodeTest(os);
-        for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i)
-        {
+        for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i) {
             os << "[";
             (*i)->serializeTo(os);
             os << "]";
         };
     };
 
-    void Step::appendPredicate(Expression *e)
-    {
+    void Step::appendPredicate(Expression *e) {
         predicates.push_back(e);
     };
 
-    void Step::prependPredicate(Expression *e)
-    {
+    void Step::prependPredicate(Expression *e) {
         predicates.push_front(e);
     };
 
     void Step::insertPredicate(int at, Expression *e) {
         std::list<Expression*>::iterator i = predicates.begin();
-        while (i != predicates.end() && at--) ++i;
+        while (i != predicates.end() && at--) { ++i; }
         predicates.insert(i, e);
     };
 
     Expression* Step::takeFirst() { Expression *retval = predicates.front(); predicates.pop_front(); return retval; };
     Expression* Step::takeLast() { Expression *retval = predicates.back(); predicates.pop_back(); return retval; };
-    Expression* Step::take(int at)
-    {
+    Expression* Step::take(int at) {
         std::list<Expression*>::iterator i = predicates.begin();
         while (i != predicates.end() && at--) ++i;
         Expression *retval = *i;
@@ -1136,8 +1152,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         return retval;
     };
 
-    Expression* Step::predicate(int at)
-    {
+    Expression* Step::predicate(int at) {
         std::list<Expression*>::iterator i = predicates.begin();
         while (i != predicates.end() && at--) ++i;
         return *i;
@@ -1145,19 +1160,15 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 
     int Step::count() const { return predicates.size(); };
 
-    Path::Path()
-    {
+    Path::Path() {
         absolute = false;
     };
 
-
-    Value* Path::evaluateExpression(const Context &c)
-    {
+    Value* Path::evaluateExpression(const Context &c) {
         return evaluate(c.currentNode);
     };
 
-    NodeSetValue *Path::evaluate(NodeRef n)
-    {
+    NodeSetValue *Path::evaluate(NodeRef n) {
         NodeSetRef initialSet = new NodeSet();
         initialSet->insert(n);
 
@@ -1169,31 +1180,29 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         return new NodeSetValue(result);
     };
 
-    NodeSetRef Path::evaluateAll(NodeSetRef workingset)
-    {
+    NodeSetRef Path::evaluateAll(NodeSetRef workingset) {
         if (absolute) {
 	    NodeSetRef newResults = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
             {
 		NodeRef thisOne = *i;
-		while (thisOne->parentNode()) thisOne = thisOne->parentNode();
+		while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
 		newResults->insert(thisOne);
             }
 	    delete workingset;
 	    workingset = newResults;
 	}
 
-        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s)
-        {
+        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes :";
 #endif
 	    NodeSetRef nextStepSet = new NodeSet();
-            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i)
-            {
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
                NodeSetRef newResults = (*s)->scan(*i);
-	       for (NodeSet::iterator j = newResults->begin(); j != newResults->end(); ++j)
+	       for (NodeSet::iterator j = newResults->begin(); j != newResults->end(); ++j) {
 		   nextStepSet->insert(*j);
+	       }
 	       delete newResults;
             };
             delete workingset;
@@ -1202,8 +1211,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         return workingset;
     };
 
-    void Path::serializeTo(std::ostream &os)
-    {
+    void Path::serializeTo(std::ostream &os) {
         if (absolute) os << "/";
         std::list<Step*>::iterator s = steps.begin(); 
         while (s != steps.end()) {
