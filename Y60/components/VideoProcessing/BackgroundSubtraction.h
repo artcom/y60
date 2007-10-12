@@ -31,10 +31,16 @@ namespace y60 {
 	        }
 
 		private:
+            unsigned int clampedSub(unsigned int theFirstValue, unsigned int theSecondValue); 
+            
             dom::Element _myResultNode;
             dom::ValuePtr _mySourceRaster;
             dom::ValuePtr _myTargetRaster;
-	};
+            dom::ValuePtr _myBackgroundRaster;
+            
+            y60::ImagePtr _myTargetImage;
+    
+    };
 
 }
 

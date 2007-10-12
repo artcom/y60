@@ -22,12 +22,12 @@ namespace y60 {
         _myResultNode("result"),
         _mySourceRaster(0)
     {
-        _myResultNode.appendChild(Element("red"));
-        _myResultNode.childNode("red")->appendChild(Text(""));
-        _myResultNode.appendChild(Element("green"));
-        _myResultNode.childNode("green")->appendChild(Text(""));
-        _myResultNode.appendChild(Element("blue"));
-        _myResultNode.childNode("blue")->appendChild(Text(""));
+        // _myResultNode.appendChild(Element("red"));
+        // _myResultNode.childNode("red")->appendChild(Text(""));
+        // _myResultNode.appendChild(Element("green"));
+        // _myResultNode.childNode("green")->appendChild(Text(""));
+        // _myResultNode.appendChild(Element("blue"));
+        // _myResultNode.childNode("blue")->appendChild(Text(""));
     }
   
 
@@ -35,62 +35,50 @@ namespace y60 {
     BackgroundSubtraction::configure(const dom::Node & theNode) {
         
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
-            const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
-            const std::string myID = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
+            const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
+            const std::string myID = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myID);
+            AC_PRINT << "configure " << myName;
             if( myImage ) {
                 if( myName == "sourceimage") {
-                    _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                    _mySourceRaster = myImage->getFacade<y60::Image>()->getRasterValue();
+                } else if( myName == "backgroundimage") {
+                    _myBackgroundRaster = myImage->getFacade<y60::Image>()->getRasterValue();
+                    AC_PRINT << "raster " << _myBackgroundRaster;
                 } else if( myName == "targetimage") {
                     _myTargetRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
+                    _myTargetImage = myImage->getFacade<y60::Image>();
                 }
             }
-        }     
+        }   
+
+        // TODO:  add colorspace and dimension checking! [sh]
     }
 
 	void 
     BackgroundSubtraction::onFrame(double t) {
         
-        std::vector<asl::Unsigned32> redHistogram(256);
-        std::vector<asl::Unsigned32> blueHistogram(256);
-        std::vector<asl::Unsigned32> greenHistogram(256);
-        if (const RGBRaster * myFrame = dom::dynamic_cast_Value<RGBRaster>(&*_mySourceRaster)) {
-            for (RGBRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
-                // AC_WARNING << static_cast<unsigned int>((*it)[0]);
-                redHistogram[static_cast<unsigned int>((*it)[0])]++;
-                greenHistogram[(*it)[1]]++;
-                blueHistogram[(*it)[2]]++;
-            }
+        const BGRRaster * mySourceFrame     = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+        const BGRRaster * myBackgroundFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myBackgroundRaster);
+        const BGRRaster * myTargetFrame     = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetRaster);
+        
+        BGRRaster::const_iterator itBg   = myBackgroundFrame->begin();
+        BGRRaster::iterator itTrgt = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
             
-        } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster)) {
-            for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
-                redHistogram[(*it)[2]]++;
-                greenHistogram[(*it)[1]]++;
-                blueHistogram[(*it)[0]]++;
-            }
-            
+        AC_PRINT <<  myBackgroundFrame;  
+
+        for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); ++itSrc,++itBg, ++itTrgt) {
+            // redHistogram[static_cast<unsigned int>((*it)[0])]++;
+            (*itTrgt)[0] = clampedSub((*itBg)[0], (*itSrc)[0]);  
+            (*itTrgt)[1] = clampedSub((*itBg)[1], (*itSrc)[1]);  
+            (*itTrgt)[2] = clampedSub((*itBg)[2], (*itSrc)[2]);  
         }
-
-        std::vector<asl::Unsigned64> mySum(3);
-        mySum[0] = 0;
-        mySum[1] = 0;
-        mySum[2] = 0;
-        for (int i = 0; i < 256; ++i) {
-            mySum[0] += redHistogram[i]*i;
-            mySum[1] += greenHistogram[i]*i;
-            mySum[2] += blueHistogram[i]*i;
-        }
-        dom::Node & redNode = *(_myResultNode.childNode("red"));
-        dom::Node & greenNode = *(_myResultNode.childNode("green"));
-        dom::Node & blueNode = *(_myResultNode.childNode("blue"));
-
-        //redNode.childNode("#text")->nodeValue(asl::as_string(redHistogram));
-        redNode["sum"] = asl::as_string(mySum[0]);
-
-        //greenNode.childNode("#text")->nodeValue(asl::as_string(greenHistogram));
-        greenNode["sum"] = asl::as_string(mySum[1]);
-
-        //blueNode.childNode("#text")->nodeValue(asl::as_string(blueHistogram));
-        blueNode["sum"] = asl::as_string(mySum[2]);
+        
+        _myTargetImage->triggerUpload();
 	}
+
+    unsigned int
+    BackgroundSubtraction::clampedSub(unsigned int theFirstValue, unsigned int theSecondValue) {
+        return asl::maximum<unsigned int>(theFirstValue, theSecondValue) -  asl::minimum<unsigned int>(theFirstValue, theSecondValue);
+    }
 }
