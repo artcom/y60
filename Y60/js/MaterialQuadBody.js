@@ -24,20 +24,6 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         throw new Exception(errorMessage);
     }
 
-/* TA 2007-08-01: FIXME
-    var myScene = theParentNode;
-
-    while (myScene.nodeName != "scene") {
-        myScene = myScene.parentNode;
-    }
-
-    // fails:
-    assert(theScene == myScene);
-
-    // works but why:
-    assert(theScene.dom == myScene);
-*/
-
     if (theImage == undefined) {
         var errorstring = "theImage is undefined";
         Logger.error(errorstring);
@@ -54,7 +40,7 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
             }
         } else if (fileExists(theImage)) {
             // theImage is-a filename
-            print("MQB filename=" + theImage);
+
             if (theImage in ourImageMap) {
                 _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
             } else {
@@ -95,8 +81,16 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
         return _myMaterial;
     }
 
+    Public.material setter = function(p) {
+        _myMaterial = p;
+    }
+
     Public.shape getter = function() {
         return _myQuadShape;
+    }
+
+    Public.shape setter = function(p) {
+        _myQuadShape = p;
     }
 
     Public.quad getter = function() {
@@ -105,5 +99,9 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
 
     Public.body getter = function() {
         return _myBody;
+    }
+
+    Public.body setter = function(p) {
+        _myBody = p;
     }
 }
