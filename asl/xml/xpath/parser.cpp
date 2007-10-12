@@ -1,5 +1,5 @@
-#include "context.h"
-#include "syntaxtree.h"
+#include "xpath/context.h"
+#include "xpath/syntaxtree.h"
 
 //#define DEBUG_PARSER_STATES
 //#define PARSER_DEBUG_VERBOSITY 2
@@ -508,9 +508,9 @@ namespace xpath {
 	    return pos;
 	}
 	pos++;
-	Expression **secondE;
-	pos = parseAddExpression(secondE, instring, pos);
-	*e = new BinaryExpression(myType, *e, *secondE);
+	Expression *secondE;
+	pos = parseAddExpression(&secondE, instring, pos);
+	*e = new BinaryExpression(myType, *e, secondE);
 	return pos;
     }
 
@@ -532,9 +532,9 @@ namespace xpath {
 	    return pos;
 	}
 	pos += (instring[pos+1]=='='?2:1);
-	Expression **secondE;
-	pos = parseRelationalExpression(secondE, instring, pos);
-	*e = new BinaryExpression(myType, *e, *secondE);
+	Expression *secondE;
+	pos = parseRelationalExpression(&secondE, instring, pos);
+	*e = new BinaryExpression(myType, *e, secondE);
 	return pos;
     }
 
@@ -592,9 +592,9 @@ namespace xpath {
 	    pos += TOKEN_AND.length();
 	    pos = read_whitespace(instring, pos);
 
-	    Expression **secondE;
-	    pos = parseAndExpression(secondE, instring, pos);
-	    *e = new BinaryExpression(BinaryExpression::And, *e, *secondE);
+	    Expression *secondE;
+	    pos = parseAndExpression(&secondE, instring, pos);
+	    *e = new BinaryExpression(BinaryExpression::And, *e, secondE);
 	}
 	return pos;
     }
@@ -614,9 +614,9 @@ namespace xpath {
 	    pos += TOKEN_OR.length();
 	    pos = read_whitespace(instring, pos);
 
-	    Expression **secondE;
-	    pos = parseOrExpression(secondE, instring, pos);
-	    *e = new BinaryExpression(BinaryExpression::Or, *e, *secondE);
+	    Expression *secondE;
+	    pos = parseOrExpression(&secondE, instring, pos);
+	    *e = new BinaryExpression(BinaryExpression::Or, *e, secondE);
 	}
 	return pos;
     }

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <math.h>
 
-#include "syntaxtree.h"
+#include "xpath/syntaxtree.h"
 #include <dom/Nodes.h>
 
 #define INTERPRETER_DEBUG
@@ -67,10 +67,11 @@ namespace xpath
 
         if (type<16) // comparison operators
         {
-            if (left->type()==right->type()==Value::NodeSetType)
+        if ((left->type()==right->type()) && (right->type() ==Value::NodeSetType))
             {
                 std::cerr << "Not yet implemented.\n";
                 assert(false);
+		return new NullValue();
                 // ## find one pair of string-values of one node each that evaluates to true.
             }
             else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
@@ -153,6 +154,7 @@ namespace xpath
                     std::cerr << "Not yet implemented!\n";
                     assert(false);
                 }
+                return new NullValue();
             }
             else // no nodeset
             {
@@ -200,6 +202,7 @@ namespace xpath
             {
                 std::cerr << "Not yet implemented!\n";
                 assert(false);
+		return new NullValue();
             }
         }
         else // "+", "-", "*", "/", "mod"
@@ -225,6 +228,7 @@ namespace xpath
             default:
                 std::cerr << "Not yet implemented.\n";
                 assert(false);
+		return new NullValue();
             };
         }
     };
@@ -321,6 +325,7 @@ namespace xpath
             return retval;
         }
         else assert(false);
+	return new NullValue();
     }
 
 

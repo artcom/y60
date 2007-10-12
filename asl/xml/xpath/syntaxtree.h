@@ -3,8 +3,8 @@
 
 #include <dom/Nodes.h>
 
-#include "context.h"
-#include "value.h"
+#include "xpath/context.h"
+#include "xpath/value.h"
 
 namespace xpath
 {

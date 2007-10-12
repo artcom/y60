@@ -1,7 +1,7 @@
 #ifndef XPATHCONTEXT_H
 #define XPATHCONTEXT_H
 
-#include "value.h"
+#include "xpath/value.h"
 
 namespace xpath
 {

@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "xpath/parser.h"
 
 int main(int argc, char **argv) {
     std::string myXML = "<testDoc><body><junk>foo</junk><junk content=\"valuable\"><junk class=\"more\" content=\"valuable\">not</junk>bar</junk></body>\

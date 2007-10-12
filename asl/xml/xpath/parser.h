@@ -1,7 +1,7 @@
 #ifndef XPATH_PARSER_H
 #define XPATH_PARSER_H
 
-#include "value.h"
+#include "xpath/value.h"
 
 namespace xpath {
 
