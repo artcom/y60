@@ -364,9 +364,6 @@ namespace xpath
             {
             case Union:
                 std::set_union(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
-                delete vcur;
-                delete v;
-                v = vres;
                 break;
             case Intersection:
                 std::set_intersection(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
@@ -375,7 +372,8 @@ namespace xpath
                 std::set_difference(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
                 break;
             }
-            delete vcur;
+	    delete vcur;
+	    delete v;
             v = vres;
         }
         return new NodeSetValue(v);
