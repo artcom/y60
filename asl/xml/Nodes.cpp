@@ -312,7 +312,7 @@ namespace dom {
         }
         return last_non_white+1;
     }
-    // returns position past second qoute char if at pos is a qoute char
+    // returns position past second quote char if at pos is a quote char
     int read_quoted_text(const String & is,int pos,
         Char opening_qoute,Char closing_qoute ) {
         if (is[pos]==opening_qoute) {
@@ -1461,7 +1461,7 @@ dom::Node::parseAll(const String& is) {
                 }
             }
         } while (completed_pos > pos);
-        // finish eventually trailing whitespace
+        // read potentially trailing whitespace
         _myParseCompletionPos = read_whitespace(is,pos);
     }
 
