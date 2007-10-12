@@ -23,12 +23,31 @@
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
 
+#include "RefCountWrapper.impl"
+
 using namespace std;
 using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-template class JSWrapper<cairo_t, Ptr< cairo_t >, StaticAccessProtocol>;
+template class JSWrapper<JSCairoWrapper, Ptr< JSCairoWrapper >, StaticAccessProtocol>;
+
+namespace jslib {
+
+template <>
+void CairoWrapper<cairo_t>::reference() {
+    cairo_reference(_myWrapped);
+}
+
+template <>
+void CairoWrapper<cairo_t>::unreference() {
+    cairo_destroy(_myWrapped);
+}
+
+}
+
+template class CairoWrapper<cairo_t>;
+
 
 static JSBool
 checkForErrors(JSContext *theJavascriptContext, cairo_t *theContext) {
@@ -1232,14 +1251,18 @@ JSCairo::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             return JS_FALSE;
         }
 
-        newNative = cairo_create(mySurface);
+        newNative = dynamic_cast<NATIVE*>(NATIVE::get(cairo_create(mySurface)));
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
 
-    myNewObject = new JSCairo(OWNERPTR(newNative), newNative);
+    JSCairoWrapper::STRONGPTR _myOwnerPtr(newNative);
+    JSCairoWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
+
+    myNewObject = new JSCairo(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
+    newNative->self(_mySelfPtr);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
@@ -1343,9 +1366,15 @@ JSCairo::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 namespace jslib {
+
 jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theNative) {
     JSObject * myReturnObject = JSCairo::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
+}
+
+jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, cairo_t * theNative) {
+    JSCairoWrapper *myWrapper = dynamic_cast<JSCairoWrapper*>(JSCairoWrapper::get(theNative));
+    return as_jsval(cx, theOwner, myWrapper);
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theTarget) {
@@ -1361,5 +1390,16 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theTarget) {
     }
     return false;
 }
+
+bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theTarget) {
+    JSCairo::NATIVE *myWrapper;
+
+    if(convertFrom(cx, theValue, myWrapper)) {
+        theTarget = myWrapper->getNative();
+        return true;
+    }
+
+    return false;
 }
 
+}

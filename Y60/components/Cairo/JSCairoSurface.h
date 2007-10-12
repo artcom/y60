@@ -15,20 +15,26 @@
 
 #include <y60/JSWrapper.h>
 
+extern "C" {
 #include <cairo/cairo.h>
+}
+
+#include "RefCountWrapper.h"
+
 
 namespace jslib {
 
-    class JSCairoSurface : public JSWrapper<cairo_surface_t, asl::Ptr< cairo_surface_t >, StaticAccessProtocol> {
+    typedef CairoWrapper<cairo_surface_t> JSCairoSurfaceWrapper;
+
+    class JSCairoSurface : public JSWrapper<JSCairoSurfaceWrapper, asl::Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol> {
         JSCairoSurface();  // hide default constructor
     public:
 
         virtual ~JSCairoSurface() {
-            cairo_surface_destroy(_myNative);
         }
 
-        typedef cairo_surface_t NATIVE;
-        typedef asl::Ptr< cairo_surface_t > OWNERPTR;
+        typedef JSCairoSurfaceWrapper NATIVE;
+        typedef asl::Ptr< JSCairoSurfaceWrapper > OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
@@ -87,9 +93,11 @@ namespace jslib {
     struct JSClassTraits<JSCairoSurface::NATIVE>
         : public JSClassTraitsWrapper<JSCairoSurface::NATIVE, JSCairoSurface> {};
 
-    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theButton);
+    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theSurface);
+    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theSurface);
     
     bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget);
+    bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROSURFACE_INCLUDED_ */

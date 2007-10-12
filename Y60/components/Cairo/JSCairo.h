@@ -19,18 +19,21 @@ extern "C" {
 #include <cairo/cairo.h>
 }
 
+#include "RefCountWrapper.h"
+
 namespace jslib {
 
-    class JSCairo : public JSWrapper<cairo_t, asl::Ptr<cairo_t>, StaticAccessProtocol> {
+    typedef CairoWrapper<cairo_t> JSCairoWrapper;
+
+    class JSCairo : public JSWrapper<JSCairoWrapper, asl::Ptr< JSCairoWrapper >, StaticAccessProtocol> {
         JSCairo();  // hide default constructor
     public:
 
         virtual ~JSCairo() {
-            cairo_destroy(_myNative);
         }
 
-        typedef cairo_t NATIVE;
-        typedef asl::Ptr<cairo_t> OWNERPTR;
+        typedef JSCairoWrapper NATIVE;
+        typedef asl::Ptr< JSCairoWrapper > OWNERPTR;
 
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
@@ -135,16 +138,17 @@ namespace jslib {
             return dynamic_cast<JSCairo &>(JSCairo::getJSWrapper(cx,obj));
         }
 
-    private:
     };
 
     template <>
     struct JSClassTraits<JSCairo::NATIVE>
         : public JSClassTraitsWrapper<JSCairo::NATIVE, JSCairo> {};
 
-    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theButton);
+    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theContext);
+    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, cairo_t * theContext);
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theTarget);
+    bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theContext);
+    bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theContext);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_ */

@@ -20,12 +20,30 @@
 
 #include "JSCairoSurface.h"
 
+#include "RefCountWrapper.impl"
+
 using namespace std;
 using namespace asl;
 using namespace y60;
 using namespace jslib;
 
-template class JSWrapper<cairo_surface_t, Ptr< cairo_surface_t >, StaticAccessProtocol>;
+template class JSWrapper<JSCairoSurfaceWrapper, Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol>;
+
+namespace jslib {
+
+template <>
+void CairoWrapper<cairo_surface_t>::reference() {
+    cairo_surface_reference(_myWrapped);
+}
+
+template <>
+void CairoWrapper<cairo_surface_t>::unreference() {
+    cairo_surface_destroy(_myWrapped);
+}
+
+}
+
+template class CairoWrapper<cairo_surface_t>;
 
 static JSBool
 checkForErrors(JSContext *theJavascriptSurface, cairo_surface_t *theSurface) {
@@ -194,14 +212,19 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 ;
         }
 
-        newNative = cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride);
+        newNative = dynamic_cast<NATIVE*>(NATIVE::get(cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride)));
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
 
-    myNewObject = new JSCairoSurface(OWNERPTR(newNative), newNative);
+    JSCairoSurfaceWrapper::STRONGPTR _myOwnerPtr(newNative);
+    JSCairoSurfaceWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
+
+    myNewObject = new JSCairoSurface(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
+    newNative->self(_mySelfPtr);
+
     myNewObject->_myImageNode = myImageNode;
 
     if (myNewObject) {
@@ -253,6 +276,11 @@ jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface:
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
+jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theNative) {
+    JSCairoSurfaceWrapper *myWrapper = dynamic_cast<JSCairoSurfaceWrapper*>(JSCairoSurfaceWrapper::get(theNative));
+    return as_jsval(cx, theOwner, myWrapper);
+}
+
 bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
@@ -266,5 +294,17 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTar
     }
     return false;
 }
+
+bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget) {
+    JSCairoSurface::NATIVE *myWrapper;
+
+    if(convertFrom(cx, theValue, myWrapper)) {
+        theTarget = myWrapper->getNative();
+        return true;
+    }
+
+    return false;
+}
+
 }
 

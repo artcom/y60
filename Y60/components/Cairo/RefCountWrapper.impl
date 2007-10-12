@@ -1,0 +1,10 @@
+
+#include "RefCountWrapper.h"
+
+namespace jslib {
+
+    template <class WRAPPED>
+    std::map<WRAPPED *, CairoWrapper<WRAPPED> *>
+    CairoWrapper<WRAPPED>::_myWrappers;
+
+}
