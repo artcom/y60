@@ -1210,14 +1210,11 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
     };
 
     void Path::serializeTo(std::ostream &os) {
-        if (absolute) os << "/";
-        std::list<Step*>::iterator s = steps.begin(); 
-        while (s != steps.end()) {
-            (*s)->serializeTo(os);
-            s++;
-            if (s != steps.end()) {
+        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
+            if ((s != steps.begin()) || absolute) {
                 os << "/";
             }
+            (*s)->serializeTo(os);
         };
     };
 
