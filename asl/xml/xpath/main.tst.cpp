@@ -1,4 +1,4 @@
-#include "xpath/parser.h"
+#include "parser.h"
 
 int main(int argc, char **argv) {
     std::string myXML = "<testDoc><body><junk>foo</junk><junk content=\"valuable\"><junk class=\"more\" content=\"valuable\">not</junk>bar</junk></body>\
@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
     if (!(instream >> root)) {
 	std::cout << "XML parse error.";
     } else {
-	std::cout << "parsed document " << root;
+	std::cout << "parsed document:\n" << root;
     }
 
     xpath::NodeRef documentElement = &*root.childNode(0);

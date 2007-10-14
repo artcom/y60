@@ -1,11 +1,13 @@
-#include <assert.h>
 
-#include <iostream>
+#include <assert.h>
 #include <math.h>
 
-#include "xpath/syntaxtree.h"
+#include <iostream>
+
+#include <asl/Logger.h>
 #include <dom/Nodes.h>
-#include "asl/Logger.h"
+
+#include "syntaxtree.h"
 
 #define INTERPRETER_DEBUG
 

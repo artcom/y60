@@ -2,6 +2,7 @@
 #define VALUE_H
 
 #include <stdlib.h>
+
 #include <dom/Nodes.h>
 
 namespace xpath

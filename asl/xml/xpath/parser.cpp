@@ -1,5 +1,7 @@
-#include "xpath/context.h"
-#include "xpath/syntaxtree.h"
+#include "context.h"
+#include "syntaxtree.h"
+
+#include "parser.h"
 
 //#define DEBUG_PARSER_STATES
 //#define PARSER_DEBUG_VERBOSITY 2
