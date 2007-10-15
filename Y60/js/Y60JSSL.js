@@ -17,14 +17,45 @@ var PI_4 = Math.PI / 4;
 var PI_180 = Math.PI / 180;
 var TWO_PI = Math.PI * 2.0;
 
-// This only works with native js objects
-function clone(theObject) {
+// This only works with native js objects or
+// properly wrapped hosted objects.
+// 
+// However, neither the prototype chain of objects
+// nor the scope chain of function objects will be copied. Thus,
+// "clone" is a rather euphemistic name for this function.
+// 
+// Looking at the details, things become a bit ugly, though:
+//
+// JSNode objects for example react differently when properties
+// are accessed through the "." operator, compared to "[]". The Code:
+//
+// aNode["nodeValue"]
+//
+// will throw a DOMException, while with the dot notation: 
+// 
+// var i = "nodeValue";
+// var ival = node.i
+//
+// anything works fine. Thus, we provide two variants of clone().
+// (TA 2007-10-14)
+
+function clone(theObject, theMode) {
     var myNewObject = [];
-    for (i in theObject) {
-        if (typeof theObject[i] == "object") {
-            myNewObject[i] = clone(theObject[i]);
-        } else {
-            myNewObject[i] = theObject[i];
+    if (theMode) {
+        for (i in theObject) {
+            if (typeof theObject[i] == "object") {
+                myNewObject[i] = clone(theObject[i], theMode);
+            } else {
+                myNewObject[i] = theObject[i];
+            }
+        }
+    } else {
+        for (i in theObject) {
+            if (typeof theObject.i == "object") {
+                myNewObject.i = clone(theObject.i, theMode);
+            } else {
+                myNewObject.i = theObject.i;
+            }
         }
     }
     return myNewObject;
@@ -132,15 +163,32 @@ function parseDate(theDateString) {
     return new Date(myDate[0], myDate[1] - 1, myDate[2]);
 }
 
+const COLOR_HEX_STRING_PATTERN = /^[0-9A-F]{6}/;
+
 // use like this: asColor("00BFA3", 1);
 function asColor(theHexString, theAlpha) {
+
+    if (theHexString instanceof Vector4f) {
+	return theHexString;
+    }
+
     if (theAlpha == undefined) {
         theAlpha = 1;
     }
-    var myRed   = eval("0x" + theHexString[0] + theHexString[1]);
-    var myGreen = eval("0x" + theHexString[2] + theHexString[3]);
-    var myBlue  = eval("0x" + theHexString[4] + theHexString[5]);
-    return [myRed / 255, myGreen / 255, myBlue / 255, theAlpha];
+
+    if (theHexString instanceof Vector3f) {
+        return new Vector4f(theHexString[0], theHexString[1], theHexString[2], theAlpha);
+    }
+
+    if (COLOR_HEX_STRING_PATTERN.test(theHexString)) {
+	print("asColor: evaluating " + theHexString);
+        var myRed   = eval("0x" + theHexString[0] + theHexString[1]);
+        var myGreen = eval("0x" + theHexString[2] + theHexString[3]);
+        var myBlue  = eval("0x" + theHexString[4] + theHexString[5]);
+        return new Vector4f(myRed / 255, myGreen / 255, myBlue / 255, theAlpha);
+    } else {
+	return new Vector4f(eval(theHexString));
+    }
 }
 
 // returns a string represenation of an (nested) array
