@@ -46,6 +46,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     ///////////////////////////////////////////////////////////////////////////////////////////
     ImageOverlayBase.prototype.Constructor(Public, Protected, theScene, null, thePosition, theParent);
 
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +203,11 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     }
 
     function setup() {
-        Public.color = asColor(Public.style.color);
+        print("::::theSize="+theSize);
+	print("Public.style.color = " + Public.style.color);
+	var myColor = asColor(Public.style.color);
+	print("asColor ergibt: " + myColor);
+        Public.color = myColor;
         if (theSize) {
             Public.width  = theSize[0];
             Public.height = theSize[1];
@@ -221,6 +226,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
 
 function Label(theScene, theText, theSize, thePosition, theStyle, theParent) {
     var Protected = [];
+
     this.Constructor(this, Protected, theScene, theText, theSize, thePosition, theStyle, theParent);
 }
 
@@ -235,16 +241,22 @@ function ImageLabel(theScene, theSource, thePosition, theStyle, theParent) {
 }
 
 ImageLabel.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theStyle, theParent) {
-    LabelBase(Public, Protected, theScene, null, thePosition, theStyle, theParent);
+    LabelBase.prototype.Constructor(Public, Protected, theScene, null, thePosition, theStyle, theParent);
     Public.setImage(theSource);
 }
 
 function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
     thePosition, theStyle, theParent)
 {
-    var Public    = this;
-    var Protected = {}
-    LabelBase(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theText, theBackgroundImageSrc, theSize,
+                     thePosition, theStyle, theParent);
+}
+
+BackgroundImageLabel.prototype.Constructor = function(Public, Protected, theScene, theText, theBackgroundImageSrc, theSize,
+                     thePosition, theStyle, theParent)
+{
+    LabelBase.prototype.Constructor(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
 
     Protected.getImageNode = function() {
         if (Public.image == null) {
