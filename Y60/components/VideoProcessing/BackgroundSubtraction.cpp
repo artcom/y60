@@ -106,9 +106,9 @@ namespace y60 {
             }
             
             // update backgroundimage
-            (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
-            (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
-            (*itBg)[2] = static_cast<unsigned int>(myAlpha * (*itSrc)[2] + (1-myAlpha)*(*itBg)[2]);
+            // (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
+            // (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
+            // (*itBg)[2] = static_cast<unsigned int>(myAlpha * (*itSrc)[2] + (1-myAlpha)*(*itBg)[2]);
 
         }
         
