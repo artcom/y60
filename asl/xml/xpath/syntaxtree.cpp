@@ -70,10 +70,10 @@ namespace xpath
 
         if (type<16) // comparison operators
         {
-        if ((left->type()==right->type()) && (right->type() ==Value::NodeSetType))
+        if ((left->type()==Value::NodeSetType) && (right->type() ==Value::NodeSetType))
             {
                 AC_ERROR << "Not yet implemented.";
-		return new NullValue();
+                return new NullValue();
                 // ## find one pair of string-values of one node each that evaluates to true.
             }
             else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
@@ -134,7 +134,7 @@ namespace xpath
 #ifdef INTERPRETER_DEBUG
                     if (retval) {
                         AC_TRACE << "string - nodeset comparison succeeded in expression: " << *this;
-		    }
+                    }
 #endif
                     delete sv; delete nsv;
                     return new BooleanValue(retval);
@@ -170,7 +170,7 @@ namespace xpath
                         retval = equals_as<NumberValue>(left, right);
                     } else {
                         retval = equals_as<StringValue>(left, right);
-		    }
+                    }
                     delete left; delete right;
                     return new BooleanValue(retval ^ (type==NotEqual));
                 }
@@ -200,10 +200,10 @@ namespace xpath
                 return new BooleanValue(rb || lb);
             } else if (type==And) {
                 return new BooleanValue(rb && lb);
-	    } else {
+            } else {
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
-		return new NullValue();
+                return new NullValue();
             }
         }
         else // "+", "-", "*", "/", "mod"
@@ -229,7 +229,7 @@ namespace xpath
             default:
                 AC_ERROR << "Not yet implemented.";
                 assert(false);
-		return new NullValue();
+                return new NullValue();
             };
         }
     };
@@ -239,11 +239,11 @@ namespace xpath
         BinaryExpression *lv = dynamic_cast<BinaryExpression*>(lvalue);
         if (lv) {
             os << "(";
-	}
+        }
         lvalue->serializeTo(os);
         if (lv) {
             os << ")";
-	}
+        }
 
         switch(type)
         {
@@ -293,11 +293,11 @@ namespace xpath
         BinaryExpression *rv = dynamic_cast<BinaryExpression*>(rvalue);
         if (rv) {
             os << "(";
-	}
+        }
         rvalue->serializeTo(os);
         if (rv) {
             os << ")";
-	}
+        }
     };
 
     void UnaryExpression::serializeTo(std::ostream &os)
@@ -328,9 +328,9 @@ namespace xpath
             retval->negate();
             return retval;
         } else {
-	    assert(false);
-	}
-	return new NullValue();
+            assert(false);
+        }
+        return new NullValue();
     }
 
 
@@ -374,8 +374,8 @@ namespace xpath
                 std::set_difference(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
                 break;
             }
-	    delete vcur;
-	    delete v;
+            delete vcur;
+            delete v;
             v = vres;
         }
         return new NodeSetValue(v);
@@ -383,7 +383,7 @@ namespace xpath
 
     Function::~Function()
     {
-	delete arguments;
+        delete arguments;
     }
 
     void Function::serializeTo(std::ostream &os)
@@ -415,7 +415,7 @@ namespace xpath
             {
                 if (!arguments) {
                     return new NumberValue(0);
-		}
+                }
 
                 Value *v = arguments->front()->evaluateExpression(c);
 
@@ -465,7 +465,7 @@ namespace xpath
             {
                 if (!arguments || !arguments->size()) {
                     return new NullValue();
-		}
+                }
 
                 string retval;
                 for (std::list<Expression*>::iterator i = arguments->begin(); i != arguments->end(); ++i) {
@@ -482,7 +482,7 @@ namespace xpath
             {
                 if (!arguments || !arguments->size()) {
                     return new NullValue();
-		}
+                }
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
@@ -514,7 +514,7 @@ namespace xpath
             {
                 if (!arguments || !arguments->size()) {
                     return new NullValue();
-		}
+                }
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
@@ -524,28 +524,28 @@ namespace xpath
 
                 if (!secondExpr) {
                     return new NullValue();
-		}
+                }
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
                 Value *third = NULL;
                 if (thirdExpr) {
                     third = thirdExpr->evaluateExpression(c);
-		}
+                }
 
                 StringValue *firstString = first->toString();
                 NumberValue *secondNumber = second->toNumber();
                 NumberValue *thirdNumber = NULL;
                 if (thirdExpr) {
                     thirdNumber= third->toNumber();
-		}
+                }
 
                 delete first;
                 delete second;
 
                 if (third) {
                     delete third;
-		}
+                }
 
                 int secondNumberValue = int(secondNumber->getValue()+0.5);
 
@@ -556,7 +556,7 @@ namespace xpath
                 // +1 for the terminating null character
                 if (thirdNumber && thirdNumber->getValue() + 1 < resultlength) {
                     resultlength = int(thirdNumber->getValue()+0.5) + 1;
-		}
+                }
 
                 string result = firstString->getValue().substr(secondNumberValue, resultlength);
 
@@ -564,7 +564,7 @@ namespace xpath
                 delete secondNumber;
                 if (thirdNumber) {
                     delete thirdNumber;
-		}
+                }
 
                 StringValue * resultvalue = new StringValue(result);
                 return resultvalue;
@@ -583,7 +583,7 @@ namespace xpath
 
                 if (!secondExpr) {
                     return new NullValue();
-		}
+                }
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
@@ -608,7 +608,7 @@ namespace xpath
             {
                 if (!arguments || !arguments->size()) {
                     return new NullValue();
-		}
+                }
 
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
@@ -616,7 +616,7 @@ namespace xpath
 
                 if (!secondExpr) {
                     return new NullValue();
-		}
+                }
 
                 Value *first = firstExpr->evaluateExpression(c);
                 Value *second = secondExpr->evaluateExpression(c);
@@ -798,9 +798,9 @@ namespace xpath
         case TestPrincipalType:
             if (nodeTestName.length()) {
                 os << nodeTestName;
-	    } else {
+            } else {
                 os << "*";
-	    }
+            }
             break;
         case TestAnyNode:
             os << "node()";
@@ -839,7 +839,7 @@ namespace xpath
 
     Step::~Step()
     {
-	for (std::list<Expression *>::iterator i = predicates.begin(); i != predicates.end(); ++i) { delete *i; };
+        for (std::list<Expression *>::iterator i = predicates.begin(); i != predicates.end(); ++i) { delete *i; };
     };
 
     const string &Step::stringForAxis(Step::Axis a)
@@ -873,7 +873,7 @@ namespace xpath
         }
         if (i == s.size()) {
             return pos + i;
-	}
+        }
         return pos;
     }
 
@@ -960,7 +960,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 
     NodeSetRef Step::scan(NodeRef curNode)
     {
-	NodeSetRef resultset = new NodeSet();
+        NodeSetRef resultset = new NodeSet();
         NodeRef origNode = curNode;
         // build up the axis with appropriate nodes containing passing the test
         switch(axis)
@@ -970,46 +970,46 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
                     if (passesNodeTest(curNode)) {
                         resultset->insert(curNode);
-		    }
-		}
-	    }
+                    }
+                }
+            }
             break;
         case Parent:
             curNode = curNode->parentNode();
             if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             break;
         case Next_Sibling:
             curNode = &*curNode->nextSibling();
             if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             break;
         case Previous_Sibling:
             curNode = &*curNode->previousSibling();
             if (curNode && passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             break;
         case Preceding_Sibling:
             while (curNode = &*curNode->previousSibling()) {
                 if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
-		}
-	    }
+                }
+            }
             break;
         case Following_Sibling:
             while (curNode = &*curNode->nextSibling()) {
                 if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
-		}
-	    }
+                }
+            }
             break;
         case Descendant_Or_Self:
             if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             /* nobreak; */
         case Descendant:
             {
@@ -1031,12 +1031,12 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         }
                         if (tmp == origNode) {
                             break;
-			}
+                        }
                     };
 
                     if (passesNodeTest(curNode)) {
                         resultset->insert(curNode);
-		    }
+                    }
                 };
             };
 #ifdef INTERPRETER_DEBUG
@@ -1046,7 +1046,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         case Self:
             if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             break;
         case Attribute:
             {
@@ -1058,7 +1058,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         case Ancestor_Or_Self:
             if (passesNodeTest(curNode)) {
                 resultset->insert(curNode);
-	    }
+            }
             /* nobreak; */
         case Ancestor:
             if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE)
@@ -1070,13 +1070,13 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 curNode = curNode->parentNode();
                 if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
-		}
+                }
             }
             while (curNode = curNode->parentNode()) {
                 if (passesNodeTest(curNode)) {
                     resultset->insert(curNode);
-		}
-	    }
+                }
+            }
         case Following:
         case Preceding:
         case Invalid:
@@ -1085,11 +1085,11 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         };
 
 #ifdef INTERPRETER_DEBUG
-	AC_TRACE << "selected " << resultset->size() << " " << Step::stringForAxis(axis) << " nodes"
-		 << " of " << origNode->nodeName();
-	if (origNode->parentNode()) {
-	    AC_TRACE << " inside " << origNode->parentNode()->nodeName();
-	}
+        AC_TRACE << "selected " << resultset->size() << " " << Step::stringForAxis(axis) << " nodes"
+                 << " of " << origNode->nodeName();
+        if (origNode->parentNode()) {
+            AC_TRACE << " inside " << origNode->parentNode()->nodeName();
+        }
 #endif
         for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i) {
 #ifdef INTERPRETER_DEBUG
@@ -1110,11 +1110,11 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
                     resultset->erase(j++);
                 }
-		else ++j;
+                else ++j;
                 delete v;
             }
         }
-	return resultset;
+        return resultset;
     };
 
     void Step::serializeTo(std::ostream & os) {
@@ -1182,28 +1182,28 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 
     NodeSetRef Path::evaluateAll(NodeSetRef workingset) {
         if (absolute) {
-	    NodeSetRef newResults = new NodeSet();
+            NodeSetRef newResults = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
             {
-		NodeRef thisOne = *i;
-		while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
-		newResults->insert(thisOne);
+                NodeRef thisOne = *i;
+                while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+                newResults->insert(thisOne);
             }
-	    delete workingset;
-	    workingset = newResults;
-	}
+            delete workingset;
+            workingset = newResults;
+        }
 
         for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes :";
 #endif
-	    NodeSetRef nextStepSet = new NodeSet();
+            NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
                NodeSetRef newResults = (*s)->scan(*i);
-	       for (NodeSet::iterator j = newResults->begin(); j != newResults->end(); ++j) {
-		   nextStepSet->insert(*j);
-	       }
-	       delete newResults;
+               for (NodeSet::iterator j = newResults->begin(); j != newResults->end(); ++j) {
+                   nextStepSet->insert(*j);
+               }
+               delete newResults;
             };
             delete workingset;
             workingset = nextStepSet;
