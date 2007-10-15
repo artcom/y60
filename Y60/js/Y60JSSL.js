@@ -163,7 +163,7 @@ function parseDate(theDateString) {
     return new Date(myDate[0], myDate[1] - 1, myDate[2]);
 }
 
-var COLOR_HEX_STRING_PATTERN = /^[0-9A-F]{6}/;
+var COLOR_HEX_STRING_PATTERN = /^[0-9A-Fa-f]{6}/;
 
 // use like this: asColor("00BFA3", 1);
 function asColor(theHexString, theAlpha) {
@@ -181,13 +181,15 @@ function asColor(theHexString, theAlpha) {
     }
 
     if (COLOR_HEX_STRING_PATTERN.test(theHexString)) {
-	print("asColor: evaluating " + theHexString);
+	Logger.trace("asColor: evaluating " + theHexString);
         var myRed   = eval("0x" + theHexString[0] + theHexString[1]);
         var myGreen = eval("0x" + theHexString[2] + theHexString[3]);
         var myBlue  = eval("0x" + theHexString[4] + theHexString[5]);
         return new Vector4f(myRed / 255, myGreen / 255, myBlue / 255, theAlpha);
     } else {
-	return new Vector4f(eval(theHexString));
+	var retval = eval(theHexString);
+	Logger.trace("asColor: eval " + theHexString);
+	return new Vector4f();
     }
 }
 
