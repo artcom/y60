@@ -631,8 +631,6 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     
 }
 
-
-
 function LanguageImageToggleTextBodyButton(theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
     var Protected = {};
     this.Constructor(this, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction);

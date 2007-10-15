@@ -157,6 +157,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
         if (!theNode || theNode.nodeName != "overlay") {
             return true;
         } else {
+	    // check visibility of parent chain recursively
             return (theNode.visible ? Protected.isVisible(theNode.parentNode) : false);
         }
     }
