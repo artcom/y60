@@ -242,8 +242,39 @@ DualImageButton.prototype.Constructor = function(Public, Protected, theScene, th
 }
 
 function ColorButton(theScene, theId, theSize, thePosition, theStyle, theParent) {
-    var Public    = this;
-    var Protected = {}
-    ButtonBase(Public, Protected, theScene, theId, theSize,
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theId, theSize, thePosition, theStyle, theParent);
+};
+
+ColorButton.prototype.Constructor = function(Public, Protected, theScene, theId,
+						theSize, thePosition, theStyle, theParent) {
+
+    ButtonBase.prototype.Constructor(Public, Protected, theScene, theId, theSize,
                thePosition, theStyle, theParent);
+};
+
+function DualImageTextButton(theScene, theId, theSources,
+                         thePosition, theStyle, theText, theParent) {
+     var Protected = [];
+     return this.Constructor(this, Protected, theScene, theId, theSources,
+                         thePosition, theStyle, theText, theParent);
 }
+
+DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene, theId, theSources,
+                                                     thePosition, theStyle, theText, theParent) {
+
+    ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
+               [1,1], thePosition, theStyle, theParent);
+
+    Public.setActive = function(theState) {
+        Public.setImage(theSources[theState?1:0]);
+        Public.enabled = !theState;
+    }
+
+    Public.setImage(theSources[0]);
+    var myImageSize = getImageSize(Public.image);
+    print("creating Label with image size "+myImageSize);
+    Public._myTextlabel =  new Label(theScene, theText, myImageSize, [0,0], theStyle, Public);
+    print("finished creating Label:");
+}
+
