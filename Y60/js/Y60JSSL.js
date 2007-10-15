@@ -163,7 +163,7 @@ function parseDate(theDateString) {
     return new Date(myDate[0], myDate[1] - 1, myDate[2]);
 }
 
-const COLOR_HEX_STRING_PATTERN = /^[0-9A-F]{6}/;
+var COLOR_HEX_STRING_PATTERN = /^[0-9A-F]{6}/;
 
 // use like this: asColor("00BFA3", 1);
 function asColor(theHexString, theAlpha) {
