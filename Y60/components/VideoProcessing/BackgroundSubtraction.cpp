@@ -114,20 +114,20 @@ namespace y60 {
         
         
         
-        BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
-        for(unsigned int blob = 0; blob < myBlobs->size(); ++blob) {
-            asl::Vector2f  myCenter =  (*myBlobs)[blob]->center();
-            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]+1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]-1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-            //dom::Node & centerNode = *(_myResultNode.childNode("center"));
+//         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
+//         for(unsigned int blob = 0; blob < myBlobs->size(); ++blob) {
+//             asl::Vector2f  myCenter =  (*myBlobs)[blob]->center();
+//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]+1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]-1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+//             dom::Node & centerNode = *(_myResultNode.childNode("center"));
             
-            //centerNode.childNode("#text")->nodeValue(asl::as_string(myCenter));
+//             centerNode.childNode("#text")->nodeValue(asl::as_string(myCenter));
             
-            //centerNode["x"] = asl::as_string(myCenter[0]);
-            //centerNode["y"] = asl::as_string(myCenter[1]);
-            AC_PRINT << myCenter[0] << " " << myCenter[1];
-        }   
+//             centerNode["x"] = asl::as_string(myCenter[0]);
+//             centerNode["y"] = asl::as_string(myCenter[1]);
+//             AC_PRINT << myCenter[0] << " " << myCenter[1];
+//         }   
     
         _myTargetImage->triggerUpload();
         _myBackgroundImage->triggerUpload();
