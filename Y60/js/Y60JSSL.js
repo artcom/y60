@@ -29,7 +29,7 @@ var TWO_PI = Math.PI * 2.0;
 // JSNode objects for example react differently when properties
 // are accessed through the "." operator, compared to "[]". The Code:
 //
-// aNode["nodeValue"]
+// someNode["nodeValue"]
 //
 // will throw a DOMException, while with the dot notation: 
 // 
