@@ -30,6 +30,8 @@ namespace y60 {
 		        return _myResultNode;
 	        }
 
+
+
 		private:
             unsigned int clampedSub(unsigned int theFirstValue, unsigned int theSecondValue); 
             
@@ -39,8 +41,12 @@ namespace y60 {
             dom::ValuePtr _myBackgroundRaster;
             
             y60::ImagePtr _myTargetImage;
-    
+            y60::ImagePtr _myBackgroundImage;   
+            
+            float _myThreshold;
+            float _myWeight;
     };
+    
 
 }
 
