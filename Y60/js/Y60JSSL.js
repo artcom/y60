@@ -169,14 +169,18 @@ var COLOR_HEX_STRING_PATTERN = /^[0-9A-Fa-f]{6}/;
 function asColor(theHexString, theAlpha) {
 
     if (theHexString instanceof Vector4f) {
+	Logger.trace("asColor: is Vector4f:" + theHexString);
 	return theHexString;
     }
+
+    Logger.trace(typeof theHexString);
 
     if (theAlpha == undefined) {
         theAlpha = 1;
     }
 
     if (theHexString instanceof Vector3f) {
+	Logger.trace("asColor: is Vector3f:" + theHexString);
         return new Vector4f(theHexString[0], theHexString[1], theHexString[2], theAlpha);
     }
 
@@ -188,8 +192,8 @@ function asColor(theHexString, theAlpha) {
         return new Vector4f(myRed / 255, myGreen / 255, myBlue / 255, theAlpha);
     } else {
 	var retval = eval(theHexString);
-	Logger.trace("asColor: eval " + theHexString);
-	return new Vector4f();
+	Logger.trace("asColor: eval " + theHexString + " ergibt " + retval);
+	return new Vector4f(retval);
     }
 }
 
