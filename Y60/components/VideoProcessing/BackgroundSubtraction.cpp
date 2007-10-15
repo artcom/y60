@@ -11,7 +11,7 @@
 
 #include "BackgroundSubtraction.h"
 
-#include "ConnectedComponent.h"
+//include "ConnectedComponent.h"
 
 using namespace asl;
 using namespace std;
