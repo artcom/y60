@@ -11,6 +11,8 @@
 
 #include "BackgroundSubtraction.h"
 
+#include "ConnectedComponent.h"
+
 using namespace asl;
 using namespace std;
 using namespace dom;
@@ -21,9 +23,9 @@ namespace y60 {
         Algorithm(theName),
         _myResultNode("result"),
         _mySourceRaster(0)
-    {
-        // _myResultNode.appendChild(Element("red"));
-        // _myResultNode.childNode("red")->appendChild(Text(""));
+    {   
+        _myResultNode.appendChild(Element("center"));
+        _myResultNode.childNode("center")->appendChild(Text(""));
         // _myResultNode.appendChild(Element("green"));
         // _myResultNode.childNode("green")->appendChild(Text(""));
         // _myResultNode.appendChild(Element("blue"));
@@ -75,17 +77,24 @@ namespace y60 {
             
         
         float myAlpha = _myWeight;
-        unsigned int myIntensity;
+        unsigned int mySrcIntensity;
+        unsigned int myBgIntensity;   
+        unsigned int myTrgtIntensity;
+        Vector3f mySrcHSV;
+        Vector3f myBgHSV;
         for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); ++itSrc,++itBg, ++itTrgt) {
-            // redHistogram[static_cast<unsigned int>((*it)[0])]++;
+            rgb_to_intensity((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], mySrcIntensity);
+            rgb_to_intensity((*itTrgt)[2], (*itTrgt)[1], (*itTrgt)[0], myTrgtIntensity);
+            rgb_to_intensity((*itBg)[2], (*itBg)[1], (*itBg)[0], myBgIntensity);
             
-            (*itTrgt)[0] = clampedSub((*itBg)[0], (*itSrc)[0]);  
-            (*itTrgt)[1] = clampedSub((*itBg)[1], (*itSrc)[1]);  
-            (*itTrgt)[2] = clampedSub((*itBg)[2], (*itSrc)[2]);  
+            //rgb_to_hsl((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], mySrcHSV);
+            //rgb_to_hsl((*itBg)[2], (*itBg)[1], (*itBg)[0], myBgHSV);
+
+            myTrgtIntensity = clampedSub(myBgIntensity, mySrcIntensity);            
+            //float myDiffSaturation = myBgHSV[1] - mySrcHSV[1];            
+            //AC_PRINT << ;
             
-            rgb_to_intensity((*itTrgt)[2], (*itTrgt)[1], (*itTrgt)[0], myIntensity);
-            
-            if( myIntensity > _myThreshold ) {
+            if( myTrgtIntensity > _myThreshold ) {
                 //AC_PRINT << myHSV[0] << " " << myHSV[1] << " " << myHSV[2];
                 (*itTrgt)[0] = 255;
                 (*itTrgt)[1] = 255;
@@ -94,7 +103,6 @@ namespace y60 {
                 (*itTrgt)[0] = 0;
                 (*itTrgt)[1] = 0;
                 (*itTrgt)[2] = 0;
-
             }
             
             // update backgroundimage
@@ -104,12 +112,35 @@ namespace y60 {
 
         }
         
+        
+        
+        BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
+        for(unsigned int blob = 0; blob < myBlobs->size(); ++blob) {
+            asl::Vector2f  myCenter =  (*myBlobs)[blob]->center();
+            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]+1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+            _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]-1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
+            //dom::Node & centerNode = *(_myResultNode.childNode("center"));
+            
+            //centerNode.childNode("#text")->nodeValue(asl::as_string(myCenter));
+            
+            //centerNode["x"] = asl::as_string(myCenter[0]);
+            //centerNode["y"] = asl::as_string(myCenter[1]);
+            AC_PRINT << myCenter[0] << " " << myCenter[1];
+        }   
+    
         _myTargetImage->triggerUpload();
         _myBackgroundImage->triggerUpload();
+        
 	}
-
+    
     unsigned int
     BackgroundSubtraction::clampedSub(unsigned int theFirstValue, unsigned int theSecondValue) {
         return asl::maximum<unsigned int>(theFirstValue, theSecondValue) -  asl::minimum<unsigned int>(theFirstValue, theSecondValue);
+    }
+
+    float
+    BackgroundSubtraction::clampedSubHSL(unsigned int theFirstValue, unsigned int theSecondValue) {
+        return asl::maximum<float>(theFirstValue, theSecondValue) -  asl::minimum<float>(theFirstValue, theSecondValue);
     }
 }

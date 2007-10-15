@@ -18,6 +18,8 @@
 
 namespace y60 {
 
+
+
 	class BackgroundSubtraction : public Algorithm {
 		public:
             BackgroundSubtraction(const std::string & theName);
@@ -34,6 +36,7 @@ namespace y60 {
 
 		private:
             unsigned int clampedSub(unsigned int theFirstValue, unsigned int theSecondValue); 
+            float clampedSubHSL(unsigned int theFirstValue, unsigned int theSecondValue); 
             
             dom::Element _myResultNode;
             dom::ValuePtr _mySourceRaster;
@@ -41,7 +44,7 @@ namespace y60 {
             dom::ValuePtr _myBackgroundRaster;
             
             y60::ImagePtr _myTargetImage;
-            y60::ImagePtr _myBackgroundImage;   
+            y60::ImagePtr _myBackgroundImage;              
             
             float _myThreshold;
             float _myWeight;
