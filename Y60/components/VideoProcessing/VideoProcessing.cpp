@@ -16,7 +16,6 @@
 #include "Histogram.h"
 #include "BackgroundSubtraction.h"
 
-#include <asl/string_functions.h>
 #include <asl/Exception.h>
 #include <asl/Logger.h>
 
