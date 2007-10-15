@@ -51,7 +51,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
      */
     obj.pickPosition = function(theScreenPixelX, theScreenPixelY, theClippingPlane) {
         var myClosestPosition = null;
-        var myInfo = pickIntersection(theScreenPixelX, theScreenPixelY);
+        var myInfo = obj.pickIntersection(theScreenPixelX, theScreenPixelY);
         if (myInfo) {
             var myIntersections = myInfo.info.intersections;
             if (myIntersections.length > 0) {
