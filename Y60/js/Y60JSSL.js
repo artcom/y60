@@ -917,5 +917,15 @@ function parseVectorOfRankedFeature(theVectorOfString) {
     return myVectorOfRankedFeature;
 }
 
-
+// prepare identifiers for use as attribute values
+//
+// filters out everything except for 
+// whitespace, alphanumeric characters and the dot.
+//
+// can be used to convert a filename into a ?dom ID?
+// see also BodyButton.js
+//
+function stripIdentifier(theIdentifier) {
+    return theIdentifier.replace(/[^\w\s.]/g, "");
+}
 
