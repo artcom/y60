@@ -40,14 +40,20 @@ var ourButtonCounter = 0;
 var MOUSE_UP   = 0;
 var MOUSE_DOWN = 1;
 
-function ButtonBase(Public, Protected, theScene, theId,
-                    theSize, thePosition, theStyle, theParent)
-{
+function ButtonBase(theScene, theId, theSize, thePosition, theStyle, theParent) {
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theId,
+                     theSize, thePosition, theStyle, theParent);
+};
+
+ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
+                    theSize, thePosition, theStyle, theParent) {
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    LabelBase(Public, Protected, theScene,
+    LabelBase.prototype.Constructor(Public, Protected, theScene,
               theSize, thePosition, theStyle, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -71,13 +77,22 @@ function ButtonBase(Public, Protected, theScene, theId,
         Protected.isPressed = theFlag;
     }
 
-    Public.onMouseButton = function(theState, theX, theY, theRadius) {
+    Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
                 Public.setPressed(false);
-                Public.onClick(Public);
+		if (Public.touches(theX, theY, theRadius)) {
+			if ("id" in Public)
+		                Logger.trace(Public.id + ": generating click");
+	                Public.onClick(Public);
+		}
             } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
+		if ("id" in Public)
+	                Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
                 Public.setPressed(true);
+            } else {
+		if ("id" in Public)
+			Logger.trace(Public.id + ": nothing to do. isPressed=", Protected.isPressed);
             }
         }
     }
@@ -99,7 +114,7 @@ function ButtonBase(Public, Protected, theScene, theId,
 
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theState, theX, theY, theRadius) {
+        Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
             if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY, theRadius)) {
                 if (theState == MOUSE_UP && Protected.isPressed) {
                     Public.onClick(this);
@@ -117,7 +132,7 @@ function ButtonBase(Public, Protected, theScene, theId,
 
     Public.setClickOnMouseDown = function() {
         // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theState, theX, theY, theRadius) {
+        Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
             if (theState == MOUSE_UP) {
                 Public.setPressed(false);
             } else if (theState == MOUSE_DOWN && Public.enabled && Protected.isVisible(Public.node) &&
@@ -160,9 +175,14 @@ function ButtonBase(Public, Protected, theScene, theId,
 function TextButton(theScene, theId, theText,
                     theSize, thePosition, theStyle, theParent)
 {
-    var Public    = this;
     var Protected = {}
-    ButtonBase(Public, Protected, theScene, theId,
+    this.Constructor(this, Protected, theScene, theId, theText,
+                     theSize, thePosition, theStyle, theParent);
+}
+
+TextButton.prototype.Constructor = function(Public, Protected, theScene, theId, theText,
+                                            theSize, thePosition, theStyle, theParent) {
+    ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
 }
@@ -176,28 +196,44 @@ function TextButton(theScene, theId, theText,
 function ImageButton(theScene, theId, theSource,
                      thePosition, theStyle, theParent)
 {
-    var Public    = this;
     var Protected = {}
-    ButtonBase(Public, Protected, theScene, theId,
+    this.Constructor(this, Protected, theScene, theId, theSource,
+                     thePosition, theStyle, theParent);
+}
+
+ImageButton.prototype.Constructor = function(Public, Protected, theScene, theId,
+                                             theSource, thePosition, theStyle, theParent) {
+
+    ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSource);
 }
 
 function DualImageButton(theScene, theId, theSources,
                          thePosition, theStyle, theParent) {
-    var Base      = {};
-    var Public    = this;
-    var Protected = {};
-    ButtonBase(Public, Protected, theScene, theId,
+
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theId, theSources,
+                     thePosition, theStyle, theParent);
+}
+
+DualImageButton.prototype.Constructor = function(Public, Protected, theScene, theId, theSources,
+			                         thePosition, theStyle, theParent) {
+    var Base      = [];
+    ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSources[0]);
 
     Base.setPressed = Public.setPressed;
     Public.setPressed = function(theFlag) {
         if (theFlag) {
+            Logger.trace("setting selected color to " + Public.style.selectedColor);
             Public.color = Public.style.selectedColor;
+
+            Logger.trace("setting image to " + theSources[1]);
             Public.setImage(theSources[1]);
         } else {
+            Logger.trace("setUnPressed");
             Public.color = Public.style.color;
             Public.setImage(theSources[0]);
         }

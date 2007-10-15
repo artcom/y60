@@ -32,13 +32,19 @@ use("Overlay.js");
 
 var ourFontCache = [];
 
-function LabelBase(Public, Protected, theScene,
+function LabelBase(theScene, theSize, thePosition, theStyle, theParent)
+{
+    Protected = [];
+    this.Constructor(this, Protected, theScene, theSize, thePosition, theStyle, theParent);
+}
+
+LabelBase.prototype.Constructor = function(Public, Protected, theScene,
                    theSize, thePosition, theStyle, theParent)
 {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
-    ImageOverlayBase(Public, Protected, theScene, null, thePosition, theParent);
+    ImageOverlayBase.prototype.Constructor(Public, Protected, theScene, null, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -53,7 +59,7 @@ function LabelBase(Public, Protected, theScene,
 
         var myStyle = null;
         if (theStyle) {
-            myStyle = clone(theStyle);
+            myStyle = theStyle;
         } else {
             myStyle = Public.style;
         }
@@ -70,7 +76,7 @@ function LabelBase(Public, Protected, theScene,
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
         window.setHTextAlignment(HTextAlign);
         window.setVTextAlignment(VTextAlign);
-        window.setTextColor(myStyle.textColor);
+        window.setTextColor(asColor(myStyle.textColor));
         window.setTracking(tracking);
         window.setLineHeight(lineHeight);
 
@@ -142,7 +148,7 @@ function LabelBase(Public, Protected, theScene,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.textCursorPos = new Vector2i(0,0);
-    Public.style = clone(theStyle);
+    Public.style = theStyle;
 
     Protected.getImageNode = function() {
         if (Public.image == null) {
@@ -196,7 +202,7 @@ function LabelBase(Public, Protected, theScene,
     }
 
     function setup() {
-        Public.color = Public.style.color;
+        Public.color = asColor(Public.style.color);
         if (theSize) {
             Public.width  = theSize[0];
             Public.height = theSize[1];
@@ -214,15 +220,21 @@ function LabelBase(Public, Protected, theScene,
 }
 
 function Label(theScene, theText, theSize, thePosition, theStyle, theParent) {
-    var Public    = this;
-    var Protected = {}
-    LabelBase(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theText, theSize, thePosition, theStyle, theParent);
+}
+
+Label.prototype.Constructor = function(Public, Protected, theScene, theText, theSize, thePosition, theStyle, theParent) {
+    LabelBase.prototype.Constructor(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
 }
 
 function ImageLabel(theScene, theSource, thePosition, theStyle, theParent) {
-    var Public    = this;
-    var Protected = {}
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theSource, thePosition, theStyle, theParent);
+}
+
+ImageLabel.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theStyle, theParent) {
     LabelBase(Public, Protected, theScene, null, thePosition, theStyle, theParent);
     Public.setImage(theSource);
 }

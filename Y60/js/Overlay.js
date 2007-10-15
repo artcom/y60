@@ -18,7 +18,14 @@ var ourOverlayCounter = 0;
 var ourImageCache = [];
 
 // Pure virtual base class
-function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
+function OverlayBase(theScene, thePosition, theParent) {
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, thePosition, theParent);
+    exit(0);
+}
+
+OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePosition, theParent) {
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Delegation of all overlay node attributes
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -189,8 +196,14 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 }
 
 // Pure virtual base class
-function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
-    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+function MaterialOverlay(theScene, thePosition, theParent) {
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, thePosition, theParent);
+    exit(0);
+}
+MaterialOverlay.prototype.Constructor = function(Public, Protected, theScene, thePosition, theParent) {
+
+    OverlayBase.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Convenience access to referenced nodes
@@ -212,7 +225,7 @@ function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
     }
 
     Public.color setter = function(theColor) {
-        _myMaterial.properties.surfacecolor = theColor;
+        _myMaterial.properties.surfacecolor = asColor(theColor);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -253,10 +266,13 @@ function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
 // @param theSize      Vector2f  Size of the overlay (optional, default is [100,100]
 // @param theParent    Node      Parent overlay node (optional, optional default is toplevel)
 function Overlay(theScene, theColor, thePosition, theSize, theParent) {
-    var Public    = this;
-    var Protected = {};
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theColor, thePosition, theSize, theParent);
+}
 
-    MaterialOverlay(Public, Protected, theScene, thePosition, theParent);
+Overlay.prototype.Constructor = function(Public, Protected, theScene, theColor, thePosition, theSize, theParent) {
+
+    MaterialOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
     if (theSize) {
         Public.width  = theSize[0];
         Public.height = theSize[1];
@@ -271,9 +287,14 @@ function Overlay(theScene, theColor, thePosition, theSize, theParent) {
 }
 
 // Pure virtual base class
-function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
+function TextureOverlay(theScene, thePosition, theParent) {
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, thePosition, theParent);
+}
+
+TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, thePosition, theParent) {
     var Base = {}
-    MaterialOverlay(Public, Protected, theScene, thePosition, theParent);
+    MaterialOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -438,8 +459,14 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
 }
 
 // Pure virtual base class
-function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent) {
-    TextureOverlay(Public, Protected, theScene, thePosition, theParent);
+function ImageOverlayBase(theScene, theSource, thePosition, theParent) {
+    var Protected = [];
+    this.Constructor(this, Protected, theScene, theSource, thePosition, theParent);
+}
+
+ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theParent) {
+
+    TextureOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
@@ -504,10 +531,11 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
 //  @param thePosition  Vector2f     Pixelposition of the overlay (optional, default is [0,0])
 //  @param theParent    Node         Parent overlay node (optional, default is toplevel)
 function ImageOverlay(theScene, theSource, thePosition, theParent) {
-    var Public    = this;
+
     var Protected = {};
-    ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent);
+    ImageOverlayBase.prototype.Constructor(this, Protected, theScene, theSource, thePosition, theParent);
 }
+
 
 /// Creates an overlay and with a movie as content
 //  @param theScene       Scene        The scene the overlay should be appended to
@@ -517,17 +545,16 @@ function ImageOverlay(theScene, theSource, thePosition, theParent) {
 //  @param theAudioFlag   Boolean      Play audio with the movie (optional, default is true)
 //  @param thePixelFormat String       The texture pixel format (optional, default is RGB)
 //  @param theDecoderHint String       Which movie decoder to use (optional, default depends on file-extension)
+
 function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint) {
-    var Public    = this;
     var Protected = {};
-    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint);
+    this.Constructor(this, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint);
 }
 
-// pure virtual base class
-function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent,
+MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theParent,
                           theAudioFlag, thePixelFormat, theDecoderHint) {
 
-    TextureOverlay(Public, Protected, theScene, thePosition, theParent);
+    TextureOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -636,7 +663,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
 function GroupOverlay(theScene, theName, thePosition, theParent) {
     var Public    = this;
     var Protected = {};
-    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+    OverlayBase.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
     if (theName != undefined && theName) {
         Public.name = theName;
     }
