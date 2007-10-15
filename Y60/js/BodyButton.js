@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2006, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,6 +7,335 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
+use("BuildUtils.js");
+
+use("Y60JSSL.js");
+
+var ourStyleCache = []
+
+const WHITE_COLOR = asColor("FFFFFF");
+const BLACK_COLOR = asColor("000000");
+
+
+const BLUE_COLOR  = asColor("0000FF");
+const GREEN_COLOR  = asColor("00FF00");
+const RED_COLOR  = asColor("FF0000");
+
+const LIGHT_GREY_COLOR  = asColor("444444");
+const GREY_COLOR  = asColor("CCCCCC");
+const DARK_GREY_COLOR = asColor("AAAAAA");
+
+const ALPHA_WHITE_COLOR = asColor("FFFFFF", 0.1);
+ 
+const DEFAULT_STYLE = {
+    font:              "FONTS/arial.ttf",
+    fontname:          "defaultfont",
+    textcolor:         WHITE_COLOR,
+    fontsize:          20,
+}
+
+function createStyleCache(theStylesNode) {
+    for(var i=0; i < theStylesNode.childNodes.length; ++i){
+        var myStyleNode = theStylesNode.childNode(i);
+        !myStyleNode.getAttribute("topPad")     ? myStyleNode.topPad     = 0 : null;
+        !myStyleNode.getAttribute("bottomPad")  ? myStyleNode.bottomPad  = 0 : null;
+        !myStyleNode.getAttribute("rightPad")   ? myStyleNode.rightPad   = 0 : null;
+        !myStyleNode.getAttribute("leftPad")    ? myStyleNode.leftPad    = 0 : null;
+        !myStyleNode.getAttribute("tracking")   ? myStyleNode.tracking   = 0 : null;
+        !myStyleNode.getAttribute("lineHeight") ? myStyleNode.lineHeight = 0 : null;
+        !myStyleNode.getAttribute("HTextAlign") ? myStyleNode.HTextAlign = Renderer.LEFT_ALIGNMENT : null;
+        !myStyleNode.getAttribute("VTextAlign") ? myStyleNode.VTextAlign = Renderer.TOP_ALIGNMENT : null;
+        !myStyleNode.getAttribute("textColor")  ? myStyleNode.textcolor  = "FFFFFFFF" : null;
+        !myStyleNode.getAttribute("backgroundColor")  ? myStyleNode.backgroundColor  = "000000" : null;
+        var myAddedFlag = addStyleToDomCache(checksumFromString(stripIdentifier(myStyleNode.name)), myStyleNode); 
+        if (myAddedFlag) {
+            window.loadTTF(myStyleNode.name, FONT_PATH + myStyleNode.face, myStyleNode.size);               
+        }
+    }    
+    //print(ourCacheDom)
+
+}
+
+// Cache utility functions:
+// consider unification with modelling_functions cache
+// and MaterialQuadBody cache.
+
+const OUR_CACHE_SCHEMA = " \
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>            \
+    <xs:element name='cache'>                                  \
+        <xs:complexType>                                           \
+            <xs:sequence minOccurs='0' maxOccurs='unbounded'>      \
+                <xs:element ref='movie'/>                       \
+                <xs:element ref='image'/>                       \
+                <xs:element ref='material'/>                       \
+                <xs:element ref='style'/>                       \
+            </xs:sequence>                                         \
+        </xs:complexType>                                          \
+    </xs:element>                                                  \
+    <xs:element name='material'>                                   \
+        <xs:complexType>                                           \
+            <xs:attribute name='id' type='xs:ID' />          \
+            <xs:attribute name='sceneid' type='xs:ID' />          \
+        </xs:complexType>                                          \
+    </xs:element>                                                  \
+    <xs:element name='image'>                                   \
+        <xs:complexType>                                           \
+            <xs:attribute name='id' type='xs:ID' />          \
+            <xs:attribute name='sceneid' type='xs:ID' />          \
+        </xs:complexType>                                          \
+    </xs:element>                                                  \
+    <xs:element name='movie'>                                   \
+        <xs:complexType>                                           \
+            <xs:attribute name='id' type='xs:ID' />          \
+            <xs:attribute name='sceneid' type='xs:ID' />          \
+        </xs:complexType>                                          \
+    </xs:element>                                                  \
+    <xs:element name='style'>                                   \
+        <xs:complexType>                                           \
+            <xs:attribute name='id' type='xs:ID' />          \
+            <xs:attribute name='name' type='xs:string' />          \
+            <xs:attribute name='textColor' type='xs:string' />          \
+            <xs:attribute name='backgroundColor' type='xs:string' />          \
+            <xs:attribute name='size' type='xs:int' />          \
+            <xs:attribute name='face' type='xs:string' />          \
+            <xs:attribute name='topPad' type='xs:int' />          \
+            <xs:attribute name='bottomPad' type='xs:int' />          \
+            <xs:attribute name='rightPad' type='xs:int' />          \
+            <xs:attribute name='leftPad' type='xs:int' />          \
+            <xs:attribute name='tracking' type='xs:int' />          \
+            <xs:attribute name='lineHeight' type='xs:int' />          \
+            <xs:attribute name='HTextAlign' type='xs:string' />          \
+            <xs:attribute name='VTextAlign' type='xs:string' />          \
+        </xs:complexType>                                          \
+    </xs:element>                                                  \
+</xs:schema>                                                       \
+";
+
+
+var ourSchema = Node.createDocument();
+ourSchema.parse(OUR_CACHE_SCHEMA);
+
+// the cache for images loaded from files
+var ourCacheDom = Node.createDocument();
+ourCacheDom.useFactories("w3c-schema,som");
+ourCacheDom.addSchema(ourSchema,"");
+var ourImageCacheNode = new Node("<cache/>").firstChild;
+ourCacheDom.appendChild(ourImageCacheNode)
+
+
+function addStyleToDomCache(theKey, theStyle) {
+    if (ourCacheDom.getElementById(theKey)) {
+        return false;
+    }
+    var myStyleNode = theStyle.cloneNode(true);
+    myStyleNode.id = theKey;
+    ourImageCacheNode.appendChild(myStyleNode);
+    return true;
+}
+function getCachedStyleByKey(theKey) {
+    return ourCacheDom.getElementById(theKey);
+}
+function getCachedStyleByName(theName) {
+    return ourCacheDom.getElementById(checksumFromString(stripIdentifier(theName)));
+}
+
+function addItemToDomCache(theKey, theItem) {
+    if (ourCacheDom.getElementById(theKey)) {
+        return;
+    }
+    var myCacheItem = Node.createElement(theItem.nodeName);
+    myCacheItem.id = theKey;
+    myCacheItem.sceneid = theItem.id;
+    ourImageCacheNode.appendChild(myCacheItem);
+}
+
+function getCachedImage(theKey) {
+    var myCacheItem = ourCacheDom.getElementById(theKey);
+    var myResult = null;
+    if (myCacheItem) {
+        myResult =  window.scene.dom.getElementById(myCacheItem.sceneid);
+    }
+   return myResult;
+}
+
+
+function getCachedMaterial(theKey) {
+    var myCacheItem = ourCacheDom.getElementById(theKey);
+    var myResult = null;
+    if (myCacheItem) {
+        myResult =  window.scene.dom.getElementById(myCacheItem.sceneid);
+    }
+   return myResult;
+}
+
+// utility functions for BodyButton:
+// (refactoring yet to come 2007-10-15)
+
+function createTextAsImage(theText, theSize, theStyle, thePosition) 
+{
+    if (!thePosition) {
+        thePosition = new Vector2i(0,0);
+    }
+    if (!theStyle) {
+        theStyle = getCachedStyleByName("default");
+    }
+    !theStyle["topPad"]     ? theStyle.topPad     = 0 : null;
+    !theStyle["bottomPad"]  ? theStyle.bottomPad  = 0 : null;
+    !theStyle["rightPad"]   ? theStyle.rightPad   = 0 : null;
+    !theStyle["leftPad"]    ? theStyle.leftPad    = 0 : null;
+    !theStyle["tracking"]   ? theStyle.tracking   = 0 : null;
+    !theStyle["lineHeight"] ? theStyle.lineHeight = 0 : null;
+    !theStyle["HTextAlign"] ? theStyle.HTextAlign = Renderer.LEFT_ALIGNMENT : null;
+    !theStyle["VTextAlign"] ? theStyle.VTextAlign = Renderer.TOP_ALIGNMENT : null;
+    !theStyle["textColor"]  ? theStyle.textcolor  = "FFFFFFFF" : null;
+    !theStyle["backgroundColor"]  ? theStyle.backgroundColor  = "000000" : null;
+    
+    var myImageNode = null;
+    var myTextSize = null;
+    var myText = new String(theText);
+
+    var myKey = checksumFromString(stripIdentifier(theText+theStyle.textColor+theStyle.size+theSize));
+    var myImageNode = getCachedImage(myKey);
+    if (!myImageNode) {
+        window.setTextPadding(theStyle.topPad, theStyle.bottomPad, theStyle.leftPad, theStyle.rightPad);
+        window.setHTextAlignment(theStyle.HTextAlign);
+        window.setVTextAlignment(theStyle.VTextAlign);
+        window.setTextColor(asColor(theStyle.textColor));
+        window.setTracking(theStyle.tracking);
+        window.setLineHeight(theStyle.lineHeight);
+
+        myImageNode = Node.createElement("image");
+        myImageNode.resize = "pad";
+        myImageNode.wrapmode = "clamp_to_edge"
+        myImageNode.mipmap = false;
+        window.scene.images.appendChild(myImageNode);
+try {
+        myTextSize = window.renderTextAsImage( myImageNode, theText, 
+                                               theStyle.name, 
+                                               theSize[0], theSize[1],
+	thePosition);
+} catch(e) {
+	Logger.error("when trying to renderTextAsImage(" + myImageNode.nodeName + ", " + theText + ", "
+				       + theStyle.name + ", " + theSize[0] + ", "
+                                       + theSize[1] + ", " + thePosition + "): " + e);
+	throw e;
+}
+        var myMatrix = new Matrix4f();
+        myMatrix.makeScaling(new Vector3f(myTextSize.x / myImageNode.width, 
+                                          myTextSize.y / myImageNode.height, 1));
+        myImageNode.matrix = myMatrix;
+
+        addItemToDomCache(myKey, myImageNode)
+    }
+    window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
+    window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
+    window.setTextPadding(0,0,0,0);
+    
+    return myImageNode;
+}
+
+function createImageFromFile(theFileName) {
+    var myKey = checksumFromString(stripIdentifier(theFileName));
+    var myImageNode = getCachedImage(myKey);
+    if (!myImageNode) {
+        myImageNode = Modelling.createImage(window.scene, theFileName);
+        addItemToDomCache(myKey, myImageNode);
+    }
+    return myImageNode;
+}
+
+function createMovieFromFile(theFileName, theDecoderHint) {
+    var myKey = checksumFromString(stripIdentifier(theFileName));
+    var myMovieNode = getCachedImage(myKey);
+    
+    if (!myMovieNode) {
+        myMovieNode = Node.createElement("movie");
+        window.scene.images.appendChild(myMovieNode);
+        myMovieNode.src = theFileName;
+        myMovieNode.name = theFileName;
+        if (theDecoderHint) {
+            myMovieNode.decoderhint = theDecoderHint;
+        }
+        window.scene.loadMovieFrame(myMovieNode);
+        
+        addItemToDomCache(myKey, myMovieNode);
+    }
+    return myMovieNode;
+}
+
+function createMovieAndMaterial( theFile, theAdditionalKey ) {
+    var myMovieDecoderHint = new Playlist().getVideoDecoderHintFromURL(theFile);
+    var myMovie =  createMovieFromFile(theFile, myMovieDecoderHint);
+    var myMovieSize = getImageSize(myMovie);    
+    var myKeyString = "Material_"+theFile;
+    if (theAdditionalKey != undefined) {
+        myKeyString += theAdditionalKey;
+    }
+    var myMaterialKey = checksumFromString(stripIdentifier(myKeyString));
+    var myMaterial = getCachedMaterial(myMaterialKey);
+    if ( !myMaterial) {
+        myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myMovie);
+        addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
+        //myMaterial.properties.surfacecolor = [1,1,1,1]        
+        myMaterial.transparent = true;
+        myMaterial.name = theFile;
+        myMaterial.properties.targetbuffers.depth = false;
+        addItemToDomCache(myMaterialKey, myMaterial)      
+    }    
+    return {movie:  myMovie, size: myMovieSize, material: myMaterial}; 
+}
+
+function createImageAndMaterial( theFile, theAdditionalKey ) {
+    var myImage =  createImageFromFile(theFile);
+    var myImageSize = getImageSize(myImage);    
+    var myKeyString = "Material_"+theFile;
+    if (theAdditionalKey != undefined) {
+        myKeyString += theAdditionalKey;
+    }
+    var myMaterialKey = checksumFromString(stripIdentifier(myKeyString));
+    var myMaterial = getCachedMaterial(myMaterialKey);
+    if ( !myMaterial) {
+        myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myImage);
+        addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
+        //myMaterial.properties.surfacecolor = [1,1,1,1]        
+        myMaterial.transparent = true;
+        myMaterial.name = theFile;
+        myMaterial.properties.targetbuffers.depth = false;
+        addItemToDomCache(myMaterialKey, myMaterial)      
+    }    
+    return {image:  myImage, size: myImageSize, material: myMaterial}; 
+}
+
+function createTextAndMaterial( theText, theSize, theStyle, theAdditionalKey ) {
+    var myImage =  createTextAsImage(theText, theSize, theStyle);
+    var myImageSize = getImageSize(myImage);    
+    var myKeyString = "Material_"+theText+theStyle.name;
+    if (theAdditionalKey != undefined) {
+        myKeyString += theAdditionalKey;
+    }
+    var myMaterialKey = checksumFromString(stripIdentifier(myKeyString));
+    var myMaterial = getCachedMaterial(myMaterialKey);
+    if ( !myMaterial) {
+        myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myImage);
+        addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
+        //myMaterial.properties.surfacecolor = asColor(theStyle.backgroundColor);
+        myMaterial.transparent = true;
+        myMaterial.properties.targetbuffers.depth = false;
+        addItemToDomCache(myMaterialKey, myMaterial)        
+    }    
+    return {image:  myImage, size: myImageSize, material: myMaterial}; 
+}
+
+function createShapeAndBody( theSize, thePosition, theMaterial, theName, theInsensibleFlag, theVisibleFlag) {
+    var myQuad = Modelling.createQuad(window.scene, theMaterial.id, 
+                                      [0,0, 0], [theSize.x, theSize.y, 0]);
+    var myBody = Modelling.createBody(window.scene.world, myQuad.id);
+    myBody.position = thePosition;
+    myBody.name = theName;
+    myBody.insensible = theInsensibleFlag;
+    myBody.visible = theVisibleFlag;
+    return {body:myBody, shape:myQuad};
+}
 
 const BUTTON_STATE_DOWN = 0;                
 const BUTTON_STATE_UP   = 1;                
