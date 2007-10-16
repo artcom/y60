@@ -13,6 +13,7 @@ use("Y60JSSL.js");
 
 var ourStyleCache = []
 
+
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
         var myStyleNode = theStylesNode.childNode(i);
