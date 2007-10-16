@@ -63,17 +63,6 @@ namespace y60 {
 
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
-        /* for (unsigned int w=1; w<myResizeableRasterPtr->width(); ++w) {
-            for (unsigned int h=0; h<myResizeableRasterPtr->height(); ++h) {
-                asl::Vector4f myColor0 = myResizeableRasterPtr->getPixel(w-1, h);
-                asl::Vector4f myColor1 = myResizeableRasterPtr->getPixel(w, h);
-                // AC_PRINT << myColor1;
-
-                myResizeableRasterPtr->setPixel(w, h, weightedAdd(myColor0, myColor1));
-            }
-            //      _mySourceImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-        } */
-
         // // left-to-right horizontal pass
         BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
         itSrc++;
@@ -83,7 +72,8 @@ namespace y60 {
                 (*itSrc)[i] = revlookup((*itSrc)[i]) + lookup((*(itSrc-1))[i]);
             }
         }
-        
+       
+        // right-to-left horizontal pass
         itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->end());
         itSrc--;
         for (itSrc; itSrc != mySourceFrame->begin(); --itSrc) {
@@ -92,6 +82,39 @@ namespace y60 {
             }
         }
         
+        // up-down vertical pass
+        // itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+
+        unsigned int myWidth  = _mySourceImage->getRasterPtr()->width();
+        unsigned int myHeight = _mySourceImage->getRasterPtr()->height();
+
+        for (unsigned int w=0; w<myWidth; w++) {
+            for (unsigned int h=1; h<myHeight; h++) {
+                for (unsigned int i=0; i<3; i++) {
+                    unsigned int pos0 = w+myWidth*(h-1);
+                    unsigned int pos1 = w+myWidth*h;
+
+                    (*(itSrc+pos1))[i] = revlookup((*(itSrc+pos1))[i]) + lookup((*(itSrc+pos0))[i]);
+                }
+            }
+        }
+
+        // down-up vertical pass
+        itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+
+        for (unsigned int w=0; w<myWidth; w++) {
+            for (unsigned int h=myHeight-1; h>0; h--) {
+                unsigned int pos0 = w+myWidth*(h-1);
+                unsigned int pos1 = w+myWidth*(h);
+                
+                for (unsigned int i=0; i<3; i++) {
+                    
+                    (*(itSrc+pos0))[i] = revlookup((*(itSrc+pos0))[i]) + lookup((*(itSrc+pos1))[i]);
+                }
+            }
+        }
+
+
         _myTargetImage->triggerUpload();
         
         // _myBackgroundImage->triggerUpload();

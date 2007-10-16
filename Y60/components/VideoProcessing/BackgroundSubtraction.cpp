@@ -94,17 +94,22 @@ namespace y60 {
             //float myDiffSaturation = myBgHSV[1] - mySrcHSV[1];            
             //AC_PRINT << ;
             
-            if( myTrgtIntensity > _myThreshold ) {
-                //AC_PRINT << myHSV[0] << " " << myHSV[1] << " " << myHSV[2];
-                (*itTrgt)[0] = 255;
-                (*itTrgt)[1] = 255;
-                (*itTrgt)[2] = 255;
-            } else {
-                (*itTrgt)[0] = 0;
-                (*itTrgt)[1] = 0;
-                (*itTrgt)[2] = 0;
-            }
-            
+            // if( myTrgtIntensity > _myThreshold ) {
+            //     //AC_PRINT << myHSV[0] << " " << myHSV[1] << " " << myHSV[2];
+            //     (*itTrgt)[0] = 255;
+            //     (*itTrgt)[1] = 255;
+            //     (*itTrgt)[2] = 255;
+            // } else {
+            //     (*itTrgt)[0] = 0;
+            //     (*itTrgt)[1] = 0;
+            //     (*itTrgt)[2] = 0;
+            // }
+           
+            (*itTrgt)[0] = myTrgtIntensity;
+            (*itTrgt)[1] = myTrgtIntensity;
+            (*itTrgt)[2] = myTrgtIntensity;
+
+
             // update backgroundimage
             // (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
             // (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
