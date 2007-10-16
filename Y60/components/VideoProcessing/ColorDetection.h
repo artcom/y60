@@ -29,7 +29,6 @@ namespace y60 {
 	        }
                 
 		private:
-			void rgb_to_hsl(unsigned char theR, unsigned char theG, unsigned char theB, asl::Vector3f & theResult);
             dom::Element _myResultNode;
             float        _myThreshold;
             dom::ValuePtr _mySourceRaster;
