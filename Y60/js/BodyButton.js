@@ -13,27 +13,6 @@ use("Y60JSSL.js");
 
 var ourStyleCache = []
 
-const WHITE_COLOR = asColor("FFFFFF");
-const BLACK_COLOR = asColor("000000");
-
-
-const BLUE_COLOR  = asColor("0000FF");
-const GREEN_COLOR  = asColor("00FF00");
-const RED_COLOR  = asColor("FF0000");
-
-const LIGHT_GREY_COLOR  = asColor("444444");
-const GREY_COLOR  = asColor("CCCCCC");
-const DARK_GREY_COLOR = asColor("AAAAAA");
-
-const ALPHA_WHITE_COLOR = asColor("FFFFFF", 0.1);
- 
-const DEFAULT_STYLE = {
-    font:              "FONTS/arial.ttf",
-    fontname:          "defaultfont",
-    textcolor:         WHITE_COLOR,
-    fontsize:          20,
-}
-
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
         var myStyleNode = theStylesNode.childNode(i);
