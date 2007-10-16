@@ -17,8 +17,9 @@
 
 namespace y60 {
 
-	typedef asl::raster<asl::BGR> BGRRaster;
-	typedef asl::raster<asl::RGB> RGBRaster;
+	typedef asl::raster<asl::BGR>  BGRRaster;
+	typedef asl::raster<asl::RGB>  RGBRaster;
+	typedef asl::raster<asl::GRAY> GRAYRaster;
 
 	/**
 	* @ingroup Y60video

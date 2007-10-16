@@ -9,17 +9,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#ifndef _AC_FASTBLUR_H_
-#define _AC_FASTBLUR_H_
+#ifndef _AC_BLOBS_H_
+#define _AC_BLOBS_H_
 
 #include "Algorithm.h"
 
 namespace y60 {
-	class FastBlur : public Algorithm {
+	class Blobs : public Algorithm {
 		public:
-            FastBlur(const std::string & theName);
+            Blobs(const std::string & theName);
 
-			static std::string getName() { return "fastblur"; }
+			static std::string getName() { return "blobs"; }
 		    void onFrame(double t);
             
             void configure(const dom::Node & theNode);
@@ -34,7 +34,7 @@ namespace y60 {
             y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
             
-            float _myStrength;
+            int _myThreshold;
     };
 }
 

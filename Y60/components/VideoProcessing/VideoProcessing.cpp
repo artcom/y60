@@ -17,6 +17,7 @@
 #include "BackgroundSubtraction.h"
 #include "FastBlur.h"
 #include "Contrast.h"
+#include "Blobs.h"
 
 #include <asl/Exception.h>
 #include <asl/Logger.h>
@@ -47,6 +48,7 @@ namespace y60 {
         REGISTER_ALGORITHM(BackgroundSubtraction); 
         REGISTER_ALGORITHM(FastBlur); 
         REGISTER_ALGORITHM(Contrast);
+        REGISTER_ALGORITHM(Blobs);
 
 		AC_WARNING << "algorithm '" << theName << "' not found.";
 		return asl::Ptr<Algorithm>(0);
