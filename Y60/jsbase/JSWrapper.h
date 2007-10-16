@@ -731,7 +731,6 @@ protected:
 
 private:
     OWNERPTR _myOwner;
-protected:
     NATIVE * _myNative; // only used when instantiated with NATIVE_ACCESS_PROTOCOL = StaticAccessProtocol
 };
 
