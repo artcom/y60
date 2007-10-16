@@ -20,7 +20,7 @@
 
 #include "JSCairoSurface.h"
 
-#include "RefCountWrapper.impl"
+#include "CairoWrapper.impl"
 
 using namespace std;
 using namespace asl;
@@ -217,10 +217,10 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     JSCairoSurfaceWrapper::STRONGPTR _myOwnerPtr(newNative);
-    JSCairoSurfaceWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
-
     myNewObject = new JSCairoSurface(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
-    newNative->self(_mySelfPtr);
+
+    JSCairoSurfaceWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
+    newNative->setSelfPtr(_mySelfPtr);
 
     myNewObject->_myImageNode = myImageNode;
 
@@ -295,7 +295,7 @@ bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget) {
     JSCairoSurface::NATIVE *myWrapper;
 
     if(convertFrom(cx, theValue, myWrapper)) {
-        theTarget = myWrapper->getNative();
+        theTarget = myWrapper->getWrapped();
         return true;
     }
 

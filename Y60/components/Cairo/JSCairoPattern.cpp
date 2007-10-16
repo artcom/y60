@@ -22,7 +22,7 @@
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
 
-#include "RefCountWrapper.impl"
+#include "CairoWrapper.impl"
 
 using namespace std;
 using namespace asl;
@@ -312,10 +312,10 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     JSCairoPatternWrapper::STRONGPTR _myOwnerPtr(newNative);
-    JSCairoPatternWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
-
     myNewObject = new JSCairoPattern(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
-    newNative->self(_mySelfPtr);
+
+    JSCairoPatternWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
+    newNative->setSelfPtr(_mySelfPtr);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
@@ -389,7 +389,7 @@ bool convertFrom(JSContext *cx, jsval theValue, cairo_pattern_t *& theTarget) {
     JSCairoPattern::NATIVE *myWrapper;
 
     if(convertFrom(cx, theValue, myWrapper)) {
-        theTarget = myWrapper->getNative();
+        theTarget = myWrapper->getWrapped();
         return true;
     }
     

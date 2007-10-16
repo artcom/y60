@@ -19,7 +19,7 @@ extern "C" {
 #include <cairo/cairo.h>
 }
 
-#include "RefCountWrapper.h"
+#include "CairoWrapper.h"
 
 
 namespace jslib {

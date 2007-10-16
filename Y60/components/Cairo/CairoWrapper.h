@@ -44,15 +44,15 @@ public:
         unreference();
     }
 
-    WRAPPED* getNative() {
+    WRAPPED* getWrapped() {
         return _myWrapped;
     }
 
-    STRONGPTR getPtr() {
+    STRONGPTR getWrappedPtr() {
         return _myWeakReference.lock();
     }
 
-    void self(WEAKPTR thePtr) {
+    void setSelfPtr(WEAKPTR thePtr) {
         _myWeakReference = thePtr;
     }
 

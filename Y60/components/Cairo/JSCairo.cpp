@@ -23,7 +23,7 @@
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
 
-#include "RefCountWrapper.impl"
+#include "CairoWrapper.impl"
 
 using namespace std;
 using namespace asl;
@@ -1248,7 +1248,7 @@ JSCairo::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             return JS_FALSE;
         }
 
-        newNative = dynamic_cast<NATIVE*>(NATIVE::get(cairo_create(mySurface)));
+        newNative = NATIVE::get(cairo_create(mySurface));
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
@@ -1256,10 +1256,10 @@ JSCairo::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     }
 
     JSCairoWrapper::STRONGPTR _myOwnerPtr(newNative);
-    JSCairoWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
-
     myNewObject = new JSCairo(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
-    newNative->self(_mySelfPtr);
+
+    JSCairoWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
+    newNative->setSelfPtr(_mySelfPtr);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
@@ -1390,7 +1390,7 @@ bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theTarget) {
     JSCairo::NATIVE *myWrapper;
 
     if(convertFrom(cx, theValue, myWrapper)) {
-        theTarget = myWrapper->getNative();
+        theTarget = myWrapper->getWrapped();
         return true;
     }
 

@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "RefCountWrapper.h"
+#include "CairoWrapper.h"
 
 namespace jslib {
 
