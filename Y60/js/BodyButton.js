@@ -13,7 +13,6 @@ use("Y60JSSL.js");
 
 var ourStyleCache = []
 
-
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
         var myStyleNode = theStylesNode.childNode(i);
@@ -610,6 +609,8 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
    setup();
     
 }
+
+
 
 function LanguageImageToggleTextBodyButton(theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
     var Protected = {};
