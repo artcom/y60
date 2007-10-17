@@ -22,7 +22,8 @@ namespace y60 {
     BackgroundSubtraction::BackgroundSubtraction(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result"),
-        _mySourceRaster(0)
+        _mySourceRaster(0),
+        _myCounter(0)
     {   
         _myResultNode.appendChild(Element("center"));
         _myResultNode.childNode("center")->appendChild(Text(""));
@@ -82,6 +83,7 @@ namespace y60 {
         unsigned int myTrgtIntensity;
         Vector3f mySrcHSV;
         Vector3f myBgHSV;
+        
         for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); ++itSrc,++itBg, ++itTrgt) {
             rgb_to_intensity((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], mySrcIntensity);
             rgb_to_intensity((*itTrgt)[2], (*itTrgt)[1], (*itTrgt)[0], myTrgtIntensity);
@@ -109,13 +111,18 @@ namespace y60 {
             (*itTrgt)[1] = myTrgtIntensity;
             (*itTrgt)[2] = myTrgtIntensity;
 
-
-            // update backgroundimage
-            // (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
-            // (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
-            // (*itBg)[2] = static_cast<unsigned int>(myAlpha * (*itSrc)[2] + (1-myAlpha)*(*itBg)[2]);
-
+            if (_myCounter >= 5) {
+                (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
+                (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
+                (*itBg)[2] = static_cast<unsigned int>(myAlpha * (*itSrc)[2] + (1-myAlpha)*(*itBg)[2]);
+            }
         }
+        
+        // update backgroundimage
+        if (_myCounter >= 30) {
+            _myCounter = 0;
+        }
+        _myCounter++;
         
         
         

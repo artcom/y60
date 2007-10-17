@@ -9,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include "Contrast.h"
+#include "AdaptiveBackground.h"
 
 using namespace asl;
 using namespace std;
@@ -17,16 +17,16 @@ using namespace dom;
 
 namespace y60 {
 
-    Contrast::Contrast(const std::string & theName) :
+    AdaptiveBackground::AdaptiveBackground(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result"),
-        _myLower(0),
-        _myUpper(255)
+        _myCounter(98)
     {   
     }
+  
 
     void 
-    Contrast::configure(const dom::Node & theNode) {
+    AdaptiveBackground::configure(const dom::Node & theNode) {
         
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
@@ -38,62 +38,43 @@ namespace y60 {
                     _mySourceImage = myImage->getFacade<y60::Image>();
                 } else if( myName == "targetimage") {
                     _myTargetImage = myImage->getFacade<y60::Image>();
+                } else if( myName == "blobimage") {
+                    _myBlobImage = myImage->getFacade<y60::Image>();
                 } 
             } else {
-                if( myName == "lower") {
-                    asl::fromString(myValue, _myLower);
-                    updateLookupTable();
-                } else if( myName == "upper") {
-                    asl::fromString(myValue, _myUpper);
-                    updateLookupTable();
+                if( myName == "strength") {
+                    asl::fromString(myValue, _myStrength);
                 }
             }
         }   
     }
 
-    void 
-    Contrast::updateLookupTable() {
-        _myLookupTable.clear();
-        
-        unsigned char myRange = _myUpper -_myLower;
-        
-        for (unsigned int i=0; i<_myLower; i++) {
-            _myLookupTable.push_back(0);
-        }
-        for (unsigned int i=_myLower, value = 1; i<_myUpper; i++, value++) {
-            unsigned char myValue = value * 255 / myRange;
-            _myLookupTable.push_back(myValue);
-        }
-        for (unsigned int i=_myUpper; i<256; i++) {
-            _myLookupTable.push_back(255);
-        }
-    }
-
 	void 
-    Contrast::onFrame(double t) {
+    AdaptiveBackground::onFrame(double t) {
+        if (_myCounter < 10) {
+            _myCounter++;
+            return;
+        }
         
+        _myCounter = 0;
+
         const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
+        const BGRRaster * myBlobFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myBlobImage->getRasterValue());
         const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
         
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
+        BGRRaster::iterator itSrc   = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+        BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myBlobFrame->begin());
+        BGRRaster::iterator itTarg  = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
 
-        dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
-
-        // // left-to-right horizontal pass
-        BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
-        itSrc++;
-
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc) {
-            for (unsigned int i=0; i<3; i++) {
-                (*itSrc)[i] = _myLookupTable[(*itSrc)[i]];
+        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
+            float myWeight = (static_cast<float>((*itBlob)[0]) / 256.0f);
+            
+            for (unsigned int i=0; i<3; ++i) {
+                    (*itTarg)[i] = static_cast<unsigned char>((*itTarg)[i]) * myWeight;
+                    (*itTarg)[i] += static_cast<unsigned char>((*itSrc)[i]) * (1-myWeight);
             }
         }
-        
+
         _myTargetImage->triggerUpload();
 	}
 }
-

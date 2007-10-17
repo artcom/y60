@@ -9,22 +9,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#ifndef _AC_BACKGROUND_SUBTRACTION_H_
-#define _AC_BACKGROUND_SUBTRACTION_H_
+#ifndef _AC_ADAPTIVEBACKGROUND_H_
+#define _AC_ADAPTIVEBACKGROUND_H_
 
 #include "Algorithm.h"
 
-
-
 namespace y60 {
-
-
-
-	class BackgroundSubtraction : public Algorithm {
+	class AdaptiveBackground : public Algorithm {
 		public:
-            BackgroundSubtraction(const std::string & theName);
+            AdaptiveBackground(const std::string & theName);
 
-			static std::string getName() { return "backgroundsubtraction"; }
+			static std::string getName() { return "adaptivebackground"; }
 		    void onFrame(double t);
             
             void configure(const dom::Node & theNode);
@@ -32,24 +27,17 @@ namespace y60 {
 		        return _myResultNode;
 	        }
 
-
-
 		private:
-            unsigned int clampedSub(unsigned int theFirstValue, unsigned int theSecondValue); 
-            float clampedSubHSL(unsigned int theFirstValue, unsigned int theSecondValue); 
-            
-            dom::Element _myResultNode;
-            dom::ValuePtr _mySourceRaster;
-            dom::ValuePtr _myTargetRaster;
-            dom::ValuePtr _myBackgroundRaster;
-            
+            float lookup(float theValue);
+            float revlookup(float theValue);
+            dom::Element  _myResultNode;
+            y60::ImagePtr _mySourceImage;
+            y60::ImagePtr _myBlobImage;
             y60::ImagePtr _myTargetImage;
-            y60::ImagePtr _myBackgroundImage;              
-            
-            float _myThreshold;
-            float _myWeight;
+            float _myStrength;
             unsigned int _myCounter;
     };
 }
 
 #endif
+
