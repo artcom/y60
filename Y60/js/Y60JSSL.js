@@ -41,7 +41,16 @@ var TWO_PI = Math.PI * 2.0;
 
 function clone(theObject, theMode) {
     var myNewObject = [];
-    if (theMode) {
+
+    if (theObject instanceof Node) {
+	var attrs = theObject.attributes;
+        for (var i = 0; i <attrs.length; i++) {
+	    myNewObject[attrs[i].nodeName] = attrs[i].nodeValue;	
+        }
+	return myNewObject;
+    }
+
+    if (!theMode) {
         for (i in theObject) {
             if (typeof theObject[i] == "object") {
                 myNewObject[i] = clone(theObject[i], theMode);
@@ -167,6 +176,10 @@ var COLOR_HEX_STRING_PATTERN = /^[0-9A-Fa-f]{6}/;
 
 // use like this: asColor("00BFA3", 1);
 function asColor(theHexString, theAlpha) {
+
+    if (!theHexString) {
+        throw new Exception("asColor: theHexString is not defined!");
+    }
 
     if (theHexString instanceof Vector4f) {
 	Logger.trace("asColor: is Vector4f:" + theHexString);
