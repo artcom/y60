@@ -1368,10 +1368,10 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         initialSet->insert(n);
 
 #ifdef INTERPRETER_DEBUG
-        AC_TRACE<<"initial set contains " << initialSet->size() << "nodes.";
+        AC_TRACE<<"initial set contains " << initialSet->size() << " nodes.";
 #endif
 
-        NodeSetRef result; // = evaluateSet<std::map<NodeRef, NodeRef> >(initialSet);
+        NodeSetRef result = evaluateAll(initialSet);
         return new NodeSetValue(result);
     };
 
