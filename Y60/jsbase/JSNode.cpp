@@ -34,6 +34,7 @@
 #include <asl/os_functions.h>
 #include <asl/Logger.h>
 #include <y60/Image.h>
+#include <xpath/parser.h>
 
 #include <iostream>
 #include <fstream>
@@ -751,6 +752,45 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 }
 
 static JSBool
+xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Follows an XPath specified in the argument, returns an array of matching nodes.");
+    DOC_PARAM("theXPath", "", DOC_TYPE_STRING);
+    DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
+    DOC_END;
+    std::string myPathString;
+    dom::NodePtr myNode;
+    bool myDeepSearchFlag = true;    
+
+    if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
+	JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
+    }
+
+    std::vector<dom::NodePtr> myResults;
+    if (argc < 1) {
+         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+    } else if (argc > 1) {
+         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+    }
+
+    if (!convertFrom(cx, argv[0], myPathString)) {
+         JS_ReportError(cx,"JSNode::find: argument is not a string.");
+    };                        
+
+    xpath::Path *myPath = xpath::xpath_parse(myPathString);
+
+    if (!myPath) {
+         JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
+	 return JS_FALSE;
+    } else {
+	 std::vector<dom::NodePtr> myResults;
+         xpath::xpath_evaluate(myPath, &*myNode, myResults);
+	 *rval = as_jsval(cx, myResults);
+	 xpath::xpath_return(myPath);
+	 return JS_TRUE;
+    }
+}
+
+static JSBool
 getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Retrieves an attribute value by name.");
     DOC_PARAM("Name", "", DOC_TYPE_STRING);
@@ -823,6 +863,7 @@ JSNode::Functions() {
         {"getElementById",      getElementById,      2},
         {"getNodesByAttribute", getNodesByAttribute, 3},
         {"getNodesByTagName",   getNodesByTagName,   1},
+        {"find",                xpath_find,          1},
         {"getAttribute",        getAttribute,        1},
         {"addEventListener",    addEventListener,    3},
         {"removeEventListener", removeEventListener, 3},
