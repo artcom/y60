@@ -73,6 +73,7 @@ namespace asl {
         //  ReferenceCounter<ThreadingModel> * next;
         AtomicCount<ThreadingModel> smartCount;
 
+	// Note:
         // weakCount is one higher than the number of weak pointers as long as the smart 
         // count is at least one. This allows an atomic test for destruction of the reference
         // counter: if the weak count is 0, no more references exist.
@@ -518,6 +519,8 @@ namespace asl {
                 return _myRefCountPtr->smartCount;
             }
             // XXX DS: huh? why is the refcount 1 if there is no reference counter?
+            // PM: The refcount is undefined if there is no reference counter
+            //     so we can return what we want; 1 is as wrong as any other number
             return 1;
         }
         
@@ -536,6 +539,7 @@ namespace asl {
             return false;
         }
 
+        // Ptr::
         inline void unreference() {
             DBP2(std::cerr<<"Ptr::unreference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
             if (_myNativePtr) {
@@ -688,6 +692,7 @@ namespace asl {
                 }
             }
 
+            // WeakPtr::
             inline void unreference() {
                 DBP2(std::cerr<<"WeakPtr::unreference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
                 if (_myNativePtr) {
