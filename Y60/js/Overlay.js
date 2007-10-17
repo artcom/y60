@@ -687,7 +687,9 @@ function removeOverlay(theOverlayNode) {
                 for (var i = 0; i < myTextures.childNodes.length; ++i) {
                     var myImageId = myTextures.childNode(i).image;
                     var myImage = theOverlayNode.getElementById(myImageId);
-                    myImage.parentNode.removeChild(myImage);
+                    if (myImage) {        
+                        myImage.parentNode.removeChild(myImage);
+                    }
                 }
             }
 
