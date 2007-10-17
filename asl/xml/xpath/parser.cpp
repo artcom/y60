@@ -5,8 +5,8 @@
 
 #include <asl/string_functions.h>
 
-//#define DEBUG_PARSER_STATES
-//#define PARSER_DEBUG_VERBOSITY 2
+#define DEBUG_PARSER_STATES
+#define PARSER_DEBUG_VERBOSITY 2
 
 namespace xpath {
 
@@ -419,7 +419,7 @@ namespace xpath {
 	}
 	p->appendStep(s);
 #if PARSER_DEBUG_VERBOSITY > 1
-	AC_TRACE << "path is now "; << *p;
+	AC_TRACE << "path is now " << *p;
 #endif
 	return pos;
     }
@@ -459,7 +459,14 @@ namespace xpath {
 
     Path *xpath_parse(const std::string &instring) {
 	Path *p = new Path();
-        parsePath(p, instring, 0);
+	AC_INFO << "parsing path " << instring;
+        if (parsePath(p, instring, 0) == 0) {
+	    // parse error
+	    AC_INFO << "parse error. Intermediate result=" << *p;
+	    delete p;
+	    return NULL;
+	}
+	AC_INFO << "parsed path " << *p;
 	return p;
     }
 

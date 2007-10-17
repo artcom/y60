@@ -49,6 +49,15 @@ public:
 	return retval;
     }
 
+    bool parses(std::string theString) {
+	Path *p = xpath_parse(theString);
+	if (p) {
+	    delete p;
+	    return true;
+	}
+	return false;
+    }
+
     void run() {
 
 	std::string myXML = "<testDoc><body><junk>foo</junk><junk content=\"valuable\">\
@@ -66,6 +75,10 @@ public:
 	}
 
 	ENSURE(search_equals(&doc, "testDoc", &*doc.childNode(0)));
+
+	// test:  "\"]" is not a valid path ->expect empty parse result.
+
+	ENSURE(!parses("\"]"));
 
 	// test:
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
