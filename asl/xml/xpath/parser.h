@@ -16,8 +16,8 @@ namespace xpath {
 
     void xpath_evaluate(Path *, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
 
-    std::set<dom::Node *> *xpath_evaluate(Path *, dom::Node *startingElement);
-    std::set<dom::Node *> *xpath_evaluate(std::string path, dom::Node *startingElement);
+    std::set<dom::Node *> *xpath_evaluate(Path *, dom::Node *);
+    std::set<dom::Node *> *xpath_evaluate(std::string path, dom::Node *);
 
 };
 

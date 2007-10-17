@@ -463,7 +463,7 @@ namespace xpath {
 	return p;
     }
 
-    std::set<dom::Node *> *evaluate(Path *p, dom::Node *theNode) {
+    std::set<dom::Node *> *xpath_evaluate(Path *p, dom::Node *theNode) {
 	xpath::NodeSetValue *value = p->evaluate(theNode);
 	std::set<dom::Node *> *retval = value->takeNodes();
 	delete value;
