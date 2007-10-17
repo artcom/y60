@@ -21,6 +21,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+#include <asl/string_functions.h>
+
 #include "Nodes.h"
 #include "Schema.h"
 #include "SchemaStrings.h"
@@ -48,6 +50,13 @@ using namespace std;
 
 namespace dom {
 
+    asl::Unsigned32 dom::UniqueId::_myCounter(0);
+
+    std::ostream& operator<<(std::ostream& os, const UniqueId & uid) {
+        os << uid._myCount << "@" << uid._ptrValue;
+        return os;
+    }
+
     const char * NodeTypeName[16] = {
         "X_NO_NODE",
         "ELEMENT_NODE",
@@ -67,106 +76,22 @@ namespace dom {
         "X_END_NODE"
     };
 
+    typedef asl::Char Char;
 
-    asl::Unsigned32 dom::UniqueId::_myCounter(0);
+    static const Char AMP = '&';
+    static const Char LT = '<';
+    static const Char GT = '>';
+    static const Char QUOTE = '"';
+    static const Char APOS = '\'';
+    static const Char C9 = 9;
+    static const Char C10 = 10;
+    static const Char C13 = 13;
+    static const Char SLASH = '/';
+    static const Char EQUAL = '=';
+    static const Char SEMI = ';';
+    static const Char Cx = 'x';
 
-    std::ostream& operator<<(std::ostream& os, const UniqueId & uid) {
-        os << uid._myCount << "@" << uid._ptrValue;
-        return os;
-    }
-
-    typedef unsigned char Char;
-    const int MAX_CHAR_VALUE = 255;
     typedef DOMString String;
-    const String EMPTY_STRING ("");
-
-    inline bool is_space(Char c) {
-        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-    }
-    inline bool is_alpha(Char c) {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-    }
-    inline bool is_printable(Char c) {
-        return (c >= 0x20 && c < 0x7f);
-    }
-    inline bool is_ascii(Char c) {
-        return (c <= 0x7f);
-    }
-    inline bool is_utf8_sequence_followup(Char c) {
-        return (c >= 0x80) && (c <= 0xBF);
-    }
-    inline bool is_utf8_sequence_start(Char c) {
-        return (c & 0xC0) == 0xC0;
-    }
-    inline bool is_utf8_multibyte(Char c) {
-        return is_utf8_sequence_start(c) || is_utf8_sequence_followup(c);
-    }
-    inline bool is_underscore(Char c) {
-        return c == '_';
-    }
-    inline bool is_colon(Char c) {
-        return c == ':';
-    }
-    inline bool is_dot(Char c) {
-        return c == '.';
-    }
-    inline bool is_hyphen(Char c) {
-        return c == '-';
-    }
-
-    inline bool is_digit(Char c) {
-        return c >= '0' && c <= '9';
-    }
-
-    const String PUBID_SPECIAL_CHARS = "-'()+,./:=?;!*#@$_%";
-    inline bool is_pubid_special(Char c) {
-        for (unsigned int i = 0; i < PUBID_SPECIAL_CHARS.size();++i) {
-            if (c == PUBID_SPECIAL_CHARS[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-    inline bool is_pubid(Char c) {
-        return is_alpha(c) || is_digit(c) || is_space(c) || is_pubid_special(c);
-    }
-
-
-    inline bool is_ABCDEF(Char c) {
-        return c >= 'A' && c <= 'F';
-    }
-    inline bool is_abcdef(Char c) {
-        return c >= 'a' && c <= 'f';
-    }
-    inline unsigned int digit_to_num(Char digit) {
-        return digit - '0';
-    }
-    inline unsigned int ABCDEF_to_num(Char digit) {
-        return digit - 'A' + 10;
-    }
-    inline unsigned int abcdef_to_num(Char digit) {
-        return digit - 'a' + 10;
-    }
-
-    const Char AMP = '&';
-    const Char LT = '<';
-    const Char GT = '>';
-    const Char QUOTE = '"';
-    const Char APOS = '\'';
-    const Char C9 = 9;
-    const Char C10 = 10;
-    const Char C13 = 13;
-    const Char SLASH = '/';
-    const Char EQUAL = '=';
-    const Char SEMI = ';';
-    const Char Cx = 'x';
-
-   /*
-    datachar    ::= '&amp;' | '&lt;' | '&gt;' | '&quot;'
-    | '&#9;'| '&#10;'| '&#13;'
-    | (Char - ('&' | '<' | '>' | '"' | #x9 | #xA | #xD))
-
-    */
 
     const String ENT_AMP("&amp;");
     const String ENT_LT("&lt;");
@@ -197,168 +122,41 @@ namespace dom {
     const String ETAG_BGN("</");
     const String ETAG_END(">");
 
+    const String PUBID_SPECIAL_CHARS = "-'()+,./:=?;!*#@$_%";
+    const String EMPTY_STRING ("");
 
-    std::string as_decimal_entity(Char c) {
-        unsigned char uc = c;
-        String result = ENT_DEC;
-        result+=asl::as_string(static_cast<unsigned>(uc));
+    inline bool is_pubid_special(Char c) {
+        for (unsigned int i = 0; i < PUBID_SPECIAL_CHARS.size();++i) {
+            if (c == PUBID_SPECIAL_CHARS[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    inline bool is_pubid(Char c) {
+        return asl::is_alpha(c) || asl::is_digit(c) || asl::is_space(c) || is_pubid_special(c);
+    }
+
+
+    inline String as_decimal_entity(Char c) {
+        std::string result = ENT_DEC;
+        result+=asl::as_string(static_cast<unsigned>(c));
         result+=SEMI;
         return result;
     }
 
-    /// convert a ascii hex digit to its binary value. ('2' -> 2, 'A' -> 10)
-    /// returns false if not a hex digit
-    bool hex_to_num(Char digit, unsigned int & num) {
-        if (is_digit(digit)) {
-            num = digit_to_num(digit);
-            return true;
-        } else if (is_ABCDEF(digit)) {
-            num = ABCDEF_to_num(digit);
-            return true;
-        } else if (is_abcdef(digit)) {
-            num = abcdef_to_num(digit);
-            return true;
-        }
-        return false;
-    }
-
-    bool is_decimal_number(const String & s, unsigned int & r, unsigned int max_value = MAX_CHAR_VALUE) {
-        if (s.size() == 0)
-            return false;
-        unsigned int result = 0;
-        for (unsigned int i = 0; i< s.size();++i) {
-            if (is_digit(s[i])) {
-                result*=10;
-                result+=digit_to_num(s[i]);
-            } else
-                return false;
-            if (result > max_value)
-                return false;
-        }
-        r = result;
-        return true;
-    }
-
-    bool is_hex_number(const String & s, unsigned int & r, unsigned int max_value = MAX_CHAR_VALUE) {
-        if (s.size() == 0)
-            return false;
-        unsigned int result = 0;
-        for (unsigned int i = 0; i< s.size();++i) {
-            unsigned int num;
-            if (hex_to_num(s[i],num)) {
-                result*=16;
-                result+=num;
-            } else
-                return false;
-            if (result > max_value)
-                return false;
-        }
-        r = result;
-        return true;
-    }
-
-    // returns the position of the first non-whitespace char
-    int read_whitespace(const String & is, int pos) {
-        while (pos < is.size() && (is_space(is[pos]))) {
-            ++pos;
-        }
-        return pos;
-    }
-
-    inline bool is_name_start_char(Char c) {
-        return is_alpha(c) || is_underscore(c) || is_colon(c);
-    }
-    inline bool is_name_char(Char c) {
-        return is_name_start_char(c) || is_digit(c) || is_dot(c) || is_hyphen(c);
-    }
-
-    // returns the position of the first non-namechar
-    int read_name(const String& is,int pos) {
-        if ( is_name_start_char(is[pos]) && pos < is.size() ) {
-            ++pos;
-            while (is_name_char(is[pos]) && pos < is.size() ) {
-                ++pos;
-            }
-        }
-        return pos;
-    }
-
-    // returns pos + 1 if c is at pos
-    inline int read_if_char(const String & is,int pos, Char c) {
-        if ( is[pos] == c && pos < is.size() ) {
-            return pos + 1;
-        }
-        return pos;
-    }
-
-    // returns position past end of s if s is the exact next part
-    inline int read_if_string(const String & is,int pos, const String & s) {
-        int i = 0;
-        int n = asl::minimum(s.size(),is.size()-pos);
-        while (i<n && pos < is.size() && is[pos+i] == s[i]) {
-            ++i;
-        }
-        if (i == s.size())
-            return pos + i;
-        return pos;
-    }
-
-    // returns pos of next delim
-    int read_text(const String & is,int pos, Char delim = LT) {
-        int last_non_white = pos;
-        while ( pos < is.size() && is[pos] != delim ) {
-            if (!is_space(is[pos])) last_non_white = pos;
-            ++pos;
-        }
-        return last_non_white+1;
-    }
-    // returns position past second quote char if at pos is a quote char
-    int read_quoted_text(const String & is,int pos,
-        Char opening_qoute,Char closing_qoute ) {
-        if (is[pos]==opening_qoute) {
-            ++pos;
-            while ( pos < is.size() && is[pos] != closing_qoute ) {
-                ++pos;
-            }
-            if (is[pos]==closing_qoute) ++pos;
-        }
-        return pos;
-    }
-    int read_quoted_text(const String & is,int pos) {
+    int read_quoted_text(const std::string & is,int pos) {
         if (is[pos] == QUOTE)
-            return read_quoted_text(is,pos,QUOTE,QUOTE);
+            return asl::read_quoted_text(is,pos,QUOTE,QUOTE);
         else
-            return read_quoted_text(is,pos,APOS,APOS);
-    }
-
-    void copy_between_quotes(const String& is,int pos, int end_pos, String & dest) {
-        dest=is.substr(pos+1,end_pos-pos-2);
-    }
-    // returns position past "right" if sequence starts with "left"
-    int read_if_between(const String & is,int pos, const String & left, const String & right)
-    {
-        int left_end = read_if_string(is,pos,left);
-        if (left_end > pos) {
-            int right_begin = is.find(right,left_end);
-            if (right_begin != String::npos)
-                pos = right_begin + right.size();
-        }
-        return pos;
-    }
-
-    // utility for previous function to copy what's between into string dest
-    void copy_between(const String & is,int pos, const String & left, const String & right,
-        int right_end_pos, String & dest)
-    {
-        int begin = pos+left.size();
-        dest = is.substr(begin,right_end_pos-begin-right.size());
+            return asl::read_quoted_text(is,pos,APOS,APOS);
     }
 
     // read <!-- comment -->
     int read_comment(const String& is,int pos,String & comment) {
-        int new_pos = read_if_between(is,pos,COMMENT_BGN,COMMENT_END);
+        int new_pos = asl::read_if_between(is,pos,COMMENT_BGN,COMMENT_END);
         if (new_pos > pos) {
-            copy_between(is,pos,COMMENT_BGN,COMMENT_END,new_pos,comment);
+            asl::copy_between(is,pos,COMMENT_BGN,COMMENT_END,new_pos,comment);
         }
         return new_pos;
     }
@@ -367,12 +165,12 @@ namespace dom {
     int read_processing_instruction(const String & is,int pos,
                                     String & target,String & proc_instr)
     {
-        int new_pos = read_if_between(is,pos,PI_BGN,PI_END);
+        int new_pos = asl::read_if_between(is,pos,PI_BGN,PI_END);
         if (new_pos > pos) {
-            int instr_pos = read_name(is,pos+2);
+            int instr_pos = asl::read_name(is,pos+2);
             if (instr_pos > pos+2) {
                 target = is.substr(pos+2,instr_pos-pos-2);
-                instr_pos = read_whitespace(is,instr_pos);
+                instr_pos = asl::read_whitespace(is,instr_pos);
                 proc_instr = is.substr(instr_pos,new_pos-instr_pos-2);
             }
         }
@@ -381,9 +179,9 @@ namespace dom {
 
     // read <![CDATA[ some otherwise entity-encoded <characters> may appear <!here/> ]]>
     int read_cdata(const String & is,int pos,String & cdata) {
-        int new_pos = read_if_between(is,pos,CDATA_BGN,CDATA_END);
+        int new_pos = asl::read_if_between(is,pos,CDATA_BGN,CDATA_END);
         if (new_pos > pos) {
-            copy_between(is,pos,CDATA_BGN,CDATA_END,new_pos,cdata);
+            asl::copy_between(is,pos,CDATA_BGN,CDATA_END,new_pos,cdata);
         }
         return new_pos;
     }
@@ -394,17 +192,17 @@ namespace dom {
     // or   SYSTEM "URL is SystemLiteral"
     // PubidLiteral is set to empty when not a public id
     int read_ExternalID(const String & is, int pos, String & PubidLiteral, String & SystemLiteral) {
-        int new_pos = read_if_string(is,pos,"PUBLIC");
+        int new_pos = asl::read_if_string(is,pos,"PUBLIC");
         if (new_pos == pos) {
-            new_pos = read_if_string(is,pos,"SYSTEM");
+            new_pos = asl::read_if_string(is,pos,"SYSTEM");
             PubidLiteral.resize(0);
         } else {
             // read PubidLiteral
             DB(AC_TRACE << "PUBLIC");
-            int pubid_start_pos = read_whitespace(is, new_pos);
+            int pubid_start_pos = asl::read_whitespace(is, new_pos);
             int pubid_end_pos = read_quoted_text(is, pubid_start_pos);
             if (pubid_end_pos > pubid_start_pos) {
-                copy_between_quotes(is,pubid_start_pos,pubid_end_pos ,PubidLiteral);
+                asl::copy_between_quotes(is,pubid_start_pos,pubid_end_pos ,PubidLiteral);
                 for (int i = 0; i < PubidLiteral.size(); ++i) {
                     if (!is_pubid(PubidLiteral[i])) {
                         throw ParseException("bad character in PUBLIC id",
@@ -423,10 +221,10 @@ namespace dom {
         if (new_pos > pos) {
             readSystemLiteral:
             // read SystemLiteral
-            int syslit_start_pos = read_whitespace(is, new_pos);
+            int syslit_start_pos = asl::read_whitespace(is, new_pos);
             int syslit_end_pos = read_quoted_text(is, syslit_start_pos);
             if (syslit_end_pos > syslit_start_pos) {
-                copy_between_quotes(is,syslit_start_pos, syslit_end_pos, SystemLiteral);
+                asl::copy_between_quotes(is,syslit_start_pos, syslit_end_pos, SystemLiteral);
                 return syslit_end_pos;
             } else {
                 throw ParseException("PUBLIC or SYSTEM id literal missing",
@@ -442,17 +240,17 @@ namespace dom {
                                  String & PubidLiteral,
                                  String & SystemLiteral)
     {
-        int new_pos = read_if_string(is,pos,DOCTYPE_BGN);
+        int new_pos = asl::read_if_string(is,pos,DOCTYPE_BGN);
         if (new_pos > pos) {
             // <!DOCTYPE found
             DB(AC_DEBUG <<DOCTYPE_BGN << " - found");
-            new_pos = read_whitespace(is, new_pos);
-            int next_pos = read_name(is,new_pos);
+            new_pos = asl::read_whitespace(is, new_pos);
+            int next_pos = asl::read_name(is,new_pos);
             if (next_pos > new_pos) {
                 // name ok
                 name = is.substr(new_pos,next_pos-new_pos);
                 DB(AC_DEBUG <<DOCTYPE_BGN << " - name ok: '" << name << "'");
-                int id_pos = read_whitespace(is,next_pos);
+                int id_pos = asl::read_whitespace(is,next_pos);
 
                 // look for external id
                 int children_pos = read_ExternalID(is,id_pos,PubidLiteral,SystemLiteral);
@@ -481,24 +279,24 @@ namespace dom {
                                  String & NDataName,
                                  const Node * doctype)
     {
-        int new_pos = read_if_string(is,pos,ENTITY_BGN);
+        int new_pos = asl::read_if_string(is,pos,ENTITY_BGN);
         if (new_pos > pos) {
             // <!ENTITY found
             DB(AC_DEBUG << ENTITY_BGN << " - found");
-            new_pos = read_whitespace(is, new_pos);
+            new_pos = asl::read_whitespace(is, new_pos);
             if (is[new_pos] == '%') {
-                new_pos = read_whitespace(is, new_pos+1);
+                new_pos = asl::read_whitespace(is, new_pos+1);
                 isParsedEntity = true;
                 DB(AC_DEBUG <<ENTITY_BGN << " - is parsed");
             } else {
                 isParsedEntity = false;
                 DB(AC_DEBUG <<ENTITY_BGN << " - is not parsed");
             }
-            int next_pos = read_name(is,new_pos);
+            int next_pos = asl::read_name(is,new_pos);
             if (next_pos > new_pos) {
                 name = is.substr(new_pos,next_pos-new_pos);
                 DB(AC_DEBUG <<ENTITY_BGN << " - name ok: '" << name << "'");
-                int id_pos = read_whitespace(is,next_pos);
+                int id_pos = asl::read_whitespace(is,next_pos);
                 int id_end_pos = read_ExternalID(is,id_pos,PubidLiteral,SystemLiteral);
                 if (id_end_pos > id_pos) {
                     // ExternalID found
@@ -508,11 +306,11 @@ namespace dom {
                             << SystemLiteral << "'");
                     if (!isParsedEntity) {
                         // see if NDataDecl is present
-                        int ndata_decl_pos = read_whitespace(is,id_end_pos);
-                        int ndata_pos = read_if_string(is, ndata_decl_pos, "NDATA");
+                        int ndata_decl_pos = asl::read_whitespace(is,id_end_pos);
+                        int ndata_pos = asl::read_if_string(is, ndata_decl_pos, "NDATA");
                         if (ndata_pos > ndata_decl_pos) {
-                            int ndata_name_pos = read_whitespace(is, ndata_pos);
-                            int ndata_name_end = read_name(is, ndata_name_pos);
+                            int ndata_name_pos = asl::read_whitespace(is, ndata_pos);
+                            int ndata_name_end = asl::read_name(is, ndata_name_pos);
                             if (ndata_name_end > ndata_name_pos) {
                                 NDataName = is.substr(ndata_name_pos, ndata_name_end - ndata_name_pos);
                                 // ok, correct NDataDecl parsed
@@ -527,17 +325,17 @@ namespace dom {
                 } else {
                     // no ExternalID, so EntityValue required
                     DB(AC_DEBUG <<ENTITY_BGN << " - value required");
-                    int ev_start = read_whitespace(is,id_pos);
+                    int ev_start = asl::read_whitespace(is,id_pos);
                     int ev_end = read_quoted_text(is, ev_start);
                     if (ev_end > ev_start) {
                         string entityValue;
-                        copy_between_quotes(is,ev_start,ev_end, entityValue);
+                        asl::copy_between_quotes(is,ev_start,ev_end, entityValue);
                         DB(AC_DEBUG <<ENTITY_BGN << " - value ok: '" << entityValue<< "'");
                         value = entity_decode_data(entityValue, ev_start + 1,doctype);
                         id_end_pos = ev_end;
                     }
                 }
-                int final_pos = read_whitespace(is, id_end_pos);
+                int final_pos = asl::read_whitespace(is, id_end_pos);
                 if (is[final_pos] == '>') {
                     // all went fine
                     return final_pos + 1;
@@ -549,9 +347,9 @@ namespace dom {
 
     // read <id param1="value1" p2="v2">
     int read_start_tag(const String& is,int pos,String & id, int & params_begin, int & params_end) {
-        int tag_end = read_quoted_text(is,pos,LT,GT);
+        int tag_end = asl::read_quoted_text(is,pos,LT,GT);
         if (tag_end > pos) {
-            int id_end = read_name(is,pos+1);
+            int id_end = asl::read_name(is,pos+1);
             if (id_end > pos + 1) {
                 id = is.substr(pos+1,id_end-pos-1);
                 params_begin = id_end;
@@ -565,9 +363,9 @@ namespace dom {
 
     // read </id>
     int read_end_tag(const String& is,int pos,String& id)   {
-        int tag_end = read_if_between(is,pos,ETAG_BGN,ETAG_END);
+        int tag_end = asl::read_if_between(is,pos,ETAG_BGN,ETAG_END);
         if (tag_end > pos) {
-            int id_end = read_name(is,pos+2);
+            int id_end = asl::read_name(is,pos+2);
             if (id_end>pos) {
                 id = is.substr(pos+2,id_end-pos-2);
             } else {
@@ -579,13 +377,13 @@ namespace dom {
 
     // read <id/> or <id param1="value1" p2="v2"/>
     int read_empty_tag(const String & is,int pos,String & id,int & params_begin, int & params_end) {
-        int tag_end = read_quoted_text(is,pos,LT,GT);
+        int tag_end = asl::read_quoted_text(is,pos,LT,GT);
         if (tag_end > pos+2 && is[tag_end-2] == SLASH) {
-            int id_end = read_name(is,pos+1);
+            int id_end = asl::read_name(is,pos+1);
 //PORT            const char* id_end_ptr = &is[id_end];
             if (id_end > pos+1) {
                 id = is.substr(pos+1,id_end - pos-1);
-                params_begin = read_whitespace (is, id_end);
+                params_begin = asl::read_whitespace (is, id_end);
                 params_end = tag_end - 2;
                 pos = tag_end;
             } else {
@@ -597,17 +395,17 @@ namespace dom {
 
     // read name="value"
     int read_attribute(const String & is,int pos,String & name,String & value) {
-        int nw_pos = read_whitespace(is,pos);
-        int name_end = read_name(is,nw_pos);
+        int nw_pos = asl::read_whitespace(is,pos);
+        int name_end = asl::read_name(is,nw_pos);
         if (name_end > nw_pos) {
             name = is.substr(nw_pos,name_end-nw_pos);
-            nw_pos = read_whitespace(is,name_end);
-            int eq_pos = read_if_char(is,nw_pos,EQUAL);
+            nw_pos = asl::read_whitespace(is,name_end);
+            int eq_pos = asl::read_if_char(is,nw_pos,EQUAL);
             if (eq_pos > nw_pos) {
-                nw_pos = read_whitespace(is,eq_pos);
+                nw_pos = asl::read_whitespace(is,eq_pos);
                 int val_end = read_quoted_text(is,nw_pos);
                 if (val_end > nw_pos) {
-                    copy_between_quotes(is,nw_pos,val_end,value);
+                    asl::copy_between_quotes(is,nw_pos,val_end,value);
                     return val_end;
                 }
             }
@@ -653,7 +451,7 @@ namespace dom {
                     result+=s[i];
                 break;
             default:
-                if (is_printable(s[i]) || is_space(s[i]) || is_utf8_multibyte(s[i])) {
+                if (asl::is_printable(s[i]) || asl::is_space(s[i]) || asl::is_utf8_multibyte(s[i])) {
                     result+=s[i];
                 } else {
                     result.append(as_decimal_entity(s[i]));
@@ -671,34 +469,34 @@ namespace dom {
         while (i < s.size()) {
             if (s[i] == AMP) {
                 int next_pos = i;
-                if ((next_pos = read_if_string(s,i,ENT_AMP)) > i)
+                if ((next_pos = asl::read_if_string(s,i,ENT_AMP)) > i)
                     result+=AMP;
-                else if ((next_pos = read_if_string(s,i,ENT_LT)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_LT)) > i)
                     result+=LT;
-                else if ((next_pos = read_if_string(s,i,ENT_GT)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_GT)) > i)
                     result+=GT;
-                else if ((next_pos = read_if_string(s,i,ENT_9)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_9)) > i)
                     result+=C9;
-                else if ((next_pos = read_if_string(s,i,ENT_10)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_10)) > i)
                     result+=C10;
-                else if ((next_pos = read_if_string(s,i,ENT_13)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_13)) > i)
                     result+=C13;
-                else if ((next_pos = read_if_string(s,i,ENT_QUOT)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_QUOT)) > i)
                     result+=QUOTE;
-                else if ((next_pos = read_if_string(s,i,ENT_APOS)) > i)
+                else if ((next_pos = asl::read_if_string(s,i,ENT_APOS)) > i)
                     result+=APOS;
                 else {
-                    next_pos = read_if_between(s,i,ENT_DEC,ENT_SEMI);
+                    next_pos = asl::read_if_between(s,i,ENT_DEC,ENT_SEMI);
                     if (next_pos > i) {
                         String entity_name;
-                        copy_between(s,i,ENT_DEC,ENT_SEMI,next_pos,entity_name);
+                        asl::copy_between(s,i,ENT_DEC,ENT_SEMI,next_pos,entity_name);
                         unsigned int value;
-                        if (is_decimal_number(entity_name,value)) {
+                        if (asl::is_decimal_number(entity_name,value)) {
                             result+=value;
                         } else
                             if (entity_name[0] == Cx) {
                                 String hex_string = entity_name.substr(1);
-                                if (is_hex_number(hex_string,value)) {
+                                if (asl::is_hex_number(hex_string,value)) {
                                     result+=value;
                                 } else {
                                     String error_msg;
@@ -713,9 +511,9 @@ namespace dom {
                                     PLUS_FILE_LINE,global_pos+next_pos);
                             }
                     } else {
-                        next_pos = read_quoted_text(s,i,AMP,SEMI);
+                        next_pos = asl::read_quoted_text(s,i,AMP,SEMI);
                         String entity_name;
-                        copy_between_quotes(s,i,next_pos,entity_name);
+                        asl::copy_between_quotes(s,i,next_pos,entity_name);
                         bool found = false;
                         if (doctype) {
                             for (int child = 0; child < doctype->childNodesLength(); ++child) {
@@ -1304,7 +1102,7 @@ dom::Node::cloneNode(CloneDepth depth, Node * theParent) const {
 /// and continue with alpha, digit, '_' , '-' or ':'
 void
 dom::Node::setName(const String& name) {
-    if (read_name(name,0)!=name.size())
+    if (asl::read_name(name,0)!=name.size())
         throw DomException(JUST_FILE_LINE,DomException::INVALID_NAME_ERR);
     _myName = name;
 }
@@ -1462,7 +1260,7 @@ dom::Node::parseAll(const String& is) {
             }
         } while (completed_pos > pos);
         // read potentially trailing whitespace
-        _myParseCompletionPos = read_whitespace(is,pos);
+        _myParseCompletionPos = asl::read_whitespace(is,pos);
     }
 
     catch (ParseException & pex) {
@@ -1719,7 +1517,7 @@ int
 dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const Node * doctype) {
     _myDocSize = is.size();
     int nw_pos;
-    while ((nw_pos = read_whitespace(is,pos)) < is.size()) {
+    while ((nw_pos = asl::read_whitespace(is,pos)) < is.size()) {
 
         // check for comment
         String myValueString;
@@ -1742,7 +1540,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
             _myType = DOCUMENT_TYPE_NODE;
             nodeValue(myValueString);
             // id's ready, check for child nodes now
-            int completed_pos = read_whitespace(is,dt_child_pos);
+            int completed_pos = asl::read_whitespace(is,dt_child_pos);
             if (is[completed_pos] == '[') {
                 ++completed_pos;
                 int child_bgn_pos = completed_pos;
@@ -1766,7 +1564,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                             _myChildren.appendWhileParsing(new_child);
                         }
                     }
-                    completed_pos = read_whitespace(is, completed_pos);
+                    completed_pos = asl::read_whitespace(is, completed_pos);
                     DB(AC_DEBUG <<"dom::parse_next_node: DOCUMENT_TYPE_NODE checking for ] at pos "
                         << completed_pos);
                     if (is[completed_pos] == ']') {
@@ -1780,7 +1578,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                     }
                 } while (completed_pos > child_bgn_pos);
             }
-            completed_pos = read_whitespace(is, completed_pos);
+            completed_pos = asl::read_whitespace(is, completed_pos);
             if (is[completed_pos] == '>') {
                 _myDocSize = _myParseCompletionPos = completed_pos + 1;
                 return _myParseCompletionPos;
@@ -1908,8 +1706,8 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         }
 
         // check for some text before the next markup starts
-        // int text_start_pos = read_whitespace(is,pos);
-        int text_end_pos = read_text(is,nw_pos);
+        // int text_start_pos = asl::read_whitespace(is,pos);
+        int text_end_pos = asl::read_text(is,nw_pos, LT);
         if (text_end_pos > nw_pos) {
             if (text_end_pos == is.size()) {
                 throw ParseException("trailing text outside of element node",
@@ -2361,7 +2159,7 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
         par_end = read_attribute(is, pos, myAttributeName, myAttributeValue);
     }
     if (par_end != end_pos) {
-        int nw_pos = read_whitespace(is,pos);
+        int nw_pos = asl::read_whitespace(is,pos);
         if (nw_pos < end_pos) {
             throw SyntaxError(
                 std::string("Element <")+_myName+"> contains extra unparseable characters '"+myAttributeName+"'",
@@ -2375,7 +2173,7 @@ void
 dom::Node::checkName(const String& name, NodeType type) {
     if (name.size() && getNameOfType(type).size() && name == getNameOfType(type))
         return;
-    if (name.size() && read_name(name,0)==name.size())
+    if (name.size() && asl::read_name(name,0)==name.size())
         return;
     string errorMessage;
     errorMessage = "dom::Node::checkName failed: name = '";

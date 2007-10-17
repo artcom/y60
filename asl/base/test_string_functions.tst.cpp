@@ -237,10 +237,10 @@ class string_functions_UnitTest : public UnitTest {
             testBase64();
 		}
 
-        void testBase64Encode(const char * IN, const char * OUT, const char * CB) {
+        void testBase64Encode(const char * IN, const char * OUT, const Char * CB) {
             testBase64Encode(string(IN), string(OUT), CB);
         }
-        void testBase64Encode(const string & theIn, const string & theOut, const char * CB) {
+        void testBase64Encode(const string & theIn, const string & theOut, const Char * CB) {
             string myIn(theIn);
             string myOut(theOut); 
             string myDestination1; 
@@ -319,7 +319,6 @@ class string_functions_UnitTest : public UnitTest {
             ENSURE_EXCEPTION(base64ToBin("!abc", myDest, 10), ParseException);
             ENSURE_EXCEPTION(base64ToBin("abc*", myDest, 10), ParseException);
         }
-
 };
 
 

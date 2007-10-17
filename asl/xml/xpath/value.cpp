@@ -56,21 +56,49 @@ namespace xpath {
             }
     };
 
-    StringValue *StringValue::stringValueFor(NodeRef n)
-    {
-        if (!n)
-            return new StringValue(NULL);
+    string string_value_for(NodeRef n) {
+	string retval;
+
         switch(n->nodeType())
             {
             case dom::Node::DOCUMENT_NODE:
             case dom::Node::ELEMENT_NODE:
-                return new StringValue(n->nodeName());
-                // ###
+		for (int i = 0; i < n->childNodesLength(); i++) {
+		    retval += string_value_for(&*n->childNode(i));
+		}
             case dom::Node::ATTRIBUTE_NODE:
             case dom::Node::TEXT_NODE:
             default:
-                return new StringValue(n->nodeValue());
+                retval = n->nodeValue();
             };
+	return retval;
+    }
+
+    double number_value_for(const string &s) {
+	double num;
+	std::istringstream iss(s);
+	if (!(iss >> num)) {
+	    return 0;
+	};
+	int pos = iss.tellg();
+	if (asl::read_whitespace(s, pos++) != s.length()) { return 0; };
+	return num;
+    }
+
+    StringValue *StringValue::stringValueFor(NodeRef n)
+    {
+        if (!n)
+            return new StringValue(NULL);
+	return new StringValue(string_value_for(n));
+    };
+
+    NumberValue *StringValue::toNumber()
+    {
+	
+	int num = 0;
+	std::istringstream iss(value);
+	iss >> num;
+	return new NumberValue(num);
     };
 
     StringValue::~StringValue()
@@ -89,7 +117,7 @@ namespace xpath {
     };
 
     NodeSetValue *NodeSetValue::toNodeSet() {
-	// ### WARNING: this practivally invalidates the current node set.
+	// WARNING: this practivally invalidates the current node set.
 	// use only in a destructive setting, i.e. if you don't need
 	// the old nodeset any more after conversion.
 	return new NodeSetValue(takeNodes());

@@ -1,5 +1,6 @@
 
 #include <assert.h>
+#include <functional>
 #include <math.h>
 
 #include <iostream>
@@ -56,12 +57,45 @@ namespace xpath
         rvalue = _rvalue;
     };
 
+    /*
+    std::binary_function<const NodeRef, double, bool> getOpFor(BinaryExpression::ExpressionType type)
+    {
+	switch(type) {
+	    
+	case BinaryExpression::Less:
+	    return NumberLess();
+	    break;
+
+	case BinaryExpression::GEqual:
+	    return std::not1(NumberLess());
+	    break;
+
+
+	case BinaryExpression::Equal:
+	    return std::equal_to<T>();
+	    break;
+	case BinaryExpression::NotEqual:
+	    return std::not_equal_to<T>();
+	    break;
+	case BinaryExpression::Greater:
+	    return std::greater<T>();
+	    break;
+	case BinaryExpression::LEqual:
+	    return std::less_equal<T>();
+	    break;
+	case BinaryExpression::GEqual:
+	    return std::greater_equal<T>();
+	    break;
+	default:
+	    return std::less<T>();
+	}
+    }
+    */
     Value *BinaryExpression::evaluateExpression(const Context &c)
     {
         assert(lvalue);
         assert(rvalue);
 
-        // ## TODO
         Value *left = lvalue->evaluateExpression(c);
         Value *right = rvalue->evaluateExpression(c);
 
@@ -70,12 +104,126 @@ namespace xpath
 
         if (type<16) // comparison operators
         {
-        if ((left->type()==Value::NodeSetType) && (right->type() ==Value::NodeSetType))
+        if ((left->type()==Value::NodeSetType) && (right->type()==Value::NodeSetType))
             {
-                AC_ERROR << "Not yet implemented.";
-                return new NullValue();
-                // ## find one pair of string-values of one node each that evaluates to true.
-            }
+                // find one pair of nodes whose string-values comparison evaluates true.
+
+		NodeSetValue *nsv1 = left->toNodeSet();
+		delete left;
+		NodeSetRef nsr1 = nsv1->takeNodes();
+		delete nsv1;
+		
+		NodeSetValue *nsv2 = right->toNodeSet();
+		delete right;
+		NodeSetRef nsr2 = nsv2->takeNodes();
+		delete nsv2;
+
+		bool retval = false;
+
+		if (type == Equal || type == NotEqual) {
+
+		    std::set<string> sm1;
+		    std::set<string> sm2;
+		        
+		    NodeSet::iterator i1 = nsr1->begin();
+		    NodeSet::iterator i2 = nsr2->begin();
+		    
+		    while (i1 != nsr1->end() || i2 != nsr2->end()) {
+			
+			string string1 = string_value_for(*i1);
+			if (string1.length()) {
+			    
+			    if (sm2.find(string1) != sm2.end()) {
+				if (type == Equal) {
+				    retval = true;
+				    break;
+				}
+			    } else {
+				if (type == NotEqual) {
+				    retval = true;
+				    break;
+				}
+			    }
+			    sm1.insert(string1);
+			}
+			
+			std::string string2 = string_value_for(*i2);
+			if (string2.length()) {
+			    {
+				if (sm1.find(string2) != sm1.end()) {
+				    if (type == Equal) {
+					retval = true;
+					break;
+				    }
+				} else {
+				    if (type == NotEqual) {
+					retval = true;
+					break;
+				    }
+				}
+			    }
+			    sm2.insert(string2);
+			}
+			
+			if (i1 != nsv2->end()) {
+			    ++i1;
+			}
+			
+			if (i2 != nsv2->end()) {
+			    ++i2;
+			}
+		    }
+		} else {
+		    std::string extreme_left;
+		    std::string extreme_right;
+		    NodeSet::iterator ileft = nsr1->begin();
+		    NodeSet::iterator iright = nsr2->begin();
+		    while (ileft != nsr1->end() || ileft != nsr2->end()) {
+			
+			if ( (  (type == Less || type == LEqual) && (string_value_for(*ileft) > extreme_left) )
+			     || (type == Greater || type == GEqual) && (string_value_for(*ileft) < extreme_left) )
+			{
+			    extreme_left = string_value_for(*ileft);
+			}
+
+			if ( (  (type == Less || type == LEqual) && (string_value_for(*iright) < extreme_right) )
+			     || (type == Greater || type == GEqual) && (string_value_for(*iright) > extreme_right) )
+			{
+			    extreme_right = string_value_for(*iright);
+			}
+
+			if (extreme_left < extreme_right) {
+			    if (type == Less || type == LEqual)
+				{
+				    retval = true;
+				    break;
+				}
+			} else if (extreme_left == extreme_right) {
+			    if (type == LEqual || type == GEqual)
+				{
+				    retval = true;
+				    break;
+				}
+			} else {
+			    if (type == Greater || type == GEqual)
+				{
+				    retval = true;
+				    break;
+				}
+			}
+
+			if (ileft != nsv2->end()) {
+			    ++ileft;
+			}
+			
+			if (iright != nsv2->end()) {
+			    ++iright;
+			}
+		    }
+		}
+                delete nsv1; delete nsv2;
+		return new BooleanValue(retval);		
+	    }
             else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
             {
                 // one nodeset, one other type
@@ -87,14 +235,20 @@ namespace xpath
                     bool stringleft;
                     if (left->type()==Value::StringType)
                     {
-                        // ### WARNING: toNodeSet() invalidates right.
+                        // WARNING: toNodeSet() invalidates right.
+			// which is okay, provided that right is
+			// no longer accessed; which actually is the case,
+			// see the "delete right" below.
                         nsv = right->toNodeSet();
                         sv = left->toString();
                         stringleft = true;
                     }
                     else
                     {
-                        // ### WARNING: toNodeSet() invalidates left.
+                        // WARNING: toNodeSet() invalidates left,
+			// which is okay, provided that left is
+			// no longer accessed; which actually is the case,
+			// see the "delete left" below.
                         nsv = left->toNodeSet();
                         sv = right->toString();
                         stringleft = false;
@@ -105,25 +259,7 @@ namespace xpath
                     bool retval = false;
                     for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i)
                     {
-                        string curstr;
-                        // ### TODO: calculate the string-value correctly.
-                        // for elements and documents, this is the concatenation
-                        // of the node values of all text descendants.
-                        switch ((*i)->nodeType())
-                        {
-                        case dom::Node::ELEMENT_NODE:
-                        case dom::Node::DOCUMENT_NODE:
-                            curstr = (*i)->nodeValue();
-                            break;
-                        case dom::Node::ATTRIBUTE_NODE:
-                        case dom::Node::TEXT_NODE:
-                            curstr = (*i)->nodeValue();
-                            break;
-                        default:
-                            curstr = "";
-                            break;
-                        }
-
+                        string curstr = string_value_for(*i);
                         if (((type==Equal || type==LEqual || type == GEqual) && curstr == sv->getValue()) || (((type == Less || type == LEqual) == !stringleft) && (curstr < sv->getValue())) || (((type == Greater || type == GEqual) == !stringleft) && (curstr > sv->getValue())))
                         {
                             retval = true;
@@ -141,19 +277,76 @@ namespace xpath
                 }
                 else if (left->type()==Value::NumberType || right->type()==Value::NumberType)
                 {
-                    AC_ERROR << "Not yet implemented!";
                     // one nodeset, one number: find one node whose string-value converted to number compares positive
+
+                    Value *theNodeSet;
+		    Value *theNumber;
+
+                    if (left->type()==Value::NumberType)
+                    {
+			theNodeSet = right;
+			theNumber = left;
+		    } else {
+			theNodeSet = left;
+			theNumber = right;
+		    }
+		    NumberValue *nv = theNumber->toNumber();
+		    NodeSetValue *nsv = theNodeSet->toNodeSet();
+
+		    delete theNumber; delete theNodeSet;
+
+		    double num = nv->getValue();
+		    NodeSetRef nsr = nsv->takeNodes();
+
+		    delete nsv;
+
+		    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
+
+		    for (NodeSet::iterator i = nsr->begin(); i != nsr->end(); ++i) {
+			bool val;
+			double currentnum = number_value_for(*i);
+			switch(type) {
+			case Equal:
+			    val = (currentnum == num);
+			    break;
+			case NotEqual:
+			    val = (currentnum != num);
+			    break;
+
+			case Greater:
+			    val = (theNumber == left) ^ (number_value_for(*i) > num);
+			    break;
+			case GEqual:
+			    val = (theNumber == left) ^ (number_value_for(*i) >= num);
+			    break;
+			case Less:
+			    val = (theNumber == left) ^ (number_value_for(*i) < num);
+			    break;
+			case LEqual:
+			    val = (theNumber == left) ^ (number_value_for(*i) <= num);
+			    break;
+			}
+
+			if (val) {
+			    delete nsr;
+			    return new BooleanValue(true);
+			}
+		    }
+		    delete nsr;
+		    return new BooleanValue(false);
                 }
                 else if (left->type()==Value::BooleanType || right->type()==Value::BooleanType)
                 {
-                    AC_ERROR << "Not yet implemented!";
-                    assert(false);
                     // one nodeset, one boolean: convert both to boolean
-                    // return compare(left->toBoolean(), type, right->toBoolean);
+                    BooleanValue *a = left->toBoolean();
+		    BooleanValue *b = right->toBoolean();
+		    delete left;
+		    delete right;
                 }
                 else
                 {
-                    AC_ERROR << "Not yet implemented!";
+		    // should not happen.
+                    AC_ERROR << "Type not implemented!";
                     assert(false);
                 }
                 return new NullValue();
@@ -201,6 +394,7 @@ namespace xpath
             } else if (type==And) {
                 return new BooleanValue(rb && lb);
             } else {
+		// should not happen.
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
                 return new NullValue();
@@ -227,6 +421,7 @@ namespace xpath
             case Mod:
                 return new NumberValue(rn - ln * floor(rn / ln));
             default:
+		// should not happen.
                 AC_ERROR << "Not yet implemented.";
                 assert(false);
                 return new NullValue();
@@ -1176,7 +1371,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         AC_TRACE<<"initial set contains " << initialSet->size() << "nodes.";
 #endif
 
-        NodeSetRef result = evaluateAll(initialSet);
+        NodeSetRef result; // = evaluateSet<std::map<NodeRef, NodeRef> >(initialSet);
         return new NodeSetValue(result);
     };
 

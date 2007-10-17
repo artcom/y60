@@ -5,7 +5,7 @@
 
 namespace xpath {
 
-    NodeSetRef evaluate(std::string path, xpath::NodeRef documentElement);
+    NodeSetRef evaluate(std::string path, xpath::NodeRef startingElement);
 
 }
 

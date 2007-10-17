@@ -164,9 +164,9 @@ namespace asl {
     }
 
     // Translation Table as described in RFC1113
-    const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    const char cb66[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_@=";
-    const char cb67[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789øþƒ";
+    const Char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    const Char cb66[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_@=";
+    const Char cb67[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789øþƒ";
 
     // Translation Table to decode (created by author)
     //static const char cd64[]="|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
@@ -174,7 +174,7 @@ namespace asl {
     static const char   cd67[]="|$$$}rstuvwxyz{$$$$$$}>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$|$XYZ[\\]^_`abcdefghijklmnopq$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$|$$$$$}";
 
     // encode 3 8-bit binary bytes as 4 '6-bit' characters
-    static void encodeBase64(const unsigned char in[3], unsigned char out[4], int len, const char * cb) {
+    static void encodeBase64(const unsigned char in[3], unsigned char out[4], int len, const Char * cb) {
         out[0] = cb[ in[0] >> 2 ];
         if (len == 1) {
             out[1] = cb[ ((in[0] & 0x03) << 4) ];
@@ -209,7 +209,7 @@ namespace asl {
     }
 
     void
-    binToBase64(const unsigned char * theData, unsigned int theLength, string & theDest, const char * theCodeTable) {
+    binToBase64(const unsigned char * theData, unsigned int theLength, string & theDest, const Char * theCodeTable) {
         unsigned myFullSourceChunks = theLength / 3;
         unsigned myRestSourceChunkSize = theLength % 3;
         unsigned myRestDestChunkSize = myRestSourceChunkSize ? 4 : 0;

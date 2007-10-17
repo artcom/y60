@@ -3,6 +3,8 @@
 
 #include <dom/Nodes.h>
 
+#include <functional>
+
 #include "context.h"
 #include "value.h"
 
@@ -61,6 +63,7 @@ namespace xpath
 	    virtual Value *evaluateExpression(const Context &);
 
 	private:
+
 	    ExpressionType type;
 	    // both must one of (path, expressions, literal, number).
 	    Expression *lvalue, *rvalue;
@@ -252,6 +255,7 @@ namespace xpath
 	    NodeSetValue *evaluate(NodeRef);
 
 	    NodeSetRef evaluateAll(NodeSetRef);
+
 	    void setAbsolute(bool a=true) { absolute = a; };
 	    bool isAbsolute() { return absolute; };
 

@@ -12,6 +12,65 @@ namespace xpath
     typedef std::set<dom::Node *> NodeSet;
     typedef NodeSet *NodeSetRef;
 
+    string string_value_for(const NodeRef);
+    double number_value_for(const string &);
+    inline double number_value_for(const NodeRef n) { return number_value_for(string_value_for(n)); };
+
+
+    struct DocOrderLess :
+	public std::binary_function<const NodeRef, const NodeRef, bool>
+    {
+	bool operator()(NodeRef a, NodeRef b) const {
+
+	    // now be cool and really fast :-)
+
+	    if (a == b) return false;
+
+	    std::list<NodeRef> parentsa;
+	    while (a) {
+		parentsa.push_front(a);
+		a = a->parentNode();
+	    }
+	    std::list<NodeRef> parentsb;
+	    while (b) {
+		parentsb.push_front(b);
+		b = b->parentNode();
+	    }
+	    std::list<NodeRef>::const_iterator ia = parentsa.begin();
+	    std::list<NodeRef>::const_iterator ib = parentsb.begin();
+
+	    while (ia != parentsa.end() && ib != parentsb.end() && (*ia == *ib)) { ++ia; ++ib;};
+	    if (ib == parentsb.end()) {
+		// b is ancestor of a
+		return false;
+	    }
+	    if (ia != parentsa.end()) {
+		// *ia shares a parent with *ib.
+		for(NodeRef tmpNode = *ia; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
+		    if (tmpNode == *ib) {
+			return false;
+		    }
+		}
+	    }
+	    return true;
+	}
+    };
+    
+    struct StringLess :
+	public std::binary_function<const NodeRef, const NodeRef, bool>
+    {
+	bool operator()(const NodeRef a, const NodeRef b) const {
+	    return string_value_for(a) < string_value_for(b);
+	}
+    };
+    
+    struct NumberLess :
+	public std::binary_function<const NodeRef, const NodeRef, bool>
+    {
+	bool operator()(const NodeRef a, const NodeRef b) const {
+	    return number_value_for(a) < number_value_for(b);
+	}
+    };
 
     class NumberValue;
     class BooleanValue;
@@ -132,7 +191,7 @@ namespace xpath
 
       virtual BooleanValue *toBoolean() { return new BooleanValue( (value.length() > 0) ); };
       // ## TODO: recognize NaN, -Infinity and parse errors.
-      virtual NumberValue *toNumber() { int num = 0; std::istringstream iss(value); iss >> num; return new NumberValue(num); };
+      virtual NumberValue *toNumber();
       virtual StringValue *toString() { return new StringValue(value); };
 
       const string &getValue() const { return value; };
