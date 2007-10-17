@@ -48,8 +48,8 @@ namespace xpath {
 	    }
 	    AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
 	    return pos;
-	} else if (instring[pos] == '\"') {
-	    if ((nw_pos = asl::read_quoted_text(instring, pos, '\"', '\"')) != pos) {
+	} else if ((instring[pos] == '\"') || (instring[pos] == '\'')) {
+	    if ((nw_pos = asl::read_quoted_text(instring, pos, instring[pos], instring[pos])) != pos) {
 #if PARSER_DEBUG_VERBOSITY > 1
 		AC_TRACE << "pos = " << pos << " nw_pos = " << nw_pos;
 #endif
