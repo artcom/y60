@@ -135,13 +135,27 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     }
 
     Public.setImage = function(theSource) {
-        var myImage = Protected.getImageNode();
-        myImage.src = theSource;
-        var mySize = getImageSize(myImage);
-        Public.width  = mySize.x;
-        Public.height = mySize.y;
-        Public.srcsize.x = 1;
-        Public.srcsize.y = 1;
+        if (typeof(theSource) == "string") {        
+            var myImage = Protected.getImageNode();
+            myImage.src = theSource;
+            var mySize = getImageSize(myImage);
+            Public.width  = mySize.x;
+            Public.height = mySize.y;
+            Public.srcsize.x = 1;
+            Public.srcsize.y = 1;
+        } else if (typeof(theSource) == "object") {
+            if (Public.image == null) {
+                Protected.addImage(theSource);                
+                Public.image = theSource;
+                var mySize = getImageSize(theSource);
+                Public.width  = mySize.x;
+                Public.height = mySize.y;
+                Public.srcsize.x = mySize[0] / nextPowerOfTwo(theSource.width);
+                Public.srcsize.y = mySize[1] / nextPowerOfTwo(theSource.height);
+            } else {
+                Public.image = theSource;
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -203,10 +217,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     }
 
     function setup() {
-        print("::::theSize="+theSize);
-	print("Public.style.color = " + Public.style.color);
-	var myColor = asColor(Public.style.color);
-	print("asColor ergibt: " + myColor);
+    	var myColor = asColor(Public.style.color);
         Public.color = myColor;
         if (theSize) {
             Public.width  = theSize[0];
