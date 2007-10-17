@@ -66,7 +66,7 @@ namespace y60 {
         unsigned int myWidth  = _mySourceImage->getRasterPtr()->width();
         unsigned int myHeight = _mySourceImage->getRasterPtr()->height();
 
-        float myFloatImage[myWidth*myHeight];
+        float * myFloatImage = new float[myWidth*myHeight];
         
         // float!
         BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
@@ -123,6 +123,8 @@ namespace y60 {
             }
         }
 
+        delete [] myFloatImage;
+    
         _myTargetImage->triggerUpload();
         
         // _myBackgroundImage->triggerUpload();
