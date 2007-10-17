@@ -457,31 +457,46 @@ namespace xpath {
 	return parseRelativePath(p, instring, pos);
     }
 
-    Path *parse(const std::string &instring) {
+    Path *xpath_parse(const std::string &instring) {
 	Path *p = new Path();
         parsePath(p, instring, 0);
 	return p;
     }
 
-    NodeSetRef evaluate(std::string path, xpath::NodeRef theNode) {
-        
-        xpath::Path *myPath = xpath::parse(path);
+    std::set<dom::Node *> *evaluate(Path *p, dom::Node *theNode) {
+	xpath::NodeSetValue *value = p->evaluate(theNode);
+	std::set<dom::Node *> *retval = value->takeNodes();
+	delete value;
+	return retval;
+    }
+
+    std::set<dom::Node *> *xpath_evaluate(std::string path, dom::Node *theNode) {
+        xpath::Path *myPath = xpath_parse(path);
 
         if (!myPath) {
             AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
-            xpath::NodeSetValue *value = myPath->evaluate(theNode);
-            AC_INFO << "evaluated path " << *myPath << ":";
-            for (int i = 0; i < value->length(); i++) {
-                AC_INFO << "\tresult " <<i<<": "<< *value->item(i);
-            }
-            AC_INFO << "/evaluated.";
-
-            NodeSetRef retval = value->takeNodes();
-            delete value;
+	    NodeSetRef retval = xpath_evaluate(myPath, theNode);
             delete myPath;
             return retval;
-        }
+	}
     }
+
+    void xpath_return(Path *p) {
+	delete p;
+    }
+
+    void xpath_evaluate(Path *p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
+
+	xpath::NodeSetValue *value = p->evaluate(startingElement);
+	std::set<dom::Node *> *retval = value->takeNodes();
+
+	for (xpath::NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+	    results.push_back((*i)->self().lock());
+	}
+
+	delete value;
+    }
+
 }

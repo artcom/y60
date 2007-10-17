@@ -1,16 +1,16 @@
 #ifndef VALUE_H
 #define VALUE_H
 
-#include <stdlib.h>
+#include "parser.h"
 
 #include <dom/Nodes.h>
 
 namespace xpath
 {
     typedef std::string string;
-    typedef dom::Node *NodeRef;
     typedef std::set<dom::Node *> NodeSet;
     typedef NodeSet *NodeSetRef;
+    typedef dom::Node *NodeRef;
 
     string string_value_for(const NodeRef);
     double number_value_for(const string &);
