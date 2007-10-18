@@ -85,9 +85,12 @@ public:
 
 	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(1)->childNode(1)->childNode(0)));
 
-	// test:
+	// further tests required on:
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
 	// nodeset-number comparison
+	//
+	// - ordering of nodes after evaluating steps
+	//
 
 
 	/*
