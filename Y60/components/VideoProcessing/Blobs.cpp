@@ -93,8 +93,6 @@ namespace y60 {
         
         correlatePositions( myBlobs );
         
-
-
         _mySourceImage->triggerUpload();
 	}
 
@@ -129,6 +127,14 @@ namespace y60 {
 
         AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
 
+        //AC_PRINT << "myCars" << _myCarCounter;
+        _myResultNode = dom::Element("result");
+        _myResultNode.appendChild(Element("cars")); 
+        _myResultNode.childNode("cars")->appendChild(Text("")); 
+        dom::Node & centerNode = *(_myResultNode.childNode("cars"));
+        centerNode.childNode("#text")->nodeValue(asl::as_string(_myCarCounter));
+        
+        
         // iterate through the distance map and correlate cursors in increasing distance order
         for (DistanceMap::iterator dit = myDistanceMap.begin(); 
              dit!=myDistanceMap.end(); ++dit)
@@ -145,13 +151,20 @@ namespace y60 {
 
                         AC_TRACE << "correlated cursor " << myCursorId << " with " << myPositionIndex;
 
+                        Element myPosition("position");
+                        myPosition.appendAttribute("last", asl::as_string(myCursor.position));
+                        myPosition.appendAttribute("id", myCursorId);
+
                         // update cursor with new position
                         asl::Vector2f myCenter = (*theROIs)[myPositionIndex]->center();
+                        myPosition.appendAttribute("current", asl::as_string(myCenter));
+                        
                         myCursor.motion = myCenter - myCursor.position;
                         myCursor.position = myCenter;
                         myCursor.previousRoi = myCursor.roi;
                         myCursor.roi = asBox2f( (*theROIs)[myPositionIndex]->bbox() );
 
+                        _myResultNode.appendChild(myPosition); 
                     }
                     // place an "else" block here for code if we want to allow to correlate multiple cursors to the same position,
                     // but he have to take care that they will be separated at some later point again
@@ -167,18 +180,13 @@ namespace y60 {
                 AC_TRACE << "new cursor " <<myNewID<< " at " << (*theROIs)[i]->center();
                 myCorrelatedPositions[i] = myNewID;
                 _myCursors.insert( make_pair( myNewID, Cursor( (*theROIs)[i]->center(),
-                                                               asBox2f( (*theROIs)[i]->bbox()) )));
+                                asBox2f( (*theROIs)[i]->bbox()) )));
                 _myCursors[myNewID].correlatedPosition = i;
                 myCars++;
                 _myCarCounter++;
             }
         }
-        //AC_PRINT << "myCars" << _myCarCounter;
-        _myResultNode = dom::Element("result");
-        _myResultNode.appendChild(Element("cars")); 
-        _myResultNode.childNode("cars")->appendChild(Text("")); 
-        dom::Node & centerNode = *(_myResultNode.childNode("cars"));
-        centerNode.childNode("#text")->nodeValue(asl::as_string(_myCarCounter));
+
 
         // Now let us iterate through all cursors and create "cursor remove" events for every uncorrelated cursors
         for (CursorMap::iterator myIt = _myCursors.begin(); myIt != _myCursors.end(); ) {
