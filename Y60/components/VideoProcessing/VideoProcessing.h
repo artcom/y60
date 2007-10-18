@@ -37,6 +37,9 @@ namespace y60 {
             {
            
             public:
+                VideoProcessingExtension();
+                virtual ~VideoProcessingExtension();
+
                 VideoProcessingExtension(asl::DLHandle theDLHandle);
              
                 void init(y60::ScenePtr theScene);
@@ -80,6 +83,7 @@ namespace y60 {
                 AlgorithmList  _myAlgorithmList;
                 y60::ScenePtr _myScene;
                 RendererPtr _myRenderer;
+                dom::Node _myResultsNode;
             };
     
     typedef asl::Ptr<VideoProcessingExtension> VideoProcessingExtensionPtr;
