@@ -80,6 +80,11 @@ public:
 
 	ENSURE(!parses("\"]"));
 
+	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)));
+	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)));
+
+	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(1)->childNode(1)->childNode(0)));
+
 	// test:
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
 	// nodeset-number comparison
@@ -91,7 +96,6 @@ public:
 	  
 	  for (int i = 0; i < 100; i++) {
 
-	  xpath::evaluate(myAbsPathToValuableContent, documentElement);
 	  xpath::evaluate(myAbsPathToJunk, documentElement);
 	  }
 	*/
