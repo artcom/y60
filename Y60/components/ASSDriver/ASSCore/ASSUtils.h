@@ -60,46 +60,6 @@ DEFINE_EXCEPTION( ASSException, asl::Exception );
 
 dom::NodePtr getASSSettings(dom::NodePtr theSettings);
 
-// XXX: The config functions might be worth publishing [DS]
-template <class T>
-bool
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, T & theValue,
-                 const T & theDefault)
-{
-    dom::NodePtr myNode = theSettings->childNode( theName );
-    if ( ! myNode ) {
-        AC_WARNING << "No node named '" << theName << "' found in configuration. "
-                   << "Adding default value '" << theDefault << "'";
-        myNode = theSettings->appendChild( dom::NodePtr( new dom::Element( theName )));
-        dom::NodePtr myTextNode = myNode->appendChild( dom::NodePtr( new dom::Text() ));
-        myTextNode->nodeValue( asl::as_string( theDefault ));
-    }
-
-    if ( myNode->childNodesLength() != 1 ) {
-        throw asl::Exception(std::string("Configuration node '") + theName +
-            "' must have exactly one child.", PLUS_FILE_LINE);
-    }
-    if ( myNode->childNode("#text") ) {
-        T myNewValue = asl::as<T>( myNode->childNode("#text")->nodeValue() );
-        if (myNewValue != theValue) {
-            theValue =  myNewValue;
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
-                "' does not have a text child." , PLUS_FILE_LINE);
-    }
-}
-
-template <class Enum>
-bool
-getConfigSetting(dom::NodePtr theSettings, const std::string & theName, Enum & theValue,
-                 typename Enum::Native theDefault)
-{
-    return getConfigSetting( theSettings, theName, theValue, Enum( theDefault ));
-}
 
 
 template <class T>

@@ -21,6 +21,7 @@
 #   include <asl/SerialDeviceFactory.h>
 #endif
 
+#include <y60/SettingsParser.h>
 #include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
 #include <y60/AbstractRenderWindow.h>

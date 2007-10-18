@@ -11,6 +11,7 @@
 #include "ASSOscClient.h"
 
 #include <asl/Assure.h>
+#include <y60/SettingsParser.h>
 
 using namespace asl;
 using namespace y60;

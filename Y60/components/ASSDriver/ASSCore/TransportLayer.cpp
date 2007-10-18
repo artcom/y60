@@ -13,6 +13,7 @@
 #include "ASSUtils.h"
 
 #include <asl/Assure.h>
+#include <y60/SettingsParser.h>
 
 #ifdef TL_LATENCY_TEST
 #   include <asl/SerialDeviceFactory.h>
@@ -20,6 +21,7 @@
 
 using namespace std;
 using namespace asl;
+using namespace y60;
 
 static const char * DriverStateStrings[] = {
     "not_connected",

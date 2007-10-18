@@ -14,9 +14,11 @@
 
 #include <asl/file_functions.h>
 #include <asl/SerialDeviceFactory.h>
+#include <y60/SettingsParser.h>
 
 using namespace std;
 using namespace asl;
+using namespace y60;
 
 namespace y60 {
 
