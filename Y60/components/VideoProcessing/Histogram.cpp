@@ -11,6 +11,8 @@
 
 #include "Histogram.h"
 
+#include <y60/AbstractRenderWindow.h>
+
 using namespace asl;
 using namespace std;
 using namespace dom;
@@ -23,11 +25,11 @@ namespace y60 {
         _mySourceRaster(0)
     {
         _myResultNode.appendChild(Element("red"));
-        _myResultNode.childNode("red")->appendChild(Text(""));
+        _myResultNode.childNode("red")->appendChild(dom::Text(""));
         _myResultNode.appendChild(Element("green"));
-        _myResultNode.childNode("green")->appendChild(Text(""));
+        _myResultNode.childNode("green")->appendChild(dom::Text(""));
         _myResultNode.appendChild(Element("blue"));
-        _myResultNode.childNode("blue")->appendChild(Text(""));
+        _myResultNode.childNode("blue")->appendChild(dom::Text(""));
     }
 
     void 

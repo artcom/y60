@@ -62,7 +62,7 @@ namespace y60 {
 	VideoProcessingExtension :: VideoProcessingExtension(asl::DLHandle theDLHandle) :
 		asl::PlugInBase(theDLHandle),
 		IRendererExtension("VideoProcessingExtension")
-	{}
+    {}
 
 	void
 	VideoProcessingExtension::onGetProperty(const std::string & thePropertyName,

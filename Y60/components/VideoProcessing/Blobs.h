@@ -13,8 +13,43 @@
 #define _AC_BLOBS_H_
 
 #include "Algorithm.h"
+#include <y60/Overlay.h>
+#include "ConnectedComponent.h"
 
 namespace y60 {
+
+struct Cursor {
+    Cursor() :
+            position(0.0, 0.0), 
+            motion(0.0,0.0),
+            correlatedPosition(-1)
+    {
+        roi.makeEmpty();
+        previousRoi.makeEmpty();
+    }
+
+    Cursor(const asl::Vector2f theCenter, const asl::Box2f & theBox) :
+            position( theCenter ), 
+            roi( theBox),
+            motion(0.0,0.0),
+            correlatedPosition(-1)
+    {
+        previousRoi.makeEmpty();
+    }
+
+    asl::Vector2f position;
+    asl::Box2f    roi;
+    asl::Box2f    previousRoi;
+
+    asl::Vector2f motion;
+    int correlatedPosition;
+
+
+};
+
+typedef std::map<int, Cursor> CursorMap;
+
+
 	class Blobs : public Algorithm {
 		public:
             Blobs(const std::string & theName);
@@ -27,7 +62,12 @@ namespace y60 {
 		        return _myResultNode;
 	        }
 
+
 		private:
+            void correlatePositions( BlobListPtr & theBlobs);
+            asl::Matrix4f getTransformationMatrix();
+
+   
             float lookup(float theValue);
             float revlookup(float theValue);
             dom::Element  _myResultNode;
@@ -35,6 +75,12 @@ namespace y60 {
             y60::ImagePtr _myTargetImage;
             
             int _myThreshold;
+            
+            CursorMap   _myCursors;
+            dom::NodePtr _myOverlay;
+            int _myIDCounter;
+            float _myDistanceThreshold;
+            int _myCarCounter;
     };
 }
 

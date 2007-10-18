@@ -25,12 +25,6 @@ namespace y60 {
         _mySourceRaster(0),
         _myCounter(0)
     {   
-        _myResultNode.appendChild(Element("center"));
-        _myResultNode.childNode("center")->appendChild(Text(""));
-        // _myResultNode.appendChild(Element("green"));
-        // _myResultNode.childNode("green")->appendChild(Text(""));
-        // _myResultNode.appendChild(Element("blue"));
-        // _myResultNode.childNode("blue")->appendChild(Text(""));
     }
   
 

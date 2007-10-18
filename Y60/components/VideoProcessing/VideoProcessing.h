@@ -79,6 +79,7 @@ namespace y60 {
                 typedef std::vector<AlgorithmPtr> AlgorithmList;
                 AlgorithmList  _myAlgorithmList;
                 y60::ScenePtr _myScene;
+                RendererPtr _myRenderer;
             };
     
     typedef asl::Ptr<VideoProcessingExtension> VideoProcessingExtensionPtr;
