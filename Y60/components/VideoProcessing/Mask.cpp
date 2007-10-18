@@ -57,10 +57,10 @@ namespace y60 {
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
             bool myLetPass = (((*itBlob)[0]) > 128);
             if (!myLetPass) {
-                (*itTarg) = Vector3f(0.0, 0.0, 0.0);
-                // for (unsigned int i=0; i<3; ++i) {
-                //     (*itTarg)[i] = 0;
-                // }
+                // (*itTarg) = Vector3f(0.0, 0.0, 0.0);
+                for (unsigned int i=0; i<3; ++i) {
+                    (*itTarg)[i] = 0;
+                }
             }
         }
 
