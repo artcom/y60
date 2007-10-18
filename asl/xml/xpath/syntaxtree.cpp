@@ -1016,6 +1016,8 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             } else switch(instring[pos+8]) {
             case '-':
                 RETCMP(instring, pos, Step::AXISNAME_ANCESTOR_OR_SELF, Step::Ancestor_Or_Self, Step::Invalid);
+            case 'e':
+                RETCMP(instring, pos, Step::AXISNAME_ATTRIBUTE, Step::Attribute, Step::Invalid);
             default:
                 RETCMP(instring, pos, Step::AXISNAME_ANCESTOR, Step::Ancestor, Step::Invalid);
             }
