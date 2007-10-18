@@ -6,7 +6,7 @@
 #include <asl/string_functions.h>
 
 #define DEBUG_RESULTS
-//#define DEBUG_PARSER_STATES
+#define DEBUG_PARSER_STATES
 #define PARSER_DEBUG_VERBOSITY 1
 
 namespace xpath {
@@ -390,23 +390,27 @@ namespace xpath {
 	    }
 	    s = new Step(a, Step::TestPrincipalType);
 	} else {
-	    if ((a = Step::read_axis(instring, pos)) != Step::Invalid) {
-		int nw_pos = asl::read_if_string(instring, pos, Step::stringForAxis(a));
-		if (instring[nw_pos] == ':' && instring[nw_pos+1] == ':') {
-		    pos = nw_pos + 2;
-		} else {
-		    // if axis and "::" are omitted,
-		    // the default axis "child" is used.
-		    // node test and predicates may follow.
-		    a = Step::Child;
-		    pos = nw_pos;
-		}
-	    } else if (instring[pos] == '@') {
+	    if (instring[pos] == '@') {
 		// shorthand for "attribute ::".
 		// name test and predicates will follow.
 		a = Step::Attribute;
 		pos++;
+	    } else if ((a = Step::read_axis(instring, pos)) != Step::Invalid) {
+		int nw_pos = asl::read_if_string(instring, pos, Step::stringForAxis(a));
+		if (nw_pos == pos) {
+		    AC_ERROR << " internal XPath parsing error: could not read step";
+		    // internal consistency error
+		} else if (instring[nw_pos] == ':' && instring[nw_pos+1] == ':') {
+		    pos = nw_pos + 2;
+		} else {
+		    AC_WARNING << " XPath parse error.";
+		    return pos;
+		    //parse error.
+		}
 	    } else {
+		// if axis and "::" are omitted,
+		// the default axis "child" is used.
+		// node test and predicates may follow.
 		a = Step::Child;
 	    }
 	    assert(a != Step::Invalid);
