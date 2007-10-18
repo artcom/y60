@@ -5,8 +5,9 @@
 
 #include <asl/string_functions.h>
 
-#define DEBUG_PARSER_STATES
-#define PARSER_DEBUG_VERBOSITY 2
+#define DEBUG_RESULTS
+//#define DEBUG_PARSER_STATES
+#define PARSER_DEBUG_VERBOSITY 1
 
 namespace xpath {
 
@@ -459,20 +460,38 @@ namespace xpath {
 
     Path *xpath_parse(const std::string &instring) {
 	Path *p = new Path();
+#if PARSER_DEBUG_VERBOSITY > 0
 	AC_INFO << "parsing path " << instring;
+#endif
         if (parsePath(p, instring, 0) == 0) {
 	    // parse error
 	    AC_INFO << "parse error. Intermediate result=" << *p;
 	    delete p;
 	    return NULL;
 	}
+#if PARSER_DEBUG_VERBOSITY > 0
 	AC_INFO << "parsing result = " << *p;
+#endif
 	return p;
     }
 
     std::set<dom::Node *> *xpath_evaluate(Path *p, dom::Node *theNode) {
 	xpath::NodeSetValue *value = p->evaluate(theNode);
 	std::set<dom::Node *> *retval = value->takeNodes();
+
+#ifdef DEBUG_RESULTS
+	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+
+            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+		try {
+		    AC_TRACE << " * " << (*i)->nodeName() << " "
+                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+		} catch(asl::Exception &e) {
+		    AC_TRACE << " oops...";
+		}
+	    }
+#endif
+
 	delete value;
 	return retval;
     }
@@ -485,18 +504,6 @@ namespace xpath {
             return NULL;
         } else {
 	    NodeSetRef retval = xpath_evaluate(myPath, theNode);
-	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
-
-#ifdef DEBUG_PARSER_STATES
-            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
-		try {
-		    AC_TRACE << " * " << (*i)->nodeName() << " "
-                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
-		} catch(asl::Exception &e) {
-		    AC_TRACE << " oops...";
-		}
-	    }
-#endif
             delete myPath;
             return retval;
 	}
@@ -508,14 +515,13 @@ namespace xpath {
 
     void xpath_evaluate(Path *p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
 
-	xpath::NodeSetValue *value = p->evaluate(startingElement);
-	std::set<dom::Node *> *retval = value->takeNodes();
+	std::set<dom::Node *> *retval = xpath_evaluate(p, startingElement);
 
 	for (xpath::NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
 	    results.push_back((*i)->self().lock());
 	}
 
-	delete value;
+	delete retval;
     }
 
 }
