@@ -466,7 +466,7 @@ namespace xpath {
 	    delete p;
 	    return NULL;
 	}
-	AC_INFO << "parsed path " << *p;
+	AC_INFO << "parsing result = " << *p;
 	return p;
     }
 
@@ -485,6 +485,18 @@ namespace xpath {
             return NULL;
         } else {
 	    NodeSetRef retval = xpath_evaluate(myPath, theNode);
+	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+
+#ifdef DEBUG_PARSER_STATES
+            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+		try {
+		    AC_TRACE << " * " << (*i)->nodeName() << " "
+                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+		} catch(asl::Exception &e) {
+		    AC_TRACE << " oops...";
+		}
+	    }
+#endif
             delete myPath;
             return retval;
 	}
