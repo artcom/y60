@@ -91,7 +91,7 @@ public:
 	//
 	// - ordering of nodes after evaluating steps
 	//
-
+	// "gamedescription/attribute::*" failed to parse the star.
 
 	/*
 	  std::string myPath = "/testDoc";
