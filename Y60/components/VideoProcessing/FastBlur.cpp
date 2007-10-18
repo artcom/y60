@@ -66,6 +66,7 @@ namespace y60 {
         unsigned int myWidth  = _mySourceImage->getRasterPtr()->width();
         unsigned int myHeight = _mySourceImage->getRasterPtr()->height();
 
+         
         float * myFloatImage = new float[myWidth*myHeight];
         
         // float!
@@ -76,20 +77,18 @@ namespace y60 {
             myFloatImage[i] = static_cast<float>((*itSrc)[0]);
         }
 
-
-        // // left-to-right horizontal pass
+        // left-to-right horizontal pass
         for (i=0; i<myWidth*myHeight; ++i) {
             myFloatImage[i] = revlookup(myFloatImage[i]) + lookup(myFloatImage[i-1]);
         }
        
-        // right-to-left horizontal pass
-        for (i=myWidth*myHeight-1; i>0; --i) {
-            myFloatImage[i] = revlookup(myFloatImage[i]) + lookup(myFloatImage[i+1]);
-        }
-        
-        // up-down vertical pass
-        // itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
 
+        // right-to-left horizontal pass
+        for (i=myWidth*myHeight-1; i>1; --i) {
+            myFloatImage[i-1] = revlookup(myFloatImage[i-1]) + lookup(myFloatImage[i]);
+        }
+         
+        // up-down vertical pass
         for (unsigned int w=0; w<myWidth; w++) {
             for (unsigned int h=1; h<myHeight; h++) {
                 unsigned int pos0 = w+myWidth*(h-1);
@@ -100,8 +99,6 @@ namespace y60 {
         }
 
         // down-up vertical pass
-        itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
-
         for (unsigned int w=0; w<myWidth; w++) {
             for (unsigned int h=myHeight-1; h>0; h--) {
                 unsigned int pos0 = w+myWidth*(h-1);
@@ -110,7 +107,6 @@ namespace y60 {
                 myFloatImage[pos0] = revlookup(myFloatImage[pos0]) + lookup(myFloatImage[pos1]);
             }
         }
-
 
         // reverse float
         // float!
@@ -127,7 +123,6 @@ namespace y60 {
     
         _myTargetImage->triggerUpload();
         
-        // _myBackgroundImage->triggerUpload();
 	}
 
     float
