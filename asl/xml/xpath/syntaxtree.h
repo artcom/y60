@@ -203,8 +203,8 @@ namespace xpath
 
 	    static NodeTest read_NodeTest(const string &instring, int pos);
 
-	    // used from scan() to evaluate a node
-	    bool passesNodeTest(NodeRef n);
+	    // used from fillAxis() to evaluate a node test
+	    bool allows(NodeRef n);
 
 	    void serializeNodeTest(std::ostream &);
 
@@ -214,13 +214,15 @@ namespace xpath
 	    Step(Axis, NodeTest=TestPrincipalType, string="");
 	    virtual ~Step();
 
-	    // returns empty set on error.
-	    NodeSetRef scan(NodeRef);
+	    // puts results from Node scan into NodeSet
+	    void scan(NodeRef from, NodeSet &into);
 
 	    virtual void serializeTo(std::ostream &);
 
 
 	    void setAxis(Axis a) { axis = a; };
+	    inline Axis getAxis() { return axis; };
+
 	    void setNodeTest(NodeTest n, const string &name="") { test = n; nodeTestName = name; };
 	    void appendPredicate(Expression *);
 	    void prependPredicate(Expression *);
@@ -234,10 +236,10 @@ namespace xpath
 	    int count() const;
 
 	private:
-
 	    Axis axis;
 	    NodeTest test;
 	    string nodeTestName;
+
 	    std::list<Expression*> predicates;
 	};
 

@@ -528,7 +528,6 @@ namespace xpath
         return new NullValue();
     }
 
-
     void SetExpression::serializeTo(std::ostream &os)
     {
         std::list<Path *>::iterator i = sets.begin();
@@ -920,72 +919,6 @@ namespace xpath
         else return Unknown;
     };
 
-    /*
-      NodeTest::NodeTest(NodeTest::TestType _type, const string &_data)
-      {
-      type = _type;
-      switch(type)
-      {
-      case Any:
-      name = 0;
-      break;
-      case Name:
-      name = strdup(_data);
-      break;
-      case Type:
-      name = 0;
-      if (!strcasecmp(_data, "comment"))
-      nodeType = Comment;
-      else if (!strcasecmp(_data, "text"))
-      nodeType = Text;
-      else if (!strcasecmp(_data, "ProcessingInstruction"))
-      nodeType = ProcessingInstruction;
-      else if (!strcasecmp(_data, "node"))
-      nodeType = Node;
-      else nodeType = Invalid;
-      };
-      };
-
-    */
-
-    bool Step::passesNodeTest(dom::Node *n)
-    {
-        if (nodeTestName.length()) {
-            if (test == TestProcessingInstruction) {
-                // ### node test name contains the parameter to the processing
-                // instruction. handle accordingly.
-            } else {
-                if (n->nodeName() != nodeTestName) {
-                    return false;
-                }
-            }
-        }
-        switch (test)
-        {
-        case TestPrincipalType:
-            switch (axis)
-            {
-            case Attribute:
-                return n->nodeType()==dom::Node::ATTRIBUTE_NODE;
-            case Namespace:
-                // ### not yet implemented, node type NAMESPACE does not exist.
-                //return n->nodeType()==dom::Node::NAMESPACE_NODE;
-            default:
-                return n->nodeType()==dom::Node::ELEMENT_NODE;
-            }
-        case TestAnyNode:
-            return true;
-        case TestCommentNode:
-            return n->nodeType()==dom::Node::COMMENT_NODE;
-        case TestTextNode:
-            return n->nodeType()==dom::Node::TEXT_NODE;
-        case TestProcessingInstruction:
-            return n->nodeType()==dom::Node::PROCESSING_INSTRUCTION_NODE;
-        default:
-            return false;
-        };
-    };
-
     void Step::serializeNodeTest(std::ostream &os)
     {
         switch (test)
@@ -1153,60 +1086,101 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         }
     }
 
-    NodeSetRef Step::scan(NodeRef curNode)
+    bool Step::allows(dom::Node *n)
     {
-        NodeSetRef resultset = new NodeSet();
+        if (nodeTestName.length()) {
+            if (test == TestProcessingInstruction) {
+                // ### node test name contains the parameter to the processing
+                // instruction. handle accordingly.
+            } else {
+                if (n->nodeName() != nodeTestName) {
+                    return false;
+                }
+            }
+        }
+        switch (test)
+        {
+        case TestPrincipalType:
+            switch (axis)
+            {
+            case Attribute:
+                return n->nodeType()==dom::Node::ATTRIBUTE_NODE;
+            case Namespace:
+                // ### not yet implemented, node type NAMESPACE does not exist.
+                //return n->nodeType()==dom::Node::NAMESPACE_NODE;
+            default:
+                return n->nodeType()==dom::Node::ELEMENT_NODE;
+            }
+        case TestAnyNode:
+            return true;
+        case TestCommentNode:
+            return n->nodeType()==dom::Node::COMMENT_NODE;
+        case TestTextNode:
+            return n->nodeType()==dom::Node::TEXT_NODE;
+        case TestProcessingInstruction:
+            return n->nodeType()==dom::Node::PROCESSING_INSTRUCTION_NODE;
+        default:
+            return false;
+        };
+    };
+
+    #define INSERT(inserter, item) *inserter++ = item;
+
+    template<class CONT>
+    void fillAxis(Step *s, NodeRef curNode, CONT &cont)
+    {
+	std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
         NodeRef origNode = curNode;
         // build up the axis with appropriate nodes containing passing the test
-        switch(axis)
+        switch(s->getAxis())
         {
-        case Child:
+        case Step::Child:
             if (curNode->hasChildNodes()) {
                 for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
-                    if (passesNodeTest(curNode)) {
-                        resultset->insert(curNode);
+                    if (s->allows(curNode)) {
+                        INSERT(resultset, curNode);
                     }
                 }
             }
             break;
-        case Parent:
+        case Step::Parent:
             curNode = curNode->parentNode();
-            if (curNode && passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+            if (curNode && s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             break;
-        case Next_Sibling:
+        case Step::Next_Sibling:
             curNode = &*curNode->nextSibling();
-            if (curNode && passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+            if (curNode && s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             break;
-        case Previous_Sibling:
+        case Step::Previous_Sibling:
             curNode = &*curNode->previousSibling();
-            if (curNode && passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+            if (curNode && s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             break;
-        case Preceding_Sibling:
+        case Step::Preceding_Sibling:
             while (curNode = &*curNode->previousSibling()) {
-                if (passesNodeTest(curNode)) {
-                    resultset->insert(curNode);
+                if (s->allows(curNode)) {
+                    INSERT(resultset, curNode);
                 }
             }
             break;
-        case Following_Sibling:
+        case Step::Following_Sibling:
             while (curNode = &*curNode->nextSibling()) {
-                if (passesNodeTest(curNode)) {
-                    resultset->insert(curNode);
+                if (s->allows(curNode)) {
+                    INSERT(resultset, curNode);
                 }
             }
             break;
-        case Descendant_Or_Self:
-            if (passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+        case Step::Descendant_Or_Self:
+            if (s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             /* nobreak; */
-        case Descendant:
+        case Step::Descendant:
             {
                 while (true)
                 {
@@ -1214,6 +1188,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         curNode = &*curNode->firstChild();
                     } else if (curNode == origNode) {
                         break;
+        // yes, this is exactly what we want.
+        case Step::Following:
+	    ;
                     } else if (curNode->nextSibling()) {
                         curNode = &*curNode->nextSibling();
                     } else {
@@ -1229,33 +1206,58 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         }
                     };
 
-                    if (passesNodeTest(curNode)) {
-                        resultset->insert(curNode);
+                    if (s->allows(curNode)) {
+                        INSERT(resultset, curNode);
                     }
                 };
             };
-#ifdef INTERPRETER_DEBUG
-            AC_TRACE << "descendant axis yielded " << resultset->size() << " nodes.";
-#endif
+	    break;
+ 	    while (true)
+                {
+                    if (curNode->firstChild()){
+                        curNode = &*curNode->firstChild();
+                    } else if (curNode == origNode) {
+                        break;
+        case Step::Preceding:
+	    ;
+                    } else if (curNode->previousSibling()) {
+                        curNode = &*curNode->previousSibling();
+                    } else {
+                        NodeRef tmp = curNode;
+                        while ((tmp = tmp->parentNode()) != origNode) {
+                            if (tmp->previousSibling()) {
+                                curNode = &*tmp->nextSibling();
+                                break;
+                            }
+                        }
+                        if (tmp == origNode) {
+                            break;
+                        }
+                    };
+
+                    if (s->allows(curNode)) {
+                        INSERT(resultset, curNode);
+                    }
+                };
             break;
-        case Self:
-            if (passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+        case Step::Self:
+            if (s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             break;
-        case Attribute:
+        case Step::Attribute:
             {
                 dom::NamedNodeMap map = curNode->attributes();
                 for (unsigned int i = 0; i < map.length(); i++)
-                    if (passesNodeTest(&*map.item(i)))
-                        resultset->insert(&*map.item(i));
+                    if (s->allows(&*map.item(i)))
+                        INSERT(resultset, &*map.item(i));
             };
-        case Ancestor_Or_Self:
-            if (passesNodeTest(curNode)) {
-                resultset->insert(curNode);
+        case Step::Ancestor_Or_Self:
+            if (s->allows(curNode)) {
+                INSERT(resultset, curNode);
             }
             /* nobreak; */
-        case Ancestor:
+        case Step::Ancestor:
             if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE)
             {
                 /*
@@ -1263,37 +1265,51 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                   curNode = curAttr.ownerElement();
                 */
                 curNode = curNode->parentNode();
-                if (passesNodeTest(curNode)) {
-                    resultset->insert(curNode);
+                if (s->allows(curNode)) {
+                    INSERT(resultset, curNode);
                 }
             }
             while (curNode = curNode->parentNode()) {
-                if (passesNodeTest(curNode)) {
-                    resultset->insert(curNode);
+                if (s->allows(curNode)) {
+                    INSERT(resultset, curNode);
                 }
             }
-        case Following:
-        case Preceding:
-        case Invalid:
+        case Step::Invalid:
         default:
             break;
         };
+    };
+
+    void Step::scan(NodeRef origNode, NodeSet &results)
+    {
+	bool have_predicates = (predicates.begin() != predicates.end());
+	if (!have_predicates) {
+	    fillAxis(this, origNode, results);
+	    return;
+	}
+
+        NodeListRef intermediateResult = new NodeList();
+	fillAxis(this, origNode, *intermediateResult);
 
 #ifdef INTERPRETER_DEBUG
-        AC_TRACE << "selected " << resultset->size() << " " << Step::stringForAxis(axis) << " nodes"
+        AC_TRACE << "selected " << intermediateResult->size() << " " << Step::stringForAxis(axis) << " nodes"
                  << " of " << origNode->nodeName();
         if (origNode->parentNode()) {
             AC_TRACE << " inside " << origNode->parentNode()->nodeName();
         }
 #endif
-        for (std::list<Expression*>::iterator i = predicates.begin(); i != predicates.end(); ++i) {
+	std::list<Expression*>::iterator last = predicates.end(); 
+	if (predicates.begin() != predicates.end()) {
+	    --last;
+	}
+        Context subcontext;
+        for (std::list<Expression*>::iterator i = predicates.begin(); i != last; ++i) {
 #ifdef INTERPRETER_DEBUG
-            AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << resultset->size() << " nodes:";
+            AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << intermediateResult->size() << " nodes:";
 #endif
-            Context subcontext;
-            subcontext.size = resultset->size();
+            subcontext.size = intermediateResult->size();
             subcontext.position = 0;
-            for (NodeSet::iterator j = resultset->begin(); j != resultset->end();) {
+            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
                 subcontext.position++;
                 subcontext.currentNode = (*j);
                 Value *tmp = (*i)->evaluateExpression(subcontext);
@@ -1303,13 +1319,33 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
                     AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
 #endif
-                    resultset->erase(j++);
+                    intermediateResult->erase(j);
                 }
-                else ++j;
                 delete v;
             }
         }
-        return resultset;
+
+	if (last != predicates.end()) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "evaluating last predicate " << *(*last) << " on a set of " << intermediateResult->size() << " nodes:";
+#endif
+            subcontext.size = intermediateResult->size();
+            subcontext.position = 0;
+            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+                subcontext.position++;
+                subcontext.currentNode = (*j);
+                Value *tmp = (*last)->evaluateExpression(subcontext);
+                BooleanValue *v = tmp->toBoolean();
+                delete tmp;
+                if (v->getValue()) {
+#ifdef INTERPRETER_DEBUG
+                    AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**last) << "] evaluates false.";
+#endif
+		    results.insert(*j);
+                }
+                delete v;
+            }
+	}
     };
 
     void Step::serializeTo(std::ostream & os) {
@@ -1394,11 +1430,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
             NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-               NodeSetRef newResults = (*s)->scan(*i);
-               for (NodeSet::iterator j = newResults->begin(); j != newResults->end(); ++j) {
-                   nextStepSet->insert(*j);
-               }
-               delete newResults;
+               (*s)->scan(*i, *nextStepSet);
             };
             delete workingset;
             workingset = nextStepSet;
