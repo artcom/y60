@@ -8,8 +8,13 @@
 namespace xpath
 {
     typedef std::string string;
+
     typedef std::set<dom::Node *> NodeSet;
     typedef NodeSet *NodeSetRef;
+
+    typedef std::list<dom::Node *> NodeList;
+    typedef NodeList *NodeListRef;
+
     typedef dom::Node *NodeRef;
 
     string string_value_for(const NodeRef);
