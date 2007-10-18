@@ -1309,7 +1309,10 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
             subcontext.size = intermediateResult->size();
             subcontext.position = 0;
-            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end();) {
+#ifdef INTERPRETER_DEBUG
+		AC_TRACE << "evaluating...";
+#endif
                 subcontext.position++;
                 subcontext.currentNode = (*j);
                 Value *tmp = (*i)->evaluateExpression(subcontext);
@@ -1319,8 +1322,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
                     AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
 #endif
-                    intermediateResult->erase(j);
+                    intermediateResult->erase(j++);
                 }
+		else ++j;
                 delete v;
             }
         }
@@ -1403,16 +1407,15 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         NodeSetRef initialSet = new NodeSet();
         initialSet->insert(n);
 
-#ifdef INTERPRETER_DEBUG
-        AC_TRACE<<"initial set contains " << initialSet->size() << " nodes.";
-#endif
-
         NodeSetRef result = evaluateAll(initialSet);
         return new NodeSetValue(result);
     };
 
     NodeSetRef Path::evaluateAll(NodeSetRef workingset) {
         if (absolute) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
             NodeSetRef newResults = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
             {
