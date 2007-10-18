@@ -157,17 +157,20 @@ namespace dom {
         Code _myError;
     };
 
-    // This exception  is thrown, when you try to access an attribute
+    // This exception  is thrown when you try to access an attribute
     // through a facade, that is not defined in the node and has no
     // default value
     DEFINE_EXCEPTION(MissingAttributeException, asl::Exception);
 
-    // This exception is thrown, if the type of an attribute defined in
+    // This exception is thrown if the type of an attribute defined in
     // the schema does not match the type defined by the AttributePlug
     DEFINE_EXCEPTION(SchemaVsFacadeTypeMismatch, asl::Exception);
 
-    // This exception is thrown, when you try to access an node value
+    // This exception is thrown when you try to access an node value
     // on a node that must not have a node value
+    // 
+    // 
+    //
     DEFINE_EXCEPTION(ValueNotAllowed, asl::Exception);
 
     /* @} */
