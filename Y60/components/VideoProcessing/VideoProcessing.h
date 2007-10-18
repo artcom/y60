@@ -37,8 +37,8 @@ namespace y60 {
             {
            
             public:
-                VideoProcessingExtension();
-                virtual ~VideoProcessingExtension();
+                // VideoProcessingExtension();
+                // virtual ~VideoProcessingExtension();
 
                 VideoProcessingExtension(asl::DLHandle theDLHandle);
              

@@ -23,7 +23,7 @@ namespace y60 {
 
 typedef asl::Ptr<inet::UDPConnection> UDPConnectionPtr;
 
- class OscClient : public VideoProcessingExtension {
+ class OscClient {  
     public:
         OscClient();
         void poll();

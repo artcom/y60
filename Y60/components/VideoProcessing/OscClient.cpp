@@ -22,7 +22,6 @@ using namespace inet;
 namespace y60 {
 
 OscClient::OscClient() :
-    VideoProcessingExtension(),
     _myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
     _myServerPort( 7000 ),
