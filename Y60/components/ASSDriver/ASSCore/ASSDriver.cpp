@@ -102,7 +102,11 @@ ASSDriver::ASSDriver() :
 
     _myClampToScreenFlag(false),
     _myWindow( 0 ),
-    _mySettings(dom::NodePtr(0))
+    _mySettings(dom::NodePtr(0)),
+
+    // XXX: shearing hack
+    _myShearX(0.0),
+    _myShearY(0.0)
 
 {
 #ifdef ASS_LATENCY_TEST
@@ -438,6 +442,14 @@ ASSDriver::getTransformationMatrix() {
         myTransform.scale( Vector3f( myScale[0], myScale[1], 0));
         myTransform.translate( Vector3f( myPosition[0], myPosition[1], 0));
         myTransform.rotateZ( myOrientation );
+
+        // XXX: shearing hack
+        Matrix4f myShear;
+        myShear.makeIdentity();
+        myShear[0][1] = _myShearX;
+        myShear[1][0] = _myShearY;
+        myShear.setType(asl::UNKNOWN);
+        myTransform.postMultiply(myShear);
     } else {
         myTransform.makeIdentity();
     }
@@ -790,6 +802,10 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
     GET_PROP( textColor, _myTextColor );
     GET_PROP( probeColor, _myProbeColor );
 
+    // XXX: shearing hack
+    GET_PROP( shearX, _myShearX );
+    GET_PROP( shearY, _myShearY );
+
     AC_ERROR << "Unknown property '" << thePropertyName << "'.";
 }
 
@@ -805,6 +821,10 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
     SET_PROP( touchColor, _myTouchColor );
     SET_PROP( textColor, _myTextColor );
     SET_PROP( probeColor, _myProbeColor );
+
+    // XXX: shearing hack
+    SET_PROP( shearX, _myShearX );
+    SET_PROP( shearY, _myShearY );
 
     AC_ERROR << "Unknown property '" << thePropertyName << "'.";
 }

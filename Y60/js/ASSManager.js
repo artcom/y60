@@ -53,6 +53,17 @@ ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
         _mySettings = theSettings;
 
         if (_myValueOverlay) {
+
+            // XXX: shearing hack
+            var myShearX = _mySettings.childNode("ShearX");
+            if(myShearX) {
+                _myDriver.shearX = Number(myShearX.childNode("#text"));
+            }
+            var myShearY = _mySettings.childNode("ShearY");
+            if(myShearY) {
+                _myDriver.shearY = Number(myShearY.childNode("#text"));
+            }
+
             var myMaterialId = getMaterialIdForValueDisplay();
             if (myMaterialId) {
                 _myValueOverlay.material = _myScene.world.getElementById( myMaterialId );

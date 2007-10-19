@@ -200,6 +200,10 @@ class ASSDriver :
 
         TransportLayerPtr _myTransportLayer;
         dom::NodePtr      _mySettings;
+        
+        // XXX: shearing hack
+        float _myShearX;
+        float _myShearY;
 
 #ifdef ASS_LATENCY_TEST
         void toggleLatencyTestPin();
