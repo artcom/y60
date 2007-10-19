@@ -220,13 +220,10 @@ namespace asl {
 #define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
 #else
 #define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
-/**
-Use AC_PRINT << "myMessage" in situations when a message should be printed and logged anyway, possibly without formatting */
 #endif
 
-
 /**
-Use AC_PRINT << "myMessage" to write to the log circumventing normal formatting */
+Use AC_PRINT << "myMessage" in situations when a message should be printed and logged anyway, possibly without formatting */
 #define AC_PRINT AC_LOG(asl::SEV_PRINT, __FILE__, __LINE__)
 /**
 Use AC_FATAL << "myErrorMessage" in situations when a severe condition (e.g. memory corruption) was
