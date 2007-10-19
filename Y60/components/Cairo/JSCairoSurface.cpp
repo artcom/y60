@@ -28,7 +28,7 @@ using namespace y60;
 
 namespace jslib {
 
-template class JSWrapper<JSCairoSurfaceWrapper, Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol>;
+template class JSWrapper<JSCairoSurfaceWrapper, asl::Ptr< JSCairoSurfaceWrapper >, StaticAccessProtocol>;
 
 template <>
 void CairoWrapper<cairo_surface_t>::reference() {

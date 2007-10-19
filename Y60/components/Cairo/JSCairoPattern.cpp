@@ -30,7 +30,7 @@ using namespace y60;
 
 namespace jslib {
 
-template class JSWrapper<JSCairoPatternWrapper, Ptr< JSCairoPatternWrapper >, StaticAccessProtocol>;
+template class JSWrapper<JSCairoPatternWrapper, asl::Ptr< JSCairoPatternWrapper >, StaticAccessProtocol>;
 
 template <>
 void CairoWrapper<cairo_pattern_t>::reference() {

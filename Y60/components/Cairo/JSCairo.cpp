@@ -31,7 +31,7 @@ using namespace y60;
 
 namespace jslib {
 
-template class JSWrapper<JSCairoWrapper, Ptr< JSCairoWrapper >, StaticAccessProtocol>;
+template class JSWrapper<JSCairoWrapper, asl::Ptr< JSCairoWrapper >, StaticAccessProtocol>;
 
 template <>
 void CairoWrapper<cairo_t>::reference() {
