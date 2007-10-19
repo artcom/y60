@@ -420,8 +420,8 @@ ImageBodyButton.prototype.Constructor = function(self, theName, theImageInfo, th
         var myBodyShapeInfo = createShapeAndBody(myImageMaterialInfo.size, thePosition, myImageMaterialInfo.material, theName, false, true);
     
         Protected.body = myBodyShapeInfo.body;
-        Protected.shape = myBodyShapeInfo.shape;    
-        Protected.type = "image";    
+        Protected.shape = myBodyShapeInfo. shape;    
+        Protected.type = "image";     
         ourShow.registerButton(self);
     }    
     ////////////////////////////////////////
@@ -429,10 +429,12 @@ ImageBodyButton.prototype.Constructor = function(self, theName, theImageInfo, th
     ////////////////////////////////////////
     setup();
 }
-function TextBodyButton(theName, theImageInfo, theStyle, thePosition, theCallBackFunction, theSize) {
-    this.Constructor(this, theName, theImageInfo, theStyle, thePosition, theCallBackFunction, theSize);
+function TextBodyButton(theName, theText, theStyle, thePosition, theCallBackFunction, theSize) {
+    this.Constructor(this, theName, theText, theStyle, thePosition, theCallBackFunction, theSize);
 }
-TextBodyButton.prototype.Constructor = function(self, theName, theImageInfo, theStyle, thePosition, theCallBackFunction, theSize) {
+TextBodyButton.prototype.Constructor = function(self, theName, theText, theStyle, thePosition, 
+                                                theCallBackFunction, theSize) 
+{
     var Protected = {};
     BodyButtonBase.prototype.Constructor(self, Protected, theName, theCallBackFunction);
     self.BodyButtonBase = [];
@@ -452,7 +454,7 @@ TextBodyButton.prototype.Constructor = function(self, theName, theImageInfo, the
         if(theSize){
             myTextSize = theSize;
         }
-        var myImageMaterialInfo = createTextAndMaterial(theImageInfo, myTextSize, theStyle);
+        var myImageMaterialInfo = createTextAndMaterial(theText, myTextSize, theStyle);
         Protected.size = myImageMaterialInfo.size;
         Protected.material = myImageMaterialInfo.material;
         var myBodyShapeInfo = createShapeAndBody(myImageMaterialInfo.size, thePosition, myImageMaterialInfo.material, theName, false, true);
@@ -468,17 +470,21 @@ TextBodyButton.prototype.Constructor = function(self, theName, theImageInfo, the
     setup();
 }
 
-function ImageToggleTextBodyButton(theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
+function ImageToggleTextBodyButton(theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode) {
     var Protected = {};
-    this.Constructor(this, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction);
+    this.Constructor(this, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode);
 }
-ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
+ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode) {
+
+    if (theGroupNode == undefined) {
+        theGroupNode = window.scene.world;
+    }
     
     BodyButtonBase.prototype.Constructor(self, Protected, theName, theCallBackFunction);
     self.BodyButtonBase = [];
     const BUTTON_STATE_DOWN = 0;                
     const BUTTON_STATE_UP   = 1;        
-    
+
     const DROP_SHADOW_DEPTH = 1;    
     ////////////////////////////////////////
     // Public 
@@ -538,21 +544,58 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     }
     
     Protected.setupImage = function() {
-        var myImageMaterialInfoDown = createImageAndMaterial(theFilenames[0]);
-        var myImageMaterialInfoUp   = createImageAndMaterial(theFilenames[1]);
-        if(theFilenames.length >2){
-            _myShadowImageMaterialInfo   = createImageAndMaterial(theFilenames[2]);
-            var myShadowImageSize = getIconSize(_myShadowImageMaterialInfo.material);
-            var myShadowXOffset = (myShadowImageSize.x - (getIconSize(myImageMaterialInfoUp.material)).x)/2;
-            var myShadowYOffset = (myShadowImageSize.y - (getIconSize(myImageMaterialInfoUp.material)).y)/2;
-            var myShadowPosition = new Vector3f(thePosition.x - myShadowXOffset, thePosition.y - myShadowYOffset, thePosition.z - DROP_SHADOW_DEPTH);
-            _myShadowBodyShapeInfo = createShapeAndBody(myShadowImageSize, myShadowPosition, _myShadowImageMaterialInfo.material,
-                                                 theName + "_shadow", true, true);
+
+        var myImageMaterialInfoDown = {};
+        var myImageMaterialInfoUp = {};
+
+        Logger.trace("typeof theFilenames[0] = " + typeof theFilenames[0]);
+
+        if (theFilenames[0] instanceof Node &&
+            theFilenames[1] instanceof Node) {
+
+            Logger.trace("theFilenames are instances of Node()");
+
+            myImageMaterialInfoDown.material = createMaterialFromImage(theFilenames[0]);
+            myImageMaterialInfoDown.size = getImageSize(theFilenames[0]);
+
+            Logger.trace("getImageSize() = " + myImageMaterialInfoDown.size);
+            Logger.trace("image.width = " + theFilenames[0].width + 
+                         " image.height = " + theFilenames[0].height);
+
+            myImageMaterialInfoUp.material = createMaterialFromImage(theFilenames[1]);
+            myImageMaterialInfoUp.size = getImageSize(theFilenames[1]);
+
+        } else if ((typeof theFilenames[0] == "string" &&
+                    typeof theFilenames[1] == "string") || 
+                   (theFilenames[0] instanceof String &&
+                    theFilenames[1] instanceof String)) {
+
+            myImageMaterialInfoDown = createImageAndMaterial(theFilenames[0]);
+            myImageMaterialInfoUp   = createImageAndMaterial(theFilenames[1]);
+            
+            if(theFilenames.length >2){
+                Logger.trace("creating drop shadow");
+
+                _myShadowImageMaterialInfo   = createImageAndMaterial(theFilenames[2]);
+                var myShadowImageSize = getIconSize(_myShadowImageMaterialInfo.material);
+                var myUpImageSize = getIconSize(myImageMaterialInfoUp.material);
+                var myShadowXOffset = (myShadowImageSize.x - myUpImageSize.x)/2;
+                var myShadowYOffset = (myShadowImageSize.y - myUpImageSize.y)/2;
+                var myShadowPosition = new Vector3f(thePosition.x - myShadowXOffset, 
+                                                    thePosition.y - myShadowYOffset, 
+                                                    thePosition.z - DROP_SHADOW_DEPTH);
+                _myShadowBodyShapeInfo = createShapeAndBody(myShadowImageSize, myShadowPosition, 
+                                                            _myShadowImageMaterialInfo.material,
+                                                            theName + "_shadow", true, true);
+                theGroupNode.appendChild(_myShadowBodyShapeInfo.body);
+            }
         }
 
         var myImageSize = getIconSize(myImageMaterialInfoUp.material);
-        var myBodyShapeInfo = createShapeAndBody(myImageSize, thePosition, myImageMaterialInfoUp.material,
+        var myBodyShapeInfo = createShapeAndBody(myImageSize, thePosition, 
+                                                 myImageMaterialInfoUp.material,
                                                  theName, false, true);
+        theGroupNode.appendChild(myBodyShapeInfo.body);
         Protected.body = myBodyShapeInfo.body;
         Protected.size = myImageMaterialInfoUp.size;        
         Protected.pressedmaterial = myImageMaterialInfoDown.material;       
@@ -562,15 +605,13 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         _myImageMaterialIds.push(myImageMaterialInfoDown.material.id);
         _myImageMaterialIds.push(myImageMaterialInfoUp.material.id);       
         
-        
-        
         ourShow.registerButton(self);
     }
     
     Protected.getTextMaterial = function(){
         return _myTextMaterialInfo;    
     }
-    Protected.getTextBodyInfo = function(){
+    self.getTextBodyInfo = function(){
         return _myTextBodyInfo;    
     }
     
@@ -585,11 +626,22 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         var myImageSize = getImageSize(_myTextMaterialInfo.image);
         var myXOffset = ((self.size.x - myImageSize.x)/2);
         var myYOffset = ((self.size.y - myImageSize.y)/2);
-        _myTextBodyInfo = createShapeAndBody(_myTextMaterialInfo.size, new Vector3f(theTextPosition.x + myXOffset, theTextPosition.y + myYOffset,
-                                                 theTextPosition.z), _myTextMaterialInfo.material,
-                                                 theName + "_text", true, true);
+        _myTextBodyInfo = createShapeAndBody(_myTextMaterialInfo.size, 
+                                             new Vector3f(theTextPosition.x + myXOffset, 
+                                                          theTextPosition.y + myYOffset,
+                                                          theTextPosition.z),
+                                             _myTextMaterialInfo.material,
+                                             theName + "_text", true, true);
+        theGroupNode.appendChild(_myTextBodyInfo.body);
+        Logger.trace("setting up the button text:\n" + 
+                     "text image size: " + myImageSize + "\n" + 
+                     "self.size: " + self.size + "\n" + 
+                     "offset: [" + myXOffset + ", " + myYOffset + "]\n" + 
+                     "text position: " + theTextPosition + "\n");
     }
+
     function setup(){
+        Logger.trace("Creating Button " + theName);
         Protected.setupImage();
         var myPosition = new Vector3f(thePosition.x, thePosition.y, TEXT_Z_POSITION);
         if (theText) {
