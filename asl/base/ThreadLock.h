@@ -26,47 +26,31 @@
 
 #include <pthread.h>
 
-
 namespace asl {
-/**
- * @ingroup aslbase
- * Threadlock is a wrapper around a mutex. It can be used
- * to protect resources that are shared over multiple threads.
- * 
- * 
- */
+ /**
+  * @ingroup aslbase
+  * ThreadLock is a mutual exclusion device.
+  * It can be used to protect resources from concurrent access.
+  */
 class ThreadLock {
-    public:
-        ThreadLock();
-        virtual ~ThreadLock();
-
-        /**
-         * Locks (acquires a Mutex) for the Thread until the 
-         * ThreadLock is unlocked.
-         * @warn the internal pthread_mutex has deadlock
-         *       prevention enabled, hence a thread can not
-         *       lock itself. Once it owns a ThreadLock, future
-         *       calls to lock are ignored.
-         */
-        void lock();
-
-        /**
-         * tries to lock (acquire) the ThreadLock.
-         * @return 0 if locked, EBUSY if it could not be locked
-         */
-        int nonblock_lock();
-        /**
-         * Unlocks (releases) the ThreadLock.
-         */
-        void unlock();
-
-
-    private:
-        ThreadLock (ThreadLock & otherLock);
-        ThreadLock& operator= (ThreadLock & otherLock);
-
-        pthread_mutex_t _myMutex;
+public:
+    
+    ThreadLock();
+    
+    virtual ~ThreadLock();
+    
+    void lock();
+    
+    bool trylock();
+    
+    bool timedlock(long theMicrosecondTimeout);
+    
+    void unlock();
+    
+private:
+    pthread_mutex_t _myMutex;
 };
+
 }
 
 #endif

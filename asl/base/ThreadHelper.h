@@ -35,6 +35,9 @@ bool
 threadPriorityFromStrings (const std::string & thePriorityClassStr, const std::string & thePriorityStr,
         int & thePriorityClass, int & thePriority);
 
+void
+pthreadCheckReturnValue(int theReturnValue, const char *theFunctionName);
+
 /* @} */
 
 #endif 

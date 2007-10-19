@@ -19,32 +19,16 @@
 //
 //=============================================================================
 
-#include "ThreadLock.h"
-#include "Logger.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <iostream>
+#include <pthread.h>
 
+#include "Logger.h"
 
-using namespace std;  // automatically added!
+#include "ThreadHelper.h"
+
+#include "ThreadLock.h"
+
 namespace asl {
-void checkRetVal (int theRetVal, char * theFunc) {
-    if (theRetVal != 0) {
-        static bool myIsInCheckRetVal = false;
-        if (myIsInCheckRetVal) {
-            // This happens if we're being called recursively and probably means that 
-            // AC_ERROR itself isn't working, so we make a feeble attempt to output
-            // stuff anyway.
-            cerr << "function="<<theFunc<<", error="<<strerror(theRetVal) << ", retVal= " << theRetVal << endl;
-        } else {
-            myIsInCheckRetVal = true;
-            AC_ERROR << "function="<<theFunc<<", error="<<strerror(theRetVal) << ", retVal= " << theRetVal << endl;
-            // Rumms. Besser, wir machten hier was sinnvolles.
-            exit (-1);
-        }
-    }
-}
 
 ThreadLock::ThreadLock()
 {
@@ -66,35 +50,59 @@ ThreadLock::ThreadLock()
 }
 
 ThreadLock::~ThreadLock() {
-#ifdef WIN32
     pthread_mutex_destroy(&_myMutex);
-#endif
 }
 
 void
 ThreadLock::lock() {
-    int myRetVal;
-    myRetVal = pthread_mutex_lock (&_myMutex);
-    checkRetVal (myRetVal, "pthread_mutex_lock");
+    int myReturnValue;
+
+    myReturnValue = pthread_mutex_lock (&_myMutex);
+
+    pthreadCheckReturnValue (myReturnValue, "pthread_mutex_lock");
 }
 
-int
-ThreadLock::nonblock_lock() {
-    int myRetVal;
-    myRetVal = pthread_mutex_trylock (&_myMutex);
-    if (myRetVal != EBUSY && myRetVal != 0) {
-        checkRetVal (myRetVal, "pthread_mutex_trylock");
+bool
+ThreadLock::trylock() {
+    int myReturnValue;
+    
+    myReturnValue = pthread_mutex_trylock (&_myMutex);
+    
+    if(myReturnValue == EBUSY) {
+        return false;
     }
-    return myRetVal;
+    
+    pthreadCheckReturnValue(myReturnValue, "pthread_mutex_trylock");
+    
+    return true;
+}
+
+bool
+ThreadLock::timedlock(long theMicrosecondTimeout) {
+    int myReturnValue;
+    char *myFunctionName;
+    
+    const struct timespec myTimeout =
+        { (theMicrosecondTimeout / 1000000), (theMicrosecondTimeout % 1000000) * 1000 };
+    
+    myReturnValue = pthread_mutex_timedlock(&_myMutex, &myTimeout);
+    
+    if(myReturnValue == ETIMEDOUT) {
+        return false;
+    }
+    
+    pthreadCheckReturnValue(myReturnValue, "pthread_mutex_timedwait");
+    
+    return true;
 }
 
 void
 ThreadLock::unlock() {
-    int myRetVal;
-    // This causes an 'interrupted system call' error if the mutex isn't locked
-    // before the call.
-    myRetVal = pthread_mutex_unlock (&_myMutex);
-    checkRetVal (myRetVal, "pthread_mutex_unlock");
-}
+    int myReturnValue;
+    
+    myReturnValue = pthread_mutex_unlock (&_myMutex);
+    
+    pthreadCheckReturnValue (myReturnValue, "pthread_mutex_unlock");
 }
 
+}
