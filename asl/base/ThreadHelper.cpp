@@ -63,26 +63,3 @@ threadPriorityFromStrings (const string & thePriorityClassName, const string & t
     return true;
 }
 
-void
-pthreadCheckReturnValue(int theReturnValue, const char *theFunctionName) {
-    if(theReturnValue != 0) {
-        static bool myRecursionGuard = false;
-
-#define ERROR_MESSAGE \
-        "pthread fault: " \
-            << theFunctionName << " returned " \
-            << theReturnValue << "(" << strerror(theReturnValue) << ")"
-
-        if(myRecursionGuard) {
-            cerr << ERROR_MESSAGE;
-        } else {
-            myRecursionGuard = true;
-
-            AC_FATAL << ERROR_MESSAGE;
-        }
-
-#undef ERROR_MESSAGE
-
-        abort();
-    }
-}

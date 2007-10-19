@@ -87,10 +87,8 @@ LockUnitTest::run() {
 
 void 
 LockUnitTest::secondThread() {
-    bool myRetVal;
-
-    myRetVal = _myLock.trylock();
-    ENSURE_MSG (!myRetVal, "nonblock_lock returns false");
+    int myRetVal = _myLock.nonblock_lock();
+    ENSURE_MSG (myRetVal == EBUSY, "nonblock_lock returns EBUSY");
     
     _myLock.lock();
     // Make sure the first thread had time to run.
@@ -98,9 +96,8 @@ LockUnitTest::secondThread() {
     _mySharedVar = 2000;
     _myLock.unlock();
 
-    myRetVal = _myLock.trylock();
-    ENSURE_MSG (myRetVal, "nonblock_lock returns true");
-
+    myRetVal = _myLock.nonblock_lock();
+    ENSURE_MSG (myRetVal == 0, "nonblock_lock returns 0");
     _myLock.unlock();
 }
 
