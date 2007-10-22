@@ -34,7 +34,7 @@
 #include <asl/os_functions.h>
 #include <asl/Logger.h>
 #include <y60/Image.h>
-#include <xpath/parser.h>
+#include <xpath/xpath_api.h>
 
 #include <iostream>
 #include <fstream>
