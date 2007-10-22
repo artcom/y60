@@ -154,32 +154,18 @@ time_t getLastModified(const std::string & theFilename);
 #endif
 
 /// returns true if file or directory exists
-inline
-bool fileExists(const std::string& theUTF8Filename) {
-    struct STAT64 myStat;
-    return STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1;
-}
+bool fileExists(const std::string& theUTF8Filename);
 
 DEFINE_EXCEPTION(IO_Failure,asl::Exception)
 
 
 // Warning: off_t is 32 bit (at least) under windows. This function will
 // return incorrect values for files > 2 gb.
-inline
-off_t getFileSize(const std::string& theUTF8Filename) {
-    struct STAT64 myStat;
-    if (STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1) {
-        return static_cast<off_t>(myStat.st_size);
-    };
-    throw asl::IO_Failure("getFileSize","can't stat file");
-}
-
+off_t getFileSize(const std::string& theUTF8Filename);
 /* @} */
 
 } //Namespace asl
 
-#undef STAT64
-#undef STAT64F
 #ifdef __cplusplus
 extern "C"
 {

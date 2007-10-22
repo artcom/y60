@@ -303,6 +303,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
             std::copy(static_cast<const unsigned char *>(theMemory),
                       static_cast<const unsigned char *>(theMemory)+theSize,
                       begin() + myOldSize);
+            countBytes(theSize);
             return *this;
         }
         /// appends all the bytes from theSource at the end of the block.

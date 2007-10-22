@@ -25,8 +25,10 @@
 #include "Nodes.h"
 #include "Schema.h"
 
+#include <asl/Stream.h>
 #include <asl/UnitTest.h>
 #include <asl/Time.h>
+#include <asl/MappedBlock.h>
 //#include <asl/linearAlgebra.h>
 
 #include <fstream>
@@ -708,6 +710,139 @@ myDocument.getValueFactory()->dump();
             }
         }
 };
+
+
+class XmlCatalogUnitTest : public UnitTest {
+    public:
+        XmlCatalogUnitTest() : UnitTest("XmlCatalogUnitTest") {  }
+        void run() {
+            try {
+                // Test loadElementById with schema
+                DTITLE("Starting getElementById with Schema tests");
+                dom::Document mySchema(
+                        "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+                        "   <xs:element name='root'>\n"
+                        "       <xs:complexType>\n"
+                        "           <xs:sequence>\n"
+                        "               <xs:element ref='child'/>\n"
+                        "           </xs:sequence>\n"
+                        "           <xs:attribute name='attrib' type='xs:string'/>\n"
+                        "           <xs:attribute name='id' type='xs:ID'/>\n"
+                        "           <xs:attribute name='id2' type='xs:ID'/>\n"
+                        "       </xs:complexType>\n"
+                        "   </xs:element>\n"
+                        "   <xs:element name='child'>\n"
+                        "       <xs:complexType>\n"
+                        "           <xs:sequence>\n"
+                        "               <xs:element ref='child'/>\n"
+                        "           </xs:sequence>\n"
+                        "           <xs:attribute name='id' type='xs:ID'/>\n"
+                        "           <xs:attribute name='id2' type='xs:ID'/>\n"
+                        "           <xs:attribute name='attrib' type='xs:string'/>\n"
+                        "       </xs:complexType>\n"
+                        "   </xs:element>\n"
+                        "</xs:schema>\n"
+                        );
+                ENSURE(mySchema);
+                dom::Document myIdDocument;
+                myIdDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
+                dom::registerStandardTypes(*myIdDocument.getValueFactory());
+                myIdDocument.addSchema(mySchema,"");
+                SUCCESS("added Schema");
+                DTITLE("Parsing original document");
+                myIdDocument.parse(
+                        "<root id='r0' id2='xr0' attrib='value0'>"
+                        "   <child id='c0' id2='xc0' attrib='value1'/>"
+                        "   <child id='c1' id2='xc1' attrib='value2'>"
+                        "       <child id='gc0' id2='xgc0' attrib='value3'/>"
+                        "       <child id='gc1' id2='xgc1' attrib='value4'/>"
+                        "   </child>"
+                        "</root>"
+                        );
+                ENSURE(myIdDocument);
+
+                ENSURE(myIdDocument.getElementById("r0")->nodeName() == "root");
+                ENSURE(myIdDocument.getElementById("r0")->getAttributeString("id") == "r0");
+                ENSURE(myIdDocument.getElementById("c0")->nodeName() == "child");
+                ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child");
+                ENSURE(myIdDocument.getElementById("gc0")->nodeName() == "child");
+                ENSURE(myIdDocument.getElementById("gc0")->getElementById("r0")->nodeName() == "root");
+                ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+
+                // write out the document with catalog
+                {
+                    asl::WriteableFile myFile("cattest.b60");
+                    asl::WriteableFile myCatalogFile("cattest.c60");
+                    myIdDocument.binarize(myFile, myCatalogFile);
+                    asl::WriteableFile myDBFile("cattest.d60");
+                    myIdDocument.binarize(myDBFile, myDBFile);
+                }
+                SUCCESS("file and catalog binarized");
+                {
+                    Dictionaries myDictionaries;
+                    asl::ReadableFile myCatalogFile("cattest.c60");
+                    unsigned myPos = myDictionaries.debinarize(myCatalogFile, 0);
+                    SUCCESS("debinarized dictionaries");
+                    NodeOffsetCatalog myCatalog;
+                    ENSURE(myCatalog.debinarize(myCatalogFile, myPos)+8 == asl::getFileSize("cattest.c60"));
+                    SUCCESS("debinarized catalog");
+                }
+                {
+                    Dictionaries myDictionaries;
+                    NodeOffsetCatalog myCatalog;
+                    asl::ReadableFile myCatalogFile("cattest.c60");
+                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, 0, myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
+                    SUCCESS("debinarized dictionaries & catalog");
+                }
+                {
+                    Dictionaries myDictionaries;
+                    NodeOffsetCatalog myCatalog;
+                    asl::ConstMappedBlock myCatalogFile("cattest.d60");
+                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, myDictionaries, myCatalog) == asl::getFileSize("cattest.d60")) ; 
+                    SUCCESS("debinarized dictionaries & catalog from end of file");
+                }
+                {
+                    asl::ReadableFile myFile("cattest.b60");
+                    NodePtr myRoot = myIdDocument.getElementById("r0"); 
+                    NodePtr myChild0 = myIdDocument.getElementById("c0"); 
+                    NodePtr myChild1 = myIdDocument.getElementById("c1");
+                    ENSURE(myRoot->removeChild(myChild0));
+                    ENSURE(myRoot->removeChild(myChild1));
+                    DPRINT(myIdDocument);
+                    NodePtr myNewChild0 = myRoot->appendChild(NodePtr(new Element("child")));
+                    NodePtr myNewChild1 = myRoot->appendChild(NodePtr(new Element("child")));
+                    DPRINT(myIdDocument);
+                    Dictionaries myDictionaries;
+                    NodeOffsetCatalog myCatalog;
+                    asl::ConstMappedBlock myCatalogFile("cattest.c60");
+                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
+                    SUCCESS("debinarized dictionaries & catalog from end of file");
+                    ENSURE(myNewChild0->loadElementById("c0","id",myFile, 0, myDictionaries, myCatalog));
+                    DPRINT(myIdDocument);
+                    ENSURE(myNewChild1->loadElementById("c1","id",myFile, 0, myDictionaries, myCatalog));
+                    DPRINT(myIdDocument);
+                }
+                  
+            }
+            catch (dom::DomException & de) {
+                std::cerr << "#### fatal failure:" << de << std::endl;
+                FAILURE("DomException");
+            }
+            catch (dom::Schema::Exception & e) {
+                std::cerr << "#### schema validation failure:" << std::endl;
+                std::cerr << e << std::endl;
+                FAILURE("dom::Schema::Exception");
+            }
+            catch (asl::Exception & e) {
+                std::cerr << "#### failure:" << e << std::endl;
+                FAILURE("Exception");
+            }
+            catch (...) {
+                std::cerr << "#### unknown exception occured" <<  std::endl;
+                FAILURE("unknown Exception");
+            }
+        }
+};
 class XmlDomEventsUnitTest : public UnitTest {
     public:
         XmlDomEventsUnitTest() : UnitTest("XmlDomEventsUnitTest") {  }
@@ -717,15 +852,15 @@ class XmlDomEventsUnitTest : public UnitTest {
 
         struct MyTestEventListener : public dom::EventListener {
             MyTestEventListener(XmlDomEventsUnitTest * theShell,
-                               EventTargetPtr theTestTargetNode,
-                               DOMString theEventType)
+                    EventTargetPtr theTestTargetNode,
+                    DOMString theEventType)
                 : _myTestTargetNode(theTestTargetNode),
-                  _myEventType(theEventType),
-                  _myShell(theShell),
-                  _myCount(0),
-                  _cancelOnCapture(false),
-                  _cancelOnBubbling(false),
-                  _cancelAtTarget(false)
+                _myEventType(theEventType),
+                _myShell(theShell),
+                _myCount(0),
+                _cancelOnCapture(false),
+                _cancelOnBubbling(false),
+                _cancelAtTarget(false)
             {}
 
             virtual void handleEvent(EventPtr evt) {
@@ -754,7 +889,6 @@ class XmlDomEventsUnitTest : public UnitTest {
 
         void run() {
             try {
-
                 // Test getElementById
                 {
                     char * myTestString =
@@ -924,6 +1058,7 @@ class XmlDomEventsUnitTest : public UnitTest {
         }
 
 };
+
 void
 XmlDomEventsUnitTest::checkEvent(XmlDomEventsUnitTest::MyTestEventListener * theTestListener, EventPtr evt) {
     NodePtr myNode = dynamic_cast_Ptr<Node>(evt->currentTarget());
@@ -1243,8 +1378,9 @@ public:
         addTest(new XmlDomUnitTest);
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
-        //addTest(new XmlSchemaUnitTest);
-        //addTest(new XmlPatchUnitTest);
+        addTest(new XmlSchemaUnitTest);
+        addTest(new XmlPatchUnitTest);
+        addTest(new XmlCatalogUnitTest);
     }
 };
 
@@ -1261,4 +1397,9 @@ int main(int argc, char *argv[]) {
     return mySuite.returnStatus();
 
 }
+
+
+
+
+
 

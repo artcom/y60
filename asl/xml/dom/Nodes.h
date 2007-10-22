@@ -191,6 +191,7 @@ namespace dom {
         friend class NodeList;
         friend class NamedNodeMap;
         friend class IDValue;
+        friend class NodeOffsetCatalog;
 
         /**
          * used to distinguish different node types;
@@ -965,9 +966,45 @@ namespace dom {
             setVersion(1);
             return myPos;
         }
-        void binarize(asl::WriteableStream & theDest) const {
-            binarize(theDest, 0, 0);
+        DictionariesPtr binarize(asl::WriteableStream & theDest) const {
+            return binarize(theDest, 0, 0);
         }
+        // binarize and write an id/offset catalog for random node access
+        // when theDataDest and theCatalogDest are the same stream, then
+        // the catalog is appended to the data file
+        // the last 8 Bytes are the size of the catalog including these 8 bytes
+        // thus the catalog can be found by reading the last 8 bytes of the file
+        void binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCatalogDest) const {
+            DictionariesPtr myDicts = binarize(theDataDest, 0, 0);
+            asl::Unsigned64 myStartPos = theCatalogDest.getByteCounter();
+            myDicts->binarize(theCatalogDest);
+            NodeOffsetCatalog myCatalog(*getIDRegistry());
+            myCatalog.binarize(theCatalogDest);
+            asl::Unsigned64 myEndPos = theCatalogDest.getByteCounter();
+            theCatalogDest.appendUnsigned64(myEndPos - myStartPos + sizeof(asl::Unsigned64)); 
+        }
+        // debinarize using an existing dictionary which is needed for random element access
+         asl::AC_SIZE_TYPE debinarize( Dictionaries & theDictionaries,
+                                       const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
+            
+            bool myUnmodifiedProxyFlag;
+            asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, &theDictionaries, false, myUnmodifiedProxyFlag);
+            return myPos;
+        }
+        NodePtr loadElementById(const DOMString & theId, const DOMString & theIdAttribute="id",
+                                const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
+                                Dictionaries & theDictionaries,
+                                const NodeOffsetCatalog & theCatalog)
+        {
+            asl::Unsigned64 myOffset = 0;
+            if (theCatalog.getElementOffsetById(theId, theIdAttribute, myOffset)) {
+               
+               debinarize(theDictionaries, theSource, thePos + asl::AC_SIZE_TYPE(myOffset));  
+               return self().lock();
+            }
+            return NodePtr(0); 
+        }
+          
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
             binarize(thePatch, 0, theOldVersion + 1);
         }
@@ -979,7 +1016,7 @@ namespace dom {
         }
 protected:
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries * theDict, bool thePatchFlag, bool & theUnmodifiedProxyFlag);
-        void binarize(asl::WriteableStream & theDest, Dictionaries * theDict, asl::Unsigned64 theIncludeVersion) const;
+        DictionariesPtr binarize(asl::WriteableStream & theDest, Dictionaries * theDict, asl::Unsigned64 theIncludeVersion) const;
 public:
         void addSchema(const DOMString & theSchemaString, const DOMString & theNSPrefix);
         void addSchema(const dom::Node & theSchemaDoc, const DOMString & theNSPrefix);
@@ -1175,7 +1212,16 @@ Dependent on node type allowed children are:<p>
         void checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent);
 
         void checkForArrayType(NodePtr mySchemaType, asl::AC_SIZE_TYPE theParsePos);
-     //@}
+
+        // small hack to store file positions for saving
+        void storeSavePosition(asl::Unsigned64 thePosition) const {
+            _myParseCompletionPos = thePosition;
+            _myDocSize = thePosition >> 32;
+        }
+        asl::Unsigned64 getSavePosition() const {
+            return asl::Unsigned64(_myParseCompletionPos) | asl::Unsigned64(_myDocSize) << 32;
+        }
+      //@}
     private:
         void markPrecursorDependenciesOutdated();
 
@@ -1187,8 +1233,8 @@ Dependent on node type allowed children are:<p>
         ValuePtr          _myValue;
         NodeList          _myChildren; // entities when doctype
         TypedNamedNodeMap _myAttributes; // notations when doctype
-        int               _myParseCompletionPos;
-        int               _myDocSize;
+        mutable asl::Unsigned32  _myParseCompletionPos;
+        mutable asl::Unsigned32  _myDocSize;
         SchemaInfoPtr     _mySchemaInfo;
         mutable FacadePtr _myFacade;
         EventListenerMap  _myEventListeners;
@@ -1393,6 +1439,39 @@ Dependent on node type allowed children are:<p>
             myNodeCount += countNodes(*theDom.childNode(i));
         }
         return myNodeCount;
+    }
+
+    /// loads dictionaries and catalog from a stream starting at thePos
+    inline
+    asl::AC_SIZE_TYPE
+    loadDictionariesAndCatalog(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
+            Dictionaries & theDictionaries,
+            NodeOffsetCatalog & theCatalog)
+    {
+        thePos = theDictionaries.debinarize(theSource, thePos);
+        thePos = theCatalog.debinarize(theSource, thePos);
+        asl::Unsigned64 mySize;
+        thePos = theSource.readUnsigned64(mySize, thePos);
+        return thePos; 
+    }
+
+    /// loads dictionaries and catalog from a block determining the position
+    /// by reading the last 8 bytes of the block first, expecting it to contain
+    /// the size of dictionaries and catalog 
+    inline
+    asl::AC_SIZE_TYPE
+    loadDictionariesAndCatalog(const asl::ReadableBlock & theSource,
+            Dictionaries & theDictionaries,
+            NodeOffsetCatalog & theCatalog)
+    {
+        asl::Unsigned64 myDictCatSize = 0;
+        theSource.readUnsigned64(myDictCatSize, theSource.size() - sizeof(asl::Unsigned64));
+        asl::AC_SIZE_TYPE thePos =  theSource.size() - myDictCatSize;
+        thePos = theDictionaries.debinarize(theSource, thePos);
+        thePos = theCatalog.debinarize(theSource, thePos);
+        asl::Unsigned64 mySize;
+        thePos = theSource.readUnsigned64(mySize, thePos);
+        return thePos; 
     }
 
     /* @} */

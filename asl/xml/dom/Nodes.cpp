@@ -1107,8 +1107,8 @@ dom::Node::setName(const String& name) {
     _myName = name;
 }
 
-std::ostream&
-dom::Node::print(std::ostream& os, const String& indent) const {
+std::ostream &
+dom::Node::print(std::ostream & os, const String& indent) const {
     switch (_myType) {
         case ELEMENT_NODE:
             {
@@ -1269,7 +1269,7 @@ dom::Node::parseAll(const String& is) {
         DBE(AC_ERROR << "parsing aborted at character position "
             << _myParseCompletionPos << std::endl);
 
-        DBE(int myDumpStartPos = asl::maximum(0, _myParseCompletionPos - 10000));
+        DBE(unsigned myDumpStartPos = asl::maximum(0, int(_myParseCompletionPos) - 10000));
         DBE(AC_ERROR << is.substr(myDumpStartPos,_myParseCompletionPos) << "#### " << std::endl);
         DBE(AC_ERROR << pex.name() << "," << pex.what() << std::endl);
         DBE(AC_ERROR << " bailed out in " << pex.where() << std::endl);
@@ -2256,11 +2256,12 @@ void dumpType(unsigned short theType) {
 #undef DB
 #define DB(x) // x
 
-void
+DictionariesPtr
 dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl::Unsigned64 theIncludeVersion) const {
-    asl::Ptr<Dictionaries,ThreadingModel> myDicts;
+    storeSavePosition(theDest.getByteCounter()); 
+    DictionariesPtr myDicts;
     if (!theDicts) {
-        myDicts = asl::Ptr<Dictionaries,ThreadingModel>(new Dictionaries);
+        myDicts = DictionariesPtr(new Dictionaries);
         theDicts = &(*myDicts);
     }
     unsigned short myNodeType = nodeType();
@@ -2311,7 +2312,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl
    
     if (myNodeType&isUnmodifiedProxy) {
         DB(AC_TRACE << "Finshed Node because isUnmodifiedProxy == true" << endl);
-        return;
+        return myDicts;
     }
 
     if (myNodeType&hasName) {
@@ -2353,6 +2354,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl
         theDicts->_myAttributeNames.dump();
     }
     */
+    return myDicts;
 }
 
 #ifdef PATCH_STATISTIC
@@ -2417,18 +2419,18 @@ dom::Node::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE t
             } else if (_myType == ATTRIBUTE_NODE) {
                 _myName = theDicts->_myAttributeNames.lookupName(myIndex);
             } else {
-                throw FormatCorrupted("NameIndex and nodeType are not comptible",PLUS_FILE_LINE);
+                throw FormatCorrupted("NameIndex and nodeType are not compatible",PLUS_FILE_LINE);
             }
         } else {
             thePos = theSource.readCountedString(_myName, thePos);
             if (_myType == ELEMENT_NODE) {
                 unsigned int myIndex = 0;
-                if (!theDicts->_myElementNames.enterName(_myName, myIndex)) {
+                if (!theDicts->isComplete && !theDicts->_myElementNames.enterName(_myName, myIndex)) {
                     throw FormatCorrupted("Name is already in _myElementNames Dictionary",PLUS_FILE_LINE);
                 }
             } else if (_myType == ATTRIBUTE_NODE) {
                 unsigned int myIndex = 0;
-                if (!theDicts->_myAttributeNames.enterName(_myName, myIndex)) {
+                if (!theDicts->isComplete && !theDicts->_myAttributeNames.enterName(_myName, myIndex)) {
                     throw FormatCorrupted("Name is already in _myAttributeNames Dictionary",PLUS_FILE_LINE);
                 }
             }

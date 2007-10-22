@@ -26,8 +26,10 @@
 
 #include "typedefs.h"
 #include "ThreadingModel.h"
+#include "Exceptions.h"
 #include <asl/MemoryPool.h>
 #include <asl/Exception.h>
+#include <asl/Stream.h>
 
 #include <string>
 #include <vector>
@@ -52,9 +54,12 @@ namespace dom {
     typedef std::map<DOMString,EntryPtr> EntryMap;
     typedef std::vector<EntryPtr> EntryList;
 
+
     class Dictionary {
     public:
         DEFINE_NESTED_EXCEPTION(Dictionary,IndexOutOfRange,asl::Exception);
+        
+        enum { DictMagic = 0xb60d1cf0, DictsMagic = 0xb60a11d1 };
 
         Dictionary() {}
         bool enterName(const DOMString & theName, unsigned int & theIndex) {
@@ -76,7 +81,43 @@ namespace dom {
             }
             return _myList[theIndex]->_myName;
         }
-    private:
+        void binarize(asl::WriteableStream & theDest) {
+            theDest.appendUnsigned32(DictMagic);
+            theDest.appendUnsigned(_myList.size());
+            for (int i = 0; i < _myList.size(); ++i) {
+                theDest.appendCountedString(_myList[i]->_myName);
+            }
+        }
+        asl::AC_SIZE_TYPE
+        debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
+            _myMap = EntryMap();
+            _myList.resize(0);
+
+            asl::Unsigned32 myMagic = 0;
+            asl::AC_SIZE_TYPE theOldPos = thePos;
+            thePos = theSource.readUnsigned32(myMagic, thePos);
+            if (myMagic != DictMagic) {
+                std::string myError = "Bad magic reading Dictionary, thePos=";
+                myError += asl::as_string(thePos);
+                myError += ", myMagic=";
+                myError += asl::as_string((void*)myMagic);
+                throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
+            }
+            asl::Unsigned64 myCount;
+            thePos = theSource.readUnsigned(myCount, thePos);
+
+            for (int i = 0; i < myCount; ++i) {
+                DOMString myName;
+                thePos = theSource.readCountedString(myName, thePos);
+                if (myName.size() == 0) {
+                    throw FormatCorrupted("empty dictionary key",PLUS_FILE_LINE);
+                }
+                unsigned int myIndex;
+                enterName(myName, myIndex);
+            }
+            return thePos;
+        }
+     private:
         EntryMap _myMap;
         EntryList _myList;
     };
@@ -111,8 +152,21 @@ namespace dom {
 #endif
 
     struct Dictionaries {
+        Dictionaries() : isComplete(false) {}
+        void binarize(asl::WriteableStream & theDest) {
+            _myElementNames.binarize(theDest);
+            _myAttributeNames.binarize(theDest);
+        }
+        asl::AC_SIZE_TYPE
+        debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
+            thePos = _myElementNames.debinarize(theSource, thePos);
+            thePos = _myAttributeNames.debinarize(theSource, thePos);
+            isComplete = true;
+            return thePos;
+        };
         Dictionary _myElementNames;
         Dictionary _myAttributeNames;
+        bool isComplete;
 #ifdef PATCH_STATISTIC
         PatchStatistic _myPatchStat;
 #endif

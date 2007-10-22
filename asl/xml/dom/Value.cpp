@@ -81,6 +81,98 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
     return NodePtr(0);
 }
 
+NodeOffsetCatalog::NodeOffsetCatalog(const NodeIDRegistry & theRegistry) {
+    for (NodeIDRegistry::IDMaps::const_iterator it = theRegistry._myIDMaps.begin();
+            it != theRegistry._myIDMaps.end(); ++it) {
+        _myIDMaps[it->first] = IDMap();
+        IDMap & myCatalog =_myIDMaps[it->first]; 
+        for (NodeIDRegistry::IDMap::const_iterator mit = it->second.begin();
+                mit != it->second.end(); ++mit) 
+        {
+            myCatalog[mit->first] = mit->second->getSavePosition();
+        }
+    }
+}
+ 
+void
+NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
+    theDest.appendUnsigned32(CatalogMagic);
+    theDest.appendUnsigned(_myIDMaps.size());
+    for (IDMaps::const_iterator it = _myIDMaps.begin(); it != _myIDMaps.end(); ++it) {
+        theDest.appendUnsigned32(CatalogEntriesMagic);
+        theDest.appendCountedString(it->first);
+        theDest.appendUnsigned(it->second.size());
+        for (IDMap::const_iterator mit = it->second.begin();
+                mit != it->second.end(); ++mit) 
+        {
+            theDest.appendCountedString(mit->first);
+            theDest.appendUnsigned(mit->second);
+        }
+    }
+}
+
+asl::AC_SIZE_TYPE
+NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
+    _myIDMaps = IDMaps();
+
+    asl::Unsigned32 myMagic = 0;
+    asl::AC_SIZE_TYPE theOldPos = thePos;
+    thePos = theSource.readUnsigned32(myMagic, thePos);
+    if (myMagic != CatalogMagic) {
+        std::string myError = "Bad magic reading ID Catalog, thePos=";
+        myError += asl::as_string(thePos);
+        myError += ", myMagic=";
+        myError += asl::as_string((void*)myMagic);
+        throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
+    }
+    asl::Unsigned64 myCatalogCount;
+    thePos = theSource.readUnsigned(myCatalogCount, thePos);
+
+    for (int i = 0; i < myCatalogCount; ++i) {
+        asl::Unsigned32 myEntriesMagic = 0;
+        thePos = theSource.readUnsigned32(myEntriesMagic, thePos);
+        if (myEntriesMagic != CatalogEntriesMagic) {
+            throw FormatCorrupted("Bad magic reading ID Catalog entry",PLUS_FILE_LINE);
+        }
+        DOMString myIDName;
+        thePos = theSource.readCountedString(myIDName, thePos);
+        if (myIDName.size() == 0) {
+            throw FormatCorrupted("empty ID name reading ID catalog",PLUS_FILE_LINE);
+        }
+        _myIDMaps[myIDName] = IDMap();
+        IDMap & myCatalog =_myIDMaps[myIDName]; 
+
+        asl::Unsigned64 myCatalogSize;
+        thePos = theSource.readUnsigned(myCatalogSize, thePos);
+        for (asl::Unsigned64 j = 0; j < myCatalogSize; ++j) {
+            DOMString myName;
+            thePos = theSource.readCountedString(myName, thePos);
+            if (myName.size() == 0) {
+                throw FormatCorrupted("empty catalog entry key",PLUS_FILE_LINE);
+            }
+            asl::Unsigned64 myOffset;
+            thePos = theSource.readUnsigned(myOffset, thePos);
+
+            myCatalog[myName] = myOffset;
+        }
+    }
+    return thePos;
+}
+
+bool 
+NodeOffsetCatalog::getElementOffsetById(const DOMString & theId, const DOMString & theIdAttribute,  asl::Unsigned64 & theOffset) const {
+    IDMaps::const_iterator myMap = _myIDMaps.find(theIdAttribute);
+    if (myMap != _myIDMaps.end()) {
+        IDMap::const_iterator myEntry = myMap->second.find(theId);
+        if (myEntry != myMap->second.end()) {
+            return theOffset = myEntry->second;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void
 IDValue::update() const {
     Node * myNode = const_cast<IDValue*>(this)->getNodePtr();

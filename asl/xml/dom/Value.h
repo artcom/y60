@@ -434,7 +434,10 @@ namespace dom {
         mutable Node * _myNode;
     };
 
+    class NodeOffsetCatalog;
+
     class NodeIDRegistry {
+        friend class NodeOffsetCatalog;
     public:
         typedef std::map<DOMString, Node *> IDMap;
         typedef std::map<DOMString, IDMap> IDMaps;
@@ -452,6 +455,33 @@ namespace dom {
         }
     private:
         IDMaps _myIDMaps;
+    };
+
+    class NodeOffsetCatalog {
+        public:
+            typedef std::map<DOMString, asl::Unsigned64> IDMap;
+            typedef std::map<DOMString, IDMap> IDMaps;
+            enum { CatalogMagic = 0xb60ca1a1, CatalogEntriesMagic = 0xb60eca1a };
+
+        public:
+            NodeOffsetCatalog() {}
+            NodeOffsetCatalog(const NodeIDRegistry & theRegistry);
+
+            void binarize(asl::WriteableStream & theDest) const;
+
+            asl::AC_SIZE_TYPE
+            debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
+            bool getElementOffsetById(const DOMString & theId, const DOMString & theIdAttribute,  asl::Unsigned64 & theOffset) const;
+
+            const IDMap * getIDMap(const DOMString & theIDAttributeName) const {
+                IDMaps::const_iterator myMap = _myIDMaps.find(theIDAttributeName);
+                if (myMap == _myIDMaps.end()) {
+                    return 0;
+                }
+                return &myMap->second;
+            }
+        private:
+            IDMaps _myIDMaps;
     };
 
     class IDValue : public StringValue {

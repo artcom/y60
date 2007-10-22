@@ -671,6 +671,35 @@ evaluateRelativePath(const std::string & theBaseDirectory,
     return myRelativePath;
 }
 
+#ifdef OSX
+#  define STAT64   stat
+#  define STAT64F  stat
+#endif
+#ifdef LINUX
+#  define STAT64   stat64
+#  define STAT64F  stat64
+#endif
+#ifdef WIN32
+#  define STAT64   __stat64
+#  define STAT64F  _stat64
+#endif
+
+/// returns true if file or directory exists
+bool fileExists(const std::string& theUTF8Filename) {
+    struct STAT64 myStat;
+    return STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1;
+}
+// Warning: off_t is 32 bit (at least) under windows. This function will
+// return incorrect values for files > 2 gb.
+off_t getFileSize(const std::string& theUTF8Filename) {
+    struct STAT64 myStat;
+    if (STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1) {
+        return static_cast<off_t>(myStat.st_size);
+    };
+    throw asl::IO_Failure("getFileSize","can't stat file");
+}
+
+
 } // namespace asl
 
 #ifdef __cplusplus

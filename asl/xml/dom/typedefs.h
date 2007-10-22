@@ -64,6 +64,9 @@ namespace dom {
     class Document;
     typedef asl::Ptr<Document,ThreadingModel> DocumentPtr;
 
+    struct Dictionaries;
+    typedef asl::Ptr<Dictionaries,ThreadingModel> DictionariesPtr;
+
     /* @} */
 } //Namespace dom
 

@@ -457,6 +457,8 @@ namespace asl {
         typedef WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> WriteableStream;
         typedef BinaryArranger<AC_HOST_BYTE_ORDER, BigEndianByteOrder> CountArranger;
 
+        WriteableArrangedStream() : _myByteCounter(0) {}
+
         /// append theSize bytes from theMemory to the WriteableStream
         virtual WriteableStream & append(const void * theMemory, size_type theSize) = 0;
 
@@ -618,6 +620,17 @@ namespace asl {
             return appendString(theString);
         }
         virtual operator bool() const = 0;
+        Unsigned64 getByteCounter()  {
+            return _myByteCounter;
+        };
+        void setByteCounter(Unsigned64 theCount) {
+            _myByteCounter = theCount;
+        };
+        void countBytes(Unsigned64 theCount) {
+            _myByteCounter += theCount;
+        }
+    private:
+        Unsigned64 _myByteCounter;
     };
 
     typedef WriteableArrangedStream<AC_DEFAULT_BYTE_ORDER> WriteableStream;
@@ -639,6 +652,7 @@ namespace asl {
                     std::string("WriteableFile::append(size=")+as_string(theSize)+")",
                     std::string("Filename='")+ _myFileName.toLocale() + "' failed." );
             }
+            countBytes(theSize);
             return *this;
         }
         operator bool() const {
