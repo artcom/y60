@@ -479,6 +479,34 @@ namespace xpath {
 	return p;
     }
 
+    dom::Node *xpath_evaluate1(Path *p, dom::Node *theNode) {
+
+	xpath::NodeSetValue *value = p->evaluate(theNode);
+	std::set<dom::Node *> *retval = value->takeNodes();
+
+#ifdef DEBUG_RESULTS
+	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+
+            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+		try {
+		    AC_TRACE << " * " << (*i)->nodeName() << " "
+                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+		} catch(asl::Exception &e) {
+		    AC_TRACE << " oops...";
+		}
+	    }
+#endif
+	delete value;
+	if (retval->begin() != retval->end()) {
+	    NodeRef retval1 = *(retval->begin());
+	    delete retval;
+	    return retval1;
+	} else {
+	    delete retval;
+	    return NULL;
+	}
+    }
+
     std::set<dom::Node *> *xpath_evaluate(Path *p, dom::Node *theNode) {
 	xpath::NodeSetValue *value = p->evaluate(theNode);
 	std::set<dom::Node *> *retval = value->takeNodes();
