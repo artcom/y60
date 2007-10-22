@@ -1190,10 +1190,10 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         curNode = &*curNode->firstChild();
                     } else if (curNode == origNode) {
                         break;
-        // yes, this is exactly what we want.
+                    } else
+        // yes, this is what we want.
         case Step::Following:
-	    ;
-                    } else if (curNode->nextSibling()) {
+			if (curNode->nextSibling()) {
                         curNode = &*curNode->nextSibling();
                     } else {
                         NodeRef tmp = curNode;
@@ -1220,9 +1220,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                         curNode = &*curNode->firstChild();
                     } else if (curNode == origNode) {
                         break;
+                    } else
         case Step::Preceding:
-	    ;
-                    } else if (curNode->previousSibling()) {
+			if (curNode->previousSibling()) {
                         curNode = &*curNode->previousSibling();
                     } else {
                         NodeRef tmp = curNode;
@@ -1435,7 +1435,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
             NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-               (*s)->scan(*i, *nextStepSet);
+                (*s)->scan(*i, *nextStepSet);
             };
             delete workingset;
             workingset = nextStepSet;
