@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include "ConnectedComponent.h"
 #include "TransportLayer.h"
 
 #include <asl/SerialDevice.h>
@@ -23,6 +22,7 @@
 #include <y60/IEventSource.h>
 #include <y60/Scene.h>
 #include <y60/GenericEvent.h>
+#include <y60/ConnectedComponent.h>
 
 #include <iostream>
 #include <deque>
