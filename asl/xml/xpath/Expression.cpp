@@ -1092,8 +1092,6 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         };
     };
 
-    #define INSERT(inserter, item) *inserter++ = item;
-
     template<class CONT>
     void fillAxis(Step *s, NodeRef curNode, CONT &cont)
     {
@@ -1106,7 +1104,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             if (curNode->hasChildNodes()) {
                 for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
                     if (s->allows(curNode)) {
-                        INSERT(resultset, curNode);
+                        *resultset++ = curNode;
                     }
                 }
             }
@@ -1114,38 +1112,38 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         case Step::Parent:
             curNode = curNode->parentNode();
             if (curNode && s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             break;
         case Step::Next_Sibling:
             curNode = &*curNode->nextSibling();
             if (curNode && s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             break;
         case Step::Previous_Sibling:
             curNode = &*curNode->previousSibling();
             if (curNode && s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             break;
         case Step::Preceding_Sibling:
             while (curNode = &*curNode->previousSibling()) {
                 if (s->allows(curNode)) {
-                    INSERT(resultset, curNode);
+		    *resultset++ = curNode;
                 }
             }
             break;
         case Step::Following_Sibling:
             while (curNode = &*curNode->nextSibling()) {
                 if (s->allows(curNode)) {
-                    INSERT(resultset, curNode);
+		    *resultset++ = curNode;
                 }
             }
             break;
         case Step::Descendant_Or_Self:
             if (s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             /* nobreak; */
         case Step::Descendant:
@@ -1175,7 +1173,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                     };
 
                     if (s->allows(curNode)) {
-                        INSERT(resultset, curNode);
+			*resultset++ = curNode;
                     }
                 };
             };
@@ -1204,13 +1202,13 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                     };
 
                     if (s->allows(curNode)) {
-                        INSERT(resultset, curNode);
+			*resultset++ = curNode;
                     }
                 };
             break;
         case Step::Self:
             if (s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             break;
         case Step::Attribute:
@@ -1218,11 +1216,11 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 dom::NamedNodeMap map = curNode->attributes();
                 for (unsigned int i = 0; i < map.length(); i++)
                     if (s->allows(&*map.item(i)))
-                        INSERT(resultset, &*map.item(i));
+			*resultset++ = &*map.item(i);
             };
         case Step::Ancestor_Or_Self:
             if (s->allows(curNode)) {
-                INSERT(resultset, curNode);
+		*resultset++ = curNode;
             }
             /* nobreak; */
         case Step::Ancestor:
@@ -1234,12 +1232,12 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 */
                 curNode = curNode->parentNode();
                 if (s->allows(curNode)) {
-                    INSERT(resultset, curNode);
+		    *resultset++ = curNode;
                 }
             }
             while (curNode = curNode->parentNode()) {
                 if (s->allows(curNode)) {
-                    INSERT(resultset, curNode);
+		    *resultset++ = curNode;
                 }
             }
         case Step::Invalid:
