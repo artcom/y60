@@ -1321,6 +1321,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 delete v;
             }
 	}
+	delete intermediateResult;
     };
 
     void Step::scan(NodeRef from, NodeSet &into) {
