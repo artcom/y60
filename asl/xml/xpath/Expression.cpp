@@ -1494,10 +1494,10 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
 	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
 #endif
-	OrderedNodeSetRef finalResult = new OrderedNodeSet();
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
 	    (*lastStep)->scan(*i, returnContainer);
 	};
+	delete workingset;
     };
 
     void Path::serializeTo(std::ostream &os) {
