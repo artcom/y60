@@ -991,7 +991,7 @@ namespace dom {
             asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, &theDictionaries, false, myUnmodifiedProxyFlag);
             return myPos;
         }
-        NodePtr loadElementById(const DOMString & theId, const DOMString & theIdAttribute="id",
+        NodePtr loadElementById(const DOMString & theId, const DOMString & theIdAttribute,
                                 const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
                                 Dictionaries & theDictionaries,
                                 const NodeOffsetCatalog & theCatalog)
