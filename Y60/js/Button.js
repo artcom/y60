@@ -274,8 +274,6 @@ DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene
 
     Public.setImage(theSources[0]);
     var myImageSize = getImageSize(Public.image);
-    print("creating Label with image size "+myImageSize);
     Public._myTextlabel =  new Label(theScene, theText, myImageSize, [0,0], theStyle, Public);
-    print("finished creating Label:");
 }
 

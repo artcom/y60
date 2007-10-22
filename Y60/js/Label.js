@@ -150,8 +150,8 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
                 var mySize = getImageSize(theSource);
                 Public.width  = mySize.x;
                 Public.height = mySize.y;
-                Public.srcsize.x = mySize[0] / nextPowerOfTwo(theSource.width);
-                Public.srcsize.y = mySize[1] / nextPowerOfTwo(theSource.height);
+                Public.srcsize.x = 1.0;//mySize[0] / nextPowerOfTwo(theSource.width);
+                Public.srcsize.y = 1.0;//mySize[1] / nextPowerOfTwo(theSource.height);
             } else {
                 Public.image = theSource;
             }
