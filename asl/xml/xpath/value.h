@@ -9,18 +9,13 @@ namespace xpath
 {
     typedef std::string string;
 
-    typedef std::set<dom::Node *> NodeSet;
-    typedef NodeSet *NodeSetRef;
-
-    typedef std::list<dom::Node *> NodeList;
-    typedef NodeList *NodeListRef;
-
     typedef dom::Node *NodeRef;
 
-    string string_value_for(const NodeRef);
-    double number_value_for(const string &);
-    inline double number_value_for(const NodeRef n) { return number_value_for(string_value_for(n)); };
+    typedef std::set<NodeRef> NodeSet;
+    typedef NodeSet *NodeSetRef;
 
+    typedef std::list<NodeRef> NodeList;
+    typedef NodeList *NodeListRef;
 
     struct DocOrderLess :
 	public std::binary_function<const NodeRef, const NodeRef, bool>
@@ -60,7 +55,11 @@ namespace xpath
 	    return true;
 	}
     };
-    
+
+    string string_value_for(const NodeRef);
+    double number_value_for(const string &);
+    inline double number_value_for(const NodeRef n) { return number_value_for(string_value_for(n)); };
+
     struct StringLess :
 	public std::binary_function<const NodeRef, const NodeRef, bool>
     {
@@ -77,6 +76,10 @@ namespace xpath
 	}
     };
 
+    typedef std::set<NodeRef, DocOrderLess> OrderedNodeSet;
+    typedef OrderedNodeSet *OrderedNodeSetRef;
+
+    
     class NumberValue;
     class BooleanValue;
     class StringValue;
@@ -210,32 +213,32 @@ namespace xpath
     class NodeSetValue : public Value
     {
     public:
-	NodeSetValue() {_myNodes = NULL;};
-	// ownership of other is transferred to the new node set value.
-	NodeSetValue(NodeSetRef other) { _myNodes = other; };
-	virtual ~NodeSetValue() { delete _myNodes; }
+        NodeSetValue() {_myNodes = NULL;};
+        // ownership of other is transferred to the new node set value.
+        NodeSetValue(NodeSetRef other) { _myNodes = other; };
+        virtual ~NodeSetValue() { delete _myNodes; }
 
-	NodeSetRef takeNodes() { NodeSetRef retval = _myNodes; _myNodes = NULL; return retval; };
+        NodeSetRef takeNodes() { NodeSetRef retval = _myNodes; _myNodes = NULL; return retval; };
 
-      virtual BooleanValue *toBoolean() { if (!_myNodes) return new BooleanValue(false); return new BooleanValue( _myNodes->size()!=0 ); };
-      virtual NumberValue *toNumber();
-      virtual StringValue *toString();
-      virtual NodeSetValue *toNodeSet();
+        virtual BooleanValue *toBoolean() { if (!_myNodes) return new BooleanValue(false); return new BooleanValue( _myNodes->size()!=0 ); };
+        virtual NumberValue *toNumber();
+        virtual StringValue *toString();
+        virtual NodeSetValue *toNodeSet();
 
-      NodeSet::iterator begin() { assert(_myNodes); return _myNodes->begin(); };
-      NodeSet::iterator end() { assert(_myNodes); return _myNodes->end(); };
-      int length() { if (!_myNodes) return 0; return _myNodes->size(); };
-      NodeRef item(int number) {
-	  assert(_myNodes); 
-	  if (!_myNodes) return NULL; 
-	  NodeSet::iterator iter = _myNodes->begin(); 
-	  while ((iter != _myNodes->end()) && number--) ++iter;
-	  return (iter == _myNodes->end()) ? NULL: *iter;
-      };
-
-      Value::ValueType type() { return NodeSetType; };
-      private:
-      NodeSetRef _myNodes;
+        NodeSet::iterator begin() { assert(_myNodes); return _myNodes->begin(); };
+        NodeSet::iterator end() { assert(_myNodes); return _myNodes->end(); };
+        int length() { if (!_myNodes) return 0; return _myNodes->size(); };
+        NodeRef item(int number) {
+            assert(_myNodes); 
+            if (!_myNodes) return NULL; 
+            NodeSet::iterator iter = _myNodes->begin(); 
+            while ((iter != _myNodes->end()) && number--) ++iter;
+            return (iter == _myNodes->end()) ? NULL: *iter;
+        };
+        
+        Value::ValueType type() { return NodeSetType; };
+    private:
+        NodeSetRef _myNodes;
     };
 
 };
