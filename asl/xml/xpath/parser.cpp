@@ -1,7 +1,6 @@
 #include <asl/string_functions.h>
 #include "Expression.h"
 
-#define DEBUG_RESULTS
 #define DEBUG_PARSER_STATES
 #define PARSER_DEBUG_VERBOSITY 1
 

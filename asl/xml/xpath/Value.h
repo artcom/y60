@@ -14,7 +14,7 @@ namespace xpath
     typedef std::set<NodeRef> NodeSet;
     typedef NodeSet *NodeSetRef;
 
-    typedef std::list<NodeRef> NodeList;
+    typedef std::vector<NodeRef> NodeList;
     typedef NodeList *NodeListRef;
 
     struct DocOrderLess :
@@ -85,14 +85,6 @@ namespace xpath
     class StringValue;
     class NodeSetValue;
 
-#define DECLARE_TYPED_BINOP(TYPE, OPNAME, OP, RESULTTYPE)     \
-   RESULTTYPE OPNAME ## As ## TYPE (Value *one, Value *two) { \
-      TYPE ## Value *lv = one->to ## TYPE();                  \
-      TYPE ## Value *rv = two->to ## TYPE();                  \
-      RESULTTYPE retval = lv OP rv;                           \
-      delete lv; delete rv;                                   \
-      return RESULTTYPE; }
-
     class Value
     {
     public:
@@ -110,17 +102,6 @@ namespace xpath
       virtual NumberValue *as(NumberValue *) { return toNumber(); };
       virtual StringValue *as(StringValue *) { return toString(); };
       virtual NodeSetValue *as(NodeSetValue *) { return toNodeSet(); };
-
-      /*
-      DECLARE_TYPED_BINOP(Boolean, equals, ==, bool);
-      DECLARE_TYPED_BINOP(String, equals, ==, bool);
-      DECLARE_TYPED_BINOP(Number, equals, ==, bool);
-      DECLARE_TYPED_BINOP(NodeSet, equals, ==, bool);
-      DECLARE_TYPED_BINOP(Boolean, smaller, <, bool);
-      DECLARE_TYPED_BINOP(String, smaller, <, bool);
-      DECLARE_TYPED_BINOP(Number, smaller, <, bool);
-      DECLARE_TYPED_BINOP(NodeSet, smaller, <, bool);
-      */
     };
 
     template <class VALUE_TYPE>
@@ -219,6 +200,7 @@ namespace xpath
         virtual ~NodeSetValue() { delete _myNodes; }
 
         NodeSetRef takeNodes() { NodeSetRef retval = _myNodes; _myNodes = NULL; return retval; };
+        NodeListRef toNodeList() { NodeListRef retval = new NodeList(); for (NodeSet::iterator i = _myNodes->begin(); i != _myNodes->end(); ++i) { retval->insert(retval->end(), *i); }; return retval; };
 
         virtual BooleanValue *toBoolean() { if (!_myNodes) return new BooleanValue(false); return new BooleanValue( _myNodes->size()!=0 ); };
         virtual NumberValue *toNumber();

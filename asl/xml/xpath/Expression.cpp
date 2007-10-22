@@ -1282,30 +1282,32 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         };
     };
 
-    void Step::scan(NodeRef origNode, NodeSet &results)
+    template<class CONT>
+    void scanStep(Step *s, NodeRef origNode, CONT &results)
     {
-	bool have_predicates = (predicates.begin() != predicates.end());
+	bool have_predicates = (s->predicates.begin() != s->predicates.end());
 	if (!have_predicates) {
-	    fillAxis(this, origNode, results);
+	    fillAxis(s, origNode, results);
 	    return;
 	}
 
         NodeListRef intermediateResult = new NodeList();
-	fillAxis(this, origNode, *intermediateResult);
+	fillAxis(s, origNode, *intermediateResult);
 
 #ifdef INTERPRETER_DEBUG
-        AC_TRACE << "selected " << intermediateResult->size() << " " << Step::stringForAxis(axis) << " nodes"
+        AC_TRACE << "selected " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes"
                  << " of " << origNode->nodeName();
         if (origNode->parentNode()) {
             AC_TRACE << " inside " << origNode->parentNode()->nodeName();
         }
 #endif
-	std::list<Expression*>::iterator last = predicates.end(); 
-	if (predicates.begin() != predicates.end()) {
+	std::list<Expression*>::iterator last = s->predicates.end(); 
+	if (s->predicates.begin() != s->predicates.end()) {
 	    --last;
 	}
         Context subcontext;
-        for (std::list<Expression*>::iterator i = predicates.begin(); i != last; ++i) {
+
+        for (std::list<Expression*>::iterator i = s->predicates.begin(); i != last; ++i) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << intermediateResult->size() << " nodes:";
 #endif
@@ -1331,7 +1333,8 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             }
         }
 
-	if (last != predicates.end()) {
+	std::insert_iterator<CONT> ins = std::inserter(results, results.end());
+	if (last != s->predicates.end()) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "evaluating last predicate " << *(*last) << " on a set of " << intermediateResult->size() << " nodes:";
 #endif
@@ -1345,14 +1348,22 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                 delete tmp;
                 if (v->getValue()) {
 #ifdef INTERPRETER_DEBUG
-                    AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**last) << "] evaluates false.";
+                    AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**last) << "] evaluates true.";
 #endif
-		    results.insert(*j);
+		    *ins++ = (*j);
                 }
                 delete v;
             }
 	}
     };
+
+    void Step::scan(NodeRef from, NodeSet &into) {
+	scanStep(this, from, into);
+    }
+
+    void Step::scan(NodeRef from, NodeList &into) {
+	scanStep(this, from, into);
+    }
 
     void Step::serializeTo(std::ostream & os) {
         os << stringForAxis(axis);
@@ -1406,19 +1417,72 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
     };
 
     NodeSetValue *Path::evaluate(NodeRef n) {
-        NodeSetRef initialSet = new NodeSet();
-        initialSet->insert(n);
-
-        NodeSetRef result = evaluateAll(initialSet);
-        return new NodeSetValue(result);
+        return new NodeSetValue(evaluateAs<NodeSetRef>(n));
     };
 
-    NodeSetRef Path::evaluateAll(NodeSetRef workingset) {
+    NodeListRef Path::evaluateAll(NodeSetRef workingset, NodeListRef dummyReturn) {
+        if (absolute) {
+	    if (steps.begin() == steps.end()) {
+#ifdef INTERPRETER_DEBUG
+		AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+		NodeSetRef newResults = new NodeSet();
+		
+		for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
+		    {
+			NodeRef thisOne = *i;
+			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+			newResults->insert(thisOne);
+		    }
+		delete workingset;
+		workingset = newResults;
+	    } else {
+#ifdef INTERPRETER_DEBUG
+		AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+		NodeListRef newResults = new NodeList();
+		NodeList::iterator nli = newResults->begin();
+		for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
+		    {
+			NodeRef thisOne = *i;
+			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+			*nli++ = thisOne;
+		    }
+		return newResults;
+	    }
+        }
+
+	std::list<Step*>::iterator lastStep = steps.end();
+	lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+#ifdef INTERPRETER_DEBUG
+	    AC_TRACE << "scanning intermediate step " << (**s) << " with "<<workingset->size()<<" nodes :";
+#endif
+	    NodeSetRef nextStepSet = new NodeSet();
+	    for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+		(*s)->scan(*i, *nextStepSet);
+	    };
+	    delete workingset;
+	    workingset = nextStepSet;
+	}
+#ifdef INTERPRETER_DEBUG
+	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+	NodeListRef nextStepSet = new NodeList();
+	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+	    (*lastStep)->scan(*i, *nextStepSet);
+	};
+	return nextStepSet;
+    };
+
+    NodeSetRef Path::evaluateAll(NodeSetRef workingset, NodeSetRef dummyReturn) {
         if (absolute) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
 #endif
             NodeSetRef newResults = new NodeSet();
+	    NodeSet::iterator resIter = newResults->end();
+
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
             {
                 NodeRef thisOne = *i;
@@ -1429,9 +1493,12 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             workingset = newResults;
         }
 
-        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
+	assert(steps.begin() != steps.end());
+	std::list<Step*>::iterator lastStep = steps.end();
+	lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
 #ifdef INTERPRETER_DEBUG
-            AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes :";
+            AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes into Set:";
 #endif
             NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
@@ -1440,7 +1507,14 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             delete workingset;
             workingset = nextStepSet;
         };
-        return workingset;
+
+	AC_TRACE << "scanning step " << (**lastStep) << " with "<<workingset->size()<<" nodes into Set:";
+	NodeSetRef nextStepSet = new NodeSet();
+	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+	    (*lastStep)->scan(*i, *nextStepSet);
+	};
+	delete workingset;
+        return nextStepSet;
     };
 
     void Path::serializeTo(std::ostream &os) {

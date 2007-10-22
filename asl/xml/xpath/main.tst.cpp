@@ -11,7 +11,7 @@ public:
     
     bool search_equals(NodeRef theNode, std::string thePath, NodeSetRef expectedResult)
     {
-	NodeSetRef myResult = xpath_evaluate(thePath, theNode);
+	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = true;
 	if (!std::includes(myResult->begin(), myResult->end(), expectedResult->begin(), expectedResult->end())) {
 	    retval = false;
@@ -34,7 +34,7 @@ public:
 
     bool search_contains(NodeRef theNode, std::string thePath, NodeRef expectedResult)
     {
-	NodeSetRef myResult = xpath_evaluate(thePath, theNode);
+	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = myResult->count(expectedResult);
 	delete myResult;
 	return retval;
@@ -42,7 +42,7 @@ public:
 
     bool search_contains(NodeRef theNode, std::string thePath, NodeSetRef expectedResult)
     {
-	NodeSetRef myResult = xpath_evaluate(thePath, theNode);
+	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = true;
 	if (!includes(expectedResult->begin(), expectedResult->end(), myResult->begin(), myResult->end())) {
 	    retval = false;

@@ -214,8 +214,9 @@ namespace xpath
 	    Step(Axis, NodeTest=TestPrincipalType, string="");
 	    virtual ~Step();
 
-	    // puts results from Node scan into NodeSet
+	    // puts results from from into into
 	    void scan(NodeRef from, NodeSet &into);
+	    void scan(NodeRef from, NodeList &into);
 
 	    virtual void serializeTo(std::ostream &);
 
@@ -235,12 +236,13 @@ namespace xpath
 	    Expression* predicate(int i);
 	    int count() const;
 
+	    std::list<Expression*> predicates;
+
 	private:
 	    Axis axis;
 	    NodeTest test;
 	    string nodeTestName;
 
-	    std::list<Expression*> predicates;
 	};
 
     // this class contains a complete XPath that can
@@ -256,7 +258,13 @@ namespace xpath
 	    virtual ~Path() { for (std::list<Step *>::iterator i = steps.begin(); i != steps.end(); ++i) delete *i; };
 	    NodeSetValue *evaluate(NodeRef);
 
-	    NodeSetRef evaluateAll(NodeSetRef);
+	    template <class T>
+		T evaluateAs(NodeRef input) {
+		NodeSetRef theseNodes = new NodeSet();
+		theseNodes->insert(input);
+		T retval = evaluateAll(theseNodes, (T)NULL);
+		return retval;
+	    }
 
 	    void setAbsolute(bool a=true) { absolute = a; };
 	    bool isAbsolute() { return absolute; };
@@ -273,6 +281,9 @@ namespace xpath
 	    Step *takeLast() { Step *retval = steps.back(); steps.pop_back(); return retval; };
 
 	private:
+	    NodeListRef evaluateAll(NodeSetRef, NodeListRef);
+	    NodeSetRef evaluateAll(NodeSetRef, NodeSetRef);
+
 	    std::list<Step*> steps;
 	    bool absolute;
 	};
