@@ -695,9 +695,8 @@ function removeOverlay(theOverlayNode) {
 
             // Remove material node
             myMaterialNode.parentNode.removeChild(myMaterialNode);
-            print("### WARNING: Remove material node " + theOverlayNode.material);
         } else {
-            print("### WARNING: Could not remove material node " + theOverlayNode.material);
+            Logger.warning("Could not remove material node " + theOverlayNode.material);
         }
     }
 
