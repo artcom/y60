@@ -1413,6 +1413,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
 			*nli++ = thisOne;
 		    }
+		delete workingset;
 		return newResults;
 	    }
         }
@@ -1458,14 +1459,12 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             workingset = newResults;
         }
 
-	assert(steps.begin() != steps.end());
-	std::list<Step*>::iterator lastStep = steps.end();
-	lastStep--;
-        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+	NodeSetRef nextStepSet = workingset;
+        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end(); ++s) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes into Set:";
 #endif
-            NodeSetRef nextStepSet = new NodeSet();
+	    nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
                 (*s)->scan(*i, *nextStepSet);
             };
@@ -1473,12 +1472,6 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             workingset = nextStepSet;
         };
 
-	AC_TRACE << "scanning step " << (**lastStep) << " with "<<workingset->size()<<" nodes into Set:";
-	NodeSetRef nextStepSet = new NodeSet();
-	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-	    (*lastStep)->scan(*i, *nextStepSet);
-	};
-	delete workingset;
         return nextStepSet;
     };
 
