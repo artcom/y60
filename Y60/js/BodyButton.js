@@ -721,7 +721,7 @@ LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protect
                                       [myImageSize.x, myImageSize.y, TEXT_Z_POSITION]);
                                       
         _myTextMaterialInfo = Protected.getTextMaterial();
-        _myTextBodyInfo = Protected.getTextBodyInfo();
+        _myTextBodyInfo = self.getTextBodyInfo();
         
         myImageSize = getImageSize(_myGermanTextMaterialInfo.image);
         _myGermanTextQuad = Modelling.createQuad(window.scene, _myGermanTextMaterialInfo.material.id, 
