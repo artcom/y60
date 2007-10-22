@@ -40,14 +40,14 @@ namespace xpath
 	    std::list<NodeRef>::const_iterator ib = parentsb.begin();
 
 	    while (ia != parentsa.end() && ib != parentsb.end() && (*ia == *ib)) { ++ia; ++ib;};
-	    if (ib == parentsb.end()) {
-		// b is ancestor of a
+	    if (ia == parentsa.end()) {
+		// a is ancestor of b
 		return false;
 	    }
-	    if (ia != parentsa.end()) {
+	    if (ib != parentsb.end()) {
 		// *ia shares a parent with *ib.
-		for(NodeRef tmpNode = *ia; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
-		    if (tmpNode == *ib) {
+		for(NodeRef tmpNode = *ib; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
+		    if (tmpNode == *ia) {
 			return false;
 		    }
 		}
@@ -191,6 +191,8 @@ namespace xpath
       string value;
     };
 
+    // NodeSetValues are unordered by default, i.e.
+    // they are ordered by pointer value.
     class NodeSetValue : public Value
     {
     public:

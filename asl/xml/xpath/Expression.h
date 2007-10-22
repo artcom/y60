@@ -217,6 +217,7 @@ namespace xpath
 	    // puts results from from into into
 	    void scan(NodeRef from, NodeSet &into);
 	    void scan(NodeRef from, NodeList &into);
+	    void scan(NodeRef from, OrderedNodeSet &into);
 
 	    virtual void serializeTo(std::ostream &);
 
@@ -281,8 +282,9 @@ namespace xpath
 	    Step *takeLast() { Step *retval = steps.back(); steps.pop_back(); return retval; };
 
 	private:
-	    NodeListRef evaluateAll(NodeSetRef, NodeListRef);
 	    NodeSetRef evaluateAll(NodeSetRef, NodeSetRef);
+	    OrderedNodeSetRef evaluateAll(NodeSetRef, OrderedNodeSetRef);
+	    NodeListRef evaluateAll(NodeSetRef, NodeListRef);
 
 	    std::list<Step*> steps;
 	    bool absolute;

@@ -1104,6 +1104,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             if (curNode->hasChildNodes()) {
                 for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
                     if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+			AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
                         *resultset++ = curNode;
                     }
                 }
@@ -1173,6 +1176,9 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
                     };
 
                     if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+			AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
 			*resultset++ = curNode;
                     }
                 };
@@ -1330,6 +1336,10 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 	scanStep(this, from, into);
     }
 
+    void Step::scan(NodeRef from, OrderedNodeSet &into) {
+	scanStep(this, from, into);
+    }
+
     void Step::serializeTo(std::ostream & os) {
         os << stringForAxis(axis);
         os << "::";
@@ -1385,7 +1395,8 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
         return new NodeSetValue(evaluateAs<NodeSetRef>(n));
     };
 
-    NodeListRef Path::evaluateAll(NodeSetRef workingset, NodeListRef dummyReturn) {
+    OrderedNodeSetRef Path::evaluateAll(NodeSetRef workingset, OrderedNodeSetRef dummyReturn) {
+
         if (absolute) {
 	    if (steps.begin() == steps.end()) {
 #ifdef INTERPRETER_DEBUG
@@ -1405,13 +1416,12 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
 		AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
 #endif
-		NodeListRef newResults = new NodeList();
-		NodeList::iterator nli = newResults->begin();
+		OrderedNodeSetRef newResults = new OrderedNodeSet();
 		for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
 		    {
 			NodeRef thisOne = *i;
 			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
-			*nli++ = thisOne;
+			newResults->insert(thisOne);
 		    }
 		delete workingset;
 		return newResults;
@@ -1422,7 +1432,7 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 	lastStep--;
         for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
 #ifdef INTERPRETER_DEBUG
-	    AC_TRACE << "scanning intermediate step " << (**s) << " with "<<workingset->size()<<" nodes :";
+	    AC_TRACE << "scanning intermediate step " << (**s) << " with "<<workingset->size()<<" nodes into List:";
 #endif
 	    NodeSetRef nextStepSet = new NodeSet();
 	    for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
@@ -1434,12 +1444,22 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
 	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
 #endif
-	NodeListRef nextStepSet = new NodeList();
+	OrderedNodeSetRef finalResult = new OrderedNodeSet();
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-	    (*lastStep)->scan(*i, *nextStepSet);
+	    (*lastStep)->scan(*i, *finalResult);
 	};
-	return nextStepSet;
+
+	return finalResult;
     };
+
+    NodeListRef Path::evaluateAll(NodeSetRef workingset, NodeListRef dummyReturn) {
+	NodeListRef finalResult = new NodeList();
+
+	OrderedNodeSetRef nextStepSet = evaluateAll(workingset, (OrderedNodeSetRef) NULL);
+	copy(nextStepSet->begin(), nextStepSet->end(), std::inserter(*finalResult, finalResult->end()));
+	delete nextStepSet;
+	return finalResult;
+    }
 
     NodeSetRef Path::evaluateAll(NodeSetRef workingset, NodeSetRef dummyReturn) {
         if (absolute) {
