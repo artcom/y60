@@ -192,7 +192,9 @@ namespace xpath
     };
 
     // NodeSetValues are unordered by default, i.e.
-    // they are ordered by pointer value.
+    // they contain a NodeSetRef which is ordered by pointer value.
+    // this provides for fast insertion and lookup.
+    //
     class NodeSetValue : public Value
     {
     public:
@@ -202,7 +204,6 @@ namespace xpath
         virtual ~NodeSetValue() { delete _myNodes; }
 
         NodeSetRef takeNodes() { NodeSetRef retval = _myNodes; _myNodes = NULL; return retval; };
-        NodeListRef toNodeList() { NodeListRef retval = new NodeList(); for (NodeSet::iterator i = _myNodes->begin(); i != _myNodes->end(); ++i) { retval->insert(retval->end(), *i); }; return retval; };
 
         virtual BooleanValue *toBoolean() { if (!_myNodes) return new BooleanValue(false); return new BooleanValue( _myNodes->size()!=0 ); };
         virtual NumberValue *toNumber();

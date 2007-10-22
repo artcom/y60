@@ -1392,13 +1392,25 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
     };
 
     NodeSetValue *Path::evaluate(NodeRef n) {
-        return new NodeSetValue(evaluateAs<NodeSetRef>(n));
+        return new NodeSetValue(evaluateAs<NodeSet>(n));
     };
 
-    OrderedNodeSetRef Path::evaluateAll(NodeSetRef workingset, OrderedNodeSetRef dummyReturn) {
+    void Path::evaluateInto(NodeSetRef workingset, OrderedNodeSet &returnContainer) {
 
         if (absolute) {
 	    if (steps.begin() == steps.end()) {
+#ifdef INTERPRETER_DEBUG
+		AC_TRACE<<"abolute path with no steps. going up to document from... " << workingset->size() << " nodes.";
+#endif
+		for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
+		    {
+			NodeRef thisOne = *i;
+			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+			returnContainer.insert(thisOne);
+		    }
+		delete workingset;
+		return;
+	    } else {
 #ifdef INTERPRETER_DEBUG
 		AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
 #endif
@@ -1412,19 +1424,6 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 		    }
 		delete workingset;
 		workingset = newResults;
-	    } else {
-#ifdef INTERPRETER_DEBUG
-		AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
-#endif
-		OrderedNodeSetRef newResults = new OrderedNodeSet();
-		for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
-		    {
-			NodeRef thisOne = *i;
-			while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
-			newResults->insert(thisOne);
-		    }
-		delete workingset;
-		return newResults;
 	    }
         }
 
@@ -1446,22 +1445,22 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
 	OrderedNodeSetRef finalResult = new OrderedNodeSet();
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-	    (*lastStep)->scan(*i, *finalResult);
+	    (*lastStep)->scan(*i, returnContainer);
 	};
-
-	return finalResult;
     };
 
-    NodeListRef Path::evaluateAll(NodeSetRef workingset, NodeListRef dummyReturn) {
-	NodeListRef finalResult = new NodeList();
+    void Path::evaluateInto(NodeSetRef workingset, NodeList &returnContainer) {
 
-	OrderedNodeSetRef nextStepSet = evaluateAll(workingset, (OrderedNodeSetRef) NULL);
-	copy(nextStepSet->begin(), nextStepSet->end(), std::inserter(*finalResult, finalResult->end()));
-	delete nextStepSet;
-	return finalResult;
+	// avoid duplicates in intermediate results
+	OrderedNodeSetRef lastStepSet = new OrderedNodeSet();
+	evaluateInto(workingset, *lastStepSet);
+
+	// but allow them in returnContainer
+	copy(lastStepSet->begin(), lastStepSet->end(), std::inserter(returnContainer, returnContainer.end()));
+	delete lastStepSet;
     }
 
-    NodeSetRef Path::evaluateAll(NodeSetRef workingset, NodeSetRef dummyReturn) {
+    void Path::evaluateInto(NodeSetRef workingset, NodeSet &returnContainer) {
         if (absolute) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
@@ -1479,20 +1478,26 @@ return (read_if_string(instring, pos, X) != pos) ? yes : no;
             workingset = newResults;
         }
 
-	NodeSetRef nextStepSet = workingset;
-        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end(); ++s) {
+	std::list<Step*>::iterator lastStep = steps.end();
+	lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
 #ifdef INTERPRETER_DEBUG
             AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes into Set:";
 #endif
-	    nextStepSet = new NodeSet();
+	    NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
                 (*s)->scan(*i, *nextStepSet);
             };
             delete workingset;
             workingset = nextStepSet;
         };
-
-        return nextStepSet;
+#ifdef INTERPRETER_DEBUG
+	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+	OrderedNodeSetRef finalResult = new OrderedNodeSet();
+	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+	    (*lastStep)->scan(*i, returnContainer);
+	};
     };
 
     void Path::serializeTo(std::ostream &os) {

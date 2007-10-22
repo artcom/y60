@@ -260,10 +260,11 @@ namespace xpath
 	    NodeSetValue *evaluate(NodeRef);
 
 	    template <class T>
-		T evaluateAs(NodeRef input) {
+		T *evaluateAs(NodeRef input) {
 		NodeSetRef theseNodes = new NodeSet();
 		theseNodes->insert(input);
-		T retval = evaluateAll(theseNodes, (T)NULL);
+		T *retval = new T;
+		evaluateInto(theseNodes, *retval);
 		return retval;
 	    }
 
@@ -282,9 +283,9 @@ namespace xpath
 	    Step *takeLast() { Step *retval = steps.back(); steps.pop_back(); return retval; };
 
 	private:
-	    NodeSetRef evaluateAll(NodeSetRef, NodeSetRef);
-	    OrderedNodeSetRef evaluateAll(NodeSetRef, OrderedNodeSetRef);
-	    NodeListRef evaluateAll(NodeSetRef, NodeListRef);
+	    void evaluateInto(NodeSetRef, NodeSet &);
+	    void evaluateInto(NodeSetRef, OrderedNodeSet &);
+	    void evaluateInto(NodeSetRef, NodeList &);
 
 	    std::list<Step*> steps;
 	    bool absolute;
