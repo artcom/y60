@@ -662,6 +662,80 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
     } HANDLE_CPP_EXCEPTION;
 }
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreatePhongMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Create a phong lit textured material");
+        DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
+        DOC_PARAM("thePhongProperties", "JSObject with properties: ambientColor, diffuseColor, emissiveColor, specularColor, shininess", DOC_TYPE_BOOLEAN); // TODO: fix type and default
+        DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "PhongMaterial");
+        DOC_PARAM_OPT("theTransparencyFlag", "is the material transparent", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
+        DOC_RVAL("The new created material", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 2, 5);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        dom::NodePtr myResult;
+
+        // parse phong props
+        y60::PhongProperties myPhongProps;
+        if ( JSVAL_IS_OBJECT( argv[1] )) {
+            JSObject * myProps;
+            if (JS_ValueToObject(cx, argv[1], & myProps )) {
+                jsval myValue;
+                JS_GetProperty(cx, myProps, "ambientColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.ambientColor );
+                JS_GetProperty(cx, myProps, "diffuseColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.diffuseColor );
+                JS_GetProperty(cx, myProps, "emissiveColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.emissiveColor );
+                JS_GetProperty(cx, myProps, "specularColor", & myValue);
+                convertFrom(cx, myValue, myPhongProps.specularColor );
+                JS_GetProperty(cx, myProps, "shininess", & myValue);
+                convertFrom(cx, myValue, myPhongProps.shininess );
+            } else {
+                // KAPUTT
+            }
+        } else {
+            // KAPUTT
+        }
+
+        string myName;
+        if (argc > 2) {
+            if ( ! convertFrom(cx, argv[2], myName)) {
+                myName = "PhongMaterial";
+            }
+        }
+        
+        bool myTransparencyFlag;
+        if (argc > 3) {
+            convertFrom(cx, argv[3], myTransparencyFlag);
+        }
+        bool mySpriteFlag;
+        if (argc > 4) {
+            convertFrom(cx, argv[4], mySpriteFlag);
+        }
+        switch (argc) {
+            case 2:
+            case 3:
+                myResult = createPhongMaterial(myScene, myName, myPhongProps);
+                break;
+            case 4:
+                myResult = createPhongMaterial(myScene, myName, myPhongProps, myTransparencyFlag);
+                break;
+            case 5:
+                myResult = createPhongMaterial(myScene, myName, myPhongProps, myTransparencyFlag, mySpriteFlag);
+                break;
+        }
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
@@ -1036,6 +1110,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createColorMaterial",         CreateColorMaterial,         3},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {"createPhongTexturedMaterial", CreatePhongTexturedMaterial, 7},
+        {"createPhongMaterial",         CreatePhongMaterial,         5},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {"setAlpha",                    SetAlpha,                    2},
         {0}

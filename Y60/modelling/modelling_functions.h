@@ -35,6 +35,12 @@ struct PhongProperties {
     float shininess;
 };
 
+dom::NodePtr createPhongMaterial(ScenePtr theScene,
+                                const std::string & theName,
+                                const PhongProperties & thePhongProperties,
+                                bool theTransparencyFlag = false,
+                                bool theSpriteFlag = false);
+
 dom::NodePtr createPhongTexturedMaterial(ScenePtr theScene,
                                 const std::string & theTextureFilename,
                                 const std::string & theName,

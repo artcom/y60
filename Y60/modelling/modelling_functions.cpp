@@ -697,11 +697,25 @@ namespace y60 {
 
         appendPhongProperties(myMaterialBuilder, thePhongProperties);
         appendBlendFunction(myMaterialBuilder);
-        if ( ! theTextureFilename.empty() ) {
+ //       if ( ! theTextureFilename.empty() ) {
             appendTexture(theScene, myMaterialBuilder, theTextureFilename,
                           theSpriteFlag, theDepth);
-        }
+//        }
 
+        myMaterialBuilder.computeRequirements();
+        return myMaterialBuilder.getNode();
+    }
+
+    dom::NodePtr
+    createPhongMaterial(ScenePtr theScene,
+                                const std::string & theName, const PhongProperties & thePhongProperties,
+                                bool theTransparencyFlag, bool theSpriteFlag)
+    {
+        MaterialBuilder myMaterialBuilder(theName, false);
+        string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
+        appendPhongProperties(myMaterialBuilder, thePhongProperties);
+        appendBlendFunction(myMaterialBuilder);
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
     }
