@@ -14,7 +14,7 @@
 
 #include "Algorithm.h"
 #include <y60/Overlay.h>
-#include "ConnectedComponent.h"
+#include <y60/ConnectedComponent.h>
 
 namespace y60 {
 
