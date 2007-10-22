@@ -57,40 +57,6 @@ namespace xpath
         rvalue = _rvalue;
     };
 
-    /*
-    std::binary_function<const NodeRef, double, bool> getOpFor(BinaryExpression::ExpressionType type)
-    {
-	switch(type) {
-	    
-	case BinaryExpression::Less:
-	    return NumberLess();
-	    break;
-
-	case BinaryExpression::GEqual:
-	    return std::not1(NumberLess());
-	    break;
-
-
-	case BinaryExpression::Equal:
-	    return std::equal_to<T>();
-	    break;
-	case BinaryExpression::NotEqual:
-	    return std::not_equal_to<T>();
-	    break;
-	case BinaryExpression::Greater:
-	    return std::greater<T>();
-	    break;
-	case BinaryExpression::LEqual:
-	    return std::less_equal<T>();
-	    break;
-	case BinaryExpression::GEqual:
-	    return std::greater_equal<T>();
-	    break;
-	default:
-	    return std::less<T>();
-	}
-    }
-    */
     Value *BinaryExpression::evaluateExpression(const Context &c)
     {
         assert(lvalue);
