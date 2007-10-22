@@ -753,6 +753,52 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 
 static JSBool
 xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Follows an XPath specified in the argument.");
+    DOC_PARAM("theXPath", "an XPath expression leading to the desired Node", DOC_TYPE_STRING);
+    DOC_RVAL("the first matching node", DOC_TYPE_ARRAY);
+    DOC_END;
+    std::string myPathString;
+    dom::NodePtr myNode;
+    bool myDeepSearchFlag = true;    
+
+    if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
+	JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
+    }
+
+    std::vector<dom::NodePtr> myResults;
+    if (argc < 1) {
+         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+    } else if (argc > 1) {
+         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+    }
+
+    if (!convertFrom(cx, argv[0], myPathString)) {
+         JS_ReportError(cx,"JSNode::find: argument is not a string.");
+    };                        
+
+    xpath::Path *myPath = xpath::xpath_parse(myPathString);
+
+    if (!myPath) {
+         JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
+	 return JS_FALSE;
+    } else {
+	 
+         dom::Node *res = xpath::xpath_evaluate1(myPath, &*myNode);
+	 if (res) {
+	     dom::NodePtr resPtr = res->self().lock();
+	     *rval = as_jsval(cx, resPtr);
+	     xpath::xpath_return(myPath);
+	     return JS_TRUE;
+	 } else {
+	     JS_ReportError(cx, "JSNode::find: no nodes found under %s", myPathString.c_str());
+	     xpath::xpath_return(myPath);
+	     return JS_FALSE;
+	 }
+    }
+}
+
+static JSBool
+xpath_findAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Follows an XPath specified in the argument, returns an array of matching nodes.");
     DOC_PARAM("theXPath", "", DOC_TYPE_STRING);
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
@@ -864,6 +910,7 @@ JSNode::Functions() {
         {"getNodesByAttribute", getNodesByAttribute, 3},
         {"getNodesByTagName",   getNodesByTagName,   1},
         {"find",                xpath_find,          1},
+        {"findAll",             xpath_findAll,       1},
         {"getAttribute",        getAttribute,        1},
         {"addEventListener",    addEventListener,    3},
         {"removeEventListener", removeEventListener, 3},
