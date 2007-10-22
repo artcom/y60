@@ -16,6 +16,8 @@
 //
 //=============================================================================
 
+use("Y60JSSL.js");
+
 function Configurator(theSceneViewer, theSettingsFile) {
     this.Constructor(this, theSceneViewer, theSettingsFile);
 }       
@@ -64,7 +66,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             mySetting = mySection.appendChild(Node.createElement(theSetting));
         }
 
-        mySetting.firstChild.nodeValue = theValue;
+        mySetting.firstChild.nodeValue = theValue;projects.xls
 
         if (theHostFlag) {
             mySetting.override = "hostname";
@@ -119,7 +121,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 // Remove the override attribute
                 var myHostSection = myHostSettings.childNode(i);
                 var myHostSetting = myHostSection.childNode(j);
-                myHostSetting     = removeAttributeByName(myHostSetting, "override");
+                myHostSetting     = removeAttributeByName(myHostSetting, "ovprojects.xlserride");
 
                 if (mySettingOverride == "hostname") {
                     var myOldCommonSection = myCommonSettings.childNode(mySection.nodeName);
