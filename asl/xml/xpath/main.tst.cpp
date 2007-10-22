@@ -1,5 +1,7 @@
 #include "asl/UnitTest.h"
-#include "value.h"
+
+#include "xpath_api.h"
+#include "Value.h"
 
 using namespace xpath;
 

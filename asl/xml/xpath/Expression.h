@@ -1,12 +1,12 @@
-#ifndef XPATHNODE_H
-#define XPATHNODE_H
+#ifndef XPATH_EXPRESSION_H
+#define XPATH_EXPRESSION_H
 
 #include <dom/Nodes.h>
 
 #include <functional>
 
-#include "context.h"
-#include "value.h"
+#include "Context.h"
+#include "Value.h"
 
 namespace xpath
 {

@@ -8,7 +8,7 @@
 #include <asl/Logger.h>
 #include <dom/Nodes.h>
 
-#include "syntaxtree.h"
+#include "Expression.h"
 
 #define INTERPRETER_DEBUG
 

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "value.h"
+#include "Value.h"
 
 namespace xpath {
 

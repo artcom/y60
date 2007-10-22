@@ -1,7 +1,7 @@
-#ifndef VALUE_H
-#define VALUE_H
+#ifndef XPATH_VALUE_H
+#define XPATH_VALUE_H
 
-#include "parser.h"
+//#include "xpath_api.h"
 
 #include <dom/Nodes.h>
 

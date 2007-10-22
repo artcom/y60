@@ -1,5 +1,5 @@
-#ifndef XPATH_PARSER_H
-#define XPATH_PARSER_H
+#ifndef XPATH_API_H
+#define XPATH_API_H
 
 #include <stdlib.h>
 #include <dom/Nodes.h>
