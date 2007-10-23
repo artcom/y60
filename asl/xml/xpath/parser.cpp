@@ -41,12 +41,12 @@ namespace xpath {
 	if (instring[pos] == '(') {
 	    pos++;
 	    if ((nw_pos = parseExpression(e, instring, pos)) != pos) {
-		pos = asl::read_whitespace(instring, nw_pos);
-		if (instring[pos] == ')') {
-		    return pos+1;
+		nw_pos = asl::read_whitespace(instring, nw_pos);
+		if (instring[nw_pos++] == ')') {
+		    return nw_pos;
 		}
 	    }
-	    AC_WARNING << "parse error at " << instring.substr(nw_pos) << " at " __FILE__ ":" << __LINE__;
+	    AC_WARNING << "parse error at " << instring.substr(nw_pos-1) << " at " __FILE__ ":" << __LINE__;
 	    return pos;
 	} else if ((instring[pos] == '\"') || (instring[pos] == '\'')) {
 	    if ((nw_pos = asl::read_quoted_text(instring, pos, instring[pos], instring[pos])) != pos) {
@@ -74,30 +74,28 @@ namespace xpath {
 	    return nw_pos;
 	} else if ((ft = Function::typeOf(instring, pos)) != Function::Unknown) {
 	    std::list<Expression*> *arglist = new std::list<Expression*>();
-	    pos = asl::read_if_string(instring, pos, Function::nameOf(ft));
-	    pos = asl::read_whitespace(instring, pos);
-	    if (instring[pos++] == '(') {
+	    nw_pos = asl::read_if_string(instring, pos, Function::nameOf(ft));
+	    nw_pos = asl::read_whitespace(instring, nw_pos);
+	    if (instring[nw_pos++] == '(') {
 		// function arguments
-		pos = parseArgumentList(arglist, instring, pos);
+		nw_pos = parseArgumentList(arglist, instring, nw_pos);
 		*e = new Function(ft, arglist);
-		return pos;
+		return nw_pos;
 	    }
-	    AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
-	    return pos;
-	} else {
-	    Path *p = new Path();
-	    nw_pos = parseRelativePath(p, instring, pos);
-	    if (nw_pos != pos) {
-		pos = nw_pos;
-		*e = p;
-	    } else {
-		// ### parse error / not a primary expression
-#if PARSER_DEBUG_VERBOSITY > 1
-		AC_TRACE << "no expression at " << instring.substr(pos);
-#endif
-	    }
-	    return pos;
 	}
+
+	Path *p = new Path();
+	nw_pos = parseRelativePath(p, instring, pos);
+	if (nw_pos != pos) {
+	    pos = nw_pos;
+	    *e = p;
+	} else {
+	    // ### parse error / not a primary expression
+#if PARSER_DEBUG_VERBOSITY > 1
+	    AC_TRACE << "no expression at " << instring.substr(pos);
+#endif
+	}
+	return pos;
     }
 
     int parseUnionExpression(Expression **e, const std::string &instring, int pos) {
