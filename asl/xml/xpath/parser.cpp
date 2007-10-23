@@ -241,16 +241,19 @@ namespace xpath {
 #endif
 	}
 	pos = asl::read_whitespace(instring, pos);
+	BinaryExpression::ExpressionType op;
 	if (instring[pos] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
 #endif
+	    op = BinaryExpression::Equal;
 	    pos++;
 	    pos = asl::read_whitespace(instring, pos);
 	} else if (instring[pos] == '!' && instring[pos+1] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
 #endif
+	    op = BinaryExpression::NotEqual;
 	    pos+=2;
 	    pos = asl::read_whitespace(instring, pos);
 	} else {
@@ -262,7 +265,7 @@ namespace xpath {
 
 	Expression *secondE;
 	pos = parseEqualityExpression(&secondE, instring, pos);
-	*e = new BinaryExpression(BinaryExpression::Equal, *e, secondE);
+	*e = new BinaryExpression(op, *e, secondE);
 #if PARSER_DEBUG_VERBOSITY > 1
 	AC_TRACE << "created equality expression " << **e;
 #endif

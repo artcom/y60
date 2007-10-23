@@ -149,10 +149,17 @@ public:
 	OrderedNodeSetRef numbers3 = xpath_evaluateOrderedSet("//numbers[number >= 7]", &doc);
 	ENSURE(equals(numbers, numbers3));
 
-	// find an element named "numbers", which has a child node named "number"
-	// whose numeric value is greater than 7.
 	OrderedNodeSetRef numbers4 = xpath_evaluateOrderedSet("//numbers[number >= 11]", &doc);
 	ENSURE(numbers4->size() == 0);
+
+	OrderedNodeSetRef numbers5 = xpath_evaluateOrderedSet("//numbers[number != 11]", &doc);
+	ENSURE(equals(numbers, numbers5));
+
+	OrderedNodeSetRef numbers6 = xpath_evaluateOrderedSet("//numbers[number != 1]", &doc);
+	ENSURE(equals(numbers, numbers6));
+
+	OrderedNodeSetRef numbers7 = xpath_evaluateOrderedSet("//numbers[number = 1]", &doc);
+	ENSURE(equals(numbers, numbers7));
 
 	/*
 	  memleak test
