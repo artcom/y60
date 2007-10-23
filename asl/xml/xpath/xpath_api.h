@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <dom/Nodes.h>
 
+#include "Types.h"
+
 namespace xpath {
 
     class Path;
@@ -19,6 +21,9 @@ namespace xpath {
     void xpath_evaluate(std::string, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
 
     dom::Node *xpath_evaluate1(Path *, dom::Node *);
+
+    OrderedNodeSetRef xpath_evaluateOrderedSet(Path *, dom::Node *);
+    OrderedNodeSetRef xpath_evaluateOrderedSet(std::string, dom::Node *);
 
     std::set<dom::Node *> *xpath_evaluateSet(Path *, dom::Node *);
     std::set<dom::Node *> *xpath_evaluateSet(std::string, dom::Node *);

@@ -9,30 +9,39 @@ class xpath_UnitTest : public UnitTest {
 public:
     xpath_UnitTest() : UnitTest("xpath_UnitTest") {  }
     
-    bool search_equals(NodeRef theNode, std::string thePath, NodeSetRef expectedResult)
+    bool equals(OrderedNodeSetRef the, OrderedNodeSetRef same)
     {
-	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = true;
-	if (!std::includes(myResult->begin(), myResult->end(), expectedResult->begin(), expectedResult->end())) {
+	if (!includes(the->begin(), the->end(), same->begin(), same->end())) {
 	    retval = false;
 	}
-	if (!std::includes(expectedResult->begin(), expectedResult->end(), myResult->begin(), myResult->end())) {
+	if (!includes(same->begin(), same->end(), the->begin(), the->end())) {
+	    retval = false;
+	}
+	return retval;
+    }
+
+    bool equals(NodeRef theNode, std::string thePath, OrderedNodeSetRef expectedResult)
+    {
+	OrderedNodeSetRef myResult = xpath_evaluateOrderedSet(thePath, theNode);
+	bool retval = true;
+	if (!equals(myResult, expectedResult)) {
 	    retval = false;
 	}
 	delete myResult;
 	return retval;
     }
 
-    bool search_equals(NodeRef theNode, std::string thePath, NodeRef expectedResult)
+    bool equals(NodeRef theNode, std::string thePath, NodeRef expectedResult)
     {
-	NodeSetRef expectedResultSet = new NodeSet();
+	OrderedNodeSetRef expectedResultSet = new OrderedNodeSet();
 	expectedResultSet->insert(expectedResult);
-	bool retval = search_equals(theNode, thePath, expectedResultSet);
+	bool retval = equals(theNode, thePath, expectedResultSet);
 	delete expectedResultSet;
 	return retval;
     }
 
-    bool search_contains(NodeRef theNode, std::string thePath, NodeRef expectedResult)
+    bool contains(NodeRef theNode, std::string thePath, NodeRef expectedResult)
     {
 	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = myResult->count(expectedResult);
@@ -40,7 +49,7 @@ public:
 	return retval;
     }
 
-    bool search_contains(NodeRef theNode, std::string thePath, NodeSetRef expectedResult)
+    bool contains(NodeRef theNode, std::string thePath, NodeSetRef expectedResult)
     {
 	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
 	bool retval = true;
@@ -48,6 +57,15 @@ public:
 	    retval = false;
 	}
 	delete myResult;
+	return retval;
+    }
+
+    bool contains(NodeSetRef larger, NodeSetRef smaller)
+    {
+	bool retval = true;
+	if (!includes(larger->begin(), larger->end(), smaller->begin(), smaller->end())) {
+	    retval = false;
+	}
 	return retval;
     }
 
@@ -79,23 +97,33 @@ public:
 	    std::cout << "parsed document:\n" << doc;
 	}
 
-	ENSURE(search_equals(&doc, "testDoc", &*doc.childNode(0)));
+	ENSURE(equals(&doc, "testDoc", &*doc.childNode(0)));
 
 	// test:  "\"]" is not a valid path ->expect empty parse result.
 
 	ENSURE(!parses("\"]"));
 
-	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)));
-	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)));
+	ENSURE(contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)));
+	ENSURE(contains(&doc, "/testDoc//junk[@content = \"valuable\"]", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)));
 
-	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)->childNode(0)));
+	ENSURE(contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)->childNode(0)));
 
-	std::vector<dom::Node *> *numbers = xpath_evaluate("//numbers/number", &doc);
-	ENSURE(numbers->size() == 10);
+	OrderedNodeSetRef numbers = xpath_evaluateOrderedSet("//numbers", &doc);
+	ENSURE(numbers->size() == 1);
+	OrderedNodeSetRef numberList = xpath_evaluateOrderedSet("//numbers/number", &doc);
+	ENSURE(numberList->size() == 10);
 
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
-        std::vector<dom::Node *> *number1 = xpath_evaluate("//number[self::node() = ../number[1]]", &doc);
+        OrderedNodeSetRef number1 = xpath_evaluateOrderedSet("//number[self::node() = ../number[1]]", &doc);
 	ENSURE(number1->size() == 1);
+
+	AC_WARNING << "Now doing the real stuff:";
+
+        OrderedNodeSetRef number1_2 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[1]]", *numbers->begin());
+	ENSURE(equals(number1, number1_2));
+
+        OrderedNodeSetRef number1_3 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[position() = ( 4 - 3 ) ] ]", *numbers->begin());
+	ENSURE(equals(number1, number1_3));
 
 	// nodeset-number comparison
 	//
@@ -114,6 +142,7 @@ public:
 	  }
 	*/
         delete numbers;
+        delete numberList;
     }
 };
 

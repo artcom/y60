@@ -41,11 +41,12 @@ namespace xpath {
 	if (instring[pos] == '(') {
 	    pos++;
 	    if ((nw_pos = parseExpression(e, instring, pos)) != pos) {
-		if (instring[nw_pos+1] == ')') {
-		    return nw_pos+1;
+		pos = asl::read_whitespace(instring, nw_pos);
+		if (instring[pos] == ')') {
+		    return pos+1;
 		}
 	    }
-	    AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
+	    AC_WARNING << "parse error at " << instring.substr(nw_pos) << " at " __FILE__ ":" << __LINE__;
 	    return pos;
 	} else if ((instring[pos] == '\"') || (instring[pos] == '\'')) {
 	    if ((nw_pos = asl::read_quoted_text(instring, pos, instring[pos], instring[pos])) != pos) {
@@ -91,7 +92,9 @@ namespace xpath {
 		*e = p;
 	    } else {
 		// ### parse error / not a primary expression
-		AC_WARNING << "parse error at " __FILE__ ":" << __LINE__;
+#if PARSER_DEBUG_VERBOSITY > 1
+		AC_TRACE << "no expression at " << instring.substr(pos);
+#endif
 	    }
 	    return pos;
 	}
@@ -253,6 +256,9 @@ namespace xpath {
 	    pos+=2;
 	    pos = asl::read_whitespace(instring, pos);
 	} else {
+#if PARSER_DEBUG_VERBOSITY > 1
+	    AC_TRACE << "couldn't parse EqualityExpression at " << instring.substr(pos);
+#endif
 	    return pos;
 	}
 

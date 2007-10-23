@@ -90,6 +90,31 @@ namespace xpath {
 	}
     }
 
+    std::set<dom::Node *> *xpath_evaluateSet(xpath::Path *myPath, dom::Node *theNode) {
+
+	NodeSetValue *retValue = myPath->evaluate(theNode);
+	NodeSetRef retval = retValue->takeNodes();
+#ifdef DEBUG_RESULTS
+	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+
+            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+		try {
+		    AC_TRACE << " * " << (*i)->nodeName() << " "
+                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+		    if ((*i)->nodeType() == dom::Node::ELEMENT_NODE) {
+			for (int j = 0; j < (*i)->attributesLength(); j++) {
+			    AC_TRACE << "   " << (*i)->getAttribute(j)->nodeName() << "=" << (*i)->getAttribute(j)->nodeValue();
+			}
+		    }
+		} catch(asl::Exception &e) {
+		    AC_TRACE << " oops...";
+		}
+	    }
+#endif
+	delete retValue;
+	return retval;
+    }
+
     std::set<dom::Node *> *xpath_evaluateSet(std::string path, dom::Node *theNode) {
         xpath::Path *myPath = xpath_parse(path);
 
@@ -97,20 +122,45 @@ namespace xpath {
             AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
-	    NodeSetValue *retValue = myPath->evaluate(theNode);
-	    NodeSetRef retval = retValue->takeNodes();
-	    delete retValue;
+	    NodeSetRef retval = xpath_evaluateSet(myPath, theNode);
             delete myPath;
             return retval;
 	}
     }
 
-    std::set<dom::Node *> *xpath_evaluateSet(xpath::Path *myPath, dom::Node *theNode) {
+    OrderedNodeSetRef xpath_evaluateOrderedSet(xpath::Path *myPath, dom::Node *theNode) {
+        OrderedNodeSetRef retval = myPath->evaluateAs<OrderedNodeSet>(theNode);
+#ifdef DEBUG_RESULTS
+        AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
 
-	NodeSetValue *retValue = myPath->evaluate(theNode);
-	NodeSetRef retval = retValue->takeNodes();
-	delete retValue;
-	return retval;
+        for (OrderedNodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+            try {
+                AC_TRACE << " * " << (*i)->nodeName() << " "
+                         << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+                if ((*i)->nodeType() == dom::Node::ELEMENT_NODE) {
+                    for (int j = 0; j < (*i)->attributesLength(); j++) {
+                        AC_TRACE << "   " << (*i)->getAttribute(j)->nodeName() << "=" << (*i)->getAttribute(j)->nodeValue();
+                    }
+                }
+            } catch(asl::Exception &e) {
+                AC_TRACE << " oops...";
+            }
+        }
+#endif
+        return retval;
+    }
+
+    OrderedNodeSetRef xpath_evaluateOrderedSet(std::string path, dom::Node *theNode) {
+        xpath::Path *myPath = xpath_parse(path);
+
+        if (!myPath) {
+            AC_ERROR << "XPath parse error.";
+            return NULL;
+        } else {
+	    OrderedNodeSetRef retval = xpath_evaluateOrderedSet(myPath, theNode);
+            delete myPath;
+            return retval;
+	}
     }
 
     void xpath_return(Path *p) {

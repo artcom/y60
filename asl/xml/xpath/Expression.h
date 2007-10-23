@@ -53,8 +53,10 @@ namespace xpath
         class BinaryExpression : public Expression
 	{
 	public:
-	    enum ExpressionType { Equal, NotEqual, Less, Greater, LEqual, GEqual, 
-				  Or = 16, And, Plus = 32, Minus, Times, Div, Mod };
+	    enum ExpressionType { Equal, NotEqual, 
+				  Less=4, Greater, LEqual, GEqual, 
+				  Or = 16, And,
+				  Plus = 32, Minus, Times, Div, Mod };
 
 	    BinaryExpression(ExpressionType, Expression *, Expression *);
 	    virtual ~BinaryExpression() { if (lvalue) delete lvalue; if (rvalue) delete rvalue; };

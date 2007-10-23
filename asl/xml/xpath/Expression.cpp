@@ -207,15 +207,22 @@ namespace xpath
                 delete nsr1; delete nsr2;
 		return new BooleanValue(retval);		
 	    }
-            else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
+	else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
             {
-                // one nodeset, one other type
+                // comparison of one nodeset with one other type
+
                 if (left->type()==Value::StringType || right->type()==Value::StringType)
                 {
+		    const int TRUTHVALUES_LEFT[] = { 1<<NotEqual | 1<<Less | 1<<LEqual,
+						     1<<Equal | 1<<LEqual | 1 <<GEqual,
+						     1<<NotEqual | 1<<Greater | 1 <<GEqual };
+		    const int TRUTHVALUES_RIGHT[] = { TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0] };
+
                     // one nodeset, one string: find one node whose string-value compares positive to the string
                     NodeSetValue *nsv;
                     StringValue *sv;
                     bool stringleft;
+		    const int *truthTable;
                     if (left->type()==Value::StringType)
                     {
                         // WARNING: toNodeSet() invalidates right.
@@ -224,7 +231,7 @@ namespace xpath
 			// see the "delete right" below.
                         nsv = right->toNodeSet();
                         sv = left->toString();
-                        stringleft = true;
+                        truthTable = TRUTHVALUES_LEFT;
                     }
                     else
                     {
@@ -234,25 +241,30 @@ namespace xpath
 			// see the "delete left" below.
                         nsv = left->toNodeSet();
                         sv = right->toString();
-                        stringleft = false;
+			truthTable = TRUTHVALUES_RIGHT;
                     };
 
                     delete left;
                     delete right;
                     bool retval = false;
-                    for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i)
-                    {
-                        string curstr = string_value_for(*i);
-                        if (((type==Equal || type==LEqual || type == GEqual) && curstr == sv->getValue()) || (((type == Less || type == LEqual) == !stringleft) && (curstr < sv->getValue())) || (((type == Greater || type == GEqual) == !stringleft) && (curstr > sv->getValue())))
-                        {
-                            retval = true;
-                            break;
-                        }
-                    };
+#ifdef INTERPRETER_DEBUG
+		    AC_INFO << " string - nodeset comparison "<< *this<<" of type " << type << " with value " << sv->getValue();
+#endif
 
+                    for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
+			string curstr = string_value_for(*i);
+			AC_INFO << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\"";
+			int cmp = curstr.compare(sv->getValue());
+			
+			if (truthTable[cmp+1]&(1<<type)) {
+			    retval = true;
+			    break;
+			}
+                    };
+		    
 #ifdef INTERPRETER_DEBUG
                     if (retval) {
-                        AC_TRACE << "string - nodeset comparison succeeded in expression: " << *this;
+			AC_TRACE <<" succeeded for string "<< sv->getValue();
                     }
 #endif
                     delete sv; delete nsv;
@@ -394,15 +406,15 @@ namespace xpath
             switch(type)
             {
             case Plus:
-                return new NumberValue(rn + ln);
+                return new NumberValue(ln + rn);
             case Minus:
-                return new NumberValue(rn - ln);
+                return new NumberValue(ln - rn);
             case Times:
-                return new NumberValue(rn * ln);
+                return new NumberValue(ln * rn);
             case Div:
-                return new NumberValue(rn / ln);
+                return new NumberValue(ln / rn);
             case Mod:
-                return new NumberValue(rn - ln * floor(rn / ln));
+                return new NumberValue(ln - rn * floor(ln / rn));
             default:
 		// should not happen.
                 AC_ERROR << "Not yet implemented.";
@@ -704,6 +716,7 @@ namespace xpath
                 assert(firstExpr);
 
                 if (!secondExpr) {
+		    AC_TRACE << "substring expression: second argument is not a number.";
                     return new NullValue();
                 }
 
@@ -728,16 +741,22 @@ namespace xpath
                     delete third;
                 }
 
-                int secondNumberValue = int(secondNumber->getValue()+0.5);
+                int secondNumberValue = int(secondNumber->getValue()+0.5) - 1;
+		if (secondNumberValue < 0) {
+		    AC_WARNING << "substring: round(secondNumberValue->getValue()+0.5) = " << secondNumberValue+1 << "is less than 1!";
+		    secondNumberValue = 0;
+		}
 
                 int resultlength;
-                // +1 for the terminating null character, +1 for secondNumber starting at 1
+		AC_TRACE << "substring: complete string is \"" << firstString->getValue() << "\"";
                 resultlength = firstString->getValue().length() - secondNumberValue;
 
                 // +1 for the terminating null character
                 if (thirdNumber && thirdNumber->getValue() + 1 < resultlength) {
                     resultlength = int(thirdNumber->getValue()+0.5) + 1;
                 }
+
+		AC_TRACE << "substring: length = " << resultlength;
 
                 string result = firstString->getValue().substr(secondNumberValue, resultlength);
 
@@ -747,6 +766,7 @@ namespace xpath
                     delete thirdNumber;
                 }
 
+		AC_TRACE << "substring expression evaluates to \"" << result << "\"";
                 StringValue * resultvalue = new StringValue(result);
                 return resultvalue;
 
@@ -1177,7 +1197,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
                         *resultset++ = curNode;
                     }
                 }
-            }
+	    }
             break;
         case Step::Parent:
             curNode = curNode->parentNode();
@@ -1317,6 +1337,9 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
         default:
             break;
         };
+#ifdef INTERPRETER_DEBUG
+	AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+#endif
     };
 
     template<class CONT>
@@ -1332,21 +1355,19 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	fillAxis(s, origNode, *intermediateResult);
 
 #ifdef INTERPRETER_DEBUG
-        AC_TRACE << "selected " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes"
-                 << " of " << origNode->nodeName();
-        if (origNode->parentNode()) {
-            AC_TRACE << " inside " << origNode->parentNode()->nodeName();
-        }
+        AC_TRACE << "now evaluating predicates of " << *s;
+        AC_TRACE << " on " << origNode->nodeName() << (origNode->parentNode() ? (" inside " + origNode->parentNode()->nodeName()):"") << ":";
+        AC_TRACE << "starting with " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes";
+
 #endif
 	std::list<Expression*>::iterator last = s->predicates.end(); 
-	if (s->predicates.begin() != s->predicates.end()) {
-	    --last;
-	}
+	--last;
+
         Context subcontext;
 
         for (std::list<Expression*>::iterator i = s->predicates.begin(); i != last; ++i) {
 #ifdef INTERPRETER_DEBUG
-            AC_TRACE << "evaluating predicate " << *(*i) << " on a set of " << intermediateResult->size() << " nodes:";
+            AC_TRACE << "filtering by predicate [" << *(*i) << "] in a context of " << intermediateResult->size() << " nodes:";
 #endif
             subcontext.size = intermediateResult->size();
             subcontext.position = 0;
@@ -1371,28 +1392,26 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
         }
 
 	std::insert_iterator<CONT> ins = std::inserter(results, results.end());
-	if (last != s->predicates.end()) {
 #ifdef INTERPRETER_DEBUG
-            AC_TRACE << "evaluating last predicate " << *(*last) << " on a set of " << intermediateResult->size() << " nodes:";
+	AC_TRACE << "filtering by last predicate [" << *(*last) << "] in a context of " << intermediateResult->size() << " nodes:";
 #endif
-            subcontext.size = intermediateResult->size();
-            subcontext.position = 0;
-            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
-                subcontext.position++;
-                subcontext.currentNode = (*j);
-                Value *tmp = (*last)->evaluateExpression(subcontext);
-                BooleanValue *v = tmp->toBoolean();
-                delete tmp;
-                if (v->getValue()) {
+	subcontext.size = intermediateResult->size();
+	subcontext.position = 0;
+	for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+	    subcontext.position++;
+	    subcontext.currentNode = (*j);
+	    Value *tmp = (*last)->evaluateExpression(subcontext);
+	    BooleanValue *v = tmp->toBoolean();
+	    delete tmp;
+	    if (v->getValue()) {
 #ifdef INTERPRETER_DEBUG
-                    AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**last) << "] evaluates true.";
+		AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " into container of " << results.size() << " elements";
+		AC_TRACE << " because the predicate [" << (**last) << "] evaluates true.";
 #endif
-		    *ins++ = (*j);
-                }
-                delete v;
-            }
+		*ins++ = (*j);
+	    }
+	    delete v;
 	}
-	delete intermediateResult;
     };
 
     void Step::scan(NodeRef from, NodeSet &into) {
