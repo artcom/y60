@@ -188,17 +188,16 @@ function createTextAsImage(theText, theSize, theStyle, thePosition)
         myImageNode.wrapmode = "clamp_to_edge"
         myImageNode.mipmap = false;
         window.scene.images.appendChild(myImageNode);
-try {
-        myTextSize = window.renderTextAsImage( myImageNode, theText, 
-                                               theStyle.name, 
-                                               theSize[0], theSize[1],
-	thePosition);
-} catch(e) {
-	Logger.error("when trying to renderTextAsImage(" + myImageNode.nodeName + ", " + theText + ", "
-				       + theStyle.name + ", " + theSize[0] + ", "
-                                       + theSize[1] + ", " + thePosition + "): " + e);
-	throw e;
-}
+        try {
+                myTextSize = window.renderTextAsImage( myImageNode, theText, 
+                                                       theStyle.name, 
+                                                       theSize[0], theSize[1],
+        	                                           thePosition);
+        } catch(e) {
+        	Logger.error("when trying to renderTextAsImage(" + myImageNode.nodeName + ", " + theText + ", "
+        				 + theStyle.name + ", " + theSize[0] + ", " + theSize[1] + ", " + thePosition + "): " + e);
+        	throw e;
+        }
         var myMatrix = new Matrix4f();
         myMatrix.makeScaling(new Vector3f(myTextSize.x / myImageNode.width, 
                                           myTextSize.y / myImageNode.height, 1));
