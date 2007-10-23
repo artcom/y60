@@ -66,10 +66,14 @@ namespace xpath {
 		for (int i = 0; i < n->childNodesLength(); i++) {
 		    retval += string_value_for(&*n->childNode(i));
 		}
+		break;
             case dom::Node::ATTRIBUTE_NODE:
             case dom::Node::TEXT_NODE:
-            default:
                 retval = n->nodeValue();
+		break;
+            default:
+		AC_ERROR << " could not determine string_value for " << n->nodeType();
+		retval = "";
             };
 	return retval;
     }
