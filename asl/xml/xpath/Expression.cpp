@@ -881,6 +881,7 @@ namespace xpath
 		    retval += number_value_for(*i);
 		}
 		delete nodes;
+		AC_INFO << "sum() returned " << retval;
 		return new NumberValue(retval);
 	    }
 	case Floor:

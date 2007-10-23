@@ -10,22 +10,25 @@ namespace xpath {
 #ifdef DEBUG_PARSER_STATES
 	AC_TRACE << "parseArgumentList at " << instring.substr(pos);
 #endif
+	int nw_pos = pos;
 	do {
 	    Expression *e = 0;
-	    int nw_pos = parseExpression(&e, instring, pos);
-	    if (nw_pos != pos) {
+	    int nw_pos2;
+	    if ((nw_pos2 = parseExpression(&e, instring, nw_pos)) != nw_pos) {
 		arguments->push_back(e);
-		pos = asl::read_whitespace(instring, nw_pos);
+		nw_pos = asl::read_whitespace(instring, nw_pos2);
 	    }
-	} while (instring[pos++] == ',');
+	} while (instring[nw_pos++] == ',');
 
-	if (instring[pos++] != ')') {
+	if (instring[nw_pos-1] != ')') {
+	    AC_WARNING << "parse error at " << instring.substr(nw_pos-1);
 	    // ### parse error.
+	    return pos;
 	}
 #if PARSER_DEBUG_VERBOSITY > 1
 	AC_TRACE << "finished parsing argument list at " << instring.substr(pos);
 #endif
-	return pos;
+	return nw_pos;
     }
 
     int parsePrimaryExpression(Expression **e, const std::string &instring, int pos) {
@@ -255,7 +258,7 @@ namespace xpath {
 	    pos = asl::read_whitespace(instring, pos);
 	} else {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    AC_TRACE << "couldn't parse EqualityExpression at " << instring.substr(pos);
+	    AC_TRACE << "no further parse EqualityExpression at " << instring.substr(pos);
 #endif
 	    return pos;
 	}

@@ -186,6 +186,12 @@ public:
 	ENSURE(numbers9->size() == 7);
 	ENSURE(contains(numberList, numbers9));
 
+	//ENSURE(!parses("//numbers/number[position() <= sum(../number[self::node() < 3))]"));
+
+	OrderedNodeSetRef numbers10 = xpath_evaluateOrderedSet("//numbers/number[position() <= 6]", &doc);
+	ENSURE(numbers10->size() == 6);
+	ENSURE(contains(numberList, numbers10));
+
 	// missing tests:
 	//
 	// - functions
