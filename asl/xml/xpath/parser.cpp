@@ -2,7 +2,7 @@
 #include "Expression.h"
 
 #define DEBUG_PARSER_STATES
-#define PARSER_DEBUG_VERBOSITY 1
+#define PARSER_DEBUG_VERBOSITY 2
 
 namespace xpath {
 
@@ -18,13 +18,16 @@ namespace xpath {
 	    int nw_pos = parseExpression(&e, instring, pos);
 	    if (nw_pos != pos) {
 		arguments->push_back(e);
-		pos = asl::read_whitespace(instring, pos);
+		pos = asl::read_whitespace(instring, nw_pos);
 	    }
 	} while (instring[pos++] == ',');
 
 	if (instring[pos++] != ')') {
 	    // ### parse error.
 	}
+#if PARSER_DEBUG_VERBOSITY > 1
+	AC_TRACE << "finished parsing argument list at " << instring.substr(pos);
+#endif
 	return pos;
     }
 
@@ -72,7 +75,7 @@ namespace xpath {
 	    std::list<Expression*> *arglist = new std::list<Expression*>();
 	    pos = asl::read_if_string(instring, pos, Function::nameOf(ft));
 	    pos = asl::read_whitespace(instring, pos);
-	    if (instring[pos] == '(') {
+	    if (instring[pos++] == '(') {
 		// function arguments
 		pos = parseArgumentList(arglist, instring, pos);
 		*e = new Function(ft, arglist);
@@ -231,10 +234,10 @@ namespace xpath {
 #endif
 	int nw_pos;
 	if ((nw_pos = parseRelationalExpression(e, instring, pos)) != pos) {
+	    pos = nw_pos;
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "parsing success for Relational Expression before " << instring.substr(pos);
 #endif
-	    pos = nw_pos;
 	}
 	pos = asl::read_whitespace(instring, pos);
 	if (instring[pos] == '=') {
