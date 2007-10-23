@@ -36,18 +36,22 @@ namespace xpath
 	    std::list<NodeRef>::const_iterator ib = parentsb.begin();
 
 	    while (ia != parentsa.end() && ib != parentsb.end() && (*ia == *ib)) { ++ia; ++ib;};
-	    if (ia == parentsa.end()) {
-		// a is ancestor of b
+	    if (ib == parentsb.end()) {
+		// since a != b,
+		// b is an ancestor of a.
 		return false;
 	    }
-	    if (ib != parentsb.end()) {
+	    if (ia != parentsa.end()) {
 		// *ia shares a parent with *ib.
 		for(NodeRef tmpNode = *ib; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
 		    if (tmpNode == *ia) {
+			// b is before a
 			return false;
 		    }
 		}
 	    }
+	    // a != b, b is not an ancestor of a, b is not before a:
+	    // b is descendant of a OR b is before a.
 	    return true;
 	}
     };
