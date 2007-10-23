@@ -117,13 +117,27 @@ public:
         OrderedNodeSetRef number1 = xpath_evaluateOrderedSet("//number[self::node() = ../number[1]]", &doc);
 	ENSURE(number1->size() == 1);
 
-	AC_WARNING << "Now doing the real stuff:";
-
         OrderedNodeSetRef number1_2 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[1]]", *numbers->begin());
 	ENSURE(equals(number1, number1_2));
 
         OrderedNodeSetRef number1_3 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[position() = ( 4 - 3 ) ] ]", *numbers->begin());
 	ENSURE(equals(number1, number1_3));
+
+	// find the <number> element whose numeric value
+	// (being its string value converted to a number)
+	// plus the numeric value of its successor
+	// equals the string value of the third node, say, the String "3".
+	// logically, this must be number one.
+        OrderedNodeSetRef number1_4 = xpath_evaluateOrderedSet("number[(self::node() + following::*) = ../number[3] ]", *numbers->begin());
+	ENSURE(equals(number1_4, number1));
+
+	// do a similar thing using the preceding::-axis
+        OrderedNodeSetRef number1_5 = xpath_evaluateOrderedSet("number[(self::node() + preceding::*) = ../number[1] ]", *numbers->begin());
+	ENSURE(equals(number1_5, number1));
+
+	// do a similar thing using the descendant-or-self::-axis
+        OrderedNodeSetRef number1_6 = xpath_evaluateOrderedSet("number[1 + descendant-or-self::* = ../number[2] ]", *numbers->begin());
+	ENSURE(equals(number1_6, number1));
 
 	// nodeset-number comparison
 	//
