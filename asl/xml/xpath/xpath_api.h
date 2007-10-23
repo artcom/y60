@@ -14,7 +14,9 @@ namespace xpath {
     // have library delete previously parse()'d Path *
     void xpath_return(Path *);
 
+    // evaluate path on startingElement into results
     void xpath_evaluate(Path *, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
+    void xpath_evaluate(std::string, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
 
     dom::Node *xpath_evaluate1(Path *, dom::Node *);
 
@@ -23,7 +25,6 @@ namespace xpath {
 
     std::vector<dom::Node *> *xpath_evaluate(Path *, dom::Node *);
     std::vector<dom::Node *> *xpath_evaluate(std::string, dom::Node *);
-
 };
 
 #endif
