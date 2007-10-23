@@ -748,3 +748,28 @@ LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protect
     
 }
 
+
+function ButtonGroup() {
+    this.Constructor(this);
+}
+ButtonGroup.prototype.Constructor = function(self) {
+
+    var _myButtons = [];
+
+    self.add = function(theButton) {  
+        Logger.trace("Added new button to button group");
+        _myButtons.push(theButton);
+        var myCallback = theButton.onClick;
+        theButton.onClick = function() {
+            Logger.trace("Extended button group callback");
+            myCallback();
+            for (var b = 0; b < _myButtons.length; b++) {
+                if (_myButtons[b] != this) {
+                    Logger.trace("Resetting state of button " + _myButtons[b].body.id);
+                    _myButtons[b].resetState();
+                }
+            }
+        }
+    }
+}
+
