@@ -131,11 +131,11 @@ namespace xpath
 			    sm2.insert(string2);
 			}
 			
-			if (i1 != nsv2->end()) {
+			if (i1 != nsr2->end()) {
 			    ++i1;
 			}
 			
-			if (i2 != nsv2->end()) {
+			if (i2 != nsr2->end()) {
 			    ++i2;
 			}
 		    }
@@ -178,16 +178,16 @@ namespace xpath
 				}
 			}
 
-			if (ileft != nsv2->end()) {
+			if (ileft != nsr2->end()) {
 			    ++ileft;
 			}
 			
-			if (iright != nsv2->end()) {
+			if (iright != nsr2->end()) {
 			    ++iright;
 			}
 		    }
 		}
-                delete nsv1; delete nsv2;
+                delete nsr1; delete nsr2;
 		return new BooleanValue(retval);		
 	    }
             else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
