@@ -64,6 +64,9 @@ public:
 
 	std::string myXML = "<testDoc><body><junk>foo</junk><junk content=\"valuable\">\
                          <junk class=\"more\" content=\"valuable\">not</junk>bar</junk></body>\
+                         <numbers><number>1</number><number>2</number><number>3</number>\
+                         <number>4</number><number>5</number><number>6</number><number>7</number>\
+                         <number>8</number><number>9</number><number>0</number></numbers>\
                          <footer><some><junk>blah</junk><junk class=\"more\">blub</junk></some>\
                          </footer></testDoc>";
 	
@@ -87,8 +90,13 @@ public:
 
 	ENSURE(search_contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)->childNode(0)));
 
-	// further tests required on:
+	std::vector<dom::Node *> *numbers = xpath_evaluate("//numbers/number", &doc);
+	ENSURE(numbers->size() == 10);
+
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
+        std::vector<dom::Node *> *number1 = xpath_evaluate("//number[self::node() = ../number[1]]", &doc);
+	ENSURE(number1->size() == 1);
+
 	// nodeset-number comparison
 	//
 	// - ordering of nodes after evaluating steps
@@ -96,6 +104,7 @@ public:
 	// "gamedescription/attribute::*" failed to parse the star.
 
 	/*
+	  memleak test
 	  std::string myPath = "/testDoc";
 	  std::string myAbsPathToJunk = "/testDoc/body//junk[@content = \"valuable\"]/text()";
 	  
@@ -104,7 +113,7 @@ public:
 	  xpath::evaluate(myAbsPathToJunk, documentElement);
 	  }
 	*/
-
+        delete numbers;
     }
 };
 
