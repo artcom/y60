@@ -772,7 +772,6 @@ namespace xpath
                 return resultvalue;
 
             }
-
         case SubstringBefore:
             {
                 if (!arguments || !arguments->size())
@@ -805,7 +804,6 @@ namespace xpath
 
                 return retval;
             }
-
         case SubstringAfter:
             {
                 if (!arguments || !arguments->size()) {
@@ -837,6 +835,10 @@ namespace xpath
 
                 return retval;
             }
+	case True:
+	    return new BooleanValue(true);
+	case False:
+	    return new BooleanValue(false);
         case Not:
             {
                 Value *result = arguments->front()->evaluateExpression(c);
@@ -846,7 +848,129 @@ namespace xpath
                 delete v;
                 return new BooleanValue(!vval);
             }
+	case Boolean:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		BooleanValue *retval = result->toBoolean();
+		delete result;
+		return retval;
+	    }
+	case Number:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		NumberValue *retval = result->toNumber();
+		delete result;
+		return retval;
+	    }
+	case String:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		StringValue *retval = result->toString();
+		delete result;
+		return retval;
+	    }
+	case Sum:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		NodeSetValue *ns = result->toNodeSet();
+		delete result;
+		NodeSetRef nodes = ns->takeNodes();
+		delete ns;
+		double retval = 0;
+		for( NodeSet::iterator i = nodes->begin(); i != nodes->end(); ++i) {
+		    retval += number_value_for(*i);
+		}
+		delete nodes;
+		return new NumberValue(retval);
+	    }
+	case Floor:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		NumberValue *retval = result->toNumber();
+		delete result;
+		double ret = floor(retval->getValue());
+		delete retval;
+		return new NumberValue(ret);
+	    }
+	case Ceiling:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		NumberValue *retval = result->toNumber();
+		delete result;
+		double ret = ceil(retval->getValue());
+		delete retval;
+		return new NumberValue(ret);
+	    }
+	case Round:
+	    {
+                Value *result = arguments->front()->evaluateExpression(c);
+		NumberValue *retval = result->toNumber();
+		double ret = round(retval->getValue());
+		delete retval;
+		return new NumberValue(ret);
+	    }
+	case StringLength:
+	    {
+		Value *result = arguments->front()->evaluateExpression(c);
+		StringValue *retval = result->toString();
+		int length = retval->getValue().length();
+		delete result;
+		delete retval;
+		return new NumberValue(length);
+	    }
+	case NormalizeSpace:
+	    {
+		Value *result = arguments->front()->evaluateExpression(c);
+		StringValue *sval = result->toString();
+		string s = sval->getValue();
+		delete result;
+		delete sval;
+		string retval;
+		for (int i = asl::read_whitespace(s, 0); i < s.length(); i++) {
+		    retval+=s[i];
+		    i = asl::read_whitespace(s, i);
+		}
+		return new StringValue(s);
+	    }
+	case Translate:
+	    {
+		std::list<Expression *>::iterator arg = arguments->begin();
+		Value *result = (*arg)->evaluateExpression(c);
+		StringValue *sval = result->toString();
+		string s = sval->getValue();
+		delete result;
+		delete sval;
 
+		++arg;
+		result = (*arg)->evaluateExpression(c);
+		sval = result->toString();
+		string from = sval->getValue();
+		delete result;
+		delete sval;
+
+		++arg;
+		result = (*arg)->evaluateExpression(c);
+		sval = result->toString();
+		string to = sval->getValue();
+		delete result;
+		delete sval;
+
+		string retval;
+		for (int i = 0; i < s.length(); i++) {
+		    int pos;
+		    if ((pos = from.find(s[i])) && pos < to.length()) {
+			retval+=to[pos];
+		    } else {
+			retval+=s[i];
+		    }
+		}
+		return new StringValue(s);
+	    }
+	case Id:
+	case Name:
+	case LocalName:
+	case NamespaceURI:
+	case Lang:
         case Unknown:
         default:
             AC_ERROR << " ** access to unknown function ** ";

@@ -186,6 +186,31 @@ public:
 	ENSURE(numbers9->size() == 7);
 	ENSURE(contains(numberList, numbers9));
 
+	// missing tests:
+	//
+	// - functions
+	//
+	//  substring-before
+	//  substring-after
+	//  substring
+	//  concat
+	//  starts-with
+	//  
+	//  true
+	//  false
+	//  not
+	//  boolean
+	//  number
+	//  string
+	//  sum
+	//  floor
+	//  ceiling
+	//  round
+	//  stringlength
+	//  normalize-space
+	//  translate
+
+
 	/*
 	  memleak test
 	  std::string myPath = "/testDoc";
