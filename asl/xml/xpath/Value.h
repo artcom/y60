@@ -114,8 +114,6 @@ namespace xpath
 
       const string &getValue() const { return value; };
 
-      static StringValue *stringValueFor(dom::Node *);
-
     private:
       string value;
     };
