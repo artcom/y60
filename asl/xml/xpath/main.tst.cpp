@@ -41,6 +41,24 @@ public:
 	return retval;
     }
 
+    bool contains(OrderedNodeSetRef larger, OrderedNodeSetRef smaller)
+    {
+	bool retval = true;
+	if (!includes(larger->begin(), larger->end(), smaller->begin(), smaller->end())) {
+	    AC_WARNING << "no containment for set ";
+	    for (OrderedNodeSet::iterator i = smaller->begin(); i != smaller->end(); ++i) {
+		AC_WARNING << **i;
+	    }
+	    AC_WARNING << "in ";
+	    for (OrderedNodeSet::iterator i = larger->begin(); i != larger->end(); ++i) {
+		AC_WARNING << **i;
+	    }
+		    
+	    retval = false;
+	}
+	return retval;
+    }
+
     bool contains(NodeRef theNode, std::string thePath, NodeRef expectedResult)
     {
 	NodeSetRef myResult = xpath_evaluateSet(thePath, theNode);
@@ -152,14 +170,21 @@ public:
 	OrderedNodeSetRef numbers4 = xpath_evaluateOrderedSet("//numbers[number >= 11]", &doc);
 	ENSURE(numbers4->size() == 0);
 
-	OrderedNodeSetRef numbers5 = xpath_evaluateOrderedSet("//numbers[number != 11]", &doc);
+	OrderedNodeSetRef numbers5 = xpath_evaluateOrderedSet("//numbers[number < 11]", &doc);
 	ENSURE(equals(numbers, numbers5));
 
-	OrderedNodeSetRef numbers6 = xpath_evaluateOrderedSet("//numbers[number != 1]", &doc);
+	OrderedNodeSetRef numbers6 = xpath_evaluateOrderedSet("//numbers[number != 11]", &doc);
 	ENSURE(equals(numbers, numbers6));
 
-	OrderedNodeSetRef numbers7 = xpath_evaluateOrderedSet("//numbers[number = 1]", &doc);
+	OrderedNodeSetRef numbers7 = xpath_evaluateOrderedSet("//numbers[number != 1]", &doc);
 	ENSURE(equals(numbers, numbers7));
+
+	OrderedNodeSetRef numbers8 = xpath_evaluateOrderedSet("//numbers[number = 1]", &doc);
+	ENSURE(equals(numbers, numbers8));
+
+	OrderedNodeSetRef numbers9 = xpath_evaluateOrderedSet("//numbers/number[self::node() < 7]", &doc);
+	ENSURE(numbers9->size() == 7);
+	ENSURE(contains(numberList, numbers9));
 
 	/*
 	  memleak test

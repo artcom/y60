@@ -1,6 +1,12 @@
 #ifndef XPATH_TYPES_H
 #define XPATH_TYPES_H
 
+#ifdef DEBUG
+#define INTERPRETER_DEBUG
+#define DEBUG_PARSER_STATES
+#define PARSER_DEBUG_VERBOSITY 2
+#endif
+
 namespace xpath
 {
     typedef std::string string;
@@ -46,6 +52,9 @@ namespace xpath
 		for(NodeRef tmpNode = *ib; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
 		    if (tmpNode == *ia) {
 			// b is before a
+#ifdef DEBUG
+			AC_TRACE << **ib << " is before " << **ia;
+#endif
 			return false;
 		    }
 		}

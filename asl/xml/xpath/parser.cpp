@@ -1,9 +1,6 @@
 #include <asl/string_functions.h>
 #include "Expression.h"
 
-#define DEBUG_PARSER_STATES
-#define PARSER_DEBUG_VERBOSITY 2
-
 namespace xpath {
 
     int parseExpression(Expression **e, const std::string &instring, int pos);

@@ -10,8 +10,6 @@
 
 #include "Expression.h"
 
-#define INTERPRETER_DEBUG
-
 namespace xpath
 {
 
