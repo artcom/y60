@@ -43,17 +43,8 @@ namespace xpath {
         NodeRef stringnode = item(0);
         if (!stringnode)
             return new StringValue(NULL);
-        switch(stringnode->nodeType())
-            {
-            case dom::Node::ELEMENT_NODE:
-            case dom::Node::DOCUMENT_NODE:
-                // ### TODO serialize text node descendants
-                return new StringValue(stringnode->nodeValue());
-            case dom::Node::TEXT_NODE:
-            case dom::Node::ATTRIBUTE_NODE:
-            default:
-                return new StringValue(stringnode->nodeValue());
-            }
+
+	return new StringValue(string_value_for(stringnode));
     };
 
     string string_value_for(NodeRef n) {
@@ -110,11 +101,10 @@ namespace xpath {
     };
 
     NumberValue *NodeSetValue::toNumber() {
-        // ## TODO: handle empty nodesets correctly.
 
-        string nodeContent;
+        
+        string nodeContent = string_value_for(item(0));
         std::stringstream myStream(nodeContent);
-        item(0)->print(myStream);
 	double num;
 	myStream >> num;
         return new NumberValue(num);
