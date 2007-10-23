@@ -139,11 +139,20 @@ public:
         OrderedNodeSetRef number1_6 = xpath_evaluateOrderedSet("number[1 + descendant-or-self::* = ../number[2] ]", *numbers->begin());
 	ENSURE(equals(number1_6, number1));
 
-	// nodeset-number comparison
-	//
-	// - ordering of nodes after evaluating steps
-	//
-	// "gamedescription/attribute::*" failed to parse the star.
+	// find an element named "numbers", which has a child node named "number"
+	// whose numeric value is 7.
+	OrderedNodeSetRef numbers2 = xpath_evaluateOrderedSet("//numbers[number = 7]", &doc);
+	ENSURE(equals(numbers, numbers2));
+
+	// find an element named "numbers", which has a child node named "number"
+	// whose numeric value is greater than 7.
+	OrderedNodeSetRef numbers3 = xpath_evaluateOrderedSet("//numbers[number >= 7]", &doc);
+	ENSURE(equals(numbers, numbers3));
+
+	// find an element named "numbers", which has a child node named "number"
+	// whose numeric value is greater than 7.
+	OrderedNodeSetRef numbers4 = xpath_evaluateOrderedSet("//numbers[number >= 11]", &doc);
+	ENSURE(numbers4->size() == 0);
 
 	/*
 	  memleak test
