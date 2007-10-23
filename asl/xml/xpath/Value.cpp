@@ -4,30 +4,24 @@
 
 namespace xpath {
 
-    Value::~Value()
-    {
+    Value::~Value() {
     };
 
-    BooleanValue::~BooleanValue()
-    {
+    BooleanValue::~BooleanValue() {
     };
 
-    NumberValue::~NumberValue()
-    {
+    NumberValue::~NumberValue() {
     };
 
-    NumberValue *BooleanValue::toNumber()
-    {
+    NumberValue *BooleanValue::toNumber() {
         return new NumberValue(value!=0?1:0);
     };
 
-    StringValue *BooleanValue::toString()
-    {
+    StringValue *BooleanValue::toString() {
         return new StringValue(value?"true":"false");
     };
 
-    StringValue *NumberValue::toString()
-    {
+    StringValue *NumberValue::toString() {
         if (isNaN)
             return new StringValue("NaN");
         if (isInfinity)
@@ -38,8 +32,7 @@ namespace xpath {
         return new StringValue(result);
     };
 
-    StringValue *NodeSetValue::toString()
-    {
+    StringValue *NodeSetValue::toString() {
         NodeRef stringnode = item(0);
         if (!stringnode)
             return new StringValue(NULL);
@@ -80,29 +73,17 @@ namespace xpath {
 	return num;
     }
 
-    StringValue *StringValue::stringValueFor(NodeRef n)
-    {
-        if (!n)
-            return new StringValue(NULL);
-	return new StringValue(string_value_for(n));
-    };
-
-    NumberValue *StringValue::toNumber()
-    {
-	
+    NumberValue *StringValue::toNumber() {
 	int num = 0;
 	std::istringstream iss(value);
 	iss >> num;
 	return new NumberValue(num);
     };
 
-    StringValue::~StringValue()
-    {
+    StringValue::~StringValue() {
     };
 
     NumberValue *NodeSetValue::toNumber() {
-
-        
         string nodeContent = string_value_for(item(0));
         std::stringstream myStream(nodeContent);
 	double num;
