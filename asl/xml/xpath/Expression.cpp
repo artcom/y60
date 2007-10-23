@@ -987,11 +987,11 @@ namespace xpath
         case Position:
             return FUNCTIONNAME_POSITION;
         case Count:
-            return  FUNCTIONNAME_COUNT;
+            return FUNCTIONNAME_COUNT;
         case StartsWith:
-            return  FUNCTIONNAME_STARTSWITH;
+            return FUNCTIONNAME_STARTSWITH;
         case Concat:
-            return  FUNCTIONNAME_CONCAT;
+            return FUNCTIONNAME_CONCAT;
         case Contains:
             return FUNCTIONNAME_CONTAINS;
         case Substring:
@@ -1002,6 +1002,40 @@ namespace xpath
             return FUNCTIONNAME_SUBSTRING_AFTER;
         case Not:
             return FUNCTIONNAME_NOT;
+        case Id:
+            return FUNCTIONNAME_ID;
+        case LocalName:
+            return FUNCTIONNAME_LOCAL_NAME;
+        case NamespaceURI:
+            return FUNCTIONNAME_NAMESPACE_URI;
+        case Name:
+            return FUNCTIONNAME_NAME;
+	case String:
+            return FUNCTIONNAME_STRING;
+	case StringLength:
+            return FUNCTIONNAME_STRING_LENGTH;
+	case NormalizeSpace:
+            return FUNCTIONNAME_NORMALIZE_SPACE;
+	case Translate:
+            return FUNCTIONNAME_TRANSLATE;
+	case Boolean:
+            return FUNCTIONNAME_BOOLEAN;
+	case True:
+            return FUNCTIONNAME_TRUE;
+	case False:
+            return FUNCTIONNAME_FALSE;
+	case Lang:
+            return FUNCTIONNAME_LANG;
+	case Number:
+            return FUNCTIONNAME_NUMBER;
+	case Sum:
+            return FUNCTIONNAME_SUM;
+	case Floor:
+            return FUNCTIONNAME_FLOOR;
+	case Ceiling:
+            return FUNCTIONNAME_CEILING;
+	case Round:
+            return FUNCTIONNAME_ROUND;
         default:
             return FUNCTIONNAME_UNKNOWN;
         }
