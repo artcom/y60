@@ -619,9 +619,8 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     ////////////////////////////////////////    
     
     function setupText(theSize, theTextPosition) {
-        var myTextSize = theSize;
-        
-        _myTextMaterialInfo = createTextAndMaterial(theText, myTextSize, theStyle);
+        var myTextSize = new Vector2f(theSize);
+        _myTextMaterialInfo = createTextAndMaterial(theText,myTextSize, theStyle);
         var myImageSize = getImageSize(_myTextMaterialInfo.image);
         var myXOffset = ((self.size.x - myImageSize.x)/2);
         var myYOffset = ((self.size.y - myImageSize.y)/2);
