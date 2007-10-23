@@ -26,7 +26,24 @@ namespace xpath
     const string Function::FUNCTIONNAME_SUBSTRING_AFTER = "substring_after";
     const string Function::FUNCTIONNAME_NOT = "not";
     const string Function::FUNCTIONNAME_UNKNOWN = " *** unknown function *** ";
-    
+    const string Function::FUNCTIONNAME_ID = "id";
+    const string Function::FUNCTIONNAME_LOCAL_NAME = "local-name";
+    const string Function::FUNCTIONNAME_NAMESPACE_URI = "namespace-uri";
+    const string Function::FUNCTIONNAME_NAME = "name";
+    const string Function::FUNCTIONNAME_STRING = "string";
+    const string Function::FUNCTIONNAME_STRING_LENGTH = "string-length";
+    const string Function::FUNCTIONNAME_NORMALIZE_SPACE = "normalize-space";
+    const string Function::FUNCTIONNAME_TRANSLATE = "translate";
+    const string Function::FUNCTIONNAME_BOOLEAN = "boolean";
+    const string Function::FUNCTIONNAME_TRUE = "true";
+    const string Function::FUNCTIONNAME_FALSE = "false";
+    const string Function::FUNCTIONNAME_LANG = "lang";
+    const string Function::FUNCTIONNAME_NUMBER = "number";
+    const string Function::FUNCTIONNAME_SUM = "sum";
+    const string Function::FUNCTIONNAME_FLOOR = "floor";
+    const string Function::FUNCTIONNAME_CEILING = "ceiling";
+    const string Function::FUNCTIONNAME_ROUND = "round";
+
     const string Step::AXISNAME_INVALID           (" *** invalid Axis *** ");
     const string Step::AXISNAME_NEXT_SIBLING      ("next-sibling");
     const string Step::AXISNAME_PREVIOUS_SIBLING  ("previous-sibling");
@@ -679,7 +696,11 @@ namespace xpath
                 std::list<Expression*>::iterator i = arguments->begin();
                 Expression *firstExpr = *i;
                 Expression *secondExpr = *(++i);
-                Expression *thirdExpr = *(++i);
+                Expression *thirdExpr = NULL;
+		if (++i != arguments->end()) {
+		    AC_TRACE << " three arguments for " << *this;
+		    thirdExpr = *i;
+		}
                 assert(firstExpr);
 
                 if (!secondExpr) {
@@ -841,48 +862,97 @@ namespace xpath
         }
     };
     
+#define RETCMP(instring, pos, X, yes, no) \
+return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
+
     Function::FunctionType Function::typeOf(string instring, int pos)
     {
-        /*
-          switch(instring[pos+3]) {
-          case 'n': //count
-            
-          case 'a': //contains
-            
-          case 'c': //concat
-            
-          case 'r': //starts-with
-            
-          case 's': //substring, substring-before, substring-after
-            
-          case 'i': //position
-            
-          default:  //not
-            
-          }
-        */
-
-        if (!instring.compare("last"))
-            return Last;
-        else if (!instring.compare("position"))
-            return Position;
-        else if (!instring.compare("count"))
-            return Count;
-        else if (!instring.compare("starts-with"))
-            return StartsWith;
-        else if (!instring.compare("concat"))
-            return Concat;
-        else if (!instring.compare("contains"))
-            return Contains;
-        else if (!instring.compare("substring"))
-            return Substring;
-        else if (!instring.compare("substring-before"))
-            return SubstringBefore;
-        else if (!instring.compare("substring-after"))
-            return SubstringAfter;
-        else if (!instring.compare("not"))
-            return Not;
-        else return Unknown;
+	switch(instring[pos]) {
+	case 'l':
+	    switch(instring[pos+2]) {
+	    case 's':
+		RETCMP(instring, pos, FUNCTIONNAME_LAST, Function::Last, Function::Unknown);
+	    case 'n':
+		RETCMP(instring, pos, FUNCTIONNAME_LANG, Function::Lang, Function::Unknown);
+	    case 'c':
+		RETCMP(instring, pos, FUNCTIONNAME_LOCAL_NAME, Function::LocalName, Function::Unknown);
+	    };
+	case 'p':
+	    RETCMP(instring, pos, FUNCTIONNAME_POSITION, Function::Position, Function::Unknown);
+	case 'c':
+	    switch(instring[pos+3]) {
+	    case 'n':
+		RETCMP(instring, pos, FUNCTIONNAME_COUNT, Function::Count, Function::Unknown);
+	    case 'l':
+		RETCMP(instring, pos, FUNCTIONNAME_CEILING, Function::Ceiling, Function::Unknown);
+	    case 'c':
+		RETCMP(instring, pos, FUNCTIONNAME_CONCAT, Function::Concat, Function::Unknown);
+	    case 't':
+		RETCMP(instring, pos, FUNCTIONNAME_CONTAINS, Function::Contains, Function::Unknown);
+	    default:
+		return Function::Unknown;
+	    }
+	case 's':
+	    switch(instring[pos+2]) {
+	    case 'a':
+		RETCMP(instring, pos, FUNCTIONNAME_STARTSWITH, Function::StartsWith, Function::Unknown);
+	    case 'm':
+		RETCMP(instring, pos, FUNCTIONNAME_SUM, Function::Sum, Function::Unknown);
+	    case 'r':
+		if (instring.length() > pos + 6 && instring[pos+6] == '-') {
+		    RETCMP(instring, pos, FUNCTIONNAME_STRING_LENGTH, Function::StringLength, Function::Unknown);
+		} else {
+		    RETCMP(instring, pos, FUNCTIONNAME_STRING, Function::String, Function::Unknown);
+		}
+	    case 'b':
+		if (instring.length() > pos + 9 && instring[pos+9] == '-') {
+		    switch(instring[pos+10]) {
+		    case 'a':
+			RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_AFTER,  Function::SubstringAfter, Function::Unknown);
+		    case 'b':
+			RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_BEFORE, Function::SubstringBefore, Function::Unknown);
+		    default:
+			RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING, Function::Substring, Function::Unknown);
+		    }
+		}
+		RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING, Function::Substring, Function::Unknown);
+	    }
+	case 'n':
+	    switch(instring[pos+2]) {
+	    case 'm':
+		RETCMP(instring, pos, FUNCTIONNAME_NUMBER, Function::Number, Function::Unknown);
+	    case 'r':
+		RETCMP(instring, pos, FUNCTIONNAME_NORMALIZE_SPACE, Function::NormalizeSpace, Function::Unknown);
+	    case 't':
+		RETCMP(instring, pos, FUNCTIONNAME_NOT, Function::Not, Function::Unknown);
+	    case 'a':
+		if (instring.length() > pos +3 && instring[pos+4] == 's') {
+		    RETCMP(instring, pos, FUNCTIONNAME_NAMESPACE_URI, Function::NamespaceURI, Function::Unknown);
+		} else {
+		    RETCMP(instring, pos, FUNCTIONNAME_NAME, Function::Name, Function::Unknown);
+		}
+	    }
+	case 'i':
+	    RETCMP(instring, pos, FUNCTIONNAME_ID, Function::Id, Function::Unknown);
+	case 't':
+	    if (instring[pos+2]== 'u') {
+		RETCMP(instring, pos, FUNCTIONNAME_TRUE, Function::True, Function::Unknown);
+	    } else {
+		RETCMP(instring, pos, FUNCTIONNAME_TRANSLATE, Function::Translate, Function::Unknown);
+	    }
+	case 'b':
+	    RETCMP(instring, pos, FUNCTIONNAME_BOOLEAN, Function::Boolean, Function::Unknown);
+	case 'f':
+	    if (instring[pos+1]== 'a') {
+		RETCMP(instring, pos, FUNCTIONNAME_FALSE, Function::False, Function::Unknown);
+	    } else {
+		RETCMP(instring, pos, FUNCTIONNAME_FLOOR, Function::Floor, Function::Unknown);
+	    }
+	case 'r':
+	    RETCMP(instring, pos, FUNCTIONNAME_ROUND, Function::Round, Function::Unknown);
+	default:
+	    return Function::Unknown;
+	}
     };
 
     void Step::serializeNodeTest(std::ostream &os)
@@ -970,9 +1040,6 @@ namespace xpath
         }
         return pos;
     }
-
-#define RETCMP(instring, pos, X, yes, no) \
-return (read_if_string(instring, pos, X) != pos) ? yes : no;
 
     Step::Axis Step::read_axis(const string &instring, int pos) {
         switch(instring[pos]) {

@@ -70,25 +70,31 @@ namespace xpath
 	};
 
         class UnaryExpression: public Expression
-	{
-	public:
-	    enum OperatorType { Minus, Tilde, Not, Invalid };
-	    UnaryExpression(OperatorType _type, Expression *_argument) { type = _type; argument = _argument; };
-	    virtual ~UnaryExpression() { if (argument) delete argument; };
+        {
+        public:
+            enum OperatorType { Minus, Tilde, Not, Invalid };
+            UnaryExpression(OperatorType _type, Expression *_argument) { type = _type; argument = _argument; };
+            virtual ~UnaryExpression() { if (argument) delete argument; };
 
-	    virtual void serializeTo(std::ostream &);
-	    virtual Value *evaluateExpression(const Context &);
+            virtual void serializeTo(std::ostream &);
+            virtual Value *evaluateExpression(const Context &);
 
-	private:
-	    OperatorType type;
-	    Expression *argument;
-	};
+        private:
+            OperatorType type;
+            Expression *argument;
+        };
 
         class Function: public Expression
 	{
 	public:
 
-	    enum FunctionType { Unknown, Last, Position, Count, StartsWith, Concat, Contains, Substring, SubstringBefore, SubstringAfter, Not };
+	    enum FunctionType { Unknown, Last, Position, Count, StartsWith, Concat, Contains, Substring, SubstringBefore, SubstringAfter, Not,
+				// To be implemented:
+				Id, LocalName, NamespaceURI, Name, 
+				String, StringLength, NormalizeSpace, Translate, 
+				Boolean, True, False, Lang, 
+				Number, Sum, Floor, Ceiling, Round
+	    };
 
 	    static const string FUNCTIONNAME_LAST;
 	    static const string FUNCTIONNAME_POSITION;
@@ -100,6 +106,23 @@ namespace xpath
 	    static const string FUNCTIONNAME_SUBSTRING_BEFORE;
 	    static const string FUNCTIONNAME_SUBSTRING_AFTER;
 	    static const string FUNCTIONNAME_NOT;
+	    static const string FUNCTIONNAME_ID;
+	    static const string FUNCTIONNAME_LOCAL_NAME;
+	    static const string FUNCTIONNAME_NAMESPACE_URI;
+	    static const string FUNCTIONNAME_NAME;
+	    static const string FUNCTIONNAME_STRING;
+	    static const string FUNCTIONNAME_STRING_LENGTH;
+	    static const string FUNCTIONNAME_NORMALIZE_SPACE;
+	    static const string FUNCTIONNAME_TRANSLATE;
+	    static const string FUNCTIONNAME_BOOLEAN;
+	    static const string FUNCTIONNAME_TRUE;
+	    static const string FUNCTIONNAME_FALSE;
+	    static const string FUNCTIONNAME_LANG;
+	    static const string FUNCTIONNAME_NUMBER;
+	    static const string FUNCTIONNAME_SUM;
+	    static const string FUNCTIONNAME_FLOOR;
+	    static const string FUNCTIONNAME_CEILING;
+	    static const string FUNCTIONNAME_ROUND;
 	    static const string FUNCTIONNAME_UNKNOWN;
 
 	    Function(FunctionType _type, std::list<Expression*> *_arguments) { type = _type; arguments = _arguments; };
