@@ -401,6 +401,9 @@ namespace xpath
             NumberValue *l = left->toNumber();
             double rn = r->getValue();
             double ln = l->getValue();
+#ifdef INTERPRETER_DEBUG
+	    AC_TRACE << "evaluating arithmetic operation " << type << " on " << rn << ", " << ln;
+#endif
             delete right; delete r;
             delete left; delete l;
             switch(type)
@@ -1179,6 +1182,14 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
         };
     };
 
+    template<class ITER>
+    void descendReverse(ITER resultset, NodeRef curNode) {
+	for (NodeRef curChild = &*curNode->lastChild(); curChild; curChild = &*curChild->previousSibling()) {
+	    descendReverse(resultset, curChild);
+	}
+	*resultset++ = curNode;
+    }
+
     template<class CONT>
     void fillAxis(Step *s, NodeRef curNode, CONT &cont)
     {
@@ -1231,23 +1242,23 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
                 }
             }
             break;
+        case Step::Following:
+	    origNode = NULL;
+	    /* nobreak; */
         case Step::Descendant_Or_Self:
-            if (s->allows(curNode)) {
-		*resultset++ = curNode;
+            if (origNode && s->allows(origNode)) {
+		*resultset++ = origNode;
             }
             /* nobreak; */
         case Step::Descendant:
             {
                 while (true)
                 {
-                    if (curNode->firstChild()){
+                    if (curNode->firstChild()) {
                         curNode = &*curNode->firstChild();
                     } else if (curNode == origNode) {
                         break;
-                    } else
-        // yes, this is what we want.
-        case Step::Following:
-			if (curNode->nextSibling()) {
+                    } else if (curNode->nextSibling()) {
                         curNode = &*curNode->nextSibling();
                     } else {
                         NodeRef tmp = curNode;
@@ -1271,33 +1282,12 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
                 };
             };
 	    break;
- 	    while (true)
-                {
-                    if (curNode->firstChild()){
-                        curNode = &*curNode->firstChild();
-                    } else if (curNode == origNode) {
-                        break;
-                    } else
-        case Step::Preceding:
-			if (curNode->previousSibling()) {
-                        curNode = &*curNode->previousSibling();
-                    } else {
-                        NodeRef tmp = curNode;
-                        while ((tmp = tmp->parentNode()) != origNode) {
-                            if (tmp->previousSibling()) {
-                                curNode = &*tmp->nextSibling();
-                                break;
-                            }
-                        }
-                        if (tmp == origNode) {
-                            break;
-                        }
-                    };
-
-                    if (s->allows(curNode)) {
-			*resultset++ = curNode;
-                    }
-                };
+	case Step::Preceding:
+	    for (;curNode;curNode = curNode->parentNode()) {
+		while (curNode->previousSibling()) {
+		    descendReverse(resultset, curNode = &*curNode->previousSibling());
+		}
+	    }
             break;
         case Step::Self:
             if (s->allows(curNode)) {
@@ -1338,7 +1328,11 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
             break;
         };
 #ifdef INTERPRETER_DEBUG
-	AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+	if (origNode) {
+	    AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+	} else {
+	    AC_TRACE << "evaluating step " << *s << ": selected " << cont.size() << " candidates...";
+	}
 #endif
     };
 
