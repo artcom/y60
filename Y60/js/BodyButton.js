@@ -13,6 +13,9 @@ use("Y60JSSL.js");
 
 var ourStyleCache = []
 
+const BUTTON_TYPE_TOGGLE = 0;
+const BUTTON_TYPE_PUSH = 1;
+
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
         var myStyleNode = theStylesNode.childNode(i);
@@ -469,11 +472,26 @@ TextBodyButton.prototype.Constructor = function(self, theName, theText, theStyle
     setup();
 }
 
-function ImageToggleTextBodyButton(theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode) {
-    var Protected = {};
-    this.Constructor(this, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode);
+function ImageToggleTextBodyButton(theName, 
+                                   theText, 
+                                   theTextSize, 
+                                   theStyle, 
+                                   theFilenames, 
+                                   thePosition, 
+                                   theCallBackFunction, 
+                                   theGroupNode) 
+{
+
+var Protected = {};
+    this.Constructor(this, Protected, theName, theText, theTextSize, theStyle, theFilenames, 
+                     thePosition, theCallBackFunction, theGroupNode);
 }
-ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theText, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode) {
+
+ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theText, 
+                                                           theTextSize, theStyle, theFilenames, 
+                                                           thePosition, theCallBackFunction, 
+                                                           theGroupNode) 
+{
 
     if (theGroupNode == undefined) {
         theGroupNode = window.scene.world;
@@ -481,26 +499,53 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     
     BodyButtonBase.prototype.Constructor(self, Protected, theName, theCallBackFunction);
     self.BodyButtonBase = [];
+
     const BUTTON_STATE_DOWN = 0;                
     const BUTTON_STATE_UP   = 1;        
-
     const DROP_SHADOW_DEPTH = 1;    
+
+
     ////////////////////////////////////////
     // Public 
     ////////////////////////////////////////
     self.BodyButtonBase.press = self.press;    
     self.press = function() {      
-        _myState = (_myState == BUTTON_STATE_DOWN) ? BUTTON_STATE_UP:BUTTON_STATE_DOWN;
-        for (var i = 0;  i < _myElementNodes.length;i++) {
-            var myElementNode = _myElementNodes[i];
-            myElementNode.material = _myImageMaterialIds[_myState];
+        if (_myType == BUTTON_TYPE_TOGGLE) {
+            self.state = (_myState == BUTTON_STATE_DOWN) ? BUTTON_STATE_UP:BUTTON_STATE_DOWN;
+            self.BodyButtonBase.press();              
+        } else if (_myType == BUTTON_TYPE_PUSH) {
+            self.state = BUTTON_STATE_DOWN;
         }
-        self.BodyButtonBase.press();              
     }
     
     self.state getter = function() {
         return _myState;
     }
+
+    self.state setter = function(theState) {
+        _myState = theState;
+        for (var i = 0;  i < _myElementNodes.length;i++) {
+            var myElementNode = _myElementNodes[i];
+            myElementNode.material = _myImageMaterialIds[_myState];
+        }
+    }
+
+    self.type getter = function() {
+        return _myType;
+    }
+
+    self.type setter = function(theType) {
+        _myType = theType;
+    }
+
+    self.unpress = function() {
+        if (_myType == BUTTON_TYPE_PUSH) {
+            self.resetState();
+            // call callback only, when mousebutton has been released
+            self.BodyButtonBase.press(); 
+        }
+    }
+
     self.resetState = function() {
         if(_myState == BUTTON_STATE_DOWN){
             _myState = BUTTON_STATE_UP;
@@ -510,6 +555,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
             }
         }
     }
+
     self.setVisible = function(theVisibleFlag){
         self.body.visible = theVisibleFlag;
         self.body.insensible = !theVisibleFlag;
@@ -650,6 +696,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     // Member 
     ////////////////////////////////////////
    var _myState = BUTTON_STATE_UP;
+   var _myType = BUTTON_TYPE_TOGGLE;
    var _myImageMaterialIds = [];
    var _myTextBodyInfo = null;
    var _myTextMaterialInfo = null;
@@ -662,7 +709,8 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
 
 
-function LanguageImageToggleTextBodyButton(theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
+function LanguageImageToggleTextBodyButton(theName, theTexts, theTextSize, 
+                                           theStyle, theFilenames, thePosition, theCallBackFunction) {
     var Protected = {};
     this.Constructor(this, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction);
 }
@@ -687,12 +735,14 @@ LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protect
     self.switchLanguage = function(theLanguage){
         var myImageSize = 0;
         if(theLanguage == GERMAN) {
-            _myTextMaterialInfo.material.childNode("textures").firstChild.image = _myGermanTextMaterialInfo.image.id;
+            _myTextMaterialInfo.material.childNode("textures").firstChild.image = 
+                _myGermanTextMaterialInfo.image.id;
             _myTextBodyInfo.body.shape = _myGermanTextQuad.id;
             myImageSize = getImageSize(_myGermanTextMaterialInfo.image);
             
         } else {
-            _myTextMaterialInfo.material.childNode("textures").firstChild.image = _myEnglishTextMaterialInfo.image.id;
+            _myTextMaterialInfo.material.childNode("textures").firstChild.image = 
+                _myEnglishTextMaterialInfo.image.id;
             _myTextBodyInfo.body.shape = _myEnglishTextQuad.id;
             myImageSize = getImageSize(_myEnglishTextMaterialInfo.image);
         }
