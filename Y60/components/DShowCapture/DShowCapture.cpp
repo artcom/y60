@@ -97,6 +97,7 @@ namespace y60 {
         int myFrameWidth = 0;//getFrameWidth();
         int myFrameHeight = 0;//getFrameHeight();
         unsigned myFrameRate = (unsigned)getFrameRate();
+        unsigned myBitsPerPixel = 24;
         unsigned myInputPinNumber = 0;
         unsigned myDeviceId = getDevice();
         unsigned myWhitebalanceU;
@@ -133,6 +134,10 @@ namespace y60 {
         if (idx != std::string::npos) {
             myFrameRate = asl::as_int(theFilename.substr(idx+4));
         }
+        idx = theFilename.find("bpp=");
+        if (idx != std::string::npos) {
+            myBitsPerPixel = asl::as_int(theFilename.substr(idx+4));
+        }
         idx = theFilename.find("input=");
         if (idx != std::string::npos) {
             myInputPinNumber = asl::as_int(theFilename.substr(idx+6));
@@ -168,8 +173,6 @@ namespace y60 {
             throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
         } 
 
-
-
         setName(myDevices[myDeviceId]);
         setFrameRate(myFrameRate);
         setFrameHeight(myFrameHeight);
@@ -179,7 +182,7 @@ namespace y60 {
         // Setup video size and image matrix
         float myXResize = float(myFrameWidth) / asl::nextPowerOfTwo(myFrameWidth);
         float myYResize = float(myFrameHeight) / asl::nextPowerOfTwo(myFrameHeight);
-        _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, 24);
+        _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, myBitsPerPixel);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));

@@ -96,6 +96,7 @@ private:
 	// The interface to set callback function
 	// ColorConverter is needed to convert other color to RGB24
 	IBaseFilter *           m_pColorConv;
+	IBaseFilter *           m_pYUVConv;
 	// Grab filter which get image data for each frame
     IBaseFilter *			m_pGrabFilter;
 	// The interface to set callback function
