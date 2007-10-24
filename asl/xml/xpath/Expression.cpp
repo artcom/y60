@@ -1689,7 +1689,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
 	    NodeSetRef nextStepSet = new NodeSet();
 	    for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-		(*s)->scan(*i, *nextStepSet);
+		(*s)->scanInto(*i, *nextStepSet);
 	    };
 	    delete workingset;
 	    workingset = nextStepSet;
@@ -1698,7 +1698,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
 #endif
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-	    (*lastStep)->scan(*i, returnContainer);
+	    (*lastStep)->scanInto(*i, returnContainer);
 	};
 	delete workingset;
     };
@@ -1740,7 +1740,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
 	    NodeSetRef nextStepSet = new NodeSet();
             for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-                (*s)->scan(*i, *nextStepSet);
+                (*s)->scanInto(*i, *nextStepSet);
             };
             delete workingset;
             workingset = nextStepSet;
@@ -1749,7 +1749,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
 #endif
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
-	    (*lastStep)->scan(*i, returnContainer);
+	    (*lastStep)->scanInto(*i, returnContainer);
 	};
 	delete workingset;
     };

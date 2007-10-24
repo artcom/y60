@@ -239,10 +239,10 @@ namespace xpath
 	    Step(Axis, NodeTest=TestPrincipalType, string="");
 	    virtual ~Step();
 
-	    // puts results from from into into
-	    void scan(NodeRef from, NodeSet &into);
-	    void scan(NodeRef from, NodeList &into);
-	    void scan(NodeRef from, OrderedNodeSet &into);
+	    template <class T>
+		void scanInto(NodeRef from, T &into) {
+		scan(from, into);
+	    }
 
 	    virtual void serializeTo(std::ostream &);
 
@@ -265,6 +265,11 @@ namespace xpath
 	    std::list<Expression*> predicates;
 
 	private:
+	    // puts results from from into into
+	    void scan(NodeRef from, NodeSet &into);
+	    void scan(NodeRef from, NodeList &into);
+	    void scan(NodeRef from, OrderedNodeSet &into);
+
 	    Axis axis;
 	    NodeTest test;
 	    string nodeTestName;
