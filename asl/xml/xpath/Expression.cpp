@@ -285,8 +285,9 @@ namespace xpath
 		    delete theNumber; delete theNodeSet;
 
 		    double num = nv->getValue();
-		    NodeSetRef nsr = nsv->takeNodes();
+		    delete nv;
 
+		    NodeSetRef nsr = nsv->takeNodes();
 		    delete nsv;
 
 		    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
@@ -301,7 +302,6 @@ namespace xpath
 			case NotEqual:
 			    val = (currentnum != num);
 			    break;
-
 			case Greater:
 			    val = (theNumber == left) ^ (number_value_for(*i) > num);
 			    break;
@@ -314,6 +314,9 @@ namespace xpath
 			case LEqual:
 			    val = (theNumber == left) ^ (number_value_for(*i) <= num);
 			    break;
+			default:
+			    AC_WARNING << "unsupported type " << type;
+			    exit(0);
 			}
 
 			if (val) {
@@ -1576,6 +1579,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	    }
 	    delete v;
 	}
+	delete intermediateResult;
     };
 
     void Step::scan(NodeRef from, NodeSet &into) {
@@ -1693,10 +1697,10 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 #ifdef INTERPRETER_DEBUG
 	AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
 #endif
-	OrderedNodeSetRef finalResult = new OrderedNodeSet();
 	for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
 	    (*lastStep)->scan(*i, returnContainer);
 	};
+	delete workingset;
     };
 
     void Path::evaluateInto(NodeSetRef workingset, NodeList &returnContainer) {
