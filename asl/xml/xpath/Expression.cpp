@@ -905,7 +905,7 @@ namespace xpath
                 Value *result = arguments->front()->evaluateExpression(c);
 		NumberValue *retval = result->toNumber();
 		delete result;
-		double ret = floor(retval->getValue());
+		double ret = ::floor(retval->getValue());
 		delete retval;
 		return new NumberValue(ret);
 	    }
@@ -914,7 +914,7 @@ namespace xpath
                 Value *result = arguments->front()->evaluateExpression(c);
 		NumberValue *retval = result->toNumber();
 		delete result;
-		double ret = ceil(retval->getValue());
+		double ret = ::ceil(retval->getValue());
 		delete retval;
 		return new NumberValue(ret);
 	    }
