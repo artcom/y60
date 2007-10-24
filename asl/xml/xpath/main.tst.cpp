@@ -170,6 +170,9 @@ public:
 	OrderedNodeSetRef numbers4 = xpath_evaluateOrderedSet("//numbers[number >= 11]", &doc);
 	ENSURE(numbers4->size() == 0);
 
+	OrderedNodeSetRef numbers4_2 = xpath_evaluateOrderedSet("//numbers[number = 11]", &doc);
+	ENSURE(numbers4_2->size() == 0);
+
 	OrderedNodeSetRef numbers5 = xpath_evaluateOrderedSet("//numbers[number < 11]", &doc);
 	ENSURE(equals(numbers, numbers5));
 
@@ -195,6 +198,13 @@ public:
 	OrderedNodeSetRef numbers11 = xpath_evaluateOrderedSet("//numbers/number[position() < 7]", &doc);
 	ENSURE(numbers11->size() == 6);
 	ENSURE(equals(numbers10, numbers11));
+
+	OrderedNodeSetRef numbers12 = xpath_evaluateOrderedSet("//numbers/number[position() = sum(../number[position()<4])]", &doc);
+	ENSURE(numbers12->size() == 1);
+	ENSURE(contains(numbers10, numbers12));
+
+	OrderedNodeSetRef number6 = xpath_evaluateOrderedSet("//numbers/number[6]", &doc);
+	ENSURE(equals(number6, numbers12));
 
 	// missing tests:
 	//
