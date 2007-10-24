@@ -126,20 +126,28 @@ public:
 
 	ENSURE(contains(&doc, "/testDoc//junk[@content = \"valuable\"]/text()", &*doc.childNode(0)->childNode(0)->childNode(1)->childNode(0)->childNode(0)));
 
+	std::list<OrderedNodeSetRef> containers;
+
 	OrderedNodeSetRef numbers = xpath_evaluateOrderedSet("//numbers", &doc);
 	ENSURE(numbers->size() == 1);
+	containers.push_back(numbers);
+
 	OrderedNodeSetRef numberList = xpath_evaluateOrderedSet("//numbers/number", &doc);
 	ENSURE(numberList->size() == 10);
+	containers.push_back(numberList);
 
 	// nodeset-nodeset comparison greater, gequal, equal, lequal, less, notequal
         OrderedNodeSetRef number1 = xpath_evaluateOrderedSet("//number[self::node() = ../number[1]]", &doc);
 	ENSURE(number1->size() == 1);
+	containers.push_back(number1);
 
         OrderedNodeSetRef number1_2 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[1]]", *numbers->begin());
 	ENSURE(equals(number1, number1_2));
+	containers.push_back(number1_2);
 
         OrderedNodeSetRef number1_3 = xpath_evaluateOrderedSet("number[substring(self::node(),1) = ../number[position() = ( 4 - 3 ) ] ]", *numbers->begin());
 	ENSURE(equals(number1, number1_3));
+	containers.push_back(number1_3);
 
 	// find the <number> element whose numeric value
 	// (being its string value converted to a number)
@@ -148,63 +156,79 @@ public:
 	// logically, this must be number one.
         OrderedNodeSetRef number1_4 = xpath_evaluateOrderedSet("number[(self::node() + following::*) = ../number[3] ]", *numbers->begin());
 	ENSURE(equals(number1_4, number1));
+	containers.push_back(number1_4);
 
 	// do a similar thing using the preceding::-axis
         OrderedNodeSetRef number1_5 = xpath_evaluateOrderedSet("number[(self::node() + preceding::*) = ../number[1] ]", *numbers->begin());
 	ENSURE(equals(number1_5, number1));
+	containers.push_back(number1_5);
 
 	// do a similar thing using the descendant-or-self::-axis
         OrderedNodeSetRef number1_6 = xpath_evaluateOrderedSet("number[1 + descendant-or-self::* = ../number[2] ]", *numbers->begin());
 	ENSURE(equals(number1_6, number1));
+	containers.push_back(number1_6);
 
 	// find an element named "numbers", which has a child node named "number"
 	// whose numeric value is 7.
 	OrderedNodeSetRef numbers2 = xpath_evaluateOrderedSet("//numbers[number = 7]", &doc);
 	ENSURE(equals(numbers, numbers2));
+	containers.push_back(numbers2);
 
 	// find an element named "numbers", which has a child node named "number"
 	// whose numeric value is greater than 7.
 	OrderedNodeSetRef numbers3 = xpath_evaluateOrderedSet("//numbers[number >= 7]", &doc);
 	ENSURE(equals(numbers, numbers3));
+	containers.push_back(numbers3);
 
 	OrderedNodeSetRef numbers4 = xpath_evaluateOrderedSet("//numbers[number >= 11]", &doc);
 	ENSURE(numbers4->size() == 0);
+	containers.push_back(numbers4);
 
 	OrderedNodeSetRef numbers4_2 = xpath_evaluateOrderedSet("//numbers[number = 11]", &doc);
 	ENSURE(numbers4_2->size() == 0);
+	containers.push_back(numbers4_2);
 
 	OrderedNodeSetRef numbers5 = xpath_evaluateOrderedSet("//numbers[number < 11]", &doc);
 	ENSURE(equals(numbers, numbers5));
+	containers.push_back(numbers5);
 
 	OrderedNodeSetRef numbers6 = xpath_evaluateOrderedSet("//numbers[number != 11]", &doc);
 	ENSURE(equals(numbers, numbers6));
+	containers.push_back(numbers6);
 
 	OrderedNodeSetRef numbers7 = xpath_evaluateOrderedSet("//numbers[number != 1]", &doc);
 	ENSURE(equals(numbers, numbers7));
+	containers.push_back(numbers7);
 
 	OrderedNodeSetRef numbers8 = xpath_evaluateOrderedSet("//numbers[number = 1]", &doc);
 	ENSURE(equals(numbers, numbers8));
+	containers.push_back(numbers8);
 
 	OrderedNodeSetRef numbers9 = xpath_evaluateOrderedSet("//numbers/number[self::node() < 7]", &doc);
 	ENSURE(numbers9->size() == 7);
 	ENSURE(contains(numberList, numbers9));
+	containers.push_back(numbers9);
 
 	//ENSURE(!parses("//numbers/number[position() <= sum(../number[self::node() < 3))]"));
 
 	OrderedNodeSetRef numbers10 = xpath_evaluateOrderedSet("//numbers/number[position() <= 6]", &doc);
 	ENSURE(numbers10->size() == 6);
 	ENSURE(contains(numberList, numbers10));
+	containers.push_back(numbers10);
 
 	OrderedNodeSetRef numbers11 = xpath_evaluateOrderedSet("//numbers/number[position() < 7]", &doc);
 	ENSURE(numbers11->size() == 6);
 	ENSURE(equals(numbers10, numbers11));
+	containers.push_back(numbers11);
 
 	OrderedNodeSetRef numbers12 = xpath_evaluateOrderedSet("//numbers/number[position() = sum(../number[position()<4])]", &doc);
 	ENSURE(numbers12->size() == 1);
 	ENSURE(contains(numbers10, numbers12));
+	containers.push_back(numbers12);
 
 	OrderedNodeSetRef number6 = xpath_evaluateOrderedSet("//numbers/number[6]", &doc);
 	ENSURE(equals(number6, numbers12));
+	containers.push_back(number6);
 
 	// missing tests:
 	//
@@ -241,8 +265,9 @@ public:
 	  xpath::evaluate(myAbsPathToJunk, documentElement);
 	  }
 	*/
-        delete numbers;
-        delete numberList;
+	for (std::list<OrderedNodeSetRef>::iterator it = containers.begin(); it != containers.end(); ++it) {
+	    delete *it;
+	}
     }
 };
 
