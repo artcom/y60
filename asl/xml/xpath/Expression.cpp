@@ -372,7 +372,6 @@ namespace xpath
                         retval = equals_as<StringValue>(left, right);
                     }
                     delete left; delete right;
-
                     return new BooleanValue(retval ^ (type==NotEqual));
                 }
                 else //  no nodeset and no equality operation
@@ -896,7 +895,6 @@ namespace xpath
 		    retval += number_value_for(*i);
 		}
 		delete nodes;
-		AC_INFO << "sum() returned " << retval;
 		return new NumberValue(retval);
 	    }
 	case Floor:
