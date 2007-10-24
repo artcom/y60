@@ -518,16 +518,20 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         }
     }
     
+    self.unpress = function() {
+        if (_myType == BUTTON_TYPE_PUSH) {
+            self.resetState();
+            // call callback only, when mousebutton has been released
+            self.BodyButtonBase.press(); 
+        }
+    }
+
     self.state getter = function() {
         return _myState;
     }
 
     self.state setter = function(theState) {
-        _myState = theState;
-        for (var i = 0;  i < _myElementNodes.length;i++) {
-            var myElementNode = _myElementNodes[i];
-            myElementNode.material = _myImageMaterialIds[_myState];
-        }
+        self.setState(theState);
     }
 
     self.type getter = function() {
@@ -538,13 +542,6 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         _myType = theType;
     }
 
-    self.unpress = function() {
-        if (_myType == BUTTON_TYPE_PUSH) {
-            self.resetState();
-            // call callback only, when mousebutton has been released
-            self.BodyButtonBase.press(); 
-        }
-    }
 
     self.resetState = function() {
         if(_myState == BUTTON_STATE_DOWN){
@@ -709,14 +706,20 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
 
 
-function LanguageImageToggleTextBodyButton(theName, theTexts, theTextSize, 
-                                           theStyle, theFilenames, thePosition, theCallBackFunction) {
+function LanguageImageToggleTextBodyButton(theName, 
+                                           theTexts, 
+                                           theTextSize, 
+                                           theStyle, 
+                                           theFilenames, 
+                                           thePosition, 
+                                           theCallBackFunction, 
+                                           theGroupNode) {
     var Protected = {};
-    this.Constructor(this, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction);
+    this.Constructor(this, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode);
 }
-LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction) {
+LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theName, theTexts, theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode) {
     
-    ImageToggleTextBodyButton.prototype.Constructor(self, Protected, theName, theTexts[0], theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction);
+    ImageToggleTextBodyButton.prototype.Constructor(self, Protected, theName, theTexts[0], theTextSize, theStyle, theFilenames, thePosition, theCallBackFunction, theGroupNode);
     self.Base = [];
 
     ////////////////////////////////////////
@@ -746,10 +749,10 @@ LanguageImageToggleTextBodyButton.prototype.Constructor = function(self, Protect
             _myTextBodyInfo.body.shape = _myEnglishTextQuad.id;
             myImageSize = getImageSize(_myEnglishTextMaterialInfo.image);
         }
-        
+        Logger.trace("theImageSize: " + myImageSize); 
         var myXOffset = ((self.size.x - myImageSize.x)/2);
         var myYOffset = ((self.size.y - myImageSize.y)/2);
-        var myNewPosition = new Vector3f(thePosition.x + myXOffset, thePosition.y + myYOffset,
+        var myNewPosition = new Vector3f(self.body.position.x + myXOffset, self.body.position.y + myYOffset,
                                                  TEXT_Z_POSITION)
         _myTextBodyInfo.body.position =  myNewPosition;                                                
             
@@ -808,10 +811,20 @@ ButtonGroup.prototype.Constructor = function(self) {
         Logger.trace("Added new button to button group");
         _myButtons.push(theButton);
         var myCallback = theButton.onClick;
+
+        // clear unpress method if it's a push button
+        if (theButton.type == BUTTON_TYPE_PUSH) {
+            theButton.unpress = function() {};
+        }
+
         theButton.onClick = function() {
             Logger.trace("Extended button group callback");
+            // ensure that the button remains pressed, when
+            // you click on it again
+            this.state = BUTTON_STATE_DOWN;
             myCallback();
             for (var b = 0; b < _myButtons.length; b++) {
+                Logger.trace("Checking button " + _myButtons[b].body.id);
                 if (_myButtons[b] != this) {
                     Logger.trace("Resetting state of button " + _myButtons[b].body.id);
                     _myButtons[b].resetState();
