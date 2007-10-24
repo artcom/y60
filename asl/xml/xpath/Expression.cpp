@@ -219,7 +219,6 @@ namespace xpath
                     // one nodeset, one string: find one node whose string-value compares positive to the string
                     NodeSetValue *nsv;
                     StringValue *sv;
-                    bool stringleft;
 		    const int *truthTable;
                     if (left->type()==Value::StringType)
                     {
