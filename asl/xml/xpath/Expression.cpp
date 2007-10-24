@@ -71,7 +71,7 @@ namespace xpath
         lvalue = _lvalue;
         rvalue = _rvalue;
     };
-
+    
     Value *BinaryExpression::evaluateExpression(const Context &c)
     {
         assert(lvalue);
@@ -215,7 +215,7 @@ namespace xpath
 						     1<<Equal | 1<<LEqual | 1 <<GEqual,
 						     1<<NotEqual | 1<<Greater | 1 <<GEqual };
 		    const int TRUTHVALUES_RIGHT[] = { TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0] };
-
+		    
                     // one nodeset, one string: find one node whose string-value compares positive to the string
                     NodeSetValue *nsv;
                     StringValue *sv;
@@ -245,15 +245,11 @@ namespace xpath
                     delete left;
                     delete right;
                     bool retval = false;
-#ifdef INTERPRETER_DEBUG
-		    AC_INFO << " string - nodeset comparison "<< *this<<" of type " << type << " with value " << sv->getValue();
-#endif
 
                     for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
 			string curstr = string_value_for(*i);
-			AC_INFO << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\"";
 			int cmp = curstr.compare(sv->getValue());
-			
+			AC_TRACE << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\" is " << cmp;
 			if (truthTable[cmp+1]&(1<<type)) {
 			    retval = true;
 			    break;
@@ -261,8 +257,9 @@ namespace xpath
                     };
 		    
 #ifdef INTERPRETER_DEBUG
+		    AC_INFO << " string - nodeset comparison of type " << type << " is " << retval?"true":"false";
                     if (retval) {
-			AC_TRACE <<" succeeded for string "<< sv->getValue();
+			AC_INFO <<" succeeded for "<< *this;
                     }
 #endif
                     delete sv; delete nsv;
@@ -331,10 +328,28 @@ namespace xpath
                 else if (left->type()==Value::BooleanType || right->type()==Value::BooleanType)
                 {
                     // one nodeset, one boolean: convert both to boolean
-                    BooleanValue *a = left->toBoolean();
-		    BooleanValue *b = right->toBoolean();
+                    BooleanValue *aVal = left->toBoolean();
+		    BooleanValue *bVal = right->toBoolean();
 		    delete left;
 		    delete right;
+		    // ###
+		    bool a = aVal->getValue();
+		    bool b = bVal->getValue();
+
+		    delete aVal;
+		    delete bVal;
+
+		    AC_INFO << "boolean comparison " << type << " " << a << ", " << b;
+
+		    if (type == Equal && a == b) return new BooleanValue(true);
+		    else if(type == Equal && a != b) return new BooleanValue(true);
+		    else if(type == NotEqual && a != b) return new BooleanValue(true);
+		    else if(type == GEqual && a >= b) return new BooleanValue(true);
+		    else if(type == LEqual && a >= b) return new BooleanValue(true);
+		    else if(type == Less && a < b) return new BooleanValue(true);
+		    else if(type == Greater && a > b) return new BooleanValue(true);
+		    
+		    return new BooleanValue(false);
                 }
                 else
                 {
@@ -358,6 +373,7 @@ namespace xpath
                         retval = equals_as<StringValue>(left, right);
                     }
                     delete left; delete right;
+
                     return new BooleanValue(retval ^ (type==NotEqual));
                 }
                 else //  no nodeset and no equality operation
@@ -366,7 +382,7 @@ namespace xpath
                         delete left; delete right;
                         return new BooleanValue(type==LEqual||type==GEqual);
                     } else { // numbers are different.
-                        bool retval = ( type==LEqual || type == Less ) ^
+                        bool retval = ( type==GEqual || type == Greater ) ^
                             ( smaller_than_as<NumberValue>(left, right));
                         delete left; delete right;
                         return new BooleanValue(retval);
