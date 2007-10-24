@@ -922,7 +922,7 @@ namespace xpath
 	    {
                 Value *result = arguments->front()->evaluateExpression(c);
 		NumberValue *retval = result->toNumber();
-		double ret = round(retval->getValue());
+		double ret = ::round(retval->getValue());
 		delete retval;
 		return new NumberValue(ret);
 	    }
