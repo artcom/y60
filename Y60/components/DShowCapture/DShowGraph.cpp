@@ -1,3 +1,12 @@
+//============================================================================
+// Copyright (C) 2007, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #include "DShowGraph.h"
 #include "DShowHelper.h"
@@ -28,9 +37,6 @@ namespace y60 {
 
 static const GUID CLSID_ColorSpaceConverter = 
 {0x1643E180,0x90F5,0x11CE, {0x97, 0xD5, 0x00, 0xAA, 0x00, 0x55, 0x59, 0x5A }};
-
-static const GUID CLSID_YUVConverter = 
-{0x4CB4FBB2,0x1342,0x48FE, {0x81, 0x29, 0x5A, 0x7C, 0x47, 0x06, 0xD6, 0x0C }};
 
 DShowGraph::DShowGraph()
 {
@@ -604,14 +610,6 @@ void DShowGraph::addExtraFilters()
     m_pFilterGraph->AddFilter(m_pColorConv, L"Color Space Converter");
     if (FAILED(hr)) {
         checkForDShowError(hr, "Add filter 'Color Space Converter' failed", PLUS_FILE_LINE);
-    }
-
-    //Sometimes, we need a YUV converter ... [jb]
-    hr = CoCreateInstance( CLSID_YUVConverter, NULL, CLSCTX_INPROC_SERVER, 
-                 IID_IBaseFilter, (void **)&m_pYUVConv );
-    m_pFilterGraph->AddFilter(m_pYUVConv, L"IAT YUV");
-    if (FAILED(hr)) {
-        checkForDShowError(hr, "Add filter 'IAT YUV' failed", PLUS_FILE_LINE);
     }
 
     // Normally, we donot need to connect the PIN by ourselves. 

@@ -1,6 +1,5 @@
 //============================================================================
-//
-// Copyright (C) 2005, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $RCSfile: DShowGraph.h,v $
-//
-//   $Author: thomas $
-//
-//   $Revision: 1.5 $
-//
-//=============================================================================
 
 #ifndef _ac_DShowCapture_DShowGraph_h_
 #define _ac_DShowCapture_DShowGraph_h_
@@ -95,23 +86,22 @@ private:
     IFilterGraph*			m_pFilterGraph;  // Filter Graph
 	// The interface to set callback function
 	// ColorConverter is needed to convert other color to RGB24
-	IBaseFilter *           m_pColorConv;
-	IBaseFilter *           m_pYUVConv;
-	// Grab filter which get image data for each frame
-    IBaseFilter *			m_pGrabFilter;
-	// The interface to set callback function
-	ISampleGrabber *		m_pSampleGrabber;
+    IBaseFilter *           m_pColorConv;
+    // Grab filter which get image data for each frame
+    IBaseFilter *           m_pGrabFilter;
+    // The interface to set callback function
+    ISampleGrabber *        m_pSampleGrabber;
     DXSampleGrabber *       m_pTrackingCB;
 
-    bool			m_fIsScaling;   // scale the video to the display window
-    //bool			m_fShowCaptureProperties; // Setup dialog before capture
-    bool			m_fstartGraph; // has the video graph started;
-    DWORD			m_dwGraphRegister;
-    void	        removeGraphFromRot(DWORD pdwRegister);
+    bool            m_fIsScaling;   // scale the video to the display window
+    //bool            m_fShowCaptureProperties; // Setup dialog before capture
+    bool            m_fstartGraph; // has the video graph started;
+    DWORD           m_dwGraphRegister;
+    void            removeGraphFromRot(DWORD pdwRegister);
     HRESULT         addGraphToRot(IUnknown *pUnkGraph, DWORD *pdwRegister);
 
-    int				_myDesiredWidth, _myDesiredHeight, _myDesiredBits;
-    int				_myDesiredFrameRate;
+    int             _myDesiredWidth, _myDesiredHeight, _myDesiredBits;
+    int             _myDesiredFrameRate;
     std::string     _myDevice;
     AnalogVideoStandard _myDesiredVideoStandard;
     std::string     pinToString(long lType);
