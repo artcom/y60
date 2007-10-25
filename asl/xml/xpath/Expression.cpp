@@ -1356,7 +1356,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
     };
 
     template<class ITER>
-    void descendReverse(ITER resultset, NodeRef curNode) {
+    void descendReverse(ITER &resultset, NodeRef curNode) {
 	for (NodeRef curChild = &*curNode->lastChild(); curChild; curChild = &*curChild->previousSibling()) {
 	    descendReverse(resultset, curChild);
 	}
