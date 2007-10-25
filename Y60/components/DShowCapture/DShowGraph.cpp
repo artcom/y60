@@ -151,6 +151,7 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 	addExtraFilters();
 
     hr = selectVideoFormat();
+    
 	if (FAILED(hr)) {
 	    checkForDShowError(hr, "selectVideoFormat() failed", PLUS_FILE_LINE);
     	//return false;  // unable to build graph
@@ -514,7 +515,22 @@ HRESULT DShowGraph::selectVideoFormat() {
         checkForDShowError(hr, "GetFormat() failed", PLUS_FILE_LINE);
     }
     
-    //AC_ERROR << pmt->
+    //check the media subtype
+    if ( !IsEqualGUID( pmt->subtype,  MEDIASUBTYPE_RGB24) ||
+         !((VIDEOINFO *)pmt->pbFormat) )
+    {
+        AC_WARNING << "Video capture device does not use selected media subtype 'RGB24' by default.";
+    }
+
+    //check the resolution 
+    VIDEOINFOHEADER *pVih = reinterpret_cast<VIDEOINFOHEADER*>(pmt->pbFormat);    
+    if ((pVih->bmiHeader.biWidth != _myDesiredWidth) ||
+        (pVih->bmiHeader.biHeight != _myDesiredHeight))
+    {
+        AC_ERROR << "Video capture device resolution is '"
+                 << pVih->bmiHeader.biWidth << "x" << pVih->bmiHeader.biHeight
+                 << "'. Should be '" << _myDesiredWidth << "x" << _myDesiredHeight << "'!";
+    }
 
     BITMAPINFOHEADER bih;
     bih.biBitCount = _myDesiredBits;
