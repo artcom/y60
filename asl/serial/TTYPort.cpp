@@ -105,13 +105,15 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     myTermIO.c_cc[VTIME]= cc_t(theTimeout);
 
     tcflush(_myPortHandle, TCIOFLUSH);
+
+    isOpen(true);
+
     if (tcsetattr(_myPortHandle, TCSANOW, & myTermIO) != 0) {
+        close();
         throw SerialPortException(string("Failed to set requested device settings on ") +
                                getDeviceName() + ".",
                                PLUS_FILE_LINE);
     }
-
-    isOpen(true);
 }
 
 void
