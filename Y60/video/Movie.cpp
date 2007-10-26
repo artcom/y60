@@ -115,8 +115,10 @@ namespace y60 {
             case PLAY_MODE_PLAY:
                 if (_myPlayMode == PLAY_MODE_PAUSE) {
                     _myDecoder->resumeMovie(getTimeFromFrame(get<CurrentFrameTag>()));
-                } else {
+                } else if (_myPlayMode == PLAY_MODE_STOP){
                     _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));
+                } else {
+                    AC_DEBUG<< "Movie::setPlayMode already playing";
                 }
                 break;
             case PLAY_MODE_PAUSE:
@@ -171,10 +173,10 @@ namespace y60 {
                     decodeFrame(myMovieTime, myFrame);                                
                 }
                 _myDecoder->setEOF(false);  
-                restart(0);   
-                //_myDecoder->stopMovie();
                 _myDecoder->setDecodeAudioFlag(true);
-                msleep(500); // give the decoder thread some time to initialize
+                
+                restart(0);   
+                
                 setPlayMode(myPlayMode);
             }
         } 
