@@ -174,6 +174,7 @@ namespace y60 {
                 restart(0);   
                 //_myDecoder->stopMovie();
                 _myDecoder->setDecodeAudioFlag(true);
+                msleep(500); // give the decoder thread some time to initialize
                 setPlayMode(myPlayMode);
             }
         } 
