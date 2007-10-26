@@ -15,6 +15,7 @@ var ourStyleCache = []
 
 const BUTTON_TYPE_TOGGLE = 0;
 const BUTTON_TYPE_PUSH = 1;
+const BUTTON_TYPE_SPECIAL = 1;
 
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
@@ -218,6 +219,9 @@ function createTextAsImage(theText, theSize, theStyle, thePosition)
 function createImageFromFile(theFileName) {
     var myKey = checksumFromString(stripIdentifier(theFileName));
     var myImageNode = getCachedImage(myKey);
+    if(myImageNode){
+        Logger.trace("found cached image: " + theFileName);
+    }
     if (!myImageNode) {
         myImageNode = Modelling.createImage(window.scene, theFileName);
         addItemToDomCache(myKey, myImageNode);
@@ -320,6 +324,7 @@ function createShapeAndBody( theSize, thePosition, theMaterial, theName, theInse
 
 const BUTTON_STATE_DOWN = 0;                
 const BUTTON_STATE_UP   = 1;                
+const BUTTON_STATE_COLORED = 2;                
 
 var ourStaticInvisibleMaterial = null;
 
@@ -501,11 +506,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     BodyButtonBase.prototype.Constructor(self, Protected, theName, theCallBackFunction);
     self.BodyButtonBase = [];
 
-    const BUTTON_STATE_DOWN = 0;                
-    const BUTTON_STATE_UP   = 1;        
-    const DROP_SHADOW_DEPTH = 1;    
-
-
+    
     ////////////////////////////////////////
     // Public 
     ////////////////////////////////////////
@@ -546,7 +547,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
 
     self.resetState = function() {
-        if(_myState == BUTTON_STATE_DOWN){
+        if(_myState == BUTTON_STATE_DOWN || BUTTON_STATE_COLORED){
             self.setState(BUTTON_STATE_UP);
         }
     }
@@ -557,9 +558,6 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         self.body.insensible = !theVisibleFlag;
         if (_myTextBody) {        
             _myTextBody.visible = theVisibleFlag;
-        }
-        if(_myShadowBodyShapeInfo){
-            _myShadowBodyShapeInfo.body.visible = theVisibleFlag;
         }
     }
     
@@ -585,6 +583,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
         var myImageMaterialInfoDown = {};
         var myImageMaterialInfoUp = {};
+        var myImageMaterialInfoColored = {};
 
         Logger.trace("typeof theFilenames[0] = " + typeof theFilenames[0]);
 
@@ -595,13 +594,21 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
             myImageMaterialInfoDown.material = createMaterialFromImage(theFilenames[0]);
             myImageMaterialInfoDown.size = getImageSize(theFilenames[0]);
-
+        
             Logger.trace("getImageSize() = " + myImageMaterialInfoDown.size);
             Logger.trace("image.width = " + theFilenames[0].width + 
                          " image.height = " + theFilenames[0].height);
 
             myImageMaterialInfoUp.material = createMaterialFromImage(theFilenames[1]);
             myImageMaterialInfoUp.size = getImageSize(theFilenames[1]);
+            
+            if(theFilenames.length >2){
+                myImageMaterialInfoColored.material = createMaterialFromImage(theFilenames[2]);
+                myImageMaterialInfoColored.size = getImageSize(theFilenames[2]);
+            } else {
+                myImageMaterialInfoColored.material = myImageMaterialInfoDown.material;
+                myImageMaterialInfoColored.size = myImageMaterialInfoDown.size;
+            }
 
         } else if ((typeof theFilenames[0] == "string" &&
                     typeof theFilenames[1] == "string") || 
@@ -612,20 +619,9 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
             myImageMaterialInfoUp   = createImageAndMaterial(theFilenames[1]);
             
             if(theFilenames.length >2){
-                Logger.trace("creating drop shadow");
-
-                _myShadowImageMaterialInfo   = createImageAndMaterial(theFilenames[2]);
-                var myShadowImageSize = getIconSize(_myShadowImageMaterialInfo.material);
-                var myUpImageSize = getIconSize(myImageMaterialInfoUp.material);
-                var myShadowXOffset = (myShadowImageSize.x - myUpImageSize.x)/2;
-                var myShadowYOffset = (myShadowImageSize.y - myUpImageSize.y)/2;
-                var myShadowPosition = new Vector3f(thePosition.x - myShadowXOffset, 
-                                                    thePosition.y - myShadowYOffset, 
-                                                    thePosition.z - DROP_SHADOW_DEPTH);
-                _myShadowBodyShapeInfo = createShapeAndBody(myShadowImageSize, myShadowPosition, 
-                                                            _myShadowImageMaterialInfo.material,
-                                                            theName + "_shadow", true, true);
-                theGroupNode.appendChild(_myShadowBodyShapeInfo.body);
+                myImageMaterialInfoColored = createImageAndMaterial(theFilenames[2]);
+            } else {
+                myImageMaterialInfoColored = myImageMaterialInfoDown;
             }
         }
 
@@ -642,11 +638,12 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         Protected.elementnodes = myBodyShapeInfo.shape.getNodesByTagName("elements");
         _myImageMaterialIds.push(myImageMaterialInfoDown.material.id);
         _myImageMaterialIds.push(myImageMaterialInfoUp.material.id);       
+        _myImageMaterialIds.push(myImageMaterialInfoColored.material.id);       
         
         ourShow.registerButton(self);
     }
     
-    Protected.getTextMaterial = function(){
+    self.getTextMaterial = function(){
         return _myTextMaterialInfo;    
     }
 
@@ -663,8 +660,16 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
     ////////////////////////////////////////    
     
     function setupText(theSize, theTextPosition) {
-        var myTextSize = new Vector2f(theSize);
-        _myTextMaterialInfo = createTextAndMaterial(theText,myTextSize, theStyle);
+        if (typeof theText == "string") {
+            var myTextSize = new Vector2f(theSize);
+            _myTextMaterialInfo = createTextAndMaterial(theText,myTextSize, theStyle);
+            
+        } else if (theText instanceof Node) {
+            _myTextMaterialInfo.material = createMaterialFromImage(theText);
+            _myTextMaterialInfo.image = theText;
+            _myTextMaterialInfo.size = getImageSize(theText);
+        }
+        
         var myImageSize = getImageSize(_myTextMaterialInfo.image);
         var myXOffset = ((self.size.x - myImageSize.x)/2);
         var myYOffset = ((self.size.y - myImageSize.y)/2);
@@ -681,15 +686,14 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
                      "self.size: " + self.size + "\n" + 
                      "offset: [" + myXOffset + ", " + myYOffset + "]\n" + 
                      "text position: " + theTextPosition + "\n");
+        
     }
 
     self.setup = function(){
         Logger.trace("Creating Button " + theName);
         Protected.setupImage();
         var myPosition = new Vector3f(thePosition.x, thePosition.y, TEXT_Z_POSITION);
-        if (theText) {
-            setupText(theTextSize, myPosition);
-        }
+        setupText(theTextSize, myPosition);
     }    
     ////////////////////////////////////////
     // Member 
@@ -699,9 +703,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
    var _myType = BUTTON_TYPE_TOGGLE;
    var _myImageMaterialIds = [];
    var _myTextBody = null;
-   var _myTextMaterialInfo = null;
-   var _myShadowImageMaterialInfo = null;
-   var _myShadowBodyShapeInfo = null;
+   var _myTextMaterialInfo = {};
     
 }
 
@@ -909,9 +911,17 @@ MultiLanguageButton.prototype.Constructor = function(self,
         Logger.trace("setupText(" + theSize + ", " + theTextPosition + ")");
 
         var myTextSize = theSize;
-        
+        var myMaterialInfo = {};
         for (var lang = 0; lang < theTexts.length; lang++) {
-            var myMaterialInfo = createTextAndMaterial(theTexts[lang], new Vector2i(0,0), theStyle);
+            if (typeof theTexts[lang] == "string") {
+                var myTextSize = new Vector2f(theSize);
+                myMaterialInfo = createTextAndMaterial(theTexts[lang],myTextSize, theStyle);
+                
+            } else if (theTexts[lang] instanceof Node) {
+                myMaterialInfo.material = createMaterialFromImage(theTexts[lang]);
+                myMaterialInfo.image = theTexts[lang];
+                myMaterialInfo.size = getImageSize(theTexts[lang]);
+            }
             _myMultiLanguageMaterials.push(myMaterialInfo);
             var myImageSize = getImageSize(myMaterialInfo.image);
             var myQuad = Modelling.createQuad(window.scene,
