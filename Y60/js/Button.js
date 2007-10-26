@@ -69,6 +69,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     }
 
     Public.setPressed = function(theFlag) {
+	Logger.trace(Public.id + ": setPressed("+theFlag+")");
         if (theFlag) {
             Public.color = Public.style.selectedColor;
         } else {
@@ -80,15 +81,16 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
+	        Logger.trace("Unpressing button " + Public.id);	
                 Public.setPressed(false);
 		if (Public.touches(theX, theY, theRadius)) {
 			if ("id" in Public)
 		                Logger.trace(Public.id + ": generating click");
 	                Public.onClick(Public);
+			return true;
 		}
             } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
-		if ("id" in Public)
-	                Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
+	        Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
                 Public.setPressed(true);
             } else {
 		if ("id" in Public)
@@ -117,7 +119,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
         Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
             if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY, theRadius)) {
                 if (theState == MOUSE_UP && Protected.isPressed) {
-                    Public.onClick(this);
+                    return Public.onClick(this);
                 } else  if (theState == MOUSE_DOWN && !Protected.isPressed) {
                     for (var i = 0; i < theButtons.length; ++i) {
                         if (theButtons[i].enabled && theButtons[i].isPressed()) {
@@ -139,7 +141,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
                        !Protected.isPressed && Public.touches(theX, theY, theRadius))
             {
                 Public.setPressed(true);
-                Public.onClick(Public);
+                return Public.onClick(Public);
             }
         }
     }
@@ -274,6 +276,8 @@ DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene
 
     Public.setImage(theSources[0]);
     var myImageSize = getImageSize(Public.image);
-    Public._myTextlabel =  new Label(theScene, theText, myImageSize, [0,0], theStyle, Public);
+    Public._myTextlabel = new Label(theScene, theText, myImageSize, [0,0], theStyle, Public);
+    Public.setText = Public._myTextlabel.setText;
+
 }
 
