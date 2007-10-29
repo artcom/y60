@@ -201,7 +201,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
 
-    obj.appendQuad2 = function (theElement, p1, p2, p3, p4) {
+    obj.appendQuad2 = function (theElement, p1, p2, p3, p4, theUVcoords) {
         // add positions to shape's vertex data
         var myPosIndex = _myPositions.length
 
@@ -220,10 +220,17 @@ ShapeBuilder.prototype.Constructor = function(obj) {
 
         // uv coordintaes for the 4 vertices
         var myTexIndex = _myUVCoords[0].length;
-        _myUVCoords[0].push([0,1]);
-        _myUVCoords[0].push([1,1]);
-        _myUVCoords[0].push([1,0]);
-        _myUVCoords[0].push([0,0]);
+        if (theUVcoords == undefined) {
+            _myUVCoords[0].push([0,1]);
+            _myUVCoords[0].push([1,1]);
+            _myUVCoords[0].push([1,0]);
+            _myUVCoords[0].push([0,0]);
+        } else {
+            _myUVCoords[0].push(theUVcoords[0]);
+            _myUVCoords[0].push(theUVcoords[1]);
+            _myUVCoords[0].push(theUVcoords[2]);
+            _myUVCoords[0].push(theUVcoords[3]);            
+        }
         theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
 
