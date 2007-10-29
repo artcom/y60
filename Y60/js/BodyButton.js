@@ -15,7 +15,6 @@ var ourStyleCache = []
 
 const BUTTON_TYPE_TOGGLE = 0;
 const BUTTON_TYPE_PUSH = 1;
-const BUTTON_TYPE_SPECIAL = 1;
 
 function createStyleCache(theStylesNode) {
     for(var i=0; i < theStylesNode.childNodes.length; ++i){
@@ -765,7 +764,9 @@ MultiLanguageButton.prototype.Constructor = function(self,
         self.body.position = thePosition;
         updateTextBodyPosition(); 
     }
-
+    self.getTextMaterial = function(){
+        return _myTextMaterialInfo;    
+    }
     self.onFrame = function(theTime){
         if (_myFadeState != STATE_IDLE) {        
             if (_myAnimationTime == -1) {
@@ -845,7 +846,7 @@ MultiLanguageButton.prototype.Constructor = function(self,
         var valid_nodes = true;
         var valid_filenames = true;
         for (var i = 0; i < theFilenames.length; i++) {
-            for (j = 0; j < theFilenames[i].length; j++) {
+            for (var j = 0; j < theFilenames[i].length; j++) {
                 valid_nodes &= theFilenames[i][j] instanceof Node && theFilenames[i][j].nodeName == "image" ;
                 valid_filenames &= typeof theFilenames[i][j] == "string";// || theFilenames[i] instanceof String;
             // XXX: instanceof String results in an internal error in JSNode,
