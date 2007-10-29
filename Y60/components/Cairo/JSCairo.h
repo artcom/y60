@@ -103,6 +103,11 @@ namespace jslib {
             PROP_HINT_METRICS_OFF,
             PROP_HINT_METRICS_ON,
 
+            PROP_EXTEND_NONE,
+            PROP_EXTEND_REPEAT,
+            // PROP_EXTEND_REFLECT,
+            // PROP_EXTEND_PAD,
+
             PROP_END
         };
         static JSPropertySpec * Properties();
