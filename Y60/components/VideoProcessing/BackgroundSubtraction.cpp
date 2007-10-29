@@ -69,7 +69,6 @@ namespace y60 {
         
         BGRRaster::iterator itBg   = const_cast<BGRRaster::iterator>(myBackgroundFrame->begin());
         BGRRaster::iterator itTrgt = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
-            
         
         float myAlpha = _myWeight;
         unsigned int mySrcIntensity;

@@ -20,6 +20,7 @@
 #include "Blobs.h"
 #include "AdaptiveBackground.h"
 #include "Mask.h"
+#include "DumbScale.h"
 
 #include <asl/Exception.h>
 #include <asl/Logger.h>
@@ -53,6 +54,7 @@ namespace y60 {
         REGISTER_ALGORITHM(Blobs);
         REGISTER_ALGORITHM(AdaptiveBackground);
         REGISTER_ALGORITHM(Mask);
+        REGISTER_ALGORITHM(DumbScale);
 
 		AC_WARNING << "algorithm '" << theName << "' not found.";
 		return asl::Ptr<Algorithm>(0);
