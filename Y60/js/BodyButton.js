@@ -736,7 +736,7 @@ MultiLanguageButton.prototype.Constructor = function(self,
                                                      theGroupNode) 
 {
     ImageToggleTextBodyButton.prototype.Constructor(self, Protected, theName, theTexts[0], 
-                                                    theTextSize, theStyle, theFilenames, 
+                                                    theTextSize, theStyle, theFilenames[0], 
                                                     thePosition, theCallBackFunction, theGroupNode);
     self.Base = [];
 
@@ -766,6 +766,58 @@ MultiLanguageButton.prototype.Constructor = function(self,
         updateTextBodyPosition(); 
     }
 
+    self.onFrame = function(theTime){
+        if (_myFadeState != STATE_IDLE) {        
+            if (_myAnimationTime == -1) {
+                _myAnimationTime = theTime;
+            }
+            if (_myDelay > 0.0) {
+                if ((theTime - _myAnimationTime) >= _myDelay) {
+                    _myDelay = 0; 
+                    _myAnimationTime = -1;
+                }
+                return;
+            }
+            var myDelta = 1.0;
+            if (_myDuration > 0) {
+                myDelta = (theTime - _myAnimationTime) / _myDuration;                
+            }
+            var myAlpha = 1.0;
+            if (myDelta >= 1.0) {
+                myAlpha = (_myFadeState == STATE_FADE_IN ? 1.0:0.0);
+                Logger.trace("Entering idle state!");
+                _myFadeState = STATE_IDLE;
+            } else {
+                myAlpha = (_myFadeState == STATE_FADE_IN ? myDelta:1.0-myDelta);
+            }
+            self.setAlpha(myAlpha);
+        }
+    }
+
+    self.fadeOut = function(theDuration, theDelay){
+        _myAnimationTime = -1;
+        if (theDelay != undefined) {
+            _myDelay = theDelay;
+        } else {
+            _myDelay = 0;
+        }
+        _myDuration = theDuration;
+        _myFadeState = STATE_FADE_OUT;        
+    }
+
+    self.fadeIn = function(theDuration, theDelay){
+        _myAnimationTime = -1;
+        _myDuration = theDuration;
+        if (theDelay != undefined) {
+            _myDelay = theDelay;
+        } else {
+            _myDelay = 0;
+        }
+        _myFadeState = STATE_FADE_IN;
+    }
+
+    self.isDone = function(){ return _myFadeState == STATE_IDLE;}
+
     self.setState = function(theState) {
         Logger.trace("setState(" + theState + ")");
         // switch material for all languages!
@@ -774,6 +826,10 @@ MultiLanguageButton.prototype.Constructor = function(self,
                 var myElementNode = Protected.elementnodes[lang][i];
                 if (theState == BUTTON_STATE_DOWN) {
                     myElementNode.material = _myImageMaterialInfos.down[lang].material.id;
+                } else if (theState == BUTTON_STATE_COLORED) {
+                    if (_myImageMaterialInfos.color.length) {
+                        myElementNode.material = _myImageMaterialInfos.color[lang].material.id;
+                    }
                 } else {
                     myElementNode.material = _myImageMaterialInfos.up[lang].material.id;
                 }
@@ -789,11 +845,13 @@ MultiLanguageButton.prototype.Constructor = function(self,
         var valid_nodes = true;
         var valid_filenames = true;
         for (var i = 0; i < theFilenames.length; i++) {
-            valid_nodes &= theFilenames[i] instanceof Node && theFilenames[i].nodeName == "image" ;
-            valid_filenames &= typeof theFilenames[i] == "string";// || theFilenames[i] instanceof String;
+            for (j = 0; j < theFilenames[i].length; j++) {
+                valid_nodes &= theFilenames[i][j] instanceof Node && theFilenames[i][j].nodeName == "image" ;
+                valid_filenames &= typeof theFilenames[i][j] == "string";// || theFilenames[i] instanceof String;
             // XXX: instanceof String results in an internal error in JSNode,
             //      so don't use filenames in String objects for now :-)
             //      This is probably a bug in JSNode and should be investigated further.
+            }
         }
 
 
@@ -801,18 +859,26 @@ MultiLanguageButton.prototype.Constructor = function(self,
             Logger.trace("Setting up materials with image nodes");
             // setup materials with image nodes
             // images are sorted like this: de_up, de_down, en_up, en_down, ...
-            for (var lang = 0; lang < theFilenames.length; lang=lang+2) {
-                Logger.trace("creating material for language " + (lang * 0.5));
+            for (var lang = 0; lang < theFilenames.length; lang++) {
+                Logger.trace("creating material for language " + lang);
                 var myUpMaterialInfo = {};
                 var myDownMaterialInfo = {};
 
-                myUpMaterialInfo.material = createMaterialFromImage(theFilenames[lang+1]);
-                myUpMaterialInfo.size = getImageSize(theFilenames[lang+1]);
+                myUpMaterialInfo.material = createMaterialFromImage(theFilenames[lang][0]);
+                myUpMaterialInfo.size = getImageSize(theFilenames[lang][0]);
                 _myImageMaterialInfos.up.push(myUpMaterialInfo);
                 
-                myDownMaterialInfo.material = createMaterialFromImage(theFilenames[lang]);
-                myDownMaterialInfo.size = getImageSize(theFilenames[lang]);
+                myDownMaterialInfo.material = createMaterialFromImage(theFilenames[lang][1]);
+                myDownMaterialInfo.size = getImageSize(theFilenames[lang][1]);
                 _myImageMaterialInfos.down.push(myDownMaterialInfo);
+
+                print("theFilenames[lang].length: " + theFilenames[lang].length);
+                if (theFilenames[lang].length == 3) {
+                    var myColorMaterialInfo = {};
+                    myColorMaterialInfo.material = createMaterialFromImage(theFilenames[lang][2]);
+                    myColorMaterialInfo.size = getImageSize(theFilenames[lang][2]);
+                    _myImageMaterialInfos.color.push(myColorMaterialInfo);
+                }
 
                 var myQuad = Modelling.createQuad(window.scene, 
                                                   myUpMaterialInfo.material.id,
@@ -857,8 +923,6 @@ MultiLanguageButton.prototype.Constructor = function(self,
         Protected.material = _myImageMaterialInfos.up[0].material;       
         Protected.pressedmaterial = _myImageMaterialInfos.down[0].material;       
         Protected.type = "toggle";     
-        
-        ourShow.registerButton(self);
     }
     
     self.switchLanguage = function(theLanguage){
@@ -955,7 +1019,8 @@ MultiLanguageButton.prototype.Constructor = function(self,
     // material information for each language 
     var _myImageMaterialInfos = {
         up : [],
-        down : []
+        down : [],
+        color : []
     }
     var _myMultiLanguageMaterials = [];
     // shapes and bodies for each language
@@ -966,6 +1031,13 @@ MultiLanguageButton.prototype.Constructor = function(self,
     // current text material info
     var _myTextMaterialInfo = null;
     
+    var _myFadeState = STATE_IDLE;
+    var _myAnimationTime = 0;
+    var _myDelay = 0;
+    var _myDuration = 0;
+    const STATE_IDLE = 0;
+    const STATE_FADE_IN = 1;
+    const STATE_FADE_OUT = 2;
 }
 
 
