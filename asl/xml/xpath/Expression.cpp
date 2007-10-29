@@ -1,3 +1,25 @@
+/**************************************************************************
+ *                                                                        *
+ *  This file is part of TaXTable, an XPath implementation for Y60.       *
+ *                                                                        *
+ *                                                                        *
+ *  (C) 2005-2007  Tobias Anton <tobias.anton@web.de>                     *
+ *                                                                        *
+ *                                                                        *
+ *  TaXTable is free software: you can redistribute it and/or modify      *
+ *  it under the terms of the GNU General Public License as published by  *
+ *  the Free Software Foundation, either version 3 of the License, or     *
+ *  (at your option) any later version.                                   *
+ *                                                                        *
+ *  TaXTable is distributed in the hope that it will be useful,           *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *  GNU General Public License for more details.                          *
+ *                                                                        *
+ *  You should have received a copy of the GNU General Public License     *
+ *  along with TaXTable.  If not, see <http://www.gnu.org/licenses/>.     *
+ *                                                                        *
+ **************************************************************************/
 
 #include <assert.h>
 #include <functional>
@@ -1271,7 +1293,9 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
                 RETCMP(instring, pos, Step::AXISNAME_FOLLOWING, Step::Following, Step::Invalid);
             }
         case 'n':
-            switch(instring[pos+1]) {
+	    if (instring.length() <= pos + 8) {
+		return Step::Invalid;
+	    } else switch(instring[pos+1]) {
             case 'a':
                 RETCMP(instring, pos, Step::AXISNAME_NAMESPACE, Step::Namespace, Step::Invalid);
             case 'e':
@@ -1280,7 +1304,9 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
                 return Step::Invalid;
             }
         case 'p':
-            switch(instring[pos+3]) {
+	    if (instring.length() <= pos + 6) {
+		return Step::Invalid;
+	    } else switch(instring[pos+3]) {
             case 'e':
                 RETCMP(instring, pos, Step::AXISNAME_PARENT, Step::Parent, Step::Invalid);
             case 'c':
@@ -1458,7 +1484,9 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	case Step::Preceding:
 	    for (;curNode;curNode = curNode->parentNode()) {
 		while (curNode->previousSibling()) {
-		    descendReverse(resultset, curNode = &*curNode->previousSibling());
+		    curNode = &*curNode->previousSibling();
+		    AC_TRACE << " diving into " << *curNode;
+		    descendReverse(resultset, curNode);
 		}
 	    }
             break;
@@ -1518,11 +1546,13 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	    return;
 	}
 
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "now evaluating step \"" << *s << "\" :";
+#endif
         NodeListRef intermediateResult = new NodeList();
 	fillAxis(s, origNode, *intermediateResult);
 
 #ifdef INTERPRETER_DEBUG
-        AC_TRACE << "now evaluating predicates of " << *s;
         AC_TRACE << " on " << origNode->nodeName() << (origNode->parentNode() ? (" inside " + origNode->parentNode()->nodeName()):"") << ":";
         AC_TRACE << "starting with " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes";
 

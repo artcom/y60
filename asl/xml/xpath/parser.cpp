@@ -1,3 +1,27 @@
+/**************************************************************************
+ *                                                                        *
+ *  This file is part of TaXTable, an XPath implementation for Y60.       *
+ *                                                                        *
+ *                                                                        *
+ *                                                                        *
+ *  (C) 2005-2007  Tobias Anton <tobias.anton@web.de>                     *
+ *                                                                        *
+ *                                                                        *
+ *  TaXTable is free software: you can redistribute it and/or modify      *
+ *  it under the terms of the GNU General Public License as published by  *
+ *  the Free Software Foundation, either version 3 of the License, or     *
+ *  (at your option) any later version.                                   *
+ *                                                                        *
+ *  TaXTable is distributed in the hope that it will be useful,           *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *  GNU General Public License for more details.                          *
+ *                                                                        *
+ *  You should have received a copy of the GNU General Public License     *
+ *  along with TaXTable.  If not, see <http://www.gnu.org/licenses/>.     *
+ *                                                                        *
+ **************************************************************************/
+
 #include <asl/string_functions.h>
 #include "Expression.h"
 
@@ -71,6 +95,7 @@ namespace xpath {
 	    int num;
 	    iss >> num;
 	    *e = new Number(num);
+	    assert(pos != nw_pos);
 	    return nw_pos;
 	} else if ((ft = Function::typeOf(instring, pos)) != Function::Unknown) {
 	    std::list<Expression*> *arglist = new std::list<Expression*>();
@@ -81,6 +106,8 @@ namespace xpath {
 		nw_pos = parseArgumentList(arglist, instring, nw_pos);
 		*e = new Function(ft, arglist);
 		return nw_pos;
+	    } else {
+		delete arglist;
 	    }
 	}
 
@@ -90,6 +117,8 @@ namespace xpath {
 	    pos = nw_pos;
 	    *e = p;
 	} else {
+	    AC_ERROR << "new path is " << *p;
+	    delete p;
 	    // ### parse error / not a primary expression
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "no expression at " << instring.substr(pos);
@@ -235,41 +264,50 @@ namespace xpath {
 #endif
 	int nw_pos;
 	if ((nw_pos = parseRelationalExpression(e, instring, pos)) != pos) {
-	    pos = nw_pos;
 #if PARSER_DEBUG_VERBOSITY > 1
-	    AC_TRACE << "parsing success for Relational Expression before " << instring.substr(pos);
+	    AC_TRACE << "parsing success for Relational Expression before " << instring.substr(nw_pos);
 #endif
+	} else {
+	    AC_WARNING << "parse error for Relational Expression " << instring.substr(pos);
+	    delete *e;
+	    return pos;
 	}
-	pos = asl::read_whitespace(instring, pos);
+	nw_pos = asl::read_whitespace(instring, nw_pos);
 	BinaryExpression::ExpressionType op;
-	if (instring[pos] == '=') {
+	if (instring[nw_pos] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
-	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
+	    AC_TRACE << "found EqualityExpression at " << instring.substr(nw_pos);
 #endif
 	    op = BinaryExpression::Equal;
-	    pos++;
-	    pos = asl::read_whitespace(instring, pos);
-	} else if (instring[pos] == '!' && instring[pos+1] == '=') {
+	    nw_pos++;
+	    nw_pos = asl::read_whitespace(instring, nw_pos);
+	} else if (instring[nw_pos] == '!' && instring[nw_pos+1] == '=') {
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "found EqualityExpression at " << instring.substr(pos);
 #endif
 	    op = BinaryExpression::NotEqual;
-	    pos+=2;
-	    pos = asl::read_whitespace(instring, pos);
+	    nw_pos+=2;
+	    nw_pos = asl::read_whitespace(instring, nw_pos);
 	} else {
 #if PARSER_DEBUG_VERBOSITY > 1
 	    AC_TRACE << "no further parse EqualityExpression at " << instring.substr(pos);
 #endif
-	    return pos;
+	    return nw_pos;
 	}
 
 	Expression *secondE;
-	pos = parseEqualityExpression(&secondE, instring, pos);
-	*e = new BinaryExpression(op, *e, secondE);
+	int nw_pos2 = parseEqualityExpression(&secondE, instring, nw_pos);
+	if (nw_pos2 != nw_pos) {
+	    *e = new BinaryExpression(op, *e, secondE);
 #if PARSER_DEBUG_VERBOSITY > 1
-	AC_TRACE << "created equality expression " << **e;
+	    AC_TRACE << "created equality expression " << **e;
 #endif
-	return pos;
+	    return nw_pos2;
+	} else {
+	    AC_WARNING << "XPath parse error.";
+	    delete secondE;
+	    return nw_pos;
+	}
     }
 
     const std::string TOKEN_AND = "and";
@@ -327,9 +365,10 @@ namespace xpath {
 #ifdef DEBUG_PARSER_STATES
 	AC_TRACE << "parsePredicates at " << instring.substr(pos);
 #endif
-	while (instring[pos] == '[') {
+	int nw_pos = pos;
+	while (instring[nw_pos] == '[') {
 	    Expression *e;
-	    pos = parseExpression(&e, instring, pos+1);
+	    nw_pos = parseExpression(&e, instring, nw_pos+1);
 
 	    if (dynamic_cast<xpath::Number*>(e)) {
 		s.appendPredicate(new BinaryExpression(BinaryExpression::Equal, new Function(Function::Position, new std::list<xpath::Expression*>()), e));
@@ -337,11 +376,12 @@ namespace xpath {
                 s.appendPredicate(e);
 	    }
 
-	    if (instring[pos++] != ']') {
-		// XXX parse error
+	    if (instring[nw_pos++] != ']') {
+		AC_WARNING << " XPath parse error: could not read predicate at " << instring.substr(pos);
+		return pos;
 	    }
 	}
-	return pos;
+	return nw_pos;
     }
 
     int parseNodeTest(Step &s, const std::string &instring, int pos) {
@@ -385,13 +425,15 @@ namespace xpath {
 #endif
 	Step::Axis a = Step::Invalid;
 	Step *s;
+	int nw_pos;
 	if (instring[pos] == '.') {
+
             if (instring[pos+1] == '.') { // ".." as shorthand for "parent::node()"
 		a = Step::Parent;
-		pos+=2;
+		nw_pos = pos + 2;
 	    } else { // "." as shorthand for "self::node()"
 		a = Step::Self;
-		pos++;
+		nw_pos = pos + 1;
 	    }
 	    s = new Step(a, Step::TestPrincipalType);
 	} else {
@@ -399,34 +441,48 @@ namespace xpath {
 		// shorthand for "attribute ::".
 		// name test and predicates will follow.
 		a = Step::Attribute;
-		pos++;
+		nw_pos = pos + 1;
 	    } else if ((a = Step::read_axis(instring, pos)) != Step::Invalid) {
-		int nw_pos = asl::read_if_string(instring, pos, Step::stringForAxis(a));
+		AC_TRACE << " current pos = " << pos;
+		nw_pos = asl::read_if_string(instring, pos, Step::stringForAxis(a));
+
 		if (nw_pos == pos) {
 		    AC_ERROR << " internal XPath parsing error: could not read step";
 		    // internal consistency error
-		} else if (instring[nw_pos] == ':' && instring[nw_pos+1] == ':') {
-		    pos = nw_pos + 2;
+		    return pos;
+		}
+
+		if (instring[nw_pos] == ':' && instring[nw_pos+1] == ':') {
+		    nw_pos += 2;
 		} else {
 		    AC_WARNING << " XPath parse error.";
 		    return pos;
-		    //parse error.
 		}
+
 	    } else {
 		// if axis and "::" are omitted,
 		// the default axis "child" is used.
 		// node test and predicates may follow.
 		a = Step::Child;
+		nw_pos = pos;
 	    }
 	    assert(a != Step::Invalid);
 	    s = new Step(a, Step::TestPrincipalType);
-	    // parse "nodetest predicates"
-	    pos = parseNodeTest(*s, instring, pos);
-	    pos = parsePredicates(*s, instring, pos);
-#if PARSER_DEBUG_VERBOSITY > 1
-	    AC_TRACE << "parseStep done at " << instring.substr(pos) << " into " << *s;
-#endif
+
+	    int nw_pos2 = parseNodeTest(*s, instring, nw_pos);
+	    if (nw_pos2 == nw_pos) {
+		delete s;
+		AC_WARNING << " XPath parse error.";
+		return pos;
+	    }
+	    nw_pos = nw_pos2;
 	}
+
+	pos = parsePredicates(*s, instring, nw_pos);
+#if PARSER_DEBUG_VERBOSITY > 1
+	AC_TRACE << "parseStep done at " << instring.substr(pos) << " into " << *s;
+#endif
+
 	p->appendStep(s);
 #if PARSER_DEBUG_VERBOSITY > 1
 	AC_TRACE << "path is now " << *p;
@@ -438,32 +494,48 @@ namespace xpath {
 #ifdef DEBUG_PARSER_STATES
 	AC_TRACE << "parseRelativePath at " << instring.substr(pos);
 #endif
-	pos = parseStep(p, instring, pos);
-	while (instring[pos] == '/') {
-	    if (instring[pos+1] == '/') {
-		p->appendStep(new Step(Step::Descendant_Or_Self, Step::TestAnyNode));
-		pos += 2;
-	    } else {
-		pos++;
-	    };
-	    pos = parseStep(p, instring, pos);
+	int nw_pos = parseStep(p, instring, pos);
+	if (nw_pos == pos) {
+	    AC_WARNING << " XPath parse error.";
+	    return pos;
 	}
-	return pos;
+	while (instring[nw_pos] == '/') {
+	    if (instring[nw_pos+1] == '/') {
+		p->appendStep(new Step(Step::Descendant_Or_Self, Step::TestAnyNode));
+		nw_pos += 2;
+	    } else {
+		nw_pos++;
+	    };
+	    int nw_pos2 = parseStep(p, instring, nw_pos);
+	    if (nw_pos2 == nw_pos) {
+		AC_WARNING << " parse error.";
+		return pos;
+	    }
+	    nw_pos = nw_pos2;
+	}
+	return nw_pos;
     }
 
     int parsePath(Path *p, const std::string &instring, int pos) {
 #ifdef DEBUG_PARSER_STATES
 	AC_TRACE << "parsePath at " << instring.substr(pos);
 #endif
+	int nw_pos = pos;
         if (instring[pos] == '/') {
 	    if (instring[pos+1] == '/') {
 		p->appendStep(new Step(Step::Descendant_Or_Self, Step::TestAnyNode));
-		pos+=2;
+		nw_pos+=2;
 	    } else {
                 p->setAbsolute();
-		pos++;
+		nw_pos++;
 	    }
 	}
-	return parseRelativePath(p, instring, pos);
+	int retval;
+	if ((retval = parseRelativePath(p, instring, nw_pos)) == nw_pos) {
+	    AC_WARNING << " XPath parse error.";
+	    return pos;
+	}
+	return retval;
+	
     }
 }; // namespace xpath
