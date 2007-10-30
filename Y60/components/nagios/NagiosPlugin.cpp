@@ -76,9 +76,14 @@ NagiosPlugin :: NagiosPlugin(DLHandle theDLHandle) :
 
 void
 NagiosPlugin :: onStartup(jslib::AbstractRenderWindow * theWindow) {
-    _myStatusServer = asl::Ptr<ConduitAcceptor<TCPPolicy> >(
-            new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort), StatusServer::create)); 
-    _myStatusServer->start();
+    if ( ! _myStatusServer ) {
+        _myStatusServer = asl::Ptr<ConduitAcceptor<TCPPolicy> >(
+                new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort),
+                                               StatusServer::create)); 
+        _myStatusServer->start();
+    } else {
+        AC_INFO << "Nagios server allready running. Reusing instance.";
+    }
 }
 
 bool
