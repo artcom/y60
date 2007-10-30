@@ -34,7 +34,6 @@ function createStyleCache(theStylesNode) {
             window.loadTTF(myStyleNode.name, FONT_PATH + myStyleNode.face, myStyleNode.size);               
         }
     }    
-    //print(ourCacheDom)
 
 }
 
@@ -182,6 +181,7 @@ function createTextAsImage(theText, theSize, theStyle, thePosition)
         window.setTextPadding(theStyle.topPad, theStyle.bottomPad, theStyle.leftPad, theStyle.rightPad);
         window.setHTextAlignment(theStyle.HTextAlign);
         window.setVTextAlignment(theStyle.VTextAlign);
+        var myOldColor = window.getTextColor();
         window.setTextColor(asColor(theStyle.textColor));
         window.setTracking(theStyle.tracking);
         window.setLineHeight(theStyle.lineHeight);
@@ -201,6 +201,7 @@ function createTextAsImage(theText, theSize, theStyle, thePosition)
         				 + theStyle.name + ", " + theSize[0] + ", " + theSize[1] + ", " + thePosition + "): " + e);
         	throw e;
         }
+        window.setTextColor(myOldColor);
         var myMatrix = new Matrix4f();
         myMatrix.makeScaling(new Vector3f(myTextSize.x / myImageNode.width, 
                                           myTextSize.y / myImageNode.height, 1));
