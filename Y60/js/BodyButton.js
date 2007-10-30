@@ -567,8 +567,9 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
         Logger.trace("setState(" + theState + ")");
         for (var i = 0;  i < Protected.elementnodes.length;i++) {
             var myElementNode = Protected.elementnodes[i];
-            myElementNode.material = _myImageMaterialIds[_myState];
+            myElementNode.material = _myImageMaterialIds[theState];
         }
+        _myState = theState;
     }
     
     self.setAlpha = function(theAlpha){
@@ -620,7 +621,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
             if(theFilenames.length >2){
                 myImageMaterialInfoColored = createImageAndMaterial(theFilenames[2]);
             } else {
-                myImageMaterialInfoColored = myImageMaterialInfoDown;
+                myImageMaterialInfoColored = myImageMaterialInfoUp;
             }
         }
 
@@ -873,7 +874,6 @@ MultiLanguageButton.prototype.Constructor = function(self,
                 myDownMaterialInfo.size = getImageSize(theFilenames[lang][1]);
                 _myImageMaterialInfos.down.push(myDownMaterialInfo);
 
-                print("theFilenames[lang].length: " + theFilenames[lang].length);
                 if (theFilenames[lang].length == 3) {
                     var myColorMaterialInfo = {};
                     myColorMaterialInfo.material = createMaterialFromImage(theFilenames[lang][2]);
