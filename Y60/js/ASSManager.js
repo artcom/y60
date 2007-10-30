@@ -7,49 +7,117 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-// i know this must hurt, but i need them (vs)
-use("Button.js")
-use("Overlay.js")
-function ASSManager(theViewer, theOSDFlag) {
-    this.Constructor(this, theViewer, theOSDFlag);
+
+function ASSManager(theViewer) {
+    this.Constructor(this, {}, theViewer, false);
 }
 
 ASSManager.driver = null;
 
-const VERBOSE_EVENTS = false;
-var QUIT_OSD = true;
-var OSD_FILE = undefined;
-const ENABLE_QUIT_OSD_TIME = 4.0;
-const ENABLE_QUIT_OSD_DISTANCE = 50;//65.0;
+ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInheritedFlag) {
 
-ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
-    function setup() {
-        if ( ! ASSManager.driver ) {
-            ASSManager.driver = plug("ASSEventSource");
-        }
-        _myDriver = ASSManager.driver;
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
 
-        _myWindow.addExtension( ASSManager.driver );
-        _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
-        _myViewer.registerSettingsListener( self, "ASSDriver" );
+    var _myViewer = theViewer;
+    var _myWindow = theViewer.getRenderWindow();
+    var _myScene = theViewer.getScene();
+    var _myDriver = null;
+    var _mySettings = null;
 
+    var _myGridSize =  new Vector2f(1, 1);
+    var _myInitialSettingsLoaded = false;
 
-        if (theOSDFlag == undefined) {
-            _hasQuitOSD = QUIT_OSD;
-        } else {
-            _hasQuitOSD = theOSDFlag;
-        }
-        print("======= has quit osd: " + _hasQuitOSD );
+    var _myValueOverlay = null;
 
-        if (_hasQuitOSD) {
-            buildQuitOSD();
-        }
-        
+    var _myEventQueues = {};
 
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+
+    Public.driver getter = function() {
+        return _myDriver;
     }
 
-    self.onUpdateSettings = function( theSettings ) {
+    Public.valueColor getter = function() {
+        var myMaterial = _myScene.world.getElementById( _myDriver.rasterNames[0] + "Material");
+        if (myMaterial) {
+            return myMaterial.properties.surfacecolor;
+        } else {
+            Logger.warning("Can not get valueColor. Materials have not been created yet.");
+            return Vector4f(1, 1, 1, 1);
+        }
+    }
 
+    Public.valueColor setter = function(theColor) {
+        var myRasterNames = _myDriver.rasterNames;
+        for (var i = 0; i < myRasterNames.length; ++i) {
+            var myId = _myDriver.rasterNames[0] + "Material";
+            var myMaterial = _myScene.world.getElementById( myId );
+            if (myMaterial) {
+                myMaterial.properties.surfacecolor = theColor;
+            } else {
+                Logger.warning("Can not set valueColor. Material with id '" + myId + "' has not been created yet.");
+            }
+        }
+    }
+
+    Public.gridColor getter = function() {
+        return _myDriver.gridColor;
+    }
+
+    Public.gridColor setter = function(theColor) {
+        _myDriver.gridColor = theColor;
+    }
+
+    Public.cursorColor getter = function() {
+        return _myDriver.cursorColor;
+    }
+
+    Public.cursorColor setter = function(theColor) {
+        _myDriver.cursorColor = theColor;
+    }
+
+    Public.touchColor getter = function() {
+        return _myDriver.touchColor;
+    }
+
+    Public.touchColor setter = function(theColor) {
+        _myDriver.touchColor = theColor;
+    }
+
+    Public.textColor getter = function() {
+        return _myDriver.textColor;
+    }
+
+    Public.textColor setter = function(theColor) {
+        _myDriver.textColor = theColor;
+    }
+
+    Public.probeColor getter = function() {
+        return _myDriver.probeColor;
+    }
+
+    Public.probeColor setter = function(theColor) {
+        _myDriver.probeColor = theColor;
+    }
+
+    Public.getPrecedingEvent = function(theEvent, theNumber) {
+        if (theEvent.id in _myEventQueues) {
+            var thisQueue = _myEventQueues[theEvent.id];
+            if (thisQueue.length > theNumber) {
+                return thisQueue[thisQueue.length - theNumber - 1];
+            }
+            return thisQueue[0];
+        } else {
+            Logger.warning("Could not retrieve preceding event " + theNumber + " for event " + theEvent.id);
+        }
+    }
+
+    Public.onUpdateSettings = function( theSettings ) {
+        
         _mySettings = theSettings;
 
         if (_myValueOverlay) {
@@ -105,154 +173,44 @@ ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
         }
     }
 
-    self.setOSDInvisible = function() {
-        _myQuitOSD.visible = false;
-        _myQuitCursorEvent = null;         
-    }
- 
-
-    var _myEventQueues = {};
-    var _myEventIDMQBs = {};
-    self.onASSEvent = function( theEventNode ) {
+    Public.onASSEvent = function(theEventNode) {
         if (!(theEventNode.id in _myEventQueues)) {
             _myEventQueues[theEventNode.id] = new Array();
         }
+
         _myEventQueues[theEventNode.id].push(theEventNode);
+
         if (_myEventQueues[theEventNode.id].length > 1000) {
             _myEventQueues[theEventNode.id].shift();
         }
-//print(theEventNode);
-        if (theEventNode.type == "configure") {
-            if ( VERBOSE_EVENTS ) {
-                print("ASSManager::onASSEvent: configure");
-            }
-            onConfigure( theEventNode );
-        } else if (theEventNode.type == "add") {
-            if ( VERBOSE_EVENTS ) {
-                print("ASSManager::onASSEvent: add");
-            }
-            if (_hasQuitOSD) {                    
-                if (!_myQuitCursorEvent) {
-                    _myQuitCursorEvent = theEventNode;
-                    //print("#### added quit cursor");
-                }
-            }
-            //_myEventIDMQBs[theEventNode.id] = new MaterialQuadBody();
 
-        } else if (theEventNode.type == "move") {
-            if ( VERBOSE_EVENTS ) {
-                print("ASSManager::onASSEvent: move");
-            }
-            if (_hasQuitOSD) {                    
-                if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
-                    var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
-                    var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
-                    if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
-                        _myQuitCursorEvent = null;
-                    } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
-                        if(_myQuitOSD.visible == false) {
-                            _myQuitOSD.moveToTop();
-                            _myQuitOSD.visible = true;
-                            window.setTimeout("setOSDInvisible", 5.0*1000, self);     
-                        }    
-                    }
-                }
-            }
-            //_myEventMQBs[theEventNode.id].body.position = theEventNode.position3D;
+        if(theEventNode.type == "configure") {
+            onConfigure(theEventNode);
+        }
 
-        } else if ( theEventNode.type == "touch") {
-            if ( VERBOSE_EVENTS ) {
-                print("ASSManager::onASSEvent: touch at " + theEventNode.raw_position);
-            }
-            if (_hasQuitOSD) {                    
-                // handle application quit
-                 var myPosition = theEventNode.position3D;                    
-                _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
-                _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x, myPosition.y);
-                _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x, myPosition.y, 30);
-                _myQuitConfirmButton.onMouseButton(MOUSE_UP, myPosition.x, myPosition.y);
-            }
-        }
-        if (theEventNode.type == "remove") {
-            if ( VERBOSE_EVENTS ) {
-                print("ASSManager::onASSEvent: remove");
-            }
-            if (_hasQuitOSD) {                    
-                if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
-                    _myQuitCursorEvent = null;
-                }
-            }
-        }
-    }
-
-    self.getPrecedingEvent = function(theEvent, theNumber) {
-        if (theEvent.id in _myEventQueues) {
-            var thisQueue = _myEventQueues[theEvent.id];
-            if (thisQueue.length > theNumber) {
-                return thisQueue[thisQueue.length - theNumber - 1];
-            }
-            return thisQueue[0];
-        } else {
-            print("Sorry, no event in queue " + theEvent.id);
-        }
-    }
-
-    self.driver getter = function() {
-        return _myDriver;
-    }
-  function buildQuitOSD() {
-        const myStyle = {
-            color:             asColor("FFFFFF"),
-            selectedColor:     asColor("FFFFFF"),
-            textColor:         asColor("00FFFF"),
-            font:              "${PRO}/testmodels/fonts/arial.ttf", 
-            HTextAlign:        Renderer.LEFT_ALIGNMENT,
-            fontsize:          18
-        }
         
-        var myOSDSize = new Vector2i(300, 80);
-        var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
-        if (OSD_FILE != undefined) {
-            myImage.src = OSD_FILE;
-        } else {
-            myImage.src = "shadertex/on_screen_display.rgb";
-        }
-        myImage.resize = "pad";
-
-        _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImage);
-        var myImageSize = getImageSize(_myQuitOSD.image);
-       _myQuitOSD.visible = false;
-
-        var myColor = 0.3
-        var myQuitText="";
-        var myContinueText="";
-        if (OSD_FILE == undefined) {
-            _myQuitOSD.color = new Vector4f(myColor,myColor,myColor,0.75);
-            myQuitText = "Quit";
-            myContinueText="Continue";
-            _myQuitOSD.width  = myOSDSize.x;
-            _myQuitOSD.height = myOSDSize.y;
-        } else {
-            _myQuitOSD.width  = myImageSize.x;
-            _myQuitOSD.height = myImageSize.y;
-         }
-       _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
-                                             (window.height - _myQuitOSD.height) / 2);
-         
-        var myButtonSize = new Vector2i((_myQuitOSD.width/2)-10,(_myQuitOSD.height/2)-10);
-        var myButtonPos = new Vector2f(10,10);
-        _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", myQuitText, myButtonSize, myButtonPos, myStyle, _myQuitOSD);
-        _myQuitConfirmButton.onClick = function() {
-            exit();
-        }
-        myStyle.HTextAlign = Renderer.RIGHT_ALIGNMENT,
-        myButtonPos.x += myButtonSize.x;
-        _myQuitCancelButton = new TextButton(window.scene, "Cancel_Quit", myContinueText, myButtonSize, myButtonPos, myStyle, _myQuitOSD);
-        _myQuitCancelButton.onClick = function() {
-            _myQuitOSD.visible = false;
-        }
     }
-    
+
+    ////////////////////////////////////////
+    // Protected
+    ////////////////////////////////////////
+
+    Protected.setup = function() {
+        if ( ! ASSManager.driver ) {
+            ASSManager.driver = plug("ASSEventSource");
+        }
+
+        _myDriver = ASSManager.driver;
+
+        _myWindow.addExtension( ASSManager.driver );
+        _myViewer.registerSettingsListener( _myDriver, "ASSDriver" );
+        _myViewer.registerSettingsListener( Public, "ASSDriver" );
+    }
+
+    ////////////////////////////////////////
+    // Private
+    ////////////////////////////////////////
+
     function setupValueMaterials() {
         var myRasterNames = _myDriver.rasterNames;
         for (var i = 0; i < myRasterNames.length; ++i) {
@@ -280,8 +238,7 @@ ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
         }
     }
 
-    function onConfigure( theEvent ) {
-
+    function onConfigure(theEvent) {
         _myGridSize = new Vector2f( theEvent.grid_size );
 
         setupValueMaterials();
@@ -294,9 +251,8 @@ ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
         _myDriver.overlay = _myValueOverlay.node;
 
         if (_mySettings) {
-            self.onUpdateSettings( _mySettings );
+            Public.onUpdateSettings( _mySettings );
         }
-
     }
 
     function getMaterialIdForValueDisplay() {
@@ -316,78 +272,11 @@ ASSManager.prototype.Constructor = function(self, theViewer, theOSDFlag) {
         return myRasterNames[ myIndex ] + "Material";
     }
 
-    self.valueColor getter = function() {
-        var myMaterial = _myScene.world.getElementById( _myDriver.rasterNames[0] + "Material");
-        if (myMaterial) {
-            return myMaterial.properties.surfacecolor;
-        }
-        Logger.warning("Can not get valueColor. Materials have not been created yet.");
-        return Vector4f(1, 1, 1, 1);
-    }
-    self.valueColor setter = function(theColor) {
-        var myRasterNames = _myDriver.rasterNames;
-        for (var i = 0; i < myRasterNames.length; ++i) {
-            var myId = _myDriver.rasterNames[0] + "Material";
-            var myMaterial = _myScene.world.getElementById( myId );
-            if (myMaterial) {
-                myMaterial.properties.surfacecolor = theColor;
-            } else {
-                Logger.warning("Can not set valueColor. Material with id '" + myId + "' has not been created yet.");
-            }
-        }
-    }
-    self.gridColor getter = function() {
-        return _myDriver.gridColor;
-    }
-    self.gridColor setter = function(theColor) {
-        _myDriver.gridColor = theColor;
-    }
+    ////////////////////////////////////////
+    // Setup
+    ////////////////////////////////////////
 
-    self.cursorColor getter = function() {
-        return _myDriver.cursorColor;
+    if(!theInheritedFlag) {
+        Protected.setup();
     }
-    self.cursorColor setter = function(theColor) {
-        _myDriver.cursorColor = theColor;
-    }
-
-    self.touchColor getter = function() {
-        return _myDriver.touchColor;
-    }
-    self.touchColor setter = function(theColor) {
-        _myDriver.touchColor = theColor;
-    }
-
-    self.textColor getter = function() {
-        return _myDriver.textColor;
-    }
-    self.textColor setter = function(theColor) {
-        _myDriver.textColor = theColor;
-    }
-
-    self.probeColor getter = function() {
-        return _myDriver.probeColor;
-    }
-    self.probeColor setter = function(theColor) {
-        _myDriver.probeColor = theColor;
-    }
-
-
-    var _myViewer = theViewer;
-    var _myWindow = theViewer.getRenderWindow();
-    var _myScene = theViewer.getScene();
-    var _myDriver = null;
-    var _mySettings = null;
-
-    var _myGridSize =  new Vector2f(1, 1);
-    var _myInitialSettingsLoaded = false;
-
-    var _myValueOverlay = null;
-    var _myQuitCancelButton  = null;
-    var _myQuitConfirmButton = null;
-    var _myQuitOSD = null;
-    var _myQuitCursorEvent = null;
-    var _hasQuitOSD = false;
- setup();
 }
-
-

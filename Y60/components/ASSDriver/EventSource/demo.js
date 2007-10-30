@@ -11,7 +11,7 @@
 if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
-use("ASSManager.js");
+use("ASSOSD.js");
 use("BuildUtils.js");
 use("SoundController.js");
 
@@ -76,7 +76,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDummyAppContainer.name = "DummyAppContainer";
         _myDummyAppContainer.scale = [DISPLAY_SCALE, DISPLAY_SCALE, 1];
 
-        _myASSManager = new ASSManager( self, _myDummyAppContainer );
+        _myASSManager = new ASSOSD( self, _myDummyAppContainer );
         //_myASSManager.driver.performTara(); // XXX
         //_myASSManager.driver.callibrateTransmissionLevels(); // XXX
 
