@@ -200,7 +200,7 @@ Playlist.prototype.Constructor = function(self) {
             if (operatingSystem() == "LINUX" || theSeekableFlag) {
                 myDecoderHint = "y60FFMpegDecoder2";
             } else {
-                myDecoderHint = "y60QuicktimeDecoder";
+                myDecoderHint = "y60FFMpegDecoder2";//"y60QuicktimeDecoder";
             }
         }
         if (theUrl.search(/\.wmv$/i)  != -1 ) {

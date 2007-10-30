@@ -175,10 +175,16 @@ self.CB = function() {
             myMover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         }
         if (!theAltFlag) {
-            _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
+            if (_myDebugVisual) {
+                _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
+            }
             self.getLightManager().onKey(theKey, theKeyState, theShiftFlag);
-            _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
-            _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);
+            if (_myAnimationManager) {
+                _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
+            }
+            if (_myConfigurator) {
+                _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);
+            }
         }
         if (_myShutter) {
             if (_myShutter.onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag)) {
@@ -483,7 +489,7 @@ self.CB = function() {
         self.setMover(ClassicTrackballMover, myViewport);
         self.setActiveCamera(window.scene.dom.getElementById(myViewport.camera), myViewport);
 
-        _myDebugVisual = new DebugVisual(myScene.world, self);
+        //_myDebugVisual = new DebugVisual(myScene.world, self);
 
         _myAnimationManager = new AnimationManager(self);
 
@@ -497,6 +503,7 @@ self.CB = function() {
                 break;
             }
         }
+        
         _myConfigurator = new Configurator(self, mySettingsFile);
 
         if (theWindowTitle != null) {

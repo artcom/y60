@@ -548,7 +548,7 @@ ImageToggleTextBodyButton.prototype.Constructor = function(self, Protected, theN
 
     self.resetState = function() {
         if(_myState == BUTTON_STATE_DOWN || BUTTON_STATE_COLORED){
-            self.setState(BUTTON_STATE_UP);
+            self.state = BUTTON_STATE_UP;
         }
     }
 
