@@ -196,10 +196,6 @@ self.CB = function() {
         }
         if (!theAltFlag) {
             switch (theKey) {
-                case 'u':
-                    window.visible = false;
-                    window.setTimeout("CB", 5.0*1000);                    
-                    break;
                 case 'n':
                     self.getActiveViewport().drawnormals = !self.getActiveViewport().drawnormals;
                     print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));

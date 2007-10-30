@@ -710,6 +710,7 @@ function setWorldPosition(theBody, theWorldPosition) {
 }
 
 function transformClipToWorld(theClipPos, theCamera) {
+    // [sh] - beware of great float values
     var myProjectionMatrix = new Matrix4f(theCamera.frustum.projectionmatrix);
     myProjectionMatrix.invert();
     myProjectionMatrix.postMultiply(theCamera.globalmatrix);
