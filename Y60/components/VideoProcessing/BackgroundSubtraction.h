@@ -35,8 +35,7 @@ namespace y60 {
 
 
 		private:
-            unsigned int clampedSub(unsigned int theFirstValue, unsigned int theSecondValue); 
-            float clampedSubHSL(unsigned int theFirstValue, unsigned int theSecondValue); 
+            unsigned char clampedSub(unsigned char theFirstValue, unsigned char theSecondValue);
             
             dom::Element _myResultNode;
             dom::ValuePtr _mySourceRaster;

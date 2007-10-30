@@ -18,6 +18,7 @@ namespace y60 {
 	class FastBlur : public Algorithm {
 		public:
             FastBlur(const std::string & theName);
+            virtual ~FastBlur();
 
 			static std::string getName() { return "fastblur"; }
 		    void onFrame(double t);
@@ -34,7 +35,10 @@ namespace y60 {
             y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
             
+            float * _myFloatImage;
             float _myStrength;
+            unsigned int _myWidth;
+            unsigned int _myHeight;
     };
 }
 

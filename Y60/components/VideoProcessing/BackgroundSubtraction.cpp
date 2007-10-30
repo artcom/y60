@@ -63,51 +63,29 @@ namespace y60 {
 	void 
     BackgroundSubtraction::onFrame(double t) {
         
-        const BGRRaster * mySourceFrame     = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
-        const BGRRaster * myBackgroundFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myBackgroundRaster);
-        const BGRRaster * myTargetFrame     = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetRaster);
+        const GRAYRaster * mySourceFrame     = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceRaster);
+        const GRAYRaster * myBackgroundFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myBackgroundRaster);
+        const GRAYRaster * myTargetFrame     = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetRaster);
         
-        BGRRaster::iterator itBg   = const_cast<BGRRaster::iterator>(myBackgroundFrame->begin());
-        BGRRaster::iterator itTrgt = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
+        GRAYRaster::iterator itBg   = const_cast<GRAYRaster::iterator>(myBackgroundFrame->begin());
+        GRAYRaster::iterator itTrgt = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());
+        
         
         float myAlpha = _myWeight;
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
+        asl::gray<unsigned char> mySrcIntensity;
+        asl::gray<unsigned char> myBgIntensity;   
+        asl::gray<unsigned char> myTrgtIntensity;
         
-        for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); ++itSrc,++itBg, ++itTrgt) {
-            rgb_to_intensity((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], mySrcIntensity);
-            rgb_to_intensity((*itTrgt)[2], (*itTrgt)[1], (*itTrgt)[0], myTrgtIntensity);
-            rgb_to_intensity((*itBg)[2], (*itBg)[1], (*itBg)[0], myBgIntensity);
-            
-            //rgb_to_hsl((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], mySrcHSV);
-            //rgb_to_hsl((*itBg)[2], (*itBg)[1], (*itBg)[0], myBgHSV);
+        for (GRAYRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); ++itSrc,++itBg, ++itTrgt) {
 
-            myTrgtIntensity = clampedSub(myBgIntensity, mySrcIntensity);            
-            //float myDiffSaturation = myBgHSV[1] - mySrcHSV[1];            
-            //AC_PRINT << ;
-            
-            // if( myTrgtIntensity > _myThreshold ) {
-            //     //AC_PRINT << myHSV[0] << " " << myHSV[1] << " " << myHSV[2];
-            //     (*itTrgt)[0] = 255;
-            //     (*itTrgt)[1] = 255;
-            //     (*itTrgt)[2] = 255;
-            // } else {
-            //     (*itTrgt)[0] = 0;
-            //     (*itTrgt)[1] = 0;
-            //     (*itTrgt)[2] = 0;
-            // }
-           
-            (*itTrgt)[0] = myTrgtIntensity;
-            (*itTrgt)[1] = myTrgtIntensity;
-            (*itTrgt)[2] = myTrgtIntensity;
 
+            myTrgtIntensity = clampedSub((*itBg).get(), (*itSrc).get());            
+            //AC_PRINT << myTrgtIntensity;            
+            (*itTrgt) = myTrgtIntensity;
+            
+            //"adaptive" background
             if (_myCounter >= 5) {
-                (*itBg)[0] = static_cast<unsigned int>(myAlpha * (*itSrc)[0] + (1-myAlpha)*(*itBg)[0]);
-                (*itBg)[1] = static_cast<unsigned int>(myAlpha * (*itSrc)[1] + (1-myAlpha)*(*itBg)[1]);
-                (*itBg)[2] = static_cast<unsigned int>(myAlpha * (*itSrc)[2] + (1-myAlpha)*(*itBg)[2]);
+                (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
             }
         }
         
@@ -117,35 +95,13 @@ namespace y60 {
         }
         _myCounter++;
         
-        
-        
-//         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
-//         for(unsigned int blob = 0; blob < myBlobs->size(); ++blob) {
-//             asl::Vector2f  myCenter =  (*myBlobs)[blob]->center();
-//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]+1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-//             _myTargetImage->getRasterPtr()->setPixel(asl::AC_SIZE_TYPE(myCenter[0]-1), asl::AC_SIZE_TYPE(myCenter[1]), Vector4f(0.0,1.0,0.0,1.0));
-//             dom::Node & centerNode = *(_myResultNode.childNode("center"));
-            
-//             centerNode.childNode("#text")->nodeValue(asl::as_string(myCenter));
-            
-//             centerNode["x"] = asl::as_string(myCenter[0]);
-//             centerNode["y"] = asl::as_string(myCenter[1]);
-//             AC_PRINT << myCenter[0] << " " << myCenter[1];
-//         }   
-    
         _myTargetImage->triggerUpload();
         _myBackgroundImage->triggerUpload();
         
 	}
     
-    unsigned int
-    BackgroundSubtraction::clampedSub(unsigned int theFirstValue, unsigned int theSecondValue) {
-        return asl::maximum<unsigned int>(theFirstValue, theSecondValue) -  asl::minimum<unsigned int>(theFirstValue, theSecondValue);
-    }
-
-    float
-    BackgroundSubtraction::clampedSubHSL(unsigned int theFirstValue, unsigned int theSecondValue) {
-        return asl::maximum<float>(theFirstValue, theSecondValue) -  asl::minimum<float>(theFirstValue, theSecondValue);
+    unsigned char
+    BackgroundSubtraction::clampedSub(unsigned char theFirstValue, unsigned char theSecondValue) {
+        return asl::maximum<unsigned char>(theFirstValue, theSecondValue) -  asl::minimum<unsigned char>(theFirstValue, theSecondValue);
     }
 }

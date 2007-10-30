@@ -23,6 +23,11 @@ namespace y60 {
     {   
     }
   
+    FastBlur::~FastBlur() 
+    {   
+        delete [] _myFloatImage;
+    }   
+
 
     void 
     FastBlur::configure(const dom::Node & theNode) {
@@ -35,6 +40,11 @@ namespace y60 {
             if( myImage ) {
                 if( myName == "sourceimage") {
                     _mySourceImage = myImage->getFacade<y60::Image>();
+                    _myWidth  = _mySourceImage->getRasterPtr()->width();
+                    _myHeight = _mySourceImage->getRasterPtr()->height();
+
+                    _myFloatImage = new float[_myWidth*_myHeight];
+
                 } else if( myName == "targetimage") {
                     _myTargetImage = myImage->getFacade<y60::Image>();
                 } 
@@ -49,77 +59,60 @@ namespace y60 {
 	void 
     FastBlur::onFrame(double t) {
         
-        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
-        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
+        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
+        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
         
-        // BGRRaster::iterator itSrc  = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
-        // BGRRaster::iterator itTrgt = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
-        
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
-
-        dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
-
-        unsigned int myWidth  = _mySourceImage->getRasterPtr()->width();
-        unsigned int myHeight = _mySourceImage->getRasterPtr()->height();
-
-         
-        float * myFloatImage = new float[myWidth*myHeight];
+       
         
         // float!
-        BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+        GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
         unsigned int i=0;
 
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
-            myFloatImage[i] = static_cast<float>((*itSrc)[0]);
+            _myFloatImage[i] = static_cast<float>((*itSrc).get());
         }
 
         // left-to-right horizontal pass
-        for (i=0; i<myWidth*myHeight; ++i) {
-            myFloatImage[i] = revlookup(myFloatImage[i]) + lookup(myFloatImage[i-1]);
+        for (i=0; i<_myWidth*_myHeight; ++i) {
+            _myFloatImage[i] = revlookup(_myFloatImage[i]) + lookup(_myFloatImage[i-1]);
         }
        
 
         // right-to-left horizontal pass
-        for (i=myWidth*myHeight-1; i>1; --i) {
-            myFloatImage[i-1] = revlookup(myFloatImage[i-1]) + lookup(myFloatImage[i]);
+        for (i=_myWidth*_myHeight-1; i>1; --i) {
+            _myFloatImage[i-1] = revlookup(_myFloatImage[i-1]) + lookup(_myFloatImage[i]);
         }
          
         // up-down vertical pass
-        for (unsigned int w=0; w<myWidth; w++) {
-            for (unsigned int h=1; h<myHeight; h++) {
-                unsigned int pos0 = w+myWidth*(h-1);
-                unsigned int pos1 = w+myWidth*h;
+        for (unsigned int w=0; w<_myWidth; w++) {
+            for (unsigned int h=1; h<_myHeight; h++) {
+                unsigned int pos0 = w+_myWidth*(h-1);
+                unsigned int pos1 = w+_myWidth*h;
 
-                myFloatImage[pos1] = revlookup(myFloatImage[pos1]) + lookup(myFloatImage[pos0]);
+                _myFloatImage[pos1] = revlookup(_myFloatImage[pos1]) + lookup(_myFloatImage[pos0]);
             }
         }
 
         // down-up vertical pass
-        for (unsigned int w=0; w<myWidth; w++) {
-            for (unsigned int h=myHeight-1; h>0; h--) {
-                unsigned int pos0 = w+myWidth*(h-1);
-                unsigned int pos1 = w+myWidth*(h);
+        for (unsigned int w=0; w<_myWidth; w++) {
+            for (unsigned int h=_myHeight-1; h>0; h--) {
+                unsigned int pos0 = w+_myWidth*(h-1);
+                unsigned int pos1 = w+_myWidth*(h);
                 
-                myFloatImage[pos0] = revlookup(myFloatImage[pos0]) + lookup(myFloatImage[pos1]);
+                _myFloatImage[pos0] = revlookup(_myFloatImage[pos0]) + lookup(_myFloatImage[pos1]);
             }
         }
 
         // reverse float
         // float!
-        itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+        itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
+        
        
         i=0;
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
-            for (unsigned int j=0; j<3; ++j) {
-                (*itSrc)[j] = static_cast<unsigned char>(myFloatImage[i]);
-            }
+            (*itSrc) = static_cast<unsigned char>(_myFloatImage[i]);
         }
 
-        delete [] myFloatImage;
     
         _myTargetImage->triggerUpload();
         

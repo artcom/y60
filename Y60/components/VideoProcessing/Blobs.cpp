@@ -70,23 +70,17 @@ namespace y60 {
     Blobs::onFrame(double t) {
         y60::ImagePtr myGrayImage = _mySourceImage;
 
-        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
+        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
         const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
         
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
-
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
         // // left-to-right horizontal pass
-        BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+        GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
         GRAYRaster::iterator itTarget = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());
         
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTarget) {
-            (*itTarget) = (*itSrc)[0];
+            (*itTarget) = (*itSrc);
         }
         
         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));

@@ -72,25 +72,17 @@ namespace y60 {
 	void 
     Contrast::onFrame(double t) {
         
-        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
-        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
+        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
+        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
         
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
-
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
         // // left-to-right horizontal pass
-        BGRRaster::iterator itSrc = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
+        GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
         itSrc++;
 
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc) {
-            for (unsigned int i=0; i<3; i++) {
-                (*itSrc)[i] = _myLookupTable[(*itSrc)[i]];
-            }
+            (*itSrc) = _myLookupTable[(*itSrc).get()];
         }
         
         _myTargetImage->triggerUpload();

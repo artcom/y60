@@ -54,16 +54,10 @@ namespace y60 {
     DumbScale::onFrame(double t) {
         
         const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
-        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetRaster);
+        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetRaster);
         
-        BGRRaster::iterator itTrgt = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
-        
-        unsigned int mySrcIntensity;
-        unsigned int myBgIntensity;   
-        unsigned int myTrgtIntensity;
-        Vector3f mySrcHSV;
-        Vector3f myBgHSV;
-        
+        GRAYRaster::iterator itTrgt = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());       
+       
         unsigned int myLineSubCounter = 0;
         
         unsigned int myDebugCount = 0;
@@ -80,9 +74,10 @@ namespace y60 {
             }
 
             if (myLineFlag) {
-                (*itTrgt)[0] = (unsigned char) ( ((*itSrc)[0] + (*itSrc)[1] + (*itSrc)[2]) / 3.0f );
-                (*itTrgt)[1] = (unsigned char) ( ((*itSrc)[0] + (*itSrc)[1] + (*itSrc)[2]) / 3.0f );
-                (*itTrgt)[2] = (unsigned char) ( ((*itSrc)[0] + (*itSrc)[1] + (*itSrc)[2]) / 3.0f );
+                unsigned char myTarget = (*itTrgt).get();
+                rgb_to_intensity((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], myTarget);
+                (*itTrgt).set(myTarget);
+
                 itTrgt++;
                 myDebugCount++;
             }

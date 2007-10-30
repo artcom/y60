@@ -82,6 +82,12 @@ namespace y60 {
                                   const unsigned char theB, unsigned int & theResult) {
             theResult = static_cast<unsigned int>(0.2989*theR + 0.5870*theG + 0.1140*theB);
         }   
+        
+        inline
+            void rgb_to_intensity(const unsigned char theR, const unsigned char theG, 
+                                  const unsigned char theB, unsigned char & theResult) {
+            theResult = static_cast<unsigned char>(0.2989*theR + 0.5870*theG + 0.1140*theB);
+        }   
 
     protected:
         y60::ScenePtr _myScene;
