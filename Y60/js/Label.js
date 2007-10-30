@@ -106,6 +106,10 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         return _myTextSize;
     }
 
+    Public.text setter = function(theText) {
+	Public.setText(theText, Public.style);
+    }
+
     // Get the size of the rendered text.
     Public.getTextSize = function() {
         return _myTextSize;
