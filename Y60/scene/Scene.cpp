@@ -1422,7 +1422,7 @@ namespace y60 {
         if (_myTextureManager->registerResourceManager(0) == 0) {
             // XXX ?
             clearShapes();
-            setup();
+            //setup();
         }
     }
 
