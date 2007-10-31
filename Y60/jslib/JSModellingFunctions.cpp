@@ -57,6 +57,7 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
             myResult = createTransform(myParentNode, myTransformName);
         }
         *rval = as_jsval(cx, myResult);
+
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;

@@ -109,6 +109,8 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
         static JSBool
+        getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 

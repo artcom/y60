@@ -411,6 +411,20 @@ JSAbstractRenderWindow<DERIVED>::setTextColor(JSContext *cx, JSObject *obj, uint
 
 template<class DERIVED>
 JSBool
+JSAbstractRenderWindow<DERIVED>::getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Gets the current text color");
+    DOC_END;
+    ensureParamCount(argc, 0);
+    try {
+        const asl::Vector4f & myColor = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextColor();
+        *rval = as_jsval(cx, myColor);
+        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+template<class DERIVED>
+JSBool
 JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Renders a text into a target image node");
     DOC_PARAM("theImageNode", "A X60 target imagenode", DOC_TYPE_NODE);
@@ -869,6 +883,7 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         // text rendering
         {"renderText",         renderText,               3},
         {"setTextColor",       setTextColor,             1},
+        {"getTextColor",       getTextColor,             0},
         {"renderTextAsImage",  renderTextAsImage,        5},
         {"getTextCursorPosition", getTextCursorPosition, 0},
         {"setTextPadding",     setTextPadding,           4},
