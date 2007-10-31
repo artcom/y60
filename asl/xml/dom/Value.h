@@ -986,7 +986,9 @@ namespace dom {
             if ( myNativeSource ) {
                 const asl::const_subraster<PIXEL> mySourceRegion(*myNativeSource, sourceX, sourceY, sourceWidth, sourceHeight);
                 if (myTargetRect.getSize() !=mySourceRect.getSize()) { 
+#ifndef WIN32
                     asl::resample(mySourceRegion, myTargetRegion, SumType());
+#endif                    
                 } else {
                     std::copy(mySourceRegion.begin(), mySourceRegion.end(), myTargetRegion.begin());
                 }
@@ -1014,7 +1016,9 @@ namespace dom {
        virtual void resample(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
             T & myNative = _myRasterValue.openWriteableValue();
             asl::raster<PIXEL> myTmp(newWidth, newHeight);
+#ifndef WIN32
             asl::resample(myNative, myTmp, SumType());
+#endif            
             std::swap(myTmp, myNative);
            _myRasterValue.closeWriteableValue();
         }
