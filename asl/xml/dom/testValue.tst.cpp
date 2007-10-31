@@ -362,6 +362,7 @@ public:
 	    
         ResizeableRaster & myRaster = dynamic_cast<ResizeableRaster&>(*myValue);	
         myRaster.resize(20, 10);
+        myRaster.pasteRaster(myInitializedValue);
     }
 private:
     T _someVariable;
