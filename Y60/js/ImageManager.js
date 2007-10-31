@@ -59,8 +59,9 @@ function blurImage(theImageNode, theRadius, theSigma) {
 }
 
 function getImageSize(theImage) {
-    if (theImage.src=="" && theImage.childNodes.length == 0) {
-        print("### ERROR: src attribute must be set, before getting size for image: "+ theImage.id);
+    if (!("src" in theImage) || (theImage.src=="" && theImage.childNodes.length == 0) {
+        Logger.error("### ERROR: src attribute must be set before getting size for image: "+ theImage.id);
+        return undefined;
     }
     var mySize = new Vector3f(theImage.width, theImage.height, 0);
     var myImageMatrix = new Matrix4f(theImage.matrix);
