@@ -25,6 +25,7 @@
 #include <asl/palgo.h>
 #include <asl/standard_pixel_types.h>
 #include <asl/Vector234.h>
+#include <asl/Box.h>
 
 #include <asl/pixels.h>
 #include <asl/Logger.h>
@@ -781,6 +782,7 @@ namespace dom {
         virtual asl::WriteableBlock & pixels() = 0;
         virtual void assign(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight, const asl::ReadableBlock & thePixels) = 0;
         virtual void resize(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) = 0;
+        virtual void resample(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) = 0;
         virtual void add(const ValueBase & theRasterArg) = 0;
         virtual void sub(const ValueBase & theRasterArg) = 0;
         virtual void clear() = 0;
@@ -800,12 +802,13 @@ namespace dom {
         virtual void writePixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const RGBA & thePixel) = 0;
         virtual ValuePtr makeScaled(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) const = 0;
         virtual ValuePtr makeSubRaster(asl::AC_SIZE_TYPE hOrigin, asl::AC_SIZE_TYPE vOrigin, asl::AC_SIZE_TYPE hSize, asl::AC_SIZE_TYPE vSize) const = 0;
-        virtual ValuePtr pasteRaster(asl::AC_SIZE_TYPE hOrigin, asl::AC_SIZE_TYPE vOrigin, const ValueBase & theRaster) = 0;
 */
-        virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY, const ValueBase & theSource,
-                                 asl::AC_OFFSET_TYPE sourceX, asl::AC_OFFSET_TYPE sourceY, 
-                                 asl::AC_OFFSET_TYPE sourceWidth, asl::AC_OFFSET_TYPE sourceHeight) = 0;
-        virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY, const ValueBase & theSource) = 0;
+        virtual void pasteRaster(const ValueBase & theSource,
+                asl::AC_OFFSET_TYPE sourceX = 0, asl::AC_OFFSET_TYPE sourceY = 0,
+                asl::AC_OFFSET_TYPE sourceWidth = 0, asl::AC_OFFSET_TYPE sourceHeight = 0,
+                asl::AC_OFFSET_TYPE targetX = 0, asl::AC_OFFSET_TYPE targetY = 0,
+                asl::AC_OFFSET_TYPE targetWidth = 0, asl::AC_OFFSET_TYPE targetHeight = 0) = 0;
+        //virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY, const ValueBase & theSource) = 0;
 
     };
     typedef asl::Ptr<ResizeableRaster, dom::ThreadingModel> ResizeableRasterPtr;
@@ -832,6 +835,7 @@ namespace dom {
     template <class RASTER_VALUE, class T, class PIXEL_VALUE>
     struct MakeResizeableRaster : public ResizeableRaster {
         typedef typename T::value_type PIXEL;
+        typedef typename asl::SumTraits<PIXEL>::type SumType; 
 
         MakeResizeableRaster(RASTER_VALUE & theRasterValue) : _myRasterValue(theRasterValue) {}
 
@@ -937,29 +941,62 @@ namespace dom {
             _myRasterValue.closeWriteableValue(); 
         }
 
-        virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY,
-                                 const ValueBase & theSource,
-                                 asl::AC_OFFSET_TYPE sourceX, asl::AC_OFFSET_TYPE sourceY,
-                                 asl::AC_OFFSET_TYPE sourceWidth, asl::AC_OFFSET_TYPE sourceHeight)
+        virtual void pasteRaster(const ValueBase & theSource,
+                                 asl::AC_OFFSET_TYPE sourceX = 0, asl::AC_OFFSET_TYPE sourceY = 0,
+                                 asl::AC_OFFSET_TYPE sourceWidth = 0, asl::AC_OFFSET_TYPE sourceHeight = 0,
+                                 asl::AC_OFFSET_TYPE targetX = 0, asl::AC_OFFSET_TYPE targetY = 0,
+                                 asl::AC_OFFSET_TYPE targetWidth = 0, asl::AC_OFFSET_TYPE targetHeight = 0)
         {
             T & myNativeTarget = _myRasterValue.openWriteableValue();
-            // TODO: bounds checking ...
-            const ResizeableRaster & mySourceRaster = raster_cast( theSource );
-            asl::subraster<PIXEL> myTargetRegion( myNativeTarget, targetX, targetY,
-                    sourceWidth, sourceHeight);
 
+            // bounds checking ...
+            if (targetWidth == 0) {
+                targetWidth = myNativeTarget.hsize() - targetX;
+            }
+
+           if (targetHeight == 0) {
+                targetHeight = myNativeTarget.vsize() - targetY;
+            }
+
+             asl::Box2<asl::AC_OFFSET_TYPE> myTargetRect(targetX, targetY, targetX+targetWidth, targetY+targetHeight);
+            asl::Box2<asl::AC_OFFSET_TYPE> myTargetRasterRect(0, 0, myNativeTarget.hsize()-1, myNativeTarget.vsize()-1);
+            if (!myTargetRasterRect.contains(myTargetRect)) {
+                AC_ERROR << "pasteRaster: target rectangle is outside target raster, target raster="<< myTargetRasterRect << ", target rect="<<myTargetRect;
+                return;
+            }
+            const ResizeableRaster & mySourceRaster = raster_cast( theSource );
             const T * myNativeSource = dynamic_cast_Value<T>( & theSource );
+            
+            if (sourceWidth == 0) {
+                sourceWidth = myNativeSource->hsize() - sourceX;
+            }
+
+           if (sourceHeight == 0) {
+                sourceHeight = myNativeSource->vsize() - sourceY;
+            }
+
+            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
+            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize()-1, myNativeSource->vsize()-1);
+            if (!mySourceRasterRect.contains(mySourceRect)) {
+                AC_ERROR << "pasteRaster: source rectangle is outside source raster, source raster="<< mySourceRasterRect << ", source rect="<<mySourceRect;
+                return;
+            }
+            asl::subraster<PIXEL> myTargetRegion( myNativeTarget, targetX, targetY, targetWidth, targetHeight);
+
             if ( myNativeSource ) {
-                const asl::const_subraster<PIXEL> mySourceRegion( *myNativeSource, sourceX, sourceY, 
-                        sourceWidth, sourceHeight);
-                std::copy(mySourceRegion.begin(), mySourceRegion.end(), myTargetRegion.begin());
+                const asl::const_subraster<PIXEL> mySourceRegion(*myNativeSource, sourceX, sourceY, sourceWidth, sourceHeight);
+                if (myTargetRect.getSize() !=mySourceRect.getSize()) { 
+                    asl::resample(mySourceRegion, myTargetRegion, SumType());
+                } else {
+                    std::copy(mySourceRegion.begin(), mySourceRegion.end(), myTargetRegion.begin());
+                }
             } else {
                 throw RasterArgumentTypeMismatch(JUST_FILE_LINE);
             }
 
             _myRasterValue.closeWriteableValue();
         }
-
+#if 0
         virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY,
                           const ValueBase & theSource)
         {
@@ -968,11 +1005,20 @@ namespace dom {
                     asl::AC_OFFSET_TYPE(mySourceRaster.width()), 
                     asl::AC_OFFSET_TYPE(mySourceRaster.height()));
         }
-
+#endif
         virtual void resize(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
             _myRasterValue.openWriteableValue().resize(newWidth, newHeight);
             _myRasterValue.closeWriteableValue();
         }
+
+       virtual void resample(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
+            T & myNative = _myRasterValue.openWriteableValue();
+            asl::raster<PIXEL> myTmp(newWidth, newHeight);
+            asl::resample(myNative, myTmp, SumType());
+            std::swap(myTmp, myNative);
+           _myRasterValue.closeWriteableValue();
+        }
+
         template <class BINARY_FUNCTION>
         void transform(const ValueBase & theRasterArg, BINARY_FUNCTION theFunction) {
             const T * myNativeRasterArg = dynamic_cast_Value<T>(&theRasterArg);

@@ -76,8 +76,7 @@ class raster {
     public:
         //  raster specific funtions go here:
         D xsize() const { return _stride;}
-        D hsize() const { return _stride;}
-
+        D hsize() const { return _stride;} 
         D ysize() const { return _stride ? size() * PackedRaster<T>::Factor / _stride : 0;}
         D vsize() const { return _stride ? size() * PackedRaster<T>::Factor / _stride : 0;}
 

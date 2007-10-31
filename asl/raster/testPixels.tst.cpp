@@ -80,6 +80,8 @@ public:
         std::multiplies<PIX> myMultiplier;
         PIX somePix = myMultiplier(firstPixel, secondPixel);
 
+        typename SumTraits<PIX>::type mySum = typename SumTraits<PIX>::type(firstPixel) + typename SumTraits<PIX>::type(secondPixel);
+        ENSURE(mySum == typename SumTraits<PIX>::type(firstPixel + secondPixel));
 /*
         iota(begin(firstPixel),end(firstPixel),1);
         //DPRINT(firstPixel);

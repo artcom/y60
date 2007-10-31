@@ -462,13 +462,14 @@ namespace y60 {
             }
             dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
             if ( theSourceRect ) {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
-                                      *mySourceRaster,
+                myRaster->pasteRaster(*mySourceRaster,
                                       theSourceRect->getMin()[0], theSourceRect->getMin()[1],
-                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
+                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1],
+                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]));
             } else {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
-                                      *mySourceRaster);
+                myRaster->pasteRaster(*mySourceRaster,
+                                      0,0,0,0,
+                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]));
             }
         } else {
             // image must be resized to fit new size

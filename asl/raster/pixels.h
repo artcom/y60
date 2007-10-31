@@ -35,6 +35,21 @@ namespace asl {
     DEFINE_EXCEPTION(NotSupportedException, Exception);
 
 template <class T>
+struct SumTraits {
+    typedef T type;
+};
+
+template<>
+struct SumTraits<char> {
+    typedef int type;
+};
+
+template<>
+struct SumTraits<unsigned char> {
+    typedef unsigned int type;
+};
+
+template <class T>
 struct PixelTraits {
     typedef T * iterator;
 };
@@ -181,6 +196,10 @@ struct PixelTraits<Pixel<THECOLOR, VALUE, DERIVED> > {
     typedef typename Pixel<THECOLOR, VALUE, DERIVED>::iterator iterator;
 };
 
+template <class THECOLOR, class VALUE, class DERIVED>
+struct SumTraits<Pixel<THECOLOR, VALUE, DERIVED> > {
+     typedef Pixel<THECOLOR, typename SumTraits<VALUE>::type, typename SumTraits<DERIVED>::type> type;
+};
 
 template <class VALUE,class THECOLOR, class PIXEL>
 inline std::ostream& operator<<(std::ostream& o, const Pixel<THECOLOR,VALUE,PIXEL>& s)
@@ -320,13 +339,15 @@ struct gray : public Pixel<ColorGray,VALUE, gray<VALUE> > {
     gray(const typename Pixel<ColorGray, VALUE, gray<VALUE> >::base_type & initValue) :
                 Pixel<ColorGray, VALUE, gray<VALUE> >::base_type(initValue) {}
 };
+
+// TODO: calculate pixelsum for gray values, fix free getter functions for red, green, blue, alpha etc.
 template <template <class> class PIXEL, class VALUE>
 VALUE getGrayValue(const PIXEL<VALUE> & thePixel) {
-    return thePixel.get(gray<VALUE>()).get();
+    return thePixel.get();
 }
 template <template <class> class PIXEL, class VALUE, class SRC_VALUE>
 void setGrayValue(PIXEL<VALUE> & thePixel, SRC_VALUE theValue) {
-    thePixel.get(gray<VALUE>()).set(theValue);
+    thePixel.set(theValue);
 }
 
 template <class VALUE>
@@ -590,6 +611,18 @@ struct DXT1 {
         return myResult;
     }
     inline
+    DXT1 operator*(DXT1 v) const {
+        DXT1 myResult;
+        myResult.value = value - v.value;
+        return myResult;
+    }
+    inline
+    DXT1 operator*(float v) const {
+        DXT1 myResult;
+        myResult.value = (unsigned long long)(value * v);
+        return myResult;
+    }
+    inline
     bool operator==(DXT1 v) const {
         return (value == v.value);
     }
@@ -614,6 +647,18 @@ struct DXT1a {
         return myResult;
     }
     inline
+    DXT1a operator*(DXT1a v) const {
+        DXT1a myResult;
+        myResult.value = value * v.value;
+        return myResult;
+    }
+    inline
+    DXT1a operator*(float v) const {
+        DXT1a myResult;
+        myResult.value = (unsigned long long)(value * v);
+        return myResult;
+    }
+     inline
     bool operator==(DXT1a v) const {
         return (value == v.value);
     }
@@ -639,6 +684,20 @@ struct DXT3 {
         myResult.value2 = value2 - v.value2;
         return myResult;
     }
+    inline
+    DXT3 operator*(DXT3 v) const {
+        DXT3 myResult;
+        myResult.value1 = value1 * v.value1;
+        myResult.value2 = value2 * v.value2;
+        return myResult;
+    }
+    DXT3 operator*(float v) const {
+        DXT3 myResult;
+        myResult.value1 = (unsigned long long)(value1 * v);
+        myResult.value2 = (unsigned long long)(value2 * v);
+        return myResult;
+    }
+
     inline
     bool operator==(DXT3 v) const {
         return (value1 == v.value1 && value2 == v.value2);
@@ -667,6 +726,20 @@ struct DXT5 {
         return myResult;
     }
     inline
+    DXT5 operator*(DXT5 v) const {
+        DXT5 myResult;
+        myResult.value1 = value1 * v.value1;
+        myResult.value2 = value2 * v.value2;
+        return myResult;
+    }
+    inline
+    DXT5 operator*(float v) const {
+        DXT5 myResult;
+        myResult.value1 = (unsigned long long)(value1 * v);
+        myResult.value2 = (unsigned long long)(value2 * v);
+        return myResult;
+    }
+     inline
     bool operator==(DXT5 v) const {
         return (value1 == v.value1 && value2 == v.value2);
     }

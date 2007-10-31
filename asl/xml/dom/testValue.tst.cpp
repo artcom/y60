@@ -47,8 +47,11 @@ using namespace dom;
 
 namespace dom {
     typedef asl::raster<asl::RGB> RasterOfRGB;
+    typedef asl::raster<asl::gray<float> > RasterOfGRAYF;
     DEFINE_VALUE_WRAPPER_TEMPLATE2(RasterOfRGB, dom::ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE2(RasterOfGRAYF, dom::ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(asl::gray<float>, SimpleValue);
 }
 
 namespace asl {
@@ -297,21 +300,21 @@ private:
         class ELEMENT_VALUE = SimpleValue<typename T::value_type>
     >
 */
-#ifdef _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
-template <template <class> class VALUE, 
-          class T>
-#else
+
+//#ifdef _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
+//template <template <class> class VALUE, 
+//          class T>
+//#else
 template <template <class,template<class,class,class> class,class> class VALUE,
           class T>
-#endif
+//#endif
 class XmlRasterValueUnitTest : public TemplateUnitTest {
 public:
     XmlRasterValueUnitTest(const char * theTemplateArgument, T testValue) 
         : TemplateUnitTest("XmlValueUnitTest-",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
+        typedef VALUE<T, dom::MakeResizeableRaster, SimpleValue<typename T::value_type> >VALUE_T;
     void run() {
-        // typedef VALUE<T, dom::MakeResizeableRaster> VALUE_T; // doesn't work in gcc
-        typedef VALUE<T> VALUE_T;
         
 		VALUE_T myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
@@ -356,6 +359,9 @@ public:
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
 		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+	    
+        ResizeableRaster & myRaster = dynamic_cast<ResizeableRaster&>(*myValue);	
+        myRaster.resize(20, 10);
     }
 private:
     T _someVariable;
@@ -620,6 +626,9 @@ public:
         asl::raster<asl::RGB> myRaster(3,4,RGB(10,11,12));
         myRaster(0,0) = RGB(20,21,22);
         addTest(new XmlRasterValueUnitTest<dom::ComplexValue,asl::raster<asl::RGB> >("raster<RGB>",myRaster));
+        asl::raster<gray<float> > myFRaster(3,4,gray<float>(10.0));
+        myFRaster(0,0) = 1.0;
+        addTest(new XmlRasterValueUnitTest<dom::ComplexValue,asl::raster<gray<float> > >("raster<gray<float> >",myFRaster));
         addTest(new BitsetValueUnitTest());
     }
 };

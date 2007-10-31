@@ -68,6 +68,31 @@ TO auto_cast(double mySrc) {
     return mySrc;
 }
 
+template <class TO>
+TO auto_cast(DXT1 mySrc) {
+    throw NotSupportedException(JUST_FILE_LINE); 
+    return mySrc;
+}
+template <class TO>
+TO auto_cast(DXT1a mySrc) {
+    throw NotSupportedException(JUST_FILE_LINE); 
+    return mySrc;
+}
+template <class TO>
+TO auto_cast(DXT3 mySrc) {
+    throw NotSupportedException(JUST_FILE_LINE); 
+    return mySrc;
+}
+
+template <class TO>
+TO auto_cast(DXT5 mySrc) {
+    throw NotSupportedException(JUST_FILE_LINE); 
+    return mySrc;
+}
+
+
+
+
 template <class TO, class FROM_T>
 TO auto_cast(const RGB_t<FROM_T> & mySrc) {
     TO myResult;
@@ -103,6 +128,23 @@ TO auto_cast(const ABGR_t<FROM_T> & mySrc) {
     setGreenValue(myResult, getGreenValue(mySrc));
     setBlueValue(myResult, getBlueValue(mySrc));
     setAlphaValue(myResult, getAlphaValue(mySrc));
+    return myResult;
+}
+
+template <class TO, class FROM_T>
+TO auto_cast(const BGRA_t<FROM_T> & mySrc) {
+    TO myResult;
+    setRedValue(myResult, getRedValue(mySrc));
+    setGreenValue(myResult, getGreenValue(mySrc));
+    setBlueValue(myResult, getBlueValue(mySrc));
+    setAlphaValue(myResult, getAlphaValue(mySrc));
+    return myResult;
+}
+
+template <class TO, class FROM_T>
+TO auto_cast(const gray<FROM_T> & mySrc) {
+    TO myResult;
+    setGrayValue(myResult, getGrayValue(mySrc));
     return myResult;
 }
 
