@@ -59,7 +59,7 @@ function blurImage(theImageNode, theRadius, theSigma) {
 }
 
 function getImageSize(theImage) {
-    if (!("src" in theImage) || (theImage.src=="" && theImage.childNodes.length == 0) {
+    if (!("src" in theImage) || (theImage.src=="" && theImage.childNodes.length == 0)) {
         Logger.error("### ERROR: src attribute must be set before getting size for image: "+ theImage.id);
         return undefined;
     }
