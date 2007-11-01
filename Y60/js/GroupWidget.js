@@ -53,8 +53,6 @@
 //
 //=============================================================================
 
-use("WidgetBase.js");
-
 function GroupWidget() {
     this.Constructor(this);
 }
@@ -64,8 +62,6 @@ GroupWidget.prototype.Constructor = function(Public) {
     //////////////////////////////////////////////////////////////////////
     // Baseclass construction
     //////////////////////////////////////////////////////////////////////
-
-    WidgetBase.prototype.Constructor(Public);
 
     Public.deactivateBut = function(theClickedWidget) {
         for (item in Public.members) {
@@ -83,9 +79,8 @@ GroupWidget.prototype.Constructor = function(Public) {
     Public.finish = function() {
 	for (item in Public.members) {
             var myButton = Public.members[item];
-	    Logger.info(myButton + " has become a member of Group " + Public.WIDGET_META.name);
             if ("groups" in myButton) {
-                myButton.WIDGET_META.groups.push(Public);
+                myButton.groups.push(Public);
             }
         }
     }
