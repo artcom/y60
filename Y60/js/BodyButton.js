@@ -775,6 +775,11 @@ MultiLanguageButton.prototype.Constructor = function(self,
     self.getTextMaterial = function(){
         return _myTextMaterialInfo;    
     }
+    
+    self.setTextPosition = function(thePosition2d){
+        _myCustomPosition2d = new Vector2f(thePosition2d);
+        _myCustomTextPositionFlag = true;
+    }
     self.onFrame = function(theTime){
         if (_myFadeState != STATE_IDLE) {        
             if (_myAnimationTime == -1) {
@@ -1038,7 +1043,7 @@ MultiLanguageButton.prototype.Constructor = function(self,
 
     // current text material info
     var _myTextMaterialInfo = null;
-    
+    var _myCustomTextPositionFlag = false;
     var _myFadeState = STATE_IDLE;
     var _myAnimationTime = 0;
     var _myDelay = 0;
@@ -1085,6 +1090,158 @@ RadioButtonGroup.prototype.Constructor = function(self) {
     }
 }
 
+function AnswerButtonGroup() {
+    this.Constructor(this);
+}
+AnswerButtonGroup.prototype.Constructor = function(self) {
 
+    const BUTTON_BETWEEN_DELAY = 0.2;
+    const WAIT_FOR_SHOW_RESULT_TIME = 0.4;
+    const SHOW_RESULT_TIME = 0.4;
+    
+    const ANSWER_GIVEN = 1;
+    const SHOW_RESULT= 2;
+    const READY_FOR_NEXT_QUESTION = 3;
+
+    var _myButtons = [];
+    var _myAnimationStartTime = 0;
+    var _myState = READY_FOR_NEXT_QUESTION;
+    var _myPressedButtonIndex = 0;
+    
+    self.add = function(theButton) {  
+        print("Added new button to button group");
+        _myButtons.push(theButton);
+
+        theButton.myOldOnClick = theButton.onClick;
+        theButton.onClick = function() {
+            Logger.trace("Extended button group callback");
+            // ensure that the button remains pressed, when
+            // you click on it again
+            this.setState(BUTTON_STATE_DOWN);   
+            for (var b = 0; b < _myButtons.length; b++) {
+                if(this == _myButtons[b]){
+                    _myPressedButtonIndex = b;
+                }
+            }
+            self.changeState(ANSWER_GIVEN); 
+        }
+    }
+    
+    self.onFrame = function(theTime){
+        if (_myAnimationStartTime  == -1 ) {
+            _myAnimationStartTime = theTime;
+        }
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].onFrame(theTime);    
+        }
+        switch (_myState) {
+            case ANSWER_GIVEN:
+                var myDelta = (theTime - _myAnimationStartTime) / WAIT_FOR_SHOW_RESULT_TIME;
+                if(myDelta >=1){
+                    self.changeState(SHOW_RESULT);
+                }
+            break;
+            case SHOW_RESULT:
+                var myDelta = (theTime - _myAnimationStartTime) / SHOW_RESULT_TIME;
+                if(myDelta >=1){
+                    self.changeState(READY_FOR_NEXT_QUESTION);
+                }
+            break; 
+        }
+    }
+
+    self.fadeOut = function(theDuration, theDelay, theButtonBetweenDelay){
+        if(theButtonBetweenDelay == undefined){
+            theButtonBetweenDelay = BUTTON_BETWEEN_DELAY;
+        }
+        for(var i=0; i < _myButtons.length; ++i){
+            var myBetweenDelay = (Number(theButtonBetweenDelay) * i);
+            _myButtons[i].fadeOut(theDuration/_myButtons.length, Number(theDelay) + myBetweenDelay);    
+        }
+    }
+
+    self.fadeIn = function(theDuration, theDelay, theButtonBetweenDelay){
+        if(theButtonBetweenDelay == undefined){
+            theButtonBetweenDelay = BUTTON_BETWEEN_DELAY;
+        }
+        for(var i=0; i < _myButtons.length; ++i){
+            var myBetweenDelay = (Number(theButtonBetweenDelay) * i);
+            _myButtons[i].fadeIn(theDuration/_myButtons.length, Number(theDelay) + myBetweenDelay);    
+        }
+    }
+    
+    self.isDone = function(){
+        var myDoneFlag = true;
+        for(var i=0; i < _myButtons.length; ++i){
+            myDoneFlag &= _myButtons[i].isDone();    
+        }
+        myDoneFlag &= (_myState == READY_FOR_NEXT_QUESTION);
+        return myDoneFlag;
+    }
+    
+    self.setAlpha = function(theAlpha){
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].setAlpha(theAlpha);    
+        }
+    }
+    self.setVisible = function(theVisibleFlag){
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].setVisible(theVisibleFlag);    
+        }
+    }
+    
+    self.setInsensible = function(theInsensibleFlag){
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].setInsensible(theInsensibleFlag);    
+        }
+    }
+    self.switchLanguage = function(theLanguage) {
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].switchLanguage(theLanguage);    
+        }
+    }
+    self.setState = function(theState) {
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].setState(theState);    
+        }
+    }
+    self.resetState = function() {
+        for(var i=0; i < _myButtons.length; ++i){
+            _myButtons[i].resetState();    
+        }
+    }
+    
+    self.changeState = function(theNewState) {
+        Logger.trace("changeState: " + theNewState);
+        _myAnimationStartTime = -1;
+        switch (theNewState) {
+            case ANSWER_GIVEN:
+                for(var i=0; i < _myButtons.length; ++i){
+                    _myButtons[i].setInsensible(true);    
+                }
+                break;
+            case SHOW_RESULT:
+                _myButtons[_myPressedButtonIndex].setState(BUTTON_STATE_COLORED);
+                if(_myButtons[_myPressedButtonIndex].correctness != "true"){
+                    for (var b = 0; b < _myButtons.length; b++) {
+                        Logger.trace("Checking button " + _myButtons[b].body.id);
+                        if (_myButtons[b].correctness == "true") {
+                            Logger.trace("setting state of button " + _myButtons[b].body.id);
+                            _myButtons[b].setState(BUTTON_STATE_COLORED);
+                        }
+                    }                    
+                } 
+                
+                break;    
+            case READY_FOR_NEXT_QUESTION:
+                if ("myOldOnClick" in _myButtons[_myPressedButtonIndex]) {
+                    _myButtons[_myPressedButtonIndex].myOldOnClick();
+                }
+                break;   
+        }        
+        _myState = theNewState;
+    }
+     
+}
 
 
