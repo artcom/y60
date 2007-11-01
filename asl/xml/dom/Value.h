@@ -958,8 +958,8 @@ namespace dom {
                 targetHeight = myNativeTarget.vsize() - targetY;
             }
 
-             asl::Box2<asl::AC_OFFSET_TYPE> myTargetRect(targetX, targetY, targetX+targetWidth, targetY+targetHeight);
-            asl::Box2<asl::AC_OFFSET_TYPE> myTargetRasterRect(0, 0, myNativeTarget.hsize()-1, myNativeTarget.vsize()-1);
+            asl::Box2<asl::AC_OFFSET_TYPE> myTargetRect(targetX, targetY, targetX+targetWidth, targetY+targetHeight);
+            asl::Box2<asl::AC_OFFSET_TYPE> myTargetRasterRect(0, 0, myNativeTarget.hsize(), myNativeTarget.vsize());
             if (!myTargetRasterRect.contains(myTargetRect)) {
                 AC_ERROR << "pasteRaster: target rectangle is outside target raster, target raster="<< myTargetRasterRect << ", target rect="<<myTargetRect;
                 return;
@@ -976,7 +976,7 @@ namespace dom {
             }
 
             asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
-            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize()-1, myNativeSource->vsize()-1);
+            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize(), myNativeSource->vsize());
             if (!mySourceRasterRect.contains(mySourceRect)) {
                 AC_ERROR << "pasteRaster: source rectangle is outside source raster, source raster="<< mySourceRasterRect << ", source rect="<<mySourceRect;
                 return;
@@ -988,6 +988,8 @@ namespace dom {
                 if (myTargetRect.getSize() !=mySourceRect.getSize()) { 
 #ifndef WIN32
                     asl::resample(mySourceRegion, myTargetRegion, SumType());
+#else
+                    throw asl::NotYetImplemented(JUST_FILE_LINE);                    
 #endif                    
                 } else {
                     std::copy(mySourceRegion.begin(), mySourceRegion.end(), myTargetRegion.begin());
@@ -1018,6 +1020,8 @@ namespace dom {
             asl::raster<PIXEL> myTmp(newWidth, newHeight);
 #ifndef WIN32
             asl::resample(myNative, myTmp, SumType());
+#else
+            throw asl::NotYetImplemented(JUST_FILE_LINE);                                
 #endif            
             std::swap(myTmp, myNative);
            _myRasterValue.closeWriteableValue();
