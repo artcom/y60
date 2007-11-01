@@ -1,25 +1,12 @@
-/**************************************************************************
- *                                                                        *
- *  This file is part of TaXTable, an XPath implementation for Y60.       *
- *                                                                        *
- *                                                                        *
- *  (C) 2005-2007  Tobias Anton <tobias.anton@web.de>                     *
- *                                                                        *
- *                                                                        *
- *  TaXTable is free software: you can redistribute it and/or modify      *
- *  it under the terms of the GNU General Public License as published by  *
- *  the Free Software Foundation, either version 3 of the License, or     *
- *  (at your option) any later version.                                   *
- *                                                                        *
- *  TaXTable is distributed in the hope that it will be useful,           *
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *  GNU General Public License for more details.                          *
- *                                                                        *
- *  You should have received a copy of the GNU General Public License     *
- *  along with TaXTable.  If not, see <http://www.gnu.org/licenses/>.     *
- *                                                                        *
- **************************************************************************/
+//=============================================================================
+// Copyright (C) 2007, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
 
 #ifndef XPATH_TYPES_H
 #define XPATH_TYPES_H
