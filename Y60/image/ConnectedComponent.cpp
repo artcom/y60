@@ -153,6 +153,10 @@ BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_thres
     RunList *runs2=new RunList();
     RunList *tmp;
 
+    RunList *myCleanupRuns1 = runs1;
+    RunList *myCleanupRuns2 = runs2;
+
+
     int run_start=0, run_stop=0;
     unsigned char cur=(pixels[0]>object_threshold)?1:0, p=0;
     //std::cerr<<"w="<<size[0]<<" h="<<size[1]<<std::endl;
@@ -200,6 +204,10 @@ BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_thres
             result->push_back(b->second);
         }
     }
+    
+    if (myCleanupRuns1) delete myCleanupRuns1;
+    if (myCleanupRuns2) delete myCleanupRuns2;
+
     return result;
 }
 
