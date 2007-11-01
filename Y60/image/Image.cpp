@@ -465,11 +465,13 @@ namespace y60 {
                 myRaster->pasteRaster(*mySourceRaster,
                                       theSourceRect->getMin()[0], theSourceRect->getMin()[1],
                                       theSourceRect->getSize()[0], theSourceRect->getSize()[1],
-                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]));
+                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
             } else {
                 myRaster->pasteRaster(*mySourceRaster,
                                       0,0,0,0,
-                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]));
+                                      asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      sourceWidth, sourceHeight);
             }
         } else {
             // image must be resized to fit new size
