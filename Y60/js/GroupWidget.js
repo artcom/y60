@@ -101,4 +101,6 @@ GroupWidget.prototype.Constructor = function(Public) {
 	    }
         }
     }
+    Public.setup = function() {
+    }
 }
