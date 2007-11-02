@@ -37,6 +37,7 @@ void CairoWrapper<cairo_surface_t>::reference() {
 
 template <>
 void CairoWrapper<cairo_surface_t>::unreference() {
+    // AC_INFO << "CairoSurface reference count: " << cairo_surface_get_reference_count(_myWrapped);
     cairo_surface_destroy(_myWrapped);
 }
 
@@ -209,7 +210,11 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 ;
         }
 
-        newNative = dynamic_cast<NATIVE*>(NATIVE::get(cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride)));
+        cairo_surface_t *mySurface = cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride);
+
+        newNative = NATIVE::get(mySurface);
+
+        cairo_surface_destroy(mySurface);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

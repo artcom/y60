@@ -40,6 +40,7 @@ void CairoWrapper<cairo_t>::reference() {
 
 template <>
 void CairoWrapper<cairo_t>::unreference() {
+    // AC_INFO << "Cairo reference count: " << cairo_get_reference_count(_myWrapped);
     cairo_destroy(_myWrapped);
 }
 
@@ -1248,7 +1249,11 @@ JSCairo::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             return JS_FALSE;
         }
 
-        newNative = NATIVE::get(cairo_create(mySurface));
+        cairo_t *myCairo = cairo_create(mySurface);
+
+        newNative = NATIVE::get(myCairo);
+
+        cairo_destroy(myCairo);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

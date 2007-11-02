@@ -39,6 +39,7 @@ void CairoWrapper<cairo_pattern_t>::reference() {
 
 template <>
 void CairoWrapper<cairo_pattern_t>::unreference() {
+    // AC_INFO << "CairoPattern reference count: " << cairo_pattern_get_reference_count(_myWrapped);
     cairo_pattern_destroy(_myWrapped);
 }
 
@@ -304,7 +305,11 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         cairo_surface_t *mySurface;
         convertFrom(cx, argv[0], mySurface);
 
-        newNative = dynamic_cast<NATIVE*>(NATIVE::get(cairo_pattern_create_for_surface(mySurface)));
+        cairo_pattern_t *myPattern = cairo_pattern_create_for_surface(mySurface);
+
+        newNative = NATIVE::get(myPattern);
+
+        cairo_pattern_destroy(myPattern);
 
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
