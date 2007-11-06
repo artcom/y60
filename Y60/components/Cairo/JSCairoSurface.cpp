@@ -217,9 +217,6 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         if (myPixelFormat == "BGRA") {
             myStride = myWidth * 4;
             myFormat = CAIRO_FORMAT_ARGB32;
-        } else if (myPixelFormat == "RGBA") {
-            myStride = myWidth * 4;
-            myFormat = CAIRO_FORMAT_ARGB32;
         } else {
             AC_ERROR << "Pixel format not supported by JSCairo: " << myPixelFormat;
             throw UnsupportedPixelFormat("Pixel format not supported by JSCairo: " + myPixelFormat, PLUS_FILE_LINE)
