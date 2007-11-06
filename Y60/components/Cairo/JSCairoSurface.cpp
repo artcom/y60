@@ -112,6 +112,23 @@ flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 // cairo_surface_type_t cairo_surface_get_type (cairo_surface_t *surface);
 
 static JSBool
+writeToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_surface_t *mySurface;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
+
+    ensureParamCount(argc, 1);
+
+    std::string myPath;
+    convertFrom(cx, argv[0], myPath);
+
+    cairo_surface_write_to_png(mySurface, myPath.c_str());
+
+    return checkForErrors(cx, mySurface);
+}
+
+static JSBool
 getWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -173,6 +190,8 @@ JSCairoSurface::Functions() {
 
         {"getWidth",             getWidth,                0},
         {"getHeight",            getHeight,               0},
+
+        {"writeToPNG",           writeToPNG,              1},
 
         // XXX hack to allow triggering texture upload -ingo
         {"triggerUpload",        triggerUpload,           0},
