@@ -918,7 +918,7 @@ namespace y60 {
         asl::Vector3f myCenter(myCenterPoint[0], myCenterPoint[1], myCenterPoint[2]);
         float myDistance = length(theCamera->get<PositionTag>() - myCenter);
 
-        // compensate for field of view (90° results in factor=1)
+        // compensate for field of view (90? results in factor=1)
         float myZoomAdjustment = 0.0f;
         float myFOV = theCamera->get<FrustumTag>().getHFov();
         if (myFOV < 180.0f) {
@@ -1283,6 +1283,13 @@ namespace y60 {
         //AC_PRINT << "Renderer::setProjection(): setting frustum: " << myFrustum << endl;
         //AC_PRINT << "Renderer::setProjection(): setting proj matrix to " << myProjectionMatrix << endl;
         glLoadMatrixf(static_cast<const GLfloat *>(myProjectionMatrix.getData()));
+        if (theViewport->get<ViewportOrientationTag>()
+            == PORTRAIT_ORIENTATION) 
+        {
+            asl::Matrix4f myRotationMatrix;
+            myRotationMatrix.makeZRotating(-float(asl::PI_2));
+            glMultMatrixf(static_cast<const GLfloat *>(myRotationMatrix.getData()));
+        }
         glMatrixMode(GL_MODELVIEW);
     }
 
