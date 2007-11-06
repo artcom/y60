@@ -72,7 +72,21 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 //                                              int height);
 // cairo_status_t cairo_surface_status         (cairo_surface_t *surface);
 // void        cairo_surface_finish            (cairo_surface_t *surface);
-// void        cairo_surface_flush             (cairo_surface_t *surface);
+
+static JSBool
+flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_surface_t *mySurface;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
+
+    ensureParamCount(argc, 0);
+
+    cairo_surface_flush(mySurface);
+
+    return checkForErrors(cx, mySurface);
+}
+
 // void        cairo_surface_get_font_options  (cairo_surface_t *surface,
 //                                              cairo_font_options_t *options);
 // cairo_content_t cairo_surface_get_content   (cairo_surface_t *surface);
@@ -122,6 +136,8 @@ JSCairoSurface::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+
+        {"flush",                flush,                   0},
 
         // XXX hack to allow triggering texture upload -ingo
         {"triggerUpload",        triggerUpload,           0},
