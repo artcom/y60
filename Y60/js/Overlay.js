@@ -672,7 +672,6 @@ function GroupOverlay(theScene, theName, thePosition, theParent) {
 function removeOverlay(theOverlayNode) {
     // Remove children
     while(theOverlayNode.childNodes.length) {
-        print(theOverlayNode.childNodes.length)
         removeOverlay(theOverlayNode.firstChild);
     }
 
