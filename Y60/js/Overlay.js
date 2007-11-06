@@ -183,7 +183,6 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
 
         _myNode = myParent.appendChild(new Node("<overlay/>").firstChild);
         _myNode.name = "Overlay_" + ourOverlayCounter++;
-
         if (thePosition) {
             _myNode.position.x = thePosition[0];
             _myNode.position.y = thePosition[1];
@@ -630,6 +629,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
                 thePixelFormat = "RGB";
             }
             myImage.texturepixelformat = thePixelFormat;
+            myImage.playmode = "stop";
         }
         var myNodeName = myImage.nodeName;
         if (myNodeName == "movie") {
