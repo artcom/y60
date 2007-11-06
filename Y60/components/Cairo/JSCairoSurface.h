@@ -12,6 +12,7 @@
 #define _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 
 #include <dom/Nodes.h>
+#include <dom/Value.h>
 
 #include <y60/JSWrapper.h>
 
@@ -87,6 +88,8 @@ namespace jslib {
 
     private:
         dom::NodePtr _myImageNode;
+
+        static void convertRGBAtoBGRA(dom::ResizeableRasterPtr theOld, dom::ResizeableRasterPtr theNew);
     };
 
     template <>
