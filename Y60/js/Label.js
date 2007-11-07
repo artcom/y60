@@ -80,7 +80,6 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         window.setTextColor(asColor(myStyle.textColor));
         window.setTracking(tracking);
         window.setLineHeight(lineHeight);
-
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
         _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,

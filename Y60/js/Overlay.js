@@ -545,13 +545,13 @@ function ImageOverlay(theScene, theSource, thePosition, theParent) {
 //  @param thePixelFormat String       The texture pixel format (optional, default is RGB)
 //  @param theDecoderHint String       Which movie decoder to use (optional, default depends on file-extension)
 
-function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint) {
+function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint, thePlayMode) {
     var Protected = {};
-    this.Constructor(this, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint);
+    this.Constructor(this, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint, thePlayMode);
 }
 
 MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theParent,
-                          theAudioFlag, thePixelFormat, theDecoderHint) {
+                          theAudioFlag, thePixelFormat, theDecoderHint, thePlayMode) {
 
     TextureOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
 
@@ -629,7 +629,9 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
                 thePixelFormat = "RGB";
             }
             myImage.texturepixelformat = thePixelFormat;
-            myImage.playmode = "stop";
+            if (thePlayMode != undefined) {
+                myImage.playmode = thePlayMode;
+            }
         }
         var myNodeName = myImage.nodeName;
         if (myNodeName == "movie") {
