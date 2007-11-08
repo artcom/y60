@@ -32,7 +32,12 @@ using namespace asl;
 
 namespace asl {
 
-// XXX: What in eris' name is this? -IA (8. Nov 2007)
+// XXX Q: What in eris' name is this? -IA (8. Nov 2007)
+//     A: IIRC this is hack by Christian Hardenberg to work around a missing define
+//        in his hopelessly outdated kernel headers. I think it should be safe to 
+//        remove it.
+//        IMHO it would be better to use TIOCINQ anyway, because we are dealing with 
+//        a terminal here. [DS]
 #ifndef FIONREAD
 #define FIONREAD       0x541B
 #endif
