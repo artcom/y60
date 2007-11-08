@@ -32,7 +32,10 @@ using namespace asl;
 
 namespace asl {
 
+// XXX: What in eris' name is this? -IA (8. Nov 2007)
+#ifndef FIONREAD
 #define FIONREAD       0x541B
+#endif
 
 TTYPort::TTYPort(const std::string & theDeviceName) :
     SerialDevice(theDeviceName)
