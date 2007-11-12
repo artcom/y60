@@ -39,7 +39,7 @@ void CairoWrapper<cairo_pattern_t>::reference() {
 
 template <>
 void CairoWrapper<cairo_pattern_t>::unreference() {
-    // AC_INFO << "CairoPattern reference count: " << cairo_pattern_get_reference_count(_myWrapped);
+    //AC_INFO << "CairoPattern@" << this << " reference count: " << cairo_pattern_get_reference_count(_myWrapped);
     cairo_pattern_destroy(_myWrapped);
 }
 

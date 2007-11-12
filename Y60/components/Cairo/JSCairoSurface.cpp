@@ -38,7 +38,7 @@ void CairoWrapper<cairo_surface_t>::reference() {
 
 template <>
 void CairoWrapper<cairo_surface_t>::unreference() {
-    // AC_INFO << "CairoSurface reference count: " << cairo_surface_get_reference_count(_myWrapped);
+    //AC_INFO << "CairoSurface@" << this << " reference count: " << cairo_surface_get_reference_count(_myWrapped);
     cairo_surface_destroy(_myWrapped);
 }
 
