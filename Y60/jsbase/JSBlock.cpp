@@ -41,12 +41,26 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+toBase64String(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Converts the block into a string.");
+    DOC_END;
+    try {
+        const ReadableBlock & myBlock = JSBlock::getJSWrapper(cx,obj).getNative();
+        std::string myStringRep;
+        binToBase64(myBlock, myStringRep, cb64); //cb64 necessary because the default cb66 is depricated [jb]
+        *rval = as_jsval(cx, myStringRep);
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 JSBlock::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"toBase64String",       toBase64String,          0},
         {0}
     };
     return myFunctions;
