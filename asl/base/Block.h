@@ -1102,7 +1102,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
 
     inline void
     binToBase64(const asl::ReadableBlock & theBlock, std::string & theDest, const Char * theCodeTable = cb66) {
-        binToBase64(theBlock.begin(), theBlock.size(), theDest);
+        binToBase64(theBlock.begin(), theBlock.size(), theDest, theCodeTable);
     }
 
 
