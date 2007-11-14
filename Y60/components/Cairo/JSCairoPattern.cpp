@@ -19,6 +19,8 @@
 
 #include <y60/JSWrapper.impl>
 
+#include "CairoUtilities.h"
+
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
 
@@ -184,11 +186,9 @@ setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     Matrix4f myMatrix;
     convertFrom(cx, argv[0], myMatrix);
 
-    const cairo_matrix_t myCairoMatrix = {
-        myMatrix[0][0], myMatrix[0][1],
-        myMatrix[1][0], myMatrix[1][1],
-        myMatrix[3][0], myMatrix[3][1]
-    };
+    cairo_matrix_t myCairoMatrix;
+
+    convertMatrixToCairo(myMatrix, &myCairoMatrix);
 
     cairo_pattern_set_matrix(myPattern, &myCairoMatrix);
 
@@ -209,25 +209,7 @@ getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     cairo_pattern_get_matrix(myPattern, &myCairoMatrix);
 
     Matrix4f myMatrix;
-    myMatrix[0][0] = myCairoMatrix.xx;
-    myMatrix[0][1] = myCairoMatrix.yx;
-    myMatrix[0][2] = 0.0;
-    myMatrix[0][3] = 0.0;
-
-    myMatrix[1][0] = myCairoMatrix.xy;
-    myMatrix[1][1] = myCairoMatrix.yy;
-    myMatrix[1][2] = 0.0;
-    myMatrix[1][3] = 0.0;
-
-    myMatrix[2][0] = 0.0;
-    myMatrix[2][1] = 0.0;
-    myMatrix[2][2] = 1.0;
-    myMatrix[2][3] = 0.0;
-
-    myMatrix[3][0] = myCairoMatrix.x0;
-    myMatrix[3][1] = myCairoMatrix.y0;
-    myMatrix[3][2] = 0.0;
-    myMatrix[3][3] = 1.0;
+    convertMatrixFromCairo(myMatrix, &myCairoMatrix);
 
     *rval = as_jsval(cx, myMatrix);
 

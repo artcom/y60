@@ -71,8 +71,6 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 //                                              cairo_content_t content,
 //                                              int width,
 //                                              int height);
-// cairo_status_t cairo_surface_status         (cairo_surface_t *surface);
-// void        cairo_surface_finish            (cairo_surface_t *surface);
 
 static JSBool
 flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

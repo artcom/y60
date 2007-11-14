@@ -14,9 +14,12 @@
 
 #include <y60/JScppUtils.h>
 #include <y60/JSNode.h>
+#include <y60/JSMatrix.h>
 #include <y60/JSVector.h>
 
 #include <y60/JSWrapper.impl>
+
+#include "CairoUtilities.h"
 
 #include "JSCairo.h"
 
@@ -114,13 +117,73 @@ getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return checkForErrors(cx, myContext);
 }
 
+static JSBool
+pushGroup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_push_group(myContext);
+
+    return checkForErrors(cx, myContext);
+}
+
 // MISSING:
-// void        cairo_push_group                (cairo_t *cr);
 // void        cairo_push_group_with_content   (cairo_t *cr,
 //                                              cairo_content_t content);
-// cairo_pattern_t* cairo_pop_group            (cairo_t *cr);
-// void        cairo_pop_group_to_source       (cairo_t *cr);
-// cairo_surface_t* cairo_get_group_target     (cairo_t *cr);
+
+static JSBool
+popGroup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_pattern_t *myResult;
+
+    myResult = cairo_pop_group(myContext);
+
+    *rval = as_jsval(cx, myResult);
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
+popGroupToSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_pop_group_to_source(myContext);
+
+    return checkForErrors(cx, myContext);
+}
+
+static JSBool
+getGroupTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_surface_t *myResult;
+
+    myResult = cairo_get_group_target(myContext);
+
+    *rval = as_jsval(cx, myResult);
+
+    return checkForErrors(cx, myContext);
+}
 
 static JSBool
 setSourceRGB(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -986,34 +1049,243 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 // Drawing: Transformations
 //
 
-// MISSING:
-// void        cairo_translate                 (cairo_t *cr,
-//                                              double tx,
-//                                              double ty);
-// void        cairo_scale                     (cairo_t *cr,
-//                                              double sx,
-//                                              double sy);
-// void        cairo_rotate                    (cairo_t *cr,
-//                                              double angle);
-// void        cairo_transform                 (cairo_t *cr,
-//                                              const cairo_matrix_t *matrix);
-// void        cairo_set_matrix                (cairo_t *cr,
-//                                              const cairo_matrix_t *matrix);
-// void        cairo_get_matrix                (cairo_t *cr,
-//                                              cairo_matrix_t *matrix);
-// void        cairo_identity_matrix           (cairo_t *cr);
-// void        cairo_user_to_device            (cairo_t *cr,
-//                                              double *x,
-//                                              double *y);
-// void        cairo_user_to_device_distance   (cairo_t *cr,
-//                                              double *dx,
-//                                              double *dy);
-// void        cairo_device_to_user            (cairo_t *cr,
-//                                              double *x,
-//                                              double *y);
-// void        cairo_device_to_user_distance   (cairo_t *cr,
-//                                              double *dx,
-//                                              double *dy);
+static JSBool
+translate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    cairo_translate(myContext, myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+scale(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myX, myY;
+    ensureParamCount(argc, 2);
+    
+    convertFrom(cx, argv[0], myX);
+    convertFrom(cx, argv[1], myY);
+
+    cairo_scale(myContext, myX, myY);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t * myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    double myAngle;
+    ensureParamCount(argc, 1);
+    
+    convertFrom(cx, argv[0], myAngle);
+
+    cairo_rotate(myContext, myAngle);
+    
+    return checkForErrors(cx, myContext); 
+}
+
+static JSBool
+transform(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Matrix4f myMatrix;
+    convertFrom(cx, argv[0], myMatrix);
+
+    cairo_matrix_t myCairoMatrix;
+
+    convertMatrixToCairo(myMatrix, &myCairoMatrix);
+
+    cairo_transform(myContext, &myCairoMatrix);
+
+    return JS_TRUE;
+}
+
+static JSBool
+setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Matrix4f myMatrix;
+    convertFrom(cx, argv[0], myMatrix);
+
+    cairo_matrix_t myCairoMatrix;
+
+    convertMatrixToCairo(myMatrix, &myCairoMatrix);
+
+    cairo_set_matrix(myContext, &myCairoMatrix);
+
+    return JS_TRUE;
+}
+
+static JSBool
+getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_matrix_t myCairoMatrix;
+
+    cairo_get_matrix(myContext, &myCairoMatrix);
+
+    Matrix4f myMatrix;
+    convertMatrixFromCairo(myMatrix, &myCairoMatrix);
+
+    *rval = as_jsval(cx, myMatrix);
+
+    return JS_TRUE;
+}
+
+static JSBool
+identityMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 0);
+
+    cairo_identity_matrix(myContext);
+
+    return JS_TRUE;
+}
+
+static JSBool
+userToDevice(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Vector2f myInput;
+    convertFrom(cx, argv[0], myInput);
+
+    double myX, myY;
+    myX = myInput[0];
+    myY = myInput[1];
+
+    cairo_user_to_device(myContext, &myX, &myY);
+
+    Vector2f myResult;
+    myResult[0] = myX;
+    myResult[1] = myY;
+
+    *rval = as_jsval(cx, myResult);
+
+    return JS_TRUE;
+}
+
+static JSBool
+userToDeviceDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Vector2f myInput;
+    convertFrom(cx, argv[0], myInput);
+
+    double myX, myY;
+    myX = myInput[0];
+    myY = myInput[1];
+
+    cairo_user_to_device_distance(myContext, &myX, &myY);
+
+    Vector2f myResult;
+    myResult[0] = myX;
+    myResult[1] = myY;
+
+    *rval = as_jsval(cx, myResult);
+
+    return JS_TRUE;
+}
+
+static JSBool
+deviceToUser(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Vector2f myInput;
+    convertFrom(cx, argv[0], myInput);
+
+    double myX, myY;
+    myX = myInput[0];
+    myY = myInput[1];
+
+    cairo_device_to_user(myContext, &myX, &myY);
+
+    Vector2f myResult;
+    myResult[0] = myX;
+    myResult[1] = myY;
+
+    *rval = as_jsval(cx, myResult);
+
+    return JS_TRUE;
+}
+
+static JSBool
+deviceToUserDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    cairo_t *myContext;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
+
+    ensureParamCount(argc, 1);
+
+    Vector2f myInput;
+    convertFrom(cx, argv[0], myInput);
+
+    double myX, myY;
+    myX = myInput[0];
+    myY = myInput[1];
+
+    cairo_device_to_user(myContext, &myX, &myY);
+
+    Vector2f myResult;
+    myResult[0] = myX;
+    myResult[1] = myY;
+
+    *rval = as_jsval(cx, myResult);
+
+    return JS_TRUE;
+}
 
 //
 // Drawing: Text
@@ -1122,6 +1394,11 @@ JSCairo::Functions() {
 
         {"getTarget",            getTarget,               0},
 
+        {"pushGroup",            pushGroup,               0},
+        {"popGroup",             popGroup,                0},
+        {"popGroupToSource",     popGroupToSource,        0},
+        {"getGroupTarget",       getGroupTarget,          0},
+
         {"setSourceRGB",         setSourceRGB,            3},
         {"setSourceRGBA",        setSourceRGBA,           4},
         {"setSourceSurface",     setSourceSurface,        1},
@@ -1181,6 +1458,19 @@ JSCairo::Functions() {
         {"relMoveTo",            relMoveTo,               0},
 
         // Drawing: Transformations
+        {"translate",            translate,               2},
+        {"scale",                scale,                   2},
+        {"rotate",               rotate,                  1},
+        {"transform",            transform,               1},
+
+        {"setMatrix",            setMatrix,               1},
+        {"getMatrix",            getMatrix,               0},
+        {"identityMatrix",       identityMatrix,          0},
+
+        {"userToDevice",         userToDevice,            1},
+        {"userToDeviceDistance", userToDeviceDistance,    1},
+        {"deviceToUser",         deviceToUser,            1},
+        {"deviceToUserDistance", deviceToUserDistance,    1},
 
         // Drawing: Text
         {"selectFontFace",       selectFontFace,          3},
