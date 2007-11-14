@@ -347,13 +347,11 @@ namespace y60 {
         } // while
 
         // adjust volume
-        // XXX: This should adjust the movie volume, _not_ the global volume!
-
         float myVolume = getMovie()->get<VolumeTag>();
         _myAudioSink->setVolume(myVolume);
         //if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
             //Pump::get().setVolume(myVolume);
-        //} //if
+        //}
 
     }
 
