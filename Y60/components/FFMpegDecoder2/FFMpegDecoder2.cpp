@@ -348,12 +348,13 @@ namespace y60 {
 
         // adjust volume
         // XXX: This should adjust the movie volume, _not_ the global volume!
-/*
+
         float myVolume = getMovie()->get<VolumeTag>();
-        if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
-            Pump::get().setVolume(myVolume);
-        } //if
-*/
+        _myAudioSink->setVolume(myVolume);
+        //if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
+            //Pump::get().setVolume(myVolume);
+        //} //if
+
     }
 
     bool FFMpegDecoder2::decodeFrame() {
