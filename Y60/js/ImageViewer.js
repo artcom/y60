@@ -355,7 +355,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
-                var myEnsureFramecount = true;
+                var myEnsureFramecount = false;
                 if (_myTheaterFlag) {
                     myEnsureFramecount = false;
                 }

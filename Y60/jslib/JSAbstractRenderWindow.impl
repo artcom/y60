@@ -13,6 +13,7 @@
 #include "JSintersection_functions.h"
 #include <y60/IScriptablePlugin.h>
 #include <y60/JSScriptablePlugin.h>
+#include <y60/Viewport.h>
 #include "JSScene.h"
 #include "IRendererExtension.h"
 
@@ -357,7 +358,7 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
     DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
     DOC_END;
     try {
-        ensureParamCount(argc, 2, 3);
+        ensureParamCount(argc, 2, 4);
 
         asl::Vector2f thePixelPosition;
         if (!convertFrom(cx, argv[0], thePixelPosition)) {
@@ -380,7 +381,16 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
                 JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a fontname");
                 return JS_FALSE;
             }
-            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont);
+            if (argc >3) {
+                dom::NodePtr theViewportNode;
+                if (!convertFrom(cx,argv[3],theViewportNode)) {
+                    JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be an viewport node");
+                    return JS_FALSE;
+                }
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont, theViewportNode->getFacade<y60::Viewport>());
+            } else {
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont);
+            }
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
         }
 

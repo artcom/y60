@@ -32,7 +32,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     var _myMessage          = [];
     var _myNextMessageLine  = 0;
     var _myFontname         = "Screen15";
-
+    var _myViewport         = null;
     self.setFontname = function(theFontname) {
         _myFontname = theFontname;
     }
@@ -68,8 +68,9 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
                 self.hide();
             }
 
-            _myOverlay.position = new Vector2f((window.width - _myOverlay.width) / 2,
-                                               (window.height - _myOverlay.height) / 2);
+            _myOverlay.position = new Vector2f(((_myViewport.size[0] * window.width) - _myOverlay.width) / 2,
+                                               ((_myViewport.size[1] * window.height) - _myOverlay.height) / 2);
+                                               
         }
     }
 
@@ -81,8 +82,8 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     }
     self.onPostRender = function() {
         if (_myOverlay && _myMessage.length) {
-            var myXPos = (window.width  - BOX_WIDTH + 140) / 2;
-            var myYPos = (window.height - BOX_HEIGHT + 50) / 2;
+            var myXPos = ((_myViewport.size[0] * window.width)  - BOX_WIDTH + 140) / 2;
+            var myYPos = ((_myViewport.size[1] * window.height) - BOX_HEIGHT + 50) / 2;
             if (myXPos < 10) {
                 myXPos = 10;
             }
@@ -94,13 +95,13 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             for (var i = _myNextMessageLine; i < _myMessage.length; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
-                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname);
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname, _myViewport);
                 myLine++;
             }
             for (i = 0; i < _myNextMessageLine; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
-                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname);
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname, _myViewport);
                 myLine++;
             }
             window.setTextColor([1,1,1,1]);
@@ -112,11 +113,13 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
         myImage.src = "shadertex/on_screen_display.rgb";
         myImage.resize = "pad";
 
-        var myBoxOverlay = new ImageOverlay(theSceneViewer.getScene(), myImage);
+        _myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
+        var myBoxOverlay = new ImageOverlay(theSceneViewer.getScene(), myImage, [0,0], _myViewport.childNode("overlays"));
         myBoxOverlay.width  = BOX_WIDTH;
         myBoxOverlay.height = BOX_HEIGHT;
-        myBoxOverlay.position = new Vector2f((window.width - myBoxOverlay.width) / 2,
-                                             (window.height - myBoxOverlay.height) / 2);
+        myBoxOverlay.position = new Vector2f(((_myViewport.size[0] * window.width) - myBoxOverlay.width) / 2,
+                                             ((_myViewport.size[1] * window.height) - myBoxOverlay.height) / 2);
+        //print(myBoxOverlay.position, _myViewport.size);
         myBoxOverlay.visible = true;
 
         var myColor = 0.3;

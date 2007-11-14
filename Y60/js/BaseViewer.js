@@ -115,7 +115,22 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getActiveViewport = function() {
         return _activeViewport;
     }
-
+    
+    self.getViewportAtWindowCoordinates = function(theX, theY) {
+        for (var myViewPortIndex = 0 ; myViewPortIndex < window.scene.canvases.childNode(0).childNodesLength(); myViewPortIndex++) {
+            var myViewPort = window.scene.canvases.childNode(0).childNode(myViewPortIndex);
+            var myViewPortSize = new Vector2f(window.width * myViewPort.size[0], window.height * myViewPort.size[1]);
+            var myViewPortPos = new Vector2f(window.width * myViewPort.position[0], window.height * myViewPort.position[1]);
+            //print("viewport : " + myViewPort.name + " index: " + myViewPortIndex + " size: " + myViewPortSize + " pos : " + myViewPortPos + theX + theY);
+            if ((theX >= myViewPortPos[0] && theX < myViewPortPos[0] + myViewPortSize[0] ) &&
+                (theY >= myViewPortPos[1] && theY < myViewPortPos[1] + myViewPortSize[1] )) {
+                    //print(theX, theY + " is in -> exit");
+                    return myViewPort;
+                }
+        }        
+        return _activeViewport;
+    }
+    
     self.getActiveCamera = function() {
         var myViewport = self.getActiveViewport();
         return myViewport.getElementById(myViewport.camera);

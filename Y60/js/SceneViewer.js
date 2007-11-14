@@ -165,9 +165,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             showStatistics();
         }
     }
-self.CB = function() {
-    window.visible = true;
-}
     
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         var myMover = self.getMover(self.getActiveViewport());

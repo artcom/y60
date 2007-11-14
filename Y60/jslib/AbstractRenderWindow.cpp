@@ -957,10 +957,11 @@ namespace jslib {
     //  Text Manager
     // =======================================================================
     void AbstractRenderWindow::renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
-                    const std::string & theFont)
+                    const std::string & theFont, const y60::ViewportPtr & theViewport)
     {
-        asl::Vector2f myRelativePosition(thePixelPosition[0] / getWidth(), thePixelPosition[1] / getHeight());
-        _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont);
+        asl::Vector2f myRelativePosition(thePixelPosition[0] / (getWidth() * theViewport->get<Size2DTag>()[0]), 
+                                         thePixelPosition[1] / (getHeight() * theViewport->get<Size2DTag>()[1]));
+        _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont, theViewport);
     }
 
     void AbstractRenderWindow::setTextColor(const asl::Vector4f & theTextColor)

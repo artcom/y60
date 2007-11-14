@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 namespace y60 {
 
@@ -38,7 +39,7 @@ namespace y60 {
             void setTTFRenderer(const TTFTextRendererPtr & theTTFRenderer);
             void render(ViewportPtr theViewport);
             void addText(const asl::Vector2f & thePos, const std::string & theString,
-                    const std::string & theFont);
+                    const std::string & theFont, ViewportPtr theViewport);
             void setColor(const asl::Vector4f & theTextColor);
             const asl::Vector4f & getColor();
             void setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding);
@@ -73,6 +74,7 @@ namespace y60 {
             BitmapTextRenderer      _myBitmapRenderer;
             TTFTextRendererPtr      _myTTFRenderer;
             std::vector<TextPtr>    _myTextSnippets;
+            std::map<std::string, std::vector<TextPtr> > _myTextSnippetsMap;
     };
 
 } // namespace y60

@@ -38,7 +38,11 @@ namespace y60 {
 
     void
     TextRendererManager::render(ViewportPtr theViewport) {
-        if (_myTextSnippets.empty()) {
+        if (_myTextSnippetsMap.find(theViewport->get<IdTag>()) == _myTextSnippetsMap.end()) {
+            return;
+        }        
+        std::vector<TextPtr> & myTextSnippets = _myTextSnippetsMap[theViewport->get<IdTag>()];
+        if (myTextSnippets.empty()) {
             return;
         }
         MAKE_SCOPE_TIMER(renderTextSnippets);
@@ -80,14 +84,14 @@ namespace y60 {
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
 
-        for (unsigned myTextIndex=0; myTextIndex!=_myTextSnippets.size(); ++myTextIndex) {
+        for (unsigned myTextIndex=0; myTextIndex!=myTextSnippets.size(); ++myTextIndex) {
             // TODO, refactor
             DB(AC_TRACE << "TextRendererManager:: rendering text #" << myTextIndex << endl);
-            _myTextSnippets[myTextIndex]->_myRenderer->renderText(_myTextSnippets[myTextIndex]);
+            myTextSnippets[myTextIndex]->_myRenderer->renderText(myTextSnippets[myTextIndex]);
         }
 
         DB(AC_TRACE << "TextRendererManager:: clearing " << endl);
-        _myTextSnippets.clear();
+        myTextSnippets.clear();
 
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
@@ -109,8 +113,11 @@ namespace y60 {
     }
 
     void
-    TextRendererManager::addText(const Vector2f & thePos, const string & theString, const string & theFont) {
-        _myTextSnippets.push_back(getTextRendererByFont(theFont).createText(thePos, theString, theFont));
+    TextRendererManager::addText(const Vector2f & thePos, const string & theString, const string & theFont, ViewportPtr theViewport) {
+        if (_myTextSnippetsMap.find(theViewport->get<IdTag>()) == _myTextSnippetsMap.end()) {
+            _myTextSnippetsMap[theViewport->get<IdTag>()] = std::vector<TextPtr>();
+        }
+        _myTextSnippetsMap[theViewport->get<IdTag>()].push_back(getTextRendererByFont(theFont).createText(thePos, theString, theFont));
     }
 
 	void

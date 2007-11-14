@@ -127,9 +127,12 @@ namespace jslib {
 
         // Text Manager Methods
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
-                const std::string & theFont);
+                const std::string & theFont, const y60::ViewportPtr & theViewport);
+        void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString, const std::string & theFont) {
+                return renderText(thePixelPosition, theString, getDefaultFont(), getSingleViewport());
+                }
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString) {
-            return renderText(thePixelPosition, theString, getDefaultFont());
+            return renderText(thePixelPosition, theString, getDefaultFont(), getSingleViewport());
         }
 
         void setTextColor(const asl::Vector4f & theTextColor);
