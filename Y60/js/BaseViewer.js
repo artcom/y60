@@ -117,18 +117,24 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
     
     self.getViewportAtWindowCoordinates = function(theX, theY) {
+        var myLowestPos = new Vector2f(10000,10000);
+        var myBestChoice = _activeViewport;
         for (var myViewPortIndex = 0 ; myViewPortIndex < window.scene.canvases.childNode(0).childNodesLength(); myViewPortIndex++) {
             var myViewPort = window.scene.canvases.childNode(0).childNode(myViewPortIndex);
             var myViewPortSize = new Vector2f(window.width * myViewPort.size[0], window.height * myViewPort.size[1]);
             var myViewPortPos = new Vector2f(window.width * myViewPort.position[0], window.height * myViewPort.position[1]);
-            //print("viewport : " + myViewPort.name + " index: " + myViewPortIndex + " size: " + myViewPortSize + " pos : " + myViewPortPos + theX + theY);
             if ((theX >= myViewPortPos[0] && theX < myViewPortPos[0] + myViewPortSize[0] ) &&
                 (theY >= myViewPortPos[1] && theY < myViewPortPos[1] + myViewPortSize[1] )) {
-                    //print(theX, theY + " is in -> exit");
                     return myViewPort;
-                }
+            }
+            // if none matches, get the most left upper viewport
+            if (myViewPortPos[0] <= myLowestPos.x && myViewPortPos[1] <= myLowestPos.y) {
+                myBestChoice = myViewPort;
+                myLowestPos.x = myViewPortPos[0];
+                myLowestPos.y = myViewPortPos[1];
+            }
         }        
-        return _activeViewport;
+        return myBestChoice;
     }
     
     self.getActiveCamera = function() {
