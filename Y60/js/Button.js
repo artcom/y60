@@ -61,7 +61,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.onClick = function(theButton) {
-        print ("Clicked " + Public.name + " - Override me!");
+        //print ("Clicked " + Public.name + " - Override me!");
     }
 
     Public.isPressed = function(theButton) {
@@ -81,20 +81,16 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
-	        Logger.trace("Unpressing button " + Public.id);	
+    	        Logger.trace("Unpressing button " + Public.id);	
                 Public.setPressed(false);
-		if (Public.touches(theX, theY, theRadius)) {
-			if ("id" in Public)
-		                Logger.trace(Public.id + ": generating click");
-	                Public.onClick(Public);
-			return true;
-		}
+        		if (Public.touches(theX, theY, theRadius)) {
+                    Public.onClick(Public);
+        			return true;
+        		}
             } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
-	        Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
-                Public.setPressed(true);
+    	        Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
+                    Public.setPressed(true);
             } else {
-		if ("id" in Public)
-			Logger.trace(Public.id + ": nothing to do. isPressed=", Protected.isPressed);
             }
         }
     }
