@@ -64,6 +64,7 @@ typedef std::map<int, Cursor> CursorMap;
 
 
 		private:
+            void groupBlobs( BlobListPtr & theBlobs);
             void correlatePositions( BlobListPtr & theBlobs);
             asl::Matrix4f getTransformationMatrix();
 

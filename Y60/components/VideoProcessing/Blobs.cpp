@@ -85,10 +85,17 @@ namespace y60 {
         
         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
         
+        groupBlobs(myBlobs);
+
         correlatePositions( myBlobs );
         
         _mySourceImage->triggerUpload();
 	}
+
+    void
+    Blobs::groupBlobs( BlobListPtr & theROIs ) {
+
+    }
 
     void 
     Blobs::correlatePositions( BlobListPtr & theROIs )

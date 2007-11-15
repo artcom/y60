@@ -13,6 +13,8 @@
 
 //include "ConnectedComponent.h"
 
+#define COUNTER__ 1
+
 using namespace asl;
 using namespace std;
 using namespace dom;
@@ -84,15 +86,18 @@ namespace y60 {
             (*itTrgt) = myTrgtIntensity;
             
             //"adaptive" background
-            if (_myCounter >= 5) {
-                (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
-            }
+        //     if (_myCounter >= COUNTER__) {
+        //         (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
+        //     }
+        
+            (*itBg) = (*itSrc).get();
         }
         
         // update backgroundimage
-        if (_myCounter >= 30) {
-            _myCounter = 0;
-        }
+        // if (_myCounter >= COUNTER__) {
+        //     _myCounter = 0;
+        // }
+        
         _myCounter++;
         
         _myTargetImage->triggerUpload();
