@@ -553,11 +553,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             myText.push("Materials:  " + myStatistics.materials);
         }
 
+        var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
         for (var i = 0; i < myText.length; ++i) {
             window.setTextColor([0,0,0,1]);
-            window.renderText([window.width - 201, 19 + (i * 15)], myText[i], "Screen13");
+            window.renderText([(myViewport.size[0] * window.width) - 201, 19 + (i * 15)], myText[i], "Screen13", myViewport);
             window.setTextColor(_myStatisticColor);
-            window.renderText([window.width - 200.8, 19.2 + (i * 15)], myText[i], "Screen13");
+            window.renderText([(myViewport.size[0] * window.width) - 200.8, 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
         }
     }
 
