@@ -50,22 +50,28 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
      * An optional world space clipping plane can be specified
      */
     obj.pickPosition = function(theScreenPixelX, theScreenPixelY, theClippingPlane) {
+        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        if (!myViewport) {
+            return null;
+        }
+        var myCamera = window.scene.world.getElementById(myViewport.camera);
         var myClosestPosition = null;
         var myInfo = obj.pickIntersection(theScreenPixelX, theScreenPixelY);
         if (myInfo) {
             var myIntersections = myInfo.info.intersections;
             if (myIntersections.length > 0) {
-
-                var myCameraPos = getCameraPos();
-                var myClosestDistance = null; // = distance(myIntersections[0].position,myCameraPos);
-                //myClosestPosition = myIntersections[0].position;
+                var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
+                var myClosestDistance = null; 
                 for (var i = 0; i < myIntersections.length; ++i) {
                     var myDistance = distance(myIntersections[i].position,myCameraPos);
 
                     if ( theClippingPlane ) {
-                        var myDistanceToPlane = signedDistance(myIntersections[i].position, theClippingPlane);
+                        var myDistanceToPlane = signedDistance(myIntersections[i].position, 
+                                                               theClippingPlane);
                         if (myDistanceToPlane > 0) {
-                            if ( myClosestDistance == undefined || myDistance < myClosestDistance) {
+                            if ( myClosestDistance == undefined 
+                                 || myDistance < myClosestDistance) 
+                            {
                                 myClosestDistance = myDistance;
                                 myClosestPosition = myIntersections[i].position;
                             }
@@ -77,7 +83,6 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
                         }
                     }
                 }
-                //print ("closest is "+myInfo.info.body+"@" + myClosestPosition + ", distance = " + myClosestDistance);
             }
         }
         return myClosestPosition;
@@ -93,10 +98,13 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         }
     }
     
-    obj.pickBodyByWorldPos = function(theWorldPos) {
-        var myCameraPos = getCameraPos();
+    obj.pickBodyByWorldPos = function(theWorldPos, theCamera) {
+        if (theCamera == undefined) {
+            theCamera = _RenderWindow.camera;
+        }
+        var myCameraPos = new Point3f(theCamera.globalmatrix.getTranslation());
         var myRay = new Ray(myCameraPos, difference( theWorldPos, myCameraPos) );
-        var myFarPos = intersection( myRay, _myRenderWindow.camera.frustum.far_plane );
+        var myFarPos = intersection( myRay, theCamera.frustum.far_plane );
         var myLineSegment = new LineSegment(myCameraPos, myFarPos);
         var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
         
@@ -116,11 +124,18 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
 
     obj.pickBodyBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixelY, theSphereRadius, theRootNode)
     {
+        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        if (!myViewport) {
+            // we picked right into the Nothing
+            print("picked nothing");
+            return null;
+        }
+        var myCamera = theRenderWindow.scene.world.getElementById(myViewport.camera);
         var myClosestBody = null;
         var myCollisions = obj.pickCollisionsBySweepingSphereFromBodies(theScreenPixelX, theScreenPixelY, theSphereRadius, theRootNode);
         if (myCollisions) {
             if (myCollisions.length > 0) {
-                var myCameraPos = getCameraPos();
+                var myCameraPos =  new Point3f(myCamera.globalmatrix.getTranslation());
                 var body = myCollisions[0].body;
                 var myClosestDistance = distance(myCameraPos, myCollisions[0].collisions[0].min.sphereCenter);;
                 for (var jj = 0; jj <  myCollisions[0].collisions.length; jj++) {
@@ -146,21 +161,26 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     }
     
 
-    obj.transformWorldToClip = function(theWorldPos) {
-        var myProjectionMatrix = new Matrix4f(_myRenderWindow.camera.globalmatrix);
+    obj.transformWorldToClip = function(theWorldPos, theCamera) {
+        if (theCamera == undefined) {
+            theCamera = _myRenderwindow.camera;
+        }
+        var myProjectionMatrix = new Matrix4f(theCamera.globalmatrix);
         myProjectionMatrix.invert();
-        myProjectionMatrix.postMultiply(_myRenderWindow.camera.frustum.projectionmatrix);
+        myProjectionMatrix.postMultiply(theCamera.frustum.projectionmatrix);
         return product(theWorldPos, myProjectionMatrix);
     }
 
     obj.
     transformClipToWorld = function(theClipPos,theScreenPixelX,theScreenPixelY) {
         var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
-	if (!myViewport) {
-            Logger.error("No viewport for screen coordinates " + theScreenPixelX + ","+theScreenPixelY + " at " + __FILE__ + ":" + __LINE__);
-            throw new Exception("No viewport for screen coordinates " + theScreenPixelX + ","+theScreenPixelY);
+        if (!myViewport) {
+            Logger.error("No viewport for screen coordinates " + theScreenPixelX 
+                         + ","+theScreenPixelY + " at " + __FILE__ + ":" + __LINE__);
+            throw new Exception("No viewport for screen coordinates " 
+                                + theScreenPixelX + ","+theScreenPixelY);
         }
-        return transformClipToWorld(theClipPos, myViewport.getElementById(myViewport.camera));
+        return transformClipToWorld(theClipPos,myViewport.getElementById(myViewport.camera));
     }
 
     /*******************************************************/
@@ -179,65 +199,62 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return new Point3f(_myRenderWindow.camera.globalmatrix.getTranslation());
     }
 
-    function getCameraToScreenRay(theScreenPixelX, theScreenPixelY) {
+    function getCameraToScreenRay(theScreenPixelX, theScreenPixelY, theCamera) {
+        if (theCamera == undefined) {
+            theCamera = _myRenderWindow.camera;
+        }
         var myScreenPos = getScreenPos(theScreenPixelX, theScreenPixelY);
-        var myCameraPos = getCameraPos();
+        var myCameraPos = new Point3f(theCamera.globalmatrix.getTranslation());
         return new Ray(myCameraPos, myScreenPos);
     }
 
     function getRayThroughScreen(theScreenPixelX, theScreenPixelY) {
-        var myScreenPos = getScreenPos(theScreenPixelX, theScreenPixelY);
-        var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
-        var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
-        var myFarEyePos = new Point3f(myPosX, myPosY, 1);
-        var myFarPos = obj.transformClipToWorld(myFarEyePos, theScreenPixelX, theScreenPixelY);
-
-        var myViewRay = new Ray(myScreenPos, myFarPos);
-        // print (myViewRay);
+        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        if (!myViewport) {
+            return null;
+        }
+        var myNearPlanePos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, myViewport, -1);
+        var myFarPlanePos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, myViewport, 1);
+        var myViewRay = new Ray(myNearPlanePos, myFarPlanePos);
         return myViewRay;
     }
 
     obj.getLineSegmentThroughScreen = function(theScreenPixelX, theScreenPixelY) {
-        var myScreenPos = getScreenPos(theScreenPixelX, theScreenPixelY);
-    //    var myCameraPos = getCameraPos();
-    //    return new Ray(myCameraPos, myScreenPos);
-        var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
-        var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
-
-        var myEyePos = new Point3f(myPosX, myPosY, 1);
-        var myFarPos = obj.transformClipToWorld(myEyePos, theScreenPixelX, theScreenPixelY);
-
-        myEyePos = new Point3f(myPosX, myPosY, -1);
-        var myNearPos = obj.transformClipToWorld(myEyePos, theScreenPixelX, theScreenPixelY);
-    
-        var myViewLineSegment = new LineSegment(myNearPos, myFarPos);
-        //print (myViewLineSegment);
+        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        if (!myViewport) {
+            return null;
+        }
+        var myNearPlanePos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, myViewport, -1);
+        var myFarPlanePos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, myViewport, 1);
+        var myViewLineSegment = new LineSegment(myNearPlanePos, myFarPlanePos);
         return myViewLineSegment;
     }
 
     obj.pickIntersection = function(theScreenPixelX, theScreenPixelY) {
-    //    var myCameraToScreenRay = getCameraToScreenRay(theScreenPixelX, theScreenPixelY);
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
         var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
-        
         return nearestIntersection(myWorld, myLineSegment);
     }
 
     obj.pickCollisionsBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixelY, theSphereRadius, theRootNode)
     {
+        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        if (!myViewport) {
+            // we picked right into the Nothing
+            return null;
+        }
+        // collide the sphere with all bodies below the root node 
+        var myNearPlanePos = transformScreenToWorld(theScreenPixelX, 
+                                                    theScreenPixelY, myViewport, -1);
 
-        var myScreenPos = getScreenPos(theScreenPixelX, theScreenPixelY);
-        var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
-        var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
-        var myFarPlanePos = new Point3f(myPosX, myPosY, 1);
-        myFarPlanePos = obj.transformClipToWorld(myFarPlanePos, theScreenPixelX, theScreenPixelY);
-
-        //print("ScreenP " + myScreenPos + " FarPlaneP " + myFarPlanePos);
-        var mySphere = new Sphere(myScreenPos, theSphereRadius);
-
-        var myMotion = new Vector3f(difference(myFarPlanePos,myScreenPos));
-
-        return Scene.collideWithBodies(theRootNode, mySphere, myMotion);
+        var myFarPlanePos = transformScreenToWorld(theScreenPixelX, 
+                                                   theScreenPixelY, myViewport, 1);
+        Logger.trace("Near plane position (in WorldCoordinates): " + myNearPlanePos);
+        Logger.trace("Far plane position (in WorldCoordinates): " + myFarPlanePos);
+        var mySphere = new Sphere(myNearPlanePos, theSphereRadius);
+        var myMotion = new Vector3f(difference(myFarPlanePos, myNearPlanePos));
+        var myCollisions = Scene.collideWithBodies(theRootNode, mySphere, myMotion);
+        return myCollisions;
     }
 
 }

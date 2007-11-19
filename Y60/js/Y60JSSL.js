@@ -718,13 +718,26 @@ function transformClipToWorld(theClipPos, theCamera) {
 }
 
 
-// XXX: don't depend on canvas of default "window".
-
-function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport) {
-    var myPosX = 2 * theScreenPixelX / window.width  - 1;
-    var myPosY = - (2 * theScreenPixelY / window.height - 1);
-    var myScreenPos = new Point3f(myPosX, myPosY, -1);
-    return transformClipToWorld(myScreenPos, theViewport.getElementById( theViewport.camera ));
+// transform screen coordinates to world coordinates (i.e. world coordinate of
+// the given clipping plane)
+// theClipZ: -1 for Near Plane, 1 for Far Plane
+function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport, theClipZ) {
+    Logger.trace("transformScreenToWorld(" + theScreenPixelX
+                 + ", " + theScreenPixelY + "," + theClipZ);
+    if (theClipZ == undefined) {
+        Logger.trace("ClipZ not defined, using default value");
+        theClipZ = -1;
+    }
+    var myViewportPixelX = theScreenPixelX - theViewport.left;
+    var myViewportPixelY = theScreenPixelY - theViewport.top;
+    Logger.trace("Pixelcoordinates in viewport: [" + 
+                 myViewportPixelX + ", " + 
+                 myViewportPixelY + "]");
+    var myClipPosX = 2 * myViewportPixelX/theViewport.width  - 1;
+    var myClipPosY = - (2 * myViewportPixelY/theViewport.height - 1);
+    var myClipCoordinates = new Point3f(myClipPosX, myClipPosY, theClipZ);
+    Logger.trace("ClipCoordinates: " + myClipCoordinates);
+    return transformClipToWorld(myClipCoordinates, window.scene.world.getElementById( theViewport.camera ));
 }
 
 function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theViewport) {
