@@ -208,6 +208,8 @@ Station::defaultBroadcastPort() {
     }
     return myBroadcastPort;
 }
+
+#if 0
 /*
  * A little test dealie to see if we can retrieve the broadcast addr
  *
@@ -353,6 +355,7 @@ int main (int argc, char * argv[])
 	
 	return 0;
 }
+#endif
 #endif
 
 void
