@@ -375,7 +375,7 @@ namespace y60 {
             // now try if there is a child that intersects
             BoundingBoxTreePtr emptiestIntersectingChild(0);
             for (int i = 0; i < myChildren.size();++i) {
-                if (myChildren[i]->myBox.intersects(theBox)) {
+                if (myChildren[i]->myBox.touches(theBox)) {
                     if (emptiestIntersectingChild) {
                         if (myChildren[i]->myTotalChildren < emptiestIntersectingChild->myTotalChildren) {
                             emptiestIntersectingChild = myChildren[i];

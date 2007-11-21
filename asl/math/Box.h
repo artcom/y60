@@ -146,30 +146,44 @@ namespace asl {
         bool contains(const Box2 & b) const {
             return contains(b.val[MIN]) && contains(b.val[MAX]);
         }
-        /** Returns TRUE if given point is inside the box.
+        /** Returns TRUE if given point is inside the box, and FALSE if the point is on the edge or outside of the box.
          * @see contains(const Point2<Number> & pt) const
          */
         bool envelopes(const Point2<Number> & pt) const {
             return (pt[0]>this->val[MIN][0]) && (pt[0]<this->val[MAX][0])
                 && (pt[1]>this->val[MIN][1]) && (pt[1]<this->val[MAX][1]);
         }
-        /** Returns TRUE if intersection of given boxes is not empty */
-        bool intersects(const Box2 & bb) const {
-            return bb.hasPosition() && hasPosition() &&
-                  (bb.envelopes(this->val[MIN]) || bb.envelopes(this->val[MAX]) || envelopes(bb.getMin()));
-        }
-
-        /** Returns TRUE if a point exists that touches both boxes */
-        bool touches(const Box2 & bb) const {
-            return bb.hasPosition() && hasPosition() &&
-                  (bb.contains(this->val[MIN]) || bb.contains(this->val[MAX]) || contains(bb.getMin()));
-        }
         /** Returns TRUE if given box is completely inside the box.  */
         bool envelopes(const Box2 & bb) const {
             return bb.hasPosition() && hasPosition() &&
                   (envelopes(bb.getMin()) && envelopes(bb.getMax()));
         }
-        /** Set the bounding values from a box.  */
+        /** Returns TRUE if intersection of given boxes is a non-empty box 
+           Note that in many cases you will prefer to use "touches" for  calculation
+           of collision and visibility determination in order to fail on the safe side
+           regarding numerical inaccuracies
+         * @see touches(const Box2<Number> & pt) const
+        */
+        bool intersects(const Box2 & theOtherBox) const {
+            return 
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) < 
+                 asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) < 
+                 asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1]));
+        }
+        /** Returns TRUE if at least one point exists that is contained by both boxes;
+         the difference to intersects() is that touches() returns true if the two boxes
+         share only one edge or corner and the intersection is empty
+         * @see intersects(const Box2<Number> & pt) const
+        */
+        bool touches(const Box2 & theOtherBox) const {
+            return 
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <= 
+                 asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <= 
+                 asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1]));
+        }
+       /** Set the bounding values from a box.  */
         void setBounds(const Box2 & theBox) {
             *this = theBox;
         }
@@ -301,7 +315,7 @@ namespace asl {
             }
         }
 
-        /** */
+        /** intersects box with another box */
         void intersect(const Box2 & theOtherBox) {
             if (theOtherBox.val[MIN][0] > this->val[MIN][0]) {
                 this->val[MIN][0] = theOtherBox.val[MIN][0];
@@ -317,17 +331,17 @@ namespace asl {
             }
         }
 
-        /** Return whether the box is empty */
+        /** Return whether the box is empty, meaning it has no area */
         bool isEmpty() const {
             return !hasArea();
         }
 
-        /** Checks if the box is not degenerated */
+        /** Checks if the box is not degenerated, meaning that one minimum coordinaate is larger than one max coordinaate */
         bool hasPosition() const {
             return ((this->val[MAX][0] >= this->val[MIN][0]) && (this->val[MAX][1] >= this->val[MIN][1]));
         }
 
-        /** Checks if the box is extended on one dimensions */
+        /** Checks if the box is extended on at least one dimensions */
         bool hasSize() const {
             return (((this->val[MAX][0] >  this->val[MIN][0]) && (this->val[MAX][1] >= this->val[MIN][1]))  ||
                     ((this->val[MAX][0] >= this->val[MIN][0]) && (this->val[MAX][1] >  this->val[MIN][1])));
@@ -356,6 +370,34 @@ namespace asl {
 
         /** @name Arithmetic Operations */
         /* @{ */
+        template <class otherReal>
+        void mult(const otherReal& y) {
+            this->val[MIN].mult(Number(y));
+            this->val[MAX].mult(Number(y));
+        }
+        template <class otherReal>
+        void div(const otherReal& y) {
+            this->val[MIN].div(Number(y));
+            this->val[MAX].div(Number(y));
+        }
+
+        void add(const Vector2<Number> & y) {
+            this->val[MIN].add(y);
+            this->val[MAX].add(y);
+        }
+        void sub(const Vector2<Number> & y) {
+            this->val[MIN].sub(y);
+            this->val[MAX].sub(y);
+        }
+        void mult(const Vector2<Number> & y) {
+            this->val[MIN].mult(y);
+            this->val[MAX].mult(y);
+        }
+        void div(const Vector2<Number> & y) {
+            this->val[MIN].div(y);
+            this->val[MAX].div(y);
+        }
+
         /** Multiplicative assignment operator for scalars*/
         template <class otherReal>
         void operator*=(const otherReal& y) {
@@ -584,6 +626,28 @@ namespace asl {
                 extendBy(r.getMax());
             }
         }
+       /** intersects box with another box */
+        void intersect(const Box3 & theOtherBox) {
+            if (theOtherBox.val[MIN][0] > this->val[MIN][0]) {
+                this->val[MIN][0] = theOtherBox.val[MIN][0];
+            }
+            if (theOtherBox.val[MIN][1] > this->val[MIN][1]) {
+                this->val[MIN][1] = theOtherBox.val[MIN][1];
+            }
+            if (theOtherBox.val[MIN][2] > this->val[MIN][2]) {
+                this->val[MIN][2] = theOtherBox.val[MIN][2];
+            }
+             if (theOtherBox.val[MAX][0] < this->val[MAX][0]) {
+                this->val[MAX][0] = theOtherBox.val[MAX][0];
+            }
+            if (theOtherBox.val[MAX][1] < this->val[MAX][1]) {
+                this->val[MAX][1] = theOtherBox.val[MAX][1];
+            }
+            if (theOtherBox.val[MAX][2] < this->val[MAX][2]) {
+                this->val[MAX][2] = theOtherBox.val[MAX][2];
+            }
+         }
+
 
         /** Returns TRUE if given point is inside or on boundary of box */
         bool contains(const Point3<Number> & pt) const {
@@ -596,7 +660,7 @@ namespace asl {
         bool contains(const Box3 &b) const {
             return contains(b.val[MIN]) && contains(b.val[MAX]);
         }
-        /** Returns TRUE if given point is inside the box.
+        /** Returns TRUE if given point is inside the box, and FALSE if the point is on the edge or outside of the box.
          * @see contains(const Point3<Number> & pt) const
          */
         bool envelopes(const Point3<Number> & pt) const {
@@ -604,26 +668,51 @@ namespace asl {
                 && (pt[1]>this->val[MIN][1]) && (pt[1]<this->val[MAX][1])
                 && (pt[2]>this->val[MIN][2]) && (pt[2]<this->val[MAX][2]);
         }
-        /** Returns TRUE if intersection of given boxes is not empty. */
-        bool intersects(const Box3 & bb) const {
+         /** Returns TRUE if given box is completely inside the box.  */
+        bool envelopes(const Box3 &bb) const {
+            return bb.hasPosition() && hasPosition() &&
+                   (envelopes(bb.getMin()) && envelopes(bb.getMax()));
+        }
+        /** Returns TRUE if intersection of given boxes is a non-empty box 
+           Note that in many cases you will prefer to use "touches" for  calculation
+           of collision and visibility determination in order to fail on the safe side
+           regarding numerical inaccuracies
+         * @see touches(const Box3<Number> & pt) const
+        */
+        bool intersects(const Box3 & theOtherBox) const {
+            return
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) < 
+                 asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) < 
+                 asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1])) &&
+                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) < 
+                 asl::minimum(theOtherBox.val[MAX][2], this->val[MAX][2]));
+        }
+
+       /** Returns TRUE if at least one point exists that is contained by both boxes;
+         the difference to intersects() is that touches() returns true if the two boxes
+         share only one edge or corner and the intersection is empty
+         * @see intersects(const Box3<Number> & pt) const
+        */
+       bool touches(const Box3 & theOtherBox) const {
+#ifdef OLD_IMPL
+            // TODO: make an implementation with fabs
             const asl::Vector3<Number> myCenterOffset_twice = (getMin()+getMax()) - (bb.getMin()+bb.getMax());
             const asl::Vector3<Number> myDoubleSize = getSize()+bb.getSize();
             return fabs(myCenterOffset_twice[0]) <= (myDoubleSize[0])
                 && fabs(myCenterOffset_twice[1]) <= (myDoubleSize[1])
                 && fabs(myCenterOffset_twice[2]) <= (myDoubleSize[2]);
+#else
+           return
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <= 
+                 asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <= 
+                 asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1])) &&
+                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) <= 
+                 asl::minimum(theOtherBox.val[MAX][2], this->val[MAX][2]));
+#endif
         }
-
-        /** Returns TRUE if a point exists that touches both boxes */
-        bool touches(const Box3 & bb) const {
-            return bb.hasPosition() && hasPosition() &&
-                  (bb.contains(this->val[MIN]) || bb.contains(this->val[MAX]) || contains(bb.getMin()));
-        }
-        /** Returns TRUE if given box is completely inside the box.  */
-        bool envelopes(const Box3 &bb) const {
-            return bb.hasPosition() && hasPosition() &&
-                   (envelopes(bb.getMin()) && envelopes(bb.getMax()));
-        }
-        // Common get and set functions
+       // Common get and set functions
         void setBounds(Number xmin, Number ymin, Number zmin,
                        Number xmax, Number ymax, Number zmax)
         {

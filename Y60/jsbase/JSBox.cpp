@@ -66,8 +66,9 @@ extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Intersect the Box with another one.");
+    DOC_BEGIN("check if the Box intersects with another one");
     DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX3F);
+    DOC_RVAL("Returns TRUE if intersection of given boxes is a non-empty box.", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -79,6 +80,24 @@ intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
     }
     JS_ReportError(cx,"JSBox3f::intersects: bad number of arguments, 1 expected");
+    return JS_FALSE;
+}
+
+static JSBool
+intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Intersect the Box with another one.");
+    DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX3F);
+    DOC_END;
+    if (argc == 1) {
+        if (JSBox3f::matchesClassOf(cx, argv[0])) {
+            typedef void (NATIVE::*MyMethod)(const asl::Box3<Number> &);
+            return Method<NATIVE>::call((MyMethod)&NATIVE::intersects,cx,obj,argc,argv,rval);
+        } else {
+            JS_ReportError(cx,"JSBox3f::intersect: bad arguments, Box3f expected");
+            return JS_FALSE;
+        }
+    }
+    JS_ReportError(cx,"JSBox3f::intersect: bad number of arguments, 1 expected");
     return JS_FALSE;
 }
 static JSBool
@@ -193,51 +212,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
-/*
-[scriptable, uuid(56dbfa2c-9010-4b0f-9bd7-38781d28f3aa)]
-interface acIBox : acIValue
-{
-  void makeEmpty();
-  void makeFull();
-  void makeCorrect();
-  readonly attribute boolean hasPosition;
-  readonly attribute boolean hasSize;
-  readonly attribute boolean hasArea;
-  readonly attribute boolean hasVolume;
-  readonly attribute boolean isEmpty;
-};
 
-[scriptable, uuid(cebacd2e-e8a0-48ab-a723-0b28eb3f05d8)]
-interface acIBoxOfFloat : acIBox
-{
-    attribute acIPointOfFloat min;
-    attribute acIPointOfFloat max;
-    attribute acIPointOfFloat center;
-    attribute acIFixedVectorOfFloat sizeVector;
-    attribute acIFixedVectorOfFloat minVector;
-    attribute acIFixedVectorOfFloat maxVector;
-    readonly attribute float volume;
-    readonly attribute float area;
-
-    void extendByPoint(in acIPointOfFloat thePoint);
-    void extendByBox(in acIBoxOfFloat theBox);
-    boolean containsPoint(in acIPointOfFloat thePoint);
-    boolean containsBox(in acIBoxOfFloat theBox);
-    boolean envelopesPoint(in acIPointOfFloat thePoint);
-    boolean envelopesBox(in acIBoxOfFloat theBox);
-    boolean touchesBox(in acIBoxOfFloat theBox);
-
-    void setBounds(in acIPointOfFloat theMinPoint, in acIPointOfFloat theMaxPointFloat);
-
-    void add(in acIFixedVectorOfFloat v);
-    void sub(in acIFixedVectorOfFloat v);
-    void mult(in acIFixedVectorOfFloat v);
-    void div(in acIFixedVectorOfFloat v);
-
-    acIPointOfFloat getElement(in unsigned long theIndex);
-    void setElement(in unsigned long theIndex, in acIPointOfFloat theValue);
-};
-*/
 JSFunctionSpec *
 JSBox3f::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -248,7 +223,8 @@ JSBox3f::Functions() {
         {"makeCorrect",        makeCorrect,             0},
         {"extendBy",           extendBy,                1}, // point, box
         {"contains",           contains,                0}, // point, box
-        {"intersects",         intersects,                 1}, // box
+        {"intersects",         intersects,              1}, // box
+        {"intersect",         intersects,               1}, // box
         {"envelopes",          envelopes,               1},
         {"touches",            touches,                 1},
         {"setBounds",          setBounds,               2},

@@ -329,9 +329,27 @@ public:
         {
             asl::Box3<T> b1(-4,-4,-4,4,4,4);
             asl::Box3<T> b2(-2,-2,-8,2,2,8);
+            asl::Box3<T> b3(4,4,4,5,5,5);
+            
+            ENSURE(b1.touches(b2));
+            ENSURE(b2.touches(b1));
             ENSURE(b1.intersects(b2));
             ENSURE(b2.intersects(b1));
-        }
+            asl::Box3<T> b12 = b1;
+            b12.intersect(b2);
+            ENSURE(!b12.isEmpty());
+            DPRINT(b12);
+
+            ENSURE(b1.touches(b3));
+            ENSURE(b3.touches(b1));
+            ENSURE(!b1.intersects(b3));
+            ENSURE(!b3.intersects(b1));
+            asl::Box3<T> b13 = b1;
+            b13.intersect(b3);
+            ENSURE(b13.hasPosition());
+            ENSURE(b13.isEmpty());
+
+      }
     }
      
 };

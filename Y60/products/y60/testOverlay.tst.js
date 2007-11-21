@@ -70,24 +70,29 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myOverlay.moveToTop();
 
         // Paranoid touches test
-        ENSURE(obj.myOverlay.touches(thePosition[0], thePosition[1]));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1]));
-        ENSURE(!obj.myOverlay.touches(thePosition[0], thePosition[1] - 1));
-        ENSURE(obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1] - 1));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1]));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] - 1));
-        ENSURE(obj.myOverlay.touches(thePosition[0], thePosition[1], 0));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1], 0));
-        ENSURE(!obj.myOverlay.touches(thePosition[0], thePosition[1] - 1, 0));
-        ENSURE(obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1] - 1, 0));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1], 0));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] - 1, 0));
-        ENSURE(obj.myOverlay.touches(thePosition[0] - 1, thePosition[1] - 1, 1));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] - 2, thePosition[1] - 1, 1));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1] - 2, 1));
-        ENSURE(obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1], 1));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0] + 1, thePosition[1] + theSize[1], 1));
-        ENSURE(!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] + 1, 1));
+        obj.thePosition = thePosition;
+        obj.theSize = theSize;
+        DPRINT('thePosition');
+        DPRINT('theSize');
+        DPRINT('obj.myOverlay');
+        ENSURE('obj.myOverlay.touches(thePosition[0], thePosition[1])');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1])');
+        ENSURE('!obj.myOverlay.touches(thePosition[0], thePosition[1] - 1)');
+        ENSURE('obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1] - 1)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1])');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] - 1)');
+        ENSURE('obj.myOverlay.touches(thePosition[0], thePosition[1], 0)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1], 0)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0], thePosition[1] - 1, 0)');
+        ENSURE('obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1] - 1, 0)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0] - 1, thePosition[1] + theSize[1], 0)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] - 1, 0)');
+        ENSURE('obj.myOverlay.touches(thePosition[0] - 1, thePosition[1] - 1, 1)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] - 2, thePosition[1] - 1, 1)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] - 1, thePosition[1] - 2, 1)');
+        ENSURE('obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1], 1)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0] + 1, thePosition[1] + theSize[1], 1)');
+        ENSURE('!obj.myOverlay.touches(thePosition[0] + theSize[0], thePosition[1] + theSize[1] + 1, 1)');
 
         ///////////////////////////////////////////////////////////////////////////////////////
         //

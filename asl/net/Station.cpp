@@ -167,7 +167,8 @@ Station::defaultBroadcastAddress() {
     if (getenv("STATION_BROADCAST_ADDR")) {
         myAddress = asl::hostaddress(getenv("STATION_BROADCAST_ADDR"));
     } else {
-        myAddress = defaultOwnIPAddress() | 0xff; // default class C broadcast address
+        //myAddress = defaultOwnIPAddress() | 0xff; // default class C broadcast address
+        myAddress = defaultOwnIPAddress() | 0x1ff; // HACK: ART+COM Subnet, TODO: add proper code, see example below
     }
     return myAddress;
 }
@@ -207,6 +208,152 @@ Station::defaultBroadcastPort() {
     }
     return myBroadcastPort;
 }
+/*
+ * A little test dealie to see if we can retrieve the broadcast addr
+ *
+ * Works on HP_UX, freebsd, linux
+ * gcc -o /tmp/get_bcast ./get_bcast.c
+ *
+ * Works on solaris or Unixware (SVR4) with:
+ * gcc -DBSD_COMP -o /tmp/get_bcast ./get_bcast.c -lsocket -lnsl
+ *
+ * Doesn't seem to work at all on Digital Unix (???)
+ *
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+
+#include <sys/types.h>
+
+#include <sys/ioctl.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+
+#if 0
+int main (int argc, char * argv[])
+{
+	struct ifconf
+		ifc; /* holds IOCTL return value for SIOCGIFCONF */
+	int
+		return_val,
+		fd = -1,
+		numreqs = 30,
+		n;
+	struct ifreq
+		*ifr; /* points to one interface returned from ioctl */
+	
+	fd = socket (PF_INET, SOCK_DGRAM, 0);
+	
+	if (fd < 0) {
+		fprintf (stderr, "Opening socket:");
+		fprintf (stderr, "got error %d (%s)\n", errno, strerror(errno));
+		exit(1);
+	}
+	
+	memset (&ifc, 0, sizeof(ifc));
+
+	ifc.ifc_buf = NULL;
+	ifc.ifc_len =  sizeof(struct ifreq) * numreqs;
+	ifc.ifc_buf = malloc(ifc.ifc_len);
+
+	/* This code attempts to handle an arbitrary number of interfaces,
+	   it keeps trying the ioctl until it comes back OK and the size
+	   returned is less than the size we sent it.
+	 */
+	for (;;) {
+		ifc.ifc_len = sizeof(struct ifreq) * numreqs;
+		ifc.ifc_buf = realloc(ifc.ifc_buf, ifc.ifc_len);
+		
+		if ((return_val = ioctl(fd, SIOCGIFCONF, &ifc)) < 0) {
+			perror("SIOCGIFCONF");
+			break;
+		}
+		if (ifc.ifc_len == sizeof(struct ifreq) * numreqs) {
+			/* assume it overflowed and try again */
+			numreqs += 10;
+			continue;
+		}
+		break;
+	}
+	
+	if (return_val < 0) {
+		fprintf (stderr, "ioctl:");		
+		fprintf (stderr, "got error %d (%s)\n", errno, strerror(errno));
+		exit(1);
+	}
+
+
+	/* loop through interfaces returned from SIOCGIFCONF */
+	ifr=ifc.ifc_req;
+	for (n=0; n < ifc.ifc_len; n+=sizeof(struct ifreq)) {
+
+		printf ("ifr_name %s\n", ifr->ifr_name);
+
+		/* Get the flags for this interface*/
+		return_val = ioctl(fd,SIOCGIFFLAGS, ifr);
+		if (return_val == 0 ) {
+			printf ("ifr_flags %08X\n", ifr->ifr_flags);
+		} else {
+			perror ("Get flags failed");			
+		}
+
+		/* Get the Destination Address for this interface */
+		return_val = ioctl(fd,SIOCGIFDSTADDR, ifr);
+		if (return_val == 0 ) {
+			if (ifr->ifr_broadaddr.sa_family == AF_INET) {
+				struct sockaddr_in
+					*sin = (struct sockaddr_in *)
+					&ifr->ifr_dstaddr;
+				
+				printf ("ifr_dstaddr %s\n",
+					inet_ntoa(sin->sin_addr));
+
+			}
+			else
+			{
+				printf ("unsupported family for dest\n");
+			}
+		} else {
+			perror ("Get dest failed");
+		}
+
+		
+		/* Get the BROADCAST address */
+		return_val = ioctl(fd,SIOCGIFBRDADDR, ifr);
+		if (return_val == 0 ) {
+			if (ifr->ifr_broadaddr.sa_family == AF_INET) {
+				struct sockaddr_in
+					*sin = (struct sockaddr_in *)
+					&ifr->ifr_broadaddr;
+				
+				printf ("ifr_broadaddr %s\n",
+					inet_ntoa(sin->sin_addr));
+
+			}
+			else
+			{
+				printf ("unsupported family for broadcast\n");
+			}
+			
+		} else {
+			perror ("Get broadcast failed");
+		}
+
+		/* check the next entry returned */
+		ifr++;
+	}
+
+	/* we don't need this memory any more */
+	free (ifc.ifc_buf);
+	close (fd);
+	
+	return 0;
+}
+#endif
 
 void
 Station::openStation(unsigned long theBroadcastAddress,
@@ -392,7 +539,7 @@ Station::broadcast(const asl::ReadableBlock & theData) {
             }
         } while (myResult < 0);
         if (myResult != myPacketSize) {
-            throw SendFailed(errorDescription(lastError()),PLUS_FILE_LINE);
+            throw SendFailed(std::string("toAddress=")+asl::as_dotted_address(ntohl(_toAddress.sin_addr.s_addr))+", port="+asl::as_string(ntohs(_toAddress.sin_port))+", error="+errorDescription(lastError()),PLUS_FILE_LINE);
         }
         mySentDataBytes += myPacket._myHeader._myMessagePartSize;
         

@@ -788,7 +788,7 @@ namespace asl {
                  const Box3<Number> & theScreen)
     {
         Box3<Number> myScreenSpaceBounds = theObjectBounds * theProjection;
-        return myScreenSpaceBounds.intersects(theScreen);
+        return myScreenSpaceBounds.touches(theScreen);
     }
 
 } // asl

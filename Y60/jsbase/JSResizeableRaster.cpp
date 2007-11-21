@@ -140,7 +140,7 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves the raster to a file.");
     DOC_PARAM("theFilename", "Filename and path where to save the image. The image format is automatically determined by the file-extension.", DOC_TYPE_STRING);
     DOC_END;
-    JS_ReportError(cx, "save(): not yet implemented");
+    JS_ReportError(cx, "save(): not yet implemented, use saveImage instead");
     return JS_FALSE;
 
     try {
@@ -217,13 +217,15 @@ JSResizeableRaster::Functions() {
     return myFunctions;
 }
 enum PropertyNumbers {PROP_width = -100,
-                      PROP_height = -101};
+                      PROP_height = -101,
+                      PROP_size = -102};
 
 JSPropertySpec *
 JSResizeableRaster::Properties() {
     static JSPropertySpec myProperties[] = {
         {"width", PROP_width, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute unsigned long
         {"height", PROP_height, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute unsigned long
+        {"size", PROP_height, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute unsigned long
         {0}
     };
     return myProperties;
@@ -257,7 +259,10 @@ JSResizeableRaster::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
             case PROP_height:
                 *vp = as_jsval(cx, getNative().height());
                 return JS_TRUE;
-            default:
+            case PROP_size:
+                *vp = as_jsval(cx, getNative().getSize());
+                return JS_TRUE;
+             default:
                 JS_ReportError(cx,"JSResizeableRaster::getProperty: index %d out of range", theID);
                 return JS_FALSE;
     }

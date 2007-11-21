@@ -912,7 +912,7 @@ namespace y60 {
         }
 
         virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
-            return (!isInsensible && _myBox.intersects(myBoundingBox));
+            return (!isInsensible && _myBox.touches(myBoundingBox));
         }
 
         bool visit(NodePtr theNode, y60::ShapePtr theShape, const asl::Matrix4f & theTransformation) {
@@ -940,7 +940,7 @@ namespace y60 {
                 bool myContainsFlag = _myBox.contains( myBoundingBox.getCenter());
                 return (!isInsensible && myContainsFlag);
             } else {
-                return (!isInsensible && _myBox.intersects(myBoundingBox));
+                return (!isInsensible && _myBox.touches(myBoundingBox));
             }
         }
     };
@@ -1074,7 +1074,7 @@ namespace y60 {
             float maxY = maximum(_mySphere.center[1], myEndCenter[1]) + _mySphere.radius;
             float maxZ = maximum(_mySphere.center[2], myEndCenter[2]) + _mySphere.radius;
             Box3f myCapsuleBox(Point3f(minX, minY, minZ), Point3f(maxX, maxY, maxZ));
-            return myCapsuleBox.intersects(myBoundingBox);
+            return myCapsuleBox.touches(myBoundingBox);
         }
 
         bool visit(NodePtr theNode, y60::ShapePtr theShape, const asl::Matrix4f & theTransformation) {

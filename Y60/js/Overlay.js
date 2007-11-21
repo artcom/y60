@@ -144,7 +144,7 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
                 [_myNode.width - 1, _myNode.height - 1, 1]);
             var myMouseBox = new Box3f([myNewPoint[0] - theSquareSize, myNewPoint[1] - theSquareSize, 0],
                 [myNewPoint[0] + theSquareSize, myNewPoint[1] + theSquareSize, 1]);
-            return myMouseBox.intersects(myOverlayBox);
+            return myMouseBox.touches(myOverlayBox);
         } else {
             if (0 <= myNewPoint[0] && 0 <= myNewPoint[1] &&
                 _myNode.width > myNewPoint[0] && _myNode.height > myNewPoint[1])

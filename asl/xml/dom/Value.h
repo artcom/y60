@@ -778,6 +778,7 @@ namespace dom {
         virtual ~ResizeableRaster() {}
         virtual asl::AC_SIZE_TYPE width() const = 0;
         virtual asl::AC_SIZE_TYPE height() const = 0;
+        virtual asl::Vector2<float> getSize() const = 0;
         virtual const asl::ReadableBlock & pixels() const = 0;
         virtual asl::WriteableBlock & pixels() = 0;
         virtual void assign(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight, const asl::ReadableBlock & thePixels) = 0;
@@ -808,7 +809,6 @@ namespace dom {
                 asl::AC_OFFSET_TYPE sourceWidth = 0, asl::AC_OFFSET_TYPE sourceHeight = 0,
                 asl::AC_OFFSET_TYPE targetX = 0, asl::AC_OFFSET_TYPE targetY = 0,
                 asl::AC_OFFSET_TYPE targetWidth = 0, asl::AC_OFFSET_TYPE targetHeight = 0) = 0;
-        //virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY, const ValueBase & theSource) = 0;
 
     };
     typedef asl::Ptr<ResizeableRaster, dom::ThreadingModel> ResizeableRasterPtr;
@@ -839,6 +839,9 @@ namespace dom {
 
         MakeResizeableRaster(RASTER_VALUE & theRasterValue) : _myRasterValue(theRasterValue) {}
 
+        asl::Vector2<float> getSize() const {
+            return asl::Vector2<float>(width(), height());
+        }
         asl::AC_SIZE_TYPE width() const {
             return _myRasterValue.getValue().hsize();
         }

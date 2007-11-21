@@ -65,8 +65,9 @@ extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Intersect the Box with another one.");
+    DOC_BEGIN("check if the Box intersects with another one");
     DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX2F);
+    DOC_RVAL("Returns TRUE if intersection of given boxes is a non-empty box.", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox2f::matchesClassOf(cx, argv[0])) {
@@ -80,13 +81,32 @@ intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     JS_ReportError(cx,"JSBox2f::intersects: bad number of arguments, 1 expected");
     return JS_FALSE;
 }
+
+static JSBool
+intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("intersect box with another one");
+    DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX2F);
+    DOC_END;
+    if (argc == 1) {
+        if (JSBox2f::matchesClassOf(cx, argv[0])) {
+            typedef void (NATIVE::*MyMethod)(const asl::Box2<Number> &) const;
+            return Method<NATIVE>::call((MyMethod)&NATIVE::intersect,cx,obj,argc,argv,rval);
+        } else {
+            JS_ReportError(cx,"JSBox2f::intersect: bad arguments, Box2f expected");
+            return JS_FALSE;
+        }
+    }
+    JS_ReportError(cx,"JSBox2f::intersect: bad number of arguments, 1 expected");
+    return JS_FALSE;
+}
+
 static JSBool
 contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Check if the Box contains a point/box.");
+    DOC_BEGIN("Check if the Box contains a point/box, ");
     DOC_PARAM("theContainedPoint", "", DOC_TYPE_POINT2F);
     DOC_RESET;
     DOC_PARAM("theContainedBox", "", DOC_TYPE_BOX2F);
-    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
+    DOC_RVAL("Returns TRUE if given point is inside or on boundary of box, or both boxes contain at least one same point, otherwise FALSE", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox2f::matchesClassOf(cx, argv[0])) {
@@ -103,11 +123,11 @@ contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Check if the Box contains and doesn't touch a point/box.");
+    DOC_BEGIN("Check if the Box contains and doesn't touch a point/box. ");
     DOC_PARAM("theEnvelopedPoint", "", DOC_TYPE_POINT2F);
     DOC_RESET;
     DOC_PARAM("theEnvelopedBox", "", DOC_TYPE_BOX2F);
-    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
+    DOC_RVAL("Returns TRUE if given point/box is inside the box, and FALSE if the argument point/box is on the edge or outside of the box", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox2f::matchesClassOf(cx, argv[0])) {
@@ -123,22 +143,12 @@ envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Check if the Box touches a point/box.");
-    DOC_PARAM("theTouchingPoint", "", DOC_TYPE_POINT2F);
-    DOC_RESET;
+    DOC_BEGIN("check if two boxes contain common points; the difference to intersects() is that touches() returns true if the two boxes share only one edge or corner and the intersection is empty");
     DOC_PARAM("theTouchingBox", "", DOC_TYPE_BOX2F);
-    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
+    DOC_RVAL("Returns TRUE if at least one point exists that is contained by both boxes", DOC_TYPE_BOOLEAN);
     DOC_END;
-    if (argc == 1) {
-        if (JSBox2f::matchesClassOf(cx, argv[0])) {
-            typedef bool (NATIVE::*MyMethod)(const asl::Box2<Number> &) const;
-            return Method<NATIVE>::call((MyMethod)&NATIVE::touches,cx,obj,argc,argv,rval);
-        } else {
-            typedef bool (NATIVE::*MyMethod)(const asl::Point2<Number> &) const;
-            return Method<NATIVE>::call((MyMethod)&NATIVE::touches,cx,obj,argc,argv,rval);
-        }
-    }
-    JS_ReportError(cx,"JSBox2f::touches: bad number of arguments, 1 expected");
+    typedef bool (NATIVE::*MyMethod)(const asl::Box2<Number> &) const;
+    return Method<NATIVE>::call((MyMethod)&NATIVE::touches,cx,obj,argc,argv,rval);
     return JS_FALSE;
 }
 static JSBool
@@ -150,7 +160,38 @@ setBounds(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     typedef void (NATIVE::*MyMethod)(const asl::Point2<Number> &, const asl::Point2<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::setBounds,cx,obj,argc,argv,rval);
 }
-
+static JSBool
+add(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Translate the Box adding an offset to its corners.");
+    DOC_PARAM("theTranslationVector", "", DOC_TYPE_VECTOR2F);
+    DOC_END;
+    typedef void (NATIVE::*MyMethod)(const asl::Vector2<Number> &);
+    return Method<NATIVE>::call((MyMethod)&NATIVE::add,cx,obj,argc,argv,rval);
+}
+static JSBool
+sub(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Translate the Box subtracting an offset to its corners.");
+    DOC_PARAM("theTranslationVector", "", DOC_TYPE_VECTOR2F);
+    DOC_END;
+    typedef void (NATIVE::*MyMethod)(const asl::Vector2<Number> &);
+    return Method<NATIVE>::call((MyMethod)&NATIVE::sub,cx,obj,argc,argv,rval);
+}
+static JSBool
+mult(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Scale the Box multiplying each coordinate by a factor.");
+    DOC_PARAM("theFactors", "", DOC_TYPE_VECTOR2F);
+    DOC_END;
+    typedef void (NATIVE::*MyMethod)(const asl::Vector2<Number> &);
+    return Method<NATIVE>::call((MyMethod)&NATIVE::mult,cx,obj,argc,argv,rval);
+}
+static JSBool
+div(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Scale the Box dividing each coordinate by a factor.");
+    DOC_PARAM("theFactors", "", DOC_TYPE_VECTOR2F);
+    DOC_END;
+    typedef void (NATIVE::*MyMethod)(const asl::Vector2<Number> &);
+    return Method<NATIVE>::call((MyMethod)&NATIVE::div,cx,obj,argc,argv,rval);
+}
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("returns string representation of the Box.");
@@ -171,11 +212,16 @@ JSBox2f::Functions() {
         {"makeCorrect",        makeCorrect,             0},
         {"extendBy",           extendBy,                1}, // point, box
         {"contains",           contains,                0}, // point, box
-        {"intersects",         intersects,                 1}, // box
+        {"intersects",         intersects,              1}, // box
+        {"intersect" ,         intersect,               1}, // box
         {"envelopes",          envelopes,               1},
         {"touches",            touches,                 1},
         {"setBounds",          setBounds,               2},
         {"toString",           toString,                0},
+        {"add",                add,                     1},
+        {"sub",                sub,                     1},
+        {"mult",               mult,                    1},
+        {"div",                div,                     1},
         {0}
     };
     return myFunctions;
