@@ -75,7 +75,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.setup(theWidth, theHeight, false, theTitle);
         _myTheaterFlag    = theTheaterFlag;        
         if (_myTheaterFlag) {
-            window.decorations     = false;;
+            window.decorations     = false;
             window.backgroundColor = [0.0, 0.0, 0.0];            
             window.position        = [0.0, 0.0];            
             window.showMouseCursor = false;
@@ -319,6 +319,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         var myFilename = urlDecode(myEntry.href);
         _myCurrentMediaType = myEntry.mediaType;
         print("Now showing '" + myFilename + "'");
+        window.title = "iv: '" + myFilename + "'";
 
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();
@@ -718,7 +719,7 @@ try {
                 myTheaterFlag = arguments[i + 1] == "1" ? true:false;
             }
         }
-        ourImageViewerApp.setup(myWidth, myHeight, "ImageViewer", myTheaterFlag);
+        ourImageViewerApp.setup(myWidth, myHeight, "iv", myTheaterFlag);
         ourImageViewerApp.go();
     }
 } catch (ex) {
