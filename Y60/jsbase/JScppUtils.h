@@ -305,6 +305,7 @@ bool convertFrom(JSContext *cx, jsval theValue, bool & theDest);
 bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, asl::Block & theDest); 
 
 template <class T>
 bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest);

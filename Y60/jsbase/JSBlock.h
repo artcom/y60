@@ -25,13 +25,13 @@
 
 namespace jslib {
 
-class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessProtocol>
+class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, VectorValueAccessProtocol>
 {
         JSBlock() {}
     public:
         typedef asl::Block NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
-        typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
+        typedef JSWrapper<NATIVE,OWNERPTR,VectorValueAccessProtocol> Base;
 
         static const char * ClassName() {
             return "Block";

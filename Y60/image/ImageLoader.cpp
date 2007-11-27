@@ -314,25 +314,6 @@ namespace y60 {
                                     const PLPixelFormat &  thePixelformat)
     {
         AC_DEBUG << "Pixelformat: " << thePixelformat.GetName();
-/*
-       int theBitsPerPixel = thePixelformat.GetBitsPerPixel();
-        switch (theBitsPerPixel) {
-            case 32:
-                _myEncoding = BGRA;
-                break;
-            case 24:
-                _myEncoding = BGR;
-                break;
-            case 16:
-                _myEncoding = GRAY16;
-                break;
-            case 8:
-                _myEncoding = GRAY;
-                break;
-            default:
-                throw ImageLoaderException(string("Unsupported bits per pixel: ") + as_string(theBitsPerPixel), PLUS_FILE_LINE);
-        }
-*/
         if (!mapFormatToPixelEncoding(thePixelformat, _myEncoding)) {
             throw ImageLoaderException(string("Unsupported Pixel Encoding: ") + thePixelformat.GetName(), PLUS_FILE_LINE);
         }
@@ -360,16 +341,7 @@ namespace y60 {
         unsigned myHeight     = GetHeight();
         unsigned myLineStride = GetBytesPerLine();
 
-#if 0
-        asl::Ptr<Block> myWritableData = dynamic_cast_Ptr<Block>(_myData);
-        if (!myWritableData) {
-            throw ImageLoaderException(string("Non-writable block: ") +
-                    _myFilename, PLUS_FILE_LINE);
-        }
-        unsigned char * pBits = myWritableData->begin();
-#else
         const unsigned char * pBits = getRaster()->pixels().begin();
-#endif
         for (unsigned i = 0; i < myHeight; ++i) {
             m_pLineArray[i] = (PLBYTE*)pBits; // caution: const leak
             pBits += myLineStride;
@@ -513,6 +485,49 @@ namespace y60 {
                         as_string(myHeightFactor), PLUS_FILE_LINE);
             }
 
+            // limit texture size
+            unsigned myTextureSizeLimit = 0;
+            if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
+                myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
+                AC_DEBUG << "Texture size limit set to " << myTextureSizeLimit;
+            } else {
+                myTextureSizeLimit = ITextureManager::getTextureSizeLimit();
+            }
+            AC_DEBUG << "Texture size limit = " << myTextureSizeLimit;
+
+            AC_DEBUG << "GetWidth() = " << GetWidth();
+            AC_DEBUG << "GetHeight() = " << GetHeight();
+            AC_DEBUG << "myWidthFactor = " << myWidthFactor;
+            AC_DEBUG << "myHeightFactor = " << myHeightFactor;
+
+            unsigned myTargetWidth = GetWidth();
+            unsigned myTargetHeight = GetHeight();
+             if (!powerOfTwo(GetWidth() / myWidthFactor) || !powerOfTwo(GetHeight() / myHeightFactor)) {
+                myTargetWidth  = nextPowerOfTwo(GetWidth() / myWidthFactor) * myWidthFactor;
+                myTargetHeight = nextPowerOfTwo(GetHeight() / myHeightFactor) * myHeightFactor;
+            }
+            AC_DEBUG << "myTargetWidth = " << myTargetWidth;
+            AC_DEBUG << "myTargetHeight = " << myTargetHeight;
+ 
+            while (myTextureSizeLimit &&
+                ((myTargetWidth / myWidthFactor) > myTextureSizeLimit ||
+                 (myTargetHeight / myHeightFactor)  > myTextureSizeLimit) )
+            {
+                myTargetWidth  = (myTargetWidth / myWidthFactor)/2 * myWidthFactor;
+                myTargetHeight = (myTargetHeight / myHeightFactor)/2 * myHeightFactor;
+            }
+            AC_DEBUG << "GetWidth() = " << myTargetWidth;
+            AC_DEBUG << "GetHeight() = " << myTargetHeight;
+            AC_DEBUG << "myTargetWidth = " << myTargetWidth;
+            AC_DEBUG << "myTargetHeight = " << myTargetHeight;
+
+            if (myTargetWidth != GetWidth() || myTargetHeight != GetHeight()) {
+                AC_WARNING << "Texture size exceeds "<<Y60_TEXTURE_SIZE_LIMIT_ENV<<"="<<
+                    myTextureSizeLimit<<", resizing to "<<
+                    myTargetWidth<<"x"<<myTargetHeight<<endl;
+                ApplyFilter(PLFilterResizeBilinear(myTargetWidth, myTargetHeight));
+            }
+
             if (!powerOfTwo(GetWidth() / myWidthFactor) || !powerOfTwo(GetHeight() / myHeightFactor)) {
 
                 unsigned myWidth  = nextPowerOfTwo(GetWidth() / myWidthFactor) * myWidthFactor;
@@ -531,29 +546,6 @@ namespace y60 {
                     throw ImageLoaderException(string("ensurePowerOfTwo: Unknown resize mode: ")
                             + theResizeMode, PLUS_FILE_LINE);
                 }
-            }
-
-            // limit texture size
-            unsigned myTextureSizeLimit = 0;
-            if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
-                myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
-            }
-
-            unsigned myTargetWidth = GetWidth();
-            unsigned myTargetHeight = GetHeight();
-
-            while (myTextureSizeLimit &&
-                ((myTargetWidth / myWidthFactor) > myTextureSizeLimit ||
-                 (myTargetHeight / myHeightFactor)  > myTextureSizeLimit) )
-            {
-                myTargetWidth  = (myTargetWidth / myWidthFactor)/2 * myWidthFactor;
-                myTargetHeight = (myTargetHeight / myHeightFactor)/2 * myHeightFactor;
-            }
-            if (myTargetWidth != GetWidth() || myTargetHeight != GetHeight()) {
-                AC_WARNING << "Texture size exceeds "<<Y60_TEXTURE_SIZE_LIMIT_ENV<<"="<<
-                    myTextureSizeLimit<<", resizing to "<<
-                    myTargetWidth<<"x"<<myTargetHeight<<endl;
-                ApplyFilter(PLFilterResizeBilinear(myTargetWidth, myTargetHeight));
             }
 
             // convert paletted textures

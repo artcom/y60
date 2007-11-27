@@ -17,6 +17,7 @@
 #include "JSBox2f.h"
 #include "JSSphere.h"
 #include "JSMatrix.h"
+#include "JSBlock.h"
 #include "ArgumentHolder.impl"
 
 #include <string>
@@ -37,6 +38,7 @@ namespace jslib {
     template struct ArgumentHolder<float const &>;
     template struct ArgumentHolder<double>;
     template struct ArgumentHolder<double const &>;
+
     template struct ArgumentHolder<asl::Vector2<int> >;
     template struct ArgumentHolder<asl::Vector3<int> >;
     template struct ArgumentHolder<asl::Vector4<int> >;
@@ -46,7 +48,11 @@ namespace jslib {
     template struct ArgumentHolder<asl::Vector2<double> >;
     template struct ArgumentHolder<asl::Vector3<double> >;
     template struct ArgumentHolder<asl::Vector4<double> >;
-
+    template struct ArgumentHolder<asl::Point2<float> >;
+    template struct ArgumentHolder<asl::Point3<float> >;
+    template struct ArgumentHolder<asl::Point4<float> >;
+    template struct ArgumentHolder<asl::Time>;
+ 
     template struct ArgumentHolder<asl::Vector2<int> const &>;
     template struct ArgumentHolder<asl::Vector3<int> const &>;
     template struct ArgumentHolder<asl::Vector4<int> const &>;
@@ -60,7 +66,7 @@ namespace jslib {
     template struct ArgumentHolder<asl::Point2<float> const &>;
     template struct ArgumentHolder<asl::Point3<float> const &>;
     template struct ArgumentHolder<asl::Point4<float> const &>;
-    template struct ArgumentHolder<asl::Time>;
+    template struct ArgumentHolder<asl::Time const&>;
     
     template struct ArgumentHolder<std::vector<unsigned int> const &>;
     template struct ArgumentHolder<std::vector<float> >;
@@ -100,6 +106,18 @@ namespace jslib {
     template struct ResultConverter<asl::Vector3<double> >;
     template struct ResultConverter<asl::Vector4<double> >;
     template struct ResultConverter<std::vector<asl::Vector3<float> > >;
+   
+    template struct ResultConverter<asl::Point2<int> >;
+    template struct ResultConverter<asl::Point3<int> >;
+    template struct ResultConverter<asl::Point4<int> >;
+    template struct ResultConverter<asl::Point2<float> >;
+    template struct ResultConverter<asl::Point3<float> >;
+    template struct ResultConverter<asl::Point4<float> >;
+    template struct ResultConverter<asl::Point2<double> >;
+    template struct ResultConverter<asl::Point3<double> >;
+    template struct ResultConverter<asl::Point4<double> >;
+    
+    template struct ResultConverter<std::vector<asl::Point3<float> > >;
     template struct ResultConverter<asl::Quaternion<float> >;
     template struct ResultConverter<dom::NodePtr>;
     template struct ResultConverter<dom::ValuePtr>;

@@ -398,7 +398,7 @@ JSBox2f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 myNewObject=new JSBox2f(myNewValue);
             }
         } else {
-            JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0,1 or 3, got %d",ClassName(), argc);
+            JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0,1 (Box2f) or 2 (Corner Points), got %d",ClassName(), argc);
             return JS_FALSE;
         }
     }

@@ -11,6 +11,7 @@
 #include "JSResizeableRaster.h"
 #include "JSNode.h"
 #include "JSVector.h"
+#include "JSBlock.h"
 #include "JSWrapper.impl"
 
 #include <iostream>
@@ -88,6 +89,31 @@ resample(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::resample,cx,obj,argc,argv,rval);
 }
+
+static JSBool
+assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("assigns a block of raw memory as new pixel data; width and height of the raster are set to argument values; the pixelformat and the width/height must match the raw data to get the expected result");
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
+    DOC_PARAM("thePixels", "Block of raw memory containing pixel data", DOC_TYPE_BLOCK); 
+    DOC_END;
+    dom::ResizeableRaster & myObject = JSClassTraits<dom::ResizeableRaster>::openNativeRef(cx, obj);
+    try {
+        ensureParamCount(argc, 3);
+        asl::AC_SIZE_TYPE myWidth;
+        convertFrom(cx, argv[0], myWidth);
+        asl::AC_SIZE_TYPE myHeight;
+        convertFrom(cx, argv[1], myHeight);
+        asl::Block * myPixels = 0;
+        convertFrom(cx, argv[1], myPixels);
+        myObject.assign(myWidth, myHeight, *myPixels);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
+//    typedef void (NATIVE::*MyMethod)(asl::AC_SIZE_TYPE,asl::AC_SIZE_TYPE, const asl::Block &);
+//    return Method<NATIVE>::call((MyMethod)&NATIVE::assign,cx,obj,argc,argv,rval);
+}
+
 
 static JSBool
 pasteRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -210,8 +236,10 @@ JSResizeableRaster::Functions() {
         {"randomize",   randomize,        2},
         {"resize",      resize,           2},
         {"resample",    resample,         2},
+        {"pasteRaster", pasteRaster,      9},
         {"clear",       clear,            0},
         {"save",        save,             1},
+        {"assignBlock", assignBlock,      3},
         {0}
     };
     return myFunctions;
@@ -261,6 +289,7 @@ JSResizeableRaster::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
                 return JS_TRUE;
             case PROP_size:
                 *vp = as_jsval(cx, getNative().getSize());
+                AC_DEBUG << "getNative().getSize() = " << getNative().getSize();
                 return JS_TRUE;
              default:
                 JS_ReportError(cx,"JSResizeableRaster::getProperty: index %d out of range", theID);

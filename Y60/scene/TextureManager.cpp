@@ -28,21 +28,14 @@
 using namespace std;
 using namespace asl;
 
-const unsigned DEFAULT_TEXTURE_SIZE_LIMIT = 0; // ask gl for max texture size
 
 namespace y60 {
 
     TextureManager::TextureManager() :
         _myResourceManager(0), _myResourceManagerCount(0),
-        _myMaxTextureSize(DEFAULT_TEXTURE_SIZE_LIMIT),
+        _myMaxTextureSize(TextureManager::getTextureSizeLimit()),
         _myMemoryResourceManager(new MemoryResourceManager())
     {
-        string myLimitString;
-        if (get_environment_var(Y60_TEXTURE_SIZE_LIMIT_ENV, myLimitString)) {
-            if (!fromString(myLimitString, _myMaxTextureSize)) {
-                AC_WARNING << "Invalid "<<Y60_TEXTURE_SIZE_LIMIT_ENV<<" environment variable, using default value = "<<DEFAULT_TEXTURE_SIZE_LIMIT<<endl;
-            }
-        }
         _myResourceManager = _myMemoryResourceManager.getNativePtr();
     }
 

@@ -22,12 +22,16 @@
 
 
 #include <asl/Ptr.h>
+#include <asl/os_functions.h>
+#include <asl/Logger.h>
 #include <dom/typedefs.h>
 
 namespace y60 {
     static const char * Y60_TEXTURE_SIZE_LIMIT_ENV = "Y60_TEXTURE_SIZE_LIMIT";
     const float TEXTURE_PRIORITY_IDLE   = 0.0f;     ///< Minimum priority for Texture management
     const float TEXTURE_PRIORITY_IN_USE = 1.0f;     ///< Priority of a Texture that is currently in use.
+
+    const unsigned DEFAULT_TEXTURE_SIZE_LIMIT = 0; // ask gl for max texture size
 
     class Image;
     /**
@@ -69,6 +73,17 @@ namespace y60 {
          */
         //virtual void uploadTexture(asl::Ptr<Image, dom::ThreadingModel> theImage) = 0;
 
+        static unsigned getTextureSizeLimit() {
+            unsigned myTextureLimit=DEFAULT_TEXTURE_SIZE_LIMIT;
+            std::string myLimitString;
+            if (asl::get_environment_var(Y60_TEXTURE_SIZE_LIMIT_ENV, myLimitString)) {
+                if (!asl::fromString(myLimitString, myTextureLimit)) {
+                    AC_WARNING << "Invalid "<<Y60_TEXTURE_SIZE_LIMIT_ENV<<" environment variable, using default value = "<<DEFAULT_TEXTURE_SIZE_LIMIT;
+                }
+            }
+            return myTextureLimit;
+        }
+ 
     };
 
     typedef asl::Ptr<ITextureManager> ITextureManagerPtr;
