@@ -521,7 +521,8 @@ namespace y60 {
             AC_DEBUG << "myTargetWidth = " << myTargetWidth;
             AC_DEBUG << "myTargetHeight = " << myTargetHeight;
 
-            if (myTargetWidth != GetWidth() || myTargetHeight != GetHeight()) {
+            if (myTextureSizeLimit &&
+                (myTargetWidth != GetWidth() || myTargetHeight != GetHeight())) {
                 AC_WARNING << "Texture size exceeds "<<Y60_TEXTURE_SIZE_LIMIT_ENV<<"="<<
                     myTextureSizeLimit<<", resizing to "<<
                     myTargetWidth<<"x"<<myTargetHeight<<endl;

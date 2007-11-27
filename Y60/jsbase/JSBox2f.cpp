@@ -395,8 +395,12 @@ JSBox2f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 return JS_FALSE;
             }
             if (JSA_GetClass(cx,myArgument) == Class()) {
+                myNewBox2f = getJSWrapper(cx, myArgument).getNative();
                 myNewObject=new JSBox2f(myNewValue);
-            }
+            } else {
+                JS_ReportError(cx,"JSBox2f::Constructor: bad argument type, Box2f expected (2)");
+                return JS_FALSE;
+             }
         } else {
             JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0,1 (Box2f) or 2 (Corner Points), got %d",ClassName(), argc);
             return JS_FALSE;
