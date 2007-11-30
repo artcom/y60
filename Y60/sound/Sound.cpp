@@ -105,6 +105,10 @@ bool Sound::isLooping() const {
     return _myIsLooping;
 }
 
+void Sound::setLooping(bool theLoop) {
+    _myIsLooping = theLoop;
+}
+
 std::string Sound::getName() const {
     return _myURI;
 }

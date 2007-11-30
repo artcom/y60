@@ -46,6 +46,7 @@ class Sound :
         asl::Time getDuration() const;
         asl::Time getCurrentTime() const;
         bool isLooping() const;
+        void setLooping(bool theLoop);
         void seek (asl::Time thePosition);
         void seekRelative (double theAmount);
         asl::Time getBufferedTime() const;

@@ -82,7 +82,7 @@ namespace jslib {
     JSSound::Properties() {
         static JSPropertySpec myProperties[] = {
             {"volume",    PROP_volume,   JSPROP_ENUMERATE|JSPROP_PERMANENT},
-            {"looping",   PROP_looping,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+            {"looping",   PROP_looping,  JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"playing",   PROP_playing,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"src",       PROP_src,      JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"duration",  PROP_duration, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
@@ -139,6 +139,8 @@ namespace jslib {
         switch (theID) {
             case PROP_volume:
                 return Method<NATIVE>::call(&NATIVE::setVolume, cx, obj, 1, vp, &dummy);
+            case PROP_looping:
+                return Method<NATIVE>::call(&NATIVE::setLooping, cx, obj, 1, vp, &dummy);
             default:
                 JS_ReportError(cx,"JSSound::setPropertySwitch: index %d out of range", theID);
         }
