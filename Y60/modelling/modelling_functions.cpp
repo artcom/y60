@@ -211,6 +211,29 @@ namespace y60 {
             WhiteColor());
     }
 
+    dom::NodePtr
+    createSphericalPlane(ScenePtr theScene, const std::string & theMaterialId,
+        asl::Sphere<float> theSphere,
+        asl::Box2<float> thePolarBounds,
+        asl::Vector2<unsigned> theSubdivision)
+    {
+AC_DEBUG << "createSphericalPlane:" << " theSphere = " << theSphere << ", thePolarBounds = " << thePolarBounds << ", theSubdivision = " << theSubdivision;
+        asl::Vector2f mySubDivision = asl::Vector2f(theSubdivision[0], theSubdivision[1]);
+        asl::Vector2f myPolarUVector = asl::Vector2f(thePolarBounds.getSize()[0], 0)/mySubDivision;
+        asl::Vector2f myPolarVVector = asl::Vector2f(0, thePolarBounds.getSize()[1])/mySubDivision;
+        
+        Vector2f myUStep( 1.0 / mySubDivision[0], 0.0);
+        Vector2f myVStep( 0.0, 1.0 / mySubDivision[1]);
+
+AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector << ", myPolarVVector = " << myPolarVVector << ", mySubDivision = " << mySubDivision;
+
+        return createPlane(theScene, theSubdivision[0]+1, theSubdivision[1]+1, "mySpherical", theMaterialId,
+            QuadBuilder(),
+            SphericalPosition(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),  
+            SphericalNormal(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),  
+            PlaneUVCoord(Point2f(0.0, 0.0), myUStep, myVStep ),
+            WhiteColor());
+    }
 
     dom::NodePtr createCrosshair(ScenePtr theScene, const std::string & theMaterialId,
                                  float theInnerRadius, float theHairLength,

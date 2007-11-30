@@ -14,7 +14,9 @@
 #include <y60/JSNode.h>
 #include <y60/JSVector.h>
 #include <y60/JSBox.h>
+#include <y60/JSBox2f.h>
 #include <y60/JSMatrix.h>
+#include <y60/JSSphere.h>
 
 #include "JSScene.h"
 #include <y60/JSWrapper.impl>
@@ -177,6 +179,45 @@ CreatePlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval
 
     } HANDLE_CPP_EXCEPTION;
 }
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateSphericalPlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Creates a plane");
+        DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
+        DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
+        DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
+        DOC_PARAM("thePolarBounds", "", DOC_TYPE_BOX2F);
+        DOC_PARAM("theHSubdivision", "", DOC_TYPE_INTEGER);
+        DOC_PARAM("theVSubdivision", "", DOC_TYPE_INTEGER);
+        DOC_RVAL("The plane shape node", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 6);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+        string myMaterialId;
+        convertFrom(cx, argv[1], myMaterialId);
+        Sphere<float> mySphere;
+        convertFrom(cx, argv[2], mySphere);
+        Box2f myPolarBounds;
+        convertFrom(cx, argv[3], myPolarBounds);
+        unsigned myHSub;
+        convertFrom(cx, argv[4], myHSub );
+        unsigned myVSub;
+        convertFrom(cx, argv[5], myVSub );
+
+
+        dom::NodePtr myResult = createSphericalPlane(myScene, myMaterialId,
+                                           mySphere, myPolarBounds,
+                                           asl::Vector2<unsigned>(myHSub, myVSub));
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1096,6 +1137,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
         {"createQuad",                  CreateQuad,                  4},
+        {"createSphericalPlane",        CreateSphericalPlane,        6},
         {"createPlane",                 CreatePlane,                 6},
         {"createCrosshair",             CreateCrosshair,             5},
         {"createDistanceMarkup",        CreateDistanceMarkup,        5},

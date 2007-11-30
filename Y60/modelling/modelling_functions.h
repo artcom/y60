@@ -103,6 +103,12 @@ dom::NodePtr createPlane(ScenePtr theScene, const std::string & theMaterialId,
         asl::Vector3f theTopLeftCorner, asl::Vector3f theBottomRightCorner,
         int theHSubdivision, int theVSubdivision);
 
+dom::NodePtr
+createSphericalPlane(ScenePtr theScene, const std::string & theMaterialId,
+        asl::Sphere<float> theSphere,
+        asl::Box2<float> thePolarBounds,
+        asl::Vector2<unsigned> theSubdivision);
+
 dom::NodePtr createCrosshair(y60::ScenePtr theScene, const std::string & theMaterialId,
                              float theInnerRadius, float theHairLength,
                              const std::string & theName = "CrosshairShape");
@@ -204,6 +210,45 @@ private:
     const float         _myRadius;
     const float         _myStepSize;
     const asl::Vector3f _myNormal;
+};
+
+struct SphericalNormal {
+    SphericalNormal(const asl::Sphere<float> & theSphere,
+                     const asl::Vector2f & thePolarPatchOrigin,
+                     const asl::Vector2f & thePolarUVector,
+                     const asl::Vector2f & thePolarVVector):
+       _mySphere(theSphere),
+        _myPolarPatchOrigin(thePolarPatchOrigin),
+        _myPolarUVector(thePolarUVector),
+        _myPolarVVector(thePolarVVector)
+    {}
+
+     asl::Vector3f operator()(unsigned x, unsigned y) const {
+        asl::Vector2f myPolarCoord = _myPolarPatchOrigin + _myPolarUVector * float(x) + _myPolarVVector * float(y);
+        asl::Vector3f myNormal = asl::Vector3f(
+                cos(myPolarCoord[0]) * cos(myPolarCoord[1]),
+                sin(myPolarCoord[1]),
+                sin(myPolarCoord[0]) * cos(myPolarCoord[1]));
+        return asl::normalized(myNormal); 
+     }
+    const asl::Sphere<float>  _mySphere;
+private:
+    const asl::Point2f  _myPolarPatchOrigin;
+    const asl::Vector2f _myPolarUVector;
+    const asl::Vector2f _myPolarVVector;
+};
+
+struct SphericalPosition : private SphericalNormal {
+    SphericalPosition(const asl::Sphere<float> & theSphere,
+                     const asl::Vector2f & thePolarPatchOrigin,
+                     const asl::Vector2f & thePolarUVector,
+                     const asl::Vector2f & thePolarVVector):
+       SphericalNormal(theSphere, thePolarPatchOrigin, thePolarUVector, thePolarVVector)
+    {}
+
+     asl::Vector3f operator()(unsigned x, unsigned y) const {
+       return SphericalNormal::_mySphere.center + SphericalNormal::operator()(x,y) * SphericalNormal::_mySphere.radius; 
+     }
 };
 
 // theVertices should be ordered like:

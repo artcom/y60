@@ -435,11 +435,19 @@ void scale_down(const Srcmat& src, Destmat& dest, const SumT& initval)
 }
 
 template <class T>
+struct linear {
+    T operator()(const T & min, const T & max, float ratio)
+    {
+        T result = T(min * (1.0 - ratio) + max * ratio);
+        return result;
+    }
+};
+
+template <class T>
 struct bilinear {
     T operator()(const T & minmin, const T & maxmin, const T & minmax, const T & maxmax,
         float xratio, float yratio)
     {
-        //	T result = T(0); 
         T result = T(minmin * ((1.0 - xratio) * (1.0 - yratio)) +
                      maxmin * (       xratio  * (1.0 - yratio)) +
                      minmax * ((1.0 - xratio) *        yratio ) +
@@ -505,6 +513,53 @@ struct mod_get_pixel {
             return convert(src(mod(x, src.xsize()), mod(y,src.ysize() ), T()));
     }
 };
+
+template <class Srcmat, class Destmat, class SampleFunction1d, class SampleFunction2d, class AccessFunction>
+void resample(const Srcmat& src, const asl::Box2<float> srcRect, Destmat& dest,  SampleFunction1d sample1d, SampleFunction sample2d, AccessFunction getpixel)
+{
+    typedef typename Destmat::value_type dest_value_type;
+    const int xdestsize = dest.xsize();
+
+    float xfactor = (srcRect.getSize()[0])/((float)dest.xsize());
+    float yfactor = (srcRect.getSize()[1])/((float)dest.ysize());
+
+    for (int y = 0; y < dest.ysize();y++) {
+        const float ysrcf = srcRect.getMin()[1]+(float)y * yfactor;
+        const int ysrc = static_cast<int>(ysrcf);
+        const float yratio = ysrcf - (float)ysrc;
+        if (asl::almostEqual(yratio,0)) {
+            for (int x = 0; x < xdestsize;x++) {
+                const float xsrcf = srcRect.getMin()[0]+(float)x * xfactor;
+                const int xsrc = static_cast<int>(xsrcf);
+                const float xratio = xsrcf - (float)xsrc;
+                if (asl::almostEqual(xratio,0)) {
+                    dest(x, y) = getpixel(src, xsrc,   ysrc);
+               } else {
+                    dest(x, y) = auto_cast<dest_value_type>(
+                            sample1d(getpixel(src, xsrc, ysrc), getpixel(src, xsrc+1, ysrc), xratio));
+                 }
+            }
+        } else {
+            for (int x = 0; x < xdestsize;x++) {
+                const float xsrcf = srcRect.getMin()[0]+(float)x * xfactor;
+                const int xsrc = static_cast<int>(xsrcf);
+                const float xratio = xsrcf - (float)xsrc;
+                if (asl::almostEqual(xratio,0)) {
+                    dest(x, y) = auto_cast<dest_value_type>(
+                            sample1d(getpixel(src, xsrc, ysrc), getpixel(src, xsrc, ysrc+1), yratio));
+                } else {
+                    dest(x, y) = auto_cast<dest_value_type>(
+                            sample2d(getpixel(src, xsrc,   ysrc),
+                                getpixel(src, xsrc+1, ysrc), 
+                                getpixel(src, xsrc,   ysrc+1),
+                                getpixel(src, xsrc+1, ysrc+1),
+                                xratio,
+                                yratio));
+                }
+            }
+        }    
+    }
+}
 
 template <class Srcmat, class Destmat, class SampleFunction, class AccessFunction>
 void resample(const Srcmat& src, Destmat& dest, SampleFunction sample, AccessFunction getpixel)
