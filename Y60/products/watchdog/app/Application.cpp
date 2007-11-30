@@ -321,9 +321,9 @@ Application::checkHeartbeat() {
         __time64_t myCurrentSecondsSince_1_1_1970;
         _time64( &myCurrentSecondsSince_1_1_1970 );
 
-        long long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 - (_atoi64(mySecondsSince1970Str.c_str()) / 1000);
+        long long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 - _atoi64(mySecondsSince1970Str.c_str());
         AC_DEBUG <<" myCurrentSecondsSince_1_1_1970 : " << myCurrentSecondsSince_1_1_1970 ;
-        AC_DEBUG <<" last heartbeat sec since 1.1.70: "<<  (_atoi64(mySecondsSince1970Str.c_str())/ 1000) ;
+        AC_DEBUG <<" last heartbeat sec since 1.1.70: "<<  _atoi64(mySecondsSince1970Str.c_str()) ;
         AC_DEBUG <<" last age : " << myLastHeartbeatAge ;
         if ( myLastHeartbeatAge > _myHeartbeatFrequency * _myAllowMissingHeartbeats) {
             _myHeartIsBroken = true;
