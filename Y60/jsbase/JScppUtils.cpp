@@ -549,6 +549,11 @@ JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError)
 
     if (exnObject != NULL)
         JS_RemoveRoot(cx, &exnObject);
+
+    // NOTE: spidermonkey exceptions are always fatal because
+    //       they indicate interpreter internal errors.
+    abort();
+
     return JS_TRUE;
 }
 
