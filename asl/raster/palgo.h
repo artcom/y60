@@ -26,6 +26,7 @@
 #define _ASL_RASTER_PALGO_H_INCLUDED_
 
 #include <asl/Vector234.h>
+#include <asl/Box.h>
 
 #include <stddef.h>
 #include <algorithm>
@@ -515,7 +516,7 @@ struct mod_get_pixel {
 };
 
 template <class Srcmat, class Destmat, class SampleFunction1d, class SampleFunction2d, class AccessFunction>
-void resample(const Srcmat& src, const asl::Box2<float> srcRect, Destmat& dest,  SampleFunction1d sample1d, SampleFunction sample2d, AccessFunction getpixel)
+void resample(const Srcmat& src, const asl::Box2<float> & srcRect, Destmat& dest,  SampleFunction1d sample1d, SampleFunction2d sample2d, AccessFunction getpixel)
 {
     typedef typename Destmat::value_type dest_value_type;
     const int xdestsize = dest.xsize();

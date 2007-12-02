@@ -2636,7 +2636,15 @@ Node::markPrecursorDependenciesOutdated() {
         _myFacade->markPrecursorDependenciesOutdated();
     } 
 }
-
+void
+Node::freeCaches() const {
+    if (_myValue) {
+        _myValue->freeCaches();
+    }
+    _myAttributes.freeCaches();
+    _myChildren.freeCaches();
+ }
+  
 void
 Node::reparent(Node * theNewParent, Node * theTopNewParent) { 
     Node * myOldParent = _myParent;

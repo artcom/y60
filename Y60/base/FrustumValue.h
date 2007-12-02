@@ -16,6 +16,10 @@
 
 namespace dom {
 
+/* PM: Where does this FrustumValue differ from a simple instantiation of SimpleValue<asl::Frustum> ?
+   Do we really need it ?
+*/
+
 class FrustumValue : public SimpleValue<asl::Frustum> {
     public:
         typedef SimpleValue<asl::Frustum> Base;
@@ -27,7 +31,6 @@ class FrustumValue : public SimpleValue<asl::Frustum> {
         virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
 
     virtual ValuePtr clone(Node * theNode) const {
-        updateValueFromString();
         this->onGetValue();
         return ValuePtr(new FrustumValue(this->getValue(), theNode));
     }

@@ -153,6 +153,13 @@ int dom::NodeList::size() const {
     return _myNodes.size();
 }
 
+void
+dom::NodeList::freeCaches() const {
+	for (int i = 0; i < size();++i) {
+		_myNodes[i]->freeCaches();
+	}
+}
+ 
 void 
 dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, unsigned long long theIncludeVersion) const {
 	theDest.appendUnsigned(size());

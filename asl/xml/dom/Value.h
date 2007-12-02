@@ -108,6 +108,7 @@ namespace dom {
         bool isVector() const {
             return false;
         }
+        virtual void freeCaches() const = 0;
         virtual Node * getNodePtr() = 0;
         virtual void binarize(asl::WriteableStream & theDest) const = 0;
         virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) = 0;
@@ -331,6 +332,7 @@ namespace dom {
         static asl::AC_SIZE_TYPE debinarizeVector(std::vector<DOMString> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             return debinarizeGeneric(theVector, theSource, thePos);
         }
+        virtual void freeCaches() const {};
     protected:
         virtual unsigned char * begin() {
             if (!this->isBlockWriteable()) {
@@ -411,6 +413,10 @@ namespace dom {
             return _isBlockWriteable;
         }
     protected:
+        virtual void clearMutableString() const {
+            _myStringValue.resize(0);
+            _myStringValue.reserve(0);
+        }
         virtual void setMutableString(const DOMString & theValue) const {
             // no more const_cast here, instead declare
             // as mutable. this is an attempt to fix bug 470
@@ -586,14 +592,14 @@ namespace dom {
     class SimpleValue : public Value<T>, public asl::PoolAllocator<SimpleValue<T> > {
     public:
         SimpleValue(Node * theNode) : Value<T>(theNode),
-              _myValueHasChanged(true), _myStringHasChanged(false), _isValueWriteable(false) {}
+             _myValueHasChanged(true), _isValueWriteable(false) {}
         SimpleValue(const T & theValue, Node * theNode) : Value<T>(theNode),
-            _myValueHasChanged(true), _myStringHasChanged(false), _myValue(theValue), _isValueWriteable(false) {}
+            _myValueHasChanged(true),  _myValue(theValue), _isValueWriteable(false) {}
         SimpleValue(const DOMString & theStringValue, Node * theNode) : Value<T>(theNode),
             _myValue(Value<T>::asT(theStringValue)),
-            _myValueHasChanged(true), _myStringHasChanged(false), _isValueWriteable(false) {}
+            _myValueHasChanged(true), _isValueWriteable(false) {}
         SimpleValue(const asl::ReadableBlock & theValue, Node * theNode) : Value<T>(theNode),
-            _myValueHasChanged(true), _myStringHasChanged(false), _isValueWriteable(false)
+            _myValueHasChanged(true), _isValueWriteable(false)
         {
             if (sizeof(T) != theValue.size()) {
                 throw SizeMismatch(
@@ -626,7 +632,7 @@ namespace dom {
         template <class TV>
             SimpleValue(const TV * theBegin, const TV * theEnd, Node * theNode)
                 : Value<T>(theNode),
-                _myValueHasChanged(true), _myStringHasChanged(false), _myValue(theBegin, theEnd), _isValueWriteable(false)
+                _myValueHasChanged(true), _myValue(theBegin, theEnd), _isValueWriteable(false)
             {}
 
     public:
@@ -642,7 +648,6 @@ namespace dom {
                 throw ValueAlreadyNativeWriteable(JUST_FILE_LINE);
             }
             setValueWriteable(true);
-            updateValueFromString();
             _myValueHasChanged = true;
             this->onGetValue();
             return _myValue;
@@ -664,7 +669,6 @@ namespace dom {
         }
     protected:
         virtual unsigned char * begin() {
-            updateValueFromString();
             _myValueHasChanged = true;
             return reinterpret_cast<unsigned char*>(&_myValue);
         }
@@ -672,11 +676,9 @@ namespace dom {
             return reinterpret_cast<unsigned char*>(&_myValue) + sizeof(T);
         }
         virtual const unsigned char * begin() const {
-            updateValueFromString();
             return reinterpret_cast<const unsigned char*>(&_myValue);
         }
         virtual const unsigned char * end() const {
-            updateValueFromString();
             return reinterpret_cast<const unsigned char*>(&_myValue) + sizeof(T);
         }
         virtual void assign(const asl::ReadableBlock & myOtherBlock) {
@@ -699,24 +701,20 @@ namespace dom {
         virtual void setString(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
             _myValueHasChanged = true;
-            _myStringHasChanged = false;
              this->bumpVersion();
              this->onSetValue();
        }
         virtual const T & getValue() const {
-            updateValueFromString();
             this->onGetValue();
             return _myValue;
         }
         virtual void setValue(const T & theValue) {
             _myValueHasChanged = true;
-            _myStringHasChanged = false;
             _myValue = theValue;
              this->bumpVersion();
              this->onSetValue();
         }
         virtual ValuePtr clone(Node * theNode) const {
-            updateValueFromString();
             this->onGetValue();
             return ValuePtr(new SimpleValue<T>(_myValue, theNode));
         }
@@ -730,24 +728,17 @@ namespace dom {
             return ValuePtr(new SimpleValue<T>(theValue, theNode));
         }
         virtual void update() const {
-            updateValueFromString();
             updateStringFromValue();
         }
     protected:
-        // UH: I believe _myStringHasChanged is deprecated (it's nowhere set to true)
-        // and can be removed, so updateValueFromString can also be removed.
-        void updateValueFromString() const {
-            if (_myStringHasChanged) {
-                _myValue = Value<T>::asT(StringValue::getString());
-                _myValueHasChanged = true;
-                _myStringHasChanged = false; // make sure we get a fresh formatted string
-            }
-        }
-        void updateStringFromValue() const {
+        virtual void freeCaches() const {
+            StringValue::clearMutableString();
+            _myValueHasChanged = true;
+        };
+       void updateStringFromValue() const {
             if (_myValueHasChanged) {
                 StringValue::setMutableString(asl::as_string(_myValue));
                 _myValueHasChanged = false;
-                _myStringHasChanged = false;
             }
         }
         void setValueHasChanged(bool theFlag) {
@@ -756,7 +747,6 @@ namespace dom {
     private:
         mutable T _myValue;
         mutable bool _myValueHasChanged;
-        mutable bool _myStringHasChanged;
         bool _isValueWriteable;
     };
 
@@ -1352,7 +1342,6 @@ namespace dom {
            return end()-begin();
         }
         virtual ValuePtr clone(Node * theNode) const {
-            this->updateValueFromString();
             this->onGetValue();
             return ValuePtr(new VectorValue<T, ACCESS, ELEMENT_VALUE>(this->getValue(), theNode));
         }
@@ -1532,6 +1521,12 @@ namespace dom {
         virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
             return ValuePtr(new ComplexValue<T, ACCESS, ELEMENT_VALUE>(theValue, theNode));
         }
+        virtual void freeCaches() const {
+            setNewValue();
+            StringValue::clearMutableString();
+            _myBlock.resize(0);
+            _myBlock.reserve(0);
+        };
     protected:
         void setNewBlock() const {
             _myStringVersion = 0;

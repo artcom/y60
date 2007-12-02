@@ -1014,6 +1014,8 @@ namespace dom {
             debinarize(thePatch, thePos, 0, true, myUnmodifiedProxyFlag);
             return !myUnmodifiedProxyFlag;
         }
+        virtual void freeCaches() const;
+
 protected:
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries * theDict, bool thePatchFlag, bool & theUnmodifiedProxyFlag);
         DictionariesPtr binarize(asl::WriteableStream & theDest, Dictionaries * theDict, asl::Unsigned64 theIncludeVersion) const;

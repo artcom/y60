@@ -69,6 +69,7 @@ namespace dom {
         virtual void setShell(Node * theShell) {
             _myShell = theShell;
         }
+        virtual void freeCaches() const;
     protected:
         NodePtr appendWhileParsing(NodePtr theNewNode);
         virtual void reparent(Node * theNewParent, Node * theTopNewParent);
