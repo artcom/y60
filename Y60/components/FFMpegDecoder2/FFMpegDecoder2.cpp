@@ -184,7 +184,7 @@ namespace y60 {
         }
     }
 
-    void FFMpegDecoder2::startMovie(double theStartTime) {
+    void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
 
         _myDecodedPacketsPerFrame = 0; // reset counter 
@@ -206,10 +206,10 @@ namespace y60 {
         /*while (_myMsgQueue.size() < 40) {
             asl::msleep(10);
         }*/
-        AsyncDecoder::startMovie(theStartTime);
+        AsyncDecoder::startMovie(theStartTime, theStartAudioFlag);
     }
 
-    void FFMpegDecoder2::resumeMovie(double theStartTime) {
+    void FFMpegDecoder2::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
         AC_INFO << "FFMpegDecoder2::resumeMovie, time: " << theStartTime;
         setState(RUN);
         if (!isActive()) {
@@ -218,10 +218,10 @@ namespace y60 {
         } else {
             AC_INFO << "Thread already running. No forking.";
         }
-        AsyncDecoder::resumeMovie(theStartTime);
+        AsyncDecoder::resumeMovie(theStartTime, theResumeAudioFlag);
     }
 
-    void FFMpegDecoder2::stopMovie() {
+    void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
         AC_INFO << "FFMpegDecoder2::stopMovie";
         
         if (getState() != STOP) {
@@ -247,7 +247,7 @@ namespace y60 {
             _myMsgQueue.clear();
             _myMsgQueue.reset();
             dumpCache();
-            AsyncDecoder::stopMovie();
+            AsyncDecoder::stopMovie(theStopAudioFlag);
         }
     }
 

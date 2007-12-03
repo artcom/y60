@@ -87,14 +87,14 @@ namespace y60 {
          * Starts movie decoding
          * @param theStartTime movie-time to start decoding at.
          */
-        void startMovie(double theStartTime = 0.0f);
+        void startMovie(double theStartTime = 0.0f, bool theStartAudioFlag = true);
 
-        void resumeMovie(double theStartTime = 0.0f);
+        void resumeMovie(double theStartTime = 0.0f, bool theResumeAudioFlag = true);
 
         /**
          * Called to stop the decoding.
          */
-        void stopMovie();
+        void stopMovie(bool theStopAudioFlag = true);
         void closeMovie();
         
         const char * getName() const { return "y60FFMpegDecoder2"; }

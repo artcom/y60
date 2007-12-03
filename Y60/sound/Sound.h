@@ -44,7 +44,7 @@ class Sound :
         double getVolume () const;
         std::string getName() const;
         asl::Time getDuration() const;
-        asl::Time getCurrentTime() const;
+        asl::Time getCurrentTime();
         bool isLooping() const;
         void setLooping(bool theLoop);
         void seek (asl::Time thePosition);

@@ -62,7 +62,7 @@ namespace y60 {
             bool hasAudio() const {
                 return _myAudioSink != 0;
             }
-            double getAudioTime() const {
+            double getAudioTime() {
                 return _myAudioSink ? double(_myAudioSink->getCurrentTime()) : 0;
             }
 

@@ -121,25 +121,25 @@ namespace y60 {
         }
     }
 
-    void MovieDecoderBase::startMovie(double theStartTime) {
+    void MovieDecoderBase::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_DEBUG << "MovieDecoderBase::startMovie -> " << theStartTime;
         _myMovieTime      = theStartTime;
         _myLastSystemTime = -1.0;
     }
 
-    void MovieDecoderBase::resumeMovie(double theStartTime) {
+    void MovieDecoderBase::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
         AC_DEBUG << "MovieDecoderBase::resumeMovie -> " << theStartTime;
         _myMovieTime      = theStartTime;
         _myLastSystemTime = -1.0;
     }
 
-    void MovieDecoderBase::stopMovie() {
+    void MovieDecoderBase::stopMovie(bool theStopAudioFlag) {
         AC_DEBUG << "MovieDecoderBase::stopMovie";
         _myMovieTime = 0.0; 
         _myLastSystemTime = -1.0;
     }
 
-    void MovieDecoderBase::pauseMovie() {
+    void MovieDecoderBase::pauseMovie(bool thePauseAudioFlag) {
         _myLastSystemTime = -1.0;
     }
 

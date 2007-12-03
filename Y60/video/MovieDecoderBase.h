@@ -97,24 +97,24 @@ namespace y60 {
              * Starts the movie playback at theStartTime.
              * @param theStartTime start time of the movie. Defaults to 0.0
              */
-            virtual void startMovie(double theStartTime = 0.0);
+            virtual void startMovie(double theStartTime = 0.0, bool theStartAudioFlag = true);
 
             /**
              * Is called before start movie, if a movie was paused before.
              */
-            virtual void resumeMovie(double theStartTime = 0.0); 
+            virtual void resumeMovie(double theStartTime = 0.0, bool theResumeAudioFlag = true); 
 
             /**
              * Stops the movie playback. Future calls of startMovie will start from the 
              * beginning of the movie.
              */
-            virtual void stopMovie();
+            virtual void stopMovie(bool theStopAudioFlag = true);
             
             /**
              * Pauses the current movie. Playback will continue at the current position after startMovie
              * is called.
              */
-            virtual void pauseMovie();
+            virtual void pauseMovie(bool thePauseAudioFlag = true);
             
             /**
              * Closes the current movie and releases all internal data.

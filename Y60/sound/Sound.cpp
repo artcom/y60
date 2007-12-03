@@ -118,7 +118,7 @@ Time Sound::getDuration() const {
     return _myDecoder->getDuration();
 }
 
-Time Sound::getCurrentTime() const {
+Time Sound::getCurrentTime() {
     return _mySampleSink->getCurrentTime();
 }
 

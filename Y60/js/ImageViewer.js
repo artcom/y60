@@ -84,6 +84,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         } else {
             window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
         }
+        //window.fixedFrameTime = 1/30;
+        window.swapInterval    = 2;
+        
         for(var i=1; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
             case "recursive": // would like to use '--recursive' but that is rejected by the acxpshell options
@@ -198,13 +201,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
+            //print("Frame #" + _myMovieNode.currentframe);
             var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
             if (myFrameDiff > 1) {
-                if (myFrameDiff > _myMaxMissedFrame ) {
-                    _myMaxMissedFrame = myFrameDiff;
-                    print("frames total : " + _myFrameCounter + ", misses: " + myFrameDiff + ", sum : " + _myMissedFrameCounter + ", max : " + _myMaxMissedFrame);
+                var myMissedFrameDiff = myFrameDiff-1;
+                if (myMissedFrameDiff > _myMaxMissedFrame ) {
+                    _myMaxMissedFrame = myMissedFrameDiff;
+                    print("frames total : " + _myFrameCounter + ", misses: " + myMissedFrameDiff + ", sum : " + _myMissedFrameCounter + ", max : " + _myMaxMissedFrame);
                 }
-                _myMissedFrameCounter += myFrameDiff;
+                _myMissedFrameCounter += myMissedFrameDiff;
             }
 
             if (myFrameDiff >0) {

@@ -129,10 +129,10 @@ namespace y60 {
          */
         double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
-        void startMovie(double theStartTime = 0.0f);
-        void resumeMovie(double theStartTime = 0.0f);
-        void stopMovie();
-        void pauseMovie();
+        void startMovie(double theStartTime = 0.0f, bool theStartAudioFlag = true);
+        void resumeMovie(double theStartTime = 0.0f, bool theResumeAudioFlag = true);
+        void stopMovie(bool theStopAudioFlag = true);
+        void pauseMovie(bool thePauseAudioFlag = true);
         void closeMovie();
 
         const char * getName() const { return "y60WMVDecoder"; }
@@ -185,7 +185,6 @@ namespace y60 {
         double        _myLastVideoTimeStamp;
         double        _myLastAudioTimeStamp;
         double        _myAudioVideoDelay;
-        bool          _myCachingFlag;
         
         ReSampleContext *   _myResampleContext;
         unsigned      _myAudioNumberOfChannels;

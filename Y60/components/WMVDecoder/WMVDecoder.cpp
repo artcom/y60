@@ -46,7 +46,7 @@ EXPORT asl::PlugInBase * y60WMVDecoder_instantiatePlugIn(asl::DLHandle myDLHandl
 
 namespace y60 {
 
-    static const unsigned FRAME_CACHE_SIZE = 256;
+    static const unsigned FRAME_CACHE_SIZE = 32; // 256
     asl::Block WMVDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
     bool
@@ -91,7 +91,6 @@ namespace y60 {
         _myLastVideoTimeStamp(0.0),
         _myLastAudioTimeStamp(0.0),
         _myAudioVideoDelay(0.0),
-        _myCachingFlag(false),
         _myResampleContext(0),
         _myReadEOF(false)
     { 
@@ -208,7 +207,8 @@ namespace y60 {
         setupVideoAndAudio(theUrl);
         AC_DEBUG << "+++ Open succeeded url=" << theUrl;
     }
-
+double ourLastVideoTimeStamp = 0.0;
+double ourLastAudioTimeStamp = 0.0;
     double
     WMVDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
         // EOF and framecache empty?
@@ -249,18 +249,18 @@ namespace y60 {
         }
 
         if (_myFrameCache.empty()) {
-            AC_WARNING << "FrameCache is empty";
+            AC_TRACE << "FrameCache is empty";
             return theTime;
         }
 
         if (theTime > _myLastVideoTimeStamp) {
-            AC_WARNING << "FrameCache underrun, time=" << theTime << " last in cache " << _myLastVideoTimeStamp;
+            //AC_PRINT << "WMVDecoder::readFrame FrameCache underrun, time=" << theTime << " last in cache " << _myLastVideoTimeStamp;
             theTime = _myLastVideoTimeStamp;
         }
 
-        if (_myAudioSink) {
+        /*if (_myAudioSink) {
             AC_PRINT << "************* audio time = " << _myAudioSink->getCurrentTime();
-        }
+        }*/
         // Find 'closest' frame in VideoFrameCache
         double myMinTimeDiff = 1000000.0;
         VideoFramePtr myBestFrame(NULL);
@@ -271,20 +271,25 @@ namespace y60 {
             VideoFramePtr myVideoFrame(*it);
             //double myTimeDiff = fabs(theTime - myVideoFrame->getTimestamp());
             double myTimeDiff = theTime - myVideoFrame->getTimestamp();
+            //AC_PRINT << "timediff : " << myTimeDiff;
             if (myTimeDiff >= 0.0 && myTimeDiff < myMinTimeDiff) {
                 myMinTimeDiff = myTimeDiff;
                 myBestFrame = myVideoFrame;
                 myFoundCachePosition = myCachePosition;
-                //AC_TRACE << "Found frame=" << myVideoFrame->getTimestamp() << " for time=" << theTime;
+                //AC_PRINT << "WMVDecoder::readFrame Found frame=" << myVideoFrame->getTimestamp() << " for time=" << theTime << "(frame: " << theFrame << ")";
             }
             ++myCachePosition;
         }
 
         if (myBestFrame == 0) {
-            AC_WARNING << "No good frame found for time=" << theTime;
+            AC_TRACE << "No good frame found for time=" << theTime;
             return theTime;
         }
 
+        /*if (myMinTimeDiff > 0.03) {
+            AC_PRINT << "frame-to-sample Tdiff=" << myMinTimeDiff;
+        }*/
+        //AC_PRINT << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << ", wanted timestamp=" << theTime << ", frame-to-sample Tdiff=" << myMinTimeDiff<< ", videotime diff to last=" << (myBestFrame->getTimestamp() - ourLastVideoTimeStamp) << ", audiotime diff to last: " << (theTime- ourLastAudioTimeStamp);
 #if 0
         //AC_TRACE << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << " at cache pos=" << myFoundCachePosition;
         //AC_TRACE << "frame-to-sample Tdiff=" << myMinTimeDiff;
@@ -305,6 +310,9 @@ namespace y60 {
 
         BYTE * myBuffer;
         DWORD myBufferLength;
+        //AC_PRINT << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << " diff to last=" << (myBestFrame->getTimestamp() - ourLastVideoTimeStamp);
+        ourLastVideoTimeStamp = myBestFrame->getTimestamp();
+        ourLastAudioTimeStamp = theTime;
         HRESULT hr = myBestFrame->getBuffer()->GetBufferAndLength(&myBuffer, &myBufferLength);
         if (checkForError(hr, "GetBufferAndLength failed", PLUS_FILE_LINE)) {
 
@@ -321,12 +329,12 @@ namespace y60 {
             memset(theTargetRaster->pixels().begin(), 0xff, theTargetRaster->pixels().size());
         }
 
-        return theTime;
-        //return myBestFrame->getTimestamp();
+        //return theTime;
+        return myBestFrame->getTimestamp();
     }
 
     void
-    WMVDecoder::resumeMovie(double theStartTime) {
+    WMVDecoder::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
         AC_INFO << "WMVDecoder::resumeMovie " << (void*)this << " time=" << theStartTime;
         if (_myReader) {
             resetEvent();
@@ -334,12 +342,12 @@ namespace y60 {
             HRESULT hr = _myReader->Resume();
             checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
         }
-        AsyncDecoder::resumeMovie(theStartTime);
+        AsyncDecoder::resumeMovie(theStartTime, !_myCachingFlag);
     }
 
     void
-    WMVDecoder::startMovie(double theStartTime) {
-        AC_INFO << "WMVDecoder::startMovie " << (void*)this << " time=" << theStartTime;
+    WMVDecoder::startMovie(double theStartTime, bool theStartAudioFlag) {
+        //AC_PRINT << "WMVDecoder::startMovie()";        
         if (_myReader) {
             resetEvent();
             _myCurrentPlaySpeed = getMovie()->get<PlaySpeedTag>();
@@ -347,21 +355,23 @@ namespace y60 {
             checkForError(hr, "Could not start WMVDecoder", PLUS_FILE_LINE);
             waitForEvent();
             checkForError(_myEventResult, "Starting playback failed.", PLUS_FILE_LINE);
-
+        }
+        AsyncDecoder::startMovie(theStartTime, false);
+        if (_myReader) {
             asl::AutoLocker<ThreadLock> myLocker(_myLock);
             if (_myAudioSink) {
                 // flush AudioBuffer
-                _myAudioSink->stop();
                 _myCachingFlag = true;
+                _myAudioSink->stop(!_myCachingFlag);
             } else {
                 _myCachingFlag = false;
             }
         }
-        AsyncDecoder::startMovie(theStartTime);
     }
 
     void
-    WMVDecoder::stopMovie() {
+    WMVDecoder::stopMovie(bool theStopAudioFlag) {
+        //AC_PRINT << "WMVDecoder::stopMovie()";
         AC_INFO << "WMVDecoder::stopMovie";
         if (_myReader) {
             resetEvent();
@@ -379,7 +389,8 @@ namespace y60 {
     }
 
     void
-    WMVDecoder::pauseMovie() {
+    WMVDecoder::pauseMovie(bool thePauseAudioFlag) {
+        //AC_PRINT << "WMVDecoder::pauseMovie()";
         asl::AutoLocker<ThreadLock> myLocker(_myLock);
         AC_INFO << "WMVDecoder::pauseMovie";
         if (_myReader) {
@@ -387,7 +398,7 @@ namespace y60 {
             HRESULT hr = _myReader->Pause();
             checkForError(hr, "Could not pause windows media reader", PLUS_FILE_LINE);
         }
-        AsyncDecoder::pauseMovie();
+        AsyncDecoder::pauseMovie(!_myCachingFlag);
     }
 
     void
@@ -584,6 +595,7 @@ namespace y60 {
                 } else {
                     throw WindowsMediaException("Unsupported pixel format", PLUS_FILE_LINE);
                 }
+                myMovie->getRasterPtr()->clear();                
             } else if (myMediaType->formattype == WMFORMAT_WaveFormatEx) {
                 WAVEFORMATEX * myAudioInfo = (WAVEFORMATEX *)myMediaType->pbFormat;
 
@@ -627,8 +639,9 @@ namespace y60 {
         float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
 
         asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));
-        myMatrix.translate(asl::Vector3f(0, myYResize, 0));
+        myMatrix.makeScaling(asl::Vector3f(1, -1, 1.0f));
+        //myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));
+        //myMatrix.translate(asl::Vector3f(0, myYResize, 0));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
         AC_DEBUG << "Video: frame=" << myVideoWidth << "x" << myVideoHeight << " pixelFormat=" << asl::getStringFromEnum(myMovie->getRasterEncoding(), y60::PixelEncodingString);
@@ -643,7 +656,8 @@ namespace y60 {
         if (_myAudioOutputId >= 0) {
             AC_DEBUG << "Audio: numChannels=" << myAudioNumberOfChannels 
                      << " sampleRate=" << myAudioSampleRate 
-                     << " bitPerSample=" << myAudioBitsPerSample;
+                     << " bitPerSample=" << myAudioBitsPerSample
+                     << " native sampleRate=" <<Pump::get().getNativeSampleRate();
 
             _myAudioSink = Pump::get().createSampleSink(theUrl);
             
@@ -710,23 +724,23 @@ namespace y60 {
             asl::AutoLocker<ThreadLock> myLocker(_myLock);
 
             if (_myLastVideoTimeStamp && (myTimeStamp - _myLastVideoTimeStamp) > 1.0) {
-                AC_WARNING << "Last VideoSample is " << (myTimeStamp - _myLastVideoTimeStamp) << "s old.";
+                AC_TRACE << "Last VideoSample is " << (myTimeStamp - _myLastVideoTimeStamp) << "s old.";
             }
-            cout <<"Got a video sample" << endl;
             _myLastVideoTimeStamp = myTimeStamp;
 
             // Push to VideoFrameCache, limit size when not caching
             _myFrameCache.push_back(VideoFramePtr(new VideoFrame(myTimeStamp, *theSample)));
-            if (_myFrameCache.size() > _myFrameCacheSize) {
-                AC_WARNING << "FrameCache overrun, dropping oldest frame";
+            if (_myFrameCache.size() > _myFrameCacheSize-1) {
+                AC_TRACE << "FrameCache overrun, dropping oldest frame cache size: " << _myFrameCache.size();
                 _myFrameCache.pop_front();
             }
 
             // Start audio when frameCache is full enough
-            double myStartTime = (_myFrameCacheSize/2) / _myFrameRate;
+            double myStartTime = (_myFrameCacheSize/16) / _myFrameRate;
             if (_myCachingFlag &&
-                (_myFrameCache.size() >= _myFrameCacheSize/2 || _myLastAudioTimeStamp >= myStartTime)) {
-                AC_INFO << "Starting A/V playback, FrameCache size=" << _myFrameCache.size();
+                ((_myFrameCache.size() >= _myFrameCacheSize/16) || (_myLastAudioTimeStamp >= myStartTime))) {
+                AC_PRINT << "Starting A/V playback, FrameCache size=" << _myFrameCache.size() << " max cache size=" << _myFrameCacheSize;
+                AC_PRINT << "                       LastAudioTimeStamp=" << _myLastAudioTimeStamp << " StartTime=" << myStartTime;
                 _myCachingFlag = false;
                 _myAudioSink->play();
             }
@@ -758,7 +772,7 @@ namespace y60 {
 
             _myLastAudioTimeStamp = myTimeStamp;
         } else if (theOutputNumber != _myAudioOutputId) {
-            AC_WARNING << "Unexpected output=" << theOutputNumber;
+            AC_TRACE << "Unexpected output=" << theOutputNumber;
         }
 
         return S_OK;
@@ -823,7 +837,7 @@ namespace y60 {
             SetEvent(_myEvent);
             break;
         default:
-            AC_WARNING << "OnStatus: Unhandled status=" << theStatus << " result=" << hr;
+            AC_TRACE << "OnStatus: Unhandled status=" << theStatus << " result=" << hr;
             break;
         }
         return S_OK;
@@ -918,7 +932,7 @@ namespace y60 {
             sizeof( DWORD ) );
         if(FAILED(hr))
         {
-            AC_WARNING << "Failed to SetOutputSetting g_wszSpeakerConfig";
+            AC_TRACE << "Failed to SetOutputSetting g_wszSpeakerConfig";
             return hr;
         }
 
@@ -934,7 +948,7 @@ namespace y60 {
         hr = _myReader->GetOutputFormatCount(dwAudioOutput, &formats);
         if(FAILED(hr))
         {
-            AC_WARNING << "Failed to get output format count.";
+            AC_TRACE << "Failed to get output format count.";
             return hr;
         }
 

@@ -123,8 +123,10 @@ namespace jslib {
             case PROP_duration:
                 *vp = as_jsval(cx, getNative().getDuration());
                 return JS_TRUE;
-            case PROP_time:
-                *vp = as_jsval(cx, getNative().getCurrentTime());
+            case PROP_time:            
+                *vp = as_jsval(cx, JSClassTraits<NATIVE>::ScopedNativeRef(cx, obj).getNative().getCurrentTime());
+                /**vp = as_jsval(cx, openNative().getCurrentTime());
+                closeNative();*/
                 return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSSound::getProperty: index %d out of range", theID);

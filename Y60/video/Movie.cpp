@@ -137,7 +137,7 @@ namespace y60 {
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
-        
+        //AC_PRINT << "rein : " << theTime << " raus : " << myReturnTime;
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
         } else {
@@ -255,6 +255,7 @@ namespace y60 {
             setPlayMode(PLAY_MODE_STOP);
         }
 
+        //AC_PRINT << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime << " movie: " << get<ImageSourceTag>();
         DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         if (myNextFrame != _myLastDecodedFrame) {
             MAKE_SCOPE_TIMER(Movie_readFrame);
