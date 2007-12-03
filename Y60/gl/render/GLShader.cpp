@@ -167,24 +167,31 @@ namespace y60 {
         // glDepthMask(myMasks[y60::DEPTH_MASK]); Depth-writes is now part of RenderState, so set it in Renderer
         glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
+        CHECK_OGL_ERROR;
 
         // line smooth
         if (myMaterialPropFacade->get<LineSmoothTag>()) {
             glEnable(GL_LINE_SMOOTH);
+            CHECK_OGL_ERROR;
         } else {
             glDisable(GL_LINE_SMOOTH);
+            CHECK_OGL_ERROR;
         }
 
         // line width
         float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
         glLineWidth(myLineWidth);
+        CHECK_OGL_ERROR;
 
         // point size
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
+        CHECK_OGL_ERROR;
         if (IS_SUPPORTED(glPointParameterfARB)) {
             glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
+            CHECK_OGL_ERROR;
             glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
+            CHECK_OGL_ERROR;
         }
 
         // blend function
@@ -205,10 +212,13 @@ namespace y60 {
             if (theViewport.get<ViewportDrawGlowTag>()) {
                 glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1]), 
                                     GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                CHECK_OGL_ERROR;
                 float myGlow = myMaterialPropFacade->get<GlowTag>();
                 glBlendColor(1.0f,1.0f,1.0f, myGlow);
+                CHECK_OGL_ERROR;
             } else {
                 glBlendFunc(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1])); 
+                CHECK_OGL_ERROR;
             }
 #endif
         } else {
@@ -221,13 +231,14 @@ namespace y60 {
             const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
+            CHECK_OGL_ERROR;
         }
     }
 
     void
     GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
-
-        //AC_DEBUG << "GLShader::activate " << theMaterial.get<NameTag>();
+        AC_TRACE << "GLShader::activate " << theMaterial.get<NameTag>();
+        AC_TRACE << "GLShader::activate " << theMaterial.getNode();
 
         theMaterial.updateParams();
 
@@ -243,6 +254,7 @@ namespace y60 {
                 glDisable(GL_DEPTH_TEST);
             }
         }
+        CHECK_OGL_ERROR;
 
         // line stipple
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
@@ -250,6 +262,7 @@ namespace y60 {
             glEnable(GL_LINE_STIPPLE);
             glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
         }
+        CHECK_OGL_ERROR;
 
         // point attenuation
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
@@ -257,6 +270,7 @@ namespace y60 {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
                                   myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
+        AC_TRACE << "GLShader::activate " << theMaterial.get<NameTag>() << " done.";
     }
 
     void
@@ -271,7 +285,7 @@ namespace y60 {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
             y60::ImagePtr myImage = myTexture.getImage();
-            //AC_TRACE << "GLShader::enableTextures image id=" << myImage->get<IdTag>() << " name=" << myImage->get<NameTag>() << " src=" << myImage->get<ImageSourceTag>();
+            AC_TRACE << "GLShader::enableTextures image id=" << myImage->get<IdTag>() << " name=" << myImage->get<NameTag>() << " src=" << myImage->get<ImageSourceTag>();
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
@@ -401,7 +415,7 @@ namespace y60 {
 
     void
     GLShader::deactivate(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "GLShader::deactivate " << theMaterial.get<NameTag>();
+        AC_TRACE << "GLShader::deactivate " << theMaterial.get<NameTag>();
         if (theMaterial.hasTexGen()) {
             // disable texture coordinate generation
             for (unsigned myTexUnit = 0; myTexUnit < theMaterial.getTexGenModes().size(); ++myTexUnit) {

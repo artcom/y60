@@ -876,6 +876,17 @@ dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 }
 
 JSBool
+freeCaches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("reduces memory consumption by freeing all text and binary caches of node values; call is propagated to all children and attributes; can be called after loading or saving, will however slow down subsequent saving operations");
+    DOC_END;
+    dom::NodePtr myNode = JSNode::getNodePtr(cx,obj);
+    AC_DEBUG << "freeing node value caches";
+    JSBool myRVal = Method<dom::Node>::call(&dom::Node::freeCaches, cx, obj, argc, argv, rval);
+    AC_DEBUG << "freeing node value caches done";
+    return myRVal;
+}
+
+JSBool
 debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("prints debug information about the value.");
     DOC_END;
@@ -915,6 +926,7 @@ JSNode::Functions() {
         {"addEventListener",    addEventListener,    3},
         {"removeEventListener", removeEventListener, 3},
         {"dispatchEvent",       dispatchEvent,       3},
+        {"freeCaches",          freeCaches,          0},
         {"debugValue",          debugValue,          0},
        {0}
     };
@@ -1238,7 +1250,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             std::string myProperty = JS_GetStringBytes(myJSStr);
             AC_TRACE << "JSNode::getProperty:" << myProperty << endl;
             AC_TRACE << "JSNode::getProperty: nodeName = " <<myNode->nodeName() << endl;
-            AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << endl;
+            //AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << endl;
 
             // First: Check if property exists as attribute
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);

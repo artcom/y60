@@ -728,6 +728,7 @@ CreatePhongMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
         if ( JSVAL_IS_OBJECT( argv[1] )) {
             JSObject * myProps;
             if (JS_ValueToObject(cx, argv[1], & myProps )) {
+                //TODO: proper error checking
                 jsval myValue;
                 JS_GetProperty(cx, myProps, "ambientColor", & myValue);
                 convertFrom(cx, myValue, myPhongProps.ambientColor );
@@ -809,6 +810,7 @@ CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         if ( JSVAL_IS_OBJECT( argv[2] )) {
             JSObject * myProps;
             if (JS_ValueToObject(cx, argv[2], & myProps )) {
+                //TODO: proper error checking
                 jsval myValue;
                 JS_GetProperty(cx, myProps, "ambientColor", & myValue);
                 convertFrom(cx, myValue, myPhongProps.ambientColor );

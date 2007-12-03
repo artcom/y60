@@ -257,7 +257,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     window.resize(0, 0, _myFullscreen);
                     print("Fullscreen: " + (_myFullscreen ? "on" : "off"));
                     break;
-                case 'X':
+                case 'A':
+                    print("Freeing dom caches...");
+                    window.scene.dom.freeCaches();
+                    print("Freeing dom caches done.");
+                    break;
+                 case 'X':
                     print(window.scene.world);
                     break;
                 case 'N':
@@ -609,6 +614,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print(" NumPad-/      draw camera frustums");
          print("   0-9         switch to camera number 0-9");
          print("    N          start Nagios plugin");
+         print("    A          free dom value caches");
          print("    h          print this help");
     }
 

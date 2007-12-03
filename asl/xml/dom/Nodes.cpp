@@ -561,7 +561,7 @@ dom::Node::ensureValue() const {
         }
         if (_mySchemaInfo) {
             if (_mySchemaInfo->_myValueFactory) {
-                DBS(AC_ERROR << "ensureValue(): creating value for type " <<_mySchemaInfo->getTypeName()<< endl);
+                DBS(AC_TRACE << "ensureValue(): creating value for type " <<_mySchemaInfo->getTypeName()<< endl);
                 const_cast<ValuePtr&>(_myValue)
                     = _mySchemaInfo->_myValueFactory->createValue(_mySchemaInfo->getTypeName(), const_cast<Node*>(this));
                 if (_myValue) {
@@ -573,7 +573,7 @@ dom::Node::ensureValue() const {
             }
         }
         // TODO: consult schema and valuefactory to select apropriate type
-        DBS(AC_ERROR << "ensureValue(): creating string value for unknown type "<< endl);
+        DBS(AC_TRACE << "ensureValue(): creating string value for unknown type "<< endl);
         const_cast<ValuePtr&>(_myValue) = ValuePtr(new StringValue(const_cast<Node*>(this)));
     }
 }
@@ -672,16 +672,16 @@ dom::Node::SchemaInfo::getSchema() const {
 
 const DOMString &
 dom::Node::SchemaInfo::getTypeName() const {
-    DBS(AC_ERROR<<"dom::Node::SchemaInfo::getTypeName()"<<endl);
+    DBS(AC_TRACE<<"dom::Node::SchemaInfo::getTypeName()"<<endl);
     if (_myType) {
-        DBS(AC_ERROR<<"dom::Node::SchemaInfo::getTypeName(): _myType = "<< *_myType<<endl);
+        DBS(AC_TRACE<<"dom::Node::SchemaInfo::getTypeName(): _myType = "<< *_myType<<endl);
         NodePtr myTypeNameAttr = _myType->getAttribute(ATTR_NAME);
         if (myTypeNameAttr) {
-            DBS(AC_ERROR<<"dom::Node::SchemaInfo::getTypeName(): returning myTypeNameAttr = "<< myTypeNameAttr->nodeValue()<<endl);
+            DBS(AC_TRACE<<"dom::Node::SchemaInfo::getTypeName(): returning myTypeNameAttr = "<< myTypeNameAttr->nodeValue()<<endl);
             return myTypeNameAttr->nodeValue();
         }
     }
-    DBS(AC_ERROR<<"dom::Node::SchemaInfo::getTypeName(): typename not found, returning 'string'"<<endl);
+    DBS(AC_TRACE<<"dom::Node::SchemaInfo::getTypeName(): typename not found, returning 'string'"<<endl);
     static DOMString myStringType("string");
     return myStringType;
 }
@@ -1345,19 +1345,19 @@ Node::checkSchemaForText(asl::AC_SIZE_TYPE theParsePos) {
         NodePtr myTypeNameAttr = myParentType->getAttribute(ATTR_NAME);
         if (myTypeNameAttr) {
             _mySchemaInfo->_myType = _myParent->_mySchemaInfo->_myType;
-            DBS(AC_ERROR<<"dom::Node::checkSchemaForText(): found type with name = "<< myTypeNameAttr->nodeValue()<<endl);
+            DBS(AC_TRACE<<"dom::Node::checkSchemaForText(): found type with name = "<< myTypeNameAttr->nodeValue()<<endl);
             return;
         }
         while (true) {
             NodePtr mySimpleContent = myParentType->childNode(XS_SIMPLECONTENT);
             if (mySimpleContent) {
-                DBS(AC_ERROR<<"dom::Node::checkSchemaForText(): mySimpleContent = "<< *mySimpleContent<<endl);
+                DBS(AC_TRACE<<"dom::Node::checkSchemaForText(): mySimpleContent = "<< *mySimpleContent<<endl);
                 NodePtr myExtension = mySimpleContent->childNode(XS_EXTENSION);
                 if (myExtension) {
-                    DBS(AC_ERROR<<"dom::Node::SchemaInfo::getTypeName(): myExtension = "<< *myExtension<<endl);
+                    DBS(AC_TRACE<<"dom::Node::SchemaInfo::getTypeName(): myExtension = "<< *myExtension<<endl);
                     NodePtr myBase = myExtension->getAttribute(ATTR_BASE);
                     if (myBase) {
-                        DBS(AC_ERROR<<"dom::Node::checkSchemaForText(): base type has name  "<< myBase->nodeValue()<<endl);
+                        DBS(AC_TRACE<<"dom::Node::checkSchemaForText(): base type has name  "<< myBase->nodeValue()<<endl);
                         NodePtr myType = _mySchemaInfo->getSchema()->findTopLevelTypeDeclaration(myBase->nodeValue());
                         if (myType) {
                             if (myType->nodeName() == XS_SIMPLETYPE) {

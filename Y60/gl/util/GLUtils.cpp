@@ -32,6 +32,7 @@ using namespace std;
 namespace y60 {
 
     void checkOGLError(const std::string& theLocation) {
+		glFlush();
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
             std::string myErrorString;

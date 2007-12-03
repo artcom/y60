@@ -70,17 +70,23 @@ namespace y60 {
         if (theMaterial.getLightingModel() != UNLIT) {
 
             glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());
+            CHECK_OGL_ERROR;
 
             // Vertexcolor always goes into the ambient color for lit materials
             if (!_myFixedFunctionShader._myVertexRegisterFlags[COLORS_REGISTER]) {
                 glMaterialfv(GL_FRONT, GL_AMBIENT,  myMaterialPropFacade->get<MaterialAmbientTag>().begin());
+                CHECK_OGL_ERROR;
             }
             glMaterialfv(GL_FRONT, GL_SPECULAR, myMaterialPropFacade->get<MaterialSpecularTag>().begin());
+            CHECK_OGL_ERROR;
+            AC_TRACE << "Shininess = " << myMaterialPropFacade->get<ShininessTag>();
             glMaterialf(GL_FRONT, GL_SHININESS, myMaterialPropFacade->get<ShininessTag>());
+            CHECK_OGL_ERROR;
             glMaterialfv(GL_FRONT, GL_EMISSION, myMaterialPropFacade->get<MaterialEmissiveTag>().begin());
-
+            CHECK_OGL_ERROR;
         } else {
             glColor4fv(myMaterialPropFacade->get<SurfaceColorTag>().begin());
+            CHECK_OGL_ERROR;
         }
     }
 
@@ -89,6 +95,7 @@ namespace y60 {
         GLShader::deactivate(theMaterial);
         if (theMaterial.getLightingModel() == UNLIT) {
             glColor4f(1.0f,1.0f,1.0f,1.0f);
+            CHECK_OGL_ERROR;
         }
     }
 
