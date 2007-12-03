@@ -17,6 +17,7 @@
 #include "AudioTimeSource.h"
 #include "SampleSource.h"
 #include "VolumeFader.h"
+#include "ExternalTimeSource.h"
 
 #include <asl/Time.h>
 #include <asl/Block.h>
@@ -77,6 +78,7 @@ namespace asl {
         bool isPlaying() const;
         bool queueSamples(AudioBufferPtr& theBuffer);
         asl::Time getBufferedTime() const;
+        asl::Time getPumpTime() const;
         //        std::string getName() const;
         State getState() const;
         static std::string stateToString(State theState);
@@ -130,6 +132,8 @@ namespace asl {
 
         bool _isDelayingPlay;
         asl::Time _myTimeToStart;  // Used for delayedPlay().
+
+        ExternalTimeSourcePtr _myPumpTimeSource;
     };
 
 }

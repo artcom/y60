@@ -391,7 +391,7 @@ void DirectSoundPump::writeToDS() {
 
     unsigned numBytesToDeliver ;
     if (myPlayCursor > _myWriteCursor) {
-        numBytesToDeliver = myPlayCursor-_myWriteCursor; 
+        numBytesToDeliver = myPlayCursor-_myWriteCursor; 
     } else {
         numBytesToDeliver = myPlayCursor+(_myFramesPerBuffer*getOutputBytesPerFrame())
                 -_myWriteCursor;

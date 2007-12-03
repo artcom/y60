@@ -26,7 +26,7 @@ class AudioTimeSource {
         virtual ~AudioTimeSource();
       
         void setCurrentTime(asl::Time theTime);
-        virtual Time getCurrentTime() const;
+        virtual Time getCurrentTime();
 
     protected:
         void stop();

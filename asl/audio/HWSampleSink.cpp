@@ -48,6 +48,8 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
                                                        _numChannels, SampleSource::_mySampleRate));
     _myBackupBuffer->clear();
 
+
+    _myPumpTimeSource = ExternalTimeSourcePtr(new ExternalTimeSource());
 }
 
 HWSampleSink::~HWSampleSink() {
@@ -75,6 +77,7 @@ void HWSampleSink::play() {
         _myVolumeFader->setVolume(_myVolume);
         changeState(RUNNING);
         AudioTimeSource::run();
+        _myPumpTimeSource->run();
     } else {
         AC_DEBUG << "HWSampleSink::play: Play received when already playing. Ignored.";
     }
@@ -86,6 +89,8 @@ void HWSampleSink::pause() {
     if (_myState == RUNNING) {
         changeState(PAUSING_FADE_OUT);
         _myVolumeFader->setVolume(0);
+        _myPumpTimeSource->pause();
+        
     } else {
         AC_DEBUG << "HWSampleSink::pause: Pause received in state " << 
                 stateToString(getState()) << ". Ignored.";
@@ -107,6 +112,7 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 _myVolumeFader->setVolume(0);
                 _myStopWhenEmpty = false;
                 AudioTimeSource::stop();
+                //_myPumpTimeSource->stop();                
                 break;
             case PAUSING_FADE_OUT:
                 changeState(STOPPING_FADE_OUT);
@@ -177,6 +183,10 @@ bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
     AC_TRACE << "queueSamples: " << *theBuffer << endl;
     _myBufferQueue.push_back(theBuffer);
     return true;
+}
+
+asl::Time HWSampleSink::getPumpTime() const {
+    return _myPumpTimeSource->getCurrentTime();
 }
 
 asl::Time HWSampleSink::getBufferedTime() const {
@@ -376,9 +386,9 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
 
             } else {
                 _numUnderruns++;
-                if (_numUnderruns == 1) {
-                    AC_WARNING << "Underrun for sample sink " << _myName;
-                }             
+                //if ((_numUnderruns % 10) == 1) {
+                    AC_WARNING << "Underrun for sample sink " << _myName << " num: " << _numUnderruns;
+                //}             
             }
         }
         _isUsingBackupBuffer = true;

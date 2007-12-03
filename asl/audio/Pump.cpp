@@ -117,7 +117,7 @@ Pump& Pump::get() {
     }
     if (_myUseRealPump) {
         try {
-#ifdef WIN32           
+#ifdef WIN32          
             return Singleton<DirectSoundPump>::get();
 #elif LINUX
             return Singleton<ALSAPump>::get();

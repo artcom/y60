@@ -12,7 +12,9 @@
 
 #include "AudioTimeSource.h"
 
+
 #include <asl/Auto.h>
+#include <asl/Logger.h>
 
 namespace asl {
     
@@ -36,7 +38,7 @@ void AudioTimeSource::setCurrentTime(asl::Time theTime) {
     _mySysTimeAtLastBuffer = Time();
 }
 
-Time AudioTimeSource::getCurrentTime() const {
+Time AudioTimeSource::getCurrentTime() {
     if (_myRunning) {
         // If the time source was just constructed, we might need to wait until 
         // some data has been sent to the sound card to get sensible values.
