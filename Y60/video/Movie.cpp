@@ -214,7 +214,7 @@ namespace y60 {
 
     void 
     Movie::ensureMovieFramecount() {
-        if (get<FrameCountTag> == -1) {
+        if (get<FrameCountTag>() == -1) {
             load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
                 MoviePlayMode myPlayMode = 
