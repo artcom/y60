@@ -226,9 +226,11 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         var mySampler2d = theMaterial.getNodesByAttribute("", "name", "occlusionTex");
         if (mySampler2d.length == 1) {
             var myIndex = mySampler2d[0].childNode("#text").nodeValue;
-            var myTexturesNode = theMaterial.childNode("textures");
-            if (myIndex !== null && myIndex < myTexturesNode.childNodesLength("texture")) {
-                return myTexturesNode.childNode("texture", myIndex);
+            var myTextureUnitsNode = theMaterial.childNode("textureunits");
+            if (myIndex !== null 
+                && myIndex < myTextureUnitsNode.childNodesLength("textureunit")) 
+            {
+                return myTexturesNode.childNode("textureunit", myIndex);
             }
         }
 
@@ -330,8 +332,8 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
         
         // replace the "textures" node
-        myNewTargetMat.replaceChild(mySwitchMat.childNode("textures").cloneNode(true),
-                                    myNewTargetMat.childNode("textures"));
+        myNewTargetMat.replaceChild(mySwitchMat.childNode("textureunits").cloneNode(true),
+                                    myNewTargetMat.childNode("textureunits"));
 
         // replace the "requires" node
         myNewTargetMat.replaceChild(mySwitchMat.childNode("requires").cloneNode(true),
@@ -342,12 +344,12 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             var myOtherOcclusionMap = findOcclusionMap(mySwitchMat);
             if (myOtherOcclusionMap) {
                 // there is already an occlusion map in the new material, replace it
-                myNewTargetMat.childNode("textures").replaceChild(myOcclusionMap.cloneNode(),
+                myNewTargetMat.childNode("textureunits").replaceChild(myOcclusionMap.cloneNode(),
                                                                      myOtherOcclusionMap);
             } else {
                 //add occlusion map and adjust the requirements
-                myNewTargetMat.childNode("textures").insertBefore(myOcclusionMap,
-                        myNewTargetMat.childNode("textures").firstChild);
+                myNewTargetMat.childNode("textureunits").insertBefore(myOcclusionMap,
+                        myNewTargetMat.childNode("textureunits").firstChild);
                 var myRequires = myNewTargetMat.childNode('requires');
                 getDescendantByName(myRequires, 'textures').childNode("#text").nodeValue = 
                     prependFeature(mySwitchMat.requires.textures, "occlusion");
@@ -442,21 +444,21 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     function switchTexture(theNode) {
         _myActiveChild = theNode;
 
-        // get image id for the new texture
+        // get texture id for the new textureunit
         var myShape = theNode.getElementById(theNode.shape);
         var myMaterialId = myShape.childNode("primitives").childNode("elements").material;
         
         var myMaterial = theNode.getElementById(myMaterialId);
-        var myImage = myMaterial.childNode("textures").firstChild.image;
+        var myTexture = myMaterial.childNode("textureunits").firstChild.texture;
 
         if (theNode.parentNode.name.search(/tswitch_occlusion/i) != -1) {
             //Occlusion map switching:
-            // get image id for the old texture
-            var myImageOld = Public.node.childNode("textures").firstChild.image;
-            switchOcclusionMap(myImageOld, myImage, myMaterial);
+            // get texture id for the old textureunit
+            var myTextureOld = Public.node.childNode("textureunits").firstChild.texture;
+            switchOcclusionMap(myTextureOld, myTexture, myMaterial);
         } else {
-            var myTexturesLength = Public.node.childNode("textures").childNodesLength();
-            var myNewTexturesLength = myMaterial.childNode("textures").childNodesLength();
+            var myTexturesLength = Public.node.childNode("textureunits").childNodesLength();
+            var myNewTexturesLength = myMaterial.childNode("textureunits").childNodesLength();
     
             // calculate textures offset
             var myTextureOffset = myTexturesLength - myNewTexturesLength;
@@ -466,17 +468,18 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
                 return;
             }
     
-            // set new images
-            for (var i=0; i<myMaterial.childNode("textures").childNodesLength(); ++i) {
-                var myImage = myMaterial.childNode("textures").childNode(i).image;
-                Public.node.childNode("textures").childNode(i+myTextureOffset).image = myImage;  
+            // set new textures
+            for (var i=0; i<myMaterial.childNode("textureunits").childNodesLength(); ++i) {
+                var myTexture = myMaterial.childNode("textureunits").childNode(i).texture;
+                Public.node.childNode("textureunits").childNode(i+myTextureOffset).texture = myTexture;  
             }
         }
     }
     
     function switchOcclusionMap(theOldId, theNewId, theMaterialNode) {
-        //change texture image ids
-        var myNodes = window.scene.materials.getNodesByAttribute("texture", "image", theOldId);
+        //change textureunits texture ids
+        var myNodes = 
+            window.scene.materials.getNodesByAttribute("textureunit", "texture", theOldId);
         for (var i = 0; i < myNodes.length; ++i) {
             var myNode = myNodes[i];
 
@@ -489,7 +492,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
 
             //do not switch texture id for the reference material node!
             if (!myNode.parentNode.parentNode.isSameNode(theMaterialNode)) {
-                myNode.image = theNewId;
+                myNode.texture = theNewId;
             } else {
                 Logger.debug("Skipping reference material.");
             }

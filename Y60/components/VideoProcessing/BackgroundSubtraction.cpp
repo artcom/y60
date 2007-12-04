@@ -100,8 +100,6 @@ namespace y60 {
         
         _myCounter++;
         
-        _myTargetImage->triggerUpload();
-        _myBackgroundImage->triggerUpload();
         
 	}
     

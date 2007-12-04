@@ -27,14 +27,14 @@ function FFMpegTest(theArguments) {
     ];
 
     var _myTests = [
-        testPlayToEnd,
-        testStop,
-        testPause,
-        testLoop,
-        testPauseStop,
-        testStopPause,
-        testSeek,
-        testRandomSeek
+//        testPlayToEnd,
+//        testStop,
+//        testPause,
+//        testLoop,
+//        testPauseStop,
+//        testStopPause,
+//        testSeek,
+//        testRandomSeek
     ];
 
     this.initTests(_myTestMovies, _myTests);
@@ -55,6 +55,7 @@ function FFMpegTest(theArguments) {
             case 25:
                 This.assure_msg(theMovie.playmode == "play", "Movie is playing last frame.");
                 This.assure_msg(theMovie.currentframe == 25, "Current frame is last frame.");
+                print(theMovie.currentframe);
                 break;
             case 26:
                 This.assure_msg(theMovie.playmode == "stop", "Movie has stopped.");

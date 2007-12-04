@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: IShader.h,v $
-//   $Author: david $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/04 14:40:15 $
-//
-//  Description:
-//
 //=============================================================================
 
 #ifndef AC_Y60_SHADER_INTERFACE_INCLUDED
@@ -31,14 +22,17 @@
 namespace y60 {
 
     DEFINE_EXCEPTION(ShaderException, asl::Exception);
+
     class MaterialBase;
-    typedef asl::Ptr<MaterialBase, dom::ThreadingModel>       MaterialBasePtr;
+    typedef asl::Ptr<MaterialBase, dom::ThreadingModel> MaterialBasePtr;
+
     class IShaderLibrary;
     class Viewport;
     class Body;
     class Camera;
     class Light;
     typedef std::vector<asl::Ptr<Light, dom::ThreadingModel> > LightVector;
+
     class IShader {
         public:
             virtual const std::string & getName() const = 0;
@@ -52,11 +46,11 @@ namespace y60 {
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const = 0;
 
             /**
-            * Return maximum number of texture units available in the current GL context.
-            * The value is dependant on the type of shader. Fixed function shader typically
-            * can use 4 texture unites. Cg fragment shader can use 16.
-            * @return Maximum number of texture units. Returns 0 on error.
-            */
+             * Return maximum number of texture units available in the current GL context.
+             * The value is dependant on the type of shader. Fixed function shader typically
+             * can use 4 texture unites. Cg fragment shader can use 16.
+             * @return Maximum number of texture units. Returns 0 on error.
+             */
             virtual unsigned getMaxTextureUnits() const = 0;
 
             virtual void load(IShaderLibrary & theShaderLibrary) = 0;
@@ -65,11 +59,10 @@ namespace y60 {
             virtual void setup(MaterialBase & theMaterial) {}
 
             // will be called once per material change
-            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {};
-            virtual void enableTextures(const MaterialBase & theMaterial) {};
-            virtual void disableTextures(const MaterialBase & theMaterial) {};
-            virtual void deactivate(const y60::MaterialBase & theMaterial) {};
-            virtual bool isCGShader() { return false; }
+            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {}
+            virtual void enableTextures(const MaterialBase & theMaterial) {}
+            virtual void disableTextures(const MaterialBase & theMaterial) {}
+            virtual void deactivate(const y60::MaterialBase & theMaterial) {}
 
             // called on body change
             virtual void bindBodyParams(const y60::MaterialBase & theMaterial,
@@ -84,15 +77,24 @@ namespace y60 {
     };
     typedef asl::Ptr<IShader, dom::ThreadingModel> IShaderPtr;
 
+    class ICombiner {
+    public:
+        virtual bool setup(dom::NodePtr theNode) = 0;
+        virtual void apply() = 0;
+    };
+    typedef asl::Ptr<ICombiner, dom::ThreadingModel> ICombinerPtr;
+    typedef asl::WeakPtr<ICombiner, dom::ThreadingModel> ICombinerWeakPtr;
+
     class IShaderLibrary {
     public:
         virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
+        virtual ICombinerPtr findCombiner(const std::string & theCombinerName) = 0;
+
         virtual const std::string & getVertexProfileName() = 0;
         virtual const std::string & getFragmentProfileName() = 0;
     };
-    typedef asl::Ptr<IShaderLibrary>   IShaderLibraryPtr;
+    typedef asl::Ptr<IShaderLibrary> IShaderLibraryPtr;
 
 } // namespace
 
 #endif// AC_Y60_SHADER_INTERFACE_INCLUDED
-

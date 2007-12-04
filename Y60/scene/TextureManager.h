@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -23,7 +23,9 @@ class PLAnyPicDecoder;
 
 namespace y60 {
 
-    class Image;
+    class Texture;
+    typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
+
     class Movie;
     class Capture;
     class ResourceManager;
@@ -36,28 +38,30 @@ namespace y60 {
      */
     class TextureManager : public ITextureManager {
         public:
+            static asl::Ptr<TextureManager> create();
+
             virtual ~TextureManager();
 
             void setSelf(const asl::Ptr<ITextureManager> & theSelf);
             asl::WeakPtr<ITextureManager> getSelf() const;
-            void setImageList(dom::NodePtr theImageListNode);
+            void setTextureList(dom::NodePtr theTexturesListNode);
 
             void reloadTextures();
             void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
                                 double theCurrentTime = -1);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
-            asl::Ptr<Image, dom::ThreadingModel> getImage(const std::string & theImageId) const;
-            asl::Ptr<Image, dom::ThreadingModel> findImage(const std::string & theImageId) const;
-            // Delegates to virtual methods of ResourceManager
+            TexturePtr getTexture(const std::string & theTextureId) const;
+            TexturePtr findTexture(const std::string & theTextureId) const;
 
+            // Delegates to virtual methods of ResourceManager
             virtual int getMaxTextureSize(int theDimensions) const; 
-            void updateImageData(asl::Ptr<Image, dom::ThreadingModel> theImage);
-            void setPriority(Image * theImage, float thePriority);           
-            void unbindTexture(Image * theImage);
+            //void updateTextureData(const TexturePtr & theTexture);
+            //void setTexturePriority(const TexturePtr & theTexture, float thePriority);           
+
+            void unbindTexture(Texture * theTexture);
             void unbindTextures();
             void validateGLContext(bool theFlag);
 
-            static asl::Ptr<TextureManager> create(); 
             /**
              * Registers theResourceManager with the TextureManager. One Renderer
              * should register its ResourceManager only once and should deregister
@@ -71,18 +75,18 @@ namespace y60 {
             const ResourceManager * getResourceManager() const { return _myResourceManager; }
 
         protected:
-            virtual unsigned setupImage(asl::Ptr<Image, dom::ThreadingModel> theImage); 
-            dom::NodePtr  _myImageList;
+            dom::NodePtr      _myTextureList;
             ResourceManager * _myResourceManager;
-            int _myResourceManagerCount;
+            int               _myResourceManagerCount;
+
         private:
             TextureManager();
             asl::WeakPtr<ITextureManager> _mySelf;
-            //asl::PackageManagerPtr _myPackageManager;
             unsigned _myMaxTextureSize;
             MemoryResourceManagerPtr _myMemoryResourceManager;
     };
+
     typedef asl::Ptr<TextureManager> TextureManagerPtr;
 }
-#endif // _ac_y60_TextureManager_h_
 
+#endif // _ac_y60_TextureManager_h_

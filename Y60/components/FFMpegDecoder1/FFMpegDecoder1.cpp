@@ -14,11 +14,14 @@
 
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+#include <asl/string_functions.h>
+
 #include <iostream>
 
 #define DB(x) // x
 
 using namespace std;
+using namespace asl;
 
 extern "C"
 EXPORT asl::PlugInBase * y60FFMpegDecoder1_instantiatePlugIn(asl::DLHandle myDLHandle) {
@@ -168,13 +171,14 @@ namespace y60 {
 
         // pixelformat stuff
         Movie * myMovie = getMovie();
-        TextureInternalFormat myTextureFormat = myMovie->getInternalEncoding();
+		TextureInternalFormat myTextureFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
         switch (myTextureFormat) {
             case TEXTURE_IFMT_RGBA8:
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
                 _myDestinationPixelFormat = PIX_FMT_RGBA32;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::RGBA);
+                myMovie->addRasterValue(createRasterValue( y60::RGBA, myWidth, myHeight), y60::RGBA, 1);                
                 break;
             case TEXTURE_IFMT_ALPHA:
             case TEXTURE_IFMT_LUMINANCE8:
@@ -182,6 +186,7 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
+                myMovie->addRasterValue(createRasterValue( y60::ALPHA, myWidth, myHeight), y60::ALPHA, 1);                
                 break;
             case TEXTURE_IFMT_RGB8:
             default:
@@ -189,11 +194,12 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGR);
+                myMovie->addRasterValue(createRasterValue( y60::BGR, myWidth, myHeight), y60::BGR, 1);                
                 break;
         }
 
-        myMovie->getRasterPtr()->clear();
-
+        myMovie->getRasterPtr(Movie::PRIMARY_BUFFER)->clear();
+		myMovie->getRasterPtr(Movie::SECONDARY_BUFFER)->clear();
 
         // framerate
         double myFPS;

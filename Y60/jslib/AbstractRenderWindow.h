@@ -43,6 +43,7 @@ namespace jslib {
                                  public y60::IGLContextManager {
     public:
         ~AbstractRenderWindow();
+
         /**
          * Sets the weak self pointer of the RenderWindow. Each RenderWindow
          * keeps a asl::WeakPtr to itself. An asl::WeakPtr is also registered
@@ -52,6 +53,7 @@ namespace jslib {
         void setSelf(asl::Ptr<AbstractRenderWindow> theSelfPtr);
 
         virtual void initDisplay() = 0;
+
         /**
          * Sets a previously loaded scene to be rendered.
          * @param theScene Scene to be rendered.
@@ -207,8 +209,8 @@ namespace jslib {
         /// save framebuffer to file
         void saveBuffer(const std::string & theFilename);
 
-        /// copy framebuffer to Image texture (and optionally to Image raster).
-        void copyBufferToImage(dom::NodePtr & theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag = false);
+        /// copy framebuffer to Texture (and optionally to Image raster).
+        void copyBufferToTexture(dom::NodePtr & theTexture, const asl::Vector2i & theOffset, bool theCopyToRasterFlag = false);
 
         void setJSContext(JSContext * cx);
 
@@ -221,6 +223,7 @@ namespace jslib {
         dom::NodePtr getCanvas();
         dom::NodePtr getCanvas() const;
         virtual bool setCanvas(const dom::NodePtr & theCanvas);
+
         /**
          * Set the current canvas to null so there is no connection from scene to window.
          */

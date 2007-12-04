@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: ShapeBuilder.h,v 1.2 2005/04/13 10:26:57 christian Exp $
-//   $RCSfile: ShapeBuilder.h,v $
-//   $Author: christian $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/13 10:26:57 $
-//
-//=============================================================================
 
 #ifndef _ac_y60_ShapeBuiler_h_
 #define _ac_y60_ShapeBuiler_h_

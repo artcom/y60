@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -10,8 +10,8 @@
 
 #include "MaterialBase.h"
 #include "TextureManager.h"
+#include "TextureUnit.h"
 
-#include <y60/Image.h>
 #include <y60/NodeValueNames.h>
 #include <y60/NodeNames.h>
 
@@ -58,11 +58,6 @@ namespace y60 {
     MaterialBase::registerDependenciesForMaterialupdate() {}
     
 
-    void
-    MaterialBase::doTheUpdate() {
-        AC_DEBUG << "MaterialBase::doTheUpdate!" << endl;
-    }
-
     bool
     MaterialBase::reloadRequired(){
         // force childnodes to reconnect
@@ -94,7 +89,7 @@ namespace y60 {
     void
     MaterialBase::load(TextureManagerPtr theTextureManager) {
 
-        addTextures(getNode().childNode(TEXTURE_LIST_NAME), theTextureManager);
+        addTextures(getNode().childNode(TEXTUREUNIT_LIST_NAME), theTextureManager);
 
         if (_myShader) {
             const VectorOfString * myLightingFeature = _myShader->getFeatures(LIGHTING_FEATURE);
@@ -132,7 +127,6 @@ namespace y60 {
             myReqFacade->getProperty(theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
 
         if (!myMaterialProperty) {
-            //AC_PRINT << "no such prop; shaderNode=" << *theShaderPropertyNode;
             // the shader has properties not in the material liste, add'em
             if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
                 theShaderPropertyNode->nodeName() != "#comment") 
@@ -141,7 +135,6 @@ namespace y60 {
                                 theShaderPropertyNode->cloneNode(Node::DEEP));
             }
         } else {
-            //AC_PRINT << "MaterialBase::mergeProperties materialProp=" << *myMaterialProperty;
             // set the value of the material with the shaders value
             myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
         }
@@ -158,17 +151,23 @@ namespace y60 {
     }
     
     void
-    MaterialBase::addTextures(const dom::NodePtr theTextureListNode,
+    MaterialBase::addTextures(const dom::NodePtr theTextureUnitListNode,
                                TextureManagerPtr theTextureManager)
     {
-        _myTextures.clear();
+        if (theTextureUnitListNode) {
+            AC_DEBUG << "MaterialBase::addTextures " << *theTextureUnitListNode;
+        }
+
+        _myTextureUnits.clear();
         // first thing is to check if the chosen shader can handle textures of this mode
         // if not, do not load the texture
         if (_myShader && _myShader->hasFeature(TEXTURE_FEATURE)) {
-            if (theTextureListNode) {
-                unsigned myTextureCount = theTextureListNode->childNodesLength(TEXTURE_NODE_NAME);
+
+            // add textureunits
+            if (theTextureUnitListNode) {
+                unsigned myTextureCount = theTextureUnitListNode->childNodesLength(TEXTUREUNIT_NODE_NAME);
                 for (unsigned i = 0; i < myTextureCount; ++i) {
-                    dom::NodePtr myTextureNode = theTextureListNode->childNode(TEXTURE_NODE_NAME,i);
+                    dom::NodePtr myTextureNode = theTextureUnitListNode->childNode(TEXTUREUNIT_NODE_NAME,i);
                     addTexture(myTextureNode, theTextureManager);
                 }
             }
@@ -181,14 +180,14 @@ namespace y60 {
 
                     for (unsigned j = 0; j < curPropList->childNodesLength(); ++j) {
                         // Q: What about the other samplers (3d, Cube, etc)? [DS]
-                        if (curPropList->childNode(j)->nodeName() == "sampler2d") { 
-                            dom::NodePtr mySamplerNode = curPropList->childNode(j);
+                        dom::NodePtr mySamplerNode = curPropList->childNode(j);
+                        if (mySamplerNode->nodeName() == "sampler2d") { 
                             unsigned myTextureIndex = (*mySamplerNode)("#text").dom::Node::nodeValueAs<unsigned>();
-                            if (myTextureIndex >= _myTextures.size()) {
+                            if (myTextureIndex >= _myTextureUnits.size()) {
                                 string myTextureName = mySamplerNode->getAttributeString("name");
                                 dom::NodePtr myTextureNode = myShaderTextures->childNodeByAttribute("texture","name",myTextureName);
                                 if (myTextureNode) {
-                                    AC_DEBUG << " loading default texture " << myTextureIndex << " " << myTextureName << endl;
+                                    AC_DEBUG << "Loading default texture " << myTextureIndex << " " << myTextureName << endl;
                                     addTexture(myTextureNode, theTextureManager);
                                 }
                             }
@@ -200,34 +199,36 @@ namespace y60 {
     }
 
     void
-    MaterialBase::addTexture(dom::NodePtr theTextureNode, TextureManagerPtr theTextureManager) {
+    MaterialBase::addTexture(dom::NodePtr theTextureUnitNode, TextureManagerPtr theTextureManager) {
+
+        AC_DEBUG << "MaterialBase::addTexture " << *theTextureUnitNode;
         unsigned myMaxUnits = _myShader->getMaxTextureUnits();
-        if (_myTextures.size() < myMaxUnits) {            
-            TexturePtr myTexture = theTextureNode->getFacade<Texture>();
-            myTexture->setTextureManager(theTextureManager);
-            _myTextures.push_back(myTexture);
-            ImagePtr myImage = myTexture->getImage();
-            //AC_DEBUG << "addTexture triggering image upload imgId=" << myImage->get<IdTag>() << " texId=" << myImage->getGraphicsId();
-            if (myImage && myImage->getGraphicsId() == 0) {
-                myImage->triggerUpload();
+        if (_myTextureUnits.size() < myMaxUnits) {            
+            TextureUnitPtr myTextureUnit = theTextureUnitNode->getFacade<TextureUnit>();
+            myTextureUnit->setTextureManager(theTextureManager);
+            _myTextureUnits.push_back(myTextureUnit);
+            TexturePtr myTexture = myTextureUnit->getTexture();
+            if (myTexture && myTexture->getTextureId() == 0) {
+                //AC_DEBUG << "addTexture triggering texture upload id=" << myTexture->get<IdTag>() << " texId=" << myTexture->getTextureId();
+                myTexture->triggerUpload();
             }
         } else {
             AC_WARNING << "Your OpenGL implementation only supports " 
                  << asl::as_string(myMaxUnits) << " texture units, "
                  << endl << "              ignoring: "
-                 << theTextureNode->getAttributeString(TEXTURE_IMAGE_ATTRIB)
+                 << theTextureUnitNode->getAttributeString(TEXTUREUNIT_TEXTURE_ATTRIB)
                  << " of material " << get<NameTag>() << endl;
         }
     }
 
     unsigned
-    MaterialBase::getTextureCount() const {
-        return _myTextures.size();
+    MaterialBase::getTextureUnitCount() const {
+        return _myTextureUnits.size();
     }
 
-    const Texture &
-    MaterialBase::getTexture(unsigned theIndex) const {
-        return *(_myTextures[theIndex]);
+    const TextureUnit &
+    MaterialBase::getTextureUnit(unsigned theIndex) const {
+        return *(_myTextureUnits[theIndex]);
     }
 
     const MaterialParameterVector &
@@ -242,7 +243,7 @@ namespace y60 {
     }
 
     void
-    MaterialBase::setDepthBufferWrite(const bool theFlag) {
+    MaterialBase::setDepthBufferWrite(bool theFlag) {
         MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
         TargetBuffers mySet = myPropFacade->get<TargetBuffersTag>();
         mySet.set(DEPTH_MASK, theFlag);
@@ -361,6 +362,7 @@ namespace y60 {
         } else {
             AC_DEBUG << "No such feature '" << MAPPING_FEATURE << "' for material " << get<NameTag>();
         }
+        AC_DEBUG << "updateParams done";
     }
 
     void
@@ -403,8 +405,6 @@ namespace y60 {
         appendCRC32(myCRC32, get<LineSmoothTag>());        
 
         string myMaterialName = getNode().parentNode()->getFacade<MaterialBase>()->get<NameTag>();
-        //AC_PRINT << "MaterialPropertiesFacade::updateGroup1Hash!: " << myMaterialName << " -> " << myCRC32;
-        
         set<MaterialPropGroup1HashTag>(myCRC32);
     }
 

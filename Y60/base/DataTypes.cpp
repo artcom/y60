@@ -154,12 +154,12 @@ namespace y60 {
         theFactory.registerPrototype("TextureSampleFilter", dom::ValuePtr(new dom::SimpleValue<y60::TextureSampleFilter>(y60::TextureSampleFilter(LINEAR),0)));
         theFactory.registerPrototype("TextureWrapMode", dom::ValuePtr(new dom::SimpleValue<y60::TextureWrapMode>(y60::TextureWrapMode(REPEAT),0)));
 
+        theFactory.registerPrototype("TextureType", dom::ValuePtr(new dom::SimpleValue<y60::TextureType>(y60::TextureType(TEXTURE_2D),0)));        
         theFactory.registerPrototype("TextureUsage", dom::ValuePtr(new dom::SimpleValue<y60::TextureUsage>(y60::TextureUsage(PAINT),0)));        
-        theFactory.registerPrototype("ImageType", dom::ValuePtr(new dom::SimpleValue<y60::ImageType>(y60::ImageType(SINGLE),0)));        
         theFactory.registerPrototype("ResizePolicy", dom::ValuePtr(new dom::SimpleValue<asl::ResizePolicy>(asl::ResizePolicy(asl::ADAPT_VERTICAL),0)));        
 
+        theFactory.registerPrototype("ImageType", dom::ValuePtr(new dom::SimpleValue<y60::ImageType>(y60::ImageType(SINGLE),0)));        
     }
-
 
     void registerSomTypes(dom::ValueFactory & theFactory) {
         registerSomMathTypes(theFactory);
@@ -167,6 +167,4 @@ namespace y60 {
         registerSomImageTypes(theFactory);
         registerEnumBitsetTypes(theFactory);        
     }
-
 }
-

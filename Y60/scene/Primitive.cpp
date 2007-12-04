@@ -287,7 +287,7 @@ namespace y60 {
         asl::Vector3f mySide1 = myPositions[2] - myPositions[1];
 
         // look for the first (hopefully only) bumpmap
-        unsigned myTextureCount = _myMaterial->getTextureCount();
+        unsigned myTextureCount = _myMaterial->getTextureUnitCount();
         unsigned myBumpmapIndex;
         for (myBumpmapIndex=0; myBumpmapIndex < myTextureCount; ++myBumpmapIndex) {
             if (_myMaterial->getTextureUsage(myBumpmapIndex) == BUMP) {

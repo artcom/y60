@@ -75,6 +75,5 @@ namespace y60 {
             }
         }
 
-        _myTargetImage->triggerUpload();
 	}
 }

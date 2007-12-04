@@ -126,14 +126,14 @@ JSAbstractRenderWindow<DERIVED>::saveBuffer(JSContext *cx, JSObject *obj, uintN 
 
 template<class DERIVED>
 JSBool
-JSAbstractRenderWindow<DERIVED>::copyBufferToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Copy framebuffer to Image texture (and optionally to Image raster)");
-    DOC_PARAM("theImage", "Image node", DOC_TYPE_NODE);
+JSAbstractRenderWindow<DERIVED>::copyBufferToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Copy framebuffer to Texture (and optionally to Image raster)");
+    DOC_PARAM("theTexture", "Texture node", DOC_TYPE_NODE);
     DOC_PARAM("theOffset", "Read offset in framebuffer", DOC_TYPE_VECTOR2I);
-    DOC_PARAM("theCopyToRasterFlag", "Copy to raster instead of direcly to texture?", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theCopyToImageFlag", "Copy to image instead of direcly to texture", DOC_TYPE_BOOLEAN);
     DOC_END;
     typedef void (DERIVED::*MyMethod)(dom::NodePtr &, const asl::Vector2i &, bool);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::copyBufferToImage,cx,obj,argc,argv,rval);
+    return Method<DERIVED>::call((MyMethod)&DERIVED::copyBufferToTexture,cx,obj,argc,argv,rval);
 }
 
 template<class DERIVED>
@@ -879,7 +879,7 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"clearTimeout",       clearTimeout,             1},
         {"clearInterval",      clearInterval,            1},
         {"saveBuffer",         saveBuffer,               1},
-        {"copyBufferToImage",  copyBufferToImage,        2},
+        {"copyBufferToTexture", copyBufferToTexture,     2},
         {"getRenderer",        getRenderer,              0},
         {"addExtension",       addExtension,             1},
         {"setSceneAndCanvas",  setSceneAndCanvas,        2},

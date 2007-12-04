@@ -292,51 +292,77 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.addSkyBoxFromImage = function(theImageNode) {
-        var mySkyboxMaterial = Node.createElement('material');
-        mySkyboxMaterial.name = "skyboxmaterial";
-        _myRenderWindow.scene.materials.appendChild(mySkyboxMaterial);
-        _mySkyboxMaterialId = mySkyboxMaterial.id;
 
-        // add textures
-        var myTexturesString =
-            '<textures>\n' +
-            '    <texture image="' + theImageNode.id + '" applymode="decal"/>\n' +
-            '</textures>';
-        var myTexturesDoc  = new Node(myTexturesString);
-        var myTexturesNode = myTexturesDoc.firstChild;
-        mySkyboxMaterial.appendChild(myTexturesNode);
+        // material
+        var myMaterialNode = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
+        if (!myMaterialNode) {
+            myMaterialNode = Node.createElement("material");
+            myMaterialNode.id = createUniqueId();
+            myMaterialNode.name = "SkyboxMaterial";
 
-        // add texture requirement
-        var myTextureFeatures = new Node('<feature name="textures">[100[skybox]]</feature>\n').firstChild;
-        mySkyboxMaterial.requires.appendChild(myTextureFeatures);
+            _mySkyboxMaterialId = myMaterialNode.id;
+            _myRenderWindow.scene.materials.appendChild(myMaterialNode);
+            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
 
-        _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
+            // add texture units
+            var myTextureUnitsNode = new Node("<textureunits><textureunit applymode='decal'/></textureunits>").firstChild;
+            myMaterialNode.appendChild(myTextureUnitsNode);
+
+            // add texture requirement
+            var myTextureFeatures = new Node("<feature name='textures'>[100[skybox]]</feature>").firstChild;
+            myMaterialNode.requires.appendChild(myTextureFeatures);
+        }
+
+        // texture unit
+        var myTextureUnitNode = myMaterialNode.childNode("textureunits").firstChild;
+ 
+        // texture
+        var myTextureNode = myMaterialNode.getElementById(myTextureUnitNode.texture);
+        if (!myTextureNode) {
+            myTextureNode = Node.createElement("texture");
+            myTextureNode.id = createUniqueId();
+            myTextureNode.name = "SkyboxTexture";
+            myTextureNode.wrapmode = "clamp_to_edge";
+            myTextureNode.mipmap = false;
+
+            _myRenderWindow.scene.textures.appendChild(myTextureNode);
+            myTextureUnitNode.texture = myTextureNode.id;
+        }
+
+        myTextureNode.image = theImageNode.id;
     }
 
     self.addSkyBoxFromFile = function(theFileName, theTile) {
+
         if (theTile == undefined) {
             theTile = new Vector2i(1,6);
         }
         if (_mySkyboxMaterialId) {
-            var mySkyboxMaterial = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
-            var mySkyboxImage = mySkyboxMaterial.getElementById(mySkyboxMaterial.childNode("textures").firstChild.image);
+            var mySkyboxMaterial = 
+                _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
+            var myTextureId = mySkyboxMaterial.childNode("textureunits").firstChild.texture;
+            var myTexture = window.scene.textures.getElementById(myTextureId);
+            var mySkyboxImage = mySkyboxMaterial.getElementById(myTexture.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
-            mySkyboxImage.wrapmode = "clamp_to_edge";
+            myTexture.wrapmode = "clamp_to_edge";
             _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();
-
             var mySkyboxImage      = Node.createElement("image");
             mySkyboxImage.name     = theFileName;
             mySkyboxImage.id       = myImageId;
             mySkyboxImage.src      = theFileName;
-            mySkyboxImage.type     = "cubemap";
-            mySkyboxImage.mipmap   = 0;
-            mySkyboxImage.wrapmode = "repeat";
             mySkyboxImage.tile     = theTile;
+            mySkyboxImage.type     = "cubemap";
 
             _myRenderWindow.scene.images.appendChild(mySkyboxImage);
+
+            var mySkyboxTexture = Modelling.createTexture(window.scene, mySkyboxImage);
+            mySkyboxTexture.mipmap   = 0;
+            mySkyboxTexture.wrapmode = "repeat";
+            mySkyboxTexture.type     = "texture_cubemap";
+
             self.addSkyBoxFromImage(mySkyboxImage);
         }
     }
@@ -344,6 +370,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.removeSkyBox = function() {
         _myRenderWindow.scene.world.skyboxmaterial = "";
     }
+    
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //  RenderWindow callback handlers

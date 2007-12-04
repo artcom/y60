@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,19 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: ImageBuilder.cpp,v 1.4 2005/04/29 13:37:56 martin Exp $
-//   $RCSfile: ImageBuilder.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/29 13:37:56 $
-//
-//
-//  Description: XML-File-Export Plugin
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #include "ImageBuilder.h"
 #include <y60/NodeNames.h>
@@ -31,36 +18,31 @@
 #include <asl/RunLengthEncoder.h>
 
 namespace y60 {
-    ImageBuilder::ImageBuilder(const std::string & theName, bool theCreateMipmapFlag)
+    ImageBuilder::ImageBuilder(const std::string & theName)
         : BuilderBase(IMAGE_NODE_NAME)
     {
-		init(theName, theCreateMipmapFlag);
+		init(theName);
 
     }
 	ImageBuilder::ImageBuilder(const std::string & theNodeName,
-		                       const std::string & theName,
-							   bool theCreateMipmapFlag) : BuilderBase(theNodeName)
+		                       const std::string & theName) : BuilderBase(theNodeName)
 	{
-		init(theName, theCreateMipmapFlag);
+		init(theName);
 	}
 
     ImageBuilder::~ImageBuilder() {
     }
 
 	void
-    ImageBuilder::init(const std::string & theName, bool theCreateMipmapFlag) {
+    ImageBuilder::init(const std::string & theName) {
         dom::NodePtr myNode = getNode();
         if (!myNode->hasFacade()) {
             //TODO: the follwoing attributes are all appended as text and not as type
             // because there is no schema available at this time
             myNode->appendAttribute(NAME_ATTRIB, theName);
             myNode->appendAttribute(IMAGE_TYPE_ATTRIB, IMAGE_TYPE_SINGLE);
-            myNode->appendAttribute(IMAGE_MIPMAP_ATTRIB, theCreateMipmapFlag);
             myNode->appendAttribute(DEPTH_ATTRIB, (unsigned int)(1));
-            myNode->appendAttribute(IMAGE_COLOR_SCALE_ATTRIB, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));
-            myNode->appendAttribute(IMAGE_COLOR_BIAS_ATTRIB, asl::Vector4f(0.0f,0.0f,0.0f,0.0f));
             myNode->appendAttribute(IMAGE_TILE_ATTRIB, asl::Vector2i(1,1));
-            myNode->appendAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB, "");
 		} else {
             myNode->getFacade<Image>()->set<NameTag>(theName);
 		}
@@ -77,8 +59,6 @@ namespace y60 {
     {
         getNode()->getFacade<Image>()->set<ImageSourceTag>(theFileName);
         getNode()->getFacade<Image>()->set<ImageFilterTag>(theFilter);
-        getNode()->getFacade<Image>()->set<ImageResizeTag>(theResizeMode);
-
     }
 
     void
@@ -100,28 +80,8 @@ namespace y60 {
     }
 
     void
-    ImageBuilder::setInternalFormat(const std::string & theType) {
-        getNode()->getFacade<Image>()->set<TexturePixelFormatTag>(theType);
-    }
-
-    void
-    ImageBuilder::setColorScale(asl::Vector4f theColorScale) {
-        getNode()->getFacade<Image>()->set<ImageColorScaleTag>(theColorScale);
-    }
-
-    void
-    ImageBuilder::setColorBias(asl::Vector4f theColorBias) {
-        getNode()->getFacade<Image>()->set<ImageColorBiasTag>(theColorBias);
-    }
-
-    void
     ImageBuilder::setDepth(unsigned int theDepth) {
         getNode()->getFacade<Image>()->set<ImageDepthTag>(theDepth);
-    }
-
-    void
-    ImageBuilder::setWrapMode(TextureWrapMode theWrapMode) {
-        getNode()->getFacade<Image>()->set<TextureWrapModeTag>(theWrapMode);
     }
 
     void

@@ -373,7 +373,7 @@ namespace y60 {
 
         if (myReload == false && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end()) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
-            if (myLastCount != theMaterial.getTextureCount()) {
+            if (myLastCount != theMaterial.getTextureUnitCount()) {
                 myReload = true;
             }
         }
@@ -402,8 +402,8 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = mySpotLightCount;
 
-            AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureCount();
-            _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureCount();
+            AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureUnitCount();
+            _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureUnitCount();
 
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
             createAndCompileProgram();
@@ -607,7 +607,7 @@ namespace y60 {
                         int mySize = cgGetArraySize(curParam._myParameter, 0);
                         for (unsigned i = 0; i < mySize; ++i) {
                             CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
-                            Matrix4f myTextureMatrix = theMaterial.getTexture(i).get<TextureMatrixTag>();
+                            Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
                             cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
                         }
                         break;
@@ -719,16 +719,19 @@ namespace y60 {
             case SAMPLERCUBE:
                 {
                     unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
-                    if (myTextureIndex < theMaterial.getTextureCount()) {
-                        const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
-                        AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
-                        cgGLSetTextureParameter( theCgParameter, myTexture.getId());
+                    if (myTextureIndex < theMaterial.getTextureUnitCount()) {
+                        const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
+                        const TexturePtr & myTexture = myTextureUnit.getTexture();
+
+                        unsigned myTextureId = myTexture->getTextureId();
+                        AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
+                        cgGLSetTextureParameter( theCgParameter, myTextureId);
                         DB(AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
-                                << ", texid=" << myTexture.getId() << ", property=" << thePropertyName
+                                << ", texid=" << myTextureId << ", property=" << thePropertyName
                                 << " to parameter : "<< cgGetParameterName(theCgParameter) << endl);
                     } else {
                         throw ShaderException(string("Texture index ") + as_string(myTextureIndex) +
-                                " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
+                                " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
                                 "CgProgramInfo::setCgMaterialParameter()");
                     }
                     break;

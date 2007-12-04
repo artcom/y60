@@ -20,7 +20,7 @@
 #ifndef _ac_scene_SkinAndBonesShader_h_
 #define _ac_scene_SkinAndBonesShader_h_
 
-#include "CGShader.h"
+#include "CgShader.h"
 
 #include <dom/Nodes.h>
 #include <y60/Facades.h>
@@ -29,12 +29,12 @@
 #include <vector>
 
 namespace y60 {
-    class SkinAndBonesShader : public CGShader {
+    class SkinAndBonesShader : public CgShader {
         public:
             SkinAndBonesShader(const dom::NodePtr theShaderLibrary,
                                const std::string & theVertexProfileName,
                                const std::string & theFragmentProfileName) 
-            : CGShader(theShaderLibrary, theVertexProfileName, theFragmentProfileName), _myBoundingBoxNode(0) {}
+            : CgShader(theShaderLibrary, theVertexProfileName, theFragmentProfileName), _myBoundingBoxNode(0) {}
 
             virtual ~SkinAndBonesShader() {}
 

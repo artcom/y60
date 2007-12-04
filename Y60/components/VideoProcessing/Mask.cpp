@@ -46,9 +46,12 @@ namespace y60 {
 
 	void 
     Mask::onFrame(double t) {
-        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
-        const BGRRaster * myMaskFrame   = dom::dynamic_cast_Value<BGRRaster>(&*_myMaskImage->getRasterValue());
-        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
+        const BGRRaster * mySourceFrame = 
+            dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
+        const BGRRaster * myMaskFrame   = 
+            dom::dynamic_cast_Value<BGRRaster>(&*_myMaskImage->getRasterValue());
+        const BGRRaster * myTargetFrame = 
+            dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
         
         BGRRaster::iterator itSrc   = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
         BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myMaskFrame->begin());
@@ -62,7 +65,5 @@ namespace y60 {
                 }
             }
         }
-
-        _myTargetImage->triggerUpload();
 	}
 }

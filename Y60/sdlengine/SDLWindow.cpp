@@ -193,7 +193,7 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
                         bool theFullscreenFlag)
 {
     DB(AC_TRACE << "setVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
-        ", Fullscreen: " << theFullscreenFlag << ")");
+            ", Fullscreen: " << theFullscreenFlag << ")");
     DB(AC_TRACE << "_myWindowInitFlag: " << _myWindowInitFlag);
     if (!_myWindowInitFlag) {
         // window not yet set up, defer to later
@@ -252,9 +252,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         if (_myRenderer) {
             _myRenderer->initGL();
             ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
-			if (myShaderLibrary) {
-				myShaderLibrary->reload();
-			}
+            if (myShaderLibrary) {
+                myShaderLibrary->reload();
+            }
         }
         // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
         for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
@@ -271,7 +271,7 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         if (_myScene) {
             _myScene->clearShapes();
             _myScene->updateAllModified();
-            _myScene->update(Scene::SHAPES);
+            _myScene->update(Scene::SHAPES); // updated in updateAllModified
             _myScene->getTextureManager()->reloadTextures();
         }
     }
@@ -730,10 +730,11 @@ SDLWindow::mainLoop() {
         EventDispatcher::get().dispatch();
         STOP_TIMER(dispatchEvents);
 
+/*
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
         STOP_TIMER(handleRequests);
-
+*/
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;

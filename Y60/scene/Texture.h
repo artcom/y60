@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,96 +7,134 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Texture.h,v $
-//   $Author: david $
-//   $Revision: 1.25 $
-//   $Date: 2005/04/04 14:40:15 $
-//
-//  Description: This class performs texture loading and management.
-//
-//=============================================================================
 
-#ifndef AC_Y60_TEXTURE_INCLUDED
-#define AC_Y60_TEXTURE_INCLUDED
+#ifndef Y60_TEXTURE_INCLUDED
+#define Y60_TEXTURE_INCLUDED
 
-#include "TextureManager.h"
-#include <y60/Image.h>
+#include "TextureTags.h"
+#include <y60/CommonTags.h>
 #include <y60/NodeValueNames.h>
-#include <y60/ITextureManager.h>
-
-#include <asl/Exception.h>
-#include <asl/Matrix4.h>
-#include <asl/Ptr.h>
+#include <y60/IResourceManager.h>
 
 #include <dom/AttributePlug.h>
 #include <dom/Facade.h>
 
-#include <string>
-namespace dom {
-    template <>
-    struct ValueWrapper<y60::ImageWeakPtr> {
-        typedef dom::SimpleValue<y60::ImageWeakPtr> Type;
-    };
 
-    inline
-    std::ostream& operator<<(std::ostream& os, const y60::ImageWeakPtr& i) {
-        return os << "[ImageWeakPtr]";
-    }
-
-    inline
-    std::istream& operator>>(std::istream& is,y60::ImageWeakPtr &i) {
-        return is;
-    }
-}
 namespace y60 {
 
-    //                  theTagName           theType        theAttributeName           theDefault
-    DEFINE_ATTRIBUT_TAG(TextureImageTag,       ImageWeakPtr,  "texture_image_tag",       ImagePtr(0));
-    DEFINE_ATTRIBUT_TAG(TextureImageIdTag,     std::string,   TEXTURE_IMAGE_ATTRIB,      "");
-    DEFINE_ATTRIBUT_TAG(TextureProjectorIdTag, std::string,   TEXTURE_PROJECTOR_ATTRIB,      "");
-    DEFINE_ATTRIBUT_TAG(TextureApplyModeTag,   TextureApplyMode,   TEXTURE_APPLYMODE_ATTRIB,  MODULATE);
-    DEFINE_ATTRIBUT_TAG(TextureSpriteTag,      bool,          TEXTURE_SPRITE_ATTRIB,     false);
-    DEFINE_ATTRIBUT_TAG(TextureMatrixTag,      asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
-
+    /**
+     * Exception
+     */
     DEFINE_EXCEPTION(TextureException, asl::Exception);
+
+    /**
+     * @ingroup y60texture
+     * Facade for a texture node in the dom.
+     */
     class Texture :
         public dom::Facade,
+        public IdTag::Plug,
+        public NameTag::Plug,
         public TextureImageIdTag::Plug,
-        public TextureProjectorIdTag::Plug,
-        public TextureApplyModeTag::Plug,
-        public TextureSpriteTag::Plug,
+        public TexturePixelFormatTag::Plug,
+        public TextureTypeTag::Plug,
+        public TextureMipmapTag::Plug,
+        public TextureAnisotropyTag::Plug,
         public TextureMatrixTag::Plug,
-        public ResizePolicyTag::Plug,
-        public dom::FacadeAttributePlug<TextureImageTag>
+        public TextureColorBiasTag::Plug,
+        public TextureColorScaleTag::Plug,
+        public TextureWrapModeTag::Plug,
+        public TextureMinFilterTag::Plug, 
+        public TextureMagFilterTag::Plug, 
+        public TextureImageIndexTag::Plug, 		
+        public dom::FacadeAttributePlug<TextureIdTag>,
+        public dom::FacadeAttributePlug<TextureInternalFormatTag>,
+        public dom::FacadeAttributePlug<TextureWidthTag>,
+        public dom::FacadeAttributePlug<TextureHeightTag>,
+        public dom::FacadeAttributePlug<TextureDepthTag>,
+        public dom::FacadeAttributePlug<TextureImageTag>,
+        public dom::FacadeAttributePlug<TextureParamChangedTag>
     {
         public:
             Texture(dom::Node & theNode);
             IMPLEMENT_FACADE(Texture);
+
             virtual ~Texture();
 
-            void setTextureManager(const asl::Ptr<TextureManager> theTextureManager);
+            void unbind();
+            void removeTextureFromResourceManager();
 
-            void setUsage(TextureUsage theUsage) {}
+            /// Get OpenGL texture ID.
+            unsigned getTextureId() const {
+                return _myTextureId;
+            }
 
-            TextureApplyMode  getApplyMode() const;
-            bool getSpriteMode() const;
+            // PBO usage
+            virtual bool usePixelBuffer() const;
+            void setPixelBufferId(unsigned theId) {
+                _myPixelBufferId = theId;
+            }
+            unsigned getPixelBufferId() const {
+                return _myPixelBufferId;
+            }
 
-            unsigned      getId() const;
-            ImagePtr  getImage() const;
+            /// Return OpenGL texture ID and upload image if necessary.
+            unsigned ensureTextureId() {
+                return get<TextureIdTag>();
+            }
+
+            unsigned applyTexture();
+            void applyTextureParams();
+
+            void triggerUpload();
+
+            void refTexture();
+            void unrefTexture();
+
+            ImagePtr getImage() const;
+
+            TextureType getType() const;
+            TextureWrapMode getWrapMode() const;
+            TextureSampleFilter getMinFilter() const;
+            TextureSampleFilter getMagFilter() const;
+            TextureInternalFormat getInternalEncoding() const;
 
             virtual void registerDependenciesRegistrators();
-    
+
         protected:
-            virtual void registerDependenciesForImageTag();
+            IResourceManager * _myResourceManager;
+
         private:
-            void update();
+            unsigned _myRefCount;
+            unsigned _myTextureId;
+            unsigned _myPixelBufferId;
+            unsigned _myImageNodeVersion;
 
             Texture();
-            asl::Ptr<TextureManager>      _myTextureManager;
+
+            void registerDependenciesForImageTag();
+            void registerDependenciesForTextureWidthUpdate();
+            void registerDependenciesForTextureHeightUpdate();
+            void registerDependenciesForInternalFormatUpdate();
+            void registerDependenciesForTextureParamChanged();
+            void registerDependenciesForTextureTypeUpdate();
+            void registerDependenciesForTextureUpdate();
+
+            void calculateInternalFormat();
+            void calculateWidth();
+            void calculateHeight();
+            void calculateTextureType();
+            void calculateImageTag();
+
+            /// Get ResourceManager from Scene facade.
+            void ensureResourceManager();
+
+            Image & getImageFacade();
+            const Image & getImageFacade() const;
     };
 
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
+    typedef asl::WeakPtr<Texture, dom::ThreadingModel> TextureWeakPtr;
 }
 
-#endif // AC_Y60_TEXTURE_INCLUDED
+#endif

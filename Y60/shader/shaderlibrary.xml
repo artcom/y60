@@ -441,80 +441,6 @@
             </vertexparameters>
         </fixedfunctionshader>
     </shader>
-    <shader id="s11" name="water1" cost="400">
-        <supports>
-            <feature class="physics" values="[`waves`]"/>
-            <feature class="textures" values="[`paint`]"/>
-            <feature class="texcoord" values="[`uv_map`]"/>
-            <feature class="lighting" values="[`lambert`]"/>
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`water.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
-            <properties>
-                <vector4f name="Wave1Params">[0.18, 0.18, 0.4, 1]</vector4f>
-                <vector4f name="Wave1Direction">[0, 0, -1, 0]</vector4f>
-                <vector4f name="Wave1NearFarWave2NearFarSmooth">[400, 800, 100, 200]</vector4f>
-                <vector4f name="Wave2Params">[0.3, 0.3, 0.03, 1]</vector4f>
-                <vector4f name="Wave2Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
-                <vector4f name="Wave3Params">[0.3, 0.3, 0.03, 1]</vector4f>
-                <vector4f name="Wave3Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
-                <vector4f name="WaterPlane">[0, 1, 0, 0]</vector4f>
-                <vector3f name="Tex1NearFarScale">[100,1000,600]</vector3f>
-                <vector3f name="Tex2NearFarScale">[100,100000000,60]</vector3f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                <vector3f name="position"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`water.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
-            <properties>
-                <sampler2d name="waterTex1">0</sampler2d>
-                <vector3f name="diffuse">[1,1,1]</vector3f>
-                <vector3f name="specular">[0.8,0.8,0.8]</vector3f>
-                <vector3f name="ambient">[0.0,0.0,0.0]</vector3f>
-                <float name="shininess">80</float>
-            </properties>
-        </fragmentshader>
-    </shader>
-    <shader id="s12" name="water2" cost="400">
-        <supports>
-            <feature class="physics" values="[`waves`]"/>
-            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
-            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
-            <feature class="lighting" values="[`lambert`]"/>
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`water.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
-            <properties>
-                <vector4f name="Wave1Params">[0.18, 0.18, 0.4, 1]</vector4f>
-                <vector4f name="Wave1Direction">[0, 0, -1, 0]</vector4f>
-                <vector4f name="Wave1NearFarWave2NearFarSmooth">[400, 800, 100, 200]</vector4f>
-                <vector4f name="Wave2Params">[0.3, 0.3, 0.03, 1]</vector4f>
-                <vector4f name="Wave2Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
-                <vector4f name="Wave3Params">[0.3, 0.3, 0.03, 1]</vector4f>
-                <vector4f name="Wave3Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
-                <vector4f name="WaterPlane">[0, 1, 0, 0]</vector4f>
-                <vector3f name="Tex1NearFarScale">[400,800,200]</vector3f>
-                <vector3f name="Tex2NearFarScale">[400,800,60]</vector3f>
-                <float name="Tex3Scale">2000</float>
-                <vector4f name="WaveOffset">[0,0,0,0]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                <vector3f name="position"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`water.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
-            <properties>
-                <sampler2d name="waterTex1">0</sampler2d>
-                <sampler2d name="waterTex2">1</sampler2d>
-                <sampler2d name="waterTex3">2</sampler2d>
-                <vector3f name="diffuse">[1,1,1]</vector3f>
-                <vector3f name="specular">[0.8,0.8,0.8]</vector3f>
-                <vector3f name="ambient">[0.0,0.0,0.0]</vector3f>
-                <float name="shininess">80</float>
-            </properties>
-        </fragmentshader>
-    </shader>
     <shader id="s13" name="toon" cost="10">
         <supports>
             <feature class="textures" values="[`paint`]"/>
@@ -1795,7 +1721,7 @@
             <feature class="texcoord" values="[`uv_map`]"/>
             <feature class="option" values="[`lens`]"/>
         </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`zoom.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`zoom.cg`]" entryfunctions="[`mainVertex`]">
             <properties/>
             <vertexparameters>
                 <vector4f name="position"/>
@@ -1803,7 +1729,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`zoom.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`zoom.cg`]" entryfunctions="[`mainFragment`]">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <vector2f name="center">[0.0,0.0]</vector2f>
@@ -1814,3 +1740,53 @@
         </fragmentshader>
     </shader>
 </shaders>
+<combiners>
+    <!-- 'previous' + 'texture' -->
+    <combiner id="c00" name="add">
+        <combineRGB mode="add">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="add">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- 'previous' - 'texture' -->
+    <combiner id="c01" name="subtract">
+        <combineRGB mode="subtract">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="subtract">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- 'previous' * 'texture' -->
+    <combiner id="c02" name="modulate">
+        <combineRGB mode="modulate">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="modulate">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- interpolate between 'previous' and 'texture' controlled by the alpha component of textureunit.color
+        arg0 * arg2 + arg1 * (1-arg2)
+    -->
+    <combiner id="c03" name="interpolate">
+        <combineRGB mode="interpolate">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+            <arg2 source="constant" operand="src_alpha"/>
+        </combineRGB>
+        <combineAlpha mode="interpolate">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+            <arg2 source="constant" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+</combiners>

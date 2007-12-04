@@ -140,45 +140,10 @@ namespace y60 {
          * Set the texture priority.
          * Zero (0.0) is the lowest, one (1.0) the highest priority.
          * Values outside this range are clamped.
-         * @param theImage Image for which to set the priority.
+         * @param theTexture Texture for which to set the priority.
          */
-        void setTexturePriority(Image * theImage, float thePriority);
+        void setTexturePriority(const TexturePtr & theTexture, float thePriority);
 
-
-        /**
-         * Check if the new image fits in current uploaded GL texture.
-         * @param theImage Image to update.
-         */
-        bool imageMatchesGLTexture(ImagePtr theImage) const;
-		
-        /**
-         * Updates the texture data.
-         * This function re-uploads the Image pixels to the GL texture memory.
-         * @param theImage Image to update.
-         */
-        void updateTextureData(ImagePtr theImage);
-
-        /**
-         * Rebinds the GL texture object.
-         * This function re-binds the texture by unbinding it and calling setupTexture.
-         * @param theImage Image to rebind.
-         */
-        //void rebindTexture(ImagePtr theImage);
-
-        /**
-         * Delete the texture object for the given Image.
-         * @param theImage Image to unbind.
-         */
-        void unbindTexture(Image * theImage);
-
-        /**
-         * Setup the GL texture object for the given Image.
-         * If the Image/texture is already bound it will be unbound and recreated.
-         * @param theImage Image to setup/bind.
-         * @return id of the texture generated from theImage
-         * @throws TextureException Unknown type of texture or corrupt image provided
-         */
-        unsigned setupTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
 
         /**
          * Load shader library from file.
@@ -201,64 +166,82 @@ namespace y60 {
          * sets parameter for oading the shader library from file.
          * loading will occur automatically immediately after window is openend.
          * @param theShaderLibraryFile Shader library filename.
-         * @param the Cg vertex shader profile name.
-         * @param the Cg fragment shader profile name.
+         * @param theVertexProfileName Cg vertex shader profile name.
+         * @param theFragmentProfileName Cg fragment shader profile name.
          */
         void prepareShaderLibrary(const std::string & theShaderLibraryFile,
              const std::string & theVertexProfileName,
              const std::string & theFragmentProfileName);
 
-       /**
+        /**
          * Return pointer to shader library.
          * @return Pointer to shader library.
          */
         IShaderLibraryPtr getShaderLibrary() const;
 
         /**
-         * update texture wrap and min, map filter
+         * Setup the GL texture object for the given Texture.
+         * If the Texture is already bound it will be unbound and recreated.
+         * @param theTexture Texture to setup/bind.
+         * @return id of the texture generated from theTexture
+         * @throws TextureException Unknown type of texture or corrupt texture provided
          */
-        void updateTextureParams(ImagePtr theImage);
+        unsigned setupTexture(TexturePtr & theTexture);
+
+        /**
+         * Updates the texture data.
+         * This function re-uploads the Texture pixels to the GL texture memory.
+         * @param theTexture Texture to update.
+         */
+        void updateTextureData(const TexturePtr & theTexture);
+
+        /**
+         * Delete the texture object for the given Texture.
+         * @param theTexture Texture to unbind.
+         */
+        void unbindTexture(Texture * theTexture);
+
+        /// Update texture wrap and min, mag filter.
+        void updateTextureParams(const TexturePtr & theTexture);
+
+        /**
+         * Check if the new image fits in current uploaded GL texture.
+         * @param theImage Image to update.
+         */
+        bool imageMatchesGLTexture(TexturePtr theTexture) const;
 
     private:
-        static PixelEncodingInfo getInternalTextureFormat(ImagePtr theImage);
+        static PixelEncodingInfo getPixelEncoding(const TexturePtr & theTexture, const ImagePtr & theImage);
 
-        /**
-         * Setup a 2D/3D texture.
-         * @param theImage
-         * @throws TextureException theImage was invalid or contained no raster info
-         * @return
-         */
-        unsigned setupSingleTexture(ImagePtr theImage, unsigned theTextureId);
+        /// Setup 2D texture.
+        void setupTexture2D(TexturePtr & theTexture);
 
-        /// Update 2D texture from image.
-        void update2DTexture(ImagePtr theImage);
+        /// Setup 3D texture.
+        void setupTexture3D(TexturePtr & theTexture);
 
-        /// Update 3D texture from image.
-        void update3DTexture(ImagePtr theImage);
+        /// Setup cubemap texture.
+        void setupCubemap(TexturePtr & theTexture);
 
-        /**
-         * Setup a cubemap texture.
-         * @param theImage
-         * @return
-         * @throws TextureException theImage was not a cubemap or invalid
-         */
-        unsigned setupCubemap(ImagePtr theImage,  unsigned theTextureId);
+        /// Update 2D texture.
+        void updateTexture2D(const TexturePtr & theTexture, ImagePtr & theImage);
 
-        /// Update cubemap from image.
-        void updateCubemap(ImagePtr theImage);
+        /// Update 3D texture.
+        void updateTexture3D(const TexturePtr & theTexture, ImagePtr & theImage);
+
+        /// Update cubemap from texture.
+        void updateCubemap(const TexturePtr & theTexture, ImagePtr & theImage);
 
         /**
          * Sets up color scale and color bias
          * @note call glPushAttrib(GL_PIXEL_MODE_BIT) before usage
-         * @param theImage Image containing the scale and bias attributes
+         * @param theTexture Texture containing the scale and bias attributes
          */
-        void setupPixelTransfer(ImagePtr theImage);
+        void updatePixelTransfer(const TexturePtr & theTexture);
 
-        GLenum getTextureType(ImagePtr theImage);
         /**
          * Sets up texture wrap and min, map filter
          */
-        void setupTextureParams(ImagePtr theImage, GLenum theTextureType);
+        //void setupTextureParams(const TexturePtr & theTexture, GLenum theTextureTarget);
 
         unsigned long _myTextureMemUsage;
         unsigned long _myVertexMemUsage;

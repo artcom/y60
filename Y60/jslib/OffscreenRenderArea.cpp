@@ -53,25 +53,55 @@ OffscreenRenderArea::~OffscreenRenderArea() {
 void OffscreenRenderArea::handle(y60::EventPtr theEvent) {
 }
 
+// IFrameBuffer
+int OffscreenRenderArea::getWidth() const {
+    if (_myWidth > 0) {
+        return _myWidth;
+    }
+    TexturePtr myTexture = getTexture();
+    if (!myTexture) {
+        return 0;
+    }
+    return myTexture->get<TextureWidthTag>();
+}
+
+int OffscreenRenderArea::getHeight() const {
+    if (_myHeight > 0) {
+        return _myHeight;
+    }
+    TexturePtr myTexture = getTexture();
+    if (!myTexture) {
+        return 0;
+    }
+    return myTexture->get<TextureHeightTag>();
+}
+
 // AbstractRenderWindow
 void OffscreenRenderArea::initDisplay() {
 }
 
 void
 OffscreenRenderArea::activate(unsigned theCubemapFace) {
-    AC_TRACE << "OffscreenRenderArea::activate";
-    ImagePtr myTexture = getImage();
-    if ( ! myTexture) {
-        AC_ERROR << "OffscreenRenderArea::activate has no canvas / image to render... ignoring";
+    TexturePtr myTexture = getTexture();
+    if (!myTexture) {
+        AC_ERROR << "OffscreenRenderArea::activate has no canvas / texture to render... ignoring";
         return;
     }
+    AC_TRACE << "OffscreenRenderArea::activate '" << myTexture->get<NameTag>() << "'";
+
     y60::OffscreenBuffer::activate(myTexture, getMultisamples(), theCubemapFace);
+
+    // fetch size from texture
+    if (_myWidth == 0 || _myHeight == 0) {
+        setWidth(myTexture->get<TextureWidthTag>());
+        setHeight(myTexture->get<TextureHeightTag>());
+    }
 }
 
 void
 OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenRenderArea::deactivate";
-    ImagePtr myTexture = getImage();
+    TexturePtr myTexture = getTexture();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::deactivate has no canvas / image to render... ignoring";
         return;
@@ -84,7 +114,7 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
     AC_TRACE << "OffscreenRenderArea::renderToCanvas copyToImage=" << theCopyToImageFlag;
     MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
 
-    ImagePtr myTexture = getImage();
+    TexturePtr myTexture = getTexture();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
@@ -109,18 +139,24 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
 }
 
 void
-OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
-    if ( ! theImageNode ) {
-        throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
+OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theTextureNode) {
+    if (!theTextureNode) {
+        throw OffscreenRendererException("No Texture.", PLUS_FILE_LINE);
     }
-    ImagePtr myImage = theImageNode->getFacade<Image>();
-    ResizeableRasterPtr myRaster = myImage->getRasterPtr();
 
+    TexturePtr myTexture = theTextureNode->getFacade<Texture>();
+    ImagePtr myImage = myTexture->getImage();
+    if (!myImage) {
+        AC_ERROR << "Texture id=" << myTexture->get<IdTag>() << " has no image associated";
+        return;
+    }
+
+    ResizeableRasterPtr myRaster = myImage->getRasterPtr();
     if (myRaster->width() != getWidth() || myRaster->height() != getHeight()) {
+        AC_DEBUG << "Resizing image id=" << myImage->get<IdTag>() << " to " << getWidth() << "x" << getHeight();
         myRaster->resize(getWidth(), getHeight());
     }
-
-    OffscreenBuffer::copyToImage(myImage);
+    OffscreenBuffer::copyToImage(myTexture);
 }
 
 void
@@ -131,12 +167,14 @@ OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
 
 void
 OffscreenRenderArea::setWidth(unsigned theWidth) {
+    AC_DEBUG << "OffscreenRenderArea::setWidth " << theWidth;
     // TODO: some kind of range checking vs. image size
     _myWidth = theWidth;
 }
 
 void
 OffscreenRenderArea::setHeight(unsigned theHeight) {
+    AC_DEBUG << "OffscreenRenderArea::setHeight " << theHeight;
     // TODO: some kind of range checking vs. image size
     _myHeight = theHeight;
 }
@@ -144,11 +182,11 @@ OffscreenRenderArea::setHeight(unsigned theHeight) {
 bool
 OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
-        ImagePtr myImage = getImage();
-        if (myImage) {
-//            ensureRaster(myImage);
-            _myWidth  = myImage->get<ImageWidthTag>();
-            _myHeight = myImage->get<ImageHeightTag>();
+        TexturePtr myTexture = getTexture();
+        if (myTexture) {
+//            ensureRaster(myTexture);
+            setWidth(myTexture->get<TextureWidthTag>());
+            setHeight(myTexture->get<TextureHeightTag>());
         } else {
             throw OffscreenRendererException(std::string("No target set for canvas: ") + theCanvas->getAttributeString(ID_ATTRIB), PLUS_FILE_LINE);
         }
@@ -158,24 +196,22 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     }
 }
 
-const ImagePtr
-OffscreenRenderArea::getImage() const {
+const TexturePtr
+OffscreenRenderArea::getTexture() const {
     if (getCanvas()) {
         return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
-    } else {
-        AC_WARNING << "No canvas.";
-        return ImagePtr(0);
     }
+    AC_WARNING << "No canvas.";
+    return TexturePtr(0);
 }
 
-ImagePtr
-OffscreenRenderArea::getImage() {
+TexturePtr
+OffscreenRenderArea::getTexture() {
     if (getCanvas()) {
         return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
-    } else {
-        AC_WARNING << "No canvas.";
-        return ImagePtr(0);
     }
+    AC_WARNING << "No canvas.";
+    return TexturePtr(0);
 }
 
 } //namespace jslib

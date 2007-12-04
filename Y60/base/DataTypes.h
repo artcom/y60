@@ -124,10 +124,12 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureSampleFilter, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureWrapMode, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureUsage, SimpleValue);
-    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::ImageType, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureType, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::ResizePolicy, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::ProjectionType, SimpleValue);
     
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::ImageType, SimpleValue);
+
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGBA, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::BGR, SimpleValue);

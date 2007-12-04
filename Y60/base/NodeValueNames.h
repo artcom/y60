@@ -61,6 +61,8 @@ namespace y60 {
     static const char * TEXTURE_APPLY_REPLACE    = "replace";
     static const char * TEXTURE_APPLY_BLEND      = "blend";
     static const char * TEXTURE_APPLY_ADD        = "add";
+    static const char * TEXTURE_APPLY_SUBTRACT   = "subtract";
+    static const char * TEXTURE_APPLY_COMBINE    = "combine";
 
     enum TextureApplyModeEnum {
         MODULATE,
@@ -68,6 +70,8 @@ namespace y60 {
         REPLACE,
         BLEND,
         ADD,
+        SUBTRACT,
+        COMBINE,
         TextureApplyModeEnum_MAX
     };
 
@@ -77,6 +81,8 @@ namespace y60 {
         TEXTURE_APPLY_REPLACE,
         TEXTURE_APPLY_BLEND,
         TEXTURE_APPLY_ADD,
+        TEXTURE_APPLY_SUBTRACT,
+        TEXTURE_APPLY_COMBINE,
         ""
     };
     DEFINE_ENUM(TextureApplyMode, TextureApplyModeEnum);
@@ -91,22 +97,24 @@ namespace y60 {
         TextureSampleFilterEnum_MAX
     };
     
-
     static const char * TextureSampleFilterStrings[] = {
         TEXTURE_SAMPLE_FILTER_NEAREST,
         TEXTURE_SAMPLE_FILTER_LINEAR,
         ""
     };
     DEFINE_ENUM(TextureSampleFilter, TextureSampleFilterEnum);
+
     //=== Texture repeat modes =====================================================
     static const char * TEXTURE_WRAP_CLAMP           = "clamp";
     static const char * TEXTURE_WRAP_CLAMP_TO_EDGE   = "clamp_to_edge";
     static const char * TEXTURE_WRAP_REPEAT          = "repeat";
+    static const char * TEXTURE_WRAP_MIRROR          = "mirror";
 
     enum TextureWrapModeEnum {
         CLAMP,
         CLAMP_TO_EDGE,
         REPEAT,
+        MIRROR,
         TextureWrapModeEnum_MAX
     };
 
@@ -114,6 +122,7 @@ namespace y60 {
         TEXTURE_WRAP_CLAMP,
         TEXTURE_WRAP_CLAMP_TO_EDGE,
         TEXTURE_WRAP_REPEAT,
+        TEXTURE_WRAP_MIRROR,
         ""
     };
     DEFINE_ENUM(TextureWrapMode, TextureWrapModeEnum);
@@ -172,7 +181,6 @@ namespace y60 {
     static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT1_EXT   = "COMPRESSED_RGBA_S3TC_DXT1_EXT";
     static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT3_EXT   = "COMPRESSED_RGBA_S3TC_DXT3_EXT";
     static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT5_EXT   = "COMPRESSED_RGBA_S3TC_DXT5_EXT";
-
 
     enum TextureInternalFormat {
         TEXTURE_IFMT_DEPTH,
@@ -338,6 +346,26 @@ namespace y60 {
     static const char * IMAGE_RESIZE_NONE  = "none";
     static const char * IMAGE_RESIZE_SCALE = "scale";
     static const char * IMAGE_RESIZE_PAD   = "pad";
+ 
+    //=== Image Types =========================================================
+    static const char * IMAGE_TYPE_SINGLE  = "single";
+    static const char * IMAGE_TYPE_VOXEL   = "voxel";
+    static const char * IMAGE_TYPE_CUBEMAP = "cubemap";
+
+    enum ImageTypeEnum {
+        SINGLE,
+        VOXEL,
+        CUBEMAP,
+        ImageTypeEnum_MAX
+    };
+
+    static const char * ImageTypeStrings[] = {
+        IMAGE_TYPE_SINGLE,
+        IMAGE_TYPE_VOXEL,
+        IMAGE_TYPE_CUBEMAP,
+        ""
+    };
+    DEFINE_ENUM(ImageType, ImageTypeEnum);
 
     //=== Texture usage =====================================================
     static const char * TEXTURE_USAGE_PAINT        = "paint";
@@ -406,14 +434,27 @@ namespace y60 {
     };
 
     //=== Texture type =====================================================
-    static const char * IMAGE_TYPE_SINGLE        = "single";
-    static const char * IMAGE_TYPE_CUBEMAP       = "cubemap";
+    static const char * TEXTURE_TYPE_2D        = "texture_2d";
+    static const char * TEXTURE_TYPE_RECTANGLE = "texture_rectangle";
+    static const char * TEXTURE_TYPE_3D        = "texture_3d";
+    static const char * TEXTURE_TYPE_CUBEMAP   = "texture_cubemap";
 
-    enum ImageTypeEnum {
-        SINGLE,
-        CUBEMAP,
-        ImageTypeEnum_MAX
+    enum TextureTypeEnum {
+        TEXTURE_2D,
+        TEXTURE_RECTANGLE,
+        TEXTURE_3D,
+        TEXTURE_CUBEMAP,
+        TextureTypeEnum_MAX
     };
+
+    static const char * TextureTypeStrings[] = {
+        TEXTURE_TYPE_2D,
+        TEXTURE_TYPE_RECTANGLE,
+        TEXTURE_TYPE_3D,
+        TEXTURE_TYPE_CUBEMAP,
+        ""
+    };
+    DEFINE_ENUM(TextureType, TextureTypeEnum);
 
     enum CubemapFacesEnum {
         CUBEMAP_BEHIND,
@@ -424,13 +465,6 @@ namespace y60 {
         CUBEMAP_BOTTOM
     };
 
-
-    static const char * ImageTypeStrings[] = {
-        IMAGE_TYPE_SINGLE,
-        IMAGE_TYPE_CUBEMAP,
-        ""
-    };
-    DEFINE_ENUM(ImageType, ImageTypeEnum);
 
     //=== Light Souce types =====================================================
 

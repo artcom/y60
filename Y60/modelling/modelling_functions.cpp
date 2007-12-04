@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2004-2006, ART+COM AG Berlin
+// Copyright (C) 2004-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -34,7 +34,7 @@ namespace y60 {
     dom::NodePtr
     createTransform(dom::NodePtr theParentNode, const std::string & theTransformName) {
         if (!theParentNode) {
-              throw asl::Exception("createTransform:: theParentNode is null!");
+            throw asl::Exception("createTransform:: theParentNode is null!");
         }
         WorldBuilderBase myParent(theParentNode);
         TransformBuilder myTransform(theTransformName);
@@ -59,7 +59,7 @@ namespace y60 {
 
         dom::Node * myShapeNode;
         dom::NodePtr myMaterial;
-        
+
         if (theNode->nodeName() == "shape") {
             myShapeNode = theNode;
             myMaterial = theNode->getElementById(theNode->childNode("primitives",0)->childNode("elements",0)->getAttributeString("material"));
@@ -87,9 +87,9 @@ namespace y60 {
             AC_ERROR << "sth is wrong when you don't find the material";
             return false;
         }
-        
+
         // XXX go through all elements of that shape
-        
+
         if( myVertexParamColorNode ) {
             VectorOfRankedFeature myVertexParam = myVertexParamColorNode->firstChild()->nodeValueRef<VectorOfRankedFeature>();
             if( myVertexParam[0]._myFeature[0] == "color") {
@@ -98,7 +98,7 @@ namespace y60 {
                     AC_WARNING << "Shape '" << myShape->get<NameTag>() << "' has no vertex colors";
                     return false;
                 }
-                
+
                 VectorOfVector4f & myColors = myColorsNode->firstChild()->nodeValueRefOpen<VectorOfVector4f>();
                 if (theNode->nodeName() == "shape") {
                     // set all vertex colors
@@ -119,10 +119,10 @@ namespace y60 {
                     }
                 }
                 myColorsNode->firstChild()->nodeValueRefClose<VectorOfVector4f>();
-                
+
                 return true;
             }
-            
+
         } else {
             return setAlphaByChangingMaterialColor(myMaterial, theAlpha);
         }
@@ -144,26 +144,26 @@ namespace y60 {
             Vector4f & myDiffuseColor = myDiffuseColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
             myDiffuseColor[3] = theAlpha;
             myDiffuseColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
-            
+
             dom::NodePtr myAmbientColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "ambient");
             Vector4f & myAmbientColor = myAmbientColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
             myAmbientColor[3] = theAlpha;
             myAmbientColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
-            
+
             dom::NodePtr mySpecularColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "specular");
             Vector4f & mySpecularColor = mySpecularColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
             mySpecularColor[3] = theAlpha;
             mySpecularColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
-            
+
             dom::NodePtr myEmissiveColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "emissive");
             Vector4f & myEmissiveColor = myEmissiveColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
             myEmissiveColor[3] = theAlpha;
             myEmissiveColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
-            
+
         }
         return true;
     }
-    
+
     dom::NodePtr
     createCanvas(ScenePtr theScene, const std::string & theCanvasName) {
         CanvasBuilder myCanvas(theCanvasName);
@@ -173,19 +173,19 @@ namespace y60 {
 
     dom::NodePtr
     createQuad(ScenePtr theScene, const std::string & theMaterialId,
-        asl::Vector3f theTopLeftCorner,
-        asl::Vector3f theBottomRightCorner)
+            asl::Vector3f theTopLeftCorner,
+            asl::Vector3f theBottomRightCorner)
     {
         float myZ = (theBottomRightCorner[2] - theTopLeftCorner[2]) / 2;
         asl::Vector3f myXVector(theBottomRightCorner[0] - theTopLeftCorner[0], 0, myZ);
         asl::Vector3f myYVector(0, theBottomRightCorner[1] - theTopLeftCorner[1], myZ);
 
         return createPlane(theScene, 2, 2, "myQuad", theMaterialId,
-            QuadBuilder(),
-            PlanePosition(asPoint(theTopLeftCorner), myXVector, myYVector),
-            ConstNormal(),
-            PlaneUVCoord(),
-            WhiteColor());
+                QuadBuilder(),
+                PlanePosition(asPoint(theTopLeftCorner), myXVector, myYVector),
+                ConstNormal(),
+                PlaneUVCoord(),
+                WhiteColor());
     }
 
     dom::NodePtr
@@ -236,8 +236,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     }
 
     dom::NodePtr createCrosshair(ScenePtr theScene, const std::string & theMaterialId,
-                                 float theInnerRadius, float theHairLength,
-                                 const std::string & theName)
+        float theInnerRadius, float theHairLength,
+        const std::string & theName)
     {
         ShapeBuilder myShapeBuilder(theName);
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
@@ -251,10 +251,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         myShapeBuilder.appendElements(myCircleElementBuilder);
 
-        // UH: the ShapeBuilder:: prefix is necessary for gcc to work
+        // the ShapeBuilder:: prefix is necessary for gcc to work
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myCount);
         myCircleElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myCircleSubdivision);
-
 
         for (unsigned i = 0; i < myCircleSubdivision; ++i) {
 
@@ -286,9 +285,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createAngleMarkup(ScenePtr theScene, const std::string & theMaterialId,
-                         const asl::Vector3f & theApex,
-                         const asl::Vector3f & thePointA,  const asl::Vector3f & thePointB,
-                         bool theOuterAngleFlag, const std::string & theName)
+            const asl::Vector3f & theApex,
+            const asl::Vector3f & thePointA,  const asl::Vector3f & thePointB,
+            bool theOuterAngleFlag, const std::string & theName)
     {
 
         asl::Vector3f myV1 = normalized( thePointA - theApex );
@@ -332,8 +331,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         for (unsigned i = 0; i < mySteps; ++i) {
             float myPhi = i * myStepSize;
             asl::Vector3f myCirclePos( theApex +
-                                       myRadius * (cos(myPhi) * myU +
-                                       myDirectionFactor * sin(myPhi) * myV));
+                    myRadius * (cos(myPhi) * myU +
+                        myDirectionFactor * sin(myPhi) * myV));
             DB2(AC_TRACE << "===> " << myCirclePos << endl);
             myShapeBuilder.appendVertexData(POSITION_ROLE, myCirclePos);
         }
@@ -425,8 +424,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createDistanceMarkup(ScenePtr theScene, const std::string & theMaterialId,
-                         const std::vector<asl::Vector3f> & thePositions,
-                         const std::string & theName)
+            const std::vector<asl::Vector3f> & thePositions,
+            const std::string & theName)
     {
         ShapeBuilder myShapeBuilder(theName);
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
@@ -446,9 +445,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createLineStrip(ScenePtr theScene, const std::string & theMaterialId,
-                         const std::vector<asl::Vector3f> & thePositions,
-                         const std::vector<asl::Vector2f> & theTexCoords,
-                         const std::vector<asl::Vector4f> & theColors)
+            const std::vector<asl::Vector3f> & thePositions,
+            const std::vector<asl::Vector2f> & theTexCoords,
+            const std::vector<asl::Vector4f> & theColors)
     {
         return createStrip(PRIMITIVE_TYPE_LINE_STRIP, theScene, 
                 theMaterialId, thePositions, theTexCoords, theColors);
@@ -456,9 +455,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createQuadStrip(ScenePtr theScene, const std::string & theMaterialId,
-                const std::vector<asl::Vector3f> & thePositions,
-                const std::vector<asl::Vector2f> & theTexCoords,
-                const std::vector<asl::Vector4f> & theColors) 
+            const std::vector<asl::Vector3f> & thePositions,
+            const std::vector<asl::Vector2f> & theTexCoords,
+            const std::vector<asl::Vector4f> & theColors) 
     {
         return createStrip(PRIMITIVE_TYPE_QUAD_STRIP, theScene, 
                 theMaterialId, thePositions, theTexCoords, theColors);
@@ -466,10 +465,10 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createStrip(const std::string & theType, ScenePtr theScene, 
-                const std::string & theMaterialId,
-                const std::vector<asl::Vector3f> & thePositions,
-                const std::vector<asl::Vector2f> & theTexCoords,
-                const std::vector<asl::Vector4f> & theColors) 
+            const std::string & theMaterialId,
+            const std::vector<asl::Vector3f> & thePositions,
+            const std::vector<asl::Vector2f> & theTexCoords,
+            const std::vector<asl::Vector4f> & theColors) 
     {
         bool needColors = theColors.size() !=0;
         bool needsNormals = false;
@@ -484,21 +483,21 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
-                    thePositions.size());
+                thePositions.size());
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
 
         if ( ! theTexCoords.empty()) {
             if (theTexCoords.size() != thePositions.size()) {
-              throw asl::Exception(string("createStrip:: theTexCoords count does not match thePosition count: ") + asl::as_string(theTexCoords.size()) + " vs " + asl::as_string(thePositions.size()) );
-                
+                throw asl::Exception(string("createStrip:: theTexCoords count does not match thePosition count: ") + asl::as_string(theTexCoords.size()) + " vs " + asl::as_string(thePositions.size()) );
+
             }
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector2f>("uvset", theTexCoords.size());
             myElementBuilder.createIndex("uvset", getTextureRole(0), theTexCoords.size());
         }
-        
+
         if (needColors) {
             if (theColors.size() != thePositions.size()) {
-              throw asl::Exception(string("createStrip:: theColors count does not match thePosition count: ") + asl::as_string(theColors.size()) + " vs " + asl::as_string(thePositions.size()) );                
+                throw asl::Exception(string("createStrip:: theColors count does not match thePosition count: ") + asl::as_string(theColors.size()) + " vs " + asl::as_string(thePositions.size()) );                
             }
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE, theColors.size());
             myElementBuilder.createIndex(COLOR_ROLE, COLORS, theColors.size());
@@ -507,11 +506,11 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, thePositions.size());
             myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, thePositions.size());
         }
-        
+
         for(unsigned i = 0; i < thePositions.size(); ++i) {
             myShapeBuilder.appendVertexData(POSITION_ROLE, thePositions[i]);
             myElementBuilder.appendIndex(POSITIONS, i);
-            
+
             if (needsNormals) {
                 asl::Vector3f myNormal;
                 int ii = i;
@@ -523,9 +522,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                 const asl::Vector3f & myV2 = (ii%2 == 0) ? 
                     thePositions[ii+2] : thePositions[ii+1];
                 myNormal = cross(difference(myV1, thePositions[ii]), 
-                                 difference(myV2, thePositions[ii]) );
+                        difference(myV2, thePositions[ii]) );
                 myNormal = normalized(myNormal);
-                
+
                 myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
                 myElementBuilder.appendIndex(NORMALS, i);
             }                
@@ -545,9 +544,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createTriangleMeshMarkup(ScenePtr theScene, const std::string & theLineMaterialId,
-                             const std::string & theAreaMaterialId,
-                             const std::vector<asl::Vector3f> & thePositions,
-                             const std::string & theName)
+            const std::string & theAreaMaterialId,
+            const std::vector<asl::Vector3f> & thePositions,
+            const std::string & theName)
     {
         ShapeBuilder myShapeBuilder(theName);
         ElementBuilder myLineElementBuilder(PRIMITIVE_TYPE_LINES, theLineMaterialId);
@@ -556,7 +555,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
-                    thePositions.size());
+                thePositions.size());
 
         myLineElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
         myAreaElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
@@ -583,13 +582,14 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     }
 
 
-    dom::NodePtr createQuadStack(ScenePtr theScene, const Vector3i & theDimensions,
-                         float theSize, const std::string & theMaterialId,
-                         const std::string theName)
+    dom::NodePtr
+    createQuadStack(ScenePtr theScene, const Vector3i & theDimensions,
+            float theSize, const std::string & theMaterialId,
+            const std::string theName)
     {
         int myHSlices = int(1.3 * (sqrt(float(theDimensions[0] * theDimensions[0] +
-                                        theDimensions[1] * theDimensions[1] +
-                                        theDimensions[2] * theDimensions[2]))) / 4.0);
+                            theDimensions[1] * theDimensions[1] +
+                            theDimensions[2] * theDimensions[2]))) / 4.0);
 
         int myNumSlices = 2 * myHSlices + 1;
         int myVertexCount = myNumSlices * 4;
@@ -603,7 +603,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         myShapeBuilder.appendElements(myElementBuilder);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
-                    myVertexCount);
+                myVertexCount);
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myVertexCount);
 
         int myVertexNum(0);
@@ -627,43 +627,49 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     void
     appendTexture(ScenePtr theScene,
-                  MaterialBuilder & theMaterialBuilder,
-                  const std::string & theTextureFilename,
-                  bool theSpriteFlag,
-                  unsigned theDepth)
+            MaterialBuilder & theMaterialBuilder,
+            const std::string & theTextureFilename,
+            bool theSpriteFlag,
+            unsigned theDepth)
     {
         // Texture code
         string myTexName             = theMaterialBuilder.getName() + "_tex";
         TextureApplyMode myApplyMode = MODULATE;
+        string myUVMappingMode       = TEXCOORD_UV_MAP;
         TextureUsage myUsage         = PAINT;
         TextureWrapMode myWrapMode   = CLAMP;
-        string myUVMappingMode       = TEXCOORD_UV_MAP;
+        bool myCreateMipmapFlag      = true;
         float myRanking              = 100.0f;
         bool myIsFallback            = true;
         float myFallbackRanking      = 100.0f;
-        bool myCreateMipmapFlag      = true;
         asl::Vector4f myColorScale   = asl::Vector4f(1.0f,1.0f,1.0f,1.0f);
         asl::Vector4f myColorBias    = asl::Vector4f(0.0f,0.0f,0.0f,0.0f);
         bool  mySpriteFlag           = theSpriteFlag;
 
-        string myImageId;
+        dom::NodePtr myNode;
         if (theMaterialBuilder.isMovie(theTextureFilename)) {
-            unsigned myLoopCount = 0;
-            myImageId = theMaterialBuilder.createMovie(*(theScene->getSceneBuilder()), myTexName,
-                                                       theTextureFilename, myLoopCount,
-                                                       myColorScale, myColorBias,
-                                                       "");
+            myNode = theMaterialBuilder.createMovieNode(*(theScene->getSceneBuilder()), myTexName,
+                    theTextureFilename, 0);
         } else {
-            myImageId = theMaterialBuilder.createImage(*(theScene->getSceneBuilder()), myTexName,
-                                                       theTextureFilename, myUsage,
-                                                       myCreateMipmapFlag, myColorScale,
-                                                       myColorBias, SINGLE, myWrapMode, 
-                                                       "", IMAGE_RESIZE_PAD, theDepth, false);
+            myNode = theMaterialBuilder.createImageNode(*(theScene->getSceneBuilder()), myTexName,
+                    theTextureFilename, myUsage,
+                    SINGLE, IMAGE_RESIZE_PAD, theDepth, false);
         }
+        string myImageId = myNode->getAttributeString(ID_ATTRIB);
 
-        theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myUVMappingMode,
-                                             Matrix4f::Identity(), myRanking, myIsFallback,
-                                             myFallbackRanking, mySpriteFlag);
+        myNode = theMaterialBuilder.createTextureNode(*(theScene->getSceneBuilder()),
+                myTexName, myImageId,
+                myWrapMode, myCreateMipmapFlag,
+                Matrix4f::Identity(), "", myColorScale, myColorBias);
+        string myTextureId = myNode->getAttributeString(ID_ATTRIB);
+
+        myNode = theMaterialBuilder.createTextureUnitNode(myTextureId,
+                myApplyMode, myUsage, myUVMappingMode, Matrix4f::Identity(), mySpriteFlag,
+                myRanking, myIsFallback, myFallbackRanking);
+
+        /*theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myUVMappingMode,
+          Matrix4f::Identity(), myRanking, myIsFallback,
+          myFallbackRanking, mySpriteFlag);*/
     }
 
     void
@@ -675,9 +681,10 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         setPropertyValue<asl::Vector4f>(theMaterialBuilder.getNode(), "vector4f",
                 SURFACE_COLOR_PROPERTY, theColor);
     }
+
     void
     appendPhongProperties(MaterialBuilder & theMaterialBuilder,
-        const PhongProperties & thePhongProperties)
+            const PhongProperties & thePhongProperties)
     {
         VectorOfRankedFeature myLightingFeature;
         createLightingFeature(myLightingFeature, PHONG);
@@ -705,14 +712,14 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         myBlendFunctions.push_back(SRC_ALPHA);
         myBlendFunctions.push_back(ONE_MINUS_SRC_ALPHA);
         setPropertyValue<VectorOfBlendFunction>(theMaterialBuilder.getNode(), "vectorofblendfunction",
-            BLENDFUNCTION_PROPERTY, myBlendFunctions);
+                BLENDFUNCTION_PROPERTY, myBlendFunctions);
     }
 
     dom::NodePtr
     createPhongTexturedMaterial(ScenePtr theScene, const std::string & theTextureFilename,
-                                const std::string & theName, const PhongProperties & thePhongProperties,
-                                bool theTransparencyFlag, bool theSpriteFlag,
-                                unsigned theDepth)
+            const std::string & theName, const PhongProperties & thePhongProperties,
+            bool theTransparencyFlag, bool theSpriteFlag,
+            unsigned theDepth)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -745,7 +752,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createUnlitTexturedColoredMaterial(ScenePtr theScene, const std::string & theTextureFilename,
-                                const std::string & theName, bool theSpriteFlag, unsigned theDepth)
+            const std::string & theName, bool theSpriteFlag, unsigned theDepth)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -755,7 +762,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         if ( ! theTextureFilename.empty()) {
             appendTexture(theScene, myMaterialBuilder,
-                          theTextureFilename, theSpriteFlag, theDepth);
+                    theTextureFilename, theSpriteFlag, theDepth);
         }
         myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(1, RankedFeature(100,"color")));
         myMaterialBuilder.computeRequirements();
@@ -763,34 +770,48 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     }
 
 
+
     dom::NodePtr
-    createUnlitTexturedMaterial(ScenePtr theScene, dom::NodePtr theImageNode,
+    createUnlitTexturedMaterial(ScenePtr theScene, 
+                                dom::NodePtr theImageOrTextureNode,
                                 const std::string & theName,
                                 bool theTransparencyFlag,
                                 bool theSpriteFlag,
                                 const Vector4f & theColor)
     {
-      // enforce image load
-      theImageNode->getFacade<Image>()->get<ImageWidthTag>();
-      MaterialBuilder myMaterialBuilder(theName, false);
+        // enforce image load
+        MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
         myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
         appendUnlitProperties(myMaterialBuilder, theColor);
         appendBlendFunction(myMaterialBuilder);
 
         // Texture code
-        TextureApplyMode myApplyMode  = MODULATE;
-        TextureUsage myUsage          = PAINT;
-        string myUVMappingMode        = TEXCOORD_UV_MAP;
-        float myRanking               = 100.0f;
-        bool myIsFallback             = true;
-        float myFallbackRanking       = 100.0f;
-        bool  mySpriteFlag            = theSpriteFlag;
+        TextureApplyMode myApplyMode = MODULATE;
+        string myUVMappingMode       = TEXCOORD_UV_MAP;
+        TextureUsage myUsage         = PAINT;
+        TextureWrapMode myWrapMode   = CLAMP;
+        bool myCreateMipmapFlag      = true;
+        float myRanking              = 100.0f;
+        bool myIsFallback            = true;
+        float myFallbackRanking      = 100.0f;
+        bool  mySpriteFlag           = theSpriteFlag;
 
-        string myImageId = theImageNode->getAttributeString(ID_ATTRIB);
-        myMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myUVMappingMode,
-                                             Matrix4f::Identity(), myRanking, myIsFallback,
-                                             myFallbackRanking, mySpriteFlag);
+        string myTextureId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
+        if (theImageOrTextureNode->nodeName() == IMAGE_NODE_NAME) {
+            theImageOrTextureNode->getFacade<Image>()->get<ImageWidthTag>();
+            string myImageId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
+            dom::NodePtr myTextureNode = myMaterialBuilder.createTextureNode(*(theScene->getSceneBuilder()),
+                    theName, myImageId,
+                    myWrapMode, myCreateMipmapFlag,
+                    Matrix4f::Identity(), "");
+            myTextureId = myTextureNode->getAttributeString(ID_ATTRIB);
+            theScene->getTexturesRoot()->appendChild(myTextureNode);
+        }
+
+        dom::NodePtr myTextureUnitNode = myMaterialBuilder.createTextureUnitNode(myTextureId,
+                myApplyMode, myUsage, myUVMappingMode, Matrix4f::Identity(), mySpriteFlag,
+                myRanking, myIsFallback, myFallbackRanking);
 
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
@@ -798,8 +819,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createUnlitTexturedMaterial(ScenePtr theScene, const std::string & theTextureFilename,
-                                const std::string & theName, bool theTransparencyFlag, bool theSpriteFlag,
-                                unsigned theDepth, const Vector4f & theColor)
+            const std::string & theName, bool theTransparencyFlag, bool theSpriteFlag,
+            unsigned theDepth, const Vector4f & theColor)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -809,7 +830,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         if ( ! theTextureFilename.empty()) {
             appendTexture( theScene, myMaterialBuilder,
-                           theTextureFilename, theSpriteFlag, theDepth);
+                    theTextureFilename, theSpriteFlag, theDepth);
         }
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
@@ -817,9 +838,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createLambertMaterial(ScenePtr theScene,
-                        const asl::Vector4f & theDiffuseColor,
-                        const asl::Vector4f & theAmbientColor,
-                        const std::string & theName)
+            const asl::Vector4f & theDiffuseColor,
+            const asl::Vector4f & theAmbientColor,
+            const std::string & theName)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -837,9 +858,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     dom::NodePtr
     createColorMaterial(ScenePtr theScene,
-                        const asl::Vector4f & theColor,
-                        const std::string & theName,
-                        bool theTransparencyFlag)
+            const asl::Vector4f & theColor,
+            const std::string & theName,
+            bool theTransparencyFlag)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -856,9 +877,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
     void
     smoothQuadNormals(const VectorOfUnsignedInt & theNormalIndices,
-                      const VectorOfUnsignedInt & thePositionIndices,
-                      VectorOfVector3f & theNormals,
-                      const VectorOfVector3f & thePositions)
+            const VectorOfUnsignedInt & thePositionIndices,
+            VectorOfVector3f & theNormals,
+            const VectorOfVector3f & thePositions)
     {
         for (unsigned i = 0;i < theNormalIndices.size(); i+=4) {
             const Vector3f & A = thePositions[thePositionIndices[i]];
@@ -871,13 +892,14 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             theNormals[theNormalIndices[i+3]] += calcNormal(C,D,A);
         }
     }
+
     void
     smoothNormals(dom::NodePtr theShape) {
         dom::NodePtr myVertexDataList = theShape->childNode(VERTEX_DATA_NAME);
         dom::NodePtr myPositionsNode = myVertexDataList->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME,
-               NAME_ATTRIB, POSITION_ROLE);
+                NAME_ATTRIB, POSITION_ROLE);
         dom::NodePtr myNormalsNode = myVertexDataList->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME,
-               NAME_ATTRIB, NORMAL_ROLE);
+                NAME_ATTRIB, NORMAL_ROLE);
 
         // get the positions and normals
         const VectorOfVector3f & myPositions = myPositionsNode->firstChild()->nodeValueAs<VectorOfVector3f>();
@@ -920,7 +942,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                     break;
                 default:
                     throw asl::Exception(std::string("TODO: smoothNormals - support more primitive types:") +
-                        asl::as_string(*theShape), PLUS_FILE_LINE);
+                            asl::as_string(*theShape), PLUS_FILE_LINE);
             }
         }
         // clean the normals, dirty the shape
@@ -929,226 +951,225 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         }
     }
 
-enum CornerNames {
-    LTF, RBF, RTF, LBF,
-    LTBK, RBBK, RTBK, LBBK,
-    MAX_CORNER
-};
+    enum CornerNames {
+        LTF, RBF, RTF, LBF,
+        LTBK, RBBK, RTBK, LBBK,
+        MAX_CORNER
+    };
 
-void
-intersectBoxWithPlane(const asl::Point3f * theCorners, const asl::Planef & thePlane,
-                      std::vector<Point3f> & theIntersections, float theEpsilon)
-{
-    asl::Point3f myIntersection;
+    void
+    intersectBoxWithPlane(const asl::Point3f * theCorners, const asl::Planef & thePlane,
+            std::vector<Point3f> & theIntersections, float theEpsilon)
+    {
+        asl::Point3f myIntersection;
 
-    if (intersection( LineSegment<float>(theCorners[LTF], theCorners[RTF]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RBF]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RBF], theCorners[LBF]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LTF]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[LTBK], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RTBK], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RBBK], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[LBBK], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-
-    if (intersection( LineSegment<float>(theCorners[LTF], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-    if (intersection( LineSegment<float>(theCorners[RBF], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
-        theIntersections.push_back(myIntersection);
-    }
-
-}
-
-Point3f
-averageVertices( const std::vector<Point3f> & thePoints ) {
-    Point3f mySum(0.0, 0.0, 0.0);
-    for (unsigned i = 0; i < thePoints.size(); ++i) {
-        mySum += asVector(thePoints[i]);
-    }
-    return mySum / float(thePoints.size());
-}
-
-float
-pseudoAngle(const Point3f & p1, const Point3f & p2) {
-    float myDX = p2[0] - p1[0];
-    float myDY = p2[1] - p1[1];
-    if (myDX == 0.0 && myDY == 0.0) {
-        return -1.0; 
-    } else {
-        float myT = myDY / (fabs( myDX) + fabs(myDY));
-        if (myDX < 0.0) {
-            myT = 2.0f - myT;
-        } else if (myDY < 0.0) {
-            myT += 4.0f;
+        if (intersection( LineSegment<float>(theCorners[LTF], theCorners[RTF]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
         }
-        return myT;
-    }
-}
 
-class PseudoAngle {
-    public:
-        PseudoAngle(const Point3f & theCenter) :
-            _myCenter(theCenter) {};
-
-        bool operator()(const Point3f & p1, const Point3f & p2) {
-            return pseudoAngle(_myCenter, p1) < pseudoAngle(_myCenter, p2);
+        if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RBF]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
         }
-    private:
-        Point3f _myCenter;
-};
 
-Vector3f
-calcUV(const Point3f & myPosition,
-       const Box3f & theVoxelBox,
-       const asl::Matrix4f & theInverseModelView)
-{
-    Point3f myModelPosition = myPosition * theInverseModelView;
-    return quotient((asVector(myModelPosition) - asVector(theVoxelBox[Box3f::MIN])), theVoxelBox.getSize());
-}
+        if (intersection( LineSegment<float>(theCorners[RBF], theCorners[LBF]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
 
-dom::NodePtr
-createVoxelProxyGeometry(ScenePtr theScene, const asl::Box3f & theVoxelBox,
-                         const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
-                         const Vector3i & theVolumeSize, float theSampleRate,
-                         const std::string & theMaterialId, const std::string & theName)
-{
-    Point3f myCorners[MAX_CORNER];
+        if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LTF]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
 
-    theVoxelBox.getCorners(myCorners[LTF], myCorners[RBF], myCorners[RTF], myCorners[LBF],
-                           myCorners[LTBK], myCorners[RBBK], myCorners[RTBK], myCorners[LBBK]);
+        if (intersection( LineSegment<float>(theCorners[LTBK], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
 
-    Matrix4f myViewMatrix = theCameraMatrix;
-    myViewMatrix.invert();
-    Matrix4f myModelViewMatrix = theModelMatrix;
-    myModelViewMatrix.postMultiply(myViewMatrix);
+        if (intersection( LineSegment<float>(theCorners[RTBK], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
 
-    for (unsigned i = 0; i < MAX_CORNER; ++i) {
-        myCorners[i]  = myCorners[i] * myModelViewMatrix;
+        if (intersection( LineSegment<float>(theCorners[RBBK], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
+        if (intersection( LineSegment<float>(theCorners[LBBK], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
+
+        if (intersection( LineSegment<float>(theCorners[LTF], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
+        if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
+        if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
+        if (intersection( LineSegment<float>(theCorners[RBF], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
+            theIntersections.push_back(myIntersection);
+        }
+
     }
 
-    // find min and max in view direction
-    float myMaxZ = - numeric_limits<float>::max();
-    float myMinZ = numeric_limits<float>::max();
-    for (unsigned i = 0; i < MAX_CORNER; ++i) {
-        if (myCorners[i][2] < myMinZ) {
-            myMinZ = myCorners[i][2];
+    Point3f
+    averageVertices( const std::vector<Point3f> & thePoints ) {
+        Point3f mySum(0.0, 0.0, 0.0);
+        for (unsigned i = 0; i < thePoints.size(); ++i) {
+            mySum += asVector(thePoints[i]);
         }
-        if (myCorners[i][2] > myMaxZ) {
-            myMaxZ = myCorners[i][2];
-        }
+        return mySum / float(thePoints.size());
     }
-    ShapeBuilder myShape(theName);
-    ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
 
-    theScene->getSceneBuilder()->appendShape( myShape );
-    myShape.appendElements( myElementBuilder );
-
-    dom::NodePtr myVertexNode = myShape.createVertexDataBin<Vector3f>(POSITION_ROLE);
-    vector<Vector3f> * myVertices = myVertexNode->nodeValuePtrOpen<vector<Vector3f> >();
-
-    dom::NodePtr myUVNode = myShape.createVertexDataBin<asl::Vector3f>("uvset");
-    vector<Vector3f> * myUVSet = myUVNode->nodeValuePtrOpen<vector<Vector3f> >();
-
-    dom::NodePtr myIndexNode = myElementBuilder.createIndex(POSITION_ROLE, POSITIONS);
-    vector<unsigned> * myIndices = myIndexNode->nodeValuePtrOpen<vector<unsigned int> >();
-
-    float mySampleDistance =  (myMaxZ - myMinZ) * theSampleRate; // XXX TODO: non-cubic voxels
-    unsigned myVertexCount = 0;
-    float myEpsilon = 1e-6f;
-
-    Matrix4f myInverseModelView = myModelViewMatrix;
-    myInverseModelView.invert();
-
-    float myZ = myMinZ;
-    while (myZ < myMaxZ || almostEqual(myZ, myMaxZ)) {
-        asl::Planef myPlane(Vector3f(0.0, 0.0, 1.0), -myZ);
-        std::vector<Point3f> myIntersections;        
-        intersectBoxWithPlane(myCorners, myPlane, myIntersections, myEpsilon);
-        if ( ! myIntersections.empty()) {
-
-            Point3f myCenter = averageVertices( myIntersections );
-            int myNumIntersections = myIntersections.size();
-
-            // sort vertices in CCW order
-            std::sort(myIntersections.begin(), myIntersections.end(), PseudoAngle(myCenter) );
-
-            myVertices->push_back(product(myCenter, myInverseModelView));
-
-            myUVSet->push_back(calcUV(myCenter, theVoxelBox, myInverseModelView));
-            myVertexCount++;
-
-            for (unsigned j = 0; j < myNumIntersections; ++j) {
-                myVertices->push_back(product(myIntersections[j], myInverseModelView));
-
-                myUVSet->push_back(calcUV(myIntersections[j], theVoxelBox, myInverseModelView));
-                myIndices->push_back(myVertexCount-1);
-                myIndices->push_back(myVertexCount+j);
-                myIndices->push_back(myVertexCount + ( (j+1) % myIntersections.size() ));
+    float
+    pseudoAngle(const Point3f & p1, const Point3f & p2) {
+        float myDX = p2[0] - p1[0];
+        float myDY = p2[1] - p1[1];
+        if (myDX == 0.0 && myDY == 0.0) {
+            return -1.0; 
+        } else {
+            float myT = myDY / (fabs( myDX) + fabs(myDY));
+            if (myDX < 0.0) {
+                myT = 2.0f - myT;
+            } else if (myDY < 0.0) {
+                myT += 4.0f;
             }
-            myVertexCount += myIntersections.size();
+            return myT;
+        }
+    }
+
+    class PseudoAngle {
+        public:
+            PseudoAngle(const Point3f & theCenter) :
+                _myCenter(theCenter) {};
+
+            bool operator()(const Point3f & p1, const Point3f & p2) {
+                return pseudoAngle(_myCenter, p1) < pseudoAngle(_myCenter, p2);
+            }
+        private:
+            Point3f _myCenter;
+    };
+
+    Vector3f
+    calcUV(const Point3f & myPosition,
+            const Box3f & theVoxelBox,
+            const asl::Matrix4f & theInverseModelView)
+    {
+        Point3f myModelPosition = myPosition * theInverseModelView;
+        return quotient((asVector(myModelPosition) - asVector(theVoxelBox[Box3f::MIN])), theVoxelBox.getSize());
+    }
+
+    dom::NodePtr
+    createVoxelProxyGeometry(ScenePtr theScene, const asl::Box3f & theVoxelBox,
+            const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
+            const Vector3i & theVolumeSize, float theSampleRate,
+            const std::string & theMaterialId, const std::string & theName)
+    {
+        Point3f myCorners[MAX_CORNER];
+
+        theVoxelBox.getCorners(myCorners[LTF], myCorners[RBF], myCorners[RTF], myCorners[LBF],
+                myCorners[LTBK], myCorners[RBBK], myCorners[RTBK], myCorners[LBBK]);
+
+        Matrix4f myViewMatrix = theCameraMatrix;
+        myViewMatrix.invert();
+        Matrix4f myModelViewMatrix = theModelMatrix;
+        myModelViewMatrix.postMultiply(myViewMatrix);
+
+        for (unsigned i = 0; i < MAX_CORNER; ++i) {
+            myCorners[i]  = myCorners[i] * myModelViewMatrix;
         }
 
-        // XXX non cubic voxels ....
-        myZ += (myMaxZ - myMinZ) / (theVolumeSize[0] * theSampleRate);
+        // find min and max in view direction
+        float myMaxZ = - numeric_limits<float>::max();
+        float myMinZ = numeric_limits<float>::max();
+        for (unsigned i = 0; i < MAX_CORNER; ++i) {
+            if (myCorners[i][2] < myMinZ) {
+                myMinZ = myCorners[i][2];
+            }
+            if (myCorners[i][2] > myMaxZ) {
+                myMaxZ = myCorners[i][2];
+            }
+        }
+        ShapeBuilder myShape(theName);
+        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
+
+        theScene->getSceneBuilder()->appendShape( myShape );
+        myShape.appendElements( myElementBuilder );
+
+        dom::NodePtr myVertexNode = myShape.createVertexDataBin<Vector3f>(POSITION_ROLE);
+        vector<Vector3f> * myVertices = myVertexNode->nodeValuePtrOpen<vector<Vector3f> >();
+
+        dom::NodePtr myUVNode = myShape.createVertexDataBin<asl::Vector3f>("uvset");
+        vector<Vector3f> * myUVSet = myUVNode->nodeValuePtrOpen<vector<Vector3f> >();
+
+        dom::NodePtr myIndexNode = myElementBuilder.createIndex(POSITION_ROLE, POSITIONS);
+        vector<unsigned> * myIndices = myIndexNode->nodeValuePtrOpen<vector<unsigned int> >();
+
+        float mySampleDistance =  (myMaxZ - myMinZ) * theSampleRate; // XXX TODO: non-cubic voxels
+        unsigned myVertexCount = 0;
+        float myEpsilon = 1e-6f;
+
+        Matrix4f myInverseModelView = myModelViewMatrix;
+        myInverseModelView.invert();
+
+        float myZ = myMinZ;
+        while (myZ < myMaxZ || almostEqual(myZ, myMaxZ)) {
+            asl::Planef myPlane(Vector3f(0.0, 0.0, 1.0), -myZ);
+            std::vector<Point3f> myIntersections;        
+            intersectBoxWithPlane(myCorners, myPlane, myIntersections, myEpsilon);
+            if ( ! myIntersections.empty()) {
+
+                Point3f myCenter = averageVertices( myIntersections );
+                int myNumIntersections = myIntersections.size();
+
+                // sort vertices in CCW order
+                std::sort(myIntersections.begin(), myIntersections.end(), PseudoAngle(myCenter) );
+
+                myVertices->push_back(product(myCenter, myInverseModelView));
+
+                myUVSet->push_back(calcUV(myCenter, theVoxelBox, myInverseModelView));
+                myVertexCount++;
+
+                for (unsigned j = 0; j < myNumIntersections; ++j) {
+                    myVertices->push_back(product(myIntersections[j], myInverseModelView));
+
+                    myUVSet->push_back(calcUV(myIntersections[j], theVoxelBox, myInverseModelView));
+                    myIndices->push_back(myVertexCount-1);
+                    myIndices->push_back(myVertexCount+j);
+                    myIndices->push_back(myVertexCount + ( (j+1) % myIntersections.size() ));
+                }
+                myVertexCount += myIntersections.size();
+            }
+
+            // XXX non cubic voxels ....
+            myZ += (myMaxZ - myMinZ) / (theVolumeSize[0] * theSampleRate);
+        }
+        myElementBuilder.copyIndexBin(POSITIONS, getTextureRole(0), "uvset");
+
+        myVertexNode->nodeValuePtrClose<vector<Vector3f> >();
+        myVertexNode = dom::NodePtr(0);
+        myVertices = 0;
+
+        myUVNode->nodeValuePtrClose<vector<Vector3f> >();
+        myUVNode = dom::NodePtr(0);
+        myUVSet = 0;
+
+        myIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
+        myIndexNode = dom::NodePtr(0);
+        myIndices = 0;
+
+
+        return myShape.getNode();
     }
-    myElementBuilder.copyIndexBin(POSITIONS, getTextureRole(0), "uvset");
 
-    myVertexNode->nodeValuePtrClose<vector<Vector3f> >();
-    myVertexNode = dom::NodePtr(0);
-    myVertices = 0;
-
-    myUVNode->nodeValuePtrClose<vector<Vector3f> >();
-    myUVNode = dom::NodePtr(0);
-    myUVSet = 0;
-
-    myIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
-    myIndexNode = dom::NodePtr(0);
-    myIndices = 0;
-
-
-    return myShape.getNode();
-}
-
-dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
-                                        const VectorOfVector2f & theContours,
-                                        const std::string & theName,
-                                        float theEqualPointsThreshold) {
-    SimpleTesselator myTesselator;
-    return myTesselator.createSurface2DFromContour(theScene, theMaterialId, theContours, theName, theEqualPointsThreshold);
-}
-
-
+    dom::NodePtr
+    createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
+            const VectorOfVector2f & theContours,
+            const std::string & theName,
+            float theEqualPointsThreshold) {
+        SimpleTesselator myTesselator;
+        return myTesselator.createSurface2DFromContour(theScene, theMaterialId, theContours, theName, theEqualPointsThreshold);
+    }
 }

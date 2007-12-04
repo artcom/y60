@@ -85,7 +85,6 @@ namespace y60 {
             (*itSrc) = _myLookupTable[(*itSrc).get()];
         }
         
-        _myTargetImage->triggerUpload();
 	}
 }
 

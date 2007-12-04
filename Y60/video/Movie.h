@@ -46,6 +46,8 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1);
     DEFINE_ATTRIBUT_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25);
     DEFINE_ATTRIBUT_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1);
+    DEFINE_ATTRIBUT_TAG(FrameBlendingTag,bool,        MOVIE_FRAMEBLENDING_ATTRIB,false);
+    DEFINE_ATTRIBUT_TAG(FrameBlendFactorTag,double,   MOVIE_FRAMEBLENDFACTOR_ATTRIB,  1.0);	
     DEFINE_ATTRIBUT_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play");
     DEFINE_ATTRIBUT_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1);
     DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1);
@@ -74,10 +76,13 @@ namespace y60 {
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,
+		public FrameBlendFactorTag::Plug,
+		public FrameBlendingTag::Plug,
         public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
         public dom::DynamicAttributePlug<DecoderTag, Movie>
     {
         public:
+			enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1, MAX_BUFFER = 2};
 
             Movie(dom::Node & theNode);
             virtual ~Movie();
@@ -127,6 +132,11 @@ namespace y60 {
 
             bool getMovieTime(double & theTime) const;
             bool getDecoderName(std::string & theName) const;
+
+            /**
+             * @add another raster to movie.
+             */
+            dom::ResizeableRasterPtr addRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth);
         private:
             Movie();
 
@@ -141,7 +151,7 @@ namespace y60 {
             double decodeFrame(double theTime, unsigned theFrame);
 
             double getTimeFromFrame(unsigned theFrame) const;
-            unsigned getFrameFromTime(double theTime) const;
+            unsigned getFrameFromTime(double theTime);
             void loadFile(const std::string & theSourceFile);
             void loadStream(asl::Ptr<asl::ReadableStream> theSource,
                             const std::string theName);
@@ -158,6 +168,11 @@ namespace y60 {
             double                     _myLastCurrentTime;
             unsigned                   _myCurrentLoopCount;
             dom::ValuePtr _myStreamData;
+
+			// Framemodulation member
+			MovieFrameBuffer           _myNextUsedBuffer;
+            unsigned                   _myFirstBufferFrame;
+            unsigned                   _mySecondBufferFrame;
     };
 
     typedef asl::Ptr<Movie, dom::ThreadingModel> MoviePtr;

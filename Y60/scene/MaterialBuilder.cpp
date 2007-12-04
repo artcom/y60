@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -12,7 +12,9 @@
 #include "SceneBuilder.h"
 #include "ImageBuilder.h"
 #include "MovieBuilder.h"
-#include "Texture.h"
+#include "TextureBuilder.h"
+
+#include "TextureUnit.h"
 #include <y60/NodeNames.h>
 #include <y60/iostream_functions.h>
 #include <y60/property_functions.h>
@@ -33,19 +35,18 @@ using namespace std;
 using namespace asl;
 
 namespace y60 {
+
     MaterialBuilder::MaterialBuilder(const std::string & theName, bool theInlineTextureFlag)
         : BuilderBase(MATERIAL_NODE_NAME), _myInlineTextureFlag(theInlineTextureFlag),
           _myRequirementsAdded(false), _needTextureFallback(false)
     {
         dom::NodePtr myNode = getNode();
         myNode->appendAttribute(NAME_ATTRIB, theName);
-        //myNode->getFacade<Material>()->set<NameTag>(theName);
 
-        // Create all neccessary container nodes
+        // Create all necessary container nodes
         (*myNode)(PROPERTY_LIST_NAME);
-        (*myNode)(TEXTURE_LIST_NAME);
+        (*myNode)(TEXTUREUNIT_LIST_NAME);
         (*myNode)(REQUIRES_LIST_NAME);
-
     }
 
     MaterialBuilder::~MaterialBuilder() {
@@ -63,11 +64,27 @@ namespace y60 {
     }
 
     bool
-    MaterialBuilder::isBumpMap(int theTextureIndex) const {
+    MaterialBuilder::isBumpMap(unsigned theTextureIndex) const {
+        // no wonder bump mapping doesn't work... APPLYMODE compared against USAGE
         return (*getNode())(TEXTURE_LIST_NAME)(TEXTURE_NODE_NAME,theTextureIndex)
-            [TEXTURE_APPLYMODE_ATTRIB].nodeValue() == TEXTURE_USAGE_BUMP;
+            [TEXTUREUNIT_APPLYMODE_ATTRIB].nodeValue() == TEXTURE_USAGE_BUMP;
     }
 
+    bool
+    MaterialBuilder::isMovie(const std::string & theFileName) const {
+        const std::string myExtension = asl::getExtension(theFileName);
+
+        static const char * myMovieExtensions[] = {
+            "m60", "mpg", "m2v", "avi", "mov", "mpeg", "wmv", 0
+        };
+        for (unsigned int i = 0; myMovieExtensions[i]; ++i) {
+            if (myExtension == myMovieExtensions[i]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     void
     MaterialBuilder::needTextureFallback(bool needTextureFallback) {
@@ -148,38 +165,24 @@ namespace y60 {
     }
 
     dom::NodePtr
-    MaterialBuilder::createTextureNode(const std::string & theImageId,
-                                       const TextureApplyMode & theApplyMode,
-                                       const TextureUsage & theUsage,
-                                       const std::string & theMappingMode,
-                                       const asl::Matrix4f & theTextureMatrix,
-                                       float theRanking,
-                                       bool  isFallback,
-                                       float theFallbackRanking,
-                                       bool  theSpriteFlag)
+    MaterialBuilder::createTextureUnitNode(const std::string & theTextureId,
+            const TextureApplyMode & theApplyMode,
+            const TextureUsage & theUsage,
+            const std::string & theMappingMode,
+            const asl::Matrix4f & theMatrix,
+            bool theSpriteFlag, float theRanking,
+            bool isFallback, float theFallbackRanking)
     {
-        dom::NodePtr myTextureListNode = getNode()->childNode(TEXTURE_LIST_NAME);
+        dom::NodePtr myTextureUnitListNode = getNode()->childNode(TEXTUREUNIT_LIST_NAME);
+        dom::NodePtr myTextureUnitNode = dom::NodePtr(new dom::Element(TEXTUREUNIT_NODE_NAME));
+        myTextureUnitListNode->appendChild(myTextureUnitNode);
 
-        dom::NodePtr myTextureNode = dom::NodePtr(new dom::Element(TEXTURE_NODE_NAME));
-        myTextureListNode->appendChild(myTextureNode);
-#if 0
-        myTextureNode->appendAttribute(TEXTURE_IMAGE_ATTRIB, theImageId);
+        TextureUnitPtr myTexture = myTextureUnitNode->getFacade<TextureUnit>();
+        myTexture->set<TextureUnitTextureIdTag>(theTextureId);
+        myTexture->set<TextureUnitApplyModeTag>(theApplyMode);
+        myTexture->set<TextureUnitSpriteTag>(theSpriteFlag);
+        myTexture->set<TextureUnitMatrixTag>(theMatrix);
 
-        if (!theApplyMode.empty()) {
-            myTextureNode->appendAttribute(TEXTURE_APPLYMODE_ATTRIB, theApplyMode);
-        }
-
-        myTextureNode->appendAttribute(TEXTURE_WRAPMODE_ATTRIB, theWrapMode);
-        myTextureNode->appendAttribute(TEXTURE_SPRITE_ATTRIB, asl::as_string(theSpriteFlag));
-        myTextureNode->appendAttribute(TEXTURE_MATRIX_ATTRIB, theTextureMatrix);
-#else
-        //TODO: activate this when Texture is a Facade
-        TexturePtr myTexture = myTextureNode->getFacade<Texture>();
-        myTexture->set<TextureImageIdTag>(theImageId);
-        myTexture->set<TextureApplyModeTag>(theApplyMode);
-        myTexture->set<TextureSpriteTag>(theSpriteFlag);
-        myTexture->set<TextureMatrixTag>(theTextureMatrix);
-#endif
         if (_myTextureRequirements.empty()) {
             RankedFeature myFirstTextureSet;
             _myTextureRequirements.push_back(myFirstTextureSet);
@@ -187,6 +190,7 @@ namespace y60 {
             RankedFeature myFirstMappingSet;
             _myMappingRequirements.push_back(myFirstMappingSet);
         }
+
         if (isFallback) {
             if (_myTextureRequirements.size() == 1) {
                 RankedFeature myFirstTextureSet;
@@ -194,8 +198,8 @@ namespace y60 {
 
                 RankedFeature myFirstMappingSet;
                 _myMappingRequirements.push_back(myFirstMappingSet);
-
             }
+
             _myTextureRequirements[1]._myFeature.push_back(theUsage.asString());
             _myTextureRequirements[1]._myRanking = theFallbackRanking;
 
@@ -209,110 +213,141 @@ namespace y60 {
         _myMappingRequirements[0]._myFeature.push_back(theMappingMode);
         _myMappingRequirements[0]._myRanking = theRanking;
 
-        return myTextureNode;
+        return myTextureUnitNode;
     }
 
-    const std::string &
-    MaterialBuilder::createImage(SceneBuilder & theSceneBuilder,
-                                 const std::string & theName,
-                                 const std::string & theFileName,
-                                 const TextureUsage & theUsage,
-                                 bool  theCreateMipmapsFlag,
-                                 asl::Vector4f theColorScale,
-                                 asl::Vector4f theColorBias,
-                                 ImageType theType,
-                                 const TextureWrapMode & theWrapMode,
-                                 const std::string & theInternalFormat,
-                                 const std::string & theResizeMode,
-                                 unsigned theDepth,
-                                 bool allowSharing)
+    dom::NodePtr
+    MaterialBuilder::createTextureNode(SceneBuilder & theSceneBuilder,
+            const std::string & theName,
+            const std::string & theImageId,
+            const TextureWrapMode & theWrapMode,
+            bool  theCreateMipmapsFlag,
+            const asl::Matrix4f & theMatrix,
+            const std::string & theInternalFormat,
+            const asl::Vector4f & theColorScale,
+            const asl::Vector4f & theColorBias,
+            bool allowSharing)
+    {
+        AC_DEBUG << "MaterialBuilder::createTextureNode name=" << theName;
+
+        if (allowSharing) {
+            // share texture if attributes match
+            dom::NodePtr myTextures = theSceneBuilder.getNode()->childNode(TEXTURE_LIST_NAME);
+
+            std::vector<dom::NodePtr> myResults;
+            myTextures->getNodesByAttribute(TEXTURE_NODE_NAME, TEXTURE_IMAGE_ATTRIB, theImageId, true, myResults);
+            for (unsigned i = 0; i < myResults.size(); ++i) {
+
+                dom::NodePtr myTextureNode = myResults[i];
+                TexturePtr myTexture = myTextureNode->getFacade<Texture>();
+                if (myTexture->get<TextureWrapModeTag>() != theWrapMode) {
+                    continue;
+                }
+                if (myTexture->get<TextureMipmapTag>() != theCreateMipmapsFlag) {
+                    continue;
+                }
+                if (myTexture->get<TextureMatrixTag>() != theMatrix) {
+                    continue;
+                }
+                if (!almostEqual(myTexture->get<TextureColorScaleTag>(), theColorScale)) {
+                    continue;
+                }
+                if (!almostEqual(myTexture->get<TextureColorBiasTag>(), theColorBias)) {
+                    continue;
+                }
+                AC_DEBUG << "Sharing texture '" << myTexture->get<NameTag>() << "' id=" << myTexture->get<IdTag>();
+                return myTextureNode; 
+            }
+        }
+
+        TextureBuilder myTextureBuilder(theName, theImageId);
+        theSceneBuilder.appendTexture(myTextureBuilder);
+
+        // determine texture type from image parameters
+        dom::NodePtr myImageNode = myTextureBuilder.getNode()->getElementById(theImageId);
+        ImagePtr myImage = myImageNode->getFacade<Image>();
+        TextureType myType = TEXTURE_2D;
+        if (myImage->get<ImageDepthTag>() > 1) {
+            myType = TEXTURE_3D;
+        } else {
+            asl::Vector2i myTiles = myImage->get<ImageTileTag>();
+            unsigned myNumTiles = myTiles[0] * myTiles[1];
+            if (myNumTiles == 6) {
+                myType = TEXTURE_CUBEMAP;
+            } else if (myNumTiles != 1) {
+                AC_ERROR << "Number of texture tiles is not six (cubemap) and not one (texture_2D), assuming texture_2D";
+            }
+        }
+
+        myTextureBuilder.setType(myType);
+        myTextureBuilder.setMipmapFlag(theCreateMipmapsFlag);
+        myTextureBuilder.setWrapMode(theWrapMode);
+        myTextureBuilder.setColorScale(theColorScale);
+        myTextureBuilder.setColorBias(theColorBias);
+        myTextureBuilder.setMatrix(theMatrix);
+
+        return myTextureBuilder.getNode();
+    }
+
+    dom::NodePtr
+    MaterialBuilder::createImageNode(SceneBuilder & theSceneBuilder,
+            const std::string & theName, const std::string & theFileName,
+            const TextureUsage & theUsage,
+            ImageType theType,
+            const std::string & theResizeMode,
+            unsigned theDepth,
+            bool allowSharing)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");
 
-        float myAlpha = theColorScale[3];
-
+        //TODO: consider also depth when looking for image; however, there is no use case for
+        // using the same image as 3D-Texture with different depth values
         if (allowSharing) {
-            //TODO: consider also depth when looking for image; however, there is no use case for
-            // using the same image as 3D-Texture with different depth values
-            
-            dom::NodePtr myImage = theSceneBuilder.findImageByFilename_ColorScale_ColorBias(myFileName,
-                                                                                            theColorScale,
-                                                                                            theColorBias);
-            if(myImage)
-                return myImage->getAttributeString(ID_ATTRIB);
+            dom::NodePtr myImage = theSceneBuilder.findImageByFilename(myFileName);
+            if (myImage) {
+                return myImage;
+            }
         }
 
-        ImageBuilder myImageBuilder(theName, theCreateMipmapsFlag);
+        ImageBuilder myImageBuilder(theName);
         const string & myId = theSceneBuilder.appendImage(myImageBuilder);
-        
-        myImageBuilder.setColorScale(theColorScale);
-        myImageBuilder.setColorBias(theColorBias);
         myImageBuilder.setType(theType);
         myImageBuilder.setDepth(theDepth);
-        myImageBuilder.setWrapMode(theWrapMode);
-        
+
         if (theType == CUBEMAP) {
             myImageBuilder.setTiling(Vector2i(1,6));
         }
 
         ImageFilter myFilter = lookupFilter(theUsage);
-        
         if (_myInlineTextureFlag || myFilter != NO_FILTER) {
             myImageBuilder.inlineImage(myFileName, myFilter, theResizeMode);
         } else {
             myImageBuilder.createFileReference(myFileName, theResizeMode);
         }
-        myImageBuilder.setInternalFormat(theInternalFormat);
-        
-        return myId;
+
+        return myImageBuilder.getNode();
     }
 
 
-    const std::string &
-    MaterialBuilder::createMovie(SceneBuilder & theSceneBuilder,
-                                 const std::string & theName,
-                                 const std::string & theFileName,
-                                 unsigned theLoopCount,
-                                 const asl::Vector4f theColorScale,
-                                 const asl::Vector4f theColorBias,
-                                 const std::string & theInternalFormat)
+    dom::NodePtr
+    MaterialBuilder::createMovieNode(SceneBuilder & theSceneBuilder, const std::string & theName,
+            const std::string & theFileName,
+            unsigned theLoopCount)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");
 
         dom::NodePtr myMovie = theSceneBuilder.findMovieByFilename(myFileName);
-
         if (myMovie) {
-            return myMovie->getAttributeString(ID_ATTRIB);
-        } else {
-            MovieBuilder myMovieBuilder(theName, myFileName);
-            const string & myId = theSceneBuilder.appendMovie(myMovieBuilder);
-            myMovieBuilder.setLoopCount(theLoopCount);
-            myMovieBuilder.setColorScale(theColorScale);
-            myMovieBuilder.setColorBias(theColorBias);
-            myMovieBuilder.setInternalFormat(theInternalFormat);
-            return myId;
-        }
-    }
-
-    bool
-    MaterialBuilder::isMovie(const std::string & theFileName) {
-        const std::string myExtension = asl::getExtension(theFileName);
-        const char * myMovieExtensions[] = {
-            "m60", "mpg", "m2v", "avi", "mov", "mpeg", "wmv", 0
-        };
-        for (unsigned int i = 0; true; ++i) {
-            if (myMovieExtensions[i]) {
-                if (myExtension == myMovieExtensions[i]) {
-                    return true;
-                }
-            } else {
-                break;
-            }
+            return myMovie;
         }
 
-        return false;
+        MovieBuilder myMovieBuilder(theName, myFileName);
+        const string & myId = theSceneBuilder.appendMovie(myMovieBuilder);
+        myMovieBuilder.setLoopCount(theLoopCount);
+
+        return myMovieBuilder.getNode();
     }
 
     void
@@ -325,21 +360,16 @@ namespace y60 {
                                    const std::string & theLeftFileName,
                                    const std::string & theTopFileName,
                                    const std::string & theBottomFileName,
-                                   const TextureApplyMode & theApplyMode,
-                                   const asl::Vector4f theColorScale)
+                                   const TextureApplyMode & theApplyMode)
     {
         checkState();
         string myFileName = theFrontFileName + "|" + theRightFileName + "|"
             + theBackFileName + "|" + theLeftFileName + "|"
             + theTopFileName + "|" + theBottomFileName;
 
-        const string & myId = createImage(theSceneBuilder, theName, myFileName,
-                theUsage, false,
-                theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f),
-                CUBEMAP, CLAMP, "");
-        createTextureNode(myId, theApplyMode, theUsage,
-                TEXCOORD_REFLECTIVE,
-                Matrix4f::Identity(), 10.0f, false, 0.0f, false);
+        dom::NodePtr myImageNode = createImageNode(theSceneBuilder, theName, myFileName, theUsage, CUBEMAP);
+        dom::NodePtr myTextureNode = createTextureNode(theSceneBuilder, theName, myImageNode->getAttributeString(ID_ATTRIB), TextureWrapMode(CLAMP), false, Matrix4f::Identity());
+        createTextureUnitNode(myTextureNode->getAttributeString(ID_ATTRIB), theApplyMode, theUsage, TEXCOORD_REFLECTIVE, Matrix4f::Identity());
     }
 
     void

@@ -24,5 +24,6 @@ IMPLEMENT_ENUM(y60::TextureApplyMode, y60::TextureApplyModeStrings);
 IMPLEMENT_ENUM(y60::TextureSampleFilter, y60::TextureSampleFilterStrings);
 IMPLEMENT_ENUM(y60::TextureWrapMode, y60::TextureWrapModeStrings);
 IMPLEMENT_ENUM(y60::TextureUsage, y60::TextureUsageStrings);
-IMPLEMENT_ENUM(y60::ImageType, y60::ImageTypeStrings);
+IMPLEMENT_ENUM(y60::TextureType, y60::TextureTypeStrings);
 
+IMPLEMENT_ENUM(y60::ImageType, y60::ImageTypeStrings);

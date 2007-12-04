@@ -578,19 +578,55 @@ CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreateTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an image inside the scene");
+    DOC_PARAM("theScene", "Scene where the texture is appended", DOC_TYPE_SCENE);    
+    DOC_PARAM_OPT("theImage", "Image node", DOC_TYPE_NODE, "");
+    DOC_RVAL("Texture node", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1,2);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        dom::NodePtr myImageNode;
+        if (argc == 2) {
+            if (!convertFrom(cx, argv[1], myImageNode)) {
+                JS_ReportError(cx, "JSScene::createTexture(): argument #2 must be a Node (Image node)");
+                return JS_FALSE;
+            }
+        }
+
+        dom::NodePtr myResult = myScene->getTexturesRoot()->appendChild(
+            dom::NodePtr(new dom::Element("texture")));
+
+        if (myImageNode) {
+            y60::ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+            y60::TexturePtr myTexture = myResult->getFacade<y60::Texture>();
+            myTexture->set<TextureImageIdTag>(myImage->get<IdTag>());
+            myTexture->set<NameTag>(myImage->get<NameTag>());
+        }
+
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an image inside the scene");
-    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
-    DOC_PARAM("theImageSource", "Path to image file", DOC_TYPE_NODE);
+    DOC_PARAM("theScene", "Scene where the image is created", DOC_TYPE_SCENE);    
+    DOC_PARAM("theFilename", "Path to image file", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
+    DOC_PARAM("theScene", "Scene where the image is created", DOC_TYPE_SCENE);    
     DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "Image height", DOC_TYPE_INTEGER);
     DOC_PARAM("thePixelEncoding", "Pixel encoding", DOC_TYPE_STRING);
-    DOC_RVAL("The new image", DOC_TYPE_NODE)
+    DOC_RVAL("Image node", DOC_TYPE_NODE)
     DOC_END;
     try {
-
         ensureParamCount(argc, 2, 4);
 
         y60::ScenePtr myScene(0);
@@ -606,6 +642,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             dom::NodePtr myResult = myScene->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
+            myResult->appendAttribute(ID_ATTRIB, IdTag::getDefault());
             *rval = as_jsval(cx, myResult);
         } else if (argc ==4) {
             unsigned myWidth;
@@ -624,9 +661,11 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
                 return JS_FALSE;
             }
             myPixelEncoding = asl::toUpperCase(myPixelEncoding);
+
             dom::NodePtr myResult = myScene->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
+
             myImage->createRaster(myWidth, myHeight, 1,
                 PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
             memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
@@ -1150,6 +1189,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createQuadStrip",             CreateQuadStrip,             4},
         {"createTriangleStrip",         CreateTriangleStrip,         4},
         {"createQuadStack",             CreateQuadStack,             5},
+        {"createTexture",               CreateTexture,               2},
         {"createImage",                 CreateImage,                 4},
         {"createLambertMaterial",       CreateLambertMaterial,       3},
         {"createColorMaterial",         CreateColorMaterial,         3},

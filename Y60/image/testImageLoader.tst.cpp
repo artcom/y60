@@ -55,7 +55,7 @@ class ImageLoaderTest : public UnitTest {
             ENSURE(myReferenceBmp == myAdapter);
 
             ImageLoader my3DAdapter("../../testfiles/test3dtexture.jpg", PackageManagerPtr(0), ITextureManagerPtr(0), 8);
-            my3DAdapter.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, SINGLE, 8);
+            my3DAdapter.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, 8);
             SUCCESS("Loaded 3D-Texture image");
         }
 };

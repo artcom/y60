@@ -1,24 +1,12 @@
-/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+//=============================================================================
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//   $RCSfile: Facades.h,v $
-//
-//   $Revision: 1.20 $
-//
-//   Description:
-//
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-*/
+//=============================================================================
 
 #ifndef _scene_Facades_h_
 #define _scene_Facades_h_
@@ -37,8 +25,9 @@
 #include "IncludeFacade.h"
 #include "Geometry.h"
 #include "Scene.h"
-
+#include "TextureUnit.h"
 #include "Texture.h"
+
 #include <y60/Image.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
@@ -153,10 +142,11 @@ namespace y60 {
         theFactory->registerPrototype(CANVAS_NODE_NAME, dom::FacadePtr(new Canvas(dom::Node::Prototype)));
         theFactory->registerPrototype(VIEWPORT_NODE_NAME, dom::FacadePtr(new Viewport(dom::Node::Prototype)));
         theFactory->registerPrototype(OVERLAY_NODE_NAME, dom::FacadePtr(new Overlay(dom::Node::Prototype)));
-        theFactory->registerPrototype(TEXTURE_NODE_NAME, dom::FacadePtr(new Texture(dom::Node::Prototype)));
         theFactory->registerPrototype(IMAGE_NODE_NAME, dom::FacadePtr(new Image(dom::Node::Prototype)));
         theFactory->registerPrototype(MOVIE_NODE_NAME, dom::FacadePtr(new Movie(dom::Node::Prototype)));
         theFactory->registerPrototype(CAPTURE_NODE_NAME, dom::FacadePtr(new Capture(dom::Node::Prototype)));
+        theFactory->registerPrototype(TEXTURE_NODE_NAME, dom::FacadePtr(new Texture(dom::Node::Prototype)));
+        theFactory->registerPrototype(TEXTUREUNIT_NODE_NAME, dom::FacadePtr(new TextureUnit(dom::Node::Prototype)));
         theFactory->registerPrototype(SHAPE_NODE_NAME, dom::FacadePtr(new Shape(dom::Node::Prototype)));
         theFactory->registerPrototype(INCLUDE_NODE_NAME, dom::FacadePtr(new IncludeFacade(dom::Node::Prototype)));
         theFactory->registerPrototype(MATERIAL_NODE_NAME, dom::FacadePtr(new MaterialBase(dom::Node::Prototype)));

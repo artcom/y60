@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,105 +7,398 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Texture.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.25 $
-//   $Date: 2005/04/24 00:41:21 $
-//
-//
-//=============================================================================
-#include "Texture.h"
-#include "TextureManager.h"
 
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
+#include "Texture.h"
+
+#include <y60/IScene.h>
+#include <dom/Field.h>
+
 
 using namespace asl;
+using namespace std;
+
+#undef DB
+#define DB(x) // x
 
 namespace y60 {
 
+    DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
+
     Texture::Texture(dom::Node & theNode) :
         Facade(theNode),
+        IdTag::Plug(theNode),
+        NameTag::Plug(theNode),
         TextureImageIdTag::Plug(theNode),
-        TextureProjectorIdTag::Plug(theNode),
-        TextureApplyModeTag::Plug(theNode),
-        TextureSpriteTag::Plug(theNode),
-		TextureMatrixTag::Plug(theNode),
-        ResizePolicyTag::Plug( theNode ),
-        dom::FacadeAttributePlug<TextureImageTag>(this)
+        TexturePixelFormatTag::Plug(theNode),
+        TextureTypeTag::Plug(theNode),
+        TextureMipmapTag::Plug(theNode),
+        TextureAnisotropyTag::Plug(theNode),
+        TextureMatrixTag::Plug(theNode),
+        TextureColorScaleTag::Plug(theNode),
+        TextureColorBiasTag::Plug(theNode),
+        TextureWrapModeTag::Plug(theNode),
+        TextureMinFilterTag::Plug(theNode),
+        TextureMagFilterTag::Plug(theNode),
+		TextureImageIndexTag::Plug(theNode),
+        dom::FacadeAttributePlug<TextureIdTag>(this),
+        dom::FacadeAttributePlug<TextureInternalFormatTag>(this),
+        dom::FacadeAttributePlug<TextureWidthTag>(this),
+        dom::FacadeAttributePlug<TextureHeightTag>(this),
+        dom::FacadeAttributePlug<TextureDepthTag>(this),
+        dom::FacadeAttributePlug<TextureImageTag>(this),
+        dom::FacadeAttributePlug<TextureParamChangedTag>(this),
+        _myResourceManager(0),
+        _myRefCount(0),
+        _myTextureId(0), 
+        _myPixelBufferId(0),
+        _myImageNodeVersion(0)
     {
+        AC_DEBUG << "Texture::Texture " << (void*) this;
     }
 
     Texture::~Texture() {
-        AC_TRACE << "Texture destructor";
-        ImagePtr myImage = getImage();
-        if (myImage) {
-            myImage->deregisterTexture();
+        AC_DEBUG << "Texture::~Texture " << (void*) this;
+        if (_myResourceManager) {
+            _myResourceManager->unbindTexture(this);
+            unbind();
         }
     }
 
     void
     Texture::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
-        TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
-    }
-    void
-    Texture::registerDependenciesForImageTag() {        
-        TextureImageTag::Plug::dependsOn<TextureImageIdTag>(*this);  
-        TexturePtr mySelf = dynamic_cast_Ptr<Texture>(getSelf());
-        TextureImageTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &Texture::update);
-        /*if (getNode() && getNode().hasFacade() && _myImage) {
-            dom::FacadeAttributePlug<TextureIdTag>::dependsOn<ImageColorBiasTag>(*getImage());  
-            Image::TextureIdTag::Plug::dependsOn<ImageColorScaleTag>(*getImage());  
-            TexturePtr mySelf = dynamic_cast_Ptr<Texture>(getSelf());
-            Image::TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &Texture::invalidateTexture);
 
-        }*/
+        TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
+        TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
+        TextureParamChangedTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureParamChanged);
+        TextureInternalFormatTag::Plug::setReconnectFunction(&Texture::registerDependenciesForInternalFormatUpdate);
+
+        TextureWidthTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureWidthUpdate);
+        TextureHeightTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureHeightUpdate);
+        TextureTypeTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureTypeUpdate);
+    }
+
+    void
+    Texture::registerDependenciesForImageTag() {
+        if (getNode()) {
+            TextureImageTag::Plug::dependsOn<TextureImageIdTag>(*this);
+            TextureImageTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateImageTag);
+        }
+    }
+
+    void
+    Texture::registerDependenciesForTextureUpdate() {
+        if (getNode()) {
+            TextureIdTag::Plug::dependsOn<TextureImageTag>(*this);  
+            TextureIdTag::Plug::dependsOn<TextureColorBiasTag>(*this);  
+            TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this); 
+            TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
+            TextureIdTag::Plug::dependsOn<TextureInternalFormatTag>(*this);
+            /*TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);*/
+        }
+    }
+
+    void
+    Texture::registerDependenciesForTextureWidthUpdate() {        
+        //AC_DEBUG << "Texture::registerDependenciesForTextureWidthUpdate";
+        if (getNode()) {
+            TextureWidthTag::Plug::dependsOn<TextureImageTag>(*this);  
+            /*TextureWidthTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateWidth);*/
+        }
+    }
+
+    void
+    Texture::registerDependenciesForTextureHeightUpdate() {        
+        //AC_DEBUG << "Texture::registerDependenciesForTextureHeightUpdate";
+        if (getNode()) {
+            TextureHeightTag::Plug::dependsOn<TextureImageTag>(*this);  
+            /*TextureHeightTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateHeight);*/
+        }
+    }
+
+    void
+    Texture::registerDependenciesForTextureTypeUpdate() {
+        //AC_DEBUG << "Texture::registerDependenciesForTextureTypeUpdate";
+        if (getNode()) {
+            TextureTypeTag::Plug::dependsOn<TextureImageTag>(*this);
+            TextureTypeTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateTextureType);
+        }
+    }
+
+    void
+    Texture::registerDependenciesForTextureParamChanged() {
+        //AC_DEBUG << "Texture::registerDependenciesForTextureParamChanged";
+        if (getNode()) {
+            TextureParamChangedTag::Plug::dependsOn<TextureAnisotropyTag>(*this);
+            TextureParamChangedTag::Plug::dependsOn<TextureWrapModeTag>(*this);
+            TextureParamChangedTag::Plug::dependsOn<TextureMinFilterTag>(*this);
+            TextureParamChangedTag::Plug::dependsOn<TextureMagFilterTag>(*this);
+            /*TextureParamChangedTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTextureParams);*/
+        }
+    }
+
+    void
+    Texture::registerDependenciesForInternalFormatUpdate() {
+        //AC_DEBUG << "Texture::registerDependenciesForInternalFormatUpdate";
+        if (getNode()) {
+            TextureInternalFormatTag::Plug::dependsOn<TextureImageTag>(*this);
+            TextureInternalFormatTag::Plug::dependsOn(getImageFacade().getRasterValue());
+            TextureInternalFormatTag::Plug::dependsOn<ImageSourceTag>(getImageFacade());
+            TextureInternalFormatTag::Plug::dependsOn<TextureColorBiasTag>(*this);
+            TextureInternalFormatTag::Plug::dependsOn<TextureColorScaleTag>(*this);
+            TextureInternalFormatTag::Plug::dependsOn<TexturePixelFormatTag>(*this);
+            TextureInternalFormatTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateInternalFormat);
+        }
+    }
+
+    void
+    Texture::ensureResourceManager() {
+        if (!_myResourceManager && getNode()) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            _myResourceManager = myScene->getResourceManager();
+        }
+    }
+
+    void
+    Texture::calculateWidth() {
+        ImagePtr myImage = getImage();
+        if (myImage) {
+            //AC_DEBUG << "Texture::calculateWidth '" << get<NameTag>() << "' width=" << myImage->get<ImageWidthTag>();
+            set<TextureWidthTag>(myImage->get<ImageWidthTag>());
+        }
+    }
+
+    void
+    Texture::calculateHeight() {
+        ImagePtr myImage = getImage();
+        if (myImage) {
+            //AC_DEBUG << "Texture::calculateHeight '" << get<NameTag>() << "' height=" << myImage->get<ImageHeightTag>();
+            set<TextureHeightTag>(myImage->get<ImageHeightTag>());
+        }
+    }
+
+
+
+    void 
+    Texture::calculateInternalFormat() {
+        std::string myInternalFormat = get<TexturePixelFormatTag>();     
+        if (myInternalFormat.size()) {
+            // If there is an texture pixel format set from outside, we use it
+        } else {
+            ImagePtr myImage = getImage();
+            if (!myImage) {
+                AC_ERROR << "Unable to determine internal pixelformat since no image is"
+                         << " attached, texture '" << get<NameTag>() << "' id=" << get<IdTag>();
+                return;
+            }
+
+            PixelEncoding myRasterFormat = myImage->getRasterEncoding();
+            bool myAlphaChannelRequired = (get<TextureColorScaleTag>()[3] < 1.0f 
+                                           || get<TextureColorBiasTag>()[3] > 0.0f);
+
+            if (myAlphaChannelRequired 
+                && (myRasterFormat == y60::RGB || myRasterFormat == y60::BGR)) 
+            {
+                // If a change in colorscale introduces an alpha channel ensure
+                // that internal format has alpha
+                myInternalFormat = getStringFromEnum(TEXTURE_IFMT_RGBA8, 
+                                                     TextureInternalFormatStrings);
+            } else {
+                TextureInternalFormat myInternalPixelFormat = 
+                    getInternalPixelFormat(myRasterFormat);
+                myInternalFormat = getStringFromEnum(myInternalPixelFormat, 
+                                                     TextureInternalFormatStrings);
+            }
+        }
+        AC_DEBUG << "Texture::calculateInternalFormat '" << get<NameTag>() 
+                 << "' internalFormat=" << myInternalFormat;
+        set<TextureInternalFormatTag>(myInternalFormat);
+    }
+
+
+
+    void
+    Texture::calculateTextureType() {
+        ImagePtr myImage = getImage();
+        if (myImage) {
+            TextureType myType = TEXTURE_2D;
+            if (myImage->get<ImageDepthTag>() > 1) {
+                myType = TEXTURE_3D;
+            } else {
+                asl::Vector2i myTiles = myImage->get<ImageTileTag>();
+                unsigned myNumTiles = myTiles[0] * myTiles[1];
+                if (myNumTiles == 6) {
+                    myType = TEXTURE_CUBEMAP;
+                } else if (myNumTiles != 1) {
+                    AC_ERROR << "Number of texture tiles is not six (cubemap) and not one"
+                             << " (texture_2D), assuming texture_2D";
+                }
+            }
+            AC_DEBUG << "Texture::calculateTextureType '" << get<NameTag>() 
+                     << "' textureType=" << myType;
+            set<TextureTypeTag>(myType);
+        }
+    }
+
+
+    void
+    Texture::calculateImageTag() {
+        //AC_DEBUG << "Texture::calculateImageTag '" << get<NameTag>() << "'";
+        const std::string & myImageId = get<TextureImageIdTag>();
+        dom::NodePtr myImageNode = getNode().getElementById(myImageId);
+        if (!myImageNode) {
+            AC_ERROR << "Texture '" << get<NameTag>() << "' id=" << get<IdTag>() << " references invalid image id=" << myImageId;
+            return;
+        }
+        ImagePtr myImage = myImageNode->getFacade<Image>();
+        set<TextureImageTag>(ImageWeakPtr(myImage));
+    }
+
+    void
+    Texture::triggerUpload() {
+        AC_DEBUG << "Texture::triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>();
+        TextureIdTag::Plug::getValuePtr()->setDirty(); // force call to applyTexture()
+    }
+
+    unsigned 
+    Texture::applyTexture() {
+
+        ensureResourceManager();
+
+        //AC_DEBUG << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        bool myForceSubloadFlag = isDirty<TextureIdTag>();
+        ImagePtr myImage = getImage();
+        if (myImage && myImage->getNode().nodeVersion() != _myImageNodeVersion) {
+            if (myImage->get<ImageWidthTag>() != get<TextureWidthTag>() || myImage->get<ImageHeightTag>() != get<TextureHeightTag>()) {
+                // size has changed, force setup
+                _myResourceManager->unbindTexture(this);
+                _myTextureId = 0;
+            } else {
+                // something else has changed, force subload
+                myForceSubloadFlag = true;
+            }
+            _myImageNodeVersion = myImage->getNode().nodeVersion();
+        }
+
+        TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
+        if (_myTextureId == 0) {
+            _myTextureId = _myResourceManager->setupTexture(myTexture);
+            set<TextureIdTag>(_myTextureId);
+        } else if (myForceSubloadFlag) { // || !_myResourceManager->imageMatchesGLTexture(myTexture)) {
+            //AC_TRACE << "Texture::applyTexture TextureIdTag dirty";
+            _myResourceManager->updateTextureData(myTexture);
+            (void) get<TextureIdTag>();
+        } else if (isDirty<TextureParamChangedTag>()) {
+            //AC_TRACE << "Texture::applyTexture TextureParamChangedTag dirty";
+            _myResourceManager->updateTextureParams(myTexture);
+            (void) get<TextureParamChangedTag>();
+        }
+
+        return _myTextureId;
+    }
+
+    void
+    Texture::applyTextureParams() {
+        AC_DEBUG << "Texture::applyTextureParams";
+        _myResourceManager->updateTextureParams(dynamic_cast_Ptr<Texture>(getSelf()));
+    }
+
+    TextureType
+    Texture::getType() const {
+        return get<TextureTypeTag>();
+    }
+
+    Image &
+    Texture::getImageFacade() {
+        ImagePtr myImage = getImage();
+        if (!myImage) {
+            throw asl::Exception(string("Texture ") + get<NameTag>() + ": Could not find image with id=" + get<TextureImageIdTag>(), PLUS_FILE_LINE);
+        }
+        return *myImage;
+    }
+
+    const Image &
+    Texture::getImageFacade() const {
+        ImagePtr myImage = getImage();
+        if (!myImage) {
+            throw asl::Exception(string("Texture ") + get<NameTag>() + ": Could not find image with id=" + get<TextureImageIdTag>(), PLUS_FILE_LINE);
+        }
+        return *myImage;
+    }
+
+    ImagePtr
+    Texture::getImage() const {
+        return get<TextureImageTag>().lock();
+    }
+
+    TextureInternalFormat
+    Texture::getInternalEncoding() const {
+        return TextureInternalFormat(getEnumFromString(get<TextureInternalFormatTag>(), TextureInternalFormatStrings));
     }
 
     void 
-    Texture::setTextureManager(const TextureManagerPtr theTextureManager) {
-        _myTextureManager = theTextureManager;
+    Texture::removeTextureFromResourceManager() {
+        //AC_DEBUG << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        if (_myTextureId == 0) {
+            return;
+        }
+        ensureResourceManager();
+        _myResourceManager->unbindTexture(this); // calls Texture::unbind
+        unbind();
+    }
+
+    TextureWrapMode
+    Texture::getWrapMode() const {
+        return get<TextureWrapModeTag>();
+    }
+
+    TextureSampleFilter
+    Texture::getMinFilter() const {
+        return get<TextureMinFilterTag>();
+    }
+    
+    TextureSampleFilter
+    Texture::getMagFilter() const {
+        return get<TextureMagFilterTag>();
+    }
+
+    void 
+    Texture::unbind() {
+        if (_myTextureId == 0) {
+            return;
+        }
+        AC_DEBUG << "Texture::unbind '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        _myTextureId = 0;
+        set<TextureIdTag>(_myTextureId);
+        //TextureIdTag::Plug::getValuePtr()->setDirty();
     }
 
     void
-    Texture::update() {
-        AC_TRACE << "Texture::update";
-
-        //if (!_myImage || getImage().getNativePtr() != myImageInDom.getNativePtr()) {
-
-        ImagePtr myOldImage = getImage();
-        if (myOldImage) {
-            myOldImage->deregisterTexture();
+    Texture::refTexture() {
+        if (_myRefCount++ == 0) {
+            ensureResourceManager();
+            _myResourceManager->setTexturePriority(dynamic_cast_Ptr<Texture>(getSelf()), TEXTURE_PRIORITY_IN_USE);
         }
-
-        ImagePtr myNewImage = _myTextureManager->findImage(get<TextureImageIdTag>());            
-        myNewImage->registerTexture();
-        set<TextureImageTag>(ImageWeakPtr(myNewImage));
-        //} 
     }
 
-    TextureApplyMode
-    Texture::getApplyMode() const {
-        return get<TextureApplyModeTag>();
-	}
-	
-    ImagePtr
-    Texture::getImage() const {
-        AC_TRACE << "Texture::getImage";
-		return get<TextureImageTag>().lock();
+    void
+    Texture::unrefTexture() {
+        if (--_myRefCount == 0) {
+            ensureResourceManager();
+            _myResourceManager->setTexturePriority(dynamic_cast_Ptr<Texture>(getSelf()), TEXTURE_PRIORITY_IDLE);
+        }
     }
 
-    unsigned
-    Texture::getId() const {
-        ImagePtr myImage = getImage();
-        if (myImage) {
-            return myImage->get<TextureIdTag>();
-        } else {
-            throw TextureException(std::string("Invalid image in texture: ") + asl::as_string(getNode()), PLUS_FILE_LINE);
-        }
+    bool
+    Texture::usePixelBuffer() const {
+        // not much use for regular images
+        return false;
     }
 }

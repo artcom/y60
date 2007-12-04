@@ -121,16 +121,20 @@ class ShapeBuilderUnitTest : public UnitTest {
             myMaterialBuilder.setType(myRankings);
 
             {
-                string myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", PAINT, false,
-                                                                 asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, CLAMP, "");
-                myMaterialBuilder.createTextureNode(myImageId, MODULATE, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
+                dom::NodePtr myImage = myMaterialBuilder.createImageNode(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", PAINT);
+                dom::NodePtr myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture1", myImage->getAttributeString(ID_ATTRIB),
+                        CLAMP, false, Matrix4f::Identity(), "", Vector4f(1.0f,1.0f,1.0f,0.5f), Vector4f(0.0f,0.0f,0.0f,0.0f));
+                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), MODULATE, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
 
-                myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture2", "glossypattern.jpg", PAINT, false,
-                                                          asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, CLAMP, "");
-                myMaterialBuilder.createTextureNode(myImageId, DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myImage = myMaterialBuilder.createImageNode(mySceneBuilder, "testTexture2", "glossypattern.jpg", PAINT);
+                myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture2", myImage->getAttributeString(ID_ATTRIB),
+                        CLAMP, false, Matrix4f::Identity(), "", Vector4f(1.0f,1.0f,1.0f,0.5f), Vector4f(0.0f,0.0f,0.0f,0.0f));
+                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
 
-                string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0, asl::Vector4f(1,1,1,1), asl::Vector4f(0,0,0,0), "");
-                myMaterialBuilder.createTextureNode(myMovieId, DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myImage = myMaterialBuilder.createMovieNode(mySceneBuilder, "testTexture3", "mymovie.mpg", PAINT);
+                myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture3", myImage->getAttributeString(ID_ATTRIB),
+                        CLAMP, false, Matrix4f::Identity(), "", Vector4f(1,1,1,1), Vector4f(0,0,0,0));
+                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
             }
 
             //==============================================================================
@@ -270,29 +274,35 @@ class ShapeBuilderUnitTest : public UnitTest {
             ENSURE(myMaterialNode->nodeName() == "material");
             ENSURE(myMaterialNode->getAttribute("name")->nodeValue() == "shinymaterial");
             ENSURE(myMaterialNode->getAttribute("id")->nodeValue().size());
-            dom::NodePtr myTextureListNode = myMaterialNode->childNode("textures");
-            ENSURE(myTextureListNode->childNodesLength() == 3);
+            dom::NodePtr myTextureUnitListNode = myMaterialNode->childNode("textureunits");
+            ENSURE(myTextureUnitListNode->childNodesLength() == 3);
 
-            dom::NodePtr myTextureNode = myTextureListNode->childNode(0);
-            // note the slash instead of backslash:
-            cerr << *myTextureNode << endl;
-            cerr << *mySceneNode << endl;
+            dom::NodePtr myTextureUnitNode = myTextureUnitListNode->childNode(0);
+            ENSURE(myTextureUnitNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == MODULATE);
+
+            string myTextureId = myTextureUnitNode->getAttributeString("texture");
+            dom::NodePtr myTextureNode = mySceneNode->childNode("textures")->getElementById(myTextureId);
+
             string myImageId = myTextureNode->getAttribute("image")->nodeValue();
             dom::NodePtr myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "tex/testtexture.jpg");
-            ENSURE(myTextureNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == MODULATE);
 
-            myTextureNode = myTextureListNode->childNode(1);
+            myTextureUnitNode = myTextureUnitListNode->childNode(1);
+            ENSURE(myTextureUnitNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == DECAL);
+
+            myTextureId = myTextureUnitNode->getAttributeString("texture");
+            myTextureNode = mySceneNode->childNode("textures")->getElementById(myTextureId);
+
             myImageId = myTextureNode->getAttribute("image")->nodeValue();
             myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
-
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "glossypattern.jpg");
-            ENSURE(myTextureNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == DECAL);
 
-            myTextureNode = myTextureListNode->childNode(2);
-            myImageId = myTextureNode->getAttribute("image")->nodeValue();
+            myTextureUnitNode = myTextureUnitListNode->childNode(2);
+            myTextureId = myTextureUnitNode->getAttributeString("texture");
+            myTextureNode = mySceneNode->childNode("textures")->getElementById(myTextureId);
 
             // it's actually myMovieNode...
+            myImageId = myTextureNode->getAttribute("image")->nodeValue();
             myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "mymovie.mpg");
             ENSURE(myImageNode->getAttribute("currentframe")->nodeValue() == "0");

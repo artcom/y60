@@ -50,7 +50,7 @@ namespace y60 {
             theChildBuilder.getNode()->appendAttribute(ID_ATTRIB, IdTag::getDefault());
         }
         theListNode->appendChild(theChildBuilder.getNode());
-        return theChildBuilder.getNode()->getAttribute(ID_ATTRIB)->nodeValue();
+        return theChildBuilder.getNode()->getAttributeString(ID_ATTRIB);
     }
 
     void
@@ -58,7 +58,7 @@ namespace y60 {
         unsigned int myNumChilds = theListNode->childNodesLength();
         for(int i = 0; i< myNumChilds; i++) {
             dom::NodePtr myChild = theListNode->childNode(i);
-            if (myChild->getAttribute(ID_ATTRIB)->nodeValue() == theId) {
+            if (myChild->getAttributeString(ID_ATTRIB) == theId) {
                 theListNode->removeChild(myChild);
             }
         }

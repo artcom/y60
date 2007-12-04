@@ -134,7 +134,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     }
 
     // texture mapping
-    MObject myImageNode = theTextureNode;
+    MObject myMayaImageNode = theTextureNode;
     string myTextureMapping = getTextureMappingType(theTextureNode);
 
     if (myTextureMapping == y60::TEXCOORD_UV_MAP) {
@@ -145,10 +145,10 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     } else {
         // generative mapping
         MPlug myImagePlug = MFnDependencyNode(theTextureNode).findPlug("image");
-        getConnectedNode(myImagePlug, myImageNode);
+        getConnectedNode(myImagePlug, myMayaImageNode);
     }
 
-    MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
+    MPlug myFilenamePlug = MFnDependencyNode(myMayaImageNode).findPlug("fileTextureName");
     MString myFileName;
     myFilenamePlug.getValue(myFileName);
     std::string myRelativeFileName = findRelativeFilePath(myFileName.asChar());
@@ -181,52 +181,12 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     //MPlug myAlphaOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("alphaOffset");
     //myAlphaOffsetPlug.getValue(myColorBias[3]);
 
-    // get custom attributes
-    bool myCreateMipmapsFlag = true;
-    getCustomAttribute(theTextureNode, "ac_mipmaps", myCreateMipmapsFlag);
-
-    TextureApplyMode myApplyMode = y60::MODULATE;
-    switch (theBlendMode) {
-        case MAYA_BLEND_NONE:
-            myApplyMode = y60::REPLACE;
-            break;
-        case MAYA_BLEND_OVER:
-            myApplyMode = y60::DECAL;
-            break;
-        case MAYA_BLEND_MULTIPLY:
-            myApplyMode = y60::MODULATE;
-            break;
-        case MAYA_BLEND_ADD:
-            myApplyMode = y60::ADD;
-            break;
-        default:
-            displayWarning(string("Blendmode: ") + getStringFromEnum(theBlendMode, MayaBlendModesString) + " not yet implemented.");
-    }
-
-    // wrap
-    TextureWrapMode myWrapMode  = y60::REPEAT;
-    bool myWrapU = false;
-    MPlug myWarpUPlug = MFnDependencyNode(myImageNode).findPlug("wrapU");
-    if (myWarpUPlug.getValue(myWrapU) != MStatus::kSuccess) {
-        AC_WARNING << "No wrapU";
-    }
-
-    bool myWrapV = false;
-    MPlug myWarpVPlug = MFnDependencyNode(myImageNode).findPlug("wrapV");
-    if (myWarpVPlug.getValue(myWrapV) != MStatus::kSuccess) {
-        AC_WARNING << "No wrapV";
-    }
-    if (!myWrapU && !myWrapV) {
-        myWrapMode = CLAMP;
-    }
-
+    // image
     AC_DEBUG << "stripped filename=" << myRelativeFileName << " Scale=" << myColorScale << ", Bias=" << myColorBias;
-    string myImageId = theBuilder.createImage(theSceneBuilder,
+    dom::NodePtr myImageNode = theBuilder.createImageNode(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
-        myRelativeFileName, theUsageMode, myCreateMipmapsFlag,
-        myColorScale, myColorBias, SINGLE, myWrapMode, "");
-
-		
+        myRelativeFileName, theUsageMode, SINGLE);
+	
     // texture matrix
     asl::Matrix4f myTextureMatrix;
     myTextureMatrix.makeIdentity();
@@ -383,9 +343,56 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         myTextureMatrix.makeScaling(asl::Vector3f(float(myRepeatU), float(myRepeatV), 1));
     }
 
-    
-    theBuilder.createTextureNode(myImageId, myApplyMode, theUsageMode,
-            myTextureMapping, myTextureMatrix, 100, false, 50);
+    // texture wrap
+    TextureWrapMode myWrapMode  = y60::REPEAT;
+    bool myWrapU = false;
+    MPlug myWarpUPlug = MFnDependencyNode(myMayaImageNode).findPlug("wrapU");
+    if (myWarpUPlug.getValue(myWrapU) != MStatus::kSuccess) {
+        AC_WARNING << "No wrapU";
+    }
+
+    bool myWrapV = false;
+    MPlug myWarpVPlug = MFnDependencyNode(myMayaImageNode).findPlug("wrapV");
+    if (myWarpVPlug.getValue(myWrapV) != MStatus::kSuccess) {
+        AC_WARNING << "No wrapV";
+    }
+    if (!myWrapU && !myWrapV) {
+        myWrapMode = CLAMP;
+    }
+ 
+    // texture mipmap
+    bool myCreateMipmapsFlag = true;
+    getCustomAttribute(theTextureNode, "ac_mipmaps", myCreateMipmapsFlag);
+
+    // texture
+    dom::NodePtr myTextureNode = theBuilder.createTextureNode(theSceneBuilder,
+        MFnDependencyNode(theTextureNode).name().asChar(),
+        myImageNode->getAttributeString(ID_ATTRIB),
+        myWrapMode, myCreateMipmapsFlag, 
+        myTextureMatrix, "", myColorScale, myColorBias);
+
+    // texture unit apply
+    TextureApplyMode myApplyMode = y60::MODULATE;
+    switch (theBlendMode) {
+        case MAYA_BLEND_NONE:
+            myApplyMode = y60::REPLACE;
+            break;
+        case MAYA_BLEND_OVER:
+            myApplyMode = y60::DECAL;
+            break;
+        case MAYA_BLEND_MULTIPLY:
+            myApplyMode = y60::MODULATE;
+            break;
+        case MAYA_BLEND_ADD:
+            myApplyMode = y60::ADD;
+            break;
+        default:
+            displayWarning(string("Blendmode: ") + getStringFromEnum(theBlendMode, MayaBlendModesString) + " not yet implemented.");
+    }
+
+    // texture unit
+    theBuilder.createTextureUnitNode(myTextureNode->getAttributeString(ID_ATTRIB),
+        myApplyMode, theUsageMode, myTextureMapping, asl::Matrix4f::Identity());
 }
 
 string
@@ -434,14 +441,20 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
     TextureUsage myUsage         = y60::BUMP;
     TextureWrapMode myWrapMode   = y60::REPEAT;
 
-		
-		
-    string myImageId = theBuilder.createImage(theSceneBuilder,
-        MFnDependencyNode(theBumpNode).name().asChar(),
-        myFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
-        asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, myWrapMode, "");
+    dom::NodePtr myImageNode = theBuilder.createImageNode(theSceneBuilder,
+            MFnDependencyNode(theBumpNode).name().asChar(),
+            myFileName, myUsage, SINGLE);
+	
+    // texture matrix
+    asl::Matrix4f myTextureMatrix;
+    myTextureMatrix.makeIdentity();
 
-    theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, TEXCOORD_UV_MAP, asl::Matrix4f::Identity(), 100, false, 0);
+    theBuilder.createTextureNode(theSceneBuilder,
+            MFnDependencyNode(theBumpNode).name().asChar(),
+            myImageNode->getAttributeString(ID_ATTRIB),
+            myWrapMode, false, 
+            myTextureMatrix);
+
     theBuilder.needTextureFallback(true);
     std::string myMaterialName = theBuilder.getName();
     std::string myTextureName(MFnDependencyNode(theBumpNode).name().asChar());
@@ -470,7 +483,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
             theUsageMode,
             frontFileName, rightFileName, backFileName,
             leftFileName, topFileName, bottomFileName,
-            myApplyMode, asl::Vector4f(1,1,1,1));
+            myApplyMode);
 
     //NOTE: specular colors are added to the diffuse colors.
     //      no alpha value support for specular colors therefore means
@@ -546,11 +559,11 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
 
         // Find connected texture node
         MPlug myColorPlug;
-        MObject myTextureNode;
+        MObject myMayaTextureNode;
         getChildPlugByName("color", myInputPlug[i], theMultiTextureNode, myColorPlug);
-        getConnectedNode(myColorPlug, myTextureNode);
+        getConnectedNode(myColorPlug, myMayaTextureNode);
 
-        exportFileTexture(theMesh, myTextureNode,
+        exportFileTexture(theMesh, myMayaTextureNode,
                 theBuilder, theSceneBuilder,
                 y60::PAINT, myBlendMode,
                 theColorGainAlpha);
@@ -624,27 +637,27 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
     } else if (myPlugArray.length() == 1) {
         hasTextures = true;
 
-        MObject myTextureNode(myPlugArray[0].node());
+        MObject myMayaTextureNode(myPlugArray[0].node());
 
-        MFn::Type myTextureType = myTextureNode.apiType();
-        //AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
+        MFn::Type myTextureType = myMayaTextureNode.apiType();
+        //AC_DEBUG << "TextureType " << myMayaTextureNode.apiTypeStr();
         switch (myTextureType) {
             case MFn::kLayeredTexture:
-                exportLayeredTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
+                exportLayeredTexture(theMesh, myMayaTextureNode, theBuilder, theSceneBuilder,
                                      theUsageMode, theColorGainPropertyName, theColorGainAlpha);
                 break;
             case MFn::kProjection:
             case MFn::kFileTexture:
-                exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
+                exportFileTexture(theMesh, myMayaTextureNode, theBuilder, theSceneBuilder,
                                   theUsageMode, ourDefaultBlendMode, theColorGainAlpha);
                 y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f",
                         theColorGainPropertyName.c_str(), asl::Vector4f(1,1,1,1));
                 break;
             case MFn::kBump:
-                exportBumpTexture(myTextureNode, theBuilder, theSceneBuilder);
+                exportBumpTexture(myMayaTextureNode, theBuilder, theSceneBuilder);
                 break;
             case MFn::kEnvCube:
-                exportEnvCubeTexture(theShaderNode, myTextureNode,
+                exportEnvCubeTexture(theShaderNode, myMayaTextureNode,
                                      theBuilder, theSceneBuilder,
                                      theUsageMode);
                 break;
@@ -654,14 +667,14 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
         }
 
         // check texture alpha, set material transparency if set
-        const MFnDependencyNode & myTextureDepNode = MFnDependencyNode(myTextureNode);
-        MObject myFileHasAlpha = MFnDependencyNode(myTextureNode).attribute("fileHasAlpha", &myStatus);
+        const MFnDependencyNode & myTextureDepNode = MFnDependencyNode(myMayaTextureNode);
+        MObject myFileHasAlpha = MFnDependencyNode(myMayaTextureNode).attribute("fileHasAlpha", &myStatus);
         if (myStatus) {
             MPlug myPlug = myTextureDepNode.findPlug(myFileHasAlpha, &myStatus);
             if (myStatus) {
                 double myDoubleValue;
                 if (!myPlug.isArray() && myPlug.getValue(myDoubleValue)) {
-                    AC_DEBUG << thePlugName << " fileHasAlpha=" << myDoubleValue;
+                    //AC_DEBUG << thePlugName << " fileHasAlpha=" << myDoubleValue;
                     theBuilder.setTransparencyFlag(myDoubleValue > 0.0);
                 }
             }

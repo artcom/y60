@@ -58,6 +58,7 @@
 #include <y60/IEventSource.h>
 #include <y60/EventDispatcher.h>
 #include <y60/Image.h>
+#include <y60/Texture.h>
 #include <y60/CommonTags.h>
 #include <y60/Request.h>
 
@@ -553,6 +554,28 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+TriggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Triggers the upload of the specified texture.");
+    DOC_PARAM("theTextureNode", "the texture node to upload.", DOC_TYPE_NODE);
+    DOC_END;
+
+    try {
+        ensureParamCount(argc, 1);
+
+        dom::NodePtr myTextureNode;
+        if (!convertFrom(cx, argv[0], myTextureNode)) {
+            JS_ReportError(cx, "triggerUpload(): argument #1 must be a dom node");
+            return JS_FALSE;
+        }
+
+        myTextureNode->getFacade<y60::Texture>()->triggerUpload();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Exports a specified image node into a file with the given filename.");
     DOC_PARAM("theImageNode", "A node in the scene that should be saved as file", DOC_TYPE_NODE);
@@ -714,7 +737,8 @@ SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
         }
 
 		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		myImage->saveToFileFiltered(myFileName, myFilterName, myFilterParams);
+		//myImage->saveToFileFiltered(myFileName, myFilterName, myFilterParams);
+		myImage->saveToFile(myFileName, myFilterName, myFilterParams);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -1364,8 +1388,9 @@ static JSFunctionSpec glob_functions[] = {
     {"reuse",             Reuse,          0},
     {"parseArguments",    ParseArguments, 2},
     {"plug",              Plug,           1},
-    {"saveImage",         SaveImage,		2},
-    {"saveImageFiltered", SaveImageFiltered,	4},
+    {"triggerUpload",     TriggerUpload,  1},
+    {"saveImage",         SaveImage,	  2},
+    {"saveImageFiltered", SaveImageFiltered, 4},
     {"applyImageFilter",  ApplyImageFilter,	3},
     {"blitImage",         BlitImage,	3},
     {"exit",              Exit,           0},
@@ -1552,7 +1577,7 @@ JSApp::run(const std::string & theScriptFilename,
     } catch (const std::exception & e) {
         AC_ERROR << "Unhandled std::exception: " << e.what() << endl;
     } catch (...) {
-        AC_ERROR << "Unhandled exception: " << endl;
+        AC_ERROR << "Unknown exception" << endl;
     }
 
     return result;

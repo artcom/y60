@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,17 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: SceneBuilder.cpp,v 1.2 2005/04/21 08:59:01 jens Exp $
-//   $RCSfile: SceneBuilder.cpp,v $
-//   $Author: jens $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 08:59:01 $
-//
-//
-//
-//
-//=============================================================================
 
 #include "SceneBuilder.h"
 #include "ShapeBuilder.h"
@@ -31,6 +20,7 @@
 #include "CharacterBuilder.h"
 #include "ImageBuilder.h"
 #include "MovieBuilder.h"
+#include "TextureBuilder.h"
 #include "WorldBuilder.h"
 #include "CameraBuilder.h"
 #include "TransformBuilder.h"
@@ -89,6 +79,7 @@ namespace y60 {
         (*myNode)(ANIMATION_LIST_NAME);
         (*myNode)(CHARACTER_LIST_NAME);
         (*myNode)(SHAPE_LIST_NAME);
+        (*myNode)(TEXTURE_LIST_NAME);        
         (*myNode)(IMAGE_LIST_NAME);        
 
         // create the main viewport
@@ -107,6 +98,11 @@ namespace y60 {
             getMainViewportNode()->getFacade<Viewport>()->set<CameraTag>(theCameraId);
         }
 
+    }
+
+    const std::string &
+    SceneBuilder::appendTexture(TextureBuilder & theTexture) {
+        return appendNodeWithId(theTexture, getNode()->childNode(TEXTURE_LIST_NAME));
     }
 
     const std::string &
@@ -159,27 +155,8 @@ namespace y60 {
         return myImages->childNodeByAttribute(IMAGE_NODE_NAME, IMAGE_SRC_ATTRIB, theImageName);
     }
 
-    dom::NodePtr SceneBuilder::findImageByFilename_ColorScale_ColorBias(const std::string & theImageName,
-                                                                        const asl::Vector4f & theColorScale,
-                                                                        const asl::Vector4f & theColorBias)
-    {
-        dom::NodePtr myImages = getNode()->childNode(IMAGE_LIST_NAME);
-        std::vector<dom::NodePtr> myResults;
-        myImages->getNodesByAttribute(IMAGE_NODE_NAME, IMAGE_SRC_ATTRIB, theImageName, true, myResults);
-        for(int i = 0; i < myResults.size(); i++) {
-            dom::NodePtr myChildNode = myResults[i];
-            const asl::Vector4f & myColorScale =  myChildNode->getFacade<Image>()->get<ImageColorScaleTag>();            
-            const asl::Vector4f & myColorBias =  myChildNode->getFacade<Image>()->get<ImageColorBiasTag>();                        
-            
-            if (asl::almostEqual(myColorScale, theColorScale) &&
-                asl::almostEqual(myColorBias, theColorBias) )
-            {
-                return myChildNode;
-            }
-        }
-        return dom::NodePtr(0);
-    }
 
+    
     const std::string &
     SceneBuilder::appendCharacter(CharacterBuilder & theCharacter) {
         return appendNodeWithId(theCharacter, getNode()->childNode(CHARACTER_LIST_NAME));

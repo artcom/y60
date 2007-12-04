@@ -709,7 +709,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         if (ourPatchObject && typeof(ourPatchObject.onSceneLoaded)=="function") {
             ourPatchObject.onSceneLoaded(myScene);
         }
-        
+
         window.queue_draw();
     }
 
@@ -853,10 +853,6 @@ function setupCameraComboBox() {
 
 function main(argv) {
     try {
-    		
-    	
-    		
-    	
         GtkMain.exitCode    = 0;
         ourGlade            = new Glade(GLADE_FILE);
         ourMainWindow       = ourGlade.get_widget("mainWindow");
@@ -868,9 +864,9 @@ function main(argv) {
         ourPreferenceDialog = new PreferenceDialog(ourGlade);
         ourSceneViewerDialog= new SceneViewerDialog(ourGlade, ourHandler);
         ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
-				
+
         window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
-        
+
         ourGlade.get_widget("renderbox").add(window);
         window.show();
         ourMainWindow.show();
@@ -880,21 +876,8 @@ function main(argv) {
         ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
         ourMainWindow.signal_delete_event.connect(ourHandler, "on_quit_activate");
         ourViewer.setupWindow(window);
-        
-        ourViewer.lastSwitched = {};
 
-        /*
-        self.setModelName(myFilename);
-        var myScene = new Scene(myFilename);
-        myScene.setup();        
-        //ourViewer.setScene(myScene);
-        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        //ourViewer.setCanvas(myCanvas);
-        self.prepareScene(myScene, myCanvas);
-        ourStatusBar.set("Opened scene: " + myFilename);
-        setupGUI();
-        window.queue_draw();
-        */
+        ourViewer.lastSwitched = {};
 
         ourViewer.registerMover(ClassicTrackballMover);
         ourViewer.registerMover(FlyMover);
@@ -902,21 +885,20 @@ function main(argv) {
         ourAnimationManager = new GtkAnimationManager(ourViewer);
 
         ourViewer.loadModel(ourViewer.getModelName());
-        //ourViewer.loadModel(null);
 
         /*
-        var myScene = new Scene(ourViewer.getModelName());
-        myScene.setup();
-        ourViewer.setScene(myScene);
-        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        ourViewer.setCanvas(myCanvas);
-        setupGUI();
-        */      
+           var myScene = new Scene(ourViewer.getModelName());
+           myScene.setup();
+           ourViewer.setScene(myScene);
+           var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+           ourViewer.setCanvas(myCanvas);
+           setupGUI();
+           */      
 
         // enable lighting
         ourViewer.getLightManager().enableHeadlight(true);
         ourViewer.getLightManager().enableSunlight(true);
-        
+
         return GtkMain.run(ourMainWindow);
     } catch (ex) {
         print("### Exception: " + ex);
@@ -927,10 +909,23 @@ function main(argv) {
 
 function setupGUI() {
     ourAnimationManager.setup();
-    ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
     ourPreferenceDialog.apply();
     setupCameraComboBox();
     ourViewer.setupSwitchNodeMenu();
+
+    // movers
+    ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
+    ourGlade.get_widget("picking_trackball").active = true;
+    ourGlade.get_widget("centered_trackball").active = false;
+    ourGlade.get_widget("fly_mover").active = false;
+    ourGlade.get_widget("walk_mover").active = false;
+
+    // XXX it should be enough to set one radio button...
+    var myBVMode = window.getRenderer().boundingVolumeMode;
+  	ourGlade.get_widget("off1").active = (myBVMode == Renderer.BV_NONE);
+  	ourGlade.get_widget("body1").active = (myBVMode == Renderer.BV_BODY);
+  	ourGlade.get_widget("shape1").active = (myBVMode == Renderer.BV_SHAPE);
+  	ourGlade.get_widget("hierarchy1").active = (myBVMode == Renderer.BV_HIERARCHY);
 }
 
 if (main(arguments) != 0 || GtkMain.exitCode != 0) {

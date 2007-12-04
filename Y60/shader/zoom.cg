@@ -74,3 +74,4 @@ float4 mainFragment(vert2frag IN,
     float4 myColor0 = tex2D(tex0, texCoord1);
     return myColor0;
 }
+

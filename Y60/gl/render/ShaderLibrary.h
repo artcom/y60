@@ -37,7 +37,7 @@ namespace y60 {
         float    points;
     };
 
-    class ShaderLibrary : public y60::IShaderLibrary {
+    class ShaderLibrary : public IShaderLibrary {
         public:
             DEFINE_EXCEPTION(ShaderLibraryException, asl::Exception);
             ShaderLibrary();
@@ -65,8 +65,11 @@ namespace y60 {
 
             void reload();
 
-            virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
+            virtual IShaderPtr findShader(MaterialBasePtr theMaterial);
             const GLShaderVector & getShaders() const { return _myShaders; };
+
+            virtual ICombinerPtr findCombiner(const std::string& theName);
+
 #ifndef _AC_NO_CG_
             CGcontext getCgContext();
 #endif

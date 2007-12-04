@@ -275,63 +275,60 @@ namespace y60 {
 
     void
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
-        unsigned myTextureCount = theMaterial.getTextureCount();
 
-        AC_TRACE << "GLShader::enableTextures material id=" << theMaterial.get<IdTag>() << " name=" << theMaterial.get<NameTag>() << " count=" << myTextureCount;
+        unsigned myTextureCount = theMaterial.getTextureUnitCount();
+        AC_TRACE << "GLShader::enableTextures '" << theMaterial.get<NameTag>() << "' id=" << theMaterial.get<IdTag>() << " texunits=" << myTextureCount;
 
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
-            const y60::Texture & myTexture = theMaterial.getTexture(i);
-            y60::ImagePtr myImage = myTexture.getImage();
-            AC_TRACE << "GLShader::enableTextures image id=" << myImage->get<IdTag>() << " name=" << myImage->get<NameTag>() << " src=" << myImage->get<ImageSourceTag>();
+            // [VS;DS;UH;SH] someone please explain this
+            // from disableTextures: Fixed Function Shaders only support paint & skybox usage
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
+            /*
+            if (myTextureUsage != PAINT && myTextureUsage != SKYBOX) {
+                continue;
+            }
+            */
+
+            const y60::TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+            y60::TexturePtr myTexture = myTextureUnit.getTexture();
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
+            glClientActiveTexture(myTexUnit);
 
-            GLenum myTextureType = 0;
-            switch (myImage->getType()) {
-            case SINGLE:
-                myTextureType = myImage->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
-                break;
-            case CUBEMAP:
-                myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
-                break;
-            default:
-                throw ShaderException(string("Invalid image type in material '") + theMaterial.get<NameTag>() + "'", PLUS_FILE_LINE);
-            }
+            // triggers texture setup/update
+            unsigned myTextureId = myTexture->applyTexture(); //ensureTextureId();
+            GLenum myTextureTarget = asGLTextureTarget(myTexture->getType());
 
-            unsigned myId = myImage->ensureTextureId(); 
-            //AC_TRACE << "GLShader::enableTextures unit=" << hex << myTexUnit << dec << " texid=" << myId;
+            // bind/enable texture
+            glBindTexture(myTextureTarget, myTextureId);
+            glEnable(myTextureTarget);
+            AC_TRACE << "GLShader::enableTextures unit=" << i << " texId=" << myTextureId << " target=0x" << hex << myTextureTarget << dec;
 
-            // [VS;DS;UH] someone please explain this
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
-            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glBindTexture(myTextureType, myId);
-                glEnable(myTextureType);
-
-                // trigger wrapmode and min/mag filter update
-                // by calling GLResourceManager::updateTextureParams
-                myImage->get<TextureParamChangedTag>();
-            }
+            // texture env apply mode
+            GLenum myTexEnvMode = asGLTextureApplyMode(myTextureUnit.get<TextureUnitApplyModeTag>());
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
+            
+            // texture env const blend color (changed from black OpenGL default)
+            glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myTextureUnit.get<TextureUnitEnvColorTag>().begin()); 
 
             // load texture matrix
-            asl::Matrix4f myMatrix = myImage->get<ImageMatrixTag>();
-            myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
+            asl::Matrix4f myMatrix;
+            const y60::ImagePtr & myImage = myTexture->getImage();
+            if (myImage) {
+                myMatrix = myImage->get<ImageMatrixTag>();
+                myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+            } else {
+                myMatrix  = myTexture->get<TextureMatrixTag>();
+            }
+            myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
-            
-            // hardwired env color for texture blend mode 'blend', changed default from black(OpenGL) to
-            // white, seems to be a better default for blend formula, can be exposed in a 2nd step (VS)            
-            GLfloat myEnv_color[] = {1,1,1,1};
-            glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myEnv_color); 
 
-#if 1
-            // UH: there's no test for this (e.g. material with three point sprite textures)
-            // but IMHO the other code is wrong. For the given case it would enable
-            // PS for the 1st, and disable it for the rest
-            if (myTexture.get<TextureSpriteTag>()) {
+            // setup texture sprite
+            if (myTextureUnit.get<TextureUnitSpriteTag>()) {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
                     CHECK_OGL_ERROR;
@@ -351,26 +348,6 @@ namespace y60 {
                 glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
                 CHECK_OGL_ERROR;
             }
-#else
-            if (myTexture.get<TextureSpriteTag>()) {
-                if (!alreadyHasSpriteTexture) {
-                    glEnable(GL_POINT_SPRITE_ARB);
-                    CHECK_OGL_ERROR;
-                    if (IS_SUPPORTED(glPointParameterfARB)) {
-                        glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
-                        CHECK_OGL_ERROR;
-                    }
-                } else {
-                    glDisable(GL_POINT_SPRITE_ARB);
-                }
-                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-                CHECK_OGL_ERROR;
-                alreadyHasSpriteTexture = true;
-            } else {
-                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
-                CHECK_OGL_ERROR;
-            }
-#endif
         }
         glMatrixMode(GL_MODELVIEW);
     }
@@ -378,37 +355,29 @@ namespace y60 {
     void
     GLShader::disableTextures(const y60::MaterialBase & theMaterial) {
 
-        unsigned myTextureCount = theMaterial.getTextureCount();
-        // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
+        unsigned myTextureCount = theMaterial.getTextureUnitCount();
+        // AC_TRACE << "current texcount:" << myTextureCount << ", prev:" << myPreviousTextureCount << endl;
         for (unsigned i = 0; i < myTextureCount; ++i) {
-            const y60::Texture & myTexture = theMaterial.getTexture(i);
-            const y60::ImagePtr & myImage = myTexture.getImage();
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
             // Fixed Function Shaders only support paint & skybox usage
-            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glActiveTexture(asGLTextureRegister(i));
-                glClientActiveTexture(asGLTextureRegister(i));
-
-                GLenum myTextureType;
-                switch (myImage->getType()) {
-                    case SINGLE :
-                        if (myImage->get<ImageDepthTag>()==1) {
-                            myTextureType = GL_TEXTURE_2D;
-                        } else {
-                            myTextureType = GL_TEXTURE_3D;
-                        }
-                        break;
-                    case CUBEMAP :
-                        myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
-                        break;
-                    default :
-                        throw ShaderException(std::string("Unknown texture type '")+
-                                myImage->get<NameTag>() + "'", PLUS_FILE_LINE);
-                }
-                glBindTexture(myTextureType, 0);
-                glDisable(myTextureType);
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
+            /*
+            if (myTextureUsage != PAINT && myTextureUsage != SKYBOX) {
+                continue;
             }
+            */
+
+            const y60::TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+            y60::TexturePtr myTexture = myTextureUnit.getTexture();
+
+            GLenum myTexUnit = asGLTextureRegister(i);
+            glActiveTexture(myTexUnit);
+            glClientActiveTexture(myTexUnit);
+
+            // unbind/disable texture
+            GLenum myTextureTarget = asGLTextureTarget(myTexture->getType());
+            glBindTexture(myTextureTarget, 0);
+            glDisable(myTextureTarget);
         }
         glDisable(GL_POINT_SPRITE_ARB);
     }
@@ -488,29 +457,27 @@ namespace y60 {
     GLShader::setupProjectorMatrix( Matrix4f & theMatrix,
                                     const MaterialBase & theMaterial,
                                     const Camera & theCamera,
-                                    const Texture & theTexture)
+                                    const TextureUnit & theTextureUnit)
     {
 
         // projector model matrix
-        const std::string & myProjectorId = theTexture.get<TextureProjectorIdTag>();
-        NodePtr myProjectorNode = theTexture.getNode().getElementById(
-                myProjectorId );
-        if ( ! myProjectorNode ) {
-            throw ShaderException(std::string("Projector with id '") +
-                    myProjectorId + "' not found.", PLUS_FILE_LINE);
+        const std::string & myProjectorId = theTextureUnit.get<TextureUnitProjectorIdTag>();
+        NodePtr myProjectorNode = theTextureUnit.getNode().getElementById(myProjectorId);
+        if (! myProjectorNode) {
+            throw ShaderException(std::string("Projector with id '") + myProjectorId + "' not found.", PLUS_FILE_LINE);
         }
         ProjectiveNodePtr myProjector = myProjectorNode->getFacade<ProjectiveNode>();
         const Matrix4f & myProjectorModelMatrix = myProjector->get<y60::InverseGlobalMatrixTag>();
 
         // projector projection matrix
-        Vector4f myPoTSize(theTexture.getImage()->get<ImageWidthTag>(),
-                        theTexture.getImage()->get<ImageHeightTag>(), 0.0f, 1.0f);
-        const Matrix4f & myImageMatrix = theTexture.getImage()->get<ImageMatrixTag>();
+        TexturePtr myTexture = theTextureUnit.getTexture();
+        Vector4f myPoTSize(myTexture->get<TextureWidthTag>(), myTexture->get<TextureHeightTag>(), 0.0f, 1.0f);
+        const Matrix4f & myImageMatrix = myTexture->getImage()->get<ImageMatrixTag>();
         Vector4f mySize = myPoTSize * myImageMatrix;
-        float myAspect( mySize[0] / mySize[1] ); // XXX [DS ]this aspect allready contains the image matrix
+        float myAspect( mySize[0] / mySize[1] ); // XXX [DS] this aspect already contains the image matrix
                                                  // TODO: think about the texture matrix...
                                                         
-        myProjector->updateFrustum( theTexture.get<ResizePolicyTag>(), myAspect );
+        myProjector->updateFrustum(theTextureUnit.get<ResizePolicyTag>(), myAspect);
 
         const Frustum & myFrustum = myProjector->get<FrustumTag>();
         // XXX myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
@@ -553,7 +520,6 @@ namespace y60 {
             for (unsigned i = 0; i < myModes.size(); ++i) {
 
                 //AC_DEBUG << "unit=" << myTexUnit << " coord=" << i << " mode=" << myModes[i];
-
                 if (myModes[i] == NONE) {
                     continue;
                 }
@@ -563,26 +529,22 @@ namespace y60 {
 
                     // push modelview matrix
                     if (mustRestoreMatrix == false) {
-                        {
+
+                        const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTexUnit);
+                        const std::string & myProjectorId = myTextureUnit.get<TextureUnitProjectorIdTag>();
+                        if (!myProjectorId.empty()) {
+                            Matrix4f myTextureMatrix;
+                            setupProjectorMatrix( myTextureMatrix, theMaterial, theCamera, myTextureUnit );
+
                             glMatrixMode( GL_TEXTURE );
-
-                            const Texture & myTexture = theMaterial.getTexture( myTexUnit );
-
-                            const std::string & myProjectorId = myTexture.get<TextureProjectorIdTag>();
-                            if ( ! myProjectorId.empty() ) {
-                                Matrix4f myTextureMatrix;
-                                setupProjectorMatrix( myTextureMatrix, theMaterial, theCamera, myTexture );
-                                glMultMatrixf(static_cast<const GLfloat *>(myTextureMatrix.getData()));
-                            }
-
-
+                            glMultMatrixf(static_cast<const GLfloat *>(myTextureMatrix.getData()));
+                            glMatrixMode( GL_MODELVIEW );
                         }
+
                         // TODO: will this work if a material has more than one projective texture?
-                        glMatrixMode( GL_MODELVIEW );
                         glPushMatrix();
                         glLoadIdentity();
                         mustRestoreMatrix = true;
-
                     }
                     glTexGenfv(ourTexGenCoord[i], GL_EYE_PLANE, &(*(myParams[i]).begin()));
                 } else if (myModes[i] == OBJECT_LINEAR) {
@@ -599,7 +561,7 @@ namespace y60 {
             }
             CHECK_OGL_ERROR;
         }
-}
+    }
 
     void
     GLShader::bindBodyParams(const MaterialBase & theMaterial,

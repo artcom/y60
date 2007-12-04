@@ -1,17 +1,11 @@
+//=============================================================================
+// Copyright (C) 2000-2007, ART+COM AG Berlin
+//
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//============================================================================
-//
-//   $Id: X3dImport.cpp,v 1.9 2005/04/21 17:15:24 danielk Exp $
-//   $Author: danielk $
-//   $Revision: 1.9 $
-//   $Date: 2005/04/21 17:15:24 $
-//
-// X3D importer.
-//
 //=============================================================================
 
 #include <iostream>
@@ -549,14 +543,9 @@ namespace y60 {
 
         AC_DEBUG  << "Image URL " << myImageURL << " importing " << myImageName;
 
-        std::string myImageId =
-            theMaterialBuilder.createImage(*_mySceneBuilder, myTextureName, myImageName,
-                                           y60::PAINT, false,
-                                           asl::Vector4f(1,1,1,1),
-                                           asl::Vector4f(0,0,0,0),
-                                           y60::SINGLE, y60::CLAMP, "");
-
-        TextureApplyMode myApplyMode = y60::MODULATE;
+        dom::NodePtr myImageNode = theMaterialBuilder.createImageNode(*_mySceneBuilder, 
+                                           myTextureName, myImageName, y60::PAINT,
+                                           y60::SINGLE);
 
         //X3D texture coords start at the BOTTOM left of the image
         asl::Matrix4f myTextureTransform;
@@ -564,9 +553,9 @@ namespace y60 {
         myTextureTransform.setTranslation(asl::Vector3f(0.0,1.0,0.0));
         myTextureTransform.setScale(asl::Vector3f(1.0,-1.0,1.0));
 
-        theMaterialBuilder.createTextureNode(myImageId, myApplyMode,
-                y60::PAINT, y60::TEXCOORD_UV_MAP, myTextureTransform,
-                100, false, 60);
+        theMaterialBuilder.createTextureNode(*_mySceneBuilder,
+                myTextureName, myImageNode->getAttributeString(ID_ATTRIB), 
+                y60::REPEAT, false, myTextureTransform);
     }
 
     // a Geometry node is an abstract node.. this func dispatches accordingly

@@ -113,7 +113,7 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
                     asl::Ptr<ReadableBlock>(new ConstMappedBlock(theSourceFile)),
                     theSourceFile));
     if (theResizeMode != "none" ) {
-        myFrame->ensurePowerOfTwo(theResizeMode, SINGLE, 1);
+        myFrame->ensurePowerOfTwo(theResizeMode);
     }
 
     if (!ourPreviousFrame) {

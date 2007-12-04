@@ -270,15 +270,14 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::copyBufferToImage(dom::NodePtr & theImageNode,
-                                            const asl::Vector2i & theOffset,
-                                            bool theCopyToRasterFlag) {
+    AbstractRenderWindow::copyBufferToTexture(dom::NodePtr & theTextureNode,
+                                              const asl::Vector2i & theOffset,
+                                              bool theCopyToRasterFlag) {
 
-        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        BufferToImage myBufferWriter(myImage, theOffset, theCopyToRasterFlag);
+        TexturePtr myTexture = theTextureNode->getFacade<y60::Texture>();
+        BufferToTexture myBufferWriter(myTexture, theOffset, theCopyToRasterFlag);
         myBufferWriter.performAction(FRAME_BUFFER);
     }
-
 
     void
     AbstractRenderWindow::setJSContext(JSContext * cx) {
@@ -396,7 +395,7 @@ namespace jslib {
         asl::NanoTime myTime = asl::NanoTime();
         if (_myStartTime < 0.0) {
             _myStartTime = myTime.seconds();
-            DB(AC_DEBUG << "startTime=" << _myStartTime);
+            //AC_DEBUG << "startTime=" << _myStartTime;
         }
 
         MAKE_SCOPE_TIMER(onFrame);
@@ -406,10 +405,22 @@ namespace jslib {
             return;
         }
 
-        DB(AC_DEBUG << "pauseT=" << _myPauseTime << " elapsedT=" << _myElapsedTime);
+        // delta-T
+        double myDeltaT;
+        if (_myFixedDeltaT != 0.0) {
+            myDeltaT = _myFixedDeltaT;
+        } else {
+            double myCurrentTime = myTime.seconds() - _myStartTime - _myPauseTime;
+            myDeltaT = myCurrentTime - _myElapsedTime;
+            if (myDeltaT < 0.0) {
+                myDeltaT = 0.0;
+            }
+        }
+
+        //AC_DEBUG << "pauseT=" << _myPauseTime << " elapsedT=" << _myElapsedTime << " deltaT=" << myDeltaT;
         // Check for timeouts
         {
-            MAKE_SCOPE_TIMER(Timeouts);
+            MAKE_SCOPE_TIMER(onFrame_updateTimeouts);
             while (_myTimeoutQueue.isShowTime(_myElapsedTime)) {
                 TimeoutPtr myTimeout = _myTimeoutQueue.popTimeout();
 
@@ -426,8 +437,7 @@ namespace jslib {
                         jslib::JSA_CallFunctionName(_myJSContext, myListener,
                                                     myTimeoutCommand.c_str(), 0, 0, &rval);
                     } else {
-                        AC_ERROR << "Timeout: Function " << myTimeoutCommand
-                                << " does not exist." << endl;
+                        AC_ERROR << "Timeout: Function '" << myTimeoutCommand << "' does not exist.";
                     }
                 } catch (const asl::Exception & ex) {
                     AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(),"
@@ -444,6 +454,7 @@ namespace jslib {
 
         // update movies and capture
         if (_myScene) {
+            MAKE_SCOPE_TIMER(onFrame_updateMovieAndCapture);
             dom::NodePtr myImages = _myScene->getImagesRoot();
             for (unsigned i = 0; i < myImages->childNodesLength(); ++i) {
                 dom::NodePtr myImage = myImages->childNode(i);
@@ -459,12 +470,13 @@ namespace jslib {
             }
         }
 
-        // JavaScript onFrame(theTime)
+        // JavaScript onFrame(theTime, theDeltaT)
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
             MAKE_SCOPE_TIMER(onFrame_JSCallback);
-            jsval argv[1], rval;
-            argv[0] = as_jsval(_myJSContext, float(_myElapsedTime));
-            JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
+            jsval argv[2], rval;
+            argv[0] = as_jsval(_myJSContext, _myElapsedTime);
+            argv[1] = as_jsval(_myJSContext, myDeltaT);
+            JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 2, argv, &rval);
         }
 
         // extensions onFrame
@@ -893,10 +905,12 @@ namespace jslib {
     ImagePtr
     AbstractRenderWindow::getImage(const std::string & theFileName) {
         if (_myScene) {
+            /* XXX
             ImagePtr myImage = _myScene->getTextureManager()->getImage(theFileName);
             if (myImage) {
                 return myImage;
             }
+            */
         }
         return ImagePtr(0);
     }

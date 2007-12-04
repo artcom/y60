@@ -245,8 +245,9 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
 
         var myMaterial = _myScene.world.getElementById( getMaterialIdForValueDisplay() );
         if ( ! _myValueOverlay) {
+            var myTexture = myMaterial.childNode("textureunits").firstChild.texture;
             _myValueOverlay = new ImageOverlay( _myScene, 
-                    _myScene.world.getElementById( myMaterial.childNode("textures").firstChild.image ));
+                                                _myScene.world.getElementById(myTexture.image));
         }
         _myDriver.overlay = _myValueOverlay.node;
 

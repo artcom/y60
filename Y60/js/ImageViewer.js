@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -53,6 +53,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myLastFrame          = 0;
     var _myFrameCounter       = 0;
     var _myTheaterFlag        = false;
+    
     //////////////////////////////////////////////////////////////////////
     //
     // Constructor
@@ -201,7 +202,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
-            //print("Frame #" + _myMovieNode.currentframe);
             var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
             if (myFrameDiff > 1) {
                 var myMissedFrameDiff = myFrameDiff-1;
@@ -511,16 +511,19 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
         } else {
             var myNode;
+            var myTexture;
             if (_myImageOverlay && _myImageOverlay.visible) {
                 myNode = _myImageNode;
+                myTexture = _myImageOverlay.node.getElementById(_myImageOverlay.textureunit.texture);
             } else {
                 myNode = _myMovieNode;
+                myTexture = _myMovieOverlay.node.getElementById(_myMovieOverlay.textureunit.texture);
             }
             if (!myNode) {
                 return "neither AUDIO nor VIDEO";
             }
-            var myString = myNode.src + "\n";
 
+            var myString = myNode.src + "\n";
             if (_myPlaylist.getNumEntries() > 1) {
                 myString += " (" + (_myFileIndex+1) + "/" + _myPlaylist.getNumEntries() + ")";
             }
@@ -529,21 +532,25 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             myString += "\n";
             myString += "Size:                 " + mySize.x + "x" + mySize.y +"\n";
             myString += "Raster Pixelformat:   " + myNode.rasterpixelformat +"\n";
-            myString += "Texture Pixelformat:  " + myNode.texturepixelformat +"\n";
-            myString += "Internal Pixelformat: " + myNode.internal_format +"\n";
+            myString += "Texture Pixelformat:  " + myTexture.texturepixelformat +"\n";
+            myString += "Internal Pixelformat: " + myTexture.internal_format +"\n";
             if (myNode.nodeName == "movie") {
-                myString += "Frame:        " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
-                myString += "Framerate:    " + myNode.fps.toPrecision(5) +"\n";
-                myString += "Playmode:     " + myNode.playmode +"\n";
-                myString += "Playspeed:    " + myNode.playspeed.toPrecision(5) +"\n";
-                myString += "Volume:       " + myNode.volume.toFixed(2) +"\n";
-                myString += "cachesize:    " + myNode.cachesize +"\n";
-                myString += "avdelay:      " + myNode.avdelay.toPrecision(3) + "\n";
-                myString += "Total frames: " + _myFrameCounter + "\n";
-                myString += "Decoder:      " + myNode.decoder + "\n";
-                myString += "Misses:  sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
+                myString += "Frame:         " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
+                myString += "Framerate:     " + myNode.fps.toPrecision(5) +"\n";
+                myString += "Playmode:      " + myNode.playmode +"\n";
+                myString += "Playspeed:     " + myNode.playspeed.toPrecision(5) +"\n";
+                myString += "Volume:        " + myNode.volume.toFixed(2) +"\n";
+                myString += "cachesize:     " + myNode.cachesize +"\n";
+                myString += "avdelay:       " + myNode.avdelay.toPrecision(3) + "\n";
+                myString += "Total frames:  " + _myFrameCounter + "\n";
+                myString += "Decoder:       " + myNode.decoder + "\n";
+                myString += "Frameblending: " + myNode.frameblending + "\n";
+                /*if (myNode.frameblending) {
+					myString += "BlendFactor:   " + myNode.frameblend_factor + "\n";
+                }*/
+                myString += "Misses:  sum:  " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
             }
-            myString += "Zoom:                 " + (_myZoomFactor*100).toFixed(1) + "%\n";
+            myString += "Zoom:          " + (_myZoomFactor*100).toFixed(1) + "%\n";
         }
         return myString.split("\n");
     }

@@ -1,6 +1,5 @@
 //============================================================================
-//
-// Copyright (C) 2005-2006, ART+COM AG Berlin
+// Copyright (C) 2005-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -18,7 +17,8 @@
 DEFINE_EXCEPTION( OffscreenRendererException, asl::Exception );
 
 namespace y60 {
-    class Image;
+    class Texture;
+    typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
 
     class OffscreenBuffer {
         public:        
@@ -31,17 +31,17 @@ namespace y60 {
             virtual ~OffscreenBuffer();
 
             /**
-            * activate the image as render target and initializes FBO 
+            * activate the texture as render target and initializes FBO 
             * if necessary  
             */
-            void activate(asl::Ptr<Image, dom::ThreadingModel> theImage,
+            void activate(TexturePtr theTexture,
                           unsigned theSamples = 1, unsigned theCubemapFace = 0); 
 
             /**
-            * deactivates the image as render target   
-            * @param theCopyToImageFlag copy result to image raster.
+            * deactivates the texture as render target   
+            * @param theCopyToImageFlag copy result to texture raster.
             */
-            void deactivate(asl::Ptr<Image, dom::ThreadingModel> theImage, 
+            void deactivate(TexturePtr theTexture, 
                             bool theCopyToImageFlag = false); 
 
         protected:
@@ -54,19 +54,19 @@ namespace y60 {
                 return _myUseFBO;
             }
 
-            void copyToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
+            void copyToImage(TexturePtr theTexture);
 
         private:
-            void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
+            void copyFrameBufferToTexture(TexturePtr theTexture);
 
             void reset();
 
-            void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture,
+            void bindOffscreenFrameBuffer(TexturePtr theTexture,
                                           unsigned theSamples = 0, unsigned theCubemapFace = 0);
             void attachCubemapFace(unsigned theCubemapFace);
             
             bool     _myUseFBO;
-            asl::Unsigned64 _myImageNodeVersion;
+            asl::Unsigned64 _myTextureNodeVersion;
             unsigned _myBlitFilter;
 
             // OpenGL id of frame buffer object

@@ -96,11 +96,11 @@ namespace y60 {
         /**
          * Ensure the loaded image is power-of-two.
          * @param theResizeMode controls how the image is to be resized if it's not power-of-two.
-         * @param theType is the type of image, either SINGLE or CUBEMAP.
-         * @param theDepth is for SINGLE 3D textures. It describes how many slices are placed in the image.
-         * @param theTile is for CUBEMAP textures. It describes the layout of the CUBEMAP sub-images.
+         * @param theDepth is for 3D textures. It describes how many slices are placed in the image.
+         * @param theTile specifies the number and layout of tiles for CUBEMAP images.
+         * For SINGLE images this can be 0 or (1,1).
          */
-        void ensurePowerOfTwo(const std::string & theResizeMode, ImageType theType,
+        void ensurePowerOfTwo(const std::string & theResizeMode,
                               unsigned theDepth = 1, const asl::Vector2i * theTile = 0);
 
         void removeUnusedAlpha();

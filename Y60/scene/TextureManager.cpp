@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,8 +9,8 @@
 //=============================================================================
 
 #include "TextureManager.h"
+#include "Texture.h"
 
-#include <y60/Image.h>
 #include <y60/ImageLoader.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
@@ -48,8 +48,8 @@ namespace y60 {
     }
 
     void
-    TextureManager::setImageList(dom::NodePtr theImageListNode) {
-        _myImageList = theImageListNode;
+    TextureManager::setTextureList(dom::NodePtr theTextureListNode) {
+        _myTextureList = theTextureListNode;
     }
 
     void
@@ -61,15 +61,16 @@ namespace y60 {
     TextureManager::validateGLContext(bool theFlag) {
         _myResourceManager->validateGLContext(theFlag);
     }
+
     void
     TextureManager::unbindTextures() {
         AC_DEBUG << "TextureManager::unbindTextures";
-        unsigned myImageCount = _myImageList->childNodesLength();
-        for (unsigned i = 0; i < myImageCount; ++i) {
-            dom::NodePtr myImageNode = _myImageList->childNode(i);
-            if (myImageNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                ImagePtr myImage = myImageNode->getFacade<Image>();
-                unbindTexture(&(*myImage));
+        unsigned myTextureCount = _myTextureList->childNodesLength();
+        for (unsigned i = 0; i < myTextureCount; ++i) {
+            dom::NodePtr myTextureNode = _myTextureList->childNode(i);
+            if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
+                TexturePtr myTexture = myTextureNode->getFacade<Texture>();
+                unbindTexture(&(*myTexture));
             }
         }
     }
@@ -78,9 +79,8 @@ namespace y60 {
     TextureManager::getMaxTextureSize(int theDimensions) const {
         if (_myMaxTextureSize == 0) {
             return _myResourceManager->getMaxTextureSize(theDimensions);
-        } else {
-            return _myMaxTextureSize;
         }
+        return _myMaxTextureSize;
     }
 
     void
@@ -131,61 +131,57 @@ namespace y60 {
 
     void
     TextureManager::reloadTextures() {
-        unsigned myImageCount = _myImageList->childNodesLength();
-        for (unsigned i = 0; i < myImageCount; ++i) {
-            dom::NodePtr myImageNode = _myImageList->childNode(i);
-            if (myImageNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                myImageNode->getFacade<Image>()->triggerUpload();
+        AC_DEBUG << "TextureManager::reloadTextures";
+        unsigned myTextureCount = _myTextureList->childNodesLength();
+        for (unsigned i = 0; i < myTextureCount; ++i) {
+            dom::NodePtr myTextureNode = _myTextureList->childNode(i);
+            if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
+                myTextureNode->getFacade<Texture>()->triggerUpload();
             }
         }
     }
 
-    ImagePtr
-    TextureManager::getImage(const std::string & theImageId) const{
-        ImagePtr myImage = findImage(theImageId);
-        if (!myImage) {
-            throw TextureManagerException(std::string("Request for image '") + theImageId +
-                                          "' failed.", PLUS_FILE_LINE);
+    TexturePtr
+    TextureManager::getTexture(const std::string & theTextureId) const{
+        TexturePtr myTexture = findTexture(theTextureId);
+        if (!myTexture) {
+            throw TextureManagerException(std::string("Request for texture '") + theTextureId + "' failed.", PLUS_FILE_LINE);
         }
-        return myImage;
+        return myTexture;
     }
 
-    ImagePtr
-    TextureManager::findImage(const std::string & theImageId) const {
+    TexturePtr
+    TextureManager::findTexture(const std::string & theTextureId) const {
 
-        dom::NodePtr myImageNode = _myImageList->getElementById(theImageId);
-        if (myImageNode) {
-             return myImageNode->getFacade<Image>();
-        } else {
-             return ImagePtr(0);
+        dom::NodePtr myTextureNode = _myTextureList->getElementById(theTextureId);
+        if (myTextureNode) {
+             return myTextureNode->getFacade<Texture>();
         }
+        return TexturePtr(0);
     }
 
-    void TextureManager::updateImageData(ImagePtr theImage) {
-        // Delegate to my ResourceManager
-        _myResourceManager->updateTextureData(theImage);
+    /*
+    void TextureManager::updateTextureData(const TexturePtr & theTexture) {
+        AC_PRINT << "XXX TextureManager::updateTextureData";
+        _myResourceManager->updateTextureData(theTexture);
     }
 
-    void TextureManager::setPriority(Image * theImage, float thePriority) {
-        // Delegate to my ResourceManager
-        _myResourceManager->setTexturePriority(theImage, thePriority);
+    void TextureManager::setTexturePriority(const TexturePtr & theTexture, float thePriority) {
+        AC_PRINT << "XXX TextureManager::setTexturePriority id=" << theTexture->get<IdTag>();
+        _myResourceManager->setTexturePriority(theTexture, thePriority);
     }
+    */
 
-    void TextureManager::unbindTexture(Image * theImage) {
-        // Delegate to my ResourceManager
-        //AC_TRACE << "Unbinding Texture " << theImage->get<TextureIdTag>();
-        theImage->removeTextureFromResourceManager();
-        //_myResourceManager->unbindTexture(theImage);
+    void TextureManager::unbindTexture(Texture * theTexture) {
+        AC_DEBUG << "TextureManager::unbindTexture id=" << theTexture->get<IdTag>();
+        theTexture->removeTextureFromResourceManager();
+        //_myResourceManager->unbindTexture(theTexture);
     }
 
     asl::Ptr<TextureManager> TextureManager::create() {
         asl::Ptr<TextureManager> myInstance = asl::Ptr<TextureManager>(new TextureManager());
         myInstance->setSelf(myInstance);
         return myInstance;
-    }
-
-    unsigned TextureManager::setupImage(ImagePtr theImage) {
-        return _myResourceManager->setupTexture(theImage);
     }
 
     int TextureManager::registerResourceManager(ResourceManager* theResourceManager) {

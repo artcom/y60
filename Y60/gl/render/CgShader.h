@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CGShader.h,v $
-//   $Author: danielk $
-//   $Revision: 1.8 $
-//   $Date: 2005/03/17 18:22:40 $
-//
-//  Description:
-//
-//=============================================================================
 
 #ifndef AC_Y60_RENDERER_CGSHADER_INCLUDED
 #define AC_Y60_RENDERER_CGSHADER_INCLUDED
@@ -27,12 +18,12 @@
 #include <string>
 
 namespace y60 {
-    class CGShader : public GLShader {
+    class CgShader : public GLShader {
         public:
-            CGShader(const dom::NodePtr theNode,
+            CgShader(const dom::NodePtr theNode,
                      const std::string & theVertexProfileName,
                      const std::string & theFragmentProfileName);
-            virtual ~CGShader();
+            virtual ~CgShader();
             virtual void compile(IShaderLibrary & theShaderLibrary);
             virtual void load(IShaderLibrary & theShaderLibrary);
             virtual void unload();
@@ -47,7 +38,7 @@ namespace y60 {
             virtual void deactivate(const MaterialBase & theMaterial);
             virtual void enableTextures(const MaterialBase & theMaterial);
             virtual void disableTextures(const MaterialBase & theMaterial);
-            virtual bool isCGShader() { return true; }
+
             virtual unsigned getMaxTextureUnits() const;
 
             void bindBodyParams(const MaterialBase & theMaterial,
@@ -74,7 +65,7 @@ namespace y60 {
             CgProgramInfoPtr      _myVertexProgram;
             CgProgramInfoPtr      _myFragmentProgram;
     };
-    typedef asl::Ptr<CGShader, dom::ThreadingModel> CGShaderPtr;
+    typedef asl::Ptr<CgShader, dom::ThreadingModel> CgShaderPtr;
 } // namespace y60
 
 #endif // AC_Y60_RENDERER_GLSHADER_INCLUDED

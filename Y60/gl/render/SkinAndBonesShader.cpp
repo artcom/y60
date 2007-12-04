@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SkinAndBones.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/24 00:41:21 $
-//
-//  Description: A simple material class.
-//
-//=============================================================================
 
 #include "SkinAndBonesShader.h"
 
@@ -143,6 +134,6 @@ namespace y60 {
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
         _myBoundingBoxNode->nodeValuePtrClose<Box3f>();
 
-        CGShader::activate(theMaterial, theViewport, 0);
+        CgShader::activate(theMaterial, theViewport, 0);
    }
 }

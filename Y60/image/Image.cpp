@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -10,7 +10,6 @@
 
 #include "Image.h"
 #include "ImageLoader.h"
-
 
 #include <y60/IScene.h>
 
@@ -42,46 +41,27 @@ namespace y60 {
 
     const char * I60_MAGIC_NUMBER = "a+c ";
     bool Image::allowInlineFlag = true;
+
     Image::Image(dom::Node & theNode) :
         Facade(theNode),
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
         ImageSourceTag::Plug(theNode),
-        TexturePixelFormatTag::Plug(theNode),
         ImageTypeTag::Plug(theNode),
-        ImageMipmapTag::Plug(theNode),
         ImageResizeTag::Plug(theNode),
         ImageFilterTag::Plug(theNode),
         ImageFilterParamsTag::Plug(theNode),
         ImageMatrixTag::Plug(theNode),
         ImageTileTag::Plug(theNode),
-        ImageColorScaleTag::Plug(theNode),
-        ImageColorBiasTag::Plug(theNode),
         ImageDepthTag::Plug(theNode),
-        TextureWrapModeTag::Plug(theNode),
-        TextureMinFilterTag::Plug(theNode),
-        TextureMagFilterTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
-        dom::FacadeAttributePlug<TextureIdTag>(this),
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
-        dom::FacadeAttributePlug<ImageInternalFormatTag>(this),
         dom::FacadeAttributePlug<ImageWidthTag>(this),
-        dom::FacadeAttributePlug<ImageHeightTag>(this),
-        dom::FacadeAttributePlug<LoadCountTag>(this),
-        dom::FacadeAttributePlug<TextureParamChangedTag>(this),        
-        _myRefCount(0),
-        _myTextureId(0), 
-        _myPixelBufferId(0),
-        _myTextureUploaded(false),
-        _myRessourceManager(0)
+        dom::FacadeAttributePlug<ImageHeightTag>(this)
     {
     }
 
     Image::~Image() {
-        if (_myRessourceManager) {
-            _myRessourceManager->unbindTexture(this);
-            unbind();
-        }
     }
 
     void
@@ -118,17 +98,13 @@ namespace y60 {
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
 
-        TextureParamChangedTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureParamChanged);
-
-        TextureIdTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureUpdate);
-        ImageInternalFormatTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageFormatUpdate);
+        ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
 
 		ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
 
         dom::ValuePtr myRasterValue = getRasterValue();
         if (myRasterValue) {
-            PixelEncoding myEncoding = PixelEncoding(getEnumFromString(
-                getNode().firstChild()->nodeName(), RasterElementNames));
+            PixelEncoding myEncoding = PixelEncoding(getEnumFromString(getNode().firstChild()->nodeName(), RasterElementNames));
             set<RasterPixelFormatTag>(getStringFromEnum(myEncoding, PixelEncodingString));
             set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);   
 
@@ -158,23 +134,6 @@ namespace y60 {
     }
 
     void
-    Image::registerDependenciesForTextureUpdate() {        
-        if (getNode()) {
-            // The rastervalue dependency has to be registered first, because getRasterValue()
-            // might trigger an image reload, which clears the raster value node and 
-            // destroys the dependency.
-            TextureIdTag::Plug::dependsOn(getRasterValue());
-            TextureIdTag::Plug::dependsOn<ImageColorBiasTag>(*this);  
-            TextureIdTag::Plug::dependsOn<ImageColorScaleTag>(*this); 
-            TextureIdTag::Plug::dependsOn<ImageTileTag>(*this);
-            TextureIdTag::Plug::dependsOn<ImageMipmapTag>(*this);
-            TextureIdTag::Plug::dependsOn<ImageInternalFormatTag>(*this);
-            TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Image>(getSelf()), &Image::uploadTexture);
-        }
-    }
-
-    void
     Image::registerDependenciesForImageWidthUpdate() {        
         if (getNode()) {
             ImageWidthTag::Plug::dependsOn(getRasterValue());
@@ -193,90 +152,23 @@ namespace y60 {
     }
 
     void
-    Image::registerDependenciesForTextureParamChanged() {        
-        if (getNode()) {
-            TextureParamChangedTag::Plug::dependsOn<TextureWrapModeTag>(*this);
-            TextureParamChangedTag::Plug::dependsOn<TextureMinFilterTag>(*this);
-            TextureParamChangedTag::Plug::dependsOn<TextureMagFilterTag>(*this);
-            TextureParamChangedTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Image>(getSelf()), &Image::updateTextureParams);
-        }
-    }
-
-    void
-    Image::registerDependenciesForImageFormatUpdate() {        
-        if (getNode()) {
-            ImageInternalFormatTag::Plug::dependsOn<ImageColorBiasTag>(*this);
-            ImageInternalFormatTag::Plug::dependsOn<ImageColorScaleTag>(*this);
-            ImageInternalFormatTag::Plug::dependsOn<TexturePixelFormatTag>(*this);
-            ImageInternalFormatTag::Plug::dependsOn<RasterPixelFormatTag>(*this);
-            ImageInternalFormatTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateInternalPixelFormat);
-        }
-    }
-
-    void
-    Image::ensureResourceManager() {
-        if (!_myRessourceManager && getNode()) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            _myRessourceManager = myScene->getResourceManager();
-        }
-    }
-
-    void 
-    Image::uploadTexture() {
-        AC_DEBUG << "uploadTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        ensureResourceManager();
-        if (_myTextureUploaded && _myRessourceManager->imageMatchesGLTexture(dynamic_cast_Ptr<Image>(getSelf()))) { 
-            _myRessourceManager->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
-        } else {
-            if (_myTextureId) {
-                // In order to prevent a texture leak, we need to unbind the texture before setupImage()
-                _myRessourceManager->unbindTexture(this);
-            }
-            _myTextureId = _myRessourceManager->setupTexture(dynamic_cast_Ptr<Image>(getSelf()));
-            set<TextureIdTag>(_myTextureId);
-            _myTextureUploaded = true;
-        }
-    }
-
-    void
     Image::calculateWidth() {
-        set<ImageWidthTag>(getRasterPtr()->width());
+        if (getRasterPtr()) {
+            set<ImageWidthTag>(getRasterPtr()->width());
+        }
     }
 
     void
     Image::calculateHeight() {
-        set<ImageHeightTag>(getRasterPtr()->height());
+        if (getRasterPtr()) {
+            set<ImageHeightTag>(getRasterPtr()->height());
+        }
     }
 
-    void 
-    Image::calculateInternalPixelFormat() {
-        PixelEncoding myRasterFormat = getRasterEncoding();
-        const std::string & myTextureFormat = get<TexturePixelFormatTag>();     
-        bool myAlphaChannelRequired = !(almostEqual(get<ImageColorScaleTag>()[3], 1) && 
-            almostEqual(get<ImageColorBiasTag>()[3], 0));
-        if (myTextureFormat.size()) {
-            // If there is an texture pixel format set from outside, we use it
-            set<ImageInternalFormatTag>(myTextureFormat);
-        } else if ((myRasterFormat == y60::RGB || myRasterFormat == y60::BGR) && myAlphaChannelRequired) {
-            // If a change in colorscale introduces an alpha channel ensure
-            // that internal format has alpha
-            set<ImageInternalFormatTag>(getStringFromEnum(TEXTURE_IFMT_RGBA8, TextureInternalFormatStrings));
-        } else {
-            TextureInternalFormat myInternalFormat = getInternalPixelFormat(myRasterFormat);
-            set<ImageInternalFormatTag>(getStringFromEnum(myInternalFormat, TextureInternalFormatStrings));
-        }        
-    }
-
-    void
-    Image::updateTextureParams() {
-        _myRessourceManager->updateTextureParams(dynamic_cast_Ptr<Image>(getSelf()));
-    }
 
     void
     Image::load() {
-        // facade contruction will always lead to a rasterctor, 
+        // facade contruction will always lead to a raster ctor, 
         // we do not want this behaviour for inlining textures
         if (!allowInlineFlag) {
             return;
@@ -292,7 +184,7 @@ namespace y60 {
             return;
         }
 
-        AC_TRACE << "Image::load loading '" << get<ImageSourceTag>() << "'";
+        AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
         ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
             ITextureManagerPtr(0), myDepth);
@@ -305,28 +197,18 @@ namespace y60 {
         }
 
         // ImageTileTag only relevant for getType() == CUBEMAP
-        myImageLoader.ensurePowerOfTwo(get<ImageResizeTag>(), getType(), myDepth, &(get<ImageTileTag>()));
+        myImageLoader.ensurePowerOfTwo(get<ImageResizeTag>(), myDepth, &(get<ImageTileTag>()));
 
         // Drop alpha channel if unused
-        const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
-        if (!asl::almostEqual(myColorScale[3], 1)) {
-            if (!myImageLoader.HasAlpha()) {
-                // the real alpha scaling is done with glPixeltransfer routines with opengl,
-                // so here we assure that the image has a alpha channel filled with 1.0 (vs/dk)
-                myImageLoader.setFixedAlpha(1);
-            }
-        } else {
-            myImageLoader.removeUnusedAlpha();
-        }
+        myImageLoader.removeUnusedAlpha();
 
         set<ImageMatrixTag>(myImageLoader.getImageMatrix());    
         setRasterValue(myImageLoader.getData(), myImageLoader.getEncoding(), myDepth);
-        set<LoadCountTag>(get<LoadCountTag>() + 1);
     }
 
     dom::ResizeableRasterPtr
     Image::setRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth) {
-        //AC_DEBUG << "setRasterValue '" << get<NameTag>() << "' id=" << get<IdTag>();
+        AC_DEBUG << "setRasterValue '" << get<NameTag>() << "' id=" << get<IdTag>();
 
         // Remove existing raster
         if (getNode().childNodes().size()) {
@@ -342,19 +224,12 @@ namespace y60 {
         dom::DOMString myRasterName = RasterElementNames[theEncoding];
         dom::NodePtr myRasterChild = getNode().appendChild(dom::NodePtr(new dom::Element(myRasterName)));
         dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
-
         myTextChild->nodeValueWrapperPtr(theRaster);
 
         // We have to reconnect the dependency graph, because the value has changed
         registerDependenciesForRasterValueUpdate();        
 
-        //_myTextureUploaded = false;
         return dynamic_cast_Ptr<dom::ResizeableRaster>(theRaster);
-    }
-
-    ImageType
-    Image::getType() const {
-        return get<ImageTypeTag>();
     }
 
     PixelEncoding
@@ -362,84 +237,7 @@ namespace y60 {
         return PixelEncoding(getEnumFromString(get<RasterPixelFormatTag>(), PixelEncodingString));
     }
 
-    TextureInternalFormat
-    Image::getInternalEncoding() const {
-        return TextureInternalFormat(getEnumFromString(get<ImageInternalFormatTag>(), TextureInternalFormatStrings));
-    }
 
-    void 
-    Image::triggerUpload() {
-        //AC_DEBUG << "triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        _myTextureUploaded = false;
-        TextureIdTag::Plug::getValuePtr()->setDirty();
-    }
-
-    bool 
-    Image::isUploaded() const {
-        return _myTextureUploaded;
-    }
-
-    void 
-    Image::removeTextureFromResourceManager() {
-        //AC_DEBUG << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        if (_myTextureId == 0) {
-            return;
-        }
-        ensureResourceManager();
-        _myRessourceManager->unbindTexture(this);
-        unbind();
-    }
-
-    TextureWrapMode
-    Image::getWrapMode() const {
-        return get<TextureWrapModeTag>();
-    }
-
-    TextureSampleFilter
-    Image::getMinFilter() const {
-        return get<TextureMinFilterTag>();
-    }
-    
-    TextureSampleFilter
-    Image::getMagFilter() const {
-        return get<TextureMagFilterTag>();
-    }
-    
-
-    void 
-    Image::unbind() {
-        if (_myTextureId == 0) {
-            return;
-        }
-        AC_DEBUG << "Image::unbind '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        _myTextureId = 0;
-        set<TextureIdTag>(_myTextureId);
-        TextureIdTag::Plug::getValuePtr()->setDirty();
-    }
-
-    void
-    Image::registerTexture() {
-        if (_myRefCount == 0) {
-            ensureResourceManager();
-            _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IN_USE);
-        }
-        ++_myRefCount;
-    }
-
-    void
-    Image::deregisterTexture() {
-        --_myRefCount;
-        if (_myRefCount==0) {
-            ensureResourceManager();
-            _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IDLE);
-        }
-    }
-
-    bool
-    Image::usePixelBuffer() const {
-        // not much use for regular images
-        return false;
-    }
 
     void
     Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
@@ -538,46 +336,19 @@ namespace y60 {
     }
 
     void
-    Image::saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
-                              const VectorOfVectorOfFloat & theFilterParams)
+    Image::saveToFile(const string & theImagePath,
+            const VectorOfString & theFilter,
+            const VectorOfVectorOfFloat & theFilterParams)
     {
         PLAnyBmp myBmp;
         convertToPLBmp( myBmp );
-        applyCustomFilter(myBmp, theFilter, theFilterParams);
-
-        string myImagePath = toLowerCase(theImagePath);
-        string::size_type pos = string::npos;
-
-        pos = myImagePath.find_last_of(".");
-        if ( pos != string::npos) {
-            string myExtension = myImagePath.substr(pos);
-            if (myExtension == ".jpg" || myExtension == ".jpeg") {
-                // [jb] PLJPEGEncoder expects images to have alpha (32bit),
-                //      this hack stuffs the pixelformat with the missing 8bit:
-                PLAnyBmp myTmpBmp;
-                convertToPLBmp( myTmpBmp );
-                myTmpBmp.CreateCopy(myBmp, PLPixelFormat::X8B8G8R8);
-
-                PLJPEGEncoder myJPEGEncoder;
-                myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
-                return;
-            }
+        if (theFilter.size()) {
+            applyCustomFilter(myBmp, theFilter, theFilterParams);
         }
 
-        PLPNGEncoder myPNGEncoder;
-        myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
-    }
-
-    void
-    Image::saveToFile(const string & theImagePath) {
-        PLAnyBmp myBmp;
-        convertToPLBmp( myBmp );
-
         string myImagePath = toLowerCase(theImagePath);
-        string::size_type pos = string::npos;
-
-        pos = myImagePath.find_last_of(".");
-        if ( pos != string::npos) {
+        string::size_type pos = myImagePath.find_last_of(".");
+        if (pos != string::npos) {
             string myExtension = myImagePath.substr(pos);
 
             if (myExtension == ".jpg" || myExtension == ".jpeg") {
@@ -596,8 +367,8 @@ namespace y60 {
             }
         }
 
+        // default to png
         PLPNGEncoder myPNGEncoder;
         myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
     }
 }
-

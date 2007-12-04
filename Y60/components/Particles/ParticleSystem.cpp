@@ -181,14 +181,14 @@ ParticleSystem::create(const dom::NodePtr & theParentNode,
         myRequiresNode.firstChild()->firstChild()->nodeValue("[100[particles]]");
     }
 
-    // turn on sprite in texture
-    dom::NodePtr myTextures = _myMaterialNode->childNode("textures");
-    dom::NodePtr myTexture = myTextures->childNode("texture");
-    myTexture->getAttribute("sprite")->nodeValue("1");
+    // turn on sprite in texture unit
+    dom::NodePtr myTextureUnits = _myMaterialNode->childNode("textureunits");
+    dom::NodePtr myTextureUnit = myTextureUnits->childNode("textureunit");
+    myTextureUnit->getAttribute("sprite")->nodeValue("1");
 
-    // turn off mipmap in image
-    _myImageNode = _myScene->getWorldRoot()->getElementById(myTexture->getAttributeString("image"));
-    _myImageNode->getAttribute("mipmap")->nodeValue("0");
+    // turn off mipmap in texture
+    _myTextureNode = _myScene->getWorldRoot()->getElementById(myTextureUnit->getAttributeString("texture"));
+    _myTextureNode->getAttribute("mipmap")->nodeValue("0");
 
     // setup vertices
     ShapeBuilder myShapeBuilder("Particles");
@@ -277,6 +277,7 @@ ParticleSystem::remove() {
     _myAnimationNode->parentNode()->removeChild(_myAnimationNode);
     _myBodyNode->parentNode()->removeChild(_myBodyNode);
     _myMaterialNode->parentNode()->removeChild(_myMaterialNode);
+    _myTextureNode->parentNode()->removeChild(_myTextureNode);
     _myImageNode->parentNode()->removeChild(_myImageNode);
     _myShapeNode->parentNode()->removeChild(_myShapeNode);
 }

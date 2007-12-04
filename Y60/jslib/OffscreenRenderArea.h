@@ -1,6 +1,5 @@
 //============================================================================
-//
-// Copyright (C) 2005, ART+COM AG Berlin
+// Copyright (C) 2005-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -19,12 +18,12 @@
 #include <y60/OffscreenBuffer.h>
 
 /**
- * 
  * @ingroup Y60jslib
  */ 
-
 namespace jslib {
-    class y60::Image;
+
+    class y60::Texture;
+    typedef asl::Ptr<y60::Texture, dom::ThreadingModel> TexturePtr;
     
     class OffscreenRenderArea : public y60::OffscreenBuffer, public AbstractRenderWindow {
         public:
@@ -71,15 +70,11 @@ namespace jslib {
              * traget has the usual power of two constrains. This function can
              * be used to retrive a partial rectangle of arbitrary size.
              */
-            void downloadFromViewport(const dom::NodePtr & theImageNode);
+            void downloadFromViewport(const dom::NodePtr & theTextureNode);
 
             // IFrameBuffer
-            virtual int getWidth() const {
-                return _myWidth;
-            }
-            virtual int getHeight() const {
-                return _myHeight;
-            }
+            virtual int getWidth() const;
+            virtual int getHeight() const;
 
             // IEventSink
             virtual void handle(y60::EventPtr theEvent);
@@ -105,11 +100,10 @@ namespace jslib {
             }
 
         private:
-            dom::ResizeableRasterPtr ensureRaster(asl::Ptr<y60::Image, dom::ThreadingModel> theImage);
+            dom::ResizeableRasterPtr ensureRaster(TexturePtr theTexture);
 
-            const asl::Ptr<y60::Image, dom::ThreadingModel> getImage() const;
-
-            asl::Ptr<y60::Image, dom::ThreadingModel> getImage();
+            const TexturePtr getTexture() const;
+            TexturePtr getTexture();
 
             unsigned _myWidth;
             unsigned _myHeight;

@@ -2,7 +2,7 @@
 #include "ShaderLibrary.h"
 #include "ShaderTypes.h"
 #include "ShaderLibrary.h"
-#include "CGShader.h"
+#include "CgShader.h"
 
 #include <asl/Exception.h>
 #include <Cg/cg.h>
@@ -24,7 +24,7 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
     }
 
     for (unsigned i = 0; i < myShaders.size(); ++i) {
-        CGShaderPtr myShader = dynamic_cast_Ptr<CGShader>(myShaders[i]);
+        CgShaderPtr myShader = dynamic_cast_Ptr<CgShader>(myShaders[i]);
         if (myShader) {
             const VectorOfString & myFragmentShaders = myShader->getShader(FRAGMENT_SHADER)._myPossibleProfileNames;
             const VectorOfString & myVertexShaders = myShader->getShader(VERTEX_SHADER)._myPossibleProfileNames;
@@ -45,6 +45,7 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
 
 int main(int argc, char * argv[]) {
     const std::string myLibraryDir = "../../../../shader/";
+//const std::string myLibraryDir = "../../shader/";
 
     try {
         testShaderLibrary(myLibraryDir+"shaderlibrary_nocg.xml","","");

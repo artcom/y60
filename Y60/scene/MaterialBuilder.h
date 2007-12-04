@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//         $Id: MaterialBuilder.h,v 1.2 2005/04/21 08:59:01 jens Exp $
-//    $RCSfile: MaterialBuilder.h,v $
-//     $Author: jens $
-//   $Revision: 1.2 $
-//       $Date: 2005/04/21 08:59:01 $
-//
-//=============================================================================
 
 #ifndef _ac_MaterialBuilder_h_
 #define _ac_MaterialBuilder_h_
@@ -36,47 +28,48 @@ namespace y60 {
     class MaterialBuilder : public BuilderBase {
     public:
         DEFINE_EXCEPTION(MaterialBuilderException, asl::Exception);
+
         MaterialBuilder(const std::string & theName, bool theInlineTextureFlag = true);
         virtual ~MaterialBuilder();
 
         void needTextureFallback(bool needTextureFallback);
         void setType(const VectorOfRankedFeature & theType);
+
         unsigned getTextureCount();
-        bool isBumpMap(int theTextureIndex) const;
+        bool isBumpMap(unsigned theTextureIndex) const;
+        bool isMovie(const std::string & theFileName) const;
 
         void addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue);
 
-        dom::NodePtr createTextureNode(const std::string & theImageId,
-                                       const TextureApplyMode & theApplyMode,
-                                       const TextureUsage & theUsage,
-                                       const std::string & theMappingMode,
-                                       const asl::Matrix4f & theTextureMatrix,
-                                       float theRanking,
-                                       bool  isFallback = false,
-                                       float theFallbackRanking = 0.0f,
-                                       bool  theSpriteFlag = false);
+        dom::NodePtr createTextureUnitNode(const std::string & theTextureId,
+                const TextureApplyMode & theApplyMode,
+                const TextureUsage & theUsage,
+                const std::string & theMappingMode,
+                const asl::Matrix4f & theMatrix,
+                bool theSpriteFlag = false, float theRanking = 100.0f,
+                bool  isFallback = false, float theFallbackRanking = 0.0f);
 
-        const std::string & createMovie(SceneBuilder & theSceneBuilder,
-                                        const std::string & theName,
-                                        const std::string & theFileName,
-                                        unsigned theLoopCount,
-                                        const asl::Vector4f theColorScale,
-                                        const asl::Vector4f theColorBias,
-										const std::string & theInternalFormat);
+        dom::NodePtr createTextureNode(SceneBuilder & theSceneBuilder,
+                const std::string & theName, const std::string & theImageId,
+                const TextureWrapMode & theWrapMode,
+                bool  theCreateMipmapsFlag,
+                const asl::Matrix4f & theMatrix,
+                const std::string & theInternalFormat = "",
+                const asl::Vector4f & theColorScale = asl::Vector4f(1,1,1,1),
+                const asl::Vector4f & theColorBias = asl::Vector4f(0,0,0,0),
+                bool allowSharing = true);
 
-        const std::string & createImage(SceneBuilder & theSceneBuilder,
-                                        const std::string & theName,
-                                        const std::string & theFileName,
-                                        const TextureUsage & theUsage,
-                                        bool  theCreateMipmapsFlag,
-                                        const asl::Vector4f theColorScale,
-                                        const asl::Vector4f theColorBias,
-                                        ImageType theType,
-                                        const TextureWrapMode & theWrapMode,
-										const std::string & theInternalFormat,
-										const std::string & theResizeMode = IMAGE_RESIZE_SCALE,
-                                        unsigned theDepth = 1,
-                                        bool allowSharing = true);
+        dom::NodePtr createMovieNode(SceneBuilder & theSceneBuilder,
+                const std::string & theName, const std::string & theFileName,
+                unsigned theLoopCount);
+
+        dom::NodePtr createImageNode(SceneBuilder & theSceneBuilder,
+                const std::string & theName, const std::string & theFileName,
+                const TextureUsage & theUsage,
+                ImageType theType = SINGLE,
+                const std::string & theResizeMode = IMAGE_RESIZE_SCALE,
+                unsigned theDepth = 1,
+                bool allowSharing = true);
 
 /*
         void appendTexture(SceneBuilder & theSceneBuilder,
@@ -85,7 +78,7 @@ namespace y60 {
                            const std::string & theApplyMode,
                            const std::string & theUsage,
                            const std::string & theWrapMode,
-                           const asl::Matrix4f & theTextureMatrix,
+                           const asl::Matrix4f & theMatrix,
                            float theRanking,
                            bool  isFallback,
                            float theFallbackRanking,
@@ -103,8 +96,7 @@ namespace y60 {
                            const std::string & theLeftFileName,
                            const std::string & theTopFileName,
                            const std::string & theBottomFileName,
-                           const TextureApplyMode & theApplyMode,
-                           const asl::Vector4f theColorScale);
+                           const TextureApplyMode & theApplyMode);
 
         void setTextureUVRepeat(const std::string & theTextureName, double theRepeatU, double theRepeatV);
 
@@ -114,7 +106,6 @@ namespace y60 {
         void setTransparencyFlag(bool theFlag);
         bool getTransparencyFlag() const;
 
-        bool isMovie(const std::string & theFileName);
     private:
         void checkState();
         void setup();

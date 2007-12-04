@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -302,74 +302,115 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
     Public.src getter = function() { return Public.image.src; }
     Public.src setter = function(theArgument) { Public.image.src = expandEnvironment(theArgument); }
 
+    /// Get image of first texture.
     Public.image getter = function() {
         if (Protected.myImages.length) {
             return Protected.myImages[0];
-        } else {
-            return null;
         }
+        return null;
     }
+
+    /// Set image of first texture.
     Public.image setter = function(theImage) {
         Protected.myImages[0] = theImage;
-        if (_myTextures) {
-            _myTextures.childNodes[0].image = theImage.id;
+        if (_myTextureUnits) {
+            var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[0].texture);
+            myTexture.image = theImage.id;
         } else {
             Protected.addTexture(theImage.id);
         }
     }
 
+    /// Set images for all textures.
     Public.images setter = function(theImages) {
         for (var i = 0; i < theImages.length; ++i) {
-            if (i < _myTextures.childNodes.length) {
-                _myTextures.childNodes[i].image = theImages[i].id;
+            if (i < _myTextureUnits.childNodes.length) {
+                var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[i].texture);
+                myTexture.image = theImages[i].id;
             } else {
                 Protected.addTexture(theImages[i].id);
             }
         }
-        i = _myTextures.childNodes.length;
+        // remove unused textureunit/texture
+        i = _myTextureUnits.childNodes.length;
         while (i-- > theImages.length) {
-            _myTextures.removeChild(_myTextures.lastChild);
+            var myTextureUnit = _myTextureUnits.lastChild;
+            var myTexture = myTextureUnit.getElementById(myTextureUnit.texture);
+            _myTextureUnits.removeChild(myTextureUnit);
+            myTexture.parentNode.removeChild(myTexture);
         }
-        addTextureRequirements(_myTextures.childNodesLength());
+        addTextureRequirements(_myTextureUnits.childNodesLength());
         Protected.myImages = theImages;
     }
 
+    /// Get all images.
     Public.images getter = function() {
-        /*
-        var myImages = [];
-        for (var i = 0; i < Protected.myImages.length; ++i) {
-            myImages.push(Protected.myImages[i]);
-        }*/
         return Protected.myImages;
     }
 
+    /*
     Public.textures getter = function() {
-        return _myTextures;
+        // XXX must be adapted for textureunit/texture/image structure.
+        Logger.error("DEPRECATED Overlay.textures getter");
+        exit(-1);
+        return _myTextureUnits;
     }
 
     Public.textures setter = function(theTextures) {
+        // XXX must be adapted for textureunit/texture/image structure.
+        Logger.error("DEPRECATED Overlay.textures setter");
+        exit(-1);
         for (var i = 0; i < theTextures.length; ++i) {
-            if (i < _myTextures.childNodes.length) {
-                _myTextures.replaceChild(theTextures[i], _myTextures.childNodes[i]);
+            if (i < _myTextureUnits.childNodes.length) {
+                _myTextureUnits.replaceChild(theTextures[i], _myTextureUnits.childNodes[i]);
             } else {
-                _myTextures.appendChild(theTextures[i]);
+                _myTextureUnits.appendChild(theTextures[i]);
             }
         }
-        i = _myTextures.childNodes.length;
+        i = _myTextureUnits.childNodes.length;
+        // XXX must be adapted for textureunit/texture/image structure.
         while (i-- > theTextures.length) {
-            _myTextures.removeChild(_myTextures.lastChild);
+            _myTextureUnits.removeChild(_myTextureUnits.lastChild);
         }
         Protected.onTextureChange();
     }
+    */
 
-    Public.texture getter = function() {
-        return _myTextures.childNodes[0];
+    /// Get texture units.
+    Public.textureunits getter = function() {
+        return _myTextureUnits;
     }
 
-    Public.texture setter = function(theTexture) {
-        _myTextures.replaceChild(theTexture, _myTextures.firstChild);
+    /// Get first texture unit.
+    Public.textureunit getter = function() {
+        return _myTextureUnits.childNodes[0];
+    }
+
+    /// Set texture unit. Default is the first texture unit.
+    Public.textureunit setter = function(theTextureUnit, theIndex) {
+        if (theIndex == undefined) {
+            theIndex = 0;
+        }
+        _myTextureUnits.replaceChild(theTextureUnit, _myTextureUnits.childNodes[theIndex]);
         Protected.onTextureChange();
     }
+
+    /// Get first texture.
+    Public.texture getter = function() {
+        var myTextureUnit = Public.textureunit;
+        return myTextureUnit.getElementById(myTextureUnit.texture);
+    }
+
+    /*
+    Public.texture setter = function(theTexture) {
+        // XXX must be adapted for textureunit/texture/image structure.
+        // but apparently no one uses this anyway...
+        Logger.error("Deprecated Overlay.texture setter. " + theTexture);
+        exit(-1);
+        _myTextureUnits.replaceChild(theTexture, _myTextureUnits.firstChild);
+        Protected.onTextureChange();
+    }
+    */
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
@@ -377,9 +418,9 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
     Protected.onTextureChange = function() {
         Protected.myImages = [];
-        for (var i = 0; i < _myTextures.childNodes.length; ++i) {
-            var myId = _myTextures.childNodes[i].image;
-            var myImage = _myTextures.getElementById(myId);
+        for (var i = 0; i < _myTextureUnits.childNodes.length; ++i) {
+            var myId = _myTextureUnits.childNodes[i].image;
+            var myImage = _myTextureUnits.getElementById(myId);
             if (myImage == null) {
                 throw new Exception("Could not find image with id: " + myId, fileline());
             }
@@ -388,24 +429,61 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
     }
 
     Protected.onMaterialChange = function() {
-        _myTextures = getDescendantByTagName(Public.material, "textures", false);
-        
-        if (_myTextures.childNodes.length != 1) {
-            throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextures.childNodes.length, fileline());
+        _myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
+        if (_myTextureUnits.childNodes.length != 1) {
+            throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextureUnits.childNodes.length, fileline());
         }
-
         Protected.onTextureChange();
     }
 
     Protected.addTexture = function(theImageId) {
-        _myTextures = getDescendantByTagName(Public.material, "textures", false);
-        if (!_myTextures) {
-            _myTextures = Public.material.appendChild(Node.createElement("textures"));
+
+        var myImage = window.scene.images.getElementById(theImageId);
+        if (!myImage) {
+            Logger.error("No such image id=" + theImageId);
+            return;
         }
-        var myTexture  = _myTextures.appendChild(Node.createElement("texture"));
-        myTexture.applymode = TextureApplyMode.modulate;
-        myTexture.image     = theImageId;
-        addTextureRequirements(_myTextures.childNodesLength());
+		var isMovieFlag = myImage.nodeName == "movie";
+		if (isMovieFlag) {
+			myImage.frameblending = false;
+		}
+        // use texture that references theImageId
+        var myTexture = getDescendantByAttribute(window.scene.textures, "image", theImageId);
+        var my2ndTexture = null
+        if (!myTexture) {
+            myTexture = Modelling.createTexture(window.scene, myImage);
+            myTexture.image = theImageId;
+            if (isMovieFlag && myImage.frameblending) {
+				var my2ndTexture = Modelling.createTexture(window.scene, myImage);
+				my2ndTexture.name = myTexture.name + "_2ndBuffer";
+				my2ndTexture.image = theImageId;
+				my2ndTexture.image_index = 1;
+            }
+        } else {
+            // re-use texture that references the given image -- maybe not such a good idea...
+            // in fact, it will probably break when cleaning up after ourselves since we might
+            // delete a texture that is in use by some other material...
+        }
+
+        // create texture unit
+        if (!_myTextureUnits) {
+            _myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
+            if (!_myTextureUnits) {
+                _myTextureUnits = Public.material.appendChild(Node.createElement("textureunits"));
+            }
+        }
+
+        var myTextureUnit = _myTextureUnits.appendChild(Node.createElement("textureunit"));
+        myTextureUnit.applymode = TextureApplyMode.modulate;
+        myTextureUnit.texture   = myTexture.id;
+
+		if (isMovieFlag && myImage.frameblending) {		
+			var my2ndTextureUnit = _myTextureUnits.appendChild(Node.createElement("textureunit"));
+			my2ndTextureUnit.applymode = TextureApplyMode.modulate;
+			my2ndTextureUnit.texture   = my2ndTexture.id;
+		}
+        addTextureRequirements(_myTextureUnits.childNodesLength());
+
         return myTexture;
     }
 
@@ -415,46 +493,56 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    function createTextureFeatureString(theTextureCount) {
-        var myString = '[100[';
+    function createTextureFeatureString(theTextureCount, theUsage) {
+
+        if (theUsage == undefined) {
+            theUsage = "paint";
+        }
+
+        var myString = "[100[";
         for (var i = 0; i < theTextureCount; ++i) {
-            myString += "paint";
-            if (i != theTextureCount - 1) {
+            if (i > 0) {
                 myString += ",";
             }
+            myString += theUsage;
         }
-        myString += ']]';
+        myString += "]]";
         return myString;
     }
-    function createTexcoordFeatureString(theTextureCount) {
-        var myString = '[100[';
+
+    function createTexcoordFeatureString(theTextureCount, theMapping) {
+
+        if (theMapping == undefined) {
+            theMapping = "uv_map";
+        }
+
+        var myString = "[100[";
         for (var i = 0; i < theTextureCount; ++i) {
-            myString += "uv_map";
-            if (i != theTextureCount - 1) {
+            if (i > 0) {
                 myString += ",";
             }
+            myString += theMapping;
         }
-        myString += ']]';
+        myString += "]]";
         return myString;
     }
 
     function addTextureRequirements(theTextureCount) {
         var myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "textures", false);
         if (myTextureFeatures == null) {
-            myTextureFeatures = new Node('<feature name="textures">[10[sds]]</feature>\n').firstChild;
+            myTextureFeatures = new Node("<feature name='textures'>[10[sds]]</feature>").firstChild;
             Public.material.requires.appendChild(myTextureFeatures);
         }
         myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
         if (myTextureFeatures == null) {
-            myTextureFeatures = new Node('<feature name="texcoord">[10[sds]]</feature>\n').firstChild;
+            myTextureFeatures = new Node("<feature name='texcoord'>[10[sds]]</feature>").firstChild;
             Public.material.requires.appendChild(myTextureFeatures);
         }
         Public.material.requires.textures = createTextureFeatureString(theTextureCount);
         Public.material.requires.texcoord = createTexcoordFeatureString(theTextureCount);
-
     }
 
-    var _myTextures = null;
+    var _myTextureUnits = null;
 }
 
 // Pure virtual base class
@@ -480,11 +568,11 @@ ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, t
                 // theSource is a string
                 myImage = Node.createElement("image");
                 myImage.src  = expandEnvironment(theSource);
-                myImage.resize = "pad";
-                myImage.mipmap = false;
+                //myImage.resize = "pad";
+                //myImage.mipmap = false;
                 theScene.images.appendChild(myImage);
                 myImage.name = mySource;
-                myImage.wrapmode  = TextureWrapMode.repeat;
+                //myImage.wrapmode  = TextureWrapMode.repeat;
                 myImage.type = ImageType.single;                
                 //ourImageCache[mySource] = myImage;
             }
@@ -628,7 +716,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
             if (thePixelFormat == undefined) {
                 thePixelFormat = "RGB";
             }
-            myImage.texturepixelformat = thePixelFormat;
+            //myImage.texturepixelformat = thePixelFormat;
             if (thePlayMode != undefined) {
                 myImage.playmode = thePlayMode;
             }
@@ -637,7 +725,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
         if (myNodeName == "movie") {
             window.scene.loadMovieFrame(myImage);
         } else if (myNodeName == "capture") {
-                window.scene.loadCaptureFrame(myImage);
+            window.scene.loadCaptureFrame(myImage);
         } else {
             throw new Exception("Unknown movie image node name: " + myNodeName, fileline());
         }
@@ -681,15 +769,26 @@ function removeOverlay(theOverlayNode) {
         var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
         if (myMaterialNode) {
 
-            // Remove images
-            var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
-            
-            if (myTextures) {
-                for (var i = 0; i < myTextures.childNodes.length; ++i) {
-                    var myImageId = myTextures.childNode(i).image;
-                    var myImage = theOverlayNode.getElementById(myImageId);
-                    if (myImage) {        
+            // Remove texture,image
+            var myTextureUnits = getDescendantByTagName(myMaterialNode, "textureunits", false);
+            if (myTextureUnits) {
+                for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
+                    var myTextureUnit = myTextureUnits.childNode(i);
+                    var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
+
+                    if (getDescendantsByAttribute(window.scene.textures, "image", myTexture.image).length == 1) {
+                        // our texture is the only one referencing this image, safe to remove
+                        var myImage = myTexture.getElementById(myTexture.image);
                         myImage.parentNode.removeChild(myImage);
+                    } else {
+                        Logger.warning("More than one texture references image id=" + myTexture.image);
+                    }
+
+                    if (getDescendantsByAttribute(window.scene.materials, "texture", myTexture.id, true).length == 1) {
+                        // our textureunit is the only one referencing this texture, safe to remove
+                        myTexture.parentNode.removeChild(myTexture);
+                    } else {
+                        Logger.warning("More than one textureunit references texture id=" + myTexture.id);
                     }
                 }
             }

@@ -85,7 +85,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool clearTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool clearInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool copyBufferToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool copyBufferToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
         static JSBool getRenderer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool setSceneAndCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

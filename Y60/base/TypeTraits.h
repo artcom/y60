@@ -56,7 +56,7 @@ namespace y60 {
                   TARGETBUFFERS,
                   BLENDFUNCTION,
                   VECTOR_OF_BLENDFUNCTION,
-                  TEXTURE_APPLYMODE,
+                  TEXTUREUNIT_APPLYMODE,
                   TEXTURE_SAMPLEFILTER,
                   TEXTURE_WRAPMODE,
                   TypeIdEnum_MAX
@@ -91,7 +91,7 @@ namespace y60 {
         "targetbuffers",
         "blendfunction",
         "vectorofblendfunction",
-        "textureapplymode",
+        "textureunitapplymode",
         "texturesamplefilter",
         "texturewrapmode",
         ""
@@ -182,7 +182,7 @@ namespace y60 {
     template <>
     struct TypeIdTraits<TextureApplyMode> {
         static const TypeId type_id() {
-            return TEXTURE_APPLYMODE;
+            return TEXTUREUNIT_APPLYMODE;
         }
     };
     template <>

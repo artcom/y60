@@ -42,10 +42,15 @@ MaterialQuadBody.prototype.Constructor = function(Public, theScene, theParentNod
             // theImage is-a filename
 
             if (theImage in ourImageMap) {
-                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], "MQB_Material");
+                _myMaterial = 
+                    Modelling.createUnlitTexturedMaterial(theScene, ourImageMap[theImage], 
+                                                          "MQB_Material");
             } else {
-                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, "MQB_Material", false);
-                ourImageMap[theImage] = _myMaterial.getElementById(_myMaterial.childNode("textures", 0).firstChild.image);
+                _myMaterial = Modelling.createUnlitTexturedMaterial(theScene, theImage, 
+                                                                    "MQB_Material", false);
+                var myTextureId = _myMaterial.childNode('textureunits').firstChild.texture;
+                var myTexture = window.scene.textures.getElementById(myTextureId);
+                ourImageMap[theImage] = _myMaterial.getElementById(myTexture.image);
             }
             _myMaterial.properties.surfacecolor = new Vector4f(1, 1, 1, 1);
         } else {

@@ -353,8 +353,9 @@ namespace y60 {
     GLenum asGLTextureRegister(y60::GLRegister theRegister);
     GLenum asGLLightEnum(unsigned theLightNum);
     GLenum asGLClippingPlaneId(unsigned thePlaneNum);
-    GLenum asGLTextureFunc(TextureApplyMode theApplyMode);
-    GLenum asGLTextureWrapmode(TextureWrapMode theWrapMode);
+    GLenum asGLTextureTarget(TextureType theTextureType);
+    GLenum asGLTextureApplyMode(TextureApplyMode theApplyMode);
+    GLenum asGLTextureWrapMode(TextureWrapMode theWrapMode);
     GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);

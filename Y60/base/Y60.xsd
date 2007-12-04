@@ -483,10 +483,11 @@ Currently the following usage flags are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+
     <xs:simpleType name="TextureApplyMode">
         <xs:annotation>
-             <xs:documentation>Texture apply mode.
-'modulate','decal','replace','blend','add'</xs:documentation>
+             <xs:documentation>Texture unit apply mode.
+'modulate','decal','replace','blend','add','combine'</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -498,7 +499,13 @@ Currently the following usage flags are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    
+    <xs:simpleType name="TextureType">
+        <xs:annotation>
+             <xs:documentation>OpenGL texture type used.
+'texture_2d','texture_rectangle','texture_3d','texture_cubemap'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="TextureWrapMode">
         <xs:annotation>
              <xs:documentation>Texture wrap mode.
@@ -506,13 +513,14 @@ Currently the following usage flags are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+
     <xs:simpleType name="ImageType">
         <xs:annotation>
              <xs:documentation>Image type.
-'single','cubemap'</xs:documentation>
+'single','voxel','cubemap'</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
-    </xs:simpleType>    
+    </xs:simpleType>
     <xs:element name="rasterofrgb">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -917,9 +925,14 @@ lightsources, animations, shapes and images</xs:documentation>
                         <xs:documentation>Contains the geometric of all objects in the scene</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="textures">
+                    <xs:annotation>
+                        <xs:documentation>Contains texture objects that are referenced by textureunits</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="images">
                     <xs:annotation>
-                        <xs:documentation>Contains images that are referenced by textures in materials</xs:documentation>
+                        <xs:documentation>Contains images that are referenced by textures</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
@@ -957,7 +970,7 @@ body, camera, light, transform, lod, joint</xs:documentation>
                 <xs:extension base="SceneGraphNodeType">
                     <xs:attribute name="skyboxmaterial" type="xs:IDREF">
                         <xs:annotation>
-                            <xs:documentation>Id of a material, that will be used as skybox.
+                            <xs:documentation>ID of a material, that will be used as skybox.
 The material must include a cubemap texture.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
@@ -1026,7 +1039,7 @@ This element can contain any number of canvas elements.</xs:documentation>
     </xs:element>
     <xs:element name="canvas">
         <xs:annotation>
-            <xs:documentation>OpenGl render area.
+            <xs:documentation>OpenGL render area.
 Webster: A canvas is a piece of cloth backed or framed as a surface for a painting.
 Normally, there is just one canvas, with one viewport, with one camera rendering through this viewport.
 But a canvas can have multiple viewports. And there can be multiple canvases, too.
@@ -1048,8 +1061,7 @@ A canvas can be used as texture for a material in the future.</xs:documentation>
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this canvas.
-Usually 'cv' plus a number, such as 'cv0'.</xs:documentation>
+                    <xs:documentation>Unique ID for this canvas.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1067,14 +1079,14 @@ backgroundcolor='[1,0,0]' to set the backgroundcolor to red.</xs:documentation>
             </xs:attribute>
             <xs:attribute name="target" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Defines a rendering target (pbuffer).
+                    <xs:documentation>Defines a rendering target (texture).
 Must reference an existing image in scene if set.
 
-Note: The image should have mipmapping disabled since existing mipmap levels
+Note: The texture should have mipmapping disabled since existing mipmap levels
 aren't updated when subloading. It has to be disabled before the first load
 occurs.
-Note2: When reading from the framebuffer the image is flipped vertically. A
-solution might be to use a scaling image matrix of [1,-1,1].
+Note2: When reading from the framebuffer the texture is flipped vertically. A
+solution might be to use a scaling matrix of [1,-1,1].
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -1103,8 +1115,7 @@ A possible application is edge blending, where you render the same scene into tw
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this viewport.
-Usually 'vp' plus a number, such as 'vp0'.</xs:documentation>
+                    <xs:documentation>Unique ID for this viewport.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1120,7 +1131,7 @@ The default is 'landscape'. Use 'portrait' mode to turn the screen and mouse eve
             </xs:attribute>
             <xs:attribute name="camera" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Id of the camera that is attached to this viewport.</xs:documentation>
+                    <xs:documentation>ID of the camera that is attached to this viewport.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="position" type="Vector2f">
@@ -1210,7 +1221,7 @@ aspect of the viewport changes.</xs:documentation>
                 <xs:extension base="Box2f">
                     <xs:attribute name="id" type="xs:ID">
                         <xs:annotation>
-                            <xs:documentation>Unique id for this box.</xs:documentation>
+                            <xs:documentation>Unique ID for this box.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
                     <xs:attribute name="name" type="xs:string">
@@ -1343,8 +1354,7 @@ Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to'
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this character.
-Usually 'ch' plus a number, such as 'ch0'.</xs:documentation>
+                    <xs:documentation>Unique ID for this character.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1374,8 +1384,7 @@ Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to'
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this clip.
-Usually 'cl' plus a number, such as 'cl0'.</xs:documentation>
+                    <xs:documentation>Unique ID for this clip.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1441,8 +1450,7 @@ reference the vertexdata</xs:documentation>
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this shape.
-Usually 's' plus a number, such as 's0'.</xs:documentation>
+                    <xs:documentation>Unique ID for this shape.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1557,7 +1565,7 @@ See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for 
             </xs:sequence>
             <xs:attribute name="material" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>The id of a material that will be used to render the list of elements.</xs:documentation>
+                    <xs:documentation>The ID of a material that will be used to render the list of elements.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="renderstyle" type="RenderStyles">
@@ -1578,11 +1586,11 @@ Supported types are:
 'linestrip'     - all vertices in the list are rendered as a connected line
 'lineloop'      - all vertices in the list are rendered as a connected line, the first and last vertex is connected
 'triangles'     - every three vertices in the list are rendered as a triangle
-'trianglestrip' - all vertices in the list are rendered as connected triangles (see OpenGl GL_TRIANGLE_STRIP description for details)
-'trianglefan'   - all vertices in the list are rendered as connected triangles (see OpenGl GL_TRIANGLE_FAN description for details)
+'trianglestrip' - all vertices in the list are rendered as connected triangles (see OpenGL GL_TRIANGLE_STRIP description for details)
+'trianglefan'   - all vertices in the list are rendered as connected triangles (see OpenGL GL_TRIANGLE_FAN description for details)
 'quads'         - every four vertices in the list are rendered as a quad
-'quadstrip'     - all vertices in the list are rendered as connected quads (see OpenGl GL_QUAD_STRIP description for details)
-'polygon'       - all vertices in the list are rendered as a connected polygon (see OpenGl GL_POLYGON description for details)</xs:documentation>
+'quadstrip'     - all vertices in the list are rendered as connected quads (see OpenGL GL_QUAD_STRIP description for details)
+'polygon'       - all vertices in the list are rendered as a connected polygon (see OpenGL GL_POLYGON description for details)</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
@@ -1685,7 +1693,7 @@ exponent (float)    Value that specifies the intensity distribution of the light
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this lightsource.</xs:documentation>
+                    <xs:documentation>Unique ID for this lightsource.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1764,8 +1772,7 @@ even if nothing changes, there are 25 values in the list per second.</xs:documen
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for the animation.
-Usually 'a' plus a number, such as 'a0'.</xs:documentation>
+                    <xs:documentation>Unique ID for the animation.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1799,7 +1806,7 @@ Properties are searched within a 'property' node under the node specified by the
              </xs:attribute>
              <xs:attribute name="node" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Id of the node to be animated, must be inside the world node.</xs:documentation>
+                    <xs:documentation>ID of the node to be animated, must be inside the world node.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="begin" type="xs:float">
@@ -1881,8 +1888,7 @@ The child overlays inherit the following attributes from their parents:
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for the overlay.
-Usually 'o' plus a number, such as 'o0'.</xs:documentation>
+                    <xs:documentation>Unique ID for the overlay.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -1949,7 +1955,7 @@ A value of [2,1] would repeat the image on the right side once.</xs:documentatio
             </xs:attribute>
             <xs:attribute name="material" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Id of the material to be used for the overlay.</xs:documentation>
+                    <xs:documentation>ID of the material to be used for the overlay.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="bordercolor" type="Vector4f">
@@ -2002,16 +2008,15 @@ to find the best matching shader for this material.</xs:documentation>
                         <xs:documentation>Contains material properties, such as colors.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="textures">
+                <xs:element ref="textureunits">
                     <xs:annotation>
-                        <xs:documentation>Contains texture definitions.</xs:documentation>
+                        <xs:documentation>Contains texture unit definitions.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for the material.
-Usually 'm' plus a number, such as 'm0'.</xs:documentation>
+                    <xs:documentation>Unique ID for the material.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">
@@ -2471,31 +2476,31 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="textures">
-        <xs:annotation>
-            <xs:documentation>List of textures that belong to the material.
 
-The number of texture child nodes must be the same as the number of textures defined in the material requirements node.</xs:documentation>
+    <xs:element name="textureunits">
+        <xs:annotation>
+            <xs:documentation>List of textureunits that belong to the material.
+The number of textureunit child nodes must be the same as the number of textures defined in the material requirements node.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="texture">
+                <xs:element ref="textureunit">
                     <xs:annotation>
-                        <xs:documentation>Contains texture attributes and reference to an image node</xs:documentation>
+                        <xs:documentation>Contains the referenced texture object, the applymode and the texture matrix.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="texture">
+    <xs:element name="textureunit">
         <xs:annotation>
-            <xs:documentation>Defines the properties of a texture used in a material
-and contains the reference to an image node.</xs:documentation>
+            <xs:documentation>Defines the properties of a texture unit used in a material
+and contains the reference to a texture object node.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:attribute name="image" type="xs:IDREF">
+            <xs:attribute name="texture" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Id of the image node referenced by this texture</xs:documentation>
+                    <xs:documentation>ID of the texture object node referenced by this texture unit</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="applymode" type="TextureApplyMode">
@@ -2507,7 +2512,19 @@ Possible values are (see also OpenGL documentation on GL_TEXTURE_ENV_MODE):
 'decal'      - Color values are blended with alpha, alpha values are replaced
 'replace'    - Color and alpha values are replaced
 'blend'      - Color values are blended, alpha values are multiplied
-'add'        - Color and alpha values are added</xs:documentation>
+'add'        - Color and alpha values are added
+'subtract'   - Values are subtracted
+'combine'    - Texture environment combiner in the 'combiner' attribute is used</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="combiner" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Texture environment combiner name as defined in the shaderlibrary.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="envcolor" type="Vector4f">
+                <xs:annotation>
+                    <xs:documentation>Texture environment blend color. Default is white.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="sprite" type="xs:boolean">
@@ -2521,7 +2538,7 @@ They are useful for particle rendering (snowflakes, etc.)</xs:documentation>
                 <xs:annotation>
                     <xs:documentation>Defines a texture-coordinate matrix.
 All texture coordinates will be multiplied with this matrix.
-useful to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
+Useful to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="projector" type="xs:IDREF">
@@ -2538,6 +2555,122 @@ the projector frustum is reshaped when the aspect of the texture changes.</xs:do
             </xs:attribute>
         </xs:complexType>
     </xs:element>
+
+
+    <xs:element name="textures">
+        <xs:annotation>
+            <xs:documentation>List of texture objects.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="texture">
+                    <xs:annotation>
+                        <xs:documentation>Texture object.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="texture">
+        <xs:annotation>
+            <xs:documentation>Defines the properties of a texture object.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique ID for the texture.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Human readable name for the texture.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="image" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>ID of the image object node referenced by this texture.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="type" type="TextureType">
+                <xs:annotation>
+                    <xs:documentation>OpenGL texture type used internally.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="wrapmode" type="TextureWrapMode">
+                <xs:annotation>
+                    <xs:documentation>The wrapmode of the texture. That is how the texture will be continued,
+after the edge (for texture coordinates greater one or less than zero).
+
+Possible values are:
+'repeat'         - The texture is repeated
+'clamp'          - The last pixel at the border of the texture is repeated
+'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="min_filter" type="TextureSampleFilter">
+                <xs:annotation>
+                    <xs:documentation>The interpolation filter used for minification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation (trilinear when mipmaps are used)
+'nearest'          - nearest neighbor</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="mag_filter" type="TextureSampleFilter">
+                <xs:annotation>
+                    <xs:documentation>The interpolation filter used for magnification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation
+'nearest'          - nearest neighbor</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="texturepixelformat" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Pixelformat which will be send to gl. Leave emtpy, to use default. Possible values are:
+RGB, BGR,RGBA,BGRA,GRAY,GRAY16,GRAY32,DEPTH,GENERIC_RGB,GENERIC_RGBA,GENERIC_ALPHA,GENERIC_LUMINANCE,
+GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DXT5,GRAYS16</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="internal_format" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Format used by OpenGL internally.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="mipmap" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Controls creation of mipmaps for the texture.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="image_index" type="xs:unsignedInt">
+                <xs:annotation>
+                    <xs:documentation>Index of image raster to use</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>            
+            <xs:attribute name="anisotropy" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Anisotropic filtering control.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="color_bias" type="Vector4f">
+                <xs:annotation>
+                    <xs:documentation>Add this offset to every texel on upload.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="color_scale" type="Vector4f">
+                <xs:annotation>
+                    <xs:documentation>Multiply every texel by this value on upload.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="matrix" type="Matrix4f">
+                <xs:annotation>
+                    <xs:documentation>Texture matrix. This matrix will be multiplied by the image matrix.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+
     <xs:element name="ImageBase" type="imageType" abstract="true">
         <xs:annotation>
             <xs:documentation>Base class for images, movies and videos</xs:documentation>
@@ -2636,7 +2769,7 @@ the projector frustum is reshaped when the aspect of the texture changes.</xs:do
         </xs:sequence>
         <xs:attribute name="id" type="xs:ID">
             <xs:annotation>
-                <xs:documentation>Unique id for the image. Usually 'i' plus a number.</xs:documentation>
+                <xs:documentation>Unique ID for the image.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="name" type="xs:string">
@@ -2659,58 +2792,15 @@ If the image is not inlined, it will be loaded from this file.</xs:documentation
             <xs:annotation>
                 <xs:documentation>Height of the image</xs:documentation>
             </xs:annotation>
-        </xs:attribute>
+        </xs:attribute>        
         <xs:attribute name="depth" type="xs:unsignedInt">
             <xs:annotation>
                 <xs:documentation>Number of layers in the image (for 3D-textures)</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="wrapmode" type="TextureWrapMode">
-            <xs:annotation>
-                <xs:documentation>The wrapmode of the texture. That is how the texture will be continued,
-after the edge (for texture coordinates greater one or less than zero).
-
-Possible values are:
-'repeat'         - The texture is repeated
-'clamp'          - The last pixel at the border of the texture is repeated
-'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="min_filter" type="TextureSampleFilter">
-            <xs:annotation>
-                <xs:documentation>The interpolation filter used for minification.
-
-Possible values are:
-'linear' (default) - bilinear interpolation (trilinear when mipmaps are used)
-'nearest'          - nearest neighbor</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="mag_filter" type="TextureSampleFilter">
-            <xs:annotation>
-                <xs:documentation>The interpolation filter used for magnification.
-
-Possible values are:
-'linear' (default) - bilinear interpolation
-'nearest'          - nearest neighbor</xs:documentation>
-            </xs:annotation>
-            </xs:attribute>
-        
         <xs:attribute name="matrix" type="Matrix4f">
             <xs:annotation>
-                <xs:documentation>UV-coordiante matrix. This matrix will be multiplied with
-all uv-coordiates. (In addition to the texture matrix). It is useful to scale non-power-of-two textures to the right dimensions.</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="texturepixelformat" type="xs:string">
-            <xs:annotation>
-                <xs:documentation>Pixelformat which will be send to gl. Leave emtpy, to use default. Possible values are:
-RGB, BGR,RGBA,BGRA,GRAY,GRAY16,GRAY32,DEPTH,GENERIC_RGB,GENERIC_RGBA,GENERIC_ALPHA,GENERIC_LUMINANCE,
-GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DXT5,GRAYS16</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="internal_format" type="xs:string">
-            <xs:annotation>
-                <xs:documentation>Format used by OpenGl internally</xs:documentation>
+                <xs:documentation>Image matrix. It is useful to scale non-power-of-two texture coordinates to the right dimensions.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="type" type="ImageType">
@@ -2718,32 +2808,27 @@ GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DX
                 <xs:documentation>Type of the image.
 
 The following types are supported:
-'single'    - for normal images
-'cubemap'   - for images containing 6 tiles to create a cubemap</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="mipmap" type="xs:boolean">
-            <xs:annotation>
-                <xs:documentation>Set this flag to create mipmaps of the image upon first load</xs:documentation>
+'single'  - for normal images
+'cubemap' - for images containing 6 tiles to create a cubemap</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="resize" type="xs:string">
             <xs:annotation>
-                <xs:documentation>Resizes the image to next power-of-two upon first load.
+                <xs:documentation>Resize the image to next power-of-two using this algorithm.
 
 The following values are possible:
-'none'   - do not resize
-'scale'  - scale the image using bilinear filtering
-'pad'    - pad the image with the border pixels</xs:documentation>
+'none'  - do not resize; default
+'scale' - scale the image using bilinear filtering
+'pad'   - pad the image with the border pixels</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="filter" type="xs:string">
             <xs:annotation>
                 <xs:documentation>Apply a image filter.
 Possible values are:
-'none'             - no filter applied
-'heightToNormal'   - convert height map into a normal map (for bumpmapping)
-'glur'             - combined blur and glow filter</xs:documentation>
+'none'           - no filter applied
+'heightToNormal' - convert height map into a normal map (for bumpmapping)
+'glur'           - combined blur and glow filter</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="filter_params" type="VectorOfFloat">
@@ -2753,18 +2838,8 @@ Possible values are:
         </xs:attribute>
         <xs:attribute name="tile" type="Vector2i">
             <xs:annotation>
-                <xs:documentation>Defines how a cubemap image is tiles
+                <xs:documentation>Defines how the six images of a cubemap are arranged
 (e.g. [1,6] for one image wide and 6 images high</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="color_bias" type="Vector4f">
-            <xs:annotation>
-                <xs:documentation>Adds an offset to the color and alpha value of each pixel during image upload</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="color_scale" type="Vector4f">
-            <xs:annotation>
-                <xs:documentation>Multiplies a scale to the color and alpha value of each pixel during image upload</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
@@ -2802,16 +2877,26 @@ Possible values are:
                         <xs:annotation>
                             <xs:documentation>The total framecount of the movie
 MPEG1 and MPEG2 Movies return -1 as framecount since the number of frames is impossible to determine.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="fps" type="xs:double">
-                        <xs:annotation>
-                            <xs:documentation>Frame rate the movie was encoded with.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="playspeed" type="xs:float">
-                        <xs:annotation>
-                            <xs:documentation>Sets the playspeed of the movie,
+                </xs:annotation>
+            </xs:attribute>                        
+            <xs:attribute name="frameblending" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Flag to enable simmple frame blending for framerate conversion.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="frameblend_factor" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Frame blend factor.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="fps" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Frame rate the movie was encoded with.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="playspeed" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Sets the playspeed of the movie,
 use values greater one for fast forward and less than minus one for fast reverse.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
@@ -2931,7 +3016,7 @@ Current subnodes include:
         </xs:sequence>
         <xs:attribute name="id" type="xs:ID">
             <xs:annotation>
-                <xs:documentation>Unique id for the node.</xs:documentation>
+                <xs:documentation>Unique ID for the node.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="name" type="xs:string">
@@ -3031,13 +3116,13 @@ Useful for cameras and lights.</xs:documentation>
         </xs:attribute>
         <xs:attribute name="clippingplanes" type="VectorOfString">
             <xs:annotation>
-                <xs:documentation>A list of ids, that reference geometry/plane nodes.
+                <xs:documentation>A list of IDs, that reference geometry/plane nodes.
 The planes specified by these nodes are used as additional clipping planes.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="scissor" type="xs:IDREF">
             <xs:annotation>
-                <xs:documentation>id of a viewport box on which the scissor test should be applied.</xs:documentation>
+                <xs:documentation>ID of a viewport box on which the scissor test should be applied.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
@@ -3052,12 +3137,12 @@ The body node itself defines the position of this geometry in the world-space.</
                 <xs:extension base="SceneGraphNodeType">
                     <xs:attribute name="shape" type="xs:IDREF">
                         <xs:annotation>
-                            <xs:documentation>Id of the shape (geometry) for the body.</xs:documentation>
+                            <xs:documentation>ID of the shape (geometry) for the body.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
                     <xs:attribute name="skeleton" type="VectorOfString">
                         <xs:annotation>
-                            <xs:documentation>A list of ids, that reference joint nodes, which contain the skeleton of
+                            <xs:documentation>A list of IDs, that reference joint nodes, which contain the skeleton of
 a character. If a body has a skeleton attribute, the skin and bones shader can use the skeleton to deform the skin, relative to
 the joint positions and orientations.
 Several bodies can use the same skeleton. (e.g. for an army of marching soldiers)</xs:documentation>
@@ -3120,7 +3205,7 @@ and references a lightsource, which contains the definitions of the light proper
                 <xs:extension base="SceneGraphNodeType">
                     <xs:attribute name="lightsource" type="xs:IDREF">
                         <xs:annotation>
-                            <xs:documentation>Id of the lightsource connected to this light.</xs:documentation>
+                            <xs:documentation>ID of the lightsource connected to this light.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
                 </xs:extension>
@@ -3199,7 +3284,7 @@ The distance from the camera to the bounding box center is multiplied by the 'lo
     <xs:element name="joint" substitutionGroup="SceneGraphNode">
         <xs:annotation>
             <xs:documentation>Joints are used to construct skeletons for skin and bones animations.
-A body can 'use' a skeleton by setting its skeleton attribute to the ids of the required joints.
+A body can 'use' a skeleton by setting its skeleton attribute to the IDs of the required joints.
 Joints are exported from maya and usually will not be edited by hand.</xs:documentation>
         </xs:annotation>
         <xs:complexType>

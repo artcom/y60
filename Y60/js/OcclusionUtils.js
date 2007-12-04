@@ -24,12 +24,12 @@ function setupOcclusionMaterials(theScene) {
             continue;
         }
 
-        var myTextures = myMaterial.childNode("textures");
-        if (!myTextures) {
+        var myTextureUnits = myMaterial.childNode("textureunits");
+        if (!myTextureUnits) {
             Logger.info("Skipping material '" + myMaterial.name + "': no texture");
             continue;
         }
-        if (myTextures.childNodes.length <= 1) {
+        if (myTextureUnits.childNodes.length <= 1) {
             Logger.info("Skipping material '" + myMaterial.name + "': only one texture");
             continue;
         }
@@ -55,7 +55,8 @@ function setupOcclusionMaterials(theScene) {
             continue;
         }
 
-        var myTexture = myTextures.childNode(0);
+        var myTextureUnit = myTextureUnits.childNode(0);
+        var myTexture = myTextureUnit.getElementById(myTextureUnit.texture);
         var myImage = myTexture.getElementById(myTexture.image);
         if (myImage.src.search(/shadowmap/) != -1) {
             myTexUsageFeature[0].features[0] = "occlusion";

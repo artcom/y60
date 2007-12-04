@@ -174,7 +174,7 @@ triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 void
 JSCairoSurface::doTriggerUpload() {
-    _myImageNode->getFacade<y60::Image>()->triggerUpload();
+    //_myImageNode->getFacade<y60::Image>()->triggerUpload();
 }
 
 JSFunctionSpec *

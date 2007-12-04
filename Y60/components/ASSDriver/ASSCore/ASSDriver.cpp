@@ -268,9 +268,9 @@ ASSDriver::updateDerivedRasters()
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myMomentRaster.value) );
 
-    triggerUpload( RAW_RASTER );
-    triggerUpload( FILTERED_RASTER );
-    triggerUpload( MOMENT_RASTER );
+//    triggerUpload( RAW_RASTER );
+//    triggerUpload( FILTERED_RASTER );
+//    triggerUpload( MOMENT_RASTER );
 }
 
 void

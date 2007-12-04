@@ -13,7 +13,7 @@
 #include "FFShader.h"
 
 #ifndef _AC_NO_CG_
-#include "CGShader.h"
+#include "CgShader.h"
 #include "SkinAndBonesShader.h"
 #endif
 
@@ -160,7 +160,7 @@ namespace y60 {
                     theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
                 myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
             } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
-                myGLShader = GLShaderPtr(new CGShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
+                myGLShader = GLShaderPtr(new CgShader(theShaderNode, _myVertexProfileName, _myFragmentProfileName));
             }
 #endif
             if (myGLShader) {
@@ -321,5 +321,11 @@ namespace y60 {
             +  theMaterial->get<NameTag>() + "', requirement = " + as_string(myReqFacade->getNode()),
                                      PLUS_FILE_LINE);
     }
-}
 
+    ICombinerPtr
+    ShaderLibrary::findCombiner(const std::string& theName) {
+
+        AC_PRINT << "ShaderLibrary::findCombiner '" << theName << "'";
+        return ICombinerPtr(0); 
+    }
+}

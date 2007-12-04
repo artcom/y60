@@ -100,13 +100,13 @@ resetCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 }
 static JSBool
 stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Opens the window, if it is not alread open and starts the main renderloop.");
+    DOC_BEGIN("Closes the window and stops the main renderloop");
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::stop,cx,obj,argc,argv,rval);
 }
 static JSBool
 go(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Closes the window and stops the main renderloop");
+    DOC_BEGIN("Opens the window, if it is not alread open and starts the main renderloop.");
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::go,cx,obj,argc,argv,rval);
 }
@@ -375,8 +375,11 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
             return Method<SDLWindow>::call(&SDLWindow::setWindowTitle, cx, obj, 1, vp, &dummy);
         case PROP_position:
             return Method<SDLWindow>::call(&SDLWindow::setPosition, cx, obj, 1, vp, &dummy);
-        case PROP_swapInterval:
-            return Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
+		case PROP_swapInterval: {
+				JSBool myResult = Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
+				AC_WARNING << "You set swapinterval, you may want to adjust window.fixedFrameTime to 1/(MonitorFrequency/" << myObj.getNative().getSwapInterval() << ") for good video performance?";
+				return myResult;
+			}
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }

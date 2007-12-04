@@ -82,7 +82,5 @@ namespace y60 {
                 myDebugCount++;
             }
         }
-        
-        _myTargetImage->triggerUpload();
 	}
 }

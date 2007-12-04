@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -247,9 +247,8 @@ namespace y60 {
     Scene::getShaderLibrary() const {
         if (_myTextureManager->getResourceManager()) {
             return _myTextureManager->getResourceManager()->getShaderLibrary();
-        } else {
-            return IShaderLibraryPtr(0);
         }
+        return IShaderLibraryPtr(0);
     }
 
     void
@@ -267,8 +266,8 @@ namespace y60 {
     void
     Scene::setup() {
         asl::Time setupStart;
-        AC_INFO << "Loading images...";
-        _myTextureManager->setImageList(getImagesRoot());
+        AC_INFO << "Loading textures...";
+        _myTextureManager->setTextureList(getTexturesRoot());
 
         setupShaderLibrary();
 
@@ -303,23 +302,23 @@ namespace y60 {
         DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
         MaterialBasePtr myMaterial = theMaterialNode->getFacade<MaterialBase>();
 
-		IShaderPtr myShader;
-		if (getShaderLibrary()) {
-			// 2. ask shaderlib for shaderdefinition
-			myShader = getShaderLibrary()->findShader(myMaterial);
-			if (!myShader) {
-				throw SceneException(string("No shader defintion found for Material: ") +
-					myMaterial->get<NameTag>(), PLUS_FILE_LINE);
-			}
+        IShaderPtr myShader;
+        if (getShaderLibrary()) {
+            // 2. ask shaderlib for shaderdefinition
+            myShader = getShaderLibrary()->findShader(myMaterial);
+            if (!myShader) {
+                throw SceneException(string("No shader defintion found for Material: ") +
+                    myMaterial->get<NameTag>(), PLUS_FILE_LINE);
+            }
             DB(AC_TRACE << "load shader");
-			myShader->load(*getShaderLibrary());
-			// 3. decide which material to build
-			// 4. load material from node
-			// 5. give material the found shaderdefinition
-		}
-		myMaterial->setShader(myShader);
-		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
-			endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
+            myShader->load(*getShaderLibrary());
+            // 3. decide which material to build
+            // 4. load material from node
+            // 5. give material the found shaderdefinition
+        }
+        myMaterial->setShader(myShader);
+        DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
+            endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
 
         if (myShader) {
             typedef map<string,bool> PropertyUsedMap;
@@ -355,7 +354,7 @@ namespace y60 {
                 }
             }
         }
-		myMaterial->load(_myTextureManager);
+        myMaterial->load(_myTextureManager);
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
     }
@@ -442,7 +441,7 @@ namespace y60 {
         }
         theShape->set<BoundingBoxTag>(myBoundingBox);
     }
-
+ 
     unsigned
     Scene::findMaxIndexSize(NodePtr theElementsNode) {
         size_t myLargestSize = 0;
@@ -486,8 +485,8 @@ namespace y60 {
     }
 
     void
-	Scene::buildShape(ShapePtr theShape) {
-		NodePtr myShapeNode = theShape->getXmlNode();
+    Scene::buildShape(ShapePtr theShape) {
+        NodePtr myShapeNode = theShape->getXmlNode();
         theShape->clear();
 
         unsigned long myShapeVertexCount = 0;
@@ -732,6 +731,16 @@ namespace y60 {
     //////////////////////////////////////////////////////////////////////////////////////
     // Scene traversal
     //////////////////////////////////////////////////////////////////////////////////////
+
+    NodePtr
+    Scene::getTexturesRoot() {
+        return getNode().childNode(TEXTURE_LIST_NAME);
+    }
+
+    const NodePtr
+    Scene::getTexturesRoot() const {
+        return getNode().childNode(TEXTURE_LIST_NAME);
+    }
 
     NodePtr
     Scene::getImagesRoot() {
@@ -1310,6 +1319,8 @@ namespace y60 {
 
     void
     Scene::collectGarbage() {
+        AC_TRACE << "Scene::collectGarbage";
+
         // (pre) Remove unused world nodes
         // (1) Iterate over all animation and character nodes and delete those that have idrefs which point to nowhere
         //     and collect all IDREFs
@@ -1338,6 +1349,8 @@ namespace y60 {
 
         collectReferences(getMaterialsRoot(), myReferences);
         collectReferences(getCanvasRoot(), myReferences);
+        removeUnreferencedNodes(getTexturesRoot(), myReferences);
+        collectReferences(getTexturesRoot(), myReferences);
         removeUnreferencedNodes(getImagesRoot(), myReferences);
     }
 

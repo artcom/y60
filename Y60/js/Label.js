@@ -173,7 +173,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
             var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
             myImage.resize = "pad";
             Protected.addImage(myImage);
-            Public.textures.lastChild.applymode = TextureApplyMode.modulate;
+            Public.textureunits.lastChild.applymode = TextureApplyMode.modulate;
         }
         return Public.image;
     }

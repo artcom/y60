@@ -87,9 +87,9 @@ function buildMaterialNode(theMaterialName,
         myMaterialNode.requires.textures = theTextureFeatures;
 
         var myTexturesString =
-            '<textures>\n' +
-            '    <texture image="i' + theMaterialName + '" applymode="modulate"/>\n' +
-            '</textures>';
+            '<textureunits>\n' +
+            '    <textureunit texture="i' + theMaterialName + '" applymode="modulate"/>\n' +
+            '</textureunits>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
         myMaterialNode.appendChild(myTexturesNode);        
@@ -98,13 +98,13 @@ function buildMaterialNode(theMaterialName,
     return myMaterialNode;
 }
 
-function buildUnlitTextureMaterialNode(theName, theImageId) {
-    var myImageArrayFlag = theImageId instanceof Array;
-    var myImageIds = [];
-    if (!myImageArrayFlag) {
-        myImageIds.push(theImageId);
+function buildUnlitTextureMaterialNode(theName, theTextureId) {
+    var myTextureArrayFlag = theTextureId instanceof Array;
+    var myTextureIds = [];
+    if (!myTextureArrayFlag) {
+        myTextureIds.push(theTextureId);
     } else {
-        myImageIds = theImageId ;
+        myTextureIds = theTextureId ;
     }
 
 
@@ -122,25 +122,25 @@ function buildUnlitTextureMaterialNode(theName, theImageId) {
 
     var myTexturesReqString = "[100["
     var myTexCoordReqString = "[100["
-    var myTexturesString = '<textures>\n';
-    for (var myImageIndex = 0; myImageIndex < myImageIds.length; myImageIndex++) {
-        var myImageId = myImageIds[myImageIndex];
-        if (myImageId == undefined) {
-            myImageId = createUniqueId(); //"i" + theName;
+    var myTexturesString = '<textureunits>\n';
+    for (var myTextureIndex = 0; myTextureIndex < myTextureIds.length; myTextureIndex++) {
+        var myTextureId = myTextureIds[myTextureIndex];
+        if (myTextureId == undefined) {
+            myTextureId = createUniqueId(); //"i" + theName;
         }
 
         // add textures
-        myTexturesString += '    <texture image="' + myImageId  + '" applymode="modulate"/>\n';
+        myTexturesString += '    <textureunit texture="' + myTextureId  + '" applymode="modulate"/>\n';
 
         // add requirements
-        if (myImageIndex > 0) {
+        if (myTextureIndex > 0) {
             myTexturesReqString += ",";
             myTexCoordReqString += ",";
         }
         myTexturesReqString += "paint";
         myTexCoordReqString += "uv_map";
     }
-    myTexturesString += '</textures>';
+    myTexturesString += '</textureunits>';
     var myTexturesDoc = new Node(myTexturesString);
     var myTexturesNode = myTexturesDoc.firstChild;
     myMaterialNode.appendChild(myTexturesNode);

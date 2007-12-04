@@ -28,7 +28,7 @@
 #include "Renderer.h"
 
 #ifndef _AC_NO_CG
-#include "CGShader.h"
+#include "CgShader.h"
 #endif
 
 #include <y60/TransformHierarchyFacade.h>
@@ -174,9 +174,11 @@ namespace y60 {
         // clean up previous material
         if (_myPreviousMaterial) {
             DBP(MAKE_SCOPE_TIMER(deactivatePreviousMaterial));
+
             IShaderPtr myPreviousShader = _myPreviousMaterial->getShader();
             myPreviousShader->disableTextures(*_myPreviousMaterial);
             CHECK_OGL_ERROR;
+
             myPreviousShader->deactivate(*_myPreviousMaterial);
             CHECK_OGL_ERROR;
         }
@@ -194,6 +196,8 @@ namespace y60 {
 
         IShaderPtr myShader = theMaterial.getShader();
         deactivatePreviousMaterial();
+        CHECK_OGL_ERROR;
+
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
@@ -313,7 +317,6 @@ namespace y60 {
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
         DBP(MAKE_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
-        CHECK_OGL_ERROR;
 
         const y60::Body & myBody = theBodyPart.getBody();
         const y60::Shape & myShape = theBodyPart.getShape();
@@ -338,21 +341,16 @@ namespace y60 {
 
             glMultMatrixf((myBody.get<GlobalMatrixTag>().getData()));
 
-            // XXX update TexGen here
             if (!myBody.get<BillboardTag>().empty()) {
                 rotateBillboard(myBody, theCamera);
             }
 
-            // 
-            const asl::Matrix4f &myMatrix = myBody.get<GlobalMatrixTag>();
+            // change face-winding when matrix is mirroring
+            const asl::Matrix4f & myMatrix = myBody.get<GlobalMatrixTag>();
             const asl::Vector3f & myXVector = asVector3(myMatrix[0][0]);
             const asl::Vector3f & myYVector = asVector3(myMatrix[1][0]);
             const asl::Vector3f & myZVector = asVector3(myMatrix[2][0]);
-
-            bool myNegativeScaleFlag = false;
-            if (dot(myXVector, cross(myYVector, myZVector)) < 0) {
-                myNegativeScaleFlag = true;
-            }
+            bool myNegativeScaleFlag = (dot(myXVector, cross(myYVector, myZVector)) < 0);
             _myState->setFrontFaceCCW( ! myNegativeScaleFlag );
 
             _myPreviousBody = &myBody;
@@ -371,17 +369,17 @@ namespace y60 {
 
         DBP2(START_TIMER(renderBodyPart_switchMaterial));
         const MaterialBase & myMaterial = myPrimitive.getMaterial();
-        bool  myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
+        bool myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
-        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureCount(); ++myTexUnit) {
+        glMatrixMode( GL_TEXTURE );
+        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureUnitCount(); ++myTexUnit) {
             glActiveTexture(asGLTextureRegister(myTexUnit));                
-            glMatrixMode( GL_TEXTURE );
             glPushMatrix();
         }
         glMatrixMode( GL_MODELVIEW );
-        
+
         IShaderPtr myShader = myMaterial.getShader();
         if (myShader) {
             if (myMaterial.hasTexGen()) {
@@ -446,9 +444,10 @@ namespace y60 {
             CHECK_OGL_ERROR;
         }
         DBP2(STOP_TIMER(renderBodyPart_setupBoundingVolume));
-        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureCount(); ++myTexUnit) {
+
+        glMatrixMode( GL_TEXTURE );
+        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureUnitCount(); ++myTexUnit) {
             glActiveTexture(asGLTextureRegister(myTexUnit));
-            glMatrixMode( GL_TEXTURE );
             glPopMatrix();
         }
         glMatrixMode( GL_MODELVIEW );
@@ -460,6 +459,8 @@ namespace y60 {
         if (thePrimitive.hasVertexData(NORMALS)) {
             glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT);
             glDisable(GL_LIGHTING);
+            glDisable(GL_TEXTURE_2D);
+            glDisable(GL_TEXTURE_3D);
             glColor3f(1.0f, .5f, 0);
 
             asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = thePrimitive.getConstLockingPositionsAccessor();
@@ -467,6 +468,7 @@ namespace y60 {
             const VertexData3f & myPositions = myPositionAccessor->get();
             const VertexData3f & myNormals = myNormalsAccessor->get();
             Vector3f myNormalTip;
+
             glBegin(GL_LINES);
             for (int i = 0; i < myPositions.size(); ++i) {
                 glVertex3fv(myPositions[i].begin());
@@ -507,9 +509,7 @@ namespace y60 {
                     default:
                         GLenum myGlRegister = asGLTextureRegister(myRegister);
                         glActiveTexture(myGlRegister);
-                        CHECK_OGL_ERROR;
                         glClientActiveTexture(myGlRegister);
-                        CHECK_OGL_ERROR;
                         myData.useAsTexCoord();
                         break;
                 }
@@ -1157,7 +1157,7 @@ namespace y60 {
             dom::NodePtr myCameraNode = theViewport->getNode().getElementById(myCameraId);
             if (!myCameraNode) {
                 throw RendererException(string("Can not find camera '")+theViewport->get<CameraTag>()+
-                        "' for viewport '"+theViewport->get<IdTag>()+"'!", PLUS_FILE_LINE);
+                        "' for viewport '"+theViewport->get<NameTag>()+"' id="+theViewport->get<IdTag>(), PLUS_FILE_LINE);
             }
             CameraPtr myCamera = myCameraNode->getFacade<Camera>();
             bindViewMatrix(myCamera);
@@ -1623,12 +1623,13 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Renderer::renderOverlays(const Viewport & theViewport,
-                             const std::string & theRootNodeName) {
+    Renderer::renderOverlays(const Viewport & theViewport, const std::string & theRootNodeName)
+    {
         dom::NodePtr myOverlays = theViewport.getNode().childNode(theRootNodeName);
         if (!myOverlays) {
             return;
         }
+
         unsigned myOverlayCount = myOverlays->childNodesLength(OVERLAY_NODE_NAME);
         if (myOverlayCount == 0) {
             return;
@@ -1638,37 +1639,48 @@ namespace y60 {
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         _myState->setBackfaceCulling( false );
+        CHECK_OGL_ERROR;
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
+        CHECK_OGL_ERROR;
 
         // UH: projection matrix is relative to viewport so no translation is necessary
         // (already done in glViewport)
         gluOrtho2D(0.0, theViewport.get<ViewportWidthTag>(),
                    theViewport.get<ViewportHeightTag>(), 0.0);
+        CHECK_OGL_ERROR;
 
         if (theViewport.get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
             asl::Matrix4f myRotationMatrix;
             myRotationMatrix.makeZRotating(float(asl::PI_2));
             myRotationMatrix.translate(asl::Vector3f(float(theViewport.get<ViewportWidthTag>()), 0.0f, 0.0f));
             glMultMatrixf(static_cast<const GLfloat *>(myRotationMatrix.getData()));
+            CHECK_OGL_ERROR;
         }
 
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
+        CHECK_OGL_ERROR;
+
         // don't force depth-buffer deactivation here - it will be done by the material
         //_myState->setIgnoreDepth(true);
         //_myState->setDepthWrites(false);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        CHECK_OGL_ERROR;
+
         for (unsigned i = 0; i < myOverlayCount; ++i) {
             renderOverlay(theViewport, myOverlays->childNode(OVERLAY_NODE_NAME, i));
         }
+
         glPopMatrix();
+
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
+
         glMatrixMode(GL_MODELVIEW);
 
         glPopAttrib();
@@ -1736,6 +1748,7 @@ namespace y60 {
                         CHECK_OGL_ERROR;
                     }
                 }
+
                 // force depth buffer deactivation
                 RenderStyles myOverlayRenderStyle(BIT(IGNORE_DEPTH) | BIT(NO_DEPTH_WRITES));
 
@@ -1748,7 +1761,7 @@ namespace y60 {
                 const asl::Vector2f & mySourceOrigin = myOverlay.get<SrcOriginTag>();
                 const asl::Vector2f & mySourceSize   = myOverlay.get<SrcSizeTag>();
 
-                unsigned myTextureCount = myMaterial->getTextureCount();
+                unsigned myTextureCount = myMaterial->getTextureUnitCount();
                 if (myTextureCount == 1) {
                     glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);
@@ -1831,6 +1844,8 @@ namespace y60 {
              renderOverlay(theViewport, theOverlayNode->childNode(OVERLAY_NODE_NAME, i), myAlpha);
         }
         glPopMatrix();
+
+        CHECK_OGL_ERROR;
     }
 
     void 

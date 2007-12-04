@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: SceneBuilder.h,v 1.2 2005/04/21 08:59:01 jens Exp $
-//   $RCSfile: SceneBuilder.h,v $
-//   $Author: jens $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 08:59:01 $
-//
-//=============================================================================
 
 #ifndef _ac_SceneBuilder_h_
 #define _ac_SceneBuilder_h_
@@ -49,6 +41,7 @@ namespace y60 {
     class ImageBuilder;
     class MovieBuilder;
     class CanvasBuilder;
+    class TextureBuilder;
 
     /**
      * @ingroup y60builder
@@ -70,14 +63,11 @@ namespace y60 {
             const std::string & appendImage(ImageBuilder & theImage);
             const std::string & appendMovie(MovieBuilder & theMovie);
             const std::string & appendCanvas(CanvasBuilder & theCanvas);
+            const std::string & appendTexture(TextureBuilder & theTexture);
             const std::string & createDefaultViewport();
 
             dom::NodePtr findMovieByFilename(const std::string & theMovieName);
-
             dom::NodePtr findImageByFilename(const std::string & theImageName);
-            dom::NodePtr findImageByFilename_ColorScale_ColorBias(const std::string & theImageName,
-                                                                  const asl::Vector4f & theColorScale,
-                                                                  const asl::Vector4f & theColorBias);
 
             void binarize(asl::WriteableStream & theBlock) const;
             std::ostream & serialize(std::ostream & theOutStream) const;

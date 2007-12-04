@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,11 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ImageLoader.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.3 $
-//   $Date: 2005/04/29 13:37:56 $
 //
 //  Description: Adapter between Paintlib bitmap and Image
 //
@@ -123,7 +118,7 @@ namespace y60 {
                 myBlock = thePackageManager->readFile(myFilenames[i]);
             }
             // fall back to simply try to open the file
-            AC_DEBUG << myBlock << " filename='" << myFilenames[i] << "'";
+            //AC_DEBUG << myBlock << " filename='" << myFilenames[i] << "'";
             if (!myBlock && fileExists(myFilenames[i])) {
                 myBlock = asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFilenames[i]));
             }
@@ -210,7 +205,7 @@ namespace y60 {
         for (unsigned i = 0; i < 6; ++i) {
             string myDescription = string("Face")+as_string(i)+"_"+_myFilename;
             ImageLoader myFaceBmp(theBlocks[i], myDescription, _myTextureManager.lock());
-            myFaceBmp.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, SINGLE, theDepth);
+            myFaceBmp.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, theDepth);
 
             if (i == 0) {
                 // Setup current image to have 6 times the height of one face
@@ -313,7 +308,7 @@ namespace y60 {
     ImageLoader::internalCreate (PLLONG theWidth, PLLONG theHeight,
                                     const PLPixelFormat &  thePixelformat)
     {
-        AC_DEBUG << "Pixelformat: " << thePixelformat.GetName();
+        AC_TRACE << "Pixelformat: " << thePixelformat.GetName();
         if (!mapFormatToPixelEncoding(thePixelformat, _myEncoding)) {
             throw ImageLoaderException(string("Unsupported Pixel Encoding: ") + thePixelformat.GetName(), PLUS_FILE_LINE);
         }
@@ -403,8 +398,10 @@ namespace y60 {
 
     void
     ImageLoader::removeUnusedAlpha() {
-        if (!_isI60 && (GetBitsPerPixel() == 32 && !HasAlpha())) {
+        if (!_isI60 && GetBitsPerPixel() == 32 && !HasAlpha()) {
             // Compress unused fourth channel
+            AC_DEBUG << "ImageLoader removing unused fourth channel";
+
             unsigned myHeight = GetHeight();
             unsigned myWidth  = GetWidth();
             unsigned myLineStride = GetBytesPerLine();
@@ -450,7 +447,7 @@ namespace y60 {
     }
 
     void
-    ImageLoader::ensurePowerOfTwo(const std::string & theResizeMode, ImageType theType,
+    ImageLoader::ensurePowerOfTwo(const std::string & theResizeMode, 
                                   unsigned theDepth, const asl::Vector2i * theTile)
     {
         if (theResizeMode == IMAGE_RESIZE_NONE) {
@@ -463,9 +460,14 @@ namespace y60 {
                     PLUS_FILE_LINE);
         }
 
+        bool myIsCubemapFlag = false;
+        if (theTile) {
+            unsigned myNumTiles = (*theTile)[0] * (*theTile)[1];
+            myIsCubemapFlag = (myNumTiles == 6 ? true : false);
+        }
         try {
             unsigned myWidthFactor = 1, myHeightFactor = theDepth;
-            if (theType == CUBEMAP && theTile) {
+            if (myIsCubemapFlag) {
                 myWidthFactor *= (*theTile)[0];
                 myHeightFactor *= (*theTile)[1];
                 AC_DEBUG << "tile=" << *theTile << " factor=" << myWidthFactor << "x" << myHeightFactor << " size=" << GetWidth() << "x" << GetHeight();

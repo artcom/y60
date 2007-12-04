@@ -65,7 +65,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         }
         
         self.image = theImage;
-        _myCanvas.target = self.image.id;
+        self.texture.image = self.image.id;
+        //_myCanvas.target = self.image.id;
 
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
@@ -165,12 +166,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         self.image = theImage;    
         self.image.name = "OffscreenBuffer_Image";
 
+        self.texture = Modelling.createTexture(window.scene, self.image);
+        self.texture.name = "OffscreenBuffer_Texture";
+
         // Flip vertically since framebuffer content is upside-down
-        //if (!theUseFBOFlag) {
-            var myMirrorMatrix = new Matrix4f;
-            myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-            self.image.matrix.postMultiply(myMirrorMatrix);  
-            //}
+        var myMirrorMatrix = new Matrix4f;
+        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+        self.image.matrix.postMultiply(myMirrorMatrix);  
 
         // Setup canvas and viewport
         if (theCanvas == undefined) {
@@ -217,7 +219,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         }
 
         // Setup target
-        _myCanvas.target = self.image.id;
+        _myCanvas.target = self.texture.id;
         _myViewport.camera = self.camera.id;
         //_myViewport.wireframe = true;
 
@@ -254,6 +256,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     }
 
     self.image                 = null;
+    self.texture               = null;
+
     var _myOffscreenRenderArea = null;
     var _myOffscreenNodes      = [];
 

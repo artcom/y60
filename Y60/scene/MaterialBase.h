@@ -11,7 +11,7 @@
 #ifndef _ac_scene_MaterialBase_h_
 #define _ac_scene_MaterialBase_h_
 
-#include "Texture.h"
+#include "TextureUnit.h"
 #include "MaterialParameter.h"
 #include "PropertyListFacade.h"
 #include "IShader.h"
@@ -57,7 +57,6 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
     DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
     DEFINE_ATTRIBUT_TAG(MaterialPropGroup1HashTag, int, "material_prop_group1_hash_tag", 0);
-
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
             LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
@@ -148,12 +147,10 @@ namespace y60 {
 
             MaterialBase(dom::Node & theNode, dom::Node & theDefaults);
 
-            virtual unsigned getTextureCount() const;
-            virtual const Texture & getTexture(unsigned myIndex) const;
+            virtual unsigned getTextureUnitCount() const;
+            virtual const TextureUnit & getTextureUnit(unsigned myIndex) const;
 
-            virtual void load(asl::Ptr<TextureManager> theTextureMananger);
-
-            //virtual void update(TextureManagerPtr theTextureManager, const dom::NodePtr theImages);
+            virtual void load(TextureManagerPtr theTextureMananger);
 
             const MaterialParameterVector & getVertexParameters() const;
             virtual bool reloadRequired();
@@ -170,7 +167,7 @@ namespace y60 {
             TextureUsage getTextureUsage(unsigned theTextureSlot) const;
 
             bool getDepthBufferWrite() const;
-            void setDepthBufferWrite(const bool theFlag);
+            void setDepthBufferWrite(bool theFlag);
 
             // texgen parameters
             void updateParams();
@@ -186,18 +183,17 @@ namespace y60 {
             TexGenParamsList getTexGenParams() const {
                 return _myTexGenParams;
             }
-            void doTheUpdate();
 
         protected:
             virtual void registerDependenciesForMaterialupdate();    
             IShaderPtr                 _myShader;
-        private:
-            void addTextures(const dom::NodePtr theTextureListNode,
-                asl::Ptr<TextureManager> theTextureMananger);
-            void addTexture(dom::NodePtr theTextureNode, asl::Ptr<TextureManager> theTextureManager);
 
-            std::vector<TexturePtr> _myTextures;
-            LightingModel           _myLightingModel;
+        private:
+            void addTextures(const dom::NodePtr theTextureListNode, asl::Ptr<TextureManager> theTextureMananger);
+            void addTexture(dom::NodePtr theTextureUnitNode, asl::Ptr<TextureManager> theTextureManager);
+
+            std::vector<TextureUnitPtr> _myTextureUnits;
+            LightingModel               _myLightingModel;
 
             asl::Unsigned64   _myMaterialVersion;
             asl::Unsigned64   _myRequiresVersion;
@@ -208,8 +204,6 @@ namespace y60 {
             TexGenParamsList  _myTexGenParams;
     };
 
-
-    //typedef asl::Ptr<MaterialBase>       MaterialBasePtr;
     typedef std::vector<MaterialBasePtr> MaterialBasePtrVector;
     typedef asl::Ptr<MaterialBase, dom::ThreadingModel> MaterialBaseFacadePtr;
     typedef asl::Ptr<MaterialBase, dom::ThreadingModel> MaterialBasePtr;

@@ -162,11 +162,12 @@ namespace y60 {
 
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
 
-        if ((_myTextureSurface->w != myImage->get<ImageWidthTag>()) ||
-            (_myTextureSurface->h != myImage->get<ImageHeightTag>()))
-        {
-            myImage->triggerUpload();
-        }
+        // XXX image-texture-separation
+        // if ((_myTextureSurface->w != myImage->get<ImageWidthTag>()) ||
+        //     (_myTextureSurface->h != myImage->get<ImageHeightTag>()))
+        // {
+        //     myImage->triggerUpload();
+        // }
 
         myImage->getRasterPtr()->assign(_myTextureSurface->w, _myTextureSurface->h,
                         ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,

@@ -284,9 +284,9 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);
-        var myTextures = getDescendantByTagName(myMaterial, "textures", false);
+        var myTextureUnits = getDescendantByTagName(myMaterial, "textureunits", false);
         
-        _myTextureCount = myTextures.childNodesLength();
+        _myTextureCount = myTextureUnits.childNodesLength();
         if (thePrebuildFlag) {
             var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
             var myShapeBuilder = new ShapeBuilder();

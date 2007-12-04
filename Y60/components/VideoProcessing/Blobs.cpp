@@ -89,7 +89,6 @@ namespace y60 {
 
         correlatePositions( myBlobs );
         
-        _mySourceImage->triggerUpload();
 	}
 
     void

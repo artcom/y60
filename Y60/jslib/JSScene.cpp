@@ -400,6 +400,7 @@ enum PropertyNumbers {
     PROP_animations,
     PROP_characters,
     PROP_shapes,
+    PROP_textures,
     PROP_images,
     PROP_document,
     PROP_MATERIALS,
@@ -487,6 +488,7 @@ JSScene::Properties() {
         {"animations",   PROP_animations,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"characters",   PROP_characters,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"shapes",       PROP_shapes,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"textures",     PROP_textures,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"images",       PROP_images,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {0}
     };
@@ -579,6 +581,9 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             return JS_TRUE;
         case PROP_shapes:
             *vp = as_jsval(cx, getNative().getShapesRoot());
+            return JS_TRUE;
+        case PROP_textures:
+            *vp = as_jsval(cx, getNative().getTexturesRoot());
             return JS_TRUE;
         case PROP_images:
             *vp = as_jsval(cx, getNative().getImagesRoot());

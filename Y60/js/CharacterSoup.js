@@ -273,13 +273,14 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                                                 myFontImageSize, 
                                                 "RGBA");
         myFontImage.resize = "pad";
-        myFontImage.wrapmode = "clamp";
-        myFontImage.mipmap = false;
+        //myFontImage.wrapmode = "clamp";
+        //myFontImage.mipmap = false;
 //        var myFakeImage = Modelling.createImage(window.scene,
 //                                                "dropshadow_fake.png");
-       var myMaterial = 
-            buildUnlitTextureMaterialNode(myFontName + "_material", 
-                                          myFontImage.id);
+//       var myMaterial = 
+//            buildUnlitTextureMaterialNode(myFontName + "_material", 
+//                                          myFontImage.id);
+       var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myFontImage);
          //print(myMaterial);
          //print(myFontImage);
 //       var myMaterial = 
@@ -289,7 +290,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
         myMaterial.transparent = true;
         myMaterial.properties.targetbuffers = "[red,green,blue,alpha]"
-        window.scene.materials.appendChild(myMaterial);
+        //window.scene.materials.appendChild(myMaterial);
 
         _myAlphabetMap[theSize] = [];
         _myAlphabetMap[theSize].material = myMaterial;

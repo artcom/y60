@@ -172,7 +172,7 @@ namespace y60 {
     DEFINE_EXCEPTION(GlTextureFunctionException, asl::Exception);
 
     GLenum
-    asGLTextureWrapmode(TextureWrapMode theWrapMode) {
+    asGLTextureWrapMode(TextureWrapMode theWrapMode) {
         GLenum myTexWrapMode;
         switch(theWrapMode) {
             case CLAMP:
@@ -207,7 +207,28 @@ namespace y60 {
     }
     
     GLenum
-    asGLTextureFunc(TextureApplyMode theApplyMode) {
+    asGLTextureTarget(TextureType theTextureType) {
+        switch (theTextureType) {
+        case TEXTURE_2D:
+            return GL_TEXTURE_2D;
+            break;
+        case TEXTURE_RECTANGLE:
+            return GL_TEXTURE_RECTANGLE_ARB;
+            break;
+        case TEXTURE_3D:
+            return GL_TEXTURE_3D;
+            break;
+        case TEXTURE_CUBEMAP:
+            return GL_TEXTURE_CUBE_MAP_ARB;
+            break;
+        default:
+            throw GlTextureFunctionException("Unknown texture type.", PLUS_FILE_LINE);
+        }
+        return 0;
+    }
+
+    GLenum
+    asGLTextureApplyMode(TextureApplyMode theApplyMode) {
         switch(theApplyMode) {
             case MODULATE:
                 return GL_MODULATE;
@@ -219,10 +240,14 @@ namespace y60 {
                 return GL_BLEND;
             case ADD:
                 return GL_ADD;
+            case SUBTRACT:
+                return GL_SUBTRACT;
+            case COMBINE:
+                return GL_COMBINE_ARB;
             default:
                 throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
         }
-        return GLenum(0);
+        return 0;
     }
 
     GLenum
@@ -239,7 +264,7 @@ namespace y60 {
             case EQUATION_REVERSE_SUBTRACT:
                 return GL_FUNC_REVERSE_SUBTRACT;
             default:
-                throw GLUnknownBlendEquation("Unknown blend equation", PLUS_FILE_LINE);
+                throw GLUnknownBlendEquation("Unknown blend equation.", PLUS_FILE_LINE);
                 break;
         }
         return GLenum(0);
@@ -262,7 +287,7 @@ namespace y60 {
             case CUBEMAP_BOTTOM:
                 return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
             default:
-                throw GlCubemapIndexOutOfRange("Cubemap face index must be within 0 <= i <= 5 !", PLUS_FILE_LINE);
+                throw GlCubemapIndexOutOfRange("Unknown cubemap face.", PLUS_FILE_LINE);
         }
         return GLenum(0);
     };

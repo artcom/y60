@@ -75,8 +75,6 @@ namespace y60 {
             myBoundingBox.extendBy(get<BoundingBoxTag>());
 
             myBoundingBox.extendBy( get<GlobalPointTag>() );
-
-            //AC_PRINT << "recalculateBoundingBox point";
             set<BoundingBoxTag>(myBoundingBox);
         }
     }
@@ -106,8 +104,6 @@ namespace y60 {
             Vector3f myTranslation = get<GlobalMatrixTag>().getTranslation();
             myBoundingBox.extendBy( myTranslation );
             myBoundingBox.extendBy( myTranslation + get<GlobalVectorTag>() );
-
-            //AC_PRINT << "recalculateBoundingBox point";
             set<BoundingBoxTag>(myBoundingBox);
         }
     }
@@ -137,8 +133,6 @@ namespace y60 {
             const asl::LineSegment<float> & myLineSegment = get<GlobalLineSegmentTag>();
             myBoundingBox.extendBy( myLineSegment.origin );
             myBoundingBox.extendBy( myLineSegment.end );
-
-            //AC_PRINT << "recalculateBoundingBox point";
             set<BoundingBoxTag>(myBoundingBox);
         }
     }

@@ -7,17 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CGShader.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.15 $
-//   $Date: 2005/04/24 00:41:18 $
-//
-//   Description:
-//
-//=============================================================================
 
-#include "CGShader.h"
+#include "CgShader.h"
 
 #include <y60/GLUtils.h>
 #include <y60/NodeNames.h>
@@ -46,7 +37,7 @@ using namespace y60;
 
 namespace y60 {
 
-    CGShader::CGShader(const dom::NodePtr theNode, 
+    CgShader::CgShader(const dom::NodePtr theNode, 
                       const std::string & theVertexProfileName,
                       const std::string & theFragmentProfileName) : GLShader(theNode)
    {
@@ -56,7 +47,7 @@ namespace y60 {
             loadShaderProperties(myShaderNode, _myVertexShader, theVertexProfileName);
             loadParameters(myShaderNode, _myVertexShader);
         } else {
-            throw ShaderException(string("CGShader::CGShader() - missing node ")+ VERTEX_SHADER_NODE_NAME +
+            throw ShaderException(string("CgShader::CgShader() - missing node ")+ VERTEX_SHADER_NODE_NAME +
                     " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
         }
 
@@ -64,25 +55,25 @@ namespace y60 {
         if (myShaderNode) {
             loadShaderProperties(myShaderNode, _myFragmentShader, theFragmentProfileName);
         } else {
-            throw ShaderException(string("CGShader::CGShader() - missing node ")+ FRAGMENT_SHADER_NODE_NAME +
+            throw ShaderException(string("CgShader::CgShader() - missing node ")+ FRAGMENT_SHADER_NODE_NAME +
                     " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
         }
     }
 
-    CGShader::~CGShader()  {
+    CgShader::~CgShader()  {
     }
 
-    void CGShader::compile(IShaderLibrary & theShaderLibrary) {
+    void CgShader::compile(IShaderLibrary & theShaderLibrary) {
         ShaderLibrary * myShaderLibrary = dynamic_cast<ShaderLibrary *>(&theShaderLibrary);
         if (!myShaderLibrary) {
-            throw ShaderException("CGShader::compile() - Dynamic cast of IShaderLibrary failed",
+            throw ShaderException("CgShader::compile() - Dynamic cast of IShaderLibrary failed",
                                   PLUS_FILE_LINE);
         }
         assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
 
         // compile fragment shader
         if (!_myFragmentProgram) {
-            DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
+            DB(AC_TRACE << "CgShader::compile(): Loading fragment shader from file '"
                     << _myFragmentShader._myFilename << "'");
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
                     myShaderLibrary->getCgContext()));
@@ -91,7 +82,7 @@ namespace y60 {
 
         // compile vertex shader
         if (!_myVertexProgram) {
-            DB(AC_TRACE << "CGShader::loadShader(): Loading vertex shader from file '"
+            DB(AC_TRACE << "CgShader::compile(): Loading vertex shader from file '"
                     << _myVertexShader._myFilename << "'");
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
                     myShaderLibrary->getCgContext()));
@@ -101,7 +92,7 @@ namespace y60 {
         AC_DEBUG << "Successfully compiled '" << getName() << "'";
     }
 
-    void CGShader::load(IShaderLibrary & theShaderLibrary) {
+    void CgShader::load(IShaderLibrary & theShaderLibrary) {
         compile(theShaderLibrary);
 
         // load fragment shader
@@ -115,29 +106,29 @@ namespace y60 {
         }
     }
 
-    bool CGShader::isLoaded() const {
+    bool CgShader::isLoaded() const {
         return (_myFragmentProgram != 0) || (_myVertexProgram != 0);
     }
 
-    void CGShader::unload() {
+    void CgShader::unload() {
         _myFragmentProgram = CgProgramInfoPtr(0);
         _myVertexProgram = CgProgramInfoPtr(0);
     }
 
     const MaterialParameterVector &
-    CGShader::getVertexParameters() const {
+    CgShader::getVertexParameters() const {
         return _myVertexShader._myVertexParameters;
     }
 
     const VertexRegisterFlags &
-    CGShader::getVertexRegisterFlags() const {
+    CgShader::getVertexRegisterFlags() const {
         return _myVertexShader._myVertexRegisterFlags;
     }
 #if 0
     // converts a comma-delimted list of compiler args ("-DFOO, -DBar") to
     // a null-terminated array of null-terminated args.
     void
-    CGShader::processCompilerArgs(std::vector<std::string> & theArgs, const string & theArgList) {
+    CgShader::processCompilerArgs(std::vector<std::string> & theArgs, const string & theArgList) {
         theArgs.clear();
         string myRestArgString(theArgList);
         string::size_type posStart = 0;
@@ -158,7 +149,7 @@ namespace y60 {
 #endif
 
     void
-    CGShader::loadShaderProperties(const dom::NodePtr theShaderNode,
+    CgShader::loadShaderProperties(const dom::NodePtr theShaderNode,
             ShaderDescription & theShader,
             const std::string & theProfileName)
     {
@@ -263,7 +254,7 @@ namespace y60 {
     }
 
     bool
-    CGShader::hasShader(const ShaderType &theShadertype) const {
+    CgShader::hasShader(const ShaderType &theShadertype) const {
         if (theShadertype == VERTEX_SHADER ) {
             return ( ! _myVertexShader._myFilename.empty());
         } else if (theShadertype == FRAGMENT_SHADER) {
@@ -275,7 +266,7 @@ namespace y60 {
     }
 
     const ShaderDescription &
-    CGShader::getShader(const ShaderType & theShadertype) const {
+    CgShader::getShader(const ShaderType & theShadertype) const {
         if (theShadertype == VERTEX_SHADER ) {
             return _myVertexShader;
         } else if (theShadertype == FRAGMENT_SHADER) {
@@ -287,7 +278,7 @@ namespace y60 {
     }
 
     void
-    CGShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+    CgShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
         GLShader::activate(theMaterial, theViewport, 0); // activate stipple && attenuation
 
         if (!theLastMaterial || theLastMaterial->getGroup1Hash() != theMaterial.getGroup1Hash()) {
@@ -306,7 +297,7 @@ namespace y60 {
     }
 
     void
-    CGShader::deactivate(const MaterialBase & theMaterial) {
+    CgShader::deactivate(const MaterialBase & theMaterial) {
 
         GLShader::deactivate(theMaterial);
 
@@ -321,7 +312,7 @@ namespace y60 {
     }
 
     void
-    CGShader::enableTextures(const MaterialBase & theMaterial) {
+    CgShader::enableTextures(const MaterialBase & theMaterial) {
         GLShader::enableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableTextures();
@@ -332,7 +323,7 @@ namespace y60 {
     }
 
     void
-    CGShader::disableTextures(const MaterialBase & theMaterial) {
+    CgShader::disableTextures(const MaterialBase & theMaterial) {
         GLShader::disableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->disableTextures();
@@ -343,13 +334,13 @@ namespace y60 {
     }
 
     void
-    CGShader::bindBodyParams(const MaterialBase & theMaterial,
+    CgShader::bindBodyParams(const MaterialBase & theMaterial,
             const Viewport & theViewport,
             const LightVector & theLights,
             const Body & theBody,
             const Camera & theCamera)
     {
-        DBP2(MAKE_SCOPE_TIMER(CGShader_bindBodyParams));
+        DBP2(MAKE_SCOPE_TIMER(CgShader_bindBodyParams));
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
         if (_myVertexProgram) {
@@ -365,7 +356,7 @@ namespace y60 {
     }
 
     void
-    CGShader::bindMaterialParams(const MaterialBase & theMaterial) {
+    CgShader::bindMaterialParams(const MaterialBase & theMaterial) {
         if (_myVertexProgram) {
             _myVertexProgram->bindMaterialParams(theMaterial);
         }
@@ -375,7 +366,7 @@ namespace y60 {
     }
 
     void
-    CGShader::bindOverlayParams(const MaterialBase & theMaterial) {
+    CgShader::bindOverlayParams(const MaterialBase & theMaterial) {
         LightVector myEmptyLights;
         if (_myVertexProgram) {
             _myVertexProgram->reloadIfRequired(myEmptyLights, theMaterial);
@@ -390,7 +381,7 @@ namespace y60 {
     }
 
     unsigned
-    CGShader::getMaxTextureUnits() const {
+    CgShader::getMaxTextureUnits() const {
         if (_myFragmentProgram) {
             // Fragment shader can use much more texture units than fixed function shaders
             int myMaxTexUnits;

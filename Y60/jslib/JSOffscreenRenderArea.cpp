@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -102,19 +102,19 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("Downloads the content of the offscreen area to an image");
-        DOC_PARAM("theImage", "", DOC_TYPE_NODE);
+        DOC_BEGIN("Downloads the content of the offscreen area to a texture.");
+        DOC_PARAM("theTexture", "", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-        dom::NodePtr myImageNode(0);
-        if( ! convertFrom(cx, argv[0], myImageNode)) {
-            JS_ReportError(cx, "OffscreenRenderArea::downloadFromViewport(): argument #0 must be an image node.");
+        dom::NodePtr myTextureNode(0);
+        if( ! convertFrom(cx, argv[0], myTextureNode)) {
+            JS_ReportError(cx, "OffscreenRenderArea::downloadFromViewport(): argument #0 must be a texture node.");
             return JS_FALSE;
         }
-        myNative->downloadFromViewport(myImageNode);
+        myNative->downloadFromViewport(myTextureNode);
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;

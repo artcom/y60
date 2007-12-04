@@ -14,6 +14,7 @@
 #include <asl/Exception.h>
 #include <asl/Block.h>
 
+#include <y60/Texture.h>
 #include <y60/Image.h>
 
 #include <paintlib/planydec.h>
@@ -75,15 +76,16 @@ namespace y60 {
             unsigned _myFormat;
     };
  
-    class BufferToImage : public BufferAdapter {
+    class BufferToTexture : public BufferAdapter {
         public:
-            BufferToImage(ImagePtr theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag);
-            virtual ~BufferToImage();
+            BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag = false);
+            virtual ~BufferToTexture();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
+
         private:
-            ImagePtr _myImage;
+            TexturePtr _myTexture;
             asl::Vector2i _myOffset;
-            bool _myCopyToRasterFlag;
+            bool _myCopyToImage;
     };
 }
 

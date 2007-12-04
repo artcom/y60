@@ -19,6 +19,7 @@
 #include <asl/Pump.h> //must come before Assure.h
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+#include <asl/string_functions.h>
 
 // remove ffmpeg macros
 #ifdef START_TIMER
@@ -659,7 +660,7 @@ namespace y60 {
         Movie * myMovie = getMovie();
         AC_TRACE << "PF=" << myMovie->get<RasterPixelFormatTag>();
         
-        TextureInternalFormat myTextureFormat = myMovie->getInternalEncoding();
+		TextureInternalFormat myTextureFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
 
         // Setup size and image matrix
         _myFrameWidth = myVCodec->width;
@@ -671,6 +672,7 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_RGBA32;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::RGBA);
+                myMovie->addRasterValue(createRasterValue( y60::RGBA, _myFrameWidth, _myFrameHeight), y60::RGBA, 1);                
                 break;
             case TEXTURE_IFMT_ALPHA:
             case TEXTURE_IFMT_LUMINANCE8:
@@ -678,6 +680,7 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
+                myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
                 break;
             case TEXTURE_IFMT_RGB8:
             default:
@@ -685,14 +688,20 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGR);
+                myMovie->addRasterValue(createRasterValue( y60::BGR, _myFrameWidth, _myFrameHeight), y60::BGR, 1);                
                 break;
         }
 
 
-        myMovie->getRasterPtr()->clear();
+        myMovie->getRasterPtr(Movie::PRIMARY_BUFFER)->clear();
+		myMovie->getRasterPtr(Movie::SECONDARY_BUFFER)->clear();
 
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
+
+        // from texture-image-separation branch: 
+        //_myFrameRate = (1.0 / av_q2d(myVCodec->time_base));
+        
         myMovie->set<FrameRateTag>(_myFrameRate);
         if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
                 myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 

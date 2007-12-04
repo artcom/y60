@@ -152,8 +152,8 @@ SceneExporter::parseOptions(const MString & theOptionString) {
 }
 
 MStatus
-SceneExporter::writer(const MFileObject& theFile,
-                      const MString& theOptionString,
+SceneExporter::writer(const MFileObject & theFile,
+                      const MString & theOptionString,
                       MPxFileTranslator::FileAccessMode theMode)
 {
     MStatus myStatus = MS::kSuccess;
@@ -788,7 +788,6 @@ SceneExporter::exportAll(SceneBuilder & theSceneBuilder,
             }
         }
     }
-
     exportShapes(theSceneBuilder, theMaterialExporter, theProgressBar, myShapeExporters);
 
     theProgressBar.setStatus("Exporting Lights");

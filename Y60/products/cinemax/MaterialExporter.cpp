@@ -124,20 +124,24 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     // color scale
     Real myMixStrength = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
-    GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix=" + RealToString(myMixStrength));
+    GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix=" 
+            + RealToString(myMixStrength));
     asl::Vector4f myColorScale;
     if (isAlphaChannel) {
-        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, myMixStrength);
+        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, 
+                                     myMixStrength);
     } else {
         myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, 1);
     }
 
     // setup color bias so that colors aren't blacked out
     asl::Vector4f myColorBias = asl::Vector4f(1,1,1,1) - myColorScale;
-    GePrint(myMaterialName + ": colorScale=" + String(asl::as_string(myColorScale).c_str()) + " colorBias=" + String(asl::as_string(myColorBias).c_str()));
+    GePrint(myMaterialName + ": colorScale=" + String(asl::as_string(myColorScale).c_str()) 
+            + " colorBias=" + String(asl::as_string(myColorBias).c_str()));
 
     // Texture
-    std::string myImageId = "";
+    dom::NodePtr myImageNode(0);
+    
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
         std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
@@ -154,32 +158,33 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                     break;
                 case BITMAPSHADER_TIMING_MODE_PINGPONG:
                     myLoopCount = 0;
-                    displayMessage(std::string("Ping-Pong Mode is not supported: ") + getString(myTextureName));
+                    displayMessage(std::string("Ping-Pong Mode is not supported: ") 
+                                   + getString(myTextureName));
                     break;
             }
 #endif
-            myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename,
-			                                            myLoopCount, myColorScale, myColorBias, myInternalFormat);
+            myImageNode = theMaterialBuilder->createMovieNode(theSceneBuilder,
+                                                              getString(myTextureName),
+                                                              myTextureFilename,
+                                                              myLoopCount);
         } else {
-            bool myCreateMipmapFlag = (theUsage == PAINT);
 
-            // wrap mode
-            TextureWrapMode myWrapMode = REPEAT; // TODO: extract wrap mode
-
-            myImageId = theMaterialBuilder->createImage(theSceneBuilder,
-                                                        getString(myTextureName), myTextureFilename,
-                                                        theUsage, myCreateMipmapFlag,
-                                                        myColorScale, myColorBias,
-                                                        SINGLE, myWrapMode, myInternalFormat);
+            myImageNode = theMaterialBuilder->createImageNode(theSceneBuilder,
+                                                              getString(myTextureName),
+                                                              myTextureFilename,
+                                                              theUsage,
+                                                              SINGLE);
         }
     }
 
+    bool myCreateMipmapFlag = (theUsage == PAINT);
+    // wrap mode
+    TextureWrapMode myWrapMode = REPEAT; // TODO: extract wrap mode
+    
     // Texture projection
     std::string myTextureMappingMode = "";
-
     Matrix4f myTextureMatrix;
     myTextureMatrix.makeIdentity();
-
     if (isEnvMap) {
         myTextureMappingMode = TexCoordMappingStrings[SPHERICAL_PROJECTION];
     } else {
@@ -277,12 +282,15 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                     "vectorofvector4f", "texgenparam0", myTexGenParams);
         }
     }
-
-
-    theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage,
-                                          myTextureMappingMode, myTextureMatrix, 100, false, 0.0);
+    theMaterialBuilder->createTextureNode(theSceneBuilder, getString(myTextureName),
+                                          myImageNode->getAttributeString(ID_ATTRIB),
+                                          myWrapMode, myCreateMipmapFlag,
+                                          myTextureMatrix, myInternalFormat,
+                                          myColorScale, myColorBias);
     return myDiffuseColorFlag;
 }
+
+
 
 bool
 MaterialExporter::exportShader(PluginShader * theShader,
@@ -291,7 +299,8 @@ MaterialExporter::exportShader(PluginShader * theShader,
                                y60::SceneBuilder & theSceneBuilder,
                                BaseContainer * theColorContainer,
                                TextureTag * theTextureTag,
-                               const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
+                               const asl::Vector3f & theMinCoord, 
+                               const asl::Vector3f & theMaxCoord,
 							   bool isAlphaChannel, bool isEnvMap)
 {
     GePrint("exportShader: Material=" + theMaterial->GetName());

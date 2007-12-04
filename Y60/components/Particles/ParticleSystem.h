@@ -37,6 +37,9 @@ public:
     dom::NodePtr getBodyNode() const {
         return _myBodyNode;
     }
+    dom::NodePtr getTextureNode() const {
+        return _myTextureNode;
+    }
     dom::NodePtr getImageNode() const {
         return _myImageNode;
     }
@@ -56,6 +59,7 @@ private:
     dom::NodePtr  _myShapeNode;
     dom::NodePtr  _myBodyNode;
     dom::NodePtr  _myMaterialNode;
+    dom::NodePtr  _myTextureNode;
     dom::NodePtr  _myImageNode;
     dom::NodePtr  _myAnimationNode;
     dom::NodePtr  _myParentNode;

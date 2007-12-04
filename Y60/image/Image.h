@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -15,7 +15,6 @@
 #include "ImageTags.h"
 #include <y60/CommonTags.h>
 #include <y60/NodeValueNames.h>
-#include <y60/IResourceManager.h>
 
 #include <dom/AttributePlug.h>
 #include <dom/Facade.h>
@@ -32,98 +31,52 @@ namespace y60 {
      * Exception
      */
     DEFINE_EXCEPTION(ImageException, asl::Exception);
-    /**
-     * Exception
-     */
     DEFINE_EXCEPTION(RasterValueDoesNotExist, ImageException);
 
     /**
      * @ingroup y60image
      * Facade for an image node in the dom.
-     *
      */
     class Image :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
-        public ImageDepthTag::Plug,
         public ImageSourceTag::Plug,
-        public TexturePixelFormatTag::Plug,
         public ImageTypeTag::Plug,
-        public ImageMipmapTag::Plug,
         public ImageResizeTag::Plug,
         public ImageFilterTag::Plug,
         public ImageFilterParamsTag::Plug,
         public ImageMatrixTag::Plug,
-        public ImageColorBiasTag::Plug,
-        public ImageColorScaleTag::Plug,
         public ImageTileTag::Plug,
-        public TextureWrapModeTag::Plug,
-        public TextureMinFilterTag::Plug, 
-        public TextureMagFilterTag::Plug, 
-        public dom::FacadeAttributePlug<TextureParamChangedTag>,   
+        public ImageDepthTag::Plug,
         public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
         public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
         public dom::FacadeAttributePlug<ImageWidthTag>,
-        public dom::FacadeAttributePlug<ImageHeightTag>,
-        public dom::FacadeAttributePlug<LoadCountTag>,
-        public dom::FacadeAttributePlug<ImageInternalFormatTag>,
-        public dom::FacadeAttributePlug<TextureIdTag>
+        public dom::FacadeAttributePlug<ImageHeightTag>
     {
         public:
+            static bool allowInlineFlag;
+
             Image(dom::Node & theNode);
             IMPLEMENT_FACADE(Image);
 
             virtual ~Image();
 
             void unbind();
-            void removeTextureFromResourceManager();
-
-            // PBO usage
-            virtual bool usePixelBuffer() const;
-            void setPixelBufferId(unsigned theId) {
-                _myPixelBufferId = theId;
-            }
-            unsigned getPixelBufferId() const {
-                return _myPixelBufferId;
-            }
-
-            // Gets graphics id, without uploading it. Id is 0 if image has not been uploaded
-            unsigned getGraphicsId() const {
-                return _myTextureId;
-            }
-
-            // Uploads the image if neccessary.
-            unsigned ensureTextureId() {
-                return get<TextureIdTag>();
-            }
-
-            // Dirty hack.
-            void triggerUpload();
-
-            void registerTexture();
-            void deregisterTexture();
 
             virtual void load();
-
-            TextureWrapMode   getWrapMode() const;
-            TextureSampleFilter  getMinFilter() const;
-            TextureSampleFilter  getMagFilter() const;
-
 
             /**
              * Creates a new empty raster with the given properties
              */
-            dom::ResizeableRasterPtr createRaster(unsigned theWidth,
-                                                  unsigned theHeight,
+            dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
                                                   unsigned theDepth,
                                                   PixelEncoding theEncoding); 
 
             /**
              * Creates a new raster with the given properties and pixels
              */
-            dom::ResizeableRasterPtr createRaster(unsigned theWidth,
-                                                  unsigned theHeight,
+            dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
                                                   unsigned theDepth,
                                                   PixelEncoding theEncoding,
                                                   const asl::ReadableBlock & thePixels); 
@@ -132,59 +85,58 @@ namespace y60 {
                            const asl::Vector2i & theTargetPos,
                            const asl::Box2i * theSourceRect = 0);
 
-            ImageType getType() const;
-
             // Returns the pixel encoding of the raster image 
             PixelEncoding getRasterEncoding() const;
 
-            // Returns the pixel encoding of the texture 
-            TextureInternalFormat getInternalEncoding() const;
-
-            unsigned getMemUsed() const{
+            unsigned getMemUsed() const {
                 if (getRasterPtr()) {
                     return getRasterPtr()->pixels().size();
-                } else {
-                    return 0;
                 }
+                return 0;
             }
 
-            /** Saves the image to disk using the PNG format. 
+            /** Saves the image to disk (png, tiff, or jpeg).
              */
-            void saveToFile(const std::string & theImagePath);
-
-            void saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
-                                    const VectorOfVectorOfFloat & theFilterParams);
+            void saveToFile(const std::string & theImagePath,
+                    const VectorOfString & theFilter = VectorOfString(),
+                    const VectorOfVectorOfFloat & theFilterParams = VectorOfVectorOfFloat());
 
             /** Apply filter to the image. 
              */
-            void applyFilter(const std::string & theFilter, const VectorOfFloat & theFilterParam);
+            void applyFilter(const std::string & theFilter, 
+                             const VectorOfFloat & theFilterParam);
 
             /// Get the node version number.
-            unsigned long long getValueVersion() const {
-                dom::NodePtr myValueNode = getRasterValueNode();
+            unsigned long long getValueVersion(unsigned theChildNodeNum = 0) const {
+                dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
                 if (myValueNode) {
                     return myValueNode->nodeVersion();
                 }
                 return 0;
             }
 
-            dom::NodePtr getRasterValueNode() const {
-                dom::NodePtr myValueElement = getNode().firstChild();
-                if (myValueElement) {
-                    return myValueElement->firstChild();
-                }
+            void dropRasterValueNodeData();
+
+            dom::NodePtr getRasterValueNode(unsigned theChildNodeNum = 0) const {
+				if (getNode().hasChildNodes() ) {
+					dom::NodePtr myValueElement = getNode().childNode(theChildNodeNum);
+					if (myValueElement) {
+						return myValueElement->firstChild();
+					}
+				}
                 return dom::NodePtr(0);
             }
 
-            const dom::ValuePtr getRasterValue() const {
-                dom::NodePtr myValueNode = getRasterValueNode();
+            const dom::ValuePtr getRasterValue(unsigned theChildNodeNum = 0) const {
+                dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
                 if (myValueNode) {
                     dom::ValuePtr myValue = myValueNode->nodeValueWrapperPtr();
                     if (myValue->isDirty()) {
                         // Trigger raster reload
                         myValue->accessReadableBlock();
 
-                        // Get node again, because reload might have changed the raster node in dom
+                        // Get node again, because reload might have changed the raster
+                        // node in dom
                         myValueNode = getRasterValueNode();
                         if (myValueNode) {
                             return myValueNode->nodeValueWrapperPtr();
@@ -196,35 +148,27 @@ namespace y60 {
                 return dom::ValuePtr(0);
             }
 
-            dom::ResizeableRasterPtr getRasterPtr() {
-                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue());
+            dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) {
+                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
             }
 
-            const dom::ResizeableRasterPtr getRasterPtr() const {
-                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue());
+            const dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) const {
+                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
             }
 
             virtual void registerDependenciesRegistrators();
-            bool isUploaded() const;
-            static bool allowInlineFlag;
+
         private:
             Image();
 
             void registerDependenciesForRasterValueUpdate();
             void registerDependenciesForImageWidthUpdate();
             void registerDependenciesForImageHeightUpdate();
-            void registerDependenciesForImageFormatUpdate();
-            void registerDependenciesForTextureParamChanged();
-            void registerDependenciesForTextureUpdate();
 
             void unregisterRasterValue();
-            void ensureResourceManager();
 
-            void uploadTexture();
-            void calculateInternalPixelFormat();
             void calculateWidth();
             void calculateHeight();
-            void updateTextureParams();
 
             dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
                 PixelEncoding theEncoding, unsigned theDepth);
@@ -232,15 +176,7 @@ namespace y60 {
             void convertToPLBmp(PLAnyBmp & theBitmap);
             void convertFromPLBmp(PLAnyBmp & theBitmap);
 
-            bool                          _myTextureUploaded;
-            unsigned                      _myTextureId;
-            unsigned                      _myPixelBufferId;
-
-            int                           _myRefCount;
             asl::Ptr<asl::PackageManager> _myPackageManager;
-            bool                          _myLoadOnFacadeCtorFlag;
-        protected:
-            IResourceManager *            _myRessourceManager;
     };
 
     typedef asl::Ptr<Image, dom::ThreadingModel> ImagePtr;

@@ -205,10 +205,9 @@ namespace y60 {
              * @param theBinaryFlag if true, the scene is saved in binary b60 format, else
              *        it is saved in xml x60 format.
              */
-            void save(const std::string & theFilename, bool theBinaryFlag);
+            void save(const std::string & theFilename, bool theBinaryFlag = false);
             void saveSchema(const std::string & theFilename,
-                            int theSchemaIndex,
-                            bool theBinaryFlag);
+                            int theSchemaIndex, bool theBinaryFlag = false);
 
             LightVector & getLights() {
                 return _myLights;
@@ -228,8 +227,12 @@ namespace y60 {
                 return _mySceneDom;
             }
 
+            dom::NodePtr getTexturesRoot();
+            const dom::NodePtr getTexturesRoot() const;
+
             dom::NodePtr getImagesRoot();
             const dom::NodePtr getImagesRoot() const;
+
             dom::NodePtr getCanvasRoot();
             const dom::NodePtr getCanvasRoot() const;
 

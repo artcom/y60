@@ -185,54 +185,68 @@ namespace y60 {
     }        
 
     // ----------------------------------------------------------------------------------------    
-    BufferToImage::BufferToImage(ImagePtr theImage, const asl::Vector2i & theOffset, bool theCopyToRasterFlag) :
-        BufferAdapter(theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), 4),
-        _myImage(theImage), _myOffset(theOffset), _myCopyToRasterFlag(theCopyToRasterFlag)
+    BufferToTexture::BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag) :
+        BufferAdapter(theTexture->get<TextureWidthTag>(), theTexture->get<TextureHeightTag>(), 4),
+        _myTexture(theTexture), _myOffset(theOffset), _myCopyToImage(theCopyToImageFlag)
     {
     }
 
-    BufferToImage::~BufferToImage() {
+    BufferToTexture::~BufferToTexture() {
     }
 
     void
-    BufferToImage::performAction(GLSourceBuffer theSourceBuffer)
+    BufferToTexture::performAction(GLSourceBuffer theSourceBuffer)
     {
         if (theSourceBuffer == FRAME_BUFFER) {
             glReadBuffer(GL_BACK);
         }
 
-        GLuint myTextureID = _myImage->ensureTextureId();
-        if (_myCopyToRasterFlag) {
-            AC_DEBUG << "BufferToImage::performAction copy to raster Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " size=" << getWidth() << "x" << getHeight();
+        unsigned myWidth = getWidth();
+        unsigned myHeight = getHeight();
+        GLuint myTextureID = _myTexture->getTextureId();
+        AC_DEBUG << "BufferToTexture::performAction '" << _myTexture->get<NameTag>() << "' id=" << _myTexture->get<IdTag>() << " offset=" << _myOffset << " " << myWidth << "x" << myHeight << " texId=" << myTextureID;
+        if (_myCopyToImage) {
 
-            // copy framebuffer to Image raster
-            PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(_myImage->getRasterEncoding());
-            myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(_myImage->getInternalEncoding());
+            ImagePtr myImage = _myTexture->getImage();
+            if (!myImage) {
+                AC_WARNING << "Texture '" << _myTexture->get<NameTag>() << "' id=" << _myTexture->get<IdTag>() << " has no image associated";
+            } else {
+                AC_DEBUG << "BufferToTexture::performAction copy to image '" << myImage->get<NameTag>() << "' id=" << myImage->get<IdTag>();
 
-            glReadPixels(_myOffset[0],_myOffset[1], getWidth(),getHeight(),
-                    myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
-                    _myImage->getRasterPtr()->pixels().begin());
-            CHECK_OGL_ERROR;
+                // copy framebuffer to Image raster
+                PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(myImage->getRasterEncoding());
+                myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(_myTexture->getInternalEncoding());
 
-            _myImage->triggerUpload();
-        } else if (myTextureID > 0) {
-            AC_DEBUG << "BufferToImage::performAction copy to texture Image '" << _myImage->get<NameTag>() << "' id=" << _myImage->get<IdTag>() << " texid=" << myTextureID << " size=" << getWidth() << "x" << getHeight();
-
-            // copy framebuffer to texture
-            glBindTexture(GL_TEXTURE_2D, myTextureID);
-            glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, _myOffset[0],_myOffset[1], getWidth(),getHeight());
-            CHECK_OGL_ERROR;
-
-            // generate mipmap levels
-            if (IS_SUPPORTED(glGenerateMipmapEXT) && _myImage->get<ImageMipmapTag>()) {
-                AC_TRACE << "BufferToImage::performAction: generating mipmap levels";
-                glGenerateMipmapEXT(GL_TEXTURE_2D);
+                glReadPixels(_myOffset[0],_myOffset[1], myWidth,myHeight,
+                        myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
+                        myImage->getRasterPtr()->pixels().begin());
                 CHECK_OGL_ERROR;
-            }
 
-            glBindTexture(GL_TEXTURE_2D, 0);
+                _myTexture->triggerUpload();
+            }
+        } else if (myTextureID > 0) {
+            GLenum myTextureTarget = asGLTextureTarget(_myTexture->getType());
+            if (myTextureTarget == GL_TEXTURE_2D) {
+                AC_DEBUG << "BufferToTexture::performAction copy to texture";
+
+                // copy framebuffer to texture
+                glBindTexture(GL_TEXTURE_2D, myTextureID);
+                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, _myOffset[0],_myOffset[1], myWidth,myHeight);
+                CHECK_OGL_ERROR;
+
+                // generate mipmap levels
+                if (IS_SUPPORTED(glGenerateMipmapEXT) && _myTexture->get<TextureMipmapTag>()) {
+                    AC_TRACE << "BufferToTexture::performAction: generating mipmap levels";
+                    glGenerateMipmapEXT(GL_TEXTURE_2D);
+                    CHECK_OGL_ERROR;
+                }
+
+                glBindTexture(GL_TEXTURE_2D, 0);
+            } else {
+                AC_WARNING << "Copy to texture only supported for 'texture_2d'";
+            }
         } else {
-            AC_DEBUG << "BufferToImage::performAction Image '" << _myImage->get<NameTag>() << "' has no valid texid";
+            AC_DEBUG << "BufferToTexture::performAction texture '" << _myTexture->get<NameTag>() << "' is not valid";
         }
     }
 }

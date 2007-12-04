@@ -84,7 +84,7 @@ namespace y60 {
             GLShader();
             void loadFeatureSet(const dom::NodePtr theShaderNode);
             void setupProjectorMatrix( asl::Matrix4f & theMatrix, const MaterialBase & theMaterial,
-                        const Camera & theCamera, const Texture & theTexture);
+                        const Camera & theCamera, const TextureUnit & theTextureUnit);
 
             std::string             _myId;
             std::string             _myName;

@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,21 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: NodeNames.h,v 1.7 2005/04/26 08:58:32 thomas Exp $
-//   $RCSfile: NodeNames.h,v $
-//   $Author: thomas $
-//   $Revision: 1.7 $
-//   $Date: 2005/04/26 08:58:32 $
-//
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #ifndef _ac_y60_NodeNames_h_
 #define _ac_y60_NodeNames_h_
@@ -64,9 +49,7 @@ namespace y60 {
     static const char * PARAMETER_NODE_NAME       = "value";
     static const char * PROPERTY_LIST_NAME        = "properties";
     static const char * REQUIRES_LIST_NAME        = "requires";
-    static const char * TEXTURE_LIST_NAME         = "textures";
     static const char * FEATURE_NODE_NAME         = "feature";
-    static const char * TEXTURE_NODE_NAME         = "texture";
     static const char * WORLD_LIST_NAME           = "worlds";
     static const char * WORLD_NODE_NAME           = "world";
     static const char * TRANSFORM_NODE_NAME       = "transform";
@@ -112,7 +95,6 @@ namespace y60 {
     static const char * REVISION_ATTRIB             = "revision";
     static const char * NAME_ATTRIB                 = "name";
     static const char * VISIBLE_ATTRIB              = "visible";
-    static const char * FROZEN_ATTRIB               = "frozen";
     static const char * WIDTH_ATTRIB                = "width";
     static const char * HEIGHT_ATTRIB               = "height";
     static const char * DEPTH_ATTRIB                = "depth";
@@ -146,15 +128,16 @@ namespace y60 {
     static const char * PRIMITIVE_TYPE_POLYGON         = "polygon";
 
     static const char * VERTEX_BUFFER_USAGE_ATTRIB     = "vertexbufferusage";
-    
-    static const char * TEXTURE_APPLYMODE_ATTRIB    = "applymode";
-    static const char * TEXTURE_WRAPMODE_ATTRIB     = "wrapmode";
-    static const char * TEXTURE_MIN_FILTER_ATTRIB   = "min_filter";
-    static const char * TEXTURE_MAG_FILTER_ATTRIB   = "mag_filter";
-    static const char * TEXTURE_IMAGE_ATTRIB        = "image";
-    static const char * TEXTURE_SPRITE_ATTRIB       = "sprite";
-    static const char * TEXTURE_MATRIX_ATTRIB       = "matrix";
-    static const char * TEXTURE_PROJECTOR_ATTRIB    = "projector";
+ 
+    static const char * TEXTUREUNIT_LIST_NAME     = "textureunits";
+    static const char * TEXTUREUNIT_NODE_NAME     = "textureunit";
+    static const char * TEXTUREUNIT_TEXTURE_ATTRIB   = "texture";
+    static const char * TEXTUREUNIT_APPLYMODE_ATTRIB = "applymode";
+    static const char * TEXTUREUNIT_COMBINER_ATTRIB  = "combiner";
+    static const char * TEXTUREUNIT_ENVCOLOR_ATTRIB  = "envcolor";
+    static const char * TEXTUREUNIT_SPRITE_ATTRIB    = "sprite";
+    static const char * TEXTUREUNIT_PROJECTOR_ATTRIB = "projector";
+
     static const char * LIGHTSOURCE_TYPE_ATTRIB     = "type";
     static const char * BODY_SHAPE_ATTRIB           = "shape";
     static const char * CULLABLE_ATTRIB             = "cullable";
@@ -221,8 +204,8 @@ namespace y60 {
     static const char * VIEWPORT_GLOW_ATTRIB        = "glow";
     static const char * VIEWPORT_CULLING_ATTRIB     = "culling";
     static const char * VIEWPORT_DEBUGCULLING_ATTRIB= "debugculling";
-    static const char * PROJECTIONMATRIX_ATTRIB     = "projectionmatrix";
 
+    static const char * PROJECTIONMATRIX_ATTRIB     = "projectionmatrix";
     static const char * FRUSTUM_ATTRIB              = "frustum";
     static const char * RESIZE_POLICY_ATTRIB        = "resizepolicy";
 
@@ -241,32 +224,45 @@ namespace y60 {
     static const char * OVERLAY_SCALE2D_ATTRIB      = "scale";
     static const char * OVERLAY_PIVOT2D_ATTRIB      = "pivot";
 
-    static const char * IMAGE_LIST_NAME                   = "images";
-    static const char * IMAGE_NODE_NAME                   = "image";
-    static const char * IMAGE_SRC_ATTRIB                  = "src";
-    static const char * IMAGE_RASTER_PIXELFORMAT_ATTRIB   = "rasterpixelformat";
-    static const char * IMAGE_TEXTURE_PIXELFORMAT_ATTRIB  = "texturepixelformat";
-    static const char * IMAGE_INTERNAL_FORMAT_ATTRIB      = "internal_format";
-    static const char * IMAGE_MIPMAP_ATTRIB               = "mipmap";
-    static const char * IMAGE_TYPE_ATTRIB                 = "type"; // "single" | "cubemap", see NodeValueNames.h
-    static const char * IMAGE_RESIZE_ATTRIB               = "resize"; // "scale" || "pad"
-    static const char * IMAGE_FILTER_ATTRIB               = "filter";
-    static const char * IMAGE_FILTER_PARAMS_ATTRIB        = "filter_params";
-    static const char * IMAGE_MATRIX_ATTRIB               = "matrix";
-    static const char * IMAGE_TILE_ATTRIB                 = "tile";
-    static const char * IMAGE_COLOR_SCALE_ATTRIB          = "color_scale";
-    static const char * IMAGE_COLOR_BIAS_ATTRIB           = "color_bias";
-    static const char * IMAGE_BYTESPERPIXEL_ATTRIB        = "bytesperpixel";
-    static const char * IMAGE_TEXTURE_ID_ATTRIB           = "textureid";
-    static const char * IMAGE_RASTER_ATTRIB               = "raster"; // for easy raster access
-    static const char * IMAGE_LOAD_COUNT_ATTRIB           = "loadcount"; // for debug purposes
+    static const char * MATRIX_ATTRIB               = "matrix";
+
+    static const char * TEXTURE_LIST_NAME              = "textures";
+    static const char * TEXTURE_NODE_NAME              = "texture";
+    static const char * TEXTURE_WRAPMODE_ATTRIB        = "wrapmode";
+    static const char * TEXTURE_MIN_FILTER_ATTRIB      = "min_filter";
+    static const char * TEXTURE_MAG_FILTER_ATTRIB      = "mag_filter";
+    static const char * TEXTURE_IMAGE_ATTRIB           = "image";
+    static const char * TEXTURE_TYPE_ATTRIB            = "type";
+    static const char * TEXTURE_INTERNAL_FORMAT_ATTRIB = "internal_format";
+    static const char * TEXTURE_ID_ATTRIB              = "textureid";
+    static const char * TEXTURE_COLOR_SCALE_ATTRIB     = "color_scale";
+    static const char * TEXTURE_COLOR_BIAS_ATTRIB      = "color_bias";
+    static const char * TEXTURE_MIPMAP_ATTRIB          = "mipmap";
+    static const char * TEXTURE_ANISOTROPY_ATTRIB      = "anisotropy";
+    static const char * TEXTURE_PIXELFORMAT_ATTRIB     = "texturepixelformat";
+    static const char * TEXTURE_IMAGE_INDEX            = "image_index";
+
+    static const char * IMAGE_LIST_NAME                 = "images";
+    static const char * IMAGE_NODE_NAME                 = "image";
+    static const char * IMAGE_SRC_ATTRIB                = "src";
+    static const char * IMAGE_TYPE_ATTRIB               = "type";
+    static const char * IMAGE_BYTESPERPIXEL_ATTRIB      = "bytesperpixel";
+    static const char * IMAGE_RASTER_PIXELFORMAT_ATTRIB = "rasterpixelformat";
+    static const char * IMAGE_RESIZE_ATTRIB             = "resize";
+    static const char * IMAGE_FILTER_ATTRIB             = "filter";
+    static const char * IMAGE_FILTER_PARAMS_ATTRIB      = "filter_params";
+    static const char * IMAGE_TILE_ATTRIB               = "tile";
+    static const char * IMAGE_RASTER_ATTRIB             = "raster"; // for easy raster access
 
     static const char * MOVIE_NODE_NAME             = "movie";
     static const char * MOVIE_FRAME_ATTRIB          = "currentframe";
     static const char * MOVIE_FRAME_CACHE_ATTRIB    = "cachesize";
     static const char * MOVIE_AVDELAY_ATTRIB        = "avdelay";
-    static const char * MOVIE_FRAMECOUNT_ATTRIB     = "framecount";
     static const char * MOVIE_FRAMERATE_ATTRIB      = "fps";
+    static const char * MOVIE_FRAMECOUNT_ATTRIB     = "framecount";
+    static const char * MOVIE_FRAMEBLENDFACTOR_ATTRIB = "frameblend_factor";	
+    static const char * MOVIE_FRAMEBLENDING_ATTRIB  = "frameblending";	
+	
     static const char * MOVIE_PLAYSPEED_ATTRIB      = "playspeed";
     static const char * MOVIE_PLAYMODE_ATTRIB       = "playmode";
     static const char * MOVIE_VOLUME_ATTRIB         = "volume";
@@ -310,7 +306,5 @@ namespace y60 {
     //=== Billboard orientation constants ====================================================
     static const char * AXIS_BILLBOARD              = "axis";
     static const char * POINT_BILLBOARD             = "point";
-
 }
 #endif
-
