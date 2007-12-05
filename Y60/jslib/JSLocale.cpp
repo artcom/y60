@@ -199,8 +199,15 @@ JSLocale::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
             return JS_FALSE;
         }
 
-        OWNERPTR myNewOwner = OWNERPTR(new NATIVE(myLocaleString.c_str()));        
-        myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+        try {
+            OWNERPTR myNewOwner = OWNERPTR(new NATIVE(myLocaleString.c_str()));        
+            myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+        } catch (const exception & ex) {
+            AC_ERROR << "Error while creating locale for `" << myLocaleString << "`. Using `C` as default. Exception thrown: " << ex.what();  
+            OWNERPTR myNewOwner = OWNERPTR(new NATIVE());
+            myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+        }
+        
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (locale) %d",ClassName(), argc);
         return JS_FALSE;
