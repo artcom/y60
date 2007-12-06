@@ -660,13 +660,13 @@ namespace y60 {
         Movie * myMovie = getMovie();
         AC_TRACE << "PF=" << myMovie->get<RasterPixelFormatTag>();
         
-		TextureInternalFormat myTextureFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
+		TextureInternalFormat myRasterPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
 
         // Setup size and image matrix
         _myFrameWidth = myVCodec->width;
         _myFrameHeight = myVCodec->height;
 
-        switch (myTextureFormat) {
+        switch (myRasterPixelFormat) {            
             case TEXTURE_IFMT_RGBA8:
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
                 _myDestinationPixelFormat = PIX_FMT_RGBA32;
