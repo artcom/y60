@@ -152,6 +152,7 @@ namespace y60 {
     static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY12         = "INTENSITY12";
     static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY16         = "INTENSITY16";
     static const char * TEXTURE_INTERNAL_FORMAT_RGB                 = "RGB";
+    static const char * TEXTURE_INTERNAL_FORMAT_BGR                 = "BGR";
     static const char * TEXTURE_INTERNAL_FORMAT_R3_G3_B2            = "R3_G3_B2";
     static const char * TEXTURE_INTERNAL_FORMAT_RGB4                = "RGB4";
     static const char * TEXTURE_INTERNAL_FORMAT_RGB5                = "RGB5";
@@ -207,6 +208,7 @@ namespace y60 {
         TEXTURE_IFMT_INTENSITY12,
         TEXTURE_IFMT_INTENSITY16,
         TEXTURE_IFMT_RGB,
+        TEXTURE_IFMT_BGR,
         TEXTURE_IFMT_R3_G3_B2,
         TEXTURE_IFMT_RGB4,
         TEXTURE_IFMT_RGB5,
@@ -263,6 +265,7 @@ namespace y60 {
         TEXTURE_INTERNAL_FORMAT_INTENSITY12,
         TEXTURE_INTERNAL_FORMAT_INTENSITY16,
         TEXTURE_INTERNAL_FORMAT_RGB,
+        TEXTURE_INTERNAL_FORMAT_BGR,
         TEXTURE_INTERNAL_FORMAT_R3_G3_B2,
         TEXTURE_INTERNAL_FORMAT_RGB4,
         TEXTURE_INTERNAL_FORMAT_RGB5,
