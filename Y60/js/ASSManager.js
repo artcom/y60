@@ -188,6 +188,12 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
             onConfigure(theEventNode);
         }
 
+        var myMaterial = _myScene.dom.getElementById( getMaterialIdForValueDisplay() );
+        var myTextureUnits = myMaterial.childNode("textureunits");
+        for (var i = 0; i < myTextureUnits.childNodes.length; i++) {
+            var myTexture = _myScene.dom.getElementById( myTextureUnits.childNode(i).texture );
+            triggerUpload(myTexture);
+        }
         
     }
 
@@ -225,15 +231,19 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
                 myMaterial.transparent = true;
             }
 
+            // grab textures
+            var myTextureUnit = myMaterial.childNode("textureunits").firstChild;
+            var myTexture = _myScene.dom.getElementById(myTextureUnit.texture);
+
             var myXScale = _myGridSize.x / myRaster.width;
             var myYScale = _myGridSize.y / myRaster.height;
             myRaster.matrix.makeScaling( new Vector3f( myXScale, myYScale, 1));
             var myColorScale = 255 / 254;
-            myRaster.color_scale = new Vector4f(myColorScale, myColorScale, myColorScale, 1);
+            myTexture.color_scale = new Vector4f(myColorScale, myColorScale, myColorScale, 1);
             //myRaster.color_bias = [1, 1, 1, 1];
-            myRaster.min_filter = TextureSampleFilter.nearest;
-            myRaster.mag_filter = TextureSampleFilter.nearest;
-            myRaster.texturepixelformat = "INTENSITY";
+            myTexture.min_filter = TextureSampleFilter.nearest;
+            myTexture.mag_filter = TextureSampleFilter.nearest;
+            myTexture.texturepixelformat = "INTENSITY";
 
         }
     }
@@ -244,10 +254,14 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
         setupValueMaterials();
 
         var myMaterial = _myScene.world.getElementById( getMaterialIdForValueDisplay() );
+        print(myMaterial);
         if ( ! _myValueOverlay) {
-            var myTexture = myMaterial.childNode("textureunits").firstChild.texture;
-            _myValueOverlay = new ImageOverlay( _myScene, 
-                                                _myScene.world.getElementById(myTexture.image));
+            var myTextureId = myMaterial.childNode("textureunits").firstChild.texture;
+            var myTexture = _myScene.world.getElementById(myTextureId);
+            print(myTexture);
+            var myImage = _myScene.world.getElementById( myTexture.image );
+            print(myImage);
+            _myValueOverlay = new ImageOverlay( _myScene, myImage );
         }
         _myDriver.overlay = _myValueOverlay.node;
 

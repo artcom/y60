@@ -10,6 +10,7 @@
 
 #include "ASSDriver.h"
 #include "SerialTransport.h"
+#include "DummyTransport.h"
 #include "ASSUtils.h"
 
 #include <asl/Logger.h>
@@ -163,7 +164,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
             _myRasterNames.push_back( theName );
             return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
         } else {
-            ImageBuilder myImageBuilder(theName, false);
+            ImageBuilder myImageBuilder(theName);
             _myScene->getSceneBuilder()->appendImage(myImageBuilder);
             y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
             myImage->set<y60::IdTag>( theName );
@@ -240,12 +241,20 @@ struct FindMaximum {
     float max;
 };
 
-void
-ASSDriver::triggerUpload( const char * theRasterId ) {
-    if (_myScene) {
-        _myScene->getSceneDom()->getElementById(theRasterId)->getFacade<y60::Image>()->triggerUpload();
-    }
-}
+//void
+//ASSDriver::triggerUpload( const char * theRasterId ) {
+//    if (_myScene) {
+//        dom::NodePtr myTextures = _myScene->getTexturesRoot();
+//        for (unsigned i = 0; i < myTextures->childNodesLength(); i++) {
+//            dom::NodePtr myTexture = myTextures->childNode(i);
+//            if (myTexture->getAttributeString(TEXTURE_IMAGE_ATTRIB) == theRasterId) {
+//                myTexture->getFacade<y60::Texture>()->triggerUpload();
+//            }
+//        }
+//        //_myScene->getSceneDom()->getElementById(theRasterId)->getFacade<y60::Image>()->triggerUpload();
+//    }
+//}
+
 
 void
 ASSDriver::updateDerivedRasters()
@@ -852,7 +861,10 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
         getConfigSetting( theSettings, "TransportLayer", myTransportName, string("serial") );
         if ( myTransportName == "serial" ) {
             _myTransportLayer = TransportLayerPtr( new SerialTransport(theSettings) );
-        } /*else if ( myTransportName == "udp") {
+        } else if ( myTransportName == "dummy" ) {
+            _myTransportLayer = TransportLayerPtr( new DummyTransport(theSettings) );
+        }
+        /*} else if ( myTransportName == "udp") {
             TODO: UDP transport layer
         }*/ else {
             throw ASSException(string("Unknown transport layer '") + myTransportName + "'",

@@ -419,10 +419,12 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
     Protected.onTextureChange = function() {
         Protected.myImages = [];
         for (var i = 0; i < _myTextureUnits.childNodes.length; ++i) {
-            var myId = _myTextureUnits.childNodes[i].image;
-            var myImage = _myTextureUnits.getElementById(myId);
+            var myId = _myTextureUnits.childNodes[i].texture;
+            var myTexture = _myTextureUnits.getElementById(myId);
+            print(myTexture);
+            var myImage = _myTextureUnits.getElementById(myTexture.image);
             if (myImage == null) {
-                throw new Exception("Could not find image with id: " + myId, fileline());
+                throw new Exception("Could not find image with id: " + myTexture.image, fileline());
             }
             Protected.myImages.push(myImage);
         }

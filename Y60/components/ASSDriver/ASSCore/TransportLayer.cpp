@@ -117,7 +117,7 @@ TransportLayer::poll() {
 
     _myFrameQueueLock.lock();
     if (_myFrameQueue.size() > _myEventQueueSize) {
-        AC_WARNING << "Event queue has more than " << _myEventQueueSize << " items. Flushing.";
+        //AC_WARNING << "Event queue has more than " << _myEventQueueSize << " items. Flushing.";
         while ( ! _myFrameQueue.empty() ) {
             _myFrameQueue.pop();
         }

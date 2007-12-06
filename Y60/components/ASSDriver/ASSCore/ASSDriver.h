@@ -142,7 +142,7 @@ class ASSDriver :
                                      const BlobListPtr & theROIs);
         void correlatePositions( const std::vector<asl::MomentResults> & theCurrentPositions, 
                                  const BlobListPtr theROIs, const ASSEvent & theEvent);
-        void triggerUpload( const char * theRasterId );
+//        void triggerUpload( const char * theRasterId );
         void queueCommand( const char * theCommand );
 
 
