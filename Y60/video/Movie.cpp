@@ -189,7 +189,7 @@ namespace y60 {
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
-        //AC_PRINT << "rein : " << theTime << " raus : " << myReturnTime;
+        //AC_PRINT << "_myAudioSink->play() rein : " << theTime << " raus : " << myReturnTime;
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
         } else {

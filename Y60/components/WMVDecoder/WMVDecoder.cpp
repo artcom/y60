@@ -211,6 +211,7 @@ double ourLastVideoTimeStamp = 0.0;
 double ourLastAudioTimeStamp = 0.0;
     double
     WMVDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        //AC_PRINT << "WMVDecoder::readFrame: " << theTime;
         // EOF and framecache empty?
         if (_myReadEOF && _myFrameCache.size() <= 1) {
             AC_DEBUG << "EoF and FrameCache empty";
@@ -342,6 +343,7 @@ double ourLastAudioTimeStamp = 0.0;
             HRESULT hr = _myReader->Resume();
             checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
         }
+        AC_PRINT << "WMVDecoder::resumeMovie caching: " <<  _myCachingFlag;
         AsyncDecoder::resumeMovie(theStartTime, !_myCachingFlag);
     }
 
@@ -736,9 +738,9 @@ double ourLastAudioTimeStamp = 0.0;
             }
 
             // Start audio when frameCache is full enough
-            double myStartTime = (_myFrameCacheSize/16) / _myFrameRate;
+            double myStartTime = (_myFrameCacheSize/2) / _myFrameRate;
             if (_myCachingFlag &&
-                ((_myFrameCache.size() >= _myFrameCacheSize/16) || (_myLastAudioTimeStamp >= myStartTime))) {
+                ((_myFrameCache.size() >= _myFrameCacheSize/2) || (_myLastAudioTimeStamp >= myStartTime))) {
                 AC_PRINT << "Starting A/V playback, FrameCache size=" << _myFrameCache.size() << " max cache size=" << _myFrameCacheSize;
                 AC_PRINT << "                       LastAudioTimeStamp=" << _myLastAudioTimeStamp << " StartTime=" << myStartTime;
                 _myCachingFlag = false;

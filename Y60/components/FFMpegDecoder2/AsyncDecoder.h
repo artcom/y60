@@ -63,7 +63,7 @@ double ourLastFrameTimeStamp;
                     AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {
-                    if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED &&
+                    /*if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED &&
                             getState() != STOP)
                     {
                         // We only get here if video is running way behind audio, resulting in
@@ -74,7 +74,7 @@ double ourLastFrameTimeStamp;
                         AC_DEBUG << "AsyncDecoder::getMovieTime: audio eof, returning "
                                 << _myLastAudioTime+0.5;
                         return _myLastAudioTime+0.5;
-                    } else {
+                    } else {*/
                         AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime()
                                 <<"video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
                         _myLastAudioTime = _myAudioSink->getCurrentTime();
@@ -88,7 +88,7 @@ double ourLastFrameTimeStamp;
                             return _myAudioSink->getPumpTime();                            
                             //return MovieDecoderBase::getMovieTime(theSystemTime);
                         }
-                    }
+                    //}
                 }
             }
 
@@ -119,6 +119,7 @@ double ourLastFrameTimeStamp;
                 MovieDecoderBase::resumeMovie(theStartTime);
                 if (theResumeAudioFlag && _myAudioSink) {            
                     _myAudioSink->play();
+                    AC_PRINT <<"resumeMovie: _myAudioSink->play()";
                 }
             }
 
