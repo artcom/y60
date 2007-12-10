@@ -82,6 +82,7 @@ namespace y60 {
 #ifdef BAD_TX
         return get<TextureUnitCombinerPtrTag>().lock();
 #else
+        return ICombinerPtr(0);
 #endif
     }
 #ifdef BAD_TX
