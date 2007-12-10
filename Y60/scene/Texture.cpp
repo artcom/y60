@@ -184,8 +184,8 @@ namespace y60 {
     Texture::calculateWidth() {
         ImagePtr myImage = getImage();
         if (myImage) {
-            AC_TRACE << "Texture::calculateWidth '" << get<NameTag>() << "' width=" << myImage->get<ImageWidthTag>();
-            set<TextureWidthTag>(myImage->get<ImageWidthTag>());
+            AC_TRACE << "Texture::calculateWidth '" << get<NameTag>() << "' width=" << myImage->Image::get<ImageWidthTag>();
+            set<TextureWidthTag>(myImage->Image::get<ImageWidthTag>());
         }
     }
 
@@ -193,7 +193,7 @@ namespace y60 {
     Texture::calculateHeight() {
         ImagePtr myImage = getImage();
         if (myImage) {
-            AC_TRACE << "Texture::calculateHeight '" << get<NameTag>() << "' height=" << myImage->get<ImageHeightTag>();
+            AC_TRACE << "Texture::calculateHeight '" << get<NameTag>() << "' height=" << myImage->Image::get<ImageHeightTag>();
             set<TextureHeightTag>(myImage->get<ImageHeightTag>());
         }
     }
