@@ -42,6 +42,7 @@
 #include <iostream>
 
 #define DB(x)  // x
+#define DBV(x)  x
 #define DB2(x) //  x
 #define DBS(x)  // x
 #define DB_Y(x) // x
@@ -695,6 +696,47 @@ dom::Node::getSchema() const {
 }
 
 #if 1
+#define BUMP_REFERENCES
+#ifdef BUMP_REFERENCES
+void 
+dom::Node::getReferencingNodes(std::vector<NodePtr> & theResult) {
+    NodeIDRefRegistryPtr myIDRefRegistry = getIDRefRegistry();
+    for (unsigned i = 0; i < _myAttributes.size();++i) {
+        const IDValue * myIDValue =_myAttributes.item(i)->nodeValuePtr<IDValue>();
+        if (myIDValue) {
+            myIDRefRegistry->getElementsReferencingId(myIDValue->getString(), _myAttributes.item(i)->nodeName(), theResult);
+        }
+    }
+}
+
+asl::Unsigned64 
+dom::Node::bumpVersion() {
+    Node * myRoot = getRealRootNode();
+    DBV(AC_TRACE << "Node::bumpVersion(): this="<<(void*)this<<" , root="<<(void*)myRoot<<" , root version = "<<myRoot->_myVersion);
+    setUpstreamVersion(++myRoot->_myVersion);
+    if (nodeType() == ELEMENT_NODE) {
+        std::vector<NodePtr> myReferencingNodes;
+        getReferencingNodes(myReferencingNodes);
+        for (unsigned i = 0; i < myReferencingNodes.size();++i) {
+            DBV(AC_TRACE << "Node::bumpVersion(): this="<<(void*)this<<"myReferencingNodes, i ="<<i);
+            myReferencingNodes[i]->setUpstreamVersion(_myVersion);
+        }
+    }
+    return _myVersion;
+}
+
+void
+dom::Node::setUpstreamVersion(asl::Unsigned64 theVersion) {
+    DBV(AC_TRACE << "Node::setUpstreamVersion(): this="<<(void*)this<<" , theVersion = "<<theVersion<<" , _myVersion = "<<_myVersion);
+    if (_myVersion != theVersion) {
+        _myVersion = theVersion;
+        if (_myParent) {
+            _myParent->setUpstreamVersion(theVersion);
+        }
+    }
+}
+#  else
+
 asl::Unsigned64 
 dom::Node::bumpVersion() {
     if (_myParent) {
@@ -704,6 +746,7 @@ dom::Node::bumpVersion() {
     }
     return _myVersion;
 }
+#  endif
 #else
 // TODO: fix this faster, non recursive version which seems to have a bug
 asl::Unsigned64 
@@ -1047,10 +1090,10 @@ dom::Node::Node(const Node & n) :
     _myVersion(0)
 {
     for (int attr = 0; attr < n._myAttributes.size(); ++attr) {
-        _myAttributes.append(n._myAttributes.item(attr)->cloneNode(DEEP,this));
+        _myAttributes.appendWithoutReparenting(n._myAttributes.item(attr)->cloneNode(DEEP,this));
     }
     for (int child = 0; child < n._myChildren.size(); ++child) {
-        _myChildren.append(n._myChildren.item(child)->cloneNode(DEEP,this));
+        _myChildren.appendWithoutReparenting(n._myChildren.item(child)->cloneNode(DEEP,this));
     }
 }
 
@@ -1252,7 +1295,7 @@ dom::Node::parseAll(const String& is) {
             if (new_child) {
                 if ((new_child->nodeType() != X_END_NODE) &&
                     (new_child->nodeType() != X_NO_NODE)) {
-                    _myChildren.appendWhileParsing(new_child);
+                    _myChildren.appendWithoutReparenting(new_child);
                 }
                 if (new_child->nodeType() == DOCUMENT_TYPE_NODE) {
                     doctype = &(*new_child);
@@ -1561,7 +1604,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                         if (new_child->nodeType() != X_NO_NODE) {
                             DB(AC_DEBUG <<"dom::parse_next_node: DOCUMENT_TYPE_NODE added child "
                                 << NodeTypeName[new_child->nodeType()]);
-                            _myChildren.appendWhileParsing(new_child);
+                            _myChildren.appendWithoutReparenting(new_child);
                         }
                     }
                     completed_pos = asl::read_whitespace(is, completed_pos);
@@ -1692,7 +1735,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                 if (new_child && completed_pos > tag_end_pos) {
                     if ((new_child->nodeType() != X_END_NODE) &&
                         (new_child->nodeType() != X_NO_NODE)) {
-                            _myChildren.appendWhileParsing(new_child);
+                            _myChildren.appendWithoutReparenting(new_child);
                         } else {
                             if (new_child->nodeName() == nodeName()) {
                                 tag_end_pos = completed_pos;
@@ -1805,7 +1848,7 @@ dom::Node::appendAttribute(NodePtr theNewAttribute) {
                 PLUS_FILE_LINE,DomException::HIERARCHY_REQUEST_ERR);
     }
     checkAndUpdateAttributeSchemaInfo(*theNewAttribute, this);
-    _myAttributes.append(theNewAttribute);
+    _myAttributes.appendWithoutReparenting(theNewAttribute); // reparenting should have been already done in checkAndUpdateAttributeSchemaInfo
     return theNewAttribute;
 }
 
@@ -1880,7 +1923,7 @@ dom::Node::appendChild(NodePtr theNewChild) {
         oldParent->removeChild(theNewChild);
     }
     checkAndUpdateChildrenSchemaInfo(*theNewChild, this);
-    _myChildren.append(theNewChild);
+    _myChildren.appendWithoutReparenting(theNewChild); // reparenting should have been already done in checkAndUpdateChildrenSchemaInfo
     return theNewChild;
 }
 
@@ -2132,7 +2175,7 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                 }
                 NodePtr new_node(new Node(ATTRIBUTE_NODE,myAttributeName, myTypedAttribute, this));
                 new_node->_myParent = this;
-                _myAttributes.appendWhileParsing(new_node);
+                _myAttributes.appendWithoutReparenting(new_node);
                 new_node->makeSchemaInfo(false);
                 new_node->_mySchemaInfo->_mySchemaDeclaration = myAttributeDecl;
                 new_node->_mySchemaInfo->_myType = myAttributeType;
@@ -2147,7 +2190,7 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                 // we have no schema declaration, so we just proceed without type
                 NodePtr new_node(new Node(ATTRIBUTE_NODE,myAttributeName, ValuePtr(new StringValue(myDecodedData, 0)),this));
                 try {
-                    _myAttributes.appendWhileParsing(new_node);
+                    _myAttributes.appendWithoutReparenting(new_node);
                 }
                 catch (ParseException & dex) {
                     dex.setParsedUntil(par_end);
@@ -2327,6 +2370,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl
 
     if (myNodeType&hasValue) {
         if (myNodeType&hasTypedValue) {
+//#define EXTERNAL_BINARIZE
 #ifdef EXTERNAL_BINARIZE
             //theDest.appendCountedString(_mySchemaInfo->getTypeName());
             DB(AC_TRACE << "Write Binary Len (Count) = " << nodeValueWrapper().size() << endl);
@@ -2467,9 +2511,10 @@ dom::Node::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE t
             asl::AC_SIZE_TYPE mySize;
             thePos = theSource.readUnsigned(mySize,thePos);
             DB(AC_TRACE << "Read Binary Len (Count) = " << mySize << endl;);
-
-            assignValue(asl::ReadableBlockAdapter(theSource.begin()+thePos, theSource.begin()+thePos + mySize));
-            thePos += mySize;
+            asl::Block myBlock;
+            myBlock.resize(mySize);
+            thePos = theSource.readBytes(myBlock.begin(), mySize, thePos);
+            assignValue(myBlock);
             DB(AC_TRACE << "Read nodeValue (Bytes) = " << nodeValueWrapper() << endl);
 #else
             ensureValue();
@@ -2545,6 +2590,9 @@ dom::Node::removeChild(dom::NodePtr theChild) {
     return _myChildren.removeItem(_myChildren.findIndex(&(*theChild)));
 }
 
+// Does not return the document node, but the root element node
+// A better name would be getRootElement(), but the name is defined
+// in the dom-standard. Use "getRealRootNode()" to get the document node.
 Node * 
 Node::getRootNode() {
     Node * myNode = this;
@@ -2569,6 +2617,26 @@ Node::getRootNode() const
     }
     return myNode;
 }
+
+Node * 
+Node::getRealRootNode() {
+    Node * myNode = this;
+    while (myNode->parentNode()) {
+        myNode = myNode->parentNode();
+    }
+    return myNode;
+}
+
+const Node *
+Node::getRealRootNode() const
+{
+    const Node * myNode = this;
+    while (myNode->parentNode()) {
+        myNode = myNode->parentNode();
+    }
+    return myNode;
+}
+
 
 bool
 Node::hasFacade() const {
@@ -2644,7 +2712,14 @@ Node::freeCaches() const {
     _myAttributes.freeCaches();
     _myChildren.freeCaches();
  }
-  
+ 
+
+// theNewParent is the new parent for the node, theTopNewParent is the same node 
+// on the first call, but stays the same during the recursion when reparenting
+// the children in case a whole subtree is reparented.
+
+//TODO: theTopNewParent looks like it is never used, so we might drop it
+ 
 void
 Node::reparent(Node * theNewParent, Node * theTopNewParent) { 
     Node * myOldParent = _myParent;

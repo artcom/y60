@@ -103,23 +103,33 @@ namespace dom {
     * Parent Facade
     \*****************************************************************/
 
-	void 
-	Facade::appendChild(NodePtr theChild) {
-		if (_myChildren.find(theChild->nodeName()) == _myChildren.end()) {
-			_myChildren[theChild->nodeName()] = theChild;
-		}
-	}
-
-	const NodePtr 
-    Facade::getChildNode(const std::string& theChildName) const {
-        std::map<std::string, NodePtr>::const_iterator myIter = _myChildren.find(theChildName);
-        if (myIter != _myChildren.end()) {
-            return myIter->second;
-        } else {
-    	    return NodePtr(0);
+    void 
+	Facade::registerChildName(const std::string & theChildName) {
+        if (hasRegisteredChild(theChildName)) {
+            throw Facade::DuplicateChildName(theChildName,PLUS_FILE_LINE);
         }
-	}
+        _myChildNames.insert(theChildName);
+    }
+    bool
+    Facade::hasRegisteredChild(const std::string & theChildName) const {
+        return _myChildNames.find(theChildName) != _myChildNames.end();
+    }
+    const NodePtr
+    Facade::getChildNode(const DOMString & theName) const {
+        if (hasRegisteredChild(theName)) {   
+            return Facade::ensureChild(_myNode, theName);
+        }
+        return NodePtr(0);
+    }
+    NodePtr
+    Facade::getChildNode(const DOMString & theName) { 
+        if (hasRegisteredChild(theName)) {   
+            return Facade::ensureChild(_myNode, theName);
+        }
+        return NodePtr(0);
+    }
 
+  
     Facade::PropertyMap & 
     Facade::getProperties() const {
 		ensureProperties(); 
@@ -141,5 +151,21 @@ namespace dom {
     Facade::setNode( Node & theNode) {
         _myNode = theNode;
     }
-
+    NodePtr
+    Facade::ensureChild(const Node & theNode, const DOMString & theName) {
+        NodePtr myChild = theNode.childNode(theName);
+        if (!myChild) {
+            myChild = createChild(theNode, theName);
+        }
+        return myChild;
+    }
+    NodePtr 
+    Facade::createChild(const Node & theNode, const DOMString & theName) {
+        try {
+            return const_cast<Node&>(theNode).appendChild(NodePtr(new Element(theName)) );
+        } catch (asl::Exception & ex) {
+            throw Facade::Exception(std::string("Could not add child '") +theName +
+                    "' to node:\n" + asl::as_string(theNode) + asl::as_string(ex), PLUS_FILE_LINE);
+        }
+    }
 }

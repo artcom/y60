@@ -117,6 +117,13 @@ Logger::Logger() :
         addMessageSink(Ptr<MessageSink>(new StreamPrinter(std::cerr)), myConsoleFormatter, myConsoleSeverity);
     }
 
+#ifndef _SETTING_WITH_TRACE_LOG_
+     if (myConsoleSeverity == SEV_TRACE) {  
+            std::cerr << "### WARNING: Logger: TRACE requested, but traces were disabled at compile time in release build. Compile with -DWITH_TRACE_LOG to compile with tracing, use debug build or modify settings.h "<<std::endl;
+    }
+#endif
+
+
 #ifdef WIN32
     Ptr<LogMessageFormatter> myVisualStudioFormatter = createFormatter(LOG_VISUAL_STUDIO_FORMAT_ENV, VisualStudioLogMessageFormatter::name(), "console");
     Severity myVisualStudioSeverity = getSeverityFromEnv(LOG_VISUAL_STUDIO_FILTER_ENV, SEV_DISABLED);

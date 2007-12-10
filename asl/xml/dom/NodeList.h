@@ -71,7 +71,7 @@ namespace dom {
         }
         virtual void freeCaches() const;
     protected:
-        NodePtr appendWhileParsing(NodePtr theNewNode);
+        NodePtr appendWithoutReparenting(NodePtr theNewNode);
         virtual void reparent(Node * theNewParent, Node * theTopNewParent);
         virtual void resize(asl::AC_SIZE_TYPE newSize);
         Node * _myShell;
@@ -100,7 +100,7 @@ namespace dom {
         static int countNodesNamed(const DOMString & name, const NodeList & nodes);
         static int findNthNodeNamed(const DOMString & name, int n, const NodeList & nodes);
     protected:
-        NodePtr appendWhileParsing(NodePtr theNewNode);
+        NodePtr appendWithoutReparenting(NodePtr theNewNode);
 	};
 
 	class TypedNamedNodeMap : public NamedNodeMap {
@@ -118,7 +118,7 @@ namespace dom {
         virtual void setItem(int theIndex, NodePtr theNewItem);
         virtual void insert(int theIndex, NodePtr theNewNode);
     protected:
-        NodePtr appendWhileParsing(NodePtr theNewNode);
+        NodePtr appendWithoutReparenting(NodePtr theNewNode);
 	private:
         void checkType(NodePtr theNewNode);
 		unsigned short allowedType;

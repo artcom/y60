@@ -225,10 +225,17 @@ struct SphericalNormal {
 
      asl::Vector3f operator()(unsigned x, unsigned y) const {
         asl::Vector2f myPolarCoord = _myPolarPatchOrigin + _myPolarUVector * float(x) + _myPolarVVector * float(y);
+#if 0
         asl::Vector3f myNormal = asl::Vector3f(
                 cos(myPolarCoord[0]) * cos(myPolarCoord[1]),
-                sin(myPolarCoord[1]),
+                sin(myPolarCoord[0]) * cos(myPolarCoord[1]),
+                sin(myPolarCoord[1]));
+#else
+        asl::Vector3f myNormal = asl::Vector3f(
+                cos(myPolarCoord[0]) * cos(myPolarCoord[1]),
+                -sin(myPolarCoord[1]),
                 sin(myPolarCoord[0]) * cos(myPolarCoord[1]));
+#endif
         return asl::normalized(myNormal); 
      }
     const asl::Sphere<float>  _mySphere;

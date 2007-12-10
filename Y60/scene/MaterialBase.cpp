@@ -60,14 +60,14 @@ namespace y60 {
 
     bool
     MaterialBase::reloadRequired(){
-        // force childnodes to reconnect
-        forceRebindChild<MaterialPropertiesTag>();
-        forceRebindChild<MaterialRequirementTag>();
-
         MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
+            AC_TRACE << "Not reloading params for material " << get<NameTag>() << " last requiresVersion:" << _myRequiresVersion;
+            AC_TRACE << "Not reloading params for material " << get<NameTag>() << " cur. requiresVersion:" << myReqFacade->getNode().nodeVersion();
             return false;
         }
+        AC_DEBUG << "Reloading params for material " << get<NameTag>() << " last requiresVersion:" << _myRequiresVersion;
+        AC_DEBUG << "Reloading params for material " << get<NameTag>() << " cur. requiresVersion:" << myReqFacade->getNode().nodeVersion();
         return true;
     }
 
@@ -257,12 +257,10 @@ namespace y60 {
         MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (!getNode() ||
             (getNode().nodeVersion() == _myMaterialVersion && myReqFacade->getNode().nodeVersion() == _myRequiresVersion)) {
+            AC_TRACE << "Not updating params for material " << get<NameTag>() << " last materialVersion:" << _myMaterialVersion << " last requiresVersion:" << _myRequiresVersion;
+            AC_TRACE << "Not updating params for material " << get<NameTag>() << " cur. materialVersion::" << getNode().nodeVersion() << " cur. requiresVersion:" << myReqFacade->getNode().nodeVersion();
             return;
         }
-
-        // force childnodes to reconnect
-        forceRebindChild<MaterialPropertiesTag>();
-        forceRebindChild<MaterialRequirementTag>();
 
         _myMaterialVersion = getNode().nodeVersion();
         _myRequiresVersion = myReqFacade->getNode().nodeVersion();

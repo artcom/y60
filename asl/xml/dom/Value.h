@@ -33,7 +33,44 @@
 #include <map>
 #include <typeinfo>
 
+#define DB(x) x
+
+/**
+This file provides the facilities to box all C++ Types into a hierarchy of "Value"-objects with a common
+base class name ValueBase. All objects can be unboxed and accessed as native types, or converted to and from
+std::strings or binary representations, which can be used for persistence.
+
+The dom::Node uses ValueBase-derived types as nodeValue, and using xml schema and factories, this mechanism
+provides the dom with efficient binary serialization deserialization.
+
+For string conversion the C++ stream operators are used.
+
+There are basically four different Value-Wrappers that can be used for different families of C++ types:
+
+StringValue - wraps std::string, all other values are derived from StringValue.
+SimpleValue - wraps POD-types (int, float etc. and structs without member functions)
+VectorValue - wraps std::vector<PODT> and other types that are consecutive arrays of POD-Types.
+ComplexValue - wraps all other types, requires additional functions to be defined for serialization
+
+Other special types include:
+ IDValue, a value that registeres itself at the document root to provide fast element-by-id access
+ RasterValue, a value that works with asl::raster to wrap image maps or other 2D-data
+
+Conversion between native, text and binary representation is lazy, except when assigning a string value
+because we want to know immediately when the conversion fails.
+
+ValueBase is also derived from Field, which provides a dependency graph facility and automatic lazy
+recomputation of dependent values. This is mainly used for FacadeAttributePlugs, which are non-persistent
+attributes that can be added to a dom::Node using the Facade-mechanism.
+
+Facade mainly provides fast and type-safe access to attributes and children of dom::Element nodes.
+ 
+*/
+
+
 namespace asl {
+
+    //TODO: This stuff does not belong here, should be moved to raster
     template <class VALUE>
     VALUE getAlphaValue(const RGB_t<VALUE> & thePixel) {
     //    return thePixel.get(alpha<VALUE>()).get();
@@ -94,6 +131,7 @@ namespace dom {
         virtual void bumpVersion() = 0;
 
         virtual void set(const ReadableBlock & theBlock) {
+            DB(AC_TRACE << "ValueBase::set(): this="<<(void*)this<<" , vtname="<<name());
             assign(theBlock);
             bumpVersion();
         }
@@ -115,26 +153,33 @@ namespace dom {
     protected:
         virtual void setNodePtr(Node * theNode) = 0;
         virtual void reparent() const {
-            const_cast<ValueBase*>(this)->bumpVersion();
+            DB(AC_TRACE << "ValueBase::reparent(): this="<<(void*)this<<" , vtname="<<name());
+            //const_cast<ValueBase*>(this)->bumpVersion();
         }
     };
 
-
+    // traits type for automatic selection of appropriate Value types
+    // is specialized for many standard C++ types here,
+    // and must be specialized for all user-defined types that shall be
+    // wrapped.
     template <class VALUE>
     struct ValueWrapper;
 
+    // automatically writes every POD-Type into a binary stream
     template <class T>
     void binarize(const T & myValue, asl::WriteableStream & theDest) {
         typedef typename ValueWrapper<T>::Type CheckType; // make sure only wrapped native values get automatically binarized
         theDest.appendData(myValue);
     }
-
+    
+    // automatically reads every POD-Type from a binary stream
     template <class T>
     asl::AC_SIZE_TYPE debinarize(T & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
         typedef typename ValueWrapper<T>::Type CheckType; // make sure only wrapped native values get automatically binarized
         return theSource.readData(myValue,thePos);
     }
 
+    // specialization for std::string
     inline
     void binarize(const std::string & myValue, asl::WriteableStream & theDest) {
         theDest.appendCountedString(myValue);
@@ -144,7 +189,9 @@ namespace dom {
         return theSource.readCountedString(myValue,thePos);
     }
 
+    // specialization for std::vector<T>
 #ifdef UNCOMPRESSED_VECTORS
+    // This version simply reads and writes the plain memory
     template <class T>
         void binarize(const std::vector<T> & myValue, asl::WriteableStream & theDest) {
             theDest.appendUnsigned(asl::AC_SIZE_TYPE(myValue.size()));
@@ -163,6 +210,7 @@ namespace dom {
             return thePos;
         }
 #else
+    // This version uses lossless run-length encoding to read and write vectors
     template <class T>
     void binarize(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
         return ValueWrapper<T>::Type::binarizeVector(theVector, theDest);
@@ -172,6 +220,7 @@ namespace dom {
         return ValueWrapper<T>::Type::debinarizeVector(theVector, theSource, thePos);
     }
 
+    // This is the generic version that call "binarize" for every element
    template <class T>
         void binarizeGeneric(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             theDest.appendUnsigned(asl::AC_SIZE_TYPE(theVector.size()));
@@ -196,6 +245,7 @@ namespace dom {
                 }
             }
         }
+    // This is the generic version that call "debinarize" for every element
     template <class T>
         asl::AC_SIZE_TYPE debinarizeGeneric(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             asl::AC_SIZE_TYPE myCount;
@@ -222,7 +272,8 @@ namespace dom {
             }
             return thePos;
         }
-
+    
+    // This is a faster version that reads/writes consecutive chunks of memory
     template <class T>
         asl::AC_SIZE_TYPE debinarizePODT(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             asl::AC_SIZE_TYPE myCount;
@@ -248,6 +299,7 @@ namespace dom {
             }
             return thePos;
         }
+    // This is a faster version that reads/writes consecutive chunks of memory
     template <class T>
         void binarizePODT(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             theDest.appendUnsigned(asl::AC_SIZE_TYPE(theVector.size()));
@@ -272,6 +324,8 @@ namespace dom {
             }
         }
 #endif
+
+    // specialization for raster
    template <class T, class Alloc, class D>
    void binarize(const asl::raster<T, Alloc, D> & myValue, asl::WriteableStream & theDest) {
        theDest.appendUnsigned(myValue.hsize());
@@ -289,6 +343,9 @@ namespace dom {
        return thePos;
    }
 
+    /** StringValue is also a base class for all other values, and is used for nodeValues when no
+        schema is present.
+    */
     class StringValue : public ValueBase {
     public:
         StringValue(Node * theNode)
@@ -438,11 +495,13 @@ namespace dom {
     private:
         mutable DOMString _myStringValue;
         bool _isBlockWriteable;
-        mutable Node * _myNode;
+        mutable Node * _myNode; // a pointer to the node is maintained to allow the value to interact with the dom
+                                // currently only IDValue makes use of it
     };
 
     class NodeOffsetCatalog;
 
+    // Registry that provides fast getElementById access on all attributes that are defined as ID in xml-schema
     class NodeIDRegistry {
         friend class NodeOffsetCatalog;
     public:
@@ -464,6 +523,7 @@ namespace dom {
         IDMaps _myIDMaps;
     };
 
+    // collects node offsets during serialization to provide fast random access by id into binarized doms (.b60 files)
     class NodeOffsetCatalog {
         public:
             typedef std::map<DOMString, asl::Unsigned64> IDMap;
@@ -490,20 +550,15 @@ namespace dom {
         private:
             IDMaps _myIDMaps;
     };
-
+    
+    // Registrar that provides fast getElementById access on all attributes that are defined as ID in xml-schema
     class IDValue : public StringValue {
     public:
         IDValue(Node * theNode) : StringValue(theNode) {
             // intentionally no call to update() or bumpversion() here
         }
-        IDValue(const asl::ReadableBlock & theValue, Node * theNode) : StringValue(theValue, theNode)
-        {
-            update();
-        }
-        IDValue(const DOMString & theValue, Node * theNode) : StringValue(theValue, theNode)
-        {
-            update();
-        }
+        IDValue(const asl::ReadableBlock & theValue, Node * theNode) : StringValue(theValue, theNode) { }
+        IDValue(const DOMString & theValue, Node * theNode) : StringValue(theValue, theNode) { }
         ~IDValue();
         virtual const char * name() const {
             return typeid(IDValue).name();
@@ -535,9 +590,82 @@ namespace dom {
         mutable NodeIDRegistryWeakPtr _myRegistry;
     };
 
+    // Registry that provides fast matching of referencend node to their references defined as IDRef in xml-schema
+    class NodeIDRefRegistry {
+        //friend class NodeOffsetCatalog;
+    public:
+        typedef std::multimap<DOMString, Node *> IDRefMap;
+        typedef std::map<DOMString, IDRefMap> IDRefMaps;
+    public:
+        void registerIDRef(const DOMString & theIDRefAttributeName, const DOMString & theIDRefAttributeValue, dom::Node * theElement);
+        void unregisterIDRef(const DOMString & theIDRefAttributeName, const DOMString & theIDRefAttributeValue, dom::Node * theElement);
+        //void getElementsReferencingId(const DOMString & theId, const DOMString & theIdAttribute, std::vector<NodePtr const> & theResult) const;
+        void getElementsReferencingId(const DOMString & theId, const DOMString & theIdAttribute, std::vector<NodePtr> & theResult);
+        const IDRefMap * getIDRefMap(const DOMString & theIDRefAttributeName) const {
+            IDRefMaps::const_iterator myMap = _myIDRefMaps.find(theIDRefAttributeName);
+            if (myMap == _myIDRefMaps.end()) {
+                return 0;
+            }
+            return &myMap->second;
+        }
+    private:
+        IDRefMaps _myIDRefMaps;
+    };
+
+    class IDRefValue : public StringValue {
+    public:
+        IDRefValue(Node * theNode) : StringValue(theNode) {
+            // intentionally no call to update() or bumpversion() here
+        }
+        IDRefValue(const asl::ReadableBlock & theValue, Node * theNode) : StringValue(theValue, theNode) { }
+        IDRefValue(const DOMString & theValue, Node * theNode) : StringValue(theValue, theNode) { }
+        ~IDRefValue();
+        virtual const char * name() const {
+            return typeid(IDRefValue).name();
+        }
+        virtual const std::type_info & getTypeInfo() const {
+            return typeid(IDRefValue);
+        }
+        virtual void update() const;
+        virtual void reparent() const;
+        virtual ValuePtr clone(Node * theNode) const {
+            onGetValue();
+            return ValuePtr(new IDRefValue(getString(), theNode));
+        }
+        virtual ValuePtr create(Node * theNode) const {
+            return ValuePtr(new IDRefValue(theNode));
+        }
+        virtual ValuePtr create(const DOMString & theValue, Node * theNode) const {
+            return ValuePtr(new IDRefValue(theValue, theNode));
+        }
+        virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
+            return ValuePtr(new IDRefValue(theValue, theNode));
+        }
+        virtual void setNodePtr(Node * theNode);
+        virtual NodePtr getReferencedElement() const;
+    protected:
+        virtual void registerIDRef(const DOMString & theCurrentValue) const;
+        virtual void unregisterIDRef() const;
+    private:
+        mutable DOMString _myOldValue;
+        mutable NodeIDRefRegistryWeakPtr _myRegistry;
+    };
+
     DEFINE_EXCEPTION(SizeMismatch,asl::Exception);
     DEFINE_PARSE_EXCEPTION(ConversionFailed,ParseException);
 
+    // common template base class adding unboxing operations for all wrapped native types
+    // Note that no references to native types should be stored in client code.
+    // References can be stored temporarily on then stack using the open/close interface.
+    // but beware of exception safety. (You should use the Node::WritableValue class when possible)
+    // A value can be opened for writing only by one user, trying to open an already open value will throw.
+    // The open/close mechanism is not intented for multi-threaded access,
+    // it serves as a safeguard and reminder not to store references.
+    // Internally it is reuqired to perform the lazy synchronization
+    // between native, binary and text representation.
+    // openWriteableValue() invalidates the cached binary and text
+    // representation. Reading of the native type does not invalidate
+    // these caches, so no open/close is required here.
     template <class T>
     class Value : public StringValue {
     protected:
@@ -560,6 +688,7 @@ namespace dom {
 
     };
 
+    // helper functions to perform dynamic casts and unboxing
     template <class T>
     T * dynamic_cast_and_openWriteableValue(ValueBase * theValueBase) {
         Value<T> * myValuePtr = dynamic_cast<Value<T>*>(theValueBase);
@@ -588,6 +717,8 @@ namespace dom {
     DEFINE_EXCEPTION(ValueNotNativeWriteable, asl::Exception);
     DEFINE_EXCEPTION(ValueAlreadyNativeWriteable, asl::Exception);
 
+    // Wrapper for all POD-Types - must not be used for other C++ types
+    // TODO: provide a POD-type check
     template <class T>
     class SimpleValue : public Value<T>, public asl::PoolAllocator<SimpleValue<T> > {
     public:
@@ -750,6 +881,7 @@ namespace dom {
         bool _isValueWriteable;
     };
 
+    // interface for vector element access
     struct AccessibleVector {
         virtual const char * elementName() const = 0;
         virtual asl::AC_SIZE_TYPE length() const = 0;
@@ -757,13 +889,16 @@ namespace dom {
         virtual bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
     };
 
+    // interface for vector element access and resizing
     struct ResizeableVector : public AccessibleVector {
         virtual void resize(asl::AC_SIZE_TYPE newSize) = 0;
         virtual bool append(const ValueBase & theValue) = 0;
         virtual bool erase(asl::AC_SIZE_TYPE theIndex) = 0;
         virtual bool insertBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
     };
-
+    
+    // interface for raster element access and resizing
+    // TODO: this should be moved somewhere else
     struct ResizeableRaster {
         virtual ~ResizeableRaster() {}
         virtual asl::AC_SIZE_TYPE width() const = 0;
@@ -801,6 +936,8 @@ namespace dom {
                 asl::AC_OFFSET_TYPE targetWidth = 0, asl::AC_OFFSET_TYPE targetHeight = 0) = 0;
 
     };
+
+    // helper function to access the native raster type
     typedef asl::Ptr<ResizeableRaster, dom::ThreadingModel> ResizeableRasterPtr;
     inline
     ResizeableRasterPtr raster_cast(ValuePtr & p) {
@@ -822,6 +959,7 @@ namespace dom {
     DEFINE_EXCEPTION(RasterArgumentSizeMismatch, asl::Exception);
     DEFINE_EXCEPTION(RasterArgumentTypeMismatch, asl::Exception);
 
+    // A Mixin-template that turns a VectorValue into a ResizableRaster
     template <class RASTER_VALUE, class T, class PIXEL_VALUE>
     struct MakeResizeableRaster : public ResizeableRaster {
         typedef typename T::value_type PIXEL;
@@ -1096,11 +1234,14 @@ namespace dom {
     };
 
 
+    // A Mixin-template to create an opaque VectorValue, which allows no element access
+    // but has all the serialization/deserialization features
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
     struct MakeOpaqueVector {
         MakeOpaqueVector(VECTOR_VALUE & ) {}
     };
 
+    // A Mixin-template that turns a VectorValue into a AccessibleVector
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
     struct MakeAccessibleVector : public AccessibleVector {
         typedef typename T::value_type ELEM;
@@ -1143,6 +1284,7 @@ namespace dom {
         VECTOR_VALUE & _myVectorValue;
     };
 
+    // A Mixin-template that turns a VectorValue into a ResizeableVector
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
     struct MakeResizeableVector : public ResizeableVector {
         typedef typename T::value_type ELEM;
@@ -1238,6 +1380,8 @@ namespace dom {
         typedef typename T::value_type value_type;
     };
 
+    
+    // template class for all vector and raster types
     template <
         class T,
         template<class,class,class> class ACCESS = MakeAccessibleVector,
@@ -1368,6 +1512,10 @@ namespace dom {
         return theSource.readBlock(myValue,thePos);
     }
 
+    // template class for all other user-defined types with complex memory layout
+    // You have to provide binarize(), debinarize(), operator<<() and operator>>()
+    // in order to use your class wrapped by ComplexValue.
+    // Note that already a std::vector<std::string> must be wrapped as ComplexValue.
     template <
         class T,
         template<class,class,class> class ACCESS = MakeOpaqueVector,
@@ -1615,18 +1763,23 @@ namespace dom {
         typedef StringValue Type;
     };
 
+// macros to define traits types
+
+// This one is for simple types
 #define DEFINE_VALUE_WRAPPER_TEMPLATE(TYPE, WRAPPER)\
     template <>\
     struct ValueWrapper<TYPE > {\
         typedef WRAPPER<TYPE > Type;\
     };
 
+// You can use this one to specify one template argument for the value class, e.g. simple vector wrapper
 #define DEFINE_VALUE_WRAPPER_TEMPLATE2(TYPE, WRAPPER, WRAPPER_ARG)\
     template <>\
     struct ValueWrapper<TYPE > {\
         typedef WRAPPER<TYPE, WRAPPER_ARG > Type;\
     };
 
+// You can use this one to specify two template arguments for the value class, e.g. raster types
 #define DEFINE_VALUE_WRAPPER_TEMPLATE3(TYPE, WRAPPER, WRAPPER_ARG, ELEMENT_WRAPPER)\
     template <>\
     struct ValueWrapper<TYPE > {\
@@ -1650,6 +1803,9 @@ namespace dom {
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Block, VectorValue);
 
+    // A prototype-based factory to create Value-types based on a type name
+    // and giving a text oder binary representation to initialize the boxed
+    // native value.
     class ValueFactory {
     public:
         ValueFactory();
@@ -1686,5 +1842,5 @@ namespace dom {
 } //Namespace dom
 
 
-
+#undef DB
 #endif

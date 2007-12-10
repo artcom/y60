@@ -52,7 +52,9 @@ namespace y60 {
         public dom::FacadeAttributePlug<TextureWidthTag>,
         public dom::FacadeAttributePlug<TextureHeightTag>,
         public dom::FacadeAttributePlug<TextureDepthTag>,
+#ifdef BAD_TX
         public dom::FacadeAttributePlug<TextureImageTag>,
+#endif
         public dom::FacadeAttributePlug<TextureParamChangedTag>
     {
         public:

@@ -21,6 +21,11 @@
 
 
 namespace dom {
+
+    // This is bogus, a WeakPtr is not a SimpleValue, it can not be copied using
+    // just memcopy, same goes for other WeakPtr-Wrappers in TextureUnit.h
+    // We must either define a special PtrValue type to wrap pointer values,
+    // however this might not be easy, or we wrap it as ComplexValue
     template <>
     struct ValueWrapper<y60::ImageWeakPtr> {
         typedef dom::SimpleValue<y60::ImageWeakPtr> Type;

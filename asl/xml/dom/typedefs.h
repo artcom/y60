@@ -61,6 +61,10 @@ namespace dom {
     typedef asl::Ptr<NodeIDRegistry,ThreadingModel> NodeIDRegistryPtr;
     typedef asl::WeakPtr<NodeIDRegistry,ThreadingModel> NodeIDRegistryWeakPtr;
 
+    class NodeIDRefRegistry;
+    typedef asl::Ptr<NodeIDRefRegistry,ThreadingModel> NodeIDRefRegistryPtr;
+    typedef asl::WeakPtr<NodeIDRefRegistry,ThreadingModel> NodeIDRefRegistryWeakPtr;
+
     class Document;
     typedef asl::Ptr<Document,ThreadingModel> DocumentPtr;
 

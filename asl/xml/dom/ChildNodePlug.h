@@ -44,51 +44,45 @@ namespace dom {
         public:
 			typedef typename TAG::TYPE VALUE;
 
-            ChildNodePlug(FACADE * theFacade) : _myChild(0) 
+            ChildNodePlug(FACADE * theFacade) 
 			{
-                ensureChild(theFacade->getNode());
-                if (_myChild) {
-                    theFacade->appendChild(_myChild);
-                } else {
-                    theFacade->appendChild(NodePtr(new Element(TAG::getName())));
-                }
+                AC_TRACE << "ChildNodePlug::ChildNodePlug()" ;
+                theFacade->registerChildName(TAG::getName());
 			}
 
 			const VALUE & getValue(const Node & theNode) const {
-                if (!_myChild) {
-                    ensureChild(theNode);
+                if (!theNode) {
+                    throw Facade::NoParentNode(std::string(TAG::getName()),PLUS_FILE_LINE);
                 }
-				return *_myChild;
+                return *Facade::ensureChild(theNode, TAG::getName());
 			}
 			void ensureDependencies() const {}
-            void forceRebindChild() { _myChild = NodePtr(0); }
-            
+
 			const NodePtr getChildNode(const Node & theNode) const { 
-                if (!_myChild) {
-                    ensureChild(theNode);
-                }
-				return _myChild; 
+                return Facade::ensureChild(theNode, TAG::getName());
 			}
-			
+			NodePtr getChildNode(const Node & theNode) { 
+                return Facade::ensureChild(theNode, TAG::getName());
+			}
+				
 		private:
-            mutable NodePtr _myChild;
             ChildNodePlug() {};
 
-            void ensureChild(const Node & theNode) const {
-                if (!theNode) {
-                    return; // to allow factory nodes
+            NodePtr ensureChild(const Node & theNode) const {
+ 				NodePtr myChild = theNode.childNode(TAG::getName());
+                if (!myChild) {
+                    myChild = createChild(theNode);
                 }
-				_myChild = theNode.childNode(TAG::getName());
-                if (!_myChild) {
-                    try {
-                        _myChild = const_cast<Node&>(theNode).appendChild(NodePtr(new Element(TAG::getName())) );
-					} catch (asl::Exception) {
-                        throw Facade::Exception(std::string("Could not add child '") + TAG::getName() +
-                            "' to node:\n" + asl::as_string(theNode), PLUS_FILE_LINE);
-                    }
+                return myChild;
+            }
+            NodePtr createChild(const Node & theNode) const {
+                try {
+                    return const_cast<Node&>(theNode).appendChild(NodePtr(new Element(TAG::getName())) );
+                } catch (asl::Exception & ex) {
+                    throw Facade::Exception(std::string("Could not add child '") + TAG::getName() +
+                            "' to node:\n" + asl::as_string(theNode) + asl::as_string(ex), PLUS_FILE_LINE);
                 }
             }
-	
     };
 }
 

@@ -36,6 +36,10 @@
 // set to supress warnings about #undef'ing colliding symbols from system headers
 #define _SETTING_NO_UNDEF_WARNING_ 1
 
+#if defined(DEBUG) || defined WITH_TRACE_LOG
+#define _SETTING_WITH_TRACE_LOG_
+#endif
+
 #ifdef _GNU_SOURCE
     #if (__GNUC__ < 3)
         #define __SETTING_FORCE_STRSTREAM___

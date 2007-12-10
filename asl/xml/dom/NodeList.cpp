@@ -254,8 +254,10 @@ dom::NodeList::append(NodePtr theNewNode) {
     return theNewNode;
 }
 
+// This call does not perform reparenting, it should be used when the parent chain
+// has already been established by prior calls to avoid excessive reparenting
 NodePtr
-dom::NodeList::appendWhileParsing(NodePtr theNewNode) {
+dom::NodeList::appendWithoutReparenting(NodePtr theNewNode) {
     _myNodes.push_back(theNewNode);
     theNewNode->self(theNewNode);
     return theNewNode;
@@ -371,7 +373,7 @@ dom::NamedNodeMap::append(NodePtr theNewNode) {
 }
 
 NodePtr
-dom::NamedNodeMap::appendWhileParsing(NodePtr theNewNode) {
+dom::NamedNodeMap::appendWithoutReparenting(NodePtr theNewNode) {
 	int i = findNthNodeNamed(theNewNode->nodeName(),0,*this);
 	if (i<size()) {
 		std::string errorMessage;
@@ -380,7 +382,7 @@ dom::NamedNodeMap::appendWhileParsing(NodePtr theNewNode) {
 		errorMessage += "' is already used in this map";
 		throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
 	}
-    return NodeList::appendWhileParsing(theNewNode);
+    return NodeList::appendWithoutReparenting(theNewNode);
 }
 
 void dom::NamedNodeMap::setItem(int theIndex, NodePtr theNewItem) {
@@ -433,9 +435,9 @@ dom::TypedNamedNodeMap::append(NodePtr theNewNode) {
 }
 
 NodePtr
-dom::TypedNamedNodeMap::appendWhileParsing(NodePtr theNewNode) {
+dom::TypedNamedNodeMap::appendWithoutReparenting(NodePtr theNewNode) {
     checkType(theNewNode);
-    return NamedNodeMap::appendWhileParsing(theNewNode);
+    return NamedNodeMap::appendWithoutReparenting(theNewNode);
 }
 
 void dom::TypedNamedNodeMap::setItem(int theIndex, NodePtr theNewItem) {

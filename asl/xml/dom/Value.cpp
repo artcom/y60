@@ -15,7 +15,7 @@
 #include "Nodes.h"
 #include <asl/Logger.h>
 
-#define DB(x) // x
+#define DB(x)  x
 #define DB2(x) // x
 
 using namespace std;
@@ -25,9 +25,11 @@ using namespace asl;
 void
 StringValue::bumpVersion() {
     Node * myNode = getNodePtr();
-    DB(AC_TRACE << "StringValue::bumpVersion():"<<endl);
+    DB(AC_TRACE << "StringValue::bumpVersion(): this="<<(void*)this<<" , vtname="<<name());
     if (myNode) {
+        DB(AC_TRACE << "StringValue::bumpVersion(): before node="<<(void*)myNode<<" , version="<<myNode->nodeVersion());
         myNode->bumpVersion();
+        DB(AC_TRACE << "StringValue::bumpVersion(): after node="<<(void*)myNode<<" , version="<<myNode->nodeVersion());
     }
 }
 void
@@ -189,7 +191,7 @@ IDValue::update() const {
 void
 IDValue::reparent() const {
     Node * myNode = const_cast<IDValue*>(this)->getNodePtr();
-    DB(AC_TRACE << "IDValue::reparent():"<<endl);
+    DB(AC_TRACE << "IDValue::reparent(): this="<<(void*)this<<" , vtname="<<name());
     if (myNode) {
         unregisterID();
         const DOMString & myCurrentValue = getStringDirect(); // do not make a onSetValue() callback
@@ -242,6 +244,157 @@ IDValue::~IDValue() {
     DB(AC_TRACE << "IDValue::~IDValue():"<<endl);
     unregisterID();
 }
+
+void
+dom::NodeIDRefRegistry::registerIDRef(const DOMString & theIDRefAttributeName, const DOMString & theIDRefAttributeValue, dom::Node * theElement) {
+    DB(AC_TRACE << "Node::registerIDRef: registering "<<theIDRefAttributeName<<"='"<<theIDRefAttributeValue<<"' at node "<<(void*)this<<endl);
+    IDRefMap & myMap = _myIDRefMaps[theIDRefAttributeName];
+    IDRefMap::iterator myFirstEntry = myMap.lower_bound(theIDRefAttributeValue);
+    IDRefMap::iterator myLastEntry = myMap.upper_bound(theIDRefAttributeValue);
+    for (IDRefMap::iterator myIt = myFirstEntry; myIt != myLastEntry; ++myIt) {
+        if (myIt->second == theElement) {
+            throw Node::DuplicateIDRefValue(string("The Element at "+as_string((void*)theElement)+" with IDRef attribute '")+theIDRefAttributeName+"' of value '"+theIDRefAttributeValue+"' is already registered at the document", PLUS_FILE_LINE);
+        }
+    }
+    myMap.insert(make_pair(theIDRefAttributeValue,theElement));
+}
+
+void
+dom::NodeIDRefRegistry::unregisterIDRef(const DOMString & theIDRefAttributeName, const DOMString & theIDRefAttributeValue, Node * theElement) {
+    DB(AC_TRACE << "Node::unregisterIDRef: unregistering "<<theIDRefAttributeName<<"='"<<theIDRefAttributeValue<<"' at node "<<(void*)this<<endl);
+    IDRefMaps::iterator myMapIt = _myIDRefMaps.find(theIDRefAttributeName);
+    if (myMapIt == _myIDRefMaps.end()) {
+        throw Node::IDRefValueNotRegistered(string("Internal Error: No Element with IDRef attribute '")+theIDRefAttributeName+"' of any value, especially '"+theIDRefAttributeValue+"' is registered at the document", PLUS_FILE_LINE);
+    }
+    IDRefMap & myMap = myMapIt->second;
+    IDRefMap::iterator myFirstEntry = myMap.lower_bound(theIDRefAttributeValue);
+    IDRefMap::iterator myLastEntry = myMap.upper_bound(theIDRefAttributeValue);
+    for (IDRefMap::iterator myIt = myFirstEntry; myIt != myLastEntry; ++myIt) {
+        if (myIt->second == theElement) {
+            myMap.erase(myIt);
+            if (!myMap.size()) {
+                _myIDRefMaps.erase(myMapIt);
+            }
+            return;
+        }
+    } 
+    throw Node::IDRefValueNotRegistered(string("Internal Error: The Element at "+as_string((void*)theElement)+" with IDRef attribute '")+theIDRefAttributeName+"' of value '"+theIDRefAttributeValue+"' is not registered at the document", PLUS_FILE_LINE);
+}
+#if 0
+void
+NodeIDRefRegistry::getElementsReferencingId(const DOMString & theId, const DOMString & theIdAttribute, std::vector<NodePtr const> & theResult) const {
+    IDRefMaps::const_iterator myMapIt = _myIDRefMaps.find(theIdAttribute);
+    if (myMapIt == _myIDRefMaps.end()) {
+        return;
+    }
+    const IDRefMap & myMap = myMapIt->second;
+    IDRefMap::const_iterator myFirstEntry = myMap.lower_bound(theId);
+    IDRefMap::const_iterator myLastEntry = myMap.upper_bound(theId);
+    for (IDRefMap::const_iterator myIt = myFirstEntry; myIt != myLastEntry; ++myIt) {
+        theResult.push_back(myIt->second->self().lock());
+    }
+}   
+#endif
+
+void
+NodeIDRefRegistry::getElementsReferencingId(const DOMString & theId, const DOMString & theIdAttribute, std::vector<NodePtr> & theResult) {
+    std::vector<NodePtr> myResult;
+    IDRefMaps::iterator myMapIt = _myIDRefMaps.find(theIdAttribute);
+    if (myMapIt == _myIDRefMaps.end()) {
+        return;
+    }
+    IDRefMap & myMap = myMapIt->second;
+    IDRefMap::iterator myFirstEntry = myMap.lower_bound(theId);
+    IDRefMap::iterator myLastEntry = myMap.upper_bound(theId);
+    for (IDRefMap::iterator myIt = myFirstEntry; myIt != myLastEntry; ++myIt) {
+        theResult.push_back(myIt->second->self().lock());
+    }
+}
+// TODO: put in common base class of IDValue; duplicate code
+void
+IDRefValue::update() const {
+    Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+    DB(AC_TRACE << "IDRefValue::update():"<<endl);
+    if (myNode) {
+        const DOMString & myCurrentValue = getStringDirect(); // do not make a onSetValue() callback
+        if (_myOldValue != myCurrentValue) {
+            unregisterIDRef();
+            registerIDRef(myCurrentValue);
+       }
+    }
+}
+
+// TODO: put in common base class of IDValue; duplicate code
+void
+IDRefValue::reparent() const {
+    Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+    DB(AC_TRACE << "IDRefValue::reparent(): this="<<(void*)this<<" , vtname="<<name());
+    if (myNode) {
+        unregisterIDRef();
+        const DOMString & myCurrentValue = getStringDirect(); // do not make a onSetValue() callback
+        registerIDRef(myCurrentValue);
+        myNode->bumpVersion();
+    }
+}
+
+// TODO: put in common base class of IDValue; duplicate code
+void
+IDRefValue::setNodePtr(Node * theNode) {
+    if (_myRegistry && getNodePtr() != theNode) {
+        unregisterIDRef();
+    }
+    StringValue::setNodePtr(theNode);
+    update();
+}
+
+// TODO: put in common base class of IDValue; duplicate code
+void
+IDRefValue::registerIDRef(const DOMString & theCurrentValue) const {
+    if (theCurrentValue.size()) {
+        Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+        if (myNode->parentNode()) {
+            DB(AC_TRACE << "IDRefValue::registerIDRef(): registerIDRef node="<<(void*)myNode<<","<<myNode->nodeName()<<"='"<<theCurrentValue<<"'"<<endl);
+            NodeIDRefRegistryPtr myIDRefRegistry = myNode->getIDRefRegistry();
+            myIDRefRegistry->registerIDRef(myNode->nodeName(), theCurrentValue, &(*(myNode->parentNode())));
+            _myOldValue = theCurrentValue;
+            _myRegistry = myIDRefRegistry;
+        } else {
+            DB(AC_TRACE << "IDRefValue::registerIDRef(): did not register IDRef '"<<theCurrentValue<<"', no parent"<<endl);
+        }
+    } else {
+        AC_WARNING << "IDRefValue::registerIDRef(): could not register IDRef '"<<theCurrentValue<<"', empty id"<<endl;
+    }
+}
+
+// TODO: put in common base class of IDValue; almost duplicate code (3rd param for unregisterIDRef call)
+void
+IDRefValue::unregisterIDRef() const {
+    Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+    if (myNode && myNode->parentNode() && _myRegistry && _myOldValue.size()) {
+        Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+        DB(AC_TRACE << "IDRefValue::unregister(): unregisterIDRef node="<<(void*)myNode<<","<<myNode->nodeName()<<"='"<<_myOldValue<<"'"<<endl);
+        _myRegistry.lock()->unregisterIDRef(myNode->nodeName(), _myOldValue, &(*(myNode->parentNode())));
+        _myOldValue.resize(0);
+    }
+    _myRegistry = NodeIDRefRegistryPtr(0);
+}
+
+IDRefValue::~IDRefValue() {
+    DB(AC_TRACE << "IDRefValue::~IDRefValue():"<<endl);
+    unregisterIDRef();
+}
+
+NodePtr
+IDRefValue::getReferencedElement() const {
+    Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+    DB(AC_TRACE << "IDRefValue::getReferencedNode():"<<endl);
+    if (myNode) {
+        return myNode->getElementById(getString(), myNode->nodeName());
+    }
+    AC_WARNING << "IDRefValue::getReferencedElement: Value is not attached to a node.";
+    return NodePtr(0);
+}
+
 
 ValueFactory::ValueFactory() {
 }
@@ -330,6 +483,7 @@ void dom::registerStandardTypes(ValueFactory & theFactory) {
 	theFactory.registerPrototype("hexBinary", ValuePtr(new VectorValue<asl::Block>(0)));
 
 	theFactory.registerPrototype("ID", ValuePtr(new IDValue(0)));
+	theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
 
     ValuePtr myStringValue(new StringValue(0));
 	theFactory.registerPrototype("string", myStringValue);
@@ -339,7 +493,6 @@ void dom::registerStandardTypes(ValueFactory & theFactory) {
 	theFactory.registerPrototype("Name", myStringValue);     // TODO: make special type for this
 	theFactory.registerPrototype("NCName", myStringValue);   // TODO: make special type for this
 	theFactory.registerPrototype("NMTOKEN", myStringValue);  // TODO: make special type for this
-	theFactory.registerPrototype("IDREF", myStringValue);    // TODO: make special type for this
 	theFactory.registerPrototype("ENTITY", myStringValue);   // TODO: make special type for this
 }
 

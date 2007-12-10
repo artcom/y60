@@ -104,8 +104,11 @@ class XmlDomUnitTest : public UnitTest {
                     ENSURE(myParsedDocument->childNode(0)->nodeType() == dom::Node::ELEMENT_NODE);
                     ENSURE(myParsedDocument->childNode(0)->nodeName() == "somexml");
                     dom::NodePtr myElement = myParsedDocument->childNode(0);
-                    myElement->appendChild(dom::Element("bla"));
+                    SUCCESS("myElement = myParsedDocument->childNode(0)");
+                    myElement->appendChild(dom::NodePtr(new dom::Element("bla")));
+                    SUCCESS("myElement->appendChild(dom::Element(bla))");
                     myElement->appendChild(dom::Element("blub"));
+                    SUCCESS("myElement->appendChild(dom::Element(blub))");
                     dom::NodePtr myChild = myElement->childNode(1);
                     ENSURE(myChild->parentNode() == &(*myElement));
                     ENSURE(myElement->childNode(0)->nextSibling() == myChild);
@@ -582,7 +585,12 @@ myDocument.getValueFactory()->dump();
 
                 }
 #endif
-                 // Test getElementById with schema
+
+                //TODO: The xml spec says: Validity constraint: One ID per Element Type 
+                //TODO: No element type may have more than one ID attribute specified.
+                //TODO: Therefore the following test does not use a valid schema
+
+                // Test getElementById with schema
                 {
                     DTITLE("Starting getElementById with Schema tests");
                     dom::Document mySchema(
@@ -591,6 +599,7 @@ myDocument.getValueFactory()->dump();
                         "       <xs:complexType>\n"
                         "           <xs:sequence>\n"
                         "               <xs:element ref='child'/>\n"
+                        "               <xs:element ref='refchild'/>\n"
                         "           </xs:sequence>\n"
                         "           <xs:attribute name='attrib' type='xs:string'/>\n"
                         "           <xs:attribute name='id' type='xs:ID'/>\n"
@@ -607,7 +616,17 @@ myDocument.getValueFactory()->dump();
                         "           <xs:attribute name='attrib' type='xs:string'/>\n"
                         "       </xs:complexType>\n"
                         "   </xs:element>\n"
-                        "</xs:schema>\n"
+                        "   <xs:element name='refchild'>\n"
+                        "       <xs:complexType>\n"
+                        "           <xs:sequence>\n"
+                        "               <xs:element ref='refchild'/>\n"
+                        "           </xs:sequence>\n"
+                        "           <xs:attribute name='id' type='xs:ID'/>\n"
+                        "           <xs:attribute name='childid' type='xs:IDREF'/>\n"
+                        "           <xs:attribute name='attrib' type='xs:string'/>\n"
+                        "       </xs:complexType>\n"
+                        "   </xs:element>\n"
+                         "</xs:schema>\n"
                     );
                     ENSURE(mySchema);
                     dom::Document myIdDocument;
@@ -623,6 +642,9 @@ myDocument.getValueFactory()->dump();
                         "       <child id='gc0' id2='xgc0' attrib='value3'/>"
                         "       <child id='gc1' id2='xgc1' attrib='value4'/>"
                         "   </child>"
+                        "   <refchild id='x1' childid='c0' attrib='value5'>"
+                        "       <refchild id='x2' childid='gc1' attrib='value6'/>"
+                        "   </refchild>"
                         "</root>"
                     );
                     ENSURE(myIdDocument);
@@ -1197,20 +1219,26 @@ public:
                 setupDocument(myOriginalDocument);;
                 SUCCESS("setup myOriginalDocument");
                 myOriginalDocument.debinarize(theOriginalDocumentBlock);
+#define DUMP_NODES
+#ifdef DUMP_NODES
                 cerr <<"myOriginalDocument:"<<endl;
                 printChangedNodes(myOriginalDocument, 0xffffffffffffffffULL, 0);                
                 cerr <<"myNewDocument:"<<endl;
                 printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);
+#endif
                 unsigned long long myNewDocumentVersionPrePrint = myNewDocument.nodeVersion();
                 cerr << endl << "make patch from version "<< 1 << " -> " <<  myNewDocument.nodeVersion() << endl;
+#ifdef DUMP_NODES
                 cerr <<"myNewDocument again:"<<endl;
                 printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);
-                
+#endif                
                 ENSURE(myNewDocumentVersionPrePrint == myNewDocument.nodeVersion());
                 asl::Block myCumulatedPatch;
                 cerr <<"changes myOriginalDocument->myNewDocument:"<<endl;
                 myNewDocument.makePatch(myCumulatedPatch, 1);
+#ifdef DUMP_NODES
                 printChangedNodes(myNewDocument, 1, 0);
+#endif                
                 cerr << endl << "applying patch from version "<< 1 << " -> " <<  myNewDocument.nodeVersion() << ", size =" << myCumulatedPatch.size() << endl;
                 myOriginalDocument.applyPatch(myCumulatedPatch);
                 SUCCESS("applied cumulated patch");
@@ -1265,13 +1293,17 @@ public:
             ENSURE(myR0);
             unsigned long long myDocumentVersion = myIdDocument.nodeVersion();
             DPRINT(myDocumentVersion);
+            ENSURE(&myIdDocument == myIdDocument.getRootNode());
+            ENSURE(myR0->getRealRootNode() == myIdDocument.getRealRootNode());
             NodePtr myNewAttr = myR0->appendAttribute("newattrib", "newvalue");
             ENSURE(myNewAttr);
 
             unsigned long long myNewDocumentVersion = myIdDocument.nodeVersion(); 
             DPRINT(myNewDocumentVersion);
             ENSURE(myNewDocumentVersion > myDocumentVersion);
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             
             myDocumentVersion = myIdDocument.nodeVersion();
             DOMString myNewAttrStringValue = myNewAttr->nodeValue();
@@ -1284,7 +1316,9 @@ public:
             myNewAttr->nodeValue("newvalue2");
             DPRINT(myIdDocument.nodeVersion());
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // append new gc attribute value via nodeValue
@@ -1293,24 +1327,32 @@ public:
             NodePtr myNewIntAttr = myR0->appendAttribute("intattrib", "0");
             DPRINT(myIdDocument.nodeVersion());
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // set attribute value via nodeValueAssign
             DTITLE("set attribute value via nodeValueAssign");
             myNewIntAttr->nodeValueAssign<int>(1);
+            DPRINT(myDocumentVersion);
             DPRINT(myIdDocument.nodeVersion());
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // append child node
             DTITLE("append child node");
-            DPRINT(myIdDocument.nodeVersion());
             NodePtr myChild = myIdDocument("root").appendChild(dom::Element("child"));
             (*myChild)["id"].nodeValue("nc");
+            DPRINT(myIdDocument.nodeVersion());
+            DPRINT(myDocumentVersion);
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // append two more childs
@@ -1321,7 +1363,9 @@ public:
             NodePtr myChild3 = myIdDocument("root").appendChild(dom::Element("child"));
             (*myChild3)["id"].nodeValue("nc3");
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // remove middle child
@@ -1329,7 +1373,9 @@ public:
             DPRINT(myIdDocument.nodeVersion());
             myChild2->parentNode()->removeChild(myChild2);
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // remove first child
@@ -1338,7 +1384,9 @@ public:
             dom::NodePtr myC0 = myIdDocument.getElementById("c0");
             myC0->parentNode()->removeChild(myC0);
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
             // remove last child
@@ -1346,7 +1394,9 @@ public:
             DPRINT(myIdDocument.nodeVersion());
             myChild3->parentNode()->removeChild(myChild3);
             ENSURE(myDocumentVersion < myIdDocument.nodeVersion());
+#ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
+#endif
             myDocumentVersion = myIdDocument.nodeVersion();
 
         } catch (dom::DomException & de) {
@@ -1374,14 +1424,17 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-
+#if 1
         addTest(new XmlDomUnitTest);
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
-        addTest(new XmlSchemaUnitTest);
-        addTest(new XmlPatchUnitTest);
         addTest(new XmlCatalogUnitTest);
-    }
+#endif
+        addTest(new XmlPatchUnitTest);
+#if 1
+        addTest(new XmlSchemaUnitTest); 
+#endif
+     }
 };
 
 

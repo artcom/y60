@@ -191,6 +191,7 @@ namespace dom {
         friend class NodeList;
         friend class NamedNodeMap;
         friend class IDValue;
+        friend class IDRefValue;
         friend class NodeOffsetCatalog;
 
         /**
@@ -220,6 +221,8 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Node,TypeMismatch,Exception);
         DEFINE_NESTED_EXCEPTION(Node,DuplicateIDValue,Exception);
         DEFINE_NESTED_EXCEPTION(Node,IDValueNotRegistered,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,DuplicateIDRefValue,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,IDRefValueNotRegistered,Exception);
 
         /**@name constructors
             many different way to construct a node type.
@@ -1107,6 +1110,8 @@ public:
 
         const Node * getRootNode() const;
         Node * getRootNode();
+        const Node * getRealRootNode() const;
+        Node * getRealRootNode();
 
         // EventTarget Interface
         void addEventListener(const DOMString & type,
@@ -1134,6 +1139,15 @@ public:
                 _myIDRegistry = NodeIDRegistryPtr(new NodeIDRegistry);
             }
             return _myIDRegistry;
+        }
+        const NodeIDRefRegistryPtr getIDRefRegistry() const {
+            if (_myParent) {
+                return _myParent->getIDRefRegistry();
+            }
+            if (!_myIDRefRegistry) {
+                _myIDRefRegistry = NodeIDRefRegistryPtr(new NodeIDRefRegistry);
+            }
+            return _myIDRefRegistry;
         }
 /**
 @memo used internally to determine if it is allowed to add a child of the particular type
@@ -1172,7 +1186,18 @@ Dependent on node type allowed children are:<p>
             }
             return _myIDRegistry;
         }
+        NodeIDRefRegistryPtr getIDRefRegistry() {
+            if (_myParent) {
+                return _myParent->getIDRefRegistry();
+            }
+            if (!_myIDRefRegistry) {
+                _myIDRefRegistry = NodeIDRefRegistryPtr(new NodeIDRefRegistry);
+            }
+            return _myIDRefRegistry;
+        }
     protected:
+        void getReferencingNodes(std::vector<NodePtr> & theResult);
+        void setUpstreamVersion(asl::Unsigned64 theVersion);
         int parseSystemAttributes(const DOMString & is, int pos, int end_pos, const Node * doctype);
         NodePtr checkSchemaForElement(const DOMString & theName, asl::AC_SIZE_TYPE theParsePos);
         void checkSchemaForText(asl::AC_SIZE_TYPE theParsePos);
@@ -1232,6 +1257,7 @@ Dependent on node type allowed children are:<p>
         Node *            _myParent;
         NodeWeakPtr       _mySelf;
         mutable NodeIDRegistryPtr _myIDRegistry;
+        mutable NodeIDRefRegistryPtr _myIDRefRegistry;
         ValuePtr          _myValue;
         NodeList          _myChildren; // entities when doctype
         TypedNamedNodeMap _myAttributes; // notations when doctype

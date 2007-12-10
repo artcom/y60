@@ -222,6 +222,12 @@ namespace asl {
 #define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
 #endif
 
+// Although it might look obscure, this macro should generate no code at all and remove the logging
+// call expression which requires an ostream &; we use it to remove all trace logging when compiling
+// in non-debug mode
+// TODO: make this configurable on the build command line 
+#define AC_DONT_LOG 0 && std::cerr
+
 /**
 Use AC_PRINT << "myMessage" in situations when a message should be printed and logged anyway, possibly without formatting */
 #define AC_PRINT AC_LOG(asl::SEV_PRINT, __FILE__, __LINE__)
@@ -252,7 +258,18 @@ Use AC_TRACE << "myDebugMessage" to trace flow of control and produce an amount 
 so detailed that the program might be too slow to perform anything reasonable; in general
 AC_TRACE Messages may be within an DB()-Macro and will not be compiled in; you will have
 to enable them on a per-file basis*/
+#ifdef _SETTING_WITH_TRACE_LOG_
 #define AC_TRACE AC_LOG(asl::SEV_TRACE, __FILE__, __LINE__)
+#else
+#define AC_TRACE AC_DONT_LOG
+#endif
+
+/**
+Use AC_SPAM << "myDebugMessage" if you think that a message spoils your debugging experience, but
+you do not want to delete it in case it might be handy some day. On per-file basis it may be 
+more desirable to use the DB() macro to provide a comple-time switch; AC_SPAM is just useful for
+really annoying mesaages.*/
+#define AC_SPAM AC_DONT_LOG
 
 #define AC_TRACE_EXPRESSION(myExpression) AC_TRACE << #myExpression << "=" << (myExpression) << std::endl;
 

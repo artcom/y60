@@ -137,6 +137,16 @@ private:
         AC_ERROR << "conversion failed in TypeConverter::jsValFromIDValue";
         return JSVAL_VOID;
     }
+    static jsval jsvalFromIDRefValue(JSContext *cx, dom::ValuePtr theValue) {
+        dom::IDRefValue * myIdValue = dynamic_cast<dom::IDRefValue *>(&*theValue);
+        if (myIdValue) {
+            //AC_TRACE << "conversion succeeded in TypeConverter::jsvalFromIDRefValue";
+            return as_jsval(cx, theValue->getString());
+        }
+        AC_ERROR << "conversion failed in TypeConverter::jsValFromIDRefValue";
+        return JSVAL_VOID;
+    }
+
 
 public:
     static ValuePtrFromJSVal findConvertFrom(const std::string & theTypeName) {
@@ -182,6 +192,10 @@ public:
         ourKnownTypes[typeid(dom::IDValue).name()] = myIndex++;
         _myValuePtrFromJSValFunctions.push_back( convertFromString ); //TODO ??
         _myJSValFromValuePtrFunctions.push_back( jsvalFromIDValue );
+        
+        ourKnownTypes[typeid(dom::IDRefValue).name()] = myIndex++;
+        _myValuePtrFromJSValFunctions.push_back( convertFromString ); //TODO ??
+        _myJSValFromValuePtrFunctions.push_back( jsvalFromIDRefValue );
 
         REGISTER_BYVALUE_CONVERTER(int);
         REGISTER_BYVALUE_CONVERTER(unsigned int);
@@ -1274,7 +1288,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 		            // 2.5: Check for children
                     dom::NodePtr myChildNode = myFacade->getChildNode(myProperty);
                     if (myChildNode) {
-                        AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myChildNode;
+                        AC_TRACE << "JSNode::getProperty: myChildNode-Facade = " <<*myChildNode;
                         *vp = as_jsval(cx, myChildNode);
                         return JS_TRUE;
                     }

@@ -27,7 +27,8 @@
 
 #include <string>
 
-
+//#define BAD_TX
+#ifdef BAD_TX
 namespace dom {
     template <>
     struct ValueWrapper<y60::TextureWeakPtr> {
@@ -47,9 +48,11 @@ namespace dom {
         typedef dom::SimpleValue<y60::ICombinerWeakPtr> Type;
     };
 }
+#endif
 
 namespace y60 {
 
+#ifdef BAD_TX
     inline
     std::ostream& operator<<(std::ostream& os, const y60::ICombinerWeakPtr& i) {
         return os << "[ICombinerWeakPtr]";
@@ -58,6 +61,7 @@ namespace y60 {
     std::istream& operator>>(std::istream& is, y60::ICombinerWeakPtr& i) {
         return is;
     }
+#endif
 
     //                  theTagName                 theType           theAttributeName              theDefault
     DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "");
@@ -67,9 +71,10 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false);
     DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "");
     DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity());
+#ifdef BAD_TX
     DEFINE_ATTRIBUT_TAG(TextureUnitTexturePtrTag,  TextureWeakPtr,   "TextureUnitTexturePtrTag",   TexturePtr(0));
     DEFINE_ATTRIBUT_TAG(TextureUnitCombinerPtrTag, ICombinerWeakPtr, "TextureUnitCombinerPtrTag",  ICombinerPtr(0));
-
+#endif
     DEFINE_EXCEPTION(TextureUnitException, asl::Exception);
 
     class TextureUnit :
@@ -81,9 +86,12 @@ namespace y60 {
         public TextureUnitEnvColorTag::Plug,
         public TextureUnitSpriteTag::Plug,
         public TextureUnitMatrixTag::Plug,
-        public ResizePolicyTag::Plug,
+        public ResizePolicyTag::Plug
+#ifdef BAD_TX
+,
         public dom::FacadeAttributePlug<TextureUnitTexturePtrTag>,
         public dom::FacadeAttributePlug<TextureUnitCombinerPtrTag>
+#endif
     {
         public:
             TextureUnit(dom::Node & theNode);
@@ -98,8 +106,10 @@ namespace y60 {
             virtual void registerDependenciesRegistrators();
     
         protected:
+#ifdef BAD_TX
             virtual void registerDependenciesForTextureTag();
             virtual void registerDependenciesForCombinerTag();
+#endif
 
         private:
             TextureUnit();

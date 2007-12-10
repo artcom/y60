@@ -29,6 +29,7 @@
 #include <asl/Ptr.h>
 
 #include <map>
+#include <set>
 
 namespace dom {
 
@@ -45,6 +46,8 @@ namespace dom {
         public:
             DEFINE_NESTED_EXCEPTION(Facade, Exception, asl::Exception);
             DEFINE_NESTED_EXCEPTION(Facade, InvalidNullPointerPassed, Exception);
+            DEFINE_NESTED_EXCEPTION(Facade, NoParentNode, Exception);
+            DEFINE_NESTED_EXCEPTION(Facade, DuplicateChildName, Exception);
 
             virtual ~Facade() {}
 
@@ -67,27 +70,32 @@ namespace dom {
             void markPrecursorDependenciesOutdated();
             void markAllDirty();
 
-            void appendChild(NodePtr theChild);
-            const NodePtr getChildNode(const std::string & theChildName) const;
+            void registerChildName(const std::string & theChildName);
+            bool hasRegisteredChild(const std::string & theChildName) const;
             
             typedef std::map<std::string, NodePtr> PropertyMap;
             PropertyMap & getProperties() const;
             NodePtr getProperty(const std::string & theName) const;
 
+            static NodePtr ensureChild(const Node & theNode, const DOMString & theName);
+            static NodePtr createChild(const Node & theNode, const DOMString & theName);
+
+            const NodePtr getChildNode(const DOMString & theName) const;
+            NodePtr getChildNode(const DOMString & theName);
         protected:
-            Facade(Node & theNode);
-            virtual void ensureProperties() const {};
-            mutable PropertyMap   _myPropertyNodes; 
-            
-            void setNode( Node & theNode);
+           Facade(Node & theNode);
+           virtual void ensureProperties() const {};
+           mutable PropertyMap   _myPropertyNodes; 
+
+           void setNode( Node & theNode);
 
         private:
-            Facade(); // no default constructor. Otherwise the member
-                      // _myNode points to nirvana [DS]
+           Facade(); // no default constructor. Otherwise the member
+           // _myNode points to nirvana [DS]
 
-            std::map<std::string, NodePtr> _myChildren;             
-            Node &                         _myNode;
-            FacadeWeakPtr                  _mySelf; 
+           std::set<std::string>          _myChildNames;             
+           Node &                         _myNode;
+           FacadeWeakPtr                  _mySelf; 
     }; 
 
 #define IMPLEMENT_FACADE(CLASS) \
@@ -123,20 +131,12 @@ namespace dom {
     IMPLEMENT_FACADE(CLASS) \
     template <class TAG> \
     const asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() const{ \
-        TAG::Plug::ensureDependencies(); \
         return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
     } \
     template <class TAG> \
     asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() { \
-        TAG::Plug::ensureDependencies(); \
         return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
-    }\
-    template <class TAG> \
-    void forceRebindChild() { \
-        TAG::Plug::ensureDependencies(); \
-        TAG::Plug::forceRebindChild(); \
     }
-
 
 #define IMPLEMENT_DYNAMIC_FACADE(CLASS) \
     IMPLEMENT_FACADE(CLASS) \
