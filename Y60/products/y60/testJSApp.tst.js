@@ -30,6 +30,7 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
+        ENSURE('"pickytests" == "pickytests"');
         /* [DS] disabled because of issues with the new continous build:
          *      - continous build now runs under cygwin
          *      - the test seems not to find the 'exec.bat' script
