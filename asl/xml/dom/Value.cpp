@@ -362,7 +362,13 @@ IDRefValue::registerIDRef(const DOMString & theCurrentValue) const {
             DB(AC_TRACE << "IDRefValue::registerIDRef(): did not register IDRef '"<<theCurrentValue<<"', no parent"<<endl);
         }
     } else {
-        AC_WARNING << "IDRefValue::registerIDRef(): could not register IDRef '"<<theCurrentValue<<"', empty id"<<endl;
+        Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
+        if (myNode) {
+            AC_DEBUG << "IDRefValue::registerIDRef(): could not register empty IDRef, attr= '"<<myNode->nodeName()
+                       <<"', element="<< (myNode->parentNode() ? myNode->parentNode()->nodeName() : std::string("Unknown-No Parent")) <<endl;
+        }else {
+            AC_DEBUG << "IDRefValue::registerIDRef(): could not register IDRef, empty id and no node associated with value"<<endl;
+        }
     }
 }
 

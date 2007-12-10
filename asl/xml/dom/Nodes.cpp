@@ -695,8 +695,18 @@ dom::Node::getSchema() const {
     return SchemaPtr(0);
 }
 
+void
+dom::Node::setUpstreamVersion(asl::Unsigned64 theVersion) {
+    DBV(AC_TRACE << "Node::setUpstreamVersion(): this="<<(void*)this<<" , theVersion = "<<theVersion<<" , _myVersion = "<<_myVersion);
+    if (_myVersion != theVersion) {
+        _myVersion = theVersion;
+        if (_myParent) {
+            _myParent->setUpstreamVersion(theVersion);
+        }
+    }
+}
 #if 1
-#define BUMP_REFERENCES
+#define NO_BUMP_REFERENCES
 #ifdef BUMP_REFERENCES
 void 
 dom::Node::getReferencingNodes(std::vector<NodePtr> & theResult) {
@@ -725,16 +735,6 @@ dom::Node::bumpVersion() {
     return _myVersion;
 }
 
-void
-dom::Node::setUpstreamVersion(asl::Unsigned64 theVersion) {
-    DBV(AC_TRACE << "Node::setUpstreamVersion(): this="<<(void*)this<<" , theVersion = "<<theVersion<<" , _myVersion = "<<_myVersion);
-    if (_myVersion != theVersion) {
-        _myVersion = theVersion;
-        if (_myParent) {
-            _myParent->setUpstreamVersion(theVersion);
-        }
-    }
-}
 #  else
 
 asl::Unsigned64 
