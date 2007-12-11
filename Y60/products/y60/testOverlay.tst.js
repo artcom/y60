@@ -200,6 +200,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         // ENSURE('obj.myMultiOverlay.images.length == 2');
         obj.myMultiOverlay.images = myImages;
         ENSURE('obj.myMultiOverlay.images.length == 3');
+        print("reset all images");
         myImages = [];
         myImages.push(obj.myMultiOverlay.images[0]);
         obj.myMultiOverlay.images = myImages;

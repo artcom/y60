@@ -178,16 +178,20 @@ namespace y60 {
 
     bool 
 	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
-        ImagePtr myImage = theTexture->getImage();
-
-		// get current uploaded image size
-        glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
+	    if (theTexture->getType() != TEXTURE_2D) {
+	        return false;
+	    }
+        CHECK_OGL_ERROR;
 
 		GLint myUploadedWidth          = -1;
 		GLint myUploadedHeight         = -1;
 		GLint myUploadedInternalFormat = -1;
 		GLint myUploadedMinFilter      = -1;
+        
+        ImagePtr myImage = theTexture->getImage();
+        glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
 
+		// get current uploaded image size
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT, 
@@ -204,19 +208,24 @@ namespace y60 {
             myHeight = nextPowerOfTwo(myImage->get<ImageHeightTag>());
         }
 
-        //PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
-        TextureInternalFormat myInternalFormat = theTexture->getInternalEncoding();
+        GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
 
-		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+		bool myOpenGLMipMapSetting = true;/*myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
 			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
 			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;*/
         bool myMipMapMatch = theTexture->get<TextureMipmapTag>() == myOpenGLMipMapSetting;
-        bool myWidthMatch = myUploadedWidth && myHeight == myUploadedHeight; 
+        bool myWidthMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight); 
         bool myInternalFormatMatch = myInternalFormat == myUploadedInternalFormat;
         AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
         AC_DEBUG << "Width match: " << myWidthMatch;
+        AC_DEBUG << "Image size: " << myWidth << "x" << myHeight;
+        AC_DEBUG << "UploadedTexure size: " << myUploadedWidth << "x" << myUploadedHeight;
         AC_DEBUG << "Internal format match: " << myInternalFormatMatch;
+        AC_DEBUG << "Uploaded InternalFormat: " << myUploadedInternalFormat;
+        AC_DEBUG << "Image InternalFormat: " << myInternalFormat;
+
+        
 		return myMipMapMatch && myWidthMatch && myInternalFormatMatch; 
 	}
 
