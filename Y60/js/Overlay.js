@@ -313,10 +313,10 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	/// Set image of first texture.
 	Public.image setter = function(theImage) {
 		Protected.myImages[0] = theImage;
-		if (_myTextureUnits) {
-			//var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[0].texture);
-			//myTexture.image = theImage.id;
-			_myTextures[0].image = theImage.id;
+		if (_myTextureUnits) {		    
+			var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[0].texture);
+			myTexture.image = theImage.id;
+			//_myTextures[0].image = theImage.id;
 		} else {
 			Protected.addTexture(theImage.id);
 		}
@@ -327,7 +327,11 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		for (var i = 0; i < theImages.length; ++i) {
 			if (i < _myTextureUnits.childNodes.length) {
 				var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[i].texture);
-				myTexture.image = theImages[i].id;
+			    if (myTexture) {
+				    myTexture.image = theImages[i].id;
+				} else {
+    				Protected.addTexture(theImages[i].id);
+				}
 			} else {
 				Protected.addTexture(theImages[i].id);
 			}
@@ -422,7 +426,6 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		for (var i = 0; i < _myTextureUnits.childNodes.length; ++i) {
 			var myId = _myTextureUnits.childNodes[i].texture;
 			var myTexture = _myTextureUnits.getElementById(myId);
-			print(myTexture);
 			var myImage = _myTextureUnits.getElementById(myTexture.image);
 			if (myImage == null) {
 				throw new Exception("Could not find image with id: " + myTexture.image, fileline());
@@ -450,18 +453,20 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 			myImage.frameblending = false;
 		}
 		
-		// use texture that references theImageId
+		// right now we do no reuse textures, because they can be shared with other textureunits/materials
 		var myTexture = 0;//getDescendantByAttribute(window.scene.textures, "image", theImageId);
-		// check if WE already have constructed texture with this image
-		for (var i = 0; i < _myTextures.length; i++) {
-			if (_myTextures[i].image == theImageId) {
-				var myTextureUnit = _myTextureUnits.appendChild(Node.createElement("textureunit"));
-				myTextureUnit.applymode = TextureApplyMode.modulate;
-				myTextureUnit.texture   = _myTextures[i].id;
-				myTexture = _myTextures[i]; 
-				break;            
-			}
-		}
+		/*if (_myTextureUnits) {
+			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
+    		for (var i = 0; i < _myTextureUnits.childNodesLength(); i++) {
+    		    var myTextureUnit = _myTextureUnits.childNode(i);
+    		    myTexture  = getDescendantByAttribute(window.scene.textures, "id", myTextureUnit.texture);
+    			if (myTexture.image == theImageId) {
+    			    break;
+    			}
+    		}
+		}*/
+		
+
 		
 		var my2ndTexture = null
 		if (!myTexture) {
