@@ -104,9 +104,12 @@ namespace y60 {
             virtual void registerDependenciesRegistrators();
 
         protected:
-            IResourceManager * _myResourceManager;
-
+            // Some violated our styleguide rule by using a protected member variable (_myResourceManager) here
+            // and it promply fell on our feet. Please do not use protected member variables. A derived class
+            // might accidently modify it, but you have a hard time to find that out. It is a bit like having
+            // a global variable.
         private:
+            IResourceManager * _myResourceManager;
             unsigned _myRefCount;
             unsigned _myTextureId;
             unsigned _myPixelBufferId;

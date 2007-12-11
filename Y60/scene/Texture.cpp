@@ -172,12 +172,18 @@ namespace y60 {
         }
     }
 
+    // This function may be correct but it looks fragile and might easily break when the dom structure
+    // wil be changed.
     void
     Texture::ensureResourceManager() {
-        if (!_myResourceManager && getNode()) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            _myResourceManager = myScene->getResourceManager();
+        AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
+        if (_myResourceManager == 0) {
+            if (getNode()) {
+                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+                _myResourceManager = myScene->getResourceManager();
+            }
         }
+        AC_TRACE << "Texture::ensureResourceManager (onexit)'" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
     }
 
     void

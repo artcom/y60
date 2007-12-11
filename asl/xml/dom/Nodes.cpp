@@ -761,7 +761,7 @@ dom::Node::bumpVersion() {
         }
         myNode = myParent;
     } while (myParent);
-    
+#ifdef ORIGINAL_BUGGY 
     myNode = this;
     myParent = myNode->parentNode();
     while (myParent) {
@@ -770,6 +770,14 @@ dom::Node::bumpVersion() {
         myParent = myParent->parentNode();
     };
     return myVersion;
+#else // untested fix
+    myNode = this;
+    do {
+        myNode->nodeVersion(myVersion);
+        myNode = myParent->parentNode();
+    } while (myNode);
+    return myVersion;
+#endif
 }
 #endif
 

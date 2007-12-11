@@ -1240,13 +1240,12 @@ Dependent on node type allowed children are:<p>
 
         void checkForArrayType(NodePtr mySchemaType, asl::AC_SIZE_TYPE theParsePos);
 
-        // small hack to store file positions for saving
+        // store file positions for saving
         void storeSavePosition(asl::Unsigned64 thePosition) const {
-            _myParseCompletionPos = thePosition;
-            _myDocSize = thePosition >> 32;
+            _mySavePosition = thePosition;
         }
         asl::Unsigned64 getSavePosition() const {
-            return asl::Unsigned64(_myParseCompletionPos) | asl::Unsigned64(_myDocSize) << 32;
+            return _mySavePosition;
         }
       //@}
     private:
@@ -1270,6 +1269,7 @@ Dependent on node type allowed children are:<p>
         static const Node X_NO_NODE_;
         asl::Unsigned64   _myVersion;
         UniqueId          _myUniqueId;
+        mutable asl::Unsigned64   _mySavePosition;
     public:
         static Node Prototype;
     };
