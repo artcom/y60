@@ -221,20 +221,38 @@ DualImageButton.prototype.Constructor = function(Public, Protected, theScene, th
     var Base      = [];
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
-    Public.setImage(theSources[0]);
+    Protected.myCachedImages = [];    
+    for (var myIndex = 0; myIndex < theSources.length; myIndex++) {
+        var myImage = 0;
+        if (typeof(theSources[myIndex]) == "object") {
+            myImage = theSources[myIndex];
+        } else {
+            myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
+            myImage.resize = "pad";
+            myImage.src = theSources[myIndex]
+            var mySize = getImageSize(myImage);
+            Public.width  = mySize.x;
+            Public.height = mySize.y;
+            Public.srcsize.x = 1;
+            Public.srcsize.y = 1;            
+        }
+        Protected.myCachedImages.push(myImage);   
+             
+    }
+    Public.setImage(Protected.myCachedImages[0]);
 
     Base.setPressed = Public.setPressed;
     Public.setPressed = function(theFlag) {
         if (theFlag) {
             Logger.trace("setting selected color to " + Public.style.selectedColor);
             Public.color = Public.style.selectedColor;
-
-            Logger.trace("setting image to " + theSources[1]);
-            Public.setImage(theSources[1]);
+            //Logger.trace("setting image to " +Protected.myCachedImages[1]);
+            Public.image = Protected.myCachedImages[1];
+            
         } else {
-            Logger.trace("setUnPressed");
+            //Logger.trace("setUnPressed");
             Public.color = Public.style.color;
-            Public.setImage(theSources[0]);
+            Public.image = Protected.myCachedImages[0];
         }
         Protected.isPressed = theFlag;
     }
@@ -264,13 +282,31 @@ DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene
 
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
-
+               
+    Protected.myCachedImages = [];    
+    for (var myIndex = 0; myIndex < theSources.length; myIndex++) {
+        var myImage = 0;
+        if (typeof(theSources[myIndex]) == "object") {
+            myImage = theSources[myIndex];
+            //Protected.addTexture(myImage.id);            
+        } else {
+            myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
+            myImage.resize = "pad";
+            myImage.src = theSources[myIndex]
+            var mySize = getImageSize(myImage);
+            Public.width  = mySize.x;
+            Public.height = mySize.y;
+            Public.srcsize.x = 1;
+            Public.srcsize.y = 1;            
+        }
+        Protected.myCachedImages.push(myImage);   
+             
+    }
     Public.setActive = function(theState) {
-        Public.setImage(theSources[theState?1:0]);
+        Public.image = Protected.myCachedImages[theState?1:0];
         Public.enabled = !theState;
     }
-
-    Public.setImage(theSources[0]);
+    Public.setImage(Protected.myCachedImages[0]);
     var myImageSize = getImageSize(Public.image);
     Public._myTextlabel = new Label(theScene, theText, myImageSize, [0,0], theStyle, Public);
     Public.setText = Public._myTextlabel.setText;
