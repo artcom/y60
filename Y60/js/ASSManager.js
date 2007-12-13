@@ -31,7 +31,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
 
     var _myValueOverlay = null;
 
-    var _myEventQueues = {};
+//    var _myEventQueues = {};
 
     ////////////////////////////////////////
     // Public
@@ -104,18 +104,6 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
         _myDriver.probeColor = theColor;
     }
 
-    Public.getPrecedingEvent = function(theEvent, theNumber) {
-        if (theEvent.id in _myEventQueues) {
-            var thisQueue = _myEventQueues[theEvent.id];
-            if (thisQueue.length > theNumber) {
-                return thisQueue[thisQueue.length - theNumber - 1];
-            }
-            return thisQueue[0];
-        } else {
-            Logger.warning("Could not retrieve preceding event " + theNumber + " for event " + theEvent.id);
-        }
-    }
-
     Public.onUpdateSettings = function( theSettings ) {
         
         _mySettings = theSettings;
@@ -174,27 +162,9 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
     }
 
     Public.onASSEvent = function(theEventNode) {
-        if (!(theEventNode.id in _myEventQueues)) {
-            _myEventQueues[theEventNode.id] = new Array();
-        }
-
-        _myEventQueues[theEventNode.id].push(theEventNode);
-
-        if (_myEventQueues[theEventNode.id].length > 1000) {
-            _myEventQueues[theEventNode.id].shift();
-        }
-
         if(theEventNode.type == "configure") {
             onConfigure(theEventNode);
         }
-
-        var myMaterial = _myScene.dom.getElementById( getMaterialIdForValueDisplay() );
-        var myTextureUnits = myMaterial.childNode("textureunits");
-        for (var i = 0; i < myTextureUnits.childNodes.length; i++) {
-            var myTexture = _myScene.dom.getElementById( myTextureUnits.childNode(i).texture );
-            triggerUpload(myTexture);
-        }
-        
     }
 
     ////////////////////////////////////////
