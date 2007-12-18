@@ -211,15 +211,15 @@ namespace y60 {
 
         GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
 
-		bool myOpenGLMipMapSetting = true;/*myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
 			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
 			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;*/
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
         bool myMipMapMatch = theTexture->get<TextureMipmapTag>() == myOpenGLMipMapSetting;
-        bool myWidthMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight); 
+        bool mySizeMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight); 
         bool myInternalFormatMatch = myInternalFormat == myUploadedInternalFormat;
         AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
-        AC_DEBUG << "Width match: " << myWidthMatch;
+        AC_DEBUG << "Width match: " << mySizeMatch;
         AC_DEBUG << "Image size: " << myWidth << "x" << myHeight;
         AC_DEBUG << "UploadedTexure size: " << myUploadedWidth << "x" << myUploadedHeight;
         AC_DEBUG << "Internal format match: " << myInternalFormatMatch;
@@ -227,7 +227,7 @@ namespace y60 {
         AC_DEBUG << "Image InternalFormat: " << myInternalFormat;
 
         
-		return myMipMapMatch && myWidthMatch && myInternalFormatMatch; 
+		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
 	}
 
     void

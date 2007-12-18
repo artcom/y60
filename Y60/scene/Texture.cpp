@@ -101,8 +101,8 @@ namespace y60 {
             TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this); 
             TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureInternalFormatTag>(*this);
-            /*TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);*/
+            // TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
+            //     dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);
         }
     }
 
@@ -288,70 +288,54 @@ namespace y60 {
         AC_DEBUG << "Texture::triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>();
         TextureIdTag::Plug::getValuePtr()->setDirty(); // force call to applyTexture()
     }
-#if 0
-    unsigned 
-    Texture::applyTexture() {
-        ensureResourceManager();        
-
-        bool myForceSetupFlag = isDirty<TextureIdTag>();
-        TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
-        myForceSetupFlag |= !_myResourceManager->imageMatchesGLTexture(myTexture);
-        if (myForceSetupFlag) {
-            _myResourceManager->unbindTexture(this);
-            _myTextureId = 0;
-        }
-        ImagePtr myImage = getImage();
-        bool myImageChangedFlag = (myImage && myImage->getNode().nodeVersion() != _myImageNodeVersion);
-        _myImageNodeVersion = myImage->getNode().nodeVersion();
-
-        if (myForceSetupFlag) {
-            _myTextureId = _myResourceManager->setupTexture(myTexture);
-            set<TextureIdTag>(_myTextureId);
-        } else {
-            if (isDirty<TextureParamChangedTag>()) {
-                _myResourceManager->updateTextureParams(myTexture);
-                (void) get<TextureParamChangedTag>();
-            } 
-            if (myImageChangedFlag) {
-                _myResourceManager->updateTextureData(myTexture);
-                (void) get<TextureIdTag>();
-            }
-        }        
-        return _myTextureId;
-    }
-#endif    
+   
     unsigned 
     Texture::applyTexture() {
 
         ensureResourceManager();
 
         AC_TRACE << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        bool myForceSubloadFlag = isDirty<TextureIdTag>();
+        
+        TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
+        
+        bool myForceSetupFlag = isDirty<TextureIdTag>();
+        myForceSetupFlag |= get<TextureIdTag>() ? false:true;
+        bool myImageContentChangedFlag = false;
+
+        // setup flags
         ImagePtr myImage = getImage();
         if (myImage && myImage->getNode().nodeVersion() != _myImageNodeVersion) {
-            if (myImage->get<ImageWidthTag>() != get<TextureWidthTag>() || myImage->get<ImageHeightTag>() != get<TextureHeightTag>()) {
-                // size has changed, force setup
-                _myResourceManager->unbindTexture(this);
-                _myTextureId = 0;
+            bool myImageMatchesTextureFlag = _myResourceManager->imageMatchesGLTexture(myTexture);
+            if (!myImageMatchesTextureFlag) {
+                myForceSetupFlag = true;
             } else {
-                // something else has changed, force subload
-                myForceSubloadFlag = true;
+                // do upload
+                myImageContentChangedFlag = true;
             }
-            _myImageNodeVersion = myImage->getNode().nodeVersion();
-        }
 
-        TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
-        if (_myTextureId == 0) {
+            _myImageNodeVersion = myImage->getNode().nodeVersion();
+        } 
+
+        // perform actions
+        if (myForceSetupFlag && _myTextureId != 0) {
+            _myResourceManager->unbindTexture(this);
+            _myTextureId = 0;
+        }
+        
+        if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
             set<TextureIdTag>(_myTextureId);
-        } else if (myForceSubloadFlag) { // || !_myResourceManager->imageMatchesGLTexture(myTexture)) {
-            //AC_TRACE << "Texture::applyTexture TextureIdTag dirty";
-            _myResourceManager->updateTextureData(myTexture);
-            (void) get<TextureIdTag>();
-        } else if (isDirty<TextureParamChangedTag>()) {
-            //AC_TRACE << "Texture::applyTexture TextureParamChangedTag dirty";
-            _myResourceManager->updateTextureParams(myTexture);
-            (void) get<TextureParamChangedTag>();
+        } else {
+
+            if (isDirty<TextureParamChangedTag>()) {
+                _myResourceManager->updateTextureParams(myTexture);
+                (void) get<TextureParamChangedTag>();
+            } 
+
+            if (myImageContentChangedFlag) {
+                _myResourceManager->updateTextureData(myTexture);
+                (void) get<TextureIdTag>();
+            }
         }
 
         return _myTextureId;

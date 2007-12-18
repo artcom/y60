@@ -97,10 +97,8 @@ namespace y60 {
     void
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
-
+        
         ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
-
-		ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
 
         dom::ValuePtr myRasterValue = getRasterValue();
         if (myRasterValue) {
