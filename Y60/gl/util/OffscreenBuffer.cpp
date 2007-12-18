@@ -100,6 +100,7 @@ void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
                                unsigned theCubmapFace)
 {
     unsigned myTextureId = theTexture->getTextureId();
+    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << "theSamples = "<<theSamples; 
     if (myTextureId == 0) {
         // ensure texture object exists
         myTextureId = theTexture->applyTexture();
@@ -114,10 +115,12 @@ void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
 void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
 {
     unsigned myTextureId = theTexture->getTextureId();
+    AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", theCopyToImageFlag = "<<theCopyToImageFlag; 
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) {
+            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture"; 
             // blit multisample buffer to texture
             glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
             glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
@@ -135,6 +138,7 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
             glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
             glDrawBuffer(GL_BACK);
         } else {
+            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer"; 
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         }
         CHECK_OGL_ERROR;
@@ -150,6 +154,7 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
     else
 #endif
     {
+        AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << "- zeroing texture"; 
         // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, myTextureId);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
@@ -177,7 +182,7 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
 {
     ImagePtr myImage = theTexture->getImage();
     if (!myImage) {
-        AC_ERROR << "Texture id='" << theTexture->get<IdTag>() << "' has no image associated";
+        AC_ERROR << "OffscreenBuffer::copyToImage: Texture id='" << theTexture->get<IdTag>() << "' has no image associated";
         return;
     }
     AC_DEBUG << "OffscreenBuffer::copyToImage texture=" << theTexture->get<NameTag>() 
@@ -236,6 +241,8 @@ void OffscreenBuffer::reset()
 void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned theSamples, 
                                                unsigned theCubemapFace)
 {
+    AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
+
 #ifdef GL_EXT_framebuffer_object
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] 
@@ -253,6 +260,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 
     unsigned myTextureId = theTexture->getTextureId();
     if (!_myFrameBufferObject[0]) {
+        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer creating FBO, texture=" << theTexture->get<IdTag>();
         /*
          * create FBO
          */
@@ -371,6 +379,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 
         checkFramebufferStatus();
     } else {
+        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer binding FBO, texture=" << theTexture->get<IdTag>();
         /*
          * bind FBO
          */

@@ -14,6 +14,7 @@
 #include <y60/PixelEncoding.h>
 #include <y60/PixelEncodingInfo.h>
 #include <asl/file_functions.h>
+#include <asl/Dashboard.h>
 
 #include <GL/glext.h>
 
@@ -45,7 +46,7 @@ namespace y60 {
 
     unsigned
     GLResourceManager::setupTexture(TexturePtr & theTexture) {
-
+        MAKE_SCOPE_TIMER(GLResourceManager_setupTexture);
         glPushAttrib(GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT); //GL_ALL_ATTRIB_BITS);
 
         if (theTexture->getTextureId() > 0) {
@@ -114,7 +115,7 @@ namespace y60 {
         glBindTexture(myTextureTarget, myTextureId);
         CHECK_OGL_ERROR;
 
-        AC_DEBUG << "GLResourceManager::updateTexture '" << theTexture->get<NameTag>() 
+        AC_DEBUG << "GLResourceManager::updateTextureData '" << theTexture->get<NameTag>() 
                  << "' id=" << theTexture->get<IdTag>() << " texTarget=0x" << hex 
                  << myTextureTarget << dec << " texId=" << myTextureId;
         updatePixelTransfer(theTexture);
@@ -484,8 +485,7 @@ namespace y60 {
         theTexture->set<TextureHeightTag>(myTexHeight);
         theTexture->set<TextureDepthTag>(myTexDepth);
 
-        AC_TRACE << "setupTexture3D internalFormat=0x" << hex 
-                 << myPixelEncoding.internalformat << dec;
+        AC_TRACE << "setupTexture3D internalFormat=0x" << hex << myPixelEncoding.internalformat << dec;
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (myPixelEncoding.compressedFlag) {
@@ -524,8 +524,7 @@ namespace y60 {
     {
         ImagePtr myImage = theTexture->getImage();
         if (!myImage) {
-            AC_ERROR << "Texture id=" << theTexture->get<IdTag>() 
-                     << " has no image associated";
+            AC_ERROR << "Texture node id=" << theTexture->get<IdTag>() << " has no image associated";
             return;
         }
 
@@ -560,8 +559,8 @@ namespace y60 {
         theTexture->set<TextureWidthTag>(myTileWidth);
         theTexture->set<TextureHeightTag>(myTileHeight);
 
-        AC_DEBUG << "setupCubemap '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>() 
+        AC_DEBUG << "setupCubemap texture name ='" << theTexture->get<NameTag>() 
+                 << "' node id=" << theTexture->get<IdTag>() 
                  << " image=" << myWidth << "x" << myHeight << " #tiles=" << myNumTiles 
                  << " tile=" << myTileWidth << "x" << myTileHeight;
 
@@ -626,7 +625,7 @@ namespace y60 {
         PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, theImage);
 
         AC_DEBUG << "GLResourceManager::updateTexture2D '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>() << " size=" << myWidth 
+                 << "' node id=" << theTexture->get<IdTag>() << " size=" << myWidth 
                  << "x" << myHeight;
         unsigned myIndex = theTexture->get<TextureImageIndexTag>();
         void * myImageData = theImage->getRasterPtr(myIndex)->pixels().begin();
@@ -685,7 +684,7 @@ namespace y60 {
         void * myImageData = theImage->getRasterPtr(myIndex)->pixels().begin();
 
         AC_DEBUG << "GLResourceManager::updateTexture3D '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>() << " size=" << myWidth 
+                 << "'node id=" << theTexture->get<IdTag>() << " size=" << myWidth 
                  << "x" << myHeight << "x" << myDepth;
 
         if (myPixelEncoding.compressedFlag) {
@@ -705,7 +704,7 @@ namespace y60 {
     GLResourceManager::updateCubemap(const TexturePtr & theTexture, ImagePtr & theImage) {
 
         AC_DEBUG << "GLResourceManager::updateCubemap '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>();
+                 << "' node id=" << theTexture->get<IdTag>();
 
         const asl::Vector2i myTileVec = theImage->get<ImageTileTag>();
         unsigned int myNumTiles = myTileVec[0] * myTileVec[1];
@@ -758,7 +757,11 @@ namespace y60 {
     void 
     GLResourceManager::updateTextureParams(const TexturePtr & theTexture) {
         AC_DEBUG << "GLResourceManager::updateTextureParams '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>();
+                 << "' id=" << theTexture->get<IdTag>()
+                 << "' wrapmode=" << theTexture->getWrapMode()
+                 << "' hasMipMaps=" << theTexture->get<TextureMipmapTag>()
+                 << "' minfilter=" << theTexture->getMinFilter()
+                 << "' magfilter=" << theTexture->getMagFilter();
 
         GLenum myTextureTarget = asGLTextureTarget(theTexture->getType());
 
@@ -797,6 +800,9 @@ namespace y60 {
 
     void
     GLResourceManager::updatePixelTransfer(const TexturePtr & theTexture) {
+        AC_DEBUG << "GLResourceManager::updatePixelTransfer '" << theTexture->get<NameTag>()
+                 << ", colorbias = "<< theTexture->get<TextureColorBiasTag>()
+                 << ", colorscale = "<< theTexture->get<TextureColorScaleTag>() ;
 
         const Vector4f & myColorBias = theTexture->get<TextureColorBiasTag>();
         if (myColorBias[0] != 0.0f) {
@@ -837,6 +843,8 @@ namespace y60 {
         PixelEncodingInfo myEncodingInfo = getDefaultGLTextureParams(myEncoding);
         myEncodingInfo.internalformat = 
             asGLTextureInternalFormat(theTexture->getInternalEncoding());
+        AC_DEBUG << "GLResourceManager::getPixelEncoding, image raster encoding '" << asl::getStringFromEnum(myEncoding, PixelEncodingString) 
+                << ", texture internal format = " << asl::getStringFromEnum(theTexture->getInternalEncoding(), TextureInternalFormatStrings);
         return myEncodingInfo;
     }
 }

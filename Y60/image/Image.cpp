@@ -184,14 +184,14 @@ namespace y60 {
             return;
         }
 
-        AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>() << "'";
+        AC_INFO << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
         ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
             ITextureManagerPtr(0), myDepth);
 
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
-            AC_DEBUG << "Image::load filter=" << myFilter;
+            AC_INFO << "Image::load filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
             myImageLoader.applyCustomFilter(myFilter, myFilterParams);
         }

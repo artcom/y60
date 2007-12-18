@@ -31,8 +31,7 @@ using namespace std;
 
 namespace y60 {
 
-    void checkOGLError(const std::string& theLocation) {
-		glFlush();
+    void checkOGLError(const std::string & theLocation) {
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
             std::string myErrorString;
@@ -52,11 +51,9 @@ namespace y60 {
                         break;
                 }
             }
-            throw OpenGLException("OpenGL error: #(" + asl::as_string(err) + ") " +
-                    myErrorString, theLocation);
-            if (err != GL_INVALID_OPERATION) {  // XXX: Do we really need this?
-                checkOGLError(theLocation);     // [DS] no, we don't get here anyway ... see throw above
-            }
+            std::string myErrorReport = std::string("OpenGL error: #(" + asl::as_string(err) + ") " + myErrorString);
+            AC_ERROR << myErrorReport << " at " << theLocation;
+            throw OpenGLException(myErrorReport, theLocation);
         }
     }
 

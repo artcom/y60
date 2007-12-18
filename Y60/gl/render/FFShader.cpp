@@ -79,7 +79,15 @@ namespace y60 {
             }
             glMaterialfv(GL_FRONT, GL_SPECULAR, myMaterialPropFacade->get<MaterialSpecularTag>().begin());
             CHECK_OGL_ERROR;
-            AC_TRACE << "Shininess = " << myMaterialPropFacade->get<ShininessTag>();
+            float myShininess = myMaterialPropFacade->get<ShininessTag>();
+            if (myShininess <0) {
+                AC_WARNING << "shininess out of range 0..128, ("<<myShininess<<") setting to 0";
+                myMaterialPropFacade->set<ShininessTag>(0);
+            } 
+            if (myShininess > 128) {
+                AC_WARNING << "shininess out of range 0..128, ("<<myShininess<<") setting to 128";
+                myMaterialPropFacade->set<ShininessTag>(128);
+            } 
             glMaterialf(GL_FRONT, GL_SHININESS, myMaterialPropFacade->get<ShininessTag>());
             CHECK_OGL_ERROR;
             glMaterialfv(GL_FRONT, GL_EMISSION, myMaterialPropFacade->get<MaterialEmissiveTag>().begin());

@@ -450,7 +450,18 @@ namespace y60 {
     ImageLoader::ensurePowerOfTwo(const std::string & theResizeMode, 
                                   unsigned theDepth, const asl::Vector2i * theTile)
     {
-        if (theResizeMode == IMAGE_RESIZE_NONE) {
+        // limit texture size
+        unsigned myTextureSizeLimit = 0;
+        if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
+            myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
+            AC_INFO << "Texture size limit set to " << myTextureSizeLimit;
+        } else {
+            myTextureSizeLimit = ITextureManager::getTextureSizeLimit();
+        }
+        AC_DEBUG << "Texture size limit = " << myTextureSizeLimit;
+
+        if (theResizeMode == IMAGE_RESIZE_NONE && 
+            (!myTextureSizeLimit || (GetWidth() <= myTextureSizeLimit && GetHeight() <= myTextureSizeLimit))) {
             return;
         }
 
@@ -486,16 +497,6 @@ namespace y60 {
                         string("ensurePowerOfTwo: '" + _myFilename + "' texture strip height must be a multiple of ")+
                         as_string(myHeightFactor), PLUS_FILE_LINE);
             }
-
-            // limit texture size
-            unsigned myTextureSizeLimit = 0;
-            if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
-                myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
-                AC_DEBUG << "Texture size limit set to " << myTextureSizeLimit;
-            } else {
-                myTextureSizeLimit = ITextureManager::getTextureSizeLimit();
-            }
-            AC_DEBUG << "Texture size limit = " << myTextureSizeLimit;
 
             AC_DEBUG << "GetWidth() = " << GetWidth();
             AC_DEBUG << "GetHeight() = " << GetHeight();
@@ -537,11 +538,11 @@ namespace y60 {
                 unsigned myHeight = nextPowerOfTwo(GetHeight() / myHeightFactor) * myHeightFactor;
 
                 if (theResizeMode == IMAGE_RESIZE_SCALE) {
-                    AC_DEBUG << "Resizing bitmap " << _myFilename << " to next power of two: " << myWidth << "x" << myHeight << ".";
+                    AC_INFO << "Resizing bitmap " << _myFilename << " to next power of two: " << myWidth << "x" << myHeight << ".";
                     ApplyFilter(PLFilterResizeBilinear(myWidth, myHeight));
                 } else if (theResizeMode == IMAGE_RESIZE_PAD) {
                     //TODO: make padding for for cube maps and 3D texture strips
-                    AC_DEBUG << "Padding bitmap '" << _myFilename << "' to next power of two: " << myWidth << "x" << myHeight << ".";
+                    AC_INFO << "Padding bitmap '" << _myFilename << "' to next power of two: " << myWidth << "x" << myHeight << ".";
                     ApplyFilter(PLFilterResizePadded(myWidth, myHeight));
                     _myImageMatrix.scale(Vector3f(float(myPreScaleWidth) / GetWidth(),
                             float(myPreScaleHeight) / GetHeight(), 1.0f));

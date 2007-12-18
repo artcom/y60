@@ -55,6 +55,7 @@ namespace y60 {
                 } catch (const asl::Exception & e) {
                     AC_WARNING << "Y60_VBO_USAGE environment must be 0 or 1; " << e;
                 }
+                AC_INFO << "Y60_VBO_USAGE environment variable was set to " << (myVBOUsage ? 1 : 0);
             }
             //AC_PRINT << "ENV: " << std::string(myUsageString ? myUsageString: "not defined") << " -> " << myVBOUsage;
             if (myVBOUsage &&
@@ -66,12 +67,15 @@ namespace y60 {
 				 )
             {
                 _myType = VERTEX_STORAGE_IS_VBO_VECTOR;
+                AC_INFO << "Using vertex buffer objects (VBOs) for vertex storage";
                 return;
             }
             if (asl::AGPVertexArray::getDefaultCapacity() != asl::AGPVertexArray::DISABLED) {
+                AC_INFO << "Using AGP memory for vertex storage";
                 _myType = VERTEX_STORAGE_IS_GFX_VECTOR;
                 return;
             }
+            AC_INFO << "Using main memory for vertex storage";
         }
 
         /**

@@ -99,32 +99,32 @@ namespace y60 {
         // TODO: exception safety
 
         void bindMe() const {
-            //AC_TRACE << "glBindBufferARB(" << _myId << ")";
+            AC_TRACE << "glBindBufferARB(" << _myId << ")";
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, _myId);
             CHECK_OGL_ERROR;
         }
         static void unbind() {
-            //AC_TRACE << "glBindBufferARB(0)";
+            AC_TRACE << "glBindBufferARB(0)";
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
         }
         static void resizeAnduploadAll(const T * theData, unsigned long theSize, VertexBufferUsage theUsageType) {
-            //AC_TRACE << "glBufferDataARB " << theSize << "(all)";
+            AC_TRACE << "glBufferDataARB " << theSize << "(all)";
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), theData, asGLEnum(theUsageType));
             CHECK_OGL_ERROR;
         }
         static void uploadPart(const T * theData, unsigned long theSize, unsigned long theOffset) {
-            //AC_TRACE << "glBufferDataARB " << theSize << "(part)";
+            AC_TRACE << "glBufferDataARB " << theSize << "(part)";
             glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, theOffset * sizeof(T), theSize * sizeof(T), theData);
             CHECK_OGL_ERROR;
         }
         static void download(T * theData, unsigned long theSize, unsigned long theOffset) {
-            //AC_TRACE << "glGetBufferSubDataARB " << theSize << "(get)";
+            AC_TRACE << "glGetBufferSubDataARB " << theSize << "(get)";
             glGetBufferSubDataARB(GL_ARRAY_BUFFER_ARB, theOffset * sizeof(T), theSize * sizeof(T), theData);
             CHECK_OGL_ERROR;
         }
         static void destructiveResize(unsigned long theSize, VertexBufferUsage theUsageType) {
-            //AC_TRACE << "glBufferSubDataARB (destructiveResize)";
+            AC_TRACE << "glBufferSubDataARB (destructiveResize)";
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), 0, asGLEnum(theUsageType));
             CHECK_OGL_ERROR;
         }
@@ -180,7 +180,7 @@ namespace y60 {
             } else if (forWriting) {
                 myFlags = GL_WRITE_ONLY;
             }
-            //AC_TRACE << "locking buffer";
+            AC_TRACE << "locking buffer";
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, _myId);
             CHECK_OGL_ERROR;
             _myLockedData = (T*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, myFlags);
@@ -192,7 +192,7 @@ namespace y60 {
         void unlockBuffer() const {
             bindMe();
             CHECK_OGL_ERROR;
-            //AC_TRACE << "unlocking buffer";
+            AC_TRACE << "unlocking buffer";
             if (!glUnmapBufferARB(GL_ARRAY_BUFFER_ARB)) {
                 CHECK_OGL_ERROR;
             }
