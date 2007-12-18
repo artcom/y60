@@ -453,8 +453,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 			myImage.frameblending = false;
 		}
 		
-		// right now we do no reuse textures, because they can be shared with other textureunits/materials
-		var myTexture = 0;//getDescendantByAttribute(window.scene.textures, "image", theImageId);
+		var myTexture = getDescendantByAttribute(window.scene.textures, "image", theImageId);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
     		for (var i = 0; i < _myTextureUnits.childNodesLength(); i++) {
