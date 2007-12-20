@@ -705,7 +705,8 @@ dom::Node::setUpstreamVersion(asl::Unsigned64 theVersion) {
         }
     }
 }
-#if 1
+//#define RECURSIVE_BUMP
+#ifdef RECURSIVE_BUMP
 #define NO_BUMP_REFERENCES
 #ifdef BUMP_REFERENCES
 void 
@@ -748,7 +749,7 @@ dom::Node::bumpVersion() {
 }
 #  endif
 #else
-// TODO: fix this faster, non recursive version which seems to have a bug
+// iterative bump
 asl::Unsigned64 
 dom::Node::bumpVersion() {
     Node * myNode = this;
@@ -761,23 +762,14 @@ dom::Node::bumpVersion() {
         }
         myNode = myParent;
     } while (myParent);
-#ifdef ORIGINAL_BUGGY 
-    myNode = this;
-    myParent = myNode->parentNode();
-    while (myParent) {
-        myNode->nodeVersion(myVersion);
-        myNode = myParent;
-        myParent = myParent->parentNode();
-    };
-    return myVersion;
-#else // untested fix
+
     myNode = this;
     do {
         myNode->nodeVersion(myVersion);
-        myNode = myParent->parentNode();
+        myNode = myNode->parentNode();
     } while (myNode);
+
     return myVersion;
-#endif
 }
 #endif
 
