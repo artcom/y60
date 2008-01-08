@@ -54,8 +54,10 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             if (myBrightness > 0.5) {
                 myTextColor = [0,0,0,1];
             }
+            var myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
+            
             window.setTextColor(myTextColor);
-            window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), "Screen8");
+            window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), "Screen8", myViewport);
 
             var myAge = _mySceneViewer.getCurrentTime() - _myMaxMemoryTime;
             var myRed   = 1;
@@ -69,11 +71,11 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             }
 
             window.setTextColor([myRed,myGreen,0,1]);
-            window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), "Screen8");
+            window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), "Screen8", myViewport);
 
             var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
             window.setTextColor(myTextColor);
-            window.renderText(new Vector2f(10, 30), myMem, "Screen8");
+            window.renderText(new Vector2f(10, 30), myMem, "Screen8", myViewport);
         }
     }
 }
