@@ -279,7 +279,7 @@ namespace y60 {
         AsyncDecoder::closeMovie();
     }
 
-    void FFMpegDecoder2::readAudio() {
+    bool FFMpegDecoder2::readAudio() {
         AC_TRACE << "---- FFMpegDecoder2::readAudio:";
         double myDestBufferedTime = _myAudioSink->getBufferedTime()+2/_myFrameRate;
         if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
@@ -293,12 +293,13 @@ namespace y60 {
             if (!myPacket) {
                 _myAudioSink->stop(true);
                 AC_DEBUG << "---- FFMpegDecoder::readAudio(): eof" << endl;
-                return;
-            }
+                return false;
+            } 
             addAudioPacket(*myPacket);
             av_free_packet(myPacket);
             delete myPacket;
         }
+        return true;
     }
 
     void FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
@@ -618,9 +619,15 @@ namespace y60 {
                 yield();
                 continue;
             }
+            bool myAudioEofFlag = false;
+            if (hasAudio()&& getDecodeAudioFlag())
+            {
+                AC_DEBUG<<"decode audio";
+                myAudioEofFlag = readAudio();
+            }
             AC_TRACE << "---- Updating cache";
             try {
-                if (!decodeFrame()) {
+                if (!decodeFrame() || myAudioEofFlag) {
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF)));
                     isDone = true;
 					AC_DEBUG << "---- EOF Yielding Thread.";
@@ -630,11 +637,6 @@ namespace y60 {
                 // This should never happen.
                 AC_WARNING << "---- Semaphore destroyed while in run. Terminating Thread.";
                 return;
-            }
-            if (hasAudio()&& getDecodeAudioFlag())
-            {
-                AC_DEBUG<<"decode audio";
-                readAudio();
             }
 
 			AC_TRACE << "---- end of loop";

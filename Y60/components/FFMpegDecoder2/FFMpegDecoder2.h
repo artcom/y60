@@ -116,7 +116,7 @@ namespace y60 {
          *  updates the Framecache depending on the current position
          */
         bool decodeFrame();
-        void readAudio();
+        bool readAudio();
         /**
          * Add an audio packet to the buffered source.
          * @param thePacket packet to add
