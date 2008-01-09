@@ -74,7 +74,7 @@ class EdgeBlender :
         void drawBlendedCorner(float theMarginX, float theMarginY);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
-
+        int _mySavedViewport[4];
         unsigned _myWindowWidth, _myWindowHeight;
         GLuint _mySceneTexture;
 
@@ -199,8 +199,8 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
                  myTextureWidth, myTextureHeight,
                  0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     checkOGLError(PLUS_FILE_LINE);
 }
 
@@ -357,6 +357,7 @@ EdgeBlender::drawGrid(const asl::Vector4f & theColor, unsigned theGridSize)
 void
 EdgeBlender::renderMultiScreen()
 {
+	//return;
     copyToTexture();
     //glClear(GL_COLOR_BUFFER_BIT); // UH: not necessary since we overwrite the entire screen
 
@@ -515,6 +516,12 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
     gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
+    
+    // store that section
+    glGetIntegerv(GL_VIEWPORT, _mySavedViewport);
+
+    // set viewport to full window
+    glViewport(0, 0, _myWindowWidth, _myWindowHeight);
 
     // load texture matrix
     glMatrixMode(GL_TEXTURE);
@@ -526,6 +533,7 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
 
+    
     // load attribs
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT | GL_POLYGON_BIT); // GL_ALL_ATTRIB_BITS);
 
@@ -542,6 +550,9 @@ EdgeBlender::postRender() {
 
     // restore matrices
     glMatrixMode(GL_PROJECTION);
+    // restore viewport
+    glViewport(_mySavedViewport[0], _mySavedViewport[1], _mySavedViewport[2], _mySavedViewport[3]);
+    
     glPopMatrix();
 
     glMatrixMode(GL_TEXTURE);
