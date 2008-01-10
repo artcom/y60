@@ -730,11 +730,10 @@ SDLWindow::mainLoop() {
         EventDispatcher::get().dispatch();
         STOP_TIMER(dispatchEvents);
 
-/*
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
         STOP_TIMER(handleRequests);
-*/
+
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;
