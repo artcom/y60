@@ -623,7 +623,7 @@ namespace y60 {
             if (hasAudio()&& getDecodeAudioFlag())
             {
                 AC_DEBUG<<"decode audio";
-                myAudioEofFlag = readAudio();
+                myAudioEofFlag = !readAudio();
             }
             AC_TRACE << "---- Updating cache";
             try {
