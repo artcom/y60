@@ -69,7 +69,7 @@ namespace asl {
         template<class T>
         Vector4<T>
         getCoefficients() const {
-            return Vector4<T>(normal[0], normal[1], normal[2], - offset);
+            return Vector4<T>(normal[0], normal[1], normal[2], offset);
         }
         
     public:
