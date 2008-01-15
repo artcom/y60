@@ -225,6 +225,7 @@ namespace y60 {
         }
 
         dom::NodePtr myParentNode    = theNode->parentNode()->self().lock();
+        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();        
         std::string myParentNodeName = myParentNode->nodeName();
         std::string myNodeName       = theNode->nodeName();
 
@@ -302,7 +303,7 @@ namespace y60 {
             // light/camera/projector node with light/camera/projector child node
             // => do nothing
             else if (myNodeName == WORLD_NODE_NAME && myParentNodeName == WORLD_LIST_NAME ||
-                     myNodeName == BODY_NODE_NAME && myNumGrandChildren == 0 ||
+                     myNodeName == BODY_NODE_NAME && (myNumGrandChildren == 0 || myParentNodeName == TRANSFORM_NODE_NAME || myParentNodeName == BODY_NODE_NAME) ||
                      (myNodeName == LIGHT_NODE_NAME || myNodeName == CAMERA_NODE_NAME || myNodeName == PROJECTOR_NODE_NAME) &&
                      (myChildNodeName == LIGHT_NODE_NAME || myChildNodeName == CAMERA_NODE_NAME || myChildNodeName == PROJECTOR_NODE_NAME))
             {
@@ -311,9 +312,22 @@ namespace y60 {
 
             // Unknown or unallowed configuration => exception
             else {
-                throw asl::Exception("Unknown configuration: '" + myParentNodeName + "' node with child '" + myNodeName + "' node",
-                                     PLUS_FILE_LINE);
-            }
+                std::string myErrorMsg("Unknown configuration: '");
+                myErrorMsg += myParentNodeName;
+                myErrorMsg += "' node ";
+                if (myParentNode->getAttribute(NAME_ATTRIB)) {
+                    myErrorMsg += " name: '"  + myParentNode->getAttributeString(NAME_ATTRIB);
+                    myErrorMsg += "'";
+                }
+                myErrorMsg += " with child '" ;
+                myErrorMsg += myNodeName;
+                myErrorMsg += "' node";
+                if (theNode->getAttribute(NAME_ATTRIB)) {
+                    myErrorMsg += " name: '"  + theNode->getAttributeString(NAME_ATTRIB);
+                    myErrorMsg += "'";
+                }
+               AC_INFO << (*_myRootNode);                
+               throw asl::Exception(myErrorMsg, PLUS_FILE_LINE);            }
         }
     }
 
