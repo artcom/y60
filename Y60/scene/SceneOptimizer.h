@@ -73,7 +73,6 @@ namespace y60 {
             void removeUnusedShapes();
             void transformToParent(dom::NodePtr & theNode);
             void convertToTransformNode(dom::NodePtr & theNode);
-            bool hasUnstickyChildren(dom::NodePtr & theNode);
 
             template <class T>
             unsigned copyVertexData(dom::NodePtr & theSrcVertexData, dom::NodePtr & theDstVertexData);

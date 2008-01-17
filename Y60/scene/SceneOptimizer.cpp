@@ -132,16 +132,7 @@ namespace y60 {
         // Optimize all sticky nodes until the list is empty
         while (!_myStickyNodes.empty()) {
             dom::NodePtr myRootNode = _myStickyNodes[0];
-            if (hasUnstickyChildren(myRootNode)) {
-                runNode(myRootNode);
-            } else {
-                unsigned myNumChildren = myRootNode->childNodesLength();
-                for (unsigned i = 0; i < myNumChildren; ++i) {
-                    dom::NodePtr myChildNode = myRootNode->childNode(i);
-                    _myStickyNodes.push_back(myChildNode);
-                }
-            }
-
+            runNode(myRootNode);
             _myStickyNodes.erase(_myStickyNodes.begin());
         }
 
@@ -171,19 +162,14 @@ namespace y60 {
         if (_mySuperShape != 0) {
             AC_INFO << "  Append superbody/supershape...";
             if (theRootNode->nodeName() == BODY_NODE_NAME) {
-                // Don't change the referenced shape of a sticky body node
-                // some code might stop working then
-                AC_INFO << "    Reusing the referenced shape.";
-                std::string myBodyId = theRootNode->getAttributeString(BODY_SHAPE_ATTRIB);
-                dom::NodePtr myShapeNode = _myScene.getShapesRoot()->getChildElementById(myBodyId, ID_ATTRIB);
-                for (signed i = myShapeNode->childNodesLength() - 1; i >= 0; --i) {
-                    myShapeNode->removeChild(myShapeNode->childNode(i));
-                }
-                for (unsigned i = 0; i < _mySuperShape->getShapeNode()->childNodesLength(); ++i) {
-                    myShapeNode->appendChild(_mySuperShape->getShapeNode()->childNode(i)->cloneNode());
-                }
+                dom::NodePtr myShapeAttributeNode = theRootNode->getAttribute(BODY_SHAPE_ATTRIB);
+                myShapeAttributeNode->nodeValue(_mySuperShape->getShapeId());
+
+                dom::NodePtr myStickyAttributeNode = theRootNode->getAttribute(STICKY_ATTRIB);
+                bool & myStickyFlag = myStickyAttributeNode->nodeValueRefOpen<bool>();
+                myStickyFlag = false;
+                myStickyAttributeNode->nodeValueRefClose<bool>();
             } else {
-                AC_INFO << "    Creating a new shape.";
                 dom::NodePtr myBodyNode = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
                 myBodyNode->appendAttribute(NAME_ATTRIB, "Optimized Body");
                 myBodyNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
@@ -297,37 +283,6 @@ namespace y60 {
                     theNode->removeChild(myChildNode);
                 }
             }
-
-            // World node with worlds parent or
-            // body node without children or
-            // light/camera/projector node with light/camera/projector child node
-            // => do nothing
-            else if (myNodeName == WORLD_NODE_NAME && myParentNodeName == WORLD_LIST_NAME ||
-                     myNodeName == BODY_NODE_NAME && (myNumGrandChildren == 0 || myParentNodeName == TRANSFORM_NODE_NAME || myParentNodeName == BODY_NODE_NAME) ||
-                     (myNodeName == LIGHT_NODE_NAME || myNodeName == CAMERA_NODE_NAME || myNodeName == PROJECTOR_NODE_NAME) &&
-                     (myChildNodeName == LIGHT_NODE_NAME || myChildNodeName == CAMERA_NODE_NAME || myChildNodeName == PROJECTOR_NODE_NAME))
-            {
-                // Allowed, but nothing to do
-            }
-
-            // Unknown or unallowed configuration => exception
-            else {
-                std::string myErrorMsg("Unknown configuration: '");
-                myErrorMsg += myParentNodeName;
-                myErrorMsg += "' node ";
-                if (myParentNode->getAttribute(NAME_ATTRIB)) {
-                    myErrorMsg += " name: '"  + myParentNode->getAttributeString(NAME_ATTRIB);
-                    myErrorMsg += "'";
-                }
-                myErrorMsg += " with child '" ;
-                myErrorMsg += myNodeName;
-                myErrorMsg += "' node";
-                if (theNode->getAttribute(NAME_ATTRIB)) {
-                    myErrorMsg += " name: '"  + theNode->getAttributeString(NAME_ATTRIB);
-                    myErrorMsg += "'";
-                }
-               AC_INFO << (*_myRootNode);                
-               throw asl::Exception(myErrorMsg, PLUS_FILE_LINE);            }
         }
     }
 
@@ -504,7 +459,7 @@ namespace y60 {
                         theNode->removeChild(myChild);
                     } else {
                         // Otherwise change it to a transform node
-                        convertToTransformNode(theNode);
+                        convertToTransformNode(myChild);
                     }
                 }
             }
@@ -748,18 +703,6 @@ namespace y60 {
         // Remove the node and append transform
         theNode->parentNode()->replaceChild(myTransformNode, theNode);
         theNode = myTransformNode;
-    }
-
-    bool
-    SceneOptimizer::hasUnstickyChildren(dom::NodePtr & theNode) {
-        unsigned myNumChildren = theNode->childNodesLength();
-        for (unsigned i = 0; i < myNumChildren; ++i) {
-            dom::NodePtr myChild = theNode->childNode(i);
-            if (!myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
 
