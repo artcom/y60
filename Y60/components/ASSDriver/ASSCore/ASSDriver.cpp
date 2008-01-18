@@ -49,19 +49,22 @@ using namespace jslib;
 namespace y60 {
 
 
-const char * CMD_ENTER_CONFIG_MODE( "x");
-const char * CMD_QUERY_CONFIG_MODE( "c98");
-const char * CMD_LEAVE_CONFIG_MODE( "c99");
+const char * CMD_ENTER_CONFIG_MODE("x");
+const char * CMD_QUERY_CONFIG_MODE("c98");
+const char * CMD_LEAVE_CONFIG_MODE("c99");
 
 const char * CMD_CALLIBRATE_TRANSMISSION_LEVEL( "c01");
 const char * CMD_PERFORM_TARA( "c02" );
-
 
 static const char * RAW_RASTER = "ASSRawRaster";
 static const char * FILTERED_RASTER = "ASSFilteredRaster";
 static const char * MOMENT_RASTER = "ASSMomentRaster";
 
 const unsigned int BEST_VERSION( 260 );
+
+const bool RESAMPLING = false;//true;
+const unsigned int GRID_SCALE_X = 2;
+const unsigned int GRID_SCALE_Y = 1;
 
 
 const float TOUCH_MARKER_LIFE_TIME( 1.0 );
@@ -76,13 +79,13 @@ asBox2f( const Box2i & theBox ) {
                 Vector2f( float(theBox[Box2i::MAX][0]), float(theBox[Box2i::MAX][1])));
 }
 
-
 ASSDriver::ASSDriver() :
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
     _myRawRaster(dom::ValuePtr(0)),
     _myDenoisedRaster(dom::ValuePtr(0)),
     _myMomentRaster(dom::ValuePtr(0)),
+    _myResampledRaster(dom::ValuePtr(0)),
     _myScene(0),
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 5 ),
@@ -107,13 +110,17 @@ ASSDriver::ASSDriver() :
 
     // XXX: shearing hack
     _myShearX(0.0),
-    _myShearY(0.0)
+    _myShearY(0.0),
+    _myUseCCRegionForMomentumFlag(0),
+    _myUserDefinedMomentumBox(-1, -1, 1, 1)
+
 
 {
 #ifdef ASS_LATENCY_TEST
     _myLatencyTestPort = asl::getSerialDevice( 0 );
     _myLatencyTestPort->open( 9600, 8, SerialDevice::NO_PARITY, 1, false);
 #endif
+    AC_PRINT << "Ctor done";
 }
 
 ASSDriver::~ASSDriver() {
@@ -132,6 +139,7 @@ ASSDriver::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
     _myScene = theWindow->getCurrentScene();
     // TODO: trigger raster reallocation
     //setState(NOT_CONNECTED);
+    AC_PRINT << "onSceneLoaded done";
     return true;
 }
 
@@ -141,26 +149,35 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 
 void
 ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize ) {
+    AC_PRINT << "allocateGridBuffers";
     _myGridSize = theGridSize;
 
     _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
     _myPoTSize[1] = nextPowerOfTwo( _myGridSize[1] );
 
     _myRasterNames.clear();
-    _myRawRaster = allocateRaster(RAW_RASTER);
-    _myDenoisedRaster = allocateRaster(FILTERED_RASTER);
-    _myMomentRaster = allocateRaster(MOMENT_RASTER);
+    _myRawRaster = allocateRaster(RAW_RASTER, _myPoTSize[0], _myPoTSize[1]);
+    _myDenoisedRaster = allocateRaster(FILTERED_RASTER, _myPoTSize[0], _myPoTSize[1]);
+    _myMomentRaster = allocateRaster(MOMENT_RASTER, _myPoTSize[0], _myPoTSize[1]);
 
+    unsigned myWidth = nextPowerOfTwo(_myGridSize[0] * GRID_SCALE_X );
+    unsigned myHeight = nextPowerOfTwo( _myGridSize[1] * GRID_SCALE_Y );
+    AC_PRINT << "Allocating";
+    _myResampledRaster = allocateRaster("resampled_raster", myWidth, myHeight);
+    AC_PRINT << "Alloc done";
+
+    // XXX brute force resampling
+    
     createTransportLayerEvent( "configure" );
 }
 
 RasterHandle
-ASSDriver::allocateRaster(const std::string & theName) {
+ASSDriver::allocateRaster(const std::string & theName, int theWidth, int theHeight) {
     if (_myScene) {
         dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(theName);
         if (myImage) {
             myImage->getFacade<y60::Image>()->createRaster( 
-                    _myPoTSize[0], _myPoTSize[1], 1, y60::GRAY);
+                    theWidth, theHeight, 1, y60::GRAY);
             _myRasterNames.push_back( theName );
             return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
         } else {
@@ -169,7 +186,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
             y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
             myImage->set<y60::IdTag>( theName );
             myImage->set<y60::NameTag>( theName );
-            myImage->createRaster( _myPoTSize[0], _myPoTSize[1], 1, y60::GRAY);
+            myImage->createRaster( theWidth, theHeight, 1, y60::GRAY);
 
             _myRasterNames.push_back( theName );
 
@@ -177,7 +194,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
         }
     } else {
         AC_WARNING << "No scene. Allocating loose rasters.";
-        RasterHandle myHandle(createRasterValue(y60::GRAY, _myPoTSize[0], _myPoTSize[1]));
+        RasterHandle myHandle(createRasterValue(y60::GRAY, theWidth, theHeight));
         myHandle.raster->clear();
         return myHandle;
                 
@@ -185,7 +202,7 @@ ASSDriver::allocateRaster(const std::string & theName) {
 }
 
 template <class PixelT>
-struct Threshold{
+struct Threshold {
     Threshold(const PixelT & theThreshold) :
         _myThreshold( theThreshold ) {}
     PixelT operator () (const PixelT & a) {
@@ -263,6 +280,12 @@ ASSDriver::updateDerivedRasters()
 
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myMomentRaster.value) );
+
+    // XXX brute force resampling
+    if (RESAMPLING) {
+        _myResampledRaster.raster->pasteRaster( * _myMomentRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+                    0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
+    }
 }
 
 void
@@ -274,7 +297,16 @@ ASSDriver::processSensorValues(const ASSEvent & theEvent) {
 
     updateDerivedRasters();
 
-    BlobListPtr myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
+
+
+
+
+    BlobListPtr myROIs;
+    if (RESAMPLING) {
+        myROIs = connectedComponents( _myResampledRaster.raster, _myComponentThreshold);
+    } else {
+        myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
+    }
 
     std::vector<MomentResults> myCurrentPositions;
     computeCursorPositions( myCurrentPositions, myROIs);
@@ -287,12 +319,33 @@ ASSDriver::computeCursorPositions( std::vector<MomentResults> & theCurrentPositi
                                    const BlobListPtr & theROIs)
 {
     typedef subraster<gray<unsigned char> > SubRaster;
-    for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
+    if (RESAMPLING) {
+        _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+                    0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
+    }
+     for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
         Box2i myBox = (*it)->bbox();
+        if (!_myUseCCRegionForMomentumFlag) {
+            Point2i myCenter = (*it)->bbox().getCenter();
+            Point2i myUpperLeft;
+            Point2i myUpperRight;
+            Point2i myLowerLeft;
+            Point2i myLowerRight;
+            _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
+            myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]), 
+                          min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
+        }
         AnalyseMoment<SubRaster> myMomentAnalysis;
         // XXX is this correct ?
-        _myMomentRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
-                                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+        if (RESAMPLING) {
+            _myResampledRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+        } else {
+//            _myMomentRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+//                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+            _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+         }
 
         MomentResults myResult = myMomentAnalysis.result;
         myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
@@ -630,6 +683,34 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
 #endif
 
 void
+ASSDriver::drawBox(const Cursor & theCursor) {
+    Box2f myBox = theCursor.roi;
+    if (!_myUseCCRegionForMomentumFlag) {
+        Point2f myCenter = theCursor.roi.getCenter();
+        Point2i myUpperLeft;
+        Point2i myUpperRight;
+        Point2i myLowerLeft;
+        Point2i myLowerRight;
+        _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
+        myBox = Box2f(myCenter[0] + myUpperLeft[0], myCenter[1] + myUpperLeft[1], 
+                      myCenter[0] + myLowerRight[0], myCenter[1] + myLowerRight[1]);
+    }
+    Point2f myUpperLeft;
+    Point2f myUpperRight;
+    Point2f myLowerLeft;
+    Point2f myLowerRight;
+    myBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
+    glColor4f(1,1,1,1);
+    glBegin( GL_LINE_LOOP );
+    glVertex2fv(myUpperLeft.begin());
+    glVertex2fv(myLowerLeft.begin());
+    glVertex2fv(myLowerRight.begin());
+    glVertex2fv(myUpperRight.begin());
+    glEnd();
+ 
+}
+
+void
 ASSDriver::drawGrid() {
     glColor4fv( _myGridColor.begin() );
     glBegin( GL_LINES );
@@ -668,7 +749,14 @@ ASSDriver::drawMarkers() {
     // draw cursors
     CursorMap::iterator myIt = _myCursors.begin();
     for (; myIt != _myCursors.end(); ++myIt ) {
-        drawCircle( myIt->second.position, 0.15f, 36, _myCursorColor );
+        if (RESAMPLING) {
+            Vector2f myPos = myIt->second.position;
+            myPos[0] *= 0.5;
+            drawCircle( myPos, 0.15f, 36, _myCursorColor );
+        } else {
+            drawCircle( myIt->second.position, 0.15f, 36, _myCursorColor );
+        }
+        drawBox(myIt->second);
     }
 
     // draw touch history
@@ -864,6 +952,10 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
     getConfigSetting( theSettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
     getConfigSetting( theSettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
     getConfigSetting( theSettings, "ClampToScreen", _myClampToScreenFlag, 0);
+    getConfigSetting( theSettings, "CCRegion4MomentumFlag", _myUseCCRegionForMomentumFlag, 0);
+    asl::Vector4f myMomentumRegion;
+    getConfigSetting( theSettings, "MomentumRegion", myMomentumRegion, asl::Vector4f(-1,-1,1,1));
+    _myUserDefinedMomentumBox = Box2i(int(myMomentumRegion[0]), int(myMomentumRegion[1]), int(myMomentumRegion[2]), int(myMomentumRegion[3])); 
 }
 
 Vector3f 
@@ -1020,6 +1112,7 @@ PerformTara(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     }
     return JS_TRUE;
 }
+
 static JSBool
 Connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
     DOC_BEGIN("");
@@ -1033,6 +1126,7 @@ Connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     }
     return JS_TRUE;
 }
+
 static JSBool
 Disconnect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
     DOC_BEGIN("");
@@ -1074,7 +1168,6 @@ QueryConfigMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     }
     return JS_TRUE;
 }
-
 
 JSFunctionSpec * 
 ASSDriver::Functions() {

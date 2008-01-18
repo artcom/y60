@@ -131,7 +131,7 @@ class ASSDriver :
         asl::Vector2i  _myPoTSize;
         int            _myIDCounter;
     private:
-        RasterHandle allocateRaster(const std::string & theName);
+        RasterHandle allocateRaster(const std::string & theName, int theWidth, int theHeight);
         void updateDerivedRasters();
         void updateCursors( double theDeltaT, const ASSEvent & theEvent);
         void findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
@@ -153,6 +153,8 @@ class ASSDriver :
         void drawLabel(jslib::AbstractRenderWindow * theWindow, const std::string & theText);
         void drawGrid();
         void drawMarkers();
+        void drawBox(const Cursor & theCursor);
+        
         void drawCircle( const asl::Vector2f & thePosition, float theRadius,
                          unsigned theSubdivision, const asl::Vector4f & theColor);
 
@@ -161,6 +163,7 @@ class ASSDriver :
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
         RasterHandle _myMomentRaster;
+        RasterHandle _myResampledRaster;
         std::vector<std::string> _myRasterNames;
 
         y60::ScenePtr _myScene;
@@ -201,6 +204,8 @@ class ASSDriver :
         TransportLayerPtr _myTransportLayer;
         dom::NodePtr      _mySettings;
         
+        int _myUseCCRegionForMomentumFlag;
+        asl::Box2i _myUserDefinedMomentumBox;
         // XXX: shearing hack
         float _myShearX;
         float _myShearY;
