@@ -164,17 +164,11 @@ namespace y60 {
             if (theRootNode->nodeName() == BODY_NODE_NAME) {
                 dom::NodePtr myShapeAttributeNode = theRootNode->getAttribute(BODY_SHAPE_ATTRIB);
                 myShapeAttributeNode->nodeValue(_mySuperShape->getShapeId());
-
-                dom::NodePtr myStickyAttributeNode = theRootNode->getAttribute(STICKY_ATTRIB);
-                bool & myStickyFlag = myStickyAttributeNode->nodeValueRefOpen<bool>();
-                myStickyFlag = false;
-                myStickyAttributeNode->nodeValueRefClose<bool>();
             } else {
                 dom::NodePtr myBodyNode = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
                 myBodyNode->appendAttribute(NAME_ATTRIB, "Optimized Body");
                 myBodyNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
                 myBodyNode->appendAttribute(BODY_SHAPE_ATTRIB, _mySuperShape->getShapeId());
-                myBodyNode->appendAttribute(STICKY_ATTRIB, "0");
             }
         }
     }
@@ -466,7 +460,7 @@ namespace y60 {
         }
 
         // Merge the shape into the supershape
-        if (theNode->nodeName() == BODY_NODE_NAME) {
+        if (theNode->nodeName() == BODY_NODE_NAME && theNode->getAttributeValue<bool>(VISIBLE_ATTRIB)) {
             BodyPtr myBody = theNode->getFacade<Body>();
             AC_INFO << "    Merge body: " + myBody->get<NameTag>();
             Shape & myShape = myBody->getShape();
@@ -514,7 +508,7 @@ namespace y60 {
                 if (!myRenderStyleAttr) {
                     myElementsRenderStyles = myShapeRenderStyles;
                 }
-                bool myRewindFlag                     = myNormalFlipFlag;
+                bool myRewindFlag = myNormalFlipFlag;
                 if (myElementsRenderStyles[BACK] && !myElementsRenderStyles[FRONT]) {
                     myElementsRenderStyles[BACK]  = false;
                     myElementsRenderStyles[FRONT] = true;
@@ -531,48 +525,51 @@ namespace y60 {
 
     void
     SceneOptimizer::removeInvisibleNodes(dom::NodePtr & theNode) {
+        // Search depth first
+        unsigned myNumChildren = theNode->childNodesLength();
+        for (signed i = myNumChildren - 1; i >= 0; --i) {
+            dom::NodePtr myChild = theNode->childNode(i);
+            removeInvisibleNodes(myChild);
+        }
+
+        // Node visible?
+        if (theNode->getAttributeValue<bool>(VISIBLE_ATTRIB)) {
+            return;
+        }
+
+        // Node sticky?
+        if(theNode->getAttributeValue<bool>(STICKY_ATTRIB)) {
+            return;
+        }
+
+        // Node has sticky descendants?
+        std::vector<dom::NodePtr> myStickyNodes;
+        theNode->getNodesByAttribute("", STICKY_ATTRIB, "1", true, myStickyNodes);
+        if (myStickyNodes.size() > 0) {
+            return;
+        }
+
+        // Search (character) animations
+        std::set<std::string> myNodeIds;
+        collectIds(theNode, myNodeIds);
         dom::NodePtr mySceneNode      = _myScene.getSceneDom()->firstChild();
         dom::NodePtr myAnimationsNode = mySceneNode->childNode(ANIMATION_LIST_NAME);
         dom::NodePtr myCharactersNode = mySceneNode->childNode(CHARACTER_LIST_NAME);
-        unsigned myNumChildren   = theNode->childNodesLength();
-        for (signed i = myNumChildren - 1; i >= 0; --i) {
-            dom::NodePtr myChild = theNode->childNode(i);
-            if (!myChild->getAttributeValue<bool>(VISIBLE_ATTRIB) && !myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
-                // Collect Ids of all contained nodes
-                std::set<std::string> myNodeIds;
-                collectIds(myChild, myNodeIds);
-
-                // Remove the animations on all nodes of the collected ids, if available
-                for (std::set<std::string>::const_iterator it = myNodeIds.begin(); it != myNodeIds.end(); it++) {
-                    std::vector<dom::NodePtr> myAnimationNodes;
-
-                    // Search animations
-                    myAnimationsNode->getNodesByAttribute(ANIMATION_NODE_NAME,
-                                                          ANIM_NODEREF_ATTRIB,
-                                                          *it,
-                                                          true,
-                                                          myAnimationNodes);
-
-                    // Search character animations
-                    myCharactersNode->getNodesByAttribute(ANIMATION_NODE_NAME,
-                                                          ANIM_NODEREF_ATTRIB,
-                                                          *it,
-                                                          true,
-                                                          myAnimationNodes);
-
-                    // Remove the animations
-                    for (unsigned j = 0; j < myAnimationNodes.size(); ++j) {
-                        myAnimationNodes[j]->parentNode()->removeChild(myAnimationNodes[j]);
-                    }
-                }
-
-                // Then remove the node itself
-                theNode->removeChild(myChild);
-            } else {
-                // Continue recursing into the tree
-                removeInvisibleNodes(myChild);
-            }
+        std::vector<dom::NodePtr> myAnimationNodes;
+        for (std::set<std::string>::const_iterator it = myNodeIds.begin(); it != myNodeIds.end(); it++) {
+            std::vector<dom::NodePtr> myAnimationNodes;
+            myAnimationsNode->getNodesByAttribute(ANIMATION_NODE_NAME, ANIM_NODEREF_ATTRIB, *it, true, myAnimationNodes);
+            myCharactersNode->getNodesByAttribute(ANIMATION_NODE_NAME, ANIM_NODEREF_ATTRIB, *it, true, myAnimationNodes);
         }
+
+        // Remove the animations
+        for (unsigned j = 0; j < myAnimationNodes.size(); ++j) {
+            myAnimationNodes[j]->parentNode()->removeChild(myAnimationNodes[j]);
+        }
+
+        // Then remove the node itself
+        theNode->parentNode()->removeChild(theNode);
+        AC_INFO << "    Node removed: " << theNode->getAttributeString(NAME_ATTRIB);
     }
 
     void
