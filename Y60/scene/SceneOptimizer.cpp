@@ -546,6 +546,8 @@ namespace y60 {
         std::vector<dom::NodePtr> myStickyNodes;
         theNode->getNodesByAttribute("", STICKY_ATTRIB, "1", true, myStickyNodes);
         if (myStickyNodes.size() > 0) {
+            dom::NodePtr myStickyAttributeNode = theNode->getAttribute(STICKY_ATTRIB);
+            myStickyAttributeNode->nodeValue("1");
             return;
         }
 
@@ -590,12 +592,16 @@ namespace y60 {
         for (std::set<std::string>::const_iterator it = myNodeIds.begin(); it != myNodeIds.end(); it++) {
             dom::NodePtr myNode   = myWorldNode->getElementById(*it, ID_ATTRIB);
             if (myNode) {
-                TransformHierarchyFacadePtr myFacade = myNode->getFacade<TransformHierarchyFacade>();
-                myFacade->set<StickyTag>(true);
+                {
+                    dom::NodePtr myStickyAttributeNode = myNode->getAttribute(STICKY_ATTRIB);
+                    myStickyAttributeNode->nodeValue("1");
+                }
 
-                dom::NodePtr myParent                      = myNode->parentNode()->self().lock();
-                TransformHierarchyFacadePtr myParentFacade = myParent->getFacade<TransformHierarchyFacade>();
-                myParentFacade->set<StickyTag>(true);
+                {
+                    dom::NodePtr myParentNode          = myNode->parentNode()->self().lock();
+                    dom::NodePtr myStickyAttributeNode = myParentNode->getAttribute(STICKY_ATTRIB);
+                    myStickyAttributeNode->nodeValue("1");
+                }
             }
         }
     }
