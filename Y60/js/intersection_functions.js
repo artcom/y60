@@ -51,9 +51,13 @@ function findNearestIntersection(myIntersectionInfo, myReferencePoint) {
             var myIntersection = myIntersectionInfo[i].intersections[j];
             var myDistance = distance(myReferencePoint, myIntersection.position);
             if (myMinDistance == undefined || myDistance < myMinDistance) {
-                myMinDistance = myDistance;
-                myMinInfo = myIntersectionInfo[i];
-                myNearestIntersection = myIntersection;
+                //if (myIntersectionInfo[i].body.visible) {
+                    myMinDistance = myDistance;
+                    myMinInfo = myIntersectionInfo[i];
+                    myNearestIntersection = myIntersection;
+                //} else {
+                //    print("Sorry, not visible: " + myIntersectionInfo[i].body.name);
+                //}
             }
         }
     }

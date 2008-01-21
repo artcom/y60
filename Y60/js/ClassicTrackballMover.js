@@ -266,7 +266,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         } else {
             myPickedBody = window.scene.world;
         }
-        //print("  -> You picked trackball object: " + myPickedBody);
+        //print("  -> You picked trackball object: " + myPickedBody.name + " id: " + myPickedBody.id);
         return myPickedBody;
     }
 }

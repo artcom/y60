@@ -78,7 +78,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
         Protected.isPressed = theFlag;
     }
 
-    Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
+    Public.onMouseButton = function(theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
     	        Logger.trace("Unpressing button " + Public.id);	
@@ -112,7 +112,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
 
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
+        Public.onMouseButton = function(theState, theX, theY, theRadius) {
             if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY, theRadius)) {
                 if (theState == MOUSE_UP && Protected.isPressed) {
                     return Public.onClick(this);
@@ -129,8 +129,8 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     }
 
     Public.setClickOnMouseDown = function() {
-        // Replace the onMouseButton function with something more advanced
-        Public.onMouseButton = function(theButton, theState, theX, theY, theRadius) {
+        // Replace the onMouseButton function with something more advanced        
+        Public.onMouseButton = function(theState, theX, theY, theRadius) {
             if (theState == MOUSE_UP) {
                 Public.setPressed(false);
             } else if (theState == MOUSE_DOWN && Public.enabled && Protected.isVisible(Public.node) &&
