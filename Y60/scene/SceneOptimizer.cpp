@@ -124,6 +124,10 @@ namespace y60 {
         AC_INFO << "  Set animated nodes sticky...";
         pinAnimatedNodes(_myRootNode);
 
+        // Set transparent bodies to sticky
+        AC_INFO << "  Set transparent bodies sticky...";
+        pinTransparentBodies(_myRootNode);
+
         // Pin body nodes that reference the same shape node (memory friendly)
         //XXX: commented out for now, maybe add a switch to be able to turn it off,
         //     but it's not that useful anyway
@@ -153,6 +157,7 @@ namespace y60 {
         _mySuperShape = SuperShapePtr(0);
 
         // Merge all bodies into one superbody
+        _myOptimizedBodyName = "Optimized Body: ";
         AC_INFO << "  Merging bodies...";
         asl::Matrix4f myInitialMatrix = theRootNode->getFacade<TransformHierarchyFacade>()->get<InverseGlobalMatrixTag>();
         mergeBodies(theRootNode, myInitialMatrix);
@@ -166,7 +171,7 @@ namespace y60 {
                 myShapeAttributeNode->nodeValue(_mySuperShape->getShapeId());
             } else {
                 dom::NodePtr myBodyNode = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
-                myBodyNode->appendAttribute(NAME_ATTRIB, "Optimized Body");
+                myBodyNode->appendAttribute(NAME_ATTRIB, _myOptimizedBodyName);
                 myBodyNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
                 myBodyNode->appendAttribute(BODY_SHAPE_ATTRIB, _mySuperShape->getShapeId());
             }
@@ -463,6 +468,7 @@ namespace y60 {
         if (theNode->nodeName() == BODY_NODE_NAME && theNode->getAttributeValue<bool>(VISIBLE_ATTRIB)) {
             BodyPtr myBody = theNode->getFacade<Body>();
             AC_INFO << "    Merge body: " + myBody->get<NameTag>();
+            _myOptimizedBodyName += theNode->getAttributeString(ID_ATTRIB) + " ";
             Shape & myShape = myBody->getShape();
 
             // Initialize the supershape if it isn't yet
@@ -601,6 +607,28 @@ namespace y60 {
                     dom::NodePtr myParentNode          = myNode->parentNode()->self().lock();
                     dom::NodePtr myStickyAttributeNode = myParentNode->getAttribute(STICKY_ATTRIB);
                     myStickyAttributeNode->nodeValue("1");
+                }
+            }
+        }
+    }
+
+    void
+    SceneOptimizer::pinTransparentBodies(dom::NodePtr & theRootNode) {
+        // Get all body nodes
+        std::vector<dom::NodePtr> myBodyNodes;
+        theRootNode->getNodesByTagName(BODY_NODE_NAME, true, myBodyNodes);
+
+        for (unsigned i = 0; i < myBodyNodes.size(); ++i) {
+            dom::NodePtr myShapeNode      = theRootNode->getElementById(myBodyNodes[i]->getAttributeString(BODY_SHAPE_ATTRIB));
+            dom::NodePtr myPrimitivesNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
+            unsigned numElements = myPrimitivesNode->childNodesLength();
+            for (unsigned j = 0; j < numElements; ++j) {
+                dom::NodePtr myElementNode  = myPrimitivesNode->childNode(j);
+                dom::NodePtr myMaterialNode = myElementNode->getElementById(myElementNode->getAttributeString(MATERIAL_REF_ATTRIB));
+                if (myMaterialNode->getAttributeValue<bool>(TRANSPARENCY_ATTRIB)) {
+                    dom::NodePtr myStickyAttributeNode = myBodyNodes[i]->getAttribute(STICKY_ATTRIB);
+                    myStickyAttributeNode->nodeValue("1");
+                    break;
                 }
             }
         }

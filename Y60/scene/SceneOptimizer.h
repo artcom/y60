@@ -67,6 +67,7 @@ namespace y60 {
             bool mergeBodies(dom::NodePtr & theNode, const asl::Matrix4f & theMatrix);
             void removeInvisibleNodes(dom::NodePtr & theNode);
             void pinAnimatedNodes(dom::NodePtr & theRootNode);
+            void pinTransparentBodies(dom::NodePtr & theRootNode);
             void pinBodiesWithSameShapes(dom::NodePtr & theRootNode);
             void collectIds(const dom::NodePtr & theNode, std::set<std::string> & theIds);
             void collectShapeIds(const dom::NodePtr & theNode, std::set<std::string> & theIds);
@@ -88,6 +89,8 @@ namespace y60 {
 
             typedef std::vector<dom::NodePtr> NodeVector;
             NodeVector _myStickyNodes;
+
+            std::string _myOptimizedBodyName;
     };
 
     template <class T>
