@@ -74,7 +74,7 @@ class EdgeBlender :
         void drawBlendedCorner(float theMarginX, float theMarginY);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
-        int _mySavedViewport[4];
+        GLint _mySavedViewport[4];
         unsigned _myWindowWidth, _myWindowHeight;
         GLuint _mySceneTexture;
 
