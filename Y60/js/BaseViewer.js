@@ -836,7 +836,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             if (theImagesPreLoadFlag == undefined || theImagesPreLoadFlag) {
                 preloadImages();
-                preloadTextures();
             }
             if (theSwitchNodeFlag == undefined || theSwitchNodeFlag) {
                 collectAllSwitchNodes();
