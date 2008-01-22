@@ -956,3 +956,15 @@ function stripIdentifier(theIdentifier) {
     return theIdentifier.replace(/[^\w\s.]/g, "");
 }
 
+function preloadImages() {
+    for (var i = 0; i < window.scene.images.childNodes.length; i++) {
+        preLoad(window.scene.images.childNode(i));        
+    }
+}
+
+function preloadTextures() {
+    for (var i = 0; i < window.scene.textures.childNodes.length; i++) {
+        preLoad(window.scene.textures.childNode(i));   
+    }
+}
+

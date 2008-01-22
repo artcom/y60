@@ -158,6 +158,8 @@ namespace y60 {
 
             virtual void registerDependenciesRegistrators();
 
+            void preload();
+
         private:
             Image();
 

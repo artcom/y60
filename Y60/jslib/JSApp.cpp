@@ -554,26 +554,30 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-TriggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Triggers the upload of the specified texture.");
-    DOC_PARAM("theTextureNode", "the texture node to upload.", DOC_TYPE_NODE);
+PreLoad(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Triggers the preload of the specified node, in case of a texture trigger upload to opengl, in case of a image, trigger i/o load.");
+    DOC_PARAM("theNode", "the node to preload.", DOC_TYPE_NODE);
     DOC_END;
 
     try {
         ensureParamCount(argc, 1);
 
-        dom::NodePtr myTextureNode;
-        if (!convertFrom(cx, argv[0], myTextureNode)) {
-            JS_ReportError(cx, "triggerUpload(): argument #1 must be a dom node");
+        dom::NodePtr myNode;
+        if (!convertFrom(cx, argv[0], myNode)) {
+            JS_ReportError(cx, "preLoad(): argument #1 must be a dom node");
             return JS_FALSE;
         }
-
-        myTextureNode->getFacade<y60::Texture>()->triggerUpload();
+        if (myNode->nodeName() == TEXTURE_NODE_NAME) {
+            myNode->getFacade<y60::Texture>()->preload();
+        } else if (myNode->nodeName() == IMAGE_NODE_NAME) {
+            myNode->getFacade<y60::Image>()->preload();
+        } else {
+            JS_ReportError(cx, "preLoad(): argument #1 must be a texture or image node");
+            return JS_FALSE;
+        }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-
-
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1388,7 +1392,7 @@ static JSFunctionSpec glob_functions[] = {
     {"reuse",             Reuse,          0},
     {"parseArguments",    ParseArguments, 2},
     {"plug",              Plug,           1},
-    {"triggerUpload",     TriggerUpload,  1},
+    {"preLoad",           PreLoad,  1},    
     {"saveImage",         SaveImage,	  2},
     {"saveImageFiltered", SaveImageFiltered, 4},
     {"applyImageFilter",  ApplyImageFilter,	3},

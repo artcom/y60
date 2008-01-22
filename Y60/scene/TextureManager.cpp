@@ -136,7 +136,7 @@ namespace y60 {
         for (unsigned i = 0; i < myTextureCount; ++i) {
             dom::NodePtr myTextureNode = _myTextureList->childNode(i);
             if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                myTextureNode->getFacade<Texture>()->triggerUpload();
+                myTextureNode->getFacade<Texture>()->preload();
             }
         }
     }

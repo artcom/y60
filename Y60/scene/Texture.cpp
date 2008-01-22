@@ -69,6 +69,7 @@ namespace y60 {
     void
     Texture::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
+        AC_DEBUG << "Texture::registerDependenciesRegistrators '" << get<NameTag>();
 
         //TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
         TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
@@ -101,8 +102,8 @@ namespace y60 {
             TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this); 
             TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureInternalFormatTag>(*this);
-            // TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
-            //     dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);
+            //TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
+            //    dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);
         }
     }
 
@@ -284,7 +285,7 @@ namespace y60 {
     }
 
     void
-    Texture::triggerUpload() {
+    Texture::preload() {
         AC_DEBUG << "Texture::triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>();
         TextureIdTag::Plug::getValuePtr()->setDirty(); // force call to applyTexture()
     }

@@ -214,7 +214,7 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
                 myImage->getRasterPtr()->pixels().begin());        
     CHECK_OGL_ERROR;
 
-    theTexture->triggerUpload();
+    theTexture->preload();
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {

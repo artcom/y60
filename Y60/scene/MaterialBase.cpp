@@ -90,6 +90,7 @@ namespace y60 {
     MaterialBase::load(TextureManagerPtr theTextureManager) {
 
         addTextures(getNode().childNode(TEXTUREUNIT_LIST_NAME), theTextureManager);
+        AC_TRACE << "loading: " << get<NameTag>();
 
         if (_myShader) {
             const VectorOfString * myLightingFeature = _myShader->getFeatures(LIGHTING_FEATURE);
@@ -210,7 +211,7 @@ namespace y60 {
             TexturePtr myTexture = myTextureUnit->getTexture();
             if (myTexture && myTexture->getTextureId() == 0) {
                 //AC_DEBUG << "addTexture triggering texture upload id=" << myTexture->get<IdTag>() << " texId=" << myTexture->getTextureId();
-                myTexture->triggerUpload();
+                myTexture->preload();
             }
         } else {
             AC_WARNING << "Your OpenGL implementation only supports " 

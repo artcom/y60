@@ -88,7 +88,7 @@ namespace y60 {
             unsigned applyTexture();
             void applyTextureParams();
 
-            void triggerUpload();
+            void preload();
 
             void refTexture();
             void unrefTexture();

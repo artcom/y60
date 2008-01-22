@@ -97,6 +97,7 @@ namespace y60 {
     void
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
+        AC_DEBUG << "Image::registerDependenciesRegistrators '" << get<NameTag>();
         
         ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
 
@@ -163,6 +164,11 @@ namespace y60 {
         }
     }
 
+    void
+    Image::preload() {
+        AC_DEBUG << "Image::preload '" << get<NameTag>() << "' id=" << get<IdTag>();
+        ImageSourceTag::Plug::getValuePtr()->setDirty(); // force call to load()
+    }
 
     void
     Image::load() {

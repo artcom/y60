@@ -222,7 +222,7 @@ namespace y60 {
                         myImage->getRasterPtr()->pixels().begin());
                 CHECK_OGL_ERROR;
 
-                _myTexture->triggerUpload();
+                _myTexture->preload();
             }
         } else if (myTextureID > 0) {
             GLenum myTextureTarget = asGLTextureTarget(_myTexture->getType());
