@@ -37,7 +37,7 @@ namespace y60 {
             virtual void onResize(Event & theEvent);
 
             void setVideoMode(unsigned theTargetWidth=0, unsigned theTargetHeight=0,
-                              bool theFullscreen=false);
+                              bool theFullscreen=false, bool theInitializeCallFlag = false);
             void dumpSDLGLParams();
             void initDisplay();
 

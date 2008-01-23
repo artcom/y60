@@ -190,7 +190,7 @@ SDLWindow::onResize(Event & theEvent) {
 
 void
 SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
-                        bool theFullscreenFlag)
+                        bool theFullscreenFlag, bool theInitializeCallFlag)
 {
     DB(AC_TRACE << "setVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
             ", Fullscreen: " << theFullscreenFlag << ")");
@@ -272,7 +272,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             _myScene->clearShapes();
             _myScene->updateAllModified();
             _myScene->update(Scene::SHAPES); // updated in updateAllModified
-            _myScene->getTextureManager()->reloadTextures();
+            if (!theInitializeCallFlag) {
+                _myScene->getTextureManager()->reloadTextures();
+            }
         }
     }
     _myFullscreenFlag = theFullscreenFlag;
@@ -283,7 +285,7 @@ SDLWindow::initDisplay() {
     ensureSDLSubsystem();
     _myWindowInitFlag = true;
 
-    setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag);
+    setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag, true);
     setWindowTitle("Y60 Renderer");
 
     if (!_myFullscreenFlag) {
