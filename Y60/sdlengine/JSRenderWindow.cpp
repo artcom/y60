@@ -72,18 +72,29 @@ resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM_OPT("theFullscreenFlag", "If this flag is set to true, the video mode is set to fullscreen.", DOC_TYPE_INTEGER, false);
     DOC_END;
     ensureParamCount(argc, 2, 3);
+    unsigned myWidth;
+    unsigned myHeight;
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+    if ( ! convertFrom(cx, argv[0], myWidth) ||
+         ! convertFrom(cx, argv[1], myHeight))
+    {
+        JS_ReportError(cx, "Renderer::resize(): Argument one and two must be integers");
+        return JS_FALSE;
+    }
     if (argc == 2) {
-        unsigned myWidth;
-        unsigned myHeight;
-        if (!convertFrom(cx, argv[0], myWidth) || !convertFrom(cx, argv[1], myHeight)) {
-            JS_ReportError(cx, "Renderer::resize(): Argument one and two must be integers");
-            return JS_FALSE;
-        }
-        JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
         myObj.getNative().setVideoMode(myWidth, myHeight);
         return JS_TRUE;
-    } else { // argc == 3
-        return Method<NATIVE>::call(&NATIVE::setVideoMode,cx,obj,argc,argv,rval);
+    } else if (argc == 3) { // argc == 3
+        bool myFullscreenFlag;
+        if ( ! convertFrom(cx, argv[2], myFullscreenFlag)) {
+            JS_ReportError(cx, "Renderer::resize(): Argument three must be bool");
+            return JS_FALSE;
+        }
+        myObj.getNative().setVideoMode(myWidth, myHeight, myFullscreenFlag);
+        return JS_TRUE;
+    } else {
+        // KAPUTT    
+        return JS_FALSE;
     }
 }
 static JSBool
