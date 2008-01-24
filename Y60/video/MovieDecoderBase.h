@@ -48,7 +48,7 @@ namespace y60 {
 
             void initialize(Movie * theMovie);
             virtual std::string canDecode(const std::string & theUrl, 
-                    asl::ReadableStream * theStream = 0);
+                    asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
 
             /**
              *

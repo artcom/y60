@@ -60,18 +60,19 @@ namespace y60 {
      *
      **********************************************************************/
     std::string
-    StlImport::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        if (theStream) {
-
-            if (isBigEndian(*theStream) || isLittleEndian(*theStream)) {
-                return MIME_TYPE_STL;
+    StlImport::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource) {
+        if (theSource) {
+            asl::ReadableStream & theStream = theSource->getStream();
+            if (theStream) {
+                if (isBigEndian(theStream) || isLittleEndian(theStream)) {
+                    return MIME_TYPE_STL;
+                }
             }
-        } else {
-            if (asl::toLowerCase(asl::getExtension(theUrl)) == "stl") {
-                return MIME_TYPE_STL;
-            }
+            return "";
         }
-        return "";
+        if (asl::toLowerCase(asl::getExtension(theUrl)) == "stl") {
+            return MIME_TYPE_STL;
+        }
     }
 
     bool 
@@ -81,7 +82,8 @@ namespace y60 {
     }
     
     bool
-    StlImport::decodeScene(asl::ReadableStream & theSource, dom::DocumentPtr theScene) {
+    StlImport::decodeScene(asl::Ptr<asl::ReadableStreamHandle> theStreamHandle, dom::DocumentPtr theScene) {
+        asl::ReadableStream & theSource = theStreamHandle->getStream();
         _myStlShapes.clear();
         if (theSource.size() < StlCodec::HEADER_SIZE + StlCodec::NUM_FACET_SIZE) {
             throw ImportException(std::string("Unable to read stl header: "), PLUS_FILE_LINE);

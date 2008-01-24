@@ -437,6 +437,9 @@ namespace asl {
         operator bool() const {
             return _myInFile;
         }
+        const std::string & getName() const {
+            return _myFileName.toUTF8();
+        }
     private:
         mutable typename Base::size_type _myPosition;
         // _myFileName must be initialized before the stream
@@ -445,6 +448,29 @@ namespace asl {
         typename Base::size_type _mySize;
     };
     typedef ReadableArrangedFile<AC_DEFAULT_BYTE_ORDER> ReadableFile;
+
+    struct ReadableStreamHandle {
+        virtual ReadableStream & getStream() = 0;
+        virtual const std::string & getName() const = 0;
+        virtual ~ReadableStreamHandle() {}
+    };
+
+    struct AlwaysOpenReadableFileHandle : public ReadableStreamHandle {
+        AlwaysOpenReadableFileHandle(const std::string & theFileName) {
+            _myFile = asl::Ptr<ReadableFile>(new ReadableFile(theFileName));
+            _myFileName = theFileName;
+        } 
+        ReadableStream & getStream() {
+            return *_myFile;
+        }
+        const std::string & getName() const {
+            return _myFileName;
+        }
+    private:
+        AlwaysOpenReadableFileHandle() {}
+        asl::Ptr<ReadableFile> _myFile;
+        std::string _myFileName;
+    };
 
     class ReadableBlock;
 

@@ -125,11 +125,12 @@ namespace y60 {
              * @param thePackageManager PackageManager for the file theFilename
              * @param theNotifier progress callback interface
              * @param useSchema use a schema to decode?
+             * @param loadLazy load catalog and root, load children only on demand
              * @see DecoderManager
              */
             static asl::Ptr<Scene,dom::ThreadingModel> load(const std::string & theFilename, asl::PackageManagerPtr thePackageManager,
-                      const IProgressNotifierPtr & theNotifier = IProgressNotifierPtr(0),
-                      bool useSchema = true);
+                      const IProgressNotifierPtr & theNotifier,
+                      bool useSchema, bool loadLazy);
             /**
              * Imports the {B|X}60-File at theFilename of thePackageManager into the current Scene. It's
              * world node is inserted under theRoot.
@@ -147,11 +148,12 @@ namespace y60 {
              * @param theSource ReadableStream to read theFilename from
              * @param theFilename File to decode into the scene
              * @param useSchema use a schema to decode?
+             * @param loadLazy load catalog and root, load children only on demand
              * @see DecoderManager
              */
-            static asl::Ptr<Scene,dom::ThreadingModel> load(asl::ReadableStream * theSource, const std::string & theFilename,
-                      const IProgressNotifierPtr & theNotifier = IProgressNotifierPtr(0),
-                      bool useSchema = true);
+            static asl::Ptr<Scene,dom::ThreadingModel> load(asl::Ptr<asl::ReadableStreamHandle> theSource, const std::string & theFilename,
+                      const IProgressNotifierPtr & theNotifier,
+                      bool useSchema, bool loadLazy);
 
             /**
              * Creates the stub nodes for the current (empty) scene.
@@ -206,6 +208,13 @@ namespace y60 {
              *        it is saved in xml x60 format.
              */
             void save(const std::string & theFilename, bool theBinaryFlag = false);
+            void saveWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname, bool theBinaryFlag = true);
+
+            // no need to call these threee functions directly, but it does no harm
+            void saveBinaryWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname);
+            void saveAsText(const std::string & theFilename);
+            void saveBinary(const std::string & theFilename);
+ 
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex, bool theBinaryFlag = false);
 

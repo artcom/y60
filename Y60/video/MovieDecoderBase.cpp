@@ -28,7 +28,7 @@ namespace y60 {
     }
 
     std::string MovieDecoderBase::canDecode(const std::string & theUrl, 
-            asl::ReadableStream * theStream) 
+            asl::Ptr<asl::ReadableStreamHandle> theStream) 
     {
         return "";
     }

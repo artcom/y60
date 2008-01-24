@@ -110,8 +110,8 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
     }
     cerr << "Loading image : " << theSourceFile << endl;
     asl::Ptr<ImageLoader> myFrame(new ImageLoader(
-                    asl::Ptr<ReadableBlock>(new ConstMappedBlock(theSourceFile)),
-                    theSourceFile));
+                    asl::Ptr<asl::ReadableBlockHandle>(new asl::AnyReadableBlockHandle(asl::Ptr<ReadableBlock>(new asl::ConstMappedBlock(theSourceFile)), theSourceFile)), theSourceFile));
+
     if (theResizeMode != "none" ) {
         myFrame->ensurePowerOfTwo(theResizeMode);
     }

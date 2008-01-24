@@ -29,9 +29,11 @@ namespace y60 {
 
 class ISceneDecoder : public IDecoder {
     public:
-        virtual bool decodeScene(asl::ReadableStream &, 
-                dom::DocumentPtr theScene) = 0;
+        virtual bool decodeScene(asl::Ptr<asl::ReadableStreamHandle>, dom::DocumentPtr theScene) = 0;
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier) = 0;
+        virtual bool setLazy(bool) = 0;
+        virtual bool getLazy() const {return false;}
+        virtual bool addSource(asl::Ptr<asl::ReadableStreamHandle>) = 0;
 };
 
 }

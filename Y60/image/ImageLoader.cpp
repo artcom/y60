@@ -109,19 +109,22 @@ namespace y60 {
         // theFrontFileName + "|" + theRightFileName + "|" + theBackFileName + "|" + theLeftFileName + "|"
 		// + theTopFileName + "|" + theBottomFileName;
         vector<string> myFilenames = asl::splitString(theFilename, "|");
-        vector<asl::Ptr<ReadableBlock> > myBlocks;
+        vector<asl::Ptr<ReadableBlockHandle> > myBlocks;
 
         // Check if files exist
         for (unsigned i = 0; i < myFilenames.size(); ++i) {
-            asl::Ptr<ReadableBlock> myBlock;
+            asl::Ptr<ReadableBlockHandle> myBlock;
             if (thePackageManager) {
                 myBlock = thePackageManager->readFile(myFilenames[i]);
             }
+#if 1
+            // PM: This seems unreasonable, but need to watch out for compat problems
             // fall back to simply try to open the file
             //AC_DEBUG << myBlock << " filename='" << myFilenames[i] << "'";
             if (!myBlock && fileExists(myFilenames[i])) {
-                myBlock = asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFilenames[i]));
+                myBlock = asl::Ptr<asl::ReadableBlockHandle>(new asl::AnyReadableBlockHandle(asl::Ptr<asl::ReadableBlock>(new ConstMappedBlock(myFilenames[i])),myFilenames[i]));
             }
+#endif
             if (!myBlock) {
                 if (thePackageManager) {
                     throw ImageLoaderException(std::string("image file '") + myFilenames[i] + "' not found in " +
@@ -143,7 +146,7 @@ namespace y60 {
         }
     }
 
-    ImageLoader::ImageLoader(asl::Ptr<ReadableBlock> theInputData,
+    ImageLoader::ImageLoader(asl::Ptr<ReadableBlockHandle> theInputData,
             const std::string & theFileDescription,
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
@@ -169,17 +172,17 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadSingleImage(asl::Ptr<ReadableBlock> theImageBlock) {
+    ImageLoader::loadSingleImage(asl::Ptr<ReadableBlockHandle> theImageBlock) {
         I60Header myHeader;
-        theImageBlock->readData(myHeader, 0);
+        theImageBlock->getBlock().readData(myHeader, 0);
 
         if (myHeader.checkMagicNumber()) {
             loadI60File(theImageBlock);
         } else {
             try {
                 PLAnyPicDecoder myDecoder;
-                myDecoder.MakeBmpFromMemory(const_cast<unsigned char*>(theImageBlock->begin()),
-                        theImageBlock->size(), this);
+                myDecoder.MakeBmpFromMemory(const_cast<unsigned char*>(theImageBlock->getBlock().begin()),
+                        theImageBlock->getBlock().size(), this);
             } catch (const PLTextException & e) {
 #if 0
                 // create black image
@@ -200,7 +203,7 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadCubemap(std::vector<asl::Ptr<ReadableBlock> > & theBlocks, unsigned theDepth) {
+    ImageLoader::loadCubemap(std::vector<asl::Ptr<ReadableBlockHandle> > & theBlocks, unsigned theDepth) {
 
         for (unsigned i = 0; i < 6; ++i) {
             string myDescription = string("Face")+as_string(i)+"_"+_myFilename;
@@ -252,10 +255,10 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadI60File(asl::Ptr<ReadableBlock> theImageBlock) {
+    ImageLoader::loadI60File(asl::Ptr<ReadableBlockHandle> theImageBlock) {
         _myImageMatrix.makeIdentity();
         I60Header myHeader;
-        theImageBlock->readData(myHeader, 0);
+        theImageBlock->getBlock().readData(myHeader, 0);
 
         if (!myHeader.checkMagicNumber()) {
             throw ImageLoaderException(string("Image ") + _myFilename +
@@ -281,7 +284,7 @@ namespace y60 {
         //_myData = theImageBlock;
         _myRasterData = createRasterValue(_myEncoding, myWidthPowerOfTwo,
             myHeightPowerOfTwo * myHeader.layercount,
-            asl::ReadableBlockAdapter(theImageBlock->begin()+sizeof(I60Header), theImageBlock->end()));
+            asl::ReadableBlockAdapter(theImageBlock->getBlock().begin()+sizeof(I60Header), theImageBlock->getBlock().end()));
 
         // TODO: Add support for other compression formats
         SetBmpInfo(PLPoint(myWidthPowerOfTwo, myHeightPowerOfTwo * myHeader.layercount),

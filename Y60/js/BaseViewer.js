@@ -172,7 +172,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
        if (!theScene) {
            self.prepareScene(null, null, theSwitchNodeFlag, theImagesPreLoadFlag);
        } else {
-           var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
+           //var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
+           var myCanvas = theCanvas ? theCanvas : theScene.dom.find('/scene/canvases/canvas');
+            if (!myCanvas) {
+                Logger.fatal("No canvas found");
+            }
            self.prepareScene(theScene, myCanvas, theSwitchNodeFlag, theImagesPreLoadFlag);
        }
    }
@@ -239,12 +243,21 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var myViewport = theCanvasNode.childNode('viewport');
             _myLightManager.setupHeadlight(myViewport);
         }
-        _activeViewport = getDescendantByTagName(_myRenderWindow.canvas, 'viewport');
+        //_activeViewport = getDescendantByTagName(_myRenderWindow.canvas, 'viewport');
+        _activeViewport = _myRenderWindow.canvas.find('//viewport');
     }
 
     self.setCanvasByIndex = function(theIndex) {
-        var myCanvasRoot = getDescendantByTagName(_myRenderWindow.scene.dom, "canvases", true);
-        var myDefaultCamera = getDescendantByTagName(_myRenderWindow.scene.dom, "camera", true);
+        //var myCanvasRoot = getDescendantByTagName(_myRenderWindow.scene.dom, "canvases", true);
+        var myCanvasRoot = _myRenderWindow.scene.dom.find('/scene/canvases');
+        if (!myCanvasRoot) {
+            Logger.fatal("no canvas root");
+        }
+        //var myDefaultCamera = getDescendantByTagName(_myRenderWindow.scene.dom, "camera", true);
+        var myDefaultCamera = _myRenderWindow.scene.dom.find('/scene/worlds/world//camera');
+        if (!myDefaultCamera) {
+            Logger.fatal("no default camera");
+        }
         if (myCanvasRoot.childNodes.length > theIndex) {
             self.setCanvas(myCanvasRoot.childNodes[theIndex]);
         } else {
@@ -414,7 +427,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (mySwitchNode.nodeName == "body") {
                     Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
-                    var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
+                    //var myMaterialId = getDescendantByTagName(myShape, "primitives", true).firstChild.material; 
+                    var myMaterialId = myShape.find("//primitives").firstChild.material; 
                     myMaterial = mySwitchNode.getElementById(myMaterialId);
                     mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
                 } else {
@@ -720,7 +734,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) != -1) {
                     // Take the first xml-file as shader library
                     _myShaderLibrary = myArgument;
-                } else if (myArgument.search(/\.[xb]60$/) != -1 ||
+                } else if (myArgument.search(/\.[xbd]60$/) != -1 ||
                            myArgument.search(/\.st.$/) != -1 ||
                            myArgument.search(/\.x3d$/) != -1) {
                     _myModelName = myArgument;
@@ -814,7 +828,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.prepareScene = function (theScene, theCanvas, theSwitchNodeFlag, theImagesPreLoadFlag) {
         if (theScene) {
             // Cache main scene nodes for fast access
-            var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
+            //var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
+            var myWorlds    = theScene.dom.find("/scene/worlds");
             
             _myWorld        = theScene.world;
             _myMaterials    = theScene.materials;

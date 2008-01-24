@@ -80,7 +80,7 @@ class PackageManager {
             package names are stored just as you enter them by calling add.
             @returns the opened file as a asl::ReadableStream or null if not found.
         */
-        Ptr<ReadableStream> readStream(const std::string & theRelativePath,
+        Ptr<ReadableStreamHandle> readStream(const std::string & theRelativePath,
                                     const std::string & thePackageName = "");
         /// opens a file located at theRelativePath.
         /** Searches theRelativePath in either thePackageName or all packages.
@@ -91,7 +91,7 @@ class PackageManager {
             package names are stored just as you enter them by calling add.
             @returns the opened file as a asl::ReadableBlock or null if not found.
         */
-        Ptr<ReadableBlock> readFile(const std::string & theRelativePath,
+        Ptr<ReadableBlockHandle> readFile(const std::string & theRelativePath,
                                     const std::string & thePackageName = "");
 
         /// findFiles lists the files in theRelativePath.

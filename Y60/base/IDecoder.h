@@ -36,7 +36,7 @@ class IDecoder {
         * @param theStream should also be provided if possible, to check for magic numbers, etc.
         * @return the Mimetype of the decoder, or an empty string, if it cannot decode the file.
         */
-        virtual std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0) = 0;
+        virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0) ) = 0;
 };
 
 typedef asl::Ptr<IDecoder> IDecoderPtr;

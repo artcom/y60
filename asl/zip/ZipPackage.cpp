@@ -73,12 +73,12 @@ ZipPackage::findFile(const std::string & theRelativePath) const {
     return "";
 }
 
-Ptr<ReadableBlock>
+Ptr<ReadableBlockHandle>
 ZipPackage::getFile(const std::string & theRelativePath) {
     return _myZipReader.getFile(theRelativePath);
 }
 
-Ptr<ReadableStream>
+Ptr<ReadableStreamHandle>
 ZipPackage::getStream(const std::string & theRelativePath) {
     return _myZipReader.getFile(theRelativePath);
 }

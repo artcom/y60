@@ -51,12 +51,13 @@ namespace dom {
         int length() const;
         int size() const;
         void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts,unsigned long long theIncludeVersion) const;
-        asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDicts, bool thePatchFlag);
+        asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDicts, OpMode theLoadMode);
         int findIndex(const Node * theNode) const;
         NodePtr previousSibling(const Node * theNode);
         const NodePtr previousSibling(const Node * theNode) const;
         NodePtr nextSibling(const Node * theNode);
         const NodePtr nextSibling(const Node * theNode) const;
+        bool findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theIndex) const;
         
         virtual NodePtr removeItem(int i);
         virtual NodePtr append(NodePtr theNewNode);

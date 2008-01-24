@@ -241,7 +241,7 @@ ReadFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             JS_ReportError(cx, "readFile(): argument #1 must be a string (relative filename)");
             return JS_FALSE;
         }
-        asl::Ptr<ReadableBlock> myBlock;
+        asl::Ptr<ReadableBlockHandle> myBlock;
         if (argc == 1) {
             myBlock = JSApp::getPackageManager()->readFile(myFilename);
         } else {
@@ -252,7 +252,7 @@ ReadFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             myBlock = JSApp::getPackageManager()->readFile(myFilename, myPackage);
         }
         if (myBlock) {
-            string myContent(myBlock->strbegin(), myBlock->strend());
+            string myContent(myBlock->getBlock().strbegin(), myBlock->getBlock().strend());
             *rval = as_jsval(cx, myContent);
         } else {
             *rval = JSVAL_NULL;
@@ -546,7 +546,7 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         if (argc > 1) {
             convertFrom(cx, argv[1], myPackageName);
         }
-        asl::Ptr<asl::ReadableBlock> myReadableBlock;
+        asl::Ptr<asl::ReadableBlockHandle> myReadableBlock;
         if (argc == 1) {
             myReadableBlock = JSApp::getPackageManager()->readFile(myRelativePath);
         } else {
@@ -557,7 +557,7 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             // since we don't have a wrapped ReadableBlock,
             // we have to make a copy
             asl::Ptr<asl::Block> myBlock(new asl::Block);
-            *myBlock = *myReadableBlock;
+            *myBlock = myReadableBlock->getBlock();
             *rval = as_jsval(cx, myBlock, &(*myBlock) );
         } else {
             *rval = JSVAL_NULL;

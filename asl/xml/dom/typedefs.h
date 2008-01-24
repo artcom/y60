@@ -70,7 +70,8 @@ namespace dom {
 
     struct Dictionaries;
     typedef asl::Ptr<Dictionaries,ThreadingModel> DictionariesPtr;
-
+    
+    enum OpMode { IMMEDIATE, PATCH, LAZY};
     /* @} */
 } //Namespace dom
 

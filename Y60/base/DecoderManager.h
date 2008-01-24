@@ -55,7 +55,8 @@ class DecoderManager : public asl::Singleton<DecoderManager> {
         * @return The first decoder, that accapts the given url/stream.
         */
         template <class DECODERTYPE>
-        asl::Ptr<DECODERTYPE> findDecoder(const std::string & theUrl, asl::ReadableStream * theSource = 0) {
+        asl::Ptr<DECODERTYPE> findDecoder(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource = asl::Ptr<asl::ReadableStreamHandle>(0)) {
+            AC_TRACE << "checking decoders for url '"<< theUrl <<"', number of decoders = " << _myDecoders.size();
             for (int i = 0; i < _myDecoders.size(); ++i) {
                 AC_TRACE << "checking decoder #" << i;
                 asl::Ptr<DECODERTYPE> myDecoder = dynamic_cast_Ptr<DECODERTYPE>(_myDecoders[i]);
@@ -77,7 +78,7 @@ class DecoderManager : public asl::Singleton<DecoderManager> {
         * @return all decoders that accept the given url/stream.
         */
         template <class DECODERTYPE>
-        std::vector<asl::Ptr<DECODERTYPE> > findAllDecoders(const std::string & theUrl, asl::ReadableStream * theSource = 0) {
+        std::vector<asl::Ptr<DECODERTYPE> > findAllDecoders(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource = asl::Ptr<asl::ReadableStreamHandle>(0)) {
             std::vector<asl::Ptr<DECODERTYPE> > myCapableDecoders;
             for (int i = 0; i < _myDecoders.size(); ++i) {
                 AC_TRACE << "checking decoder #" << i;

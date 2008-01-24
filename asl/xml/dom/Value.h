@@ -16,6 +16,7 @@
 
 #include "typedefs.h"
 #include "Exceptions.h"
+#include "Dictionary.h"
 #include "Field.h"
 
 #include <asl/Block.h>
@@ -33,7 +34,7 @@
 #include <map>
 #include <typeinfo>
 
-#define DB(x) x
+#define DB(x) // x
 
 /**
 This file provides the facilities to box all C++ Types into a hierarchy of "Value"-objects with a common
@@ -499,6 +500,53 @@ namespace dom {
                                 // currently only IDValue makes use of it
     };
 
+    struct UniqueId {
+        friend class Node;
+        friend std::ostream & operator<<(std::ostream& os, const UniqueId & uid);
+        
+        UniqueId() : _myCount(_myCounter++), _ptrValue((ptrdiff_t)this)
+        { }
+        UniqueId(const UniqueId & theID) : _myCount(theID._myCount), _ptrValue(theID._ptrValue)
+        { }
+        UniqueId & operator=(const UniqueId & theOther) {
+            _ptrValue = theOther._ptrValue;
+            _myCount = theOther._myCount;
+        }
+        UniqueId(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE & thePos) {
+            thePos = theSource.readUnsigned64(_ptrValue, thePos);
+            thePos = theSource.readUnsigned32(_myCount, thePos);
+        }
+        void append(asl::WriteableStream & theDest) const {
+            theDest.appendUnsigned64(_ptrValue);
+            theDest.appendUnsigned32(_myCount);
+        }
+        bool operator==(const UniqueId & theOther) const {
+            return (_ptrValue == theOther._ptrValue) && (_myCount == theOther._myCount);
+        }
+        bool operator!=(const UniqueId & theOther) const {
+            return (_ptrValue != theOther._ptrValue) || (_myCount != theOther._myCount);
+        }
+        bool operator<(const UniqueId & theOther) const {
+            return (_ptrValue == theOther._ptrValue) ? (_myCount < theOther._myCount) : (_ptrValue < theOther._ptrValue);
+        }
+     private:
+        void set(const UniqueId & theOther) {
+            _ptrValue = theOther._ptrValue;
+            _myCount = theOther._myCount;
+#ifdef KEEP_COUNT_SMALL_FOR_DEBUGGING
+            if (_myCount > _myCounter) {
+                _myCounter = _myCount;
+            }
+#endif
+        }
+        asl::Unsigned64 _ptrValue;
+        asl::Unsigned32 _myCount;
+        
+        static asl::Unsigned32 _myCounter;
+    };
+
+    std::ostream& operator<<(std::ostream& os, const UniqueId & uid);
+
     class NodeOffsetCatalog;
 
     // Registry that provides fast getElementById access on all attributes that are defined as ID in xml-schema
@@ -519,8 +567,34 @@ namespace dom {
             }
             return &myMap->second;
         }
-    private:
+        bool hasOffsetCatalog() const {
+            return _myOffsets;
+        }
+        NodeOffsetCatalog & getOffsetCatalog();
+        const NodeOffsetCatalog & getOffsetCatalog() const;
+        void clearOffsetCatalog() {
+            _myOffsets = asl::Ptr<NodeOffsetCatalog>(0);
+        }
+        void setOffsetCatalog(asl::Ptr<NodeOffsetCatalog> theOffsets) {
+            _myOffsets = theOffsets;
+        }
+        void setDictionaries(DictionariesPtr theDicts) {
+            _myDicts = theDicts;
+        }
+        DictionariesPtr getDictionaries() {
+            return _myDicts;
+        }
+        void setStorage(asl::Ptr<asl::ReadableStreamHandle> theStorage) {
+            _myStorage = theStorage;
+        }
+        asl::Ptr<asl::ReadableStreamHandle> getStorage() {
+            return _myStorage;
+        }
+     private:
         IDMaps _myIDMaps;
+        mutable asl::Ptr<NodeOffsetCatalog> _myOffsets;
+        mutable DictionariesPtr _myDicts;
+        mutable asl::Ptr<asl::ReadableStreamHandle> _myStorage;
     };
 
     // collects node offsets during serialization to provide fast random access by id into binarized doms (.b60 files)
@@ -528,11 +602,14 @@ namespace dom {
         public:
             typedef std::map<DOMString, asl::Unsigned64> IDMap;
             typedef std::map<DOMString, IDMap> IDMaps;
-            enum { CatalogMagic = 0xb60ca1a1, CatalogEntriesMagic = 0xb60eca1a };
+            typedef std::map<UniqueId, asl::AC_SIZE_TYPE> UIDMap;
+            enum { CatalogMagic = 0xb60ca1a1, CatalogEntriesMagic = 0xb60eca1a, UIDCatalogMagic = 0xb60ca1a2, CatalogEndMagic = 0xe60cafee };
+            enum { InvalidIndex = asl::AC_SIZE_TYPE(-1) };
 
         public:
             NodeOffsetCatalog() {}
-            NodeOffsetCatalog(const NodeIDRegistry & theRegistry);
+            NodeOffsetCatalog(const Node & theRootNode);
+            void extractFrom(const Node & theRootNode);
 
             void binarize(asl::WriteableStream & theDest) const;
 
@@ -547,8 +624,54 @@ namespace dom {
                 }
                 return &myMap->second;
             }
+            asl::AC_SIZE_TYPE enterUID(const UniqueId & theUID, asl::Unsigned64 theOffset, asl::Unsigned64 theEndOffset, asl::AC_SIZE_TYPE theParentIndex) {
+                    _myParentIndex.push_back(theParentIndex);
+                    asl::AC_SIZE_TYPE myIndex = _myNodeOffsets.size();
+                    _myNodeOffsets.push_back(theOffset);
+                    _myNodeEndOffsets.push_back(theEndOffset);
+                    return myIndex;
+            }
+            void debug() {
+                for (int i = 0; i < _myParentIndex.size();++i) {
+                    AC_PRINT<<"debug:" <<" theOffset="<<_myNodeOffsets[i]<<", theEndOffset="<<_myNodeEndOffsets[i]<<", theParentIndex="<<_myParentIndex[i];
+                }
+            }
+            asl::Unsigned64 getNodeOffset(asl::AC_SIZE_TYPE theIndex) const {
+                return _myNodeOffsets[theIndex];
+            }
+            asl::Unsigned64 getNodeEndOffset(asl::AC_SIZE_TYPE theIndex) const {
+                return _myNodeEndOffsets[theIndex];
+            }
+            asl::AC_SIZE_TYPE getParentIndex(asl::AC_SIZE_TYPE theIndex) const {
+                return _myParentIndex[theIndex];
+            }
+            bool findNodeOffset(asl::Unsigned64 theOffset, asl::AC_SIZE_TYPE & theIndex) const {
+                std::vector<asl::Unsigned64>::const_iterator myIndexIt = 
+                    std::lower_bound(_myNodeOffsets.begin(), _myNodeOffsets.end(), theOffset);
+                if (myIndexIt != _myNodeOffsets.end() && !(theOffset < *myIndexIt)) {
+                    theIndex = myIndexIt - _myNodeOffsets.begin();
+                    return true; 
+                }
+                return false;
+            }
+
+            void clear() {
+                _myIDMaps.clear();
+                _myNodeOffsets.clear();
+                _myNodeEndOffsets.clear();
+                _myParentIndex.clear();
+            }
+            asl::AC_SIZE_TYPE size() const {
+                if (_myNodeOffsets.size() == _myNodeEndOffsets.size() && _myNodeOffsets.size() == _myParentIndex.size()) {
+                    return _myNodeOffsets.size();
+                }
+                throw CatalogCorrupted(JUST_FILE_LINE);
+            }
         private:
             IDMaps _myIDMaps;
+            std::vector<asl::Unsigned64> _myNodeOffsets;
+            std::vector<asl::Unsigned64> _myNodeEndOffsets;
+            std::vector<asl::AC_SIZE_TYPE> _myParentIndex;
     };
     
     // Registrar that provides fast getElementById access on all attributes that are defined as ID in xml-schema

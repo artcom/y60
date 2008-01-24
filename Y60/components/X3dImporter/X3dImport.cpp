@@ -238,31 +238,35 @@ namespace y60 {
         _myProgressNotifier = theNotifier;
         return true;
     }
+
     std::string
-    X3dImport::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        if (theStream) {
-            static const std::string myExampleHeader =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
-<!DOCTYPE X3D PUBLIC \"ISO//Web3D//DTD X3D 3.0//EN\" \"http://www.web3d.org/specifications/x3d-3.0.dtd\">\
-<X3D profile=\"Immersive\">";
+    X3dImport::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource) {
+        if (theSource) {
+            asl::ReadableStream & theStream = theSource->getStream();
+            if (theStream) {
+                static const std::string myExampleHeader =
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
+                    <!DOCTYPE X3D PUBLIC \"ISO//Web3D//DTD X3D 3.0//EN\" \"http://www.web3d.org/specifications/x3d-3.0.dtd\">\
+                    <X3D profile=\"Immersive\">";
 
-            std::string myXML;
-            //lets say some exotic but valid X3D header wont be longer than twice myExampleHeader...
-            theStream->readString(myXML, 2*myExampleHeader.size(), 0);
-            if (myXML.find("<X3D") != std::string::npos) {
-                return MIME_TYPE_X3D;
+                std::string myXML;
+                //lets say some exotic but valid X3D header wont be longer than twice myExampleHeader...
+                theStream.readString(myXML, 2*myExampleHeader.size(), 0);
+                if (myXML.find("<X3D") != std::string::npos) {
+                    return MIME_TYPE_X3D;
+                }
             }
-        } else {
-            if (asl::toLowerCase(asl::getExtension(theUrl)) == "x3d") {
-                return MIME_TYPE_X3D;
-            }
+            return "";
         }
-
+        if (asl::toLowerCase(asl::getExtension(theUrl)) == "x3d") {
+            return MIME_TYPE_X3D;
+        }
         return "";
     }
 
     bool
-    X3dImport::decodeScene(asl::ReadableStream & theSource, dom::DocumentPtr theScene) {
+    X3dImport::decodeScene(asl::Ptr<asl::ReadableStreamHandle> theStreamHandle, dom::DocumentPtr theScene) {
+        asl::ReadableStream & theSource = theStreamHandle->getStream();
         asl::Time decodeStart;
 
         if (_myProgressNotifier) {

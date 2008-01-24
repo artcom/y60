@@ -51,41 +51,41 @@ class PackageManagerUnitTest : public UnitTest {
 #endif
 
             {
-                asl::Ptr<ReadableBlock> myFile = myPackageManager.readFile("not there");
+                asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("not there");
                 ENSURE(!myFile);
                 string myFilename = myPackageManager.searchFile("not there");
                 ENSURE(myFilename.empty());
             }
             {
-                asl::Ptr<ReadableBlock> myFile = myPackageManager.readFile("testfiles/test.zip");
+                asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("testfiles/test.zip");
                 ENSURE(myFile);
                 string myFilename = myPackageManager.searchFile("testfiles/test.zip");
                 ENSURE(myFilename == "../../testfiles/test.zip");
             }
             {
-                asl::Ptr<ReadableBlock> myFile = myPackageManager.readFile("test.zip");
+                asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("test.zip");
                 ENSURE(myFile);
                 string myFilename = myPackageManager.searchFile("test.zip");
                 ENSURE(myFilename == "../../testfiles/test.zip");
             }
             {
-                asl::Ptr<ReadableBlock> myFile = myPackageManager.readFile("File One.txt");
+                asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("File One.txt");
                 ENSURE(myFile);
                 string myFilename = myPackageManager.searchFile("File One.txt");
                 ENSURE(myFilename == "../../testfiles/test.zip/File One.txt");
             }
             {
-                asl::Ptr<ReadableBlock> myFile;
+                asl::Ptr<ReadableBlockHandle> myFile;
                 myFile = myPackageManager.readFile("File One.txt","../../testfiles/test.zip");
                 ENSURE(myFile);
                 string myExpectedString = "Hello World One!";
                 string myTestString;
-                myFile->readString(myTestString, myExpectedString.size(),0);
+                myFile->getBlock().readString(myTestString, myExpectedString.size(),0);
                 DPRINT(myTestString);
                 ENSURE(myExpectedString == myTestString);
             }
             {                
-                asl::Ptr<ReadableBlock> myFile = myPackageManager.readFile("File One.txt","test.zip");
+                asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("File One.txt","test.zip");
                 ENSURE( ! myFile);
             }
             { 

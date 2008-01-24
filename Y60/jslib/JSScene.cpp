@@ -443,10 +443,11 @@ JSScene::Functions() {
         {"collectGarbage",        collectGarbage,      0},
         {"bodyVolume",            bodyVolume,          1},
         {"save",                  save,                2},
+        {"saveWithCatalog",       saveWithCatalog,     2},
         {"setup",                 setup,               0},
         {"getWorldSize",          getWorldSize,        1},
         {"loadMovieFrame",        loadMovieFrame,      1},
-        {"ensureMovieFramecount", ensureMovieFramecount,      1},
+        {"ensureMovieFramecount", ensureMovieFramecount,1},
         {"loadCaptureFrame",      loadCaptureFrame,    2},
         {0}
     };
@@ -610,6 +611,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     DOC_BEGIN("Creates a scene from the given file or an empty scene if no file is given.");
     DOC_RESET;
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("loadLazy", "load only catalog and root node, children only on demand", DOC_TYPE_BOOLEAN,"");
     DOC_RESET;
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_PARAM("theTarget", "Target for ProgressCallback", DOC_TYPE_STRING);
@@ -641,14 +643,17 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
             if (argc >= 1) {
                 std::string myFilename = as_string(cx, argv[0]);
+                bool lazyFlag = false;
+                if (argc == 2) {
+                    convertFrom(cx, argv[0], lazyFlag);
+                }
 
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
                 AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from "
-                        << getDirectoryPart(myFilename);
+                        << getDirectoryPart(myFilename)<<", lazy="<<lazyFlag;
                 myPackageManager->add(asl::getDirectoryPart(myFilename));
-                //myNewPtr->load(getFilenamePart(myFilename), myPackageManager, myCallback);
                 myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager,
-                            myCallback);
+                            myCallback, true, lazyFlag);
             }
 
         }
@@ -703,6 +708,17 @@ JSScene::save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_END;
     ensureParamCount(argc, 1, 2);
     return Method<JSScene::NATIVE>::call(&JSScene::NATIVE::save,cx,obj,argc,argv,rval);
+}
+
+JSBool
+JSScene::saveWithCatalog(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Saves the scene to a file.");
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theCatalogFilenname", "", DOC_TYPE_STRING);
+    DOC_PARAM("theBinaryFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    ensureParamCount(argc, 3, 3);
+    return Method<JSScene::NATIVE>::call(&JSScene::NATIVE::saveWithCatalog,cx,obj,argc,argv,rval);
 }
 
 } // namespace

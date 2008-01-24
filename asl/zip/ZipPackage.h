@@ -35,8 +35,8 @@ class ZipPackage : public IPackage {
         const std::string & getPath() const { return _myZipFilename; };
         FileList getFileList(const std::string & theSubDir = "", bool theRecurseFlag = false);
         std::string findFile(const std::string & theRelativePath) const;
-        Ptr<ReadableBlock> getFile(const std::string & theRelativePath);
-        Ptr<ReadableStream> getStream(const std::string & theRelativePath);
+        Ptr<ReadableBlockHandle> getFile(const std::string & theRelativePath);
+        Ptr<ReadableStreamHandle> getStream(const std::string & theRelativePath);
 
     private:
         ZipReader _myZipReader;

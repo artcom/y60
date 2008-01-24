@@ -27,15 +27,15 @@ using namespace asl;
 
 namespace y60 {
     std::string
-    Y60Decoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    Y60Decoder::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
         if (theStream) {
             std::string myXML;
             // we read the first 100 bytes of the stream. If they contain <scene>, we
             // assume this to be an x60.
-            theStream->readString(myXML, 100, 0);
-            if (myXML.find("<scene") != std::string::npos) {
+            theStream->getStream().readString(myXML, 100, 0);
+            if (myXML.find("<scene") != std::string::npos) { //TODO: smells cheesy
                 return MIME_TYPE_X60;
-            } else if (myXML.find(std::string(1, char(5)) + "scene") != std::string::npos) {
+            } else if (myXML.find(std::string(1, char(5)) + "scene") != std::string::npos) { //TODO: smells cheesy
                 return MIME_TYPE_B60;
             }
         } else {
@@ -45,7 +45,10 @@ namespace y60 {
             if (asl::toLowerCase(asl::getExtension(theUrl)) == "b60") {
                 return MIME_TYPE_B60;
             }
-        }
+            if (asl::toLowerCase(asl::getExtension(theUrl)) == "d60") {
+                return MIME_TYPE_D60;
+            }
+       }
         return "";
     }
 
@@ -53,17 +56,30 @@ namespace y60 {
     Y60Decoder::setProgressNotifier(IProgressNotifierPtr theNotifier) {
         return false;
     }
+    bool 
+    Y60Decoder::setLazy(bool theFlag) {
+        _myLazyMode = theFlag;
+    }
 
     bool 
-    Y60Decoder::decodeScene(asl::ReadableStream & theStream, dom::DocumentPtr theDocument) {
+    Y60Decoder::addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
+        _mySources.push_back(theSource);
+    }
+ 
+    bool 
+    Y60Decoder::decodeScene(asl::Ptr<asl::ReadableStreamHandle> theSource, dom::DocumentPtr theDocument) {
+        AC_DEBUG << "  Y60Decoder::decodeScene: theSource = '" << theSource->getName() << "'";
         asl::Time loadStart;
         asl::Time parseStart;
         bool myBinaryFlag = true;
-        if (canDecode("", &theStream) == MIME_TYPE_X60) {
+        asl::ReadableStream & theStream = theSource->getStream();
+        if (canDecode("", theSource) == MIME_TYPE_X60) {
             myBinaryFlag = false;
         }
 
         unsigned long myFileSize = 0;
+        unsigned long myNodeCount = 0;
+        
         if (myBinaryFlag) {
             myFileSize = theStream.size();
             double myLoadTime = asl::Time() - loadStart;
@@ -73,8 +89,13 @@ namespace y60 {
                 AC_INFO << "  Readable Stream size: " << myFileSize << " bytes ";
             }
             parseStart.setNow();
-            theDocument->debinarize(theStream);
-
+            if (getLazy()) {
+                theDocument->debinarizeLazy(theSource);
+                myNodeCount = 1; // TODO: get node count from catalog
+            } else {
+                theDocument->debinarize(theStream);
+                myNodeCount = countNodes(*theDocument);
+            }
         } else {
             std::string myXMLFile;
             theStream.readString(myXMLFile, theStream.size(), 0);
@@ -88,8 +109,8 @@ namespace y60 {
             if (!theDocument) {
                 throw Y60DecodeException("### ERROR while parsing scene file", PLUS_FILE_LINE);
             }
-    
-            removeComments(dom::NodePtr(theDocument));
+            myNodeCount = countNodes(*theDocument);
+            removeComments(dom::NodePtr(theDocument)); // PM: Why is this necessary?
         }
 
         asl::Time processingEnd;
@@ -97,7 +118,7 @@ namespace y60 {
         double myProcessingTime = processingEnd - loadStart;
 
         AC_INFO<< "  Parse time: " << myParseTime << " sec, " << long(myFileSize/myParseTime/1024) << " kb/sec";
-        unsigned long myNodeCount = countNodes(*theDocument);
+        
         AC_INFO << "  Number of XML-Nodes: " << myNodeCount << ", "<< long(myNodeCount/myParseTime)
             << " nodes/sec, " << long(myFileSize/myNodeCount)<<" bytes/node";
         AC_INFO << "  Total XML processing time: " << myProcessingTime << " sec, "

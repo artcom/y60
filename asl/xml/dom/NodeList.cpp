@@ -93,6 +93,18 @@ int dom::NodeList::findIndex(const Node * theNode) const {
 	return -1;
 };
 
+bool
+dom::NodeList::findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theIndex) const {
+	for (int i=0; i < length();++i) {
+        AC_TRACE << "NodeList::findByOffset i = "<<i<<", savepos = "<<item(i)->getSavePosition();
+		if (item(i)->getSavePosition() == myOffset) {
+            theIndex = i;
+			return true;
+		}
+	}
+	return false;
+};
+
 NodePtr
 dom::NodeList::nextSibling(const Node * theNode) {
 	int myIndex = findIndex(theNode);
@@ -164,7 +176,7 @@ void
 dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, unsigned long long theIncludeVersion) const {
 	theDest.appendUnsigned(size());
 	for (int i = 0; i < size();++i) {
-		_myNodes[i]->binarize(theDest, &theDict, theIncludeVersion);
+		_myNodes[i]->binarize(theDest, theDict, theIncludeVersion);
 	}
 }
 
@@ -175,19 +187,19 @@ dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, 
 #endif
 
 asl::AC_SIZE_TYPE 
-dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, bool thePatchFlag) {
+dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, OpMode theLoadMode) {
     DB(AC_TRACE << "dom::NodeList::debinarize theSource.size() = " << theSource.size() << ", thePos = " << thePos << endl);
     asl::AC_SIZE_TYPE mySize;
 	thePos = theSource.readUnsigned(mySize,thePos);
     DB(AC_TRACE << "dom::NodeList::debinarize count = " << mySize << endl);
-    if (!thePatchFlag) {
+    if (theLoadMode != PATCH) {
 	    for (asl::AC_SIZE_TYPE n=0; n < mySize; ++n) {
 		    NodePtr newNode(new Node);
             if (_myShell) {
  	            newNode->reparent(_myShell, _myShell);
             }
             bool myUnmodifiedProxyFlag = false;
-		    thePos = newNode->debinarize(theSource, thePos, &theDict, thePatchFlag, myUnmodifiedProxyFlag);
+		    thePos = newNode->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag);
             newNode->self(newNode);
 		    _myNodes.push_back(newNode);
             PS(++theDict._myPatchStat.newNodes);
@@ -201,7 +213,7 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
             bool myUnmodifiedProxyFlag = false;
             if (di < length()) {
                 // try to match existing node
-		        theNewPos = item(di)->debinarize(theSource, thePos, &theDict, thePatchFlag, myUnmodifiedProxyFlag); 
+		        theNewPos = item(di)->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag); 
             }
             if (theNewPos == thePos) {
                 // unique id did not match
@@ -215,7 +227,7 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
                     if (_myShell) {
                         newNode->reparent(_myShell, _myShell);
                     }
-                    thePos = newNode->debinarize(theSource, thePos, &theDict, false, myUnmodifiedProxyFlag);
+                    thePos = newNode->debinarize(theSource, thePos, theDict, IMMEDIATE, myUnmodifiedProxyFlag);
                     newNode->self(newNode);
                     if (di < length()) {
                         insert(di,newNode);

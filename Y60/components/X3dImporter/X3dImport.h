@@ -42,10 +42,23 @@ namespace y60 {
 
         ~X3dImport() { }
 
+      bool decodeScene(asl::Ptr<asl::ReadableStreamHandle> theSource, dom::DocumentPtr theScene);
+        //bool encodeScene(const dom::DocumentPtr theScene, asl::WriteableStream * theStream);
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier);
-        bool decodeScene(asl::ReadableStream & theSource,
-                dom::DocumentPtr theScene);
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource);
+        const char * ClassName() {
+            static const char * myClassName = "StlPlugIn";
+            return myClassName;
+        }
+        bool setLazy(bool lazy) {
+            if (lazy) {
+                AC_WARNING << "X3dImport::decodeScene: lazy loading not supported";
+            }
+            return false;
+        }
+        bool addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
+            AC_WARNING << "X3dImport::addSource: additional sources not supported";
+        }
     private:
         void processNode(const dom::NodePtr theNode);
 

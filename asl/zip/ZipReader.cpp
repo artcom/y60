@@ -104,12 +104,12 @@ ZipReader::readDirectory() {
     }
 }
 
-Ptr<ReadableBlock> 
+Ptr<ReadableBlockHandle> 
 ZipReader::getFile(int theFileIndex) {
     return getFile(_myDirectory[theFileIndex]);
 }
 
-Ptr<ReadableBlock> 
+Ptr<ReadableBlockHandle> 
 ZipReader::getFile(const std::string & theFilePath) {
     Path myPath(theFilePath, UTF8);
     for (int i = 0; i < _myDirectory.size(); ++i) {
@@ -119,10 +119,10 @@ ZipReader::getFile(const std::string & theFilePath) {
             return getFile(_myDirectory[i]);
         }
     }
-    return Ptr<ReadableBlock>(0);
+    return Ptr<ReadableBlockHandle>(0);
 }
 
-Ptr<ReadableBlock> 
+Ptr<ReadableBlockHandle> 
 ZipReader::getFile(const Entry & theEntry) {
     DB(AC_TRACE << "unzipping '" << theEntry.filename << "', size=" << theEntry.size << endl);
     unz_file_pos myFilePos;
@@ -132,6 +132,7 @@ ZipReader::getFile(const Entry & theEntry) {
     unzGoToFilePos(_myInputStream, &myFilePos);
     CHECK_UNZIP(unzOpenCurrentFilePassword(_myInputStream, NULL));
     asl::Ptr<Block> myBlock(new Block(theEntry.size));
+    asl::Ptr<ReadableBlockHandle> myHandle(new AnyReadableBlockHandle(myBlock, theEntry.filename.toUTF8()));
     size_t myTotalBytesRead =0;
     while (myTotalBytesRead < theEntry.size) {
         int myBytesRead = unzReadCurrentFile(_myInputStream, myBlock->begin()+myTotalBytesRead, 
@@ -143,7 +144,7 @@ ZipReader::getFile(const Entry & theEntry) {
         myTotalBytesRead += myBytesRead;
     }
     unzCloseCurrentFile(_myInputStream);
-    return myBlock;
+    return myHandle;
 }
 
 }

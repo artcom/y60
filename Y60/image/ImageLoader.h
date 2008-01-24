@@ -55,7 +55,7 @@ namespace y60 {
         //! Creates an empty bitmap.
         ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0));
         //! Creates and loads a bitmap from a block.
-        ImageLoader(asl::Ptr<asl::ReadableBlock> theInputBlock, 
+        ImageLoader(asl::Ptr<asl::ReadableBlockHandle> theInputBlock, 
                     const std::string & theFileDescription="",
                     const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0), 
                     unsigned theDepth = 1);
@@ -129,9 +129,9 @@ namespace y60 {
         //  virtual void initPointers ();
 
     private:
-        void loadSingleImage(asl::Ptr<asl::ReadableBlock> theImageBlock);
-        void loadCubemap(std::vector<asl::Ptr<asl::ReadableBlock> > & theBlocks, unsigned theDepth);
-        void loadI60File(asl::Ptr<asl::ReadableBlock> theImageBlock);
+        void loadSingleImage(asl::Ptr<asl::ReadableBlockHandle> theImageBlock);
+        void loadCubemap(std::vector<asl::Ptr<asl::ReadableBlockHandle> > & theBlocks, unsigned theDepth);
+        void loadI60File(asl::Ptr<asl::ReadableBlockHandle> theImageBlock);
         void updateLineArray();
 
         dom::ValuePtr                 _myRasterData;

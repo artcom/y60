@@ -15,13 +15,21 @@
 #include "Nodes.h"
 #include <asl/Logger.h>
 
-#define DB(x)  x
+#define DB(x) // x
 #define DB2(x) // x
 
 using namespace std;
 using namespace dom;
 using namespace asl;
 
+namespace dom {
+asl::Unsigned32 dom::UniqueId::_myCounter(0);
+
+std::ostream & operator<<(std::ostream& os, const UniqueId & uid) {
+    os << uid._myCount << "@" << uid._ptrValue;
+    return os;
+}
+}
 void
 StringValue::bumpVersion() {
     Node * myNode = getNodePtr();
@@ -83,7 +91,30 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
     return NodePtr(0);
 }
 
-NodeOffsetCatalog::NodeOffsetCatalog(const NodeIDRegistry & theRegistry) {
+NodeOffsetCatalog &
+NodeIDRegistry::getOffsetCatalog() {
+    if (!_myOffsets) {
+        _myOffsets = asl::Ptr<NodeOffsetCatalog>(new NodeOffsetCatalog);
+    }
+    return *_myOffsets;
+}
+
+const NodeOffsetCatalog &
+NodeIDRegistry::getOffsetCatalog() const {
+    if (!_myOffsets) {
+        _myOffsets = asl::Ptr<NodeOffsetCatalog>(new NodeOffsetCatalog);
+    }
+    return *_myOffsets;
+}
+
+NodeOffsetCatalog::NodeOffsetCatalog(const Node & theRootNode) {
+    extractFrom(theRootNode);
+}
+
+void
+NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
+    clear();
+    const NodeIDRegistry & theRegistry = *theRootNode.getIDRegistry();
     for (NodeIDRegistry::IDMaps::const_iterator it = theRegistry._myIDMaps.begin();
             it != theRegistry._myIDMaps.end(); ++it) {
         _myIDMaps[it->first] = IDMap();
@@ -94,8 +125,9 @@ NodeOffsetCatalog::NodeOffsetCatalog(const NodeIDRegistry & theRegistry) {
             myCatalog[mit->first] = mit->second->getSavePosition();
         }
     }
+    theRootNode.collectOffsets(*this);
 }
- 
+
 void
 NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
     theDest.appendUnsigned32(CatalogMagic);
@@ -111,7 +143,20 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
             theDest.appendUnsigned(mit->second);
         }
     }
-}
+    theDest.appendUnsigned32(UIDCatalogMagic);
+    binarizePODT(_myNodeOffsets, theDest);
+    binarizePODT(_myNodeEndOffsets, theDest);
+    binarizePODT(_myParentIndex, theDest);
+#if 0
+    theDest.appendUnsigned(_myUIDMap.size());
+    for (UIDMap::const_iterator mit = _myUIDMap.begin(); mit != _myUIDMap.end(); ++mit) 
+    {
+        mit->first.append(theDest);
+        theDest.appendUnsigned(mit->second);
+    }
+#endif
+    theDest.appendUnsigned32(CatalogEndMagic);
+ }
 
 asl::AC_SIZE_TYPE
 NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
@@ -158,6 +203,31 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
             myCatalog[myName] = myOffset;
         }
     }
+
+    asl::Unsigned32 myUIDCatalogMagic = 0;
+    thePos = theSource.readUnsigned32(myUIDCatalogMagic, thePos);
+    if (myUIDCatalogMagic != UIDCatalogMagic) {
+        throw FormatCorrupted("Bad magic reading UID Catalog",PLUS_FILE_LINE);
+    }
+    thePos = debinarizePODT(_myNodeOffsets, theSource, thePos);
+    thePos = debinarizePODT(_myNodeEndOffsets, theSource, thePos);
+    thePos = debinarizePODT(_myParentIndex, theSource, thePos);
+#if 0
+    asl::Unsigned64 myUIDCatalogSize;
+    thePos = theSource.readUnsigned(myUIDCatalogSize, thePos);
+    for (asl::Unsigned64 j = 0; j < myUIDCatalogSize; ++j) {
+        UniqueId myUID(theSource,thePos);
+        asl::Unsigned64 myOffset;
+        thePos = theSource.readUnsigned(myOffset, thePos);
+        _myUIDMap[myUID] = myOffset;
+    }
+#endif
+    asl::Unsigned32 myCatalogEndMagic = 0;
+    thePos = theSource.readUnsigned32(myCatalogEndMagic, thePos);
+    if (myCatalogEndMagic != CatalogEndMagic) {
+        throw FormatCorrupted("Bad magic reading catalog end",PLUS_FILE_LINE);
+    }
+    //debug();
     return thePos;
 }
 

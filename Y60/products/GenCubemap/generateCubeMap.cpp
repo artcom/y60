@@ -96,8 +96,8 @@ void createCubeMap(const std::string & theFace, PLBmp& theTargetBitmap, bool doS
     } else {
         throw asl::Exception(string("ERROR: No file specified for face ") + theFace );
     }
-    asl::Ptr<ImageLoader> myFace(new ImageLoader(asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFileName)),
-                myFileName));
+    asl::Ptr<ImageLoader> myFace(new ImageLoader(asl::Ptr<asl::ReadableBlockHandle>(new asl::AnyReadableBlockHandle(asl::Ptr<ReadableBlock>(new asl::ConstMappedBlock(myFileName)), myFileName)), myFileName));
+
     if (doScaling && theSize!=myFace->GetWidth()){
         cout << "Scaling image to size " << theSize << " x " << theSize << endl;
         myFace->ApplyFilter(PLFilterResizeBilinear(theSize,theSize));

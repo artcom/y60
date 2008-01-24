@@ -25,8 +25,8 @@
 
 #include <iostream>
 
-#define DB(x)  x
-#define DB2(x) x
+#define DB(x) // x
+#define DB2(x) // x
 
 using namespace std;
 using namespace dom;

@@ -778,6 +778,12 @@ class XmlCatalogUnitTest : public UnitTest {
                         "   <child id='c1' id2='xc1' attrib='value2'>"
                         "       <child id='gc0' id2='xgc0' attrib='value3'/>"
                         "       <child id='gc1' id2='xgc1' attrib='value4'/>"
+                        "       <child id='gc2' id2='xgc2' attrib='value5'>"
+                        "           <child id='ggc0' id2='xggc2' attrib='value6'/>"
+                        "           <child id='ggc1' id2='xggc3' attrib='value7'>"
+                        "               <child id='gggc0' id2='xgggc3' attrib='value8'/>"
+                        "           </child>"
+                        "       </child>"
                         "   </child>"
                         "</root>"
                         );
@@ -834,17 +840,59 @@ class XmlCatalogUnitTest : public UnitTest {
                     NodePtr myNewChild0 = myRoot->appendChild(NodePtr(new Element("child")));
                     NodePtr myNewChild1 = myRoot->appendChild(NodePtr(new Element("child")));
                     DPRINT(myIdDocument);
-                    Dictionaries myDictionaries;
+                    DictionariesPtr myDictionaries = DictionariesPtr(new Dictionaries) ;
                     NodeOffsetCatalog myCatalog;
                     asl::ConstMappedBlock myCatalogFile("cattest.c60");
-                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
+                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, *myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
                     SUCCESS("debinarized dictionaries & catalog from end of file");
-                    ENSURE(myNewChild0->loadElementById("c0","id",myFile, 0, myDictionaries, myCatalog));
+                    ENSURE(myNewChild0->loadElementById("c0","id",myFile, 0, *myDictionaries, myCatalog));
                     DPRINT(myIdDocument);
-                    ENSURE(myNewChild1->loadElementById("c1","id",myFile, 0, myDictionaries, myCatalog));
+                    ENSURE(myNewChild1->loadElementById("c1","id",myFile, 0, *myDictionaries, myCatalog));
                     DPRINT(myIdDocument);
                 }
                   
+                {
+                    DTITLE("Testing Lazy Loading");
+                    dom::Document myLazyIdDocument;
+                    myLazyIdDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
+                    dom::registerStandardTypes(*myLazyIdDocument.getValueFactory());
+                    myLazyIdDocument.addSchema(mySchema,"");
+                    SUCCESS("added Schema to myLazyIdDocument");
+                    DTITLE("Lazy loading original document");
+
+                    asl::Ptr<asl::ReadableStreamHandle> myFile(new asl::AlwaysOpenReadableFileHandle("cattest.d60"));
+                    myLazyIdDocument.debinarizeLazy(myFile);
+                    ENSURE(myLazyIdDocument);
+                    ENSURE(myLazyIdDocument.hasLazyChildren());
+                    ENSURE(myLazyIdDocument.firstChild());
+                    ENSURE(!myLazyIdDocument.hasLazyChildren());
+                    DPRINT(myLazyIdDocument);
+                }
+                {
+                    DTITLE("Testing Lazy Loading by ID");
+                    dom::Document myLazyIdDocument;
+                    myLazyIdDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
+                    dom::registerStandardTypes(*myLazyIdDocument.getValueFactory());
+                    myLazyIdDocument.addSchema(mySchema,"");
+                    SUCCESS("added Schema to myLazyIdDocument");
+                    DTITLE("Lazy loading original document");
+
+                    asl::Ptr<asl::ReadableStreamHandle> myFile(new asl::AlwaysOpenReadableFileHandle("cattest.d60"));
+                    myLazyIdDocument.debinarizeLazy(myFile);
+                    ENSURE(myLazyIdDocument);
+                    ENSURE(myLazyIdDocument.hasLazyChildren());
+                    
+                    NodePtr myRoot = myLazyIdDocument.getElementById("r0");
+                    ENSURE(myRoot); 
+                    NodePtr myChild0 = myLazyIdDocument.getElementById("c0");
+                    ENSURE(myChild0); 
+                    NodePtr myChild1 = myLazyIdDocument.getElementById("c1");
+                    ENSURE(myChild1); 
+                    NodePtr myChild8 = myLazyIdDocument.getElementById("gggc0");
+                    ENSURE(myChild8); 
+                    ENSURE(myChild8->getAttribute("id")->nodeValue() == "gggc0"); 
+                    DPRINT(myLazyIdDocument);
+                }
             }
             catch (dom::DomException & de) {
                 std::cerr << "#### fatal failure:" << de << std::endl;
@@ -1424,14 +1472,12 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-#if 1
+        addTest(new XmlCatalogUnitTest);
+#if 0
         addTest(new XmlDomUnitTest);
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
-        addTest(new XmlCatalogUnitTest);
-#endif
         addTest(new XmlPatchUnitTest);
-#if 1
         addTest(new XmlSchemaUnitTest); 
 #endif
      }

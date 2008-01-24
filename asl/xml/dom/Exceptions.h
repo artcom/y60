@@ -173,6 +173,14 @@ namespace dom {
     //
     DEFINE_EXCEPTION(ValueNotAllowed, asl::Exception);
 
+    DEFINE_EXCEPTION(NoOffsetCatalog, asl::Exception);
+    DEFINE_EXCEPTION(NoStorage, asl::Exception);
+    DEFINE_EXCEPTION(NoDictionaries, asl::Exception);
+    DEFINE_EXCEPTION(NoLazyChildren, asl::Exception);
+    DEFINE_EXCEPTION(InternalLoaderError, asl::Exception);
+    DEFINE_EXCEPTION(OffsetNotFound, asl::Exception);
+    DEFINE_EXCEPTION(CatalogCorrupted, asl::Exception);
+
     /* @} */
 } //Namespace dom
 

@@ -69,7 +69,7 @@ namespace y60 {
 
         void parseOptions(const std::string & theURL);
 
-        virtual std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0) {
+        virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0)) {
             return "";
         }
 

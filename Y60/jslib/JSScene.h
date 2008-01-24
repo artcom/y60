@@ -59,6 +59,9 @@ public:
 
     static JSBool
     save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+    
+    static JSBool
+    saveWithCatalog(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
     /*
     static JSObject *

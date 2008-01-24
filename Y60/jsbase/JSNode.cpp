@@ -519,12 +519,13 @@ parseFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 debinarizeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a binary stream from a file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "path to binary xml file", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theCatalogFilename", "path to index file ", DOC_TYPE_STRING,"");
     DOC_END;
 
     try {
-        if (argc != 1) {
-            JS_ReportError(cx,"JSNode::debinarizeFile() - Wrong number of parameters: %d, 1 expected", argc);
+        if ((argc != 1) && (argc !=2)) {
+            JS_ReportError(cx,"JSNode::debinarizeFile() - Wrong number of parameters: %d, 1 or 2 expected", argc);
             return JS_FALSE;
         }
 
@@ -540,12 +541,30 @@ debinarizeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
             return JS_FALSE;
         }
         myFilename = asl::expandEnvironment(myFilename);
-        ReadableFile mySource(myFilename);
-        if (!mySource) {
-            myNode->debinarize(mySource);
+
+        std::string myIndexFilename;
+        if (argc > 1) {
+            if(!convertFrom(cx, argv[1], myIndexFilename))  {
+                JS_ReportError(cx,"JSNode::debinarizeFile() - Could not convert second argument, string expected");
+                return JS_FALSE;
+            }
+            myIndexFilename = asl::expandEnvironment(myIndexFilename);
+            if (myIndexFilename == myFilename) {
+                asl::Ptr<asl::ReadableStreamHandle> myFile(new asl::AlwaysOpenReadableFileHandle(myFilename));
+                myNode->debinarizeLazy(myFile);
+            } else {
+                asl::Ptr<asl::ReadableStreamHandle> myFile(new asl::AlwaysOpenReadableFileHandle(myFilename));
+                asl::Ptr<asl::ReadableStreamHandle> myCatalogFile(new asl::AlwaysOpenReadableFileHandle(myIndexFilename));
+                myNode->debinarizeLazy(myFile, myCatalogFile);
+            }
         } else {
-            JS_ReportError(cx,"JSNode::debinarizeFile() - Could not read file");
-            return JS_FALSE;
+            ReadableFile mySource(myFilename);
+            if (!mySource) {
+                myNode->debinarize(mySource);
+            } else {
+                JS_ReportError(cx,"JSNode::debinarizeFile() - Could not read file");
+                return JS_FALSE;
+            }
         }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

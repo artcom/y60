@@ -51,10 +51,10 @@ class IPackage {
         virtual std::string findFile(const std::string & theRelativePath) const = 0;
 
         /// opens a stream to a contained file.
-        virtual Ptr<ReadableStream> getStream(const std::string & theRelativePath) = 0;
+        virtual Ptr<ReadableStreamHandle> getStream(const std::string & theRelativePath) = 0;
         
         /// get the contents of a contained file.
-        virtual Ptr<ReadableBlock> getFile(const std::string & theRelativePath) = 0;
+        virtual Ptr<ReadableBlockHandle> getFile(const std::string & theRelativePath) = 0;
 };
 
 typedef asl::Ptr<IPackage> IPackagePtr;

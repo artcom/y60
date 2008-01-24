@@ -44,9 +44,9 @@ class ZipReader {
         ZipReader(const char * theInputFileName);
         virtual ~ZipReader();
         const Directory & getDirectory() const;
-        Ptr<ReadableBlock> getFile(const Entry & theEntry);
-        Ptr<ReadableBlock> getFile(int theFileIndex);
-        Ptr<ReadableBlock> getFile(const std::string & theFilePath);
+        Ptr<ReadableBlockHandle> getFile(const Entry & theEntry);
+        Ptr<ReadableBlockHandle> getFile(int theFileIndex);
+        Ptr<ReadableBlockHandle> getFile(const std::string & theFilePath);
     private:
         ZipReader();
         ZipReader(const ZipReader &);

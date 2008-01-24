@@ -48,6 +48,38 @@ namespace dom {
 
     /*! \addtogroup aslxml */
     /* @{ */
+   /// loads dictionaries and catalog from a stream starting at thePos
+    inline
+    asl::AC_SIZE_TYPE
+    loadDictionariesAndCatalog(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
+            Dictionaries & theDictionaries,
+            NodeOffsetCatalog & theCatalog)
+    {
+        thePos = theDictionaries.debinarize(theSource, thePos);
+        thePos = theCatalog.debinarize(theSource, thePos);
+        asl::Unsigned64 mySize;
+        thePos = theSource.readUnsigned64(mySize, thePos);
+        return thePos; 
+    }
+
+    /// loads dictionaries and catalog from a block determining the position
+    /// by reading the last 8 bytes of the block first, expecting it to contain
+    /// the size of dictionaries and catalog 
+    inline
+    asl::AC_SIZE_TYPE
+    loadDictionariesAndCatalog(const asl::ReadableStream & theSource,
+            Dictionaries & theDictionaries,
+            NodeOffsetCatalog & theCatalog)
+    {
+        asl::Unsigned64 myDictCatSize = 0;
+        theSource.readUnsigned64(myDictCatSize, theSource.size() - sizeof(asl::Unsigned64));
+        asl::AC_SIZE_TYPE thePos =  theSource.size() - myDictCatSize;
+        thePos = theDictionaries.debinarize(theSource, thePos);
+        thePos = theCatalog.debinarize(theSource, thePos);
+        asl::Unsigned64 mySize;
+        thePos = theSource.readUnsigned64(mySize, thePos);
+        return thePos; 
+    }
 
     /**
     *
@@ -101,43 +133,6 @@ namespace dom {
 
     extern const char * NodeTypeName[16];
 
-
-    struct UniqueId {
-        friend class Node;
-        friend std::ostream& operator<<(std::ostream& os, const UniqueId & uid);
-        
-        UniqueId() : _myCount(_myCounter++), _ptrValue((ptrdiff_t)this)
-        { }
-        UniqueId(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE & thePos) {
-            thePos = theSource.readUnsigned64(_ptrValue, thePos);
-            thePos = theSource.readUnsigned32(_myCount, thePos);
-        }
-        void append(asl::WriteableStream & theDest) const {
-            theDest.appendUnsigned64(_ptrValue);
-            theDest.appendUnsigned32(_myCount);
-        }
-        bool operator==(const UniqueId & theOther) const {
-            return (_ptrValue == theOther._ptrValue) && (_myCount == theOther._myCount);
-        }
-        bool operator!=(const UniqueId & theOther) const {
-            return (_ptrValue != theOther._ptrValue) || (_myCount != theOther._myCount);
-        }
-    private:
-        void set(const UniqueId & theOther) {
-            _ptrValue = theOther._ptrValue;
-            _myCount = theOther._myCount;
-            _ptrValue = theOther._ptrValue;
-            if (_myCount > _myCounter) {
-                _myCounter = _myCount;
-            }
-        }
-        asl::Unsigned64 _ptrValue;
-        asl::Unsigned32 _myCount;
-        
-        static asl::Unsigned32 _myCounter;
-    };
-
-    std::ostream& operator<<(std::ostream& os, const UniqueId & uid);
 
     /** Base Class for all XML-Node Types, contains almost everything you use.
      *
@@ -233,21 +228,21 @@ namespace dom {
         //@{
         /// default constructor
         Node() : _myType(X_NO_NODE), _myParseCompletionPos(0), _myDocSize(0),
-                _myChildren(this),_myAttributes(this), _myParent(0), _myFacade(0), _myVersion(0) {}
+                _myChildrenList(this), _myAttributes(this), _myParent(0), _myFacade(0), _myVersion(0), _lazyChildren(false) {}
 
         /// create element node with attributes
         Node(const DOMString & name, const NamedNodeMap & attributes, Node * theParent)
             : _myType(ELEMENT_NODE), _myName(name), _myAttributes(attributes, ATTRIBUTE_NODE, this),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent),_myChildren(this),
-            _myFacade(0), _myVersion(0) {}
+            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
+            _myFacade(0), _myVersion(0), _lazyChildren(false) {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes
             */
         Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent)
             : _myType(type), _myName(name),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildren(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0)
+            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
+            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
         {
             nodeValue(value);
         }
@@ -257,8 +252,8 @@ namespace dom {
             */
         Node(NodeType type,const DOMString & name, const ValueBase & theValue, Node * theParent)
             : _myType(type), _myName(name), _myValue(theValue.clone(this)),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent),_myChildren(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0) {}
+            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent),_myChildrenList(this),
+            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false) {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes by supplying a special Value Type Ptr;
@@ -266,8 +261,8 @@ namespace dom {
             */
         Node(NodeType type,const DOMString & name, ValuePtr theValuePtr, Node * theParent)
             : _myType(type), _myName(name), _myValue(theValuePtr),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent),_myChildren(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0)
+            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
+            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
         {
             if (_myValue) {
                 _myValue->setNodePtr(this);
@@ -285,15 +280,15 @@ namespace dom {
         Node(const DOMString & xml, int pos,
             Node * parent, const Node * doctype, NodeType type = X_NO_NODE)
             : _myType(type), _myParseCompletionPos(0), _myDocSize(0),
-            _myParent(parent),_myChildren(this),_myAttributes(this),
-            _myFacade(0), _myVersion(0)
+            _myParent(parent),_myChildrenList(this),_myAttributes(this),
+            _myFacade(0), _myVersion(0), _lazyChildren(false)
         {
             parseNextNode(xml,pos,parent,doctype);
         }
 
         Node(const DOMString & xml)
             : _myType(X_NO_NODE), _myParseCompletionPos(0), _myDocSize(0),_myParent(0),
-            _myChildren(this), _myAttributes(this), _myFacade(0), _myVersion(0)
+            _myChildrenList(this), _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
         {
             parseAll(xml);
         }
@@ -366,7 +361,7 @@ namespace dom {
         void setVersion(asl::Unsigned64 theVersion) {
             _myVersion = theVersion;
             _myAttributes.setVersion(theVersion);
-            _myChildren.setVersion(theVersion);
+            getChildren().setVersion(theVersion);
         }
         const UniqueId & getUniqueId() const {
             return _myUniqueId;
@@ -557,7 +552,7 @@ namespace dom {
         */
         /*virtual*/ operator bool() const {
             return (nodeType()!=X_NO_NODE) && (_myParseCompletionPos == _myDocSize)
-                && (nodeType()!=DOCUMENT_NODE || _myChildren.size());
+                && (nodeType()!=DOCUMENT_NODE || hasLazyChildren() || getChildren().size());
         }
         /// returns the position past the last character processed Parse()
         /*virtual*/ int parsedUntil() const {
@@ -612,11 +607,11 @@ namespace dom {
         }
         /// returns what the name promises
         int childNodesLength() const {
-            return _myChildren.length();
+            return getChildren().length();
         }
         /// returns what the name promises
         /*virtual*/ bool hasChildNodes() const {
-            return _myChildren.length() != 0;
+            return getChildren().length() != 0;
         }
         /// returns true if theNode is the same Node
         bool isSameNode(const Node & theNode) const {
@@ -630,31 +625,31 @@ namespace dom {
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
         const NodePtr childNode(int i) const {
-            if (i < 0 || i >= _myChildren.size()) {
+            if (i < 0 || i >= getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
-            return _myChildren.item(i);
+            return getChildren().item(i);
         }
         /** @return a pointer to node's i'th child
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
         NodePtr childNode(int i)  {
-            if (i < 0 || i >=_myChildren.size()) {
+            if (i < 0 || i >=getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
-            return _myChildren.item(i);
+            return getChildren().item(i);
         }
         /// returns the number of children of this node with this name
         int childNodesLength(const DOMString & name) const {
-            return NamedNodeMap::countNodesNamed(name,_myChildren);
+            return NamedNodeMap::countNodesNamed(name,getChildren());
         }
         /** @return a read only pointer to node's i'th child
             of this node with this name or 0 if it does not exist
         */
         const NodePtr childNode(const DOMString & name, int n) const {
-            int i = NamedNodeMap::findNthNodeNamed(name,n,_myChildren);
-            if (i<_myChildren.size()) {
-                return _myChildren.item(i);
+            int i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
+            if (i<getChildren().size()) {
+                return getChildren().item(i);
             }
             return NodePtr(0);
         }
@@ -666,9 +661,9 @@ namespace dom {
             of this node with this name or 0 if it does not exist
         */
         NodePtr childNode(const DOMString & name, int n) {
-            int i = NamedNodeMap::findNthNodeNamed(name,n,_myChildren);
-            if (i<_myChildren.size()) {
-                return _myChildren.item(i);
+            int i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
+            if (i<getChildren().size()) {
+                return getChildren().item(i);
             }
             return NodePtr(0);
         }
@@ -677,10 +672,10 @@ namespace dom {
             return childNode(name,0);
         }
         NodeList & childNodes() {
-            return _myChildren;
+            return getChildren();
         }
         const NodeList & childNodes() const {
-            return _myChildren;
+            return getChildren();
         }
         Node * parentNode() {
             return _myParent;
@@ -724,26 +719,26 @@ namespace dom {
         const NodePtr previousSibling() const;
 
         NodePtr firstChild() {
-            if (_myChildren.size()) {
-                return _myChildren.item(0);
+            if (getChildren().size()) {
+                return getChildren().item(0);
             }
             return NodePtr(0);
         }
         const NodePtr firstChild() const {
-            if (_myChildren.size()) {
-                return _myChildren.item(0);
+            if (getChildren().size()) {
+                return getChildren().item(0);
             }
             return NodePtr(0);
         }
         const NodePtr lastChild() const {
-            if (_myChildren.size()) {
-                return _myChildren.item(_myChildren.size()-1);
+            if (getChildren().size()) {
+                return getChildren().item(getChildren().size()-1);
             }
             return NodePtr(0);
         }
         NodePtr lastChild() {
-            if (_myChildren.size()) {
-                return _myChildren.item(_myChildren.size()-1);
+            if (getChildren().size()) {
+                return getChildren().item(getChildren().size()-1);
             }
             return NodePtr(0);
         }
@@ -963,37 +958,42 @@ namespace dom {
             return _myAttributes;
         }
         //@}
-         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
+         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0, OpMode myMode = IMMEDIATE) {
             bool myUnmodifiedProxyFlag;
-            asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, 0, false, myUnmodifiedProxyFlag);
+            Dictionaries myDicts;
+            asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, myDicts, myMode, myUnmodifiedProxyFlag);
             setVersion(1);
             return myPos;
         }
-        DictionariesPtr binarize(asl::WriteableStream & theDest) const {
-            return binarize(theDest, 0, 0);
+        void binarize(asl::WriteableStream & theDest) const {
+            Dictionaries myDicts;
+            binarize(theDest, myDicts, 0);
+        }
+         void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts) const {
+            binarize(theDest, theDicts, 0);
         }
         // binarize and write an id/offset catalog for random node access
         // when theDataDest and theCatalogDest are the same stream, then
         // the catalog is appended to the data file
         // the last 8 Bytes are the size of the catalog including these 8 bytes
         // thus the catalog can be found by reading the last 8 bytes of the file
-        void binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCatalogDest) const {
-            DictionariesPtr myDicts = binarize(theDataDest, 0, 0);
-            asl::Unsigned64 myStartPos = theCatalogDest.getByteCounter();
-            myDicts->binarize(theCatalogDest);
-            NodeOffsetCatalog myCatalog(*getIDRegistry());
-            myCatalog.binarize(theCatalogDest);
-            asl::Unsigned64 myEndPos = theCatalogDest.getByteCounter();
-            theCatalogDest.appendUnsigned64(myEndPos - myStartPos + sizeof(asl::Unsigned64)); 
-        }
+        // function will binarize from the root node of the DOM even when called
+        // on a child to avoid partial catalogs
+        void binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCatalogDest) const;
+       
         // debinarize using an existing dictionary which is needed for random element access
-         asl::AC_SIZE_TYPE debinarize( Dictionaries & theDictionaries,
+        asl::AC_SIZE_TYPE debinarize(Dictionaries & theDictionaries,
                                        const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             
             bool myUnmodifiedProxyFlag;
-            asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, &theDictionaries, false, myUnmodifiedProxyFlag);
+            asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, theDictionaries, IMMEDIATE, myUnmodifiedProxyFlag);
             return myPos;
         }
+        /// debinarize lazy using an existing catalog appended to the source file
+        bool debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource);
+        /// debinarize lazy using an existing catalog from a separete catalog file
+        bool debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource, asl::Ptr<asl::ReadableStreamHandle> theCatalogSource);
+
         NodePtr loadElementById(const DOMString & theId, const DOMString & theIdAttribute,
                                 const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
                                 Dictionaries & theDictionaries,
@@ -1009,19 +1009,28 @@ namespace dom {
         }
           
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
-            binarize(thePatch, 0, theOldVersion + 1);
+            Dictionaries myDicts;
+            binarize(thePatch, myDicts, theOldVersion + 1);
         }
         /// return true if something has changed
         bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0) {
             bool myUnmodifiedProxyFlag = false;
-            debinarize(thePatch, thePos, 0, true, myUnmodifiedProxyFlag);
+            Dictionaries myDicts;
+            debinarize(thePatch, thePos, myDicts, PATCH, myUnmodifiedProxyFlag);
             return !myUnmodifiedProxyFlag;
         }
         virtual void freeCaches() const;
 
 protected:
-        asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries * theDict, bool thePatchFlag, bool & theUnmodifiedProxyFlag);
-        DictionariesPtr binarize(asl::WriteableStream & theDest, Dictionaries * theDict, asl::Unsigned64 theIncludeVersion) const;
+        NodePtr loadPathById(const DOMString & theId, const DOMString & theIdAttribute);
+        void collectOffsets(NodeOffsetCatalog & theCatalog, asl::AC_SIZE_TYPE theParentIndex = asl::AC_SIZE_TYPE(-1)) const {
+            theParentIndex = theCatalog.enterUID(_myUniqueId, _mySavePosition, _mySaveEndPosition, theParentIndex);
+            for (unsigned i = 0; i < getChildren().size(); ++i) {
+                getChildren()[i].collectOffsets(theCatalog, theParentIndex);
+            }
+        }
+        asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, OpMode theLoadMode, bool & theUnmodifiedProxyFlag);
+        void binarize(asl::WriteableStream & theDest, Dictionaries & theDict, asl::Unsigned64 theIncludeVersion) const;
 public:
         void addSchema(const DOMString & theSchemaString, const DOMString & theNSPrefix);
         void addSchema(const dom::Node & theSchemaDoc, const DOMString & theNSPrefix);
@@ -1247,18 +1256,49 @@ Dependent on node type allowed children are:<p>
         asl::Unsigned64 getSavePosition() const {
             return _mySavePosition;
         }
-      //@}
+        void storeSaveEndPosition(asl::Unsigned64 thePosition) const {
+            _mySaveEndPosition = thePosition;
+        }
+        asl::Unsigned64 getSaveEndPosition() const {
+            return _mySaveEndPosition;
+        }
+        void storeChildrenPosition(asl::Unsigned64 thePosition) const {
+            _myChildrenPosition = thePosition;
+        }
+        asl::Unsigned64 getChildrenPosition() const {
+            return _myChildrenPosition;
+        }
+        void loadChildren();
+        NodeList & getChildren() {
+            if (_lazyChildren) {
+                loadChildren();
+            }
+            return _myChildrenList;
+        }
+        const NodeList & getChildren() const {
+            if (_lazyChildren) {
+                const_cast<Node&>(*this).loadChildren();
+            }
+            return _myChildrenList;
+        }
+    public:
+        // main provided for debugging purposes
+        bool hasLazyChildren() const {
+            return _lazyChildren;
+        }
+       //@}
     private:
         void markPrecursorDependenciesOutdated();
 
         NodeType          _myType;
+        mutable bool      _lazyChildren;
         DOMString         _myName;
         Node *            _myParent;
         NodeWeakPtr       _mySelf;
         mutable NodeIDRegistryPtr _myIDRegistry;
         mutable NodeIDRefRegistryPtr _myIDRefRegistry;
         ValuePtr          _myValue;
-        NodeList          _myChildren; // entities when doctype
+        mutable NodeList  _myChildrenList; // entities when doctype
         TypedNamedNodeMap _myAttributes; // notations when doctype
         mutable asl::Unsigned32  _myParseCompletionPos;
         mutable asl::Unsigned32  _myDocSize;
@@ -1270,6 +1310,8 @@ Dependent on node type allowed children are:<p>
         asl::Unsigned64   _myVersion;
         UniqueId          _myUniqueId;
         mutable asl::Unsigned64   _mySavePosition;
+        mutable asl::Unsigned64   _myChildrenPosition;
+        mutable asl::Unsigned64   _mySaveEndPosition;
     public:
         static Node Prototype;
     };
@@ -1469,39 +1511,7 @@ Dependent on node type allowed children are:<p>
         return myNodeCount;
     }
 
-    /// loads dictionaries and catalog from a stream starting at thePos
-    inline
-    asl::AC_SIZE_TYPE
-    loadDictionariesAndCatalog(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos,
-            Dictionaries & theDictionaries,
-            NodeOffsetCatalog & theCatalog)
-    {
-        thePos = theDictionaries.debinarize(theSource, thePos);
-        thePos = theCatalog.debinarize(theSource, thePos);
-        asl::Unsigned64 mySize;
-        thePos = theSource.readUnsigned64(mySize, thePos);
-        return thePos; 
-    }
-
-    /// loads dictionaries and catalog from a block determining the position
-    /// by reading the last 8 bytes of the block first, expecting it to contain
-    /// the size of dictionaries and catalog 
-    inline
-    asl::AC_SIZE_TYPE
-    loadDictionariesAndCatalog(const asl::ReadableBlock & theSource,
-            Dictionaries & theDictionaries,
-            NodeOffsetCatalog & theCatalog)
-    {
-        asl::Unsigned64 myDictCatSize = 0;
-        theSource.readUnsigned64(myDictCatSize, theSource.size() - sizeof(asl::Unsigned64));
-        asl::AC_SIZE_TYPE thePos =  theSource.size() - myDictCatSize;
-        thePos = theDictionaries.debinarize(theSource, thePos);
-        thePos = theCatalog.debinarize(theSource, thePos);
-        asl::Unsigned64 mySize;
-        thePos = theSource.readUnsigned64(mySize, thePos);
-        return thePos; 
-    }
-
+ 
     /* @} */
 
 } //Namespace dom

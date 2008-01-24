@@ -153,6 +153,13 @@ namespace asl {
         virtual ~ReadableBlock() {}
     };
 
+    struct ReadableBlockHandle : public ReadableStreamHandle {
+        virtual ReadableStream & getStream() {
+            return getBlock();
+        }
+        virtual ReadableBlock & getBlock() = 0;
+    };
+
     template <class EXTERNAL_BYTE_ORDER, class SIZE_TYPE, class OFFSET_TYPE>
     WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> &
     WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>
@@ -550,6 +557,23 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     private:
         Chunk _myData;
     };
+
+   struct AnyReadableBlockHandle : public ReadableBlockHandle {
+        AnyReadableBlockHandle(asl::Ptr<ReadableBlock> theBlock, const std::string & theName="") 
+            : _myBlock(theBlock), _myName(theName) {}
+        
+        ReadableBlock & getBlock() {
+            return *_myBlock;;
+        }
+        const std::string & getName() const {
+            return _myName;
+        }
+    private:
+        AnyReadableBlockHandle() {}
+        asl::Ptr<ReadableBlock> _myBlock;
+        std::string _myName;
+    };
+    
 
     /**
         SizeBlock extends Block with a member getSizeField() which can

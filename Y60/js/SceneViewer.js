@@ -231,7 +231,11 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     self.getScene().save("saved_scene.b60", true);
                     print("Saved scene to: saved_scene.b60");
                     break;
-                case 'p':
+                case 'D':
+                    self.getScene().saveWithCatalog("saved_scene.d60", "saved_scene.d60", true);
+                    print("Saved scene and catalog to: saved_scene.d60");
+                    break;
+                 case 'p':
                     window.pause = !window.pause;
                     print("Pause: " + (window.pause ? "on" : "off"));
                     break;
@@ -460,14 +464,15 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         } else {
             var myModelname = self.getModelName();
             if (myModelname) {
-                myScene = new Scene(myModelname);
+                myScene = new Scene(myModelname, true);
             } else {
                 myScene = new Scene();
             }
             self.preprocessScene(myScene);
             myScene.setup();
         }
-        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        //var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        var myCanvas = myScene.dom.find("/scene/canvases/canvas");
         
         self.setScene(myScene, myCanvas, theSwitchNodeFlag, theImagesPreLoadFlag);
         renderer = window.getRenderer();

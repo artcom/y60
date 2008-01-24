@@ -68,33 +68,85 @@ namespace y60 {
     //////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Scene::save(const std::string & theFilename, bool theBinaryFlag) {
-        AC_INFO << "Saving scene file '" << theFilename << "' ... ";
-        asl::Time saveStart;
-        if (theBinaryFlag) {
+    Scene::saveBinary(const std::string & theFilename) {
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+        asl::Block theBlock;
+#else
+        asl::WriteableFile theBlock(theFilename);
+        if (!theBlock) {
+            throw IOError(std::string("Could map the new writable binary file '") + theFilename + "'", "Scene::saveBinary()");
+        }
+#endif
+        _mySceneDom->binarize(theBlock);
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+        if (!asl::writeFile(theFilename,theBlock)) {
+            throw IOError(std::string("Could not open or write binary file '") + theFilename + "'", "Scene::saveBinary()");
+        }
+#endif
+    }
+    void
+    Scene::saveAsText(const std::string & theFilename) {
+        std::ofstream myFile(theFilename.c_str());
+        if (!myFile) {
+            throw OpenFailed(std::string("Can not open file '") + theFilename + "' for writing", "Scene::saveAsText()");
+        }
+        myFile << *_mySceneDom;
+        if (!myFile) {
+            throw WriteFailed(std::string("Could not write text file '") + theFilename + "'", "Scene::saveAsText()");
+        }
+    }
+
+   void
+    Scene::saveBinaryWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname) {
+        if (theFilename == theCatalogFilenname) {
 #ifdef DONT_USE_MAPPED_BLOCK_IO
             asl::Block theBlock;
 #else
             asl::WriteableFile theBlock(theFilename);
             if (!theBlock) {
-                throw IOError(std::string("Could map the new writable binary file '") + theFilename + "'", "Scene::save()");
+                throw IOError(std::string("Could map the new writable binary file '") + theFilename + "'", "Scene::saveBinary()");
             }
 #endif
-            _mySceneDom->binarize(theBlock);
+            _mySceneDom->binarize(theBlock, theBlock);
 #ifdef DONT_USE_MAPPED_BLOCK_IO
             if (!asl::writeFile(theFilename,theBlock)) {
-                throw IOError(std::string("Could not open or write binary file '") + theFilename + "'", "Scene::save()");
+                throw IOError(std::string("Could not open or write binary file '") + theFilename + "'", "Scene::saveBinary()");
             }
 #endif
         } else {
-            std::ofstream myFile(theFilename.c_str());
-            if (!myFile) {
-                throw OpenFailed(std::string("Can not open file '") + theFilename + "' for writing", "Scene::save()");
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            asl::Block theBlock;
+            asl::Block theCatalogBlock;
+#else
+            asl::WriteableFile theBlock(theFilename);
+            if (!theBlock) {
+                throw IOError(std::string("Could map the new writable binary file '") + theFilename + "'", "Scene::saveBinary()");
             }
-           myFile << *_mySceneDom;
-            if (!myFile) {
-                throw WriteFailed(std::string("Could not write text file '") + theFilename + "'", "Scene::save()");
+            asl::WriteableFile theCatalogBlock(theCatalogFilenname);
+            if (!theCatalogBlock) {
+                throw IOError(std::string("Could map the new writable binary catalog file '") + theCatalogFilenname + "'", "Scene::saveBinary()");
             }
+#endif
+            _mySceneDom->binarize(theBlock, theCatalogBlock);
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            if (!asl::writeFile(theFilename,theBlock)) {
+                throw IOError(std::string("Could not open or write binary file '") + theFilename + "'", "Scene::saveBinary()");
+            }
+            if (!asl::writeFile(theFilename,theCatalogBlock)) {
+                throw IOError(std::string("Could not open or write binary catalog file '") + theCatalogFilenname + "'", "Scene::saveBinary()");
+            }
+#endif
+         }
+    }
+
+    void
+    Scene::save(const std::string & theFilename, bool theBinaryFlag) {
+        AC_INFO << "Saving scene file '" << theFilename << "' ... ";
+        asl::Time saveStart;
+        if (theBinaryFlag) {
+            saveBinary(theFilename);
+        } else {
+            saveAsText(theFilename);
         }
         asl::Time saveEnd;
         double mySaveTime = saveEnd - saveStart;
@@ -102,6 +154,23 @@ namespace y60 {
         AC_INFO << "Saved File Size is " << myFileSize << " bytes";
         AC_INFO << "Save time " << mySaveTime << " sec, " << long(myFileSize/mySaveTime/1024)<<" kb/sec";
     }
+
+    void
+    Scene::saveWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname, bool theBinaryFlag) {
+        AC_INFO << "Saving scene file with '" << theFilename << "' with catalog '"<<theCatalogFilenname<<"'... ";
+        asl::Time saveStart;
+        if (theBinaryFlag) {
+            saveBinaryWithCatalog(theFilename,theCatalogFilenname);
+        } else {
+            AC_ERROR << "non-binary saving with catalog not yet implemented";
+        }
+        asl::Time saveEnd;
+        double mySaveTime = saveEnd - saveStart;
+        unsigned long myFileSize = asl::getFileSize(theFilename);
+        AC_INFO << "Saved File Size is " << myFileSize << " bytes";
+        AC_INFO << "Save time " << mySaveTime << " sec, " << long(myFileSize/mySaveTime/1024)<<" kb/sec";
+    }
+
 
     void
     Scene::saveSchema(const std::string & theFilename, int theSchemaIndex, bool theBinaryFlag) {
@@ -162,18 +231,18 @@ namespace y60 {
     ScenePtr
     Scene::load(const std::string & theFilename, PackageManagerPtr thePackageManager,
             const IProgressNotifierPtr & theNotifier,
-            bool useSchema)
+            bool useSchema, bool loadLazy)
     {
         //_myTextureManager->setPackageManager(thePackageManager);
         if (theFilename.empty() || theFilename == "null") {
-            return load(0, "empty scene", theNotifier, useSchema);
+            return load(asl::Ptr<asl::ReadableStreamHandle>(0), "empty scene", theNotifier, useSchema, loadLazy);
         } else {
-            asl::Ptr<ReadableStream> mySource = thePackageManager->readStream(theFilename);
+            asl::Ptr<ReadableStreamHandle> mySource = thePackageManager->readStream(theFilename);
             if (!mySource) {
                 throw IOError(std::string("Can not open or read scene file '") + theFilename + "'", PLUS_FILE_LINE);
             }
             try {
-                return load(&(*mySource), theFilename, theNotifier, useSchema);
+                return load(mySource, theFilename, theNotifier, useSchema, loadLazy);
             } catch (asl::Exception & ex) {
                 ex.appendWhat(string("while opening '")+theFilename+"'");
                 throw ex;
@@ -183,23 +252,27 @@ namespace y60 {
     }
 
     ScenePtr
-    Scene::load(asl::ReadableStream * theSource, const std::string & theFilename,
+    Scene::load(asl::Ptr<asl::ReadableStreamHandle> theSource, const std::string & theFilename,
                const IProgressNotifierPtr & theNotifier,
-               bool useSchema)
+               bool useSchema, bool loadLazy)
     {
         asl::Time loadStart;
 
         dom::DocumentPtr mySceneDom(new Document());
         if (useSchema) {
-
             setupEmptyDocument(*mySceneDom, "");
+        }
+       
+        if (!DecoderManager::get().findDecoder<ISceneDecoder>("dummy.x60", asl::Ptr<asl::ReadableStreamHandle>(0))) {
+            DecoderManager::get().addDecoder(IDecoderPtr(new Y60Decoder()));
         }
 
         asl::Ptr<ISceneDecoder> myDecoder =
             DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, theSource);
         if (myDecoder) {
+            myDecoder->setLazy(loadLazy);
             myDecoder->setProgressNotifier(theNotifier);
-            myDecoder->decodeScene(*theSource, mySceneDom);
+            myDecoder->decodeScene(theSource, mySceneDom);
             myDecoder->setProgressNotifier(IProgressNotifierPtr(0));
         } else {
             throw SceneException(std::string("Unknown extension '") + getExtension(theFilename) + "'", PLUS_FILE_LINE);
@@ -1203,7 +1276,7 @@ namespace y60 {
         }
 
         // asl::Ptr<ReadableStream> mySource = thePackageManager->readFile(theFilename);
-        asl::Ptr<ReadableStream> mySource = thePackageManager->readStream(theFilename);
+        asl::Ptr<ReadableStreamHandle> mySource = thePackageManager->readStream(theFilename);
         if (!mySource) {
             AC_ERROR << "Could not open include file '" << theFilename + "'. So I will ignore it.";
             return;
@@ -1212,9 +1285,9 @@ namespace y60 {
         DocumentPtr mySceneDom(new dom::Document());
         setupEmptyDocument(*mySceneDom, "");
         asl::Ptr<ISceneDecoder> myDecoder =
-            DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, &*mySource);
+            DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, mySource);
         if (myDecoder) {
-            myDecoder->decodeScene(*mySource, mySceneDom);
+            myDecoder->decodeScene(mySource, mySceneDom);
         } else {
             AC_ERROR << "Unknown extension '" << getExtension(theFilename) + "' - ignoring included file: " << theFilename;
             return;

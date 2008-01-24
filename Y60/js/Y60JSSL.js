@@ -339,6 +339,8 @@ function getDescendantById(theNode, theId, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantById is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -347,6 +349,8 @@ function getDescendantByName(theNode, theName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantByName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -355,6 +359,8 @@ function getDescendantsByName(theNode, theName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantsByName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
     return myResult;
 }
@@ -365,6 +371,8 @@ function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantByAttributeName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -375,6 +383,8 @@ function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch)
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantByAttribute is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -385,6 +395,8 @@ function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantsByAttribute is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
     return myResult;
 }
@@ -393,6 +405,8 @@ function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantsByAttributeName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
     return myResult;
 }
@@ -402,6 +416,8 @@ function getDescendantByTagName(theNode, theTagName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantByTagName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);    
     return myResult.length == 0 ? null:myResult[0];
 }
@@ -411,11 +427,15 @@ function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
     if (doDeepSearch == undefined || !doDeepSearch) {
         doDeepSearch = false;
     }
+    Logger.warning("getDescendantsByTagName is deprecated");
+    dumpstack();
     var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);        
     return myResult;
 }
 
 function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
+    Logger.warning("getChildElementNodes is deprecated");
+    dumpstack();
     var myChildElementNodes = [];
     var i;
 

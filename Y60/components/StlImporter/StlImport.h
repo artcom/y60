@@ -61,15 +61,23 @@ namespace y60 {
         StlImport (asl::DLHandle theDLHandle) : _myGenerateNormal(false), PlugInBase(theDLHandle) {}
         ~StlImport() { }
 
-        bool decodeScene(asl::ReadableStream & theSource,
-            dom::DocumentPtr theScene);
+        bool decodeScene(asl::Ptr<asl::ReadableStreamHandle> theSource, dom::DocumentPtr theScene);
         //bool encodeScene(const dom::DocumentPtr theScene, asl::WriteableStream * theStream);
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier);
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource);
         void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         const char * ClassName() {
             static const char * myClassName = "StlPlugIn";
             return myClassName;
+        }
+        bool setLazy(bool lazy) {
+            if (lazy) {
+                AC_WARNING << "StlImport::decodeScene: lazy loading not supported";
+            }
+            return false;
+        }
+        bool addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
+            AC_WARNING << "StlImport::addSource: additional sources not supported";
         }
 
     private:
