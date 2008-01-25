@@ -59,11 +59,13 @@ namespace y60 {
     bool 
     Y60Decoder::setLazy(bool theFlag) {
         _myLazyMode = theFlag;
+        return theFlag;
     }
 
     bool 
     Y60Decoder::addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
         _mySources.push_back(theSource);
+        return theSource;
     }
  
     bool 

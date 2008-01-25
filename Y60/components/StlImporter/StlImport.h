@@ -78,6 +78,7 @@ namespace y60 {
         }
         bool addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
             AC_WARNING << "StlImport::addSource: additional sources not supported";
+            return false;
         }
 
     private:
