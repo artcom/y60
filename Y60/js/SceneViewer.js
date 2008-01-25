@@ -444,7 +444,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.renderingCaps = window.renderingCaps & (~theCapability);
     }
 
-    self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag, theImagesPreLoadFlag) {
+    self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
         if (window == null) {
             window = new RenderWindow();
@@ -474,7 +474,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         //var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         var myCanvas = myScene.dom.find("/scene/canvases/canvas");
         
-        self.setScene(myScene, myCanvas, theSwitchNodeFlag, theImagesPreLoadFlag);
+        self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();
 
         // Turn on sync to V-Blank
