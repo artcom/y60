@@ -48,7 +48,7 @@
         plug("y60X3dImporter");
     }
 
-    ourShow.setup(1024,768);
+    ourShow.setup(1024,768, false,true,false);
     ourShow.go();
 } catch (ex) {
     reportException(ex);
