@@ -58,6 +58,7 @@ namespace y60 {
         }
         bool addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
             AC_WARNING << "X3dImport::addSource: additional sources not supported";
+            return false;
         }
     private:
         void processNode(const dom::NodePtr theNode);

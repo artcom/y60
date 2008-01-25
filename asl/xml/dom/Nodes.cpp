@@ -2602,7 +2602,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
     }
 
     NodeType myType = static_cast<NodeType>(myNodeType&0xf);
-    if (myUniqueID == getUniqueId()) {
+    if (theLoadMode == PATCH && myUniqueID == getUniqueId()) {
         if (myType != _myType) {
             throw FormatCorrupted("Node with matching unique id but different node type encountered in stream",PLUS_FILE_LINE);
         }

@@ -559,9 +559,11 @@ void dom::registerStandardTypes(ValueFactory & theFactory) {
 	theFactory.registerPrototype("hexBinary", ValuePtr(new VectorValue<asl::Block>(0)));
 
 	theFactory.registerPrototype("ID", ValuePtr(new IDValue(0)));
-	theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
 
-    ValuePtr myStringValue(new StringValue(0));
+    ValuePtr myStringValue(new StringValue(0));    
+
+	//theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
+    theFactory.registerPrototype("IDREF", myStringValue);
 	theFactory.registerPrototype("string", myStringValue);
 	theFactory.registerPrototype("normalizedString", myStringValue);  // TODO: make special type for this
 	theFactory.registerPrototype("token", myStringValue);    // TODO: make special type for this

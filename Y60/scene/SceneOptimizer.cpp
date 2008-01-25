@@ -99,7 +99,7 @@ namespace y60 {
 
     void
     SceneOptimizer::run(const dom::NodePtr & theRootNode) {
-        AC_INFO << "Running Scene optimizer";
+        AC_DEBUG << "Running Scene optimizer";
 
         _myRootNode = theRootNode;
 
@@ -117,15 +117,15 @@ namespace y60 {
         _myStickyNodes.push_back(_myRootNode);
 
         // Remove invisible nodes
-        AC_INFO << "  Removing invisible nodes...";
+        AC_DEBUG << "  Removing invisible nodes...";
         removeInvisibleNodes(_myRootNode);
 
         // Set nodes with animations on it to sticky
-        AC_INFO << "  Set animated nodes sticky...";
+        AC_DEBUG << "  Set animated nodes sticky...";
         pinAnimatedNodes(_myRootNode);
 
         // Set transparent bodies to sticky
-        AC_INFO << "  Set transparent bodies sticky...";
+        AC_DEBUG << "  Set transparent bodies sticky...";
         pinTransparentBodies(_myRootNode);
 
         // Pin body nodes that reference the same shape node (memory friendly)
@@ -142,13 +142,13 @@ namespace y60 {
 
         // Remove empty transforms and
         // merge transforms with single childs with their child
-        AC_INFO << "  Cleanup scene...";
+        AC_DEBUG << "  Cleanup scene...";
         cleanupScene(_myRootNode);
 
         // Remove unused shapes
-        AC_INFO << "  Removing unused shapes...";
+        AC_DEBUG << "  Removing unused shapes...";
         removeUnusedShapes();
-        AC_INFO << "  Optimizing done!";
+        AC_DEBUG << "  Optimizing done!";
     }
 
     void
@@ -158,14 +158,13 @@ namespace y60 {
 
         // Merge all bodies into one superbody
         _myOptimizedBodyName = "Optimized Body: ";
-        AC_INFO << "  Merging bodies...";
         asl::Matrix4f myInitialMatrix = theRootNode->getFacade<TransformHierarchyFacade>()->get<InverseGlobalMatrixTag>();
         mergeBodies(theRootNode, myInitialMatrix);
 
         // Create a superbody and append the supershape
         // or reuse the rootnode, if it is a body
         if (_mySuperShape != 0) {
-            AC_INFO << "  Append superbody/supershape...";
+            AC_DEBUG << "  Append superbody/supershape...";
             if (theRootNode->nodeName() == BODY_NODE_NAME) {
                 dom::NodePtr myShapeAttributeNode = theRootNode->getAttribute(BODY_SHAPE_ATTRIB);
                 myShapeAttributeNode->nodeValue(_mySuperShape->getShapeId());
@@ -467,7 +466,7 @@ namespace y60 {
         // Merge the shape into the supershape
         if (theNode->nodeName() == BODY_NODE_NAME && theNode->getAttributeValue<bool>(VISIBLE_ATTRIB)) {
             BodyPtr myBody = theNode->getFacade<Body>();
-            AC_INFO << "    Merge body: " + myBody->get<NameTag>();
+            AC_DEBUG << "    Merge body: " + myBody->get<NameTag>();
             _myOptimizedBodyName += theNode->getAttributeString(ID_ATTRIB) + " ";
             Shape & myShape = myBody->getShape();
 
@@ -522,7 +521,6 @@ namespace y60 {
                 }
                 mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementsRenderStyles);
             }
-
             return true;
         }
 
@@ -577,7 +575,7 @@ namespace y60 {
 
         // Then remove the node itself
         theNode->parentNode()->removeChild(theNode);
-        AC_INFO << "    Node removed: " << theNode->getAttributeString(NAME_ATTRIB);
+        AC_DEBUG << "    Node removed: " << theNode->getAttributeString(NAME_ATTRIB);
     }
 
     void
