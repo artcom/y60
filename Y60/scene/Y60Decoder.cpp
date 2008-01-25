@@ -75,14 +75,17 @@ namespace y60 {
         asl::Time parseStart;
         bool myBinaryFlag = true;
         asl::ReadableStream & theStream = theSource->getStream();
-        if (canDecode("", theSource) == MIME_TYPE_X60) {
+        std::string myMimeType = canDecode("", theSource);
+        if (myMimeType == MIME_TYPE_X60) {
             myBinaryFlag = false;
         }
+        AC_INFO << "  Y60Decoder::decodeScene: MIME type = '"<<myMimeType<<"'";
 
         unsigned long myFileSize = 0;
         unsigned long myNodeCount = 0;
         
         if (myBinaryFlag) {
+            AC_INFO << "  Y60Decoder::decodeScene: using binary xml loader";
             myFileSize = theStream.size();
             double myLoadTime = asl::Time() - loadStart;
             if (dynamic_cast<asl::MappedBlock*>(&theStream)) {
@@ -91,7 +94,8 @@ namespace y60 {
                 AC_INFO << "  Readable Stream size: " << myFileSize << " bytes ";
             }
             parseStart.setNow();
-            if (getLazy()) {
+            if (getLazy() && myMimeType == MIME_TYPE_D60) {
+                AC_INFO << "  Y60Decoder::decodeScene: using lazy mode";
                 theDocument->debinarizeLazy(theSource);
                 myNodeCount = 1; // TODO: get node count from catalog
             } else {
@@ -99,6 +103,7 @@ namespace y60 {
                 myNodeCount = countNodes(*theDocument);
             }
         } else {
+            AC_INFO << "  Y60Decoder::decodeScene: using unicode xml loader";
             std::string myXMLFile;
             theStream.readString(myXMLFile, theStream.size(), 0);
             myFileSize = myXMLFile.size();
