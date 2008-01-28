@@ -61,6 +61,7 @@ namespace y60 {
      **********************************************************************/
     std::string
     StlImport::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theSource) {
+        AC_DEBUG << " StlImport::canDecode: theUrl = '" << theUrl << "', theSource=" << theSource;
         if (theSource) {
             asl::ReadableStream & theStream = theSource->getStream();
             if (theStream) {
@@ -68,11 +69,13 @@ namespace y60 {
                     return MIME_TYPE_STL;
                 }
             }
+            AC_DEBUG << "StlImport::canDecode: returning empty string";
             return "";
         }
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "stl") {
             return MIME_TYPE_STL;
         }
+        return "";
     }
 
     bool 
