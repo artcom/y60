@@ -435,7 +435,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	}
 
 	Protected.onMaterialChange = function() {
-		_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
+		_myTextureUnits = Public.material.find("//textureunits");//getDescendantByTagName(Public.material, "textureunits", false);
 		if (_myTextureUnits.childNodes.length != 1) {
 			throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextureUnits.childNodes.length, fileline());
 		}
@@ -452,8 +452,8 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		if (isMovieFlag) {
 			myImage.frameblending = false;
 		}
-		
-		var myTexture = getDescendantByAttribute(window.scene.textures, "image", theImageId);
+        var myFindString = "//texture[@image='"+ theImageId+ "']";		
+		var myTexture = window.scene.textures.find(myFindString);//getDescendantByAttribute(window.scene.textures, "image", theImageId);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
     		for (var i = 0; i < _myTextureUnits.childNodesLength(); i++) {
@@ -486,7 +486,8 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
 		// create texture unit
 		if (!_myTextureUnits) {
-			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
+            var myFindString = "//textureunits";				    
+			_myTextureUnits = Public.material.find(myFindString);//getDescendantByTagName(Public.material, "textureunits", false);
 			if (!_myTextureUnits) {
 				_myTextureUnits = Public.material.appendChild(Node.createElement("textureunits"));
 			}
@@ -547,12 +548,14 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	}
 
 	function addTextureRequirements(theTextureCount) {
-		var myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "textures", false);
+        var myFindString = "//*[@name='textures']";
+		var myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "textures", false);
 		if (myTextureFeatures == null) {
 			myTextureFeatures = new Node("<feature name='textures'>[10[sds]]</feature>").firstChild;
 			Public.material.requires.appendChild(myTextureFeatures);
 		}
-		myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
+        myFindString = "//*[@name='texcoord']";
+		myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
 		if (myTextureFeatures == null) {
 			myTextureFeatures = new Node("<feature name='texcoord'>[10[sds]]</feature>").firstChild;
 			Public.material.requires.appendChild(myTextureFeatures);
@@ -790,7 +793,8 @@ function removeOverlay(theOverlayNode) {
 		if (myMaterialNode) {
 
 			// Remove texture,image
-			var myTextureUnits = getDescendantByTagName(myMaterialNode, "textureunits", false);
+			
+			var myTextureUnits = myMaterialNode.find("//textureunits");//getDescendantByTagName(myMaterialNode, "textureunits", false);
 			if (myTextureUnits) {
 				for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
 					var myTextureUnit = myTextureUnits.childNode(i);
