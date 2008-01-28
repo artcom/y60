@@ -1003,7 +1003,7 @@ AC_TRACE << "throwing OffsetNotFound";
                 // our node should be loaded now
                 NodePtr myResult = myIDRegistry->getElementById(theId, theIdAttribute);
                 if (!myResult) {
-                    throw InternalLoaderError("Element found in persistent DOM, but did not load properly",PLUS_FILE_LINE); 
+                    throw InternalLoaderError("Element found in persistent DOM, but did not load or register properly",PLUS_FILE_LINE); 
                 }
                 return myResult; 
             }
@@ -2359,6 +2359,13 @@ void dumpType(unsigned short theType) {
 }
 #undef DB
 #define DB(x) // x
+void
+dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl::Unsigned64 theIncludeVersion, asl::Unsigned32 theMagic) const {
+    theDest.appendUnsigned32(theMagic);
+    theDest.appendUnsigned32(BINARIZER_VERSION);
+    binarize(theDest, theDicts, theIncludeVersion);
+    
+}
 
 void
 dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl::Unsigned64 theIncludeVersion) const {
@@ -2403,15 +2410,6 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
         if (attributes().size()) myNodeType|=hasAttributes;
         if (childNodes().size()) myNodeType|=hasChildren;
     }
-#if 0
-    if (_myParent) {
-        DB(AC_TRACE << "Write parent saveposition (LongLong+Long) = " << _myParent->getSavePosition() << endl);
-        theDest.appendUnsigned(_myParent->getSavePosition());
-    } else {
-        DB(AC_TRACE << "Write no parent saveposition (LongLong) = -1" << endl);
-        theDest.appendUnsigned(asl::Unsigned64(-1));
-    } 
-#endif
     DB(AC_TRACE << "Write uniqueID (LongLong+Long) = " << getUniqueId() << endl);
     getUniqueId().append(theDest);
    
@@ -2479,7 +2477,7 @@ Node::binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCat
         _myParent->binarize(theDataDest, theCatalogDest);
     } else {
         Dictionaries myDicts;
-        binarize(theDataDest, myDicts, 0);
+        binarize(theDataDest, myDicts, 0, D60_MAGIC);
         asl::Unsigned64 myStartPos = theCatalogDest.getByteCounter();
         myDicts.binarize(theCatalogDest);
         NodeOffsetCatalog & myCatalog = const_cast<Node*>(this)->getIDRegistry()->getOffsetCatalog();
@@ -2572,6 +2570,21 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
                       bool & theUnmodifiedProxyFlag)
 {
     DB(AC_TRACE << "dom::Node::debinarize theSource.size() = " << theSource.size() << ", thePos = " << thePos << endl);
+    if (thePos == 0) {
+        // check magic and version number
+        asl::Unsigned32 myMagic;
+        thePos = theSource.readUnsigned32(myMagic, thePos);
+        if (myMagic != B60_MAGIC && myMagic != D60_MAGIC) {
+            throw BadMagicNumber("Bad magic number at start of file", PLUS_FILE_LINE);
+        }
+        asl::Unsigned32 myVersion;
+        thePos = theSource.readUnsigned32(myVersion, thePos);
+
+        if (myVersion != BINARIZER_VERSION) {
+            throw VersionMismatch(std::string("expected ")+asl::as_string((void*)(asl::Unsigned32(BINARIZER_VERSION)))+", got "+asl::as_string((void*)(myVersion)), PLUS_FILE_LINE);
+        }
+    }
+
     storeSavePosition(thePos);
     asl::AC_SIZE_TYPE theOldPos = thePos;
 
@@ -3074,8 +3087,39 @@ dom::Node::callListeners(EventListenerMap & theListeners, EventPtr evt) {
     }
 }
 
+void
+dom::Node::printChangedNodes(const std::string & theLastVersion) const {
+    unsigned long long myLastVersion;
+    if (asl::fromString(theLastVersion, myLastVersion)) {
+        printChangedNodes(myLastVersion);
+    } else {
+        AC_ERROR << "Node::printChangedNodes: could not convert argument to Unsigned64:"<<theLastVersion;
+    }
+}
 
-
+void
+dom::Node::printChangedNodes(unsigned long long theLastVersion, int theLevel) const {
+    if (nodeVersion() > theLastVersion || theLastVersion == 0xffffffffffffffffULL) {
+        std::string myPrefix;
+        for (int i = 0; i < theLevel; ++i) {
+            myPrefix += "  ";
+        }
+        cerr << myPrefix << nodeTypeName() << " '"<< nodeName() <<"', V="<<nodeVersion()<<", UID="<<getUniqueId();
+        cerr << " = ";
+        if (mayHaveValue()) {
+            cerr << nodeValue();
+        } else {
+            cerr <<"#NO VALUE";
+        }
+        cerr << endl;
+        for (unsigned i = 0; i < attributesLength(); ++i ) {
+            attributes().item(i)->printChangedNodes(theLastVersion, theLevel+1);
+        }
+        for (unsigned i = 0; i < childNodesLength(); ++i ) {
+            childNode(i)->printChangedNodes(theLastVersion, theLevel+1);
+        }
+    }
+}
 
 std::istream &
 dom::operator>>(std::istream & is, dom::Node & n) {

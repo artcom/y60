@@ -24,7 +24,7 @@
     }
 
     if ("help" in myArgs.options) {
-        print("ART+COM SceneViewer Usage: sv filename.[x60/b60] [options]");
+        print("ART+COM SceneViewer Usage: sv filename.[x60/b60/d60] [options]");
         print("available options:");
         print(" --help                         - print this help message");
         print(" --m or --multisamples [number] - specify the Number of multisamples."); 

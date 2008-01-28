@@ -210,6 +210,11 @@ namespace dom {
             X_END_NODE = 15
         };
 
+        enum { BINARIZER_VERSION = 100};
+        enum { B60_MAGIC = 0xbbbbfb60};
+        enum { D60_MAGIC = 0xddddfd60};
+        enum { P60_MAGIC = 0xaaaaab60}; // b60 patch
+
         DEFINE_NESTED_EXCEPTION(Node,Exception,asl::Exception);
         DEFINE_NESTED_EXCEPTION(Node,LoadFileFailed,Exception);
         DEFINE_NESTED_EXCEPTION(Node,SchemaNotParsed,Exception);
@@ -218,6 +223,8 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Node,IDValueNotRegistered,Exception);
         DEFINE_NESTED_EXCEPTION(Node,DuplicateIDRefValue,Exception);
         DEFINE_NESTED_EXCEPTION(Node,IDRefValueNotRegistered,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,BadMagicNumber,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,VersionMismatch,Exception);
 
         /**@name constructors
             many different way to construct a node type.
@@ -967,10 +974,10 @@ namespace dom {
         }
         void binarize(asl::WriteableStream & theDest) const {
             Dictionaries myDicts;
-            binarize(theDest, myDicts, 0);
+            binarize(theDest, myDicts, 0, B60_MAGIC);
         }
-         void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts) const {
-            binarize(theDest, theDicts, 0);
+         void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl::Unsigned32 theMagic) const {
+            binarize(theDest, theDicts, 0, theMagic);
         }
         // binarize and write an id/offset catalog for random node access
         // when theDataDest and theCatalogDest are the same stream, then
@@ -1010,7 +1017,7 @@ namespace dom {
           
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
             Dictionaries myDicts;
-            binarize(thePatch, myDicts, theOldVersion + 1);
+            binarize(thePatch, myDicts, theOldVersion + 1, P60_MAGIC);
         }
         /// return true if something has changed
         bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0) {
@@ -1031,6 +1038,7 @@ protected:
         }
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, OpMode theLoadMode, bool & theUnmodifiedProxyFlag);
         void binarize(asl::WriteableStream & theDest, Dictionaries & theDict, asl::Unsigned64 theIncludeVersion) const;
+        void binarize(asl::WriteableStream & theDest, Dictionaries & theDict, asl::Unsigned64 theIncludeVersion, asl::Unsigned32 theMagic) const;
 public:
         void addSchema(const DOMString & theSchemaString, const DOMString & theNSPrefix);
         void addSchema(const dom::Node & theSchemaDoc, const DOMString & theNSPrefix);
@@ -1204,6 +1212,8 @@ Dependent on node type allowed children are:<p>
             }
             return _myIDRefRegistry;
         }
+        void printChangedNodes(const std::string & theLastVersion) const;
+        void printChangedNodes(asl::Unsigned64 theLastVersion= 0xffffffffffffffffULL, int theLevel=0) const;
     protected:
         void getReferencingNodes(std::vector<NodePtr> & theResult);
         void setUpstreamVersion(asl::Unsigned64 theVersion);

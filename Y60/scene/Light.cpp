@@ -40,6 +40,7 @@ namespace y60 {
         if (_myLightSourceVersion != myCurrentVersion) {
             dom::NodePtr myLightSource = getNode().getElementById(get<LightSourceTag>());
             if (!myLightSource) {
+                AC_ERROR << getNode();
                 AC_ERROR << "Could not find light source with id: " << get<LightSourceTag>();
             } else {
                 _myLightSource = myLightSource->getFacade<LightSource>();

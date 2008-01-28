@@ -766,7 +766,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     // is called before first scene update
     self.preprocessScene = function(theScene) {
         // find all movienodes with no decoderhint and try to set it
-        var myMovies = getDescendantsByTagName(theScene.images, "movie", false);
+        //var myMovies = getDescendantsByTagName(theScene.images, "movie", false);
+        var myMovies = theScene.images.findAll("movie");
 
         if (myMovies) {
             for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {

@@ -256,6 +256,8 @@ namespace y60 {
                const IProgressNotifierPtr & theNotifier,
                bool useSchema, bool loadLazy)
     {
+        
+        AC_DEBUG << "Scene::load: loadLazy="<<loadLazy;
         asl::Time loadStart;
 
         dom::DocumentPtr mySceneDom(new Document());
@@ -275,7 +277,7 @@ namespace y60 {
             myDecoder->decodeScene(theSource, mySceneDom);
             myDecoder->setProgressNotifier(IProgressNotifierPtr(0));
         } else {
-            throw SceneException(std::string("Unknown extension '") + getExtension(theFilename) + "'", PLUS_FILE_LINE);
+            throw SceneException(std::string("Could not determine file type of '") +theFilename + "' (bad magic number)", PLUS_FILE_LINE);
         }
         //_myPreviousDomVersion = 0;
         //_mySceneBuilder = SceneBuilderPtr(new SceneBuilder(_mySceneDom));

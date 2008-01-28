@@ -74,15 +74,13 @@ namespace xpath
     const string Step::NODETEST_TEXT = "text";
     const string Step::NODETEST_PI = "processing-instruction";
 
-    BinaryExpression::BinaryExpression(BinaryExpression::ExpressionType _type, Expression *_lvalue, Expression *_rvalue)
-    {
+    BinaryExpression::BinaryExpression(BinaryExpression::ExpressionType _type, Expression *_lvalue, Expression *_rvalue) {
         type = _type;
         lvalue = _lvalue;
         rvalue = _rvalue;
     };
     
-    Value *BinaryExpression::evaluateExpression(const Context &c)
-    {
+    Value *BinaryExpression::evaluateExpression(const Context &c) {
         assert(lvalue);
         assert(rvalue);
 
@@ -94,147 +92,147 @@ namespace xpath
 
         if (type<16) // comparison operators
         {
-        if ((left->type()==Value::NodeSetType) && (right->type()==Value::NodeSetType))
+            if ((left->type()==Value::NodeSetType) && (right->type()==Value::NodeSetType))
             {
                 // find one pair of nodes whose string-values comparison evaluates true.
 
-		NodeSetValue *nsv1 = left->toNodeSet();
-		delete left;
-		NodeSetRef nsr1 = nsv1->takeNodes();
-		delete nsv1;
-		
-		NodeSetValue *nsv2 = right->toNodeSet();
-		delete right;
-		NodeSetRef nsr2 = nsv2->takeNodes();
-		delete nsv2;
+                NodeSetValue *nsv1 = left->toNodeSet();
+                delete left;
+                NodeSetRef nsr1 = nsv1->takeNodes();
+                delete nsv1;
 
-		bool retval = false;
+                NodeSetValue *nsv2 = right->toNodeSet();
+                delete right;
+                NodeSetRef nsr2 = nsv2->takeNodes();
+                delete nsv2;
 
-		if (type == Equal || type == NotEqual) {
+                bool retval = false;
 
-		    std::set<string> sm1;
-		    std::set<string> sm2;
-		        
-		    NodeSet::iterator i1 = nsr1->begin();
-		    NodeSet::iterator i2 = nsr2->begin();
-		    
-		    while (i1 != nsr1->end() || i2 != nsr2->end()) {
-			
-			string string1 = string_value_for(*i1);
-			if (string1.length()) {
-			    
-			    if (sm2.find(string1) != sm2.end()) {
-				if (type == Equal) {
-				    retval = true;
-				    break;
-				}
-			    } else {
-				if (type == NotEqual) {
-				    retval = true;
-				    break;
-				}
-			    }
-			    sm1.insert(string1);
-			}
-			
-			std::string string2 = string_value_for(*i2);
-			if (string2.length()) {
-			    {
-				if (sm1.find(string2) != sm1.end()) {
-				    if (type == Equal) {
-					retval = true;
-					break;
-				    }
-				} else {
-				    if (type == NotEqual) {
-					retval = true;
-					break;
-				    }
-				}
-			    }
-			    sm2.insert(string2);
-			}
-			
-			if (i1 != nsr2->end()) {
-			    ++i1;
-			}
-			
-			if (i2 != nsr2->end()) {
-			    ++i2;
-			}
-		    }
-		} else {
-		    std::string extreme_left;
-		    std::string extreme_right;
-		    NodeSet::iterator ileft = nsr1->begin();
-		    NodeSet::iterator iright = nsr2->begin();
-		    while (ileft != nsr1->end() || ileft != nsr2->end()) {
-			
-			if ( (  (type == Less || type == LEqual) && (string_value_for(*ileft) > extreme_left) )
-			     || (type == Greater || type == GEqual) && (string_value_for(*ileft) < extreme_left) )
-			{
-			    extreme_left = string_value_for(*ileft);
-			}
+                if (type == Equal || type == NotEqual) {
 
-			if ( (  (type == Less || type == LEqual) && (string_value_for(*iright) < extreme_right) )
-			     || (type == Greater || type == GEqual) && (string_value_for(*iright) > extreme_right) )
-			{
-			    extreme_right = string_value_for(*iright);
-			}
+                    std::set<string> sm1;
+                    std::set<string> sm2;
 
-			if (extreme_left < extreme_right) {
-			    if (type == Less || type == LEqual)
-				{
-				    retval = true;
-				    break;
-				}
-			} else if (extreme_left == extreme_right) {
-			    if (type == LEqual || type == GEqual)
-				{
-				    retval = true;
-				    break;
-				}
-			} else {
-			    if (type == Greater || type == GEqual)
-				{
-				    retval = true;
-				    break;
-				}
-			}
+                    NodeSet::iterator i1 = nsr1->begin();
+                    NodeSet::iterator i2 = nsr2->begin();
 
-			if (ileft != nsr2->end()) {
-			    ++ileft;
-			}
-			
-			if (iright != nsr2->end()) {
-			    ++iright;
-			}
-		    }
-		}
+                    while (i1 != nsr1->end() || i2 != nsr2->end()) {
+
+                        string string1 = string_value_for(*i1);
+                        if (string1.length()) {
+
+                            if (sm2.find(string1) != sm2.end()) {
+                                if (type == Equal) {
+                                    retval = true;
+                                    break;
+                                }
+                            } else {
+                                if (type == NotEqual) {
+                                    retval = true;
+                                    break;
+                                }
+                            }
+                            sm1.insert(string1);
+                        }
+
+                        std::string string2 = string_value_for(*i2);
+                        if (string2.length()) {
+                            {
+                                if (sm1.find(string2) != sm1.end()) {
+                                    if (type == Equal) {
+                                        retval = true;
+                                        break;
+                                    }
+                                } else {
+                                    if (type == NotEqual) {
+                                        retval = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            sm2.insert(string2);
+                        }
+
+                        if (i1 != nsr2->end()) {
+                            ++i1;
+                        }
+
+                        if (i2 != nsr2->end()) {
+                            ++i2;
+                        }
+                    }
+                } else {
+                    std::string extreme_left;
+                    std::string extreme_right;
+                    NodeSet::iterator ileft = nsr1->begin();
+                    NodeSet::iterator iright = nsr2->begin();
+                    while (ileft != nsr1->end() || ileft != nsr2->end()) {
+
+                        if ( (  (type == Less || type == LEqual) && (string_value_for(*ileft) > extreme_left) )
+                                || (type == Greater || type == GEqual) && (string_value_for(*ileft) < extreme_left) )
+                        {
+                            extreme_left = string_value_for(*ileft);
+                        }
+
+                        if ( (  (type == Less || type == LEqual) && (string_value_for(*iright) < extreme_right) )
+                                || (type == Greater || type == GEqual) && (string_value_for(*iright) > extreme_right) )
+                        {
+                            extreme_right = string_value_for(*iright);
+                        }
+
+                        if (extreme_left < extreme_right) {
+                            if (type == Less || type == LEqual)
+                            {
+                                retval = true;
+                                break;
+                            }
+                        } else if (extreme_left == extreme_right) {
+                            if (type == LEqual || type == GEqual)
+                            {
+                                retval = true;
+                                break;
+                            }
+                        } else {
+                            if (type == Greater || type == GEqual)
+                            {
+                                retval = true;
+                                break;
+                            }
+                        }
+
+                        if (ileft != nsr2->end()) {
+                            ++ileft;
+                        }
+
+                        if (iright != nsr2->end()) {
+                            ++iright;
+                        }
+                    }
+                }
                 delete nsr1; delete nsr2;
-		return new BooleanValue(retval);		
-	    }
-	else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
+                return new BooleanValue(retval);		
+            }
+            else if (left->type()==Value::NodeSetType || right->type()==Value::NodeSetType)
             {
                 // comparison of one nodeset with one other type
 
                 if (left->type()==Value::StringType || right->type()==Value::StringType)
                 {
-		    const int TRUTHVALUES_LEFT[] = { 1<<NotEqual | 1<<Less | 1<<LEqual,
-						     1<<Equal | 1<<LEqual | 1 <<GEqual,
-						     1<<NotEqual | 1<<Greater | 1 <<GEqual };
-		    const int TRUTHVALUES_RIGHT[] = { TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0] };
-		    
+                    const int TRUTHVALUES_LEFT[] = { 1<<NotEqual | 1<<Less | 1<<LEqual,
+                        1<<Equal | 1<<LEqual | 1 <<GEqual,
+                        1<<NotEqual | 1<<Greater | 1 <<GEqual };
+                    const int TRUTHVALUES_RIGHT[] = { TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0] };
+
                     // one nodeset, one string: find one node whose string-value compares positive to the string
                     NodeSetValue *nsv;
                     StringValue *sv;
-		    const int *truthTable;
+                    const int *truthTable;
                     if (left->type()==Value::StringType)
                     {
                         // WARNING: toNodeSet() invalidates right.
-			// which is okay, provided that right is
-			// no longer accessed; which actually is the case,
-			// see the "delete right" below.
+                        // which is okay, provided that right is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete right" below.
                         nsv = right->toNodeSet();
                         sv = left->toString();
                         truthTable = TRUTHVALUES_LEFT;
@@ -242,12 +240,12 @@ namespace xpath
                     else
                     {
                         // WARNING: toNodeSet() invalidates left,
-			// which is okay, provided that left is
-			// no longer accessed; which actually is the case,
-			// see the "delete left" below.
+                        // which is okay, provided that left is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete left" below.
                         nsv = left->toNodeSet();
                         sv = right->toString();
-			truthTable = TRUTHVALUES_RIGHT;
+                        truthTable = TRUTHVALUES_RIGHT;
                     };
 
                     delete left;
@@ -255,19 +253,19 @@ namespace xpath
                     bool retval = false;
 
                     for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
-			string curstr = string_value_for(*i);
-			int cmp = curstr.compare(sv->getValue());
-			AC_TRACE << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\" is " << cmp;
-			if (truthTable[cmp+1]&(1<<type)) {
-			    retval = true;
-			    break;
-			}
+                        string curstr = string_value_for(*i);
+                        int cmp = curstr.compare(sv->getValue());
+                        AC_TRACE << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\" is " << cmp;
+                        if (truthTable[cmp+1]&(1<<type)) {
+                            retval = true;
+                            break;
+                        }
                     };
-		    
+
 #ifdef INTERPRETER_DEBUG
-		    AC_INFO << " string - nodeset comparison of type " << type << " is " << retval?"true":"false";
+                    AC_INFO << " string - nodeset comparison of type " << type << " is " << retval?"true":"false";
                     if (retval) {
-			AC_INFO <<" succeeded for "<< *this;
+                        AC_INFO <<" succeeded for "<< *this;
                     }
 #endif
                     delete sv; delete nsv;
@@ -278,93 +276,93 @@ namespace xpath
                     // one nodeset, one number: find one node whose string-value converted to number compares positive
 
                     Value *theNodeSet;
-		    Value *theNumber;
+                    Value *theNumber;
 
                     if (left->type()==Value::NumberType)
                     {
-			theNodeSet = right;
-			theNumber = left;
-		    } else {
-			theNodeSet = left;
-			theNumber = right;
-		    }
-		    NumberValue *nv = theNumber->toNumber();
-		    NodeSetValue *nsv = theNodeSet->toNodeSet();
+                        theNodeSet = right;
+                        theNumber = left;
+                    } else {
+                        theNodeSet = left;
+                        theNumber = right;
+                    }
+                    NumberValue *nv = theNumber->toNumber();
+                    NodeSetValue *nsv = theNodeSet->toNodeSet();
 
-		    delete theNumber; delete theNodeSet;
+                    delete theNumber; delete theNodeSet;
 
-		    double num = nv->getValue();
-		    delete nv;
+                    double num = nv->getValue();
+                    delete nv;
 
-		    NodeSetRef nsr = nsv->takeNodes();
-		    delete nsv;
+                    NodeSetRef nsr = nsv->takeNodes();
+                    delete nsv;
 
-		    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
+                    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
 
-		    for (NodeSet::iterator i = nsr->begin(); i != nsr->end(); ++i) {
-			bool val;
-			double currentnum = number_value_for(*i);
-			switch(type) {
-			case Equal:
-			    val = (currentnum == num);
-			    break;
-			case NotEqual:
-			    val = (currentnum != num);
-			    break;
-			case Greater:
-			    val = (theNumber == left) ^ (number_value_for(*i) > num);
-			    break;
-			case GEqual:
-			    val = (theNumber == left) ^ (number_value_for(*i) >= num);
-			    break;
-			case Less:
-			    val = (theNumber == left) ^ (number_value_for(*i) < num);
-			    break;
-			case LEqual:
-			    val = (theNumber == left) ^ (number_value_for(*i) <= num);
-			    break;
-			default:
-			    AC_WARNING << "unsupported type " << type;
-			    exit(0);
-			}
+                    for (NodeSet::iterator i = nsr->begin(); i != nsr->end(); ++i) {
+                        bool val;
+                        double currentnum = number_value_for(*i);
+                        switch(type) {
+                            case Equal:
+                                val = (currentnum == num);
+                                break;
+                            case NotEqual:
+                                val = (currentnum != num);
+                                break;
+                            case Greater:
+                                val = (theNumber == left) ^ (number_value_for(*i) > num);
+                                break;
+                            case GEqual:
+                                val = (theNumber == left) ^ (number_value_for(*i) >= num);
+                                break;
+                            case Less:
+                                val = (theNumber == left) ^ (number_value_for(*i) < num);
+                                break;
+                            case LEqual:
+                                val = (theNumber == left) ^ (number_value_for(*i) <= num);
+                                break;
+                            default:
+                                AC_WARNING << "unsupported type " << type;
+                                exit(0);
+                        }
 
-			if (val) {
-			    delete nsr;
-			    return new BooleanValue(true);
-			}
-		    }
-		    delete nsr;
-		    return new BooleanValue(false);
+                        if (val) {
+                            delete nsr;
+                            return new BooleanValue(true);
+                        }
+                    }
+                    delete nsr;
+                    return new BooleanValue(false);
                 }
                 else if (left->type()==Value::BooleanType || right->type()==Value::BooleanType)
                 {
                     // one nodeset, one boolean: convert both to boolean
                     BooleanValue *aVal = left->toBoolean();
-		    BooleanValue *bVal = right->toBoolean();
-		    delete left;
-		    delete right;
-		    // ###
-		    bool a = aVal->getValue();
-		    bool b = bVal->getValue();
+                    BooleanValue *bVal = right->toBoolean();
+                    delete left;
+                    delete right;
+                    // ###
+                    bool a = aVal->getValue();
+                    bool b = bVal->getValue();
 
-		    delete aVal;
-		    delete bVal;
+                    delete aVal;
+                    delete bVal;
 
-		    AC_INFO << "boolean comparison " << type << " " << a << ", " << b;
+                    AC_INFO << "boolean comparison " << type << " " << a << ", " << b;
 
-		    if (type == Equal && a == b) return new BooleanValue(true);
-		    else if(type == Equal && a != b) return new BooleanValue(true);
-		    else if(type == NotEqual && a != b) return new BooleanValue(true);
-		    else if(type == GEqual && a >= b) return new BooleanValue(true);
-		    else if(type == LEqual && a >= b) return new BooleanValue(true);
-		    else if(type == Less && a < b) return new BooleanValue(true);
-		    else if(type == Greater && a > b) return new BooleanValue(true);
-		    
-		    return new BooleanValue(false);
+                    if (type == Equal && a == b) return new BooleanValue(true);
+                    else if(type == Equal && a != b) return new BooleanValue(true);
+                    else if(type == NotEqual && a != b) return new BooleanValue(true);
+                    else if(type == GEqual && a >= b) return new BooleanValue(true);
+                    else if(type == LEqual && a >= b) return new BooleanValue(true);
+                    else if(type == Less && a < b) return new BooleanValue(true);
+                    else if(type == Greater && a > b) return new BooleanValue(true);
+
+                    return new BooleanValue(false);
                 }
                 else
                 {
-		    // should not happen.
+                    // should not happen.
                     AC_ERROR << "Type not implemented!";
                     assert(false);
                 }
@@ -413,7 +411,7 @@ namespace xpath
             } else if (type==And) {
                 return new BooleanValue(rb && lb);
             } else {
-		// should not happen.
+                // should not happen.
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
                 return new NullValue();
@@ -426,27 +424,27 @@ namespace xpath
             double rn = r->getValue();
             double ln = l->getValue();
 #ifdef INTERPRETER_DEBUG
-	    AC_TRACE << "evaluating arithmetic operation " << type << " on " << rn << ", " << ln;
+            AC_TRACE << "evaluating arithmetic operation " << type << " on " << rn << ", " << ln;
 #endif
             delete right; delete r;
             delete left; delete l;
             switch(type)
             {
-            case Plus:
-                return new NumberValue(ln + rn);
-            case Minus:
-                return new NumberValue(ln - rn);
-            case Times:
-                return new NumberValue(ln * rn);
-            case Div:
-                return new NumberValue(ln / rn);
-            case Mod:
-                return new NumberValue(ln - rn * floor(ln / rn));
-            default:
-		// should not happen.
-                AC_ERROR << "Not yet implemented.";
-                assert(false);
-                return new NullValue();
+                case Plus:
+                    return new NumberValue(ln + rn);
+                case Minus:
+                    return new NumberValue(ln - rn);
+                case Times:
+                    return new NumberValue(ln * rn);
+                case Div:
+                    return new NumberValue(ln / rn);
+                case Mod:
+                    return new NumberValue(ln - rn * floor(ln / rn));
+                default:
+                    // should not happen.
+                    AC_ERROR << "Not yet implemented.";
+                    assert(false);
+                    return new NullValue();
             };
         }
     };
@@ -1370,182 +1368,180 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 
     template<class ITER>
     void descendReverse(ITER &resultset, NodeRef curNode) {
-	for (NodeRef curChild = &*curNode->lastChild(); curChild; curChild = &*curChild->previousSibling()) {
-	    descendReverse(resultset, curChild);
-	}
-	*resultset++ = curNode;
+        for (NodeRef curChild = &*curNode->lastChild(); curChild; curChild = &*curChild->previousSibling()) {
+            descendReverse(resultset, curChild);
+        }
+        *resultset++ = curNode;
     }
 
     template<class CONT>
-    void fillAxis(Step *s, NodeRef curNode, CONT &cont)
-    {
-	std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
+    void fillAxis(Step *s, NodeRef curNode, CONT &cont) {
+        std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
         NodeRef origNode = curNode;
         // build up the axis with appropriate nodes containing passing the test
         switch(s->getAxis())
         {
-        case Step::Child:
-            if (curNode->hasChildNodes()) {
-                for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
-                    if (s->allows(curNode)) {
+            case Step::Child:
+                if (curNode->hasChildNodes()) {
+                    for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
+                        if (s->allows(curNode)) {
 #ifdef INTERPRETER_DEBUG
-			AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
 #endif
+                            *resultset++ = curNode;
+                        }
+                    }
+                }
+                break;
+            case Step::Parent:
+                curNode = curNode->parentNode();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Next_Sibling:
+                curNode = &*curNode->nextSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Previous_Sibling:
+                curNode = &*curNode->previousSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Preceding_Sibling:
+                while (curNode = &*curNode->previousSibling()) {
+                    if (s->allows(curNode)) {
                         *resultset++ = curNode;
                     }
                 }
-	    }
-            break;
-        case Step::Parent:
-            curNode = curNode->parentNode();
-            if (curNode && s->allows(curNode)) {
-		*resultset++ = curNode;
-            }
-            break;
-        case Step::Next_Sibling:
-            curNode = &*curNode->nextSibling();
-            if (curNode && s->allows(curNode)) {
-		*resultset++ = curNode;
-            }
-            break;
-        case Step::Previous_Sibling:
-            curNode = &*curNode->previousSibling();
-            if (curNode && s->allows(curNode)) {
-		*resultset++ = curNode;
-            }
-            break;
-        case Step::Preceding_Sibling:
-            while (curNode = &*curNode->previousSibling()) {
-                if (s->allows(curNode)) {
-		    *resultset++ = curNode;
+                break;
+            case Step::Following_Sibling:
+                while (curNode = &*curNode->nextSibling()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
                 }
-            }
-            break;
-        case Step::Following_Sibling:
-            while (curNode = &*curNode->nextSibling()) {
-                if (s->allows(curNode)) {
-		    *resultset++ = curNode;
+                break;
+            case Step::Following:
+                origNode = NULL;
+                /* nobreak; */
+            case Step::Descendant_Or_Self:
+                if (origNode && s->allows(origNode)) {
+                    *resultset++ = origNode;
                 }
-            }
-            break;
-        case Step::Following:
-	    origNode = NULL;
-	    /* nobreak; */
-        case Step::Descendant_Or_Self:
-            if (origNode && s->allows(origNode)) {
-		*resultset++ = origNode;
-            }
-            /* nobreak; */
-        case Step::Descendant:
-            {
-                while (true)
+                /* nobreak; */
+            case Step::Descendant:
                 {
-                    if (curNode->firstChild()) {
-                        curNode = &*curNode->firstChild();
-                    } else if (curNode == origNode) {
-                        break;
-                    } else if (curNode->nextSibling()) {
-                        curNode = &*curNode->nextSibling();
-                    } else {
-                        NodeRef tmp = curNode;
-                        while ((tmp = tmp->parentNode()) != origNode) {
-                            if (tmp->nextSibling()) {
-                                curNode = &*tmp->nextSibling();
+                    while (true)
+                    {
+                        if (curNode->firstChild()) {
+                            curNode = &*curNode->firstChild();
+                        } else if (curNode == origNode) {
+                            break;
+                        } else if (curNode->nextSibling()) {
+                            curNode = &*curNode->nextSibling();
+                        } else {
+                            NodeRef tmp = curNode;
+                            while ((tmp = tmp->parentNode()) != origNode) {
+                                if (tmp->nextSibling()) {
+                                    curNode = &*tmp->nextSibling();
+                                    break;
+                                }
+                            }
+                            if (tmp == origNode) {
                                 break;
                             }
-                        }
-                        if (tmp == origNode) {
-                            break;
+                        };
+
+                        if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
+                            *resultset++ = curNode;
                         }
                     };
-
-                    if (s->allows(curNode)) {
-#ifdef INTERPRETER_DEBUG
-			AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
-#endif
-			*resultset++ = curNode;
-                    }
                 };
-            };
-	    break;
-	case Step::Preceding:
-	    for (;curNode;curNode = curNode->parentNode()) {
-		while (curNode->previousSibling()) {
-		    curNode = &*curNode->previousSibling();
-		    AC_TRACE << " diving into " << *curNode;
-		    descendReverse(resultset, curNode);
-		}
-	    }
-            break;
-        case Step::Self:
-            if (s->allows(curNode)) {
-		*resultset++ = curNode;
-            }
-            break;
-        case Step::Attribute:
-            {
-                dom::NamedNodeMap map = curNode->attributes();
-                for (unsigned int i = 0; i < map.length(); i++)
-                    if (s->allows(&*map.item(i)))
-			*resultset++ = &*map.item(i);
-            };
-        case Step::Ancestor_Or_Self:
-            if (s->allows(curNode)) {
-		*resultset++ = curNode;
-            }
-            /* nobreak; */
-        case Step::Ancestor:
-            if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE)
-            {
-                /*
-                  dom::Attribute curAttr = curNode;
-                  curNode = curAttr.ownerElement();
-                */
-                curNode = curNode->parentNode();
-                if (s->allows(curNode)) {
-		    *resultset++ = curNode;
+                break;
+            case Step::Preceding:
+                for (;curNode;curNode = curNode->parentNode()) {
+                    while (curNode->previousSibling()) {
+                        curNode = &*curNode->previousSibling();
+                        AC_TRACE << " diving into " << *curNode;
+                        descendReverse(resultset, curNode);
+                    }
                 }
-            }
-            while (curNode = curNode->parentNode()) {
+                break;
+            case Step::Self:
                 if (s->allows(curNode)) {
-		    *resultset++ = curNode;
+                    *resultset++ = curNode;
                 }
-            }
-        case Step::Invalid:
-        default:
-            break;
+                break;
+            case Step::Attribute:
+                {
+                    dom::NamedNodeMap & map = curNode->attributes();
+                    for (unsigned int i = 0; i < map.length(); i++)
+                        if (s->allows(&*map.item(i)))
+                            *resultset++ = &*map.item(i);
+                };
+            case Step::Ancestor_Or_Self:
+                if (s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                /* nobreak; */
+            case Step::Ancestor:
+                if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE)
+                {
+                    /*
+                       dom::Attribute curAttr = curNode;
+                       curNode = curAttr.ownerElement();
+                     */
+                    curNode = curNode->parentNode();
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                while (curNode = curNode->parentNode()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+            case Step::Invalid:
+            default:
+                break;
         };
 #ifdef INTERPRETER_DEBUG
-	if (origNode) {
-	    AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
-	} else {
-	    AC_TRACE << "evaluating step " << *s << ": selected " << cont.size() << " candidates...";
-	}
+        if (origNode) {
+            AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+        } else {
+            AC_TRACE << "evaluating step " << *s << ": selected " << cont.size() << " candidates...";
+        }
 #endif
     };
 
     template<class CONT>
-    void scanStep(Step *s, NodeRef origNode, CONT &results)
-    {
-	bool have_predicates = (s->predicates.begin() != s->predicates.end());
-	if (!have_predicates) {
-	    fillAxis(s, origNode, results);
-	    return;
-	}
+    void scanStep(Step *s, NodeRef origNode, CONT &results) {
+        bool have_predicates = (s->predicates.begin() != s->predicates.end());
+        if (!have_predicates) {
+            fillAxis(s, origNode, results);
+            return;
+        }
 
 #ifdef INTERPRETER_DEBUG
         AC_TRACE << "now evaluating step \"" << *s << "\" :";
 #endif
-        NodeListRef intermediateResult = new NodeList();
-	fillAxis(s, origNode, *intermediateResult);
+        NodeVectorRef intermediateResult = new NodeVector();
+        fillAxis(s, origNode, *intermediateResult);
 
 #ifdef INTERPRETER_DEBUG
         AC_TRACE << " on " << origNode->nodeName() << (origNode->parentNode() ? (" inside " + origNode->parentNode()->nodeName()):"") << ":";
         AC_TRACE << "starting with " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes";
 
 #endif
-	std::list<Expression*>::iterator last = s->predicates.end(); 
-	--last;
+        std::list<Expression*>::iterator last = s->predicates.end(); 
+        --last;
 
         Context subcontext;
 
@@ -1555,9 +1551,9 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
             subcontext.size = intermediateResult->size();
             subcontext.position = 0;
-            for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end();) {
+            for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end();) {
 #ifdef INTERPRETER_DEBUG
-		AC_TRACE << "evaluating...";
+                AC_TRACE << "evaluating...";
 #endif
                 subcontext.position++;
                 subcontext.currentNode = (*j);
@@ -1570,40 +1566,40 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 #endif
                     intermediateResult->erase(j++);
                 }
-		else ++j;
+                else ++j;
                 delete v;
             }
         }
 
-	std::insert_iterator<CONT> ins = std::inserter(results, results.end());
+        std::insert_iterator<CONT> ins = std::inserter(results, results.end());
 #ifdef INTERPRETER_DEBUG
-	AC_TRACE << "filtering by last predicate [" << *(*last) << "] in a context of " << intermediateResult->size() << " nodes:";
+        AC_TRACE << "filtering by last predicate [" << *(*last) << "] in a context of " << intermediateResult->size() << " nodes:";
 #endif
-	subcontext.size = intermediateResult->size();
-	subcontext.position = 0;
-	for (NodeList::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
-	    subcontext.position++;
-	    subcontext.currentNode = (*j);
-	    Value *tmp = (*last)->evaluateExpression(subcontext);
-	    BooleanValue *v = tmp->toBoolean();
-	    delete tmp;
-	    if (v->getValue()) {
+        subcontext.size = intermediateResult->size();
+        subcontext.position = 0;
+        for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+            subcontext.position++;
+            subcontext.currentNode = (*j);
+            Value *tmp = (*last)->evaluateExpression(subcontext);
+            BooleanValue *v = tmp->toBoolean();
+            delete tmp;
+            if (v->getValue()) {
 #ifdef INTERPRETER_DEBUG
-		AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " into container of " << results.size() << " elements";
-		AC_TRACE << " because the predicate [" << (**last) << "] evaluates true.";
+                AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " into container of " << results.size() << " elements";
+                AC_TRACE << " because the predicate [" << (**last) << "] evaluates true.";
 #endif
-		*ins++ = (*j);
-	    }
-	    delete v;
-	}
-	delete intermediateResult;
+                *ins++ = (*j);
+            }
+            delete v;
+        }
+        delete intermediateResult;
     };
 
     void Step::scan(NodeRef from, NodeSet &into) {
-	scanStep(this, from, into);
+        scanStep(this, from, into);
     }
 
-    void Step::scan(NodeRef from, NodeList &into) {
+    void Step::scan(NodeRef from, NodeVector &into) {
 	scanStep(this, from, into);
     }
 
@@ -1720,7 +1716,7 @@ return (asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 	delete workingset;
     };
 
-    void Path::evaluateInto(NodeSetRef workingset, NodeList &returnContainer) {
+    void Path::evaluateInto(NodeSetRef workingset, NodeVector & returnContainer) {
 
 	// avoid duplicates in intermediate results
 	OrderedNodeSetRef lastStepSet = new OrderedNodeSet();

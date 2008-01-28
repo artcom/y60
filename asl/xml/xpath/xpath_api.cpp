@@ -20,14 +20,14 @@ namespace xpath {
 
     Path *xpath_parse(const std::string &instring) {
         Path *p = new Path();
-        AC_INFO << "parsing path " << instring;
+        AC_DEBUG << "parsing path " << instring;
         if (parsePath(p, instring, 0) == 0) {
             // parse error
-            AC_INFO << "parse error. Intermediate result=" << *p;
+            AC_WARNING << "parse error. Intermediate result=" << *p;
             delete p;
             return NULL;
         }
-        AC_INFO << "parsing result = " << *p;
+        AC_DEBUG << "parsing result = " << *p;
         return p;
     }
 
@@ -36,7 +36,7 @@ namespace xpath {
         OrderedNodeSetRef retval = p->evaluateAs<OrderedNodeSet>(theNode);
 
 #ifdef DEBUG_RESULTS
-        AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+        AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
 
         for (OrderedNodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
             try {
@@ -63,9 +63,9 @@ namespace xpath {
     }
 
     std::vector<dom::Node *> *xpath_evaluate(Path *p, dom::Node *theNode) {
-        xpath::NodeListRef retval = p->evaluateAs<NodeList>(theNode);
+        xpath::NodeVectorRef retval = p->evaluateAs<NodeVector>(theNode);
 #ifdef DEBUG_RESULTS
-        AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+        AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
 
         for (std::vector<dom::Node *>::iterator i = retval->begin(); i != retval->end(); ++i) {
             try {
@@ -91,35 +91,34 @@ namespace xpath {
             AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
-	    NodeListRef retval = xpath_evaluate(myPath, theNode);
+            NodeVectorRef retval = xpath_evaluate(myPath, theNode);
             delete myPath;
             return retval;
-	}
+        }
     }
 
     std::set<dom::Node *> *xpath_evaluateSet(xpath::Path *myPath, dom::Node *theNode) {
-
-	NodeSetValue *retValue = myPath->evaluate(theNode);
-	NodeSetRef retval = retValue->takeNodes();
+        NodeSetValue *retValue = myPath->evaluate(theNode);
+        NodeSetRef retval = retValue->takeNodes();
 #ifdef DEBUG_RESULTS
-	    AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+        AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
 
-            for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
-		try {
-		    AC_TRACE << " * " << (*i)->nodeName() << " "
-                             << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
-		    if ((*i)->nodeType() == dom::Node::ELEMENT_NODE) {
-			for (int j = 0; j < (*i)->attributesLength(); j++) {
-			    AC_TRACE << "   " << (*i)->getAttribute(j)->nodeName() << "=" << (*i)->getAttribute(j)->nodeValue();
-			}
-		    }
-		} catch(asl::Exception &e) {
-		    AC_TRACE << " oops...";
-		}
-	    }
+        for (NodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
+            try {
+                AC_TRACE << " * " << (*i)->nodeName() << " "
+                    << ((*i)->nodeType() == dom::Node::TEXT_NODE ? (*i)->nodeValue():"");
+                if ((*i)->nodeType() == dom::Node::ELEMENT_NODE) {
+                    for (int j = 0; j < (*i)->attributesLength(); j++) {
+                        AC_TRACE << "   " << (*i)->getAttribute(j)->nodeName() << "=" << (*i)->getAttribute(j)->nodeValue();
+                    }
+                }
+            } catch(asl::Exception &e) {
+                AC_TRACE << " oops...";
+            }
+        }
 #endif
-	delete retValue;
-	return retval;
+        delete retValue;
+        return retval;
     }
 
     std::set<dom::Node *> *xpath_evaluateSet(std::string path, dom::Node *theNode) {
@@ -129,16 +128,16 @@ namespace xpath {
             AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
-	    NodeSetRef retval = xpath_evaluateSet(myPath, theNode);
+            NodeSetRef retval = xpath_evaluateSet(myPath, theNode);
             delete myPath;
             return retval;
-	}
+        }
     }
 
     OrderedNodeSetRef xpath_evaluateOrderedSet(xpath::Path *myPath, dom::Node *theNode) {
         OrderedNodeSetRef retval = myPath->evaluateAs<OrderedNodeSet>(theNode);
 #ifdef DEBUG_RESULTS
-        AC_INFO << "evaluated path contains " << retval->size() << " nodes.";
+        AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
 
         for (OrderedNodeSet::iterator i = retval->begin(); i != retval->end(); ++i) {
             try {
@@ -164,36 +163,36 @@ namespace xpath {
             AC_ERROR << "XPath parse error.";
             return NULL;
         } else {
-	    OrderedNodeSetRef retval = xpath_evaluateOrderedSet(myPath, theNode);
+            OrderedNodeSetRef retval = xpath_evaluateOrderedSet(myPath, theNode);
             delete myPath;
             return retval;
-	}
+        }
     }
 
     void xpath_return(Path *p) {
-	delete p;
+        delete p;
     }
 
     void xpath_evaluate(Path *p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
 
-	std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
+        std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
 
-	for (std::vector<dom::Node *>::iterator i = retval->begin(); i != retval->end(); ++i) {
-	    results.push_back((*i)->self().lock());
-	}
+        for (std::vector<dom::Node *>::iterator i = retval->begin(); i != retval->end(); ++i) {
+            results.push_back((*i)->self().lock());
+        }
 
-	delete retval;
+        delete retval;
     }
 
     void xpath_evaluate(std::string p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
 
-	std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
+        std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
 
-	for (std::vector<dom::Node *>::iterator i = retval->begin(); i != retval->end(); ++i) {
-	    results.push_back((*i)->self().lock());
-	}
+        for (std::vector<dom::Node *>::iterator i = retval->begin(); i != retval->end(); ++i) {
+            results.push_back((*i)->self().lock());
+        }
 
-	delete retval;
+        delete retval;
     }
 
 }

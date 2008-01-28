@@ -15,7 +15,7 @@
 #include "Nodes.h"
 #include <asl/Logger.h>
 
-#define DB(x) // x
+#define DB(x)  x
 #define DB2(x) // x
 
 using namespace std;
@@ -43,6 +43,11 @@ StringValue::bumpVersion() {
 void
 dom::NodeIDRegistry::registerID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue, dom::Node * theElement) {
     DB(AC_TRACE << "Node::registerID: registering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
+#if 0
+    if (theIDAttributeValue == "B7QW8wUFeqA=") {
+       AC_TRACE << asl::StackTrace();
+    }
+#endif
     IDMap & myMap = _myIDMaps[theIDAttributeName];
     IDMap::iterator myEntry = myMap.find(theIDAttributeValue);
     if (myEntry != myMap.end()) {
@@ -54,6 +59,11 @@ dom::NodeIDRegistry::registerID(const DOMString & theIDAttributeName, const DOMS
 void
 dom::NodeIDRegistry::unregisterID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue) {
     DB(AC_TRACE << "Node::unregisterID: unregistering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
+#if 0
+    if (theIDAttributeValue == "B7QW8wUFeqA=") {
+       AC_TRACE << asl::StackTrace();
+    }
+#endif
     IDMaps::iterator myMap = _myIDMaps.find(theIDAttributeName);
     if (myMap == _myIDMaps.end()) {
         throw Node::IDValueNotRegistered(string("Internal Error: No Element with ID attribute '")+theIDAttributeName+"' of any value, especially '"+theIDAttributeValue+"' is registered at the document", PLUS_FILE_LINE);

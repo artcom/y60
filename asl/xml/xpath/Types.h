@@ -27,8 +27,8 @@ namespace xpath
     typedef std::set<NodeRef> NodeSet;
     typedef NodeSet *NodeSetRef;
 
-    typedef std::vector<NodeRef> NodeList;
-    typedef NodeList *NodeListRef;
+    typedef std::vector<NodeRef> NodeVector;
+    typedef NodeVector * NodeVectorRef;
 
     struct DocOrderLess :
 	public std::binary_function<const NodeRef, const NodeRef, bool>

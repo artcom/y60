@@ -37,6 +37,11 @@ namespace dom {
     /*! \addtogroup aslxml */
     /* @{ */
 
+    /* NodeList holds a list of Nodes; beware that you can not use NodeList freely because NodeList also
+       manages parent pointers and IDRegistry entries, so putting a Node into a NodeList will unregister it
+       with the original dom IDRRegistry.
+    */
+
     class NodeList {
     public:
         friend class Node;

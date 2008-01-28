@@ -24,8 +24,7 @@ namespace xpath
     class StringValue;
     class NodeSetValue;
 
-    class Value
-    {
+    class Value {
     public:
       virtual ~Value();
       enum ValueType { NullType, BooleanType, NumberType, StringType, NodeSetType };
@@ -45,32 +44,30 @@ namespace xpath
 
     template <class VALUE_TYPE>
     bool equals_as(Value *left, Value *right) {
-	VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
-	VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
-	bool retval = lv->getValue() == rv->getValue();
-	delete lv;
-	delete rv;
-	return retval;
+        VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
+        VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
+        bool retval = lv->getValue() == rv->getValue();
+        delete lv;
+        delete rv;
+        return retval;
     }
 
     template <class VALUE_TYPE>
     bool smaller_than_as(Value *left, Value *right) {
-	VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
-	VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
-	bool retval = lv->getValue() < rv->getValue();
-	delete lv;
-	delete rv;
-	return retval;
+        VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
+        VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
+        bool retval = lv->getValue() < rv->getValue();
+        delete lv;
+        delete rv;
+        return retval;
     }
 
-    class NullValue : public Value
-    {
+    class NullValue : public Value {
     public:
       ValueType type() { return NullType; };
     };
 
-    class BooleanValue : public Value
-    {
+    class BooleanValue : public Value {
     public:
       BooleanValue(bool _value) { value = _value; };
       virtual ~BooleanValue();
@@ -87,8 +84,7 @@ namespace xpath
       bool value;
     };
 
-    class NumberValue : public Value
-    {
+    class NumberValue : public Value {
     public:
       NumberValue(double _value) { value = _value; isNaN = false; isInfinity = false; };
       virtual ~NumberValue();
@@ -108,8 +104,7 @@ namespace xpath
       double value;
     };
 
-    class StringValue : public Value
-    {
+    class StringValue : public Value {
     public:
       StringValue(const string &s)
 	  { value = s; };
@@ -132,8 +127,7 @@ namespace xpath
     // they contain a NodeSetRef which is ordered by pointer value.
     // this provides for fast insertion and lookup.
     //
-    class NodeSetValue : public Value
-    {
+    class NodeSetValue : public Value {
     public:
         NodeSetValue() {_myNodes = NULL;};
         // ownership of other is transferred to the new node set value.

@@ -211,7 +211,7 @@ namespace y60 {
             TexturePtr myTexture = myTextureUnit->getTexture();
             if (myTexture && myTexture->getTextureId() == 0) {
                 //AC_DEBUG << "addTexture triggering texture upload id=" << myTexture->get<IdTag>() << " texId=" << myTexture->getTextureId();
-                myTexture->preload();
+                //myTexture->preload();
             }
         } else {
             AC_WARNING << "Your OpenGL implementation only supports " 

@@ -35,8 +35,14 @@ namespace y60 {
             theStream->getStream().readString(myXML, 100, 0);
             if (myXML.find("<scene") != std::string::npos) { //TODO: smells cheesy
                 return MIME_TYPE_X60;
-            } else if (myXML.find(std::string(1, char(5)) + "scene") != std::string::npos) { //TODO: smells cheesy
+            } 
+            asl::Unsigned32 myMagic;
+            theStream->getStream().readUnsigned32(myMagic, 0);
+            if (myMagic == dom::Node::B60_MAGIC) {
                 return MIME_TYPE_B60;
+            }
+            if (myMagic == dom::Node::D60_MAGIC) {
+                return MIME_TYPE_D60;
             }
         } else {
             if (asl::toLowerCase(asl::getExtension(theUrl)) == "x60") {
@@ -48,7 +54,7 @@ namespace y60 {
             if (asl::toLowerCase(asl::getExtension(theUrl)) == "d60") {
                 return MIME_TYPE_D60;
             }
-       }
+        }
         return "";
     }
 
@@ -79,13 +85,13 @@ namespace y60 {
         if (myMimeType == MIME_TYPE_X60) {
             myBinaryFlag = false;
         }
-        AC_INFO << "  Y60Decoder::decodeScene: MIME type = '"<<myMimeType<<"'";
+        AC_DEBUG << "  Y60Decoder::decodeScene: MIME type = '"<<myMimeType<<"'";
 
         unsigned long myFileSize = 0;
         unsigned long myNodeCount = 0;
         
         if (myBinaryFlag) {
-            AC_INFO << "  Y60Decoder::decodeScene: using binary xml loader";
+            AC_DEBUG << "  Y60Decoder::decodeScene: using binary xml loader, lazy="<<getLazy();
             myFileSize = theStream.size();
             double myLoadTime = asl::Time() - loadStart;
             if (dynamic_cast<asl::MappedBlock*>(&theStream)) {
@@ -94,7 +100,7 @@ namespace y60 {
                 AC_INFO << "  Readable Stream size: " << myFileSize << " bytes ";
             }
             parseStart.setNow();
-            if (getLazy() && myMimeType == MIME_TYPE_D60) {
+            if (getLazy() && (myMimeType == MIME_TYPE_D60)) {
                 AC_INFO << "  Y60Decoder::decodeScene: using lazy mode";
                 theDocument->debinarizeLazy(theSource);
                 myNodeCount = 1; // TODO: get node count from catalog
@@ -103,7 +109,7 @@ namespace y60 {
                 myNodeCount = countNodes(*theDocument);
             }
         } else {
-            AC_INFO << "  Y60Decoder::decodeScene: using unicode xml loader";
+            AC_DEBUG << "  Y60Decoder::decodeScene: using unicode xml loader";
             std::string myXMLFile;
             theStream.readString(myXMLFile, theStream.size(), 0);
             myFileSize = myXMLFile.size();
