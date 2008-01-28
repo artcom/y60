@@ -1188,6 +1188,8 @@ Dependent on node type allowed children are:<p>
 
         static
         DOMString  getNameOfType(NodeType type);
+        void printChangedNodes(const std::string & theLastVersion) const;
+        void printChangedNodes(asl::Unsigned64 theLastVersion= 0xffffffffffffffffULL, int theLevel=0) const;
     protected:
         typedef std::map<EventListener*,EventListenerPtr> EventListenerSet;
         typedef std::map<DOMString, EventListenerSet> EventListenerMap;
@@ -1212,8 +1214,6 @@ Dependent on node type allowed children are:<p>
             }
             return _myIDRefRegistry;
         }
-        void printChangedNodes(const std::string & theLastVersion) const;
-        void printChangedNodes(asl::Unsigned64 theLastVersion= 0xffffffffffffffffULL, int theLevel=0) const;
     protected:
         void getReferencingNodes(std::vector<NodePtr> & theResult);
         void setUpstreamVersion(asl::Unsigned64 theVersion);
