@@ -3107,7 +3107,11 @@ dom::Node::printChangedNodes(unsigned long long theLastVersion, int theLevel) co
         cerr << myPrefix << nodeTypeName() << " '"<< nodeName() <<"', V="<<nodeVersion()<<", UID="<<getUniqueId();
         cerr << " = ";
         if (mayHaveValue()) {
-            cerr << nodeValue();
+            if (nodeValue().size() < 50) {
+                cerr << nodeValue();
+            } else {
+                cerr << nodeValue().substr(0,50) << "...";
+            }
         } else {
             cerr <<"#NO VALUE";
         }

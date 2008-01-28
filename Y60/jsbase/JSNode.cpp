@@ -930,6 +930,18 @@ debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+JSBool
+printChangedNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("prints a list of all nodes that have a higher version number as the given argument version number");
+    DOC_PARAM("theLastVersion", "Version Number (64 Bit unsigned integer as string)", DOC_TYPE_STRING);
+    DOC_END;
+    dom::NodePtr myNode = JSNode::getNodePtr(cx,obj);
+    typedef void (dom::Node::*MyMethod)(const std::string &) const;
+    JSBool myRVal = Method<dom::Node>::call((MyMethod)&dom::Node::printChangedNodes, cx, obj, argc, argv, rval);
+    return myRVal;
+}
+
+
 JSFunctionSpec *
 JSNode::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -962,6 +974,7 @@ JSNode::Functions() {
         {"dispatchEvent",       dispatchEvent,       3},
         {"freeCaches",          freeCaches,          0},
         {"debugValue",          debugValue,          0},
+        {"printChangedNodes",   printChangedNodes,   1},
        {0}
     };
     return myFunctions;

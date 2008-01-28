@@ -235,9 +235,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     self.getScene().saveWithCatalog("saved_scene.d60", "saved_scene.d60", true);
                     print("Saved scene and catalog to: saved_scene.d60");
                     break;
-                 case 'p':
+                case 'p':
                     window.pause = !window.pause;
                     print("Pause: " + (window.pause ? "on" : "off"));
+                    break;
+                case 'P':
+                    window.scene.dom.printChangedNodes(_sinceLastVersion);
+                    _sinceLastVersion = window.scene.dom.nodeVersion;
                     break;
                 case 'h':
                 case 'H':
@@ -515,6 +519,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _mySplashScreen.position = new Vector2f((window.width - _mySplashScreen.width) / 2,
                                                     (window.height - _mySplashScreen.height) / 2);
         }
+        _sinceLastVersion="1";
     }
 
     self.createShutter = function() {
