@@ -93,13 +93,13 @@ namespace y60 {
     }
 
     void
-    M60Decoder::stopMovie() {
+    M60Decoder::stopMovie(bool theStopAudioFlag) {
         _myLastDecodedFrame = UINT_MAX;
     }
 
     double
     M60Decoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-        DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame);
+        DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame << ", theTime: " << theTime);
 
         if (theFrame >= getFrameCount()) {
             setEOF(true);
@@ -111,6 +111,7 @@ namespace y60 {
         if (_myLastDecodedFrame > theFrame) {
             if ( _myLastDecodedFrame != UINT_MAX  && !myReverseFlag) {
                 setEOF(true);
+                DB(AC_DEBUG << "Wraparound detected");
                 return theTime;                
             } else {
                 _myFilePos = _myMovieHeaderSize;
