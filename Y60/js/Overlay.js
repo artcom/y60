@@ -799,8 +799,8 @@ function removeOverlay(theOverlayNode) {
 				for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
 					var myTextureUnit = myTextureUnits.childNode(i);
 					var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
-
-					if (getDescendantsByAttribute(window.scene.textures, "image", myTexture.image).length == 1) {
+					//if (getDescendantsByAttribute(window.scene.textures, "image", myTexture.image).length == 1) {
+					if (window.scene.textures.findAll("//*[@image='"+ myTexture.image+ "']").length == 1) {
 						// our texture is the only one referencing this image, safe to remove
 						var myImage = myTexture.getElementById(myTexture.image);
 						myImage.parentNode.removeChild(myImage);
@@ -808,7 +808,8 @@ function removeOverlay(theOverlayNode) {
 						Logger.warning("More than one texture references image id=" + myTexture.image);
 					}
 
-					if (getDescendantsByAttribute(window.scene.materials, "texture", myTexture.id, true).length == 1) {
+					//if (getDescendantsByAttribute(window.scene.materials, "texture", myTexture.id, true).length == 1) {
+					if (window.scene.materials.findAll("//*[@texture='"+ myTexture.id+ "']").length == 1) {
 						// our textureunit is the only one referencing this texture, safe to remove
 						myTexture.parentNode.removeChild(myTexture);
 					} else {
