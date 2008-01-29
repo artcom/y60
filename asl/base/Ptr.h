@@ -518,10 +518,7 @@ namespace asl {
             if (_myRefCountPtr) {
                 return _myRefCountPtr->smartCount;
             }
-            // XXX DS: huh? why is the refcount 1 if there is no reference counter?
-            // PM: The refcount is undefined if there is no reference counter
-            //     so we can return what we want; 1 is as wrong as any other number
-            return 1;
+            return 0;
         }
         
     private:
@@ -658,19 +655,13 @@ namespace asl {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->smartCount;
                 }
-                // XXX DS: huh? why is the refcount 1 if there is no reference counter?
-                // PM: The refcount is undefined if there is no reference counter
-                //     so we can return what we want; 1 is as wrong as any other number
-                return 1;
+                return 0;
             }
             inline long getWeakCount() const {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->weakCount;
                 }
-                // XXX DS: huh? why is the refcount 1 if there is no reference counter?
-                // PM: The refcount is undefined if there is no reference counter
-                //     so we can return what we want; 1 is as wrong as any other number
-                return 1;
+                return 0;
             }
 
         private:

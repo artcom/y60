@@ -2906,7 +2906,50 @@ Node::freeCaches() const {
     getChildren().freeCaches();
  }
  
+bool
+Node::flushUnusedChildren() const {
+    if (!getIDRegistry()->hasOffsetCatalog()) {
+        AC_WARNING << "flushUnusedChildren() called on non-lazy dom, doing nothing";
+        return false;
+    }
+    if (_lazyChildren) {
+        AC_DEBUG << "flushUnusedChildren(): dont need to flush because not yet loaded " << getUniqueId() << ", name="<<nodeName(); 
+        return true;
+    }
+    bool flushMyChildren = true;   
+    for (int i = 0; i< getChildren().length(); ++i) {
+        if (!getChildren()[i].flushUnusedChildren()) {
+            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because child " << i << " is modified or referenced"; 
+            flushMyChildren = false;
+        }
+    }
+    if (flushMyChildren && getChildren().length()) {
+        AC_DEBUG << "flushUnusedChildren() flushing children of" << getUniqueId() << ", name="<<nodeName(); 
+        const_cast<Node&>(*this).getChildren().flush();
+        _lazyChildren = true;
+    }
 
+    if (nodeVersion() != 1) {
+        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because nodeVersion() is " << nodeVersion(); 
+        return false;
+    }
+    if (self().getRefCount() !=1) {
+        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because refcount() is " << self().getRefCount(); 
+        return false;
+    }
+    if (nodeType() == ATTRIBUTE_NODE) {
+        AC_DEBUG << "flushUnusedChildren() attribute " << getUniqueId() << ", name="<<nodeName() << " is unchanged and not externally referenced, flushMyChildren="<<flushMyChildren; 
+        return flushMyChildren;
+    }
+    for (int i = 0; i< _myAttributes.length(); ++i) {
+        if (!_myAttributes[i].flushUnusedChildren()) {
+            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because attribute " << i << " is modified or referenced"; 
+            return false;
+        }
+    }
+    return flushMyChildren;
+ }
+ 
 // theNewParent is the new parent for the node, theTopNewParent is the same node 
 // on the first call, but stays the same during the recursion when reparenting
 // the children in case a whole subtree is reparented.

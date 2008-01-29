@@ -61,6 +61,17 @@ dom::NodeList::clear() {
     }
 }
 
+void 
+dom::NodeList::flush() {
+	for (int i = 0; i < size();++i) {
+	    if (_myNodes[i]->parentNode() == _myShell) {
+	        _myNodes[i]->reparent(0, 0);
+	    }
+	}
+    resize(0);
+}
+
+
 dom::NodeList::NodeList(Node * theShell):_myShell(theShell) {
     
 };

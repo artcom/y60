@@ -243,6 +243,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     window.scene.dom.printChangedNodes(_sinceLastVersion);
                     _sinceLastVersion = window.scene.dom.nodeVersion;
                     break;
+                case 'U':
+                    window.scene.dom.flushUnusedChildren();
+                    break;
                 case 'h':
                 case 'H':
                     printHelp();
@@ -614,6 +617,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    B          save scene to binary file");
          print("    q          quits the application");
          print("    X          dumps scene on console");
+         print("    P          prints a list of all nodes that have changed since last print");
+         print("    U          flush currently unused nodes in lazy loading mode");
          print("    u          toggle used memory display");
          print("    e          re-evaluate all include-files");
          print("    i          Cycles window swap interval");

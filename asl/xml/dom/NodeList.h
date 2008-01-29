@@ -80,6 +80,7 @@ namespace dom {
         NodePtr appendWithoutReparenting(NodePtr theNewNode);
         virtual void reparent(Node * theNewParent, Node * theTopNewParent);
         virtual void resize(asl::AC_SIZE_TYPE newSize);
+        virtual void flush(); // is a clear() with version bumping
         Node * _myShell;
     private:
         std::vector<NodePtr> _myNodes;

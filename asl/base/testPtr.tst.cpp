@@ -101,7 +101,7 @@ public:
             ENSURE(!emptyBasePtr);
             ENSURE(emptyBasePtr.getNativePtr() == 0);
             //DPRINT(emptyBasePtr.getRefCount());
-            ENSURE(emptyBasePtr.getRefCount() == 1);
+            ENSURE(emptyBasePtr.getRefCount() == 0);
             //DPRINT(emptyBasePtr.getRefCount());
             // Test single non-empty pointer behaviour
             Ptr<TestClassBase<N>,ThreadingModel> myBasePtr(new TestClassBase<N> );

@@ -62,7 +62,9 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,       TextureWrapMode,     TEXTURE_WRAPMODE_ATTRIB,        REPEAT);
     DEFINE_ATTRIBUT_TAG(TextureMinFilterTag,      TextureSampleFilter, TEXTURE_MIN_FILTER_ATTRIB,      LINEAR);
     DEFINE_ATTRIBUT_TAG(TextureMagFilterTag,      TextureSampleFilter, TEXTURE_MAG_FILTER_ATTRIB,      LINEAR);
+#ifdef BAD_TX
     DEFINE_ATTRIBUT_TAG(TextureImageTag,          ImageWeakPtr,        "textureImage",                 ImagePtr(0));
+#endif
     DEFINE_ATTRIBUT_TAG(TextureParamChangedTag,   bool,                "textureParamChanged",          false);
 }
 

@@ -1027,7 +1027,7 @@ namespace dom {
             return !myUnmodifiedProxyFlag;
         }
         virtual void freeCaches() const;
-
+        virtual bool flushUnusedChildren() const;
 protected:
         NodePtr loadPathById(const DOMString & theId, const DOMString & theIdAttribute);
         void collectOffsets(NodeOffsetCatalog & theCatalog, asl::AC_SIZE_TYPE theParentIndex = asl::AC_SIZE_TYPE(-1)) const {

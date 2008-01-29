@@ -941,6 +941,17 @@ printChangedNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     return myRVal;
 }
 
+JSBool
+flushUnusedChildren(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("reduces memory consumption by flushing all child nodes that have not changed since loading and are not referenced from somewhere else");
+    DOC_END;
+    dom::NodePtr myNode = JSNode::getNodePtr(cx,obj);
+    AC_DEBUG << "flushing unused nodes";
+    JSBool myRVal = Method<dom::Node>::call(&dom::Node::flushUnusedChildren, cx, obj, argc, argv, rval);
+    AC_DEBUG << "done flushing unused nodes";
+    return myRVal;
+}
+
 
 JSFunctionSpec *
 JSNode::Functions() {
@@ -974,6 +985,7 @@ JSNode::Functions() {
         {"dispatchEvent",       dispatchEvent,       3},
         {"freeCaches",          freeCaches,          0},
         {"debugValue",          debugValue,          0},
+        {"flushUnusedChildren", flushUnusedChildren, 0},
         {"printChangedNodes",   printChangedNodes,   1},
        {0}
     };
