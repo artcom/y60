@@ -824,7 +824,7 @@ xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_TRUE;
         } else {
             //JS_ReportError(cx, "JSNode::find: no nodes found under %s", myPathString.c_str());
-            AC_WARNING << "JSNode::find: no nodes found under path'" << myPathString <<"'";
+            AC_DEBUG << "JSNode::find: no nodes found under path'" << myPathString <<"'";
             xpath::xpath_return(myPath);
             return JS_TRUE;
         }
