@@ -367,14 +367,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             mySkyboxImage.id       = myImageId;
             mySkyboxImage.src      = theFileName;
             mySkyboxImage.tile     = theTile;
-            mySkyboxImage.type     = "cubemap";
 
             _myRenderWindow.scene.images.appendChild(mySkyboxImage);
 
             var mySkyboxTexture = Modelling.createTexture(window.scene, mySkyboxImage);
             mySkyboxTexture.mipmap   = 0;
             mySkyboxTexture.wrapmode = "repeat";
-            mySkyboxTexture.type     = "texture_cubemap";
 
             self.addSkyBoxFromImage(mySkyboxImage);
         }

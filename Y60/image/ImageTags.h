@@ -22,7 +22,6 @@ namespace y60 {
     //                  theTagName              theType         theAttributeName                 theDefault
     DEFINE_ATTRIBUT_TAG(ImageSourceTag,         std::string,    IMAGE_SRC_ATTRIB,                "");
     DEFINE_ATTRIBUT_TAG(RasterPixelFormatTag,   std::string,    IMAGE_RASTER_PIXELFORMAT_ATTRIB, "RGB");
-    DEFINE_ATTRIBUT_TAG(ImageTypeTag,           ImageType,      IMAGE_TYPE_ATTRIB,               SINGLE);
     DEFINE_ATTRIBUT_TAG(ImageResizeTag,         std::string,    IMAGE_RESIZE_ATTRIB,             IMAGE_RESIZE_NONE);
     DEFINE_ATTRIBUT_TAG(ImageWidthTag,          unsigned,       WIDTH_ATTRIB,                    0);
     DEFINE_ATTRIBUT_TAG(ImageHeightTag,         unsigned,       HEIGHT_ATTRIB,                   0);

@@ -42,7 +42,6 @@ namespace y60 {
         public IdTag::Plug,
         public NameTag::Plug,
         public ImageSourceTag::Plug,
-        public ImageTypeTag::Plug,
         public ImageResizeTag::Plug,
         public ImageFilterTag::Plug,
         public ImageFilterParamsTag::Plug,

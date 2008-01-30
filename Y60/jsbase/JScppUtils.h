@@ -30,6 +30,7 @@
 
 #include <paintlib/plexcept.h>
 
+#include <iostream>
 // Undefine stuff to undo Apple namespace pollution
 #ifdef check
 #undef check
@@ -157,6 +158,7 @@ JSA_GetClass(JSContext *cx, JSObject *obj) {
 
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount = 0);
 
+void dumpJSStack(JSContext *cx, FILE * theTarget = stderr);
 JSStackFrame * getStackFrame(int i, JSContext *cx);
 bool getFileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, const char * & filename, int & lineno);
 

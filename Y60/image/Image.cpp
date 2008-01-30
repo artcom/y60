@@ -47,7 +47,6 @@ namespace y60 {
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
         ImageSourceTag::Plug(theNode),
-        ImageTypeTag::Plug(theNode),
         ImageResizeTag::Plug(theNode),
         ImageFilterTag::Plug(theNode),
         ImageFilterParamsTag::Plug(theNode),

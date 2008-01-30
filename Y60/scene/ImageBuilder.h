@@ -27,7 +27,6 @@ namespace y60 {
 		    void inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode);
             void createFileReference(const std::string & myFileName, const std::string & theResizeMode);
 
-            void setType(ImageType theType);
             void setTiling(asl::Vector2i theTiling);
             void setDepth(unsigned int theDepth);
 

@@ -36,6 +36,7 @@
 #include <y60/Image.h>
 #include <xpath/xpath_api.h>
 
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -1414,6 +1415,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                             IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode-Facade = " <<*myAttrNode << endl);
 #define FACADE_ATTRIBUTES_WRITE_PROTECED
 #ifdef FACADE_ATTRIBUTES_WRITE_PROTECED
+                            dumpJSStack(cx);
                             AC_ERROR << "JSNode::setProperty: facade attribute '"<<myProperty<<"' is not writeable."<<endl;
                             return JS_FALSE;
 #else

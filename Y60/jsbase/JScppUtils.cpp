@@ -22,6 +22,7 @@
 #include <js/jsarena.h>
 #include <js/jscntxt.h>
 #include <js/jsdbgapi.h>
+
 #ifndef WIN32
 #include <glib.h>
 #endif
@@ -195,6 +196,36 @@ void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
         throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.");
     }
 };
+
+void 
+dumpJSStack(JSContext *cx, FILE * theTarget) {
+    JSStackFrame* fp;
+    JSStackFrame* iter = 0;
+    FILE * myOutFile = theTarget;
+    
+    int num = 0;
+    while(0 != (fp = JS_FrameIterator(cx, &iter))) {
+        fprintf(myOutFile, "Stackframe %d:", num);
+        if(!JS_IsNativeFrame(cx, fp)) {
+            JSScript* script = JS_GetFrameScript(cx, fp);
+            jsbytecode* pc = JS_GetFramePC(cx, fp);
+            if(script && pc) {
+                const char * filename = JS_GetScriptFilename(cx, script);
+                int lineno =  JS_PCToLineNumber(cx, script, pc);
+
+                const char * funname = 0;
+                JSFunction * fun = JS_GetFrameFunction(cx, fp);
+                if(fun) {
+                    funname = JS_GetFunctionName(fun);
+                }
+                fprintf(myOutFile, "  lineno:%5d filename: '%s' function: %s\n", lineno, filename ? filename : "-", funname ? funname : "-");
+            }
+        } else {
+            fprintf(myOutFile, "native\n");
+        }
+        ++num;
+    }    
+}
 
 JSStackFrame *
 getStackFrame(int i, JSContext *cx) {

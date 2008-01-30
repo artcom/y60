@@ -312,7 +312,6 @@ namespace y60 {
 
         ImageBuilder myImageBuilder(theName);
         const string & myId = theSceneBuilder.appendImage(myImageBuilder);
-        myImageBuilder.setType(theType);
         myImageBuilder.setDepth(theDepth);
 
         if (theType == CUBEMAP) {

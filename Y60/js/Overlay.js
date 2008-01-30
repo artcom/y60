@@ -596,7 +596,7 @@ ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, t
 				theScene.images.appendChild(myImage);
 				myImage.name = mySource;
 				//myImage.wrapmode  = TextureWrapMode.repeat;
-				myImage.type = ImageType.single;                
+				//myImage.type = ImageType.single;                
 				//ourImageCache[mySource] = myImage;
 			}
 		} else if (typeof(theSource) == "object" && "previousSibling" in theSource) {

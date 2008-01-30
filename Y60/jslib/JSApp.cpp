@@ -283,33 +283,7 @@ DumpStack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Dumps the stack to stderr.");
     DOC_END;
     try {
-        JSStackFrame* fp;
-        JSStackFrame* iter = 0;
-        int num = 0;
-
-        fprintf(gOutFile, "Dumping Stackframes:\n");
-
-        while(0 != (fp = JS_FrameIterator(cx, &iter))) {
-            fprintf(gOutFile, "Stackframe %d:", num);
-            if(!JS_IsNativeFrame(cx, fp)) {
-                JSScript* script = JS_GetFrameScript(cx, fp);
-                jsbytecode* pc = JS_GetFramePC(cx, fp);
-                if(script && pc) {
-                    const char * filename = JS_GetScriptFilename(cx, script);
-                    int lineno =  JS_PCToLineNumber(cx, script, pc);
-
-                    const char * funname = 0;
-                    JSFunction * fun = JS_GetFrameFunction(cx, fp);
-                    if(fun) {
-                        funname = JS_GetFunctionName(fun);
-                    }
-                    fprintf(gOutFile, "  lineno:%5d filename: '%s' function: %s\n", lineno, filename ? filename : "-", funname ? funname : "-");
-                }
-            } else {
-                fprintf(gOutFile, "native\n");
-            }
-            ++num;
-        }
+        dumpJSStack(cx, gOutFile);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

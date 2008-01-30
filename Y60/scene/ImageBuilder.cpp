@@ -75,11 +75,6 @@ namespace y60 {
     }
 
     void
-    ImageBuilder::setType(ImageType theType) {
-        getNode()->getFacade<Image>()->set<ImageTypeTag>(theType);
-    }
-
-    void
     ImageBuilder::setDepth(unsigned int theDepth) {
         getNode()->getFacade<Image>()->set<ImageDepthTag>(theDepth);
     }

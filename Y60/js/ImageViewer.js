@@ -601,7 +601,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
-            _myMovieNode.audio = 1;
+            _myMovieNode.audio = 0;
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             if (theEnsureFrameCount) {
