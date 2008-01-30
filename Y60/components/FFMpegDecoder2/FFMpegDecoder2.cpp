@@ -51,7 +51,7 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLH
 
 namespace y60 {
 
-    const unsigned FFMpegDecoder2::FRAME_CACHE_SIZE = 8;
+    const unsigned FFMpegDecoder2::FRAME_CACHE_SIZE = 32;
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
     asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
@@ -725,7 +725,7 @@ namespace y60 {
                      << _myVStream->duration;
         } else {
 	        myMovie->set<FrameCountTag>(int(_myVStream->duration));
-	        _myTimeUnitsPerSecond = _myFrameRate;
+	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);//_myFrameRate;
             AC_DEBUG << "FFMpegDecoder2::setupVideo(): _myVStream->duration="
                      << _myVStream->duration;
         }

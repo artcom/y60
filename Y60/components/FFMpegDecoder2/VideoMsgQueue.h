@@ -87,6 +87,11 @@ namespace y60 {
          * with a asl::ThreadSemaphore::ClosedException.
          */
         void clear();
+
+        /**
+         * Dumps the queue.
+         */
+        void dump();
         
     private:
         asl::ThreadSemaphore _mySemaphore;

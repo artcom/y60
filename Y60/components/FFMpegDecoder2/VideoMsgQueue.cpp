@@ -90,6 +90,18 @@ void VideoMsgQueue::clear() {
     _myList.clear(); 
     _mySemaphore.reset(); 
 }
+void VideoMsgQueue::dump() {
+    AC_DEBUG << "VideoMsgQueue::dump";
+    _myListLock.lock();
+    std::list<VideoMsgPtr>::iterator myItStart = _myList.begin();
+    std::list<VideoMsgPtr>::iterator myItEnd = _myList.end();
+    unsigned i = 0;
+    for (; myItStart != myItEnd; myItStart++) {
+        AC_DEBUG << "Frame in queue #" << i << " timestamp -> " <<  (*myItStart)->getTime();
+        i++;
+    }    
+    _myListLock.unlock();
+}
 
 }
 
