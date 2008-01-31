@@ -38,7 +38,7 @@ namespace y60 {
 }
 
 struct MaterialFeature {
-    MaterialFeature::MaterialFeature(std::string theClass, std::string theValues) :
+   MaterialFeature(std::string theClass, std::string theValues) :
         classname(theClass), values(theValues)
     {}
 
