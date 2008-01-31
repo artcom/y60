@@ -511,6 +511,7 @@ namespace dom {
         UniqueId & operator=(const UniqueId & theOther) {
             _ptrValue = theOther._ptrValue;
             _myCount = theOther._myCount;
+            return * this;
         }
         UniqueId(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE & thePos) {
             thePos = theSource.readUnsigned64(_ptrValue, thePos);
