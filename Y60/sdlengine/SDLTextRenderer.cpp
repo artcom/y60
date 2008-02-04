@@ -25,7 +25,7 @@
 #define DB(x) //x
 #define DB2(x) //x
 
-//#define DUMP_TEXT_AS_PNG
+#define DUMP_TEXT_AS_PNG
 #ifdef DUMP_TEXT_AS_PNG
 #include <paintlib/plpngenc.h>
 #include <paintlib/pltiffenc.h>
@@ -169,10 +169,6 @@ namespace y60 {
         //     myImage->triggerUpload();
         // }
 
-        myImage->getRasterPtr()->assign(_myTextureSurface->w, _myTextureSurface->h,
-                        ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
-                        (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
-
 #ifdef DUMP_TEXT_AS_PNG
         PLAnyBmp myBmp;
         myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8,
@@ -180,6 +176,10 @@ namespace y60 {
         PLPNGEncoder myEncoder;
         myEncoder.MakeFileFromBmp("test.png", &myBmp);
 #endif
+        myImage->getRasterPtr()->assign(_myTextureSurface->w, _myTextureSurface->h,
+                        ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
+                        (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
+
 
         return myTextSize;
     }
@@ -499,7 +499,7 @@ namespace y60 {
     // Calculate line metrics and total blockheight
     unsigned
     SDLTextRenderer::createLines(const vector<Word> & theWords, vector<Line> & theLines,
-        unsigned theLineWidth, unsigned theLineHeight)
+        unsigned theLineWidth, unsigned theLineHeight, unsigned theSurfaceHeight)
     {
         DB2(AC_TRACE << "-------  Create lines  -------" << endl;)
         unsigned myNewlineCount = 0;
@@ -510,7 +510,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
             const Word & myWord = theWords[i];
-            if (theLines.back().width + myWord.surface->w > theLineWidth) {
+            if (theLines.back().width + myWord.surface->w > theLineWidth && ((i+1)*theLineHeight <= theSurfaceHeight)) {
                 // start new line
                 theLines.push_back(Line());
                 theLines.back().indent = _myIndentation;
@@ -669,7 +669,7 @@ namespace y60 {
         }
 
         unsigned myTotalLineHeight = createLines(myWords, myLines,
-                    mySurfaceWidth-_myLeftPadding-_myRightPadding, myLineHeight);
+                    mySurfaceWidth-_myLeftPadding-_myRightPadding, myLineHeight, mySurfaceHeight);
         if (theTargetHeight == 0) {
             DB2(AC_TRACE << "Set auto-height to " << myTotalLineHeight << endl;)
             mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
@@ -680,6 +680,7 @@ namespace y60 {
         DB2(
             AC_TRACE << "-------- Text puzzle ----------" << endl;
             AC_TRACE << "Target surface size: " << mySurfaceWidth << " x " << mySurfaceHeight << endl;
+            AC_TRACE << "Number of words: " << myWords.size() << endl;
             AC_TRACE << "Number of lines: " << myLines.size() << endl;
             AC_TRACE << "Total line height: " << myTotalLineHeight << endl << endl;
         )
@@ -687,7 +688,6 @@ namespace y60 {
         // Render lines
         unsigned myWordCount = 0;
         int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myParagraphTopOffset + _myCursorPos[1];
-
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
             int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);

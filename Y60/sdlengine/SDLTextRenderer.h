@@ -106,7 +106,7 @@ namespace y60 {
                     const SDL_Color & theTextColor);
 
             unsigned createLines(const std::vector<Word> & theWords, std::vector<Line> & theLines,
-                    unsigned theLineWidth, unsigned theLineHeight);
+                    unsigned theLineWidth, unsigned theLineHeight, unsigned theSurfaceHeight);
 
             int calcHorizontalAlignment(unsigned theTextWidth, const Line & theLine,
                     int theMinX);
