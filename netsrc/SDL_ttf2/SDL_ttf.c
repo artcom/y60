@@ -1001,12 +1001,12 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 			maxy = glyph->maxy;
 		}
 
-        //DB2(
+        DB2(
             printf("SizeUNICODE char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance fitted: %f,advance_unf: %f\n",
                    *ch, glyph->minx, glyph->maxx,
 				   getKerning(font, prev_index, glyph->index),
                    xstart, glyph->advance, glyph->advance_unfitted);
-        //)
+        )
 
         prev_index = glyph->index;
 	}
