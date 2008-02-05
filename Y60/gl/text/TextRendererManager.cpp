@@ -202,9 +202,10 @@ namespace y60 {
 
 	void
 	TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
-	                  int theHeight, TTFFontInfo::FONTTYPE & theFonttype)
+	                  int theHeight, TTFFontInfo::FONTHINTING & theFonthint, 
+	                  TTFFontInfo::FONTTYPE & theFonttype)
     {
-        _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonttype);
+        _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonthint, theFonttype);
 	}
 
     bool

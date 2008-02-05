@@ -126,8 +126,13 @@ static FT_Library library;
 static int TTF_initialized = 0;
 static int TTF_byteswapped = 0;
 
-/* If true, fonts are fitted to screen pixels [ART+COM Patch] */
-static int TTF_fontfitting = 1;
+/* deprecated: If true, fonts are fitted to screen pixels [ART+COM Patch] */
+/* Set hinting:
+   NoHinting -> TTF_fontfitting = 0
+   NativeHinting -> TTF_fontfitting = 1
+   AutoHinting -> TTF_fontfitting = 2
+*/
+static int TTF_fontfitting = 0;
 
 /* Holds the minx of the first character of the last rendered word,
    for pixel-perfect left alignment [ART+COM Patch] */
@@ -467,10 +472,12 @@ static FT_Error Load_Glyph( TTF_Font* font, Uint16 ch, c_glyph* cached, int want
 		cached->index = FT_Get_Char_Index( face, ch );
 	}
 
-    if (TTF_fontfitting) {
+    if (TTF_fontfitting == 0) {
+        error = FT_Load_Glyph( face, cached->index, FT_LOAD_DEFAULT| FT_LOAD_NO_HINTING);
+    } else if (TTF_fontfitting == 1) {
         error = FT_Load_Glyph( face, cached->index, FT_LOAD_DEFAULT);
     } else {
-        error = FT_Load_Glyph( face, cached->index, FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING);
+        error = FT_Load_Glyph( face, cached->index, FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT);
     }
 	if( error ) {
 		return error;
@@ -884,7 +891,7 @@ double getKerning(TTF_Font * theFont, FT_UInt thePreviousIndex, FT_UInt theCurre
     DB(printf("face-flags:%d, kerning-bit:%d\n", theFont->face->face_flags, FT_FACE_FLAG_KERNING));
     if (FT_HAS_KERNING( theFont->face ) && thePreviousIndex && theCurrentIndex ) {
         FT_Vector delta;
-        if (TTF_fontfitting) {
+        if (TTF_fontfitting > 0) {
             FT_Get_Kerning( theFont->face, thePreviousIndex, theCurrentIndex, ft_kerning_default, &delta );
             kerning = (double)(delta.x >> 6);
         } else {
@@ -975,7 +982,7 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 
         maxx = (int)ceil(xstart + glyph->advance);
 
-        if (TTF_fontfitting) {
+        if (TTF_fontfitting > 0) {
             xstart += glyph->advance;
 		} else {
 		    xstart += glyph->advance_unfitted;
@@ -994,12 +1001,12 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 			maxy = glyph->maxy;
 		}
 
-        DB2(
-            printf("SizeUNICODE char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance_unf: %f\n",
+        //DB2(
+            printf("SizeUNICODE char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance fitted: %f,advance_unf: %f\n",
                    *ch, glyph->minx, glyph->maxx,
 				   getKerning(font, prev_index, glyph->index),
-                   xstart, glyph->advance_unfitted);
-        )
+                   xstart, glyph->advance, glyph->advance_unfitted);
+        //)
 
         prev_index = glyph->index;
 	}
@@ -1213,7 +1220,7 @@ SDL_Surface *TTF_RenderUNICODE_Solid(TTF_Font *font,
 			}
 		}
 
-        if (TTF_fontfitting) {
+        if (TTF_fontfitting > 0) {
             xstart += glyph->advance;
 		} else {
 		    xstart += glyph->advance_unfitted;
@@ -1471,7 +1478,7 @@ SDL_Surface* TTF_RenderUNICODE_Shaded( TTF_Font* font,
 			}
 		}
 
-        if (TTF_fontfitting) {
+        if (TTF_fontfitting > 0) {
             xstart += glyph->advance;
 		} else {
 		    xstart += glyph->advance_unfitted;
@@ -1727,7 +1734,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 			}
 		}
 
-        if (TTF_fontfitting) {
+        if (TTF_fontfitting > 0 ) {
 		    xstart += glyph->advance;
 		} else {
 		    xstart += glyph->advance_unfitted;

@@ -29,6 +29,13 @@ namespace y60 {
         "BoldItalic",
         0
     };
+    
+    static const char * FontHintStrings[] = {
+        "NoHinting",
+        "NativeHinting",
+        "AutoHinting",
+        0
+    };
 
     class TTFFontInfo {
         public:
@@ -39,19 +46,30 @@ namespace y60 {
                 BOLDITALIC
             };
 
-            TTFFontInfo(FONTTYPE theFontType, int theHeight) :
-                _myFontType(theFontType), _myHeight(theHeight) {}
+            enum FONTHINTING {
+                NOHINTING,
+                NATIVEHINTING,
+                AUTOHINTING
+            };
 
-            TTFFontInfo() : _myFontType(NORMAL) {};
+            TTFFontInfo(FONTTYPE theFontType, int theHeight, FONTHINTING theHinting) :
+                _myFontType(theFontType), _myHeight(theHeight), 
+                _myFontHinting(theHinting)  {}
+
+            TTFFontInfo() : _myFontType(NORMAL),_myFontHinting(NOHINTING) {};
 
             const FONTTYPE getFontType() {
                 return _myFontType;
+            }
+            const FONTHINTING getFontHinting() {
+                return _myFontHinting;
             }
             int getHeight() {
                 return _myHeight;
             }
         private:
             FONTTYPE   _myFontType;
+            FONTHINTING _myFontHinting;
             int        _myHeight;
     };
 

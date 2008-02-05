@@ -28,8 +28,8 @@ namespace y60 {
 
     class SDLFontInfo : public TTFFontInfo {
         public:
-            SDLFontInfo(TTF_Font* theFont, FONTTYPE theFontType, int theHeight) :
-                _myFont(theFont), TTFFontInfo(theFontType, theHeight) {}
+            SDLFontInfo(TTF_Font* theFont, FONTTYPE theFontType, int theHeight, FONTHINTING theHinting ) :
+                _myFont(theFont), TTFFontInfo(theFontType, theHeight, theHinting) {}
 
             SDLFontInfo() {};
 

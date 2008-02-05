@@ -34,7 +34,8 @@ namespace y60 {
             ~SDLTextRenderer();
 
             void loadFont(const std::string & theName, const std::string & theFileName,
-                    int theHeight, TTFFontInfo::FONTTYPE theFontType);
+                    int theHeight, TTFFontInfo::FONTHINTING & theFonthint, 
+                    TTFFontInfo::FONTTYPE theFontType);
             TextPtr createText(const asl::Vector2f & thePos,
                     const std::string & theString,
                     const std::string & theFontName);
@@ -81,7 +82,6 @@ namespace y60 {
                 bool          newline;
                 double        kerning;
                 int           minx;
-
                 private:
                 Word() {}
             };
@@ -112,6 +112,8 @@ namespace y60 {
                     int theMinX);
             int calcVerticalAlignment(unsigned theTextHeight, unsigned theBlockHeight);
             SDLFontInfo & getFontInfo(const std::string & theName);
+            const TTFFontInfo::FONTHINTING & SDLTextRenderer::getFontHint(const std::string & theName) const;
+            
             std::string makeFontName(const std::string & theName, SDLFontInfo::FONTTYPE theFontType = SDLFontInfo::NORMAL) const;
             const TTF_Font * getFont(const std::string & theName) const;
 
@@ -130,6 +132,8 @@ namespace y60 {
             FontLibrary          _myFonts;
             std::string          _myWordDelimiters;
             unsigned             _myMaxFontFittingSize;
+            std::map<std::string, TTFFontInfo::FONTHINTING> _myFontHintingMap;
+            
 
     };
     typedef asl::Ptr<SDLTextRenderer> SDLTextRendererPtr;

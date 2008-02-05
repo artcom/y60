@@ -59,11 +59,11 @@ namespace y60 {
 
     void
     SDLTextRenderer::setFontFitting(int theHeight) {
-        if (theHeight > _myMaxFontFittingSize) {
+        /*if (theHeight > _myMaxFontFittingSize) {
             TTF_SetFitting(0);
         } else {
             TTF_SetFitting(1);
-        }
+        }*/
     }
 
     std::string
@@ -74,16 +74,20 @@ namespace y60 {
 
     void
     SDLTextRenderer::loadFont(const string & theName, const string & theFileName,
-                              int theHeight, TTFFontInfo::FONTTYPE theFontType)
+                              int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
+                              TTFFontInfo::FONTTYPE theFontType)
     {
         setFontFitting(theHeight);
-
+        TTF_SetFitting((int)theFonthint);
+        
         string myFontName = makeFontName(theName, theFontType);
         if (_myFonts.find(myFontName) != _myFonts.end()) {
             // Font already loaded
             return;
         }
-
+        _myFontHintingMap[theName] = theFonthint;
+        TTF_SetFitting((int)_myFontHintingMap[theName]);
+        
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
                 throw GLTextRendererException("You must register a normal style font with the same name, before registering bold or italic fonts", PLUS_FILE_LINE);
@@ -98,7 +102,7 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + theFileName, PLUS_FILE_LINE);
         }
-        _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight);
+        _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight, theFonthint);
 
         AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << theFileName << " with size: "
                 << theHeight << " and style: " << theFontType << endl;
@@ -112,6 +116,15 @@ namespace y60 {
     SDLTextRenderer::getFontInfo(const string & theName) {
         FontLibrary::iterator myIt = _myFonts.find(theName);
         if (myIt == _myFonts.end()) {
+            throw GLTextRendererException(string("Font: ") + theName+ " not found in fontlibrary.", PLUS_FILE_LINE);
+        }
+        return myIt->second;
+    }
+
+    const TTFFontInfo::FONTHINTING &
+    SDLTextRenderer::getFontHint(const string & theName) const {
+        std::map<std::string, TTFFontInfo::FONTHINTING>::const_iterator myIt = _myFontHintingMap.find(theName);
+        if (myIt == _myFontHintingMap.end()) {
             throw GLTextRendererException(string("Font: ") + theName+ " not found in fontlibrary.", PLUS_FILE_LINE);
         }
         return myIt->second;
@@ -196,6 +209,7 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
+        TTF_SetFitting((int)getFontHint(theFontName));
 
         theFontHeight = TTF_FontHeight(myFont);
         theFontAscent = TTF_FontAscent(myFont);
@@ -215,6 +229,8 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
+
+        TTF_SetFitting((int)getFontHint(theFontName));
 
         Uint16 myUnicodeChar[2];
         UTF8_to_UNICODE(myUnicodeChar, theCharacter.c_str(), 1);
@@ -239,6 +255,9 @@ namespace y60 {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
 
+        TTF_SetFitting((int)getFontHint(theFontName));
+
+
         Uint16 myFirstUnicodeChar[2];
         Uint16 mySecondUnicodeChar[2];
 
@@ -259,6 +278,8 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
+
+        TTF_SetFitting((int)getFontHint(theFontName));
 
         Uint16 myUnicodeChar[2];
         UTF8_to_UNICODE(myUnicodeChar,  theCharacter.c_str(),  1);
@@ -564,6 +585,8 @@ namespace y60 {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);
         }
 
+        TTF_SetFitting((int)getFontHint(theFontName));
+
         const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
         const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
         const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
@@ -661,6 +684,8 @@ namespace y60 {
             mySurfaceWidth  = theTargetWidth;
             mySurfaceHeight = theTargetHeight;
         }
+
+        TTF_SetFitting((int)getFontHint(theFontName));
 
         vector<Line> myLines;
         unsigned myLineHeight = _myLineHeight;

@@ -49,7 +49,7 @@ namespace y60 {
             void setLineHeight(unsigned theHeight);
             void setParagraph(unsigned theTopOffset, unsigned theBottomOffset);
             void loadTTF(const std::string & theName, const std::string & theFileName,
-                    int theHeight, TTFFontInfo::FONTTYPE & theFonttype);
+                    int theHeight, TTFFontInfo::FONTHINTING & theFonthint, TTFFontInfo::FONTTYPE & theFonttype);
             asl::Vector2i renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                     const std::string & theString,
                     const std::string & theFont,

@@ -127,16 +127,19 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theName", "Symbolic font name", DOC_TYPE_STRING);
     DOC_PARAM("theFilename", "Filename to load the font from", DOC_TYPE_STRING);
     DOC_PARAM("theHeight", "Font height", DOC_TYPE_INTEGER);
+    DOC_PARAM("theHinting", "Font hinting", DOC_TYPE_ENUMERATION);
     DOC_PARAM_OPT("theFontFace", "Font face, see static properties of Renderer", DOC_TYPE_ENUMERATION, SDLFontInfo::NORMAL);
     DOC_END;
     // Binding is implemented by hand to allow overloading
     try {
         SDLFontInfo::FONTTYPE myFontType = SDLFontInfo::NORMAL;
+        SDLFontInfo::FONTHINTING myFontHint = SDLFontInfo::NOHINTING;
+        
         std::string myName   = "";
         std::string myPath   = "";
         unsigned    myHeight = 0;
 
-        if (argc != 3 && argc != 4) {
+        if (argc != 4 && argc != 5) {
             JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be three or four");
             return JS_FALSE;
         }
@@ -156,16 +159,23 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        if (argc > 3) {
+        unsigned short myFontHintEnum = 0;
+        if (!convertFrom(cx, argv[3], myFontHintEnum)) {
+            JS_ReportError(cx, "Renderer::loadTTF(): Argument #4 must be a font hint type");
+            return JS_FALSE;
+        }
+        myFontHint = SDLFontInfo::FONTHINTING(myFontHintEnum);
+
+        if (argc > 4) {
             unsigned short myFontTypeEnum = 0;
-            if (!convertFrom(cx, argv[3], myFontTypeEnum)) {
-                JS_ReportError(cx, "Renderer::loadTTF(): Argument #4 must be a font face type");
+            if (!convertFrom(cx, argv[4], myFontTypeEnum)) {
+                JS_ReportError(cx, "Renderer::loadTTF(): Argument #5 must be a font face type");
                 return JS_FALSE;
             }
             myFontType = SDLFontInfo::FONTTYPE(myFontTypeEnum);
         }
 
-        myObj.getNative().getRenderer()->getTextManager().loadTTF(myName, myPath, myHeight, myFontType);
+        myObj.getNative().getRenderer()->getTextManager().loadTTF(myName, myPath, myHeight, myFontHint, myFontType);
         return JS_TRUE;
    } HANDLE_CPP_EXCEPTION;
 }

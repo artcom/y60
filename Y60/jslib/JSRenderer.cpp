@@ -255,9 +255,14 @@ JSRenderer::ConstIntProperties() {
     const unsigned short BV_BODY         = 2;
     const unsigned short BV_HIERARCHY    = 4;
 
+    const unsigned short PROP_NORMAL     = 0;
     const unsigned short PROP_BOLD       = 1;
     const unsigned short PROP_ITALIC     = 2;
     const unsigned short PROP_BOLDITALIC = 3;
+
+    const unsigned short PROP_NOHINTING     = 0;
+    const unsigned short PROP_NATIVEHINTING = 1;
+    const unsigned short PROP_AUTOHINTING   = 2;
 
     static JSConstIntPropertySpec myProperties[] = {
             DEFINE_PROPERTY(BV_NONE),
@@ -270,6 +275,10 @@ JSRenderer::ConstIntProperties() {
             DEFINE_SCENE_FLAG(ANIMATIONS_LOAD),
             DEFINE_SCENE_FLAG(WORLD),
             DEFINE_SCENE_FLAG(ALL),        // end of deprecated scene flags
+            DEFINE_FONT_FLAG(NOHINTING),
+            DEFINE_FONT_FLAG(NATIVEHINTING),
+            DEFINE_FONT_FLAG(AUTOHINTING),
+            DEFINE_FONT_FLAG(NORMAL),
             DEFINE_FONT_FLAG(BOLD),
             DEFINE_FONT_FLAG(ITALIC),
             DEFINE_FONT_FLAG(BOLDITALIC),
