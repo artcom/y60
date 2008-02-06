@@ -112,7 +112,7 @@ namespace y60 {
                     int theMinX);
             int calcVerticalAlignment(unsigned theTextHeight, unsigned theBlockHeight);
             SDLFontInfo & getFontInfo(const std::string & theName);
-            const TTFFontInfo::FONTHINTING & SDLTextRenderer::getFontHint(const std::string & theName) const;
+            const TTFFontInfo::FONTHINTING & getFontHint(const std::string & theName) const;
             
             std::string makeFontName(const std::string & theName, SDLFontInfo::FONTTYPE theFontType = SDLFontInfo::NORMAL) const;
             const TTF_Font * getFont(const std::string & theName) const;
