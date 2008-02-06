@@ -140,7 +140,7 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         unsigned    myHeight = 0;
 
         if (argc != 4 && argc != 5) {
-            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be three or four");
+            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be four or five");
             return JS_FALSE;
         }
 
