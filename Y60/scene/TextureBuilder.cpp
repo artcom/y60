@@ -46,6 +46,11 @@ namespace y60 {
     TextureBuilder::setMipmapFlag(bool theFlag) {
         getNode()->getFacade<Texture>()->set<TextureMipmapTag>(theFlag);
     }
+    
+    void 
+    TextureBuilder::setTextureFormat(const std::string & theInternalFormat) {
+        getNode()->getFacade<Texture>()->set<TexturePixelFormatTag>(theInternalFormat);
+    }
 
     void
     TextureBuilder::setWrapMode(const TextureWrapMode & theWrapMode) {

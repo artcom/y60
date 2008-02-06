@@ -29,6 +29,7 @@ namespace y60 {
             void setColorScale(const asl::Vector4f & theColorScale);
             void setColorBias(const asl::Vector4f & theColorBias);
             void setMatrix(const asl::Matrix4f & theMatrix);
+            void setTextureFormat(const std::string & theInternalFormat);
 
 		protected:
 

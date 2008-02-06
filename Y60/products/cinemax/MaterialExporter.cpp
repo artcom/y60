@@ -10,7 +10,7 @@
 
 #include "MaterialExporter.h"
 
-#include "CinemaHelpers.h"
+#include <cinemax/CinemaHelpers.h>
 
 #include <asl/Matrix4.h>
 #include <y60/property_functions.h>
@@ -168,7 +168,6 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                                                               myTextureFilename,
                                                               myLoopCount);
         } else {
-
             myImageNode = theMaterialBuilder->createImageNode(theSceneBuilder,
                                                               getString(myTextureName),
                                                               myTextureFilename,
@@ -282,11 +281,18 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                     "vectorofvector4f", "texgenparam0", myTexGenParams);
         }
     }
-    theMaterialBuilder->createTextureNode(theSceneBuilder, getString(myTextureName),
+    GePrint("Texture InternalFormat=" + String(myInternalFormat.c_str()));
+    
+    dom::NodePtr myTextureNode = theMaterialBuilder->createTextureNode(theSceneBuilder, getString(myTextureName),
                                           myImageNode->getAttributeString(ID_ATTRIB),
                                           myWrapMode, myCreateMipmapFlag,
                                           myTextureMatrix, myInternalFormat,
                                           myColorScale, myColorBias);
+
+    // texture unit
+    theMaterialBuilder->createTextureUnitNode(myTextureNode->getAttributeString(ID_ATTRIB),
+        myApplyMode, theUsage, myTextureMappingMode, asl::Matrix4f::Identity());
+                                          
     return myDiffuseColorFlag;
 }
 
@@ -333,6 +339,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
                 break;
             case Xbitmap:
                 {
+                    GePrint("     Shader='Xbitmap'");
                     BaseContainer *  myColorContainer = theColorContainer ? theColorContainer : theShader->GetDataInstance();
                     myDiffuseColorFlag |= exportTexture(theMaterial, theMaterialBuilder,
                                                         theSceneBuilder, myColorContainer,
@@ -476,10 +483,12 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     bool myDiffuseColorFlag = false;
                     PluginShader  * myShader = myColorChannel->GetShader();
                     if (!myShader) {
+                        
                         // Note: We do not export the diffuse color if a texture is present, because we are
                         // currently not able to support the mix-mode feature of cinema 4d
-                        asl::Vector4f myDiffuseColor;
+                        asl::Vector4f myDiffuseColor(1,1,1,1);
                         getColor(myColorChannel, myDiffuseColor);
+                        
                         setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
 
                         asl::Vector4f myAmbientColor = product(myDiffuseColor, AMBIENT_COLOR);

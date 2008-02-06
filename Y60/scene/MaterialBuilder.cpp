@@ -285,7 +285,8 @@ namespace y60 {
         myTextureBuilder.setColorScale(theColorScale);
         myTextureBuilder.setColorBias(theColorBias);
         myTextureBuilder.setMatrix(theMatrix);
-
+        myTextureBuilder.setTextureFormat(theInternalFormat);
+        
         return myTextureBuilder.getNode();
     }
 
