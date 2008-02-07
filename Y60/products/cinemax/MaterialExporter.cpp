@@ -10,7 +10,7 @@
 
 #include "MaterialExporter.h"
 
-#include <cinemax/CinemaHelpers.h>
+#include "CinemaHelpers.h"
 
 #include <asl/Matrix4.h>
 #include <y60/property_functions.h>
