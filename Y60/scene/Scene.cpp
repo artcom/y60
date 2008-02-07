@@ -1031,82 +1031,92 @@ namespace y60 {
 
     bool
     Scene::intersectWorld(const asl::LineSegment<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_LineSegment);
         IntersectBodyVisitor<asl::LineSegment<float> > myVisitor(theStick, theIntersections);
-        return visitBodys(myVisitor, getWorldRoot() );
+        return visitBodys(myVisitor, getWorldRoot(), theIntersectInvisibleBodysFlag );
     }
     bool
     Scene::intersectWorld(const Ray<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Ray);
         IntersectBodyVisitor<Ray<float> > myVisitor(theStick, theIntersections);
-        return visitBodys(myVisitor, getWorldRoot());
+        return visitBodys(myVisitor, getWorldRoot(), theIntersectInvisibleBodysFlag);
     }
     bool
     Scene::intersectWorld(const asl::Line<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Line);
         IntersectBodyVisitor<asl::Line<float> > myVisitor (theStick, theIntersections);
-        return visitBodys(myVisitor, getWorldRoot() );
+        return visitBodys(myVisitor, getWorldRoot() , theIntersectInvisibleBodysFlag);
     }
 
     bool
     Scene::intersectBodyCenters(dom::NodePtr theRootNode, const asl::Box3<float> & theBox,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Box3f_center);
         IntersectBoundingBoxCenterVisitor myVisitor(theBox, theIntersections);
-        return visitBodys(myVisitor, theRootNode);
+        return visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag);
     }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const asl::Box3<float> & theBox,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Box3f);
         IntersectBodyVisitor<asl::Box3<float> > myVisitor(theBox, theIntersections);
-        return visitBodys(myVisitor, theRootNode);
+        return visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag);
     }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const asl::LineSegment<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_LineSegment);
         IntersectBodyVisitor<asl::LineSegment<float> > myVisitor(theStick, theIntersections);
-        return visitBodys(myVisitor, theRootNode);
+        return visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag);
     }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const Ray<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Ray);
         IntersectBodyVisitor<Ray<float> > myVisitor(theStick, theIntersections);
-        return visitBodys(myVisitor, theRootNode);
+        return visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag);
     }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const asl::Line<float> & theStick,
-                          IntersectionInfoVector & theIntersections)
+                          IntersectionInfoVector & theIntersections,
+                          bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Line);
         IntersectBodyVisitor<asl::Line<float> > myVisitor (theStick, theIntersections);
-        return visitBodys(myVisitor, theRootNode );
+        return visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag );
     }
     template <class VISITOR>
     bool
     Scene::visitBodys(VISITOR & theVisitor,
-                      NodePtr theNode)
+                      NodePtr theNode, 
+                      bool theIntersectInvisibleBodysFlag)
     {
         bool myResult = false;
 
         TransformHierarchyFacadePtr myTransform = theNode->Node::getFacade<y60::TransformHierarchyFacade>();
         bool isInsensible = myTransform->TransformHierarchyFacade::get<y60::InsensibleTag>();
+        bool isVisibleVisitFlag = theIntersectInvisibleBodysFlag || myTransform->TransformHierarchyFacade::get<y60::VisibleTag>();
         Box3f myBoundingBox = myTransform->TransformHierarchyFacade::get<BoundingBoxTag>();
         bool isLeafNode = theNode->childNodesLength() == 0;
-        if (theVisitor.hitBoundingBox(myBoundingBox, isInsensible, isLeafNode) ) {
-            //AC_WARNING << "hit BB " << myTransform->get<NameTag>();
+        if (isVisibleVisitFlag && theVisitor.hitBoundingBox(myBoundingBox, isInsensible, isLeafNode) ) {
+            //AC_WARNING << "hit BB " << myTransform->TransformHierarchyFacade::get<y60::NameTag>();
             // check bounding box hierarchy first
             if (theNode->nodeName() == BODY_NODE_NAME) {
                 // prepare check for intersection with body geometry
@@ -1126,7 +1136,7 @@ namespace y60 {
             }
             unsigned myChildCount = theNode->childNodesLength();
             for (unsigned i = 0; i < myChildCount; ++i) {
-                if (visitBodys(theVisitor, theNode->childNode(i))) {
+                if (visitBodys(theVisitor, theNode->childNode(i), theIntersectInvisibleBodysFlag)) {
                     myResult = true;
                 }
             }
@@ -1230,41 +1240,45 @@ namespace y60 {
     bool
     Scene::collideWithWorld(const asl::Sphere<float> & theSphere,
                                 const Vector3<float> & theMotion,
-                                CollisionInfoVector & theCollisions)
+                                CollisionInfoVector & theCollisions,
+                                bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(collideWithWorld);
-        return collideWithBodies(getWorldRoot(), theSphere, theMotion, theCollisions);
+        return collideWithBodies(getWorldRoot(), theSphere, theMotion, theCollisions, theIntersectInvisibleBodysFlag);
     }
 
     bool
     Scene::collideWithWorld(const asl::Sphere<float> & theSphere,
                                 const Vector3<float> & theMotion,
-                                CollisionInfo & theCollision)
+                                CollisionInfo & theCollision,
+                                bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(collideWithWorldFirstOnly);
-        return collideWithBodies( getWorldRoot(), theSphere, theMotion, theCollision);
+        return collideWithBodies( getWorldRoot(), theSphere, theMotion, theCollision, theIntersectInvisibleBodysFlag);
     }
 
     bool
     Scene::collideWithBodies(NodePtr theRootNode,
                              const asl::Sphere<float> & theSphere,
                              const Vector3<float> & theMotion,
-                             CollisionInfoVector & theCollisions)
+                             CollisionInfoVector & theCollisions,
+                            bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(collideWithBodies);
         SweepSphereAllContactsVisitor myVisitor(theSphere, theMotion, theCollisions);
-        bool rc = visitBodys(myVisitor, theRootNode );
+        bool rc = visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag);
         return rc;
     }
 
     bool
     Scene::collideWithBodies(NodePtr theRootNode, const asl::Sphere<float> & theSphere,
                                 const Vector3<float> & theMotion,
-                                CollisionInfo & theCollision)
+                                CollisionInfo & theCollision,
+                                bool theIntersectInvisibleBodysFlag)
     {
         MAKE_SCOPE_TIMER(collideWithWorldFirstOnly);
         SweepSphereFirstContactVisitor myVisitor(theSphere, theMotion, theCollision);
-        bool rc = visitBodys(myVisitor, theRootNode );
+        bool rc = visitBodys(myVisitor, theRootNode, theIntersectInvisibleBodysFlag );
         return rc;
     }
 

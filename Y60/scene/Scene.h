@@ -284,43 +284,55 @@ namespace y60 {
             }
 
             bool intersectWorld(const asl::LineSegment<float> & theStick,
-                                IntersectionInfoVector & theIntersections);
+                                IntersectionInfoVector & theIntersectionsbool,
+                                bool theIntersectInvisibleBodysFlag = true);
             bool intersectWorld(const asl::Ray<float> & theRay,
-                                IntersectionInfoVector & theIntersections);
+                                IntersectionInfoVector & theIntersections,
+                                bool theIntersectInvisibleBodysFlag = true);
             bool intersectWorld(const asl::Line<float> & theLine,
-                                IntersectionInfoVector & theIntersections);
+                                IntersectionInfoVector & theIntersections,
+                                bool theIntersectInvisibleBodysFlag = true);
 
             bool collideWithWorld(const asl::Sphere<float> & theSphere,
                                   const asl::Vector3<float> & theMotion,
-                                  CollisionInfoVector & theCollisions);
+                                  CollisionInfoVector & theCollisions,
+                                  bool theIntersectInvisibleBodysFlag = true);
             bool collideWithWorld(const asl::Sphere<float> & theSphere,
                                   const asl::Vector3<float> & theMotion,
-                                  CollisionInfo & theCollision);
+                                  CollisionInfo & theCollision,
+                                  bool theIntersectInvisibleBodysFlag = true);
 
             static bool intersectBodyCenters(dom::NodePtr theRootNode,
                                  const asl::Box3<float> & theBox,
-                                 IntersectionInfoVector & theIntersections);
+                                 IntersectionInfoVector & theIntersections,
+                                 bool theIntersectInvisibleBodysFlag = true);
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::Box3<float> & theBox,
-                                 IntersectionInfoVector & theIntersections);
+                                 IntersectionInfoVector & theIntersections,
+                                 bool theIntersectInvisibleBodysFlag = true);
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::LineSegment<float> & theStick,
-                                 IntersectionInfoVector & theIntersections);
+                                 IntersectionInfoVector & theIntersections,
+                                 bool theIntersectInvisibleBodysFlag = true);
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::Ray<float> & theRay,
-                                 IntersectionInfoVector & theIntersections);
+                                 IntersectionInfoVector & theIntersections,
+                                 bool theIntersectInvisibleBodysFlag = true);
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::Line<float> & theLine,
-                                 IntersectionInfoVector & theIntersections);
+                                 IntersectionInfoVector & theIntersections,
+                                 bool theIntersectInvisibleBodysFlag = true);
 
             static bool collideWithBodies(dom::NodePtr theRootNode,
                                     const asl::Sphere<float> & theSphere,
                                     const asl::Vector3<float> & theMotion,
-                                    CollisionInfoVector & theCollisions);
+                                    CollisionInfoVector & theCollisions,
+                                    bool theIntersectInvisibleBodysFlag = true);
             static bool collideWithBodies(dom::NodePtr theRootNode,
                                     const asl::Sphere<float> & theSphere,
                                     const asl::Vector3<float> & theMotion,
-                                    CollisionInfo & theCollision);
+                                    CollisionInfo & theCollision,
+                                    bool theIntersectInvisibleBodysFlag = true);
 
 	        void reverseUpdateShape(ShapePtr theShape);
             void reverseUpdateShapes();
@@ -375,7 +387,7 @@ namespace y60 {
             void collectCameras(dom::NodeList & theCameras, dom::NodePtr theNode) const;
 
             template <class VISITOR>
-            static bool visitBodys(VISITOR & theVisitor, dom::NodePtr theNode);
+            static bool visitBodys(VISITOR & theVisitor, dom::NodePtr theNode, bool theIntersectInvisibleBodysFlag);
 
             static
             dom::NodePtr getVertexDataNode(dom::NodePtr theShapeNode, const std::string & theDataName);

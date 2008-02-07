@@ -110,28 +110,35 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
+    DOC_PARAM_OPT("theIntersectInvisibleBodysFlag", "Intersect invisible bodies, default is true.", DOC_TYPE_BOOLEAN, true);
+    
     DOC_END;
     try {
-        ensureParamCount(argc, 2);
+        ensureParamCount(argc, 2, 3);
+
         dom::NodePtr myBodies;
         y60::IntersectionInfoVector myIntersections;
         convertFrom(cx, argv[0], myBodies);
+        bool theIntersectInvisibleBodysFlag = true;
+        if (argc >= 2) {
+            convertFrom(cx, argv[2], theIntersectInvisibleBodysFlag);            
+        }
         if (JSLineSegment::matchesClassOf(cx, argv[1])) {
             asl::LineSegment<float> myStick;
             convertFrom(cx, argv[1], myStick);
-            y60::Scene::intersectBodies(myBodies, myStick, myIntersections);
+            y60::Scene::intersectBodies(myBodies, myStick, myIntersections, theIntersectInvisibleBodysFlag);
         } else if (JSLine::matchesClassOf(cx, argv[1])) {
             asl::Line<float> myLine;
             convertFrom(cx, argv[1], myLine);
-            y60::Scene::intersectBodies(myBodies, myLine, myIntersections);
+            y60::Scene::intersectBodies(myBodies, myLine, myIntersections, theIntersectInvisibleBodysFlag);
         } else if (JSRay::matchesClassOf(cx, argv[1])) {
             asl::Ray<float> myRay;
             convertFrom(cx, argv[1], myRay);
-            y60::Scene::intersectBodies(myBodies, myRay, myIntersections);
+            y60::Scene::intersectBodies(myBodies, myRay, myIntersections, theIntersectInvisibleBodysFlag);
         } else if (JSBox3f::matchesClassOf(cx, argv[1])) {
             asl::Box3<float> myBox;
             convertFrom(cx, argv[1], myBox);
-            y60::Scene::intersectBodies(myBodies, myBox, myIntersections);
+            y60::Scene::intersectBodies(myBodies, myBox, myIntersections, theIntersectInvisibleBodysFlag);
         }
         else {
             JS_ReportError(cx,"JSScene::intersectBodies: bad argument type #1");

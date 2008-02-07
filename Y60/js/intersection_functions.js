@@ -87,7 +87,10 @@ function findNearestCollision(theCollisions, theReferencePoint) {
     return myNearestCollision;
 }
 
-function findIntersectionsByBox(theRootNode, myBox) {
+function findIntersectionsByBox(theRootNode, myBox, theIntersectInVisibleShapes) {
+    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+        theIntersectInVisibleShapes = true;
+    }
     var myIntersectionInfo = Scene.intersectBodies(theRootNode, myBox);
     var myResult= [];
     if (myIntersectionInfo && myIntersectionInfo.length >0) {
@@ -111,15 +114,21 @@ function findIntersectionsByBoxCenter(theRootNode, myBox) {
 
 // this function will dispatch according to the type of myLineSegment.
 // it may be a LineSegment or a Ray
-function nearestIntersection(theRootNode, myLineSegment) {
-    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);
+function nearestIntersection(theRootNode, myLineSegment, theIntersectInVisibleShapes) {
+    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+        theIntersectInVisibleShapes = true;
+    }
+    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment, theIntersectInVisibleShapes);
     if (myIntersectionInfo) {
         return findNearestIntersection(myIntersectionInfo, myLineSegment.origin);
     }
     return undefined;
 }
-function farthestIntersection(theRootNode, myLineSegment) {
-    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);
+function farthestIntersection(theRootNode, myLineSegment, theIntersectInVisibleShapes) {
+    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+        theIntersectInVisibleShapes = true;
+    }
+    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment, theIntersectInVisibleShapes);
     if (myIntersectionInfo) {
         return findFarthestIntersection(myIntersectionInfo, myLineSegment.origin);
     }    

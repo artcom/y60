@@ -55,7 +55,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     var _myCenteredFlag = theCenteredFlag;
     var _myFixedCenter  = false;
     var _myPowerMateButtonState = BUTTON_UP;
-    
+    var _myPickInvisibleBodies = true;
   
     
     //////////////////////////////////////////////////////////////////////
@@ -80,6 +80,9 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             }
             _myTrackBallCenter = getTrackballCenter();
         }
+    }
+    obj.pickInvisible setter = function(theFlag) {
+        _myPickInvisibleBodies = theFlag;
     }
 
     obj.setCentered = function(theFlag) {
@@ -260,13 +263,13 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
     	//var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
-        var myIntersection = nearestIntersection(obj.getWorld(), myMouseRay);
+        var myIntersection = nearestIntersection(obj.getWorld(), myMouseRay, _myPickInvisibleBodies);
         if (myIntersection) {
             myPickedBody = myIntersection.info.body;
         } else {
             myPickedBody = window.scene.world;
         }
-        //print("  -> You picked trackball object: " + myPickedBody.name + " id: " + myPickedBody.id);
+        print("  -> You picked trackball object: " + myPickedBody.name + " id: " + myPickedBody.id);
         return myPickedBody;
     }
 }
