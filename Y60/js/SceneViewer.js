@@ -240,8 +240,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Pause: " + (window.pause ? "on" : "off"));
                     break;
                 case 'P':
-                    window.scene.dom.printChangedNodes(_sinceLastVersion);
-                    _sinceLastVersion = window.scene.dom.nodeVersion;
+                    window.scene.dom.printChangedNodes(_mySinceLastVersion);
+                    _mySinceLastVersion = window.scene.dom.nodeVersion;
                     break;
                 case 'U':
                     window.scene.dom.flushUnusedChildren();
@@ -369,16 +369,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("All includes re-evaluated.");
                     break;
                 case "i":
-                    {
-                        // Cycle swap interval
-                        var mySwapInterval = window.swapInterval;
-                        mySwapInterval++;
-                        if (mySwapInterval > 4) {
-                            mySwapInterval = 0;
-                        }
-                        window.swapInterval = mySwapInterval;
-                        print("Swap interval=" + window.swapInterval);
+                    // Cycle swap interval
+                    var mySwapInterval = window.swapInterval;
+                    mySwapInterval++;
+                    if (mySwapInterval > 4) {
+                        mySwapInterval = 0;
                     }
+                    window.swapInterval = mySwapInterval;
+                    print("Swap interval=" + window.swapInterval);
                     break;
                 case 'o':
                     print("Optimizing scene...");
@@ -522,7 +520,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _mySplashScreen.position = new Vector2f((window.width - _mySplashScreen.width) / 2,
                                                     (window.height - _mySplashScreen.height) / 2);
         }
-        _sinceLastVersion="1";
+        _mySinceLastVersion="1";
     }
 
     self.createShutter = function() {
@@ -675,4 +673,5 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myOnScreenStatistics    = 0;
     var _myVideoRecorder         = null;
     var _myStatisticColor        = [1,1,1,1];
+    var _mySinceLastVersion        = "1";
 }
