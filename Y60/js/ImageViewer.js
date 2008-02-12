@@ -85,8 +85,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         } else {
             window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
         }
-        window.fixedFrameTime = 1/60;
-        window.swapInterval    = 0;
+        //window.fixedFrameTime = 1/60;
+        //window.swapInterval    = 0;
         
         for(var i=1; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
@@ -200,9 +200,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
-        if (window.fps < 60) {
+        /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
-        }
+        }*/
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
             var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
