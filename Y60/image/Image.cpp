@@ -53,6 +53,7 @@ namespace y60 {
         ImageMatrixTag::Plug(theNode),
         ImageTileTag::Plug(theNode),
         ImageDepthTag::Plug(theNode),
+        TargetPixelFormatTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
         dom::FacadeAttributePlug<ImageWidthTag>(this),
@@ -185,6 +186,9 @@ namespace y60 {
                 createRaster(1,1,1,GRAY);
             }
             return;
+        }
+        if (get<TargetPixelFormatTag>() != "") {
+            throw ImageException(string("Image ") + get<ImageSourceTag>() + " target pixel format conversion not yet supported: " + get<TargetPixelFormatTag>(), PLUS_FILE_LINE);
         }
 
         AC_INFO << "Image::load loading '" << get<ImageSourceTag>() << "'";

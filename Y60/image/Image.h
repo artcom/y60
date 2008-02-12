@@ -48,6 +48,7 @@ namespace y60 {
         public ImageMatrixTag::Plug,
         public ImageTileTag::Plug,
         public ImageDepthTag::Plug,
+        public TargetPixelFormatTag::Plug,
         public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
         public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
         public dom::FacadeAttributePlug<ImageWidthTag>,

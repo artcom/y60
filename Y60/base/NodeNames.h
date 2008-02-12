@@ -248,6 +248,7 @@ namespace y60 {
     static const char * IMAGE_TYPE_ATTRIB               = "type";
     static const char * IMAGE_BYTESPERPIXEL_ATTRIB      = "bytesperpixel";
     static const char * IMAGE_RASTER_PIXELFORMAT_ATTRIB = "rasterpixelformat";
+    static const char * IMAGE_TARGET_PIXELFORMAT_ATTRIB = "targetpixelformat";    
     static const char * IMAGE_RESIZE_ATTRIB             = "resize";
     static const char * IMAGE_FILTER_ATTRIB             = "filter";
     static const char * IMAGE_FILTER_PARAMS_ATTRIB      = "filter_params";

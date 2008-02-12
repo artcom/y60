@@ -2842,6 +2842,11 @@ Possible values are:
 (e.g. [1,6] for one image wide and 6 images high</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="targetpixelformat" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>A format the image/image will be converted after laoding</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
     <xs:element name="image" substitutionGroup="ImageBase">
         <xs:annotation>
