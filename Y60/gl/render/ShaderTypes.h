@@ -33,7 +33,7 @@ namespace y60 {
         "glslc",
         "gp4fp",
         "gp4vp",
-        "gp4gp"
+        "gp4gp",
         0
     };
 
