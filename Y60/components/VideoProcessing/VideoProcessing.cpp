@@ -21,6 +21,8 @@
 #include "AdaptiveBackground.h"
 #include "Mask.h"
 #include "DumbScale.h"
+#include "Convert.h"
+#include "Canny.h"
 
 #include <asl/Exception.h>
 #include <asl/Logger.h>
@@ -55,6 +57,8 @@ namespace y60 {
         REGISTER_ALGORITHM(AdaptiveBackground);
         REGISTER_ALGORITHM(Mask);
         REGISTER_ALGORITHM(DumbScale);
+        REGISTER_ALGORITHM(Convert);
+        REGISTER_ALGORITHM(Canny);
 
 		AC_WARNING << "algorithm '" << theName << "' not found.";
 		return asl::Ptr<Algorithm>(0);

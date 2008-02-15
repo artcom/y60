@@ -60,12 +60,12 @@ namespace y60 {
     FastBlur::onFrame(double t) {
         
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
-        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
         
-       
+        dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
+        GRAYRaster & myTargetFrame = myTargetFrameLock.get();
         
         // float!
-        GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
+        GRAYRaster::const_iterator itSrc =mySourceFrame->begin();
         unsigned int i=0;
 
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
@@ -105,16 +105,12 @@ namespace y60 {
 
         // reverse float
         // float!
-        itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
+        GRAYRaster::iterator itTrgt = myTargetFrame.begin();
         
-       
         i=0;
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
-            (*itSrc) = static_cast<unsigned char>(_myFloatImage[i]);
+        for (itTrgt; itTrgt != myTargetFrame.end(); ++itTrgt, ++i) {
+            (*itTrgt) = static_cast<unsigned char>(_myFloatImage[i]);
         }
-
-    
-        
 	}
 
     float
