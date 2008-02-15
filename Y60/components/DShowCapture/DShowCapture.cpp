@@ -205,7 +205,9 @@ namespace y60 {
         _myGraph->setCameraParams(myWhitebalanceU, myWhitebalanceV, myShutter, myGain);
     }
 
-    std::string DShowCapture::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    std::string DShowCapture::canDecode(const std::string & theUrl, 
+                                        asl::Ptr<asl::ReadableStreamHandle> theStream) 
+    {
         if (theUrl.find("dshow://") != std::string::npos) {
             return MIME_TYPE_CAMERA;
         } else {
