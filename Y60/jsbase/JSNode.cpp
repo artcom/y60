@@ -509,6 +509,23 @@ parse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::parseAll, cx, obj, argc, argv, rval);
 }
+
+static JSBool
+bumpVersion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Bump nodeversion");
+    DOC_END;
+    try {        
+        dom::NodePtr myNode;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
+            JS_ReportError(cx,"JSNode::bumpVersion() - Could not convert object to node");
+            return JS_FALSE;
+        }
+            myNode->bumpVersion();
+            return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    
+}
+
 static JSBool
 parseFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Parses a document from a file");
@@ -971,6 +988,7 @@ JSNode::Functions() {
         {"useFactories",        useFactories,        1},
         {"parse",               parse,               1},
         {"parseFile",           parseFile,           1},
+        {"bumpVersion",         bumpVersion,         1},
         {"saveFile",            saveFile,            2},
         {"debinarizeFile",      debinarizeFile,      1},
         {"childNode",           childNode,           2},
