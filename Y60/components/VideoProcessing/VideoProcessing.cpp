@@ -91,6 +91,7 @@ namespace y60 {
     void 
     VideoProcessingExtension::init(y60::ScenePtr theScene) {
         _myScene = theScene;
+        _myAlgorithmList.clear();
     }   
 
 	void
