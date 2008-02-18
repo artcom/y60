@@ -24,15 +24,15 @@ namespace y60 {
 
         private:
 
-            float applyThreshold( float theValue );
             bool isOnEdge(unsigned theIndex, int theXOffset, int theYOffset);
-            void traceEdge( unsigned theX, unsigned theY );
+            bool doHysteresisStep();
 
             unsigned _myWidth;
             unsigned _myHeight;
 
             float _myLowThreshold;
             float _myHighThreshold;
+            float _myGradientThreshold;
             float _myMaxGradient;
 
             output_t _myOutput;

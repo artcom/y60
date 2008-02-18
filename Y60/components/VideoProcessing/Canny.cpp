@@ -7,6 +7,7 @@ using namespace y60;
 
 
 Canny::Canny( const string & theName ) : Algorithm( theName ) {
+    _myGradientThreshold = 0.015;
 }
 
 void Canny::onFrame( double t ) {
@@ -70,7 +71,7 @@ void Canny::onFrame( double t ) {
                 continue;
             }
             float myGradient = _myGradientImage[myIndex];
-            if (_myGradientImage[myIndex] <= _myLowThreshold * _myMaxGradient) {
+            if (_myGradientImage[myIndex] <= _myGradientThreshold * _myMaxGradient) {
                 _myGradientImage[myIndex] = 0;
             }
             _myResultImage[myIndex] = _myGradientImage[myIndex] == 0 ? 0 : 1;
@@ -89,9 +90,24 @@ void Canny::onFrame( double t ) {
         }
     }
 
-
     // hysteresis
-
+//    for (unsigned y = 0; y < _myHeight; y++) {
+//        for (unsigned x = 0; x < _myWidth; x++) {
+//            unsigned myIndex = y * _myWidth + x;
+//            _myResult[myIndex] = 0;
+//            if (_myResultImage[myIndex] == 1) {
+//                if (_myGradientImage[myIndex] > _myHighThreshold * _myMaxGradient) {
+//                    _myResult[myIndex] = 1;
+//                }
+//            }
+//        }
+//    }
+//
+//    bool myDone = false;
+//    for (unsigned i = 0; myDone = false || i < 500; i++) { 
+//        myDone = doHysteresisStep();
+//    }
+//
     for (unsigned y = 0; y < _myHeight; y++) {
         for (unsigned x = 0; x < _myWidth; x++) {
             unsigned myIndex = y * _myWidth + x;
@@ -112,6 +128,32 @@ void Canny::onFrame( double t ) {
     }
 }
 
+bool Canny::doHysteresisStep() {
+    bool myDone = true;
+    for (unsigned y = 0; y < _myHeight; y++) {
+        for (unsigned x = 0; x < _myWidth; x++) {
+            unsigned myIndex = y*_myWidth+x;
+            bool hasMarkedNeighbour = false;
+            if (_myResultImage[myIndex] == 1) {
+                if(_myGradientImage[myIndex] >= _myLowThreshold * _myMaxGradient
+                   && _myGradientImage[myIndex] <= _myHighThreshold * _myMaxGradient) {
+                   for (int r = -1; r <= 1; r++) {
+                       for (int s = -1; s <= 1; s++) {
+                           hasMarkedNeighbour |= _myResult[(y+r) * _myWidth + x + s] == 1;
+                       }
+                   }
+                   if (hasMarkedNeighbour) {
+                       _myResult[myIndex] = 1;
+                       myDone = false; 
+                   }
+                }
+            }
+        }
+    }
+    return myDone;
+}
+
+
 bool Canny::isOnEdge( unsigned theIndex, int theXOffset, int theYOffset) {
     if (_myDirectionImage[theIndex] == 0) {
         return theYOffset == 0;
@@ -122,12 +164,6 @@ bool Canny::isOnEdge( unsigned theIndex, int theXOffset, int theYOffset) {
     } else {
         return theXOffset * theYOffset == 1;
     }
-}
-
-float Canny::applyThreshold( float theValue ) {
-    return (theValue < _myLowThreshold * _myMaxGradient 
-            || theValue > _myHighThreshold * _myMaxGradient) ? 0.0 : theValue;
-
 }
 
 
@@ -150,6 +186,7 @@ void Canny::configure( const dom::Node & theNode ) {
                 _myGradientImage.reserve(_myWidth * _myHeight);
                 _myDirectionImage.reserve(_myWidth * _myHeight);
                 _myResultImage.reserve(_myWidth * _myHeight);
+                _myResult.reserve(_myWidth * _myHeight);
             } 
         }
         if (myName == "lowthreshold") {
