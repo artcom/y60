@@ -10,12 +10,18 @@
 // Warning: There are several enum/string pairs in this file which need to
 // stay consistent.
 
+
+//#define AC_NV_CG_20
+
 namespace y60 {
 
     enum MaterialType { CG_MATERIAL, FIXED_FUNCTION_MATERIAL };
     enum ShaderType { NO_SHADER_TYPE, FRAGMENT_SHADER, VERTEX_SHADER };
-    enum ShaderProfile {NO_PROFILE, GLSLV, GLSLF, ARBVP1, ARBFP1, VP40, FP40, VP30, FP30, VP20, FP20,
-        GLSLC, GP4FP, GP4VP, GP4GP
+    enum ShaderProfile {NO_PROFILE, GLSLV, GLSLF, ARBVP1, ARBFP1, VP40, FP40, VP30, FP30, VP20, FP20
+#ifdef AC_NV_CG_20
+    ,
+    GLSLC, GP4FP, GP4VP, GP4GP
+#endif
     };
 
     static const char * ShaderProfileStrings[] = {
@@ -30,10 +36,12 @@ namespace y60 {
         "fp30",
         "vp20",
         "fp20",
+#ifdef AC_NV_CG_20
         "glslc",
         "gp4fp",
         "gp4vp",
         "gp4gp",
+#endif
         0
     };
 

@@ -148,6 +148,12 @@ namespace y60 {
 
 #ifdef GL_MULTISAMPLE_ARB
         glEnable(GL_MULTISAMPLE_ARB);
+        // XXX
+        glEnable(GL_SAMPLE_COVERAGE_ARB);
+        glEnable(GL_SAMPLE_ALPHA_TO_ONE_ARB);
+        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+#else
+#warning "GL_MULTISAMPLE_ARB is not defined"
 #endif
     }
 
