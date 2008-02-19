@@ -7,7 +7,8 @@ using namespace y60;
 
 
 Canny::Canny( const string & theName ) : Algorithm( theName ) {
-    _myGradientThreshold = 0.015;
+//    _myGradientThreshold = 0.03;
+    _myGradientThreshold = 0.02;
 }
 
 void Canny::onFrame( double t ) {
@@ -18,7 +19,7 @@ void Canny::onFrame( double t ) {
     GRAYRaster & myTargetFrame = myTargetFrameLock.get();
 
     float mySobelX[9] = { -1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0 };
-    float mySobelY[9] = { 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0 };
+    float mySobelY[9] = { -1.0, -2.0, -1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0 };
 
     _myMaxGradient = 0;
 
@@ -34,7 +35,7 @@ void Canny::onFrame( double t ) {
                 gy += mySobelY[i++] * mySrcFloat;
             }
             float myGradient = sqrt(gx*gx + gy*gy);            
-            _myGradientImage[y * _myWidth + x] = myGradient;
+            _myGradients[y * _myWidth + x] = myGradient; 
             if (_myMaxGradient < myGradient) {
                 _myMaxGradient = myGradient;
             }
@@ -56,33 +57,35 @@ void Canny::onFrame( double t ) {
                 myDirection = 0;
             }
 
-            _myDirectionImage[y * _myWidth + x] = myDirection;
+            _myDirections[y * _myWidth + x] = myDirection;
         }
     }
 
     // nonmaximum suppression
     GRAYRaster::iterator itTrgt = myTargetFrame.begin();
     float myResult = 0;
-    for (unsigned y = 0; y < _myHeight; y++) {
+    for (int y = 0; y < _myHeight; y++) {
         for (unsigned x = 0; x < _myWidth; x++) {
             unsigned myIndex = y * _myWidth + x;
             if (y == 0 || y == _myHeight -1 || x == 0 || x == _myWidth-1) {
                 _myResultImage[myIndex] = 0;
                 continue;
             }
-            float myGradient = _myGradientImage[myIndex];
-            if (_myGradientImage[myIndex] <= _myGradientThreshold * _myMaxGradient) {
-                _myGradientImage[myIndex] = 0;
+            float myGradient = _myGradients[myIndex];
+            if (_myGradients[myIndex] <= _myGradientThreshold * _myMaxGradient) {
+                _myGradients[myIndex] = 0;
             }
-            _myResultImage[myIndex] = _myGradientImage[myIndex] == 0 ? 0 : 1;
+            _myResultImage[myIndex] = _myGradients[myIndex] == 0 ? 0 : 1;
             // check surrounding pixels"
             for (int i = -1; i <= 1; i=i+2) {
                 for (int j = -1; j <= 1; j=j+2) {
                     if (!isOnEdge(myIndex, i, j)) {
-                        if (_myGradientImage[(y+j) * _myWidth + (x+i)] 
-                            > _myGradientImage[myIndex]) 
-                        {
-                            _myResultImage[myIndex] = 0;
+                        if (!(i==0 && j==0)) {
+                            if (_myGradients[(y+j) * _myWidth + (x+i)] 
+                                > _myGradients[myIndex]) 
+                            {
+                                _myResultImage[myIndex] = 0;
+                            }
                         }
                     }
                 }
@@ -90,13 +93,28 @@ void Canny::onFrame( double t ) {
         }
     }
 
-    // hysteresis
+
+    for (int y = 1; y < _myHeight-1; y++) {
+        for (unsigned x = 1; x < _myWidth-1; x++) {
+            unsigned myIndex = y * _myWidth + x;
+            _myResult[myIndex] = 0;
+            if (_myResultImage[myIndex] == 1) {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        _myResult[(y+j) * _myWidth + (x+i)] = 1;
+                    }
+                }
+            }
+        }
+    }
+
+  // hysteresis
 //    for (unsigned y = 0; y < _myHeight; y++) {
 //        for (unsigned x = 0; x < _myWidth; x++) {
 //            unsigned myIndex = y * _myWidth + x;
 //            _myResult[myIndex] = 0;
 //            if (_myResultImage[myIndex] == 1) {
-//                if (_myGradientImage[myIndex] > _myHighThreshold * _myMaxGradient) {
+//                if (_myGradients[myIndex] > _myHighThreshold * _myMaxGradient) {
 //                    _myResult[myIndex] = 1;
 //                }
 //            }
@@ -108,20 +126,22 @@ void Canny::onFrame( double t ) {
 //        myDone = doHysteresisStep();
 //    }
 //
-    for (unsigned y = 0; y < _myHeight; y++) {
+//    dom::Node::WritableValue<GRAYRaster>    
+//        myDirectionFrameLock(_myDirectionImage->getRasterValueNode());
+//    GRAYRaster & myDirectionFrame = myDirectionFrameLock.get();
+//    GRAYRaster::iterator itDir = myDirectionFrame.begin();
+    for (int y = _myHeight-1; y >= 0; y--) {
         for (unsigned x = 0; x < _myWidth; x++) {
             unsigned myIndex = y * _myWidth + x;
             switch(_myOutput) {
                 case CANNY_OUTPUT:
-                    (*itTrgt++) = static_cast<unsigned char>((1-_myResultImage[myIndex])*255);
+                    (*itTrgt++) = static_cast<unsigned char>((_myResult[myIndex])*255);
                     break;
                 case GRADIENT_OUTPUT:
                     (*itTrgt++) = 
-                        static_cast<unsigned char>((1-_myGradientImage[myIndex]) * 255);
+                        static_cast<unsigned char>((_myGradients[myIndex]) * 255);
                     break;
                 case DIRECTION_OUTPUT:
-                    (*itTrgt++) = 
-                        static_cast<unsigned char>((1-_myDirectionImage[myIndex]) * 255);
                     break;
             }
         }
@@ -135,8 +155,8 @@ bool Canny::doHysteresisStep() {
             unsigned myIndex = y*_myWidth+x;
             bool hasMarkedNeighbour = false;
             if (_myResultImage[myIndex] == 1) {
-                if(_myGradientImage[myIndex] >= _myLowThreshold * _myMaxGradient
-                   && _myGradientImage[myIndex] <= _myHighThreshold * _myMaxGradient) {
+                if(_myGradients[myIndex] >= _myLowThreshold * _myMaxGradient
+                   && _myGradients[myIndex] <= _myHighThreshold * _myMaxGradient) {
                    for (int r = -1; r <= 1; r++) {
                        for (int s = -1; s <= 1; s++) {
                            hasMarkedNeighbour |= _myResult[(y+r) * _myWidth + x + s] == 1;
@@ -155,11 +175,11 @@ bool Canny::doHysteresisStep() {
 
 
 bool Canny::isOnEdge( unsigned theIndex, int theXOffset, int theYOffset) {
-    if (_myDirectionImage[theIndex] == 0) {
+    if (_myDirections[theIndex] == 0) {
         return theYOffset == 0;
-    } else if (_myDirectionImage[theIndex] == 0.25*PI) {
+    } else if (_myDirections[theIndex] == 0.25*PI) {
         return theXOffset * theYOffset == -1; 
-    } else if (_myDirectionImage[theIndex] == 0.5*PI) {
+    } else if (_myDirections[theIndex] == 0.5*PI) {
         return theXOffset == 0;
     } else {
         return theXOffset * theYOffset == 1;
@@ -183,17 +203,15 @@ void Canny::configure( const dom::Node & theNode ) {
                 _myTargetImage = myImage->getFacade<y60::Image>();
                 _myWidth  = _mySourceImage->getRasterPtr()->width();
                 _myHeight = _mySourceImage->getRasterPtr()->height();
-                _myGradientImage.reserve(_myWidth * _myHeight);
-                _myDirectionImage.reserve(_myWidth * _myHeight);
+                _myGradients.reserve(_myWidth * _myHeight);
+                _myDirections.reserve(_myWidth * _myHeight);
                 _myResultImage.reserve(_myWidth * _myHeight);
                 _myResult.reserve(_myWidth * _myHeight);
-            } 
+            } else if (myName == "directionimage") {
+                _myDirectionImage = myImage->getFacade<y60::Image>();
+            }
         }
-        if (myName == "lowthreshold") {
-            _myLowThreshold = as<float>(myValue);
-        } else if (myName == "highthreshold") {
-            _myHighThreshold = as<float>(myValue);
-        } else if (myName == "output") {
+        if (myName == "output") {
             if (myValue == "gradient") {
                 _myOutput = GRADIENT_OUTPUT;
             } else if (myValue == "direction") {
@@ -202,5 +220,8 @@ void Canny::configure( const dom::Node & theNode ) {
                 _myOutput = CANNY_OUTPUT;
             }
         }
+//        else if (myName == "gradientthreshold") {
+//            _myGradientThreshold = as<float>(myValue);
+//        }
     }
 }

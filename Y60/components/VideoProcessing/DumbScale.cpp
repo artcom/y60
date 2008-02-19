@@ -54,16 +54,20 @@ namespace y60 {
     DumbScale::onFrame(double t) {
         
         const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
-        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetRaster);
-        
-        GRAYRaster::iterator itTrgt = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());       
+        dom::Node::WritableValue<GRAYRaster> myTargetLock(_myTargetImage->getRasterValueNode());
+        GRAYRaster & myTargetFrame = myTargetLock.get();
+
+        GRAYRaster::iterator itTrgt = myTargetFrame.begin();       
        
         unsigned int myLineSubCounter = 0;
         
         unsigned int myDebugCount = 0;
         bool myLineFlag = true; 
     
-        for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); itSrc != mySourceFrame->end(); itSrc+=2) {
+        for (BGRRaster::const_iterator itSrc = mySourceFrame->begin(); 
+             itSrc != mySourceFrame->end(); 
+             itSrc+=2) 
+        {
             
             // get only every second pixel in a line
             myLineSubCounter++;
@@ -76,9 +80,7 @@ namespace y60 {
             if (myLineFlag) {
                 unsigned char myTarget = (*itTrgt).get();
                 rgb_to_intensity((*itSrc)[2], (*itSrc)[1], (*itSrc)[0], myTarget);
-                (*itTrgt).set(myTarget);
-
-                itTrgt++;
+                (*itTrgt++) = myTarget;
                 myDebugCount++;
             }
         }

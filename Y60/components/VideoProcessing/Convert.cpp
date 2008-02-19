@@ -11,7 +11,6 @@ void Convert::configure( const Node & theNode ) {
 
         const string myName = theNode.childNode("property", i)->getAttribute("name")->nodeValue();
         const string myValue = theNode.childNode("property", i)->getAttribute("value")->nodeValue();
-
         dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
         if (myImage) {
             if (myName == "sourceimage") {

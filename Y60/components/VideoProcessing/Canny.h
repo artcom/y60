@@ -39,9 +39,10 @@ namespace y60 {
 
             y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
+            y60::ImagePtr _myDirectionImage;
 
-            std::vector<float> _myGradientImage;
-            std::vector<float> _myDirectionImage;
+            std::vector<float> _myGradients;
+            std::vector<float> _myDirections;
             std::vector<float> _myResultImage;
             std::vector<float> _myResult;
     };
