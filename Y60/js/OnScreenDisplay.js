@@ -109,12 +109,14 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     }
 
     function createTextOverlay() {
-        var myImage = theSceneViewer.getImageManager().getImageNode("OSD_Overlay");
+        var myImage = window.scene.images.find("//image[@name = 'OSD_Overlay']");
+        if(!myImage) {
+            myImage = Modelling.createImage(window.scene, 1,1,"RGB");
+            myImage.name = "OSD_Overlay";
+        }
         myImage.src = "shadertex/on_screen_display.rgb";
-        myImage.resize = "pad";
-
         _myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-        var myBoxOverlay = new ImageOverlay(theSceneViewer.getScene(), myImage, [0,0], _myViewport.childNode("overlays"));
+        var myBoxOverlay = new ImageOverlay(window.scene, myImage, [0,0], _myViewport.childNode("overlays"));
         myBoxOverlay.width  = BOX_WIDTH;
         myBoxOverlay.height = BOX_HEIGHT;
         myBoxOverlay.position = new Vector2f(((_myViewport.size[0] * window.width) - myBoxOverlay.width) / 2,
