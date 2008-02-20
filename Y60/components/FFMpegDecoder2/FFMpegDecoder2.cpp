@@ -669,7 +669,6 @@ namespace y60 {
         if (myMovie->get<TargetPixelFormatTag>() != "") {
         	myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
         }
-        AC_PRINT << "TF=" << myMovie->get<TargetPixelFormatTag>();
 
         // Setup size and image matrix
         _myFrameWidth = myVCodec->width;
