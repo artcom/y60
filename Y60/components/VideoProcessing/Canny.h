@@ -32,7 +32,7 @@ namespace y60 {
 
             float _myLowThreshold;
             float _myHighThreshold;
-            float _myGradientThreshold;
+            unsigned char _myGradientThreshold;
             float _myMaxGradient;
 
             output_t _myOutput;

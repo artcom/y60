@@ -8,7 +8,7 @@ using namespace y60;
 
 Canny::Canny( const string & theName ) : Algorithm( theName ) {
 //    _myGradientThreshold = 0.03;
-    _myGradientThreshold = 0.02;
+    _myGradientThreshold = 100;
 }
 
 void Canny::onFrame( double t ) {
@@ -18,95 +18,94 @@ void Canny::onFrame( double t ) {
     dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
     GRAYRaster & myTargetFrame = myTargetFrameLock.get();
 
-    float mySobelX[9] = { -1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0 };
-    float mySobelY[9] = { -1.0, -2.0, -1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0 };
+//    float mySobelX[9] = { -1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0 };
+//    float mySobelY[9] = { -1.0, -2.0, -1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0 };
+//
+//    _myMaxGradient = 0;
+//
+//    for (unsigned y = 0; y < _myHeight; y++) {
+//        for (unsigned x = 0; x < _myWidth; x++) {
+//            GRAYRaster::const_sub_iterator itSrc = mySourceFrame->begin(x,y,3,3);
+//            unsigned i = 0;
+//            float gx = 0;
+//            float gy = 0;
+//            while (itSrc != mySourceFrame->end(x,y,3,3)) {
+//                float mySrcFloat = static_cast<float>((*itSrc++).get())/255;
+//                gx += mySobelX[i++] * mySrcFloat;
+//                gy += mySobelY[i++] * mySrcFloat;
+//            }
+//            float myGradient = sqrt(gx*gx + gy*gy);            
+//            _myGradients[y * _myWidth + x] = myGradient; 
+//            if (_myMaxGradient < myGradient) {
+//                _myMaxGradient = myGradient;
+//            }
+//            
+//            float myDirection = 0.0f;
+//            if (gx == 0 && gy != 0) {
+//                myDirection = 0.5 * PI;
+//            } else {
+//                myDirection = atan(gy/gx);            
+//            }
+//            // round to 0, 1/4pi, 1/2pi, 3/4pi
+//            if (myDirection > 0.125 * PI && myDirection < 0.375 * PI) {
+//                myDirection = 0.25 * PI;
+//            } else if (myDirection > 0.375 * PI && myDirection < 0.625 * PI) {
+//                myDirection = 0.5 * PI;
+//            } else if (myDirection > 0.625 * PI && myDirection < 0.875 * PI) {
+//                myDirection = 0.75 * PI;
+//            } else {
+//                myDirection = 0;
+//            }
+//
+//            _myDirections[y * _myWidth + x] = myDirection;
+//        }
+//    }
+//
+//  // nonmaximum suppression
+//    float myResult = 0;
+//    for (int y = 0; y < _myHeight; y++) {
+//        for (unsigned x = 0; x < _myWidth; x++) {
+//            unsigned myIndex = y * _myWidth + x;
+//            if (y == 0 || y == _myHeight -1 || x == 0 || x == _myWidth-1) {
+//                _myResultImage[myIndex] = 0;
+//                continue;
+//            }
+//            float myGradient = _myGradients[myIndex];
+//            if (_myGradients[myIndex] <= _myGradientThreshold * _myMaxGradient) {
+//                _myGradients[myIndex] = 0;
+//            }
+//            _myResultImage[myIndex] = _myGradients[myIndex] == 0 ? 0 : 1;
+//            // check surrounding pixels"
+//            for (int i = -1; i <= 1; i=i+2) {
+//                for (int j = -1; j <= 1; j=j+2) {
+//                    if (!isOnEdge(myIndex, i, j)) {
+//                        if (!(i==0 && j==0)) {
+//                            if (_myGradients[(y+j) * _myWidth + (x+i)] 
+//                                > _myGradients[myIndex]) 
+//                            {
+//                                _myResultImage[myIndex] = 0;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    _myMaxGradient = 0;
-
-    for (unsigned y = 0; y < _myHeight; y++) {
-        for (unsigned x = 0; x < _myWidth; x++) {
-            GRAYRaster::const_sub_iterator itSrc = mySourceFrame->begin(x,y,3,3);
-            unsigned i = 0;
-            float gx = 0;
-            float gy = 0;
-            while (itSrc != mySourceFrame->end(x,y,3,3)) {
-                float mySrcFloat = static_cast<float>((*itSrc++).get())/255;
-                gx += mySobelX[i++] * mySrcFloat;
-                gy += mySobelY[i++] * mySrcFloat;
-            }
-            float myGradient = sqrt(gx*gx + gy*gy);            
-            _myGradients[y * _myWidth + x] = myGradient; 
-            if (_myMaxGradient < myGradient) {
-                _myMaxGradient = myGradient;
-            }
-            
-            float myDirection = 0.0f;
-            if (gx == 0 && gy != 0) {
-                myDirection = 0.5 * PI;
-            } else {
-                myDirection = atan(gy/gx);            
-            }
-            // round to 0, 1/4pi, 1/2pi, 3/4pi
-            if (myDirection > 0.125 * PI && myDirection < 0.375 * PI) {
-                myDirection = 0.25 * PI;
-            } else if (myDirection > 0.375 * PI && myDirection < 0.625 * PI) {
-                myDirection = 0.5 * PI;
-            } else if (myDirection > 0.625 * PI && myDirection < 0.875 * PI) {
-                myDirection = 0.75 * PI;
-            } else {
-                myDirection = 0;
-            }
-
-            _myDirections[y * _myWidth + x] = myDirection;
-        }
-    }
-
-    // nonmaximum suppression
-    GRAYRaster::iterator itTrgt = myTargetFrame.begin();
-    float myResult = 0;
-    for (int y = 0; y < _myHeight; y++) {
-        for (unsigned x = 0; x < _myWidth; x++) {
-            unsigned myIndex = y * _myWidth + x;
-            if (y == 0 || y == _myHeight -1 || x == 0 || x == _myWidth-1) {
-                _myResultImage[myIndex] = 0;
-                continue;
-            }
-            float myGradient = _myGradients[myIndex];
-            if (_myGradients[myIndex] <= _myGradientThreshold * _myMaxGradient) {
-                _myGradients[myIndex] = 0;
-            }
-            _myResultImage[myIndex] = _myGradients[myIndex] == 0 ? 0 : 1;
-            // check surrounding pixels"
-            for (int i = -1; i <= 1; i=i+2) {
-                for (int j = -1; j <= 1; j=j+2) {
-                    if (!isOnEdge(myIndex, i, j)) {
-                        if (!(i==0 && j==0)) {
-                            if (_myGradients[(y+j) * _myWidth + (x+i)] 
-                                > _myGradients[myIndex]) 
-                            {
-                                _myResultImage[myIndex] = 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    for (int y = 1; y < _myHeight-1; y++) {
-        for (unsigned x = 1; x < _myWidth-1; x++) {
-            unsigned myIndex = y * _myWidth + x;
-            _myResult[myIndex] = 0;
-            if (_myResultImage[myIndex] == 1) {
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
-                        _myResult[(y+j) * _myWidth + (x+i)] = 1;
-                    }
-                }
-            }
-        }
-    }
+//
+//    for (int y = 1; y < _myHeight-1; y++) {
+//        for (unsigned x = 1; x < _myWidth-1; x++) {
+//            unsigned myIndex = y * _myWidth + x;
+//            _myResult[myIndex] = 0;
+//            if (_myResultImage[myIndex] == 1) {
+//                for (int i = -1; i <= 1; i++) {
+//                    for (int j = -1; j <= 1; j++) {
+//                        _myResult[(y+j) * _myWidth + (x+i)] = 1;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
   // hysteresis
 //    for (unsigned y = 0; y < _myHeight; y++) {
@@ -130,12 +129,16 @@ void Canny::onFrame( double t ) {
 //        myDirectionFrameLock(_myDirectionImage->getRasterValueNode());
 //    GRAYRaster & myDirectionFrame = myDirectionFrameLock.get();
 //    GRAYRaster::iterator itDir = myDirectionFrame.begin();
+    GRAYRaster::iterator itTrgt = myTargetFrame.begin();
+    GRAYRaster::const_iterator itSrc = mySourceFrame->begin();
     for (int y = _myHeight-1; y >= 0; y--) {
         for (unsigned x = 0; x < _myWidth; x++) {
             unsigned myIndex = y * _myWidth + x;
+            unsigned char mySrcValue = (*itSrc++).get();
             switch(_myOutput) {
                 case CANNY_OUTPUT:
-                    (*itTrgt++) = static_cast<unsigned char>((_myResult[myIndex])*255);
+                    //(*itTrgt++) = static_cast<unsigned char>((_myResultImage[myIndex])*255);
+                    (*itTrgt++) = mySrcValue > _myGradientThreshold ? 255 : 0;
                     break;
                 case GRADIENT_OUTPUT:
                     (*itTrgt++) = 
@@ -220,8 +223,11 @@ void Canny::configure( const dom::Node & theNode ) {
                 _myOutput = CANNY_OUTPUT;
             }
         }
-//        else if (myName == "gradientthreshold") {
-//            _myGradientThreshold = as<float>(myValue);
-//        }
+        else if (myName == "gradientthreshold") {
+            float myThreshold = as<float>(myValue);
+            _myGradientThreshold = static_cast<unsigned char>(myThreshold);
+            AC_PRINT << "myValue: " << myValue;
+            AC_PRINT << "myGradientThreshold: " << _myGradientThreshold;
+        }
     }
 }

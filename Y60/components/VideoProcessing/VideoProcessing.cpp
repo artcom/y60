@@ -23,6 +23,7 @@
 #include "DumbScale.h"
 #include "Convert.h"
 #include "Canny.h"
+#include "MaskPerson.h"
 
 #include <asl/Exception.h>
 #include <asl/Logger.h>
@@ -59,6 +60,7 @@ namespace y60 {
         REGISTER_ALGORITHM(DumbScale);
         REGISTER_ALGORITHM(Convert);
         REGISTER_ALGORITHM(Canny);
+        REGISTER_ALGORITHM(MaskPerson);
 
 		AC_WARNING << "algorithm '" << theName << "' not found.";
 		return asl::Ptr<Algorithm>(0);

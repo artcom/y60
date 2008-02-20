@@ -38,12 +38,9 @@ namespace y60 {
             unsigned char clampedSub(unsigned char theFirstValue, unsigned char theSecondValue);
             
             dom::Element _myResultNode;
-            dom::ValuePtr _mySourceRaster;
-            dom::ValuePtr _myTargetRaster;
-            dom::ValuePtr _myBackgroundRaster;
-            
+            y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
-            y60::ImagePtr _myBackgroundImage;              
+            y60::ImagePtr _myBackgroundImage;
             
             float _myThreshold;
             float _myWeight;
