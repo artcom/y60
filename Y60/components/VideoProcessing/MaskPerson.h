@@ -19,9 +19,11 @@ namespace y60 {
     
             unsigned int _myThreshold;
             unsigned int _myBlurRadius;
+            unsigned int _myGradientRadius;
 
             y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
+            y60::ImagePtr _myTargetMask;
 
     };
 
