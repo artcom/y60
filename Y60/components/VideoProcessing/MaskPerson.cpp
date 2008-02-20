@@ -48,7 +48,7 @@ void MaskPerson::onFrame( double t ) {
          itTrgt != myTargetRaster.end(); 
          ++itTrgt, ++itHGrad, ++itVGrad, ++itBlur)
     {
-        (*itTrgt) = asl::BGR(itHGrad->get()/2, itVGrad->get()/2, itBlur->get());
+        (*itTrgt) = asl::BGR((itHGrad->get() + 255)/2 , (itVGrad->get()+255)/2, itBlur->get());
     }
 }
 
