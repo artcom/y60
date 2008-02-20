@@ -30,9 +30,9 @@ void MaskPerson::onFrame( double t ) {
 
     std::copy(myBinaryRaster.begin(), myBinaryRaster.end(), myMaskRaster.begin());
     
-    raster<asl::GRAY> myBluredBinary(mySourceRaster->hsize(), mySourceRaster->vsize());
-    lowpass2d(_myBlurRadius, _myBlurRadius, myBinaryRaster, myBluredBinary, 
-              asl::gray<unsigned int>(0));
+//    raster<asl::GRAY> myBluredBinary(mySourceRaster->hsize(), mySourceRaster->vsize());
+//    lowpass2d(_myBlurRadius, _myBlurRadius, myBinaryRaster, myBluredBinary, 
+//              asl::gray<unsigned int>(0));
 
     raster<asl::gray<int> > myHGradient(mySourceRaster->hsize(), mySourceRaster->vsize());
     h_gradient(_myGradientRadius, myBinaryRaster, myHGradient, asl::gray<int>(0)); 
@@ -43,7 +43,7 @@ void MaskPerson::onFrame( double t ) {
     raster<asl::BGR>::iterator itTrgt = myTargetRaster.begin();
     raster<asl::gray<int> >::iterator itHGrad = myHGradient.begin();    
     raster<asl::gray<int> >::iterator itVGrad = myVGradient.begin();    
-    raster<asl::GRAY>::iterator itBlur = myBluredBinary.begin();     
+    raster<asl::GRAY>::iterator itBlur = myBinaryRaster.begin();//myBluredBinary.begin();     
     for (;   
          itTrgt != myTargetRaster.end(); 
          ++itTrgt, ++itHGrad, ++itVGrad, ++itBlur)
@@ -79,6 +79,5 @@ void MaskPerson::configure( const dom::Node & theNode ) {
         if (myName == "gradientradius") {
             _myGradientRadius = as<unsigned int>(myValue);
         }
-        _myGradientRadius = 5;
     }
 }
