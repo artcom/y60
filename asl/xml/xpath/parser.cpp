@@ -302,19 +302,19 @@ namespace xpath {
 #ifdef DEBUG_PARSER_STATES
 	AC_TRACE << "parseAndExpression at " << instring.substr(pos);
 #endif
-	int nw_pos;
+    int nw_pos;
 	if ((nw_pos = parseEqualityExpression(e, instring, pos)) != pos) {
 	    pos = nw_pos;
 	}
 	pos = asl::read_whitespace(instring, pos);
-	if (!(instring.compare(TOKEN_AND), pos, TOKEN_AND.length())) {
-	    pos += TOKEN_AND.length();
+    if (instring.compare(pos, TOKEN_AND.length(), TOKEN_AND) == 0) {
+        pos += TOKEN_AND.length();
 	    pos = asl::read_whitespace(instring, pos);
 
 	    Expression *secondE;
 	    pos = parseAndExpression(&secondE, instring, pos);
 	    *e = new BinaryExpression(BinaryExpression::And, *e, secondE);
-	}
+	} 
 	return pos;
     }
 
@@ -329,7 +329,7 @@ namespace xpath {
 	    pos = nw_pos;
 	}
 	pos = asl::read_whitespace(instring, pos);
-	if (!(instring.compare(TOKEN_OR), pos, TOKEN_OR.length())) {
+	if (instring.compare(pos, TOKEN_OR.length(), TOKEN_OR) == 0) {
 	    pos += TOKEN_OR.length();
 	    pos = asl::read_whitespace(instring, pos);
 
