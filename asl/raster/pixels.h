@@ -378,7 +378,7 @@ struct RGB_t : public Triple<red<T>, green<T>, blue<T>, RGB_t<T> > {
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Triple<red<T>, green<T>, blue<T>, RGB_t<T> >::SIZE;}
+    static int size() { return Triple<red<T>, green<T>, blue<T>, RGB_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
@@ -420,7 +420,7 @@ struct BGR_t : public Triple<blue<T>, green<T>, red<T>, BGR_t<T> > {
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Triple<blue<T>, green<T>, red<T>, BGR_t<T> >::SIZE;}
+    static int size() { return Triple<blue<T>, green<T>, red<T>, BGR_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
@@ -460,7 +460,7 @@ struct HSV_t : public Triple<hue<T>, saturation<T>, gray<T>, HSV_t<T> >{
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Triple<hue<T>, saturation<T>, gray<T>, HSV_t<T> >::SIZE;}
+    static int size() { return Triple<hue<T>, saturation<T>, gray<T>, HSV_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
@@ -496,7 +496,7 @@ struct RGBA_t : public Quad<red<T>, green<T>, blue<T>, alpha<T>, RGBA_t<T> > {
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Quad<red<T>, green<T>, blue<T>, alpha<T>, RGBA_t<T> >::SIZE;}
+    static int size() { return Quad<red<T>, green<T>, blue<T>, alpha<T>, RGBA_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
@@ -532,7 +532,7 @@ struct ABGR_t : public Quad<alpha<T>, blue<T>, green<T>, red<T>, ABGR_t<T> > {
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Quad<alpha<T>, blue<T>, green<T>, red<T>, ABGR_t<T> >::SIZE;}
+    static int size() { return Quad<alpha<T>, blue<T>, green<T>, red<T>, ABGR_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
@@ -568,7 +568,7 @@ struct BGRA_t : public Quad<blue<T>, green<T>, red<T>, alpha<T>, BGRA_t<T> > {
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
-    static int size() { return Quad<blue<T>, green<T>, red<T>, alpha<T>, BGRA_t<T> >::SIZE;}
+    static int size() { return Quad<blue<T>, green<T>, red<T>, alpha<T>, BGRA_t<T> >::size();}
     T * begin() {
         return &(*this)[0];
     }
