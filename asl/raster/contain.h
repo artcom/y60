@@ -253,7 +253,7 @@ struct Triple {
     Triple(const Triple & x) { first(x.first()); second(x.second()); third(x.third());}
     Triple(const T1 & a, const T2 & b, const T3 & c) { first(a); second(b); third(c);}
 
-    int size() { return 4;}
+    static int size() { return 3;}
 
     void first(const T1 & x) {_first = x;}
     void second(const T2 & x) {_second = x;}
@@ -382,6 +382,8 @@ struct Quad  {
     void second(const T2 & x) {_second = x;}
     void third(const T3 & x) {_third = x;}
     void fourth(const T4 & x) {_fourth = x;}
+
+    static int size() { return 4; }
 
     T1 & first() {return _first;}
     const T1& first() const {return _first;}
