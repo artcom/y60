@@ -1407,11 +1407,11 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         } else {
             JSString *myJSStr = JS_ValueToString(cx, id);
             std::string myProperty = JS_GetStringBytes(myJSStr);
-            IF_NOISY(
+            //IF_NOISY(
                 AC_TRACE << "JSNode::setProperty:" << myProperty << endl;
                 AC_TRACE << "JSNode::setProperty: nodeName = " << myNode->nodeName() << endl;
                 AC_TRACE << "JSNode::setProperty: myNode = " << *myNode << endl;
-            )
+            //)
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
 
             // Try to convert array to strings
@@ -1421,7 +1421,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             }
 
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);
+                AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl;
                 myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {
@@ -1430,7 +1430,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                     if (myFacade) {
                         dom::NodePtr myAttrNode = myFacade->getNamedItem(myProperty);
                         if (myAttrNode) {
-                            IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode-Facade = " <<*myAttrNode << endl);
+                            AC_TRACE << "JSNode::setProperty: myAttrNode-Facade = " <<*myAttrNode << endl;
 #define FACADE_ATTRIBUTES_WRITE_PROTECED
 #ifdef FACADE_ATTRIBUTES_WRITE_PROTECED
                             dumpJSStack(cx);
@@ -1444,6 +1444,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 						// ask the facades propertylist (features, properties, etc)
                         dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                         if (myPropertyNode) {
+                            AC_TRACE << "JSNode::setProperty: myPropertyNode = " <<*myPropertyNode << endl;
                             myPropertyNode->nodeValue(myResult);
                             return JS_TRUE;
 						}
@@ -1454,7 +1455,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             // retry to check for attrribute again; it may have been created by the facade
             myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode-post = " <<*myAttrNode << endl);
+                AC_TRACE << "JSNode::setProperty: myAttrNode-post = " <<*myAttrNode << endl;
                 myAttrNode->nodeValue(as_string(cx,*vp));
                 return JS_TRUE;
             } else {

@@ -183,15 +183,15 @@ namespace asl {
 
             while (lead_count-- && lead!=end) {
                 lead_value = auto_cast<T>(*lead++);
-                *out++ = auto_cast<typename iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail)));
+                *out++ = auto_cast<typename std::iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail)));
             }
             while (lead!=end) {
                 lead_value = auto_cast<T>(*lead++, init);
-                *out++ =  auto_cast<typename iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail++)));
+                *out++ =  auto_cast<typename std::iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail++)));
             }
             int trail_count = radius;
             while (trail!=end && trail_count--) {
-                *out++ = auto_cast<typename iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail++)));
+                *out++ = auto_cast<typename std::iterator_traits<OutputIterator>::value_type>(pixel_abs(lead_value - auto_cast<T>(*trail++)));
             }
             return out;
         }
@@ -233,7 +233,7 @@ namespace asl {
     template <class InputIterator,class OutputIterator,class T>
         OutputIterator paverage(InputIterator begin, InputIterator end, InputIterator begin2, OutputIterator out, const T& divisor) {
             while (begin!=end) {
-                *out++ = auto_cast<typename iterator_traits<OutputIterator>::value_type(((auto_cast<T>(*begin++) + auto_cast<T>(*begin2++))) / divisor);
+                *out++ = auto_cast<typename std::iterator_traits<OutputIterator>::value_type>(((auto_cast<T>(*begin++) + auto_cast<T>(*begin2++))) / divisor);
             }
             return out;
         }

@@ -42,15 +42,15 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ScaleTag,            asl::Vector3f,    SCALE_ATTRIB,             asl::Vector3f(1,1,1));
     DEFINE_ATTRIBUT_TAG(PivotTag,            asl::Vector3f,    PIVOT_ATTRIB,             asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(InsensibleTag,       bool,             INSENSIBLE_ATTRIB,        false);
-    DEFINE_ATTRIBUT_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity());
-    DEFINE_ATTRIBUT_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
-    DEFINE_ATTRIBUT_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
     DEFINE_ATTRIBUT_TAG(BillboardTag,        std::string,      BILLBOARD_ATTRIB,         "");
     DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true);
     DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString());
     DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "");
     DEFINE_ATTRIBUT_TAG(StickyTag,           bool,             STICKY_ATTRIB,            false);
 
+    DEFINE_FACADE_ATTRIBUTE_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity());
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
+    DEFINE_FACADE_ATTRIBUTE_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
     class TransformHierarchyFacade :
         public dom::Facade,
         public IdTag::Plug,

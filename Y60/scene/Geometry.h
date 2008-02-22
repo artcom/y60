@@ -74,7 +74,7 @@ namespace y60 {
 
     //=== Plane ============================================================
     DEFINE_ATTRIBUT_TAG(PlaneTag,       asl::Planef,   GEOMETRY_VALUE_ATTRIB,    asl::Planef(asl::Vector3f(0,0,1), 0));
-    DEFINE_ATTRIBUT_TAG(GlobalPlaneTag, asl::Planef,   GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Planef(asl::Vector3f(0,0,1), 0));
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalPlaneTag, asl::Planef,   GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Planef(asl::Vector3f(0,0,1), 0));
     class Plane :
         public Geometry<asl::Planef, PlaneTag, GlobalPlaneTag, Plane>
     {
@@ -96,7 +96,7 @@ namespace y60 {
 
     //=== Point ============================================================
     DEFINE_ATTRIBUT_TAG(PointTag,       asl::Point3f,  GEOMETRY_VALUE_ATTRIB,        asl::Point3f(0,0,0));
-    DEFINE_ATTRIBUT_TAG(GlobalPointTag, asl::Point3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Point3f(0,0,0));
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalPointTag, asl::Point3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Point3f(0,0,0));
     class Point :
         public Geometry<asl::Point3f, PointTag, GlobalPointTag, Point>
     {
@@ -117,7 +117,7 @@ namespace y60 {
 
     //=== Vector ============================================================
     DEFINE_ATTRIBUT_TAG(VectorTag,       asl::Vector3f,  GEOMETRY_VALUE_ATTRIB,        asl::Vector3f(1,0,0));
-    DEFINE_ATTRIBUT_TAG(GlobalVectorTag, asl::Vector3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Vector3f(1,0,0));
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalVectorTag, asl::Vector3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Vector3f(1,0,0));
     class Vector :
         public Geometry<asl::Vector3f, VectorTag, GlobalVectorTag, Vector>
     {
@@ -139,7 +139,7 @@ namespace y60 {
     //=== LineSegment ============================================================
     DEFINE_ATTRIBUT_TAG(LineSegmentTag,       asl::LineSegment<float>,  GEOMETRY_VALUE_ATTRIB,
             asl::LineSegment<float>(asl::Vector3f(0,0,0), asl::Vector3f(1,0,0)));
-    DEFINE_ATTRIBUT_TAG(GlobalLineSegmentTag, asl::LineSegment<float>,  GEOMETRY_GLOBAL_VALUE_ATTRIB,
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalLineSegmentTag, asl::LineSegment<float>,  GEOMETRY_GLOBAL_VALUE_ATTRIB,
             asl::LineSegment<float>(asl::Vector3f(0,0,0), asl::Vector3f(1,0,0)));
     class LineSegment :
         public Geometry<asl::LineSegment<float>, LineSegmentTag, GlobalLineSegmentTag, LineSegment>

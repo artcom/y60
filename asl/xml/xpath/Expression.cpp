@@ -255,6 +255,8 @@ namespace xpath
                     for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
                         string curstr = string_value_for(*i);
                         int cmp = curstr.compare(sv->getValue());
+                        if (cmp < 0) cmp = -1;
+                        if (cmp > 0) cmp = 1;
                         AC_TRACE << "  comparing string \"" << sv->getValue() << "\" with node of value \"" <<curstr<<"\" is " << cmp;
                         if (truthTable[cmp+1]&(1<<type)) {
                             retval = true;

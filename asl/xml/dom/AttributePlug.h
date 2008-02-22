@@ -38,7 +38,13 @@ namespace dom {
 		static const TYPE getDefault() { return theDefault; } \
     };
 
-
+#define DEFINE_FACADE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault) \
+    struct theTagName { \
+        typedef theType TYPE; \
+        typedef dom::FacadeAttributePlug<theTagName> Plug; \
+        static const char * getName() { return theAttributeName; } \
+		static const TYPE getDefault() { return theDefault; } \
+    };
     class Connector {
     public:
         template <class THE_FIRST, class THE_SECOND>
@@ -121,16 +127,7 @@ namespace dom {
              }
 #endif
         protected:
-            void dependsOn(ValuePtr theValue) {
-                _myAttribute->nodeValueWrapperPtr()->registerPrecursor(theValue);
-            }
-            void noLongerDependsOn(ValuePtr theValue) {
-                _myAttribute->nodeValueWrapperPtr()->unregisterPrecursor(theValue);
-            }
-            bool alreadyDependsOn(ValuePtr theValue) {
-                return _myAttribute->nodeValueWrapperPtr()->hasPrecursor(theValue);
-            }
-            bool hasOutdatedDependencies() const {
+             bool hasOutdatedDependencies() const {
                 if (_myAttribute) {
                     return _myAttribute->nodeValueWrapperPtr()->hasOutdatedDependencies();
                 }
@@ -142,23 +139,7 @@ namespace dom {
                 }
             }
 
-            template <class THE_OTHER_TAG>
-            void dependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
-                Connector::dependsOn(*this, theOtherTag);
-            }
-            template <class THE_OTHER_TAG, class THE_FACADE>
-            void dependsOn(PropertyPlug<THE_OTHER_TAG,THE_FACADE> & theOtherTag) {
-                Connector::dependsOn(*this, theOtherTag);
-            }
-            template <class THE_OTHER_TAG>
-            void noLongerDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
-                Connector::noLongerDependsOn(*this, theOtherTag);
-            }            
-            template <class THE_OTHER_TAG>
-            bool alreadyDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
-                return Connector::alreadyDependsOn(*this, theOtherTag);
-            } 
-
+ 
             template <class THE_OTHER_TAG>
             void affects(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
                 Connector::affects(*this, theOtherTag);
@@ -195,7 +176,6 @@ namespace dom {
                 return _myAttribute->nodeValueWrapperPtr();
             }
 
-            mutable NodePtr _myAttribute;
             virtual bool updateBeforeRead(VALUE & theValue) const {
                 return false;
             };
@@ -216,6 +196,7 @@ namespace dom {
                 ensureSchemaVsFacade(theNode, myAttribute);
                 return myAttribute;
             }
+            mutable NodePtr _myAttribute;
         private:
             AttributePlug() {};
 
@@ -234,6 +215,7 @@ namespace dom {
     // a candidate for the obfuscated C++ contest :-)
     template<class TAG>
     class FacadeAttributePlug : public AttributePlug<TAG> {
+        friend class Connector;
     protected:
         FacadeAttributePlug(NamedNodeMap * theFacade) :
             AttributePlug<TAG>(
@@ -248,7 +230,33 @@ namespace dom {
         { 
             this->getValuePtr()->setSelf(this->getValuePtr());
         }
-    };
+
+        template <class THE_OTHER_TAG>
+            void dependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
+                Connector::dependsOn(*this, theOtherTag);
+            }
+        template <class THE_OTHER_TAG, class THE_FACADE>
+            void dependsOn(PropertyPlug<THE_OTHER_TAG,THE_FACADE> & theOtherTag) {
+                Connector::dependsOn(*this, theOtherTag);
+            }
+        template <class THE_OTHER_TAG>
+            void noLongerDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
+                Connector::noLongerDependsOn(*this, theOtherTag);
+            }            
+        template <class THE_OTHER_TAG>
+            bool alreadyDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
+                return Connector::alreadyDependsOn(*this, theOtherTag);
+            } 
+        void dependsOn(ValuePtr theValue) {
+            AttributePlug<TAG>::_myAttribute->nodeValueWrapperPtr()->registerPrecursor(theValue);
+        }
+        void noLongerDependsOn(ValuePtr theValue) {
+            AttributePlug<TAG>::_myAttribute->nodeValueWrapperPtr()->unregisterPrecursor(theValue);
+        }
+        bool alreadyDependsOn(ValuePtr theValue) {
+            return AttributePlug<TAG>::_myAttribute->nodeValueWrapperPtr()->hasPrecursor(theValue);
+        }
+   };
 
     template<class FACADE>
     class DynamicAttributeMapper {

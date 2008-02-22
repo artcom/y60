@@ -52,7 +52,7 @@ namespace y60 {
 
     struct BoundingBoxTag {
         typedef asl::Box3f TYPE;
-        typedef dom::AttributePlug<BoundingBoxTag> Plug;
+        typedef dom::FacadeAttributePlug<BoundingBoxTag> Plug;
         static const char * getName() { return BOUNDING_BOX_ATTRIB; }
         static const TYPE getDefault() {
             asl::Box3f myEmptyBox;

@@ -38,14 +38,14 @@ using namespace std;
 using namespace dom;
 using namespace asl;
 
-//                  theTagName     theType         theAttributeName  theDefault
-DEFINE_ATTRIBUT_TAG(IdTag,         std::string,    "id",             "");
-DEFINE_ATTRIBUT_TAG(FloatTag,      float,          "float",          1);
-DEFINE_ATTRIBUT_TAG(Float2Tag,     float,          "float2",         1);
-DEFINE_ATTRIBUT_TAG(BoolTag,       bool,           "bool",           false);
-DEFINE_ATTRIBUT_TAG(HalfFloatTag,  float,          "halffloat",      0.5);
-DEFINE_ATTRIBUT_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2);
-DEFINE_ATTRIBUT_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0);
+//                       theTagName     theType         theAttributeName  theDefault
+DEFINE_ATTRIBUT_TAG        (IdTag,         std::string,    "id",             "");
+DEFINE_ATTRIBUT_TAG        (FloatTag,      float,          "float",          1);
+DEFINE_FACADE_ATTRIBUTE_TAG(Float2Tag,     float,          "float2",         1);
+DEFINE_ATTRIBUT_TAG        (BoolTag,       bool,           "bool",           false);
+DEFINE_FACADE_ATTRIBUTE_TAG(HalfFloatTag,  float,          "halffloat",      0.5);
+DEFINE_FACADE_ATTRIBUTE_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2);
+DEFINE_FACADE_ATTRIBUTE_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0);
 
 DEFINE_PROPERTY_TAG(FloatPropTag,  TestPropertiesFacade, float, "float", "floatproperty",  "properties", 0.5);
 
