@@ -76,7 +76,10 @@ namespace y60 {
         asl::Frustum myFrustum = get<FrustumTag>();
         myFrustum.changeAspectRatio( thePolicy, theNewAspect );
         myFrustum.updatePlanes(get<GlobalMatrixTag>(), get<InverseGlobalMatrixTag>());
-        set<FrustumTag>( myFrustum ); // XXX [DS] Ain't nice ... writable values would come in handy here
+        // avoid bumping version numbers when nothing has changed
+        if (memcmp(&myFrustum, &get<FrustumTag>(), sizeof(asl::Frustum)) !=0) { 
+            set<FrustumTag>( myFrustum ); 
+        }
     }
 
     Camera::Camera(dom::Node & theNode) : ProjectiveNode( theNode ) {}

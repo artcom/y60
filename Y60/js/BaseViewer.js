@@ -522,8 +522,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                     myNearPlane = myWorldSize / 10000.0;
                     myFarPlane = myWorldSize * 2.0;
                 }
-                myCamera.frustum.near = myNearPlane;
-                myCamera.frustum.far = myFarPlane;
+                if (!(almostEqual(myCamera.frustum.near, myNearPlane) &&
+                      almostEqual(myCamera.frustum.far,myFarPlane)))
+                {
+                    myCamera.frustum.near = myNearPlane;
+                    myCamera.frustum.far = myFarPlane;
+                }
             }
         }
         _myLightManager.onPreViewport(theViewport);

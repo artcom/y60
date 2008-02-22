@@ -240,6 +240,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Pause: " + (window.pause ? "on" : "off"));
                     break;
                 case 'P':
+                    print("Node changed since version "+_mySinceLastVersion+":");
                     window.scene.dom.printChangedNodes(_mySinceLastVersion);
                     _mySinceLastVersion = window.scene.dom.nodeVersion;
                     break;
