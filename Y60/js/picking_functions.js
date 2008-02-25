@@ -264,7 +264,8 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     
     obj.pickIntersection = function(theScreenPixelX, theScreenPixelY) {
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
-        var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        //var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        var myWorld = _myRenderWindow.scene.dom.find("worlds/world");
         return nearestIntersection(myWorld, myLineSegment);
     }
 

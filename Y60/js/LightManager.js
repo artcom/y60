@@ -228,13 +228,17 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     obj.onPreViewport = function(theViewport) {
         
         if (_myEnabledFlag && _myHeadLightFlag  && theViewport.id in _myViewportHeadlights) {
-            if (_myViewportHeadlights.length > 1 || _myViewportHeadlights[theViewport.id].visible != _myViewportHeadlightsEnabled[theViewport.id]) {
+            if (_myViewportHeadlights[theViewport.id].visible != _myViewportHeadlightsEnabled[theViewport.id]) {
                 _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];
             } 
         } 
     }
     obj.onPostViewport = function(theViewport) {
-        if (_myEnabledFlag && _myHeadLightFlag && (_myViewportHeadlights.length > 1) && theViewport.id in _myViewportHeadlights) {
+        var numLights = 0;
+        for (i in _myViewportHeadlights) {
+            ++numLights;
+        }
+        if (_myEnabledFlag && numLights > 1 && _myHeadLightFlag && theViewport.id in _myViewportHeadlights && _myViewportHeadlights[theViewport.id].visible) {
             _myViewportHeadlights[theViewport.id].visible = false;
         }
     }
