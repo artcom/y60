@@ -700,7 +700,7 @@ namespace y60 {
             mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
         }
 
-        createTargetSurface(nextPowerOfTwo(mySurfaceWidth), nextPowerOfTwo(mySurfaceHeight), theTextColor);
+        createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(
             AC_TRACE << "-------- Text puzzle ----------" << endl;
