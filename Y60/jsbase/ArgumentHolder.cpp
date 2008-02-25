@@ -10,7 +10,7 @@
 
 #include "JSWrapper.h"
 #include "JSNode.h"
-#include "JSEvent.h"
+#include "JSDomEvent.h"
 #include "JSVector.h"
 #include "JSQuaternion.h"
 #include "JSBox.h"
