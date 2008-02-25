@@ -246,13 +246,7 @@ namespace dom {
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes
             */
-        Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent)
-            : _myType(type), _myName(name),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
-        {
-            nodeValue(value);
-        }
+        Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent);
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes by supplying a special Value Type
@@ -1258,6 +1252,7 @@ Dependent on node type allowed children are:<p>
         void checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent);
 
         void checkForArrayType(NodePtr mySchemaType, asl::AC_SIZE_TYPE theParsePos);
+        void storeValue(const DOMString & theValue);
 
         // store file positions for saving
         void storeSavePosition(asl::Unsigned64 thePosition) const {

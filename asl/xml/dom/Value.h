@@ -122,6 +122,7 @@ namespace dom {
         virtual const std::type_info & getTypeInfo() const = 0;
         virtual const DOMString & getString() const = 0;
         virtual void setString(const DOMString & theValue) = 0;
+        virtual void setStringWithoutNotification(const DOMString & theValue) = 0;
         virtual ValuePtr clone(Node * theNode) const = 0;
         /// create default constructed value
         virtual ValuePtr create(Node * theNode) const = 0;
@@ -428,7 +429,11 @@ namespace dom {
             bumpVersion();
             onSetValue();
         }
-        virtual ValuePtr clone(Node * theNode) const {
+        virtual void setStringWithoutNotification(const DOMString & theValue) {
+            _myStringValue = theValue;
+            update();
+        }
+         virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
             return ValuePtr(new StringValue(_myStringValue, theNode));
         }
@@ -441,9 +446,7 @@ namespace dom {
         virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
             return ValuePtr(new StringValue(theValue, theNode));
         }
-        virtual void update() const {
-        }
-        virtual void assign(const asl::ReadableBlock & myOtherBlock) {
+       virtual void assign(const asl::ReadableBlock & myOtherBlock) {
             _myStringValue.resize(myOtherBlock.size());
             std::copy(myOtherBlock.begin(),myOtherBlock.end(),&_myStringValue[0]);
             update();
@@ -471,6 +474,10 @@ namespace dom {
             return _isBlockWriteable;
         }
     protected:
+        // update is called internally when the value has changed so in case the value
+        // is registered somewhere this registry can be also updated (e.g. in case of an IDValue)
+        virtual void update() const {
+        }
         virtual void clearMutableString() const {
             _myStringValue.resize(0);
             _myStringValue.reserve(0);
@@ -956,9 +963,15 @@ namespace dom {
         virtual void setString(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
             _myValueHasChanged = true;
-             this->bumpVersion();
-             this->onSetValue();
-       }
+            this->update();
+            this->bumpVersion();
+            this->onSetValue();
+        }
+        virtual void setStringWithoutNotification(const DOMString & theValue) {
+            _myValue = Value<T>::asT(theValue);
+            _myValueHasChanged = true;
+            this->update();
+        }
         virtual const T & getValue() const {
             this->onGetValue();
             return _myValue;
@@ -1764,9 +1777,15 @@ namespace dom {
         }
         virtual void setString(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
-            this->bumpVersion();
             setNewValue();
+            this->update();
+            this->bumpVersion();
             this->onSetValue();
+        }
+        virtual void setStringWithoutNotification(const DOMString & theValue) {
+            _myValue = Value<T>::asT(theValue);
+            setNewValue();
+            this->update();
         }
         const T & getValue() const {
             updateValue();
@@ -1805,11 +1824,13 @@ namespace dom {
             _myValueVersion = 0;
             _myBlockVersion = 1;
         }
+#if 0
         void setNewString() const {
             _myStringVersion = 1;
             _myValueVersion = 0;
             _myBlockVersion = 0;
         }
+#endif
         void setNewValue() const {
             _myStringVersion = 0;
             _myValueVersion = 1;

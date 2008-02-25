@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSEvent.h"
+#include "JSDomEvent.h"
 #include "JSNode.h"
 #include "JScppUtils.h"
 #include "JSWrapper.impl"
@@ -20,17 +20,58 @@ using namespace asl;
 
 namespace jslib {
 
-template class JSWrapper<GenericJSEvent, asl::Ptr<GenericJSEvent, dom::ThreadingModel>, 
+template class JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, 
          StaticAccessProtocol>;
+
+JSDomEventListener::JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName)
+    : _myJSContext(theContext), _myEventListener(theEventListener), _myMethodName(theMethodName)
+{
+    if(_myEventListener) {
+        if (!JS_AddRoot(_myJSContext, &_myEventListener)) {
+            // We might at one day remove this warning when we use non-js event listeners
+            AC_WARNING << "JSDomEventListener(): could not root event listener objects";
+        };
+    }
+    AC_PRINT<< " JSDomEventListener()";
+}
+
+JSDomEventListener::~JSDomEventListener() {
+    if(_myEventListener) {
+        JS_RemoveRoot(_myJSContext, &_myEventListener);
+    }
+    AC_PRINT<< " ~JSDomEventListener()";
+}
+void 
+JSDomEventListener::handleEvent(dom::EventPtr theEvent) {
+    asl::Ptr<GenericJSDomEvent, dom::ThreadingModel> myGenericEvent = dynamic_cast_Ptr<GenericJSDomEvent>(theEvent);
+    if (myGenericEvent) {
+        jsval argv[1], rval;
+        argv[0] = as_jsval(_myJSContext, theEvent);
+        JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
+    } else {
+        AC_ERROR << "JSDomEventListener::handleEvent: not a js listener" << std::endl;
+    }
+}
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the type of the native event");
     DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
-    JSEvent::Base * myWrapperPtr = JSEvent::getJSWrapperPtr(cx,obj);
+    JSDomEvent::Base * myWrapperPtr = JSDomEvent::getJSWrapperPtr(cx,obj);
     if (myWrapperPtr) {
         std::string myStringRep = std::string("Event<")+myWrapperPtr->getNative().type()+">";
+#if 0
+        GenericJSDomEvent myEvent = myWrapperPtr->getNative();
+        std::string myStringRep = std::string("{")+
+                                    "type: '" + myEvent.type() + "', " +
+                                    "eventPhase: '" + myEvent.eventPhase() +
+                                    "bubbles: '" + myEvent.bubbles() +
+                                    "cancelable: '" + myEvent.cancelable() +
+                                    "isDefaultPrevented: '" + myEvent.isDefaultPrevented() +
+                                    "payload: " + myEvent.getPayload() +
+                                    "}"
+#endif
         *rval = as_jsval(cx, myStringRep);
         return JS_TRUE;
     } else {
@@ -67,7 +108,7 @@ preventDefault(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 }
 
 JSFunctionSpec *
-JSEvent::Functions() {
+JSDomEvent::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -81,7 +122,7 @@ JSEvent::Functions() {
 }
 
 JSPropertySpec *
-JSEvent::Properties() {
+JSDomEvent::Properties() {
     static JSPropertySpec myProperties[] = {
         {"type", PROP_type, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"target", PROP_target, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -91,13 +132,14 @@ JSEvent::Properties() {
         {"cancelable", PROP_cancelable, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"timeStamp", PROP_timeStamp, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"isDefaultPrevented", PROP_isDefaultPrevented, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"data", PROP_data, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
 }
 
 JSConstIntPropertySpec *
-JSEvent::ConstIntProperties() {
+JSDomEvent::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         "CAPTURING_PHASE", PROP_CAPTURING_PHASE,  dom::Event::CAPTURING_PHASE,
@@ -109,20 +151,20 @@ JSEvent::ConstIntProperties() {
 };
 
 JSPropertySpec *
-JSEvent::StaticProperties() {
+JSDomEvent::StaticProperties() {
     static JSPropertySpec myProperties[] = {{0}};
     return myProperties;
 }
 
 JSFunctionSpec *
-JSEvent::StaticFunctions() {
+JSDomEvent::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
 
 // getproperty handling
 JSBool
-JSEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSDomEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
             case PROP_type:
                 *vp = as_jsval(cx, getNative().type());
@@ -148,22 +190,25 @@ JSEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             case PROP_isDefaultPrevented:
                 *vp = as_jsval(cx, getNative().isDefaultPrevented());
                 return JS_TRUE;
-            default:
-                JS_ReportError(cx,"JSEvent::getProperty: index %d out of range", theID);
+            case PROP_data:
+                *vp = OBJECT_TO_JSVAL(*getNative().getPayload());
+                return JS_TRUE;
+             default:
+                JS_ReportError(cx,"JSDomEvent::getProperty: index %d out of range", theID);
                 return JS_FALSE;
     }
 }
 
 // setproperty handling
 JSBool
-JSEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSDomEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     //switch (theID) {
         //case PROP_isOpen:
             //jsval dummy;
             //return Method<NATIVE>::call(&NATIVE::isOpen, cx, obj, 1, vp, &dummy);
             return JS_FALSE;
       //  default:
-            JS_ReportError(cx,"JSEvent::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSDomEvent::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     //}
 }
@@ -175,7 +220,7 @@ JSEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
              double theTimeStamp = DOMTimeStamp() )
 */
 JSBool
-JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a dom event.");
     DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);
     DOC_PARAM("thePayload", "", DOC_TYPE_OBJECT);
@@ -187,19 +232,19 @@ JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
-    JSEvent * myNewObject = 0;
+    JSDomEvent * myNewObject = 0;
     if (argc == 0 ) {
-        OWNERPTR myNewEvent = OWNERPTR(new GenericJSEvent("default"));
-        myNewObject = new JSEvent(myNewEvent, &(*myNewEvent));
+        OWNERPTR myNewEvent = OWNERPTR(new GenericJSDomEvent("default"));
+        myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
     } else if (argc >0 && argc < 6) {
         if (JSVAL_IS_VOID(argv[0])) {
-            JS_ReportError(cx,"JSEvent::Constructor: bad argument #1 (undefined)");
+            JS_ReportError(cx,"JSDomEvent::Constructor: bad argument #1 (undefined)");
             return JS_FALSE;
         }
 
         std::string myType = "";
         if (!convertFrom(cx, argv[0], myType)) {
-            JS_ReportError(cx, "JSEvent::Constructor: argument #1 must be an string (type)");
+            JS_ReportError(cx, "JSDomEvent::Constructor: argument #1 must be an string (type)");
             return JS_FALSE;
         }
         asl::Ptr<JSObject*> myObject(new JSObject*(0));
@@ -209,14 +254,14 @@ JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         bool canBubbleArg = true;
         if (argc > 2) {
             if (!convertFrom(cx, argv[2], canBubbleArg)) {
-                JS_ReportError(cx, "JSEvent::Constructor: argument #3 must be a bool (canBubbleArg)");
+                JS_ReportError(cx, "JSDomEvent::Constructor: argument #3 must be a bool (canBubbleArg)");
                 return JS_FALSE;
             }
         }
         bool cancelableArg = true;
         if (argc > 3) {
             if (!convertFrom(cx, argv[3], cancelableArg)) {
-                JS_ReportError(cx, "JSEvent::Constructor: argument #4 must be a bool (cancelableArg)");
+                JS_ReportError(cx, "JSDomEvent::Constructor: argument #4 must be a bool (cancelableArg)");
                 return JS_FALSE;
             }
         }
@@ -225,21 +270,21 @@ JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         if (argc > 4) {
             if (!convertFrom(cx, argv[4], myTime)) {
                 myTimeStamp = myTime;
-                JS_ReportError(cx, "JSEvent::Constructor: argument #5 must be a double (theTimeStamp)");
+                JS_ReportError(cx, "JSDomEvent::Constructor: argument #5 must be a double (theTimeStamp)");
                 return JS_FALSE;
             }
         }
         if (argc > 5) {
-            JS_ReportError(cx, "JSEvent::Constructor: excess arguments ignored, max arguments = 5");
+            JS_ReportError(cx, "JSDomEvent::Constructor: excess arguments ignored, max arguments = 5");
         }
         OWNERPTR myNewEvent = OWNERPTR(
-            new GenericJSEvent(myType,
+            new GenericJSDomEvent(myType,
                      canBubbleArg,
                      cancelableArg,
                      myTimeStamp,
                      myObject)
                      );
-        myNewObject = new JSEvent(myNewEvent, &(*myNewEvent));
+        myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1-5 (theType [, thePayload, canBubbleArg, cancelableArg, theTimeStamp]) %d",ClassName(), argc);
         return JS_FALSE;
@@ -249,12 +294,12 @@ JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JS_SetPrivate(cx,obj,myNewObject);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSEvent::Constructor: bad parameters");
+    JS_ReportError(cx,"JSDomEvent::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 JSObject *
-JSEvent::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSDomEvent::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor,
                 Properties(), Functions(), ConstIntProperties());
         createClassDocumentation(ClassName(), Properties(), Functions(),
@@ -262,13 +307,13 @@ JSEvent::initClass(JSContext *cx, JSObject *theGlobalObject) {
         return myClass;
 }
 
-//bool convertFrom(JSContext *cx, jsval theValue, JSEvent::NATIVE & theEvent) {
+//bool convertFrom(JSContext *cx, jsval theValue, JSDomEvent::NATIVE & theEvent) {
 bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSEvent::NATIVE >::Class()) {
-                theEvent = JSClassTraits<JSEvent::NATIVE>::getNativeOwner(cx,myArgument);
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSDomEvent::NATIVE >::Class()) {
+                theEvent = JSClassTraits<JSDomEvent::NATIVE>::getNativeOwner(cx,myArgument);
                 return true;
             }
         }
@@ -277,17 +322,17 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent) {
 }
 
 
-//jsval as_jsval(JSContext *cx, JSEvent::OWNERPTR theOwner) {
+//jsval as_jsval(JSContext *cx, JSDomEvent::OWNERPTR theOwner) {
 jsval as_jsval(JSContext *cx, dom::EventPtr theOwner) {
     // TODO, generalize to dom::Events. Right now it only works for JSGenericEvents
-    JSEvent::OWNERPTR myGenericEvent = dynamic_cast_Ptr<JSEvent::NATIVE>(theOwner);
-    JSObject * myReturnObject = JSEvent::Construct(cx, myGenericEvent, &(*myGenericEvent));
+    JSDomEvent::OWNERPTR myGenericEvent = dynamic_cast_Ptr<JSDomEvent::NATIVE>(theOwner);
+    JSObject * myReturnObject = JSDomEvent::Construct(cx, myGenericEvent, &(*myGenericEvent));
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-//jsval as_jsval(JSContext *cx, JSEvent::OWNERPTR theOwner, JSEvent::NATIVE * theEvent) {
-jsval as_jsval(JSContext *cx, dom::EventPtr theOwner, JSEvent::NATIVE * theEvent) {
-    JSObject * myObject = JSEvent::Construct(cx, theOwner, theEvent);
+//jsval as_jsval(JSContext *cx, JSDomEvent::OWNERPTR theOwner, JSDomEvent::NATIVE * theEvent) {
+jsval as_jsval(JSContext *cx, dom::EventPtr theOwner, JSDomEvent::NATIVE * theEvent) {
+    JSObject * myObject = JSDomEvent::Construct(cx, theOwner, theEvent);
     return OBJECT_TO_JSVAL(myObject);
 }
 

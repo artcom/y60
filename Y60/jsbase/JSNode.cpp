@@ -26,7 +26,7 @@
 #include "JSResizeableRaster.h"
 #include "JSResizeableVector.h"
 #include "JSAccessibleVector.h"
-#include "JSEvent.h"
+#include "JSDomEvent.h"
 #include "JSPlane.h"
 #include "JSEnum.h"
 #include "JSBitset.h"
@@ -898,7 +898,7 @@ getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     return Method<dom::Node>::call((MyMethod)&dom::Node::getAttributeValueWrapperPtr, cx, obj, argc, argv, rval);
     return JS_FALSE;
 }
-
+#if 0
 static JSBool
 addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Registers an event listener, depending on the useCapture parameter, on the capture phase of the DOM event flow or its target and bubbling phases");
@@ -918,6 +918,60 @@ removeEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::removeEventListener, cx, obj, argc, argv, rval);
 }
+#else 
+static JSBool
+    addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Registers an event listener, depending on the useCapture parameter, on the capture phase of the DOM event flow or its target and bubbling phases");
+        DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
+        DOC_PARAM("Listener", "", DOC_TYPE_OBJECT);
+        DOC_PARAM("useCapture", "", DOC_TYPE_BOOLEAN);
+        DOC_END;
+   
+        // TODO: find out why our automatic binding does not work; it just fails silently 
+        //typedef void (dom::Node::*MyMethod)(const dom::DOMString &, dom::EventListenerPtr, bool);
+        //return Method<dom::Node>::call((MyMethod)&dom::Node::addEventListener, cx, obj, argc, argv, rval);
+
+        dom::DOMString myType;
+        convertFrom(cx, argv[0], myType);
+
+        dom::EventListenerPtr myListener;
+        dom::DOMString myIdAttribute = "id";
+        convertFrom(cx, argv[1], myListener);
+
+        bool useCapture = false;
+        convertFrom(cx, argv[2], useCapture);
+
+        dom::NodePtr myNode;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
+
+        myNode->addEventListener(myType, myListener, useCapture);
+        return JS_TRUE;
+    }
+static JSBool
+removeEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Removes an event listeners from the default group");
+    DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
+    DOC_PARAM("Listener", "", DOC_TYPE_OBJECT);
+    DOC_PARAM("useCapture", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    dom::DOMString myType;
+    convertFrom(cx, argv[0], myType);
+
+    dom::EventListenerPtr myListener;
+    dom::DOMString myIdAttribute = "id";
+    convertFrom(cx, argv[1], myListener);
+
+    bool useCapture = false;
+    convertFrom(cx, argv[2], useCapture);
+
+    dom::NodePtr myNode;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
+
+    myNode->removeEventListener(myType, myListener, useCapture);
+    return JS_TRUE;
+}
+#endif
+
 
 static JSBool
 dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

@@ -48,7 +48,7 @@
 #include <y60/JSResizeableRaster.h>
 #include <y60/JSAccessibleVector.h>
 #include <y60/JSGlobal.h>
-#include <y60/JSEvent.h>
+#include <y60/JSDomEvent.h>
 #include <y60/JSFrustum.h>
 #include <y60/JSBlock.h>
 #include <y60/JSEnum.h>
@@ -187,7 +187,7 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     }
     createFunctionDocumentation("MathFunctions", Global::Functions());
 
-    if (!JSEvent::initClass(cx, theGlobalObject)) {
+    if (!JSDomEvent::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSRequestWrapper::initClass(cx, theGlobalObject)) {

@@ -1051,6 +1051,17 @@ Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) 
     return myNode->getChildElementById(theId, theIdAttribute);
 }
 
+/** create Entity Reference, Entity, ProcessingInstruction or Notation node
+  or any of the above nodes
+ */
+dom::Node::Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent)
+    : _myType(type), _myName(name),
+    _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
+    _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
+{
+    storeValue(value); // NVX
+}
+
 // create a node by type;name is set automatically if appropriate
 dom::Node::Node(NodeType type, Node * theParent) :
     _myType(type),
@@ -1097,7 +1108,7 @@ dom::Node::Node(NodeType type, const String & name_or_value, Node * theParent) :
         case COMMENT_NODE:
         case CDATA_SECTION_NODE:
             _myName = getNameOfType(type);
-            nodeValue(name_or_value);
+            storeValue(name_or_value); // NVX
             break;
         case ELEMENT_NODE:
         case ENTITY_REFERENCE_NODE:
@@ -1629,7 +1640,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         if (e_end_pos > nw_pos) {
             // is comment
             _myType = COMMENT_NODE;
-            nodeValue(myValueString);
+            storeValue(myValueString); // NVX
             _myName = getNameOfType(_myType);
             _myDocSize = _myParseCompletionPos = e_end_pos;
             // comment node ready
@@ -1642,7 +1653,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         if (dt_child_pos > nw_pos) {
             // is document_type
             _myType = DOCUMENT_TYPE_NODE;
-            nodeValue(myValueString);
+            storeValue(myValueString); // NVX
             // id's ready, check for child nodes now
             int completed_pos = asl::read_whitespace(is,dt_child_pos);
             if (is[completed_pos] == '[') {
@@ -1701,7 +1712,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         if (e_end_pos > nw_pos) {
             // is cdata
             _myType = ENTITY_NODE;
-            nodeValue(myValueString);
+            storeValue(myValueString); // NVX
             _myDocSize = _myParseCompletionPos = e_end_pos;
             // entity node ready
             return _myParseCompletionPos;
@@ -1713,7 +1724,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
             // is cdata
             _myType = CDATA_SECTION_NODE;
             _myName = getNameOfType(_myType);
-            nodeValue(myValueString);
+            storeValue(myValueString); // NVX
             _myDocSize = _myParseCompletionPos = e_end_pos;
             // cdata node ready
             return _myParseCompletionPos;
@@ -1724,7 +1735,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         if (e_end_pos > nw_pos) {
             // is processing_instruction
             _myType = PROCESSING_INSTRUCTION_NODE;
-            nodeValue(myValueString);
+            storeValue(myValueString); // NVX
             _myDocSize = _myParseCompletionPos = e_end_pos;
             // processing_instruction node ready
             return _myParseCompletionPos;
@@ -1821,7 +1832,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
             _myName = getNameOfType(_myType);
             checkSchemaForText(text_end_pos);
             try {
-                nodeValue(entity_decode_data(is.substr(nw_pos,text_end_pos - nw_pos),nw_pos,doctype));
+                storeValue(entity_decode_data(is.substr(nw_pos,text_end_pos - nw_pos),nw_pos,doctype)); // NVX
             }
             catch (ParseException & ex) {
                 ex.setParsedUntil(text_end_pos);
@@ -2056,7 +2067,7 @@ dom::Node::checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theT
             if (!theNewAttribute.checkMyValueTypeFits()) {
                 ValuePtr myDifferentTypeValue = theNewAttribute._myValue;
                 theNewAttribute.trashValue();
-                theNewAttribute.nodeValueWrapperPtr(myDifferentTypeValue);
+                theNewAttribute.nodeValueWrapperPtr(myDifferentTypeValue); // NVX
             }
             if (theNewAttribute._myValue) {
                 theNewAttribute._myValue->setNodePtr(&theNewAttribute);
@@ -2080,7 +2091,7 @@ dom::Node::checkAndUpdateChildrenSchemaInfo(Node & theNewChild, Node * theTopNew
                 if (!theNewChild.checkMyValueTypeFits()) {
                     ValuePtr myDifferentTypeValue = theNewChild._myValue;
                     theNewChild.trashValue();
-                    theNewChild.nodeValueWrapperPtr(myDifferentTypeValue);
+                    theNewChild.nodeValueWrapperPtr(myDifferentTypeValue); // NVX
                 }
             }
         }
@@ -2326,11 +2337,33 @@ dom::Node::nodeValue(const String& value) {
     ensureValue();
     _myValue->setString(value);
 }
+
+
+/// assign a new node value without triggering bumpVersion or Field::onUpdate()
+/// if the node type is not element, attribute
+/// cdata or comment, an exception is thrown
+void
+dom::Node::storeValue(const DOMString & value) {
+    if (!mayHaveValue()) {
+        string errorMessage;
+        errorMessage = "dom::Node::storeValue(value='";
+        errorMessage += value;
+        errorMessage += "') failed, nodeName = ";
+        errorMessage += nodeName();
+        errorMessage += "', nodeType = ";
+        errorMessage += NodeTypeName[nodeType()];
+        throw DomException(errorMessage,PLUS_FILE_LINE,DomException::NO_DATA_ALLOWED_ERR);
+    }
+    ensureValue();
+    _myValue->setStringWithoutNotification(value);
+}
+
+
 /// assign a new node value; if the node type is not element, attribute
 /// cdata or comment, an exception is thrown
 Node &
 dom::Node::operator=(const String& value) {
-    nodeValue(value);
+    nodeValue(value); // NVX
     return *this;
 }
 
@@ -2992,7 +3025,9 @@ Node::reparent(Node * theNewParent, Node * theTopNewParent) {
         _myParent->markPrecursorDependenciesOutdated();
     }
 #endif
-    bumpVersion();
+    if (_myParent) {
+        bumpVersion();
+    }
 }
 
 /*
@@ -3099,6 +3134,7 @@ dom::Node::dispatchEvent(EventPtr evt) {
 
     if (!evt->isPropagationStopped()) {
         evt->eventPhase(Event::AT_TARGET);
+        callListeners(_myCapturingEventListeners, evt);
         callListeners(_myEventListeners, evt);
     }
 
@@ -3159,7 +3195,21 @@ dom::Node::printChangedNodes(unsigned long long theLastVersion, int theLevel) co
             cerr <<"#NO VALUE";
         }
         cerr << endl;
-        for (unsigned i = 0; i < attributesLength(); ++i ) {
+        if (_myEventListeners.size()) {
+            cerr << myPrefix<< "-- EventListeners ("<<_myEventListeners.size()<<"):";
+            for (EventListenerMap::const_iterator it = _myEventListeners.begin(); it != _myEventListeners.end(); ++it) {
+                cerr << " '"<<it->first<<"'("<<it->second.size()<<")";
+            }
+            cerr << endl;
+        }
+        if (_myCapturingEventListeners.size()) {
+            cerr << myPrefix<< "-- Capturing EventListeners ("<<_myCapturingEventListeners.size()<<"):";
+            for (EventListenerMap::const_iterator it = _myCapturingEventListeners.begin(); it != _myCapturingEventListeners.end(); ++it) {
+                cerr << " '"<<it->first<<"'("<<it->second.size()<<")";
+            }
+            cerr << endl;
+        }
+         for (unsigned i = 0; i < attributesLength(); ++i ) {
             attributes().item(i)->printChangedNodes(theLastVersion, theLevel+1);
         }
         for (unsigned i = 0; i < childNodesLength(); ++i ) {

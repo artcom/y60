@@ -298,7 +298,7 @@ DomEventTest.prototype.Constructor = function(obj, theName) {
     	var myChildNode2 = myChildNode1.childNode(0);
     	var myChildNode3 = myChildNode2.childNode(0);
     	var myVector = new Vector3f(0,1,2);
-    	var myDomEvent = new JSEvent("testEvent", myVector, true, false, 0.0);
+    	var myDomEvent = new DomEvent("testEvent", myVector, true, false, 0.0);
     	//ENSURE = print;
     	ENSURE(myDomEvent.stopPropagation());
     	ENSURE(myDomEvent.preventDefault());

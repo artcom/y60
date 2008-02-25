@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _Y60_ACXPSHELL_JSEvent_INCLUDED_
-#define _Y60_ACXPSHELL_JSEvent_INCLUDED_
+#ifndef _Y60_ACXPSHELL_JSDomEvent_INCLUDED_
+#define _Y60_ACXPSHELL_JSDomEvent_INCLUDED_
 
 #include "JSWrapper.h"
 
@@ -19,23 +19,20 @@
 
 struct JSObject;
 
-//struct GenericJSEvent : public dom::GenericEvent<JSObject*> {
-//};
-
 namespace jslib {
 
-typedef dom::GenericEvent<JSObject*> GenericJSEvent;
+typedef dom::GenericEvent<JSObject*> GenericJSDomEvent;
 
-class JSEvent : public JSWrapper<GenericJSEvent, asl::Ptr<GenericJSEvent, dom::ThreadingModel>, StaticAccessProtocol>
+class JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, StaticAccessProtocol>
 {
-        JSEvent() {}
+        JSDomEvent() {}
     public:
-        typedef GenericJSEvent NATIVE;
+        typedef GenericJSDomEvent NATIVE;
         typedef asl::Ptr<NATIVE, dom::ThreadingModel> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "JSEvent";
+            return "DomEvent";
         }
         static JSFunctionSpec * Functions();
 
@@ -50,7 +47,8 @@ class JSEvent : public JSWrapper<GenericJSEvent, asl::Ptr<GenericJSEvent, dom::T
             PROP_bubbles,
             PROP_cancelable,
             PROP_timeStamp,
-            PROP_isDefaultPrevented
+            PROP_isDefaultPrevented,
+            PROP_data
         };
         static JSPropertySpec * Properties();
         static JSConstIntPropertySpec * ConstIntProperties();
@@ -74,52 +72,43 @@ class JSEvent : public JSWrapper<GenericJSEvent, asl::Ptr<GenericJSEvent, dom::T
         }
         static
             JSObject * Construct(JSContext *cx, dom::EventPtr theOwner, NATIVE * theNative) {
-            OWNERPTR myEvent = dynamic_cast_Ptr<GenericJSEvent>(theOwner);
+            OWNERPTR myEvent = dynamic_cast_Ptr<GenericJSDomEvent>(theOwner);
             return Base::Construct(cx, myEvent, theNative);
         }
 
-        JSEvent(OWNERPTR theOwner, NATIVE * theNative)
+        JSDomEvent(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         {}
 
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
-        static JSEvent & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSEvent &>(JSEvent::getJSWrapper(cx,obj));
+        static JSDomEvent & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSDomEvent &>(JSDomEvent::getJSWrapper(cx,obj));
         }
 
     private:
 };
 
 template <>
-struct JSClassTraits<GenericJSEvent> : public JSClassTraitsWrapper<GenericJSEvent, JSEvent> {};
+struct JSClassTraits<GenericJSDomEvent> : public JSClassTraitsWrapper<GenericJSDomEvent, JSDomEvent> {};
 
 template <>
-struct JSClassTraits<dom::Event> : public JSClassTraitsWrapper<GenericJSEvent, JSEvent> {};
+struct JSClassTraits<dom::Event> : public JSClassTraitsWrapper<GenericJSDomEvent, JSDomEvent> {};
 
 bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
 
 jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
-jsval as_jsval(JSContext *cx, dom::EventPtr, JSEvent::NATIVE * theEvent);
+jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
 
 
 jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
 
 
-struct JSEventListener : public dom::EventListener {
-    JSEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName = "handleEvent")
-        : _myJSContext(theContext), _myEventListener(theEventListener), _myMethodName(theMethodName)
-    {}
-    void handleEvent(dom::EventPtr theEvent) {
-        asl::Ptr<GenericJSEvent, dom::ThreadingModel> myGenericEvent = dynamic_cast_Ptr<GenericJSEvent>(theEvent);
-        if (myGenericEvent) {
-            jsval argv[1], rval;
-            argv[0] = as_jsval(_myJSContext, theEvent);
-            JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
-        } else {
-            AC_ERROR << "JSEventListener::handleEvent: not a js listener" << std::endl;
-        }
-    }
+struct JSDomEventListener : public dom::EventListener {
+    JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName = "handleEvent");
+    ~JSDomEventListener();
+    void handleEvent(dom::EventPtr theEvent);
+    
     JSObject * getJSListener() {
         return _myEventListener;
     }
@@ -128,27 +117,28 @@ struct JSEventListener : public dom::EventListener {
     std::string _myMethodName;
 };
 
-typedef asl::Ptr<JSEventListener,dom::ThreadingModel> JSEventListenerPtr;
+typedef asl::Ptr<JSDomEventListener,dom::ThreadingModel> JSDomEventListenerPtr;
 
+#if 1
 // creates a new wrapper object for the object passed in value; it does extract a wrapped value as usaual
-//bool convertFrom(JSContext *cx, jsval theValue, JSEventListener & theEventListener) {
+//bool convertFrom(JSContext *cx, jsval theValue, JSDomEventListener & theEventListener) {
 inline
 bool convertFrom(JSContext *cx, jsval theValue, dom::EventListenerPtr & theEventListener) {
      JSObject * myObject;
      if (JS_ValueToObject(cx, theValue, &myObject)) {
-        theEventListener = JSEventListenerPtr(new JSEventListener(cx, myObject));
+        theEventListener = JSDomEventListenerPtr(new JSDomEventListener(cx, myObject));
         return true;
     }
     return false;
 }
-
+#endif
 inline
-jsval as_jsval(JSContext *cx, asl::Ptr<JSEventListener> theOwner) {
+jsval as_jsval(JSContext *cx, asl::Ptr<JSDomEventListener> theOwner) {
     return OBJECT_TO_JSVAL(theOwner->getJSListener());
 }
 
 inline
-jsval as_jsval(JSContext *cx, asl::Ptr<JSEventListener>, JSEventListener * theEvent) {
+jsval as_jsval(JSContext *cx, asl::Ptr<JSDomEventListener>, JSDomEventListener * theEvent) {
     return OBJECT_TO_JSVAL(theEvent->getJSListener());
 }
 
