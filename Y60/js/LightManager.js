@@ -234,11 +234,11 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         } 
     }
     obj.onPostViewport = function(theViewport) {
-        var numLights = 0;
-        for (i in _myViewportHeadlights) {
-            ++numLights;
-        }
-        if (_myEnabledFlag && numLights > 1 && _myHeadLightFlag && theViewport.id in _myViewportHeadlights && _myViewportHeadlights[theViewport.id].visible) {
+        //var numLights = 0;
+        //for (i in _myViewportHeadlights) {
+        //    ++numLights;
+        //}
+        if (_myEnabledFlag /*&& numLights > 1*/ && _myHeadLightFlag && theViewport.id in _myViewportHeadlights && _myViewportHeadlights[theViewport.id].visible) {
             _myViewportHeadlights[theViewport.id].visible = false;
         }
     }
