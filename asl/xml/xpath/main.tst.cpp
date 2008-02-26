@@ -21,14 +21,14 @@ public:
     
     bool equals(OrderedNodeSetRef the, OrderedNodeSetRef same)
     {
-    bool retval = true;
-    if (!includes(the->begin(), the->end(), same->begin(), same->end())) {
-        retval = false;
-    }
-    if (!includes(same->begin(), same->end(), the->begin(), the->end())) {
-        retval = false;
-    }
-    return retval;
+        bool retval = true;
+        if (!includes(the->begin(), the->end(), same->begin(), same->end())) {
+            retval = false;
+        }
+        if (!includes(same->begin(), same->end(), the->begin(), the->end())) {
+            retval = false;
+        }
+        return retval;
     }
 
     bool equals(NodeRef theNode, std::string thePath, OrderedNodeSetRef expectedResult) {
@@ -276,6 +276,44 @@ public:
         ENSURE(equals(number6, numbers12));
         containers.push_back(number6);
     
+        OrderedNodeSetRef numbers13 = xpath_evaluateOrderedSet("//numbers/number[self::node() = 6 or self::node() = 5]", &doc);
+        ENSURE(numbers13->size() == 2);
+        ENSURE(contains(numbers10, numbers13));
+        containers.push_back(numbers13);
+    
+        OrderedNodeSetRef numbers14 = xpath_evaluateOrderedSet("//numbers/number[self::node() >= 5 and self::node() < 7]", &doc);
+        ENSURE(numbers14->size() == 2);
+        ENSURE(equals(numbers14, numbers13));
+        containers.push_back(numbers14);
+        
+        OrderedNodeSetRef number62 = xpath_evaluateOrderedSet("//numbers/number[text() = 6]", &doc);
+        ENSURE(number62->size() == 1);
+        ENSURE(equals(number62, number6));
+        containers.push_back(number62);
+        
+        OrderedNodeSetRef number63 = xpath_evaluateOrderedSet("//numbers/number[position() = last()-4]", &doc);
+        ENSURE(number63->size() == 1);
+        ENSURE(equals(number63, number62));
+        containers.push_back(number63);
+        
+        OrderedNodeSetRef numbers15 = xpath_evaluateOrderedSet("//*[count(number) = 10]", &doc);
+        ENSURE(equals(numbers15, numbers));
+        containers.push_back(numbers15);
+        
+// XXX tests fail
+// xpath interpreter seems to have problems with the last() function in case its used without position() function       
+//        OrderedNodeSetRef number64 = xpath_evaluateOrderedSet("//numbers/number[last()-4]", &doc);
+//        ENSURE(number64->size() == 1);
+//        ENSURE(equals(number64, number62));
+//        containers.push_back(number64);
+
+// xpath interpreter can not handle "|"        
+//        OrderedNodeSetRef numbers16 = xpath_evaluateOrderedSet("//numbers/number | //numbers/number[text() = 5]", &doc);
+//        ENSURE(numbers16->size() == 2);
+//        ENSURE(equals(numbers16, numbers13));
+//        containers.push_back(numbers16);
+        
+        
         // missing tests:
         //
         // - functions

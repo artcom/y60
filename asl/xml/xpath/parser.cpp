@@ -88,12 +88,17 @@ namespace xpath {
 	    nw_pos = asl::read_if_string(instring, pos, Function::nameOf(ft));
 	    nw_pos = asl::read_whitespace(instring, nw_pos);
 	    if (instring[nw_pos++] == '(') {
-		// function arguments
-		nw_pos = parseArgumentList(arglist, instring, nw_pos);
-		*e = new Function(ft, arglist);
-		return nw_pos;
+		    // function arguments
+            nw_pos = asl::read_whitespace(instring, nw_pos);
+            if (instring[nw_pos] != ')') {
+		        nw_pos = parseArgumentList(arglist, instring, nw_pos);
+            } else {
+                nw_pos++;
+            }
+		    *e = new Function(ft, arglist);
+		    return nw_pos;
 	    } else {
-		delete arglist;
+		    delete arglist;
 	    }
 	}
 
