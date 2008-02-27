@@ -798,7 +798,9 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         bool  mySpriteFlag           = theSpriteFlag;
 
         string myTextureId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
-        if (theImageOrTextureNode->nodeName() == IMAGE_NODE_NAME) {
+        if (theImageOrTextureNode->nodeName() == IMAGE_NODE_NAME ||
+            theImageOrTextureNode->nodeName() == MOVIE_NODE_NAME) 
+        {
             theImageOrTextureNode->getFacade<Image>()->get<ImageWidthTag>();
             string myImageId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
             dom::NodePtr myTextureNode = myMaterialBuilder.createTextureNode(*(theScene->getSceneBuilder()),
