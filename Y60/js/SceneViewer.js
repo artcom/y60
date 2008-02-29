@@ -455,6 +455,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (window == null) {
             window = new RenderWindow();
         }
+        if (theWindowWidth != null && theWindowHeight != null) {
+            window.resize(theWindowWidth, theWindowHeight, theFullscreen);
+        }
 
         // set the window behavior while sleeping
         window.renderWhileSleep = false;
@@ -479,10 +482,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();
 
-        if (theWindowWidth != null && theWindowHeight != null) {
-            window.resize(theWindowWidth, theWindowHeight, theFullscreen);
-        }
-
+        
         // Turn on sync to V-Blank
         window.swapInterval = 1;
 
