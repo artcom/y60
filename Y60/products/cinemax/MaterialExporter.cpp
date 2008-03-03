@@ -140,12 +140,15 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
             + " colorBias=" + String(asl::as_string(myColorBias).c_str()));
 
     // Texture
+    bool myCreateMipmapFlag = (theUsage == PAINT);
+    
     dom::NodePtr myImageNode(0);
     
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
         std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
         if (theMaterialBuilder->isMovie(myTextureFilename)) {
+            myCreateMipmapFlag = false;
             LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
             unsigned myLoopCount = 0;
 #if C4D_API_VERSION >= 8500
@@ -176,7 +179,6 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         }
     }
 
-    bool myCreateMipmapFlag = (theUsage == PAINT);
     // wrap mode
     TextureWrapMode myWrapMode = REPEAT; // TODO: extract wrap mode
     
