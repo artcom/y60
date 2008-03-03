@@ -25,6 +25,42 @@ namespace y60 {
     AnimationManager::~AnimationManager() {
     }
 
+    std::string
+    AnimationManager::splitNameAndComponent( const std::string & theName,
+        AnimationBase::AttributeComponent & theComponent ) 
+    {
+        std::string myName( theName );
+
+        if (myName.length() >= 2 && myName[myName.length() - 2] == '.') {
+            char myLastChar = tolower(myName[myName.length() - 1]);
+            switch (myLastChar) {
+                case 'x':
+                case 'r':
+                    theComponent = AnimationBase::X;
+                    break;
+                case 'y':
+                case 'g':
+                    theComponent = AnimationBase::Y;
+                    break;
+                case 'z':
+                case 'b':
+                    theComponent = AnimationBase::Z;
+                    break;
+                case 'w':
+                case 'a':
+                    theComponent = AnimationBase::W;
+                    break;
+            }
+            if (theComponent != AnimationBase::SCALAR) {
+                myName = myName.substr(0, myName.length() - 2);
+            }
+        } else if (myName == "frustum.hfov") {
+            theComponent = AnimationBase::HFOV;
+            myName = "frustum";
+        }
+        return myName;
+    }
+
     //dom::ValuePtr
     dom::NodePtr
     AnimationManager::findAnimatedValue(dom::NodePtr theNode,
@@ -32,34 +68,8 @@ namespace y60 {
                                         AnimationBase::AttributeComponent & theAttributeComponent)
     {
         string myAttributeName = theAttributeRef;
-        
-        if (theAttributeRef[theAttributeRef.length() - 2] == '.') {
-            char myLastChar = tolower(theAttributeRef[theAttributeRef.length() - 1]);
-            switch (myLastChar) {
-                case 'x':
-                case 'r':
-                    theAttributeComponent = AnimationBase::X;
-                    break;
-                case 'y':
-                case 'g':
-                    theAttributeComponent = AnimationBase::Y;
-                    break;
-                case 'z':
-                case 'b':
-                    theAttributeComponent = AnimationBase::Z;
-                    break;
-                case 'w':
-                case 'a':
-                    theAttributeComponent = AnimationBase::W;
-                    break;
-            }
-            if (theAttributeComponent != AnimationBase::SCALAR) {
-                myAttributeName = myAttributeName.substr(0, myAttributeName.length() - 2);
-            }
-        } else if (theAttributeRef == "frustum.hfov") {
-            theAttributeComponent = AnimationBase::HFOV;
-            myAttributeName = "frustum";
-        }
+
+        myAttributeName = splitNameAndComponent( myAttributeName, theAttributeComponent );
             
         dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
         
@@ -103,6 +113,8 @@ namespace y60 {
             dom::NodePtr myProperty = theNode->getAttribute(ANIM_PROPERTY_ATTRIB);
             if (myProperty) {
                 myAttributeRef = myProperty->nodeValue();
+
+                myAttributeRef = splitNameAndComponent( myAttributeRef, myAttributeComponent );
 
                 dom::NodePtr myPropPtr = myAnimatedNode->childNode(PROPERTY_LIST_NAME);
 

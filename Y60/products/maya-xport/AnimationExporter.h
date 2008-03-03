@@ -25,6 +25,7 @@
 #include <y60/SceneBuilder.h>
 #include <asl/Dashboard.h>
 #include <maya/MFnAnimCurve.h>
+#include <maya/MFnLambertShader.h>
 #include <maya/MFnCamera.h>
 
 #include <string>
@@ -65,13 +66,16 @@ struct ValueDescription {
     public:
         ValueDescription(const std::string & theY60AttributeName,
                          ConvertFunc theConvertFunc,
-                         const std::string & theTypeName):
+                         const std::string & theTypeName,
+                         bool thePropertyFlag = false):
                 _myY60AttributeName(theY60AttributeName),
                 _myTypeName(theTypeName),
-                _myConvertFunc(theConvertFunc) {}
+                _myConvertFunc(theConvertFunc),
+                _myPropertyFlag( thePropertyFlag ) {}
         const std::string   _myY60AttributeName;
         const std::string   _myTypeName;
         ConvertFunc         _myConvertFunc;
+        bool                _myPropertyFlag;
 };
 typedef asl::Ptr<ValueDescription> ValueDescriptionPtr;
 typedef std::map<std::string, ValueDescriptionPtr> MayaAttribDescriptionMap;
@@ -81,24 +85,28 @@ class AnimationExporter {
         AnimationExporter(y60::SceneBuilder & theSceneBuilder);
         virtual ~AnimationExporter();
 
+        void exportLambertFeatures(const MFnLambertShader & theDagNode,
+                                   const std::string & theNodeId);
         void exportGlobal(const MFnDagNode & theDagNode, const std::string & theNodeId);
         void exportCharacter(const MObject & theNode, std::map<std::string, std::string> & theIdMap);
 
     private:
-        template <class T>
-        void exportAnimation(const MFnDagNode & theDagNode,
+        template <class T, class MayaNodeType>
+        void exportAnimation(const MayaNodeType & theDagNode,
                              const std::string & theParameterName,
                              const std::string & theNodeId,
                              const std::string & theAttributeName,
-                             ConvertFunc theConvertFunc);
-        template <class T>
+                             ConvertFunc theConvertFunc,
+                             bool thePropertyFlag = false);
+        template <class T, class MayaNodeType>
         bool exportCurve(y60::AnimationBuilder & theAnimBuilder,
                          const MFnAnimCurve & theAnimCurve,
-                         const MFnDagNode & theDagNode,
+                         const MayaNodeType & theDagNode,
                          const std::string & theParameterName,
                          const std::string & theNodeId,
                          const std::string & theAttributeName,
-                         ConvertFunc theConvertFunc);
+                         ConvertFunc theConvertFunc,
+                         bool thePropertyFlag);
         void
         exportRotatingAnimation(const MFnDagNode & theDagNode, 
                          const std::string & theNodeId);
@@ -131,8 +139,10 @@ class AnimationExporter {
                           const std::string & theNodeId,
                           const std::string & theAttributeName,
                           MTime theStartTime,
-                          MTime theDuration);
-        MObject getAnimationNode(const MFnDagNode & theDagNode,
+                          MTime theDuration,
+                          bool thePropertyFlag);
+        template <class MayaNodeType>
+        MObject getAnimationNode(const MayaNodeType & theDagNode,
                                  const std::string & theParameterName);
                                  
         asl::Vector3f getInitialOrientation(const MFnDagNode & theDagNode);

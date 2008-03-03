@@ -55,6 +55,11 @@ void
 doNotConvert(float & theValue) {
 }
 
+void
+transparencyToAlpha(float & theValue) {
+    theValue = 1.0 - theValue;
+}
+
 template <class T>
 void
 AnimationExporter::exportSampledData(y60::AnimationBuilder & theAnimBuilder,
@@ -64,12 +69,17 @@ AnimationExporter::exportSampledData(y60::AnimationBuilder & theAnimBuilder,
                                      const std::string & theNodeId,
                                      const std::string & theAttributeName,
                                      MTime theStartTime,
-                                     MTime theDuration) 
+                                     MTime theDuration,
+                                     bool thePropertyFlag) 
 {
     START_TIMER(exportAnimation_myAnimationBuilder);
     theAnimBuilder.setName(theCurveName);
     theAnimBuilder.setNodeRef(theNodeId);
-    theAnimBuilder.setAttribute(theAttributeName);
+    if ( thePropertyFlag ) {
+        theAnimBuilder.setProperty(theAttributeName);
+    } else {
+        theAnimBuilder.setAttribute(theAttributeName);
+    }
     theAnimBuilder.setDuration(float(theDuration.as(MTime::kSeconds)));
     STOP_TIMER(exportAnimation_myAnimationBuilder);
 
@@ -92,13 +102,14 @@ AnimationExporter::exportSampledData(y60::AnimationBuilder & theAnimBuilder,
 }
 
 
-template <class T>
+template <class T, class MayaNodeType>
 void
-AnimationExporter::exportAnimation(const MFnDagNode & theDagNode,
+AnimationExporter::exportAnimation(const MayaNodeType & theDagNode,
                                    const std::string & theParameterName,
                                    const std::string & theNodeId,
                                    const std::string & theAttributeName,
-                                   ConvertFunc theConvertFunc)
+                                   ConvertFunc theConvertFunc,
+                                   bool thePropertyFlag)
 {
     MAKE_SCOPE_TIMER(AnimationExporter_exportAnimation);
     MObject myNode = getAnimationNode(theDagNode, theParameterName);
@@ -112,7 +123,8 @@ AnimationExporter::exportAnimation(const MFnDagNode & theDagNode,
         y60::AnimationBuilder myAnimationBuilder;
         std::string myId = _mySceneBuilder.appendAnimation(myAnimationBuilder);
         bool success = exportCurve<T>(myAnimationBuilder, myAnimCurve, theDagNode,
-                       theParameterName, theNodeId, theAttributeName, theConvertFunc);
+                       theParameterName, theNodeId, theAttributeName, theConvertFunc,
+                       thePropertyFlag);
         if (!success) {
             _mySceneBuilder.removeNodeById(_mySceneBuilder.getNode()->childNode(y60::ANIMATION_LIST_NAME), myId);
         }
@@ -271,20 +283,22 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
                     myAnimationBuilder.setEnable(false);
                     success = exportCurve<float>(myAnimationBuilder,
                                                 myCurves[myCurveIndex],
-                                                theNode,
+                                                MFnDagNode(theNode),
                                                 myAttributeName, myId,
                                                 myMapIter->second->_myY60AttributeName,
-                                                myMapIter->second->_myConvertFunc);
+                                                myMapIter->second->_myConvertFunc,
+                                                myMapIter->second->_myPropertyFlag);
                 }
             } else if (myMapIter->second->_myTypeName == "bool") {
                     myClipBuilder.appendAnimation(myAnimationBuilder);                
                     myAnimationBuilder.setEnable(false);
                     success = exportCurve<AcBool>(myAnimationBuilder,
                                                 myCurves[myCurveIndex],
-                                                theNode,
+                                                MFnDagNode(theNode),
                                                 myAttributeName, myId,
                                                 myMapIter->second->_myY60AttributeName,
-                                                myMapIter->second->_myConvertFunc);
+                                                myMapIter->second->_myConvertFunc,
+                                                myMapIter->second->_myPropertyFlag);
             } else {
                 throw ExportException(std::string("Sorry, maya type not yet supported : ") + myTypeStr
                                       + " for attribute: " + myAttributeName,
@@ -351,7 +365,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
 
 void
 AnimationExporter::exportGlobal(const MFnDagNode & theDagNode, const std::string & theNodeId) {
-    DB(AC_TRACE << "exportAnimation() examining node: " << theDagNode.name().asChar() << endl;)
+    DB(AC_TRACE << "exportGlobal() examining node: " << theDagNode.name().asChar() << endl;)
     MAKE_SCOPE_TIMER(AnimationExporter_exportCurves);
 
     exportAnimation<float>(theDagNode, "translateX", theNodeId, "position.x", &convertToMeter);
@@ -369,6 +383,17 @@ AnimationExporter::exportGlobal(const MFnDagNode & theDagNode, const std::string
     if (theDagNode.object().apiType() == MFn::kCamera) {
         exportAnimation<float>(theDagNode, "focalLength", theNodeId, "frustum.hfov", &doNotConvert);
     }
+
+    // Material features
+    exportAnimation<float>(theDagNode, "transparencyR", theNodeId, "diffuse.a", & transparencyToAlpha);
+}
+
+void 
+AnimationExporter::exportLambertFeatures(const MFnLambertShader & theDagNode,
+                                         const std::string & theNodeId)
+{
+    exportAnimation<float>( theDagNode, "transparencyR", theNodeId, "diffuse.a",
+            & transparencyToAlpha, true);
 }
 
 void
@@ -421,7 +446,7 @@ AnimationExporter::exportQuaternionAnimation(y60::AnimationBuilder & theAnimBuil
     }
     
     exportSampledData(theAnimBuilder, myValues, theAnimCurveName, thePostInfinity,
-            theNodeId, theAttributeName, theStartTime, myDuration);
+            theNodeId, theAttributeName, theStartTime, myDuration, false);
             
 }
 
@@ -514,8 +539,9 @@ AnimationExporter::exportRotatingAnimation(const MFnDagNode & theDagNode, const 
     }
 }
 
+template <class MayaNodeType>
 MObject
-AnimationExporter::getAnimationNode(const MFnDagNode & theDagNode,
+AnimationExporter::getAnimationNode(const MayaNodeType & theDagNode,
                                     const std::string & theParameterName)
 {
     MAKE_SCOPE_TIMER(AnimationExporter_getAnimationNode);
@@ -525,7 +551,8 @@ AnimationExporter::getAnimationNode(const MFnDagNode & theDagNode,
         MPlugArray myConnectedPlugs;
         myPlug.connectedTo(myConnectedPlugs, true, false, &myStatus);
         if (myStatus == MStatus::kSuccess && myConnectedPlugs.length() == 1 &&
-            !myConnectedPlugs[0].node().hasFn (MFn::kCharacter)) {
+            !myConnectedPlugs[0].node().hasFn (MFn::kCharacter))
+        {
             return myConnectedPlugs[0].node();
         }
     }
@@ -553,15 +580,16 @@ AnimationExporter::printAnimationInfo(const MFnAnimCurve & theAnimation) {
 }
 
 
-template <class T>
+template <class T, class MayaNodeType>
 bool
 AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
                                const MFnAnimCurve & theAnimCurve,
-                               const MFnDagNode & theDagNode,
+                               const MayaNodeType & theDagNode,
                                const std::string & theParameterName,
                                const std::string & theNodeId,
                                const std::string & theAttributeName,
-                               ConvertFunc theConvertFunc)
+                               ConvertFunc theConvertFunc,
+                               bool thePropertyFlag)
 {
     std::string myAnimCurveName = theAnimCurve.name().asChar();
     // We reject animations with empty names, because we do not know where they come from
@@ -618,7 +646,7 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
     }
     exportSampledData(theAnimBuilder, myValues, theAnimCurve.name().asChar(), 
             theAnimCurve.postInfinityType(), theNodeId, theAttributeName, 
-            myStartTime, myDuration);
+            myStartTime, myDuration, thePropertyFlag);
     return true;
 }
 

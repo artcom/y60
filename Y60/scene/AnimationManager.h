@@ -54,6 +54,8 @@ namespace y60 {
         private:
             AnimationCharacterPtr getCharacter(const std::string & theCharacterName, const std::string & theContext);
 
+            std::string splitNameAndComponent( const std::string & theName,
+                    AnimationBase::AttributeComponent & theComponent );
             AnimationClipPtr         _myGlobalAnimations;
             AnimationCharacterMap    _myCharacter;
 

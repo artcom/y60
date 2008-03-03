@@ -10,6 +10,7 @@
 
 #include "MayaHelpers.h"
 #include "MaterialExporter.h"
+#include "AnimationExporter.h"
 #include "ExportExceptions.h"
 
 #define DEBUG_LEVEL 0
@@ -728,11 +729,19 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     AC_DEBUG << "MaterialExporter::exportLambertFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     MStatus myStatus;
 
+
+
+    // XXX Material animation tests
+    MFnLambertShader myShaderDag( theShaderNode );
+
     // transparency, alpha
     MColor myTransparency = MFnLambertShader(theShaderNode).transparency(& myStatus);
     float myAlpha = 1.0f - myTransparency.r; // UH: what? alpha from transparency red?!?
     // Problem here is that myAlpha is used for diffuse.a as well as color_scale.a
     // so the final alpha is: diffuse.a * color_scale.a * texture.a
+
+    AnimationExporter myAnimExporter( theSceneBuilder );
+    myAnimExporter.exportLambertFeatures( myShaderDag, theBuilder.getId() );
 
     // ambient color
     MColor myAmbientColor = MFnLambertShader(theShaderNode).ambientColor(& myStatus);
