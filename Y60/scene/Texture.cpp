@@ -73,7 +73,7 @@ namespace y60 {
         AC_DEBUG << "Texture::registerDependenciesRegistrators '" << get<NameTag>();
 
         //TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
-        TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
+        //TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
         TextureParamChangedTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureParamChanged);
         TextureInternalFormatTag::Plug::setReconnectFunction(&Texture::registerDependenciesForInternalFormatUpdate);
 
@@ -303,7 +303,9 @@ namespace y60 {
         TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
         
         bool myForceSetupFlag = isDirty<TextureIdTag>();
+        AC_TRACE << "ForceSetupFlag(0) : " << myForceSetupFlag;
         myForceSetupFlag |= get<TextureIdTag>() ? false:true;
+        AC_TRACE << "ForceSetupFlag(1) : " << myForceSetupFlag;
         bool myImageContentChangedFlag = false;
 
         // setup flags
@@ -325,12 +327,12 @@ namespace y60 {
             _myResourceManager->unbindTexture(this);
             _myTextureId = 0;
         }
-        
+        AC_TRACE << "ForceSetupFlag(2) : " << myForceSetupFlag << " myImageContentChangedFlag : " << myImageContentChangedFlag;
         if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
             set<TextureIdTag>(_myTextureId);
+            AC_PRINT << "############### isDirty<TextureIdTag>( : " << isDirty<TextureIdTag>();
         } else {
-
             if (isDirty<TextureParamChangedTag>()) {
                 _myResourceManager->updateTextureParams(myTexture);
                 (void) get<TextureParamChangedTag>();
