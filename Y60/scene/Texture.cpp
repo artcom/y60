@@ -331,7 +331,6 @@ namespace y60 {
         if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
             set<TextureIdTag>(_myTextureId);
-            AC_PRINT << "############### isDirty<TextureIdTag>( : " << isDirty<TextureIdTag>();
         } else {
             if (isDirty<TextureParamChangedTag>()) {
                 _myResourceManager->updateTextureParams(myTexture);
