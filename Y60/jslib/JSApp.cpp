@@ -545,6 +545,8 @@ PreLoad(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             myNode->getFacade<y60::Texture>()->preload();
         } else if (myNode->nodeName() == IMAGE_NODE_NAME) {
             myNode->getFacade<y60::Image>()->preload();
+        } else if (myNode->nodeName() == MOVIE_NODE_NAME) {
+        	// do nothing
         } else {
             JS_ReportError(cx, "preLoad(): argument #1 must be a texture or image node");
             return JS_FALSE;
