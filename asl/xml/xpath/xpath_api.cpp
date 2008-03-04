@@ -18,7 +18,8 @@ namespace xpath {
     // defined in parser.cpp, for which no Header file exists.
     int parsePath(Path *p, const std::string &instring, int pos);
 
-    Path *xpath_parse(const std::string &instring) {
+    Path *
+    xpath_parse(const std::string &instring) {
         Path *p = new Path();
         AC_DEBUG << "parsing path " << instring;
         if (parsePath(p, instring, 0) == 0) {
@@ -31,7 +32,8 @@ namespace xpath {
         return p;
     }
 
-    dom::Node *xpath_evaluate1(Path *p, dom::Node *theNode) {
+    dom::Node *
+    xpath_evaluate1(Path *p, dom::Node *theNode) {
 
         OrderedNodeSetRef retval = p->evaluateAs<OrderedNodeSet>(theNode);
 
@@ -62,7 +64,8 @@ namespace xpath {
         }
     }
 
-    std::vector<dom::Node *> *xpath_evaluate(Path *p, dom::Node *theNode) {
+    std::vector<dom::Node *> *
+    xpath_evaluate(Path *p, dom::Node *theNode) {
         xpath::NodeVectorRef retval = p->evaluateAs<NodeVector>(theNode);
 #ifdef DEBUG_RESULTS
         AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
@@ -84,7 +87,8 @@ namespace xpath {
         return retval;
     }
 
-    std::vector<dom::Node *> *xpath_evaluate(std::string path, dom::Node *theNode) {
+    std::vector<dom::Node *> *
+    xpath_evaluate(std::string path, dom::Node *theNode) {
         xpath::Path *myPath = xpath_parse(path);
 
         if (!myPath) {
@@ -97,7 +101,8 @@ namespace xpath {
         }
     }
 
-    std::set<dom::Node *> *xpath_evaluateSet(xpath::Path *myPath, dom::Node *theNode) {
+    std::set<dom::Node *> *
+    xpath_evaluateSet(xpath::Path *myPath, dom::Node *theNode) {
         NodeSetValue *retValue = myPath->evaluate(theNode);
         NodeSetRef retval = retValue->takeNodes();
 #ifdef DEBUG_RESULTS
@@ -121,7 +126,8 @@ namespace xpath {
         return retval;
     }
 
-    std::set<dom::Node *> *xpath_evaluateSet(std::string path, dom::Node *theNode) {
+    std::set<dom::Node *> *
+    xpath_evaluateSet(std::string path, dom::Node *theNode) {
         xpath::Path *myPath = xpath_parse(path);
 
         if (!myPath) {
@@ -134,7 +140,8 @@ namespace xpath {
         }
     }
 
-    OrderedNodeSetRef xpath_evaluateOrderedSet(xpath::Path *myPath, dom::Node *theNode) {
+    OrderedNodeSetRef 
+    xpath_evaluateOrderedSet(xpath::Path *myPath, dom::Node *theNode) {
         OrderedNodeSetRef retval = myPath->evaluateAs<OrderedNodeSet>(theNode);
 #ifdef DEBUG_RESULTS
         AC_DEBUG << "evaluated path contains " << retval->size() << " nodes.";
@@ -156,7 +163,8 @@ namespace xpath {
         return retval;
     }
 
-    OrderedNodeSetRef xpath_evaluateOrderedSet(std::string path, dom::Node *theNode) {
+    OrderedNodeSetRef
+    xpath_evaluateOrderedSet(std::string path, dom::Node *theNode) {
         xpath::Path *myPath = xpath_parse(path);
 
         if (!myPath) {
@@ -169,11 +177,13 @@ namespace xpath {
         }
     }
 
-    void xpath_return(Path *p) {
+    void
+    xpath_return(Path *p) {
         delete p;
     }
 
-    void xpath_evaluate(Path *p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
+    void
+    xpath_evaluate(Path *p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
 
         std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
 
@@ -184,7 +194,8 @@ namespace xpath {
         delete retval;
     }
 
-    void xpath_evaluate(std::string p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
+    void
+    xpath_evaluate(std::string p, dom::Node *startingElement, std::vector<dom::NodePtr> &results) {
 
         std::vector<dom::Node *> *retval = xpath_evaluate(p, startingElement);
 

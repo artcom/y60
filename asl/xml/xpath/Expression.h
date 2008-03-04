@@ -25,9 +25,14 @@ namespace xpath
     class SyntaxNode
     {
         public:
-            virtual ~SyntaxNode(){};
+            virtual ~SyntaxNode(){}
             virtual void serializeTo(std::ostream &) = 0;
-            string serialize() { string retval; std::ostringstream oss(retval); serializeTo(oss); return retval; };
+            string serialize() {
+                string retval;
+                std::ostringstream oss(retval);
+                serializeTo(oss);
+                return retval;
+            }
     };
 
     class Expression : public SyntaxNode {
@@ -37,10 +42,14 @@ namespace xpath
 
     class Literal : public Expression {
         public:
-            Literal(const string &data) { value = data; };
-            virtual ~Literal() { };
-            virtual void serializeTo(std::ostream &os) { os << "\"" << value << "\""; };
-            virtual Value *evaluateExpression(const Context &c) { return new StringValue(value); };
+            Literal(const string &data) { value = data; }
+            virtual ~Literal() { }
+            virtual void serializeTo(std::ostream &os) {
+                os << "\"" << value << "\"";
+            }
+            virtual Value *evaluateExpression(const Context &c) {
+                return new StringValue(value);
+            }
 
         private:
             string value;
@@ -48,10 +57,12 @@ namespace xpath
 
     class Number : public Expression {
         public:
-            Number(int _value) { value = _value; };
-            virtual ~Number() {};
-            virtual void serializeTo(std::ostream &os) { os << value; };
-            virtual Value *evaluateExpression(const Context &)  { return new NumberValue(value); };
+            Number(int _value) { value = _value; }
+            virtual ~Number() {}
+            virtual void serializeTo(std::ostream &os) { os << value; }
+            virtual Value *evaluateExpression(const Context &)  {
+                return new NumberValue(value);
+            }
 
         private:
             int value;
@@ -59,13 +70,31 @@ namespace xpath
 
     class BinaryExpression : public Expression {
         public:
-            enum ExpressionType { Equal, NotEqual, 
-                Less=4, Greater, LEqual, GEqual, 
-                Or = 16, And,
-                Plus = 32, Minus, Times, Div, Mod };
+            enum ExpressionType {
+                Equal,
+                NotEqual, 
+                Less=4,
+                Greater,
+                LEqual,
+                GEqual, 
+                Or = 16,
+                And,
+                Plus = 32,
+                Minus,
+                Times,
+                Div,
+                Mod
+            };
 
             BinaryExpression(ExpressionType, Expression *, Expression *);
-            virtual ~BinaryExpression() { if (lvalue) delete lvalue; if (rvalue) delete rvalue; };
+            virtual ~BinaryExpression() {
+                if (lvalue) {
+                    delete lvalue;
+                }
+                if (rvalue) {
+                    delete rvalue;
+                }
+            }
 
             virtual void serializeTo(std::ostream &);
             virtual Value *evaluateExpression(const Context &);
@@ -74,14 +103,27 @@ namespace xpath
 
             ExpressionType type;
             // both must one of (path, expressions, literal, number).
-            Expression *lvalue, *rvalue;
+            Expression * lvalue;
+            Expression * rvalue;
     };
 
-    class UnaryExpression: public Expression {
+    class UnaryExpression : public Expression {
         public:
-            enum OperatorType { Minus, Tilde, Not, Invalid };
-            UnaryExpression(OperatorType _type, Expression *_argument) { type = _type; argument = _argument; };
-            virtual ~UnaryExpression() { if (argument) delete argument; };
+            enum OperatorType {
+                Minus,
+                Tilde,
+                Not,
+                Invalid
+            };
+            UnaryExpression(OperatorType _type, Expression *_argument) : 
+                type( _type ),
+                argument( _argument )
+            {}
+            virtual ~UnaryExpression() {
+                if (argument) {
+                    delete argument; 
+                }
+            }
 
             virtual void serializeTo(std::ostream &);
             virtual Value *evaluateExpression(const Context &);
@@ -94,12 +136,36 @@ namespace xpath
     class Function: public Expression {
         public:
 
-            enum FunctionType { Unknown, Last, Position, Count, StartsWith, Concat, Contains, Substring, SubstringBefore, SubstringAfter, Not,
+            enum FunctionType {
+                Unknown,
+                Last,
+                Position,
+                Count,
+                StartsWith,
+                Concat,
+                Contains,
+                Substring,
+                SubstringBefore,
+                SubstringAfter,
+                Not,
                 // To be implemented:
-                Id, LocalName, NamespaceURI, Name, 
-                String, StringLength, NormalizeSpace, Translate, 
-                Boolean, True, False, Lang, 
-                Number, Sum, Floor, Ceiling, Round
+                Id,
+                LocalName,
+                NamespaceURI,
+                Name, 
+                String,
+                StringLength,
+                NormalizeSpace,
+                Translate, 
+                Boolean,
+                True,
+                False,
+                Lang, 
+                Number,
+                Sum,
+                Floor,
+                Ceiling,
+                Round
             };
 
             static const string FUNCTIONNAME_LAST;
@@ -131,7 +197,10 @@ namespace xpath
             static const string FUNCTIONNAME_ROUND;
             static const string FUNCTIONNAME_UNKNOWN;
 
-            Function(FunctionType _type, std::list<Expression*> *_arguments) { type = _type; arguments = _arguments; };
+            Function(FunctionType _type, std::list<Expression*> *_arguments) :
+                type( _type ),
+                arguments( _arguments )
+            {}
             virtual ~Function();
 
             virtual void serializeTo(std::ostream &);
@@ -151,22 +220,22 @@ namespace xpath
        previous-sibling:                                  backward
        following-sibling:                        indirect
        preceding-sibling:                        indirect backward
-child:                           vertical
-parent:                          vertical          backward
-descendant:                      vertical indirect
-ancestor:                        vertical indirect backward
-next?---------------include-self----------------------------
-previous?-----------include-self---------------------backward-
-following:          include-self          indirect
-preceding:          include-self          indirect backward
-child-or-self?------include-self-vertical-------------------
-parent-or-self?-----include-self-vertical-------------------
-ancestor-or-self:   include-self vertical indirect
-descendant-or-self: include-self vertical indirect backward
-
-namespace
-self
-attribute
+       child:                           vertical
+       parent:                          vertical          backward
+       descendant:                      vertical indirect
+       ancestor:                        vertical indirect backward
+       next?---------------include-self----------------------------
+       previous?-----------include-self---------------------backward-
+       following:          include-self          indirect
+       preceding:          include-self          indirect backward
+       child-or-self?------include-self-vertical-------------------
+       parent-or-self?-----include-self-vertical-------------------
+       ancestor-or-self:   include-self vertical indirect
+       descendant-or-self: include-self vertical indirect backward
+    
+       namespace
+       self
+       attribute
      */
 
     class Step : public SyntaxNode {
@@ -174,22 +243,22 @@ attribute
 
             // -----------------------------
 
-            static const string AXISNAME_INVALID           ;
-            static const string AXISNAME_NEXT_SIBLING      ;
-            static const string AXISNAME_PREVIOUS_SIBLING  ;
-            static const string AXISNAME_FOLLOWING_SIBLING ;
-            static const string AXISNAME_PRECEDING_SIBLING ;
-            static const string AXISNAME_CHILD             ;
-            static const string AXISNAME_PARENT            ;
-            static const string AXISNAME_DESCENDANT        ;
-            static const string AXISNAME_ANCESTOR          ;
-            static const string AXISNAME_FOLLOWING         ;
-            static const string AXISNAME_PRECEDING         ;
-            static const string AXISNAME_ANCESTOR_OR_SELF  ;
+            static const string AXISNAME_INVALID;
+            static const string AXISNAME_NEXT_SIBLING;
+            static const string AXISNAME_PREVIOUS_SIBLING;
+            static const string AXISNAME_FOLLOWING_SIBLING;
+            static const string AXISNAME_PRECEDING_SIBLING;
+            static const string AXISNAME_CHILD;
+            static const string AXISNAME_PARENT;
+            static const string AXISNAME_DESCENDANT;
+            static const string AXISNAME_ANCESTOR;
+            static const string AXISNAME_FOLLOWING;
+            static const string AXISNAME_PRECEDING;
+            static const string AXISNAME_ANCESTOR_OR_SELF;
             static const string AXISNAME_DESCENDANT_OR_SELF;
-            static const string AXISNAME_SELF              ;
-            static const string AXISNAME_NAMESPACE         ;
-            static const string AXISNAME_ATTRIBUTE         ;
+            static const string AXISNAME_SELF;
+            static const string AXISNAME_NAMESPACE;
+            static const string AXISNAME_ATTRIBUTE;
 
             enum Axis {
                 Invalid = 255,
@@ -216,12 +285,14 @@ attribute
 
             // --------------------------------
 
-            enum NodeTest { TestPrincipalType,
+            enum NodeTest {
+                TestPrincipalType,
                 TestAnyNode,
                 TestCommentNode,
                 TestTextNode,
                 TestProcessingInstruction,
-                InvalidTest };
+                InvalidTest 
+            };
 
             static const string NODETEST_INVALID;
             static const string NODETEST_NODE;
@@ -243,9 +314,9 @@ attribute
             virtual ~Step();
 
             template <class T>
-                void scanInto(NodeRef from, T &into) {
-                    scan(from, into);
-                }
+            void scanInto(NodeRef from, T &into) {
+                scan(from, into);
+            }
 
             virtual void serializeTo(std::ostream &);
 
@@ -269,6 +340,7 @@ attribute
             std::list<Expression*> predicates;
 
         private:
+
             // puts results from from into into
             void scan(NodeRef from, NodeSet & into);
             void scan(NodeRef from, NodeVector & into);
@@ -289,31 +361,50 @@ attribute
             Path();
             virtual void serializeTo(std::ostream &);
             virtual Value *evaluateExpression(const Context &c);
-            virtual ~Path() { for (std::list<Step *>::iterator i = steps.begin(); i != steps.end(); ++i) delete *i; };
+            virtual ~Path() {
+                typedef std::list<Step *>::iterator StepIterator;
+                for ( StepIterator i = steps.begin(); i != steps.end(); ++i) {
+                    delete *i;
+                }
+            }
             NodeSetValue *evaluate(NodeRef);
 
             template <class T>
-                T *evaluateAs(NodeRef input) {
-                    NodeSetRef theseNodes = new NodeSet();
-                    theseNodes->insert(input);
-                    T *retval = new T;
-                    evaluateInto(theseNodes, *retval);
-                    return retval;
-                }
+            T * evaluateAs(NodeRef input) {
+                NodeSetRef theseNodes = new NodeSet();
+                theseNodes->insert(input);
+                T *retval = new T;
+                evaluateInto(theseNodes, *retval);
+                return retval;
+            }
 
-            void setAbsolute(bool a=true) { absolute = a; };
+            void setAbsolute(bool a = true) { absolute = a; };
             bool isAbsolute() { return absolute; };
 
-            void appendStep(Step *nextStep) { steps.push_back(nextStep); };
-            void prependStep(Step *prevStep) { steps.push_front(prevStep); };
+            void appendStep(Step *nextStep) {
+                steps.push_back(nextStep);
+            }
+            void prependStep(Step *prevStep) {
+                steps.push_front(prevStep);
+            }
 
-            int count() { return steps.size(); };
+            int count() {
+                return steps.size();
+            }
 
             // a list does not support random access, so
             // hide this call: Step *step(int i) { return steps.item(i); };
 
-            Step *takeFirst() { Step *retval = steps.front(); steps.pop_front(); return retval;};
-            Step *takeLast() { Step *retval = steps.back(); steps.pop_back(); return retval; };
+            Step *takeFirst() {
+                Step *retval = steps.front(); 
+                steps.pop_front(); 
+                return retval;
+            }
+            Step *takeLast() {
+                Step *retval = steps.back();
+                steps.pop_back();
+                return retval;
+            }
 
         private:
             void evaluateInto(NodeSetRef, NodeSet &);

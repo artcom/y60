@@ -21,14 +21,16 @@ namespace xpath {
     class Path;
 
     // yields a path pointer to the responsibility of the caller.
-    Path *xpath_parse(const std::string &instring);
+    Path * xpath_parse(const std::string &instring);
 
     // have library delete previously parse()'d Path *
     void xpath_return(Path *);
 
     // evaluate path on startingElement into results
-    void xpath_evaluate(Path *, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
-    void xpath_evaluate(std::string, dom::Node *startingElement, std::vector<dom::NodePtr> &results);
+    void xpath_evaluate(Path *, dom::Node *startingElement,
+            std::vector<dom::NodePtr> &results);
+    void xpath_evaluate(std::string, dom::Node *startingElement,
+            std::vector<dom::NodePtr> &results);
 
     dom::Node *xpath_evaluate1(Path *, dom::Node *);
 
