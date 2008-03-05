@@ -52,7 +52,6 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.setText = function(theText, theStyle) {
-
         if (theText == "") {
             theText = " ";
         }
@@ -82,11 +81,14 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         window.setLineHeight(lineHeight);
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
+        
         _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null,
                         Public.textCursorPos);
-
+                        
+        _myCursorPos = window.getTextCursorPosition();
+                        
         Public.srcsize.x = _myTextSize[0] / myImage.width;
         Public.srcsize.y = _myTextSize[1] / myImage.height;
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
@@ -105,13 +107,15 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         return _myTextSize;
     }
 
-    Public.text setter = function(theText) {
-	Public.setText(theText, Public.style);
-    }
 
     // Get the size of the rendered text.
     Public.getTextSize = function() {
         return _myTextSize;
+    }
+
+    // Get the size of the rendered text.
+    Public.getCurrentCursor = function() {
+        return _myCursorPos;
     }
 
     // Use this function if you need a foreground text that is independently
@@ -234,7 +238,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
 
     var _myChildLabel = null;
     var _myTextSize = [-1,-1];
-
+    var _myCursorPos = null;
     setup();
 }
 
