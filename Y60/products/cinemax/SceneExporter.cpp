@@ -135,7 +135,7 @@ SceneExporter::writeCamera(y60::WorldBuilderBasePtr theTransformBuilder, CameraO
     if (myContainer) {
         Real myXOffset = myContainer->GetReal(CAMERAOBJECT_FILM_OFFSET_X);
         Real myYOffset = myContainer->GetReal(CAMERAOBJECT_FILM_OFFSET_Y);
-        myCameraBuilder->setShift( myXOffset, myYOffset );
+        myCameraBuilder->setShift( -myXOffset, myYOffset );
     }
     return myCameraBuilder;
 }

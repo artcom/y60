@@ -428,8 +428,8 @@ void
 Frustum::setHShift(const float & theShift) {
     float myWidth = getWidth();
     float myOffset = theShift * myWidth;
-    _myRight =  - 0.5f * myWidth - myOffset;
-    _myLeft = 0.5f * myWidth - myOffset;
+    _myRight = 0.5f * myWidth - myOffset;
+    _myLeft = -0.5f * myWidth - myOffset;
 }
 
 float
