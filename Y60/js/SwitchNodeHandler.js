@@ -100,7 +100,7 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
     }
 
     Public.setActiveChild = function( theIndex ) {
-        Public.activeChild.visible.visible = false;
+        Public.activeChild.visible = false;
         Public.activeIndex = theIndex;
         Public.activeChild.visible = true;
     }
@@ -422,7 +422,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         // find the transform node with the texture references first
         var myReferenceNode = getDescendantByName(window.scene.world, "textureswitches", true);
         if (!myReferenceNode) {
-            Logger.info("Could not find reference node for textureswitches");
+            Logger.error("Could not find reference node for textureswitches");
             return;
         }
        
@@ -509,9 +509,11 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             if (matchNodeName(myNode, theName, theSubnameFlag, theIgnoreCaseFlag)) {
                 Logger.debug("setting "+Public.node.name+" to "+theName);
                 switchTexture(myNode);
-                break;
+                return;
             }
         }
+
+        Logger.error("Failed to activate child '" + theName + "' for switchnode '" + Public.switchName + "'.");
     }
     
     Public.setActiveChildBySubName = function(theSubName, theIgnoreCaseFlag) {
