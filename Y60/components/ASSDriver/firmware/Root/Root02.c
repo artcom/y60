@@ -21,13 +21,26 @@
 #include <avr/pgmspace.h>
 
 //=== Configuration ==========================================================
+/*
+ROOT Fuse-Settings:
+
+This fuses ON:
+- Preserve EEPROM memory through the Chip Erase cycle
+- Boot Flash section size=4096 words
+- CKOPT fuse
+- Brown-out detection level at VCC=4.0 V
+- Brown-out detection enabled
+- Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 64 ms
+
+All other fuses OFF
+*/
 
 //=== Globals ================================================================
 uint8_t  g_rowBuffer[MAX_MATRIX_WIDTH], g_colAverage[MAX_MATRIX_WIDTH];
 uint8_t  g_RTB_Write_Pointer=0, g_RTB_Read_Pointer=0, g_RTB_Filled=0, g_PacketCounter=0;
 
 #define TBUFFER_SIZE MAX_MATRIX_WIDTH+TX_PACKET_SIZE+LENGTH_STATUS_MSG //should be large enough to hold all that
-uint8_t  g_rowTransmissionBuffer[TBUFFER_SIZE];
+uint8_t  g_rowTransmissionBuffer[TBUFFER_SIZE+1];
 
 uint8_t  g_currentRow;
 
@@ -35,7 +48,7 @@ uint16_t g_scanPeriod;
 uint16_t g_deltaTRow;
 uint16_t g_FrameNumber;
 
-uint8_t  g_mainTimer2=0, g_readState=0;
+uint8_t  g_readState=0;
 
 uint8_t  g_SystemCalibrated=0, g_TaraRequest=0;
 
@@ -79,6 +92,7 @@ uint8_t i, i2;
 
     //init AUX-ports
     DDR_AUX0 |= _BV(AUX0);
+    DDR_AUX1 |= _BV(AUX1);
 
     //init DIP switch pins
     DDRD &= ~0xF0;
@@ -142,7 +156,7 @@ uint8_t i, i2;
 	stdout = &g_uart0_str;
     PORT_CTS |= _BV(CTS); //toggle CTS to force FTDI chip to flush buffer
     DDR_CTS |= _BV(CTS);
-    DDR_RTS &= ~_BV(CTS); //set RTS to input (is used to turn on/off data transmission to host; this feature
+    DDR_RTS &= ~_BV(RTS); //set RTS to input (is used to turn on/off data transmission to host; this feature
                           //is controlled via DIP switch no. 6
     g_dataTransmitMode = 0; //normal operation
 
@@ -212,7 +226,8 @@ uint8_t i, i2;
 
 uint8_t setScanParameter(uint8_t w, uint8_t h, uint8_t f){
 uint8_t  em, i;
-uint16_t my_scanPeriod, my_deltaTRow;
+uint32_t my_scanPeriod;
+uint16_t my_deltaTRow;
 uint32_t bw;
 
     em = 0;
@@ -248,8 +263,8 @@ uint32_t bw;
     }
 
     //check if sample time per row is sufficient
-    my_scanPeriod = 1000000/f; //(1000000us)
-    my_deltaTRow  = (1000000/f/(h+1))+1; //(1000000us)
+    my_scanPeriod = 1000000/(uint32_t)f; //(1000000us)
+    my_deltaTRow  = (my_scanPeriod/(h+1))+1; //(1000000us)
     if(my_deltaTRow < MIN_DELTA_T_ROW){
         my_deltaTRow = MIN_DELTA_T_ROW;
         em = 1;
@@ -292,8 +307,7 @@ static uint16_t scanCounter=0, targetTime=0;
 static uint8_t swBefore;
 uint8_t v0;
 
-	g_mainTimer2 = 1;// is set every 100us
-
+PORT_AUX0 ^= _BV(AUX0); //AUX0
 	//move through read state according to following scheme:
 	//read state = 0: reset
 	//read state = 1: trigger read sequence
@@ -305,7 +319,7 @@ uint8_t v0;
 	}else{
 		if(scanCounter >= targetTime){
 			if(scanCounter >= g_scanPeriod){
-				scanCounter = 0;
+				scanCounter -= g_scanPeriod;
 				targetTime = g_deltaTRow;
 			}else{
 				targetTime += g_deltaTRow;
@@ -336,40 +350,11 @@ uint8_t v0;
 }
 
 
-ISR( USART0_UDRE_vect ) {
-
-    g_PacketCounter--;
-    if(g_PacketCounter > 0){
-		//send next byte
-		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-    }
-
-    g_RTB_Read_Pointer++;
-    if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
-        g_RTB_Read_Pointer = 0;
-    }
-    g_RTB_Filled--;
-
-    if(g_PacketCounter == 0){
-        //check if still more bytes then package size are left
-        if(g_RTB_Filled >= TX_PACKET_SIZE){
-            g_PacketCounter = TX_PACKET_SIZE;
-            UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-        }else{
-            UCSR0B &= ~ _BV(UDRIE0); // disable USART interrupt
-            PORT_CTS |= _BV(CTS);
-        }
-	}
-}
-
-
-
-
 void sendByte(uint8_t b){
 
     UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
 
-    if(g_RTB_Filled >= TBUFFER_SIZE){
+    if(g_RTB_Filled >= (TBUFFER_SIZE-1)){
         g_errorState |= ERROR_TBUFFER;
     }else{
         g_RTB_Write_Pointer++;
@@ -392,6 +377,30 @@ void sendByte(uint8_t b){
     if(g_PacketCounter > 0){ //transmit remaining/new bytes
         UCSR0B |= _BV(UDRIE0); // enable data register empty interrupt
     }
+}
+
+
+ISR( USART0_UDRE_vect ) {
+
+    g_RTB_Read_Pointer++;
+    if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
+        g_RTB_Read_Pointer = 0;
+    }
+    g_RTB_Filled--;
+    g_PacketCounter--;
+    if(g_PacketCounter > 0){
+		//send next byte
+		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+    }else{
+        //check if still more bytes then package size, that is a full package, are left
+        if(g_RTB_Filled >= TX_PACKET_SIZE){
+            g_PacketCounter = TX_PACKET_SIZE;//start new package
+            UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+        }else{
+            UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
+            PORT_CTS |= _BV(CTS);
+        }
+	}
 }
 
 
@@ -425,7 +434,7 @@ void SPIdummyRead(void){
 
 
 void performReceiverTara(void){
-uint8_t i, ix;
+uint8_t i, ix, UCSR0B_old;
 int8_t  si;
 
 
@@ -455,10 +464,10 @@ int8_t  si;
 
 			//read in current row
 	        ix = 0;
-            //temporarly turn off all interrupts except UART transmission
+            //temporarly turn off UART interrupts --> no transmission is going on during row read out time!!!
             cli();
-            UCSR0B &= ~_BV(RXCIE0);
-            TIMSK &= ~_BV(OCIE1A);
+            UCSR0B_old = UCSR0B;
+            UCSR0B &= ~(_BV(RXCIE0)|_BV(UDRIE0));
             //wait for reception complete
 asm (      "sbis 0x0E,7"  );//SPSR,SPIF
 asm (      "rjmp .-4"     );
@@ -468,16 +477,15 @@ asm (      "rjmp .-4"     );
 asm (          "sbis 0x0E,7"  );//SPSR,SPIF
 asm (          "rjmp .-4"     );
             	SPDR = 0;//transmit/receive next byte
-                //briefly allow UART TX interrupts
+                //briefly allow timer 1 interrupt
                 sei();
 asm (          "nop"     );
 asm (          "nop"     );
                 cli();
                 ix++;
             }while(ix < g_matrixWidth);
-            //turn all interrupts back on
-            UCSR0B |= _BV(RXCIE0);
-            TIMSK |= _BV(OCIE1A);
+            //turn all UART interrupts back on
+            UCSR0B = UCSR0B_old;
             sei();
     		//all bytes received
 
@@ -528,6 +536,8 @@ uint16_t checksum;
 uint8_t  tVoltage;
 uint8_t  ADCcounter=0;
 uint8_t  sc2=0, sc3=0;
+uint8_t  statusBytesRingCounter=0;
+uint8_t  UCSR0B_old;
 
 #ifdef TEST_MODE
 uint8_t  testBuffer[20];
@@ -578,6 +588,9 @@ uint8_t  testBuffer[20];
 		if(g_readState == 1){
         //begin of row sampling
 //PORT_AUX0 |= _BV(AUX0); //AUX0
+if(g_currentRow == 0){
+    PORT_AUX1 |= _BV(AUX1); //AUX1
+}
 			g_readState++;
 
 			//switch to next row
@@ -589,10 +602,10 @@ uint8_t  testBuffer[20];
 
 			//read in current row (takes approx. 5us per byte // 100us for 20 cols, 200us for 40 cols, 250us for 50 cols //+ interrupt calls!!)
 	        SPICounter = 0;
-            //temporarly turn off all interrupts except UART transmission
+            //temporarly turn off UART interrupts --> no transmission is going on during row read out time!!!
             cli();
-            UCSR0B &= ~_BV(RXCIE0);
-            TIMSK &= ~_BV(OCIE1A);
+            UCSR0B_old = UCSR0B;
+            UCSR0B &= ~(_BV(RXCIE0)|_BV(UDRIE0));
             //wait for reception complete
 asm (      "sbis 0x0E,7"  );//SPSR,SPIF
 asm (      "rjmp .-4"     );
@@ -610,9 +623,8 @@ asm (          "rjmp .-4"     );
                 cli();
                 SPICounter++;
             }while(SPICounter < g_matrixWidth);
-            //turn all interrupts back on
-            UCSR0B |= _BV(RXCIE0);
-            TIMSK |= _BV(OCIE1A);
+            //turn all UART interrupts back on
+            UCSR0B = UCSR0B_old;
             sei();
     		//all bytes received
     		rowReceptionComplete = 1;
@@ -624,6 +636,7 @@ asm (          "rjmp .-4"     );
 		if(rowReceptionComplete){
 			rowReceptionComplete = 0;
 
+            //search for grid points with max/min levels
             if(g_maxMinLevelRequest == 2){
                 if(g_currentRow < g_matrixHeigth){
     	    	    for(ix=0; ix<g_matrixWidth; ix++){
@@ -644,6 +657,7 @@ asm (          "rjmp .-4"     );
                 }
             }
 
+            //grab level at designated coordinates
             if(g_XYLevelRequest == 1){
                 if(g_currentRow < g_matrixHeigth){
                     if(g_currentRow == g_arg2){
@@ -653,6 +667,7 @@ asm (          "rjmp .-4"     );
                     g_XYLevelRequest = 0;
                 }
             }
+
 
 #ifdef COL_CORRECTION
             if(g_SystemCalibrated == 1){
@@ -733,40 +748,69 @@ asm (          "rjmp .-4"     );
                             g_FrameNumber++;//increment frame number
 #ifdef SEND_STATUS_BYTES
                             //send header bytes
-                            sendByte(255);
+                            sendByte(255);//reserved byte to indicate start of header bytes/start of frame
                             sendByte(0);
-                            //send version
-                            sendByte('V');
-                            sendInt(VERSION);
-                            sendInt(SUBVERSION);
-                            //send status
-                            sendByte('S');
-                            sendInt(0);
-                            sendInt(g_status);
-                            //send ID
-                            sendByte('I');
-                            sendInt(0);
-                            sendInt(g_ID);
-                            //send mode
-                            sendByte('M');
-                            sendInt(0);
-                            sendInt(g_mode);
-                            //send scan frequency
-                            sendByte('F');
-                            sendInt(0);
-                            sendInt(g_scanFrequency);
-                            //send width
-                            sendByte('W');
-                            sendInt(0);
-                            sendInt(g_matrixWidth);
-                            //send heigth
-                            sendByte('H');
-                            sendInt(0);
-                            sendInt(g_matrixHeigth);
-                            //send grid size
-                            sendByte('G');
-                            sendInt(0);
-                            sendInt(g_gridSpacing);
+                            switch(statusBytesRingCounter){
+                                case 0:
+                                    //send version
+                                    sendByte('V');
+                                    sendInt(VERSION);
+                                    sendInt(SUBVERSION);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 1:
+                                    //send status
+                                    sendByte('S');
+                                    sendInt(0);
+                                    sendInt(g_status);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 2:
+                                    //send ID
+                                    sendByte('I');
+                                    sendInt(0);
+                                    sendInt(g_ID);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 3:
+                                    //send mode
+                                    sendByte('M');
+                                    sendInt(0);
+                                    sendInt(g_mode);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 4:
+                                    //send scan frequency
+                                    sendByte('F');
+                                    sendInt(0);
+                                    sendInt(g_scanFrequency);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 5:
+                                    //send width
+                                    sendByte('W');
+                                    sendInt(0);
+                                    sendInt(g_matrixWidth);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 6:
+                                    //send heigth
+                                    sendByte('H');
+                                    sendInt(0);
+                                    sendInt(g_matrixHeigth);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 7:
+                                    //send grid size
+                                    sendByte('G');
+                                    sendInt(0);
+                                    sendInt(g_gridSpacing);
+                                    statusBytesRingCounter++;
+                                    break;
+                                case 8:
+                                default:
+                                    statusBytesRingCounter = 0;
+                            }
                             //send frame number
                             sendByte('N');
                             sendInt(g_FrameNumber>>8);
@@ -797,7 +841,8 @@ asm (          "rjmp .-4"     );
             //end of row sampling
             //max 1,1us for reading rows of 40 cols. (including COL_CORRECTION)
             //quite some time is lost in sendByte(); optimizing this function will speed up things tremendously
-//    PORT_AUX0 &= ~_BV(AUX0); //AUX0
+ //   PORT_AUX0 &= ~_BV(AUX0); //AUX0
+    PORT_AUX1 &= ~_BV(AUX1); //AUX1
 	    }
 
         //check if system should switch to config mode because of RTS active

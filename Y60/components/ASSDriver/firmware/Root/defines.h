@@ -16,7 +16,7 @@
 //=== Configuration ==========================================================
 
 #define VERSION    1
-#define SUBVERSION 5
+#define SUBVERSION 6
 
 #define DEFAULT_ID                    0
 #define DEFAULT_MATRIX_WIDTH          20
@@ -52,7 +52,8 @@
 
 #define VZERO   10
 
-#define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
+//#define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
+#define LENGTH_STATUS_MSG 2+3*5 //adjust to actual number of transmitted status bytes per frame
 
 #define ABS_MODE 1
 #define REL_MODE 2

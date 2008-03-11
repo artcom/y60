@@ -111,7 +111,8 @@ void init(void) {
 
 	//=== prepare timer1
 	TCCR1 = 0; //stop timer1 for now
-	OCR1A = 175; //350us time out (pre-scaler=16 --> 0.5us base) 
+//	OCR1A = 175; //350us time out (pre-scaler=16 --> 0.5us base) 
+	OCR1A = 250; //500us time out (pre-scaler=16 --> 0.5us base) 
     TIMSK |= _BV(OCIE1A); //enable output compare match interrupt
 
 
@@ -181,7 +182,7 @@ ISR( USI_OVF_vect ) {
 
 
 /* timer1 interrupt */
-//is called 350 us after first clocked through byte
+//is called 500us(/350us depending on settings) after first clocked through byte
 ISR( TIM1_COMPA_vect ) {
 	//stop timer1
 	TCCR1 = 0;
