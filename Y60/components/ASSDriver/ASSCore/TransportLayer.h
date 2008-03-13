@@ -108,6 +108,8 @@ class TransportLayer :  public asl::PosixThread {
         void addLineToChecksum(std::vector<unsigned char>::const_iterator theLineIt,
                                std::vector<unsigned char>::const_iterator theEnd );
 
+        unsigned valuesPerLine() const;
+
         virtual void establishConnection() = 0;
         virtual void readData() = 0;
         virtual void writeData(const char * theData, size_t theSize) = 0;
@@ -145,6 +147,8 @@ class TransportLayer :  public asl::PosixThread {
         int _myFirmwareMode;
         int _myFramerate;
         int _myFrameNo;
+        int _myCurrentMultiplex;
+        int _myMultiplexMax;
         asl::Unsigned16 _myChecksum;
 
         bool _myFirstFrameFlag;

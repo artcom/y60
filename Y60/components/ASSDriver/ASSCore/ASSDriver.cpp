@@ -258,11 +258,86 @@ struct FindMaximum {
     float max;
 };
 
+void
+ASSDriver::cureLine( unsigned theLineNo ) {
+
+    unsigned char * myBrokenLine = _myRawRaster.raster->pixels().begin() +
+            theLineNo * _myGridSize[0];
+    
+
+    unsigned char * myUpperNeighbour = 0;
+    unsigned char * myLowerNeighbour = 0;
+
+    if (theLineNo == 0) {
+        myUpperNeighbour = myLowerNeighbour = myBrokenLine + _myGridSize[0];
+    } else if ( theLineNo == _myGridSize[1] - 1 ) {
+        myUpperNeighbour = myLowerNeighbour = myBrokenLine - _myGridSize[0];
+    } else {
+        myUpperNeighbour = myBrokenLine - _myGridSize[0];
+        myLowerNeighbour = myBrokenLine + _myGridSize[0];
+    }
+    for (unsigned i = 0; i < _myGridSize[0]; ++i) {
+        (*myBrokenLine++) = (int(*myUpperNeighbour++) +  int(*myLowerNeighbour++)) >> 2;
+    }
+}
+
+enum Neighbours {
+    LOWER,
+    UPPER,
+    RIGHT,
+    LEFT,
+    NUM_NEIGHBOURS
+};
+
+void
+ASSDriver::curePoint( unsigned theX, unsigned theY ) {
+    unsigned char * myBrokenPoint = _myRawRaster.raster->pixels().begin() +
+            theY * _myGridSize[0] + theX;
+
+    unsigned char * myNeighbours[NUM_NEIGHBOURS];
+
+    if (theY == 0) {
+        myNeighbours[UPPER] = 0;
+    } else if ( theY == _myGridSize[1] - 1 ) {
+        myNeighbours[LOWER] = 0;
+    } else {
+        myNeighbours[UPPER] = myBrokenPoint - _myGridSize[0];
+        myNeighbours[LOWER] = myBrokenPoint + _myGridSize[0];
+    }
+    
+    if (theX == 0) {
+        myNeighbours[LEFT] = 0;
+    } else if ( theX == _myGridSize[0] - 1 ) {
+        myNeighbours[RIGHT] = 0;
+    } else {
+        myNeighbours[LEFT] = myBrokenPoint - 1;
+        myNeighbours[RIGHT] = myBrokenPoint + 1;
+    }
+    
+    unsigned myNumSamples = 0;
+    int mySum = 0;
+    for (unsigned i = 0; i < NUM_NEIGHBOURS; ++i) {
+        if (myNeighbours[i]) {
+            mySum += *myNeighbours[i];
+            myNumSamples += 1;
+        }    
+    }
+    *myBrokenPoint = (unsigned char)(mySum / myNumSamples);
+}
+
+void
+ASSDriver::cureBrokenElectrodes() {
+    cureLine( 5 ); // XXX
+    curePoint( 23, 13 ); // XXX
+    curePoint( 20, 13 ); // XXX
+}
 
 
 void
-ASSDriver::updateDerivedRasters()
-{
+ASSDriver::updateDerivedRasters() {
+
+    cureBrokenElectrodes();
+
     const y60::RasterOfGRAY & myRawRaster = *
             dom::dynamic_cast_Value<y60::RasterOfGRAY>( & * (_myRawRaster.value) );
     y60::RasterOfGRAY & myDenoisedRaster = *

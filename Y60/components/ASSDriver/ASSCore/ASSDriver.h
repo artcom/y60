@@ -160,6 +160,11 @@ class ASSDriver :
 
         void setupDriver(dom::NodePtr theSettings);
 
+
+        void cureBrokenElectrodes();
+        void cureLine(unsigned theLineNo);
+        void curePoint(unsigned theX, unsigned theY);
+
         RasterHandle _myRawRaster;
         RasterHandle _myDenoisedRaster;
         RasterHandle _myMomentRaster;

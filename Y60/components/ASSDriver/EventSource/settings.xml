@@ -21,7 +21,7 @@
         <TransportLayer>serial</TransportLayer>
         <SerialPort>0</SerialPort>
         <UseUSB min="0" max="1">1</UseUSB>
-        <BaudRate>230400</BaudRate>
+        <BaudRate>460800</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
         <Parity>no_parity</Parity>
         <StopBits min="1" max="2">1</StopBits>

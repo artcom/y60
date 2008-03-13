@@ -49,7 +49,7 @@ const std::string ERROR_STRING("\r\nERR");
 const double COMMAND_TIMEOUT( 10 );
 
 // TODO: clean up this stuff ...
-const unsigned int MAX_NUM_STATUS_TOKENS( 10 );
+const unsigned int MAX_NUM_STATUS_TOKENS( 12 );
 const unsigned int BYTES_PER_STATUS_TOKEN( 5 );
 const unsigned int MAX_STATUS_LINE_LENGTH( MAX_NUM_STATUS_TOKENS * BYTES_PER_STATUS_TOKEN + 2 );
 
@@ -78,7 +78,9 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     _myLastCommandTime( asl::Time() ),
     _myFrameBuffer( 0 ),
     _myRunningFlag( true ),
-    _myTransportName( theTransportName )
+    _myTransportName( theTransportName ),
+    _myCurrentMultiplex( 0 ),
+    _myMultiplexMax( 0 )
 {
     getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 100);
 
@@ -179,6 +181,12 @@ TransportLayer::getBytesPerStatusLine() {
         // ten tokens: <version> <status> <id> <mode> <framerate>
         //             <width> <height> <gridspacing> <framenumber> <checksum>
         return 10 * BYTES_PER_STATUS_TOKEN + 2;
+    } else if (_myFirmwareVersion == 262) {
+        // twelve tokens: <version> <status> <id> <mode> <framerate>
+        //             <width> <height> <gridspacing> <framenumber>
+        //             <multiplex> <current_multiplex>
+        //             <checksum>
+        return 12 * BYTES_PER_STATUS_TOKEN + 2;
     }
     throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
             PLUS_FILE_LINE );
@@ -188,7 +196,7 @@ TransportLayer::getBytesPerStatusLine() {
 size_t
 TransportLayer::getBytesPerFrame() {
     // line format: <start> <lineno> <databytes>
-    return (1 + 1 + _myGridSize[0]) * _myGridSize[1] + MAX_STATUS_LINE_LENGTH;
+    return (1 + 1 + valuesPerLine() ) * _myGridSize[1] + MAX_STATUS_LINE_LENGTH;
 }
 
 void
@@ -227,6 +235,18 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                 _myGridSpacing = readStatusToken( myIt, 'G' );
                 _myFrameNo = readStatusToken( myIt, 'N' );
                 myChecksum = readStatusToken( myIt, 'C' );
+            } else if ( _myFirmwareVersion == 262 ) {
+                _myFirmwareStatus = readStatusToken( myIt, 'S' );
+                _myControllerId = readStatusToken( myIt, 'I' );
+                _myFirmwareMode = readStatusToken( myIt, 'M' );
+                _myFramerate = readStatusToken( myIt, 'F' );
+                myGridSize[0] = readStatusToken( myIt, 'W' );
+                myGridSize[1] = readStatusToken( myIt, 'H' );
+                _myGridSpacing = readStatusToken( myIt, 'G' );
+                _myFrameNo = readStatusToken( myIt, 'N' );
+                _myMultiplexMax = readStatusToken( myIt, 'X' );
+                _myCurrentMultiplex = readStatusToken( myIt, 'x' );
+                myChecksum = readStatusToken( myIt, 'C' );
             } else {
                 throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
                         PLUS_FILE_LINE );
@@ -252,20 +272,22 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                 dumpControllerStatus();
                 _myFirstFrameFlag = false;
             } else {
-                if ( myHasChecksumFlag ) {
-                    if (_myChecksum == myChecksum) {
-                        //AC_PRINT << "Checksum OK.";
-			MAKE_SCOPE_TIMER(TransportLayer_parseStatusLine);
-                        _myFrameQueueLock.lock();
-                        _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameNo,
-                                    _myFrameBuffer ));
-                        AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
-                        // TODO use smart pointers 
-                        _myFrameBuffer = 0;
-                        _myFrameQueueLock.unlock();
-                    } else {
-                        AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
-                        _myChecksumErrorCounter += 1;
+                //if (_myMultiplexMax == _myCurrentMultiplex -1 ) {
+                if ( _myCurrentMultiplex == 0 ) {
+                    if ( myHasChecksumFlag ) {
+                        // TODO check checksums for multiplexed frames
+                        if (_myChecksum == myChecksum ) {
+                            _myFrameQueueLock.lock();
+                            _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameNo,
+                                        _myFrameBuffer ));
+                            AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
+                            // TODO use smart pointers 
+                            _myFrameBuffer = 0;
+                            _myFrameQueueLock.unlock();
+                        } else {
+                            AC_WARNING << "Checksum error. Dropping frame No. " << _myFrameNo << ".";
+                            _myChecksumErrorCounter += 1;
+                        }
                     }
                 }
             }
@@ -293,10 +315,19 @@ TransportLayer::addLineToChecksum(std::vector<unsigned char>::const_iterator the
     }
 }
 
+unsigned
+TransportLayer::valuesPerLine() const {
+    if (_myMultiplexMax) {
+        return _myGridSize[0] / _myMultiplexMax;       
+    } else {
+        return _myGridSize[0];       
+    }
+}
+
 void
 TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
     while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ? 
-                getBytesPerStatusLine() : _myGridSize[0] + 2 ))
+                getBytesPerStatusLine() : valuesPerLine() + 2 ))
     {
         //dumpBuffer( _myTmpBuffer );
         if ( _myExpectedLine == 0 ) {
@@ -304,6 +335,7 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
         } else {
             if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
                 AC_WARNING << "Sync error.";
+                exit( 1 );
                 _mySyncLostCounter++;
                 _myFrameQueueLock.lock();
                 _myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
@@ -314,18 +346,28 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             int myRowIdx = _myTmpBuffer[1] - 1;
             //AC_PRINT << "Got row: " << myRowIdx;
 
-            size_t byteCount = (_myTmpBuffer.begin() + 2 + _myGridSize[0]) - (_myTmpBuffer.begin() + 2);
+            size_t byteCount = (_myTmpBuffer.begin() + 2 + valuesPerLine() ) - (_myTmpBuffer.begin() + 2);
             if ( ! _myFrameBuffer ) {
                 // TODO use smart pointers 
                 _myFrameBuffer = new unsigned char[ _myGridSize[0] * _myGridSize[1] ];
                 
             }
             unsigned char * myRowPtr = _myFrameBuffer + myRowIdx * _myGridSize[0];
-            std::copy(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+            if (_myMultiplexMax == 0) {
+                std::copy(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+            } else {
+                std::vector<unsigned char>::iterator myInput = _myTmpBuffer.begin() + 2;
+                myRowPtr += _myCurrentMultiplex;
+                for (unsigned i = 0; i < valuesPerLine(); ++i) {
+                    * myRowPtr = * myInput;
+                    myRowPtr += _myMultiplexMax;
+                    ++myInput;
+                }    
+            }
 
-            addLineToChecksum(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0]);
+            addLineToChecksum(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + valuesPerLine());
 
-            _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + _myGridSize[0] + 2);
+            _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + valuesPerLine() + 2);
 
             if ( myRowIdx == _myGridSize[1] - 1) {
                 _myExpectedLine = 0;
@@ -374,10 +416,8 @@ TransportLayer::synchronize() {
     if ( _myMagicTokenFlag && _myTmpBuffer.size() > 1) {
         ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN );
         if (_myTmpBuffer[1] == 0) {
-            //AC_PRINT << "Found status line.";
             setState(RUNNING);
         } else {
-            //AC_PRINT << "Found data line: " << int(_myTmpBuffer[1]);
             _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + 1);
             _myMagicTokenFlag = false;
         }

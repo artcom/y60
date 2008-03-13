@@ -16,7 +16,7 @@
         <EventQueueSize>100</EventQueueSize>
         <SerialPort>0</SerialPort>
         <UseUSB>1</UseUSB>
-        <BaudRate>230400</BaudRate>
+        <BaudRate>460800</BaudRate>
         <BitsPerWord>8</BitsPerWord>
         <Parity>no_parity</Parity>
         <StopBits>1</StopBits>
