@@ -18,8 +18,6 @@
 
 namespace y60 {
 
-
-
 	class BackgroundSubtraction : public Algorithm {
 		public:
             BackgroundSubtraction(const std::string & theName);
@@ -41,7 +39,9 @@ namespace y60 {
             y60::ImagePtr _mySourceImage;
             y60::ImagePtr _myTargetImage;
             y60::ImagePtr _myBackgroundImage;
-            
+    
+            unsigned _myImageNodeVersion;
+
             float _myThreshold;
             float _myWeight;
             unsigned int _myCounter;

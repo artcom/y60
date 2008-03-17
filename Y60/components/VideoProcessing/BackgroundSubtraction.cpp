@@ -24,7 +24,8 @@ namespace y60 {
     BackgroundSubtraction::BackgroundSubtraction(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result"),
-        _myCounter(0)
+        _myCounter(0),
+        _myImageNodeVersion(0)
     {   
     }
   
@@ -64,6 +65,13 @@ namespace y60 {
 	void 
     BackgroundSubtraction::onFrame(double t) {
         
+        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        if (myImageNodeVersion > _myImageNodeVersion) {
+            _myImageNodeVersion = myImageNodeVersion;
+        } else {
+            return;
+        }
+
         const GRAYRaster & mySourceFrame =  
             _mySourceImage->getRasterValueNode()->nodeValueRef<GRAYRaster>();
         dom::Node::WritableValue<GRAYRaster> 
@@ -86,22 +94,18 @@ namespace y60 {
              itSrc != mySourceFrame.end(); 
              ++itSrc,++itBg, ++itTrgt) 
         {
-            myTrgtIntensity = clampedSub((*itBg).get(), (*itSrc).get());            
+        #if 1 // motion difference
+            myTrgtIntensity = clampedSub((*itBg).get(), (*itSrc).get());  
             //AC_PRINT << myTrgtIntensity;            
             (*itTrgt) = myTrgtIntensity;
-            
+        #else    
             //"adaptive" background
-        //     if (_myCounter >= COUNTER__) {
-        //         (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
-        //     }
-        
-            //(*itBg) = (*itSrc).get();
+            if (_myCounter >= COUNTER__) {
+                (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
+            }
+        #endif
+            (*itBg) = (*itSrc).get();
         }
-        
-        // update backgroundimage
-        // if (_myCounter >= COUNTER__) {
-        //     _myCounter = 0;
-        // }
 	}
     
     unsigned char

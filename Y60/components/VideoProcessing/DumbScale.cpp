@@ -20,10 +20,10 @@ namespace y60 {
     DumbScale::DumbScale(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result"),
-        _mySourceRaster(0)
+        _mySourceRaster(0), 
+        _myImageNodeVersion(0)
     {   
     }
-  
 
     void 
     DumbScale::configure(const dom::Node & theNode) {
@@ -35,7 +35,8 @@ namespace y60 {
             AC_PRINT << "configure " << myName;
             if( myImage ) {
                 if( myName == "sourceimage") {
-                    _mySourceRaster = myImage->getFacade<y60::Image>()->getRasterValue();
+                    _mySourceImage = myImage->getFacade<y60::Image>();
+                    _mySourceRaster = _mySourceImage->getRasterValue();
                 } else if( myName == "targetimage") {
                     _myTargetRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
                     _myTargetImage = myImage->getFacade<y60::Image>();
@@ -52,6 +53,13 @@ namespace y60 {
 
 	void 
     DumbScale::onFrame(double t) {
+        
+        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        if (myImageNodeVersion > _myImageNodeVersion) {
+            _myImageNodeVersion = myImageNodeVersion;
+        } else {
+            return;
+        }
         
         const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
         dom::Node::WritableValue<GRAYRaster> myTargetLock(_myTargetImage->getRasterValueNode());

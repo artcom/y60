@@ -53,7 +53,6 @@ namespace y60 {
             } else {
                 if( myName == "threshold") {
                     asl::fromString(myValue, _myThreshold);
-                    AC_ERROR << "setting threshold: " << _myThreshold;
                 } else if( myName == "overlay") {
                     std::vector<NodePtr> myResults;
                     dom::NodePtr myNode = _myScene->getSceneDom()->firstChild()->childNode(CANVAS_LIST_NAME);

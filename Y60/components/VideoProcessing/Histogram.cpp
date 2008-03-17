@@ -11,7 +11,7 @@
 
 #include "Histogram.h"
 
-#include <y60/AbstractRenderWindow.h>
+// #include <y60/AbstractRenderWindow.h>
 
 using namespace asl;
 using namespace std;

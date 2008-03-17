@@ -32,9 +32,14 @@ namespace y60 {
             dom::Element _myResultNode;
             dom::ValuePtr _mySourceRaster;
             dom::ValuePtr _myTargetRaster;
+
+            // const raster<asl::BGR> * mySourceRaster = dynamic_cast_Value<raster<asl::BGR> >(&*_mySourceImage->getRasterValue());
+            // const raster<asl::BGR> * myTargetRaster = dynamic_cast_Value<raster<asl::GRAY> >(&*_mySourceImage->getRasterValue());
             
             y60::ImagePtr _myTargetImage;
-            
+            y60::ImagePtr _mySourceImage;
+
+            unsigned int _myImageNodeVersion;
             unsigned int _myWidth;
             unsigned int _myHeight;
     };

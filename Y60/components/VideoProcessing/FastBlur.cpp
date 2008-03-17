@@ -61,11 +61,8 @@ namespace y60 {
         
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
         
-        dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
-        GRAYRaster & myTargetFrame = myTargetFrameLock.get();
-        
         // float!
-        GRAYRaster::const_iterator itSrc =mySourceFrame->begin();
+        GRAYRaster::const_iterator itSrc = mySourceFrame->begin();
         unsigned int i=0;
 
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
@@ -73,11 +70,10 @@ namespace y60 {
         }
 
         // left-to-right horizontal pass
-        for (i=0; i<_myWidth*_myHeight; ++i) {
+        for (i=1; i<_myWidth*_myHeight; ++i) {
             _myFloatImage[i] = revlookup(_myFloatImage[i]) + lookup(_myFloatImage[i-1]);
         }
-       
-
+        
         // right-to-left horizontal pass
         for (i=_myWidth*_myHeight-1; i>1; --i) {
             _myFloatImage[i-1] = revlookup(_myFloatImage[i-1]) + lookup(_myFloatImage[i]);
@@ -101,16 +97,18 @@ namespace y60 {
                 
                 _myFloatImage[pos0] = revlookup(_myFloatImage[pos0]) + lookup(_myFloatImage[pos1]);
             }
-        }
-
+        } 
+        
         // reverse float
         // float!
+        dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
+        GRAYRaster & myTargetFrame = myTargetFrameLock.get();
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
-        
+     
         i=0;
         for (itTrgt; itTrgt != myTargetFrame.end(); ++itTrgt, ++i) {
             (*itTrgt) = static_cast<unsigned char>(_myFloatImage[i]);
-        }
+        }   
 	}
 
     float
