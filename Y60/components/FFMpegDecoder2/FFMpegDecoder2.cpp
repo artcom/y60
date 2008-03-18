@@ -41,9 +41,6 @@
 using namespace std;
 using namespace asl;
 
-#define USE_RGBA 0
-#define USE_GRAY 1
-
 extern "C"
 EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::FFMpegDecoder2(myDLHandle);
@@ -679,10 +676,10 @@ namespace y60 {
         switch (myTargetPixelFormat) {            
             case TEXTURE_IFMT_RGBA8:
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
-                _myDestinationPixelFormat = PIX_FMT_RGBA32;
+                _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
-                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::RGBA);
-                myMovie->addRasterValue(createRasterValue( y60::RGBA, _myFrameWidth, _myFrameHeight), y60::RGBA, 1);                
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGRA);
+                myMovie->addRasterValue(createRasterValue( y60::BGRA, _myFrameWidth, _myFrameHeight), y60::BGRA, 1);                
                 break;
             case TEXTURE_IFMT_ALPHA:
             case TEXTURE_IFMT_LUMINANCE8:
