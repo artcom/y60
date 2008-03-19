@@ -132,9 +132,14 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
 
 
     obj.pickBodyBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixelY, 
-                                                      theSphereRadius, theRootNode)
+                                                      theSphereRadius, theRootNode, theViewport)
     {
-        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        var myViewport = null;
+        if (theViewport != undefined) {
+            myViewport = theViewport;
+        } else {
+            myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);            
+        }
         if (!myViewport) {
             // we picked right into the Nothing
             print("picked nothing");
@@ -145,7 +150,8 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myCollisions = obj.pickCollisionsBySweepingSphereFromBodies(theScreenPixelX, 
                                                                         theScreenPixelY, 
                                                                         theSphereRadius, 
-                                                                        theRootNode);
+                                                                        theRootNode,
+                                                                        myViewport);
         if (myCollisions) {
             if (myCollisions.length > 0) {
                 var myCameraPos =  new Point3f(myCamera.globalmatrix.getTranslation());
@@ -272,9 +278,16 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     
     
     obj.pickCollisionsBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixelY, 
-                                                            theSphereRadius, theRootNode)
+                                                            theSphereRadius, theRootNode,
+                                                            theViewport)
     {
-        var myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        var myViewport = null;
+        if (theViewport != undefined) {
+            myViewport = theViewport;
+        } else {
+            myViewport = obj.getViewportAt(theScreenPixelX, theScreenPixelY);
+        }
+        
         if (!myViewport) {
             // we picked right into the Nothing
             return null;
