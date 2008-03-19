@@ -259,27 +259,52 @@ struct FindMaximum {
 };
 
 void
-ASSDriver::cureLine( unsigned theLineNo ) {
+ASSDriver::cureHLine( unsigned theLineNo ) {
 
     unsigned char * myBrokenLine = _myRawRaster.raster->pixels().begin() +
-            theLineNo * _myGridSize[0];
+            theLineNo * _myPoTSize[0];
     
 
     unsigned char * myUpperNeighbour = 0;
     unsigned char * myLowerNeighbour = 0;
 
     if (theLineNo == 0) {
-        myUpperNeighbour = myLowerNeighbour = myBrokenLine + _myGridSize[0];
+        myUpperNeighbour = myLowerNeighbour = myBrokenLine + _myPoTSize[0];
     } else if ( theLineNo == _myGridSize[1] - 1 ) {
-        myUpperNeighbour = myLowerNeighbour = myBrokenLine - _myGridSize[0];
+        myUpperNeighbour = myLowerNeighbour = myBrokenLine - _myPoTSize[0];
     } else {
-        myUpperNeighbour = myBrokenLine - _myGridSize[0];
-        myLowerNeighbour = myBrokenLine + _myGridSize[0];
+        myUpperNeighbour = myBrokenLine - _myPoTSize[0];
+        myLowerNeighbour = myBrokenLine + _myPoTSize[0];
     }
     for (unsigned i = 0; i < _myGridSize[0]; ++i) {
-        (*myBrokenLine++) = (int(*myUpperNeighbour++) +  int(*myLowerNeighbour++)) >> 2;
+        *myBrokenLine = (int(*myUpperNeighbour++) +  int(*myLowerNeighbour++)) >> 1;
+        myBrokenLine++;
     }
 }
+
+void
+ASSDriver::cureVLine( unsigned theRowNo ) {
+
+    unsigned char * myBrokenPoint = 0;
+    unsigned char * myLeftNeighbour = 0;
+    unsigned char * myRightNeighbour = 0;
+
+    for (unsigned i = 0; i < _myGridSize[1]; ++i) {
+        myBrokenPoint = _myRawRaster.raster->pixels().begin() + i * _myPoTSize[0] + theRowNo;
+
+        if (theRowNo == 0) {
+            myLeftNeighbour = myRightNeighbour = myBrokenPoint + 1;
+        } else if ( theRowNo == _myGridSize[0] - 1 ) {
+            myLeftNeighbour = myRightNeighbour = myBrokenPoint - 1;
+        } else {
+            myLeftNeighbour = myBrokenPoint - 1;
+            myRightNeighbour = myBrokenPoint + 1;
+        }
+
+        *myBrokenPoint = (int(*myLeftNeighbour++) +  int(*myRightNeighbour++)) / 2;
+    }
+}
+
 
 enum Neighbours {
     LOWER,
@@ -289,10 +314,11 @@ enum Neighbours {
     NUM_NEIGHBOURS
 };
 
+
 void
 ASSDriver::curePoint( unsigned theX, unsigned theY ) {
     unsigned char * myBrokenPoint = _myRawRaster.raster->pixels().begin() +
-            theY * _myGridSize[0] + theX;
+            theY * _myPoTSize[0] + theX;
 
     unsigned char * myNeighbours[NUM_NEIGHBOURS];
 
@@ -301,8 +327,8 @@ ASSDriver::curePoint( unsigned theX, unsigned theY ) {
     } else if ( theY == _myGridSize[1] - 1 ) {
         myNeighbours[LOWER] = 0;
     } else {
-        myNeighbours[UPPER] = myBrokenPoint - _myGridSize[0];
-        myNeighbours[LOWER] = myBrokenPoint + _myGridSize[0];
+        myNeighbours[UPPER] = myBrokenPoint - _myPoTSize[0];
+        myNeighbours[LOWER] = myBrokenPoint + _myPoTSize[0];
     }
     
     if (theX == 0) {
@@ -322,14 +348,23 @@ ASSDriver::curePoint( unsigned theX, unsigned theY ) {
             myNumSamples += 1;
         }    
     }
+    
+
+
     *myBrokenPoint = (unsigned char)(mySum / myNumSamples);
 }
 
 void
 ASSDriver::cureBrokenElectrodes() {
-    //cureLine( 5 ); // XXX
-    //curePoint( 23, 13 ); // XXX
-    //curePoint( 20, 13 ); // XXX
+    cureHLine( 5 ); // XXX
+    cureVLine(1);
+    curePoint( 23, 13 ); // XXX
+    //setPointToValue(1,5);
+    //curePoint(39,1);
+    //for(unsigned i=0; i<20; i++) {
+    //curePoint( 1, 5 );
+        //}
+    // curePoint( 20, 13 ); // XXX
 }
 
 
@@ -454,9 +489,7 @@ ASSDriver::updateCursors(double theDeltaT, const ASSEvent & theEvent) {
 
     CursorMap::iterator myCursorIt = _myCursors.begin();
     for(; myCursorIt != _myCursors.end(); ++myCursorIt) {
-        computeIntensity(myCursorIt, myRawRaster);
         findTouch(myCursorIt, theDeltaT, theEvent);
-
     }
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
@@ -582,6 +615,10 @@ void
 ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
         const BlobListPtr theROIs, const ASSEvent & theEvent)
 {
+
+    y60::RasterOfGRAY & myRawRaster = *
+        dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
+
     Matrix4f myTransform = getTransformationMatrix();
 
     const BlobList & myROIs = * theROIs;
@@ -596,6 +633,8 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
     CursorMap::iterator myCursorIt  = _myCursors.begin();
     for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
+        computeIntensity(myCursorIt, myRawRaster);
+
         myCursorIt->second.correlatedPosition = -1;
         for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
             float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion
@@ -641,7 +680,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
                 // post a move event
                 createEvent( myCursorId, "move", myCursor.position,
                         applyTransform( myCursor.position, myTransform),
-                        myCursor.roi, 0 /*myCursor.intensity*/, theEvent); // TODO
+                        myCursor.roi, myCursor.intensity, theEvent); // TODO
             }
             // place an "else" block here for code if we want to allow to correlate multiple cursors to the same position,
             // but he have to take care that they will be separated at some later point again
@@ -660,7 +699,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             _myCursors[myNewID].correlatedPosition = i;
             createEvent( myNewID, "add", theCurrentPositions[i].center,
                     applyTransform( theCurrentPositions[i].center, myTransform),
-                    asBox2f( myROIs[i]->bbox() ), 0 /*myCursor.intensity*/,
+                    asBox2f( myROIs[i]->bbox() ), _myCursors[myNewID].intensity,
                     theEvent); // TODO
         }
     }
@@ -680,6 +719,8 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
         }
         myIt = nextIt;
     }
+
+    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) ); 
 }
 #else
 void 
@@ -1021,7 +1062,6 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
     getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
     getConfigSetting( theSettings, "NoiseThreshold", _myNoiseThreshold, 15 );
     getConfigSetting( theSettings, "GainPower", _myGainPower, 2.0f );
-    getConfigSetting( theSettings, "IntensityThreshold", _myIntensityThreshold, 9.0f );
     getConfigSetting( theSettings, "FirstDerivativeThreshold", _myFirstDerivativeThreshold, 25.0f );
     getConfigSetting( theSettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
     getConfigSetting( theSettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );

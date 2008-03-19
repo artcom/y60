@@ -145,7 +145,6 @@ class ASSDriver :
 //        void triggerUpload( const char * theRasterId );
         void queueCommand( const char * theCommand );
 
-
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
                                       const asl::Matrix4f & theTransform );
         asl::Matrix4f getTransformationMatrix();
@@ -162,7 +161,8 @@ class ASSDriver :
 
 
         void cureBrokenElectrodes();
-        void cureLine(unsigned theLineNo);
+        void cureHLine(unsigned theLineNo);
+        void cureVLine(unsigned theLineNo);
         void curePoint(unsigned theX, unsigned theY);
 
         RasterHandle _myRawRaster;
@@ -179,7 +179,6 @@ class ASSDriver :
 
         int         _myComponentThreshold;
         int         _myNoiseThreshold;
-        float       _myIntensityThreshold;
         float       _myFirstDerivativeThreshold;
         float       _myGainPower;
         double      _myMinTouchInterval;
