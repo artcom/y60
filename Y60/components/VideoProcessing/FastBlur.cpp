@@ -19,7 +19,8 @@ namespace y60 {
 
     FastBlur::FastBlur(const std::string & theName) :
         Algorithm(theName),
-        _myResultNode("result")
+        _myResultNode("result"),
+        _myImageNodeVersion(0)
     {   
     }
   
@@ -36,7 +37,7 @@ namespace y60 {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
-            AC_PRINT << "configure " << myName;
+            AC_INFO << "configure " << myName;
             if( myImage ) {
                 if( myName == "sourceimage") {
                     _mySourceImage = myImage->getFacade<y60::Image>();
@@ -58,6 +59,12 @@ namespace y60 {
 
 	void 
     FastBlur::onFrame(double t) {
+        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        if (myImageNodeVersion > _myImageNodeVersion) {
+            _myImageNodeVersion = myImageNodeVersion;
+        } else {
+            return;
+        }
         
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
         

@@ -21,18 +21,20 @@ namespace y60 {
 struct Cursor {
     Cursor() :
             position(0.0, 0.0), 
-            motion(0.0,0.0),
-            correlatedPosition(-1)
+            motion(0.0, 0.0),
+            correlatedPosition(-1),
+            creationTime(0.0)
     {
         roi.makeEmpty();
         previousRoi.makeEmpty();
     }
 
-    Cursor(const asl::Vector2f theCenter, const asl::Box2f & theBox) :
+    Cursor(const asl::Vector2f theCenter, const asl::Box2f & theBox, double theTime) :
             position( theCenter ), 
             roi( theBox),
             motion(0.0,0.0),
-            correlatedPosition(-1)
+            correlatedPosition(-1),
+            creationTime(theTime)
     {
         previousRoi.makeEmpty();
     }
@@ -43,8 +45,7 @@ struct Cursor {
 
     asl::Vector2f motion;
     int correlatedPosition;
-
-
+    double creationTime;
 };
 
 typedef std::map<int, Cursor> CursorMap;
@@ -64,11 +65,9 @@ typedef std::map<int, Cursor> CursorMap;
 
 
 		private:
-            void groupBlobs( BlobListPtr & theBlobs);
-            void correlatePositions( BlobListPtr & theBlobs);
+            void correlatePositions(BlobListPtr & theBlobs, double theDeltaT);
             asl::Matrix4f getTransformationMatrix();
 
-   
             float lookup(float theValue);
             float revlookup(float theValue);
             dom::Element  _myResultNode;

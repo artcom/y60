@@ -29,13 +29,12 @@ namespace y60 {
         Algorithm(theName),
         _myResultNode("result"),
         _myThreshold(5),
-        _myIDCounter( 0 ),
-        _myDistanceThreshold( 0 ),
-        _myCarCounter( 0 )
+        _myIDCounter(0),
+        _myDistanceThreshold(0),
+        _myCarCounter(0)
     {   
     }
   
-
     void 
     Blobs::configure(const dom::Node & theNode) {
         
@@ -43,7 +42,7 @@ namespace y60 {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myNode = _myScene->getSceneDom()->getElementById(myValue);
-            AC_PRINT << "configure " << myName;
+            AC_INFO << "configure " << myName;
             if( myNode ) {
                 if( myName == "sourceimage") {
                     _mySourceImage = myNode->getFacade<y60::Image>();
@@ -84,19 +83,11 @@ namespace y60 {
         
         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
         
-        groupBlobs(myBlobs);
-
-        correlatePositions( myBlobs );
-        
+        correlatePositions(myBlobs, t);
 	}
 
-    void
-    Blobs::groupBlobs( BlobListPtr & theROIs ) {
-
-    }
-
     void 
-    Blobs::correlatePositions( BlobListPtr & theROIs )
+    Blobs::correlatePositions(BlobListPtr & theROIs, double t)
     {
         Matrix4f myTransform = getTransformationMatrix();
 
@@ -114,7 +105,7 @@ namespace y60 {
                 
                 float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion
                                               -  (*theROIs)[i]->center());
-                //AC_PRINT << myDistance << " id " << myCursorIt->first;
+                //AC_INFO << myDistance << " id " << myCursorIt->first;
                 if (myDistance < myDistanceThreshold) {
                     myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first)));
                 }
@@ -126,7 +117,7 @@ namespace y60 {
 
         AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
 
-        //AC_PRINT << "myCars" << _myCarCounter;
+        //AC_INFO << "myCars" << _myCarCounter;
         _myResultNode = dom::Element("result");
         _myResultNode.appendChild(Element("cars")); 
         _myResultNode.childNode("cars")->appendChild(Text("")); 
@@ -158,6 +149,9 @@ namespace y60 {
                         asl::Vector2f myCenter = (*theROIs)[myPositionIndex]->center();
                         myPosition.appendAttribute("current", asl::as_string(myCenter));
                         
+                        // update cursor with new position
+                        myPosition.appendAttribute("lifetime", asl::as_string(t - myCursor.creationTime));
+                        
                         myCursor.motion = myCenter - myCursor.position;
                         myCursor.position = myCenter;
                         myCursor.previousRoi = myCursor.roi;
@@ -179,7 +173,7 @@ namespace y60 {
                 AC_TRACE << "new cursor " <<myNewID<< " at " << (*theROIs)[i]->center();
                 myCorrelatedPositions[i] = myNewID;
                 _myCursors.insert( make_pair( myNewID, Cursor( (*theROIs)[i]->center(),
-                                asBox2f( (*theROIs)[i]->bbox()) )));
+                                asBox2f( (*theROIs)[i]->bbox()), t )));
                 _myCursors[myNewID].correlatedPosition = i;
                 myCars++;
                 _myCarCounter++;
@@ -201,77 +195,6 @@ namespace y60 {
             myIt = nextIt;
         }
     }
-
- //    void 
-//     Blobs::correlatePositions( BlobListPtr & theBlobs)
-//     {
-
-//         Matrix4f myTransform = getTransformationMatrix();
-
-//         const BlobList & myBlobs = *theBlobs;
-
-//         std::vector<int> myCorrelatedIds;
-//         unsigned int myCars = 0;
-//         for (unsigned i = 0; i < myBlobs.size(); ++i) {
-//             float myMinDistance = 10000.0;
-//             CursorMap::iterator myMinDistIt  = _myCursors.end();
-//             CursorMap::iterator myCursorIt  = _myCursors.begin();
-//             for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
-//                 if ( find( myCorrelatedIds.begin(), myCorrelatedIds.end(), myCursorIt->first ) ==
-//                      myCorrelatedIds.end())
-//                     {   
-//                         asl::Vector2f myCenter =  (*theBlobs)[i]->center(); 
-//                         float myDistance = magnitude( myCursorIt->second.position - myCenter);
-//                         if (myDistance < myMinDistance) {
-//                             myMinDistance = myDistance;
-//                             myMinDistIt = myCursorIt;
-//                         }
-//                     }
-//             }
-//             float myDistanceThreshold = 18.0f;
-//             //AC_PRINT << "distance threshold: " << myDistanceThreshold;
-//             if (myMinDistIt != _myCursors.end() && myMinDistance < myDistanceThreshold) {
-//                 // cursor moved
-//                 AC_PRINT << "blob moved";
-//             } else {
-//                 // new cursor
-//                 //AC_PRINT << "new blob";
-//                 _myCarCounter++;
-//                 myCars++;
-
-//                 int myNewID( _myIDCounter++ );    
-//                 _myCursors.insert( make_pair( myNewID, Cursor( (*theBlobs)[i]->center(),
-//                                                                asBox2f( myBlobs[i]->bbox()) )));
-//                 myCorrelatedIds.push_back( myNewID );
-//             }   
-//         }
-
-//         _myResultNode = dom::Element("result");
-//         _myResultNode.appendChild(Element("cars")); 
-//         _myResultNode.childNode("cars")->appendChild(Text("")); 
-//         dom::Node & centerNode = *(_myResultNode.childNode("cars"));
-//         centerNode.childNode("#text")->nodeValue(asl::as_string(myCars));
-
-//         CursorMap::iterator myIt = _myCursors.begin();
-//         std::vector<int> myOutdatedCursorIds;
-//         for (; myIt != _myCursors.end(); ++myIt) {
-//             if ( find( myCorrelatedIds.begin(), myCorrelatedIds.end(), myIt->first ) ==
-//                  myCorrelatedIds.end())
-//                 {
-//                     // cursor removed
-//                     myOutdatedCursorIds.push_back( myIt->first );
-//                     _myCarCounter--;
-
-//                 }
-//         }
-
-//         for (unsigned i = 0; i < myOutdatedCursorIds.size(); ++i) {
-//             _myCursors.erase( myOutdatedCursorIds[i] );
-//         }
-                 
-//         //AC_PRINT << "cursors length " << _myCursors.size() << " car count " << _myCarCounter;
-        
-//     }
 
     asl::Matrix4f
     Blobs::getTransformationMatrix() {

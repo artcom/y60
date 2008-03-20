@@ -74,7 +74,7 @@ namespace y60 {
                 virtual JSFunctionSpec* Functions();
 
                 void onUpdateSettings(dom::NodePtr theSettings) {
-                    AC_PRINT << "New Settings: " << *theSettings;
+                    AC_INFO << "New Settings: " << *theSettings;
                 }
 
             private:

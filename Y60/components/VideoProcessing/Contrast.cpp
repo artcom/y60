@@ -21,7 +21,8 @@ namespace y60 {
         Algorithm(theName),
         _myResultNode("result"),
         _myLower(0),
-        _myUpper(255)
+        _myUpper(255),
+        _myImageNodeVersion(0)
     {   
     }
 
@@ -32,7 +33,7 @@ namespace y60 {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
-            AC_PRINT << "configure " << myName;
+            AC_INFO << "configure " << myName;
             if( myImage ) {
                 if( myName == "sourceimage") {
                     _mySourceImage = myImage->getFacade<y60::Image>();
@@ -71,20 +72,27 @@ namespace y60 {
 
 	void 
     Contrast::onFrame(double t) {
+        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        if (myImageNodeVersion > _myImageNodeVersion) {
+            _myImageNodeVersion = myImageNodeVersion;
+        } else {
+            return;
+        }
         
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
-        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
         
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
         // // left-to-right horizontal pass
         GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
-        itSrc++;
-
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc) {
-            (*itSrc) = _myLookupTable[(*itSrc).get()];
-        }
         
+        dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
+        GRAYRaster & myTargetFrame = myTargetFrameLock.get();
+        GRAYRaster::iterator itTrgt = myTargetFrame.begin();
+        
+        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTrgt) {
+            (*itTrgt) = _myLookupTable[(*itSrc).get()];
+        }
 	}
 }
 

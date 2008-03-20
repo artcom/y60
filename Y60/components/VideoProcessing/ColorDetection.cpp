@@ -30,7 +30,7 @@ namespace y60 {
 		} catch(asl::Exception ex) {
             AC_ERROR << "ColorDetection::configure(): Could not parse configuration " << theNode;
 		}
-		AC_PRINT << "ColorDetection::configure threshold " << _myThreshold;
+		AC_INFO << "ColorDetection::configure threshold " << _myThreshold;
     }
 
 	void 

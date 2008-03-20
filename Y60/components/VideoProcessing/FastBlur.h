@@ -39,6 +39,8 @@ namespace y60 {
             float _myStrength;
             unsigned int _myWidth;
             unsigned int _myHeight;
+            
+            unsigned int _myImageNodeVersion;
     };
 }
 

@@ -35,7 +35,9 @@ namespace y60 {
             
             float _myUpper;
             float _myLower;
-            
+           
+            unsigned _myImageNodeVersion;
+
             std::vector<unsigned char> _myLookupTable;
     };
 }

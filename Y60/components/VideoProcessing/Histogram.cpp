@@ -42,7 +42,7 @@ namespace y60 {
                 if( myName == "sourceimage") {
                     _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
                     //const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
-                    //AC_PRINT << "histogram configure " << *myFrame;
+                    //AC_INFO << "histogram configure " << *myFrame;
                 }
             }   
         }       

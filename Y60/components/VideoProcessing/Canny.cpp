@@ -226,8 +226,8 @@ void Canny::configure( const dom::Node & theNode ) {
         else if (myName == "gradientthreshold") {
             float myThreshold = as<float>(myValue);
             _myGradientThreshold = static_cast<unsigned char>(myThreshold);
-            AC_PRINT << "myValue: " << myValue;
-            AC_PRINT << "myGradientThreshold: " << _myGradientThreshold;
+            AC_INFO << "myValue: " << myValue;
+            AC_INFO << "myGradientThreshold: " << _myGradientThreshold;
         }
     }
 }

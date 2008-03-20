@@ -31,7 +31,7 @@ namespace y60 {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
-            AC_PRINT << "configure " << myName;
+            AC_INFO << "configure " << myName;
             if( myImage ) {
                 if( myName == "sourceimage") {
                     _mySourceImage = myImage->getFacade<y60::Image>();

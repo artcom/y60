@@ -100,16 +100,16 @@ namespace y60 {
 	void 
 	ShotDetectionAlgorithm::configure(const dom::Node & theNode) { 
 		try {
-            AC_PRINT << "configure scene " << _myScene; 
+            AC_INFO << "configure scene " << _myScene; 
             for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
                 const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
                 const std::string myValue = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
-                AC_PRINT << "configure " << myName << " " << myValue;
+                AC_INFO << "configure " << myName << " " << myValue;
                 if( myName == "sourceimage") {  
                     dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);   
                     if( myImage ) {
                         _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
-                        //AC_PRINT << "got source raster" << _mySourceRaster;
+                        //AC_INFO << "got source raster" << _mySourceRaster;
                     }
                 } else if( myName == "threshold" ) {
                     asl::fromString(theNode["threshold"].nodeValue(), _myThreshold);    
@@ -121,9 +121,9 @@ namespace y60 {
         } catch(asl::Exception ex) {
 			AC_ERROR << "could not parse configuration " << theNode;
 		}
-        AC_PRINT << "ShotDetection::configure sourceimage " << _mySourceRaster;
-		AC_PRINT << "ShotDetection::configure threshold " << _myThreshold;
-		AC_PRINT << "ShotDetection::configure min. shot length " << _myMinimalShotLength;
+        AC_INFO << "ShotDetection::configure sourceimage " << _mySourceRaster;
+		AC_INFO << "ShotDetection::configure threshold " << _myThreshold;
+		AC_INFO << "ShotDetection::configure min. shot length " << _myMinimalShotLength;
 	}
 
 	const dom::Node & 

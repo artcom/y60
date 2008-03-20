@@ -100,12 +100,12 @@ namespace y60 {
 	VideoProcessingExtension::onSetProperty(const std::string & thePropertyName,
                                             const PropertyValue & thePropertyValue)
 	{
-		AC_PRINT << "onSetProperty " << thePropertyName;
+		AC_INFO << "onSetProperty " << thePropertyName;
                 
 		if (thePropertyName == "configuration") {
             dom::Node myConfig = *thePropertyValue.get<dom::NodePtr>();           
             for( unsigned int i=0; i<myConfig.childNodesLength(); i++)  {   
-                    AC_PRINT << "config " << myConfig.childNode("algorithm", i)->getAttribute("name")->nodeValue();
+                    AC_INFO << "config " << myConfig.childNode("algorithm", i)->getAttribute("name")->nodeValue();
                     dom::NodePtr myAlgorithmNode = myConfig.childNode("algorithm", i);
                     const std::string myAlgorithmName = myAlgorithmNode->getAttribute("name")->nodeValue();
                 
@@ -120,7 +120,7 @@ namespace y60 {
                     }
                     _myAlgorithmList.push_back(myAlgorithm);
             }                      
-            AC_PRINT << "videoprocessingextension :: configuration se prop " << _myScene;
+            AC_INFO << "videoprocessingextension :: configuration se prop " << _myScene;
         }    
     }           
         
