@@ -83,9 +83,12 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         notifyListeners();
     }
 
-    obj.saveSettings = function(theAdditionalCommonFile, theAdditionalHostFile, theCommonFlag, theHostFlag) {
+    obj.saveSettings = function(theAdditionalCommonFile, theAdditionalHostFile, theCommonFlag, theHostFlag, theMergeCommonFlag) {
         if (theCommonFlag == undefined) {
             theCommonFlag = true;
+        }
+        if (theMergeCommonFlag == undefined) {
+            theMergeCommonFlag = false;
         }
 
         if (theHostFlag == undefined) {
@@ -103,7 +106,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }
 
             // Don't inherit sections from the host specific settings
-            if (!_myOriginalCommonSettings.childNode(mySection.nodeName)) {
+            if (!_myOriginalCommonSettings.childNode(mySection.nodeName) && !theMergeCommonFlag) {
                 var myCommonSection = myCommonSettings.childNode(i);
                 myCommonSettings.removeChild(myCommonSection);
                 continue;
