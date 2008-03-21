@@ -18,8 +18,17 @@
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning
 #define EMULATE_INTTYPES
 #endif
+
+#ifdef OSX
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+}
+#else
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
+#endif
+
 #ifdef WIN32
 #pragma warning( default : 4244 ) // Renable ffmpeg warning
 #endif
@@ -27,6 +36,12 @@
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
 #include <asl/os_functions.h>
+
+#ifdef STOP_TIMER
+// name class with macro in avutil/common.h 
+#undef STOP_TIMER
+#undef START_TIMER
+#endif
 #include <asl/Dashboard.h>
 
 #define DB(x) //x

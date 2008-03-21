@@ -45,7 +45,7 @@ namespace y60 {
         if (myTextSnippets.empty()) {
             return;
         }
-        MAKE_SCOPE_TIMER(renderTextSnippets);
+        MAKE_GL_SCOPE_TIMER(renderTextSnippets);
 
         unsigned myWindowWidth = theViewport->get<ViewportWidthTag>();
         unsigned myWindowHeight = theViewport->get<ViewportHeightTag>();

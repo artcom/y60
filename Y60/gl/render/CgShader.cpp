@@ -93,6 +93,7 @@ namespace y60 {
     }
 
     void CgShader::load(IShaderLibrary & theShaderLibrary) {
+        MAKE_GL_SCOPE_TIMER(CgShader_load);
         compile(theShaderLibrary);
 
         // load fragment shader
@@ -153,6 +154,7 @@ namespace y60 {
             ShaderDescription & theShader,
             const std::string & theProfileName)
     {
+        MAKE_GL_SCOPE_TIMER(CgShader_loadShaderProperties);
         GLShader::loadShaderProperties(theShaderNode, theShader);
         
         theShader._myPossibleProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
@@ -279,6 +281,7 @@ namespace y60 {
 
     void
     CgShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+        MAKE_GL_SCOPE_TIMER(CgShader_activate);
         GLShader::activate(theMaterial, theViewport, 0); // activate stipple && attenuation
 
         if (!theLastMaterial || theLastMaterial->getGroup1Hash() != theMaterial.getGroup1Hash()) {
@@ -298,6 +301,7 @@ namespace y60 {
 
     void
     CgShader::deactivate(const MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(CgShader_deactivate);
 
         GLShader::deactivate(theMaterial);
 
@@ -313,6 +317,7 @@ namespace y60 {
 
     void
     CgShader::enableTextures(const MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(CgShader_enableTextures);
         GLShader::enableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableTextures();
@@ -324,6 +329,7 @@ namespace y60 {
 
     void
     CgShader::disableTextures(const MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(CgShader_disableTextures);
         GLShader::disableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->disableTextures();
@@ -340,7 +346,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        DBP2(MAKE_SCOPE_TIMER(CgShader_bindBodyParams));
+        MAKE_GL_SCOPE_TIMER(CgShader_bindBodyParams);
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
         if (_myVertexProgram) {
@@ -367,6 +373,7 @@ namespace y60 {
 
     void
     CgShader::bindOverlayParams(const MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(CgShader_bindOverlayParams);
         LightVector myEmptyLights;
         if (_myVertexProgram) {
             _myVertexProgram->reloadIfRequired(myEmptyLights, theMaterial);

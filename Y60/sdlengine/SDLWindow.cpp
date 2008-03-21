@@ -138,7 +138,7 @@ SDLWindow::getHeight() const {
 
 void
 SDLWindow::swapBuffers() {
-    MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
+    MAKE_GL_SCOPE_TIMER(SDL_GL_SwapBuffers);
     AbstractRenderWindow::swapBuffers();
 #ifdef AC_USE_X11
     if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI) && _mySwapInterval) {
@@ -670,7 +670,7 @@ SDLWindow::setAutoPause(bool theAutoPauseFlag) {
 
 void
 SDLWindow::handle(EventPtr theEvent) {
-    MAKE_SCOPE_TIMER(handleEvents);
+    MAKE_GL_SCOPE_TIMER(handleEvents);
     switch (theEvent->type) {
         case Event::QUIT:
             _myAppQuitFlag = true;
@@ -750,7 +750,7 @@ SDLWindow::mainLoop() {
         }
 
         if (_myJSContext) {
-            MAKE_SCOPE_TIMER(gc);
+            MAKE_GL_SCOPE_TIMER(gc);
             if (getForceFullGC()) {
                 JS_GC(_myJSContext);
             } else {

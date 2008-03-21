@@ -21,6 +21,7 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 #include <string.h>
 #include <asl/Exception.h>
 #include <asl/numeric_functions.h>
+#include <asl/os_functions.h>
 #include <asl/Logger.h>
 
 #ifndef _AC_NO_CG_
@@ -30,6 +31,7 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 using namespace std;
 
 namespace y60 {
+    bool GLScopeTimer::_flushGL_before_stop = false;
 
     void checkOGLError(const std::string & theLocation) {
         GLenum err = glGetError();
@@ -701,6 +703,14 @@ void * aglGetProcAddress (char * pszProc)
                      bool /*theVerboseFlag*/,
                      bool theInitGLH_extension)
     {
+        std::string mySyncTiming;
+        if (asl::get_environment_var("Y60_SYNC_GL_TIMING", mySyncTiming)) {
+            if (asl::as<bool>(mySyncTiming)) {
+                AC_WARNING << "Y60_SYNC_GL_TIMING is set, may lead to performance degradation (but allows to get true timing results from Dashboard)"; 
+                GLScopeTimer::_flushGL_before_stop = true;
+            }
+        }
+        
         unsigned myVersionMajor = 0;
         unsigned myVersionMinor = 0;
         unsigned myVersionRelease = 0;

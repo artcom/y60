@@ -13,6 +13,7 @@
 
 #include <asl/Exception.h>
 #include <asl/string_functions.h>
+#include <asl/Dashboard.h>
 #include <y60/NodeValueNames.h>
 #include <y60/MaterialParameter.h>
 
@@ -330,6 +331,28 @@ DEF_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC, glRenderbufferStor
 #endif
 
 namespace y60 {
+    class GLScopeTimer {
+	public:
+		GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
+           if (_flushGL_before_stop) {
+                glFlush();
+            }
+			_myTimer->start();
+		}
+		~GLScopeTimer() {
+            if (_flushGL_before_stop) {
+                glFlush();
+            }
+			_myTimer->stop();
+		}
+        static bool _flushGL_before_stop;
+	private:
+		asl::TimerPtr _myTimer;
+	};
+    #define MAKE_GL_SCOPE_TIMER(NAME) \
+    static asl::TimerPtr myScopeTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
+        y60::GLScopeTimer myScopeTimerWrapper ## NAME ( myScopeTimer ## NAME);
+
     void checkOGLError(const std::string& theLocation);
     void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
 

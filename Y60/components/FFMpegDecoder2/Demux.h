@@ -21,7 +21,14 @@
 #ifdef OSX
 #include <Carbon/Carbon.h>
 #endif
+
+#ifdef OSX
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#else
 #include <ffmpeg/avformat.h>
+#endif
 
 #ifdef WIN32
 #pragma warning(pop)

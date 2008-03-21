@@ -73,6 +73,7 @@ namespace y60 {
         // Create container nodes
         dom::NodePtr myNode = getNode();
         (*myNode)(WORLD_LIST_NAME);
+        (*myNode)(RECORD_LIST_NAME);
         (*myNode)(CANVAS_LIST_NAME);
         (*myNode)(MATERIAL_LIST_NAME);
         (*myNode)(LIGHTSOURCE_LIST_NAME);

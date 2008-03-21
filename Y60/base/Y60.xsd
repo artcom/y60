@@ -768,7 +768,22 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="vectorofunsigned">
+    <xs:element name="vectorofsigned">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of signed integer values as text child.
+
+Example:
+&lt;vectorofsigned&gt;[-1,2,3,4,5]&lt;/vectorofsigned&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfSignedInt">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+     <xs:element name="vectorofunsigned">
         <xs:annotation>
             <xs:documentation>This element contains a vector of unsigned integer values as text child.
 
@@ -794,6 +809,23 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="VectorOfVector2f">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="vertexbufferusage" type="VertexBufferUsage"/>
+                </xs:extension>                                    
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector2i">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of 2-dimensional float vectors as text child.
+The example shows how the element is used to list a number of uv-coordinates inside a shape element.
+
+Example:
+&lt;vectorofvector2i name='map1'&gt;[[0,1],[1,1],[0,0],[1,0],[0,-1]]&lt;/vectorofvector2i&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector2i">
                     <xs:attribute name="name" type="xs:string"/>
                     <xs:attribute name="vertexbufferusage" type="VertexBufferUsage"/>
                 </xs:extension>                                    
@@ -895,7 +927,12 @@ lightsources, animations, shapes and images</xs:documentation>
                         <xs:documentation>Contains the scenegraph hierachy</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="canvases">
+                <xs:element ref="records">
+                    <xs:annotation>
+                        <xs:documentation>Contains the user defined data hierarchy</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                 <xs:element ref="canvases">
                     <xs:annotation>
                         <xs:documentation>Contains render areas and viewports</xs:documentation>
                     </xs:annotation>
@@ -958,7 +995,22 @@ This element can contain any number of world elements.</xs:documentation>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="world">
+    <xs:element name="records">
+        <xs:annotation>
+            <xs:documentation>Toplevel element for all worlds in the scenegraph.
+This element can contain any number of world elements.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="record">
+                    <xs:annotation>
+                        <xs:documentation>Contains the user defined data records</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+     <xs:element name="world">
         <xs:annotation>
             <xs:documentation>The world is the toplevel node for the scenegraph.
 It contains a hierachy of scenegraph object.
@@ -2310,6 +2362,25 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="vector2i">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 2-dimensional vector of int values as text child
+
+Example:
+&lt;vector2i name='foo'&gt;[2,4]&lt;/vector2i&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector2i">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="vector3f">
         <xs:annotation>
             <xs:documentation>Property that contains an a 3-dimensional vector of float values as text child
@@ -2377,6 +2448,82 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="Quaternionf">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="planef">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a plane of float values (normal vector and offset) as text child
+
+Example:
+&lt;planef name='foo'&gt;[[3.8,2.4,1.9],7.5]&lt;/planef&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Planef">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="frustum">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a planef of float values as text child
+
+Example:
+&lt;frustum name='foo'&gt;[3.8,2.4,1.9,7.5]&lt;/frustum&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Frustum">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="box3f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a planef of float values as text child
+
+Example:
+&lt;box3f name='foo'&gt;[3.8,2.4,1.9,7.5]&lt;/box3f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Box3f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="box2i">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a box2 of int values as text child
+
+Example:
+&lt;box2i name='foo'&gt;[3.8,2.4,1.9,7.5]&lt;/box2i&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Box2i">
                     <xs:attribute name="name" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Name of the property</xs:documentation>
@@ -3029,6 +3176,16 @@ Current subnodes include:
                 <xs:documentation>Human readable name for the scenegraph node</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="classes" type="VectorOfString">
+            <xs:annotation>
+                <xs:documentation>transparent storage for an arbitrary list of strings</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="record" type="xs:IDREF">
+            <xs:annotation>
+                <xs:documentation>reference to user defined data record node</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="position" type="Vector3f">
             <xs:annotation>
                 <xs:documentation>Position of the node in units.
@@ -3063,13 +3220,13 @@ By default the pivot point is [0,0,0] but for cases such as doors, it is useful 
         </xs:attribute>
         <xs:attribute name="globalmatrix" type="Matrix4f">
             <xs:annotation>
-                <xs:documentation>The global (or world-) transformation-matrix is calculated once per frame
+                <xs:documentation>(Virtual Attribute):The global (or world-) transformation-matrix is calculated once per frame
 from position/orientation/size attributes. You can directly manipulate it during pre-render step.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="boundingbox" type="Box3f">
             <xs:annotation>
-                <xs:documentation>The axis-aligned bounding box of element in world-space.</xs:documentation>
+                <xs:documentation>(Virtual Attribute):The axis-aligned bounding box of element in world-space.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="sticky" type="xs:boolean">
@@ -3401,12 +3558,260 @@ Joints are exported from maya and usually will not be edited by hand.</xs:docume
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="record">
+        <xs:annotation>
+            <xs:documentation>
+element than can contains a list of named and typed data items
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="record">
+                    <xs:annotation>
+                        <xs:documentation>nested record</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+               <xs:element ref="frustum">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Frustum</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="planef">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Planef</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector2i">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector2i</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofbool">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofbool</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofblendfunction">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofblendfunction</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofsigned">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofsigned</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector2i">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofvector2i</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofvector3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofquaternionf">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofquaternionf</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+              <xs:element ref="VectorOfRankedFeature">
+                    <xs:annotation>
+                        <xs:documentation>Property of type bool</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="box3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Box3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="box2f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Box2f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="box2i">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Box2i</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofrgb">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgb</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofrgba">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgba</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofbgr">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type bgr</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofbgra">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type bgra</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofabgr">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type abgr</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                 <xs:element ref="rasterofrgb_float">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgb with 32 bit float pixel values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofrgba_float">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgba with 32 bit float pixel values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                 <xs:element ref="rasterofrgb_half">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgb with 16 bit float pixel values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofrgba_half">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type rgba with 16 bit float pixel values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofgray">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type graylevel</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofgray16">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type graylevel 16 bit</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofgray32">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type graylevel 32 bit</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofgrays16">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type greylevel signed 16 bit</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofdxt1">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type dxt1 texture-compression</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofdxt1a">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type dxt1a texture-compression</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofdxt3">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type dxt3 texture-compression</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="rasterofdxt5">
+                    <xs:annotation>
+                        <xs:documentation>Contains runlength encoded pixel data of type dxt5 texture-compression</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+               <xs:element ref="vectorofunsigned">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofunsigned</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="bool">
+                    <xs:annotation>
+                        <xs:documentation>Property of type bool</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="unsignedint">
+                    <xs:annotation>
+                        <xs:documentation>Property of type unsigned integer</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="float">
+                    <xs:annotation>
+                        <xs:documentation>Property of type float</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="string">
+                    <xs:annotation>
+                        <xs:documentation>Property of type string</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="point3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Point3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector2f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector2f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="matrix4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Matrix4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectoroffloat">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of float</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector2f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of Vector2f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of Vector4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofstring">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of String</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique ID for the node.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Human readable name for the scenegraph node</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="class" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>transparent storage for an arbitrary list of strings</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="next" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>reference to property node</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>
-
-
-
-
-
-
-
-

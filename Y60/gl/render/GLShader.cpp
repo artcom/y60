@@ -237,6 +237,7 @@ namespace y60 {
 
     void
     GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+        MAKE_GL_SCOPE_TIMER(GLShader_activate);
         AC_TRACE << "GLShader::activate " << theMaterial.get<NameTag>();
         AC_TRACE << "GLShader::activate " << theMaterial.getNode();
 
@@ -275,6 +276,7 @@ namespace y60 {
 
     void
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(GLShader_enableTextures);
 
         unsigned myTextureCount = theMaterial.getTextureUnitCount();
         AC_TRACE << "GLShader::enableTextures '" << theMaterial.get<NameTag>() << "' id=" << theMaterial.get<IdTag>() << " texunits=" << myTextureCount;
@@ -354,6 +356,7 @@ namespace y60 {
 
     void
     GLShader::disableTextures(const y60::MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(GLShader_disableTextures);
 
         unsigned myTextureCount = theMaterial.getTextureUnitCount();
         // AC_TRACE << "current texcount:" << myTextureCount << ", prev:" << myPreviousTextureCount << endl;
@@ -384,6 +387,7 @@ namespace y60 {
 
     void
     GLShader::deactivate(const MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(GLShader_deactivate);
         AC_TRACE << "GLShader::deactivate " << theMaterial.get<NameTag>();
         if (theMaterial.hasTexGen()) {
             // disable texture coordinate generation
@@ -407,6 +411,7 @@ namespace y60 {
 
     void
     GLShader::loadParameters(const dom::NodePtr theParameterListNode, ShaderDescription & theShader) {
+        MAKE_GL_SCOPE_TIMER(GLShader_loadParameters);
         theShader._myVertexParameters.clear();
 
         dom::NodePtr myParameterListNode = theParameterListNode->childNode(PARAMETER_LIST_NAME);
@@ -459,6 +464,7 @@ namespace y60 {
                                     const Camera & theCamera,
                                     const TextureUnit & theTextureUnit)
     {
+        MAKE_GL_SCOPE_TIMER(GLShader_setupProjectorMatrix);
 
         // projector model matrix
         const std::string & myProjectorId = theTextureUnit.get<TextureUnitProjectorIdTag>();
@@ -505,6 +511,7 @@ namespace y60 {
             const Viewport & theViewport,
             const Camera & theCamera)
     {
+        MAKE_GL_SCOPE_TIMER(GLShader_enableTextureProjection);
 
         MaterialBase::TexGenModeList myTexGenModes = theMaterial.getTexGenModes();
         MaterialBase::TexGenParamsList myTexGenParams = theMaterial.getTexGenParams();

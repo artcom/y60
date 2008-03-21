@@ -60,6 +60,7 @@ namespace y60 {
 
     void
     FFShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+        MAKE_GL_SCOPE_TIMER(FFShader_activate);
         GLShader::activate(theMaterial, theViewport, 0); // activate stipple && attenuation
 
         if (!theLastMaterial || theLastMaterial->getGroup1Hash() != theMaterial.getGroup1Hash()) {
@@ -100,6 +101,7 @@ namespace y60 {
 
     void
     FFShader::deactivate(const y60::MaterialBase & theMaterial) {
+        MAKE_GL_SCOPE_TIMER(FFShader_deactivate);
         GLShader::deactivate(theMaterial);
         if (theMaterial.getLightingModel() == UNLIT) {
             glColor4f(1.0f,1.0f,1.0f,1.0f);

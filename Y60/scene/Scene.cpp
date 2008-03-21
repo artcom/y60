@@ -859,6 +859,16 @@ namespace y60 {
     }
 
     NodePtr
+    Scene::getRecordsRoot() {
+        return getNode().childNode(RECORD_LIST_NAME);
+    }
+
+    const NodePtr
+    Scene::getRecordsRoot() const {
+        return getNode().childNode(RECORD_LIST_NAME);
+    }
+
+    NodePtr
     Scene::getMaterialsRoot() {
         return getNode().childNode(MATERIAL_LIST_NAME);
     }

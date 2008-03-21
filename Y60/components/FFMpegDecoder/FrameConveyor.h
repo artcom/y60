@@ -23,8 +23,17 @@
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning
 #define EMULATE_INTTYPES
 #endif
+
+#ifdef OSX
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+}
+#else
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
+#endif
+
 #ifdef WIN32
 #pragma warning( default : 4244 ) // Renable ffmpeg warning
 #endif

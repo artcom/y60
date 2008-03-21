@@ -26,20 +26,20 @@ template class JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::Thr
 JSDomEventListener::JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName)
     : _myJSContext(theContext), _myEventListener(theEventListener), _myMethodName(theMethodName)
 {
+    AC_TRACE << "JSDomEventListener()";
     if(_myEventListener) {
         if (!JS_AddRoot(_myJSContext, &_myEventListener)) {
             // We might at one day remove this warning when we use non-js event listeners
             AC_WARNING << "JSDomEventListener(): could not root event listener objects";
         };
     }
-    AC_PRINT<< " JSDomEventListener()";
 }
 
 JSDomEventListener::~JSDomEventListener() {
+    AC_TRACE<< " ~JSDomEventListener()";
     if(_myEventListener) {
         JS_RemoveRoot(_myJSContext, &_myEventListener);
     }
-    AC_PRINT<< " ~JSDomEventListener()";
 }
 void 
 JSDomEventListener::handleEvent(dom::EventPtr theEvent) {

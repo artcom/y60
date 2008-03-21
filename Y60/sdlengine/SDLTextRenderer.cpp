@@ -160,7 +160,7 @@ namespace y60 {
                                             unsigned int theTargetHeight,
                                             const asl::Vector2i & theCursorPos)
     {
-        MAKE_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
         TTF_SetTracking(_myTracking);
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
@@ -783,7 +783,7 @@ namespace y60 {
 
     void
     SDLTextRenderer::renderText(TextPtr & theText) {
-        MAKE_SCOPE_TIMER(SDLTextRenderer_renderText);
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderText);
         SDLTextPtr mySDLText = dynamic_cast_Ptr<SDLText>(theText);
         if (mySDLText == 0) {
             throw GLTextRendererException("SDLTextRenderer - can only render SDLText objects.", PLUS_FILE_LINE);

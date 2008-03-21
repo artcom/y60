@@ -112,11 +112,11 @@ namespace y60 {
 
     void CgProgramInfo::createAndCompileProgram() {
         AC_DEBUG << "createAndCompileProgram " << _myPathName.c_str();
-        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
+        DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
 
         if (_myCgProgramString.empty()) {
             AC_DEBUG << "loading from file";
-            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_loadFromFile));
+            DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_loadFromFile));
 
             // create null terminated array of null terminated strings
             for (int i=0; i < _myShader._myCompilerArgs.size(); ++i) {
@@ -141,7 +141,7 @@ namespace y60 {
 
         } else {
             AC_DEBUG << "destroying and reloading from string";
-            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_destroyReload));
+            DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_destroyReload));
 
             cgDestroyProgram(_myCgProgramID);
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
@@ -154,7 +154,7 @@ namespace y60 {
         processParameters();
         DBP2(STOP_TIMER(CgProgramInfo_processParameters));
 
-        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_compileProgram));
+        DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_compileProgram));
         cgCompileProgram(_myCgProgramID);
         assertCg(PLUS_FILE_LINE, _myContext);
     }
@@ -300,7 +300,7 @@ namespace y60 {
             const LightVector & theLightInstances,
             const MaterialBase & theMaterial)
     {
-        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
+        DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
         //AC_DEBUG << "reloadIfRequired";
 
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
@@ -382,7 +382,7 @@ namespace y60 {
             //change unsized array sizes here
             AC_DEBUG << "Cg program reload required";
 
-            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
+            DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             AC_DEBUG << "#of positional lights:" << myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
@@ -437,7 +437,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams);
+        MAKE_GL_SCOPE_TIMER(CgProgramInfo_bindBodyParams);
         setCGGLParameters();
 
         std::vector<Vector3f> myPositionalLights;

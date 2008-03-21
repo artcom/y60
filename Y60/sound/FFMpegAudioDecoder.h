@@ -20,7 +20,14 @@
 #ifdef WIN32
 #define EMULATE_INTTYPES
 #endif
+
+#ifdef OSX
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#else
 #include <ffmpeg/avformat.h>
+#endif
 
 namespace y60 {
 

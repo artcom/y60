@@ -245,6 +245,9 @@ namespace y60 {
             dom::NodePtr getCanvasRoot();
             const dom::NodePtr getCanvasRoot() const;
 
+            dom::NodePtr getRecordsRoot();
+            const dom::NodePtr getRecordsRoot() const;
+
             dom::NodePtr getMaterialsRoot();
             const dom::NodePtr getMaterialsRoot() const;
 

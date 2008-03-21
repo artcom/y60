@@ -190,7 +190,8 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
 //                        +"				<xs:element name='node' type='xs:hexBinary'/>\n"
             +"				<xs:element name='node' type='xs:string'/>\n"
             +"			</xs:sequence>\n"
-            +"			<xs:attribute name='id' type='xs:int' />\n"
+            +"			<xs:attribute name='id' type='xs:ID' />\n"
+            +"			<xs:attribute name='next' type='xs:IDREF' />\n"
             +"			<xs:attribute name='name' type='xs:string' />\n"
             +"		</xs:complexType>\n"
             +"	</xs:element>\n"
@@ -215,8 +216,11 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
 			"<scene version='214' size='[1,2,3]'>"
 			+"	<shapes>12345</shapes>\n"
 			+"	<materials/>\n"
-			+"	<worlds></worlds>\n"
-            +"   <uvset name='bla'>23</uvset>\n"
+			+"	<worlds>\n"
+			+"	   <world id='world1' name='myFirstWorld' next='world2'/>\n"
+			+"	   <world id='world2' name='mySecondWorld'/>\n"
+			+"  </worlds>\n"
+            +"  <uvset name='bla'>23</uvset>\n"
 			+"</scene>\n"
 			);
 		ENSURE('myDocument.ok');
@@ -241,6 +245,10 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
 		obj.mySceneSize.value = new Vector3f(2,3,4);
 		ENSURE('almostEqual(mySceneSize,new Vector3f(2,3,4))');
 		ENSURE('almostEqual(myScene.size,new Vector3f(2,3,4))');
+
+        DPRINT('myScene.find("//world").name');
+        ENSURE('myScene.find("//world").name == "myFirstWorld"');
+        ENSURE('myScene.find("//world").$next.name == "mySecondWorld"');
 	}
 }
 

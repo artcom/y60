@@ -27,6 +27,7 @@
 #include "Scene.h"
 #include "TextureUnit.h"
 #include "Texture.h"
+#include "Record.h"
 
 #include <y60/Image.h>
 #include <y60/Movie.h>
@@ -154,6 +155,7 @@ namespace y60 {
                 MATERIAL_NODE_NAME);
         theFactory->registerPrototype(REQUIRES_LIST_NAME, dom::FacadePtr(new MaterialRequirementFacade(dom::Node::Prototype)),
                 MATERIAL_NODE_NAME);
+        theFactory->registerPrototype(RECORD_NODE_NAME, dom::FacadePtr(new RecordFacade(dom::Node::Prototype)));
 
         //=== Analytic Geometry Nodes =========================================
         theFactory->registerPrototype(PLANE_NODE_NAME, dom::FacadePtr(new Plane(dom::Node::Prototype)));

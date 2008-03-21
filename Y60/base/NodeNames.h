@@ -75,6 +75,8 @@ namespace y60 {
     static const char * CANVAS_LIST_NAME          = "canvases";
     static const char * CANVAS_NODE_NAME          = "canvas";
     static const char * VIEWPORT_NODE_NAME        = "viewport";
+    static const char * RECORD_LIST_NAME          = "records";
+    static const char * RECORD_NODE_NAME          = "record";
 
     //=== Analytic Geometry ==========================================================
     static const char * POINT_NODE_NAME        = "point";

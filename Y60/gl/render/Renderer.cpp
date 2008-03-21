@@ -179,7 +179,7 @@ namespace y60 {
     Renderer::deactivatePreviousMaterial() const  {
         // clean up previous material
         if (_myPreviousMaterial) {
-            DBP(MAKE_SCOPE_TIMER(deactivatePreviousMaterial));
+            DBP(MAKE_GL_SCOPE_TIMER(deactivatePreviousMaterial));
 
             IShaderPtr myPreviousShader = _myPreviousMaterial->getShader();
             myPreviousShader->disableTextures(*_myPreviousMaterial);
@@ -197,7 +197,7 @@ namespace y60 {
         } else if (_myPreviousMaterial == 0) {
             _myLastVertexRegisterFlags.reset();
         }
-        DBP(MAKE_SCOPE_TIMER(switchMaterial));
+        DBP(MAKE_GL_SCOPE_TIMER(switchMaterial));
         COUNT(materialChange);
 
         IShaderPtr myShader = theMaterial.getShader();
@@ -206,7 +206,7 @@ namespace y60 {
 
         {
             // activate new material
-            DBP(MAKE_SCOPE_TIMER(activateShader));
+            DBP(MAKE_GL_SCOPE_TIMER(activateShader));
 
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
             CHECK_OGL_ERROR;
@@ -295,7 +295,7 @@ namespace y60 {
         const Vector3f & myPivot = theBody.get<PivotTag>();
         glTranslatef(myPivot[0], myPivot[1], myPivot[2]);
         if (theBody.get<BillboardTag>() == AXIS_BILLBOARD) {
-            DBP(MAKE_SCOPE_TIMER(update_billboards));
+            DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
             Matrix4f myBillboardTransform = theBody.get<GlobalMatrixTag>();
             myBillboardTransform.translate(theBody.get<PivotTag>());
             double myRotation = getBillboardRotation(myBillboardTransform,
@@ -321,7 +321,7 @@ namespace y60 {
 
     void
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
-        DBP(MAKE_SCOPE_TIMER(renderBodyPart));
+        DBP(MAKE_GL_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
 
         const y60::Body & myBody = theBodyPart.getBody();
@@ -392,7 +392,7 @@ namespace y60 {
                 myShader->enableTextureProjection( myMaterial, theViewport, theCamera );
             }
             if (myBodyHasChanged || myMaterialHasChanged) {
-                DBP2(MAKE_SCOPE_TIMER(renderBodyPart_bindBodyParams));
+                DBP2(MAKE_GL_SCOPE_TIMER(renderBodyPart_bindBodyParams));
                 myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
                 CHECK_OGL_ERROR;
             }
@@ -488,7 +488,7 @@ namespace y60 {
 
     void
     Renderer::renderPrimitives(const BodyPart & theBodyPart, const MaterialBase & theMaterial) {
-        DBP(MAKE_SCOPE_TIMER(renderPrimitives));
+        DBP(MAKE_GL_SCOPE_TIMER(renderPrimitives));
         DBP(START_TIMER(getPrimitive));
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         DBP(STOP_TIMER(getPrimitive));
@@ -548,7 +548,7 @@ namespace y60 {
         DBP(COUNT(VertexArrays));
 
         {
-            DBP(MAKE_SCOPE_TIMER(glDrawArrays));
+            DBP(MAKE_GL_SCOPE_TIMER(glDrawArrays));
             glDrawArrays(getPrimitiveGLType(myPrimitive.getType()), 0, myPrimitive.size());
             CHECK_OGL_ERROR;
         }
@@ -675,6 +675,7 @@ namespace y60 {
 
     void
     Renderer::enableRenderStyles(const RenderStyles & theRenderStyles, const MaterialBase * theMaterial) {
+        MAKE_GL_SCOPE_TIMER(Renderer_enableRenderStyles);
         // AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
         _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
@@ -698,6 +699,7 @@ namespace y60 {
                            float theSize,
                            const std::string & theRenderStyles)
    {
+        MAKE_GL_SCOPE_TIMER(Renderer_preDraw);
         std::istringstream myRenderStylesStream(theRenderStyles);
         RenderStyles myRenderStyles;
         myRenderStylesStream >> myRenderStyles;
@@ -912,6 +914,8 @@ namespace y60 {
 
     dom::NodePtr
     Renderer::getActiveLodChild(dom::NodePtr theNode, const CameraPtr theCamera) {
+        MAKE_GL_SCOPE_TIMER(Renderer_getActiveLodChild);
+        
         const LodFacadePtr myLodFacade = theNode->getFacade<LodFacade>();
         if (!myLodFacade) {
             throw RendererException(string("Node with id: ") + theNode->getAttributeString(ID_ATTRIB)
@@ -960,7 +964,7 @@ namespace y60 {
     {
         TransformHierarchyFacadePtr myFacade;
         {
-            DBP(MAKE_SCOPE_TIMER(createRenderList_prologue));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_prologue));
             // Skip undefined nodes
             if (!theNode) {
                 return;
@@ -989,7 +993,7 @@ namespace y60 {
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
         {
 
-            DBP(MAKE_SCOPE_TIMER(createRenderList_cull));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_cull));
             if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
                 if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
                     return;
@@ -999,14 +1003,14 @@ namespace y60 {
 
         // Collect clipping planes and scissoring
         {
-            DBP(MAKE_SCOPE_TIMER(createRenderList_collectClippingScissor));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_collectClippingScissor));
             collectClippingPlanes(theNode, theClippingPlanes);
             collectScissorBox(theNode, theScissorBox);
         }
 
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
-            DBP(MAKE_SCOPE_TIMER(createRenderList_lod));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_lod));
             createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts,
                     theCamera, theEyeSpaceTransform, theViewport, theOverlapFrustumFlag,
                     theClippingPlanes, theScissorBox);
@@ -1015,7 +1019,7 @@ namespace y60 {
 
         // Add remaining bodies to render list
         if (theNode->nodeName() == BODY_NODE_NAME) {
-            DBP(MAKE_SCOPE_TIMER(createRenderList_insertBody));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_insertBody));
             const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // Split the body in bodyparts to make material sorted rendering possible
@@ -1050,7 +1054,7 @@ namespace y60 {
         }
 
         {
-            DBP(MAKE_SCOPE_TIMER(createRenderList_recurse));
+            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_recurse));
             for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
                 createRenderList(theNode->childNode(i), theBodyParts, theCamera,
                         theEyeSpaceTransform, theViewport, myOverlapFrustumFlag,
@@ -1102,7 +1106,7 @@ namespace y60 {
     }
     void
     Renderer::clearBuffers(const CanvasPtr & theCanvas, unsigned int theBuffersMask) {
-        MAKE_SCOPE_TIMER(Renderer_preRender);
+        MAKE_GL_SCOPE_TIMER(Renderer_clearBuffers);
         // called once per canvas per frame
         const asl::Vector4f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
@@ -1111,7 +1115,7 @@ namespace y60 {
 
     void
     Renderer::setupRenderState(ViewportPtr theViewport) {
-        MAKE_SCOPE_TIMER(Renderer_setupRenderState);
+        MAKE_GL_SCOPE_TIMER(Renderer_setupRenderState);
         _myState->setWireframe(theViewport->get<ViewportWireframeTag>());
         _myState->setFlatShading(theViewport->get<ViewportFlatshadingTag>());
         _myState->setLighting(theViewport->get<ViewportLightingTag>());
@@ -1136,7 +1140,7 @@ namespace y60 {
     // called once per Canvas per Frame
     void
     Renderer::render(ViewportPtr theViewport) {
-        MAKE_SCOPE_TIMER(render);
+        MAKE_GL_SCOPE_TIMER(render);
         _myRenderedUnderlays = false;
         
         // Setup viewport, parameters are in screen space
@@ -1153,7 +1157,7 @@ namespace y60 {
 
         // Render underlays
         {
-            MAKE_SCOPE_TIMER(renderUnderlays);
+            MAKE_GL_SCOPE_TIMER(renderUnderlays);
             renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
         }
 
@@ -1192,7 +1196,7 @@ namespace y60 {
                 // (2) Create lists of render objects
                 BodyPartMap myBodyParts;
                 {
-                    MAKE_SCOPE_TIMER(createRenderList);
+                    MAKE_GL_SCOPE_TIMER(createRenderList);
                     Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
                     asl::Box2f myScissorBox;
                     myScissorBox.makeFull();
@@ -1202,32 +1206,23 @@ namespace y60 {
                 }
 
                 // (3) render skybox
-                {
-                    MAKE_SCOPE_TIMER(renderSkyBox);
                     renderSkyBox(*theViewport, myCamera);
                     CHECK_OGL_ERROR;
-                }
 
                 // (4) Setup camera
                 bindViewMatrix(myCamera);
 
                 // (5) activate all visible lights
-                {
-                    MAKE_SCOPE_TIMER(enableVisibleLights);
                     enableVisibleLights();
                     CHECK_OGL_ERROR;
-                }
 
                 // (6) enable fog
-                {
-                    MAKE_SCOPE_TIMER(enableFog);
                     enableFog();
                     CHECK_OGL_ERROR;
-                }
 
                 // (7) render bodies
                 if (! myBodyParts.empty()) {
-                    MAKE_SCOPE_TIMER(renderBodyParts);
+                    MAKE_GL_SCOPE_TIMER(renderBodyParts);
                     _myPreviousBody = 0;
 
                     glPushMatrix();
@@ -1259,10 +1254,12 @@ namespace y60 {
             }
         }
 
+        
         {
-            MAKE_SCOPE_TIMER(renderOverlays);
+            MAKE_GL_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
+
 
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
@@ -1331,6 +1328,7 @@ namespace y60 {
 
     void
     Renderer::enableVisibleLights() {
+        MAKE_GL_SCOPE_TIMER(enableVisibleLights);
         static GLint myMaxLights = 0;
         if (myMaxLights == 0) {
             glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
@@ -1440,6 +1438,7 @@ namespace y60 {
 
     void
     Renderer::enableFog() {
+        MAKE_GL_SCOPE_TIMER(Renderer_enableFog);
         WorldFacadePtr myWorldFacade = _myScene->getWorldRoot()->getFacade<WorldFacade>();
         const string & myFogModeString = myWorldFacade->get<FogModeTag>();
         if (myFogModeString.size() == 0) {
@@ -1507,6 +1506,7 @@ namespace y60 {
 
     void
     Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) { 
+        MAKE_GL_SCOPE_TIMER(renderSkyBox);
         if (_myRenderedUnderlays) {
             return;
         }
@@ -1696,12 +1696,8 @@ namespace y60 {
 
     void
     Renderer::renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha) {
+        MAKE_GL_SCOPE_TIMER(renderOverlay);
 
-#if 0
-        if (theOverlayNode->nodeType() != dom::Node::ELEMENT_NODE) {
-            return;
-        }
-#endif
         const y60::Overlay & myOverlay = *(theOverlayNode->getFacade<y60::Overlay>());
         if (myOverlay.get<VisibleTag>() == false) {
             return;
@@ -1750,6 +1746,7 @@ namespace y60 {
                 if (myMaterialHasChanged) {
                     IShaderPtr myShader = myMaterial->getShader();
                     if (myShader) {
+                        MAKE_GL_SCOPE_TIMER(renderOverlay_bindOverlayParams);
                         myShader->bindOverlayParams(*myMaterial);
                         CHECK_OGL_ERROR;
                     }
@@ -1769,6 +1766,7 @@ namespace y60 {
 
                 unsigned myTextureCount = myMaterial->getTextureUnitCount();
                 if (myTextureCount == 1) {
+                    MAKE_GL_SCOPE_TIMER(renderOverlay_single_texture);
                     glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);
                     glVertex2f(0, 0);
@@ -1783,6 +1781,7 @@ namespace y60 {
                     glVertex2f(myWidth, 0);
                     glEnd();
                 } else {
+                    MAKE_GL_SCOPE_TIMER(renderOverlay_multi_texture);
                     glBegin(GL_QUADS);
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0],mySourceOrigin[1]);
@@ -1806,6 +1805,7 @@ namespace y60 {
                     glEnd();
                 }
             }
+            MAKE_GL_SCOPE_TIMER(renderOverlay_border);
 
             // Render borders
             const bool & hasTopBorder    = myOverlay.get<TopBorderTag>();
@@ -1859,7 +1859,7 @@ namespace y60 {
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
         bool myOverlapFrustumFlag = true;
 
-        MAKE_SCOPE_TIMER(renderAnalyticGeometry);
+        MAKE_GL_SCOPE_TIMER(renderAnalyticGeometry);
         Matrix4f myMatrix;
         myMatrix.makeIdentity();
 
