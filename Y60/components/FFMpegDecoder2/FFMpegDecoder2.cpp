@@ -682,12 +682,18 @@ namespace y60 {
                 myMovie->addRasterValue(createRasterValue( y60::BGRA, _myFrameWidth, _myFrameHeight), y60::BGRA, 1);                
                 break;
             case TEXTURE_IFMT_ALPHA:
+            	AC_TRACE << "Using Alpha pixels";
+	            _myDestinationPixelFormat = PIX_FMT_GRAY8;
+	            _myBytesPerPixel = 1;
+	            myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
+	            myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
+	            break;
             case TEXTURE_IFMT_LUMINANCE8:
                 AC_TRACE << "Using GRAY pixels";
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
-                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
-                myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);                
                 break;
             case TEXTURE_IFMT_RGB8:
             default:
