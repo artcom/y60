@@ -106,11 +106,19 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
     ////////////////////////////////////////
 
     function buildQuitOSD() {
+        var myFontPath = "fonts/arial.ttf";
+        if (!fileExists(myFontPath)) {
+            myFontPath = "${PRO}/testmodels/fonts/arial.ttf";
+            if (!fileExists(myFontPath) && operatingSystem() == "WIN32") {
+                myFontPath = "${SYSTEMROOT}/fonts/arial.ttf";
+            }
+        }
+        
         const myStyle = {
             color:             asColor("FFFFFF"),
             selectedColor:     asColor("FFFFFF"),
             textColor:         asColor("00FFFF"),
-            font:              "${PRO}/testmodels/fonts/arial.ttf", // XXX: not distribution-safe
+            font:              myFontPath,
             HTextAlign:        Renderer.LEFT_ALIGNMENT,
             fontsize:          18
         }
