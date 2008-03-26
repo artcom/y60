@@ -38,25 +38,25 @@ using namespace y60;
 namespace y60 {
 
     CgShader::CgShader(const dom::NodePtr theNode, 
-                      const std::string & theVertexProfileName,
-                      const std::string & theFragmentProfileName) : GLShader(theNode)
-   {
+                       const std::string & theVertexProfileName,
+                       const std::string & theFragmentProfileName) : GLShader(theNode)
+    {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
         if (myShaderNode) {
             loadShaderProperties(myShaderNode, _myVertexShader, theVertexProfileName);
             loadParameters(myShaderNode, _myVertexShader);
+            _myVertexShader._myType = VERTEX_SHADER;
         } else {
-            throw ShaderException(string("CgShader::CgShader() - missing node ")+ VERTEX_SHADER_NODE_NAME +
-                    " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
-        }
+            AC_WARNING << "no vertex prog found for " << theNode->nodeName();
+         }
 
         myShaderNode = theNode->childNode(FRAGMENT_SHADER_NODE_NAME);
         if (myShaderNode) {
             loadShaderProperties(myShaderNode, _myFragmentShader, theFragmentProfileName);
+            _myFragmentShader._myType = FRAGMENT_SHADER;
         } else {
-            throw ShaderException(string("CgShader::CgShader() - missing node ")+ FRAGMENT_SHADER_NODE_NAME +
-                    " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
+            AC_WARNING << "no fragment prog found for " << theNode->nodeName();
         }
     }
 
@@ -72,20 +72,22 @@ namespace y60 {
         assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
 
         // compile fragment shader
-        if (!_myFragmentProgram) {
+        if (!_myFragmentProgram && _myFragmentShader._myType != NO_SHADER_TYPE
+            ) {
             DB(AC_TRACE << "CgShader::compile(): Loading fragment shader from file '"
-                    << _myFragmentShader._myFilename << "'");
+               << _myFragmentShader._myFilename << "'");
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
-                    myShaderLibrary->getCgContext()));
+                                                                           myShaderLibrary->getCgContext()));
             assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
         // compile vertex shader
-        if (!_myVertexProgram) {
+        if (!_myVertexProgram && _myVertexShader._myType != NO_SHADER_TYPE
+) {
             DB(AC_TRACE << "CgShader::compile(): Loading vertex shader from file '"
-                    << _myVertexShader._myFilename << "'");
+               << _myVertexShader._myFilename << "'");
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
-                    myShaderLibrary->getCgContext()));
+                                                                         myShaderLibrary->getCgContext()));
             assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
@@ -151,8 +153,8 @@ namespace y60 {
 
     void
     CgShader::loadShaderProperties(const dom::NodePtr theShaderNode,
-            ShaderDescription & theShader,
-            const std::string & theProfileName)
+                                   ShaderDescription & theShader,
+                                   const std::string & theProfileName)
     {
         MAKE_GL_SCOPE_TIMER(CgShader_loadShaderProperties);
         GLShader::loadShaderProperties(theShaderNode, theShader);
@@ -191,11 +193,11 @@ namespace y60 {
             theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilenames[myFileIndex]);
             if (theShader._myFilename.empty()) {
                 throw ShaderException(string("Could not find cg-shader '") + myFilenames[myFileIndex] + "' in " +
-                        AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+                                      AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
             }
-         } else {
+        } else {
             throw ShaderException("bad number of program file names", PLUS_FILE_LINE);
-         }    
+        }    
         
         // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
         int myEntryIndex = 0;
@@ -213,9 +215,9 @@ namespace y60 {
             if (theShader._myEntryFunction.empty()) {
                 throw ShaderException("Empty entry function name provided in shader library", PLUS_FILE_LINE);
             }
-         } else {
+        } else {
             throw ShaderException("bad number of entry function names", PLUS_FILE_LINE);
-         }    
+        }    
         
 
         // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
@@ -242,15 +244,15 @@ namespace y60 {
         theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilename);
         if (theShader._myFilename.empty()) {
             throw ShaderException(string("Could not find cg-shader '") + myFilename + "' in " +
-                AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+                                  AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
         }
         theShader._myEntryFunction = theShaderNode->getAttributeString(CG_ENTRY_FUNCTION_PROPERTY);
         string myProfile = theShaderNode->getAttributeString(CG_PROFILE_PROPERTY);
         theShader._myProfile = ShaderProfile(asl::getEnumFromString(myProfile,
-                ShaderProfileStrings));
+                                                                    ShaderProfileStrings));
         if (theShaderNode->getAttribute(CG_COMPILERARGS_PROPERTY)) {
             processCompilerArgs(theShader._myCompilerArgs,
-                    theShaderNode->getAttributeString(CG_COMPILERARGS_PROPERTY));
+                                theShaderNode->getAttributeString(CG_COMPILERARGS_PROPERTY));
         }
 #endif
     }
@@ -263,7 +265,7 @@ namespace y60 {
             return ( ! _myFragmentShader._myFilename.empty());
         } else {
             throw ShaderException(string("Unknown Shadertype : ") + as_string(theShadertype) ,
-                    "CgMaterial::hasShader()" );
+                                  "CgMaterial::hasShader()" );
         }
     }
 
@@ -275,7 +277,7 @@ namespace y60 {
             return _myFragmentShader;
         } else {
             throw ShaderException(string("Unknown Shadertype : ") + as_string(theShadertype) ,
-                                    "CgMaterial::getShader()" );
+                                  "CgMaterial::getShader()" );
         }
     }
 
@@ -341,10 +343,10 @@ namespace y60 {
 
     void
     CgShader::bindBodyParams(const MaterialBase & theMaterial,
-            const Viewport & theViewport,
-            const LightVector & theLights,
-            const Body & theBody,
-            const Camera & theCamera)
+                             const Viewport & theViewport,
+                             const LightVector & theLights,
+                             const Body & theBody,
+                             const Camera & theCamera)
     {
         MAKE_GL_SCOPE_TIMER(CgShader_bindBodyParams);
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);

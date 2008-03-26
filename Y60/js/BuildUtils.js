@@ -186,6 +186,18 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     myRequiresDocNode.appendChild(myRequirementNode);
 }
 
+function removeMaterialRequirement(theMaterialNode, theRequirementClass) {
+
+    var myRequiresDocNode = theMaterialNode.find("//requires");
+
+    if (myRequiresDocNode) {
+        var myRequirement = myRequiresDocNode.find("//*[@name='" + 
+                                                   theRequirementClass +
+                                                   "']");
+        myRequiresDocNode.removeChild(myRequirement);
+    }
+}
+
 // build an <image> node
 function buildImageNode(theName, theFilename, theMipMapFlag)
 {
