@@ -169,24 +169,37 @@ namespace y60 {
         int myWidth = _myVStream->codec->width;
         int myHeight = _myVStream->codec->height;
 
+
         // pixelformat stuff
         Movie * myMovie = getMovie();
 		TextureInternalFormat myTextureFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
-        switch (myTextureFormat) {
+
+        TextureInternalFormat myTargetPixelFormat = myTextureFormat;
+        if (myMovie->get<TargetPixelFormatTag>() != "") {
+        	myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
+        }
+
+        switch (myTargetPixelFormat) {
             case TEXTURE_IFMT_RGBA8:
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
-                _myDestinationPixelFormat = PIX_FMT_RGBA32;
+                _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::RGBA);
                 myMovie->addRasterValue(createRasterValue( y60::RGBA, myWidth, myHeight), y60::RGBA, 1);                
                 break;
             case TEXTURE_IFMT_ALPHA:
-            case TEXTURE_IFMT_LUMINANCE8:
                 AC_TRACE << "Using GRAY pixels";
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
                 myMovie->addRasterValue(createRasterValue( y60::ALPHA, myWidth, myHeight), y60::ALPHA, 1);                
+                break;
+            case TEXTURE_IFMT_LUMINANCE8:
+                AC_TRACE << "Using GRAY pixels";
+                _myDestinationPixelFormat = PIX_FMT_GRAY8;
+                _myBytesPerPixel = 1;
+                myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth, myHeight), y60::GRAY, 1);                
                 break;
             case TEXTURE_IFMT_RGB8:
             default:
