@@ -14,7 +14,7 @@
 #include <y60/ASSDriver.h>
 #include <asl/UDPConnection.h>
 
-#include <oscpack/osc/OscOutboundPacketStream.h>
+#include <oscpack/OscOutboundPacketStream.h>
 
 namespace y60 {
 
