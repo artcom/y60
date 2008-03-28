@@ -48,7 +48,7 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLH
 
 namespace y60 {
 
-    const unsigned FFMpegDecoder2::FRAME_CACHE_SIZE = 8;
+    const unsigned FFMpegDecoder2::FRAME_CACHE_SIZE = 32;//8;
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
     asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
