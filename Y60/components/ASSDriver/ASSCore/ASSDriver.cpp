@@ -356,9 +356,9 @@ ASSDriver::curePoint( unsigned theX, unsigned theY ) {
 
 void
 ASSDriver::cureBrokenElectrodes() {
-    cureHLine( 5 ); // XXX
-    cureVLine(1);
-    curePoint( 23, 13 ); // XXX
+    //cureHLine( 5 ); // XXX
+    //cureVLine(1);
+    //curePoint( 23, 13 ); // XXX
     //setPointToValue(1,5);
     //curePoint(39,1);
     //for(unsigned i=0; i<20; i++) {
