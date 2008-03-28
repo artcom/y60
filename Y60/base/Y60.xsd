@@ -1230,6 +1230,13 @@ Flatshading is disabled by default.</xs:documentation>
 Texturing is enabled by default.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="alphatest" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns alpha test on/off. Alpha test is enabled by default
+                    and lets fragments with alpha > 0 pass.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="culling" type="xs:boolean">
                 <xs:annotation>
                     <xs:documentation>Turns culling on/off.

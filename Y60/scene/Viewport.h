@@ -48,6 +48,8 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ViewportCullingTag,         bool,          VIEWPORT_CULLING_ATTRIB,         true);
     DEFINE_ATTRIBUT_TAG(ViewportDebugCullingTag,    bool,          VIEWPORT_DEBUGCULLING_ATTRIB,    false);
     DEFINE_ATTRIBUT_TAG(ViewportTexturingTag,       bool,          VIEWPORT_TEXTURING_ATTRIB,       true);
+    DEFINE_ATTRIBUT_TAG(ViewportAlphaTestTag,       bool,          VIEWPORT_ALPHATEST_ATTRIB,
+    true);
     DEFINE_ATTRIBUT_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false);
     DEFINE_ATTRIBUT_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false);
 
@@ -66,6 +68,7 @@ namespace y60 {
 		public ViewportFlatshadingTag::Plug,
 		public ViewportCullingTag::Plug,
 		public ViewportDebugCullingTag::Plug,
+        public ViewportAlphaTestTag::Plug,
         public ViewportDrawNormalsTag::Plug,
         public ViewportDrawGlowTag::Plug,
         public dom::DynamicAttributePlug<ViewportTopTag, Viewport>,
@@ -90,6 +93,7 @@ namespace y60 {
                   ViewportTexturingTag::Plug(theNode),
                   ViewportCullingTag::Plug(theNode),
                   ViewportDebugCullingTag::Plug(theNode),
+                  ViewportAlphaTestTag::Plug(theNode),
                   ViewportDrawGlowTag::Plug(theNode),
                   ViewportDrawNormalsTag::Plug(theNode),
                   dom::DynamicAttributePlug<ViewportTopTag, Viewport>(this, &Viewport::getTop),

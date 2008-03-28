@@ -91,6 +91,7 @@ namespace y60 {
         CaptureDevicePtr myDevice = DecoderManager::get().findDecoder<CaptureDevice>(theUrl);
 
         if (!myDevice) {
+            AC_ERROR << "Capture::open(): could not load capture device!";
             return;
         }
         _myDevice = myDevice->instance();

@@ -1126,7 +1126,9 @@ namespace y60 {
 
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.
-        if (theViewport->get<ViewportDrawGlowTag>()) {
+        if (!theViewport->get<ViewportAlphaTestTag>() 
+            || theViewport->get<ViewportDrawGlowTag>()) 
+        {
             glDisable(GL_ALPHA_TEST);
         } else {
             glAlphaFunc(GL_GREATER, 0.0);
@@ -1232,7 +1234,9 @@ namespace y60 {
                     //int i = 0;
                     bool currentMaterialHasAlpha = false;
                     for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
-                        if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
+                        if (theViewport->get<ViewportAlphaTestTag>() 
+                            && !currentMaterialHasAlpha && it->first.getTransparencyFlag()) 
+                        {
                             glEnable(GL_ALPHA_TEST);
                             currentMaterialHasAlpha = true;
                         }

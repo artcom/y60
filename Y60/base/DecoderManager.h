@@ -61,7 +61,7 @@ class DecoderManager : public asl::Singleton<DecoderManager> {
                 AC_TRACE << "checking decoder #" << i;
                 asl::Ptr<DECODERTYPE> myDecoder = dynamic_cast_Ptr<DECODERTYPE>(_myDecoders[i]);
                 if (myDecoder) {
-                    std::string myMimeType = myDecoder->canDecode(theUrl, theSource);
+                    std::string myMimeType = _myDecoders[i]->canDecode(theUrl, theSource);
                     AC_TRACE << "decoder returned '" << myMimeType << "'";
                     if (!myMimeType.empty()) {
                         return myDecoder;

@@ -112,7 +112,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         var myRay = new Ray(myCameraPos, difference( theWorldPos, myCameraPos) );
         var myFarPos = intersection( myRay, theCamera.frustum.far_plane );
         var myLineSegment = new LineSegment(myCameraPos, myFarPos);
-        var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
+        var myWorld = _myRenderWindow.scene.dom.find("//world");
         
         var myIntersection = nearestIntersection(myWorld, myLineSegment);
         if (myIntersection) {
@@ -270,7 +270,6 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
     
     obj.pickIntersection = function(theScreenPixelX, theScreenPixelY) {
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
-        //var myWorld = getDescendantByTagName(_myRenderWindow.scene.dom, "world", true);
         var myWorld = _myRenderWindow.scene.dom.find("worlds/world");
         return nearestIntersection(myWorld, myLineSegment);
     }
