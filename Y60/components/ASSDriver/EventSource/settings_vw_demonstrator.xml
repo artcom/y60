@@ -1,0 +1,34 @@
+<settings>
+  <ASSDriver>
+    <ShowASSData min="0" max="1">1.00000</ShowASSData>
+    <SensorPosition step="1.00">[1359.70000,611.40000]</SensorPosition>
+    <SensorOrientation step="1.5707963">0</SensorOrientation>
+    <SensorScale step="0.1">[33.50000,33.50000]</SensorScale>
+    <MirrorX min="0" max="1">1.00000</MirrorX>
+    <MirrorY min="0" max="1">1.00000</MirrorY>
+    <GainPower step="0.5">2.00000</GainPower>
+    <CorrelationDistance step="0.5">4.00000</CorrelationDistance>
+    <ComponentThreshold>19.00000</ComponentThreshold>
+    <NoiseThreshold>15.00000</NoiseThreshold>
+    <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
+    <MinTouchInterval step="0.01">0.20000</MinTouchInterval>
+    <MinTouchThreshold step="0.1">9.0000</MinTouchThreshold>
+    <WatchedValue min="-1" step="1">[13.00000,5.00000]</WatchedValue>
+    <DumpValues min="0" max="1" step="1">0</DumpValues>
+    <CurrentValueDisplay min="0" max="3">0</CurrentValueDisplay>
+    <TransportLayer>serial</TransportLayer>
+    <SerialPort>5</SerialPort>
+    <UseUSB min="0" max="1">1</UseUSB>
+    <BaudRate>460800</BaudRate>
+    <BitsPerWord min="5" max="8">8</BitsPerWord>
+    <Parity>no_parity</Parity>
+    <StopBits min="1" max="2">1</StopBits>
+    <Handshaking min="0" max="1">0</Handshaking>
+    <DebugTouchEvents>0</DebugTouchEvents>
+    <ProbePosition>[-1,-1]</ProbePosition>
+    <ClampToScreen>0</ClampToScreen>
+    <EventQueueSize>100</EventQueueSize>
+    <CCRegion4MomentumFlag>0</CCRegion4MomentumFlag>
+    <MomentumRegion>[-2,-2,2,2]</MomentumRegion>
+  </ASSDriver>
+</settings>

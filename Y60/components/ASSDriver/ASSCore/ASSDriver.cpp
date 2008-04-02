@@ -23,8 +23,8 @@
 #endif
 
 #include <y60/SettingsParser.h>
-#include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
+#include <y60/ImageBuilder.h>
 #include <y60/AbstractRenderWindow.h>
 #include <y60/JSScriptablePlugin.h>
 #include <y60/Overlay.h>
@@ -56,15 +56,15 @@ const char * CMD_LEAVE_CONFIG_MODE("c99");
 const char * CMD_CALLIBRATE_TRANSMISSION_LEVEL( "c01");
 const char * CMD_PERFORM_TARA( "c02" );
 
-static const char * RAW_RASTER = "ASSRawRaster";
+    static const char * RAW_RASTER = "ASSRawRaster";
 static const char * FILTERED_RASTER = "ASSFilteredRaster";
 static const char * MOMENT_RASTER = "ASSMomentRaster";
 
 const unsigned int BEST_VERSION( 260 );
 
-const bool RESAMPLING = false;//true;
+const bool RESAMPLING = false;
 const unsigned int GRID_SCALE_X = 2;
-const unsigned int GRID_SCALE_Y = 1;
+const unsigned int GRID_SCALE_Y = 2;
 
 
 const float TOUCH_MARKER_LIFE_TIME( 1.0 );
@@ -92,17 +92,22 @@ ASSDriver::ASSDriver() :
     _myFirstDerivativeThreshold( 200 ),
     _myGainPower(2.0f),
     _myMinTouchInterval( 0.25 ),
+    _myMinTouchThreshold( 9 ),
     _myIDCounter( 0 ),
     _myDebugTouchEventsFlag( 0 ),
     _myLastFrameTime( asl::Time() ),
     _myRunTime(0.0),
     _myProbePosition( -1, -1),
+    _myInterpolationMethod(1),
+    _myCureBrokenElectrodesFlag(0),
 
     _myGridColor(0.5, 0.5, 0, 1.0),
     _myCursorColor(0.5, 0.5, 0, 1.0),
     _myTouchColor(1.0, 1.0, 1.0, 1.0),
     _myTextColor(1.0, 1.0, 1.0, 1.0),
     _myProbeColor(0.0, 0.75, 0.0, 1.0),
+    _myResampleColor(1.0, 0.0, 0.0, 1.0),
+
 
     _myClampToScreenFlag(false),
     _myWindow( 0 ),
@@ -162,7 +167,7 @@ ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize ) {
 
     unsigned myWidth = nextPowerOfTwo(_myGridSize[0] * GRID_SCALE_X );
     unsigned myHeight = nextPowerOfTwo( _myGridSize[1] * GRID_SCALE_Y );
-    AC_PRINT << "Allocating";
+    AC_PRINT << "Allocating" << myWidth << " " << myHeight;
     _myResampledRaster = allocateRaster("resampled_raster", myWidth, myHeight);
     AC_PRINT << "Alloc done";
 
@@ -248,14 +253,29 @@ struct AnalyseProximity {
     typename PixelT::value_type max;
 };
 
-template <class PixelT>
+template<class RASTER>
+void findMaximum(const RASTER & mat, MaximumResults & res)
+{
+    for (int y = 0; y < mat.vsize(); y++) {
+        for (int x = 0; x < mat.hsize(); x++) {
+            if(mat(x,y).get() > res.max) {
+                res.max = mat(x,y).get();
+                res.center[0] = x;
+                res.center[1] = y;
+            }   
+        }   
+    }       
+    
+}
+
+template <class RASTER>
 struct FindMaximum {
-    FindMaximum() :
-        max( 0 ) {}
-    void operator () (const PixelT & a) {
-        max = maximum( max, sqrt(float(a.get())));
+    FindMaximum()
+    {   result.max = 0; }
+    void operator () (const RASTER & theRaster) {
+        findMaximum(theRaster, result);
     }
-    float max;
+    MaximumResults result;
 };
 
 void
@@ -370,8 +390,10 @@ ASSDriver::cureBrokenElectrodes() {
 
 void
 ASSDriver::updateDerivedRasters() {
-
-    cureBrokenElectrodes();
+    
+    if(_myCureBrokenElectrodesFlag) {
+        cureBrokenElectrodes();
+    }
 
     const y60::RasterOfGRAY & myRawRaster = *
             dom::dynamic_cast_Value<y60::RasterOfGRAY>( & * (_myRawRaster.value) );
@@ -408,71 +430,177 @@ ASSDriver::processSensorValues(const ASSEvent & theEvent) {
     updateDerivedRasters();
 
 
+    //_myTmpPositions.clear();
 
 
 
     BlobListPtr myROIs;
     if (RESAMPLING) {
-        myROIs = connectedComponents( _myResampledRaster.raster, _myComponentThreshold);
+        //myROIs = connectedComponents( _myResampledRaster.raster, _myComponentThreshold);
+        
+        // take the peaks 
+        y60::RasterOfGRAY & myResampledRaster = *
+            dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myResampledRaster.value) );
+
+        // std::transform( myResampledRaster.begin(), myResampledRaster.end(),
+        //     myResampledRaster.begin(),
+        //     Threshold<gray<unsigned char> >( _myComponentThreshold ));
+        
+        asl::GRAY *pixels = myResampledRaster.begin();
+        unsigned width = _myResampledRaster.raster->width();
+        unsigned height = _myResampledRaster.raster->height();
+        for(unsigned y=0; y<height; y++) {
+                for(unsigned x=0; x<width; x++) {
+                        asl::GRAY val = *(pixels + myResampledRaster.offset(x,y));
+                        asl::gray<unsigned char> threshold = _myComponentThreshold;
+                        if( val.get() > _myComponentThreshold ){
+                            //AC_PRINT << val;
+                            _myTmpPositions.push_back(Vector2f(x/GRID_SCALE_X,y/GRID_SCALE_Y));
+                        }
+                    }   
+        }       
+        dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myResampledRaster.value) );
+        
+
     } else {
         myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
-    }
-
-    std::vector<MomentResults> myCurrentPositions;
-    computeCursorPositions( myCurrentPositions, myROIs);
-    correlatePositions( myCurrentPositions, myROIs, theEvent );
-    updateCursors( 1.0 / _myTransportLayer->getFramerate(), theEvent );
-}
-
-void
-ASSDriver::computeCursorPositions( std::vector<MomentResults> & theCurrentPositions, 
-                                   const BlobListPtr & theROIs)
-{
-    typedef subraster<gray<unsigned char> > SubRaster;
-    if (RESAMPLING) {
-        _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
-                    0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
-    }
-     for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
-        Box2i myBox = (*it)->bbox();
-        if (!_myUseCCRegionForMomentumFlag) {
-            Point2i myCenter = (*it)->bbox().getCenter();
-            Point2i myUpperLeft;
-            Point2i myUpperRight;
-            Point2i myLowerLeft;
-            Point2i myLowerRight;
-            _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
-            myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]), 
-                          min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
-        }
-        AnalyseMoment<SubRaster> myMomentAnalysis;
-        // XXX is this correct ?
-        if (RESAMPLING) {
-            _myResampledRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
-                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+        if(_myInterpolationMethod ) {
+            std::vector<MomentResults> myCurrentPositions;
+            computeCursorPositions( myCurrentPositions, myROIs);
+            correlatePositions( myCurrentPositions, myROIs, theEvent );
         } else {
-//            _myMomentRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
-//                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
-            _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
-                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
-         }
-
-        MomentResults myResult = myMomentAnalysis.result;
-        myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
-                                     float(myBox[Box2i::MIN][1]));
-
-        //AC_PRINT << "major angle: " << myMomentAnalysis.result.major_angle << " major dir: " << myMomentAnalysis.result.major_dir;
-        /*
-        AC_PRINT << "moment: w: " << myMomentAnalysis.result.w 
-                 << " l: " << myMomentAnalysis.result.l
-                 << " major dir: " << myMomentAnalysis.result.major_dir
-                 << " minor dir: " << myMomentAnalysis.result.minor_dir;
-                 */
-
-        theCurrentPositions.push_back( myResult );
+            std::vector<MaximumResults> myCurrentPositions;
+            computeCursorPositions( myCurrentPositions, myROIs);
+            correlatePositions( myCurrentPositions, myROIs, theEvent );
+        }
+        updateCursors( 1.0 / _myTransportLayer->getFramerate(), theEvent );
     }
 
+    
 }
+
+asl::Vector2f 
+ASSDriver::interpolateMaximum(const asl::Vector2f theCenter, float theMaximum) {
+    Vector2f myResult(0.0,0.0);
+
+    y60::RasterOfGRAY & myDenoisedRaster = *
+        dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
+
+    
+    float x0y0 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]-1).get();
+    float x1y0 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]-1).get();
+    float x2y0 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]-1).get();
+
+    float x0y1 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]).get();
+    float x1y1 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]).get();
+    float x2y1 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]).get();
+
+    float x0y2 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]+1).get();
+    float x1y2 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]+1).get();
+    float x2y2 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]+1).get();
+    
+    float x = theCenter[0]
+        + 0.125 * ((- (x0y0 / theMaximum)) + (x2y0 / theMaximum))
+        + 0.75  * ((- (x0y1 / theMaximum)) + (x2y1 / theMaximum))
+        - 0.125 * ((- (x0y2 / theMaximum)) + (x2y2 / theMaximum));
+
+    float y = theCenter[1]
+        + 0.125 * ((- (x0y0 / theMaximum)) + (x0y2 / theMaximum))
+        + 0.75  * ((- (x1y0 / theMaximum)) + (x1y2 / theMaximum))
+        - 0.125 * ((- (x2y0 / theMaximum)) + (x2y2 / theMaximum));
+    
+    myResult[0] = x;
+    myResult[1] = y;
+
+    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
+
+    return myResult;
+}
+
+
+    template<>
+    void
+    ASSDriver::computeCursorPositions<MomentResults>( std::vector<MomentResults> & theCurrentPositions, 
+                                                      const BlobListPtr & theROIs)
+    {
+        typedef subraster<gray<unsigned char> > SubRaster;
+        if (RESAMPLING) {
+            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+                                                    0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
+        }
+        for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
+            Box2i myBox = (*it)->bbox();
+        
+            FindMaximum<SubRaster> myMaxAnalysis;
+            _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                                             myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMaxAnalysis);
+       
+        
+            if (!_myUseCCRegionForMomentumFlag) {
+                Point2i myCenter = (*it)->bbox().getCenter();
+                Point2i myUpperLeft;
+                Point2i myUpperRight;
+                Point2i myLowerLeft;
+                Point2i myLowerRight;
+                _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
+                myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]), 
+                              min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
+            }
+            AnalyseMoment<SubRaster> myMomentAnalysis;
+            // XXX is this correct ?
+            if (RESAMPLING) {
+                _myResampledRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                                                  myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+            } else {
+                //            _myMomentRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                //                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+                _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                                                 myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+            }
+
+            MomentResults myResult = myMomentAnalysis.result;
+            myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
+                                         float(myBox[Box2i::MIN][1]));
+        
+            AC_TRACE << "moment position " << myResult.center;
+            theCurrentPositions.push_back( myResult );
+        }
+
+    }
+
+    template<>
+    void
+    ASSDriver::computeCursorPositions<MaximumResults>( std::vector<MaximumResults> & theCurrentPositions, 
+                                                       const BlobListPtr & theROIs)
+
+    {
+        typedef subraster<gray<unsigned char> > SubRaster;
+        if (RESAMPLING) {
+            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+                                                    0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
+        }
+        for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
+            Box2i myBox = (*it)->bbox();
+        
+            FindMaximum<SubRaster> myMaxAnalysis;
+            _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                                             myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMaxAnalysis);
+        
+            MaximumResults myResult = myMaxAnalysis.result;
+
+            myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
+                                         float(myBox[Box2i::MIN][1]));
+
+        
+            myResult.center = interpolateMaximum(myResult.center, myResult.max);
+
+            AC_TRACE << "maximum position " << myResult.center;
+            
+            theCurrentPositions.push_back( myResult );
+        }
+
+    }
+
 
 template <class N>
 N sqr(const N & n) {
@@ -508,7 +636,7 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
     float myTouch = 0;
     if ( myFirstDerivative > _myFirstDerivativeThreshold  &&
         _myRunTime - theCursorIt->second.lastTouchTime > _myMinTouchInterval &&
-        theCursorIt->second.intensity > 9) // XXX This should be tweakable! -pm
+        theCursorIt->second.intensity > _myMinTouchThreshold)
     {
         myTouch = theCursorIt->second.intensity;   
         //AC_PRINT << "touched me! at " << _myRunTime;
@@ -533,6 +661,7 @@ ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
 
 void
 ASSDriver::computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster) {
+
     const Vector2f & myPosition = theCursorIt->second.position;
     
     Vector2i myTopLeft;
@@ -611,9 +740,11 @@ ASSDriver::getTransformationMatrix() {
 
 #define PAVELS_CORRELATOR
 #ifdef PAVELS_CORRELATOR 
+template<>
 void 
-ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
+ASSDriver::correlatePositions<MomentResults>( const std::vector<MomentResults> & theCurrentPositions,
         const BlobListPtr theROIs, const ASSEvent & theEvent)
+
 {
 
     y60::RasterOfGRAY & myRawRaster = *
@@ -633,7 +764,7 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
     AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
     CursorMap::iterator myCursorIt  = _myCursors.begin();
     for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
-        computeIntensity(myCursorIt, myRawRaster);
+        //computeIntensity(myCursorIt, myRawRaster);
 
         myCursorIt->second.correlatedPosition = -1;
         for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
@@ -694,7 +825,119 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             int myNewID( _myIDCounter++ );
             AC_TRACE << "new cursor " <<myNewID<< " at " << theCurrentPositions[i].center;
             myCorrelatedPositions[i] = myNewID;
-            _myCursors.insert( make_pair( myNewID, Cursor( theCurrentPositions[i],
+            _myCursors.insert( make_pair( myNewID, MomentCursor( theCurrentPositions[i],
+                            asBox2f( myROIs[i]->bbox()) )));
+            _myCursors[myNewID].correlatedPosition = i;
+            createEvent( myNewID, "add", theCurrentPositions[i].center,
+                    applyTransform( theCurrentPositions[i].center, myTransform),
+                    asBox2f( myROIs[i]->bbox() ), _myCursors[myNewID].intensity,
+                    theEvent); // TODO
+        }
+    }
+
+    // Now let us iterate through all cursors and create "cursor remove" events for every uncorrelated cursors
+    for (CursorMap::iterator myIt = _myCursors.begin(); myIt != _myCursors.end(); ) {
+        // advance iterator to allow safe map erase while iterating
+        CursorMap::iterator nextIt = myIt;
+        ++nextIt;
+        if (myIt->second.correlatedPosition == -1) {
+            // cursor removed
+            createEvent( myIt->first, "remove", myIt->second.position,
+                    applyTransform( myIt->second.position, myTransform ),
+                    myIt->second.roi, 0 /*myCursor.intensity*/, theEvent); // TODO
+            AC_TRACE << "removing cursor "<<myIt->first<<" at " << myIt->second.correlatedPosition;
+            _myCursors.erase(myIt);
+        }
+        myIt = nextIt;
+    }
+
+    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) ); 
+}
+
+template<>
+void 
+ASSDriver::correlatePositions<MaximumResults>( const std::vector<MaximumResults> & theCurrentPositions,
+        const BlobListPtr theROIs, const ASSEvent & theEvent)
+
+{
+
+    y60::RasterOfGRAY & myRawRaster = *
+        dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
+
+    Matrix4f myTransform = getTransformationMatrix();
+
+    const BlobList & myROIs = * theROIs;
+
+    // populate a map with all distances between existing cursors and new positions 
+    typedef std::multimap<float, std::pair<int,int> > DistanceMap;
+    DistanceMap myDistanceMap;
+    float myDistanceThreshold = 4.0;
+    if (_myTransportLayer->getGridSpacing() > 0) {
+        myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
+    }
+    AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
+    CursorMap::iterator myCursorIt  = _myCursors.begin();
+    for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
+        //computeIntensity(myCursorIt, myRawRaster);
+
+        myCursorIt->second.correlatedPosition = -1;
+        for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
+            float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion
+                               - theCurrentPositions[i].center);
+            if (myDistance < myDistanceThreshold) {
+                myDistanceMap.insert(std::make_pair(myDistance, std::make_pair(i, myCursorIt->first)));
+            }
+        }
+    }
+
+    // will contain the correlated cursor id at index n for position n or -1 if uncorrelated
+    std::vector<int> myCorrelatedPositions(theCurrentPositions.size(), -1);
+
+    AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
+
+    // iterate through the distance map and correlate cursors in increasing distance order
+    for (DistanceMap::iterator dit = myDistanceMap.begin(); 
+            dit!=myDistanceMap.end(); ++dit)
+    {
+        // check if we already have correlated one of our nodes
+        int myPositionIndex = dit->second.first;
+        int myCursorId = dit->second.second;
+        if (_myCursors[myCursorId].correlatedPosition == -1) {
+            if (myCorrelatedPositions[myPositionIndex] == -1)  {
+                // correlate
+                myCorrelatedPositions[myPositionIndex] = myCursorId;
+                Cursor & myCursor = _myCursors[myCursorId];
+                myCursor.correlatedPosition = myPositionIndex;
+
+                AC_TRACE << "correlated cursor " << myCursorId << " with " << myPositionIndex;
+
+                // update cursor with new position
+                myCursor.motion = theCurrentPositions[myPositionIndex].center - myCursor.position;
+                myCursor.position = theCurrentPositions[myPositionIndex].center;
+                // TODO: intensity is not up-to-date yet, so we the previous intensity will be posted in the move event 
+                //myCursor.previousIntensity = myCursor.intensity;
+                //myCursor.intensity = theCurrentPositions[myPositionIndex].intensity;
+                myCursor.previousRoi = myCursor.roi;
+                myCursor.roi = asBox2f( myROIs[myPositionIndex]->bbox() );
+
+                // post a move event
+                createEvent( myCursorId, "move", myCursor.position,
+                        applyTransform( myCursor.position, myTransform),
+                        myCursor.roi, myCursor.intensity, theEvent); // TODO
+            }
+            // place an "else" block here for code if we want to allow to correlate multiple cursors to the same position,
+            // but he have to take care that they will be separated at some later point again
+        }
+    }
+
+    // Now let us iterate through all new positions and create "cursor add" events for every uncorrelated position
+    for (unsigned i = 0; i < theCurrentPositions.size(); ++i) {
+        if (myCorrelatedPositions[i] == -1)  {
+            // new cursor
+            int myNewID( _myIDCounter++ );
+            AC_TRACE << "new cursor " <<myNewID<< " at " << theCurrentPositions[i].center;
+            myCorrelatedPositions[i] = myNewID;
+            _myCursors.insert( make_pair( myNewID, MaximumCursor( theCurrentPositions[i],
                             asBox2f( myROIs[i]->bbox()) )));
             _myCursors[myNewID].correlatedPosition = i;
             createEvent( myNewID, "add", theCurrentPositions[i].center,
@@ -757,8 +1000,8 @@ ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPosi
             // cursor moved
             myCorrelatedIds.push_back( myMinDistIt->first );
             myMinDistIt->second.position = theCurrentPositions[i].center;
-            myMinDistIt->second.major_direction = theCurrentPositions[i].major_dir;
-            myMinDistIt->second.minor_direction = theCurrentPositions[i].minor_dir;
+            //myMinDistIt->second.major_direction = theCurrentPositions[i].major_dir;
+            //myMinDistIt->second.minor_direction = theCurrentPositions[i].minor_dir;
 
             myMinDistIt->second.previousRoi = myMinDistIt->second.roi;
             myMinDistIt->second.roi = asBox2f( myROIs[i]->bbox() );
@@ -861,7 +1104,14 @@ void
 ASSDriver::drawMarkers() {
     // draw origin
     drawCircle( Vector2f(0.0, 0.0), 0.15f, 36, _myGridColor );
-
+    
+    /*
+    std::vector<asl::Vector2f>::iterator myIt = _myTmpPositions.begin();
+    for (; myIt != _myTmpPositions.end(); ++myIt ) {
+        drawCircle(*myIt, 0.15f, 36, _myTouchColor);
+    }
+    */
+    
     // draw cursors
     CursorMap::iterator myIt = _myCursors.begin();
     for (; myIt != _myCursors.end(); ++myIt ) {
@@ -893,6 +1143,7 @@ ASSDriver::drawMarkers() {
     if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
         drawCircle( _myProbePosition, 0.15f, 36, _myProbeColor);
     }
+    
 }
 
 void
@@ -935,8 +1186,9 @@ ASSDriver::onPostRender(jslib::AbstractRenderWindow * theWindow) {
             if (_myTransportLayer) {
                 if ( _myTransportLayer->getState() == RUNNING ) {
                     glPushMatrix();
-                    glLoadMatrixf( static_cast<const GLfloat*>( getTransformationMatrix().getData()));
-
+                    Matrix4f myMat = getTransformationMatrix();
+                    glLoadMatrixf( static_cast<const GLfloat*>( myMat.getData()));
+                    
                     glDisable( GL_DEPTH_TEST );
 
                     drawGrid();
@@ -997,6 +1249,7 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
     GET_PROP( touchColor, _myTouchColor );
     GET_PROP( textColor, _myTextColor );
     GET_PROP( probeColor, _myProbeColor );
+    GET_PROP( resampleColor, _myResampleColor );
 
     // XXX: shearing hack
     GET_PROP( shearX, _myShearX );
@@ -1017,6 +1270,7 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
     SET_PROP( touchColor, _myTouchColor );
     SET_PROP( textColor, _myTextColor );
     SET_PROP( probeColor, _myProbeColor );
+    SET_PROP( resampleColor, _myResampleColor );
 
     // XXX: shearing hack
     SET_PROP( shearX, _myShearX );
@@ -1066,8 +1320,12 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
     getConfigSetting( theSettings, "DebugTouchEvents", _myDebugTouchEventsFlag, 0 );
     getConfigSetting( theSettings, "ProbePosition", _myProbePosition, Vector2f( -1, -1) );
     getConfigSetting( theSettings, "MinTouchInterval", _myMinTouchInterval, 0.25 );
+    getConfigSetting( theSettings, "MinTouchThreshold", _myMinTouchThreshold, 9.0f );
     getConfigSetting( theSettings, "ClampToScreen", _myClampToScreenFlag, 0);
     getConfigSetting( theSettings, "CCRegion4MomentumFlag", _myUseCCRegionForMomentumFlag, 0);
+    getConfigSetting( theSettings, "InterpolationMethod", _myInterpolationMethod, 1);
+    getConfigSetting( theSettings, "CureBrokenElectrodes", _myCureBrokenElectrodesFlag, 0);
+
     asl::Vector4f myMomentumRegion;
     getConfigSetting( theSettings, "MomentumRegion", myMomentumRegion, asl::Vector4f(-1,-1,1,1));
     _myUserDefinedMomentumBox = Box2i(int(myMomentumRegion[0]), int(myMomentumRegion[1]), int(myMomentumRegion[2]), int(myMomentumRegion[3])); 

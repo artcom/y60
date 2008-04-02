@@ -8,7 +8,11 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+#ifndef Y60_ASS_DRIVER_INCLUDED
+#define Y60_ASS_DRIVER_INCLUDED
+
 #include "TransportLayer.h"
+#include "Cursor.h"
 
 #include <asl/SerialDevice.h>
 #include <asl/Enum.h>
@@ -34,54 +38,6 @@ namespace y60 {
 
 //#define ASS_LATENCY_TEST
 
-struct Cursor {
-    Cursor() :
-            position(0.0, 0.0), 
-            major_direction(0.0, 0.0),
-            minor_direction(0.0, 0.0),
-            firstDerivative(0.0),
-            lastTouchTime(0.0),
-            intensity(0.0),
-            previousIntensity(0.0),
-            motion(0.0,0.0),
-            correlatedPosition(-1)
-    {
-        roi.makeEmpty();
-        previousRoi.makeEmpty();
-    }
-
-    Cursor(const asl::MomentResults & theMomentResult, const asl::Box2f & theBox) :
-            position( theMomentResult.center ), 
-            major_direction( theMomentResult.major_dir ),
-            minor_direction( theMomentResult.minor_dir ),
-            roi( theBox),
-            firstDerivative(0.0),
-            lastTouchTime(0.0),
-            intensity(0.0),
-            previousIntensity(0.0),
-            motion(0.0,0.0),
-            correlatedPosition(-1)
-    {
-        previousRoi.makeEmpty();
-    }
-
-    asl::Vector2f position;
-    asl::Vector2f major_direction;
-    asl::Vector2f minor_direction;
-    asl::Box2f    roi;
-    asl::Box2f    previousRoi;
-    float         intensity;
-    float         previousIntensity;
-    float         firstDerivative;
-    double        lastTouchTime;
-
-    std::deque<float> intensityHistory;
-    asl::Vector2f motion;
-    int correlatedPosition;
-
-};
-
-typedef std::map<int, Cursor> CursorMap;
 
 class ASSDriver :
     public jslib::IScriptablePlugin,
@@ -138,11 +94,30 @@ class ASSDriver :
                        const ASSEvent & theEvent);
         void computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster);
         float matchProximityPattern(const CursorMap::iterator & theCursorIt);
-        void computeCursorPositions( std::vector<asl::MomentResults> & theCurrentPositions,
-                                     const BlobListPtr & theROIs);
-        void correlatePositions( const std::vector<asl::MomentResults> & theCurrentPositions, 
-                                 const BlobListPtr theROIs, const ASSEvent & theEvent);
-//        void triggerUpload( const char * theRasterId );
+        //void computeCursorPositions( std::vector<asl::MomentResults> & theCurrentPositions,
+        //                             const BlobListPtr & theROIs);
+
+        
+    template<class RESULTS> 
+    void computeCursorPositions( std::vector<RESULTS> & theCurrentPositions,
+                                 const BlobListPtr & theROIs)
+    {
+        AC_ERROR << "how could this happen - we need a specialization here";
+    }
+
+    template<class RESULTS> 
+    void correlatePositions( const std::vector<RESULTS> & theCurrentPositions, 
+                             const BlobListPtr theROIs, const ASSEvent & theEvent)
+    {
+        AC_ERROR << "how could this happen - we need a specialization here";
+    }
+
+
+
+        asl::Vector2f interpolateMaximum(const asl::Vector2f theCenter, float theMaximum);
+
+
+        // void triggerUpload( const char * theRasterId );
         void queueCommand( const char * theCommand );
 
         asl::Vector3f applyTransform( const asl::Vector2f & theRawPosition,
@@ -170,6 +145,8 @@ class ASSDriver :
         RasterHandle _myMomentRaster;
         RasterHandle _myResampledRaster;
         std::vector<std::string> _myRasterNames;
+        
+        std::vector<asl::Vector2f> _myTmpPositions;
 
         y60::ScenePtr _myScene;
         jslib::AbstractRenderWindow *  _myWindow;
@@ -182,6 +159,9 @@ class ASSDriver :
         float       _myFirstDerivativeThreshold;
         float       _myGainPower;
         double      _myMinTouchInterval;
+        float       _myMinTouchThreshold;
+        int         _myInterpolationMethod;
+        int         _myCureBrokenElectrodesFlag;
 
         CursorMap   _myCursors;
 
@@ -204,6 +184,7 @@ class ASSDriver :
         asl::Vector4f _myTouchColor;
         asl::Vector4f _myTextColor;
         asl::Vector4f _myProbeColor;
+        asl::Vector4f _myResampleColor;
 
         TransportLayerPtr _myTransportLayer;
         dom::NodePtr      _mySettings;
@@ -220,4 +201,21 @@ class ASSDriver :
 #endif
 };
 
+    template<>
+    void ASSDriver::computeCursorPositions<asl::MomentResults>( std::vector<asl::MomentResults> & theCurrentPositions, 
+                                                                const BlobListPtr & theROIs);
+    template<>
+    void ASSDriver::computeCursorPositions<MaximumResults>( std::vector<MaximumResults> & theCurrentPositions, 
+                                                                const BlobListPtr & theROIs);
+
+    template <>
+    void ASSDriver::correlatePositions<asl::MomentResults>( const std::vector<asl::MomentResults> & theCurrentPositions,
+                                                            const BlobListPtr theROIs, const ASSEvent & theEvent);
+    template <>
+    void ASSDriver::correlatePositions<MaximumResults>( const std::vector<MaximumResults> & theCurrentPositions,
+                                                            const BlobListPtr theROIs, const ASSEvent & theEvent);
+
+
 } // end of namespace
+
+#endif // Y60_ASS_DRIVERS_INCLUDED

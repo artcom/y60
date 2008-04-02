@@ -67,7 +67,6 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
-        //window.position = [0, 0];
         window.decorations = false;
         _myPicking = new Picking(window);
         window.resize(theWidth, theHeight);
@@ -85,6 +84,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.camera.frustum.type = ProjectionType.orthonormal;
         window.camera.frustum.width = 400;
         window.camera.position.z = 40;
+        window.position = [0, 0]; //1200];
 
         //window.canvas.backgroundcolor = [1,1,1,1];
 
@@ -203,7 +203,7 @@ if (__main__ == "ASSDriverTest") {
     try {
         var ourASSDriverTestApp = new ASSDriverTestApp(arguments);
         //ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
-        ourASSDriverTestApp.setup(1400, 1050, "ASSDriverTest");
+        ourASSDriverTestApp.setup(1400, 660, "ASSDriverTest");
         //ourASSDriverTestApp.setup(1920, 1280, "ASSDriverTest");
         ourASSDriverTestApp.go();
     } catch (ex) {
