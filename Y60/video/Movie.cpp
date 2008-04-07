@@ -307,7 +307,7 @@ namespace y60 {
                                                  + " has negative currentframe and a invalid "
                                                  + "framecount, trying a wraparound with " 
                                                  + "invalid framecount will fail-> calling "
-                                                 + "explicit ensureFramecount will help";
+                                                 + "explicit ensureMovieFramecount() will help";
                         ASSURE_MSG(get<FrameCountTag>() != -1, myErrorMsg.c_str());
                         return;
                     }
