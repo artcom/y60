@@ -269,7 +269,9 @@ namespace y60 {
         AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp <<
                 " myTimeUnitsPerSecond=" << myTimeUnitsPerSecond;
         AC_DEBUG << "_myLastVideoTimestamp=" << _myLastVideoTimestamp;
-
+        if (myFrameTimestamp == _myLastVideoTimestamp) {
+            return theTime;
+        }
         if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
             setEOF(true);
@@ -286,8 +288,6 @@ namespace y60 {
         AC_DEBUG << "--- decodeFrame ---" << endl;
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
         int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
-
-
         if (_myVStream->index_entries != NULL) {
             if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
                 (theTimestamp < _myLastVideoTimestamp || theTimestamp >
