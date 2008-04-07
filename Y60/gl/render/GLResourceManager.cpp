@@ -407,7 +407,7 @@ namespace y60 {
             }
             */
 
-            // First allocate the texture with power of two dimensions
+            // First allocate the texture
             glTexImage2D(GL_TEXTURE_2D, 0,
                     myPixelEncoding.internalformat,
                     myTexWidth, myTexHeight, 0,

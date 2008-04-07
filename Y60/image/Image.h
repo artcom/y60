@@ -115,8 +115,6 @@ namespace y60 {
                 return 0;
             }
 
-            void dropRasterValueNodeData();
-
             dom::NodePtr getRasterValueNode(unsigned theChildNodeNum = 0) const {
 				if (getNode().hasChildNodes() ) {
 					dom::NodePtr myValueElement = getNode().childNode(theChildNodeNum);
