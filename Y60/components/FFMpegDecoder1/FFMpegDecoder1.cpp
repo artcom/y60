@@ -178,6 +178,9 @@ namespace y60 {
         if (myMovie->get<TargetPixelFormatTag>() != "") {
             TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
             switch(myTargetPixelFormat) {
+                case TEXTURE_IFMT_RGBA8:
+                    myRasterEncoding = RGBA;
+                    break;                
                 case TEXTURE_IFMT_ALPHA:
                     myRasterEncoding = ALPHA;
                     break;
