@@ -310,7 +310,9 @@ namespace y60 {
 
         // setup flags
         ImagePtr myImage = getImage();
-        if (myImage && myImage->getNode().nodeVersion() != _myImageNodeVersion) {
+        //if (myImage && myImage.getNode().nodeVersion() != _myImageNodeVersion) {
+        if (myImage && myImage->getRasterValueNode()->nodeVersion() != _myImageNodeVersion) {
+//            bool myImageMatchesTextureFlag = true;//_myResourceManager->imageMatchesGLTexture(myTexture);
             bool myImageMatchesTextureFlag = _myResourceManager->imageMatchesGLTexture(myTexture);
             if (!myImageMatchesTextureFlag) {
                 myForceSetupFlag = true;
@@ -319,7 +321,8 @@ namespace y60 {
                 myImageContentChangedFlag = true;
             }
 
-            _myImageNodeVersion = myImage->getNode().nodeVersion();
+            //_myImageNodeVersion = myImage->getNode().nodeVersion();
+            _myImageNodeVersion = myImage->getRasterValueNode()->nodeVersion();
         } 
 
         // perform actions
