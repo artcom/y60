@@ -658,13 +658,24 @@ namespace y60 {
  
         Movie * myMovie = getMovie();
         AC_TRACE << "PF=" << myMovie->get<RasterPixelFormatTag>();
-        
-		TextureInternalFormat myRasterPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), TextureInternalFormatStrings));
+
+        PixelEncoding myRasterEncoding = PixelEncoding(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), PixelEncodingString));
 
         // TargetPixelFormatTag is the format the incoming movieframe will be converted in
-        TextureInternalFormat myTargetPixelFormat = myRasterPixelFormat;
         if (myMovie->get<TargetPixelFormatTag>() != "") {
-        	myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
+            TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
+            switch(myTargetPixelFormat) {
+                case TEXTURE_IFMT_ALPHA:
+                    myRasterEncoding = ALPHA;
+                    break;
+
+                case TEXTURE_IFMT_LUMINANCE:
+                case TEXTURE_IFMT_LUMINANCE8:
+                case TEXTURE_IFMT_LUMINANCE16:
+                case TEXTURE_IFMT_INTENSITY:
+                    myRasterEncoding = GRAY;
+                    break;
+            }
         }
 
         // Setup size and image matrix
@@ -673,29 +684,29 @@ namespace y60 {
         
 //        myRasterPixelFormat = TEXTURE_IFMT_ALPHA;
         
-        switch (myTargetPixelFormat) {            
-            case TEXTURE_IFMT_RGBA8:
+        switch (myRasterEncoding) {            
+            case RGBA:
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGRA);
                 myMovie->addRasterValue(createRasterValue( y60::BGRA, _myFrameWidth, _myFrameHeight), y60::BGRA, 1);                
                 break;
-            case TEXTURE_IFMT_ALPHA:
+            case ALPHA:
             	AC_TRACE << "Using Alpha pixels";
 	            _myDestinationPixelFormat = PIX_FMT_GRAY8;
 	            _myBytesPerPixel = 1;
 	            myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
 	            myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
 	            break;
-            case TEXTURE_IFMT_LUMINANCE8:
+            case GRAY:
                 AC_TRACE << "Using GRAY pixels";
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);                
                 break;
-            case TEXTURE_IFMT_RGB8:
+            case RGB:
             default:
                 AC_TRACE << "Using BGR pixels";
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
