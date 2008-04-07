@@ -664,7 +664,6 @@ namespace y60 {
         // TargetPixelFormatTag is the format the incoming movieframe will be converted in
         if (myMovie->get<TargetPixelFormatTag>() != "") {
             TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
-            AC_PRINT << myMovie->get<TargetPixelFormatTag>() << " -> " << myTargetPixelFormat;
             switch(myTargetPixelFormat) {
                 case TEXTURE_IFMT_RGBA8:
                     myRasterEncoding = RGBA;
