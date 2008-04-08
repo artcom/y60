@@ -73,7 +73,7 @@ namespace dom {
     {
         asl::Unsigned64 myDictCatSize = 0;
         theSource.readUnsigned64(myDictCatSize, theSource.size() - sizeof(asl::Unsigned64));
-        asl::AC_SIZE_TYPE thePos =  theSource.size() - myDictCatSize;
+        asl::AC_SIZE_TYPE thePos =  theSource.size() - asl::AC_SIZE_TYPE(myDictCatSize);
         thePos = theDictionaries.debinarize(theSource, thePos);
         thePos = theCatalog.debinarize(theSource, thePos);
         asl::Unsigned64 mySize;

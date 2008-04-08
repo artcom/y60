@@ -2548,7 +2548,7 @@ dom::Node::loadChildren() {
     DictionariesPtr myDictsPtr = myIDRegistry->getDictionaries();
     asl::ReadableStream & mySource = myIDRegistry->getStorage()->getStream();
 
-    asl::AC_SIZE_TYPE myPos = _myChildrenList.debinarize(mySource, getChildrenPosition(), *myDictsPtr, LAZY);
+    asl::AC_SIZE_TYPE myPos = _myChildrenList.debinarize(mySource, asl::AC_SIZE_TYPE(getChildrenPosition()), *myDictsPtr, LAZY);
     _lazyChildren = false;
 }
 
@@ -2749,7 +2749,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
             NodeOffsetCatalog & myCatalog = getIDRegistry()->getOffsetCatalog();
             asl::AC_SIZE_TYPE myIndex = NodeOffsetCatalog::InvalidIndex;
             if (myCatalog.findNodeOffset(getSavePosition(), myIndex)) {
-                thePos = myCatalog.getNodeEndOffset(myIndex);
+                thePos = asl::AC_SIZE_TYPE(myCatalog.getNodeEndOffset(myIndex));
             } else {
                 throw OffsetNotFound(asl::as_string(getSavePosition()), PLUS_FILE_LINE);
             }
