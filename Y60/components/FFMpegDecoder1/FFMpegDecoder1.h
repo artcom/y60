@@ -111,7 +111,7 @@ namespace y60 {
         void closeMovie();
 
         /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
-        bool decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
+        bool decodeFrame(double & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
     
         // Convert frame from yuv to rgb
         void convertFrame(AVFrame* theFrame, dom::ResizeableRasterPtr theTargetRaster);
@@ -127,7 +127,7 @@ namespace y60 {
         // All Timestamp variables are in movie time units (We've seen 1/90000 and 1/25 second
         // time units in movies).
         int64_t           _myStartTimestamp;
-        int64_t           _myLastVideoTimestamp;
+        double           _myLastVideoTimestamp;
         int               _myDestinationPixelFormat;
         unsigned          _myBytesPerPixel;
 

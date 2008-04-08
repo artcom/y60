@@ -199,8 +199,8 @@ namespace y60 {
                 AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
-                myMovie->createRaster(myWidth, myHeight, 1, y60::RGBA);
-                myMovie->addRasterValue(createRasterValue( y60::RGBA, myWidth, myHeight), y60::RGBA, 1);                
+                myMovie->createRaster(myWidth, myHeight, 1, y60::BGRA);
+                myMovie->addRasterValue(createRasterValue( y60::BGRA, myWidth, myHeight), y60::BGRA, 1);                
                 break;
             case ALPHA:
                 AC_TRACE << "Using GRAY pixels";
@@ -231,7 +231,7 @@ namespace y60 {
 
         // framerate
         double myFPS;
-        myFPS = (1.0 / av_q2d(_myVStream->codec->time_base));
+        myFPS = av_q2d(_myVStream->r_frame_rate);
         myMovie->set<FrameRateTag>(myFPS);
 
         // duration
@@ -241,11 +241,13 @@ namespace y60 {
                 myVCodec->codec_id == CODEC_ID_MPEG2VIDEO ) {
             myMovie->set<FrameCountTag>(-1);
         } else {
-            myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration
-                                            * av_q2d(_myVStream->time_base)));
+            myMovie->set<FrameCountTag>(int(_myVStream->duration));
+	    //    myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration
+        //                                    * av_q2d(_myVStream->time_base)));
         }
 
 
+    
         _myLastVideoTimestamp = 0;
 
         // Get Starttime
@@ -263,8 +265,8 @@ namespace y60 {
     double
     FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
         // theTime is in seconds,
-        int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
-        int64_t myFrameTimestamp = (int64_t)(theTime * myTimeUnitsPerSecond) + _myStartTimestamp;
+        double myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
+        double myFrameTimestamp = theTime * myTimeUnitsPerSecond + _myStartTimestamp;
 
         AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp <<
                 " myTimeUnitsPerSecond=" << myTimeUnitsPerSecond;
@@ -284,10 +286,10 @@ namespace y60 {
 
     // TODO: Make theTimestamp an input-only parameter.
     bool
-    FFMpegDecoder1::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder1::decodeFrame(double & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
         AC_DEBUG << "--- decodeFrame ---" << endl;
-        int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
-        int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
+        double myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
+        double myTimePerFrame = myTimeUnitsPerSecond / getFrameRate();
         if (_myVStream->index_entries != NULL) {
             if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
                 (theTimestamp < _myLastVideoTimestamp || theTimestamp >
@@ -298,7 +300,7 @@ namespace y60 {
 
                 // [ch] If we seek directly to the seek timestamp the packet sometimes cannot be decoded afterwards.
                 // Therefore this workaround seeks a bit (0.01 Frames) before the requested timestamp
-                int64_t mySeekTimestamp = theTimestamp-myTimePerFrame/100;
+                int64_t mySeekTimestamp = int64_t(theTimestamp-myTimePerFrame/100);
                 if (mySeekTimestamp < 0) {
                     mySeekTimestamp = 0;
                 }
