@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2007, ART+COM AG Berlin
+// Copyright (C) 2008, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -18,16 +18,19 @@
 
 
 uint8_t detectNumberOfTransmitters(void){
+    //not implemented yet!
+    //  ...
     return 0;
 }
 
 
 uint8_t detectNumberOfReceivers(void){
+    //not implemented yet!
+    //  ...
     return 0;
 }
 
 
-////////////
 void activateFirstLine(void){
 	//set data high
 	PORT_TR_DATA |= _BV(TR_DATA); //Data
@@ -260,6 +263,10 @@ uint8_t i;
 
 /////////////////////
 void EEPROM_write(uint16_t uiAddress, uint8_t ucData){
+    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){//EEPROM is locked by DIP switch 8
+        return;
+    }
+
     /* Wait for completion of previous write */
     while(EECR & (1<<EEWE))
         ;

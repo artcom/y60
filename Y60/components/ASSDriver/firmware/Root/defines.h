@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2007, ART+COM AG Berlin
+// Copyright (C) 2008, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -16,14 +16,14 @@
 //=== Configuration ==========================================================
 
 #define VERSION    1
-#define SUBVERSION 6
+#define SUBVERSION 5//7 //kept 5 for be compatible to ASS Driver
 
 #define DEFAULT_ID                    0
 #define DEFAULT_MATRIX_WIDTH          20
 #define DEFAULT_MATRIX_HEIGTH         10
 #define DEFAULT_SCAN_FREQUENCY        20  //Hz (max 100Hz, min 16Hz)
 #define DEFAULT_VOLTAGE_TRANSMITTER   106 //=5V *21,2(*1/V)
-#define DEFAULT_GRID_SPACING          100 //mm
+#define DEFAULT_GRID_SPACING          50  //mm
 #define DEFAULT_BAUD_RATE             0   //0 = 57600bps
                                           //1 = 115200bps
                                           //2 = 230400bps
@@ -33,27 +33,27 @@
 
 //=== Don't change anything below this line! =================================
 
-#define MAX_MATRIX_WIDTH  50//40
-#define MAX_MATRIX_HEIGTH 25
+#define MAX_MATRIX_WIDTH  120//40
+#define MAX_MATRIX_HEIGTH 50
 
 #define MIN_SCAN_FREQUENCY 16//Hz (lower frequencies don't work as g_scanPeriod is 16-bit integer)
 #define MAX_SCAN_FREQUENCY 100//Hz (additional restrictions apply!)
 
-#define UART0_BAUD_RATE_LS 9600
-#define UART0_BAUD_RATE_HS 57600 //will be scaled by factors 2, 4, 8, 16 up to 921600 bps
-#define UART0_MAX_BAUD_RATE_FACTOR 4
+#define UART_BAUD_RATE_LS 9600
+#define UART_BAUD_RATE_HS 57600 //will be scaled by factors 2, 4, 8, 16 up to 921600 bps
+#define UART_MAX_BAUD_RATE_FACTOR 4
 
-#define MIN_GRID_SPACING  10 //mm
+#define MIN_GRID_SPACING   5 //mm
 #define MAX_GRID_SPACING 200 //mm
 
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
-#define MIN_DELTA_T_ROW  750 //us
+#define MIN_DELTA_T_ROW  750+500 //us
 
 #define VZERO   10
 
-//#define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
-#define LENGTH_STATUS_MSG 2+3*5 //adjust to actual number of transmitted status bytes per frame
+#define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
+//#define LENGTH_STATUS_MSG 2+3*5 //adjust to actual number of transmitted status bytes per frame
 
 #define ABS_MODE 1
 #define REL_MODE 2
@@ -69,8 +69,9 @@
 
 //DIP Switch Functions
 #define DIP_AUTO_SWITCH_TO_REL_MODE   0
-#define DIP_RTS_CONTROL               5 //to disable/enable control of data transmission via RTS
-#define DIP_ETHERNET_PORT             6 //if on USB-UART operates at low speed (9600bps)
+#define DIP_UART_SELECT               4
+#define DIP_RTS_CONTROL               5
+#define DIP_UART_LOW_SPEED            6
 #define DIP_EEPROM_LOCK               7
 
 
@@ -85,7 +86,7 @@
 #define EEPROM_LOC_GRID_SPACING        0x07
 #define EEPROM_LOC_ID                  0x08
 
-#define EEPROM_FORMAT_KEY 0x1234
+#define EEPROM_FORMAT_KEY 0x77BB
 
 uint8_t g_matrixWidth;
 uint8_t g_matrixHeigth;
@@ -100,6 +101,7 @@ uint8_t g_DIPSwitch;
 uint8_t g_UARTBytesReceived, g_arg1, g_arg2, g_PMinX,  g_PMinY, g_PMaxX,  g_PMaxY;
 uint8_t g_BaudRateFactor;
 uint8_t g_UART_mode;
+uint8_t g_UART_select;
 uint8_t g_dataTransmitMode;
 uint8_t g_T1[256];
 #define LS 0
@@ -240,5 +242,6 @@ uint8_t detectNumberOfReceivers(void);
 void    handleConfigRequests(void);
 void    sendByte(uint8_t);
 void    sendInt(uint8_t);
+void    processReceivedByte(uint8_t c);
 
 #endif

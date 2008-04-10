@@ -14,17 +14,20 @@
 /*
  * Perform UART startup initialization.
  */
-void	uart0_init(void);
+void uart0_init(void);
+void uart1_init(void);
 
 /*
  * Send one character to the UART.
  */
-int	uart0_putchar(char c, FILE *stream);
+int uart0_putchar(char c, FILE *stream);
+int uart1_putchar(char c, FILE *stream);
 
 /*
  * Size of internal line buffer used by uart_getchar().
  */
-#define RX0_BUFSIZE 80
+#define RX0_BUFSIZE 40
+#define RX1_BUFSIZE 40
 
 /*
  * Receive one character from the UART.  The actual reception is
@@ -32,3 +35,4 @@ int	uart0_putchar(char c, FILE *stream);
  * each invokation.
  */
 int	uart0_getchar(FILE *stream);
+int	uart1_getchar(FILE *stream);

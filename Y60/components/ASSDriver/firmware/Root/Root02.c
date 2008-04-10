@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2007, ART+COM AG Berlin
+// Copyright (C) 2008, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -11,6 +11,8 @@
 //#define TEST_MODE
 #define COL_CORRECTION
 #define SEND_STATUS_BYTES
+
+#define TESTBUFFERLENGTH 20
 
 #include <avr/interrupt.h>
 #include <stdlib.h>
@@ -35,6 +37,33 @@ This fuses ON:
 All other fuses OFF
 */
 
+/*
+DIP Switch
+    1       On: Perform automatic calibration on power-up after 4 sec.
+            Off: Disable automatic calibration on power-up
+
+    2       On:
+            Off:
+
+    3       On:
+            Off:
+
+    4       On:
+            Off:
+
+    5       On: Use Com1/Xport for communication
+            Off: Use Com0/USB for communication
+
+    6       On: CTS line is ignored
+            Off: System is forced in config mode when CTS is passive (only valid when UART0 is selected)
+
+    7       On: UART runs at low speed (9600bps); Set up functions available only (via x[CR])
+            Off: regular data at selected high speed on UART
+
+    8       On: EEPROM parameters locked
+            Off: EEPROM accessible for parameter write
+*/
+
 //=== Globals ================================================================
 uint8_t  g_rowBuffer[MAX_MATRIX_WIDTH], g_colAverage[MAX_MATRIX_WIDTH];
 uint8_t  g_RTB_Write_Pointer=0, g_RTB_Read_Pointer=0, g_RTB_Filled=0, g_PacketCounter=0;
@@ -56,11 +85,10 @@ uint8_t  g_ConfigMode=0, g_NextCommand=0;
 
 uint8_t  g_maxMinLevelRequest=0, g_XYLevelRequest=0, g_maxLevel, g_minLevel, g_XYLevel;
 
-
 uint16_t ADCValue_C0, ADCValue_C1;
 
-
 FILE    g_uart0_str = FDEV_SETUP_STREAM(uart0_putchar, uart0_getchar, _FDEV_SETUP_RW);
+FILE    g_uart1_str = FDEV_SETUP_STREAM(uart1_putchar, uart1_getchar, _FDEV_SETUP_RW);
 
 const char configWelcomeMsg[] PROGMEM = "\nCommands:\
 \nC01      Auto-calibrate transmission level\
@@ -151,9 +179,7 @@ uint8_t i, i2;
     ADCSRA = _BV(ADEN) | 7;              //prescaler = 128
 
 
-    //===  init UART ==================
-	//uart0_init(); //do that call later when main timer interrupt is running as this functions needs access to DIP switches
-	stdout = &g_uart0_str;
+    //===  prepare UART init ==================
     PORT_CTS |= _BV(CTS); //toggle CTS to force FTDI chip to flush buffer
     DDR_CTS |= _BV(CTS);
     DDR_RTS &= ~_BV(RTS); //set RTS to input (is used to turn on/off data transmission to host; this feature
@@ -194,7 +220,7 @@ uint8_t i, i2;
     }
 
     g_BaudRateFactor = EEPROM_read(EEPROM_LOC_BAUD_RATE);
-    if( g_BaudRateFactor > UART0_MAX_BAUD_RATE_FACTOR){
+    if( g_BaudRateFactor > UART_MAX_BAUD_RATE_FACTOR){
         EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
         g_BaudRateFactor = DEFAULT_BAUD_RATE;
     }
@@ -273,7 +299,7 @@ uint32_t bw;
     //check required bandwidth
     bw = (uint32_t)w*h*f*10 + LENGTH_STATUS_MSG*10;
     bw += bw/10; //10% increase to have some buffer
-    if(bw > (((uint32_t)UART0_BAUD_RATE_HS)<<g_BaudRateFactor)){
+    if(bw > (((uint32_t)UART_BAUD_RATE_HS)<<g_BaudRateFactor)){
         em = 1;
     }
 
@@ -351,54 +377,109 @@ PORT_AUX0 ^= _BV(AUX0); //AUX0
 
 
 void sendByte(uint8_t b){
+    if(g_UART_select == 0){
+        //use UART0
+        UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
 
-    UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
-
-    if(g_RTB_Filled >= (TBUFFER_SIZE-1)){
-        g_errorState |= ERROR_TBUFFER;
-    }else{
-        g_RTB_Write_Pointer++;
-        if(g_RTB_Write_Pointer >= TBUFFER_SIZE){
-            g_RTB_Write_Pointer = 0;
-        }
-        g_rowTransmissionBuffer[g_RTB_Write_Pointer] = b;
-        g_RTB_Filled++;
-
-        if(g_PacketCounter == 0){ //currrently no transmission is going on
-            //start transmission when buffer length is reached
-            if(g_RTB_Filled >= TX_PACKET_SIZE){
-                PORT_CTS &= ~_BV(CTS);
-                UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-                g_PacketCounter = TX_PACKET_SIZE;
+        if(g_RTB_Filled >= (TBUFFER_SIZE-1)){
+            g_errorState |= ERROR_TBUFFER;
+        }else{
+            g_RTB_Write_Pointer++;
+            if(g_RTB_Write_Pointer >= TBUFFER_SIZE){
+                g_RTB_Write_Pointer = 0;
             }
+            g_rowTransmissionBuffer[g_RTB_Write_Pointer] = b;
+            g_RTB_Filled++;
+
+            if(g_PacketCounter == 0){ //currrently no transmission is going on
+                //start transmission when buffer length is reached
+                if(g_RTB_Filled >= TX_PACKET_SIZE){
+                    PORT_CTS &= ~_BV(CTS);
+                    UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+                    g_PacketCounter = TX_PACKET_SIZE;
+                }
+            }
+        }
+
+        if(g_PacketCounter > 0){ //transmit remaining/new bytes
+            UCSR0B |= _BV(UDRIE0); // enable data register empty interrupt
         }
     }
 
-    if(g_PacketCounter > 0){ //transmit remaining/new bytes
-        UCSR0B |= _BV(UDRIE0); // enable data register empty interrupt
+    if(g_UART_select == 1){
+        //use UART1
+        UCSR1B &= ~_BV(UDRIE1); // disable USART interrupt
+
+        if(g_RTB_Filled >= (TBUFFER_SIZE-1)){
+            g_errorState |= ERROR_TBUFFER;
+        }else{
+            g_RTB_Write_Pointer++;
+            if(g_RTB_Write_Pointer >= TBUFFER_SIZE){
+                g_RTB_Write_Pointer = 0;
+            }
+            g_rowTransmissionBuffer[g_RTB_Write_Pointer] = b;
+            g_RTB_Filled++;
+
+            if(g_PacketCounter == 0){ //currrently no transmission is going on
+                //start transmission when buffer length is reached
+                if(g_RTB_Filled >= TX_PACKET_SIZE){
+                    UDR1 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+                    g_PacketCounter = TX_PACKET_SIZE;
+                }
+            }
+        }
+
+        if(g_PacketCounter > 0){ //transmit remaining/new bytes
+            UCSR1B |= _BV(UDRIE1); // enable data register empty interrupt
+        }
     }
 }
 
 
 ISR( USART0_UDRE_vect ) {
-
-    g_RTB_Read_Pointer++;
-    if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
-        g_RTB_Read_Pointer = 0;
-    }
-    g_RTB_Filled--;
-    g_PacketCounter--;
-    if(g_PacketCounter > 0){
-		//send next byte
-		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
-    }else{
-        //check if still more bytes then package size, that is a full package, are left
-        if(g_RTB_Filled >= TX_PACKET_SIZE){
-            g_PacketCounter = TX_PACKET_SIZE;//start new package
-            UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+    if(g_UART_select == 0){//UART0 is active
+        g_RTB_Read_Pointer++;
+        if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
+            g_RTB_Read_Pointer = 0;
+        }
+        g_RTB_Filled--;
+        g_PacketCounter--;
+        if(g_PacketCounter > 0){
+		    //send next byte
+    		UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
         }else{
-            UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
-            PORT_CTS |= _BV(CTS);
+            //check if still more bytes then package size, that is a full package, are left
+            if(g_RTB_Filled >= TX_PACKET_SIZE){
+                g_PacketCounter = TX_PACKET_SIZE;//start new package
+                UDR0 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+            }else{
+                UCSR0B &= ~_BV(UDRIE0); // disable USART interrupt
+                PORT_CTS |= _BV(CTS);
+            }
+        }
+	}
+}
+
+
+ISR( USART1_UDRE_vect ) {
+    if(g_UART_select == 1){//UART1 is active
+        g_RTB_Read_Pointer++;
+        if(g_RTB_Read_Pointer >= TBUFFER_SIZE){
+            g_RTB_Read_Pointer = 0;
+        }
+        g_RTB_Filled--;
+        g_PacketCounter--;
+        if(g_PacketCounter > 0){
+		    //send next byte
+    		UDR1 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+        }else{
+            //check if still more bytes then package size, that is a full package, are left
+            if(g_RTB_Filled >= TX_PACKET_SIZE){
+                g_PacketCounter = TX_PACKET_SIZE;//start new package
+                UDR1 = g_rowTransmissionBuffer[g_RTB_Read_Pointer];
+            }else{
+                UCSR1B &= ~_BV(UDRIE1); // disable USART interrupt
+            }
         }
 	}
 }
@@ -536,19 +617,34 @@ uint16_t checksum;
 uint8_t  tVoltage;
 uint8_t  ADCcounter=0;
 uint8_t  sc2=0, sc3=0;
-uint8_t  statusBytesRingCounter=0;
-uint8_t  UCSR0B_old;
+//uint8_t  statusBytesRingCounter=0;
+uint8_t  UCSRnB_old;
 
 #ifdef TEST_MODE
-uint8_t  testBuffer[20];
+uint8_t  testBuffer[TESTBUFFERLENGTH];
 #endif
 
 
     init();
-    //make sure timer interrupt has been called at least twice
+    //make sure timer interrupt has been called at least once (to get secure DIP-Switch readings)
     g_mainTimer = 0;
     while(g_mainTimer < 2);
-    uart0_init();
+
+    //decide which UART to use depending on DIP switch no. 5
+    if((g_DIPSwitch&_BV(DIP_UART_SELECT)) == 0){
+        g_UART_select = 0; //use UART0
+    }else{
+        g_UART_select = 1; //use UART1
+    }
+
+    if(g_UART_select == 0){
+        stdout = &g_uart0_str;
+        uart0_init();
+    }else{
+        stdout = &g_uart1_str;
+        uart1_init();
+        g_ConfigMode = 1;//in COM1-Version always start in config mode as there is no CTS control
+    }
 
 
 #ifdef TEST_MODE
@@ -572,6 +668,7 @@ uint8_t  testBuffer[20];
         //  [...]
     }
 
+
 	//initialize scanning
 	autoCalTimer = 4*1000; //4sec; automated calibration 4 seconds after power up
 	g_mainTimer = 0;
@@ -583,29 +680,32 @@ uint8_t  testBuffer[20];
 
     PORT_CLK_EN |= _BV(CLK_EN); //CLK_EN ->high to enable outputs
 
-    //main scan loop
+
+
+    //MAIN SCAN LOOP
 	while(1){
 		if(g_readState == 1){
         //begin of row sampling
-//PORT_AUX0 |= _BV(AUX0); //AUX0
-if(g_currentRow == 0){
-    PORT_AUX1 |= _BV(AUX1); //AUX1
-}
 			g_readState++;
 
-			//switch to next row
+			//switch transmitter to next row
 			next_row = g_currentRow + 1;
-			if(next_row >= (g_matrixHeigth+1)){ // +1: ther is one extra row sample that determines average values
+			if(next_row >= (g_matrixHeigth+1)){ // +1: there is one extra row sampling to determine average line load
 				next_row = 0;
             }
 			activateTransmitter(next_row);
 
-			//read in current row (takes approx. 5us per byte // 100us for 20 cols, 200us for 40 cols, 250us for 50 cols //+ interrupt calls!!)
+			//read in current row
 	        SPICounter = 0;
-            //temporarly turn off UART interrupts --> no transmission is going on during row read out time!!!
+            //temporarly turn off UART RX interrupts during row read in
             cli();
-            UCSR0B_old = UCSR0B;
-            UCSR0B &= ~(_BV(RXCIE0)|_BV(UDRIE0));
+            if(g_UART_select == 0){
+                UCSRnB_old = UCSR0B;
+                UCSR0B &= ~(_BV(RXCIE0)|_BV(UDRIE0));
+            }else{
+                UCSRnB_old = UCSR1B;
+                UCSR1B &= ~(_BV(RXCIE1)|_BV(UDRIE1));
+            }
             //wait for reception complete
 asm (      "sbis 0x0E,7"  );//SPSR,SPIF
 asm (      "rjmp .-4"     );
@@ -624,11 +724,14 @@ asm (          "rjmp .-4"     );
                 SPICounter++;
             }while(SPICounter < g_matrixWidth);
             //turn all UART interrupts back on
-            UCSR0B = UCSR0B_old;
+            if(g_UART_select == 0){
+                UCSR0B = UCSRnB_old;
+            }else{
+                UCSR1B = UCSRnB_old;
+            }
             sei();
     		//all bytes received
     		rowReceptionComplete = 1;
-
 		}
 
 
@@ -636,7 +739,7 @@ asm (          "rjmp .-4"     );
 		if(rowReceptionComplete){
 			rowReceptionComplete = 0;
 
-            //search for grid points with max/min levels
+            //search for grid points with max/min levels when requested
             if(g_maxMinLevelRequest == 2){
                 if(g_currentRow < g_matrixHeigth){
     	    	    for(ix=0; ix<g_matrixWidth; ix++){
@@ -652,12 +755,12 @@ asm (          "rjmp .-4"     );
                             g_PMinY = g_currentRow;
                         }
                     }
-                }else{//don't include last row (average scan)
+                }else{//don't include last row (average scan) in max/min levels
                     g_maxMinLevelRequest = 0;
                 }
             }
 
-            //grab level at designated coordinates
+            //grab level at designated coordinates when requested
             if(g_XYLevelRequest == 1){
                 if(g_currentRow < g_matrixHeigth){
                     if(g_currentRow == g_arg2){
@@ -705,22 +808,24 @@ asm (          "rjmp .-4"     );
 		        	fprintf(stdout, "\n");
                     //fprintf(stdout, "%4.u ", ADCValue_C0);
     	    	}
-        		if(g_currentRow < 19){
+        		if(g_currentRow < TESTBUFFERLENGTH){
                     //copy values
-                    if(1){
+                    if(1){//if true sample column
                         if(g_currentRow<g_matrixHeigth)
-                            testBuffer[g_currentRow] = g_rowBuffer[12];
+                            testBuffer[g_currentRow] = g_rowBuffer[12]; //sample column 12
                         else
                             testBuffer[g_currentRow] = 0;
-                    }
-                    else if(g_currentRow == 0){
-                        for(i=0; i<10; i++){
-                            if(i<g_matrixWidth)
-                                testBuffer[i] = g_rowBuffer[i];
-                            else
-                                testBuffer[i] = 0;
+                    }else{
+                        if(g_currentRow == 3){ //sample row 3
+                            for(i=0; i<TESTBUFFERLENGTH; i++){
+                                if(i<g_matrixWidth)
+                                    testBuffer[i] = g_rowBuffer[i];
+                                else
+                                    testBuffer[i] = 0;
+                            }
                         }
                     }
+                    //print test values one at a time
     		  		v1 = testBuffer[g_currentRow];
 	        		fprintf(stdout, "%3.u ", v1);
     	    	}
@@ -729,7 +834,7 @@ asm (          "rjmp .-4"     );
                 //if enabled by corresponding DIP switch transmit only when RTS is passive
                 if((g_dataTransmitMode&(1+4)) != (1+4)){
         		   	//line is ready to send to host
-                    //send via UART only if UART high speed mode is enabled
+                    //send data only if UART high speed mode is enabled
                     if(g_UART_mode == HS){
                         if(g_currentRow < g_matrixHeigth){//don't send average sample
                             //copy bytes to TX buffer
@@ -738,7 +843,7 @@ asm (          "rjmp .-4"     );
                             for(ix=0; ix<g_matrixWidth; ix++){
                                 //limit byte value to range 0-254
                                 v1 = g_rowBuffer[ix];
-                                if(v1 > 254){
+                                if(v1 == 255){//substitute 255 by 254 because 255 is a reserved special character
                                     v1 = 254;
                                 }
                                 sendByte(v1);
@@ -746,71 +851,71 @@ asm (          "rjmp .-4"     );
                             }
                         }else{//send info bytes
                             g_FrameNumber++;//increment frame number
-#ifdef SEND_STATUS_BYTES
+  #ifdef SEND_STATUS_BYTES
                             //send header bytes
                             sendByte(255);//reserved byte to indicate start of header bytes/start of frame
                             sendByte(0);
-                            switch(statusBytesRingCounter){
-                                case 0:
+//                            switch(statusBytesRingCounter){
+//                                case 0:
                                     //send version
                                     sendByte('V');
                                     sendInt(VERSION);
                                     sendInt(SUBVERSION);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 1:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 1:
                                     //send status
                                     sendByte('S');
                                     sendInt(0);
                                     sendInt(g_status);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 2:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 2:
                                     //send ID
                                     sendByte('I');
                                     sendInt(0);
                                     sendInt(g_ID);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 3:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 3:
                                     //send mode
                                     sendByte('M');
                                     sendInt(0);
                                     sendInt(g_mode);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 4:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 4:
                                     //send scan frequency
                                     sendByte('F');
                                     sendInt(0);
                                     sendInt(g_scanFrequency);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 5:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 5:
                                     //send width
                                     sendByte('W');
                                     sendInt(0);
                                     sendInt(g_matrixWidth);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 6:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 6:
                                     //send heigth
                                     sendByte('H');
                                     sendInt(0);
                                     sendInt(g_matrixHeigth);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 7:
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 7:
                                     //send grid size
                                     sendByte('G');
                                     sendInt(0);
                                     sendInt(g_gridSpacing);
-                                    statusBytesRingCounter++;
-                                    break;
-                                case 8:
-                                default:
-                                    statusBytesRingCounter = 0;
-                            }
+//                                    statusBytesRingCounter++;
+//                                    break;
+//                                case 8:
+//                                default:
+//                                    statusBytesRingCounter = 0;
+//                            }
                             //send frame number
                             sendByte('N');
                             sendInt(g_FrameNumber>>8);
@@ -821,17 +926,15 @@ asm (          "rjmp .-4"     );
                             sendInt(checksum&255);
                             checksum = 0;
                             //make sure that correct number of bytes is in header file (LENGTH_STATUS_MSG)
-#endif
+  #endif
                          }
                     }
                 }
 #endif
             }
             //switch to next line
-        	g_currentRow++;
-        	if(g_currentRow >= (g_matrixHeigth+1)){
-    	    	g_currentRow = 0;
-
+        	g_currentRow = next_row;
+        	if(g_currentRow == 0){
                 if(g_maxMinLevelRequest == 1){
                     g_maxMinLevelRequest = 2;
                     g_maxLevel = 0;
@@ -839,16 +942,13 @@ asm (          "rjmp .-4"     );
                 }
             }
             //end of row sampling
-            //max 1,1us for reading rows of 40 cols. (including COL_CORRECTION)
             //quite some time is lost in sendByte(); optimizing this function will speed up things tremendously
- //   PORT_AUX0 &= ~_BV(AUX0); //AUX0
-    PORT_AUX1 &= ~_BV(AUX1); //AUX1
 	    }
 
         //check if system should switch to config mode because of RTS active
         if((g_dataTransmitMode&1) != 0){
             if((g_dataTransmitMode&4) != 0){//RTS-line
-                g_ConfigMode = 2;//skip welcome message and directly go to step 2
+                g_ConfigMode = 2;//skip config mode welcome message and directly go to step 2
             }
         }
 
@@ -890,8 +990,8 @@ asm (          "rjmp .-4"     );
                     }
                 }else{
                     //reduce voltage and try again
-                    if(tVoltage > 70){ //minium level is 65 (3V)
-                        tVoltage -= 5;
+                    if(tVoltage > 70){ //minium level is 70 (3V)
+                        tVoltage -= 5; //search in -5 steps
                         setDACValue(tVoltage);
                         //get maximum levels
                         g_maxMinLevelRequest = 1;
@@ -955,8 +1055,8 @@ asm (          "rjmp .-4"     );
             }
 
             //process DIP switch no. 6
-            if((g_DIPSwitch&_BV(DIP_RTS_CONTROL)) == 0){
-                g_dataTransmitMode |= 1; //indicate that data transmission is controlled by RTS
+            if((g_DIPSwitch&_BV(DIP_RTS_CONTROL)) == 0  &&  g_UART_select == 0){//only applicable when uart0 is selected
+                g_dataTransmitMode |= 1; //set flag: data transmission is controlled by RTS
             }else{
                 g_dataTransmitMode &= ~1;
             }
@@ -1020,7 +1120,59 @@ asm (          "rjmp .-4"     );
 *****    serial command reception processing                           ***
 *************************************************************************/
 ISR( USART0_RX_vect ) {
-uint8_t i, j, c;
+uint8_t c;
+
+    if(g_UART_select == 0){ //UART0 is selected
+        //check error bits first
+        c = UCSR0A;
+        if((c&_BV(FE0)) != 0){
+            //framing error occured; ignore byte
+            //clear receive buffer
+            g_UARTBytesReceived=0;
+            //dummy read to clear RXC0
+            c = UDR0;
+        }else{
+            //read in byte
+            c = UDR0;
+            processReceivedByte(c);
+        }
+    }else{
+        //dummy read to clear RXC0
+        c = UDR0;
+    }
+
+    return;
+}
+
+
+ISR( USART1_RX_vect ) {
+uint8_t c;
+
+    if(g_UART_select == 1){ //UART1 is selected
+        //check error bits first
+        c = UCSR1A;
+        if((c&_BV(FE1)) != 0){
+            //framing error occured; ignore byte
+            //clear receive buffer
+            g_UARTBytesReceived=0;
+            //dummy read to clear RXC1
+            c = UDR1;
+        }else{
+            //read in byte
+            c = UDR1;
+            processReceivedByte(c);
+        }
+    }else{
+        //dummy read to clear RXC1
+        c = UDR1;
+    }
+
+    return;
+}
+
+
+void processReceivedByte(uint8_t c){
+uint8_t i, j;
 
 #define CR 13
 #define LF 10
@@ -1066,19 +1218,6 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                              {"C98"},      \
                              {"C99"}};
 
-    //check error bits first
-    c = UCSR0A;
-    if((c&_BV(FE0)) != 0){
-        //framing error occured; ignore byte
-        //clear receive buffer
-        g_UARTBytesReceived=0;
-        //dummy read to clear RXC0
-        c = UDR0;
-        return;
-    }
-
-    //read byte
-    c = UDR0;
 
     //ignore LF
     if(c == LF){
@@ -1258,7 +1397,11 @@ static uint16_t pointer1=0;
         if(g_ConfigMode == 1){//while g_ConfigMode=1 print welcome message
             if(pointer1 == 0){
                 //clear current transmission
-                UCSR0B &= ~ _BV(UDRIE0); // disable USART interrupt
+                if(g_UART_select == 0){
+                    UCSR0B &= ~ _BV(UDRIE0); // disable USART interrupt
+                }else{
+                    UCSR1B &= ~ _BV(UDRIE1); // disable USART interrupt
+                }
                 g_RTB_Filled = g_RTB_Write_Pointer = g_RTB_Read_Pointer = g_PacketCounter = 0;
 
                 pointer1 = &configWelcomeMsg;
@@ -1269,7 +1412,11 @@ static uint16_t pointer1=0;
                 g_ConfigMode = 2;
                 pointer1 = 0;
             }else{
-                uart0_putchar(e, stdout);
+                if(g_UART_select == 0){
+                    uart0_putchar(e, stdout);
+                }else{
+                    uart1_putchar(e, stdout);
+                }
             }
         }else if(g_ConfigMode == 2){//wait for command
             switch(g_NextCommand){
@@ -1383,7 +1530,7 @@ static uint16_t pointer1=0;
                     if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
-                        if(g_arg1 > UART0_MAX_BAUD_RATE_FACTOR){
+                        if(g_arg1 > UART_MAX_BAUD_RATE_FACTOR){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             e = g_BaudRateFactor;
