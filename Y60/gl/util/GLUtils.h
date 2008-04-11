@@ -34,6 +34,20 @@
 	#define AC_USE_NSGL
 #endif
 
+#ifdef AC_USE_OSX_CGL
+
+	//#include <OpenGL/gl.h>
+	//#include <OpenGL/glu.h>
+	//#include <OpenGL/glext.h>
+	#include <GL/gl.h>
+	#include <GL/glext.h>
+	#include <GL/glu.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+	#include <GL/glext.h>
+#endif
+
 #ifdef OSX
 #ifdef AC_USE_OSX_CGL
 #define Cursor X11_Cursor
@@ -42,18 +56,6 @@
 #endif
 #endif
 
-#ifdef AC_USE_OSX_CGL
-	//#include <OpenGL/gl.h>
-	//#include <OpenGL/glu.h>
-	//#include <OpenGL/glext.h>
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-	#include <GL/glext.h>
-#else
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-	#include <GL/glext.h>
-#endif
 
 // window system extensions
 #ifdef WIN32
@@ -283,6 +285,11 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 #define GL_DRAW_FRAMEBUFFER_EXT         0x8CA9
 #define GL_DRAW_FRAMEBUFFER_BINDING_EXT 0x8CA6
 #define GL_READ_FRAMEBUFFER_BINDING_EXT 0x8CAA
+
+#endif
+
+#ifndef PFNGLBLITFRAMEBUFFEREXTPROC_DEFINDED
+#define PFNGLBLITFRAMEBUFFEREXTPROC_DEFINDED
 typedef void (APIENTRYP PFNGLBLITFRAMEBUFFEREXTPROC) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
                             GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
                             GLbitfield mask, GLenum filter);
@@ -291,13 +298,16 @@ typedef void (APIENTRYP PFNGLBLITFRAMEBUFFEREXTPROC) (GLint srcX0, GLint srcY0, 
 DEF_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT );
 #define glBlitFramebufferEXT _ac_glBlitFramebufferEXT
 
-#ifndef GL_EXT_framebuffer_multisample
+#ifndef GL_MAX_SAMPLES_EXT
 // XXX these should come from the gl.h header but currently don't (Jan.2007)
 //     they do now, at least on current nvidia-glx. revisit. (Aug.2007)
-#define GL_EXT_framebuffer_multisample 1
 #define GL_RENDERBUFFER_SAMPLES_EXT               0x8CAB
 #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT 0x8D56
 #define GL_MAX_SAMPLES_EXT                        0x8D57
+#endif
+
+#ifndef PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC_DEFINED
+#define PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC_DEFINED
 typedef void (APIENTRYP PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
 #endif
 

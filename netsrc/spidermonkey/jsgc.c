@@ -186,7 +186,7 @@ typedef struct JSGCPageInfo {
 #include <unistd.h>
 #endif
 
-typedef uint64 cycles_t;
+typedef js_uint64 cycles_t;
 
 #define USE_TIME_OF_DAY  
 
@@ -199,7 +199,7 @@ js_get_cycles() {
     uint32 a = 0;
     uint32 d = 0; 
     asm volatile("rdtsc" : "=a" (a), "=d" (d)); 
-    (ret) = ((uint64)a) | (((uint64)d)<<32); 
+    (ret) = ((js_uint64)a) | (((js_uint64)d)<<32); 
     return ret;
 }
 #    endif

@@ -50,6 +50,7 @@ namespace y60 {
         dom::FacadeAttributePlug<TextureImageTag>(this),
 #endif
         dom::FacadeAttributePlug<TextureParamChangedTag>(this),
+        dom::FacadeAttributePlug<TextureNPOTMatrixTag>(this),
         _myResourceManager(0),
         _myRefCount(0),
         _myTextureId(0), 
@@ -333,7 +334,9 @@ namespace y60 {
         AC_TRACE << "ForceSetupFlag(2) : " << myForceSetupFlag << " myImageContentChangedFlag : " << myImageContentChangedFlag;
         if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
+            AC_TRACE << "set<TextureIdTag>("<<_myTextureId<<")";
             set<TextureIdTag>(_myTextureId);
+            AC_TRACE << "get<TextureIdTag>() = "<<get<TextureIdTag>();
         } else {
             if (isDirty<TextureParamChangedTag>()) {
                 _myResourceManager->updateTextureParams(myTexture);

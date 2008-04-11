@@ -81,17 +81,17 @@ extern int gettimeofday(struct timeval *tv);
 #endif /* XP_UNIX */
 
 #ifdef XP_MAC
-static uint64 			 dstLocalBaseMicroseconds;
+static js_uint64 			 dstLocalBaseMicroseconds;
 static unsigned long	 gJanuaryFirst1970Seconds;
 
 static void MacintoshInitializeTime(void)
 {
-    uint64					upTime;
+    js_uint64					upTime;
     unsigned long			currentLocalTimeSeconds,
 	   startupTimeSeconds;
-    uint64				startupTimeMicroSeconds;
+    js_uint64				startupTimeMicroSeconds;
     uint32				upTimeSeconds;
-    uint64				oneMillion, upTimeSecondsLong, microSecondsToSeconds;
+    js_uint64				oneMillion, upTimeSecondsLong, microSecondsToSeconds;
     DateTimeRec				firstSecondOfUnixTime;
 
     /*

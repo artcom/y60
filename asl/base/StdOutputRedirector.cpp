@@ -87,23 +87,23 @@ namespace asl {
     StdOutputRedirector::init(const Arguments & theArguments) {
         
         if (theArguments.haveOption("--std-logfile")) {
-            const char * myEnv = getenv(LOG_WRAPAROUND_FILESIZE);       
+            const char * myEnv = ::getenv(LOG_WRAPAROUND_FILESIZE);       
             if (myEnv) {
                 string mylogFileSize(myEnv);             
                 _myMaximumFileSize = asl::as<long>(mylogFileSize);    
             }
-            myEnv = getenv(LOG_CREATE_ON_EACH_RUN); 
+            myEnv = ::getenv(LOG_CREATE_ON_EACH_RUN); 
             if (myEnv) { 
                 string myTmpStr(myEnv);
                 _myLogInOneFileFlag = !(strcmp(toLowerCase(myTmpStr).c_str(), "true") == 0);  
             }
-            myEnv = getenv(LOG_REMOVE_OLD_ARCHIVE); 
+            myEnv = ::getenv(LOG_REMOVE_OLD_ARCHIVE); 
             if (myEnv) { 
                 string myTmpStr(myEnv);
                 _myRemoveOldArchiveFlag = (strcmp(toLowerCase(myTmpStr).c_str(), "true") == 0);
             }
             
-            myEnv = getenv(LOG_WRAPAROUND_CHECK_SEC); 
+            myEnv = ::getenv(LOG_WRAPAROUND_CHECK_SEC); 
             if (myEnv) { 
                 string myTmpStr(myEnv);
                 _myFileSizeCheckFrequInSec = asl::as<long>(myTmpStr);     

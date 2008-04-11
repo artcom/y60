@@ -47,5 +47,39 @@ namespace y60 {
                         asl::getStringFromEnum(theEncoding, y60::PixelEncodingString), PLUS_FILE_LINE);
         }
     }
-
+    std::string getGLEnumString(GLenum theFormat) {
+        switch (theFormat) {
+            case GL_DEPTH_COMPONENT: return "GL_DEPTH_COMPONENT"; 
+            case GL_ALPHA: return "GL_ALPHA"; 
+            case GL_LUMINANCE8: return "GL_LUMINANCE8"; 
+            case GL_LUMINANCE16: return "GL_LUMINANCE16"; 
+            case GL_INTENSITY: return "GL_INTENSITY"; 
+            case GL_RGB8: return "GL_RGB8"; 
+            case GL_RGB: return "GL_RGB"; 
+            case GL_BGR: return "GL_BGR"; 
+            case GL_RGBA8: return "GL_RGBA8"; 
+            case GL_BGRA: return "GL_BGRA"; 
+            case GL_UNSIGNED_BYTE: return "GL_UNSIGNED_BYTE"; 
+            case GL_UNSIGNED_SHORT: return "GL_UNSIGNED_SHORT"; 
+            case GL_SHORT: return "GL_SHORT"; 
+            case GL_UNSIGNED_INT: return "GL_UNSIGNED_INT"; 
+            case GL_COMPRESSED_RGB_ARB: return "GL_COMPRESSED_RGB_ARB"; 
+            case GL_COMPRESSED_RGBA_ARB: return "GL_COMPRESSED_RGBA_ARB"; 
+            case GL_COMPRESSED_ALPHA_ARB: return "GL_COMPRESSED_ALPHA_ARB"; 
+            case GL_COMPRESSED_LUMINANCE_ARB: return "GL_COMPRESSED_LUMINANCE_ARB"; 
+            case GL_COMPRESSED_LUMINANCE_ALPHA_ARB: return "GL_COMPRESSED_LUMINANCE_ALPHA_ARB"; 
+            case GL_COMPRESSED_INTENSITY_ARB: return "GL_COMPRESSED_INTENSITY_ARB"; 
+            case GL_COMPRESSED_RGB_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGB_S3TC_DXT1_EXT"; 
+            case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT1_EXT"; 
+            case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT3_EXT"; 
+            case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; 
+            case GL_RGBA16F_ARB: return "GL_RGBA16F_ARB"; 
+            case GL_RGB16F_ARB: return "GL_RGB16F_ARB"; 
+            case GL_RGBA_FLOAT32_ATI: return "GL_RGBA_FLOAT32_ATI"; 
+            case GL_RGB_FLOAT32_ATI: return "GL_RGB_FLOAT32_ATI"; 
+            case GL_HALF_FLOAT_ARB: return "GL_HALF_FLOAT_ARB"; 
+            case GL_FLOAT: return "GL_FLOAT"; 
+            default:return std::string("UNKNOWN_GL_ENUM=")+asl::as_string(theFormat);
+        }
+    }
 }

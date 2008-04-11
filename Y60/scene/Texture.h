@@ -56,6 +56,7 @@ namespace y60 {
 #ifdef BAD_TX
         public dom::FacadeAttributePlug<TextureImageTag>,
 #endif
+        public dom::FacadeAttributePlug<TextureNPOTMatrixTag>,
         public dom::FacadeAttributePlug<TextureParamChangedTag>
     {
         public:
@@ -104,6 +105,13 @@ namespace y60 {
 
             virtual void registerDependenciesRegistrators();
 
+            /// Get texture mem usage.
+            unsigned getTextureMemUsage() const {
+                return _myTextureMemUsage;
+            }
+            void setTextureMemUsage(unsigned theAmount) {
+                _myTextureMemUsage = theAmount;
+            }
         protected:
             // Some violated our styleguide rule by using a protected member variable (_myResourceManager) here
             // and it promply fell on our feet. Please do not use protected member variables. A derived class
@@ -115,6 +123,7 @@ namespace y60 {
             unsigned _myTextureId;
             unsigned _myPixelBufferId;
             unsigned _myImageNodeVersion;
+            unsigned _myTextureMemUsage;
 
             Texture();
 

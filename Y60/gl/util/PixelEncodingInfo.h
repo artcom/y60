@@ -19,6 +19,7 @@
 
 #include <string>
 #include <stdio.h>
+#include <iostream>
 
 #include "GLUtils.h"
 
@@ -44,5 +45,14 @@ namespace y60 {
         bool     compressedFlag;
     };
     PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
-}
+    std::string getGLEnumString(GLenum theFormat);
+    inline
+    std::ostream & operator<<(std::ostream & os, const PixelEncodingInfo & theInfo) {
+        os << "externalformat: " << getGLEnumString(theInfo.externalformat);
+        os << ", internalformat: " << getGLEnumString(theInfo.internalformat);
+        os << ", pixeltype: " << getGLEnumString(theInfo.pixeltype);
+        os << ", bytesPerPixel: " << theInfo.bytesPerPixel;
+        os << ", compressedFlag: " << theInfo.compressedFlag;
+    }
+ }
 #endif

@@ -26,7 +26,7 @@
 
 #ifdef OSX
 #include <mach/mach.h>
-#include <kvm.h>
+//#include <kvm.h>
 #include <paths.h>
 #include <sys/sysctl.h>
 #include <Carbon/Carbon.h>
@@ -287,13 +287,17 @@ namespace asl {
         mach_port_t myTask;
         myStatus = task_for_pid(mach_task_self(), thePid, & myTask);
         if ( myStatus != KERN_SUCCESS) {
-            throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
+            AC_ERROR << "Mach call failed: " << mach_error_string(myStatus);
+            return 0;
+            //throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
         }
         struct task_basic_info myTaskInfo;
         mach_msg_type_number_t myCount = TASK_BASIC_INFO_COUNT;
         myStatus = task_info(myTask, TASK_BASIC_INFO, (task_info_t)& myTaskInfo, & myCount);
         if ( myStatus != KERN_SUCCESS) {
-            throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
+            AC_ERROR << "Mach call failed: " << mach_error_string(myStatus);
+            return 0;
+            //throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
         }
 
         // [DS] dunno exactly if this is correct ... but it works;

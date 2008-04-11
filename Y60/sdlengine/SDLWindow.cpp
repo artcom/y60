@@ -878,7 +878,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 #endif
 #ifdef AC_USE_OSX_CGL
-    const long myInterval = theInterval;  
+    const GLint myInterval = theInterval;  
     CGLError myError = CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &myInterval);
     if (myError != 0) {
         AC_WARNING << "Cannot set swap interval, error=" << CGLErrorString(myError) << ", " <<

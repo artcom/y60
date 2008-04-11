@@ -128,7 +128,7 @@ namespace asl {
         static unsigned getDefaultCapacity() {
             static unsigned myDefaultCapacity = UNKNOWN;
             if (myDefaultCapacity == UNKNOWN) {
-                char * myCapacityString = getenv("Y60_AGP_VERTEX_MEMORY");
+                char * myCapacityString = ::getenv("Y60_AGP_VERTEX_MEMORY");
                 if (myCapacityString) {
                     unsigned myCapacity = asl::as<unsigned>(myCapacityString);
                     if (myCapacity > 0) {

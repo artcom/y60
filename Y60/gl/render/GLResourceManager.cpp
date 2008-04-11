@@ -8,6 +8,13 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/* 
+PM: We might consider to rewrite the texture handling od GLResourceManger and scene/Texture in a way that the
+Resourcemanager does not modify any state in texture, but that texture more directly reflects the GL state.
+E.g. modifying the texture size should then result in an actual resize of the gl texture.
+We need to find a clean way to deal with NPOT textures then.
+*/
+
 #include "GLResourceManager.h"
 
 #include <y60/Image.h>
@@ -89,6 +96,7 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         AC_DEBUG << "Texture memory usage=" << _myTextureMemUsage / (1024.0*1024.0) << " MB";
+        AC_DEBUG << "setupTexture: returning texture id = "<<myTextureId;
 
         return myTextureId;
     }
@@ -158,14 +166,8 @@ namespace y60 {
             theTexture->unbind();
 
             // adjust texmem usage
-            ImagePtr myImage = theTexture->getImage();
-            if (myImage) {
-                unsigned int myTopLevelTextureSize = myImage->getMemUsed();
-                if (theTexture->get<TextureMipmapTag>()) {
-                    _myTextureMemUsage -= myTopLevelTextureSize/3;
-                }
-                _myTextureMemUsage -= myTopLevelTextureSize;
-            }
+            _myTextureMemUsage -= theTexture->getTextureMemUsage();
+            AC_DEBUG << "Texture memory usage (after unbind) =" << _myTextureMemUsage / (1024.0*1024.0) << " MB";
         }
 
         unsigned int myBufferId = theTexture->getPixelBufferId();
@@ -181,7 +183,9 @@ namespace y60 {
 
     bool 
 	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
+        AC_DEBUG << "imageMatchesGLTexture()";
 	    if (theTexture->getType() != TEXTURE_2D) {
+            AC_DEBUG << "imageMatchesGLTexture() returning false (no TEXTURE_2D)";
 	        return false;
 	    }
         CHECK_OGL_ERROR;
@@ -192,13 +196,18 @@ namespace y60 {
 		GLint myUploadedMinFilter      = -1;
         
         ImagePtr myImage = theTexture->getImage();
+        AC_DEBUG << "imageMatchesGLTexture() binding Texture " << theTexture->getTextureId();
         glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
+        CHECK_OGL_ERROR;
 
 		// get current uploaded image size
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
+        CHECK_OGL_ERROR;
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
+        CHECK_OGL_ERROR;
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT, 
                                  &myUploadedInternalFormat);
+        CHECK_OGL_ERROR;
 
 		glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
 		
@@ -225,10 +234,9 @@ namespace y60 {
         AC_DEBUG << "Image size: " << myWidth << "x" << myHeight;
         AC_DEBUG << "UploadedTexure size: " << myUploadedWidth << "x" << myUploadedHeight;
         AC_DEBUG << "Internal format match: " << myInternalFormatMatch;
-        AC_DEBUG << "Uploaded InternalFormat: " << myUploadedInternalFormat;
-        AC_DEBUG << "Image InternalFormat: " << myInternalFormat;
+        AC_DEBUG << "Uploaded InternalFormat: " << getGLEnumString(myUploadedInternalFormat);
+        AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
 
-        
 		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
 	}
 
@@ -274,6 +282,11 @@ namespace y60 {
         return _myShaderLibrary;
     }
 
+    static bool only_power_of_two_textures() {
+        static bool has_GL_ARB_texture_non_power_of_two = queryOGLExtension("GL_ARB_texture_non_power_of_two");
+        static bool Y60_GL_DISABLE_NON_POWER_OF_TWO = asl::getenv("Y60_GL_DISABLE_NON_POWER_OF_TWO", false); 
+        return !has_GL_ARB_texture_non_power_of_two || Y60_GL_DISABLE_NON_POWER_OF_TWO;
+    }
 
     /**********************************************************************
      *
@@ -318,6 +331,7 @@ namespace y60 {
             myPixels = myImage->getRasterPtr(myIndex)->pixels().begin();
         }
         PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, myImage);
+        AC_DEBUG << "myPixelEncoding:"<< myPixelEncoding;
 
         // disable mipmap for compressed textures
         bool myMipmapFlag = theTexture->get<TextureMipmapTag>();
@@ -327,6 +341,7 @@ namespace y60 {
             theTexture->set<TextureMipmapTag>(false);
             myMipmapFlag = false;
         }
+        AC_DEBUG << "myMipmapFlag="<< myMipmapFlag;
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB
         // pixel buffer
@@ -335,10 +350,12 @@ namespace y60 {
             glGenBuffersARB(1, &myBufferId);
             theTexture->setPixelBufferId(myBufferId);
             CHECK_OGL_ERROR;
+            AC_DEBUG << "using pixel buffer id ="<< myBufferId;
         }
         if (IS_SUPPORTED(glBindBufferARB)) {
             glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
+            AC_DEBUG << "pixel buffer unpack set to 0";
         }
 #endif
 
@@ -346,16 +363,18 @@ namespace y60 {
         // UH: disabled since it produces problems with alpha (according to DS)
         static bool SGIS_generate_mipmap = queryOGLExtension("GL_SGIS_generate_mipmap");
 #endif
-
+        unsigned myTextureMemUsage = 0;
         if (myMipmapFlag) {
             // mipmap
 #ifdef GL_SGIS_generate_mipmap
             if (SGIS_generate_mipmap) {
+                AC_DEBUG << "building 2D mipmap using SGIS_generate_mipmap, myPixelEncoding ="<<myPixelEncoding;
                 glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
             }
             else
 #endif
             {
+                AC_DEBUG << "building 2D mipmap, myPixelEncoding ="<<myPixelEncoding;
                 // 2D-Texture
                 gluBuild2DMipmaps(GL_TEXTURE_2D, myPixelEncoding.internalformat,
                         myWidth, myHeight,
@@ -365,8 +384,9 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             // myTopLevelTextureSize is added later
-            _myTextureMemUsage += myTopLevelTextureSize/3;
+            myTextureMemUsage += myTopLevelTextureSize/3;
         } else {
+            AC_DEBUG << "no mipmapping, myPixelEncoding ="<<myPixelEncoding;
             // no mipmapping
 #ifdef GL_SGIS_generate_mipmap
             if (SGIS_generate_mipmap) {
@@ -381,31 +401,41 @@ namespace y60 {
         unsigned int myTexWidth = myWidth;
         unsigned int myTexHeight = myHeight;
         unsigned int myTexDepth = myDepth;
-        AC_TRACE << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
-        AC_TRACE << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
+        
+        if (only_power_of_two_textures()) {
+            AC_DEBUG << "has_GL_ARB_texture_non_power_of_two not supported or disabled, using POT-Texture";
+            myTexWidth = nextPowerOfTwo(myWidth);
+            myTexHeight = nextPowerOfTwo(myHeight / myDepth);
+            myTexDepth = nextPowerOfTwo(myDepth);
+            asl::Matrix4<float> myCorrectionMatrix;
+            myCorrectionMatrix.makeIdentity();
+            // set texture correction matrix, does not work with texture tiling (u,v > 1)
+            myCorrectionMatrix.scale(Vector3f(float(myWidth) / myTexWidth,
+                                              float(myHeight) / myTexHeight,
+                                              1.0f));
+            theTexture->set<TextureNPOTMatrixTag>(myCorrectionMatrix);
+            
+       }
+        AC_DEBUG << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
+        AC_DEBUG << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
 
         theTexture->set<TextureWidthTag>(myTexWidth);
         theTexture->set<TextureHeightTag>(myTexHeight);
         theTexture->set<TextureDepthTag>(myTexDepth);
 
-        AC_TRACE << "setupTexture2D internalFormat=" << hex 
-                 << myPixelEncoding.internalformat << dec;
+        AC_TRACE << "setupTexture2D internalFormat="<< getGLEnumString(myPixelEncoding.internalformat);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (myPixelEncoding.compressedFlag) {
             // Upload
+            AC_DEBUG << "uploadinf compressed texture";
             glCompressedTexImage2DARB(GL_TEXTURE_2D, 0,
                     myPixelEncoding.internalformat,
                     myTexWidth, myTexHeight, 0,
                     myImage->getMemUsed(), myPixels);
         } else {
-            /*
-            if (myImage->get<ImageResizeTag>() != IMAGE_RESIZE_NONE) {
-                myTexWidth = nextPowerOfTwo(myWidth);
-                myTexHeight = nextPowerOfTwo(myHeight / myDepth);
-                myTexDepth = nextPowerOfTwo(myDepth);
-            }
-            */
+           
+            AC_DEBUG << "uploading texture, format = "<<myPixelEncoding;
 
             // First allocate the texture
             glTexImage2D(GL_TEXTURE_2D, 0,
@@ -427,8 +457,10 @@ namespace y60 {
 
             myTopLevelTextureSize = getBytesRequired(myTexWidth * myTexHeight * myTexDepth, 
                                                      myImage->getRasterEncoding());
-            _myTextureMemUsage += myTopLevelTextureSize;
+            myTextureMemUsage += myTopLevelTextureSize;
         }
+        theTexture->setTextureMemUsage(myTextureMemUsage);
+        _myTextureMemUsage+=myTextureMemUsage;
     }
 
     void
@@ -799,7 +831,7 @@ namespace y60 {
         if (hasMipMaps) {
             float maxAnisotropy = theTexture->get<TextureAnisotropyTag>();
             if (maxAnisotropy > 1.0f) {
-                //AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
+                AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
                 glTexParameterf(myTextureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
                 CHECK_OGL_ERROR;
             }

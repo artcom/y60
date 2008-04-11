@@ -35,7 +35,8 @@ public class GccLinker extends AbstractLdLinker {
     private static String[] linkerOptions = new String[]{"-bundle",
             "-dynamiclib", "-nostartfiles", "-nostdlib", "-prebind", "-s",
             "-static", "-shared", "-symbolic", "-Xlinker",
-            "--export-all-symbols", "-static-libgcc", "-install_name"};
+            "--export-all-symbols", "-static-libgcc",
+            "-install_name", "-dylib_file"};
     private static final GccLinker dllLinker = new GccLinker("gcc", objFiles,
             discardFiles, "lib", ".so", false, new GccLinker("gcc", objFiles,
                     discardFiles, "lib", ".so", true, null));

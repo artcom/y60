@@ -87,6 +87,9 @@ namespace asl {
         std::istringstream myStream(theString);
         myStream >> outValue;
         return (myStream != 0); // Shouldn't this be (myStream.good() || myStream.eof()) ? (MS)
+                                // PM: it would be the same, stream::operator void*() is called here which
+                                // return 0 whhen neither the fail nor the bad bit is set, and ignores eofbit
+                                // while good() considers all three existing error flagss.
     }
 #endif
 

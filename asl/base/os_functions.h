@@ -34,6 +34,7 @@
 //    overall review status  : poor
 //
 //    recommendations:
+//       - rename to "shell_functions.h/cpp"
 //       - doxygenize documentation
 //       - add missing tests
 //       - unify names with styleguide in mind
@@ -92,6 +93,19 @@ namespace asl {
 
     template <class T>
     bool get_environment_var_as(const std::string & theVariable, T& theValue);
+    
+    template <class T>
+    T getenv(const std::string & theVariable, const T & theDefaultValue) {
+        T myResult = theDefaultValue;
+        try {
+            get_environment_var_as(theVariable, myResult);
+        }
+        catch (asl::ParseException & ex) {
+            throw asl::ParseException(std::string("Could not convert value of environment variable '"+theVariable+"' to type "+
+                                      typeid(myResult).name()), PLUS_FILE_LINE); 
+        }
+        return myResult;
+    }
 
 #ifdef WIN32
 		bool hResultIsOk(HRESULT hr, std::string & theMessage);

@@ -67,6 +67,7 @@ namespace y60 {
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureHeightTag,         unsigned,            HEIGHT_ATTRIB,                  0);
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureDepthTag,          unsigned,            DEPTH_ATTRIB,                   1);
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureParamChangedTag,   bool,                "textureParamChanged",          false);
+    DEFINE_FACADE_ATTRIBUTE_TAG(TextureNPOTMatrixTag,     asl::Matrix4f,       "npotmatrix",                    asl::Matrix4f::Identity());
 }
 
 #endif

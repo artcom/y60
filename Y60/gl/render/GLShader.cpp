@@ -322,10 +322,11 @@ namespace y60 {
             const y60::ImagePtr & myImage = myTexture->getImage();
             if (myImage) {
                 myMatrix = myImage->get<ImageMatrixTag>();
-                myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+                myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
             } else {
-                myMatrix  = myTexture->get<TextureMatrixTag>();
+                myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
             }
+            myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
             myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 

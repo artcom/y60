@@ -23,8 +23,10 @@ use("UnitTest.js");
 
 plug("ProcFunctions");
 
-const START_FRAMES = 199;
-const END_FRAMES   = 200;
+//const START_FRAMES = 199;
+//const END_FRAMES   = 200;
+const START_FRAMES = 3;
+const END_FRAMES   = 4;
 
 var myShaderLibrary = "../../../../shader/shaderlibrary.xml";
 GLResourceManager.prepareShaderLibrary(myShaderLibrary);
@@ -51,14 +53,16 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
             } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + theVideoCount) {
                 toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
-                window.renderText([500,100], myText, "Screen15");                
+                window.renderText([500,100], myText, "Screen15");        
+/*        
             } else if (_myFrameCount == START_FRAMES + theVideoCount){
                 toggleMovie();
             } else if (_myFrameCount == START_FRAMES + theVideoCount + 200) {
                 toggleMovie();
-            } else if (_myFrameCount == START_FRAMES + theVideoCount + 400) {
-                remove();
-            } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 400) {
+*/
+            } else if (_myFrameCount == START_FRAMES + theVideoCount + END_FRAMES) {
+//                remove();
+            } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 1) {
                 gc();
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = getProcessMemoryUsage();
@@ -73,13 +77,14 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 print("Difference                              : " + obj.myMemoryDifff);
                 print("allowed difference                      : " + obj.AllowedMemoryUsage + " ,(due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)");
                 ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');                
+                window.scene.save("leaktest.x60");
                 window.stop();
             }
             window.renderText([500,150], "Delta memory usage: " + (myMem-_myLastMemory), "Screen15");
             window.renderText([500,200], "Total memory usage: " + myMem, "Screen15");                
             _myFrameCount++; 
             _myLastMemory = myMem;     
-            //if (_myFrameCount % 10 == 0) window.printStatistics();      
+            if (_myFrameCount % 10 == 0) window.printStatistics();      
         }
         window.go();
     }

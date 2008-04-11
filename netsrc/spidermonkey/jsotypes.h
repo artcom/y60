@@ -49,7 +49,7 @@
 
 #ifdef XP_BEOS
 /* BeOS defines most int types in SupportDefs.h (int8, uint8, int16,
- * uint16, int32, uint32, int64, uint64), so in the interest of
+ * uint16, int32, uint32, int64, js_uint64), so in the interest of
  * not conflicting with other definitions elsewhere we have to skip the
  * #ifdef jungle below, duplicate some definitions, and do our stuff.
  */
@@ -70,7 +70,7 @@ typedef JSUintn uint;
 #endif
 
 typedef JSUintn uintn;
-typedef JSUint64 uint64;
+typedef JSUint64 js_uint64;
 #if !defined(XP_MAC) && !defined(_WIN32) && !defined(XP_OS2)
 typedef JSUint32 uint32;
 #else

@@ -20,6 +20,7 @@
 
 #include "proc_functions.h"
 #include "UnitTest.h"
+#include "Logger.h"
 
 class ProcUnitTest : public UnitTest {
     public:
@@ -34,8 +35,15 @@ class ProcUnitTest : public UnitTest {
             ENSURE(asl::getFreeMemory() > 0 && asl::getFreeMemory() < asl::getTotalMemory());
             DPRINT(asl::getUsedMemory());
             ENSURE(asl::getUsedMemory() > 0);
-
-            ENSURE(asl::getProcessMemoryUsage() > 0);
+            if (asl::getProcessMemoryUsage() > 0) {
+                SUCCESS("asl::getProcessMemoryUsage()");
+            } else {
+#ifdef OSX
+                AC_WARNING << "asl::getProcessMemoryUsage() on leopard needs a signed application";
+#else
+                FAILURE("asl::getProcessMemoryUsage() > 0");
+#endif
+            }
         }
 };
 

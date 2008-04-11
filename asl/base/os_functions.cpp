@@ -253,7 +253,7 @@ namespace asl {
 
     bool
     get_environment_var(const std::string & theVariable, std::string & theValue) {
-         const char * myValue = getenv(theVariable.c_str());
+         const char * myValue = ::getenv(theVariable.c_str());
          if (myValue) {
              theValue = myValue;
              return true;
