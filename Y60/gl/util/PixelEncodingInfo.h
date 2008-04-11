@@ -53,6 +53,7 @@ namespace y60 {
         os << ", pixeltype: " << getGLEnumString(theInfo.pixeltype);
         os << ", bytesPerPixel: " << theInfo.bytesPerPixel;
         os << ", compressedFlag: " << theInfo.compressedFlag;
+        return os;
     }
  }
 #endif
