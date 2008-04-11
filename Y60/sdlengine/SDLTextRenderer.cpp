@@ -25,7 +25,7 @@
 #define DB(x) //x
 #define DB2(x) //x
 
-#define DUMP_TEXT_AS_PNG
+//#define DUMP_TEXT_AS_PNG
 #ifdef DUMP_TEXT_AS_PNG
 #include <paintlib/plpngenc.h>
 #include <paintlib/pltiffenc.h>
