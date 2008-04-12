@@ -103,8 +103,14 @@ namespace y60 {
 
         dom::ValuePtr myRasterValue = getRasterValue();
         if (myRasterValue) {
-            PixelEncoding myEncoding = PixelEncoding(getEnumFromString(getNode().firstChild()->nodeName(), RasterElementNames));
-            set<RasterPixelFormatTag>(getStringFromEnum(getInternalPixelFormat(myEncoding), PixelEncodingString));
+            // AC_DEBUG << getNode();
+            const string & myRasterElementName = getNode().firstChild()->nodeName();
+            // AC_DEBUG << "myRasterElementName="<<myRasterElementName;
+            PixelEncoding myEncoding = PixelEncoding(getEnumFromString(myRasterElementName, RasterElementNames));
+            // AC_DEBUG << "myEncoding="<<int(myEncoding);
+            const char * myRasterPixelFormat = getStringFromEnum(myEncoding, PixelEncodingString);
+            // AC_DEBUG << "myRasterPixelFormat="<<int(myRasterPixelFormat);
+            set<RasterPixelFormatTag>(myRasterPixelFormat);
             set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);   
 
             registerDependenciesForRasterValueUpdate();
