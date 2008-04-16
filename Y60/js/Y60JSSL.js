@@ -482,6 +482,17 @@ function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
     return myChildElementNodes;
 }
 
+function findNodeByNameChecked(theRootNode, theName) {
+    var myResult = theRootNode.find("//*[@name='"+theName+"']");
+    if (!myResult) {
+        Logger.error("findNodeByNameChecked failed, see stack trace:");
+        dumpstack();
+        Logger.fatal("Could not find a node with name '"+theName+"'");
+    }
+    return myResult;
+}
+
+
 function getDescendantByNameChecked(theNode, theName, theDeepFlag) {
     var myResult = getDescendantByName(theNode, theName, true);
     if (!myResult) {

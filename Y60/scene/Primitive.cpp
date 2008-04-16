@@ -73,11 +73,11 @@ namespace y60 {
         myTypeId.fromString(theDataNode->nodeName());
         //= TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
         
-        VertexBufferUsage myUsage = VERTEX_USAGE_STATIC_DRAW;
+        VertexBufferUsage myUsage = getDefaultVertexBufferUsage();
         if (theDataNode->getAttribute(VERTEX_BUFFER_USAGE_ATTRIB)) {
             myUsage = theDataNode->getAttributeValue<VertexBufferUsage>(VERTEX_BUFFER_USAGE_ATTRIB);
         }
-        AC_TRACE << "Primitive::load " << theDataNode->parentNode()->parentNode()->getAttributeString(NAME_ATTRIB) 
+        AC_DEBUG << "Primitive::load " << theDataNode->parentNode()->parentNode()->getAttributeString(NAME_ATTRIB) 
                  << ", usage:" << myUsage << " for role: " << myRoleString;
         
         VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole, myUsage);

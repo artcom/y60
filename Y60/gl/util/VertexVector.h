@@ -17,8 +17,6 @@
 #include <vector>
 
 #include <asl/Exception.h>
-
-
 #include <asl/Logger.h>
 #include <asl/Auto.h>
 
@@ -59,7 +57,8 @@ namespace y60 {
         }
         return GLenum(0);   
     }
-    
+
+  
     template <class T>
     class VertexVector {
     public:
@@ -217,7 +216,7 @@ namespace y60 {
         }
     public:
 
-        VertexVector() : _myId(0), _mySize(0), _myCapacity(0), _myLockCount(0), _myUsageType(VERTEX_USAGE_STATIC_DRAW) {}
+        VertexVector() : _myId(0), _mySize(0), _myCapacity(0), _myLockCount(0), _myUsageType(getDefaultVertexBufferUsage()) {}
 
         VertexVector(const VertexVector<T> & x)
             : _myId(getNewId()), _mySize(x.size()), _myCapacity(x.size()), _myLockCount(0)

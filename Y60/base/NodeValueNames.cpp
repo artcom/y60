@@ -9,6 +9,10 @@
 //============================================================================
 
 #include "NodeValueNames.h"
+#include <asl/Logger.h>
+#ifdef OSX
+#undef verify
+#endif
 
 // [DS, TS] This can't be in the y60 namespace because the ms compiler
 // b0rks. So just keep it in global space which does no harm anyway
@@ -27,3 +31,25 @@ IMPLEMENT_ENUM(y60::TextureUsage, y60::TextureUsageStrings);
 IMPLEMENT_ENUM(y60::TextureType, y60::TextureTypeStrings);
 
 IMPLEMENT_ENUM(y60::ImageType, y60::ImageTypeStrings);
+
+namespace y60 {
+
+    static VertexBufferUsage
+    initDefaultVertexBufferUsage() {
+        const char * myDefaultUsageString = ::getenv("Y60_DEFAULT_VBO_USAGE");
+        if (myDefaultUsageString) {
+            AC_INFO << "Y60_DEFAULT_VBO_USAGE is set to "<< myDefaultUsageString;
+            VertexBufferUsage myDefaultUsage;
+            myDefaultUsage.fromString(myDefaultUsageString);
+            return myDefaultUsage;
+        } else {
+            return VERTEX_USAGE_STATIC_DRAW;
+        }
+    };
+
+    VertexBufferUsage getDefaultVertexBufferUsage() {
+        static VertexBufferUsage myDefault =  initDefaultVertexBufferUsage();
+        return myDefault;
+    }
+}
+

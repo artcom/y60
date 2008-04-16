@@ -2905,6 +2905,46 @@ void testDyScript() {
     //dys::testCode();
     dys::testLoop();
 }
+//===============================================================
+
+// SYMBOL
+namespace sym {
+
+
+class Singleton {
+};
+
+class Object {
+    virtual Object * clone() = 0;
+    virtual Object * get() = 0;
+    virtual Object * put() = 0;
+};
+
+class Function : Object {
+    virtual Object * apply(Object *) = 0;
+};
+
+class Symbol : Singleton {
+    virtual Symbol * apply(Object *) = 0;
+};
+
+class Type : Singleton {
+};
+
+class Map : Object {
+    virtual Object * add(Object *) = 0;
+};
+
+}
+
+
+
+
+//===============================================================
+
+
+
+
 
 #include <asl/Arguments.h>
 

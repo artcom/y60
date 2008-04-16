@@ -170,6 +170,7 @@ namespace y60 {
         }
 
         _myCursorPos = theCursorPos;
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
         Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
             theTargetWidth, theTargetHeight);
 
@@ -183,12 +184,14 @@ namespace y60 {
         // }
 
 #ifdef DUMP_TEXT_AS_PNG
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage_dumpAsPng);
         PLAnyBmp myBmp;
         myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8,
                 (unsigned char*)_myTextureSurface->pixels, _myTextureSurface->w*4);
         PLPNGEncoder myEncoder;
         myEncoder.MakeFileFromBmp("test.png", &myBmp);
 #endif
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage_assign);
         myImage->getRasterPtr()->assign(_myTextureSurface->w, _myTextureSurface->h,
                         ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
                         (unsigned char*)_myTextureSurface->pixels + myImageDataSize));

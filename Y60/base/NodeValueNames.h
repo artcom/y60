@@ -665,7 +665,9 @@ namespace y60 {
             "dynamic_copy", 
             ""
     };
-    DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum);   
+    DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum);
+   
+    VertexBufferUsage getDefaultVertexBufferUsage();
 
 }
 

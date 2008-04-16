@@ -524,6 +524,7 @@ namespace asl {
         }
         return false;
     }
+    
     // same as above but returns interpolated normal from supplied normals
     template<class Number>
 	bool intersection(const Triangle<Number> & theTriangle,
@@ -544,8 +545,7 @@ namespace asl {
         }
         return false;
     }
-
-
+    
     //============== Triangle/Ray intersection ===================
     //
     // return true and intersection point in "theResult" when they intersects

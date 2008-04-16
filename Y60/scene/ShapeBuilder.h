@@ -46,7 +46,7 @@ namespace y60 {
 
         template <class T>
         dom::NodePtr createVertexDataBin(const std::string & theName, unsigned theSize = 0, 
-                                         const VertexBufferUsage & theUsage = VERTEX_USAGE_STATIC_DRAW);
+                                         const VertexBufferUsage theUsage = y60::getDefaultVertexBufferUsage());
 
         template <class T>
         unsigned getVertexDataSize(const std::string & theName);
@@ -61,7 +61,7 @@ namespace y60 {
 
     template <class T>
     dom::NodePtr
-    ShapeBuilder::createVertexDataBin(const std::string & theName, unsigned theSize, const VertexBufferUsage & theUsage) {
+    ShapeBuilder::createVertexDataBin(const std::string & theName, unsigned theSize, const VertexBufferUsage theUsage) {
         dom::NodePtr myVertexDataNode = getNode()->childNode(VERTEX_DATA_NAME);
 
         dom::NodePtr myDataBinNode = myVertexDataNode->appendChild(dom::Element(VectorTypeNameTrait<T>::name()));
