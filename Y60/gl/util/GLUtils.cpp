@@ -210,16 +210,12 @@ namespace y60 {
         switch (theTextureType) {
         case TEXTURE_2D:
             return GL_TEXTURE_2D;
-            break;
         case TEXTURE_RECTANGLE:
             return GL_TEXTURE_RECTANGLE_ARB;
-            break;
         case TEXTURE_3D:
             return GL_TEXTURE_3D;
-            break;
         case TEXTURE_CUBEMAP:
             return GL_TEXTURE_CUBE_MAP_ARB;
-            break;
         default:
             throw GlTextureFunctionException("Unknown texture type.", PLUS_FILE_LINE);
         }

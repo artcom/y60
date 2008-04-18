@@ -181,6 +181,12 @@ namespace y60 {
         }
     }
 
+    static bool only_power_of_two_textures() {
+        static bool has_GL_ARB_texture_non_power_of_two = queryOGLExtension("GL_ARB_texture_non_power_of_two");
+        static bool Y60_GL_DISABLE_NON_POWER_OF_TWO = asl::getenv("Y60_GL_DISABLE_NON_POWER_OF_TWO", false); 
+        return !has_GL_ARB_texture_non_power_of_two || Y60_GL_DISABLE_NON_POWER_OF_TWO;
+    }
+
     bool 
 	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
         AC_DEBUG << "imageMatchesGLTexture()";
@@ -190,18 +196,21 @@ namespace y60 {
 	    }
         CHECK_OGL_ERROR;
 
-		GLint myUploadedWidth          = -1;
-		GLint myUploadedHeight         = -1;
-		GLint myUploadedInternalFormat = -1;
-		GLint myUploadedMinFilter      = -1;
-        
-        ImagePtr myImage = theTexture->getImage();
+        if (theTexture->getTextureId() == 0) {
+            AC_DEBUG << "imageMatchesGLTexture(): return false, texture has not been uploaded yet";
+            return false;
+        }
+ 
         AC_DEBUG << "imageMatchesGLTexture() binding Texture " << theTexture->getTextureId();
         glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
         CHECK_OGL_ERROR;
 
 		// get current uploaded image size
-		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
+		GLint myUploadedWidth          = -1;
+		GLint myUploadedHeight         = -1;
+		GLint myUploadedInternalFormat = -1;
+		GLint myUploadedMinFilter      = -1;
+        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
         CHECK_OGL_ERROR;
 		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
         CHECK_OGL_ERROR;
@@ -212,10 +221,10 @@ namespace y60 {
 		glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
 		
         CHECK_OGL_ERROR;
+        ImagePtr myImage = theTexture->getImage();
         unsigned int myWidth = myImage->get<ImageWidthTag>();
         unsigned int myHeight = myImage->get<ImageHeightTag>();
-        if (myImage->get<ImageResizeTag>() != IMAGE_RESIZE_NONE) { 
-            // be sure everthing is power of 2, images are always, but movies not!!
+        if (only_power_of_two_textures()) {
             myWidth = nextPowerOfTwo(myImage->get<ImageWidthTag>());
             myHeight = nextPowerOfTwo(myImage->get<ImageHeightTag>());
         }
@@ -282,11 +291,6 @@ namespace y60 {
         return _myShaderLibrary;
     }
 
-    static bool only_power_of_two_textures() {
-        static bool has_GL_ARB_texture_non_power_of_two = queryOGLExtension("GL_ARB_texture_non_power_of_two");
-        static bool Y60_GL_DISABLE_NON_POWER_OF_TWO = asl::getenv("Y60_GL_DISABLE_NON_POWER_OF_TWO", false); 
-        return !has_GL_ARB_texture_non_power_of_two || Y60_GL_DISABLE_NON_POWER_OF_TWO;
-    }
 
     /**********************************************************************
      *
@@ -797,14 +801,41 @@ namespace y60 {
     void 
     GLResourceManager::updateTextureParams(const TexturePtr & theTexture) {
         MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureParams);
+        
         AC_DEBUG << "GLResourceManager::updateTextureParams '" << theTexture->get<NameTag>() 
-                 << "' id=" << theTexture->get<IdTag>()
-                 << "' wrapmode=" << theTexture->getWrapMode()
-                 << "' hasMipMaps=" << theTexture->get<TextureMipmapTag>()
-                 << "' minfilter=" << theTexture->getMinFilter()
-                 << "' magfilter=" << theTexture->getMagFilter();
+                 << "' id='" << theTexture->get<IdTag>()
+                 << "' texid='" << theTexture->get<TextureIdTag>()
+                 << "' wrapmode='" << theTexture->getWrapMode()
+                 << "' hasMipMaps='" << theTexture->get<TextureMipmapTag>()
+                 << "' minfilter='" << theTexture->getMinFilter()
+                 << "' magfilter='" << theTexture->getMagFilter()
+                 << "'";
 
         GLenum myTextureTarget = asGLTextureTarget(theTexture->getType());
+
+#define DONT_CHECK_TEX_ID
+#ifdef CHECK_TEX_ID
+        // Do some checks
+        GLint myId = 0;
+        switch (myTextureTarget) {
+        case GL_TEXTURE_CUBE_MAP_ARB:
+        case GL_TEXTURE_2D:
+        case GL_TEXTURE_RECTANGLE_ARB:
+            glGetIntegerv(GL_TEXTURE_2D_BINDING_EXT, &myId);
+            AC_DEBUG << "current id = " << myId << "(GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE_ARB or GL_TEXTURE_CUBE_MAP_ARB)";
+            break;
+        case GL_TEXTURE_3D:
+            glGetIntegerv(GL_TEXTURE_3D_BINDING_EXT, &myId);
+            AC_DEBUG << "current id = " << myId << "(GL_TEXTURE_3D_BINDING_EXT)";
+            break;
+        default:
+            AC_ERROR << "Unknow texture target = " << myTextureTarget;
+       }
+       if (myId == 0) {
+            AC_DEBUG << "No texture bound, trace = ";
+            AC_DEBUG << asl::StackTrace();
+        }
+#endif
 
         glTexParameteri(myTextureTarget, GL_TEXTURE_WRAP_S, 
                         asGLTextureWrapMode(theTexture->getWrapMode()));
