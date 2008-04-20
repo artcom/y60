@@ -134,6 +134,12 @@ JSBool JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError);
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval);
 
+JSBool
+JSA_CallFunction(JSContext * cx, JSObject * obj, JSFunction *fun, int argc, jsval argv[], jsval* rval);
+
+JSBool
+JSA_CallFunctionValue(JSContext * cx, JSObject * obj, jsval fval, int argc, jsval argv[], jsval* rval);
+
 void
 dumpJSObj(JSContext * cx, JSObject * obj);
 

@@ -28,6 +28,10 @@ namespace jslib {
 
 template class JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol>;
 
+const char * JSNamedNodeMap::ClassName() {
+    return "NamedNodeMap";
+}
+
 // TODO: add namedItem getter and setter functions
 JSFunctionSpec *
 JSNamedNodeMap::Functions() {
@@ -36,6 +40,7 @@ JSNamedNodeMap::Functions() {
         /* name         native          nargs    */
         {"item",             JSNamedNodeMap::item,            1}, // gcc does not allow function pointers to inherited functions
         {"appendNode",       JSNamedNodeMap::appendNode,      1},
+        {"getNamedItem",     JSNamedNodeMap::getNamedItem,    1},
         //{"replaceChild",     replaceChild,    1},
 //        {"setAllNodeValues",  JSNamedNodeMap::setAllNodeValues,    1},
         {0}
@@ -58,6 +63,18 @@ JSNamedNodeMap::item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 }
 
 JSBool
+JSNamedNodeMap::getNamedItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
+        jsval *rval) 
+{
+    DOC_BEGIN("Returns a node with a given name from the nodelist");
+    DOC_PARAM("theName", "Name of the node to retrieve", DOC_TYPE_INTEGER);
+    DOC_RVAL("The node from the nodelist with the specified name or undefined when node can not be found", DOC_TYPE_NODE);
+    DOC_END;
+    typedef dom::NodePtr (NamedNodeMap::*MyMethod)(const DOMString & name);
+    return Method<NamedNodeMap>::call((MyMethod)&NamedNodeMap::getNamedItem,cx,obj,argc,argv,rval);
+}
+
+JSBool
 JSNamedNodeMap::appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Appends a node to the node list");
     DOC_PARAM("theNode", "The xml node to append", DOC_TYPE_NODE);
@@ -67,7 +84,7 @@ JSNamedNodeMap::appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
     return Method<NamedNodeMap>::call((MyMethod)&NamedNodeMap::append,cx,obj,argc,argv,rval);
 }
 
-static JSPropertySpec * Properties() {
+JSPropertySpec * JSNamedNodeMap::Properties() {
     static JSPropertySpec myProperties[] = {
         {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute unsigned long
         {0}
@@ -151,6 +168,10 @@ JSNamedNodeMap::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 JSObject *
 JSNamedNodeMap::Construct(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theList) {
     return Base::Construct(cx, theNode, theList);
+}
+jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap) {
+    JSObject * myObject = JSNamedNodeMap::Construct(cx, theNode, theNodeMap);
+    return OBJECT_TO_JSVAL(myObject);
 }
 
 }

@@ -135,6 +135,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSNodeList::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSNamedNodeMap::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSAccessibleVector::initClass(cx, theGlobalObject)) {
         return false;
     }

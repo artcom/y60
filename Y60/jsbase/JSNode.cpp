@@ -900,6 +900,18 @@ getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 }
 
 static JSBool
+getAttributeNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Retrieves an attribute node by name.");
+    DOC_PARAM("Name", "", DOC_TYPE_STRING);
+    DOC_RVAL("The typed attribute node.", DOC_TYPE_OBJECT);
+    DOC_END;
+    typedef dom::NodePtr (dom::Node::*MyMethod)(const dom::DOMString &);
+    return Method<dom::Node>::call((MyMethod)&dom::Node::getAttribute, cx, obj, argc, argv, rval);
+    return JS_FALSE;
+}
+
+
+static JSBool
 addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Registers an event listener, depending on the useCapture parameter, on the capture phase of the DOM event flow or its target and bubbling phases");
     DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
@@ -927,7 +939,7 @@ dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     return Method<dom::Node>::call(&dom::Node::dispatchEvent, cx, obj, argc, argv, rval);
 }
 
-JSBool
+static JSBool
 freeCaches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("reduces memory consumption by freeing all text and binary caches of node values; call is propagated to all children and attributes; can be called after loading or saving, will however slow down subsequent saving operations");
     DOC_END;
@@ -938,7 +950,7 @@ freeCaches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return myRVal;
 }
 
-JSBool
+static JSBool
 debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("prints debug information about the value.");
     DOC_END;
@@ -948,7 +960,7 @@ debugValue(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
-JSBool
+static JSBool
 printChangedNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("prints a list of all nodes that have a higher version number as the given argument version number");
     DOC_PARAM("theLastVersion", "Version Number (64 Bit unsigned integer as string)", DOC_TYPE_STRING);
@@ -959,7 +971,7 @@ printChangedNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     return myRVal;
 }
 
-JSBool
+static JSBool
 flushUnusedChildren(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("reduces memory consumption by flushing all child nodes that have not changed since loading and are not referenced from somewhere else");
     DOC_END;
@@ -970,6 +982,29 @@ flushUnusedChildren(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     return myRVal;
 }
 
+static JSBool
+nodeValueDependsOn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Registers a node whose value the object's value depends on; the function assigned to the nodeValueCalculateFunction property is called at least once before reading the Node value to allow recomputation when the upstream nodeValue has changed");
+    DOC_PARAM("theUpstreamNode", "", DOC_TYPE_NODE);
+    DOC_END;
+    
+    dom::NodePtr myNode;
+    if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
+        JS_ReportError(cx,"JSNode::nodeValueDependsOn() - Could not convert object to node");
+    }
+    dom::NodePtr myDependsOnNode;
+    if (!convertFrom(cx, argv[0], myDependsOnNode)) {                    
+        JS_ReportError(cx,"JSNode::nodeValueDependsOn() - argument not a node");
+        return JS_FALSE;
+    }
+    AC_DEBUG << "Registering dependency for value of node" << myNode->nodeTypeName() << " '"<< myNode->nodeName() 
+             <<"', V="<<myNode->nodeVersion()<<", UID="<<myNode->getUniqueId()
+             << ", depends on value of node " << myDependsOnNode->nodeTypeName() 
+             << " '"<< myDependsOnNode->nodeName() <<"', V="<<myDependsOnNode->nodeVersion()
+             <<", UID="<<myDependsOnNode->getUniqueId();
+    myNode->nodeValueWrapperPtr()->registerPrecursor(myDependsOnNode->nodeValueWrapperPtr());
+    return JS_TRUE;
+}
 
 JSFunctionSpec *
 JSNode::Functions() {
@@ -999,6 +1034,7 @@ JSNode::Functions() {
         {"find",                xpath_find,          1},
         {"findAll",             xpath_findAll,       1},
         {"getAttribute",        getAttribute,        1},
+        {"getAttributeNode",    getAttributeNode,    1},
         {"addEventListener",    addEventListener,    3},
         {"removeEventListener", removeEventListener, 3},
         {"dispatchEvent",       dispatchEvent,       3},
@@ -1006,6 +1042,7 @@ JSNode::Functions() {
         {"debugValue",          debugValue,          0},
         {"flushUnusedChildren", flushUnusedChildren, 0},
         {"printChangedNodes",   printChangedNodes,   1},
+        {"nodeValueDependsOn",   nodeValueDependsOn, 1},
        {0}
     };
     return myFunctions;
@@ -1158,7 +1195,7 @@ JSNode::StaticFunctions() {
 }
 
 
-enum PropertyNumbers {PROP_nodeName,
+enum PropertyNumbers {PROP_nodeName = -100,
 PROP_nodeValue,
 //PROP_nodeValueTyped,
 PROP_nodeType,
@@ -1175,6 +1212,9 @@ PROP_schema,
 PROP_nodeUniqueId,
 PROP_nodeVersion,
 PROP_nodeValueTypeName,
+PROP_onOutdatedValue,
+PROP_onSetValue,
+PROP_onReconnect,
 
 // const static property ids:
 PROP_ELEMENT_NODE,
@@ -1210,6 +1250,9 @@ JSNode::Properties() {
         {"nodeVersion",     PROP_nodeVersion,    JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
         {"nodeUniqueId",    PROP_nodeUniqueId,   JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
         {"nodeValueTypeName",PROP_nodeValueTypeName,JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
+        {"onOutdatedValue",PROP_onOutdatedValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
+        {"onSetValue",PROP_onSetValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
+        {"onReconnect",PROP_onReconnect,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
         {0}
     };
     return myProperties;
@@ -1242,6 +1285,45 @@ JSPropertySpec *
 JSNode::StaticProperties() {
     static JSPropertySpec myProperties[] = {{0}};
     return myProperties;
+}
+
+class JS_FieldCalculator : public dom::CallBackBase {
+public:
+    JS_FieldCalculator(JSContext * theContext, JSObject * theObject, jsval theFunction) :
+        _myContext(theContext),
+        _myObject(theObject),
+        _myFunction(theFunction)
+    {
+        JS_AddRoot(_myContext, &_myFunction);
+    }
+    ~JS_FieldCalculator() {
+        JS_RemoveRoot(_myContext, &_myFunction);
+     }
+    void callback() {
+        jsval rval;
+        int argc = 0;
+        jsval * argv = 0;
+        JSA_CallFunctionValue(_myContext, _myObject, _myFunction, argc, argv, &rval);
+    }
+    jsval getFunction() {
+        return _myFunction;
+    }
+private:
+        JSObject * _myObject;
+        JSContext * _myContext;
+        jsval _myFunction;
+};
+
+inline
+jsval as_jsval(JSContext *cx, dom::CallBackPtr theCallback) {
+    if (theCallback) {
+        asl::Ptr<JS_FieldCalculator, dom::ThreadingModel> myFieldCB = dynamic_cast_Ptr<JS_FieldCalculator>(theCallback);
+        if (myFieldCB) {
+            return myFieldCB->getFunction();
+        }
+        return as_jsval(cx, std::string("[native code]"));
+    }
+    return JSVAL_NULL;
 }
 
 JSBool
@@ -1321,6 +1403,15 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                     break;
                case PROP_nodeUniqueId:
                     *vp = as_jsval(cx, asl::as_string(myNode->getUniqueId()));
+                    break;
+               case PROP_onOutdatedValue:
+                    *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->getCalculatorFunction());
+                    break;
+                case PROP_onSetValue:
+                    *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->getImmediateCallBack());
+                    break;
+                case PROP_onReconnect:
+                    *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->geReconnectFunction());
                     break;
             }
         } else {
@@ -1405,6 +1496,9 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     } HANDLE_CPP_EXCEPTION
 }
 
+
+
+
 JSBool
 JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
@@ -1418,9 +1512,27 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         if (JSVAL_IS_INT(id)) {
             int myIndex = JSVAL_TO_INT(id);
             switch (myIndex) {
-            case PROP_nodeValue:
-                myNode->nodeValue(as_string(cx,*vp));
-                return JS_TRUE;
+                case PROP_nodeValue:
+                    myNode->nodeValue(as_string(cx,*vp));
+                    return JS_TRUE;
+                case PROP_onOutdatedValue:
+                {
+                    dom::CallBackPtr myCalculator(new JS_FieldCalculator(cx, obj, *vp));
+                    myNode->nodeValueWrapperPtr()->setCalculatorFunction(myCalculator);
+                    return JS_TRUE;
+                }
+                case PROP_onSetValue:
+                {
+                    dom::CallBackPtr myCalculator(new JS_FieldCalculator(cx, obj, *vp));
+                    myNode->nodeValueWrapperPtr()->setImmediateCallBack(myCalculator);
+                    return JS_TRUE;
+                }
+                case PROP_onReconnect:
+                {
+                    dom::CallBackPtr myCalculator(new JS_FieldCalculator(cx, obj, *vp));
+                    myNode->nodeValueWrapperPtr()->setReconnectFunction(myCalculator);
+                    return JS_TRUE;
+                }
             }
         } else {
             JSString *myJSStr = JS_ValueToString(cx, id);

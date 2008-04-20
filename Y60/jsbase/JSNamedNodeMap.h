@@ -30,14 +30,16 @@ class JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAcc
 public:
     typedef JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> Base;
 
-    static const char * ClassName() {
-        return "NamedNodeMap";
-    }
+    static const char * ClassName();
+    
     static JSBool
     item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
     static JSBool
     appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
+    static JSBool
+    getNamedItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
     static JSFunctionSpec * Functions();
     static JSPropertySpec * Properties();
@@ -60,8 +62,9 @@ public:
         : Base(theNode, theNodeList)
     {}
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject) {
+        JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), 0, 0, 0);
         DOC_CREATE(JSNamedNodeMap);
-        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
+        return myClass;
     }
 };
 
@@ -69,6 +72,9 @@ template <>
 struct JSClassTraits<dom::NamedNodeMap>
     : public JSClassTraitsWrapper<dom::NamedNodeMap, JSNamedNodeMap> {};
 
+jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap);
+
 }
+
 
 #endif

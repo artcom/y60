@@ -128,7 +128,16 @@ namespace dom {
                 throw InvalidNullPointerPassed(JUST_FILE_LINE);
             }
             _myCalculator = CallBackPtr(new CallBack<CALCULATOR>(theCalculator, theCalculateFunction));
+
         }
+        void setCalculatorFunction(CallBackPtr theCalculator) {
+            _myCalculator = theCalculator;
+        }
+
+        CallBackPtr getCalculatorFunction() const {
+            return _myCalculator;
+        }
+
 
 		template <class OBJECT>
         void setImmediateCallBack(asl::Ptr<OBJECT, ThreadingModel> theObject, void (OBJECT::*theFunction)()) {
@@ -142,8 +151,17 @@ namespace dom {
             }
             _myImmediateCB = CallBackPtr(new CallBack<OBJECT>(theObject, theFunction));
         }
+        void setImmediateCallBack(CallBackPtr theCallback) {
+             _myImmediateCB = theCallback;
+        }
+        CallBackPtr getImmediateCallBack() const {
+            return _myImmediateCB;
+        }
 
         void setReconnectFunction(CallBackPtr theCallBack);
+        CallBackPtr geReconnectFunction() const {
+            return _myConnector;
+        }
 
         void transferDependenciesFrom(Field & theField);
         void clearPrecursorFields();

@@ -884,7 +884,7 @@ namespace dom {
             return NodePtr(0);
         }
 
-        /** returns a read only pointer to the attribute node with this name
+        /** returns a pointer to the attribute node with this name
             or 0 if no attribute with given name exists
         */
         NodePtr getAttribute(const DOMString & name) {

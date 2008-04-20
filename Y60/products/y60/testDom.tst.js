@@ -249,6 +249,58 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         DPRINT('myScene.find("//world").name');
         ENSURE('myScene.find("//world").name == "myFirstWorld"');
         ENSURE('myScene.find("//world").$next.name == "mySecondWorld"');
+
+
+        obj.myScene = obj.myDocument.firstChild;
+        print(obj.myScene.childNodes);
+        print(obj.myScene.attributes);
+        obj.myVersionAttrNode = obj.myScene.attributes.getNamedItem("version");
+        obj.myUVSet = obj.myScene.find("//uvset").firstChild;
+        
+        ENSURE("myVersionAttrNode.isSameNode(myScene.getAttributeNode('version'))");;
+        //obj.myVersionAttrNode.nodeValueDependsOn(obj.myDocument.firstChild.firstChild.firstChild);
+        
+        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
+        obj.myVersionAttrNode.onReconnect = function() {
+            print("onReconnect:");
+            print("nodeValueDependsOn: root = "+this.rootNode.nodeName);
+            print("nodeValueDependsOn:"+this.rootNode.find("//uvset").firstChild);
+            this.nodeValueDependsOn(this.rootNode.find("//uvset").firstChild);
+        };
+        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
+        
+        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
+        obj.myVersionAttrNode.onOutdatedValue = function() {
+            print("recalculating myVersionAttrNode, this="+this);
+            this.nodeValue = this.rootNode.find("//uvset").firstChild.nodeValue * 10;
+        };
+        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
+        
+        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
+        obj.myVersionAttrNode.onSetValue = function() {print("onSet, this="+this)};
+        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
+       
+        gc(); 
+        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
+        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
+        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
+        
+        obj.myDocument.firstChild.firstChild.firstChild.onSetValue = function() {
+            print("scene version onSetValue("+this.nodeValue+")");
+        } 
+        obj.myUVSet.onSetValue = function() {
+            print("UVSet onSetValue("+this.nodeValue+")");
+        }; 
+        print("reading myVersionAttrNode.nodeValue");
+        print(obj.myVersionAttrNode.nodeValue);
+        ENSURE("myVersionAttrNode.nodeValue == 230");
+        print("assigning 42 to myUVSet.nodeValue");
+        obj.myUVSet.nodeValue = 42; 
+        print("reading myVersionAttrNode.nodeValue");
+        print(obj.myVersionAttrNode.nodeValue);
+        print("reading myVersionAttrNode.nodeValue");
+        print(obj.myVersionAttrNode.nodeValue);
+        ENSURE("myVersionAttrNode.nodeValue == 420");
 	}
 }
 

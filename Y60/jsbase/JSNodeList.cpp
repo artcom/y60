@@ -136,8 +136,7 @@ namespace jslib {
         return JS_FALSE;
     }
 
-    JSObject * JSNodeList::Construct(JSContext *cx, dom::NodePtr theNode, 
-            NodeList * theList) {
+    JSObject * JSNodeList::Construct(JSContext *cx, dom::NodePtr theNode, NodeList * theList) {
         return Base::Construct(cx, theNode, theList);
     }
 
@@ -155,9 +154,10 @@ namespace jslib {
     template <>
     struct JSClassTraits<dom::NodeList>
         : public JSClassTraitsWrapper<dom::NodeList, JSNodeList> {};
-jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList) {
-    JSObject * myObject = JSNodeList::Construct(cx, theNode, theNodeList);
-    return OBJECT_TO_JSVAL(myObject);
-}
+
+    jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList) {
+        JSObject * myObject = JSNodeList::Construct(cx, theNode, theNodeList);
+        return OBJECT_TO_JSVAL(myObject);
+    }
 
 }

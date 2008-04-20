@@ -600,6 +600,31 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int a
     } HANDLE_CPP_EXCEPTION;
 }
 
+JSBool
+JSA_CallFunction(JSContext * cx, JSObject * obj, JSFunction *fun, int argc, jsval argv[], jsval* rval) {
+    try {
+        JSBool ok = JS_CallFunction(cx, obj, fun, argc, argv, rval);
+        if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
+            AC_ERROR << "Exception while calling js function" << endl;
+            JSA_reportUncaughtException(cx, cx->errorReporter);
+        }
+        return ok;
+    } HANDLE_CPP_EXCEPTION;
+}
+JSBool
+JSA_CallFunctionValue(JSContext * cx, JSObject * obj, jsval fval, int argc, jsval argv[], jsval* rval) {
+    try {
+        JSBool ok = JS_CallFunctionValue(cx, obj, fval, argc, argv, rval);
+        if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
+            AC_ERROR << "Exception while calling js function " << endl;
+            JSA_reportUncaughtException(cx, cx->errorReporter);
+        }
+        return ok;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+
 void
 dumpJSObj(JSContext * cx, JSObject * obj) {
     AC_PRINT << "obj = " << (void*)obj

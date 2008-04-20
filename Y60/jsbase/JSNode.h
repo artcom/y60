@@ -31,6 +31,7 @@ jsval as_jsval(JSContext *cx, dom::Node::NodeType theValue) {
     return as_jsval(cx, int(theValue));
 }
 
+
 jsval as_jsval(JSContext *cx, dom::ValuePtr theValue);
 
 // this function will take a jsval and try create a ValuePtr from it
