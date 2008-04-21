@@ -29,7 +29,7 @@ var myVideoCount = 5;
 
 var myMovieLeak =  myVideoCount * 26 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
 
-var myMovieBaseMemoryUsage =  6*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
+var myMovieBaseMemoryUsage =  12*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
 var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
 
 
