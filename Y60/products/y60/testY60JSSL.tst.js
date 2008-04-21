@@ -31,6 +31,8 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     function testRemoveElement(theArray, theResult) {
+        DTITLE("removing elemnts");
+
         obj.myArray = theArray;
         obj.myResult = theResult;
         for (var i = 0; i < obj.myArray.length; ++i) {
@@ -46,7 +48,29 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
         }
     }
 
+    function testRemoveAttribute() {
+        DTITLE("removing attributes");
+
+        var myNode = Node.createElement("testNode");        
+        myNode.test = "testval";
+        myNode.test2 = "testval2";
+        var myAttributeCount = myNode.attributes.length;
+        myNode = removeAttributeByName(myNode, "test");
+        ENSURE(myAttributeCount == 2 && myNode.attributes.length == 1,
+            "added two attributes and removed the first");
+
+        myNode = removeAttributeByName(myNode, "nonexistingAttrib");
+        ENSURE(myNode.attributes.length == 1,
+               "trying to remove a non-existing attribute");
+
+        myNode = removeAttributeByName(myNode, "test2");
+        ENSURE(myNode.attributes.length == 0,
+            "removed the last remaining attribute");
+    }
+
     function testAngleFunctions() {
+        DTITLE("angle functions");
+
         ENSURE( 'degBetween(0,0) == 0');
         ENSURE( 'degBetween(0, 90) == -90 ' );
         ENSURE( 'degBetween(90, 0) == 90 ' );
@@ -71,6 +95,7 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
         testRemoveElement([1,0,2], [1,2]);
         testRemoveElement([1,2,3], [1,2,3]);
         testRemoveElement([0,0,1,0,0,2,0,0,3,0,0], [1,2,3]);
+        testRemoveAttribute();
     }
 };
 
