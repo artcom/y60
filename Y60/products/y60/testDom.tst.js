@@ -301,6 +301,24 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         print("reading myVersionAttrNode.nodeValue");
         print(obj.myVersionAttrNode.nodeValue);
         ENSURE("myVersionAttrNode.nodeValue == 420");
+
+        for (var i in obj.myScene.childNodes) {
+            print(i);
+            print(obj.myScene.childNodes[i]);
+        }
+        for (i = 0; i < obj.myScene.childNodes.length;++i) {
+            print(i);
+            print(obj.myScene.childNodes[i]);
+        }
+        for (i = 0; i < obj.myScene.attributes.length;++i) {
+            print(i);
+            print(obj.myScene.attributes[i]);
+        }
+        for (i in obj.myScene.attributes) {
+            print(i);
+            print(obj.myScene.attributes[i]);
+        }
+        //exit(1);
 	}
 }
 
