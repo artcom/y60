@@ -48,6 +48,7 @@ public:
     static JSFunctionSpec * StaticFunctions();
 
 
+    virtual unsigned long length() const;
     // getproperty handling
     virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
     virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp);

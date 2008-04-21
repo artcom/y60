@@ -110,8 +110,12 @@ JSNamedNodeMap::StaticFunctions() {
     return myFunctions;
 }
 
-// getproperty handling
+unsigned long
+JSNamedNodeMap::length() const {
+    return this->getNative().length();
+}
 
+// getproperty handling
 JSBool
 JSNamedNodeMap::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
@@ -123,7 +127,8 @@ JSNamedNodeMap::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
                 return JS_FALSE;
     }
 };
-JSBool JSNamedNodeMap::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSBool
+JSNamedNodeMap::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     *vp = as_jsval(cx, getNative().item(theIndex));
     return JS_TRUE;
 };
