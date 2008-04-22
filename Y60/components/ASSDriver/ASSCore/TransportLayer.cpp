@@ -326,14 +326,16 @@ TransportLayer::valuesPerLine() const {
 
 void
 TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
+    //dumpBuffer( _myTmpBuffer );
     while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ? 
                 getBytesPerStatusLine() : valuesPerLine() + 2 ))
     {
-        //dumpBuffer( _myTmpBuffer );
         if ( _myExpectedLine == 0 ) {
             parseStatusLine(/*theTargetRaster*/);
         } else {
             if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
+                AC_PRINT << "MAGIC_TOKEN : " << (_myTmpBuffer[0] == MAGIC_TOKEN);
+                AC_PRINT << "Expected line : " << (_myTmpBuffer[1] == _myExpectedLine);
                 AC_WARNING << "Sync error.";
                 exit( 1 );
                 _mySyncLostCounter++;

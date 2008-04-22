@@ -10,6 +10,7 @@
 
 #include "ASSDriver.h"
 #include "SerialTransport.h"
+#include "SocketTransport.h"
 #include "DummyTransport.h"
 #include "ASSUtils.h"
 
@@ -1302,6 +1303,8 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
         getConfigSetting( theSettings, "TransportLayer", myTransportName, string("serial") );
         if ( myTransportName == "serial" ) {
             _myTransportLayer = TransportLayerPtr( new SerialTransport(theSettings) );
+        } else if ( myTransportName == "socket" ) {
+            _myTransportLayer = TransportLayerPtr( new SocketTransport(theSettings) );
         } else if ( myTransportName == "dummy" ) {
             _myTransportLayer = TransportLayerPtr( new DummyTransport(theSettings) );
         }
