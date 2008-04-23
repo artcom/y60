@@ -19,7 +19,9 @@
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
         <TransportLayer>serial</TransportLayer>
-        <SerialPort>0</SerialPort>
+        <IpAddress>10.1.0.106</IpAddress>
+        <Port>10001</Port>
+        <SerialPort>1</SerialPort>
         <UseUSB min="0" max="1">1</UseUSB>
         <BaudRate>230400</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
