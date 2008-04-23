@@ -43,6 +43,8 @@
 #define INCL_INET_TCPSOCKET
 
 #include "Socket.h"
+#include <asl/Ptr.h>
+
 #include "INetEndpoint.h"
 
 namespace inet {
@@ -57,5 +59,6 @@ namespace inet {
 
             virtual void open();
     };
+    typedef asl::Ptr<TCPSocket> TCPSocketPtr;    
 }
 #endif

@@ -68,6 +68,7 @@ namespace inet {
             void connect();
             int retry(int n);
     };
+    typedef asl::Ptr<TCPClientSocket> TCPClientSocketPtr;    
 
 }
 #endif
