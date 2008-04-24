@@ -94,15 +94,13 @@ SocketTransport::readData() {
                                                     myMaxBytes );
 
         _myNumReceivedBytes += myCurrentReceivedBytes;
-        AC_PRINT << "SocketTransport::readData() received bytes: " << myCurrentReceivedBytes
+        AC_TRACE << "SocketTransport::readData() received bytes: " << myCurrentReceivedBytes
                  << " total received: " << _myNumReceivedBytes 
                  << " receivebuffer size : " << _myReceiveBuffer.size();
 
         _myTmpBuffer.insert( _myTmpBuffer.end(),
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myCurrentReceivedBytes );
-        AC_PRINT <<"socket data: ";
         //dumpBuffer( _myReceiveBuffer );
-        AC_PRINT <<"--------'";           
     } catch (const SocketException & ex) {
         /*MAKE_SCOPE_TIMER(SocketTransport_serialPortException);
         _myFrameQueueLock.lock();

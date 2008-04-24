@@ -334,8 +334,6 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             parseStatusLine(/*theTargetRaster*/);
         } else {
             if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
-                AC_PRINT << "MAGIC_TOKEN : " << (_myTmpBuffer[0] == MAGIC_TOKEN);
-                AC_PRINT << "Expected line : " << (_myTmpBuffer[1] == _myExpectedLine);
                 AC_WARNING << "Sync error.";
                 exit( 1 );
                 _mySyncLostCounter++;
