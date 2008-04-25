@@ -337,7 +337,7 @@ JSRenderWindow::Properties() {
 JSBool
 JSRenderWindow::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-
+    //cerr << "JSRenderWindow::getPropertySwitch: id ="<<int(theID)<<endl;
     switch (theID) {
         case PROP_windeco:
             *vp = as_jsval(cx, myObj.getNative().getWinDeco());

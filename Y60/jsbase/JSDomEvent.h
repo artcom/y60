@@ -71,7 +71,7 @@ class JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEven
             return Base::Construct(cx, theOwner, theNative);
         }
         static
-            JSObject * Construct(JSContext *cx, dom::EventPtr theOwner, NATIVE * theNative) {
+        JSObject * Construct(JSContext *cx, dom::EventPtr theOwner, NATIVE * theNative) {
             OWNERPTR myEvent = dynamic_cast_Ptr<GenericJSDomEvent>(theOwner);
             return Base::Construct(cx, myEvent, theNative);
         }
@@ -100,9 +100,7 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
 jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
 jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
 
-
 jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
-
 
 struct JSDomEventListener : public dom::EventListener {
     JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName = "handleEvent");
@@ -112,6 +110,9 @@ struct JSDomEventListener : public dom::EventListener {
     JSObject * getJSListener() {
         return _myEventListener;
     }
+    void setMethodName(const std::string & theMethodName) {
+        _myMethodName = theMethodName;
+    }
     JSContext * _myJSContext;
     JSObject * _myEventListener;
     std::string _myMethodName;
@@ -119,9 +120,6 @@ struct JSDomEventListener : public dom::EventListener {
 
 typedef asl::Ptr<JSDomEventListener,dom::ThreadingModel> JSDomEventListenerPtr;
 
-#if 1
-// creates a new wrapper object for the object passed in value; it does extract a wrapped value as usaual
-//bool convertFrom(JSContext *cx, jsval theValue, JSDomEventListener & theEventListener) {
 inline
 bool convertFrom(JSContext *cx, jsval theValue, dom::EventListenerPtr & theEventListener) {
      JSObject * myObject;
@@ -131,7 +129,7 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::EventListenerPtr & theEvent
     }
     return false;
 }
-#endif
+
 inline
 jsval as_jsval(JSContext *cx, asl::Ptr<JSDomEventListener> theOwner) {
     return OBJECT_TO_JSVAL(theOwner->getJSListener());

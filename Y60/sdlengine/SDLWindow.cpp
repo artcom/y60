@@ -436,9 +436,13 @@ SDLWindow::getScreenSize(unsigned theScreen) const {
     if (SDL_GetWMInfo(&wminfo) < 0) {
         AC_ERROR << "SDL_GetWMInfo: " << SDL_GetError() << endl;
     } else {
+#ifdef OSX
+	AC_WARNING << "getScreenSize not yet implemeted on OSX";
+#else
         Display * myDisplay = wminfo.info.x11.display;
         myWidth  = DisplayWidth(myDisplay, theScreen);
         myHeight = DisplayHeight(myDisplay, theScreen);
+#endif
     }
 #endif
     if (myWidth >= 0 && myHeight >= 0) {

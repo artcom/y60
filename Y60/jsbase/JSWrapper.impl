@@ -285,13 +285,13 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::JSWrapper()
     : _myNative(0), _myOwner(0)
 {
 }
-
+/*
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::~JSWrapper() 
 {
 }
-
+*/
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>

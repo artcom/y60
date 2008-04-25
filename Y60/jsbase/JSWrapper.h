@@ -563,10 +563,23 @@ struct VectorValueAccessProtocol {
     }
 };
 
+class JSWrapperBase {
+public:
+    static JSWrapperBase * getBasePtr(JSContext *cx, JSObject *obj) {
+        JSWrapperBase * myJSWrapper = static_cast<JSWrapperBase*>(JS_GetPrivate(cx,obj));
+        if (!myJSWrapper) {
+            JS_ReportError(cx,"JSWrapperBase::getJSWrapperPtr: internal error, binding object does not exist");
+        }
+        return myJSWrapper;
+    }
+    virtual const void * getNativeAdress() const = 0;
+    virtual ~JSWrapperBase() {}; 
+};
+
 template <class NATIVE,
           class OWNERPTR=asl::Ptr<typename dom::ValueWrapper<NATIVE>::Type, dom::ThreadingModel>,
           template<class,class> class ACCESS_PROTOCOL = ValueAccessProtocol>
-class JSWrapper {
+class JSWrapper : public JSWrapperBase {
 public:
     typedef ACCESS_PROTOCOL<NATIVE, OWNERPTR> NATIVE_ACCESS_PROTOCOL;
     typedef OWNERPTR NativeValuePtr;
@@ -632,6 +645,9 @@ public:
             JSWrapper * _myWrapper;
     };
     
+    virtual const void * getNativeAdress() const {
+        return &getNative();
+    }
     virtual const NATIVE & getNative() const;
 
     virtual OWNERPTR & getOwner();
@@ -717,7 +733,6 @@ public:
 protected:
     JSWrapper(OWNERPTR theOwner, NATIVE * theNative);
     JSWrapper();
-    virtual ~JSWrapper(); 
 
     static JSObject * initClass(JSContext *cx,
         JSObject *theGlobalObject,

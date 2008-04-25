@@ -860,7 +860,7 @@ xpath_findAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     bool myDeepSearchFlag = true;    
 
     if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
-	JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
+        JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
     }
 
     std::vector<dom::NodePtr> myResults;
@@ -917,8 +917,39 @@ addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
     DOC_PARAM("Listener", "", DOC_TYPE_OBJECT);
     DOC_PARAM("useCapture", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM_OPT("theHandlerMethodName", "", DOC_TYPE_STRING, "<same as Eventtype>");
     DOC_END;
+#if 1
+    dom::DOMString myEventtype;
+    dom::DOMString myHandlerMethodName = "";
+    dom::EventListenerPtr myListener;
+    bool myUseCaptureFlag = true;    
+    dom::NodePtr myNode;
+    JSDomEventListenerPtr myJSListener;
+    
+    convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
+    switch (argc) {
+        case 4:
+            convertFrom(cx, argv[3], myHandlerMethodName);                        
+        case 3:
+            convertFrom(cx, argv[2], myUseCaptureFlag);
+            convertFrom(cx, argv[1], myListener);
+            convertFrom(cx, argv[0], myEventtype);
+            if (myHandlerMethodName == "") {
+                myHandlerMethodName = myEventtype;
+            }
+            myJSListener = dynamic_cast_Ptr<JSDomEventListener>(myListener);;
+            myJSListener->setMethodName(myHandlerMethodName);
+            myNode->addEventListener(myEventtype, myListener, myUseCaptureFlag);
+            break;
+        default:
+            JS_ReportError(cx,"JSNode::addEventListener: wrong number of parameters: %d, 3 or 4 expected", argc);
+            return JS_FALSE;            
+    }
+    return JS_TRUE;
+#else
     return Method<dom::Node>::call(&dom::Node::addEventListener, cx, obj, argc, argv, rval);
+#endif
 }
 
 static JSBool
@@ -1035,7 +1066,7 @@ JSNode::Functions() {
         {"findAll",             xpath_findAll,       1},
         {"getAttribute",        getAttribute,        1},
         {"getAttributeNode",    getAttributeNode,    1},
-        {"addEventListener",    addEventListener,    3},
+        {"addEventListener",    addEventListener,    4},
         {"removeEventListener", removeEventListener, 3},
         {"dispatchEvent",       dispatchEvent,       3},
         {"freeCaches",          freeCaches,          0},

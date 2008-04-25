@@ -290,7 +290,7 @@ DumpStack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Tries string conversion on the given data and prints the result to stderr.");
+    DOC_BEGIN("Tries string conversion on the given data and prints the result to stdout. Arguments are separated by space, and a new line is printed after the last argument");
     DOC_PARAM("theMessage", "Message to print to console", DOC_TYPE_STRING);
     DOC_PARAM("...",  "Any number of parameters can be provided.", DOC_TYPE_STRING);
     DOC_END;
@@ -308,6 +308,26 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         if (n) {
             cout << endl;
         }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+Puts(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Tries string conversion on the given data and prints the result to stdout. Arguments are separated by space, no new line is printed");
+    DOC_PARAM("theMessage", "Message to print to console", DOC_TYPE_STRING);
+    DOC_PARAM("...",  "Any number of parameters can be provided.", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        uintN i, n;
+        for (i = n = 0; i < argc; i++) {
+            std::string myString;
+            if (! convertFrom(cx, argv[i], myString) ) {
+                return JS_FALSE;
+            }
+            cout << (i ? " " : "") << myString;
+        }
+        n++;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -927,6 +947,81 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+className(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns classname of native class");
+    DOC_PARAM("theClass", "A string", DOC_TYPE_OBJECT);
+    DOC_RVAL("the class name", DOC_TYPE_STRING);
+    DOC_END;
+    if (argc == 1) {
+        if (JSVAL_IS_VOID(argv[0]) || JSVAL_IS_NULL(argv[0])) {
+            JS_ReportError(cx, "className(): Argument #%d is undefined", 1);
+            return JS_FALSE;
+        }
+
+        string theClassName;
+        if (!JSVAL_IS_OBJECT(argv[0])) {
+            JS_ReportError(cx, "className(): Argument #%d is not an object", 1);
+            return JS_FALSE;
+        }
+        JSObject * myObject = JSVAL_TO_OBJECT(argv[0]);
+
+        JSClass * myClass = JSA_GetClass(cx, myObject);
+        if (!myClass) {
+            *rval = JSVAL_VOID;
+            return JS_TRUE;
+        }
+        if (myClass->flags & JSCLASS_HAS_PRIVATE) {
+        }
+//cerr << "&" << (void*)myClass->name;
+        if (!myClass->name) {
+            *rval = JSVAL_NULL;
+            return JS_TRUE;
+        }
+        
+        std::string myClassName = myClass->name;
+//cerr << "§" << myClassName;
+        *rval = as_jsval(cx, myClassName);
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"checksumFromString: bad number of arguments should be one, got %d", argc);
+    return JS_FALSE;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+objectid(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns a unique id string for each object; wrapped native objects can also compared for identity comparing the result of objectid(); the === operator currently does not work properly for these kind of objects");
+    DOC_RVAL("the object", DOC_TYPE_STRING);
+    DOC_END;
+    if (argc == 1) {
+        if (JSVAL_IS_VOID(argv[0]) || JSVAL_IS_NULL(argv[0])) {
+            JS_ReportError(cx, "className(): Argument #%d is undefined", 1);
+            return JS_FALSE;
+        }
+
+        JSObject * myObject = JSVAL_TO_OBJECT(argv[0]);
+
+        const void * myID = myObject;
+        std::string myPrefix="_JS_";
+        JSClass * myClass = JSA_GetClass(cx, myObject);
+        if (!myClass) {
+            *rval = JSVAL_VOID;
+            return JS_TRUE;
+        }
+        if (myClass->flags & JSCLASS_HAS_PRIVATE) {
+            myID = JSWrapperBase::getBasePtr(cx, myObject)->getNativeAdress();
+            myPrefix = "_NA_";
+        }
+        std::string myIDString = myPrefix+asl::as_string(myID);
+        *rval = as_jsval(cx, myIDString);
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"checksumFromString: bad number of arguments should be one, got %d", argc);
+    return JS_FALSE;
+}
+
+
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the time since program start in milliseconds.");
     DOC_RVAL("The time in milliseconds", DOC_TYPE_FLOAT);
@@ -1360,6 +1455,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSFunctionSpec glob_functions[] = {
     {"print",             Print,          0},
+    {"puts",              Puts,           0},
 #ifdef DEBUG
     {"trace",             Trace,          1},
 #endif
@@ -1402,6 +1498,8 @@ static JSFunctionSpec glob_functions[] = {
 
     {"exec",            execute,         2},
     {"operatingSystem", operatingSystem, 0},
+    {"className", className, 1},
+    {"objectid", objectid, 1},
     {0}
 };
 

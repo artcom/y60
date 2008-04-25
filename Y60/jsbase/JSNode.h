@@ -48,7 +48,7 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::Node & thePtr);
 #if 1
 bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
 #endif
-class JSNode {
+class JSNode : public JSWrapperBase {
 public:
     typedef dom::NodePtr NativeValuePtr;
 
@@ -69,6 +69,10 @@ public:
     dom::NodePtr getNodePtr(JSContext *cx, JSObject *obj);
     static
     dom::NodePtr getNodePtr(JSContext *cx, jsval theJSValue);
+    
+    virtual const void * getNativeAdress() const {
+        return _myNode.getNativePtr();
+    }
 
     static JSBool
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

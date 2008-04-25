@@ -1000,6 +1000,7 @@ template<class DERIVED>
 JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
+    //std::cerr << "JSRenderWindow::getPropertySwitch: id ="<<int(theID)<<std::endl;
     switch (theID) {
         case PROP_forceFullGC:
             *vp = as_jsval(cx, theNative.getForceFullGC()); //TODO: remove global
