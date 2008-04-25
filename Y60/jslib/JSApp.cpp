@@ -983,7 +983,7 @@ className(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         *rval = as_jsval(cx, myClassName);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"checksumFromString: bad number of arguments should be one, got %d", argc);
+    JS_ReportError(cx,"className: bad number of arguments should be one, got %d", argc);
     return JS_FALSE;
 }
 
@@ -994,7 +994,7 @@ objectid(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     if (argc == 1) {
         if (JSVAL_IS_VOID(argv[0]) || JSVAL_IS_NULL(argv[0])) {
-            JS_ReportError(cx, "className(): Argument #%d is undefined", 1);
+            JS_ReportError(cx, "objectid(): Argument #%d is undefined", 1);
             return JS_FALSE;
         }
 
@@ -1015,7 +1015,7 @@ objectid(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         *rval = as_jsval(cx, myIDString);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"checksumFromString: bad number of arguments should be one, got %d", argc);
+    JS_ReportError(cx,"objectid: bad number of arguments should be one, got %d", argc);
     return JS_FALSE;
 }
 
