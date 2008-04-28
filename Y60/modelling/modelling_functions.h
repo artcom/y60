@@ -587,7 +587,8 @@ updatePlane(dom::NodePtr theShapeNode, unsigned theXCount, unsigned theYCount,
       THE_POSITION_FUNCTION thePositionFunction = PlanePosition(),
       THE_NORMAL_FUNCTION theNormalFunction = ConstNormal(),
       THE_UV_FUNCTION theUVFunction = PlaneUVCoord(),
-      THE_COLOR_FUNCTION theColorFunction = BlackColor())
+      THE_COLOR_FUNCTION theColorFunction = BlackColor(),
+      unsigned theIndexOffset = 0)
 {
     ShapePtr myShape = theShapeNode->dom::Node::getFacade<y60::Shape>();
     if (!myShape) {
@@ -634,7 +635,7 @@ updatePlane(dom::NodePtr theShapeNode, unsigned theXCount, unsigned theYCount,
     VectorOfVector4f & myColors    = myColorsLock.get();
     VectorOfVector2f & myUVCoords  = myUVCoordsLock.get();
 
-    unsigned myCounter = 0;
+    unsigned myCounter = theIndexOffset;
     for (unsigned y = 0; y < theYCount; ++y) {
         for (unsigned x = 0; x < theXCount; ++x) {
             myPositions[myCounter] = thePositionFunction(x, y);
