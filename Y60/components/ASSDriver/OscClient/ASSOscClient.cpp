@@ -27,13 +27,14 @@ ASSOscClient::ASSOscClient() :
     _myServerPort( 7000 ),
     _myServerAddress("127.0.0.1")
 {
+    AC_DEBUG << "created osc sender";
 }
 
 
 void
 ASSOscClient::poll() {
 
-    //AC_PRINT << "==== poll ====";
+    AC_TRACE << "polling data from " << _myServerAddress << ":" << _myServerPort;
 
     _myOSCStream.Clear();
 
@@ -68,6 +69,7 @@ ASSOscClient::poll() {
 
 void
 ASSOscClient::connectToServer() {
+    AC_DEBUG << "connecting to server " << _myServerAddress << ":" << _myServerPort;
     _myConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
     _myConnection->connect( getHostAddress( _myServerAddress.c_str() ), _myServerPort);
 }
@@ -110,6 +112,8 @@ ASSOscClient::createTransportLayerEvent( const std::string & theType) {
 void 
 ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
 
+    AC_DEBUG << "updating osc sender settings";
+
     ASSDriver::onUpdateSettings( theSettings );
 
     dom::NodePtr mySettings = getASSSettings( theSettings );
@@ -134,6 +138,7 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
         _myServerAddress = myServerAddress;
         _myConnection = UDPConnectionPtr( 0 );
     }
+
 }
 
 } // end of namespace y60

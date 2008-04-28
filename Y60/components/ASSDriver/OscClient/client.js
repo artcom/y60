@@ -9,7 +9,9 @@ mySettings.parseFile("settings.xml");
 
 myClient.onUpdateSettings( mySettings );
 
+
 while (1) {
+
     myClient.poll();
     msleep( 10 ); // XXX
 }

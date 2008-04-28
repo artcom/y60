@@ -44,4 +44,4 @@ class SocketTransport : public TransportLayer {
 
 } // end of namespace
 
-#endif // Y60_ASS_SERIAL_TRANSPORT_INCLUDED
+#endif // Y60_ASS_SOCKET_TRANSPORT_INCLUDED

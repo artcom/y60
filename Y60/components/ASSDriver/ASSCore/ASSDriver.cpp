@@ -1284,6 +1284,8 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
 void
 ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 
+
+    AC_DEBUG << "updating ASSDriver settings";
     _mySettings = getASSSettings( theSettings );
     setupDriver(_mySettings);
 }
@@ -1298,11 +1300,15 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
         _myTransportLayer = TransportLayerPtr( 0 );
     }
 
+    AC_DEBUG << "driver setup: transport layer is '" << _myTransportLayer << "'";
+
     if ( ! _myTransportLayer ) {
         string myTransportName;
         getConfigSetting( theSettings, "TransportLayer", myTransportName, string("serial") );
+
         if ( myTransportName == "serial" ) {
-            _myTransportLayer = TransportLayerPtr( new SerialTransport(theSettings) );
+            TransportLayer* myTmp = new SerialTransport(theSettings);
+            _myTransportLayer = TransportLayerPtr(myTmp);
         } else if ( myTransportName == "socket" ) {
             _myTransportLayer = TransportLayerPtr( new SocketTransport(theSettings) );
         } else if ( myTransportName == "dummy" ) {
@@ -1314,6 +1320,9 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
             throw ASSException(string("Unknown transport layer '") + myTransportName + "'",
                     PLUS_FILE_LINE);
         }
+
+    } else {
+        AC_ERROR << "dirver setup: no TransportLayer setting found.";
     }
 
     getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
