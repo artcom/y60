@@ -382,6 +382,7 @@ namespace y60 {
 
         // default to png
         PLPNGEncoder myPNGEncoder;
+        myPNGEncoder.SetCompressionLevel(9);
         myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
     }
 }
