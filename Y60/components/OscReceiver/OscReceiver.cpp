@@ -20,14 +20,14 @@ using namespace std;
 using namespace asl;
 
 extern std::string ourosceventxsd;
-extern std::string oureventxsd;
+extern std::string ourasseventxsd;
 
 
 namespace y60 {
 
     OscReceiver::OscReceiver(DLHandle theHandle):
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
-        _myASSEventSchema( new dom::Document( oureventxsd )  ),
+        _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
         asl::PlugInBase( theHandle ),
