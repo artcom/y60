@@ -40,6 +40,9 @@ namespace y60 {
                 return myClassName;
             }
 
+            virtual void onGetProperty(const std::string & thePropertyName,
+                           PropertyValue & theReturnValue) const;
+        
             EventPtrList poll();
 
             void start();
@@ -65,6 +68,7 @@ namespace y60 {
             UdpListeningReceiveSocket _mySocket;
  	
             dom::NodePtr                 _myEventSchema;
+            dom::NodePtr                 _myASSEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
 
         };

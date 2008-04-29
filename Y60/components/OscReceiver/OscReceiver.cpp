@@ -14,16 +14,20 @@
 #include "y60/Documentation.h"
 #include <y60/JSScriptablePlugin.h>
 #include <y60/GenericEvent.h>
+#include <asl/string_functions.h>
 
 using namespace std;
 using namespace asl;
 
+extern std::string ourosceventxsd;
 extern std::string oureventxsd;
+
 
 namespace y60 {
 
     OscReceiver::OscReceiver(DLHandle theHandle):
-        _myEventSchema( new dom::Document( oureventxsd )  ),
+        _myEventSchema( new dom::Document( ourosceventxsd )  ),
+        _myASSEventSchema( new dom::Document( oureventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
         asl::PlugInBase( theHandle ),
@@ -75,8 +79,8 @@ namespace y60 {
         }
     }
 
-    void OscReceiver::ProcessMessage( const osc::ReceivedMessage& m, 
-                                      const IpEndpointName& remoteEndpoint ){
+    void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage, 
+                                      const IpEndpointName& theRemoteEndpoint ){
 
         try{
             _myEventListLock.lock();
@@ -85,7 +89,44 @@ namespace y60 {
 
             dom::NodePtr myNode = myY60Event->getNode();
     
-            myNode->appendAttribute<string>("type", m.AddressPattern());
+            myNode->appendAttribute<string>("type", string(theMessage.AddressPattern()).substr(1));
+
+            osc::ReceivedMessage::const_iterator myArgItr = 
+                 theMessage.ArgumentsBegin();
+
+            while ( myArgItr != theMessage.ArgumentsEnd() ){
+       
+                if (myArgItr->IsString()){
+                    myNode->appendChild(dom::Node("<string>" + 
+                                                  asl::as_string(myArgItr->AsString()) + 
+                                                  "</string>").firstChild());
+                } else if (myArgItr->IsFloat()){
+                    myNode->appendChild(dom::Node("<float>" + 
+                                                  asl::as_string(myArgItr->AsFloat()) + 
+                                                  "</float>").firstChild());
+                } else if (myArgItr->IsBool()){
+                    myNode->appendChild(dom::Node("<bool>" + 
+                                                  asl::as_string(myArgItr->AsBool()) + 
+                                                  "</bool>").firstChild());
+                } else if (myArgItr->IsInt32()){
+                    myNode->appendChild(dom::Node("<int>" + 
+                                                  asl::as_string(myArgItr->AsInt32()) + 
+                                                  "</int>").firstChild());
+                } else if (myArgItr->IsInt64()){
+                    myNode->appendChild(dom::Node("<int>" + 
+                                                  asl::as_string(myArgItr->AsInt64()) + 
+                                                  "</int>").firstChild());
+                } else if (myArgItr->IsDouble()){
+                    myNode->appendChild(dom::Node("<double>" + 
+                                                  asl::as_string(myArgItr->AsDouble()) + 
+                                                  "</double>").firstChild());
+                } else {
+                    AC_ERROR << "unknown osc message received";
+                }
+            
+                myArgItr++;
+
+            }
 
             _myNewY60Events.push_back(myY60Event);
 
@@ -96,9 +137,19 @@ namespace y60 {
             // any parsing errors such as unexpected argument types, or 
             // missing arguments get thrown as exceptions.
             std::cout << "error while parsing message: "
-                      << m.AddressPattern() << ": " << e.what() << "\n";
+                      << theMessage.AddressPattern() << ": " << e.what() << "\n";
         }
     }
+
+void
+OscReceiver::onGetProperty(const std::string & thePropertyName,
+        PropertyValue & theReturnValue) const
+{
+    if (thePropertyName == "eventSchema") {
+        theReturnValue.set( _myASSEventSchema );
+        return;
+    }
+}
 
     static JSBool
     Stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 

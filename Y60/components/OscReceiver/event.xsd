@@ -12,6 +12,54 @@
             <xs:attribute name="callback" type="xs:string"/>
             <xs:attribute name="type" type="xs:string"/> 
             <xs:attribute name="simulation_time" type="xs:double"/>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="float" />
+                <xs:element ref="string" />
+                <xs:element ref="int" />
+                <xs:element ref="double" />
+                <xs:element ref="bool" />
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="float">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:float">
+                   </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>      
+    <xs:element name="string">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                   </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>      
+    <xs:element name="int">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                   </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>      
+    <xs:element name="double">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:double">
+                   </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>      
+    <xs:element name="bool">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:bool">
+                   </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>      
+
 </xs:schema>
