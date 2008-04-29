@@ -64,6 +64,8 @@ namespace y60 {
             y60::EventPtrList         _myNewY60Events;
             UdpListeningReceiveSocket _mySocket;
  	
+            dom::NodePtr                 _myEventSchema;
+            asl::Ptr<dom::ValueFactory>  _myValueFactory;
 
         };
 

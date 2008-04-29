@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- example nodes
+         <generic when="1.17026e+09"
+                  callback="onOscEvent"
+                  type="whatever" />
+    -->
+    
+    <xs:element name="generic">
+        <xs:complexType>
+            <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="callback" type="xs:string"/>
+            <xs:attribute name="type" type="xs:string"/> 
+            <xs:attribute name="simulation_time" type="xs:double"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

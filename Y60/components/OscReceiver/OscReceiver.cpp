@@ -18,21 +18,20 @@
 using namespace std;
 using namespace asl;
 
+extern std::string oureventxsd;
+
 namespace y60 {
 
     OscReceiver::OscReceiver(DLHandle theHandle):
-        //_myValueFactory( new dom::ValueFactory() )
+        _myEventSchema( new dom::Document( oureventxsd )  ),
+        _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
         asl::PlugInBase( theHandle ),
-        _mySocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 12000),
-                  this )
+        _mySocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 12000), this )
     {
 
-        //_myEventSchema = new dom::Document(");
    
-/*        registerStandardTypes( * _myValueFactory );
-          registerSomTypes( * _myValueFactory );
-*/
+        registerStandardTypes( * _myValueFactory );
     }
 
     OscReceiver::~OscReceiver(){
@@ -41,13 +40,14 @@ namespace y60 {
 
 
     y60::EventPtrList OscReceiver::poll() {
-
         _myCurrentY60Events.clear();
         _myEventListLock.lock();
         
         _myCurrentY60Events = _myNewY60Events;
+        _myNewY60Events.clear();
+
         _myEventListLock.unlock();
-        
+
         return _myCurrentY60Events;
     }
 
@@ -79,11 +79,9 @@ namespace y60 {
                                       const IpEndpointName& remoteEndpoint ){
 
         try{
-            std::cout << "c++: received message: " << m.AddressPattern() <<  std::endl;
-            
             _myEventListLock.lock();
 
-            y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent"));
+            y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent",_myEventSchema, _myValueFactory));
 
             dom::NodePtr myNode = myY60Event->getNode();
     
@@ -91,7 +89,7 @@ namespace y60 {
 
             _myNewY60Events.push_back(myY60Event);
 
-            AC_PRINT << "c++: adding osc event " << *myNode;
+            AC_TRACE << "c++: adding osc event " << *myNode;
             _myEventListLock.unlock();
             
         }catch( osc::Exception& e ){
