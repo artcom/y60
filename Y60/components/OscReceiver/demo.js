@@ -37,11 +37,16 @@ function OscReceiverDemo(theArguments, theWidth, theHeight, theTitle) {
         window.swapInterval    = 0;
 
         _myOscReceiver = new OscReceiver();
+        _myOscReceiver.start();
     }
 
     //////////////////////////////////////////////////////////////////////
     // Callbacks
     //////////////////////////////////////////////////////////////////////
+
+    Public.onOscEvent = function(theNode){
+        print(theNode);
+    }
 
     //  Will be called first in renderloop, has the time since application start
     Base.onFrame = Public.onFrame;

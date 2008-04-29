@@ -33,22 +33,17 @@ namespace y60 {
     public: 
 
             OscReceiver(asl::DLHandle theHandle);
-            virtual ~OscReceiver(){};
+            virtual ~OscReceiver();
 
             const char * ClassName() {
                 static const char * myClassName = "OscReceiver";
                 return myClassName;
             }
 
-/*
-            virtual void onGetProperty(const std::string & thePropertyName,
-                                       PropertyValue & theReturnValue) const;
-            virtual void onSetProperty(const std::string & thePropertyName,
-                                       const PropertyValue & thePropertyValue);
-*/
             EventPtrList poll();
 
-            void start(){ AC_PRINT << "started thread"; }
+            void start();
+            void stop();
 
             // threading
             void run();
@@ -64,8 +59,11 @@ namespace y60 {
 
     private:
 
-            EventPtrList            _myEvents;
-
+            asl::ThreadLock           _myEventListLock;
+            y60::EventPtrList         _myCurrentY60Events;
+            y60::EventPtrList         _myNewY60Events;
+            UdpListeningReceiveSocket _mySocket;
+ 	
 
         };
 
