@@ -191,7 +191,9 @@ namespace y60 {
     }
 
     bool
-    Renderer::switchMaterial(const Viewport & theViewport, const MaterialBase & theMaterial, bool isOverlay) {
+    Renderer::switchMaterial(const Viewport & theViewport, 
+                             const MaterialBase & theMaterial, 
+                             bool isOverlay) {
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
