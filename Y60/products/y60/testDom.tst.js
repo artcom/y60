@@ -386,7 +386,7 @@ DomEventTest.prototype.Constructor = function(obj, theName) {
     	ENSURE(myDomEvent.cancelable == false);
     	ENSURE(myDomEvent.isDefaultPrevented == true);
 
-    	myChildNode2.addEventListener("testEvent", obj, true);
+    	myChildNode2.addEventListener("testEvent", obj, true, "handleEvent");
     	myChildNode3.dispatchEvent(myDomEvent);
     }
 

@@ -232,7 +232,7 @@ namespace y60 {
             dom::DocumentPtr getSceneDom() {
                 return _mySceneDom;
             }
-            dom::DocumentPtr getSceneDom() const {
+            const dom::DocumentPtr getSceneDom() const {
                 return _mySceneDom;
             }
 
