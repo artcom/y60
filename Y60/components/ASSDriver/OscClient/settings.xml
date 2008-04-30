@@ -22,7 +22,7 @@
         <StopBits>1</StopBits>
         <Handshaking>false</Handshaking>
 
-        <ServerAddress>127.0.0.1</ServerAddress>
+        <ServerAddress>127.0.0.1,10.1.2.145</ServerAddress>
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
         <TouchThreshold step="5">200</TouchThreshold>

@@ -24,54 +24,60 @@ ASSOscClient::ASSOscClient() :
     ASSDriver(),
     _myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
-    _myServerPort( 7000 ),
-    _myServerAddress("127.0.0.1")
+    _myServerPort( 7000 )
 {
     AC_DEBUG << "created osc sender";
 }
 
-
 void
 ASSOscClient::poll() {
 
-    AC_TRACE << "polling data from " << _myServerAddress << ":" << _myServerPort;
-
     _myOSCStream.Clear();
-
+    
     _myOSCStream << osc::BeginBundleImmediate;
 
-    if ( ! _myConnection ) {
-        connectToServer();
-        // if(running)
-        createTransportLayerEvent("configure");
+    for (int i = 0; i < _myReceivers.size(); ++i){
+        
+        if ( ! _myReceivers[i].udpConnection ) {
+            connectToServer(i);
+            // Send a new "configure" to all receivers, not only the
+            // newly connected one. This behaviour may change if
+            // needed.
+            createTransportLayerEvent("configure");
+        }
     }
-
+   
     processInput();
-
+        
     _myOSCStream << osc::EndBundle;
 
     ASSURE( _myOSCStream.IsReady() );
 
-    if (_myConnection) {
-        if ( _myOSCStream.Size() > 16 ) { // empty bundles have size 16
-                                          // determined experimentally ... ain't nice
-            try {
-                _myConnection->send( _myOSCStream.Data(), _myOSCStream.Size() );
-            } catch (const inet::SocketException & ex) {
-                AC_WARNING << "Failed to connect to " << _myServerAddress << " at port "
-                           << _myServerPort << ": " << ex;
-                _myConnection = UDPConnectionPtr( 0 );
+    for (int i = 0; i < _myReceivers.size(); ++i){
+
+        if (_myReceivers[i].udpConnection) {
+            if ( _myOSCStream.Size() > 16 ) { // empty bundles have size 16
+                // determined experimentally ... ain't nice
+                try {
+                    _myReceivers[i].udpConnection->send( _myOSCStream.Data(), _myOSCStream.Size() );
+                } catch (const inet::SocketException & ex) {
+                    AC_WARNING << "Failed to connect to " << _myReceivers[i].address << " at port "
+                               << _myServerPort << ": " << ex;
+                    _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
+                }
             }
         }
     }
+
     //AC_PRINT << "==== done ====";
 }
 
 void
-ASSOscClient::connectToServer() {
-    AC_DEBUG << "connecting to server " << _myServerAddress << ":" << _myServerPort;
-    _myConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
-    _myConnection->connect( getHostAddress( _myServerAddress.c_str() ), _myServerPort);
+ASSOscClient::connectToServer(int theIndex) {
+    AC_DEBUG << "connecting to server " << _myReceivers[theIndex].address << ":" << _myServerPort;
+    _myReceivers[theIndex].udpConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
+    _myReceivers[theIndex].udpConnection->connect( 
+        getHostAddress( _myReceivers[theIndex].address.c_str() ), _myServerPort);
 }
 
 
@@ -122,23 +128,34 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     getConfigSetting( mySettings, "ClientPort", myClientPort, 7001 );
     if ( myClientPort != _myClientPort ) {
         _myClientPort = myClientPort;
-        _myConnection = UDPConnectionPtr( 0 );
+        for (int i = 0; i < _myReceivers.size(); ++i){
+            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
+        }
     }
 
     int myServerPort;
     getConfigSetting( mySettings, "ServerPort", myServerPort, 7000 );
     if ( myServerPort != _myServerPort ) {
         _myServerPort = myServerPort;
-        _myConnection = UDPConnectionPtr( 0 );
+        for (int i = 0; i < _myReceivers.size(); ++i){
+            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
+        }
     }
 
-    std::string myServerAddress;
-    getConfigSetting( mySettings, "ServerAddress", myServerAddress, string("127.0.0.1") );
-    if ( myServerAddress != _myServerAddress ) {
-        _myServerAddress = myServerAddress;
-        _myConnection = UDPConnectionPtr( 0 );
-    }
 
+    std::string myReceiversString;
+    getConfigSetting( mySettings, "ServerAddress", myReceiversString, string("127.0.0.1") );
+    vector<string> myAddresses = splitString(myReceiversString, ",");
+    for (int i = 0; i < myAddresses.size(); ++i){
+        if ((int) _myReceivers.size() - 2 < i){
+            _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
+        }
+        if ( myAddresses[i].compare(_myReceivers[i].address) != 0 ) {
+            AC_DEBUG << "adding '" << myAddresses[i] << "' to the osc receiver list";
+            _myReceivers[i].address = myAddresses[i];
+            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
+        }
+    }
 }
 
 } // end of namespace y60
