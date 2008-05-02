@@ -1,30 +1,39 @@
 <settings>
     <ASSDriver>
-        <GainPower>2</GainPower>
-        <ComponentThreshold>10.00000</ComponentThreshold>
-        <NoiseThreshold>15</NoiseThreshold>
-        <IntensityThreshold step="0.5">9.00000</IntensityThreshold>
+          <ShowASSData min="0" max="1">0.00000</ShowASSData>
+        <SensorPosition step="1.00">[33.70000,39.00000]</SensorPosition>
+        <SensorOrientation step="1.5707963">0</SensorOrientation>
+        <SensorScale step="0.1">[34.90000,34.80000]</SensorScale>
+        <MirrorX min="0" max="1">0.00000</MirrorX>
+        <MirrorY min="0" max="1">0.00000</MirrorY>
+        <GainPower>4.00000</GainPower>
+        <ComponentThreshold>5.00000</ComponentThreshold>
+        <NoiseThreshold>5.00000</NoiseThreshold>
+        <IntensityThreshold step="0.5">8.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
-        <MinTouchInterval step="0.01">0.2</MinTouchInterval>
-        <ClampToScreen step="1">0</ClampToScreen>
-
-        <ProbePosition min="-1" step="1">[2.00000,3.00000]</ProbePosition>
+        <ProbePosition min="-1" step="1">[1.00000,18.00000]</ProbePosition>
+        <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
+        <MomentumRegion step="1">[-1.00,-1.00000,1.00,1.00000]</MomentumRegion>
+        <InterpolationMode min="0" max="1">0</InterpolationMode>
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
-
-        <TransportLayer>serial</TransportLayer>
         <EventQueueSize>100</EventQueueSize>
+        <TransportLayer>serial</TransportLayer>
         <SerialPort>0</SerialPort>
-        <UseUSB>1</UseUSB>
-        <BaudRate>460800</BaudRate>
-        <BitsPerWord>8</BitsPerWord>
+        <UseUSB min="0" max="1">1</UseUSB>
+        <BaudRate>230400</BaudRate>
+        <BitsPerWord min="5" max="8">8</BitsPerWord>
         <Parity>no_parity</Parity>
-        <StopBits>1</StopBits>
-        <Handshaking>false</Handshaking>
-
-        <ServerAddress>127.0.0.1,10.1.2.145</ServerAddress>
+        <StopBits min="1" max="2">1</StopBits>
+        <Handshaking min="0" max="1">0</Handshaking>
+        <MinTouchInterval step="0.01">0.2</MinTouchInterval>
+        <ClampToScreen>0</ClampToScreen>
+        <MinTouchThreshold>9</MinTouchThreshold>
+        <InterpolationMethod>1</InterpolationMethod>
+        <CureBrokenElectrodes>0</CureBrokenElectrodes>
+    
+        <ServerAddress>127.0.0.1,ascon</ServerAddress>
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
-        <TouchThreshold step="5">200</TouchThreshold>
     </ASSDriver>
 </settings>
