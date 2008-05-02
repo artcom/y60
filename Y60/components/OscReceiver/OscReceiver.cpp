@@ -90,6 +90,9 @@ namespace y60 {
             dom::NodePtr myNode = myY60Event->getNode();
     
             myNode->appendAttribute<string>("type", string(theMessage.AddressPattern()).substr(1));
+            char mySenderAddress[IpEndpointName::ADDRESS_STRING_LENGTH];
+            theRemoteEndpoint.AddressAsString(mySenderAddress);
+            myNode->appendAttribute<string>("sender", string(mySenderAddress));
 
             osc::ReceivedMessage::const_iterator myArgItr = 
                  theMessage.ArgumentsBegin();
