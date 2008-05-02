@@ -49,13 +49,8 @@ namespace y60 {
         _myCurrentY60Events.clear();
 
         while (!_myNewMessages.empty()){
-
-            cout << "received message " << _myNewMessages.front().AddressPattern() << endl;
-
             _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
-
             _myNewMessages.pop_front();
-            
         }
 
         _myThreadLock.unlock();
@@ -89,7 +84,7 @@ namespace y60 {
     
     EventPtr OscReceiver::createY60Event(osc::ReceivedMessage theMessage){
         
-        y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent",_myEventSchema, _myValueFactory));
+        y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent", _myEventSchema, _myValueFactory));
 
         dom::NodePtr myNode = myY60Event->getNode();
     
@@ -133,6 +128,7 @@ namespace y60 {
 
         }
 
+        AC_TRACE << "new osc event: " << *myNode;
         return myY60Event;
 
     }
