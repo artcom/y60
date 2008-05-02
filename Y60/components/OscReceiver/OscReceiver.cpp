@@ -29,6 +29,7 @@ namespace y60 {
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
         _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
+        asl::PosixThread(),
         asl::PlugInBase( theHandle ),
         _mySocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 12000), this )
     {
@@ -38,23 +39,102 @@ namespace y60 {
     }
 
     OscReceiver::~OscReceiver(){
-        
+        stop();
     }
 
 
     y60::EventPtrList OscReceiver::poll() {
-       
-        // start the socket listening (sockets "Break()"-Method is called at the
-        // end of PrecessMessage to get nice single threading)
-        _mySocket.Run();
-    
-        _myCurrentY60Events.clear();
-        
-        _myCurrentY60Events = _myNewY60Events;
-        _myNewY60Events.clear();
+        _myThreadLock.lock();
 
+        _myCurrentY60Events.clear();
+
+        while (!_myNewMessages.empty()){
+
+            cout << "received message " << _myNewMessages.front().AddressPattern() << endl;
+
+            _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
+
+            _myNewMessages.pop_front();
+            
+        }
+
+        _myThreadLock.unlock();
 
         return _myCurrentY60Events;
+    }
+
+    void OscReceiver::start(){
+        AC_DEBUG << "start listening for osc events";
+        fork();
+    }
+
+    void OscReceiver::stop(){
+        _mySocket.AsynchronousBreak();
+        join();
+        AC_DEBUG << "stopped listening for osc events";
+    }
+
+    void OscReceiver::run( ) {
+        try {
+            AC_DEBUG << "launched the osc receiver thread";
+    
+            _mySocket.Run();
+
+            AC_DEBUG << "receiver thread finished";
+        } catch (const asl::Exception & ex) {
+            AC_ERROR << "asl::Exception in OscReceiver thread: " << ex;
+            throw;
+        }
+    }
+    
+    EventPtr OscReceiver::createY60Event(osc::ReceivedMessage theMessage){
+        
+        y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent",_myEventSchema, _myValueFactory));
+
+        dom::NodePtr myNode = myY60Event->getNode();
+    
+        myNode->appendAttribute<string>("type", string(theMessage.AddressPattern()).substr(1));
+
+        osc::ReceivedMessage::const_iterator myArgItr = 
+            theMessage.ArgumentsBegin();
+
+        while ( myArgItr != theMessage.ArgumentsEnd() ){
+       
+            if (myArgItr->IsString()){
+                myNode->appendChild(dom::Node("<string>" + 
+                                              asl::as_string(myArgItr->AsString()) + 
+                                              "</string>").firstChild());
+            } else if (myArgItr->IsFloat()){
+                myNode->appendChild(dom::Node("<float>" + 
+                                              asl::as_string(myArgItr->AsFloat()) + 
+                                              "</float>").firstChild());
+            } else if (myArgItr->IsBool()){
+                myNode->appendChild(dom::Node("<bool>" + 
+                                              asl::as_string(myArgItr->AsBool()) + 
+                                              "</bool>").firstChild());
+            } else if (myArgItr->IsInt32()){
+                myNode->appendChild(dom::Node("<int>" + 
+                                              asl::as_string(myArgItr->AsInt32()) + 
+                                              "</int>").firstChild());
+            } else if (myArgItr->IsInt64()){
+                myNode->appendChild(dom::Node("<int>" + 
+                                              asl::as_string(myArgItr->AsInt64()) + 
+                                              "</int>").firstChild());
+            } else if (myArgItr->IsDouble()){
+                myNode->appendChild(dom::Node("<double>" + 
+                                              asl::as_string(myArgItr->AsDouble()) + 
+                                              "</double>").firstChild());
+            } else {
+                AC_ERROR << "unknown osc message received";
+                break;
+            }
+            
+            myArgItr++;
+
+        }
+
+        return myY60Event;
+
     }
 
 
@@ -62,81 +142,66 @@ namespace y60 {
                                       const IpEndpointName& theRemoteEndpoint ){
 
         try{
+            _myThreadLock.lock();
 
-            y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent",_myEventSchema, _myValueFactory));
-
-            dom::NodePtr myNode = myY60Event->getNode();
-    
-            myNode->appendAttribute<string>("type", string(theMessage.AddressPattern()).substr(1));
-            char mySenderAddress[IpEndpointName::ADDRESS_STRING_LENGTH];
-            theRemoteEndpoint.AddressAsString(mySenderAddress);
-            myNode->appendAttribute<string>("sender", string(mySenderAddress));
-
-            osc::ReceivedMessage::const_iterator myArgItr = 
-                 theMessage.ArgumentsBegin();
-
-            while ( myArgItr != theMessage.ArgumentsEnd() ){
-       
-                if (myArgItr->IsString()){
-                    myNode->appendChild(dom::Node("<string>" + 
-                                                  asl::as_string(myArgItr->AsString()) + 
-                                                  "</string>").firstChild());
-                } else if (myArgItr->IsFloat()){
-                    myNode->appendChild(dom::Node("<float>" + 
-                                                  asl::as_string(myArgItr->AsFloat()) + 
-                                                  "</float>").firstChild());
-                } else if (myArgItr->IsBool()){
-                    myNode->appendChild(dom::Node("<bool>" + 
-                                                  asl::as_string(myArgItr->AsBool()) + 
-                                                  "</bool>").firstChild());
-                } else if (myArgItr->IsInt32()){
-                    myNode->appendChild(dom::Node("<int>" + 
-                                                  asl::as_string(myArgItr->AsInt32()) + 
-                                                  "</int>").firstChild());
-                } else if (myArgItr->IsInt64()){
-                    myNode->appendChild(dom::Node("<int>" + 
-                                                  asl::as_string(myArgItr->AsInt64()) + 
-                                                  "</int>").firstChild());
-                } else if (myArgItr->IsDouble()){
-                    myNode->appendChild(dom::Node("<double>" + 
-                                                  asl::as_string(myArgItr->AsDouble()) + 
-                                                  "</double>").firstChild());
-                } else {
-                    AC_ERROR << "unknown osc message received";
-                }
+            _myNewMessages.push_front(theMessage);
             
-                myArgItr++;
-
-            }
-
-            _myNewY60Events.push_back(myY60Event);
-
-            cout << "c++: adding osc event " << *myNode;
-    
-            // exit from osc sockets "Run()" method
-            _mySocket.Break();
+            //AC_TRACE << "c++: adding osc event " << *myNode;
+            _myThreadLock.unlock();
             
         }catch( osc::Exception& e ){
             // any parsing errors such as unexpected argument types, or 
             // missing arguments get thrown as exceptions.
             std::cout << "error while parsing message: "
                       << theMessage.AddressPattern() << ": " << e.what() << "\n";
+            _myThreadLock.unlock();
         }
     }
 
-void
-OscReceiver::onGetProperty(const std::string & thePropertyName,
-        PropertyValue & theReturnValue) const
-{
-    if (thePropertyName == "eventSchema") {
-        theReturnValue.set( _myASSEventSchema );
-        return;
+    void
+    OscReceiver::onGetProperty(const std::string & thePropertyName,
+                               PropertyValue & theReturnValue) const
+    {
+        if (thePropertyName == "eventSchema") {
+            theReturnValue.set( _myASSEventSchema );
+            return;
+        }
     }
-}
+
+    static JSBool
+    Stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+        DOC_BEGIN("Start listening for osc events in a seperate thread (fork)");
+        DOC_END;
+   
+        asl::Ptr<y60::OscReceiver> myNative = jslib::getNativeAs<y60::OscReceiver>(cx, obj);
+        if (myNative) {
+            myNative->stop();
+        } else {
+            assert(myNative);
+        }
+        return JS_TRUE;
+    }
+
+    static JSBool
+    Start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+        DOC_BEGIN("Stop listening for osc events in a seperate thread (join).");
+        DOC_END;
+   
+        asl::Ptr<y60::OscReceiver> myNative = jslib::getNativeAs<y60::OscReceiver>(cx, obj);
+        if (myNative) {
+            myNative->start();
+        } else {
+            assert(myNative);
+        }
+        return JS_TRUE;
+    }
+
 
     JSFunctionSpec * 
     OscReceiver::Functions() {
         static JSFunctionSpec myFunctions[] = {
+            {"start", Start, 0},
+            {"stop", Stop, 0},
             {0}
         };
         return myFunctions;

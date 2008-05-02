@@ -27,7 +27,8 @@ namespace y60 {
     class OscReceiver : public osc::OscPacketListener,
         public asl::PlugInBase,
         public jslib::IScriptablePlugin,
-        public y60::IEventSource {
+        public y60::IEventSource,
+        public asl::PosixThread {
 
     public: 
 
@@ -44,6 +45,12 @@ namespace y60 {
         
             EventPtrList poll();
 
+            void start();
+            void stop();
+
+            // threading
+            void run();
+
             JSFunctionSpec * Functions();
 
     protected:
@@ -55,8 +62,11 @@ namespace y60 {
 
     private:
 
+            y60::EventPtr createY60Event(osc::ReceivedMessage theMessage);
+
+            asl::ThreadLock           _myThreadLock;
             y60::EventPtrList         _myCurrentY60Events;
-            y60::EventPtrList         _myNewY60Events;
+            std::list<osc::ReceivedMessage> _myNewMessages;
             UdpListeningReceiveSocket _mySocket;
  	
             dom::NodePtr                 _myEventSchema;
