@@ -464,6 +464,15 @@ JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
                 JSClassTraits<asl::Quaternionf>::getNativeRef(cx,myArgument);
             myNewObject = new JSMatrix(myNewValue);
             myNewMatrix = asl::Matrix4f(myQuat);
+        } else {
+            std::string myText = asl::as_string(cx, argv[0]);
+            try {
+                myNewMatrix = asl::as<asl::Matrix4f>(myText);
+            } catch (asl::Exception & ex) {
+                JS_ReportError(cx,"Constructor for %s: malformed argument, not a Matrix4f: %s",ClassName(), myText.c_str());
+                return JS_FALSE;
+            }
+            myNewObject = new JSMatrix(myNewValue);
         }
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0,1 or 16, got %d",ClassName(), argc);
