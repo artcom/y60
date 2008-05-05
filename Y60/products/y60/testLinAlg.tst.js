@@ -168,7 +168,6 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
     }
 }
 
-
 function Matrix4fUnitTest() {
     this.Constructor(this, "Matrix4fUnitTest");
 };
@@ -205,43 +204,41 @@ Matrix4fUnitTest.prototype.Constructor = function(obj, theName) {
             ENSURE('obj.myMatrix[obj.i].toString() == obj.myExpectedResult.toString()');
             ENSURE('almostEqual(obj.myMatrix[obj.i], obj.myExpectedResult)');
         }
-/*
+        DPRINT('new Matrix4f(obj.myMatrix.toString()).toString()');
+        ENSURE('obj.myMatrix.toString() == new Matrix4f(obj.myMatrix.toString()).toString()');
+
         ENSURE('obj.myMatrix.type == Matrix4f.UNKNOWN', "Testing type");
 
-        obj.myMatrix2 = new Matrix4f();
-        obj.myMatrix2.assignMatrix(obj.myMatrix);
-        ENSURE('almostEqualMatrix(obj.myMatrix,obj.myMatrix2)');
+        obj.myMatrix2 = new Matrix4f(obj.myMatrix);
+        ENSURE('almostEqual(obj.myMatrix,obj.myMatrix2)');
 
         // makeIdentity
         DTITLE("Testing makeIdentity");
-        obj.myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
         obj.myMatrix.makeIdentity();
         DPRINT('obj.myMatrix.type');
-        DPRINT('obj.myMatrix.IDENTITY');
+        DPRINT('Matrix4f.IDENTITY');
 
-        ENSURE('obj.myMatrix.type == obj.myMatrix.IDENTITY', "Test makeIdentity()");
+        ENSURE('obj.myMatrix.type == Matrix4f.IDENTITY', "Test makeIdentity()");
         obj.myIdentity = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-        ENSURE('almostEqualMatrix(obj.myMatrix, myIdentity)', "Test makeIdentity()");
+        ENSURE('almostEqual(obj.myMatrix, myIdentity)', "Test makeIdentity()");
 
         DTITLE("Testing makeScaling");
-        obj.myMatrix.assignValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+        obj.myMatrix = new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
         obj.myMatrix.makeScaling(new Vector3f(-1, 2, 3));
         DPRINT('obj.myMatrix.type');
-        ENSURE('obj.myMatrix.type != obj.myMatrix.IDENTITY', "Test makeScaling()");
-        ENSURE('obj.myMatrix.type == obj.myMatrix.SCALING', "Test makeScaling()");
-        obj.myScaling = new Matrix4f();
-        obj.myScaling.assignValues(-1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1);
-        ENSURE('almostEqualMatrix(obj.myMatrix, myScaling)', "Test makeScaling()");
+        ENSURE('obj.myMatrix.type != Matrix4f.IDENTITY', "Test makeScaling()");
+        ENSURE('obj.myMatrix.type == Matrix4f.SCALING', "Test makeScaling()");
+        obj.myScaling = new Matrix4f(-1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1);
+        ENSURE('almostEqual(obj.myMatrix, myScaling)', "Test makeScaling()");
 
         DTITLE("Testing makeTranslating");
-        obj.myMatrix.assignValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+        obj.myMatrix= new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
         obj.myMatrix.makeTranslating(new Vector3f(3, 2, -1));
         DPRINT('obj.myMatrix.type');
-        ENSURE('obj.myMatrix.type != obj.myMatrix.IDENTITY', "Test makeScaling()");
-        ENSURE('obj.myMatrix.type == obj.myMatrix.TRANSLATING', "Test makeTranslating()");
-        obj.myTranslating = new Matrix4f();
-        obj.myTranslating.assignValues(1,0,0,0,0,1,0,0,0,0,1,0,3,2,-1,1);
-        ENSURE('almostEqualMatrix(obj.myMatrix, obj.myTranslating)', "Test makeTranslating()");
+        ENSURE('obj.myMatrix.type != Matrix4f.IDENTITY', "Test makeScaling()");
+        ENSURE('obj.myMatrix.type == Matrix4f.TRANSLATING', "Test makeTranslating()");
+        obj.myTranslating = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,3,2,-1,1);
+        ENSURE('almostEqual(obj.myMatrix, obj.myTranslating)', "Test makeTranslating()");
 
         DTITLE("Testing rotate");
         obj.myIdentity = new Matrix4f();
@@ -254,118 +251,118 @@ Matrix4fUnitTest.prototype.Constructor = function(obj, theName) {
 
         with (obj) {
             myMatrix.rotateX(0);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
             myMatrix.rotateY(0);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
             myMatrix.rotateZ(0);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateX(2 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateY(2 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateZ(2 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateX(PI);
             myMatrix.rotateX(PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateY(PI);
             myMatrix.rotateY(PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateZ(PI);
             myMatrix.rotateZ(PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             myMatrix.makeIdentity();
             myMatrix.rotateZ(PI);
             myMatrix.rotateX(PI);
             myMatrix.rotateY(PI);
-            ENSURE('almostEqualMatrix(myMatrix, myIdentity)');
+            ENSURE('almostEqual(myMatrix, myIdentity)');
 
             obj.myExpectedResult = new Matrix4f();
             myExpectedResult.makeIdentity();
 
             myMatrix.makeXRotating(0);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)', "Testing makeXRotating");
-            ENSURE('myMatrix.type == myMatrix.X_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)', "Testing makeXRotating");
             myMatrix.makeXRotating(2.0 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('myMatrix.type == Matrix4f.X_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myMatrix.makeXRotating(PI/4);
             myExpectedResult.rotateX(PI/4);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myExpectedResult.makeIdentity();
 
             myMatrix.makeYRotating(0);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)', "Testing makeYRotating");
-            ENSURE('myMatrix.type == myMatrix.Y_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)', "Testing makeYRotating");
             myMatrix.makeYRotating(2.0 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('myMatrix.type == Matrix4f.Y_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myMatrix.makeYRotating(PI/4);
             myExpectedResult.rotateY(PI/4);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myExpectedResult.makeIdentity();
 
             myMatrix.makeZRotating(0);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)', "Testing makeZRotating");
-            ENSURE('myMatrix.type == myMatrix.Z_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)', "Testing makeZRotating");
             myMatrix.makeZRotating(2.0 * PI);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('myMatrix.type == Matrix4f.Z_ROTATING');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myMatrix.makeZRotating(PI/4);
             myExpectedResult.rotateZ(PI/4);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
             myExpectedResult.makeIdentity();
 
             myMatrix.makeRotating(new Vector3f(1, 0, 0), 0.123);
-            ENSURE('myMatrix.type == myMatrix.ROTATING');
+            ENSURE('myMatrix.type ==Matrix4f.ROTATING');
             myExpectedResult.makeXRotating(0.123);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)', "Testing makeRotating");
+            ENSURE('almostEqual(myMatrix, myExpectedResult)', "Testing makeRotating");
             myMatrix.makeRotating(new Vector3f(1.0, 2.0, 3.0), 2 * PI);
             myExpectedResult.makeRotating(new Vector3f(1.0, 2.0, 3.0), 0);
-            ENSURE('almostEqualMatrix(myMatrix, myExpectedResult)');
+            ENSURE('almostEqual(myMatrix, myExpectedResult)');
 
             // Test Vector * Matrix
-            myMatrix.assignValues(0,1,2,3, 4,5,6,7, 8,9,10,11, 12,13,14,15);
+            myMatrix = new Matrix4f(0,1,2,3, 4,5,6,7, 8,9,10,11, 12,13,14,15);
             obj.myVector = new Vector4f(0,1,2,3);
-            ENSURE('almostEqual(multiplyVector(obj.myVector,obj.myMatrix), new Vector4f(56, 62, 68, 74))',
+            ENSURE('almostEqual(product(obj.myVector,obj.myMatrix), new Vector4f(56, 62, 68, 74))',
                     "Testing vector * matrix");
 
-            myMatrix.assignValues(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+            myMatrix = new Matrix4f(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
             myVector = new Vector4f(-1,1,-1,1);
-            ENSURE('almostEqual(multiplyVector(myVector,myMatrix), new Vector4f(0,0,0,0))',
+            ENSURE('almostEqual(product(myVector,myMatrix), new Vector4f(0,0,0,0))',
                     "Testing vector * matrix");
 
             // Point * Matrix
             obj.myPoint = new Point3f(0,1,2);
-            myMatrix.assignValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-            obj.myResult = multiplyVector(new Vector4f(0, 1, 2, 1), obj.myMatrix);
+            myMatrix = new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+            obj.myResult = product(new Vector4f(0, 1, 2, 1), obj.myMatrix);
             var f = 1.0 / dot(new Vector4f(0,1,2,1), myMatrix.getColumn(3));
             obj.myResult.mult(new Vector4f(f,f,f,f));
-            obj.myProduct = multiplyPoint(myPoint,myMatrix);
+            obj.myProduct = product(myPoint,myMatrix);
             DPRINT('obj.myResult.toString()');
             DPRINT('obj.myProduct.toString()');
             ENSURE('almostEqual(obj.myProduct, new Point3f(myResult[0],myResult[1],myResult[2]))', "Testing point * matrix");
-            myMatrix.assignValues(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+            myMatrix = new Matrix4f(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
             myPoint = new Point3f(-1,1,-1);
-            myResult = multiplyVector(new Vector4f(-1, 1, -1, 1), myMatrix);
-            ENSURE(almostEqual(multiplyPoint(myPoint,myMatrix),
+            myResult = product(new Vector4f(-1, 1, -1, 1), myMatrix);
+            ENSURE(almostEqual(product(myPoint,myMatrix),
                         new Point3f(myResult[0],myResult[1],myResult[2])), "Testing point * matrix");
 
             // getTranslation
-            myMatrix.assignValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+            myMatrix = new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
             ENSURE(almostEqual(myMatrix.getTranslation(), new Vector3f(12, 13, 14)), "Testing getTranslation()");
         }
-*/
+
         {
             // Test setRow / setColumn
             var myRowMatrix = new Matrix4f();
