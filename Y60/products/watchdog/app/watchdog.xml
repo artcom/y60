@@ -47,7 +47,7 @@
     </UdpControl>
     <!--<RebootTime>15:30</RebootTime>-->
     <!--<HaltTime>16:10</HaltTime>-->
-    <Application binary="calc.exe">
+    <Application binary="calc.exe" directory="">
         <EnvironmentVariables>
             <!--<EnvironmentVariable name="key"><![CDATA[value]]></EnvironmentVariable>-->
         </EnvironmentVariables>

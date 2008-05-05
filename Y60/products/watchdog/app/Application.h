@@ -88,6 +88,7 @@ class Application {
         std::map<std::string, std::string> _myEnvironmentVariables;
 
         std::string      _myFileName;
+        std::string      _myWorkingDirectory;            
         std::string      _myArguments;
         std::string      _myWindowTitle;
         long             _myAppStartTimeInSeconds;

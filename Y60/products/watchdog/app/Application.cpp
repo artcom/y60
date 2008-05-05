@@ -55,7 +55,7 @@ Application::Application(Logger & theLogger):
     _myRestartCheck(false), _myMemoryThresholdTimed(0),_myStartTimeInSeconds(0),
     _myMemoryIsFull(false), _myItIsTimeToRestart(false), _myHeartIsBroken(false),
     _myDayChanged(false), _myLogger(theLogger), _myWindowTitle(""), _myApplicationPaused(false),
-    _myRestartDelay(10), _myStartDelay(0), _myStartupCount(0)
+    _myRestartDelay(10), _myStartDelay(0), _myStartupCount(0), _myWorkingDirectory("")
 {
 }
 
@@ -83,6 +83,9 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
     if (theAppNode->getAttribute("windowtitle")) {
         _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
     }
+    if (theAppNode->getAttribute("directory")) {
+        _myWorkingDirectory = theAppNode->getAttribute("directory")->nodeValue();
+    }    
     AC_DEBUG <<"_myFileName: " << _myFileName;
     if (_myFileName.empty()){
         cerr <<"### ERROR, no application binary to watch." << endl;
@@ -265,9 +268,14 @@ Application::launch() {
         0, NULL, NULL, NULL, NULL
     };
 
+    LPTSTR myWorkingDirectory = NULL;
+    if (_myWorkingDirectory != "") {
+        myWorkingDirectory = &_myWorkingDirectory[0];
+    }
+
     bool myResult = CreateProcess(NULL, (&_myCommandLine[0]),
                     NULL, NULL, TRUE, 0,
-                    NULL, NULL, &StartupInfo,
+                    NULL, myWorkingDirectory, &StartupInfo,
                     &_myProcessInfo);
     _myStartTimeInSeconds = getElapsedSecondsToday();
 
