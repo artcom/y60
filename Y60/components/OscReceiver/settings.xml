@@ -1,0 +1,5 @@
+<settings>
+    <OscReceiver>
+        <ReceiverPorts>[12000, 10000]</ReceiverPorts>
+    </OscReceiver>
+</settings>

@@ -19,10 +19,14 @@
 
 #include <asl/PosixThread.h>
 #include <asl/PlugInBase.h>
+#include <asl/Exception.h>
+
 #include <y60/IEventSource.h>
 #include <y60/IScriptablePlugin.h>
 
 namespace y60 {
+
+    DEFINE_EXCEPTION( OscException, asl::Exception );
 
     class OscReceiver : public osc::OscPacketListener,
         public asl::PlugInBase,
@@ -31,7 +35,13 @@ namespace y60 {
         public asl::PosixThread {
 
     public: 
-
+            struct OscMessageInfo {
+                OscMessageInfo(const osc::ReceivedMessage & theMessage, const IpEndpointName& theSender) : 
+                    _myMessage(theMessage), _mySender(theSender) {}
+                osc::ReceivedMessage _myMessage;
+                IpEndpointName       _mySender;    
+            };
+            
             OscReceiver(asl::DLHandle theHandle);
             virtual ~OscReceiver();
 
@@ -42,7 +52,8 @@ namespace y60 {
 
             virtual void onGetProperty(const std::string & thePropertyName,
                            PropertyValue & theReturnValue) const;
-        
+
+            virtual void onUpdateSettings(dom::NodePtr theSettings);
             EventPtrList poll();
 
             void start();
@@ -62,19 +73,19 @@ namespace y60 {
 
     private:
 
-            y60::EventPtr createY60Event(osc::ReceivedMessage theMessage);
+            y60::EventPtr createY60Event(OscMessageInfo &theMessageInfo);
 
             asl::ThreadLock           _myThreadLock;
             y60::EventPtrList         _myCurrentY60Events;
-            std::list<osc::ReceivedMessage> _myNewMessages;
-            UdpListeningReceiveSocket _mySocket;
- 	
+            std::list<OscMessageInfo> _myNewMessages;
+ 	        std::vector< asl::Ptr<UdpListeningReceiveSocket> > _myOscReceiverSockets;
             dom::NodePtr                 _myEventSchema;
             dom::NodePtr                 _myASSEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
 
         };
-
+        
+    dom::NodePtr getOscReceiverSettings(dom::NodePtr theSettings);
 }
 
 #endif // OSC_RECEIVER_INCLUDED

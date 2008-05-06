@@ -39,6 +39,7 @@ function OscReceiverDemo(theArguments, theWidth, theHeight, theTitle) {
         // create and start osc receiver (will call onOscEvent 
         // to tell about messages)
         _myOscReceiver = new OscReceiver();
+        Public.registerSettingsListener(_myOscReceiver, "OscReceiver");
         _myOscReceiver.start();
     }
 

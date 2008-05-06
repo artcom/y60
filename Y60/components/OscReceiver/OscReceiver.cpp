@@ -14,7 +14,9 @@
 #include "y60/Documentation.h"
 #include <y60/JSScriptablePlugin.h>
 #include <y60/GenericEvent.h>
+#include <y60/DataTypes.h>
 #include <asl/string_functions.h>
+#include <y60/SettingsParser.h>
 
 using namespace std;
 using namespace asl;
@@ -30,11 +32,8 @@ namespace y60 {
         _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
-        asl::PlugInBase( theHandle ),
-        _mySocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 12000), this )
+        asl::PlugInBase( theHandle )
     {
-
-   
         registerStandardTypes( * _myValueFactory );
     }
 
@@ -59,12 +58,20 @@ namespace y60 {
     }
 
     void OscReceiver::start(){
+        if (_myOscReceiverSockets.size() == 0 ) {
+            AC_WARNING << "Sorry, no osc receiver ports configured, use settings file with node <OscReceiver>.";
+        }
         AC_DEBUG << "start listening for osc events";
         fork();
     }
 
     void OscReceiver::stop(){
-        _mySocket.AsynchronousBreak();
+        for (unsigned int mySocketIndex = 0; mySocketIndex < _myOscReceiverSockets.size(); mySocketIndex++) {
+            if (mySocketIndex >0) {
+                msleep(100);
+            }
+            _myOscReceiverSockets[mySocketIndex]->AsynchronousBreak();
+        }
         join();
         AC_DEBUG << "stopped listening for osc events";
     }
@@ -73,7 +80,9 @@ namespace y60 {
         try {
             AC_DEBUG << "launched the osc receiver thread";
     
-            _mySocket.Run();
+            for (unsigned int mySocketIndex = 0; mySocketIndex < _myOscReceiverSockets.size(); mySocketIndex++) {
+                _myOscReceiverSockets[mySocketIndex]->Run();
+            }
 
             AC_DEBUG << "receiver thread finished";
         } catch (const asl::Exception & ex) {
@@ -82,18 +91,20 @@ namespace y60 {
         }
     }
     
-    EventPtr OscReceiver::createY60Event(osc::ReceivedMessage theMessage){
-        
+    EventPtr OscReceiver::createY60Event(OscMessageInfo & theMessageInfo){
         y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent", _myEventSchema, _myValueFactory));
 
         dom::NodePtr myNode = myY60Event->getNode();
     
-        myNode->appendAttribute<string>("type", string(theMessage.AddressPattern()).substr(1));
+        myNode->appendAttribute<string>("type", string(theMessageInfo._myMessage.AddressPattern()).substr(1));
+        char myBuffer[IpEndpointName::ADDRESS_STRING_LENGTH];
+        theMessageInfo._mySender.AddressAsString(myBuffer);
+        myNode->appendAttribute<string>("sender", string(myBuffer));
 
         osc::ReceivedMessage::const_iterator myArgItr = 
-            theMessage.ArgumentsBegin();
+            theMessageInfo._myMessage.ArgumentsBegin();
 
-        while ( myArgItr != theMessage.ArgumentsEnd() ){
+        while ( myArgItr != theMessageInfo._myMessage.ArgumentsEnd() ){
        
             if (myArgItr->IsString()){
                 myNode->appendChild(dom::Node("<string>" + 
@@ -139,19 +150,36 @@ namespace y60 {
 
         try{
             _myThreadLock.lock();
-
-            _myNewMessages.push_front(theMessage);
+            _myNewMessages.push_front(OscMessageInfo(theMessage, theRemoteEndpoint));
             
             //AC_TRACE << "c++: adding osc event " << *myNode;
             _myThreadLock.unlock();
             
-        }catch( osc::Exception& e ){
+        }catch( OscException& e ){
             // any parsing errors such as unexpected argument types, or 
             // missing arguments get thrown as exceptions.
             std::cout << "error while parsing message: "
                       << theMessage.AddressPattern() << ": " << e.what() << "\n";
             _myThreadLock.unlock();
         }
+    }
+    
+    void
+    OscReceiver::onUpdateSettings(dom::NodePtr theSettings) {
+    
+    
+        AC_DEBUG << "updating OscReceiver settings";
+
+        VectorOfUnsignedInt myDefaultPorts;
+        myDefaultPorts.push_back(12000);
+        dom::NodePtr mySettings = getOscReceiverSettings( theSettings );                
+        VectorOfUnsignedInt myPorts;
+        getConfigSetting( theSettings, "ReceiverPorts", myPorts, myDefaultPorts );        
+        for (unsigned i =0; i < myPorts.size();i++) {
+            AC_PRINT << "Initiated osc receiver on port: " << myPorts[i];
+            _myOscReceiverSockets.push_back(asl::Ptr<UdpListeningReceiveSocket>(new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, myPorts[i]), this )));
+        }
+        
     }
 
     void
@@ -182,7 +210,8 @@ namespace y60 {
     Start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
         DOC_BEGIN("Stop listening for osc events in a seperate thread (join).");
         DOC_END;
-   
+       AC_DEBUG << "JSOscReceiver Start";
+
         asl::Ptr<y60::OscReceiver> myNative = jslib::getNativeAs<y60::OscReceiver>(cx, obj);
         if (myNative) {
             myNative->start();
@@ -201,6 +230,27 @@ namespace y60 {
             {0}
         };
         return myFunctions;
+    }
+    
+    dom::NodePtr
+    getOscReceiverSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings(0);
+        if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+            if (theSettings->childNode(0)->nodeName() == "settings") {
+                mySettings = theSettings->childNode(0)->childNode("OscReceiver", 0);
+            }
+        } else if ( theSettings->nodeName() == "settings") {
+            mySettings = theSettings->childNode("OscReceiver", 0);
+        } else if ( theSettings->nodeName() == "OscReceiver" ) {
+            mySettings = theSettings;
+        }
+        
+        if ( ! mySettings ) {
+            throw y60::OscException(
+                std::string("Could not find OscReceiver node in settings: ") +
+                as_string( * theSettings), PLUS_FILE_LINE );
+        }
+        return mySettings;
     }
 
 };
