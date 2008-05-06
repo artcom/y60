@@ -75,8 +75,8 @@ namespace y60 {
         virtual ~FFMpegDecoder2();
 
         virtual asl::Ptr<MovieDecoderBase> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
-
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
+ 
         /**
          * loads a movie from the file given by theFilename
          * @param theFilename file to load into the decoder

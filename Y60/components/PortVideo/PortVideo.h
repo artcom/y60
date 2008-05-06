@@ -20,9 +20,12 @@
 #include "RingBuffer.h"
 #include "cameraTool.h"
 
+
 namespace y60 {
 /*! @addtogroup Y60componentsPortVideo */
 /*  @{ */
+DEFINE_EXCEPTION(BufferSizeMismatch, asl::Exception);
+
     const std::string MIME_TYPE_CAMERA = "video/camera";
     class PortVideo : public CaptureDevice, public asl::PlugInBase, public asl::PosixThread {
     public:
@@ -30,7 +33,7 @@ namespace y60 {
         ~PortVideo();
         
         virtual asl::Ptr<CaptureDevice> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
         DEFINE_EXCEPTION(Exception, asl::Exception);
@@ -42,18 +45,19 @@ namespace y60 {
         // const dc1394camera_t & getDeviceHandle() const { return (*_myDevices)[getDevice()]; };
         // dc1394camera_t & getDeviceHandle() { return (*_myDevices)[getDevice()]; };
         cameraEngine * _myCamera; 
-        unsigned char * _myCameraBuffer;
+        //unsigned char * _myCameraBuffer;
         bool _myIsRunning;
 
         RingBuffer * _myRingBuffer; 
 
-        unsigned char * _mySourceBuffer;
-        unsigned char * _myDestBuffer;
+        //unsigned char * _mySourceBuffer;
+        //unsigned char * _myDestBuffer;
 
         unsigned int _myWidth, _myHeight, _mySourceDepth, _myDestDepth;
         unsigned int _myBytesPerDestPixel, _myBytesPerSourcePixel; 
         
         asl::ThreadLock _myLock;
+        bool _async;
    
         void freeBuffers();
         bool setupCamera();

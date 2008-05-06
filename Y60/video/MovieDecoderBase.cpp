@@ -26,13 +26,14 @@ namespace y60 {
     void MovieDecoderBase::initialize(Movie * theMovie) {
         _myMovie = theMovie;
     }
-
+#if 0
     std::string MovieDecoderBase::canDecode(const std::string & theUrl, 
             asl::Ptr<asl::ReadableStreamHandle> theStream) 
     {
-        return "";
+        AC_WARNING << "MovieDecoderBase::canDecode: Using deprecated interface";  
+        return canDecode(theUrl, theStream::getStream());
     }
-
+#endif
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
         AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime 
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 

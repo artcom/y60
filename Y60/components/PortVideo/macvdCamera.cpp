@@ -17,6 +17,7 @@
 */
 
 #include "macvdCamera.h"
+#include <asl/Logger.h>
 
 macvdCamera::macvdCamera()
 {
@@ -42,15 +43,13 @@ bool macvdCamera::findCamera() {
 	
 	if(!(pVdg = vdgNew()))
 	{
-		//printf("no camera found\n");
-		//printf("vdgNew: failed to allocate\n");
+		AC_ERROR << "no camera found, vdgNew: failed to allocate";
 		return false;
 	}
 	
 	if(err = vdgInit(pVdg))
 	{
-		printf("no camera found\n");
-		//printf("vdgInit err=%d\n", err);
+		AC_ERROR << "no camera found, vdgInit err="<<err;
 		return false;
 	}
 
@@ -70,8 +69,7 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 	OSErr err;
 	if(err = vdgRequestSettings(pVdg))
 	{
-		printf("camera setup cancelled\n");
-		//printf("vdgRequestSettings err=%d\n", err);
+		AC_ERROR << "camera setup cancelled, vdgRequestSettings err="<<err;
 		return false;
 	}
 
@@ -89,12 +87,12 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 		fps = 30;
 	} else fps = (int)(framerate/65536);
 
-	//fps = vdgGetFrameRate(pVdg);	
-	//printf("%d\n",fps);
+	fps = vdgGetFrameRate(pVdg);	
+	AC_DEBUG << "fps=" << fps;
 
 	if(err = vdgPreflightGrabbing(pVdg))
 	{
-		//printf("vdgPreflightGrabbing err=%d\n", err);
+		AC_ERROR << "vdgPreflightGrabbing err="<<err;
 		return false;
 	}
 	
@@ -102,13 +100,13 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 	if (err = vdgGetImageDescription( pVdg, 
 									  vdImageDesc))
 	{
-		//printf("vdgGetImageDescription err=%d\n", err);
+		AC_ERROR << "vdgGetImageDescription err="<<err;
 		return false;
 	}
 
 	this->width = (*vdImageDesc)->width;
 	this->height = (*vdImageDesc)->height;
-    //printf("%dx%d\n",this->width,this->height);
+    AC_DEBUG << "video grabber size = " << this->width << "x" << this->height;
 
 	dstPortBounds.left = 0;
 	dstPortBounds.right = this->width;
@@ -123,7 +121,7 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 										k422YpCbCr8CodecType,
 										&dstPortBounds))
 	{
-		printf("createOffscreenGWorld err=%d\n", err);
+		AC_ERROR << "createOffscreenGWorld err="<<err;
 		return false;	
 	}
 	
@@ -136,47 +134,54 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 	// Set the decompression destination to the offscreen GWorld
 	if (err = vdgSetDestination(	pVdg, dstPort ))
 	{
-		//printf("vdgSetDestination err=%d\n", err);
+		AC_ERROR << "vdgSetDestination err="<<err;
 		return false;
 	}
-
-	buffer = new unsigned char[width*height*bytes];
+    
+    AC_DEBUG << "macvdCamera::initCamera() buffer w="<<this->width<<",h="<<this->height<<", bytes="<<bytes;
+	buffer = new unsigned char[this->width*this->height*bytes];
 	return true;
 }
 
 unsigned char* macvdCamera::getFrame()
 {
+    AC_DEBUG << "macvdCamera::getFrame()";
 	OSErr   err;
 	int		isUpdated = 0;
 
 	if (!vdgIsGrabbing(pVdg)) {
+        AC_DEBUG << "macvdCamera::getFrame() !vdgIsGrabbing";
         return NULL;
     }
 
 	if (err = vdgIdle( pVdg, &isUpdated))
 	{
-		printf("could not grab frame\n");
+		AC_ERROR << "could not grab frame, vdgIdle err="<<err;
 		return NULL;
 	}
 	
 	if (isUpdated)
 	{
+        AC_DEBUG << "macvdCamera::getFrame() isUpdated";
 		unsigned char *src = (unsigned char*)pDstData;
 		unsigned char *dest = buffer;
 		
 		switch (colour) {
 			case true: {
+                AC_DEBUG << "macvdCamera::getFrame() uyvy2rgb w="<<width<<",h="<<height<<", src="<<(void*)src<<",dest="<<(void*)dest;
 				uyvy2rgb(width,height,src,dest);
 				break;
 			}
 			case false: {
+                AC_DEBUG << "macvdCamera::getFrame() uyvy2gray w="<<width<<",h="<<height<<", src="<<(void*)src<<",dest="<<(void*)dest;
 				uyvy2gray(width,height,src,dest);
 				break;
 			}
 		}
+        AC_DEBUG << "macvdCamera::getFrame() returning buffer="<<(void*)buffer;
 		return buffer;
 	}
-	
+    AC_DEBUG << "macvdCamera::getFrame() !isUpdated, returning 0";
 	return NULL;
 }
 
@@ -186,7 +191,7 @@ bool macvdCamera::startCamera()
 	OSErr err;
 	if (err = vdgStartGrabbing(pVdg))
 	{
-		printf("could not start camera\n");
+		AC_ERROR << "could not start camera, vdgStartGrabbing err="<<err;
 		return false;
 	}
 
@@ -198,7 +203,7 @@ bool macvdCamera::stopCamera()
 	OSErr err;
 	if (err = vdgStopGrabbing(pVdg))
 	{
-		printf("could not stop camera\n");
+		AC_ERROR << "could not stop camera, vdgStopGrabbing err="<<err;
 		return false;
 	}
 

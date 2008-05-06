@@ -19,11 +19,13 @@ namespace y60 {
 
     PortVideo::PortVideo(asl::DLHandle theDLHandle) : 
         PlugInBase(theDLHandle), PosixThread(),
-        _myCamera(NULL), _mySourceDepth(0),
-        _mySourceBuffer(NULL), _myRingBuffer(NULL),
+        _myCamera(NULL), _mySourceDepth(24), _myDestDepth(24),
+        //_mySourceBuffer(NULL),
+         _myRingBuffer(NULL),
         _myWidth(320), _myHeight(240),
-        _myBytesPerSourcePixel(0), _myBytesPerDestPixel(0),
-        _myIsRunning(false)
+        _myBytesPerSourcePixel(_mySourceDepth/8), _myBytesPerDestPixel(_myDestDepth/8),
+        _myIsRunning(false),
+        _async(true)
     { 
     }
 
@@ -43,7 +45,7 @@ namespace y60 {
         if (_myCamera == NULL) {
             return false;
         }
-        
+    
         bool myColor = false;
         if (_mySourceDepth==24) {
             myColor = true;
@@ -69,26 +71,27 @@ namespace y60 {
     void PortVideo::allocateBuffers() {
         AC_INFO << "Allocating buffers";
         _myBytesPerSourcePixel = _mySourceDepth/8;	
-        _myBytesPerDestPixel = _mySourceDepth/8;
-        _mySourceBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerSourcePixel];
-        _myDestBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerDestPixel];
-        _myCameraBuffer = NULL;
+        _myBytesPerDestPixel = _myDestDepth/8;
+        //_mySourceBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerSourcePixel];
+        //_myDestBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerDestPixel];
+        //_myCameraBuffer = NULL;
         
-        AC_INFO << "Allocating ringbuffer";
+        AC_DEBUG << "Allocating ringbuffer w="<<_myWidth <<",h="<<_myHeight<<" bypp="<< _myBytesPerSourcePixel;
         _myRingBuffer = new RingBuffer(_myWidth*_myHeight*_myBytesPerSourcePixel);
-        AC_INFO << "buffer allocation done.";
+        AC_DEBUG << "buffer allocation done.";
     }
   
     void PortVideo::run() {
         unsigned char * myCameraBuffer = NULL;
         unsigned char * myCameraWriteBuffer = NULL;
-                
+        AC_DEBUG << "PortVideo::run()";
 	    
         while (_myCamera) {	
-            if (_myIsRunning) {
+            if (_myIsRunning && _myRingBuffer) {
                 _myLock.lock();
-                
+                AC_DEBUG << "PortVideo::run() cam->getFrame()";
                 myCameraBuffer = _myCamera->getFrame();
+                AC_DEBUG << "PortVideo::run() cam->getFrame() returned "<<(void*)myCameraBuffer;
                 
                 if (myCameraBuffer != NULL) {
                     myCameraWriteBuffer = _myRingBuffer->getNextBufferToWrite();
@@ -97,38 +100,112 @@ namespace y60 {
                         _myRingBuffer->writeFinished();
                     }
                 } 
-        
                 _myLock.unlock();
-                
                 msleep(10);
             }
+            msleep(10);
         }
     }
 
     void PortVideo::readFrame(dom::ResizeableRasterPtr theTargetRaster) {
-        // AC_INFO << "PortVideo: reading frame";
+        AC_DEBUG << "PortVideo: reading frame";
         
         unsigned char * myCameraReadBuffer = NULL;
-        /*
+        
 		// loop until we get access to a frame
 		myCameraReadBuffer = _myRingBuffer->getNextBufferToRead();
+        if (_async && !myCameraReadBuffer) {
+            return;
+        }
 		while (myCameraReadBuffer == NULL) {
 			msleep(1);
 			myCameraReadBuffer = _myRingBuffer->getNextBufferToRead();
         }
-		
+        theTargetRaster->resize(_myWidth, _myHeight);
+        if (theTargetRaster->pixels().size() != _myRingBuffer->size()) {
+            AC_ERROR << "target raster and video-in buffer size mismatch, targetraster="<<theTargetRaster->pixels().size()
+                     <<", in-buffer ="<<_myRingBuffer->size();
+            throw BufferSizeMismatch(JUST_FILE_LINE);
+        }	
+	
 		// try again if we can get a more recent frame
 		do {
-			memcpy(_mySourceBuffer, myCameraReadBuffer, _myRingBuffer->size());
+			memcpy(theTargetRaster->pixels().begin(), myCameraReadBuffer, _myRingBuffer->size());
 			_myRingBuffer->readFinished();
-			
 			myCameraReadBuffer = _myRingBuffer->getNextBufferToRead();
 		} while( myCameraReadBuffer != NULL ); 
-       */ 
-        // theTargetRaster->resize(320, 240);
     }
 
     void PortVideo::load(const std::string & theFilename) {
+        AC_DEBUG << "PortVideo::load " << theFilename;
+
+        int myFrameWidth = 0;
+        int myFrameHeight = 0;
+        unsigned myFrameRate = (unsigned)getFrameRate();
+        unsigned myBitsPerPixel = 24;
+#if 0
+        unsigned myInputPinNumber = 0;
+        unsigned myDeviceId = getDevice();
+        unsigned myWhitebalanceU;
+        unsigned myWhitebalanceV;
+        unsigned myShutter;
+        unsigned myGain;
+#endif
+        if (myFrameWidth == 0) {
+            myFrameWidth = 320;
+        }
+        if (myFrameHeight == 0) {
+            myFrameHeight = 240;
+        }
+
+        setPixelFormat(RGB);
+
+        int idx = theFilename.find("width=");
+        if (idx != std::string::npos) {
+            myFrameWidth = asl::as_int(theFilename.substr(idx+6));
+        }
+        idx = theFilename.find("height=");
+        if (idx != std::string::npos) {
+            myFrameHeight = asl::as_int(theFilename.substr(idx+7));
+        }
+        idx = theFilename.find("fps=");
+        if (idx != std::string::npos) {
+            myFrameRate = asl::as_int(theFilename.substr(idx+4));
+        }
+        idx = theFilename.find("bpp=");
+        if (idx != std::string::npos) {
+            myBitsPerPixel = asl::as_int(theFilename.substr(idx+4));
+        }
+#if 0
+        idx = theFilename.find("input=");
+        if (idx != std::string::npos) {
+            myInputPinNumber = asl::as_int(theFilename.substr(idx+6));
+        }
+        idx = theFilename.find("device=");
+        if (idx != std::string::npos && theFilename.substr(idx+7).length() > 0) {
+            myDeviceId = asl::as_int(theFilename.substr(idx+7));
+        }
+        idx = theFilename.find("whitebalanceb=");
+        if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
+            myWhitebalanceU = asl::as_int(theFilename.substr(idx+14));
+        }
+        idx = theFilename.find("whitebalancer=");
+        if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
+            myWhitebalanceV = asl::as_int(theFilename.substr(idx+14));
+        }
+        idx = theFilename.find("shutter=");
+        if (idx != std::string::npos && theFilename.substr(idx+8).length() > 0) {
+            myShutter = asl::as_int(theFilename.substr(idx+8));
+        }
+        idx = theFilename.find("gain=");
+        if (idx != std::string::npos && theFilename.substr(idx+5).length() > 0) {
+            myGain = asl::as_int(theFilename.substr(idx+5));
+        }
+        idx = theFilename.find("deinterlace=");
+        if (idx != std::string::npos && theFilename.substr(idx+12).length() > 0) {
+            _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;            
+        }
+#endif
         if(setupCamera()) {
             allocateBuffers();
             fork();
@@ -137,7 +214,8 @@ namespace y60 {
         }
     }
 
-    std::string PortVideo::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    std::string PortVideo::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
+        AC_DEBUG << "PortVideo::canDecode: theUrl=" << theUrl << ", theStream = " << (void*)theStream.getNativePtr(); 
         if (theUrl.find("portvideo://") != std::string::npos) {
             return MIME_TYPE_CAMERA;
         } else {

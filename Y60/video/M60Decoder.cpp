@@ -43,6 +43,16 @@ namespace y60 {
 
     M60Decoder::~M60Decoder() {
     }
+    
+    std::string M60Decoder::canDecode(const std::string & theUrl, 
+                                        asl::Ptr<asl::ReadableStreamHandle> theStream) 
+    {
+        if (theUrl.find(".m60") != std::string::npos) {
+            return "video/x-m60";
+        } else {
+            return "";
+        }
+    }
 
     void
     M60Decoder::load(const std::string & theFilename) {

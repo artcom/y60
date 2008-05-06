@@ -47,9 +47,10 @@ namespace y60 {
             virtual ~MovieDecoderBase();
 
             void initialize(Movie * theMovie);
+/*
             virtual std::string canDecode(const std::string & theUrl, 
                     asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
-
+*/
             /**
              *
              * @param theSystemTime used for calculation of delta t in free running mode.

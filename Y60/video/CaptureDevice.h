@@ -68,11 +68,13 @@ namespace y60 {
         }
 
         void parseOptions(const std::string & theURL);
-
+#if 0
         virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0)) {
+            AC_ERROR << asl::StackTrace();
+            AC_ERROR << "canDecode() not implemented in CaptureDevice();
             return "";
         }
-
+#endif
         void initialize(Capture * theParent) {
             _myParent = theParent;
         }

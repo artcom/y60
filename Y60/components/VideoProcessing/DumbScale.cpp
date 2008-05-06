@@ -60,7 +60,8 @@ namespace y60 {
         } else {
             return;
         }
-        
+#define ORIG
+#ifdef ORIG       
         const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
         dom::Node::WritableValue<GRAYRaster> myTargetLock(_myTargetImage->getRasterValueNode());
         GRAYRaster & myTargetFrame = myTargetLock.get();
@@ -92,5 +93,8 @@ namespace y60 {
                 myDebugCount++;
             }
         }
+#else
+    // TODO: make proper raster functionality here
+#endif
 	}
 }

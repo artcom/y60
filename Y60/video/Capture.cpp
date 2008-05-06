@@ -15,6 +15,7 @@ namespace y60 {
         NormTag::Plug(theNode), _myDevice(0),
         _myPlayMode(PLAY_MODE_STOP)
     {
+        AC_TRACE << "Capture::Capture " << theNode;
     }
 
     Capture::~Capture() {
@@ -30,7 +31,7 @@ namespace y60 {
 
     void
     Capture::setPlayMode(MoviePlayMode thePlayMode) {
-        AC_DEBUG << "Movie::setPlayMode " << asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings);
+        AC_DEBUG << "Capture::setPlayMode " << asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings);
         // process changes
         switch (thePlayMode) {
             case PLAY_MODE_STOP:
