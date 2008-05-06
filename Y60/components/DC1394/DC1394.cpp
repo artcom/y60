@@ -163,7 +163,7 @@ namespace y60 {
         _isTransmitting = true;
     }
 
-    std::string DC1394::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    std::string DC1394::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
         if (theUrl.find("video://") != std::string::npos) {
             return MIME_TYPE_CAMERA;
         } else {

@@ -25,7 +25,7 @@ namespace y60 {
         _myWidth(320), _myHeight(240),
         _myBytesPerSourcePixel(_mySourceDepth/8), _myBytesPerDestPixel(_myDestDepth/8),
         _myIsRunning(false),
-        _async(true)
+        _async(false)
     { 
     }
 

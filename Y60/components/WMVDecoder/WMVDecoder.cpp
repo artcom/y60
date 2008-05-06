@@ -135,7 +135,7 @@ namespace y60 {
     }
 
     std::string
-    WMVDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    WMVDecoder::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
         const std::string myExtension = asl::toLowerCase(asl::getExtension(theUrl));
         if (myExtension == "wmv") {
             return MIME_TYPE_WMV;

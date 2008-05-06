@@ -59,7 +59,7 @@ namespace y60 {
     }
 
     std::string
-    QuicktimeDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    QuicktimeDecoder::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mov") {
             AC_INFO << "QuicktimeDecoder can decode :" << theUrl << endl;
             return MIME_TYPE_MOV;

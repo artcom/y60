@@ -108,7 +108,7 @@ namespace y60 {
         // Methods of MovieDecoderBase
         //
         double getAudioVideoDelay() const;
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
 
         void load(const std::string & theUrl);
 

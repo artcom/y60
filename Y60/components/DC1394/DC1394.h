@@ -36,7 +36,7 @@ namespace y60 {
         DC1394(asl::DLHandle theDLHandle);
         ~DC1394();
         virtual asl::Ptr<CaptureDevice> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
         DEFINE_EXCEPTION(Exception, asl::Exception);

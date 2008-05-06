@@ -84,8 +84,11 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 	long bytesPerSecond;
 	if (err = vdgGetDataRate(pVdg, &milliSecPerFrame, &framerate, &bytesPerSecond))
 	{
-		fps = 30;
-	} else fps = (int)(framerate/65536);
+		AC_WARNING << "vdgGetDataRate err="<<err;
+	} else {
+       AC_INFO <<  "macvdCamera::initCamera: vdgGetDataRate: milliSecPerFrame="<<milliSecPerFrame
+               <<",framerate="<<framerate<<", bytesPerSecond="<<bytesPerSecond;
+    }
 
 	fps = vdgGetFrameRate(pVdg);	
 	AC_DEBUG << "fps=" << fps;
