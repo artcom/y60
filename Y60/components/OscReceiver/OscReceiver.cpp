@@ -90,46 +90,66 @@ namespace y60 {
             throw;
         }
     }
+
+
     
-    EventPtr OscReceiver::createY60Event(OscMessageInfo & theMessageInfo){
+    EventPtr OscReceiver::createY60Event(const string& theMessage){
         y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent", _myEventSchema, _myValueFactory));
 
-        dom::NodePtr myNode = myY60Event->getNode();
-    
-        myNode->appendAttribute<string>("type", string(theMessageInfo._myMessage.AddressPattern()).substr(1));
+        dom::NodePtr myNode = myY60Event->getDocument();
+        dom::NodePtr myOldEvent = myNode->firstChild();
+        myNode->parseAll(theMessage);
+        myNode->removeChild(myOldEvent);
+        myNode->firstChild()->
+            appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
+        myNode->firstChild()->
+            appendAttribute<string>("callback", myOldEvent->getAttributeString("callback"));
+
+        AC_TRACE << "new osc event: " << *myY60Event->getNode();
+        return myY60Event;
+
+    }
+
+    string OscReceiver::createMessageString(const osc::ReceivedMessage& theMessage,
+                                            const IpEndpointName& theRemoteEndpoint){
+
+
         char myBuffer[IpEndpointName::ADDRESS_STRING_LENGTH];
-        theMessageInfo._mySender.AddressAsString(myBuffer);
-        myNode->appendAttribute<string>("sender", string(myBuffer));
+        theRemoteEndpoint.AddressAsString(myBuffer);
+
+        string myMessageString = "<generic type='" + 
+            string(theMessage.AddressPattern()).substr(1) +
+            "' sender='" + string(myBuffer) + "'>";
 
         osc::ReceivedMessage::const_iterator myArgItr = 
-            theMessageInfo._myMessage.ArgumentsBegin();
+            theMessage.ArgumentsBegin();
 
-        while ( myArgItr != theMessageInfo._myMessage.ArgumentsEnd() ){
+        while ( myArgItr != theMessage.ArgumentsEnd() ){
        
             if (myArgItr->IsString()){
-                myNode->appendChild(dom::Node("<string>" + 
+                myMessageString += "<string>" + 
                                               asl::as_string(myArgItr->AsString()) + 
-                                              "</string>").firstChild());
+                                              "</string>";
             } else if (myArgItr->IsFloat()){
-                myNode->appendChild(dom::Node("<float>" + 
+                myMessageString += "<float>" + 
                                               asl::as_string(myArgItr->AsFloat()) + 
-                                              "</float>").firstChild());
+                                              "</float>";
             } else if (myArgItr->IsBool()){
-                myNode->appendChild(dom::Node("<bool>" + 
+                myMessageString += "<bool>" + 
                                               asl::as_string(myArgItr->AsBool()) + 
-                                              "</bool>").firstChild());
+                                              "</bool>";
             } else if (myArgItr->IsInt32()){
-                myNode->appendChild(dom::Node("<int>" + 
+                myMessageString += "<int>" + 
                                               asl::as_string(myArgItr->AsInt32()) + 
-                                              "</int>").firstChild());
+                                              "</int>";
             } else if (myArgItr->IsInt64()){
-                myNode->appendChild(dom::Node("<int>" + 
+                myMessageString += "<int>" + 
                                               asl::as_string(myArgItr->AsInt64()) + 
-                                              "</int>").firstChild());
+                                              "</int>";
             } else if (myArgItr->IsDouble()){
-                myNode->appendChild(dom::Node("<double>" + 
+                myMessageString += "<double>" + 
                                               asl::as_string(myArgItr->AsDouble()) + 
-                                              "</double>").firstChild());
+                                              "</double>";
             } else {
                 AC_ERROR << "unknown osc message received";
                 break;
@@ -139,18 +159,22 @@ namespace y60 {
 
         }
 
-        AC_TRACE << "new osc event: " << *myNode;
-        return myY60Event;
+        myMessageString += "</generic>";
 
+        return myMessageString;
     }
-
 
     void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage, 
                                       const IpEndpointName& theRemoteEndpoint ){
 
         try{
             _myThreadLock.lock();
-            _myNewMessages.push_front(OscMessageInfo(theMessage, theRemoteEndpoint));
+
+
+            string myMessageString = 
+                createMessageString(theMessage, theRemoteEndpoint);
+            _myNewMessages.push_front(myMessageString);
+
             
             //AC_TRACE << "c++: adding osc event " << *myNode;
             _myThreadLock.unlock();
@@ -176,10 +200,9 @@ namespace y60 {
         VectorOfUnsignedInt myPorts;
         getConfigSetting( theSettings, "ReceiverPorts", myPorts, myDefaultPorts );        
         for (unsigned i =0; i < myPorts.size();i++) {
-            AC_PRINT << "Initiated osc receiver on port: " << myPorts[i];
+            AC_DEBUG << "Initiated osc receiver on port: " << myPorts[i];
             _myOscReceiverSockets.push_back(asl::Ptr<UdpListeningReceiveSocket>(new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, myPorts[i]), this )));
         }
-        
     }
 
     void

@@ -36,9 +36,10 @@ namespace y60 {
 
     public: 
             struct OscMessageInfo {
-                OscMessageInfo(const osc::ReceivedMessage & theMessage, const IpEndpointName& theSender) : 
+                OscMessageInfo(const std::string& theMessage, 
+                               const IpEndpointName& theSender) : 
                     _myMessage(theMessage), _mySender(theSender) {}
-                osc::ReceivedMessage _myMessage;
+                std::string          _myMessage;
                 IpEndpointName       _mySender;    
             };
             
@@ -73,11 +74,14 @@ namespace y60 {
 
     private:
 
-            y60::EventPtr createY60Event(OscMessageInfo &theMessageInfo);
+            std::string createMessageString(const osc::ReceivedMessage& m, 
+                                         const IpEndpointName& remoteEndpoint);
+
+            y60::EventPtr createY60Event(const std::string& theMessage);
 
             asl::ThreadLock           _myThreadLock;
             y60::EventPtrList         _myCurrentY60Events;
-            std::list<OscMessageInfo> _myNewMessages;
+            std::list<std::string> _myNewMessages;
  	        std::vector< asl::Ptr<UdpListeningReceiveSocket> > _myOscReceiverSockets;
             dom::NodePtr                 _myEventSchema;
             dom::NodePtr                 _myASSEventSchema;
