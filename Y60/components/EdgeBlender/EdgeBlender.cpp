@@ -103,10 +103,14 @@ class EdgeBlender :
         *       this region is blended.
         *       the projected half-screens should overlap throughout this region.
         *
+        *
+        * MODE_MULTI_SCREEN_MULTI_PC
+        *       Both modi
         */
         enum {
             MODE_MULTI_PC               = 1,
-            MODE_MULTI_SCREEN           = 2
+            MODE_MULTI_SCREEN           = 2,
+            MODE_MULTI_SCREEN_MULTI_PC  = 3
         };
         unsigned _myMode;
 
@@ -326,6 +330,9 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer)
         case MODE_MULTI_PC:
             renderBlending();
             break;
+        case MODE_MULTI_SCREEN_MULTI_PC:
+            renderMultiScreen();
+            renderBlending();
     }
 
     // post-blend grid
