@@ -18,7 +18,6 @@
 
 namespace y60 {
 
-    typedef asl::Ptr<inet::UDPConnection> UDPConnectionPtr;
 
     class ASSOscClient : public ASSDriver {
     public:
@@ -48,11 +47,11 @@ namespace y60 {
         void connectToServer(int theIndex);
 
         struct Receiver{
-            Receiver(std::string theAddress, UDPConnectionPtr theConnection):
+            Receiver(std::string theAddress, inet::UDPConnectionPtr theConnection):
                 address(theAddress),
                 udpConnection(theConnection){}
             std::string       address;
-            UDPConnectionPtr  udpConnection;
+            inet::UDPConnectionPtr  udpConnection;
         };
 
         char myBuffer[ BUFFER_SIZE ];
