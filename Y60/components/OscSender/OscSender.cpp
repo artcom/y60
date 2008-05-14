@@ -24,7 +24,7 @@ using namespace asl;
 using namespace inet;
 
 namespace y60 {
-
+    static long ourPacketCounter = 0;
     OscSender::OscSender() : 
         _myReceiverAddress(""), _myReceiverPort(0), _myReceiverUDPConnection(0)
     {
@@ -59,7 +59,7 @@ namespace y60 {
             bool myValidPacket = true;
             char myBuffer[ MAX_UDP_PACKET_SIZE ];        
             osc::OutboundPacketStream myOSCStream( myBuffer, MAX_UDP_PACKET_SIZE);
-            myOSCStream << osc::BeginBundleImmediate;
+            myOSCStream << osc::BeginBundle(ourPacketCounter++);
             
             std::string myAddress("/");
             if (theOscEvent->getAttribute("type") ) {                
