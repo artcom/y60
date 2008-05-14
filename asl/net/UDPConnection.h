@@ -45,6 +45,8 @@
 
 #include "UDPSocket.h"
 
+#include <asl/Ptr.h>
+
 namespace inet {
     /** implements connected UDP 
      *
@@ -74,5 +76,8 @@ namespace inet {
             UDPConnection(asl::Unsigned32 thehost, asl::Unsigned16 theport);
             virtual bool connect(asl::Unsigned32 thehost, asl::Unsigned16 theport);
     };
+
+    typedef asl::Ptr<UDPConnection> UDPConnectionPtr;
+    
 }
 #endif
