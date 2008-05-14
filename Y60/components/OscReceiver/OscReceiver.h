@@ -71,6 +71,8 @@ namespace y60 {
 
             virtual void ProcessMessage( const osc::ReceivedMessage& m, 
                                          const IpEndpointName& remoteEndpoint );
+            virtual void ProcessBundle( const osc::ReceivedBundle& theBundle, 
+                                         const IpEndpointName& remoteEndpoint );
 
     private:
 
@@ -86,6 +88,7 @@ namespace y60 {
             dom::NodePtr                 _myEventSchema;
             dom::NodePtr                 _myASSEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
+            long                         _myCurrentBundleTimeTag;
 
         };
         

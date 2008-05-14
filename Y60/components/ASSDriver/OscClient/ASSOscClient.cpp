@@ -19,6 +19,7 @@ using namespace std;
 using namespace inet;
 
 namespace y60 {
+static long ourPacketCounter = 0;
 
 ASSOscClient::ASSOscClient() :
     ASSDriver(),
@@ -34,7 +35,7 @@ ASSOscClient::poll() {
 
     _myOSCStream.Clear();
     
-    _myOSCStream << osc::BeginBundleImmediate;
+    _myOSCStream << osc::BeginBundle(ourPacketCounter++);//Immediate;
 
     for (int i = 0; i < _myReceivers.size(); ++i){
         

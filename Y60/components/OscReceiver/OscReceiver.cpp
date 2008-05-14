@@ -32,7 +32,8 @@ namespace y60 {
         _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
-        asl::PlugInBase( theHandle )
+        asl::PlugInBase( theHandle ),
+        _myCurrentBundleTimeTag(0)
     {
         registerStandardTypes( * _myValueFactory );
     }
@@ -47,7 +48,7 @@ namespace y60 {
 
         _myCurrentY60Events.clear();
 
-        while (!_myNewMessages.empty()){
+        while (!_myNewMessages.empty()){            
             _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
             _myNewMessages.pop_front();
         }
@@ -100,11 +101,11 @@ namespace y60 {
         dom::NodePtr myOldEvent = myNode->firstChild();
         myNode->parseAll(theMessage);
         myNode->removeChild(myOldEvent);
-        myNode->firstChild()->
-            appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
+        //myNode->firstChild()->
+        //    appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
         myNode->firstChild()->
             appendAttribute<string>("callback", myOldEvent->getAttributeString("callback"));
-
+        myY60Event->when = as<double>(myNode->firstChild()->getAttributeString("when"));   
         AC_TRACE << "new osc event: " << *myY60Event->getNode();
         return myY60Event;
 
@@ -117,37 +118,33 @@ namespace y60 {
         char myBuffer[IpEndpointName::ADDRESS_STRING_LENGTH];
         theRemoteEndpoint.AddressAsString(myBuffer);
 
-        string myMessageString = "<generic type='" + 
-            string(theMessage.AddressPattern()).substr(1) +
-            "' sender='" + string(myBuffer) + "'>";
-
         osc::ReceivedMessage::const_iterator myArgItr = 
             theMessage.ArgumentsBegin();
-
+        string myArguments = "";
         while ( myArgItr != theMessage.ArgumentsEnd() ){
        
             if (myArgItr->IsString()){
-                myMessageString += "<string>" + 
+                myArguments += "<string>" + 
                                               asl::as_string(myArgItr->AsString()) + 
                                               "</string>";
             } else if (myArgItr->IsFloat()){
-                myMessageString += "<float>" + 
+                myArguments += "<float>" + 
                                               asl::as_string(myArgItr->AsFloat()) + 
                                               "</float>";
             } else if (myArgItr->IsBool()){
-                myMessageString += "<bool>" + 
+                myArguments += "<bool>" + 
                                               asl::as_string(myArgItr->AsBool()) + 
                                               "</bool>";
             } else if (myArgItr->IsInt32()){
-                myMessageString += "<int>" + 
+                myArguments += "<int>" + 
                                               asl::as_string(myArgItr->AsInt32()) + 
                                               "</int>";
             } else if (myArgItr->IsInt64()){
-                myMessageString += "<int>" + 
+                myArguments += "<int>" + 
                                               asl::as_string(myArgItr->AsInt64()) + 
                                               "</int>";
             } else if (myArgItr->IsDouble()){
-                myMessageString += "<double>" + 
+                myArguments += "<double>" + 
                                               asl::as_string(myArgItr->AsDouble()) + 
                                               "</double>";
             } else {
@@ -158,10 +155,18 @@ namespace y60 {
             myArgItr++;
 
         }
-
+        string myMessageString = "<generic type='" + 
+            string(theMessage.AddressPattern()).substr(1) +
+            "' when='" + asl::as_string(_myCurrentBundleTimeTag) + 
+            "' sender='" + string(myBuffer) + "'>";
+        myMessageString += myArguments;
         myMessageString += "</generic>";
-
         return myMessageString;
+    }
+    void OscReceiver::ProcessBundle( const osc::ReceivedBundle& theBundle, 
+                                     const IpEndpointName& remoteEndpoint ) {
+        _myCurrentBundleTimeTag = theBundle.TimeTag();                                        
+        OscPacketListener::ProcessBundle(theBundle, remoteEndpoint);                                        
     }
 
     void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage, 
