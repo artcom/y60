@@ -15,7 +15,7 @@ namespace y60 {
 GenericEvent::GenericEvent(const std::string & theCallback, 
                            const dom::NodePtr & theSchemaDoc,
                            const dom::ValueFactoryPtr & theValueFactory) :
-    Event( GENERIC ),
+    Event( GENERIC, asl::Time() ),
     _myDocument( new dom::Document() )
 {
 
