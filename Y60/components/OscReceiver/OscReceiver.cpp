@@ -12,11 +12,12 @@
 
 #include "OscReceiver.h"
 #include "y60/Documentation.h"
-#include <y60/JSScriptablePlugin.h>
 #include <y60/GenericEvent.h>
 #include <y60/DataTypes.h>
 #include <asl/string_functions.h>
 #include <y60/SettingsParser.h>
+
+#include <y60/EventDispatcher.h>
 
 using namespace std;
 using namespace asl;
@@ -27,15 +28,21 @@ extern std::string ourasseventxsd;
 
 namespace y60 {
 
-    OscReceiver::OscReceiver(DLHandle theHandle):
+    OscReceiver::OscReceiver(int thePort):
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
         _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
-        asl::PlugInBase( theHandle ),
         _myCurrentBundleTimeTag(0)
     {
         registerStandardTypes( * _myValueFactory );
+
+        AC_DEBUG << "Initiated osc receiver on port: " << thePort;
+        _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(
+            new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 
+                                                         thePort), this));
+
+        y60::EventDispatcher::get().addSource(this);
     }
 
     OscReceiver::~OscReceiver(){
@@ -59,20 +66,15 @@ namespace y60 {
     }
 
     void OscReceiver::start(){
-        if (_myOscReceiverSockets.size() == 0 ) {
-            AC_WARNING << "Sorry, no osc receiver ports configured, use settings file with node <OscReceiver>.";
+        if (!_myOscReceiverSocket) {
+            AC_WARNING << "Sorry, no osc receiver port settet, use the 'port'-propperty to do so.";
         }
         AC_DEBUG << "start listening for osc events";
         fork();
     }
 
     void OscReceiver::stop(){
-        for (unsigned int mySocketIndex = 0; mySocketIndex < _myOscReceiverSockets.size(); mySocketIndex++) {
-            if (mySocketIndex >0) {
-                msleep(100);
-            }
-            _myOscReceiverSockets[mySocketIndex]->AsynchronousBreak();
-        }
+        _myOscReceiverSocket->AsynchronousBreak();
         join();
         AC_DEBUG << "stopped listening for osc events";
     }
@@ -81,9 +83,7 @@ namespace y60 {
         try {
             AC_DEBUG << "launched the osc receiver thread";
     
-            for (unsigned int mySocketIndex = 0; mySocketIndex < _myOscReceiverSockets.size(); mySocketIndex++) {
-                _myOscReceiverSockets[mySocketIndex]->Run();
-            }
+            _myOscReceiverSocket->Run();
 
             AC_DEBUG << "receiver thread finished";
         } catch (const asl::Exception & ex) {
@@ -125,28 +125,28 @@ namespace y60 {
        
             if (myArgItr->IsString()){
                 myArguments += "<string>" + 
-                                              asl::as_string(myArgItr->AsString()) + 
-                                              "</string>";
+                    asl::as_string(myArgItr->AsString()) + 
+                    "</string>";
             } else if (myArgItr->IsFloat()){
                 myArguments += "<float>" + 
-                                              asl::as_string(myArgItr->AsFloat()) + 
-                                              "</float>";
+                    asl::as_string(myArgItr->AsFloat()) + 
+                    "</float>";
             } else if (myArgItr->IsBool()){
                 myArguments += "<bool>" + 
-                                              asl::as_string(myArgItr->AsBool()) + 
-                                              "</bool>";
+                    asl::as_string(myArgItr->AsBool()) + 
+                    "</bool>";
             } else if (myArgItr->IsInt32()){
                 myArguments += "<int>" + 
-                                              asl::as_string(myArgItr->AsInt32()) + 
-                                              "</int>";
+                    asl::as_string(myArgItr->AsInt32()) + 
+                    "</int>";
             } else if (myArgItr->IsInt64()){
                 myArguments += "<int>" + 
-                                              asl::as_string(myArgItr->AsInt64()) + 
-                                              "</int>";
+                    asl::as_string(myArgItr->AsInt64()) + 
+                    "</int>";
             } else if (myArgItr->IsDouble()){
                 myArguments += "<double>" + 
-                                              asl::as_string(myArgItr->AsDouble()) + 
-                                              "</double>";
+                    asl::as_string(myArgItr->AsDouble()) + 
+                    "</double>";
             } else {
                 AC_ERROR << "unknown osc message received";
                 break;
@@ -193,98 +193,29 @@ namespace y60 {
         }
     }
     
-    void
-    OscReceiver::onUpdateSettings(dom::NodePtr theSettings) {
-    
-    
-        AC_DEBUG << "updating OscReceiver settings";
+/*
+  void
+  OscReceiver::onGetProperty(const std::string & thePropertyName,
+  PropertyValue & theReturnValue) const
+  {
+  if (thePropertyName == "eventSchema") {
+  theReturnValue.set( _myASSEventSchema );
+  return;
+  }
+  }
 
-        VectorOfUnsignedInt myDefaultPorts;
-        myDefaultPorts.push_back(12000);
-        dom::NodePtr mySettings = getOscReceiverSettings( theSettings );                
-        VectorOfUnsignedInt myPorts;
-        getConfigSetting( theSettings, "ReceiverPorts", myPorts, myDefaultPorts );        
-        for (unsigned i =0; i < myPorts.size();i++) {
-            AC_DEBUG << "Initiated osc receiver on port: " << myPorts[i];
-            _myOscReceiverSockets.push_back(asl::Ptr<UdpListeningReceiveSocket>(new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, myPorts[i]), this )));
-        }
-    }
-
-    void
-    OscReceiver::onGetProperty(const std::string & thePropertyName,
-                               PropertyValue & theReturnValue) const
-    {
-        if (thePropertyName == "eventSchema") {
-            theReturnValue.set( _myASSEventSchema );
-            return;
-        }
-    }
-
-    static JSBool
-    Stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
-        DOC_BEGIN("Start listening for osc events in a seperate thread (fork)");
-        DOC_END;
-   
-        asl::Ptr<y60::OscReceiver> myNative = jslib::getNativeAs<y60::OscReceiver>(cx, obj);
-        if (myNative) {
-            myNative->stop();
-        } else {
-            assert(myNative);
-        }
-        return JS_TRUE;
-    }
-
-    static JSBool
-    Start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
-        DOC_BEGIN("Stop listening for osc events in a seperate thread (join).");
-        DOC_END;
-       AC_DEBUG << "JSOscReceiver Start";
-
-        asl::Ptr<y60::OscReceiver> myNative = jslib::getNativeAs<y60::OscReceiver>(cx, obj);
-        if (myNative) {
-            myNative->start();
-        } else {
-            assert(myNative);
-        }
-        return JS_TRUE;
-    }
-
-
-    JSFunctionSpec * 
-    OscReceiver::Functions() {
-        static JSFunctionSpec myFunctions[] = {
-            {"start", Start, 0},
-            {"stop", Stop, 0},
-            {0}
-        };
-        return myFunctions;
-    }
-    
-    dom::NodePtr
-    getOscReceiverSettings(dom::NodePtr theSettings) {
-        dom::NodePtr mySettings(0);
-        if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
-            if (theSettings->childNode(0)->nodeName() == "settings") {
-                mySettings = theSettings->childNode(0)->childNode("OscReceiver", 0);
-            }
-        } else if ( theSettings->nodeName() == "settings") {
-            mySettings = theSettings->childNode("OscReceiver", 0);
-        } else if ( theSettings->nodeName() == "OscReceiver" ) {
-            mySettings = theSettings;
-        }
-        
-        if ( ! mySettings ) {
-            throw y60::OscException(
-                std::string("Could not find OscReceiver node in settings: ") +
-                as_string( * theSettings), PLUS_FILE_LINE );
-        }
-        return mySettings;
-    }
-
-};
-
-
-extern "C"
-EXPORT asl::PlugInBase* OscReceiver_instantiatePlugIn(asl::DLHandle myDLHandle) {
-    return new y60::OscReceiver(myDLHandle);
+  void
+  OscReceiver::onSetProperty(const std::string & thePropertyName,
+  const PropertyValue & thePropertyValue)
+  {
+  if (thePropertyName == "port") {
+  int myPort;
+  thePropertyValue.get(myPort);
+  AC_DEBUG << "Initiated osc receiver on port: " << myPort;
+  _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, myPort), this));
+            
+  return;
+  }
+  }
+*/  
 }

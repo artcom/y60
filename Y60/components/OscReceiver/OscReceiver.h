@@ -18,7 +18,6 @@
 #include <oscpack/ip/UdpSocket.h>
 
 #include <asl/PosixThread.h>
-#include <asl/PlugInBase.h>
 #include <asl/Exception.h>
 
 #include <y60/IEventSource.h>
@@ -29,8 +28,6 @@ namespace y60 {
     DEFINE_EXCEPTION( OscException, asl::Exception );
 
     class OscReceiver : public osc::OscPacketListener,
-        public asl::PlugInBase,
-        public jslib::IScriptablePlugin,
         public y60::IEventSource,
         public asl::PosixThread {
 
@@ -43,7 +40,7 @@ namespace y60 {
                 IpEndpointName       _mySender;    
             };
             
-            OscReceiver(asl::DLHandle theHandle);
+            OscReceiver(int thePort);
             virtual ~OscReceiver();
 
             const char * ClassName() {
@@ -51,10 +48,6 @@ namespace y60 {
                 return myClassName;
             }
 
-            virtual void onGetProperty(const std::string & thePropertyName,
-                           PropertyValue & theReturnValue) const;
-
-            virtual void onUpdateSettings(dom::NodePtr theSettings);
             EventPtrList poll();
 
             void start();
@@ -64,6 +57,8 @@ namespace y60 {
             void run();
 
             JSFunctionSpec * Functions();
+
+            dom::NodePtr getEventSchema() const { return _myASSEventSchema; }
 
     protected:
 
@@ -77,22 +72,23 @@ namespace y60 {
     private:
 
             std::string createMessageString(const osc::ReceivedMessage& m, 
-                                         const IpEndpointName& remoteEndpoint);
+                                            const IpEndpointName& remoteEndpoint);
 
             y60::EventPtr createY60Event(const std::string& theMessage);
 
             asl::ThreadLock           _myThreadLock;
             y60::EventPtrList         _myCurrentY60Events;
-            std::list<std::string> _myNewMessages;
- 	        std::vector< asl::Ptr<UdpListeningReceiveSocket> > _myOscReceiverSockets;
+            std::list<std::string>    _myNewMessages;
+ 	        asl::Ptr<UdpListeningReceiveSocket> _myOscReceiverSocket;
             dom::NodePtr                 _myEventSchema;
             dom::NodePtr                 _myASSEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
             long                         _myCurrentBundleTimeTag;
 
         };
-        
-    dom::NodePtr getOscReceiverSettings(dom::NodePtr theSettings);
+
+    typedef asl::Ptr<OscReceiver> OscReceiverPtr;
+
 }
 
 #endif // OSC_RECEIVER_INCLUDED

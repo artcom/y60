@@ -106,10 +106,11 @@ ASSOscClient::createTransportLayerEvent( const std::string & theType) {
     std::string myAddress("/");
     myAddress += theType;
     _myOSCStream << osc::BeginMessage( myAddress.c_str() )
-        << _myIDCounter++;
+                 << _myIDCounter++;
 
     if (theType == "configure") {
         _myOSCStream << _myGridSize[0] << _myGridSize[1];
+        AC_TRACE << "configure with " << _myGridSize << ".";
     }
 
     _myOSCStream << osc::EndMessage;
