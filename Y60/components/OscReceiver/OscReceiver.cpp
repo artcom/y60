@@ -99,14 +99,18 @@ namespace y60 {
 
         dom::NodePtr myNode = myY60Event->getDocument();
         dom::NodePtr myOldEvent = myNode->firstChild();
-        myNode->parseAll(theMessage);
-        myNode->removeChild(myOldEvent);
-        //myNode->firstChild()->
-        //    appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
-        myNode->firstChild()->
-            appendAttribute<string>("callback", myOldEvent->getAttributeString("callback"));
-        myY60Event->when = as<double>(myNode->firstChild()->getAttributeString("when"));   
-        AC_TRACE << "new osc event: " << *myY60Event->getNode();
+        try {
+            myNode->parseAll(theMessage);
+            myNode->removeChild(myOldEvent);
+            //myNode->firstChild()->
+            //    appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
+            myNode->firstChild()->
+                appendAttribute<string>("callback", myOldEvent->getAttributeString("callback"));
+            myY60Event->when = as<double>(myNode->firstChild()->getAttributeString("when"));   
+            AC_TRACE << "new osc event: " << *myY60Event->getNode();
+        } catch (...){
+            AC_ERROR << "bad osc message: "<< endl << theMessage;
+        }
         return myY60Event;
 
     }
