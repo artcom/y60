@@ -23,7 +23,7 @@ static long ourPacketCounter = 0;
 
 ASSOscClient::ASSOscClient() :
     ASSDriver(),
-    _myOSCStream( myBuffer, BUFFER_SIZE ),
+    //_myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
     _myServerPort( 7000 )
 {
@@ -33,34 +33,34 @@ ASSOscClient::ASSOscClient() :
 void
 ASSOscClient::poll() {
 
-    _myOSCStream.Clear();
     
-    _myOSCStream << osc::BeginBundle(ourPacketCounter++);//Immediate;
 
     for (int i = 0; i < _myReceivers.size(); ++i){
-        
-        if ( ! _myReceivers[i].udpConnection ) {
-            connectToServer(i);
-            // Send a new "configure" to all receivers, not only the
-            // newly connected one. This behaviour may change if
-            // needed.
-            createTransportLayerEvent("configure");
-        }
+        _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));
+        _myOSCStreams[i]->Clear();
+        *_myOSCStreams[i] << osc::BeginBundle(ourPacketCounter++);//Immediate;
     }
+
+    // Send a new "configure" to all receivers, not only the
+    // newly connected one. This behaviour may change if
+    // needed.
+    createTransportLayerEvent("configure");
    
     processInput();
         
-    _myOSCStream << osc::EndBundle;
+    for (int i = 0; i < _myReceivers.size(); ++i){
+        *_myOSCStreams[i] << osc::EndBundle;
+    }
 
-    ASSURE( _myOSCStream.IsReady() );
+    //ASSURE( _myOSCStream.IsReady() );
 
     for (int i = 0; i < _myReceivers.size(); ++i){
-
+        ASSURE( _myOSCStreams[i]->IsReady() );
         if (_myReceivers[i].udpConnection) {
-            if ( _myOSCStream.Size() > 16 ) { // empty bundles have size 16
+            if ( _myOSCStreams[i]->Size() > 16 ) { // empty bundles have size 16
                 // determined experimentally ... ain't nice
                 try {
-                    _myReceivers[i].udpConnection->send( _myOSCStream.Data(), _myOSCStream.Size() );
+                    _myReceivers[i].udpConnection->send( _myOSCStreams[i]->Data(), _myOSCStreams[i]->Size() );
                 } catch (const inet::SocketException & ex) {
                     AC_WARNING << "Failed to connect to " << _myReceivers[i].address << " at port "
                                << _myServerPort << ": " << ex;
@@ -90,11 +90,20 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
 {
     // TODO send ROI?
     //AC_PRINT << "createEvent: " << theType;
+    unsigned myTargetStream = 0;
+    for (unsigned myOscRegionsIndex =0; myOscRegionsIndex < _myOscRegions.size(); myOscRegionsIndex++) {
+        if (thePosition3D[0] >= _myOscRegions[myOscRegionsIndex][0] && 
+            thePosition3D[0] <= _myOscRegions[myOscRegionsIndex][1] ) {
+                myTargetStream = myOscRegionsIndex;
+                AC_DEBUG << "Dispatch eventpos : " << thePosition3D << " to client # " << myTargetStream << " cause regions fitted: " << _myOscRegions[myOscRegionsIndex];
+                break;    
+            }
+    }
     std::string myAddress("/");
     myAddress += theType;
 
     // theIntensity argument added after MfN Project (TA, MS 2007-07-30)
-    _myOSCStream << osc::BeginMessage( myAddress.c_str() )
+    *_myOSCStreams[myTargetStream] << osc::BeginMessage( myAddress.c_str() )
         << theID
         << thePosition3D[0] << thePosition3D[1] << thePosition3D[2]
 	<< theIntensity << osc::EndMessage;
@@ -103,17 +112,23 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
 
 void
 ASSOscClient::createTransportLayerEvent( const std::string & theType) {
-    std::string myAddress("/");
-    myAddress += theType;
-    _myOSCStream << osc::BeginMessage( myAddress.c_str() )
-                 << _myIDCounter++;
-
-    if (theType == "configure") {
-        _myOSCStream << _myGridSize[0] << _myGridSize[1];
-        AC_TRACE << "configure with " << _myGridSize << ".";
+    for (int i = 0; i < _myReceivers.size(); ++i){
+        if ( ! _myReceivers[i].udpConnection ) {
+            connectToServer(i);
+    
+            std::string myAddress("/");
+            myAddress += theType;
+            *_myOSCStreams[i] << osc::BeginMessage( myAddress.c_str() )
+                         << _myIDCounter++;
+        
+            if (theType == "configure") {
+                *_myOSCStreams[i] << _myGridSize[0] << _myGridSize[1];
+                AC_TRACE << "configure with " << _myGridSize << ".";
+            }
+        
+            *_myOSCStreams[i] << osc::EndMessage;
+        }
     }
-
-    _myOSCStream << osc::EndMessage;
 
 }
 
@@ -158,6 +173,32 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
             _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
         }
     }
+
+    std::string myOscRegionString;
+    getConfigSetting( mySettings, "OscClientASSWiresFilter", myOscRegionString, string("") );
+    vector<string> myOscRegions = splitString(myOscRegionString, ",");
+    if (myOscRegions.size() > 0) {
+        if (myOscRegions.size() == _myReceivers.size()+1) {
+            int myFirstWire = as<int>(myOscRegions[0]);
+            for (int i = 1; i < myOscRegions.size(); ++i){
+                int myNextWire = as<int>(myOscRegions[i]);
+                if (myFirstWire < myNextWire) {
+                    Vector2i myRegion(myFirstWire, myNextWire);
+                    _myOscRegions.push_back(myRegion);
+                    myFirstWire = myNextWire;
+                    AC_PRINT << "i: " << i << " region: " << myRegion;
+                } else {
+                    AC_ERROR << "Keypoints # " << (i -1) << " and #: " << i << " not ascending!";
+                }
+            }
+        } else {
+            // not enough keypoints
+            AC_ERROR << "Not correct keypoints : " << myOscRegions.size() << " must be: " << _myReceivers.size()+1 << "!";
+        }
+        
+        
+    }
+    
 }
 
 } // end of namespace y60

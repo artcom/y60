@@ -30,9 +30,9 @@
         <ClampToScreen>0</ClampToScreen>
         <MinTouchThreshold>9</MinTouchThreshold>
         <InterpolationMethod>1</InterpolationMethod>
-        <CureBrokenElectrodes>0</CureBrokenElectrodes>
-    
+        <CureBrokenElectrodes>0</CureBrokenElectrodes>   
         <ServerAddress>127.0.0.1,ascon</ServerAddress>
+        <OscClientASSWiresFilter>0,10,20</OscClientASSWiresFilter>        
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
     </ASSDriver>

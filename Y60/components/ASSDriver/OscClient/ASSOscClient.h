@@ -17,8 +17,9 @@
 #include <oscpack/osc/OscOutboundPacketStream.h>
 
 namespace y60 {
-
-
+    
+    typedef asl::Ptr<osc::OutboundPacketStream, dom::ThreadingModel> OutboundPacketStreamPtr;
+    
     class ASSOscClient : public ASSDriver {
     public:
         ASSOscClient();
@@ -55,11 +56,12 @@ namespace y60 {
         };
 
         char myBuffer[ BUFFER_SIZE ];
-        osc::OutboundPacketStream _myOSCStream;
+        std::vector<OutboundPacketStreamPtr> _myOSCStreams;
 
-        int                      _myClientPort;
-        int                      _myServerPort;
-        std::vector<Receiver>    _myReceivers;
+        int                        _myClientPort;
+        int                        _myServerPort;
+        std::vector<Receiver>      _myReceivers;
+        std::vector<asl::Vector2i> _myOscRegions;
     };
 
 } // end of namespace y60
