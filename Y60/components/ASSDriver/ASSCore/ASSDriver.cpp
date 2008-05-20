@@ -1321,8 +1321,8 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
                     PLUS_FILE_LINE);
         }
 
-    } else {
-        AC_ERROR << "dirver setup: no TransportLayer setting found.";
+    /*} else {
+        AC_ERROR << "driver setup: no TransportLayer setting found.";*/
     }
 
     getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
