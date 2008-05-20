@@ -25,7 +25,8 @@ ASSOscClient::ASSOscClient() :
     ASSDriver(),
     //_myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
-    _myServerPort( 7000 )
+    _myServerPort( 7000 ),
+    _myStreamIndex(0)
 {
     AC_DEBUG << "created osc sender";
 }
@@ -34,17 +35,20 @@ void
 ASSOscClient::poll() {
 
     
-
     for (int i = 0; i < _myReceivers.size(); ++i){
-        _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));
         _myOSCStreams[i]->Clear();
         *_myOSCStreams[i] << osc::BeginBundle(ourPacketCounter++);//Immediate;
-    }
 
-    // Send a new "configure" to all receivers, not only the
-    // newly connected one. This behaviour may change if
-    // needed.
-    createTransportLayerEvent("configure");
+        if ( ! _myReceivers[i].udpConnection ) {
+            connectToServer(i);
+        
+            // Send a new "configure" to all receivers, not only the
+            // newly connected one. This behaviour may change if
+            // needed.
+            _myStreamIndex = i;
+            createTransportLayerEvent("configure");
+        }
+    }
    
     processInput();
         
@@ -100,35 +104,38 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
             }
     }
     std::string myAddress("/");
-    myAddress += theType;
+    myAddress += theType;   
 
-    // theIntensity argument added after MfN Project (TA, MS 2007-07-30)
-    *_myOSCStreams[myTargetStream] << osc::BeginMessage( myAddress.c_str() )
-        << theID
-        << thePosition3D[0] << thePosition3D[1] << thePosition3D[2]
-	<< theIntensity << osc::EndMessage;
+    for (unsigned myOscRegionsIndex =0; myOscRegionsIndex < _myOscRegions.size(); myOscRegionsIndex++) {
+        if ( (_myOscRegions[myOscRegionsIndex][0] ==-1 && _myOscRegions[myOscRegionsIndex][0] ==-1 ) ||
+             ( thePosition3D[0] >= _myOscRegions[myOscRegionsIndex][0] && 
+            thePosition3D[0] <= _myOscRegions[myOscRegionsIndex][1]) ) {
+                
+            // theIntensity argument added after MfN Project (TA, MS 2007-07-30)
+            *_myOSCStreams[myOscRegionsIndex] << osc::BeginMessage( myAddress.c_str() )
+                << theID
+                << thePosition3D[0] << thePosition3D[1] << thePosition3D[2]
+        	<< theIntensity << osc::EndMessage;
+                AC_DEBUG << "Dispatch eventpos : " << thePosition3D << " to client # " << myOscRegionsIndex << " cause regions fitted: " << _myOscRegions[myOscRegionsIndex];
+            }
+    }
 
 }
 
 void
 ASSOscClient::createTransportLayerEvent( const std::string & theType) {
-    for (int i = 0; i < _myReceivers.size(); ++i){
-        if ( ! _myReceivers[i].udpConnection ) {
-            connectToServer(i);
     
-            std::string myAddress("/");
-            myAddress += theType;
-            *_myOSCStreams[i] << osc::BeginMessage( myAddress.c_str() )
-                         << _myIDCounter++;
-        
-            if (theType == "configure") {
-                *_myOSCStreams[i] << _myGridSize[0] << _myGridSize[1];
-                AC_TRACE << "configure with " << _myGridSize << ".";
-            }
-        
-            *_myOSCStreams[i] << osc::EndMessage;
-        }
+    std::string myAddress("/");
+    myAddress += theType;
+    *_myOSCStreams[_myStreamIndex] << osc::BeginMessage( myAddress.c_str() )
+                 << _myIDCounter++;
+
+    if (theType == "configure") {
+        *_myOSCStreams[_myStreamIndex] << _myGridSize[0] << _myGridSize[1];
+        AC_TRACE << "configure with " << _myGridSize << ".";
     }
+
+    *_myOSCStreams[_myStreamIndex] << osc::EndMessage;
 
 }
 
@@ -159,46 +166,33 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
         }
     }
 
-
-    std::string myReceiversString;
-    getConfigSetting( mySettings, "ServerAddress", myReceiversString, string("127.0.0.1") );
-    vector<string> myAddresses = splitString(myReceiversString, ",");
-    for (int i = 0; i < myAddresses.size(); ++i){
-        if ((int) _myReceivers.size() - 2 < i){
-            _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
-        }
-        if ( myAddresses[i].compare(_myReceivers[i].address) != 0 ) {
-            AC_DEBUG << "adding '" << myAddresses[i] << "' to the osc receiver list";
-            _myReceivers[i].address = myAddresses[i];
-            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
-        }
-    }
-
-    std::string myOscRegionString;
-    getConfigSetting( mySettings, "OscClientASSWiresFilter", myOscRegionString, string("") );
-    vector<string> myOscRegions = splitString(myOscRegionString, ",");
-    if (myOscRegions.size() > 0) {
-        if (myOscRegions.size() == _myReceivers.size()+1) {
-            int myFirstWire = as<int>(myOscRegions[0]);
-            for (int i = 1; i < myOscRegions.size(); ++i){
-                int myNextWire = as<int>(myOscRegions[i]);
-                if (myFirstWire < myNextWire) {
-                    Vector2i myRegion(myFirstWire, myNextWire);
-                    _myOscRegions.push_back(myRegion);
-                    myFirstWire = myNextWire;
-                    AC_PRINT << "i: " << i << " region: " << myRegion;
-                } else {
-                    AC_ERROR << "Keypoints # " << (i -1) << " and #: " << i << " not ascending!";
-                }
+    _myOSCStreams.clear();
+    if (mySettings->childNode("OscReceiverList")) {
+        for (int oscReceiverIndex = 0; 
+             oscReceiverIndex < mySettings->childNode("OscReceiverList")->childNodesLength(); 
+             oscReceiverIndex++) {
+            dom::NodePtr myReceiverNode = mySettings->childNode("OscReceiverList")->childNode(oscReceiverIndex);
+            if ((int) _myReceivers.size() - 2 < oscReceiverIndex){
+                _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
             }
-        } else {
-            // not enough keypoints
-            AC_ERROR << "Not correct keypoints : " << myOscRegions.size() << " must be: " << _myReceivers.size()+1 << "!";
+            string myAddress = myReceiverNode->getAttributeString("ip");
+            if ( myAddress.compare(_myReceivers[oscReceiverIndex].address) != 0 ) {
+                AC_DEBUG << "adding '" << myAddress << "' to the osc receiver list";
+                _myReceivers[oscReceiverIndex].address =myAddress;
+                _myReceivers[oscReceiverIndex].udpConnection = UDPConnectionPtr( 0 );
+                char* myBuffer = new char[ BUFFER_SIZE ];
+                _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));            
+            } else {
+                AC_PRINT << "sollte hier nicht vorbei kommen";
+            }
+            asl::Vector2i myRegion(-1,-1);
+            if (myReceiverNode->getAttribute("wire_range")) {
+               myRegion = myReceiverNode->getAttributeValue<asl::Vector2i>("wire_range");
+            }
+            _myOscRegions.push_back(myRegion);
+            AC_DEBUG << "Added Region #: " << oscReceiverIndex << " region: " << myRegion;
         }
-        
-        
     }
-    
 }
 
 } // end of namespace y60

@@ -55,13 +55,13 @@ namespace y60 {
             inet::UDPConnectionPtr  udpConnection;
         };
 
-        char myBuffer[ BUFFER_SIZE ];
         std::vector<OutboundPacketStreamPtr> _myOSCStreams;
 
         int                        _myClientPort;
         int                        _myServerPort;
         std::vector<Receiver>      _myReceivers;
         std::vector<asl::Vector2i> _myOscRegions;
+        unsigned                   _myStreamIndex;
     };
 
 } // end of namespace y60
