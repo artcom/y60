@@ -1,15 +1,15 @@
 <settings>
     <ASSDriver>
-          <ShowASSData min="0" max="1">0.00000</ShowASSData>
+        <ShowASSData min="0" max="1">1.00000</ShowASSData>
         <SensorPosition step="1.00">[33.70000,39.00000]</SensorPosition>
         <SensorOrientation step="1.5707963">0</SensorOrientation>
         <SensorScale step="0.1">[34.90000,34.80000]</SensorScale>
         <MirrorX min="0" max="1">0.00000</MirrorX>
         <MirrorY min="0" max="1">0.00000</MirrorY>
-        <GainPower>4.00000</GainPower>
+        <GainPower>3.00000</GainPower>
         <ComponentThreshold>5.00000</ComponentThreshold>
         <NoiseThreshold>5.00000</NoiseThreshold>
-        <IntensityThreshold step="0.5">8.00000</IntensityThreshold>
+        <IntensityThreshold step="0.5">6.00000</IntensityThreshold>
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
         <ProbePosition min="-1" step="1">[1.00000,18.00000]</ProbePosition>
         <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
@@ -18,8 +18,9 @@
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
-        <TransportLayer>serial</TransportLayer>
-        <SerialPort>4</SerialPort>
+        <TransportLayer>socket</TransportLayer>
+	    <IpAddress>192.168.7.50</IpAddress>
+        <Port>10001</Port>
         <UseUSB min="0" max="1">1</UseUSB>
         <BaudRate>230400</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
@@ -32,9 +33,17 @@
         <InterpolationMethod>1</InterpolationMethod>
         <CureBrokenElectrodes>0</CureBrokenElectrodes>
         <OscReceiverList>    
-            <OscReceiver ip="10.1.2.53"/>
-            <OscReceiver ip="10.1.2.57" wire_range="[6,11]"/>
-        </OscReceiverList>    
+            <OscReceiver ip="192.168.6.50"/>
+            <OscReceiver ip="192.168.6.51"/>
+            <OscReceiver ip="192.168.6.52"/>
+            <OscReceiver ip="192.168.6.53"/>
+            <OscReceiver ip="192.168.6.54"/>
+            <OscReceiver ip="192.168.6.55"/>
+            <OscReceiver ip="192.168.6.56"/>
+            <OscReceiver ip="192.168.6.57"/>
+            <OscReceiver ip="192.168.6.58"/>
+            <OscReceiver ip="10.1.2.59" wire_range="[6,11]"/>
+        </OscReceiverList>            
         <ServerPort>12000</ServerPort>
         <ClientPort>7001</ClientPort>
     </ASSDriver>

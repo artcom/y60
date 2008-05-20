@@ -142,7 +142,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         }
         if (!myViewport) {
             // we picked right into the Nothing
-            print("picked nothing");
+            Logger.trace("picked nothing");
             return null;
         }
         var myCamera = theRenderWindow.scene.world.getElementById(myViewport.camera);
