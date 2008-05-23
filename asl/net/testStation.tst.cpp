@@ -87,6 +87,7 @@ class StationTest : public TemplateUnitTest {
                 for (int i = 0; i < 2000; ++i) {
                 //for (int i = 0; i < 500; ++i) {
                     testData.appendString(asl::as_string(i));
+
                 }
                 cerr << "Testdata size = " << testData.size() << ":" << endl;
                 // cerr << testData << endl;
