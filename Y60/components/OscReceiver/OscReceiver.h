@@ -58,7 +58,6 @@ namespace y60 {
 
             JSFunctionSpec * Functions();
 
-            dom::NodePtr getEventSchema() const { return _myASSEventSchema; }
 
     protected:
 
@@ -81,7 +80,6 @@ namespace y60 {
             std::list<std::string>    _myNewMessages;
  	        asl::Ptr<UdpListeningReceiveSocket> _myOscReceiverSocket;
             dom::NodePtr                 _myEventSchema;
-            dom::NodePtr                 _myASSEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
             long                         _myCurrentBundleTimeTag;
 

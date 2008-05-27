@@ -56,7 +56,6 @@ namespace jslib {
     JSPropertySpec *
     JSOscReceiver::Properties() {
         static JSPropertySpec myProperties[] = {
-            {"eventSchema", PROP_eventSchema, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {0}
         };
         return myProperties;
@@ -77,9 +76,6 @@ namespace jslib {
     JSBool
     JSOscReceiver::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
-        case PROP_eventSchema:
-            *vp = as_jsval(cx, getNative().getEventSchema());
-            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSOscReceiver::getProperty: index %d out of range", theID);
             return JS_FALSE;

@@ -23,14 +23,12 @@ using namespace std;
 using namespace asl;
 
 extern std::string ourosceventxsd;
-extern std::string ourasseventxsd;
 
 
 namespace y60 {
 
     OscReceiver::OscReceiver(int thePort):
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
-        _myASSEventSchema( new dom::Document( ourasseventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
         asl::PosixThread(),
         _myCurrentBundleTimeTag(0)
@@ -195,31 +193,5 @@ namespace y60 {
                       << theMessage.AddressPattern() << ": " << e.what() << "\n";
             _myThreadLock.unlock();
         }
-    }
-    
-/*
-  void
-  OscReceiver::onGetProperty(const std::string & thePropertyName,
-  PropertyValue & theReturnValue) const
-  {
-  if (thePropertyName == "eventSchema") {
-  theReturnValue.set( _myASSEventSchema );
-  return;
-  }
-  }
-
-  void
-  OscReceiver::onSetProperty(const std::string & thePropertyName,
-  const PropertyValue & thePropertyValue)
-  {
-  if (thePropertyName == "port") {
-  int myPort;
-  thePropertyValue.get(myPort);
-  AC_DEBUG << "Initiated osc receiver on port: " << myPort;
-  _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, myPort), this));
-            
-  return;
-  }
-  }
-*/  
+    }    
 }
