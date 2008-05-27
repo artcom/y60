@@ -37,7 +37,6 @@ class ASSSchemaPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin 
             DOC_BEGIN("");
             DOC_END;
             dom::NodePtr myEventSchema( new dom::Document( getASSSchema() ) );
-            AC_PRINT << "our schema: " << getASSSchema();
             *rval = jslib::as_jsval(cx, myEventSchema);
             return JS_TRUE;    
         } HANDLE_CPP_EXCEPTION;
