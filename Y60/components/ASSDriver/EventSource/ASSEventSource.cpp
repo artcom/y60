@@ -9,18 +9,21 @@
 //============================================================================
 
 #include "ASSEventSource.h"
+#include <y60/AssEventSchema.h>
 
 using namespace asl;
 using namespace y60;
 
-extern std::string oureventxsd;
+#include <y60/IScriptablePlugin.h>
+#include <y60/JSWrapper.h>
+
 
 namespace y60 {
 
 ASSEventSource::ASSEventSource(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     ASSDriver( /*theHandle */),
-    _myEventSchema( new dom::Document( oureventxsd ) ),
+    _myEventSchema( new dom::Document( getASSSchema() ) ),
     _myValueFactory( new dom::ValueFactory() )
 
 {
