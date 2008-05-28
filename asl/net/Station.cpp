@@ -410,7 +410,7 @@ Station::openStation(unsigned long theBroadcastAddress,
 #endif 
     
     _fromAddress.sin_family = AF_INET;
-    _fromAddress.sin_addr.s_addr=htonl(INADDR_ANY);
+    _fromAddress.sin_addr.s_addr=htonl(_ownIPAddress);
     _fromAddress.sin_port = htons(_myReceivePort); 
     AC_DEBUG << "Binding Receiver Adress " << asl::as_dotted_address(ntohl(_fromAddress.sin_addr.s_addr)) << " to port " << ntohs(_fromAddress.sin_port) << endl;
 
@@ -422,7 +422,7 @@ Station::openStation(unsigned long theBroadcastAddress,
     _toAddress.sin_addr.s_addr=htonl(_myBroadcastAddress);
     _toAddress.sin_port = htons(_myBroadcastPort);
     AC_DEBUG << "Transmitter Adress is " << asl::as_dotted_address(ntohl(_toAddress.sin_addr.s_addr)) << " port " << ntohs(_toAddress.sin_port) << endl;
-     
+    
     _good = true;
 }
 
