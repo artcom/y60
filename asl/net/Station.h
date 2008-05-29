@@ -126,6 +126,7 @@ public:
     static unsigned long defaultNetworkID();
     static unsigned long defaultOwnIPAddress();
     static unsigned long defaultStationID();
+    static bool disableReceivingFlag();
 
     union Descriptor {
         unsigned long long _together;

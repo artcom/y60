@@ -161,6 +161,16 @@ Station::defaultOwnIPAddress() {
     return myAddress;
 }
 
+bool
+Station::disableReceivingFlag() {
+    bool myFlag = false;
+    if (getenv("STATION_DISABLE_RECEIVING")) {
+        myFlag = getenv("STATION_DISABLE_RECEIVING");
+    }
+    return myFlag;
+}
+
+
 unsigned long
 Station::defaultBroadcastAddress() {
     unsigned long myAddress = 0;
@@ -360,12 +370,12 @@ int main (int argc, char * argv[])
 
 void
 Station::openStation(unsigned long theBroadcastAddress,
-        unsigned short theBroadcastPort,
-        unsigned short theReceivePort,
-        unsigned long ownIPAddress,
-        unsigned long theStationID, 
-        unsigned long theNetworkID
-        )
+                     unsigned short theBroadcastPort,
+                     unsigned short theReceivePort,
+                     unsigned long ownIPAddress,
+                     unsigned long theStationID, 
+                     unsigned long theNetworkID
+    )
 { 
     _myOutgoingMessageNumber = 0;
 
@@ -408,14 +418,16 @@ Station::openStation(unsigned long theBroadcastAddress,
         throw SetSockOptFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
 #endif 
-    
-    _fromAddress.sin_family = AF_INET;
-    _fromAddress.sin_addr.s_addr=htonl(_ownIPAddress);
-    _fromAddress.sin_port = htons(_myReceivePort); 
-    AC_DEBUG << "Binding Receiver Adress " << asl::as_dotted_address(ntohl(_fromAddress.sin_addr.s_addr)) << " to port " << ntohs(_fromAddress.sin_port) << endl;
 
-    if (bind(_myFileDescriptor,(struct sockaddr*)&_fromAddress,sizeof(_fromAddress))<0) {
-        throw BindFailed(errorDescription(lastError()),PLUS_FILE_LINE);
+    if (!disableReceivingFlag()){
+        _fromAddress.sin_family = AF_INET;
+        _fromAddress.sin_addr.s_addr=htonl(INADDR_ANY);
+        _fromAddress.sin_port = htons(_myReceivePort); 
+        AC_DEBUG << "Binding Receiver Adress " << asl::as_dotted_address(ntohl(_fromAddress.sin_addr.s_addr)) << " to port " << ntohs(_fromAddress.sin_port) << endl;
+
+        if (bind(_myFileDescriptor,(struct sockaddr*)&_fromAddress,sizeof(_fromAddress))<0) {
+            throw BindFailed(errorDescription(lastError()),PLUS_FILE_LINE);
+        }
     }
 
     _toAddress.sin_family = AF_INET;
