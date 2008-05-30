@@ -1697,6 +1697,8 @@ namespace y60 {
 
         glPopAttrib();
         
+        _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
+        
         _myRenderedUnderlays = true;
     }
 
