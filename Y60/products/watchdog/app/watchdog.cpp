@@ -132,7 +132,7 @@ WatchDog::watch() {
                 myReturnString = "Application paused.";
             }
       
-            while (myRestarted == false && _myAppToWatch.getProcessResult() == WAIT_TIMEOUT) {
+            while (myRestarted == false && _myAppToWatch.getProcessResult() == PR_RUNNING) {
                 // update projector state
                 for (unsigned i = 0; i < _myProjectors.size(); ++i) {
                     _myProjectors[i]->update();
@@ -186,7 +186,7 @@ WatchDog::watch() {
         exit(-1);
     }
 
-    return FALSE;
+    return false;
 }
 
 void
@@ -209,23 +209,6 @@ WatchDog::checkForHalt() {
     }
 }
 
-void
-WatchDog::dumpWinError(const string& theErrorLocation) {
-    LPVOID lpMsgBuf;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                  FORMAT_MESSAGE_FROM_SYSTEM |
-                  FORMAT_MESSAGE_IGNORE_INSERTS,
-                  NULL,
-                  GetLastError(),
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                  (LPTSTR) &lpMsgBuf,
-                  0,
-                  NULL
-                  );
-
-    cerr << "Warning: " << theErrorLocation << " failed." << endl;
-    cerr << "         Error was " << *(char*)lpMsgBuf << endl;
-}
 
 bool
 WatchDog::init(dom::Document & theConfigDoc) {

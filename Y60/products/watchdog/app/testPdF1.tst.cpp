@@ -58,7 +58,7 @@ public:
 
 int main( int argc, char *argv[] )
 {
-    UnitTestSuite mySuite ("PdF1 Projector tests");
+    UnitTestSuite mySuite ("PdF1 Projector tests", argc, argv);
 
     try {
        //mySuite.addTest(new TestPowerUp);

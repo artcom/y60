@@ -22,6 +22,8 @@
 #include <paintlib/planydec.h>
 #include <paintlib/planybmp.h>
 
+#include <asl/os_functions.h>
+
 #include <SDL/SDL_getenv.h>
 #include <sstream>
 #include <iostream>
@@ -52,8 +54,8 @@ SDLSplashScreen::enable(const std::string& theBMPFilePath, int theXPos, int theY
     try {
         // setting up environment for SDL window offset
         std::stringstream myEnvText;
-        myEnvText << "SDL_VIDEO_WINDOW_POS=" << theXPos << "," << theYPos;
-        putenv(myEnvText.str().c_str());
+        myEnvText << theXPos << "," << theYPos;
+        asl::set_environment_var("SDL_VIDEO_WINDOW_POS", myEnvText.str());
         
         // decoding image to PLAnyBmp
         PLAnyPicDecoder myDecoder;
@@ -154,3 +156,4 @@ SDLSplashScreen::setSurfacePixels(T * theBmpPixel, T ** thePixels, SDL_Surface *
         }
     }
 }
+

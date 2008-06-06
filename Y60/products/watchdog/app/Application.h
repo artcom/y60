@@ -25,14 +25,13 @@
 #ifndef INCL_APPLICATION
 #define INCL_APPLICATION
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include "system_functions.h"
 
 #include <dom/Nodes.h>
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include <dom/Nodes.h>
 
@@ -51,7 +50,7 @@ enum RestartMode {
 
 class Application {
     public:
-        Application::Application(Logger & theLogger);
+        Application(Logger & theLogger);
         virtual ~Application();
 
         bool setup(const dom::NodePtr & theAppNode);
@@ -71,7 +70,7 @@ class Application {
         bool     restartedToday() const;
         std::string getHeartbeatFile() const;
         long     getRestartTimeInSecondsToday() const;
-        DWORD    getProcessResult() const;
+        ProcessResult    getProcessResult() const;
         std::string getFilename() const;
         std::string getArguments() const; 
         
@@ -82,17 +81,15 @@ class Application {
 
 
     private:
-        void closeAllThreads();
         void setEnvironmentVariables();
 
         std::map<std::string, std::string> _myEnvironmentVariables;
 
         std::string      _myFileName;
         std::string      _myWorkingDirectory;            
-        std::string      _myArguments;
+        std::vector<std::string> _myArguments;
         std::string      _myWindowTitle;
         long             _myAppStartTimeInSeconds;
-        std::string      _myCommandLine;
 
         int              _myAllowMissingHeartbeats;
         int              _myHeartbeatFrequency;
@@ -117,8 +114,8 @@ class Application {
         bool             _myItIsTimeToRestart;
         bool             _myHeartIsBroken;
         long             _myStartTimeInSeconds;
-        PROCESS_INFORMATION _myProcessInfo;
-        DWORD            _myProcessResult;
+        ProcessInfo      _myProcessInfo;
+        ProcessResult    _myProcessResult;
         std::string      _myLastWeekday;
         bool             _myDayChanged;
         Logger &         _myLogger;

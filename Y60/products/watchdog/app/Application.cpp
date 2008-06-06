@@ -21,7 +21,9 @@
 #include "Logger.h"
 #include "system_functions.h"
 
-#include <time.h>
+#include <ctime>
+#include <sstream>
+#include <typeinfo>
 
 #include <asl/MappedBlock.h>
 #include <asl/Exception.h>
@@ -29,8 +31,9 @@
 #include <asl/os_functions.h>
 #include <asl/proc_functions.h>
 
-
-#include <Tlhelp32.h>
+#ifdef WIN32
+#   include <Tlhelp32.h>
+#endif
 
 using namespace std;  // Manually included.
 using namespace dom;  // Manually included.
@@ -45,6 +48,22 @@ const char * ourWeekdayMap[] = {
     "sunday",
     0
 };
+
+struct to_upper {
+      char operator()(char c1) {return std::toupper(c1);}
+}; 
+
+template< typename T >
+inline T convertFromString(const std::string& str)
+{
+    std::istringstream iss(str);
+    T obj;
+    iss >> obj;
+    if( !iss ) {
+        AC_ERROR << "Conversion from " << str << " to '" << typeid(T).name() << "' failed!";
+    }
+    return obj;
+}
 
 const std::string STARTUP_COUNT_ENV = "AC_STARTUP_COUNT";
 
@@ -99,18 +118,16 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         for (int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
             const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
             if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                _myArguments += (*myArgumentNode)("#text").nodeValue();
-                _myArguments += " ";
+                _myArguments.push_back(asl::expandEnvironment((*myArgumentNode)("#text").nodeValue()));
+                AC_DEBUG << "Argument : "<< myArgumentNr << ": " << _myArguments.back() ;
             }
-            _myArguments = asl::expandEnvironment(_myArguments);
-            AC_DEBUG <<"Argument : "<<myArgumentNr << ": " << _myArguments ;
         }
     }
     if (theAppNode->childNode("RestartDay")) {
         _myRestartCheck = true;
         _myRestartDay = (*theAppNode->childNode("RestartDay"))("#text").nodeValue();
         _myRestartMode |= RESTARTDAY;
-        std::transform(_myRestartDay.begin(), _myRestartDay.end(), _myRestartDay.begin(), toupper);
+        std::transform(_myRestartDay.begin(), _myRestartDay.end(), _myRestartDay.begin(), to_upper());
         AC_DEBUG <<"_myRestartDay : " << _myRestartDay;
     }
     if (theAppNode->childNode("RestartTime")) {
@@ -118,8 +135,8 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         std::string myRestartTime = (*theAppNode->childNode("RestartTime"))("#text").nodeValue();
         std::string myHours = myRestartTime.substr(0, myRestartTime.find_first_of(':'));
         std::string myMinutes = myRestartTime.substr(myRestartTime.find_first_of(':')+1, myRestartTime.length());
-        _myRestartTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
-        _myRestartTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
+        _myRestartTimeInSecondsToday = convertFromString<long>(myHours) * 3600;
+        _myRestartTimeInSecondsToday += convertFromString<long>(myMinutes) * 60;
         _myRestartMode |= RESTARTTIME;
         AC_DEBUG <<"_myRestartTimeInSecondsToday : " << _myRestartTimeInSecondsToday;
     }
@@ -128,8 +145,8 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         std::string myCheckMemoryTime = (*theAppNode->childNode("CheckMemoryTime"))("#text").nodeValue();
         std::string myHours = myCheckMemoryTime.substr(0, myCheckMemoryTime.find_first_of(':'));
         std::string myMinutes = myCheckMemoryTime.substr(myCheckMemoryTime.find_first_of(':')+1, myCheckMemoryTime.length());
-        _myCheckMemoryTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
-        _myCheckMemoryTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
+        _myCheckMemoryTimeInSecondsToday = convertFromString<long>(myHours) * 3600;
+        _myCheckMemoryTimeInSecondsToday += convertFromString<long>(myMinutes) * 60;
         _myRestartMode |= CHECKMEMORYTIME;
         AC_DEBUG <<"_myCheckMemoryTimeInSecondsToday : " << _myCheckMemoryTimeInSecondsToday;
     }
@@ -184,7 +201,7 @@ void
 Application::setEnvironmentVariables() {
     std::map<std::string, std::string>::iterator myIter = _myEnvironmentVariables.begin();
     for( myIter = _myEnvironmentVariables.begin(); myIter != _myEnvironmentVariables.end(); ++myIter ) {
-        SetEnvironmentVariable(myIter->first.c_str(), myIter->second.c_str());
+        asl::set_environment_var(myIter->first, myIter->second);
         _myLogger.logToFile(string("Set environment variable: ") + myIter->first +
                             "=" + myIter->second);
         cerr << "Set environment variable: " << myIter->first <<
@@ -196,39 +213,11 @@ Application::setEnvironmentVariables() {
 void
 Application::terminate(const std::string & theReason, bool theWMCloseAllowed){
     _myLogger.logToFile(string("Terminate because: ") + theReason);
-
-    // Send WM_CLOSE to window
-    if (theWMCloseAllowed && _myWindowTitle != "") {
-        HWND myHWnd = FindWindow (0, _myWindowTitle.c_str());
-        if (!myHWnd) {
-            _myLogger.logToFile(string("Could not find Window ") + _myWindowTitle);
-        } else {
-            // Find process handle for window
-            DWORD myWindowProcessId;
-            DWORD myWindowThreadId = GetWindowThreadProcessId(myHWnd, &myWindowProcessId);
-
-            SendMessage(myHWnd, WM_CLOSE, 0, 0);
-            _myLogger.logToFile("WM_CLOSE sent.");
-            asl::msleep(500); // Give it some time to work...
-
-            // Terminate process
-            HANDLE myWindowProcessHandle = OpenProcess(0, false, myWindowProcessId);
-            if (myWindowProcessHandle) {
-                TerminateProcess(myWindowProcessHandle, 0);
-                CloseHandle(myWindowProcessHandle);
-            }
-        }
+    if (_myProcessResult == PR_RUNNING) {
+        closeApp( theWMCloseAllowed ? _myWindowTitle : std::string(""), _myProcessInfo, 
+                  _myLogger );
     }
-    else {
-        // Terminate process
-        _myLogger.logToFile("Try to terminate application.");
-        TerminateProcess(_myProcessInfo.hProcess, 0);
-        _myLogger.logToFile("O.k., terminated.");
-    }
-
-    _myProcessResult = WAIT_OBJECT_0;
-    asl::msleep(500); // Give it some time to work...
-    closeAllThreads();
+    _myProcessResult = PR_TERMINATED;
 }
 
 bool
@@ -259,53 +248,20 @@ Application::launch() {
     _myEnvironmentVariables[STARTUP_COUNT_ENV] = asl::as_string(++_myStartupCount);
     setEnvironmentVariables();
 
-    _myCommandLine = _myFileName + " " + _myArguments;
 
-    STARTUPINFO StartupInfo = {
-        sizeof(STARTUPINFO),
-        NULL, NULL, NULL, 0, 0, 0, 0, 0, 0,
-        0, STARTF_USESHOWWINDOW, SW_SHOWDEFAULT,
-        0, NULL, NULL, NULL, NULL
-    };
-
-    LPTSTR myWorkingDirectory = NULL;
-    if (_myWorkingDirectory != "") {
-        myWorkingDirectory = &_myWorkingDirectory[0];
-    }
-
-    bool myResult = CreateProcess(NULL, (&_myCommandLine[0]),
-                    NULL, NULL, TRUE, 0,
-                    NULL, myWorkingDirectory, &StartupInfo,
-                    &_myProcessInfo);
-    _myStartTimeInSeconds = getElapsedSecondsToday();
-
-    // Error handling
+    bool myResult = launchApp( _myFileName, _myArguments, _myWorkingDirectory, 
+                               _myProcessInfo );
+    
+    std::string myCommandLine = _myFileName + " " + getArguments();
+    
     if (!myResult) {
-        LPVOID lpMsgBuf;
-        FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            GetLastError(),
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) &lpMsgBuf,
-            0,
-            NULL
-        );
-
-        char myMessage[255];
-        strcpy( myMessage, (LPCSTR) lpMsgBuf );
-        strcat( myMessage, "\n\n" );
-        strcat( myMessage, _myCommandLine.c_str() );
-
-        cerr << myMessage << endl;
-
-        LocalFree(lpMsgBuf);
+        cerr << getLastError() << "\n\n" << myCommandLine << endl;
         exit(-1);
     }
-    _myLogger.logToFile("Started successfully: " + _myCommandLine);
-    _myProcessResult = WAIT_TIMEOUT;
+    _myStartTimeInSeconds = getElapsedSecondsToday();
+
+    _myLogger.logToFile("Started successfully: " + myCommandLine);
+    _myProcessResult = PR_RUNNING;
 
     _myItIsTimeToRestart   = false;
     _myHeartIsBroken       = false;
@@ -326,12 +282,14 @@ Application::checkHeartbeat() {
         myHeartbeatXml.parse(myHeartbeatStr);
 
         string mySecondsSince1970Str = myHeartbeatXml.firstChild()->getAttributeString("secondsSince1970");
-        __time64_t myCurrentSecondsSince_1_1_1970;
-        _time64( &myCurrentSecondsSince_1_1_1970 );
+        time_t myCurrentSecondsSince_1_1_1970;
+        time( &myCurrentSecondsSince_1_1_1970 );
 
-        long long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 - _atoi64(mySecondsSince1970Str.c_str());
+        long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 
+                                   - convertFromString<long>(mySecondsSince1970Str);
         AC_DEBUG <<" myCurrentSecondsSince_1_1_1970 : " << myCurrentSecondsSince_1_1_1970 ;
-        AC_DEBUG <<" last heartbeat sec since 1.1.70: "<<  _atoi64(mySecondsSince1970Str.c_str()) ;
+        AC_DEBUG <<" last heartbeat sec since 1.1.70: "
+                 <<  convertFromString<long>(mySecondsSince1970Str) ;
         AC_DEBUG <<" last age : " << myLastHeartbeatAge ;
         if ( myLastHeartbeatAge > _myHeartbeatFrequency * _myAllowMissingHeartbeats) {
             _myHeartIsBroken = true;
@@ -343,68 +301,19 @@ Application::checkHeartbeat() {
     }
 }
 
-void
-Application::closeAllThreads() {
-    // clean up the application: collect all threads and kill em
-    AC_DEBUG << "clean up the application: collect all threads and kill em ";
-    _myLogger.logToFile("Clean up the application: collect all threads and kill em");
-    THREADENTRY32  myThreadInfo;
-    myThreadInfo.dwSize = sizeof( THREADENTRY32 );
-    HANDLE hProcessSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD,0);//TH32CS_SNAPPROCESS, 0 );
-    int myThreadNum = 0;
-    if( hProcessSnap == INVALID_HANDLE_VALUE ) {
-        cerr <<"Application::closeAllThreads() failed " << endl;
-    } else {
-        if (Thread32First(hProcessSnap, &myThreadInfo)){
-            do {
-                _myLogger.logToFile(string("### found a running thread with id: ") + asl::as_string(myThreadInfo.th32ThreadID));
-                if( myThreadInfo.th32OwnerProcessID == _myProcessInfo.dwProcessId )    {
-                    myThreadNum++;
-                    AC_DEBUG << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate...";
-                    HANDLE myChildThreadHandle = OpenThread(THREAD_ALL_ACCESS, FALSE, myThreadInfo.th32ThreadID);
-                    CloseHandle(myChildThreadHandle);
-                }
-            } while(Thread32Next(hProcessSnap, &myThreadInfo));
-        } else {
-            dumpWinError( "Thread32First" );  // Show cause of failure
-        }
-        CloseHandle(hProcessSnap);
-    }
-    if (myThreadNum > 0) {
-        cerr <<"Process had still " << myThreadNum << " threads, terminated them" << endl << endl;
-    }
-    _myLogger.logToFile(string("Closed all threads: ") + asl::as_string(myThreadNum));
-}
 
 void
 Application::shutdown() {
     // Terminate process
     terminate("Application shutdown", false);
-
-    // Close process and thread handles.
-    CloseHandle( _myProcessInfo.hProcess );
-    CloseHandle( _myProcessInfo.hThread );
 }
 
 std::string
 Application::runUntilNextCheck(int theWatchFrequency) {
     // Wait until child process exits.
-    _myProcessResult = WaitForSingleObject( _myProcessInfo.hProcess, 1000 * theWatchFrequency );
-
-    if (_myProcessResult == WAIT_FAILED) {
-        LPVOID lpMsgBuf;
-        FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                       FORMAT_MESSAGE_FROM_SYSTEM |
-                       FORMAT_MESSAGE_IGNORE_INSERTS,
-                       NULL,
-                       GetLastError(),
-                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                       (LPTSTR) &lpMsgBuf,
-                       0,
-                       NULL );
-        std::string myProcessOutputString  = ((LPCTSTR)lpMsgBuf);
-        LocalFree( lpMsgBuf );
-        return string("Return code of process: ") + myProcessOutputString;
+    _myProcessResult = waitForApp( _myProcessInfo, 1000 * theWatchFrequency );
+    if (_myProcessResult == PR_FAILED) {
+        return string("Return code of process: ") + getLastError();
     }
     return string("Internal quit.");
 }
@@ -415,11 +324,11 @@ Application::checkState() {
     if (_myRestartCheck) {
         // get memory available/free
         unsigned myAvailMem = 0;
-        MEMORYSTATUS myMemoryStatus;
-        GlobalMemoryStatus (&myMemoryStatus);
 #if 1
         myAvailMem = asl::getFreeMemory() / 1024;
 #else
+        MEMORYSTATUS myMemoryStatus;
+        GlobalMemoryStatus (&myMemoryStatus);
         AC_INFO << "virt free:  " << myMemoryStatus.dwAvailVirtual / 1024;
         AC_INFO << "virt used:  " << (myMemoryStatus.dwTotalVirtual - myMemoryStatus.dwAvailVirtual) / 1024;
         AC_INFO << "virt total: " << myMemoryStatus.dwTotalVirtual / 1024;
@@ -455,7 +364,7 @@ Application::checkState() {
             _myDayChanged = false;
         }
 
-        std::transform(myWeekday.begin(), myWeekday.end(), myWeekday.begin(), toupper);
+        std::transform(myWeekday.begin(), myWeekday.end(), myWeekday.begin(), to_upper());
 
         // time check
         if (_myRestartMode & RESTARTTIME) {
@@ -527,7 +436,7 @@ long Application::getRestartTimeInSecondsToday() const {
     return _myRestartTimeInSecondsToday;
 }
 
-DWORD Application::getProcessResult() const {
+ProcessResult Application::getProcessResult() const {
     return _myProcessResult;
 }
 
@@ -536,7 +445,15 @@ std::string Application::getFilename() const {
 }
 
 std::string Application::getArguments() const {
-    return _myArguments;
+    std::string myResult;
+    for (std::vector<std::string>::size_type i = 0; i < _myArguments.size(); i++) {
+        myResult += _myArguments[i];
+        myResult += " ";
+    }
+    if (!myResult.empty()) {
+        myResult.resize( myResult.size() - 1 );
+    }
+    return myResult;
 }
 
 void Application::setPaused(bool thePausedFlag) {
@@ -548,10 +465,10 @@ void Application::setRestartedToday(bool theRestartedTodayFlag) {
 }
        
 long getElapsedSecondsToday() {
-    __time64_t ltime;
+    time_t ltime;
     struct tm *newtime;
-    _time64( &ltime );
-    newtime = _localtime64( &ltime );
+    time( &ltime );
+    newtime = localtime( &ltime );
     long myElapsedSecondsToday = newtime->tm_hour * 3600;
     myElapsedSecondsToday += newtime->tm_min * 60;
     myElapsedSecondsToday += newtime->tm_sec;

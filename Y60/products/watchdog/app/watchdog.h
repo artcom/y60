@@ -55,7 +55,6 @@ private:
     std::vector<Projector *> _myProjectors;
     bool                _myPowerUpProjectorsOnStartup;
 
-    void                dumpWinError(const std::string& theErrorLocation);
     void                checkForReboot();
     void                checkForHalt();
     
