@@ -53,13 +53,13 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
         _myParticleSystem = new GPUParticles(window.scene);
         _myParticleSystem.create( window.scene.world, 
                                   50, // number of particles
-                                  "ahorn01.png", // 3d texture
+                                  "2.png", // 3d texture
                                   [1.0, -0.5, 0.0], // initial emitting direction
                                   [0.0, 25.0], // the scattering angles
                                   [0.5, 1.5]); // the speed range
 
         _myParticleSystem.material.properties.timetolive = 1.0;
-        _myParticleSystem.material.properties.gravity = [0.0, 0.5, 0.0];
+        _myParticleSystem.material.properties.gravity = [0.0, 0.5, 0.0, 0.0];
         _myParticleSystem.material.properties.size = [20.0, 2.0, 640.0];
         window.scene.update(Scene.ANIMATIONS_LOAD); 
 

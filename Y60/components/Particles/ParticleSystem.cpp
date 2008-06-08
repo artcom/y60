@@ -160,7 +160,7 @@ ParticleSystem::create(const dom::NodePtr & theParentNode,
     myProperties->appendChild(dom::Node("<float name='time'>0</float>").firstChild());
     myProperties->appendChild(dom::Node(string("<float name='stoptime'>") + asl::as_string(NumericTraits<float>::max()) + "</float>").firstChild());
     myProperties->appendChild(dom::Node("<float name='timetolive'>3.0</float>").firstChild());
-    myProperties->appendChild(dom::Node("<vector3f name='gravity'>[0.0, 0.0, 0.0]</vector3f>").firstChild());
+    myProperties->appendChild(dom::Node("<vector4f name='gravity'>[0.0, 0.0, 0.0, 0.0]</vector4f>").firstChild());
     myProperties->appendChild(dom::Node("<vector3f name='size'>[8.0, 2.0, 640.0]</vector3f>").firstChild());
 
     string myMaterialNodeId = _myMaterialNode->getAttribute("id")->nodeValue();
