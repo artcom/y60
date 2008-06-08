@@ -50,7 +50,7 @@ const char * ourWeekdayMap[] = {
 };
 
 struct to_upper {
-      char operator()(char c1) {return std::toupper(c1);}
+      char operator()(char c1) {return ::toupper(c1);}
 }; 
 
 template< typename T >

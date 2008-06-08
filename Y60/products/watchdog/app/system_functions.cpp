@@ -174,10 +174,10 @@ bool launchApp( const std::string & theFileName,
         myCommandLine += theArguments[i];
     }
 
-    return CreateProcess(NULL, myCommandLine.c_str(),
+    return CreateProcess(NULL, &(myCommandLine[0]),
                          NULL, NULL, TRUE, 0,
                          NULL, 
-                         myWorkingDirectory.empty() ? NULL : myWorkingDirectory.c_str(), 
+                         theWorkingDirectory.empty() ? NULL : theWorkingDirectory.c_str(), 
                          &StartupInfo,
                          &theProcessInfo);
 
