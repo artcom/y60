@@ -24,6 +24,7 @@
 #endif
 
 #include "net_functions.h"
+#include "asl/os_functions.h"
 #include "SocketException.h"
 
 #include <asl/settings.h>
@@ -142,9 +143,11 @@ namespace asl {
         return myResult;
     }
     
-    asl::Block getHardwareAddress() {
+    asl::Block getHardwareAddress(const std::string & theInterfaceName) {
         asl::Block myHardwareMac;
 #ifdef WIN32
+        const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "0");
+        // TODO: check interface name or use name as index instead
         PIP_ADAPTER_INFO pAdapterInfo;
         PIP_ADAPTER_INFO pAdapter = NULL;
         DWORD dwRetVal = 0;
@@ -186,6 +189,7 @@ namespace asl {
         }
 
 #ifdef OSX
+        const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "en0");
         struct ifaddrs *ifap0 = 0;
         if (getifaddrs(&ifap0) < 0) {
             throw SocketException(PLUS_FILE_LINE); 
@@ -194,7 +198,7 @@ namespace asl {
 
         bool myFoundIfFlag = false;
         while (ifap && myFoundIfFlag == false) {
-            if (strcmp(ifap->ifa_name, "en0") == 0 && ifap->ifa_addr->sa_family == AF_LINK) {
+            if (strcmp(ifap->ifa_name, myInterfaceName.c_str()) == 0 && ifap->ifa_addr->sa_family == AF_LINK) {
                 struct sockaddr_dl * dl = (struct sockaddr_dl *) ifap->ifa_addr;
                 unsigned myIfNameLen = strlen("en0");
                 /*AC_PRINT << ifap->ifa_name << " index=" << dl->sdl_index << " len=" << (int)(dl->sdl_alen) << " data=" << dl->sdl_data;
@@ -209,8 +213,9 @@ namespace asl {
         }
         freeifaddrs(ifap0);
 #else
+        const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "eth0");
         ifreq myInterface;
-        strcpy (myInterface.ifr_name, "eth0");
+        strcpy (myInterface.ifr_name, myInterfaceName.c_str());
         if (ioctl (fd, SIOCGIFHWADDR, &myInterface) < 0) {
             throw SocketException(PLUS_FILE_LINE); 
         }

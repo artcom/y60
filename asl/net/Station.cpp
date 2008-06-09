@@ -391,9 +391,10 @@ Station::openStation(unsigned long theBroadcastAddress,
         throw SocketFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
 
-#ifdef N_WIN32
+#ifdef SO_REUSEADDR
     int myReUseAddr = -1;
     if (setsockopt(_myFileDescriptor, SOL_SOCKET, SO_REUSEADDR, (char*) &myReUseAddr, sizeof(myReUseAddr)) < 0) {
+        AC_DEBUG << "setting SO_REUSEADDR socket option";
         throw SetSockOptFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
 #endif
@@ -415,6 +416,7 @@ Station::openStation(unsigned long theBroadcastAddress,
 // Unfortunately this is not yet supported in Linux (2.4.18), may be in the future
 #ifdef SO_REUSEPORT
     if(setsockopt(_myFileDescriptor, SOL_SOCKET, SO_REUSEPORT, &myState, sizeof(myState))!=0) {
+        AC_DEBUG << "setting SO_REUSEPORT socket option";
         throw SetSockOptFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
 #endif 

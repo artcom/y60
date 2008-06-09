@@ -66,7 +66,7 @@ namespace asl {
     unsigned long from_dotted_address(const std::string & dottedAddress);
     std::string as_dotted_address(unsigned long theAdress);
 
-    asl::Block getHardwareAddress();
+    asl::Block getHardwareAddress(const std::string & theInterfaceName = "");
 } //Namespace asl
 
 #endif
