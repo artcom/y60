@@ -665,10 +665,14 @@ namespace asl {
     class WriteableArrangedFile : public WriteableArrangedStream<EXTERNAL_BYTE_ORDER> {
         typedef WriteableArrangedStream<EXTERNAL_BYTE_ORDER> Base;
     public:
-        WriteableArrangedFile(const std::string & theFileName) : 
+        WriteableArrangedFile(const std::string & theFileName, bool appendToFile = false) : 
             _myFileName(theFileName, UTF8)
         {
-            _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary);
+            if (appendToFile) {
+                _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary|std::ios::ate);
+            } else {
+                _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary|std::ios::trunc);
+            }
         }
 
         typename Base::WriteableStream & append(const void * theMemory, typename Base::size_type theSize) {
