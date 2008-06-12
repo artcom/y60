@@ -24,6 +24,7 @@
 #include <ctime>
 #include <sstream>
 #include <typeinfo>
+#include <cctype>
 
 #include <asl/MappedBlock.h>
 #include <asl/Exception.h>
@@ -50,7 +51,7 @@ const char * ourWeekdayMap[] = {
 };
 
 struct to_upper {
-      char operator()(char c1) {return ::toupper(c1);}
+      char operator()(char c1) {return std::toupper(c1);}
 }; 
 
 template< typename T >
@@ -60,7 +61,7 @@ inline T convertFromString(const std::string& str)
     T obj;
     iss >> obj;
     if( !iss ) {
-        AC_ERROR << "Conversion from " << str << " to '" << typeid(T).name() << "' failed!";
+        AC_ERROR << "Conversion from \"" << str << "\" to '" << typeid(T).name() << "' failed!";
     }
     return obj;
 }
@@ -325,23 +326,21 @@ Application::checkState() {
         // get memory available/free
         unsigned myAvailMem = 0;
 #if 1
-        myAvailMem = asl::getFreeMemory() / 1024;
+        myAvailMem = asl::getFreeMemory();
 #else
+        const unsigned int pmu = asl::getProcessMemoryUsage(_myProcessInfo.dwProcessId);
         MEMORYSTATUS myMemoryStatus;
         GlobalMemoryStatus (&myMemoryStatus);
-        AC_INFO << "virt free:  " << myMemoryStatus.dwAvailVirtual / 1024;
-        AC_INFO << "virt used:  " << (myMemoryStatus.dwTotalVirtual - myMemoryStatus.dwAvailVirtual) / 1024;
-        AC_INFO << "virt total: " << myMemoryStatus.dwTotalVirtual / 1024;
-        AC_INFO << "child proc: " << asl::getProcessMemoryUsage(_myProcessInfo.dwProcessId) / 1024;
-        AC_INFO << "phy free:   " << myMemoryStatus.dwAvailPhys / 1024;
-        AC_INFO << "phy used:   " << (myMemoryStatus.dwTotalPhys - myMemoryStatus.dwAvailPhys) / 1024;
-        AC_INFO << "phy total:  " << myMemoryStatus.dwTotalPhys / 1024;
+        AC_INFO << "virt free:  " << myMemoryStatus.dwAvailVirtual / 1024 << "kb";
+        AC_INFO << "virt used:  " << (myMemoryStatus.dwTotalVirtual - myMemoryStatus.dwAvailVirtual) / 1024 << "kb";
+        AC_INFO << "virt total: " << myMemoryStatus.dwTotalVirtual / 1024 << "kb";
+        AC_INFO << "phy free:   " << myMemoryStatus.dwAvailPhys / 1024 << "kb";
+        AC_INFO << "phy used:   " << (myMemoryStatus.dwTotalPhys - myMemoryStatus.dwAvailPhys) / 1024 << "kb";
+        AC_INFO << "phy total:  " << myMemoryStatus.dwTotalPhys / 1024 << "kb";
         AC_INFO << "%:          " << myMemoryStatus.dwMemoryLoad;
+        AC_INFO << "child proc: " << pmu << "kb";
         AC_INFO << "---------------------------------------";
-        // NOTE: for MEMORYSTATUS seems to only take the watchdogs
-        // memory usage itself into account, this version explicitly
-        // subtracts the used memory of the watched process from availible memory [jb]
-        myAvailMem = (asl::getFreeMemory() - asl::getProcessMemoryUsage(_myProcessInfo.dwProcessId)) / 1024;
+        myAvailMem = myMemStatus.dwAvailPhys - pmu;
 #endif
         _myMemoryIsFull = (myAvailMem <= _myRestartMemoryThreshold);
         if (_myMemoryIsFull) {
