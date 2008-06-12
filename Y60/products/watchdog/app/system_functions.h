@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "asl/proc_functions.h"
+
 #include "Logger.h"
 
 #ifdef WIN32
@@ -37,8 +39,9 @@
 #error your platform is missing!
 #endif
 
+typedef asl::ProcessID ProcessResult;
+
 #ifdef WIN32
-    typedef DWORD ProcessResult;
     enum {
         PR_RUNNING = WAIT_TIMEOUT,
         PR_TERMINATED = WAIT_OBJECT_0,
@@ -47,7 +50,6 @@
     typedef PROCESS_INFORMATION ProcessInfo;
     typedef DWORD ErrorNumber;
 #elif defined(LINUX)
-    typedef pid_t ProcessResult;
     enum {
         PR_RUNNING,
         PR_TERMINATED,
