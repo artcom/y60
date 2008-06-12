@@ -203,7 +203,7 @@ namespace asl {
             // GlobalMemoryStatusEx for that.
             MEMORYSTATUS myMemStat;
             GlobalMemoryStatus(&myMemStat);
-            myTotalMemory = myMemStat.dwTotalVirtual;
+            myTotalMemory = myMemStat.dwTotalPhys / 1024;
 #elif LINUX
             myTotalMemory = getMemInfo(MEM_TOTAL);
 #elif OSX
@@ -220,9 +220,7 @@ namespace asl {
     unsigned getUsedMemory() {
         unsigned myUsedMemory = 0;
 #ifdef WIN32
-        MEMORYSTATUS myMemStat;
-        GlobalMemoryStatus(&myMemStat);
-        myUsedMemory = myMemStat.dwTotalVirtual - myMemStat.dwAvailVirtual;
+        myUsedMemory = getTotalMemory()-getFreeMemory();
 #elif LINUX
         // Determining used/free memory under Linux is a bit tricky since
         // the kernel usually tries to take all free memory for caching.
@@ -243,7 +241,7 @@ namespace asl {
 #ifdef WIN32
         MEMORYSTATUS myMemStat;
         GlobalMemoryStatus(&myMemStat);
-        myFreeMemory = myMemStat.dwAvailVirtual;
+        myFreeMemory = myMemStat.dwAvailPhys / 1024;
 #elif LINUX
         myFreeMemory = getTotalMemory() - getUsedMemory();
 #elif OSX
@@ -275,7 +273,7 @@ namespace asl {
         if (hProcess) {
             PROCESS_MEMORY_COUNTERS pmc;
             if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
-                myMemUsage = pmc.WorkingSetSize;
+                myMemUsage = pmc.WorkingSetSize / 1024;
             }
             CloseHandle(hProcess);
         }
