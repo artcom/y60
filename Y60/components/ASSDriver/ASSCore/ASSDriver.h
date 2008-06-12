@@ -20,6 +20,7 @@
 
 #include <dom/Nodes.h>
 
+#include <y60/DataTypes.h>
 #include <asl/PlugInBase.h>
 #include <y60/IScriptablePlugin.h>
 #include <y60/IRendererExtension.h>
@@ -191,6 +192,10 @@ class ASSDriver :
         
         int _myUseCCRegionForMomentumFlag;
         asl::Box2i _myUserDefinedMomentumBox;
+        
+        asl::Vector4f _myCureVLines;
+        asl::Vector4f _myCureHLines;
+        y60::VectorOfVector2f _myCurePoints;
         // XXX: shearing hack
         float _myShearX;
         float _myShearY;

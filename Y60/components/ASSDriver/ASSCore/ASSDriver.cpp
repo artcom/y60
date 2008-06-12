@@ -118,7 +118,11 @@ ASSDriver::ASSDriver() :
     _myShearX(0.0),
     _myShearY(0.0),
     _myUseCCRegionForMomentumFlag(0),
-    _myUserDefinedMomentumBox(-1, -1, 1, 1)
+    _myUserDefinedMomentumBox(-1, -1, 1, 1),
+
+    _myCureVLines(-1,-1,-1,-1),
+    _myCureHLines(-1,-1,-1,-1),
+    _myCurePoints(0)
 
 
 {
@@ -340,7 +344,7 @@ void
 ASSDriver::curePoint( unsigned theX, unsigned theY ) {
     unsigned char * myBrokenPoint = _myRawRaster.raster->pixels().begin() +
             theY * _myPoTSize[0] + theX;
-
+    
     unsigned char * myNeighbours[NUM_NEIGHBOURS];
 
     if (theY == 0) {
@@ -377,15 +381,29 @@ ASSDriver::curePoint( unsigned theX, unsigned theY ) {
 
 void
 ASSDriver::cureBrokenElectrodes() {
-    //cureHLine( 5 ); // XXX
-    //cureVLine(1);
-    //curePoint( 23, 13 ); // XXX
-    //setPointToValue(1,5);
-    //curePoint(39,1);
-    //for(unsigned i=0; i<20; i++) {
-    //curePoint( 1, 5 );
-        //}
-    // curePoint( 20, 13 ); // XXX
+
+    for(unsigned int i=0; i<_myCureVLines.size(); i++) {
+        if( _myCureVLines[i] != -1 && _myCureVLines[i] < _myGridSize[0]) {
+            //AC_PRINT << "cure v line " << _myCureVLines[i] << " i " << i;
+            cureVLine(_myCureVLines[i]);
+        }
+    }
+
+    for(unsigned int i=0; i<_myCureHLines.size(); i++) {
+        if( _myCureHLines[i] != -1 && _myCureVLines[i] < _myGridSize[1]) {
+            //AC_PRINT << "cure h line " << _myCureHLines[i] << " i " << i;
+            cureHLine(_myCureHLines[i]);
+        }
+    }
+
+    for(unsigned int i=0; i<_myCurePoints.size(); i++) {
+        if( _myCurePoints[i][0] != -1 && _myCurePoints[i][1] != -1 &&
+            _myCurePoints[i][0] < _myGridSize[0] && _myCurePoints[i][1] < _myGridSize[1]) {
+            //AC_PRINT << "cure point " << _myCurePoints[i][0] << "  " << _myCurePoints[i][1] << " i " << i;
+            curePoint(_myCurePoints[i][0], _myCurePoints[i][1]);
+        }
+    }
+
 }
 
 
@@ -1341,6 +1359,36 @@ ASSDriver::setupDriver(dom::NodePtr theSettings) {
     asl::Vector4f myMomentumRegion;
     getConfigSetting( theSettings, "MomentumRegion", myMomentumRegion, asl::Vector4f(-1,-1,1,1));
     _myUserDefinedMomentumBox = Box2i(int(myMomentumRegion[0]), int(myMomentumRegion[1]), int(myMomentumRegion[2]), int(myMomentumRegion[3])); 
+
+    
+    asl::Vector4f myCureVLines;
+    getConfigSetting( theSettings, "CureVLineValues", myCureVLines, asl::Vector4f(-1,-1,-1,-1));
+    _myCureVLines = Vector4f(myCureVLines[0], myCureVLines[1], myCureVLines[2], myCureVLines[3]); 
+
+    asl::Vector4f myCureHLines;
+    getConfigSetting( theSettings, "CureHLineValues", myCureHLines, asl::Vector4f(-1,-1,-1,-1));
+    _myCureHLines = Vector4f(myCureHLines[0], myCureHLines[1], myCureHLines[2], myCureHLines[3]); 
+
+    asl::Vector2f myCurePoint1;
+    asl::Vector2f myCurePoint2;
+    asl::Vector2f myCurePoint3;
+    asl::Vector2f myCurePoint4;
+    
+    _myCurePoints.clear();
+    AC_PRINT << "cure points " << _myCurePoints.size();
+    getConfigSetting( theSettings, "CurePoint1", myCurePoint1, asl::Vector2f(-1,-1));
+    _myCurePoints.push_back(myCurePoint1);
+
+    getConfigSetting( theSettings, "CurePoint2", myCurePoint2, asl::Vector2f(-1,-1));
+    _myCurePoints.push_back(myCurePoint2);
+
+    getConfigSetting( theSettings, "CurePoint3", myCurePoint3, asl::Vector2f(-1,-1));
+    _myCurePoints.push_back(myCurePoint3);
+
+    getConfigSetting( theSettings, "CurePoint4", myCurePoint4, asl::Vector2f(-1,-1));
+    _myCurePoints.push_back(myCurePoint4);
+    AC_PRINT << "cure points " << _myCurePoints.size();
+    
 }
 
 Vector3f 
