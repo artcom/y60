@@ -668,8 +668,8 @@ ApplyImageFilter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
     try {
         if (argc != 3) {
-			JS_ReportError(cx, "applyImageFilter(): expects at least three arguments : image node,"
-                               "filter name, filter params");
+			JS_ReportError(cx, "applyImageFilter(): expects three arguments : image node,"
+                               "filter name, vector of filter params");
             return JS_FALSE;
         }
 		dom::NodePtr myImageNode;
