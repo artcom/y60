@@ -380,7 +380,7 @@ namespace y60 {
                 if (frameFinished == 0) {
                     continue;
                 }
-                _myLastVideoTimestamp = myPacket.dts;
+                _myLastVideoTimestamp = double(myPacket.dts);
 
                 // suitable framestamp?
                 if (_myLastVideoTimestamp >= theTimestamp) {
@@ -394,7 +394,7 @@ namespace y60 {
         convertFrame(_myFrame, theTargetRaster);
         // store actual timestamp
 
-        theTimestamp = myPacket.dts;
+        theTimestamp = double(myPacket.dts);
         AC_DEBUG << "Packet dts: " << myPacket.dts << ", pts: " << myPacket.pts;
 
         _myLastVStreamIndex = myPacket.stream_index;

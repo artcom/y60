@@ -48,7 +48,6 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLH
 
 namespace y60 {
 
-    const unsigned FFMpegDecoder2::FRAME_CACHE_SIZE = 128;//64;//8;
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
     asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
@@ -74,6 +73,7 @@ namespace y60 {
         _myNumIFramesDecoded(0),
         _myDecodedPacketsPerFrame(0),
         _myBytesPerPixel(1),
+        _myMaxCacheSize(8),
         _myLastFrameTime(0)
     {}
 
@@ -184,14 +184,12 @@ namespace y60 {
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
-
+        Movie * myMovie = getMovie();
+        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myDecodedPacketsPerFrame = 0; // reset counter 
         decodeFrame();
-        if (hasAudio() && getDecodeAudioFlag())
-        {
+        if (hasAudio() && getDecodeAudioFlag()) {
             readAudio();
-            AC_INFO << "Start Audio";
-            _myAudioSink->play();
         }
 
         setState(RUN);
@@ -201,14 +199,13 @@ namespace y60 {
         } else {
             AC_INFO << "Thread already running. No forking.";
         }
-        /*while (_myMsgQueue.size() < 40) {
-            asl::msleep(10);
-        }*/
         AsyncDecoder::startMovie(theStartTime, theStartAudioFlag);
     }
 
     void FFMpegDecoder2::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
         AC_INFO << "FFMpegDecoder2::resumeMovie, time: " << theStartTime;
+        Movie * myMovie = getMovie();
+        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         setState(RUN);
         if (!isActive()) {
             AC_TRACE << "Forking FFMpegDecoder Thread";
@@ -237,9 +234,6 @@ namespace y60 {
                 avcodec_flush_buffers(_myAStream->codec);
             }
 */            
-            if (_myAudioSink && getDecodeAudioFlag()) {
-                _myAudioSink->stop();
-            }
             _myDemux->clearPacketCache();
             setState(STOP);
             _myMsgQueue.clear();
@@ -414,11 +408,6 @@ namespace y60 {
                     _myDecodedPacketsPerFrame++;                    
                     AC_DEBUG << "### needed packets to decode frame: "<<_myDecodedPacketsPerFrame;
                 }
-                /*// first packet of a frame has the DTS value ->so save it for later
-                if (_myKeepDTSFlag) {
-                    _myStoredDTS = myPacket->dts;
-                    _myKeepDTSFlag = false;
-                }*/
                 // start_time indicates the begin of the video
                 if (myFrameCompleteFlag  && (myPacket->dts >= _myVStream->start_time)) {
                     STOP_TIMER(decodeFrame_ffmpegdecode);
@@ -426,7 +415,7 @@ namespace y60 {
                         _myStartTimestamp = myPacket->dts;//_myVStream->start_time;
                         AC_DEBUG << "Set StartTimestamp to packet timestamp= " << _myStartTimestamp;
                     }
-                    int64_t myNextPacketTimestamp = myPacket->dts;//_myStoredDTS;//
+                    int64_t myNextPacketTimestamp = myPacket->dts;
                     double myFrameTime = (double)myNextPacketTimestamp/_myTimeUnitsPerSecond;
                     AC_DEBUG << "---- add frame"<< " time_base:"<<_myTimeUnitsPerSecond
 		                        <<" FrameTime: "<<myFrameTime;
@@ -440,7 +429,6 @@ namespace y60 {
 
                     av_free_packet(myPacket);
                     delete myPacket;
-                    //_myKeepDTSFlag = true;
                     break;
                 }
                 av_free_packet(myPacket);
@@ -606,7 +594,7 @@ namespace y60 {
         bool isDone = false;
         while (!shouldTerminate() && !isDone) {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
-            if (_myMsgQueue.size() >= FRAME_CACHE_SIZE) {
+            if (_myMsgQueue.size() >= _myMaxCacheSize) {
                 // decode the audio...but let the video thread sleep
                 if (hasAudio() && getDecodeAudioFlag()) {
                     AC_DEBUG<<"---sleeping ---still decode audio";
@@ -726,8 +714,6 @@ namespace y60 {
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
 
-        // from texture-image-separation branch: 
-        //_myFrameRate = (1.0 / av_q2d(myVCodec->time_base));
         
         myMovie->set<FrameRateTag>(_myFrameRate);
         if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
@@ -751,6 +737,16 @@ namespace y60 {
         } else {
 	        myMovie->set<FrameCountTag>(int(_myVStream->duration));
 	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);//_myFrameRate;
+	        if(_myTimeUnitsPerSecond != _myFrameRate){
+	            AC_DEBUG << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
+                << _myFrameRate << " framecount=" << getFrameCount()<< "time_base: "
+                <<_myTimeUnitsPerSecond;
+                
+                AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< "r_framerate num: "<< _myVStream->r_frame_rate.num;
+                AC_DEBUG << " time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
+                AC_DEBUG << " time_base2: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
+                AC_DEBUG << " formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time:"<<_myVStream->start_time;
+	        }
             AC_DEBUG << "FFMpegDecoder2::setupVideo(): _myVStream->duration="
                      << _myVStream->duration;
         }

@@ -42,6 +42,7 @@ namespace y60 {
         VolumeTag::Plug(theNode),
         LoopCountTag::Plug(theNode),
         CacheSizeTag::Plug(theNode),
+        MaxCacheSizeTag::Plug(theNode),
         AVDelayTag::Plug(theNode),
         AudioTag::Plug(theNode),
         DecoderHintTag::Plug(theNode),

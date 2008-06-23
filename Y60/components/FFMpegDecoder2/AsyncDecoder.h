@@ -56,7 +56,6 @@ namespace y60 {
              * @return if the movie has audio, the audio-time that audio is currently 
              *         played back, else theSystemTime
              */
-double ourLastFrameTimeStamp;
              
             double getMovieTime(double theSystemTime) {
                 if (!hasAudio() || !getDecodeAudioFlag()) {
@@ -75,15 +74,13 @@ double ourLastFrameTimeStamp;
                                 << _myLastAudioTime+0.5;
                         return _myLastAudioTime+0.5;
                     } else {*/
-                        AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime()
-                                <<"video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
-                        _myLastAudioTime = _myAudioSink->getCurrentTime();
+                        AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()
+                                <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
+                        _myLastAudioTime = _myAudioSink->getPumpTime();
                         // audio is not running yet, maybe cause we are buffering, so do not show any video frames
                         if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
                             return 0;
                         } else {
-                            //AC_PRINT << " ASyncDecoder::getMovieTime------\nrendertimediff : " << (MovieDecoderBase::getMovieTime(theSystemTime) - ourLastFrameTimeStamp);
-                            ourLastFrameTimeStamp = MovieDecoderBase::getMovieTime(theSystemTime);
                             //return _myAudioSink->getCurrentTime();
                             return _myAudioSink->getPumpTime();                            
                             //return MovieDecoderBase::getMovieTime(theSystemTime);
@@ -97,7 +94,7 @@ double ourLastFrameTimeStamp;
              */
             virtual void pauseMovie(bool thePauseAudioFlag = true) {
                 AC_INFO << "AsyncDecoder::pauseMovie";
-                if (thePauseAudioFlag && _myAudioSink) {            
+                if (thePauseAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->pause();
                 }
                 setState(PAUSE);
@@ -107,7 +104,7 @@ double ourLastFrameTimeStamp;
             void startMovie(double theStartTime, bool theStartAudioFlag = true) {
                 AC_DEBUG << "AsyncDecoder::startMovie";
                 MovieDecoderBase::startMovie(theStartTime);
-                if (theStartAudioFlag && _myAudioSink) {            
+                if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->play();
                 }
             }
@@ -117,7 +114,7 @@ double ourLastFrameTimeStamp;
             void resumeMovie(double theStartTime, bool theResumeAudioFlag = true) {
                 AC_DEBUG << "AsyncDecoder::resumeMovie";
                 MovieDecoderBase::resumeMovie(theStartTime);
-                if (theResumeAudioFlag && _myAudioSink) {            
+                if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->play();
                     AC_PRINT <<"resumeMovie: _myAudioSink->play()";
                 }
@@ -130,7 +127,7 @@ double ourLastFrameTimeStamp;
             virtual void stopMovie(bool theStopAudioFlag = true) {
                 AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
-                if (theStopAudioFlag && _myAudioSink) {            
+                if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->stop();
                 } 
             }

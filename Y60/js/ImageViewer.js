@@ -607,6 +607,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.audio = 0;
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
+            //_myMovieNode.maxcachesize = 128;
             //_myMovieNode.targetpixelformat = "ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"
             if (theEnsureFrameCount) {
                 window.scene.ensureMovieFramecount(_myMovieNode);

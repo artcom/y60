@@ -261,6 +261,7 @@ namespace y60 {
     static const char * MOVIE_NODE_NAME             = "movie";
     static const char * MOVIE_FRAME_ATTRIB          = "currentframe";
     static const char * MOVIE_FRAME_CACHE_ATTRIB    = "cachesize";
+    static const char * MOVIE_FRAME_MAX_CACHE_ATTRIB = "maxcachesize";
     static const char * MOVIE_AVDELAY_ATTRIB        = "avdelay";
     static const char * MOVIE_FRAMERATE_ATTRIB      = "fps";
     static const char * MOVIE_FRAMECOUNT_ATTRIB     = "framecount";

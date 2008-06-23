@@ -42,6 +42,7 @@ namespace y60 {
     //                  theTagName       theType      theAttributeName               theDefault
     DEFINE_ATTRIBUT_TAG(AVDelayTag,      double,      MOVIE_AVDELAY_ATTRIB,     0);
     DEFINE_ATTRIBUT_TAG(CacheSizeTag,    int,         MOVIE_FRAME_CACHE_ATTRIB, 0);
+    DEFINE_ATTRIBUT_TAG(MaxCacheSizeTag, unsigned,    MOVIE_FRAME_MAX_CACHE_ATTRIB, 32);
     DEFINE_ATTRIBUT_TAG(CurrentFrameTag, int,         MOVIE_FRAME_ATTRIB,       0);
     DEFINE_ATTRIBUT_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1);
     DEFINE_ATTRIBUT_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25);
@@ -73,6 +74,7 @@ namespace y60 {
         public VolumeTag::Plug,
         public LoopCountTag::Plug,
         public CacheSizeTag::Plug,
+        public MaxCacheSizeTag::Plug,
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,

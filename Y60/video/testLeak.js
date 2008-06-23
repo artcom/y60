@@ -84,7 +84,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
             window.renderText([500,200], "Total memory usage: " + myMem, "Screen15");                
             _myFrameCount++; 
             _myLastMemory = myMem;     
-            if (_myFrameCount % 10 == 0) window.printStatistics();      
+            //if (_myFrameCount % 10 == 0) window.printStatistics();      
         }
         window.go();
     }
