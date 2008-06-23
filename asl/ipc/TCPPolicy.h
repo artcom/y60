@@ -61,7 +61,6 @@ class TCPPolicy : public SocketPolicy {
 
         // Acceptor methods
         static Handle startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount);
-
         static void disconnect(Handle & theHandle);
         static void stopListening(Handle theHandle);
         static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 

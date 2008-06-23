@@ -55,6 +55,10 @@ namespace asl {
 class SocketPolicy : public ConduitPolicy {
     public:
         typedef int Handle; 
+
+        static bool isValid(const Handle & theHandle) { 
+            return theHandle != NULL; 
+        }
       
         static void disconnect(Handle & theHandle);
         /// Handles pending IO operations - should be called periodically (e.g. per frame) 

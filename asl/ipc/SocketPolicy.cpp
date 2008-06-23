@@ -158,11 +158,13 @@ SocketPolicy::handleIO(Handle & theHandle, BufferQueue & theInQueue, BufferQueue
     }
     if (FD_ISSET(theHandle, &myReadSet)) {
         if (!receiveData(theHandle, theInQueue)) {
+            disconnect(theHandle);
             return false;
         }
     }
     if (FD_ISSET(theHandle, &myWriteSet)) {
         if (!sendData(theHandle, theOutQueue)) {
+            disconnect(theHandle);
             return false;
         }
     }

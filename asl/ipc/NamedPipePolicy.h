@@ -92,6 +92,11 @@ class NamedPipePolicy : public ConduitPolicy {
         /// Creates a (client) conduit connected to the remote endpoint
         // @throws ConduitException
         static Handle connectTo(Endpoint theRemoteEndpoint);
+
+        static bool isValid(const Handle & theHandle) { 
+            return theHandle.isValid(); 
+        }
+
         /// disconnects a conduit 
         // @throws ConduitException
         static void disconnect(Handle & theHandle);

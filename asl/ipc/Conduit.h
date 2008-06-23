@@ -60,9 +60,8 @@ class Conduit {
         typedef asl::WeakPtr<Conduit> WPtr;
 
         /// Create a new conduit, connecting to a given remote endpoint
-        Conduit(typename POLICY::Endpoint theRemoteEndpoint) : _myValidFlag(false) {
+        Conduit(typename POLICY::Endpoint theRemoteEndpoint) {
             _myHandle = POLICY::connectTo(theRemoteEndpoint);
-            _myValidFlag = true;
         };
 
         virtual ~Conduit() {
@@ -78,10 +77,10 @@ class Conduit {
 
         /// must be called periodically to handle I/O. 
         virtual bool handleIO(int theTimeout = 0) {
-            if (_myValidFlag) {
-                _myValidFlag = POLICY::handleIO(_myHandle, _myInQueue, _myOutQueue, theTimeout); 
+            if (!isValid()) {
+                return false;
             }
-            return _myValidFlag;
+            return POLICY::handleIO(_myHandle, _myInQueue, _myOutQueue, theTimeout); 
         }
         /// Send all outgoing data 
         virtual bool flush(int theTimeout) {
@@ -99,7 +98,7 @@ class Conduit {
         /// check status of the conduit.
         ///@returns true if the conduit is still operational, otherwise false.
         bool isValid() const {
-            return _myValidFlag;
+            return POLICY::isValid(_myHandle);
         }
 
         /** @name sending and receiving raw data.
@@ -243,15 +242,14 @@ class Conduit {
     protected:
         /// create a new conduit using an already connected I/O handle
         Conduit(typename POLICY::Handle theHandle) : _myHandle(theHandle) {
-            _myValidFlag = (bool)theHandle;
-        };
+
+        }
 
         Conduit(const Conduit<POLICY> &);
         Conduit & operator=(const Conduit<POLICY> &);
         typename POLICY::Handle _myHandle;
         BufferQueue _myInQueue;
         BufferQueue _myOutQueue;
-        bool _myValidFlag;
 };
 
 /* @} */
