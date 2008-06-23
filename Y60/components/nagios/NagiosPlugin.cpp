@@ -116,7 +116,7 @@ NagiosPlugin::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set<asl::Unsigned16>(_myPort);
     } else if (thePropertyName == "timeout") {
         theReturnValue.set<asl::Signed32>(StatusServer::readFrameTimeout());
-    } else if (thePropertyName == "timeout") {
+    } else if (thePropertyName == "text") {
         theReturnValue.set<std::string>(StatusServer::readStatusText());
     } else {
         //cerr << "### WARNING: Unknown property: " << thePropertyName << endl;
