@@ -57,7 +57,7 @@ class SocketPolicy : public ConduitPolicy {
         typedef int Handle; 
 
         static bool isValid(const Handle & theHandle) { 
-            return theHandle != NULL; 
+            return theHandle != 0; 
         }
       
         static void disconnect(Handle & theHandle);
