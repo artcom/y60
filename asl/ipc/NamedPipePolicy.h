@@ -89,12 +89,13 @@ class NamedPipePolicy : public ConduitPolicy {
             BufferQueue * inQueue;
         };
         typedef PipeInfo Handle;
+
         /// Creates a (client) conduit connected to the remote endpoint
         // @throws ConduitException
         static Handle connectTo(Endpoint theRemoteEndpoint);
 
         static bool isValid(const Handle & theHandle) { 
-            return theHandle.isValid(); 
+            return theHandle.isValid; 
         }
 
         /// disconnects a conduit 
