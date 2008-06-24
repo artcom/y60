@@ -3065,6 +3065,11 @@ use values greater one for fast forward and less than minus one for fast reverse
 For your information only.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
+                    <xs:attribute name="maxcachesize" type="xs:unsignedInt">
+                        <xs:annotation>
+                            <xs:documentation>Maximum number of video frames cached by the movie decoder</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                     <xs:attribute name="playmode" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Sets the playmode of the movie.
