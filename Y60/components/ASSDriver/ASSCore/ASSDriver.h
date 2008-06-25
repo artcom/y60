@@ -135,6 +135,7 @@ class ASSDriver :
 
         void setupDriver(dom::NodePtr theSettings);
 
+        void captureSensorData();
 
         void cureBrokenElectrodes();
         void cureHLine(unsigned theLineNo);
@@ -163,6 +164,8 @@ class ASSDriver :
         float       _myMinTouchThreshold;
         int         _myInterpolationMethod;
         int         _myCureBrokenElectrodesFlag;
+        int         _myCaputureSensorDataFlag;
+        int         _myCapturedFrameCounter;
 
         CursorMap   _myCursors;
 

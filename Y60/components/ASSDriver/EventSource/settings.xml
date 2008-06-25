@@ -16,6 +16,7 @@
         <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
         <MomentumRegion step="1">[-1.00,-1.00000,1.00,1.00000]</MomentumRegion>
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
+        <CaptureSensorData> min="0" max="1" step="1" >0</CaptureSensorData>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
         <TransportLayer>socket</TransportLayer>
@@ -32,5 +33,11 @@
         <MinTouchThreshold step="0.1">9.0</MinTouchThreshold>
         <InterpolationMethod min="0" max="1" step="1" >1</InterpolationMethod>
         <CureBrokenElectrodes min="0" max="1" step="1" >0</CureBrokenElectrodes>
+        <CureVLineValues min="-1" step="1">[-1,-1,-1,-1]</CureVLineValues>
+        <CureHLineValues min="-1" step="1">[-1,-1,-1,-1]</CureHLineValues>
+        <CurePoint1 min="-1" step="1">[-1,-1]</CurePoint1>
+        <CurePoint2 min="-1" step="1">[-1,-1]</CurePoint2>
+        <CurePoint3 min="-1" step="1">[-1,-1]</CurePoint3>
+        <CurePoint4 min="-1" step="1">[-1,-1]</CurePoint4>
     </ASSDriver>
 </settings>
