@@ -194,16 +194,19 @@ namespace asl {
     }
 #endif
 
+
     unsigned getTotalMemory() {
         static unsigned myTotalMemory = 0;
         if (myTotalMemory == 0) {
 #ifdef WIN32
-            // GlobalMemoryStatus may return incorrect values
-            // for systems with more than 4 GB. Have to use (you guess it)
+            // GlobalMemoryStatus may returns incorrect values
+            // for systems with more than 2 GB. So we have to use (you guess it)
             // GlobalMemoryStatusEx for that.
-            MEMORYSTATUS myMemStat;
-            GlobalMemoryStatus(&myMemStat);
-            myTotalMemory = myMemStat.dwTotalPhys / 1024;
+            // TODO this does not work for >4 GB -> make the interface 64Bit 
+            MEMORYSTATUSEX myMemStat;
+            myMemStat.dwLength = sizeof (myMemStat);
+            GlobalMemoryStatusEx (&myMemStat);
+            myTotalMemory = unsigned(myMemStat.ullTotalPhys / 1024);
 #elif LINUX
             myTotalMemory = getMemInfo(MEM_TOTAL);
 #elif OSX
@@ -239,9 +242,10 @@ namespace asl {
     unsigned getFreeMemory() {
         unsigned myFreeMemory = 0;
 #ifdef WIN32
-        MEMORYSTATUS myMemStat;
-        GlobalMemoryStatus(&myMemStat);
-        myFreeMemory = myMemStat.dwAvailPhys / 1024;
+        MEMORYSTATUSEX myMemStat;
+        myMemStat.dwLength = sizeof (myMemStat);
+        GlobalMemoryStatusEx (&myMemStat);
+        myFreeMemory = unsigned(myMemStat.ullAvailPhys / 1024);
 #elif LINUX
         myFreeMemory = getTotalMemory() - getUsedMemory();
 #elif OSX
