@@ -16,7 +16,7 @@
 #include "Projector.h"
 
 
-const int myPort = 1; // if this doesn´t exist under Windows the test will fail
+const int myPort = 0; // if this doesn´t exist under Windows the test will fail
 
 
 class TestPowerUp: public UnitTest {
