@@ -41,11 +41,7 @@ sub runLocalMakedist($) {
     }
 
     # Install dependencies
-    if ($ourPlatform eq "WIN") {
-        depends("Y60/js", "Y60/shader", "y60/components", "Y60/products/watchdog/app");
-    } else {
-        depends("Y60/js", "Y60/shader", "y60/components");
-    }
+    depends("Y60/js", "Y60/shader", "y60/components", "Y60/products/watchdog/app");
 }
 
 sub runLocalMakeInstaller() {
