@@ -191,15 +191,24 @@ bool launchApp( const std::string & theFileName,
         return true;
     }
     std::vector<char*> myArgv;
-    std::cerr << "starting application " << theFileName << " ";
+    std::cerr << "Starting application " << theFileName << " ";
     myArgv.push_back( const_cast<char*>(theFileName.c_str()) );
     for (std::vector<std::string>::size_type i = 0; i < theArguments.size(); i++) {
         myArgv.push_back( const_cast<char*>(theArguments[i].c_str()) );
         std::cerr << theArguments[i] << " ";
     }
+    if ( ! theWorkingDirectory.empty() ) {
+        std::cerr << "in directory: '" << theWorkingDirectory << "'";    
+    }
     myArgv.push_back(NULL);
     std::cerr << std::endl;
-    execv( theFileName.c_str(), &myArgv[0] );
+    if ( ! theWorkingDirectory.empty() ) {
+        if (chdir( theWorkingDirectory.c_str() ) < 0) {
+            dumpLastError( std::string("chdir('") + theWorkingDirectory + "')" );
+            std::abort();
+        }    
+    }
+    execvp( theFileName.c_str(), &myArgv[0] );
     dumpLastError(theFileName);
     std::abort();
 #else
