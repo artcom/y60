@@ -145,7 +145,7 @@ ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout ) {
     if (myResult == -1) {
         return PR_FAILED;
     }
-    if (WIFEXITED(myStatus)) {
+    if (myResult == theProcessInfo && WIFEXITED(myStatus)) {
         return PR_TERMINATED;
     } else {
         return PR_RUNNING;
