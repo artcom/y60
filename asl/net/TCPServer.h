@@ -82,6 +82,14 @@ namespace inet {
             // @returns a new TCPSocket for each new connection
             TCPSocket* waitForConnection() const;
 
+            asl::Unsigned32 getHost() {
+                return _myHost;
+            }
+            
+            asl::Unsigned16 getPort() {
+                return _myPort;
+            }
+
         private:
             asl::Unsigned32 _myHost;
             asl::Unsigned16 _myPort;

@@ -39,7 +39,6 @@
 */
 
 #include "Socket.h"
-#include "TCPServer.h"
 #include "TestSocket.h"
 #include "TCPClientSocket.h"
 #include "UDPSocket.h"
@@ -145,9 +144,7 @@ void TestSocket::BaseTest() {
     ENSURE_EXCEPTION(theSocket.send("Hallo",5), SocketException);
 }
 
-void TestSocket::TCPTest() {
-    pthread_t myThread;
-    int myResult;
+TCPServer * TestSocket::createTCPServer(){
 
     TCPServer * myTCPServer;
     int serverPort;
@@ -193,6 +190,16 @@ void TestSocket::TCPTest() {
     }
     ENSURE(myTCPServer != 0);
 
+    return myTCPServer;
+}
+
+void TestSocket::TCPTest() {
+
+    TCPServer * myTCPServer = createTCPServer();
+
+    pthread_t myThread;
+    int myResult;
+
     // start server thread
     myResult = pthread_create(&myThread, NULL, TCPServerThread, (void *)myTCPServer);
     ENSURE(myResult==0);
@@ -201,7 +208,7 @@ void TestSocket::TCPTest() {
     Unsigned32 inHostAddress = getHostAddress("localhost");
 
     TCPClientSocket myClient;
-    myClient.setRemoteAddr(inHostAddress, serverPort);
+    myClient.setRemoteAddr(inHostAddress, myTCPServer->getPort());
     myClient.connect();
     if (!myClient.isValid())
         myClient.retry(10);
@@ -215,7 +222,12 @@ void TestSocket::TCPTest() {
     myClient.close();
     ENSURE_EXCEPTION(myClient.send("hallo",5), SocketException);
 
+    // start another server thread
+    myResult = pthread_create(&myThread, NULL, TCPServerThread, (void *)myTCPServer);
+    ENSURE(myResult==0);
+
     myClient.connect();
+    myInputBuffer[3] = ' '; // invalidate buffer
     myClient.receive(myInputBuffer,5);
     ENSURE(strncmp(myInputBuffer,"READY",5)==0);
     myClient.send("QUIT!",5);
@@ -225,8 +237,6 @@ void TestSocket::TCPTest() {
     int threadResult;
     pthread_join(myThread, (void **)&threadResult);
     ENSURE_MSG(threadResult==0, "Error in server thread");
-
-    delete myTCPServer;
 }
 
 void * TestSocket::TCPServerThread(void *arg) {
@@ -235,18 +245,25 @@ void * TestSocket::TCPServerThread(void *arg) {
     char myInputBuffer[5];
     long myResult = 0;
 
-    for (int i = 0; i<2; i++) {
-        AC_DEBUG <<"TCPServerThread waiting to connect" << endl;
-        TCPSocket *mySocket = theServer->waitForConnection();
-        AC_DEBUG <<"TCPServerThread connected" << endl;
-        mySocket->send("READY",5);
+    AC_DEBUG <<"TCPServerThread waiting to connect" << endl;
+    TCPSocket *mySocket = theServer->waitForConnection();
+    AC_DEBUG <<"TCPServerThread connected" << endl;
+    mySocket->send("READY",5);
+
+    do {
         mySocket->receive(myInputBuffer, 5);
-        if (strncmp(myInputBuffer, "QUIT!", 5)!=0) {
-            myResult = -1;
+        AC_DEBUG << "TCPServerThread received " << myInputBuffer;
+        if (strncmp(myInputBuffer, "BREAK",5)==0){
+            AC_DEBUG << "TCPServerThread breaking the connection";
+            pthread_exit((void *)myResult);
+            return (void*)myResult;
         }
-        delete mySocket;
-        mySocket = 0;
-    }
+
+    } while (strncmp(myInputBuffer, "QUIT!", 5)!=0);
+
+    AC_DEBUG << "TCPServerThread received quit";
+    delete mySocket;
+    mySocket = 0;
 
     pthread_exit((void *)myResult);
 
@@ -383,9 +400,50 @@ void * TestSocket::UDPServerThread(void *arg) {
     return 0;
 }
 
+
+void TestSocket::testConnectionTimeout(){
+
+    TCPServer * myTCPServer = createTCPServer();
+
+    pthread_t myThread;
+    int myResult;
+
+    // start server thread
+    myResult = pthread_create(&myThread, NULL, TCPServerThread, (void *)myTCPServer);
+    ENSURE(myResult==0);
+
+    // start client
+    Unsigned32 inHostAddress = getHostAddress("localhost");
+
+    TCPClientSocket myClient;
+    myClient.setRemoteAddr(inHostAddress, myTCPServer->getPort());
+
+    myClient.setConnectionTimeout(1);
+    myClient.connect();
+
+    char myInputBuffer[5];
+    myClient.receive(myInputBuffer,5);
+    ENSURE(strncmp(myInputBuffer,"READY",5)==0);
+
+    // break the server thread 
+    myClient.send("BREAK",5);
+    int threadResult;
+    pthread_join(myThread, (void **)&threadResult);
+    ENSURE_MSG(threadResult==0, "Error in server thread");
+
+    ENSURE(myClient.getConnectionTimeout() == 1);
+
+    ENSURE_EXCEPTION(myClient.receive(myInputBuffer,5), SocketException);
+
+    myClient.close();
+
+    delete myTCPServer;
+}
+
 void TestSocket::run() {
     testHostAddressMethods();
     BaseTest();
     TCPTest();
     UDPTest();
+    testConnectionTimeout();
 }

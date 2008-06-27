@@ -55,6 +55,9 @@
 #include <iostream>
 #include <assert.h>
 
+#include <asl/string_functions.h>
+#include <asl/net_functions.h>
+
 using namespace std;
 using namespace asl;
 
@@ -62,6 +65,7 @@ namespace inet {
 
     Socket::Socket(asl::Unsigned32 thehost, Unsigned16 theport)
         : fd(-1),
+          _myTimeOut(0),
           _myLocalEndpoint(thehost, theport)
     {
         initSockets();
@@ -88,7 +92,7 @@ namespace inet {
                 throw SocketException(err, "Socket::close() failed.");
             }
 #else
-        // TODO: error handling.
+            // TODO: error handling.
             ::close(fd);
 #endif
             fd = -1;
@@ -98,14 +102,37 @@ namespace inet {
 
     unsigned Socket::receive(void *data, const unsigned maxlen)
     {
+
+        if (_myTimeOut != 0){
+            AC_TRACE << "socket timeout is " << _myTimeOut;
+
+            struct timeval tv;
+
+            fd_set readset;
+            FD_ZERO(&readset);
+            FD_SET(fd, &readset);
+
+            // Initialize time out struct
+            tv.tv_sec = getConnectionTimeout();
+            tv.tv_usec = 0;
+
+            int result = select(fd + 1, &readset, NULL, NULL, &tv);
+            if (result == 0){
+                int err = getLastSocketError();
+                throw SocketException(err, 
+                                      "lost connection while receiveing from socket " + 
+                                      hostname(getRemoteAddress()) + ":" + as_string(getRemotePort()));
+            }
+        }
+
         int bytesread;
-        if ((bytesread=recv(fd, (char*)data, maxlen, 0))>=0)
+        if ((bytesread=recv(fd, (char*)data, maxlen, 0))>=0){
             return bytesread;
-        else
-        {
+        } else {
             int err = getLastSocketError();
-            if ( err != OS_SOCKET_ERROR(EWOULDBLOCK))
+            if ( err != OS_SOCKET_ERROR(EWOULDBLOCK)){
                 throw SocketException(err, "Socket::receive() failed");
+            }
         }
 
         return 0;
@@ -172,10 +199,10 @@ namespace inet {
         AC_INFO << "STATUS of fd:";
         switch(status & O_ACCMODE)
         {
-            case O_RDONLY:AC_INFO << "O_RDONLY, ";break;
-            case O_WRONLY:AC_INFO << "O_WRONLY, ";break;
-            case O_RDWR:AC_INFO << "O_RDWR, ";break;
-            default:AC_INFO << "O_?ILLEGAL?, ";break;
+        case O_RDONLY:AC_INFO << "O_RDONLY, ";break;
+        case O_WRONLY:AC_INFO << "O_WRONLY, ";break;
+        case O_RDWR:AC_INFO << "O_RDWR, ";break;
+        default:AC_INFO << "O_?ILLEGAL?, ";break;
         }
         if (status & FNDELAY) AC_INFO <<   "FNDELAY, ";
         if (status & FAPPEND) AC_INFO <<   "FAPPEND, ";

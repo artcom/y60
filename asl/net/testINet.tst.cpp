@@ -62,7 +62,6 @@ int main( int argc, char *argv[] ) {
 
     mySuite.run();
 
-
     AC_INFO << ">> Finished test '" << argv[0] << "'"
            << ", return status = " << mySuite.returnStatus();
 

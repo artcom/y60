@@ -89,6 +89,19 @@ class Socket {
 
         virtual void setBlockingMode(bool isBlocking);
 
+        /// @returns seconds to wait before raising an socket exception
+        unsigned int getConnectionTimeout() const {
+            return _myTimeOut;
+        }
+
+        /// Sets the seconds to wait before raising an socket
+        /// exception.
+        /// A value of zero disables this feature.
+        /// @note only implemented for receive right now
+        void setConnectionTimeout(unsigned int theTimeOut) {
+            _myTimeOut = theTimeOut;
+        }
+
         asl::Unsigned32 getLocalAddress() const {
             return ntohl(_myLocalEndpoint.sin_addr.s_addr);
         }
@@ -118,6 +131,8 @@ class Socket {
         int fd;
 
     private:
+
+        unsigned int _myTimeOut;
 };
 
 }

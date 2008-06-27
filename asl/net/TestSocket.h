@@ -43,6 +43,8 @@
 #include <string>
 #include <asl/UnitTest.h>
 
+#include "TCPServer.h"
+
 class TestSocket: public UnitTest{
     public:
         TestSocket ()
@@ -50,10 +52,15 @@ class TestSocket: public UnitTest{
 
         virtual void run();
     private:
+
+        /// creates a new tcp server. you 'll need to delete it
+        inet::TCPServer * createTCPServer();
+        
         void testHostAddressMethods ();
         void BaseTest();
         void TCPTest();
         void UDPTest();
+        void testConnectionTimeout ();
         static void * TCPServerThread(void *arg);
         static void * UDPServerThread(void *arg); 
 
