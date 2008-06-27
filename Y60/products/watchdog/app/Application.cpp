@@ -89,7 +89,8 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
         if (myEnvNode->nodeType() == dom::Node::ELEMENT_NODE) {
             string myEnviromentVariable = myEnvNode->getAttributeString("name");
             if (myEnviromentVariable.size()>0 && myEnvNode->childNodesLength() == 1) {
-                string myEnvironmentValue = myEnvNode->firstChild()->nodeValue();
+                string myEnvironmentValue = asl::expandEnvironment(
+                        myEnvNode->firstChild()->nodeValue() );
                 AC_DEBUG <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
                         << " -> " << myEnvironmentValue ;
                 _myEnvironmentVariables[myEnviromentVariable] = myEnvironmentValue;
@@ -104,7 +105,8 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
     }
     if (theAppNode->getAttribute("directory")) {
-        _myWorkingDirectory = theAppNode->getAttribute("directory")->nodeValue();
+        _myWorkingDirectory = asl::expandEnvironment(
+                theAppNode->getAttribute("directory")->nodeValue() );
     }    
     AC_DEBUG <<"_myFileName: " << _myFileName;
     if (_myFileName.empty()){
