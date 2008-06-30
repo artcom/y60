@@ -126,7 +126,7 @@ void initiateSystemShutdown() {
         dumpLastError("ExitWindowsEx");
     }
 #elif defined(LINUX)
-    int myResult = reboot(LINUX_REBOOT_CMD_HALT);
+    int myResult = reboot(LINUX_REBOOT_CMD_POWER_OFF);
     if (myResult == -1) {
         dumpLastError("reboot");
     }
