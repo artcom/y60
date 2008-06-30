@@ -101,27 +101,33 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
 
 bool Application::setup(const dom::NodePtr & theAppNode) {
     _myFileName = asl::expandEnvironment(theAppNode->getAttribute("binary")->nodeValue());
-    if (theAppNode->getAttribute("windowtitle")) {
-        _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
-    }
-    if (theAppNode->getAttribute("directory")) {
-        _myWorkingDirectory = asl::expandEnvironment(
-                theAppNode->getAttribute("directory")->nodeValue() );
-    }    
     AC_DEBUG <<"_myFileName: " << _myFileName;
     if (_myFileName.empty()){
         cerr <<"### ERROR, no application binary to watch." << endl;
         return false;
     }
+    if (theAppNode->getAttribute("windowtitle")) {
+        _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
+        AC_DEBUG <<"_myWindowTitle: " << _myWindowTitle;
+    }
+    if (theAppNode->getAttribute("directory")) {
+        _myWorkingDirectory = asl::expandEnvironment(
+            theAppNode->getAttribute("directory")->nodeValue() );
+        AC_DEBUG <<"_myWorkingDirectory: " << _myWorkingDirectory;
+    }    
     if (theAppNode->childNode("EnvironmentVariables")) {
         setupEnvironment(theAppNode->childNode("EnvironmentVariables"));
+        AC_DEBUG << "finished setting up environment variables";
     }
     if (theAppNode->childNode("Arguments")) {
         const dom::NodePtr & myArguments = theAppNode->childNode("Arguments");
+        AC_DEBUG << "arguments: " << myArguments;
         for (int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
             const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
-            if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                _myArguments.push_back(asl::expandEnvironment((*myArgumentNode)("#text").nodeValue()));
+            if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE && 
+                myArgumentNode->hasChildNodes() ) {
+                std::string myArgument = (*myArgumentNode)("#text").nodeValue();
+                _myArguments.push_back(asl::expandEnvironment(myArgument));
                 AC_DEBUG << "Argument : "<< myArgumentNr << ": " << _myArguments.back() ;
             }
         }
