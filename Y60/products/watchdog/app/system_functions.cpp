@@ -81,7 +81,11 @@ void initiateSystemReboot() {
         dumpLastError("ExitWindowsEx");
     }
 #elif defined(LINUX)
-    int myResult = reboot(LINUX_REBOOT_CMD_RESTART);
+//   int myResult = reboot(LINUX_REBOOT_CMD_RESTART);
+//   if (myResult == -1) {
+//       dumpLastError("reboot");
+//   }
+    int myResult = system("/sbin/reboot");
     if (myResult == -1) {
         dumpLastError("reboot");
     }
@@ -126,10 +130,15 @@ void initiateSystemShutdown() {
         dumpLastError("ExitWindowsEx");
     }
 #elif defined(LINUX)
-    int myResult = reboot(LINUX_REBOOT_CMD_POWER_OFF);
+//   int myResult = reboot(LINUX_REBOOT_CMD_POWER_OFF);
+//   if (myResult == -1) {
+//       dumpLastError("reboot");
+//   }
+    int myResult = system("/sbin/halt");
     if (myResult == -1) {
         dumpLastError("reboot");
     }
+
 #else
 #error Your platform is missing!
 #endif
