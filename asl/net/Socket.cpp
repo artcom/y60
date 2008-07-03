@@ -40,6 +40,7 @@
 #include "Socket.h"
 #include "SocketException.h"
 #include "net.h"
+#include "net_functions.h"
 
 #include <asl/Logger.h>
 
@@ -56,7 +57,6 @@
 #include <assert.h>
 
 #include <asl/string_functions.h>
-#include <asl/net_functions.h>
 
 using namespace std;
 using namespace asl;
