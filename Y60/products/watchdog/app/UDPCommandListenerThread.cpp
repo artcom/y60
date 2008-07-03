@@ -31,6 +31,10 @@
 using namespace inet;
 using namespace std;
 
+inline bool isCommand(const std::string & theReceivedCommand, const std::string & theExpectedCommand) {
+	return (!theExpectedCommand.empty() && theReceivedCommand == theExpectedCommand);    
+}
+
 UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theProjectors,
                                                    Application & theApplication,
                                                    const dom::NodePtr & theConfigNode) :
@@ -168,6 +172,7 @@ UDPCommandListenerThread::initiateReboot() {
     initiateSystemReboot();
 }
 
+
 void
 UDPCommandListenerThread::run() {
     cout << "Halt listener activated." << endl;
@@ -187,19 +192,23 @@ UDPCommandListenerThread::run() {
             char myInputBuffer[2048];
             unsigned myBytesRead = myUDPServer.receiveFrom(0,0,myInputBuffer,sizeof(myInputBuffer)-1);
             myInputBuffer[myBytesRead] = 0;
-            if (_mySystemHaltCommand != "" && !strcmp(myInputBuffer, _mySystemHaltCommand.c_str())) {
+            std::istringstream myIss(myInputBuffer);
+            std::string myCommand;
+		    std::getline(myIss, myCommand);
+            cerr << "Received command: " << myCommand << "\nRestart App Command: " << _myRestartAppCommand << endl;
+            if (isCommand(myCommand,_mySystemHaltCommand)) {
                 cerr << "Client received halt packet" << endl;
                 initiateShutdown();
                 break;
-            } else if (_mySystemRebootCommand != "" && !strcmp(myInputBuffer, _mySystemRebootCommand.c_str())) {
+            } else if (isCommand(myCommand,_mySystemRebootCommand)) {
                 cerr << "Client received reboot packet" << endl;
                 initiateReboot();
                 break;
-            } else if (_myRestartAppCommand != "" && !strcmp(myInputBuffer, _myRestartAppCommand.c_str())) {
+            } else if (isCommand(myCommand, _myRestartAppCommand)) {
                 cerr << "Client received restart application packet" << endl;
                 _myApplication.terminate(string("Restart from Network"), true);
                 _myApplication.setPaused(false);
-            } else if (_myStopAppCommand != "" && !strcmp(myInputBuffer, _myStopAppCommand.c_str())) {
+            } else if (isCommand(myCommand, _myStopAppCommand)) {
                 cerr << "Client received stop application packet" << endl;
                 if (_myShutterCloseProjectorsOnStop) {
                     // close shutter on all connected projectors
@@ -207,17 +216,17 @@ UDPCommandListenerThread::run() {
                 }
                 _myApplication.setPaused(true);
                 _myApplication.terminate(string("Stop from Network"), true);
-            } else if (_myStartAppCommand != "" && !strcmp(myInputBuffer, _myStartAppCommand.c_str())) {
+            } else if (isCommand(myCommand, _myStartAppCommand)) {
                 cerr << "Client received start application packet" << endl;
                 _myApplication.setPaused(false);
                 if (_myShutterCloseProjectorsOnStop) {
                     // open shutter on all connected projectors
                     controlProjector("projector_shutter_open");
                 }
-            } else if (controlProjector(std::string(myInputBuffer)) == true) {
+            } else if (controlProjector(myCommand) == true) {
                 // pass
             } else {
-                cerr << "### UDPHaltListener: Unexpected packet '" << myInputBuffer << "'. Ignoring" << endl;
+                cerr << "### UDPHaltListener: Unexpected packet '" << myCommand << "'. Ignoring" << endl;
             }
         }
     } catch (SocketException & se) {
