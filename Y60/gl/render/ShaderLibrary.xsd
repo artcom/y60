@@ -39,6 +39,30 @@
     <xs:simpleType name="Matrix4f">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="VectorOfBlendFunction">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of blendfunction enum values. Legal values:
+One of the following Enum values:
+- one
+- zero
+- dst_color
+- src_color
+- one_minus_dst_color
+- one_minus_src_color
+- src_alpha
+- one_minus_src_alpha
+- dst_alpha
+- one_minus_dst_alpha
+- src_alpha_saturate
+- constant_color
+- one_minus_constant_color
+- constant_alpha
+- one_minus_constant_alpha
+Example:
+[src_alpha, one_minus_src_alpha]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -56,6 +80,7 @@
                 <xs:element ref="sampler2d"/>
                 <xs:element ref="sampler3d"/>
                 <xs:element ref="samplerCUBE"/>
+                <xs:element ref="vectorofblendfunction"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -339,6 +364,20 @@
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="combineArgument"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofblendfunction">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of blendfunction enum values as text child.
+Example:
+&lt;vectorofblendfunction&gt;[src_alpha, one_minus_src_alpha]&lt;/vectorofblendfunction&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfBlendFunction">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>

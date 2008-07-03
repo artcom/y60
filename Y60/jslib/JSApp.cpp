@@ -210,9 +210,9 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
 
         // Only log uncaught exceptions, because the others are caught in javascript
         if (report->errorNumber == 147 /* "uncaugth exception" */) {
-            AC_LOG(mySeverity, ourLastFileName.c_str(), ourLastLineNumber) <<  myStrictMsg << message << endl;
+            AC_LOG_CHECK(mySeverity, ourLastFileName.c_str(), ourLastLineNumber) <<  myStrictMsg << message << endl;
         } else {
-            AC_LOG(mySeverity, myFileName, report->lineno) <<  myStrictMsg << message << endl;
+            AC_LOG_CHECK(mySeverity, myFileName, report->lineno) <<  myStrictMsg << message << endl;
             throwException(cx, message, myFileName, report->lineno);
             // To be able to report uncaught exceptions correctly
             // Could be solved better, if the rethrowing mechanism would file the report structure correctly
@@ -220,7 +220,7 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
             ourLastLineNumber = report->lineno;
         }
     } else {
-        AC_LOG(mySeverity, myFileName, report->lineno) <<  myStrictMsg << message << endl;
+        AC_LOG_CHECK(mySeverity, myFileName, report->lineno) <<  myStrictMsg << message << endl;
     }
 }
 

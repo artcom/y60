@@ -82,7 +82,7 @@ class ShapeBuilderUnitTest : public UnitTest {
             myShapeBuilder.appendVertexData("testuvset4D", Vector4f(1.0, 1.0, 0.0, 0.0));
             myShapeBuilder.appendVertexData("testuvset4D", Vector4f(1.0, 0.0, 0.0, 0.0));
 
-            ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, "m0");
+            ElementBuilder myElementBuilder(PrimitiveTypeStrings[TRIANGLES], "m0");
             myShapeBuilder.appendElements(myElementBuilder);
 
             myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 3);
@@ -249,7 +249,7 @@ class ShapeBuilderUnitTest : public UnitTest {
 
             ENSURE(myElementsNode->childNodesLength() == 5);
             ENSURE((*myElementsNode)["material"].nodeValue() == "m0");
-            ENSURE((*myElementsNode)["type"].nodeValue() == PRIMITIVE_TYPE_TRIANGLES);
+            ENSURE((*myElementsNode)["type"].nodeValue() == PrimitiveTypeStrings[TRIANGLES]);
 
             dom::NodePtr myPositionNode = getIndexDataNode(myElementsNode, "position");
             ENSURE(myPositionNode->childNode("#text")->nodeValue() == "[0,1,2]");

@@ -110,8 +110,6 @@ assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
     JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
-//    typedef void (NATIVE::*MyMethod)(asl::AC_SIZE_TYPE,asl::AC_SIZE_TYPE, const asl::Block &);
-//    return Method<NATIVE>::call((MyMethod)&NATIVE::assign,cx,obj,argc,argv,rval);
 }
 
 
@@ -163,67 +161,71 @@ clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Saves the raster to a file.");
-    DOC_PARAM("theFilename", "Filename and path where to save the image. The image format is automatically determined by the file-extension.", DOC_TYPE_STRING);
+    DOC_BEGIN("Saves the raw raster data to a file without any metainformation; to save as .jpeg or other standard image format, use saveImage().");
+    DOC_PARAM("theFilename", "Filename and path where to save the image.", DOC_TYPE_STRING);
     DOC_END;
-    JS_ReportError(cx, "save(): not yet implemented, use saveImage instead");
+    //JS_ReportError(cx, "save(): not yet implemented, use saveImage instead");
     return JS_FALSE;
 
     try {
-        if (argc != 1) {
-			JS_ReportError(cx, "save(): expects at one argument: file name.");
+        const dom::ResizeableRaster & mySourceRaster = JSClassTraits<dom::ResizeableRaster>::getNativeRef(cx, obj);
+       if (argc != 1) {
+			JS_ReportError(cx, "raster.save(): expects at one argument: file name.");
             return JS_FALSE;
         }
 
         string myFileName;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[1], myFileName)) {
-            JS_ReportError(cx, "saveImage(): argument #2 must be a string. (theFilename)");
+            JS_ReportError(cx, "raster.save: argument #1 must be a string. (theFilename)");
             return JS_FALSE;
         }
-/*
-        PLAnyBmp myPLBitmap;
-        
-        PLPixelFormat myPixelFormat;
-        if (!mapPixelEncodingToFormat(getRasterEncoding(), myPixelFormat)) {
-              throw ImageException(std::string("Image::convertToPLBmp(): Unsupported Encoding: ") +
-                      asl::as_string(getRasterEncoding()), PLUS_FILE_LINE);
+        asl::WriteableFile myFile(myFileName);
+        if (!myFile) {
+            JS_ReportError(cx, "raster.save: could not open file '%s'", myFileName.c_str());
+            return JS_FALSE;
         }
-        myPLBitmap.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
-        PLBYTE **myLineArray = myPLBitmap.GetLineArray();
-        int myBytesPerLine = myPixelFormat.GetBitsPerPixel() * myWidth / 8;
-        const unsigned char *myData = getRasterPtr()->pixels().begin();
-        for (unsigend y=0; y < myHeight; ++y) {
-            memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
-        }
-
-        string myImagePath = toLowerCase(myFileName);
-        string::size_type pos = string::npos;
-
-        pos = myImagePath.find_last_of(".");
-        if ( pos != string::npos) {
-            string myExtension = myImagePath.substr(pos);
-
-            if (myExtension == ".jpg" || myExtension == ".jpeg") {
-                // [jb] PLJPEGEncoder expects images to have alpha (32bit),
-                //      this hack stuffs the pixelformat with the missing 8bit:
-                PLAnyBmp myTmpBmp;
-                myTmpBmp.CreateCopy(myPLBitmap, PLPixelFormat::X8B8G8R8);
-                PLJPEGEncoder myJPEGEncoder;
-                myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
-                return JS_TRUE;
-            } else if (myExtension == ".tif" || myExtension == ".tiff") {
-                PLTIFFEncoder myTiffEncoder;
-                myTiffEncoder.MakeFileFromBmp(Path(myFileName, UTF8).toLocale().c_str(), &myPLBitmap);
-                return JS_TRUE;
-            }
-        }
-
-        PLPNGEncoder myPNGEncoder;
-        myPNGEncoder.MakeFileFromBmp(Path(myFileName, UTF8).toLocale().c_str(), &myPLBitmap);
-*/
+        myFile.WriteableStream::append(mySourceRaster.pixels());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+
+static JSBool
+load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("loads a block of raw data as new pixel data; width and height of the raster are set to argument values; the pixelformat and the width/height must match the raw data to get the expected result");
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
+    DOC_PARAM("theFileName", "raw file containing pixel data", DOC_TYPE_STRING); 
+    DOC_END;
+    dom::ResizeableRaster & myObject = JSClassTraits<dom::ResizeableRaster>::openNativeRef(cx, obj);
+    try {
+        ensureParamCount(argc, 3);
+        asl::AC_SIZE_TYPE myWidth;
+        convertFrom(cx, argv[0], myWidth);
+        asl::AC_SIZE_TYPE myHeight;
+        convertFrom(cx, argv[1], myHeight);
+        string myFileName;
+        convertFrom(cx, argv[2], myFileName);
+        asl::ReadableFile myFile(myFileName);
+        if (!myFile) {
+            JS_ReportError(cx, "raster.load: could not open file '%s'", myFileName.c_str());
+            JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
+            return JS_FALSE;
+        }
+        myObject.resize(myWidth, myHeight);
+        if (myObject.pixels().size() == myFile.size()) {
+            myFile.readBytes(myObject.pixels().begin(), myObject.pixels().size(), 0);
+            JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
+        } else {
+            JS_ReportError(cx, "raster.load: could not read pixels from file '%s', file size = %d, pixel map size = %d",
+                           myFileName.c_str(), myFile.size(), myObject.pixels().size());
+            JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
+            return JS_FALSE;
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
+}
+
 
 JSFunctionSpec *
 JSResizeableRaster::Functions() {
@@ -239,6 +241,7 @@ JSResizeableRaster::Functions() {
         {"pasteRaster", pasteRaster,      9},
         {"clear",       clear,            0},
         {"save",        save,             1},
+        {"load",        load,             3},
         {"assignBlock", assignBlock,      3},
         {0}
     };

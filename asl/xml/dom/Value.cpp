@@ -43,11 +43,6 @@ StringValue::bumpVersion() {
 void
 dom::NodeIDRegistry::registerID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue, dom::Node * theElement) {
     DB(AC_TRACE << "Node::registerID: registering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
-#if 0
-    if (theIDAttributeValue == "B7QW8wUFeqA=") {
-       AC_TRACE << asl::StackTrace();
-    }
-#endif
     IDMap & myMap = _myIDMaps[theIDAttributeName];
     IDMap::iterator myEntry = myMap.find(theIDAttributeValue);
     if (myEntry != myMap.end()) {
@@ -59,11 +54,6 @@ dom::NodeIDRegistry::registerID(const DOMString & theIDAttributeName, const DOMS
 void
 dom::NodeIDRegistry::unregisterID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue) {
     DB(AC_TRACE << "Node::unregisterID: unregistering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
-#if 0
-    if (theIDAttributeValue == "B7QW8wUFeqA=") {
-       AC_TRACE << asl::StackTrace();
-    }
-#endif
     IDMaps::iterator myMap = _myIDMaps.find(theIDAttributeName);
     if (myMap == _myIDMaps.end()) {
         throw Node::IDValueNotRegistered(string("Internal Error: No Element with ID attribute '")+theIDAttributeName+"' of any value, especially '"+theIDAttributeValue+"' is registered at the document", PLUS_FILE_LINE);
@@ -77,6 +67,34 @@ dom::NodeIDRegistry::unregisterID(const DOMString & theIDAttributeName, const DO
         _myIDMaps.erase(myMap);
     }
 }
+
+void
+dom::NodeIDRegistry::registerNodeName(dom::Node * theNode) {
+    AC_TRACE << "Node::registerNodeName: registering node @"<<asl::as_string((void*)theNode)<<" with name <"<<theNode->nodeName()<<"> at registry "<<(void*)this;
+    NodeSet & myNodes = _myNodeNames[theNode->nodeName()];
+    NodeSet::iterator myEntry = myNodes.find(theNode);
+    if (myEntry != myNodes.end()) {
+        throw Node::DuplicateNode(std::string("The node with name '")+theNode->nodeName()+" @"+asl::as_string((void*)theNode)+"' is already registered at the document", PLUS_FILE_LINE);
+    }
+    myNodes.insert(theNode);
+}
+void
+dom::NodeIDRegistry::unregisterNodeName(dom::Node * theNode) {
+    AC_TRACE << "Node::registerNodeName: unregistering node @"<<asl::as_string((void*)theNode)<<" with name <"<<theNode->nodeName()<<"> at registry "<<(void*)this;
+    NodeNameMap::iterator myNodes = _myNodeNames.find(theNode->nodeName());
+    if (myNodes == _myNodeNames.end()) {
+        throw Node::NodeNotRegistered(std::string("No node with name '")+theNode->nodeName()+", especially not @"+asl::as_string((void*)theNode)+"' is not registered at the document", PLUS_FILE_LINE);
+    }
+    NodeSet::iterator myEntry = myNodes->second.find(theNode);
+    if (myEntry == myNodes->second.end()) {
+        throw Node::NodeNotRegistered(std::string("The node with name '")+theNode->nodeName()+" @"+asl::as_string((void*)theNode)+"' is not registered at the document", PLUS_FILE_LINE);
+    }
+    myNodes->second.erase(myEntry);
+    if (myNodes->second.size() == 0) {
+        _myNodeNames.erase(myNodes);
+    }   
+}
+
 const NodePtr
 NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
     IDMaps::const_iterator myMap = _myIDMaps.find(theIdAttribute);

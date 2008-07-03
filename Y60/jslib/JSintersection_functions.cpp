@@ -89,7 +89,8 @@ jsval as_jsval(JSContext *cx,
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
     if (!JS_DefineProperty(cx, myReturnObject, "startvertex", as_jsval(cx, theIntersection._myElement._myStartVertex), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
-    if (!JS_DefineProperty(cx, myReturnObject, "domstartvertex", as_jsval(cx, theIntersection._myElement._myStartVertex + theIntersection._myElement._myPrimitive->getDomIndex()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    //if (!JS_DefineProperty(cx, myReturnObject, "domstartvertex", as_jsval(cx, theIntersection._myElement._myStartVertex + theIntersection._myElement._myPrimitive->getDomIndex()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "domstartvertex", as_jsval(cx, theIntersection._myElement._myStartVertex), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "rawposition", as_jsval(cx, theIntersection._myPosition), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "position", as_jsval(cx, theIntersection._myPosition * myTransformation), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "rawnormal", as_jsval(cx, theIntersection._myNormal), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;

@@ -459,7 +459,25 @@ Currently the following styles are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    <xs:simpleType name="VertexBufferUsage">
+    <xs:simpleType name="PrimitiveType">
+        <xs:annotation>
+             <xs:documentation>Determines as what kind of primitives the vertices are interpreted; see the OpenGL documentation for details .
+
+Currently the following primitives are supported:
+'points'        - each vertex in the list is rendered as a single point
+'lines'         - every two vertices in the list are rendered as a line segment
+'lineloop'      - all vertices in the list are rendered as a connected line, the first and last vertex is connected
+'linestrip'     - all vertices in the list are rendered as a connected line
+'triangles'     - every three vertices in the list are rendered as a triangle
+'trianglestrip' - all vertices in the list are rendered as connected triangles (see OpenGL GL_TRIANGLE_STRIP description for details)
+'trianglefan'   - all vertices in the list are rendered as connected triangles (see OpenGL GL_TRIANGLE_FAN description for details)
+'quads'         - every four vertices in the list are rendered as a quad
+'quadstrip'     - all vertices in the list are rendered as connected quads (see OpenGL GL_QUAD_STRIP description for details)
+'polygon'       - all vertices in the list are rendered as a connected polygon (see OpenGL GL_POLYGON description for details)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+     <xs:simpleType name="VertexBufferUsage">
         <xs:annotation>
              <xs:documentation>A list of VertexBufferUsage strings.
 Currently the following usage flags are supported:
@@ -1455,7 +1473,7 @@ Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to'
     </xs:element>
     <xs:element name="shapes">
         <xs:annotation>
-            <xs:documentation>Parent node for all shape nodes.</xs:documentation>
+            <xs:documentation>Parent node for shape nodes.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -1506,7 +1524,32 @@ and other vertex data</xs:documentation>
 reference the vertexdata</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-            </xs:sequence>
+                <xs:element ref="material">
+                    <xs:annotation>
+                        <xs:documentation>Contains material definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="ImageBase">
+                    <xs:annotation>
+                        <xs:documentation>Contains Image or movie definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="texture">
+                    <xs:annotation>
+                        <xs:documentation>Contains texture definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="animation">
+                    <xs:annotation>
+                        <xs:documentation>Contains an animation</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="character">
+                    <xs:annotation>
+                        <xs:documentation>Contains a character definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+               </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique ID for this shape.</xs:documentation>
@@ -1635,7 +1678,7 @@ values</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
 
-            <xs:attribute name="type" type="xs:string">
+            <xs:attribute name="type" type="PrimitiveType">
                 <xs:annotation>
                     <xs:documentation>The type of elements, which are referenced in the indices-node.
 
@@ -2072,7 +2115,17 @@ to find the best matching shader for this material.</xs:documentation>
                         <xs:documentation>Contains texture unit definitions.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-            </xs:sequence>
+                <xs:element ref="texture">
+                    <xs:annotation>
+                        <xs:documentation>Contains texture definitions.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                 <xs:element ref="ImageBase">
+                    <xs:annotation>
+                        <xs:documentation>Contains image and movie definitions.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique ID for the material.</xs:documentation>
@@ -2089,7 +2142,12 @@ to find the best matching shader for this material.</xs:documentation>
 Transparent materials are rendered in z-order in a second pass.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-        </xs:complexType>
+            <xs:attribute name="enabled" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Tells the renderer if the shader of the material should be loaded; trying to render a disabled material will result in an error. This flag can be used to disable shader loading when changing the material requirements piecewise to prevent shader loading with incomplete requirements.  </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+         </xs:complexType>
     </xs:element>
     <xs:element name="requires">
         <xs:annotation>
@@ -2730,7 +2788,14 @@ the projector frustum is reshaped when the aspect of the texture changes.</xs:do
             <xs:documentation>Defines the properties of a texture object.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:attribute name="id" type="xs:ID">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="ImageBase">
+                    <xs:annotation>
+                        <xs:documentation>An image object.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Unique ID for the texture.</xs:documentation>
                 </xs:annotation>
@@ -3177,6 +3242,41 @@ Current subnodes include:
                     <xs:documentation>Scene graph nodes can contain any number of other scenegraph nodes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element ref="material">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of materials nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="shape">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of shape nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="ImageBase">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of image or movie nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="record">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number record nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+             <xs:element ref="animation">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number animation nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+             <xs:element ref="character">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of character nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+             <xs:element ref="texture">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of texture nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="id" type="xs:ID">
             <xs:annotation>
@@ -3299,7 +3399,12 @@ The planes specified by these nodes are used as additional clipping planes.</xs:
                 <xs:documentation>ID of a viewport box on which the scissor test should be applied.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-    </xs:complexType>
+        <xs:attribute name="events" type="VectorOfString">
+            <xs:annotation>
+                <xs:documentation>list of dom-event names the node will generate; you have to attach appropriate event handlers in order to receive them; currently supported events are "onrender"(will be generated when the object is visible (not culled, loded or switched off)) </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+     </xs:complexType>
     <xs:element name="body" substitutionGroup="SceneGraphNode">
         <xs:annotation>
             <xs:documentation>A body represents one piece of geometry in the scene.

@@ -78,7 +78,7 @@ Time FFMpegAudioDecoder::getDuration() const {
 
 void FFMpegAudioDecoder::seek (Time thePosition)
 {
-    AC_DEBUG << "FFMpegAudioDecoder::seek(" << thePosition << ")";
+    AC_TRACE << "FFMpegAudioDecoder::seek(" << thePosition << ")";
 #if (LIBAVCODEC_BUILD < 4738)
     int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
 #else
@@ -143,8 +143,8 @@ void FFMpegAudioDecoder::open() {
 
         _mySampleRate = myCodecContext->sample_rate;
         _myNumChannels = myCodecContext->channels;
-        AC_INFO << "Number of channels: " << _myNumChannels << endl;
-        AC_INFO << "Sample rate: " << _mySampleRate << endl;
+        AC_DEBUG << "Number of channels: " << _myNumChannels << endl;
+        AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
 
         if (_mySampleRate != Pump::get().getNativeSampleRate()) {
             _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    

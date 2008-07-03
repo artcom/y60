@@ -58,7 +58,7 @@ void Sound::setSelf(const SoundPtr& mySelf)
 
 void Sound::play() {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::play (" << _myURI << ")";
+    AC_TRACE << "Sound::play (" << _myURI << ")";
     _myDecodingComplete = false;
     _myLockedSelf = _mySelf.lock();
     _myDecoder->play();
@@ -68,7 +68,7 @@ void Sound::play() {
 
 void Sound::pause() {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::pause (" << _myURI << ")";
+    AC_TRACE << "Sound::pause (" << _myURI << ")";
     _myDecoder->pause();
     _mySampleSink->pause();
     _myLockedSelf = SoundPtr(0);
@@ -76,7 +76,7 @@ void Sound::pause() {
 
 void Sound::stop() {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::stop (" << _myURI << ")";
+    AC_TRACE << "Sound::stop (" << _myURI << ")";
     _myDecoder->stop();
     _mySampleSink->stop();
     if (_myCacheItem) {
@@ -125,7 +125,7 @@ Time Sound::getCurrentTime() {
 void Sound::seek (Time thePosition)
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::seek()";
+    AC_TRACE << "Sound::seek()";
     bool myIsPlaying = isPlaying();
     _mySampleSink->stop();
     float myOldVolume = _mySampleSink->getVolume();
@@ -192,10 +192,10 @@ void Sound::update(double theTimeSlice) {
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
     _myDecoder->setTime(getCurrentTime());
-    AC_DEBUG << "Sound::update: " << hex << (void*)this << dec << " playing=" << 
+    AC_TRACE << "Sound::update: " << hex << (void*)this << dec << " playing=" << 
             isPlaying() << " decodingComplete=" << _myDecodingComplete;
     if (_myDecodingComplete && !isPlaying()) {
-        AC_DEBUG << "Sound::update: Playback complete";
+        AC_TRACE << "Sound::update: Playback complete";
         _myDecodingComplete = false;
         _myLockedSelf = SoundPtr(0);
     }
@@ -218,17 +218,17 @@ void Sound::update(double theTimeSlice) {
                 if (_myCacheItem && _myCacheItem->isFull() && 
                         !dynamic_cast<CacheReader *>(_myDecoder)) 
                 {
-                    AC_DEBUG << " ----> Reading from cache.";
+                    AC_TRACE << " ----> Reading from cache.";
                     delete _myDecoder;
                     _myDecoder = new CacheReader(_myCacheItem);
                     _myDecoder->setSampleSink(this);
                 }
                 if (_myIsLooping) {
-                    AC_DEBUG << "Sound::update: Loop";
+                    AC_TRACE << "Sound::update: Loop";
                     _myDecoder->seek(0);
                     update(0.1);
                 } else {
-                    AC_DEBUG << "Sound::update: DecodingComplete";
+                    AC_TRACE << "Sound::update: DecodingComplete";
                     _myDecodingComplete = true;
                     _mySampleSink->stop(true);
                     close();

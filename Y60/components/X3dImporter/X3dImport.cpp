@@ -592,7 +592,7 @@ namespace y60 {
     {
         AC_DEBUG  << "processing Indexed Face Set node";
 
-        const char *myPrimitiveType = y60::PRIMITIVE_TYPE_TRIANGLES;
+        const char *myPrimitiveType = PrimitiveTypeStrings[TRIANGLES];
 
         std::string myShapeName("sX3D");
         y60::ShapeBuilder myShapeBuilder(myShapeName);
@@ -807,7 +807,7 @@ namespace y60 {
                                       bool theCCWFlag)
     {
         unsigned myElementVertexCount;
-        if (thePrimitiveType == y60::PRIMITIVE_TYPE_TRIANGLES) {
+        if (thePrimitiveType == PrimitiveTypeStrings[TRIANGLES]) {
             myElementVertexCount = 3;
         } else {
             throw ImportException("#### ERROR Primitive type " + asl::as_string(thePrimitiveType)

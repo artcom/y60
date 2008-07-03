@@ -127,11 +127,12 @@ namespace jslib {
         //}
         try {
             y60::ScopedGLContext myContextLock(this);
-            initDisplay();
-
-            _myRenderer = RendererPtr(new Renderer(_myGLContext, _myRenderingCaps));
-            //AC_INFO << "created Renderer" << _myRenderer;
-            _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
+            if (!_myRenderer) {
+                initDisplay();
+                _myRenderer = RendererPtr(new Renderer(_myGLContext, _myRenderingCaps));
+                //AC_INFO << "created Renderer" << _myRenderer;
+                _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
+            }
 
             _myScene = theScene;
             _myRenderer->setCurrentScene(_myScene);

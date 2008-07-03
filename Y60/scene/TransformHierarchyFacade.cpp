@@ -27,6 +27,15 @@ using namespace std;
 using namespace asl;
 using namespace dom;
 
+// PM: The following lines introduce an unwanted forward dependency to jslib due to insufficient 
+// language barrier crossing design of the event payload - this should be fixed during a
+// general event system overhaul that should unite the at least three different event types
+// used throughout Y60
+struct JSObject;
+namespace jslib {
+typedef dom::GenericEvent<JSObject*> GenericJSDomEvent;
+}
+
 
 namespace y60 {
 
@@ -58,10 +67,14 @@ namespace y60 {
         ClippingPlanesTag::Plug(theNode),
         ScissorTag::Plug(theNode),
         StickyTag::Plug(theNode),
+        EventsTag::Plug(theNode),
         dom::FacadeAttributePlug<BoundingBoxTag>(this),
         dom::FacadeAttributePlug<GlobalMatrixTag>(this),
         dom::FacadeAttributePlug<LocalMatrixTag>(this),
-        dom::FacadeAttributePlug<InverseGlobalMatrixTag>(this)
+        dom::FacadeAttributePlug<InverseGlobalMatrixTag>(this),
+        dom::FacadeAttributePlug<LastActiveFrameTag>(this),
+        _onRenderEventEnabled(false),
+        _onFirstRenderEventEnabled(false)
     {}
 
     void
@@ -71,7 +84,67 @@ namespace y60 {
         GlobalMatrixTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForGlobalMatrix);
         BoundingBoxTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForBoundingBox);
         InverseGlobalMatrixTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForInverseGlobalMatrix);
+        EventsTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForEvents);
     }
+
+    void
+    TransformHierarchyFacade::registerDependenciesForEvents() {
+        AC_TRACE << "TransformHierarchyFacade::registerDependenciesForEvents()";
+        Node & myNode = getNode();
+        if (myNode) {
+            AC_TRACE << "TransformHierarchyFacade::registerDependenciesForEvents() - callback registered";
+            EventsTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<TransformHierarchyFacade>(getSelf()), &TransformHierarchyFacade::updateEventTrigger);
+        }
+    }
+
+    void
+    TransformHierarchyFacade::updateEventTrigger() {
+        AC_TRACE << "TransformHierarchyFacade::updateEventTrigger()";
+        Node & myNode = getNode();
+        if (myNode) {
+            const VectorOfString & myEvents = get<EventsTag>();
+            _onRenderEventEnabled = false;
+            _onFirstRenderEventEnabled = false;
+            bool someEventEnabled = false;
+            for (int i = 0; i < myEvents.size();++i) {
+                AC_TRACE << "TransformHierarchyFacade::updateEventTrigger() event="<<myEvents[i];
+                if (myEvents[i] == "onRender") {
+                    _onRenderEventEnabled = true;
+                    someEventEnabled = true;
+                } else if (myEvents[i] == "onFirstRender") {
+                    _onFirstRenderEventEnabled = true;
+                    someEventEnabled = true;
+                } else {
+                    AC_WARNING << "unknown event trigger:" << myEvents[i];
+                }
+            }
+            if (someEventEnabled) {
+                LastActiveFrameTag::Plug::getValuePtr()->setImmediateCallBack(
+                        dynamic_cast_Ptr<TransformHierarchyFacade>(getSelf()), &TransformHierarchyFacade::triggerRenderEvent);
+            } 
+        }
+    }
+ 
+    void
+    TransformHierarchyFacade::triggerRenderEvent() {
+        AC_TRACE << "TransformHierarchyFacade::triggerRenderEvent()";
+        Node & myNode = getNode();
+        if (myNode) {
+            if (_onFirstRenderEventEnabled) {
+                AC_TRACE << "TransformHierarchyFacade::triggerRenderEvent(): dispatching dom event 'onFirstRender'";
+                dom::EventPtr myEvent = dom::EventPtr(new jslib::GenericJSDomEvent("onFirstRender", false, false, true));
+                myNode.dispatchEvent(myEvent);
+                _onFirstRenderEventEnabled = false;
+            }
+            if (_onRenderEventEnabled) {
+                AC_TRACE << "TransformHierarchyFacade::triggerRenderEvent(): dispatching dom event 'onRender'";
+                //dom::EventPtr myEvent = dom::EventPtr(new RenderEvent("onRender", false, false, true));
+                dom::EventPtr myEvent = dom::EventPtr(new jslib::GenericJSDomEvent("onRender", false, false, true));
+                myNode.dispatchEvent(myEvent);
+            }
+        }
+    }
+
 
     void
     TransformHierarchyFacade::registerDependenciesForLocalMatrix() {
@@ -120,8 +193,10 @@ namespace y60 {
             for (unsigned i = 0; i < myNode.childNodesLength(); ++i) {
                 NodePtr myChildNode = myNode.childNode(i);
                 if (myChildNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                    TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();
-                    BoundingBoxTag::Plug::dependsOn<BoundingBoxTag>(*myChild);
+                    TransformHierarchyFacadePtr myChild = myChildNode->tryGetFacade<TransformHierarchyFacade>();
+                    if (myChild) {
+                        BoundingBoxTag::Plug::dependsOn<BoundingBoxTag>(*myChild);
+                    }
                 }
             }
 #endif
@@ -202,8 +277,10 @@ namespace y60 {
         for (unsigned i = 0; i < getNode().childNodesLength(); ++i) {
             NodePtr myChildNode = getNode().childNode(i);
             if (myChildNode == Node::ELEMENT_NODE) {
-                TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();
-                myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());
+                TransformHierarchyFacadePtr myChild = myChildNode->tryGetFacade<TransformHierarchyFacade>();
+                if (myChild) {
+                    myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());
+                }
             }
         }
         set<BoundingBoxTag>(myBoundingBox);

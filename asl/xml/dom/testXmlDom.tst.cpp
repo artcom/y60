@@ -1035,7 +1035,8 @@ class XmlDomEventsUnitTest : public UnitTest {
                     ENSURE(myC1TestListener0->_myCount == 2);
                     ENSURE(myGC1TestListener0->_myCount == 2);
                     ENSURE(myGC1TestListener1->_myCount == 2);
-                    ENSURE(myGC1AttribTestListener0->_myCount == 1);
+                    DPRINT(myGC1AttribTestListener0->_myCount);
+                    ENSURE(myGC1AttribTestListener0->_myCount == 2);
 
                     // now lets test removal
                     DTITLE("testing removeEventListener");
@@ -1048,7 +1049,7 @@ class XmlDomEventsUnitTest : public UnitTest {
                     ENSURE(myC1TestListener0->_myCount == 4);
                     ENSURE(myGC1TestListener0->_myCount == 4);
                     ENSURE(myGC1TestListener1->_myCount == 4);
-                    ENSURE(myGC1AttribTestListener0->_myCount == 1);
+                    ENSURE(myGC1AttribTestListener0->_myCount == 2);
 
                     // now we add even more listeners
                     DTITLE("testing with more listeners");
@@ -1069,7 +1070,7 @@ class XmlDomEventsUnitTest : public UnitTest {
                     ENSURE(myC1TestListener0->_myCount == 4);
                     ENSURE(myGC1TestListener0->_myCount == 4);
                     ENSURE(myGC1TestListener1->_myCount == 4);
-                    ENSURE(myGC1AttribTestListener0->_myCount == 1);
+                    ENSURE(myGC1AttribTestListener0->_myCount == 2);
                     myRootTestListener0->_cancelOnCapture = false;
 
                     // cancel grandchild on bubbling on bubbling
@@ -1082,7 +1083,7 @@ class XmlDomEventsUnitTest : public UnitTest {
                     ENSURE(myC1TestListener0->_myCount == 5);
                     ENSURE(myGC1TestListener0->_myCount == 6);
                     ENSURE(myGC1TestListener1->_myCount == 6);
-                    ENSURE(myGC1AttribTestListener0->_myCount == 2);
+                    ENSURE(myGC1AttribTestListener0->_myCount == 4);
                     myGC1TestListener1->_cancelOnBubbling = false;
 
                     // restrict phases by event info
@@ -1096,14 +1097,14 @@ class XmlDomEventsUnitTest : public UnitTest {
                     ENSURE(myC1TestListener0->_myCount == 6);
                     ENSURE(myGC1TestListener0->_myCount == 7);
                     ENSURE(myGC1TestListener1->_myCount == 7);
-                    ENSURE(myGC1AttribTestListener0->_myCount == 3);
+                    ENSURE(myGC1AttribTestListener0->_myCount == 5);
                     myRootTestListener0->_cancelOnCapture = false;
 
                     // test root element == target
                     DTITLE("test root element == target");
                     myTestEvent = dom::StandardEventFactory().createEvent("test");
                     myR0->dispatchEvent(myTestEvent);
-                    ENSURE(myRootTestListener0->_myCount == 9);
+                    ENSURE(myRootTestListener0->_myCount == 10);
                     ENSURE(myC0TestListener0->_myCount == 0);
                     ENSURE(myC1TestListener0->_myCount == 6);
                 }
@@ -1473,7 +1474,7 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new XmlCatalogUnitTest);
-#if 0
+#if 1
         addTest(new XmlDomUnitTest);
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);

@@ -43,7 +43,7 @@ namespace y60 {
         if (!myNode->hasFacade()) {
 	        myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(myDefaultStyle));
         } else {
-            myNode->getFacade<Shape>()->set<RenderStyleTag>(myDefaultStyle);
+            myNode->getFacade<Shape>()->set<RenderStylesTag>(myDefaultStyle);
         }
         /*
 	    myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(RenderStyles()));
@@ -86,9 +86,9 @@ namespace y60 {
             getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue(as_string(myStyle));
         } else {
             // easy way - with facades
-            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStyleTag>();
+            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStylesTag>();
             myStyle.set(BACK, isBackFacing);
-            getNode()->getFacade<Shape>()->set<RenderStyleTag>(myStyle);
+            getNode()->getFacade<Shape>()->set<RenderStylesTag>(myStyle);
         }
     }
 
@@ -101,9 +101,9 @@ namespace y60 {
             getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue(as_string(myStyle));
         } else {
             // easy way - with facades
-            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStyleTag>();
+            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStylesTag>();
             myStyle.set(FRONT, isFrontFacing);
-            getNode()->getFacade<Shape>()->set<RenderStyleTag>(myStyle);
+            getNode()->getFacade<Shape>()->set<RenderStylesTag>(myStyle);
         }
     }
 }

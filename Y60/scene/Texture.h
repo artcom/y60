@@ -57,7 +57,8 @@ namespace y60 {
         public dom::FacadeAttributePlug<TextureImageTag>,
 #endif
         public dom::FacadeAttributePlug<TextureNPOTMatrixTag>,
-        public dom::FacadeAttributePlug<TextureParamChangedTag>
+        public dom::FacadeAttributePlug<TextureParamChangedTag>,
+        public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
         public:
             Texture(dom::Node & theNode);

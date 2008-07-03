@@ -602,8 +602,8 @@ namespace asl {
     {
         // RETURN SPLINE SEGMENT FOR x = 0...1
 
-        if ( x < 0.0 ) AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;
-        if ( x > 1.0 ) AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;
+        if ( x < 0.0 ) { AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;}
+        if ( x > 1.0 )  {AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;}
 
         float retval =
             + y1  * ( 1.0f - 3.0f * x*x + 2.0f *x*x*x )
@@ -635,8 +635,8 @@ namespace asl {
     { 
         // RETURN 1. DERIVATIVE OF SPLINE SEGMENT FOR X = A...B
 
-        if ( x < a ) AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;
-        if ( x > b ) AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;
+        if ( x < a ) { AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;}
+        if ( x > b ) { AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;}
 
         float retval =
             (y1- y2) * (a-x) * (b-x) * 6.0f		/ ((b-a)*(b-a)*(b-a))

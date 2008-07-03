@@ -153,6 +153,7 @@ namespace dom {
     }
     NodePtr
     Facade::ensureChild(const Node & theNode, const DOMString & theName) {
+        theNode.getFacade()->ensureProperties();
         NodePtr myChild = theNode.childNode(theName);
         if (!myChild) {
             myChild = createChild(theNode, theName);

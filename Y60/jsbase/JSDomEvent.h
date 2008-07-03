@@ -43,6 +43,7 @@ class JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEven
             PROP_type,
             PROP_target,
             PROP_currentTarget,
+            PROP_targetOnly,
             PROP_eventPhase,
             PROP_bubbles,
             PROP_cancelable,

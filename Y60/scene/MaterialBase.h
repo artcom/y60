@@ -33,6 +33,8 @@ namespace y60 {
     class TextureManager;
 
     DEFINE_EXCEPTION(MaterialBaseException, asl::Exception);
+    DEFINE_EXCEPTION(MaterialLocked, MaterialBaseException);
+
     static y60::VectorOfBlendFunction getDefaultBlendFunction() {
         y60::VectorOfBlendFunction myResult;
         myResult.push_back(SRC_ALPHA);
@@ -123,6 +125,9 @@ namespace y60 {
     DEFINE_CHILDNODE_TAG(MaterialRequirementTag, MaterialBase, MaterialRequirementFacade, REQUIRES_LIST_NAME);
 
     DEFINE_ATTRIBUT_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false);
+    DEFINE_ATTRIBUT_TAG(EnabledTag,   bool, "enabled", true);
+
+    class Scene;
 
     class MaterialBase :
         public dom::Facade,
@@ -130,7 +135,9 @@ namespace y60 {
         public MaterialPropertiesTag::Plug,
         public MaterialRequirementTag::Plug,
         public NameTag::Plug,
-        public TransparencyTag::Plug
+        public TransparencyTag::Plug,
+        public EnabledTag::Plug,
+        public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
         public:
             typedef std::vector<TexCoordMode> TexGenMode;
@@ -150,16 +157,16 @@ namespace y60 {
             virtual unsigned getTextureUnitCount() const;
             virtual const TextureUnit & getTextureUnit(unsigned myIndex) const;
 
-            virtual void load(TextureManagerPtr theTextureMananger);
+            virtual void load();
 
             const MaterialParameterVector & getVertexParameters() const;
             virtual bool reloadRequired();
-            virtual bool rebindRequired();
+            //virtual bool rebindRequired();
             int getGroup1Hash() const;
 
-            void setShader(IShaderPtr theShader);
-            const IShaderPtr getShader() const { return _myShader; };
-            IShaderPtr getShader() { return _myShader; };
+            //void setShader(IShaderPtr theShader);
+            const IShaderPtr getShader() const;
+            IShaderPtr getShader();
 
             void mergeProperties(const dom::NodePtr & thePropertyNode);
             const LightingModel getLightingModel() const { return _myLightingModel; }
@@ -177,31 +184,38 @@ namespace y60 {
             }
 
             TexGenModeList getTexGenModes() const {
+                ensureProperties();
                 return _myTexGenModes;
             }
 
             TexGenParamsList getTexGenParams() const {
+                ensureProperties();
                 return _myTexGenParams;
             }
+            Scene & getScene();
+            const Scene & getScene() const;
 
         protected:
             virtual void registerDependenciesForMaterialupdate();    
-            IShaderPtr                 _myShader;
-
+            void ensureShader();
+            virtual void ensureProperties() const;
+            void updateLock();
         private:
+            IShaderPtr                 _myShader;
             void addTextures(const dom::NodePtr theTextureListNode, asl::Ptr<TextureManager> theTextureMananger);
             void addTexture(dom::NodePtr theTextureUnitNode, asl::Ptr<TextureManager> theTextureManager);
 
             std::vector<TextureUnitPtr> _myTextureUnits;
             LightingModel               _myLightingModel;
 
-            asl::Unsigned64   _myMaterialVersion;
+            mutable asl::Unsigned64   _myMaterialVersion;
             asl::Unsigned64   _myRequiresVersion;
-            asl::Unsigned64   _myIdTagVersion;
+            //asl::Unsigned64   _myIdTagVersion;
 
             bool              _myTexGenFlag;
             TexGenModeList    _myTexGenModes;
             TexGenParamsList  _myTexGenParams;
+            mutable bool       _ensuring;
     };
 
     typedef std::vector<MaterialBasePtr> MaterialBasePtrVector;

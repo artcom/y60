@@ -205,5 +205,33 @@ namespace xpath {
 
         delete retval;
     }
+   std::vector<dom::NodePtr>
+   findAll(dom::Node & theRoot, const std::string & theExpression) {
+        std::vector<dom::NodePtr> myResults;
+        xpath::Path *myPath = xpath::xpath_parse(theExpression);
+        if (!myPath) {
+            AC_ERROR << "xpath could not parse '"<< theExpression<< "'";
+        } else {
+            xpath::xpath_evaluate(myPath, &theRoot, myResults);
+            xpath::xpath_return(myPath);
+        }
+        return myResults;
+    }
+
+    dom::NodePtr
+    find(dom::Node & theRoot, const std::string & theExpression) {
+        dom::NodePtr myResult;
+        xpath::Path *myPath = xpath::xpath_parse(theExpression);
+        if (!myPath) {
+            AC_ERROR << "xpath could not parse '"<< theExpression<< "'";
+        } else {
+            dom::Node * myResultNode = xpath::xpath_evaluate1(myPath, &theRoot);
+            xpath::xpath_return(myPath);
+            if (myResultNode) {
+                myResult = myResultNode->self().lock();
+            }
+        }
+        return myResult;
+    }
 
 }

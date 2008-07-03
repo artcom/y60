@@ -51,13 +51,15 @@ namespace dom {
         virtual EventTargetPtr currentTarget() const = 0;
         virtual PhaseType eventPhase() const = 0;
         virtual bool bubbles() const = 0;
+        virtual bool targetOnly() const = 0;
         virtual bool cancelable() const = 0;
         virtual const DOMTimeStamp &  timeStamp() const = 0;
         virtual void stopPropagation() = 0;
         virtual void preventDefault() = 0;
         virtual void initEvent(const DOMString & eventTypeArg, 
                                 bool canBubbleArg, 
-                                bool cancelableArg) = 0;
+                                bool cancelableArg,
+                                bool targetOnly= false) = 0;
         /*
         // Introduced in DOM Level 3:
         readonly attribute DOMString       namespaceURI;
@@ -146,6 +148,7 @@ namespace dom {
         GenericEvent(const DOMString theType,
                      bool canBubbleArg = true, 
                      bool cancelableArg = true,
+                     bool targetOnly = false,
                      DOMTimeStamp theTimeStamp = DOMTimeStamp(),
                      asl::Ptr<PAYLOAD> thePayload = asl::Ptr<PAYLOAD>(0))
                      : 
@@ -156,6 +159,7 @@ namespace dom {
         _myEventPhase(CAPTURING_PHASE),
         _myPropagationStopped(false),
         _myDefaultPrevented(false),
+        _myTargetOnlyFlag(false),
         _myPayload(thePayload)
         {}
         ~GenericEvent() {}
@@ -174,6 +178,9 @@ namespace dom {
         virtual bool bubbles() const {
             return _myBubblesFlag;
         }
+        virtual bool targetOnly() const {
+            return _myTargetOnlyFlag;
+        }
         virtual bool cancelable() const {
             return _myCancelableFlag;
         }
@@ -190,10 +197,12 @@ namespace dom {
         }
         virtual void initEvent(const DOMString & eventTypeArg, 
                                 bool canBubbleArg, 
-                                bool cancelableArg)
+                                bool cancelableArg,
+                                bool targetOnly)
         {
             _myBubblesFlag = canBubbleArg;
             _myCancelableFlag = cancelableArg;
+            _myTargetOnlyFlag = targetOnly;
         }
         /*
         // Introduced in DOM Level 3:
@@ -250,6 +259,7 @@ namespace dom {
         PhaseType _myEventPhase;
         bool _myBubblesFlag;
         bool _myCancelableFlag;
+        bool _myTargetOnlyFlag;
         DOMTimeStamp _myTimeStamp;
         bool _myPropagationStopped;
         bool _myDefaultPrevented;

@@ -52,9 +52,9 @@ namespace y60 {
             myPrimitive.appendAttribute(RENDER_STYLE_ATTRIB, theRenderStyles);
             dom::NodePtr myPrimitiveNode = _myShapeNode->childNode(PRIMITIVE_LIST_NAME)->appendChild(myPrimitive);
             myPrimitiveCache = PrimitiveCachePtr(new PrimitiveCache(myPrimitiveNode));
-            if (theType == PRIMITIVE_TYPE_TRIANGLES) {
+            if (theType == PrimitiveTypeStrings[TRIANGLES]) {
                 _myPrimitiveMap[myKey] = myPrimitiveCache;
-            } else if (theType == PRIMITIVE_TYPE_LINE_STRIP) {
+            } else if (theType == PrimitiveTypeStrings[LINE_STRIP]) {
                 // nothing to do
             } else {
                 throw asl::NotYetImplemented(std::string("The optimizer doesn't understand primitives of type '") + theType + "' yet",
@@ -376,8 +376,8 @@ namespace y60 {
                                     VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles) {
         // Get element type
         std::string myNewPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
-        if (myNewPrimitiveType == PRIMITIVE_TYPE_QUADS) {
-            myNewPrimitiveType = PRIMITIVE_TYPE_TRIANGLES;
+        if (myNewPrimitiveType == PrimitiveTypeStrings[QUADS]) {
+            myNewPrimitiveType = PrimitiveTypeStrings[TRIANGLES];
         }
 
         // Get element material ref
@@ -398,7 +398,7 @@ namespace y60 {
 
             // Triangulate quads
             std::string myOldPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
-            if (myOldPrimitiveType == PRIMITIVE_TYPE_QUADS) {
+            if (myOldPrimitiveType == PrimitiveTypeStrings[QUADS]) {
                 myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
                 unsigned mySrcSize = mySrc.size();
                 for (unsigned k = 0; k < mySrcSize; k += 4) {
@@ -418,8 +418,9 @@ namespace y60 {
                         myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
                     }
                 }
-            } else if (myOldPrimitiveType == PRIMITIVE_TYPE_TRIANGLES || myOldPrimitiveType == PRIMITIVE_TYPE_LINE_STRIP) {
-                unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
+            } else if (myOldPrimitiveType == PrimitiveTypeStrings[TRIANGLES] || myOldPrimitiveType == PrimitiveTypeStrings[LINE_STRIP]) {
+                //unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
+                unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(theElements->getFacade<Primitive>()->get<PrimitiveTypeTag>());
                 myDst.resize(mySrc.size() + myOffset);
                 unsigned mySrcSize = mySrc.size();
                 if (theFlipFlag) {
@@ -486,7 +487,7 @@ namespace y60 {
             bool myNormalFlipFlag           = dot(myXVector, cross(myYVector, myZVector)) < 0;
 
             // Get shape renderstyles
-            RenderStyles myShapeRenderStyles = myShape.get<RenderStyleTag>();
+            RenderStyles myShapeRenderStyles = myShape.get<RenderStylesTag>();
 
             // Collect vertexdata used by primitives
             dom::NodePtr myVertexData   = myShape.getNode().childNode(VERTEX_DATA_NAME);

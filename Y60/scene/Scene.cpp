@@ -38,6 +38,7 @@
 #include <asl/Stream.h>
 
 #include <dom/Schema.h>
+#include <xpath/xpath_api.h>
 #include <iostream>
 #include <fstream>
 #include <set>
@@ -345,7 +346,7 @@ namespace y60 {
         _myTextureManager->setTextureList(getTexturesRoot());
 
         setupShaderLibrary();
-
+#if 0
         AC_INFO << "Loading materials...";
         NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
@@ -353,7 +354,7 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             loadMaterial(myMaterialNode);
         }
-
+#endif
         AC_INFO << "Loading world...";
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
         asl::Time setupEnd;
@@ -371,7 +372,7 @@ namespace y60 {
         //save("optimizedScene.x60", false);
         update(SHAPES|WORLD);
     }
-
+#if 0
     void
     Scene::loadMaterial(NodePtr theMaterialNode) {
         DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
@@ -433,7 +434,6 @@ namespace y60 {
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
     }
-    
     void
     Scene::rebindMaterials() {
         PrimitiveVector myAffectedPrimitives;
@@ -457,7 +457,9 @@ namespace y60 {
             }
         }        
     }
-    
+#endif 
+
+#if 0 
     void
     Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
         // Find all primitives that reference the material
@@ -482,7 +484,37 @@ namespace y60 {
             myAffectedPrimitives[i]->setMaterial(myNewMaterial);
         }
     }
+#else
+#if 0
+    void
+    Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
+        AC_TRACE << " Scene::reloadMaterial id="<< theMaterialNode->getAttributeString("id");
+        // Find all primitives that reference the material
+        MaterialBase * myMaterial = &*theMaterial;
+        PrimitiveVector myAffectedPrimitives;
+        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes.size();
+        for (unsigned i = 0; i < myShapeCount; ++i) {
+            NodePtr myShapeNode = myShapes[i];
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            const PrimitiveVector & myPrimitives = myShape->getPrimitives();
+            for (unsigned j = 0; j < myPrimitives.size(); ++j) {
+                if (&(myPrimitives[j]->getMaterial()) == myMaterial) {
+                    myAffectedPrimitives.push_back(myPrimitives[j]);
+                }
+            }
+        }
 
+        loadMaterial(theMaterialNode);
+        for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
+            MaterialBasePtr myNewMaterial = theMaterialNode->getFacade<MaterialBase>();
+            myAffectedPrimitives[i]->setMaterial(myNewMaterial);
+        }
+    }
+#endif
+#endif
+
+#if 0
     NodePtr
     Scene::getVertexDataNode(NodePtr theShapeNode, const std::string & theDataName) {
         NodePtr myVertexDataListNode = theShapeNode->childNode(VERTEX_DATA_NAME);
@@ -516,7 +548,8 @@ namespace y60 {
         }
         theShape->set<BoundingBoxTag>(myBoundingBox);
     }
- 
+#endif 
+#if 0
     unsigned
     Scene::findMaxIndexSize(NodePtr theElementsNode) {
         size_t myLargestSize = 0;
@@ -530,9 +563,9 @@ namespace y60 {
         }
         return myLargestSize;
     }
-
     void
     Scene::clearShapes() {
+        // TODO: clears only shape nodes under the <shapes> element
         NodePtr myShapeListNode = getShapesRoot();
         unsigned myShapeCount = myShapeListNode->childNodesLength();
         for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
@@ -558,7 +591,38 @@ namespace y60 {
             _myStatistics.primitiveCount += myShape->getPrimitives().size();
         }
     }
+#else
+#if 0
+    void
+    Scene::clearShapes() {
+        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes.size();
+        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
+            NodePtr myShapeNode = myShapes[myShapeIndex];
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            myShape->clear();
+        }
+    }
 
+    void
+    Scene::updateShapes() {
+        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes.size();
+        _myStatistics.vertexCount = 0;
+        _myStatistics.primitiveCount = 0;
+        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
+            NodePtr myShapeNode = myShapes[myShapeIndex];
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
+                buildShape(myShape);
+            }
+            _myStatistics.vertexCount += myShape->getVertexCount();
+            _myStatistics.primitiveCount += myShape->getPrimitives().size();
+        }
+    }
+#endif
+#endif
+#if 0
     void
     Scene::buildShape(ShapePtr theShape) {
         NodePtr myShapeNode = theShape->getXmlNode();
@@ -635,7 +699,8 @@ namespace y60 {
         calculateShapeBoundingBox(theShape);
         theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
     }
-
+#endif
+#if 0
     void
     Scene::reverseUpdateShapes() {
         NodePtr myShapeListNode = getShapesRoot();
@@ -689,7 +754,7 @@ namespace y60 {
         myShapeNode->bumpVersion();
         theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
     }
-
+#endif
     void
     Scene::loadAnimations() {
         NodePtr myAnimationNodes = getNode().childNode(ANIMATION_LIST_NAME);
@@ -701,6 +766,9 @@ namespace y60 {
 
     void
     Scene::updateAllModified() {
+        //AC_WARNING << "updateAllModified() disabled by pavel";
+        //return;
+
         dom::Node & mySceneElement = getNode();
         //printChangedNodes(mySceneElement, _myPreviousDomVersion, 0);
         dom::NodePtr myWorldListElement = mySceneElement.childNode(WORLD_LIST_NAME);
@@ -738,12 +806,16 @@ namespace y60 {
 
     void
     Scene::update(unsigned short theUpdateFlags) {
+        //AC_WARNING << "update() disabled by pavel";
+        //return;
+#if 0
         MAKE_SCOPE_TIMER(updateScene);
         if (theUpdateFlags & MATERIALS) {
             AC_TRACE << "updateMaterials";
             MAKE_SCOPE_TIMER(updateMaterials);
             updateMaterials(); //ok
         }
+#endif
 
         if (theUpdateFlags & ANIMATIONS_LOAD) {
             AC_TRACE << "updateAnimationsReload";
@@ -754,26 +826,30 @@ namespace y60 {
             MAKE_SCOPE_TIMER(updateAnimations);
             _myAnimationManager.update();
         }
-
+#if 0
         if (theUpdateFlags & SHAPES) {
             AC_TRACE << "updateShapes";
             MAKE_SCOPE_TIMER(updateShapes);
             updateShapes();
         }
-
+#endif
         if (theUpdateFlags & WORLD) {
             AC_TRACE << "updateWorld";
             MAKE_SCOPE_TIMER(updateWorld);
             Matrix4f myInitialMatrix;
             myInitialMatrix.makeIdentity();
             _myLights.clear();
-            _myAnalyticGeometry.clear();
-            updateTransformHierachy(getWorldRoot(), myInitialMatrix);
+            //_myAnalyticGeometry.clear();
+            updateTransformHierachy(getWorldRoot());
         }
     }
-
+#if 0
     void
     Scene::updateMaterials() {
+        AC_WARNING << "updateMaterials() disabled by pavel";
+        //AC_DEBUG << asl::StackTrace();
+        return;
+
         NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
         bool myMaterialRebindFlag = false;
@@ -801,6 +877,38 @@ namespace y60 {
             rebindMaterials();
         }
     }
+#else
+#if 0
+    void
+    Scene::updateMaterials() {
+        std::vector<NodePtr> myMaterials = xpath::findAll(getNode(), "//material");
+        unsigned myMaterialCount = myMaterials.size();
+        bool myMaterialRebindFlag = false;
+        AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
+        for (unsigned i = 0; i < myMaterialCount; ++i) {
+            NodePtr myMaterialNode = myMaterials[i];
+            MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
+            if (myMaterial) {
+				if (myMaterial->reloadRequired()) {
+                    reloadMaterial(myMaterialNode, myMaterial);
+                }
+                 // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
+                if (myMaterial->rebindRequired()) {
+                    myMaterialRebindFlag = true;
+                }
+            } else {
+                const std::string myMaterialId = myMaterialNode->getAttributeString("id");
+                AC_TRACE << "could not find material " << myMaterialId << ", loading";
+            }
+        }
+        // check if one material forces a material rebind
+        if (myMaterialRebindFlag) {
+            rebindMaterials();
+        }
+    }
+#endif
+#endif
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -880,19 +988,23 @@ namespace y60 {
 
     float
     Scene::getWorldSize(const NodePtr & theActiveCamera) const {
+        AC_TRACE << "getWorldSize()";
         const NodePtr myWorld = getWorldRoot();
         WorldFacadePtr myWorldFacade = myWorld->getFacade<WorldFacade>();
-        asl::Box3f myWorldBox = myWorld->getFacade<WorldFacade>()->get<BoundingBoxTag>();
-
+        asl::Box3f myWorldBox = myWorldFacade->get<BoundingBoxTag>();
+        
         asl::Matrix4f myCameraMatrix = theActiveCamera->getFacade<Camera>()->get<GlobalMatrixTag>();
         asl::Vector3f myCameraPos = myCameraMatrix.getTranslation();
         myWorldBox.extendBy(myCameraPos);
         return asl::distance(myWorldBox[0], myWorldBox[1]);
     }
-
+#if 0
     void
     Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix) {
-        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
+        TransformHierarchyFacadePtr myFacade = theNode->tryGetFacade<TransformHierarchyFacade>();
+        if (!myFacade) {
+            return;
+        }
         DB(AC_TRACE << "updateTransformHierachy for Node " << myFacade->get<IdTag>();)
         bool isLightNode   = (theNode->nodeName() == LIGHT_NODE_NAME);
         bool isIncludeNode = (theNode->nodeName() == INCLUDE_NODE_NAME);
@@ -936,7 +1048,43 @@ namespace y60 {
             }
         }
     }
+#else
+   void
+   Scene::updateLights() {
+        _myLights = getNode().getAllFacades<Light>(LIGHT_NODE_NAME);
+        AC_TRACE << "lights = "<< _myLights.size();
+        for (int i = 0; i < _myLights.size();++i) {
+            AC_TRACE << "light["<<i<<"] = "<< _myLights[i]->getNode();
+        }
+    }
+    void
+    Scene::updateTransformHierachy(NodePtr theNode) {
+      
+        // TODO: This should be possibly done in a lazy fashion during rendering 
+        std::vector<IncludeFacadePtr> myIncludes = theNode->getAllFacades<IncludeFacade>(INCLUDE_NODE_NAME);
+        AC_TRACE << "includes = "<< _myLights.size();
+        for (unsigned i = 0; i < myIncludes.size();++i) {
+            AC_TRACE << "includes["<<i<<"] = "<< myIncludes[i]->getNode();
+            IncludeFacadePtr & myInclude = myIncludes[i];
+            Node & myIncludeNode = myInclude->getNode();
 
+            // Check if src has a new revision
+            if (!myInclude->isUpToDate()) {
+                myInclude->setUpToDate();
+                if (myIncludeNode.childNodesLength()) {
+                    while (myIncludeNode.childNodesLength()) {
+                        myIncludeNode.removeChild(myIncludeNode.firstChild());
+                    }
+                    collectGarbage();
+                }
+                if (myInclude->get<IncludeSrcTag>() != "") {
+                    import(myInclude->get<IncludeSrcTag>(), AppPackageManager::get().getPtr(), myIncludeNode.self().lock());
+                }
+            }
+         }
+         //COUNT(WorldNodes);
+    }
+#endif
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Camera handling
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1120,7 +1268,10 @@ namespace y60 {
     {
         bool myResult = false;
 
-        TransformHierarchyFacadePtr myTransform = theNode->Node::getFacade<y60::TransformHierarchyFacade>();
+        TransformHierarchyFacadePtr myTransform = theNode->Node::tryGetFacade<y60::TransformHierarchyFacade>();
+        if (!myTransform) {
+            return myResult;
+        }
         bool isInsensible = myTransform->TransformHierarchyFacade::get<y60::InsensibleTag>();
         bool isVisibleVisitFlag = theIntersectInvisibleBodysFlag || myTransform->TransformHierarchyFacade::get<y60::VisibleTag>();
         Box3f myBoundingBox = myTransform->TransformHierarchyFacade::get<BoundingBoxTag>();
@@ -1333,10 +1484,13 @@ namespace y60 {
             if (myOldChild->nodeType() == dom::Node::ELEMENT_NODE &&
                 myOldChild->nodeName() != CANVAS_LIST_NAME)
             {
+                AC_TRACE << "myOldChild = "<<myOldChild->nodeName();
                 for (unsigned j = 0; j < myNewScene->childNodesLength(); ++j) {
                     NodePtr myNewChild = myNewScene->childNode(j);
+                    AC_TRACE << "myNewChild = "<<myNewChild->nodeName();
                     if (myNewChild->nodeName() == myOldChild->nodeName()) {
                         while (myNewChild->childNodesLength() != 0) {
+                            AC_TRACE << "myNewChild.firstChild = "<<myNewChild->firstChild()->nodeName();
                             if (myNewChild->nodeName() == WORLD_LIST_NAME) {
                                 theRoot->appendChild(myNewChild->firstChild());
                             } else {
@@ -1510,7 +1664,7 @@ namespace y60 {
             if (myId) {
                 if (theReferences.find(myId->nodeValue()) == theReferences.end()) {
                     myNodesToRemove.push_back(myChild);
-                    AC_INFO << "Scene::removeUnreferencedNodes is removing node with id: " << myId->nodeValue();
+                    AC_INFO << "Scene::removeUnreferencedNodes is removing node with id: " << myId->nodeValue() << ", name="<<(*myChild)[NAME_ATTRIB].nodeValue();
                 }
             }
         }
@@ -1523,7 +1677,7 @@ namespace y60 {
     Scene::registerResourceManager(ResourceManager* theResourceManager) {
         // We only have to update the Scene if this is the first ResourceManager.
         if (1 == _myTextureManager->registerResourceManager(theResourceManager)) {
-            clearShapes();
+            //clearShapes();
             setup();
         }
     }
@@ -1533,7 +1687,7 @@ namespace y60 {
         AC_DEBUG << "deregisterResourceManager";
         if (_myTextureManager->registerResourceManager(0) == 0) {
             // XXX ?
-            clearShapes();
+            //clearShapes();
             //setup();
         }
     }

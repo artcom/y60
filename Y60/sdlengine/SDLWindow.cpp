@@ -269,9 +269,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         }
 
         if (_myScene) {
-            _myScene->clearShapes();
+            //_myScene->clearShapes();
             _myScene->updateAllModified();
-            _myScene->update(Scene::SHAPES); // updated in updateAllModified
+            //_myScene->update(Scene::SHAPES); // updated in updateAllModified
             if (!theInitializeCallFlag) {
                 _myScene->getTextureManager()->reloadTextures();
             }

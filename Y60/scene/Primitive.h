@@ -24,6 +24,7 @@
 #include "MaterialBase.h"
 #include "ResourceManager.h"
 
+#if 0
 // defined in VertexData.h
 #ifdef _USE_GFX_MEM_ //DK this looks broken to me!
 #include "GLAlloc.h"
@@ -50,6 +51,7 @@
 #else
 #include <GL/gl.h>
 #endif
+#endif
 
 #include <y60/DataTypes.h>
 #include <asl/Exception.h>
@@ -64,34 +66,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(MaterialFault, asl::Exception);
     DEFINE_EXCEPTION(UnknownDataSource, asl::Exception);
-    
-    enum PrimitiveType {
-        POINTS         = GL_POINTS,
-        LINES          = GL_LINES,
-        LINE_STRIP     = GL_LINE_STRIP,
-        LINE_LOOP      = GL_LINE_LOOP,
-        TRIANGLES      = GL_TRIANGLES,
-        TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
-        TRIANGLE_FAN   = GL_TRIANGLE_FAN,
-        QUADS          = GL_QUADS,
-        QUAD_STRIP     = GL_QUAD_STRIP,
-        POLYGON        = GL_POLYGON,
-    };
-
-    static const char * PrimitiveTypeString[] = {
-        "POINTS",
-        "LINES",
-        "LINE_STRIP",
-        "LINE_LOOP",
-        "TRIANGLES",
-        "TRIANGLE_STRIP",
-        "TRIANGLE_FAN",
-        "QUADS",
-        "QUAD_STRIP",
-        "POLYGON",
-        0
-    };
-    
+     
     inline
     unsigned
     getVerticesPerPrimitive(PrimitiveType theType) {
@@ -123,13 +98,25 @@ namespace y60 {
     struct BoundingBoxTree;
     typedef asl::Ptr<BoundingBoxTree> BoundingBoxTreePtr;
 
-    /**
+    //                  theTagName      theType       theAttributeName        theDefault
+    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE()); 
+    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string()); 
+    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES); 
+
+    class Shape;
+     /**
      * @ingroup y60scene
      * A list of elements described by their vertexdata. An element is
      * for example a triangle, quad or tringle strip, line, ...
      */
-    class Primitive {
+    class Primitive : 
+        public dom::Facade,
+        public MaterialIdTag::Plug,
+        public PrimitiveTypeTag::Plug,
+        public RenderStylesTag::Plug
+    {
         public:
+            IMPLEMENT_FACADE(Primitive);
             struct Element {
                 Primitive * _myPrimitive;
                 unsigned int _myStartVertex;
@@ -151,16 +138,22 @@ namespace y60 {
             typedef std::vector<Primitive::Intersection> IntersectionList;
             typedef std::vector<Primitive::SphereContacts> SphereContactsList;
     
-            Primitive(PrimitiveType theType, y60::MaterialBasePtr theMaterial, 
+            Primitive(dom::Node & theNode);
+#if 0
+           Primitive(PrimitiveType theType, y60::MaterialBasePtr theMaterial, 
                       const std::string & theShapeId,
                       unsigned int theDomIndex = 0);
-            
+#endif        
             ~Primitive();
 
+            void updateVertexData();
+            void reverseUpdateVertexData();
+            unsigned findMaxIndexSize();
+#if 0
             unsigned int getDomIndex() const { 
                 return _myDomIndex; 
             }
-           
+#endif       
             /**
              * Loads a Primitive from the indexnode @p theIndicesNode and the data node
              * @p theDataNode.
@@ -185,22 +178,21 @@ namespace y60 {
             const VertexDataBase & getVertexData(VertexDataRole theRole) const;
             VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole);
             const VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole) const;
-            static PrimitiveType
-            getTypeFromNode(dom::NodePtr thePrimitiveNode);
-
+/*
+            static PrimitiveType getTypeFromNode(dom::NodePtr thePrimitiveNode);
             void setMaterial(MaterialBasePtr theMaterial) {
                 _myMaterial = theMaterial;
             }
-            MaterialBase & getMaterial() {
-                return *(_myMaterial);
-            }
-            const MaterialBase & getMaterial() const {
-                return *(_myMaterial);
-            }
+*/
+            MaterialBase & getMaterial();
+            const MaterialBase & getMaterial() const;
+            Shape & getShape();
+            const Shape & getShape() const;
+            /*
             PrimitiveType getType() const {
                 return _myType;
             }
-
+*/
             //TODO: make complete
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor(bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor(bool forWriting = true, bool  forReading = false);
@@ -228,12 +220,14 @@ namespace y60 {
             const std::vector<VertexDataBasePtr> & getVertexData() const {
                 return _myVertexData;
             }
+#if 0
             const RenderStyles & getRenderStyles() const { 
                 return _myRenderStyles; 
             }
             RenderStyles & getRenderStyles() { 
                 return _myRenderStyles; 
             }
+#endif
        private:
             // hide default, copy ctor and assignment
             Primitive(); 
@@ -272,15 +266,17 @@ namespace y60 {
 #endif
             void updateBoundingBoxTree();
 
+#if 0
             std::string                    _myShapeId;
             PrimitiveType                  _myType;
             MaterialBasePtr                _myMaterial;
-            std::vector<VertexDataBasePtr> _myVertexData;
             RenderStyles                   _myRenderStyles;
             unsigned int                   _myDomIndex;
+#endif
+            std::vector<VertexDataBasePtr> _myVertexData;
             mutable BoundingBoxTreePtr     _myBoundingBoxTree;
     };
-    typedef asl::Ptr<Primitive> PrimitivePtr;
+    typedef asl::Ptr<Primitive, dom::ThreadingModel> PrimitivePtr;
     typedef std::vector<PrimitivePtr> PrimitiveVector;        
        
     template <class T, class Alloc>

@@ -18,6 +18,8 @@
 //=============================================================================
 
 #include "Primitive.h"
+#include "Shape.h"
+#include "Scene.h"
 
 #include <y60/NodeNames.h>
 #include <y60/VertexDataRoles.h>
@@ -38,7 +40,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(PrimitiveException, asl::Exception);
     DEFINE_EXCEPTION(UnknownPrimitiveType, PrimitiveException);
-
+#if 0
     Primitive::Primitive(PrimitiveType theType, MaterialBasePtr theMaterial,
                          const std::string & theShapeId, unsigned int theDomIndex)
         : _myType(theType),
@@ -47,9 +49,33 @@ namespace y60 {
           _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr(0)),
           _myDomIndex(theDomIndex)
     {}
+#endif
+    Primitive::Primitive(dom::Node & theNode) :
+                 dom::Facade(theNode),
+                MaterialIdTag::Plug(theNode),
+                PrimitiveTypeTag::Plug(theNode),
+                RenderStylesTag::Plug(theNode),
+                _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr(0))
+    {
+/*
+          _myType(theType),
+          _myShapeId(theShapeId),
+          _myMaterial(theMaterial),
+          _myDomIndex(theDomIndex)
+*/
+    }
 
     Primitive::~Primitive() {
-        AC_TRACE << "Primitive DTOR " << this << endl;
+        AC_TRACE << "~Primitive()" << this << endl;
+    }
+    
+    MaterialBase & Primitive::getMaterial() {
+        return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
+        //return *(_myMaterial);
+    }
+    const MaterialBase & Primitive::getMaterial() const {
+        return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
+        //return *(_myMaterial);
     }
 
     void
@@ -71,7 +97,6 @@ namespace y60 {
 
         TypeId myTypeId;
         myTypeId.fromString(theDataNode->nodeName());
-        //= TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
         
         VertexBufferUsage myUsage = getDefaultVertexBufferUsage();
         if (theDataNode->getAttribute(VERTEX_BUFFER_USAGE_ATTRIB)) {
@@ -108,7 +133,7 @@ namespace y60 {
         if (myDataBin) {
             if (myDataBin->size() != myIndices.size()) {
                 AC_ERROR << "Primitive::unload: gl vertex data and dom index array have different size, vertex data role "<<myRoleString<<
-                    " has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<<_myShapeId<<endl;
+                    " has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().get<IdTag>()<<endl;
                 return;
             } else {
                 myDataBin->unload(myIndices, myDataNode, theBeginIndex, theEndIndex);
@@ -192,6 +217,66 @@ namespace y60 {
         return myDataBin;
     }
 
+    Shape & Primitive::getShape() {
+        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
+    }
+    const Shape & Primitive::getShape() const {
+        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
+    }
+
+    unsigned
+    Primitive::findMaxIndexSize() {
+        size_t myLargestSize = 0;
+        dom::Node & myElementsNode = getNode();
+        unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
+        for (unsigned i = 0; i < myIndicesCount; ++i) {
+            dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, i);
+            const VectorOfUnsignedInt & myIndices = myIndicesNode->
+                childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
+
+            myLargestSize = asl::maximum(myLargestSize, myIndices.size());
+        }
+        return myLargestSize;
+    }
+
+    void 
+    Primitive::updateVertexData() {
+        unsigned myBegin = 0;
+        unsigned myEnd = findMaxIndexSize();
+
+        if (myEnd > 1024*64) {
+            AC_WARNING << "Primitive larger than 64k vertices, may cause problems on some graphics cards";
+        }
+       
+        Shape & myShape = getShape(); 
+        dom::Node & myElementsNode = getNode();
+        ResourceManager * myResourceManager = myShape.getScene().getTextureManager()->getResourceManager();
+        unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
+        for (unsigned k = 0; k < myIndicesCount; ++k) {
+            dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
+            const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
+            dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
+            load(myResourceManager, myIndicesNode, myDataNode, myBegin, myEnd);
+        }
+    }
+
+    void Primitive::reverseUpdateVertexData() {
+        dom::Node & myElementsNode = getNode();
+        Shape & myShape = getShape(); 
+        unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
+        for (unsigned k = 0; k < myIndicesCount; ++k) {
+            dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
+            const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
+            dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
+            const VectorOfUnsignedInt & myIndices = myIndicesNode->
+                childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
+            //TODO: find mechanism for selective range update with dirty flags/regions
+            unsigned myBegin = 0;
+            unsigned myEnd   =  myIndices.size();
+            unload(myIndicesNode, myDataNode, myBegin, myEnd);
+        }
+   }
+
     VertexDataBasePtr
     Primitive::getVertexDataPtr(VertexDataRole theRole) {
         // AGPMemoryFlushSingleton::get().flushGLAGPMemory(); moved to gl/util/VertexArray.lock()
@@ -206,9 +291,9 @@ namespace y60 {
         if (!myDataBin) {
             throw PrimitiveException(string("Vertexdata bin for: '") +
                 getStringFromEnum(theRole, VertexDataRoleString) +
-                "' not found in shape " + _myShapeId + ", primitive type: " +
-                getStringFromEnum(_myType, PrimitiveTypeString) + ", material: " +
-                _myMaterial->get<IdTag>(), PLUS_FILE_LINE);
+                "' not found in shape " + getShape().get<IdTag>() + ", primitive type: " +
+                getStringFromEnum(get<PrimitiveTypeTag>(), PrimitiveTypeStrings) + ", material: " +
+                getMaterial().get<IdTag>(), PLUS_FILE_LINE);
         }
 
         return *myDataBin;
@@ -221,14 +306,14 @@ namespace y60 {
         if (!myDataBin) {
             throw PrimitiveException(string("Vertexdata bin for: '") +
                 getStringFromEnum(theRole, VertexDataRoleString) +
-                "' not found in shape " + _myShapeId + ", primitive type: " +
-                getStringFromEnum(_myType, PrimitiveTypeString) + ", material: " +
-                _myMaterial->get<IdTag>(), PLUS_FILE_LINE);
+                "' not found in shape " + getShape().get<IdTag>() + ", primitive type: " +
+                getStringFromEnum(get<PrimitiveTypeTag>(), PrimitiveTypeStrings) + ", material: " +
+                getMaterial().get<IdTag>(), PLUS_FILE_LINE);
         }
 
         return *myDataBin;
     }
-
+#if 0
     PrimitiveType
     Primitive::getTypeFromNode(dom::NodePtr thePrimitiveNode) {
         std::string myPrimitiveTypeString = (*thePrimitiveNode)[PRIMITIVE_TYPE_ATTRIB].nodeValue();
@@ -265,7 +350,7 @@ namespace y60 {
         }
         throw UnknownPrimitiveType(myPrimitiveTypeString, PLUS_FILE_LINE);
     }
-
+#endif
     template <>
     void
     Primitive::createTangents(GfxVectorOfVector3f & theBin) {
@@ -287,10 +372,11 @@ namespace y60 {
         asl::Vector3f mySide1 = myPositions[2] - myPositions[1];
 
         // look for the first (hopefully only) bumpmap
-        unsigned myTextureCount = _myMaterial->getTextureUnitCount();
+        MaterialBase & myMaterial = getMaterial();
+        unsigned myTextureCount = myMaterial.getTextureUnitCount();
         unsigned myBumpmapIndex;
         for (myBumpmapIndex=0; myBumpmapIndex < myTextureCount; ++myBumpmapIndex) {
-            if (_myMaterial->getTextureUsage(myBumpmapIndex) == BUMP) {
+            if (myMaterial.getTextureUsage(myBumpmapIndex) == BUMP) {
                 break;
             }
         }
@@ -299,12 +385,12 @@ namespace y60 {
         VertexDataRole myRole = VertexDataRole(TEXCOORD0 + myBumpmapIndex);
 
         if (myBumpmapIndex == myTextureCount) {
-            throw MaterialFault( std::string("missing Bumpmap in Material ")+_myMaterial->get<NameTag>(),
+            throw MaterialFault( std::string("missing Bumpmap in Material ")+myMaterial.get<NameTag>(),
                                   PLUS_FILE_LINE );
         }
 
         if (_myVertexData[myRole]->getType() != VECTOR2F) {
-            throw MaterialFault( std::string("UV Set is not a Vector2f! in Material ")+_myMaterial->get<NameTag>(),
+            throw MaterialFault( std::string("UV Set is not a Vector2f! in Material ")+myMaterial.get<NameTag>(),
                                   PLUS_FILE_LINE );
         }
 
@@ -352,7 +438,8 @@ namespace y60 {
         bool myHit = false;
 
         unsigned int myStep = 1;
-        switch (_myType) {
+        PrimitiveType myType = get<PrimitiveTypeTag>();
+        switch (myType) {
             case POINTS:
             case LINES:
                 myStep = 2;
@@ -361,7 +448,7 @@ namespace y60 {
                 for (unsigned i = 0; (i + 1) < thePositions.size(); i += myStep) {
                     myHit |= theDetector(this, i, asl::asLineSegment(asl::asPoint(thePositions[i])));
                 }
-                if (_myType == LINE_LOOP) {
+                if (myType == LINE_LOOP) {
                     asl::LineSegment<float> edge(asl::asPoint(thePositions[thePositions.size()-1]),
                                         asl::asPoint(thePositions[0]));
                     myHit |= theDetector(this, thePositions.size(), edge);
@@ -412,7 +499,7 @@ namespace y60 {
                         // TODO: make faster routine for quad intersection
                         asl::Triangle<float> myOtherTriangle;
                         asl::Vector3<asl::Vector3<float> > myOtherNormals;
-                        if (_myType == QUADS) {
+                        if (myType == QUADS) {
                             myOtherTriangle = asl::Triangle<float>(
                                 asl::asPoint(thePositions[i+2]),
                                 asl::asPoint(thePositions[i+3]),
@@ -443,7 +530,7 @@ namespace y60 {
             case POLYGON:
                 return false;
             default:
-                throw UnknownPrimitiveType(asl::as_string(_myType), PLUS_FILE_LINE);
+                throw UnknownPrimitiveType(asl::as_string(myType), PLUS_FILE_LINE);
         }
 
         return myHit;
@@ -521,7 +608,8 @@ namespace y60 {
         bool myHasNormals = (theNormals->size() == thePositions.size());
 
         const int i = theTree.myMinIndex;
-        switch (_myType) {
+        PrimitiveType myType = get<PrimitiveTypeTag>();
+        switch (myType) {
             case POINTS:
             case LINES:
             case LINE_STRIP:
@@ -587,7 +675,7 @@ namespace y60 {
             case POLYGON:
                 return false;
             default:
-                throw UnknownPrimitiveType(asl::as_string(_myType), PLUS_FILE_LINE);
+                throw UnknownPrimitiveType(asl::as_string(myType), PLUS_FILE_LINE);
         }
 
         return myHit;
@@ -646,7 +734,7 @@ namespace y60 {
 
             myInfo._myElement._myPrimitive    = thePrimitive;
             myInfo._myElement._myStartVertex  = theStartVertex;// + thePrimitive->getDomIndex();
-            myInfo._myElement._myType         = thePrimitive->getType();
+            myInfo._myElement._myType         = thePrimitive->get<PrimitiveTypeTag>();
             myInfo._myElement._myVertexCount  = getVerticesPerPrimitive(myInfo._myElement._myType);
 
             myInfo._myPosition = theIntersection;
@@ -793,7 +881,7 @@ namespace y60 {
 
             myInfo._myElement._myPrimitive    = thePrimitive;
             myInfo._myElement._myStartVertex  = theStartVertex;
-            myInfo._myElement._myType         = thePrimitive->getType();
+            myInfo._myElement._myType         = thePrimitive->get<PrimitiveTypeTag>();
             myInfo._myElement._myVertexCount  = getVerticesPerPrimitive(myInfo._myElement._myType);
 
             myInfo._myNumberOfContacts = theContactCount;
@@ -907,7 +995,7 @@ namespace y60 {
         {
             _myNewContactInfo._myElement._myPrimitive    = thePrimitive;
             _myNewContactInfo._myElement._myStartVertex  = theStartVertex;
-            _myNewContactInfo._myElement._myType         = thePrimitive->getType();
+            _myNewContactInfo._myElement._myType         = thePrimitive->get<PrimitiveTypeTag>();
             _myNewContactInfo._myElement._myVertexCount  = getVerticesPerPrimitive(_myNewContactInfo._myElement._myType);
 
             _myNewContactInfo._myNumberOfContacts = 1;

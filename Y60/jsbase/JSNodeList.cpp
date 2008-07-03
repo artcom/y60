@@ -43,12 +43,21 @@ namespace jslib {
         return Method<NodeList>::call((MyMethod)&NodeList::append,cx,obj,argc,argv,rval);
     }
 
+    JSBool
+    JSNodeList::clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("deletes all nodes from the node list");
+        DOC_END;
+        typedef void (NodeList::*MyMethod)();
+        return Method<NodeList>::call((MyMethod)&NodeList::clear,cx,obj,argc,argv,rval);
+    }
+
     JSFunctionSpec * JSNodeList::Functions() {
         AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
         static JSFunctionSpec myFunctions[] = {
             /* name         native          nargs    */
             {"item",             item,            1},
             {"appendNode",       appendNode,      1},
+            {"clear",            clear,           0},
             //{"replaceChild",     replaceChild,    1},
             //{"setAllNodeValues", setAllNodeValues,    1},
             {0}

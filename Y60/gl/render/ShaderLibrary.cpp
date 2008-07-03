@@ -17,10 +17,10 @@
 #include "SkinAndBonesShader.h"
 #endif
 
+#include <y60/iostream_functions.h>
 #include <y60/NodeNames.h>
 #include <y60/property_functions.h>
 #include <y60/NodeValueNames.h>
-#include <y60/iostream_functions.h>
 #include <dom/Nodes.h>
 
 #include <asl/PackageManager.h>
@@ -35,7 +35,7 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
-#define DB(x) //x
+#define DB(x) x
 
 namespace y60 {
     bool ShaderLibrary::_myGLisReadyFlag = false;
@@ -210,7 +210,7 @@ namespace y60 {
             VectorOfRankedFeature myRequiredFeature = myRequirementNode->nodeValueAs<VectorOfRankedFeature>();
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
-            DB(AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << myRequiredFeature << endl);
+            AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << asl::as_string(myRequiredFeature) << endl;
             for (int j = 0; j < myRequiredFeature.size(); j++) {
                 const VectorOfString & myRequiredFeatureCombo = myRequiredFeature[j]._myFeature;
 
@@ -218,7 +218,7 @@ namespace y60 {
                     GLShaderPtr myGLShader = _myShaders[i];
 					GLShader::ShaderMatch myShaderMatchResult = myGLShader->matches(myRequiredFeatureClass, myRequiredFeatureCombo);
 					if (myShaderMatchResult != GLShader::NO_MATCH) {
-                        DB(AC_DEBUG << "Match: Shader '"<<myGLShader->getName()<<"' matches "<< myRequiredFeatureCombo << " in class '"<<myRequiredFeatureClass<<"'"<<endl);
+                        DB(AC_DEBUG << "Match: Shader '"<<myGLShader->getName()<<"' matches "<< asl::as_string(myRequiredFeatureCombo) << " in class '"<<asl::as_string(myRequiredFeatureClass)<<"'"<<endl);
                         myScoreBoard[i].featurehits++;
                         myScoreBoard[i].points += (myGLShader->getCosts()) == 0 ?
                                                   0.0f : ( myRequiredFeature[j]._myRanking /
@@ -229,7 +229,7 @@ namespace y60 {
                         oneShaderCanHandleMaterial = true;
 
                     } else {
-                        DB(AC_DEBUG << "Shader '"<<myGLShader->getName()<<"' does not match "<< myRequiredFeatureCombo << " in class '"<<myRequiredFeatureClass<<"'"<<endl);
+                        DB(AC_DEBUG << "Shader '"<<myGLShader->getName()<<"' does not match "<< asl::as_string(myRequiredFeatureCombo) << " in class '"<<asl::as_string(myRequiredFeatureClass)<<"'"<<endl);
                         if ( myRequiredFeatureCombo.size() == 1 &&
                             myRequiredFeatureCombo[0] == FEATURE_DROPPED) {
                                 myFeatureCanBedropped = true;
@@ -238,7 +238,7 @@ namespace y60 {
                 }
             }
             if (myFeatureCanBedropped) {
-                AC_INFO << "Material: " << theMaterial->get<NameTag>() << ": Feature can be dropped: "<<myRequiredFeatureClass<<endl;
+                AC_INFO << "Material: " << theMaterial->get<NameTag>() << ": Feature can be dropped: "<<asl::as_string(myRequiredFeatureClass)<<endl;
                 if (!oneShaderCanHandleMaterial){
                     AC_INFO << "          and no shader found to handle it: drop it!!!" <<endl;
                     // feature dropped, erase it from requirements
@@ -261,22 +261,21 @@ namespace y60 {
         }
         // find the shader that supports all features required (the score equals the feature count)
         // implement a magic algorithm to find the best shader that serves the requirements
-        DB(
-            AC_DEBUG << "---- Shader search rubberpoint scoreboard for material: " << theMaterial->get<NameTag>() << " ----" << endl;
-            for (int i = 0; i <myScoreBoard.size(); i++ )
-            {
-                const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
-                bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
-                AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: "
-                    << myScoreBoard[i].featurehits << " features"
-                    << " and " << myScoreBoard[i].points << " points";
-                if (allShaderFeatureUsed) {
-                    AC_DEBUG << " and all its features could be used." << endl;
-                } else {
-                    AC_DEBUG << " but its feature support is unacceptable." << endl;
-                }
+            
+        AC_DEBUG << "---- Shader search rubberpoint scoreboard for material: " << theMaterial->get<NameTag>() << " ----" << endl;
+        for (int i = 0; i <myScoreBoard.size(); i++ )
+        {
+            const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
+            bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
+            AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: "
+                << myScoreBoard[i].featurehits << " features"
+                << " and " << myScoreBoard[i].points << " points";
+            if (allShaderFeatureUsed) {
+                AC_DEBUG << " and all its features could be used." << endl;
+            } else {
+                AC_DEBUG << " but its feature support is unacceptable." << endl;
             }
-        ) // end DB2
+        }
 
         GLShaderPtr myLeadingShader(0);
         float myMaxPoints = 0.0;
@@ -289,19 +288,16 @@ namespace y60 {
             // shader must not be oversized, all its features must be required
             bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
 
-            DB(
-                AC_DEBUG << endl;
-                AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: " <<endl;
-                AC_DEBUG << myScoreBoard[i].featurehits << " features of" << " of " << myRequirementMap.size() <<" requirements"<<endl;
-                AC_DEBUG << myShaderFeatureSet.getFeatureCount() << " shader features" << " of " << myRequirementMap.size() <<" requirements"<<endl;
-                AC_DEBUG<< " Points: " << myScoreBoard[i].points << " points"<<", best = "<<myMaxPoints<<endl;
-                if (allShaderFeatureUsed) {
-                    AC_DEBUG << " and all its features could be used." << endl;
-                } else {
-                    AC_DEBUG << " but its feature support is unacceptable." << endl;
-                }
-            )
-
+            AC_DEBUG << endl;
+            AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: " <<endl;
+            AC_DEBUG << myScoreBoard[i].featurehits << " features of" << " of " << myRequirementMap.size() <<" requirements"<<endl;
+            AC_DEBUG << myShaderFeatureSet.getFeatureCount() << " shader features" << " of " << myRequirementMap.size() <<" requirements"<<endl;
+            AC_DEBUG<< " Points: " << myScoreBoard[i].points << " points"<<", best = "<<myMaxPoints<<endl;
+            if (allShaderFeatureUsed) {
+                AC_DEBUG << " and all its features could be used." << endl;
+            } else {
+                AC_DEBUG << " but its feature support is unacceptable." << endl;
+            }
 
             if ( matchAllMaterialRequirements && shaderHasHigherScore &&  allShaderFeatureUsed )
             {

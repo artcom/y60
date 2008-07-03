@@ -49,7 +49,7 @@ JSDomEventListener::handleEvent(dom::EventPtr theEvent) {
         argv[0] = as_jsval(_myJSContext, theEvent);
         JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
     } else {
-        AC_ERROR << "JSDomEventListener::handleEvent: not a js listener" << std::endl;
+        AC_ERROR << "JSDomEventListener::handleEvent: not a GenericJSDomEvent" << std::endl;
     }
 }
 
@@ -85,6 +85,7 @@ initEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);
     DOC_PARAM("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN);
     DOC_PARAM("theCancelableFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theTargetOnlyFlag", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     Method<dom::Event>::call(&dom::Event::initEvent, cx, obj, argc, argv, rval);
     *rval = as_jsval(cx, true);
@@ -129,6 +130,7 @@ JSDomEvent::Properties() {
         {"currentTarget", PROP_currentTarget, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"eventPhase", PROP_eventPhase, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"bubbles", PROP_bubbles, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"targetOnly", PROP_targetOnly, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"cancelable", PROP_cancelable, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"timeStamp", PROP_timeStamp, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"isDefaultPrevented", PROP_isDefaultPrevented, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -181,7 +183,10 @@ JSDomEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             case PROP_bubbles:
                 *vp = as_jsval(cx, getNative().bubbles());
                 return JS_TRUE;
-            case PROP_cancelable:
+            case PROP_targetOnly:
+                *vp = as_jsval(cx, getNative().targetOnly());
+                return JS_TRUE;
+             case PROP_cancelable:
                 *vp = as_jsval(cx, getNative().cancelable());
                 return JS_TRUE;
             case PROP_timeStamp:
@@ -223,10 +228,11 @@ JSBool
 JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a dom event.");
     DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);
-    DOC_PARAM("thePayload", "", DOC_TYPE_OBJECT);
-    DOC_PARAM("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theCancelableFlag", "", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theTimeStamp", "", DOC_TYPE_OBJECT);
+    DOC_PARAM_OPT("thePayload", "", DOC_TYPE_OBJECT, "undefined");
+    DOC_PARAM_OPT("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN, "false");
+    DOC_PARAM_OPT("theCancelableFlag", "", DOC_TYPE_BOOLEAN, "false");
+    DOC_PARAM_OPT("theTargetOnlyFlag", "", DOC_TYPE_BOOLEAN, "true");
+    DOC_PARAM_OPT("theTimeStamp", "", DOC_TYPE_OBJECT, "<current time>");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -236,7 +242,7 @@ JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     if (argc == 0 ) {
         OWNERPTR myNewEvent = OWNERPTR(new GenericJSDomEvent("default"));
         myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
-    } else if (argc >0 && argc < 6) {
+    } else if (argc >0 && argc < 7) {
         if (JSVAL_IS_VOID(argv[0])) {
             JS_ReportError(cx,"JSDomEvent::Constructor: bad argument #1 (undefined)");
             return JS_FALSE;
@@ -265,12 +271,19 @@ JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                 return JS_FALSE;
             }
         }
+        bool targetOnly = false;
+        if (argc > 4) {
+            if (!convertFrom(cx, argv[4], targetOnly)) {
+                JS_ReportError(cx, "JSDomEvent::Constructor: argument #5 must be a bool (targetOnly)");
+                return JS_FALSE;
+            }
+        }
         dom::DOMTimeStamp myTimeStamp;
         double myTime;
-        if (argc > 4) {
-            if (!convertFrom(cx, argv[4], myTime)) {
+        if (argc > 5) {
+            if (!convertFrom(cx, argv[5], myTime)) {
                 myTimeStamp = myTime;
-                JS_ReportError(cx, "JSDomEvent::Constructor: argument #5 must be a double (theTimeStamp)");
+                JS_ReportError(cx, "JSDomEvent::Constructor: argument #6 must be a double (theTimeStamp)");
                 return JS_FALSE;
             }
         }
@@ -281,12 +294,13 @@ JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
             new GenericJSDomEvent(myType,
                      canBubbleArg,
                      cancelableArg,
+                     targetOnly,
                      myTimeStamp,
                      myObject)
                      );
         myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
     } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1-5 (theType [, thePayload, canBubbleArg, cancelableArg, theTimeStamp]) %d",ClassName(), argc);
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1-6 args (theType [, thePayload, canBubbleArg, cancelableArg, targetOnly, theTimeStamp]) %d",ClassName(), argc);
         return JS_FALSE;
     }
 

@@ -13,7 +13,7 @@
                 <vector4f name="specular">[1,1,1,1]</vector4f>
                 <vector4f name="ambient">[1,1,1,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
         <vertexshader profiles="[`arbvp1`, `vp20`,`vp30`,`vp40`]" files="[`phongBump.cg`]" entryfunctions="[`mainVertex`]">
@@ -40,7 +40,7 @@
                 <vector4f name="specular">[1,1,1,1]</vector4f>
                 <vector4f name="ambient">[1,1,1,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
         <vertexshader profiles="[`arbvp1`,`vp20`,`vp30`,`vp40`]" files="[`phongBump.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`]]">
@@ -66,7 +66,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -88,7 +88,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -108,7 +108,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -130,7 +130,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -153,7 +153,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -177,7 +177,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -199,7 +199,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -219,7 +219,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -236,7 +236,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -253,7 +253,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -271,7 +271,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -290,7 +290,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -307,7 +307,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -325,7 +325,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -343,7 +343,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -362,7 +362,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -381,7 +381,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -399,7 +399,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -414,7 +414,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -432,7 +432,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -454,7 +454,7 @@
                 <vector4f name="specular">[1.0,1.0,1.0,1]</vector4f>
                 <float name="shininess">40</float>
                 <sampler2d name="decalTex">0</sampler2d>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`toon2.cg`]" entryfunctions="[`mainVertex`]">
@@ -476,7 +476,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -487,7 +487,7 @@
         <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -501,7 +501,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
                 <float name="specularrolloff">1</float>
                 <float name="eccentricity">1</float>
@@ -517,7 +517,7 @@
                 <sampler2d name="occlusionTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
                 <samplerCUBE name="emissiveEnvTex">2</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -531,7 +531,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -543,7 +543,7 @@
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <samplerCUBE name="emissiveEnvTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -557,7 +557,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -572,7 +572,7 @@
                 <sampler2d name="decalTex">0</sampler2d>
                 <sampler2d name="emissiveTex">1</sampler2d>
                 <samplerCUBE name="envTex">2</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -586,7 +586,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -601,7 +601,7 @@
                 <sampler2d name="occlusionTex">0</sampler2d>
                 <sampler2d name="decalTex">1</sampler2d>
                 <samplerCUBE name="envTex">2</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -613,7 +613,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -631,7 +631,7 @@
             <properties>
                 <vector4f name="WindParams">[0.18, 0.18, 0.1, 1]</vector4f>
                 <vector4f name="WindDirection">[-2, 1, 0, 0]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -653,7 +653,7 @@
         </supports>
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`wave_2d.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
             <properties>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
                 <vector4f name="WaveColor">[1.0,1.0,1.0,0.5]</vector4f>
             </properties>
@@ -677,7 +677,7 @@
         </supports>
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`wave_1d.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
             <properties>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
                 <vector4f name="WaveColor">[1.0,1.0,1.0,0.5]</vector4f>
             </properties>
@@ -703,7 +703,7 @@
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
                 <vectorofvector4f name="BoneMatrix">[[1,0,0,0],[0,1,0,0],[0,0,1,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector4f name="position"/>
@@ -730,7 +730,7 @@
         </supports>
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`hexwisp.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
             <properties>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <vector2f name="mirrorpoint">[0,0]</vector2f>
                 <vector2f name="wispScale">[2,2]</vector2f>
                 <vectorofvector2f name="wisppos">[[3,3]]</vectorofvector2f>
@@ -759,7 +759,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -772,7 +772,7 @@
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -786,7 +786,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -799,7 +799,7 @@
             <properties>
                 <sampler2d name="occlusionTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -813,7 +813,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -828,7 +828,7 @@
                 <samplerCUBE name="envTex">1</samplerCUBE>
                 <sampler2d name="brakeOneTex">2</sampler2d>
                 <sampler2d name="brakeTwoTex">3</sampler2d>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="strength">0</float>
             </properties>
         </fragmentshader>
@@ -843,7 +843,7 @@
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -856,7 +856,7 @@
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -871,7 +871,7 @@
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
                 <vector4f name="specular">[0,0,0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -882,7 +882,7 @@
         <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -898,7 +898,7 @@
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
                 <vector4f name="specular">[0,0,0,1]</vector4f>
                 <float name="shininess">32</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
@@ -909,7 +909,7 @@
         <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPHONG_SPECULAR`]]">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
@@ -927,7 +927,7 @@
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -944,7 +944,7 @@
         <fixedfunctionshader>
             <properties>
                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`one`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[one,one_minus_src_alpha]</vectorofblendfunction>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
@@ -971,7 +971,7 @@
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -993,7 +993,7 @@
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1016,7 +1016,7 @@
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1041,7 +1041,7 @@
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1065,7 +1065,7 @@
                 <float name="shininess">1.0</float>
                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1091,7 +1091,7 @@
                 <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1116,7 +1116,7 @@
                 <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
                 <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1132,7 +1132,7 @@
         </supports>
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`hdr.cg`]" entryfunctions="[`mainVertex`]">
             <properties>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <vector2f name="hdr">[0,1]</vector2f>
             </properties>
             <vertexparameters>
@@ -1157,7 +1157,7 @@
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`antialias.cg`]" entryfunctions="[`mainVertex`]">
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
                 <vector2f name="pixelSize">[0,0]</vector2f>
             </properties>
             <vertexparameters>
@@ -1182,7 +1182,7 @@
         <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`accumulation.cg`]" entryfunctions="[`mainVertex`]">
             <properties>
                 <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector4f name="position"/>
@@ -1258,7 +1258,7 @@
         <fixedfunctionshader>
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="position"/>
@@ -1681,7 +1681,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>
@@ -1704,7 +1704,7 @@
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
                 <vector3f name="normal"/>

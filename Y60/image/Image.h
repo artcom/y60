@@ -52,7 +52,8 @@ namespace y60 {
         public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
         public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
         public dom::FacadeAttributePlug<ImageWidthTag>,
-        public dom::FacadeAttributePlug<ImageHeightTag>
+        public dom::FacadeAttributePlug<ImageHeightTag>,
+        public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
         public:
             static bool allowInlineFlag;

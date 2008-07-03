@@ -67,8 +67,8 @@
 #include <string>
 #include <algorithm>
 
-#define DB(x)  //x
-#define DB2(x) //x
+#define DB(x)   x
+#define DB2(x) // x
 
 // profiling
 //#define PROFILING_LEVEL_FULL
@@ -96,7 +96,8 @@ namespace y60 {
         _myBoundingVolumeMode(BV_NONE),
         _myPreviousMaterial(0),
         _myRenderingCaps(theRenderingCaps),
-        _myContext(theGLContext)
+        _myContext(theGLContext),
+        _myFrameNumber(0)
     {
         _myState = _myContext->getStateCache();
         _myLastVertexRegisterFlags.reset();
@@ -403,8 +404,8 @@ namespace y60 {
 
         // get renderstyles for this primitive
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
-        const RenderStyles & myPrimitveStyle = myPrimitive.getRenderStyles();
-        const RenderStyles & myShapeStyle    = myShape.get<RenderStyleTag>();
+        const RenderStyles & myPrimitveStyle = myPrimitive.get<RenderStylesTag>();
+        const RenderStyles & myShapeStyle    = myShape.get<RenderStylesTag>();
 
         const RenderStyles & myRenderStyles  = myPrimitveStyle.any() ? myPrimitveStyle : myShapeStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
@@ -551,7 +552,7 @@ namespace y60 {
 
         {
             DBP(MAKE_GL_SCOPE_TIMER(glDrawArrays));
-            glDrawArrays(getPrimitiveGLType(myPrimitive.getType()), 0, myPrimitive.size());
+            glDrawArrays(getPrimitiveGLType(myPrimitive.get<PrimitiveTypeTag>()), 0, myPrimitive.size());
             CHECK_OGL_ERROR;
         }
     }
@@ -913,7 +914,7 @@ namespace y60 {
 
         postDraw();
     }
-
+    
     dom::NodePtr
     Renderer::getActiveLodChild(dom::NodePtr theNode, const CameraPtr theCamera) {
         MAKE_GL_SCOPE_TIMER(Renderer_getActiveLodChild);
@@ -945,16 +946,19 @@ namespace y60 {
         if (theNode->childNodesLength() == 1) {
             return theNode->childNode(0);
         } else {
+            unsigned n = 0;
             for (unsigned i = 0 ; i < theNode->childNodesLength(); ++i) {
-                if (i >= myRanges.size() || myMetric < myRanges[i]) {
-                    return theNode->childNode(i);
+                if (theNode->childNode(i)->tryGetFacade<TransformHierarchyFacade>()) {
+                    if (n >= myRanges.size() || myMetric < myRanges[n]) {
+                        return theNode->childNode(i);
+                    }
+                    n++;
                 }
             }
         }
-
         return dom::NodePtr(0);
     }
-
+//#define DB(x) x
     void
     Renderer::createRenderList(const dom::NodePtr & theNode, BodyPartMap & theBodyParts,
                                const CameraPtr theCamera,
@@ -964,28 +968,39 @@ namespace y60 {
                                std::vector<asl::Planef> theClippingPlanes,
                                asl::Box2f theScissorBox)
     {
+        DB(AC_TRACE << "createRenderList: " << theNode->nodeName());
         TransformHierarchyFacadePtr myFacade;
         {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_prologue));
             // Skip undefined nodes
             if (!theNode) {
+                DB(AC_TRACE << "createRenderList: no node return");
                 return;
             }
 
             // Skip non element nodes
             if (!(theNode->nodeType() == dom::Node::ELEMENT_NODE)) {
+                DB(AC_TRACE << "createRenderList: no element return");
                 return;
             }
 
             // Skip comments
             if (theNode->nodeName() == "#comment") {
+                DB(AC_TRACE << "createRenderList: comment return");
                 return;
             }
 
-            myFacade = theNode->getFacade<TransformHierarchyFacade>();
+            myFacade = theNode->tryGetFacade<TransformHierarchyFacade>();
+            
+            // skip non-hierarchy nodes
+            if (!myFacade) {
+                DB(AC_TRACE << "createRenderList: no transform return");
+                return;
+            }
 
             // Skip invisible nodes
             if (!(myFacade->get<VisibleTag>())) {
+                DB(AC_TRACE << "createRenderList: visible flag return";)
                 return;
             }
         }
@@ -998,6 +1013,9 @@ namespace y60 {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_cull));
             if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
                 if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                    DB(AC_TRACE << "createRenderList: bbox=" << myFacade->get<BoundingBoxTag>();)
+                    DB(AC_TRACE << "createRenderList: Frustum=" << myFrustum;)
+                    DB(AC_TRACE << "createRenderList: cull return";)
                     return;
                 }
             } 
@@ -1010,22 +1028,27 @@ namespace y60 {
             collectScissorBox(theNode, theScissorBox);
         }
 
+        myFacade->set<LastActiveFrameTag>(_myFrameNumber);
+
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_lod));
             createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts,
                     theCamera, theEyeSpaceTransform, theViewport, theOverlapFrustumFlag,
                     theClippingPlanes, theScissorBox);
+            DB(AC_TRACE << "createRenderList: lod return";)
             return;
         }
 
         // Add remaining bodies to render list
         if (theNode->nodeName() == BODY_NODE_NAME) {
+            DB(AC_TRACE << "createRenderList: body processing";)
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_insertBody));
             const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // Split the body in bodyparts to make material sorted rendering possible
             const Shape & myShape = myBody.getShape();
+            const_cast<Shape&>(myShape).set<LastActiveFrameTag>(_myFrameNumber);
             const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();
             Matrix4f myTransform = myBody.get<GlobalMatrixTag>();
             myTransform.postMultiply(theEyeSpaceTransform);
@@ -1033,9 +1056,11 @@ namespace y60 {
             double myNearPlane = myFrustum.getNear();
 
             unsigned mySize = myPrimitives.size();
+            DB(AC_TRACE << "createRenderList: primitives="<<mySize;)
             for (unsigned i = 0; i < mySize; ++i) {
                 const Primitive & myPrimitive = (*myPrimitives[i]);
                 const MaterialBase & myMaterial = myPrimitive.getMaterial();
+                const_cast<MaterialBase&>(myMaterial).set<LastActiveFrameTag>(_myFrameNumber);
                 asl::Unsigned16 myBodyKey = makeBodyKey(myMaterial,
                                                         myShape,
                                                         myTransform,
@@ -1063,7 +1088,10 @@ namespace y60 {
                         theClippingPlanes, theScissorBox);
             }
         }
+        DB(AC_TRACE << "createRenderList: end of function return";)
     }
+//#undef DB
+//#define DB(x) // x
 
     void
     Renderer::collectClippingPlanes(dom::NodePtr theNode,
@@ -1085,6 +1113,7 @@ namespace y60 {
                     theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
             }
             PlanePtr myPlane = myPlaneNode->getFacade<Plane>();
+            myPlane->set<LastActiveFrameTag>(_myFrameNumber);
             theClippingPlanes.push_back( myPlane->get<GlobalPlaneTag>());
         }
     }
@@ -1146,6 +1175,7 @@ namespace y60 {
     Renderer::render(ViewportPtr theViewport) {
         MAKE_GL_SCOPE_TIMER(render);
         _myRenderedUnderlays = false;
+        ++_myFrameNumber;
         
         // Setup viewport, parameters are in screen space
         glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
@@ -1207,6 +1237,7 @@ namespace y60 {
                     createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera,
                             myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
                             myScissorBox);
+                    DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size()); 
                 }
 
                 // (3) render skybox
@@ -1342,7 +1373,9 @@ namespace y60 {
 
         int myActiveLightCount = 0;
         LightVector & myLights = _myScene->getLights();
+        DB(AC_TRACE << "enableVisibleLights: numlights=" << myLights.size());
         for (unsigned i = 0; i < myLights.size(); ++i) {
+            DB(AC_TRACE << myLights[i]->getNode());
             if (myLights[i]->get<VisibleTag>()) {
                 if (myActiveLightCount >= myMaxLights) {
                     static bool myAlreadyWarned = false;
@@ -1861,7 +1894,7 @@ namespace y60 {
 
         CHECK_OGL_ERROR;
     }
-
+#if 0
     void 
     Renderer::renderAnalyticGeometry( ViewportPtr theViewport, CameraPtr theCamera) {
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
@@ -1904,5 +1937,47 @@ namespace y60 {
             }
         }
     }
+#else
+    void 
+    Renderer::renderAnalyticGeometry(ViewportPtr theViewport, CameraPtr theCamera) {
+        const Frustum & myFrustum = theCamera->get<FrustumTag>();
+        bool myOverlapFrustumFlag = true;
+
+        MAKE_GL_SCOPE_TIMER(renderAnalyticGeometry);
+        Matrix4f myMatrix;
+        myMatrix.makeIdentity();
+
+        dom::Node & mySceneNode = _myScene->getNode();
+#if 1
+        std::vector<PlanePtr> myPlanes = mySceneNode.getAllFacades<Plane>(PLANE_NODE_NAME);
+        for (unsigned i = 0; i < myPlanes.size();++i) {
+            PlanePtr & myFacade = myPlanes[i];
+            Planef myPlane = myFacade->get<GlobalPlaneTag>();
+            // TODO: intersect with frustum and visualize something ...
+        }
+#endif
+        std::vector<PointPtr> myPoints = mySceneNode.getAllFacades<Point>(POINT_NODE_NAME);
+        for (unsigned i = 0; i < myPoints.size();++i) {
+            PointPtr & myFacade = myPoints[i];
+            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() || 
+                    intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                draw( asVector(myFacade->get<GlobalPointTag>()), myFacade->get<ColorTag>(), myMatrix, myFacade->get<AG::PointSizeTag>(), "");
+            }
+        }
+
+        std::vector<VectorPtr> myVectors = mySceneNode.getAllFacades<Vector>(VECTOR_NODE_NAME);
+        for (unsigned i = 0; i < myVectors.size();++i) {
+            VectorPtr & myFacade = myVectors[i];
+            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() || 
+                    intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                asl::LineSegment<float> myLineSegment( myFacade->get<GlobalMatrixTag>().getTranslation(), myFacade->get<GlobalVectorTag>() );
+                draw( myLineSegment, myFacade->get<ColorTag>(), myMatrix, myFacade->get<AG::LineWidthTag>(), "");
+                // TODO: draw arrow head
+            }
+        }
+    }
+    
+#endif
+
 
 }

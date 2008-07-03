@@ -11,6 +11,7 @@
 #include "MaterialBase.h"
 #include "TextureManager.h"
 #include "TextureUnit.h"
+#include "Scene.h"
 
 #include <y60/NodeValueNames.h>
 #include <y60/NodeNames.h>
@@ -22,7 +23,7 @@
 
 #include <algorithm>
 
-#define DB(x) // x
+#define DB(x)  x
 
 using namespace asl;
 using namespace std;
@@ -31,31 +32,61 @@ using namespace dom;
 namespace y60 {
 
     MaterialBase::MaterialBase(dom::Node & theNode): 
-        
+        Facade(theNode),
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
         TransparencyTag::Plug(theNode),
         MaterialPropertiesTag::Plug(this),
         MaterialRequirementTag::Plug(this),   
-        Facade(theNode),
+        EnabledTag::Plug(theNode),
+        dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myShader(0),
         _myLightingModel(LAMBERT),
-        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0), _myIdTagVersion(0)
+        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0), /*_myIdTagVersion(0),*/ _ensuring(false)
     {}
 
     MaterialBase::~MaterialBase() {
+        //AC_TRACE << "~MaterialBase() id=" << get<IdTag>() <<", name="<<get<NameTag>();
+        AC_TRACE << "~MaterialBase() @"<<(void*)this; 
     }
 
+    Scene &
+    MaterialBase::getScene() {
+        Node * myRoot = getNode().getRootElement();
+        return *myRoot->getFacade<Scene>(); 
+    }
+    const Scene &
+    MaterialBase::getScene() const {
+        const Node * myRoot = getNode().getRootElement();
+        return *myRoot->getFacade<Scene>(); 
+    }
 
     void
     MaterialBase::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();        
         getChild<MaterialPropertiesTag>()->registerDependenciesRegistrators();
-        
     }
 
     void
-    MaterialBase::registerDependenciesForMaterialupdate() {}
+    MaterialBase::registerDependenciesForMaterialupdate() {
+        AC_TRACE << "MaterialBase::registerDependenciesForMaterialupdate()";
+        Node & myNode = getNode();
+        if (myNode) {
+            AC_TRACE << "MaterialBase::registerDependenciesForMaterialupdate() - callback registered";
+            EnabledTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<MaterialBase>(getSelf()), &MaterialBase::updateLock);
+        }
+     }
+    void
+    MaterialBase::updateLock() {
+        AC_TRACE << "MaterialBase::updateLock()";
+        Node & myNode = getNode();
+        if (myNode) {
+            AC_TRACE << "MaterialBase::updateLock() - callback registered";
+            if (get<EnabledTag>()) {
+                ensureShader();
+            }
+        }
+     }
     
 
     bool
@@ -75,7 +106,7 @@ namespace y60 {
     MaterialBase::getGroup1Hash() const {
         return getChild<MaterialPropertiesTag>()->get<MaterialPropGroup1HashTag>();
     }
-
+/*
     bool 
     MaterialBase::rebindRequired() {
 		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
@@ -85,34 +116,128 @@ namespace y60 {
             return false;
         }
     }
+*/
+    const IShaderPtr
+    MaterialBase::getShader() const {
+        if (!get<EnabledTag>()) {
+            throw MaterialLocked(std::string("material id=")+get<IdTag>()+" is locked and must be unlocked to be rendered", PLUS_FILE_LINE);
+        }
+        const_cast<MaterialBase*>(this)->ensureShader();
+        return _myShader;
+    };
+    IShaderPtr MaterialBase::getShader() {
+        if (!get<EnabledTag>()) {
+            throw MaterialLocked(std::string("material id=")+get<IdTag>()+" is locked and must be unlocked to be rendered", PLUS_FILE_LINE);
+        }
+        ensureShader();
+        return _myShader;
+    };
+    void MaterialBase::ensureShader() {
+        AC_TRACE << "MaterialBase::ensureShader() - load & updateParams";
+        if (reloadRequired()) {
+            AC_TRACE << "MaterialBase::ensureShader() - load & updateParams";
+            load();
+        }
+    }
+	
+    void MaterialBase::ensureProperties() const {
+        if (!_ensuring && getNode().nodeVersion() != _myMaterialVersion) {
+            _ensuring = true;
+            const_cast<MaterialBase*>(this)->load();
+            _ensuring = false;
+            _myMaterialVersion = getNode().nodeVersion();
+        }
+    }
+
 
     void
-    MaterialBase::load(TextureManagerPtr theTextureManager) {
+    MaterialBase::load() {
+        if (!get<EnabledTag>()) {
+            AC_TRACE << "MaterialBase::load not performed because material is not enabled, material id" << get<IdTag>();
+            return;
+        }
+        DB(AC_TRACE << "MaterialBase::load " << getNode());
+        MaterialBasePtr myMaterial = getNode().getFacade<MaterialBase>();
 
-        addTextures(getNode().childNode(TEXTUREUNIT_LIST_NAME), theTextureManager);
-        AC_TRACE << "loading: " << get<NameTag>();
+        Scene & myScene = getScene();
 
-        if (_myShader) {
-            const VectorOfString * myLightingFeature = _myShader->getFeatures(LIGHTING_FEATURE);
+        IShaderPtr myShader;
+        if (myScene.getShaderLibrary()) {
+            // 2. ask shaderlib for shaderdefinition
+            myShader = myScene.getShaderLibrary()->findShader(myMaterial);
+            if (!myShader) {
+                throw SceneException(string("No shader defintion found for Material: ") + get<NameTag>(), PLUS_FILE_LINE);
+            }
+            DB(AC_TRACE << "load shader");
+            myShader->load(*myScene.getShaderLibrary());
+            // 3. decide which material to build
+            // 4. load material from node
+            // 5. give material the found shaderdefinition
+        }
+        _myShader = myShader;
+        DB(AC_TRACE << "Material::load(): Load material " << endl << getNode() <<
+            endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
+
+        if (myShader) {
+            typedef map<string,bool> PropertyUsedMap;
+            PropertyUsedMap myPropertyNames;
+
+            NodePtr myPropertiesNode = getNode().childNode(PROPERTY_LIST_NAME);
+            if (myPropertiesNode) {
+                // remove sampler properties since they may change with the new shader
+                for (int i = myPropertiesNode->childNodesLength()-1; i >= 0; --i) {
+                    NodePtr myPropertyNode = myPropertiesNode->childNode(i);
+                    const std::string & myPropTagName = myPropertyNode->nodeName();
+                    const std::string & myPropName = myPropertyNode->getAttributeString("name");
+                    if (myPropTagName == "sampler1d" || myPropTagName == "sampler2d" || myPropTagName == "samplerCUBE") {
+                        AC_DEBUG << "Removing sampler property '" << myPropName << "'";
+                        myPropertiesNode->removeChild(myPropertyNode);
+                    } else {
+                        myPropertyNames[myPropName] = false;
+                    }
+                }
+            }
+
+            for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
+                // default property with the shader default, unless the material already has that property
+                myPropertiesNode = myShader->getPropertyNode(i);
+                for (unsigned j = 0; j < myPropertiesNode->childNodesLength(); ++j) {
+                    dom::NodePtr myPropertyNode  = myPropertiesNode->childNode(j);
+                    if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE && myPropertyNode->nodeName() != "#comment") {
+                        const std::string & myPropName = myPropertyNode->getAttributeString("name");
+                        if (myPropertyNames.find(myPropName) == myPropertyNames.end()) {
+                            mergeProperties(myPropertyNode);
+                        }
+                    }
+                }
+            }
+        }
+
+        addTextures(getNode().childNode(TEXTUREUNIT_LIST_NAME), myScene.getTextureManager());
+
+        if (myShader) {
+            const VectorOfString * myLightingFeature = myShader->getFeatures(LIGHTING_FEATURE);
             if (myLightingFeature && myLightingFeature->size() == 1) {
                 _myLightingModel = LightingModel(getEnumFromString((*myLightingFeature)[0],LightingModelString));
             } else {
                 throw ShaderException("Shader has none or more than one lightingmodels.I do not know how to light this buddy.",
                     PLUS_FILE_LINE);
             } 
-            _myShader->setup(*this);
+            myShader->setup(*this);
         } else {
             _myLightingModel = UNLIT;
         }
 
         updateParams();
+        DB(AC_TRACE << "Material::load() - id: " << myMaterial->get<IdTag>()
+                    << ", name: " << myMaterial->get<NameTag>());
     }
-
+/*
     void
     MaterialBase::setShader(IShaderPtr theShader) {
         _myShader = theShader;
     }
-
+*/
     void
     MaterialBase::mergeProperties(const dom::NodePtr & theShaderPropertyNode) {
 
@@ -132,12 +257,19 @@ namespace y60 {
             if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
                 theShaderPropertyNode->nodeName() != "#comment") 
             {
+                AC_TRACE << "MaterialBase::mergeProperties(): adding property "<<*theShaderPropertyNode<<" from shader to material:" << getNode();
                 getNode().childNode(PROPERTY_LIST_NAME)->appendChild(
                                 theShaderPropertyNode->cloneNode(Node::DEEP));
+                AC_TRACE << "MaterialBase::mergeProperties(): done: adding property from shader to material:" << getNode();
             }
         } else {
             // set the value of the material with the shaders value
+            AC_TRACE << "MaterialBase::mergeProperties(): setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
+            
+            // TODO: This seems to wrong that shader-properties do overwrite material properties if they already exist, but the test baseline assumes that this
+            // happens.
             myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
+            AC_TRACE << "MaterialBase::mergeProperties(): done: setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
         }
     }
 
@@ -180,7 +312,7 @@ namespace y60 {
                     dom::NodePtr curPropList = _myShader->getPropertyNode(i);
 
                     for (unsigned j = 0; j < curPropList->childNodesLength(); ++j) {
-                        // Q: What about the other samplers (3d, Cube, etc)? [DS]
+                        // Q: What about the other samplers (sampler3d, samplerCube, etc)? [DS]
                         dom::NodePtr mySamplerNode = curPropList->childNode(j);
                         if (mySamplerNode->nodeName() == "sampler2d") { 
                             unsigned myTextureIndex = (*mySamplerNode)("#text").dom::Node::nodeValueAs<unsigned>();
@@ -265,7 +397,7 @@ namespace y60 {
 
         _myMaterialVersion = getNode().nodeVersion();
         _myRequiresVersion = myReqFacade->getNode().nodeVersion();
-        _myIdTagVersion    = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
+        //_myIdTagVersion    = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
         AC_DEBUG << "Updating params for material " << get<NameTag>() << " materialVersion:" << _myMaterialVersion << " requiresVersion:" << _myRequiresVersion;
 
         _myTexGenModes.clear();
@@ -280,6 +412,7 @@ namespace y60 {
  
                 const VectorOfString & myTexCoordFeature = myTexCoordFeatures[0]._myFeature;
                 for (unsigned myTexUnit = 0 ; myTexUnit < myTexCoordFeature.size(); ++myTexUnit) {
+                AC_TRACE << " MaterialBase::updateParams(): myTexCoordFeature[="<<myTexUnit<<"]='"<<myTexCoordFeature[myTexUnit]<<"'";
                     TexGenMode myTexGenModes;
                     TexGenParams myTexGenParams;
 

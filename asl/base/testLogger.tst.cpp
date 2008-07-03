@@ -24,6 +24,8 @@
 #include "Logger.h"
 
 #include "UnitTest.h"
+#include "string_functions.h"
+#include "Dashboard.h"
 #include <string>
 #include <iostream>
 
@@ -53,6 +55,32 @@ public:
        SUCCESS("first");
     }
 };
+
+std::string wasteTime() {
+    int s = 0;
+    for (int i = 0; i<10000;++i) {
+       s+=random();
+    }
+    return asl::as_string(s);
+}
+
+class LoggerPerfTest : public UnitTest {
+public:
+    LoggerPerfTest() : UnitTest("LoggerPerfTest") {}
+    void run() {
+        const int myTestCount = 100000000;
+        asl::Time myStart;
+        for (int i = 0; i < myTestCount; ++i) {
+            AC_DEBUG << "This is a Test Warning Log Entry" << wasteTime();       
+            //int * myPtr = new int(1);
+        }
+        double myTime = asl::Time() - myStart;
+        cerr << myTestCount << " logchecks took " << myTime << "secs., " << myTestCount/myTime/(1000*1000) << " mio. checks/sec" << endl;
+       
+       SUCCESS("ready");
+    }
+};
+
 
 #if 0
 
@@ -140,21 +168,21 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
+        addTest(new LoggerPerfTest,10);
         addTest(new LoggerUnitTest,10);
     }
 };
 
-
 int main(int argc, char *argv[]) {
+    Dashboard::get().print(cout);
 
     MyTestSuite mySuite(argv[0], argc, argv);
-
     //asl::Logger::get().setVerbosity(Severity(argc));
     mySuite.run();
 
     cerr << ">> Finished test suite '" << argv[0] << "'"
         << ", return status = " << mySuite.returnStatus() << endl;
-
+    Dashboard::get().print(cout);
     return mySuite.returnStatus();
 }
 

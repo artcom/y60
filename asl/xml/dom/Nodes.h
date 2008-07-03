@@ -220,6 +220,8 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Node,SchemaNotParsed,Exception);
         DEFINE_NESTED_EXCEPTION(Node,TypeMismatch,Exception);
         DEFINE_NESTED_EXCEPTION(Node,DuplicateIDValue,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,DuplicateNode,Exception);
+        DEFINE_NESTED_EXCEPTION(Node,NodeNotRegistered,Exception);
         DEFINE_NESTED_EXCEPTION(Node,IDValueNotRegistered,Exception);
         DEFINE_NESTED_EXCEPTION(Node,DuplicateIDRefValue,Exception);
         DEFINE_NESTED_EXCEPTION(Node,IDRefValueNotRegistered,Exception);
@@ -1022,7 +1024,7 @@ namespace dom {
         }
         virtual void freeCaches() const;
         virtual bool flushUnusedChildren() const;
-protected:
+    protected:
         NodePtr loadPathById(const DOMString & theId, const DOMString & theIdAttribute);
         void collectOffsets(NodeOffsetCatalog & theCatalog, asl::AC_SIZE_TYPE theParentIndex = asl::AC_SIZE_TYPE(-1)) const {
             theParentIndex = theCatalog.enterUID(_myUniqueId, _mySavePosition, _mySaveEndPosition, theParentIndex);
@@ -1033,7 +1035,9 @@ protected:
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, OpMode theLoadMode, bool & theUnmodifiedProxyFlag);
         void binarize(asl::WriteableStream & theDest, Dictionaries & theDict, asl::Unsigned64 theIncludeVersion) const;
         void binarize(asl::WriteableStream & theDest, Dictionaries & theDict, asl::Unsigned64 theIncludeVersion, asl::Unsigned32 theMagic) const;
-public:
+        void unregisterName();
+        void registerName();
+    public:
         void addSchema(const DOMString & theSchemaString, const DOMString & theNSPrefix);
         void addSchema(const dom::Node & theSchemaDoc, const DOMString & theNSPrefix);
         void loadSchemas(const DOMString & theURLS);
@@ -1080,6 +1084,16 @@ public:
         const FacadePtr getFacade() const;
 
         template <class TARGET_FACADE>
+        asl::Ptr<TARGET_FACADE, dom::ThreadingModel> tryGetFacade() {
+            return dynamic_cast_Ptr<TARGET_FACADE>(getFacade());
+        }
+
+        template <class TARGET_FACADE>
+        const asl::Ptr<TARGET_FACADE, dom::ThreadingModel> tryGetFacade() const {
+            return dynamic_cast_Ptr<TARGET_FACADE>(getFacade());
+        }
+
+        template <class TARGET_FACADE>
         asl::Ptr<TARGET_FACADE, dom::ThreadingModel> getFacade() {
             asl::Ptr<TARGET_FACADE, dom::ThreadingModel> myFacade = dynamic_cast_Ptr<TARGET_FACADE>(getFacade());
             if (!myFacade) {
@@ -1095,6 +1109,18 @@ public:
                 throw Facade::Exception("Dynamic cast of facade failed", PLUS_FILE_LINE);
             }
             return myFacade;
+        }
+
+         template <class TARGET_FACADE>
+         std::vector<asl::Ptr<TARGET_FACADE, dom::ThreadingModel> > getAllFacades(const std::string & theElementName) {
+            std::vector<asl::Ptr<TARGET_FACADE, dom::ThreadingModel> > myResult;
+            NodeIDRegistry::NodeSet * myNodes = getIDRegistry()->getNodes(theElementName);
+            if (myNodes) {
+                for (NodeIDRegistry::NodeSet::iterator it = myNodes->begin(); it!=myNodes->end();++it) {
+                    myResult.push_back((*it)->self().lock()->getFacade<TARGET_FACADE>());
+                }
+            }
+            return myResult;
         }
 
         const NodePtr childNodeByAttribute(const DOMString & theElementName,
@@ -1119,10 +1145,19 @@ public:
         const NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute="id") const;
         NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute="id");
 
+        /// Does not return the document node, but the root element node
+        /// A better name would is getRootElement(), but the name getRootNode() is defined
+        /// in the dom-standard. Use "getRealRootNode()" or getDocumentNode() to get the document node.
         const Node * getRootNode() const;
         Node * getRootNode();
         const Node * getRealRootNode() const;
         Node * getRealRootNode();
+        
+        // some better names for above functions
+        const Node * getRootElement() const {return getRootNode();}
+        Node * getRootElement() {return getRootNode();}
+        const Node * getDocumentNode() const {return getRealRootNode();}
+        Node * getDocumentNode() {return getRealRootNode();}
 
         // EventTarget Interface
         void addEventListener(const DOMString & type,
@@ -1301,6 +1336,7 @@ Dependent on node type allowed children are:<p>
         Node *            _myParent;
         NodeWeakPtr       _mySelf;
         mutable NodeIDRegistryPtr _myIDRegistry;
+        mutable NodeIDRegistryWeakPtr _myNameRegistry;
         mutable NodeIDRefRegistryPtr _myIDRefRegistry;
         ValuePtr          _myValue;
         mutable NodeList  _myChildrenList; // entities when doctype

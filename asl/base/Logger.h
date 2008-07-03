@@ -219,7 +219,10 @@ namespace asl {
 #ifdef WIN32
 #define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
 #else
-#define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
+#define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
+
+#define MAKEUNIQUE(x) myVar_##x
+#define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
 #endif
 
 // Although it might look obscure, this macro should generate no code at all and remove the logging
@@ -230,7 +233,7 @@ namespace asl {
 
 /**
 Use AC_PRINT << "myMessage" in situations when a message should be printed and logged anyway, possibly without formatting */
-#define AC_PRINT AC_LOG(asl::SEV_PRINT, __FILE__, __LINE__)
+#define AC_PRINT AC_LOG_CHECK(asl::SEV_PRINT, __FILE__, __LINE__)
 /**
 Use AC_FATAL << "myErrorMessage" in situations when a severe condition (e.g. memory corruption) was
 detected and you are going to abort program execution. */
@@ -242,7 +245,7 @@ might the reason for undesired or unexpected behavior of the application*/
 #define AC_ERROR AC_LOG(asl::SEV_ERROR, __FILE__, __LINE__)
 /**
 Use AC_WARNING << "myWarningMessage" in situations when an error occured that will be
-compensated but might degrade user experience (e.g. performace, lack of features) */
+compensated but might degrade user experience (e.g. performance, lack of features) */
 #define AC_WARNING AC_LOG(asl::SEV_WARNING, __FILE__, __LINE__)
 /**
 Use AC_INFO << "myInfoMessage" in situations to inform about resource usage,

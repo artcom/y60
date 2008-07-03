@@ -41,7 +41,7 @@ namespace y60 {
                                                  const string & theName,
                                                  float theEqualPointsThreshold) {
         ShapeBuilder myShapeBuilder(theName);
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
+        ElementBuilder myElementBuilder(PrimitiveTypeStrings[TRIANGLES], theMaterialId);
         
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
         

@@ -219,11 +219,14 @@ namespace y60 {
                             int theSchemaIndex, bool theBinaryFlag = false);
 
             LightVector & getLights() {
+                updateLights();
                 return _myLights;
             }
+#if 0
             std::vector<dom::NodePtr> & getAnalyticGeometry() {
                 return _myAnalyticGeometry;
             }
+#endif
 
             const Statistics getStatistics() const;
 
@@ -337,11 +340,11 @@ namespace y60 {
                                     CollisionInfo & theCollision,
                                     bool theIntersectInvisibleBodysFlag = true);
 
-	        void reverseUpdateShape(ShapePtr theShape);
-            void reverseUpdateShapes();
+	        //void reverseUpdateShape(ShapePtr theShape);
+            //void reverseUpdateShapes();
 
             void setup();
-            void clearShapes();
+            //void clearShapes();
 
             /**
              * Register a ResourceManager with the scenes Texturemanager. The ResourceManager
@@ -360,20 +363,22 @@ namespace y60 {
             const IResourceManager * getResourceManager() const;
             IResourceManager * getResourceManager();
 
+            IShaderLibraryPtr getShaderLibrary() const;
         private:
+            void updateLights();
             void setSceneDom(dom::DocumentPtr theDocument);
             void updateReferences(dom::NodePtr theRootNode,
                 std::map<std::string, std::string> & theOldToNewIdMap);
             void createUniqueIds(dom::NodePtr theDocument, dom::NodePtr theNode,
                 std::map<std::string, std::string> & theOldToNewIdMap, const std::string & theFilename);
 
-            void buildShape(ShapePtr theShape);
-            void updateShapes();
-            void loadMaterial(dom::NodePtr theMaterialNode);
-            void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
-            void rebindMaterials();            
+            //void buildShape(ShapePtr theShape);
+            //void updateShapes();
+            //void loadMaterial(dom::NodePtr theMaterialNode);
+            //void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
+            //void rebindMaterials();            
             void loadAnimations();
-            void updateMaterials();
+            //void updateMaterials();
 
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
             void removeDangelingNodes(dom::NodePtr theNode, dom::NodePtr theDocument);
@@ -382,11 +387,11 @@ namespace y60 {
 
             void calculateShapeBoundingBox(ShapePtr myShape);
 
-            void updateTransformHierachy(dom::NodePtr theNode,
-                                         const asl::Matrix4f & theParentMatrix);
-
+            void updateTransformHierachy(dom::NodePtr theNode);
+/*
             Primitive & createPrimitive(int theMaterialNumber,
                                         const std::string & theShapeId, unsigned int theDomIndex);
+*/
             void collectCameras(dom::NodeList & theCameras, dom::NodePtr theNode) const;
 
             template <class VISITOR>
@@ -397,7 +402,6 @@ namespace y60 {
 
             unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
 
-            IShaderLibraryPtr getShaderLibrary() const;
             void setupShaderLibrary();
 
             SceneBuilderPtr          _mySceneBuilder;
@@ -405,7 +409,7 @@ namespace y60 {
             AnimationManager         _myAnimationManager;
 
             LightVector               _myLights;
-            std::vector<dom::NodePtr> _myAnalyticGeometry;
+            //std::vector<dom::NodePtr> _myAnalyticGeometry;
 
             dom::DocumentPtr         _mySceneDom;
             Statistics               _myStatistics;

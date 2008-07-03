@@ -91,7 +91,7 @@ dom::NodeList::setVersion(unsigned long long theVersion) {
     }
 }
 
-dom::NodeList::NodeList(const NodeList & theOtherList, Node * theShell) : _myShell(theShell){
+dom::NodeList::NodeList(const NodeList & theOtherList, Node * theShell) : _myShell(theShell) {
 	_myNodes = theOtherList._myNodes;
 }
 

@@ -61,7 +61,6 @@ namespace y60 {
         return myName;
     }
 
-    //dom::ValuePtr
     dom::NodePtr
     AnimationManager::findAnimatedValue(dom::NodePtr theNode,
                                         const string & theAttributeRef,

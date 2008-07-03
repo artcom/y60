@@ -281,6 +281,8 @@ namespace y60 {
         unsigned myTextureCount = theMaterial.getTextureUnitCount();
         AC_TRACE << "GLShader::enableTextures '" << theMaterial.get<NameTag>() << "' id=" << theMaterial.get<IdTag>() << " texunits=" << myTextureCount;
 
+        asl::Unsigned64 myFrameNumber = theMaterial.get<LastActiveFrameTag>();
+
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned i = 0; i < myTextureCount; ++i) {
@@ -296,6 +298,7 @@ namespace y60 {
 
             const y60::TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
             y60::TexturePtr myTexture = myTextureUnit.getTexture();
+            myTexture->set<LastActiveFrameTag>(myFrameNumber);
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
@@ -321,6 +324,7 @@ namespace y60 {
             asl::Matrix4f myMatrix;
             const y60::ImagePtr & myImage = myTexture->getImage();
             if (myImage) {
+                const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(myFrameNumber);
                 myMatrix = myImage->get<ImageMatrixTag>();
                 myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
             } else {

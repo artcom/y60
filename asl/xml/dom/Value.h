@@ -32,6 +32,7 @@
 #include <asl/Logger.h>
 
 #include <map>
+#include <set>
 #include <typeinfo>
 
 #define DB(x) // x
@@ -563,6 +564,8 @@ namespace dom {
     public:
         typedef std::map<DOMString, Node *> IDMap;
         typedef std::map<DOMString, IDMap> IDMaps;
+        typedef std::set<Node*> NodeSet;
+        typedef std::map<DOMString, NodeSet> NodeNameMap;
     public:
         void registerID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue, dom::Node * theElement);
         void unregisterID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue);
@@ -574,6 +577,18 @@ namespace dom {
                 return 0;
             }
             return &myMap->second;
+        }
+        void registerNodeName(dom::Node * theNode);
+        void unregisterNodeName(dom::Node * theNode);
+        NodeNameMap & getNodeNames() {
+            return _myNodeNames;
+        }
+        NodeSet * getNodes(const DOMString & theName) {
+            NodeNameMap::iterator myNodes = _myNodeNames.find(theName);
+            if (myNodes != _myNodeNames.end()) {
+                return &myNodes->second;
+            }
+            return 0;
         }
         bool hasOffsetCatalog() const {
             return _myOffsets;
@@ -600,6 +615,7 @@ namespace dom {
         }
      private:
         IDMaps _myIDMaps;
+        NodeNameMap _myNodeNames;
         mutable asl::Ptr<NodeOffsetCatalog> _myOffsets;
         mutable DictionariesPtr _myDicts;
         mutable asl::Ptr<asl::ReadableStreamHandle> _myStorage;

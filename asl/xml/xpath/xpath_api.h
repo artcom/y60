@@ -42,6 +42,9 @@ namespace xpath {
 
     std::vector<dom::Node *> *xpath_evaluate(Path *, dom::Node *);
     std::vector<dom::Node *> *xpath_evaluate(std::string, dom::Node *);
+
+    std::vector<dom::NodePtr> findAll(dom::Node & theRoot, const std::string & theExpression);
+    dom::NodePtr find(dom::Node & theRoot, const std::string & theExpression);
 };
 
 #endif

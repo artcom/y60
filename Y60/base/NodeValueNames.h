@@ -550,6 +550,36 @@ namespace y60 {
         ""
     };
     DEFINE_ENUM(BlendFunction, BlendFunctionEnum);
+
+    // same as GL_POINTS, GL_LINES etc.
+    enum PrimitiveTypeEnum {
+        POINTS         = 0,
+        LINES          = 1,
+        LINE_LOOP      = 2,
+        LINE_STRIP     = 3,
+        TRIANGLES      = 4,
+        TRIANGLE_STRIP = 5,
+        TRIANGLE_FAN   = 6,
+        QUADS          = 7,
+        QUAD_STRIP     = 8,
+        POLYGON        = 9,
+        PrimitiveTypeEnum_MAX
+    };
+
+    static const char * PrimitiveTypeStrings[] = {
+        "points",
+        "lines",
+        "lineloop",
+        "linestrip",
+        "triangles",
+        "trianglestrip",
+        "trianglefan",
+        "quads",
+        "quadstrip",
+        "polygon",
+        ""
+    };
+    DEFINE_ENUM(PrimitiveType, PrimitiveTypeEnum);
     
     enum TargetBuffersEnum {
         RED_MASK,

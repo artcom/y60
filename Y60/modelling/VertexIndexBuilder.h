@@ -29,7 +29,7 @@ namespace y60 {
 
     struct PointBuilder {
         std::string getType() const {
-            return PRIMITIVE_TYPE_POINTS;
+            return PrimitiveTypeStrings[POINTS];
         }
 
         void createIndices(ElementBuilder & theElementBuilder, unsigned theXVertexCount,
@@ -55,7 +55,7 @@ namespace y60 {
     
     struct QuadBuilder {
         std::string getType() const {
-            return PRIMITIVE_TYPE_QUADS;
+            return PrimitiveTypeStrings[QUADS];
         }
 
         void createIndices(ElementBuilder & theElementBuilder, unsigned theXVertexCount,
@@ -97,7 +97,7 @@ namespace y60 {
 
     struct QuadStripBuilder {
         std::string getType() const {
-            return PRIMITIVE_TYPE_QUAD_STRIP;
+            return PrimitiveTypeStrings[QUAD_STRIP];
         }
 
         void createIndices(ElementBuilder & theElementBuilder, unsigned theXVertexCount,

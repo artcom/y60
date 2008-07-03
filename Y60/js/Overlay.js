@@ -548,18 +548,33 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	}
 
 	function addTextureRequirements(theTextureCount) {
+/*
         var myFindString = "//*[@name='textures']";
 		var myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "textures", false);
 		if (myTextureFeatures == null) {
-			myTextureFeatures = new Node("<feature name='textures'>[10[sds]]</feature>").firstChild;
+			myTextureFeatures = new Node("<feature name='textures'>[10[paint]]</feature>").firstChild;
 			Public.material.requires.appendChild(myTextureFeatures);
 		}
         myFindString = "//*[@name='texcoord']";
 		myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
 		if (myTextureFeatures == null) {
-			myTextureFeatures = new Node("<feature name='texcoord'>[10[sds]]</feature>").firstChild;
+			myTextureFeatures = new Node("<feature name='texcoord'>[10[uv_map]]</feature>").firstChild;
 			Public.material.requires.appendChild(myTextureFeatures);
 		}
+*/
+        var myFragment = Node.createDocumentFragment();
+        if (!("textures" in Public.material.requires)) {
+            myFragment.appendChild(new Node("<feature name='texcoord'>[10[uv_map]]</feature>").firstChild);
+        }
+        if (!("textures" in Public.material.requires)) {
+            myFragment.appendChild(new Node("<feature name='textures'>[10[paint]]</feature>").firstChild);
+        }
+
+        if (myFragment.childNodes.length) {
+            // append all nodes in one call to avoid incomplete feature set
+            Public.material.requires.appendChild(myFragment);
+        }
+
 		Public.material.requires.textures = createTextureFeatureString(theTextureCount);
 		Public.material.requires.texcoord = createTexcoordFeatureString(theTextureCount);
 	}

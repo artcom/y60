@@ -153,13 +153,16 @@ as_jsval(JSContext *cx, const char * theU8String) {
     delete [] myWChars;
     return STRING_TO_JSVAL(myString);
 #else
-    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,0);
+    GError *error = NULL;
+    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,&error);
     if ( ! myUTF16) {
         ostringstream os;
         os << "Failed to convert UTF8 to UTF16. '" << theU8String << "' hex:";
         for (unsigned i = 0; i < strlen(theU8String); ++i) {
             os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
         }
+        os << ", reason: "<<error->message;
+        //g_clear_error(&error);
         throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE); 
     }
     

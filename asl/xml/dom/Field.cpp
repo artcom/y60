@@ -296,7 +296,9 @@ namespace dom {
     Field::onSetValue() {
         // [CH]: This is not neccessary, because ensureDependencies only updates precursors, not the dependents.
         // This might also be the reason, why in some rare cases, the dependency network does not work.
-        //ensureDependencies();
+        // [PM]: however, it is necessary in order to make the immediate-callback work properly, which is
+        // used for render-event generation
+        ensureDependencies();
 		if (_myImmediateCB) {
 	        const_cast<Field*>(this)->_myImmediateCB->callback();
 		}

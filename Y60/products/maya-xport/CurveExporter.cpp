@@ -233,7 +233,7 @@ exportCurve(MFnDagNode & theDagNode, WorldBuilderBase & theParentTransform, Scen
     myShapeBuilder.createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, 1);
     myShapeBuilder.appendVertexData(NORMAL_ROLE, asl::Vector3f(1, 0, 0));
 
-    ElementBuilder myElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, myMaterialId);
+    ElementBuilder myElementBuilder(PrimitiveTypeStrings[LINE_STRIP], myMaterialId);
     myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myVertexCount);
     myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, 1);
 

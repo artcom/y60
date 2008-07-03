@@ -183,7 +183,7 @@ namespace y60 {
              myShapeName.erase(myShapeNameEnd);
          }
 
-         ElementBuilder elementBuilder(PRIMITIVE_TYPE_TRIANGLES, materialId);
+         ElementBuilder elementBuilder(PrimitiveTypeStrings[TRIANGLES], materialId);
          ShapeBuilder shapeBuilder(std::string("s") + myShapeName, false);
          shapeBuilder.appendElements(elementBuilder);
          sceneBuilder.appendShape(shapeBuilder);

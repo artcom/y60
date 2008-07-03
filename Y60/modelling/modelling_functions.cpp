@@ -247,7 +247,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         float myStep = 2 * float(PI) / myCircleSubdivision;
 
         CircularPosition myPositionFunction(Vector3f(0.0, 0.0, 0.0), theInnerRadius, myStep);
-        ElementBuilder myCircleElementBuilder(PRIMITIVE_TYPE_LINE_LOOP, theMaterialId);
+        ElementBuilder myCircleElementBuilder(PrimitiveTypeStrings[LINE_LOOP], theMaterialId);
 
         myShapeBuilder.appendElements(myCircleElementBuilder);
 
@@ -267,7 +267,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         myShapeBuilder.appendVertexData(POSITION_ROLE, Vector3f(0.0, - theHairLength, 0.0));
         myShapeBuilder.appendVertexData(POSITION_ROLE, Vector3f( - theHairLength, 0.0, 0.0));
 
-        ElementBuilder myHairElementBuilder(PRIMITIVE_TYPE_LINES, theMaterialId);
+        ElementBuilder myHairElementBuilder(PrimitiveTypeStrings[LINES], theMaterialId);
         myHairElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 8);
         myShapeBuilder.appendElements(myHairElementBuilder);
 
@@ -338,7 +338,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         }
 
 
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theMaterialId);
+        ElementBuilder myElementBuilder(PrimitiveTypeStrings[LINE_STRIP], theMaterialId);
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 3);
 
         myElementBuilder.appendIndex(POSITIONS, 1);
@@ -347,7 +347,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         myShapeBuilder.appendElements( myElementBuilder );
 
-        ElementBuilder myCircleElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theMaterialId);
+        ElementBuilder myCircleElementBuilder(PrimitiveTypeStrings[LINE_STRIP], theMaterialId);
         myCircleElementBuilder.createIndex(POSITION_ROLE, POSITIONS, mySteps);
 
         for (unsigned i = 0; i < mySteps; ++i) {
@@ -408,7 +408,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         }
 
         // build the triangle fan
-        ElementBuilder myCircleElementBuilder(PRIMITIVE_TYPE_TRIANGLE_FAN, theMaterialId);
+        ElementBuilder myCircleElementBuilder(PrimitiveTypeStrings[TRIANGLE_FAN], theMaterialId);
         myCircleElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 1 + myDiskSubdivisions);
         myCircleElementBuilder.appendIndex(POSITIONS, 0);
 
@@ -431,7 +431,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, 2);
 
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theMaterialId);
+        ElementBuilder myElementBuilder(PrimitiveTypeStrings[LINE_STRIP], theMaterialId);
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
 
         for(unsigned i = 0; i < thePositions.size(); ++i) {
@@ -449,7 +449,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             const std::vector<asl::Vector2f> & theTexCoords,
             const std::vector<asl::Vector4f> & theColors)
     {
-        return createStrip(PRIMITIVE_TYPE_LINE_STRIP, theScene, 
+        return createStrip(PrimitiveTypeStrings[LINE_STRIP], theScene, 
                 theMaterialId, thePositions, theTexCoords, theColors);
     }
 
@@ -459,7 +459,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             const std::vector<asl::Vector2f> & theTexCoords,
             const std::vector<asl::Vector4f> & theColors) 
     {
-        return createStrip(PRIMITIVE_TYPE_QUAD_STRIP, theScene, 
+        return createStrip(PrimitiveTypeStrings[QUAD_STRIP], theScene, 
                 theMaterialId, thePositions, theTexCoords, theColors);
     }
 
@@ -472,7 +472,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     {
         bool needColors = theColors.size() !=0;
         bool needsNormals = false;
-        if (theType == PRIMITIVE_TYPE_QUAD_STRIP || theType == PRIMITIVE_TYPE_TRIANGLE_STRIP) {
+        if (theType == PrimitiveTypeStrings[QUAD_STRIP] || theType == PrimitiveTypeStrings[TRIANGLE_STRIP]) {
             needsNormals = true;
         }            
 
@@ -549,8 +549,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             const std::string & theName)
     {
         ShapeBuilder myShapeBuilder(theName);
-        ElementBuilder myLineElementBuilder(PRIMITIVE_TYPE_LINES, theLineMaterialId);
-        ElementBuilder myAreaElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theAreaMaterialId);
+        ElementBuilder myLineElementBuilder(PrimitiveTypeStrings[LINES], theLineMaterialId);
+        ElementBuilder myAreaElementBuilder(PrimitiveTypeStrings[TRIANGLES], theAreaMaterialId);
 
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
 
@@ -597,7 +597,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         float myDeltaDist = sqrt(theSize * theSize + theSize * theSize + theSize * theSize) / myNumSlices;
 
         ShapeBuilder myShapeBuilder(theName);
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_QUADS, theMaterialId);
+        ElementBuilder myElementBuilder(PrimitiveTypeStrings[QUADS], theMaterialId);
 
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
         myShapeBuilder.appendElements(myElementBuilder);
@@ -936,7 +936,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         // sum up the normals for each element
         for (unsigned int i = 0; i < myElementCount; ++i) {
             dom::NodePtr myElementNode = myPrimitivesNode->childNode(ELEMENTS_NODE_NAME, i);
-            PrimitiveType myType = Primitive::getTypeFromNode(myElementNode);
+            //PrimitiveType myType = Primitive::getTypeFromNode(myElementNode);
+            PrimitiveType myType = myElementNode->getFacade<Primitive>()->get<PrimitiveTypeTag>();
             switch (myType) {
                 case QUADS:
                     smoothQuadNormals(*myNormalIndices[i], *myPositionIndices[i],
@@ -1095,7 +1096,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             }
         }
         ShapeBuilder myShape(theName);
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
+        ElementBuilder myElementBuilder(PrimitiveTypeStrings[TRIANGLES], theMaterialId);
 
         theScene->getSceneBuilder()->appendShape( myShape );
         myShape.appendElements( myElementBuilder );

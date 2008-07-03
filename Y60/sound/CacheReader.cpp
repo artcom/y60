@@ -55,7 +55,7 @@ Time CacheReader::getDuration() const {
 void CacheReader::seek (Time thePosition)
 {
     _myCurFrame = int(thePosition*_myCacheItem->getSampleRate());
-    AC_DEBUG << "CacheReader::seek(" << _myCurFrame << ")";
+    AC_TRACE << "CacheReader::seek(" << _myCurFrame << ")";
 }
 
 bool CacheReader::decode() {

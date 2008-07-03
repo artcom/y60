@@ -146,6 +146,7 @@ function setupBumpMap(theScene, theBodyOrShape, theNormalMap, theBaseMap) {
     var myMaterial = myElements.getElementById(myElements.material);
 
     // tweak requirements for normalmapping
+    myMaterial.enabled = false;
     myMaterial.requires.lighting = "[100[phong]]";
     if (theBaseMap) {
         myMaterial.requires.textures = "[100[paint,bump]]";
@@ -158,6 +159,7 @@ function setupBumpMap(theScene, theBodyOrShape, theNormalMap, theBaseMap) {
     if (!myTextureUnits) {
         myMaterial.appendChild(Node.createElement("textureunits"));
     }
+    myMaterial.enabled = true;
 
     // add base map
     if (theBaseMap) {

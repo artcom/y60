@@ -127,6 +127,7 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureType, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::ResizePolicy, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::ProjectionType, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::PrimitiveType, SimpleValue);
     
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::ImageType, SimpleValue);
 

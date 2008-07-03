@@ -495,7 +495,7 @@ CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return CreateStrip(PRIMITIVE_TYPE_LINE_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PrimitiveTypeStrings[LINE_STRIP], cx, obj, argc, argv, rval);
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
@@ -509,7 +509,7 @@ CreateQuadStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created quadstrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return CreateStrip(PRIMITIVE_TYPE_QUAD_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PrimitiveTypeStrings[QUAD_STRIP], cx, obj, argc, argv, rval);
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
@@ -523,7 +523,7 @@ CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
     DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created trianglestrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return CreateStrip(PRIMITIVE_TYPE_TRIANGLE_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PrimitiveTypeStrings[TRIANGLE_STRIP], cx, obj, argc, argv, rval);
 }
 
 

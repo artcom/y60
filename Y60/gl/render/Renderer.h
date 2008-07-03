@@ -106,6 +106,9 @@ namespace y60 {
                       const std::string & theRenderStyles = "");
 
             void renderFrustum(dom::NodePtr theProjectiveNode );
+            asl::Unsigned64 getFrameNumber() const {
+                return _myFrameNumber;
+            }
        private:
             void setupRenderState(ViewportPtr theViewport);
 
@@ -186,6 +189,7 @@ namespace y60 {
 
             // needed to avoid skybox/underlays interferences
             bool _myRenderedUnderlays;
+            asl::Unsigned64 _myFrameNumber;
 };
 
     typedef asl::Ptr<Renderer> RendererPtr;

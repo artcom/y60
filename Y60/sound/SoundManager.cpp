@@ -123,7 +123,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
 {
     // We need a factory function so we can set the Sound's mySelf pointer and
     // do some decoder creation and cache management magic.
-    AC_DEBUG << "SoundManager::createSound " << theURI << ", loop: " << theLoop 
+    AC_TRACE << "SoundManager::createSound " << theURI << ", loop: " << theLoop 
             << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
     IAudioDecoder * myDecoder;
@@ -132,7 +132,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
         checkCacheSize();
         myCacheItem = getCacheItem(theURI);
         if (myCacheItem == SoundCacheItemPtr(0)) {
-            AC_DEBUG << "    --> Sound not cached yet.";
+            AC_TRACE << "    --> Sound not cached yet.";
             // This sound hasn't been played before.
             myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
             addCacheItem(myCacheItem);
@@ -140,11 +140,11 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
         } else {
             if (myCacheItem->isFull()) {
                 // The sound is cached completely.
-                AC_DEBUG << "    --> Usable sound cache item exists.";
+                AC_TRACE << "    --> Usable sound cache item exists.";
                 myDecoder = new CacheReader(myCacheItem);
             } else {
                 // The sound is currently being cached. Ignore the cache.
-                AC_DEBUG << "    --> Sound cache item exists, but isn't complete.";
+                AC_TRACE << "    --> Sound cache item exists, but isn't complete.";
                 myDecoder = createDecoder(theURI);
                 myCacheItem = SoundCacheItemPtr(0);
             }
@@ -180,9 +180,9 @@ bool SoundManager::isRunning() const {
 }
 
 void SoundManager::preloadSound(const std::string& theURI) {
-    AC_DEBUG << "SoundManager::preloadSound(" << theURI << ")";
+    AC_TRACE << "SoundManager::preloadSound(" << theURI << ")";
     if (_myCache.find(theURI) != _myCache.end()) {
-        AC_DEBUG << "    --> Already in cache. Ignoring.";
+        AC_TRACE << "    --> Already in cache. Ignoring.";
         return;
     }
     checkCacheSize();
@@ -218,7 +218,7 @@ unsigned SoundManager::getNumItemsInCache() const {
 
 void SoundManager::stopAll() {
     {
-        AC_DEBUG << "SoundManager::stopAll";
+        AC_TRACE << "SoundManager::stopAll";
         std::vector < SoundWeakPtr >::iterator it;
         unsigned myNumSoundsStopped = 0;
         // Here, we'd like to just lock the Sounds, iterate through the sounds and
@@ -243,13 +243,13 @@ void SoundManager::stopAll() {
             msleep(1);
         }
         if (myNumSoundsStopped) {
-            AC_DEBUG << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
+            AC_TRACE << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
         }
     }
     msleep(100);
 
     update();
-    AC_DEBUG << "SoundManager::stopAll end";
+    AC_TRACE << "SoundManager::stopAll end";
 }
 
 void SoundManager::update() {
@@ -316,16 +316,16 @@ SoundCacheItemPtr SoundManager::getCacheItem(const std::string & theURI) const {
 }
 
 void SoundManager::checkCacheSize() {
-    AC_DEBUG << "SoundManager::checkCacheSize: " << getCacheMemUsed();
+    AC_TRACE << "SoundManager::checkCacheSize: " << getCacheMemUsed();
     if (getCacheMemUsed() > _myMaxCacheSize) {
-        AC_DEBUG << "SoundManager: removing excess items from cache.";
+        AC_TRACE << "SoundManager: removing excess items from cache.";
     }
     
     // TODO: Check if searching linearly is a performance hit and change if needed.
     // -> Maybe also move the cache to a separate class when that's nessesary.
     int myIteration = 0;
     while (getCacheMemUsed() > _myMaxCacheSize) {
-        AC_DEBUG << "    " << myIteration << ": " << getCacheMemUsed();
+        AC_TRACE << "    " << myIteration << ": " << getCacheMemUsed();
         CacheMap::iterator it;
         CacheMap::iterator myOldestItem = _myCache.begin();
         for (it=_myCache.begin(); it != _myCache.end(); ++it) {

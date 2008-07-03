@@ -31,7 +31,10 @@ public:
     static JSBool
     appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
-    static JSFunctionSpec * Functions();
+    static JSBool
+    clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
+     static JSFunctionSpec * Functions();
     enum PropertyNumbers {PROP_length = -100};
     static JSPropertySpec * Properties();
     static JSConstIntPropertySpec * ConstIntProperties();

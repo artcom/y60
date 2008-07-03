@@ -22,6 +22,7 @@
 #include <asl/GeometryUtils.h>
 #include "Body.h"
 #include "Scene.h"
+#include "Primitive.h"
 
 using namespace std;
 using namespace asl;
@@ -55,8 +56,8 @@ namespace y60 {
         AC_TRACE << "Body DTOR " << this << endl;
     }
     
-    static bool isSupportedPrimitive(const Primitive &thePrimitive) {
-        switch (thePrimitive.getType()) {
+    static bool isSupportedPrimitive(const Primitive & thePrimitive) {
+        switch (thePrimitive.get<PrimitiveTypeTag>()) {
             case TRIANGLES:
             case TRIANGLE_STRIP:
             case TRIANGLE_FAN:

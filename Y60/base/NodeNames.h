@@ -118,6 +118,7 @@ namespace y60 {
     static const char * FOGDENSITY_ATTRIB           = "fogdensity";
 
     static const char * PRIMITIVE_TYPE_ATTRIB          = "type";
+#if 0
     static const char * PRIMITIVE_TYPE_POINTS          = "points";
     static const char * PRIMITIVE_TYPE_LINES           = "lines";
     static const char * PRIMITIVE_TYPE_LINE_STRIP      = "linestrip";
@@ -128,6 +129,7 @@ namespace y60 {
     static const char * PRIMITIVE_TYPE_QUADS           = "quads";
     static const char * PRIMITIVE_TYPE_QUAD_STRIP      = "quadstrip";
     static const char * PRIMITIVE_TYPE_POLYGON         = "polygon";
+#endif
 
     static const char * VERTEX_BUFFER_USAGE_ATTRIB     = "vertexbufferusage";
  

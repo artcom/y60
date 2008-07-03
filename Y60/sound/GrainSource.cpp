@@ -59,7 +59,7 @@ GrainSource::~GrainSource() {
 //
 void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "GrainSource::deliverData();";
+    AC_TRACE << "GrainSource::deliverData();";
     ASSURE(getNumChannels() == theBuffer.getNumChannels());
     ASSURE(_mySampleRate == theBuffer.getSampleRate());
     ASSURE(_myGrainSize >= 1);
@@ -250,7 +250,7 @@ float GrainSource::getRatio() const {
 
 void GrainSource::setRatio(float theRatio) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    //    AC_DEBUG << "GrainSource::setRatio("<<theRatio<<");";
+    //    AC_TRACE << "GrainSource::setRatio("<<theRatio<<");";
     ASSURE(_myRatio > 0);
     if (theRatio > 0) {
         _myRatio = theRatio;
@@ -259,7 +259,7 @@ void GrainSource::setRatio(float theRatio) {
 
 void GrainSource::setRatioJitter(float theJitter) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    //    AC_DEBUG << "GrainSource::setRatioJitter("<<theJitter<<");";
+    //    AC_TRACE << "GrainSource::setRatioJitter("<<theJitter<<");";
     ASSURE(theJitter < _myRatio);
     if (theJitter < _myRatio) {
         _myRatioJitter = theJitter;
@@ -273,7 +273,7 @@ float GrainSource::getRatioJitter() const {
 
 void GrainSource::setTransposition(float theTransposition) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    //    AC_DEBUG << "GrainSource::setTransposition("<<theTransposition<<");";
+    //    AC_TRACE << "GrainSource::setTransposition("<<theTransposition<<");";
     _myRatio = pow(2.f, theTransposition/12.f);
     ASSURE(_myRatio > 0);
 }
@@ -281,7 +281,7 @@ void GrainSource::setTransposition(float theTransposition) {
 
 float GrainSource::getTransposition() const {
     float myTranspose = 12.f * log(_myRatio)/log(2.f);
-    //    AC_DEBUG << myTranspose << " = GrainSource::getTransposition()";
+    //    AC_TRACE << myTranspose << " = GrainSource::getTransposition()";
     return myTranspose;
 }
 
@@ -302,21 +302,21 @@ float GrainSource::getVolume() const {
 
 
 inline unsigned GrainSource::jitterValue(unsigned theValue, unsigned theJitter) const {
-    //    AC_DEBUG << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
+    //    AC_TRACE << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
     if (theJitter > 0) {
         theValue = theValue + (2 * (std::rand() % theJitter) - theJitter);
         if (theValue < 0) theValue = 1;
     }
-    //    AC_DEBUG << "result: " << theValue;
+    //    AC_TRACE << "result: " << theValue;
     return theValue;
 }
 
 inline float GrainSource::jitterValue(float theValue, float theJitter) const {
-    //    AC_DEBUG << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
+    //    AC_TRACE << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
     float myRandomFloat = (float)(std::rand() % 1000) / 1000.f; 
     float myResult = theValue + (2 * myRandomFloat * theJitter - theJitter);
-    //    AC_DEBUG << "randomFloat " << myRandomFloat;
-    //    AC_DEBUG << "result: " << myResult;
+    //    AC_TRACE << "randomFloat " << myRandomFloat;
+    //    AC_TRACE << "result: " << myResult;
     return myResult > 0 ? myResult : 0;
 }
 

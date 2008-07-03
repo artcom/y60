@@ -199,17 +199,17 @@ namespace inet {
         AC_INFO << "STATUS of fd:";
         switch(status & O_ACCMODE)
         {
-        case O_RDONLY:AC_INFO << "O_RDONLY, ";break;
-        case O_WRONLY:AC_INFO << "O_WRONLY, ";break;
-        case O_RDWR:AC_INFO << "O_RDWR, ";break;
-        default:AC_INFO << "O_?ILLEGAL?, ";break;
-        }
-        if (status & FNDELAY) AC_INFO <<   "FNDELAY, ";
-        if (status & FAPPEND) AC_INFO <<   "FAPPEND, ";
-        if (status & FFSYNC) AC_INFO <<    "FSYNC, ";
-        //   if (status & FRCACH) AC_INFO <<  "FRCACH, ";
-        if (status & FASYNC) AC_INFO <<    "FASYNC, ";
-        if (status & FNONBLOCK) AC_INFO << "FNONBLK";
+            case O_RDONLY:{AC_INFO << "O_RDONLY, ";break;}
+            case O_WRONLY:{AC_INFO << "O_WRONLY, ";break;}
+            case O_RDWR:{AC_INFO << "O_RDWR, ";break;}
+            default:{AC_INFO << "O_?ILLEGAL?, ";break;}
+       }
+        if (status & FNDELAY) {AC_INFO <<   "FNDELAY, ";}
+        if (status & FAPPEND) {AC_INFO <<   "FAPPEND, ";}
+        if (status & FFSYNC) {AC_INFO <<    "FSYNC, ";}
+        //   if (status & FRCACH) AC_INFO <<  "FRCACH, ";}
+        if (status & FASYNC) {AC_INFO <<    "FASYNC, ";}
+        if (status & FNONBLOCK) {AC_INFO << "FNONBLK";}
         AC_INFO << endl;
 #endif
     }

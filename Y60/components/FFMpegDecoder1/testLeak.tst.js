@@ -20,12 +20,11 @@ use("../../../../video/testLeak.js");
 
 const MOVIE_1 = "../../../../video/testmovies/1.1.mpg";
 const MOVIE_2 = "../../../../video/testmovies/1.4.mpg"
-//const MOVIE_2 = "../../../../video/testmovies/T2_pan_7.mpg";
 
 var myTestName = "y60FFMpegDecoder1 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder1";
-//var myVideoCount = 500;
-var myVideoCount = 5;
+var myVideoCount = 500;
+//var myVideoCount = 5;
 
 var myMovieLeak =  myVideoCount * 26 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
 

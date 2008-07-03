@@ -212,6 +212,7 @@ JSRenderer::Functions() {
 enum PropertyNumbers {
     PROP_boundingVolumeMode = -100,
     PROP_scene,
+    PROP_framenumber,
 // const static int for bounding volume mode
     PROP_BV_NONE,
     PROP_BV_SHAPE,
@@ -305,6 +306,7 @@ JSRenderer::Properties() {
     static JSPropertySpec myProperties[] = {
         {"boundingVolumeMode",PROP_boundingVolumeMode,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"scene",           PROP_scene,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"framenumber",     PROP_framenumber,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
         {0}
     };
     return myProperties;
@@ -331,6 +333,9 @@ JSRenderer::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             return JS_TRUE;
         case PROP_scene:
             *vp = as_jsval(cx, getScene().getSceneDom()->childNode("scene"));
+            return JS_TRUE;
+        case PROP_framenumber:
+            *vp = as_jsval(cx, asl::as_string(getNative().getFrameNumber()));
             return JS_TRUE;
         default:
             JS_ReportError(cx,"JSRenderer::getProperty: index %d out of range", theID);

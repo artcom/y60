@@ -12,6 +12,7 @@
 
 #include <y60/IScene.h>
 #include <dom/Field.h>
+#include <xpath/xpath_api.h>
 
 
 using namespace asl;
@@ -51,6 +52,7 @@ namespace y60 {
 #endif
         dom::FacadeAttributePlug<TextureParamChangedTag>(this),
         dom::FacadeAttributePlug<TextureNPOTMatrixTag>(this),
+        dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myResourceManager(0),
         _myRefCount(0),
         _myTextureId(0), 
@@ -175,8 +177,10 @@ namespace y60 {
         }
     }
 
+#if 0
     // This function may be correct but it looks fragile and might easily break when the dom structure
     // wil be changed.
+    // PM: and it broke...
     void
     Texture::ensureResourceManager() {
         AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
@@ -188,6 +192,19 @@ namespace y60 {
         }
         AC_TRACE << "Texture::ensureResourceManager (onexit)'" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
     }
+#else
+    void
+    Texture::ensureResourceManager() {
+        AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
+        if (_myResourceManager == 0) {
+            if (getNode()) {
+                IScenePtr myScene = getNode().getRootNode()->getFacade<IScene>();                
+                _myResourceManager = myScene->getResourceManager();
+            }
+        }
+        AC_TRACE << "Texture::ensureResourceManager (onexit)'" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
+    }
+#endif
 
     void
     Texture::calculateWidth() {

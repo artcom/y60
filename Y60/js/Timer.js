@@ -93,6 +93,9 @@ Timer.prototype.Constructor = function(obj, theName) {
             theCount = 1;
         }
 		var myIndex = _myTimes.length;
+        while (theName in _myTimerNames) {
+            theName = theName + "_";
+        }
 		_myTimes.push(millisec());
         _myCounts.push(theCount);
         _myElapsed.push(0);
@@ -105,9 +108,11 @@ Timer.prototype.Constructor = function(obj, theName) {
     }
 
     obj.stop = function(theIndex) {
+//print("theIndex="+theIndex);
+//        dumpstack();
 		_myElapsed[theIndex] = millisec() - _myTimes[theIndex];
     }
-
+/*
     obj.print = function() {
         if (ENABLE_TIMING) {
             print(_myName + " timing:");
@@ -120,6 +125,31 @@ Timer.prototype.Constructor = function(obj, theName) {
                 }
             }
             print('  TOTAL: \t'+ Number(_myTimes[_myTimes.length - 1] - _myTimes[0]).toFixed(3));
+        }
+    }
+*/
+   this.print = function() {
+        if (ENABLE_TIMING) {
+            print(_myName + " timing:");
+
+            var myMaxNameLength = 0;
+            for (var myTimerName in _myTimerNames) {
+                if (myTimerName.length > myMaxNameLength) {
+                    myMaxNameLength = myTimerName.length;
+                }
+            }
+            for (var myTimerName in _myTimerNames) {
+                var myIndex = _myTimerNames[myTimerName];
+                if (myIndex > 0) {
+                    var myPadding = "";
+                    for (var i = 0; i < myMaxNameLength - myTimerName.length; ++i) {
+                        myPadding += " ";
+                    }
+					var myTime = Number(_myElapsed[myIndex]);
+					var myPerSecond = _myCounts[myIndex] * 1000 / myTime;
+                    print('  ' + myTimerName + ':  '  + myPadding + myTime.toFixed(3)+", "+ myPerSecond.toFixed(1) +" per sec.");
+                }
+            }
         }
     }
 }

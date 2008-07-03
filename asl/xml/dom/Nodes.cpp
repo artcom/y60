@@ -1172,7 +1172,7 @@ dom::Node::Node(const Node & n) :
 /// makes a deep copy
 Node &
 dom::Node::operator=(const Node & n) {
-
+    unregisterName(); 
     _myName.resize(0);
     //_myParent = 0;
     //_mySelf = NodePtr(0);
@@ -1367,7 +1367,8 @@ dom::Node::parseAll(const String& is) {
             if (new_child) {
                 if ((new_child->nodeType() != X_END_NODE) &&
                     (new_child->nodeType() != X_NO_NODE)) {
-                    getChildren().appendWithoutReparenting(new_child);
+                    //getChildren().appendWithoutReparenting(new_child);
+                    getChildren().append(new_child);
                 }
                 if (new_child->nodeType() == DOCUMENT_TYPE_NODE) {
                     doctype = &(*new_child);
@@ -1439,7 +1440,12 @@ void Node::makeSchemaInfo(bool forceNew) {
     }
 }
 
-Node::~Node() {}
+Node::~Node() {
+   if (_myNameRegistry) {
+        _myNameRegistry.lock()->unregisterNodeName(this);
+        _myNameRegistry = NodeIDRegistryPtr(0);
+    } 
+}
 
 void
 Node::checkSchemaForText(asl::AC_SIZE_TYPE theParsePos) {
@@ -1676,7 +1682,8 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                         if (new_child->nodeType() != X_NO_NODE) {
                             DB(AC_DEBUG <<"dom::parse_next_node: DOCUMENT_TYPE_NODE added child "
                                 << NodeTypeName[new_child->nodeType()]);
-                            getChildren().appendWithoutReparenting(new_child);
+                            //getChildren().appendWithoutReparenting(new_child);
+                            getChildren().append(new_child);
                         }
                     }
                     completed_pos = asl::read_whitespace(is, completed_pos);
@@ -1807,7 +1814,8 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                 if (new_child && completed_pos > tag_end_pos) {
                     if ((new_child->nodeType() != X_END_NODE) &&
                         (new_child->nodeType() != X_NO_NODE)) {
-                            getChildren().appendWithoutReparenting(new_child);
+                            //getChildren().appendWithoutReparenting(new_child);
+                            getChildren().append(new_child);
                         } else {
                             if (new_child->nodeName() == nodeName()) {
                                 tag_end_pos = completed_pos;
@@ -1972,8 +1980,19 @@ dom::Node::appendChild(NodePtr theNewChild) {
 
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
-        for (int i = 0; i < theNewChild->childNodesLength();++i) {
-            appendChild(theNewChild->childNode(i));
+        // appending a DocumentFragment-Node is a kind of poor man's "atomic" operation in the sense that
+        // most computation in callbacks and Facade-updates are performed after all nodes are in place
+        std::vector<NodePtr> myNewNodes;
+        while (theNewChild->childNodesLength()) {
+            dom::NodePtr myNewChild = theNewChild->firstChild();
+            dom::Node * oldParent = myNewChild->parentNode();
+            if (oldParent) {
+                oldParent->removeChild(myNewChild);
+            }
+            myNewNodes.push_back(getChildren().appendWithoutReparenting(myNewChild));
+        }
+        for (int i = 0; i < myNewNodes.size(); ++i) {
+            checkAndUpdateChildrenSchemaInfo(*myNewNodes[i], this);
         }
         return NodePtr(0);
     }
@@ -2247,7 +2266,8 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                 }
                 NodePtr new_node(new Node(ATTRIBUTE_NODE,myAttributeName, myTypedAttribute, this));
                 new_node->_myParent = this;
-                _myAttributes.appendWithoutReparenting(new_node);
+                //_myAttributes.appendWithoutReparenting(new_node);
+                _myAttributes.append(new_node);
                 new_node->makeSchemaInfo(false);
                 new_node->_mySchemaInfo->_mySchemaDeclaration = myAttributeDecl;
                 new_node->_mySchemaInfo->_myType = myAttributeType;
@@ -2262,7 +2282,8 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                 // we have no schema declaration, so we just proceed without type
                 NodePtr new_node(new Node(ATTRIBUTE_NODE,myAttributeName, ValuePtr(new StringValue(myDecodedData, 0)),this));
                 try {
-                    _myAttributes.appendWithoutReparenting(new_node);
+                    //_myAttributes.appendWithoutReparenting(new_node);
+                    _myAttributes.append(new_node);
                 }
                 catch (ParseException & dex) {
                     dex.setParsedUntil(par_end);
@@ -2988,11 +3009,32 @@ Node::flushUnusedChildren() const {
 // the children in case a whole subtree is reparented.
 
 //TODO: theTopNewParent looks like it is never used, so we might drop it
+
+
+void
+Node::unregisterName() {
+    if (_myNameRegistry) {
+        _myNameRegistry.lock()->unregisterNodeName(this);
+        _myNameRegistry = NodeIDRegistryPtr(0);
+    }
+}
+
+void 
+Node::registerName() {
+    if (nodeType() == ELEMENT_NODE) {
+        _myNameRegistry = getIDRegistry();
+        _myNameRegistry.lock()->registerNodeName(this);
+    }
+ }
  
 void
-Node::reparent(Node * theNewParent, Node * theTopNewParent) { 
+Node::reparent(Node * theNewParent, Node * theTopNewParent) {
     Node * myOldParent = _myParent;
     _myParent = theNewParent;
+    unregisterName();
+    if (theTopNewParent) {
+        registerName(); 
+    }
     if (_myValue) {
         _myValue->reparent();
     }
@@ -3111,43 +3153,52 @@ dom::Node::removeEventListener(const DOMString & type,
 }
 bool
 dom::Node::dispatchEvent(EventPtr evt) {
-    // gather list event targets
     std::vector<NodePtr> myTargets;
-    Node * myNode = this;
-    while (myNode) {
-        NodePtr myNodePtr = myNode->self().lock();
-        if (myNodePtr) {
-            myTargets.push_back(myNodePtr);
-        }
-        myNode = myNode->parentNode();
-    }
-    // setup event members
+    
+    // set event target
     evt->target(self().lock());
 
-    // perform capturing phase event dispatch
-    evt->eventPhase(Event::CAPTURING_PHASE);
-    for (int i = myTargets.size() - 1; i > 0  &&
-        !evt->isPropagationStopped(); --i)
-    {
-        myTargets[i]->callListeners(myTargets[i]->_myCapturingEventListeners, evt);
+    if (!evt->targetOnly()) {
+        // gather list event targets
+        Node * myNode = this;
+        while (myNode) {
+            NodePtr myNodePtr = myNode->self().lock();
+            if (myNodePtr) {
+                myTargets.push_back(myNodePtr);
+            }
+            myNode = myNode->parentNode();
+        }
+        // perform capturing phase event dispatch
+        evt->eventPhase(Event::CAPTURING_PHASE);
+        for (int i = myTargets.size() - 1; i > 0  &&
+                !evt->isPropagationStopped(); --i)
+        {
+            myTargets[i]->callListeners(myTargets[i]->_myCapturingEventListeners, evt);
+        }
     }
-
+    
+    // at target
     if (!evt->isPropagationStopped()) {
         evt->eventPhase(Event::AT_TARGET);
         callListeners(_myCapturingEventListeners, evt);
-        callListeners(_myEventListeners, evt);
+        if (evt->bubbles()) {
+            callListeners(_myEventListeners, evt);
+        }
     }
 
-    if (evt->bubbles()) {
-        evt->eventPhase(Event::BUBBLING_PHASE);
-        for (int i = 1;  i < myTargets.size() &&
-            !evt->isPropagationStopped(); ++i)
-        {
-            myTargets[i]->callListeners(myTargets[i]->_myEventListeners, evt);
+    // bubble
+    if (!evt->targetOnly()) {
+        if (evt->bubbles()) {
+            evt->eventPhase(Event::BUBBLING_PHASE);
+            for (int i = 1;  i < myTargets.size() &&
+                    !evt->isPropagationStopped(); ++i)
+            {
+                myTargets[i]->callListeners(myTargets[i]->_myEventListeners, evt);
+            }
         }
     }
     return evt->isDefaultPrevented();
-    }
+}
 
 void
 dom::Node::callListeners(EventListenerMap & theListeners, EventPtr evt) {

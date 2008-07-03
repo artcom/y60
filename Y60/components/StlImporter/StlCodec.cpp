@@ -59,9 +59,9 @@ namespace y60 {
         std::string myName = theShape->getNode().nodeName();
         for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
             const Primitive & myPrimitive = (*myPrimitiveVector[i]);
-            const PrimitiveType & myType = myPrimitive.getType();
+            const PrimitiveType & myType = myPrimitive.get<PrimitiveTypeTag>();
             switch (myType) {
-            case GL_TRIANGLES: {
+            case TRIANGLES: {
                 asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
                 asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                 const VertexData3f & myVertexData = myPositionAccessor->get();
@@ -89,7 +89,7 @@ namespace y60 {
                 }
                                }
                 break;
-            case GL_QUADS: {
+            case QUADS: {
                 asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
                 asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                 const VertexData3f & myVertexData = myPositionAccessor->get();
@@ -119,7 +119,7 @@ namespace y60 {
                            }
                 break;
             default:
-                AC_ERROR << "Not yet implemented: Stl-Export of " << PrimitiveTypeString[myType] << ". Ignoring Primitive";
+                AC_ERROR << "Not yet implemented: Stl-Export of " << PrimitiveTypeStrings[myType] << ". Ignoring Primitive";
                 break;
             }
             //const VertexDataBase & myVertexData = myPrimitive.getVertexData(y60::POSITIONS);
@@ -160,16 +160,16 @@ namespace y60 {
                 const PrimitiveVector & myPrimitiveVector = myShape->getPrimitives();
                 for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
                     const Primitive & myPrimitive = (*myPrimitiveVector[i]);
-                    const PrimitiveType & myType = myPrimitive.getType();
+                    const PrimitiveType & myType = myPrimitive.get<PrimitiveTypeTag>();
                     asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
                     asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                     const VertexData3f & myVertexData = myPositionAccessor->get();
                     int myVSize = myVertexData.size();
                     switch (myType) {
-                    case GL_TRIANGLES:
+                    case TRIANGLES:
                         myNumFaces += myVSize / 3;
                         break;
-                    case GL_QUADS: 
+                    case QUADS: 
                         myNumFaces += myVSize / 2;
                         break;
                     default:

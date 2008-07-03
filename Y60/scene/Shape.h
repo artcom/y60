@@ -30,23 +30,26 @@ namespace y60 {
 
     class MaterialBase;
 
-    //                  theTagName      theType       theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RenderStyleTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE());
+    DEFINE_EXCEPTION(ShapeException, asl::Exception);
+
+    class Scene;
 
     class Shape :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
-        public RenderStyleTag::Plug,
-        public dom::FacadeAttributePlug<BoundingBoxTag>
+        public RenderStylesTag::Plug,
+        public dom::FacadeAttributePlug<BoundingBoxTag>,
+        public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
         public:        
             Shape(dom::Node & theNode) : 
                 dom::Facade(theNode),
                 IdTag::Plug(theNode),
                 NameTag::Plug(theNode),
-                RenderStyleTag::Plug(theNode),
+                RenderStylesTag::Plug(theNode),
                 dom::FacadeAttributePlug<BoundingBoxTag>(this),
+                dom::FacadeAttributePlug<LastActiveFrameTag>(this),
                 _myVertexCount(0),
                 _myLastRenderVersion(0)
             {
@@ -56,7 +59,7 @@ namespace y60 {
             }
 
             IMPLEMENT_FACADE(Shape);
-
+#if 0
             Primitive & createPrimitive(PrimitiveType theType, 
                     MaterialBasePtr theMaterial, unsigned int theDomIndex) 
             {    
@@ -64,13 +67,21 @@ namespace y60 {
                                 getNode().getAttributeString("id"), theDomIndex)));    
                 return *_myPrimitives.back();
             }
-
-            const PrimitiveVector & getPrimitives() const { 
+#endif
+            const PrimitiveVector & getPrimitives() const {
+                const_cast<Shape*>(this)->update(); 
                 return _myPrimitives; 
             }
-            PrimitiveVector & getPrimitives() { 
+            PrimitiveVector & getPrimitives() {
+                update(); 
                 return _myPrimitives; 
             }
+            void update();
+            void build();
+            unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
+            void calculateBoundingBox();
+            dom::NodePtr getVertexDataNode(const std::string & theDataName);
+            void reverseUpdate();
             /*
             const RenderStyles & getRenderStyles() const { 
                 return _myRenderStyles; 
@@ -125,18 +136,20 @@ namespace y60 {
 
             void clear() {
                 _myPrimitives.clear();
-                // _myRenderStyles.reset();
-                _myVertexCount = 0;
+                 _myVertexCount = 0;
                 _myLastRenderVersion = 0;
             }
-
+            Scene & getScene();
+            const Scene & getScene() const;
+            void registerDependenciesRegistrators();
+        protected:
+            virtual void registerDependenciesForBoundingBox();
         private:
             Shape();
             Shape(const Shape &);
             Shape & operator=(const Shape &);
 
             PrimitiveVector    _myPrimitives;   
-            // RenderStyles       _myRenderStyles;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;
     };

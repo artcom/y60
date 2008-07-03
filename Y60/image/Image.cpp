@@ -57,7 +57,8 @@ namespace y60 {
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
         dom::FacadeAttributePlug<ImageWidthTag>(this),
-        dom::FacadeAttributePlug<ImageHeightTag>(this)
+        dom::FacadeAttributePlug<ImageHeightTag>(this),
+        dom::FacadeAttributePlug<LastActiveFrameTag>(this)
     {
     }
 

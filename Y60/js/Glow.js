@@ -304,7 +304,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         //var myBlurXTextureUnits  = getDescendantByTagName(myBlurXMaterial, "textureunits");
         var myBlurXTextureUnits  = myBlurXMaterial.find("textureunits");
         myBlurXTextureUnits.appendChild(myTextureUnit);
-
+        //window.scene.save("dump.x60");
         window.scene.update(Scene.MATERIALS);
         myBlurXMaterial.properties.texelSize = new Vector3f( 1/myBlurXImage.width, 1/myBlurXImage.height, 0.0);
         myBlurXMaterial.properties.glowScale = theGlowScale;

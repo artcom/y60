@@ -173,8 +173,8 @@ smallest id-range takes precedence.
 bool
 Logger::IfLog(Severity theSeverity, const char * theModule, int theId) {
     MAKE_SCOPE_TIMER(Logger_IfLog);
-    Severity myVerbosity = _myGlobalVerbosity;
     if (!_myVerbositySettings.empty()) {
+        Severity myVerbosity = _myGlobalVerbosity;
         const std::string myModule(file_string(theModule)); // remove everything before the last backslash
         // find all setting for a particular module
         std::multimap<std::string,ModuleVerbosity>::const_iterator myLowerBound =
@@ -201,8 +201,9 @@ Logger::IfLog(Severity theSeverity, const char * theModule, int theId) {
                 }
             }
         }
+        return theSeverity <= myVerbosity;
     }
-    return theSeverity <= myVerbosity;
+    return theSeverity <= _myGlobalVerbosity;
 }
 
 void

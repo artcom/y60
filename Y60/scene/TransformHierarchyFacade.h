@@ -36,7 +36,6 @@
 
 namespace y60 {
     //                  theTagName           theType           theAttributeName               theDefault
-
     DEFINE_ATTRIBUT_TAG(PositionTag,         asl::Vector3f,    POSITION_ATTRIB,          asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(OrientationTag,      asl::Quaternionf, ORIENTATION_ATTRIB,       asl::Quaternionf(0,0,0,1));
     DEFINE_ATTRIBUT_TAG(ScaleTag,            asl::Vector3f,    SCALE_ATTRIB,             asl::Vector3f(1,1,1));
@@ -47,10 +46,13 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString());
     DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "");
     DEFINE_ATTRIBUT_TAG(StickyTag,           bool,             STICKY_ATTRIB,            false);
+    DEFINE_ATTRIBUT_TAG(EventsTag,           VectorOfString,   "events",                 VectorOfString());
 
     DEFINE_FACADE_ATTRIBUTE_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity());
     DEFINE_FACADE_ATTRIBUTE_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
     DEFINE_FACADE_ATTRIBUTE_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
+
+
     class TransformHierarchyFacade :
         public dom::Facade,
         public IdTag::Plug,
@@ -66,10 +68,12 @@ namespace y60 {
         public ClippingPlanesTag::Plug,
         public ScissorTag::Plug,
         public StickyTag::Plug,
+        public EventsTag::Plug,
         public dom::FacadeAttributePlug<BoundingBoxTag>,
         public dom::FacadeAttributePlug<GlobalMatrixTag>,
         public dom::FacadeAttributePlug<LocalMatrixTag>,
-        public dom::FacadeAttributePlug<InverseGlobalMatrixTag>
+        public dom::FacadeAttributePlug<InverseGlobalMatrixTag>,
+        public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
         public:
             TransformHierarchyFacade(dom::Node & theNode);
@@ -92,8 +96,14 @@ namespace y60 {
             void copyLocalToGlobalMatrix();
             void recalculateBoundingBox();
             void recalculateInverseGlobalMatrix();
+            void registerDependenciesForEvents();
+            void updateEventTrigger();
+            void triggerRenderEvent();
         private:
             void getLocalMatrix(asl::Matrix4f & theLocalMatrix) const;
+            bool _onRenderEventEnabled;
+            bool _onFirstRenderEventEnabled;
+            //TODO: onProximity, onUnused, onRemoval, onInsert
 
     };
 

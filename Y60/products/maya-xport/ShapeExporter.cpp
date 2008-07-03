@@ -291,9 +291,9 @@ ShapeExporter::outputPrimitives(y60::ShapeBuilder & theShapeBuilder,
             if (myElementIt == myElementMap.end()) {
                 MAKE_SCOPE_TIMER(outputPrimitives_ElementBuilder);
 
-                string myPrimitiveTye = PRIMITIVE_TYPE_TRIANGLES;
+                string myPrimitiveTye = PrimitiveTypeStrings[TRIANGLES];
                 if (myVertexCountPerFace == 4) {
-                    myPrimitiveTye = PRIMITIVE_TYPE_QUADS;
+                    myPrimitiveTye = PrimitiveTypeStrings[QUADS];
                 }
 
                 // Create new primitives builder for this material and primitive type

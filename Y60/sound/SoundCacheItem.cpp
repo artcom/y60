@@ -24,11 +24,11 @@ SoundCacheItem::SoundCacheItem (const string& myURI)
       _myTotalFrames(-1),
       _myInUseCount(0)
 {
-    AC_DEBUG << "SoundCacheItem::SoundCacheItem";
+    AC_TRACE << "SoundCacheItem::SoundCacheItem";
 }
 
 SoundCacheItem::~SoundCacheItem() {
-    AC_DEBUG << "SoundCacheItem::~SoundCacheItem";
+    AC_TRACE << "SoundCacheItem::~SoundCacheItem";
 }
 
 std::string SoundCacheItem::getURI() const {
@@ -59,7 +59,7 @@ void SoundCacheItem::doneCaching(int theTotalFrames) {
                 ", _myFramesDecoded = " << _myFramesDecoded;
         }
     }
-    AC_DEBUG << "SoundCacheItem::doneCaching: _myTotalFrames= " << _myTotalFrames 
+    AC_TRACE << "SoundCacheItem::doneCaching: _myTotalFrames= " << _myTotalFrames 
             << ", _myFramesDecoded= " << _myFramesDecoded;
     if (!isFull()) {
         SoundManager::get().deleteCacheItem(_myURI);
@@ -74,7 +74,7 @@ AudioBufferPtr SoundCacheItem::getBuffer(int theStartFrame) const {
         AC_TRACE << "SoundCacheItem::getBuffer: entire buffer";
         return myBuffer;
     } else {
-        AC_DEBUG << "SoundCacheItem::getBuffer: partial buffer";
+        AC_TRACE << "SoundCacheItem::getBuffer: partial buffer";
         --it;
         AudioBufferPtr myOrigBuffer = it->second;
         unsigned myRelStartFrame = theStartFrame-myOrigBuffer->getStartFrame();
