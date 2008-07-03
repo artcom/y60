@@ -216,12 +216,12 @@ namespace asl {
     };
 }
 
+#define MAKEUNIQUE(x) myVar_##x
 #ifdef WIN32
-#define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
+#define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
+#define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
 #else
 #define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
-
-#define MAKEUNIQUE(x) myVar_##x
 #define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
 #endif
 
@@ -238,24 +238,29 @@ Use AC_PRINT << "myMessage" in situations when a message should be printed and l
 Use AC_FATAL << "myErrorMessage" in situations when a severe condition (e.g. memory corruption) was
 detected and you are going to abort program execution. */
 #define AC_FATAL AC_LOG(asl::SEV_FATAL, __FILE__, __LINE__)
+#define AC_FATAL_CHECK AC_LOG_CHECK(asl::SEV_FATAL, __FILE__, __LINE__)
 /**
 Use AC_ERROR << "myErrorMessage" in situations when an error occured that 
 is likely to have significant impact on further computation and
 might the reason for undesired or unexpected behavior of the application*/
 #define AC_ERROR AC_LOG(asl::SEV_ERROR, __FILE__, __LINE__)
+#define AC_ERROR_CHECK AC_LOG(asl::SEV_ERROR, __FILE__, __LINE__)
 /**
 Use AC_WARNING << "myWarningMessage" in situations when an error occured that will be
 compensated but might degrade user experience (e.g. performance, lack of features) */
 #define AC_WARNING AC_LOG(asl::SEV_WARNING, __FILE__, __LINE__)
+#define AC_WARNING_CHECK AC_LOG_CHECK(asl::SEV_WARNING, __FILE__, __LINE__)
 /**
 Use AC_INFO << "myInfoMessage" in situations to inform about resource usage,
 performance, or completion of important tasks or important events */
 #define AC_INFO AC_LOG(asl::SEV_INFO, __FILE__, __LINE__)
+#define AC_INFO_CHECK AC_LOG_CHECK(asl::SEV_INFO, __FILE__, __LINE__)
 /**
 Use AC_DEBUG << "myDebugMessage" to inform about creation or destruction of important objects,
 overall flow of control and general input/output events; keep in mind that debug message should
 still permit the application to perform its work; use them sparsely*/
 #define AC_DEBUG AC_LOG(asl::SEV_DEBUG, __FILE__, __LINE__)
+#define AC_DEBUG_CHECK AC_LOG_CHECK(asl::SEV_DEBUG, __FILE__, __LINE__)
 /**
 Use AC_TRACE << "myDebugMessage" to trace flow of control and produce an amount of information
 so detailed that the program might be too slow to perform anything reasonable; in general
@@ -263,6 +268,7 @@ AC_TRACE Messages may be within an DB()-Macro and will not be compiled in; you w
 to enable them on a per-file basis*/
 #ifdef _SETTING_WITH_TRACE_LOG_
 #define AC_TRACE AC_LOG(asl::SEV_TRACE, __FILE__, __LINE__)
+#define AC_TRACE_CHECK AC_LOG_CHECK(asl::SEV_TRACE, __FILE__, __LINE__)
 #else
 #define AC_TRACE AC_DONT_LOG
 #endif

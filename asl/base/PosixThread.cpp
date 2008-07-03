@@ -174,30 +174,31 @@ PosixThread::updatePriority() {
     switch (myRetVal) {
         case 0:
             return true;
-        case EPERM:
+        case EPERM: 
             return false;
-        case ENOTSUP:
+		case ENOTSUP:{
             // This happens if the scheduling policy isn't SCHED_OTHER under windows.
             DB(AC_TRACE << "###ERROR: PosixThread::updatePriority() : pthread_setschedparam: ENOTSUP"
                  << endl;)
-            return false;
-        case EINVAL:
+				 return false;
+					 }
+		case EINVAL:{
             AC_ERROR << "PosixThread::updatePriority() : pthread_setschedparam: EINVAL"
                  << endl;
-            return false;
-        case ESRCH:
+			return false;}
+		case ESRCH:{
             AC_ERROR << "PosixThread::updatePriority() : pthread_setschedparam: ESRCH"
                  << endl;
-            return false;
-        case EFAULT:
+			return false;}
+		case EFAULT:{
             AC_ERROR << "PosixThread::updatePriority() : pthread_setschedparam: EFAULT"
                  << endl;
-            return false;
-        default:
+			return false;}
+		default:{
             AC_ERROR << "PosixThread::updatePriority() : pthread_setschedparam: Unknown"
                     " error code (" << myRetVal << ") "
                  << endl;
-            return false;
+			return false;}
     }
 }
 
