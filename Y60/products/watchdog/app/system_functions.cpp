@@ -36,6 +36,7 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 
 /*#include <time.h>
@@ -144,7 +145,7 @@ void initiateSystemShutdown() {
 #endif
 }
 
-ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout ) {
+ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Logger & theLogger ) {
 #ifdef WIN32
     return WaitForSingleObject( theProcessInfo.hProcess, theTimeout );
 #elif defined(LINUX)
@@ -154,11 +155,19 @@ ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout ) {
     if (myResult == -1) {
         return PR_FAILED;
     }
-    if (myResult == theProcessInfo && (WIFEXITED(myStatus) || WIFSIGNALED(myStatus))) {
-        return PR_TERMINATED;
-    } else {
-        return PR_RUNNING;
+    if (myResult == theProcessInfo) {
+        std::ostringstream myOss;
+        if (WIFEXITED(myStatus)) {
+            myOss << "Process exited with status " << WEXITSTATUS(myStatus);
+            theLogger.logToFile(myOss.str());
+            return PR_TERMINATED;
+        } else if (WIFSIGNALED(myStatus)) {
+            myOss << "Process terminated with signal " << WTERMSIG(myStatus);
+            theLogger.logToFile(myOss.str());
+            return PR_TERMINATED;
+        }
     }
+    return PR_RUNNING;
 #else
 #error Your platform is missing!
 #endif
@@ -264,7 +273,7 @@ void closeApp( const std::string & theWindowTitle, const ProcessInfo & theProces
 #elif defined(LINUX)
     theLogger.logToFile("Try to terminate application.");
     kill( theProcessInfo, SIGTERM );
-    ProcessResult myResult = waitForApp( theProcessInfo, 500 );
+    ProcessResult myResult = waitForApp( theProcessInfo, 500, theLogger );
     switch (myResult) {
         case PR_RUNNING:
             theLogger.logToFile("Sending SIGKILL...");

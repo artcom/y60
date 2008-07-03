@@ -320,7 +320,7 @@ Application::shutdown() {
 std::string
 Application::runUntilNextCheck(int theWatchFrequency) {
     // Wait until child process exits.
-    _myProcessResult = waitForApp( _myProcessInfo, 1000 * theWatchFrequency );
+    _myProcessResult = waitForApp( _myProcessInfo, 1000 * theWatchFrequency, _myLogger );
     if (_myProcessResult == PR_FAILED) {
         return string("Return code of process: ") + getLastError();
     }

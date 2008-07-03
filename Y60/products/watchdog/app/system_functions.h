@@ -64,7 +64,7 @@ typedef asl::ProcessID ProcessResult;
 
 void initiateSystemReboot();
 void initiateSystemShutdown();
-ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout );
+ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Logger & theLogger );
 bool launchApp( const std::string & theFileName, 
                 const std::vector<std::string> & theArguments,
                 const std::string & theWorkingDirectory, 
