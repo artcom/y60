@@ -158,11 +158,14 @@ ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Lo
     if (myResult == theProcessInfo) {
         std::ostringstream myOss;
         if (WIFEXITED(myStatus)) {
-            myOss << "Process exited with status " << WEXITSTATUS(myStatus);
+            myOss << "Process exited with status " << WEXITSTATUS(myStatus) 
+	    	  << ".";
             theLogger.logToFile(myOss.str());
             return PR_TERMINATED;
         } else if (WIFSIGNALED(myStatus)) {
-            myOss << "Process terminated with signal " << WTERMSIG(myStatus);
+	    int mySignal = WTERMSIG(myStatus);
+            myOss << "Process terminated with signal " << mySignal 
+	    	  << " (" << strsignal(mySignal) << ").";
             theLogger.logToFile(myOss.str());
             return PR_TERMINATED;
         }
@@ -327,10 +330,10 @@ std::string getLastError( ErrorNumber theErrorNumber) {
 #endif
 }
 
+
 std::string getLastError() {
     return getLastError( getLastErrorNumber() );
 }
-
 
 
 void
