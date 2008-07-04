@@ -566,6 +566,22 @@ namespace asl {
             return _myRefCountPtr != otherPtr._myRefCountPtr;
         }
     
+        bool operator<(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
+            return _myNativePtr < otherPtr._myNativePtr;
+        }
+    
+        bool operator>(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
+            return otherPtr._myNativePtr < _myNativePtr;
+        }
+    
+        bool operator<=(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
+            return !operator>(_myNativePtr,otherPtr._myNativePtr);
+        }
+    
+        bool operator>=(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
+            return !operator<(_myNativePtr,otherPtr._myNativePtr);
+        }
+    
     private:
         // do not allow comparison with other types and forbid comparison of bool results
         template<class D>
