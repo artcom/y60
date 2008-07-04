@@ -16,9 +16,7 @@
 
 namespace {
 
-    typedef std::vector<const dom::NodePtr>         ParentList;
-    typedef ParentList::const_reverse_iterator      ParentListIter;
-    typedef std::pair<ParentListIter,ParentListIter>DiffResult;
+    typedef std::vector<dom::NodePtr>               ParentList;
 
     template< typename FwdIter >
     bool compareFindResult( FwdIter itLhs, FwdIter endLhs
@@ -51,14 +49,14 @@ namespace {
     }
 
     template< typename FwdIter >
-    DiffResult find_firstDiff( FwdIter beginLhs, FwdIter endLhs
-                             , FwdIter beginRhs, FwdIter endRhs )
+    std::pair<FwdIter,FwdIter> find_firstDiff( FwdIter beginLhs, FwdIter endLhs
+                                             , FwdIter beginRhs, FwdIter endRhs )
     {
         while( beginLhs!=endLhs && beginRhs!=endRhs && *beginLhs==*beginRhs ) {
             ++beginLhs;
             ++beginRhs;
         }
-        return DiffResult(beginLhs,beginRhs);
+        return std::pair<FwdIter,FwdIter>(beginLhs,beginRhs);
     }
 
 }
@@ -71,6 +69,9 @@ namespace xpath {
             if (Lhs == Rhs) {
                 return false;
             }
+
+            typedef ParentList::const_reverse_iterator      ParentListIter;
+            typedef std::pair<ParentListIter,ParentListIter>DiffResult;
 
             const ParentList& parentsLhs = getParentList(Lhs);
             const ParentList& parentsRhs = getParentList(Rhs);
