@@ -52,7 +52,7 @@ using namespace std;
 static HANDLE ourServerThreadID = 0;
 
 //#define DBT(x) { std::ostringstream s; s << "TRACE:" << x; std::cout << s.str(); }
-#define DBT(x) AC_DEBUG << x;
+#define DBT(x) {AC_DEBUG << x;}
 
 namespace asl {
 
@@ -325,7 +325,7 @@ NamedPipePolicy::onWriteCompleted(DWORD theError, DWORD theBytesTransferred, LPO
         case ERROR_SUCCESS :
             break;
         case ERROR_OPERATION_ABORTED :
-            AC_WARNING << *myHandle << " pipe broken on writing" << endl;
+			{AC_WARNING << *myHandle << " pipe broken on writing" << endl;}
             return;
         case ERROR_BROKEN_PIPE :
             DBT(*myHandle << " pipe broken on writing" << endl);

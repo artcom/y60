@@ -196,21 +196,21 @@ namespace y60 {
 
         switch (myRasterEncoding) {
             case RGBA:
-                AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
+				{AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGRA);
                 myMovie->addRasterValue(createRasterValue( y60::BGRA, myWidth, myHeight), y60::BGRA, 1);                
                 break;
             case ALPHA:
-                AC_TRACE << "Using GRAY pixels";
+				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
                 myMovie->addRasterValue(createRasterValue( y60::ALPHA, myWidth, myHeight), y60::ALPHA, 1);                
                 break;
             case GRAY:
-                AC_TRACE << "Using GRAY pixels";
+				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
@@ -218,7 +218,7 @@ namespace y60 {
                 break;
             case RGB:
             default:
-                AC_TRACE << "Using BGR pixels";
+				{AC_TRACE << "Using BGR pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGR);
@@ -246,8 +246,6 @@ namespace y60 {
         //                                    * av_q2d(_myVStream->time_base)));
         }
 
-
-    
         _myLastVideoTimestamp = 0;
 
         // Get Starttime

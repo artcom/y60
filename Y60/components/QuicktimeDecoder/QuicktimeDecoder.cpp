@@ -149,7 +149,7 @@ namespace y60 {
             case k32RGBAPixelFormat:
             case k32ABGRPixelFormat:
                 myQTTargetPixelFormat = k32BGRAPixelFormat;
-                AC_TRACE << "Using BGRA pixels";
+				{AC_TRACE << "Using BGRA pixels";}
                 myMovie->createRaster(movieBounds.right, movieBounds.bottom, 1, y60::BGRA);
                 break;
             case k24BGRPixelFormat:

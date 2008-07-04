@@ -518,7 +518,7 @@ namespace y60 {
                 setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
                 break;
             case POSITIONAL_LIGHTS :
-                AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
+				{AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;}
                 setCgUnsizedArrayParameter(curParam, myPositionalLights);
                 break;
             case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
@@ -528,7 +528,7 @@ namespace y60 {
                 setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
                 break;
             case DIRECTIONAL_LIGHTS :
-                AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
+				{AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;}
                 setCgUnsizedArrayParameter(curParam, myDirectionalLights);
                 break;
             case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
@@ -538,7 +538,7 @@ namespace y60 {
                 setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
                 break;
             case SPOT_LIGHTS :
-                AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;
+				{AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;}
                 setCgUnsizedArrayParameter(curParam, mySpotLights);
                 break;
             case SPOT_LIGHTS_DIFFUSE_COLOR :

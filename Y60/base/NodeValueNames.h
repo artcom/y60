@@ -566,17 +566,28 @@ namespace y60 {
         PrimitiveTypeEnum_MAX
     };
 
+    static const char * PRIMITIVE_TYPE_POINTS          = "points";
+    static const char * PRIMITIVE_TYPE_LINES           = "lines";
+    static const char * PRIMITIVE_TYPE_LINE_STRIP      = "linestrip";
+    static const char * PRIMITIVE_TYPE_LINE_LOOP       = "lineloop";
+    static const char * PRIMITIVE_TYPE_TRIANGLES       = "triangles";
+    static const char * PRIMITIVE_TYPE_TRIANGLE_STRIP  = "trianglestrip";
+    static const char * PRIMITIVE_TYPE_TRIANGLE_FAN    = "trianglefan";
+    static const char * PRIMITIVE_TYPE_QUADS           = "quads";
+    static const char * PRIMITIVE_TYPE_QUAD_STRIP      = "quadstrip";
+    static const char * PRIMITIVE_TYPE_POLYGON         = "polygon";
+
     static const char * PrimitiveTypeStrings[] = {
-        "points",
-        "lines",
-        "lineloop",
-        "linestrip",
-        "triangles",
-        "trianglestrip",
-        "trianglefan",
-        "quads",
-        "quadstrip",
-        "polygon",
+		PRIMITIVE_TYPE_POINTS,
+        PRIMITIVE_TYPE_LINES,
+        PRIMITIVE_TYPE_LINE_LOOP,
+        PRIMITIVE_TYPE_LINE_STRIP,
+        PRIMITIVE_TYPE_TRIANGLES,
+        PRIMITIVE_TYPE_TRIANGLE_STRIP,
+        PRIMITIVE_TYPE_TRIANGLE_FAN,
+        PRIMITIVE_TYPE_QUADS,
+        PRIMITIVE_TYPE_QUAD_STRIP,
+        PRIMITIVE_TYPE_POLYGON,
         ""
     };
     DEFINE_ENUM(PrimitiveType, PrimitiveTypeEnum);

@@ -118,20 +118,20 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 changeState(STOPPING_FADE_OUT);
                 _myStopWhenEmpty = false;
                 break;
-            case PAUSED:
+			case PAUSED:{
                 changeState(STOPPED);
                 AudioTimeSource::stop();
                 AC_TRACE << "PAUSED: _myBufferQueue.clear();";
                 _myBufferQueue.clear(); 
                 _myPosInInputBuffer = 0;
                 _myStopWhenEmpty = false;
-                break;
+				break;}
             case STOPPED:
                 _myBufferQueue.clear();
                 break;
-            default:
+			default:{
                 AC_DEBUG << "HWSampleSink::stop: stop received in state " << 
-                        stateToString(getState()) << ". Ignored.";
+					stateToString(getState()) << ". Ignored.";}
         }
     }
 }

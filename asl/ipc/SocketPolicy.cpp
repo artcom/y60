@@ -221,9 +221,9 @@ SocketPolicy::sendData(Handle & theHandle, BufferQueue & theOutQueue)
     {
         int myLastError = getLastSocketError();
         switch (myLastError) {
-            case EPIPE:
+			case EPIPE:{
                 AC_WARNING << "broken pipe: send failed";
-                return false;
+				return false;}
             default:
                 throw ConduitException(string("SocketPolicy::send failed - ") +
                     getSocketErrorMessage(myLastError), PLUS_FILE_LINE);

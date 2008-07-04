@@ -677,21 +677,21 @@ namespace y60 {
         
         switch (myRasterEncoding) {            
             case RGBA:
-                AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
+				{AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGRA);
                 myMovie->addRasterValue(createRasterValue( y60::BGRA, _myFrameWidth, _myFrameHeight), y60::BGRA, 1);                
                 break;
             case ALPHA:
-            	AC_TRACE << "Using Alpha pixels";
+				{AC_TRACE << "Using Alpha pixels";}
 	            _myDestinationPixelFormat = PIX_FMT_GRAY8;
 	            _myBytesPerPixel = 1;
 	            myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
 	            myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
 	            break;
             case GRAY:
-                AC_TRACE << "Using GRAY pixels";
+				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
@@ -699,21 +699,17 @@ namespace y60 {
                 break;
             case RGB:
             default:
-                AC_TRACE << "Using BGR pixels";
+				{AC_TRACE << "Using BGR pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGR);
                 myMovie->addRasterValue(createRasterValue( y60::BGR, _myFrameWidth, _myFrameHeight), y60::BGR, 1);                
                 break;
         }
-
-
         myMovie->getRasterPtr(Movie::PRIMARY_BUFFER)->clear();
 		myMovie->getRasterPtr(Movie::SECONDARY_BUFFER)->clear();
 
-
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-
         
         myMovie->set<FrameRateTag>(_myFrameRate);
         if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||

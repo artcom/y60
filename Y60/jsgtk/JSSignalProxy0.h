@@ -74,11 +74,11 @@ class JSSignalProxy0 : public JSWrapper<Glib::SignalProxy0<R>, asl::Ptr<Glib::Si
                 JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR( new sigc::connection);
                 switch (argc) {
                     case 2 :
-                        AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "'";
+						{AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "'";}
                         *myConnection = myOwner->connect(mySlot);
                         break;
                     case 3 :
-                        AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "', after=" << myAfterFlag;
+						{AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "', after=" << myAfterFlag;}
                         *myConnection = myOwner->connect(mySlot, myAfterFlag);
                         break;
                 }

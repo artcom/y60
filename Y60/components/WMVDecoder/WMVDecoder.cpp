@@ -790,31 +790,31 @@ double ourLastAudioTimeStamp = 0.0;
         asl::AutoLocker<ThreadLock> myLocker(_myLock); // protect _myEventResult, _myReadEOF
         switch (theStatus) {
         case WMT_LOCATING:
-            AC_INFO << "Locating.";
+			{AC_INFO << "Locating.";}
             break;
         case WMT_CONNECTING:
-            AC_INFO << "Connecting.";
+			{AC_INFO << "Connecting.";}
             break;
         case WMT_BUFFERING_START:
-            AC_INFO << "Buffering Start.";
+			{AC_INFO << "Buffering Start.";}
             _myEventResult = hr;
             SetEvent(_myEvent);
             break;
         case WMT_BUFFERING_STOP:
-            AC_INFO << "Buffering Stop.";
+			{AC_INFO << "Buffering Stop.";}
             break;
         case WMT_OPENED:
-            AC_INFO << "Opened File.";
+			{AC_INFO << "Opened File.";}
             _myEventResult = hr;
             SetEvent(_myEvent);
             break;
         case WMT_STARTED:
-            AC_INFO << "Started.";
+			{AC_INFO << "Started.";}
             _myEventResult = hr;
             SetEvent(_myEvent);
             break;
         case WMT_STOPPED:
-            AC_INFO << "Stopped.";
+			{AC_INFO << "Stopped.";}
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
@@ -822,7 +822,7 @@ double ourLastAudioTimeStamp = 0.0;
             SetEvent(_myEvent);
             break;
         case WMT_CLOSED:
-            AC_INFO << "Closed File.";
+			{AC_INFO << "Closed File.";}
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
@@ -830,16 +830,16 @@ double ourLastAudioTimeStamp = 0.0;
             SetEvent(_myEvent);
             break;
         case WMT_END_OF_STREAMING:
-            AC_INFO << "End of Streaming.";
+			{AC_INFO << "End of Streaming.";}
             break;
         case WMT_EOF:
-            AC_INFO << "End of File.";
+			{AC_INFO << "End of File.";}
             _myReadEOF = true;
             _myEventResult = hr;
             SetEvent(_myEvent);
             break;
         default:
-            AC_TRACE << "OnStatus: Unhandled status=" << theStatus << " result=" << hr;
+			{AC_TRACE << "OnStatus: Unhandled status=" << theStatus << " result=" << hr;}
             break;
         }
         return S_OK;

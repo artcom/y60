@@ -292,7 +292,7 @@ JSResizeableRaster::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
                 return JS_TRUE;
             case PROP_size:
                 *vp = as_jsval(cx, getNative().getSize());
-                AC_DEBUG << "getNative().getSize() = " << getNative().getSize();
+				{AC_DEBUG << "getNative().getSize() = " << getNative().getSize();}
                 return JS_TRUE;
              default:
                 JS_ReportError(cx,"JSResizeableRaster::getProperty: index %d out of range", theID);

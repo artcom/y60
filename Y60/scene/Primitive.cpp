@@ -133,7 +133,7 @@ namespace y60 {
         if (myDataBin) {
             if (myDataBin->size() != myIndices.size()) {
                 AC_ERROR << "Primitive::unload: gl vertex data and dom index array have different size, vertex data role "<<myRoleString<<
-                    " has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().get<IdTag>()<<endl;
+					" has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().Shape::get<IdTag>()<<endl;
                 return;
             } else {
                 myDataBin->unload(myIndices, myDataNode, theBeginIndex, theEndIndex);
@@ -455,7 +455,7 @@ namespace y60 {
                 }
                 break;
             case TRIANGLE_FAN:
-                AC_TRACE << "Scanning " << thePositions.size() << " positions.";
+				{AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
                 for (unsigned i = 1; i < (thePositions.size()-1); ++i) {
                     asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
                             asl::asPoint(thePositions[i]),
@@ -471,7 +471,7 @@ namespace y60 {
             case TRIANGLES:
                 myStep = 3;
             case TRIANGLE_STRIP:
-                AC_TRACE << "Scanning " << thePositions.size() << " positions.";
+				{AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
                 for (unsigned i = 0; (i + 2) < thePositions.size(); i += myStep) {
                     if (myHasNormals) {
                         myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])),
@@ -617,7 +617,7 @@ namespace y60 {
                 //dk TODO Copy/Paste from scanElements ?
                 return false;
             case TRIANGLE_FAN:
-                AC_TRACE << "scanHierarchy " << thePositions.size() << " positions.";
+				{AC_TRACE << "scanHierarchy " << thePositions.size() << " positions.";}
                 {
                     asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
                             asl::asPoint(thePositions[i]),

@@ -59,7 +59,7 @@ public:
 std::string wasteTime() {
     int s = 0;
     for (int i = 0; i<10000;++i) {
-       s+=random();
+		s+=i;
     }
     return asl::as_string(s);
 }

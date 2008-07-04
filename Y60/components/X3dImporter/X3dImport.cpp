@@ -370,12 +370,11 @@ namespace y60 {
                 processShapeNode(theNode);
                 break;
             case NAVIGATION_X3D_NODE:
-                AC_INFO << "ignoring x3d node type " << theNode->nodeName();
+				{AC_INFO << "ignoring x3d node type " << theNode->nodeName();}
                 break;
-
             case UNKNOWN_X3D_NODE:
             default:
-                AC_INFO << "unknown x3d node type " << theNode->nodeName();
+				{AC_INFO << "unknown x3d node type " << theNode->nodeName();}
         }
     }
 

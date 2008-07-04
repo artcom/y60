@@ -339,7 +339,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         // color buffer
         switch (theTexture->getType()) {
             case TEXTURE_2D:
-                AC_DEBUG << "attaching 2D texture";
+				{AC_DEBUG << "attaching 2D texture";}
                 glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
                                           GL_TEXTURE_2D, _myColorBuffer[0], 0);
                 checkOGLError(PLUS_FILE_LINE);
