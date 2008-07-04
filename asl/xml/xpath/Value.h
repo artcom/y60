@@ -11,192 +11,208 @@
 #ifndef XPATH_VALUE_H
 #define XPATH_VALUE_H
 
-//#include "xpath_api.h"
+#include <cassert>
+
+#include <asl/Ptr.h>
+#include <asl/Exception.h>
 
 #include <dom/Nodes.h>
 
 #include "Types.h"
 
 namespace xpath {
-    class NumberValue;
+
+    class NumberValue ;
     class BooleanValue;
-    class StringValue;
+    class StringValue ;
     class NodeSetValue;
+
+    DEFINE_EXCEPTION(BadCast, asl::Exception);
+
+    class Value;
+    typedef asl::Ptr<Value       ,ThreadingModel>   ValuePtr;
+    typedef asl::Ptr<NumberValue ,ThreadingModel>   NumberValuePtr;
+    typedef asl::Ptr<BooleanValue,ThreadingModel>   BooleanValuePtr;
+    typedef asl::Ptr<StringValue ,ThreadingModel>   StringValuePtr;
+    typedef asl::Ptr<NodeSetValue,ThreadingModel>   NodeSetValuePtr;
 
     class Value {
         public:
-            virtual ~Value();
-            enum ValueType { NullType, BooleanType, NumberType, StringType, NodeSetType };
+            enum ValueType { NullType
+                           , BooleanType
+                           , NumberType
+                           , StringType
+                           , NodeSetType };
 
-            virtual ValueType type() = 0;
+            virtual ~Value() {}
 
-            virtual BooleanValue *toBoolean() { return 0; };
-            virtual NumberValue *toNumber() { return 0; };
-            virtual StringValue *toString() { return 0; };
-            virtual NodeSetValue *toNodeSet() { return 0; };
+            virtual ValueType type() const = 0;
 
-            virtual BooleanValue *as(BooleanValue *) { return toBoolean(); };
-            virtual NumberValue *as(NumberValue *) { return toNumber(); };
-            virtual StringValue *as(StringValue *) { return toString(); };
-            virtual NodeSetValue *as(NodeSetValue *) { return toNodeSet(); };
+            template< typename VALUE_TYPE >
+            VALUE_TYPE as() const {return as(static_cast<VALUE_TYPE*>(0));}
+
+        private:
+            virtual BooleanValue toBoolean() const;
+            virtual NumberValue  toNumber () const; 
+            virtual StringValue  toString () const;
+            virtual NodeSetValue toNodeSet() const;
+
+            BooleanValue as(BooleanValue*) const;
+            NumberValue  as(NumberValue *) const;
+            StringValue  as(StringValue *) const;
+            NodeSetValue as(NodeSetValue*) const;
     };
 
     template <class VALUE_TYPE>
-    bool equals_as(Value *left, Value *right) {
-        VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
-        VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
-        bool retval = lv->getValue() == rv->getValue();
-        delete lv;
-        delete rv;
-        return retval;
+    inline bool equal_as(const Value& left, const Value& right) {
+        return left.as<VALUE_TYPE>().getValue() == right.as<VALUE_TYPE>().getValue();
     }
 
     template <class VALUE_TYPE>
-    bool smaller_than_as(Value *left, Value *right) {
-        VALUE_TYPE *lv = left->as((VALUE_TYPE*)0);
-        VALUE_TYPE *rv = right->as((VALUE_TYPE*)0);
-        bool retval = lv->getValue() < rv->getValue();
-        delete lv;
-        delete rv;
-        return retval;
+    inline bool equal_as(const ValuePtr& left, const ValuePtr& right) {
+        return equal_as(*left,*right);
+    }
+
+    template <class VALUE_TYPE>
+    inline bool smaller_than_as(const Value& left, const Value& right) {
+        return left.as<VALUE_TYPE>().getValue() < right.as<VALUE_TYPE>().getValue();
+    }
+
+    template <class VALUE_TYPE>
+    inline bool smaller_than_as(const ValuePtr& left, const ValuePtr& right) {
+        return smaller_than_as(*left,*right);
     }
 
     class NullValue : public Value {
         public:
-            ValueType type() { return NullType; };
+            ValueType type() const { return NullType; };
     };
 
     class BooleanValue : public Value {
         public:
-            BooleanValue(bool _value) : value( _value ) {};
-            virtual ~BooleanValue();
+            explicit BooleanValue(bool _value) : value( _value ) {};
 
-            ValueType type() { return BooleanType; };
+            ValueType type() const { return BooleanType; };
 
-            bool getValue() { return value; };
-
-            virtual BooleanValue *toBoolean() {
-                return new BooleanValue( getValue());
-            };
-            virtual NumberValue *toNumber();
-            virtual StringValue *toString();
+            bool getValue() const { return value; };
 
         private:
             bool value;
+
+            virtual BooleanValue toBoolean() const;
+            virtual NumberValue  toNumber () const;
+            virtual StringValue  toString () const;
     };
 
     class NumberValue : public Value {
         public:
-            NumberValue(double _value) :
-                value( _value ),
-                isNaN( false ),
-                isInfinity( false ) {};
-            virtual ~NumberValue();
+            explicit NumberValue(double _value = double()) : value( _value ) {}
 
-            ValueType type() { return NumberType; };
+            ValueType type() const  { return NumberType; }
 
-            double getValue() { return value; };
+            double getValue() const { return value; }
 
-            virtual BooleanValue *toBoolean() {
-                return new BooleanValue(!isNaN || value!=0);
-            }
-            virtual NumberValue *toNumber() {
-                return new NumberValue(value);
-            }
-            virtual StringValue *toString();
-
-            void negate() {
-                value = - value;
-            }
+            NumberValue negate()    { value = - value; return *this; }
 
         private:
-            bool isNaN;
-            bool isInfinity;
             double value;
+
+            virtual BooleanValue toBoolean() const;
+            virtual NumberValue  toNumber () const;
+            virtual StringValue  toString () const;
     };
 
     class StringValue : public Value {
         public:
-            StringValue(const string &s) : value( s ) { }
-            virtual ~StringValue();
+            explicit StringValue(const std::string &s = "") : value( s ) {}
 
-            ValueType type() { return StringType; };
+            ValueType type() const { return StringType; };
 
-            virtual BooleanValue *toBoolean() {
-                return new BooleanValue( (value.length() > 0) );
-            }
-            // ## TODO: recognize NaN, -Infinity and parse errors.
-            virtual NumberValue *toNumber();
-            virtual StringValue *toString() {
-                return new StringValue(value);
-            }
-
-            const string & getValue() const { return value; };
+            const std::string & getValue() const { return value; };
 
         private:
-            string value;
+            std::string value;
+
+            virtual BooleanValue toBoolean() const;
+            virtual NumberValue  toNumber () const;
+            virtual StringValue  toString () const;
     };
 
     // NodeSetValues are unordered by default, i.e.
-    // they contain a NodeSetRef which is ordered by pointer value.
+    // they contain a NodeSetPtr which is ordered by pointer value.
     // this provides for fast insertion and lookup.
     //
     class NodeSetValue : public Value {
         public:
+            typedef NodeSet::size_type              size_type;
+
             NodeSetValue() : _myNodes( 0 ) {}
+
             // ownership of other is transferred to the new node set value.
             // XXX: This comment might somehow relate to the strange stuff in Context.h [DS]
-            NodeSetValue( NodeSetRef other ) : _myNodes( other) {}
-            virtual ~NodeSetValue() {
-                delete _myNodes;
-            }
+            explicit NodeSetValue(NodeSetPtr rhs) : _myNodes(rhs) {}
 
-            NodeSetRef takeNodes() {
-                NodeSetRef retval = _myNodes;
-                _myNodes = 0;
+            Value::ValueType type() const           { return NodeSetType; };
+
+            NodeSetPtr takeNodes() {
+                NodeSetPtr retval = _myNodes;
+                _myNodes = NodeSetPtr();
                 return retval;
             }
 
-            virtual BooleanValue *toBoolean() {
-                if ( ! _myNodes) {
-                    return new BooleanValue(false);
-                }
-                return new BooleanValue( _myNodes->size()!=0 ); 
-            }
-            virtual NumberValue *toNumber();
-            virtual StringValue *toString();
-            virtual NodeSetValue *toNodeSet();
+            NodeSet::iterator begin()              { assert(_myNodes); return _myNodes->begin(); }
+            NodeSet::iterator end()                { assert(_myNodes); return _myNodes->end  (); }
 
-            NodeSet::iterator begin() {
-                assert(_myNodes);
-                return _myNodes->begin();
-            }
-            NodeSet::iterator end() {
-                assert(_myNodes);
-                return _myNodes->end();
-            }
-            int length() {
-                if ( ! _myNodes) {
-                    return 0;
-                }
-                return _myNodes->size();
-            }
-            NodeRef item(int number) {
-                assert(_myNodes); 
-                if (!_myNodes) {
-                    return 0; 
-                }
-                NodeSet::iterator iter = _myNodes->begin(); 
-                while ((iter != _myNodes->end()) && number--) {
-                    ++iter;
-                }
-                return (iter == _myNodes->end()) ? 0 : *iter;
-            };
+            NodeSet::const_iterator begin() const  { assert(_myNodes); return _myNodes->begin(); }
+            NodeSet::const_iterator end() const    { assert(_myNodes); return _myNodes->end  (); }
 
-            Value::ValueType type() { return NodeSetType; };
+            size_type length() const               { return _myNodes ? _myNodes->size() : 0; }
+
+//             dom::Node* item(size_type number) const {
+//                 assert(_myNodes); 
+//                 if (!_myNodes) {
+//                     return 0; 
+//                 }
+//                 NodeSet::iterator iter = _myNodes->begin(); 
+//                 while ((iter != _myNodes->end()) && number--) {
+//                     ++iter;
+//                 }
+//                 return (iter == _myNodes->end()) ? 0 : *iter;
+//             };
+
         private:
-            NodeSetRef _myNodes;
+            NodeSetPtr _myNodes;
+
+            virtual BooleanValue toBoolean() const {return BooleanValue( length()!=0 );}
+            virtual NumberValue  toNumber () const;
+            virtual StringValue  toString () const;
+            virtual NodeSetValue toNodeSet() const;
     };
+
+    inline BooleanValue Value::as(BooleanValue*) const { return toBoolean(); };
+    inline NumberValue  Value::as(NumberValue *) const { return toNumber (); };
+    inline StringValue  Value::as(StringValue *) const { return toString (); };
+    inline NodeSetValue Value::as(NodeSetValue*) const { return toNodeSet(); };
+
+    inline BooleanValue Value       ::toBoolean() const {return BooleanValue(bool());}
+    inline NumberValue  Value       ::toNumber () const {return NumberValue (double());} 
+    inline StringValue  Value       ::toString () const {return StringValue (std::string());}
+    inline NodeSetValue Value       ::toNodeSet() const {return NodeSetValue();}
+
+    inline BooleanValue BooleanValue::toBoolean() const {return *this;};
+    inline NumberValue  BooleanValue::toNumber () const {return NumberValue(getValue());}
+    inline StringValue  BooleanValue::toString () const {return StringValue(getValue()?"true":"false");}
+
+    inline BooleanValue NumberValue ::toBoolean() const {return BooleanValue(getValue()!=0);}
+    inline NumberValue  NumberValue ::toNumber () const {return *this;}
+
+    inline BooleanValue StringValue ::toBoolean() const {return BooleanValue(getValue().length() > 0);}
+    inline StringValue  StringValue ::toString () const {return *this;}
+    inline NumberValue  StringValue ::toNumber () const {return NumberValue( number_value_for(getValue()) ); }
+
+    inline StringValue  NodeSetValue::toString () const {return length() ? StringValue( string_value_for(*_myNodes->begin()) ) : StringValue(std::string()); }
+    inline NodeSetValue NodeSetValue::toNodeSet() const {return NodeSetValue(_myNodes);}
+    inline NumberValue  NodeSetValue::toNumber () const {return NumberValue( number_value_for(toString().getValue()) );}
 
 } // end of namespace xpath
 

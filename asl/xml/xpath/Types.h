@@ -11,101 +11,53 @@
 #ifndef XPATH_TYPES_H
 #define XPATH_TYPES_H
 
-#ifdef DEBUG
-#define DEBUG_RESULTS
-#define INTERPRETER_DEBUG
-#define DEBUG_PARSER_STATES
-#define PARSER_DEBUG_VERBOSITY 2
-#endif
+#include <string>
+#include <vector>
+#include <set>
+#include <functional>
+
+#include <asl/Ptr.h>
+
+#include <dom/Nodes.h>
 
 namespace xpath {
-    typedef std::string string;
 
-    typedef dom::Node *NodeRef;
+    typedef dom::ThreadingModel                     ThreadingModel;
 
-    typedef std::set<NodeRef> NodeSet;
-    typedef NodeSet *NodeSetRef;
+    typedef std::set<dom::NodePtr>                  NodeSet;
+    typedef asl::Ptr<NodeSet,ThreadingModel>        NodeSetPtr;
 
-    typedef std::vector<NodeRef> NodeVector;
-    typedef NodeVector * NodeVectorRef;
+    typedef std::vector<dom::NodePtr>               NodeVector;
+    typedef asl::Ptr<NodeVector,ThreadingModel>     NodeVectorPtr;
 
-    struct DocOrderLess :
-	    public std::binary_function<const NodeRef, const NodeRef, bool>
+    struct DocOrderLess : public std::binary_function<const dom::NodePtr, const dom::NodePtr, bool>
     {
-
-        bool operator() (NodeRef a, NodeRef b) const {
-
-            // now be cool and really fast :-)
-
-            if (a == b) {
-                return false;
-            }
-
-            std::list<NodeRef> parentsa;
-            while (a) {
-                parentsa.push_front(a);
-                a = a->parentNode();
-            }
-            std::list<NodeRef> parentsb;
-            while (b) {
-                parentsb.push_front(b);
-                b = b->parentNode();
-            }
-            std::list<NodeRef>::const_iterator ia = parentsa.begin();
-            std::list<NodeRef>::const_iterator ib = parentsb.begin();
-
-            while (ia != parentsa.end() && ib != parentsb.end() && (*ia == *ib)) {
-                ++ia;
-                ++ib;
-            };
-            if (ib == parentsb.end()) {
-                // since a != b,
-                // b is an ancestor of a.
-                return false;
-            }
-            if (ia != parentsa.end()) {
-                // *ia shares a parent with *ib.
-                for(NodeRef tmpNode = *ib; tmpNode; tmpNode = &*tmpNode->nextSibling()) {
-                    if (tmpNode == *ia) {
-                        // b is before a
-#ifdef DEBUG
-                        AC_TRACE << **ib << " is before " << **ia;
-#endif
-                        return false;
-                    }
-                }
-            }
-            // a != b, b is not an ancestor of a, b is not before a:
-            // b is descendant of a OR b is before a.
-            return true;
-        }
+        bool operator()(const dom::NodePtr Lhs, const dom::NodePtr Rhs) const;
     };
 
-    string string_value_for(const NodeRef);
-    double number_value_for(const string &);
+    std::string string_value_for(const dom::NodePtr);
+    double number_value_for(const std::string &);
 
     inline
-    double number_value_for(const NodeRef n) {
+    double number_value_for(const dom::NodePtr n) {
         return number_value_for(string_value_for(n));
     }
 
-    struct StringLess :
-        public std::binary_function<const NodeRef, const NodeRef, bool>
+    struct StringLess : public std::binary_function<const dom::NodePtr, const dom::NodePtr, bool>
     {
-        bool operator()(const NodeRef a, const NodeRef b) const {
-            return string_value_for(a) < string_value_for(b);
+        bool operator()(const dom::NodePtr Lhs, const dom::NodePtr Rhs) const {
+            return string_value_for(Lhs) < string_value_for(Rhs);
         }
     };
 
-    struct NumberLess :
-        public std::binary_function<const NodeRef, const NodeRef, bool>
+    struct NumberLess : public std::binary_function<const dom::NodePtr, const dom::NodePtr, bool>
     {
-        bool operator()(const NodeRef a, const NodeRef b) const {
-            return number_value_for(a) < number_value_for(b);
+        bool operator()(const dom::NodePtr Lhs, const dom::NodePtr Rhs) const {
+            return number_value_for(Lhs) < number_value_for(Rhs);
         }
     };
 
-    typedef std::set<NodeRef, DocOrderLess> OrderedNodeSet;
-    typedef OrderedNodeSet *OrderedNodeSetRef;
+    typedef std::set<dom::NodePtr, DocOrderLess>    OrderedNodeSet;
+    typedef asl::Ptr<OrderedNodeSet,ThreadingModel> OrderedNodeSetPtr;
 };
 #endif

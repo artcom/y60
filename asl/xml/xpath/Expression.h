@@ -11,207 +11,178 @@
 #ifndef XPATH_EXPRESSION_H
 #define XPATH_EXPRESSION_H
 
-#include <dom/Nodes.h>
+#include <vector>
 
-#include <functional>
+#include <asl/Ptr.h>
+
+#include <dom/Nodes.h>
 
 #include "Context.h"
 #include "Value.h"
 
 namespace xpath
 {
-    typedef std::string string;
+    class Expression;
+    typedef asl::Ptr<Expression,ThreadingModel>     ExpressionPtr;
+    class BinaryExpression;
+    typedef asl::Ptr<BinaryExpression,ThreadingModel>
+                                                    BinaryExpressionPtr;
+    class Step;
+    typedef asl::Ptr<Step,ThreadingModel>           StepPtr;
+    class Path;
+    typedef asl::Ptr<Path,ThreadingModel>           PathPtr;
+    class SetExpression;
+    typedef asl::Ptr<SetExpression,ThreadingModel>  SetExpressionPtr;
 
     class SyntaxNode
     {
         public:
-            virtual ~SyntaxNode(){}
-            virtual void serializeTo(std::ostream &) = 0;
-            string serialize() {
-                string retval;
-                std::ostringstream oss(retval);
+            virtual ~SyntaxNode() {}
+
+            std::string serialize() const {
+                std::ostringstream oss;
                 serializeTo(oss);
-                return retval;
+                return oss.str();
             }
+
+            virtual void serializeTo(std::ostream &) const = 0;
+
+        private:
+            friend std::ostream &operator<<(std::ostream &stream, const SyntaxNode &myNode);
     };
 
     class Expression : public SyntaxNode {
         public:
-            virtual Value *evaluateExpression(const Context &) = 0;
+            virtual ValuePtr evaluateExpression(const Context &) const = 0;
     };
 
     class Literal : public Expression {
         public:
-            Literal(const string &data) { value = data; }
-            virtual ~Literal() { }
-            virtual void serializeTo(std::ostream &os) {
-                os << "\"" << value << "\"";
-            }
-            virtual Value *evaluateExpression(const Context &c) {
-                return new StringValue(value);
-            }
+            Literal(const std::string &data)                        : _value(data) {}
+
+            ValuePtr evaluateExpression(const Context &c) const       {return ValuePtr(new StringValue(_value));}
+
+            virtual void serializeTo(std::ostream &os)  const         {os << '\"' << _value << '\"';}
 
         private:
-            string value;
+            std::string _value;
     };
 
     class Number : public Expression {
         public:
-            Number(int _value) { value = _value; }
-            virtual ~Number() {}
-            virtual void serializeTo(std::ostream &os) { os << value; }
-            virtual Value *evaluateExpression(const Context &)  {
-                return new NumberValue(value);
-            }
+            Number(double data)                                     : _value(data) {}
+
+            ValuePtr evaluateExpression(const Context &) const        {return ValuePtr(new NumberValue(_value));}
+
+            virtual void serializeTo(std::ostream &os) const          { os << _value; }
 
         private:
-            int value;
+            double _value;
     };
 
     class BinaryExpression : public Expression {
         public:
-            enum ExpressionType {
-                Equal,
-                NotEqual, 
-                Less=4,
-                Greater,
-                LEqual,
-                GEqual, 
-                Or = 16,
-                And,
-                Plus = 32,
-                Minus,
-                Times,
-                Div,
-                Mod
-            };
+            enum ExpressionType { Equal
+                                , NotEqual
+                                , Less=4
+                                , Greater
+                                , LEqual
+                                , GEqual
+                                , Or = 16
+                                , And
+                                , Plus = 32
+                                , Minus
+                                , Times
+                                , Div
+                                , Mod
+                                };
 
-            BinaryExpression(ExpressionType, Expression *, Expression *);
-            virtual ~BinaryExpression() {
-                if (lvalue) {
-                    delete lvalue;
-                }
-                if (rvalue) {
-                    delete rvalue;
-                }
-            }
+            BinaryExpression( ExpressionType type
+                            , ExpressionPtr lvalue
+                            , ExpressionPtr rvalue)                 : _type(type), _lvalue(lvalue)
+                                                                                 , _rvalue(rvalue) {}
 
-            virtual void serializeTo(std::ostream &);
-            virtual Value *evaluateExpression(const Context &);
+            virtual ValuePtr evaluateExpression(const Context &) const;
+
+            virtual void serializeTo(std::ostream &) const;
 
         private:
-
-            ExpressionType type;
+            ExpressionType _type;
             // both must one of (path, expressions, literal, number).
-            Expression * lvalue;
-            Expression * rvalue;
+            ExpressionPtr _lvalue;
+            ExpressionPtr _rvalue;
     };
 
     class UnaryExpression : public Expression {
         public:
-            enum OperatorType {
-                Minus,
-                Tilde,
-                Not,
-                Invalid
-            };
-            UnaryExpression(OperatorType _type, Expression *_argument) : 
-                type( _type ),
-                argument( _argument )
-            {}
-            virtual ~UnaryExpression() {
-                if (argument) {
-                    delete argument; 
-                }
-            }
+            enum OperatorType { Minus
+                              , Tilde
+                              , Not
+                              , Invalid 
+                              };
 
-            virtual void serializeTo(std::ostream &);
-            virtual Value *evaluateExpression(const Context &);
+            UnaryExpression( OperatorType type
+                           , ExpressionPtr argument )               : _type(type), _argument(argument) {}
+
+            virtual ValuePtr evaluateExpression(const Context &) const;
+
+            virtual void serializeTo(std::ostream &) const;
 
         private:
-            OperatorType type;
-            Expression *argument;
+            OperatorType _type;
+            ExpressionPtr _argument;
     };
 
     class Function: public Expression {
         public:
+            typedef std::vector<ExpressionPtr>                        ArgumentList;
+            typedef ArgumentList::size_type                           size_type;
 
-            enum FunctionType {
-                Unknown,
-                Last,
-                Position,
-                Count,
-                StartsWith,
-                Concat,
-                Contains,
-                Substring,
-                SubstringBefore,
-                SubstringAfter,
-                Not,
-                // To be implemented:
-                Id,
-                LocalName,
-                NamespaceURI,
-                Name, 
-                String,
-                StringLength,
-                NormalizeSpace,
-                Translate, 
-                Boolean,
-                True,
-                False,
-                Lang, 
-                Number,
-                Sum,
-                Floor,
-                Ceiling,
-                Round
-            };
+            enum FunctionType { Unknown
+                              , Last
+                              , Position
+                              , Count
+                              , StartsWith
+                              , Concat
+                              , Contains
+                              , Substring
+                              , SubstringBefore
+                              , SubstringAfter
+                              , Not
+                              // To be implemented:
+                              , Id
+                              , LocalName
+                              , NamespaceURI
+                              , Name
+                              , String
+                              , StringLength
+                              , NormalizeSpace
+                              , Translate
+                              , Boolean
+                              , True
+                              , False
+                              , Lang
+                              , Number
+                              , Sum
+                              , Floor
+                              , Ceiling
+                              , Round
+                              };
 
-            static const string FUNCTIONNAME_LAST;
-            static const string FUNCTIONNAME_POSITION;
-            static const string FUNCTIONNAME_COUNT;
-            static const string FUNCTIONNAME_STARTSWITH;
-            static const string FUNCTIONNAME_CONCAT;
-            static const string FUNCTIONNAME_CONTAINS;
-            static const string FUNCTIONNAME_SUBSTRING;
-            static const string FUNCTIONNAME_SUBSTRING_BEFORE;
-            static const string FUNCTIONNAME_SUBSTRING_AFTER;
-            static const string FUNCTIONNAME_NOT;
-            static const string FUNCTIONNAME_ID;
-            static const string FUNCTIONNAME_LOCAL_NAME;
-            static const string FUNCTIONNAME_NAMESPACE_URI;
-            static const string FUNCTIONNAME_NAME;
-            static const string FUNCTIONNAME_STRING;
-            static const string FUNCTIONNAME_STRING_LENGTH;
-            static const string FUNCTIONNAME_NORMALIZE_SPACE;
-            static const string FUNCTIONNAME_TRANSLATE;
-            static const string FUNCTIONNAME_BOOLEAN;
-            static const string FUNCTIONNAME_TRUE;
-            static const string FUNCTIONNAME_FALSE;
-            static const string FUNCTIONNAME_LANG;
-            static const string FUNCTIONNAME_NUMBER;
-            static const string FUNCTIONNAME_SUM;
-            static const string FUNCTIONNAME_FLOOR;
-            static const string FUNCTIONNAME_CEILING;
-            static const string FUNCTIONNAME_ROUND;
-            static const string FUNCTIONNAME_UNKNOWN;
+            Function(FunctionType type)                             : _type(type), _arguments() {}
 
-            Function(FunctionType _type, std::list<Expression*> *_arguments) :
-                type( _type ),
-                arguments( _arguments )
-            {}
-            virtual ~Function();
+            Function(FunctionType type, const ArgumentList& args)   : _type(type), _arguments(args) {}
 
-            virtual void serializeTo(std::ostream &);
+            virtual ValuePtr evaluateExpression(const Context &) const;
 
-            static string nameOf(FunctionType);
-            static FunctionType typeOf(string instring, int pos=0);
-            virtual Value *evaluateExpression(const Context &);
+            virtual void serializeTo(std::ostream &) const;
+
+            static std::string nameOf(FunctionType);
+            static FunctionType typeOf(const std::string& instring, std::string::size_type pos=0);
 
         private:
-            FunctionType type;
-            std::list<Expression*> *arguments;
+            FunctionType _type;
+            ArgumentList _arguments;
     };
 
 
@@ -239,116 +210,124 @@ namespace xpath
      */
 
     class Step : public SyntaxNode {
+        private:
+            typedef std::vector<ExpressionPtr>                        PredicateList;
         public:
 
-            // -----------------------------
+            typedef PredicateList::size_type                          size_type;
+            typedef PredicateList::const_iterator                     const_iterator;
 
-            static const string AXISNAME_INVALID;
-            static const string AXISNAME_NEXT_SIBLING;
-            static const string AXISNAME_PREVIOUS_SIBLING;
-            static const string AXISNAME_FOLLOWING_SIBLING;
-            static const string AXISNAME_PRECEDING_SIBLING;
-            static const string AXISNAME_CHILD;
-            static const string AXISNAME_PARENT;
-            static const string AXISNAME_DESCENDANT;
-            static const string AXISNAME_ANCESTOR;
-            static const string AXISNAME_FOLLOWING;
-            static const string AXISNAME_PRECEDING;
-            static const string AXISNAME_ANCESTOR_OR_SELF;
-            static const string AXISNAME_DESCENDANT_OR_SELF;
-            static const string AXISNAME_SELF;
-            static const string AXISNAME_NAMESPACE;
-            static const string AXISNAME_ATTRIBUTE;
+            enum Axis { Invalid = 255
+                      , Next_Sibling = 0
+                      , Previous_Sibling
+                      , Following_Sibling
+                      , Preceding_Sibling
+                      , Child
+                      , Parent
+                      , Descendant
+                      , Ancestor
+                      , Following = 10
+                      , Preceding
+                      , Ancestor_Or_Self = 14
+                      , Descendant_Or_Self
+                      , Self
+                      , Namespace
+                      , Attribute
+                      };
 
-            enum Axis {
-                Invalid = 255,
-                Next_Sibling = 0,
-                Previous_Sibling,
-                Following_Sibling,
-                Preceding_Sibling,
-                Child,
-                Parent,
-                Descendant,
-                Ancestor,
-                Following = 10,
-                Preceding,
-                Ancestor_Or_Self = 14,
-                Descendant_Or_Self,
-                Self,
-                Namespace,
-                Attribute
-            };
+            static const std::string &stringForAxis(Axis a);
 
-            static const string &stringForAxis(Axis a);
-
-            static Axis read_axis(const string &instring, int pos);
+            static Axis read_axis(const std::string &instring, int pos);
 
             // --------------------------------
 
-            enum NodeTest {
-                TestPrincipalType,
-                TestAnyNode,
-                TestCommentNode,
-                TestTextNode,
-                TestProcessingInstruction,
-                InvalidTest 
-            };
+            enum NodeTest { TestPrincipalType
+                          , TestAnyNode
+                          , TestCommentNode
+                          , TestTextNode
+                          , TestProcessingInstruction
+                          , InvalidTest 
+                          };
 
-            static const string NODETEST_INVALID;
-            static const string NODETEST_NODE;
-            static const string NODETEST_COMMENT;
-            static const string NODETEST_TEXT;
-            static const string NODETEST_PI;
+            static NodeTest read_NodeTest(const std::string &instring, int pos);
 
-            static NodeTest read_NodeTest(const string &instring, int pos);
+            // ---------------------------------
+
+            Step()                                                  : _axis(Child)
+                                                                    , _test(TestPrincipalType)
+                                                                    , _nodeTestName()
+                                                                    , _predicates() {}
+
+            //Step(Axis axis)                                         : _axis(axis), _test()
+            //                                                        , _nodeTestName()
+            //                                                        , _predicates() {}
+
+            Step(Axis axis, NodeTest test)                          : _axis(axis), _test(test)
+                                                                    , _nodeTestName()
+                                                                    , _predicates() {}
+
+            Step(Axis axis, NodeTest test, const std::string& name) : _axis(axis), _test(test)
+                                                                    , _nodeTestName(name)
+                                                                    , _predicates() {}
 
             // used from fillAxis() to evaluate a node test
-            bool allows(NodeRef n);
+            bool allows(dom::NodePtr n) const;
 
-            void serializeNodeTest(std::ostream &);
-
-            // ---------------------------------
-
-            Step();
-            Step(Axis, NodeTest=TestPrincipalType, string="");
-            virtual ~Step();
+            void serializeNodeTest(std::ostream &) const;
 
             template <class T>
-            void scanInto(NodeRef from, T &into) {
-                scan(from, into);
-            }
-
-            virtual void serializeTo(std::ostream &);
+            void scanInto(dom::NodePtr from, T &into) const           {scan(from,into);}
 
             // ---------------------------------
 
-            void setAxis(Axis a) { axis = a; };
-            inline Axis getAxis() { return axis; };
+            void setAxis(Axis a)                                      { _axis = a; }
+            Axis getAxis() const                                      { return _axis; }
 
-            void setNodeTest(NodeTest n, const string &name="") { test = n; nodeTestName = name; };
-            void appendPredicate(Expression *);
-            void prependPredicate(Expression *);
-            void insertPredicate(int i, Expression *e);
+            void setNodeTest(NodeTest n, const std::string &name="")  { _test = n; _nodeTestName = name; };
+            void appendPredicate(ExpressionPtr e)                     { _predicates.push_back(e); }
+            void prependPredicate(ExpressionPtr e)                    { _predicates.insert(_predicates.begin(),e); }
+            void insertPredicate(size_type idx, ExpressionPtr e)      { _predicates.insert(findPredicate(idx),e); }
 
-            Expression* takeFirst();
-            Expression* takeLast();
-            Expression* take(int i);
+            ExpressionPtr takeFirst()                                 { return take(_predicates.begin()); }
+            ExpressionPtr takeLast()                                  { return take(_predicates.end()-1); }
+            ExpressionPtr take(size_type idx)                         { return take(findPredicate(idx)); }
 
-            Expression* predicate(int i);
-            int count() const;
+            ExpressionPtr predicate(size_type idx)                    { return *findPredicate(idx); }
 
-            std::list<Expression*> predicates;
+            size_type count() const                                   { return _predicates.size(); }
+            const_iterator begin() const                              { return _predicates.begin(); }
+            const_iterator end  () const                              { return _predicates.end  (); }
+
+            virtual void serializeTo(std::ostream &) const;
 
         private:
+            PredicateList               _predicates;
+            Axis                        _axis;
+            NodeTest                    _test;
+            std::string                 _nodeTestName;
 
             // puts results from from into into
-            void scan(NodeRef from, NodeSet & into);
-            void scan(NodeRef from, NodeVector & into);
-            void scan(NodeRef from, OrderedNodeSet & into);
+            void scan(dom::NodePtr from, NodeSet & into) const;
+            void scan(dom::NodePtr from, NodeVector & into) const;
+            void scan(dom::NodePtr from, OrderedNodeSet & into) const;
 
-            Axis axis;
-            NodeTest test;
-            string nodeTestName;
+            PredicateList::iterator findPredicate(size_type idx)
+            {
+                PredicateList::iterator result = _predicates.begin();
+                while( result != _predicates.end() && idx ) {
+                    --idx;
+                    ++result;
+                }
+                assert( result != _predicates.end() );
+                return result;
+            }
+
+            ExpressionPtr take(PredicateList::iterator it) {
+                assert( it != _predicates.end() );
+                ExpressionPtr retval = *it;
+                _predicates.erase(it);
+                return retval;
+            }
 
     };
 
@@ -357,80 +336,83 @@ namespace xpath
     // b) be serialized to a complete  expression.
 
     class Path : public Expression {
+        private:
+            typedef std::vector<StepPtr>                              StepList;
         public:
-            Path();
-            virtual void serializeTo(std::ostream &);
-            virtual Value *evaluateExpression(const Context &c);
-            virtual ~Path() {
-                typedef std::list<Step *>::iterator StepIterator;
-                for ( StepIterator i = steps.begin(); i != steps.end(); ++i) {
-                    delete *i;
-                }
-            }
-            NodeSetValue *evaluate(NodeRef);
+            typedef StepList::size_type                               size_type;
 
-            template <class T>
-            T * evaluateAs(NodeRef input) {
-                NodeSetRef theseNodes = new NodeSet();
+            Path()                                                  : _steps(), _absolute(false) {}
+
+            ValuePtr evaluateExpression(const Context &c) const       {return ValuePtr(evaluate(c.currentNode));}
+
+            NodeSetValuePtr evaluate(const dom::NodePtr n) const      {return NodeSetValuePtr( new NodeSetValue(evaluateAs<NodeSet>(n)) );}
+
+            virtual void serializeTo(std::ostream &) const;
+
+            template<class T>
+            asl::Ptr<T,ThreadingModel> evaluateAs(const dom::NodePtr input) const {
+                NodeSetPtr theseNodes( new NodeSet() );
                 theseNodes->insert(input);
-                T *retval = new T;
+                asl::Ptr<T,ThreadingModel> retval( new T );
                 evaluateInto(theseNodes, *retval);
                 return retval;
             }
 
-            void setAbsolute(bool a = true) { absolute = a; };
-            bool isAbsolute() { return absolute; };
+            void setAbsolute(bool a = true)                           { _absolute = a; }
 
-            void appendStep(Step *nextStep) {
-                steps.push_back(nextStep);
-            }
-            void prependStep(Step *prevStep) {
-                steps.push_front(prevStep);
-            }
+            bool isAbsolute()                                         { return _absolute; }
 
-            int count() {
-                return steps.size();
-            }
+            void appendStep(StepPtr nextStep)                         { _steps.push_back(nextStep); }
+            void prependStep(StepPtr prevStep)                        { _steps.insert(_steps.begin(),prevStep); }
 
-            // a list does not support random access, so
-            // hide this call: Step *step(int i) { return steps.item(i); };
+            size_type count() const                                   { return _steps.size(); }
 
-            Step *takeFirst() {
-                Step *retval = steps.front(); 
-                steps.pop_front(); 
-                return retval;
-            }
-            Step *takeLast() {
-                Step *retval = steps.back();
-                steps.pop_back();
-                return retval;
-            }
+            StepPtr takeFirst()                                       { return take(_steps.begin());}
+            StepPtr takeLast()                                        { return take(_steps.end()-1);}
 
         private:
-            void evaluateInto(NodeSetRef, NodeSet &);
-            void evaluateInto(NodeSetRef, OrderedNodeSet &);
-            void evaluateInto(NodeSetRef, NodeVector &);
+            StepList _steps;
+            bool _absolute;
 
-            std::list<Step*> steps;
-            bool absolute;
+            void evaluateInto(NodeSetPtr, NodeSet &) const;
+            void evaluateInto(NodeSetPtr, OrderedNodeSet &) const;
+            void evaluateInto(NodeSetPtr, NodeVector &) const;
+
+            StepPtr take(StepList::iterator it) {
+                assert( it != _steps.end() );
+                StepPtr retval = *it;
+                _steps.erase(it);
+                return retval;
+            }
+
     };
 
     class SetExpression: public Expression {
+        private:
+            typedef std::vector<PathPtr>                              PathList;
         public:
-            enum SetOperation { Union, Intersection, Difference };
-            SetExpression(SetOperation op) { m_op=op; };
+            enum SetOperation { Union
+                              , Intersection
+                              , Difference 
+                              };
 
-            void appendPath(Path *p) { sets.push_back(p); };
+            SetExpression(SetOperation op)                          : _op(op) {}
 
-            virtual void serializeTo(std::ostream &);
-            virtual Value *evaluateExpression(const Context &);
+            void appendPath(PathPtr p)                                { _sets.push_back(p); }
+
+            virtual ValuePtr evaluateExpression(const Context &) const;
+
+            virtual void serializeTo(std::ostream &) const;
 
         private:
-            SetOperation m_op;
-            std::list<Path *> sets;
+            SetOperation _op;
+            PathList _sets;
     };
 
-}; // namespace
+    inline std::ostream &operator<<(std::ostream &stream, const SyntaxNode &myNode) {
+        myNode.serializeTo(stream);
+        return stream;
+    }
+} // namespace
 
-std::ostream &operator<<(std::ostream &stream, xpath::SyntaxNode &myNode);
 #endif

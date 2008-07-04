@@ -492,10 +492,10 @@ namespace y60 {
         // Find all primitives that reference the material
         MaterialBase * myMaterial = &*theMaterial;
         PrimitiveVector myAffectedPrimitives;
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
+        xpath::NodeVectorPtr myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes->size();
         for (unsigned i = 0; i < myShapeCount; ++i) {
-            NodePtr myShapeNode = myShapes[i];
+            NodePtr myShapeNode = (*myShapes)[i];
             ShapePtr myShape = myShapeNode->getFacade<Shape>();
             const PrimitiveVector & myPrimitives = myShape->getPrimitives();
             for (unsigned j = 0; j < myPrimitives.size(); ++j) {
@@ -595,10 +595,10 @@ namespace y60 {
 #if 0
     void
     Scene::clearShapes() {
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
+        xpath::NodeVectorPtr myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes->size();
         for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapes[myShapeIndex];
+            NodePtr myShapeNode = (*myShapes)[myShapeIndex];
             ShapePtr myShape = myShapeNode->getFacade<Shape>();
             myShape->clear();
         }
@@ -606,12 +606,12 @@ namespace y60 {
 
     void
     Scene::updateShapes() {
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
+        xpath::NodeVectorPtr myShapes = xpath::findAll(getNode(), "//shape");
+        unsigned myShapeCount = myShapes->size();
         _myStatistics.vertexCount = 0;
         _myStatistics.primitiveCount = 0;
         for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapes[myShapeIndex];
+            NodePtr myShapeNode = (*myShapes)[myShapeIndex];
             ShapePtr myShape = myShapeNode->getFacade<Shape>();
             if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
                 buildShape(myShape);
@@ -881,12 +881,12 @@ namespace y60 {
 #if 0
     void
     Scene::updateMaterials() {
-        std::vector<NodePtr> myMaterials = xpath::findAll(getNode(), "//material");
-        unsigned myMaterialCount = myMaterials.size();
+        xpath::NodeVectorPtr myMaterials = xpath::findAll(getNode(), "//material");
+        unsigned myMaterialCount = myMaterials->size();
         bool myMaterialRebindFlag = false;
         AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
         for (unsigned i = 0; i < myMaterialCount; ++i) {
-            NodePtr myMaterialNode = myMaterials[i];
+            NodePtr myMaterialNode = (*myMaterials)[i];
             MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
             if (myMaterial) {
 				if (myMaterial->reloadRequired()) {
