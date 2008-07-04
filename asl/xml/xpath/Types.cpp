@@ -65,7 +65,7 @@ namespace xpath {
 
     //struct DocOrderLess : public std::binary_function<const dom::NodePtr, const dom::NodePtr, bool>
     //{
-    bool DocOrderLess::operator()(const dom::NodePtr Lhs, const dom::NodePtr Rhs) const {
+        bool DocOrderLess::operator()(const dom::NodePtr Lhs, const dom::NodePtr Rhs) const {
             if (Lhs == Rhs) {
                 return false;
             }

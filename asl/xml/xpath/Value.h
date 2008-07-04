@@ -70,7 +70,7 @@ namespace xpath {
 
     template <class VALUE_TYPE>
     inline bool equal_as(const ValuePtr& left, const ValuePtr& right) {
-        return equal_as(*left,*right);
+        return equal_as<VALUE_TYPE>(*left,*right);
     }
 
     template <class VALUE_TYPE>
@@ -80,7 +80,7 @@ namespace xpath {
 
     template <class VALUE_TYPE>
     inline bool smaller_than_as(const ValuePtr& left, const ValuePtr& right) {
-        return smaller_than_as(*left,*right);
+        return smaller_than_as<VALUE_TYPE>(*left,*right);
     }
 
     class NullValue : public Value {
