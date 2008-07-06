@@ -1075,14 +1075,18 @@ namespace dom {
             }
         }
 
-        /// returns whether node has a facade object;
+        /// returns whether node has can have a facade object by trying to create one; as a side effect a facade is created
+        // TODO: should be possibly rename in "tryFacade"
         bool hasFacade() const;
 
         /// returns facade object; if none exists yet, it is created; if it cant be created, an exception is thrown
         /// you can check with hasFacade() to avoid exception
         FacadePtr getFacade();
         const FacadePtr getFacade() const;
-
+        
+        /// return true if a facade has been already constructed
+        bool hasExistingFacade() const;
+            
         template <class TARGET_FACADE>
         asl::Ptr<TARGET_FACADE, dom::ThreadingModel> tryGetFacade() {
             return dynamic_cast_Ptr<TARGET_FACADE>(getFacade());

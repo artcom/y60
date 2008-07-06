@@ -217,7 +217,10 @@ namespace y60 {
     private:
         static PixelEncodingInfo getPixelEncoding(const TexturePtr & theTexture, const ImagePtr & theImage);
 
-        /// Setup 2D texture.
+        bool imageMatchesGLTexture2D(TexturePtr theTexture) const;
+        bool imageMatchesGLTexture3D(TexturePtr theTexture) const;
+
+       /// Setup 2D texture.
         void setupTexture2D(TexturePtr & theTexture);
 
         /// Setup 3D texture.

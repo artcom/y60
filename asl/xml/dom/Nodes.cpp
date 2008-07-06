@@ -2908,6 +2908,12 @@ Node::hasFacade() const {
     return true;
 }
 
+bool
+Node::hasExistingFacade() const {
+    return _myFacade;
+}
+
+
 FacadePtr
 Node::getFacade() {
     if (hasFacade()) {

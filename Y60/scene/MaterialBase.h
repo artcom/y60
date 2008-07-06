@@ -160,7 +160,7 @@ namespace y60 {
             virtual void load();
 
             const MaterialParameterVector & getVertexParameters() const;
-            virtual bool reloadRequired();
+            virtual bool reloadRequired() const;
             //virtual bool rebindRequired();
             int getGroup1Hash() const;
 

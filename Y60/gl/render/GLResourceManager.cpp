@@ -188,20 +188,8 @@ namespace y60 {
     }
 
     bool 
-	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
-        AC_DEBUG << "imageMatchesGLTexture()";
-	    if (theTexture->getType() != TEXTURE_2D) {
-            AC_DEBUG << "imageMatchesGLTexture() returning false (no TEXTURE_2D)";
-	        return false;
-	    }
-        CHECK_OGL_ERROR;
-
-        if (theTexture->getTextureId() == 0) {
-            AC_DEBUG << "imageMatchesGLTexture(): return false, texture has not been uploaded yet";
-            return false;
-        }
- 
-        AC_DEBUG << "imageMatchesGLTexture() binding Texture " << theTexture->getTextureId();
+	GLResourceManager::imageMatchesGLTexture2D(TexturePtr theTexture) const {
+        AC_DEBUG << "imageMatchesGLTexture2D() binding Texture " << theTexture->getTextureId();
         glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
         CHECK_OGL_ERROR;
 
@@ -247,6 +235,78 @@ namespace y60 {
         AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
 
 		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
+    }
+   bool 
+	GLResourceManager::imageMatchesGLTexture3D(TexturePtr theTexture) const {
+        AC_DEBUG << "imageMatchesGLTexture3D() binding Texture " << theTexture->getTextureId();
+        glBindTexture(GL_TEXTURE_3D, theTexture->getTextureId());
+        CHECK_OGL_ERROR;
+
+		// get current uploaded image size
+		GLint myUploadedWidth          = -1;
+		GLint myUploadedHeight         = -1;
+		GLint myUploadedDepth          = -1;
+		GLint myUploadedInternalFormat = -1;
+		GLint myUploadedMinFilter      = -1;
+        glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
+        CHECK_OGL_ERROR;
+		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
+        CHECK_OGL_ERROR;
+		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_DEPTH, &myUploadedDepth);
+        CHECK_OGL_ERROR;
+		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_INTERNAL_FORMAT, 
+                                 &myUploadedInternalFormat);
+        CHECK_OGL_ERROR;
+
+		glGetTexParameteriv(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
+		
+        CHECK_OGL_ERROR;
+        ImagePtr myImage = theTexture->getImage();
+        unsigned int myWidth = myImage->get<ImageWidthTag>();
+        unsigned int myHeight = myImage->get<ImageHeightTag>();
+        unsigned int myDepth = myImage->get<ImageDepthTag>();
+        if (only_power_of_two_textures()) {
+            myWidth = nextPowerOfTwo(myImage->get<ImageWidthTag>());
+            myHeight = nextPowerOfTwo(myImage->get<ImageHeightTag>());
+            myDepth = nextPowerOfTwo(myImage->get<ImageHeightTag>());
+        }
+
+        GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
+
+		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
+			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
+        bool myMipMapMatch = theTexture->get<TextureMipmapTag>() == myOpenGLMipMapSetting;
+        bool mySizeMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight) && (myDepth == myUploadedDepth); 
+        bool myInternalFormatMatch = myInternalFormat == myUploadedInternalFormat;
+        AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
+        AC_DEBUG << "Width match: " << mySizeMatch;
+        AC_DEBUG << "Image size: " << myWidth << "x" << myHeight << "x" << myDepth;
+        AC_DEBUG << "UploadedTexure size: " << myUploadedWidth << "x" << myUploadedHeight;
+        AC_DEBUG << "Internal format match: " << myInternalFormatMatch;
+        AC_DEBUG << "Uploaded InternalFormat: " << getGLEnumString(myUploadedInternalFormat);
+        AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
+
+		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
+    }
+    
+    bool 
+	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
+        AC_DEBUG << "imageMatchesGLTexture()";
+        if (theTexture->getTextureId() == 0) {
+            AC_DEBUG << "imageMatchesGLTexture(): return false, texture has not been uploaded yet";
+            return false;
+        }
+        CHECK_OGL_ERROR;
+	    if (theTexture->getType() != TEXTURE_2D) {
+	        return imageMatchesGLTexture2D(theTexture);
+	    }
+	    if (theTexture->getType() != TEXTURE_3D) {
+	        return imageMatchesGLTexture3D(theTexture);
+	    }
+        AC_DEBUG << "imageMatchesGLTexture() returning false, unknown texture type (not TEXTURE_2D or TEXTURE_3D), id=  " << theTexture->getTextureId();
+        return false; 
 	}
 
     void
@@ -536,22 +596,50 @@ namespace y60 {
                     myImage->getMemUsed(), myPixels);
         } else {
             // First allocate the texture with power of two dimensions
+        
+#if 0
+            // some test code
+            const unsigned char * myEmptyPixels = 0;
+            myEmptyPixels = myPixels;
+            dom::ValuePtr myEmptyMap = createRasterValue(myImage->getRasterEncoding(), myTexWidth, myTexHeight * myTexDepth);
+            dom::ResizeableRasterPtr myRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(myEmptyMap);
+            //myRaster->clear();
+            myRaster->fillRect(0,0,myRaster->width(), myRaster->height(), asl::Vector4<float>(1,0,0,1));
+            myEmptyPixels = myRaster->pixels().begin();
+            //myImage->saveToFile("/var/tmp/testimg.png");
+#endif
+
+#ifdef OSX
+#define glTexSubImage3D_OSX_BUG_WORKAROUND
+#endif
+#ifdef glTexSubImage3D_OSX_BUG_WORKAROUND
+            // Workaround for OSX driver bug; glTexSubImage3D does not work: use glTexImage3D only
+            glTexImage3D(GL_TEXTURE_3D, 0,
+                    myPixelEncoding.internalformat,
+                    myTexWidth, myTexHeight, myTexDepth, 0,
+                    myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
+                    myPixels);
+            
+            CHECK_OGL_ERROR;
+#else
             glTexImage3D(GL_TEXTURE_3D, 0,
                     myPixelEncoding.internalformat,
                     myTexWidth, myTexHeight, myTexDepth, 0,
                     myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
                     0);
+            
             CHECK_OGL_ERROR;
 
             // Then upload it. This way we can upload textures that are not power of two.
             // Empty textures just remain empty. Useful for render to texture... [DS]
             if (myPixels) {
                 glTexSubImage3D(GL_TEXTURE_3D, 0,
-                        0, 0, 0, myWidth, myHeight / myDepth, myDepth,
+                        0, 0, 0, myTexWidth, myTexHeight, myTexDepth,
                         myPixelEncoding.externalformat,
                         myPixelEncoding.pixeltype, myPixels);
                 CHECK_OGL_ERROR;
             }
+#endif
 
             myTopLevelTextureSize = getBytesRequired(myTexWidth * myTexHeight * myTexDepth, 
                                                      myImage->getRasterEncoding());
@@ -736,10 +824,19 @@ namespace y60 {
                     myPixelEncoding.externalformat,
                     theImage->getMemUsed(), myImageData);
         } else {
+#ifdef glTexSubImage3D_OSX_BUG_WORKAROUND
+            glTexImage3D(GL_TEXTURE_3D, 0,
+                    myPixelEncoding.internalformat,
+                    myWidth, myHeight / myDepth, myDepth,
+                    0,
+                    myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
+                    myImageData);
+#else
             glTexSubImage3D(GL_TEXTURE_3D, 0,
                     0, 0, 0, myWidth, myHeight / myDepth, myDepth,
                     myPixelEncoding.externalformat,
                     myPixelEncoding.pixeltype, myImageData);
+#endif
         }
     }
 

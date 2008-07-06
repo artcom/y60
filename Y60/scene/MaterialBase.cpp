@@ -90,8 +90,8 @@ namespace y60 {
     
 
     bool
-    MaterialBase::reloadRequired(){
-        MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
+    MaterialBase::reloadRequired() const {
+        const MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
             AC_TRACE << "Not reloading params for material " << get<NameTag>() << " last requiresVersion:" << _myRequiresVersion;
             AC_TRACE << "Not reloading params for material " << get<NameTag>() << " cur. requiresVersion:" << myReqFacade->getNode().nodeVersion();
@@ -133,22 +133,41 @@ namespace y60 {
         return _myShader;
     };
     void MaterialBase::ensureShader() {
-        AC_TRACE << "MaterialBase::ensureShader() - load & updateParams";
+        AC_TRACE << "MaterialBase::ensureShader() - load?";
         if (reloadRequired()) {
-            AC_TRACE << "MaterialBase::ensureShader() - load & updateParams";
+            AC_TRACE << "MaterialBase::ensureShader() - load!";
             load();
         }
     }
-	
-    void MaterialBase::ensureProperties() const {
-        if (!_ensuring && getNode().nodeVersion() != _myMaterialVersion) {
-            _ensuring = true;
-            const_cast<MaterialBase*>(this)->load();
-            _ensuring = false;
-            _myMaterialVersion = getNode().nodeVersion();
-        }
-    }
+#if 1	
+    //TODO: we should not load every time a property has changed, only when the requirements change
+   void MaterialBase::ensureProperties() const {
+       if (!_ensuring && getNode().nodeVersion() != _myMaterialVersion) {
+           _ensuring = true;
+           const_cast<MaterialBase*>(this)->load();
+           _ensuring = false;
+           _myMaterialVersion = getNode().nodeVersion();
+       }
+   }
+#else
+    // this is an improved version, but it does not work properly
+   void MaterialBase::ensureProperties() const {
+       if (_ensuring || getNode().nodeVersion() == _myMaterialVersion) {
+           return;
+       }
+       _ensuring = true;
+       if (!reloadRequired()) {
+           _ensuring = false;
+           return;
+       }
+       const_cast<MaterialBase*>(this)->load();
+       _ensuring = false;
+   }
+ #endif
 
+    static bool isSampler(const DOMString & theName) {
+        return theName == "sampler1d" || theName == "sampler2d" || theName == "sampler3d" || theName == "samplerCUBE";
+    }
 
     void
     MaterialBase::load() {
@@ -189,7 +208,7 @@ namespace y60 {
                     NodePtr myPropertyNode = myPropertiesNode->childNode(i);
                     const std::string & myPropTagName = myPropertyNode->nodeName();
                     const std::string & myPropName = myPropertyNode->getAttributeString("name");
-                    if (myPropTagName == "sampler1d" || myPropTagName == "sampler2d" || myPropTagName == "samplerCUBE") {
+                    if (isSampler(myPropTagName)) {
                         AC_DEBUG << "Removing sampler property '" << myPropName << "'";
                         myPropertiesNode->removeChild(myPropertyNode);
                     } else {
@@ -268,7 +287,7 @@ namespace y60 {
             
             // TODO: This seems to wrong that shader-properties do overwrite material properties if they already exist, but the test baseline assumes that this
             // happens.
-            myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
+            //myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue()); // remove!
             AC_TRACE << "MaterialBase::mergeProperties(): done: setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
         }
     }
@@ -314,7 +333,7 @@ namespace y60 {
                     for (unsigned j = 0; j < curPropList->childNodesLength(); ++j) {
                         // Q: What about the other samplers (sampler3d, samplerCube, etc)? [DS]
                         dom::NodePtr mySamplerNode = curPropList->childNode(j);
-                        if (mySamplerNode->nodeName() == "sampler2d") { 
+                        if (isSampler(mySamplerNode->nodeName())) { 
                             unsigned myTextureIndex = (*mySamplerNode)("#text").dom::Node::nodeValueAs<unsigned>();
                             if (myTextureIndex >= _myTextureUnits.size()) {
                                 string myTextureName = mySamplerNode->getAttributeString("name");
