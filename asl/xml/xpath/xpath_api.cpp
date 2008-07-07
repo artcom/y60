@@ -523,29 +523,27 @@ namespace xpath {
         return xpath_evaluateOrderedSet(myPath, theNode);
     }
 
-    void xpath_evaluate(PathPtr p, dom::NodePtr startingElement, NodeVectorPtr &results) {
+    void xpath_evaluate(PathPtr p, dom::NodePtr startingElement, NodeVector& results) {
         NodeVectorPtr retval = xpath_evaluate(p, startingElement);
         for (NodeVector::const_iterator i = retval->begin(); i != retval->end(); ++i) {
-            //results.push_back((*i)->self().lock());
-            results->push_back(*i);
+            results.push_back(*i);
         }
     }
 
-    void xpath_evaluate(const std::string& p, const dom::NodePtr startingElement, NodeVectorPtr &results) {
+    void xpath_evaluate(const std::string& p, const dom::NodePtr startingElement, NodeVector& results) {
         NodeVectorPtr retval = xpath_evaluate(p, startingElement);
         for (NodeVector::const_iterator i = retval->begin(); i != retval->end(); ++i) {
-            //results.push_back((*i)->self().lock());
-            results->push_back(*i);
+            results.push_back(*i);
         }
     }
 
    NodeVectorPtr findAll(dom::Node & theRoot, const std::string & theExpression) {
-        NodeVectorPtr myResults;
+        NodeVectorPtr myResults( new NodeVector );
         xpath::PathPtr myPath = xpath::xpath_parse(theExpression);
         if (!myPath) {
             AC_ERROR << "xpath could not parse '"<< theExpression<< "'";
         } else {
-            xpath::xpath_evaluate(myPath, theRoot.self().lock(), myResults);
+            xpath::xpath_evaluate(myPath, theRoot.self().lock(), *myResults);
         }
         return myResults;
     }

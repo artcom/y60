@@ -32,10 +32,10 @@ namespace xpath {
     // evaluate path on startingElement into results
     void xpath_evaluate( PathPtr 
                        , const dom::NodePtr startingElement
-                       , NodeVectorPtr &results );
+                       , NodeVector& results );
     void xpath_evaluate( const std::string& 
                        , const dom::NodePtr startingElement
-                       , NodeVectorPtr &results);
+                       , NodeVector& results);
 
     dom::NodePtr xpath_evaluate1(PathPtr, const dom::NodePtr);
 

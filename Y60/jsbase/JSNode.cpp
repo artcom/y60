@@ -877,9 +877,9 @@ xpath_findAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
         JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
         return JS_FALSE;
     } else {
-        xpath::NodeVectorPtr myResults;
+        xpath::NodeVector myResults;
         xpath::xpath_evaluate(myPath, myNode, myResults);
-        *rval = as_jsval(cx, *myResults);
+        *rval = as_jsval(cx, myResults);
         return JS_TRUE;
     }
 }
