@@ -1229,7 +1229,7 @@ namespace xpath
                 NodeSetPtr newResults( new NodeSet() );
                 for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end();++it) {
                     dom::NodePtr thisOne = *it;
-                    while (thisOne->parentNode()) {
+                    while (thisOne && thisOne->parentNode()->self()) {
                         thisOne = thisOne->parentNode()->self().lock();
                     }
                     newResults->insert(thisOne);
