@@ -16,20 +16,29 @@
 namespace xpath {
     class Context {
         public:
-            Context()                                               : currentNode(), position(1)
-                                                                    , size(1), depth(0) {}
-            Context(dom::NodePtr n)                                 : currentNode(n), position(1)
-                                                                    , size(1), depth(0) {}
-            //Context( const Context & other ) : 
-            //    size( other.size ),
-            //    position( other.position ),
-            //    currentNode( other.currentNode )
-            //{
-            //    size = other.size + 1; // TODO: Understand the +1 [DS]
-            //}
+            Context() { };
+            Context(NodeRef n) { currentNode = n; position = 1; size=1; depth = 0;};
+            //
+            // XXX TODO: Understand this:
+            // Context(const Context &other) {
+            //      size = other.size;
+            //      position = other.position;
+            //      currentNode = other.currentNode;
+            //      size = other.size + 1;
+            // };
+            // Why is the size member first set to other.size and later to other.size +1?
+            // This looks like a bug to me, but as long as I don't understand it I'll leave 
+            // it alone. [DS]
+            Context( const Context & other ) : 
+                size( other.size ),
+                position( other.position ),
+                currentNode( other.currentNode )
+            {
+                size = other.size + 1; // TODO: Understand the +1 [DS]
+            }
 
             // context position
-            dom::NodePtr currentNode;
+            NodeRef currentNode;
 
             int position;
 

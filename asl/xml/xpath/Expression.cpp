@@ -8,313 +8,126 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "Expression.h"
-
-#include <cassert>
+#include <assert.h>
 #include <functional>
-#include <cmath>
+#include <math.h>
 
 #include <iostream>
 
 #include <asl/Logger.h>
 #include <dom/Nodes.h>
 
-namespace {
-
-    const std::string FUNCTIONNAME_LAST             = "last";
-    const std::string FUNCTIONNAME_POSITION         = "position";
-    const std::string FUNCTIONNAME_COUNT            = "count";
-    const std::string FUNCTIONNAME_STARTSWITH       = "startswith";
-    const std::string FUNCTIONNAME_CONCAT           = "concat";
-    const std::string FUNCTIONNAME_CONTAINS         = "contains";
-    const std::string FUNCTIONNAME_SUBSTRING        = "substring";
-    const std::string FUNCTIONNAME_SUBSTRING_BEFORE = "substring_before";
-    const std::string FUNCTIONNAME_SUBSTRING_AFTER  = "substring_after";
-    const std::string FUNCTIONNAME_NOT              = "not";
-    const std::string FUNCTIONNAME_UNKNOWN          = " *** unknown function *** ";
-    const std::string FUNCTIONNAME_ID               = "id";
-    const std::string FUNCTIONNAME_LOCAL_NAME       = "local-name";
-    const std::string FUNCTIONNAME_NAMESPACE_URI    = "namespace-uri";
-    const std::string FUNCTIONNAME_NAME             = "name";
-    const std::string FUNCTIONNAME_STRING           = "std::string";
-    const std::string FUNCTIONNAME_STRING_LENGTH    = "std::string-length";
-    const std::string FUNCTIONNAME_NORMALIZE_SPACE  = "normalize-space";
-    const std::string FUNCTIONNAME_TRANSLATE        = "translate";
-    const std::string FUNCTIONNAME_BOOLEAN          = "boolean";
-    const std::string FUNCTIONNAME_TRUE             = "true";
-    const std::string FUNCTIONNAME_FALSE            = "false";
-    const std::string FUNCTIONNAME_LANG             = "lang";
-    const std::string FUNCTIONNAME_NUMBER           = "number";
-    const std::string FUNCTIONNAME_SUM              = "sum";
-    const std::string FUNCTIONNAME_FLOOR            = "floor";
-    const std::string FUNCTIONNAME_CEILING          = "ceiling";
-    const std::string FUNCTIONNAME_ROUND            = "round";
-
-    const std::string AXISNAME_INVALID              = " *** invalid Axis *** ";
-    const std::string AXISNAME_NEXT_SIBLING         = "next-sibling";
-    const std::string AXISNAME_PREVIOUS_SIBLING     = "previous-sibling";
-    const std::string AXISNAME_FOLLOWING_SIBLING    = "following-sibling";
-    const std::string AXISNAME_PRECEDING_SIBLING    = "preceding-sibling";
-    const std::string AXISNAME_CHILD                = "child";
-    const std::string AXISNAME_PARENT               = "parent";
-    const std::string AXISNAME_DESCENDANT           = "descendant";
-    const std::string AXISNAME_ANCESTOR             = "ancestor";
-    const std::string AXISNAME_FOLLOWING            = "following";
-    const std::string AXISNAME_PRECEDING            = "preceding";
-    const std::string AXISNAME_ANCESTOR_OR_SELF     = "ancestor-or-self";
-    const std::string AXISNAME_DESCENDANT_OR_SELF   = "descendant-or-self";
-    const std::string AXISNAME_SELF                 = "self";
-    const std::string AXISNAME_NAMESPACE            = "namespace";
-    const std::string AXISNAME_ATTRIBUTE            = "attribute";
-
-    const std::string NODETEST_INVALID              = " *** invalid node test *** ";
-    const std::string NODETEST_NODE                 = "node";
-    const std::string NODETEST_COMMENT              = "comment";
-    const std::string NODETEST_TEXT                 = "text";
-    const std::string NODETEST_PI                   = "processing-instruction";
-
-    template< typename ENUM >
-    inline ENUM retcmp( const std::string& instring
-                      , std::string::size_type pos
-                      , const std::string& X
-                      , ENUM yes, ENUM no) 
-    {
-        return asl::read_if_string(instring, pos, X) != pos ? yes : no;
-    }
-
-    template<class ITER>
-    void descendReverse(ITER &resultset, dom::NodePtr curNode) {
-        for (dom::NodePtr curChild = curNode->lastChild(); curChild; curChild = curChild->previousSibling())
-        {
-            descendReverse(resultset, curChild);
-        }
-        *resultset++ = curNode;
-    }
-
-    template<class CONT>
-    void fillAxis(const xpath::Step& s, dom::NodePtr curNode, CONT &cont) {
-        using namespace xpath;
-        std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
-        dom::NodePtr origNode = curNode;
-        // build up the axis with appropriate nodes containing passing the test
-        switch(s.getAxis()) {
-            case Step::Child:
-                if (curNode->hasChildNodes()) {
-                    for (curNode = curNode->firstChild(); curNode; curNode = curNode->nextSibling()) {
-                        if (s.allows(curNode)) {
-                            *resultset++ = curNode;
-                        }
-                    }
-                }
-                break;
-            case Step::Parent:
-                curNode = curNode->parentNode()->self().lock();
-                if (curNode && s.allows(curNode)) {
-                    *resultset++ = curNode;
-                }
-                break;
-            case Step::Next_Sibling:
-                curNode = curNode->nextSibling();
-                if (curNode && s.allows(curNode)) {
-                    *resultset++ = curNode;
-                }
-                break;
-            case Step::Previous_Sibling:
-                curNode = curNode->previousSibling();
-                if (curNode && s.allows(curNode)) {
-                    *resultset++ = curNode;
-                }
-                break;
-            case Step::Preceding_Sibling:
-                while (curNode = curNode->previousSibling()) {
-                    if (s.allows(curNode)) {
-                        *resultset++ = curNode;
-                    }
-                }
-                break;
-            case Step::Following_Sibling:
-                while (curNode = curNode->nextSibling()) {
-                    if (s.allows(curNode)) {
-                        *resultset++ = curNode;
-                    }
-                }
-                break;
-            case Step::Following:
-                origNode = dom::NodePtr();
-                /* nobreak; */
-            case Step::Descendant_Or_Self:
-                if (origNode && s.allows(origNode)) {
-                    *resultset++ = origNode;
-                }
-                /* nobreak; */
-            case Step::Descendant:
-                {
-                    while (true) {
-                        if (curNode->firstChild()) {
-                            curNode = curNode->firstChild();
-                        } else if (curNode == origNode) {
-                            break;
-                        } else if (curNode->nextSibling()) {
-                            curNode = curNode->nextSibling();
-                        } else {
-                            dom::NodePtr tmp = curNode;
-                            while ( (tmp = tmp->parentNode()->self().lock()) && tmp != origNode) {
-                                if (tmp->nextSibling()) {
-                                    curNode = tmp->nextSibling();
-                                    break;
-                                }
-                            }
-                            if ( !tmp || tmp == origNode ) {
-                                break;
-                            }
-                        }
-
-                        if (s.allows(curNode)) {
-                            *resultset++ = curNode;
-                        }
-                    }
-                }
-                break;
-            case Step::Preceding:
-                for ( ; curNode; curNode = curNode->parentNode()->self().lock() ) {
-                    while (curNode->previousSibling()) {
-                        curNode = curNode->previousSibling();
-                        AC_TRACE << " diving into " << *curNode;
-                        descendReverse(resultset, curNode);
-                    }
-                }
-                break;
-            case Step::Self:
-                if (s.allows(curNode)) {
-                    *resultset++ = curNode;
-                }
-                break;
-            case Step::Attribute:
-                {
-                    dom::NamedNodeMap & map = curNode->attributes();
-                    for (unsigned int i = 0; i < map.length(); i++) {
-                        if (s.allows(map.item(i))) {
-                            *resultset++ = map.item(i);
-                        }
-                    }
-                }
-            case Step::Ancestor_Or_Self:
-                if (s.allows(curNode)) {
-                    *resultset++ = curNode;
-                }
-                /* nobreak; */
-            case Step::Ancestor:
-                if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE) {
-                    /*
-                       dom::Attribute curAttr = curNode;
-                       curNode = curAttr.ownerElement();
-                     */
-                    curNode = curNode->parentNode()->self().lock();
-                    if (s.allows(curNode)) {
-                        *resultset++ = curNode;
-                    }
-                }
-                while (curNode = curNode->parentNode()->self().lock()) {
-                    if (s.allows(curNode)) {
-                        *resultset++ = curNode;
-                    }
-                }
-            case Step::Invalid:
-            default:
-                break;
-        }
-    };
-
-    template<class CONT>
-    void scanStep(const xpath::Step& s, dom::NodePtr origNode, CONT &results) {
-        using namespace xpath;
-        if ( 0 == s.count() ) {
-            fillAxis(s, origNode, results);
-            return;
-        }
-
-        NodeVector intermediateResult;
-        fillAxis(s, origNode, intermediateResult);
-
-        Step::const_iterator last = s.end(); 
-        --last;
-
-        Context subcontext;
-
-        for (Step::const_iterator itS = s.begin(); itS != last; ++itS) {
-            subcontext.size = intermediateResult.size();
-            subcontext.position = 0;
-            for (NodeVector::iterator itNV = intermediateResult.begin(); itNV != intermediateResult.end();) {
-                subcontext.position++;
-                subcontext.currentNode = (*itNV);
-                ValuePtr tmp = (*itS)->evaluateExpression(subcontext);
-                BooleanValue v = tmp->as<BooleanValue>();
-                if (!v.getValue()) {
-                    intermediateResult.erase(itNV++);
-                }
-                else ++itNV;
-            }
-        }
-
-        std::insert_iterator<CONT> ins = std::inserter(results, results.end());
-        subcontext.size = intermediateResult.size();
-        subcontext.position = 0;
-        for (NodeVector::const_iterator itNV = intermediateResult.begin(); itNV != intermediateResult.end(); ++itNV) {
-            subcontext.position++;
-            subcontext.currentNode = (*itNV);
-            ValuePtr tmp = (*last)->evaluateExpression(subcontext);
-            BooleanValue v = tmp->as<BooleanValue>();
-            if (v.getValue()) {
-                *ins++ = (*itNV);
-            }
-        }
-    };
-
-}
+#include "Expression.h"
 
 namespace xpath
 {
 
-    ValuePtr BinaryExpression::evaluateExpression(const Context &c) const {
-        assert(_lvalue);
-        assert(_rvalue);
+    const string Function::FUNCTIONNAME_LAST = "last";
+    const string Function::FUNCTIONNAME_POSITION = "position";
+    const string Function::FUNCTIONNAME_COUNT = "count";
+    const string Function::FUNCTIONNAME_STARTSWITH = "startswith";
+    const string Function::FUNCTIONNAME_CONCAT = "concat";
+    const string Function::FUNCTIONNAME_CONTAINS = "contains";
+    const string Function::FUNCTIONNAME_SUBSTRING = "substring";
+    const string Function::FUNCTIONNAME_SUBSTRING_BEFORE = "substring_before";
+    const string Function::FUNCTIONNAME_SUBSTRING_AFTER = "substring_after";
+    const string Function::FUNCTIONNAME_NOT = "not";
+    const string Function::FUNCTIONNAME_UNKNOWN = " *** unknown function *** ";
+    const string Function::FUNCTIONNAME_ID = "id";
+    const string Function::FUNCTIONNAME_LOCAL_NAME = "local-name";
+    const string Function::FUNCTIONNAME_NAMESPACE_URI = "namespace-uri";
+    const string Function::FUNCTIONNAME_NAME = "name";
+    const string Function::FUNCTIONNAME_STRING = "string";
+    const string Function::FUNCTIONNAME_STRING_LENGTH = "string-length";
+    const string Function::FUNCTIONNAME_NORMALIZE_SPACE = "normalize-space";
+    const string Function::FUNCTIONNAME_TRANSLATE = "translate";
+    const string Function::FUNCTIONNAME_BOOLEAN = "boolean";
+    const string Function::FUNCTIONNAME_TRUE = "true";
+    const string Function::FUNCTIONNAME_FALSE = "false";
+    const string Function::FUNCTIONNAME_LANG = "lang";
+    const string Function::FUNCTIONNAME_NUMBER = "number";
+    const string Function::FUNCTIONNAME_SUM = "sum";
+    const string Function::FUNCTIONNAME_FLOOR = "floor";
+    const string Function::FUNCTIONNAME_CEILING = "ceiling";
+    const string Function::FUNCTIONNAME_ROUND = "round";
 
-        ValuePtr left  = _lvalue->evaluateExpression(c);
-        ValuePtr right = _rvalue->evaluateExpression(c);
+    const string Step::AXISNAME_INVALID           (" *** invalid Axis *** ");
+    const string Step::AXISNAME_NEXT_SIBLING      ("next-sibling");
+    const string Step::AXISNAME_PREVIOUS_SIBLING  ("previous-sibling");
+    const string Step::AXISNAME_FOLLOWING_SIBLING ("following-sibling");
+    const string Step::AXISNAME_PRECEDING_SIBLING ("preceding-sibling");
+    const string Step::AXISNAME_CHILD             ("child");
+    const string Step::AXISNAME_PARENT            ("parent");
+    const string Step::AXISNAME_DESCENDANT        ("descendant");
+    const string Step::AXISNAME_ANCESTOR          ("ancestor");
+    const string Step::AXISNAME_FOLLOWING         ("following");
+    const string Step::AXISNAME_PRECEDING         ("preceding");
+    const string Step::AXISNAME_ANCESTOR_OR_SELF  ("ancestor-or-self");
+    const string Step::AXISNAME_DESCENDANT_OR_SELF("descendant-or-self");
+    const string Step::AXISNAME_SELF              ("self");
+    const string Step::AXISNAME_NAMESPACE         ("namespace");
+    const string Step::AXISNAME_ATTRIBUTE         ("attribute");
+    
+    const string Step::NODETEST_INVALID = " *** invalid node test *** ";
+    const string Step::NODETEST_NODE = "node";
+    const string Step::NODETEST_COMMENT = "comment";
+    const string Step::NODETEST_TEXT = "text";
+    const string Step::NODETEST_PI = "processing-instruction";
+
+    BinaryExpression::BinaryExpression(BinaryExpression::ExpressionType _type,
+            Expression *_lvalue, Expression *_rvalue) :
+        type( _type ),
+        lvalue( _lvalue ),
+        rvalue( _rvalue ) {}
+
+    Value *BinaryExpression::evaluateExpression(const Context &c) {
+        assert(lvalue);
+        assert(rvalue);
+
+        Value *left = lvalue->evaluateExpression(c);
+        Value *right = rvalue->evaluateExpression(c);
 
         assert(left);
         assert(right);
 
-        if (_type < 16) { // comparison operators
+        if (type < 16) { // comparison operators
             if ((left->type()==Value::NodeSetType) &&
                     (right->type()==Value::NodeSetType))
             {
-                // find one pair of nodes whose std::string-values comparison evaluates true.
+                // find one pair of nodes whose string-values comparison evaluates true.
 
-                NodeSetPtr nsr1 = left ->as<NodeSetValue>().takeNodes();
-                NodeSetPtr nsr2 = right->as<NodeSetValue>().takeNodes();
+                NodeSetValue *nsv1 = left->toNodeSet();
+                delete left;
+                NodeSetRef nsr1 = nsv1->takeNodes();
+                delete nsv1;
+
+                NodeSetValue *nsv2 = right->toNodeSet();
+                delete right;
+                NodeSetRef nsr2 = nsv2->takeNodes();
+                delete nsv2;
 
                 bool retval = false;
 
-                if (_type == Equal || _type == NotEqual) {
+                if (type == Equal || type == NotEqual) {
 
-                    std::set<std::string> sm1;
-                    std::set<std::string> sm2;
+                    std::set<string> sm1;
+                    std::set<string> sm2;
 
-                    NodeSet::const_iterator i1 = nsr1->begin();
-                    NodeSet::const_iterator i2 = nsr2->begin();
+                    NodeSet::iterator i1 = nsr1->begin();
+                    NodeSet::iterator i2 = nsr2->begin();
 
                     while (i1 != nsr1->end() || i2 != nsr2->end()) {
 
-                        const std::string& string1 = string_value_for(*i1);
-                        if (!string1.empty()) {
+                        string string1 = string_value_for(*i1);
+                        if (string1.length()) {
+
                             if (sm2.find(string1) != sm2.end()) {
-                                if (_type == Equal) {
+                                if (type == Equal) {
                                     retval = true;
                                     break;
                                 }
                             } else {
-                                if (_type == NotEqual) {
+                                if (type == NotEqual) {
                                     retval = true;
                                     break;
                                 }
@@ -323,14 +136,14 @@ namespace xpath
                         }
 
                         std::string string2 = string_value_for(*i2);
-                        if (!string2.empty()) {
+                        if (string2.length()) {
                             if (sm1.find(string2) != sm1.end()) {
-                                if (_type == Equal) {
+                                if (type == Equal) {
                                     retval = true;
                                     break;
                                 }
                             } else {
-                                if (_type == NotEqual) {
+                                if (type == NotEqual) {
                                     retval = true;
                                     break;
                                 }
@@ -349,36 +162,38 @@ namespace xpath
                 } else {
                     std::string extreme_left;
                     std::string extreme_right;
-                    NodeSet::const_iterator ileft = nsr1->begin();
-                    NodeSet::const_iterator iright = nsr2->begin();
+                    NodeSet::iterator ileft = nsr1->begin();
+                    NodeSet::iterator iright = nsr2->begin();
                     while (ileft != nsr1->end() || ileft != nsr2->end()) {
 
-                        if ( ( (_type==Less || _type==LEqual) 
-                            && (string_value_for(*ileft) > extreme_left) )
-                          ||   (_type == Greater || _type == GEqual)
-                            && (string_value_for(*ileft) < extreme_left) ) {
+                        if ( ((type == Less || type == LEqual) &&
+                              (string_value_for(*ileft) > extreme_left)) ||
+                             (type == Greater || type == GEqual) && 
+                             (string_value_for(*ileft) < extreme_left) )
+                        {
                             extreme_left = string_value_for(*ileft);
                         }
 
-                        if ( ( (_type == Less || _type == LEqual) 
-                            && (string_value_for(*iright) < extreme_right) )
-                          ||   (_type == Greater || _type == GEqual) 
-                            && (string_value_for(*iright) > extreme_right) ) {
+                        if ( ((type == Less || type == LEqual) &&
+                              (string_value_for(*iright) < extreme_right) ) ||
+                             (type == Greater || type == GEqual) &&
+                             (string_value_for(*iright) > extreme_right) )
+                        {
                             extreme_right = string_value_for(*iright);
                         }
 
                         if (extreme_left < extreme_right) {
-                            if (_type == Less || _type == LEqual) {
+                            if (type == Less || type == LEqual) {
                                 retval = true;
                                 break;
                             }
                         } else if (extreme_left == extreme_right) {
-                            if (_type == LEqual || _type == GEqual) {
+                            if (type == LEqual || type == GEqual) {
                                 retval = true;
                                 break;
                             }
                         } else {
-                            if (_type == Greater || _type == GEqual) {
+                            if (type == Greater || type == GEqual) {
                                 retval = true;
                                 break;
                             }
@@ -393,55 +208,78 @@ namespace xpath
                         }
                     }
                 }
-                return ValuePtr(new BooleanValue(retval));
-            } else if ( left->type()==Value::NodeSetType 
-                     || right->type()==Value::NodeSetType ) {
-                // comparison of one nodeset with one other _type
+                delete nsr1;
+                delete nsr2;
+                return new BooleanValue(retval);        
+            } else if (left->type()==Value::NodeSetType ||
+                    right->type()==Value::NodeSetType)
+            {
+                // comparison of one nodeset with one other type
 
                 if (left->type()==Value::StringType || right->type()==Value::StringType) {
-                    const int TRUTHVALUES_LEFT[] = { 1 << NotEqual | 1 << Less    | 1 << LEqual
-                                                   , 1 << Equal    | 1 << LEqual  | 1 << GEqual
-                                                   , 1 << NotEqual | 1 << Greater | 1 << GEqual };
+                    const int TRUTHVALUES_LEFT[] = {
+                        1 << NotEqual | 1 << Less | 1 << LEqual,
+                        1 << Equal | 1 << LEqual | 1 << GEqual,
+                        1 << NotEqual | 1 << Greater | 1 << GEqual };
                     const int TRUTHVALUES_RIGHT[] = { 
                         TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0]
                     };
 
-                    // one nodeset, one std::string: find one node whose std::string-value compares positive to the std::string
-                    NodeSetValue nsv;
-                    StringValue sv;
+                    // one nodeset, one string: find one node whose string-value compares positive to the string
+                    NodeSetValue *nsv;
+                    StringValue *sv;
                     const int *truthTable;
                     if (left->type()==Value::StringType) {
-                        nsv = right->as<NodeSetValue>();
-                        sv = left->as<StringValue>();
+                        // WARNING: toNodeSet() invalidates right.
+                        // which is okay, provided that right is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete right" below.
+                        nsv = right->toNodeSet();
+                        sv = left->toString();
                         truthTable = TRUTHVALUES_LEFT;
                     } else {
-                        nsv = left->as<NodeSetValue>();
-                        sv = right->as<StringValue>();
+                        // WARNING: toNodeSet() invalidates left,
+                        // which is okay, provided that left is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete left" below.
+                        nsv = left->toNodeSet();
+                        sv = right->toString();
                         truthTable = TRUTHVALUES_RIGHT;
                     }
 
+                    delete left;
+                    delete right;
                     bool retval = false;
 
-                    for (NodeSet::const_iterator it = nsv.begin(); it !=nsv.end(); ++it) {
-                        std::string curstr = string_value_for(*it);
-                        int cmp = curstr.compare(sv.getValue());
+                    for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
+                        string curstr = string_value_for(*i);
+                        int cmp = curstr.compare(sv->getValue());
                         if (cmp < 0) cmp = -1;
                         if (cmp > 0) cmp = 1;
-                        AC_TRACE << "  comparing std::string \"" << sv.getValue() <<
+                        AC_TRACE << "  comparing string \"" << sv->getValue() <<
                                     "\" with node of value \"" <<curstr<<"\" is " << cmp;
-                        if ( truthTable[ cmp+1 ] & ( 1 << _type )) {
+                        if ( truthTable[ cmp+1 ] & ( 1 << type )) {
                             retval = true;
                             break;
                         }
                     }
 
-                    return ValuePtr(new BooleanValue(retval));
-                } else if ( left->type() == Value::NumberType
-                         || right->type() == Value::NumberType ) {
-                    // one nodeset, one number: find one node whose std::string-value converted to number compares positive
+#ifdef INTERPRETER_DEBUG
+                    AC_INFO << " string - nodeset comparison of type " << type << " is " << retval?"true":"false";
+                    if (retval) {
+                        AC_INFO <<" succeeded for "<< *this;
+                    }
+#endif
+                    delete sv;
+                    delete nsv;
+                    return new BooleanValue(retval);
+                } else if (left->type()==Value::NumberType ||
+                        right->type()==Value::NumberType)
+                {
+                    // one nodeset, one number: find one node whose string-value converted to number compares positive
 
-                    ValuePtr theNodeSet;
-                    ValuePtr theNumber;
+                    Value *theNodeSet;
+                    Value *theNumber;
 
                     if (left->type()==Value::NumberType) {
                         theNodeSet = right;
@@ -450,18 +288,24 @@ namespace xpath
                         theNodeSet = left;
                         theNumber = right;
                     }
-                    NumberValue nv = theNumber->as<NumberValue>();
-                    NodeSetValue nsv = theNodeSet->as<NodeSetValue>();
+                    NumberValue *nv = theNumber->toNumber();
+                    NodeSetValue *nsv = theNodeSet->toNodeSet();
 
-                    double num = nv.getValue();
-                    NodeSetPtr nsr = nsv.takeNodes();
+                    delete theNumber;
+                    delete theNodeSet;
 
-                    //std::binary_function<dom::NodePtr, double, bool> theOp = getOpFor<double>(_type);
+                    double num = nv->getValue();
+                    delete nv;
 
-                    for (NodeSet::const_iterator it = nsr->begin(); it != nsr->end(); ++it) {
+                    NodeSetRef nsr = nsv->takeNodes();
+                    delete nsv;
+
+                    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
+
+                    for (NodeSet::iterator i = nsr->begin(); i != nsr->end(); ++i) {
                         bool val;
-                        double currentnum = number_value_for(*it);
-                        switch(_type) {
+                        double currentnum = number_value_for(*i);
+                        switch(type) {
                             case Equal:
                                 val = (currentnum == num);
                                 break;
@@ -469,422 +313,672 @@ namespace xpath
                                 val = (currentnum != num);
                                 break;
                             case Greater:
-                                val = (theNumber == left) ^ (number_value_for(*it) > num);
+                                val = (theNumber == left) ^ (number_value_for(*i) > num);
                                 break;
                             case GEqual:
-                                val = (theNumber == left) ^ (number_value_for(*it) >= num);
+                                val = (theNumber == left) ^ (number_value_for(*i) >= num);
                                 break;
                             case Less:
-                                val = (theNumber == left) ^ (number_value_for(*it) < num);
+                                val = (theNumber == left) ^ (number_value_for(*i) < num);
                                 break;
                             case LEqual:
-                                val = (theNumber == left) ^ (number_value_for(*it) <= num);
+                                val = (theNumber == left) ^ (number_value_for(*i) <= num);
                                 break;
                             default:
-                                AC_WARNING << "unsupported type " << _type;
-                                assert(0); // XXX: replace with exception [DS]
+                                AC_WARNING << "unsupported type " << type;
+                                exit(0); // XXX: replace with exception [DS]
                         }
 
                         if (val) {
-                            return ValuePtr(new BooleanValue(true));
+                            delete nsr;
+                            return new BooleanValue(true);
                         }
                     }
-                    return ValuePtr(new BooleanValue(false));
-                } else if ( left->type()==Value::BooleanType
-                         || right->type()==Value::BooleanType ) {
+                    delete nsr;
+                    return new BooleanValue(false);
+                } else if (left->type()==Value::BooleanType ||
+                        right->type()==Value::BooleanType)
+                {
                     // one nodeset, one boolean: convert both to boolean
-                    bool a = left ->as<BooleanValue>().getValue();
-                    bool b = right->as<BooleanValue>().getValue();
+                    BooleanValue *aVal = left->toBoolean();
+                    BooleanValue *bVal = right->toBoolean();
+                    delete left;
+                    delete right;
+                    // ###
+                    bool a = aVal->getValue();
+                    bool b = bVal->getValue();
 
-                    AC_TRACE << "boolean comparison " << _type << " " << a << ", " << b;
+                    delete aVal;
+                    delete bVal;
+
+                    AC_INFO << "boolean comparison " << type << " " << a << ", " << b;
 
                     // XXX: WTF? Why are all of them true? [DS]
-                    if (_type == Equal && a == b) return ValuePtr(new BooleanValue(true));
-                    else if(_type == Equal && a != b) return ValuePtr(new BooleanValue(true)); // XXX
-                    else if(_type == NotEqual && a != b) return ValuePtr(new BooleanValue(true));
-                    else if(_type == GEqual && a >= b) return ValuePtr(new BooleanValue(true));
-                    else if(_type == LEqual && a >= b) return ValuePtr(new BooleanValue(true)); // XXX
-                    else if(_type == Less && a < b) return ValuePtr(new BooleanValue(true));
-                    else if(_type == Greater && a > b) return ValuePtr(new BooleanValue(true));
-                    else return ValuePtr(new BooleanValue(false));
+                    if (type == Equal && a == b) return new BooleanValue(true);
+                    else if(type == Equal && a != b) return new BooleanValue(true); // XXX
+                    else if(type == NotEqual && a != b) return new BooleanValue(true);
+                    else if(type == GEqual && a >= b) return new BooleanValue(true);
+                    else if(type == LEqual && a >= b) return new BooleanValue(true); // XXX
+                    else if(type == Less && a < b) return new BooleanValue(true);
+                    else if(type == Greater && a > b) return new BooleanValue(true);
+
+                    return new BooleanValue(false);
                 } else {
                     // should not happen.
                     AC_ERROR << "Type not implemented!";
                     assert(false);
                 }
-                return ValuePtr(new NullValue());
+                return new NullValue();
             } else {// no nodeset 
-                if (_type==Equal || _type == NotEqual) {
+                if (type==Equal || type == NotEqual) {
                     // convert to simplest common type and compare
                     bool retval;
                     if (left->type() == Value::BooleanType || right->type() == Value::BooleanType) {
-                        retval = equal_as<BooleanValue>(*left, *right);
+                        retval = equals_as<BooleanValue>(left, right);
                     } else if (left->type() == Value::NumberType || right->type() == Value::NumberType) {
-                        retval = equal_as<NumberValue>(*left, *right);
+                        retval = equals_as<NumberValue>(left, right);
                     } else {
-                        retval = equal_as<StringValue>(*left, *right);
+                        retval = equals_as<StringValue>(left, right);
                     }
-                    return ValuePtr( new BooleanValue(retval ^ (_type==NotEqual)) );
+                    delete left;
+                    delete right;
+                    return new BooleanValue(retval ^ (type==NotEqual));
                 } else { //  no nodeset and no equality operation
-                    if (equal_as<NumberValue>(*left, *right)) {
-                        return ValuePtr( new BooleanValue(_type==LEqual||_type==GEqual) );
+                    if (equals_as<NumberValue>(left, right)) {
+                        delete left;
+                        delete right;
+                        return new BooleanValue(type==LEqual||type==GEqual);
                     } else { // numbers are different.
-                        bool retval = ( _type==GEqual || _type == Greater ) ^
-                            ( smaller_than_as<NumberValue>(*left, *right));
-                        return ValuePtr(new BooleanValue(retval));
+                        bool retval = ( type==GEqual || type == Greater ) ^
+                            ( smaller_than_as<NumberValue>(left, right));
+                        delete left;
+                        delete right;
+                        return new BooleanValue(retval);
                     }
                 }
             }
-        } else if (_type < 32) { // "or" | "and"
-            bool rb = right->as<BooleanValue>().getValue();
-            bool lb = left ->as<BooleanValue>().getValue();
-            if (_type==Or) {
-                return ValuePtr( new BooleanValue(rb || lb) );
-            } else if (_type==And) {
-                return ValuePtr( new BooleanValue(rb && lb) );
+        } else if (type < 32) { // "or" | "and"
+            BooleanValue *r = right->toBoolean();
+            BooleanValue *l = left->toBoolean();
+            bool rb = r->getValue();
+            bool lb = l->getValue();
+            delete right;
+            delete r;
+            delete left;
+            delete l;
+            if (type==Or) {
+                return new BooleanValue(rb || lb);
+            } else if (type==And) {
+                return new BooleanValue(rb && lb);
             } else {
                 // should not happen.
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
+                return new NullValue();
             }
         } else { // "+", "-", "*", "/", "mod"
-            double rn = right->as<NumberValue>().getValue();
-            double ln = left ->as<NumberValue>().getValue();
-            switch(_type) {
-                case Plus : return ValuePtr( new NumberValue(ln + rn) );
-                case Minus: return ValuePtr( new NumberValue(ln - rn) );
-                case Times: return ValuePtr( new NumberValue(ln * rn) );
-                case Div  : return ValuePtr( new NumberValue(ln / rn) );
-                case Mod  : return ValuePtr( new NumberValue(ln - rn * floor(ln / rn)) );
+            NumberValue *r = right->toNumber();
+            NumberValue *l = left->toNumber();
+            double rn = r->getValue();
+            double ln = l->getValue();
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "evaluating arithmetic operation " << type << " on " << rn << ", " << ln;
+#endif
+            delete right;
+            delete r;
+            delete left;
+            delete l;
+            switch(type) {
+                case Plus:
+                    return new NumberValue(ln + rn);
+                case Minus:
+                    return new NumberValue(ln - rn);
+                case Times:
+                    return new NumberValue(ln * rn);
+                case Div:
+                    return new NumberValue(ln / rn);
+                case Mod:
+                    return new NumberValue(ln - rn * floor(ln / rn));
                 default:
                     // should not happen.
                     AC_ERROR << "Not yet implemented.";
                     assert(false);
+                    return new NullValue();
             }
         }
-        return ValuePtr( new NullValue() );
     }
 
-    void BinaryExpression::serializeTo(std::ostream &os) const {
-        BinaryExpressionPtr lv = dynamic_cast_Ptr<BinaryExpression>(_lvalue);
+    void BinaryExpression::serializeTo(std::ostream &os) {
+        BinaryExpression *lv = dynamic_cast<BinaryExpression*>(lvalue);
         if (lv) {
             os << "(";
         }
-        _lvalue->serializeTo(os);
+        lvalue->serializeTo(os);
         if (lv) {
             os << ")";
         }
 
-        switch(_type) {
-            case Equal   : os << " = "  ; break;
-            case NotEqual: os << " != " ; break;
-            case Greater : os << " > "  ; break;
-            case GEqual  : os << " >= " ; break;
-            case Less    : os << " < "  ; break;
-            case LEqual  : os << " <= " ; break;
-            case Or      : os << " or " ; break;
-            case And     : os << " and "; break;
-            case Plus    : os << " + "  ; break;
-            case Minus   : os << " - "  ; break;
-            case Times   : os << " * "  ; break;
-            case Div     : os << " div "; break;
-            case Mod     : os << " mod "; break;
+        switch(type) {
+            case Equal:
+                os << " = ";
+                break;
+            case NotEqual:
+                os << " != ";
+                break;
+            case Greater:
+                os << " > ";
+                break;
+            case GEqual:
+                os << " >= ";
+                break;
+            case Less:
+                os << " < ";
+                break;
+            case LEqual:
+                os << " <= ";
+                break;
+            case Or:
+                os << " or ";
+                break;
+            case And:
+                os << " and ";
+                break;
+            case Plus:
+                os << " + ";
+                break;
+            case Minus:
+                os << " - ";
+                break;
+            case Times:
+                os << " * ";
+                break;
+            case Div:
+                os << " div ";
+                break;
+            case Mod:
+                os << " mod ";
+                break;
             default:
                 os << " ** unknown operator ** ";
                 break;
         }
-        BinaryExpressionPtr rv = dynamic_cast_Ptr<BinaryExpression>(_rvalue);
+        BinaryExpression *rv = dynamic_cast<BinaryExpression*>(rvalue);
         if (rv) {
             os << "(";
         }
-        _rvalue->serializeTo(os);
+        rvalue->serializeTo(os);
         if (rv) {
             os << ")";
         }
     }
 
-    void UnaryExpression::serializeTo(std::ostream &os) const {
-        switch(_type) {
-            case Minus : os << "-"; break;
-            case Tilde : os << "~"; break;
-            case Not   : os << "!"; break;
+    void UnaryExpression::serializeTo(std::ostream &os) {
+        switch(type) {
+            case Minus:
+                os << "-";
+                break;
+            case Tilde:
+                os << "~";
+                break;
+            case Not:
+                os << "!";
             default:
                 AC_ERROR << "Not yet implemented!";
                 assert(false);
         };
-        _argument->serializeTo(os);
+        argument->serializeTo(os);
     }
 
-    ValuePtr UnaryExpression::evaluateExpression(const Context &c) const {
-        if (_type==Minus) {
-            NumberValue retval = _argument->evaluateExpression(c)->as<NumberValue>().negate();
-            return ValuePtr( new NumberValue(retval) );
+    Value *UnaryExpression::evaluateExpression(const Context &c) {
+        if (type==Minus) {
+            Value *subvalue = argument->evaluateExpression(c);
+            NumberValue *retval = subvalue->toNumber();
+            delete subvalue;
+            retval->negate();
+            return retval;
         } else {
-            AC_ERROR << "Expression not supported!";
             assert(false);
         }
-        return ValuePtr( new NullValue() );
+        return new NullValue();
     }
 
-    void Function::serializeTo(std::ostream &os) const {
-        os << nameOf(_type);
+    void SetExpression::serializeTo(std::ostream &os) {
+        std::list<Path *>::iterator i = sets.begin();
+        if (*i) {
+            (*i)->serializeTo(os);
+            while ((++i) != sets.end()) {
+                os << " | ";
+                (*i)->serializeTo(os);
+            }
+        }
+    }
+
+    Value *SetExpression::evaluateExpression(const Context &c) {
+        std::list<Path*>::iterator i = sets.begin();
+
+        NodeSetValue *firstValue = (*i)->evaluate(c.currentNode);
+
+        NodeSetRef v = firstValue->takeNodes();
+        delete firstValue;
+
+        while (++i != sets.end()) {
+            NodeSetValue *thisValue = (*i)->evaluate(c.currentNode);
+            NodeSetRef vcur = thisValue->takeNodes();
+            delete thisValue;
+
+            NodeSetRef vres = new NodeSet();
+            switch(m_op) {
+                case Union:
+                    std::set_union(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+                case Intersection:
+                    std::set_intersection(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+                case Difference:
+                    std::set_difference(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+            }
+            delete vcur;
+            delete v;
+            v = vres;
+        }
+        return new NodeSetValue(v);
+    }
+
+    Function::~Function() {
+        delete arguments;
+    }
+
+    typedef std::list<Expression*>::iterator ExpIter;
+
+    void Function::serializeTo(std::ostream &os) {
+        os << nameOf(type);
         os << "(";
 
-        ArgumentList::const_iterator it = _arguments.begin();
-        if (it != _arguments.end()) {
-            (*it)->serializeTo(os);
+        ExpIter i = arguments->begin();
+        if (i != arguments->end()) {
+            (*i)->serializeTo(os);
 
-            for (++it; it != _arguments.end(); ++it) {
+            for (++i; i != arguments->end();++i) {
                 os << ", ";
-                (*it)->serializeTo(os);
+                (*i)->serializeTo(os);
             }
         }
         os << ")";
     }
 
-    ValuePtr Function::evaluateExpression(const Context &c) const {
-        switch(_type) {
+    Value *Function::evaluateExpression(const Context &c) {
+        switch(type) {
             case Last:
-                return ValuePtr( new NumberValue(c.size) );
+                return new NumberValue(c.size);
             case Position:
-                return ValuePtr( new NumberValue(c.position) );
+                return new NumberValue(c.position);
             case Count:
                 {
-                    if (_arguments.empty()) {
-                        return ValuePtr( new NumberValue(0) );
+                    if (!arguments) {
+                        return new NumberValue(0);
                     }
 
-                    ValuePtr v = _arguments.front()->evaluateExpression(c);
+                    Value *v = arguments->front()->evaluateExpression(c);
 
-                    AC_TRACE << "counting \"" << *(_arguments.front()) <<"\"...";
+                    AC_TRACE << "counting \"" << *(arguments->front()) <<"\"...";
 
                     // convert into a nodeSet
-                    NodeSetValuePtr nsv = dynamic_cast_Ptr<NodeSetValue>(v);
+                    NodeSetValue *nsv = dynamic_cast<NodeSetValue*>(v);
 
                     if (!nsv) {
+                        delete v;
                         AC_WARNING << " ... failed: argument not a node-set!";
-                        return ValuePtr( new NumberValue(0) );
+                        return new NumberValue(0);
                     }
 
                     // and count the nodeSet
                     int retval = nsv->length();
+                    delete nsv;
                     AC_TRACE << " returning: " << retval;
-                    return ValuePtr( new NumberValue(retval) );
+                    return new NumberValue(retval);
                 }
 
             case StartsWith:
                 {
-                    if ( _arguments.empty() ) {
+                    if (!arguments || !arguments->size()) {
                         AC_WARNING << "Warning: " << *this << " called with zero arguments.";
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    ArgumentList::const_iterator it = _arguments.begin();
-                    ExpressionPtr firstExpr = *it;
-                    ExpressionPtr secondExpr = *(++it);
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
                     assert(firstExpr);
 
                     if (!secondExpr) {
                         AC_WARNING << "Warning: " << *this << " called with only one argument.";
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    ValuePtr first = firstExpr->evaluateExpression(c);
-                    ValuePtr second = secondExpr->evaluateExpression(c);
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
 
-                    return ValuePtr( new BooleanValue( equal_as<StringValue>(*first, *second) ) );
+                    bool retval = equals_as<StringValue>(first, second);
+                    delete first;
+                    delete second;
+                    return new BooleanValue(retval);
                 }
 
             case Concat:
                 {
-                    if ( _arguments.empty() ) {
-                        return ValuePtr( new NullValue() );
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
                     }
 
-                    std::string retval;
-                    for (ArgumentList::const_iterator it = _arguments.begin(); it != _arguments.end(); ++it) {
-                        retval+=(*it)->evaluateExpression(c)->as<StringValue>().getValue();
+                    string retval;
+                    for (ExpIter i = arguments->begin(); i != arguments->end(); ++i) {
+                        Value *currentvalue = (*i)->evaluateExpression(c);
+                        StringValue *currentstring = currentvalue->toString();
+                        retval+=currentstring->getValue();
+                        delete currentstring;
+                        delete currentvalue;
                     }
-                    return ValuePtr( new StringValue(retval) );
+                    return new StringValue(retval);
                 }
 
             case Contains:
                 {
-                    if ( _arguments.empty()) {
-                        return ValuePtr( new NullValue() );
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
                     }
 
-                    ArgumentList::const_iterator it = _arguments.begin();
-                    ExpressionPtr firstExpr = *it;
-                    ExpressionPtr secondExpr = *(++it);
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
 
                     if (!secondExpr) {
                         AC_WARNING << "ERROR: parameter missing to function call " << *this;
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    StringValue firstString  = firstExpr ->evaluateExpression(c)->as<StringValue>();
-                    StringValue secondString = secondExpr->evaluateExpression(c)->as<StringValue>();
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
 
-                    const bool retval = firstString.getValue().find(secondString.getValue()) >= 0;
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
 
-                    return ValuePtr( new BooleanValue(retval) );
+                    delete first;
+                    delete second;
+
+                    bool retval = firstString->getValue().find(secondString->getValue()) >= 0;
+
+                    delete firstString;
+                    delete secondString;
+
+                    return new BooleanValue(retval);
                 }
 
             case Substring:
                 {
-                    if (_arguments.empty()) {
-                        return ValuePtr( new NullValue() );
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
                     }
 
-                    ArgumentList::const_iterator it = _arguments.begin();
-                    ExpressionPtr firstExpr = *it;
-                    ExpressionPtr secondExpr = *(++it);
-                    ExpressionPtr thirdExpr;
-                    if (++it != _arguments.end()) {
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+                    Expression *thirdExpr = NULL;
+                    if (++i != arguments->end()) {
                         AC_TRACE << " three arguments for " << *this;
-                        thirdExpr = *it;
+                        thirdExpr = *i;
                     }
                     assert(firstExpr);
 
                     if (!secondExpr) {
                         AC_TRACE << "substring expression: second argument is not a number.";
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    ValuePtr third;
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+                    Value *third = NULL;
                     if (thirdExpr) {
                         third = thirdExpr->evaluateExpression(c);
                     }
 
-                    StringValue firstString  = firstExpr ->evaluateExpression(c)->as<StringValue>();
-                    NumberValue secondNumber = secondExpr->evaluateExpression(c)->as<NumberValue>();
-                    NumberValue thirdNumber;
+                    StringValue *firstString = first->toString();
+                    NumberValue *secondNumber = second->toNumber();
+                    NumberValue *thirdNumber = NULL;
                     if (thirdExpr) {
-                        thirdNumber= third->as<NumberValue>();
+                        thirdNumber= third->toNumber();
                     }
 
-                    int secondNumberValue = int(secondNumber.getValue()+0.5) - 1;
+                    delete first;
+                    delete second;
+
+                    if (third) {
+                        delete third;
+                    }
+
+                    int secondNumberValue = int(secondNumber->getValue()+0.5) - 1;
                     if (secondNumberValue < 0) {
                         AC_WARNING << "substring: round(secondNumberValue->getValue()+0.5) = " << secondNumberValue+1 << "is less than 1!";
                         secondNumberValue = 0;
                     }
 
-                    AC_TRACE << "substring: complete std::string is \"" << firstString.getValue() << "\"";
-                    int resultlength = firstString.getValue().length() - secondNumberValue;
+                    int resultlength;
+                    AC_TRACE << "substring: complete string is \"" << firstString->getValue() << "\"";
+                    resultlength = firstString->getValue().length() - secondNumberValue;
 
                     // +1 for the terminating null character
-                    if ( thirdNumber.getValue() + 1 < resultlength ) {
-                        resultlength = int(thirdNumber.getValue()+0.5) + 1;
+                    if (thirdNumber && thirdNumber->getValue() + 1 < resultlength) {
+                        resultlength = int(thirdNumber->getValue()+0.5) + 1;
                     }
 
                     AC_TRACE << "substring: length = " << resultlength;
 
-                    std::string result = firstString.getValue().substr(secondNumberValue, resultlength);
+                    string result = firstString->getValue().substr(secondNumberValue, resultlength);
+
+                    delete firstString;
+                    delete secondNumber;
+                    if (thirdNumber) {
+                        delete thirdNumber;
+                    }
 
                     AC_TRACE << "substring expression evaluates to \"" << result << "\"";
-                    return ValuePtr( new StringValue(result) );
+                    StringValue * resultvalue = new StringValue(result);
+                    return resultvalue;
 
                 }
             case SubstringBefore:
                 {
-                    if (_arguments.empty()) {
-                        return ValuePtr( new NullValue() );
-                    }
+                    if (!arguments || !arguments->size())
+                        return new NullValue();
 
-                    ArgumentList::const_iterator it = _arguments.begin();
-                    ExpressionPtr firstExpr = *it;
-                    ExpressionPtr secondExpr = *(++it);
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
                     assert(firstExpr);
 
                     if (!secondExpr) {
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    StringValue firstString  = firstExpr ->evaluateExpression(c)->as<StringValue>();
-                    StringValue secondString = secondExpr->evaluateExpression(c)->as<StringValue>();
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
 
-                    const std::string::size_type pos = firstString.getValue().find(secondString.getValue());
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
 
-                    return StringValuePtr( new StringValue(firstString.getValue().substr(0, pos)) );
+                    delete first;
+                    delete second;
+
+                    int endPos = firstString->getValue().find(secondString->getValue());
+
+                    StringValue *retval = new StringValue(firstString->getValue().substr(0, endPos));
+
+                    delete firstString;
+                    delete secondString;
+
+                    return retval;
                 }
             case SubstringAfter:
                 {
-                    if (_arguments.empty()) {
-                        return ValuePtr( new NullValue() );
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
                     }
 
-                    ArgumentList::const_iterator it = _arguments.begin();
-                    ExpressionPtr firstExpr = *it;
-                    ExpressionPtr secondExpr = *(++it);
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
 
                     if (!secondExpr) {
-                        return ValuePtr( new NullValue() );
+                        return new NullValue();
                     }
 
-                    StringValue firstString  = firstExpr->evaluateExpression(c) ->as<StringValue>();
-                    StringValue secondString = secondExpr->evaluateExpression(c)->as<StringValue>();
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
 
-                    const std::string::size_type pos = firstString.getValue().find(secondString.getValue());
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
 
-                    return ValuePtr(  new StringValue(secondString.getValue().substr(pos+secondString.getValue().length())) );
+                    delete first;
+                    delete second;
+
+                    int pos = firstString->getValue().find(secondString->getValue());
+
+                    StringValue *retval = new StringValue(secondString->getValue().substr(pos+secondString->getValue().length()));
+                    delete firstString;
+                    delete secondString;
+
+                    return retval;
                 }
             case True:
-                return ValuePtr( new BooleanValue(true) );
+                return new BooleanValue(true);
             case False:
-                return ValuePtr( new BooleanValue(false) );
+                return new BooleanValue(false);
             case Not:
-                    return ValuePtr( new BooleanValue(_arguments.front()->evaluateExpression(c)->as<BooleanValue>()) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    BooleanValue *v = result->toBoolean();
+                    bool vval = v->getValue();
+                    delete result;
+                    delete v;
+                    return new BooleanValue(!vval);
+                }
             case Boolean:
-                    return ValuePtr( new BooleanValue(_arguments.front()->evaluateExpression(c)->as<BooleanValue>()) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    BooleanValue *retval = result->toBoolean();
+                    delete result;
+                    return retval;
+                }
             case Number:
-                    return ValuePtr( new NumberValue(_arguments.front()->evaluateExpression(c)->as<NumberValue>()) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    return retval;
+                }
             case String:
-                    return ValuePtr( new StringValue(_arguments.front()->evaluateExpression(c)->as<StringValue>()) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *retval = result->toString();
+                    delete result;
+                    return retval;
+                }
             case Sum:
                 {
-                    NodeSetPtr nodes = _arguments.front()->evaluateExpression(c)->as<NodeSetValue>().takeNodes();
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NodeSetValue *ns = result->toNodeSet();
+                    delete result;
+                    NodeSetRef nodes = ns->takeNodes();
+                    delete ns;
                     double retval = 0;
-                    for( NodeSet::const_iterator it = nodes->begin(); it != nodes->end(); ++it) {
-                        retval += number_value_for(*it);
+                    for( NodeSet::iterator i = nodes->begin(); i != nodes->end(); ++i) {
+                        retval += number_value_for(*i);
                     }
-                    return ValuePtr( new NumberValue(retval) );
+                    delete nodes;
+                    return new NumberValue(retval);
                 }
             case Floor:
-                    return ValuePtr( new NumberValue( std::floor(_arguments.front()->evaluateExpression(c)->as<NumberValue>().getValue()) ) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    double ret = ::floor(retval->getValue());
+                    delete retval;
+                    return new NumberValue(ret);
+                }
             case Ceiling:
-                    return ValuePtr( new NumberValue( std::ceil (_arguments.front()->evaluateExpression(c)->as<NumberValue>().getValue()) ) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    double ret = ::ceil(retval->getValue());
+                    delete retval;
+                    return new NumberValue(ret);
+                }
             case Round:
-                    return ValuePtr( new NumberValue( std::floor(_arguments.front()->evaluateExpression(c)->as<NumberValue>().getValue()) ) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    double ret = ::floor(retval->getValue()+0.5);
+                    delete retval;
+                    return new NumberValue(ret);
+                }
             case StringLength:
-                    return ValuePtr( new NumberValue( _arguments.front()->evaluateExpression(c)->as<StringValue>().getValue().length() ) );
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *retval = result->toString();
+                    int length = retval->getValue().length();
+                    delete result;
+                    delete retval;
+                    return new NumberValue(length);
+                }
             case NormalizeSpace:
                 {
-                    const std::string& s = _arguments.front()->evaluateExpression(c)->as<StringValue>().getValue();
-                    std::string retval;
-                    for (std::string::size_type i = asl::read_whitespace(s, 0); i < s.length(); i++) {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *sval = result->toString();
+                    string s = sval->getValue();
+                    delete result;
+                    delete sval;
+                    string retval;
+                    for (int i = asl::read_whitespace(s, 0); i < s.length(); i++) {
                         retval+=s[i];
                         i = asl::read_whitespace(s, i);
                     }
-                    return ValuePtr( new StringValue(s) );
+                    return new StringValue(s);
                 }
             case Translate:
                 {
-                    ArgumentList::const_iterator arg = _arguments.begin();
-                    const std::string&    s = (*arg)->evaluateExpression(c)->as<StringValue>().getValue();
-                    const std::string& from = (*(++arg))->evaluateExpression(c)->as<StringValue>().getValue();
-                    const std::string& to   = (*(++arg))->evaluateExpression(c)->as<StringValue>().getValue();
+                    ExpIter arg = arguments->begin();
+                    Value *result = (*arg)->evaluateExpression(c);
+                    StringValue *sval = result->toString();
+                    string s = sval->getValue();
+                    delete result;
+                    delete sval;
 
-                    std::string retval;
-                    for (std::string::size_type i = 0; i < s.length(); i++) {
-                        std::string::size_type pos;
+                    ++arg;
+                    result = (*arg)->evaluateExpression(c);
+                    sval = result->toString();
+                    string from = sval->getValue();
+                    delete result;
+                    delete sval;
+
+                    ++arg;
+                    result = (*arg)->evaluateExpression(c);
+                    sval = result->toString();
+                    string to = sval->getValue();
+                    delete result;
+                    delete sval;
+
+                    string retval;
+                    for (int i = 0; i < s.length(); i++) {
+                        int pos;
                         if ((pos = from.find(s[i])) && pos < to.length()) {
                             retval+=to[pos];
                         } else {
                             retval+=s[i];
                         }
                     }
-                    return ValuePtr( new StringValue(s) );
+                    return new StringValue(s);
                 }
             case Id:
             case Name:
@@ -894,155 +988,283 @@ namespace xpath
             case Unknown:
             default:
                 AC_ERROR << " ** access to unknown function ** ";
-                return ValuePtr( new BooleanValue(false) );
+                return new BooleanValue(false);
         };
     };
 
-    std::string Function::nameOf(Function::FunctionType ft) {
+    string Function::nameOf(Function::FunctionType ft) {
         switch(ft) {
-            case Last            : return FUNCTIONNAME_LAST;
-            case Position        : return FUNCTIONNAME_POSITION;
-            case Count           : return FUNCTIONNAME_COUNT;
-            case StartsWith      : return FUNCTIONNAME_STARTSWITH;
-            case Concat          : return FUNCTIONNAME_CONCAT;
-            case Contains        : return FUNCTIONNAME_CONTAINS;
-            case Substring       : return FUNCTIONNAME_SUBSTRING;
-            case SubstringBefore : return FUNCTIONNAME_SUBSTRING_BEFORE;
-            case SubstringAfter  : return FUNCTIONNAME_SUBSTRING_AFTER;
-            case Not             : return FUNCTIONNAME_NOT;
-            case Id              : return FUNCTIONNAME_ID;
-            case LocalName       : return FUNCTIONNAME_LOCAL_NAME;
-            case NamespaceURI    : return FUNCTIONNAME_NAMESPACE_URI;
-            case Name            : return FUNCTIONNAME_NAME;
-            case String          : return FUNCTIONNAME_STRING;
-            case StringLength    : return FUNCTIONNAME_STRING_LENGTH;
-            case NormalizeSpace  : return FUNCTIONNAME_NORMALIZE_SPACE;
-            case Translate       : return FUNCTIONNAME_TRANSLATE;
-            case Boolean         : return FUNCTIONNAME_BOOLEAN;
-            case True            : return FUNCTIONNAME_TRUE;
-            case False           : return FUNCTIONNAME_FALSE;
-            case Lang            : return FUNCTIONNAME_LANG;
-            case Number          : return FUNCTIONNAME_NUMBER;
-            case Sum             : return FUNCTIONNAME_SUM;
-            case Floor           : return FUNCTIONNAME_FLOOR;
-            case Ceiling         : return FUNCTIONNAME_CEILING;
-            case Round           : return FUNCTIONNAME_ROUND;
-            default              : return FUNCTIONNAME_UNKNOWN;
+            case Last:
+                return FUNCTIONNAME_LAST;
+            case Position:
+                return FUNCTIONNAME_POSITION;
+            case Count:
+                return FUNCTIONNAME_COUNT;
+            case StartsWith:
+                return FUNCTIONNAME_STARTSWITH;
+            case Concat:
+                return FUNCTIONNAME_CONCAT;
+            case Contains:
+                return FUNCTIONNAME_CONTAINS;
+            case Substring:
+                return FUNCTIONNAME_SUBSTRING;
+            case SubstringBefore:
+                return FUNCTIONNAME_SUBSTRING_BEFORE;
+            case SubstringAfter:
+                return FUNCTIONNAME_SUBSTRING_AFTER;
+            case Not:
+                return FUNCTIONNAME_NOT;
+            case Id:
+                return FUNCTIONNAME_ID;
+            case LocalName:
+                return FUNCTIONNAME_LOCAL_NAME;
+            case NamespaceURI:
+                return FUNCTIONNAME_NAMESPACE_URI;
+            case Name:
+                return FUNCTIONNAME_NAME;
+            case String:
+                return FUNCTIONNAME_STRING;
+            case StringLength:
+                return FUNCTIONNAME_STRING_LENGTH;
+            case NormalizeSpace:
+                return FUNCTIONNAME_NORMALIZE_SPACE;
+            case Translate:
+                return FUNCTIONNAME_TRANSLATE;
+            case Boolean:
+                return FUNCTIONNAME_BOOLEAN;
+            case True:
+                return FUNCTIONNAME_TRUE;
+            case False:
+                return FUNCTIONNAME_FALSE;
+            case Lang:
+                return FUNCTIONNAME_LANG;
+            case Number:
+                return FUNCTIONNAME_NUMBER;
+            case Sum:
+                return FUNCTIONNAME_SUM;
+            case Floor:
+                return FUNCTIONNAME_FLOOR;
+            case Ceiling:
+                return FUNCTIONNAME_CEILING;
+            case Round:
+                return FUNCTIONNAME_ROUND;
+            default:
+                return FUNCTIONNAME_UNKNOWN;
         }
     }
+    
+#define RETCMP(instring, pos, X, yes, no) \
+    return ( asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 
-    Function::FunctionType Function::typeOf(const std::string& instring, std::string::size_type pos) {
+    Function::FunctionType Function::typeOf(string instring, int pos) {
         switch(instring[pos]) {
             case 'l':
                 switch(instring[pos+2]) {
-                    case 's': return retcmp(instring, pos, FUNCTIONNAME_LAST      , Function::Last     , Function::Unknown);
-                    case 'n': return retcmp(instring, pos, FUNCTIONNAME_LANG      , Function::Lang     , Function::Unknown);
-                    case 'c': return retcmp(instring, pos, FUNCTIONNAME_LOCAL_NAME, Function::LocalName, Function::Unknown);
-                    default : return Function::Unknown;
+                    case 's':
+                        RETCMP(instring, pos, FUNCTIONNAME_LAST,
+                                Function::Last, Function::Unknown);
+                    case 'n':
+                        RETCMP(instring, pos, FUNCTIONNAME_LANG,
+                                Function::Lang, Function::Unknown);
+                    case 'c':
+                        RETCMP(instring, pos, FUNCTIONNAME_LOCAL_NAME,
+                                Function::LocalName, Function::Unknown);
                 }
-            case 'p': return retcmp(instring, pos, FUNCTIONNAME_POSITION, Function::Position, Function::Unknown);
+            case 'p':
+                RETCMP(instring, pos, FUNCTIONNAME_POSITION,
+                        Function::Position, Function::Unknown);
             case 'c':
                 switch(instring[pos+3]) {
-                    case 'n': return retcmp(instring, pos, FUNCTIONNAME_COUNT   , Function::Count   , Function::Unknown);
-                    case 'l': return retcmp(instring, pos, FUNCTIONNAME_CEILING , Function::Ceiling , Function::Unknown);
-                    case 'c': return retcmp(instring, pos, FUNCTIONNAME_CONCAT  , Function::Concat  , Function::Unknown);
-                    case 't': return retcmp(instring, pos, FUNCTIONNAME_CONTAINS, Function::Contains, Function::Unknown);
-                    default : return Function::Unknown;
+                    case 'n':
+                        RETCMP(instring, pos, FUNCTIONNAME_COUNT,
+                                Function::Count, Function::Unknown);
+                    case 'l':
+                        RETCMP(instring, pos, FUNCTIONNAME_CEILING,
+                                Function::Ceiling, Function::Unknown);
+                    case 'c':
+                        RETCMP(instring, pos, FUNCTIONNAME_CONCAT,
+                                Function::Concat, Function::Unknown);
+                    case 't':
+                        RETCMP(instring, pos, FUNCTIONNAME_CONTAINS,
+                                Function::Contains, Function::Unknown);
+                    default:
+                        return Function::Unknown;
                 }
             case 's':
                 switch(instring[pos+2]) {
-                    case 'a': return retcmp(instring, pos, FUNCTIONNAME_STARTSWITH, Function::StartsWith, Function::Unknown);
-                    case 'm': return retcmp(instring, pos, FUNCTIONNAME_SUM       , Function::Sum       , Function::Unknown);
-                    case 'r': 
-                        if (instring.length() > pos + 6 && instring[pos+6] == '-') {
-                            return retcmp(instring, pos, FUNCTIONNAME_STRING_LENGTH, Function::StringLength, Function::Unknown);
+                    case 'a':
+                        RETCMP(instring, pos, FUNCTIONNAME_STARTSWITH,
+                                Function::StartsWith, Function::Unknown);
+                    case 'm':
+                        RETCMP(instring, pos, FUNCTIONNAME_SUM,
+                                Function::Sum, Function::Unknown);
+                    case 'r':
+                        if (instring.length() > pos + 6 &&
+                            instring[pos+6] == '-')
+                        {
+                            RETCMP(instring, pos, FUNCTIONNAME_STRING_LENGTH,
+                                    Function::StringLength, Function::Unknown);
                         } else {
-                            return retcmp(instring, pos, FUNCTIONNAME_STRING       , Function::String      , Function::Unknown);
+                            RETCMP(instring, pos, FUNCTIONNAME_STRING,
+                                    Function::String, Function::Unknown);
                         }
                     case 'b':
-                        if (instring.length() > pos + 9 && instring[pos+9] == '-') {
+                        if (instring.length() > pos + 9 &&
+                            instring[pos+9] == '-')
+                        {
                             switch(instring[pos+10]) {
-                                case 'a': return retcmp(instring, pos, FUNCTIONNAME_SUBSTRING_AFTER , Function::SubstringAfter , Function::Unknown);
-                                case 'b': return retcmp(instring, pos, FUNCTIONNAME_SUBSTRING_BEFORE, Function::SubstringBefore, Function::Unknown);
-                                default : return retcmp(instring, pos, FUNCTIONNAME_SUBSTRING       , Function::Substring      , Function::Unknown);
+                                case 'a':
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_AFTER,
+                                            Function::SubstringAfter, Function::Unknown);
+                                case 'b':
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_BEFORE,
+                                            Function::SubstringBefore, Function::Unknown);
+                                default:
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING,
+                                            Function::Substring, Function::Unknown);
                             }
                         }
-                        return retcmp(instring, pos, FUNCTIONNAME_SUBSTRING, Function::Substring, Function::Unknown);
+                        RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING,
+                                Function::Substring, Function::Unknown);
                 }
             case 'n':
                 switch(instring[pos+2]) {
-                    case 'm': return retcmp(instring, pos, FUNCTIONNAME_NUMBER         , Function::Number        , Function::Unknown);
-                    case 'r': return retcmp(instring, pos, FUNCTIONNAME_NORMALIZE_SPACE, Function::NormalizeSpace, Function::Unknown);
-                    case 't': return retcmp(instring, pos, FUNCTIONNAME_NOT            , Function::Not           , Function::Unknown);
-                    case 'a': 
-                        if (instring.length() > pos +3 && instring[pos+4] == 's') {
-                            return retcmp(instring, pos, FUNCTIONNAME_NAMESPACE_URI, Function::NamespaceURI, Function::Unknown);
+                    case 'm':
+                        RETCMP(instring, pos, FUNCTIONNAME_NUMBER,
+                                Function::Number, Function::Unknown);
+                    case 'r':
+                        RETCMP(instring, pos, FUNCTIONNAME_NORMALIZE_SPACE,
+                                Function::NormalizeSpace, Function::Unknown);
+                    case 't':
+                        RETCMP(instring, pos, FUNCTIONNAME_NOT,
+                                Function::Not, Function::Unknown);
+                    case 'a':
+                        if (instring.length() > pos +3 &&
+                            instring[pos+4] == 's')
+                        {
+                            RETCMP(instring, pos, FUNCTIONNAME_NAMESPACE_URI,
+                                    Function::NamespaceURI, Function::Unknown);
                         } else {
-                            return retcmp(instring, pos, FUNCTIONNAME_NAME         , Function::Name        , Function::Unknown);
+                            RETCMP(instring, pos, FUNCTIONNAME_NAME,
+                                    Function::Name, Function::Unknown);
                         }
                 }
-            case 'i': return retcmp(instring, pos, FUNCTIONNAME_ID, Function::Id, Function::Unknown);
-            case 't': 
+            case 'i':
+                RETCMP(instring, pos, FUNCTIONNAME_ID, Function::Id,
+                        Function::Unknown);
+            case 't':
                 if (instring[pos+2]== 'u') {
-                    return retcmp(instring, pos, FUNCTIONNAME_TRUE     , Function::True, Function::Unknown);
+                    RETCMP(instring, pos, FUNCTIONNAME_TRUE, Function::True,
+                            Function::Unknown);
                 } else {
-                    return retcmp(instring, pos, FUNCTIONNAME_TRANSLATE, Function::Translate, Function::Unknown);
+                    RETCMP(instring, pos, FUNCTIONNAME_TRANSLATE,
+                            Function::Translate, Function::Unknown);
                 }
-            case 'b': return retcmp(instring, pos, FUNCTIONNAME_BOOLEAN, Function::Boolean, Function::Unknown);
+            case 'b':
+                RETCMP(instring, pos, FUNCTIONNAME_BOOLEAN,
+                        Function::Boolean, Function::Unknown);
             case 'f':
                 if (instring[pos+1]== 'a') {
-                    return retcmp(instring, pos, FUNCTIONNAME_FALSE, Function::False, Function::Unknown);
+                    RETCMP(instring, pos, FUNCTIONNAME_FALSE,
+                            Function::False, Function::Unknown);
                 } else {
-                    return retcmp(instring, pos, FUNCTIONNAME_FLOOR, Function::Floor, Function::Unknown);
+                    RETCMP(instring, pos, FUNCTIONNAME_FLOOR,
+                            Function::Floor, Function::Unknown);
                 }
-            case 'r': return retcmp(instring, pos, FUNCTIONNAME_ROUND, Function::Round, Function::Unknown);
-            default : return Function::Unknown;
+            case 'r':
+                RETCMP(instring, pos, FUNCTIONNAME_ROUND,
+                        Function::Round, Function::Unknown);
+            default:
+                return Function::Unknown;
         }
     }
 
-    void Step::serializeNodeTest(std::ostream &os) const {
-        switch (_test) {
-            case TestPrincipalType         : os << ( !_nodeTestName.empty() ? _nodeTestName : std::string("*") ); break;
-            case TestAnyNode               : os << "node()"; break;
-            case TestCommentNode           : os << "comment()"; break;
-            case TestTextNode              : os << "text()"; break;
-            case TestProcessingInstruction : os << "processinginstruction(" << _nodeTestName << ")"; break;
-            case InvalidTest               : os << "invalid"; break;
+    void Step::serializeNodeTest(std::ostream &os) {
+        switch (test) {
+            case TestPrincipalType:
+                if (nodeTestName.length()) {
+                    os << nodeTestName;
+                } else {
+                    os << "*";
+                }
+                break;
+            case TestAnyNode:
+                os << "node()";
+                break;
+            case TestCommentNode:
+                os << "comment()";
+                break;
+            case TestTextNode:
+                os << "text()";
+                break;
+            case TestProcessingInstruction:
+                os << "processinginstruction(";
+                os << nodeTestName << ")";
+                break;
+            case InvalidTest:
+                os << "invalid";
+                break;
         }
-        if (_test != TestPrincipalType && _test != TestProcessingInstruction && !_nodeTestName.empty()) {
-            os << "[self::node() == \"" << _nodeTestName << "\"]";
+        if (test != TestPrincipalType && test != TestProcessingInstruction && nodeTestName.length()) {
+            os << "[self::node() == \"" << nodeTestName << "\"]";
         }
     }
 
-    const std::string &
+    Step::Step(Step::Axis _axis, Step::NodeTest _test, string name) :
+        axis( _axis ), test( _test ), nodeTestName( name ) { }
+
+    Step::Step() : axis( Child ), test( TestPrincipalType ) {}
+
+    Step::~Step() {
+        for (ExpIter i = predicates.begin(); i != predicates.end(); ++i) {
+            delete *i;
+        }
+    }
+
+    const string &
     Step::stringForAxis(Step::Axis a) {
         switch(a) {
-            case Next_Sibling       : return AXISNAME_NEXT_SIBLING;
-            case Previous_Sibling   : return AXISNAME_PREVIOUS_SIBLING;
-            case Following_Sibling  : return AXISNAME_FOLLOWING_SIBLING;
-            case Preceding_Sibling  : return AXISNAME_PRECEDING_SIBLING;
-            case Child              : return AXISNAME_CHILD;
-            case Parent             : return AXISNAME_PARENT;
-            case Descendant         : return AXISNAME_DESCENDANT;
-            case Ancestor           : return AXISNAME_ANCESTOR;
-            case Following          : return AXISNAME_FOLLOWING;
-            case Preceding          : return AXISNAME_PRECEDING;
-            case Ancestor_Or_Self   : return AXISNAME_ANCESTOR_OR_SELF;
-            case Descendant_Or_Self : return AXISNAME_DESCENDANT_OR_SELF;
-            case Self               : return AXISNAME_SELF;
-            case Namespace          : return AXISNAME_NAMESPACE;
-            case Attribute          : return AXISNAME_ATTRIBUTE;
-            default                 : return AXISNAME_INVALID;
+            case Next_Sibling:      
+                return AXISNAME_NEXT_SIBLING;
+            case Previous_Sibling:
+                return AXISNAME_PREVIOUS_SIBLING;
+            case Following_Sibling:
+                return AXISNAME_FOLLOWING_SIBLING;
+            case Preceding_Sibling:
+                return AXISNAME_PRECEDING_SIBLING;
+            case Child:
+                return AXISNAME_CHILD;
+            case Parent:
+                return AXISNAME_PARENT;
+            case Descendant:
+                return AXISNAME_DESCENDANT;
+            case Ancestor:
+                return AXISNAME_ANCESTOR;
+            case Following:
+                return AXISNAME_FOLLOWING;
+            case Preceding:
+                return AXISNAME_PRECEDING;
+            case Ancestor_Or_Self:
+                return AXISNAME_ANCESTOR_OR_SELF;
+            case Descendant_Or_Self:
+                return AXISNAME_DESCENDANT_OR_SELF;
+            case Self:
+                return AXISNAME_SELF;
+            case Namespace:
+                return AXISNAME_NAMESPACE;
+            case Attribute:
+                return AXISNAME_ATTRIBUTE;
+            default:
+                return AXISNAME_INVALID;
         }
     }
 
     // returns position past end of s if s is the exact next part
     inline
-    std::string::size_type read_if_string( const std::string &    is
-                                         , std::string::size_type pos
-                                         , const std::string &    s ) {
-        std::string::size_type i = 0;
-        std::string::size_type n = asl::minimum(s.size(),is.size()-pos);
+    int
+    read_if_string(const string & is,int pos, const string & s) {
+        int i = 0;
+        int n = asl::minimum(s.size(),is.size()-pos);
         while (i<n && pos < is.size() && is[pos+i] == s[i]) {
             ++i;
         }
@@ -1052,84 +1274,130 @@ namespace xpath
         return pos;
     }
 
-    Step::Axis Step::read_axis(const std::string &instring, int pos) {
+    Step::Axis Step::read_axis(const string &instring, int pos) {
         switch(instring[pos]) {
             case 'a':
                 if (instring.length() <= pos + 8) {
-                    return retcmp(instring, pos, AXISNAME_ANCESTOR, Step::Ancestor, Step::Invalid);
+                    RETCMP(instring, pos, Step::AXISNAME_ANCESTOR,
+                            Step::Ancestor, Step::Invalid);
                 } else switch(instring[pos+8]) {
-                    case '-': return retcmp(instring, pos, AXISNAME_ANCESTOR_OR_SELF, Step::Ancestor_Or_Self, Step::Invalid);
-                    case 'e': return retcmp(instring, pos, AXISNAME_ATTRIBUTE       , Step::Attribute       , Step::Invalid);
-                    default : return retcmp(instring, pos, AXISNAME_ANCESTOR        , Step::Ancestor        , Step::Invalid);
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_ANCESTOR_OR_SELF,
+                                Step::Ancestor_Or_Self, Step::Invalid);
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_ATTRIBUTE,
+                                Step::Attribute, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_ANCESTOR,
+                                Step::Ancestor, Step::Invalid);
                 }
-            case 'c': return retcmp(instring, pos, AXISNAME_CHILD, Step::Child, Step::Invalid);
+            case 'c':
+                RETCMP(instring, pos, Step::AXISNAME_CHILD, Step::Child,
+                        Step::Invalid);
             case 'd':
                 if (instring.length() <= pos + 10) {
-                    return retcmp(instring, pos, AXISNAME_DESCENDANT, Step::Descendant, Step::Invalid);
+                    RETCMP(instring, pos, Step::AXISNAME_DESCENDANT,
+                            Step::Descendant, Step::Invalid);
                 } else switch(instring[pos+10]) {
-                    case '-': return retcmp(instring, pos, AXISNAME_DESCENDANT_OR_SELF, Step::Descendant_Or_Self, Step::Invalid);
-                    default : return retcmp(instring, pos, AXISNAME_DESCENDANT        , Step::Descendant        , Step::Invalid);
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_DESCENDANT_OR_SELF,
+                                Step::Descendant_Or_Self, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_DESCENDANT,
+                                Step::Descendant, Step::Invalid);
                 }
-            case 'f': 
+            case 'f':
                 if (instring.length() <= pos + 9) {
-                    return retcmp(instring, pos, AXISNAME_FOLLOWING, Step::Following, Step::Invalid);
+                    RETCMP(instring, pos, Step::AXISNAME_FOLLOWING,
+                            Step::Following, Step::Invalid);
                 } else switch(instring[pos+9]) {
-                    case '-': return retcmp(instring, pos, AXISNAME_FOLLOWING_SIBLING, Step::Following_Sibling, Step::Invalid);
-                    default : return retcmp(instring, pos, AXISNAME_FOLLOWING        , Step::Following        , Step::Invalid);
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_FOLLOWING_SIBLING,
+                                Step::Following_Sibling, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_FOLLOWING,
+                                Step::Following, Step::Invalid);
                 }
             case 'n':
                 if (instring.length() <= pos + 8) {
                     return Step::Invalid;
                 } else switch(instring[pos+1]) {
-                    case 'a': return retcmp(instring, pos, AXISNAME_NAMESPACE   , Step::Namespace   , Step::Invalid);
-                    case 'e': return retcmp(instring, pos, AXISNAME_NEXT_SIBLING, Step::Next_Sibling, Step::Invalid);
-                    default : return Step::Invalid;
+                    case 'a':
+                        RETCMP(instring, pos, Step::AXISNAME_NAMESPACE,
+                                Step::Namespace, Step::Invalid);
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_NEXT_SIBLING,
+                                Step::Next_Sibling, Step::Invalid);
+                    default:
+                        return Step::Invalid;
                 }
             case 'p':
                 if (instring.length() <= pos + 6) {
                     return Step::Invalid;
                 } else switch(instring[pos+3]) {
-                    case 'e': return retcmp(instring, pos, AXISNAME_PARENT, Step::Parent, Step::Invalid);
-                    case 'c': 
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_PARENT,
+                                Step::Parent, Step::Invalid);
+                    case 'c':
                         if (instring.length() <= pos + 9) {
-                            return retcmp(instring, pos, AXISNAME_PRECEDING, Step::Preceding, Step::Invalid);
+                            RETCMP(instring, pos, Step::AXISNAME_PRECEDING,
+                                    Step::Preceding, Step::Invalid);
                         } else switch(instring[pos+9]) {
-                            case '-': return retcmp(instring, pos, AXISNAME_PRECEDING_SIBLING, Step::Preceding_Sibling, Step::Invalid);
-                            default : return retcmp(instring, pos, AXISNAME_PRECEDING        , Step::Preceding        , Step::Invalid);
+                            case '-':
+                                RETCMP(instring, pos,
+                                        Step::AXISNAME_PRECEDING_SIBLING,
+                                        Step::Preceding_Sibling, Step::Invalid);
+                            default:
+                                RETCMP(instring, pos, Step::AXISNAME_PRECEDING,
+                                        Step::Preceding, Step::Invalid);
                         }
-                    case 'v': return retcmp(instring, pos, AXISNAME_PREVIOUS_SIBLING, Step::Previous_Sibling, Step::Invalid);
+                    case 'v':
+                        RETCMP(instring, pos, Step::AXISNAME_PREVIOUS_SIBLING,
+                                Step::Previous_Sibling, Step::Invalid);
                 }
-            case 's': return retcmp(instring, pos, AXISNAME_SELF, Step::Self, Step::Invalid);
-            default : return Step::Invalid;
+            case 's':
+                RETCMP(instring, pos, Step::AXISNAME_SELF, Step::Self,
+                        Step::Invalid);
+            default:
+                return Step::Invalid;
         }
     }
 
-    Step::NodeTest Step::read_NodeTest(const std::string &instring, int pos) {
+    Step::NodeTest Step::read_NodeTest(const string &instring, int pos) {
         switch(instring[pos]) {
-            case 'n': return retcmp(instring, pos, NODETEST_NODE   , Step::TestAnyNode              , Step::InvalidTest);
-            case 'c': return retcmp(instring, pos, NODETEST_COMMENT, Step::TestCommentNode          , Step::InvalidTest);
-            case 't': return retcmp(instring, pos, NODETEST_TEXT   , Step::TestTextNode             , Step::InvalidTest);
-            case 'p': return retcmp(instring, pos, NODETEST_PI     , Step::TestProcessingInstruction, Step::InvalidTest);
-            default : return Step::InvalidTest;
+            case 'n':
+                RETCMP(instring, pos, Step::NODETEST_NODE, Step::TestAnyNode,
+                        Step::InvalidTest);
+            case 'c':
+                RETCMP(instring, pos, Step::NODETEST_COMMENT, Step::TestCommentNode,
+                        Step::InvalidTest);
+            case 't':
+                RETCMP(instring, pos, Step::NODETEST_TEXT, Step::TestTextNode,
+                        Step::InvalidTest);
+            case 'p':
+                RETCMP(instring, pos, Step::NODETEST_PI, Step::TestProcessingInstruction,
+                        Step::InvalidTest);
+            default:
+                return Step::InvalidTest;
         }
     }
 
-    bool Step::allows(dom::NodePtr n) const
+    bool Step::allows(dom::Node *n)
     {
-        if (_nodeTestName.length()) {
-            if (_test == TestProcessingInstruction) {
+        if (nodeTestName.length()) {
+            if (test == TestProcessingInstruction) {
                 // ### node test name contains the parameter to the processing
                 // instruction. handle accordingly.
             } else {
-                if (n->nodeName() != _nodeTestName) {
+                if (n->nodeName() != nodeTestName) {
                     return false;
                 }
             }
         }
-        switch (_test)
+        switch (test)
         {
         case TestPrincipalType:
-            switch (_axis)
+            switch (axis)
             {
             case Attribute:
                 return n->nodeType()==dom::Node::ATTRIBUTE_NODE;
@@ -1152,152 +1420,436 @@ namespace xpath
         };
     };
 
-    void Step::scan(dom::NodePtr from, NodeSet &into) const {
-        scanStep(*this, from, into);
+    template<class ITER>
+    void descendReverse(ITER &resultset, NodeRef curNode) {
+        for (NodeRef curChild = &*curNode->lastChild(); curChild;
+                curChild = &*curChild->previousSibling())
+        {
+            descendReverse(resultset, curChild);
+        }
+        *resultset++ = curNode;
     }
 
-    void Step::scan(dom::NodePtr from, NodeVector &into) const {
-        scanStep(*this, from, into);
+    template<class CONT>
+    void fillAxis(Step *s, NodeRef curNode, CONT &cont) {
+        std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
+        NodeRef origNode = curNode;
+        // build up the axis with appropriate nodes containing passing the test
+        switch(s->getAxis()) {
+            case Step::Child:
+                if (curNode->hasChildNodes()) {
+                    for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
+                        if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
+                            *resultset++ = curNode;
+                        }
+                    }
+                }
+                break;
+            case Step::Parent:
+                curNode = curNode->parentNode();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Next_Sibling:
+                curNode = &*curNode->nextSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Previous_Sibling:
+                curNode = &*curNode->previousSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Preceding_Sibling:
+                while (curNode = &*curNode->previousSibling()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                break;
+            case Step::Following_Sibling:
+                while (curNode = &*curNode->nextSibling()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                break;
+            case Step::Following:
+                origNode = NULL;
+                /* nobreak; */
+            case Step::Descendant_Or_Self:
+                if (origNode && s->allows(origNode)) {
+                    *resultset++ = origNode;
+                }
+                /* nobreak; */
+            case Step::Descendant:
+                {
+                    while (true) {
+                        if (curNode->firstChild()) {
+                            curNode = &*curNode->firstChild();
+                        } else if (curNode == origNode) {
+                            break;
+                        } else if (curNode->nextSibling()) {
+                            curNode = &*curNode->nextSibling();
+                        } else {
+                            NodeRef tmp = curNode;
+                            while ((tmp = tmp->parentNode()) != origNode) {
+                                if (tmp->nextSibling()) {
+                                    curNode = &*tmp->nextSibling();
+                                    break;
+                                }
+                            }
+                            if (tmp == origNode) {
+                                break;
+                            }
+                        }
+
+                        if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
+                            *resultset++ = curNode;
+                        }
+                    }
+                }
+                break;
+            case Step::Preceding:
+                for (;curNode;curNode = curNode->parentNode()) {
+                    while (curNode->previousSibling()) {
+                        curNode = &*curNode->previousSibling();
+                        AC_TRACE << " diving into " << *curNode;
+                        descendReverse(resultset, curNode);
+                    }
+                }
+                break;
+            case Step::Self:
+                if (s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Attribute:
+                {
+                    dom::NamedNodeMap & map = curNode->attributes();
+                    for (unsigned int i = 0; i < map.length(); i++) {
+                        if (s->allows(&*map.item(i))) {
+                            *resultset++ = &*map.item(i);
+                        }
+                    }
+                }
+            case Step::Ancestor_Or_Self:
+                if (s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                /* nobreak; */
+            case Step::Ancestor:
+                if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE) {
+                    /*
+                       dom::Attribute curAttr = curNode;
+                       curNode = curAttr.ownerElement();
+                     */
+                    curNode = curNode->parentNode();
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                while (curNode = curNode->parentNode()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+            case Step::Invalid:
+            default:
+                break;
+        };
+#ifdef INTERPRETER_DEBUG
+        if (origNode) {
+            AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+        } else {
+            AC_TRACE << "evaluating step " << *s << ": selected " << cont.size() << " candidates...";
+        }
+#endif
+    };
+
+    template<class CONT>
+    void scanStep(Step *s, NodeRef origNode, CONT &results) {
+        bool have_predicates = (s->predicates.begin() != s->predicates.end());
+        if (!have_predicates) {
+            fillAxis(s, origNode, results);
+            return;
+        }
+
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "now evaluating step \"" << *s << "\" :";
+#endif
+        NodeVectorRef intermediateResult = new NodeVector();
+        fillAxis(s, origNode, *intermediateResult);
+
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << " on " << origNode->nodeName() << (origNode->parentNode() ? (" inside " + origNode->parentNode()->nodeName()):"") << ":";
+        AC_TRACE << "starting with " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes";
+
+#endif
+        ExpIter last = s->predicates.end(); 
+        --last;
+
+        Context subcontext;
+
+        for (ExpIter i = s->predicates.begin(); i != last; ++i) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "filtering by predicate [" << *(*i) << "] in a context of " << intermediateResult->size() << " nodes:";
+#endif
+            subcontext.size = intermediateResult->size();
+            subcontext.position = 0;
+            for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end();) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE << "evaluating...";
+#endif
+                subcontext.position++;
+                subcontext.currentNode = (*j);
+                Value *tmp = (*i)->evaluateExpression(subcontext);
+                BooleanValue *v = tmp->toBoolean();
+                delete tmp;
+                if (!v->getValue()) {
+#ifdef INTERPRETER_DEBUG
+                    AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
+#endif
+                    intermediateResult->erase(j++);
+                }
+                else ++j;
+                delete v;
+            }
+        }
+
+        std::insert_iterator<CONT> ins = std::inserter(results, results.end());
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "filtering by last predicate [" << *(*last) << "] in a context of " << intermediateResult->size() << " nodes:";
+#endif
+        subcontext.size = intermediateResult->size();
+        subcontext.position = 0;
+        for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+            subcontext.position++;
+            subcontext.currentNode = (*j);
+            Value *tmp = (*last)->evaluateExpression(subcontext);
+            BooleanValue *v = tmp->toBoolean();
+            delete tmp;
+            if (v->getValue()) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " into container of " << results.size() << " elements";
+                AC_TRACE << " because the predicate [" << (**last) << "] evaluates true.";
+#endif
+                *ins++ = (*j);
+            }
+            delete v;
+        }
+        delete intermediateResult;
+    };
+
+    void Step::scan(NodeRef from, NodeSet &into) {
+        scanStep(this, from, into);
     }
 
-    void Step::scan(dom::NodePtr from, OrderedNodeSet &into) const {
-        scanStep(*this, from, into);
+    void Step::scan(NodeRef from, NodeVector &into) {
+        scanStep(this, from, into);
     }
 
-    void Step::serializeTo(std::ostream & os) const {
-        os << stringForAxis(_axis);
+    void Step::scan(NodeRef from, OrderedNodeSet &into) {
+        scanStep(this, from, into);
+    }
+
+    void Step::serializeTo(std::ostream & os) {
+        os << stringForAxis(axis);
         os << "::";
         serializeNodeTest(os);
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (ExpIter i = predicates.begin(); i != predicates.end(); ++i) {
             os << "[";
-            (*it)->serializeTo(os);
+            (*i)->serializeTo(os);
             os << "]";
         }
     }
 
-    void Path::evaluateInto(NodeSetPtr workingset, NodeSet &returnContainer) const {
-        if (_absolute) {
-            NodeSetPtr newResults( new NodeSet() );
-            NodeSet::const_iterator resIter = newResults->end();
-
-            for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end(); ++it)
-            {
-                dom::NodePtr thisOne = *it;
-                while (thisOne->parentNode()) {
-                    thisOne = thisOne->parentNode()->self().lock();
-                };
-                newResults->insert(thisOne);
-            }
-            workingset = newResults;
-        }
-
-        StepList::const_iterator lastStep = _steps.end();
-        lastStep--;
-        for (StepList::const_iterator s = _steps.begin(); s != lastStep; ++s) {
-            NodeSetPtr nextStepSet( new NodeSet() );
-            for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end(); ++it) {
-                (*s)->scanInto(*it, *nextStepSet);
-            }
-            workingset = nextStepSet;
-        };
-        for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end(); ++it) {
-            (*lastStep)->scanInto(*it, returnContainer);
-        }
+    void Step::appendPredicate(Expression *e) {
+        predicates.push_back(e);
     }
 
-    void Path::evaluateInto(NodeSetPtr workingset, NodeVector & returnContainer) const {
-        // avoid duplicates in intermediate results
-        OrderedNodeSet lastStepSet;
-        evaluateInto(workingset, lastStepSet);
-
-        // but allow them in returnContainer
-        copy(lastStepSet.begin(), lastStepSet.end(), std::inserter(returnContainer, returnContainer.end()));
+    void Step::prependPredicate(Expression *e) {
+        predicates.push_front(e);
     }
 
-    void Path::evaluateInto(NodeSetPtr workingset, OrderedNodeSet &returnContainer) const {
-        if (_absolute) {
-            if (_steps.begin() == _steps.end()) {
-                for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end();++it) {
-                    dom::NodePtr thisOne = *it;
-                    while (thisOne->parentNode()) {
-                        thisOne = thisOne->parentNode()->self().lock();
-                    }
+    void Step::insertPredicate(int at, Expression *e) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        predicates.insert(i, e);
+    }
+
+    Expression *
+    Step::takeFirst() {
+        Expression *retval = predicates.front();
+        predicates.pop_front();
+        return retval;
+    }
+    Expression *
+    Step::takeLast() {
+        Expression *retval = predicates.back();
+        predicates.pop_back();
+        return retval;
+    }
+    Expression *
+    Step::take(int at) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        Expression *retval = *i;
+        predicates.erase(i);
+        return retval;
+    }
+
+    Expression *
+    Step::predicate(int at) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        return *i;
+    }
+
+    int Step::count() const { return predicates.size(); };
+
+    Path::Path() {
+        absolute = false;
+    }
+
+    Value*
+    Path::evaluateExpression(const Context &c) {
+        return evaluate(c.currentNode);
+    }
+
+    NodeSetValue *
+    Path::evaluate(NodeRef n) {
+        return new NodeSetValue(evaluateAs<NodeSet>(n));
+    }
+
+    void Path::evaluateInto(NodeSetRef workingset, OrderedNodeSet &returnContainer) {
+        if (absolute) {
+            if (steps.begin() == steps.end()) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE<<"abolute path with no steps. going up to document from... " << workingset->size() << " nodes.";
+#endif
+                for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i) {
+                    NodeRef thisOne = *i;
+                    while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
                     returnContainer.insert(thisOne);
                 }
+                delete workingset;
                 return;
             } else {
-                NodeSetPtr newResults( new NodeSet() );
-                for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end();++it) {
-                    dom::NodePtr thisOne = *it;
-                    while (thisOne && thisOne->parentNode()->self()) {
-                        thisOne = thisOne->parentNode()->self().lock();
-                    }
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+                NodeSetRef newResults = new NodeSet();
+
+                for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i) {
+                    NodeRef thisOne = *i;
+                    while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
                     newResults->insert(thisOne);
                 }
+                delete workingset;
                 workingset = newResults;
             }
         }
 
-        StepList::const_iterator lastStep = _steps.end();
+        std::list<Step*>::iterator lastStep = steps.end();
         lastStep--;
-        for (StepList::const_iterator itS = _steps.begin(); itS != lastStep; ++itS) {
-            NodeSetPtr nextStepSet( new NodeSet() );
-            for (NodeSet::const_iterator itNS = workingset->begin(); itNS != workingset->end(); ++itNS) {
-                (*itS)->scanInto(*itNS, *nextStepSet);
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "scanning intermediate step " << (**s) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+            NodeSetRef nextStepSet = new NodeSet();
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+                (*s)->scanInto(*i, *nextStepSet);
             }
+            delete workingset;
             workingset = nextStepSet;
         }
-        for (NodeSet::const_iterator it = workingset->begin(); it != workingset->end(); ++it) {
-            (*lastStep)->scanInto(*it, returnContainer);
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+        for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+            (*lastStep)->scanInto(*i, returnContainer);
         }
+        delete workingset;
     }
 
-    void Path::serializeTo(std::ostream &os) const {
-        for (StepList::const_iterator s = _steps.begin(); s != _steps.end();++s) {
-            if ((s != _steps.begin()) || _absolute) {
+    void Path::evaluateInto(NodeSetRef workingset, NodeVector & returnContainer) {
+
+        // avoid duplicates in intermediate results
+        OrderedNodeSetRef lastStepSet = new OrderedNodeSet();
+        evaluateInto(workingset, *lastStepSet);
+
+        // but allow them in returnContainer
+        copy(lastStepSet->begin(), lastStepSet->end(), std::inserter(returnContainer, returnContainer.end()));
+        delete lastStepSet;
+    }
+
+    void Path::evaluateInto(NodeSetRef workingset, NodeSet &returnContainer) {
+        if (absolute) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+            NodeSetRef newResults = new NodeSet();
+            NodeSet::iterator resIter = newResults->end();
+
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
+            {
+                NodeRef thisOne = *i;
+                while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+                newResults->insert(thisOne);
+            }
+            delete workingset;
+            workingset = newResults;
+        }
+
+        std::list<Step*>::iterator lastStep = steps.end();
+        lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes into Set:";
+#endif
+            NodeSetRef nextStepSet = new NodeSet();
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+                (*s)->scanInto(*i, *nextStepSet);
+            }
+            delete workingset;
+            workingset = nextStepSet;
+        };
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+        for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+            (*lastStep)->scanInto(*i, returnContainer);
+        }
+        delete workingset;
+    }
+
+    void Path::serializeTo(std::ostream &os) {
+        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
+            if ((s != steps.begin()) || absolute) {
                 os << "/";
             }
             (*s)->serializeTo(os);
         }
     }
-
-    void SetExpression::serializeTo(std::ostream &os) const {
-        PathList::const_iterator it = _sets.begin();
-        if (*it) {
-            (*it)->serializeTo(os);
-            while ((++it) != _sets.end()) {
-                os << " | ";
-                (*it)->serializeTo(os);
-            }
-        }
-    }
-
-    ValuePtr SetExpression::evaluateExpression(const Context &c) const {
-        if (_sets.empty()) {
-            return ValuePtr( new NullValue() );
-        }
-        PathList::const_iterator it = _sets.begin();
-        NodeSetPtr v = (*it)->evaluate(c.currentNode)->takeNodes();
-
-        while (++it != _sets.end()) {
-            NodeSetPtr vcur = (*it)->evaluate(c.currentNode)->takeNodes();
-
-            NodeSetPtr vres( new NodeSet );
-            switch(_op) {
-                case Union:
-                    std::set_union(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
-                    break;
-                case Intersection:
-                    std::set_intersection(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
-                    break;
-                case Difference:
-                    std::set_difference(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
-                    break;
-            }
-            v = vres; // shouldn't this be: v.insert( vres.begin(), vres.end() ); ??? 
-        }
-        return ValuePtr( new NodeSetValue(v) );
-    }
-
 }
 
+std::ostream &operator<<(std::ostream &stream, xpath::SyntaxNode &myNode) {
+    myNode.serializeTo(stream);
+    return stream;
+}

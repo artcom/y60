@@ -827,20 +827,23 @@ xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         JS_ReportError(cx,"JSNode::find: argument is not a string.");
     };                        
 
-    xpath::PathPtr myPath = xpath::xpath_parse(myPathString);
+    xpath::Path *myPath = xpath::xpath_parse(myPathString);
 
     if (!myPath) {
         JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
         return JS_FALSE;
     } else {
 
-        dom::NodePtr resPtr = xpath::xpath_evaluate1(myPath,myNode);
-        if (resPtr) {
+        dom::Node *res = xpath::xpath_evaluate1(myPath, &*myNode);
+        if (res) {
+            dom::NodePtr resPtr = res->self().lock();
             *rval = as_jsval(cx, resPtr);
+            xpath::xpath_return(myPath);
             return JS_TRUE;
         } else {
             //JS_ReportError(cx, "JSNode::find: no nodes found under %s", myPathString.c_str());
             AC_DEBUG << "JSNode::find: no nodes found under path'" << myPathString <<"'";
+            xpath::xpath_return(myPath);
             return JS_TRUE;
         }
     }
@@ -871,15 +874,16 @@ xpath_findAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
          JS_ReportError(cx,"JSNode::find: argument is not a string.");
     };                        
 
-    xpath::PathPtr myPath = xpath::xpath_parse(myPathString);
+    xpath::Path *myPath = xpath::xpath_parse(myPathString);
 
     if (!myPath) {
         JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
         return JS_FALSE;
     } else {
-        xpath::NodeVector myResults;
-        xpath::xpath_evaluate(myPath, myNode, myResults);
+        std::vector<dom::NodePtr> myResults;
+        xpath::xpath_evaluate(myPath, &*myNode, myResults);
         *rval = as_jsval(cx, myResults);
+        xpath::xpath_return(myPath);
         return JS_TRUE;
     }
 }

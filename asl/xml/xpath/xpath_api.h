@@ -11,44 +11,39 @@
 #ifndef XPATH_API_H
 #define XPATH_API_H
 
-#include <cstdlib>
-#include <string>
-
+#include <stdlib.h>
 #include <dom/Nodes.h>
 
 #include "Types.h"
-#include "Expression.h"
 
 namespace xpath {
 
-    void f(PathPtr);
+    class Path;
 
     // yields a path pointer to the responsibility of the caller.
-    PathPtr xpath_parse(const std::string &instring);
+    Path * xpath_parse(const std::string &instring);
 
-    // OBSOLETE
-    inline void xpath_return(PathPtr) {}
+    // have library delete previously parse()'d Path *
+    void xpath_return(Path *);
 
     // evaluate path on startingElement into results
-    void xpath_evaluate( PathPtr 
-                       , const dom::NodePtr startingElement
-                       , NodeVector& results );
-    void xpath_evaluate( const std::string& 
-                       , const dom::NodePtr startingElement
-                       , NodeVector& results);
+    void xpath_evaluate(Path *, dom::Node *startingElement,
+            std::vector<dom::NodePtr> &results);
+    void xpath_evaluate(std::string, dom::Node *startingElement,
+            std::vector<dom::NodePtr> &results);
 
-    dom::NodePtr xpath_evaluate1(PathPtr, const dom::NodePtr);
+    dom::Node *xpath_evaluate1(Path *, dom::Node *);
 
-    OrderedNodeSetPtr xpath_evaluateOrderedSet(PathPtr myPath, dom::NodePtr theNode);
-    OrderedNodeSetPtr xpath_evaluateOrderedSet(const std::string&, dom::NodePtr);
+    OrderedNodeSetRef xpath_evaluateOrderedSet(Path *, dom::Node *);
+    OrderedNodeSetRef xpath_evaluateOrderedSet(std::string, dom::Node *);
 
-    NodeSetPtr xpath_evaluateSet(PathPtr, dom::NodePtr);
-    NodeSetPtr xpath_evaluateSet(const std::string&, dom::NodePtr);
+    std::set<dom::Node *> *xpath_evaluateSet(Path *, dom::Node *);
+    std::set<dom::Node *> *xpath_evaluateSet(std::string, dom::Node *);
 
-    NodeVectorPtr xpath_evaluate(PathPtr, dom::NodePtr);
-    NodeVectorPtr xpath_evaluate(const std::string&, dom::NodePtr);
+    std::vector<dom::Node *> *xpath_evaluate(Path *, dom::Node *);
+    std::vector<dom::Node *> *xpath_evaluate(std::string, dom::Node *);
 
-    NodeVectorPtr findAll(dom::Node & theRoot, const std::string & theExpression);
+    std::vector<dom::NodePtr> findAll(dom::Node & theRoot, const std::string & theExpression);
     dom::NodePtr find(dom::Node & theRoot, const std::string & theExpression);
 };
 
