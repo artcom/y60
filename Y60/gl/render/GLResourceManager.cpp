@@ -299,10 +299,10 @@ namespace y60 {
             return false;
         }
         CHECK_OGL_ERROR;
-	    if (theTexture->getType() != TEXTURE_2D) {
+	    if (theTexture->getType() == TEXTURE_2D) {
 	        return imageMatchesGLTexture2D(theTexture);
 	    }
-	    if (theTexture->getType() != TEXTURE_3D) {
+	    if (theTexture->getType() == TEXTURE_3D) {
 	        return imageMatchesGLTexture3D(theTexture);
 	    }
         AC_DEBUG << "imageMatchesGLTexture() returning false, unknown texture type (not TEXTURE_2D or TEXTURE_3D), id=  " << theTexture->getTextureId();
