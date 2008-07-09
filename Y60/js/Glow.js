@@ -11,6 +11,26 @@
 use("Y60JSSL.js");
 use("Overlay.js");
 
+/*
+
+How does our Glow it work?
+
+To avoid rendering the whole scene multiple times, our "glow" feature uses the
+alpha channel to store information about what pixels are supposed to glow, and how bright.
+
+When glow is switched on, the scene is rendered into an offscreen buffer first,
+accumulating glow information in the alpha channel.
+
+This offscreen buffer is then used as texture for an overlay that uses a special
+shader to extract and filter the glow color information from the scene.
+This shader however does only horizontal filtering, so a third pass is performed
+to to the vertical filtering.
+
+The main scene rendered consists just of two overlays,
+the scene underlay, and the glow texture is then rendered as overlay.
+
+*/
+
 function Glow(theViewer, theKernelSize, theGlowScale) {
     this.Constructor(this, theViewer, theKernelSize, theGlowScale);
 }
@@ -118,8 +138,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         window.render();
         window.postRender();
         window.swapBuffers();
-
+        
         window.scene.world.visible = true;
+
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -202,7 +223,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myViewport = window.canvas.find("viewport");
         if (myViewport.glow == true) {
             Logger.warning("Disabling glow on viewport '" + myViewport.name + "' id=" + myViewport.id);
-            //myViewport.glow = false;
+            myViewport.glow = false;
         }
 
         /*
@@ -263,6 +284,10 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myOffscreenOverlay.srcorigin = new Vector2f( 0, 1 - myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));*/
         _myOffscreenOverlay.material.name = "Offscreen";
         _myOffscreenOverlay.material.properties.blendfunction = "[one,zero]";
+        //_myOffscreenOverlay.material.properties.blendfunction = "[src_color,zero]";
+        //_myOffscreenOverlay.material.properties.blendequation = "add";
+        //_myOffscreenOverlay.material.transparent = 0;
+        //_myOffscreenOverlay.material.childNode("textureunits").firstChild.applymode = "replace";
 
         /*
          * Blur_X
@@ -349,7 +374,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurYTextureUnits  = myBlurYMaterial.find("textureunits");
         myBlurYTextureUnits.appendChild(myTextureUnit);
 
-        window.scene.update(Scene.MATERIALS);
+        //window.scene.update(Scene.MATERIALS);
         myBlurYMaterial.properties.texelSize = new Vector3f( 1/myBlurYImage.width, 1/myBlurYImage.height,1.0);
         myBlurYMaterial.properties.glowScale = theGlowScale;
         myBlurYMaterial.properties.kernelSize = theKernelSize;

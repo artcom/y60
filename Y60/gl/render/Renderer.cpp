@@ -1173,6 +1173,7 @@ namespace y60 {
     // called once per Canvas per Frame
     void
     Renderer::render(ViewportPtr theViewport) {
+        AC_TRACE << "Rendering:" << theViewport->getNode();
         MAKE_GL_SCOPE_TIMER(render);
         _myRenderedUnderlays = false;
         ++_myFrameNumber;

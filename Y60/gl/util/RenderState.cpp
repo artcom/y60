@@ -32,7 +32,7 @@ namespace y60 {
         _myIgnoreDepthFlag(false),
         _myDepthWritesFlag(true),
         _myPolygonOffsetFlag(false),
-        _myBlendFlag(false),
+        _myBlendFlag(true),
         _myAlphaTestFlag(true),
         _myScissorTestFlag(false),
         _myFrontFaceCCWFlag(true),

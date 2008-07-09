@@ -59,6 +59,7 @@ namespace y60 {
             case GL_BGR: return "GL_BGR"; 
             case GL_RGBA8: return "GL_RGBA8"; 
             case GL_BGRA: return "GL_BGRA"; 
+            case GL_RGBA: return "GL_RGBA"; 
             case GL_UNSIGNED_BYTE: return "GL_UNSIGNED_BYTE"; 
             case GL_UNSIGNED_SHORT: return "GL_UNSIGNED_SHORT"; 
             case GL_SHORT: return "GL_SHORT"; 
@@ -79,7 +80,7 @@ namespace y60 {
             case GL_RGB_FLOAT32_ATI: return "GL_RGB_FLOAT32_ATI"; 
             case GL_HALF_FLOAT_ARB: return "GL_HALF_FLOAT_ARB"; 
             case GL_FLOAT: return "GL_FLOAT"; 
-            default:return std::string("UNKNOWN_GL_ENUM=")+asl::as_string(theFormat);
+            default:return std::string("UNKNOWN_GL_ENUM=0x")+asl::as_string((void*)theFormat);
         }
     }
 }

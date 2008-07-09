@@ -211,10 +211,12 @@ namespace y60 {
 #else
             if (theViewport.get<ViewportDrawGlowTag>()) {
                 AC_TRACE << "setting blendfunction for glow:" << asl::as_string(myBlendFunction);
-                glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1]), 
-                                    GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]),
+                                    asGLBlendFunction(myBlendFunction[1]), 
+                                    GL_CONSTANT_ALPHA,
+                                    GL_ONE_MINUS_SRC_ALPHA);
                 CHECK_OGL_ERROR;
-                float myGlow = myMaterialPropFacade->get<GlowTag>();
+                float myGlow = myMaterialPropFacade->get<GlowTag>() + 0.01; // add 0.01 to workaround an alpha test bug
                 glBlendColor(1.0f,1.0f,1.0f, myGlow);
                 CHECK_OGL_ERROR;
             } else {

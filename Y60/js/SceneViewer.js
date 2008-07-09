@@ -282,6 +282,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     myPlugin.timeout = 5000;
                     print("Nagios plugin listening on port "+myPlugin.port+", frame timeout is "+myPlugin.timeout+" ms");
                     break;
+                case "W":
                 case "sys req":
                 case "print screen":
                     screenShot();
@@ -599,7 +600,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     function printHelp() {
          print("Scene Viewer Keys:");
-         print("  print        write screenshot as png image to the current directory");
+         print("  print or W   write screenshot as png image to the current directory");
          print("  shift-print  enables/disables video recorder");
          print("    w          toggle wireframe");
          print("    F          toggle flatshading");
