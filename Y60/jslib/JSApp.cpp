@@ -807,7 +807,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             AC_DEBUG << "use myIncludeFileWithPath=" << myIncludeFileWithPath;
             if (myIncludeFileWithPath.empty()) {
                 AC_ERROR << "File '" << myIncludeFile << "' not found in " << myIncludePath << ";" << JSApp::getPackageManager()->getSearchPath() << std::endl;
-                return JS_FALSE;
+                throwException(cx, "File not found", myIncludeFile, myLine);
             } else {
                 // Only include files once
                 IncludeGuardVector::const_iterator it = find(ourIncludeGuard.begin(), ourIncludeGuard.end(), myIncludeFileWithPath);
