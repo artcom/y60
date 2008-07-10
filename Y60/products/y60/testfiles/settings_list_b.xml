@@ -1,0 +1,11 @@
+<settings>
+    <ListBOnlySection>
+        <ListBOnly>ListB</ListBOnly>
+    </ListBOnlySection>
+    <CommonAndListBSection>
+        <CommonAndListB>ListB</CommonAndListB>
+    </CommonAndListBSection>
+    <CommonSection>
+        <Common>ListB</Common>
+    </CommonSection>
+</settings>

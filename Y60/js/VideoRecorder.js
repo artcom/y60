@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function VideoRecorder(theFramesPerSecond, theDirectory) {
+function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
 
     var Public = this;
 
@@ -37,12 +37,16 @@ function VideoRecorder(theFramesPerSecond, theDirectory) {
         }
     }
 
-    Public.onFrame = function(theTime) {
+    Public.onFrame = function() {
         if (_myEnabledFlag) {
             var myFileName = _myDirectory + "/frame";
             myFileName += padStringFront(_myFrameCount++, "0", 5);
             myFileName += ".png";
-            window.saveBuffer(myFileName);
+            if (theRenderArea) {
+                theRenderArea.renderToCanvas(true);
+            } else {
+                window.saveBuffer(myFileName);
+            }
             print(myFileName);
         }
     }

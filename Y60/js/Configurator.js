@@ -18,11 +18,13 @@
 
 use("Y60JSSL.js");
 
-function Configurator(theSceneViewer, theSettingsFile) {
-    this.Constructor(this, theSceneViewer, theSettingsFile);
+function Configurator(theSceneViewer, theSettingsFile, theSettingsFileList) {
+    this.Constructor(this, theSceneViewer, theSettingsFile, theSettingsFileList);
 }       
 
-Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFile) {
+Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsFile, 
+                                               theSettingsFileList) 
+{
     const DISPLAY_DURATION  = 3;
     const FADE_DURATION     = 1;
     const BOX_SIZE          = [600,100];
@@ -43,19 +45,20 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
     }
 
-    obj.getHostSettingsFile = function() {
-        if (_myHostSettingsFile) {
-            return _myHostSettingsFile;
-        } else {
-            throw new Exception("No host specific settingsfile found", fileline());
-        }
-    }
-
     obj.setSettingsFile = function(theSettingsFile) {
         setup(obj, theSceneViewer, theSettingsFile);
     }
 
-    obj.setSetting = function(theSection, theSetting, theValue, theHostFlag) {
+    obj.setSettingsFileList = function( theFileList ) {
+        _mySettingsFileList = theFileList;
+        setup( obj, theSceneViewer, _myCommonSettingsFile );
+    }
+
+    obj.getSettingsFileList = function() {
+        return _mySettingsFileList;
+    }
+
+    obj.setSetting = function(theSection, theSetting, theValue) {
         var mySection = _myMergedSettings.childNode(theSection);
         if (!mySection) {
             mySection = _myMergedSettings.appendChild(Node.createElement(theSection));
@@ -66,111 +69,62 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             mySetting = mySection.appendChild(Node.createElement(theSetting));
         }
 
-        mySetting.firstChild.nodeValue = theValue;projects.xls
-
-        if (theHostFlag) {
-            mySetting.override = "hostname";
-        }
+        mySetting.firstChild.nodeValue = theValue;
     }
 
     obj.restoreSettings = function() {
         for (var i = 0; i < _myMergedSettings.childNodes.length; ++i) {
             var myChild = _myMergedSettings.childNode(i);
             for (var j = 0; j < myChild.childNodes.length; ++j) {
-                myChild.childNode(j).firstChild.nodeValue = _myOriginalMergedSettings.childNode(i).childNode(j).firstChild;
+                myChild.childNode(j).firstChild.nodeValue = 
+                    _myOriginalMergedSettings.childNode(i).childNode(j).firstChild;
             }
         }
         notifyListeners();
     }
-
-    obj.saveSettings = function(theAdditionalCommonFile, theAdditionalHostFile, theCommonFlag, theHostFlag, theMergeCommonFlag) {
-        if (theCommonFlag == undefined) {
-            theCommonFlag = true;
-        }
-        if (theMergeCommonFlag == undefined) {
-            theMergeCommonFlag = false;
-        }
-
-        if (theHostFlag == undefined) {
-            theHostFlag = true;
-        }
-
-        var myCommonSettings = _myMergedSettings.cloneNode(true);
-        var myHostSettings   = _myMergedSettings.cloneNode(true);
-
-        for (var i = _myMergedSettings.childNodesLength() - 1; i >= 0; --i) {
-            var mySection         = _myMergedSettings.childNode(i);
-            var mySectionOverride = "none";
-            if ("override" in mySection) {
-                mySectionOverride = mySection.override;
+    
+    function saveSection( theSourceSection, theTargetSection ) {
+        // save common setting values
+        for (var i = 0; i < theTargetSection.childNodesLength(); i++) {
+            var myTargetNode = theTargetSection.childNode( i );
+            var mySourceNode = theSourceSection.childNode( myTargetNode.nodeName );
+            if (mySourceNode) {
+                theTargetSection.replaceChild( mySourceNode.cloneNode(true), myTargetNode );
+                // remove them from merged section
+                theSourceSection.removeChild( mySourceNode ); 
             }
-
-            // Don't inherit sections from the host specific settings
-            if (!_myOriginalCommonSettings.childNode(mySection.nodeName) && !theMergeCommonFlag) {
-                var myCommonSection = myCommonSettings.childNode(i);
-                myCommonSettings.removeChild(myCommonSection);
-                continue;
-            }
-
-            for (var j = mySection.childNodesLength() - 1; j >= 0; --j) {
-                var mySetting = mySection.childNode(j);
-                var mySettingOverride = "none";
-                if ("override" in mySetting) {
-                    mySettingOverride = mySetting.override;
-                } else {
-                    mySettingOverride = mySectionOverride;
-                }
-
-                // Remove the override attribute
-                var myHostSection = myHostSettings.childNode(i);
-                var myHostSetting = myHostSection.childNode(j);
-                myHostSetting     = removeAttributeByName(myHostSetting, "ovprojects.xlserride");
-
-                if (mySettingOverride == "hostname") {
-                    var myOldCommonSection = myCommonSettings.childNode(mySection.nodeName);
-                    var myOldCommonSetting = myOldCommonSection.childNode(mySetting.nodeName);
-                    var myNewCommonSection = _myOriginalCommonSettings.childNode(mySection.nodeName);
-                    var myNewCommonSetting = myNewCommonSection.childNode(mySetting.nodeName);
-                    myOldCommonSection.replaceChild(myNewCommonSetting.cloneNode(true), myOldCommonSetting);
-                } else if (mySettingOverride == "none") {
-                    var myHostSection = myHostSettings.childNode(mySection.nodeName);
-                    var myHostSetting = myHostSection.childNode(mySetting.nodeName);
-                    myHostSection.removeChild(myHostSetting);
-                } else {
-                    Logger.warning("Unknown override setting '" + mySettingOverride + "'");
-                }
-            }
-
-            // Remove empty sections
-            var myCommonSection = myCommonSettings.childNode(i);
-            if (myCommonSection.childNodesLength() == 0) {
-                myCommonSettings.removeChild(myCommonSection);
-            }
-            var myHostSection = myHostSettings.childNode(i);
-            if (myHostSection.childNodesLength() == 0) {
-                myHostSettings.removeChild(myHostSection);
-            } else {
-                // Remove the override attribute
-                removeAttributeByName(myHostSection, "override");
-            }
-        }
-
-        if (theCommonFlag) {
-            myCommonSettings.saveFile(_myCommonSettingsFile);
-        }
-
-        if (theHostFlag) {
-            myHostSettings.saveFile(_myHostSettingsFile);
-        }
-
-        if (theAdditionalCommonFile) {
-            myCommonSettings.saveFile(theAdditionalCommonFile);
-        }
-
-        if (theAdditionalHostFile) {
-            myHostSettings.saveFile(theAdditionalHostFile);
         }
     }
+
+    function saveSetting( theSetting, theSettingsFile, theCurrentMergedSettings ) {
+
+        for (var j = 0; j < theSetting.childNodesLength(); j++) {
+            var myCurrentSection = theSetting.childNode( j );    
+            var myMergedSection = 
+                theCurrentMergedSettings.childNode( myCurrentSection.nodeName );
+            if ( myMergedSection ) {
+                saveSection( myMergedSection, myCurrentSection );
+                if (!myMergedSection.hasChildNodes()) {
+                    theCurrentMergedSettings.removeChild( myMergedSection );
+                }
+            }
+        } 
+        theSetting.saveFile( theSettingsFile );
+    }
+
+    obj.saveSettings = function() {
+
+        var myCurrentMergedSettings = _myMergedSettings.cloneNode( true ); 
+        for (var i = _mySettingsList.length - 1; i >= 0; i--) { 
+            var myCurrentSettings = _mySettingsList[i];
+            saveSetting( myCurrentSettings, _mySettingsFileList[i], 
+                         myCurrentMergedSettings );
+        }
+        saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile, 
+                     myCurrentMergedSettings );
+
+    }
+
 
     obj.removeListener = function(theListener) {
         for (var i=_myListeners.length-1; i >= 0; --i) {
@@ -434,33 +388,45 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         return theNode;
     }
 
-    function setup(obj, theSceneViewer, theSettingsFile) {
+    function setup(obj, theSceneViewer, theSettingsFile, theSettingsFileList) {
+
+        if (theSettingsFileList != undefined) {
+            _mySettingsFileList = theSettingsFileList;
+        }
+
         _myCommonSettingsFile = theSettingsFile;
         if (fileExists(_myCommonSettingsFile)) {
             Logger.info("Parsing settings from '" + _myCommonSettingsFile + "'");
-            var mySettingsDom = new Node();
-            mySettingsDom.parseFile(_myCommonSettingsFile);
-            _myOriginalCommonSettings = mySettingsDom.firstChild;
-
-            // build hostname specific settings filename
-            var myFileparts  = theSettingsFile.split(".");
-            var myFileprefix = "";
-            var myFilesuffix = "";
-            if (myFileparts.length == 1) {
-                myFileprefix = myFileparts[0];
+            var myCommonSettingsDom = new Node();
+            if (fileExists( _myCommonSettingsFile )) {
+                myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             } else {
-                myFileprefix = myFileparts.slice(0, myFileparts.length - 1).join("");
-                myFilesuffix = "." + myFileparts[myFileparts.length - 1];
+                throw new Exception( "Settings file " + _myCommonSettingsFile + 
+                                     "does not exist!", fileline() );
             }
-            var myHostname      = hostname().split(".")[0]; // make sure we don't get a FQ name
-            _myHostSettingsFile = myFileprefix + "-" + myHostname + myFilesuffix;
+            _myOriginalCommonSettings = myCommonSettingsDom.firstChild;
 
-            _myMergedSettings         = mySettingsDom.firstChild.cloneNode(true);
-            _myOriginalMergedSettings = _myMergedSettings.cloneNode(true);
-            if (fileExists(_myHostSettingsFile)) {
-                mergeHostSpecificSettings();
+            _myMergedSettings         = myCommonSettingsDom.firstChild.cloneNode(true);
+
+            // merge all settings in the settings file list
+            for (var i = 0; i < _mySettingsFileList.length; i++) {
+                var mySettingsFile = _mySettingsFileList[i];
+                if (fileExists(mySettingsFile)) {
+                    var mySettingsDom = new Node();
+                    mySettingsDom.parseFile( mySettingsFile );
+                    var mySettings = mySettingsDom.firstChild;
+                    _mySettingsList.push( mySettings );
+                    Logger.info("Using settings from '" + mySettingsFile + "'");
+                    mergeSettings( mySettings );
+                } else {
+                    Logger.warning( 'Settings file "' + mySettingsFile 
+                                    + '" does not exist!');
+                }
             }
+
+            _myOriginalMergedSettings = _myMergedSettings.cloneNode( true );
     
+            // set default current settings
             _myCurrentSection = _myMergedSettings.firstChild;
             _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
         }
@@ -510,64 +476,57 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
          print("shift-tab restore original Settings");
     }
 
-    function mergeHostSpecificSettings() {
-        Logger.info("Using host-specific settings from '" + _myHostSettingsFile + "'");
+    function mergeSettings( theSettings ) {
 
-        var mySettingsDom = new Node();
-        mySettingsDom.parseFile(_myHostSettingsFile);
-        _myOriginalHostSettings = mySettingsDom.firstChild;
-
-        for (var i = 0; i < _myOriginalHostSettings.childNodesLength(); ++i) {
-            var myHostSection   = _myOriginalHostSettings.childNode(i);
-            var myCommonSection = _myMergedSettings.childNode(myHostSection.nodeName);
+        for (var i = 0; i < theSettings.childNodesLength(); i++) {
+            var mySection = theSettings.childNode( i );
+            var myCommonSection = _myMergedSettings.childNode( mySection.nodeName );
 
             if (!myCommonSection) {
-                myCommonSection = Node.createElement(myHostSection.nodeName);
-                _myMergedSettings.appendChild(myCommonSection);
+                myCommonSection = Node.createElement( mySection.nodeName );
+                _myMergedSettings.appendChild( myCommonSection );
             }
 
-            // Merge sections
-            mergeHostSpecificSection(myCommonSection, myHostSection);
+            mergeSection( myCommonSection, mySection );
         }
+        
     }
 
-    function mergeHostSpecificSection(theCommonSection, theHostSection) {
-        var myChildNodesLength = theHostSection.childNodesLength();
+    function mergeSection(theCommonSection, theSection) {
+        var myChildNodesLength = theSection.childNodesLength();
         for (var i = myChildNodesLength - 1; i >= 0; --i) {
-            var myHostNode = theHostSection.childNode(i);
+            var myNode = theSection.childNode(i);
 
-            myHostNode = removeAttributeByName(myHostNode, "override");
-
-            var myCommonNode = theCommonSection.childNode(myHostNode.nodeName);
+            var myCommonNode = theCommonSection.childNode(myNode.nodeName);
             if (myCommonNode) {
                 // Use the attributes from the common node
                 var myAttributes = myCommonNode.attributes;
                 for (var j = 0; j < myAttributes.length; ++j) {
-                    myHostNode[myAttributes[j].nodeName] = myCommonNode[myAttributes[j].nodeName];
+                    myNode[myAttributes[j].nodeName] = 
+                        myCommonNode[myAttributes[j].nodeName];
                 }
-
-                // Replace the common node with host specific node
-                theCommonSection.replaceChild(myHostNode.cloneNode(true), myCommonNode);
+                // Replace the common node with new node
+                theCommonSection.replaceChild(myNode.cloneNode(true), myCommonNode);
             } else {
                 // Add node to config if it does not exist
-                theCommonSection.appendChild(myHostNode.cloneNode(true));
+                theCommonSection.appendChild(myNode.cloneNode(true));
             }
         }
     }
 
     var _mySceneViewer            = theSceneViewer;
-    var _myMergedSettings         = null;
-    var _myOriginalMergedSettings = null;
+    var _myMergedSettings         = null;   
     var _myOriginalCommonSettings = null;
-    var _myOriginalHostSettings   = null;
+    var _myOriginalMergedSettings = null;
     var _myCommonSettingsFile     = null;
-    var _myHostSettingsFile       = null;
+    var _mySettingsFileList       = [];
+    var _mySettingsList           = [];
     var _myCurrentSection         = null;
     var _myCurrentSetting         = null;
     var _myListeners              = [];
     var _myKeyDown                = null;
 
-    setup(obj, theSceneViewer, theSettingsFile);
+    setup( obj, theSceneViewer, theSettingsFile, theSettingsFileList );
 }
 
 //

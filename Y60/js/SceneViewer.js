@@ -123,7 +123,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _myShutter.onFrame(theTime);
         }
         if (_myVideoRecorder) {
-            _myVideoRecorder.onFrame(theTime);
+            _myVideoRecorder.onFrame();
         }
         var myCanvas = self.getActiveViewport().parentNode; //self.getRenderWindow().canvas;
         if (myCanvas) {
@@ -511,7 +511,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 break;
             }
         }
-        _myConfigurator = new Configurator(self, mySettingsFile);
+
+        var mySettingsListString = self.arguments["settings"];
+        var mySettingsList = undefined;
+        if (mySettingsListString) {
+            mySettingsList = mySettingsListString.split(":");
+        }
+
+        _myConfigurator = new Configurator(self, mySettingsFile, mySettingsList);
 
         if (theWindowTitle != null) {
             window.title = theWindowTitle;

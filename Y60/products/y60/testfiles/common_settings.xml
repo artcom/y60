@@ -1,0 +1,14 @@
+<settings>
+    <CommonOnlySection>
+        <CommonOnly>Common</CommonOnly>
+    </CommonOnlySection> 
+    <CommonAndListASection>
+        <CommonAndListA>Common</CommonAndListA>
+    </CommonAndListASection>
+    <CommonAndListBSection>
+        <CommonAndListB>Common</CommonAndListB>
+    </CommonAndListBSection>
+    <CommonSection>
+        <Common>Common</Common>
+    </CommonSection>
+</settings>

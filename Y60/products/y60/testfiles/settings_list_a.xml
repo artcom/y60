@@ -1,0 +1,11 @@
+<settings>
+    <ListAOnlySection>
+        <ListAOnly>ListA</ListAOnly>
+    </ListAOnlySection>
+    <CommonAndListASection>
+        <CommonAndListA>ListA</CommonAndListA>
+    </CommonAndListASection>
+    <CommonSection>
+        <Common>ListA</Common>
+    </CommonSection>
+</settings>
