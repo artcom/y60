@@ -508,9 +508,9 @@ createPlane(y60::ScenePtr theScene, unsigned theXCount, unsigned theYCount,
 
     // UH: the ShapeBuilder:: prefix is necessary for gcc to work
     const unsigned myCount = theXCount * theYCount;
-    myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myCount);
+    myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myCount, VERTEX_USAGE_STREAM_DRAW);
     myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, myCount);
-    myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE, myCount);
+    myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE, myCount, VERTEX_USAGE_STREAM_DRAW);
     myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector2f>("uvset", myCount);
 
     appendToPlane(myShapeBuilder, theXCount, theYCount, theMaterialId, theIndexBuilder,

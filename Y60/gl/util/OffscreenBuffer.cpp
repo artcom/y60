@@ -41,9 +41,13 @@ static void checkFramebufferStatus()
         case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT" << endl;
             break;
+#ifdef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT
         case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" << endl;
             break;
+#else 
+#   warning GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT undefined
+#endif
         case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" << endl;
             break;
@@ -264,16 +268,8 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         /*
          * create FBO
          */
-        // XXX use power-of-two for image size since Y60 textures are POT only at the moment.
-        // Once we support non-power-of-two textures this should be replaced with the actual
-        // texture size (should come from Image/Texture object so that NPOT support is handled
-        // properly)
         unsigned myWidth = theTexture->get<TextureWidthTag>(); 
         unsigned myHeight = theTexture->get<TextureHeightTag>(); 
-//        if (theImage->get<ImageResizeTag>() == IMAGE_RESIZE_PAD) { 
-//            myWidth = asl::nextPowerOfTwo(theImage->get<ImageWidthTag>());
-//            myHeight = asl::nextPowerOfTwo(theImage->get<ImageHeightTag>());
-//        }
         AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>() 
                  << " size=" << myWidth << "x" << myHeight;
 
@@ -333,6 +329,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 
         // framebuffer
         glGenFramebuffersEXT(1, &_myFrameBufferObject[0]);
+        checkOGLError(PLUS_FILE_LINE);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
         checkOGLError(PLUS_FILE_LINE);
 
@@ -347,16 +344,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             case TEXTURE_CUBEMAP:
                 {
                     attachCubemapFace(theCubemapFace);
-                    // for depth buffer (see below) the face dimensions are needed
-                    // and not the dimension of the whole cubemap
-                    /*
-                    ImagePtr myImage = theTexture->getImage();
-                    if (myImage) {
-                        asl::Vector2i myTile = myImage->get<ImageTileTag>();
-                        myWidth = theTexture->get<TextureWidthTag>() / myTile[0];
-                        myHeight = theTexture->get<TextureHeightTag>() / myTile[1];
-                    }
-                    */
                 }
                 break;
             default:
