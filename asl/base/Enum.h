@@ -17,7 +17,7 @@
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
 //    formatting             : ok
-//    documentation          : perfect
+//    documentation          : poor (no docs for bitset)
 //    test coverage          : ok
 //    names                  : ok
 //    style guide conformance: ok
@@ -390,15 +390,6 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
  */
 #define DEFINE_ENUM( THE_NAME, THE_ENUM) \
     typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
-
-/** Helper macro. Runs the verify() method during static initialization.
- * @relates asl::Enum
- */
-#define IMPLEMENT_ENUM( THE_NAME, THE_STRINGS ) \
-    template <> const char ** THE_NAME ::_ourStrings = THE_STRINGS; \
-    template <> const char * THE_NAME ::_ourName = #THE_NAME; \
-    template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
-
 
 /** Helper macro. Creates a typedef.
  * @relates asl::Bitset
