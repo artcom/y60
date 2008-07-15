@@ -16,7 +16,7 @@
         <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
         <MomentumRegion step="1">[-1.00,-1.00000,1.00,1.00000]</MomentumRegion>
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
-        <CaptureSensorData> min="0" max="1" step="1" >0</CaptureSensorData>
+        <CaptureSensorData min="0" max="1" step="1" >0</CaptureSensorData>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
         <TransportLayer>socket</TransportLayer>
