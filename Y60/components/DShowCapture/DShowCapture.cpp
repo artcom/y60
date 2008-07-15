@@ -24,7 +24,9 @@
 #pragma warning(disable:4244)
 #define EMULATE_INTTYPES
 #endif
+extern "C" {
 #include <ffmpeg/avcodec.h>
+}
 
 extern "C"
 EXPORT asl::PlugInBase * y60DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {

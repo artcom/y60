@@ -32,7 +32,9 @@ extern "C" {
 #undef AV_NOPTS_VALUE
 #define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
 #endif
 
 #ifdef WIN32

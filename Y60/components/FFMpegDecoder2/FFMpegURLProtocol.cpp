@@ -30,13 +30,13 @@
 #define EMULATE_INTTYPES
 #endif
 
-#ifdef OSX
 extern "C" {
+#ifdef OSX
 #include <libavformat/avformat.h>
-}
 #else
 #include <ffmpeg/avformat.h>
 #endif
+}
 
 
 using namespace asl;

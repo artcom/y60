@@ -22,7 +22,9 @@
 #ifdef WIN32
 #define EMULATE_INTTYPES
 #endif
+extern "C" {
 #include <ffmpeg/avformat.h> // For resampling
+}
 
 namespace y60 {
 
