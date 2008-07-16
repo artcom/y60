@@ -488,7 +488,6 @@ namespace y60 {
         } else {
             myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
             if(_myInterpolationMethod ) {
-                AC_WARNING << "ASS interpolation mode seems to have no effect";
                 std::vector<MomentResults> myCurrentPositions;
                 computeCursorPositions( myCurrentPositions, myROIs);
                 correlatePositions( myCurrentPositions, myROIs, theEvent );
