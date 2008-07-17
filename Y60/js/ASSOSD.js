@@ -106,7 +106,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
     ////////////////////////////////////////
 
     function buildQuitOSD() {
-        var myFontPath = "fonts/arial.ttf";
+        var myFontPath = "FONTS/arial.ttf";
         if (!fileExists(myFontPath)) {
             myFontPath = "${PRO}/testmodels/fonts/arial.ttf";
             if (!fileExists(myFontPath) && operatingSystem() == "WIN32") {
