@@ -28,11 +28,11 @@ LayerManager.prototype.Constructor = function(Public) {
 
             Logger.info("Setting up layer \"" + myLayerName + "\" at depth " + myLayerDepth + "...");
 
-            // TODO: add projectspecific layers directory for custom implementations [sh]
             use("GUI/LAYERS/" + myLayerType + "Layer.js");
+            
             var myCtorCall = "new "+myLayerType + "Layer("+myLayerDepth+",'"+myLayerName+"'"+",'"+myLayerType+"')";
             var myNewLayer = eval(myCtorCall);
-            myNewLayer.setup(theLayerNode.childNode(i));
+            myNewLayer.setup(myLayerNode);
             _myLayers.push(myNewLayer);
         }
     }    

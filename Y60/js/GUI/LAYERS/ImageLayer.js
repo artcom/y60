@@ -29,6 +29,7 @@ ImageLayer.prototype.Constructor = function(Public, theDepth, theName, theType) 
     Base.setup = Public.setup;
     Public.setup = function(theLayerNode) {
         
+        Logger.info(theLayerNode);
         _myName = theLayerNode.name;
 
         _myMaterial = getCachedImageMaterial("CONTENT/" + theLayerNode.getAttribute("file"));
