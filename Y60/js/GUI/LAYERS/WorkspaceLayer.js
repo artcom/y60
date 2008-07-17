@@ -35,6 +35,7 @@ WorkspaceLayer.prototype.Constructor = function(Public, theDepth, theName, theTy
         Public.LayerBase.setup(theLayerNode);        
         for(var i=0; i < theLayerNode.childNodesLength("workspace"); ++i){
             var myWorkspaceNode = theLayerNode.childNode("workspace", i);
+            print("workspace " + myWorkspaceNode);
             _myWorkspaces.push(new Workspace(myWorkspaceNode, Protected.getDepth()));
         }
     }
@@ -53,10 +54,6 @@ WorkspaceLayer.prototype.Constructor = function(Public, theDepth, theName, theTy
         }
     }
 
-    Public.southFinishesHack = function(theChance) {
-        var myWorkspace = Public.getWorkspaceByName("workspace-south");
-        myWorkspace.gameFinished(theChance);
-    }
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
