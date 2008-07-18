@@ -239,9 +239,10 @@ function applyStyleDefaults(theStyle) {
 function textAsImage(theText, theStyle, theSize) {
     var myImage = Node.createElement("image");
 
-    myImage.resize = "pad";
-    myImage.wrapmode = "clamp_to_edge";
-    myImage.mipmap = false;
+    // TODO: port to image-texture-separation foo [sh]
+    // myImage.resize = "pad";
+    // myImage.wrapmode = "clamp_to_edge";
+    // myImage.mipmap = false;
 
     window.scene.images.appendChild(myImage);
 
@@ -260,9 +261,9 @@ function textToImage(theImage, theText, theStyle, theSize) {
     window.setTracking(theStyle.tracking);
     window.setLineHeight(theStyle.lineHeight);
 
-    theImage.resize = "pad";
-    theImage.wrapmode = "clamp_to_edge"
-    theImage.mipmap = false;
+    // theImage.resize = "pad";
+    // theImage.wrapmode = "clamp_to_edge"
+    // theImage.mipmap = false;
 
     var myTextSize =
         window.renderTextAsImage(theImage,

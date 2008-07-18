@@ -23,9 +23,15 @@ use("GUI/TextButton.js");
 use("GUI/Utilities.js");
 use("GUI/LayerManager.js");
 
+plug("Cairo");
+
 function GuiBase(theArguments) {
     this.Constructor(this, theArguments);
 }
+
+// TODO: define somewhere else. [sh]
+const CONTENT = "CONTENT";
+const MINZOOMFACTOR = 0.0;
 
 GuiBase.prototype.Constructor = function(self, theArguments) {
     var Base = {};
@@ -86,6 +92,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         Base.setup(_myWidth, _myHeight, false, theTitle);
         
         window.showMouseCursor = !Public.getReleaseMode(); 
+        window.swapInterval = 1;
 
         setupCamera();
 

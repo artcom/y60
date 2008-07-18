@@ -212,15 +212,17 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
         // our texture
         _myImage = Modelling.createImage(window.scene, _myWidth, _myHeight, "BGRA");
         _myImage.name = _myName + "-surface";
-        _myImage.resize = "none";
-        _myImage.wrapmode = "clamp";
         _myImage.raster.fillRect(0, 0, _myWidth, _myHeight, [0,0,0,1]);
 
         // our material
-        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
-                                                            _myImage, true);
+        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myImage, true);
         _myMaterial.transparent = true;
-
+        
+        print(_myMaterial);
+        print(_myMaterial.childNode("textureunits").firstChild.texture);
+        // _myImage.resize = "none";
+        // _myImage.wrapmode = "clamp";
+        
         // our body and shape
         _myQuad = createQuad(theParent, _myName, new Vector2f(_myWidth, _myHeight),
                              new Vector3f(_myNode.x, _myNode.y, theDepth),

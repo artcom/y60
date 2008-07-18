@@ -34,11 +34,26 @@ ImageLayer.prototype.Constructor = function(Public, theDepth, theName, theType) 
 
         _myMaterial = getCachedImageMaterial("CONTENT/" + theLayerNode.getAttribute("file"));
         _myMaterial.transparent = theLayerNode.transparent;
+    
+        var myX = 0;
+        if ("x" in theLayerNode) {
+            myX = Number(theLayerNode.x);
+        }
+        
+        var myY = 0;
+        if ("y" in theLayerNode) {
+            myY = Number(theLayerNode.y);
+        }
+        
+        var myZ = _myDepth;
+        if ("z" in theLayerNode) {
+            myZ = Number(theLayerNode.z);
+        }
 
         _myQuad = createQuad(window.scene.world,
                              _myName,
                              new Vector2i(theLayerNode.width, theLayerNode.height),
-                             new Vector3i(0,0,_myDepth),
+                             new Vector3i(myX, myY, myZ),
                              _myMaterial,
                              true, true);
 
