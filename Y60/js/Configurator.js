@@ -82,6 +82,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         }
         notifyListeners();
     }
+
+    obj.reloadSettings = function() {
+        setup( obj, theSceneViewer, _myCommonSettingsFile );
+    }
     
     function saveSection( theSourceSection, theTargetSection ) {
         // save common setting values
