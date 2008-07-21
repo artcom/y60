@@ -153,7 +153,11 @@ ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Lo
     int myStatus;
     pid_t myResult = waitpid( theProcessInfo, &myStatus, WNOHANG );
     if (myResult == -1) {
-        return PR_FAILED;
+        if (getLastErrorNumber() == ECHILD ) {
+            return PR_TERMINATED;
+        } else {
+            return PR_FAILED;
+        }
     }
     if (myResult == theProcessInfo) {
         std::ostringstream myOss;
