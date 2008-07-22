@@ -25,9 +25,10 @@ namespace jslib {
 
 template<class DERIVED>
 JSBool JSAbstractRenderWindow<DERIVED>::setTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets a javascript line to be executed after a certain time");
+    DOC_BEGIN("Sets a javascript line to be executed after a certain time. When a JSObject is given the JSCommand (e.g. a function name) is called on that object.");
     DOC_PARAM("theJavaScriptCommand", "", DOC_TYPE_STRING);
     DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
+    DOC_PARAM_OPT("theJSObjectToCall", "", DOC_TYPE_OBJECT, "");
     DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
     DOC_END;
     
@@ -62,9 +63,10 @@ JSBool JSAbstractRenderWindow<DERIVED>::setTimeout(JSContext *cx, JSObject *obj,
 
 template<class DERIVED>
 JSBool JSAbstractRenderWindow<DERIVED>::setInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets a javascript line to be executed in a certain interval until clearInterval() is called.");
+    DOC_BEGIN("Sets a javascript line to be executed in a certain interval until clearInterval() is called. When a JSObject is given the JSCommand (e.g. a function name) is called on that object.");
     DOC_PARAM("theJavaScriptCommand", "", DOC_TYPE_STRING);
     DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
+    DOC_PARAM_OPT("theJSObjectToCall", "", DOC_TYPE_OBJECT, "");
     DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
     DOC_END;
     if (argc == 2 || argc == 3) {
