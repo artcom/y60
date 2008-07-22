@@ -48,6 +48,14 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         return _myMaterial;
     }
     
+    Public.alpha getter = function() {
+        return _myMaterial.properties.surfacecolor[3];
+    }
+
+    Public.alpha setter = function(theAlpha) {
+        Modelling.setAlpha(_myQuad.body, theAlpha);
+    }
+    
     Public.visible getter = function() {
         return Public.body.visible;
     }
