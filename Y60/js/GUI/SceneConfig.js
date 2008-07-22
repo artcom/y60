@@ -42,7 +42,7 @@ const CONTENT = "CONTENT";
 
 // Layer manager / layout.
 const LAYOUT_CONFIG = "CONFIG/layers.xml";
-const LAYER_PATH    = "LAYERS/";
+const LAYER_PATH    = "Layers/";
 
 // Game logic and charts.
 const GAME_CONFIG = "CONFIG/market.xml";

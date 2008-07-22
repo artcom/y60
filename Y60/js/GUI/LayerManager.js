@@ -28,7 +28,7 @@ LayerManager.prototype.Constructor = function(Public) {
 
             Logger.info("Setting up layer \"" + myLayerName + "\" at depth " + myLayerDepth + "...");
 
-            use("GUI/LAYERS/" + myLayerType + "Layer.js");
+            use("GUI/Layers/" + myLayerType + "Layer.js");
             
             var myCtorCall = "new "+myLayerType + "Layer("+myLayerDepth+",'"+myLayerName+"'"+",'"+myLayerType+"')";
             var myNewLayer = eval(myCtorCall);
