@@ -10,6 +10,9 @@
 
 use("CompositeAnimation.js");
 
+/**
+ * Play several animations in sequence.
+ */
 function SequenceAnimation() {
     this.Constructor(this, {});
 }
@@ -19,8 +22,17 @@ SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 
     CompositeAnimation.Constructor(Public, Protected);
 
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
+
     var _current = 0;
 	
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+
+    // duration = sum(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
     Public.childDurationChanged = function() {
 		var d = 0.0;
@@ -31,6 +43,7 @@ SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 	};
 	
     // start to play this animation
+    // plays the first animation
     Base.play = Public.play;
 	Public.play = function()
 	{
@@ -41,7 +54,7 @@ SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 	    Base.play();	
     };
 	
-    // on every frame
+    // iterate through child animations
     Public.doFrame = function() {
 	    Public.children[_current].doFrame();
 	    if(!Public.children[_current].running) {
@@ -55,7 +68,7 @@ SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 	};
 	
 	Public.toString = function() {
-		return standardToString("SequenceAnimation");
+		return Protected.standardToString("SequenceAnimation");
 	};
 
 };

@@ -10,6 +10,9 @@
 
 use("Animation.js");
 
+/**
+ * Base class for non-composite animations.
+ */
 var SimpleAnimation = {};
 
 SimpleAnimation.Constructor = function(Public, Protected) {
@@ -17,6 +20,11 @@ SimpleAnimation.Constructor = function(Public, Protected) {
 
     Animation.Constructor(Public, Protected);
 
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+
+    // simple animations allow setting of their duration
     Public.duration setter = function(d) {
         Protected.duration = d;
 	};

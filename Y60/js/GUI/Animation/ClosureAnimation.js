@@ -10,6 +10,9 @@
 
 use("SimpleAnimation.js");
 
+/**
+ * Animations implemented with a closure function.
+ */
 function ClosureAnimation(theDuration, theEasing, theFunction) {
     this.Constructor(this, {}, theDuration, theEasing, theFunction);
 }
@@ -18,9 +21,18 @@ ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration
     var Base = {};
 
     SimpleAnimation.Constructor.call(Public, Public, Protected);
+    
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
 
     var _function = null;
-		
+    
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+    
+    // initialize from arguments
     Public.setup = function() {
 		Protected.duration = theDuration;
 
@@ -30,15 +42,15 @@ ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration
 
 		_function = theFunction;
     };
-		
+    
+    // call the closure with the current progress value
     Base.render = Public.render;
     Public.render = function() {
         if(_function != null) {
             _function(Public.progress);
         }
-        //print(_object + "." + _property + " = " + _object[_property]);
 	};
-		
+    
 	Public.toString = function() {
 		return "ClosureAnimation" + _function;
 	};

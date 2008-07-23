@@ -8,13 +8,27 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/**
+ * The thing that runs animations.
+ * 
+ * Instantiate yourself one and call its
+ * doFrame() method on every frame.
+ */
 function AnimationManager() {
     this.Constructor(this, {});
 }
 
 AnimationManager.prototype.Constructor = function(Public, Protected) {
     
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
+    
     var _animations = [];
+
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
 	
     Public.play = function(a) {
 		_animations.push(a);
@@ -34,7 +48,11 @@ AnimationManager.prototype.Constructor = function(Public, Protected) {
 		}
 	    removeFinished();
     };
-		
+	
+    ////////////////////////////////////////
+    // Private
+    ////////////////////////////////////////
+    
     function removeFinished() {
         for(var i = 0; i < _animations.length; i++) {
 			var a = _animations[i];

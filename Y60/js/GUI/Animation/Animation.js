@@ -8,11 +8,19 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/**
+ * Abstract base class for animations.
+ */
 var Animation = {};
 
+// global counter for generating animation ids
 Animation.idCounter = 0;
 
 Animation.Constructor = function(Public, Protected) {
+
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
 
     var _id = Animation.idCounter++;
     var _name = null;
@@ -32,7 +40,10 @@ Animation.Constructor = function(Public, Protected) {
     var _onPlay        = null;
     var _onFinish      = null;
     var _onCancel      = null;
-		
+
+    ////////////////////////////////////////
+    // Properties
+    ////////////////////////////////////////		
 		
     // getter / setter 
     Public.id getter = function() {
@@ -85,8 +96,7 @@ Animation.Constructor = function(Public, Protected) {
     Public.loop setter = function(l) {
         _loop = l;
     };
-    
-	
+    	
     Public.running getter = function()	{
 		return _running;
 	};
@@ -122,7 +132,11 @@ Animation.Constructor = function(Public, Protected) {
     Public.onFinish setter = function(f) {
 		_onFinish = f;
 	};
-		
+
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+
     Public.play = function() {
 		_startTime = millisec();
 	    _progressTime = 0;
@@ -141,7 +155,6 @@ Animation.Constructor = function(Public, Protected) {
 	    if(_onCancel != null) {
 			_onCancel();
 		}
-	    //Logger.debug(Public + " cancelled");
 	};
 		
     Public.finish = function() {
@@ -153,7 +166,6 @@ Animation.Constructor = function(Public, Protected) {
         } else {
             _running = false;
         }
-	    //Logger.debug(Public + " finished");
 	};
 		
     Public.doFrame = function() {
@@ -177,6 +189,14 @@ Animation.Constructor = function(Public, Protected) {
     Public.render = function() {
     };
 
+    Public.toString = function() {
+		return Protected.standardToString("Animation");
+	};
+
+    ////////////////////////////////////////
+    // Protected
+    ////////////////////////////////////////
+
     Protected.durationChanged = function() {
 		if(_parent) {
 			_parent.childDurationChanged(Public);
@@ -185,10 +205,6 @@ Animation.Constructor = function(Public, Protected) {
 		
     Protected.standardToString = function(cls) {
 		return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "");
-	};
-		
-    Public.toString = function() {
-		return standardToString("Animation");
 	};
 
 };

@@ -10,6 +10,9 @@
 
 use("Animation.js");
 
+/**
+ * Animations that are time-compositions of their children.
+ */
 var CompositeAnimation = {};
 
 CompositeAnimation.Constructor = function(Public, Protected) {
@@ -17,21 +20,32 @@ CompositeAnimation.Constructor = function(Public, Protected) {
 
     Animation.Constructor(Public, Protected);
 	
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
+
     var _children = [];
+
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
 		
     Public.children getter = function() {
         return [].concat(_children);
 	};
-		
+    
+    // add a child, also updating duration
     Public.add = function(theAnimation) {
 		_children.push(theAnimation);
         theAnimation.parent = Public;
 		Public.childDurationChanged();
 	};
 
+    // duration computation, should be overridden
     Public.childDurationChanged = function(theChild) {
     };
-		
+    
+    // generic cancel
     Base.cancel = Public.cancel;
     Public.cancel = function() {
 		for(var i = 0; i < _children.length; i++) {
@@ -42,6 +56,7 @@ CompositeAnimation.Constructor = function(Public, Protected) {
 	    Base.cancel();
     };
 
+    // generic finish
     Base.finish = Public.finish;
     Public.finish = function(){
 		for(var i = 0; i < _children.length; i++) {

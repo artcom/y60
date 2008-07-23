@@ -10,6 +10,9 @@
 
 use("CompositeAnimation.js");
 
+/**
+ * Play several animations in parallel.
+ */
 function ParallelAnimation() {
     this.Constructor(this, {});
 }
@@ -19,6 +22,11 @@ ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 
     CompositeAnimation.Constructor.call(Public, Public, Protected);
 
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+
+    // duration = max(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
     Public.childDurationChanged = function(theChild) {
     	var d = 0;
@@ -31,6 +39,7 @@ ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 	    Protected.duration = d;
 	};
 	
+    // start playing all children
     Base.play = Public.play;
 	Public.play = function() {
 		Base.play();
@@ -39,6 +48,7 @@ ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 		}
 	};
 	
+    // step all children forward
 	Public.doFrame = function()	{
 		var finished = true;
 		for(var i = 0; i < Public.children.length; i++) {
@@ -53,8 +63,7 @@ ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 		}
 	};
 	
-	Public.toString = function()
-	{
+	Public.toString = function() {
 		return "ParallelAnimation";
 	};
 	

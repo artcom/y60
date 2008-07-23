@@ -10,6 +10,9 @@
 
 use("SimpleAnimation.js");
 
+/**
+ * Animate a javascript property on one or more objects.
+ */
 function PropertyAnimation(theDuration, theEasing, theObject, theProperty, theMin, theMax) {
     this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theMin, theMax);
 }
@@ -19,12 +22,21 @@ PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuratio
     var Base = {};
 
     SimpleAnimation.Constructor.call(Public, Public, Protected);
+    
+    ////////////////////////////////////////
+    // Member
+    ////////////////////////////////////////
 
     var _object = null;
 	var _property = "";
 	var _min = 0;
 	var _max = 0;
-		
+    
+    ////////////////////////////////////////
+    // Public
+    ////////////////////////////////////////
+    
+    // initialize from arguments
     Public.setup = function() {
 		Protected.duration = theDuration;
 
@@ -37,13 +49,20 @@ PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuratio
 		_min = theMin;
 		_max = theMax;
     };
-		
+    
+    // set the current value
     Base.render = Public.render;
     Public.render = function() {
-		_object[_property] = _min + ((_max - _min) * Public.progress);
-	    //print(_object + "." + _property + " = " + _object[_property]);
+        var myValue = _min + ((_max - _min) * Public.progress);
+        if(_object instanceof Array) {
+            for (var object in _object) {
+		        object[_property] = myValue;
+            }
+        } else {
+	        _object[_property] = myValue;
+        }
 	};
-		
+    
 	Public.toString = function() {
 		return "PropertyAnimation" + " on "  + _object + "." + _property;
 	};
