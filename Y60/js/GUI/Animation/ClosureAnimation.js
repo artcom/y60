@@ -10,20 +10,16 @@
 
 use("SimpleAnimation.js");
 
-function PropertyAnimation(theDuration, theEasing, theObject, theProperty, theMin, theMax) {
-    this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theMin, theMax);
+function ClosureAnimation(theDuration, theEasing, theFunction) {
+    this.Constructor(this, {}, theDuration, theEasing, theFunction);
 }
 
-PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, 
-                                                   theObject, theProperty, theMin, theMax) {
+ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, theFunction) {
     var Base = {};
 
     SimpleAnimation.Constructor.call(Public, Public, Protected);
 
-    var _object = null;
-	var _property = "";
-	var _min = 0;
-	var _max = 0;
+    var _function = null;
 		
     Public.setup = function() {
 		Protected.duration = theDuration;
@@ -32,20 +28,19 @@ PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuratio
 			Public.easing = theEasing;
 		}
 
-		_object = theObject;
-		_property = theProperty;
-		_min = theMin;
-		_max = theMax;
+		_function = theFunction;
     };
 		
     Base.render = Public.render;
     Public.render = function() {
-		_object[_property] = _min + ((_max - _min) * Public.progress);
-	    //print(_object + "." + _property + " = " + _object[_property]);
+        if(_function != null) {
+            _function(Public.progress);
+        }
+        //print(_object + "." + _property + " = " + _object[_property]);
 	};
 		
 	Public.toString = function() {
-		return "PropertyAnimation" + " on "  + _object + "." + _property;
+		return "ClosureAnimation" + _function;
 	};
     
     Public.setup();

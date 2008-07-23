@@ -14,39 +14,35 @@ function SequenceAnimation() {
     this.Constructor(this, {});
 }
 
-
 SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     var Base = {};
 
-    CompositeAnimation.prototype.Constructor(Public, Protected);
+    CompositeAnimation.Constructor(Public, Protected);
 
     var _current = 0;
 	
-    Base.propagateDurationChange = Protected.propagateDurationChange;
-    Protected.propagateDurationChange = function() {
-		var d:Number = 0;
+    Base.childDurationChanged = Public.childDurationChanged;
+    Public.childDurationChanged = function() {
+		var d = 0.0;
 	    for(var i = 0; i < Public.children.length; i++) {
 				d += Public.children[i].duration;
 			}
-		Public.setDuration(d);
-	    Base.propagateDurationChange();
-	}
-		
+		Protected.duration = d;
+	};
+	
+    // start to play this animation
     Base.play = Public.play;
-	Public.play =function()
+	Public.play = function()
 	{
 		_current = 0;
 	    if(Public.children.length >= 1) {
 			Public.children[_current].play();
 		}
 	    Base.play();	
-    }
-		
+    };
+	
+    // on every frame
     Public.doFrame = function() {
-		if(Public.onFrameBegin != null) {
-			Public.onFrameBegin();
-		}
-		
 	    Public.children[_current].doFrame();
 	    if(!Public.children[_current].running) {
 			_current++;
@@ -56,13 +52,10 @@ SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 				Public.finish();
 			}
 		}
-		
-		if(Public.onFrameFinish != null) {
-			Public.onFrameFinish();
-		}
-	}
+	};
 	
 	Public.toString = function() {
 		return standardToString("SequenceAnimation");
-	}
-}
+	};
+
+};

@@ -14,41 +14,32 @@ function ParallelAnimation() {
     this.Constructor(this, {});
 }
 
-
 ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     var Base = {};
 
-    CompositeAnimation.prototype.Constructor(Public, Protected);
+    CompositeAnimation.Constructor.call(Public, Public, Protected);
 
-	
-
-    Base.propagateDurationChange = Protected.propagateDurationChange;
-    Protected.propagateDurationChange = function() {
+    Base.childDurationChanged = Public.childDurationChanged;
+    Public.childDurationChanged = function(theChild) {
     	var d = 0;
 	    for(var i = 0; i < Public.children.length; i++) {
-	        var c = Public.children[i].getDuration();
+	        var c = Public.children[i].duration;
 		    if(c > d) {
 				d = c;
 			}
 		}
-	    Public.setDuration(d);
-	    Base.propagateDurationChange();
-	}
+	    Protected.duration = d;
+	};
 	
     Base.play = Public.play;
-	Public.play =function()
-	{
+	Public.play = function() {
 		Base.play();
 		for(var i = 0; i < Public.children.length; i++) {
 			Public.children[i].play();
 		}
-	}
+	};
 	
 	Public.doFrame = function()	{
-		if(Public.onFrameBegin != null) {
-			Public.onFrameBegin();
-		}
-		
 		var finished = true;
 		for(var i = 0; i < Public.children.length; i++) {
 			Public.children[i].doFrame();
@@ -57,18 +48,14 @@ ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 			}
 		}
 		
-		if(Public.onFrameFinish != null) {
-			Public.onFrameFinish();
-		}
-		
 		if(finished) {
 			Public.finish();
 		}
-	}
+	};
 	
 	Public.toString = function()
 	{
 		return "ParallelAnimation";
-	}
+	};
 	
-}
+};

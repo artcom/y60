@@ -12,32 +12,28 @@ function AnimationManager() {
     this.Constructor(this, {});
 }
 
-
 AnimationManager.prototype.Constructor = function(Public, Protected) {
-
+    
     var _animations = [];
-		
-		
-    Public.play = function(a)
-    {
+	
+    Public.play = function(a) {
 		_animations.push(a);
 	    a.play(0);
-	}
+	};
 		
     Public.isPlaying = function() {
 		return _animations.length > 0;	
-	}
+	};
 		
     Public.doFrame = function() {
-		removeFinished();
 	    for(var i = 0; i < _animations.length; i++) {
-		var a = _animations[i];
-		if(a.running) {
-			a.doFrame();
-			}
+	        var a = _animations[i];
+		    if(a.running) {
+		        a.doFrame();
+		    }
 		}
 	    removeFinished();
-    }
+    };
 		
     function removeFinished() {
         for(var i = 0; i < _animations.length; i++) {
@@ -46,6 +42,6 @@ AnimationManager.prototype.Constructor = function(Public, Protected) {
 				_animations.splice(i, 1);
 			}
 		}
-	}
+	};
 	
-}
+};

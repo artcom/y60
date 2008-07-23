@@ -10,25 +10,15 @@
 
 use("Animation.js");
 
-function SimpleAnimation(theDuration) {
-    this.Constructor(this, {}, theDuration);
-}
+var SimpleAnimation = {};
 
-
-SimpleAnimation.prototype.Constructor = function(Public, Protected, theDuration) {
+SimpleAnimation.Constructor = function(Public, Protected) {
     var Base = {};
 
-    Animation.prototype.Constructor(Public, Protected);
+    Animation.Constructor(Public, Protected);
 
-	Public.setup = function() {
-        
-    }
-    
-    Base.setDuration = Public.setDuration;
-    Public.setDuration = function(d) {
-		Base.setDuration(d);
-        Protected.propagateDurationChange();
-	}
+    Public.duration setter = function(d) {
+        Protected.duration = d;
+	};
 
-	
-}
+};

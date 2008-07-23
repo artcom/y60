@@ -10,27 +10,27 @@
 
 use("Animation.js");
 
-function CompositeAnimation() {
-    this.Constructor(this, {});
-}
+var CompositeAnimation = {};
 
-
-CompositeAnimation.prototype.Constructor = function(Public, Protected) {
+CompositeAnimation.Constructor = function(Public, Protected) {
     var Base = {};
 
-    Animation.prototype.Constructor(Public, Protected);
+    Animation.Constructor(Public, Protected);
 	
     var _children = [];
 		
-     Public.children getter = function() {
-         return [].concat(_children);
-	 }
+    Public.children getter = function() {
+        return [].concat(_children);
+	};
 		
     Public.add = function(theAnimation) {
 		_children.push(theAnimation);
         theAnimation.parent = Public;
-		Protected.propagateDurationChange();
-	}
+		Public.childDurationChanged();
+	};
+
+    Public.childDurationChanged = function(theChild) {
+    };
 		
     Base.cancel = Public.cancel;
     Public.cancel = function() {
@@ -40,9 +40,7 @@ CompositeAnimation.prototype.Constructor = function(Public, Protected) {
 			}
 		}
 	    Base.cancel();
-    }
-		
-    
+    };
 
     Base.finish = Public.finish;
     Public.finish = function(){
@@ -52,6 +50,6 @@ CompositeAnimation.prototype.Constructor = function(Public, Protected) {
 			}
 		}
 	    Base.finish();
-	}
+	};
     
-}
+};
