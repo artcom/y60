@@ -85,6 +85,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 
     obj.reloadSettings = function() {
         setup( obj, theSceneViewer, _myCommonSettingsFile );
+        notifyListeners();
     }
     
     function saveSection( theSourceSection, theTargetSection ) {
