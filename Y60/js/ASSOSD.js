@@ -50,18 +50,39 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
         _myQuitCursorEvent = null;         
     }
 
+    function tryPressQuitCancelButton( theEventNode ) {
+        if (_myQuitOSD.visible) {
+            var myPosition = theEventNode.position3D;                    
+            _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, 
+                                              myPosition.y, 20);
+            _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x, 
+                                              myPosition.y, 20);
+            _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x, 
+                                               myPosition.y, 20);
+            _myQuitConfirmButton.onMouseButton(MOUSE_UP, myPosition.x, 
+                                               myPosition.y, 20);
+        }
+    }
+
     Base.onASSEvent = Public.onASSEvent;
     Public.onASSEvent = function(theEventNode) {
         switch(theEventNode.type) {
         case "add":
-            if (!_myQuitCursorEvent) {
-                _myQuitCursorEvent = theEventNode;
+            if (_myQuitOSD.visible) {
+                print( "got add event and trying to press button!" );
+                tryPressQuitCancelButton( theEventNode );
+            } else {
+                if (!_myQuitCursorEvent) {
+                    _myQuitCursorEvent = theEventNode;
+                }
             }
             break;
         case "move":
             if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
-                var myTouchDuration = theEventNode.simulation_time - _myQuitCursorEvent.simulation_time;
-                var myHandTraveled = distance(theEventNode.position3D, _myQuitCursorEvent.position3D);
+                var myTouchDuration = theEventNode.simulation_time 
+                                      - _myQuitCursorEvent.simulation_time;
+                var myHandTraveled = distance(theEventNode.position3D, 
+                                              _myQuitCursorEvent.position3D);
                 if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
                     _myQuitCursorEvent = null;
                 } else if (myTouchDuration > ENABLE_QUIT_OSD_TIME) {
@@ -71,14 +92,11 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
                         window.setTimeout("setOSDInvisible", 5.0*1000, Public);     
                     }
                 }
+            } else {
+                tryPressQuitCancelButton( theEventNode );
             }
             break;
         case "touch":
-            var myPosition = theEventNode.position3D;                    
-            _myQuitCancelButton.onMouseButton(_myQuitCancelButton, MOUSE_DOWN, myPosition.x, myPosition.y);
-            _myQuitCancelButton.onMouseButton(_myQuitCancelButton, MOUSE_UP, myPosition.x, myPosition.y);
-            _myQuitConfirmButton.onMouseButton(_myQuitConfirmButton, MOUSE_DOWN, myPosition.x, myPosition.y);
-            _myQuitConfirmButton.onMouseButton(_myQuitConfirmButton, MOUSE_UP, myPosition.x, myPosition.y);
             break;
         case "remove":
             if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
