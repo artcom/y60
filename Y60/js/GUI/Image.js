@@ -22,6 +22,8 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     var _myNode   = theImageNode;
     var _myParent = theParent;
     var _myDepth  = theDepth;
+    var _myHeight = 0;
+    var _myWidth  = 0;
 
     var _mySelected = false;
 
@@ -63,18 +65,34 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.visible setter = function(theVisibility) {
         Public.body.visible = theVisibility;
     }
-
-    Public.image setter = function(theImage) {
+    
+    Public.texture getter = function() {
         var myTextureUnit = _myMaterial.childNode("textureunits").firstChild;
-        var myTexture = window.scene.dom.getElementById(myTextureUnit.texture);
-        myTexture.image = theImage.id; 
+        return window.scene.dom.getElementById(myTextureUnit.texture);
+    }
+    
+    Public.image setter = function(theImage) {
+        Public.texture.image = theImage.id; 
     }
     
     Public.image getter = function() {
-        var myTextureUnit = _myMaterial.childNode("textureunits").firstChild;
-        var myTexture = window.scene.dom.getElementById(myTextureUnit.texture);
-        
-        return window.scene.dom.getElementById(myTexture.image);
+        return window.scene.dom.getElementById(Public.texture.image);
+    }
+    
+    Public.wrapmode getter = function() {
+        return Public.texture.wrapmode;
+    }
+    
+    Public.wrapmode setter = function(theWrapmode) {
+        Public.texture.wrapmode = theWrapmode;
+    }
+    
+    Public.width getter = function() {
+        return _myWidth;
+    }
+    
+    Public.height getter = function() {
+        return _myHeight;
     }
 
     ////////////////////////////////////////
@@ -92,13 +110,16 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
          _myMaterial = getCachedImageMaterial(myFile);
          _myMaterial.transparent = true;
  
+         _myWidth = _myNode.width;
+         _myHeight = _myNode.height;
+ 
          var myInsensible = true;
          if ("insensible" in _myNode) {
              myInsensible = _myNode.insensible;
          }
          
          _myQuad = createQuad(_myParent, _myName,
-                              new Vector2f(_myNode.width,_myNode.height),
+                              new Vector2f(_myWidth,_myHeight),
                               new Vector3f(_myNode.x,_myNode.y, _myDepth),
                               _myMaterial,
                               myInsensible,
@@ -108,7 +129,11 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
              _myQuad.body.orientation =
                  Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)))
          }
-    }        
+         
+         if("wrapmode" in _myNode) {
+            Public.wrapmode = _myNode.wrapmode;
+         }
+    } 
     
     Public.setup();
 }
