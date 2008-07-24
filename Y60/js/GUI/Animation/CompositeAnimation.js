@@ -8,17 +8,15 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("Animation.js");
-
 /**
  * Animations that are time-compositions of their children.
  */
-var CompositeAnimation = {};
+GUI.CompositeAnimation = {};
 
-CompositeAnimation.Constructor = function(Public, Protected) {
+GUI.CompositeAnimation.Constructor = function(Public, Protected) {
     var Base = {};
 
-    Animation.Constructor(Public, Protected);
+    GUI.Animation.Constructor(Public, Protected);
 	
     ////////////////////////////////////////
     // Member

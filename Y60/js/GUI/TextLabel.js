@@ -8,8 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("TextWidget.js");
-
 function TextLabel(theParent, theTextLabelNode, theDepth) {
     this.Constructor(this, {}, theParent, theTextLabelNode, theDepth);
 }

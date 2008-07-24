@@ -8,19 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("SimpleAnimation.js");
-
 /**
  * Animations implemented with a closure function.
  */
-function ClosureAnimation(theDuration, theEasing, theFunction) {
+GUI.ClosureAnimation = function(theDuration, theEasing, theFunction) {
     this.Constructor(this, {}, theDuration, theEasing, theFunction);
 }
 
-ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, theFunction) {
+GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, theFunction) {
     var Base = {};
 
-    SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor(Public, Protected);
     
     ////////////////////////////////////////
     // Member

@@ -8,8 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("TextWidget.js");
-
 var ourButtons = [];
 
 function TextButton(theParent, theTextButtonNode, theDepth) {

@@ -127,7 +127,7 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
 
          if("angle" in _myNode) {
              _myQuad.body.orientation =
-                 Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)))
+                 Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)));
          }
          
          if("wrapmode" in _myNode) {

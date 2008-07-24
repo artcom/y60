@@ -8,19 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("CompositeAnimation.js");
-
 /**
  * Play several animations in parallel.
  */
-function ParallelAnimation() {
+GUI.ParallelAnimation = function() {
     this.Constructor(this, {});
 }
 
-ParallelAnimation.prototype.Constructor = function(Public, Protected) {
+GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     var Base = {};
 
-    CompositeAnimation.Constructor.call(Public, Public, Protected);
+    GUI.CompositeAnimation.Constructor.call(Public, Public, Protected);
 
     ////////////////////////////////////////
     // Public

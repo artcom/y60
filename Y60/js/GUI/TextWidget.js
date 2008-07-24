@@ -8,9 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-function TextWidget() {
-    Logger.fatal("TextWidget is abstract.");
-}
+var TextWidget = {};
 
 TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTextWidgetNode, theDepth) {
     

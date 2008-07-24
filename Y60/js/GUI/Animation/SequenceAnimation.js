@@ -8,19 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("CompositeAnimation.js");
-
 /**
  * Play several animations in sequence.
  */
-function SequenceAnimation() {
+GUI.SequenceAnimation = function() {
     this.Constructor(this, {});
 }
 
-SequenceAnimation.prototype.Constructor = function(Public, Protected) {
+GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     var Base = {};
 
-    CompositeAnimation.Constructor(Public, Protected);
+    GUI.CompositeAnimation.Constructor(Public, Protected);
 
     ////////////////////////////////////////
     // Member

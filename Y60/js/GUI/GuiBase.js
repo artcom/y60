@@ -8,30 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-plug("y60JSSound");
-
-// libraries
-use("ASSManager.js");
-use("SceneViewer.js");
-use("MaterialQuadBody.js");
-
-use("GUI/Characters.js");
-use("GUI/TextBox.js");
-use("GUI/TextButton.js");
-
-// core functionality
-use("GUI/Utilities.js");
-use("GUI/LayerManager.js");
-
-plug("Cairo");
-
 function GuiBase(theArguments) {
     this.Constructor(this, theArguments);
 }
-
-// TODO: define somewhere else. [sh]
-const CONTENT = "CONTENT";
-const MINZOOMFACTOR = 0.0;
 
 GuiBase.prototype.Constructor = function(self, theArguments) {
     var Base = {};

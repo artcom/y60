@@ -8,8 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("Utilities.js");
-
 function Text(theParent, theTextNode, theDepth) {
     this.Constructor(this, theParent, theTextNode, theDepth);
 }

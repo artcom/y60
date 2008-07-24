@@ -8,20 +8,18 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("SimpleAnimation.js");
-
 /**
  * Animate a javascript property on one or more objects.
  */
-function PropertyAnimation(theDuration, theEasing, theObject, theProperty, theMin, theMax) {
+GUI.PropertyAnimation = function(theDuration, theEasing, theObject, theProperty, theMin, theMax) {
     this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theMin, theMax);
 }
 
-PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, 
-                                                   theObject, theProperty, theMin, theMax) {
+GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, 
+                                                       theObject, theProperty, theMin, theMax) {
     var Base = {};
 
-    SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
     
     ////////////////////////////////////////
     // Member

@@ -8,17 +8,15 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("Animation.js");
-
 /**
  * Base class for non-composite animations.
  */
-var SimpleAnimation = {};
+GUI.SimpleAnimation = {};
 
-SimpleAnimation.Constructor = function(Public, Protected) {
+GUI.SimpleAnimation.Constructor = function(Public, Protected) {
     var Base = {};
 
-    Animation.Constructor(Public, Protected);
+    GUI.Animation.Constructor(Public, Protected);
 
     ////////////////////////////////////////
     // Public

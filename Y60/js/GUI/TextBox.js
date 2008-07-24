@@ -8,8 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("TextWidget.js");
-
 function TextBox(theParent, theTextBoxNode, theDepth) {
     this.Constructor(this, {}, theParent, theTextBoxNode, theDepth);
 }

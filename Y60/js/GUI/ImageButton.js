@@ -8,8 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("Image.js");
-
 var ourButtons = [];
 
 function ImageButton(theParent, theImageButtonNode, theDepth) {

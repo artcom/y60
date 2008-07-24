@@ -11,12 +11,12 @@
 /**
  * Abstract base class for animations.
  */
-var Animation = {};
+GUI.Animation = {};
 
 // global counter for generating animation ids
-Animation.idCounter = 0;
+GUI.Animation.idCounter = 0;
 
-Animation.Constructor = function(Public, Protected) {
+GUI.Animation.Constructor = function(Public, Protected) {
 
     ////////////////////////////////////////
     // Member

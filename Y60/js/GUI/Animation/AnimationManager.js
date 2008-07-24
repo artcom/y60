@@ -14,11 +14,11 @@
  * Instantiate yourself one and call its
  * doFrame() method on every frame.
  */
-function AnimationManager() {
+GUI.AnimationManager = function() {
     this.Constructor(this, {});
 }
 
-AnimationManager.prototype.Constructor = function(Public, Protected) {
+GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
     
     ////////////////////////////////////////
     // Member
