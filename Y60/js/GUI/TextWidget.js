@@ -8,7 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-var TextWidget = {};
+function TextWidget() {
+}
 
 TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTextWidgetNode, theDepth) {
     
