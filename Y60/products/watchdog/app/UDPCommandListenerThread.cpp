@@ -37,9 +37,11 @@ inline bool isCommand(const std::string & theReceivedCommand, const std::string 
 
 UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theProjectors,
                                                    Application & theApplication,
-                                                   const dom::NodePtr & theConfigNode) :
+                                                   const dom::NodePtr & theConfigNode,
+                                                   Logger & theLogger) :
     _myProjectors(theProjectors),
     _myApplication(theApplication),
+    _myLogger(theLogger),
     _myUDPPort(2342),
     _myPowerDownProjectorsOnHalt(false),
     _myShutterCloseProjectorsOnStop(false),
@@ -184,7 +186,6 @@ UDPCommandListenerThread::run() {
     cout << "Application stop   : " << _myStopAppCommand << endl;
     cout << "Application start  : " << _myStartAppCommand << endl;
 
-
     try {
         UDPSocket myUDPServer(INADDR_ANY, _myUDPPort);
 
@@ -198,18 +199,19 @@ UDPCommandListenerThread::run() {
             cerr << "Received command: " << myCommand << "\nRestart App Command: " << _myRestartAppCommand << endl;
             if (isCommand(myCommand,_mySystemHaltCommand)) {
                 cerr << "Client received halt packet" << endl;
+                _myLogger.logToFile( string("Shutdown from Network" ));
                 initiateShutdown();
-                break;
             } else if (isCommand(myCommand,_mySystemRebootCommand)) {
                 cerr << "Client received reboot packet" << endl;
+                _myLogger.logToFile( string("Reboot from Network" ));
                 initiateReboot();
-                break;
             } else if (isCommand(myCommand, _myRestartAppCommand)) {
                 cerr << "Client received restart application packet" << endl;
                 _myApplication.terminate(string("Restart from Network"), true);
                 _myApplication.setPaused(false);
             } else if (isCommand(myCommand, _myStopAppCommand)) {
                 cerr << "Client received stop application packet" << endl;
+                _myLogger.logToFile( string( "Stop application from Network" ));
                 if (_myShutterCloseProjectorsOnStop) {
                     // close shutter on all connected projectors
                     controlProjector("projector_shutter_close");
@@ -218,6 +220,7 @@ UDPCommandListenerThread::run() {
                 _myApplication.terminate(string("Stop from Network"), true);
             } else if (isCommand(myCommand, _myStartAppCommand)) {
                 cerr << "Client received start application packet" << endl;
+                _myLogger.logToFile( string( "Start application from Network" ));
                 _myApplication.setPaused(false);
                 if (_myShutterCloseProjectorsOnStop) {
                     // open shutter on all connected projectors
@@ -227,10 +230,19 @@ UDPCommandListenerThread::run() {
                 // pass
             } else {
                 cerr << "### UDPHaltListener: Unexpected packet '" << myCommand << "'. Ignoring" << endl;
+                ostringstream myOss;
+                myOss << "### UDPHaltListener: Unexpected packet '" << myCommand 
+                      << "'. Ignoring";
+                _myLogger.logToFile( myOss.str() );
             }
         }
     } catch (SocketException & se) {
         cerr << "### UDPHaltListener: " << se.what() << endl;
+        ostringstream myOss;
+        myOss <<  "### UDPHaltListener: " << se.what();
+        _myLogger.logToFile( myOss.str() );
     }
+    cerr << "stopped udp command listener thread.\n";
+    _myLogger.logToFile( string( "Stopped command listener thread!" ) );
 }
 

@@ -16,6 +16,7 @@
 
 #include <time.h>
 #include <iostream>
+#include <asl/Auto.h>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ Logger::openLogFile(const std::string & theLogFilename) {
 }
 void
 Logger::logToFile(const string& theMessage) {
+    asl::AutoLocker<asl::ThreadLock> myLocker(_myLock);
     if (_myFile) {
         time_t myTime;
         time(&myTime);

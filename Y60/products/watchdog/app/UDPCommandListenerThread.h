@@ -19,6 +19,8 @@ class Projector;
 #include <asl/PosixThread.h>
 #include <dom/Nodes.h>
 
+#include "Logger.h"
+
 #include <string>
 #include <vector>
 
@@ -27,7 +29,8 @@ class UDPCommandListenerThread : public asl::PosixThread {
     public:
         UDPCommandListenerThread(std::vector<Projector *> theProjectors,
                                  Application & theApplication,
-                                 const dom::NodePtr & theConfigNode);
+                                 const dom::NodePtr & theConfigNode,
+                                 Logger & theLogger);
         virtual ~UDPCommandListenerThread();
 
         void setSystemHaltCommand(const std::string & theSystemhaltCommand);
@@ -45,6 +48,7 @@ class UDPCommandListenerThread : public asl::PosixThread {
         std::vector<Projector*> _myProjectors;
         int                     _myUDPPort;
         Application &           _myApplication;
+        Logger &                _myLogger;
         bool                    _myPowerDownProjectorsOnHalt;
         bool                    _myShutterCloseProjectorsOnStop;
         bool                    _myShutterCloseProjectorsOnReboot;

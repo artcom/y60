@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <string>
+#include <asl/ThreadLock.h>
 
 class Logger {
     public:
@@ -25,5 +26,6 @@ class Logger {
         void logToFile(const std::string& theMessage);
     private:
         std::ofstream * _myFile;
+        asl::ThreadLock _myLock;
 };
 #endif // INCL_LOGGER

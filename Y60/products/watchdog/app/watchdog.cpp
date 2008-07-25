@@ -264,7 +264,7 @@ WatchDog::init(dom::Document & theConfigDoc) {
                     AC_DEBUG <<"Found " << _myProjectors.size() << " projectors";
                 }
                 
-                _myUDPCommandListenerThread = new UDPCommandListenerThread(_myProjectors, _myAppToWatch, myUdpControlNode);
+                _myUDPCommandListenerThread = new UDPCommandListenerThread(_myProjectors, _myAppToWatch, myUdpControlNode, _myLogger);
             }
 
             // check for system reboot time command configuration
