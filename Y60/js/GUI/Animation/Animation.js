@@ -169,7 +169,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
 	};
 		
     Public.doFrame = function() {
-        _progressTime = (millisec() - _startTime) / 1000.0;
+        _progressTime = (millisec() - _startTime);
 		_progress = _easing(_progressTime / _duration);
 	    
 	    var finished = (_progressTime >= _duration);
