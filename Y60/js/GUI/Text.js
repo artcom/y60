@@ -80,6 +80,10 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
         } else {
             _myText = "";
         }
+        
+        if("z" in _myNode) {
+            _myDepth += Number(_myNode.z);
+        }
 
         _myStyle = fontStyleFromNode(_myNode);
         _mySize = new Vector2f(_myNode.width, _myNode.height);

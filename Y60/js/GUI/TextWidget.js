@@ -202,6 +202,10 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
             _myBackground = getCachedImage(CONTENT + "/" + _myNode.backgroundImage);
             _myBackground.resize = "none";
         }
+        
+        if("z" in _myNode) {
+            _myDepth += Number(_myNode.z);
+        }
 
         // text image
         _myTextImage = Modelling.createImage(window.scene, _myTextSurfaceWidth, _myTextHeight, "RGBA");
@@ -224,7 +228,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
         
         // our body and shape
         _myQuad = createQuad(theParent, _myName, new Vector2f(_myWidth, _myHeight),
-                             new Vector3f(_myNode.x, _myNode.y, theDepth),
+                             new Vector3f(_myNode.x, _myNode.y, _myDepth),
                              _myMaterial, true, true);
 
         if("text" in _myNode) {

@@ -94,6 +94,14 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.height getter = function() {
         return _myHeight;
     }
+    
+    Public.z getter = function() {
+        return Public.body.position.z;
+    }
+    
+    Public.z setter = function(v) {
+        Public.body.position.z = v;
+    }
 
     ////////////////////////////////////////
     // setup
