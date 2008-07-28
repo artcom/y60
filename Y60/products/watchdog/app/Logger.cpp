@@ -47,8 +47,9 @@ Logger::logToFile(const string& theMessage) {
         time_t myTime;
         time(&myTime);
         struct tm * myPrintableTime = localtime(&myTime);
-        (*_myFile) << "threadid: " << (unsigned int)pthread_self() 
-                   << " " << asctime(myPrintableTime) << theMessage << "\n"
+        (*_myFile) << asctime(myPrintableTime) 
+                   << "threadid: " << std::hex << (unsigned int)pthread_self() << std::dec << "\n"
+                   << theMessage << "\n" 
                    << "---------------------------------------------------------------------" << endl;
     }
 }
