@@ -14,7 +14,7 @@
 
 #include "Logger.h"
 
-#include <time.h>
+#include <ctime>
 #include <iostream>
 #include <asl/Auto.h>
 
@@ -47,8 +47,9 @@ Logger::logToFile(const string& theMessage) {
         time_t myTime;
         time(&myTime);
         struct tm * myPrintableTime = localtime(&myTime);
-        (*_myFile) << asctime(myPrintableTime) << theMessage << endl;
-        (*_myFile) << "---------------------------------------------------------------------" << endl;
+        (*_myFile) << "threadid: " << (unsigned int)pthread_self() 
+                   << " " << asctime(myPrintableTime) << theMessage << "\n"
+                   << "---------------------------------------------------------------------" << endl;
     }
 }
 

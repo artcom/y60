@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <dom/Nodes.h>
+#include <asl/ThreadLock.h>
 
 long getElapsedSecondsToday();
 
@@ -54,12 +55,11 @@ class Application {
         virtual ~Application();
 
         bool setup(const dom::NodePtr & theAppNode);
-        bool checkForRestart();
+        bool checkForRestart( std::string & myRestartMessage );
         void launch();
-        void shutdown();
         void checkHeartbeat();
         void checkState();
-//        void restartPerUdp();
+        void restart();
         void terminate(const std::string & theReason, bool theWMCloseAllowed);
         std::string runUntilNextCheck(int theWatchFrequency);
        
@@ -90,6 +90,9 @@ class Application {
         std::vector<std::string> _myArguments;
         std::string      _myWindowTitle;
         long             _myAppStartTimeInSeconds;
+
+        asl::ThreadLock  _myLock;
+        bool             _myRecvRestart;
 
         int              _myAllowMissingHeartbeats;
         int              _myHeartbeatFrequency;

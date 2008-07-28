@@ -207,7 +207,7 @@ UDPCommandListenerThread::run() {
                 initiateReboot();
             } else if (isCommand(myCommand, _myRestartAppCommand)) {
                 cerr << "Client received restart application packet" << endl;
-                _myApplication.terminate(string("Restart from Network"), true);
+                _myApplication.restart();
                 _myApplication.setPaused(false);
             } else if (isCommand(myCommand, _myStopAppCommand)) {
                 cerr << "Client received stop application packet" << endl;

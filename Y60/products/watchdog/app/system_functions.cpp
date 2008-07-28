@@ -167,7 +167,7 @@ ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Lo
             theLogger.logToFile(myOss.str());
             return PR_TERMINATED;
         } else if (WIFSIGNALED(myStatus)) {
-	    int mySignal = WTERMSIG(myStatus);
+	        int mySignal = WTERMSIG(myStatus);
             myOss << "Process terminated with signal " << mySignal 
 	    	  << " (" << strsignal(mySignal) << ").";
             theLogger.logToFile(myOss.str());

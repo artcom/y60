@@ -31,6 +31,7 @@
 #include <asl/file_functions.h>
 #include <asl/os_functions.h>
 #include <asl/proc_functions.h>
+#include <asl/Auto.h>
 
 #ifdef WIN32
 #   include <Tlhelp32.h>
@@ -71,7 +72,7 @@ const std::string STARTUP_COUNT_ENV = "AC_STARTUP_COUNT";
 Application::Application(Logger & theLogger):
     _myAllowMissingHeartbeats(3), _myHeartbeatFrequency(0), _myPerformECG(false),_myRestartedToday(false),
     _myRestartMemoryThreshold(0),_myRestartTimeInSecondsToday(0), _myCheckMemoryTimeInSecondsToday(0),
-    _myAppStartTimeInSeconds(0), _myRestartMode(UNSET),_myCheckedMemoryToday(false),
+    _myAppStartTimeInSeconds(0), _myRecvRestart(false), _myRestartMode(UNSET),_myCheckedMemoryToday(false),
     _myRestartCheck(false), _myMemoryThresholdTimed(0),_myStartTimeInSeconds(0),
     _myMemoryIsFull(false), _myItIsTimeToRestart(false), _myHeartIsBroken(false),
     _myDayChanged(false), _myLogger(theLogger), _myWindowTitle(""), _myApplicationPaused(false),
@@ -230,26 +231,35 @@ Application::terminate(const std::string & theReason, bool theWMCloseAllowed){
 }
 
 bool
-Application::checkForRestart() {
-    if (_myMemoryIsFull || _myItIsTimeToRestart || _myHeartIsBroken) {
-        string myMessage;
-        if (_myMemoryIsFull) {
-            myMessage = "Memory threshold reached.";
-        }
-        if (_myItIsTimeToRestart) {
-            myMessage = "Time to restart reached.";
-        }
-        if (_myHeartIsBroken) {
-            myMessage = "Failed to detect heartbeat.";
-        }
-        if (_myApplicationPaused) {
-            myMessage = "Application was intentionally stopped.";
-        }
-        terminate(myMessage, true);
+Application::checkForRestart( std::string & myRestartMessage ) {
+    if (_myMemoryIsFull) {
+        myRestartMessage = "Memory threshold reached.";
         return true;
-    } else {
-        return false;
     }
+    if (_myItIsTimeToRestart) {
+        myRestartMessage = "Time to restart reached.";
+        return true;
+    }
+    if (_myHeartIsBroken) {
+        myRestartMessage = "Failed to detect heartbeat.";
+        return true;
+    }
+    if (_myApplicationPaused) {
+        myRestartMessage = "Application was intentionally stopped.";
+        return true;
+    }
+    if (_myRecvRestart) {
+        myRestartMessage = "Received restart command.";
+        _myRecvRestart = false;
+        return true;
+    }
+    return false;
+}
+
+void 
+Application::restart() {
+    asl::AutoLocker<asl::ThreadLock> myAutoLock(_myLock);
+    _myRecvRestart = true;
 }
 
 void
@@ -310,12 +320,6 @@ Application::checkHeartbeat() {
     }
 }
 
-
-void
-Application::shutdown() {
-    // Terminate process
-    terminate("Application shutdown", false);
-}
 
 std::string
 Application::runUntilNextCheck(int theWatchFrequency) {
