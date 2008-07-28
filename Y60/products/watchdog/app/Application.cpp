@@ -244,10 +244,6 @@ Application::checkForRestart( std::string & myRestartMessage ) {
         myRestartMessage = "Failed to detect heartbeat.";
         return true;
     }
-    if (_myApplicationPaused) {
-        myRestartMessage = "Application was intentionally stopped.";
-        return true;
-    }
     if (_myRecvRestart) {
         myRestartMessage = "Received restart command.";
         _myRecvRestart = false;
@@ -258,8 +254,12 @@ Application::checkForRestart( std::string & myRestartMessage ) {
 
 void 
 Application::restart() {
-    asl::AutoLocker<asl::ThreadLock> myAutoLock(_myLock);
-    _myRecvRestart = true;
+    if (!paused()) {
+        asl::AutoLocker<asl::ThreadLock> myAutoLock(_myLock);
+        _myRecvRestart = true;
+    } else {
+       setPaused( false );
+    }
 }
 
 void

@@ -208,7 +208,6 @@ UDPCommandListenerThread::run() {
             } else if (isCommand(myCommand, _myRestartAppCommand)) {
                 cerr << "Client received restart application packet" << endl;
                 _myApplication.restart();
-                _myApplication.setPaused(false);
             } else if (isCommand(myCommand, _myStopAppCommand)) {
                 cerr << "Client received stop application packet" << endl;
                 _myLogger.logToFile( string( "Stop application from Network" ));
@@ -217,7 +216,6 @@ UDPCommandListenerThread::run() {
                     controlProjector("projector_shutter_close");
                 }
                 _myApplication.setPaused(true);
-                _myApplication.terminate(string("Stop from Network"), true);
             } else if (isCommand(myCommand, _myStartAppCommand)) {
                 cerr << "Client received start application packet" << endl;
                 _myLogger.logToFile( string( "Start application from Network" ));

@@ -126,6 +126,7 @@ WatchDog::watch() {
             std::string myReturnString;
             if (!_myAppToWatch.paused()) {
                 myReturnString = "Internal quit.";
+                _myLogger.logToFile( "Restarting application." );
                 _myAppToWatch.launch();
             } else {
                 myReturnString = "Application paused.";
@@ -133,7 +134,7 @@ WatchDog::watch() {
 
             std::string myRestartMessage = "Application shutdown";
       
-            while (_myAppToWatch.getProcessResult() == PR_RUNNING) {
+            while (!_myAppToWatch.paused() && _myAppToWatch.getProcessResult() == PR_RUNNING) {
                 // update projector state
                 for (unsigned i = 0; i < _myProjectors.size(); ++i) {
                     _myProjectors[i]->update();
@@ -158,7 +159,7 @@ WatchDog::watch() {
                     
             _myAppToWatch.terminate(myRestartMessage, false);
 
-            _myLogger.logToFile(_myAppToWatch.getFilename() + string(" exited: ") + myReturnString + "\nRestarting application.");
+            _myLogger.logToFile(_myAppToWatch.getFilename() + string(" exited: ") + myReturnString);
 
             unsigned myRestartDelay = _myAppToWatch.getRestartDelay();
             
