@@ -736,8 +736,8 @@ namespace y60 {
                 unsigned mySrcHeight = myWord.surface->h;
                 unsigned mySrcWidth  = myWord.surface->w;
 
-                if (mySurfaceHeight > (_myBottomPadding + myYPos)) {
-                    if (mySrcHeight + myYPos > mySurfaceHeight-_myBottomPadding) {
+                if (int(mySurfaceHeight) > (_myBottomPadding + myYPos)) {
+                    if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myBottomPadding)) {
                         mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
                     }
                 } else {
