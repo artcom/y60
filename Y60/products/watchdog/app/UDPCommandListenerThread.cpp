@@ -199,11 +199,13 @@ UDPCommandListenerThread::run() {
             cerr << "Received command: " << myCommand << "\nRestart App Command: " << _myRestartAppCommand << endl;
             if (isCommand(myCommand,_mySystemHaltCommand)) {
                 cerr << "Client received halt packet" << endl;
-                _myLogger.logToFile( string("Shutdown from Network" ));
+                _myLogger.logToFile( string("Shutdown from Network") );
+                _myLogger.closeLogFile();
                 initiateShutdown();
             } else if (isCommand(myCommand,_mySystemRebootCommand)) {
                 cerr << "Client received reboot packet" << endl;
                 _myLogger.logToFile( string("Reboot from Network" ));
+                _myLogger.closeLogFile();
                 initiateReboot();
             } else if (isCommand(myCommand, _myRestartAppCommand)) {
                 cerr << "Client received restart application packet" << endl;

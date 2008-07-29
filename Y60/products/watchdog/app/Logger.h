@@ -23,6 +23,7 @@ class Logger {
         Logger();
         ~Logger();
         void openLogFile(const std::string & theLogFilename);
+        void closeLogFile();
         void logToFile(const std::string& theMessage);
     private:
         std::ofstream * _myFile;

@@ -40,6 +40,15 @@ Logger::openLogFile(const std::string & theLogFilename) {
         }
     }
 }
+
+void
+Logger::closeLogFile() {
+    asl::AutoLocker<asl::ThreadLock> myLocker(_myLock);
+    if (_myFile) {
+        _myFile->close();
+    }
+}
+
 void
 Logger::logToFile(const string& theMessage) {
     asl::AutoLocker<asl::ThreadLock> myLocker(_myLock);
