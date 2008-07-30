@@ -70,8 +70,6 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
     Public.setup = function() {
         Logger.info("Setting up image button " + _myName);
         
-        Base.setup();
-
         Public.insensible = false;
 
         registerBodyOwner(Public, Public.body);
