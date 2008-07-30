@@ -68,7 +68,7 @@ TextButton.prototype.Constructor = function(Public, Protected, theParent, theTex
         
     Base.setup = Protected.setup;
     Protected.setup = function() {
-        Logger.info("Setting up textbutton " + _myName);
+        Logger.info("Setting up text button " + _myName);
         
         Base.setup();
 

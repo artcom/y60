@@ -68,7 +68,7 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
         
     Base.setup = Public.setup;
     Public.setup = function() {
-        Logger.info("Setting up textbutton " + _myName);
+        Logger.info("Setting up image button " + _myName);
         
         Base.setup();
 

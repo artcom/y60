@@ -32,7 +32,7 @@ TextLabel.prototype.Constructor = function(Public, Protected, theParent, theText
         
     Base.setup = Protected.setup;
     Protected.setup = function() {
-        Logger.info("Setting up textbutton " + _myName);
+        Logger.info("Setting up text label " + _myName);
         
         Base.setup();
 

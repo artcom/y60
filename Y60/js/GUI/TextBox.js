@@ -139,7 +139,7 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
         
     Base.setup = Protected.setup;
     Protected.setup = function() {
-        Logger.info("Setting up textbox " + _myName);
+        Logger.info("Setting up text box " + _myName);
         
         Base.setup();
     }  
