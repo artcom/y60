@@ -514,10 +514,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
 
-        var mySettingsListString = self.arguments["settings"];
         var mySettingsList = undefined;
-        if (mySettingsListString) {
-            mySettingsList = mySettingsListString.split(":");
+        if ("settings" in self.arguments) {
+            var mySettingsListString = self.arguments["settings"];
+            if (mySettingsListString) {
+                mySettingsList = mySettingsListString.split(":");
+            }
         }
 
         _myConfigurator = new Configurator(self, mySettingsFile, mySettingsList);
