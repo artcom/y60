@@ -54,6 +54,9 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
 	
     // iterate through child animations
     Public.doFrame = function() {
+        if (_current >= Public.children.length) {
+            return;
+        }
 	    Public.children[_current].doFrame();
 	    if(!Public.children[_current].running) {
 			_current++;
