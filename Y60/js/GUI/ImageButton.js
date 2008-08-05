@@ -60,7 +60,14 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
             Public.image = _myImageNormal;
         }
     }
+    
+    Public.imageNormal getter = function() {
+        return _myImageNormal;
+    }
 
+    Public.imageHighlighted getter = function() {
+        return _myImageHighlighted;
+    }
 
     ////////////////////////////////////////
     // setup

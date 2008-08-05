@@ -32,7 +32,7 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
 	
     Public.play = function(a) {
 		_animations.push(a);
-	    a.play(0);
+	    a.play();
 	};
 		
     Public.isPlaying = function() {

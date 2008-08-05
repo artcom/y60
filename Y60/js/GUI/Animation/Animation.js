@@ -143,24 +143,18 @@ GUI.Animation.Constructor = function(Public, Protected) {
 		_progress = _easing(0.0);
 	    _running = true;
 		
-	    if(_onPlay != null) {
-	        _onPlay();
-		}
+	    callOnPlay();
 	    
 	    Public.render();
 	};
 		
     Public.cancel = function() {
 		_running = false;
-	    if(_onCancel != null) {
-			_onCancel();
-		}
+	    callOnCancel();
 	};
 		
     Public.finish = function() {
-		if(_onFinish != null) {
-			_onFinish();
-		}
+		callOnFinish();
         if(_loop) {
             Public.play();
         } else {
@@ -206,5 +200,27 @@ GUI.Animation.Constructor = function(Public, Protected) {
     Protected.standardToString = function(cls) {
 		return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "");
 	};
+	
+    ////////////////////////////////////////
+    // Private
+    ////////////////////////////////////////
+
+    function callOnPlay() {
+        if(_onPlay != null) {
+            _onPlay.call(Public);
+        }
+    };
+    
+    function callOnFinish() {
+        if(_onFinish != null) {
+            _onFinish.call(Public);
+        }
+    };
+    
+    function callOnCancel() {
+        if(_onCancel != null) {
+            _onCancel.call(Public);
+        }
+    };
 
 };

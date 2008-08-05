@@ -29,6 +29,22 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
 	var _property = "";
 	var _min = 0;
 	var _max = 0;
+	
+	Public.object getter = function() {
+	    return _object;
+	}
+	
+	Public.property getter = function() {
+	    return _property;
+	}
+	
+	Public.min getter = function() {
+	    return _min;
+	}
+	
+	Public.max getter = function() {
+	    return _max;
+	}
     
     ////////////////////////////////////////
     // Public
@@ -62,7 +78,7 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
 	};
     
 	Public.toString = function() {
-		return "PropertyAnimation" + " on "  + _object + "." + _property;
+		return "PropertyAnimation" + " on "  + _object.name + "." + _property;
 	};
     
     Public.setup();

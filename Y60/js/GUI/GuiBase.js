@@ -64,7 +64,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         // configure window
         // (before Base.setup because of SDL window initialization)
         window              = new RenderWindow();
-        window.position     = [_myWidth, _myHeight];
+        window.position     = [0, 0];
         window.multisamples = 4;
         window.showTaskbar  = !Public.getReleaseMode();
 

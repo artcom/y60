@@ -55,6 +55,10 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     Public.bodies getter = function() {
         return [_myQuad.body];
     }
+    
+    Public.body getter = function() {
+        return _myQuad.body;
+    }
 
     Public.name getter = function() {
         return _myName;
@@ -62,6 +66,14 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
 
     Public.color setter = function(theColor) {
         _myStyle.textColor = theColor;
+    }
+    
+    Public.visible getter = function() {
+        return Public.body.visible;
+    }
+    
+    Public.visible setter = function(theVisibility) {
+        Public.body.visible = theVisibility;
     }
 
     ////////////////////////////////////////
