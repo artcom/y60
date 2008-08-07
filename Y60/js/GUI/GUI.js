@@ -48,6 +48,7 @@ use("Animation/Animation.js");
 use("Animation/SimpleAnimation.js");
 use("Animation/ClosureAnimation.js");
 use("Animation/PropertyAnimation.js");
+use("Animation/RotationAnimation.js");
 use("Animation/CompositeAnimation.js");
 use("Animation/ParallelAnimation.js");
 use("Animation/SequenceAnimation.js");
