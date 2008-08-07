@@ -49,7 +49,7 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
             myShapeBuilder.appendLineElement(myElement, [0,0,1], [0,0,0]);
 
             _myShapeNode = myShapeBuilder.buildNode();
-            _mySceneViewer.getShapes().appendChild(_myShapeNode);
+            window.scene.shapes.appendChild(_myShapeNode);
         }
     }
 

@@ -74,7 +74,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             myInteractivePixelImageDom.parseFile(_myShutterXmlFileName);
             _myInteractivePixelImage = myInteractivePixelImageDom.firstChild;
             _myInteractivePixelImage.id = createUniqueId();
-            theSceneViewer.getImages().appendChild(_myInteractivePixelImage);
+            window.scene.images.appendChild(_myInteractivePixelImage);
             print("Found a "+_myShutterXmlFileName+" image, delete it to start over!");
         } else {
             _myInteractivePixelImage = theSceneViewer.getImageManager().getImageNode("InteractiveShutter");

@@ -204,12 +204,12 @@ WalkMover.prototype.Constructor = function(self) {
 
     function positionAllowed(theNewPostion) {
         var myForwardStep = new LineSegment(_myPosition, theNewPostion);
-        var myForwardIntersection = nearestIntersection(self.getWorld(), myForwardStep);
+        var myForwardIntersection = nearestIntersection(window.scene.world, myForwardStep);
         return (myForwardIntersection == null)
     }
 
     function findGround(theProbe) {
-        var myGroundIntersection = nearestIntersection(self.getWorld(), theProbe);
+        var myGroundIntersection = nearestIntersection(window.scene.world, theProbe);
         //print("Find ground with ray: " + theProbe);
         if (myGroundIntersection) {
             _myGroundPlane  = new Planef(_myUpVector, myGroundIntersection.position);
