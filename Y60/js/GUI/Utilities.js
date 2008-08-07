@@ -87,8 +87,10 @@ function getCachedImageMaterial(theImagePath) {
 
     var myImage = getCachedImage(theImagePath);
 
+    var myTexture = Modelling.createTexture(window.scene, myImage);
+
     var myMaterial =
-        Modelling.createUnlitTexturedMaterial(window.scene, myImage, myMaterialName);
+        Modelling.createUnlitTexturedMaterial(window.scene, myTexture, myMaterialName);
     
     return myMaterial;
 }
