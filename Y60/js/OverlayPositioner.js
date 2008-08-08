@@ -87,7 +87,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
         for (var i = 0; i < theConfig.childNodes.length; ++i) {
             var myConfigNode = theConfig.childNode(i);
             mergeConfig(myConfigNode);
-            var myNewNode = getDescendantByName(_myOverlays, myConfigNode.name, true);
+            var myNewNode = _myOverlays.find("//*[@name = '" + myConfigNode.name + "']");
             if (myNewNode) {
                 myNewNode.width    = myConfigNode.width;
                 myNewNode.height   = myConfigNode.height;

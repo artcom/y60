@@ -264,7 +264,7 @@ ourHandler.on_backface_culling_activate = function(theMenuItem) {
 
 ourHandler.on_coordinate_system_activate = function(theMenuItem) {
     if (!ourCoordinateSystem) {
-        ourCoordinateSystem = new DebugVisual(ourViewer.getWorld(), ourViewer);
+        ourCoordinateSystem = new DebugVisual(window.scene.world, ourViewer);
         ourCoordinateSystem.setup();
     }
 

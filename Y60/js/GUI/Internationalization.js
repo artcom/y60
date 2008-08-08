@@ -13,7 +13,7 @@ ourStaticTextNode.parseFile("CONFIG/statictext.xml");
 ourStaticTextNode = ourStaticTextNode.firstChild;
 
 function getInternationalizedText(theLanguage, theId) {
-    var myNode = getDescendantByName(ourStaticTextNode, theId);
+    var myNode = ourStaticTextNode.find("//*[@name = '" + theId + "']");
     if (myNode) {
         if (theLanguage in myNode) {
             return myNode[theLanguage];

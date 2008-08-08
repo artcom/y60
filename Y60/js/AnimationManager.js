@@ -16,7 +16,7 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     var _mySceneViewer   = theSceneViewer;
     var _myName  = theAnimationName;
 
-    var _myAnimationNode = getDescendantByName(_mySceneViewer.getAnimations(), theAnimationName, true);
+    var _myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationName + "']");
     if (!_myAnimationNode) {
         throw new Exception("Could not find animation: " + theAnimationName, fileline());
     }
@@ -88,7 +88,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     }
 
     obj.enableGlobalAnimations = function(theFlag) {
-        var myAnimations = _mySceneViewer.getAnimations();
+        var myAnimations = window.scene.animations;
         for (var i = 0; i < myAnimations.childNodes.length; ++i) {
             myAnimations.childNode(i).enabled = theFlag;
         }
@@ -284,7 +284,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
 
     obj.saveStripByAnimation = function(theAnimationName, thePrefix, theDirectory, theOverwriteFlag) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
-        var myAnimationNode = getDescendantByName(_mySceneViewer.getAnimations(), theAnimationName, true);
+        var myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationName + "']");
         myAnimationNode.begin = myCurrentTime;
         myAnimationNode.enabled = true;
         myAnimationNode.count   = 0;
@@ -294,7 +294,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     obj.saveStripByAnimations = function(theAnimationNames, thePrefix, theDirectory, theOverwriteFlag) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
         for (var i = 0; i < theAnimationNames.length; i++) {
-            var myAnimationNode = getDescendantByName(_mySceneViewer.getAnimations(), theAnimationNames[i], true);
+            var myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationNames[i] + "']");
             myAnimationNode.begin   = 0;
             myAnimationNode.enabled = true;
             myAnimationNode.count   = 1;
@@ -311,7 +311,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
 
 
     obj.saveStripByNodeId = function(theNodeId, thePrefix, theDirectory, theOverwriteFlag) {
-        var myCameraAnimations = getDescendantsByAttribute(_mySceneViewer.getAnimations(), "node", theNodeId, true);
+        var myCameraAnimations = window.scene.animations.findAll("//*[@node = '" + theNodeId + "']");
         if (myCameraAnimations.length == 0 ) {
             Logger.error("Unable to find animation for id=" + theNodeId);
             return;

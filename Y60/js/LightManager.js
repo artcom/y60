@@ -21,10 +21,8 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     
     var _myScene        = theScene;
     var _myWorld        = theWorld;
-    //var _myLightSources = getDescendantByTagName(theScene.dom,'lightsources', false);
     var _myLightSources = theScene.dom.find('/scene/lightsources');
 
-    //var _myLights = getDescendantsByTagName(theWorld,'light', true);
     var _myLights = theWorld.findAll('//light');
     
     var _myLightCursor = 0;
@@ -48,7 +46,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         // create a default sun light
         //
         // ==================================
-        //_mySunLight = getDescendantByName(_myWorld, "Sun", true);
         _mySunLight = _myWorld.find("//light[@name='Sun']");
 
         if (!_mySunLight) {
@@ -78,7 +75,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         Logger.debug("Lightmanager iterating through " + myViewportCount + " Viewports.");
         for (var i = 0; i < myViewportCount; ++i) {
             var myViewport = theCanvas.childNode("viewport", i);
-            //var myHeadLight = getDescendantByName(_myWorld, "Headlight_"+myViewport.id, true);
             var myHeadLight = _myWorld.find("//light[@name='Headlight_"+myViewport.id+"']");
             if (!myHeadLight) {
                 myHeadLight = Node.createElement('light');
@@ -99,7 +95,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             // obj.setupHeadlight(myViewport);
         }
         var activeLightsFound = false;
-        //_myLights = getDescendantsByTagName(_myWorld, "light", true);
         _myLights = _myWorld.findAll("//light");
         
         for (var i=0; i < _myLights.length; ++i) {
@@ -276,7 +271,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     function ensureHeadlightSource() {
-        //var myLightSourceNode = getDescendantByName(_myLightSources, "HeadLightSource");
         var myLightSourceNode = _myLightSources.find("//lightsource[@name='HeadLightSource']");
         if (!myLightSourceNode) {
             Logger.debug("HeadLightSource not found");
@@ -292,7 +286,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     }
 
     function ensureSunLightSource() {
-        //var myLightSourceNode = getDescendantByName(_myLightSources, "SunLightSource");
         var myLightSourceNode = _myLightSources.find("//lightsource[@name='SunLightSource']");
         if (!myLightSourceNode) {
             Logger.debug("SunLightSource not found");

@@ -52,7 +52,7 @@ DemoBehaviourRendexApp.prototype.Constructor = function(self, theArguments) {
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, theTitle);
 
-        var myCube = getElementById(self.getWorld(), "b0", true);
+        var myCube = getElementById(window.scene.world, "b0", true);
         _myCubeBehaviour.node = myCube;
 		self.registerSettingsListener(_myCubeBehaviour);
         createTextOverlay();

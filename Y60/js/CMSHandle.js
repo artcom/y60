@@ -328,7 +328,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         _myConfigDoc.parseFile(_myConfigFile);
 
         if (theLocation && _myConfigDoc.childNodesLength() > 1) {
-            _myConfig = getDescendantByAttribute(_myConfigDoc, "location", theLocation, true);
+            _myConfig = _myConfigDoc.find("//*[@location = '" + theLocation + "']");
         }
         
         if (!_myConfig) {

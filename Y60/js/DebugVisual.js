@@ -31,7 +31,7 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
     var _myMaterial     = null;
 
     obj.setup = function() {
-        if (getDescendantById(_mySceneViewer.getMaterials(), "mCoordinateSystem") == null) {
+        if(window.scene.materials.getElementById("mCoordinateSystem") == null) {
             _myMaterial = Modelling.createColorMaterial(_mySceneViewer.getScene(),[1,1,1,1]);
             var myVertexparamsFeatures = new Node('<feature name="vertexparams">[0[]]</feature>\n').firstChild;
             _myMaterial.requires.appendChild(myVertexparamsFeatures);
@@ -107,7 +107,7 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
                 theNode.appendChild(myBodyNode);
             }
         } else {
-            var myCoordNode = getDescendantByName(theNode, "b_coord_" + theNode.id, true);
+            var myCoordNode = theNode.find("//*[@name = 'b_coord_" + theNode.id + "']");
             if (myCoordNode) {
                 theNode.removeChild(myCoordNode);
             }

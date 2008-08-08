@@ -53,7 +53,7 @@ WindShader.prototype.Constructor = function(obj, theWind, theBodyNames, theWorld
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     obj.addMaterial = function(theMaterialNode) {
-        var newParameterNode = getDescendantByName(theMaterialNode, "WindParams", true).childNodes[0];
+        var newParameterNode = theMaterialNode.find("//*[@name = 'WindParams']").childNodes[0];
         _myParameterNodes.push(newParameterNode);
     }
 
@@ -102,7 +102,7 @@ WindShader.prototype.Constructor = function(obj, theWind, theBodyNames, theWorld
         var theBodyCount = theBodyNames.length;
         var theBodys = [];
         for (var i = 0; i < theBodyCount; ++i) {
-            var myNode = getDescendantByName(theWorld, theBodyNames[i], true);
+            var myNode = theWorld.find("//*[@name = '" + theBodyNames[i] + "']");
             if (myNode) {
                 print ("WindShader loading body " + myNode.name);
                 theBodys.push(myNode);

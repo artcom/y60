@@ -35,7 +35,7 @@ function setupOcclusionMaterials(theScene) {
         }
 
         var myRequiresNode = myMaterial.childNode("requires");
-        var myTexUsage = getDescendantByName(myRequiresNode, "textures");
+        var myTexUsage = myRequiresNode.find("//*[@name = 'textures']");
         if (!myTexUsage) {
             continue;
         }
@@ -45,7 +45,7 @@ function setupOcclusionMaterials(theScene) {
             continue;
         }
 
-        var myTexCoords = getDescendantByName(myRequiresNode, "texcoord");
+        var myTexCoords = myRequiresNode.find("//*[@name = 'texcoord']");
         if (!myTexCoords) {
             continue;
         }

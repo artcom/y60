@@ -30,17 +30,17 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
     }
 
     self.getPositions = function() {
-        var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
+        var myVertexPositions = self.getPositionsNode();
         var myPositions = myVertexPositions.childNode('#text')[1];
         return myPositions;
     }
     self.getPositionsNode = function() {
-        var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
+        var myVertexPositions = _myShape.find("//*[@name = 'position']");
         return myVertexPositions;
     }
 
     self.getColors = function() {
-        var myVertexColors = getDescendantByAttribute(_myShape, "name", "color", true);
+        var myVertexColors = _myShape.find("//*[@name = 'color']");
         var myColors = myVertexColors.childNode('#text')[1];
         return myColors;
     }
@@ -241,8 +241,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     myUVCoordX += myXDelta;
                 }
             } else {
-                var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
-                var myShapeVertexPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;
+                var myShapeVertexPositions = getPositions();
                 myShapeVertexPositions[j + 0] = myPositions[0];
                 myShapeVertexPositions[j + 1] = myPositions[1];
                 myShapeVertexPositions[j + 2] = myPositions[2];
@@ -284,7 +283,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);
-        var myTextureUnits = getDescendantByTagName(myMaterial, "textureunits", false);
+        var myTextureUnits = myMaterial.childNode("textureunits");
         
         _myTextureCount = myTextureUnits.childNodesLength();
         if (thePrebuildFlag) {
@@ -354,7 +353,7 @@ function test_PathText() {
         var mySvgNode = new Node(mySvgFile);
 
         var mySvgPaths = []
-        var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        var myPaths = mySvgNode.findAll("//path");
         
         for (var i = 0; i < myPaths.length; ++i) {
             mySvgPaths.push(new SvgPath(myPaths[i].d));

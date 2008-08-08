@@ -64,7 +64,7 @@ function buildMaterialNode(theMaterialName,
     myMaterialNode.id = createUniqueId(); //"m" + theMaterialName;
     myMaterialNode.name = theMaterialName;
 
-    var myMaterialParent = window.scene.dom.find("//materials");//getDescendantByTagName(window.scene.dom, "materials", true);
+    var myMaterialParent = window.scene.dom.find("//materials");
     
     myMaterialParent.appendChild(myMaterialNode);
 
@@ -111,7 +111,7 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theName;
     myMaterialNode.name = theName;
-    var myMaterialParent = window.scene.dom.find("//materials");//getDescendantByTagName(window.scene.dom, "materials", true);
+    var myMaterialParent = window.scene.dom.find("//materials");
     
     myMaterialParent.appendChild(myMaterialNode);
     var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
@@ -175,7 +175,7 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     var myRequirementString = "<feature name='" + theRequirementClass + "'>" + theRequirementValue + "</feature>";
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
-    var myRequiresDocNode = theMaterialNode.find("//requires");//getDescendantByTagName(theMaterialNode, "requires", false);
+    var myRequiresDocNode = theMaterialNode.find("//requires");
     
     if (!myRequiresDocNode) {
         var myRequiresString = "<requires/>";

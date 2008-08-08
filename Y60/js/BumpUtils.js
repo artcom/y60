@@ -37,14 +37,14 @@ function calculateAndAppendTangents(theShape) {
     var myElements = theShape.childNode("primitives").firstChild;
     var myVertexData = theShape.childNode("vertexdata");
 
-    var myVertexIndexNode = getDescendantByAttribute(myElements, "role", "position");
+    var myVertexIndexNode = myElements.find("//*[@role = 'position']");
     var myVertexIndex = myVertexIndexNode.firstChild.nodeValue;
-    var myVertices = getDescendantByName(myVertexData, myVertexIndexNode.vertexdata).firstChild.nodeValue;
+    var myVertices = myVertexData.find("//*[@name = '" + myVertexIndexNode.vertexdata + "']").firstChild.nodeValue;
 
-    var myTexCoordIndexNode = getDescendantByAttribute(myElements, "role", "texcoord0");
+    var myTexCoordIndexNode = myElements.find("//*[@role = 'texcoord0']");
     var myTexCoordIndex = myTexCoordIndexNode.firstChild.nodeValue;
-    var myTexCoords = getDescendantByName(myVertexData, myTexCoordIndexNode.vertexdata).firstChild.nodeValue;
-
+    var myTexCoords = myVertexData.find("//*[@name = '" + myTexCoordIndexNode.vertexdata + "']").firstChild.nodeValue;
+    
     // tangent indices
     var myTangentIndex = [];
     var myTangentData = [];
@@ -104,7 +104,7 @@ function getOrCreateTexture(theScene, theImage)
 {
     var myImage = ensureImageNode(theScene, theImage);
 
-    var myTexture = getDescendantByAttribute(theScene.textures, "image", myImage.id, true);
+    var myTexture = theScene.textures.find("texture[@image = '" + myImage.id + "']");
     if (!myTexture) {
         myTexture = Node.createElement("texture");
         myTexture.id = createUniqueId();

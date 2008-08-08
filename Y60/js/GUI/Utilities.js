@@ -25,13 +25,13 @@ function playerInfoToExcel(thePlayersNode) {
         var myTemplateNode = new Node();
         myTemplateNode.parseFile("CONFIG/excel_template.xml");
     
-        var myTableNode = getDescendantByTagName(myTemplateNode, "Table", true);
-        var myRowNode = getDescendantByAttributeName(myTableNode, "y60:name", true).parentNode.parentNode;
+        var myTableNode = myTemplateNode.find("//Table");
+        var myRowNode = myTableNode.find("//*[@name = 'y60:name']").parentNode.parentNode;
     
         for (var i=0;i<thePlayersNode.childNodesLength("player");++i) {
             var myNewRow = myRowNode.cloneNode(true);
             var myPlayer = thePlayersNode.childNode("player", i);
-            var myDataNodes = getDescendantsByAttributeName(myNewRow, "y60:name", true);
+            var myDataNodes = myNewRow.findAll("//*[@name = 'y60:name']");
             for (var j=0;j<myDataNodes.length;++j) {
                 var myValue = "";
                 var myDataNode = myDataNodes[j];

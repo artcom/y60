@@ -435,7 +435,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	}
 
 	Protected.onMaterialChange = function() {
-		_myTextureUnits = Public.material.find("//textureunits");//getDescendantByTagName(Public.material, "textureunits", false);
+		_myTextureUnits = Public.material.find("textureunits");
 		if (_myTextureUnits.childNodes.length != 1) {
 			throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextureUnits.childNodes.length, fileline());
 		}
@@ -453,7 +453,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 			myImage.frameblending = false;
 		}
         var myFindString = "//texture[@image='"+ theImageId+ "']";		
-		var myTexture = window.scene.textures.find(myFindString);//getDescendantByAttribute(window.scene.textures, "image", theImageId);
+		var myTexture = window.scene.textures.find(myFindString);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
     		for (var i = 0; i < _myTextureUnits.childNodesLength(); i++) {
@@ -486,8 +486,8 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
 		// create texture unit
 		if (!_myTextureUnits) {
-            var myFindString = "//textureunits";				    
-			_myTextureUnits = Public.material.find(myFindString);//getDescendantByTagName(Public.material, "textureunits", false);
+            var myFindString = "textureunits";				    
+			_myTextureUnits = Public.material.find(myFindString);
 			if (!_myTextureUnits) {
 				_myTextureUnits = Public.material.appendChild(Node.createElement("textureunits"));
 			}
@@ -809,12 +809,11 @@ function removeOverlay(theOverlayNode) {
 
 			// Remove texture,image
 			
-			var myTextureUnits = myMaterialNode.find("//textureunits");//getDescendantByTagName(myMaterialNode, "textureunits", false);
+			var myTextureUnits = myMaterialNode.find("textureunits");
 			if (myTextureUnits) {
 				for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
 					var myTextureUnit = myTextureUnits.childNode(i);
 					var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
-					//if (getDescendantsByAttribute(window.scene.textures, "image", myTexture.image).length == 1) {
 					if (window.scene.textures.findAll("//*[@image='"+ myTexture.image+ "']").length == 1) {
 						// our texture is the only one referencing this image, safe to remove
 						var myImage = myTexture.getElementById(myTexture.image);
@@ -823,7 +822,6 @@ function removeOverlay(theOverlayNode) {
 						Logger.warning("More than one texture references image id=" + myTexture.image);
 					}
 
-					//if (getDescendantsByAttribute(window.scene.materials, "texture", myTexture.id, true).length == 1) {
 					if (window.scene.materials.findAll("//*[@texture='"+ myTexture.id+ "']").length == 1) {
 						// our textureunit is the only one referencing this texture, safe to remove
 						myTexture.parentNode.removeChild(myTexture);

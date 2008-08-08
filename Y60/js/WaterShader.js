@@ -208,11 +208,11 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
         const myOverscan = 1.5;
 
         // remove old water bodies
-        var oldWaterBody = getDescendantByName(_myWorldNode, "wellen", true);
+        var oldWaterBody = _myWorldNode.find("//*[@name = 'wellen']");
         if (oldWaterBody) {
             oldWaterBody.parentNode.removeChild(oldWaterBody);
         }
-        oldWaterBody = getDescendantByName(_myWorldNode, "bigwater", true);
+        oldWaterBody = _myWorldNode.find("//*[@name = 'bigwater']");
         if (oldWaterBody) {
             oldWaterBody.parentNode.removeChild(oldWaterBody);
         }
@@ -365,15 +365,14 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
         if (_myCgFlag) {
             // Cg uniform parameter handles
             for (var i = 0; i < _myWaves.length; ++i) {
-                _myWaveParams[i] = getDescendantByName(_myMaterialNode,
-                    "Wave" + Number(i+1) + "Params", true).childNodes[0];
-                var myWaveDirection = getDescendantByName(_myMaterialNode,
-                    "Wave" + Number(i+1) + "Direction", true).childNodes[0];
+                _myWaveParams[i] = _myMaterialNode.find("//*[@name = 'Wave" + Number(i+1) + "Params']").childNodes[0];
+                var myWaveDirection = _myMaterialNode.find("//*[@name = 'Wave" + Number(i+1) + "Direction']").childNodes[0];
+                        
                 var myDirection3f = _myWaves[i].direction;
                 myWaveDirection.nodeValue = new Vector4f(myDirection3f[0], myDirection3f[1], myDirection3f[2], 0);
 
-                _myTextureScaleParam[0] = getDescendantByName(_myMaterialNode, "Tex1NearFarScale", true).childNodes[0];
-                _myTextureScaleParam[1] = getDescendantByName(_myMaterialNode, "Tex2NearFarScale", true).childNodes[0];
+                _myTextureScaleParam[0] = _myMaterialNode.find("//*[@name = 'Tex1NearFarScale']").childNodes[0];
+                _myTextureScaleParam[1] = _myMaterialNode.find("//*[@name = 'Tex2NearFarScale']").childNodes[0];
             }
         } else {
             for (var i = 0; i < _myWaves.length; ++i) {
