@@ -232,7 +232,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
             var myCenterRay  = new Ray(myPosition, myViewVector);
             var myTrackballRadius = 1;
-            var myIntersection = nearestIntersection(window.scene.world, myCenterRay);
+            var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
             if (myIntersection) {
                 myTrackballRadius = myIntersection.distance;
             }
@@ -263,7 +263,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
     	//var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
-        var myIntersection = nearestIntersection(window.scene.world, myMouseRay, _myPickInvisibleBodies);
+        var myIntersection = nearestIntersection(obj.getWorld(), myMouseRay, _myPickInvisibleBodies);
         if (myIntersection) {
             myPickedBody = myIntersection.info.body;
         } else {

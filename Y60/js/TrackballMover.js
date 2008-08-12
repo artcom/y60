@@ -187,7 +187,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
             var myCenterRay  = new Ray(myPosition, myViewVector);
 
             var myTrackballRadius = 1.0; //_myTrackball.getSphereRadius();
-            var myIntersection = nearestIntersection(window.scene.world, myCenterRay);
+            var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
             if (myIntersection) {
             	myTrackballRadius = myIntersection.distance;
             }
@@ -265,7 +265,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
 
-        var myWorld = window.scene.world;
+        var myWorld = obj.getWorld();
     	var myIntersection = nearestIntersection(myWorld, myMouseRay);
     	if (myIntersection) {
     	    print("  -> You picked trackball object: " + myIntersection.info.body.name);
