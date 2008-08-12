@@ -69,37 +69,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myModelName;
     }
 
-    // [CH]: deprecated, use window.scene.world (etc.) instead.
-    // Use these functions for fast access to the scene graph
-    self.getWorld = function() {
-        Logger.warning("getWorld() is deprecated, use window.scene.world instead");
-        return _myWorld;
-    }
-    self.getMaterials = function() {
-        Logger.warning("getMaterials() is deprecated, use window.scene.materials instead");
-        return _myMaterials;
-    }
-    self.getLightSources = function() {
-        Logger.warning("getLightSources() is deprecated, use window.scene.lightsources instead");
-        return _myLightSources;
-    }
-    self.getShapes = function() {
-        Logger.warning("getShapes() is deprecated, use window.scene.shapes instead");
-        return _myShapes;
-    }
-    self.getAnimations = function() {
-        Logger.warning("getAnimations() is deprecated, use window.scene.animations instead");
-        return _myAnimations;
-    }
-    self.getCharacters = function() {
-        Logger.warning("getCharacters() is deprecated, use window.scene.characters instead");
-        return _myCharacters;
-    }
-    self.getImages = function() {
-        Logger.warning("getImages() is deprecated, use window.scene.images instead");
-        return _myImages;
-    }
-
     self.getLightManager = function() {
         return _myLightManager;
     }

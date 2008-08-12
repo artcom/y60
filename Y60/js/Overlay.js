@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("ImageManager.js");
 use("Y60JSSL.js");
 use("Playlist.js");
 

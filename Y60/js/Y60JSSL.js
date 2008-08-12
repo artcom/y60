@@ -973,7 +973,6 @@ function parseVectorOfRankedFeature(theVectorOfString) {
 // whitespace, alphanumeric characters and the dot.
 //
 // can be used to convert a filename into a ?dom ID?
-// see also BodyButton.js
 //
 function stripIdentifier(theIdentifier) {
     return theIdentifier.replace(/[^\w\s.]/g, "");
@@ -991,3 +990,22 @@ function preloadTextures() {
     }
 }
 
+function blurImage(theImageNode, theRadius, theSigma) {
+    var mySize = getImageSize(theImageNode);
+    if( theSigma == null ) {
+        theSigma = 1.0;
+    }
+    applyImageFilter(theImageNode, "gaussianblur", [theRadius, mySize.x, mySize.y, theSigma]);
+}
+
+function getImageSize(theImage) {
+    if (!theImage.src && theImage.childNodes.length == 0) {
+        Logger.error("### ERROR: src attribute must be set before getting size for image: "+ theImage.id);
+        return undefined;
+    }
+    var mySize = new Vector3f(theImage.width, theImage.height, 0);
+    var myImageMatrix = new Matrix4f(theImage.matrix);
+    myImageMatrix.setRow(3, [0,0,0,1]);
+    mySize = product(mySize, myImageMatrix);
+    return new Vector2i(Math.abs(Math.round(mySize.x)), Math.abs(Math.round(mySize.y)));
+}
