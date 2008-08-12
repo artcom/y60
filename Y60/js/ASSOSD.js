@@ -142,15 +142,14 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
         }
         
         var myOSDSize = new Vector2i(300, 80);
-        var myImage = theViewer.getImageManager().getImageNode("OSD_Overlay");
+        var myImageSrc = null;
         if (OSD_FILE != undefined) {
-            myImage.src = OSD_FILE;
+            myImageSrc = OSD_FILE;
         } else {
-            myImage.src = "shadertex/on_screen_display.rgb";
+            myImageSrc = "shadertex/on_screen_display.rgb";
         }
-        myImage.resize = "pad";
         
-        _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImage);
+        _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImageSrc);
         var myImageSize = getImageSize(_myQuitOSD.image);
         _myQuitOSD.visible = false;
         

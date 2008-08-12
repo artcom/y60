@@ -37,7 +37,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
     var _myRightOverlay          = null;
     var _myTopOverlay            = null;
     var _myBottomOverlay         = null;
-    var _myPixelImage            = null;
+    //var _myPixelImage            = null;
     var _myInteractiveOverlay    = null;
     var _myInteractivePixelImage = null;
     var _myInteractiveFlag       = false;
@@ -66,8 +66,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
 
     // public functions
     self.setup = function(theShutterOverlayFile, theCustomShutterFile) {
-        _myPixelImage = theSceneViewer.getImageManager().getImageNode("Shutter");
-        _myPixelImage.src = theShutterOverlayFile;
         _myShutterXmlFileName = "shutter."+hostname()+".xml";
         if (fileExists(_myShutterXmlFileName)) {
             var myInteractivePixelImageDom = new Node();
@@ -77,7 +75,9 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             window.scene.images.appendChild(_myInteractivePixelImage);
             print("Found a "+_myShutterXmlFileName+" image, delete it to start over!");
         } else {
-            _myInteractivePixelImage = theSceneViewer.getImageManager().getImageNode("InteractiveShutter");
+            _myInteractivePixelImage = Node.createElement("image");
+            window.scene.images.appendChild(_myInteractivePixelImage);
+            _myInteractivePixelImage.name = "InteractiveShutter";
             if (theCustomShutterFile != undefined) {
                 _myInteractivePixelImage.src = theCustomShutterFile;
             } else {
@@ -85,18 +85,19 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             }
         }
 
-        _myLeftOverlay   = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
-        _myRightOverlay  = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
-        _myTopOverlay    = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
-        _myBottomOverlay = new ImageOverlay(theSceneViewer.getScene(), _myPixelImage);
-
+        _myLeftOverlay   = new ImageOverlay(theSceneViewer.getScene(), theShutterOverlayFile);
+        _myLeftOverlay.image.name = "Shutter";
+        _myRightOverlay  = new ImageOverlay(theSceneViewer.getScene(), theShutterOverlayFile);
+        _myRightOverlay.image.name = "Shutter";
+        _myTopOverlay    = new ImageOverlay(theSceneViewer.getScene(), theShutterOverlayFile);
+        _myTopOverlay.image.name = "Shutter";
+        _myBottomOverlay = new ImageOverlay(theSceneViewer.getScene(), theShutterOverlayFile);
+        _myBottomOverlay.image.name = "Shutter";
+        
         _myInteractiveOverlay   = new ImageOverlay(theSceneViewer.getScene(), _myInteractivePixelImage);
 
         // cursor
-        var myCursorImage = theSceneViewer.getImageManager().getImageNode("ShutterCursor");
-        myCursorImage.src = CURSOR_IMAGE;
-
-        _myCursor = new ImageOverlay(theSceneViewer.getScene(), myCursorImage);
+        _myCursor = new ImageOverlay(theSceneViewer.getScene(), CURSOR_IMAGE);
         _myCursor.width = CURSOR_SIZE;
         _myCursor.height = CURSOR_SIZE;
         _myCursor.visible = true;

@@ -87,20 +87,26 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         sendControlPacket("MS",  "Set to stream-mode");
         sendControlPacket("OI",  "Identify device");
 
-        var myWhiteImage = _myEventReceiver.getImageManager().getImageNode("TouchScreenBackgroundImage");
-        myWhiteImage.src = "shadertex/one_white_pixel.png";
-        myWhiteImage.resize = "scale";
+        //var myWhiteImage = _myEventReceiver.getImageManager().getImageNode("TouchScreenBackgroundImage");
+        //myWhiteImage.src = "shadertex/one_white_pixel.png";
+        //myWhiteImage.resize = "scale";
 
-        _myBackground = new ImageOverlay(_myEventReceiver.getScene(), myWhiteImage);
+        //_myBackground = new ImageOverlay(_myEventReceiver.getScene(), myWhiteImage);
+        _myBackground = new ImageOverlay(_myEventReceiver.getScene(), "shadertex/one_white_pixel.png");
+        var myWhiteImage = _myBackground.image;
+        myWhiteImage.resize = "scale";
+        myWhiteImage.name = "TouchScreenBackgroundImage";
         _myBackground.position = new Vector2f(0, 0);
         _myBackground.width  = window.width;
         _myBackground.height = window.height;
         _myBackground.visible = false;
 
-        var myCrossHairImage = _myEventReceiver.getImageManager().getImageNode("TouchScreenCrossHair");
-        myCrossHairImage.src = CROSSHAIR_TEXTURE;
+        //var myCrossHairImage = _myEventReceiver.getImageManager().getImageNode("TouchScreenCrossHair");
+        //myCrossHairImage.src = CROSSHAIR_TEXTURE;
 
-        _myCrossHair = new ImageOverlay(_myEventReceiver.getScene(), myCrossHairImage);
+        //_myCrossHair = new ImageOverlay(_myEventReceiver.getScene(), myCrossHairImage);
+        _myCrossHair = new ImageOverlay(_myEventReceiver.getScene(), CROSSHAIR_TEXTURE);
+        _myCrossHair.image.name = "TouchScreenCrossHair";
         _myCrossHair.position = new Vector2f(0, 0);
         _myCrossHair.width  = 128;
         _myCrossHair.height = 128;
