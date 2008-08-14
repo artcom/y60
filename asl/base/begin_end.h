@@ -50,44 +50,72 @@ namespace asl {
     /* @{ */
     
     template <class T>
-    T * begin(T & x) {
+    inline T * begin(T & x) {
         return &x;
     }
 
     template <class T>
-    T * end(T & x) {
+    inline T * end(T & x) {
         return &x+1;
     }
 
     template <class T>
-    const T * begin(const T & x) {
+    inline const T * begin(const T & x) {
         return &x;
     }
 
     template <class T>
-    const T * end(const T & x) {
+    inline const T * end(const T & x) {
         return &x+1;
     }
 
     template <class ELEM, template <class> class CONTAINER>
-    typename CONTAINER<ELEM>::iterator begin(CONTAINER<ELEM> & c) {
+    inline typename CONTAINER<ELEM>::iterator begin(CONTAINER<ELEM> & c) {
         return c.begin();
     }
 
     template <class ELEM, template <class> class CONTAINER>
-    typename CONTAINER<ELEM>::iterator end(CONTAINER<ELEM> & c) {
+    inline typename CONTAINER<ELEM>::iterator end(CONTAINER<ELEM> & c) {
         return c.end();
     }
 
     template <class ELEM, template <class> class CONTAINER>
-    typename CONTAINER<ELEM>::const_iterator begin(const CONTAINER<ELEM> & c) {
+    inline typename CONTAINER<ELEM>::const_iterator begin(const CONTAINER<ELEM> & c) {
         return c.begin();
     }
 
     template <class ELEM, template <class> class CONTAINER>
-    typename CONTAINER<ELEM>::const_iterator end(const CONTAINER<ELEM> & c) {
+    inline typename CONTAINER<ELEM>::const_iterator end(const CONTAINER<ELEM> & c) {
         return c.end();
     }
+
+    //! begin iterator into C array
+    template <typename T, const std::size_t N>
+    inline T* begin(T (&array)[N]) {
+        return array;
+    }
+
+    //! end iterator into C array
+    template <typename T, const std::size_t N>
+    inline T* end(T (&array)[N]) {
+        return array+N;
+    }
+
+    //! size of C array
+    template <typename T, const std::size_t N>
+    inline std::size_t size(T const (&)[N]) {
+        return N;
+    }
+
+    namespace detail { // disregard
+	    template <typename T, const std::size_t N>
+	    const char ( &static_array_size_(T const (&)[N]) ) [N];
+    }
+
+    //! size of C array, yields a compile-time const
+#   define asl_static_array_size(a)  sizeof(::asl::detail::static_array_size_(a))
+
     /* @} */
+
 } // namespace asl
 #endif

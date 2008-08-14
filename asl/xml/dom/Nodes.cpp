@@ -36,7 +36,7 @@
 
 #include <deque>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -47,6 +47,22 @@
 #define DB2(x) //  x
 #define DBS(x)  // x
 #define DB_Y(x) // x
+
+namespace {
+
+    typedef std::vector<const dom::Node*>             NodeParentList;
+
+    // needed for 'compareByDocumentOrder()'
+    inline NodeParentList findAncestors(const dom::Node* node)
+    {
+        NodeParentList result;
+        for( const dom::Node* it=node; it->parentNode(); it=it->parentNode() ) {
+            result.push_back( it->parentNode() );
+        }
+        return result;
+    }
+
+}
 
 using namespace std;
 
@@ -2016,6 +2032,54 @@ dom::Node::appendChild(NodePtr theNewChild) {
     checkAndUpdateChildrenSchemaInfo(*theNewChild, this);
     getChildren().appendWithoutReparenting(theNewChild); // reparenting should have been already done in checkAndUpdateChildrenSchemaInfo
     return theNewChild;
+}
+
+int
+dom::Node::compareByDocumentOrder(const NodePtr theNode) const
+{
+    if( this == theNode.getNativePtr() ) {
+        return 0;
+    }
+    if( getSavePosition() && theNode->getSavePosition() ) {
+        if( getSavePosition() < theNode->getSavePosition() ) {
+            return -1;
+        }
+        if( getSavePosition() > theNode->getSavePosition() ) {
+            return 1;
+        }
+        assert(false); // two different nodes at the same position
+    }
+
+    const NodeParentList& lhsParents = findAncestors(this);
+    const NodeParentList& rhsParents = findAncestors(theNode.getNativePtr());
+
+    NodeParentList::const_reverse_iterator lhsIt = lhsParents.rbegin();
+    NodeParentList::const_reverse_iterator rhsIt = rhsParents.rbegin();
+
+    assert(*lhsIt==*rhsIt);  // nodes must be in same document
+
+    while( *lhsIt==*rhsIt && lhsIt!=lhsParents.rend() && rhsIt!=rhsParents.rend() ) {
+        ++lhsIt;
+        ++rhsIt;
+    }
+
+    const dom::Node* const plhs = (lhsIt==lhsParents.rend()) ? this                   : *lhsIt;
+    const dom::Node* const prhs = (rhsIt==rhsParents.rend()) ? theNode.getNativePtr() : *rhsIt;
+    const dom::Node* const commonParent = *(lhsIt-1);
+
+    for( std::size_t idx=0; idx<commonParent->childNodesLength(); ++idx ) {
+        const dom::Node* const currentChild = commonParent->childNode(idx).getNativePtr();
+        if( currentChild == plhs ) {
+            return -1;
+        }
+        if( currentChild == prhs ) {
+            return +1;
+        }
+    }
+
+    assert(false); // both should have been in child list of common parent
+
+    return 0;
 }
 
 NodePtr 
