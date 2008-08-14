@@ -1,1326 +1,1855 @@
-/**********************************************************************************************/
+//=============================================================================
+// Copyright (C) 2007, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
 
-/*
-**
-** Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
-**
-** These coded instructions, statements, and computer programs contain
-** unpublished proprietary information of ART+COM AG Berlin, and
-** are copy protected by law. They may not be disclosed to third parties
-** or copied or duplicated in any form, in whole or in part, without the
-** specific, prior written permission of ART+COM AG Berlin.
-**
-*/
+#include <assert.h>
+#include <functional>
+#include <math.h>
 
-/**********************************************************************************************/
+#include <iostream>
 
-/*!
-** \file xpath/Expression.cpp
-**
-** \brief XPath syntax tree expressions
-**
-** \author Hendrik Schober
-**
-** \date 2008-07-15
-**
-*/
+#include <asl/Logger.h>
+#include <dom/Nodes.h>
 
-/**********************************************************************************************/
 #include "Expression.h"
 
-/**********************************************************************************************/
-#include <cfloat>
-#include <sstream>
+namespace xpath
+{
 
-/**********************************************************************************************/
-#include <asl/string_functions.h>
+    const string Function::FUNCTIONNAME_LAST = "last";
+    const string Function::FUNCTIONNAME_POSITION = "position";
+    const string Function::FUNCTIONNAME_COUNT = "count";
+    const string Function::FUNCTIONNAME_STARTSWITH = "startswith";
+    const string Function::FUNCTIONNAME_CONCAT = "concat";
+    const string Function::FUNCTIONNAME_CONTAINS = "contains";
+    const string Function::FUNCTIONNAME_SUBSTRING = "substring";
+    const string Function::FUNCTIONNAME_SUBSTRING_BEFORE = "substring_before";
+    const string Function::FUNCTIONNAME_SUBSTRING_AFTER = "substring_after";
+    const string Function::FUNCTIONNAME_NOT = "not";
+    const string Function::FUNCTIONNAME_UNKNOWN = " *** unknown function *** ";
+    const string Function::FUNCTIONNAME_ID = "id";
+    const string Function::FUNCTIONNAME_LOCAL_NAME = "local-name";
+    const string Function::FUNCTIONNAME_NAMESPACE_URI = "namespace-uri";
+    const string Function::FUNCTIONNAME_NAME = "name";
+    const string Function::FUNCTIONNAME_STRING = "string";
+    const string Function::FUNCTIONNAME_STRING_LENGTH = "string-length";
+    const string Function::FUNCTIONNAME_NORMALIZE_SPACE = "normalize-space";
+    const string Function::FUNCTIONNAME_TRANSLATE = "translate";
+    const string Function::FUNCTIONNAME_BOOLEAN = "boolean";
+    const string Function::FUNCTIONNAME_TRUE = "true";
+    const string Function::FUNCTIONNAME_FALSE = "false";
+    const string Function::FUNCTIONNAME_LANG = "lang";
+    const string Function::FUNCTIONNAME_NUMBER = "number";
+    const string Function::FUNCTIONNAME_SUM = "sum";
+    const string Function::FUNCTIONNAME_FLOOR = "floor";
+    const string Function::FUNCTIONNAME_CEILING = "ceiling";
+    const string Function::FUNCTIONNAME_ROUND = "round";
 
-/**********************************************************************************************/
-#include "Path.h"
-#include "ParseInput.h"
-#include "PathParser.h"
-#include "xpath_api.h"
+    const string Step::AXISNAME_INVALID           (" *** invalid Axis *** ");
+    const string Step::AXISNAME_NEXT_SIBLING      ("next-sibling");
+    const string Step::AXISNAME_PREVIOUS_SIBLING  ("previous-sibling");
+    const string Step::AXISNAME_FOLLOWING_SIBLING ("following-sibling");
+    const string Step::AXISNAME_PRECEDING_SIBLING ("preceding-sibling");
+    const string Step::AXISNAME_CHILD             ("child");
+    const string Step::AXISNAME_PARENT            ("parent");
+    const string Step::AXISNAME_DESCENDANT        ("descendant");
+    const string Step::AXISNAME_ANCESTOR          ("ancestor");
+    const string Step::AXISNAME_FOLLOWING         ("following");
+    const string Step::AXISNAME_PRECEDING         ("preceding");
+    const string Step::AXISNAME_ANCESTOR_OR_SELF  ("ancestor-or-self");
+    const string Step::AXISNAME_DESCENDANT_OR_SELF("descendant-or-self");
+    const string Step::AXISNAME_SELF              ("self");
+    const string Step::AXISNAME_NAMESPACE         ("namespace");
+    const string Step::AXISNAME_ATTRIBUTE         ("attribute");
+    
+    const string Step::NODETEST_INVALID = " *** invalid node test *** ";
+    const string Step::NODETEST_NODE = "node";
+    const string Step::NODETEST_COMMENT = "comment";
+    const string Step::NODETEST_TEXT = "text";
+    const string Step::NODETEST_PI = "processing-instruction";
 
-/**********************************************************************************************/
+    BinaryExpression::BinaryExpression(BinaryExpression::ExpressionType _type,
+            Expression *_lvalue, Expression *_rvalue) :
+        type( _type ),
+        lvalue( _lvalue ),
+        rvalue( _rvalue ) {}
 
-namespace {
+    Value *BinaryExpression::evaluateExpression(const Context &c) {
+        assert(lvalue);
+        assert(rvalue);
 
-    using namespace xpath::detail;
+        Value *left = lvalue->evaluateExpression(c);
+        Value *right = rvalue->evaluateExpression(c);
 
-    typedef Predicate::ExpressionPtr                  ExpressionPtr;
+        assert(left);
+        assert(right);
 
-    /******************************************************************************************/
+        if (type < 16) { // comparison operators
+            if ((left->type()==Value::NodeSetType) &&
+                    (right->type()==Value::NodeSetType))
+            {
+                // find one pair of nodes whose string-values comparison evaluates true.
 
-    template< typename Func_ >
-    inline ExpressionPtr tryRead(ParseInput& pi, Func_ func)
-    {
-        ParseState ps(pi);
-        const ExpressionPtr expr = func(pi);
-        if( ps.hasRead() ) {
-            ps.commit();
-            return expr;
+                NodeSetValue *nsv1 = left->toNodeSet();
+                delete left;
+                NodeSetRef nsr1 = nsv1->takeNodes();
+                delete nsv1;
+
+                NodeSetValue *nsv2 = right->toNodeSet();
+                delete right;
+                NodeSetRef nsr2 = nsv2->takeNodes();
+                delete nsv2;
+
+                bool retval = false;
+
+                if (type == Equal || type == NotEqual) {
+
+                    std::set<string> sm1;
+                    std::set<string> sm2;
+
+                    NodeSet::iterator i1 = nsr1->begin();
+                    NodeSet::iterator i2 = nsr2->begin();
+
+                    while (i1 != nsr1->end() || i2 != nsr2->end()) {
+
+                        string string1 = string_value_for(*i1);
+                        if (string1.length()) {
+
+                            if (sm2.find(string1) != sm2.end()) {
+                                if (type == Equal) {
+                                    retval = true;
+                                    break;
+                                }
+                            } else {
+                                if (type == NotEqual) {
+                                    retval = true;
+                                    break;
+                                }
+                            }
+                            sm1.insert(string1);
+                        }
+
+                        std::string string2 = string_value_for(*i2);
+                        if (string2.length()) {
+                            if (sm1.find(string2) != sm1.end()) {
+                                if (type == Equal) {
+                                    retval = true;
+                                    break;
+                                }
+                            } else {
+                                if (type == NotEqual) {
+                                    retval = true;
+                                    break;
+                                }
+                            }
+                            sm2.insert(string2);
+                        }
+
+                        if (i1 != nsr2->end()) {
+                            ++i1;
+                        }
+
+                        if (i2 != nsr2->end()) {
+                            ++i2;
+                        }
+                    }
+                } else {
+                    std::string extreme_left;
+                    std::string extreme_right;
+                    NodeSet::iterator ileft = nsr1->begin();
+                    NodeSet::iterator iright = nsr2->begin();
+                    while (ileft != nsr1->end() || ileft != nsr2->end()) {
+
+                        if ( ((type == Less || type == LEqual) &&
+                              (string_value_for(*ileft) > extreme_left)) ||
+                             (type == Greater || type == GEqual) && 
+                             (string_value_for(*ileft) < extreme_left) )
+                        {
+                            extreme_left = string_value_for(*ileft);
+                        }
+
+                        if ( ((type == Less || type == LEqual) &&
+                              (string_value_for(*iright) < extreme_right) ) ||
+                             (type == Greater || type == GEqual) &&
+                             (string_value_for(*iright) > extreme_right) )
+                        {
+                            extreme_right = string_value_for(*iright);
+                        }
+
+                        if (extreme_left < extreme_right) {
+                            if (type == Less || type == LEqual) {
+                                retval = true;
+                                break;
+                            }
+                        } else if (extreme_left == extreme_right) {
+                            if (type == LEqual || type == GEqual) {
+                                retval = true;
+                                break;
+                            }
+                        } else {
+                            if (type == Greater || type == GEqual) {
+                                retval = true;
+                                break;
+                            }
+                        }
+
+                        if (ileft != nsr2->end()) {
+                            ++ileft;
+                        }
+
+                        if (iright != nsr2->end()) {
+                            ++iright;
+                        }
+                    }
+                }
+                delete nsr1;
+                delete nsr2;
+                return new BooleanValue(retval);        
+            } else if (left->type()==Value::NodeSetType ||
+                    right->type()==Value::NodeSetType)
+            {
+                // comparison of one nodeset with one other type
+
+                if (left->type()==Value::StringType || right->type()==Value::StringType) {
+                    const int TRUTHVALUES_LEFT[] = {
+                        1 << NotEqual | 1 << Less | 1 << LEqual,
+                        1 << Equal | 1 << LEqual | 1 << GEqual,
+                        1 << NotEqual | 1 << Greater | 1 << GEqual };
+                    const int TRUTHVALUES_RIGHT[] = { 
+                        TRUTHVALUES_LEFT[2], TRUTHVALUES_LEFT[1], TRUTHVALUES_LEFT[0]
+                    };
+
+                    // one nodeset, one string: find one node whose string-value compares positive to the string
+                    NodeSetValue *nsv;
+                    StringValue *sv;
+                    const int *truthTable;
+                    if (left->type()==Value::StringType) {
+                        // WARNING: toNodeSet() invalidates right.
+                        // which is okay, provided that right is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete right" below.
+                        nsv = right->toNodeSet();
+                        sv = left->toString();
+                        truthTable = TRUTHVALUES_LEFT;
+                    } else {
+                        // WARNING: toNodeSet() invalidates left,
+                        // which is okay, provided that left is
+                        // no longer accessed; which actually is the case,
+                        // see the "delete left" below.
+                        nsv = left->toNodeSet();
+                        sv = right->toString();
+                        truthTable = TRUTHVALUES_RIGHT;
+                    }
+
+                    delete left;
+                    delete right;
+                    bool retval = false;
+
+                    for (NodeSet::iterator i = nsv->begin(); i !=nsv->end(); ++i) {
+                        string curstr = string_value_for(*i);
+                        int cmp = curstr.compare(sv->getValue());
+                        if (cmp < 0) cmp = -1;
+                        if (cmp > 0) cmp = 1;
+                        AC_TRACE << "  comparing string \"" << sv->getValue() <<
+                                    "\" with node of value \"" <<curstr<<"\" is " << cmp;
+                        if ( truthTable[ cmp+1 ] & ( 1 << type )) {
+                            retval = true;
+                            break;
+                        }
+                    }
+
+#ifdef INTERPRETER_DEBUG
+                    AC_INFO << " string - nodeset comparison of type " << type << " is " << retval?"true":"false";
+                    if (retval) {
+                        AC_INFO <<" succeeded for "<< *this;
+                    }
+#endif
+                    delete sv;
+                    delete nsv;
+                    return new BooleanValue(retval);
+                } else if (left->type()==Value::NumberType ||
+                        right->type()==Value::NumberType)
+                {
+                    // one nodeset, one number: find one node whose string-value converted to number compares positive
+
+                    Value *theNodeSet;
+                    Value *theNumber;
+
+                    if (left->type()==Value::NumberType) {
+                        theNodeSet = right;
+                        theNumber = left;
+                    } else {
+                        theNodeSet = left;
+                        theNumber = right;
+                    }
+                    NumberValue *nv = theNumber->toNumber();
+                    NodeSetValue *nsv = theNodeSet->toNodeSet();
+
+                    delete theNumber;
+                    delete theNodeSet;
+
+                    double num = nv->getValue();
+                    delete nv;
+
+                    NodeSetRef nsr = nsv->takeNodes();
+                    delete nsv;
+
+                    //std::binary_function<NodeRef, double, bool> theOp = getOpFor<double>(type);
+
+                    for (NodeSet::iterator i = nsr->begin(); i != nsr->end(); ++i) {
+                        bool val;
+                        double currentnum = number_value_for(*i);
+                        switch(type) {
+                            case Equal:
+                                val = (currentnum == num);
+                                break;
+                            case NotEqual:
+                                val = (currentnum != num);
+                                break;
+                            case Greater:
+                                val = (theNumber == left) ^ (number_value_for(*i) > num);
+                                break;
+                            case GEqual:
+                                val = (theNumber == left) ^ (number_value_for(*i) >= num);
+                                break;
+                            case Less:
+                                val = (theNumber == left) ^ (number_value_for(*i) < num);
+                                break;
+                            case LEqual:
+                                val = (theNumber == left) ^ (number_value_for(*i) <= num);
+                                break;
+                            default:
+                                AC_WARNING << "unsupported type " << type;
+                                exit(0); // XXX: replace with exception [DS]
+                        }
+
+                        if (val) {
+                            delete nsr;
+                            return new BooleanValue(true);
+                        }
+                    }
+                    delete nsr;
+                    return new BooleanValue(false);
+                } else if (left->type()==Value::BooleanType ||
+                        right->type()==Value::BooleanType)
+                {
+                    // one nodeset, one boolean: convert both to boolean
+                    BooleanValue *aVal = left->toBoolean();
+                    BooleanValue *bVal = right->toBoolean();
+                    delete left;
+                    delete right;
+                    // ###
+                    bool a = aVal->getValue();
+                    bool b = bVal->getValue();
+
+                    delete aVal;
+                    delete bVal;
+
+                    AC_INFO << "boolean comparison " << type << " " << a << ", " << b;
+
+                    // XXX: WTF? Why are all of them true? [DS]
+                    if (type == Equal && a == b) return new BooleanValue(true);
+                    else if(type == Equal && a != b) return new BooleanValue(true); // XXX
+                    else if(type == NotEqual && a != b) return new BooleanValue(true);
+                    else if(type == GEqual && a >= b) return new BooleanValue(true);
+                    else if(type == LEqual && a >= b) return new BooleanValue(true); // XXX
+                    else if(type == Less && a < b) return new BooleanValue(true);
+                    else if(type == Greater && a > b) return new BooleanValue(true);
+
+                    return new BooleanValue(false);
+                } else {
+                    // should not happen.
+                    AC_ERROR << "Type not implemented!";
+                    assert(false);
+                }
+                return new NullValue();
+            } else {// no nodeset 
+                if (type==Equal || type == NotEqual) {
+                    // convert to simplest common type and compare
+                    bool retval;
+                    if (left->type() == Value::BooleanType || right->type() == Value::BooleanType) {
+                        retval = equals_as<BooleanValue>(left, right);
+                    } else if (left->type() == Value::NumberType || right->type() == Value::NumberType) {
+                        retval = equals_as<NumberValue>(left, right);
+                    } else {
+                        retval = equals_as<StringValue>(left, right);
+                    }
+                    delete left;
+                    delete right;
+                    return new BooleanValue(retval ^ (type==NotEqual));
+                } else { //  no nodeset and no equality operation
+                    if (equals_as<NumberValue>(left, right)) {
+                        delete left;
+                        delete right;
+                        return new BooleanValue(type==LEqual||type==GEqual);
+                    } else { // numbers are different.
+                        bool retval = ( type==GEqual || type == Greater ) ^
+                            ( smaller_than_as<NumberValue>(left, right));
+                        delete left;
+                        delete right;
+                        return new BooleanValue(retval);
+                    }
+                }
+            }
+        } else if (type < 32) { // "or" | "and"
+            BooleanValue *r = right->toBoolean();
+            BooleanValue *l = left->toBoolean();
+            bool rb = r->getValue();
+            bool lb = l->getValue();
+            delete right;
+            delete r;
+            delete left;
+            delete l;
+            if (type==Or) {
+                return new BooleanValue(rb || lb);
+            } else if (type==And) {
+                return new BooleanValue(rb && lb);
+            } else {
+                // should not happen.
+                AC_ERROR << "Not yet implemented!";
+                assert(false);
+                return new NullValue();
+            }
+        } else { // "+", "-", "*", "/", "mod"
+            NumberValue *r = right->toNumber();
+            NumberValue *l = left->toNumber();
+            double rn = r->getValue();
+            double ln = l->getValue();
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "evaluating arithmetic operation " << type << " on " << rn << ", " << ln;
+#endif
+            delete right;
+            delete r;
+            delete left;
+            delete l;
+            switch(type) {
+                case Plus:
+                    return new NumberValue(ln + rn);
+                case Minus:
+                    return new NumberValue(ln - rn);
+                case Times:
+                    return new NumberValue(ln * rn);
+                case Div:
+                    return new NumberValue(ln / rn);
+                case Mod:
+                    return new NumberValue(ln - rn * floor(ln / rn));
+                default:
+                    // should not happen.
+                    AC_ERROR << "Not yet implemented.";
+                    assert(false);
+                    return new NullValue();
+            }
         }
-        return ExpressionPtr();
     }
 
-    inline MultiplicativeExpr::Operator readMultOperator(ParseInput& pi)
-    {
-        if( pi.readIf('*') ) {
-            return MultiplicativeExpr::Operator_Mul;
+    void BinaryExpression::serializeTo(std::ostream &os) {
+        BinaryExpression *lv = dynamic_cast<BinaryExpression*>(lvalue);
+        if (lv) {
+            os << "(";
         }
-        if( pi.readIf("mod") ) {
-            return MultiplicativeExpr::Operator_Mod;
+        lvalue->serializeTo(os);
+        if (lv) {
+            os << ")";
         }
-        if( pi.readIf("div") ) {
-            return MultiplicativeExpr::Operator_Div;
+
+        switch(type) {
+            case Equal:
+                os << " = ";
+                break;
+            case NotEqual:
+                os << " != ";
+                break;
+            case Greater:
+                os << " > ";
+                break;
+            case GEqual:
+                os << " >= ";
+                break;
+            case Less:
+                os << " < ";
+                break;
+            case LEqual:
+                os << " <= ";
+                break;
+            case Or:
+                os << " or ";
+                break;
+            case And:
+                os << " and ";
+                break;
+            case Plus:
+                os << " + ";
+                break;
+            case Minus:
+                os << " - ";
+                break;
+            case Times:
+                os << " * ";
+                break;
+            case Div:
+                os << " div ";
+                break;
+            case Mod:
+                os << " mod ";
+                break;
+            default:
+                os << " ** unknown operator ** ";
+                break;
         }
-        pi.setErrorIndex();
-        return MultiplicativeExpr::Operator_Invalid;
+        BinaryExpression *rv = dynamic_cast<BinaryExpression*>(rvalue);
+        if (rv) {
+            os << "(";
+        }
+        rvalue->serializeTo(os);
+        if (rv) {
+            os << ")";
+        }
     }
 
-    inline AdditiveExpr::Operator readAddOperator(ParseInput& pi)
-    {
-        if( pi.readIf('+') ) {
-            return AdditiveExpr::Operator_Plus;
+    void UnaryExpression::serializeTo(std::ostream &os) {
+        switch(type) {
+            case Minus:
+                os << "-";
+                break;
+            case Tilde:
+                os << "~";
+                break;
+            case Not:
+                os << "!";
+            default:
+                AC_ERROR << "Not yet implemented!";
+                assert(false);
+        };
+        argument->serializeTo(os);
+    }
+
+    Value *UnaryExpression::evaluateExpression(const Context &c) {
+        if (type==Minus) {
+            Value *subvalue = argument->evaluateExpression(c);
+            NumberValue *retval = subvalue->toNumber();
+            delete subvalue;
+            retval->negate();
+            return retval;
+        } else {
+            assert(false);
         }
-        if( pi.readIf('-') ) {
-            return AdditiveExpr::Operator_Minus;
+        return new NullValue();
+    }
+
+    void SetExpression::serializeTo(std::ostream &os) {
+        std::list<Path *>::iterator i = sets.begin();
+        if (*i) {
+            (*i)->serializeTo(os);
+            while ((++i) != sets.end()) {
+                os << " | ";
+                (*i)->serializeTo(os);
+            }
         }
-        pi.setErrorIndex();
-        return AdditiveExpr::Operator_Invalid;
+    }
+
+    Value *SetExpression::evaluateExpression(const Context &c) {
+        std::list<Path*>::iterator i = sets.begin();
+
+        NodeSetValue *firstValue = (*i)->evaluate(c.currentNode);
+
+        NodeSetRef v = firstValue->takeNodes();
+        delete firstValue;
+
+        while (++i != sets.end()) {
+            NodeSetValue *thisValue = (*i)->evaluate(c.currentNode);
+            NodeSetRef vcur = thisValue->takeNodes();
+            delete thisValue;
+
+            NodeSetRef vres = new NodeSet();
+            switch(m_op) {
+                case Union:
+                    std::set_union(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+                case Intersection:
+                    std::set_intersection(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+                case Difference:
+                    std::set_difference(v->begin(), v->end(), vcur->begin(), vcur->end(), std::inserter(*vres, vres->begin()));
+                    break;
+            }
+            delete vcur;
+            delete v;
+            v = vres;
+        }
+        return new NodeSetValue(v);
+    }
+
+    Function::~Function() {
+        delete arguments;
+    }
+
+    typedef std::list<Expression*>::iterator ExpIter;
+
+    void Function::serializeTo(std::ostream &os) {
+        os << nameOf(type);
+        os << "(";
+
+        ExpIter i = arguments->begin();
+        if (i != arguments->end()) {
+            (*i)->serializeTo(os);
+
+            for (++i; i != arguments->end();++i) {
+                os << ", ";
+                (*i)->serializeTo(os);
+            }
+        }
+        os << ")";
+    }
+
+    Value *Function::evaluateExpression(const Context &c) {
+        switch(type) {
+            case Last:
+                return new NumberValue(c.size);
+            case Position:
+                return new NumberValue(c.position);
+            case Count:
+                {
+                    if (!arguments) {
+                        return new NumberValue(0);
+                    }
+
+                    Value *v = arguments->front()->evaluateExpression(c);
+
+                    AC_TRACE << "counting \"" << *(arguments->front()) <<"\"...";
+
+                    // convert into a nodeSet
+                    NodeSetValue *nsv = dynamic_cast<NodeSetValue*>(v);
+
+                    if (!nsv) {
+                        delete v;
+                        AC_WARNING << " ... failed: argument not a node-set!";
+                        return new NumberValue(0);
+                    }
+
+                    // and count the nodeSet
+                    int retval = nsv->length();
+                    delete nsv;
+                    AC_TRACE << " returning: " << retval;
+                    return new NumberValue(retval);
+                }
+
+            case StartsWith:
+                {
+                    if (!arguments || !arguments->size()) {
+                        AC_WARNING << "Warning: " << *this << " called with zero arguments.";
+                        return new NullValue();
+                    }
+
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+                    assert(firstExpr);
+
+                    if (!secondExpr) {
+                        AC_WARNING << "Warning: " << *this << " called with only one argument.";
+                        return new NullValue();
+                    }
+
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+
+                    bool retval = equals_as<StringValue>(first, second);
+                    delete first;
+                    delete second;
+                    return new BooleanValue(retval);
+                }
+
+            case Concat:
+                {
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
+                    }
+
+                    string retval;
+                    for (ExpIter i = arguments->begin(); i != arguments->end(); ++i) {
+                        Value *currentvalue = (*i)->evaluateExpression(c);
+                        StringValue *currentstring = currentvalue->toString();
+                        retval+=currentstring->getValue();
+                        delete currentstring;
+                        delete currentvalue;
+                    }
+                    return new StringValue(retval);
+                }
+
+            case Contains:
+                {
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
+                    }
+
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+
+                    if (!secondExpr) {
+                        AC_WARNING << "ERROR: parameter missing to function call " << *this;
+                        return new NullValue();
+                    }
+
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
+
+                    delete first;
+                    delete second;
+
+                    bool retval = firstString->getValue().find(secondString->getValue()) >= 0;
+
+                    delete firstString;
+                    delete secondString;
+
+                    return new BooleanValue(retval);
+                }
+
+            case Substring:
+                {
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
+                    }
+
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+                    Expression *thirdExpr = NULL;
+                    if (++i != arguments->end()) {
+                        AC_TRACE << " three arguments for " << *this;
+                        thirdExpr = *i;
+                    }
+                    assert(firstExpr);
+
+                    if (!secondExpr) {
+                        AC_TRACE << "substring expression: second argument is not a number.";
+                        return new NullValue();
+                    }
+
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+                    Value *third = NULL;
+                    if (thirdExpr) {
+                        third = thirdExpr->evaluateExpression(c);
+                    }
+
+                    StringValue *firstString = first->toString();
+                    NumberValue *secondNumber = second->toNumber();
+                    NumberValue *thirdNumber = NULL;
+                    if (thirdExpr) {
+                        thirdNumber= third->toNumber();
+                    }
+
+                    delete first;
+                    delete second;
+
+                    if (third) {
+                        delete third;
+                    }
+
+                    int secondNumberValue = int(secondNumber->getValue()+0.5) - 1;
+                    if (secondNumberValue < 0) {
+                        AC_WARNING << "substring: round(secondNumberValue->getValue()+0.5) = " << secondNumberValue+1 << "is less than 1!";
+                        secondNumberValue = 0;
+                    }
+
+                    int resultlength;
+                    AC_TRACE << "substring: complete string is \"" << firstString->getValue() << "\"";
+                    resultlength = firstString->getValue().length() - secondNumberValue;
+
+                    // +1 for the terminating null character
+                    if (thirdNumber && thirdNumber->getValue() + 1 < resultlength) {
+                        resultlength = int(thirdNumber->getValue()+0.5) + 1;
+                    }
+
+                    AC_TRACE << "substring: length = " << resultlength;
+
+                    string result = firstString->getValue().substr(secondNumberValue, resultlength);
+
+                    delete firstString;
+                    delete secondNumber;
+                    if (thirdNumber) {
+                        delete thirdNumber;
+                    }
+
+                    AC_TRACE << "substring expression evaluates to \"" << result << "\"";
+                    StringValue * resultvalue = new StringValue(result);
+                    return resultvalue;
+
+                }
+            case SubstringBefore:
+                {
+                    if (!arguments || !arguments->size())
+                        return new NullValue();
+
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+                    assert(firstExpr);
+
+                    if (!secondExpr) {
+                        return new NullValue();
+                    }
+
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
+
+                    delete first;
+                    delete second;
+
+                    int endPos = firstString->getValue().find(secondString->getValue());
+
+                    StringValue *retval = new StringValue(firstString->getValue().substr(0, endPos));
+
+                    delete firstString;
+                    delete secondString;
+
+                    return retval;
+                }
+            case SubstringAfter:
+                {
+                    if (!arguments || !arguments->size()) {
+                        return new NullValue();
+                    }
+
+                    ExpIter i = arguments->begin();
+                    Expression *firstExpr = *i;
+                    Expression *secondExpr = *(++i);
+
+                    if (!secondExpr) {
+                        return new NullValue();
+                    }
+
+                    Value *first = firstExpr->evaluateExpression(c);
+                    Value *second = secondExpr->evaluateExpression(c);
+
+                    StringValue *firstString = first->toString();
+                    StringValue *secondString = second->toString();
+
+                    delete first;
+                    delete second;
+
+                    int pos = firstString->getValue().find(secondString->getValue());
+
+                    StringValue *retval = new StringValue(secondString->getValue().substr(pos+secondString->getValue().length()));
+                    delete firstString;
+                    delete secondString;
+
+                    return retval;
+                }
+            case True:
+                return new BooleanValue(true);
+            case False:
+                return new BooleanValue(false);
+            case Not:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    BooleanValue *v = result->toBoolean();
+                    bool vval = v->getValue();
+                    delete result;
+                    delete v;
+                    return new BooleanValue(!vval);
+                }
+            case Boolean:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    BooleanValue *retval = result->toBoolean();
+                    delete result;
+                    return retval;
+                }
+            case Number:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    return retval;
+                }
+            case String:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *retval = result->toString();
+                    delete result;
+                    return retval;
+                }
+            case Sum:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NodeSetValue *ns = result->toNodeSet();
+                    delete result;
+                    NodeSetRef nodes = ns->takeNodes();
+                    delete ns;
+                    double retval = 0;
+                    for( NodeSet::iterator i = nodes->begin(); i != nodes->end(); ++i) {
+                        retval += number_value_for(*i);
+                    }
+                    delete nodes;
+                    return new NumberValue(retval);
+                }
+            case Floor:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    double ret = ::floor(retval->getValue());
+                    delete retval;
+                    return new NumberValue(ret);
+                }
+            case Ceiling:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    delete result;
+                    double ret = ::ceil(retval->getValue());
+                    delete retval;
+                    return new NumberValue(ret);
+                }
+            case Round:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    NumberValue *retval = result->toNumber();
+                    double ret = ::floor(retval->getValue()+0.5);
+                    delete retval;
+                    return new NumberValue(ret);
+                }
+            case StringLength:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *retval = result->toString();
+                    int length = retval->getValue().length();
+                    delete result;
+                    delete retval;
+                    return new NumberValue(length);
+                }
+            case NormalizeSpace:
+                {
+                    Value *result = arguments->front()->evaluateExpression(c);
+                    StringValue *sval = result->toString();
+                    string s = sval->getValue();
+                    delete result;
+                    delete sval;
+                    string retval;
+                    for (int i = asl::read_whitespace(s, 0); i < s.length(); i++) {
+                        retval+=s[i];
+                        i = asl::read_whitespace(s, i);
+                    }
+                    return new StringValue(s);
+                }
+            case Translate:
+                {
+                    ExpIter arg = arguments->begin();
+                    Value *result = (*arg)->evaluateExpression(c);
+                    StringValue *sval = result->toString();
+                    string s = sval->getValue();
+                    delete result;
+                    delete sval;
+
+                    ++arg;
+                    result = (*arg)->evaluateExpression(c);
+                    sval = result->toString();
+                    string from = sval->getValue();
+                    delete result;
+                    delete sval;
+
+                    ++arg;
+                    result = (*arg)->evaluateExpression(c);
+                    sval = result->toString();
+                    string to = sval->getValue();
+                    delete result;
+                    delete sval;
+
+                    string retval;
+                    for (int i = 0; i < s.length(); i++) {
+                        int pos;
+                        if ((pos = from.find(s[i])) && pos < to.length()) {
+                            retval+=to[pos];
+                        } else {
+                            retval+=s[i];
+                        }
+                    }
+                    return new StringValue(s);
+                }
+            case Id:
+            case Name:
+            case LocalName:
+            case NamespaceURI:
+            case Lang:
+            case Unknown:
+            default:
+                AC_ERROR << " ** access to unknown function ** ";
+                return new BooleanValue(false);
+        };
+    };
+
+    string Function::nameOf(Function::FunctionType ft) {
+        switch(ft) {
+            case Last:
+                return FUNCTIONNAME_LAST;
+            case Position:
+                return FUNCTIONNAME_POSITION;
+            case Count:
+                return FUNCTIONNAME_COUNT;
+            case StartsWith:
+                return FUNCTIONNAME_STARTSWITH;
+            case Concat:
+                return FUNCTIONNAME_CONCAT;
+            case Contains:
+                return FUNCTIONNAME_CONTAINS;
+            case Substring:
+                return FUNCTIONNAME_SUBSTRING;
+            case SubstringBefore:
+                return FUNCTIONNAME_SUBSTRING_BEFORE;
+            case SubstringAfter:
+                return FUNCTIONNAME_SUBSTRING_AFTER;
+            case Not:
+                return FUNCTIONNAME_NOT;
+            case Id:
+                return FUNCTIONNAME_ID;
+            case LocalName:
+                return FUNCTIONNAME_LOCAL_NAME;
+            case NamespaceURI:
+                return FUNCTIONNAME_NAMESPACE_URI;
+            case Name:
+                return FUNCTIONNAME_NAME;
+            case String:
+                return FUNCTIONNAME_STRING;
+            case StringLength:
+                return FUNCTIONNAME_STRING_LENGTH;
+            case NormalizeSpace:
+                return FUNCTIONNAME_NORMALIZE_SPACE;
+            case Translate:
+                return FUNCTIONNAME_TRANSLATE;
+            case Boolean:
+                return FUNCTIONNAME_BOOLEAN;
+            case True:
+                return FUNCTIONNAME_TRUE;
+            case False:
+                return FUNCTIONNAME_FALSE;
+            case Lang:
+                return FUNCTIONNAME_LANG;
+            case Number:
+                return FUNCTIONNAME_NUMBER;
+            case Sum:
+                return FUNCTIONNAME_SUM;
+            case Floor:
+                return FUNCTIONNAME_FLOOR;
+            case Ceiling:
+                return FUNCTIONNAME_CEILING;
+            case Round:
+                return FUNCTIONNAME_ROUND;
+            default:
+                return FUNCTIONNAME_UNKNOWN;
+        }
     }
     
-    inline RelationalExpr::Operator readRelOperator(ParseInput& pi)
-    {
-        if( pi.readIf('<') ) {
-            return RelationalExpr::Operator_Less;
-        }
-        if( pi.readIf('>') ) {
-            return RelationalExpr::Operator_Greater;
-        }
-        if( pi.readIf("<=") ) {
-            return RelationalExpr::Operator_LessEqual;
-        }
-        if( pi.readIf(">=") ) {
-            return RelationalExpr::Operator_GreaterEqual;
-        }
-        pi.setErrorIndex();
-        return RelationalExpr::Operator_Invalid;
-    }
+#define RETCMP(instring, pos, X, yes, no) \
+    return ( asl::read_if_string(instring, pos, X) != pos) ? yes : no;
 
-    inline EqualityExpr::Operator readEquOperator(ParseInput& pi)
-    {
-        if( pi.readIf('=') ) {
-            return EqualityExpr::Operator_Equal;
-        }
-        if( pi.readIf("!=") ) {
-            return EqualityExpr::Operator_Unequal;
-        }
-        pi.setErrorIndex();
-        return EqualityExpr::Operator_Invalid;
-    }
-
-    inline bool readUnionOperator(ParseInput& pi)
-    {
-        return pi.readIf('|');
-    }
-
-    /******************************************************************************************/
-
-    ExpressionPtr readNumberExpr(ParseInput& pi)
-    {
-        std::string numstr;
-        while( asl::is_digit(pi.peekNextChar()) ) {
-            numstr += pi.getNextChar();
-        }
-        if( pi.readIf('.') ) {
-            numstr += '.';
-            while( asl::is_digit(pi.peekNextChar()) ) {
-                numstr += pi.getNextChar();
-            }
-        }
-        std::istringstream iss(numstr);
-        Number num;
-        iss >> num;
-        assert( iss && iss.eof() );
-        return ExpressionPtr( new NumberExpr(num) );
-    }
-
-    ExpressionPtr readLiteralExpr(ParseInput& pi)
-    {
-        const std::string& lit = pi.readQuotedText(pi.peekNextChar(),pi.peekNextChar());
-        return ExpressionPtr( new LiteralExpr(lit) );
-    }
-
-    ExpressionPtr readFunctionCallExpr(ParseInput& pi)
-    {
-        //[16]    FunctionCall                    ::= FunctionName '(' ( Argument ( ',' Argument )* )? ')'
-        //[17]    Argument                        ::= Expr
-        const FunctionCallExpr::FunctionInfo functionInfo = FunctionCallExpr::readFunctionType(pi);
-        if( functionInfo.functionType != FunctionCallExpr::Func_Invalid ) {
-            ParseState ps(pi);
-            if( pi.readIf('(') ) {
-                FunctionCallExpr::Arguments arguments;
-                // read arguments
-                while( !pi.readIf(')') ) {
-                    if( isEndOfExpr(pi) ) {
-                        pi.setErrorIndex();
-                        throw xpath::SyntaxError( "Function call missing ')'", PLUS_FILE_LINE );
-                    }
-                    ExpressionPtr expr = readExpression(pi);
-                    if( expr ) {
-                        arguments.push_back(expr);
-                        if( pi.readIf(')') ) {
-                            break;
+    Function::FunctionType Function::typeOf(string instring, int pos) {
+        switch(instring[pos]) {
+            case 'l':
+                switch(instring[pos+2]) {
+                    case 's':
+                        RETCMP(instring, pos, FUNCTIONNAME_LAST,
+                                Function::Last, Function::Unknown);
+                    case 'n':
+                        RETCMP(instring, pos, FUNCTIONNAME_LANG,
+                                Function::Lang, Function::Unknown);
+                    case 'c':
+                        RETCMP(instring, pos, FUNCTIONNAME_LOCAL_NAME,
+                                Function::LocalName, Function::Unknown);
+                }
+            case 'p':
+                RETCMP(instring, pos, FUNCTIONNAME_POSITION,
+                        Function::Position, Function::Unknown);
+            case 'c':
+                switch(instring[pos+3]) {
+                    case 'n':
+                        RETCMP(instring, pos, FUNCTIONNAME_COUNT,
+                                Function::Count, Function::Unknown);
+                    case 'l':
+                        RETCMP(instring, pos, FUNCTIONNAME_CEILING,
+                                Function::Ceiling, Function::Unknown);
+                    case 'c':
+                        RETCMP(instring, pos, FUNCTIONNAME_CONCAT,
+                                Function::Concat, Function::Unknown);
+                    case 't':
+                        RETCMP(instring, pos, FUNCTIONNAME_CONTAINS,
+                                Function::Contains, Function::Unknown);
+                    default:
+                        return Function::Unknown;
+                }
+            case 's':
+                switch(instring[pos+2]) {
+                    case 'a':
+                        RETCMP(instring, pos, FUNCTIONNAME_STARTSWITH,
+                                Function::StartsWith, Function::Unknown);
+                    case 'm':
+                        RETCMP(instring, pos, FUNCTIONNAME_SUM,
+                                Function::Sum, Function::Unknown);
+                    case 'r':
+                        if (instring.length() > pos + 6 &&
+                            instring[pos+6] == '-')
+                        {
+                            RETCMP(instring, pos, FUNCTIONNAME_STRING_LENGTH,
+                                    Function::StringLength, Function::Unknown);
+                        } else {
+                            RETCMP(instring, pos, FUNCTIONNAME_STRING,
+                                    Function::String, Function::Unknown);
                         }
-                        if( !pi.readIf(',') ) {
-                            pi.setErrorIndex();
-                            return ExpressionPtr();
+                    case 'b':
+                        if (instring.length() > pos + 9 &&
+                            instring[pos+9] == '-')
+                        {
+                            switch(instring[pos+10]) {
+                                case 'a':
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_AFTER,
+                                            Function::SubstringAfter, Function::Unknown);
+                                case 'b':
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING_BEFORE,
+                                            Function::SubstringBefore, Function::Unknown);
+                                default:
+                                    RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING,
+                                            Function::Substring, Function::Unknown);
+                            }
                         }
-                    } else {
-                        if( !arguments.empty() ) {
-                            pi.setErrorIndex();
-                            return ExpressionPtr();
+                        RETCMP(instring, pos, FUNCTIONNAME_SUBSTRING,
+                                Function::Substring, Function::Unknown);
+                }
+            case 'n':
+                switch(instring[pos+2]) {
+                    case 'm':
+                        RETCMP(instring, pos, FUNCTIONNAME_NUMBER,
+                                Function::Number, Function::Unknown);
+                    case 'r':
+                        RETCMP(instring, pos, FUNCTIONNAME_NORMALIZE_SPACE,
+                                Function::NormalizeSpace, Function::Unknown);
+                    case 't':
+                        RETCMP(instring, pos, FUNCTIONNAME_NOT,
+                                Function::Not, Function::Unknown);
+                    case 'a':
+                        if (instring.length() > pos +3 &&
+                            instring[pos+4] == 's')
+                        {
+                            RETCMP(instring, pos, FUNCTIONNAME_NAMESPACE_URI,
+                                    Function::NamespaceURI, Function::Unknown);
+                        } else {
+                            RETCMP(instring, pos, FUNCTIONNAME_NAME,
+                                    Function::Name, Function::Unknown);
                         }
-                    }
                 }
-                ps.commit();
-                return ExpressionPtr( new FunctionCallExpr(functionInfo.functionType,arguments) );
-            }
-        }
-        pi.setErrorIndex();
-        return ExpressionPtr();
-    }
-
-    ExpressionPtr readVariableReferenceExpr(ParseInput& pi)
-    {
-        ParseState ps(pi);
-        if( !pi.readIf('$') ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-        const std::string& identifier = pi.readIdentifier();
-        if( identifier.empty() ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-        ps.commit();
-        return ExpressionPtr( new VariableRefExpr(identifier) );
-    }
-
-    ExpressionPtr readPrimaryExpr(ParseInput& pi)
-    {
-        //[15]    PrimaryExpr                     ::= '(' Expr ')'
-        if( '(' == pi.peekNextChar(true) ) {
-            ParseState ps(pi);
-            if( const ExpressionPtr expr = tryRead(pi,&readExpression) ) {
-                if( isEndOfExpr(pi) || pi.readIf(')') ) {
-                    ps.commit();
-                    return expr;
+            case 'i':
+                RETCMP(instring, pos, FUNCTIONNAME_ID, Function::Id,
+                        Function::Unknown);
+            case 't':
+                if (instring[pos+2]== 'u') {
+                    RETCMP(instring, pos, FUNCTIONNAME_TRUE, Function::True,
+                            Function::Unknown);
+                } else {
+                    RETCMP(instring, pos, FUNCTIONNAME_TRANSLATE,
+                            Function::Translate, Function::Unknown);
                 }
-            }
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        //                                          | VariableReference
-        if( '$' == pi.peekNextChar(true) ) {
-            return readVariableReferenceExpr(pi);
-        }
-
-        //                                          | Number
-        if( asl::is_digit(pi.peekNextChar(true)) ) {
-            return readNumberExpr(pi);
-        }
-
-        //                                          | Literal
-        if( isQuote(pi.peekNextChar(true)) ) {
-            return readLiteralExpr(pi);
-        }
-
-        //                                          | FunctionCall
-        if( const ExpressionPtr expr = tryRead(pi,&readFunctionCallExpr) ) {
-            return expr;
-        }
-
-        pi.setErrorIndex();
-        return ExpressionPtr();
-    }
-
-    ExpressionPtr readFilterExpr(ParseInput& pi)
-    {
-        //[20]    FilterExpr                      ::= PrimaryExpr
-        ExpressionPtr expr = readPrimaryExpr(pi);
-        if( !expr ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-        ExpressionPtr predicate;
-        //                                          | FilterExpr Predicate
-        if( '['==pi.peekNextChar() ) {
-            predicate = readExpression(pi);
-        }
-        return ExpressionPtr( new FilterExpr(expr,predicate) );
-    }
-
-    ExpressionPtr readPathExpr(ParseInput& pi)
-    {
-        //[19]    PathExpr                        ::= LocationPath
-        ParseState ps(pi);
-        xpath::Path::StepList stepList;
-        parsePath(pi,stepList.steps);
-        if( ps.hasRead() ) {
-            xpath::Path path(stepList);
-            ps.commit();
-            return ExpressionPtr( new PathExpr(path) );
-        }
-        //                                          | FilterExpr
-        ExpressionPtr expr = readFilterExpr(pi);
-        if( !expr ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-        if( '/' != pi.peekNextChar(true) ) {
-            ps.commit();
-            return expr;
-        }
-        //                                          | FilterExpr '/' RelativeLocationPath !!!
-        //                                          | FilterExpr '//' RelativeLocationPath !!!
-        pi.setErrorIndex();
-        throw xpath::NotImplemented( "This is not implemented (see http://www.w3.org/TR/1999/REC-xpath-19991116#NT-PathExpr, production #3 and #4)", PLUS_FILE_LINE );
-    }
-
-    ExpressionPtr readUnionExpr(ParseInput& pi)
-    {
-       //[18]    UnionExpr                       ::= PathExpr
-        ExpressionPtr lhs = tryRead(pi,&readPathExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | UnionExpr '|' PathExpr
-        while( readUnionOperator(pi) ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readPathExpr) ) {
-                lhs = ExpressionPtr( new UnionExpr(lhs,rhs) );
-            } else {
-                return lhs;
-            }
-        }
-        ps.commit();
-        return lhs;
-
-    }
-
-    ExpressionPtr readUnaryExpr(ParseInput& pi)
-    {
-        //[27]    UnaryExpr                       ::= '-' UnaryExpr
-        if( pi.readIf('-') ) {
-            return ExpressionPtr( new UnaryExpr(readUnaryExpr(pi),true) );
-        }
-        //                                          | UnionExpr
-        return readUnionExpr(pi);
-    }
-
-    ExpressionPtr readMultiplicativeExpr(ParseInput& pi)
-    {
-        //[26]    MultiplicativeExpr              ::= UnaryExpr
-        ExpressionPtr lhs = tryRead(pi,&readUnaryExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | MultiplicativeExpr MultiplyOperator UnaryExpr
-        //                                          | MultiplicativeExpr 'div' UnaryExpr
-        //                                          | MultiplicativeExpr 'mod' UnaryExpr
-        while( MultiplicativeExpr::Operator op = readMultOperator(pi) ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readUnaryExpr) ) {
-                lhs = ExpressionPtr( new MultiplicativeExpr(lhs,rhs,op) );
-            } else {
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    ExpressionPtr readAdditiveExpr(ParseInput& pi)
-    {
-        //[25]    AdditiveExpr                    ::= MultiplicativeExpr
-        //                                          | AdditiveExpr '+' MultiplicativeExpr
-        //                                          | AdditiveExpr '-' MultiplicativeExpr
-        ExpressionPtr lhs = tryRead(pi,&readMultiplicativeExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | AdditiveExpr '+' MultiplicativeExpr
-        //                                          | AdditiveExpr '-' MultiplicativeExpr
-        while( AdditiveExpr::Operator op = readAddOperator(pi) ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readUnaryExpr) ) {
-                lhs = ExpressionPtr( new AdditiveExpr(lhs,rhs,op) );
-            } else {
-                pi.setErrorIndex();
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    ExpressionPtr readRelationalExpr(ParseInput& pi)
-    {
-        //[24]    RelationalExpr                  ::= AdditiveExpr
-        ExpressionPtr lhs = tryRead(pi,&readAdditiveExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | RelationalExpr '<' AdditiveExpr
-        //                                          | RelationalExpr '>' AdditiveExpr
-        //                                          | RelationalExpr '<=' AdditiveExpr
-        //                                          | RelationalExpr '>=' AdditiveExpr
-        while( RelationalExpr::Operator op = readRelOperator(pi) ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readAdditiveExpr) ) {
-                lhs = ExpressionPtr( new RelationalExpr(lhs,rhs,op) );
-            } else {
-                pi.setErrorIndex();
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    ExpressionPtr readEqualityExpr(ParseInput& pi)
-    {
-        //[23]    EqualityExpr                    ::= RelationalExpr
-        ExpressionPtr lhs = tryRead(pi,&readRelationalExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | EqualityExpr '=' RelationalExpr
-        //                                          | EqualityExpr '!=' RelationalExpr
-        while( EqualityExpr::Operator op = readEquOperator(pi) ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readRelationalExpr) ) {
-                lhs = ExpressionPtr( new EqualityExpr(lhs,rhs,op) );
-            } else {
-                pi.setErrorIndex();
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    ExpressionPtr readAndExpr(ParseInput& pi)
-    {
-        //[22]    AndExpr                         ::= EqualityExpr
-        ExpressionPtr lhs = tryRead(pi,&readEqualityExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | AndExpr 'and' EqualityExpr
-        while( pi.readIf("and") ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readEqualityExpr) ) {
-                lhs = ExpressionPtr( new AndExpr(lhs,rhs) );
-            } else {
-                pi.setErrorIndex();
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    ExpressionPtr readOrExpr(ParseInput& pi)
-    {
-        //[21]    OrExpr                          ::= AndExpr
-        ExpressionPtr lhs = tryRead(pi,&readAndExpr);
-        if( !lhs ) {
-            pi.setErrorIndex();
-            return ExpressionPtr();
-        }
-
-        ParseState ps(pi);
-        //                                          | OrExpr 'or' AndExpr
-        while( pi.readIf("or") ) {
-            if( ExpressionPtr rhs = tryRead(pi,&readAndExpr) ) {
-                lhs = ExpressionPtr( new OrExpr(lhs,rhs) );
-            } else {
-                pi.setErrorIndex();
-                return ExpressionPtr();
-            }
-        }
-        ps.commit();
-        return lhs;
-    }
-
-    /******************************************************************************************/
-
-    inline FunctionCallExpr::ExpressionPtr getArg( const FunctionCallExpr::Arguments& args
-                                                 , std::size_t                        idx )
-    {
-        if( args.size() < idx ) {
-            throw xpath::SyntaxError( "Invalid number of function call arguments", PLUS_FILE_LINE );
-        }
-        return args[idx-1];
-    }
-
-    template< typename Result >
-    inline Result getArgAs( const FunctionCallExpr::Arguments&  args
-                          , std::size_t                         idx
-                          , const Predicate::EvaluationContext& evContext )
-    {
-        FunctionCallExpr::ExpressionPtr expr = getArg(args,idx);
-        const Object& obj = expr->doEvaluate(evContext);
-        return obj.as<Result>();
-    }
-
-    inline String::size_type findSubString(const StringValue& str, const StringValue& substr)
-    {
-        return str.getValue().find(substr.getValue());
-    }
-
-    inline char readNextNormalizedChar(String& result, const String& str, String::size_type& idx)
-    {
-        assert(idx<str.size());
-
-        if( asl::is_space(str[idx]) ) {
-            do {
-                if( ++idx == str.size() ) {
-                    return '\0';
+            case 'b':
+                RETCMP(instring, pos, FUNCTIONNAME_BOOLEAN,
+                        Function::Boolean, Function::Unknown);
+            case 'f':
+                if (instring[pos+1]== 'a') {
+                    RETCMP(instring, pos, FUNCTIONNAME_FALSE,
+                            Function::False, Function::Unknown);
+                } else {
+                    RETCMP(instring, pos, FUNCTIONNAME_FLOOR,
+                            Function::Floor, Function::Unknown);
                 }
-            } while( asl::is_space(str[idx]) );
-            return ' ';
-        } else {
-            return str[idx++];
+            case 'r':
+                RETCMP(instring, pos, FUNCTIONNAME_ROUND,
+                        Function::Round, Function::Unknown);
+            default:
+                return Function::Unknown;
         }
     }
 
-    Object executeFunc_Id             (const FunctionCallExpr::Arguments&     , const Predicate::EvaluationContext&          )
-    {
-        throw xpath::NotImplemented( "Function 'id()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_StartsWith     (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        const String::size_type idx = findSubString( getArgAs<StringValue>(args,1,evContext)
-                                                   , getArgAs<StringValue>(args,2,evContext) );
-        return Object( 0 == idx );
-    }
-
-    Object executeFunc_Contains       (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        const String::size_type idx = findSubString( getArgAs<StringValue>(args,1,evContext)
-                                                   , getArgAs<StringValue>(args,2,evContext) );
-        return Object( String::npos != idx );
-    }
-
-    Object executeFunc_Boolean        (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( getArg(args,1)->doEvaluate(evContext).as<BooleanValue>() );
-    }
-
-    Object executeFunc_Not            (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( !( getArg(args,1)->doEvaluate(evContext).as<BooleanValue>().getValue() ) );
-    }
-
-    Object executeFunc_True           (const FunctionCallExpr::Arguments&     , const Predicate::EvaluationContext&          )
-    {
-        return Object( true );
-    }
-
-    Object executeFunc_False          (const FunctionCallExpr::Arguments&     , const Predicate::EvaluationContext&          )
-    {
-        return Object( false );
-    }
-
-    Object executeFunc_Lang           (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'lang()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_Last           (const FunctionCallExpr::Arguments&     , const Predicate::EvaluationContext& evContext)
-    {
-        return Object( static_cast<Number>(evContext.nodeSetSize) );
-    }
-
-    Object executeFunc_Position       (const FunctionCallExpr::Arguments&     , const Predicate::EvaluationContext& evContext)
-    {
-        return Object( static_cast<Number>(evContext.proximityPos) );
-    }
-
-    Object executeFunc_Count          (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( static_cast<Number>(getArg(args,1)->doEvaluate(evContext).as<NodeSetValue>().getValue().size()) );
-    }
-
-    Object executeFunc_StringLength   (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( static_cast<Number>(getArg(args,1)->doEvaluate(evContext).as<StringValue>().getValue().size()) );
-    }
-
-    Object executeFunc_Number         (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( getArg(args,1)->doEvaluate(evContext).as<NumberValue>().getValue() );
-    }
-
-    Object executeFunc_Sum            (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'sum()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_Floor          (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( std::floor( getArg(args,1)->doEvaluate(evContext).as<NumberValue>().getValue() ) );
-    }
-
-    Object executeFunc_Ceiling        (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( std::ceil ( getArg(args,1)->doEvaluate(evContext).as<NumberValue>().getValue() ) );
-    }
-
-    Object executeFunc_Round          (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( std::floor( getArg(args,1)->doEvaluate(evContext).as<NumberValue>().getValue() + .5 ) );
-    }
-
-    Object executeFunc_LocalName      (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'local-name()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_NamespaceURI   (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'namespace-uri()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_Name           (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'name()' is not implemented", PLUS_FILE_LINE );
-    }
-
-    Object executeFunc_String         (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( getArg(args,1)->doEvaluate(evContext).as<StringValue>() );
-    }
-
-    Object executeFunc_Concat         (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        String result;
-        result += getArgAs<StringValue>(args,1,evContext).getValue();
-        result += getArgAs<StringValue>(args,2,evContext).getValue();
-        for( FunctionCallExpr::Arguments::size_type idx=3; idx<=args.size(); ++idx ) {
-            result += getArgAs<StringValue>(args,idx,evContext).getValue();
-        }
-        return Object( result );
-    }
-
-    Object executeFunc_SubstringBefore(const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        const StringValue&    str = getArgAs<StringValue>(args,1,evContext);
-        const StringValue& substr = getArgAs<StringValue>(args,2,evContext);
-        const String::size_type idx = findSubString(str,substr);
-        return Object( str.getValue().substr(0,idx) );
-    }
-
-    Object executeFunc_SubstringAfter (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        const StringValue&    str = getArgAs<StringValue>(args,1,evContext);
-        const StringValue& substr = getArgAs<StringValue>(args,2,evContext);
-        const String::size_type idx = findSubString(str,substr);
-        return Object( str.getValue().substr(idx+substr.getValue().size()) );
-    }
-
-    Object executeFunc_Substring      (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        return Object( getArgAs<StringValue>(args,1,evContext).getValue().substr( static_cast<std::size_t>(getArgAs<NumberValue>(args,2,evContext).getValue())
-                                                                                , static_cast<std::size_t>(getArgAs<NumberValue>(args,3,evContext).getValue()) ) );
-    }
-
-    Object executeFunc_NormalizeSpace (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        const String str = getArgAs<StringValue>(args,1,evContext).getValue();
-        String result;
-        if( !str.empty() ) {
-            String::size_type idx = 0;
-            const char ch = readNextNormalizedChar(result,str,idx);
-            if( ch != '\0' && ch != ' ' ) {
-                result += ch;
-            }
-            while( idx < str.size()  ) {
-                const char ch = readNextNormalizedChar(result,str,idx);
-                if( ch != '\0') {
-                    result += ch;
+    void Step::serializeNodeTest(std::ostream &os) {
+        switch (test) {
+            case TestPrincipalType:
+                if (nodeTestName.length()) {
+                    os << nodeTestName;
+                } else {
+                    os << "*";
                 }
-            }
+                break;
+            case TestAnyNode:
+                os << "node()";
+                break;
+            case TestCommentNode:
+                os << "comment()";
+                break;
+            case TestTextNode:
+                os << "text()";
+                break;
+            case TestProcessingInstruction:
+                os << "processinginstruction(";
+                os << nodeTestName << ")";
+                break;
+            case InvalidTest:
+                os << "invalid";
+                break;
         }
-        return Object( result );
+        if (test != TestPrincipalType && test != TestProcessingInstruction && nodeTestName.length()) {
+            os << "[self::node() == \"" << nodeTestName << "\"]";
+        }
     }
 
-    Object executeFunc_Translate      (const FunctionCallExpr::Arguments& args, const Predicate::EvaluationContext& evContext)
-    {
-        throw xpath::NotImplemented( "Function 'translate()' is not implemented", PLUS_FILE_LINE );
-        /*
-        The translate function returns the first argument string with occurrences of characters 
-        in the second argument string replaced by the character at the corresponding position 
-        in the third argument string. For example, translate("bar","abc","ABC") returns the 
-        string "BAr". If there is a character in the second argument string with no character 
-        at a corresponding position in the third argument string (because the second argument 
-        string is longer than the third argument string), then occurrences of that character in 
-        the first argument string are removed. For example, translate("--aaa--","abc-","ABC") 
-        returns "AAA". If a character occurs more than once in the second argument string, then 
-        the first occurrence determines the replacement character. If the third argument string 
-        is longer than the second argument string, then excess characters are ignored.
-        */
+    Step::Step(Step::Axis _axis, Step::NodeTest _test, string name) :
+        axis( _axis ), test( _test ), nodeTestName( name ) { }
+
+    Step::Step() : axis( Child ), test( TestPrincipalType ) {}
+
+    Step::~Step() {
+        for (ExpIter i = predicates.begin(); i != predicates.end(); ++i) {
+            delete *i;
+        }
     }
 
-    const ValueType ValueType_Non       = static_cast<ValueType>(0);
-    const ValueType ValueType_Any       = static_cast<ValueType>(-1);
-    const ValueType ValueType_Ellipsis  = static_cast<ValueType>(-2);
+    const string &
+    Step::stringForAxis(Step::Axis a) {
+        switch(a) {
+            case Next_Sibling:      
+                return AXISNAME_NEXT_SIBLING;
+            case Previous_Sibling:
+                return AXISNAME_PREVIOUS_SIBLING;
+            case Following_Sibling:
+                return AXISNAME_FOLLOWING_SIBLING;
+            case Preceding_Sibling:
+                return AXISNAME_PRECEDING_SIBLING;
+            case Child:
+                return AXISNAME_CHILD;
+            case Parent:
+                return AXISNAME_PARENT;
+            case Descendant:
+                return AXISNAME_DESCENDANT;
+            case Ancestor:
+                return AXISNAME_ANCESTOR;
+            case Following:
+                return AXISNAME_FOLLOWING;
+            case Preceding:
+                return AXISNAME_PRECEDING;
+            case Ancestor_Or_Self:
+                return AXISNAME_ANCESTOR_OR_SELF;
+            case Descendant_Or_Self:
+                return AXISNAME_DESCENDANT_OR_SELF;
+            case Self:
+                return AXISNAME_SELF;
+            case Namespace:
+                return AXISNAME_NAMESPACE;
+            case Attribute:
+                return AXISNAME_ATTRIBUTE;
+            default:
+                return AXISNAME_INVALID;
+        }
+    }
 
+    // returns position past end of s if s is the exact next part
     inline
-    FunctionCallExpr::ParameterTypeList
-    buildParameterTypeList( ValueType vt1 = ValueType_Non
-                          , ValueType vt2 = ValueType_Non
-                          , ValueType vt3 = ValueType_Non
-                          , ValueType vt4 = ValueType_Non )
-    {
-        FunctionCallExpr::ParameterTypeList result;
-        if( vt1 != ValueType_Non ) result.push_back(vt1); else return result;
-        if( vt2 != ValueType_Non ) result.push_back(vt2); else return result;
-        if( vt3 != ValueType_Non ) result.push_back(vt3); else return result;
-        if( vt4 != ValueType_Non ) result.push_back(vt4); 
-        return result;
+    int
+    read_if_string(const string & is,int pos, const string & s) {
+        int i = 0;
+        int n = asl::minimum(s.size(),is.size()-pos);
+        while (i<n && pos < is.size() && is[pos+i] == s[i]) {
+            ++i;
+        }
+        if (i == s.size()) {
+            return pos + i;
+        }
+        return pos;
     }
 
-    typedef asl::static_dict_entry_type<FunctionCallExpr::FunctionInfo>::result_type
-                                                  FuncDictEntry;
-
-    const FuncDictEntry funcDictEntries[] = 
-        { FuncDictEntry( "id"               , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Id              , buildParameterTypeList( ValueType_Any                                  ), executeFunc_Id              ) )
-        , FuncDictEntry( "starts-with"      , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_StartsWith      , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_StartsWith      ) )
-        , FuncDictEntry( "contains"         , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Contains        , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_Contains        ) )
-        , FuncDictEntry( "boolean"          , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Boolean         , buildParameterTypeList( ValueType_Any                                  ), executeFunc_Boolean         ) )
-        , FuncDictEntry( "not"              , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Not             , buildParameterTypeList( ValueType_Any                                  ), executeFunc_Not             ) )
-        , FuncDictEntry( "true"             , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_True            , buildParameterTypeList(                                                ), executeFunc_True            ) )
-        , FuncDictEntry( "false"            , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_False           , buildParameterTypeList(                                                ), executeFunc_False           ) )
-        , FuncDictEntry( "lang"             , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Lang            , buildParameterTypeList( Value_String                                   ), executeFunc_Lang            ) )
-        , FuncDictEntry( "last"             , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Last            , buildParameterTypeList(                                                ), executeFunc_Last            ) )
-        , FuncDictEntry( "position"         , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Position        , buildParameterTypeList(                                                ), executeFunc_Position        ) )
-        , FuncDictEntry( "count"            , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Count           , buildParameterTypeList( Value_NodeSet                                  ), executeFunc_Count           ) )
-        , FuncDictEntry( "string-length"    , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_StringLength    , buildParameterTypeList( Value_String                                   ), executeFunc_StringLength    ) )
-        , FuncDictEntry( "number"           , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Number          , buildParameterTypeList( ValueType_Any                                  ), executeFunc_Number          ) )
-        , FuncDictEntry( "sum"              , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Sum             , buildParameterTypeList( Value_NodeSet                                  ), executeFunc_Sum             ) )
-        , FuncDictEntry( "floor"            , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Floor           , buildParameterTypeList( Value_Number                                   ), executeFunc_Floor           ) )
-        , FuncDictEntry( "ceiling"          , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Ceiling         , buildParameterTypeList( Value_Number                                   ), executeFunc_Ceiling         ) )
-        , FuncDictEntry( "round"            , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Round           , buildParameterTypeList( Value_Number                                   ), executeFunc_Round           ) )
-        , FuncDictEntry( "local-name"       , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_LocalName       , buildParameterTypeList( Value_NodeSet                                  ), executeFunc_LocalName       ) )
-        , FuncDictEntry( "namespace-uri"    , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_NamespaceURI    , buildParameterTypeList( Value_NodeSet                                  ), executeFunc_NamespaceURI    ) )
-        , FuncDictEntry( "name"             , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Name            , buildParameterTypeList( Value_NodeSet                                  ), executeFunc_Name            ) )
-        , FuncDictEntry( "string"           , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_String          , buildParameterTypeList( ValueType_Any                                  ), executeFunc_String          ) )
-        , FuncDictEntry( "concat"           , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Concat          , buildParameterTypeList( Value_String, Value_String, ValueType_Ellipsis ), executeFunc_Concat          ) )
-        , FuncDictEntry( "substring-before" , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_SubstringBefore , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_SubstringBefore ) )
-        , FuncDictEntry( "substring-after"  , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_SubstringAfter  , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_SubstringAfter  ) )
-        , FuncDictEntry( "substring"        , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Substring       , buildParameterTypeList( Value_String, Value_Number, Value_Number       ), executeFunc_Substring       ) )
-        , FuncDictEntry( "normalize-space"  , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_NormalizeSpace  , buildParameterTypeList( Value_String                                   ), executeFunc_NormalizeSpace  ) )
-        , FuncDictEntry( "translate"        , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Translate       , buildParameterTypeList( Value_String, Value_String, Value_String       ), executeFunc_Translate       ) )
-        };
-
-    typedef asl::static_dict<FunctionCallExpr::FunctionInfo,asl_static_array_size(funcDictEntries)>
-                                              FuncDict;
-    const FuncDict funcDict( asl::begin(funcDictEntries)
-                           , asl::end  (funcDictEntries) );
-
-    typedef std::map<FunctionCallExpr::FunctionType,FuncDict::const_iterator>
-                                                        Ft2FdiMap;
-
-    inline Ft2FdiMap buildFt2FdiMap()
-    {
-        Ft2FdiMap result;
-        for( FuncDict::const_iterator it=funcDict.begin(); it!=funcDict.end(); ++it ) {
-            result.insert( Ft2FdiMap::value_type(it->second.functionType,it) );
-        }
-        return result;
-    }
-
-    inline const Ft2FdiMap& getFt2FdiMap()
-    {
-        static const Ft2FdiMap& ft2FdiMap = buildFt2FdiMap();
-        return ft2FdiMap;
-    }
-
-    inline FuncDict::const_iterator getFunctionInfo(FunctionCallExpr::FunctionType type)
-    {
-        const Ft2FdiMap& ft2FdiMap = getFt2FdiMap(); 
-        const Ft2FdiMap::const_iterator itFT = ft2FdiMap .find(type);
-        assert(itFT != ft2FdiMap.end());
-        const FuncDict::const_iterator itFD = itFT->second;
-        const FunctionCallExpr::FunctionInfo& functionInfo = itFD->second;
-        assert(type==functionInfo.functionType);
-        return itFD;
-    }
-
-    inline void checkFuncParameterList( const std::string&                         funcName
-                                      , const FunctionCallExpr::Arguments&         args
-                                      , const FunctionCallExpr::ParameterTypeList& argTypes )
-    {
-        if( args.size() != argTypes.size() ) {
-            if( !argTypes.empty() ) {
-                if( argTypes.back() == ValueType_Ellipsis ) {
-                    return;
+    Step::Axis Step::read_axis(const string &instring, int pos) {
+        switch(instring[pos]) {
+            case 'a':
+                if (instring.length() <= pos + 8) {
+                    RETCMP(instring, pos, Step::AXISNAME_ANCESTOR,
+                            Step::Ancestor, Step::Invalid);
+                } else switch(instring[pos+8]) {
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_ANCESTOR_OR_SELF,
+                                Step::Ancestor_Or_Self, Step::Invalid);
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_ATTRIBUTE,
+                                Step::Attribute, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_ANCESTOR,
+                                Step::Ancestor, Step::Invalid);
                 }
-            }
-            throw xpath::SyntaxError( std::string("Invalid number of arguments for function '")
-                                    + funcName
-                                    + "()'", PLUS_FILE_LINE );
-        }
-    }
-
-    /******************************************************************************************/
-
-    enum ComparisonOperation { BooleanOperation
-                             , EqualityOperation
-                             , RelationalOperation };
-
-    template< int Int >
-    struct Int2Type {
-        enum { result = Int };
-    };
-
-    template< int LhsValueType
-            , int RhsValueType >
-    struct Comparison;
-
-    template< int LhsValueType, int RhsValueType >
-    struct Comparison<LhsValueType,RhsValueType> {
-        template< template<typename> class Comparator >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<BooleanOperation>)
-        {
-            return Comparator<Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
-        }
-
-        template< template<typename> class Comparator >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<EqualityOperation>)
-        {
-            if( lhs.getType()==Value_Boolean || rhs.getType()==Value_Boolean ) {
-                return Comparator<Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
-            }
-            if( lhs.getType()==Value_Number || rhs.getType()==Value_Number ) {
-                return Comparator<Number>()( lhs.as<NumberValue>().getValue(), rhs.as<NumberValue>().getValue() );
-            }
-            if( lhs.getType()==Value_String || rhs.getType()==Value_String ) {
-                return Comparator<String>()( lhs.as<StringValue>().getValue(), rhs.as<StringValue>().getValue() );
-            }
-            assert(false);
-            return true;
-        }
-
-        template< template<typename> class Comparator >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<RelationalOperation>)
-        {
-            return Comparator<Number>()( lhs.as<NumberValue>().getValue(), rhs.as<NumberValue>().getValue() );
-        }
-    };
-
-    template< int RhsValueType >
-    struct Comparison< Value_NodeSet, RhsValueType > {
-        template< template<typename> class Comparator, int Operation >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<Operation>)
-        {
-            const NodeSet lhsNS = lhs.as<NodeSetValue>().getValue();
-            for( NodeSet::const_iterator itL=lhsNS.begin(); itL!=lhsNS.end(); ++itL ) {
-                if( Comparison<Value_String,RhsValueType>::compare<Comparator>(Object(getStringValue(*itL)),rhs,Int2Type<Operation>()) ) {
-                    return true;
+            case 'c':
+                RETCMP(instring, pos, Step::AXISNAME_CHILD, Step::Child,
+                        Step::Invalid);
+            case 'd':
+                if (instring.length() <= pos + 10) {
+                    RETCMP(instring, pos, Step::AXISNAME_DESCENDANT,
+                            Step::Descendant, Step::Invalid);
+                } else switch(instring[pos+10]) {
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_DESCENDANT_OR_SELF,
+                                Step::Descendant_Or_Self, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_DESCENDANT,
+                                Step::Descendant, Step::Invalid);
                 }
-            }
-            return false;
-        }
-    };
-
-    template< int LhsValueType >
-    struct Comparison< LhsValueType, Value_NodeSet > {
-        template< template<typename> class Comparator, int Operation >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<Operation>)
-        {
-            const NodeSet rhsNS = rhs.as<NodeSetValue>().getValue();
-            for( NodeSet::const_iterator itR=rhsNS.begin(); itR!=rhsNS.end(); ++itR ) {
-                if( Comparison<LhsValueType,Value_String>::compare<Comparator>(lhs,Object(getStringValue(*itR)),Int2Type<Operation>()) ) {
-                    return true;
+            case 'f':
+                if (instring.length() <= pos + 9) {
+                    RETCMP(instring, pos, Step::AXISNAME_FOLLOWING,
+                            Step::Following, Step::Invalid);
+                } else switch(instring[pos+9]) {
+                    case '-':
+                        RETCMP(instring, pos, Step::AXISNAME_FOLLOWING_SIBLING,
+                                Step::Following_Sibling, Step::Invalid);
+                    default:
+                        RETCMP(instring, pos, Step::AXISNAME_FOLLOWING,
+                                Step::Following, Step::Invalid);
                 }
-            }
-            return false;
-        }
-    };
-
-    template<>
-    struct Comparison< Value_NodeSet, Value_NodeSet > {
-        template< template<typename> class Comparator, int Operation >
-        static bool compare(const Object& lhs, const Object& rhs, Int2Type<Operation>)
-        {
-            const NodeSet lhsNS = lhs.as<NodeSetValue>().getValue();
-            const NodeSet rhsNS = rhs.as<NodeSetValue>().getValue();
-            for( NodeSet::const_iterator itL=lhsNS.begin(); itL!=lhsNS.end(); ++itL ) {
-                for( NodeSet::const_iterator itR=rhsNS.begin(); itR!=rhsNS.end(); ++itR ) {
-                    if( Comparison<Value_String,Value_String>::compare<Comparator>(Object(getStringValue(*itL)),Object(getStringValue(*itR)),Int2Type<Operation>()) ) {
-                        return true;
-                    }
+            case 'n':
+                if (instring.length() <= pos + 8) {
+                    return Step::Invalid;
+                } else switch(instring[pos+1]) {
+                    case 'a':
+                        RETCMP(instring, pos, Step::AXISNAME_NAMESPACE,
+                                Step::Namespace, Step::Invalid);
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_NEXT_SIBLING,
+                                Step::Next_Sibling, Step::Invalid);
+                    default:
+                        return Step::Invalid;
                 }
-            }
-            return false;
-        }
-    };
-
-    template< int Operation
-            , int LhsValueType
-            , int RhsValueType
-            , template<typename> class Comparator >
-    inline bool doCompareRhs( const Object& lhs, const Object& rhs )
-    {
-        return Comparison<LhsValueType,RhsValueType>::compare<Comparator>(lhs,rhs,Int2Type<Operation>());
-    }
-
-    template< int Operation
-            , int LhsValueType
-            , template<typename> class Comparator >
-    inline bool doCompareLhs( const Object& lhs, const Object& rhs )
-    {
-        switch( rhs.getType() ) {
-            case Value_NodeSet : return doCompareRhs<Operation,LhsValueType,Value_NodeSet,Comparator>(lhs,rhs);
-            case Value_Boolean : return doCompareRhs<Operation,LhsValueType,Value_Boolean,Comparator>(lhs,rhs);
-            case Value_Number  : return doCompareRhs<Operation,LhsValueType,Value_Number ,Comparator>(lhs,rhs);
-            case Value_String  : return doCompareRhs<Operation,LhsValueType,Value_String ,Comparator>(lhs,rhs);
-            default : assert(false);
-        }
-        return true;
-    }
-
-    template< int Operation
-            , template<typename> class Comparator >
-    inline bool compare( const Object& lhs, const Object& rhs )
-    {
-        switch( lhs.getType() ) {
-            case Value_NodeSet : return doCompareLhs<Operation,Value_NodeSet,Comparator>(lhs,rhs);
-            case Value_Boolean : return doCompareLhs<Operation,Value_Boolean,Comparator>(lhs,rhs);
-            case Value_Number  : return doCompareLhs<Operation,Value_Number ,Comparator>(lhs,rhs);
-            case Value_String  : return doCompareLhs<Operation,Value_String ,Comparator>(lhs,rhs);
-            default : assert(false);
-        }
-        return true;
-    }
-
-}
-
-/**********************************************************************************************/
-
-namespace xpath {
-
-    namespace detail {
-
-        //class BinaryExpr : public Predicate::Expression {
-        //public:
-        //};
-
-        //class OrExpr : public BinaryExpr {
-        //public:
-            std::ostream& OrExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                os << " or ";
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object OrExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                return Object(compare<BooleanOperation,std::logical_or>(lhsValue,rhsValue));
-            }
-        //};
-
-        //class AndExpr : public BinaryExpr {
-        //public:
-            std::ostream& AndExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                os << " and ";
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object AndExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                return Object(compare<BooleanOperation,std::logical_and>(lhsValue,rhsValue));
-            }
-        //};
-
-        //class EqualityExpr : public BinaryExpr {
-        //public:
-            std::ostream& EqualityExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                switch( oper_ ) {
-                    case Operator_Equal   : os << '='; break;
-                    case Operator_Unequal : os << "!="; break;
-                    default               : assert(false);
-                }
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object EqualityExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                switch( oper_ ) {
-                    case Operator_Equal   : return Object(compare<EqualityOperation,std::equal_to    >(lhsValue,rhsValue));
-                    case Operator_Unequal : return Object(compare<EqualityOperation,std::not_equal_to>(lhsValue,rhsValue));
-                    default               : assert(false);
-                }
-                return Object(false);
-            }
-        //};
-
-        //class RelationalExpr : public BinaryExpr {
-        //public:
-            std::ostream& RelationalExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                switch( oper_ ) {
-                    case Operator_Less         : os << '<'; break;
-                    case Operator_Greater      : os << '>'; break;
-                    case Operator_LessEqual    : os << "<="; break;
-                    case Operator_GreaterEqual : os << ">="; break;
-                    default                    : assert(false);
-                }
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object RelationalExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                switch( oper_ ) {
-                    case Operator_Less         : return Object(compare<RelationalOperation,std::less         >(lhsValue,rhsValue));
-                    case Operator_Greater      : return Object(compare<RelationalOperation,std::greater      >(lhsValue,rhsValue));
-                    case Operator_LessEqual    : return Object(compare<RelationalOperation,std::less_equal   >(lhsValue,rhsValue));
-                    case Operator_GreaterEqual : return Object(compare<RelationalOperation,std::greater_equal>(lhsValue,rhsValue));
-                    default                    : assert(false);
-                }
-                return Object(false);
-            }
-        //};
-
-        //class AdditiveExpr : public BinaryExpr {
-        //public:
-            std::ostream& AdditiveExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                switch( oper_ ) {
-                    case Operator_Plus  : os << '+'; break;
-                    case Operator_Minus : os << '-'; break;
-                    default             : assert(false);
-                }
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object AdditiveExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                if( lhsValue.getType() != Value_Number ) {
-                    throw SyntaxError( "Additive expression implies number value", PLUS_FILE_LINE );
-                }
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                if( rhsValue.getType() != Value_Number ) {
-                    throw SyntaxError( "Additive expression implies number value", PLUS_FILE_LINE );
-                }
-                switch( oper_ ) {
-                    case Operator_Plus  : return Object(lhsValue.as<NumberValue>().getValue() + rhsValue.as<NumberValue>().getValue());
-                    case Operator_Minus : return Object(lhsValue.as<NumberValue>().getValue() - rhsValue.as<NumberValue>().getValue());
-                    default             : assert(false);
-                }
-                return Object(false);
-            }
-        //};
-
-        //class MultiplicativeExpr : public BinaryExpr {
-        //public:
-            std::ostream& MultiplicativeExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                switch( oper_ ) {
-                    case Operator_Mul : os << " * "; break;
-                    case Operator_Div : os << " div " ; break;
-                    case Operator_Mod : os << " mod " ; break;
-                    default           : assert(false);
-                }
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object MultiplicativeExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                if( lhsValue.getType() != Value_Number ) {
-                    throw SyntaxError( "Multiplicative expression implies number value", PLUS_FILE_LINE );
-                }
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                if( rhsValue.getType() != Value_Number ) {
-                    throw SyntaxError( "Multiplicative expression implies number value", PLUS_FILE_LINE );
-                }
-                switch( oper_ ) {
-                    case Operator_Mul : return Object(lhsValue.as<NumberValue>().getValue() * rhsValue.as<NumberValue>().getValue());
-                    case Operator_Div : return Object(lhsValue.as<NumberValue>().getValue() / rhsValue.as<NumberValue>().getValue());
-                    case Operator_Mod : return Object(NumberValue( static_cast<long int>(lhsValue.as<NumberValue>().getValue())
-                                                                 % static_cast<long int>(rhsValue.as<NumberValue>().getValue()) ));
-                    default           : assert(false);
-                }
-                return Object(false);
-            }
-        //};
-
-        //class UnaryExpr : public Predicate::Expression {
-        //public:
-            std::ostream& UnaryExpr::streamTo(std::ostream& os) const
-            {
-                if( negative_ ) {
-                    os << '-';
-                }
-                expr_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object UnaryExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& tmp = expr_->doEvaluate(evContext);
-                if( !negative_ ) {
-                    return tmp;
-                }
-                if( tmp.getType() != Value_Number ) {
-                    throw SyntaxError( "Unary minus implies number value", PLUS_FILE_LINE );
-                }
-                return Object(-tmp.as<NumberValue>().getValue());
-            }
-        //};
-
-        //class UnionExpr : public BinaryExpr {
-        //public:
-            std::ostream& UnionExpr::streamTo(std::ostream& os) const
-            {
-                lhs_->streamTo(os);
-                os << " | ";
-                rhs_->streamTo(os);
-                return os;
-            }
-        //protected:
-            Object UnionExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object& lhsValue = lhs_->doEvaluate(evContext);
-                if( lhsValue.getType() != Value_NodeSet ) {
-                    throw SyntaxError( "Union expression implies node set expression", PLUS_FILE_LINE );
-                }
-                const Object& rhsValue = rhs_->doEvaluate(evContext);
-                if( rhsValue.getType() != Value_NodeSet ) {
-                    throw SyntaxError( "Union expression implies node set expression", PLUS_FILE_LINE );
-                }
-                NodeSet result( lhsValue.as<NodeSetValue>().getValue() );
-                result.insert( rhsValue.as<NodeSetValue>().getValue().begin()
-                             , rhsValue.as<NodeSetValue>().getValue().end  () );
-                return Object(result);
-            }
-        //};
-
-        //class PathExpr : public Predicate::Expression {
-        //public:
-            std::ostream& PathExpr::streamTo(std::ostream& os) const
-            {
-                path_.streamTo(os);
-                return os;
-            }
-        //protected:
-            Object PathExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                NodeList nodeList;
-                xpath::findAll(path_, evContext.contextNode->self().lock(), nodeList);
-                const NodeSet nodeSet( nodeList.begin(), nodeList.end() );
-                return Object(nodeSet);
-            }
-        //};
-
-        //class FilterExpr : public Predicate::Expression {
-        //public:
-            std::ostream& FilterExpr::streamTo(std::ostream& os) const
-            {
-                os << *expr_;
-                if( predicate_ ) {
-                    os << predicate_;
-                }
-                return os;
-            }
-        //protected:
-            Object FilterExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const Object v = expr_->doEvaluate(evContext);
-                if( !predicate_ ) {
-                    return v;
-                }
-                if( !v.getType() == Value_NodeSet ) {
-                    throw SyntaxError( "Predicate implies node set expression", PLUS_FILE_LINE );
-                }
-                const NodeSet nodeSet = v.as<NodeSetValue>().getValue();
-                NodeSet result;
-                std::size_t idx = 0;
-                for( NodeSet::const_iterator it=nodeSet.begin(); it!=nodeSet.end(); ++it ) {
-                    const EvaluationContext subEvContext( *it, nodeSet.size(), ++idx );
-                    if( predicate_->evaluate(subEvContext) ) {
-                        result.insert(*it);
-                    }
-                }
-                return Object(result);
-            }
-        //};
-
-        //class PrimaryExpr : public Predicate::Expression {
-        //};
-
-        //class VariableRefExpr : public PrimaryExpr {
-        //public:
-            std::ostream& VariableRefExpr::streamTo(std::ostream& os) const
-            {
-                os << variable_;
-                return os;
-            }
-        //protected:
-            Object VariableRefExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                throw NotImplemented( "XPath variable references not implemented", PLUS_FILE_LINE );
-            }
-        //};
-
-        //class LiteralExpr : public PrimaryExpr {
-        //public:
-            std::ostream& LiteralExpr::streamTo(std::ostream& os) const
-            {
-                os << '\"' << literal_ << '\"';
-                return os;
-            }
-        //protected:
-            Object LiteralExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                return Object(literal_);
-            }
-        //};
-
-        //class NumberExpr : public PrimaryExpr {
-        //public:
-            std::ostream& NumberExpr::streamTo(std::ostream& os) const
-            {
-                os << number_;
-                return os;
-            }
-        //protected:
-            Object NumberExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                return Object(number_);
-            }
-        //};
-
-        //class FunctionCallExpr : public PrimaryExpr {
-        //public:
-            FunctionCallExpr::FunctionInfo FunctionCallExpr::readFunctionType(ParseInput& pi)
-            {
-                typedef std::pair<FuncDict::const_iterator,ParseInput::const_iterator>
-                                                          FindResult;
-                const FindResult& result = funcDict.lookup(pi.begin(),pi.end());
-                if( result.first == funcDict.end() ) {
-                    pi.setErrorIndex();
-                    return FunctionInfo(false,Func_Invalid,ParameterTypeList(),NULL);
-                }
-                if( !result.first->second.implemented ) {
-                    pi.setErrorIndex();
-                    throw NotImplemented( std::string("Function '") 
-                                        + result.first->first
-                                        + "()' is not implemented", PLUS_FILE_LINE );
-                }
-                pi.forwardTo(result.second);
-                assert(result.first->second.implemented);
-                return result.first->second;
-            }
-
-            FunctionCallExpr::FunctionCallExpr( FunctionType type
-                                              , const Arguments& args)
-                : functionType_(type), args_(args)
-            {
-                const FuncDict::const_iterator itFD = getFunctionInfo(functionType_);
-                checkFuncParameterList( itFD->first, args_, itFD->second.parameterTypeList );
-            }
-
-            FunctionCallExpr::FunctionCallExpr(ParseInput& pi, const Arguments& args)
-                : args_(args)
-            {
-                const FunctionInfo& functionInfo = readFunctionType(pi);
-                const FuncDict::const_iterator itFD = getFunctionInfo(functionType_);
-                checkFuncParameterList( itFD->first, args_, functionInfo.parameterTypeList );
-                functionType_ = functionInfo.functionType;
-            }
-
-            std::ostream& FunctionCallExpr::streamTo(std::ostream& os) const
-            {
-                const FuncDict::const_iterator itFD = getFunctionInfo(functionType_);
-                      Arguments::const_iterator begin = args_.begin();
-                const Arguments::const_iterator end   = args_.end  ();
-                os << itFD->first << '(';
-                if( begin != end ) {
-                    for(;;) {
-                        os << **begin;
-                        ++begin;
-                        if( begin == end ) {
-                            break;
+            case 'p':
+                if (instring.length() <= pos + 6) {
+                    return Step::Invalid;
+                } else switch(instring[pos+3]) {
+                    case 'e':
+                        RETCMP(instring, pos, Step::AXISNAME_PARENT,
+                                Step::Parent, Step::Invalid);
+                    case 'c':
+                        if (instring.length() <= pos + 9) {
+                            RETCMP(instring, pos, Step::AXISNAME_PRECEDING,
+                                    Step::Preceding, Step::Invalid);
+                        } else switch(instring[pos+9]) {
+                            case '-':
+                                RETCMP(instring, pos,
+                                        Step::AXISNAME_PRECEDING_SIBLING,
+                                        Step::Preceding_Sibling, Step::Invalid);
+                            default:
+                                RETCMP(instring, pos, Step::AXISNAME_PRECEDING,
+                                        Step::Preceding, Step::Invalid);
                         }
-                        os << ',';
-                    }
+                    case 'v':
+                        RETCMP(instring, pos, Step::AXISNAME_PREVIOUS_SIBLING,
+                                Step::Previous_Sibling, Step::Invalid);
                 }
-                os << ')';
-                return os;
-            }
-        //protected:
-            Object FunctionCallExpr::doEvaluate(const EvaluationContext& evContext) const
-            {
-                const FuncDict::const_iterator itFD = getFunctionInfo(functionType_);
-                const FunctionInfo& functionInfo = itFD->second;
-                assert(functionInfo.implemented);
-                return (functionInfo.funcImpl)(args_,evContext);
-            }
-        //private:
-        //};
-
-        ExpressionPtr readExpression(ParseInput& pi)
-        {
-            return readOrExpr(pi);
+            case 's':
+                RETCMP(instring, pos, Step::AXISNAME_SELF, Step::Self,
+                        Step::Invalid);
+            default:
+                return Step::Invalid;
         }
-
     }
 
+    Step::NodeTest Step::read_NodeTest(const string &instring, int pos) {
+        switch(instring[pos]) {
+            case 'n':
+                RETCMP(instring, pos, Step::NODETEST_NODE, Step::TestAnyNode,
+                        Step::InvalidTest);
+            case 'c':
+                RETCMP(instring, pos, Step::NODETEST_COMMENT, Step::TestCommentNode,
+                        Step::InvalidTest);
+            case 't':
+                RETCMP(instring, pos, Step::NODETEST_TEXT, Step::TestTextNode,
+                        Step::InvalidTest);
+            case 'p':
+                RETCMP(instring, pos, Step::NODETEST_PI, Step::TestProcessingInstruction,
+                        Step::InvalidTest);
+            default:
+                return Step::InvalidTest;
+        }
+    }
+
+    bool Step::allows(dom::Node *n)
+    {
+        if (nodeTestName.length()) {
+            if (test == TestProcessingInstruction) {
+                // ### node test name contains the parameter to the processing
+                // instruction. handle accordingly.
+            } else {
+                if (n->nodeName() != nodeTestName) {
+                    return false;
+                }
+            }
+        }
+        switch (test)
+        {
+        case TestPrincipalType:
+            switch (axis)
+            {
+            case Attribute:
+                return n->nodeType()==dom::Node::ATTRIBUTE_NODE;
+            case Namespace:
+                // ### not yet implemented, node type NAMESPACE does not exist.
+                //return n->nodeType()==dom::Node::NAMESPACE_NODE;
+            default:
+                return n->nodeType()==dom::Node::ELEMENT_NODE;
+            }
+        case TestAnyNode:
+            return true;
+        case TestCommentNode:
+            return n->nodeType()==dom::Node::COMMENT_NODE;
+        case TestTextNode:
+            return n->nodeType()==dom::Node::TEXT_NODE;
+        case TestProcessingInstruction:
+            return n->nodeType()==dom::Node::PROCESSING_INSTRUCTION_NODE;
+        default:
+            return false;
+        };
+    };
+
+    template<class ITER>
+    void descendReverse(ITER &resultset, NodeRef curNode) {
+        for (NodeRef curChild = &*curNode->lastChild(); curChild;
+                curChild = &*curChild->previousSibling())
+        {
+            descendReverse(resultset, curChild);
+        }
+        *resultset++ = curNode;
+    }
+
+    template<class CONT>
+    void fillAxis(Step *s, NodeRef curNode, CONT &cont) {
+        std::insert_iterator<CONT> resultset = std::inserter(cont, cont.end());
+        NodeRef origNode = curNode;
+        // build up the axis with appropriate nodes containing passing the test
+        switch(s->getAxis()) {
+            case Step::Child:
+                if (curNode->hasChildNodes()) {
+                    for (curNode = &*curNode->firstChild(); curNode; curNode = &*curNode->nextSibling()) {
+                        if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
+                            *resultset++ = curNode;
+                        }
+                    }
+                }
+                break;
+            case Step::Parent:
+                curNode = curNode->parentNode();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Next_Sibling:
+                curNode = &*curNode->nextSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Previous_Sibling:
+                curNode = &*curNode->previousSibling();
+                if (curNode && s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Preceding_Sibling:
+                while (curNode = &*curNode->previousSibling()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                break;
+            case Step::Following_Sibling:
+                while (curNode = &*curNode->nextSibling()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                break;
+            case Step::Following:
+                origNode = NULL;
+                /* nobreak; */
+            case Step::Descendant_Or_Self:
+                if (origNode && s->allows(origNode)) {
+                    *resultset++ = origNode;
+                }
+                /* nobreak; */
+            case Step::Descendant:
+                {
+                    while (true) {
+                        if (curNode->firstChild()) {
+                            curNode = &*curNode->firstChild();
+                        } else if (curNode == origNode) {
+                            break;
+                        } else if (curNode->nextSibling()) {
+                            curNode = &*curNode->nextSibling();
+                        } else {
+                            NodeRef tmp = curNode;
+                            while ((tmp = tmp->parentNode()) != origNode) {
+                                if (tmp->nextSibling()) {
+                                    curNode = &*tmp->nextSibling();
+                                    break;
+                                }
+                            }
+                            if (tmp == origNode) {
+                                break;
+                            }
+                        }
+
+                        if (s->allows(curNode)) {
+#ifdef INTERPRETER_DEBUG
+                            AC_TRACE << "appending " << *curNode << " into container of " << cont.size() << " nodes.";
+#endif
+                            *resultset++ = curNode;
+                        }
+                    }
+                }
+                break;
+            case Step::Preceding:
+                for (;curNode;curNode = curNode->parentNode()) {
+                    while (curNode->previousSibling()) {
+                        curNode = &*curNode->previousSibling();
+                        AC_TRACE << " diving into " << *curNode;
+                        descendReverse(resultset, curNode);
+                    }
+                }
+                break;
+            case Step::Self:
+                if (s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                break;
+            case Step::Attribute:
+                {
+                    dom::NamedNodeMap & map = curNode->attributes();
+                    for (unsigned int i = 0; i < map.length(); i++) {
+                        if (s->allows(&*map.item(i))) {
+                            *resultset++ = &*map.item(i);
+                        }
+                    }
+                }
+            case Step::Ancestor_Or_Self:
+                if (s->allows(curNode)) {
+                    *resultset++ = curNode;
+                }
+                /* nobreak; */
+            case Step::Ancestor:
+                if (curNode->nodeType()==dom::Node::ATTRIBUTE_NODE) {
+                    /*
+                       dom::Attribute curAttr = curNode;
+                       curNode = curAttr.ownerElement();
+                     */
+                    curNode = curNode->parentNode();
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+                while (curNode = curNode->parentNode()) {
+                    if (s->allows(curNode)) {
+                        *resultset++ = curNode;
+                    }
+                }
+            case Step::Invalid:
+            default:
+                break;
+        };
+#ifdef INTERPRETER_DEBUG
+        if (origNode) {
+            AC_TRACE << "evaluating step " << *s << " on " << *origNode << ": selected " << cont.size() << " candidates...";
+        } else {
+            AC_TRACE << "evaluating step " << *s << ": selected " << cont.size() << " candidates...";
+        }
+#endif
+    };
+
+    template<class CONT>
+    void scanStep(Step *s, NodeRef origNode, CONT &results) {
+        bool have_predicates = (s->predicates.begin() != s->predicates.end());
+        if (!have_predicates) {
+            fillAxis(s, origNode, results);
+            return;
+        }
+
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "now evaluating step \"" << *s << "\" :";
+#endif
+        NodeVectorRef intermediateResult = new NodeVector();
+        fillAxis(s, origNode, *intermediateResult);
+
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << " on " << origNode->nodeName() << (origNode->parentNode() ? (" inside " + origNode->parentNode()->nodeName()):"") << ":";
+        AC_TRACE << "starting with " << intermediateResult->size() << " " << Step::stringForAxis(s->getAxis()) << " nodes";
+
+#endif
+        ExpIter last = s->predicates.end(); 
+        --last;
+
+        Context subcontext;
+
+        for (ExpIter i = s->predicates.begin(); i != last; ++i) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "filtering by predicate [" << *(*i) << "] in a context of " << intermediateResult->size() << " nodes:";
+#endif
+            subcontext.size = intermediateResult->size();
+            subcontext.position = 0;
+            for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end();) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE << "evaluating...";
+#endif
+                subcontext.position++;
+                subcontext.currentNode = (*j);
+                Value *tmp = (*i)->evaluateExpression(subcontext);
+                BooleanValue *v = tmp->toBoolean();
+                delete tmp;
+                if (!v->getValue()) {
+#ifdef INTERPRETER_DEBUG
+                    AC_TRACE << " kicking out " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " because the predicate [" << (**i) << "] evaluates false.";
+#endif
+                    intermediateResult->erase(j++);
+                }
+                else ++j;
+                delete v;
+            }
+        }
+
+        std::insert_iterator<CONT> ins = std::inserter(results, results.end());
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "filtering by last predicate [" << *(*last) << "] in a context of " << intermediateResult->size() << " nodes:";
+#endif
+        subcontext.size = intermediateResult->size();
+        subcontext.position = 0;
+        for (NodeVector::iterator j = intermediateResult->begin(); j != intermediateResult->end(); ++j) {
+            subcontext.position++;
+            subcontext.currentNode = (*j);
+            Value *tmp = (*last)->evaluateExpression(subcontext);
+            BooleanValue *v = tmp->toBoolean();
+            delete tmp;
+            if (v->getValue()) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE << " picking up " << subcontext.currentNode->nodeName() << " " << subcontext.position << " of " << subcontext.size << " into container of " << results.size() << " elements";
+                AC_TRACE << " because the predicate [" << (**last) << "] evaluates true.";
+#endif
+                *ins++ = (*j);
+            }
+            delete v;
+        }
+        delete intermediateResult;
+    };
+
+    void Step::scan(NodeRef from, NodeSet &into) {
+        scanStep(this, from, into);
+    }
+
+    void Step::scan(NodeRef from, NodeVector &into) {
+        scanStep(this, from, into);
+    }
+
+    void Step::scan(NodeRef from, OrderedNodeSet &into) {
+        scanStep(this, from, into);
+    }
+
+    void Step::serializeTo(std::ostream & os) {
+        os << stringForAxis(axis);
+        os << "::";
+        serializeNodeTest(os);
+        for (ExpIter i = predicates.begin(); i != predicates.end(); ++i) {
+            os << "[";
+            (*i)->serializeTo(os);
+            os << "]";
+        }
+    }
+
+    void Step::appendPredicate(Expression *e) {
+        predicates.push_back(e);
+    }
+
+    void Step::prependPredicate(Expression *e) {
+        predicates.push_front(e);
+    }
+
+    void Step::insertPredicate(int at, Expression *e) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        predicates.insert(i, e);
+    }
+
+    Expression *
+    Step::takeFirst() {
+        Expression *retval = predicates.front();
+        predicates.pop_front();
+        return retval;
+    }
+    Expression *
+    Step::takeLast() {
+        Expression *retval = predicates.back();
+        predicates.pop_back();
+        return retval;
+    }
+    Expression *
+    Step::take(int at) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        Expression *retval = *i;
+        predicates.erase(i);
+        return retval;
+    }
+
+    Expression *
+    Step::predicate(int at) {
+        ExpIter i = predicates.begin();
+        while (i != predicates.end() && at--) {
+            ++i;
+        }
+        return *i;
+    }
+
+    int Step::count() const { return predicates.size(); };
+
+    Path::Path() {
+        absolute = false;
+    }
+
+    Value*
+    Path::evaluateExpression(const Context &c) {
+        return evaluate(c.currentNode);
+    }
+
+    NodeSetValue *
+    Path::evaluate(NodeRef n) {
+        return new NodeSetValue(evaluateAs<NodeSet>(n));
+    }
+
+    void Path::evaluateInto(NodeSetRef workingset, OrderedNodeSet &returnContainer) {
+        if (absolute) {
+            if (steps.begin() == steps.end()) {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE<<"abolute path with no steps. going up to document from... " << workingset->size() << " nodes.";
+#endif
+                for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i) {
+                    NodeRef thisOne = *i;
+                    while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+                    returnContainer.insert(thisOne);
+                }
+                delete workingset;
+                return;
+            } else {
+#ifdef INTERPRETER_DEBUG
+                AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+                NodeSetRef newResults = new NodeSet();
+
+                for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i) {
+                    NodeRef thisOne = *i;
+                    while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+                    newResults->insert(thisOne);
+                }
+                delete workingset;
+                workingset = newResults;
+            }
+        }
+
+        std::list<Step*>::iterator lastStep = steps.end();
+        lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "scanning intermediate step " << (**s) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+            NodeSetRef nextStepSet = new NodeSet();
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+                (*s)->scanInto(*i, *nextStepSet);
+            }
+            delete workingset;
+            workingset = nextStepSet;
+        }
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+        for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+            (*lastStep)->scanInto(*i, returnContainer);
+        }
+        delete workingset;
+    }
+
+    void Path::evaluateInto(NodeSetRef workingset, NodeVector & returnContainer) {
+
+        // avoid duplicates in intermediate results
+        OrderedNodeSetRef lastStepSet = new OrderedNodeSet();
+        evaluateInto(workingset, *lastStepSet);
+
+        // but allow them in returnContainer
+        copy(lastStepSet->begin(), lastStepSet->end(), std::inserter(returnContainer, returnContainer.end()));
+        delete lastStepSet;
+    }
+
+    void Path::evaluateInto(NodeSetRef workingset, NodeSet &returnContainer) {
+        if (absolute) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE<<"abolute path. going up to document from... " << workingset->size() << " nodes.";
+#endif
+            NodeSetRef newResults = new NodeSet();
+            NodeSet::iterator resIter = newResults->end();
+
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end();++i)
+            {
+                NodeRef thisOne = *i;
+                while (thisOne->parentNode()) { thisOne = thisOne->parentNode(); };
+                newResults->insert(thisOne);
+            }
+            delete workingset;
+            workingset = newResults;
+        }
+
+        std::list<Step*>::iterator lastStep = steps.end();
+        lastStep--;
+        for (std::list<Step*>::iterator s = steps.begin(); s != lastStep; ++s) {
+#ifdef INTERPRETER_DEBUG
+            AC_TRACE << "scanning step " << (**s) << " with "<<workingset->size()<<" nodes into Set:";
+#endif
+            NodeSetRef nextStepSet = new NodeSet();
+            for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+                (*s)->scanInto(*i, *nextStepSet);
+            }
+            delete workingset;
+            workingset = nextStepSet;
+        };
+#ifdef INTERPRETER_DEBUG
+        AC_TRACE << "scanning last step " << (**lastStep) << " with "<<workingset->size()<<" nodes into List:";
+#endif
+        for (NodeSet::iterator i = workingset->begin(); i != workingset->end(); ++i) {
+            (*lastStep)->scanInto(*i, returnContainer);
+        }
+        delete workingset;
+    }
+
+    void Path::serializeTo(std::ostream &os) {
+        for (std::list<Step*>::iterator s = steps.begin(); s != steps.end();++s) {
+            if ((s != steps.begin()) || absolute) {
+                os << "/";
+            }
+            (*s)->serializeTo(os);
+        }
+    }
 }
 
-/**********************************************************************************************/
+std::ostream &operator<<(std::ostream &stream, xpath::SyntaxNode &myNode) {
+    myNode.serializeTo(stream);
+    return stream;
+}

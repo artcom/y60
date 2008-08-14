@@ -167,7 +167,7 @@ namespace asl {
     void binToString(unsigned char * theData, unsigned int theLength, std::string & theDest);
     bool stringToBin(const std::string & theString, unsigned char * theData, unsigned int maxLength);
 
-    std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators = " \n\r\t");
+	std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators = " \n\r\t");
 
     // Converts an enum into a string, given a string list with the same layout as the enum
     // and a zero at the end
@@ -322,33 +322,15 @@ namespace asl {
         return is_name_start_char(c) || is_digit(c) || is_dot(c) || is_hyphen(c);
     }
 
-    inline bool is_identifier_start_char(Char c) {
-        return is_alpha(c) || is_underscore(c);
-    }
-    inline bool is_identifier_char(Char c) {
-        return is_identifier_start_char(c) || is_digit(c);
-    }
-
-    template< typename StartCharFunc, typename CharFunc >
-    inline int read_object( const std::string& is, int pos
-                          , StartCharFunc is_start_char_func, CharFunc is_char_func) {
-        if ( is_start_char_func(is[pos]) && pos < is.size() ) {
+    // returns the position of the first non-namechar
+    inline int read_name(const std::string& is,int pos) {
+        if ( is_name_start_char(is[pos]) && pos < is.size() ) {
             ++pos;
-            while (is_char_func(is[pos]) && pos < is.size() ) {
+            while (is_name_char(is[pos]) && pos < is.size() ) {
                 ++pos;
             }
         }
         return pos;
-    }
-
-    // returns the position of the first non-namechar
-    inline int read_name(const std::string& is,int pos) {
-        return read_object(is,pos,is_name_start_char,is_name_char);
-    }
-
-    // returns the position of the first non-identifier char
-    inline int read_identifier(const std::string& is,int pos) {
-        return read_object(is,pos,is_identifier_start_char,is_identifier_char);
     }
 
     // returns pos + 1 if c is at pos
