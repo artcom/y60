@@ -29,6 +29,8 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     var _myImage    = null;
     var _myMaterial = null;
     var _myQuad     = null;
+    var _myHeight = 0;
+    var _myWidth  = 0;
 
     ////////////////////////////////////////
     // Public
@@ -75,6 +77,30 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     Public.visible setter = function(theVisibility) {
         Public.body.visible = theVisibility;
     }
+    
+    Public.alpha getter = function() {
+        return _myMaterial.properties.surfacecolor[3];
+    }
+
+    Public.alpha setter = function(theAlpha) {
+        Modelling.setAlpha(_myQuad.body, theAlpha);
+    }
+    
+    Public.width getter = function() {
+        return _myWidth;
+    }
+    
+    Public.width setter = function(theWidth) {
+        _myWidth = theWidth;
+    }
+    
+    Public.height getter = function() {
+        return _myHeight;
+    }
+    
+    Public.height setter = function(theHeight) {
+        _myHeight = theHeight;
+    }
 
     ////////////////////////////////////////
     // setup
@@ -96,9 +122,12 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
         if("z" in _myNode) {
             _myDepth += Number(_myNode.z);
         }
+        
+        _myWidth = _myNode.width;
+        _myHeight = _myNode.height;
 
         _myStyle = fontStyleFromNode(_myNode);
-        _mySize = new Vector2f(_myNode.width, _myNode.height);
+        _mySize = new Vector2f(_myWidth, _myHeight);
 
         _myImage = textAsImage(_myText, _myStyle, _mySize);
 

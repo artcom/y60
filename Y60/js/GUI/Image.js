@@ -33,6 +33,12 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.bodies getter = function() {
         return [_myQuad.body];
     }
+    
+    Public.clone = function() {
+        var myNode = clone(_myNode);
+        myNode.name = _myNode.name + "_copy";
+        return new Image(_myParent, myNode, _myDepth);
+    }
    
     Public.name getter = function() {
         return _myName;
@@ -91,8 +97,16 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         return _myWidth;
     }
     
+    Public.width setter = function(theWidth) {
+        _myWidth = theWidth;
+    }
+    
     Public.height getter = function() {
         return _myHeight;
+    }
+    
+    Public.height setter = function(theHeight) {
+        _myHeight = theHeight;
     }
     
     Public.z getter = function() {
