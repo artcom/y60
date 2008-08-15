@@ -277,7 +277,7 @@ namespace {
                              , const dom::NodePtr&    rhs )
     {
         xpath::NodeList result(lhs);
-        result.push_back(rhs.getNativePtr());
+        result.push_back(rhs);
         return result;
     }
 
