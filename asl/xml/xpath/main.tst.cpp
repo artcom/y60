@@ -178,6 +178,7 @@ namespace {
 
                 DTITLE("Tests from pro60 tests");
                 XPATH_TEST_PARSER( "//texture[@image='B9QG8wYM2d8=']"                                           , "/descendant-or-self::node()/child::texture[attribute::image=\"B9QG8wYM2d8=\"]"                                               );
+                XPATH_TEST_PARSER( "//text[@field = 'title']"                                                   , "/descendant-or-self::node()/child::text[attribute::field=\"title\"]"                                                         );
 
                 DTITLE("Features not implemented: Path expressions, rule [19], productions #3 and #4")
                 XPATH_TEST_PARSER_FAIL( "child::*[boolean(\"foo\")/child::para[position()=5]]"                  , "child::*[boolean(\"foo\")/child::para[position()=5]]"                                                                        );

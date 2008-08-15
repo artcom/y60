@@ -283,7 +283,9 @@ namespace xpath {
                 }
 
                 if( '(' != pi.peekNextChar(true) ) {
-                    return Type_Invalid;
+                    value = identifier;
+                    ps.commit();
+                    return Type_NameTest;
                 }
                 value = pi.readQuotedText('(',')'); // nested calls not allowed here
                 if( !value.empty() && result.first->second!=Type_ProcessingInstructionTest ) {
