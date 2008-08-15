@@ -73,18 +73,6 @@ HANDLE GetConsole(ostream & os) {
 }
 #endif
 
-ostream & TTYGREEN ( ostream & os ) {
-    if (isTTY(os)) {
-#if WIN32
-        os.flush();
-        SetConsoleTextAttribute(GetConsole(os), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-#else
-        os << "\033[0;32m";
-#endif
-    }
-    return os;
-}
-
 ostream & TTYRED ( ostream & os ) {
     if (isTTY(os)) {
 #if WIN32
@@ -97,6 +85,29 @@ ostream & TTYRED ( ostream & os ) {
     return os;
 }
 
+ostream & TTYGREEN ( ostream & os ) {
+    if (isTTY(os)) {
+#if WIN32
+        os.flush();
+        SetConsoleTextAttribute(GetConsole(os), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+#else
+        os << "\033[0;32m";
+#endif
+    }
+    return os;
+}
+
+ostream & asl::TTYYELLOW ( ostream & os ) {
+    if (isTTY(os)) {
+#if WIN32
+        os.flush();
+        SetConsoleTextAttribute(GetConsole(os), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+#else
+        os << "\033[0;33m";
+#endif
+    }
+    return os;
+}
 ostream & ENDCOLOR ( ostream & os ) {
     if (isTTY(os)) {
 #if WIN32
@@ -111,13 +122,18 @@ ostream & ENDCOLOR ( ostream & os ) {
 #endif
 
 unsigned int
+UnitTest::getPassedCount() const {
+    return _passedCount;
+}
+
+unsigned int
 UnitTest::getFailedCount() const {
     return _failedCount;
 }
 
 unsigned int
-UnitTest::getPassedCount() const {
-    return _passedCount;
+UnitTest::getExpectedFailedCount() const {
+    return _expectedfailedCount;
 }
 
 const char *
@@ -130,13 +146,18 @@ UnitTest::~UnitTest() {
 }
 
 void
+UnitTest::incrementPassedCount() {
+    ++_passedCount;
+}
+
+void
 UnitTest::incrementFailedCount() {
     ++_failedCount;
 }
 
 void
-UnitTest::incrementPassedCount() {
-    ++_passedCount;
+UnitTest::incrementExpectedFailedCount() {
+    ++_expectedfailedCount;
 }
 
 int
@@ -170,35 +191,52 @@ UnitTest::setup() {
 
 void
 UnitTest::teardown() {
-    std::cerr << ">>>> Completed Test Unit '" << _myName << "'" << ", ";
+    std::cerr << ">>>> Completed Test Unit '" << getMyName() << "'" << ", ";
+
     if (getFailedCount()) {
         std::cerr << TTYRED;
     }
-    std::cerr << getFailedCount() << " tests failed" << ENDCOLOR
-        << ", " << getPassedCount() << " tests passed"
-        << std::endl;
-    // endwin();
+    std::cerr << getFailedCount() << " total tests failed unexpected" << ENDCOLOR;
+
+    std::cerr << ", ";
+    if (getExpectedFailedCount()) {
+        std::cerr << TTYYELLOW;
+    }
+    std::cerr << getExpectedFailedCount() << " total tests failed expected" << ENDCOLOR;
+
+    std::cerr << ", ";
+    if (getPassedCount()) {
+        std::cerr << TTYGREEN;
+    }
+    std::cerr << getPassedCount() << " total tests passed" << ENDCOLOR;
+
+    std::cerr << std::endl;
+
 }
 
 UnitTest::UnitTest(const char * myName)
-    : _myName(myName), _passedCount(0),
-    _failedCount(0), _silentSuccess(false), _abortOnFailure(false), _profilingRepeatCount(0) { }
+    : _myName(myName)
+    , _passedCount(0), _failedCount(0), _expectedfailedCount(0)
+    , _profilingRepeatCount(0)
+    , _silentSuccess(false), _abortOnFailure(false) { }
 
 void
 UnitTest::ensure(bool myExpressionResult,
         const char * myExpression,
         const char * mySourceFileName,
-        unsigned long mySourceLine)
+        unsigned long mySourceLine,
+        bool myExpectedResult)
 {
-    if (myExpressionResult == true) {
-        incrementPassedCount();
+    reportResult(myExpressionResult,myExpectedResult);
+    if (myExpressionResult == myExpectedResult) {
         if (_silentSuccess) {
             return;
         }
-        std::cerr << ">>>>>> "<< TTYGREEN << " OK  " << ENDCOLOR;
+        std::cerr << ">>>>>> "<< (myExpectedResult ? TTYGREEN : TTYYELLOW)
+                  << (myExpectedResult ? "OK    " : "KNOWN ") << ENDCOLOR;
     } else {
-        incrementFailedCount();
-        std::cerr << "###### "<< TTYRED << "FAIL " << ENDCOLOR;
+        std::cerr << "###### "<< (myExpectedResult ? TTYRED : TTYYELLOW)
+                  << (myExpectedResult ? "FAIL  " : "UNEXP " ) << ENDCOLOR;
     }
     std::cerr << " ("<< myExpression << "), Line " << mySourceLine << std::endl;
     if (!myExpressionResult && _abortOnFailure) {
@@ -208,12 +246,16 @@ UnitTest::ensure(bool myExpressionResult,
 }
 
 void
+UnitTest::setPassedCount(unsigned int passedTests) {
+    _passedCount = passedTests;
+}
+void
 UnitTest::setFailedCount(unsigned int failedTests) {
     _failedCount = failedTests;
 }
 void
-UnitTest::setPassedCount(unsigned int passedTests) {
-    _passedCount = passedTests;
+UnitTest::setExpectedFailedCount(unsigned int failedTests) {
+    _expectedfailedCount = failedTests;
 }
 
 void
@@ -231,6 +273,23 @@ UnitTest::setMyName(const char * theName) {
     _myName = theName;
 }
 
+void
+UnitTest::reportResult(bool myExpressionResult, bool myExpectedResult)
+{
+    if( myExpressionResult ) {
+        if( myExpectedResult ) {
+            incrementPassedCount(); // expected success
+        } else {
+            incrementPassedCount(); // unexpected success
+        }
+    } else {
+        if( myExpectedResult ) {
+            incrementFailedCount(); // unexpected failure
+        } else {
+            incrementExpectedFailedCount(); // expected failure
+        }
+    }
+}
 
 void
 UnitTestSuite::run() {
@@ -262,8 +321,9 @@ UnitTestSuite::run() {
                 for (unsigned i = 0; i < _myTests.size(); ++i) {
                     _myTests[i]->setup();
                     _myTests[i]->run();
-                    setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
                     setPassedCount(getPassedCount() + _myTests[i]->getPassedCount());
+                    setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
+                    setExpectedFailedCount(getExpectedFailedCount() + _myTests[i]->getExpectedFailedCount());
                     _myTests[i]->teardown();
                 }
             } else {
@@ -277,8 +337,9 @@ UnitTestSuite::run() {
                         for (unsigned r = 0; r < _myTests[i]->getProfileRepeatCount(); ++r) {
                             _myTests[i]->run();
                         }
-                        setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
                         setPassedCount(getPassedCount() + _myTests[i]->getPassedCount());
+                        setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
+                        setExpectedFailedCount(getExpectedFailedCount() + _myTests[i]->getExpectedFailedCount());
                         _myTests[i]->teardown();
                     }
                 }
@@ -319,7 +380,8 @@ UnitTestSuite::run() {
         }
     } catch (...) {
         std::cerr << "## test suite '" << getMyName() << "'"
-            << " was not completed because of an exception" << std::endl;
+            << " was not completed because of an unknown exception" << std::endl;
+        throw;
     }
 }
 
@@ -327,16 +389,7 @@ UnitTestSuite::run() {
 void
 UnitTestSuite::teardown() {
     destroyMyTests();
-    std::cerr << ">> Completed Test Unit '" << getMyName() << "'" << ", ";
-    if (getFailedCount()) {
-        std::cerr << TTYRED;
-    }
-    std::cerr << getFailedCount() << " total tests failed" << ENDCOLOR;
-    std::cerr << ", ";
-    if (getPassedCount()) {
-        std::cerr << TTYGREEN;
-    }
-    std::cerr << getPassedCount() << " total tests passed" << ENDCOLOR;
+
+    UnitTest::teardown();
     std::cerr << std::endl;
 }
-

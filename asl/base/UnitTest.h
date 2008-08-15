@@ -34,12 +34,14 @@
 class UnitTest {
 public:
     virtual void run() = 0;
-    unsigned int getFailedCount() const; 
     unsigned int getPassedCount() const;
+    unsigned int getFailedCount() const; 
+    unsigned int getExpectedFailedCount() const; 
     const char * getMyName() const;
     virtual ~UnitTest();
-    virtual void incrementFailedCount();
     virtual void incrementPassedCount();
+    virtual void incrementFailedCount();
+    virtual void incrementExpectedFailedCount();
     int returnStatus() const;
     const char * getTracePrefix ();
     virtual void setSilentSuccess(bool makeSilent = true);
@@ -48,7 +50,7 @@ public:
     virtual void teardown();
     virtual unsigned getProfileRepeatCount() const;
     virtual void setProfileRepeatCount(unsigned theCount);
- private:
+private:
     UnitTest();
     UnitTest(const UnitTest &);
     const UnitTest & operator=(const UnitTest &);
@@ -56,21 +58,26 @@ protected:
     explicit UnitTest(const char * myName);
 public:
     void ensure(bool myExpressionResult,
-              const char * myExpression,
-              const char * mySourceFileName,
-              unsigned long mySourceLine);
+                const char * myExpression,
+                const char * mySourceFileName,
+                unsigned long mySourceLine,
+                bool myExpectedResult = true);
 protected:
-    virtual void setFailedCount(unsigned int failedTests);
     virtual void setPassedCount(unsigned int passedTests);
+    virtual void setFailedCount(unsigned int failedTests);
+    virtual void setExpectedFailedCount(unsigned int failedTests);
     virtual void setMyName(const char * theName);
     friend class UnitTestSuite;
 private:
     const char * _myName;
     unsigned int _passedCount;
     unsigned int _failedCount;
+    unsigned int _expectedfailedCount;
     unsigned int _profilingRepeatCount;
     bool _silentSuccess;
     bool _abortOnFailure;
+
+    void reportResult(bool myExpressionResult,bool myExpectedResult);
 };
 
 class UnitTestSuite : public UnitTest {
@@ -149,9 +156,16 @@ public:
 };
 
 
+#define ENSURE_FULL(EXPRESSION, MESSAGE, EXPECT)    ensure(EXPRESSION, MESSAGE, __FILE__, __LINE__, EXPECT);
 
-#define ENSURE(EXP) ensure(EXP, # EXP, __FILE__, __LINE__);
-#define ENSURE_MSG(EXP, MSG) ensure(EXP, MSG, __FILE__, __LINE__);
+#define ENSURE_MSG(EXP, MSG)                        ENSURE_FULL(EXP,MSG ,true );
+#define ENSURE(EXP)                                 ENSURE_FULL(EXP,#EXP,true );
+#define ENSURE_FAIL_EXPECTED(EXP)                   ENSURE_FULL(EXP,#EXP,false);
+
+#define FAILURE(MSG)                                ENSURE_FULL(false,MSG,true );
+#define FAILURE_EXPECTED(MSG)                       ENSURE_FULL(false,MSG,false);
+#define SUCCESS(MSG)                                ENSURE_FULL(true ,MSG,true );
+
 #define ENSURE_EXCEPTION(theTest, theException) \
   { \
     try { \
@@ -162,20 +176,26 @@ public:
     } \
  }
 
-#define FAILURE(MSG) ensure(false, MSG, __FILE__, __LINE__);
-#define SUCCESS(MSG) ensure(true, MSG, __FILE__, __LINE__);
-#define DTITLE(TITLE) std::cerr << getTracePrefix() << TITLE << ":" << std::endl;;
-#define DPRINT(VARIABLE) std::cerr << getTracePrefix() << #VARIABLE << " = " << VARIABLE << std::endl;;
-#define DDUMP(MULTI_LINE_VARIABLE) std::cerr << getTracePrefix() << #MULTI_LINE_VARIABLE<< ":" << std::endl << MULTI_LINE_VARIABLE<< std::endl;
-#define DPRINT2(TITEL,VARIABLE) std::cerr << getTracePrefix() << TITEL << ": " << #VARIABLE << " = " << VARIABLE << std::endl;;
+#define DTITLE(TITLE)                               std::cerr << getTracePrefix() << TITLE << ":" << std::endl;;
+#define DPRINT2(TITEL,VARIABLE)                     std::cerr << getTracePrefix() << TITEL << ": " << #VARIABLE << " = " << VARIABLE << std::endl;;
+#define DPRINT(VARIABLE)                            DPRINT2(#VARIABLE,VARIABLE)
+#define DDUMP(MULTI_LINE_VARIABLE)                  std::cerr << getTracePrefix() << #MULTI_LINE_VARIABLE<< ":" << std::endl << MULTI_LINE_VARIABLE<< std::endl;
 
 
 #define ENSURE_EQUAL(EXP1,EXP2) { \
-	ensure(EXP1 == EXP2, # EXP1 "==" # EXP2, __FILE__, __LINE__); \
-	if ((EXP1) != (EXP2)) { \
-		std::cerr << getTracePrefix() << #EXP1 << " = " << EXP1 << std::endl; \
-		std::cerr << getTracePrefix() << #EXP2 << " = " << EXP2 << std::endl; \
-	} \
+    ENSURE_FULL(EXP1 == EXP2, # EXP1 "==" # EXP2, true); \
+    if ((EXP1) != (EXP2)) { \
+        std::cerr << getTracePrefix() << #EXP1 << " = " << EXP1 << std::endl; \
+        std::cerr << getTracePrefix() << #EXP2 << " = " << EXP2 << std::endl; \
+    } \
+}
+
+#define ENSURE_UNEQUAL(EXP1,EXP2) { \
+    ENSURE_FULL(EXP1 != EXP2, # EXP1 "==" # EXP2, true); \
+    if ((EXP1) == (EXP2)) { \
+        std::cerr << getTracePrefix() << #EXP1 << " = " << EXP1 << std::endl; \
+        std::cerr << getTracePrefix() << #EXP2 << " = " << EXP2 << std::endl; \
+    } \
 }
 
 

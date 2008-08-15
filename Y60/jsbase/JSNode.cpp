@@ -808,44 +808,35 @@ xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theXPath", "an XPath expression leading to the desired Node", DOC_TYPE_STRING);
     DOC_RVAL("the first matching node", DOC_TYPE_ARRAY);
     DOC_END;
-    std::string myPathString;
-    dom::NodePtr myNode;
-    bool myDeepSearchFlag = true;    
 
+    dom::NodePtr myNode;
     if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
         JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
+        return JS_FALSE;
     }
 
-    std::vector<dom::NodePtr> myResults;
-    if (argc < 1) {
+    if (argc != 1) {
         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
-    } else if (argc > 1) {
-        JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+        return JS_FALSE;
     }
 
+    std::string myPathString;
     if (!convertFrom(cx, argv[0], myPathString)) {
         JS_ReportError(cx,"JSNode::find: argument is not a string.");
-    };                        
-
-    xpath::Path *myPath = xpath::xpath_parse(myPathString);
-
-    if (!myPath) {
-        JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
         return JS_FALSE;
-    } else {
+    }
 
-        dom::Node *res = xpath::xpath_evaluate1(myPath, &*myNode);
-        if (res) {
-            dom::NodePtr resPtr = res->self().lock();
-            *rval = as_jsval(cx, resPtr);
-            xpath::xpath_return(myPath);
-            return JS_TRUE;
+    try {
+        const xpath::Path myPath(myPathString);
+        if ( const dom::Node* resPtr = xpath::find(myPath,myNode) ) {
+            *rval = as_jsval(cx, resPtr->self().lock());
         } else {
-            //JS_ReportError(cx, "JSNode::find: no nodes found under %s", myPathString.c_str());
-            AC_DEBUG << "JSNode::find: no nodes found under path'" << myPathString <<"'";
-            xpath::xpath_return(myPath);
-            return JS_TRUE;
+            AC_DEBUG << "JSNode::find: no nodes found under path \"" << myPathString <<'\"';
         }
+        return JS_TRUE;
+    } catch( const xpath::XPathError& x ) {
+        JS_ReportError(cx,"JSNode::find: could not parse %s", asl::compose_message(x).c_str() );
+        return JS_FALSE;
     }
 }
 
@@ -855,36 +846,35 @@ xpath_findAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_PARAM("theXPath", "", DOC_TYPE_STRING);
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
-    std::string myPathString;
-    dom::NodePtr myNode;
-    bool myDeepSearchFlag = true;    
 
+    dom::NodePtr myNode;
     if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
         JS_ReportError(cx,"JSNode::find() - Could not convert object to node");
-    }
-
-    std::vector<dom::NodePtr> myResults;
-    if (argc < 1) {
-         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
-    } else if (argc > 1) {
-         JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
-    }
-
-    if (!convertFrom(cx, argv[0], myPathString)) {
-         JS_ReportError(cx,"JSNode::find: argument is not a string.");
-    };                        
-
-    xpath::Path *myPath = xpath::xpath_parse(myPathString);
-
-    if (!myPath) {
-        JS_ReportError(cx,"JSNode::find: could not parse %s", myPathString.c_str());
         return JS_FALSE;
-    } else {
-        std::vector<dom::NodePtr> myResults;
-        xpath::xpath_evaluate(myPath, &*myNode, myResults);
+    }
+
+    if (argc != 1) {
+        JS_ReportError(cx,"JSNode::find: wrong number of parameters: %d, 1 expected", argc);
+        return JS_FALSE;
+    }
+
+    std::string myPathString;
+    if (!convertFrom(cx, argv[0], myPathString)) {
+        JS_ReportError(cx,"JSNode::find: argument is not a string.");
+        return JS_FALSE;
+    }
+
+    try {
+        const xpath::Path myPath(myPathString);
+        xpath::NodeList myResults = xpath::findAll(myPath, myNode);
+        if (myResults.empty()) {
+            AC_DEBUG << "JSNode::find: no nodes found under path \"" << myPathString <<'\"';
+        }
         *rval = as_jsval(cx, myResults);
-        xpath::xpath_return(myPath);
         return JS_TRUE;
+    } catch( const xpath::XPathError& x ) {
+        JS_ReportError(cx,"JSNode::find: could not parse %s", asl::compose_message(x).c_str() );
+        return JS_FALSE;
     }
 }
 

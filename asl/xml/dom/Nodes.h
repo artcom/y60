@@ -236,36 +236,44 @@ namespace dom {
         */
         //@{
         /// default constructor
-        Node() : _myType(X_NO_NODE), _myParseCompletionPos(0), _myDocSize(0),
-                _myChildrenList(this), _myAttributes(this), _myParent(0), _myFacade(0), _myVersion(0), _lazyChildren(false) {}
+        Node()
+            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0), _myChildrenList(this)
+            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
+            , _myVersion(0), _mySavePosition()
+        {}
 
         /// create element node with attributes
         Node(const DOMString & name, const NamedNodeMap & attributes, Node * theParent)
-            : _myType(ELEMENT_NODE), _myName(name), _myAttributes(attributes, ATTRIBUTE_NODE, this),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
-            _myFacade(0), _myVersion(0), _lazyChildren(false) {}
+            : _myType(ELEMENT_NODE), _lazyChildren(false), _myName(name), _myParent(theParent)
+            , _myChildrenList(this), _myAttributes(attributes, ATTRIBUTE_NODE, this)
+            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
+            , _mySavePosition()
+        {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes
             */
-        Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent);
+        Node(NodeType type, const DOMString & name, const DOMString & value, Node * theParent);
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes by supplying a special Value Type
             */
-        Node(NodeType type,const DOMString & name, const ValueBase & theValue, Node * theParent)
-            : _myType(type), _myName(name), _myValue(theValue.clone(this)),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent),_myChildrenList(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false) {}
+        Node(NodeType type, const DOMString & name, const ValueBase & theValue, Node * theParent)
+            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent)
+            , _myValue(theValue.clone(this)), _myChildrenList(this), _myAttributes(this)
+            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
+            , _mySavePosition()
+        {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes by supplying a special Value Type Ptr;
             this constructor takes the ownership of ValuePtr.
             */
-        Node(NodeType type,const DOMString & name, ValuePtr theValuePtr, Node * theParent)
-            : _myType(type), _myName(name), _myValue(theValuePtr),
-            _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
-            _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
+        Node(NodeType type, const DOMString & name, ValuePtr theValuePtr, Node * theParent)
+            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent)
+            , _myValue(theValuePtr), _myChildrenList(this), _myAttributes(this)
+            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
+            , _mySavePosition()
         {
             if (_myValue) {
                 _myValue->setNodePtr(this);
@@ -282,16 +290,17 @@ namespace dom {
         */
         Node(const DOMString & xml, int pos,
             Node * parent, const Node * doctype, NodeType type = X_NO_NODE)
-            : _myType(type), _myParseCompletionPos(0), _myDocSize(0),
-            _myParent(parent),_myChildrenList(this),_myAttributes(this),
-            _myFacade(0), _myVersion(0), _lazyChildren(false)
+            : _myType(type), _lazyChildren(false), _myParent(parent), _myChildrenList(this)
+            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
+            , _myVersion(0), _mySavePosition()
         {
             parseNextNode(xml,pos,parent,doctype);
         }
 
         Node(const DOMString & xml)
-            : _myType(X_NO_NODE), _myParseCompletionPos(0), _myDocSize(0),_myParent(0),
-            _myChildrenList(this), _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
+            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0), _myChildrenList(this)
+            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
+            , _myVersion(0), _mySavePosition()
         {
             parseAll(xml);
         }
@@ -624,6 +633,10 @@ namespace dom {
         bool isSameNode(const NodePtr theNode) const {
             return &(theNode->_myType) == &_myType;
         }
+        /** compare document order
+            @return -1, if *this<*theNode; +1, if *this>*theNode; 0, if this==theNode
+        */
+        int compareByDocumentOrder(const NodePtr theNode) const;
         /** @return a read only pointer to node's i'th child
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */

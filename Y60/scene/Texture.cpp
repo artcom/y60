@@ -12,8 +12,6 @@
 
 #include <y60/IScene.h>
 #include <dom/Field.h>
-#include <xpath/xpath_api.h>
-
 
 using namespace asl;
 using namespace std;

@@ -1,114 +1,116 @@
-//=============================================================================
-// Copyright (C) 2007, ART+COM AG Berlin
-//
-// These coded instructions, statements, and computer programs contain
-// unpublished proprietary information of ART+COM AG Berlin, and
-// are copy protected by law. They may not be disclosed to third parties
-// or copied or duplicated in any form, in whole or in part, without the
-// specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
+/**********************************************************************************************/
 
-#include <stdlib.h>
+/*
+**
+** Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+**
+** These coded instructions, statements, and computer programs contain
+** unpublished proprietary information of ART+COM AG Berlin, and
+** are copy protected by law. They may not be disclosed to third parties
+** or copied or duplicated in any form, in whole or in part, without the
+** specific, prior written permission of ART+COM AG Berlin.
+**
+*/
 
+/**********************************************************************************************/
+
+/*!
+** \file xpath/Value.cpp
+**
+** \brief XPath values
+**
+** \author Hendrik Schober
+**
+** \date 2008-07-14
+**
+*/
+
+/**********************************************************************************************/
 #include "Value.h"
+
+/**********************************************************************************************/
+#include <cfloat>
+#include <cassert>
+#include <vector>
+#include <sstream>
+
+/**********************************************************************************************/
+#include <asl/numeric_functions.h>
+
+/**********************************************************************************************/
 
 namespace xpath {
 
-    Value::~Value() {}
+    namespace detail {
 
-    BooleanValue::~BooleanValue() {}
+        //struct LessByDocOrder : public std::binary_function< const dom::Node*
+        //                                                   , const dom::Node*
+        //                                                   , bool >
+        //{
+            bool LessByDocOrder::operator()(const dom::Node* lhs, const dom::Node* rhs) const
+            {
+                return -1 == lhs->compareByDocumentOrder(rhs->self().lock());
+            }
+        //};
 
-    NumberValue::~NumberValue() {}
-
-    NumberValue *
-    BooleanValue::toNumber() {
-        return new NumberValue(value!=0?1:0);
-    }
-
-    StringValue *
-    BooleanValue::toString() {
-        return new StringValue(value?"true":"false");
-    }
-
-    StringValue *
-    NumberValue::toString() {
-        if (isNaN)
-            return new StringValue("NaN");
-        if (isInfinity)
-            return new StringValue("-Infinity"+(value<0?0:1));
-        std::string result;
-        std::ostringstream stream(result);
-        stream << value;
-        return new StringValue(result);
-    }
-
-    StringValue *
-    NodeSetValue::toString() {
-        NodeRef stringnode = item(0);
-        if (!stringnode) {
-            return new StringValue(NULL);
+        StringValue getStringValue(const dom::Node* node)
+        {
+            return StringValue( node->nodeValue() );
         }
-        return new StringValue(string_value_for(stringnode));
-    }
 
-    string
-    string_value_for(NodeRef n) {
-        string retval;
-        switch(n->nodeType()) {
-            case dom::Node::DOCUMENT_NODE:
-            case dom::Node::ELEMENT_NODE:
-                for (int i = 0; i < n->childNodesLength(); i++) {
-                    retval += string_value_for(&*n->childNode(i));
+        //class NodeSetValue : public TypedValue<Value_NodeSet> {
+        //private:
+            StringValue NodeSetValue::to(StringValue *) const
+            {
+                if( getValue().empty() ) {
+                    return StringValue(String());
                 }
-                break;
-            case dom::Node::ATTRIBUTE_NODE:
-            case dom::Node::TEXT_NODE:
-                retval = n->nodeValue();
-                break;
-            default:
-                AC_ERROR << " could not determine string_value for " << n->nodeType();
-                retval = "";
-        }
-        return retval;
+                return getStringValue( *getValue().begin() );
+            }
+        //};
+
+        //class NumberValue : public TypedValue<Value_Number> {
+        //private:
+            bool NumberValue::isNaN() const
+            {
+                return asl::isNaN(getValue());
+            }
+
+            bool NumberValue::isFinite() const
+            {
+                return asl::isFinite(getValue());
+            }
+
+            StringValue NumberValue::to(StringValue *) const
+            {
+                if( isNaN() ) {
+                    return StringValue("NaN");
+                }
+                if( !isFinite() ) {
+                    return StringValue(getValue() > 0 ? "Infinity" : "-Infinity");
+                }
+                std::basic_ostringstream<String::value_type> oss;
+                oss << getValue();
+                return StringValue(oss.str());
+            }
+        //};
+
+        //class StringValue : public TypedValue<Value_String> {
+        //private:
+            NumberValue StringValue::to(NumberValue *) const
+            {
+                std::basic_istringstream<String::value_type> iss(getValue());
+                Number num;
+                iss >> std::ws >> num;
+                if( !iss ) {
+                    throw BadCast( std::string("Cannot cast ")+getValue()+" to number", PLUS_FILE_LINE );
+                }
+                return NumberValue(num);
+            }
+        //};
+
     }
 
-    double
-    number_value_for(const string &s) {
-        double num;
-        std::istringstream iss(s);
-        if (! (iss >> num)) {
-            return 0;
-        }
-        int pos = iss.tellg();
-        if ( asl::read_whitespace(s, pos++) != s.length()) {
-            return 0; 
-        }
-        return num;
-    }
-
-    NumberValue *StringValue::toNumber() {
-        int num = 0;
-        std::istringstream iss(value);
-        iss >> num;
-        return new NumberValue(num);
-    }
-
-    StringValue::~StringValue() {}
-
-    NumberValue *
-    NodeSetValue::toNumber() {
-        string nodeContent = string_value_for(item(0));
-        std::stringstream myStream(nodeContent);
-        double num;
-        myStream >> num;
-        return new NumberValue(num);
-    }
-
-    NodeSetValue *
-    NodeSetValue::toNodeSet() {
-        // WARNING: this practivally invalidates the current node set.
-        // use only in a destructive setting, i.e. if you don't need
-        // the old nodeset any more after conversion.
-        return new NodeSetValue(takeNodes());
-    }
 }
+
+/**********************************************************************************************/

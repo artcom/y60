@@ -27,6 +27,9 @@
 #include <limits>
 #include <string>
 
+#if defined(WIN32)
+#include <float.h>
+#endif //defined(WIN32)
 
 namespace asl {
 
@@ -42,13 +45,32 @@ static const double EULER = 2.7182818284590452354;
 inline double radFromDeg(double theDegree)  { return (theDegree * PI) / 180.0; }
 inline double degFromRad(double theRadiant) { return (theRadiant * 180.0) / PI; }
 
+inline 
+bool isNaN(const double theNumber) {
+#if defined(WIN32)
+	return _isnan(theNumber);
+#else //defined(WIN32)
+	return std::isnan(theNumber);
+#endif //defined(WIN32)
+}
+
+inline 
+bool isFinite(const double theNumber) {
+#if defined(WIN32)
+	return _finite(theNumber);
+#else //defined(WIN32)
+	return std::isfinite(theNumber);
+#endif //defined(WIN32)
+}
 
 template<class T>
+inline
 T abs(T theNumber) {
     return (theNumber < (T)(0) ? -theNumber : theNumber);
 }
 
 template<class T>
+inline
 int round(T theNumber) {
     if ((theNumber - floor(theNumber)) >= (T)(0.5)) {
         return int(ceil(theNumber));
