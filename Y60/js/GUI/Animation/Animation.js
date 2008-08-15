@@ -79,6 +79,10 @@ GUI.Animation.Constructor = function(Public, Protected) {
     Public.easing getter = function() {
         return _easing;
 	};
+	
+	Public.easing setter = function(theEasing) {
+        _easing = theEasing;
+	};
 		
     Public.duration getter = function() {
         return _duration;
