@@ -123,38 +123,38 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         
     Public.setup = function() {
         Logger.info("Setting up image " + _myName);
-
+        
         if("z" in _myNode) {
             _myDepth += Number(_myNode.z);
         }
 
-         var myFile = CONTENT + "/" + _myNode.file;
-         _myMaterial = getCachedImageMaterial(myFile);
-         _myMaterial.transparent = true;
+        var myFile = CONTENT + "/" + _myNode.file;
+        _myMaterial = getCachedImageMaterial(myFile);
+        _myMaterial.transparent = true;
  
-         _myWidth = _myNode.width;
-         _myHeight = _myNode.height;
+        _myWidth = _myNode.width;
+        _myHeight = _myNode.height;
  
-         var myInsensible = true;
-         if ("insensible" in _myNode) {
-             myInsensible = _myNode.insensible;
-         }
+        var myInsensible = true;
+        if ("insensible" in _myNode) {
+            myInsensible = _myNode.insensible;
+        }
          
-         _myQuad = createQuad(_myParent, _myName,
-                              new Vector2f(_myWidth,_myHeight),
-                              new Vector3f(_myNode.x,_myNode.y, _myDepth),
-                              _myMaterial,
-                              myInsensible,
-                              /* visible */    true);
+        _myQuad = createQuad(_myParent, _myName,
+                             new Vector2f(_myWidth,_myHeight),
+                             new Vector3f(_myNode.x,_myNode.y, _myDepth),
+                             _myMaterial,
+                             myInsensible,
+                             /* visible */    true);
 
-         if("angle" in _myNode) {
-             _myQuad.body.orientation =
-                 Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)));
-         }
+        if ("angle" in _myNode) {
+            _myQuad.body.orientation =
+                Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)));
+        }
          
-         if("wrapmode" in _myNode) {
+        if ("wrapmode" in _myNode) {
             Public.wrapmode = _myNode.wrapmode;
-         }
+        }
     } 
     
     Public.setup();

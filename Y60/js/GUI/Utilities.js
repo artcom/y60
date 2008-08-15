@@ -70,14 +70,29 @@ function getNodeByName(theName) {
 function getCachedImage(theImagePath) {
     var myImageName = "image-" + theImagePath;
     var myImage = getNodeByName(myImageName);
-
+    
     if(!myImage) {
         myImage = Modelling.createImage(window.scene, theImagePath);
         myImage.name = myImageName;
-
         registerNode(myImageName, myImage);
     }
     return myImage;
+}
+
+function getCachedMovie(theMoviePath) {
+    var myMovieName = "movie-" + theMoviePath;
+    var myMovie = getNodeByName(myMovieName);
+    
+    if(!myMovie) {
+        myMovie = Node.createElement("movie");
+        window.scene.images.appendChild(myMovie);
+        myMovie.src = theMoviePath;
+        myMovie.name = myMovieName;
+        myMovie.loopcount = 0;
+        window.scene.loadMovieFrame(myMovie);
+        registerNode(myMovieName, myMovie);
+    }
+    return myMovie;
 }
 
 function getCachedImageMaterial(theImagePath) {
@@ -88,6 +103,21 @@ function getCachedImageMaterial(theImagePath) {
     var myImage = getCachedImage(theImagePath);
 
     var myTexture = Modelling.createTexture(window.scene, myImage);
+
+    var myMaterial =
+        Modelling.createUnlitTexturedMaterial(window.scene, myTexture, myMaterialName);
+    
+    return myMaterial;
+}
+
+function getCachedMovieMaterial(theMoviePath) {
+    var myMaterialName = "movie-material-" + theMoviePath;
+
+    Logger.info("Computing image material for " + theMoviePath);
+
+    var myMovie = getCachedMovie(theMoviePath);
+
+    var myTexture = Modelling.createTexture(window.scene, myMovie);
 
     var myMaterial =
         Modelling.createUnlitTexturedMaterial(window.scene, myTexture, myMaterialName);
