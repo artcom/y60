@@ -828,7 +828,7 @@ xpath_find(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     try {
         const xpath::Path myPath(myPathString);
-        if ( const dom::Node* resPtr = xpath::find(myPath,myNode) ) {
+        if ( dom::NodePtr resPtr = xpath::find(myPath,myNode) ) {
             *rval = as_jsval(cx, resPtr->self().lock());
         } else {
             AC_DEBUG << "JSNode::find: no nodes found under path \"" << myPathString <<'\"';
