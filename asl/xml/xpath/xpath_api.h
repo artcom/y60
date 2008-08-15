@@ -43,21 +43,21 @@
 
 namespace xpath {
 
-    typedef std::vector<const dom::Node*>             NodeList;
+    typedef std::vector<const dom::NodePtr>           NodeList;
 
-    void find(const Path&, const dom::NodePtr, const dom::Node*&);
+    void find(const Path&, const dom::NodePtr, dom::NodePtr&);
 
-    const dom::Node* find(const Path&, const dom::NodePtr);
+    dom::NodePtr find(const Path&, const dom::NodePtr);
 
     void findAll(const Path&, const dom::NodePtr, NodeList&);
 
     NodeList findAll(const Path&, const dom::NodePtr);
 
     inline 
-    const dom::Node* 
+    dom::NodePtr 
     find(const Path& thePath, const dom::NodePtr theNode)
     {
-        const dom::Node* myResult;
+        dom::NodePtr myResult;
         find(thePath,theNode,myResult);
         return myResult;
     }

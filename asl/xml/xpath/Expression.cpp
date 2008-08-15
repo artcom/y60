@@ -39,7 +39,7 @@
 #include "Path.h"
 #include "ParseInput.h"
 #include "PathParser.h"
-#include "xpath_api.h"
+#include "xpath_api_impl.h"
 
 /**********************************************************************************************/
 
@@ -1160,9 +1160,10 @@ namespace xpath {
         //protected:
             Object PathExpr::doEvaluate(const EvaluationContext& evContext) const
             {
-                NodeList nodeList;
-                xpath::findAll(path_, evContext.contextNode->self().lock(), nodeList);
-                const NodeSet nodeSet( nodeList.begin(), nodeList.end() );
+                NodePtrVec nodePtrVec;
+                Context subcontext(evContext.contextNode);
+                findNodes(path_,subcontext,nodePtrVec,false);
+                const NodeSet nodeSet( nodePtrVec.begin(), nodePtrVec.end() );
                 return Object(nodeSet);
             }
         //};
