@@ -812,14 +812,14 @@ namespace {
         template< template<typename> class Comparator >
         static bool compare(const Object& lhs, const Object& rhs, Int2Type<BooleanOperation>)
         {
-            return Comparator<Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
+            return Comparator<xpath::detail::Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
         }
 
         template< template<typename> class Comparator >
         static bool compare(const Object& lhs, const Object& rhs, Int2Type<EqualityOperation>)
         {
             if( lhs.getType()==Value_Boolean || rhs.getType()==Value_Boolean ) {
-                return Comparator<Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
+                return Comparator<xpath::detail::Boolean>()( lhs.as<BooleanValue>().getValue(), rhs.as<BooleanValue>().getValue() );
             }
             if( lhs.getType()==Value_Number || rhs.getType()==Value_Number ) {
                 return Comparator<Number>()( lhs.as<NumberValue>().getValue(), rhs.as<NumberValue>().getValue() );
