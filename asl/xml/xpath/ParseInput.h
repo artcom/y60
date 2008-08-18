@@ -75,7 +75,8 @@ namespace xpath {
 
             void forwardTo(index_type idx)              {idx_=idx;}
 
-            void forwardTo(const_iterator it)           {idx_ = (it-str_.begin());}
+            // note: const_cast in order to circumvent GCC bug where the string changes when calling begin()
+            void forwardTo(const_iterator it)           {idx_ = (it-const_cast<const std::string&>(str_).begin());} 
 
             char getNextChar(bool skipWs = true)        {if(eof(true)) return '\0'; else return str_[idx_++];}
 
