@@ -761,7 +761,7 @@ namespace {
 
     inline const Ft2FdiMap& getFt2FdiMap()
     {
-        static const Ft2FdiMap& ft2FdiMap = buildFt2FdiMap();
+        static const Ft2FdiMap ft2FdiMap = buildFt2FdiMap();
         return ft2FdiMap;
     }
 
