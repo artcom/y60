@@ -287,8 +287,8 @@ namespace xpath {
             subcontext.currentNodes = findNodeTestNodes (subcontext,step.getNodeTest() );
             subcontext.currentNodes = findPredicateNodes(subcontext,step.getPredicate());
             context.currentNodes.insert( context.currentNodes.end()
-                                    , subcontext.currentNodes.begin()
-                                    , subcontext.currentNodes.end  () );
+                                       , subcontext.currentNodes.begin()
+                                       , subcontext.currentNodes.end  () );
         }
 
         /**************************************************************************************/

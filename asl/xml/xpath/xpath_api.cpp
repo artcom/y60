@@ -49,7 +49,7 @@ namespace xpath {
         if( !temp.empty() ) {
             result = temp.front()->self().lock();
         } else {
-        	result = dom::NodePtr();
+            result = dom::NodePtr();
         }
     }
 
