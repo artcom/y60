@@ -272,7 +272,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myOffscreenRenderArea.eventListener = theViewer;
         _myBufferBits = _myOffscreenRenderArea.constructor.GL_COLOR_BUFFER_BIT | _myOffscreenRenderArea.constructor.GL_DEPTH_BUFFER_BIT;
 
-        _myOffscreenOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, myOffscreenCanvas.find("//overlays"));
+        _myOffscreenOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, myOffscreenCanvas.find(".//overlays"));
         _myOffscreenOverlay.name = "Offscreen";
         /*_myOffscreenOverlay.srcsize = new Vector2f(myOffscreenImage.width / nextPowerOfTwo(myOffscreenImage.width),
                                                    myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
@@ -308,7 +308,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myBlurXRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
         _myBlurXRenderArea.setSceneAndCanvas( window.scene, myBlurXCanvas);
 
-        _myBlurXOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, myBlurXCanvas.find("//overlays"));
+        _myBlurXOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, myBlurXCanvas.find(".//overlays"));
         _myBlurXOverlay.name = "BlurX";
         _myBlurXOverlay.width = myWidth;
         _myBlurXOverlay.height = myHeight;
@@ -351,7 +351,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myBlurYRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
         _myBlurYRenderArea.setSceneAndCanvas( window.scene, myBlurYCanvas);
 
-        _myBlurYOverlay = new ImageOverlay(window.scene, myBlurXImage, null, myBlurYCanvas.find("//overlays"));
+        _myBlurYOverlay = new ImageOverlay(window.scene, myBlurXImage, null, myBlurYCanvas.find(".//overlays"));
         _myBlurYOverlay.name = "BlurY";
 
         var myBlurYMaterial = _myBlurYOverlay.material;
@@ -374,7 +374,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
          * Glow
          * renders myBlurYImage onto screen
          */
-        _myGlowOverlay = new ImageOverlay(window.scene, myBlurYImage, null, myBlurYCanvas.find("//overlays"));
+        _myGlowOverlay = new ImageOverlay(window.scene, myBlurYImage, null, myBlurYCanvas.find(".//overlays"));
         _myGlowOverlay.name = "Glow";
         _myGlowOverlay.width = _myOffscreenOverlay.width;
         _myGlowOverlay.height = _myOffscreenOverlay.height;
