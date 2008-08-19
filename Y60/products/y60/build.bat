@@ -1,3 +1,3 @@
-call "C:\Programme\Microsoft Visual Studio .NET 2003\Common7\Tools\vsvars32.bat"
+call "%VS71COMNTOOLS%\vsvars32.bat"
 set CHERE_INVOKING=1
-c:\cygwin\bin\bash.exe --login --noprofile ./build.sh
+c:\cygwin\bin\bash.exe --login %PRO%\src\Y60\products\y60\build.sh
