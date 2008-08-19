@@ -95,6 +95,23 @@ function getCachedMovie(theMoviePath) {
     return myMovie;
 }
 
+function getCachedTexture(theImagePath) {
+    var myTextureName = "image-texture-" + theImagePath;
+
+    Logger.info("Computing image texture for " + theImagePath);
+    
+    var myImage = getCachedImage(theImagePath);
+    var myTexture = getNodeByName(myTextureName);
+    
+    if(!myTexture) {
+        myTexture = Modelling.createTexture(window.scene, myImage);
+        myTexture.name = myTextureName;
+        registerNode(myTextureName, myTexture);
+    }
+    
+    return myTexture;
+}
+
 function getCachedImageMaterial(theImagePath) {
     var myMaterialName = "image-material-" + theImagePath;
 
