@@ -116,6 +116,18 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.z setter = function(v) {
         Public.body.position.z = v;
     }
+    
+    Public.playmode getter = function() {
+        if ("playmode" in Public.image) {
+            return Public.image.playmode;
+        }
+        return "";
+    }
+    Public.playmode setter = function(theMode) {
+        if ("playmode" in Public.image) {
+            Public.image.playmode = theMode;
+        }
+    }
 
     ////////////////////////////////////////
     // setup

@@ -89,6 +89,7 @@ function getCachedMovie(theMoviePath) {
         myMovie.src = theMoviePath;
         myMovie.name = myMovieName;
         myMovie.loopcount = 0;
+        myMovie.playmode = "stop";
         window.scene.loadMovieFrame(myMovie);
         registerNode(myMovieName, myMovie);
     }
