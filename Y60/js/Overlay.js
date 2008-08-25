@@ -20,7 +20,7 @@ var ourImageCache = [];
 function OverlayBase(theScene, thePosition, theParent) {
 	var Protected = [];
 	this.Constructor(this, Protected, theScene, thePosition, theParent);
-	exit(0);
+	exit(1);
 }
 
 OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePosition, theParent) {
@@ -197,7 +197,7 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
 function MaterialOverlay(theScene, thePosition, theParent) {
 	var Protected = [];
 	this.Constructor(this, Protected, theScene, thePosition, theParent);
-	exit(0);
+	exit(1);
 }
 MaterialOverlay.prototype.Constructor = function(Public, Protected, theScene, thePosition, theParent) {
 

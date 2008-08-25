@@ -4084,12 +4084,14 @@ js_Interpret(JSContext *cx, jsval *result)
                 }
                 fprintf(tracefp, " @ %d\n", sp - fp->spbase);
             }
+#ifdef DEBUG_STACK
             fprintf(tracefp, "  stack: ");
             for (siter = fp->spbase; siter < sp; siter++) {
                 str = js_ValueToSource(cx, *siter);
                 fprintf(tracefp, "%s ",
                         str ? JS_GetStringBytes(str) : "<null>");
             }
+#endif
             fputc('\n', tracefp);
         }
 #endif

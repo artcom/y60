@@ -33,7 +33,7 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
 		std::string myMessage;
 		ensureParamCount(argc, 1);
 		convertFrom(cx, argv[0], myMessage);
-		AC_LOG(theSeverity, myFilename, myLineNo) << myMessage;
+		AC_LOG_CHECK(theSeverity, myFilename, myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

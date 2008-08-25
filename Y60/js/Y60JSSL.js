@@ -483,7 +483,7 @@ function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
 }
 
 function findNodeByNameChecked(theRootNode, theName) {
-    var myResult = theRootNode.find("//*[@name='"+theName+"']");
+    var myResult = theRootNode.find(".//*[@name='"+theName+"']");
     if (!myResult) {
         Logger.error("findNodeByNameChecked failed, see stack trace:");
         dumpstack();
