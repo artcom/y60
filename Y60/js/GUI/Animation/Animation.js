@@ -142,6 +142,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
 
     Public.play = function() {
+            Logger.info("Playing " + this);
 		_startTime = millisec();
 	    _progressTime = 0;
 		_progress = _easing(0.0);
@@ -153,11 +154,13 @@ GUI.Animation.Constructor = function(Public, Protected) {
 	};
 		
     Public.cancel = function() {
+            Logger.info("Cancelled " + this);
 		_running = false;
 	    callOnCancel();
 	};
 		
     Public.finish = function() {
+        Logger.info("Finished " + this);
 		callOnFinish();
         if(_loop) {
             Public.play();
