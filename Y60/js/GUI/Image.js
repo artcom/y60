@@ -30,6 +30,9 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     var _myMaterial = null;
     var _myQuad     = null;
 
+    var _myAlpha    = 1.0;
+    var _myMaxAlpha = 1.0;
+
     Public.bodies getter = function() {
         return [_myQuad.body];
     }
@@ -57,11 +60,17 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     }
     
     Public.alpha getter = function() {
-        return _myMaterial.properties.surfacecolor[3];
+        return _myAlpha; 
+    }
+    
+    Public.alpha setter = function(theAlpha) {
+        _myAlpha = theAlpha; 
+        Modelling.setAlpha(_myQuad.body, Math.min(_myMaxAlpha, _myAlpha));
     }
 
-    Public.alpha setter = function(theAlpha) {
-        Modelling.setAlpha(_myQuad.body, theAlpha);
+    Public.maxalpha setter = function(theAlpha) {
+        _myMaxAlpha = theAlpha;
+        Public.alpha = _myAlpha;
     }
     
     Public.visible getter = function() {
