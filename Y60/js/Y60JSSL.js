@@ -832,16 +832,26 @@ function convertQuatToEuler(q) {
 // Intuitively speaking: 'If you fix some arguments,
 // you get a function of the remaining arguments.'
 // P.S.: It's 'Schoenfinkeln' in german
-function curry(theFunction) {
- return (function innerCurry(theArgCount, theArguments) {
-     if (theArgCount == 0) {
-         return theFunction.apply(theFunction, theArguments);
-     } else {
-         return function(theExtractedArgument) {
-             return innerCurry(theArgCount-1, theArguments.concat([theExtractedArgument]))
-         };
-     }
- })(theFunction.length || theArguments[1] || 0, []);
+function curry() {
+    var theFunction = arguments[0];
+    var theCurry = Array.prototype.slice.call(arguments, 1);
+
+    return function() {
+        var myDirectArguments = Array.prototype.slice.call(arguments);
+        var myArguments = theCurry.concat(myDirectArguments);
+        return theFunction.apply(this, myArguments);
+    };
+}
+
+function rcurry() {
+    var theFunction = arguments[0];
+    var theCurry = Array.prototype.slice.call(arguments, 1);
+
+    return function() {
+        var myDirectArguments = Array.prototype.slice.call(arguments);
+        var myArguments = myDirectArguments.concat(theCurry);
+        return theFunction.apply(this, myArguments);
+    };
 }
 
 
