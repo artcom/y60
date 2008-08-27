@@ -180,8 +180,9 @@ PowermateInputExtension::pulseLED(int theStaticBrightness, int thePulseSpeed, in
     ev.code = MSC_PULSELED;
     ev.value = theStaticBrightness | (thePulseSpeed << 8) | (thePulseTable << 17) | (thePulseAsleep << 19) | (thePulseAwake << 20);
 
-    if (write(theFileDescriptor, &ev, sizeof(struct input_event)) != sizeof(struct input_event))
+    if (write(theFileDescriptor, &ev, sizeof(struct input_event)) != sizeof(struct input_event)) {
         AC_ERROR << "PowerMate :: Failed to Write to Griffin PowerMate " << strerror(errno);
+    }
 }
 
 void
