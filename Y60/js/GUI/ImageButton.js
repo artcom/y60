@@ -23,6 +23,8 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
     var Base = {};
 
     var _myName   = theImageButtonNode.name;
+    
+    var _myButtonName = ("button" in theImageButtonNode)?theImageButtonNode.button:theImageButtonNode.name;
     var _myNode   = theImageButtonNode;
     var _myParent = theParent;
 
@@ -46,6 +48,10 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
         } else {
             Modelling.setAlpha(Public.body, BUTTON_DISABLED_ALPHA);
         }
+    }
+
+    Public.buttonname getter = function() {
+        return _myButtonName;
     }
 
     Public.highlight getter = function() {

@@ -152,6 +152,25 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
     ////////////////////////////////////////
     // frame callback dispatch
     ////////////////////////////////////////
+    
+    Public.getButtonByName = function(theName) {
+        for (var i=0; i<ourButtons.length; ++i) {
+            if (ourButtons[i].buttonname == theName) {
+                return ourButtons[i];
+            }
+        }
+        
+        return null;
+    }
+
+    Public.clickButtonByName = function(theName) {
+        var myButton = Public.getButtonByName(theName);
+        if (myButton) {
+            myButton.onPointerClickWithSelf("bla", myButton[a]);
+        } else {
+            Logger.warning("Button '"+theName+"' not found");
+        }
+    }
 
     Base.onFrame = Public.onFrame;
     Public.onFrame = function(theTime) {
