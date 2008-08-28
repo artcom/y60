@@ -165,11 +165,14 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
 
     Public.clickButtonByName = function(theName) {
         var myButton = Public.getButtonByName(theName);
-        if (myButton) {
-            myButton.onPointerClickWithSelf("bla", myButton[a]);
-        } else {
+        if (!myButton) {
             Logger.warning("Button '"+theName+"' not found");
+            return;
         }
+        
+        if (myButton.enabled) {
+            myButton.onPointerClickWithSelf("bla", myButton);
+        } 
     }
 
     Base.onFrame = Public.onFrame;
