@@ -38,6 +38,64 @@
 //    recommendations: move this to its own component, 
 //                     check interfaces, 
 //                     remove CVS log 
+
+/** The "Station" protokoll is a simple UDP-based broadcast protocol that basically performs
+fragmentation and defragmentation of messages that do not fit into a single UDP packet.
+It is intended for use in local area networks within one broadcast range.
+
+The protocol is called "station" because it acts like a radio broadcast station. Every station can
+broadcast, and the broadcast is picked up by all listening stations.
+
+In addition to fragmentation/defragmentation, the protocol offers two additional features:
+
+1) A transparent 32-Bit Network id that allows to create pseudo-multicast groups
+2) Compression of the payload when the uncompressed payload does not fit into one packet
+
+The protocol is not designed for high throughput, but for low-latency and synchronisation purposes.
+It also features extensive error checking and reporting. When one packet of a multi-packet message
+is lost, the whole message is discarded, no retransmission occurs. Message boundaries are always
+preserved. Duplicate messages are not discarded, and nothing is done to ensure ordering of messages,
+although on a LAN the ordering of messages is generally preserved. However, message integrity is
+strictly preserved.
+
+Usage:
+
+The interface is quite simple: it consists of the openStation(), closeStation(), broadcast() and receive() calls.
+
+broadcast() takes a block of memory as sole argument and broadcasts it.
+receive() is non-blocking and returns the oldest fully received message when available, together with the 
+originating host adress and station id.
+
+Caveeats: 
+Altough the protocol is fairly simple and easy to use, there are a few things to consider:
+1) Under Linux, unfortunately the SO_REUSEPORT socket option does not exist, which limits the number of
+receiving stations with the same port number on a single linux host to one. Although this can be solved
+by using a simple port forwarder, it is not nice. In practice it is often desirable that multiple
+independent processes can listen to the same broadcast.
+
+Please note that you can always provide different port numbers for sending and receiving, so there is
+no limit for the number of transmit-only stations on a single Linux host when they use different
+port numbers.
+
+On Windows and OSX however however multiple port bindings are allowed. (Windows does not have the
+SO_REUSEPORT option, but allowing multiple port bindings is default.)
+
+The proper solution for Linux systems would be to use multicast instead of broadcast. In this case,
+the SO_REUSEADDR option hase the same effect like SO_REUSEPORT and should work also properly
+with Linux.
+
+2) Currently the protocol adds 40 Bytes overhead, which could be easily reduced to less than the half,
+but has not be considered to be worth the problems it might add.
+
+3) The protocol will not perform well when packet loss is high and the messages are very long; the
+chances of getting even one message through drops exponentially with the message length:
+prob_msg_lost = prob_packet_lost ^ packets_per_message 
+
+4) The implementation is non-blocking and well suited to run in a single threaded environment; therefore
+receive() should not be called in a tight loop when there is no work to be performed. A typical usage is
+to check once per frame for new messages that have arrived. For operation in a multi-threaded environment,
+the code either needs to be modified to support blocking operation as well, or support for using select()
+needs to be added; exposing the file descriptor should be enough to do that.
 */
 
 #ifndef AC_STATION_H_INCLUDED
@@ -87,12 +145,12 @@ public:
 
     Station() : _good(false) {};
     Station(unsigned long theBroadcastAddress, // IP-Broadcast Adress
-            unsigned short theBroadcastPort,   // IP-Port Adresse
-            unsigned short theReceivePort,     // IP-Port Adresse
-            unsigned long ownIPAddress,        // eigene Adresse angeben, um eigene Pakete auszufiltern
-            unsigned long theStationID,        // beliebige ID zur Unterscheidung verschiedener Teilnehmer
-                                               // auf einem Host (geht z.Z . unter Linux nicht wg. fehlendem SO_REUSEPORT
-            unsigned long theNetworkID)        // beliebige ID, muss bei allen Teilnehmern identisch sein
+            unsigned short theBroadcastPort,   // IP-Port Adress
+            unsigned short theReceivePort,     // IP-Port Adress
+            unsigned long ownIPAddress,        // supply own Adresse to avoid receiving self-sent packets
+            unsigned long theStationID,        // arbitrary unique ID to distinguish different stations
+                                               // on a single  host (geht z.Z . unter Linux nicht wg. fehlendem SO_REUSEPORT
+            unsigned long theNetworkID)        // arbitrary group id, must be the same number for all participating nodes
         : _good(false)
     {
         openStation(theBroadcastAddress, theBroadcastPort, theReceivePort, ownIPAddress, theStationID, theNetworkID);
