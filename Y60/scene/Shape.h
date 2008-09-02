@@ -105,6 +105,9 @@ namespace y60 {
             void setLastRenderVersion(unsigned long long theVersion) {
                 _myLastRenderVersion = theVersion;
             }
+            void enforceReload() {
+                _myLastRenderVersion = 0;
+            }
             void setVertexCount(unsigned long theVertexCount) {
                 _myVertexCount = theVertexCount;
             }

@@ -50,6 +50,8 @@
 #include <y60/ShaderLibrary.h>
 #include <y60/ArgumentHolder.impl>
 
+#include <xpath/xpath_api.h>
+
 using namespace std;
 using namespace y60;
 
@@ -274,6 +276,14 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             //_myScene->update(Scene::SHAPES); // updated in updateAllModified
             if (!theInitializeCallFlag) {
                 _myScene->getTextureManager()->reloadTextures();
+            }
+        }
+        if (_myScene) {        
+            xpath::NodeList myResult;
+            xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
+            for (int myIndex = 0; myIndex < myResult.size(); myIndex++) {
+               ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
+               myShape->enforceReload();             
             }
         }
     }
