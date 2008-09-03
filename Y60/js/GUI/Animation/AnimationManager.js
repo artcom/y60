@@ -40,7 +40,7 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
 	};
 		
     Public.doFrame = function() {
-	    for(var i = 0; i < _animations.length; i++) {
+        for(var i = 0; i < _animations.length; i++) {
 	        var a = _animations[i];
 		    if(a.running) {
 		        a.doFrame();

@@ -43,11 +43,7 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
     Public.enabled setter = function(theValue) {
         _myEnabled = theValue;
         Public.insensible = !theValue;
-        if(theValue) {
-            Modelling.setAlpha(Public.body, 1.0);
-        } else {
-            Modelling.setAlpha(Public.body, BUTTON_DISABLED_ALPHA);
-        }
+        Public.visible = theValue;
     }
 
     Public.buttonname getter = function() {
