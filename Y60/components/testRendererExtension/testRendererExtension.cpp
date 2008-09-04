@@ -153,7 +153,7 @@ Foo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JSFunctionSpec *
 TestRendererExtension::Functions() {
-    AC_DEBUG << "SimWaterPlugin::Functions";
+    AC_DEBUG << "TestRendererExtension::Functions";
     static JSFunctionSpec myFunctions[] = {
         {"foo", Foo, 0},
         {0}
