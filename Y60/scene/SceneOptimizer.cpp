@@ -624,7 +624,7 @@ namespace y60 {
             for (unsigned j = 0; j < numElements; ++j) {
                 dom::NodePtr myElementNode  = myPrimitivesNode->childNode(j);
                 dom::NodePtr myMaterialNode = myElementNode->getElementById(myElementNode->getAttributeString(MATERIAL_REF_ATTRIB));
-                if (myMaterialNode->getAttributeValue<bool>(TRANSPARENCY_ATTRIB)) {
+                if (myMaterialNode->getAttribute(TRANSPARENCY_ATTRIB)) {
                     dom::NodePtr myStickyAttributeNode = myBodyNodes[i]->getAttribute(STICKY_ATTRIB);
                     myStickyAttributeNode->nodeValue("1");
                     break;
