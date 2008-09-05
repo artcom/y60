@@ -37,13 +37,13 @@ function calculateAndAppendTangents(theShape) {
     var myElements = theShape.childNode("primitives").firstChild;
     var myVertexData = theShape.childNode("vertexdata");
 
-    var myVertexIndexNode = myElements.find("//*[@role = 'position']");
+    var myVertexIndexNode = myElements.find(".//*[@role = 'position']");
     var myVertexIndex = myVertexIndexNode.firstChild.nodeValue;
-    var myVertices = myVertexData.find("//*[@name = '" + myVertexIndexNode.vertexdata + "']").firstChild.nodeValue;
+    var myVertices = myVertexData.find(".//*[@name = '" + myVertexIndexNode.vertexdata + "']").firstChild.nodeValue;
 
-    var myTexCoordIndexNode = myElements.find("//*[@role = 'texcoord0']");
+    var myTexCoordIndexNode = myElements.find(".//*[@role = 'texcoord0']");
     var myTexCoordIndex = myTexCoordIndexNode.firstChild.nodeValue;
-    var myTexCoords = myVertexData.find("//*[@name = '" + myTexCoordIndexNode.vertexdata + "']").firstChild.nodeValue;
+    var myTexCoords = myVertexData.find(".//*[@name = '" + myTexCoordIndexNode.vertexdata + "']").firstChild.nodeValue;
     
     // tangent indices
     var myTangentIndex = [];

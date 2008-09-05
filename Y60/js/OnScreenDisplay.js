@@ -109,7 +109,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     }
 
     function createTextOverlay() {
-        var myImage = window.scene.images.find("//image[@name = 'OSD_Overlay']");
+        var myImage = window.scene.images.find("image[@name = 'OSD_Overlay']");
         if(!myImage) {
             myImage = Modelling.createImage(window.scene, 1,1,"RGB");
             myImage.name = "OSD_Overlay";

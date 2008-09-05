@@ -211,7 +211,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var myViewport = theCanvasNode.childNode('viewport');
             _myLightManager.setupHeadlight(myViewport);
         }
-        _activeViewport = _myRenderWindow.canvas.find('//viewport');
+        _activeViewport = _myRenderWindow.canvas.find('viewport');
     }
 
     self.setCanvasByIndex = function(theIndex) {
@@ -377,20 +377,20 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // merge materials
         for (var i=0; i<_myMaterialTable.childNodesLength(); ++i) {
             var myNode = _myMaterialTable.childNode(i);
-            var myMaterial = _myMaterials.find("//*[@name = '" + myNode.name + "']");
+            var myMaterial = _myMaterials.find("material[@name = '" + myNode.name + "']");
             if (myMaterial) {
                 Logger.info("Setting "+myMaterial.name+" to table value.");
                 mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
             } else {
                 // in case of materialswitches
-                var mySwitchNode = self.getScene().world.find("//*[@name = '" + myNode.name + "']");
+                var mySwitchNode = self.getScene().world.find(".//*[@name = '" + myNode.name + "']");
                 if (!mySwitchNode) {
                     continue;
                 }
                 if (mySwitchNode.nodeName == "body") {
                     Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
-                    var myMaterialId = myShape.find("//primitives").firstChild.material; 
+                    var myMaterialId = myShape.find("primitives").firstChild.material; 
                     myMaterial = mySwitchNode.getElementById(myMaterialId);
                     mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
                 } else {
@@ -414,7 +414,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 // skip samplers
                 continue;
             }
-            var myTargetProperty = myTargetProperties.find("//*[@name = '" + myNode.name + "']");
+            var myTargetProperty = myTargetProperties.find(".//*[@name = '" + myNode.name + "']");
             if (myTargetProperty) {
                 // remove property before replacing it
                 myTargetProperties.removeChild(myTargetProperty);

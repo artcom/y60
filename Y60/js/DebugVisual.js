@@ -107,7 +107,7 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
                 theNode.appendChild(myBodyNode);
             }
         } else {
-            var myCoordNode = theNode.find("//*[@name = 'b_coord_" + theNode.id + "']");
+            var myCoordNode = theNode.find(".//*[@name = 'b_coord_" + theNode.id + "']");
             if (myCoordNode) {
                 theNode.removeChild(myCoordNode);
             }

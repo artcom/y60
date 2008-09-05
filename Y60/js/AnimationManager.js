@@ -16,7 +16,7 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     var _mySceneViewer   = theSceneViewer;
     var _myName  = theAnimationName;
 
-    var _myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationName + "']");
+    var _myAnimationNode = window.scene.animations.find(".//*[@name = '" + theAnimationName + "']");
     if (!_myAnimationNode) {
         throw new Exception("Could not find animation: " + theAnimationName, fileline());
     }
@@ -284,7 +284,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
 
     obj.saveStripByAnimation = function(theAnimationName, thePrefix, theDirectory, theOverwriteFlag) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
-        var myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationName + "']");
+        var myAnimationNode = window.scene.animations.find(".//*[@name = '" + theAnimationName + "']");
         myAnimationNode.begin = myCurrentTime;
         myAnimationNode.enabled = true;
         myAnimationNode.count   = 0;
@@ -294,7 +294,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     obj.saveStripByAnimations = function(theAnimationNames, thePrefix, theDirectory, theOverwriteFlag) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
         for (var i = 0; i < theAnimationNames.length; i++) {
-            var myAnimationNode = window.scene.animations.find("//*[@name = '" + theAnimationNames[i] + "']");
+            var myAnimationNode = window.scene.animations.find(".//*[@name = '" + theAnimationNames[i] + "']");
             myAnimationNode.begin   = 0;
             myAnimationNode.enabled = true;
             myAnimationNode.count   = 1;
@@ -311,7 +311,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
 
 
     obj.saveStripByNodeId = function(theNodeId, thePrefix, theDirectory, theOverwriteFlag) {
-        var myCameraAnimations = window.scene.animations.findAll("//*[@node = '" + theNodeId + "']");
+        var myCameraAnimations = window.scene.animations.findAll(".//*[@node = '" + theNodeId + "']");
         if (myCameraAnimations.length == 0 ) {
             Logger.error("Unable to find animation for id=" + theNodeId);
             return;

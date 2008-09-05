@@ -32,19 +32,19 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
     }
 
     self.getPositions = function() {
-        var myPositions = _myShape.find("//*[@name = 'position']");
+        var myPositions = _myShape.find(".//*[@name = 'position']");
         myPositions = myPositions.childNode('#text')[1];
         return myPositions;
     }
 
     self.getColors = function() {
-        var myColors = _myShape.find("//*[@name = 'color']");
+        var myColors = _myShape.find(".//*[@name = 'color']");
         myColors = myColors.childNode('#text')[1];
         return myColors;
     }
 
     self.getTexCoords = function() {
-        var myTexCoords = _myShape.find("//*[@name = 'uvmap']");
+        var myTexCoords = _myShape.find(".//*[@name = 'uvmap']");
         myTexCoords = myTexCoords.childNode('#text')[1];
         return myTexCoords;
     }
@@ -294,7 +294,7 @@ function test_PathStrip() {
     } else {
         var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg")); //svg-logo-001.svg");
         var mySvgNode = new Node(mySvgFile);
-        var myPaths = mySvgNode.findAll("//path");
+        var myPaths = mySvgNode.findAll(".//path");
         
         myPath = new SvgPath(myPaths[6].d, 100);
         myWidth = 20.0;

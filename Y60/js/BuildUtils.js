@@ -191,7 +191,7 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     var myRequirementString = "<feature name='" + theRequirementClass + "'>" + theRequirementValue + "</feature>";
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
-    var myRequiresDocNode = theMaterialNode.find(".//requires");
+    var myRequiresDocNode = theMaterialNode.find("requires");
     
     if (!myRequiresDocNode) {
         var myRequiresString = "<requires/>";
@@ -204,10 +204,10 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
 
 function removeMaterialRequirement(theMaterialNode, theRequirementClass) {
 
-    var myRequiresDocNode = theMaterialNode.find("//requires");
+    var myRequiresDocNode = theMaterialNode.find("requires");
 
     if (myRequiresDocNode) {
-        var myRequirement = myRequiresDocNode.find("//*[@name='" + 
+        var myRequirement = myRequiresDocNode.find(".//*[@name='" + 
                                                    theRequirementClass +
                                                    "']");
         myRequiresDocNode.removeChild(myRequirement);

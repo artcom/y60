@@ -529,7 +529,7 @@ function removeAllAttributes(theNode) {
 }
 
 function getPropertyValue() {
-    var myNode = thePropertiesNode.find("//*[@name = '" + theProperty + "']");
+    var myNode = thePropertiesNode.find(".//*[@name = '" + theProperty + "']");
     if (!myNode) {
         return null;
     }
@@ -541,7 +541,7 @@ function getPropertyValue() {
 }
 
 function setPropertyValue(thePropertiesNode, theDataType, theProperty, theValue) {
-    var myNode = thePropertiesNode.find("//*[@name = '" + theProperty + "']");
+    var myNode = thePropertiesNode.find(".//*[@name = '" + theProperty + "']");
     if (!myNode) {
         myNode = Node.createElement(theDataType);
         thePropertiesNode.appendChild(myNode);

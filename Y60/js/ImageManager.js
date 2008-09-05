@@ -19,7 +19,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     // public methods
     obj.getImageNode = function(theImageName, theEncoding) {
-        var myImageNode = window.scene.images.find("//image[@name = '" + theImageName + "']");
+        var myImageNode = window.scene.images.find("image[@name = '" + theImageName + "']");
         if (!myImageNode) {
             var myEncoding = (theEncoding != undefined) ? theEncoding.toUpperCase() : "RGB";
             myImageNode = Modelling.createImage(window.scene, 1,1,myEncoding);

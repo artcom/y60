@@ -35,12 +35,12 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         return myPositions;
     }
     self.getPositionsNode = function() {
-        var myVertexPositions = _myShape.find("//*[@name = 'position']");
+        var myVertexPositions = _myShape.find(".//*[@name = 'position']");
         return myVertexPositions;
     }
 
     self.getColors = function() {
-        var myVertexColors = _myShape.find("//*[@name = 'color']");
+        var myVertexColors = _myShape.find(".//*[@name = 'color']");
         var myColors = myVertexColors.childNode('#text')[1];
         return myColors;
     }
@@ -353,7 +353,7 @@ function test_PathText() {
         var mySvgNode = new Node(mySvgFile);
 
         var mySvgPaths = []
-        var myPaths = mySvgNode.findAll("//path");
+        var myPaths = mySvgNode.findAll(".//path");
         
         for (var i = 0; i < myPaths.length; ++i) {
             mySvgPaths.push(new SvgPath(myPaths[i].d));

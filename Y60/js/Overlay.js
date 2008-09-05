@@ -451,7 +451,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		if (isMovieFlag) {
 			myImage.frameblending = false;
 		}
-        var myFindString = "//texture[@image='"+ theImageId+ "']";		
+        var myFindString = "texture[@image='"+ theImageId+ "']";		
 		var myTexture = window.scene.textures.find(myFindString);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
@@ -548,13 +548,13 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
 	function addTextureRequirements(theTextureCount) {
 /*
-        var myFindString = "//*[@name='textures']";
+        var myFindString = "*[@name='textures']";
 		var myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "textures", false);
 		if (myTextureFeatures == null) {
 			myTextureFeatures = new Node("<feature name='textures'>[10[paint]]</feature>").firstChild;
 			Public.material.requires.appendChild(myTextureFeatures);
 		}
-        myFindString = "//*[@name='texcoord']";
+        myFindString = "*[@name='texcoord']";
 		myTextureFeatures = Public.material.requires.find(myFindString);//getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
 		if (myTextureFeatures == null) {
 			myTextureFeatures = new Node("<feature name='texcoord'>[10[uv_map]]</feature>").firstChild;
@@ -813,7 +813,7 @@ function removeOverlay(theOverlayNode) {
 				for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
 					var myTextureUnit = myTextureUnits.childNode(i);
 					var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
-					if (window.scene.textures.findAll("//*[@image='"+ myTexture.image+ "']").length == 1) {
+					if (window.scene.textures.findAll("texture[@image='"+ myTexture.image+ "']").length == 1) {
 						// our texture is the only one referencing this image, safe to remove
 						var myImage = myTexture.getElementById(myTexture.image);
 						myImage.parentNode.removeChild(myImage);
@@ -821,7 +821,7 @@ function removeOverlay(theOverlayNode) {
 						Logger.warning("More than one texture references image id=" + myTexture.image);
 					}
 
-					if (window.scene.materials.findAll("//*[@texture='"+ myTexture.id+ "']").length == 1) {
+					if (window.scene.materials.findAll(".//textureunit[@texture='"+ myTexture.id+ "']").length == 1) {
 						// our textureunit is the only one referencing this texture, safe to remove
 						myTexture.parentNode.removeChild(myTexture);
 					} else {

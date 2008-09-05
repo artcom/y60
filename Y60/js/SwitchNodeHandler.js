@@ -250,7 +250,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     function getTexcoordCount(theMaterialNode) {
         
         var myRequires = theMaterialNode.childNode('requires');
-        var myFeatureList = myRequires.find("//*[@name = 'texcoord']").childNode("#text").nodeValue;
+        var myFeatureList = myRequires.find("*[@name = 'texcoord']").childNode("#text").nodeValue;
         var myCount = 0;
         var myRegExp = /\[\d{1,3}\[(.*)\]\]/;
         var myResults = myRegExp.exec(myFeatureList);
@@ -290,7 +290,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                     Logger.warning("Could not find shape with id: " + myShapeId);
                     return false;
                 }
-                var myElement = myShape.find("//elements");
+                var myElement = myShape.find(".//elements");
                 
                 mySwitchMat = myElement.getElementById(myElement.material);
             }
@@ -351,13 +351,13 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 myNewTargetMat.childNode("textureunits").insertBefore(myOcclusionMap,
                         myNewTargetMat.childNode("textureunits").firstChild);
                 var myRequires = myNewTargetMat.childNode('requires');
-                myRequires.find("//*[@name = 'textures']").childNode("#text").nodeValue = 
+                myRequires.find("*[@name = 'textures']").childNode("#text").nodeValue = 
                     prependFeature(mySwitchMat.requires.textures, "occlusion");
-                myRequires.find("//*[@name = 'texcoord']").childNode("#text").nodeValue = 
+                myRequires.find("*[@name = 'texcoord']").childNode("#text").nodeValue = 
                         prependFeature(mySwitchMat.requires.texcoord, "uv_map");
             }
             //quickfix for missing occlusionmap after more then one switch, cleanup is on it's way [jb]
-            var my2dSampler = myNewTargetMat.childNode("properties").find("//*[@name = 'occlusionTex']");
+            var my2dSampler = myNewTargetMat.childNode("properties").find(".//*[@name = 'occlusionTex']");
             if (!my2dSampler) {
                 var myNode = new Node("<sampler2d name='occlusionTex'>0</sampler2d>");
                 myNewTargetMat.childNode("properties").appendChild(myNode.firstChild);
@@ -420,7 +420,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         }
         
         // find the transform node with the texture references first
-        var myReferenceNode = window.scene.world.find("//*[@name = 'textureswitches']");
+        var myReferenceNode = window.scene.world.find(".//*[@name = 'textureswitches']");
         if (!myReferenceNode) {
             Logger.error("Could not find reference node for textureswitches");
             return;
@@ -483,7 +483,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         for (var i = 0; i < myNodes.length; ++i) {
             var myNode = myNodes[i];
 
-            var myFeatureList = myNode.parentNode.parentNode.find("//*[@name = 'textures']").childNode("#text").nodeValue;
+            var myFeatureList = myNode.parentNode.parentNode.find(".//*[@name = 'textures']").childNode("#text").nodeValue;
             Logger.info(myNode.parentNode.parentNode.name+": "+myFeatureList);
             /*TODO: activate after shader envlack is fixed
             if (String(myFeatureList).search(/occlusion/i) == -1) {

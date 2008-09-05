@@ -24,7 +24,7 @@ function convertFile(theFilename) {
     myXmlDoc.parseFile(theFilename);
     var myWorld = myXmlDoc.childNode(0).find("//world");
 
-    var myNodes = myWorld.findAll("//*[@name = 'orientation']");
+    var myNodes = myWorld.findAll(".//*[@name = 'orientation']");
     for (var myNodeIndex = 0; myNodeIndex < myNodes.length; myNodeIndex++) {
         var myOrientation = stringToArray(myNodes[myNodeIndex].orientation);
         print(myOrientation);
