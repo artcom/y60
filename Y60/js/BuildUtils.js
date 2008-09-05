@@ -170,12 +170,28 @@ function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theV
     myPropertiesNode.appendChild(myPropertyNode);
 }
 */
+function addMaterialRequirements(theMaterialNode, theRequirementlist) {
+    var myRequiresNode = theMaterialNode.find(".//requires");
+    if (!myRequiresNode) {
+       var myRequiresString = "<requires/>";
+       var myRequiresDoc = new Node(myRequiresString);
+       myRequiresNode = myRequiresDoc.childNodes[0];
+       theMaterialNode.append(myRequiresNode);
+       myRequiresNode = theMaterialNode.find(".//requires");
+    }
+    for (var i = 0; i < theRequirementlist.length; i++ ) {
+        var myRequirementString = "<feature name='" + theRequirementlist[i].name + "'>" + theRequirementlist[i].value + "</feature>";
+        var myRequirementDoc = new Node(myRequirementString);
+        var myRequirementNode = myRequirementDoc.childNodes[0];
+        myRequiresNode.appendChild(myRequirementNode);
+    }
+}
 
 function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequirementValue) {
     var myRequirementString = "<feature name='" + theRequirementClass + "'>" + theRequirementValue + "</feature>";
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
-    var myRequiresDocNode = theMaterialNode.find("//requires");
+    var myRequiresDocNode = theMaterialNode.find(".//requires");
     
     if (!myRequiresDocNode) {
         var myRequiresString = "<requires/>";
