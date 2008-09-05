@@ -31,11 +31,11 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        obj.mySocket1 = new Socket(Socket.UDP, 1101, "127.0.0.1");
-        obj.mySocket2 = new Socket(Socket.UDP, 1102, "127.0.0.1");
+        obj.mySocket1 = new Socket(Socket.UDP, 51101, "127.0.0.1");
+        obj.mySocket2 = new Socket(Socket.UDP, 51102, "127.0.0.1");
 
-        obj.mySocket1.connect("127.0.0.1", 1102);
-        obj.mySocket2.connect("127.0.0.1", 1101);
+        obj.mySocket1.connect("127.0.0.1", 51102);
+        obj.mySocket2.connect("127.0.0.1", 51101);
         
         print(obj.mySocket1);
         print(obj.mySocket2);
@@ -65,8 +65,8 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.mySocket1.read() == ""');
         obj.mySocket1.setBlockingMode(true);
         
-        obj.mySocket3 = new Socket(Socket.UDP, 1103, "0.0.0.0");
-        obj.mySocket3.connect("BROADCAST", 1101);
+        obj.mySocket3 = new Socket(Socket.UDP, 51103, "0.0.0.0");
+        obj.mySocket3.connect("BROADCAST", 51101);
         print(obj.mySocket3);
 
         ENSURE('obj.mySocket3.write("test") == 4');
