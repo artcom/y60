@@ -211,6 +211,7 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
             }
             bool myUnmodifiedProxyFlag = false;
 		    thePos = newNode->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag);
+		    newNode->registerName();
             newNode->self(newNode);
 		    _myNodes.push_back(newNode);
             PS(++theDict._myPatchStat.newNodes);
