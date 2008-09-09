@@ -4,9 +4,8 @@
 #include <asl/Time.h>
 #include <iostream>
 
-#include <dc1394/dc1394_control.h>
-#include <dc1394/dc1394_utils.h>
-#include <dc1394/dc1394_conversions.h>
+#include <dc1394/dc1394.h>
+#include <libraw1394/raw1394.h>
 
 #include <map>
 #include <vector>
@@ -45,8 +44,38 @@ namespace y60 {
 
     void 
     DC1394::scanBus() {
-         dc1394error_t myStatus = dc1394_find_cameras (&_myDevices, &_myDeviceCount);
-         ASSERT_DC1394(myStatus);
+
+         dc1394camera_list_t * list;
+         dc1394error_t err;
+         dc1394_t * d;
+
+         d = dc1394_new();
+         err = dc1394_camera_enumerate( d, &list );
+         DC1394_ERR_RTN( err, "Failed to enumerate cameras");
+
+         if (list->num == 0) {
+             dc1394_log_error("No cameras found");
+             return 1;
+         }
+
+         int j = 0; 
+         for (int i = 0; i < list->num; i++) {
+             if (j >= MAX_CAMERAS) {
+                 break;
+             }
+             cameras[j] = dc1394_camera_new( d, list->ids[i].guid );
+             if (!cameras[j]) {
+                 dc1394_log_warning( "Failed to initialize camera with guid %llx", 
+                                     list->ids[i].guid );
+                 continue;
+             }
+             j++;
+         }
+         dc1394_camera_free_list( list );
+
+         if (j == 0) {
+            dc1394_log_error("No cameras found");
+         }
     }
 
     void DC1394::readFrame(dom::ResizeableRasterPtr theTargetRaster) {

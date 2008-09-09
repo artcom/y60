@@ -25,7 +25,9 @@
 #include <asl/ThreadLock.h>
 
 #include <libraw1394/raw1394.h>
-#include <dc1394/dc1394_control.h>
+#include <dc1394/dc1394.h>
+
+#define MAX_CAMERAS 8
 
 namespace y60 {
 /*! @addtogroup Y60componentsDC1394 */
@@ -44,7 +46,7 @@ namespace y60 {
         virtual void stopCapture();
         virtual void pauseCapture();
     private:
-        dc1394camera_t ** _myDevices;
+        dc1394camera_t * _myDevices[MAX_CAMERAS];
         const dc1394camera_t & getDeviceHandle() const { return (*_myDevices)[getDevice()]; };
         dc1394camera_t & getDeviceHandle() { return (*_myDevices)[getDevice()]; };
         unsigned int _myDeviceCount;
