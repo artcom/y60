@@ -283,11 +283,12 @@ namespace y60 {
             }
         } else {
             // set the value of the material with the shaders value
+            // in is case the material has not the properties but the created facade has them,
+            // so the default value of the facade are overwritten from the shader ones
+            
             AC_TRACE << "MaterialBase::mergeProperties(): setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
             
-            // TODO: This seems to wrong that shader-properties do overwrite material properties if they already exist, but the test baseline assumes that this
-            // happens.
-            //myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue()); // remove!
+            myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
             AC_TRACE << "MaterialBase::mergeProperties(): done: setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
         }
     }
