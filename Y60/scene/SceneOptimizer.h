@@ -47,7 +47,8 @@ namespace y60 {
                 public:
                     SuperShape(Scene & theScene);
                     dom::NodePtr getVertexData(const std::string & theType, const std::string & theName);
-                    PrimitiveCachePtr getPrimitive(const std::string & theType, const std::string & theMaterialRef, const RenderStyles & theRenderStyles);
+                    PrimitiveCachePtr getPrimitive(const std::string & theType, const std::string & theMaterialRef, 
+                                                   const RenderStyles & theRenderStyles, unsigned theAdditionalKeyValue);
                     std::string getShapeId() const;
                     dom::NodePtr getShapeNode();
 

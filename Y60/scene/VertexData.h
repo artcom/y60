@@ -147,14 +147,11 @@ namespace y60 {
             virtual const void * getDataPtr() const = 0;
             /// load vertex data from dom source arrays into gfx memory
             virtual void load(const VectorOfUnsignedInt & theIndices,
-                              dom::NodePtr theVertexDataNode,
-                              unsigned theBeginIndex, 
-                              unsigned theEndIndex) = 0;
+                              dom::NodePtr theVertexDataNode) = 0;
 
             /// write back vertex data from gfx memory to dom source arrays
             virtual void unload(const VectorOfUnsignedInt & theIndices,
-                      dom::NodePtr theVertexDataNode,
-                      unsigned theBeginIndex, unsigned theEndIndex) const = 0;
+                      dom::NodePtr theVertexDataNode) const = 0;
 
         private:
             VertexDataBase(const VertexDataBase &);

@@ -47,40 +47,34 @@ namespace y60 {
             }
         }
         void load(const VectorOfUnsignedInt & theIndices,
-            dom::NodePtr theVertexDataNode,
-            unsigned theBeginIndex, unsigned theEndIndex)  
+            dom::NodePtr theVertexDataNode)  
         {
             const std::vector<T> & mySource = 
                 theVertexDataNode->dom::Node::nodeValueRef<std::vector<T> >();
 
-            unsigned count = theEndIndex - theBeginIndex;
             unsigned mySize = _myData.size(); 
             
-            _myData.resize(mySize + count);
+            _myData.resize(mySize + theIndices.size());
 
             lock(true, false);
-            for (unsigned i = 0; i < count; ++i) {
-                _myData[mySize+i] = mySource[theIndices[i+theBeginIndex]];
+            for (unsigned i = 0; i < theIndices.size(); ++i) {
+                _myData[mySize+i] = mySource[theIndices[i]];
             }        
             unlock();
-
-//            for (unsigned i = theBeginIndex; i < theEndIndex; ++i) {
-//                _myData.push_back(mySource[theIndices[i]]);
-//            }        
         }
+        
         // write back vertex data to dom source arrays
         void unload(const VectorOfUnsignedInt & theIndices,
-            dom::NodePtr theVertexDataNode,
-            unsigned theBeginIndex, unsigned theEndIndex) const
+            dom::NodePtr theVertexDataNode) const
         {
             dom::Node::WritableValue<std::vector<T> > mySourceLock(theVertexDataNode);
             std::vector<T> & mySource = mySourceLock.get();
 
-            if (_myData.size() != theEndIndex - theBeginIndex) {
+            if (_myData.size() != theIndices.size()) {
                 throw UnloadVertexArraySizeMismatch(JUST_FILE_LINE);
             }
 
-            for (unsigned i = theBeginIndex; i < theEndIndex; ++i) {
+            for (unsigned i = 0; i < theIndices.size(); ++i) {
                 mySource[theIndices[i]] = _myData[i];
             }        
         }

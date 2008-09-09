@@ -148,7 +148,6 @@ namespace y60 {
 
             void updateVertexData();
             void reverseUpdateVertexData();
-            unsigned findMaxIndexSize();
 #if 0
             unsigned int getDomIndex() const { 
                 return _myDomIndex; 
@@ -160,15 +159,10 @@ namespace y60 {
              * @param theResourceManager ResourceManager for creation of the VertexData
              * @param theIndicesNode Node of indices
              * @param theDataNode Node of data
-             * @param theBeginIndex index to begin with
-             * @param theEndIndex index to end at
              */
-            void load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode,
-                      unsigned long theBeginIndex, unsigned long theEndIndex);
+            void load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode);
 
-            void unload(dom::NodePtr theIndicesNode, dom::NodePtr theDataNode,
-                    unsigned long theBeginIndex,
-                    unsigned long theEndIndex);
+            void unload(dom::NodePtr theIndicesNode, dom::NodePtr theDataNode);
 
             unsigned size() const;
 

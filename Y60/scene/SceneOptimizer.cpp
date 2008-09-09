@@ -41,9 +41,13 @@ namespace y60 {
     }
 
     SceneOptimizer::PrimitiveCachePtr
-    SceneOptimizer::SuperShape::getPrimitive(const std::string & theType, const std::string & theMaterial, const RenderStyles & theRenderStyles) {
+    SceneOptimizer::SuperShape::getPrimitive(const std::string & theType, const std::string & theMaterial, 
+                                             const RenderStyles & theRenderStyles, unsigned theAdditionalKeyValue) {
         std::string myKey = theType + "_" + theMaterial + "_" + as_string(theRenderStyles);
-
+        if (theAdditionalKeyValue > 0) {
+            myKey += std::string("_") + asl::as_string(theAdditionalKeyValue);
+            
+        }
         PrimitiveCachePtr myPrimitiveCache(0);
         if (_myPrimitiveMap.find(myKey) == _myPrimitiveMap.end()) {
             dom::Element myPrimitive(ELEMENTS_NODE_NAME);
@@ -383,19 +387,37 @@ namespace y60 {
         // Get element material ref
         std::string myMaterialRef = theElements->getAttributeString(MATERIAL_REF_ATTRIB);
 
-        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles);
         unsigned myNumSrcElements       = theElements->childNodesLength();
+
+        // find dst elements node where the source elements will fit into
+        unsigned myDstElementCounter = 0;
+        dom::NodePtr mySrcIndex = theElements->childNode(0);
+        const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
+
+        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);            
+        dom::NodePtr myDstIndex         = myDstElements->getIndex(POSITION_ROLE, POSITION_ROLE);
+        unsigned myOffset               = myDstIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>().size();
+
+        while (mySrc.size() + myOffset  > 1024*64) {
+            AC_WARNING << "Sorry, supershapes primitive will have more then 64k vertices -> use new element";
+            myDstElementCounter++;
+            myDstElements  = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);
+            myDstIndex     = myDstElements->getIndex(POSITION_ROLE, POSITION_ROLE);
+            myOffset       = myDstIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>().size();
+        }
+
+
         for (unsigned j = 0; j < myNumSrcElements; ++j) {
             dom::NodePtr mySrcIndex = theElements->childNode(j);
+            const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
             std::string myName      = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
             std::string myRole      = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
-            dom::NodePtr myDstIndex = myDstElements->getIndex(myName, myRole);
 
-            const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
+            dom::NodePtr myDstIndex           = myDstElements->getIndex(myName, myRole);
             VectorOfUnsignedInt & myDst       = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
-            unsigned myOffset                 = myDst.size();
-            unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
+            myOffset                          = myDst.size();
 
+            unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
             // Triangulate quads
             std::string myOldPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
             if (myOldPrimitiveType == PrimitiveTypeStrings[QUADS]) {
@@ -421,6 +443,9 @@ namespace y60 {
             } else if (myOldPrimitiveType == PrimitiveTypeStrings[TRIANGLES] || myOldPrimitiveType == PrimitiveTypeStrings[LINE_STRIP]) {
                 //unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
                 unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(theElements->getFacade<Primitive>()->get<PrimitiveTypeTag>());
+                if (mySrc.size() + myOffset  > 1024*64) {
+                    AC_WARNING << "Sorry, supershapes primitive will have more then 64k vertices, will not render";
+                }
                 myDst.resize(mySrc.size() + myOffset);
                 unsigned mySrcSize = mySrc.size();
                 if (theFlipFlag) {
@@ -452,7 +477,7 @@ namespace y60 {
             if (myChild->getAttributeValue<bool>(STICKY_ATTRIB)) {
                 _myStickyNodes.push_back(myChild);
             } else {
-                if (mergeBodies(myChild, theInitialMatrix)) {
+                if ( mergeBodies(myChild, theInitialMatrix)) {
                     if (myChild->childNodesLength() == 0) {
                         // Remove the merged body if it has no children
                         theNode->removeChild(myChild);
@@ -495,6 +520,7 @@ namespace y60 {
             unsigned myNumElements      = myPrimitives->childNodesLength();
             for (unsigned i = 0; i < myNumElements; ++i) {
                 dom::NodePtr myElements = myPrimitives->childNode(i);
+                RenderStyles myElementRenderStyles = myElements->getFacade<Primitive>()->get<RenderStylesTag>();
 
                 // Merge vertex data
                 RoleMap myRoles;
@@ -509,18 +535,18 @@ namespace y60 {
                 mergeVertexData(myVertexData, myNormalFlipFlag, myMatrix, myRoles, myVertexDataOffsets);
 
                 // Merge primitives
-                RenderStyles myElementsRenderStyles;
-                dom::NodePtr myRenderStyleAttr = myElements->getAttribute(RENDER_STYLE_ATTRIB);
-                if (!myRenderStyleAttr) {
-                    myElementsRenderStyles = myShapeRenderStyles;
+                //RenderStyles myElementsRenderStyles;
+                //dom::NodePtr myRenderStyleAttr = myElements->getAttribute(RENDER_STYLE_ATTRIB);
+                if (!myElementRenderStyles.any()) {
+                    myElementRenderStyles = myShapeRenderStyles;
                 }
                 bool myRewindFlag = myNormalFlipFlag;
-                if (myElementsRenderStyles[BACK] && !myElementsRenderStyles[FRONT]) {
-                    myElementsRenderStyles[BACK]  = false;
-                    myElementsRenderStyles[FRONT] = true;
+                if (myElementRenderStyles[BACK] && !myElementRenderStyles[FRONT]) {
+                    myElementRenderStyles[BACK]  = false;
+                    myElementRenderStyles[FRONT] = true;
                     myRewindFlag                  = !myRewindFlag;
                 }
-                mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementsRenderStyles);
+                mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles);
             }
             return true;
         }
@@ -624,7 +650,9 @@ namespace y60 {
             for (unsigned j = 0; j < numElements; ++j) {
                 dom::NodePtr myElementNode  = myPrimitivesNode->childNode(j);
                 dom::NodePtr myMaterialNode = myElementNode->getElementById(myElementNode->getAttributeString(MATERIAL_REF_ATTRIB));
-                if (myMaterialNode->getAttribute(TRANSPARENCY_ATTRIB)) {
+                myMaterialNode->getFacade<MaterialBase>();
+                if (/*myMaterialNode->getAttribute(TRANSPARENCY_ATTRIB) && */
+                    myMaterialNode->getAttributeValue<bool>(TRANSPARENCY_ATTRIB)) {
                     dom::NodePtr myStickyAttributeNode = myBodyNodes[i]->getAttribute(STICKY_ATTRIB);
                     myStickyAttributeNode->nodeValue("1");
                     break;

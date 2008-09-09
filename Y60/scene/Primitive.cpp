@@ -79,12 +79,15 @@ namespace y60 {
     }
 
     void
-    Primitive::load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode,
-                    unsigned long theBeginIndex,
-                    unsigned long theEndIndex)
+    Primitive::load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode)
     {
         const VectorOfUnsignedInt & myIndices = theIndicesNode->
             childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
+
+        if (myIndices.size() > 1024*64) {
+            AC_WARNING << "Primitive larger than 64k vertices, may cause problems on some graphics cards";
+        }
+
 
         const dom::NodePtr myDataNode = theDataNode->childNode(0);
         if (!myDataNode) {
@@ -108,13 +111,11 @@ namespace y60 {
         VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole, myUsage);
         if (myVertexData) {
             DB(AC_TRACE << "uploading Vertex Data role=" << myRole);
-            myVertexData->load(myIndices, myDataNode, theBeginIndex, theEndIndex);
+            myVertexData->load(myIndices, myDataNode);
         }
     }
     void
-    Primitive::unload(dom::NodePtr theIndicesNode, dom::NodePtr theDataNode,
-                    unsigned long theBeginIndex,
-                    unsigned long theEndIndex)
+    Primitive::unload(dom::NodePtr theIndicesNode, dom::NodePtr theDataNode)
     {
         dom::Node::WritableValue<VectorOfUnsignedInt> myIndicesLock(theIndicesNode->childNode(0));
         VectorOfUnsignedInt & myIndices = myIndicesLock.get();
@@ -136,7 +137,7 @@ namespace y60 {
 					" has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().Shape::get<IdTag>()<<endl;
                 return;
             } else {
-                myDataBin->unload(myIndices, myDataNode, theBeginIndex, theEndIndex);
+                myDataBin->unload(myIndices, myDataNode);
             }
         }
 
@@ -224,30 +225,8 @@ namespace y60 {
         return *getNode().parentNode()->parentNode()->getFacade<Shape>();
     }
 
-    unsigned
-    Primitive::findMaxIndexSize() {
-        size_t myLargestSize = 0;
-        dom::Node & myElementsNode = getNode();
-        unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
-        for (unsigned i = 0; i < myIndicesCount; ++i) {
-            dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, i);
-            const VectorOfUnsignedInt & myIndices = myIndicesNode->
-                childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
-
-            myLargestSize = asl::maximum(myLargestSize, myIndices.size());
-        }
-        return myLargestSize;
-    }
-
     void 
     Primitive::updateVertexData() {
-        unsigned myBegin = 0;
-        unsigned myEnd = findMaxIndexSize();
-
-        if (myEnd > 1024*64) {
-            AC_WARNING << "Primitive larger than 64k vertices, may cause problems on some graphics cards";
-        }
-       
         Shape & myShape = getShape(); 
         dom::Node & myElementsNode = getNode();
         ResourceManager * myResourceManager = myShape.getScene().getTextureManager()->getResourceManager();
@@ -256,7 +235,7 @@ namespace y60 {
             dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
             const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
             dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
-            load(myResourceManager, myIndicesNode, myDataNode, myBegin, myEnd);
+            load(myResourceManager, myIndicesNode, myDataNode);
         }
     }
 
@@ -271,9 +250,7 @@ namespace y60 {
             const VectorOfUnsignedInt & myIndices = myIndicesNode->
                 childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
             //TODO: find mechanism for selective range update with dirty flags/regions
-            unsigned myBegin = 0;
-            unsigned myEnd   =  myIndices.size();
-            unload(myIndicesNode, myDataNode, myBegin, myEnd);
+            unload(myIndicesNode, myDataNode);
         }
    }
 
