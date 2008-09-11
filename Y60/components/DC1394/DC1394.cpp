@@ -33,40 +33,52 @@ namespace y60 {
 
     DC1394::~DC1394() {
         freeRingBuffer();
+        resetBus();
     }
 
     void 
     DC1394::scanBus() {
 
-         dc1394camera_list_t * list;
-         dc1394error_t err;
+         dc1394camera_list_t * myCamList;
+         dc1394error_t myError;
          dc1394_t * d;
 
          d = dc1394_new();
-         err = dc1394_camera_enumerate( d, &list );
+         myError = dc1394_camera_enumerate( d, &myCamList );
 
-         if (err) {
-             AC_ERROR <<  "Failed to enumerate cameras: Error " << err;
+         if (myError) {
+             AC_ERROR <<  "Failed to enumerate cameras: Error " << myError;
              return;
          }
 
-         if (list->num == 0) {
+         if (myCamList->num == 0) {
              AC_ERROR << "No cameras found";
              return;
          }
 
-         for (int i = 0; i < list->num; i++) {
-             dc1394camera_t * myCamera = dc1394_camera_new( d, list->ids[i].guid );
+         for (int i = 0; i < myCamList->num; i++) {
+             dc1394camera_t * myCamera = dc1394_camera_new( d, myCamList->ids[i].guid );
              if (!myCamera) {
                  AC_ERROR << "Failed to initialize camera with guid " 
-                          << list->ids[i].guid ;
+                          << myCamList->ids[i].guid ;
                  continue;
              } else {
                 _myDevices.push_back(myCamera);
              }
          }
          _myDeviceCount = _myDevices.size();
-         dc1394_camera_free_list( list );
+         dc1394_camera_free_list( myCamList );
+         dc1394_free( d );
+    }
+
+    void
+    DC1394::resetBus() {
+
+        for (unsigned i = 0; i < _myDevices.size(); i++) {
+            dc1394_reset_bus( _myDevices[i] );
+            dc1394_camera_free( _myDevices[i] );
+        }
+
     }
 
     void DC1394::readFrame(dom::ResizeableRasterPtr theTargetRaster) {
@@ -74,7 +86,7 @@ namespace y60 {
         dc1394video_frame_t * myFrame = NULL;
 
         dc1394error_t myStatus = dc1394_capture_dequeue( myCamera, 
-                                                         DC1394_CAPTURE_POLICY_WAIT, 
+                                                         DC1394_CAPTURE_POLICY_POLL, 
                                                          &myFrame );
         ASSERT_DC1394(myStatus);
 

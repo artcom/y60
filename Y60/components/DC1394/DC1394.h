@@ -71,6 +71,7 @@ namespace y60 {
         // raw1394handle_t _myFirewire;
 
         void scanBus();
+        void resetBus();
         void initRingBuffer();
         void freeRingBuffer();
 
