@@ -10,8 +10,8 @@
 
 #include "JSSoundManager.h"
 #include "JSSound.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 using namespace std;
 using namespace asl;

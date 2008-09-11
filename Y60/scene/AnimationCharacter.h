@@ -21,8 +21,8 @@
 #define _ac_scene_AnimationCharacter_h_
 
 #include "AnimationClip.h"
-#include <dom/Nodes.h>
-#include <asl/Exception.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Exception.h>
 
 #include <string>
 #include <vector>

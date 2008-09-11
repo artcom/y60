@@ -13,10 +13,10 @@
 #define _ac_jsgtk_JSVSeparator_h_
 
 #include "JSSeparator.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/separator.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 /**

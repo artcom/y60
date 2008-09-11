@@ -9,14 +9,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
 #include "WaterRepresentation.h"
 #include "WaterSimulation.h"
 
-#include <asl/Dashboard.h>
-#include <asl/Logger.h>
-#include <asl/numeric_functions.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/Logger.h>
+#include <asl/math/numeric_functions.h>
 
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>

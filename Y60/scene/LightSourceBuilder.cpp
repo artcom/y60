@@ -23,9 +23,9 @@
 
 #include "LightSourceBuilder.h"
 #include "LightSource.h"
-#include <y60/NodeNames.h>
-#include <y60/PropertyNames.h>
-#include <y60/property_functions.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/property_functions.h>
 
 //TODO: change all setPropertyValue<> stuff to facade access
 

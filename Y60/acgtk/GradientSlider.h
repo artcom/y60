@@ -11,8 +11,8 @@
 #ifndef ACGTK_GRADIENT_SLIDER_INCLUDED
 #define ACGTK_GRADIENT_SLIDER_INCLUDED
 
-#include <asl/Vector234.h>
-#include <dom/Nodes.h>
+#include <asl/math/Vector234.h>
+#include <asl/dom/Nodes.h>
 
 #ifdef OSX
 #undef check

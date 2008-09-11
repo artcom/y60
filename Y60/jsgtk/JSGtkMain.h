@@ -11,12 +11,12 @@
 #ifndef _Y60_ACGTKSHELL_JSGTKSINGLETON_INCLUDED_
 #define _Y60_ACGTKSHELL_JSGTKSINGLETON_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/main.h>
 
-#include <asl/MessageAcceptor.h>
-#include <asl/LocalPolicy.h>
-#include <asl/string_functions.h>
+#include <asl/ipc/MessageAcceptor.h>
+#include <asl/ipc/LocalPolicy.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

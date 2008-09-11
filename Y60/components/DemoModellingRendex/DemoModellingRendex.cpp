@@ -19,15 +19,15 @@
 //
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
-#include <y60/modelling_functions.h>
-#include <y60/WorldBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/BodyBuilder.h>
-#include <y60/JSScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
+#include <y60/modelling/modelling_functions.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
 
 #include <iostream>
 

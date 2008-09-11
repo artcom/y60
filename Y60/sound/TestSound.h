@@ -13,19 +13,19 @@
 #ifndef INCL_TESTSOUND
 #define INCL_TESTSOUND
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include "SoundManager.h"
 #include "TestGrainSource.h"
-#include <asl/Pump.h>
+#include <asl/audio/Pump.h>
 
-#include <asl/numeric_functions.h>
-#include <asl/string_functions.h>
-#include <asl/PlugInManager.h>
-#include <asl/proc_functions.h>
-#include <asl/os_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/proc_functions.h>
+#include <asl/base/os_functions.h>
 
-#include <asl/Time.h>
+#include <asl/base/Time.h>
 
 using namespace std;
 using namespace asl;

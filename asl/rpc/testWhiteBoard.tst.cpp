@@ -20,15 +20,15 @@
 */
 
 #include "WhiteBoard.h"
-#include <asl/Station.h>
+#include <asl/net/Station.h>
 
-#include <asl/UnitTest.h>
-#include <asl/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/string_functions.h>
 #include <asl/Xml.h>
 #include <asl/XmlTypes.h>
 
-#include <asl/MultiThreadedUnitTest.h>
-#include <asl/Time.h>
+#include <asl/base/MultiThreadedUnitTest.h>
+#include <asl/base/Time.h>
 
 #include <unistd.h>
 

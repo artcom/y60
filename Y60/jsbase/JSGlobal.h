@@ -17,7 +17,7 @@
 //=============================================================================
 
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 #include "JScppUtils.h"
 

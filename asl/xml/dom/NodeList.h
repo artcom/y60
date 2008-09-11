@@ -27,7 +27,7 @@
 
 #include "typedefs.h"
 #include "Dictionary.h"
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 
 #include <vector>
 #include <map>

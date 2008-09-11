@@ -19,10 +19,10 @@
 #include "PanasonicProjector.h"
 #include "HitachiProjector.h"
 
-#include <asl/SerialDeviceFactory.h>
-#include <asl/SerialDevice.h>
-#include <asl/Exception.h>
-#include <dom/Nodes.h>
+#include <asl/serial/SerialDeviceFactory.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/Exception.h>
+#include <asl/dom/Nodes.h>
 
 
 Projector* Projector::getProjector(const std::string& theType, int thePortNum, int theBaud)

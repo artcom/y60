@@ -17,20 +17,20 @@
 #include "MayaHelpers.h"
 #include "ProgressBar.h"
 
-#include <dom/Nodes.h>
-#include <asl/Dashboard.h>
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
-#include <asl/Revision.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Dashboard.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Revision.h>
 
-#include <y60/SceneBuilder.h>
-#include <y60/LightBuilder.h>
-#include <y60/TransformBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/LightBuilder.h>
+#include <y60/scene/TransformBuilder.h>
 
-#include <y60/CameraBuilder.h>
-#include <y60/WorldBuilder.h>
-#include <y60/JointBuilder.h>
+#include <y60/scene/CameraBuilder.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/JointBuilder.h>
 
 #include <maya/MStatus.h>
 #include <maya/MPoint.h>

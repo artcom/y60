@@ -13,8 +13,8 @@
 #include "AudioTimeSource.h"
 
 
-#include <asl/Auto.h>
-#include <asl/Logger.h>
+#include <asl/base/Auto.h>
+#include <asl/base/Logger.h>
 
 namespace asl {
     

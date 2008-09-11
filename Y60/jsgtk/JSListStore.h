@@ -12,10 +12,10 @@
 #define _Y60_ACGTKSHELL_JSLISTSTORE_INCLUDED_
 
 #include "JSTreeModel.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/liststore.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

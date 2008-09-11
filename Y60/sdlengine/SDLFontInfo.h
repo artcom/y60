@@ -20,9 +20,9 @@
 #ifndef AC_Y60_SDLFONTINFO
 #define AC_Y60_SDLFONTINFO
 
-#include <y60/TTFFontInfo.h>
+#include <y60/gltext/TTFFontInfo.h>
 
-#include <sdl/SDL_ttf.h>
+#include <SDL/ttf2/SDL_ttf.h>
 
 namespace y60 {
 

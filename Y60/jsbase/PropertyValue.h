@@ -12,7 +12,7 @@
 #define _PROPERTY_VALUE_INCLUDED
 
 #include "JScppUtils.h"
-#include <js/jsapi.h>
+#include <js/spidermonkey/jsapi.h>
 
 namespace y60 {
 

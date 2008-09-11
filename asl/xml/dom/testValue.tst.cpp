@@ -28,11 +28,11 @@
 #include "Schema.h"
 #include "Value.h"
 
-#include <asl/UnitTest.h>
-#include <asl/Enum.h>
-#include <asl/linearAlgebra.h>
-#include <asl/raster.h>
-#include <asl/standard_pixel_types.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Enum.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/raster/raster.h>
+#include <asl/raster/standard_pixel_types.h>
 
 #include <fstream>
 

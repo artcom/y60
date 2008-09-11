@@ -1,5 +1,5 @@
 #include "GStreamerCapturePlugin.h"
-#include <asl/Auto.h>
+#include <asl/base/Auto.h>
 
 extern "C"
 EXPORT asl::PlugInBase * GStreamerCapturePlugin_instantiatePlugIn(asl::DLHandle myDLHandle) {

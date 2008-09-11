@@ -1,7 +1,7 @@
 #include "CTFile.h"
-#include <y60/Image.h>
-#include <asl/numeric_functions.h>
-#include <y60/PLFilterResizePadded.h>
+#include <y60/image/Image.h>
+#include <asl/math/numeric_functions.h>
+#include <y60/image/PLFilterResizePadded.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
 #include <paintlib/plpixelformat.h>
 #include <paintlib/planybmp.h>

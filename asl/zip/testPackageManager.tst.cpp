@@ -23,9 +23,9 @@
 #include "PackageManager.h"
 #include "DirectoryPackage.h"
 #include "ZipPackage.h"
-#include <asl/UnitTest.h>
-#include <asl/MappedBlock.h>
-#include <asl/Ptr.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <iostream>

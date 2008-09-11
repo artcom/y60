@@ -17,17 +17,17 @@
 #include "SkinAndBonesShader.h"
 #endif
 
-#include <y60/iostream_functions.h>
-#include <y60/NodeNames.h>
-#include <y60/property_functions.h>
-#include <y60/NodeValueNames.h>
-#include <dom/Nodes.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/property_functions.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/dom/Nodes.h>
 
-#include <asl/PackageManager.h>
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
-#include <asl/os_functions.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/os_functions.h>
 
 
 using namespace std;

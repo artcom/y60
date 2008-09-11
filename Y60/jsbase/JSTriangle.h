@@ -13,11 +13,11 @@
 
 #include "JSWrapper.h"
 
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Triangle.h>
-#include <dom/Value.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/Triangle.h>
+#include <asl/dom/Value.h>
 
 
 namespace jslib {

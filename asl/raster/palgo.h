@@ -25,14 +25,14 @@
 #ifndef _ASL_RASTER_PALGO_H_INCLUDED_
 #define _ASL_RASTER_PALGO_H_INCLUDED_
 
-#include <asl/Vector234.h>
-#include <asl/Box.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Box.h>
 
 #include <stddef.h>
 #include <algorithm>
 #include <functional>
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 #include "standard_pixel_types.h"
 #include "raster.h"

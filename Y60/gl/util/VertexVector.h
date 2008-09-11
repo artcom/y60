@@ -16,9 +16,9 @@
 #include <limits>
 #include <vector>
 
-#include <asl/Exception.h>
-#include <asl/Logger.h>
-#include <asl/Auto.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Auto.h>
 
 namespace y60 {
     class Primitive;

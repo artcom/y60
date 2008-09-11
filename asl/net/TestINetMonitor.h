@@ -41,7 +41,7 @@
 #define INCL_TESTINETMONITOR
 
 #include <string>
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 class TestINetMonitor: public UnitTest{
     public:

@@ -20,8 +20,8 @@
 #ifndef _ac_scene_PropertyListFacade_h_
 #define _ac_scene_PropertyListFacade_h_
 
-#include <y60/PropertyNames.h>
-#include <dom/Facade.h>
+#include <y60/base/PropertyNames.h>
+#include <asl/dom/Facade.h>
 #include <string>
 #include <vector>
 

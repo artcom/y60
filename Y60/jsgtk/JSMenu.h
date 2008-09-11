@@ -12,10 +12,10 @@
 #define _Y60_ACGTKSHELL_JSMENU_INCLUDED_
 
 #include "JSMenuShell.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/menu.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

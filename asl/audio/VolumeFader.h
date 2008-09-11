@@ -15,8 +15,8 @@
 
 #include "Effect.h"
 
-#include <asl/settings.h>
-#include <asl/Ptr.h>
+#include <asl/base/settings.h>
+#include <asl/base/Ptr.h>
 
 namespace asl {
 

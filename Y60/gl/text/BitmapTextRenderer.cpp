@@ -36,7 +36,7 @@
 #include "Times14.h"
 #include "Times144.h"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 #ifdef WIN32
 #include <windows.h>

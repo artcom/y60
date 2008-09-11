@@ -11,10 +11,10 @@
 #ifndef _SoundCacheItem_H_
 #define _SoundCacheItem_H_
 
-#include <asl/Ptr.h>
-#include <asl/Time.h>
-#include <asl/AudioBufferBase.h>
-#include <asl/ISampleSink.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Time.h>
+#include <asl/audio/AudioBufferBase.h>
+#include <asl/audio/ISampleSink.h>
 
 #include <string>
 #include <map>

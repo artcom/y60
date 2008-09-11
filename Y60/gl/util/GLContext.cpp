@@ -24,9 +24,9 @@
 #include "GLContext.h"
 #include "GLUtils.h"
 
-#include <asl/Logger.h>
-#include <asl/numeric_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/string_functions.h>
 
 #include <math.h>
 #include <iostream>

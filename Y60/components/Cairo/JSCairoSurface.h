@@ -11,10 +11,10 @@
 #ifndef _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 #define _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 
-#include <dom/Nodes.h>
-#include <dom/Value.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Value.h>
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 extern "C" {
 #include <cairo/cairo.h>

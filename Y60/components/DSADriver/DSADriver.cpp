@@ -14,9 +14,9 @@
 
 #include "DSADriver.h"
 
-#include <asl/Vector234.h>
-#include <y60/TouchEvent.h>
-#include <y60/DataTypes.h>
+#include <asl/math/Vector234.h>
+#include <y60/input/TouchEvent.h>
+#include <y60/base/DataTypes.h>
 
 using namespace std;
 

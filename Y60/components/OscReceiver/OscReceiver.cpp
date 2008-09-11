@@ -11,13 +11,13 @@
 #include <iostream>
 
 #include "OscReceiver.h"
-#include "y60/Documentation.h"
-#include <y60/GenericEvent.h>
-#include <y60/DataTypes.h>
-#include <asl/string_functions.h>
-#include <y60/SettingsParser.h>
+#include "y60/jsbase/Documentation.h"
+#include <y60/input/GenericEvent.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/string_functions.h>
+#include <y60/base/SettingsParser.h>
 
-#include <y60/EventDispatcher.h>
+#include <y60/input/EventDispatcher.h>
 
 using namespace std;
 using namespace asl;

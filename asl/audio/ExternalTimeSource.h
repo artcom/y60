@@ -15,10 +15,10 @@
 #include "TimeSource.h"
 #include "AudioTimeSource.h"
 
-#include <asl/Auto.h>
-#include <asl/Time.h>
-#include <asl/Ptr.h>
-#include <asl/settings.h>
+#include <asl/base/Auto.h>
+#include <asl/base/Time.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/settings.h>
 
 namespace asl {
     

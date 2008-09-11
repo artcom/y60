@@ -28,11 +28,11 @@
 #include <atlctl.h>
 #include <atlconv.h>
 
-#include <asl/Vector234.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
-#include <asl/MappedBlock.h>
-#include <asl/Exception.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Exception.h>
 
 class EventListener;
 namespace y60 {

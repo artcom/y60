@@ -11,7 +11,7 @@
 #include "CgProgramInfo.h"
 #include "Renderer.h"
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
 
 #ifdef WIN32
@@ -23,9 +23,9 @@
     #include <GL/glx.h>
 #endif
 
-#include <y60/NodeValueNames.h>
-#include <asl/string_functions.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/base/string_functions.h>
+#include <asl/dom/Nodes.h>
 
 #define DB(x) // x
 

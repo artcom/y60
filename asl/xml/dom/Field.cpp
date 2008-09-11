@@ -22,8 +22,8 @@
 */
 
 #include "Value.h"
-#include <asl/Logger.h>
-#include <asl/console_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/console_functions.h>
 #include <typeinfo>
 
 

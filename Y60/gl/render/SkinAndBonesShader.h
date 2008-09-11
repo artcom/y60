@@ -22,9 +22,9 @@
 
 #include "CgShader.h"
 
-#include <dom/Nodes.h>
-#include <y60/Facades.h>
-#include <asl/Matrix4.h>
+#include <asl/dom/Nodes.h>
+#include <y60/scene/Facades.h>
+#include <asl/math/Matrix4.h>
 
 #include <vector>
 

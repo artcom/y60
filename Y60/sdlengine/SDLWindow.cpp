@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/GLResourceManager.h>
+#include <y60/render/GLResourceManager.h>
 
 #ifdef OSX
 #include <Carbon/Carbon.h>
@@ -21,7 +21,7 @@
 #include "SDLWindow.h"
 #include "SDLTextRenderer.h"
 
-#include <y60/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.h>
 
 #include <SDL/SDL.h>
 
@@ -31,26 +31,26 @@
 #include <SDL/SDL_syswm.h>
 
 #include <iostream>
-#include <asl/numeric_functions.h>
-#include <asl/GeometryUtils.h>
-#include <asl/Box.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/GeometryUtils.h>
+#include <asl/math/Box.h>
 
-#include <y60/GLResourceManager.h>
-#include <y60/JSBox.h>
-#include <y60/JSLine.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSSphere.h>
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSNode.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/JSApp.h>
-#include <y60/JScppUtils.h>
-#include <y60/GLAlloc.h>
-#include <y60/ShaderLibrary.h>
-#include <y60/ArgumentHolder.impl>
+#include <y60/render/GLResourceManager.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/JSApp.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/glutil/GLAlloc.h>
+#include <y60/render/ShaderLibrary.h>
+#include <y60/jsbase/ArgumentHolder.impl>
 
-#include <xpath/xpath_api.h>
+#include <asl/xpath/xpath_api.h>
 
 using namespace std;
 using namespace y60;

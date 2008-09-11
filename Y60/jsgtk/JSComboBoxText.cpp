@@ -15,8 +15,8 @@
 #include "JSTreeIter.h"
 #include "JSCellRenderer.h"
 #include "jsgtk.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
 
 #include <gtkmm/liststore.h>

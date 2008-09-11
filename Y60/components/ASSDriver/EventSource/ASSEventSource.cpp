@@ -9,13 +9,13 @@
 //============================================================================
 
 #include "ASSEventSource.h"
-#include <y60/AssEventSchema.h>
+#include <y60/input/AssEventSchema.h>
 
 using namespace asl;
 using namespace y60;
 
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSWrapper.h>
 
 
 namespace y60 {

@@ -13,9 +13,9 @@
 
 #include "ASSUtils.h"
 
-#include <asl/Ptr.h>
-#include <asl/PosixThread.h>
-#include <dom/Nodes.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/PosixThread.h>
+#include <asl/dom/Nodes.h>
 
 #include <queue>
 

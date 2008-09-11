@@ -13,17 +13,17 @@
 
 #include "ShaderLibrary.h"
 
-#include <asl/Singleton.h>
+#include <asl/base/Singleton.h>
 
-#include <y60/ResourceManager.h>
-#include <y60/GLUtils.h>
+#include <y60/scene/ResourceManager.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <y60/VertexData.h>
-#include <y60/VertexMemory.h>
-#include <y60/VertexVector.h>
-#include <y60/VertexArray.h>
-#include <y60/VertexBufferObject.h>
-#include <y60/GLAlloc.h>
+#include <y60/scene/VertexData.h>
+#include <y60/glutil/VertexMemory.h>
+#include <y60/glutil/VertexVector.h>
+#include <y60/glutil/VertexArray.h>
+#include <y60/glutil/VertexBufferObject.h>
+#include <y60/glutil/GLAlloc.h>
 
 namespace y60 {
 

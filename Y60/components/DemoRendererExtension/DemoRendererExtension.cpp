@@ -19,12 +19,12 @@
 //
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
 
 #include <iostream>
 

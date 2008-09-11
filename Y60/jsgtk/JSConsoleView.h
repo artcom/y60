@@ -14,8 +14,8 @@
 #include "JSTextView.h"
 
 #include <acgtk/ConsoleView.h>
-#include <y60/JSWrapper.h>
-#include <asl/string_functions.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

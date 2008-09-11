@@ -1,7 +1,7 @@
 #ifndef ACGTK_TNT_THRESHOLD_LIST_INCLUDED
 #define ACGTK_TNT_THRESHOLD_LIST_INCLUDED
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #ifdef OSX
 #undef check

@@ -15,10 +15,10 @@
 #include "SoundCacheItem.h"
 #include "IAudioDecoderFactory.h"
 
-#include <asl/Singleton.h>
-#include <asl/Stream.h>
-#include <asl/ThreadLock.h>
-#include <asl/PosixThread.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/Stream.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/PosixThread.h>
 
 #include <string>
 #include <vector>

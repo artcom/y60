@@ -9,14 +9,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 
-#include <y60/GLUtils.h>
-#include <y60/SDLWindow.h>
-#include <y60/GLResourceManager.h>
+#include <y60/glutil/GLUtils.h>
+#include <y60/sdlengine/SDLWindow.h>
+#include <y60/render/GLResourceManager.h>
 
-#include <y60/PixelEncoding.h>
-#include <y60/TextureCompressor.h>
-#include <y60/I60Header.h>
-#include <y60/PLFilterResizePadded.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/glutil/TextureCompressor.h>
+#include <y60/image/I60Header.h>
+#include <y60/image/PLFilterResizePadded.h>
 
 #if 0
 #ifdef OSX
@@ -26,13 +26,13 @@
 #endif
 #endif
 
-#include <asl/Arguments.h>
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
-#include <asl/os_functions.h>
+#include <asl/base/Arguments.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/os_functions.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #include <paintlib/planydec.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>

@@ -12,14 +12,14 @@
 #include "FFMpegURLProtocol.h"
 #include "Demux.h"
 
-#include <y60/Movie.h>
-#include <y60/SoundManager.h>
-#include <asl/Ptr.h>
-#include <asl/Auto.h>
-#include <asl/Pump.h> //must come before Assure.h
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
+#include <y60/video/Movie.h>
+#include <y60/sound/SoundManager.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Auto.h>
+#include <asl/audio/Pump.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
 
 // remove ffmpeg macros
 #ifdef START_TIMER
@@ -31,7 +31,7 @@
 
 
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #include <iostream>
 #include <stdlib.h>
 

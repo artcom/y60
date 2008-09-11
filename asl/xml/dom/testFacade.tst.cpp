@@ -28,8 +28,8 @@
 #include "PropertyPlug.h"
 #include "ChildNodePlug.h"
 
-#include <asl/UnitTest.h>
-#include <asl/numeric_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/numeric_functions.h>
 
 #include <string>
 #include <iostream>

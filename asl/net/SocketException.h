@@ -42,7 +42,7 @@
 #define SocketException_class
 
 #include <string>
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 #ifdef WIN32
 #include <winsock2.h>

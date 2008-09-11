@@ -11,9 +11,9 @@
 #ifndef _Y60_JSLIB_JSGLRESOURCEMANAGER_INCLUDED_
 #define _Y60_JSLIB_JSGLRESOURCEMANAGER_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
-#include <y60/GLResourceManager.h>
+#include <y60/render/GLResourceManager.h>
 
 namespace jslib {
 

@@ -3,8 +3,8 @@
 
 #include "WorldBuilderBase.h"
 
-#include <asl/Vector234.h>
-#include <asl/Quaternion.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Quaternion.h>
 #include <string>
 
 namespace y60 {

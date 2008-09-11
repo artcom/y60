@@ -20,19 +20,19 @@
 #ifndef _ac_scene_StlImport_h_
 #define _ac_scene_StlImport_h_
 
-#include <y60/ISceneDecoder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/IScriptablePlugin.h>
-#include <asl/PlugInBase.h>
-#include <dom/Nodes.h>
-#include <y60/NodeNames.h>
-#include <asl/Exception.h>
-#include <asl/Vector234.h>
-#include <asl/MappedBlock.h>
-#include <asl/Logger.h>
-#include <y60/VertexDataRoles.h>
-#include <y60/ShapeBuilder.h>
+#include <y60/scene/ISceneDecoder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/base/Exception.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Logger.h>
+#include <y60/base/VertexDataRoles.h>
+#include <y60/scene/ShapeBuilder.h>
 
 
 #include "JSStlCodec.h"

@@ -30,12 +30,12 @@
 #include "Record.h"
 #include "Primitive.h"
 
-#include <y60/Image.h>
-#include <y60/Movie.h>
-#include <y60/Capture.h>
+#include <y60/image/Image.h>
+#include <y60/video/Movie.h>
+#include <y60/video/Capture.h>
 
-#include <dom/Nodes.h>
-#include <asl/Matrix4.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Matrix4.h>
 
 namespace y60 {
 

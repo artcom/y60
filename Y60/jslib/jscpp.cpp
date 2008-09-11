@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
@@ -32,30 +32,30 @@
 
 #include "jscpp.h"
 
-#include <y60/JSSphere.h>
-#include <y60/JSBox.h>
-#include <y60/JSBox2f.h>
-#include <y60/JSLine.h>
-#include <y60/JSPlane.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSVector.h>
-#include <y60/JSQuaternion.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSNode.h>
-#include <y60/JSNodeList.h>
-#include <y60/JSNamedNodeMap.h>
-#include <y60/JSResizeableVector.h>
-#include <y60/JSResizeableRaster.h>
-#include <y60/JSAccessibleVector.h>
-#include <y60/JSGlobal.h>
-#include <y60/JSDomEvent.h>
-#include <y60/JSFrustum.h>
-#include <y60/JSBlock.h>
-#include <y60/JSEnum.h>
-#include <y60/JSBitset.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSBox2f.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSPlane.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSQuaternion.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSNodeList.h>
+#include <y60/jsbase/JSNamedNodeMap.h>
+#include <y60/jsbase/JSResizeableVector.h>
+#include <y60/jsbase/JSResizeableRaster.h>
+#include <y60/jsbase/JSAccessibleVector.h>
+#include <y60/jsbase/JSGlobal.h>
+#include <y60/jsbase/JSDomEvent.h>
+#include <y60/jsbase/JSFrustum.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSEnum.h>
+#include <y60/jsbase/JSBitset.h>
+#include <y60/jsbase/JSWrapper.impl>
 
-#include <y60/NodeValueNames.h>
+#include <y60/base/NodeValueNames.h>
 
 namespace jslib {
 

@@ -27,9 +27,9 @@
 #include "typedefs.h"
 #include "ThreadingModel.h"
 #include "Exceptions.h"
-#include <asl/MemoryPool.h>
-#include <asl/Exception.h>
-#include <asl/Stream.h>
+#include <asl/base/MemoryPool.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Stream.h>
 
 #include <string>
 #include <vector>

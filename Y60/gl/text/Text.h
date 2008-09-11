@@ -20,8 +20,8 @@
 #ifndef AC_Y60_TEXT
 #define AC_Y60_TEXT
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
 
 #include <map>
 #include <string>

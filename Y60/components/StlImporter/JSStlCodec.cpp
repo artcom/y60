@@ -1,9 +1,9 @@
 #include "JSStlCodec.h"
 
-#include <asl/PackageManager.h>
-#include <y60/JSNode.h>
-#include <y60/JSBlock.h>
-#include <y60/JSWrapper.impl>
+#include <asl/zip/PackageManager.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 using namespace asl;
 using namespace y60;

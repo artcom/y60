@@ -20,7 +20,7 @@
 #include "MayaHelpers.h"
 #include "ExportExceptions.h"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 #include <maya/MGlobal.h>
 #include <maya/MPlug.h>

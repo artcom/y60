@@ -11,7 +11,7 @@
 #ifndef _ac_NodeValueNames_h_
 #define _ac_NodeValueNames_h_
 
-#include <asl/Enum.h>
+#include <asl/base/Enum.h>
 
 namespace y60 {
 

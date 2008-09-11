@@ -13,7 +13,7 @@
 
 #include "JSWrapper.h"
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
 namespace jslib {
 

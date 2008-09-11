@@ -13,10 +13,10 @@
 
 #include "JSContainer.h"
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/notebook.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

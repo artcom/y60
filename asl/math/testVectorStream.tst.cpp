@@ -22,7 +22,7 @@
 
 #include "FixedVector.h"
 #include "linearAlgebra.h"
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <string>
 #include <iostream>

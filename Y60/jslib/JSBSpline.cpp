@@ -8,9 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/JSVector.h>
+#include <y60/jsbase/JSVector.h>
 #include "JSBSpline.h"
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.impl>
 
 namespace jslib {
 

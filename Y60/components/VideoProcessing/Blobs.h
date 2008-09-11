@@ -13,8 +13,8 @@
 #define _AC_BLOBS_H_
 
 #include "Algorithm.h"
-#include <y60/Overlay.h>
-#include <y60/ConnectedComponent.h>
+#include <y60/scene/Overlay.h>
+#include <y60/image/ConnectedComponent.h>
 
 namespace y60 {
 

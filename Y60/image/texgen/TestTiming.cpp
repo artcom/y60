@@ -24,9 +24,9 @@
 #include "TestTiming.h"
 #include "TextureGenerator.h"
 
-#include <dom/Nodes.h>
-#include <asl/string_functions.h>
-#include <asl/Time.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Time.h>
 
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>

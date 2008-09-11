@@ -12,10 +12,10 @@
 #define AC_Y60_SHADER_INTERFACE_INCLUDED
 
 #include "MaterialParameter.h"
-#include <y60/DataTypes.h>
-#include <y60/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <string>
 #include <vector>
 

@@ -17,11 +17,11 @@
 #include "SampleFormat.h"
 
 //#define ASSURE_POLICY AssurePolicy::Exit
-#include <asl/Block.h>
-#include <asl/Logger.h>
-#include <asl/Assure.h>
-#include <asl/numeric_functions.h>
-#include <asl/settings.h>
+#include <asl/base/Block.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/settings.h>
 
 
 #include <iostream>

@@ -41,8 +41,8 @@
 #include "TCPClientSocket.h"
 #include "net.h"
 
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 
 #ifndef WIN32
 #include <arpa/inet.h>

@@ -12,8 +12,8 @@
 #include "ASSDriver.h"
 #include "ASSUtils.h"
 
-#include <asl/Assure.h>
-#include <y60/SettingsParser.h>
+#include <asl/base/Assure.h>
+#include <y60/base/SettingsParser.h>
 
 #ifdef TL_LATENCY_TEST
 #   include <asl/SerialDeviceFactory.h>

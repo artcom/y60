@@ -11,9 +11,9 @@
 #ifndef _ac_y60_RendererState_h_
 #define _ac_y60_RendererState_h_
 
-#include <asl/Plane.h>
-#include <asl/Ptr.h>
-#include <asl/Box.h>
+#include <asl/math/Plane.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Box.h>
 
 #ifdef WIN32
     #ifndef WIN32_LEAN_AND_MEAN

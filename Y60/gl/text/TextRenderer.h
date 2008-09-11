@@ -21,10 +21,10 @@
 #define AC_Y60_TEXTRENDERER
 
 #include "Text.h"
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
-#include <asl/Box.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Box.h>
 
 #include <map>
 namespace y60 {

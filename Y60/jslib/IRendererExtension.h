@@ -1,8 +1,8 @@
 #ifndef _IRENDERER_EXTENSION_INCLUDED
 #define _IRENDERER_EXTENSION_INCLUDED
 
-#include <asl/Ptr.h>
-#include <y60/Event.h>
+#include <asl/base/Ptr.h>
+#include <y60/input/Event.h>
 
 namespace jslib {
     class AbstractRenderWindow;

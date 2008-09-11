@@ -21,9 +21,9 @@
 
 #include "IProgressNotifier.h"
 
-#include <y60/IDecoder.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
+#include <y60/base/IDecoder.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

@@ -12,10 +12,10 @@
 #define _Y60_ACGTKSHELL_JSSEPARATORMENUITEM_INCLUDED_
 
 #include "JSMenuItem.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/separatormenuitem.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

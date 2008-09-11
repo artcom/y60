@@ -9,9 +9,9 @@
 //============================================================================
 
 #include "MovieBuilder.h"
-#include <y60/NodeNames.h>
-#include <y60/Movie.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <y60/video/Movie.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     MovieBuilder::MovieBuilder(const std::string & theName,

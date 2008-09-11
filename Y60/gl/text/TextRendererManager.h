@@ -17,13 +17,13 @@
 #include "TTFTextRenderer.h"
 #include "TTFFontInfo.h"
 
-#include <y60/Viewport.h>
+#include <y60/scene/Viewport.h>
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
-#include <asl/Box.h>
-#include <asl/Matrix4.h>
-#include <asl/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Box.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Exception.h>
 
 #include <vector>
 #include <string>

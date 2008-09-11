@@ -20,7 +20,7 @@
 #ifndef _ac_gl_vertex_data_buffer_h
 #define _ac_gl_vertex_data_buffer_h
 
-#include "VertexDataImpl.h"
+#include <y60/scene/VertexDataImpl.h>
 
 namespace y60 {
     

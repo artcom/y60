@@ -11,8 +11,8 @@
 #ifndef ASS_EVENT_SOURCE_INCLUDED
 #define ASS_EVENT_SOURCE_INCLUDED
 
-#include <y60/ASSDriver.h>
-#include <asl/UDPConnection.h>
+#include <y60/ASSCore/ASSDriver.h>
+#include <asl/net/UDPConnection.h>
 
 #include <oscpack/osc/OscOutboundPacketStream.h>
 

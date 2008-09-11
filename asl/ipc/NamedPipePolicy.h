@@ -41,7 +41,7 @@
 #define __asl_NamedPipePolicy_included
 
 #include "ConduitPolicy.h"
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <vector>

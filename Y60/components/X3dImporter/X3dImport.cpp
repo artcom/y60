@@ -12,23 +12,23 @@
 #include <fstream>
 #include <map>
 
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
-#include <asl/GeometryUtils.h>
-#include <y60/WorldBuilder.h>
-#include <y60/CameraBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/BodyBuilder.h>
-#include <y60/TransformBuilder.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/GeometryUtils.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/CameraBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/scene/TransformBuilder.h>
 
-#include <y60/Shape.h>
+#include <y60/scene/Shape.h>
 
-#include <y60/property_functions.h>
-#include <y60/PropertyNames.h>
+#include <y60/base/property_functions.h>
+#include <y60/base/PropertyNames.h>
 
 #include "X3dImport.h"
 

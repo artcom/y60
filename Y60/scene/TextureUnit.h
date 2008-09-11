@@ -15,15 +15,15 @@
 #include "IShader.h"
 #include "Texture.h"
 
-#include <y60/NodeValueNames.h>
-#include <y60/ITextureManager.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/image/ITextureManager.h>
 
-#include <asl/Exception.h>
-#include <asl/Matrix4.h>
-#include <asl/Ptr.h>
+#include <asl/base/Exception.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Ptr.h>
 
-#include <dom/AttributePlug.h>
-#include <dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/dom/Facade.h>
 
 #include <string>
 

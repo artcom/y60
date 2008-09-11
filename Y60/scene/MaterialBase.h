@@ -16,16 +16,16 @@
 #include "PropertyListFacade.h"
 #include "IShader.h"
 
-#include <y60/CommonTags.h>
-#include <y60/PropertyNames.h>
-#include <dom/Facade.h>
-#include <dom/PropertyPlug.h>
-#include <dom/AttributePlug.h>
-#include <dom/ChildNodePlug.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/PropertyNames.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/PropertyPlug.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/dom/ChildNodePlug.h>
 
-#include <asl/Exception.h>
-#include <y60/DataTypes.h>
-#include <dom/Nodes.h>
+#include <asl/base/Exception.h>
+#include <y60/base/DataTypes.h>
+#include <asl/dom/Nodes.h>
 #include <string>
 #include <vector>
 

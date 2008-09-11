@@ -11,7 +11,7 @@
 #include "WiiScanner.h"
 #include "Utils.h"
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 #ifdef LINUX
 #   include "Liimote.h"

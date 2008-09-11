@@ -26,13 +26,13 @@
 #include "WorldBuilder.h"
 #include "TransformBuilder.h"
 #include "BodyBuilder.h"
-#include <y60/DataTypes.h>
-#include <y60/Image.h>
+#include <y60/base/DataTypes.h>
+#include <y60/image/Image.h>
 
-#include <asl/string_functions.h>
-#include <asl/UnitTest.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Matrix4.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/Matrix4.h>
 #include <iostream>
 #include <math.h>
 

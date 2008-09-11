@@ -25,8 +25,8 @@
 #define _asl_xml_typedefs_included_
 
 #include "ThreadingModel.h" 
-#include <asl/Ptr.h>
-#include <asl/Time.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Time.h>
 #include <string>
 
 namespace dom {

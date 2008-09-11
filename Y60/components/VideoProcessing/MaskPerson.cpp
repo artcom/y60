@@ -1,6 +1,6 @@
 #include "MaskPerson.h"
 #include "cv_algo.h"
-#include <asl/standard_pixel_types.h>
+#include <asl/raster/standard_pixel_types.h>
 
 using namespace y60;
 using namespace asl;

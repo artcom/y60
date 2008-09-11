@@ -21,14 +21,14 @@
 #include "Shape.h"
 #include "Scene.h"
 
-#include <y60/NodeNames.h>
-#include <y60/VertexDataRoles.h>
-#include <y60/NodeValueNames.h>
-#include <asl/string_functions.h>
-#include <asl/Triangle.h>
-#include <asl/linearAlgebra.h>
-#include <asl/intersection.h>
-#include <asl/Dashboard.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/VertexDataRoles.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/Triangle.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/base/Dashboard.h>
 #include "ResourceManager.h"
 
 using namespace asl;

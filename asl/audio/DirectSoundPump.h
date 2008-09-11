@@ -18,7 +18,7 @@
 
 #include "AudioBuffer.h"
 
-#include <asl/Singleton.h>
+#include <asl/base/Singleton.h>
 
 #include <string>
 #include <dsound.h>

@@ -12,29 +12,29 @@
 #include "StlImport.h"
 #include "JSStlCodec.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/TransformBuilder.h>
-#include <y60/WorldBuilder.h>
-#include <y60/CameraBuilder.h>
-#include <y60/BodyBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/scene/TransformBuilder.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/CameraBuilder.h>
+#include <y60/scene/BodyBuilder.h>
 
-#include <y60/Shape.h>
+#include <y60/scene/Shape.h>
 
-#include <y60/PropertyNames.h>
-#include <y60/property_functions.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/property_functions.h>
 
-#include <y60/DataTypes.h>
-#include <y60/VertexData.h>
-#include <y60/Primitive.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/VertexData.h>
+#include <y60/scene/Primitive.h>
 
-#include <asl/linearAlgebra.h>
-#include <asl/file_functions.h>
-#include <asl/settings.h>
-#include <asl/Stream.h>
-#include <asl/Assure.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/settings.h>
+#include <asl/base/Stream.h>
+#include <asl/base/Assure.h>
 
 #include <iostream>
 #include <fstream>

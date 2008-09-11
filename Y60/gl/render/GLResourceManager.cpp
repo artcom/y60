@@ -17,11 +17,11 @@ We need to find a clean way to deal with NPOT textures then.
 
 #include "GLResourceManager.h"
 
-#include <y60/Image.h>
-#include <y60/PixelEncoding.h>
-#include <y60/PixelEncodingInfo.h>
-#include <asl/file_functions.h>
-#include <asl/Dashboard.h>
+#include <y60/image/Image.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/glutil/PixelEncodingInfo.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Dashboard.h>
 
 #include <GL/glext.h>
 

@@ -20,10 +20,10 @@
 #ifndef _ac_maya_AnimationExporter_h_
 #define _ac_maya_AnimationExporter_h_
 
-#include <y60/iostream_functions.h>
-#include <y60/AnimationBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <asl/Dashboard.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/scene/AnimationBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <asl/base/Dashboard.h>
 #include <maya/MFnAnimCurve.h>
 #include <maya/MFnLambertShader.h>
 #include <maya/MFnCamera.h>

@@ -15,9 +15,9 @@
 #include "NodeNames.h"
 #include "NodeValueNames.h"
 #include "AcBool.h"
-#include <asl/Vector234.h>
-#include <asl/Quaternion.h>
-#include <asl/string_functions.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Quaternion.h>
+#include <asl/base/string_functions.h>
 #include <string>
 #include "DataTypes.h"
 

@@ -24,7 +24,7 @@
 #ifndef _ac_c4d_Exceptions_h_
 #define _ac_c4d_Exceptions_h_
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 DEFINE_EXCEPTION(ExportException, asl::Exception)
 

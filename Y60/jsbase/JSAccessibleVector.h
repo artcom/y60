@@ -20,7 +20,7 @@
 #define _Y60_ACXPSHELL_JSACCESSIBLEVECTOR_H_INCLUDED_
 
 #include "JSWrapper.h"
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
 namespace jslib {
 

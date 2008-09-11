@@ -12,12 +12,12 @@
 #include "CTScan.h"
 #include "Mesh.h"
 
-#include <y60/IDecoder.h>
-#include <asl/PlugInManager.h>
-#include <y60/DecoderManager.h>
+#include <y60/base/IDecoder.h>
+#include <asl/base/PlugInManager.h>
+#include <y60/base/DecoderManager.h>
 
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
 
 using namespace std;
 using namespace asl;

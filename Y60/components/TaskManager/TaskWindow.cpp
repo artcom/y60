@@ -18,7 +18,7 @@
 
 #include "TaskWindow.h"
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 #include <paintlib/win/plwinbmp.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/Filter/plfilterfliprgb.h>

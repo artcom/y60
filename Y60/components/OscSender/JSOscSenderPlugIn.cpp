@@ -21,8 +21,8 @@
 
 #include "JSOscSender.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
 	class JSOscSenderPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

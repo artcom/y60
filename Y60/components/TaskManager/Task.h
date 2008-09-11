@@ -19,7 +19,7 @@
 #ifndef _ac_y60_Task_h_
 #define _ac_y60_Task_h_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <string>
 #include <vector>
 #define _WIN32_WINNT 0x0501

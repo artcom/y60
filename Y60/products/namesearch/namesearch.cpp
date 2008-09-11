@@ -19,10 +19,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Arguments.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Arguments.h>
 
 #include <iostream>
 #include <string>

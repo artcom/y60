@@ -20,11 +20,11 @@
 #ifndef _ac_y60_Movie_h_
 #define _ac_y60_Movie_h_
 
-#include <y60/Image.h>
-#include <y60/NodeNames.h>
+#include <y60/image/Image.h>
+#include <y60/base/NodeNames.h>
 
-#include <asl/Ptr.h>
-#include <asl/Stream.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Stream.h>
 
 namespace asl {
     class PackageManager;

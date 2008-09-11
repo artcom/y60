@@ -24,7 +24,7 @@
 #if !defined(INCL_TESTTIMING)
 #define INCL_TESTTIMING
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <paintlib/planybmp.h>
 

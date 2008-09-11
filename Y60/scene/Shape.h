@@ -13,14 +13,14 @@
 
 #include "Primitive.h"
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
 
-#include <dom/Facade.h>
-#include <dom/AttributePlug.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
 
 #include <map>
 #include <vector>

@@ -25,12 +25,12 @@
 #define _ac_y60_PrimitivesBuiler_h_
 
 #include "BuilderBase.h"
-#include <y60/VertexDataRoles.h>
-#include <y60/typedefs.h>
-#include <y60/DataTypes.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
-#include <dom/Value.h>
+#include <y60/base/VertexDataRoles.h>
+#include <y60/base/typedefs.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Value.h>
 #include <vector>
 #include <string>
 #include <map>

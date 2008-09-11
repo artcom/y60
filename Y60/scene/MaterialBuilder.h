@@ -12,13 +12,13 @@
 #define _ac_MaterialBuilder_h_
 
 #include "BuilderBase.h"
-#include <y60/RankedFeature.h>
-#include <y60/NodeValueNames.h>
-#include <y60/typedefs.h>
+#include <y60/base/RankedFeature.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/typedefs.h>
 
-#include <dom/typedefs.h>
-#include <asl/Ptr.h>
-#include <asl/Matrix4.h>
+#include <y60/base/typedefs.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Matrix4.h>
 
 #include <vector>
 

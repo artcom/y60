@@ -21,7 +21,7 @@
 
 #include "jssettings.h"
 #include "JScppUtils.h"
-#include <js/jsapi.h>
+#include <js/spidermonkey/jsapi.h>
 
 #include <string>
 #include <vector>

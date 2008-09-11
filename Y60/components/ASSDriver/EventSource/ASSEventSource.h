@@ -11,7 +11,7 @@
 #ifndef ASS_EVENT_SOURCE_INCLUDED
 #define ASS_EVENT_SOURCE_INCLUDED
 
-#include <y60/ASSDriver.h>
+#include <y60/ASSCore/ASSDriver.h>
 
 
 namespace y60 {

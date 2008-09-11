@@ -13,18 +13,18 @@
 
 #include "SDLWindow.h"
 
-#include <y60/JSWrapper.h>
-#include <y60/JSAbstractRenderWindow.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/jslib/JSAbstractRenderWindow.h>
 
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/intersection.h>
-#include <asl/Exception.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/base/Exception.h>
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
-#include <y60/Scene.h>
+#include <y60/scene/Scene.h>
 
 DEFINE_EXCEPTION(JSRendererWindowException, asl::Exception);
 

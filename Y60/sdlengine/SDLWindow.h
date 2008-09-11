@@ -14,17 +14,17 @@
 #include "SDLEventSource.h"
 #include "SDLApp.h"
 
-#include <asl/settings.h>
-#include <asl/Exception.h>
-#include <y60/JScppUtils.h>
-#include <y60/jssettings.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/KeyEvent.h>
-#include <y60/WindowEvent.h>
+#include <asl/base/settings.h>
+#include <asl/base/Exception.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/jssettings.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/input/KeyEvent.h>
+#include <y60/input/WindowEvent.h>
 
-#include <y60/DebugEventSink.h>
-#include <y60/EventDispatcher.h>
-#include <y60/EventRecorder.h>
+#include <y60/input/DebugEventSink.h>
+#include <y60/input/EventDispatcher.h>
+#include <y60/input/EventRecorder.h>
 
 namespace y60 {
 

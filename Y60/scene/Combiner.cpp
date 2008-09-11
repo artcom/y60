@@ -10,9 +10,9 @@
 
 #include "Combiner.h"
 
-#include <y60/NodeNames.h>
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
+#include <y60/base/NodeNames.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Logger.h>
 
 
 using namespace asl;

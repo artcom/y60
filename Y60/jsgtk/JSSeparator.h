@@ -14,11 +14,11 @@
 #define _ac_jsgtk_JSSeparator_h_
 
 #include "JSWidget.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/widget.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 /**

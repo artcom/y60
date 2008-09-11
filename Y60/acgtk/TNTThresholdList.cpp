@@ -1,7 +1,7 @@
 #include "TNTThresholdList.h"
 #include "CellRendererPixbufToggle.h"
 
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 #include <iostream>
 
 using namespace std;

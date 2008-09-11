@@ -11,11 +11,11 @@
 #ifndef _WMADecoderFactory_H_
 #define _WMADecoderFactory_H_
 
-#include <y60/IAudioDecoderFactory.h>
+#include <y60/sound/IAudioDecoderFactory.h>
 
-#include <asl/ISampleSink.h>
-#include <asl/Block.h>
-#include <asl/PlugInBase.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/Block.h>
+#include <asl/base/PlugInBase.h>
 
 namespace y60 {
 

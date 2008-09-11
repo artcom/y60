@@ -11,10 +11,10 @@
 #include "OffscreenRenderArea.h"
 #include "JSApp.h"
 
-#include <y60/Image.h>
-#include <y60/PixelEncodingInfo.h>
+#include <y60/image/Image.h>
+#include <y60/glutil/PixelEncodingInfo.h>
 #include "GLContextRegistry.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 
 using namespace dom;

@@ -11,7 +11,7 @@
 #ifndef _ac_jslib_JSDvbTuner_h_
 #define _ac_jslib_JSDvbTuner_h_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include "DvbTuner.h"
 
 class JSDvbTuner : public jslib::JSWrapper<DvbTuner, asl::Ptr<DvbTuner> , jslib::StaticAccessProtocol> {

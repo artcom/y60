@@ -20,9 +20,9 @@
 #ifndef AC_Y60_SHADER_FEATURE_SET_INCLUDED
 #define AC_Y60_SHADER_FEATURE_SET_INCLUDED
 
-#include <dom/Nodes.h>
-#include <y60/DataTypes.h>
-#include <asl/Exception.h>
+#include <asl/dom/Nodes.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/Exception.h>
 
 #include <iostream>
 #include <string>

@@ -12,8 +12,8 @@
 
 #include "Movie.h"
 #include "MovieEncoding.h"
-#include <asl/Ptr.h>
-#include <asl/RunLengthEncoder.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/RunLengthEncoder.h>
 
 using namespace std;
 using namespace asl;
@@ -31,7 +31,7 @@ using namespace asl;
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "M60Header.h"
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
 #define DB(x) //x
 

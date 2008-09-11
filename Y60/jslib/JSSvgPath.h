@@ -11,10 +11,10 @@
 #ifndef _Y60_JSSVGPATH_H_
 #define _Y60_JSSVGPATH_H_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
-#include <asl/SvgPath.h>
-#include <dom/Value.h>
+#include <asl/math/SvgPath.h>
+#include <asl/dom/Value.h>
 
 namespace jslib {
 

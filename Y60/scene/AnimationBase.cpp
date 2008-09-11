@@ -19,10 +19,10 @@
 
 #include "AnimationBase.h"
 
-#include <y60/NodeNames.h>
+#include <y60/base/NodeNames.h>
 
-#include <dom/Nodes.h>
-#include <asl/Logger.h> 
+#include <asl/dom/Nodes.h>
+#include <asl/base/Logger.h>
 
 #include <iostream>
 

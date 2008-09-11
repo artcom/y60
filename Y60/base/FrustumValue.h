@@ -11,8 +11,8 @@
 #ifndef _ac_y60_frustumvalue_h_
 #define _ac_y60_frustumvalue_h_
 
-#include <dom/Value.h>
-#include <asl/Frustum.h>
+#include <asl/dom/Value.h>
+#include <asl/math/Frustum.h>
 
 namespace dom {
 

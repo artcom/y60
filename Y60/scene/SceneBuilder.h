@@ -13,9 +13,9 @@
 
 #include "BuilderBase.h"
 
-#include <dom/typedefs.h>
-#include <asl/Vector234.h>
-#include <asl/Stream.h>
+#include <y60/base/typedefs.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Stream.h>
 
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
     #include <strstream>

@@ -19,12 +19,12 @@
 #ifndef __Y60_JSAPP_INCLUDED__
 #define __Y60_JSAPP_INCLUDED__
 
-#include <y60/jssettings.h>
-#include <js/jsapi.h>
+#include <y60/jsbase/jssettings.h>
+#include <js/spidermonkey/jsapi.h>
 
-#include <asl/PlugInBase.h>
-#include <asl/MappedBlock.h>
-#include <asl/PackageManager.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/zip/PackageManager.h>
 #include <vector>
 #include <string>
 #include <map>

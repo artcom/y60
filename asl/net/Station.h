@@ -101,9 +101,9 @@ needs to be added; exposing the file descriptor should be enough to do that.
 #ifndef AC_STATION_H_INCLUDED
 #define AC_STATION_H_INCLUDED
 
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <asl/Block.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Block.h>
 
 #include <sys/types.h>
 

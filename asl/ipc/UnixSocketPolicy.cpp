@@ -39,8 +39,8 @@
 */
 #include "UnixSocketPolicy.h"
 
-#include <asl/net.h>
-#include <asl/string_functions.h>
+#include <asl/net/net.h>
+#include <asl/base/string_functions.h>
 
 #include <errno.h>
 

@@ -10,12 +10,12 @@
 
 #include "JSParticleSystem.h"
 
-#include <asl/os_functions.h>
-#include <y60/JSBlock.h>
-#include <dom/Nodes.h>
-#include <y60/JSNode.h>
-#include <y60/JSScene.h>
-#include <y60/JSWrapper.impl>
+#include <asl/base/os_functions.h>
+#include <y60/jsbase/JSBlock.h>
+#include <asl/dom/Nodes.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jslib/JSScene.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 

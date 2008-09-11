@@ -21,12 +21,12 @@
 
 #include "AnimationBuilder.h"
 #include "SceneBuilder.h"
-#include <y60/DataTypes.h>
-#include <y60/Y60xsd.h>
-#include <y60/Facades.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/Y60xsd.h>
+#include <y60/scene/Facades.h>
 
-#include <asl/UnitTest.h>
-#include <asl/FixedVector.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/FixedVector.h>
 
 using namespace std;
 using namespace asl;

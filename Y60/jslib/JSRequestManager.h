@@ -11,10 +11,10 @@
 #ifndef _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 
-#include <y60/JSWrapper.h>
-#include <y60/RequestManager.h>
-#include <asl/Ptr.h>
-#include <asl/string_functions.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/inet/RequestManager.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

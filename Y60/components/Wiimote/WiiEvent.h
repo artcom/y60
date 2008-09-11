@@ -12,7 +12,7 @@
 #define Y60_WII_EVENT_INCLUDED
 
 #include <string>
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 
 enum WiiReportMode {
     BUTTON,

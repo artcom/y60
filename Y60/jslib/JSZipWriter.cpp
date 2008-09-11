@@ -9,11 +9,11 @@
 //=============================================================================
 
 #include "JSZipWriter.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSBlock.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSWrapper.impl>
 
-#include <asl/file_functions.h>
+#include <asl/base/file_functions.h>
 
 using namespace std;
 using namespace asl;

@@ -1,15 +1,15 @@
 #ifndef Y60_SIM_WATER_INCLUDED
 #define Y60_SIM_WATER_INCLUDED
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
 #include "WaterSimulation.h"
 #include "WaterRepresentation.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/Documentation.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/Documentation.h>
 
 class SimWater :
     public asl::PlugInBase,

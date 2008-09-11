@@ -14,12 +14,12 @@
 #include <shlobj.h>
 #include <string>
 
-#include <asl/string_functions.h>
-#include <asl/Path.h>
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JScppUtils.h>
-#include <y60/Documentation.h>
+#include <asl/base/string_functions.h>
+#include <asl/xpath/Path.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/Documentation.h>
 
 
 using namespace std;

@@ -20,7 +20,7 @@
 #ifndef _ac_scene_Scene_h_
 #define _ac_scene_Scene_h_
 
-#include <y60/IScene.h>
+#include <y60/base/IScene.h>
 
 #include "IShader.h"
 #include "MaterialBase.h"
@@ -32,10 +32,10 @@
 #include "Y60Decoder.h"
 
 #include "SceneBuilder.h"
-#include <asl/PackageManager.h>
-#include <asl/Matrix4.h>
-#include <asl/Box.h>
-#include <dom/Nodes.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/math/Matrix4.h>
+#include <asl/math/Box.h>
+#include <asl/dom/Nodes.h>
 #include "ResourceManager.h"
 
 #include <string>

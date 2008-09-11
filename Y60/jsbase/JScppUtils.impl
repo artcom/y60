@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
 namespace jslib {
 

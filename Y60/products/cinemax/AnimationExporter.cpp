@@ -21,14 +21,14 @@
 #include "SceneExporter.h"
 #include "CinemaHelpers.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/AnimationBuilder.h>
-#include <y60/TransformBuilder.h>
-#include <y60/CharacterBuilder.h>
-#include <y60/ClipBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/AnimationBuilder.h>
+#include <y60/scene/TransformBuilder.h>
+#include <y60/scene/CharacterBuilder.h>
+#include <y60/scene/ClipBuilder.h>
 
-#include <asl/numeric_functions.h>
-#include <asl/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 #include <float.h>

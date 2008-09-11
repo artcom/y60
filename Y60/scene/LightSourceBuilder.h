@@ -25,8 +25,8 @@
 #define _ac_y60_LightSourceBuilder_h_
 
 #include "BuilderBase.h"
-#include <y60/NodeValueNames.h>
-#include <asl/Vector234.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/math/Vector234.h>
 
 namespace y60 {
 

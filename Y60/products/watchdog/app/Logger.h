@@ -16,7 +16,7 @@
 
 #include <fstream>
 #include <string>
-#include <asl/ThreadLock.h>
+#include <asl/base/ThreadLock.h>
 
 class Logger {
     public:

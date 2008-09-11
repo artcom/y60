@@ -11,11 +11,11 @@
 #ifndef _ac_render_GLBufferAdapter_h_
 #define _ac_render_GLBufferAdapter_h_
 
-#include <asl/Exception.h>
-#include <asl/Block.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Block.h>
 
-#include <y60/Texture.h>
-#include <y60/Image.h>
+#include <y60/scene/Texture.h>
+#include <y60/image/Image.h>
 
 #include <paintlib/planydec.h>
 

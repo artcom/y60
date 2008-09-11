@@ -9,10 +9,10 @@
 //==============================================================================
 
 #include "CMSCache.h"
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <y60/Request.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <y60/inet/Request.h>
 
 #ifdef verify
 	#ifndef _SETTING_NO_UNDEF_WARNING_ 

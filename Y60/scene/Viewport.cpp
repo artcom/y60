@@ -12,7 +12,7 @@
 #include "Canvas.h" 
 #include "Camera.h" 
 
-#include <asl/Logger.h> 
+#include <asl/base/Logger.h>
 
 using namespace asl;
 using namespace dom;

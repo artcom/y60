@@ -39,15 +39,15 @@
 
 // This needs to be the first include to avoid duplicate definitions in
 // winsock.h and winsock2.h.
-#include <asl/TCPClientSocket.h>
-#include <asl/UDPConnection.h>
-#include <asl/UDPSocket.h>
+#include <asl/net/TCPClientSocket.h>
+#include <asl/net/UDPConnection.h>
+#include <asl/net/UDPSocket.h>
 
 #include "Script.h"
 
-#include <asl/address.h>
-#include <asl/net.h>
-#include <asl/os_functions.h>
+#include <asl/net/address.h>
+#include <asl/net/net.h>
+#include <asl/base/os_functions.h>
 
 #ifdef MACINTOSH
 	#include <windows.h>

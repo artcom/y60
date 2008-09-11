@@ -18,8 +18,8 @@
 
 #include "CameraBuilder.h"
 #include "Camera.h"
-#include <y60/NodeNames.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/dom/Nodes.h>
 
 using namespace asl;
 

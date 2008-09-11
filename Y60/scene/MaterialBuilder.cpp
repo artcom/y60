@@ -15,15 +15,15 @@
 #include "TextureBuilder.h"
 
 #include "TextureUnit.h"
-#include <y60/NodeNames.h>
-#include <y60/iostream_functions.h>
-#include <y60/property_functions.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/base/property_functions.h>
 
-#include <dom/Nodes.h>
-#include <dom/Value.h>
-#include <asl/Block.h>
-#include <asl/Dashboard.h>
-#include <asl/file_functions.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Value.h>
+#include <asl/base/Block.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/file_functions.h>
 
 #include <algorithm>
 

@@ -11,11 +11,11 @@
 #ifndef __included_Timeout_h__
 #define __included_Timeout_h__
 
-#include <asl/Time.h>
-#include <asl/Ptr.h>
+#include <asl/base/Time.h>
+#include <asl/base/Ptr.h>
 
-#include <y60/jssettings.h>
-#include <js/jsapi.h>
+#include <y60/jsbase/jssettings.h>
+#include <js/spidermonkey/jsapi.h>
 
 #include <string>
 #include <map>

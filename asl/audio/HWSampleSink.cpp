@@ -13,11 +13,11 @@
 #include "HWSampleSink.h"
 #include "Pump.h"
 
-#include <asl/Auto.h>
-#include <asl/Logger.h>
+#include <asl/base/Auto.h>
+#include <asl/base/Logger.h>
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 namespace asl {

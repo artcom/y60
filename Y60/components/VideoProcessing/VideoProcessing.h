@@ -12,18 +12,18 @@
 #ifndef __VIDEOPROCESSING_H__
 #define __VIDEOPROCESSING_H__
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
 #include "Algorithm.h"
 
 
-#include <y60/JSWrapper.h>
-#include <y60/JSNode.h>
-#include <y60/JSScene.h>
-#include <y60/Scene.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jslib/JSScene.h>
+#include <y60/scene/Scene.h>
 
 #include <vector>
 

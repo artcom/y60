@@ -12,10 +12,10 @@
 #define _Y60_ACGTKSHELL_JSSTATUSBAR_INCLUDED_
 
 #include "JSHBox.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/statusbar.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

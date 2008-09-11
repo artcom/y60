@@ -12,8 +12,8 @@
 #define _ac_ImageBuilder_h_
 
 #include "BuilderBase.h"
-#include <y60/Image.h>
-#include <asl/Ptr.h>
+#include <y60/image/Image.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 

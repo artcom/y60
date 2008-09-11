@@ -13,10 +13,10 @@
 
 #include "ShaderDescription.h"
 
-#include <y60/Viewport.h>
-#include <y60/Camera.h>
-#include <y60/Body.h>
-#include <y60/Light.h>
+#include <y60/scene/Viewport.h>
+#include <y60/scene/Camera.h>
+#include <y60/scene/Body.h>
+#include <y60/scene/Light.h>
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
 

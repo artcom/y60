@@ -20,16 +20,16 @@
 #ifndef _ac_scene_LightSource_h_
 #define _ac_scene_LightSource_h_
 
-#include <y60/DataTypes.h>
-#include <y60/CommonTags.h>
-#include <y60/NodeValueNames.h>
-#include <y60/PropertyNames.h>
-#include <y60/TypeTraits.h>
-#include <dom/Facade.h>
-#include <dom/PropertyPlug.h>
-#include <dom/AttributePlug.h>
-#include <dom/ChildNodePlug.h>
-#include <asl/Logger.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/TypeTraits.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/PropertyPlug.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/dom/ChildNodePlug.h>
+#include <asl/base/Logger.h>
 
 #include "PropertyListFacade.h"
 

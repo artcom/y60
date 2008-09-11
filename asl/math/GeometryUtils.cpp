@@ -22,7 +22,7 @@
 
 #include "GeometryUtils.h"
 #include "Triangle.h"
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 #define DB(x) // x
 

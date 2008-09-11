@@ -11,11 +11,11 @@
 #ifndef _plugin_CharacterMover_h_
 #define _plugin_CharacterMover_h_
 
-#include <y60/VertexData.h>
-#include <y60/Shape.h>
-#include <y60/Body.h>
-#include <dom/Nodes.h>
-#include <asl/Vector234.h>
+#include <y60/scene/VertexData.h>
+#include <y60/scene/Shape.h>
+#include <y60/scene/Body.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Vector234.h>
 #include <vector>
 
 namespace jslib {

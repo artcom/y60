@@ -11,10 +11,10 @@
 #include "ShapeBuilder.h"
 #include "ElementBuilder.h"
 #include "Shape.h"
-#include <y60/NodeValueNames.h>
-#include <y60/DataTypes.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
 #define DB(x) //x
 

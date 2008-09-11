@@ -21,7 +21,7 @@
 #ifndef INCL_SOUNDEXCEPTION
 #define INCL_SOUNDEXCEPTION 
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace asl {
   DEFINE_EXCEPTION (AudioException, asl::Exception)

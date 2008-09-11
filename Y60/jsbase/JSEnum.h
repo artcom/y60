@@ -14,11 +14,11 @@
 #include "JScppUtils.h"
 #include "JSWrapper.h"
 
-#include <asl/settings.h>
-#include <asl/string_functions.h>
-#include <asl/Singleton.h>
-#include <dom/Value.h>
-#include <y60/DataTypes.h>
+#include <asl/base/settings.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Singleton.h>
+#include <asl/dom/Value.h>
+#include <y60/base/DataTypes.h>
 
 namespace jslib {
 

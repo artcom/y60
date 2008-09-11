@@ -25,10 +25,10 @@
 
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/frontend.h>
-#include <asl/settings.h>
-#include <dom/Nodes.h>
+#include <asl/base/settings.h>
+#include <asl/dom/Nodes.h>
 
-#include <asl/PosixThread.h>
+#include <asl/base/PosixThread.h>
 
 #include "DvbTeleText.h"
 

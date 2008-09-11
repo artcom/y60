@@ -22,8 +22,8 @@
 
 #include "MaterialTypes.h"
 
-#include <y60/VertexDataRoles.h>
-#include <asl/Ptr.h>
+#include <y60/base/VertexDataRoles.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <vector>

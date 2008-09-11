@@ -41,9 +41,9 @@
 #include "net_functions.h"
 #include "net.h"
 
-#include <asl/UnitTest.h>
-#include <asl/settings.h>
-#include <asl/Time.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/settings.h>
+#include <asl/base/Time.h>
 
 #ifdef WIN32
 #include <windows.h>

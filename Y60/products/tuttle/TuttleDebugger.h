@@ -4,10 +4,10 @@
 
 #include <queue>
 
-#include <js/jsapi.h>
+#include <js/spidermonkey/jsapi.h>
 
-#include <asl/ThreadLock.h>
-#include <asl/ThreadSemaphore.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/ThreadSemaphore.h>
 
 namespace tuttle {
 

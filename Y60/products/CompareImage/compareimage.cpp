@@ -12,9 +12,9 @@
 #include "plfiltersubtract.h"
 #include "plfilter3x3.h"
 
-#include <asl/Arguments.h>
-#include <asl/file_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Logger.h>
 
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>

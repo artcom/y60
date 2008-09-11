@@ -17,14 +17,14 @@
 //=============================================================================
 
 #include "SDLEventSource.h"
-#include <y60/MouseEvent.h>
-#include <y60/WindowEvent.h>
-#include <y60/AxisEvent.h>
-#include <y60/KeyEvent.h>
-#include <y60/ButtonEvent.h>
-#include <y60/KeyCodes.h>
+#include <y60/input/MouseEvent.h>
+#include <y60/input/WindowEvent.h>
+#include <y60/input/AxisEvent.h>
+#include <y60/input/KeyEvent.h>
+#include <y60/input/ButtonEvent.h>
+#include <y60/input/KeyCodes.h>
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 #include <iostream>
 

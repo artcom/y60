@@ -42,7 +42,7 @@
 #include "net.h"
 #include "net_functions.h"
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -56,7 +56,7 @@
 #include <iostream>
 #include <assert.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 using namespace std;
 using namespace asl;

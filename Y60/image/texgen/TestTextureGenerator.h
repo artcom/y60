@@ -24,7 +24,7 @@
 #if !defined(INCL_TESTTEXTUREGENERATOR)
 #define INCL_TESTTEXTUREGENERATOR
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <string>
 

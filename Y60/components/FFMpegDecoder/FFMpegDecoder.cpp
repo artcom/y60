@@ -44,10 +44,10 @@
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
 
-#include <y60/Movie.h>
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/Pump.h>
+#include <y60/video/Movie.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/audio/Pump.h>
 
 #include <iostream>
 #include <float.h>

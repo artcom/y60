@@ -10,9 +10,9 @@
 
 #include "DInputExtension.h"
 
-#include <asl/Logger.h>
-#include <y60/AxisEvent.h>
-#include <y60/ButtonEvent.h>
+#include <asl/base/Logger.h>
+#include <y60/input/AxisEvent.h>
+#include <y60/input/ButtonEvent.h>
 
 #include <iostream>
 

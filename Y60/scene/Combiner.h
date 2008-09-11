@@ -13,11 +13,11 @@
 
 #include <string>
 
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
 
-#include <y60/DataTypes.h>
-#include <y60/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/NodeValueNames.h>
 
 
 namespace y60 {

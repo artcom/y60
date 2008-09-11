@@ -20,7 +20,7 @@
 #include "JScppUtils.h"
 #include "JSWrapper.impl"
 
-#include <asl/file_functions.h>
+#include <asl/base/file_functions.h>
 
 using namespace std;
 using namespace asl;

@@ -14,7 +14,7 @@
 #include "JSMatrix.h"
 #include "JSWrapper.impl"
 
-#include <y60/DataTypes.h>
+#include <y60/base/DataTypes.h>
 
 #include <iostream>
 

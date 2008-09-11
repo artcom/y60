@@ -22,12 +22,12 @@
 #include "WiiScanner.h"
 #include "WiiEvent.h"
 
-#include <asl/Ptr.h>
-#include <asl/PlugInBase.h>
-#include <asl/Vector234.h>
-#include <asl/ThreadLock.h>
-#include <y60/IEventSource.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/ThreadLock.h>
+#include <y60/input/IEventSource.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 #include <vector>
 #include <queue>

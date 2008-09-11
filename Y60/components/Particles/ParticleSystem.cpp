@@ -11,17 +11,17 @@
 
 #include "ParticleSystem.h"
 
-#include <y60/JSVector.h>
-#include <y60/Shape.h>
-#include <y60/modelling_functions.h>
-#include <y60/SceneBuilder.h>
-#include <y60/JSScene.h>
-#include <y60/WorldBuilder.h>
-#include <y60/BodyBuilder.h>
-#include <y60/AnimationBuilder.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/scene/Shape.h>
+#include <y60/modelling/modelling_functions.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/jslib/JSScene.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/scene/AnimationBuilder.h>
 
-#include <asl/numeric_functions.h>
-#include <dom/Nodes.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/dom/Nodes.h>
 
 #define DB(x)  x
 

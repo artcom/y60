@@ -22,7 +22,7 @@
 
 #include "GlurFilter.h"
 
-#include <asl/numeric_functions.h>
+#include <asl/math/numeric_functions.h>
 
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>

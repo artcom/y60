@@ -1,7 +1,7 @@
 
 #include "DC1394.h"
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 #include <iostream>
 
 #include <dc1394/dc1394.h>

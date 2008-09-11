@@ -24,16 +24,16 @@
 #endif
 
 #include "net_functions.h"
-#include "asl/os_functions.h"
 #include "SocketException.h"
 
-#include <asl/settings.h>
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Time.h>
-#include <asl/Exception.h>
-#include <asl/Logger.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/settings.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Logger.h>
 
 // cycle counter
 

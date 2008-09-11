@@ -13,7 +13,7 @@
 
 #include <map>
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace jslib {
 

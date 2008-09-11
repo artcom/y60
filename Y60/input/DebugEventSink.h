@@ -21,7 +21,7 @@
 #include "Event.h"
 #include "IEventSink.h"
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 

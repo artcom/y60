@@ -11,9 +11,9 @@
 
 #include "JSDvbTuner.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSWrapper.impl>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 namespace y60 {
     class JSDvbPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

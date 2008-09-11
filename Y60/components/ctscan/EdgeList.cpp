@@ -1,5 +1,5 @@
 #include "EdgeList.h"
-#include <asl/Assure.h>
+#include <asl/base/Assure.h>
 
 namespace y60 {
 EdgeList::EdgeList(dom::NodePtr theHalfEdgesNode, dom::NodePtr theIndicesNode) : _myHalfEdges(theHalfEdgesNode->nodeValueRef<VectorOfSignedInt>()), _myIndices(theIndicesNode->nodeValueRef<VectorOfUnsignedInt>()) {

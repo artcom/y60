@@ -11,11 +11,11 @@
 #ifndef _ac_render_GLUtils_h_
 #define _ac_render_GLUtils_h_
 
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
-#include <asl/Dashboard.h>
-#include <y60/NodeValueNames.h>
-#include <y60/MaterialParameter.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Dashboard.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/scene/MaterialParameter.h>
 
 #ifdef WIN32
     #ifndef WIN32_LEAN_AND_MEAN

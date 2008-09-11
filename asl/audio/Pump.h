@@ -19,9 +19,9 @@
 #include "AudioBuffer.h"
 #include "AudioTimeSource.h"
 
-#include <asl/PosixThread.h>
-#include <asl/Time.h>
-#include <asl/ThreadLock.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/Time.h>
+#include <asl/base/ThreadLock.h>
 
 #include <string>
 #include <vector>

@@ -11,8 +11,8 @@
 #include "JSMenu.h"
 #include "JSBox.h"
 #include "jsgtk.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 #include <gtk/gtk.h>
 #include <iostream>
 

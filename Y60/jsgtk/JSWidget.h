@@ -13,10 +13,10 @@
 
 #include "JSRenderArea.h"
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/widget.h>
-#include <y60/JSAbstractRenderWindow.h>
-#include <asl/string_functions.h>
+#include <y60/jslib/JSAbstractRenderWindow.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

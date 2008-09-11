@@ -11,17 +11,17 @@
 #include "TextureManager.h"
 #include "Texture.h"
 
-#include <y60/ImageLoader.h>
-#include <y60/Movie.h>
-#include <y60/Capture.h>
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
+#include <y60/image/ImageLoader.h>
+#include <y60/video/Movie.h>
+#include <y60/video/Capture.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <dom/Nodes.h>
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Dashboard.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Dashboard.h>
 
 #define DB(x) // x
 

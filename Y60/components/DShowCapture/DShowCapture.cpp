@@ -9,10 +9,10 @@
 //============================================================================
 
 #include "DShowCapture.h"
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 #include <asl/assure.h>
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 
 #include <dshow.h>
 #include <iostream>

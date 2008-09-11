@@ -5,12 +5,12 @@
 #include "ShaderFeatureSet.h"
 #include "ShaderTypes.h"
 
-#include <y60/DataTypes.h>
-#include <y60/IShader.h>
-#include <y60/MaterialBase.h>
-#include <y60/NodeValueNames.h>
-#include <dom/Nodes.h>
-#include <asl/Ptr.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/IShader.h>
+#include <y60/scene/MaterialBase.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <GL/gl.h>

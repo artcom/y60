@@ -234,15 +234,15 @@ Loop
 //#include "jssettings.h"
 //#include "xpshell.h"
 
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
 
-#include <asl/Dashboard.h>
-#include <asl/linearAlgebra.h>
+#include <asl/base/Dashboard.h>
+#include <asl/math/linearAlgebra.h>
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
 #include <vector>
 #include <map>
@@ -2946,7 +2946,7 @@ class Map : Object {
 
 
 
-#include <asl/Arguments.h>
+#include <asl/base/Arguments.h>
 
 asl::Arguments ourArguments;
 

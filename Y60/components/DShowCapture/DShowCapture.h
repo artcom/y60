@@ -11,9 +11,9 @@
 #ifndef _ac_DShowCapture_DShowCapture_h_
 #define _ac_DShowCapture_DShowCapture_h_
 
-#include <y60/CaptureDevice.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
+#include <y60/video/CaptureDevice.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
 #include "DXSampleGrabber.h"
 #include "DShowGraph.h"
 

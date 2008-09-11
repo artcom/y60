@@ -23,8 +23,8 @@
 #include "AnimationBase.h"
 #include "AnimationCharacter.h"
 
-#include <asl/Exception.h>
-#include <dom/Nodes.h>
+#include <asl/base/Exception.h>
+#include <asl/dom/Nodes.h>
 
 #include <string>
 #include <vector>

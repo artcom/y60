@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSproc_functions.h"
-#include <y60/Documentation.h>
+#include <y60/jsbase/Documentation.h>
 
-#include <asl/proc_functions.h>
+#include <asl/base/proc_functions.h>
 
 namespace jslib {
 

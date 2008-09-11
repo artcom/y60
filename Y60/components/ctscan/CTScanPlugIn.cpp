@@ -23,8 +23,8 @@
 #include "JSCTScan.h"
 #include "JSMesh.h"
 
-#include <y60/IScriptablePlugin.h>
-#include <asl/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
 
 #include <dicom/dcmjpeg/djdecode.h>
 

@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 #include "ErrorMap.h"
 
 namespace y60 {

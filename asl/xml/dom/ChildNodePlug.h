@@ -22,7 +22,7 @@
 #define _xml_ChildNodePlug_h_
 
 #include "Nodes.h"
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace dom {
 

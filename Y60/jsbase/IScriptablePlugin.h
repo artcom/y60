@@ -12,9 +12,9 @@
 #define _ac_jslib_IScriptablePlugin_h_
 
 #include "PropertyValue.h"
-#include <js/jsapi.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
+#include <js/spidermonkey/jsapi.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
 
 struct JSContext;
 struct JSObject;

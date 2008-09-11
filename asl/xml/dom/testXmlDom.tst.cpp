@@ -25,11 +25,11 @@
 #include "Nodes.h"
 #include "Schema.h"
 
-#include <asl/Stream.h>
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
-#include <asl/MappedBlock.h>
-//#include <asl/linearAlgebra.h>
+#include <asl/base/Stream.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/math/linearAlgebra.h>
 
 #include <fstream>
 

@@ -16,16 +16,16 @@
 #include "RankedFeature.h"
 #include "NodeValueNames.h"
 
-#include <dom/Value.h>
-#include <asl/string_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Exception.h>
-#include <asl/Box.h>
-#include <asl/Matrix4.h>
-#include <asl/Vector234.h>
-#include <asl/Quaternion.h>
-#include <asl/Frustum.h>
-#include <asl/BSpline.h>
+#include <asl/dom/Value.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/base/Exception.h>
+#include <asl/math/Box.h>
+#include <asl/math/Matrix4.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Quaternion.h>
+#include <asl/math/Frustum.h>
+#include <asl/math/BSpline.h>
 
 #include <string>
 #include <vector>

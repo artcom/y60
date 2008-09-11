@@ -22,11 +22,11 @@
 
 #include <y60/AsyncDecoder.h>
 #include <y60/FFMpegDecoder.h>
-#include <y60/MovieEncoding.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
-#include <asl/MappedBlock.h>
-#include <asl/Exception.h>
+#include <y60/video/MovieEncoding.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Exception.h>
 
 #include <windows.h>
 #include <wmsdk/wmsdk.h>

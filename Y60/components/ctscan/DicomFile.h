@@ -20,8 +20,8 @@
 #define _ac_y60_components_dicomfile_h_
 
 #include "CTFile.h"
-#include <dom/Value.h>
-#include <asl/Exception.h>
+#include <asl/dom/Value.h>
+#include <asl/base/Exception.h>
 
 class DcmFileFormat;
 

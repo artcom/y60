@@ -10,7 +10,7 @@
 
 #include "WMHelper.h"
 
-#include <y60/IAudioDecoderFactory.h>
+#include <y60/sound/IAudioDecoderFactory.h>
 
 //#include <atlbase.h> // For CComPtr and CComQIPtr
 #include <dsound.h>  // For the DSSPEAKER_5POINT1 value

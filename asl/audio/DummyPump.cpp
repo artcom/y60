@@ -12,10 +12,10 @@
 
 #include "DummyPump.h"
 
-#include <asl/Logger.h>
-//#include <asl/string_functions.h>
-//#include <asl/numeric_functions.h>
-//#include <asl/Assure.h>
+#include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Assure.h>
 
 //#include <exception>
 //#include <sstream>

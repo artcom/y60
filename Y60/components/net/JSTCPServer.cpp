@@ -11,12 +11,12 @@
 #include "JSTCPServer.h"
 #include "JSSocket.h"
 
-#include <asl/net.h>
-#include <asl/TCPServer.h>
-#include <asl/TCPSocket.h>
-#include <asl/os_functions.h>
-#include <asl/net_functions.h>
-#include <y60/JSWrapper.impl>
+#include <asl/net/net.h>
+#include <asl/net/TCPServer.h>
+#include <asl/net/TCPSocket.h>
+#include <asl/base/os_functions.h>
+#include <asl/net/net_functions.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 

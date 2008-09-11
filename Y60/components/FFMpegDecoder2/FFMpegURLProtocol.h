@@ -19,8 +19,8 @@
 //
 //=============================================================================
 
-#include <asl/Ptr.h>
-#include <asl/Stream.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Stream.h>
 
 namespace y60 {
     

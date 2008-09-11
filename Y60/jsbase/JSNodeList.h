@@ -14,9 +14,9 @@
 #include "JSWrapper.h"
 #include "JSNode.h"
 
-// #include <dom/Value.h>
-#include <dom/Nodes.h>
-#include <dom/NodeList.h>
+#include <asl/dom/Value.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/NodeList.h>
 
 namespace jslib {
 

@@ -10,7 +10,7 @@
 
 #include "GLContextRegistry.h"
 #include "AbstractRenderWindow.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 using namespace jslib;
 using namespace asl;

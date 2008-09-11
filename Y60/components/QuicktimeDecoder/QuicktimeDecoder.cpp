@@ -19,11 +19,11 @@
 
 #include "QuicktimeDecoder.h"
 
-#include <y60/Movie.h>
+#include <y60/video/Movie.h>
 
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <y60/Movie.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <y60/video/Movie.h>
 
 #include <qt/QTML.h>
 #include <qt/TextUtils.h>

@@ -15,22 +15,22 @@
 
 #define DEBUG_LEVEL 0
 
-#include <y60/MaterialTypes.h>
-#include <y60/DataTypes.h>
-#include <y60/SceneBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/NodeValueNames.h>
-#include <y60/PropertyNames.h>
-#include <y60/property_functions.h>
-#include <y60/Image.h>
+#include <y60/scene/MaterialTypes.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/property_functions.h>
+#include <y60/image/Image.h>
 
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Dashboard.h>
-#include <asl/Matrix4.h>
-#include <asl/PackageManager.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Dashboard.h>
+#include <asl/math/Matrix4.h>
+#include <asl/zip/PackageManager.h>
 
 #include <maya/MGlobal.h>
 #include <maya/MObject.h>

@@ -20,12 +20,12 @@
 #include "ShapeExporter.h"
 #include "CinemaHelpers.h"
 
-#include <y60/ElementBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
 
-#include <asl/GeometryUtils.h>
-#include <asl/numeric_functions.h>
+#include <asl/math/GeometryUtils.h>
+#include <asl/math/numeric_functions.h>
 
 using namespace asl;
 using namespace y60;

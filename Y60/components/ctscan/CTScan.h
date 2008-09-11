@@ -19,19 +19,19 @@
 #ifndef _ac_y60_components_ctscan_h_
 #define _ac_y60_components_ctscan_h_
 
-#include <dom/Nodes.h>
-#include <asl/Box.h>
-#include <y60/PixelEncoding.h>
-#include <y60/Scene.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Box.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/scene/Scene.h>
 
-#include <asl/pixel_functions.h>
-#include <asl/palgo.h>
-#include <asl/raster.h>
+#include <asl/raster/pixel_functions.h>
+#include <asl/raster/palgo.h>
+#include <asl/raster/raster.h>
 #include <string>
 #include <sigc++/sigc++.h>
 #include <glibmm/ustring.h>
-#include <asl/raster.h>
-#include <y60/AcBool.h>
+#include <asl/raster/raster.h>
+#include <y60/base/AcBool.h>
 
 #include <map>
 

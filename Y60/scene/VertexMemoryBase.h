@@ -21,7 +21,7 @@
 #define _ac_scene_VertexMemoryBase_h
 
 #include "VertexDataImpl.h"
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 
 namespace y60 {

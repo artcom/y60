@@ -14,10 +14,10 @@
 #include "Request.h"
 #include "TestServer.h"
 
-#include <asl/Time.h>
-#include <asl/UnitTest.h>
-#include <asl/net.h>
-#include <asl/file_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/UnitTest.h>
+#include <asl/net/net.h>
+#include <asl/base/file_functions.h>
 #include <iostream>
 #include <sstream>
 

@@ -11,11 +11,11 @@
 #ifndef Y60_CONNECTED_COMPONENTS_INCLUDED
 #define Y60_CONNECTED_COMPONENTS_INCLUDED
 
-#include <asl/Vector234.h>
-#include <asl/Box.h>
-#include <asl/Ptr.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Box.h>
+#include <asl/base/Ptr.h>
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
 #include <vector>
 #include <list>

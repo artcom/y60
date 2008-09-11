@@ -19,8 +19,8 @@
 #ifndef _IDECODER_INCLUDED
 #define _IDECODER_INCLUDED
 
-#include <asl/Ptr.h>
-#include <asl/Stream.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Stream.h>
 
 #include <string>
 

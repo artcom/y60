@@ -21,7 +21,7 @@
 #ifndef _included_asl_numeric_functions_
 #define _included_asl_numeric_functions_
 
-#include <asl/settings.h> 
+#include <asl/base/settings.h>
 
 #include <cmath>
 #include <limits>

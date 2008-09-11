@@ -20,9 +20,9 @@
 #ifndef _SENSOR_SERVER_INCLUDED
 #define _SENSOR_SERVER_INCLUDED
 
-#include <asl/Ptr.h>
-#include <asl/SerialDevice.h>
-#include <asl/Time.h>
+#include <asl/base/Ptr.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/Time.h>
 
 #include <string>
 #include <vector>

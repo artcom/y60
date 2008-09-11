@@ -9,18 +9,18 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 
-#include <y60/ImageLoader.h>
-#include <y60/MovieEncoding.h>
-#include <y60/M60Header.h>
+#include <y60/image/ImageLoader.h>
+#include <y60/video/MovieEncoding.h>
+#include <y60/video/M60Header.h>
 
-#include <asl/Arguments.h>
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
-#include <asl/Matrix4.h>
-#include <asl/RunLengthEncoder.h>
+#include <asl/base/Arguments.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/RunLengthEncoder.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 #include <set>
 #include <algorithm>
 #include <iostream>

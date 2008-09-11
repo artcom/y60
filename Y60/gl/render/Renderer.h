@@ -12,27 +12,27 @@
 #define _ac_renderer_Renderer_h_
 
 #include "BodyPart.h"
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <y60/RenderState.h>
+#include <y60/glutil/RenderState.h>
 
-#include <y60/TextRendererManager.h>
+#include <y60/gltext/TextRendererManager.h>
 
-#include <y60/Body.h>
-#include <y60/Canvas.h>
-#include <y60/Viewport.h>
-#include <y60/Scene.h>
-#include <y60/MaterialBase.h>
-#include <y60/Light.h>
-#include <y60/GLContext.h>
+#include <y60/scene/Body.h>
+#include <y60/scene/Canvas.h>
+#include <y60/scene/Viewport.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/MaterialBase.h>
+#include <y60/scene/Light.h>
+#include <y60/glutil/GLContext.h>
 
 
-#include <asl/Frustum.h>
-#include <asl/Dashboard.h>
-#include <asl/linearAlgebra.h>
-#include <asl/intersection.h>
-#include <asl/Exception.h>
-#include <asl/SvgPath.h>
+#include <asl/math/Frustum.h>
+#include <asl/base/Dashboard.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/base/Exception.h>
+#include <asl/math/SvgPath.h>
 
 #ifdef WIN32
 #   include <windows.h>

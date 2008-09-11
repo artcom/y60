@@ -22,7 +22,7 @@
 #ifndef _included_asl_Spline_
 #define _included_asl_Spline_
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 #include <vector>
 #include <iostream>
 

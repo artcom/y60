@@ -41,8 +41,8 @@
 #define __asl_ConduitAcceptor_included
 
 #include "ConduitServer.h"
-#include <asl/Ptr.h>
-#include <asl/Logger.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Logger.h>
 #include <algorithm>
 #include <list>
 

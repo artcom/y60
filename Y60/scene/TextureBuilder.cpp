@@ -10,11 +10,11 @@
 
 #include "TextureBuilder.h"
 
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <dom/Nodes.h>
-#include <asl/Block.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Block.h>
 
 
 namespace y60 {

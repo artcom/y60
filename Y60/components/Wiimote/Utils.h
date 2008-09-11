@@ -6,7 +6,7 @@
 #ifndef __WIIMOTE_UTILS__
 #define __WIIMOTE_UTILS__
 
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 
 #include <iostream>
 #include <string>

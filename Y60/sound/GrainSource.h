@@ -13,12 +13,12 @@
 #ifndef INCL_GRAINSOURCE
 #define INCL_GRAINSOURCE
 
-#include <asl/ISampleSink.h>
-#include <asl/SampleSource.h>
-#include <asl/AudioBuffer.h>
-#include <asl/VolumeFader.h>
-#include <asl/ThreadLock.h>
-#include <asl/settings.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/audio/SampleSource.h>
+#include <asl/audio/AudioBuffer.h>
+#include <asl/audio/VolumeFader.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/settings.h>
 
 #include "Resampler.h"
 #include "WindowFunction.h"

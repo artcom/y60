@@ -18,7 +18,7 @@
 #ifndef ACGTK_CW_RULER_INCLUDED
 #define ACGTK_CW_RULER_INCLUDED
 
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 
 #include <gtkmm/drawingarea.h>
 #include <sigc++/sigc++.h>

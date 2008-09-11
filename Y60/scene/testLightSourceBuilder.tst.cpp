@@ -23,14 +23,14 @@
 #include "LightBuilder.h"
 #include "LightSourceBuilder.h"
 #include "WorldBuilder.h"
-#include <y60/DataTypes.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/string_functions.h>
-#include <asl/UnitTest.h>
-#include <asl/linearAlgebra.h>
-#include <dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/dom/Nodes.h>
 
-#include <dom/typedefs.h>
+#include <y60/base/typedefs.h>
 #include <iostream>
 #include <cmath>
 

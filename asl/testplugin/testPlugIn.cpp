@@ -19,8 +19,8 @@
 //
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <asl/PlugInManager.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/PlugInManager.h>
 #include "ITest.h"
 
 #include <iostream>

@@ -11,10 +11,10 @@
 #ifndef _ac_y60_jslib_gcobserver_included_
 #define _ac_y60_jslib_gcobserver_included_
 
-#include <y60/jssettings.h>
-#include <asl/Singleton.h>
+#include <y60/jsbase/jssettings.h>
+#include <asl/base/Singleton.h>
 
-#include <js/jsapi.h>
+#include <js/spidermonkey/jsapi.h>
 #include <sigc++/sigc++.h>
 
 #include <map>

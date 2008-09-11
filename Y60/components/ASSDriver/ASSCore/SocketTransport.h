@@ -13,7 +13,7 @@
 
 #include "TransportLayer.h"
 
-#include <asl/TCPClientSocket.h>
+#include <asl/net/TCPClientSocket.h>
 
 namespace y60 {
 

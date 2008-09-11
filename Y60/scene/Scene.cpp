@@ -18,27 +18,27 @@
 #include "TextureManager.h"
 #include "SceneOptimizer.h"
 
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
-#include <y60/DataTypes.h>
-#include <y60/Y60xsd.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/Y60xsd.h>
 
 #include "SceneBuilder.h"
 #include "WorldBuilder.h"
 #include "CameraBuilder.h"
 
-#include <y60/DecoderManager.h>
+#include <y60/base/DecoderManager.h>
 
-#include <asl/intersection.h>
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
-#include <asl/Time.h>
-#include <asl/Dashboard.h>
-#include <asl/Logger.h>
-#include <asl/Stream.h>
+#include <asl/math/intersection.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Time.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Stream.h>
 
-#include <dom/Schema.h>
-#include <xpath/xpath_api.h>
+#include <asl/dom/Schema.h>
+#include <asl/xpath/xpath_api.h>
 #include <iostream>
 #include <fstream>
 #include <set>

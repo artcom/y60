@@ -22,9 +22,9 @@
 #include "DataTypes.h"
 
 
-#include <asl/FixedVector.h>
-#include <asl/linearAlgebra.h>
-#include <asl/UnitTest.h>
+#include <asl/math/FixedVector.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/base/UnitTest.h>
 
 #include <string>
 #include <iostream>

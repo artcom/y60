@@ -12,10 +12,10 @@
 #define _Y60_ACGTKSHELL_JSCHECKBUTTON_INCLUDED_
 
 #include "JSToggleButton.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/checkbutton.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

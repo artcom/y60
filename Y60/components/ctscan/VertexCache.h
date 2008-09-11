@@ -13,7 +13,7 @@
 #define _ac_ctscan_VertexCache_h_
 
 #include <vector>
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 /**

@@ -9,10 +9,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 
-#include <y60/ImageLoader.h>
+#include <y60/image/ImageLoader.h>
 
-#include <asl/Arguments.h>
-#include <asl/MappedBlock.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/MappedBlock.h>
 
 #include <paintlib/planybmp.h>
 #include <paintlib/plpngenc.h>

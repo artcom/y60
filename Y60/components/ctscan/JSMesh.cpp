@@ -18,18 +18,18 @@
 
 #include "JSMesh.h"
 
-#include <y60/JSApp.h>
-#include <y60/JSVector.h>
-#include <y60/JSBox.h>
-#include <y60/JSNode.h>
-#include <y60/Image.h>
-#include <y60/JSScene.h>
-#include <y60/JSSphere.h>
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <dom/Nodes.h>
+#include <y60/jslib/JSApp.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/image/Image.h>
+#include <y60/jslib/JSScene.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <asl/dom/Nodes.h>
 
-#include <asl/PackageManager.h>
+#include <asl/zip/PackageManager.h>
 #include <jsgtk/JSSignal2.h>
 
 #include <iostream>

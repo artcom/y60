@@ -12,10 +12,10 @@
 #ifndef _AC_PORTVIDEO_H__
 #define _AC_PORTVIDEO_H__
 
-#include <y60/CaptureDevice.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
-#include <asl/PosixThread.h>
+#include <y60/video/CaptureDevice.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/PosixThread.h>
 
 #include "RingBuffer.h"
 #include "cameraTool.h"

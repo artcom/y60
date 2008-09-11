@@ -25,12 +25,12 @@
 #include "CameraBuilder.h"
 #include "MaterialBuilder.h"
 
-#include <y60/DataTypes.h>
-#include <y60/Y60xsd.h>
-#include <y60/Facades.h>
-#include <asl/string_functions.h>
-#include <asl/UnitTest.h>
-#include <asl/linearAlgebra.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/Y60xsd.h>
+#include <y60/scene/Facades.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/linearAlgebra.h>
 #include <iostream>
 #include <math.h>
 

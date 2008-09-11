@@ -17,9 +17,9 @@
 //=============================================================================
 
 #include "GtkEventAdapter.h"
-#include <y60/EventDispatcher.h>
-#include <y60/MouseEvent.h>
-#include <y60/WindowEvent.h>
+#include <y60/input/EventDispatcher.h>
+#include <y60/input/MouseEvent.h>
+#include <y60/input/WindowEvent.h>
 
 using namespace asl;
 using namespace y60;

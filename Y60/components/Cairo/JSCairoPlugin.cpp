@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 #include "JSCairo.h"
 #include "JSCairoSurface.h"

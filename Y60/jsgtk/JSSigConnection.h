@@ -11,7 +11,7 @@
 #ifndef _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 #define _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 #ifdef OSX
 namespace SigC { typedef ::sigc::connection Connection; }

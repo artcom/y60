@@ -42,9 +42,9 @@
 
 #include "ConduitServer.h"
 
-#include <asl/Ptr.h>
-#include <asl/ThreadFifo.h>    
-#include <asl/Block.h>    
+#include <asl/base/Ptr.h>
+#include <asl/base/ThreadFifo.h>
+#include <asl/base/Block.h>
 #include <string.h>
 
 #define DB(x) // x

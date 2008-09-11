@@ -9,13 +9,13 @@
 //============================================================================
 
 #include "ImageBuilder.h"
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <dom/Nodes.h>
-#include <asl/Block.h>
-#include <asl/Dashboard.h>
-#include <asl/RunLengthEncoder.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Block.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/RunLengthEncoder.h>
 
 namespace y60 {
     ImageBuilder::ImageBuilder(const std::string & theName)

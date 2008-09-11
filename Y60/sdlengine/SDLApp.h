@@ -19,7 +19,7 @@
 #ifndef __Y60_SDLAPP_INCLUDED__
 #define __Y60_SDLAPP_INCLUDED__
 
-#include <y60/JSApp.h>
+#include <y60/jslib/JSApp.h>
 
 class SDLApp : public jslib::JSApp {
     public:

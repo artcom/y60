@@ -10,13 +10,13 @@
 
 #include "SkinAndBonesShader.h"
 
-#include <y60/TransformHierarchyFacade.h>
-#include <y60/DataTypes.h>
-#include <y60/NodeNames.h>
-#include <dom/Nodes.h>
+#include <y60/scene/TransformHierarchyFacade.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/dom/Nodes.h>
 
-#include <asl/Box.h>
-#include <asl/Logger.h>
+#include <asl/math/Box.h>
+#include <asl/base/Logger.h>
 
 using namespace std;
 using namespace asl;

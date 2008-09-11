@@ -23,9 +23,9 @@
 #include "AnimationExporter.h"
 #include "ShapeExporter.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/Body.h>
-#include <dom/Nodes.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/Body.h>
+#include <asl/dom/Nodes.h>
 
 #include <maya/MObject.h>
 #include <maya/MPxFileTranslator.h>

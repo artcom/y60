@@ -12,12 +12,12 @@
 #include "WMADecoder.h"
 #include "WMHelper.h"
 
-#include <y60/SoundManager.h>
+#include <y60/sound/SoundManager.h>
 
-#include <asl/ISampleSink.h>
-//#include <asl/Singleton.h>
-#include <asl/Block.h>
-#include <asl/file_functions.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/Block.h>
+#include <asl/base/file_functions.h>
 
 using namespace asl;
 

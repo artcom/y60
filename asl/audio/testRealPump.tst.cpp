@@ -18,12 +18,12 @@
 
 #include "Pump.h"
 
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
-#include <asl/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
+#include <asl/base/string_functions.h>
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 #include <math.h>

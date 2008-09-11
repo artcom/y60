@@ -41,7 +41,7 @@
 
 #include "UDPSocket.h"
 #include "SocketException.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 #include <errno.h>
 #ifndef WIN32

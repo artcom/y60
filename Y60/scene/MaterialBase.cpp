@@ -13,12 +13,12 @@
 #include "TextureUnit.h"
 #include "Scene.h"
 
-#include <y60/NodeValueNames.h>
-#include <y60/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/NodeNames.h>
 
-#include <asl/Logger.h> 
-#include <asl/string_functions.h>
-#include <asl/checksum.h>
+#include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/checksum.h>
 
 
 #include <algorithm>

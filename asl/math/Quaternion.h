@@ -24,7 +24,7 @@
 
 #include "Vector234.h"
 #include "Sphere.h"
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace asl {
 

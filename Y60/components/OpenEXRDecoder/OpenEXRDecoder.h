@@ -12,10 +12,10 @@
 #ifndef _ac_y60_OpenEXRDecoder_h_
 #define _ac_y60_OpenEXRDecoder_h_
 
-#include <asl/Exception.h>
-#include <asl/pixels.h>
-#include <asl/raster.h>
-#include <dom/Value.h>
+#include <asl/base/Exception.h>
+#include <asl/raster/pixels.h>
+#include <asl/raster/raster.h>
+#include <asl/dom/Value.h>
 
 #include <paintlib/plpicdec.h>
 #include <OpenEXR/half.h>

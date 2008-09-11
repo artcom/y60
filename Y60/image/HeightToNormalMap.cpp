@@ -1,6 +1,6 @@
 #include "HeightToNormalMap.h"
 
-#include <asl/numeric_functions.h>
+#include <asl/math/numeric_functions.h>
 
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>

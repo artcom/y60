@@ -23,12 +23,12 @@
 #include "Light.h"
 #include "Facades.h"
 
-#include <y60/DataTypes.h>
-#include <y60/Y60xsd.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/Y60xsd.h>
 
-#include <asl/Ptr.h>
-#include <asl/UnitTest.h>
-#include <asl/linearAlgebra.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/linearAlgebra.h>
 
 #include <string>
 #include <iostream>

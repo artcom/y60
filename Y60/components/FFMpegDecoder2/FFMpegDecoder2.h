@@ -15,13 +15,13 @@
 #include "VideoMsgQueue.h"
 #include "Demux.h"
 
-#include <y60/MovieEncoding.h>
+#include <y60/video/MovieEncoding.h>
 
-#include <asl/PlugInBase.h>
+#include <asl/base/PlugInBase.h>
 
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
-#include <asl/ThreadSemaphore.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/ThreadSemaphore.h>
 
 #include <string>
 #include <list>
@@ -44,8 +44,8 @@ extern "C" {
 #pragma warning(pop)
 #endif
 
-#include <asl/Stream.h>
-#include <asl/Ptr.h>
+#include <asl/base/Stream.h>
+#include <asl/base/Ptr.h>
 
 namespace AudioBase {
     class BufferedSource;

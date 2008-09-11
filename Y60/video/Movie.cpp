@@ -12,14 +12,14 @@
 #include "MovieDecoderBase.h"
 #include "M60Decoder.h"
 
-#include <y60/PixelEncoding.h>
-#include <y60/DecoderManager.h>
-#include <y60/IScene.h>
-#include <asl/Logger.h>
-#include <asl/PackageManager.h>
-#include <asl/PlugInManager.h>
-#include <asl/Assure.h>
-#include <asl/Dashboard.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/base/DecoderManager.h>
+#include <y60/base/IScene.h>
+#include <asl/base/Logger.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/Assure.h>
+#include <asl/base/Dashboard.h>
 #include <string.h>
 
 using namespace dom;

@@ -41,8 +41,8 @@
 #include "net.h"
 #include "SocketException.h"
 
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Logger.h>
 
 #include <algorithm>
 

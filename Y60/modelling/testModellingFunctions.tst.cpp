@@ -20,15 +20,15 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include <y60/Y60xsd.h>
+#include <y60/base/Y60xsd.h>
 
-#include <y60/Scene.h>
-#include <y60/TextureManager.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/TextureManager.h>
 
-#include <asl/UnitTest.h>
-#include <asl/Vector234.h>
-#include <dom/Nodes.h>
-#include <dom/Schema.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/Vector234.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Schema.h>
 
 #include <string>
 #include <iostream>

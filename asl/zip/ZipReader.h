@@ -23,9 +23,9 @@
 #ifndef __asl_zipfile_included_
 #define __asl_zipfile_included_
 
-#include <asl/Stream.h>
-#include <asl/Block.h>
-#include <asl/Path.h>
+#include <asl/base/Stream.h>
+#include <asl/base/Block.h>
+#include <asl/xpath/Path.h>
 #include <string>
 
 namespace asl {

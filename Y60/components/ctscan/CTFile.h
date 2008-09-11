@@ -19,9 +19,9 @@
 #ifndef _ac_y60_components_ctfile_h_
 #define _ac_y60_components_ctfile_h_
 
-#include <dom/Value.h>
-#include <asl/Exception.h>
-#include <y60/PixelEncoding.h>
+#include <asl/dom/Value.h>
+#include <asl/base/Exception.h>
+#include <y60/image/PixelEncoding.h>
 
 namespace y60 {
 

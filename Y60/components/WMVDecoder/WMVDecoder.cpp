@@ -19,12 +19,12 @@
 
 #include "WMVDecoder.h"
 
-#include <y60/Movie.h>
+#include <y60/video/Movie.h>
 
-#include <asl/Auto.h>
-#include <asl/Pump.h>
-#include <asl/Logger.h>
-#include <asl/os_functions.h>
+#include <asl/base/Auto.h>
+#include <asl/audio/Pump.h>
+#include <asl/base/Logger.h>
+#include <asl/base/os_functions.h>
 
 #include <typeinfo>
 #include <atlbase.h> //for CComPtr and CComQIPtr

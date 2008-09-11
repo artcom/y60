@@ -20,9 +20,9 @@
 #include "LightExporter.h"
 #include "ExportExceptions.h"
 
-#include <asl/linearAlgebra.h>
-#include <asl/numeric_functions.h>
-#include <y60/LightSourceBuilder.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/numeric_functions.h>
+#include <y60/scene/LightSourceBuilder.h>
 
 #include <maya/MGlobal.h>
 #include <maya/MFnSet.h>

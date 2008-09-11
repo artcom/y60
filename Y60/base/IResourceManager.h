@@ -11,8 +11,8 @@
 #ifndef _IRESOURCEMANAGER_INCLUDED
 #define _IRESOURCEMANAGER_INCLUDED
 
-#include <asl/Ptr.h>
-#include <dom/ThreadingModel.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/ThreadingModel.h>
 
 #include <string>
 

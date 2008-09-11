@@ -1,6 +1,6 @@
 #include "Histogram.h"
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 #include <paintlib/pldebug.h>
 #include <paintlib/Filter/pl2passscale.h>
 

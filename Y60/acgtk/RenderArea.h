@@ -26,7 +26,7 @@
 
 #include "GtkEventAdapter.h"
 
-#include <y60/AbstractRenderWindow.h>
+#include <y60/jslib/AbstractRenderWindow.h>
 #include <gdk/gdkgltypes.h>
 #include <string>
 #include <sigc++/connection.h>

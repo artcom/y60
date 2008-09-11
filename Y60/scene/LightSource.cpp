@@ -19,9 +19,9 @@
 
 #include "LightSource.h"
 
-#include <y60/PropertyNames.h>
-#include <y60/property_functions.h>
-#include <asl/string_functions.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/property_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace y60 {
 

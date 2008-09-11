@@ -18,9 +18,9 @@
 
 #include "CharacterBuilder.h"
 #include "ClipBuilder.h"
-#include <y60/NodeNames.h>
+#include <y60/base/NodeNames.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 using namespace asl;
 

@@ -16,8 +16,8 @@
 //
 //=============================================================================
 
-#include <y60/JSVector.h>
-#include <asl/Logger.h>
+#include <y60/jsbase/JSVector.h>
+#include <asl/base/Logger.h>
 #include "JSWMPPlayer.h"
 
 #include <iostream>

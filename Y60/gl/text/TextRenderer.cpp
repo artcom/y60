@@ -23,11 +23,11 @@
 
 #include "TextRenderer.h"
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <asl/Vector234.h>
-#include <asl/Dashboard.h>
-#include <asl/numeric_functions.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Dashboard.h>
+#include <asl/math/numeric_functions.h>
 
 #include <iostream>
 

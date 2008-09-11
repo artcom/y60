@@ -28,7 +28,7 @@
 
 #include "TextureGenerator.h"
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>

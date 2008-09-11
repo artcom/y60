@@ -11,8 +11,8 @@
 #ifndef _ac_scene_VertexMemory_h
 #define _ac_scene_VertexMemory_h
 
-#include <y60/VertexDataImpl.h>
-#include <y60/VertexMemoryBase.h>
+#include <y60/scene/VertexDataImpl.h>
+#include <y60/scene/VertexMemoryBase.h>
 
 namespace y60 {
     // Standard Main Memory managed by new() and delete() on heap

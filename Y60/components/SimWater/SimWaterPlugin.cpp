@@ -11,7 +11,7 @@
 
 #include "SimWater.h"
 
-#include <asl/PlugInBase.h>
+#include <asl/base/PlugInBase.h>
 
 extern "C"
 EXPORT asl::PlugInBase* SimWater_instantiatePlugIn(asl::DLHandle myDLHandle) {

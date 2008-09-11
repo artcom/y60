@@ -21,8 +21,8 @@
 
 #include "JSGladeSignalAdapter.h"
 
-#include <y60/JSApp.h>
-#include <y60/JScppUtils.h>
+#include <y60/jslib/JSApp.h>
+#include <y60/jsbase/JScppUtils.h>
 
 namespace jslib {
 

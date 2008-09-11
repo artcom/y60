@@ -25,10 +25,10 @@
 #define _ac_y60_AnimationBuilder_h_
 
 #include "BuilderBase.h"
-#include <y60/DataTypes.h>
-#include <y60/NodeValueNames.h>
-#include <y60/TypeTraits.h>
-#include <dom/Nodes.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/TypeTraits.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     class AnimationBuilder : public BuilderBase {

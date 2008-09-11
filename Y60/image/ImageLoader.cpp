@@ -18,13 +18,13 @@
 #include "PLFilterFactory.h"
 #include "I60Header.h"
 
-#include <asl/MappedBlock.h>
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Block.h>
-#include <asl/PackageManager.h>
-#include <asl/Logger.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Block.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/base/Logger.h>
 
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>

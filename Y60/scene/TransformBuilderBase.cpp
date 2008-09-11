@@ -20,9 +20,9 @@
 #include "TransformBuilderBase.h"
 #include "TransformHierarchyFacade.h"
 #include "Shape.h"
-#include <y60/NodeNames.h>
-#include <asl/Quaternion.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/math/Quaternion.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     TransformBuilderBase::TransformBuilderBase(const std::string & theNodeName,

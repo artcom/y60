@@ -21,32 +21,32 @@
 #include "DicomFile.h"
 #include "MarchingCubes.h"
 
-#include <y60/WorldBuilder.h>
-#include <y60/TransformBuilder.h>
-#include <y60/BodyBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/CameraBuilder.h>
-#include <y60/Camera.h>
-#include <y60/Image.h>
-#include <y60/Facades.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/TransformBuilder.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/CameraBuilder.h>
+#include <y60/scene/Camera.h>
+#include <y60/image/Image.h>
+#include <y60/scene/Facades.h>
 
 #include <paintlib/plexcept.h>
-#include <asl/MappedBlock.h>
-#include <asl/Logger.h>
-#include <asl/PackageManager.h>
-#include <asl/Box.h>
-#include <asl/Line.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Logger.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/math/Box.h>
+#include <asl/math/Line.h>
 
-#include <y60/property_functions.h>
-#include <y60/PropertyNames.h>
+#include <y60/base/property_functions.h>
+#include <y60/base/PropertyNames.h>
 
-#include <y60/PLFilterResizePadded.h>
+#include <y60/image/PLFilterResizePadded.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
 #include <paintlib/plpixelformat.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plsubbmp.h>
 #include <paintlib/plpngenc.h>
-#include <asl/Assure.h>
+#include <asl/base/Assure.h>
 #include <fstream>
 #include <algorithm>
 

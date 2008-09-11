@@ -13,9 +13,9 @@
 
 #include "AudioFrame.h"
 
-#include <asl/HWSampleSink.h>
-#include <asl/Ptr.h>
-#include <dom/Value.h>
+#include <asl/audio/HWSampleSink.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Value.h>
 
 #include <map>
 

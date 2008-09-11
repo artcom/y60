@@ -9,13 +9,13 @@
 //=============================================================================
 
 #include "JSfile_functions.h"
-#include <y60/Documentation.h>
+#include <y60/jsbase/Documentation.h>
 #include "JSApp.h"
-#include <y60/JSBlock.h>
+#include <y60/jsbase/JSBlock.h>
 
-#include <asl/Block.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
+#include <asl/base/Block.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
 
 using namespace std;
 using namespace asl;

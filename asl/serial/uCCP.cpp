@@ -16,8 +16,8 @@
 #include "CRC8.h"
 #include "SerialDevice.h"
 
-#include <asl/string_functions.h>
-#include <asl/Dashboard.h> // needed for the statistic ascii table thingy
+#include <asl/base/string_functions.h>
+#include <asl/base/Dashboard.h>
 
 #include <string>
 

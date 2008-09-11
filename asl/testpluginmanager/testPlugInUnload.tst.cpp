@@ -23,12 +23,12 @@
 #include <iostream>
 #include <string>
 
-#include <asl/PlugInManager.h>
-#include <asl/Exception.h>
-#include <asl/file_functions.h>
-#include <asl/UnitTest.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/Exception.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/UnitTest.h>
 
-#include <asl/ITest.h>
+#include <asl/testPlugIn/ITest.h>
 
 using namespace asl;
 using namespace std;

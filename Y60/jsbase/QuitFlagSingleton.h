@@ -16,7 +16,7 @@
 //
 //=============================================================================
 
-#include <asl/Singleton.h>
+#include <asl/base/Singleton.h>
 
 #ifndef _Y60_ACXPSHELL_EXIT_INCLUDED_
 #define _Y60_ACXPSHELL_EXIT_INCLUDED_

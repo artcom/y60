@@ -24,12 +24,12 @@
 #include <iostream>
 #include <map>
 
-#include <asl/Arguments.h>
-#include <asl/file_functions.h>
-#include <asl/UDPSocket.h>
-#include <asl/address.h>
-#include <asl/net.h>
-#include <asl/Time.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/file_functions.h>
+#include <asl/net/UDPSocket.h>
+#include <asl/net/address.h>
+#include <asl/net/net.h>
+#include <asl/base/Time.h>
 
 
 #ifndef WIN32_LEAN_AND_MEAN

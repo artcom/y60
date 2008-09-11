@@ -11,9 +11,9 @@
 #ifndef _ac_y60_PixelEncoding_h_
 #define _ac_y60_PixelEncoding_h_
 
-#include <asl/Logger.h>
-#include <y60/DataTypes.h>
-#include <asl/string_functions.h>
+#include <asl/base/Logger.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/string_functions.h>
 #include <math.h>
 
 class PLPixelFormat;

@@ -14,20 +14,20 @@
 #include "TransportLayer.h"
 #include "Cursor.h"
 
-#include <asl/SerialDevice.h>
-#include <asl/Enum.h>
-#include <asl/Vector234.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/Enum.h>
+#include <asl/math/Vector234.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
-#include <y60/DataTypes.h>
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IEventSource.h>
-#include <y60/Scene.h>
-#include <y60/GenericEvent.h>
-#include <y60/ConnectedComponent.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/input/IEventSource.h>
+#include <y60/scene/Scene.h>
+#include <y60/input/GenericEvent.h>
+#include <y60/image/ConnectedComponent.h>
 
 #include <iostream>
 #include <deque>

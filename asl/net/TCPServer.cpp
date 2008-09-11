@@ -42,8 +42,8 @@
 #include <errno.h>
 
 #include "TCPServer.h"
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 
 #ifdef OSX
 #include <netinet/in.h>

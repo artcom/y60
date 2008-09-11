@@ -12,10 +12,10 @@
 #define _ac_jslib_OffscreenRenderArea_h_
 
 #include "AbstractRenderWindow.h"
-#include <asl/Logger.h>
-#include <dom/Nodes.h>
-#include <dom/Value.h>
-#include <y60/OffscreenBuffer.h>
+#include <asl/base/Logger.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Value.h>
+#include <y60/glutil/OffscreenBuffer.h>
 
 /**
  * @ingroup Y60jslib

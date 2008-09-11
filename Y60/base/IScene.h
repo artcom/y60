@@ -19,8 +19,8 @@
 #ifndef _ISCENE_INCLUDED
 #define _ISCENE_INCLUDED
 
-#include <asl/Ptr.h>
-#include <dom/ThreadingModel.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/ThreadingModel.h>
 
 namespace y60 {
     class IResourceManager;

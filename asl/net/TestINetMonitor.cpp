@@ -42,8 +42,8 @@
 #include "TCPServer.h"
 #include "SocketException.h"
 
-#include <asl/Exception.h>
-#include <asl/Time.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Time.h>
 
 #ifndef WIN32
 #include <unistd.h>

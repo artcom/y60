@@ -12,7 +12,7 @@
 
 #include "DvbTuner.h"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 using namespace asl;
 using namespace std;

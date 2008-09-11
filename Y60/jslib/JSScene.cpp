@@ -8,27 +8,27 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/JSVector.h>
-#include <y60/JSNode.h>
-#include <y60/JSNodeList.h>
-#include <y60/JSLine.h>
-#include <y60/JSBox.h>
-#include <y60/JSSphere.h>
-#include <y60/JSMatrix.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSNodeList.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSMatrix.h>
 #include "JSintersection_functions.h"
 #include "JSScene.h"
 #include "JSApp.h"
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
 
-#include <asl/Logger.h>
-#include <y60/IProgressNotifier.h>
-#include <y60/modelling_functions.h>
-#include <y60/TextureManager.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/Body.h>
-#include <y60/Movie.h>
-#include <y60/Capture.h>
+#include <asl/base/Logger.h>
+#include <y60/scene/IProgressNotifier.h>
+#include <y60/modelling/modelling_functions.h>
+#include <y60/scene/TextureManager.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/Body.h>
+#include <y60/video/Movie.h>
+#include <y60/video/Capture.h>
 
 using namespace y60;
 using namespace asl;

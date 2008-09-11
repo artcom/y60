@@ -11,11 +11,11 @@
 #ifndef _scene_Overlay_h_
 #define _scene_Overlay_h_
 
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
-#include <asl/Vector234.h>
-#include <dom/AttributePlug.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
+#include <asl/math/Vector234.h>
+#include <asl/dom/AttributePlug.h>
 
 namespace y60 {
     

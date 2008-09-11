@@ -15,10 +15,10 @@
 #include "PdF1Projector.h"
 #include "CRC16.h"
 
-#include <asl/SerialDevice.h>
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
-#include <asl/Exception.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Exception.h>
 
 #include <iostream>
 

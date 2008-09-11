@@ -21,7 +21,7 @@
 
 #include "contact.h"
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 #include <iostream>
 
 using namespace std;

@@ -12,12 +12,12 @@
 #define _Y60_ACXPSHELL_JSSPHERE_INCLUDED_
 
 #include "JSWrapper.h"
-#include <y60/DataTypes.h>
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Sphere.h>
-#include <dom/Value.h>
+#include <y60/base/DataTypes.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/Sphere.h>
+#include <asl/dom/Value.h>
 
 
 namespace jslib {

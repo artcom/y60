@@ -11,9 +11,9 @@
 #ifndef __Y60_JSGTK_JSGTKUTILS_INCLUDED__
 #define __Y60_JSGTK_JSGTKUTILS_INCLUDED__
 
-#include <y60/JScppUtils.h>
-#include <y60/jssettings.h>
-#include <js/jsapi.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/jssettings.h>
+#include <js/spidermonkey/jsapi.h>
 #include <gtkmm.h>
 
 namespace jslib {

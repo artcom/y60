@@ -13,7 +13,7 @@
 
 #include "Event.h"
 
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 
 namespace y60 {
 

@@ -40,8 +40,8 @@
 
 #include "INetMonitor.h"
 
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 #include <curl/curl.h>
 
 #include <string>

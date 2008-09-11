@@ -13,11 +13,11 @@
 
 #include "PixelEncoding.h"
 #include "ImageTags.h"
-#include <y60/CommonTags.h>
-#include <y60/NodeValueNames.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <dom/AttributePlug.h>
-#include <dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/dom/Facade.h>
 
 #include <paintlib/planybmp.h>
 

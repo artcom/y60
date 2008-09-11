@@ -22,8 +22,8 @@
 
 #include "ZipReader.h"
 #include "ZipWriter.h"
-#include <asl/MappedBlock.h>
-#include <asl/UnitTest.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/UnitTest.h>
 
 #include <string>
 #include <iostream>

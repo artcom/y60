@@ -10,11 +10,11 @@
 
 #include "EventRecorder.h"
 
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #include "Event.h"
 

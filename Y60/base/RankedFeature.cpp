@@ -10,8 +10,8 @@
 
 #include "RankedFeature.h"
 
-#include <asl/Block.h>
-#include <dom/Value.h>
+#include <asl/base/Block.h>
+#include <asl/dom/Value.h>
 
 #include <string>
 #include <vector>

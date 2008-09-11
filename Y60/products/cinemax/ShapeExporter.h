@@ -21,7 +21,7 @@
 #define _ac_c4d_ShapeExporter_h_
 
 #include "MaterialExporter.h"
-#include <asl/linearAlgebra.h>
+#include <asl/math/linearAlgebra.h>
 
 #include <string>
 #include <vector>

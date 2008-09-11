@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/string_functions.h>
-#include <dom/Value.h>
+#include <asl/base/string_functions.h>
+#include <asl/dom/Value.h>
 
 namespace jslib {
 

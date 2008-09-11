@@ -28,10 +28,10 @@
 #include "AcBool.h"
 #include "NodeValueNames.h"
 
-#include <asl/Vector234.h>
-#include <asl/Quaternion.h>
-#include <asl/raster.h>
-#include <asl/standard_pixel_types.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Quaternion.h>
+#include <asl/raster/raster.h>
+#include <asl/raster/standard_pixel_types.h>
 
 #include <string>
 #include <vector>

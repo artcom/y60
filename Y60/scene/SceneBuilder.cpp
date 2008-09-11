@@ -27,18 +27,18 @@
 #include "Viewport.h"
 #include "Facades.h"
 
-#include <y60/CommonTags.h>
-#include <y60/Image.h>
-#include <y60/NodeNames.h>
-#include <y60/Y60xsd.h>
+#include <y60/base/CommonTags.h>
+#include <y60/image/Image.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/Y60xsd.h>
 
-#include <asl/Revision.h>
+#include <asl/base/Revision.h>
 
 #include <iostream>
 
-#include <asl/string_functions.h>
-#include <dom/Schema.h>
-#include <dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/dom/Schema.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     SceneBuilder::SceneBuilder(dom::DocumentPtr theDocument) : BuilderBase(SCENE_ROOT_NAME),

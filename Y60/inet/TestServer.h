@@ -13,8 +13,8 @@
 #ifndef y60_inet_testserver_included
 #define y60_inet_testserver_included
 
-#include <asl/ConduitAcceptor.h>
-#include <asl/TCPPolicy.h>
+#include <asl/ipc/ConduitAcceptor.h>
+#include <asl/ipc/TCPPolicy.h>
 
 namespace inet {
     

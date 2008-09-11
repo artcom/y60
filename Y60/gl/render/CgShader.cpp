@@ -10,10 +10,10 @@
 
 #include "CgShader.h"
 
-#include <y60/GLUtils.h>
-#include <y60/NodeNames.h>
-#include <asl/PackageManager.h>
-#include <asl/os_functions.h>
+#include <y60/glutil/GLUtils.h>
+#include <y60/base/NodeNames.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/base/os_functions.h>
 
 using namespace std;
 using namespace asl;

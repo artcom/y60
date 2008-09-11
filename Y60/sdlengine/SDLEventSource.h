@@ -18,12 +18,12 @@
 #ifndef _Y60_INPUT_SDLEVENTSOURCE_INCLUDED_
 #define _Y60_INPUT_SDLEVENTSOURCE_INCLUDED_
 
-#include <y60/Event.h>
-#include <y60/IEventSource.h>
-#include <y60/KeyCodes.h>
+#include <y60/input/Event.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/KeyCodes.h>
 
 #include <SDL/SDL.h>
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 #include <vector>
 

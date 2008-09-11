@@ -21,8 +21,8 @@
 
 #include "IDecoder.h"
 
-#include <asl/Logger.h>
-#include <asl/Singleton.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Singleton.h>
 
 #define DB(x) //x
 

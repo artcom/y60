@@ -20,10 +20,10 @@
 #include "Geometry.h"
 #include "Scene.h"
 
-#include <asl/Logger.h>
-#include <asl/Matrix4.h>
-#include <asl/GeometryUtils.h>
-#include <asl/linearAlgebra.h>
+#include <asl/base/Logger.h>
+#include <asl/math/Matrix4.h>
+#include <asl/math/GeometryUtils.h>
+#include <asl/math/linearAlgebra.h>
 
 using namespace std;
 using namespace asl;

@@ -41,7 +41,7 @@
 #ifndef INCL_INETMONITOR
 #define INCL_INETMONITOR
 
-#include <asl/PosixThread.h>
+#include <asl/base/PosixThread.h>
 
 #include <vector>
 #include <string>

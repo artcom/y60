@@ -9,14 +9,14 @@
 //=============================================================================
 
 #include "JSSvgPath.h"
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSLine.h>
-#include <y60/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSSphere.h>
 #include "JSBSpline.h"
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.impl>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

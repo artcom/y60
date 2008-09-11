@@ -11,15 +11,15 @@
 #include "JSAbstractRenderWindow.h"
 #include "JSRenderer.h"
 #include "JSintersection_functions.h"
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/Viewport.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/scene/Viewport.h>
 #include "JSScene.h"
 #include "IRendererExtension.h"
 
-#include <y60/ScopedGLContext.h>
-#include <asl/string_functions.h>
-#include <asl/os_functions.h>
+#include <y60/glutil/ScopedGLContext.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/os_functions.h>
 
 namespace jslib {
 

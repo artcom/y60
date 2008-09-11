@@ -12,10 +12,10 @@
 #include "FFMpegAudioDecoder.h"
 #include "CacheReader.h"
 
-#include <asl/Logger.h>
-#include <asl/Pump.h>
-#include <asl/Auto.h>
-#include <asl/proc_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/audio/Pump.h>
+#include <asl/base/Auto.h>
+#include <asl/base/proc_functions.h>
 
 using namespace std;
 using namespace asl;

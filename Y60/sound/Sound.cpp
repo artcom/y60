@@ -11,8 +11,8 @@
 #include "Sound.h"
 #include "CacheReader.h"
 
-#include <asl/Auto.h>
-#include <asl/Pump.h>
+#include <asl/base/Auto.h>
+#include <asl/audio/Pump.h>
 
 using namespace std;
 using namespace asl;

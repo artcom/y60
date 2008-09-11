@@ -13,11 +13,11 @@
 
 #include "IFrameBuffer.h"
 
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
-#include <dom/Facade.h>
-#include <dom/AttributePlug.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
 namespace y60 {
 
     class Texture;

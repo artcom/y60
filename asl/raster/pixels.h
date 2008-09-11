@@ -26,9 +26,9 @@
 #define _ASL_RASTER_PIXELS_H_INCLUDED_
 
 #include "contain.h"
-#include <asl/begin_end.h>
+#include <asl/base/begin_end.h>
 #include <functional>
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace asl {
 

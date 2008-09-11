@@ -15,7 +15,7 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-#include <asl/Matrix4.h>
+#include <asl/math/Matrix4.h>
 #include <paintlib/plbitmap.h>
 #include <paintlib/Filter/plfilter.h>
 

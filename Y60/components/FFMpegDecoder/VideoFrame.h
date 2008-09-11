@@ -11,8 +11,8 @@
 #ifndef _ac_y60_VideoFrame_h_
 #define _ac_y60_VideoFrame_h_
 
-#include <asl/Ptr.h>
-#include <asl/Block.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Block.h>
 
 namespace y60 {
 

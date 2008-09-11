@@ -8,12 +8,12 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/Exception.h>
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
 
-#include <dom/Nodes.h>
-#include <dom/Schema.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Schema.h>
 
 #include <iostream>
 

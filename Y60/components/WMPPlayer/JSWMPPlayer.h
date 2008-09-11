@@ -20,7 +20,7 @@
 #define _ac_y60_components_jswmpplayer_h_
 
 #include "WMPPlayer.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
     

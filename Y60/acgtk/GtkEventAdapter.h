@@ -18,9 +18,9 @@
 #ifndef _Y60_INPUT_GTKEVENTADAPTER_INCLUDED_
 #define _Y60_INPUT_GTKEVENTADAPTER_INCLUDED_
 
-#include <y60/Event.h>
-#include <y60/IEventSource.h>
-#include <y60/KeyCodes.h>
+#include <y60/input/Event.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/KeyCodes.h>
 
 #include <gdk/gdkevents.h>
 #include <vector>

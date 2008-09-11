@@ -1,7 +1,7 @@
 #include "JSGladeSignalAdapter.h"
 #include "jsgtk.h"
 
-#include <y60/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.h>
 #include <gtkmm.h>
 
 using namespace std;

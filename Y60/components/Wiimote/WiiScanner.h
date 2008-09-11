@@ -13,8 +13,8 @@
 
 #include "WiiRemote.h"
 
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
 
 #include <vector>
 #include <queue>

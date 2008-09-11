@@ -7,7 +7,7 @@
 
 #include <clish/shell.h>
 
-#include <js/jsdbgapi.h>
+#include <js/spidermonkey/jsdbgapi.h>
 
 namespace tuttle {
 

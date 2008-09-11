@@ -11,12 +11,12 @@
 #include "JSRenderArea.h"
 #include "JSWidget.h"
 #include "jsgtk.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSAbstractRenderWindow.h>
-#include <y60/JSAbstractRenderWindow.impl>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jslib/JSAbstractRenderWindow.h>
+#include <y60/jslib/JSAbstractRenderWindow.impl>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
-#include <y60/GLContextRegistry.h>
+#include <y60/jslib/GLContextRegistry.h>
 
 using namespace std;
 using namespace asl;

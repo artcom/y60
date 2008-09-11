@@ -22,7 +22,7 @@
 #include <paintlib/planydec.h>
 #include <paintlib/planybmp.h>
 
-#include <asl/os_functions.h>
+#include <asl/base/os_functions.h>
 
 #include <SDL/SDL_getenv.h>
 #include <sstream>

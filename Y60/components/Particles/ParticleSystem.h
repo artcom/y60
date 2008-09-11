@@ -1,17 +1,17 @@
 #ifndef _ParticleSystem_h_
 #define _ParticleSystem_h_
 
-#include <asl/PlugInBase.h>
+#include <asl/base/PlugInBase.h>
 
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
-#include <y60/JSNode.h>
-#include <y60/JSVector.h>
-#include <y60/MaterialBase.h>
-#include <y60/modelling_functions.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Shape.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/scene/MaterialBase.h>
+#include <y60/modelling/modelling_functions.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Shape.h>
 
 #include <iostream>
 #include <vector>

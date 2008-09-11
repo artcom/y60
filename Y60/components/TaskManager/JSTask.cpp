@@ -10,10 +10,10 @@
 
 #include "JSTask.h"
 #include "JSTaskWindow.h"
-#include <y60/JSRenderer.h>
-#include <y60/JScppUtils.h>
-#include <y60/JScppUtils.impl>
-#include <y60/JSWrapper.impl>
+#include <y60/jslib/JSRenderer.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.impl>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 

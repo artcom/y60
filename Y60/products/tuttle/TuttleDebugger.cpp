@@ -1,8 +1,8 @@
 
 #include <iostream>
 
-#include <js/jsapi.h>
-#include <js/jsdbgapi.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jsdbgapi.h>
 
 #include "TuttleApplication.h"
 #include "TuttleDebugger.h"

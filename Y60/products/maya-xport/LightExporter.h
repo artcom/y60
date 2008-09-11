@@ -22,8 +22,8 @@
 
 #include "MaterialExporter.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/DataTypes.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/base/DataTypes.h>
 
 #include <maya/MFnLight.h>
 

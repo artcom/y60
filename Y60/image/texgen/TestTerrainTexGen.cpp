@@ -21,7 +21,7 @@
 //
 //=============================================================================
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
 #pragma warning(disable:4786)  

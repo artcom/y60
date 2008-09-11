@@ -12,10 +12,10 @@
 #include "SimWater.h"
 #include "AGPBufferAllocator.h"
 
-#include <y60/JSVector.h>
-#include <y60/AbstractRenderWindow.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jslib/AbstractRenderWindow.h>
 
-#include <y60/GLAlloc.h>
+#include <y60/glutil/GLAlloc.h>
 
 //const int SIMULATION_WIDTH = 480;
 //const int SIMULATION_HEIGHT = 240;

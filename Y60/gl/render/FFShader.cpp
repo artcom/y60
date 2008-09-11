@@ -8,19 +8,19 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/GLUtils.h>
-#include <asl/Logger.h>
+#include <y60/glutil/GLUtils.h>
+#include <asl/base/Logger.h>
 
 #include "FFShader.h"
-#include <y60/glExtensions.h>
+#include <y60/glutil/glExtensions.h>
 
-#include <y60/Texture.h>
-#include <y60/Image.h>
-#include <y60/NodeNames.h>
-#include <y60/PropertyNames.h>
+#include <y60/scene/Texture.h>
+#include <y60/image/Image.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/PropertyNames.h>
 
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
 using namespace std;
 using namespace asl;

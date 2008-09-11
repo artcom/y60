@@ -16,8 +16,8 @@
 */
 
 #include "DirectoryPackage.h"
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
 
 using namespace std;
 

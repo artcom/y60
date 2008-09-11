@@ -18,10 +18,10 @@
 
 #include "CTScan.h"
 #include "PLFile.h"
-#include <asl/Block.h>
-#include <y60/PLFilterResizePadded.h>
-#include <y60/PLFilterFactory.h>
-#include <y60/Image.h>
+#include <asl/base/Block.h>
+#include <y60/image/PLFilterResizePadded.h>
+#include <y60/image/PLFilterFactory.h>
+#include <y60/image/Image.h>
 
 using namespace asl;
 using namespace std;

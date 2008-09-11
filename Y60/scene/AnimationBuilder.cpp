@@ -22,9 +22,9 @@
 //=============================================================================
 
 #include "AnimationBuilder.h"
-#include <y60/DataTypes.h>
+#include <y60/base/DataTypes.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     AnimationBuilder::AnimationBuilder() :

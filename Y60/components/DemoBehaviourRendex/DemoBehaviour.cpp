@@ -20,8 +20,8 @@
 //=============================================================================
 
 #include "DemoBehaviour.h"
-#include <y60/KeyEvent.h>
-#include <y60/MouseEvent.h>
+#include <y60/input/KeyEvent.h>
+#include <y60/input/MouseEvent.h>
 
 #include <iostream>
 

@@ -10,11 +10,11 @@
 //============================================================================
 
 #include "TextRendererManager.h"
-#include <y60/GLUtils.h>
-#include <dom/Nodes.h>
-#include <asl/Vector234.h>
-#include <asl/Dashboard.h>
-#include <asl/os_functions.h>
+#include <y60/glutil/GLUtils.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/os_functions.h>
 
 #include <iostream>
 

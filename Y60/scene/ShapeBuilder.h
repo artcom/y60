@@ -12,13 +12,13 @@
 #define _ac_y60_ShapeBuiler_h_
 
 #include "BuilderBase.h"
-#include <y60/NodeNames.h>
-#include <y60/TypeTraits.h>
-#include <y60/iostream_functions.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/TypeTraits.h>
+#include <y60/base/iostream_functions.h>
 
-#include <dom/Nodes.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Ptr.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/base/Ptr.h>
 
 #include <vector>
 #include <string>

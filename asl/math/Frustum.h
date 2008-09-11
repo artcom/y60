@@ -24,7 +24,7 @@
 #include "Matrix4.h"
 #include "Box.h"
 
-#include <asl/Enum.h>
+#include <asl/base/Enum.h>
 
 namespace asl {
 

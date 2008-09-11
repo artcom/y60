@@ -41,8 +41,8 @@
 #ifndef _included_asl_net_functions_
 #define _included_asl_net_functions_
 
-#include <asl/Exception.h>
-#include <asl/Block.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Block.h>
 
 #include <string>
 #include <sys/types.h>

@@ -22,8 +22,8 @@
 #include "raster.h"
 #include "standard_pixel_types.h"
 
-#include <asl/UnitTest.h>
-#include <asl/string_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/string_functions.h>
 
 #include <string>
 #include <iostream>

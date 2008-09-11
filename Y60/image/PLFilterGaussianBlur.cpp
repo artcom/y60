@@ -22,9 +22,9 @@
 
 #include "PLFilterGaussianBlur.h"
 
-#include <asl/numeric_functions.h>
-#include <asl/Logger.h>
-#include <asl/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/math/Vector234.h>
 
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>

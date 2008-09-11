@@ -17,8 +17,8 @@
 
 #define _WIN32_WINNT 0x500
 
-#include <asl/UDPSocket.h>
-#include <asl/net.h>
+#include <asl/net/UDPSocket.h>
+#include <asl/net/net.h>
 
 #include <iostream>
 

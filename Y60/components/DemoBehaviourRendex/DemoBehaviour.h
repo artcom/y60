@@ -22,14 +22,14 @@
 #ifndef _ac_y60_DemoBehaviour_h_
 #define _ac_y60_DemoBehaviour_h_
 
-#include <y60/JSNode.h>
-#include <y60/JSVector.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IFactoryPlugin.h>
-#include <y60/Body.h>
-#include <y60/JSVector.h>
-#include <asl/PlugInBase.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/IFactoryPlugin.h>
+#include <y60/scene/Body.h>
+#include <y60/jsbase/JSVector.h>
+#include <asl/base/PlugInBase.h>
 
 namespace y60 {
 

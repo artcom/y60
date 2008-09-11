@@ -11,12 +11,12 @@
 #ifndef Y60_CLASS_MAP_SINGLETON_INCLUDED
 #define Y60_CLASS_MAP_SINGLETON_INCLUDED
 
-#include <asl/Singleton.h>
+#include <asl/base/Singleton.h>
 
 #include <map>
 
 #include "jssettings.h"
-#include <js/jsapi.h>
+#include <js/spidermonkey/jsapi.h>
 
 
 class ClassMapSingleton :

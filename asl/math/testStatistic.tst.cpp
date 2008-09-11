@@ -22,8 +22,8 @@
 
 #include "Statistic.h"
 
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
 
 #include <math.h>
 

@@ -26,7 +26,7 @@
 
 #include "FilterTile.h"
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <paintlib/Filter/plfilter.h>
 #include <paintlib/planybmp.h>

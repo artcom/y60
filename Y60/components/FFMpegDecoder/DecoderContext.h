@@ -12,9 +12,9 @@
 #define _ac_y60_DecoderContext_h_
 
 #include "FFMpegPixelEncoding.h"
-#include <y60/MovieDecoderBase.h>
+#include <y60/video/MovieDecoderBase.h>
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <string>
 #include <map>
 

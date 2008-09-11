@@ -11,10 +11,10 @@
 #ifndef _ac_y60_FFMpegDecoder_h_
 #define _ac_y60_FFMpegDecoder_h_
 
-#include <asl/PlugInBase.h>
-#include <y60/MovieDecoderBase.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/video/MovieDecoderBase.h>
 
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 #include <string>
 #include <vector>
 

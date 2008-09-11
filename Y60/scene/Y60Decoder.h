@@ -21,7 +21,7 @@
 #define _ac_scene_Y60Decoder_h_
 
 #include "ISceneDecoder.h"
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace y60 {
 

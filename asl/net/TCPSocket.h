@@ -43,7 +43,7 @@
 #define INCL_INET_TCPSOCKET
 
 #include "Socket.h"
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 #include "INetEndpoint.h"
 

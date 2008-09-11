@@ -11,8 +11,8 @@
 #ifndef _ac_jslib_JSSocket_h_
 #define _ac_jslib_JSSocket_h_
 
-#include <y60/JSWrapper.h>
-#include <asl/Socket.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <asl/net/Socket.h>
 
 class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , jslib::StaticAccessProtocol> {
         JSSocket() {}

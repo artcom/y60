@@ -26,7 +26,7 @@
 #include "Point234.h"
 #include "numeric_functions.h"
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 #include <math.h>
 
 #undef min

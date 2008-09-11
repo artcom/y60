@@ -11,25 +11,25 @@
 #ifndef _Y60_JSLIB_JSRENDERER_INCLUDED_
 #define _Y60_JSLIB_JSRENDERER_INCLUDED_
 
-#include <y60/JSWrapper.h>
-#include <y60/JSLine.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSSphere.h>
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSNode.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSNode.h>
 
-#include <y60/Renderer.h>
+#include <y60/render/Renderer.h>
 
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/intersection.h>
-#include <asl/Exception.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/base/Exception.h>
 
-#include <dom/Value.h>
+#include <asl/dom/Value.h>
 
-#include <y60/Scene.h>
+#include <y60/scene/Scene.h>
 
 DEFINE_EXCEPTION(JSRendererException, asl::Exception);
 

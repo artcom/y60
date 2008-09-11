@@ -20,12 +20,12 @@
 #ifndef _ac_video_AsyncDecoder_h_
 #define _ac_video_AsyncDecoder_h_
 
-#include <y60/MovieDecoderBase.h>
+#include <y60/video/MovieDecoderBase.h>
 
-#include <asl/ThreadLock.h>
-#include <asl/Logger.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/Logger.h>
 
-#include <asl/HWSampleSink.h>
+#include <asl/audio/HWSampleSink.h>
 
 namespace y60 {
     

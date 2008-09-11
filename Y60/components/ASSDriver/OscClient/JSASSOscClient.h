@@ -20,7 +20,7 @@
 #define _ac_y60_components_jsctscan_h_
 
 #include "ASSOscClient.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
     

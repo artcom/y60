@@ -20,8 +20,8 @@
 #ifndef _ac_y60_QuicktimeDecoder_h_
 #define _ac_y60_QuicktimeDecoder_h_
 
-#include <asl/PlugInBase.h>
-#include <y60/MovieDecoderBase.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/video/MovieDecoderBase.h>
 
 #include <string>
 #include <vector>

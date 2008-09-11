@@ -11,11 +11,11 @@
 #ifndef _Y60_POWERMATE_INPUTEXTENSION_INCLUDED_
 #define _Y60_POWERMATE_INPUTEXTENSION_INCLUDED_
 
-#include <asl/Ptr.h>
-#include <asl/PlugInBase.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/PlugInBase.h>
 
-#include <y60/Event.h>
-#include <y60/IEventSource.h>
+#include <y60/input/Event.h>
+#include <y60/input/IEventSource.h>
 
 #include <vector>
 #include <linux/input.h>

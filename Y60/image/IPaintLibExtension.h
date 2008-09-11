@@ -1,7 +1,7 @@
 #ifndef _IPAINTLIB_EXTENSION_INCLUDED
 #define _IPAINTLIB_EXTENSION_INCLUDED
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <paintlib/plpicdec.h>
 #include <paintlib/pldecoderfactory.h>
 

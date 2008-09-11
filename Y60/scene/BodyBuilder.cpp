@@ -1,8 +1,8 @@
 #include "BodyBuilder.h"
 #include "Body.h"
-#include <y60/iostream_functions.h>
-#include <y60/NodeNames.h>
-#include <dom/Nodes.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/base/NodeNames.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     BodyBuilder::BodyBuilder(const std::string & theShapeId, const std::string & theName)

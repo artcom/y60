@@ -12,9 +12,9 @@
 #ifndef _ac_StlImporter_StlCodec_h_
 #define _ac_StlImporter_StlCodec_h_
 
-#include <asl/Stream.h>
-#include <y60/Shape.h>
-#include <dom/Nodes.h>
+#include <asl/base/Stream.h>
+#include <y60/scene/Shape.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 struct StlHeader {

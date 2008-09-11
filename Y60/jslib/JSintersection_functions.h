@@ -11,10 +11,10 @@
 #ifndef __y60_jslib_jsintersection_functions_h_included_
 #define __y60_jslib_jsintersection_functions_h_included_
 
-#include <y60/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.h>
 
-#include <y60/Primitive.h>
-#include <y60/Scene.h>
+#include <y60/scene/Primitive.h>
+#include <y60/scene/Scene.h>
 
 namespace jslib {
 

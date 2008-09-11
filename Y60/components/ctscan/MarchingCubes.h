@@ -27,10 +27,10 @@
 #include "CTScan.h"
 #include "VertexCache.h"
 
-#include <asl/Box.h>
-#include <asl/Logger.h>
-#include <asl/Assure.h>
-#include <asl/string_functions.h>
+#include <asl/math/Box.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
+#include <asl/base/string_functions.h>
 
 #include <algorithm>
 #include <stdio.h>
@@ -41,7 +41,7 @@
 #endif
 #define ASSURE_POLICY AssurePolicy::Throw
 
-#include <asl/Assure.h>
+#include <asl/base/Assure.h>
 
 //#define MC_DONT_SHARE_VERTICES
 

@@ -10,27 +10,27 @@
 
 #include "AbstractRenderWindow.h"
 #include "JSApp.h"
-#include <y60/JSNode.h>
+#include <y60/jsbase/JSNode.h>
 
-#include <y60/WindowEvent.h>
-#include <y60/KeyEvent.h>
-#include <y60/MouseEvent.h>
-#include <y60/AxisEvent.h>
-#include <y60/ButtonEvent.h>
-#include <y60/TouchEvent.h>
-#include <y60/GenericEvent.h>
-#include <y60/ScopedGLContext.h>
-#include <y60/Image.h>
-#include <y60/Movie.h>
-#include <y60/Capture.h>
-#include <y60/GLBufferAdapter.h>
+#include <y60/input/WindowEvent.h>
+#include <y60/input/KeyEvent.h>
+#include <y60/input/MouseEvent.h>
+#include <y60/input/AxisEvent.h>
+#include <y60/input/ButtonEvent.h>
+#include <y60/input/TouchEvent.h>
+#include <y60/input/GenericEvent.h>
+#include <y60/glutil/ScopedGLContext.h>
+#include <y60/image/Image.h>
+#include <y60/video/Movie.h>
+#include <y60/video/Capture.h>
+#include <y60/glutil/GLBufferAdapter.h>
 
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/PlugInManager.h>
-#include <asl/Ptr.h>
-#include <asl/StdOutputRedirector.h>
-#include <dom/Nodes.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/StdOutputRedirector.h>
+#include <asl/dom/Nodes.h>
 #include "GLContextRegistry.h"
 
 using namespace std;

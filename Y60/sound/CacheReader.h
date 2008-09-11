@@ -14,7 +14,7 @@
 #include "IAudioDecoder.h"
 #include "SoundCacheItem.h"
 
-#include <asl/ISampleSink.h>
+#include <asl/audio/ISampleSink.h>
 
 namespace y60 {
 

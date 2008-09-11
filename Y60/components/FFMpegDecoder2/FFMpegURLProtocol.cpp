@@ -20,9 +20,9 @@
 
 #include "FFMpegURLProtocol.h"
 
-#include <asl/Ptr.h>
-#include <asl/Block.h>
-#include <asl/MappedBlock.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Block.h>
+#include <asl/base/MappedBlock.h>
 
 #ifdef WIN32
 #pragma warning(push)

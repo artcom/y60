@@ -11,8 +11,8 @@
 #ifndef OSC_RECEIVER_PLUGIN_INCLUDED
 #define OSC_RECEIVER_PLUGIN_INCLUDED
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 #include "JSOscReceiver.h"
 
 namespace y60 {

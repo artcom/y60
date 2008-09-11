@@ -44,7 +44,7 @@
 #include "ConduitAcceptor.h"
 
 #include "MessageServer.h"
-#include <asl/ThreadFifo.h>    
+#include <asl/base/ThreadFifo.h>
 
 #include <queue>
 

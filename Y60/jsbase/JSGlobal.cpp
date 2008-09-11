@@ -21,11 +21,11 @@
 
 #include "JSGlobal.h"
 
-#include <asl/linearAlgebra.h>
-#include <asl/intersection.h>
-#include <asl/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/math/numeric_functions.h>
 
-#include <y60/Request.h>
+#include <y60/inet/Request.h>
 
 #define DB(x) // x
 

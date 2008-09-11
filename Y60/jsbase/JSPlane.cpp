@@ -12,7 +12,7 @@
 #include "JSPlane.h"
 #include "JSLine.h"
 #include "JSWrapper.impl"
-#include <asl/intersection.h>
+#include <asl/math/intersection.h>
 #include <iostream>
 
 using namespace std;

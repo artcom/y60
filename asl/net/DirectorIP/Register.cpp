@@ -41,8 +41,8 @@
 	#define INITGUID      /* not just references to them. Must be declared in */
 #endif                  /* only one file. */
 
-#include <asl/TCPClientSocket.h>
-#include <asl/UDPSocket.h>
+#include <asl/net/TCPClientSocket.h>
+#include <asl/net/UDPSocket.h>
 
 #include "Register.h"
 #include "Script.h"

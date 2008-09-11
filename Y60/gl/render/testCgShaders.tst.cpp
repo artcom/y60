@@ -4,7 +4,7 @@
 #include "ShaderLibrary.h"
 #include "CgShader.h"
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 #include <Cg/cg.h>
 #include <iostream>
 

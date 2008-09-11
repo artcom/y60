@@ -11,8 +11,8 @@
 #ifndef _ac_BuilderBase_h_
 #define _ac_BuilderBase_h_
 
-#include <dom/typedefs.h>
-#include <asl/Exception.h>
+#include <asl/dom/typedefs.h>
+#include <asl/base/Exception.h>
 
 namespace y60 {
 

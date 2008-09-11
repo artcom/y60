@@ -20,7 +20,7 @@
 #include "jsgtk.h"
 #include "JSSignal1.h"
 #include <acgtk/GCObserver.h>
-#include <y60/Documentation.h>
+#include <y60/jsbase/Documentation.h>
 
 #define DB(x) // x
 

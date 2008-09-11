@@ -11,7 +11,7 @@
 #include "BSpline.h"
 #include "numeric_functions.h"
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 #include <iostream>
 
 using namespace std;

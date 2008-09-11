@@ -11,10 +11,10 @@
 #ifndef _ac_y60_ITextureManager_h_
 #define _ac_y60_ITextureManager_h_
 
-#include <asl/Ptr.h>
-#include <asl/os_functions.h>
-#include <asl/Logger.h>
-#include <dom/typedefs.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Logger.h>
+#include <y60/base/typedefs.h>
 
 namespace y60 {
 

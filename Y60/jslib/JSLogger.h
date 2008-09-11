@@ -12,9 +12,9 @@
 #ifndef _ac_jslib_JSLogger_h_
 #define _ac_jslib_JSLogger_h_
 
-#include <asl/Logger.h>
-#include <asl/Ptr.h>
-#include <y60/JSWrapper.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Ptr.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
 

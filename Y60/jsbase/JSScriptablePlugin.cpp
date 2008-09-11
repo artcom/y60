@@ -13,8 +13,8 @@
 #include "JSNode.h"
 #include "ClassMapSingleton.h"
 
-#include <asl/PlugInManager.h>
-#include <asl/Ptr.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/Ptr.h>
 
 #include <iostream>
 

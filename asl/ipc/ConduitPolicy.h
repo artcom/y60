@@ -40,9 +40,9 @@
 #ifndef __asl_ConduitPolicy_included
 #define __asl_ConduitPolicy_included
 
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <asl/Block.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Block.h>
 #include <vector>
 #include <deque>
 #include <sstream>

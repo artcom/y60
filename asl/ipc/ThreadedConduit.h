@@ -41,8 +41,8 @@
 #define _asl_ipc_threadedConduit_included_
 
 #include "Conduit.h"
-#include <asl/Ptr.h>
-#include <asl/Logger.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Logger.h>
 
 namespace asl {
 

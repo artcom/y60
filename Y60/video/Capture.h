@@ -21,7 +21,7 @@
 #define _ac_video_Capture_h_
 
 #include "Movie.h"
-#include <y60/NodeNames.h>
+#include <y60/base/NodeNames.h>
 
 namespace y60 {
 

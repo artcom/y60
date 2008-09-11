@@ -9,19 +9,19 @@
 //=============================================================================
 
 #include "JSModellingFunctions.h"
-#include <y60/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.h>
 
-#include <y60/JSNode.h>
-#include <y60/JSVector.h>
-#include <y60/JSBox.h>
-#include <y60/JSBox2f.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSSphere.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSBox2f.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSSphere.h>
 
 #include "JSScene.h"
-#include <y60/JSWrapper.impl>
-#include <y60/modelling_functions.h>
-#include <y60/Body.h>
+#include <y60/jsbase/JSWrapper.impl>
+#include <y60/modelling/modelling_functions.h>
+#include <y60/scene/Body.h>
 
 #include <iostream>
 

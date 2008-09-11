@@ -25,9 +25,9 @@
 #define _ac_property_functions_h_
 
 #include "NodeNames.h"
-#include <dom/Nodes.h>
-#include <asl/string_functions.h>
-#include <asl/Exception.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Exception.h>
 
 namespace y60 {
 

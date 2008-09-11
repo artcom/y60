@@ -12,7 +12,7 @@
 #include "JSNode.h"
 #include "JSWrapper.impl"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 #include <iostream>
 
 using namespace std;

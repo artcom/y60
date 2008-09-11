@@ -17,8 +17,8 @@
 //=============================================================================
 
 #include "WorldBuilder.h"
-#include <y60/NodeNames.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     WorldBuilder::WorldBuilder() : WorldBuilderBase(WORLD_NODE_NAME) {}

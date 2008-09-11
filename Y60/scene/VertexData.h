@@ -20,13 +20,13 @@
 #ifndef _ac_scene_VertexData_h_
 #define _ac_scene_VertexData_h_
 
-#include <y60/TypeTraits.h>
-#include <y60/DataTypes.h>
+#include <y60/base/TypeTraits.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/Auto.h>
-#include <asl/Singleton.h>
-#include <asl/Exception.h>
-#include <dom/Nodes.h>
+#include <asl/base/Auto.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/Exception.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

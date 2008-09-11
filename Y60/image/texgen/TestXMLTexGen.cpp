@@ -22,11 +22,11 @@
 //=============================================================================
 
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 #include "TestXMLTexGen.h"
 
 #include "TerrainTexGen.h"
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 //#include <asl/XmlTypes.h>
 
 #ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_

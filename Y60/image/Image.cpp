@@ -11,17 +11,17 @@
 #include "Image.h"
 #include "ImageLoader.h"
 
-#include <y60/IScene.h>
+#include <y60/base/IScene.h>
 
-#include <dom/Field.h>
+#include <asl/dom/Field.h>
 
-#include <asl/string_functions.h>
-#include <asl/PackageManager.h>
+#include <asl/base/string_functions.h>
+#include <asl/zip/PackageManager.h>
 
-#include <asl/subraster.h>
-#include <asl/palgo.h>
-#include <asl/pixels.h>
-#include <asl/standard_pixel_types.h>
+#include <asl/raster/subraster.h>
+#include <asl/raster/palgo.h>
+#include <asl/raster/pixels.h>
+#include <asl/raster/standard_pixel_types.h>
 
 #include <paintlib/plpixelformat.h>
 #include <paintlib/plpngenc.h>

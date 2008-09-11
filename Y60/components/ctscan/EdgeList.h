@@ -13,8 +13,8 @@
 #ifndef _ac_scene_EdgeList_h_
 #define _ac_scene_EdgeList_h_
 
-#include <dom/Nodes.h>
-#include <y60/DataTypes.h>
+#include <asl/dom/Nodes.h>
+#include <y60/base/DataTypes.h>
 #include <deque>
 
 //#ifdef DEBUG

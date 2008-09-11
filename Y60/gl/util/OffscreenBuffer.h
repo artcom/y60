@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <asl/Ptr.h>
-#include <dom/ThreadingModel.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/ThreadingModel.h>
 
 #ifndef _ac_y60_OffscreenBuffer_h_
 #define _ac_y60_OffscreenBuffer_h_

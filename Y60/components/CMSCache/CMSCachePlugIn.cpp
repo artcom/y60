@@ -12,10 +12,10 @@
 
 #include "JSCMSCache.h"
 
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSEnum.h>
-#include <y60/JSWrapper.impl>
-#include <asl/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSEnum.h>
+#include <y60/jsbase/JSWrapper.impl>
+#include <asl/base/PlugInBase.h>
 
 namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BackendType, SimpleValue);

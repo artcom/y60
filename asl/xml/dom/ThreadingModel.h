@@ -24,7 +24,7 @@
 #ifndef _asl_xml_ThreadingModel_included_
 #define _asl_xml_ThreadingModel_included_
 
-#include <asl/AtomicCount.h>
+#include <asl/base/AtomicCount.h>
 
 
 namespace dom {

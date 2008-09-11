@@ -11,8 +11,8 @@
 #ifndef _ac_y60_TaskWindow_h_
 #define _ac_y60_TaskWindow_h_
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
 
 #define _WIN32_WINNT 0x0501
 #include <windows.h>

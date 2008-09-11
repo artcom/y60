@@ -13,8 +13,8 @@
 
 #include "OscSender.h"
 
-#include <asl/Logger.h>
-#include <asl/Assure.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
 
 #include <string>
 #include <assert.h>

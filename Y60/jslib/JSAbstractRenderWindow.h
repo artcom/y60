@@ -11,9 +11,9 @@
 #ifndef _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 #define _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include "AbstractRenderWindow.h"
-#include <y60/Viewport.h>
+#include <y60/scene/Viewport.h>
 
 namespace jslib {
 

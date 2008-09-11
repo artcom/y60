@@ -11,8 +11,8 @@
 #ifndef _ac_y60_JSSoundManager_h_
 #define _ac_y60_JSSoundManager_h_
 
-#include <y60/SoundManager.h>
-#include <y60/JSWrapper.h>
+#include <y60/sound/SoundManager.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
 

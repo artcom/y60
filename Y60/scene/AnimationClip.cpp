@@ -20,9 +20,9 @@
 #include "AnimationClip.h"
 #include "AnimationManager.h"
 
-#include <y60/NodeNames.h>
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
+#include <y60/base/NodeNames.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 

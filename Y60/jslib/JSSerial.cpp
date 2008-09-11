@@ -9,13 +9,13 @@
 //=============================================================================
 
 #include "JSSerial.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSBlock.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSWrapper.impl>
 
-#include <asl/SerialDeviceFactory.h>
-#include <asl/DebugPort.h>
-#include <asl/numeric_functions.h>
+#include <asl/serial/SerialDeviceFactory.h>
+#include <asl/serial/DebugPort.h>
+#include <asl/math/numeric_functions.h>
 #include <iostream>
 
 using namespace std;

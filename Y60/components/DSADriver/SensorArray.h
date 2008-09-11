@@ -20,8 +20,8 @@
 #ifndef _SENSOR_ARRAY_INCLUDED
 #define _SENSOR_ARRAY_INCLUDED
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
 
 #include <string>
 #include <map>

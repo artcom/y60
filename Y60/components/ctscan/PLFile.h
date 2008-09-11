@@ -20,9 +20,9 @@
 #define _ac_y60_components_plslice_h_
 
 #include "CTFile.h"
-#include <asl/Block.h>
-#include <y60/ImageLoader.h>
-#include <dom/Nodes.h>
+#include <asl/base/Block.h>
+#include <y60/image/ImageLoader.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

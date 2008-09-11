@@ -13,9 +13,9 @@
 #include "AudioFrame.h"
 #include "FrameAnalyser.h"
 
-#include <asl/Logger.h>
-#include <asl/os_functions.h>
-#include <asl/console_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/console_functions.h>
 
 #ifdef WIN32
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning

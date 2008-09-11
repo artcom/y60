@@ -12,16 +12,16 @@
 #include "JScppUtils.h"
 #include "JScppUtils.impl"
 
-#include <asl/error_functions.h>
-#include <js/jsapi.h>
-#include <js/jsprf.h>
-#include <js/jsparse.h>
-#include <js/jsscan.h>
-#include <js/jsemit.h>
-#include <js/jsscript.h>
-#include <js/jsarena.h>
-#include <js/jscntxt.h>
-#include <js/jsdbgapi.h>
+#include <asl/base/error_functions.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jsprf.h>
+#include <js/spidermonkey/jsparse.h>
+#include <js/spidermonkey/jsscan.h>
+#include <js/spidermonkey/jsemit.h>
+#include <js/spidermonkey/jsscript.h>
+#include <js/spidermonkey/jsarena.h>
+#include <js/spidermonkey/jscntxt.h>
+#include <js/spidermonkey/jsdbgapi.h>
 
 #ifndef WIN32
 #include <glib.h>
@@ -495,7 +495,7 @@ JSErrorFormatString AC_ErrorFormatString[JSErr_Limit] = {
 #define MSG_DEF(name, number, count, exception, format) \
     { NULL, count } ,
 #endif
-#include <js/js.msg>
+#include <js/spidermonkey/js.msg>
 #undef MSG_DEF
 };
 

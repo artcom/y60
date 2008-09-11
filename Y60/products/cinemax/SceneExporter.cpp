@@ -27,15 +27,15 @@
 #include "res/Facxmlexport.h"
 #include "res/Facbinaryexport.h"
 
-#include <asl/settings.h>
-#include <asl/linearAlgebra.h>
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/settings.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
 
-#include <y60/BodyBuilder.h>
-#include <y60/LightSourceBuilder.h>
-#include <y60/NodeNames.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/scene/LightSourceBuilder.h>
+#include <y60/base/NodeNames.h>
 
 #include <stdio.h>
 #include <iostream>

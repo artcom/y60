@@ -11,9 +11,9 @@
 #ifndef __y60__AssetRequest__included
 #define __y60__AssetRequest__included
 
-#include <asl/Enum.h>
-#include <y60/Request.h>
-#include <dom/Nodes.h>
+#include <asl/base/Enum.h>
+#include <y60/inet/Request.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

@@ -8,13 +8,13 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #include <iostream>
 
-#include <y60/jssettings.h>
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/jssettings.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include "SDLApp.h"
 #include "SDLFontInfo.h"
@@ -23,26 +23,26 @@
 
 #include "JSRenderWindow.h"
 
-#include <y60/GLAlloc.h>
-#include <y60/Renderer.h>
+#include <y60/glutil/GLAlloc.h>
+#include <y60/render/Renderer.h>
 
-#include <y60/Event.h>
+#include <y60/input/Event.h>
 
-#include <asl/Time.h>
-#include <asl/numeric_functions.h>
-#include <asl/GeometryUtils.h>
-#include <asl/Box.h>
-#include <asl/PlugInManager.h>
+#include <asl/base/Time.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/GeometryUtils.h>
+#include <asl/math/Box.h>
+#include <asl/base/PlugInManager.h>
 
-#include <y60/JSBox.h>
-#include <y60/JSLine.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSSphere.h>
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSNode.h>
-#include <y60/JSAbstractRenderWindow.h>
-#include <y60/JSAbstractRenderWindow.impl>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jslib/JSAbstractRenderWindow.h>
+#include <y60/jslib/JSAbstractRenderWindow.impl>
 
 #define DB(x) // x
 

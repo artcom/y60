@@ -21,10 +21,10 @@
 #define _ac_c4d_AnimationExporter_h_
 
 
-#include <y60/iostream_functions.h>
-#include <y60/AnimationBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/ClipBuilder.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/scene/AnimationBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ClipBuilder.h>
 
 #include "c4d_include.h"
 

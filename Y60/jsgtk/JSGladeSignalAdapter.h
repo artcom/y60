@@ -19,10 +19,10 @@
 #ifndef _Y60_ACGTKSHELL_JSGLADE_SIGNALADAPTER_INCLUDED_
 #define _Y60_ACGTKSHELL_JSGLADE_SIGNALADAPTER_INCLUDED_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
-#include <y60/jssettings.h>
-#include <js/jsapi.h>
+#include <y60/jsbase/jssettings.h>
+#include <js/spidermonkey/jsapi.h>
 
 #include <list>
 #include <string>

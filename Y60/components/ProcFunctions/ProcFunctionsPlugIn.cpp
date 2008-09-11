@@ -8,10 +8,10 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <y60/IScriptablePlugin.h>
-#include <asl/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
 #include "JSproc_functions.h"
-#include <y60/Documentation.h>
+#include <y60/jsbase/Documentation.h>
 
 namespace y60 {
     class ProcFunctionsPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

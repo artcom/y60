@@ -3,7 +3,7 @@
 
 #include "ShaderTypes.h"
 
-#include <y60/MaterialParameter.h>
+#include <y60/scene/MaterialParameter.h>
 
 #include <string>
 #include <vector>

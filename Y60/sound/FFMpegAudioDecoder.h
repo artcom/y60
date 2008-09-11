@@ -14,8 +14,8 @@
 #include "IAudioDecoder.h"
 #include "SoundManager.h"
 
-#include <asl/ISampleSink.h>
-#include <asl/Block.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/Block.h>
 
 #ifdef WIN32
 #define EMULATE_INTTYPES

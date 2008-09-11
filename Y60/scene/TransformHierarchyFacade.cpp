@@ -21,7 +21,7 @@
 */
 
 #include "TransformHierarchyFacade.h"
-#include <asl/console_functions.h>
+#include <asl/base/console_functions.h>
 
 using namespace std;
 using namespace asl;

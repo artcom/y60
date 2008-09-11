@@ -15,12 +15,12 @@
 
 #include <acgtk/GradientSlider.h>
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/container.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

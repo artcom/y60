@@ -13,20 +13,20 @@
 
 #include "jssettings.h"
 
-#include <js/jspubtd.h>
-#include <js/jsapi.h>
-#include <js/jscntxt.h>
-#include <js/jsnum.h>
-#include <js/jslock.h>
+#include <js/spidermonkey/jspubtd.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jscntxt.h>
+#include <js/spidermonkey/jsnum.h>
+#include <js/spidermonkey/jslock.h>
 
-#include <asl/settings.h>
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Time.h>
-#include <asl/Logger.h>
-#include <y60/AcBool.h>
-#include <dom/Value.h>
+#include <asl/base/settings.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/Logger.h>
+#include <y60/base/AcBool.h>
+#include <asl/dom/Value.h>
 
 #include <paintlib/plexcept.h>
 

@@ -42,8 +42,8 @@
 
 #include "ConduitPolicy.h"
 
-#include <asl/INetEndpoint.h>
-#include <asl/Exception.h>
+#include <asl/net/INetEndpoint.h>
+#include <asl/base/Exception.h>
 
 namespace asl {
 

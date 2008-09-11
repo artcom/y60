@@ -20,9 +20,9 @@
 #ifndef _GSTREAMER_CAPTURE_PLUGIN_H_
 #define _GSTREAMER_CAPTURE_PLUGIN_H_
 
-#include <y60/CaptureDevice.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
+#include <y60/video/CaptureDevice.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
 
 #include <gst/gst.h>
 

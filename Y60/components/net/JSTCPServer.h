@@ -11,8 +11,8 @@
 #ifndef _ac_jslib_JSTCPServer_h_
 #define _ac_jslib_JSTCPServer_h_
 
-#include <y60/JSWrapper.h>
-#include <asl/TCPServer.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <asl/net/TCPServer.h>
 
 
 class JSTCPServer : public jslib::JSWrapper<inet::TCPServer, asl::Ptr<inet::TCPServer> , jslib::StaticAccessProtocol> {

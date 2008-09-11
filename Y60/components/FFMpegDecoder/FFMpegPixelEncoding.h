@@ -11,7 +11,7 @@
 #ifndef _ac_y60_FFMpegPixelEncoding_h_
 #define _ac_y60_FFMpegPixelEncoding_h_
 
-#include <y60/PixelEncoding.h>
+#include <y60/image/PixelEncoding.h>
 #include <string>
 
 #ifdef WIN32

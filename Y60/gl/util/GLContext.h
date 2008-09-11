@@ -24,7 +24,7 @@
 #ifndef AC_Y60_GLCONTEXT_INCLUDED
 #define AC_Y60_GLCONTEXT_INCLUDED
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 #include "GLUtils.h"
 #include "RenderState.h"

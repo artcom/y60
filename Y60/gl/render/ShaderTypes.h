@@ -2,9 +2,9 @@
 #define _ac_renderer_Shader_types_h_
 
 
-//#include <y60/NodeValueNames.h>
-//#include <asl/Exception.h>
-//#include <asl/string_functions.h>
+#include <y60/base/NodeValueNames.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
 
 #include <string>
 // Warning: There are several enum/string pairs in this file which need to

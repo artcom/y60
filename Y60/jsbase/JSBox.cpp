@@ -13,7 +13,7 @@
 #include "JSPlane.h"
 #include "JSWrapper.impl"
 #include "JScppUtils.impl"
-#include <asl/Box.h>
+#include <asl/math/Box.h>
 
 #include <iostream>
 

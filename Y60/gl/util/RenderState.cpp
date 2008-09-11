@@ -11,8 +11,8 @@
 #include "RenderState.h"
 
 #include "GLUtils.h"
-#include <y60/Viewport.h>
-#include <y60/Canvas.h>
+#include <y60/scene/Viewport.h>
+#include <y60/scene/Canvas.h>
 
 #ifdef WIN32
 #   include <GL/glh_extensions.h>

@@ -24,8 +24,8 @@ DEFINE_GUID(PROPSETID_VIDCAP_AVT,
 #import "AVTPropSet.tlb" no_namespace
 
 #include <atlcomcli.h>
-#include <asl/Logger.h>
-#include <asl/Assure.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
 
 #include <iostream>
 

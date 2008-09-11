@@ -14,21 +14,21 @@
 #include "DummyTransport.h"
 #include "ASSUtils.h"
 
-#include <asl/Logger.h>
-#include <asl/Assure.h>
-#include <asl/numeric_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
+#include <asl/math/numeric_functions.h>
 
 #ifdef ASS_LATENCY_TEST
 #   include <asl/SerialDevice.h>
 #   include <asl/SerialDeviceFactory.h>
 #endif
 
-#include <y60/SettingsParser.h>
-#include <y60/PixelEncoding.h>
-#include <y60/ImageBuilder.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/Overlay.h>
+#include <y60/base/SettingsParser.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/scene/ImageBuilder.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/scene/Overlay.h>
 
 #include <iostream>
 #include <algorithm>

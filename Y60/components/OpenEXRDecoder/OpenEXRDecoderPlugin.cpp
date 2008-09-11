@@ -14,8 +14,8 @@
 
 #include "OpenEXRDecoder.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IPaintLibExtension.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/image/IPaintLibExtension.h>
 
 #include <paintlib/pldecoderfactory.h>
 #include <OpenEXR/ImfVersion.h>

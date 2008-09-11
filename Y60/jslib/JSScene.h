@@ -11,9 +11,9 @@
 #ifndef _Y60_JSLIB_JSSCENE_INCLUDED_
 #define _Y60_JSLIB_JSSCENE_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
-#include <y60/Scene.h>
+#include <y60/scene/Scene.h>
 
 
 namespace jslib {

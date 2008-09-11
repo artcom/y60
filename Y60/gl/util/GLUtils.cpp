@@ -19,10 +19,10 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 #include <iostream>
 #include <iomanip>
 #include <string.h>
-#include <asl/Exception.h>
-#include <asl/numeric_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/Exception.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Logger.h>
 
 #ifndef _AC_NO_CG_
 	#include <Cg/cgGL.h>

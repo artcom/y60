@@ -24,8 +24,8 @@
 #include "RankedFeature.h" // Needed to make sure [de]binarize(RankedFeature) gets called :-(.
 #include "typedefs.h"
 
-#include <asl/Block.h>
-#include <dom/Value.h>
+#include <asl/base/Block.h>
+#include <asl/dom/Value.h>
 
 namespace asl {
 

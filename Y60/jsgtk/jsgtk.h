@@ -13,8 +13,8 @@
 
 #include "JSgtkutils.h"
 
-#include <y60/jssettings.h>
-#include <js/jsapi.h>
+#include <y60/jsbase/jssettings.h>
+#include <js/spidermonkey/jsapi.h>
 #include <gtkmm.h>
 
 extern bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject);

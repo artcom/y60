@@ -40,9 +40,9 @@
 
 #include "SocketPolicy.h"
 
-#include <asl/net.h>
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
+#include <asl/net/net.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Logger.h>
 
 #include <errno.h>
 

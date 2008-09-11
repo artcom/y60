@@ -9,9 +9,9 @@
 #include <iostream>
 #include <fstream>
 
-#include <asl/Time.h>
-#include <asl/file_functions.h>
-#include <asl/numeric_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/file_functions.h>
+#include <asl/math/numeric_functions.h>
 
 //#include <pm/ptime.h>
 //#define yrTime ptime

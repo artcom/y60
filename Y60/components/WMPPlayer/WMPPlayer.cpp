@@ -20,10 +20,10 @@
 #include "WMPPlayer.h"
 #include "EventListener.h"
 
-#include <asl/Logger.h>
-#include <asl/os_functions.h>
-#include <asl/Time.h>
-#include <y60/JSWrapper.impl>
+#include <asl/base/Logger.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Time.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 
 

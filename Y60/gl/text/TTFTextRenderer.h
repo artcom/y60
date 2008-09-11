@@ -11,12 +11,12 @@
 #ifndef AC_Y60_TTFTEXTRENDERER
 #define AC_Y60_TTFTEXTRENDERER
 
-#include  <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 #include "TextRenderer.h"
 #include "Text.h"
 #include "TTFFontInfo.h"
 
-#include <y60/TextureManager.h>
+#include <y60/scene/TextureManager.h>
 
 #include <map>
 #include <string>

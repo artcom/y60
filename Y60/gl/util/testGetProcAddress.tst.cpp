@@ -25,8 +25,8 @@
 #   include <GL/glh_genext.h>
 #endif
 
-#include <asl/UnitTest.h>
-#include <y60/GLUtils.h>
+#include <asl/base/UnitTest.h>
+#include <y60/glutil/GLUtils.h>
 
 using namespace std;
 using namespace asl;

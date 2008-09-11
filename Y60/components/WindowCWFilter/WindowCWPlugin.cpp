@@ -19,9 +19,9 @@
 
 #include "PLFilterWindowCW.h"
 
-#include <asl/PlugInBase.h>
+#include <asl/base/PlugInBase.h>
 
-#include <y60/PLFilterFactory.h>
+#include <y60/image/PLFilterFactory.h>
 
 #include <iostream>
 

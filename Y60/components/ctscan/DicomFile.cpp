@@ -18,11 +18,11 @@
 //=============================================================================
 
 #include "DicomFile.h"
-#include <asl/Block.h>
-#include <asl/MappedBlock.h>
-#include <y60/PLFilterFactory.h>
-#include <y60/PLFilterResizePadded.h>
-#include <y60/Image.h>
+#include <asl/base/Block.h>
+#include <asl/base/MappedBlock.h>
+#include <y60/image/PLFilterFactory.h>
+#include <y60/image/PLFilterResizePadded.h>
+#include <y60/image/Image.h>
 
 #include <dicom/dcmdata/dcistrmb.h>
 #include <dicom/dcmdata/dcistrmf.h>

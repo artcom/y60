@@ -11,7 +11,7 @@
 
 #include "TextureDefinition.h"
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 //#define TEXGEN_GENERATE_STATISTICS
 

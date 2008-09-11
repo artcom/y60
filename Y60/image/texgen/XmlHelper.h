@@ -28,7 +28,7 @@
 
 #include <paintlib/plpixel32.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 #include <string>
 
 namespace TexGen {

@@ -12,9 +12,9 @@
 
 
 #include "GrainSource.h"
-#include <asl/AudioBuffer.h>
-#include <asl/VolumeFader.h>
-#include <asl/Auto.h>
+#include <asl/audio/AudioBuffer.h>
+#include <asl/audio/VolumeFader.h>
+#include <asl/base/Auto.h>
 
 using namespace asl;
 using namespace y60;

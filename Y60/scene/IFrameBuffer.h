@@ -23,7 +23,7 @@
 #ifndef _scene_IFrameBuffer_h_
 #define _scene_IFrameBuffer_h_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
    

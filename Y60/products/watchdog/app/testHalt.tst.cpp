@@ -15,10 +15,10 @@
 //
 //=============================================================================
 
-#include <asl/UnitTest.h>
-#include <asl/UDPSocket.h>
-#include <asl/net.h>
-#include <asl/Logger.h>
+#include <asl/base/UnitTest.h>
+#include <asl/net/UDPSocket.h>
+#include <asl/net/net.h>
+#include <asl/base/Logger.h>
 
 using namespace std;
 using namespace inet;

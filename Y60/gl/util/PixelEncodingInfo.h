@@ -12,9 +12,9 @@
 #ifndef INCL_TEXTURE_COMPRESSION_TYPE
 #define INCL_TEXTURE_COMPRESSION_TYPE
 
-#include <asl/string_functions.h>
-#include <asl/Exception.h>
-#include <y60/PixelEncoding.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Exception.h>
+#include <y60/image/PixelEncoding.h>
 
 
 #include <string>

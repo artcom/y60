@@ -11,12 +11,12 @@
 #ifndef _Y60_ACXPSHELL_JSSERIAL_INCLUDED_
 #define _Y60_ACXPSHELL_JSSERIAL_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
-#include <asl/SerialDevice.h>
-#include <asl/uCCP.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/serial/uCCP.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

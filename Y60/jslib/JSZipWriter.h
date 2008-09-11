@@ -11,9 +11,9 @@
 #ifndef _Y60_ACXPSHELL_JSZIPWRITER_INCLUDED_
 #define _Y60_ACXPSHELL_JSZIPWRITER_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
-#include <asl/ZipWriter.h>
+#include <asl/zip/ZipWriter.h>
 
 namespace jslib {
 

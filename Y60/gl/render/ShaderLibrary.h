@@ -16,11 +16,11 @@
 #include "GLShader.h"
 //#include "Texture.h"
 
-#include <y60/DataTypes.h>
-#include <y60/IShader.h>
-#include <y60/MaterialParameter.h>
-#include <dom/Nodes.h>
-#include <asl/Ptr.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/IShader.h>
+#include <y60/scene/MaterialParameter.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Ptr.h>
 
 #ifndef _AC_NO_CG_
 // CG support

@@ -12,8 +12,8 @@
 #ifndef _ac_jslib_GLContextRegistry_h_
 #define _ac_jslib_GLContextRegistry_h_
 
-#include <asl/Singleton.h>
-#include <asl/Ptr.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/Ptr.h>
 #include <set>
 #include "AbstractRenderWindow.h"
 

@@ -24,10 +24,10 @@
 
 #include "c4d_include.h"
 
-#include <y60/MaterialBuilder.h>
-#include <y60/SceneBuilder.h>
-#include <y60/DataTypes.h>
-#include <y60/NodeValueNames.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/NodeValueNames.h>
 
 #include <string>
 #include <vector>

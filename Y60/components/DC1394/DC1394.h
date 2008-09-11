@@ -20,9 +20,9 @@
 #ifndef _ac_DC1394
 #define _ac_DC1394
 
-#include <y60/CaptureDevice.h>
-#include <asl/PlugInBase.h>
-#include <asl/ThreadLock.h>
+#include <y60/video/CaptureDevice.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/ThreadLock.h>
 
 #include <libraw1394/raw1394.h>
 #include <dc1394/dc1394.h>

@@ -40,9 +40,9 @@
 #include <ostream>
 
 /**********************************************************************************************/
-#include <asl/Ptr.h>
-#include <asl/static_dict.h>
-#include <dom/Nodes.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/static_dict.h>
+#include <asl/dom/Nodes.h>
 
 /**********************************************************************************************/
 #include "Value.h"

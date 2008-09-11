@@ -17,8 +17,8 @@
 #include "SampleFormat.h"
 #include "AudioBufferBase.h"
 
-#include <asl/Ptr.h>
-#include <asl/settings.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/settings.h>
 
 #include <string>
 

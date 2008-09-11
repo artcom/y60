@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-#include <js/jscntxt.h>
+#include <js/spidermonkey/jscntxt.h>
 
 namespace tuttle {
 

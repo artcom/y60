@@ -22,7 +22,7 @@
 
 #include "MovieDecoderBase.h"
 #include "MovieEncoding.h"
-#include <asl/MappedBlock.h>
+#include <asl/base/MappedBlock.h>
 
 namespace y60 {
 

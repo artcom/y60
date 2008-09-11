@@ -11,12 +11,12 @@
 #ifndef _ac_y60_ImageTags_h_
 #define _ac_y60_ImageTags_h_
 
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
-#include <y60/DataTypes.h>
-#include <y60/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/CommonTags.h>
 
-#include <asl/Matrix4.h>
+#include <asl/math/Matrix4.h>
 
 namespace y60 {
     //                  theTagName              theType         theAttributeName                 theDefault

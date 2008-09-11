@@ -14,12 +14,12 @@
 #include "JSSoundManager.h"
 #include "JSGrainSource.h"
 
-#include <y60/Sound.h>
-#include <y60/JSWrapper.h>
-#include <y60/IScriptablePlugin.h>
+#include <y60/sound/Sound.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
-#include <asl/PlugInBase.h>
-#include <asl/Pump.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/audio/Pump.h>
 
 
 namespace jslib {

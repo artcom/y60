@@ -23,10 +23,10 @@
 #include "SensorServer.h"
 #include "SensorArray.h"
 
-#include <y60/JSScriptablePlugin.h>
-#include <y60/JSWrapper.h>
-#include <y60/IEventSource.h>
-#include <asl/PlugInBase.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/input/IEventSource.h>
+#include <asl/base/PlugInBase.h>
 
 #include <vector>
 #include <map>

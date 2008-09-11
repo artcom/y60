@@ -16,17 +16,17 @@
 //=============================================================================
 
 
-#include <asl/Exception.h>
-#include <asl/Stream.h>
-#include <dom/Nodes.h>
-#include <y60/SceneBuilder.h>
-#include <y60/WorldBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Stream.h>
+#include <asl/dom/Nodes.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
 
-#include <asl/PlugInBase.h>
-#include <y60/ISceneDecoder.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/scene/ISceneDecoder.h>
 
 namespace y60 {
 

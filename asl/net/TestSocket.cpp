@@ -43,8 +43,8 @@
 #include "TCPClientSocket.h"
 #include "UDPSocket.h"
 #include "UDPConnection.h"
-#include <asl/os_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Logger.h>
 
 #include <string>
 #include <iostream>

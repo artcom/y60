@@ -14,10 +14,10 @@
 #include "IAudioDecoder.h"
 #include "SoundCacheItem.h"
 
-#include <asl/HWSampleSink.h>
-#include <asl/Stream.h>
-#include <asl/ISampleSink.h>
-#include <asl/ThreadLock.h>
+#include <asl/audio/HWSampleSink.h>
+#include <asl/base/Stream.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/ThreadLock.h>
 
 namespace y60 {
 

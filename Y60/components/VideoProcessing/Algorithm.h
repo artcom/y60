@@ -12,8 +12,8 @@
 #ifndef _ac_VideoProcessing_Algorithm_h_
 #define _ac_VideoProcessing_Algorithm_h_
 
-#include <y60/Image.h>
-#include <y60/Scene.h>
+#include <y60/image/Image.h>
+#include <y60/scene/Scene.h>
 
 namespace y60 {
 

@@ -21,10 +21,10 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-#include <asl/Exception.h>
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
-#include <asl/settings.h>
+#include <asl/base/Exception.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/settings.h>
 
 #include <iostream>
 #include <fstream>

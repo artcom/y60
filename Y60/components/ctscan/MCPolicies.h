@@ -12,12 +12,12 @@
 #ifndef Y60_CTSCAN_MCPOLICIES_INCLUDED
 #define Y60_CTSCAN_MCPOLICIES_INCLUDED
 
-#include <asl/Vector234.h>
-#include <asl/string_functions.h>
-#include <dom/Value.h>
-#include <y60/Scene.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/string_functions.h>
+#include <asl/dom/Value.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
 
 #include <vector>
 

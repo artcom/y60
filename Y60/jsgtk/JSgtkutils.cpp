@@ -11,8 +11,8 @@
 
 #include "JSgtkutils.h"
 
-#include <y60/QuitFlagSingleton.h>
-#include <asl/Logger.h>
+#include <y60/jsbase/QuitFlagSingleton.h>
+#include <asl/base/Logger.h>
 
 namespace jslib {
 

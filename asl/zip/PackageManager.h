@@ -25,8 +25,8 @@
 
 #include "IPackage.h"
 
-#include <asl/Block.h>
-#include <asl/Singleton.h>
+#include <asl/base/Block.h>
+#include <asl/base/Singleton.h>
 #include <map>
 #include <list>
 #include <string>

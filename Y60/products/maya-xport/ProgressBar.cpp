@@ -20,8 +20,8 @@
 #include "ProgressBar.h"
 #include "ExportExceptions.h"
 
-#include <asl/Time.h>
-#include <asl/string_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/string_functions.h>
 
 #include <maya/MString.h>
 #include <maya/MGlobal.h>

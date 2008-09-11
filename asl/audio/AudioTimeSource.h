@@ -14,9 +14,9 @@
 
 #include "TimeSource.h"
 
-#include <asl/Time.h>
-#include <asl/ThreadLock.h>
-#include <asl/settings.h>
+#include <asl/base/Time.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/settings.h>
 
 namespace asl {
  

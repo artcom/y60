@@ -11,7 +11,7 @@
 #ifndef _ac_jslib_JSOscSender_h_
 #define _ac_jslib_JSOscSender_h_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 #include "OscSender.h"
 

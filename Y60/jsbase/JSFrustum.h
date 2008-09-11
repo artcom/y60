@@ -14,12 +14,12 @@
 #include "JSWrapper.h"
 #include "JSEnum.h"
 
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Frustum.h>
-#include <dom/Value.h>
-#include <y60/FrustumValue.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/Frustum.h>
+#include <asl/dom/Value.h>
+#include <y60/base/FrustumValue.h>
 
 namespace jslib {
 

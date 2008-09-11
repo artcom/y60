@@ -11,7 +11,7 @@
 #ifndef _Y60_IPROGRESSNOTIFIER_INCLUDED
 #define _Y60_IPROGRESSNOTIFIER_INCLUDED
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <string>
 
 namespace y60 {

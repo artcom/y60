@@ -24,13 +24,13 @@
 #include "system_functions.h"
 #include "Projector.h"
 
-#include <dom/Nodes.h>
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Exception.h>
-#include <asl/Arguments.h>
-#include <asl/Time.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/Time.h>
 #ifndef WIN32
 #   include <asl/signal_functions.h>
 #endif

@@ -11,12 +11,12 @@
 #ifndef AC_Y60_SDLTEXTRENDERER
 #define AC_Y60_SDLTEXTRENDERER
 
-#include  <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 #include "SDLText.h"
 #include "SDLFontInfo.h"
 
-#include <y60/TTFTextRenderer.h>
-#include <y60/TextureManager.h>
+#include <y60/gltext/TTFTextRenderer.h>
+#include <y60/scene/TextureManager.h>
 
 #include <SDL/SDL.h>
 

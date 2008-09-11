@@ -22,15 +22,15 @@
 //=============================================================================
 
 #include "SDLText.h"
-#include <y60/TextRenderer.h>
+#include <y60/gltext/TextRenderer.h>
 
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/Dashboard.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Dashboard.h>
 
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <sdl/SDL_ttf.h>
+#include <SDL/ttf2/SDL_ttf.h>
 
 #include <iostream>
 

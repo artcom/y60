@@ -12,8 +12,8 @@
 #define _ac_y60_FFMpegDecoder_h_
 
 #include "FrameConveyor.h"
-#include <y60/MovieDecoderBase.h>
-#include <asl/PlugInBase.h>
+#include <y60/video/MovieDecoderBase.h>
+#include <asl/base/PlugInBase.h>
 #include <string>
 
 namespace y60 {

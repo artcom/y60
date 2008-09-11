@@ -11,8 +11,8 @@
 #ifndef _JSGRAINSOURCE_H_
 #define _JSGRAINSOURCE_H_
 
-#include <y60/JSWrapper.h>
-#include <y60/GrainSource.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/sound/GrainSource.h>
 
 namespace jslib {
 

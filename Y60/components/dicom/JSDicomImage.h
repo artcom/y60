@@ -19,7 +19,7 @@
 #ifndef _ac_y60_components_dicomimage_h_
 #define _ac_y60_components_dicomimage_h_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #ifndef WIN32
 #include <dicom/osconfig.h>
 #endif

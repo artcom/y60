@@ -43,7 +43,7 @@
 
 #include "SocketException.h"
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #ifdef WIN32
   #include <winsock2.h>

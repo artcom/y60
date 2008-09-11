@@ -11,11 +11,11 @@
 #ifndef _ac_y60_TextureManager_h_
 #define _ac_y60_TextureManager_h_
 
-#include <y60/IResourceManager.h>
-#include <y60/ITextureManager.h>
-#include <asl/Exception.h>
-#include <asl/PackageManager.h>
-#include <dom/typedefs.h>
+#include <y60/base/IResourceManager.h>
+#include <y60/image/ITextureManager.h>
+#include <asl/base/Exception.h>
+#include <asl/zip/PackageManager.h>
+#include <y60/base/typedefs.h>
 #include "ResourceManager.h"
 #include "MemoryResourceManager.h"
 

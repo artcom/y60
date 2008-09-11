@@ -13,8 +13,8 @@
 
 #include "JSWrapper.h"
 
-#include <dom/Events.h>
-#include <asl/string_functions.h>
+#include <asl/dom/Events.h>
+#include <asl/base/string_functions.h>
 
 
 struct JSObject;

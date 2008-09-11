@@ -18,7 +18,7 @@
     #include <GL/glx.h>
 #endif
 
-//#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 
 #define USE_AGP_MEMORY
 

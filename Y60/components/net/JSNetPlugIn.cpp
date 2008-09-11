@@ -22,8 +22,8 @@
 #include "JSSocket.h"
 #include "JSTCPServer.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
 	class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

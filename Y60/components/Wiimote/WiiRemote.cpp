@@ -10,10 +10,10 @@
 
 #include "WiiRemote.h"
 
-#include <asl/Logger.h>
-#include <asl/Assure.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
 
-#include <y60/GenericEvent.h>
+#include <y60/input/GenericEvent.h>
 
 using namespace std;
 using namespace asl;

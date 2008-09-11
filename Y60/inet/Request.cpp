@@ -10,11 +10,11 @@
 
 #include "Request.h"
 
-#include <asl/MappedBlock.h>
+#include <asl/base/MappedBlock.h>
 
 #include <iostream>
-#include <asl/string_functions.h>
-#include <asl/os_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/os_functions.h>
 
 
 using namespace std;

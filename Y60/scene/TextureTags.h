@@ -11,13 +11,13 @@
 #ifndef Y60_TEXTURETAGS_INCLUDED
 #define Y60_TEXTURETAGS_INCLUDED
 
-#include <y60/Image.h>
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
-#include <y60/DataTypes.h>
-#include <y60/CommonTags.h>
+#include <y60/image/Image.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/base/CommonTags.h>
 
-#include <asl/Matrix4.h>
+#include <asl/math/Matrix4.h>
 
 
 namespace dom {

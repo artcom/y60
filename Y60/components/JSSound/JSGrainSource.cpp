@@ -9,11 +9,11 @@
 //=============================================================================
 
 #include "JSGrainSource.h"
-#include <y60/JScppUtils.h>
-#include <y60/FFMpegAudioDecoder.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/sound/FFMpegAudioDecoder.h>
+#include <y60/jsbase/JSWrapper.impl>
 
-#include <asl/Pump.h>
+#include <asl/audio/Pump.h>
 
 using namespace asl;
 using namespace y60;

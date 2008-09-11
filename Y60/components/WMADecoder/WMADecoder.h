@@ -11,11 +11,11 @@
 #ifndef _WMADecoder2_H_
 #define _WMADecoder2_H_
 
-#include <y60/IAudioDecoder.h>
-#include <y60/SoundManager.h>
+#include <y60/sound/IAudioDecoder.h>
+#include <y60/sound/SoundManager.h>
 
-#include <asl/ISampleSink.h>
-#include <asl/Block.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/Block.h>
 
 #include <wmsdk/wmsdk.h>
 

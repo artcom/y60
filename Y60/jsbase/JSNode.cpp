@@ -31,10 +31,10 @@
 #include "JSEnum.h"
 #include "JSBitset.h"
 
-#include <asl/os_functions.h>
-#include <asl/Logger.h>
-#include <y60/Image.h>
-#include <xpath/xpath_api.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Logger.h>
+#include <y60/image/Image.h>
+#include <asl/xpath/xpath_api.h>
 
 
 #include <iostream>

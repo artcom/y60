@@ -12,7 +12,7 @@
 
 #include "SampleFormat.h"
 
-#include <asl/Assure.h>
+#include <asl/base/Assure.h>
 
 namespace asl {
 

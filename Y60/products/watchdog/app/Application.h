@@ -27,14 +27,14 @@
 
 #include "system_functions.h"
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include <dom/Nodes.h>
-#include <asl/ThreadLock.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/ThreadLock.h>
 
 long getElapsedSecondsToday();
 

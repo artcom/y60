@@ -17,7 +17,7 @@
 */
 
 #include "macvdCamera.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 macvdCamera::macvdCamera()
 {

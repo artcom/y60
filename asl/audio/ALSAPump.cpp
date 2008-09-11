@@ -13,15 +13,15 @@
 #include "ALSAPump.h"
 #include "AudioException.h"
 
-#include <asl/Logger.h>
-#include <asl/os_functions.h>
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Assure.h>
-#include <asl/Auto.h>
+#include <asl/base/Logger.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Assure.h>
+#include <asl/base/Auto.h>
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 #include <exception>

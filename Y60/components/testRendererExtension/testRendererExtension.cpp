@@ -19,11 +19,11 @@
 //
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/QuitFlagSingleton.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/QuitFlagSingleton.h>
 
 #include <iostream>
 #include <vector>

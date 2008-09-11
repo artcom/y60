@@ -13,7 +13,7 @@
 
 #include "TransportLayer.h"
 
-#include <asl/SerialDevice.h>
+#include <asl/serial/SerialDevice.h>
 
 namespace y60 {
 

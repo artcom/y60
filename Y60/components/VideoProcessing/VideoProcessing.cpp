@@ -25,8 +25,8 @@
 #include "Canny.h"
 #include "MaskPerson.h"
 
-#include <asl/Exception.h>
-#include <asl/Logger.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Logger.h>
 
 #include <iostream>
 

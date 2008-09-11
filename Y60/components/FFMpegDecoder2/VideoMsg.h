@@ -12,8 +12,8 @@
 #ifndef _ac_video_VideoMsg_h_
 #define _ac_video_VideoMsg_h_
 
-#include <asl/Ptr.h>
-#include <dom/Value.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Value.h>
 
 namespace y60 {
 

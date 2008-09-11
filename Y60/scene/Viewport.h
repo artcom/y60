@@ -23,12 +23,12 @@
 #ifndef _scene_Viewport_h_
 #define _scene_Viewport_h_
 
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
-#include <dom/Facade.h>
-#include <dom/AttributePlug.h>
-#include <asl/Frustum.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/math/Frustum.h>
 
 namespace y60 {
 

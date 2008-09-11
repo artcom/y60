@@ -11,11 +11,11 @@
 #ifndef _Y60_INPUT_EVENT_INCLUDED_
 #define _Y60_INPUT_EVENT_INCLUDED_
 
-#include <asl/Ptr.h>
-#include <asl/Time.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Time.h>
 #include <functional>
 
-#include <dom/typedefs.h>
+#include <asl/dom/typedefs.h>
 
 
 namespace y60 {

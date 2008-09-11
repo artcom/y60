@@ -22,8 +22,8 @@
 
 #include "PLFilterResizePadded.h"
 
-#include <asl/numeric_functions.h>
-#include <asl/Logger.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Logger.h>
 
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>

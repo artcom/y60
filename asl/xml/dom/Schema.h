@@ -32,13 +32,13 @@
 #include <set>
 
 /*
-#include <asl/settings.h>
-#include <asl/Ptr.h>
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Block.h>
-#include <asl/MemoryPool.h>
+#include <asl/base/settings.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Block.h>
+#include <asl/base/MemoryPool.h>
 
 #include <string>
 #include <vector>

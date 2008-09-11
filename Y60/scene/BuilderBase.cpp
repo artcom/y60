@@ -13,9 +13,9 @@
 
 #include "BuilderBase.h"
 
-#include <y60/NodeNames.h>
-#include <y60/CommonTags.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/CommonTags.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

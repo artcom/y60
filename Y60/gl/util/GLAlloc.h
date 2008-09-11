@@ -26,10 +26,10 @@
 #include <iostream>
 #include <map>
 
-#include <asl/Block.h>
-#include <asl/Ptr.h>
-#include <asl/Singleton.h>
-#include <asl/Logger.h>
+#include <asl/base/Block.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/Logger.h>
 
 #include "GLUtils.h"
 

@@ -20,11 +20,11 @@
 #ifndef AC_Y60_SDLTEXT
 #define AC_Y60_SDLTEXT
 
-#include <y60/Text.h>
-#include <y60/GLUtils.h>
+#include <y60/gltext/Text.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
 
 #include <SDL/SDL.h>
 

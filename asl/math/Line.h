@@ -25,7 +25,7 @@
 #include "Vector234.h"
 #include "Point234.h"
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <iostream>
 
 namespace asl {	

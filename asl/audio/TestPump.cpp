@@ -15,11 +15,11 @@
 #include "Pump.h"
 #include "DummyPump.h"
 
-#include <asl/proc_functions.h>
-#include <asl/os_functions.h>
+#include <asl/base/proc_functions.h>
+#include <asl/base/os_functions.h>
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 using namespace asl;

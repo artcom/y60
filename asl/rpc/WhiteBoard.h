@@ -24,16 +24,16 @@
 #define AC_WHITE_BOARD_INCLUDED
 
 #include <asl/XmlTypes.h>
-#include <asl/ThreadLock.h>
-#include <asl/ReadWriteLock.h>
-#include <asl/Auto.h>
-#include <asl/os_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/ReadWriteLock.h>
+#include <asl/base/Auto.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/string_functions.h>
 #include "oclient.h"
 #include "string_aux.h"
 #include "DirectorLink.h"
-#include <asl/Ptr.h>
-#include <asl/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Exception.h>
 
 #include <vector>
 #include <string>

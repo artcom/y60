@@ -19,10 +19,10 @@
 
 #include "CanvasBuilder.h"
 #include "Canvas.h"
-#include <y60/PropertyNames.h>
-#include <y60/property_functions.h>
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/property_functions.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
 
 namespace y60 {
     CanvasBuilder::CanvasBuilder(const std::string & theName) : BuilderBase(CANVAS_NODE_NAME) {

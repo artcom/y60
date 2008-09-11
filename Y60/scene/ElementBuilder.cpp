@@ -22,10 +22,10 @@
 //=============================================================================
 
 #include "ElementBuilder.h"
-#include <y60/DataTypes.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/Dashboard.h>
-#include <dom/Nodes.h>
+#include <asl/base/Dashboard.h>
+#include <asl/dom/Nodes.h>
 
 using namespace asl;
 

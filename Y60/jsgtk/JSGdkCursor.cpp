@@ -11,8 +11,8 @@
 #include "JSGdkCursor.h"
 #include "jsgtk.h"
 #include <acgtk/CustomCursors.h>
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 #include <gdk/gdkkeysyms.h>

@@ -6,7 +6,7 @@
 
 #include <clish/shell.h>
 
-#include <js/jscntxt.h>
+#include <js/spidermonkey/jscntxt.h>
 
 namespace tuttle {
 

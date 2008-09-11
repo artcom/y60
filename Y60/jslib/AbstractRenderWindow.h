@@ -16,16 +16,16 @@
 #include "JSRequestWrapper.h"
 #include "JSRequest.h"
 
-#include <y60/Canvas.h>
-#include <y60/IFrameBuffer.h>
-#include <y60/Renderer.h>
-#include <y60/TTFTextRenderer.h>
-#include <y60/IGLContextManager.h>
-#include <y60/RequestManager.h>
-#include <y60/GLContext.h>
-#include <y60/Scene.h>
-#include <y60/IEventSink.h>
-#include <y60/IEventSource.h>
+#include <y60/scene/Canvas.h>
+#include <y60/scene/IFrameBuffer.h>
+#include <y60/render/Renderer.h>
+#include <y60/gltext/TTFTextRenderer.h>
+#include <y60/glutil/IGLContextManager.h>
+#include <y60/inet/RequestManager.h>
+#include <y60/glutil/GLContext.h>
+#include <y60/scene/Scene.h>
+#include <y60/input/IEventSink.h>
+#include <y60/input/IEventSource.h>
 
 #include <list>
 

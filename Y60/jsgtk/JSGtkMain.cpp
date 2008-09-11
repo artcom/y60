@@ -17,8 +17,8 @@
 #include "JSSignal1.h"
 
 #include <acgtk/GCObserver.h>
-#include <y60/JScppUtils.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
 #include <gtkmm/main.h>
 #include <sigc++/slot.h>

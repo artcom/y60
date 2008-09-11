@@ -12,10 +12,10 @@
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 
-#include <y60/Image.h>
-#include <y60/Texture.h>
-#include <asl/Logger.h>
-#include <asl/numeric_functions.h>
+#include <y60/image/Image.h>
+#include <y60/scene/Texture.h>
+#include <asl/base/Logger.h>
+#include <asl/math/numeric_functions.h>
 
 
 using namespace std;

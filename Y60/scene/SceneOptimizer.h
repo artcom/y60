@@ -14,7 +14,7 @@
 #include "Scene.h"
 #include "Body.h"
 #include "Shape.h"
-#include <asl/Matrix4.h>
+#include <asl/math/Matrix4.h>
 
 namespace y60 {
 

@@ -10,8 +10,8 @@
 //
 //=============================================================================
 
-#include <asl/UnitTest.h>
-#include <asl/Ptr.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Ptr.h>
 
 #include "Projector.h"
 

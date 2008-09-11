@@ -12,7 +12,7 @@
 #define _Y60_INPUT_IEVENTSOURCE_INCLUDED_
 
 #include "Event.h"
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <vector>
 
 namespace y60 {

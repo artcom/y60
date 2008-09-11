@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 namespace jslib {
 

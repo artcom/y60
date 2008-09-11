@@ -21,15 +21,15 @@
 #define _ac_scene_Animation_h_
 
 #include "AnimationBase.h"
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
-#include <asl/Frustum.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/Frustum.h>
 
-#include <dom/Nodes.h>
-#include <asl/begin_end.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/begin_end.h>
 
 #include <string>
 #include <math.h>

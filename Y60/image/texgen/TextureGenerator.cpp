@@ -25,7 +25,7 @@
 //=============================================================================
 
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
 #pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
@@ -35,9 +35,9 @@
 #include "LitTerrainTexGen.h"
 #include "XmlHelper.h"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 #include <paintlib/planybmp.h>
 #include <paintlib/plpoint.h>

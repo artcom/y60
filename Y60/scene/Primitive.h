@@ -53,12 +53,12 @@
 #endif
 #endif
 
-#include <y60/DataTypes.h>
-#include <asl/Exception.h>
-#include <asl/contact.h>
-#include <dom/Nodes.h>
-#include <asl/FixedVector.h>
-#include <asl/numeric_functions.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/Exception.h>
+#include <asl/math/contact.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/FixedVector.h>
+#include <asl/math/numeric_functions.h>
 
 #include <vector>
 

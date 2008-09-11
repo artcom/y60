@@ -21,7 +21,7 @@
 
 #include "JSWrapper.h"
 
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 
 namespace jslib {
 

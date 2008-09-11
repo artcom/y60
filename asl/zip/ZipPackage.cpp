@@ -22,8 +22,8 @@
 
 #include "ZipPackage.h"
 
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
 
 
 using namespace std;

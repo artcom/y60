@@ -19,15 +19,15 @@
 #ifndef _ac_y60_MovieDecoderBase_h_
 #define _ac_y60_MovieDecoderBase_h_
 
-#include <y60/PixelEncoding.h>
-#include <y60/NodeValueNames.h>
-#include <y60/IDecoder.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/IDecoder.h>
 
-#include <asl/Ptr.h>
-#include <asl/Matrix4.h>
-#include <asl/Stream.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Stream.h>
 #include <string>
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 namespace asl {
     class ReadableBlock;

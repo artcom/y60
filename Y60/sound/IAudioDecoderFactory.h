@@ -13,7 +13,7 @@
 
 #include "IAudioDecoder.h"
 
-#include <asl/ISampleSink.h>
+#include <asl/audio/ISampleSink.h>
 
 #include <string>
 

@@ -11,7 +11,7 @@
 #ifndef JS_OSC_RECEIVER_INCLUDED
 #define JS_OSC_RECEIVER_INCLUDED
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include "OscReceiver.h"
 
 namespace jslib {

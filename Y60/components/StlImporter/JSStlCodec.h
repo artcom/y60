@@ -12,7 +12,7 @@
 #ifndef _ac_StlImporter_JSStlCodec_h_
 #define _ac_StlImporter_JSStlCodec_h_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include "StlCodec.h"
 
 namespace jslib {

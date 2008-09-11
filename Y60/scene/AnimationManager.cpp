@@ -10,9 +10,9 @@
 
 #include "AnimationManager.h"
 #include "Animation.h"
-#include <y60/typedefs.h>
-#include <y60/NodeNames.h>
-#include <asl/Frustum.h>
+#include <y60/base/typedefs.h>
+#include <y60/base/NodeNames.h>
+#include <asl/math/Frustum.h>
 
 using namespace std;
 using namespace asl;

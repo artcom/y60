@@ -22,8 +22,8 @@
 //=============================================================================
 
 #include "Statistic.h"
-#include <asl/Time.h>
-#include <asl/Logger.h>
+#include <asl/base/Time.h>
+#include <asl/base/Logger.h>
 
 #include <float.h>
 #include <math.h>

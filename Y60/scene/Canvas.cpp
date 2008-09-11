@@ -10,7 +10,7 @@
 
 #include "Scene.h"
 #include "Canvas.h"
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 using namespace std;
 

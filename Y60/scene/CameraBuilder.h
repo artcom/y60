@@ -3,7 +3,7 @@
 
 #include "TransformBuilderBase.h"
 
-#include <asl/Frustum.h>
+#include <asl/math/Frustum.h>
 
 namespace y60 {
 

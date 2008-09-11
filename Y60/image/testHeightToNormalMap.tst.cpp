@@ -22,11 +22,11 @@
 
 #include "HeightToNormalMap.h"
 
-#include <asl/linearAlgebra.h>
-#include <asl/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/numeric_functions.h>
 #include <paintlib/plpaintlibdefs.h>
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <paintlib/plpixel8.h>
 #include <paintlib/plpixel32.h>

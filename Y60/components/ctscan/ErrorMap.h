@@ -10,9 +10,9 @@
 #ifndef _ctscan_error_map_included
 #define _ctscan_error_map_included
 
-#include <asl/numeric_functions.h>
-#include <asl/Assure.h>
-#include <asl/Dashboard.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Assure.h>
+#include <asl/base/Dashboard.h>
 #include <set>
 #include <map>
 #include <vector>

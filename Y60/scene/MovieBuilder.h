@@ -12,7 +12,7 @@
 #define _ac_MovieBuilder_h_
 
 #include "ImageBuilder.h"
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 

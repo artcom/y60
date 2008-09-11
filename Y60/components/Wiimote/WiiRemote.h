@@ -14,12 +14,12 @@
 #include "WiiEvent.h"
 #include "Utils.h"
 
-#include <asl/Ptr.h>
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
 
-#include <y60/DataTypes.h>
-#include <y60/IEventSource.h>
+#include <y60/base/DataTypes.h>
+#include <y60/input/IEventSource.h>
 
 #include <queue>
 

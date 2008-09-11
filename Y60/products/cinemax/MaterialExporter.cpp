@@ -12,11 +12,11 @@
 
 #include "CinemaHelpers.h"
 
-#include <asl/Matrix4.h>
-#include <y60/property_functions.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/PropertyNames.h>
-#include <y60/Image.h>
+#include <asl/math/Matrix4.h>
+#include <y60/base/property_functions.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/image/Image.h>
 
 #if C4D_API_VERSION >= 8500
 #include <Xbitmap.h>

@@ -23,7 +23,7 @@
 #ifndef _ac_som_PLFilterWindowCW_h_
 #define _ac_som_PLFilterWindowCW_h_
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 #include <paintlib/plpaintlibdefs.h>
 #include <paintlib/Filter/plfilter.h>

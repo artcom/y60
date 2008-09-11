@@ -11,9 +11,9 @@
 #include "AssetRequest.h"
 
 #include "RequestThread.h"
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/MappedBlock.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
 
 using namespace std;
 using namespace asl;

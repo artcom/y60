@@ -10,9 +10,9 @@
 
 #include "WiimoteDriver.h"
 
-#include <y60/JSScriptablePlugin.h>
-#include <y60/Documentation.h>
-#include <y60/GenericEvent.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/Documentation.h>
+#include <y60/input/GenericEvent.h>
 
 using namespace std;
 using namespace asl;

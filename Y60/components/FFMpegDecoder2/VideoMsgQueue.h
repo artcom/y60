@@ -22,8 +22,8 @@
 
 #include "VideoMsg.h"
 
-#include <asl/ThreadSemaphore.h>
-#include <asl/ThreadLock.h>
+#include <asl/base/ThreadSemaphore.h>
+#include <asl/base/ThreadLock.h>
 #include <list>
 
 namespace y60 {

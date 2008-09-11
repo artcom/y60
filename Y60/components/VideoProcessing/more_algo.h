@@ -5,7 +5,7 @@
 
 #include <pix/matrix.h>
 #include <pix/submat.h>
-#include <pix/palgo.h>
+#include <asl/raster/palgo.h>
 #include <pm/vec2.h>
 #include <pm/box2.h>
 

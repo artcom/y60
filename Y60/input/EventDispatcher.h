@@ -17,7 +17,7 @@
 #ifndef _Y60_INPUT_EVENTDISPATCHER_INCLUDED_
 #define _Y60_INPUT_EVENTDISPATCHER_INCLUDED_
 
-#include <asl/Singleton.h>
+#include <asl/base/Singleton.h>
 
 #include "IEventSink.h"
 #include "IEventSource.h"

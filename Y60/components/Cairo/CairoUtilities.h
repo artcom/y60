@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <asl/Matrix4.h>
+#include <asl/math/Matrix4.h>
 
 #include <cairo.h>
 

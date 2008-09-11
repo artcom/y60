@@ -27,7 +27,7 @@
 #include <paintlib/Filter/plfilter.h>
 
 #include <vector>
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 class PLBmp;
 
 typedef std::vector<int> KernelVec;

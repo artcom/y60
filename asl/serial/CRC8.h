@@ -20,7 +20,7 @@
 #ifndef ASL_CRC8_INCLUDED
 #define ASL_CRC8_INCLUDED
 
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 
 namespace asl {
     

@@ -20,11 +20,11 @@
 #ifndef _ac_renderer_BodyPart_h_
 #define _ac_renderer_BodyPart_h_
 
-#include <y60/Body.h>
-#include <y60/MaterialBase.h>
-#include <y60/NodeNames.h>
+#include <y60/scene/Body.h>
+#include <y60/scene/MaterialBase.h>
+#include <y60/base/NodeNames.h>
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
 #include <map>
 

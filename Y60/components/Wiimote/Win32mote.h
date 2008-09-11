@@ -18,12 +18,12 @@
 #include "Utils.h"
 //#include "HIDDevice.h"
 
-#include <asl/Vector234.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
-#include <y60/Scene.h>
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
+#include <y60/scene/Scene.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
 
 #include <iostream>
 #include <vector>

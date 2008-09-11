@@ -10,8 +10,8 @@
 
 #include "Texture.h"
 
-#include <y60/IScene.h>
-#include <dom/Field.h>
+#include <y60/base/IScene.h>
+#include <asl/dom/Field.h>
 
 using namespace asl;
 using namespace std;

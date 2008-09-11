@@ -11,8 +11,8 @@
 
 #include "JSParticleSystem.h"
 
-#include <asl/PlugInBase.h>
-#include <y60/IScriptablePlugin.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
     class JSParticlesPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {

@@ -17,7 +17,7 @@
 #include "Effect.h"
 #include "VolumeFader.h"
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 #include <math.h>
 #include <stdlib.h>

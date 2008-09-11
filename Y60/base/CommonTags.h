@@ -24,11 +24,11 @@
 #define _xml_CommonTags_h_
 
 #include "NodeNames.h"
-#include <dom/AttributePlug.h>
-#include <asl/Frustum.h>
-#include <asl/Box.h>
-#include <asl/Singleton.h>
-#include <asl/string_functions.h>
+#include <asl/dom/AttributePlug.h>
+#include <asl/math/Frustum.h>
+#include <asl/math/Box.h>
+#include <asl/base/Singleton.h>
+#include <asl/base/string_functions.h>
 
 namespace y60 {
 

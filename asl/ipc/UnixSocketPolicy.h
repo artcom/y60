@@ -42,8 +42,8 @@
 
 #include "SocketPolicy.h"
 
-#include <asl/INetEndpoint.h>
-#include <asl/Exception.h>
+#include <asl/net/INetEndpoint.h>
+#include <asl/base/Exception.h>
 
 #include <sys/socket.h>
 #include <sys/un.h>

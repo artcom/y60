@@ -12,7 +12,7 @@
 #include "intersection.h"
 #include "linearAlgebra.h"
 
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 #include <algorithm>
 
 namespace asl {

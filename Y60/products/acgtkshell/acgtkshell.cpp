@@ -19,13 +19,13 @@
 
 #include <jsgtk/GTKApp.h>
 
-#include <y60/jssettings.h>
+#include <y60/jsbase/jssettings.h>
 #include <gtkmm.h>
 
-#include <asl/Arguments.h>
-#include <asl/string_functions.h>
-#include <asl/StdOutputRedirector.h>
-#include <asl/os_functions.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/StdOutputRedirector.h>
+#include <asl/base/os_functions.h>
 
 #include <iostream>
 

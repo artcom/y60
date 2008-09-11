@@ -12,7 +12,7 @@
 #include "TestGrainSource.h"
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 using namespace std;

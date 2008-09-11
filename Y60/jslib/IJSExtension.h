@@ -1,8 +1,8 @@
 #ifndef _IJEXTENSION_INCLUDED
 #define _IJEXTENSION_INCLUDED
 
-#include <asl/Ptr.h>
-#include <y60/PropertyValue.h>
+#include <asl/base/Ptr.h>
+#include <y60/jsbase/PropertyValue.h>
 
 struct JSContext;
 struct JSObject;

@@ -28,21 +28,21 @@
 
 #include "ShaderLibrary.h"
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
-#include <y60/NodeNames.h>
-#include <y60/PropertyNames.h>
-#include <y60/DataTypes.h>
-#include <y60/Body.h>
-#include <y60/Viewport.h>
-#include <y60/Camera.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/Body.h>
+#include <y60/scene/Viewport.h>
+#include <y60/scene/Camera.h>
 
-#include <y60/property_functions.h>
-#include <y60/glExtensions.h>
-#include <y60/GLUtils.h>
+#include <y60/base/property_functions.h>
+#include <y60/glutil/glExtensions.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <asl/string_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Logger.h>
 
 
 using namespace std;

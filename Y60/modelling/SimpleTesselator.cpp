@@ -11,13 +11,13 @@
 
 #include "SimpleTesselator.h"
 
-#include <y60/property_functions.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/PropertyNames.h>
-#include <asl/Assure.h>
-#include <asl/Matrix4.h>
-#include <asl/numeric_functions.h>
+#include <y60/base/property_functions.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/base/PropertyNames.h>
+#include <asl/base/Assure.h>
+#include <asl/math/Matrix4.h>
+#include <asl/math/numeric_functions.h>
 
 #define DB(x) // x
 #define DB2(x) // x

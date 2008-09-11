@@ -15,8 +15,8 @@
 #ifndef INCL_Y60_OSCSENDER
 #define INCL_Y60_OSCSENDER
 
-#include <asl/UDPConnection.h>
-#include <dom/Nodes.h>
+#include <asl/net/UDPConnection.h>
+#include <asl/dom/Nodes.h>
 #include <oscpack/osc/OscOutboundPacketStream.h>
 
 namespace y60 {

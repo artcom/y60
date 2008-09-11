@@ -22,8 +22,8 @@
 //=============================================================================
 
 #include "LightBuilder.h"
-#include <y60/NodeNames.h>
-#include <dom/Nodes.h>
+#include <y60/base/NodeNames.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
     LightBuilder::LightBuilder(const std::string & theLightSourceId, const std::string & theName)

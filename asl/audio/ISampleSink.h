@@ -15,7 +15,7 @@
 
 #include "AudioBufferBase.h"
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace asl {
 

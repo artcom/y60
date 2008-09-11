@@ -10,11 +10,11 @@
 
 #include "FFMpegDecoder1.h"
 
-#include <y60/Movie.h>
+#include <y60/video/Movie.h>
 
-#include <asl/Logger.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 

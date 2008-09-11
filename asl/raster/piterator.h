@@ -46,8 +46,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include <asl/settings.h>
-#include <asl/numeric_functions.h>
+#include <asl/base/settings.h>
+#include <asl/math/numeric_functions.h>
 #include <assert.h>
 #include <iterator>
 #include "fraction.h"

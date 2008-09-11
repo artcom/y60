@@ -13,14 +13,14 @@
 
 #include "VertexIndexBuilder.h"
 
-#include <y60/Scene.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/MaterialBuilder.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
 
-#include <dom/Nodes.h>
-#include <asl/Vector234.h>
-#include <asl/PerlinNoise.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/PerlinNoise.h>
 
 #include <string>
 #include <iostream>

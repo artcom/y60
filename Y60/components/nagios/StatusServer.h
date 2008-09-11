@@ -13,9 +13,9 @@
 #ifndef y60_inet_statusserver_included
 #define y60_inet_statusserver_included
 
-#include <asl/ConduitAcceptor.h>
-#include <asl/TCPPolicy.h>
-#include <asl/ReadWriteLock.h>
+#include <asl/ipc/ConduitAcceptor.h>
+#include <asl/ipc/TCPPolicy.h>
+#include <asl/base/ReadWriteLock.h>
 
 namespace inet {
     

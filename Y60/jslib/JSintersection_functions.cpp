@@ -10,14 +10,14 @@
 
 #include "JSintersection_functions.h"
 
-#include <y60/JSLine.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSSphere.h>
-#include <y60/JSVector.h>
-#include <y60/JSMatrix.h>
-#include <y60/JSNode.h>
-#include <y60/JScppUtils.h>
-#include <y60/JScppUtils.impl>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSMatrix.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.impl>
 
 /*
 found at http://www.gamedev.net/columns/hardcore/dxshader2/page3.asp

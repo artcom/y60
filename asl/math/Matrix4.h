@@ -27,7 +27,7 @@
 #include "Point234.h"
 #include "numeric_functions.h"
 
-#include <asl/Enum.h>
+#include <asl/base/Enum.h>
 
 namespace asl {
 

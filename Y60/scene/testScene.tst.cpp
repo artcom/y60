@@ -24,11 +24,11 @@
 #include "Body.h"
 #include "TextureManager.h"
 
-#include <y60/Y60xsd.h>
-#include <asl/file_functions.h>
-#include <asl/UnitTest.h>
-#include <dom/Nodes.h>
-#include <dom/Schema.h>
+#include <y60/base/Y60xsd.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/UnitTest.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Schema.h>
 
 #include <string>
 #include <iostream>

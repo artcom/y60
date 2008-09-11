@@ -8,18 +8,18 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/JSNode.h>
-#include <y60/IRendererExtension.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
-#include <y60/GLUtils.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
+#include <y60/glutil/GLUtils.h>
 
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Exception.h>
-#include <asl/Logger.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Logger.h>
 
 #include <iostream>
 

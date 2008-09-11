@@ -22,9 +22,9 @@
 
 #include "MaterialExporter.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/DataTypes.h>
-#include <asl/Ptr.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/base/DataTypes.h>
+#include <asl/base/Ptr.h>
 
 #include <maya/MFnMesh.h>
 #include <maya/MPointArray.h>

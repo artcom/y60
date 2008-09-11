@@ -12,8 +12,8 @@
 #define _ac_DShowCapture_DXSampleGrabber_h_
 
 #include <qedit.h>
-#include <dom/Value.h>
-#include <asl/ThreadLock.h>
+#include <asl/dom/Value.h>
+#include <asl/base/ThreadLock.h>
 //#include <afxmt.h>
 
 namespace y60 {

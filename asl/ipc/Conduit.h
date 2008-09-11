@@ -42,10 +42,10 @@
 
 #include "ConduitPolicy.h"
 
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <asl/Time.h>
-#include <asl/Block.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Time.h>
+#include <asl/base/Block.h>
 
 namespace asl {
 

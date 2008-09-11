@@ -16,7 +16,7 @@
 #define _ac_watchdog_Projector_h_
 
 #include <string>
-#include <dom/typedefs.h>
+#include <y60/base/typedefs.h>
 
 namespace asl {
     class SerialDevice;

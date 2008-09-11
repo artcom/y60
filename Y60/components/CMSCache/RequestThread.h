@@ -14,11 +14,11 @@
 
 #include "AssetRequest.h"
 
-#include <dom/Nodes.h>
-#include <asl/PosixThread.h>
-#include <asl/ThreadFifo.h>
-#include <asl/ReadWriteLock.h>
-#include <y60/RequestManager.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadFifo.h>
+#include <asl/base/ReadWriteLock.h>
+#include <y60/inet/RequestManager.h>
 
 namespace y60 {
 

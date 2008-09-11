@@ -23,7 +23,7 @@
 #include "Pump.h"
 
 #include <string>
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 class TestPump: public UnitTest{
     public:

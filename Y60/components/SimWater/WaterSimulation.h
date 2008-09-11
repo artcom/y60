@@ -12,12 +12,12 @@
 #ifndef _WaterSimulation_h_
 #define _WaterSimulation_h_
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
-#include <asl/ThreadSemaphore.h>
-#include <asl/Logger.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/ThreadSemaphore.h>
+#include <asl/base/Logger.h>
 
 #include <stdio.h>
 #include <iostream>

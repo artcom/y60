@@ -10,9 +10,9 @@
 
 #include "CacheReader.h"
 
-#include <asl/Auto.h>
-#include <asl/Pump.h>
-#include <asl/Assure.h>
+#include <asl/base/Auto.h>
+#include <asl/audio/Pump.h>
+#include <asl/base/Assure.h>
 
 using namespace std;
 using namespace asl;

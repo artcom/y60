@@ -14,12 +14,12 @@
 #include "DvbTeleText.h"
 #include <sstream>
 #include <iostream>
-#include <asl/Auto.h>
-#include <asl/settings.h>
-#include <asl/Logger.h>
-#include <asl/string_functions.h>
+#include <asl/base/Auto.h>
+#include <asl/base/settings.h>
+#include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
 
-#include <y60/ArgumentHolder.impl>
+#include <y60/jsbase/ArgumentHolder.impl>
 
 #define MAX_PES_SIZE (4*1024)
 

@@ -24,7 +24,7 @@
 #ifndef _xml_Nodes_h_included_
 #define _xml_Nodes_h_included_
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #include "typedefs.h"
 #include "Exceptions.h"

@@ -30,8 +30,8 @@
 #include "standard_pixel_types.h"
 #include "pixel_functions.h"
 
-#include <asl/UnitTest.h>
-#include <asl/Time.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
 
 using namespace std;  
 using namespace asl;  

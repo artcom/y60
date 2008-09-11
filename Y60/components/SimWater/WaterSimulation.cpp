@@ -33,7 +33,7 @@
 
 
 #include "WaterSimulation.h"
-#include <asl/ThreadSemaphore.h>
+#include <asl/base/ThreadSemaphore.h>
 
 using namespace std;  // automatically added!
 

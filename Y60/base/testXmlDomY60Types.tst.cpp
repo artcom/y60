@@ -25,11 +25,11 @@
 #include "DataTypes.h"
 #include "Y60xsd.h"
 
-#include <dom/Nodes.h>
-#include <dom/Schema.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Schema.h>
 
-#include <asl/UnitTest.h>
-#include <asl/linearAlgebra.h>
+#include <asl/base/UnitTest.h>
+#include <asl/math/linearAlgebra.h>
 
 #include <fstream>
 

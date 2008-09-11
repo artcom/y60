@@ -10,7 +10,7 @@
 
 
 #ifdef OSX
-#include <y60/GLUtils.h>
+#include <y60/glutil/GLUtils.h>
 #undef check
 #undef notify
 #undef verify
@@ -20,14 +20,14 @@
 
 #include "RenderArea.h"
 
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Exception.h>
-#include <y60/JSApp.h>
-#include <y60/ScopedGLContext.h>
-#include <y60/EventDispatcher.h>
-#include <y60/GLResourceManager.h>
-#include <y60/GLUtils.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Exception.h>
+#include <y60/jslib/JSApp.h>
+#include <y60/glutil/ScopedGLContext.h>
+#include <y60/input/EventDispatcher.h>
+#include <y60/render/GLResourceManager.h>
+#include <y60/glutil/GLUtils.h>
 
 #include <glade/glade.h>
 #include <gtk/gtkgl.h>

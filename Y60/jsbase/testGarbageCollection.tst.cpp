@@ -10,20 +10,20 @@
 //==============================================================================
 
 
-#include <asl/UnitTest.h>
-#include <asl/Logger.h>
-#include <y60/jssettings.h>
-#include <y60/JSVector.h>
-#include <js/jsapi.h>
-#include <js/jsprf.h>
-#include <js/jsparse.h>
-#include <js/jsscan.h>
-#include <js/jsemit.h>
-#include <js/jsscript.h>
-#include <js/jsarena.h>
-#include <js/jscntxt.h>
-#include <js/jsdbgapi.h>
-#include <js/jsscope.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/Logger.h>
+#include <y60/jsbase/jssettings.h>
+#include <y60/jsbase/JSVector.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jsprf.h>
+#include <js/spidermonkey/jsparse.h>
+#include <js/spidermonkey/jsscan.h>
+#include <js/spidermonkey/jsemit.h>
+#include <js/spidermonkey/jsscript.h>
+#include <js/spidermonkey/jsarena.h>
+#include <js/spidermonkey/jscntxt.h>
+#include <js/spidermonkey/jsdbgapi.h>
+#include <js/spidermonkey/jsscope.h>
 
 #include <errno.h>
 

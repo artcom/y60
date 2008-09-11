@@ -11,7 +11,7 @@
 #ifndef _ac_y60_rankedfeature_h_
 #define _ac_y60_rankedfeature_h_
 
-#include <asl/Stream.h>
+#include <asl/base/Stream.h>
 
 #include <string>
 #include <vector>

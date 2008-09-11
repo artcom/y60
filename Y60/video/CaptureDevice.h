@@ -21,12 +21,12 @@
 #define _ac_video_CaptureDevice_h_
 
 #include "Capture.h"
-#include <y60/NodeNames.h>
-#include <y60/NodeValueNames.h>
-#include <y60/IDecoder.h>
-#include <y60/PixelEncoding.h>
-#include <y60/Image.h>
-#include <dom/Value.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/IDecoder.h>
+#include <y60/image/PixelEncoding.h>
+#include <y60/image/Image.h>
+#include <asl/dom/Value.h>
 
 namespace y60 {
     

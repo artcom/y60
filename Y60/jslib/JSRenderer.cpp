@@ -9,15 +9,15 @@
 //=============================================================================
 
 #include "JSRenderer.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSBox.h>
-#include <y60/JSVector.h>
-#include <y60/JSLine.h>
-#include <y60/JSTriangle.h>
-#include <y60/JSSphere.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSBox.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSLine.h>
+#include <y60/jsbase/JSTriangle.h>
+#include <y60/jsbase/JSSphere.h>
 #include "JSBSpline.h"
 #include "JSSvgPath.h"
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 

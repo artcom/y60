@@ -19,26 +19,26 @@
 //
 //=============================================================================
 
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
-#include <y60/NodeNames.h>
-#include <y60/KeyEvent.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
+#include <y60/base/NodeNames.h>
+#include <y60/input/KeyEvent.h>
 
-#include <asl/Station.h>
-#include <asl/MappedBlock.h>
-#include <asl/Dashboard.h>
+#include <asl/net/Station.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Dashboard.h>
 
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
-#include <asl/ConduitServer.h>
-#include <asl/ConduitAcceptor.h>
-#include <asl/TCPPolicy.h>
-#include <asl/MessageAcceptor.h>
-#include <asl/net_functions.h>
+#include <asl/ipc/ConduitServer.h>
+#include <asl/ipc/ConduitAcceptor.h>
+#include <asl/ipc/TCPPolicy.h>
+#include <asl/ipc/MessageAcceptor.h>
+#include <asl/net/net_functions.h>
 
 #include <iostream>
 

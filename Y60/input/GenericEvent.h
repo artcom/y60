@@ -13,7 +13,7 @@
 
 #include "Event.h"
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

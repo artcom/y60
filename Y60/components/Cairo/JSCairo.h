@@ -11,9 +11,9 @@
 #ifndef _Y60_CAIRO_JSCAIRO_INCLUDED_
 #define _Y60_CAIRO_JSCAIRO_INCLUDED_
 
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 extern "C" {
 #include <cairo/cairo.h>

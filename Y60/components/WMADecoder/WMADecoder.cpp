@@ -11,9 +11,9 @@
 #include "WMADecoder.h"
 #include "WMHelper.h"
 
-#include <asl/Auto.h>
-#include <asl/Pump.h>
-#include <asl/string_functions.h>
+#include <asl/base/Auto.h>
+#include <asl/audio/Pump.h>
+#include <asl/base/string_functions.h>
 
 #include <atlbase.h> // For CComPtr and CComQIPtr
 #include <dsound.h>  // For the DSSPEAKER_5POINT1 value

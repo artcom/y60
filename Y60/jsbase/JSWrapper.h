@@ -14,14 +14,14 @@
 #include "Documentation.h"
 #include "JScppUtils.h"
 #include "ArgumentHolder.h"
-#include <js/jspubtd.h>
-#include <js/jsapi.h>
-#include <js/jscntxt.h>
-#include <js/jsgc.h>
-#include <js/jslock.h>
-#include <js/jsnum.h>
-#include <dom/Nodes.h>
-#include <asl/Singleton.h>
+#include <js/spidermonkey/jspubtd.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jscntxt.h>
+#include <js/spidermonkey/jsgc.h>
+#include <js/spidermonkey/jslock.h>
+#include <js/spidermonkey/jsnum.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Singleton.h>
 
 #include <set>
 

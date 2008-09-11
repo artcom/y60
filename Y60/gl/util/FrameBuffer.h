@@ -25,10 +25,10 @@
 #define AC_Y60_FRAMEBUFFER_INCLUDED
 
 #include "GLContext.h"
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
 
-#include <y60/IFrameBuffer.h>
+#include <y60/scene/IFrameBuffer.h>
 
 #include <vector>
 #include <string>

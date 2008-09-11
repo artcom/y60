@@ -11,7 +11,7 @@
 #ifndef _ac_y60_AudioFrame_h_
 #define _ac_y60_AudioFrame_h_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 

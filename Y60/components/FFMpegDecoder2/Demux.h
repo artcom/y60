@@ -11,7 +11,7 @@
 #ifndef _ac_y60_Demux_h_
 #define _ac_y60_Demux_h_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4244)

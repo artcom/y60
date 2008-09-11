@@ -41,7 +41,7 @@
 #include "SocketException.h"
 #include "net.h"
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 #include <algorithm>

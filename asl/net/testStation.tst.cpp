@@ -42,11 +42,11 @@
 #include "net.h"
 #include "net_functions.h"
 
-#include <asl/UnitTest.h>
-#include <asl/string_functions.h>
-#include <asl/os_functions.h>
-#include <asl/Time.h>
-#include <asl/Logger.h>
+#include <asl/base/UnitTest.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/Logger.h>
 
 #include <string>
 #include <iostream>

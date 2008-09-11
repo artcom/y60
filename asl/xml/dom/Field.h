@@ -27,7 +27,7 @@
 #include "typedefs.h"
 #include "Exceptions.h"
 #include <vector>
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 
 namespace dom {

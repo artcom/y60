@@ -24,8 +24,8 @@
 #define _included_asl_Vector_
 
 #include "FixedVector.h"
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
 #include <math.h>
 
 namespace asl {

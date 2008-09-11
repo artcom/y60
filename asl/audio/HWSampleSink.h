@@ -19,10 +19,10 @@
 #include "VolumeFader.h"
 #include "ExternalTimeSource.h"
 
-#include <asl/Time.h>
-#include <asl/Block.h>
-#include <asl/ThreadLock.h>
-#include <asl/settings.h>
+#include <asl/base/Time.h>
+#include <asl/base/Block.h>
+#include <asl/base/ThreadLock.h>
+#include <asl/base/settings.h>
 
 #include <string>
 #include <list>

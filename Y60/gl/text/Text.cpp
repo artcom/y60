@@ -24,7 +24,7 @@
 #include "Text.h"
 #include "TextRenderer.h"
 
-#include <asl/Vector234.h>
+#include <asl/math/Vector234.h>
 
 using namespace std;
 using namespace asl;

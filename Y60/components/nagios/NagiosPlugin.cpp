@@ -9,16 +9,16 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <asl/net.h>
-#include <asl/INetEndpoint.h>
-#include <asl/ConduitAcceptor.h>
-#include <asl/TCPPolicy.h>
-#include <asl/PlugInBase.h>
-#include <y60/IRendererExtension.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/AbstractRenderWindow.h>
-#include <y60/Scene.h>
+#include <asl/net/net.h>
+#include <asl/net/INetEndpoint.h>
+#include <asl/ipc/ConduitAcceptor.h>
+#include <asl/ipc/TCPPolicy.h>
+#include <asl/base/PlugInBase.h>
+#include <y60/jslib/IRendererExtension.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
+#include <y60/scene/Scene.h>
 
 #include <iostream>
 

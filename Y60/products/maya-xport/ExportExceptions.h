@@ -20,7 +20,7 @@
 #ifndef _ac_maya_xport_exceptions_h_
 #define _ac_maya_xport_exceptions_h_
 
-#include <asl/Exception.h>
+#include <asl/base/Exception.h>
 
 DEFINE_EXCEPTION(ExportException, asl::Exception)
 DEFINE_EXCEPTION(MayaException, ExportException)

@@ -20,10 +20,10 @@
 #ifndef _ac_scene_AnimationBase_h_
 #define _ac_scene_AnimationBase_h_
 
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
-#include <y60/NodeValueNames.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
+#include <y60/base/NodeValueNames.h>
 
 #include <string>
 #include <math.h>

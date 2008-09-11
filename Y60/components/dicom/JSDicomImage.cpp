@@ -18,10 +18,10 @@
 
 #include "JSDicomImage.h"
 
-#include <y60/JSVector.h>
-#include <y60/JSNode.h>
-#include <y60/Image.h>
-#include <dom/Nodes.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/image/Image.h>
+#include <asl/dom/Nodes.h>
 
 #include <iostream>
 

@@ -23,12 +23,12 @@
 #include "JSSigConnection.h"
 #include "jsgtk.h"
 #include <acgtk/GCObserver.h>
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <libglademm/xml.h>
 #include <sigc++/slot.h>
 #include <sigc++/connection.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

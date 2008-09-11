@@ -27,7 +27,7 @@
 #include "TerrainTexGen.h"
 #include "TextureDefinition.h"
 
-#include <asl/UnitTest.h>
+#include <asl/base/UnitTest.h>
 
 class TestXMLTexGen: public UnitTest {
 public:

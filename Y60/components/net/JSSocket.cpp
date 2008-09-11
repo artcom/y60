@@ -10,14 +10,14 @@
 
 #include "JSSocket.h"
 
-#include <asl/net.h>
-#include <asl/SocketException.h>
-#include <asl/UDPConnection.h>
-#include <asl/TCPClientSocket.h>
-#include <asl/os_functions.h>
-#include <asl/net_functions.h>
-#include <y60/JSBlock.h>
-#include <y60/JSWrapper.impl>
+#include <asl/net/net.h>
+#include <asl/net/SocketException.h>
+#include <asl/net/UDPConnection.h>
+#include <asl/net/TCPClientSocket.h>
+#include <asl/base/os_functions.h>
+#include <asl/net/net_functions.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
 

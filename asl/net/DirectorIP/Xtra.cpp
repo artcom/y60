@@ -37,8 +37,8 @@
  *	for this particular class. In addition, this file may include other .h
  *	files defining additional callback interfaces for use by a third party.
  ****************************************************************************/
-#include <asl/TCPClientSocket.h>
-#include <asl/UDPSocket.h>
+#include <asl/net/TCPClientSocket.h>
+#include <asl/net/UDPSocket.h>
 
 #include "Script.h"
 #include "Register.h"

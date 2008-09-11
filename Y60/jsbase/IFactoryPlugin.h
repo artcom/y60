@@ -20,7 +20,7 @@
 #define _ac_jslib_IFactoryPlugin_h_
 
 #include "IScriptablePlugin.h"
-#include <dom/Nodes.h>
+#include <asl/dom/Nodes.h>
 
 namespace jslib {
 	struct IFactoryPlugin {

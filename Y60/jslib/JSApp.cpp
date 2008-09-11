@@ -12,55 +12,55 @@
 #include "IRendererExtension.h"
 
 #include "jscpp.h"
-#include <y60/JScppUtils.h>
-#include <y60/JScppUtils.impl>
-#include <y60/JSNode.h>
-#include <y60/JSBlock.h>
-#include <y60/JSVector.h>
-#include <y60/JSScriptablePlugin.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/IFactoryPlugin.h>
-#include <y60/QuitFlagSingleton.h>
-#include <y60/Documentation.h>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.impl>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/IFactoryPlugin.h>
+#include <y60/jsbase/QuitFlagSingleton.h>
+#include <y60/jsbase/Documentation.h>
 
-#include <asl/string_functions.h>
-#include <asl/file_functions.h>
-#include <asl/DirectoryPackage.h>
-#include <asl/os_functions.h>
-#include <asl/Time.h>
-#include <asl/MappedBlock.h>
-#include <asl/Arguments.h>
-#include <asl/PlugInManager.h>
-#include <asl/Logger.h>
-#include <asl/Revision.h>
-#include <asl/numeric_functions.h>
-#include <asl/checksum.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/zip/DirectoryPackage.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/Time.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Arguments.h>
+#include <asl/base/PlugInManager.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Revision.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/checksum.h>
 
 #ifndef WIN32
-#   include <asl/signal_functions.h>
+#   include <asl/base/signal_functions.h>
 #endif
 
-#include <js/jsapi.h>
-#include <js/jsprf.h>
-#include <js/jsparse.h>
-#include <js/jsscan.h>
-#include <js/jsemit.h>
-#include <js/jsscript.h>
-#include <js/jsarena.h>
-#include <js/jscntxt.h>
-#include <js/jsdbgapi.h>
+#include <js/spidermonkey/jsapi.h>
+#include <js/spidermonkey/jsprf.h>
+#include <js/spidermonkey/jsparse.h>
+#include <js/spidermonkey/jsscan.h>
+#include <js/spidermonkey/jsemit.h>
+#include <js/spidermonkey/jsscript.h>
+#include <js/spidermonkey/jsarena.h>
+#include <js/spidermonkey/jscntxt.h>
+#include <js/spidermonkey/jsdbgapi.h>
 
-#include <y60/IPaintLibExtension.h>
+#include <y60/image/IPaintLibExtension.h>
 #include <paintlib/planydec.h>
 
-#include <y60/IDecoder.h>
-#include <y60/DecoderManager.h>
-#include <y60/IEventSource.h>
-#include <y60/EventDispatcher.h>
-#include <y60/Image.h>
-#include <y60/Texture.h>
-#include <y60/CommonTags.h>
-#include <y60/Request.h>
+#include <y60/base/IDecoder.h>
+#include <y60/base/DecoderManager.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/EventDispatcher.h>
+#include <y60/image/Image.h>
+#include <y60/scene/Texture.h>
+#include <y60/base/CommonTags.h>
+#include <y60/inet/Request.h>
 
 #include <errno.h>
 #include <stdio.h>

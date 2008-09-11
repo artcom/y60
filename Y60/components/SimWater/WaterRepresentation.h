@@ -14,9 +14,9 @@
 
 #include "WaterSimulation.h"
 
-#include <asl/Ptr.h>
-#include <asl/Vector234.h>
-#include <asl/string_functions.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/string_functions.h>
 
 #include <GL/gl.h>
 #include <stdio.h>

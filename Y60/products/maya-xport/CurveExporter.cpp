@@ -19,19 +19,19 @@
 #include "CurveExporter.h"
 #include "MayaHelpers.h"
 
-#include <y60/SceneBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/MaterialBuilder.h>
-#include <y60/ElementBuilder.h>
-#include <y60/PropertyNames.h>
-#include <y60/WorldBuilderBase.h>
-#include <y60/property_functions.h>
-#include <y60/Body.h>
-#include <y60/DataTypes.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/ElementBuilder.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/scene/WorldBuilderBase.h>
+#include <y60/base/property_functions.h>
+#include <y60/scene/Body.h>
+#include <y60/base/DataTypes.h>
 
-#include <asl/string_functions.h>
-#include <asl/Dashboard.h>
-#include <dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Dashboard.h>
+#include <asl/dom/Nodes.h>
 
 #include <maya/MStatus.h>
 #include <maya/MPoint.h>

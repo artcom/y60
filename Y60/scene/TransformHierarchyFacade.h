@@ -23,16 +23,16 @@
 #ifndef _xml_TransformHierarchyFacades_h_
 #define _xml_TransformHierarchyFacades_h_
 
-#include <y60/CommonTags.h>
-#include <y60/NodeNames.h>
-#include <y60/DataTypes.h>
+#include <y60/base/CommonTags.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/DataTypes.h>
 
-#include <dom/Facade.h>
-#include <dom/AttributePlug.h>
+#include <asl/dom/Facade.h>
+#include <asl/dom/AttributePlug.h>
 
-#include <asl/Matrix4.h>
-#include <asl/Box.h>
-#include <asl/Vector234.h>
+#include <asl/math/Matrix4.h>
+#include <asl/math/Box.h>
+#include <asl/math/Vector234.h>
 
 namespace y60 {
     //                  theTagName           theType           theAttributeName               theDefault

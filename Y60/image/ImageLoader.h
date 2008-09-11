@@ -13,12 +13,12 @@
 
 #include "PixelEncoding.h"
 #include "ITextureManager.h"
-#include <y60/NodeValueNames.h>
+#include <y60/base/NodeValueNames.h>
 
-#include <asl/Ptr.h>
-#include <asl/Matrix4.h>
-#include <asl/Stream.h>
-#include <asl/PackageManager.h>
+#include <asl/base/Ptr.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Stream.h>
+#include <asl/zip/PackageManager.h>
 
 // Dumb hack since paintlib is installed as a non-debug variant
 #ifdef _DEBUG

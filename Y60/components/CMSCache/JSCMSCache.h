@@ -12,7 +12,7 @@
 #define _ac_y60_components_jsCMSCache_h_
 
 #include "CMSCache.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
     

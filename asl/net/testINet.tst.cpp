@@ -44,8 +44,8 @@
 #include "TestSocket.h"
 #include "net.h"
 
-#include <asl/Logger.h>
-#include <asl/settings.h>
+#include <asl/base/Logger.h>
+#include <asl/base/settings.h>
 
 using namespace std;
 using namespace inet;

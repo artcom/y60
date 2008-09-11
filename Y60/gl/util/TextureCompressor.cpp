@@ -22,9 +22,9 @@
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 
-#include <asl/settings.h>
-#include <asl/file_functions.h>
-#include <asl/Logger.h>
+#include <asl/base/settings.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Logger.h>
 
 #ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
 #pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
@@ -46,7 +46,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
-#include <asl/numeric_functions.h>
+#include <asl/math/numeric_functions.h>
 
 
 namespace y60 {

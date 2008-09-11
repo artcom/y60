@@ -19,7 +19,7 @@
 #define ASL_COM_PORT_INCLUDED
 
 #include "SerialDevice.h"
-#include <asl/Block.h>
+#include <asl/base/Block.h>
 #include <string>
 #include <windows.h>
 

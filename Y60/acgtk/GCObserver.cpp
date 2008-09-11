@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include "GCObserver.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 namespace jslib {
 

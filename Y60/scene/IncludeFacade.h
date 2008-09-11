@@ -20,9 +20,9 @@
 #ifndef _ac_scene_IncludeFacade_h_
 #define _ac_scene_IncludeFacade_h_
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include "TransformHierarchyFacade.h"
-#include <y60/NodeValueNames.h>
+#include <y60/base/NodeValueNames.h>
 
 namespace y60 {
     //                  theTagName     theType      theAttributeName         theDefault

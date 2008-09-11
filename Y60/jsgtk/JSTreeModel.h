@@ -11,10 +11,10 @@
 #ifndef _Y60_ACGTKSHELL_JSTREEMODEL_INCLUDED_
 #define _Y60_ACGTKSHELL_JSTREEMODEL_INCLUDED_
 
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/treemodel.h>
 
-#include <asl/string_functions.h>
+#include <asl/base/string_functions.h>
 
 namespace jslib {
 

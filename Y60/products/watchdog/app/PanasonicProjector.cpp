@@ -15,11 +15,11 @@
 #include "PanasonicProjector.h"
 #include "Logger.h"
 
-#include <asl/SerialDevice.h>
-#include <asl/string_functions.h>
-#include <asl/Exception.h>
-#include <asl/Time.h>
-#include <dom/Nodes.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Time.h>
+#include <asl/dom/Nodes.h>
 
 #include <iostream>
 #include <strstream>

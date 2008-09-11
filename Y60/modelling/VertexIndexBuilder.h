@@ -19,7 +19,7 @@
 #ifndef ac_y60_VertexIndexBuilder_included
 #define ac_y60_VertexIndexBuilder_included
 
-#include <y60/ElementBuilder.h>
+#include <y60/scene/ElementBuilder.h>
 //#include <string>
 
 // TODO:

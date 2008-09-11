@@ -11,11 +11,11 @@
 #ifndef AC_Y60_SIMPLE_TESSELATOR_FUNCTIONS_INCLUDED
 #define AC_Y60_SIMPLE_TESSELATOR_FUNCTIONS_INCLUDED
 
-#include <y60/Scene.h>
+#include <y60/scene/Scene.h>
 
-#include <dom/Nodes.h>
-#include <asl/Vector234.h>
-#include <asl/Exception.h>
+#include <asl/dom/Nodes.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Exception.h>
 
 #include <string>
 #include <iostream>

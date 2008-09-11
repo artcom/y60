@@ -10,9 +10,9 @@
 
 #include "JSGLResourceManager.h"
 #include "JSApp.h"
-#include <y60/JSWrapper.impl>
-#include <y60/GLResourceManager.h>
-#include <asl/os_functions.h>
+#include <y60/jsbase/JSWrapper.impl>
+#include <y60/render/GLResourceManager.h>
+#include <asl/base/os_functions.h>
 
 using namespace std;
 using namespace asl;

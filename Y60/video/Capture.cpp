@@ -1,7 +1,7 @@
 #include "Capture.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 #include "CaptureDevice.h"
-#include <y60/DecoderManager.h>
+#include <y60/base/DecoderManager.h>
 
 using namespace dom;
 using namespace std;

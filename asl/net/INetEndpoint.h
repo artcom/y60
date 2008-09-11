@@ -41,7 +41,7 @@
 #ifndef INCL_INET_ENDPOINT
 #define INCL_INET_ENDPOINT
 
-#include <asl/settings.h>
+#include <asl/base/settings.h>
 
 #ifdef WIN32
     #include <winsock2.h>

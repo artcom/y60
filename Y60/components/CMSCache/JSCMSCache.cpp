@@ -9,12 +9,12 @@
 //=============================================================================
 
 #include "JSCMSCache.h"
-#include <y60/JSEnum.h>
-#include <y60/JSNode.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSEnum.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSWrapper.impl>
 
 
-#include <asl/PackageManager.h>
+#include <asl/zip/PackageManager.h>
 
 #include <iostream>
 

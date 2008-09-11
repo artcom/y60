@@ -23,7 +23,7 @@
 #ifndef _GLUR_FILTER_h_
 #define _GLUR_FILTER_h_
 
-#include <y60/DataTypes.h>
+#include <y60/base/DataTypes.h>
 
 #include <paintlib/plpaintlibdefs.h>
 #include <paintlib/Filter/plfilter.h>

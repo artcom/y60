@@ -22,12 +22,12 @@
 #include "CoreAudioPump.h"
 #endif
 
-#include <asl/Auto.h>
-#include <asl/os_functions.h>
-#include <asl/string_functions.h>
+#include <asl/base/Auto.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/string_functions.h>
 
 #ifdef USE_DASHBOARD
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 #endif
 
 

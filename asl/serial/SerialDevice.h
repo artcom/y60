@@ -12,8 +12,8 @@
 #ifndef ASL_SERIAL_DEVICE_INCLUDED
 #define ASL_SERIAL_DEVICE_INCLUDED
 
-#include <asl/Enum.h>
-#include <asl/Exception.h>
+#include <asl/base/Enum.h>
+#include <asl/base/Exception.h>
 #include <string>
 
 namespace asl {

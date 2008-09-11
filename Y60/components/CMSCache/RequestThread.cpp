@@ -9,9 +9,9 @@
 //==============================================================================
 
 #include "RequestThread.h"
-#include <y60/Request.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
+#include <y60/inet/Request.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
 
 #include <curl/curl.h>
 

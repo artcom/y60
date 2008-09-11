@@ -33,16 +33,16 @@ extern "C" {
 #pragma warning( default : 4244 ) // Renable ffmpeg warning
 #endif
 
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/os_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/os_functions.h>
 
 #ifdef STOP_TIMER
 // name class with macro in avutil/common.h 
 #undef STOP_TIMER
 #undef START_TIMER
 #endif
-#include <asl/Dashboard.h>
+#include <asl/base/Dashboard.h>
 
 #define DB(x) //x
 

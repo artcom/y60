@@ -11,16 +11,16 @@
 
 #include "SDLTextRenderer.h"
 
-#include <y60/Image.h>
+#include <y60/image/Image.h>
 
-#include <asl/numeric_functions.h>
-#include <asl/file_functions.h>
-#include <asl/Dashboard.h>
-#include <asl/Logger.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/Logger.h>
 
 #include <iostream>
 
-#include <sdl/SDL_ttf.h>
+#include <SDL/ttf2/SDL_ttf.h>
 
 #define DB(x) //x
 #define DB2(x) //x

@@ -13,9 +13,9 @@
 #ifndef _TESTGRAINSOURCE_H_
 #define _TESTGRAINSOURCE_H_
 
-#include <asl/UnitTest.h>
-#include <asl/Pump.h>
-#include <y60/FFMpegAudioDecoder.h>
+#include <asl/base/UnitTest.h>
+#include <asl/audio/Pump.h>
+#include <y60/sound/FFMpegAudioDecoder.h>
 
 #include "GrainSource.h"
 

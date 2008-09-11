@@ -20,7 +20,7 @@
 #define _ac_y60_JSTaskWindow_h_
 
 #include "TaskWindow.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
 

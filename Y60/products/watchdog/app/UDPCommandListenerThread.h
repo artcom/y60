@@ -16,8 +16,8 @@
 
 class Projector;
 
-#include <asl/PosixThread.h>
-#include <dom/Nodes.h>
+#include <asl/base/PosixThread.h>
+#include <asl/dom/Nodes.h>
 
 #include "Logger.h"
 

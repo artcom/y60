@@ -10,7 +10,7 @@
 //============================================================================
 
 #include "Blobs.h"
-#include <asl/numeric_functions.h>
+#include <asl/math/numeric_functions.h>
 
 using namespace asl;
 using namespace std;

@@ -5,13 +5,13 @@
 #include "ErrorMap.h"
 #include "EdgeList.h"
 
-#include <y60/NodeNames.h>
-#include <y60/Scene.h>
-#include <y60/Body.h>
+#include <y60/base/NodeNames.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/Body.h>
 
-#include <asl/Logger.h>
-#include <asl/Assure.h>
-#include <asl/GeometryUtils.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
+#include <asl/math/GeometryUtils.h>
 
 #include <list>
 

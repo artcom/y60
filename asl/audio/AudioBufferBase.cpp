@@ -12,8 +12,8 @@
 
 #include "AudioBufferBase.h"
 
-#include <asl/Auto.h>
-#include <asl/Assure.h>
+#include <asl/base/Auto.h>
+#include <asl/base/Assure.h>
 
 namespace asl {
 

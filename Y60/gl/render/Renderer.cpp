@@ -31,36 +31,36 @@
 #include "CgShader.h"
 #endif
 
-#include <y60/TransformHierarchyFacade.h>
-#include <y60/LodFacade.h>
-#include <y60/Facades.h>
-#include <y60/BitmapTextRenderer.h>
-#include <y60/GLUtils.h>
-#include <y60/TextureCompressor.h>
-#include <y60/Shape.h>
-#include <y60/Viewport.h>
-#include <y60/Overlay.h>
-#include <y60/NodeValueNames.h>
-#include <y60/NodeNames.h>
-#include <y60/PropertyNames.h>
-#include <y60/DataTypes.h>
-#include <y60/Primitive.h>
+#include <y60/scene/TransformHierarchyFacade.h>
+#include <y60/scene/LodFacade.h>
+#include <y60/scene/Facades.h>
+#include <y60/gltext/BitmapTextRenderer.h>
+#include <y60/glutil/GLUtils.h>
+#include <y60/glutil/TextureCompressor.h>
+#include <y60/scene/Shape.h>
+#include <y60/scene/Viewport.h>
+#include <y60/scene/Overlay.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/NodeNames.h>
+#include <y60/base/PropertyNames.h>
+#include <y60/base/DataTypes.h>
+#include <y60/scene/Primitive.h>
 
-#include <y60/Viewport.h>
-#include <y60/VertexDataRoles.h>
+#include <y60/scene/Viewport.h>
+#include <y60/base/VertexDataRoles.h>
 
 #include "GLResourceManager.h"
 
-#include <asl/Assure.h>
-#include <asl/file_functions.h>
-#include <asl/string_functions.h>
-#include <asl/numeric_functions.h>
-#include <asl/Matrix4.h>
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Assure.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 
-#include <dom/Nodes.h>
-#include <dom/Schema.h>
+#include <asl/dom/Nodes.h>
+#include <asl/dom/Schema.h>
 
 #include <GL/glu.h>
 #include <iostream>

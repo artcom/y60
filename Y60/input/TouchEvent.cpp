@@ -7,8 +7,8 @@
 
 #include "TouchEvent.h"
 
-#include <asl/Vector234.h>
-#include <dom/Nodes.h>
+#include <asl/math/Vector234.h>
+#include <asl/dom/Nodes.h>
 
 namespace y60 {
 

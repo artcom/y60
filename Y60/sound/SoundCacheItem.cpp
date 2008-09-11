@@ -11,7 +11,7 @@
 #include "SoundCacheItem.h"
 #include "SoundManager.h"
 
-#include <asl/Assure.h>
+#include <asl/base/Assure.h>
 
 using namespace std;
 using namespace asl;

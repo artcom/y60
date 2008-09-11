@@ -11,8 +11,8 @@
 */
 
 #include "StatusServer.h"
-#include <asl/string_functions.h>
-#include <asl/Revision.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Revision.h>
 
 using namespace asl;
 using namespace std;

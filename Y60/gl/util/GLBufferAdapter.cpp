@@ -12,8 +12,8 @@
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 
-#include <asl/string_functions.h>
-#include <y60/PixelEncoding.h>
+#include <asl/base/string_functions.h>
+#include <y60/image/PixelEncoding.h>
 
 #include <paintlib/plpngenc.h>
 #include <paintlib/pljpegenc.h>

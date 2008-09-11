@@ -21,8 +21,8 @@
 
 #include "ImageLoader.h"
 
-#include <asl/string_functions.h>
-#include <asl/UnitTest.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/UnitTest.h>
 #include <iostream>
 // Dumb hack since paintlib is installed as a non-debug variant
 #ifdef _DEBUG

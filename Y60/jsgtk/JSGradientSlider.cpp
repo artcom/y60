@@ -11,10 +11,10 @@
 #include "JSGradientSlider.h"
 #include "JSSignal0.h"
 #include "jsgtk.h"
-#include <y60/JScppUtils.h>
-#include <y60/JSVector.h>
-#include <y60/JSNode.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;

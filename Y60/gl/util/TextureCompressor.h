@@ -24,10 +24,10 @@
 #ifndef AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 #define AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 
-#include <y60/PixelEncoding.h>
+#include <y60/image/PixelEncoding.h>
 
-#include <asl/Block.h>
-#include <asl/Exception.h>
+#include <asl/base/Block.h>
+#include <asl/base/Exception.h>
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 

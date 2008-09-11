@@ -17,7 +17,7 @@
 #include "Sphere.h"
 #include "Matrix4.h"
 
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 #include <vector>
 
 namespace asl {

@@ -20,7 +20,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
 #include "GLAlloc.h"
-// #include <y60/Primitive.h>
+#include <y60/scene/Primitive.h>
 
 
 #define DB(x) // x

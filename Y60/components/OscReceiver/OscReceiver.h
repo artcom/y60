@@ -17,11 +17,11 @@
 #include <oscpack/osc/OscPacketListener.h>
 #include <oscpack/ip/UdpSocket.h>
 
-#include <asl/PosixThread.h>
-#include <asl/Exception.h>
+#include <asl/base/PosixThread.h>
+#include <asl/base/Exception.h>
 
-#include <y60/IEventSource.h>
-#include <y60/IScriptablePlugin.h>
+#include <y60/input/IEventSource.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
 

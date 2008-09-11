@@ -19,17 +19,17 @@
 #include "Dictionary.h"
 #include "Field.h"
 
-#include <asl/Block.h>
-#include <asl/MemoryPool.h>
-#include <asl/raster.h>
-#include <asl/subraster.h>
-#include <asl/palgo.h>
-#include <asl/standard_pixel_types.h>
-#include <asl/Vector234.h>
-#include <asl/Box.h>
+#include <asl/base/Block.h>
+#include <asl/base/MemoryPool.h>
+#include <asl/raster/raster.h>
+#include <asl/raster/subraster.h>
+#include <asl/raster/palgo.h>
+#include <asl/raster/standard_pixel_types.h>
+#include <asl/math/Vector234.h>
+#include <asl/math/Box.h>
 
-#include <asl/pixels.h>
-#include <asl/Logger.h>
+#include <asl/raster/pixels.h>
+#include <asl/base/Logger.h>
 
 #include <map>
 #include <set>

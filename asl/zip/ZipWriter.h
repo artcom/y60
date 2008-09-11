@@ -23,8 +23,8 @@
 #ifndef __asl_zipwriter_included_
 #define __asl_zipwriter_included_
 
-#include <asl/Stream.h>
-#include <asl/Block.h>
+#include <asl/base/Stream.h>
+#include <asl/base/Block.h>
 #include <string>
 
 namespace asl {

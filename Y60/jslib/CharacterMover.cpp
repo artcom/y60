@@ -10,8 +10,8 @@
 
 #include "CharacterMover.h"
 
-#include <asl/Logger.h>
-#include <asl/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Time.h>
 #include <cmath>
 
 #define DB(x) // x

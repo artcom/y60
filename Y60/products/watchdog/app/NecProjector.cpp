@@ -14,11 +14,11 @@
 
 #include "NecProjector.h"
 
-#include <asl/SerialDevice.h>
-#include <asl/Exception.h>
-#include <asl/Time.h>
-#include <asl/Logger.h>
-#include <asl/string_functions.h>
+#include <asl/serial/SerialDevice.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Time.h>
+#include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 

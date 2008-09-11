@@ -105,10 +105,10 @@
 // just for unit tests
 #include "JSTestSubject.h"
 
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
-#include <asl/Exception.h>
-#include <asl/string_functions.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
 
 using namespace jslib;
 using namespace std;

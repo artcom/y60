@@ -11,8 +11,8 @@
 #ifndef _IAudioDecoder_H_
 #define _IAudioDecoder_H_
 
-#include <asl/ISampleSink.h>
-#include <asl/Time.h>
+#include <asl/audio/ISampleSink.h>
+#include <asl/base/Time.h>
 
 namespace y60 {
 

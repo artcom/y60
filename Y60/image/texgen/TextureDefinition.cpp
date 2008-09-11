@@ -25,8 +25,8 @@
 #include "LayerDefinition.h"
 #include "XmlHelper.h"
 
-#include <dom/Nodes.h>
-#include <asl/string_functions.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
 
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>

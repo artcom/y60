@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSLogger.h"
-#include <y60/Documentation.h>
-#include <y60/JSWrapper.impl>
-#include <asl/LogMessageSinks.h>
+#include <y60/jsbase/Documentation.h>
+#include <y60/jsbase/JSWrapper.impl>
+#include <asl/base/LogMessageSinks.h>
 #include <iostream>
 
 using namespace asl;

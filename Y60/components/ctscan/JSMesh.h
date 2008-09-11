@@ -13,7 +13,7 @@
 #define _ac_y60_components_jsmesh_h_
 
 #include "Mesh.h"
-#include <y60/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
     

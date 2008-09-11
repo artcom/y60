@@ -15,9 +15,9 @@
 
 #include "SampleFormat.h"
 
-#include <asl/Ptr.h>
-#include <asl/Logger.h>
-#include <asl/ThreadLock.h>
+#include <asl/base/Ptr.h>
+#include <asl/base/Logger.h>
+#include <asl/base/ThreadLock.h>
 
 #include <iostream>
 

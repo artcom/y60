@@ -22,11 +22,11 @@
 #include "MayaHelpers.h"
 #include "JointWeight.h"
 
-#include <asl/linearAlgebra.h>
-#include <asl/Dashboard.h>
+#include <asl/math/linearAlgebra.h>
+#include <asl/base/Dashboard.h>
 
-#include <y60/ShapeBuilder.h>
-#include <y60/ElementBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/ElementBuilder.h>
 
 #include <maya/MGlobal.h>
 #include <maya/MFnSet.h>

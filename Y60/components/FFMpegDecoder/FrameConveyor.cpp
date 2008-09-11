@@ -13,10 +13,10 @@
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
 
-#include <asl/Logger.h>
-#include <asl/Block.h>
-#include <asl/console_functions.h>
-#include <asl/Pump.h>
+#include <asl/base/Logger.h>
+#include <asl/base/Block.h>
+#include <asl/base/console_functions.h>
+#include <asl/audio/Pump.h>
 #include <math.h>
 
 #define DB(x) // x

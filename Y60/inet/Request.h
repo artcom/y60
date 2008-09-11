@@ -17,11 +17,11 @@
     #undef max
 #endif
 
-#include <asl/Exception.h>
-#include <asl/Enum.h>
-#include <asl/Revision.h>
-#include <asl/Block.h>
-#include <asl/Ptr.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Enum.h>
+#include <asl/base/Revision.h>
+#include <asl/base/Block.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <curl/curl.h>

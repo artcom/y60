@@ -24,12 +24,12 @@
 #include <stddef.h>
 #include <string>
 
-#include <y60/SceneBuilder.h>
-#include <y60/ShapeBuilder.h>
-#include <y60/LightBuilder.h>
-#include <y60/WorldBuilder.h>
-#include <y60/TransformBuilder.h>
-#include <y60/CameraBuilder.h>
+#include <y60/scene/SceneBuilder.h>
+#include <y60/scene/ShapeBuilder.h>
+#include <y60/scene/LightBuilder.h>
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/TransformBuilder.h>
+#include <y60/scene/CameraBuilder.h>
 
 #include "c4d_include.h"
 

@@ -8,10 +8,10 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <y60/JSNode.h>
-#include <y60/IScriptablePlugin.h>
-#include <y60/JSWrapper.h>
-#include <y60/AssEventSchema.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/JSWrapper.h>
+#include <y60/input/AssEventSchema.h>
 
 namespace y60 {
 

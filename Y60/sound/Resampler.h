@@ -13,9 +13,9 @@
 #ifndef INCL_Y60_RESAMPLER_H
 #define INCL_Y60_RESAMPLER_H
 
-#include <asl/Effect.h>
-#include <asl/settings.h>
-#include <asl/Ptr.h>
+#include <asl/audio/Effect.h>
+#include <asl/base/settings.h>
+#include <asl/base/Ptr.h>
 
 namespace y60 {
 

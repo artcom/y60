@@ -17,7 +17,7 @@
 //=============================================================================
 
 #include "DecoderManager.h"
-#include <asl/Logger.h>
+#include <asl/base/Logger.h>
 
 namespace y60 {
 

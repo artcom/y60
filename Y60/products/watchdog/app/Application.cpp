@@ -26,12 +26,12 @@
 #include <typeinfo>
 #include <cctype>
 
-#include <asl/MappedBlock.h>
-#include <asl/Exception.h>
-#include <asl/file_functions.h>
-#include <asl/os_functions.h>
-#include <asl/proc_functions.h>
-#include <asl/Auto.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/Exception.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
+#include <asl/base/proc_functions.h>
+#include <asl/base/Auto.h>
 
 #ifdef WIN32
 #   include <Tlhelp32.h>

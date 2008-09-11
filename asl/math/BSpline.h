@@ -13,7 +13,7 @@
 
 #include "Vector234.h"
 #include <math.h>
-#include <asl/Ptr.h>
+#include <asl/base/Ptr.h>
 
 namespace asl {
 

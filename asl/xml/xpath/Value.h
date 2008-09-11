@@ -35,9 +35,9 @@
 #include <set>
 
 /**********************************************************************************************/
-#include <asl/Exception.h>
-#include <asl/Ptr.h>
-#include <dom/Nodes.h>
+#include <asl/base/Exception.h>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Nodes.h>
 
 /**********************************************************************************************/
 

@@ -9,8 +9,8 @@
 //=============================================================================
 
 #include "JSLocale.h"
-#include <y60/Documentation.h>
-#include <y60/JSWrapper.impl>
+#include <y60/jsbase/Documentation.h>
+#include <y60/jsbase/JSWrapper.impl>
 #include <locale>
 #include <iostream>
 

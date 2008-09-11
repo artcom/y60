@@ -11,9 +11,9 @@
 #ifndef Y60_ASS_UTILS_INCLUDED
 #define Y60_ASS_UTILS_INCLUDED
 
-#include <dom/Nodes.h>
-#include <asl/Exception.h>
-#include <y60/DataTypes.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/Exception.h>
+#include <y60/base/DataTypes.h>
 
 namespace y60 {
 
