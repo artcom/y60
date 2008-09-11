@@ -27,28 +27,44 @@
 #include <libraw1394/raw1394.h>
 #include <dc1394/dc1394.h>
 
-#define MAX_CAMERAS 8
-
 namespace y60 {
-/*! @addtogroup Y60componentsDC1394 */
-/*  @{ */
+    
     const std::string MIME_TYPE_CAMERA = "video/camera";
+
     class DC1394 : public CaptureDevice, public asl::PlugInBase {
     public:
         DC1394(asl::DLHandle theDLHandle);
         ~DC1394();
         virtual asl::Ptr<CaptureDevice> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
+        std::string canDecode( const std::string & theUrl, 
+                               asl::Ptr<asl::ReadableStreamHandle> theStream = 
+                                   asl::Ptr<asl::ReadableStreamHandle>(0) );
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
         DEFINE_EXCEPTION(Exception, asl::Exception);
         virtual void startCapture();
         virtual void stopCapture();
         virtual void pauseCapture();
+
     private:
-        dc1394camera_t * _myDevices[MAX_CAMERAS];
-        const dc1394camera_t & getDeviceHandle() const { return (*_myDevices)[getDevice()]; };
-        dc1394camera_t & getDeviceHandle() { return (*_myDevices)[getDevice()]; };
+
+        std::vector<dc1394camera_t*> _myDevices;
+
+        dc1394video_mode_t _myVideoMode; 
+
+        const dc1394camera_t & getDeviceHandle() const { 
+            return *_myDevices[getDevice()]; 
+        };
+
+        dc1394camera_t & getDeviceHandle() { 
+            return *_myDevices[getDevice()]; 
+        };
+
+        template<typename T> 
+        void getOption( const std::string & theOptionString, 
+                        const std::string & theUrl,
+                        T & theOption );
+
         unsigned int _myDeviceCount;
         bool _hasRingBuffer;
         bool _isTransmitting;
@@ -57,8 +73,8 @@ namespace y60 {
         void scanBus();
         void initRingBuffer();
         void freeRingBuffer();
+
     };
-/* @} */
 }
 
-#endif // _ac_VFWCapture_VFWCapture_h_
+#endif // _ac_DC1394
