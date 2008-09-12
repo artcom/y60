@@ -12,7 +12,7 @@
 #define _Y60_INPUT_DINPUTEXTENSION_INCLUDED_
 
 #include <asl/base/Ptr.h>
-#include <asl/PluginBase.h>
+#include <asl/base/PluginBase.h>
 
 #include <y60/input/Event.h>
 #include <y60/input/IEventSource.h>
