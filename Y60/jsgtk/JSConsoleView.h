@@ -13,7 +13,7 @@
 
 #include "JSTextView.h"
 
-#include <acgtk/ConsoleView.h>
+#include <y60/acgtk/ConsoleView.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <asl/base/string_functions.h>
 

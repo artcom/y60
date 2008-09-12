@@ -22,7 +22,7 @@
 
 #include <y60/gltext/TTFFontInfo.h>
 
-#include <SDL/ttf2/SDL_ttf.h>
+#include <sdl/ttf2/SDL_ttf.h>
 
 namespace y60 {
 

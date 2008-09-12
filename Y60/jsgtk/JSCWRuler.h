@@ -13,7 +13,7 @@
 
 #include "JSDrawingArea.h"
 
-#include <acgtk/CWRuler.h>
+#include <y60/acgtk/CWRuler.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>

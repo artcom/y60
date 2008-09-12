@@ -10,7 +10,7 @@
 
 #include "JSGdkCursor.h"
 #include "jsgtk.h"
-#include <acgtk/CustomCursors.h>
+#include <y60/acgtk/CustomCursors.h>
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>
 

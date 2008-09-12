@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-#include <SDL/ttf2/SDL_ttf.h>
+#include <sdl/ttf2/SDL_ttf.h>
 
 #define DB(x) //x
 #define DB2(x) //x

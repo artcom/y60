@@ -13,7 +13,7 @@
 
 #include "JSEmbeddedButton.h"
 
-#include <acgtk/EmbeddedToggle.h>
+#include <y60/acgtk/EmbeddedToggle.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>

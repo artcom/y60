@@ -14,7 +14,7 @@
 #include "JSTreeView.h"
 
 #include <y60/jsbase/JSWrapper.h>
-#include <acgtk/TNTThresholdList.h>
+#include <y60/acgtk/TNTThresholdList.h>
 
 #include <asl/base/string_functions.h>
 

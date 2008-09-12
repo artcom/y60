@@ -13,7 +13,7 @@
 
 #include "JSEventBox.h"
 
-#include <acgtk/EmbeddedButton.h>
+#include <y60/acgtk/EmbeddedButton.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>

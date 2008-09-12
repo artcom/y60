@@ -12,7 +12,7 @@
 #define _Y60_AC_ICON_FACTORY_INCLUDED_
 
 #include <y60/jsbase/JSWrapper.h>
-#include <acgtk/ACIconFactory.h>
+#include <y60/acgtk/ACIconFactory.h>
 
 #include <asl/base/string_functions.h>
 

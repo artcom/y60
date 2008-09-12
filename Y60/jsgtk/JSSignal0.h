@@ -15,7 +15,7 @@
 #include "JSSigConnection.h"
 #include "jsgtk.h"
 
-#include <acgtk/GCObserver.h>
+#include <y60/acgtk/GCObserver.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <libglademm/xml.h>

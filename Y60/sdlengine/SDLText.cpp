@@ -30,7 +30,7 @@
 
 #include <y60/glutil/GLUtils.h>
 
-#include <SDL/ttf2/SDL_ttf.h>
+#include <sdl/ttf2/SDL_ttf.h>
 
 #include <iostream>
 

@@ -17,7 +17,7 @@
 //
 //=============================================================================
 
-#include <jsgtk/GTKApp.h>
+#include <y60/jsgtk/GTKApp.h>
 
 #include <y60/jsbase/jssettings.h>
 #include <gtkmm.h>

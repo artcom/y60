@@ -11,7 +11,7 @@
 #ifndef _Y60_ACGTKSHELL_JSRENDERAREA_INCLUDED_
 #define _Y60_ACGTKSHELL_JSRENDERAREA_INCLUDED_
 
-#include <acgtk/RenderArea.h>
+#include <y60/acgtk/RenderArea.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>

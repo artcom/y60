@@ -13,7 +13,7 @@
 
 #include "JSEmbeddedButton.h"
 
-#include <acgtk/DragButton.h>
+#include <y60/acgtk/DragButton.h>
 
 #include <y60/jsbase/JSWrapper.h>
 #include <gtkmm/window.h>

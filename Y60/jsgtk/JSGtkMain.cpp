@@ -16,7 +16,7 @@
 #include "JSSignalProxy0.h"
 #include "JSSignal1.h"
 
-#include <acgtk/GCObserver.h>
+#include <y60/acgtk/GCObserver.h>
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
