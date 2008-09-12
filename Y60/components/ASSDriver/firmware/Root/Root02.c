@@ -101,7 +101,7 @@ const char configWelcomeMsg[] PROGMEM = "\nCommands:\
 \nC11      Display max/min values\
 \nC12 x,y  Display value of x/y-position (top left corner: 0, 0)\
 \nC21 w    Set width\
-\nC22 h    Set heigth\
+\nC22 h    Set height\
 \nC23 f    Set scan frequency (16-100Hz)\
 \nC24 b    Set Baud rate factor (0-4)\
 \nC25 s    Set grid spacing (in mm)\
@@ -212,7 +212,7 @@ uint8_t i, i2;
 
         EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, DEFAULT_VOLTAGE_TRANSMITTER);
         EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, DEFAULT_MATRIX_WIDTH);
-        EEPROM_write(EEPROM_LOC_MATRIX_HEIGTH, DEFAULT_MATRIX_HEIGTH);
+        EEPROM_write(EEPROM_LOC_MATRIX_HEIGHT, DEFAULT_MATRIX_HEIGHT);
         EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, DEFAULT_SCAN_FREQUENCY);
         EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
         EEPROM_write(EEPROM_LOC_GRID_SPACING, DEFAULT_GRID_SPACING);
@@ -226,7 +226,7 @@ uint8_t i, i2;
     }
 
     i = setScanParameter(EEPROM_read(EEPROM_LOC_MATRIX_WIDTH), \
-                         EEPROM_read(EEPROM_LOC_MATRIX_HEIGTH), \
+                         EEPROM_read(EEPROM_LOC_MATRIX_HEIGHT), \
                          EEPROM_read(EEPROM_LOC_SCAN_FREQUENCY));
     if(i == 1){
         g_errorState |= ERROR_PARAMETERS;
@@ -236,7 +236,7 @@ uint8_t i, i2;
 
 
 	//turn off all transmitters by shifting 0 to all transmitters
-	for(i=0; i<=g_matrixHeigth; i++){
+	for(i=0; i<=g_matrixHeight; i++){
 		activateNextLine();
 	}
 
@@ -273,8 +273,8 @@ uint32_t bw;
         em = 1;
     }
     
-    if(h > MAX_MATRIX_HEIGTH){
-        h = MAX_MATRIX_HEIGTH;
+    if(h > MAX_MATRIX_HEIGHT){
+        h = MAX_MATRIX_HEIGHT;
         em = 1;
     }
 
@@ -307,14 +307,14 @@ uint32_t bw;
     g_scanPeriod = my_scanPeriod;
     g_deltaTRow = my_deltaTRow;
     g_matrixWidth = w;
-    g_matrixHeigth = h;
+    g_matrixHeight = h;
     g_scanFrequency = f;
     g_mode = ABS_MODE;
 
     for(i=0; i<255; i++){
-        g_T1[i] = i/(50/g_matrixHeigth);//exact weight might vary to g_matrixHeigth (for now it's 50/g_matrixHeigth)
+        g_T1[i] = i/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeigth)
     }
-    g_T1[255] = 255/(50/g_matrixHeigth);//exact weight might vary to g_matrixHeigth (for now it's 50/g_matrixHeigth)
+    g_T1[255] = 255/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeigth)
 
     if(em == 0){
         g_errorState &= ~ERROR_PARAMETERS;
@@ -520,7 +520,7 @@ int8_t  si;
 
 
     //activate last line to always start sequence from same state
-    activateTransmitter(g_matrixHeigth);
+    activateTransmitter(g_matrixHeight);
 
 
 	//stop clock pulses for 250ms to indicate calibration request
@@ -534,13 +534,13 @@ int8_t  si;
 
 	//scan once through all lines
 	g_readState = 0;
-	for(si=-1; si<(g_matrixHeigth+1); ){ // +1: include additional average scan
+	for(si=-1; si<(g_matrixHeight+1); ){ // +1: include additional average scan
 		if(g_readState == 1){
 			g_readState++;
             if(si >= 0){
     			activateTransmitter(si);
             }else{
-    			activateTransmitter(g_matrixHeigth);// one extra line as receivers ignore
+    			activateTransmitter(g_matrixHeight);// one extra line as receivers ignore
             }                                       // first line after calibration request
 
 			//read in current row
@@ -676,7 +676,7 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
 	g_currentRow = 0; //start scan with row 0
 	g_readState = 0;
 
-    configSpecialScanMode(g_matrixHeigth);
+    configSpecialScanMode(g_matrixHeight);
 
     PORT_CLK_EN |= _BV(CLK_EN); //CLK_EN ->high to enable outputs
 
@@ -690,7 +690,7 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
 
 			//switch transmitter to next row
 			next_row = g_currentRow + 1;
-			if(next_row >= (g_matrixHeigth+1)){ // +1: there is one extra row sampling to determine average line load
+			if(next_row >= (g_matrixHeight+1)){ // +1: there is one extra row sampling to determine average line load
 				next_row = 0;
             }
 			activateTransmitter(next_row);
@@ -741,7 +741,7 @@ asm (          "rjmp .-4"     );
 
             //search for grid points with max/min levels when requested
             if(g_maxMinLevelRequest == 2){
-                if(g_currentRow < g_matrixHeigth){
+                if(g_currentRow < g_matrixHeight){
     	    	    for(ix=0; ix<g_matrixWidth; ix++){
                         v1 = g_rowBuffer[ix];
                         if(v1 > g_maxLevel){
@@ -762,7 +762,7 @@ asm (          "rjmp .-4"     );
 
             //grab level at designated coordinates when requested
             if(g_XYLevelRequest == 1){
-                if(g_currentRow < g_matrixHeigth){
+                if(g_currentRow < g_matrixHeight){
                     if(g_currentRow == g_arg2){
                         g_XYLevel = g_rowBuffer[g_arg1];
                     }
@@ -775,7 +775,7 @@ asm (          "rjmp .-4"     );
 #ifdef COL_CORRECTION
             if(g_SystemCalibrated == 1){
  			    //correct values to minimize crosstalk between lines dueto weak receiver line
-                if(g_currentRow < g_matrixHeigth){
+                if(g_currentRow < g_matrixHeight){
    	    		    for(ix=0; ix<g_matrixWidth; ix++){
        	    		    //adjust values of new row
                         v1 = g_colAverage[ix];
@@ -811,7 +811,7 @@ asm (          "rjmp .-4"     );
         		if(g_currentRow < TESTBUFFERLENGTH){
                     //copy values
                     if(1){//if true sample column
-                        if(g_currentRow<g_matrixHeigth)
+                        if(g_currentRow<g_matrixHeight)
                             testBuffer[g_currentRow] = g_rowBuffer[12]; //sample column 12
                         else
                             testBuffer[g_currentRow] = 0;
@@ -836,7 +836,7 @@ asm (          "rjmp .-4"     );
         		   	//line is ready to send to host
                     //send data only if UART high speed mode is enabled
                     if(g_UART_mode == HS){
-                        if(g_currentRow < g_matrixHeigth){//don't send average sample
+                        if(g_currentRow < g_matrixHeight){//don't send average sample
                             //copy bytes to TX buffer
                             sendByte(255);
                             sendByte(g_currentRow+1);
@@ -899,10 +899,10 @@ asm (          "rjmp .-4"     );
 //                                    statusBytesRingCounter++;
 //                                    break;
 //                                case 6:
-                                    //send heigth
+                                    //send height
                                     sendByte('H');
                                     sendInt(0);
-                                    sendInt(g_matrixHeigth);
+                                    sendInt(g_matrixHeight);
 //                                    statusBytesRingCounter++;
 //                                    break;
 //                                case 7:
@@ -958,7 +958,7 @@ asm (          "rjmp .-4"     );
         if(g_TaraRequest == 1){
             performReceiverTara();
             //reset read cycle
-            g_currentRow = g_matrixHeigth; //by this next row will be row 0
+            g_currentRow = g_matrixHeight; //by this next row will be row 0
             g_readState = 0;
             checksum = 0;
             g_TaraRequest = 0;
@@ -1004,7 +1004,7 @@ asm (          "rjmp .-4"     );
             }
         }else if(g_TaraRequest == 4){
             //reset read cycle
-            g_currentRow = g_matrixHeigth; //by this next row will be row 0
+            g_currentRow = g_matrixHeight; //by this next row will be row 0
             g_readState = 0;
             checksum = 0;
             g_TaraRequest = 0;
@@ -1013,7 +1013,7 @@ asm (          "rjmp .-4"     );
         if(g_TaraRequest == 10){
             switchToAbsoluteMode();
             //reset read cycle
-            g_currentRow = g_matrixHeigth; //by this next row will be row 0
+            g_currentRow = g_matrixHeight; //by this next row will be row 0
             g_readState = 0;
             checksum = 0;
             g_TaraRequest = 0;
@@ -1316,7 +1316,7 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                         }
                     }
 
-                    if(j == C22){//C22 has one argument (heigth/number of rows)
+                    if(j == C22){//C22 has one argument (height/number of rows)
                         g_arg1 = 0;
                         while(i < g_UARTBytesReceived){
                             c = recBuffer[i++];
@@ -1461,7 +1461,7 @@ static uint16_t pointer1=0;
                     g_ConfigMode = 6;
                     break;
                 case C12: //print x/y values
-                    if(g_arg1 >= g_matrixWidth  ||  g_arg2 >= g_matrixHeigth){
+                    if(g_arg1 >= g_matrixWidth  ||  g_arg2 >= g_matrixHeight){
                         fprintf(stdout, "\nOut of range\n");
                         g_NextCommand = 0;
                     }else{
@@ -1477,7 +1477,7 @@ static uint16_t pointer1=0;
                         if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_WIDTH){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
-                            if(setScanParameter(g_arg1, g_matrixHeigth, g_scanFrequency) == 0){
+                            if(setScanParameter(g_arg1, g_matrixHeight, g_scanFrequency) == 0){
                                 EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
@@ -1488,16 +1488,16 @@ static uint16_t pointer1=0;
                     }
                     g_NextCommand = 0;
                     break;
-                case C22: //set heigth/number of rows
+                case C22: //set height/number of rows
                     //first check if locked (switch 8 on)
                     if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
-                        if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_HEIGTH){
+                        if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_HEIGHT){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             if(setScanParameter(g_matrixWidth, g_arg1, g_scanFrequency) == 0){
-                                EEPROM_write(EEPROM_LOC_MATRIX_HEIGTH, g_arg1);
+                                EEPROM_write(EEPROM_LOC_MATRIX_HEIGHT, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
                             }else{
@@ -1515,7 +1515,7 @@ static uint16_t pointer1=0;
                         if(g_arg1 < MIN_SCAN_FREQUENCY  ||  g_arg1 > MAX_SCAN_FREQUENCY){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
-                            if(setScanParameter(g_matrixWidth, g_matrixHeigth, g_arg1) == 0){
+                            if(setScanParameter(g_matrixWidth, g_matrixHeight, g_arg1) == 0){
                                 EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, g_arg1);
                                 fprintf(stdout, "\nOK\n");
                             }else{
@@ -1535,7 +1535,7 @@ static uint16_t pointer1=0;
                         }else{
                             e = g_BaudRateFactor;
                             g_BaudRateFactor = g_arg1;
-                            if(setScanParameter(g_matrixWidth, g_matrixHeigth, g_scanFrequency) != 0){
+                            if(setScanParameter(g_matrixWidth, g_matrixHeight, g_scanFrequency) != 0){
                                 g_BaudRateFactor = e;
                                 fprintf(stdout, "\nOut of range\n");
                             }else{

@@ -20,7 +20,7 @@
 
 #define DEFAULT_ID                    0
 #define DEFAULT_MATRIX_WIDTH          20
-#define DEFAULT_MATRIX_HEIGTH         10
+#define DEFAULT_MATRIX_HEIGHT         10
 #define DEFAULT_SCAN_FREQUENCY        20  //Hz (max 100Hz, min 16Hz)
 #define DEFAULT_VOLTAGE_TRANSMITTER   106 //=5V *21,2(*1/V)
 #define DEFAULT_GRID_SPACING          50  //mm
@@ -34,7 +34,7 @@
 //=== Don't change anything below this line! =================================
 
 #define MAX_MATRIX_WIDTH  120//40
-#define MAX_MATRIX_HEIGTH 50
+#define MAX_MATRIX_HEIGHT 50
 
 #define MIN_SCAN_FREQUENCY 16//Hz (lower frequencies don't work as g_scanPeriod is 16-bit integer)
 #define MAX_SCAN_FREQUENCY 100//Hz (additional restrictions apply!)
@@ -80,7 +80,7 @@
 
 #define EEPROM_LOC_VOLTAGE_TRANSMITTER 0x02
 #define EEPROM_LOC_MATRIX_WIDTH        0x03
-#define EEPROM_LOC_MATRIX_HEIGTH       0x04
+#define EEPROM_LOC_MATRIX_HEIGHT       0x04
 #define EEPROM_LOC_SCAN_FREQUENCY      0x05
 #define EEPROM_LOC_BAUD_RATE           0x06
 #define EEPROM_LOC_GRID_SPACING        0x07
@@ -89,7 +89,7 @@
 #define EEPROM_FORMAT_KEY 0x77BB
 
 uint8_t g_matrixWidth;
-uint8_t g_matrixHeigth;
+uint8_t g_matrixHeight;
 uint8_t g_scanFrequency;
 uint8_t g_gridSpacing;
 uint8_t g_ID;

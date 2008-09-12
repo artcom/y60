@@ -60,7 +60,7 @@ void activateNextLine(void){
 
 
 void activateTransmitter(uint8_t r){
-    if(r == g_matrixHeigth){
+    if(r == g_matrixHeight){
         //turn on 'special scan mode'
         PORT_SM_EN |= _BV(SM_EN); // SM_EN
     }else{
