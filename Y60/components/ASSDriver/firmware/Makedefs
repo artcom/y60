@@ -1,0 +1,34 @@
+
+CC=avr-gcc
+LD=avr-ld
+NM=avr-nm
+SIZE=avr-size
+OBJCOPY=avr-objcopy
+OBJDUMP=avr-objdump
+
+CFLAGS=-Wall -Os -fsigned-char -mmcu=$(MCU)
+
+OBJ=$(patsubst %.c,%.o,$(SRC))
+
+default: $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf
+	$(SIZE) $(PRG).elf
+.PHONY: default
+
+$(PRG).bin: $(PRG).elf
+	$(OBJCOPY) -O binary $(PRG).elf $(PRG).bin
+
+$(PRG).hex: $(PRG).elf
+	$(OBJCOPY) -O ihex   $(PRG).elf $(PRG).hex
+
+$(PRG).sym: $(PRG).elf
+	$(NM) $(PRG).elf > $(PRG).sym
+
+$(PRG).lst: $(PRG).elf
+	$(OBJDUMP) -d $(PRG).elf > $(PRG).lst
+
+$(PRG).elf: $(SRC)
+	$(CC) -o $(@) $(CFLAGS) $(SRC)
+
+clean:
+	$(RM) $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf
+.PHONY: clean
