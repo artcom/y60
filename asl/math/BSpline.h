@@ -63,7 +63,7 @@ namespace asl {
 
         class Normal {
             public:
-                Normal(const BSpline & theSpline, Vector3<T> & theUpVector = Vector3<T>(0,0,1)) :
+                Normal(const BSpline & theSpline, const Vector3<T> & theUpVector = Vector3<T>(0,0,1)) :
                     _mySpline(theSpline),
                     _myUpVector(theUpVector)
                 {}

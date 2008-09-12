@@ -50,6 +50,7 @@
 #include <asl/math/numeric_functions.h>
 #include <assert.h>
 #include <iterator>
+#include <iostream>
 #include "fraction.h"
 
 /////////////////////////////////////////////////////////////////////////////////
