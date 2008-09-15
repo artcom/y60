@@ -10,7 +10,7 @@ CFLAGS=-Wall -Os -fsigned-char -mmcu=$(MCU)
 
 OBJ=$(patsubst %.c,%.o,$(SRC))
 
-default: $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf
+default: $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf $(PRG).od
 	$(SIZE) $(PRG).elf
 .PHONY: default
 
@@ -25,6 +25,9 @@ $(PRG).sym: $(PRG).elf
 
 $(PRG).lst: $(PRG).elf
 	$(OBJDUMP) -d $(PRG).elf > $(PRG).lst
+
+$(PRG).od: $(PRG).elf
+	$(OBJDUMP) -zhD $(PRG).elf > $(PRG).od
 
 $(PRG).elf: $(SRC)
 	$(CC) -o $(@) $(CFLAGS) $(SRC)
