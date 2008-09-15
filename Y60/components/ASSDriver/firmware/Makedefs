@@ -33,5 +33,5 @@ $(PRG).elf: $(SRC)
 	$(CC) -o $(@) $(CFLAGS) $(SRC)
 
 clean:
-	$(RM) $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf
+	$(RM) $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf $(PRG).od
 .PHONY: clean
