@@ -11,7 +11,7 @@
 #include "DShowCapture.h"
 #include <asl/base/Logger.h>
 #include <asl/base/Time.h>
-#include <asl/assure.h>
+#include <asl/base/assure.h>
 #include <asl/base/Block.h>
 
 #include <dshow.h>

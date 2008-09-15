@@ -20,8 +20,9 @@
 #ifndef _ac_WMVDecoder_h_
 #define _ac_WMVDecoder_h_
 
-#include <y60/AsyncDecoder.h>
-#include <y60/FFMpegDecoder.h>
+//#include <y60/AsyncDecoder.h>
+#include <y60/video/AsyncDecoder.h>
+#include <y60/FFMpegDecoder/FFMpegDecoder.h>
 #include <y60/video/MovieEncoding.h>
 #include <asl/base/PlugInBase.h>
 #include <asl/base/ThreadLock.h>

@@ -11,10 +11,10 @@
 #ifndef _ac_y60_FFMpegDecoder2_h_
 #define _ac_y60_FFMpegDecoder2_h_
 
-#include "AsyncDecoder.h"
 #include "VideoMsgQueue.h"
 #include "Demux.h"
 
+#include <y60/video/AsyncDecoder.h>
 #include <y60/video/MovieEncoding.h>
 
 #include <asl/base/PlugInBase.h>
