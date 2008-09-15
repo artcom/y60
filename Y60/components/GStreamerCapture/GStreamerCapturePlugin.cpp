@@ -91,7 +91,7 @@ namespace y60 {
     }
     
     bool dumpPads( GstElement* theElement ) {
-        
+        AC_PRINT << "dumping pads .."; 
         GstIterator* myPadIterator =  gst_element_iterate_src_pads( theElement );
         GstPad* myPad = NULL;
 
@@ -100,7 +100,7 @@ namespace y60 {
                 case GST_ITERATOR_OK:
                 {
                     GstCaps* myCaps = gst_pad_get_caps(myPad);
-                    //AC_PRINT << "caps: " << gst_caps_to_string( myCaps );
+                    AC_PRINT << "caps: " << gst_caps_to_string( myCaps );
                     gst_object_unref( myPad );
                 }
                     break;
@@ -110,6 +110,14 @@ namespace y60 {
                     return false;
             }
         }
+    }
+
+    std::string GStreamerCapturePlugin::getUrl( const std::string & theInputStr ) {
+        std::string::size_type myIdx = theInputStr.find( "," );
+        if (myIdx != std::string::npos) {
+            return theInputStr.substr(0, myIdx);
+        }
+        return theInputStr; 
     }
 
     void GStreamerCapturePlugin::load(const std::string & theFilename) {
@@ -134,33 +142,64 @@ namespace y60 {
         AC_INFO << "Plugging GStreamer Plugin using GStreamer version "
                 << major << "." << minor << "." << micro << "." << std::string(nano_str);
 
-        GstElement *myPipeline;
-        myPipeline = gst_pipeline_new( "Capture" );
+        AC_PRINT << "Using URL: " << getUrl( theFilename );
 
-        GstBus *myBus;
-        myBus = gst_pipeline_get_bus( GST_PIPELINE( myPipeline ));
-        gst_bus_add_watch( myBus, cb_buscallback, gpointer(this) );
-        gst_object_unref( myBus );
+        std::string myPipelineStr = "rtspsrc location=" + getUrl(theFilename) 
+                                    + " ! rtpmp4vdepay ! ffdec_mpeg4 ! ffmpegcolorspace !"
+                                    + "capsfilter caps=video/x-raw-rgb ! fakesink "
+                                    + "name=fakesink";
 
-        GstElement *mySource, *myConverter, *myFakeSink, *myFilter;
-        mySource = gst_element_factory_make( "v4l2src", "source" );
-        myConverter = gst_element_factory_make( "ffmpegcolorspace", "conv" );
-        myFilter = gst_element_factory_make ("capsfilter", "filter");
-        myFakeSink = gst_element_factory_make( "fakesink", "sink" );
-        GstCaps* myCaps = gst_caps_new_simple( "video/x-raw-rgb",
-                                               NULL);
-        g_object_set( G_OBJECT( myFilter ), "caps", myCaps, NULL ); 
-
-
-        gst_bin_add_many( GST_BIN( myPipeline ), mySource, myConverter, myFilter, myFakeSink, NULL );
-
-        if (!gst_element_link_many( mySource, myConverter, myFilter, myFakeSink, NULL )) {
-            g_warning( "Failed to link elements" );
+        GstElement *myFirstPipeline;
+        GError* error = NULL;
+        myFirstPipeline = 
+            (GstElement*) gst_parse_launch((const gchar*)myPipelineStr.c_str(), &error);
+       
+        if (error) {
+           AC_PRINT << "link problems" << error;
         }
 
-        dumpPads( mySource );
+        GstElement *myPipeline;
+        myPipeline = gst_element_factory_make( "pipeline", NULL );
+        gst_bin_add( GST_BIN( myPipeline ), myFirstPipeline );
+//        myPipeline = myFirstPipeline;
 
-        g_object_set( G_OBJECT( myFakeSink ), "signal-handoffs", TRUE );
+        GstElement* myFakeSink = gst_bin_get_by_name( GST_BIN( myPipeline ), "fakesink" );
+
+//        GstElement* myPipeline;
+//        myPipeline = gst_element_factory_make( "pipeline", NULL );
+//
+//        GstBus *myBus;
+//        myBus = gst_pipeline_get_bus( GST_PIPELINE( myPipeline ));
+//        gst_bus_add_watch( myBus, cb_buscallback, gpointer(this) );
+//        gst_object_unref( myBus );
+//
+//    
+//        GstElement *mySource, *myConverter, *myFakeSink, *myFilter, *myCapsFilter;
+//        mySource = gst_element_factory_make( "rtspsrc", "source" );
+//        g_object_set( G_OBJECT( mySource ), "location",  
+//                      "rtsp://10.1.2.117/live.sdp", NULL );
+//        myConverter = gst_element_factory_make( "rtpmp4vdepay", "conv" );
+//        myFilter = gst_element_factory_make ( "ffdec_mpeg4", "filter" );
+//        myCapsFilter = gst_element_factory_make( "capsfilter", "caps" );
+//
+//        GstCaps* myCaps = gst_caps_new_simple( "video/x-raw-rgb", NULL );
+//        g_object_set( G_OBJECT( myCapsFilter ), "caps", myCaps , NULL );
+//
+//        myFakeSink = gst_element_factory_make( "fakesink", "sink" );
+//
+//
+//        gst_bin_add_many( GST_BIN( myPipeline ),mySource,myConverter, myFilter, 
+//                          myFakeSink, NULL );
+//
+//        if (!gst_element_link_many( mySource, myConverter, myFilter, 
+//                                    myFakeSink, NULL )) 
+//        {
+//            g_warning( "Failed to link elements" );
+//        }
+//
+//        dumpPads( myFakeSink );
+//
+        g_object_set( G_OBJECT( myFakeSink ), "signal-handoffs", TRUE, NULL );
         g_signal_connect( myFakeSink, "handoff", 
                           G_CALLBACK( cb_handoff ), 
                           this );
@@ -173,14 +212,15 @@ namespace y60 {
     }
 
 
-    std::string GStreamerCapturePlugin::canDecode(const std::string & theUrl, 
-                                                  asl::Ptr<asl::ReadableStreamHandle> 
-                                                    theStream)
+    std::string GStreamerCapturePlugin::canDecode( const std::string & theUrl, 
+                                                   asl::Ptr<asl::ReadableStreamHandle> 
+                                                   theStream)
     {
-        if (theUrl.find("video://") != std::string::npos) {
+        if (theUrl.find("rtsp://") != std::string::npos) {
+            _myUrl = theUrl;
             return "video/camera";
         } else {
-            return "video/camera";
+            return "";
         }
     }
 

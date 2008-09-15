@@ -61,9 +61,12 @@ namespace y60 {
         
         gboolean buscallback( GstBus *bus, GstMessage* message );
 
+        std::string getUrl( const std::string & theConfigStr );
+
         guint8 _myBuffer[1024*1024];
         std::size_t _myBufferSize;
         asl::ThreadLock  _myBufferLock;
+        std::string _myUrl;
 
     };
 }

@@ -11,6 +11,7 @@
 // libraries
 use("SceneViewer.js");
 plug("GStreamerCapturePlugin");
+//plug("y60DC1394");
 
 var ourShow  = null;
 
@@ -40,7 +41,7 @@ function TestGStreamerCapture(theArguments, theWidth, theHeight, theTitle) {
 
         Base.setup(WINDOW_WIDTH, WINDOW_HEIGHT, false, theTitle);
         
-        _myCameraInput = createGrabber( "", [0,0] ); 
+        _myCameraInput = createGrabber( "video://video_mode=640x480_YUV422,fps=30", [0,0] ); 
         //_myCameraInput = Modelling.createImage( window.scene, "test.png" );
 
         var myOverlay = new ImageOverlay( window.scene, _myCameraInput );
