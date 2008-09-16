@@ -93,19 +93,19 @@ FILE    g_uart1_str = FDEV_SETUP_STREAM(uart1_putchar, uart1_getchar, _FDEV_SETU
 const char configWelcomeMsg[] PROGMEM = "\nCommands:\
 \nC01      Auto-calibrate transmission level\
 \nC02      Tara and switch to relative mode\
-\nC03      Print current error state\
+\n\nC03      Print current error state\
 \nC04      Clear error state\
 \nC05      Print ID\
 \nC06      Print (HS)Baud rate\
 \nC07      Switch to absolute mode\
-\nC11      Display max/min values\
+\n\nC11      Display max/min values\
 \nC12 x,y  Display value of x/y-position (top left corner: 0, 0)\
-\nC21 w    Set width\
+\n\nC21 w    Set width\
 \nC22 h    Set height\
 \nC23 f    Set scan frequency (16-100Hz)\
 \nC24 b    Set Baud rate factor (0-4)\
 \nC25 s    Set grid spacing (in mm)\
-\nC98      Just replies 'ok'\
+\n\nC98      Just replies 'ok'\
 \nC99      Resume normal operation\n\
 @";//must be terminated with '@'!
 
