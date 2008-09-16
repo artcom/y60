@@ -312,9 +312,9 @@ uint32_t bw;
     g_mode = ABS_MODE;
 
     for(i=0; i<255; i++){
-        g_T1[i] = i/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeigth)
+        g_T1[i] = i/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeight)
     }
-    g_T1[255] = 255/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeigth)
+    g_T1[255] = 255/(50/g_matrixHeight);//exact weight might vary to g_matrixHeight (for now it's 50/g_matrixHeight)
 
     if(em == 0){
         g_errorState &= ~ERROR_PARAMETERS;
@@ -344,6 +344,7 @@ PORT_AUX0 ^= _BV(AUX0); //AUX0
 		g_readState = 1;
 	}else{
 		if(scanCounter >= targetTime){
+            //switch to next line
 			if(scanCounter >= g_scanPeriod){
 				scanCounter -= g_scanPeriod;
 				targetTime = g_deltaTRow;
@@ -1068,6 +1069,7 @@ asm (          "rjmp .-4"     );
             }
 
             //toggle LEDs
+            //RED LED
             if(g_errorState == 0){
                 //turn off red LED
                 PORT_LED &= ~_BV(LED_R);
@@ -1079,7 +1081,6 @@ asm (          "rjmp .-4"     );
                 }
             sc2++;
             }
-
             if(g_mode == REL_MODE){
                 //turn on green LED
                 PORT_LED |= _BV(LED_G);
