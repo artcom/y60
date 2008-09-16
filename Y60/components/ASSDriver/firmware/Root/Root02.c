@@ -981,7 +981,7 @@ asm (          "rjmp .-4"     );
             if(g_maxMinLevelRequest == 0){
                 //check if level is below 250
                 if(g_maxLevel < 250){
-                    if(g_maxLevel > 200){
+                    if(g_maxLevel > 200  &&  g_minLevel > 100){
                         //-->voltage found
                         //store value in EEPROM
                         EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, tVoltage);
