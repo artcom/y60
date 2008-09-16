@@ -994,7 +994,7 @@ asm (          "rjmp .-4"     );
                 }else{
                     //reduce voltage and try again
                     if(tVoltage > 70){ //minium level is 70 (3V)
-                        tVoltage -= 5; //search in -5 steps
+                        tVoltage -= 2; //search in -2 steps
                         setDACValue(tVoltage);
                         //get maximum levels
                         g_maxMinLevelRequest = 1;
