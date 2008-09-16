@@ -176,6 +176,7 @@ uint8_t g_T1[256];
 #define    DDR_SNC_OUT   DDRE
 #define    SNC_OUT       PE7
 #define    PORT_SNC_IN   PORTE
+#define    PIN_SNC_IN    PINE
 #define    DDR_SNC_IN    DDRE
 #define    SNC_IN        PE6
 

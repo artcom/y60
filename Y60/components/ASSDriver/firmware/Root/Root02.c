@@ -131,9 +131,10 @@ uint8_t i, i2;
     PORTC |= 0x03;
 
     //init opto coupler
-    DDRE |= _BV(SNC_OUT);
-    PORTE &= ~_BV(SNC_OUT);
-    DDRE &= ~_BV(SNC_IN);
+    DDR_SNC_OUT  |=  _BV(SNC_OUT);
+    PORT_SNC_OUT &= ~_BV(SNC_OUT);
+    DDR_SNC_IN   &= ~_BV(SNC_IN);
+    PORT_SNC_IN  &= ~_BV(SNC_IN); //disable pull-up resistor
 
     //disable scan clock outputs
     PORT_CLK_EN &= ~_BV(CLK_EN); //CLK_EN ->low to disable outputs
