@@ -244,6 +244,7 @@ uint8_t i, i2;
     //config scan signal
     configScanOscillator();
     //ADD: handle CPLD error
+    //  ...
 
 
     //=== fire ======================
