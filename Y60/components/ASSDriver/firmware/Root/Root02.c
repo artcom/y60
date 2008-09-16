@@ -335,7 +335,7 @@ static uint16_t scanCounter=0, targetTime=0;
 static uint8_t swBefore;
 uint8_t v0;
 
-PORT_AUX0 ^= _BV(AUX0); //AUX0
+//PORT_AUX0 ^= _BV(AUX0); //AUX0
 	//move through read state according to following scheme:
 	//read state = 0: reset
 	//read state = 1: trigger read sequence
