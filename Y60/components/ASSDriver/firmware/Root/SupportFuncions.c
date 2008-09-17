@@ -82,11 +82,41 @@ void activateTransmitter(uint8_t r){
 void configScanOscillator(void){
 uint8_t SREG_old, SPCR_old;
 uint8_t cc0, cc1, cc2;
+uint8_t CONF0, CONF1, CONF2;
 uint8_t tries;
 
-#define CONF0    9  //(switch H->L of transmit signal at this moment)
-#define CONF1   21  //(switch L->H of transmit signal at this moment)
-#define CONF2   31  //(total cycle duration in system clocks)
+    switch(g_tFrequency){
+        case 0:
+            //settings for 446.84kHz
+            CONF0 = 7;
+            CONF1 = 21;
+            CONF2 = 32;
+            break;
+        case 1:
+            //settings for 460.80kHz
+            CONF0 = 7;
+            CONF1 = 21;
+            CONF2 = 31;
+            break;
+        case 2:
+            //settings for 491.52kHz
+            CONF0 = 6;
+            CONF1 = 19;
+            CONF2 = 29;
+            break;
+        case 3:
+            //settings for 546.13kHz
+            CONF0 = 5;
+            CONF1 = 16;
+            CONF2 = 26;
+            break;
+        default:
+            //settings for 491.52kHz
+            CONF0 = 6;
+            CONF1 = 19;
+            CONF2 = 29;
+    }
+
 
     SREG_old = SREG; //sample and restore I-bit at end of function
 	cli();

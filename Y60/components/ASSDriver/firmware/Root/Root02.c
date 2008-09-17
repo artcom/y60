@@ -105,6 +105,7 @@ const char configWelcomeMsg[] PROGMEM = "\nCommands:\
 \nC23 f    Set scan frequency (16-100Hz)\
 \nC24 b    Set Baud rate factor (0-4)\
 \nC25 s    Set grid spacing (in mm)\
+\nC26 t    Set transmitter frequency (0-3)\
 \n\nC98      Just replies 'ok'\
 \nC99      Resume normal operation\n\
 @";//must be terminated with '@'!
@@ -218,6 +219,7 @@ uint8_t i, i2;
         EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
         EEPROM_write(EEPROM_LOC_GRID_SPACING, DEFAULT_GRID_SPACING);
         EEPROM_write(EEPROM_LOC_ID, DEFAULT_ID);
+        EEPROM_write(EEPROM_LOC_T_FREQUENCY, DEFAULT_T_FREQUENCY);
     }
 
     g_BaudRateFactor = EEPROM_read(EEPROM_LOC_BAUD_RATE);
@@ -234,6 +236,7 @@ uint8_t i, i2;
     }
     g_gridSpacing = EEPROM_read(EEPROM_LOC_GRID_SPACING);
     g_ID = EEPROM_read(EEPROM_LOC_ID);
+    g_tFrequency = EEPROM_read(EEPROM_LOC_T_FREQUENCY);
 
 
 	//turn off all transmitters by shifting 0 to all transmitters
@@ -1197,9 +1200,10 @@ static uint8_t recBuffer[recBufferSize];
 #define C23  12
 #define C24  13
 #define C25  14
-#define C98  15
-#define C99  16
-#define NrOfCMDs 16
+#define C26  15
+#define C98  16
+#define C99  17
+#define NrOfCMDs 17
 #define CMDLength 3 //for now, all commands have to be 3 characters long!
 
 //das sollte noch in den Programm-Speicher um RAM zu sparen...
@@ -1218,6 +1222,7 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                              {"C23"},      \
                              {"C24"},      \
                              {"C25"},      \
+                             {"C26"},      \
                              {"C98"},      \
                              {"C99"}};
 
@@ -1362,6 +1367,20 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                     }
 
                     if(j == C25){//C25 has one argument (grid spacing)
+                        g_arg1 = 0;
+                        while(i < g_UARTBytesReceived){
+                            c = recBuffer[i++];
+                            if(c == ','){
+                                break;//switch to next argument
+                            }else if(c >= '0'  &&  c <= '9'){
+                                g_arg1 = g_arg1*10 + c-'0';
+                            }else{
+                                //error ADD: ...
+                            }
+                        }
+                    }
+
+                    if(j == C26){//C26 has one argument
                         g_arg1 = 0;
                         while(i < g_UARTBytesReceived){
                             c = recBuffer[i++];
@@ -1561,6 +1580,21 @@ static uint16_t pointer1=0;
                         }else{
                             EEPROM_write(EEPROM_LOC_GRID_SPACING, g_arg1);
                             g_gridSpacing = g_arg1;
+                            fprintf(stdout, "OK\n");
+                        }
+                    }
+                    g_NextCommand = 0;
+                    break;
+                case C26: //select transmitter frequency
+                    //first check if locked (switch 8 on)
+                    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){
+                        fprintf(stdout, "\nDevice is locked!\n");
+                    }else{
+                        if(g_arg1 > MAX_T_FREQUENCY){
+                            fprintf(stdout, "\nOut of range\n");
+                        }else{
+                            EEPROM_write(EEPROM_LOC_T_FREQUENCY, g_arg1);
+                            fprintf(stdout, "\nWill be applied after restart.\n");
                             fprintf(stdout, "OK\n");
                         }
                     }

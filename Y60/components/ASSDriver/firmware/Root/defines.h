@@ -30,6 +30,11 @@
                                           //3 = 460800bps
                                           //4 = 921600bps
 
+#define DEFAULT_T_FREQUENCY           2   //0 = 446.84kHz
+                                          //1 = 460.80kHz
+                                          //2 = 491.52kHz
+                                          //3 = 546.13kHz
+
 
 //=== Don't change anything below this line! =================================
 
@@ -45,6 +50,8 @@
 
 #define MIN_GRID_SPACING   5 //mm
 #define MAX_GRID_SPACING 200 //mm
+
+#define MAX_T_FREQUENCY   3
 
 #define TX_PACKET_SIZE 62 //matches to buffer size of FTDI chip
 
@@ -85,6 +92,7 @@
 #define EEPROM_LOC_BAUD_RATE           0x06
 #define EEPROM_LOC_GRID_SPACING        0x07
 #define EEPROM_LOC_ID                  0x08
+#define EEPROM_LOC_T_FREQUENCY         0x09
 
 #define EEPROM_FORMAT_KEY 0x77BB
 
@@ -93,6 +101,7 @@ uint8_t g_matrixHeight;
 uint8_t g_scanFrequency;
 uint8_t g_gridSpacing;
 uint8_t g_ID;
+uint8_t g_tFrequency;
 uint8_t g_mode;
 uint8_t g_status;
 uint8_t g_errorState;
