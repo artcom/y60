@@ -1542,11 +1542,7 @@ namespace dom {
     >
     class VectorValue :
         public SimpleValue<T>,
-#ifdef _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
         public ACCESS<VectorValue<T,ACCESS,ELEMENT_VALUE>,T,ELEMENT_VALUE>
-#else
-        public ACCESS<VectorValue,T,ELEMENT_VALUE>
-#endif
     {
     public:
         typedef typename T::value_type ELEM;

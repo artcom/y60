@@ -226,35 +226,50 @@ private:
 	std::string _myTypeName;
 };
 
+template <template <class,
+                    template<class,class,class> class,
+                    class > 
+         class VALUE,
+         class T> 
+struct ValueTraits;
+
+template<class T> struct ValueTraits<ComplexValue,T> {
+    typedef ComplexValue<T> ValueType;
+};
+
+template<class T> struct ValueTraits<VectorValue,T> {
+    typedef VectorValue<T> ValueType;
+};
 
 
-
-#ifdef _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
-template <template <class> class VALUE, class T>
-#else
-template <template <class,template<class,class,class> class,class> class VALUE, class T>
-#endif
+template <template <class,
+                    template<class,class,class> class,
+                    class > 
+         class VALUE, 
+         class T>
 class XmlVectorValueUnitTest : public TemplateUnitTest {
 public:
     XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue) 
         : TemplateUnitTest("XmlValueUnitTest-",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
+
+        typedef typename ValueTraits<VALUE,T>::ValueType ValueType;
 		
-		VALUE<T> myDefaultConstructedValue(0);
+		ValueType myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
-		VALUE<T> myInitializedValue(_someVariable, 0);
+		ValueType myInitializedValue(_someVariable, 0);
 		ENSURE(myInitializedValue.getValue() == _someVariable);
 
-		VALUE<T> myStringInitializedValue(asl::as_string(_someVariable), 0);
+		ValueType myStringInitializedValue(asl::as_string(_someVariable), 0);
 		ENSURE(myStringInitializedValue.getValue() == _someVariable);
 
         T mySavedValue = _someVariable;
         asl::Block myBinaryRep(myInitializedValue.accessReadableBlock());
         DDUMP(myBinaryRep.size());
         asl::Block myCopiedRep(myBinaryRep);
-        VALUE<T> myBinaryInitializedValue(myCopiedRep, 0);
+        ValueType myBinaryInitializedValue(myCopiedRep, 0);
         _someVariable[0] = _someVariable[1];
         DDUMP(myCopiedRep.size());
         std::fill(myCopiedRep.begin(),myCopiedRep.end(),0);
@@ -265,9 +280,9 @@ public:
         DPRINT(myBinaryInitializedValue.getValue());
         DPRINT(_someVariable);
         ENSURE(myInitializedValue.getValue() == _someVariable);
-        ENSURE(myInitializedValue.accessReadableBlock() == VALUE<T>(_someVariable, 0).accessReadableBlock());
+        ENSURE(myInitializedValue.accessReadableBlock() == ValueType(_someVariable, 0).accessReadableBlock());
         ENSURE(myBinaryInitializedValue.getValue() == mySavedValue);
-        ENSURE(myBinaryInitializedValue.accessReadableBlock() == VALUE<T>(mySavedValue, 0).accessReadableBlock());
+        ENSURE(myBinaryInitializedValue.accessReadableBlock() == ValueType(mySavedValue, 0).accessReadableBlock());
 
         std::cerr << _someVariable << endl;
         std::cerr << myBinaryInitializedValue.getValue() << endl;
@@ -275,7 +290,7 @@ public:
         ENSURE(myBinaryInitializedValue.getValue() != _someVariable);
        
         dom::ValueFactory myValueFactory;
-        myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new VALUE<T>(0)));
+        myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new ValueType(0)));
 		SUCCESS("Initialized myValueFactory");
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
@@ -283,7 +298,7 @@ public:
 		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
 		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
 
-		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,VALUE<T>(_someVariable, 0).accessReadableBlock(),0));
+		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,ValueType(_someVariable, 0).accessReadableBlock(),0));
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
 		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
