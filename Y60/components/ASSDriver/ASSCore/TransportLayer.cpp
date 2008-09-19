@@ -88,7 +88,6 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     _myLatencyTestPort = getSerialDevice(0);
     _myLatencyTestPort->open(9600, 8, SerialDevice::NO_PARITY, 1, false);
 #endif
-    fork();
 }
 
 TransportLayer::~TransportLayer() {
