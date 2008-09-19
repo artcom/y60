@@ -1321,8 +1321,6 @@ namespace y60 {
         if ( _myTransportLayer && _myTransportLayer->settingsChanged( theSettings ) ) {
             _myTransportLayer = TransportLayerPtr( 0 );
         }
-        _myTransportLayer->fork();
-    }
 
         AC_DEBUG << "driver setup: transport layer is '" << _myTransportLayer << "'";
 
@@ -1347,6 +1345,7 @@ namespace y60 {
 
             /*} else {
               AC_ERROR << "driver setup: no TransportLayer setting found.";*/
+            _myTransportLayer->fork();
         }
 
         getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
