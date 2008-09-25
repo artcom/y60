@@ -12,9 +12,7 @@ namespace y60 {
     
     GStreamerCapturePlugin::GStreamerCapturePlugin(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), _myBufferSize(0)
     {
-        //AC_PRINT << "gstreamercaptureplugin ctr: " << this;
         memset( _myBuffer, 0, sizeof( _myBuffer ));
-
     }
 
     GStreamerCapturePlugin::~GStreamerCapturePlugin() {
@@ -23,10 +21,6 @@ namespace y60 {
     void GStreamerCapturePlugin::handoff( GstElement *fakesrc, GstBuffer *buffer, 
                                           GstPad *pad) {
 
-        GstCaps* myBufferCaps = gst_buffer_get_caps( buffer );
-        //AC_PRINT << "myBufferCaps: " << gst_caps_to_string( myBufferCaps );
-
-
         int buffer_size = GST_BUFFER_SIZE (buffer);
         guint8* buffer_data = GST_BUFFER_DATA (buffer);
 
@@ -34,16 +28,6 @@ namespace y60 {
         asl::AutoLocker<asl::ThreadLock> myAutoLocker(_myBufferLock);
         std::copy( buffer_data, buffer_data + buffer_size, _myBuffer ); 
         _myBufferSize = buffer_size;
-        //AC_PRINT << "handoff: " 
-        //         << getpid() << " "
-        //         << this << " "
-        //         << (void*)(&_myBuffer[0]) << " " 
-        //         << _myBufferSize << " " 
-        //         << std::hex << int(_myBuffer[1000]);
-
-
-
-
     }
 
     gboolean GStreamerCapturePlugin::buscallback( GstBus *bus, GstMessage* message ) {
@@ -81,13 +65,6 @@ namespace y60 {
         theTargetRaster->resize(getFrameWidth(), getFrameHeight());
         asl::AutoLocker<asl::ThreadLock> myAutoLocker(_myBufferLock);
         memcpy(theTargetRaster->pixels().begin(), _myBuffer, _myBufferSize);
-        //AC_PRINT << "readframe: " 
-        //         << getpid() << " "
-        //         << this << " "
-        //         << (void*)(&_myBuffer[0]) << " " 
-        //         << _myBufferSize << " " 
-        //         << std::hex << int(_myBuffer[1000]);
-        //_myBufferSize = 0;
     }
     
     bool dumpPads( GstElement* theElement ) {
@@ -155,57 +132,21 @@ namespace y60 {
             (GstElement*) gst_parse_launch((const gchar*)myPipelineStr.c_str(), &error);
        
         if (error) {
-           AC_PRINT << "link problems" << error;
+           AC_ERROR << "Cannot link gstreamer elements!" << error;
         }
 
         GstElement *myPipeline;
         myPipeline = gst_element_factory_make( "pipeline", NULL );
         gst_bin_add( GST_BIN( myPipeline ), myFirstPipeline );
-//        myPipeline = myFirstPipeline;
 
         GstElement* myFakeSink = gst_bin_get_by_name( GST_BIN( myPipeline ), "fakesink" );
 
-//        GstElement* myPipeline;
-//        myPipeline = gst_element_factory_make( "pipeline", NULL );
-//
-//        GstBus *myBus;
-//        myBus = gst_pipeline_get_bus( GST_PIPELINE( myPipeline ));
-//        gst_bus_add_watch( myBus, cb_buscallback, gpointer(this) );
-//        gst_object_unref( myBus );
-//
-//    
-//        GstElement *mySource, *myConverter, *myFakeSink, *myFilter, *myCapsFilter;
-//        mySource = gst_element_factory_make( "rtspsrc", "source" );
-//        g_object_set( G_OBJECT( mySource ), "location",  
-//                      "rtsp://10.1.2.117/live.sdp", NULL );
-//        myConverter = gst_element_factory_make( "rtpmp4vdepay", "conv" );
-//        myFilter = gst_element_factory_make ( "ffdec_mpeg4", "filter" );
-//        myCapsFilter = gst_element_factory_make( "capsfilter", "caps" );
-//
-//        GstCaps* myCaps = gst_caps_new_simple( "video/x-raw-rgb", NULL );
-//        g_object_set( G_OBJECT( myCapsFilter ), "caps", myCaps , NULL );
-//
-//        myFakeSink = gst_element_factory_make( "fakesink", "sink" );
-//
-//
-//        gst_bin_add_many( GST_BIN( myPipeline ),mySource,myConverter, myFilter, 
-//                          myFakeSink, NULL );
-//
-//        if (!gst_element_link_many( mySource, myConverter, myFilter, 
-//                                    myFakeSink, NULL )) 
-//        {
-//            g_warning( "Failed to link elements" );
-//        }
-//
-//        dumpPads( myFakeSink );
-//
         g_object_set( G_OBJECT( myFakeSink ), "signal-handoffs", TRUE, NULL );
         g_signal_connect( myFakeSink, "handoff", 
                           G_CALLBACK( cb_handoff ), 
                           this );
 
         gst_element_set_state( myPipeline, GST_STATE_PLAYING );
-            //AC_PRINT << theFilename;
         setFrameWidth(640);
         setFrameHeight(480);
         setPixelFormat(RGB);
