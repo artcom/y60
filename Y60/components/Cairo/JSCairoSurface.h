@@ -17,7 +17,7 @@
 #include <y60/jsbase/JSWrapper.h>
 
 extern "C" {
-#include <cairo/cairo.h>
+#include <cairo.h>
 }
 
 #include "CairoWrapper.h"
