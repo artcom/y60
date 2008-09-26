@@ -20,6 +20,7 @@
 #include <string.h>
 #include "uart64.h"
 #include "defines.h"
+#include "global.h"
 #include <avr/pgmspace.h>
 
 /*
@@ -67,28 +68,6 @@
  */
 
 //=== Globals ================================================================
-uint8_t  g_rowBuffer[MAX_MATRIX_WIDTH], g_colAverage[MAX_MATRIX_WIDTH];
-uint8_t  g_RTB_Write_Pointer=0, g_RTB_Read_Pointer=0, g_RTB_Filled=0, g_PacketCounter=0;
-
-#define TBUFFER_SIZE MAX_MATRIX_WIDTH+TX_PACKET_SIZE+LENGTH_STATUS_MSG //should be large enough to hold all that
-uint8_t  g_rowTransmissionBuffer[TBUFFER_SIZE+1];
-
-uint8_t  g_currentRow;
-
-uint16_t g_scanPeriod;
-uint16_t g_deltaTRow;
-uint16_t g_FrameNumber;
-
-uint8_t  g_readState=0;
-
-uint8_t  g_SystemCalibrated=0, g_TaraRequest=0;
-
-uint8_t  g_ConfigMode=0, g_NextCommand=0;
-
-uint8_t  g_maxMinLevelRequest=0, g_XYLevelRequest=0, g_maxLevel, g_minLevel, g_XYLevel;
-
-uint16_t ADCValue_C0, ADCValue_C1;
-
 FILE    g_uart0_str = FDEV_SETUP_STREAM(uart0_putchar, uart0_getchar, _FDEV_SETUP_RW);
 FILE    g_uart1_str = FDEV_SETUP_STREAM(uart1_putchar, uart1_getchar, _FDEV_SETUP_RW);
 

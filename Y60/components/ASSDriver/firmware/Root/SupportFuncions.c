@@ -15,6 +15,7 @@
 #include <string.h>
 #include "uart64.h"
 #include "defines.h"
+#include "global.h"
 
 
 uint8_t detectNumberOfTransmitters(void){

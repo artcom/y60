@@ -13,6 +13,7 @@
 #include <avr/io.h>
 #include "uart64.h"
 #include "defines.h"
+#include "global.h"
 
 
 #define UART_BAUD_CALC( theBaudRate, theClock) \

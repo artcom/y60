@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#ifndef _DEFINES_H_
-#define _DEFINES_H_
+#ifndef _ASS_ROOT_DEFINES_H_
+#define _ASS_ROOT_DEFINES_H_
 
 #define F_CPU 14745600
 
@@ -96,23 +96,8 @@
 
 #define EEPROM_FORMAT_KEY 0x77BB
 
-uint8_t g_matrixWidth;
-uint8_t g_matrixHeight;
-uint8_t g_scanFrequency;
-uint8_t g_gridSpacing;
-uint8_t g_ID;
-uint8_t g_tFrequency;
-uint8_t g_mode;
-uint8_t g_status;
-uint8_t g_errorState;
-uint8_t g_mainTimer;
-uint8_t g_DIPSwitch;
-uint8_t g_UARTBytesReceived, g_arg1, g_arg2, g_PMinX,  g_PMinY, g_PMaxX,  g_PMaxY;
-uint8_t g_BaudRateFactor;
-uint8_t g_UART_mode;
-uint8_t g_UART_select;
-uint8_t g_dataTransmitMode;
-uint8_t g_T1[256];
+#define TBUFFER_SIZE MAX_MATRIX_WIDTH+TX_PACKET_SIZE+LENGTH_STATUS_MSG //should be large enough to hold all that
+
 #define LS 0
 #define HS 1
 
