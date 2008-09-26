@@ -22,47 +22,49 @@
 #include "defines.h"
 #include <avr/pgmspace.h>
 
-//=== Configuration ==========================================================
 /*
-ROOT Fuse-Settings:
-
-This fuses ON:
-- Preserve EEPROM memory through the Chip Erase cycle
-- Boot Flash section size=4096 words
-- CKOPT fuse
-- Brown-out detection level at VCC=4.0 V
-- Brown-out detection enabled
-- Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 64 ms
-
-All other fuses OFF
-*/
+ * Fuse settings
+ *
+ * Switch these fuses on:
+ * - Preserve EEPROM memory through the Chip Erase cycle
+ * - Boot Flash section size=4096 words
+ * - CKOPT fuse
+ * - Brown-out detection level at VCC=4.0 V
+ * - Brown-out detection enabled
+ * - Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 64 ms
+ *
+ * Switch all other fuses off.
+ *
+ */
 
 /*
-DIP Switch
-    1       On: Perform automatic calibration on power-up after 4 sec.
-            Off: Disable automatic calibration on power-up
-
-    2       On:
-            Off:
-
-    3       On:
-            Off:
-
-    4       On:
-            Off:
-
-    5       On: Use Com1/Xport for communication
-            Off: Use Com0/USB for communication
-
-    6       On: CTS line is ignored
-            Off: System is forced in config mode when CTS is passive (only valid when UART0 is selected)
-
-    7       On: UART runs at low speed (9600bps); Set up functions available only (via x[CR])
-            Off: regular data at selected high speed on UART
-
-    8       On: EEPROM parameters locked
-            Off: EEPROM accessible for parameter write
-*/
+ * DIP switches
+ *
+ * 1 On:  Perform automatic calibration on power-up after 4 sec.
+ *   Off: Disable automatic calibration on power-up
+ *
+ * 2 On:
+ *   Off:
+ *
+ * 3 On:
+ *   Off:
+ *
+ * 4 On:
+ *   Off:
+ *
+ * 5 On:  Use Com1/Xport for communication
+ *   Off: Use Com0/USB for communication
+ *
+ * 6 On:  CTS line is ignored
+ *   Off: System is forced in config mode when CTS is passive (only valid when UART0 is selected)
+ *
+ * 7 On:  UART runs at low speed (9600bps); Set up functions available only (via x[CR])
+ *   Off: regular data at selected high speed on UART
+ *
+ * 8 On:  EEPROM parameters locked
+ *   Off: EEPROM accessible for parameter write
+ *
+ */
 
 //=== Globals ================================================================
 uint8_t  g_rowBuffer[MAX_MATRIX_WIDTH], g_colAverage[MAX_MATRIX_WIDTH];
