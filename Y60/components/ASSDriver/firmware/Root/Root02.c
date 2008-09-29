@@ -88,9 +88,7 @@ const char configWelcomeMsg[] PROGMEM = "\nCommands:\
 \nC25 s    Set grid spacing (in mm)\
 \nC26 t    Set transmitter frequency (0-3)\
 \n\nC98      Just replies 'ok'\
-\nC99      Resume normal operation\n\
-@";//must be terminated with '@'!
-
+\nC99      Resume normal operation\n";
 
 void init(void) {
 uint8_t i, i2;
@@ -1410,7 +1408,7 @@ static uint16_t pointer1=0;
                 pointer1 = &configWelcomeMsg;
             }
             e = pgm_read_byte(pointer1++);//get next byte from FLASH;
-            if(e == '@'){
+            if(e == '\0'){
                 fprintf(stdout, "OK\n");
                 g_ConfigMode = 2;
                 pointer1 = 0;
