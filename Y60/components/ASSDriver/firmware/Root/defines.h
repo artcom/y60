@@ -230,8 +230,6 @@ void    configSpecialScanMode(uint8_t);
 uint8_t setScanParameter(uint8_t, uint8_t, uint8_t);
 int8_t  setDACValue(uint8_t);
 void    pause1us(void);
-void    EEPROM_write(uint16_t uiAddress, uint8_t ucData);
-uint8_t EEPROM_read(uint16_t uiAddress);
 uint8_t detectNumberOfTransmitters(void);
 uint8_t detectNumberOfReceivers(void);
 void    handleConfigRequests(void);

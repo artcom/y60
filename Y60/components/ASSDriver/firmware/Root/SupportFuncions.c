@@ -290,35 +290,3 @@ uint8_t i;
 
     return;
 }
-
-
-/////////////////////
-void EEPROM_write(uint16_t uiAddress, uint8_t ucData){
-    if((g_DIPSwitch&_BV(DIP_EEPROM_LOCK)) != 0){//EEPROM is locked by DIP switch 8
-        return;
-    }
-
-    /* Wait for completion of previous write */
-    while(EECR & (1<<EEWE))
-        ;
-    /* Set up address and data registers */
-    EEAR = uiAddress;
-    EEDR = ucData;
-    asm volatile ("sbi 0x1C,2");//sbi EECR,EEMWE
-    asm volatile ("sbi 0x1C,1");//sbi EECR,EEWE
-    
-    return;
-}
-
-
-uint8_t EEPROM_read(uint16_t uiAddress){
-    /* Wait for completion of previous write */
-    while((EECR & _BV(EEWE)) != 0)
-        ;
-    /* Set up address register */
-    EEAR = uiAddress;
-    /* Start eeprom read by writing EERE */
-   asm volatile ("sbi 0x1C,0");//EECR |= (1<<EERE);
-    /* Return data from data register */
-    return EEDR;
-}

@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "global.h"
 #include <avr/pgmspace.h>
+#include <avr/eeprom.h>
 
 /*
  * Fuse settings
@@ -182,40 +183,40 @@ uint8_t i, i2;
     //check format entry
 #define EEPROM_KEY_RETRIES 8
     for(i=0; i<EEPROM_KEY_RETRIES; i++){
-        if(EEPROM_read(EEPROM_LOC_FORMAT_ENTRY) == (EEPROM_FORMAT_KEY&0xFF)  &&  EEPROM_read(EEPROM_LOC_FORMAT_ENTRY+1) == (EEPROM_FORMAT_KEY>>8)){
+        if(eeprom_read_byte(EEPROM_LOC_FORMAT_ENTRY) == (EEPROM_FORMAT_KEY&0xFF)  &&  eeprom_read_byte(EEPROM_LOC_FORMAT_ENTRY+1) == (EEPROM_FORMAT_KEY>>8)){
             //key found!
             break;
         }
     }
     if(i == EEPROM_KEY_RETRIES){
-        EEPROM_write(EEPROM_LOC_FORMAT_ENTRY, (EEPROM_FORMAT_KEY&0xFF));
-        EEPROM_write(EEPROM_LOC_FORMAT_ENTRY+1, (EEPROM_FORMAT_KEY>>8));
+        eeprom_write_byte(EEPROM_LOC_FORMAT_ENTRY, (EEPROM_FORMAT_KEY&0xFF));
+        eeprom_write_byte(EEPROM_LOC_FORMAT_ENTRY+1, (EEPROM_FORMAT_KEY>>8));
 
-        EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, DEFAULT_VOLTAGE_TRANSMITTER);
-        EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, DEFAULT_MATRIX_WIDTH);
-        EEPROM_write(EEPROM_LOC_MATRIX_HEIGHT, DEFAULT_MATRIX_HEIGHT);
-        EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, DEFAULT_SCAN_FREQUENCY);
-        EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
-        EEPROM_write(EEPROM_LOC_GRID_SPACING, DEFAULT_GRID_SPACING);
-        EEPROM_write(EEPROM_LOC_ID, DEFAULT_ID);
-        EEPROM_write(EEPROM_LOC_T_FREQUENCY, DEFAULT_T_FREQUENCY);
+        eeprom_write_byte(EEPROM_LOC_VOLTAGE_TRANSMITTER, DEFAULT_VOLTAGE_TRANSMITTER);
+        eeprom_write_byte(EEPROM_LOC_MATRIX_WIDTH, DEFAULT_MATRIX_WIDTH);
+        eeprom_write_byte(EEPROM_LOC_MATRIX_HEIGHT, DEFAULT_MATRIX_HEIGHT);
+        eeprom_write_byte(EEPROM_LOC_SCAN_FREQUENCY, DEFAULT_SCAN_FREQUENCY);
+        eeprom_write_byte(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
+        eeprom_write_byte(EEPROM_LOC_GRID_SPACING, DEFAULT_GRID_SPACING);
+        eeprom_write_byte(EEPROM_LOC_ID, DEFAULT_ID);
+        eeprom_write_byte(EEPROM_LOC_T_FREQUENCY, DEFAULT_T_FREQUENCY);
     }
 
-    g_BaudRateFactor = EEPROM_read(EEPROM_LOC_BAUD_RATE);
+    g_BaudRateFactor = eeprom_read_byte(EEPROM_LOC_BAUD_RATE);
     if( g_BaudRateFactor > UART_MAX_BAUD_RATE_FACTOR){
-        EEPROM_write(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
+        eeprom_write_byte(EEPROM_LOC_BAUD_RATE, DEFAULT_BAUD_RATE);
         g_BaudRateFactor = DEFAULT_BAUD_RATE;
     }
 
-    i = setScanParameter(EEPROM_read(EEPROM_LOC_MATRIX_WIDTH), \
-                         EEPROM_read(EEPROM_LOC_MATRIX_HEIGHT), \
-                         EEPROM_read(EEPROM_LOC_SCAN_FREQUENCY));
+    i = setScanParameter(eeprom_read_byte(EEPROM_LOC_MATRIX_WIDTH), \
+                         eeprom_read_byte(EEPROM_LOC_MATRIX_HEIGHT), \
+                         eeprom_read_byte(EEPROM_LOC_SCAN_FREQUENCY));
     if(i == 1){
         g_errorState |= ERROR_PARAMETERS;
     }
-    g_gridSpacing = EEPROM_read(EEPROM_LOC_GRID_SPACING);
-    g_ID = EEPROM_read(EEPROM_LOC_ID);
-    g_tFrequency = EEPROM_read(EEPROM_LOC_T_FREQUENCY);
+    g_gridSpacing = eeprom_read_byte(EEPROM_LOC_GRID_SPACING);
+    g_ID = eeprom_read_byte(EEPROM_LOC_ID);
+    g_tFrequency = eeprom_read_byte(EEPROM_LOC_T_FREQUENCY);
 
 
 	//turn off all transmitters by shifting 0 to all transmitters
@@ -642,7 +643,7 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
     PORT_HVSHDN &= ~_BV(HVSHDN);
     //set DAC value
     //e = setDACValue(106); //5V*21,2(*1/V)
-    v1 = EEPROM_read(EEPROM_LOC_VOLTAGE_TRANSMITTER);
+    v1 = eeprom_read_byte(EEPROM_LOC_VOLTAGE_TRANSMITTER);
     e = setDACValue(v1);
   	if((g_errorState&ERROR_IIC) == 0){
 #ifdef TEST_MODE
@@ -966,7 +967,7 @@ asm (          "rjmp .-4"     );
                     if(g_maxLevel > 200  &&  g_minLevel > 100){
                         //-->voltage found
                         //store value in EEPROM
-                        EEPROM_write(EEPROM_LOC_VOLTAGE_TRANSMITTER, tVoltage);
+                        eeprom_write_byte(EEPROM_LOC_VOLTAGE_TRANSMITTER, tVoltage);
                         g_errorState &= ~(ERROR_T_LEVEL2 | ERROR_T_LEVEL1);
                         g_TaraRequest = 4; //switch to next state
                     }else{ //if g_maxLevel is close to 0: search failed!
@@ -1479,7 +1480,7 @@ static uint16_t pointer1=0;
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             if(setScanParameter(g_arg1, g_matrixHeight, g_scanFrequency) == 0){
-                                EEPROM_write(EEPROM_LOC_MATRIX_WIDTH, g_arg1);
+                                eeprom_write_byte(EEPROM_LOC_MATRIX_WIDTH, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
                             }else{
@@ -1498,7 +1499,7 @@ static uint16_t pointer1=0;
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             if(setScanParameter(g_matrixWidth, g_arg1, g_scanFrequency) == 0){
-                                EEPROM_write(EEPROM_LOC_MATRIX_HEIGHT, g_arg1);
+                                eeprom_write_byte(EEPROM_LOC_MATRIX_HEIGHT, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
                             }else{
@@ -1517,7 +1518,7 @@ static uint16_t pointer1=0;
                             fprintf(stdout, "\nOut of range\n");
                         }else{
                             if(setScanParameter(g_matrixWidth, g_matrixHeight, g_arg1) == 0){
-                                EEPROM_write(EEPROM_LOC_SCAN_FREQUENCY, g_arg1);
+                                eeprom_write_byte(EEPROM_LOC_SCAN_FREQUENCY, g_arg1);
                                 fprintf(stdout, "\nOK\n");
                             }else{
                                 fprintf(stdout, "\nOut of range\n");
@@ -1540,7 +1541,7 @@ static uint16_t pointer1=0;
                                 g_BaudRateFactor = e;
                                 fprintf(stdout, "\nOut of range\n");
                             }else{
-                                EEPROM_write(EEPROM_LOC_BAUD_RATE, g_arg1);
+                                eeprom_write_byte(EEPROM_LOC_BAUD_RATE, g_arg1);
                                 //g_BaudRateFactor = g_arg1;
                                 fprintf(stdout, "\nWill be applied after restart.\n");
                                 fprintf(stdout, "OK\n");
@@ -1557,7 +1558,7 @@ static uint16_t pointer1=0;
                         if(g_arg1 < MIN_GRID_SPACING  ||  g_arg1 > MAX_GRID_SPACING){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
-                            EEPROM_write(EEPROM_LOC_GRID_SPACING, g_arg1);
+                            eeprom_write_byte(EEPROM_LOC_GRID_SPACING, g_arg1);
                             g_gridSpacing = g_arg1;
                             fprintf(stdout, "OK\n");
                         }
@@ -1572,7 +1573,7 @@ static uint16_t pointer1=0;
                         if(g_arg1 > MAX_T_FREQUENCY){
                             fprintf(stdout, "\nOut of range\n");
                         }else{
-                            EEPROM_write(EEPROM_LOC_T_FREQUENCY, g_arg1);
+                            eeprom_write_byte(EEPROM_LOC_T_FREQUENCY, g_arg1);
                             fprintf(stdout, "\nWill be applied after restart.\n");
                             fprintf(stdout, "OK\n");
                         }
