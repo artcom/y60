@@ -71,7 +71,7 @@ namespace y60 {
 #if 0
         virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0)) {
             AC_ERROR << asl::StackTrace();
-            AC_ERROR << "canDecode() not implemented in CaptureDevice();
+            AC_ERROR << "canDecode() not implemented in CaptureDevice()";
             return "";
         }
 #endif
