@@ -228,7 +228,7 @@ WatchDog::init(dom::Document & theConfigDoc) {
                 if (myDotPos == std::string::npos) {
                     myDotPos = _myLogFilename.size();
                 }
-#ifdef LINUX
+#if defined(LINUX) || defined(OSX)
                 time_t ltime = time(NULL);
                 struct tm* today = localtime(&ltime);
 #else

@@ -25,14 +25,17 @@
 
 #ifdef WIN32
 #   include <windows.h>
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
 #   include <sys/wait.h>
 #   include <errno.h>
 #   include <unistd.h>
-#   include <linux/reboot.h>
-#   include <sys/reboot.h>
 #else
 #   error Your platform is missing!
+#endif
+
+#ifdef LINUX
+#   include <linux/reboot.h>
+#   include <sys/reboot.h>
 #endif
 
 #include <iostream>
@@ -81,11 +84,13 @@ void initiateSystemReboot() {
     if (!ok) {
         dumpLastError("ExitWindowsEx");
     }
-#elif defined(LINUX)
-//   int myResult = reboot(LINUX_REBOOT_CMD_RESTART);
-//   if (myResult == -1) {
-//       dumpLastError("reboot");
-//   }
+#elif defined(LINUX) || defined(OSX)
+    // Although this is not the recommended way to programmatically reboot OSX
+    // it seems to work. Because we never deployed on OSX I'll leave it with that.
+    // The official way to reboot OS X is documented here:
+    // http://developer.apple.com/qa/qa2001/qa1134.html
+    // google keywords: "programmatically reboot mac os x"
+    // [DS]
     int myResult = system("/sbin/reboot");
     if (myResult == -1) {
         dumpLastError("reboot");
@@ -130,11 +135,8 @@ void initiateSystemShutdown() {
     if (!ok) {
         dumpLastError("ExitWindowsEx");
     }
-#elif defined(LINUX)
-//   int myResult = reboot(LINUX_REBOOT_CMD_POWER_OFF);
-//   if (myResult == -1) {
-//       dumpLastError("reboot");
-//   }
+#elif defined(LINUX) || defined(OSX)
+    // See comment in initiateSystemReboot() [DS]
     int myResult = system("/sbin/halt");
     if (myResult == -1) {
         dumpLastError("reboot");
@@ -148,7 +150,7 @@ void initiateSystemShutdown() {
 ProcessResult waitForApp( const ProcessInfo & theProcessInfo, int theTimeout, Logger & theLogger ) {
 #ifdef WIN32
     return WaitForSingleObject( theProcessInfo.hProcess, theTimeout );
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
     asl::msleep(theTimeout);
     int myStatus;
     pid_t myResult = waitpid( theProcessInfo, &myStatus, WNOHANG );
@@ -207,7 +209,7 @@ bool launchApp( const std::string & theFileName,
                          &theProcessInfo);
 
 
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
     theProcessInfo = fork();
     if (theProcessInfo == -1) {
         return false;
@@ -277,7 +279,7 @@ void closeApp( const std::string & theWindowTitle, const ProcessInfo & theProces
         CloseHandle( theProcessInfo.hProcess );
         CloseHandle( theProcessInfo.hThread );
     }
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
     theLogger.logToFile("Try to terminate application.");
     kill( theProcessInfo, SIGTERM );
     ProcessResult myResult = waitForApp( theProcessInfo, 500, theLogger );
@@ -302,7 +304,7 @@ void closeApp( const std::string & theWindowTitle, const ProcessInfo & theProces
 ErrorNumber getLastErrorNumber() {
 #ifdef WIN32
     return GetLastError();
-#elif defined(LINUX) 
+#elif defined(LINUX) || defined(OSX)
     return errno;
 #else 
 #error Your platform is missing!
@@ -327,7 +329,7 @@ std::string getLastError( ErrorNumber theErrorNumber) {
         std::string myResult((LPCSTR)lpMsgBuf);
         LocalFree(lpMsgBuf);
         return myResult;
-#elif defined(LINUX) 
+#elif defined(LINUX) || defined(OSX)
         return strerror( theErrorNumber );
 #else 
 #error Your platform is missing!

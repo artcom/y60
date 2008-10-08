@@ -32,7 +32,7 @@
 
 #ifdef WIN32
 #   include <windows.h>
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
 #   include <sys/types.h>
 #   include <unistd.h>
 #else
@@ -49,7 +49,7 @@ typedef asl::ProcessID ProcessResult;
     };
     typedef PROCESS_INFORMATION ProcessInfo;
     typedef DWORD ErrorNumber;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(OSX)
     enum {
         PR_RUNNING,
         PR_TERMINATED,

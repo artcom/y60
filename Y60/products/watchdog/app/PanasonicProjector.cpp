@@ -22,7 +22,7 @@
 #include <asl/dom/Nodes.h>
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
 
 using namespace std;
 
