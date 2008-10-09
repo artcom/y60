@@ -1156,6 +1156,32 @@ uint8_t c;
     return;
 }
 
+void
+parseInt(char *buf, uint8_t len, uint8_t *res) {
+    uint8_t r = 0;
+    uint8_t i = 0;
+    char c;
+
+    while(i < len) {
+        c = buf[i];
+        if(c == ',') {
+            goto ret;
+        } else if(c >= '0' && c <= '9') {
+            r = r*10 + c-'0';
+        } else {
+            goto err;
+        }
+        i++;
+    }
+
+  ret:
+    *res = r;
+    return;
+    
+  err:
+    *res = 0; // XXX: report error somehow
+    return;    
+}
 
 void processReceivedByte(uint8_t c){
 uint8_t i, j;
@@ -1164,7 +1190,7 @@ uint8_t i, j;
 #define LF 10
 
 #define recBufferSize 10
-static uint8_t recBuffer[recBufferSize];
+static char recBuffer[recBufferSize];
 
 #define C01  1
 #define C02  2
@@ -1262,120 +1288,28 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                 j++; //adjust offset 1
                 if(g_NextCommand == 0){//begin executing new command
 
-                    //check if command has arguments
-                    if(j == C12){//C12 has two arguments (x,y position)
-                        //first get x position
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                        //then get y position
-                        g_arg2 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg2 = g_arg2*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
+                    g_arg1 = 0;
+                    g_arg2 = 0;
 
-                    if(j == C21){//C21 has one argument (width/number of columns)
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
+                    switch(j) {
+                    // commands with two arguments
+                    case C12:
+                        parseInt(recBuffer + i, g_UARTBytesReceived - i, &g_arg2);
+                    // commands with one argument
+                    case C21:
+                    case C22:
+                    case C23:
+                    case C24:
+                    case C25:
+                    case C26:
+                        parseInt(recBuffer + i, g_UARTBytesReceived - i, &g_arg1);
+                        break;
 
-                    if(j == C22){//C22 has one argument (height/number of rows)
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
-
-                    if(j == C23){//C23 has one argument (scan frequency)
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
-
-                    if(j == C24){//C24 has one argument (baud rate factor)
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
-
-                    if(j == C25){//C25 has one argument (grid spacing)
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
-                    }
-
-                    if(j == C26){//C26 has one argument
-                        g_arg1 = 0;
-                        while(i < g_UARTBytesReceived){
-                            c = recBuffer[i++];
-                            if(c == ','){
-                                break;//switch to next argument
-                            }else if(c >= '0'  &&  c <= '9'){
-                                g_arg1 = g_arg1*10 + c-'0';
-                            }else{
-                                //error ADD: ...
-                            }
-                        }
+                    default:
+                        break;
                     }
 
                     g_NextCommand = j;
-
                 }else{
                     //previous command is still pending, so ignore new command
                     //ADD err msg. here later
