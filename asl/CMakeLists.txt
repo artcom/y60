@@ -8,22 +8,25 @@ project(asl)
 set(CMAKE_MODULE_PATH ../acmake ${CMAKE_MODULE_PATH})
 
 include(FindZLIB)
-
 include(FindPkgConfig)
 
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
-pkg_search_module(ALSA  REQUIRED alsa)
 pkg_search_module(CURL  REQUIRED libcurl)
 
-include(SvnGenerateCxx)
-
+include(AcGenerateRevision)
 
 include_directories(../)
 
 if(UNIX)
-  set(LINUX true)
-  add_definitions(-DLINUX)
-  link_libraries(m dl pthread rt stdc++)
+  if(APPLE)
+    set(OSX true)
+    add_definitions(-DOSX)
+  else(APPLE)
+    set(LINUX true)
+    add_definitions(-DLINUX)
+    link_libraries(m dl pthread rt stdc++)
+    pkg_search_module(ALSA REQUIRED alsa)
+  endif(APPLE)
 endif(UNIX)
 
 add_subdirectory(base)

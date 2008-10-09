@@ -1,5 +1,5 @@
 
-svn_generate_cxx(../ Revision.cpp asl ourRevision)
+ac_generate_revision_cxx(../ Revision.cpp asl ourRevision)
 
 set(SOURCE
 Arguments.cpp
@@ -129,10 +129,10 @@ Time
 UnitTest
 )
 
-if(APPLE)
+if(OSX)
   set(SOURCE ${SOURCE} MachOBacktrace.cpp)
   set(HEADERS ${HEADERS} MachOBacktrace.h)
-endif(APPLE)
+endif(OSX)
 
 if(LINUX)
   set(SOURCE ${SOURCE} GlibcBacktrace.cpp)
@@ -146,6 +146,8 @@ endif(WIN32)
 
 add_library(aslbase SHARED ${SOURCE})
 set_target_properties(aslbase PROPERTIES PUBLIC_HEADER "${HEADERS}")
+
+# we need glib for paths
 link_directories(${GLIB2_LIBRARY_DIRS})
 include_directories(${GLIB2_INCLUDE_DIRS})
 target_link_libraries(aslbase ${GLIB2_LIBRARIES})
