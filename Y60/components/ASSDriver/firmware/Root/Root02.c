@@ -536,13 +536,12 @@ int8_t  si;
             UCSR0B_old = UCSR0B;
             UCSR0B &= ~(_BV(RXCIE0)|_BV(UDRIE0));
             //wait for reception complete
-asm (      "sbis 0x0E,7"  );//SPSR,SPIF
-asm (      "rjmp .-4"     );
+            loop_until_bit_is_set(SPSR, SPIF);
+ 
            	SPDR = 0;//transmit/receive first byte
             do{
                 //wait for reception complete
-asm (          "sbis 0x0E,7"  );//SPSR,SPIF
-asm (          "rjmp .-4"     );
+                loop_until_bit_is_set(SPSR, SPIF);
             	SPDR = 0;//transmit/receive next byte
                 //briefly allow timer 1 interrupt
                 sei();
@@ -693,13 +692,11 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
                 UCSR1B &= ~(_BV(RXCIE1)|_BV(UDRIE1));
             }
             //wait for reception complete
-asm (      "sbis 0x0E,7"  );//SPSR,SPIF
-asm (      "rjmp .-4"     );
+            loop_until_bit_is_set(SPSR, SPIF);
            	SPDR = 0;//transmit/receive first byte
             do{
                 //wait for reception complete
-asm (          "sbis 0x0E,7"  );//SPSR,SPIF
-asm (          "rjmp .-4"     );
+                loop_until_bit_is_set(SPSR, SPIF);
                 //store received byte
                 v1 = SPDR;
             	SPDR = 0;//transmit/receive next byte
