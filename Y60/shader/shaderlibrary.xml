@@ -192,21 +192,26 @@
             <feature class="lighting" values="[`phong`]"/>
             <feature class="texcoord" values="[`uv_map`]"/>
         </supports>
-        <fixedfunctionshader>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
                 <float name="shininess">1.0</float>
-                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
             <vertexparameters>
+                <vector4f name="position"/>
                 <vector3f name="normal"/>
-                <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
-        </fixedfunctionshader>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <sampler2d name="occlusionTex">0</sampler2d>
+                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+            </properties>
+        </fragmentshader>
     </shader>
     <shader id="s6" name="lambert" cost="120">
         <supports>
