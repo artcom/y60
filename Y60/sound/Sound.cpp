@@ -127,8 +127,8 @@ void Sound::seek (Time thePosition)
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_TRACE << "Sound::seek()";
     bool myIsPlaying = isPlaying();
-    _mySampleSink->stop();
     float myOldVolume = _mySampleSink->getVolume();
+    _mySampleSink->stop();
     // Forget the old sample sink. It'll fade out and then destroy itself.
     _mySampleSink = Pump::get().createSampleSink(_myURI);
 
