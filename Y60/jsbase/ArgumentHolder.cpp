@@ -27,6 +27,8 @@ namespace jslib {
     template struct ArgumentHolder<bool>;
     template struct ArgumentHolder<short>;
     template struct ArgumentHolder<unsigned short>;
+    template struct ArgumentHolder<char>;
+    template struct ArgumentHolder<unsigned char>;
     template struct ArgumentHolder<int>;
     template struct ArgumentHolder<unsigned int>;
     template struct ArgumentHolder<unsigned int const &>;
