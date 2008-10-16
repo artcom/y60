@@ -459,7 +459,9 @@ namespace y60 {
     SDLTextRenderer::parseWord(const string & theText, unsigned thePos) {
         for (unsigned i = 0; i < _myWordDelimiters.size(); ++i) {
             if (theText[thePos] == _myWordDelimiters[i]) {
-                string::size_type myNextWordPos = theText.find_first_not_of(_myWordDelimiters, thePos);
+                string::size_type myNextWordPos;
+                myNextWordPos = theText.find_first_not_of(_myWordDelimiters, thePos);
+                
                 if (myNextWordPos == string::npos) {
                     return theText.size() - thePos;
                 } else {
@@ -476,10 +478,20 @@ namespace y60 {
         unsigned myTextPos   = 0;
         unsigned myWordStart = 0;
         unsigned myWordEnd   = 0;
+        unsigned myNextWordOffset = 0;
+        
         Format myFormat;
         Format myNewFormat;
+        
         while (myTextPos < theText.size()) {
             unsigned myOffset = 0;
+           
+            if (myNextWordOffset > 0) {
+                myTextPos += myNextWordOffset;
+                myWordEnd   = myTextPos;
+                myNextWordOffset = 0;
+            }
+            
             if (myOffset = parseNewline(theText, myTextPos)) {
                 theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                 theResult.back().newline = true;
@@ -500,10 +512,16 @@ namespace y60 {
                 myTextPos  += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
-            } else if (myOffset = parseWord(theText, myTextPos)) {
-                theResult.push_back(Word(theText.substr(myWordStart, myWordEnd + myOffset - myWordStart)));
+            } else if (myOffset = parseWord(theText, myTextPos)) {  
+                if (_myHorizontalAlignment == RIGHT_ALIGNMENT) {
+                    theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
+                    myNextWordOffset = myOffset; 
+                } else {
+                    theResult.push_back(Word(theText.substr(myWordStart, myWordEnd + myOffset - myWordStart)));
+                    myTextPos  += myOffset;
+                }
+                
                 theResult.back().format = myFormat;
-                myTextPos  += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
                 DB2(AC_TRACE << "Found word-end, word: '" << theResult.back().text << "' new start: " << myWordStart << endl;)
