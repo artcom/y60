@@ -1381,7 +1381,6 @@ namespace y60 {
         asl::Vector2f myCurePoint4;
     
         _myCurePoints.clear();
-        AC_PRINT << "cure points " << _myCurePoints.size();
         getConfigSetting( theSettings, "CurePoint1", myCurePoint1, asl::Vector2f(-1,-1));
         _myCurePoints.push_back(myCurePoint1);
 
@@ -1393,8 +1392,7 @@ namespace y60 {
 
         getConfigSetting( theSettings, "CurePoint4", myCurePoint4, asl::Vector2f(-1,-1));
         _myCurePoints.push_back(myCurePoint4);
-        AC_PRINT << "cure points " << _myCurePoints.size();
-    
+        
     }
 
     Vector3f 
