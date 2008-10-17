@@ -25,6 +25,8 @@ function MoverBase(theViewport) {
 }
 
 MoverBase.prototype.Constructor = function(obj, theViewport) {
+    const DOUBLE_CLICK_INTERVAL = 500;
+    
     var _myViewport              = theViewport ? theViewport : window.canvas.childNode("viewport");
     var _myMoverObject           = null;
     var _myWorldSize             = null;
@@ -36,7 +38,8 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     var _myMiddleButtonFlag      = false;
     var _myRightButtonFlag       = false;
     var _myDoubleLeftButtonFlag  = false;
-
+    var _myDoubleClickInterval   = DOUBLE_CLICK_INTERVAL;
+    
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -88,6 +91,9 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         return _myMoverObject;
     }
 
+    obj.setDoubleClickActive = function(theFlag) {
+        _myDoubleClickInterval = (theFlag) ? DOUBLE_CLICK_INTERVAL : 0; 
+    }
     obj.setWorldSize = function(theSize) {
         if (theSize) {
             _myWorldSize  = theSize;
@@ -181,7 +187,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
             case LEFT_BUTTON:
                 _myLeftButtonFlag = (theState == BUTTON_DOWN);
                 if (_myLeftButtonFlag) {
-                    _myDoubleLeftButtonFlag = !_myDoubleLeftButtonFlag && ((millisec() - _myLastButtonTime) < 500);
+                    _myDoubleLeftButtonFlag = !_myDoubleLeftButtonFlag && ((millisec() - _myLastButtonTime) < _myDoubleClickInterval);
                     _myLastButtonTime = millisec();
                 }
                 break;
