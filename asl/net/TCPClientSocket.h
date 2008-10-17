@@ -48,19 +48,6 @@ namespace inet {
     /**
      * Implements a TCP Client.
      *
-     * @code
-     * inet::asl::Unsigned32 serverAddress = inet::Socket::getHostAddress("www.anyhost.de");
-     *
-     * inet::TCPClientSocket myConnection(serverPort,serverAddress);
-     * if (!myConnection.isValid())
-     *     myConnection.retry(10);
-     *
-     * ENSURE(myConnection.isValid());
-     * 
-     * myConnection.read(myInputBuffer,bufferSize);
-     * myConnection.write(myOutputBuffer, bufferSize);
-     *
-     * @endcode
      */
     class TCPClientSocket : public TCPSocket {
         public:
