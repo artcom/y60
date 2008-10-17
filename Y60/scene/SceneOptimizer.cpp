@@ -377,7 +377,9 @@ namespace y60 {
 
     void
     SceneOptimizer::mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag,
-                                    VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles) {
+                                    VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles,
+                                    unsigned theBeginIndex, unsigned theEndIndex) {
+                                        
         // Get element type
         std::string myNewPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
         if (myNewPrimitiveType == PrimitiveTypeStrings[QUADS]) {
@@ -388,7 +390,6 @@ namespace y60 {
         std::string myMaterialRef = theElements->getAttributeString(MATERIAL_REF_ATTRIB);
 
         unsigned myNumSrcElements       = theElements->childNodesLength();
-
         // find dst elements node where the source elements will fit into
         unsigned myDstElementCounter = 0;
         dom::NodePtr mySrcIndex = theElements->childNode(0);
@@ -398,7 +399,8 @@ namespace y60 {
         dom::NodePtr myDstIndex         = myDstElements->getIndex(POSITION_ROLE, POSITION_ROLE);
         unsigned myOffset               = myDstIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>().size();
 
-        while (mySrc.size() + myOffset  > 1024*64) {
+        unsigned mySrcVertices = (theEndIndex - theBeginIndex)+1;        
+        while (mySrcVertices + myOffset  > 1024*64 ) {
             AC_WARNING << "Sorry, supershapes primitive will have more then 64k vertices -> use new element";
             myDstElementCounter++;
             myDstElements  = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);
@@ -412,6 +414,7 @@ namespace y60 {
             const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
             std::string myName      = mySrcIndex->getAttributeString(VERTEX_DATA_ATTRIB);
             std::string myRole      = mySrcIndex->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+            unsigned myNumSrcVertices = (theEndIndex - theBeginIndex) +1;
 
             dom::NodePtr myDstIndex           = myDstElements->getIndex(myName, myRole);
             VectorOfUnsignedInt & myDst       = myDstIndex->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
@@ -420,10 +423,11 @@ namespace y60 {
             unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
             // Triangulate quads
             std::string myOldPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+            
             if (myOldPrimitiveType == PrimitiveTypeStrings[QUADS]) {
-                myDst.resize(unsigned(1.5 * mySrc.size() + myOffset));
-                unsigned mySrcSize = mySrc.size();
-                for (unsigned k = 0; k < mySrcSize; k += 4) {
+                myDst.resize(unsigned(1.5 * myNumSrcVertices + myOffset));
+                //unsigned mySrcSize = mySrc.size();
+                for (unsigned k = theBeginIndex; k <= theEndIndex; k += 4) {
                     if (theFlipFlag) {
                         myDst[myOffset++] = mySrc[k + 0] + myVertexDataOffset;
                         myDst[myOffset++] = mySrc[k + 3] + myVertexDataOffset;
@@ -441,29 +445,24 @@ namespace y60 {
                     }
                 }
             } else if (myOldPrimitiveType == PrimitiveTypeStrings[TRIANGLES] || myOldPrimitiveType == PrimitiveTypeStrings[LINE_STRIP]) {
-                //unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(Primitive::getTypeFromNode(theElements));
-                unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(theElements->getFacade<Primitive>()->get<PrimitiveTypeTag>());
-                if (mySrc.size() + myOffset  > 1024*64) {
+                if (myNumSrcVertices + myOffset  > 1024*64) {
                     AC_WARNING << "Sorry, supershapes primitive will have more then 64k vertices, will not render";
                 }
-                myDst.resize(mySrc.size() + myOffset);
+                myDst.resize(myNumSrcVertices + myOffset);
                 unsigned mySrcSize = mySrc.size();
                 if (theFlipFlag) {
-                    for (unsigned k = 0; k < mySrcSize; ++k) {
-                        //unsigned mySrcIndex = k + myVerticesPerPrimitive - 2 * (k % myVerticesPerPrimitive) - 1;
-                        //myDst[myOffset + k] = mySrc[mySrcIndex] + myVertexDataOffset;
-                        myDst[myOffset + k] = mySrc[mySrcSize - 1 - k] + myVertexDataOffset;
+                    for (unsigned k = theBeginIndex; k <= theEndIndex; ++k) {
+                        myDst[myOffset + k-theBeginIndex] = mySrc[mySrcSize - 1 - k] + myVertexDataOffset;
                     }
                 } else {
-                    for (unsigned k = 0; k < mySrcSize; ++k) {
-                        myDst[myOffset + k] = mySrc[k] + myVertexDataOffset;
+                    for (unsigned k = theBeginIndex; k <= theEndIndex; ++k) {
+                        myDst[myOffset + k-theBeginIndex] = mySrc[k] + myVertexDataOffset;
                     }
                 }
             } else {
                 throw asl::NotYetImplemented(std::string("The optimizer doesn't understand primitives of type '") + myOldPrimitiveType + "' yet",
                                              PLUS_FILE_LINE);
             }
-
             myDstIndex->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
         }
     }
@@ -546,7 +545,28 @@ namespace y60 {
                     myElementRenderStyles[FRONT] = true;
                     myRewindFlag                  = !myRewindFlag;
                 }
-                mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles);
+                
+                dom::NodePtr mySrcIndex = myElements->childNode(0);
+                const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
+                // iterate over src primitve in steps of 64k vertices
+                unsigned myBeginIndex = 0;
+                unsigned myEndIndex = std::min((unsigned int)1024*64, mySrc.size())-1;
+                while (myEndIndex <  mySrc.size() && myBeginIndex != mySrc.size()) {
+                    // assure division of num vertices will be 3 in cas of triangles and 4 in case of quads
+                    unsigned myDivisorTarget = 3;
+                    std::string myPrimitiveType = myElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
+                    if (myPrimitiveType == PrimitiveTypeStrings[QUADS]) {
+                        myDivisorTarget = 4;
+                    }
+                    
+                    unsigned int myCount = (myEndIndex - myBeginIndex)+1;
+                    float myDivisor = (float)myCount / (myDivisorTarget);
+                    myEndIndex = (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1;
+                    mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles, myBeginIndex, myEndIndex);
+                    unsigned myOldEndIndex = myEndIndex;
+                    myBeginIndex = myEndIndex+1;
+                    myEndIndex = std::min(myOldEndIndex + (1024*64), mySrc.size())-1;   
+                }
             }
             return true;
         }

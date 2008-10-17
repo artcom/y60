@@ -64,7 +64,7 @@ namespace y60 {
             void mergeVertexData(const dom::NodePtr & theVertexData, bool theFlipFlag, const asl::Matrix4f & theMatrix,
                                  const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
             void mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag, VertexDataMap & theVertexDataOffsets,
-                                 const RenderStyles & theRenderStyles);
+                                 const RenderStyles & theRenderStyles, unsigned theBeginIndex, unsigned theEndIndex);
             bool mergeBodies(dom::NodePtr & theNode, const asl::Matrix4f & theMatrix);
             void removeInvisibleNodes(dom::NodePtr & theNode);
             void pinAnimatedNodes(dom::NodePtr & theRootNode);
