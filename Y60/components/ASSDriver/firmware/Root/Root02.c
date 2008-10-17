@@ -177,7 +177,6 @@ uint8_t i, i2;
     }
 
     g_errorState = 0;
-    g_mode = ABS_MODE;
 
     //check if EEPROM contains stored values; if not write default values
     //check format entry
@@ -318,7 +317,9 @@ static uint16_t scanCounter=0, targetTime=0;
 static uint8_t swBefore;
 uint8_t v0;
 
-//PORT_AUX0 ^= _BV(AUX0); //AUX0
+#ifdef TASSI
+    if(g_mode > STANDBY_MODE) {
+#endif
 	//move through read state according to following scheme:
 	//read state = 0: reset
 	//read state = 1: trigger read sequence
@@ -340,6 +341,9 @@ uint8_t v0;
 		}
 		scanCounter += 100;//us
 	}
+#ifdef TASSI
+    }
+#endif
 
 
     //divide frequency by 10 -->rate 1ms
@@ -593,8 +597,60 @@ uint8_t i;
     return;
 }
 
+void performScanningOuter(void);
+void performScanning(void);
 
-int main(void) {
+int
+main(void) {
+  init();
+
+#ifdef TASSI
+  TSC_init();
+  g_mode = STANDBY_MODE;
+#else
+  g_mode = ABS_MODE;
+#endif
+
+
+
+  //make sure timer interrupt has been called at least once (to get secure DIP-Switch readings)
+  g_mainTimer = 0;
+  while(g_mainTimer < 2);
+
+  uart0_init();
+  uart1_init();
+  
+  while(1) {
+#ifdef TASSI
+      g_mode = STANDBY_MODE;
+      while(1) {
+          while(g_mainTimer > 0) {
+              g_mainTimer--;
+              TSC_update();
+          }
+          if(g_power > 0) {
+              PORT_HVSHDN |= _BV(HVSHDN);
+              uint16_t x;
+              for(x = 0; x < 1000; x++) {
+                  pause1us();
+              }
+              break;
+          }
+      }
+#endif
+      
+      init();
+      
+      performScanningOuter();
+      
+      init();
+  }
+
+  return 0;
+}
+
+void
+performScanningOuter(void) {
 uint8_t  ix, next_row, SPICounter, rowReceptionComplete;
 uint8_t  v0, v1, e;
 uint16_t autoCalTimer;
@@ -610,11 +666,6 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
 #endif
 
 
-    init();
-    //make sure timer interrupt has been called at least once (to get secure DIP-Switch readings)
-    g_mainTimer = 0;
-    while(g_mainTimer < 2);
-
     //decide which UART to use depending on DIP switch no. 5
     if((g_DIPSwitch&_BV(DIP_UART_SELECT)) == 0){
         g_UART_select = 0; //use UART0
@@ -624,10 +675,9 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
 
     if(g_UART_select == 0){
         stdout = &g_uart0_str;
-        uart0_init();
+
     }else{
         stdout = &g_uart1_str;
-        uart1_init();
         g_ConfigMode = 1;//in COM1-Version always start in config mode as there is no CTS control
     }
 
@@ -1067,7 +1117,7 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
                 //turn on green LED
                 PORT_LED |= _BV(LED_G);
                 sc3 = 0;
-            }else{
+            } else if (g_mode == ABS_MODE) {
                 if(sc3 == 0){
                     //toggle green LED
                     PORT_LED ^= _BV(LED_G);
@@ -1075,13 +1125,20 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
                         sc3=180; //off period is shorter
                     }
                 }
-            sc3++;
+                sc3++;
+            } else {
+                PORT_LED ^= ~_BV(LED_G);
             }
 
 
             //trigger automatic calibration a few seconds after start-up
             while(g_mainTimer > 0){
                 g_mainTimer--;
+
+#ifdef TASSI
+                TSC_update();
+#endif
+
                 if(autoCalTimer > 0){
                     autoCalTimer--;
                     if(autoCalTimer == 1){
@@ -1093,9 +1150,13 @@ uint8_t  testBuffer[TESTBUFFERLENGTH];
                 }
             }
         }
-	}
 
-    return 0;
+#ifdef TASSI
+        if(g_power == 0) {
+            break;
+        }
+#endif
+    }
 }
 
 
@@ -1229,6 +1290,11 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
                              {"C98"},      \
                              {"C99"}};
 
+#ifdef TASSI
+    if(g_power == 0) {
+        goto skipProcessing;
+    }
+#endif
 
     //ignore LF
     if(c == LF){
@@ -1314,6 +1380,11 @@ uint8_t commandList[NrOfCMDs][CMDLength] = {       \
             }
         }
     }
+
+
+#ifdef TASSI
+ skipProcessing:
+#endif
 
     //clear receive buffer
     g_UARTBytesReceived=0;

@@ -11,6 +11,9 @@
 #ifndef _ASS_ROOT_DEFINES_H_
 #define _ASS_ROOT_DEFINES_H_
 
+#include <avr/io.h>
+#include <stdio.h>
+
 #define F_CPU 14745600
 
 //=== Configuration ==========================================================
@@ -62,6 +65,7 @@
 #define LENGTH_STATUS_MSG 2+10*5 //adjust to actual number of transmitted status bytes per frame
 //#define LENGTH_STATUS_MSG 2+3*5 //adjust to actual number of transmitted status bytes per frame
 
+#define STANDBY_MODE 0
 #define ABS_MODE 1
 #define REL_MODE 2
 
@@ -144,11 +148,29 @@
 //AUX
 #define    PORT_AUX0      PORTC
 #define    DDR_AUX0       DDRC
+#define    PIN_AUX0       PINC
 #define    AUX0           PC3
 
 #define    PORT_AUX1      PORTC
 #define    DDR_AUX1       DDRC
+#define    PIN_AUX1       PINC
 #define    AUX1           PC4
+
+#define    PORT_AUX2      PORTC
+#define    DDR_AUX2       DDRC
+#define    PIN_AUX2       PINC
+#define    AUX2           PC5
+
+#define    PORT_AUX3      PORTC
+#define    DDR_AUX3       DDRC
+#define    PIN_AUX3       PINC
+#define    AUX3           PC6
+
+#define    PORT_AUX4      PORTC
+#define    DDR_AUX4       DDRC
+#define    PIN_AUX4       PINC
+#define    AUX4           PC7
+
 
 //PC1 is CLK of line shift register
 //PC2 is Data of line shift register
@@ -217,6 +239,9 @@
 
 //=== Prototypes =============================================================
 
+extern FILE g_uart0_str;
+extern FILE g_uart1_str;
+
 void    init(void);
 void    configScanOscillator(void);
 void    activateFirstLine(void);
@@ -236,5 +261,9 @@ void    handleConfigRequests(void);
 void    sendByte(uint8_t);
 void    sendInt(uint8_t);
 void    processReceivedByte(uint8_t c);
+
+void    TSC_init(void);
+void    TSC_update(void);
+void    TSC_transferCommand(uint16_t pointer);
 
 #endif

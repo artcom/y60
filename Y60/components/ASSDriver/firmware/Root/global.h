@@ -69,4 +69,8 @@ extern uint16_t ADCValue_C1;
 
 extern uint8_t g_status;
 
+#ifdef TASSI
+extern uint8_t g_power;
+#endif
+
 #endif

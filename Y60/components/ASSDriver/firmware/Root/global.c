@@ -102,3 +102,9 @@ uint16_t ADCValue_C1;
 
 // never used. only sent to host. always 0.
 uint8_t g_status;
+
+#ifdef TASSI
+// tassi power state
+uint8_t g_power;
+#endif
+
