@@ -38,6 +38,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
 
     const PAN_SPEED           = 1;
     const ZOOM_SPEED          = 1;
+    const ROTATE_SPEED        = 3;
     const MAX_DISTANCE_FACTOR = 10.0;
 
     //////////////////////////////////////////////////////////////////////
@@ -75,6 +76,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
         if (theButton == LEFT_BUTTON && theState == BUTTON_DOWN) {
             if (obj.getDoubleLeftButtonFlag()) {
+                print("####################################")
                 var myPickedBody = pickBody(theX, theY);
                 setupTrackball(myPickedBody);
             }
@@ -104,8 +106,8 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     }
 
     obj.rotate = function(theDeltaX, theDeltaY) {
-        _myTrackballOrientation.x += theDeltaY * TWO_PI;
-        _myTrackballOrientation.y -= theDeltaX * TWO_PI;
+        _myTrackballOrientation.x += theDeltaY * PI_2 * ROTATE_SPEED;
+        _myTrackballOrientation.y -= theDeltaX * PI_2 * ROTATE_SPEED;
         calculateTrackball();
     }
 
