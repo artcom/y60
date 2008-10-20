@@ -110,7 +110,10 @@ namespace y60 {
         _myTextColor(1.0, 1.0, 1.0, 1.0),
         _myProbeColor(0.0, 0.75, 0.0, 1.0),
         _myResampleColor(1.0, 0.0, 0.0, 1.0),
-
+        
+        _myTransformEventPosition(0.0f,0.0f),
+        _myTransformEventScale(1.0f,1.0f),
+        _myTransformEventOrientation(0.0f),
 
         _myClampToScreenFlag(false),
         _myWindow( 0 ),
@@ -734,11 +737,11 @@ namespace y60 {
     asl::Matrix4f
     ASSDriver::getTransformationMatrix() {
         Matrix4f myTransform;
-        if (_myOverlay ) {
-            const y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
-            const Vector2f & myPosition = myOverlay.get<Position2DTag>();
-            const Vector2f & myScale = myOverlay.get<Scale2DTag>();
-            const float & myOrientation = myOverlay.get<Rotation2DTag>();
+        //if (_myOverlay ) {
+            //const y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
+            const Vector2f & myPosition = _myTransformEventPosition;//myOverlay.get<Position2DTag>();
+            const Vector2f & myScale = _myTransformEventScale;//myOverlay.get<Scale2DTag>();
+            const float & myOrientation = _myTransformEventOrientation;//myOverlay.get<Rotation2DTag>();
 
             myTransform.makeIdentity();
 
@@ -755,9 +758,9 @@ namespace y60 {
             myShear[1][0] = _myShearY;
             myShear.setType(asl::UNKNOWN);
             myTransform.postMultiply(myShear);
-        } else {
-            myTransform.makeIdentity();
-        }
+        //} else {
+        //    myTransform.makeIdentity();
+        //}
         return myTransform;
     }
 
@@ -1274,6 +1277,10 @@ namespace y60 {
         GET_PROP( probeColor, _myProbeColor );
         GET_PROP( resampleColor, _myResampleColor );
 
+        GET_PROP( transformEventPosition, _myTransformEventPosition );
+        GET_PROP( transformEventScale, _myTransformEventScale );
+        GET_PROP( transformEventOrientation, _myTransformEventOrientation );
+
         // XXX: shearing hack
         GET_PROP( shearX, _myShearX );
         GET_PROP( shearY, _myShearY );
@@ -1294,6 +1301,18 @@ namespace y60 {
         SET_PROP( textColor, _myTextColor );
         SET_PROP( probeColor, _myProbeColor );
         SET_PROP( resampleColor, _myResampleColor );
+
+        SET_PROP( transformEventPosition, _myTransformEventPosition );
+        SET_PROP( transformEventScale, _myTransformEventScale );
+        SET_PROP( transformEventOrientation, _myTransformEventOrientation );
+
+        // ensure overlay for legacy reasons
+        if (_myOverlay) {        
+            y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
+            myOverlay.set<Position2DTag>(_myTransformEventPosition);
+            myOverlay.set<Scale2DTag>(_myTransformEventScale); 
+            myOverlay.set<Rotation2DTag>(_myTransformEventOrientation);
+        }
 
         // XXX: shearing hack
         SET_PROP( shearX, _myShearX );
@@ -1392,7 +1411,30 @@ namespace y60 {
 
         getConfigSetting( theSettings, "CurePoint4", myCurePoint4, asl::Vector2f(-1,-1));
         _myCurePoints.push_back(myCurePoint4);
+
+
+        getConfigSetting( theSettings, "SensorPosition", _myTransformEventPosition, asl::Vector2f(0.0f,0.0f));
+        getConfigSetting( theSettings, "SensorScale", _myTransformEventScale, asl::Vector2f(1.0f,1.0f));
+        getConfigSetting( theSettings, "SensorOrientation", _myTransformEventOrientation, 0.0f);
+        int myMirrorxFlag = 0;
+        getConfigSetting( theSettings, "MirrorX", myMirrorxFlag, 0);
+        int myMirroryFlag = 0;
+        getConfigSetting( theSettings, "MirrorY", myMirroryFlag, 0);
+        if (myMirrorxFlag) {
+            _myTransformEventScale[0] *= -1;
+        }
+        if (myMirroryFlag) {
+            _myTransformEventScale[1] *= -1;
+        }
+        // ensure overlay for legacy reasons
+        if (_myOverlay) {        
+            y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
+            myOverlay.set<Position2DTag>(_myTransformEventPosition);
+            myOverlay.set<Scale2DTag>(_myTransformEventScale); 
+            myOverlay.set<Rotation2DTag>(_myTransformEventOrientation);
+        }
         
+    
     }
 
     Vector3f 

@@ -203,6 +203,10 @@ class ASSDriver :
         float _myShearX;
         float _myShearY;
 
+        float _myTransformEventOrientation;
+        asl::Vector2f _myTransformEventScale;
+        asl::Vector2f  _myTransformEventPosition;
+
 #ifdef ASS_LATENCY_TEST
         void toggleLatencyTestPin();
         asl::SerialDevice * _myLatencyTestPort;
