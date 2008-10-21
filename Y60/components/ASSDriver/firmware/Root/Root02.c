@@ -629,11 +629,6 @@ main(void) {
               TSC_update();
           }
           if(g_power > 0) {
-              PORT_HVSHDN |= _BV(HVSHDN);
-              uint16_t x;
-              for(x = 0; x < 1000; x++) {
-                  pause1us();
-              }
               break;
           }
       }
