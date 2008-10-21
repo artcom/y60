@@ -118,16 +118,20 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     }
 
     obj.saveSettings = function() {
-
+        var myCommonSettingsFileSavedFlag = false;
         var myCurrentMergedSettings = _myMergedSettings.cloneNode( true ); 
         for (var i = _mySettingsList.length - 1; i >= 0; i--) { 
             var myCurrentSettings = _mySettingsList[i];
             saveSetting( myCurrentSettings, _mySettingsFileList[i], 
                          myCurrentMergedSettings );
+            if(_mySettingsFileList[i] == _myCommonSettingsFile) {
+                myCommonSettingsFileSavedFlag = true;
+            }
         }
-        saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile, 
-                     myCurrentMergedSettings );
-
+        if(!myCommonSettingsFileSavedFlag) {
+            saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile, 
+                         myCurrentMergedSettings );
+        }
     }
 
 
@@ -231,9 +235,17 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 
         function setup() {
             _myArrayPos  = 0;
-            _myValue     = _myNode.firstChild.nodeValue;
-            _myArrayFlag = (_myValue[0] == "[");
-            _myArray     = stringToArray(_myValue);
+            if(_myNode.firstChild) {
+                if(_myNode.firstChild.nodeType != Node.TEXT_NODE) {
+                    _myValue = null;
+                    Logger.warning("Node " + _myNode.nodeName + " has no value");
+                    return;
+                }
+                _myValue     = _myNode.firstChild.nodeValue;
+                _myArrayFlag = (_myValue[0] == "[");
+                _myArray     = stringToArray(_myValue);
+            }
+            
         }
         
         this.name = function() {
@@ -360,7 +372,11 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         if (!theNode) {
             return false;
         }
-        return (theNode.nodeType == Node.ELEMENT_NODE);
+        if ((theNode.nodeType == Node.ELEMENT_NODE)/* && theNode.firstChild && (theNode.firstChild.nodeType == Node.TEXT_NODE)*/) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function nextNode(theNode) {
@@ -403,15 +419,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         if (fileExists(_myCommonSettingsFile)) {
             Logger.info("Parsing settings from '" + _myCommonSettingsFile + "'");
             var myCommonSettingsDom = new Node();
-            if (fileExists( _myCommonSettingsFile )) {
-                myCommonSettingsDom.parseFile(_myCommonSettingsFile);
-            } else {
-                throw new Exception( "Settings file " + _myCommonSettingsFile + 
-                                     "does not exist!", fileline() );
-            }
+            myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             _myOriginalCommonSettings = myCommonSettingsDom.firstChild;
 
-            _myMergedSettings         = myCommonSettingsDom.firstChild.cloneNode(true);
+            _myMergedSettings = myCommonSettingsDom.firstChild.cloneNode(true);
 
             // merge all settings in the settings file list
             for (var i = 0; i < _mySettingsFileList.length; i++) {
@@ -430,11 +441,16 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
 
             _myOriginalMergedSettings = _myMergedSettings.cloneNode( true );
-    
             // set default current settings
             _myCurrentSection = _myMergedSettings.firstChild;
             _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
+            
+        } else {
+            throw new Exception( "Settings file " + _myCommonSettingsFile + 
+                                 "does not exist!", fileline() );
         }
+            
+        
     }
 
     function notifyListeners() {
@@ -491,7 +507,6 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 myCommonSection = Node.createElement( mySection.nodeName );
                 _myMergedSettings.appendChild( myCommonSection );
             }
-
             mergeSection( myCommonSection, mySection );
         }
         
