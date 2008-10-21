@@ -38,7 +38,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
 
     const PAN_SPEED           = 1;
     const ZOOM_SPEED          = 1;
-    const ROTATE_SPEED        = 3;
+    const ROTATE_SPEED        = 4;
     const MAX_DISTANCE_FACTOR = 10.0;
 
     //////////////////////////////////////////////////////////////////////
@@ -58,7 +58,8 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     var _myPowerMateButtonState = BUTTON_UP;
     var _myPickInvisibleBodies = true;
   
-    
+    var _myZoomSpeed = ZOOM_SPEED;
+    var _myRotateSpeed = ROTATE_SPEED;
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -70,7 +71,21 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     obj.setup = function() {
         setupTrackball(null);
     }
+    
+    obj.zoomspeed setter = function(theZoomSpeed) {
+        _myZoomSpeed = theZoomSpeed;
+    }
+    obj.zoomspeed getter = function() {
+        return _myZoomSpeed;
+    }
 
+    obj.rotatespeed setter = function(theRotateSpeed) {
+        _myRotateSpeed = theRotateSpeed;
+    }
+    obj.rotatespeed getter = function() {
+        return _myRotateSpeed;
+    }
+    
     obj.Mover.onMouseButton = obj.onMouseButton;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
@@ -106,14 +121,14 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     }
 
     obj.rotate = function(theDeltaX, theDeltaY) {
-        _myTrackballOrientation.x += theDeltaY * PI_2 * ROTATE_SPEED;
-        _myTrackballOrientation.y -= theDeltaX * PI_2 * ROTATE_SPEED;
+        _myTrackballOrientation.x += theDeltaY * PI_2 * _myRotateSpeed;
+        _myTrackballOrientation.y -= theDeltaX * PI_2 * _myRotateSpeed;
         calculateTrackball();
     }
 
     obj.zoom = function(theDelta) {
         var myZoomFactor =  getDistanceDependentFactor();
-        var myWorldTranslation = new Vector3f(0, 0, theDelta * obj.getWorldSize() * myZoomFactor / ZOOM_SPEED);
+        var myWorldTranslation = new Vector3f(0, 0, theDelta * obj.getWorldSize() * myZoomFactor / _myZoomSpeed);
         obj.update(myWorldTranslation, 0);
     }
 
