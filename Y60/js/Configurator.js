@@ -446,8 +446,9 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
             
         } else {
-            throw new Exception( "Settings file " + _myCommonSettingsFile + 
-                                 "does not exist!", fileline() );
+            // XXX todo: no settings.xml -> no configurator?
+            //throw new Exception( "Settings file " + _myCommonSettingsFile + 
+            //                     "does not exist!", fileline() );
         }
             
         
