@@ -68,18 +68,36 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.getSettings = function() {
-        return _myConfigurator.getSettings();
+        if(_myConfigurator) {
+            return _myConfigurator.getSettings();
+        } else {
+            Logger.warning("no settings.xml used -> no Configurator")
+            return null;
+        }
     }
 
     self.getConfigurator = function() {
-        return _myConfigurator;
+        if(_myConfigurator) {
+            return _myConfigurator;
+        } else {
+            Logger.warning("no settings.xml used -> no Configurator")
+            return null;
+        }
     }
 
     self.registerSettingsListener = function(theListener, theSection) {
-        _myConfigurator.addListener(theListener, theSection);
+        if(_myConfigurator) {
+            _myConfigurator.addListener(theListener, theSection);
+        } else {
+            Logger.warning("no settings.xml used -> no Configurator")
+        }
     }
     self.deregisterSettingsListener = function(theListener) {
-        _myConfigurator.removeListener(theListener);
+        if(_myConfigurator) {
+            _myConfigurator.removeListener(theListener);
+        } else {
+            Logger.warning("no settings.xml used -> no Configurator")
+        }
     }
 
     self.getCurrentTime = function(){
@@ -143,7 +161,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_mySplashScreen) {
             fadeSplashScreen(theTime);
         }
-        _myConfigurator.onFrame(theTime);
+        if(_myConfigurator) {
+            _myConfigurator.onFrame(theTime);
+        }
     }
 
     self.onPreRender = function() {
@@ -175,7 +195,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
             self.getLightManager().onKey(theKey, theKeyState, theShiftFlag);
             _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
-            _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);
+            if(_myConfigurator) {
+                _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);
+            }
         }
         if (_myShutter) {
             if (_myShutter.onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag)) {
@@ -509,7 +531,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 mySettingsFile = SETTINGS_FILE_NAMES[i];
                 break;
             } else {
-                Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
+                //Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
             }
         }
 
@@ -521,7 +543,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
 
-        _myConfigurator = new Configurator(self, mySettingsFile, mySettingsList);
+        if(mySettingsFile != "" || mySettingsList != undefined) {
+            _myConfigurator = new Configurator(self, mySettingsFile, mySettingsList);
+        }
 
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
