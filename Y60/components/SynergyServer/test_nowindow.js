@@ -9,13 +9,9 @@ var mySettings = new Node();
 mySettings.parseFile( "settings.xml" );
 myASSEventSource.onUpdateSettings( mySettings );
 
-
-
 const MOVE_VELOCITY = 100; 
 const RESIZE_VELOCITY = 20; 
 const DAMPING_FACTOR = 1.3; 
-
-
 
 var _myMouseMoveId = null;
 var _myButtonPressedId = null;
@@ -33,7 +29,7 @@ function onFrame ( theTime ) {
                                        _myTargetPosition), 
                                   1 / (MOVE_VELOCITY + 1)); 
         _myMousePosition = myPosition; 
-        if (distance( _myMousePosition, _myTargetPosition ) < 0.01) {
+        if (distance( _myMousePosition, _myTargetPosition ) < 0.1) {
             _myTargetPosition = null;
         }
         _mySynergyServer.onMouseMotion( _myMousePosition.x, 
