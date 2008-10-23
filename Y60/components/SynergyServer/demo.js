@@ -8,20 +8,20 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 // example start code
-// y60 ASSMouse.js rehearsal
+// y60 demo.js rehearsal
 //=============================================================================
 
 use("SceneViewer.js");
 use("ASSManager.js");
-plug("ASSMouse");
+plug("SynergyServer");
 
-function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
+function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
 
     //////////////////////////////////////////////////////////////////////
     // Baseclass construction
     //////////////////////////////////////////////////////////////////////
    
-    var _myASSMouse = null;
+    var _mySynergyServer = null;
     var _myASSManager = null;
 
     var _myMouseMoveId = null;
@@ -56,7 +56,7 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
             _myHost = theArguments[2];
         }
 
-        _myASSMouse = new ASSMouse( _myHost, 24800);
+        _mySynergyServer = new SynergyServer( _myHost, 24800);
         _myASSManager = new ASSManager( Public );
 
         if (_myHost == "localhost" && operatingSystem() == "LINUX") {
@@ -86,7 +86,7 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
             if (distance( _myMousePosition, _myTargetPosition ) < 0.01) {
                 _myTargetPosition = null;
             }
-            _myASSMouse.onMouseMotion( _myMousePosition.x + WINDOW_POSITION[0], 
+            _mySynergyServer.onMouseMotion( _myMousePosition.x + WINDOW_POSITION[0], 
                                        _myMousePosition.y + WINDOW_POSITION[1] );
 
         }
@@ -110,7 +110,7 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
         if (_myHost != "localhost") {
-            _myASSMouse.onMouseMotion( theX + WINDOW_POSITION[0], 
+            _mySynergyServer.onMouseMotion( theX + WINDOW_POSITION[0], 
                                        theY + WINDOW_POSITION[1] );
         }
     }
@@ -120,7 +120,7 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         Base.onMouseButton(theButton, theState, theX, theY);
         if (_myHost != "localhost") {
-            _myASSMouse.onMouseButton( theButton, theState );
+            _mySynergyServer.onMouseButton( theButton, theState );
         }
     }
 
@@ -138,7 +138,7 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
     Public.onMouseWheel = function(theDeltaX, theDeltaY) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
         if (_myHost != "localhost") {
-            _myASSMouse.onMouseWheel( theDeltaX, theDeltaY );
+            _mySynergyServer.onMouseWheel( theDeltaX, theDeltaY );
         }
     }
 
@@ -185,14 +185,14 @@ function ASSMouseSpike(theArguments, theWidth, theHeight, theTitle) {
                 _myVelocity = new Vector2f( 0, 0 );
             } else if (_myButtonPressedId == null) {
                 _myButtonPressedId = theNode.id;
-                _myASSMouse.onMouseButton( 1, true );
+                _mySynergyServer.onMouseButton( 1, true );
             }
         } else if ( theNode.type == "remove") {
             if (_myMouseMoveId == theNode.id) {
                 _myMouseMoveId = null;
             } else if (_myButtonPressedId == theNode.id) {
                 _myButtonPressedId = null;
-                _myASSMouse.onMouseButton( 1, false );
+                _mySynergyServer.onMouseButton( 1, false );
             }
         } else if ( theNode.type == "move" ) {
             if (_myMouseMoveId == theNode.id) {
@@ -218,7 +218,7 @@ try {
 //    var myWindowHeight = 770;
     var myWindowWidth  = 1920;
     var myWindowHeight = 1200;
-    var ourShow = new ASSMouseSpike(arguments, myWindowWidth, myWindowHeight, "ASSMouse");
+    var ourShow = new SynergyServerSpike(arguments, myWindowWidth, myWindowHeight, "SynergyServer");
     ourShow.go();
 } catch (ex) {
     reportException(ex);
