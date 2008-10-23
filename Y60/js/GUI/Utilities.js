@@ -178,7 +178,7 @@ function loadCachedFont(theName, theSize, theStyle) {
 
         Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle);
 
-        window.loadTTF(myName, "FONTS/" + theName + "-" + theStyle + ".ttf", theSize, fontStyleFromString(theStyle));
+        window.loadTTF(myName, "FONTS/" + theName + "-" + theStyle + ".ttf", theSize, Renderer.AUTOHINTING, fontStyleFromString(theStyle));
         ourLoadedFonts[myName] = true;
     }
     return myName;
