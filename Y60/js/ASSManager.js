@@ -157,6 +157,11 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
                             _myValueOverlay.position;
                 }
             }
+            // transfer overlay transformations to driver
+            _myDriver.transformEventPosition = _myValueOverlay.position;
+            _myDriver.transformEventScale = _myValueOverlay.scale;
+            _myDriver.transformEventOrientation = _myValueOverlay.rotation;
+            
             _myInitialSettingsLoaded = true;
         }
     }
