@@ -58,6 +58,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         return _mySettingsFileList;
     }
 
+    obj.hasSection = function(theSection) {
+        return _myMergedSettings.childNode(theSection) != null;
+    }
+
     obj.setSetting = function(theSection, theSetting, theValue) {
         var mySection = _myMergedSettings.childNode(theSection);
         if (!mySection) {
