@@ -13,6 +13,8 @@ const MOVE_VELOCITY = 100;
 const RESIZE_VELOCITY = 20; 
 const DAMPING_FACTOR = 1.3; 
 
+const POSITION_OFFSET = [0,140];
+
 var _myMouseMoveId = null;
 var _myButtonPressedId = null;
 var _myTargetPosition = null;
@@ -32,8 +34,8 @@ function onFrame ( theTime ) {
         if (distance( _myMousePosition, _myTargetPosition ) < 0.1) {
             _myTargetPosition = null;
         }
-        _mySynergyServer.onMouseMotion( _myMousePosition.x, 
-                                        _myMousePosition.y );
+        _mySynergyServer.onMouseMotion( _myMousePosition.x + POSITION_OFFSET[0], 
+                                        _myMousePosition.y + POSITION_OFFSET[1] );
 
     }
 

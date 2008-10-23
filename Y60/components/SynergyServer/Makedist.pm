@@ -19,6 +19,7 @@ sub runLocalMakedist($) {
     copyIfMoreRecent("$ENV{PRO}/lib/liby60ASSCoreOPT.so", $theDistDir);
     copyIfMoreRecent("$ENV{PRO}/lib/libEventLoopOPT.so", $theDistDir);
     copyIfMoreRecent("$ENV{PRO}/lib/libSynergyServerOPT.so", $theDistDir);
+    copyIfMoreRecent("$ENV{PRO}/lib/liboscpackOPT.so", $theDistDir);
     copyIfMoreRecent("test_nowindow.js", $theDistDir);
     copyIfMoreRecent("start_dist.sh", $theDistDir);
     depends("Y60/products/y60");
