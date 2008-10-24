@@ -29,9 +29,12 @@
 macro(list_contains var value)
   set(${var})
   foreach (value2 ${ARGN})
-    if (${value} STREQUAL ${value2})
+    # XXX: This is our own custom special-case of
+    #      a workaround for cmake bug #0007681.
+    #      See http://public.kitware.com/Bug/view.php?id=7681.
+    if ("XXX${value}XXX" STREQUAL "XXX${value2}XXX")
       set(${var} TRUE)
-    endif (${value} STREQUAL ${value2})
+    endif ("XXX${value}XXX" STREQUAL "XXX${value2}XXX")
   endforeach (value2)
 endmacro(list_contains)
 
