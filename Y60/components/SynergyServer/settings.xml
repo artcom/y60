@@ -4,8 +4,8 @@
         <SensorPosition step="1">[28.34,1949.2]</SensorPosition>
         <SensorOrientation step="1.5707963">-1.57080</SensorOrientation>
         <SensorScale step="0.01">[100.05000,180.20000]</SensorScale>
-        <MirrorX min="0" max="1">1.00000</MirrorX>
-        <MirrorY min="0" max="1">1.00000</MirrorY>
+        <MirrorX min="0" max="1">0.00000</MirrorX>
+        <MirrorY min="0" max="1">0.00000</MirrorY>
         <ClampToScreen min="0" max="1">1</ClampToScreen>
         <GainPower>3.00000</GainPower>
         <ComponentThreshold>1.50000</ComponentThreshold>

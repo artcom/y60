@@ -81,8 +81,13 @@ void TestSynergyServer::testHandshake() {
    
     testResponse( 4, "QINF", myPacket );
 
-    char myDInfoMessage[8] = { 0x00, 0x00, 0x00, 0x04, // length
-                               'D','I','N','F' }; // message type 
+    char myDInfoMessage[22] = { 0x00, 0x00, 0x00, 0x12, // length
+                               'D','I','N','F',         // message type 
+                                0x00, 0x00, 0x00, 0x00, 
+                                0x07, 0x80, 0x04, 0xb0,
+                                0x00, 0x00, 
+                                0x00, 0x00, 0x00, 0x00 };     
+                                
     _myTestSocket.send( myDInfoMessage, sizeof(myDInfoMessage) );
 
     testResponse( 4, "CIAK", myPacket );
@@ -99,6 +104,10 @@ void TestSynergyServer::testHandshake() {
         _myTestSocket.send( myKeepAliveMsg, sizeof(myKeepAliveMsg) );
         testResponse( 4, "CALV", myPacket );
     }
+
+    // test handshake-complete state
+    ENSURE( _mySynergyServer.isConnected() );
+    ENSURE( _mySynergyServer.getScreenSize() == asl::Vector2i( 1920, 1200 ) );
 
 }
 
@@ -183,14 +192,6 @@ void TestSynergyServer::testMouse() {
     testResponse( 8, "DMWM", myPacket, myMouseData );
 
 }
-
-
-//void TestSynergyServer::testKeyboard() {
-//
-//    SynergyPacket myPacket;
-//    std::vector<unsigned char> myMouseData;
-//
-//}
 
 
 void TestSynergyServer::testResponse( unsigned theLength, const std::string & theMessage, 

@@ -15,6 +15,8 @@
 #include <asl/net/TCPServer.h>
 #include <asl/base/Logger.h>
 #include <asl/base/ThreadLock.h>
+#include <asl/math/Vector234.h>
+#include <asl/base/Auto.h>
 #include <queue>
 
 // debug helper
@@ -96,8 +98,13 @@ class SynergyServer : public asl::PosixThread {
         void onMouseMotion( unsigned theX, unsigned theY );
         void onMouseButton( unsigned char theButton, bool theState );
         void onMouseWheel( int theDeltaX, int theDeltaY );
-//        void onKey( char theKey, bool theKeyState, bool theShiftFlag, bool theControlFlag, 
-//                    bool theAltFlag );
+        bool isConnected() {
+            return _myIsConnected;
+        }
+        asl::Vector2i getScreenSize() {
+            asl::AutoLocker<asl::ThreadLock> myLocker(_myLock);
+            return _myClientScreenSize;
+        }
 
     private:
 
@@ -111,6 +118,7 @@ class SynergyServer : public asl::PosixThread {
         void sendHeartBeat();
         bool timedOut();
         bool canInteract();
+        void parseClientInfo( const std::vector<unsigned char> & theMessage );
 
         inet::TCPServer  _myTCPServer;
         inet::TCPSocket* _mySocket;
@@ -123,6 +131,8 @@ class SynergyServer : public asl::PosixThread {
 
         std::queue<std::vector<unsigned char> > _myMessageQueue;
         std::queue<std::vector<unsigned char> > _mySendMsgQueue;
+
+        asl::Vector2i _myClientScreenSize;
 
 };
 

@@ -39,23 +39,24 @@ onMouseWheel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
                                                   cx, obj, argc, argv, rval);
 }
 
-//static JSBool
-//run(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
-//    DOC_BEGIN("Sends mouse wheel data to synergy clients.");
-//    DOC_END;
-//
-//    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::run, cx, obj, 
-//                                             argc, argv, rval);
-//}
+static JSBool
+getScreenSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
+    DOC_BEGIN("Get the screen size from the synergy client.");
+    DOC_END;
 
-//static JSBool
-//onKey(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
-//    DOC_BEGIN("Sends mouse wheel data to synergy clients.");
-//    DOC_END;
-//
-//    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onKey, cx, obj, 
-//                                             argc, argv, rval);
-//}
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::getScreenSize, 
+                                                  cx, obj, argc, argv, rval);
+}
+
+static JSBool
+isConnected(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
+    DOC_BEGIN("Returns true if the handshake with the client software is complete.");
+    DOC_END;
+
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::isConnected, 
+                                                  cx, obj, argc, argv, rval);
+}
+
 
 JSSynergyServer::~JSSynergyServer() {
 }
@@ -68,8 +69,8 @@ JSSynergyServer::Functions() {
         {"onMouseMotion",        onMouseMotion,         2},
         {"onMouseButton",        onMouseButton,         2},
         {"onMouseWheel",         onMouseWheel,          2},
-//        {"run",                   run,          2},
-//        {"onKey",                onKey,                 7},
+        {"getScreenSize",        getScreenSize,         2},
+        {"isConnected",          isConnected,           2},
         {0}
     };
     return myFunctions;
@@ -138,7 +139,7 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
     
     try{
 
-        ensureParamCount(argc, 0, 2);
+        ensureParamCount(argc, 2);
         
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError( cx, "Constructor for %s bad object; did you forget a 'new'?", 
@@ -148,45 +149,27 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
         
         JSSynergyServer * myNewObject = 0;
 
-        if (argc == 0) {
-
-//            OWNERPTR myAssMouse = OWNERPTR(new SynergyServer());
-//            myNewObject = new JSSynergyServer(myAssMouse, &(*myAssMouse));
-
-        } 
-        else if (argc > 0) { 
-
-            std::string myHostName; 
-            if (!convertFrom(cx, argv[0], myHostName)) {
-                JS_ReportError( cx, 
-                                "JSSynergyServer::Constructor: argument #1 must be a "
-                                "string)" );
-                return JS_FALSE;
-            }
-            asl::Unsigned32 myHostAddress = inet::getHostAddress( myHostName.c_str() );
-
-            if (argc == 2 ) {
-
-                unsigned myPort;
-                if (!convertFrom(cx, argv[1], myPort)) {
-                    JS_ReportError( cx, 
-                                    "JSSynergyServer::Constructor: argument #2 must be a "
-                                    "Number)" );
-                    return JS_FALSE;
-                }
-
-                OWNERPTR myAssMouse = OWNERPTR(new SynergyServer( myHostAddress, myPort ));
-                myNewObject = new JSSynergyServer(myAssMouse, &(*myAssMouse));
-
-            } else {
-                
-//                OWNERPTR myAssMouse = OWNERPTR(new SynergyServer( myHostAddress ));
-//                myNewObject = new JSSynergyServer(myAssMouse, &(*myAssMouse));
-
-            }
-
+        std::string myHostName; 
+        if (!convertFrom(cx, argv[0], myHostName)) {
+            JS_ReportError( cx, 
+                            "JSSynergyServer::Constructor: argument #1 must be a "
+                            "string)" );
+            return JS_FALSE;
         }
-            
+        asl::Unsigned32 myHostAddress = inet::getHostAddress( myHostName.c_str() );
+
+        unsigned myPort;
+        if (!convertFrom(cx, argv[1], myPort)) {
+            JS_ReportError( cx, 
+                            "JSSynergyServer::Constructor: argument #2 must be a "
+                            "Number)" );
+            return JS_FALSE;
+        }
+
+        OWNERPTR mySynergyServer = OWNERPTR(new SynergyServer( myHostAddress, 
+                                                               myPort ));
+        myNewObject = new JSSynergyServer(mySynergyServer, &(*mySynergyServer));
+
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
             return JS_TRUE;

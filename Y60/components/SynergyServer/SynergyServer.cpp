@@ -11,7 +11,6 @@
 #include "SynergyServer.h"
 #include <asl/base/Time.h>
 #include <y60/base/iostream_functions.h>
-#include <asl/base/Auto.h>
 #include <asl/net/net_functions.h>
 #include <sstream>
 
@@ -40,7 +39,8 @@ void printVectorAsHex( const std::vector<unsigned char> & theMessage ) {
 SynergyServer::SynergyServer( asl::Unsigned32 theHost, asl::Unsigned16 thePort ) :
     _myTCPServer( theHost, thePort ),
     _mySocket(NULL),
-    _myIsConnected(false)
+    _myIsConnected(false),
+    _myClientScreenSize(0,0)
 {
     AC_TRACE << "ASS_Mouse::SynergyServer";
     fork();
@@ -115,7 +115,6 @@ void SynergyServer::onMouseWheel( int theDeltaX, int theDeltaY ) {
     }
 
 }
-
 
 
 void SynergyServer::stop() {
@@ -288,7 +287,7 @@ void SynergyServer::processMessages() {
         }
         else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "DINF") {
             AC_TRACE << "Got DInfo message";
-            // do something with client data...
+            parseClientInfo(myMsg);
             send( "CIAK" );            
             send( "CROP" );
             std::vector<unsigned char> myOptions(4,0);
@@ -308,5 +307,24 @@ void SynergyServer::processMessages() {
                                                                 myMsg.begin() + 4 );
         }
     }
+
+}
+       
+void SynergyServer::parseClientInfo( const std::vector<unsigned char> & theMsg ) {
+
+    if( std::string( theMsg.begin(), theMsg.begin() + 4 ) != "DINF" ) {
+        AC_ERROR << "No client-info message!";
+        return;
+    }
+    
+    if (theMsg.size() != 18) {
+        AC_ERROR << "Client info incomplete! Got only " << theMsg.size() << "bytes!";
+        return;
+    }
+    
+    _myLock.lock();
+    _myClientScreenSize[0] = (theMsg[8] << 8) + theMsg[9];
+    _myClientScreenSize[1] = (theMsg[10] << 8) + theMsg[11];
+    _myLock.unlock();
 
 }
