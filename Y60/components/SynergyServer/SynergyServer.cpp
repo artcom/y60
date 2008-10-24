@@ -164,7 +164,9 @@ void SynergyServer::run() {
             receive();
             processMessages(); 
             
-            sendHeartBeat();
+            if (_myIsConnected) {
+                sendHeartBeat();
+            }
             
             while (!_mySendMsgQueue.empty()) {
                 if (_mySocket != NULL && _mySocket->isValid()) {
