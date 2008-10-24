@@ -57,6 +57,9 @@ namespace jslib {
                 JSA_CallFunctionName( _myJSContext, _myEventListener, 
                                       "onFrame", 1, &arg, &rval );
             }
+
+            asl::msleep(10);
+
         }
 
     }

@@ -12,7 +12,7 @@
 #include <asl/base/Time.h>
 #include <y60/base/iostream_functions.h>
 #include <asl/base/Auto.h>
-#include <asl/net_functions.h>
+#include <asl/net/net_functions.h>
 #include <sstream>
 
 const unsigned int READ_BUFFER_SIZE = 2000;
