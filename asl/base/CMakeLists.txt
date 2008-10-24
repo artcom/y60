@@ -110,6 +110,7 @@ MultiThreadedUnitTest
 MyClass
 _os_functions
 Path
+PlugInManager
 PosixThread
 PrioCeilingRWLock
 _proc_functions
@@ -150,4 +151,10 @@ ac_add_library(
   HEADERS ${HEADERS}
   EXTERNS GLIB2
   TESTS   ${TESTS}
+)
+
+ac_add_plugin(
+  testpluginOPT
+  SOURCES testPlugIn.cpp
+  HEADERS testPlugIn.h
 )
