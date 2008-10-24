@@ -21,6 +21,8 @@ const DAMPING_FACTOR = 1.3;
 
 const POSITION_OFFSET = [0,140];
 const SCREENSIZE_OFFSET = [0, -280];
+//const POSITION_OFFSET = [0,0];
+//const SCREENSIZE_OFFSET = [0, 0];
 var _myScreenSize = _mySynergyServer.getScreenSize();
 
 var _myMouseMoveId = null;
@@ -88,10 +90,14 @@ function onASSEvent ( theEvent ) {
             _myMouseMoveId = theEvent.id;
             _myTargetPosition = null;
             if (_myGridSize) {
-                var myCurrentPos = getMousePos( theEvent.raw_position );
-                if (distance( _myMousePosition, myCurrentPos ) < 100) {
-                    _myMousePosition = myCurrentPos;
-                }
+                _myMousePosition = getMousePos( theEvent.raw_position );
+                _mySynergyServer.onMouseMotion( _myMousePosition.x + POSITION_OFFSET[0], 
+                                                _myMousePosition.y + POSITION_OFFSET[1] );
+            }
+            // if we still have our other hand on the table, treat as an aditional mouse
+            // click
+            if (_myButtonPressedId) {
+                _mySynergyServer.onMouseButton( 1, true );
             }
             _myVelocity = new Vector2f( 0, 0 );
         } else if (_myButtonPressedId == null) {
@@ -99,8 +105,14 @@ function onASSEvent ( theEvent ) {
             _mySynergyServer.onMouseButton( 1, true );
         }
     } else if ( theEvent.type == "remove") {
+        // ending our mouse movement
         if (_myMouseMoveId == theEvent.id) {
             _myMouseMoveId = null;
+            // if we are still clicking with mouse, raise the mouse button now
+            if (_myButtonPressedId) {
+                _mySynergyServer.onMouseButton( 1, false );
+            }
+        // ending button press
         } else if (_myButtonPressedId == theEvent.id) {
             _myButtonPressedId = null;
             _mySynergyServer.onMouseButton( 1, false );

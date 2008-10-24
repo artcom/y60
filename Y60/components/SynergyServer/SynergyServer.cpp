@@ -321,6 +321,10 @@ void SynergyServer::parseClientInfo( const std::vector<unsigned char> & theMsg )
     
     if (theMsg.size() != 18) {
         AC_ERROR << "Client info incomplete! Got only " << theMsg.size() << "bytes!";
+        // reconnect... 
+        _mySocket->close();
+        delete _mySocket;
+        _mySocket = NULL;
         return;
     }
     
