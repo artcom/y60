@@ -1,2 +1,2 @@
-y60 ./test_nowindow.js &
+y60 ./run_nowindow.js &
 synergyc --no-daemon localhost

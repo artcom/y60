@@ -15,11 +15,12 @@ while (!_mySynergyServer.isConnected()) {
 }
 
 
-const MOVE_VELOCITY = 100; 
+const MOVE_VELOCITY = 40; 
 const RESIZE_VELOCITY = 20; 
 const DAMPING_FACTOR = 1.3; 
 
 const POSITION_OFFSET = [0,140];
+const SCREENSIZE_OFFSET = [0, -280];
 var _myScreenSize = _mySynergyServer.getScreenSize();
 
 var _myMouseMoveId = null;
@@ -66,7 +67,7 @@ function getMousePos( theRawPosition ) {
         myRawX = _myGridSize.x - theRawPosition.x;
     }
     var myX = myRawX / _myGridSize.x 
-              * _myScreenSize.x;
+              * (_myScreenSize.x + SCREENSIZE_OFFSET[0]);
               
     var myRawY = theRawPosition.y;
     if (_myMirror.y > 0) {
@@ -74,7 +75,7 @@ function getMousePos( theRawPosition ) {
     }
               
     var myY = myRawY / _myGridSize.y 
-              * _myScreenSize.y;
+              * (_myScreenSize.y + SCREENSIZE_OFFSET[1]);
 
     return new Vector2f( myX, myY );
 }
@@ -82,16 +83,14 @@ function getMousePos( theRawPosition ) {
 
 function onASSEvent ( theEvent ) {
     
-    print( theEvent );
-
     if ( theEvent.type == "add") {
         if (_myMouseMoveId == null) {
             _myMouseMoveId = theEvent.id;
             _myTargetPosition = null;
             if (_myGridSize) {
-                var myCurMousePos = getMousePos( theEvent.raw_position );
-                if (distance( _myMousePosition, myCurMousePos ) < 100) {
-                    _myMousePosition = myCurrentMousePosition;
+                var myCurrentPos = getMousePos( theEvent.raw_position );
+                if (distance( _myMousePosition, myCurrentPos ) < 100) {
+                    _myMousePosition = myCurrentPos;
                 }
             }
             _myVelocity = new Vector2f( 0, 0 );
