@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 AudioBufferBase.cpp
 AudioBuffer.cpp
 AudioTimeSource.cpp
@@ -38,41 +38,29 @@ Effect
 RealPump
 )
 
+set(EXTERNS)
+
 if(APPLE)
-  set(SOURCE ${SOURCE} CoreAudioPump.cpp)
+  set(SOURCES ${SOURCES} CoreAudioPump.cpp)
   set(HEADERS ${HEADERS} CoreAudioPump.h)
 endif(APPLE)
 
 if(LINUX)
-  set(SOURCE ${SOURCE} ALSAPump.cpp)
+  list(APPEND EXTERNS ALSA)
+  set(SOURCES ${SOURCES} ALSAPump.cpp)
   set(HEADERS ${HEADERS} ALSAPump.h)
 endif(LINUX)
 
 if(WIN32)
-  set(SOURCE ${SOURCE} DirectSoundPump.cpp)
+  set(SOURCES ${SOURCES} DirectSoundPump.cpp)
   set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
 endif(WIN32)
 
-add_library(aslaudio SHARED ${SOURCE})
-set_target_properties(aslaudio PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslaudio aslbase aslmath )
-
-if(LINUX)
-  link_directories(aslaudio ${ALSA_INCLUDE_DIRECTORIES})
-  include_directories(aslaudio ${ALSA_LIBRARY_DIRECTORIES})
-  target_link_libraries(aslaudio ${ALSA_LIBRARIES})
-endif(LINUX)
-
-install(
-  TARGETS aslaudio
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/audio
+ac_add_library(
+  audio
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  EXTERNS ${EXTERNS}
+  DEPENDS aslbase
+  TESTS ${TESTS}
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslaudio)
-  add_test(${test} test${test})
-endforeach(test)

@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 address.cpp
 Hop.cpp
 INetEndpoint.cpp
@@ -43,23 +43,12 @@ _net_functions
 Station
 )
 
-add_library(aslnet SHARED ${SOURCE})
-set_target_properties(aslnet PROPERTIES PUBLIC_HEADER "${HEADERS}")
-link_directories(aslnet ${CURL_LIBRARY_DIRECTORIES})
-include_directories(aslnet ${CURL_INCLUDE_DIRECTORIES})
-target_link_libraries(aslnet aslbase aslmath ${CURL_LIBRARIES})
-
-install(
-  TARGETS aslnet
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/net
+ac_add_library(
+  net
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase
+  EXTERNS CURL
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslnet)
-  add_test(${test} test${test})
-endforeach(test)
 

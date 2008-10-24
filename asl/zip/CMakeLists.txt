@@ -27,36 +27,11 @@ set(TESTS
 ZipFile
 )
 
-if(APPLE)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(APPLE)
-
-if(LINUX)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(LINUX)
-
-if(WIN32)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(WIN32)
-
-add_library(aslzip SHARED ${SOURCE})
-set_target_properties(aslzip PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslzip aslbase ${ZLIB_LIBRARIES})
-
-install(
-  TARGETS aslzip
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/zip
+ac_add_library(
+  zip
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase
+  EXTERNS ZLIB
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslzip)
-  add_test(${test} test${test})
-endforeach(test)
-

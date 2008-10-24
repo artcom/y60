@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 SocketPolicy.cpp
 TCPPolicy.cpp
 UnixSocketPolicy.cpp
@@ -24,25 +24,14 @@ set(TESTS
 )
 
 if(WIN32)
-  set(SOURCE ${SOURCE} NamedPipePolicy.cpp)
+  set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
   set(HEADERS ${HEADERS} NamedPipePolicy.h)
 endif(WIN32)
 
-add_library(aslipc SHARED ${SOURCE})
-set_target_properties(aslipc PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslipc aslbase aslnet)
-
-install(
-  TARGETS aslipc
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/ipc
+ac_add_library(
+  ipc
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase aslnet
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslipc)
-  add_test(${test} test${test})
-endforeach(test)
-

@@ -35,5 +35,12 @@ include_directories(../)
 
 add_subdirectory(base)
 add_subdirectory(math)
+add_subdirectory(audio)
 add_subdirectory(raster)
+add_subdirectory(dom)
+add_subdirectory(xpath)
+add_subdirectory(serial)
+add_subdirectory(ipc)
+add_subdirectory(net)
+#add_subdirectory(zip)
 

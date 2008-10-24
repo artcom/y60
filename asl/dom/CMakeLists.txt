@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 Events.cpp
 Facade.cpp
 Field.cpp
@@ -37,36 +37,10 @@ XmlDom
 Xml
 )
 
-if(APPLE)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(APPLE)
-
-if(LINUX)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(LINUX)
-
-if(WIN32)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(WIN32)
-
-add_library(asldom SHARED ${SOURCE})
-set_target_properties(asldom PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(asldom aslbase)
-
-install(
-  TARGETS asldom
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/dom
+ac_add_library(
+  dom
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} asldom)
-  add_test(${test} test${test})
-endforeach(test)
-

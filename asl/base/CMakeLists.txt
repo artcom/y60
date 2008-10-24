@@ -129,19 +129,19 @@ UnitTest
 )
 
 if(OSX)
-  list(APPEND SOURCES MachOBacktrace.cpp)
-  list(APPEND HEADERS MachOBacktrace.h)
+  set(SOURCES ${SOURCES} MachOBacktrace.cpp)
+  set(HEADERS ${HEADERS} MachOBacktrace.h)
 endif(OSX)
 
 if(LINUX)
-  list(APPEND SOURCES GlibcBacktrace.cpp)
-  list(APPEND HEADERS GlibcBacktrace.h)
+  set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
+  set(HEADERS ${HEADERS} GlibcBacktrace.h)
   list(APPEND EXTERNALS glib)
 endif(LINUX)
 
 if(WIN32)
-  list(APPEND SOURCES Win32Backtrace.cpp)
-  list(APPEND HEADERS Win32Backtrace.h)
+  set(SOURCES ${SOURCES} Win32Backtrace.cpp)
+  set(HEADERS ${HEADERS} Win32Backtrace.h)
 endif(WIN32)
 
 

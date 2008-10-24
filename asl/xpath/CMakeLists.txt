@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 Expression.cpp
 Path.cpp
 PathParser.cpp
@@ -21,36 +21,10 @@ set(TESTS
 XPath
 )
 
-if(APPLE)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(APPLE)
-
-if(LINUX)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(LINUX)
-
-if(WIN32)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(WIN32)
-
-add_library(aslxpath SHARED ${SOURCE})
-set_target_properties(aslxpath PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslxpath aslbase asldom)
-
-install(
-  TARGETS aslxpath
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/xpath
+ac_add_library(
+  xpath
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase asldom
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslxpath)
-  add_test(${test} test${test})
-endforeach(test)
-

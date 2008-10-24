@@ -1,9 +1,8 @@
 
-set(SOURCE
+set(SOURCES
 CRC8.cpp
 SerialDevice.cpp
 SerialDeviceFactory.cpp
-TTYPort.cpp
 uCCP.cpp
 )
 
@@ -12,7 +11,6 @@ CRC8.h
 DebugPort.h
 SerialDeviceFactory.h
 SerialDevice.h
-TTYPort.h
 uCCP.h
 )
 
@@ -20,36 +18,18 @@ set(TESTS
 SerialDevice
 )
 
-if(APPLE)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(APPLE)
-
-if(LINUX)
-  set(SOURCE ${SOURCE})
-  set(HEADERS ${HEADERS})
-endif(LINUX)
-
 if(WIN32)
-  set(SOURCE ${SOURCE} ComPort.cpp)
+  set(SOURCES ${SOURCES} ComPort.cpp)
   set(HEADERS ${HEADERS} ComPort.h)
+else(WIN32)
+  set(SOURCES ${SOURCES} TTYPort.cpp)
+  set(HEADERS ${HEADERS} TTYPort.h)  
 endif(WIN32)
 
-add_library(aslserial SHARED ${SOURCE})
-set_target_properties(aslserial PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslserial aslbase aslmath)
-
-install(
-  TARGETS aslserial
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/serial
+ac_add_library(
+  serial
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  TESTS ${TESTS}
+  DEPENDS aslbase
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslserial)
-  add_test(${test} test${test})
-endforeach(test)
-
