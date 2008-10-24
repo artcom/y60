@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 CoordSpline.cpp
 Frustum.cpp
 GeometryUtils.cpp
@@ -60,21 +60,10 @@ SvgPath
 VectorStream
 )
 
-add_library(aslmath SHARED ${SOURCE})
-set_target_properties(aslmath PROPERTIES PUBLIC_HEADER "${HEADERS}")
-target_link_libraries(aslmath aslbase)
-
-install(
-  TARGETS aslmath
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/math
+ac_add_library(
+  math
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  DEPENDS aslbase
+  TESTS   ${TESTS}
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslmath)
-  add_test(${test} test${test})
-endforeach(test)
-

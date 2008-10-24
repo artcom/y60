@@ -7,33 +7,19 @@
 # or copied or duplicated in any form, in whole or in part, without the
 # specific, prior written permission of ART+COM AG Berlin.
 #============================================================================
+#
+# Helper macros common to various acmake subsystems.
+#
+#============================================================================
 
-cmake_minimum_required(VERSION 2.6)
+macro(_ac_attach_depends TARGET)
+  target_link_libraries(${TARGET} ${ARGN})
+endmacro(_ac_attach_depends)
 
-include(AcMake)
-
-
-# dependencies
-
-include(FindPkgConfig)
-
-find_package(ZLIB)
-
-pkg_search_module(GLIB2 REQUIRED glib-2.0)
-pkg_search_module(CURL  REQUIRED libcurl)
-
-if(LINUX)
-  pkg_search_module(ALSA REQUIRED alsa)
-endif(LINUX)
-
-
-# declarations
-
-project(asl)
-
-include_directories(../)
-
-add_subdirectory(base)
-add_subdirectory(math)
-add_subdirectory(raster)
-
+macro(_ac_attach_externs TARGET)
+  foreach(EXTERN ${ARGN})
+    link_directories(${${EXTERN}_LIBRARY_DIRS})
+    include_directories(${${EXTERN}_INCLUDE_DIRS})
+    target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
+  endforeach(EXTERN)
+endmacro(_ac_attach_externs)

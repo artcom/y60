@@ -7,33 +7,24 @@
 # or copied or duplicated in any form, in whole or in part, without the
 # specific, prior written permission of ART+COM AG Berlin.
 #============================================================================
+#
+# Toplevel module for including all of acmake.
+#
+# Also makes a few standard cmake modules available.
+#
+#============================================================================
 
-cmake_minimum_required(VERSION 2.6)
 
-include(AcMake)
-
-
-# dependencies
+enable_testing()
 
 include(FindPkgConfig)
 
-find_package(ZLIB)
 
-pkg_search_module(GLIB2 REQUIRED glib-2.0)
-pkg_search_module(CURL  REQUIRED libcurl)
+include(AcPlatform)
+include(AcUtils)
 
-if(LINUX)
-  pkg_search_module(ALSA REQUIRED alsa)
-endif(LINUX)
-
-
-# declarations
-
-project(asl)
-
-include_directories(../)
-
-add_subdirectory(base)
-add_subdirectory(math)
-add_subdirectory(raster)
-
+include(AcCommon)
+include(AcProject)
+include(AcAddExecutable)
+include(AcAddLibrary)
+include(AcAddPlugin)

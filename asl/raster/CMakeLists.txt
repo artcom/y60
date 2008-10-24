@@ -17,13 +17,11 @@ PixelRaster
 Pixels
 )
 
-install(
-  FILES ${HEADERS}
-  DESTINATION include/asl/raster
+ac_add_library(
+  raster
+  HEADERS ${HEADERS}
+  DEPENDS aslbase
+  TESTS   ${TESTS}
+  HEADER_ONLY
 )
 
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslbase)
-  add_test(${test} test${test})
-endforeach(test)

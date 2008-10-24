@@ -1,7 +1,5 @@
 
-ac_generate_revision_cxx(../ Revision.cpp asl ourRevision)
-
-set(SOURCE
+set(SOURCES
 Arguments.cpp
 Block.cpp
 console_functions.cpp
@@ -103,7 +101,7 @@ Dashboard
 Enum
 Exception
 _file_functions
-GarbageCollector
+#GarbageCollector
 Itimer
 Logger
 MappedBlock
@@ -130,39 +128,26 @@ UnitTest
 )
 
 if(OSX)
-  set(SOURCE ${SOURCE} MachOBacktrace.cpp)
-  set(HEADERS ${HEADERS} MachOBacktrace.h)
+  list(APPEND SOURCES MachOBacktrace.cpp)
+  list(APPEND HEADERS MachOBacktrace.h)
 endif(OSX)
 
 if(LINUX)
-  set(SOURCE ${SOURCE} GlibcBacktrace.cpp)
-  set(HEADERS ${HEADERS} GlibcBacktrace.h)
+  list(APPEND SOURCES GlibcBacktrace.cpp)
+  list(APPEND HEADERS GlibcBacktrace.h)
+  list(APPEND EXTERNALS glib)
 endif(LINUX)
 
 if(WIN32)
-  set(SOURCE ${SOURCE} Win32Backtrace.cpp)
-  set(HEADERS ${HEADERS} Win32Backtrace.h)
+  list(APPEND SOURCES Win32Backtrace.cpp)
+  list(APPEND HEADERS Win32Backtrace.h)
 endif(WIN32)
 
-add_library(aslbase SHARED ${SOURCE})
-set_target_properties(aslbase PROPERTIES PUBLIC_HEADER "${HEADERS}")
 
-# we need glib for paths
-link_directories(${GLIB2_LIBRARY_DIRS})
-include_directories(${GLIB2_INCLUDE_DIRS})
-target_link_libraries(aslbase ${GLIB2_LIBRARIES})
-
-install(
-  TARGETS aslbase
-  LIBRARY
-    DESTINATION lib
-  PUBLIC_HEADER 
-    DESTINATION include/asl/base
+ac_add_library(
+  base
+  SOURCES ${SOURCES}
+  HEADERS ${HEADERS}
+  EXTERNS GLIB2
+  TESTS   ${TESTS}
 )
-
-foreach(test ${TESTS})
-  add_executable(test${test} test${test}.tst.cpp)
-  target_link_libraries(test${test} aslbase)
-  add_test(${test} test${test})
-endforeach(test)
-
