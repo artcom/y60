@@ -17,7 +17,7 @@ include(AcMake)
 
 include(FindPkgConfig)
 
-find_package(ZLIB)
+#find_package(ZLIB)
 
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
 pkg_search_module(CURL  REQUIRED libcurl)
