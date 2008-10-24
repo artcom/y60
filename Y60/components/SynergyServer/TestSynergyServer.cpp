@@ -164,23 +164,23 @@ void TestSynergyServer::testMouse() {
     testResponse( 5, "DMUP", myPacket, myMouseData );
 
     // test mouse wheel
-//    myMouseData.clear();
-//    myMouseData.push_back(0x00);
-//    myMouseData.push_back(0x00);
-//    myMouseData.push_back(0x00);
-//    myMouseData.push_back(0x78);
-//
-//    _mySynergyServer.onMouseWheel( 0, -1 );
-//    testResponse( 8, "DMWM", myPacket, myMouseData );
-//    
-//    myMouseData.clear();
-//    myMouseData.push_back(0x00);
-//    myMouseData.push_back(0x00);
-//    myMouseData.push_back(0xFF);
-//    myMouseData.push_back(0x88);
-//    
-//    _mySynergyServer.onMouseWheel( 0, 1 );
-//    testResponse( 8, "DMWM", myPacket, myMouseData );
+    myMouseData.clear();
+    myMouseData.push_back(0x00);
+    myMouseData.push_back(0x00);
+    myMouseData.push_back(0x00);
+    myMouseData.push_back(0x78);
+
+    _mySynergyServer.onMouseWheel( 0, -1 );
+    testResponse( 8, "DMWM", myPacket, myMouseData );
+    
+    myMouseData.clear();
+    myMouseData.push_back(0x00);
+    myMouseData.push_back(0x00);
+    myMouseData.push_back(0xFF);
+    myMouseData.push_back(0x88);
+    
+    _mySynergyServer.onMouseWheel( 0, 1 );
+    testResponse( 8, "DMWM", myPacket, myMouseData );
 
 }
 

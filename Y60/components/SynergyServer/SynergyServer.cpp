@@ -103,11 +103,15 @@ void SynergyServer::onMouseWheel( int theDeltaX, int theDeltaY ) {
     if (!_myIsConnected) {
         return;
     }
-
+    
     if (theDeltaY == 1) {
-        //send( "DMWM", MOUSE_WHEEL_DOWN, 4 );
+        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_DOWN, 
+                                                  MOUSE_WHEEL_DOWN 
+                                                  + sizeof(MOUSE_WHEEL_DOWN) ) );
     } else if (theDeltaY == -1) {
-        //send( "DMWM", MOUSE_WHEEL_UP, 4 );
+        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_UP, 
+                                                  MOUSE_WHEEL_UP 
+                                                  + sizeof(MOUSE_WHEEL_UP) ) );
     }
 
 }
