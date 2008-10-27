@@ -137,7 +137,7 @@ endif(OSX)
 if(LINUX)
     set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
     set(HEADERS ${HEADERS} GlibcBacktrace.h)
-    list(APPEND EXTERNALS glib)
+    list(APPEND EXTERNALS GLIB2)
 endif(LINUX)
 
 if(WIN32)
