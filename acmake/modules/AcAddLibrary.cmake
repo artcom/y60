@@ -15,11 +15,11 @@
 macro(ac_add_library LIBRARY_NAME)
   parse_arguments(THIS_LIBRARY
     "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;"
-    "HEADER_ONLY;"
+    "HEADER_ONLY;DONT_INSTALL;"
     ${ARGN})
 
   # compute full name
-  set(THIS_LIBRARY_NAME "${CMAKE_PROJECT_NAME}${LIBRARY_NAME}")
+  set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
 
   # compute path within project
   set(THIS_LIBRARY_PATH "${CMAKE_PROJECT_NAME}/${LIBRARY_NAME}")
@@ -27,10 +27,12 @@ macro(ac_add_library LIBRARY_NAME)
   if(THIS_LIBRARY_HEADER_ONLY)
     # for a header-only-library
 
-    install(
-      FILES ${THIS_LIBRARY_HEADERS}
-      DESTINATION include/${THIS_LIBRARY_PATH}
+    if(NOT THIS_LIBRARY_NO_INSTALL)
+      install(
+        FILES ${THIS_LIBRARY_HEADERS}
+          DESTINATION include/${THIS_LIBRARY_PATH}
       )
+    endif(NOT THIS_LIBRARY_NO_INSTALL)
 
   else(THIS_LIBRARY_HEADER_ONLY)
     # for a full library
@@ -49,28 +51,28 @@ macro(ac_add_library LIBRARY_NAME)
     _ac_attach_externs(${THIS_LIBRARY_NAME} ${THIS_LIBRARY_EXTERNS})
     
     # define installation
-    install(
-      TARGETS ${THIS_LIBRARY_NAME}
-      LIBRARY
-        DESTINATION lib
-      PUBLIC_HEADER
-        DESTINATION include/${THIS_LIBRARY_PATH}
-    )
+    if(NOT THIS_LIBRARY_DONT_INSTALL)
+      install(
+        TARGETS ${THIS_LIBRARY_NAME}
+        LIBRARY
+          DESTINATION lib
+        PUBLIC_HEADER
+          DESTINATION include/${THIS_LIBRARY_PATH}
+      )
+    endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
   endif(THIS_LIBRARY_HEADER_ONLY)
 
   # create tests
   foreach(TEST ${TESTS})
-    # define target
-    add_executable(test${TEST} test${TEST}.tst.cpp)
-
-    # care about proper linkage
-    if(THIS_LIBRARY_HEADER_ONLY)
-      _ac_attach_depends(test${TEST} ${THIS_LIBRARY_DEPENDS})
-      _ac_attach_externs(test${TEST} ${THIS_LIBRARY_EXTERNS})
-    else(THIS_LIBRARY_HEADER_ONLY)
-      target_link_libraries(test${TEST} ${THIS_LIBRARY_NAME})
-    endif(THIS_LIBRARY_HEADER_ONLY)
+    # define the target
+    ac_add_executable(
+      test${TEST}
+      SOURCES test${TEST}.tst.cpp
+      DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME}
+      EXTERNS ${THIS_LIBRARY_EXTERNS}
+      DONT_INSTALL
+    )
 
     # tell ctest about it
     add_test(${TEST} test${TEST})

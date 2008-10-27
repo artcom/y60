@@ -44,7 +44,7 @@ Station
 )
 
 ac_add_library(
-  net
+  aslnet
   SOURCES ${SOURCES}
   HEADERS ${HEADERS}
   TESTS ${TESTS}

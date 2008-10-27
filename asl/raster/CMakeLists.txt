@@ -18,7 +18,7 @@ Pixels
 )
 
 ac_add_library(
-  raster
+  aslraster
   HEADERS ${HEADERS}
   DEPENDS aslbase
   TESTS   ${TESTS}

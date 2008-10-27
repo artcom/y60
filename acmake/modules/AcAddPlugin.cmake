@@ -14,12 +14,12 @@
 
 macro(ac_add_plugin PLUGIN_NAME)
   parse_arguments(THIS_PLUGIN
-    "SOURCES;HEADERS;DEPENDS;EXTERNS;"
-    ""
+    "SOURCES;HEADERS;DEPENDS;EXTERNS;FRAMEWORK;"
+    "DONT_INSTALL;"
     ${ARGN})
 
   # compute full name
-  set(THIS_PLUGIN_NAME "${CMAKE_PROJECT_NAME}${PLUGIN_NAME}")
+  set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
 
   # compute path within project
   set(THIS_PLUGIN_PATH "${CMAKE_PROJECT_NAME}/${PLUGIN_NAME}")
@@ -38,13 +38,19 @@ macro(ac_add_plugin PLUGIN_NAME)
   _ac_attach_externs(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_EXTERNS})
     
   # define installation
-  install(
-    TARGETS ${THIS_PLUGIN_NAME}
-    LIBRARY
-      DESTINATION lib # XXX: depends on container
-    PUBLIC_HEADER
-      DESTINATION include/${THIS_PLUGIN_PATH}
-  )
+  if(NOT THIS_PLUGIN_DONT_INSTALL)
+    set (THIS_PLUGIN_INSTALL_LOCATION lib)
+    if(THIS_PLUGIN_FRAMEWORK)
+      set (THIS_PLUGIN_INSTALL_LOCATION $THIS_PLUGIN_FRAMEWORK/$THIS_PLUGIN_INSTALL_LOCATION)
+    endif(THIS_PLUGIN_FRAMEWORK)
+    install(
+      TARGETS ${THIS_PLUGIN_NAME}
+      LIBRARY
+        DESTINATION lib # XXX: depends on container
+      PUBLIC_HEADER
+        DESTINATION include/${THIS_PLUGIN_PATH}
+    )
+  endif(NOT THIS_PLUGIN_DONT_INSTALL)
 
   # XXX: tests?
   

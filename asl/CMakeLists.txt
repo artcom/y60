@@ -10,14 +10,17 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-include(AcMake)
+project(asl)
 
+set(CMAKE_MODULE_PATH ../acmake/modules ${CMAKE_MODULE_PATH})
 
 # dependencies
 
+include(FindZLIB)
+
 include(FindPkgConfig)
 
-#find_package(ZLIB)
+include(AcMake)
 
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
 pkg_search_module(CURL  REQUIRED libcurl)
@@ -29,9 +32,9 @@ endif(LINUX)
 
 # declarations
 
-project(asl)
-
 include_directories(../)
+
+add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 add_subdirectory(base)
 add_subdirectory(math)

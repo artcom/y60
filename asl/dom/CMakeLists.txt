@@ -38,7 +38,7 @@ Xml
 )
 
 ac_add_library(
-  dom
+  asldom
   SOURCES ${SOURCES}
   HEADERS ${HEADERS}
   TESTS ${TESTS}

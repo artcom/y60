@@ -57,7 +57,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_library(
-  audio
+  aslaudio
   SOURCES ${SOURCES}
   HEADERS ${HEADERS}
   EXTERNS ${EXTERNS}

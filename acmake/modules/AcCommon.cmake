@@ -13,13 +13,20 @@
 #============================================================================
 
 macro(_ac_attach_depends TARGET)
-  target_link_libraries(${TARGET} ${ARGN})
+  foreach(DEPEND ${ARGN})
+    get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
+    if("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
+        OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
+      target_link_libraries(${TARGET} ${DEPEND})
+    endif("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
+           OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
+  endforeach(DEPEND)
 endmacro(_ac_attach_depends)
 
 macro(_ac_attach_externs TARGET)
   foreach(EXTERN ${ARGN})
     link_directories(${${EXTERN}_LIBRARY_DIRS})
-    include_directories(${${EXTERN}_INCLUDE_DIRS})
     target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
+    include_directories(${${EXTERN}_INCLUDE_DIRS})
   endforeach(EXTERN)
 endmacro(_ac_attach_externs)

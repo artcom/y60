@@ -146,7 +146,7 @@ endif(WIN32)
 
 
 ac_add_library(
-  base
+  aslbase
   SOURCES ${SOURCES}
   HEADERS ${HEADERS}
   EXTERNS GLIB2
@@ -154,7 +154,8 @@ ac_add_library(
 )
 
 ac_add_plugin(
-  testpluginOPT
+  asltestplugin
   SOURCES testPlugIn.cpp
   HEADERS testPlugIn.h
+  DONT_INSTALL
 )

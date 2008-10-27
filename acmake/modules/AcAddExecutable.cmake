@@ -15,7 +15,7 @@
 macro(ac_add_executable EXECUTABLE_NAME)
   parse_arguments(THIS_EXECUTABLE
     "SOURCES;DEPENDS;EXTERNS;"
-    ""
+    "DONT_INSTALL;"
     ${ARGN})
 
   # compute full name
@@ -29,11 +29,13 @@ macro(ac_add_executable EXECUTABLE_NAME)
   _ac_attach_externs(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_EXTERNS})
     
   # define installation
-  install(
-    TARGETS ${THIS_EXECUTABLE_NAME}
-    RUNTIME
-      DESTINATION bin
-  )
+  if(NOT THIS_EXECUTABLE_DONT_INSTALL)
+    install(
+      TARGETS ${THIS_EXECUTABLE_NAME}
+      RUNTIME
+        DESTINATION bin
+    )
+  endif(NOT THIS_EXECUTABLE_DONT_INSTALL)
 
   # XXX: tests?
   
