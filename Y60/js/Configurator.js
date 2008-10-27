@@ -414,7 +414,6 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     }
 
     function setup(obj, theSceneViewer, theSettingsFile, theSettingsFileList) {
-
         if (theSettingsFileList != undefined) {
             _mySettingsFileList = theSettingsFileList;
         }
@@ -430,7 +429,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 
             // merge all settings in the settings file list
             for (var i = 0; i < _mySettingsFileList.length; i++) {
-                var mySettingsFile = _mySettingsFileList[i];
+                var mySettingsFile = trim(_mySettingsFileList[i]);
                 if (fileExists(mySettingsFile)) {
                     var mySettingsDom = new Node();
                     mySettingsDom.parseFile( mySettingsFile );
