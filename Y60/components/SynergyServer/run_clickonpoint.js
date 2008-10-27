@@ -95,28 +95,13 @@ function onASSEvent ( theEvent ) {
                 _myMousePosition = getMousePos( theEvent.raw_position );
                 _mySynergyServer.onMouseMotion( _myMousePosition.x + POSITION_OFFSET[0], 
                                                 _myMousePosition.y + POSITION_OFFSET[1] );
-            }
-            // if we still have our other hand on the table, treat as an aditional mouse
-            // click
-            if (_myButtonPressedId) {
                 _mySynergyServer.onMouseButton( 1, true );
             }
-            _myVelocity = new Vector2f( 0, 0 );
-        } else if (_myButtonPressedId == null) {
-            _myButtonPressedId = theEvent.id;
-            _mySynergyServer.onMouseButton( 1, true );
         }
     } else if ( theEvent.type == "remove") {
         // ending our mouse movement
         if (_myMouseMoveId == theEvent.id) {
             _myMouseMoveId = null;
-            // if we are still clicking with mouse, raise the mouse button now
-            if (_myButtonPressedId) {
-                _mySynergyServer.onMouseButton( 1, false );
-            }
-        // ending button press
-        } else if (_myButtonPressedId == theEvent.id) {
-            _myButtonPressedId = null;
             _mySynergyServer.onMouseButton( 1, false );
         }
     } else if ( theEvent.type == "move" ) {
