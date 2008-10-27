@@ -24,14 +24,14 @@ set(TESTS
 )
 
 if(WIN32)
-  set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
-  set(HEADERS ${HEADERS} NamedPipePolicy.h)
+    set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
+    set(HEADERS ${HEADERS} NamedPipePolicy.h)
 endif(WIN32)
 
 ac_add_library(
-  aslipc
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase aslnet
+    aslipc
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase aslnet
 )

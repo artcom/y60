@@ -13,48 +13,48 @@
 #============================================================================
 
 macro(ac_add_plugin PLUGIN_NAME)
-  parse_arguments(THIS_PLUGIN
-    "SOURCES;HEADERS;DEPENDS;EXTERNS;FRAMEWORK;"
-    "DONT_INSTALL;"
-    ${ARGN})
-
-  # compute full name
-  set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
-
-  # compute path within project
-  set(THIS_PLUGIN_PATH "${CMAKE_PROJECT_NAME}/${PLUGIN_NAME}")
-
-  # define the target
-  add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES})
-
-  # link to aslbase because it contains asl::PluginBase
-  target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
+    parse_arguments(THIS_PLUGIN
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;FRAMEWORK;"
+        "DONT_INSTALL;"
+        ${ARGN})
     
-  # attach headers to target
-  set_target_properties(
-    ${THIS_PLUGIN_NAME} PROPERTIES
-    PUBLIC_HEADER "${THIS_PLUGIN_HEADERS}"
-    )
-
-  # attach depends and externs
-  _ac_attach_depends(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_DEPENDS})
-  _ac_attach_externs(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_EXTERNS})
+    # compute full name
+    set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     
-  # define installation
-  if(NOT THIS_PLUGIN_DONT_INSTALL)
-    set (THIS_PLUGIN_INSTALL_LOCATION lib)
-    if(THIS_PLUGIN_FRAMEWORK)
-      set (THIS_PLUGIN_INSTALL_LOCATION $THIS_PLUGIN_FRAMEWORK/$THIS_PLUGIN_INSTALL_LOCATION)
-    endif(THIS_PLUGIN_FRAMEWORK)
-    install(
-      TARGETS ${THIS_PLUGIN_NAME}
-      LIBRARY
-        DESTINATION lib # XXX: depends on container
-      PUBLIC_HEADER
-        DESTINATION include/${THIS_PLUGIN_PATH}
+    # compute path within project
+    set(THIS_PLUGIN_PATH "${CMAKE_PROJECT_NAME}/${PLUGIN_NAME}")
+    
+    # define the target
+    add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES})
+    
+    # link to aslbase because it contains asl::PluginBase
+    target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
+    
+    # attach headers to target
+    set_target_properties(
+        ${THIS_PLUGIN_NAME} PROPERTIES
+            PUBLIC_HEADER "${THIS_PLUGIN_HEADERS}"
     )
-  endif(NOT THIS_PLUGIN_DONT_INSTALL)
-
-  # XXX: tests?
   
+    # attach depends and externs
+    _ac_attach_depends(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_DEPENDS})
+    _ac_attach_externs(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_EXTERNS})
+    
+    # define installation
+    if(NOT THIS_PLUGIN_DONT_INSTALL)
+        set (THIS_PLUGIN_INSTALL_LOCATION lib)
+        if(THIS_PLUGIN_FRAMEWORK)
+            set (THIS_PLUGIN_INSTALL_LOCATION $THIS_PLUGIN_FRAMEWORK/$THIS_PLUGIN_INSTALL_LOCATION)
+        endif(THIS_PLUGIN_FRAMEWORK)
+        install(
+            TARGETS ${THIS_PLUGIN_NAME}
+            LIBRARY
+                DESTINATION lib # XXX: depends on container
+            PUBLIC_HEADER
+                DESTINATION include/${THIS_PLUGIN_PATH}
+        )
+    endif(NOT THIS_PLUGIN_DONT_INSTALL)
+    
+    # XXX: tests?
+    
 endmacro(ac_add_plugin)

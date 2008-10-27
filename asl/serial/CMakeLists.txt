@@ -19,17 +19,17 @@ SerialDevice
 )
 
 if(WIN32)
-  set(SOURCES ${SOURCES} ComPort.cpp)
-  set(HEADERS ${HEADERS} ComPort.h)
+    set(SOURCES ${SOURCES} ComPort.cpp)
+    set(HEADERS ${HEADERS} ComPort.h)
 else(WIN32)
-  set(SOURCES ${SOURCES} TTYPort.cpp)
-  set(HEADERS ${HEADERS} TTYPort.h)  
+    set(SOURCES ${SOURCES} TTYPort.cpp)
+    set(HEADERS ${HEADERS} TTYPort.h)  
 endif(WIN32)
 
 ac_add_library(
-  aslserial
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase
+    aslserial
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase
 )

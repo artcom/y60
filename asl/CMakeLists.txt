@@ -26,7 +26,7 @@ pkg_search_module(GLIB2 REQUIRED glib-2.0)
 pkg_search_module(CURL  REQUIRED libcurl)
 
 if(LINUX)
-  pkg_search_module(ALSA REQUIRED alsa)
+    pkg_search_module(ALSA REQUIRED alsa)
 endif(LINUX)
 
 if(OSX)

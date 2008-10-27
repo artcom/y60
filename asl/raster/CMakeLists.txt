@@ -18,10 +18,10 @@ Pixels
 )
 
 ac_add_library(
-  aslraster
-  HEADERS ${HEADERS}
-  DEPENDS aslbase
-  TESTS   ${TESTS}
-  HEADER_ONLY
+    aslraster
+    HEADERS ${HEADERS}
+    DEPENDS aslbase
+    TESTS   ${TESTS}
+    HEADER_ONLY
 )
 

@@ -23,39 +23,39 @@
 #============================================================================
 
 if(UNIX)
-
-  if(APPLE)
-
-    set(OSX true)
-    add_definitions(-DOSX )
-
-    if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
-        add_definitions( -DOSX_X86 )
-    else( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
-        add_definitions( -DOSX_PPC )
-    endif( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
-
-  else(APPLE)
-
-    set(LINUX true)
-    add_definitions(-DLINUX)
-
-    # we consider libm and some others standard
-    link_libraries(m dl rt pthread)
-
-    # always be reentrant
-    add_definitions(-D_REENTRANT)
-
-    # may the GNU be with us
-    add_definitions(-D_GNU_SOURCE)
-
-    # XXX: we should really really do this.
-    #add_definitions(-D_FILE_OFFSET_BITS=64)
-  endif(APPLE)
-
+    
+    if(APPLE)
+        
+        set(OSX true)
+        add_definitions(-DOSX )
+        
+        if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+            add_definitions( -DOSX_X86 )
+        else( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+            add_definitions( -DOSX_PPC )
+        endif( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^i[36]86$" )
+        
+    else(APPLE)
+        
+        set(LINUX true)
+        add_definitions(-DLINUX)
+        
+        # we consider libm and some others standard
+        link_libraries(m dl rt pthread)
+        
+        # always be reentrant
+        add_definitions(-D_REENTRANT)
+        
+        # may the GNU be with us
+        add_definitions(-D_GNU_SOURCE)
+        
+        # XXX: we should really really do this.
+        #add_definitions(-D_FILE_OFFSET_BITS=64)
+    endif(APPLE)
+    
 else(UNIX)
-
-  if(WIN32)
-  endif(WIN32)
-
+    
+    if(WIN32)
+    endif(WIN32)
+    
 endif(UNIX)

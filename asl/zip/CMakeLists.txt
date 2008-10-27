@@ -28,10 +28,10 @@ ZipFile
 )
 
 ac_add_library(
-  zip
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase
-  EXTERNS ZLIB
+    zip
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase
+    EXTERNS ZLIB
 )

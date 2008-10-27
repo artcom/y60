@@ -44,11 +44,11 @@ Station
 )
 
 ac_add_library(
-  aslnet
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase
-  EXTERNS CURL
+    aslnet
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase
+    EXTERNS CURL
 )
 

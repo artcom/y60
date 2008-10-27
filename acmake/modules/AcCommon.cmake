@@ -13,24 +13,24 @@
 #============================================================================
 
 macro(_ac_attach_depends TARGET)
-  foreach(DEPEND ${ARGN})
-    get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
-    if("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
-        OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
-      target_link_libraries(${TARGET} ${DEPEND})
-    endif("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
-           OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
-  endforeach(DEPEND)
+    foreach(DEPEND ${ARGN})
+        get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
+        if("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
+                OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
+            target_link_libraries(${TARGET} ${DEPEND})
+        endif("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
+            OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
+    endforeach(DEPEND)
 endmacro(_ac_attach_depends)
 
 macro(_ac_attach_externs TARGET)
-  foreach(EXTERN ${ARGN})
-    if( EXTERN MATCHES ".*\\.framework/?$" )
-      target_link_libraries(${TARGET} ${EXTERN})
-    else( EXTERN MATCHES ".*\\.framework/?$" )
-      link_directories(${${EXTERN}_LIBRARY_DIRS})
-      include_directories(${${EXTERN}_INCLUDE_DIRS})
-      target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
-    endif( EXTERN MATCHES ".*\\.framework/?$" )
-  endforeach(EXTERN)
+    foreach(EXTERN ${ARGN})
+        if(EXTERN MATCHES ".*\\.framework/?$")
+            target_link_libraries(${TARGET} ${EXTERN})
+        else(EXTERN MATCHES ".*\\.framework/?$")
+            link_directories(${${EXTERN}_LIBRARY_DIRS})
+            include_directories(${${EXTERN}_INCLUDE_DIRS})
+            target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
+        endif(EXTERN MATCHES ".*\\.framework/?$")
+    endforeach(EXTERN)
 endmacro(_ac_attach_externs)

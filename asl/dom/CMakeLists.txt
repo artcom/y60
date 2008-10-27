@@ -38,9 +38,9 @@ Xml
 )
 
 ac_add_library(
-  asldom
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase
+    asldom
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase
 )

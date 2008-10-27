@@ -41,26 +41,26 @@ RealPump
 set(EXTERNS)
 
 if(APPLE)
-  set(SOURCES ${SOURCES} CoreAudioPump.cpp)
-  set(HEADERS ${HEADERS} CoreAudioPump.h)
+    set(SOURCES ${SOURCES} CoreAudioPump.cpp)
+    set(HEADERS ${HEADERS} CoreAudioPump.h)
 endif(APPLE)
 
 if(LINUX)
-  list(APPEND EXTERNS ALSA)
-  set(SOURCES ${SOURCES} ALSAPump.cpp)
-  set(HEADERS ${HEADERS} ALSAPump.h)
+    list(APPEND EXTERNS ALSA)
+    set(SOURCES ${SOURCES} ALSAPump.cpp)
+    set(HEADERS ${HEADERS} ALSAPump.h)
 endif(LINUX)
 
 if(WIN32)
-  set(SOURCES ${SOURCES} DirectSoundPump.cpp)
-  set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
+    set(SOURCES ${SOURCES} DirectSoundPump.cpp)
+    set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
 endif(WIN32)
 
 ac_add_library(
-  aslaudio
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  EXTERNS ${EXTERNS}
-  DEPENDS aslbase
-  TESTS ${TESTS}
+    aslaudio
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    EXTERNS ${EXTERNS}
+    DEPENDS aslbase
+    TESTS ${TESTS}
 )

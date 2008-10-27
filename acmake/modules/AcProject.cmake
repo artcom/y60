@@ -13,5 +13,5 @@
 #============================================================================
 
 macro(ac_project PROJECT_NAME)
-  project(${PROJECT_NAME})
+    project(${PROJECT_NAME})
 endmacro(ac_project)

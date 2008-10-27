@@ -129,34 +129,34 @@ UnitTest
 )
 
 if(OSX)
-  set(SOURCES ${SOURCES} MachOBacktrace.cpp)
-  set(HEADERS ${HEADERS} MachOBacktrace.h)
-  list(APPEND EXTERNALS ${CARBON} )
+    set(SOURCES ${SOURCES} MachOBacktrace.cpp)
+    set(HEADERS ${HEADERS} MachOBacktrace.h)
+    list(APPEND EXTERNALS ${CARBON} )
 endif(OSX)
 
 if(LINUX)
-  set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
-  set(HEADERS ${HEADERS} GlibcBacktrace.h)
-  list(APPEND EXTERNALS glib)
+    set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
+    set(HEADERS ${HEADERS} GlibcBacktrace.h)
+    list(APPEND EXTERNALS glib)
 endif(LINUX)
 
 if(WIN32)
-  set(SOURCES ${SOURCES} Win32Backtrace.cpp)
-  set(HEADERS ${HEADERS} Win32Backtrace.h)
+    set(SOURCES ${SOURCES} Win32Backtrace.cpp)
+    set(HEADERS ${HEADERS} Win32Backtrace.h)
 endif(WIN32)
 
 
 ac_add_library(
-  aslbase
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  EXTERNS ${EXTERNALS}
-  TESTS   ${TESTS}
+    aslbase
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    EXTERNS ${EXTERNALS}
+    TESTS   ${TESTS}
 )
 
 ac_add_plugin(
-  asltestplugin
-  SOURCES testPlugIn.cpp
-  HEADERS testPlugIn.h
-  DONT_INSTALL
+    asltestplugin
+    SOURCES testPlugIn.cpp
+    HEADERS testPlugIn.h
+    DONT_INSTALL
 )

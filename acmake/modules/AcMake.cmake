@@ -18,7 +18,6 @@ enable_testing()
 
 include(FindPkgConfig)
 
-
 include(AcPlatform)
 include(AcUtils)
 

@@ -22,9 +22,9 @@ XPath
 )
 
 ac_add_library(
-  aslxpath
-  SOURCES ${SOURCES}
-  HEADERS ${HEADERS}
-  TESTS ${TESTS}
-  DEPENDS aslbase asldom
+    aslxpath
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    TESTS ${TESTS}
+    DEPENDS aslbase asldom
 )
