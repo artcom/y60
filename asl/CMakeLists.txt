@@ -13,17 +13,14 @@ cmake_minimum_required(VERSION 2.6)
 project(asl)
 
 set(CMAKE_MODULE_PATH ../acmake/modules ${CMAKE_MODULE_PATH})
-
-# dependencies
-
-include(FindZLIB)
-
+include(AcMake)
 include(FindPkgConfig)
 
-include(AcMake)
-
+# dependencies
+find_package(ZLIB)
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
 pkg_search_module(CURL  REQUIRED libcurl)
+pkg_search_module(OPEN_EXR  REQUIRED OpenEXR)
 
 if(LINUX)
     pkg_search_module(ALSA REQUIRED alsa)
@@ -31,6 +28,7 @@ endif(LINUX)
 
 if(OSX)
     find_library( CARBON Carbon )
+    find_library( AUDIO_UNIT AudioUnit )
 endif(OSX)
 
 # declarations
@@ -46,7 +44,7 @@ add_subdirectory(raster)
 add_subdirectory(dom)
 add_subdirectory(xpath)
 add_subdirectory(serial)
-add_subdirectory(ipc)
 add_subdirectory(net)
+add_subdirectory(ipc)
 #add_subdirectory(zip)
 

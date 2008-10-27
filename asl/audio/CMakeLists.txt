@@ -40,10 +40,11 @@ RealPump
 
 set(EXTERNS)
 
-if(APPLE)
+if(OSX)
     set(SOURCES ${SOURCES} CoreAudioPump.cpp)
     set(HEADERS ${HEADERS} CoreAudioPump.h)
-endif(APPLE)
+    list(APPEND EXTERNS ${AUDIO_UNIT} )
+endif(OSX)
 
 if(LINUX)
     list(APPEND EXTERNS ALSA)

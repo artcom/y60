@@ -49,6 +49,6 @@ ac_add_library(
     HEADERS ${HEADERS}
     TESTS ${TESTS}
     DEPENDS aslbase
-    EXTERNS CURL
+    EXTERNS CURL ZLIB
 )
 
