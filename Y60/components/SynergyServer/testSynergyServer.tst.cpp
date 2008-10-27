@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.  
 //=============================================================================
 
+
 #include "TestSynergyServer.h"
 
 #include <asl/base/Logger.h>
@@ -15,6 +16,7 @@
 
 int main( int argc, char ** argv ) {
 
+#ifndef WIN32
     UnitTestSuite mySuite( "SynergyServer tests", argc, argv );
     mySuite.addTest( new TestSynergyServer );
     mySuite.run();
@@ -23,5 +25,9 @@ int main( int argc, char ** argv ) {
             << ", return status = " << mySuite.returnStatus();
 
     return mySuite.returnStatus();
+#else 
+    return 0;
+#endif
 
 }
+
