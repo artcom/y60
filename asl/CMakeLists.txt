@@ -29,6 +29,9 @@ if(LINUX)
   pkg_search_module(ALSA REQUIRED alsa)
 endif(LINUX)
 
+if(OSX)
+    find_library( CARBON Carbon )
+endif(OSX)
 
 # declarations
 

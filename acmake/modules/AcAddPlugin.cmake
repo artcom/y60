@@ -26,6 +26,9 @@ macro(ac_add_plugin PLUGIN_NAME)
 
   # define the target
   add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES})
+
+  # link to aslbase because it contains asl::PluginBase
+  target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
     
   # attach headers to target
   set_target_properties(

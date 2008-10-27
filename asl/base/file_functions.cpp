@@ -44,11 +44,6 @@
 #include <unistd.h>
 #include <utime.h>
 #endif
-#ifdef OSX
-    #include <Types.h>
-    #include <Files.h>
-    #include <Processes.h>
-#endif
 
 #define DB(x) // x
 
