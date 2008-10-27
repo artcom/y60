@@ -98,6 +98,8 @@ class SynergyServer : public asl::PosixThread {
         void onMouseMotion( unsigned theX, unsigned theY );
         void onMouseButton( unsigned char theButton, bool theState );
         void onMouseWheel( int theDeltaX, int theDeltaY );
+        void onRelMouseMotion( unsigned theDeltaX, unsigned theDeltaY );
+
         bool isConnected() {
             return _myIsConnected;
         }

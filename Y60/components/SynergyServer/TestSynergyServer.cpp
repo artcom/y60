@@ -160,6 +160,10 @@ void TestSynergyServer::testMouse() {
     _mySynergyServer.onMouseMotion( theX, theY );
     testResponse( 8, "DMMV", myPacket, myMouseData );
 
+    _mySynergyServer.onRelMouseMotion( theX, theY );
+    testResponse( 8, "DMRM", myPacket, myMouseData );
+
+
     // test mouse buttons 
     myMouseData.clear();
     unsigned char myButton = 1;

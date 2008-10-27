@@ -98,11 +98,18 @@ function onASSEvent ( theEvent ) {
                 _mySynergyServer.onMouseButton( 1, true );
             }
         }
+        else if (_myButtonPressedId == null) {
+            _myButtonPressedId = theEvent.id;
+            _mySynergyServer.onMouseButton( 2, true );
+        }
     } else if ( theEvent.type == "remove") {
         // ending our mouse movement
         if (_myMouseMoveId == theEvent.id) {
             _myMouseMoveId = null;
             _mySynergyServer.onMouseButton( 1, false );
+        }
+        else if (_myButtonPressedId == theEvent.id) {
+            _mySynergyServer.onMouseButton( 2, false );
         }
     } else if ( theEvent.type == "move" ) {
         if (_myMouseMoveId == theEvent.id) {

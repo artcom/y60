@@ -73,6 +73,25 @@ void SynergyServer::onMouseMotion( unsigned theX, unsigned theY ) {
 
 }
 
+
+void SynergyServer::onRelMouseMotion( unsigned theDeltaX, unsigned theDeltaY ) {
+    AC_TRACE << "SynergyServer::onRelMouseMotion(" << theDeltaX << "," << theDeltaY << ")";
+
+    if (!_myIsConnected) {
+        AC_TRACE << "failed sending mouse motion";
+        return;
+    }
+
+    std::vector<unsigned char> myMouseData;
+    myMouseData.push_back((theDeltaX >> 8) & BITMASK);
+    myMouseData.push_back(theDeltaX & BITMASK);
+    myMouseData.push_back((theDeltaY >> 8) & BITMASK);
+    myMouseData.push_back(theDeltaY & BITMASK);
+    
+    send( "DMRM", myMouseData );
+
+}
+
 void SynergyServer::onMouseButton( unsigned char theButton, bool theState ) {
     
     AC_TRACE << "SynergyServer::onMouseButton";
