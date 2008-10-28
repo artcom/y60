@@ -172,6 +172,19 @@
 #define    AUX4           PC7
 
 
+#define    PORT_AUX2      PORTC
+#define    DDR_AUX2       DDRC
+#define    AUX2           PC5
+
+#define    PORT_AUX3      PORTC
+#define    DDR_AUX3       DDRC
+#define    AUX3           PC6
+
+#define    PORT_AUX4      PORTC
+#define    DDR_AUX4       DDRC
+#define    AUX4           PC7
+
+
 //PC1 is CLK of line shift register
 //PC2 is Data of line shift register
 #define    PORT_TR_DATA   PORTC
