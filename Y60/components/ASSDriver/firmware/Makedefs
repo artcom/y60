@@ -8,11 +8,17 @@ OBJDUMP=avr-objdump
 
 CFLAGS=-Wall -O0 -fsigned-char -mmcu=$(MCU)
 
+MAKEDEPEND=avr-gcc -M $(CFLAGS) -o $(*).d $(<)
+
 OBJ=$(patsubst %.c,%.o,$(SRC))
+DEP=$(patsubst %.c,%.P,$(SRC))
 
 default: $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf $(PRG).od
+	@echo "Done building $(PRG).elf"
 	$(SIZE) $(PRG).elf
 .PHONY: default
+
+depend: $(DEP)
 
 $(PRG).bin: $(PRG).elf
 	$(OBJCOPY) -O binary $(PRG).elf $(PRG).bin
@@ -29,9 +35,22 @@ $(PRG).lst: $(PRG).elf
 $(PRG).od: $(PRG).elf
 	$(OBJDUMP) -zhD $(PRG).elf > $(PRG).od
 
-$(PRG).elf: $(SRC)
-	$(CC) -o $(@) $(CFLAGS) $(SRC)
+$(PRG).elf: $(OBJ)
+	$(CC) -o $(@) $(CFLAGS) $(OBJ)
 
 clean:
 	$(RM) $(PRG).hex $(PRG).bin $(PRG).lst $(PRG).sym $(PRG).elf $(PRG).od
+	$(RM) $(DEP)
+	$(RM) $(OBJ)
 .PHONY: clean
+
+%.o : %.c
+	$(CC) -c -o $(@) $(CFLAGS) $(<)
+
+%.P : %.c
+	@$(MAKEDEPEND)
+	@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.d > $@; \
+		rm -f $*.d; [ -s $@ ] || rm -f $@
+
+-include $(SRC:.c=.P)
+
