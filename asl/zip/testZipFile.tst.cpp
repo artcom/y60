@@ -24,6 +24,7 @@
 #include "ZipWriter.h"
 #include <asl/base/MappedBlock.h>
 #include <asl/base/UnitTest.h>
+#include <asl/base/file_functions.h>
 
 #include <string>
 #include <iostream>
@@ -35,7 +36,8 @@ class ZipReaderUnitTest : public UnitTest {
     public:
         ZipReaderUnitTest() : UnitTest("ZipReaderUnitTest") {  }
         void run() {
-            ZipReader myZipReader("../../testfiles/test.zip");
+            const std::string myRootDir = asl::getDirectoryPart( __FILE__ );
+            ZipReader myZipReader((myRootDir + "/testfiles/test.zip").c_str());
             ZipReader::Directory myDirectory = myZipReader.getDirectory();
             ENSURE(myDirectory.size() == 4);
             DPRINT(myDirectory[0].filename);

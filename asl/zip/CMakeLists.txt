@@ -1,5 +1,5 @@
 
-set(SOURCE
+set(SOURCES
 DirectoryPackage.cpp
 PackageManager.cpp
 ZipPackage.cpp

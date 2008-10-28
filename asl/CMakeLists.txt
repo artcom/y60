@@ -46,5 +46,5 @@ add_subdirectory(xpath)
 add_subdirectory(serial)
 add_subdirectory(net)
 add_subdirectory(ipc)
-#add_subdirectory(zip)
+add_subdirectory(zip)
 
