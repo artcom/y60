@@ -435,7 +435,7 @@ TTYPort::convertHandShaking(bool theFlag) {
     return 0;
 }
 
-#if \
+#if defined( LINUX ) && (  \
 ! defined( B57600 ) || \
 ! defined( B115200 ) || \
 ! defined( B230400 ) || \
@@ -450,7 +450,7 @@ TTYPort::convertHandShaking(bool theFlag) {
 ! defined( B2500000 ) || \
 ! defined( B3000000 ) || \
 ! defined( B3500000 ) || \
-! defined( B4000000 )
+! defined( B4000000 ))
 #   warning "High baudrates are not defined. If on Linux update your libc."
 #endif
 
