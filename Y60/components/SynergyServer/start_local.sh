@@ -1,2 +1,2 @@
-y60 ./run_nowindow.js &
+y60 ./mousewheel.js &
 synergyc --no-daemon localhost
