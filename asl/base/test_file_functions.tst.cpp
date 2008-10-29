@@ -78,8 +78,6 @@ class file_functions_UnitTest : public UnitTest {
         }
 
         void perform_filename_func() {
-            const std::string myRootDir(getDirectoryPart( __FILE__ ));
-
             ENSURE(getFilenamePart("/etc/passwd")=="passwd");
             ENSURE(getFilenamePart("/etc/")=="");
             ENSURE(getFilenamePart("passwd")=="passwd");
@@ -101,13 +99,11 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getParentDirectory("")=="");
             ENSURE(getParentDirectory("X")=="");
 
-            DPRINT( myRootDir );
-            DPRINT( getFilenamePart( __FILE__) );
-            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;" + myRootDir) == myRootDir + getFilenamePart(__FILE__));            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));            
             ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
-            ENSURE(searchFile(getFilenamePart(__FILE__), myRootDir) == myRootDir + getFilenamePart(__FILE__));            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));            
 #ifdef LINUX
-            ENSURE(searchFile(getFilenamePart(__FILE__), "/:.:" + myRootDir) == myRootDir + getFilenamePart(__FILE__));
+            ENSURE(searchFile(getFilenamePart(__FILE__), "/:.:../..") == std::string("../../") + getFilenamePart(__FILE__));
 #endif            
 
             ENSURE(getExtension("myfile.mp3") == "mp3");
@@ -212,9 +208,6 @@ class DirectoryTest : public UnitTest {
     public:
         DirectoryTest() : UnitTest("DirectoryTest") {  }
         void run() {
-            const std::string myRootDir(getDirectoryPart( __FILE__ ));
-            DPRINT( myRootDir );
-
             DIR * myDirHandle = opendir(".");
             struct dirent *dir_entry;
 
@@ -238,7 +231,7 @@ class DirectoryTest : public UnitTest {
 
             // use getdir utility function instead
 
-            vector<string> myDirEntries = getDirectoryEntries( myRootDir + theDirectorySeparator + "testdir");
+            vector<string> myDirEntries = getDirectoryEntries(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
             std::sort(myDirEntries.begin(), myDirEntries.end());
 
             ENSURE(myDirEntries.size() == 5);
@@ -248,58 +241,45 @@ class DirectoryTest : public UnitTest {
             ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
             ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
 
-            ENSURE_EXCEPTION(getDirectoryEntries(myRootDir + "/testdir/a"), OpenDirectoryFailed);
+            ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
             ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
 
             ENSURE(isDirectory("."));
-            ENSURE(isDirectory(myRootDir + "/testdir/"));
+            ENSURE(isDirectory("../../testdir/"));
             ENSURE(!isDirectory("nonexistingdir"));
-            ENSURE(!isDirectory(myRootDir + "/testdir/a"));
-            ENSURE(isDirectory(myRootDir + "/testdir/.svn"));
+            ENSURE(!isDirectory("../../testdir/a"));
+            //        ENSURE(isDirectory("../../testdir/.svn"));
 
             std::string myAppDir = getAppDirectory();
             DPRINT(myAppDir);
             ENSURE(isDirectory(myAppDir));
 
             // last modified stuff
-            // Write file to the current dir. 
-            std::string myFile = "./dates.tst";
-            try {
-                writeFile(myFile, "foo");
-                ENSURE( fileExists( myFile ));
+            std::string myFile = "../../dates.tst";
+            writeFile(myFile, "foo");
 
-                time_t myZeroTime = 0;
-                tm myTimeStruct = *localtime(&myZeroTime);
-                {
-                    myTimeStruct.tm_year = 100;
-                    myTimeStruct.tm_mon = 1;
+            time_t myZeroTime = 0;
+            tm myTimeStruct = *localtime(&myZeroTime);
+            {
+                myTimeStruct.tm_year = 100;
+                myTimeStruct.tm_mon = 1;
 
-                    time_t myTime = mktime(&myTimeStruct);  
-                    setLastModified(myFile, myTime); 
+                time_t myTime = mktime(&myTimeStruct);  
+                setLastModified(myFile, myTime); 
 
-                    DPRINT(myTime);
-                    ENSURE_EQUAL(myTime, getLastModified(myFile));
-                }
-                {
-                    myTimeStruct.tm_year = 100;
-                    myTimeStruct.tm_mon = 7;
-
-                    time_t myTime = mktime(&myTimeStruct);  
-                    setLastModified(myFile, myTime); 
-
-                    DPRINT(myTime);
-                    ENSURE_EQUAL(myTime, getLastModified(myFile));
-                }
-            } catch (...) {
-                if (fileExists( myFile )) {
-                    deleteFile( myFile );
-                }
-                throw;
+                DPRINT(myTime);
+                ENSURE_EQUAL(myTime, getLastModified(myFile));
             }
-            if (fileExists( myFile )) {
-                deleteFile( myFile );
+            {
+                myTimeStruct.tm_year = 100;
+                myTimeStruct.tm_mon = 7;
+
+                time_t myTime = mktime(&myTimeStruct);  
+                setLastModified(myFile, myTime); 
+
+                DPRINT(myTime);
+                ENSURE_EQUAL(myTime, getLastModified(myFile));
             }
-            ENSURE( ! fileExists( myFile ));
         }
 };
 

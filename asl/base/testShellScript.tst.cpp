@@ -62,11 +62,11 @@ int main(int argc, char *argv[]) {
 
     cerr << argv[0] << " launched with argc = " << argc << endl;
 
-    string myDirectoryName = asl::getDirectoryPart(__FILE__);
+    string myDirectoryName = asl::getDirectoryPart(argv[0]);
     string myProgramName = asl::getFilenamePart(argv[0]);
     cerr << myProgramName << " started in directory " << myDirectoryName << endl;
 
-    string myScriptName = myDirectoryName + "/" + myProgramName + ".sh"; 
+    string myScriptName = string("../../") + myProgramName + ".sh"; 
 
     cerr << myProgramName << ": executing script '" << myScriptName << "'" << endl;
 
