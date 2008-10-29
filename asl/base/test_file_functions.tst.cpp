@@ -101,6 +101,8 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getParentDirectory("")=="");
             ENSURE(getParentDirectory("X")=="");
 
+            DPRINT( myRootDir );
+            DPRINT( getFilenamePart( __FILE__) );
             ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;" + myRootDir) == myRootDir + getFilenamePart(__FILE__));            
             ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
             ENSURE(searchFile(getFilenamePart(__FILE__), myRootDir) == myRootDir + getFilenamePart(__FILE__));            
