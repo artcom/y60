@@ -63,13 +63,11 @@ all others off
 
 //=== Globals ================================================================
 
-uint8_t  g_USImark = 0;
+uint8_t  g_USImark = 0; // XXX reset
 uint8_t  g_nextModeRequest = 0;
 uint8_t  g_mode = ABS_MODE;
 uint8_t  g_requestCalibration = 0;
 uint8_t  g_triggerSample = 0;
-uint8_t  g_readOutState = 0;
-uint8_t  g_ADCvalueAvailable = 0;
 uint8_t  g_ADC_Calibrated = 0;
 uint8_t  g_inhibitModeChange = 1;
 
@@ -78,10 +76,10 @@ int16_t  g_ADCOffsetFollow[MAX_LINES];
 uint8_t  g_NumberOfLines;
 uint8_t  g_lineCounter;
 
-uint8_t  g_EEPROMState = 0;
+//uint8_t  g_EEPROMState = 0; // XXX reset
 
-uint16_t g_ADCLH;
-uint8_t  g_ADCLHAvailable=0;
+uint16_t g_ADCLH; // XXX reset
+uint8_t  g_ADCLHAvailable=0; // XXX reset
 
 
 //=== Prototypes =============================================================
@@ -476,30 +474,31 @@ uint8_t EEPROM_read(uint8_t ucAddress){
     return EEDR;
 }
 
-// EEPROM Ready interrupt
-ISR( EE_RDY_vect ) {
-uint8_t jk;
-    if(g_EEPROMState >= 1){//g_EEPROMState counts from 1 (number of lines) up to 2*g_NumberOfLines+1
-        if(g_EEPROMState <= (g_NumberOfLines<<1)){
-            //write next byte
-            EECR = (0<<EEPM1) | (0<<EEPM0) | _BV(EERIE);//set programming mode and turn on interrupt
-            EEAR = g_EEPROMState; //ucAddress
-            //ucData
-            g_EEPROMState--;
-            if((g_EEPROMState&1) == 0){
-                EEDR = jk = (uint8_t)(g_ADCOffset[(g_EEPROMState>>1)]>>8);
-            }else{
-                EEDR = jk = (uint8_t)(g_ADCOffset[(g_EEPROMState>>1)]&255);
-            }
-            //start EEPROM write by setting EEPE
-            asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE
-            asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE
-            g_EEPROMState += 2;
-        }else{
-            g_EEPROMState = 0;
-            EECR &= ~_BV(EERIE);
-        }
-    }else{
-        EECR &= ~_BV(EERIE);
-    }
-}
+/* // EEPROM Ready interrupt */
+/* ISR( EE_RDY_vect ) { */
+/* uint8_t jk; */
+/*     if(g_EEPROMState >= 1){//g_EEPROMState counts from 1 (number of lines) up to 2*g_NumberOfLines+1 */
+/*         if(g_EEPROMState <= (g_NumberOfLines<<1)){ */
+/*             //write next byte */
+/*             EECR = (0<<EEPM1) | (0<<EEPM0) | _BV(EERIE);//set programming mode and turn on interrupt */
+/*             EEAR = g_EEPROMState; //ucAddress */
+/*             //ucData */
+/*             g_EEPROMState--; */
+/*             if((g_EEPROMState&1) == 0){ */
+/*                 EEDR = jk = (uint8_t)(g_ADCOffset[(g_EEPROMState>>1)]>>8); */
+/*             }else{ */
+/*                 EEDR = jk = (uint8_t)(g_ADCOffset[(g_EEPROMState>>1)]&255); */
+/*             } */
+/*             //start EEPROM write by setting EEPE */
+/*             asm volatile ("sbi 0x1C,2");//sbi EECR,EEMPE */
+/*             asm volatile ("sbi 0x1C,1");//sbi EECR,EEPE */
+/*             g_EEPROMState += 2; */
+/*         }else{ */
+/*             g_EEPROMState = 0; */
+/*             EECR &= ~_BV(EERIE); */
+/*         } */
+/*     }else{ */
+/*         EECR &= ~_BV(EERIE); */
+/*     } */
+/* } */
+
