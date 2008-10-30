@@ -561,7 +561,6 @@ spark.Widget.Constructor = function(Protected) {
 
     Base.realize = Public.realize;
     Public.realize = function(theSceneNode) {
-
         _myPressedFlag[LEFT_BUTTON]   = false;    
         _myPressedFlag[MIDDLE_BUTTON] = false;    
         _myPressedFlag[RIGHT_BUTTON]  = false;    
@@ -583,6 +582,11 @@ spark.Widget.Constructor = function(Protected) {
                                        Protected.getNumber("y", 0.0),
                                        Protected.getNumber("z", 0.0));
                                        
+        var myPos = Protected.getArray("pos", []);
+        if(myPos.length > 0) {
+            Public.position = new Vector3f(myPos);    
+        }
+                                       
         Public.scale = new Vector3f(Protected.getNumber("scaleX", 1.0),
                                     Protected.getNumber("scaleY", 1.0),
                                     Protected.getNumber("scaleZ", 1.0));
@@ -590,6 +594,8 @@ spark.Widget.Constructor = function(Protected) {
         Public.rotation = new Vector3f(Protected.getNumber("rotationX", 0.0),
                                        Protected.getNumber("rotationY", 0.0),
                                        Protected.getNumber("rotationZ", 0.0));
+                                       
+        Public.pivot = Protected.getVector3f("pivot", new Vector3f(0,0,0));
         
     };
     
@@ -776,6 +782,7 @@ spark.Image.Constructor = function(Protected) {
 
         var mySize = new Vector3f(Protected.getNumber("width" , _myImage.raster.width),
                                Protected.getNumber("height", _myImage.raster.height), 0);
+                               
         Protected.origin = Protected.getVector3f("origin", [0,0,0]);
         var myLowerLeft = new Vector3f(-Protected.origin.x,-Protected.origin.y,-Protected.origin.z);
         var myUpperRight = new Vector3f(mySize.x - Protected.origin.x, mySize.y - Protected.origin.y, mySize.z - Protected.origin.z);
@@ -996,7 +1003,7 @@ spark.Movie.Constructor = function(Protected) {
         Protected.origin = Protected.getVector3f("origin", [0,0,0]);
         var myLowerLeft = new Vector3f(-Protected.origin.x,-Protected.origin.y,-Protected.origin.z);
         var myUpperRight = new Vector3f(mySize.x - Protected.origin.x, mySize.y - Protected.origin.y, mySize.z - Protected.origin.z);
-        
+                
         _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, myLowerLeft, myUpperRight);
         _myShape.name = Public.name + "-shape";
 
