@@ -74,7 +74,7 @@ void SynergyServer::onMouseMotion( unsigned theX, unsigned theY ) {
 }
 
 
-void SynergyServer::onRelMouseMotion( unsigned theDeltaX, unsigned theDeltaY ) {
+void SynergyServer::onRelMouseMotion( int theDeltaX, int theDeltaY ) {
     AC_TRACE << "SynergyServer::onRelMouseMotion(" << theDeltaX << "," << theDeltaY << ")";
 
     if (!_myIsConnected) {

@@ -22,6 +22,16 @@ onMouseMotion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 }
 
 static JSBool
+onRelMouseMotion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
+    DOC_BEGIN("Sends relative mouse move data to synergy clients.");
+    DOC_END;
+
+    return Method<JSSynergyServer::NATIVE>
+           ::call( &JSSynergyServer::NATIVE::onRelMouseMotion, 
+                   cx, obj, argc, argv, rval);
+}
+
+static JSBool
 onMouseButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
     DOC_BEGIN("Sends mouse button data to synergy clients.");
     DOC_END;
@@ -67,6 +77,7 @@ JSSynergyServer::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name          native         nargs
         {"onMouseMotion",        onMouseMotion,         2},
+        {"onRelMouseMotion",     onRelMouseMotion,      2},
         {"onMouseButton",        onMouseButton,         2},
         {"onMouseWheel",         onMouseWheel,          2},
         {"getScreenSize",        getScreenSize,         2},

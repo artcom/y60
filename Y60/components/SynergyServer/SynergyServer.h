@@ -53,8 +53,6 @@ class SynergyPacket {
 
             AC_TRACE << "rest bytes: " << (_myPacket.end() - _myPacketIt);
             if (_myPacket.end() - _myPacketIt < 4) {
-//                AC_ERROR << "borken packet!";
-//                AC_ERROR << "Rest:" << std::string( _myPacketIt, _myPacket.end() );
                 return false;
             }
 
@@ -65,10 +63,7 @@ class SynergyPacket {
 
             AC_TRACE << "message length: " << myLen;
             if (myLen > _myPacket.end() - _myPacketIt) {
-//                AC_ERROR << "borken packet!";
-//                AC_ERROR << "length: " << myLen;
-//                AC_ERROR << "num bytes: " << _myPacket.end() - _myPacketIt;
-//                AC_ERROR << "Rest:" << std::string( _myPacketIt, _myPacket.end() );
+                // broken packet
                 _myPacketIt = _myPacket.end();
                 return false;
             }
@@ -98,7 +93,7 @@ class SynergyServer : public asl::PosixThread {
         void onMouseMotion( unsigned theX, unsigned theY );
         void onMouseButton( unsigned char theButton, bool theState );
         void onMouseWheel( int theDeltaX, int theDeltaY );
-        void onRelMouseMotion( unsigned theDeltaX, unsigned theDeltaY );
+        void onRelMouseMotion( int theDeltaX, int theDeltaY );
 
         bool isConnected() {
             return _myIsConnected;

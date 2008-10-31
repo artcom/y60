@@ -38,7 +38,6 @@ void TestSynergyServer::run() {
     testSynergyPacket();
     testHandshake();
     testMouse();
-//    testKeyboard();
     
     _myTestSocket.close();
 
@@ -241,7 +240,8 @@ bool TestSynergyServer::waitUntilTimeout() {
            && (myCurrentTime.millis() - myStartTime.millis() <= RESPONSE_TIMEOUT)) {
         myCurrentTime = myCurrentTime.setNow();
     }
-    return (myCurrentTime.millis() - myStartTime.millis() < RESPONSE_TIMEOUT && _myTestSocket.peek(1));
+    return (myCurrentTime.millis() - myStartTime.millis() < RESPONSE_TIMEOUT 
+            && _myTestSocket.peek(1));
 }
 
 

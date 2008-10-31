@@ -2,7 +2,7 @@ plug( "EventLoop" );
 plug( "ASSEventSource" );
 plug( "SynergyServer" );
 
-var _mySynergyServer = new SynergyServer( "localhost", 24800 );
+var _mySynergyServer = new SynergyServer( "10.1.2.208", 24800 );
 
 var myASSEventSource = new ASSEventSource();
 var mySettings = new Node();
