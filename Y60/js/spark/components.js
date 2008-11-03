@@ -610,11 +610,6 @@ spark.Widget.Constructor = function(Protected) {
                                        Protected.getNumber("y", 0.0),
                                        Protected.getNumber("z", 0.0));
                                        
-        var myPos = Protected.getArray("pos", []);
-        if(myPos.length > 0) {
-            Public.position = new Vector3f(myPos);    
-        }
-                                       
         Public.scale = new Vector3f(Protected.getNumber("scaleX", 1.0),
                                     Protected.getNumber("scaleY", 1.0),
                                     Protected.getNumber("scaleZ", 1.0));
