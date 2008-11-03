@@ -89,9 +89,6 @@ spark.Component.Constructor = function(Protected) {
         }
     };
     
-    // XXX: referring to layout properties from outside the widget is always wrong.
-    Public.getString = Protected.getString;
-
     // XXX: this is a very very ugly hack
     Public.acquisition = function(theComponentTypeName, theItemId) {
         return (_myNode.nodeName == theComponentTypeName &&  Public.node.getElementById(theItemId)) ? _myNode:null;
