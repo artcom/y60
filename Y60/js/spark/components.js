@@ -33,10 +33,12 @@ spark.Component.Constructor = function(Protected) {
         return _myName;
     };
 
-
+    // XXX: really bad solution.
+    //      this should be higher up and more informative.
     Public.toString = function (){
         return _myName;
-    }
+    };
+    
     var _myParent = null;
 
     Public.parent getter = function() {
@@ -60,18 +62,21 @@ spark.Component.Constructor = function(Protected) {
         _myName   = Protected.getString("name", "");
     };
 
+    // XXX: realize and post-realize should be one thing,
+    //      with the remaining coupled properties uncoupled.
     Public.realize = function() {
         spark.ourComponentsByNameMap[Public.name] = Public;
         Logger.info("Realizing component named " + Public.name);
     };
-    
     Public.postRealize = function() {
         Logger.info("Post-Realizing component named " + Public.name);
     };
 
+    
     Public.instantiateChildren = function() {
     };
 
+    
     Protected.getString = function(theName, theDefault) {
         if(theName in _myNode) {
             return _myNode[theName];
@@ -84,12 +89,15 @@ spark.Component.Constructor = function(Protected) {
         }
     };
     
+    // XXX: referring to layout properties from outside the widget is always wrong.
     Public.getString = Protected.getString;
-    
+
+    // XXX: this is a very very ugly hack
     Public.acquisition = function(theComponentTypeName, theItemId) {
         return (_myNode.nodeName == theComponentTypeName &&  Public.node.getElementById(theItemId)) ? _myNode:null;
     }
-                
+
+    // XXX: I18N should be implemented with a property type
     Protected.realizeI18N = function(theItem, theAttribute) {
         var myConcreteItem = theItem;
         var myId = "";
@@ -144,6 +152,7 @@ spark.Component.Constructor = function(Protected) {
         }
     };
     
+    // XXX: this requires a member type. else it don't make no sense.
     Protected.getArray = function(theName, theDefault) {
         if(theName in _myNode) {
             return _myNode[theName].substring(1, _myNode[theName].length -1).replace(/ /g,"").split(",");
@@ -190,6 +199,7 @@ spark.Container.Constructor = function(Protected) {
         theChild.parent = Public;
     };
 
+    // XXX: why was this introduced?
     Public.getChildAt = function(theIndex) {
         return _myChildArray[theIndex];
     };
@@ -202,6 +212,7 @@ spark.Container.Constructor = function(Protected) {
         }
     };
 
+    // XXX: very very dirty hack
     Public.acquisition = function(theComponentTypeName, theItemId) {
         if (Public.node.nodeName == theComponentTypeName &&  
             (theItemId==undefined || Public.node.getElementById(theItemId))) {
@@ -220,17 +231,14 @@ spark.Container.Constructor = function(Protected) {
         }
     }
 
-    /*Public.getChildByType = function(theType) {
-        return _myChildMap[theName];
-    };*/
+    // XXX: rework realization
     Base.realize = Public.realize;
     Public.realize = function() {
         Base.realize();
         for(var i = 0; i < _myChildArray.length; i++) {
             _myChildArray[i].realize();
         }
-    };
-    
+    };    
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
@@ -254,9 +262,6 @@ spark.Container.Constructor = function(Protected) {
  * This is where positioning, orientation, scaling,
  * visibility and sensibility go.
  */
-
-
-
 spark.Widget = spark.AbstractClass("Widget");
 
 spark.Widget.Constructor = function(Protected) {
@@ -266,7 +271,11 @@ spark.Widget.Constructor = function(Protected) {
     this.Inherit(spark.Container);
 
     var _mySceneNode   = null;
+    
+    // XXX: what the fuck?
     var _myPressedFlag = new Array();
+    
+    // XXX: try to get rid of this.
     Public.sceneNode getter = function() {
         return _mySceneNode;
     };
@@ -313,9 +322,12 @@ spark.Widget.Constructor = function(Protected) {
         }
     };
     
+    
+    // XXX: this needs a place. here can't be it. thank you.
     Public.isPressed = function(theButton) {
         return _myPressedFlag[theButton];
     }
+    
     // VISIBILITY
 
     Public.visible getter = function() {
@@ -340,6 +352,7 @@ spark.Widget.Constructor = function(Protected) {
         }
     };
 
+    // XXX: revisit
     Public.propagateSensibility = function(){
         var mySensibility = Public.sensible;
         for(var i = 0; i < Public.children.length; i++) {
@@ -350,8 +363,10 @@ spark.Widget.Constructor = function(Protected) {
         }
         Public.sensible = mySensibility;
     }
-    // SIZE
     
+    // SIZE
+
+    // XXX: good idea. bad implementation.
     Public.size getter = function() {
         var myBoundingBox = _mySceneNode.boundingbox;
         var myWidth = 0;
@@ -408,7 +423,8 @@ spark.Widget.Constructor = function(Protected) {
         _mySceneNode.position.y = theValue.y + _myOrigin.y;
         _mySceneNode.position.z = theValue.z + _myOrigin.z;
     };
-
+    
+    // XXX: huh!? this seems like a pretty special thing to me.
     Public.worldposition getter = function() {
         return _mySceneNode.globalmatrix.getTranslation();
     };
@@ -450,8 +466,9 @@ spark.Widget.Constructor = function(Protected) {
     };
 
 
-    // #
-    
+    // PIVOT
+    // XXX: finish implementing pivot wrappers
+
     Public.pivot getter = function() {
         return _mySceneNode.pivot.clone();
     };
@@ -463,6 +480,8 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     // ORIGIN
+    // XXX: finish implementing origin wrappers
+
     var _myOrigin = new Vector3f(0,0,0);
     
     Protected.originX getter = function() {
@@ -477,7 +496,6 @@ spark.Widget.Constructor = function(Protected) {
     Protected.originZ getter = function() {
         return _myOrigin.z;
     };
-
 
     Protected.origin getter = function() {
         return new Vector3f(_myOrigin);
@@ -620,7 +638,8 @@ spark.Widget.Constructor = function(Protected) {
         Base.postRealize();
         
     };  
-      
+    
+    // XXX: accept as temporary hack. introduce real events at some point.
     Public.onClick = function (theButton, thePickedBodyId, theButtonState, theX, theY) {
         _myPressedFlag[theButton] = theButtonState;
         if (theButtonState) {
@@ -710,6 +729,12 @@ spark.World.Constructor = function(Protected) {
     };
 };
 
+
+/**
+ * Wrapper to Y60 bodies.
+ * 
+ * Used to wrap everything that is a body in the scene.
+ */
 spark.Body = spark.AbstractClass("Body");
 
 spark.Body.Constructor = function(Protected) {
@@ -721,6 +746,8 @@ spark.Body.Constructor = function(Protected) {
     Base.propagateAlpha = Public.propagateAlpha;
     Public.propagateAlpha = function() {
         Base.propagateAlpha();
+        
+        // XXX: why this condition!?
         if (Public.sceneNode.nodeName == "body") {
             Modelling.setAlpha(Public.sceneNode, Public.actualAlpha);
         }
@@ -807,6 +834,8 @@ spark.Image.Constructor = function(Protected) {
     };
 };
 
+
+// XXX: I18N
 spark.I18N = spark.ComponentClass("I18N");
 
 const GERMAN  = "de";
@@ -875,6 +904,8 @@ spark.I18NItem.Constructor = function(Protected) {
     Public.instantiateChildren = function(theNode) {}
 }
 
+
+
 /**
  * A labelesque text component.
  */
@@ -919,6 +950,7 @@ spark.Text.Constructor = function(Protected) {
         spark.renderText(_myImage, _myText, _myStyle, theSize);
     }
     
+    // XXX: I18N
     Public.updateI18N = function() {   
         Public.text = Protected.realizeI18N(_myText);
     }        
@@ -1040,6 +1072,7 @@ spark.Movie.Constructor = function(Protected) {
 };
 
 
+// XXX: revisit. good idea though.
 spark.Model = spark.ComponentClass("Model");
 
 spark.Model.Constructor = function(Protected) {
@@ -1080,6 +1113,8 @@ spark.Model.Constructor = function(Protected) {
     }    
 }
 
+
+// XXX: non-generic component
 spark.Button = spark.ComponentClass("Button");
 
 spark.Button.Constructor = function(Protected) {
@@ -1113,6 +1148,7 @@ spark.Button.Constructor = function(Protected) {
     
 }
 
+// XXX: non-generic component
 spark.LanguageButton = spark.ComponentClass("LanguageButton");
 
 spark.LanguageButton.Constructor = function(Protected) {

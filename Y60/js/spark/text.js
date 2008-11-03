@@ -19,10 +19,12 @@ spark.loadFont = function(theName, theSize, theStyle) {
             Logger.error("FONTS/" + theName + "-" + theStyle + ".ttf doesn't exist");
             exit(1);
         }
+        
         // blurry aber gutes spacing -> No Hinting (Renderer.NOHINTING)
         // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING)
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
+        // XXX: inconsistent hinting!?
         if (theStyle != "normal") {
            // enforce loadttf of a normal font, otherwise we get an exception
            window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , fontStyleFromString("normal"));
@@ -144,6 +146,8 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
     if(theSize != undefined) {
         mySize = theSize;
     }
+    
+    // XXX: uhm. well. this needs fixing.
     if((theText == "") && (mySize.x == 0 || mySize.y == 0 )) {
         Logger.error("text is empty and size is 0 -> this doesn't work");
         exit(1);
