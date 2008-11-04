@@ -22,6 +22,7 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS aslbase
     TESTS   ${TESTS}
+    EXTERNS OPEN_EXR
     HEADER_ONLY
 )
 

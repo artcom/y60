@@ -27,7 +27,7 @@
 
 #include "pixels.h"
 
-#include <OpenEXR/half.h>
+#include <half.h> // ILM OpenEXR 16Bit floating-point implementation
 
 namespace asl {
 
