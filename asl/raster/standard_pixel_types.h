@@ -27,7 +27,11 @@
 
 #include "pixels.h"
 
+#ifdef AC_BUILT_WITH_CMAKE
 #include <half.h> // ILM OpenEXR 16Bit floating-point implementation
+#else
+#include <OpenEXR/half.h> // ILM OpenEXR 16Bit floating-point implementation
+#endif
 
 namespace asl {
 
