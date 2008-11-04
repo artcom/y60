@@ -38,10 +38,13 @@ static JSBool
 renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Render scene to texture given by the target attribute of canvas. ");
     DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
-    DOC_END;
+    DOC_PARAM_OPT("myCubemapFace", "myCubemapFace.", DOC_TYPE_BOOLEAN, false);
+    DOC_PARAM_OPT("theClearColorBufferFlag", "if true the color buffer is cleared.", DOC_TYPE_BOOLEAN, true);
+    DOC_PARAM_OPT("theDEpthColorBufferFlag", "if true the depth buffer is cleared.", DOC_TYPE_BOOLEAN, true);
     
+    DOC_END;
     try {
-        ensureParamCount(argc, 0, 2);
+        ensureParamCount(argc, 0, 4);
 
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
@@ -52,8 +55,22 @@ renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
             if (argc > 1) {
                 unsigned myCubemapFace;
                 convertFrom(cx, argv[1], myCubemapFace);
-                myNative->renderToCanvas(myCopyToImageFlag, myCubemapFace);
-                return JS_TRUE;
+                if (argc > 2) {
+                    bool myClearColorBufferFlag;
+                    convertFrom(cx, argv[2], myClearColorBufferFlag);
+                    if (argc > 3) {
+                        bool myDepthColorBufferFlag;
+                        convertFrom(cx, argv[3], myDepthColorBufferFlag);
+                        myNative->renderToCanvas(myCopyToImageFlag, myCubemapFace, myClearColorBufferFlag, myDepthColorBufferFlag);
+                        return JS_TRUE;
+                    } else {
+                        myNative->renderToCanvas(myCopyToImageFlag, myCubemapFace, myClearColorBufferFlag);
+                        return JS_TRUE;
+                    }
+                } else {
+                    myNative->renderToCanvas(myCopyToImageFlag, myCubemapFace);
+                    return JS_TRUE;
+                }
             }
             myNative->renderToCanvas(myCopyToImageFlag);
         } else {

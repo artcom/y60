@@ -110,7 +110,8 @@ OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
 }
 
 void
-OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemapFace) {
+OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemapFace,
+                                    bool theClearColorBufferFlag, bool theClearDepthBufferFlag) {
     AC_TRACE << "OffscreenRenderArea::renderToCanvas copyToImage=" << theCopyToImageFlag;
     MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
 
@@ -126,7 +127,11 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
     }
 
     activate(theCubemapFace); //y60::OffscreenBuffer::activate(myTexture);
-    clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLuint myClearMask = 0;
+    myClearMask |= theClearColorBufferFlag ? GL_COLOR_BUFFER_BIT : 0;
+    myClearMask |= theClearDepthBufferFlag ? GL_DEPTH_BUFFER_BIT : 0;
+    clearBuffers(myClearMask);
+    
 
     {
         MAKE_SCOPE_TIMER(OffscreenRenderArea_render);

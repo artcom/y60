@@ -46,7 +46,7 @@ namespace jslib {
              * the underlying raster value is ignored
              * else the texture is copied into the raster.
              */
-            void renderToCanvas(bool theCopyToImageFlag = false, unsigned theCubemapFace = 0); 
+            void renderToCanvas(bool theCopyToImageFlag = false, unsigned theCubemapFace = 0, bool theClearColorBufferFlag = true, bool theClearDepthBufferFlag = true); 
 
             /**
              * sets my canvas (calling base function)
