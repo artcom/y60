@@ -109,6 +109,7 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
 
 
     var myMaterialNode = Node.createElement('material');
+    myMaterialNode.enabled = false;
     myMaterialNode.id = createUniqueId(); //"m" + theName;
     myMaterialNode.name = theName;
     var myMaterialParent = window.scene.dom.find("//materials");
@@ -119,7 +120,6 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
     var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
     myMaterialNode.requires.appendChild(myTexCoordFeatures);
     myMaterialNode.requires.lighting = "[10[unlit]]";
-
     var myTexturesReqString = "[100["
     var myTexCoordReqString = "[100["
     var myTexturesString = '<textureunits>\n';
@@ -151,6 +151,8 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
     myTexCoordReqString += "]]";
     myMaterialNode.requires.texcoord = myTexCoordReqString;
     myMaterialNode.properties.surfacecolor = new Vector4f(1,1,1,1);
+
+    myMaterialNode.enabled = true;
     return myMaterialNode;
 
 }
