@@ -29,6 +29,7 @@ namespace jslib {
         virtual JSFunctionSpec * StaticFunctions();
 
         virtual JSFunctionSpec * Functions();
+        virtual JSConstIntPropertySpec * ConstIntProperties();
 
         /**
          * Return the name under which the class is visible in js.

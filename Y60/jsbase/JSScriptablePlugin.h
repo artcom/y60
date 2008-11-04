@@ -35,7 +35,8 @@ namespace jslib {
 
             static JSBool Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
             static void initClass(JSContext *cx, JSObject *theGlobalObject, const char * theClassName,
-                    JSFunctionSpec * theFunctions = 0, JSFunctionSpec * theStaticFunctions = 0);
+                    JSFunctionSpec * theFunctions = 0, JSFunctionSpec * theStaticFunctions = 0,
+                    JSConstIntPropertySpec * theConstIntProperties = 0);
 
             static IScriptablePluginPtr & getNative(JSContext *cx, JSObject *obj);
             static JSObject * Construct(JSContext *cx, IScriptablePluginPtr theNative);

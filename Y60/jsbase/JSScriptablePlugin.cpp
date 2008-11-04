@@ -296,7 +296,7 @@ namespace jslib {
 
     void
     JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName,
-            JSFunctionSpec * theFunctions, JSFunctionSpec * theStaticFunctions)
+            JSFunctionSpec * theFunctions, JSFunctionSpec * theStaticFunctions, JSConstIntPropertySpec * theConstIntProperties)
     {
         AC_DEBUG << "JSScriptablePlugin::initClass for class " << theClassName;
 
@@ -305,6 +305,18 @@ namespace jslib {
         JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
                 Constructor, 0, Properties(), & ( * myFunctions.begin()), 0,
                 & ( * myStaticFunctions.begin()));
+
+        if (theConstIntProperties) {
+            jsval myConstructorFuncObjVal;
+            if (JS_GetProperty(cx, theGlobalObject, theClassName, &myConstructorFuncObjVal)) {
+                JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
+                JSA_DefineConstInts(cx, myConstructorFuncObj, theConstIntProperties);
+            } else {
+                AC_ERROR << "initClass: constructor function object not found, could not initialize static members"<<std::endl;
+            }
+        }
+
+
 
         //document the plugin mechanism and not the plugin named theClassName itself...
         createClassModuleDocumentation("Global", "JSScriptablePlugin", Properties(),
