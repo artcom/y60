@@ -42,5 +42,6 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS ${TESTS}
-    DEPENDS aslbase
+    DEPENDS aslbase aslraster
+    EXTERNS OPEN_EXR
 )
