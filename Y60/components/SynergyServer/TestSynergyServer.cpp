@@ -107,6 +107,16 @@ void TestSynergyServer::testHandshake() {
     // test handshake-complete state
     ENSURE( _mySynergyServer.isConnected() );
     ENSURE( _mySynergyServer.getScreenSize() == asl::Vector2i( 1920, 1200 ) );
+    
+    char myDInfoMessage2[22] = { 0x00, 0x00, 0x00, 0x12, // length
+                                'D','I','N','F',         // message type 
+                                 0x00, 0x00, 0x00, 0x00, 
+                                 0x04, 0x00, 0x03, 0x00,
+                                 0x00, 0x00, 
+                                 0x00, 0x00, 0x00, 0x00 };     
+    _myTestSocket.send( myDInfoMessage2, sizeof( myDInfoMessage2 ) );
+    testResponse( 4, "CIAK", myPacket );
+    ENSURE( _mySynergyServer.getScreenSize() == asl::Vector2i( 1024, 768 ) );
 
 }
 
