@@ -2,7 +2,8 @@ plug( "EventLoop" );
 plug( "ASSEventSource" );
 plug( "SynergyServer" );
 
-var _mySynergyServer = new SynergyServer( "localhost", 24800 );
+//var _mySynergyServer = new SynergyServer( "localhost", 24800 );
+var _mySynergyServer = new SynergyServer( "10.1.2.179", 24800 );
 
 var myASSEventSource = new ASSEventSource();
 var mySettings = new Node();
@@ -19,11 +20,10 @@ const MOVE_VELOCITY = 40;
 const RESIZE_VELOCITY = 20; 
 const DAMPING_FACTOR = 1.3; 
 
-const POSITION_OFFSET = [0,140];
-const SCREENSIZE_OFFSET = [0, -280];
-//const POSITION_OFFSET = [0,0];
-//const SCREENSIZE_OFFSET = [0, 0];
-var _myScreenSize = _mySynergyServer.getScreenSize();
+//const POSITION_OFFSET = [1440,140];
+//const SCREENSIZE_OFFSET = [-1400, -280];
+const POSITION_OFFSET = [0,0];
+const SCREENSIZE_OFFSET = [0, 0];
 
 var _myMouseMoveId = null;
 var _myButtonPressedId = null;
@@ -64,12 +64,14 @@ function onFrame ( theTime ) {
 }
 
 function getMousePos( theRawPosition ) {
+    var myScreenSize = _mySynergyServer.getScreenSize();
+    print( "CURRENT SCREEN SIZE:",myScreenSize);
     var myRawX = theRawPosition.x;
     if (_myMirror.x > 0) {
         myRawX = _myGridSize.x - theRawPosition.x;
     }
     var myX = myRawX / _myGridSize.x 
-              * (_myScreenSize.x + SCREENSIZE_OFFSET[0]);
+              * (myScreenSize.x + SCREENSIZE_OFFSET[0]);
               
     var myRawY = theRawPosition.y;
     if (_myMirror.y > 0) {
@@ -77,7 +79,7 @@ function getMousePos( theRawPosition ) {
     }
               
     var myY = myRawY / _myGridSize.y 
-              * (_myScreenSize.y + SCREENSIZE_OFFSET[1]);
+              * (myScreenSize.y + SCREENSIZE_OFFSET[1]);
 
     return new Vector2f( myX, myY );
 }

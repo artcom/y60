@@ -7,7 +7,7 @@
         <MirrorX min="0" max="1">0.00000</MirrorX>
         <MirrorY min="0" max="1">0.00000</MirrorY>
         <ClampToScreen min="0" max="1">1</ClampToScreen>
-        <GainPower>2.00000</GainPower>
+        <GainPower>1.70000</GainPower>
         <ComponentThreshold>1.50000</ComponentThreshold>
         <NoiseThreshold>10</NoiseThreshold>
         <IntensityThreshold step="0.5">2.50000</IntensityThreshold>

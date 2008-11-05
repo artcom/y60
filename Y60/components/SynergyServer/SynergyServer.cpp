@@ -138,6 +138,7 @@ void SynergyServer::onMouseWheel( int theDeltaX, int theDeltaY ) {
 
 void SynergyServer::stop() {
     AC_TRACE << "SynergyServer::stop";
+    send( "CBYE" );
     join();
     _myTCPServer.close();
     if (_mySocket) {
@@ -310,12 +311,14 @@ void SynergyServer::processMessages() {
             AC_TRACE << "Got DInfo message";
             parseClientInfo(myMsg);
             send( "CIAK" );            
-            send( "CROP" );
-            std::vector<unsigned char> myOptions(4,0);
-            send( "DSOP", myOptions ); 
-            std::vector<unsigned char> myScreenPos(10,0);
-            send( "CINN", myScreenPos ); 
-            send( "CALV" );
+            if (!_myIsConnected) { 
+                send( "CROP" );
+                std::vector<unsigned char> myOptions(4,0);
+                send( "DSOP", myOptions ); 
+                std::vector<unsigned char> myScreenPos(10,0);
+                send( "CINN", myScreenPos ); 
+                send( "CALV" );
+            }
             resetKeepalive();
             _myIsConnected = true;
         }
