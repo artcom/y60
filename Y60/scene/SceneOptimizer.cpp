@@ -550,7 +550,7 @@ namespace y60 {
                 const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
                 // iterate over src primitve in steps of 64k vertices
                 unsigned myBeginIndex = 0;
-                unsigned myEndIndex = std::min((unsigned int)1024*64, mySrc.size())-1;
+                unsigned myEndIndex = std::min((size_t)1024*64, mySrc.size())-1;
                 while (myEndIndex <  mySrc.size() && myBeginIndex != mySrc.size()) {
                     // assure division of num vertices will be 3 in cas of triangles and 4 in case of quads
                     unsigned myDivisorTarget = 3;
@@ -561,9 +561,9 @@ namespace y60 {
                     
                     unsigned int myCount = (myEndIndex - myBeginIndex)+1;
                     float myDivisor = (float)myCount / (myDivisorTarget);
-                    myEndIndex = (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1;
+                    size_t myEndIndex = (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1;
                     mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles, myBeginIndex, myEndIndex);
-                    unsigned myOldEndIndex = myEndIndex;
+                    size_t myOldEndIndex = myEndIndex;
                     myBeginIndex = myEndIndex+1;
                     myEndIndex = std::min(myOldEndIndex + (1024*64), mySrc.size())-1;   
                 }
