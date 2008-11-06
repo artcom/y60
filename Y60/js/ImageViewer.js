@@ -523,7 +523,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myTexture = _myMovieOverlay.node.getElementById(_myMovieOverlay.textureunit.texture);
             }
             if (!myNode) {
-                return "neither AUDIO nor VIDEO";
+                return ["neither AUDIO nor VIDEO"];
             }
 
             var myString = myNode.src + "\n";
