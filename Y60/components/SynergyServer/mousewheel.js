@@ -18,7 +18,7 @@ while (!_mySynergyServer.isConnected()) {
 const CLICK_THRESHOLD = 20;
 var _myMouseButtonPressed = false;
 var _myLastRemoveEvent = null;
-const EVENT_QUEUE_SIZE = 15;
+const EVENT_QUEUE_SIZE = 20;
 
 const DIRECTION_UP = -1;
 const DIRECTION_DOWN = 1;
@@ -74,6 +74,7 @@ function onFrame ( theTime ) {
 }
 
 function getMousePos( theRawPosition ) {
+
     var myRawX = theRawPosition.x;
     if (_myMirror.x > 0) {
         myRawX = _myGridSize.x - theRawPosition.x;
@@ -140,13 +141,15 @@ function onASSEvent ( theEvent ) {
 
         if (singleCursor( theEvent )) {
 
+            //print( "pos:", getMousePos( theEvent.raw_position ) );
+
             if (_myTargetPosition) {
 
                 var myMoveDirection = getDirectionVector( _myFirstEvents );
+                //print( "dir:",myMoveDirection );
+                //print( "mag:",magnitude( myMoveDirection ));
 
                 if (magnitude( myMoveDirection ) > 70) {
-                    print( "dir:",myMoveDirection );
-                    print( "mag:",magnitude( myMoveDirection ));
 
                     _myTargetPosition = sum( _myTargetPosition, myMoveDirection );
 
@@ -175,7 +178,8 @@ function onASSEvent ( theEvent ) {
 
         if (dualCursor( theEvent )) {
 
-            if (_myFirstEvents.length == 5 && _mySecondEvents.length == 5) {
+            if (_myFirstEvents.length == EVENT_QUEUE_SIZE 
+                && _mySecondEvents.length == EVENT_QUEUE_SIZE) {
                 var myDirection = getDirection( _myFirstEvents );
                 if (myDirection == getDirection( _mySecondEvents )) {
                     _mySynergyServer.onMouseWheel( 0, myDirection );
@@ -217,7 +221,7 @@ function getDirectionVector( theEventQueue ) {
 
     var myFirstPos = getMousePos( myLastEvent.raw_position );
     var mySecondPos = getMousePos( myFirstEvent.raw_position );
-    print( "First:", myFirstPos, "Second:", mySecondPos );
+    //print( "First:", myFirstPos, "Second:", mySecondPos );
     myDifference = difference( myFirstPos, mySecondPos );
     //myDifference = normalized( myDifference );
 
