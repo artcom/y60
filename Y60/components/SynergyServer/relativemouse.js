@@ -18,7 +18,7 @@ while (!_mySynergyServer.isConnected()) {
 const CLICK_THRESHOLD = 20;
 var _myMouseButtonPressed = false;
 var _myLastRemoveEvent = null;
-const EVENT_QUEUE_SIZE = 30;
+const EVENT_QUEUE_SIZE = 50;
 const DIRECTION_MINIMUM = 100;
 
 const DIRECTION_UP = -1;
@@ -141,30 +141,26 @@ function onASSEvent ( theEvent ) {
 
         if (singleCursor( theEvent )) {
 
-//            if (_myFirstEvents.length == EVENT_QUEUE_SIZE) {
+            var myAvgDirection = getAvgDirectionVector( _myFirstEvents );
+            print( "avg direction: ", myAvgDirection );
 
-                var myAvgDirection = getAvgDirectionVector( _myFirstEvents );
-                myAvgDirection = product( myAvgDirection, 10 );
-                print( "avg direction: ", myAvgDirection );
-                print( "avg magnitude: ", magnitude( myAvgDirection ) );
-                
-                if (magnitude( myAvgDirection ) > DIRECTION_MINIMUM) {
+            var myDistance = getMoveDistance( _myFirstEvents );
+            print( "move distance: ", myDistance );
 
-                    _myTargetPosition = sum( _myMousePosition, myAvgDirection );
-                    
-                    if (_myTargetPosition.x < 0) {
-                        _myTargetPosition.x = 0;
-                    } else if (_myTargetPosition.x > _myScreenSize.x) {
-                        _myTargetPosition.x = _myScreenSize.x;
-                    }
-                    if (_myTargetPosition.y < 0) {
-                        _myTargetPosition.y = 0;
-                    } else if (_myTargetPosition.y > _myScreenSize.y) {
-                        _myTargetPosition.y = _myScreenSize.y;
-                    }
-                }
- //           }
+            var myMoveIncrement = product( normalized( myAvgDirection ), myDistance );
 
+            _myTargetPosition = sum( _myMousePosition, myMoveIncrement );
+
+            if (_myTargetPosition.x < 0) {
+                _myTargetPosition.x = 0;
+            } else if (_myTargetPosition.x > _myScreenSize.x) {
+                _myTargetPosition.x = _myScreenSize.x;
+            }
+            if (_myTargetPosition.y < 0) {
+                _myTargetPosition.y = 0;
+            } else if (_myTargetPosition.y > _myScreenSize.y) {
+                _myTargetPosition.y = _myScreenSize.y;
+            }
             return;
 
         }
@@ -231,6 +227,19 @@ function getAvgDirectionVector( theEventQueue ) {
         myAvgDirection = sum( myAvgDirection, difference( mySecondPos, myFirstPos ) );
     }
     return product( myAvgDirection, 1/theEventQueue.length );
+
+}
+
+function getMoveDistance( theEventQueue ) {
+
+    var myDistance = 0;
+    var myFirstPos = getMousePos( theEventQueue[0].raw_position );
+
+    for (var i = 1; i < theEventQueue.length; i++) {
+        myDistance += distance( getMousePos( theEventQueue[i].raw_position ), myFirstPos );
+    }
+    myDistance /= theEventQueue.length - 1;
+    return myDistance;
 
 }
 

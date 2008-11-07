@@ -87,7 +87,6 @@ function getMousePos( theRawPosition ) {
 
 function onASSEvent ( theEvent ) {
 
-    
     if ( theEvent.type == "add") {
     print( theEvent );
         if (_myMouseMoveId == null) {
@@ -124,7 +123,6 @@ function onASSEvent ( theEvent ) {
     }
 
 }
-
 
 var myEventLoop = new EventLoop();
 myEventLoop.go(this);

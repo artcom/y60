@@ -324,7 +324,11 @@ void SynergyServer::processMessages() {
         }
         else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "CNOP") {
             AC_TRACE << "Got NOP message";
-            continue;
+            // do nothing
+        }
+        else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "CCLP") {
+            AC_TRACE << "Got Clipboard message";
+            // do nothing (yet)
         }
         else {
             AC_PRINT << "Got strange message: " << std::string( myMsg.begin(), 

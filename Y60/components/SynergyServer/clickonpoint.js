@@ -18,7 +18,7 @@ while (!_mySynergyServer.isConnected()) {
 const CLICK_THRESHOLD = 20;
 var _myMouseButtonPressed = false;
 var _myLastRemoveEvent = null;
-const EVENT_QUEUE_SIZE = 30;
+const EVENT_QUEUE_SIZE = 10;
 const DIRECTION_MINIMUM = 100;
 
 const DIRECTION_UP = -1;
@@ -98,30 +98,20 @@ function onASSEvent ( theEvent ) {
     if ( theEvent.type == "add") {
         if (_myFirstEvents.length == 0) {
             _myFirstEvents.push(theEvent);
-
-            if (_myLastRemoveEvent) {
-                var myOldPos = getMousePos( _myLastRemoveEvent.raw_position );
-                var myCurrentPos = getMousePos( theEvent.raw_position );
-
-                if (distance( myCurrentPos, myOldPos ) < CLICK_THRESHOLD) {
-                    _mySynergyServer.onMouseButton( 1, true );
-                    _myMouseButtonPressed = true;
-                }
-            }
+            _mySynergyServer.onMouseButton( 1, true );
+            _myMouseButtonPressed = true;
         }
         else if (_mySecondEvents.length == 0) {
+            print( "adding second event queue" );
             _mySecondEvents.push(theEvent);
         }
     } else if ( theEvent.type == "remove") {
         // ending our mouse movement
         if (_myFirstEvents.length > 0 && _myFirstEvents[0].id == theEvent.id) {
-            _myLastRemoveEvent = theEvent;
-
             _myFirstEvents = [];
             if (_myMouseButtonPressed) {
                 _mySynergyServer.onMouseButton( 1, false );
                 _myMouseButtonPressed = false;
-                _myLastRemoveEvent = null;
             }
             if (_mySecondEvents.length > 0) {
                 _myFirstEvents = _mySecondEvents;
@@ -141,45 +131,22 @@ function onASSEvent ( theEvent ) {
 
         if (singleCursor( theEvent )) {
 
-//            if (_myFirstEvents.length == EVENT_QUEUE_SIZE) {
-
-                var myAvgDirection = getAvgDirectionVector( _myFirstEvents );
-                myAvgDirection = product( myAvgDirection, 10 );
-                print( "avg direction: ", myAvgDirection );
-                print( "avg magnitude: ", magnitude( myAvgDirection ) );
-                
-                if (magnitude( myAvgDirection ) > DIRECTION_MINIMUM) {
-
-                    _myTargetPosition = sum( _myMousePosition, myAvgDirection );
-                    
-                    if (_myTargetPosition.x < 0) {
-                        _myTargetPosition.x = 0;
-                    } else if (_myTargetPosition.x > _myScreenSize.x) {
-                        _myTargetPosition.x = _myScreenSize.x;
-                    }
-                    if (_myTargetPosition.y < 0) {
-                        _myTargetPosition.y = 0;
-                    } else if (_myTargetPosition.y > _myScreenSize.y) {
-                        _myTargetPosition.y = _myScreenSize.y;
-                    }
-                }
- //           }
-
-            return;
+            _myTargetPosition = getMousePos( theEvent.raw_position );
 
         }
 
-//        if (dualCursor( theEvent )) {
-//
-//            if (_myFirstEvents.length == EVENT_QUEUE_SIZE 
-//                && _mySecondEvents.length == EVENT_QUEUE_SIZE) {
-//                var myDirection = getDirection( _myFirstEvents );
-//                if (myDirection == getDirection( _mySecondEvents )) {
-//                    _mySynergyServer.onMouseWheel( 0, myDirection );
-//                }
-//            }
-//
-//        }
+        if (dualCursor( theEvent )) {
+
+            print( "dual cursor event" );
+
+            var myDirection = getDirection( _myFirstEvents );
+            print( "direction:", myDirection );
+            if (myDirection != 0 && myDirection == getDirection( _mySecondEvents )) {
+                print( "sending mouse wheel event" );
+                _mySynergyServer.onMouseWheel( 0, myDirection );
+            }
+
+        }
 
     } else if ( theEvent.type == "configure" ) {
         _myGridSize = theEvent.grid_size;
@@ -231,6 +198,19 @@ function getAvgDirectionVector( theEventQueue ) {
         myAvgDirection = sum( myAvgDirection, difference( mySecondPos, myFirstPos ) );
     }
     return product( myAvgDirection, 1/theEventQueue.length );
+
+}
+
+function getMoveDistance( theEventQueue ) {
+
+    var myDistance = 0;
+    var myFirstPos = getMousePos( theEventQueue[0].raw_position );
+
+    for (var i = 1; i < theEventQueue.length; i++) {
+        myDistance += distance( getMousePos( theEventQueue[i].raw_position ), myFirstPos );
+    }
+    myDistance /= theEventQueue.length - 1;
+    return myDistance;
 
 }
 
