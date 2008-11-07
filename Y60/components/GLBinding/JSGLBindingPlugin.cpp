@@ -43,13 +43,13 @@ namespace jslib {
             virtual JSConstIntPropertySpec * ConstIntProperties();
             
     		const char * ClassName() {
-    		    static const char * myClassName = "GLBinding";
+    		    static const char * myClassName = "gl";
     		    return myClassName;
     		}
 	};
 	
     JS_STATIC_DLL_CALLBACK(JSBool)
-    glEnable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    Enable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         try {
             DOC_BEGIN("");
             DOC_END;
@@ -57,7 +57,7 @@ namespace jslib {
 
             unsigned  myGLFlag;
             if (!convertFrom(cx, argv[0], myGLFlag)) {
-                JS_ReportError(cx,"glEnable: argument 1 is not a unsigned");
+                JS_ReportError(cx,"Enable: argument 1 is not a unsigned");
                 return JS_FALSE;
             }            
             ::glEnable(myGLFlag);
@@ -66,7 +66,7 @@ namespace jslib {
         } HANDLE_CPP_EXCEPTION;
     }
     JS_STATIC_DLL_CALLBACK(JSBool)
-    glDisable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    Disable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         try {
             DOC_BEGIN("");
             DOC_END;
@@ -74,7 +74,7 @@ namespace jslib {
 
             unsigned  myGLFlag;
             if (!convertFrom(cx, argv[0], myGLFlag)) {
-                JS_ReportError(cx,"glDisable: argument 1 is not a unsigned");
+                JS_ReportError(cx,"Disable: argument 1 is not a unsigned");
                 return JS_FALSE;
             }            
             ::glDisable(myGLFlag);
@@ -91,7 +91,7 @@ namespace jslib {
 
     JSConstIntPropertySpec *
     GLBinding::ConstIntProperties() {
-        const unsigned short BLENDING        = GL_BLEND;
+        const unsigned short BLENDING = GL_BLEND;
         
         static JSConstIntPropertySpec myProperties[] = {
                 DEFINE_PROPERTY(BLENDING),
@@ -106,8 +106,8 @@ namespace jslib {
     JSFunctionSpec * GLBinding::StaticFunctions() {
         static JSFunctionSpec myFunctions[] = {
             // name                         native                       nargs    
-            {"glEnable",             glEnable,             1},
-            {"glDisable",            glDisable,             1},
+            {"Enable",             Enable,             1},
+            {"Disable",            Disable,             1},
             {0}
         };
         return myFunctions;
@@ -115,6 +115,6 @@ namespace jslib {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * GLBinding_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * gl_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new jslib::GLBinding(myDLHandle);
 }
