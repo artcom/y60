@@ -84,6 +84,9 @@ RelativeMouseHandler.prototype.Constructor = function( Public, theSynergyServer,
                 return;
 
             }
+
+            Protected.tryMouseWheel( theEvent );
+
         }
     }
 }

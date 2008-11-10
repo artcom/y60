@@ -257,5 +257,17 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
         }
 
     }
+
+    Protected.tryMouseWheel = function( theEvent ) {
+        if (Protected.dualCursor( theEvent )) {
+            Protected.targetPosition = null;
+            var myDirection = Protected.getDirection( Protected.firstEvents );
+            var mySecondDirection = Protected.getDirection( Protected.secondEvents );
+            if (myDirection != 0 && myDirection == mySecondDirection) {
+                _mySynergyServer.onMouseWheel( 0, myDirection );
+            }
+
+        }
+    }
 }
 
