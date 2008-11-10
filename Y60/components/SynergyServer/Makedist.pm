@@ -20,10 +20,13 @@ sub runLocalMakedist($) {
     copyIfMoreRecent("$ENV{PRO}/lib/libEventLoopOPT.so", $theDistDir);
     copyIfMoreRecent("$ENV{PRO}/lib/libSynergyServerOPT.so", $theDistDir);
     copyIfMoreRecent("$ENV{PRO}/lib/liboscpackOPT.so", $theDistDir);
-    copyIfMoreRecent("run_nowindow.js", $theDistDir);
-    copyIfMoreRecent("run_clickonpoint.js", $theDistDir);
-    copyIfMoreRecent("mousewheel.js", $theDistDir);
+    copyIfMoreRecent("SynergyEventHandler.js", $theDistDir);
+    copyIfMoreRecent("ClickOnPointHandler.js", $theDistDir);
+    copyIfMoreRecent("RelativeMouseHandler.js", $theDistDir);
+    copyIfMoreRecent("ClickWithSecondHand.js", $theDistDir);
+    copyIfMoreRecent("demo.js", $theDistDir);
     copyIfMoreRecent("start_dist.sh", $theDistDir);
+
     depends("Y60/products/y60");
 }
 
