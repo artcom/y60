@@ -19,9 +19,8 @@ RelativeMouseHandler.prototype.Constructor = function( Public, theSynergyServer,
     var _myLastRemoveEvent = null;
 
     const MOVE_VELOCITY = 40; 
-    const CLICK_THRESHOLD = 20;
+    const CLICK_THRESHOLD = 80;
 
-    var _myMousePosition = new Vector2f( 0, 0 );
     var _myVelocity = new Vector2f(0,0);
 
     Base.onRemoveFirst = Public.onRemoveFirst;
@@ -49,6 +48,7 @@ RelativeMouseHandler.prototype.Constructor = function( Public, theSynergyServer,
                 var myCurrentPos = Protected.getMousePos( theEvent.raw_position );
 
                 if (distance( myCurrentPos, myOldPos ) < CLICK_THRESHOLD) {
+                    print( "pressing mousebutton..." );
                     _mySynergyServer.onMouseButton( 1, true );
                     _myMouseButtonPressed = true;
                 }
@@ -64,14 +64,12 @@ RelativeMouseHandler.prototype.Constructor = function( Public, theSynergyServer,
 
                 var myAvgDirection = 
                     Protected.getAvgDirectionVector( Protected.firstEvents );
-                ////print( "avg direction: ", myAvgDirection );
 
                 var myDistance = Protected.getMoveDistance( Protected.firstEvents );
-                //print( "move distance: ", myDistance );
 
                 var myMoveIncrement = product( normalized( myAvgDirection ), myDistance );
 
-                Protected.targetPosition = sum( _myMousePosition, myMoveIncrement );
+                Protected.targetPosition = sum( Protected.mousePosition, myMoveIncrement );
 
                 if (Protected.targetPosition.x < 0) {
                     Protected.targetPosition.x = 0;

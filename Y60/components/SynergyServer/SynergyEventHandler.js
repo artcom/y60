@@ -43,6 +43,8 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     var _myMousePosition = new Vector2f(0,0);
     var _myTargetPosition = null;
     
+
+    // TODO: implement onAddFirst, onMoveFirst, onAddSecond, onMoveSecond ...
     Public.onRemoveFirst = function( theEvent ) {}
     Public.onRemoveSecond = function( theEvent ) {}
 
@@ -67,6 +69,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     
 
     Public.onASSEvent = function( theEvent ) {
+
         if (theEvent.type == "add") {
             if (_myFirstEvents.length == 0) {
                 _myFirstEvents.push(theEvent);
@@ -117,6 +120,10 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
 
     Protected.targetPosition setter = function( theTargetPosition ) {
         _myTargetPosition = theTargetPosition;
+    }
+
+    Protected.mousePosition getter = function() {
+        return _myMousePosition;
     }
 
     Protected.firstEvents getter = function() {
