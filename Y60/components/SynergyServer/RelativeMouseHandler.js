@@ -8,7 +8,7 @@ RelativeMouseHandler.prototype.Constructor = function( Public, theSynergyServer,
                                                        theSettings ) 
 {
 
-    Protected = [];
+    var Protected = [];
     SynergyEventHandler.prototype.Constructor( Public, Protected, theSynergyServer, 
                                                theSettings );
     var Base = [];
