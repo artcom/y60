@@ -272,8 +272,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         unsigned myHeight = theTexture->get<TextureHeightTag>(); 
         AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>() 
                  << " size=" << myWidth << "x" << myHeight;
-AC_PRINT << "glRenderbufferStorageMultisampleEXT" << IS_SUPPORTED(glRenderbufferStorageMultisampleEXT);
-AC_PRINT << "glBlitFramebufferEXT: " << IS_SUPPORTED(glBlitFramebufferEXT);
         if (theSamples >= 1 
             && !(IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) 
                  && IS_SUPPORTED(glBlitFramebufferEXT))) 
