@@ -301,6 +301,7 @@ DEF_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT );
 #ifndef GL_MAX_SAMPLES_EXT
 // XXX these should come from the gl.h header but currently don't (Jan.2007)
 //     they do now, at least on current nvidia-glx. revisit. (Aug.2007)
+#define GL_EXT_framebuffer_multisample 1
 #define GL_RENDERBUFFER_SAMPLES_EXT               0x8CAB
 #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT 0x8D56
 #define GL_MAX_SAMPLES_EXT                        0x8D57
