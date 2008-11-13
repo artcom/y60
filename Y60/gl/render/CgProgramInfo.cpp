@@ -976,12 +976,16 @@ namespace y60 {
         case  FP20:
             myResult = CG_PROFILE_FP20;
             break;
+#ifdef CG_PROFILE_GLSLV
         case GLSLV:
             myResult = CG_PROFILE_GLSLV;
             break;
+#endif
+#ifdef CG_PROFILE_GLSLF
         case GLSLF:
             myResult = CG_PROFILE_GLSLF;
             break;
+#endif
         default:
             throw RendererException(string("Unknown shaderprofile : ") +
                                     getStringFromEnum(theShader._myProfile, ShaderProfileStrings),
