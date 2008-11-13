@@ -485,6 +485,20 @@ class Matrix4UnitTest : public UnitTest {
             const T * myData = myMatrix.getData();
 
             for (unsigned i = 0; i < 16; ++i) {
+                // Introducing this stream output circumvents a
+                // GCC optimizer bug (or so i believe) in:
+                //
+                //   gcc (GCC) 4.2.4 (Ubuntu 4.2.4-1ubuntu3)
+                //
+                // The bug showed itself by making the equality
+                // test work only for the first four items and
+                // only occured in the OPT build. If you are
+                // reading this and it is no longer 2008, please
+                // try running the test without this hack and
+                // remove it if things are fine afterwards. -IA
+#ifdef __GNUC__
+                cout << "Comparing " << i << " and " << myData[i] << " for almost-equality..." << endl;
+#endif
                 ENSURE_MSG(almostEqual(myData[i], i), "Testing getData");
             }
         }
