@@ -52,7 +52,7 @@ while (!mySynergyServer.isConnected()) {
 
 
 
-if (arguments.length == 1 && arguments[0] == "clickonpoint") {
+if (myMode == CLICKONPOINT_MODE) {
 
     // ClickOnPointHandler: 
     //      Hand positions the mouse cursor directly and on every touch ("add") event, 
@@ -62,7 +62,7 @@ if (arguments.length == 1 && arguments[0] == "clickonpoint") {
     print( "Using click on point handler" );
     use( "ClickOnPointHandler.js" );
     var myEventHandler = new ClickOnPointHandler( mySynergyServer, mySettings );
-} else if (arguments.length == 1 && arguments[0] == "relative") {
+} else if (myMode == RELATIVE_MODE) {
 
     // RelativeMouseHandler:
     //      hand movement moves the mouse cursor only a certain amount in move-direction.
