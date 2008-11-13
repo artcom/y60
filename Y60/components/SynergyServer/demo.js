@@ -2,8 +2,43 @@ plug( "EventLoop" );
 plug( "ASSEventSource" );
 plug( "SynergyServer" );
 
+const DEFAULT_MODE = 0;
+const CLICKONPOINT_MODE = 1;
+const RELATIVE_MODE = 2;
 
-var mySynergyServer = new SynergyServer( "localhost", 24800 );
+var myHost = "localhost";
+var myPort = 24800;
+
+// parse arguments
+var myMode = DEFAULT_MODE;
+for (var i = 0; i < arguments.length; i++) {
+
+    var myArgumentStrings = arguments[i].split('='); 
+    if (myArgumentStrings[0] == "host") {
+        myHost = myArgumentStrings[1];
+        print( "Hostname:", myHost );
+    } else if (myArgumentStrings[0] == "mode") {
+        switch (myArgumentStrings[1]) {
+            case "clickonpoint":
+                myMode = CLICKONPOINT_MODE;
+                break;
+            case "relative":
+                myMode = RELATIVE_MODE;
+                break;
+            default:
+                myMode = DEFAULT_MODE;
+                break;
+        }
+        print( "Mode:", myMode );
+    } else if (myArgumentStrings[0] == "port") {
+        myPort = Number( myArgumentStrings[1] );
+        print( "Port:", myPort );
+    }
+
+}
+
+
+var mySynergyServer = new SynergyServer( myHost, myPort );
 var myASSEventSource = new ASSEventSource();
 
 var mySettings = new Node();
@@ -14,6 +49,8 @@ myASSEventSource.onUpdateSettings( mySettings );
 while (!mySynergyServer.isConnected()) {
     ;
 }
+
+
 
 if (arguments.length == 1 && arguments[0] == "clickonpoint") {
 
