@@ -948,12 +948,16 @@ namespace y60 {
         case ARBFP1 :
             myResult = CG_PROFILE_ARBFP1;
             break;
+#ifdef CG_PROFILE_GPU_VP
         case GP4VP:
             myResult = CG_PROFILE_GPU_VP;
             break;
+#endif
+#ifdef CG_PROFILE_GPU_FP
         case GP4FP:
             myResult = CG_PROFILE_GPU_FP;
             break;
+#endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
             break;

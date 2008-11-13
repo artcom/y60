@@ -11,7 +11,7 @@
 // stay consistent.
 
 
-#define AC_NV_CG_20
+#define AC_NV_CG_20 // XXX: this define does not make any sense like this.
 
 namespace y60 {
 
