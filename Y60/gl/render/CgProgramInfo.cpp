@@ -948,6 +948,12 @@ namespace y60 {
         case ARBFP1 :
             myResult = CG_PROFILE_ARBFP1;
             break;
+        case GP4VP:
+            myResult = CG_PROFILE_GPU_VP;
+            break;
+        case GP4FP:
+            myResult = CG_PROFILE_GPU_FP;
+            break;
         case  VP40:
             myResult = CG_PROFILE_VP40;
             break;
@@ -965,6 +971,12 @@ namespace y60 {
             break;
         case  FP20:
             myResult = CG_PROFILE_FP20;
+            break;
+        case GLSLV:
+            myResult = CG_PROFILE_GLSLV;
+            break;
+        case GLSLF:
+            myResult = CG_PROFILE_GLSLF;
             break;
         default:
             throw RendererException(string("Unknown shaderprofile : ") +
