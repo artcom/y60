@@ -42,7 +42,7 @@ public class GppLinker extends AbstractLdLinker {
     private static String[] linkerOptions = new String[]{"-bundle", "-dylib",
             "-dynamic", "-dynamiclib", "-nostartfiles", "-nostdlib",
             "-prebind", "-s", "-static", "-shared", "-symbolic", "-Xlinker",
-            "-install_name", "-dylib_file"}; // added for OSX - pavel
+            "-install_name", "-dylib_file","-arch"}; // added for OSX - pavel
     private static final GppLinker instance = new GppLinker("g++", objFiles,
             discardFiles, "", "", false, null);
     private static final GppLinker machDllLinker = new GppLinker("g++",
