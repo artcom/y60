@@ -33,5 +33,10 @@
     #define XP_UNIX    
 #endif
 
+// undefine to use tracemonkey
+#define SPIDERMONK
+
+
+
 #endif
 

@@ -46,6 +46,8 @@ namespace jslib {
             static bool getQuitFlag();
             void setStrictFlag(bool theStrictFlag);
             void setJSVersion(int theVersion);
+            void enableJIT(bool theFlag);
+            void enableXML(bool theFlag);
             static void setProgramName(const std::string & theProgramName) {
                 _myProgramName = theProgramName;
             }
@@ -75,6 +77,8 @@ namespace jslib {
                 const std::vector<std::string> & theScriptArgs);
 
             bool   ourStrictFlag;
+            bool   ourXMLFlag;
+            bool   ourJITFlag;
             int    ourJSVersion;
             static std::string _myProgramName;
     };

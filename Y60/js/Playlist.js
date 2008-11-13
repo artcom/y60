@@ -26,7 +26,7 @@ const ASF_REGEXP       = /Ref\d+=(.*?)\n/gi;
 const RM_REGEXP        = /^\s*(.*?)(?:\s*--stop--.*)/i;
 const PLS_REGEXP       = /file\d+=(.*?)\n(?:title\d+=(.*?))\n/gi;
 const SMIL_REGEXP      = /<audio.+?src\s*=\s*"(.+?)"/gi;
-const M3U_REGEXP       = /#EXTINF:\d+,(.*?)\n(.*?)\n)/gi;
+const M3U_REGEXP       = /#EXTINF:\d+,(.*?)\n(.*?)\n/gi;
 const EMBEDDED_REGEXP  = /<object.*?>.*?<embed.+?type\s*?=\s*?"(?:.+?)".+?src\s*=\s*"(.+?)"/gi;
 
 const MAX_REDIRECTION_DEPTH = 5;

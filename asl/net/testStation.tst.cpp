@@ -100,6 +100,7 @@ class StationTest : public TemplateUnitTest {
                 asl::Time start;
                 asl::Time lastTime;
                 for (int i = 0; i < testCount; ++i) {
+//#define WITH_STATISTIC
 #ifdef WITH_STATISTIC
                     Station::Statistic myReceiveStat = myStation.getReceiveStatistic();
                     Station::Statistic myTransmitStat = myStation.getTransmitStatistic();

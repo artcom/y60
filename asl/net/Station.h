@@ -58,6 +58,8 @@ preserved. Duplicate messages are not discarded, and nothing is done to ensure o
 although on a LAN the ordering of messages is generally preserved. However, message integrity is
 strictly preserved.
 
+With 2008 machines and gigabit ethernet, maximum throughput will be in the range of 10-30 MBytes/sec.
+
 Usage:
 
 The interface is quite simple: it consists of the openStation(), closeStation(), broadcast() and receive() calls.

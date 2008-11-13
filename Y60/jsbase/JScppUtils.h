@@ -203,6 +203,10 @@ NoisyNewResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **
 JSBool
 NoisyConvert(JSContext *cx, JSObject *obj, JSType type, jsval *vp);
 
+#ifndef JS_STATIC_DLL_CALLBACK
+#define JS_STATIC_DLL_CALLBACK(x) x
+#endif
+
 JS_STATIC_DLL_CALLBACK(void)
 NoisyFinalize(JSContext *cx, JSObject *obj);
 

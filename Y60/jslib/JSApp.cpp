@@ -89,7 +89,7 @@ std::string ourTopScriptFilename;
 
 std::string JSApp::_myProgramName;
 
-JSApp::JSApp() : ourStrictFlag(false), ourJSVersion(0)
+JSApp::JSApp() : ourStrictFlag(false), ourJITFlag(false),ourXMLFlag(false),ourJSVersion(0)
 {}
 
 // ****************  runtime-options **********************
@@ -112,6 +112,14 @@ JSApp::setReportWarnings(bool theEnableFlag) {
     reportWarnings = theEnableFlag ? JS_TRUE : JS_FALSE;
 }
 
+void
+JSApp::enableXML(bool theFlag) {
+    ourXMLFlag = theFlag;
+}
+void
+JSApp::enableJIT(bool theFlag) {
+    ourJITFlag = theFlag;
+}
 void
 JSApp::setStrictFlag(bool theStrictFlag) {
     ourStrictFlag = theStrictFlag;
@@ -1560,6 +1568,20 @@ JSApp::processArguments(JSContext * theContext, JSObject * theGlobalObject,
 
     if (ourStrictFlag) {
         JS_ToggleOptions(theContext, JSOPTION_STRICT);
+    }
+    if (ourJITFlag) {
+#ifndef SPIDERMONK
+        JS_ToggleOptions(theContext, JSOPTION_JIT);
+#else
+        AC_WARNING << "Javascript engine JIT not available";
+#endif
+    }
+    if (ourXMLFlag) {
+#ifndef SPIDERMONK
+        JS_ToggleOptions(theContext, JSOPTION_XML);
+#else
+        AC_WARNING << "Javascript engine XML not available";
+#endif
     }
 
     vector<string> myArgs = theScriptArgs;

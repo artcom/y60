@@ -30,19 +30,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/stow/cmake/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/stow/cmake/bin/cmake -E remove -f
+RM = /opt/local/bin/cmake -E remove -f
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/local/stow/cmake/bin/ccmake
+CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/prom/Work/PRO60/src/asl
+CMAKE_SOURCE_DIR = /Users/pavel/pro60/src/asl
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/prom/Work/PRO60/src/asl
+CMAKE_BINARY_DIR = /Users/pavel/pro60/src/asl
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +50,7 @@ CMAKE_BINARY_DIR = /home/prom/Work/PRO60/src/asl
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,19 +60,19 @@ edit_cache/fast: edit_cache
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/cmake -P cmake_install.cmake
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/cmake -P cmake_install.cmake
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
@@ -82,7 +82,7 @@ install/local/fast: install/local
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
@@ -101,7 +101,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -111,7 +111,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target test
 test:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	cd /home/prom/Work/PRO60/src/asl/zip && /usr/local/stow/cmake/bin/ctest --force-new-ctest-process $(ARGS)
+	cd /Users/pavel/pro60/src/asl/zip && /opt/local/bin/ctest --force-new-ctest-process $(ARGS)
 .PHONY : test
 
 # Special rule for the target test
@@ -120,14 +120,14 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/prom/Work/PRO60/src/asl && $(CMAKE_COMMAND) -E cmake_progress_start /home/prom/Work/PRO60/src/asl/CMakeFiles /home/prom/Work/PRO60/src/asl/zip/CMakeFiles/progress.make
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/prom/Work/PRO60/src/asl/CMakeFiles 0
+	cd /Users/pavel/pro60/src/asl && $(CMAKE_COMMAND) -E cmake_progress_start /Users/pavel/pro60/src/asl/CMakeFiles /Users/pavel/pro60/src/asl/zip/CMakeFiles/progress.make
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/pavel/pro60/src/asl/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/clean
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/clean
 .PHONY : clean
 
 # The main clean target
@@ -136,36 +136,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/preinstall
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/preinstall
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/prom/Work/PRO60/src/asl && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/pavel/pro60/src/asl && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
-zip/CMakeFiles/aslzip.dir/rule:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/CMakeFiles/aslzip.dir/rule
-.PHONY : zip/CMakeFiles/aslzip.dir/rule
-
-# Convenience name for target.
-aslzip: zip/CMakeFiles/aslzip.dir/rule
-.PHONY : aslzip
-
-# fast build rule for target.
-aslzip/fast:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/build
-.PHONY : aslzip/fast
-
-# Convenience name for target.
 zip/CMakeFiles/testZipFile.dir/rule:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/CMakeFiles/testZipFile.dir/rule
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/CMakeFiles/testZipFile.dir/rule
 .PHONY : zip/CMakeFiles/testZipFile.dir/rule
 
 # Convenience name for target.
@@ -174,15 +160,29 @@ testZipFile: zip/CMakeFiles/testZipFile.dir/rule
 
 # fast build rule for target.
 testZipFile/fast:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/build
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/build
 .PHONY : testZipFile/fast
+
+# Convenience name for target.
+zip/CMakeFiles/zip.dir/rule:
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f CMakeFiles/Makefile2 zip/CMakeFiles/zip.dir/rule
+.PHONY : zip/CMakeFiles/zip.dir/rule
+
+# Convenience name for target.
+zip: zip/CMakeFiles/zip.dir/rule
+.PHONY : zip
+
+# fast build rule for target.
+zip/fast:
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/build
+.PHONY : zip/fast
 
 DirectoryPackage.o: DirectoryPackage.cpp.o
 .PHONY : DirectoryPackage.o
 
 # target to build an object file
 DirectoryPackage.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/DirectoryPackage.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/DirectoryPackage.cpp.o
 .PHONY : DirectoryPackage.cpp.o
 
 DirectoryPackage.i: DirectoryPackage.cpp.i
@@ -190,7 +190,7 @@ DirectoryPackage.i: DirectoryPackage.cpp.i
 
 # target to preprocess a source file
 DirectoryPackage.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/DirectoryPackage.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/DirectoryPackage.cpp.i
 .PHONY : DirectoryPackage.cpp.i
 
 DirectoryPackage.s: DirectoryPackage.cpp.s
@@ -198,7 +198,7 @@ DirectoryPackage.s: DirectoryPackage.cpp.s
 
 # target to generate assembly for a file
 DirectoryPackage.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/DirectoryPackage.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/DirectoryPackage.cpp.s
 .PHONY : DirectoryPackage.cpp.s
 
 PackageManager.o: PackageManager.cpp.o
@@ -206,7 +206,7 @@ PackageManager.o: PackageManager.cpp.o
 
 # target to build an object file
 PackageManager.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/PackageManager.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/PackageManager.cpp.o
 .PHONY : PackageManager.cpp.o
 
 PackageManager.i: PackageManager.cpp.i
@@ -214,7 +214,7 @@ PackageManager.i: PackageManager.cpp.i
 
 # target to preprocess a source file
 PackageManager.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/PackageManager.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/PackageManager.cpp.i
 .PHONY : PackageManager.cpp.i
 
 PackageManager.s: PackageManager.cpp.s
@@ -222,7 +222,7 @@ PackageManager.s: PackageManager.cpp.s
 
 # target to generate assembly for a file
 PackageManager.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/PackageManager.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/PackageManager.cpp.s
 .PHONY : PackageManager.cpp.s
 
 ZipPackage.o: ZipPackage.cpp.o
@@ -230,7 +230,7 @@ ZipPackage.o: ZipPackage.cpp.o
 
 # target to build an object file
 ZipPackage.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipPackage.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipPackage.cpp.o
 .PHONY : ZipPackage.cpp.o
 
 ZipPackage.i: ZipPackage.cpp.i
@@ -238,7 +238,7 @@ ZipPackage.i: ZipPackage.cpp.i
 
 # target to preprocess a source file
 ZipPackage.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipPackage.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipPackage.cpp.i
 .PHONY : ZipPackage.cpp.i
 
 ZipPackage.s: ZipPackage.cpp.s
@@ -246,7 +246,7 @@ ZipPackage.s: ZipPackage.cpp.s
 
 # target to generate assembly for a file
 ZipPackage.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipPackage.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipPackage.cpp.s
 .PHONY : ZipPackage.cpp.s
 
 ZipReader.o: ZipReader.cpp.o
@@ -254,7 +254,7 @@ ZipReader.o: ZipReader.cpp.o
 
 # target to build an object file
 ZipReader.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipReader.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipReader.cpp.o
 .PHONY : ZipReader.cpp.o
 
 ZipReader.i: ZipReader.cpp.i
@@ -262,7 +262,7 @@ ZipReader.i: ZipReader.cpp.i
 
 # target to preprocess a source file
 ZipReader.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipReader.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipReader.cpp.i
 .PHONY : ZipReader.cpp.i
 
 ZipReader.s: ZipReader.cpp.s
@@ -270,7 +270,7 @@ ZipReader.s: ZipReader.cpp.s
 
 # target to generate assembly for a file
 ZipReader.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipReader.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipReader.cpp.s
 .PHONY : ZipReader.cpp.s
 
 ZipWriter.o: ZipWriter.cpp.o
@@ -278,7 +278,7 @@ ZipWriter.o: ZipWriter.cpp.o
 
 # target to build an object file
 ZipWriter.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipWriter.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipWriter.cpp.o
 .PHONY : ZipWriter.cpp.o
 
 ZipWriter.i: ZipWriter.cpp.i
@@ -286,7 +286,7 @@ ZipWriter.i: ZipWriter.cpp.i
 
 # target to preprocess a source file
 ZipWriter.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipWriter.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipWriter.cpp.i
 .PHONY : ZipWriter.cpp.i
 
 ZipWriter.s: ZipWriter.cpp.s
@@ -294,7 +294,7 @@ ZipWriter.s: ZipWriter.cpp.s
 
 # target to generate assembly for a file
 ZipWriter.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ZipWriter.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ZipWriter.cpp.s
 .PHONY : ZipWriter.cpp.s
 
 ioapi.o: ioapi.c.o
@@ -302,7 +302,7 @@ ioapi.o: ioapi.c.o
 
 # target to build an object file
 ioapi.c.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ioapi.c.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ioapi.c.o
 .PHONY : ioapi.c.o
 
 ioapi.i: ioapi.c.i
@@ -310,7 +310,7 @@ ioapi.i: ioapi.c.i
 
 # target to preprocess a source file
 ioapi.c.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ioapi.c.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ioapi.c.i
 .PHONY : ioapi.c.i
 
 ioapi.s: ioapi.c.s
@@ -318,7 +318,7 @@ ioapi.s: ioapi.c.s
 
 # target to generate assembly for a file
 ioapi.c.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/ioapi.c.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/ioapi.c.s
 .PHONY : ioapi.c.s
 
 iowin32.o: iowin32.c.o
@@ -326,7 +326,7 @@ iowin32.o: iowin32.c.o
 
 # target to build an object file
 iowin32.c.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/iowin32.c.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/iowin32.c.o
 .PHONY : iowin32.c.o
 
 iowin32.i: iowin32.c.i
@@ -334,7 +334,7 @@ iowin32.i: iowin32.c.i
 
 # target to preprocess a source file
 iowin32.c.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/iowin32.c.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/iowin32.c.i
 .PHONY : iowin32.c.i
 
 iowin32.s: iowin32.c.s
@@ -342,7 +342,7 @@ iowin32.s: iowin32.c.s
 
 # target to generate assembly for a file
 iowin32.c.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/iowin32.c.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/iowin32.c.s
 .PHONY : iowin32.c.s
 
 mztools.o: mztools.c.o
@@ -350,7 +350,7 @@ mztools.o: mztools.c.o
 
 # target to build an object file
 mztools.c.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/mztools.c.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/mztools.c.o
 .PHONY : mztools.c.o
 
 mztools.i: mztools.c.i
@@ -358,7 +358,7 @@ mztools.i: mztools.c.i
 
 # target to preprocess a source file
 mztools.c.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/mztools.c.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/mztools.c.i
 .PHONY : mztools.c.i
 
 mztools.s: mztools.c.s
@@ -366,7 +366,7 @@ mztools.s: mztools.c.s
 
 # target to generate assembly for a file
 mztools.c.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/mztools.c.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/mztools.c.s
 .PHONY : mztools.c.s
 
 testZipFile.tst.o: testZipFile.tst.cpp.o
@@ -374,7 +374,7 @@ testZipFile.tst.o: testZipFile.tst.cpp.o
 
 # target to build an object file
 testZipFile.tst.cpp.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.o
 .PHONY : testZipFile.tst.cpp.o
 
 testZipFile.tst.i: testZipFile.tst.cpp.i
@@ -382,7 +382,7 @@ testZipFile.tst.i: testZipFile.tst.cpp.i
 
 # target to preprocess a source file
 testZipFile.tst.cpp.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.i
 .PHONY : testZipFile.tst.cpp.i
 
 testZipFile.tst.s: testZipFile.tst.cpp.s
@@ -390,7 +390,7 @@ testZipFile.tst.s: testZipFile.tst.cpp.s
 
 # target to generate assembly for a file
 testZipFile.tst.cpp.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/testZipFile.dir/build.make zip/CMakeFiles/testZipFile.dir/testZipFile.tst.cpp.s
 .PHONY : testZipFile.tst.cpp.s
 
 unzip.o: unzip.c.o
@@ -398,7 +398,7 @@ unzip.o: unzip.c.o
 
 # target to build an object file
 unzip.c.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/unzip.c.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/unzip.c.o
 .PHONY : unzip.c.o
 
 unzip.i: unzip.c.i
@@ -406,7 +406,7 @@ unzip.i: unzip.c.i
 
 # target to preprocess a source file
 unzip.c.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/unzip.c.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/unzip.c.i
 .PHONY : unzip.c.i
 
 unzip.s: unzip.c.s
@@ -414,7 +414,7 @@ unzip.s: unzip.c.s
 
 # target to generate assembly for a file
 unzip.c.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/unzip.c.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/unzip.c.s
 .PHONY : unzip.c.s
 
 zip.o: zip.c.o
@@ -422,7 +422,7 @@ zip.o: zip.c.o
 
 # target to build an object file
 zip.c.o:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/zip.c.o
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/zip.c.o
 .PHONY : zip.c.o
 
 zip.i: zip.c.i
@@ -430,7 +430,7 @@ zip.i: zip.c.i
 
 # target to preprocess a source file
 zip.c.i:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/zip.c.i
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/zip.c.i
 .PHONY : zip.c.i
 
 zip.s: zip.c.s
@@ -438,7 +438,7 @@ zip.s: zip.c.s
 
 # target to generate assembly for a file
 zip.c.s:
-	cd /home/prom/Work/PRO60/src/asl && $(MAKE) -f zip/CMakeFiles/aslzip.dir/build.make zip/CMakeFiles/aslzip.dir/zip.c.s
+	cd /Users/pavel/pro60/src/asl && $(MAKE) -f zip/CMakeFiles/zip.dir/build.make zip/CMakeFiles/zip.dir/zip.c.s
 .PHONY : zip.c.s
 
 # Help Target
@@ -447,7 +447,6 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... aslzip"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
@@ -456,6 +455,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... testZipFile"
+	@echo "... zip"
 	@echo "... DirectoryPackage.o"
 	@echo "... DirectoryPackage.i"
 	@echo "... DirectoryPackage.s"
@@ -500,6 +500,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/prom/Work/PRO60/src/asl && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/pavel/pro60/src/asl && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

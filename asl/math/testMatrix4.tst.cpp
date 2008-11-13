@@ -24,6 +24,9 @@
 #include "linearAlgebra.h"
 #include "numeric_functions.h"
 
+// temporarily inserted to compare speed with sony library
+//#include "vectormath/c/vectormath_aos.h"
+
 #include <asl/base/UnitTest.h>
 #include <asl/base/Time.h>
 #include <iostream>

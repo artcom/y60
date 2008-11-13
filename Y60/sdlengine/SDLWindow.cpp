@@ -768,7 +768,11 @@ SDLWindow::mainLoop() {
             if (getForceFullGC()) {
                 JS_GC(_myJSContext);
             } else {
+#ifdef SPIDERMONK
                 JS_AdaptiveGC(_myJSContext);
+#else
+                JS_GC(_myJSContext);
+#endif
             }
         }
 

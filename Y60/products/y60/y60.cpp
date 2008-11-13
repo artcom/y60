@@ -34,6 +34,10 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"--no-jswarnings", ""},
     {"--pause-on-error", ""},
     {"--std-logfile", "logfile base filename for stdout/stderr"},
+#ifndef SPIDERMONK
+    {"--jit", ""},
+    {"--xml", ""},
+#endif
     {"--help", ""},
      //y60 will quit automatically after some frames taking a screen shot.
     {"", ""}
@@ -61,6 +65,14 @@ main(int argc, char **argv) {
         if (ourArguments.haveOption("--jsversion")) {
             myApp.setJSVersion(asl::as<int>(ourArguments.getOptionArgument("--jsversion")));
         }
+#ifndef SPIDERMONK
+        if (ourArguments.haveOption("--jit")) {
+            myApp.enableJIT(true);
+        }
+        if (ourArguments.haveOption("--xml")) {
+            myApp.enableXML(true);
+        }
+#endif
 
         if (ourArguments.haveOption("--help")) {
             ourArguments.printUsage();
