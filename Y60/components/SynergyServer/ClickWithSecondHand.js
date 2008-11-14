@@ -52,8 +52,10 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
             if (Protected.firstEvents.length == 1) {
                 Protected.targetPosition = null;
                 var myMousePosition = Protected.getMousePos( theEvent.raw_position );
-                _mySynergyServer.onMouseMotion( myMousePosition.x + POSITION_OFFSET[0], 
-                                                myMousePosition.y + POSITION_OFFSET[1]);
+                _mySynergyServer.onMouseMotion( myMousePosition.x 
+                                                + Protected.positionOffset[0], 
+                                                myMousePosition.y 
+                                                + Protected.positionOffset[1]);
 //                if (_myButtonPressedId) {
 //                    _mySynergyServer.onMouseButton( 1, true );
 //                }

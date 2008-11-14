@@ -8,6 +8,10 @@ const RELATIVE_MODE = 2;
 
 var myHost = "localhost";
 var myPort = 24800;
+var myXOffset = 0;
+var myYOffset = 0;
+var myWidthOffset = 0;
+var myHeightOffset = 0;
 
 // parse arguments
 var myMode = DEFAULT_MODE;
@@ -33,6 +37,18 @@ for (var i = 0; i < arguments.length; i++) {
     } else if (myArgumentStrings[0] == "port") {
         myPort = Number( myArgumentStrings[1] );
         print( "Port:", myPort );
+    } else if (myArgumentStrings[0] == "xoffset") {
+        myXOffset = Number( myArgumentStrings[1] );
+        print( "XOffset:", myXOffset );
+    } else if (myArgumentsString[0] == "yoffset") {
+        myYOffset = Number( myArgumentStrings[1] );
+        print( "YOffset:", myYOffset );
+    } else if (myArgumentStrings[0] == "widthoffset") {
+        myWidthOffset = Number( myArgumentStrings[1] );
+        print( "WidthOffset:", myWidthOffset );
+    } else if (myArgumentStrings[0] == "heightoffset") {
+        myHeightOffset = Number( myArgumentStrings[1] );
+        print( "HeightOffset:", myHeightOffset );
     }
 
 }
@@ -82,6 +98,9 @@ if (myMode == CLICKONPOINT_MODE) {
     use( "ClickWithSecondHand.js" );
     var myEventHandler = new ClickWidthSecondHand( mySynergyServer, mySettings );
 }
+
+myEventHandler.positionOffset = new Vector2f( myXOffset, myYOffset );
+myEventHandler.sizeOffset = new Vector2f( myWidthOffset, myHeightOffset );
 
 function onFrame( theTime ) {
     myEventHandler.onFrame( theTime );

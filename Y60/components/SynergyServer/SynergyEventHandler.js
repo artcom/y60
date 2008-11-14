@@ -1,5 +1,3 @@
-const POSITION_OFFSET = [0,0];
-const SCREENSIZE_OFFSET = [0, 0];
 //const POSITION_OFFSET = [0,140];
 //const SCREENSIZE_OFFSET = [0, -280];
 const EVENT_QUEUE_SIZE = 10;
@@ -29,6 +27,9 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     var _myScreenSize = _mySynergyServer.getScreenSize();
     var _myGridSize = new Vector2f( 1, 1 );
     var _myMirror = new Vector2i(0,0);
+
+    var _myPositionOffset = new Vector2f( 0, 0 );
+    var _mySizeOffset = new Vector2f( 0, 0 );
 
     var myMirrorXNode = _mySettings.find( "//MirrorX" );
     if (myMirrorXNode) {
@@ -60,8 +61,8 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
             if (distance( _myMousePosition, _myTargetPosition ) < 0.1) {
                 _myTargetPosition = null;
             }
-            _mySynergyServer.onMouseMotion( _myMousePosition.x + POSITION_OFFSET[0], 
-                                            _myMousePosition.y + POSITION_OFFSET[1] );
+            _mySynergyServer.onMouseMotion( _myMousePosition.x + _myPositionOffset[0], 
+                                            _myMousePosition.y + _myPositionOffset[1] );
 
         }
 
@@ -150,6 +151,18 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
         return _myScreenSize;
     }
 
+    Protected.positionOffset setter = function( thePositionOffset ) {
+        _myPositionOffset = thePositionOffset;
+    }
+    
+    Protected.positionOffset getter = function() {
+        return _myPositionOffset;
+    }
+
+    Protected.sizeOffset setter = function( theSizeOffset ) {
+        _mySizeOffset = theSizeOffset;
+    }
+
     Protected.getMousePos = function( theRawPosition ) {
 
         //print( "SynergyEventHandler.getMousePos(",theRawPosition,")");
@@ -159,7 +172,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
             myRawX = _myGridSize.x - theRawPosition.x;
         }
         var myX = myRawX / _myGridSize.x 
-                  * (_myScreenSize.x + SCREENSIZE_OFFSET[0]);
+                  * (_myScreenSize.x + _mySizeOffset[0]);
                   
         var myRawY = theRawPosition.y;
         if (_myMirror.y > 0) {
@@ -167,7 +180,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
         }
                   
         var myY = myRawY / _myGridSize.y 
-                  * (_myScreenSize.y + SCREENSIZE_OFFSET[1]);
+                  * (_myScreenSize.y + _mySizeOffset[1]);
         var myMousePosition = new Vector2f( myX, myY );
 
         //print( "SynergyEventHandler.getMousePos: myMousePosition =", myMousePosition );
