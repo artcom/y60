@@ -125,6 +125,10 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     Protected.mousePosition getter = function() {
         return _myMousePosition;
     }
+    
+    Protected.mousePosition setter = function( theMousePosition ) {
+        _myMousePosition = theMousePosition;
+    }
 
     Protected.firstEvents getter = function() {
         return _myFirstEvents;

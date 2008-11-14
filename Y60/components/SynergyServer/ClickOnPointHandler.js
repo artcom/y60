@@ -28,6 +28,7 @@ ClickOnPointHandler.prototype.Constructor
     Base.onRemoveFirst = Public.onRemoveFirst;
     Public.onRemoveFirst = function( theEvent ) {
         if (_myMouseButtonPressed) {
+            print( "mouse button released" );
             _mySynergyServer.onMouseButton( 1, false );
             _myMouseButtonPressed = false;
         }
@@ -39,9 +40,11 @@ ClickOnPointHandler.prototype.Constructor
 
         if ( theEvent.type == "add") {
             if (Protected.firstEvents.length == 1) { 
-                var myMousePos = Protected.getMousePos( theEvent.raw_position );
-                _mySynergyServer.onMouseMotion( myMousePos.x, myMousePos.y );
+                Protected.mousePosition = Protected.getMousePos( theEvent.raw_position );
+                _mySynergyServer.onMouseMotion( Protected.mousePosition.x, 
+                                                Protected.mousePosition.y );
                 _mySynergyServer.onMouseButton( 1, true );
+                print( "mouse button pressed" );
                 Protected.targetPosition = null;
                 _myMouseButtonPressed = true;
             }
