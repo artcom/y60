@@ -40,7 +40,7 @@ for (var i = 0; i < arguments.length; i++) {
     } else if (myArgumentStrings[0] == "xoffset") {
         myXOffset = Number( myArgumentStrings[1] );
         print( "XOffset:", myXOffset );
-    } else if (myArgumentsString[0] == "yoffset") {
+    } else if (myArgumentStrings[0] == "yoffset") {
         myYOffset = Number( myArgumentStrings[1] );
         print( "YOffset:", myYOffset );
     } else if (myArgumentStrings[0] == "widthoffset") {
