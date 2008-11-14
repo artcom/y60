@@ -20,15 +20,27 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
 
     var _myVelocity = new Vector2f(0,0);
     var _myMouseMoveId = null;
+    var _myMouseButtonPressed = false;
     var _myButtonPressedId = null;
+
+    function releaseMouse() {
+        if (_myMouseButtonPressed) {
+            print( "mouse button released" );
+            _mySynergyServer.onMouseButton( 1, false );
+            _myMouseButtonPressed = false;
+        } 
+    }
+
+
 
     Base.onRemoveFirst = Public.onRemoveFirst;
     Public.onRemoveFirst = function( theEvent ) {
-        _mySynergyServer.onMouseButton( 1, false );
+        releaseMouse();
     }
 
     Base.onRemoveSecond = Public.onRemoveSecond;
     Public.onRemoveSecond = function( theEvent ) {
+        releaseMouse();
     }
 
     Base.onASSEvent = Public.onASSEvent;
@@ -47,13 +59,15 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
 //                }
                 _myVelocity = new Vector2f( 0, 0 );
             } else if (Protected.secondEvents.length == 1) {
+                print( "mouse button pressed..." );
                 _mySynergyServer.onMouseButton( 1, true );
+                _myMouseButtonPressed = true;
             }
         } 
         else if ( theEvent.type == "move" ) {
             if (Protected.singleCursor( theEvent )) {
                 Protected.targetPosition = Protected.getMousePos( theEvent.raw_position );
             }
-        } 
+        }
     }
 }
