@@ -39,7 +39,7 @@ namespace jslib {
         DOC_PARAM("theNode", "The xml node to append", DOC_TYPE_NODE);
         DOC_RVAL("The appended node", DOC_TYPE_NODE);
         DOC_END;
-        typedef dom::NodePtr (NodeList::*MyMethod)(int);
+        typedef dom::NodePtr (NodeList::*MyMethod)(dom::NodePtr);
         return Method<NodeList>::call((MyMethod)&NodeList::append,cx,obj,argc,argv,rval);
     }
 
@@ -167,6 +167,18 @@ namespace jslib {
     jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList) {
         JSObject * myObject = JSNodeList::Construct(cx, theNode, theNodeList);
         return OBJECT_TO_JSVAL(myObject);
+    }
+    bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList) {
+        if (JSVAL_IS_OBJECT(theValue)) {
+            JSObject * myArgument;
+            if (JS_ValueToObject(cx, theValue, &myArgument)) {
+                if (JSA_GetClass(cx,myArgument) == JSClassTraits<dom::NodeList>::Class()) {
+                    theNodeList = JSClassTraits<dom::NodeList>::getNativeRef(cx,myArgument);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

@@ -10,6 +10,7 @@
 
 #include "QuitFlagSingleton.h"
 #include "JScppUtils.h"
+#include "JSNode.h"
 #include "JScppUtils.impl"
 
 #include <asl/base/error_functions.h>
@@ -988,5 +989,7 @@ template bool convertFrom(JSContext *cx, jsval theValue, std::vector<std::string
 template bool convertFrom(JSContext *cx, jsval theValue, std::vector<JSObject *> & theVector);
 template bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned char> & theVector);
 template bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Time> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Time> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<dom::NodePtr> & theVector);
 
 }

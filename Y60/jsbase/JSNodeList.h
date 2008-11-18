@@ -60,7 +60,7 @@ public:
 };
 
 jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
-
+bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList);
 }
 
 #endif
