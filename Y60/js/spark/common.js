@@ -38,7 +38,13 @@ function Class(theName) {
         
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
-        myNamespace[theName].Constructor.apply(myPublic, myArguments);
+        if (theName in myNamespace){
+            myNamespace[theName].Constructor.apply(myPublic, myArguments);
+        } else {
+            Logger.error("'" + theName + 
+                         "' not found in namespace '" + myNamespace.name + "'");
+        }
+
     };
 
     return myConstructor;

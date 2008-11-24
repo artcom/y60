@@ -22,3 +22,6 @@ use("load.js");
 use("text.js");
 use("cache.js");
 use("components.js");
+
+if (useSparkWidgets)
+    use("widgets.js");

@@ -36,6 +36,12 @@ spark.loadDocument = function(theNode, theParent) {
  * Internal: instantiation engine.
  */
 spark.instantiateRecursively = function(theNode, theParent) {
+
+    if (!theNode){
+        Logger.error("no node given.");
+        exit(1);
+    }
+
     // shortcut for defining template classes
     if(theNode.nodeName == "Template") {
         var myFile = theNode.src;
@@ -49,9 +55,18 @@ spark.instantiateRecursively = function(theNode, theParent) {
         return null;
     }
 
+    var myName = theNode.nodeName;
+    print(myName);
+
+    if (! (myName in spark.componentClasses)){
+        Logger.warning("Skipping node '" +  myName + 
+                     "'. No matching component found.");
+        return null;
+    }
+
     // instantiate the component
     var myInstance = spark.instantiateComponent(theNode);
-
+    
     // add to parent if we have one
     if(theParent) {
         theParent.addChild(myInstance);
