@@ -56,8 +56,6 @@ spark.instantiateRecursively = function(theNode, theParent) {
     }
 
     var myName = theNode.nodeName;
-    print(myName);
-
     if (! (myName in spark.componentClasses)){
         Logger.warning("Skipping node '" +  myName + 
                      "'. No matching component found.");
