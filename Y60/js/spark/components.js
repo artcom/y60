@@ -190,7 +190,6 @@ spark.Container.Constructor = function(Protected) {
 
     Public.addChild = function(theChild) {
         _myChildArray.push(theChild);
-        Public.node.appendChild(theChild.node);
         if(theChild.name) {
             _myChildMap[theChild.name] = theChild;
         }
