@@ -264,9 +264,21 @@ function ENSURE_EQUAL(theExpected, theResult, theMessage) {
         var myResult = false;
         print('###### EXCEPTION:'+e);
     }
-    ourCurrentTest.ensure(myResult,
-                          theMessage + ": Should be " + theExpected + " but was " + theResult,
-                          __LINE__(2));
+
+    if (!theMessage)
+        theMessage = "no message";
+
+    var myResultMessage;
+    if (myResult){
+        myResultMessage = theMessage;
+    } else {
+        myResultMessage = theMessage + ": Should be " + 
+            theExpected + " but was " + theResult;
+    }
+
+    ourCurrentTest.ensure(myResult, myResultMessage,
+                              __LINE__(2));
+
     return myResult;
 }
 
