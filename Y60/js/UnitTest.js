@@ -257,6 +257,20 @@ function ENSURE(theExpression, theMessage) {
     return myResult;
 }
 
+function ENSURE_EQUAL(theExpected, theResult, theMessage) {
+    try {
+        var myResult = (theExpected == theResult);
+    } catch(e) {
+        var myResult = false;
+        print('###### EXCEPTION:'+e);
+    }
+    ourCurrentTest.ensure(myResult,
+                          theMessage + ": Should be " + theExpected + " but was " + theResult,
+                          __LINE__(2));
+    return myResult;
+}
+
+
 function FAILURE(MSG) {
     ourCurrentTest.ensure(false, MSG, __LINE__(2));
 }
