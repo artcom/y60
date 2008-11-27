@@ -59,12 +59,8 @@ namespace y60 {
             }
             //AC_PRINT << "ENV: " << std::string(myUsageString ? myUsageString: "not defined") << " -> " << myVBOUsage;
             if (myVBOUsage &&
-                (queryOGLExtension("GL_ARB_vertex_buffer_object", true) ||
-                 queryOGLExtension("GL_EXT_vertex_buffer_object", true))
-//#ifdef OSX // TODO PORT - disabled VBOs
-//				&& false
-//#endif				 
-				 )
+                (y60::hasCap("GL_ARB_vertex_buffer_object")||
+                 y60::hasCap("GL_EXT_vertex_buffer_object")))
             {
                 _myType = VERTEX_STORAGE_IS_VBO_VECTOR;
                 AC_INFO << "Using vertex buffer objects (VBOs) for vertex storage";
@@ -102,7 +98,14 @@ namespace y60 {
     public:
         DEFINE_NESTED_EXCEPTION(GLResourceManager, TextureException, asl::Exception);
 
-        GLResourceManager() : _myTextureMemUsage(0), _myShaderLibrary(ShaderLibraryPtr(0)) {
+        GLResourceManager() : 
+            _myTextureMemUsage(0), 
+            _myShaderLibrary(ShaderLibraryPtr(0)), 
+            _myHasVBOExtension(false),
+            _myHasPixelUnpackBuffer(false),
+            _myHasAnisotropicTex(false),
+            _myHasSGIGenerateMipMap(false)
+        {
             validateGLContext(true);
         }
 
@@ -213,6 +216,11 @@ namespace y60 {
          * @param theImage Image to update.
          */
         bool imageMatchesGLTexture(TexturePtr theTexture) const;
+        
+        /**
+         * Init the OpenGL capabilities. 
+         */
+        void initCaps();
 
     private:
         static PixelEncodingInfo getPixelEncoding(const TexturePtr & theTexture, const ImagePtr & theImage);
@@ -252,6 +260,12 @@ namespace y60 {
 
         unsigned long _myTextureMemUsage;
         unsigned long _myVertexMemUsage;
+
+        bool _myHasVBOExtension;
+        bool _myHasPixelUnpackBuffer;
+        bool _myHasAnisotropicTex;
+        bool _myHasSGIGenerateMipMap;
+
         ShaderLibraryPtr _myShaderLibrary;
     };
 }

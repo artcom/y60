@@ -371,8 +371,8 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
 }
 
 bool
-WaterRepresentation::initExtensions(char* extension) {
-  if ( ! queryOGLExtension(extension)) {
+WaterRepresentation::initExtensions(const char * extension) {
+  if ( !hasCap(extension)) {
     AC_ERROR << "requires the " << extension << " OpenGL extension to work.";
     return false;
   }

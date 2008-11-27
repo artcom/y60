@@ -267,7 +267,7 @@ private:
     float               _surfaceOpacity;
     
     bool            initRender();
-    bool            initExtensions(char* extension);
+    bool            initExtensions(const char* extension);
 
     inline int      computeNumLinesPerBuffer() const {
         return _dataHeight / NUM_VAR_BUFFERS;

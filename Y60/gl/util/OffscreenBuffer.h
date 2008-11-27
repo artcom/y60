@@ -66,6 +66,9 @@ namespace y60 {
             void attachCubemapFace(unsigned theCubemapFace);
             
             bool     _myUseFBO;
+            bool     _myHasFBO;
+            bool     _myHasFBOMultisample;
+
             asl::Unsigned64 _myTextureNodeVersion;
             unsigned _myBlitFilter;
 

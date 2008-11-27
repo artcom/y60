@@ -8,22 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifdef WIN32
-#define NOMINMAX
-// Note: GLH_EXT_SINGLE_FILE must be defined only in one object file
-// it makes the header file to define the function pointer variables
-// never set it in a .h file or any other file that shall be linked
-// with this object file
-// If you use GLH_EXT_SINGLE_FILE 1 make sure that glh_extensions.h
-// and glh_genext.h has not been included from another include file
-// already without GLH_EXT_SINGLE_FILE set
-//
-#   include <GL/glh_extensions.h>
-#   include <GL/glh_genext.h>
-#else
-//
-#endif
-
 #include "GLShader.h"
 
 #include "ShaderLibrary.h"
@@ -75,7 +59,9 @@ namespace y60 {
     };
 
     GLShader::GLShader(const dom::NodePtr theNode) :
-        _myType(FIXED_FUNCTION_MATERIAL)
+        _myType(FIXED_FUNCTION_MATERIAL),
+        _myHasBlendMinMaxEXT(hasCap("GL_EXT_blend_minmax")),
+        _myHasPointParmatersEXT(hasCap("GL_EXT_point_parameters"))
     {
         _myId              = theNode->getAttributeString(ID_ATTRIB);
         _myName            = theNode->getAttributeString(NAME_ATTRIB);
@@ -187,7 +173,7 @@ namespace y60 {
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
         CHECK_OGL_ERROR;
-        if (IS_SUPPORTED(glPointParameterfARB)) {
+        if (_myHasPointParmatersEXT) {
             glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
             CHECK_OGL_ERROR;
             glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
@@ -231,7 +217,7 @@ namespace y60 {
         }
 
         // blend equation
-        if (IS_SUPPORTED(glBlendEquation)) {
+        if (_myHasBlendMinMaxEXT) {
             const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
@@ -271,7 +257,7 @@ namespace y60 {
 
         // point attenuation
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
-        if (IS_SUPPORTED(glPointParameterfARB) && myPointAttenuationProp) {
+        if (_myHasPointParmatersEXT && myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
                                   myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
@@ -343,7 +329,7 @@ namespace y60 {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
                     CHECK_OGL_ERROR;
-                    if (IS_SUPPORTED(glPointParameterfARB)) {
+                    if (_myHasPointParmatersEXT) {
                         glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
                         CHECK_OGL_ERROR;
                     }

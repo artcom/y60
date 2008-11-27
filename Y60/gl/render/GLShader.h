@@ -13,7 +13,8 @@
 #include <asl/base/Ptr.h>
 
 #include <string>
-#include <GL/gl.h>
+
+#include <GL/glew.h>
 
 namespace y60 {
 
@@ -93,6 +94,9 @@ namespace y60 {
             
             ShaderFeatureSet          _myFeatureSet;
             std::vector<dom::NodePtr> _myPropertyNodes;
+    
+            bool _myHasPointParmatersEXT;
+            bool _myHasBlendMinMaxEXT;
     };
 
     typedef asl::Ptr<GLShader, dom::ThreadingModel> GLShaderPtr;

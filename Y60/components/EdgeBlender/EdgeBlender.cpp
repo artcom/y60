@@ -189,7 +189,6 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     unsigned myTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
     AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
 
-    initGLExtensions(0);
     glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &_myMaxTexUnits);
     AC_DEBUG << "maxTextureUnits=" << _myMaxTexUnits;
 

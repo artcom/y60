@@ -87,87 +87,6 @@ namespace y60 {
         }
     }
 
-    static bool queryStringForExtension(const char * supported,
-                                        const char * extName) {
-
-        if (supported == NULL) {
-            return false;
-        }
-        bool supportedFlag = false;
-
-        /*
-        ** Search for extName in the extensions string. Use of strstr()
-        ** is not sufficient because extension names can be prefixes of
-        ** other extension names. Could use strtok() but the constant
-        ** string returned by glGetString might be in read-only memory.
-        */
-        const char * p = supported;
-        int extNameLen = strlen(extName);
-        const char * end = p + strlen(p);
-
-        while (p < end) {
-            int n = strcspn(p, " ");
-            if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {
-                AC_DEBUG << "Extension '" << extName << "' is supported";
-                supportedFlag = true;
-                break;
-            }
-            p += (n + 1);
-        }
-
-        if (supportedFlag) {
-            const char* glQuirks = getenv("Y60_GL_QUIRKS");
-            if (glQuirks && strstr(glQuirks, extName) != 0) {
-                AC_WARNING << "Disabling quirky extension '" << extName << "'";
-                supportedFlag = false;
-            }
-        } else {
-            AC_INFO << "Extension '" << extName << "' is not supported";
-        }
-
-        return supportedFlag;
-    }
-
-#ifdef WIN32
-    bool queryWGLExtension(const char *extension)
-    {
-    	const char *supported = NULL;
-
-    	// Try To Use wglGetExtensionStringARB On Current DC, If Possible
-    	PROC wglGetExtString = wglGetProcAddress("wglGetExtensionsStringARB");
-
-    	if (wglGetExtString)
-    		supported = ((char*(__stdcall*)(HDC))wglGetExtString)(wglGetCurrentDC());
-
-    	// If That Failed, Try Standard Opengl Extensions String
-    	if (supported == NULL)
-    		supported = (char*)glGetString(GL_EXTENSIONS);
-
-        return queryStringForExtension(supported, extension);
-    }
-#endif
-
-#ifdef AC_USE_X11
-    bool queryGLXExtension(const char *extName)
-    {
-        Display * dpy = glXGetCurrentDisplay();
-        if (!dpy) {
-            AC_ERROR << "Unable to contact display server for GLX extensions";
-            return false;
-        }
-
-        const char * supports = glXQueryExtensionsString(dpy, 0);
-        bool supported = queryStringForExtension(supports, extName);
-
-        return supported;
-    }
-#endif
-
-    bool queryOGLExtension(const char *extName, bool)
-    {
-        return queryStringForExtension((char*) glGetString(GL_EXTENSIONS), extName);
-    }
-
     DEFINE_EXCEPTION(GlTextureFunctionException, asl::Exception);
 
     GLenum
@@ -548,28 +467,6 @@ namespace y60 {
         return GL_OBJECT_LINEAR;
     }
 
-#ifdef WIN32
-#define SET_PROC_ADDRESS(p,x) \
-    x = (p) wglGetProcAddress( #x ); \
-    if (!x) { \
-        x = Missing_ ## x; \
-        AC_DEBUG << "GL Extension missing:" << #x << endl; \
-    } else { \
-        AC_DEBUG << "GL Extension available:" << #x << endl; \
-    }
-#endif
-
-#ifdef AC_USE_X11
-#define SET_PROC_ADDRESS(p,x) \
-    _ac_ ## x = (p) glXGetProcAddressARB((const GLubyte*) #x ); \
-    if (!x) { \
-        x = Missing_ ## x; \
-        AC_DEBUG << "GL Extension missing:" << #x << endl; \
-    } else { \
-        AC_DEBUG << "GL Extension available:" << #x << endl; \
-    }
-#endif
-
 #ifdef AC_USE_OSX_CGL
 
 // see http://developer.apple.com/qa/qa2001/qa1188.html for details
@@ -594,16 +491,6 @@ void * NSGLGetProcAddress (const char * name)
     free(symbolName);
     return symbol ? NSAddressOfSymbol(symbol) : NULL;
 }
-
-#define SET_PROC_ADDRESS(p,x) \
-    _ac_ ## x = (p)  NSGLGetProcAddress( #x ); \
-    if (!x) { \
-        x = Missing_ ## x; \
-        AC_DEBUG << "GL Extension missing:" << #x << endl; \
-    } else { \
-        AC_DEBUG << "GL Extension available:" << #x << endl; \
-    }
-
 #else
 
 // Apple AGL Version
@@ -683,227 +570,35 @@ void * aglGetProcAddress (char * pszProc)
                      pszProc, CFStringGetSystemEncoding (), NULL));
 }
 
-#define SET_PROC_ADDRESS(p,x) \
-    _ac_ ## x = (p)  aglGetProcAddress( #x ); \
-    if (!x) { \
-        x = Missing_ ## x; \
-    }
-
 #endif
 
 #endif
-
-
-    void
-    initGLExtensions(unsigned int /*theNeededExtensions*/,
-                     bool /*theVerboseFlag*/,
-                     bool theInitGLH_extension)
-    {
-        std::string mySyncTiming;
-        if (asl::get_environment_var("Y60_SYNC_GL_TIMING", mySyncTiming)) {
-            if (asl::as<bool>(mySyncTiming)) {
-                AC_WARNING << "Y60_SYNC_GL_TIMING is set, may lead to performance degradation (but allows to get true timing results from Dashboard)"; 
-                GLScopeTimer::_flushGL_before_stop = true;
-            }
-        }
-        
-        unsigned myVersionMajor = 0;
-        unsigned myVersionMinor = 0;
-        unsigned myVersionRelease = 0;
-        queryGLVersion(myVersionMajor, myVersionMinor, myVersionRelease);
-        AC_DEBUG << "Found OpenGL " << myVersionMajor << "." << myVersionMinor << " rel " << myVersionRelease;
-
-        // don't call SET_PROC_ADDRESS to simulate a missing extenstion
-        // SET_PROC_ADDRESS( PFNACTESTPROC, acTestMissingExtension );
-        // call SET_PROC_ADDRESS to simulate a missing function pointer lookup
-        SET_PROC_ADDRESS( PFNACTESTPROC, acTestMissingFunction );
-
-        if (queryOGLExtension("GL_ARB_vertex_buffer_object") ||
-            queryOGLExtension("GL_EXT_vertex_buffer_object")) {
-
-            /* ARB_vertex_buffer_object */
-            SET_PROC_ADDRESS( PFNGLBINDBUFFERARBPROC, glBindBufferARB );
-            SET_PROC_ADDRESS( PFNGLDELETEBUFFERSARBPROC, glDeleteBuffersARB );
-            SET_PROC_ADDRESS( PFNGLGENBUFFERSARBPROC, glGenBuffersARB );
-            SET_PROC_ADDRESS( PFNGLISBUFFERARBPROC, glIsBufferARB );
-            SET_PROC_ADDRESS( PFNGLBUFFERDATAARBPROC, glBufferDataARB );
-            SET_PROC_ADDRESS( PFNGLBUFFERSUBDATAARBPROC, glBufferSubDataARB );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERSUBDATAARBPROC, glGetBufferSubDataARB );
-            SET_PROC_ADDRESS( PFNGLMAPBUFFERARBPROC, glMapBufferARB );
-            SET_PROC_ADDRESS( PFNGLUNMAPBUFFERARBPROC, glUnmapBufferARB );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERPARAMETERIVARBPROC, glGetBufferParameterivARB );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERPOINTERVARBPROC, glGetBufferPointervARB );
-
-            /* OpenGL core 1.5 functions without ARB-identifier */
-
-            SET_PROC_ADDRESS( PFNGLBINDBUFFERPROC, glBindBuffer );
-            SET_PROC_ADDRESS( PFNGLDELETEBUFFERSPROC, glDeleteBuffers );
-            SET_PROC_ADDRESS( PFNGLGENBUFFERSPROC, glGenBuffers );
-            SET_PROC_ADDRESS( PFNGLISBUFFERPROC, glIsBuffer );
-            SET_PROC_ADDRESS( PFNGLBUFFERDATAPROC, glBufferData );
-            SET_PROC_ADDRESS( PFNGLBUFFERSUBDATAPROC, glBufferSubData );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERSUBDATAPROC, glGetBufferSubData );
-            SET_PROC_ADDRESS( PFNGLMAPBUFFERPROC, glMapBuffer );
-            SET_PROC_ADDRESS( PFNGLUNMAPBUFFERPROC, glUnmapBuffer );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERPARAMETERIVPROC, glGetBufferParameteriv );
-            SET_PROC_ADDRESS( PFNGLGETBUFFERPOINTERVPROC, glGetBufferPointerv );
-
-            SET_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
-            SET_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
-
-            if (!(IS_SUPPORTED(glBindBuffer) &&
-                IS_SUPPORTED(glDeleteBuffers) &&
-                IS_SUPPORTED(glGenBuffers) &&
-                IS_SUPPORTED(glIsBuffer) &&
-                IS_SUPPORTED(glBufferData) &&
-                IS_SUPPORTED(glBufferSubData) &&
-                IS_SUPPORTED(glGetBufferSubData) &&
-                IS_SUPPORTED(glMapBuffer) &&
-                IS_SUPPORTED(glUnmapBuffer) &&
-                IS_SUPPORTED(glGetBufferParameteriv) &&
-                IS_SUPPORTED(glGetBufferPointerv))) {
-                AC_WARNING << "Only ARB versions of vertex_buffer_object extension available";
-            }
-        }
-
-        // cubemap extensions
-        if (queryOGLExtension("GL_ARB_texture_cube_map") || queryOGLExtension("GL_EXT_texture_cube_map")) {
-        }
-
-        // texture compression
-        if (queryOGLExtension("GL_ARB_texture_compression") ||
-            queryOGLExtension("GL_EXT_texture_compression_s3tc")) {
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXIMAGE1DARBPROC, glCompressedTexImage1DARB );
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXIMAGE2DARBPROC, glCompressedTexImage2DARB );
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXIMAGE3DARBPROC, glCompressedTexImage3DARB );
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC, glCompressedTexSubImage1DARB );
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC, glCompressedTexSubImage2DARB );
-            SET_PROC_ADDRESS( PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC, glCompressedTexSubImage3DARB );
-            SET_PROC_ADDRESS( PFNGLGETCOMPRESSEDTEXIMAGEARBPROC, glGetCompressedTexImageARB );
-        }
-
-        // multitexture
-        if (queryOGLExtension("GL_ARB_multitexture")) {
-#ifdef WIN32
-            if (theInitGLH_extension) {
-                glh_init_extensions("GL_ARB_multitexture"); // who needs this (vs)? (gtk extension calling this crash)
-            }
-#endif
-            /* Retrieve some ARB_multitexture routines. */
-            SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2IARBPROC, glMultiTexCoord2iARB );
-            SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FARBPROC, glMultiTexCoord3fARB );
-            SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FVARBPROC, glMultiTexCoord3fvARB );
-            SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
-            SET_PROC_ADDRESS( PFNGLACTIVETEXTUREPROC, glActiveTexture );
-            SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture );
-        } else {
-            //throw OpenGLException(string("GL_ARB_multitexture not supported but mandatory"), PLUS_FILE_LINE);
-        }
-
-        // DS: for some reason this extension is not in the nvidia extension list but I've
-        //     seen a demo using it. According to the GL_NV_point_sprite extension spec it
-        //     uses exact the same tokens as GL_ARB_point_sprite. So they are exchangable.
-        //     the token names are different but we defined these tokens ourself in
-        //     glExtensions.h anyway.
-        // point sprites
-
-        if (queryOGLExtension("GL_ARB_point_sprite") || queryOGLExtension("GL_NV_point_sprite")) {
-        }
-
-        // point parameters
-        if (queryOGLExtension("GL_ARB_point_parameters")) {
-            SET_PROC_ADDRESS( PFNGLPOINTPARAMETERFARBPROC, glPointParameterfARB );
-            SET_PROC_ADDRESS( PFNGLPOINTPARAMETERFVARBPROC, glPointParameterfvARB );
-        }
-
-        // 3d texture
-        if (myVersionMajor >= 2 || myVersionMinor >= 2) {
-            GLint myMaxSize = 0;
-            glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &myMaxSize);
-            AC_INFO << "Max.texture size 3D " << myMaxSize;
-            SET_PROC_ADDRESS( PFNGLTEXIMAGE3DPROC, glTexImage3D );
-            SET_PROC_ADDRESS( PFNGLTEXSUBIMAGE3DPROC, glTexSubImage3D );
-            SET_PROC_ADDRESS( PFNGLCOPYTEXSUBIMAGE3DPROC, glCopyTexSubImage3D );
-        } else {
-            AC_WARNING << "Probably no 3D texture support";
-        }
-
-        // frame buffer objects
-#ifdef GL_EXT_framebuffer_object
-        if (queryOGLExtension("GL_EXT_framebuffer_object")) {
-            //these are not all but just those needed in OffScreenRenderArea
-            SET_PROC_ADDRESS( PFNGLGENRENDERBUFFERSEXTPROC, glGenRenderbuffersEXT );
-            SET_PROC_ADDRESS( PFNGLDELETERENDERBUFFERSEXTPROC, glDeleteRenderbuffersEXT );
-
-            SET_PROC_ADDRESS( PFNGLGENFRAMEBUFFERSEXTPROC, glGenFramebuffersEXT );
-            SET_PROC_ADDRESS( PFNGLDELETEFRAMEBUFFERSEXTPROC, glDeleteFramebuffersEXT );
-
-            SET_PROC_ADDRESS( PFNGLBINDFRAMEBUFFEREXTPROC, glBindFramebufferEXT );
-            SET_PROC_ADDRESS( PFNGLBINDRENDERBUFFEREXTPROC, glBindRenderbufferEXT );
-            SET_PROC_ADDRESS( PFNGLFRAMEBUFFERTEXTURE2DEXTPROC, glFramebufferTexture2DEXT );
-            SET_PROC_ADDRESS( PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC, glFramebufferRenderbufferEXT );
-            SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEEXTPROC, glRenderbufferStorageEXT );
-            SET_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEXT );
-            SET_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
-        }
-#endif
-#ifdef GL_EXT_framebuffer_blit
-        if (queryOGLExtension("GL_EXT_framebuffer_blit")) {
-            SET_PROC_ADDRESS( PFNGLBLITFRAMEBUFFEREXTPROC, glBlitFramebufferEXT);
-        }
-#endif
-#ifdef GL_EXT_framebuffer_multisample
-        if (queryOGLExtension("GL_EXT_framebuffer_multisample")) {
-            SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC, glRenderbufferStorageMultisampleEXT);
-        }
-#endif
-
-        SET_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
-        if (queryOGLExtension("GL_EXT_blend_func_separate")) {
-            SET_PROC_ADDRESS( PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate );
-        }
-        if (queryOGLExtension("GL_EXT_blend_color")) {
-            SET_PROC_ADDRESS( PFNGLBLENDCOLORPROC, glBlendColor );
-        }
-        if (queryOGLExtension("GL_EXT_texture_filter_anisotropic")) {
-            AC_INFO << "Anisotropic filter support";
-        }
-
-#ifdef WIN32
-        if (queryWGLExtension("WGL_EXT_swap_control")) {
-            SET_PROC_ADDRESS( PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT );
-            SET_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
-        }
-#endif
-#ifdef AC_USE_X11
-        if (queryGLXExtension("GLX_SGI_video_sync")) {
-            SET_PROC_ADDRESS( PFNGLXGETVIDEOSYNCSGIPROC, glXGetVideoSyncSGI );
-            SET_PROC_ADDRESS( PFNGLXWAITVIDEOSYNCSGIPROC, glXWaitVideoSyncSGI );
-        }
-#endif
-    }
 
     bool hasCap(const string & theCapStr) {
-        return queryOGLExtension(theCapStr.c_str());
+        bool myReturn = glewIsSupported(theCapStr.c_str());
+        if (!myReturn) {
+            AC_WARNING << "OpenGL Extension not supported: " << theCapStr;
+        }
+        return myReturn;
     }
 
     bool hasCap(unsigned int theCap) {
         bool myResult = false;
         switch (theCap) {
             case CUBEMAP_SUPPORT:
-                myResult = queryOGLExtension("GL_ARB_texture_cube_map") || queryOGLExtension("GL_EXT_texture_cube_map");
+                myResult = hasCap("GL_ARB_texture_cube_map GL_EXT_texture_cube_map");
                 break;
             case TEXTURECOMPRESSION_SUPPORT:
-                myResult = queryOGLExtension("GL_ARB_texture_compression") || queryOGLExtension("GL_EXT_texture_compression_s3tc");
+                myResult = hasCap("GL_ARB_texture_compression GL_EXT_texture_compression_s3tc");
                 break;
             case MULTITEXTURE_SUPPORT :
-                myResult = queryOGLExtension("GL_ARB_multitexture");
+                myResult = hasCap("GL_ARB_multitexture");
                 break;
             case POINT_SPRITE_SUPPORT :
-                myResult = queryOGLExtension("GL_NV_point_sprite") || queryOGLExtension("GL_ARB_point_sprite");
+                myResult = hasCap("GL_NV_point_sprite GL_ARB_point_sprite");
                 break;
             case POINT_PARAMETER_SUPPORT :
-                myResult = queryOGLExtension("GL_ARB_point_parameters");
+                myResult = hasCap("GL_ARB_point_parameters");
                 break;
             case TEXTURE_3D_SUPPORT :
                 {
@@ -915,11 +610,7 @@ void * aglGetProcAddress (char * pszProc)
                 }
                 break;
             case FRAMEBUFFER_SUPPORT:
-#ifdef GL_FRAMEBUFFER_EXT
-                myResult = queryOGLExtension("GL_EXT_framebuffer_object");
-#else
-                myResult = false;
-#endif
+                myResult = hasCap("GL_EXT_framebuffer_object");
                 break;
             default:
              throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);

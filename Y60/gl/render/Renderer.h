@@ -11,8 +11,8 @@
 #ifndef _ac_renderer_Renderer_h_
 #define _ac_renderer_Renderer_h_
 
-#include "BodyPart.h"
 #include <y60/glutil/GLUtils.h>
+#include "BodyPart.h"
 
 #include <y60/glutil/RenderState.h>
 
@@ -37,8 +37,6 @@
 #ifdef WIN32
 #   include <windows.h>
 #endif
-
-#include <GL/gl.h>
 
 // CG support
 #ifndef _AC_NO_CG_

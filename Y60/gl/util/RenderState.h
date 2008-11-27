@@ -15,6 +15,8 @@
 #include <asl/base/Ptr.h>
 #include <asl/math/Box.h>
 
+#include <GL/glew.h>
+
 #ifdef WIN32
     #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN 1
@@ -22,8 +24,6 @@
     #include <windows.h>
     #undef max
 #endif
-
-#include <GL/gl.h>
 
 #define RENDERSTATE_GETTER_SETTER(THE_NAME) \
     public: \

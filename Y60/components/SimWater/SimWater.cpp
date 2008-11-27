@@ -53,7 +53,6 @@ SimWater::SimWater(DLHandle theDLHandle) :
     _myCubemapCounter(0),
     _isRunning( false )
 {
-//    initGLExtensions(0);
 }
 
 SimWater::~SimWater() {
@@ -195,7 +194,6 @@ SimWater::onSetProperty(const std::string & thePropertyName,
 void 
 SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     AC_PRINT << "SimWater::onStartup()";
-    initGLExtensions(0, true, false);
     initializeGLMemoryExtensions();
     _myViewportSize[0] = theWindow->getWidth();
     _myViewportSize[1] = theWindow->getHeight();

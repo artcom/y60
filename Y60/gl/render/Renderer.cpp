@@ -8,23 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifdef WIN32
-// Note: GLH_EXT_SINGLE_FILE must be defined only in one object file
-// it makes the header file to define the function pointer variables
-// never set it in a .h file or any other file that shall be linked
-// with this object file
-// If you use GLH_EXT_SINGLE_FILE 1 make sure that glh_extensions.h
-// and glh_genext.h has not been included from another include file
-// already without GLH_EXT_SINGLE_FILE set
-//
-#   define GLH_EXT_SINGLE_FILE
-#   include <GL/glh_extensions.h>
-#   include <GL/glh_genext.h>
-
-#endif
-
-#include <GL/glu.h>
-
 #include "Renderer.h"
 
 #ifndef _AC_NO_CG
@@ -62,7 +45,6 @@
 #include <asl/dom/Nodes.h>
 #include <asl/dom/Schema.h>
 
-#include <GL/glu.h>
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -115,13 +97,8 @@ namespace y60 {
 
     void
     Renderer::initGL() {
-
         // initialize the GL-Vertex Buffer/Object, initialize its Factories
         GLResourceManager::get().initVertexDataFactories();
-
-        static bool myVerboseFlag = true;
-        initGLExtensions(_myRenderingCaps, myVerboseFlag);
-        myVerboseFlag = false;
 
         _myState->init();
 
@@ -146,16 +123,8 @@ namespace y60 {
 
         // enable vertex arrays
         glEnableClientState(GL_VERTEX_ARRAY);
-
-#ifdef GL_MULTISAMPLE_ARB
+        
         glEnable(GL_MULTISAMPLE_ARB);
-        // XXX
-        /*glEnable(GL_SAMPLE_COVERAGE_ARB);
-        glEnable(GL_SAMPLE_ALPHA_TO_ONE_ARB);
-        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);*/
-#else
-#warning "GL_MULTISAMPLE_ARB is not defined"
-#endif
     }
 
     IShaderLibraryPtr

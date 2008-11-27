@@ -8,24 +8,22 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "CgProgramInfo.h"
-#include "Renderer.h"
-
 #include <y60/glutil/GLUtils.h>
-
-
-#ifdef WIN32
-#   include <GL/glh_extensions.h>
-#   include <GL/glh_genext.h>
-#endif
-#ifdef LINUX
-    #include <GL/glext.h>
-    #include <GL/glx.h>
-#endif
-
 #include <y60/base/NodeValueNames.h>
 #include <asl/base/string_functions.h>
 #include <asl/dom/Nodes.h>
+
+#include "CgProgramInfo.h"
+#include "Renderer.h"
+
+// #ifdef WIN32
+// #   include <GL/glh_extensions.h>
+// #   include <GL/glh_genext.h>
+// #endif
+// #ifdef LINUX
+//     #include <GL/glext.h>
+//     #include <GL/glx.h>
+// #endif
 
 #define DB(x) // x
 

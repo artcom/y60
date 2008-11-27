@@ -58,7 +58,11 @@ namespace y60 {
     TextureCompressor::TextureCompressor (PixelEncoding myFormat)
         : _myFormat(myFormat)
     {
-        initGLExtensions(y60::TEXTURECOMPRESSION_SUPPORT);
+        unsigned int myGlewError = glewInit();
+        if (GLEW_OK != myGlewError) {
+            AC_ERROR << "Glew Initialization Error: " << glewGetErrorString(myGlewError); 
+            throw;
+        }
     }
 
     TextureCompressor::~TextureCompressor() {}

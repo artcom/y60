@@ -12,10 +12,6 @@
 
 #ifdef OSX
 #include <Carbon/Carbon.h>
-#define Cursor X11_Cursor
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#undef Cursor
 #endif
 
 #include "SDLWindow.h"
@@ -86,7 +82,8 @@ SDLWindow::SDLWindow() :
     _myStandardCursor(0),
     _myAutoPauseFlag(false),
     _mySwapInterval(0),
-    _myLastSwapCounter(0)
+    _myLastSwapCounter(0),
+    _myHasVideoSync(false)
 {
     setGLContext(GLContextPtr(new GLContext()));
 }
@@ -119,6 +116,24 @@ SDLWindow::activateGLContext() {
         unsigned int myFlags = SDL_OPENGL;
 #endif
         SDL_SetVideoMode(1, 1, 32, myFlags);
+        
+        // init glew 
+        unsigned int myGlewError = glewInit();
+        if (GLEW_OK != myGlewError) {
+            throw RendererException(std::string("Glew Initialization Error: ") +  
+                    std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))), 
+                    PLUS_FILE_LINE);
+        }
+        
+        GLResourceManager::get().initCaps();
+
+#ifdef WIN32 
+        _myHasVideoSync = wglewIsSupported("WGL_EXT_swap_control");
+#elif LINUX
+        _myHasVideoSync = glxewIsSupported("GLX_SGI_video_sync");
+#else
+        _myHasVideoSync = false;
+#endif
     }
 }
 
@@ -143,7 +158,7 @@ SDLWindow::swapBuffers() {
     MAKE_GL_SCOPE_TIMER(SDL_GL_SwapBuffers);
     AbstractRenderWindow::swapBuffers();
 #ifdef AC_USE_X11
-    if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI) && _mySwapInterval) {
+    if (_myHasVideoSync && _mySwapInterval) {
         unsigned counter;
         glXGetVideoSyncSGI(&counter);
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
@@ -484,15 +499,8 @@ void SDLWindow::setVisibility(bool theFlag) {
         
     }
 #else
-#ifndef OSX // TODO PORT
-        wminfo.info.x11.lock_func();
-        if (theFlag) {
-            XRaiseWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
-        } else {
-            XLowerWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow);
-        }
-        XSync(wminfo.info.x11.display, false);
-        wminfo.info.x11.unlock_func();
+#ifdef OSX // TODO PORT
+    AC_WARNING << "SDLWindow::setVisibility not yet implemented for OSX";    
 #endif
 #endif        
     AC_TRACE << "SDLWindow::setVisibility : " << theFlag;
@@ -528,12 +536,8 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
                    myRect.bottom-myRect.top, true);
     }
 #else
-#ifndef OSX // TODO PORT
-    wminfo.info.x11.lock_func();
-    XMoveWindow(wminfo.info.x11.display, wminfo.info.x11.wmwindow,
-                thePos[0], thePos[1]);
-    XSync(wminfo.info.x11.display, false);
-    wminfo.info.x11.unlock_func();
+#ifdef OSX // TODO PORT
+    AC_WARNING << "SDLWindow::setPosition not yet implemented for OSX";    
 #endif
 #endif
 }
@@ -858,7 +862,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 
 #ifdef WIN32
-    if (IS_SUPPORTED(wglSwapIntervalEXT) && IS_SUPPORTED(wglGetSwapIntervalEXT)) {
+    if (_myHasVideoSync) {
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
         if (theInterval != _mySwapInterval) {
@@ -871,7 +875,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 #endif
 #ifdef AC_USE_X11
-    if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI)) {
+    if (_myHasVideoSync) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working
             unsigned counter0 = 0;
@@ -883,8 +887,8 @@ SDLWindow::setSwapInterval(unsigned theInterval)
             if (counter1 <= counter0) {
                 AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter0=" << counter0 << ", counter1=" << counter1 << "), disabling";
                 theInterval = 0;
-                glXGetVideoSyncSGI = 0;
-                glXWaitVideoSyncSGI = 0;
+                // glXGetVideoSyncSGI = 0;
+                // glXWaitVideoSyncSGI = 0;
             } else {
                 AC_INFO << "setSwapInterval(): glXGetVideoSyncSGI working properly";
             }
@@ -916,7 +920,7 @@ SDLWindow::getSwapInterval() {
     }
 
 #ifdef WIN32
-    if (IS_SUPPORTED(wglGetSwapIntervalEXT)) {
+    if (_myHasVideoSync) {
         return wglGetSwapIntervalEXT();
     } else {
         AC_WARNING << "getSwapInterval(): wglSwapInterval Extension not supported.";

@@ -28,7 +28,7 @@
 #   include <windows.h>
 #endif
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 using namespace std;
 using namespace asl;
@@ -235,7 +235,7 @@ namespace y60 {
                 CHECK_OGL_ERROR;
 
                 // generate mipmap levels
-                if (IS_SUPPORTED(glGenerateMipmapEXT) && _myTexture->get<TextureMipmapTag>()) {
+                if (hasCap("GL_GENERATE_MIPMAP") && _myTexture->get<TextureMipmapTag>()) {
                     AC_TRACE << "BufferToTexture::performAction: generating mipmap levels";
                     glGenerateMipmapEXT(GL_TEXTURE_2D);
                     CHECK_OGL_ERROR;

@@ -1,8 +1,8 @@
+#include "CgShader.h"
 #include "CgProgramInfo.h"
 #include "ShaderLibrary.h"
 #include "ShaderTypes.h"
 #include "ShaderLibrary.h"
-#include "CgShader.h"
 
 #include <asl/base/Exception.h>
 #include <Cg/cg.h>

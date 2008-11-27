@@ -165,6 +165,8 @@ namespace y60 {
             bool        _myAppQuitFlag;
             bool        _myAutoPauseFlag;
 
+            bool        _myHasVideoSync;
+
             SDL_Surface * _myScreen;
             unsigned    _mySwapInterval;
             unsigned    _myLastSwapCounter;

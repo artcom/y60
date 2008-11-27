@@ -14,12 +14,6 @@
 #include <y60/scene/Viewport.h>
 #include <y60/scene/Canvas.h>
 
-#ifdef WIN32
-#   include <GL/glh_extensions.h>
-#else
-#   include <GL/gl.h>
-#endif
-
 using namespace asl;
 
 namespace y60 {

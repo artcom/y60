@@ -9,8 +9,8 @@
 //============================================================================
 
 #include "OffscreenBuffer.h"
-#include "GLUtils.h"
 #include "PixelEncodingInfo.h"
+#include "GLUtils.h"
 
 #include <y60/image/Image.h>
 #include <y60/scene/Texture.h>
@@ -42,11 +42,13 @@ static void checkFramebufferStatus()
             os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT" << endl;
             break;
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT
+// EXT_framebuffer_object version < 117
         case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" << endl;
             break;
 #else 
-#   warning GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT undefined
+// EXT_framebuffer_object version >= 117
+//   GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT has been removed from the extension [sh]
 #endif
         case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" << endl;
@@ -77,6 +79,8 @@ static void checkFramebufferStatus()
 
 OffscreenBuffer::OffscreenBuffer() :
     _myUseFBO(true),
+    _myHasFBO(hasCap("GL_EXT_framebuffer_object")),
+    _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
     _myTextureNodeVersion(0),
     _myBlitFilter(GL_NEAREST)
 {
@@ -89,13 +93,11 @@ OffscreenBuffer::~OffscreenBuffer() {
 
 void OffscreenBuffer::setUseFBO(bool theUseFlag)
 {
-#ifdef GL_EXT_framebuffer_object
-    if (theUseFlag && !IS_SUPPORTED(glGenFramebuffersEXT)) {
+    if (theUseFlag && !hasCap("GL_EXT_framebuffer_object")) {
         AC_WARNING << "OpenGL FBO rendering requested but not supported, "
                    << "falling back to backbuffer rendering";
         theUseFlag = false;
     }
-#endif
     _myUseFBO = theUseFlag;
 }
 
@@ -121,7 +123,6 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
     unsigned myTextureId = theTexture->getTextureId();
     AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", theCopyToImageFlag = "<<theCopyToImageFlag; 
 
-#ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) {
             AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture"; 
@@ -148,16 +149,13 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
-        if (IS_SUPPORTED(glGenerateMipmapEXT) && theTexture->get<TextureMipmapTag>()) {
+        if (theTexture->get<TextureMipmapTag>()) {
             AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
             glBindTexture(GL_TEXTURE_2D, myTextureId);
             glGenerateMipmapEXT(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
-    }
-    else
-#endif
-    {
+    } else {
         AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << "- zeroing texture"; 
         // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, myTextureId);
@@ -166,7 +164,7 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
-        if (IS_SUPPORTED(glGenerateMipmapEXT) && theTexture->get<TextureMipmapTag>()) {
+        if (_myHasFBO && theTexture->get<TextureMipmapTag>()) {
             AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
             glGenerateMipmapEXT(GL_TEXTURE_2D);
             CHECK_OGL_ERROR;
@@ -192,7 +190,6 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
     AC_DEBUG << "OffscreenBuffer::copyToImage texture=" << theTexture->get<NameTag>() 
              << " image=" << myImage->get<NameTag>();
 
-#ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if 
                                        // multisampling is enabled
@@ -201,7 +198,6 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
         }
     }
-#endif
  
     PixelEncodingInfo myPixelEncodingInfo = 
         getDefaultGLTextureParams(myImage->getRasterEncoding());
@@ -220,7 +216,6 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
 
     //theTexture->preload();
 
-#ifdef GL_EXT_framebuffer_object
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if 
                                        // multisampling is enabled
@@ -230,7 +225,6 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
         }
         CHECK_OGL_ERROR;
     }
-#endif
 }
 
 
@@ -247,7 +241,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 {
     AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
 
-#ifdef GL_EXT_framebuffer_object
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] 
         && theTexture->getNode().nodeVersion() != _myTextureNodeVersion) 
@@ -272,9 +265,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         unsigned myHeight = theTexture->get<TextureHeightTag>(); 
         AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>() 
                  << " size=" << myWidth << "x" << myHeight;
-        if (theSamples >= 1 
-            && !(IS_SUPPORTED(glRenderbufferStorageMultisampleEXT) 
-                 && IS_SUPPORTED(glBlitFramebufferEXT))) 
+        if (theSamples >= 1 && !_myHasFBOMultisample) 
         {
             AC_WARNING << "Multisampling requested but not supported, turning it off";
             theSamples = 0;
@@ -386,9 +377,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             }
         }
     }
-#else
-    throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);
-#endif
 }
 
 void OffscreenBuffer::attachCubemapFace(unsigned theCubemapFace) {

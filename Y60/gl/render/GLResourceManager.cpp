@@ -23,8 +23,6 @@ We need to find a clean way to deal with NPOT textures then.
 #include <asl/base/file_functions.h>
 #include <asl/base/Dashboard.h>
 
-#include <GL/glext.h>
-
 using namespace std;
 using namespace asl;
 
@@ -32,6 +30,15 @@ using namespace asl;
 
 namespace y60 {
     const unsigned int CUBEMAP_SIDES = 6;
+
+    void
+    GLResourceManager::initCaps() {
+        // workaround
+        _myHasVBOExtension      = hasCap("GL_ARB_vertex_buffer_object");
+        _myHasPixelUnpackBuffer = hasCap("GL_ARB_pixel_buffer_object") || hasCap("GL_EXT_pixel_buffer_object");
+        _myHasAnisotropicTex    = hasCap("GL_EXT_texture_filter_anisotropic");
+        _myHasSGIGenerateMipMap = hasCap("GL_SGIS_generate_mipmap"); 
+    }
 
     int
     GLResourceManager::getMaxTextureSize(int theDimensions) const {
@@ -171,7 +178,7 @@ namespace y60 {
         }
 
         unsigned int myBufferId = theTexture->getPixelBufferId();
-        if (IS_SUPPORTED(glDeleteBuffersARB) && myBufferId) {
+        if (_myHasVBOExtension && myBufferId) {
             AC_DEBUG << "GLResourceManager::unbindTexture '" << theTexture->get<NameTag>() 
                      << "' id=" << theTexture->get<IdTag>() << " pboId=" << myBufferId;
 
@@ -182,7 +189,8 @@ namespace y60 {
     }
 
     static bool only_power_of_two_textures() {
-        static bool has_GL_ARB_texture_non_power_of_two = queryOGLExtension("GL_ARB_texture_non_power_of_two");
+        static bool has_GL_ARB_texture_non_power_of_two = y60::hasCap("GL_ARB_texture_non_power_of_two");
+        AC_WARNING << "has NPOT  "<< y60::hasCap("GL_ARB_texture_non_power_of_two");
         static bool Y60_GL_DISABLE_NON_POWER_OF_TWO = asl::getenv("Y60_GL_DISABLE_NON_POWER_OF_TWO", false); 
         return !has_GL_ARB_texture_non_power_of_two || Y60_GL_DISABLE_NON_POWER_OF_TWO;
     }
@@ -407,37 +415,29 @@ namespace y60 {
         }
         AC_DEBUG << "myMipmapFlag="<< myMipmapFlag;
 
-#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
         // pixel buffer
-        if (IS_SUPPORTED(glGenBuffersARB) && theTexture->usePixelBuffer()) {
-            unsigned int myBufferId = 0;
-            glGenBuffersARB(1, &myBufferId);
-            theTexture->setPixelBufferId(myBufferId);
-            CHECK_OGL_ERROR;
-            AC_DEBUG << "using pixel buffer id ="<< myBufferId;
-        }
-        if (IS_SUPPORTED(glBindBufferARB)) {
+        if (_myHasPixelUnpackBuffer && _myHasVBOExtension) { 
+            if (theTexture->usePixelBuffer()) {
+                unsigned int myBufferId = 0;
+                glGenBuffersARB(1, &myBufferId);
+                theTexture->setPixelBufferId(myBufferId);
+                CHECK_OGL_ERROR;
+                AC_DEBUG << "using pixel buffer id ="<< myBufferId;
+            }
+
             glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
             AC_DEBUG << "pixel buffer unpack set to 0";
         }
-#endif
 
-#ifdef GL_SGIS_generate_mipmap
-        // UH: disabled since it produces problems with alpha (according to DS)
-        static bool SGIS_generate_mipmap = queryOGLExtension("GL_SGIS_generate_mipmap");
-#endif
         unsigned myTextureMemUsage = 0;
         if (myMipmapFlag) {
             // mipmap
-#ifdef GL_SGIS_generate_mipmap
-            if (SGIS_generate_mipmap) {
+            
+            if (_myHasSGIGenerateMipMap) {
                 AC_DEBUG << "building 2D mipmap using SGIS_generate_mipmap, myPixelEncoding ="<<myPixelEncoding;
                 glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-            }
-            else
-#endif
-            {
+            } else {
                 AC_DEBUG << "building 2D mipmap, myPixelEncoding ="<<myPixelEncoding;
                 // 2D-Texture
                 gluBuild2DMipmaps(GL_TEXTURE_2D, myPixelEncoding.internalformat,
@@ -452,11 +452,9 @@ namespace y60 {
         } else {
             AC_DEBUG << "no mipmapping, myPixelEncoding ="<<myPixelEncoding;
             // no mipmapping
-#ifdef GL_SGIS_generate_mipmap
-            if (SGIS_generate_mipmap) {
+            if (_myHasSGIGenerateMipMap) {
                 glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
             }
-#endif
         }
 
         // calculate texture width/height/depth
@@ -467,7 +465,7 @@ namespace y60 {
         unsigned int myTexDepth = myDepth;
         
         if (only_power_of_two_textures()) {
-            AC_DEBUG << "has_GL_ARB_texture_non_power_of_two not supported or disabled, using POT-Texture";
+            AC_WARNING << "has_GL_ARB_texture_non_power_of_two not supported or disabled, using POT-Texture";
             myTexWidth = nextPowerOfTwo(myWidth);
             myTexHeight = nextPowerOfTwo(myHeight / myDepth);
             myTexDepth = nextPowerOfTwo(myDepth);
@@ -492,7 +490,7 @@ namespace y60 {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (myPixelEncoding.compressedFlag) {
             // Upload
-            AC_DEBUG << "uploadinf compressed texture";
+            AC_DEBUG << "uploading compressed texture";
             glCompressedTexImage2DARB(GL_TEXTURE_2D, 0,
                     myPixelEncoding.internalformat,
                     myTexWidth, myTexHeight, 0,
@@ -761,26 +759,25 @@ namespace y60 {
         void * myImageData = theImage->getRasterPtr(myIndex)->pixels().begin();
         unsigned int myImageDataLen = theImage->getMemUsed();
 
-#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
-        unsigned int myBufferId = theTexture->getPixelBufferId();
-        if (IS_SUPPORTED(glBindBufferARB) && myBufferId) {
+        if (_myHasPixelUnpackBuffer) {
+            unsigned int myBufferId = theTexture->getPixelBufferId();
+            if (_myHasVBOExtension && myBufferId) {
 
-            // bind buffer
-            glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, myBufferId);
-            CHECK_OGL_ERROR;
+                // bind buffer
+                glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, myBufferId);
+                CHECK_OGL_ERROR;
 
-            // map buffer
-            glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, myImageDataLen, NULL, GL_STREAM_DRAW);
-            void * myPBOData = glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
-            memcpy(myPBOData, myImageData, myImageDataLen);
-            glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
-            CHECK_OGL_ERROR;
+                // map buffer
+                glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, myImageDataLen, NULL, GL_STREAM_DRAW);
+                void * myPBOData = glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+                memcpy(myPBOData, myImageData, myImageDataLen);
+                glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
+                CHECK_OGL_ERROR;
 
-            // treated as an offset into the pixel buffer
-            myImageData = 0;
+                // treated as an offset into the pixel buffer
+                myImageData = 0;
+            }
         }
-#endif
-
         if (myPixelEncoding.compressedFlag) {
             glCompressedTexSubImage2DARB(GL_TEXTURE_2D, 0,
                     0, 0, myWidth, myHeight,
@@ -793,13 +790,13 @@ namespace y60 {
                     myPixelEncoding.pixeltype, myImageData);
         }
 
-#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
-        // unbind buffer
-        if (IS_SUPPORTED(glBindBufferARB) && myBufferId) {
-            glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
-            CHECK_OGL_ERROR;
+        if (_myHasPixelUnpackBuffer) {
+            // unbind buffer
+            if (_myHasVBOExtension) {
+                glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+                CHECK_OGL_ERROR;
+            }
         }
-#endif
     }
 
     void
@@ -955,8 +952,7 @@ namespace y60 {
         glTexParameteri(myTextureTarget, GL_TEXTURE_MIN_FILTER, myFilter);
         CHECK_OGL_ERROR;
 
-#ifdef GL_TEXTURE_MAX_ANISOTROPY_EXT
-        if (hasMipMaps) {
+        if (_myHasAnisotropicTex && hasMipMaps) {
             float maxAnisotropy = theTexture->get<TextureAnisotropyTag>();
             if (maxAnisotropy > 1.0f) {
                 AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
@@ -964,7 +960,6 @@ namespace y60 {
                 CHECK_OGL_ERROR;
             }
         }
-#endif
     }
 
     void
