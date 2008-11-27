@@ -28,45 +28,14 @@
 
 using namespace std;
 
-#ifdef AC_USE_X11
-// hack to allow old glx header without the prototypes as well as new ones
-extern "C" {   
-#ifndef PFNGLXALLOCATEMEMORYNVPROC
-typedef void * ( * PFNGLXALLOCATEMEMORYNVPROC) (int size, float readfreq, float writefreq, float priority);
-#endif
-
-#ifndef PFNGLXFREEMEMORYNVPROC
-typedef void ( * PFNGLXFREEMEMORYNVPROC) (GLvoid *pointer);
-#endif
-
-
-PFNGLXALLOCATEMEMORYNVPROC _ac_glXAllocateMemoryNV = 
-    (PFNGLXALLOCATEMEMORYNVPROC) glXGetProcAddressARB((const GLubyte *) "glXAllocateMemoryNV");
-#define glXAllocateMemoryNV _ac_glXAllocateMemoryNV
-
-PFNGLXFREEMEMORYNVPROC _ac_glXFreeMemoryNV = 
-    (PFNGLXFREEMEMORYNVPROC) glXGetProcAddressARB((const GLubyte *) "glXFreeMemoryNV");
-#define glXFreeMemoryNV _ac_glXFreeMemoryNV
-
-}
-
-#endif
-
 namespace asl
 {    
     bool tryInitializeGLMemoryExtensions() {
 #ifdef WIN32
-        wglAllocateMemoryNV = (PFNWGLALLOCATEMEMORYNVPROC) wglGetProcAddress("wglAllocateMemoryNV");
-        wglFreeMemoryNV = (PFNWGLFREEMEMORYNVPROC) wglGetProcAddress("wglFreeMemoryNV");
-        glVertexArrayRangeNV = (PFNGLVERTEXARRAYRANGENVPROC) wglGetProcAddress("glVertexArrayRangeNV");
-        glFlushVertexArrayRangeNV = (PFNGLFLUSHVERTEXARRAYRANGENVPROC) wglGetProcAddress("glFlushVertexArrayRangeNV");
-        return (wglAllocateMemoryNV && wglFreeMemoryNV && glVertexArrayRangeNV && glFlushVertexArrayRangeNV);
+        return y60::hasCap("GL_NV_vertex_array_range"); 
 #else
 #ifdef AC_USE_X11
-        return (glXAllocateMemoryNV != NULL &&
-                glXFreeMemoryNV != NULL &&
-                glVertexArrayRangeNV != NULL &&
-                glFlushVertexArrayRangeNV != NULL);
+        return y60::hasCap("GL_NV_vertex_array_range"); 
 #else
 #ifdef AC_USE_OSX_CGL
 		return false;

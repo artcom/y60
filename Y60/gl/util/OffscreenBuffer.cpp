@@ -271,6 +271,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             theSamples = 0;
         }
 
+#ifdef GL_EXT_framebuffer_multisample // TODO: ugly hack to support older glew versions (<1.4.0), update linux buildserver
         if (theSamples >= 1) {
             /*
              * setup multisample framebuffer
@@ -307,6 +308,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
                     GL_RENDERBUFFER_EXT, _myDepthBuffer[1]);
             checkOGLError(PLUS_FILE_LINE);
         }
+#endif
 
         /*
          * setup render-to-texture framebuffer
