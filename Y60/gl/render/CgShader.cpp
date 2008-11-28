@@ -393,7 +393,7 @@ namespace y60 {
     CgShader::getMaxTextureUnits() const {
         if (_myFragmentProgram) {
             // Fragment shader can use much more texture units than fixed function shaders
-            int myMaxTexUnits;
+            GLint myMaxTexUnits;
             glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &myMaxTexUnits);
             if (myMaxTexUnits < 0) { // should not happen
                 myMaxTexUnits = 0;

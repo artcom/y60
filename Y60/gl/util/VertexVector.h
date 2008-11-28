@@ -80,7 +80,7 @@ namespace y60 {
         // typedef const T* const_iterator;
         typedef asl::AutoLocker<VertexVector<T> > Locker;
     protected:
-        unsigned int _myId;
+        GLuint _myId;
         unsigned int _mySize;
         unsigned int _myCapacity;
         mutable T *  _myLockedData;
@@ -88,7 +88,7 @@ namespace y60 {
         VertexBufferUsage _myUsageType;
 
         static unsigned int getNewId() {
-            unsigned int myId = 0;
+            GLuint myId = 0;
             glGenBuffersARB(1, &myId);
             AC_TRACE << "glGenBuffersARB created a new buffer " << myId << std::endl;
             CHECK_OGL_ERROR;

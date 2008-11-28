@@ -11,6 +11,8 @@
 #include <asl/base/Ptr.h>
 #include <asl/dom/ThreadingModel.h>
 
+#include <GL/glew.h>
+
 #ifndef _ac_y60_OffscreenBuffer_h_
 #define _ac_y60_OffscreenBuffer_h_
 
@@ -73,13 +75,13 @@ namespace y60 {
             unsigned _myBlitFilter;
 
             // OpenGL id of frame buffer object
-            unsigned _myFrameBufferObject[2];
+            GLuint _myFrameBufferObject[2];
 
             // OpenGL id(s) of color buffer
-            unsigned _myColorBuffer[2];
+            GLuint _myColorBuffer[2];
 
             // OpenGL id(s) of depth buffer 
-            unsigned _myDepthBuffer[2];
+            GLuint _myDepthBuffer[2];
     };
 }
 

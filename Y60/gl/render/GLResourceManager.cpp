@@ -68,7 +68,7 @@ namespace y60 {
         }
 
         // generate texture object
-        unsigned myTextureId;
+        GLuint myTextureId;
         glGenTextures(1, &myTextureId);
         CHECK_OGL_ERROR;
 
@@ -163,7 +163,7 @@ namespace y60 {
             return;
         }
 
-        unsigned myTextureId = theTexture->getTextureId();
+        GLuint myTextureId = theTexture->getTextureId();
         if (myTextureId) {
             AC_DEBUG << "GLResourceManager::unbindTexture '" << theTexture->get<NameTag>() 
                      << "' id=" << theTexture->get<IdTag>() << " texId=" << myTextureId;
@@ -177,7 +177,7 @@ namespace y60 {
             AC_DEBUG << "Texture memory usage (after unbind) =" << _myTextureMemUsage / (1024.0*1024.0) << " MB";
         }
 
-        unsigned int myBufferId = theTexture->getPixelBufferId();
+        GLuint myBufferId = theTexture->getPixelBufferId();
         if (_myHasVBOExtension && myBufferId) {
             AC_DEBUG << "GLResourceManager::unbindTexture '" << theTexture->get<NameTag>() 
                      << "' id=" << theTexture->get<IdTag>() << " pboId=" << myBufferId;
@@ -318,7 +318,7 @@ namespace y60 {
 
     void
     GLResourceManager::setTexturePriority(const TexturePtr & theTexture, float thePriority) {
-        unsigned myTextureId = theTexture->getTextureId();
+        GLuint myTextureId = theTexture->getTextureId();
         glPrioritizeTextures(1, &myTextureId, &thePriority);
     }
 
@@ -417,7 +417,7 @@ namespace y60 {
         // pixel buffer
         if (_myHasPixelUnpackBuffer && _myHasVBOExtension) { 
             if (theTexture->usePixelBuffer()) {
-                unsigned int myBufferId = 0;
+                GLuint myBufferId = 0;
                 glGenBuffersARB(1, &myBufferId);
                 theTexture->setPixelBufferId(myBufferId);
                 CHECK_OGL_ERROR;

@@ -599,7 +599,7 @@ namespace y60 {
 
     unsigned
     GLShader::getMaxTextureUnits() const {
-        int myMaxTexUnits;
+        GLint myMaxTexUnits;
         glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &myMaxTexUnits);
         if (myMaxTexUnits < 0) { // should not happen
             myMaxTexUnits = 0;

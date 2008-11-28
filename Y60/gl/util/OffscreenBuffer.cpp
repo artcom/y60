@@ -276,7 +276,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             /*
              * setup multisample framebuffer
              */
-            int myMaxSamples;
+            GLint myMaxSamples;
             glGetIntegerv(GL_MAX_SAMPLES_EXT, &myMaxSamples);
             AC_DEBUG << "setup multisample framebuffer multisampling samples=" 
                      << theSamples << " max.samples=" << myMaxSamples;
