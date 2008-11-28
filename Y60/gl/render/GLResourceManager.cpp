@@ -190,7 +190,6 @@ namespace y60 {
 
     static bool only_power_of_two_textures() {
         static bool has_GL_ARB_texture_non_power_of_two = y60::hasCap("GL_ARB_texture_non_power_of_two");
-        AC_WARNING << "has NPOT  "<< y60::hasCap("GL_ARB_texture_non_power_of_two");
         static bool Y60_GL_DISABLE_NON_POWER_OF_TWO = asl::getenv("Y60_GL_DISABLE_NON_POWER_OF_TWO", false); 
         return !has_GL_ARB_texture_non_power_of_two || Y60_GL_DISABLE_NON_POWER_OF_TWO;
     }
