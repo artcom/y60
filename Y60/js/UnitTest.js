@@ -282,6 +282,31 @@ function ENSURE_EQUAL(theExpected, theResult, theMessage) {
     return myResult;
 }
 
+function ENSURE_NOT_EQUAL(theExpected, theResult, theMessage) {
+    try {
+        var myResult = (theExpected != theResult);
+    } catch(e) {
+        var myResult = false;
+        print('###### EXCEPTION:'+e);
+    }
+
+    if (!theMessage)
+        theMessage = "no message";
+
+    var myResultMessage;
+    if (myResult){
+        myResultMessage = theMessage;
+    } else {
+        myResultMessage = theMessage + ": Should not be " + 
+            theExpected;
+    }
+
+    ourCurrentTest.ensure(myResult, myResultMessage,
+                              __LINE__(2));
+
+    return myResult;
+}
+
 function ENSURE_ALMOST_EQUAL(theExpected, theResult, theMessage) {
     try {
         var myResult = almostEqual(theExpected, theResult);
