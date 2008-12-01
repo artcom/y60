@@ -61,7 +61,7 @@ namespace y60 {
     GLShader::GLShader(const dom::NodePtr theNode) :
         _myType(FIXED_FUNCTION_MATERIAL),
         _myHasBlendMinMaxEXT(hasCap("GL_EXT_blend_minmax")),
-        _myHasPointParmatersEXT(hasCap("GL_EXT_point_parameters"))
+        _myHasPointParmatersEXT(hasCap("GL_ARB_point_parameters"))
     {
         _myId              = theNode->getAttributeString(ID_ATTRIB);
         _myName            = theNode->getAttributeString(NAME_ATTRIB);
