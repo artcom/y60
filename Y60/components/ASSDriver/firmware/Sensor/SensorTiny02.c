@@ -394,7 +394,7 @@ uint8_t  secondCal = 0;
 					if(g_NumberOfLines < MAX_LINES){
 						g_NumberOfLines++;
 					}else{
-						g_requestCalibration = 3;
+						g_requestCalibration = 3; // XXX: and then what? this gets us stuck.
 					}
 				default:
 					;
