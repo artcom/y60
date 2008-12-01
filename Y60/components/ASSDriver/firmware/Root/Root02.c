@@ -1461,7 +1461,7 @@ static uint16_t pointer1=0;
                     break;
                 case C12: //print x/y values
                     if(g_arg1 >= g_matrixWidth  ||  g_arg2 >= g_matrixHeight){
-                        fprintf(stdout, "\nOut of range\n");
+                        fprintf(stdout, "\nPoint [%d,%d] is out of range\n", g_arg1, g_arg2);
                         g_NextCommand = 0;
                     }else{
                         g_XYLevelRequest = 1; // g_arg1: x coordinate, g_arg2: y coordinate
@@ -1474,14 +1474,14 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_WIDTH){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nWidth %d is out of range\n", g_arg1);
                         }else{
                             if(setScanParameter(g_arg1, g_matrixHeight, g_scanFrequency) == 0){
                                 eeprom_write_byte(EEPROM_LOC_MATRIX_WIDTH, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
                             }else{
-                                fprintf(stdout, "\nOut of range\n");
+                                fprintf(stdout, "\nWidth %d exceeds bandwidth limit\n", g_arg1);
                             }
                         }
                     }
@@ -1493,14 +1493,14 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 == 0  ||  g_arg1 > MAX_MATRIX_HEIGHT){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nHeight %d is out of range\n", g_arg1);
                         }else{
                             if(setScanParameter(g_matrixWidth, g_arg1, g_scanFrequency) == 0){
                                 eeprom_write_byte(EEPROM_LOC_MATRIX_HEIGHT, g_arg1);
                                 switchToAbsoluteMode();
                                 fprintf(stdout, "\nOK\n");
                             }else{
-                                fprintf(stdout, "\nOut of range\n");
+                                fprintf(stdout, "\nHeight %d exceeds bandwidth limit\n", g_arg1);
                             }
                         }
                     }
@@ -1512,13 +1512,13 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 < MIN_SCAN_FREQUENCY  ||  g_arg1 > MAX_SCAN_FREQUENCY){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nScan frequency %d is out of range\n", g_arg1);
                         }else{
                             if(setScanParameter(g_matrixWidth, g_matrixHeight, g_arg1) == 0){
                                 eeprom_write_byte(EEPROM_LOC_SCAN_FREQUENCY, g_arg1);
                                 fprintf(stdout, "\nOK\n");
                             }else{
-                                fprintf(stdout, "\nOut of range\n");
+                                fprintf(stdout, "\nScan frequency %d exceeds bandwidth limit\n", g_arg1);
                             }
                         }
                     }
@@ -1530,13 +1530,13 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 > UART_MAX_BAUD_RATE_FACTOR){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nBaudrate factor %d is out of range\n", g_arg1);
                         }else{
                             e = g_BaudRateFactor;
                             g_BaudRateFactor = g_arg1;
                             if(setScanParameter(g_matrixWidth, g_matrixHeight, g_scanFrequency) != 0){
                                 g_BaudRateFactor = e;
-                                fprintf(stdout, "\nOut of range\n");
+                                fprintf(stdout, "\nBaudrate factor %d is insufficient for current configuration\n", g_arg1);
                             }else{
                                 eeprom_write_byte(EEPROM_LOC_BAUD_RATE, g_arg1);
                                 //g_BaudRateFactor = g_arg1;
@@ -1553,7 +1553,7 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 < MIN_GRID_SPACING  ||  g_arg1 > MAX_GRID_SPACING){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nGrid spacing %d is out of range\n", g_arg1);
                         }else{
                             eeprom_write_byte(EEPROM_LOC_GRID_SPACING, g_arg1);
                             g_gridSpacing = g_arg1;
@@ -1568,7 +1568,7 @@ static uint16_t pointer1=0;
                         fprintf(stdout, "\nDevice is locked!\n");
                     }else{
                         if(g_arg1 > MAX_T_FREQUENCY){
-                            fprintf(stdout, "\nOut of range\n");
+                            fprintf(stdout, "\nChannel %d is out of range\n", g_arg1);
                         }else{
                             eeprom_write_byte(EEPROM_LOC_T_FREQUENCY, g_arg1);
                             fprintf(stdout, "\nWill be applied after restart.\n");
