@@ -8,15 +8,22 @@
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-
-#include <y60/image/ImageLoader.h>
+//=============================================================================
 
 #include <asl/base/Arguments.h>
 #include <asl/base/MappedBlock.h>
 
+#include <y60/image/ImageLoader.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 
 using namespace std;
@@ -83,7 +90,7 @@ void copyImageData(asl::Ptr<ImageLoader> theSource, PLBmp & theDestination, unsi
 
         unsigned myFaceHeight = theSource->GetHeight();
         long myLineSize = theDestination.GetBytesPerLine();
-        for (int y = 0; y < myFaceHeight; ++y) {
+        for (unsigned y = 0; y < myFaceHeight; ++y) {
             memcpy(myDstLines[y] + theOffset, mySrcLines[y], myLineSize);
         }
 }
@@ -98,7 +105,7 @@ void createCubeMap(const std::string & theFace, PLBmp& theTargetBitmap, bool doS
     }
     asl::Ptr<ImageLoader> myFace(new ImageLoader(asl::Ptr<asl::ReadableBlockHandle>(new asl::AnyReadableBlockHandle(asl::Ptr<ReadableBlock>(new asl::ConstMappedBlock(myFileName)), myFileName)), myFileName));
 
-    if (doScaling && theSize!=myFace->GetWidth()){
+    if (doScaling && theSize!=static_cast<unsigned int>(myFace->GetWidth())){
         cout << "Scaling image to size " << theSize << " x " << theSize << endl;
         myFace->ApplyFilter(PLFilterResizeBilinear(theSize,theSize));
     }
@@ -123,7 +130,7 @@ void addCubeMapImage(const std::string & theFace, PLBmp & theTargetBitmap, bool 
         throw asl::Exception(string("ERROR: No file specified for face ") + theFace );
     }
     asl::Ptr<ImageLoader> myFace(new ImageLoader(myFileName));
-    if (doScaling && theSize!=myFace->GetWidth()){
+    if (doScaling && theSize!=static_cast<unsigned int>(myFace->GetWidth())){
         cout << "Scaling image to size " << theSize << " x " << theSize << endl;
         myFace->ApplyFilter(PLFilterResizeBilinear(theSize,theSize));
     }

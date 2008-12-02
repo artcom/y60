@@ -225,7 +225,7 @@ namespace inet {
         // set the credentials for basic/digest authentication [jb]
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERPWD, _myAuthentData.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        unsigned myOption;
+        int myOption;
         switch (theAuthentType) {
             case BASIC:
                 myOption = CURLAUTH_BASIC;

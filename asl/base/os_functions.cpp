@@ -228,7 +228,7 @@ namespace asl {
                 throw ParseException(std::string("Missing right brace in string '") + theString + "'", "expandEnvironment()");
             }
             std::string myVarName = myExpandedString.substr(myOpenPos+2, myClosePos - myOpenPos - 2);
-            for (int i= 0; i < myVarName.size(); ++i) {
+            for (std::string::size_type i= 0; i < myVarName.size(); ++i) {
                 if (!is_alpha(myVarName[i]) && !is_underscore(myVarName[i]) && !is_digit(myVarName[i])) {
                     throw ParseException(std::string("Unexpected character in variable name '") + myVarName + "'", "expandEnvironment()");
                 }

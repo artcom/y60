@@ -18,11 +18,19 @@
 
 #include "TaskWindow.h"
 
-#include <asl/base/Exception.h>
+#include <winuser.h>
+
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
 #include <paintlib/win/plwinbmp.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/Filter/plfilterfliprgb.h>
-#include <winuser.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
+
+#include <asl/base/Exception.h>
 
 using namespace std;
 
@@ -65,7 +73,7 @@ namespace y60 {
 
     bool
     TaskWindow::isVisible() const {
-        return IsWindowVisible(_myHandle);
+        return 0 != IsWindowVisible(_myHandle);
     }
 
     void
@@ -181,7 +189,7 @@ namespace y60 {
     TaskWindow::setAlpha(float theAlpha) {
         SetWindowLong(_myHandle, GWL_EXSTYLE,
                       GetWindowLong(_myHandle, GWL_EXSTYLE) | WS_EX_LAYERED);
-        SetLayeredWindowAttributes(_myHandle, 0, int(theAlpha * 255.0f), LWA_ALPHA);
+        SetLayeredWindowAttributes(_myHandle, 0, static_cast<BYTE>(theAlpha * 255.0f), LWA_ALPHA);
     }
 
     void

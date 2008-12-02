@@ -68,7 +68,7 @@ class LinearAlgebraTestBase : public UnitTest {
 			T myFirstTriple(1.0, 2.0, 3.0);
 			T mySecondTriple(-1.f, -2.f, -3.f);
 
-            bool equal = (myFirstTriple == T(1.0, 2.0, 3.0));
+            //bool equal = (myFirstTriple == T(1.0, 2.0, 3.0));
 			ENSURE_MSG(myFirstTriple == T(1.0, 2.0, 3.0), string(theProbandName + "'s equal operator.").c_str() );
 			ENSURE_MSG((myFirstTriple[0] == 1.0) && (myFirstTriple[1] == 2.0) && (myFirstTriple[2] == 3.0) &&
 					(myFirstTriple == T(1.0f, 2.0f, 3.0f)), string(theProbandName + "'s equal operator.").c_str() );

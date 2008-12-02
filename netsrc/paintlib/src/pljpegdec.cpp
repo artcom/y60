@@ -23,6 +23,11 @@
 #define JPEG_INTERNALS
 #include <jmorecfg.h>
 
+#include <algorithm> // min/max
+
+using std::min;
+using std::max;
+
 
 /////////////////////////////////////////////////////////////////////
 // Error handling.

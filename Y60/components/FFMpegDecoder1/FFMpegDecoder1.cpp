@@ -138,7 +138,7 @@ namespace y60 {
 
         // find video/audio streams
         int myIndex = 0;
-        for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType;
             myCodecType = _myFormatContext->streams[i]->codec->codec_type;
             // if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
@@ -320,7 +320,7 @@ namespace y60 {
         memset(&myPacket, 0, sizeof(myPacket));
 
         // until a frame is found or eof
-        while (true) {
+        for(;;) {
             // EOF handling
             int myError;
             if ((myError = av_read_frame(_myFormatContext, &myPacket)) < 0) {
@@ -332,7 +332,7 @@ namespace y60 {
                  * chance to get the last frame of the video
                  */
                 int frameFinished = 0;
-                int myLen = avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
+                /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
 

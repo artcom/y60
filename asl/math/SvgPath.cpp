@@ -541,7 +541,7 @@ namespace asl {
 
     const SvgPath::SvgPathCommand * SvgPath::getSvgPathCommand(char theCommandChar) const {
 
-        theCommandChar = tolower(theCommandChar);
+        theCommandChar = static_cast<char>(tolower(theCommandChar));
         for (unsigned i = 0; i < (sizeof(_ourPathCommands) / sizeof(_ourPathCommands[0])); ++i) {
             if (_ourPathCommands[i].command == theCommandChar) {
                 return &_ourPathCommands[i];
@@ -664,7 +664,7 @@ namespace asl {
         SvgPath * myPath = new SvgPath;
         myPath->move(myLastPos);
 
-        while (1) {
+        for(;;) {
 
             LineSegment3fPtr myElement = _myElements[myElementIndex];
             if (!myFirstFlag && !almostEqual(myElement->origin, myLastPos)) {

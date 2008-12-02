@@ -194,7 +194,7 @@ getStaticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     switch (myID) {
     case PROP_verbosity:
         *vp = as_jsval(cx, int(Logger::get().getVerbosity()));
-        return JS_TRUE;
+        break;
     default:
         JS_ReportError(cx,"JSLogger::getStaticProperty: index %d out of range", myID);
         return JS_FALSE;
@@ -211,7 +211,7 @@ setStaticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         int myVerbosity;
         convertFrom(cx, *vp, myVerbosity);
         Logger::get().setVerbosity(asl::Severity(myVerbosity));
-        return JS_TRUE;
+        break;
     default:
         JS_ReportError(cx,"JSLogger::getStaticProperty: index %d out of range", myID);
         return JS_FALSE;
@@ -234,10 +234,10 @@ JSLogger::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSLogger::getProperty: index %d out of range", theID);
-            return JS_FALSE;
+            ;
     }
-    return JS_TRUE;
+    JS_ReportError(cx,"JSLogger::getProperty: index %d out of range", theID);
+    return JS_FALSE;
 };
 
 // setproperty handling
@@ -246,9 +246,10 @@ JSLogger::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSLogger::setPropertySwitch: index %d out of range", theID);
-            return JS_FALSE;
+            ;
     }
+    JS_ReportError(cx,"JSLogger::setPropertySwitch: index %d out of range", theID);
+    return JS_FALSE;
 };
 
 JSBool

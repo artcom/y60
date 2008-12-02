@@ -17,7 +17,13 @@
 
 #include "CellRendererPixbufToggle.h"
 
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 #include <sstream>
 
 
@@ -76,8 +82,8 @@ CellRendererPixbufToggle::get_size_vfunc(Gtk::Widget&,
     } else {
         myCurrentIcon = property_inactive_icon_;
     }
-    int myIconWidth;
-    int myIconHeight;
+    int myIconWidth = 0;
+    int myIconHeight = 0;
     if (myCurrentIcon) {
         myIconWidth = myCurrentIcon->get_width();     
         myIconHeight = myCurrentIcon->get_height();     
@@ -114,7 +120,7 @@ CellRendererPixbufToggle::render_vfunc(const Glib::RefPtr<Gdk::Drawable>& window
         const Gdk::Rectangle&,
         const Gdk::Rectangle& cell_area,
         const Gdk::Rectangle&,
-        Gtk::CellRendererState flags)
+        Gtk::CellRendererState /*flags*/)
 {
     const unsigned int cell_xpad = property_xpad();
     const unsigned int cell_ypad = property_ypad();

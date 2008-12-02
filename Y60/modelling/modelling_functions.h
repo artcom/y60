@@ -389,8 +389,8 @@ struct PlaneUVCoord {
     {}
     PlaneUVCoord() :
         _myOrigin(0., 0.),
-        _myXVector(1., 0.),
-        _myYVector(0., 1.)
+        _myXVector(1.f, 0.f),
+        _myYVector(0.f, 1.f)
     {}
     PlaneUVCoord(unsigned myXSubdivisions, unsigned myYSubdivisions) :
         _myOrigin(0., 0.),

@@ -45,23 +45,23 @@ namespace dom {
         // has strange effects, please talk to me :-)
         //markAllDirty();
     }
- 
+
     void 
     Facade::markAllDirty() {
         DB(AC_TRACE << "Facade::markAllDirty: this ="<<(void*)this); 
 
         Node & myNode = getNode();
-        for (int i=0; i < myNode.attributes().size(); ++i) {
+        for (size_type i=0; i < myNode.attributes().size(); ++i) {
             myNode.attributes()[i].nodeValueWrapperPtr()->setDirty();
         }
-        for (int i=0; i < size(); ++i) {
+        for (size_type i=0; i < size(); ++i) {
             item(i)->nodeValueWrapperPtr()->setDirty();
         }
     }
 
     void 
     Facade::markPrecursorDependenciesOutdated() {
-        for (int i=0; i < size(); ++i) {
+        for (size_type i=0; i < size(); ++i) {
             item(i)->nodeValueWrapperPtr()->markPrecursorDependenciesOutdated();
         }
     }

@@ -15,7 +15,7 @@
 //
 // Description:  Memory Block handling functions; consider to use them whenever
 //               you think about using memcpy; here you get typesafe conversion,
-//				 read-write control, convenient windows api interfaces and
+//               read-write control, convenient windows api interfaces and
 //               also a copy-on-write (COW) implementation if you want.
 //
 //
@@ -366,7 +366,7 @@ namespace asl {
             theReadOffset = readUnsigned(myStringLength, theReadOffset);
             return readString(theDest, myStringLength, theReadOffset);	
         }
-        virtual operator bool() const = 0;
+        virtual operator const void*() const = 0;
     };
     typedef ReadableArrangedStream<AC_DEFAULT_BYTE_ORDER> ReadableStream;
 
@@ -390,8 +390,8 @@ namespace asl {
         virtual typename Base::size_type readBytes(void * theDest, typename Base::size_type theSize, typename Base::size_type theReadOffset) const {
             return _myStream.readBytes(theDest, theSize, theReadOffset);
         }
-        operator bool() const {
-            return _myStream.operator bool();
+        operator const void*() const {
+            return _myStream.operator const void*();
         }
     private:
         ReadableArrangedStream<IN_BYTE_ORDER> & _myStream;
@@ -421,7 +421,7 @@ namespace asl {
                 }
             }
             _myInFile.read((char*)theDest, theSize);
-            if (_myInFile.gcount() != theSize) {
+            if ( static_cast<std::size_t>(_myInFile.gcount()) != theSize) {
                 throw StreamReadFailed(
                     std::string("ReadableFile::readBytes(size=")+as_string(theSize)+")",
                     std::string("Filename='")+ _myFileName.toLocale() + "', pos = " + as_string(theReadOffset) 
@@ -434,7 +434,7 @@ namespace asl {
         virtual typename Base::size_type size() const {
             return _mySize;
         }
-        operator bool() const {
+        operator const void*() const {
             return _myInFile;
         }
         const std::string & getName() const {
@@ -639,13 +639,17 @@ namespace asl {
             return append(&theByte, sizeof(theByte));
         }
         WriteableStream & appendString(const std::string & theString) {
-            return append(&(*theString.begin()), theString.size());
+            if( theString.empty() ) {
+                return append(NULL,0);
+            } else {
+                return append(&(*theString.begin()), theString.size());
+            }
         }
         WriteableStream & appendCountedString(const std::string & theString) {
             appendUnsigned(SIZE_TYPE(theString.size()));
             return appendString(theString);
         }
-        virtual operator bool() const = 0;
+        virtual operator const void*() const = 0;
         Unsigned64 getByteCounter()  {
             return _myByteCounter;
         };
@@ -685,7 +689,7 @@ namespace asl {
             countBytes(theSize);
             return *this;
         }
-        operator bool() const {
+        operator const void*() const {
             return _myOutFile;
         }
     private:

@@ -76,10 +76,10 @@ class net_functions_UnitTest : public UnitTest {
             ENSURE(hostaddress("BROADCAST") == 0xffffffff);
 
             ENSURE(hostaddress(localhostname()));
-            DPRINT(hex << hostaddress(localhostname()) << dec);
-            DPRINT(as_dotted_address(hostaddress(localhostname())));
+            // DPRINT(hex << hostaddress(localhostname()) << dec);
+            // DPRINT(as_dotted_address(hostaddress(localhostname())));
 
-            DPRINT(getHardwareAddress());
+            // DPRINT(getHardwareAddress());
             ENSURE(getHardwareAddress().size() == 6); // MACs are 48 bits
         }
 };

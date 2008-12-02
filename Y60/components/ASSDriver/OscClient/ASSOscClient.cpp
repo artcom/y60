@@ -35,7 +35,7 @@ void
 ASSOscClient::poll() {
 
     
-    for (int i = 0; i < _myReceivers.size(); ++i){
+    for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
         _myOSCStreams[i]->Clear();
         *_myOSCStreams[i] << osc::BeginBundle(ourPacketCounter++);//Immediate;
 
@@ -52,13 +52,13 @@ ASSOscClient::poll() {
    
     processInput();
         
-    for (int i = 0; i < _myReceivers.size(); ++i){
+    for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
         *_myOSCStreams[i] << osc::EndBundle;
     }
 
     //ASSURE( _myOSCStream.IsReady() );
 
-    for (int i = 0; i < _myReceivers.size(); ++i){
+    for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
         ASSURE( _myOSCStreams[i]->IsReady() );
         if (_myReceivers[i].udpConnection) {
             if ( _myOSCStreams[i]->Size() > 16 ) { // empty bundles have size 16
@@ -80,9 +80,9 @@ ASSOscClient::poll() {
 void
 ASSOscClient::connectToServer(int theIndex) {
     AC_DEBUG << "connecting to server " << _myReceivers[theIndex].address << ":" << _myServerPort;
-    _myReceivers[theIndex].udpConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, _myClientPort ));
+    _myReceivers[theIndex].udpConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(_myClientPort) ));
     _myReceivers[theIndex].udpConnection->connect( 
-        getHostAddress( _myReceivers[theIndex].address.c_str() ), _myServerPort);
+        getHostAddress( _myReceivers[theIndex].address.c_str() ), static_cast<asl::Unsigned16>(_myServerPort) );
 }
 
 
@@ -152,7 +152,7 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     getConfigSetting( mySettings, "ClientPort", myClientPort, 7001 );
     if ( myClientPort != _myClientPort ) {
         _myClientPort = myClientPort;
-        for (int i = 0; i < _myReceivers.size(); ++i){
+        for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
             _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
         }
     }
@@ -161,7 +161,7 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     getConfigSetting( mySettings, "ServerPort", myServerPort, 7000 );
     if ( myServerPort != _myServerPort ) {
         _myServerPort = myServerPort;
-        for (int i = 0; i < _myReceivers.size(); ++i){
+        for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
             _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
         }
     }
@@ -169,10 +169,10 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
     _myOSCStreams.clear();
     if (mySettings->childNode("OscReceiverList")) {
         for (int oscReceiverIndex = 0; 
-             oscReceiverIndex < mySettings->childNode("OscReceiverList")->childNodesLength(); 
+             oscReceiverIndex < static_cast<int>(mySettings->childNode("OscReceiverList")->childNodesLength()); 
              oscReceiverIndex++) {
             dom::NodePtr myReceiverNode = mySettings->childNode("OscReceiverList")->childNode(oscReceiverIndex);
-            if ((int) _myReceivers.size() - 2 < oscReceiverIndex){
+            if (static_cast<int>(_myReceivers.size()> - 2) < static_cast<int>(oscReceiverIndex) ){
                 _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
             }
             string myAddress = myReceiverNode->getAttributeString("ip");

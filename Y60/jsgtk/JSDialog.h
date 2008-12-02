@@ -13,7 +13,14 @@
 
 #include "JSWindow.h"
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm/dialog.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 

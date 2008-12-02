@@ -133,7 +133,7 @@ namespace asl {
     std::ostream & operator << (std::ostream & os, const Plane<Number> & thePlane) {
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printPlane(os, thePlane,
-                    os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                    0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );

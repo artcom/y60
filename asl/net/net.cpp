@@ -109,7 +109,7 @@ namespace inet {
         { 
         }
 
-        bool operator<(const SocketError& rhs) {
+        bool operator<(const SocketError& rhs) const {
             return ID < rhs.ID;
         }
     };
@@ -178,8 +178,8 @@ namespace inet {
 
         // Tack appropriate canned message onto end of supplied message 
         // prefix. Note that we do a binary search here: gaErrorList must be
-	    // sorted by the error constant's value.
-	    SocketError* End = SocketErrorList + NumMessages;
+        // sorted by the error constant's value.
+        SocketError* End = SocketErrorList + NumMessages;
         SocketError Target(ErrorID);
         SocketError* it = lower_bound(SocketErrorList, End, Target);
         if ((it != End) && (it->ID == Target.ID)) {

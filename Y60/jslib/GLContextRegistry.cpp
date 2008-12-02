@@ -48,7 +48,7 @@ GLContextRegistry::getContext() {
 
 void
 GLContextRegistry::cleanup() {
-    int myInitialSize = _myContexts.size();
+    //int myInitialSize = _myContexts.size();
     //_myContexts.erase(asl::WeakPtr<AbstractRenderWindow>(0));
 }
 

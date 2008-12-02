@@ -141,7 +141,7 @@ namespace y60 {
             //dump_format(_myFormatContext, 0, myString, 0);
         
         // find video/audio streams
-        for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
             if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
                 _myVStreamIndex = i;
@@ -365,7 +365,7 @@ namespace y60 {
                 AC_DEBUG << "---- decodeFrame: eof";
                 int myFrameCompleteFlag = 0;
                 
-                int myLen = avcodec_decode_video(_myVStream->codec, _myFrame,
+                /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame,
                         &myFrameCompleteFlag, 0, 0);
                         
                 if (myFrameCompleteFlag) {
@@ -535,7 +535,7 @@ namespace y60 {
             bool myFrameDroppedFlag = false;
 
             if (!useLastVideoFrame) {
-                while (true) {
+                for(;;) {
                     myVideoMsg = _myMsgQueue.pop_front();
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
@@ -588,7 +588,7 @@ namespace y60 {
 			AC_WARNING << "---- Neither audio nor video stream in FFMpegDecoder2::run";
             return;
         }
-        int64_t mySeekTimestamp = AV_NOPTS_VALUE;
+        //int64_t mySeekTimestamp = AV_NOPTS_VALUE;
 
         // decoder loop
         bool isDone = false;
@@ -771,7 +771,7 @@ namespace y60 {
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
-        if (myACodec->sample_rate != Pump::get().getNativeSampleRate())
+        if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()))
         {
             _myResampleContext = audio_resample_init(myACodec->channels,
                     myACodec->channels, Pump::get().getNativeSampleRate(),
@@ -842,7 +842,7 @@ namespace y60 {
         if(theDestTime == -1){
             //seek to begin of file
             AC_DEBUG<<"seeking to start"<<" starttime: "<< _myStartTimestamp;
-            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_ANY);
+            /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_ANY);
             Movie * myMovie = getMovie();
             myMovie->set<CurrentFrameTag>(0);
         } else {
@@ -860,7 +860,7 @@ namespace y60 {
             mySeekTimeInTimeBaseUnits = int64_t(myCalculatedSeekTime*_myTimeUnitsPerSecond);
             AC_DEBUG<<"FFMpegDecoder2::doSeek real destTime: "<<theDestTime<<" destFrame: "<<myDestFrame
                     <<"calculated SeekTime: "<< myCalculatedSeekTime<<" calculated SeekFrame: "<<myCalculatedSeekTime*_myFrameRate;
-            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
+            /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex,
                 mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD);
         }
         _myDecodedPacketsPerFrame = 0;

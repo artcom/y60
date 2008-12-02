@@ -78,7 +78,7 @@ namespace y60 {
             asl::ThreadLock           _myThreadLock;
             y60::EventPtrList         _myCurrentY60Events;
             std::list<std::string>    _myNewMessages;
- 	        asl::Ptr<UdpListeningReceiveSocket> _myOscReceiverSocket;
+            asl::Ptr<UdpListeningReceiveSocket> _myOscReceiverSocket;
             dom::NodePtr                 _myEventSchema;
             asl::Ptr<dom::ValueFactory>  _myValueFactory;
             long                         _myCurrentBundleTimeTag;

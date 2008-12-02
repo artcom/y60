@@ -9,23 +9,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <y60/glutil/GLUtils.h>
-
 #include "WaterRepresentation.h"
-#include "WaterSimulation.h"
-
-#include <asl/base/Dashboard.h>
-#include <asl/base/Logger.h>
-#include <asl/math/numeric_functions.h>
-
-#include <paintlib/plpngenc.h>
-#include <paintlib/planybmp.h>
-#include <paintlib/planydec.h>
-#include <paintlib/Filter/plfilterresizebilinear.h>
-
 
 #include <stdio.h>
-//#include <values.h>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -33,6 +19,25 @@
 #include <assert.h>
 #include <list>
 #include <vector>
+
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
+#include <paintlib/plpngenc.h>
+#include <paintlib/planybmp.h>
+#include <paintlib/planydec.h>
+#include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
+
+#include <asl/base/Dashboard.h>
+#include <asl/base/Logger.h>
+#include <asl/math/numeric_functions.h>
+
+#include <y60/glutil/GLUtils.h>
+
+#include "WaterSimulation.h"
 
 using namespace std;  // automatically added!
 using namespace asl;  // manually added!

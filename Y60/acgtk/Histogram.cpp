@@ -1,10 +1,16 @@
 #include "Histogram.h"
 
+#include <iostream>
 #include <asl/base/Logger.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/pldebug.h>
 #include <paintlib/Filter/pl2passscale.h>
-
-#include <iostream>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 
@@ -132,8 +138,8 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
         int myXStart;
         int myXEnd;
         if (_myMode == MODE_CENTER_WIDTH) {
-            myXStart = convertValueToScreenPos(_myWindowCenter - (0.5 * _myWindowWidth));
-            myXEnd   = convertValueToScreenPos(_myWindowCenter + (0.5 * _myWindowWidth));
+            myXStart = convertValueToScreenPos(_myWindowCenter - static_cast<float>(0.5 * _myWindowWidth));
+            myXEnd   = convertValueToScreenPos(_myWindowCenter + static_cast<float>(0.5 * _myWindowWidth));
         } else {
             myXStart = convertValueToScreenPos(_myLower);
             myXEnd   = convertValueToScreenPos(_myUpper);
@@ -158,7 +164,7 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
 
 void
 Histogram::rebuildBins() {
-    int myWidth = get_allocation().get_width();
+    std::vector<unsigned>::size_type myWidth = get_allocation().get_width();
     if (myWidth < _mySampleData.size()) {
         _myBins.clear();
         _myBins.resize(myWidth);

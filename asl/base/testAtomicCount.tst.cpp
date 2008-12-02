@@ -106,7 +106,7 @@ public:
         SUCCESS("atomic increment thread 2 ready");
         ENSURE(D.conditional_decrement());
         DPRINT(D);
-        for (int i = 1; i < _myIncArray.size(); ++i) {
+        for (std::vector<Unsigned32>::size_type i = 1; i < _myIncArray.size(); ++i) {
             if (_myIncArray[i] != 1) {
                 FAILURE("Non-Atomic increment detected");
                 DPRINT(i);

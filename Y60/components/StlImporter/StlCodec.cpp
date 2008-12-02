@@ -150,10 +150,10 @@ namespace y60 {
 
     void 
     StlCodec::exportShapes(const dom::NodePtr theNode, const std::vector<std::string> & theIds) {
-        int myNumChildren = theNode->childNodesLength();
+        //int myNumChildren = theNode->childNodesLength();
         int myNumFaces = 0;
         // First get the total amount of triangles
-        for (int j = 0; j < theIds.size(); ++j) {
+        for (std::vector<std::string>::size_type j = 0; j < theIds.size(); ++j) {
             dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
             if (myNode) {
                 ShapePtr myShape = myNode->getFacade<Shape>();
@@ -193,7 +193,7 @@ namespace y60 {
                 break;
         }
         // export shapes
-        for (int j = 0; j < theIds.size(); ++j) {
+        for (std::vector<std::string>::size_type j = 0; j < theIds.size(); ++j) {
             dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
             if (myNode) {
                 ShapePtr myShape = myNode->getFacade<Shape>();

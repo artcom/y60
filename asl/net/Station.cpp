@@ -163,11 +163,7 @@ Station::defaultOwnIPAddress() {
 
 bool
 Station::disableReceivingFlag() {
-    bool myFlag = false;
-    if (getenv("STATION_DISABLE_RECEIVING")) {
-        myFlag = getenv("STATION_DISABLE_RECEIVING");
-    }
-    return myFlag;
+    return NULL != getenv("STATION_DISABLE_RECEIVING");
 }
 
 
@@ -407,8 +403,8 @@ Station::openStation(unsigned long theBroadcastAddress,
 #ifdef WIN32
     // set nonblocking mode in windows here
     u_long myEnableNonBlockingFlag = 1;
-    int myError = 0;
-    if (myError = ioctlsocket(_myFileDescriptor, FIONBIO, &myEnableNonBlockingFlag) != 0) {
+    int myError = ioctlsocket(_myFileDescriptor, FIONBIO, &myEnableNonBlockingFlag);
+    if (myError != 0) {
         throw SetSockOptFailed(errorDescription(myError),PLUS_FILE_LINE);
     }
 #endif
@@ -509,10 +505,10 @@ operator/(const Station::Statistic & theOne, double theTime) {
 void
 Station::broadcast(const asl::ReadableBlock & theData) {
     
-    int mySentDataBytes = 0;
+    asl::ReadableBlock::size_type mySentDataBytes = 0;
     
     Packet myPacket;
-    myPacket._myHeader._myMagicNumber = STATION_MESSAGE_MAGIC;
+    myPacket._myHeader._myMagicNumber = static_cast<unsigned long>(STATION_MESSAGE_MAGIC);
     myPacket._myHeader._mySrcAddress = _ownIPAddress;
     myPacket._myHeader._myStationID = _myStationID;
     myPacket._myHeader._myNetworkID = _myNetworkID;
@@ -533,8 +529,8 @@ Station::broadcast(const asl::ReadableBlock & theData) {
 
     while (mySentDataBytes < myData->size()) {
         myPacket._myHeader._myMessagePartSize 
-            = min((long unsigned int)(myData->size() - mySentDataBytes),
-                    (long unsigned int)(Packet::PAYLOAD_SIZE));
+            = std::min( static_cast<std::size_t>(myData->size() - mySentDataBytes)
+                      , static_cast<std::size_t>(Packet::PAYLOAD_SIZE) );
        
         std::copy(myData->begin()+mySentDataBytes,
                   myData->begin()+mySentDataBytes+myPacket._myHeader._myMessagePartSize,
@@ -579,7 +575,7 @@ Station::broadcast(const asl::ReadableBlock & theData) {
 bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderAddress, unsigned long & theStationID) {
 
     theData.resize(0);
-    do {
+    for(;;) {
         asl::Ptr<Packet> myNewPacket = asl::Ptr<Packet>(new Packet);
         struct sockaddr_in mySender;
 #ifdef WIN32
@@ -616,7 +612,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                  << " discarded, my ID = "<< _myNetworkID << endl;
             continue;
         }
-        if (myNewPacket->_myHeader._myMessagePartSize + sizeof(Header) != myResult) {
+        if (myNewPacket->_myHeader._myMessagePartSize + sizeof(Header) != static_cast<unsigned long>(myResult)) {
             throw SizeMismatch("Size in Header does not match received bytes", PLUS_FILE_LINE);
         }
 
@@ -661,7 +657,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                 myNewPacket->_myHeader._myMessagePartCount )
         {
             // We received the final packet of a message, lets see if we have all parts
-            unsigned long storedPacketCount = _myIncomingPackets[mySenderID].size();
+            //unsigned long storedPacketCount = _myIncomingPackets[mySenderID].size();
             if (myNewPacket->_myHeader._myMessagePartCount > myStoredPackets.size()) {
                 // We didnt get all previous packets, lets discard them all 
                 DB(AC_TRACE << "Not enough packets, discarding all,  stored = " << myStoredPackets.size() << endl);
@@ -670,15 +666,15 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
             } else {
                 DB(AC_TRACE << "Final part received, stored = " << myStoredPackets.size() << endl);
                 // The number of packets is sufficient, so look if they belong to the same message 
-                int myMessageNumber = myNewPacket->_myHeader._myMessageNumber; 
-                int myPartNumber = 0;
-                int myMessagePartSizeSum = 0;
+                unsigned long myMessageNumber = myNewPacket->_myHeader._myMessageNumber; 
+                unsigned long myPartNumber = 0;
+                unsigned long myMessagePartSizeSum = 0;
                 DB(AC_TRACE << "Assembling message number  " << myMessageNumber 
                                 << " consisting of " << myNewPacket->_myHeader._myMessagePartCount 
                                 << " parts, size should be = " << myNewPacket->_myHeader._myMessageSize 
                                 <<  endl);
-                int discardedMessageNumber = 0; // just for statistic gathering
-                for (int i = 0; i < myStoredPackets.size(); ++i) {
+                unsigned long discardedMessageNumber = 0; // just for statistic gathering
+                for (vector<asl::Ptr<Packet> >::size_type i = 0; i < myStoredPackets.size(); ++i) {
                     if ((myStoredPackets[i]->_myHeader._myMessageNumber == myMessageNumber) &&
                             (myStoredPackets[i]->_myHeader._myMessagePartNumber == myPartNumber)) {
                         DB(AC_TRACE << "Found correct in-sequence packet " << i 
@@ -723,7 +719,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                     // ..and assemble it finally
                     //string::iterator myResult = theData.begin();
                     unsigned char * myResult = &theData[0];
-                    for (int i = 0; i < myStoredPackets.size(); ++i) {
+                    for (vector<asl::Ptr<Packet> >::size_type i = 0; i < myStoredPackets.size(); ++i) {
                         memcpy(myResult,&myStoredPackets[i]->_myData,myStoredPackets[i]->_myHeader._myMessagePartSize);
                         myResult+=myStoredPackets[i]->_myHeader._myMessagePartSize;
                         //myResult = copy(&myStoredPackets[i]->_myData,
@@ -753,7 +749,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                 }
             }
         }
-    } while (true);
+    }
 }
 
 //==============================================================================

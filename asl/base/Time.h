@@ -114,15 +114,15 @@ namespace asl {
                  */
                 Time() {
                         setNow();
-                };
+                }
                 /**
                  * Constructor. 
                  * @param secs Number of seconds. If this has to be a absolute time,
          *             the number of seconds since 1.1.1970 0:00.
                  */
                 Time(const double secs) {
-                        when.tv_sec=static_cast<time_t>(floor(secs));
-                        when.tv_usec=static_cast<time_t>(fmod(secs, 1.0)*1.0e6);
+                        when.tv_sec=static_cast<long>(floor(secs));
+                        when.tv_usec=static_cast<long>(fmod(secs, 1.0)*1.0e6);
                 }
                 /**
                  * Sets the instance to the current time (GMT).
@@ -146,43 +146,43 @@ namespace asl {
                         gettimeofday(&when, 0);
 #endif
                         return *this;
-                };
+                }
                 int secs() {
                         return when.tv_sec;
-                };
+                }
                 int usecs() {
                         return when.tv_usec;
-                };
+                }
                 bool operator==(const Time & t) const {
                         return((when.tv_sec==t.when.tv_sec) && (when.tv_usec==t.when.tv_usec));
-                };
+                }
                 bool operator!=(const Time & t) const {
                         return((when.tv_sec!=t.when.tv_sec) || (when.tv_usec!=t.when.tv_usec));
-                };
+                }
                 bool operator>(const Time & t) const {
                         return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec>t.when.tv_usec) : (when.tv_sec>t.when.tv_sec));
-                };
+                }
                 bool operator<(const Time & t) const {
                         return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec<t.when.tv_usec) : (when.tv_sec<t.when.tv_sec));
-                };
+                }
                 bool operator>=(const Time & t) const {
                         return *this > t || t == *this;
-                };
+                }
                 bool operator<=(const Time & t) const {
                         return *this < t || t == *this;
-                };
+                }
                 operator double() const {
                         return (double)when.tv_sec+(double)when.tv_usec/1.0e6;
-                };
-        operator const timeval() const {
-            return when;
-        };
-        operator const timespec() const {
-            timespec myTimeSpec = {when.tv_sec, when.tv_usec * 1000};
-            //myTimeSpec.tv_sec = when.tv_sec;
-            //myTimeSpec.tv_nsec = when.tv_usec * 1000;
-            return myTimeSpec;
-        };
+                }
+                operator const timeval() const {
+                    return when;
+                }
+                operator const timespec() const {
+                    timespec myTimeSpec = {when.tv_sec, when.tv_usec * 1000};
+                    //myTimeSpec.tv_sec = when.tv_sec;
+                    //myTimeSpec.tv_nsec = when.tv_usec * 1000;
+                    return myTimeSpec;
+                }
 
                 long long micros() const {
                         return when.tv_sec * 1000000L + when.tv_usec;
@@ -198,73 +198,73 @@ namespace asl {
 
         inline std::ostream& Time::print(std::ostream& s) const
         {
-                struct tm *tp;
-        tp=gmtime((time_t*)&when.tv_sec);
-        if ( s.iword(TimeStreamFormater::ourIsFormatedFlagIndex) ) {
-            std::string myFormatString( static_cast<const char * >(
-                s.pword(TimeStreamFormater::ourFormatStringIndex)));
-            bool isFieldToken = false;
-            for (unsigned i = 0; i < myFormatString.size(); ++i) {
-                if ( isFieldToken ) {
-                    switch (myFormatString[i]) {
-                        case 'Y':
-                            // add 1900 to get correct bc year
-                            s << 1900 + tp->tm_year;
-                            break;
-                        case 'M':
-                            // add one cause this is meant as an index into an array with month names
-                            s << std::setw(2) << std::setfill('0') << 1 + tp->tm_mon;
-                            break;
-                        case 'D':
-                            s << std::setw(2) << std::setfill('0') << tp->tm_mday;
-                            break;
-                        case 'h':
-                            s << std::setw(2) << std::setfill('0') << tp->tm_hour;
-                            break;
-                        case 'm':
-                            s << std::setw(2) << std::setfill('0') << tp->tm_min;
-                            break;
-                        case 's':
-                            s << std::setw(2) << std::setfill('0') << tp->tm_sec;
-                            break;
-                        case 'l':
-                            s << std::setw(3) << std::setfill('0') << when.tv_usec/1000;
-                            break;
-                        case 'u':
-                            s << std::setw(3) << std::setfill('0') << when.tv_usec/1000 << ','
-                              << std::setw(3) << std::setfill('0') << when.tv_usec%1000;
-                            break;
-                        case '%':
-                            // %% -> %
-                            s << myFormatString[i];
-                            break;
-                        default:
-                            throw ParseException(std::string("Unknown token %") +
-                                myFormatString[i] + " in time format string.",
-                                PLUS_FILE_LINE);
-                            break;
-                    }
-                    isFieldToken = false;
-                } else {
-                    if (myFormatString[i] == '%') {
-                        isFieldToken = true;
+            const time_t myTvSec = static_cast<time_t>(when.tv_sec);
+            tm *tp=gmtime(&myTvSec);
+            if ( s.iword(TimeStreamFormater::ourIsFormatedFlagIndex) ) {
+                std::string myFormatString( static_cast<const char * >(
+                    s.pword(TimeStreamFormater::ourFormatStringIndex)));
+                bool isFieldToken = false;
+                for (unsigned i = 0; i < myFormatString.size(); ++i) {
+                    if ( isFieldToken ) {
+                        switch (myFormatString[i]) {
+                            case 'Y':
+                                // add 1900 to get correct bc year
+                                s << 1900 + tp->tm_year;
+                                break;
+                            case 'M':
+                                // add one cause this is meant as an index into an array with month names
+                                s << std::setw(2) << std::setfill('0') << 1 + tp->tm_mon;
+                                break;
+                            case 'D':
+                                s << std::setw(2) << std::setfill('0') << tp->tm_mday;
+                                break;
+                            case 'h':
+                                s << std::setw(2) << std::setfill('0') << tp->tm_hour;
+                                break;
+                            case 'm':
+                                s << std::setw(2) << std::setfill('0') << tp->tm_min;
+                                break;
+                            case 's':
+                                s << std::setw(2) << std::setfill('0') << tp->tm_sec;
+                                break;
+                            case 'l':
+                                s << std::setw(3) << std::setfill('0') << when.tv_usec/1000;
+                                break;
+                            case 'u':
+                                s << std::setw(3) << std::setfill('0') << when.tv_usec/1000 << ','
+                                  << std::setw(3) << std::setfill('0') << when.tv_usec%1000;
+                                break;
+                            case '%':
+                                // %% -> %
+                                s << myFormatString[i];
+                                break;
+                            default:
+                                throw ParseException(std::string("Unknown token %") +
+                                    myFormatString[i] + " in time format string.",
+                                    PLUS_FILE_LINE);
+                                break;
+                        }
+                        isFieldToken = false;
                     } else {
-                        s.put(myFormatString[i]);
+                        if (myFormatString[i] == '%') {
+                            isFieldToken = true;
+                        } else {
+                            s.put(myFormatString[i]);
+                        }
                     }
                 }
+
+            } else {
+                s << std::setw(2) << std::setfill('0') << tp->tm_hour << ':'
+                  << std::setw(2) << std::setfill('0') << tp->tm_min << ':'
+                  << std::setw(2) << std::setfill('0') << tp->tm_sec
+                  << '.'
+                  << std::setw(3) << std::setfill('0') << when.tv_usec/1000 << ','
+                  << std::setw(3) << std::setfill('0') << when.tv_usec%1000;
             }
 
-        } else {
-            s << std::setw(2) << std::setfill('0') << tp->tm_hour << ':'
-              << std::setw(2) << std::setfill('0') << tp->tm_min << ':'
-              << std::setw(2) << std::setfill('0') << tp->tm_sec
-              << '.'
-              << std::setw(3) << std::setfill('0') << when.tv_usec/1000 << ','
-              << std::setw(3) << std::setfill('0') << when.tv_usec%1000;
+            return s;
         }
-
-        return s;
-        };
 
 #ifdef WIN32
         inline void msleep(unsigned long theMilliSeconds) {
@@ -426,7 +426,7 @@ namespace asl {
         };
     inline std::ostream & operator<<(std::ostream& s, const asl::Time & t) {
         return t.print(s);
-    };
+    }
 } // end of namespace asl
 
 

@@ -24,13 +24,13 @@ convertMatrixToCairo(Matrix4f &theMatrix, cairo_matrix_t *theCairoMatrix) {
 
 void
 convertMatrixFromCairo(Matrix4f &theMatrix, cairo_matrix_t *theCairoMatrix) {
-    theMatrix[0][0] = theCairoMatrix->xx;
-    theMatrix[0][1] = theCairoMatrix->yx;
+    theMatrix[0][0] = static_cast<float>(theCairoMatrix->xx);
+    theMatrix[0][1] = static_cast<float>(theCairoMatrix->yx);
     theMatrix[0][2] = 0.0;
     theMatrix[0][3] = 0.0;
 
-    theMatrix[1][0] = theCairoMatrix->xy;
-    theMatrix[1][1] = theCairoMatrix->yy;
+    theMatrix[1][0] = static_cast<float>(theCairoMatrix->xy);
+    theMatrix[1][1] = static_cast<float>(theCairoMatrix->yy);
     theMatrix[1][2] = 0.0;
     theMatrix[1][3] = 0.0;
 
@@ -39,8 +39,8 @@ convertMatrixFromCairo(Matrix4f &theMatrix, cairo_matrix_t *theCairoMatrix) {
     theMatrix[2][2] = 1.0;
     theMatrix[2][3] = 0.0;
 
-    theMatrix[3][0] = theCairoMatrix->x0;
-    theMatrix[3][1] = theCairoMatrix->y0;
+    theMatrix[3][0] = static_cast<float>(theCairoMatrix->x0);
+    theMatrix[3][1] = static_cast<float>(theCairoMatrix->y0);
     theMatrix[3][2] = 0.0;
     theMatrix[3][3] = 1.0;
 }

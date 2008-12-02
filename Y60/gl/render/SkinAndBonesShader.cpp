@@ -53,7 +53,7 @@ namespace y60 {
         vector<NodePtr> myElements;
         myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, theMaterial.get<IdTag>(), true, myElements);
 
-        Node * myShape;
+        Node * myShape = NULL;
         string myShapeId;
         for (unsigned i = 0; i < myElements.size(); ++i) {
             Node * myOtherShape = myElements[i]->parentNode()->parentNode();

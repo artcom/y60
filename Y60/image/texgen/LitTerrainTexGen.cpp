@@ -6,16 +6,22 @@
 
 #include "LitTerrainTexGen.h"
 
+#include <assert.h>
+#include <stdexcept>
+#include <math.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel24.h>
 #include <paintlib/plbitmap.h>
 #include <paintlib/plpoint.h>
 #include <paintlib/plrect.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/Filter/plfiltercrop.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <math.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace TexGen {
 
@@ -36,7 +42,7 @@ namespace TexGen {
                 PLBYTE& col = myDestMapLines[y][x];
                 myScale =  PLBYTE(myLightMapLines[y][x]);
                 int tempInt = (col*myScale)/255;
-                col = min(tempInt, 255); 
+                col = static_cast<PLBYTE>(min(tempInt, 255)); 
             }
         }
     }
@@ -50,7 +56,7 @@ namespace TexGen {
         
         double Scale = double(srcRect.Width())/textureBmp.GetWidth();
         double YScale = double(srcRect.Height())/textureBmp.GetHeight();
-        assert (Scale == YScale);
+        assert (Scale == YScale); (void)YScale;
 
         PLBYTE ** myAttnBmpLines   = attnBmp.GetLineArray(); 
         PLPixel32 ** myTextureBmpLines = (PLPixel32**)textureBmp.GetLineArray();
@@ -66,10 +72,9 @@ namespace TexGen {
                     int tempIntR = int((myLightingFactor * col.GetR() * myScale)/256);
                     int tempIntG = int((myLightingFactor * col.GetG() * myScale)/256);
                     int tempIntB = int((myLightingFactor * col.GetB() * myScale)/256);
-                    col.Set(min(tempIntR,255), 
-                            min(tempIntG,255), 
-                            min(tempIntB,255),
-                            255);
+                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)), 
+                             static_cast<PLBYTE>(min(tempIntG,255)), 
+                             static_cast<PLBYTE>(min(tempIntB,255)), 255 );
                 }
             }
         } else {
@@ -105,10 +110,10 @@ namespace TexGen {
                     int tempIntR = int((myLightingFactor * col.GetR() * myScale) /256);
                     int tempIntG = int((myLightingFactor * col.GetG() * myScale) /256);
                     int tempIntB = int((myLightingFactor * col.GetB() * myScale) /256);
-                    col.Set(min(tempIntR,255), 
-                            min(tempIntG,255), 
-                            min(tempIntB,255),
-                            255);
+                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)), 
+                             static_cast<PLBYTE>(min(tempIntG,255)), 
+                             static_cast<PLBYTE>(min(tempIntB,255)),
+                             255);                               
                 }
             }
         }

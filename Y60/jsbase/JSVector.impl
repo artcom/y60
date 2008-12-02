@@ -259,9 +259,9 @@ namespace jslib {
                 //NATIVE_VECTOR & myNativeVector = getNative(cx,obj);
                 const NATIVE_VECTOR & myNativeVector = getJSWrapper(cx, obj).getNative();
                 std::vector<jsval> mySwizzledArgs(myProperty.size());
-                for (int i = 0; i < myProperty.size(); ++i) {
-                    int n;
-                    double v;
+                for (std::string::size_type i = 0; i < myProperty.size(); ++i) {
+                    int n = SIZE;
+                    double v = 0.0;
                     switch(myProperty[i]) {
                         case 'x': n = 0; break;
                         case 'y': n = 1; break;
@@ -284,7 +284,7 @@ namespace jslib {
                         return JS_FALSE;
                     }
                 }
-                JSObject *myReturnObject;
+                JSObject *myReturnObject = NULL;
                 switch (myProperty.size()) {
                     case 1: *vp = mySwizzledArgs[0];
                             return JS_TRUE;
@@ -317,11 +317,9 @@ namespace jslib {
                 if (JS_ValueToNumber(cx,*vp, &myParam)) {
                     myObjRef.getNative()[myIndex] = ELEM(myParam);
                     return JS_TRUE;
-                } else {
-                    JS_ReportError(cx, "JSVector::setProperty: index is not a number");
-                    return JS_FALSE;
                 }
-                return JS_TRUE;
+                JS_ReportError(cx, "JSVector::setProperty: index is not a number");
+                return JS_FALSE;
             }
             switch (myIndex) {
                 case PROP_LENGTH:
@@ -346,8 +344,8 @@ namespace jslib {
             if (myProperty.size()>0 && myProperty.size()<=SIZE) {
                 asl::QuadrupleOf<bool> isUsed(false,false,false,false);
                 asl::Vector4i myIndices;
-                for (int i = 0; i < myProperty.size(); ++i) {
-                    int n;
+                for (std::string::size_type i = 0; i < myProperty.size(); ++i) {
+                    int n = SIZE;
                     switch(myProperty[i]) {
                         case 'x': n = 0; break;
                         case 'y': n = 1; break;

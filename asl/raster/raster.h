@@ -193,16 +193,16 @@ class raster {
         // same as std::vector:
 
         iterator begin() {
-            return &(*_data.begin());
+			return _data.empty() ? NULL : &(*_data.begin());
         }
         const_iterator begin() const {
-            return &(*_data.begin());
+            return _data.empty() ? NULL : &(*_data.begin());
         }
         iterator end() {
-            return &(*_data.end());
+            return begin() + size();
         }
         const_iterator end() const {
-            return &(*_data.end());
+            return begin() + size();
         }
         reverse_iterator rbegin() {
             return std::reverse_iterator<T*>(end());
@@ -218,7 +218,7 @@ class raster {
         }
 
         size_type size() const {
-            return size_type(end() - begin());
+            return _data.size();
         }
         size_type max_size() const {
             return size_type(-1);

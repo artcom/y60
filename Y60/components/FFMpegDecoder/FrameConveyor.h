@@ -19,23 +19,22 @@
 
 #include <map>
 
-#ifdef WIN32
-#pragma warning( disable : 4244 ) // Disable ffmpeg warning
-#define EMULATE_INTTYPES
-#endif
-
-extern "C" {
 #ifdef OSX
-#   include <libavcodec/avcodec.h>
-#   include <libavformat/avformat.h>
+    extern "C" {
+#       include <libavformat/avformat.h>
+    }
+#   undef AV_NOPTS_VALUE
+#   define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
-#   include <ffmpeg/avcodec.h>
-#   include <ffmpeg/avformat.h>
-#endif
-}
-
-#ifdef WIN32
-#pragma warning( default : 4244 ) // Renable ffmpeg warning
+#   if defined(_MSC_VER)
+#       pragma warning(push,1)
+#   endif
+    extern "C" {
+#       include <ffmpeg/avformat.h>
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 #endif
 
 struct AVFrame;

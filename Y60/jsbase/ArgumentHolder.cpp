@@ -93,6 +93,7 @@ namespace jslib {
 
     template struct ResultConverter<bool>;
     template struct ResultConverter<unsigned short>;
+    template struct ResultConverter<unsigned long>;
     template struct ResultConverter<int>;
     template struct ResultConverter<unsigned int>;
     template struct ResultConverter<long>;

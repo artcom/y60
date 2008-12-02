@@ -22,17 +22,23 @@
 
 #include "PLFilterGaussianBlur.h"
 
-#include <asl/math/numeric_functions.h>
-#include <asl/base/Logger.h>
-#include <asl/math/Vector234.h>
+#include <iostream>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/Filter/plfiltercrop.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <iostream>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/Logger.h>
+#include <asl/math/Vector234.h>
 
 #define DB(x) // x
 
@@ -67,39 +73,39 @@ template<class PIXELTYPE>
 void multAndStore(PIXELTYPE& theResult, PIXELTYPE * theSource, int theScale );
 template<>
 void multAndStore(PLPixel32 & theResult, PLPixel32 * theSource, int theScale ) {
-    theResult.SetR(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255));
-    theResult.SetG(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255));
-    theResult.SetB(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255));
-    theResult.SetA(minimum(theResult.GetA() + (((theSource->GetA() * theScale)+128) / 256), 255));
+    theResult.SetR( static_cast<PLBYTE>(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255)) );
+    theResult.SetG( static_cast<PLBYTE>(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255)) );
+    theResult.SetB( static_cast<PLBYTE>(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255)) );
+    theResult.SetA( static_cast<PLBYTE>(minimum(theResult.GetA() + (((theSource->GetA() * theScale)+128) / 256), 255)) );
 }
 template<>
 void multAndStore(PLPixel24& theResult, PLPixel24 * theSource, int theScale ) { 
-    theResult.SetR(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255));
-    theResult.SetG(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255));
-    theResult.SetB(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255));
+    theResult.SetR( static_cast<PLBYTE>(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255)) );
+    theResult.SetG( static_cast<PLBYTE>(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255)) );
+    theResult.SetB( static_cast<PLBYTE>(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255)) );
 
 }
 template<>
 void multAndStore(PLPixel16& theResult, PLPixel16 * theSource, int theScale ) { 
-    theResult.SetR(minimum(theResult.GetR() + ((theSource->GetR() * theScale) / 256), 255));
-    theResult.SetG(minimum(theResult.GetG() + ((theSource->GetG() * theScale) / 256), 255));
-    theResult.SetB(minimum(theResult.GetB() + ((theSource->GetB() * theScale) / 256), 255));
+    theResult.SetR( static_cast<PLBYTE>(minimum(theResult.GetR() + ((theSource->GetR() * theScale) / 256), 255)) );
+    theResult.SetG( static_cast<PLBYTE>(minimum(theResult.GetG() + ((theSource->GetG() * theScale) / 256), 255)) );
+    theResult.SetB( static_cast<PLBYTE>(minimum(theResult.GetB() + ((theSource->GetB() * theScale) / 256), 255)) );
 }
 template<>
 void multAndStore(PLPixel8 & theResult, PLPixel8 * theSource, int theScale ) { 
-    theResult.Set(minimum(theResult.Get() + ((theSource->Get() * theScale) / 256), 255));
+    theResult.Set( static_cast<PLBYTE>(minimum(theResult.Get() + ((theSource->Get() * theScale) / 256), 255)) );
 }
 
 template <class PIXELTYPE>
 void
 gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & theKernel, double theRadius, 
-			 unsigned theRealWidth, unsigned theRealHeight, double theSigma) {    
+             unsigned theRealWidth, unsigned theRealHeight, double theSigma) {
     int myIntRadius = int(ceil(double(theRadius)));
 
     unsigned mySrcHeight = theSource->GetHeight();
     unsigned mySrcWidth = theSource->GetWidth();
-    int myDestWidth =  mySrcWidth;
-    int myDestHeight = mySrcHeight;
+    unsigned myDestWidth =  mySrcWidth;
+    unsigned myDestHeight = mySrcHeight;
     PLBmp * myTempBmp = new PLAnyBmp();
     myTempBmp->Create(myDestWidth, mySrcHeight, theSource->GetPixelFormat());
 
@@ -109,74 +115,74 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
     int myOffset = myIntRadius - 1;
     {
         // pass 1: Glur in x direction
-        for (int y=0; y < mySrcHeight; ++y) {
-            for(int x=0; x<myDestWidth; ++x) {
+        for (unsigned y=0; y < mySrcHeight; ++y) {
+            for(unsigned x=0; x<myDestWidth; ++x) {
                 PIXELTYPE myColor;
-				clearPixel(myColor);      
+                clearPixel(myColor);      
                 for(int w=0; w<myIntRadius; ++w) {
                     int xs = x + w - myOffset;
                     PIXELTYPE myKernelPixel;
-                    if (xs>=0 && xs<theRealWidth) {
+                    if (xs>=0 && static_cast<unsigned>(xs)<theRealWidth) {
                         getPix<PIXELTYPE>(theSource, xs,y, myKernelPixel);
-					} else {
-						if (xs < 0) {
-		                    getPix<PIXELTYPE>(theSource, 0,y, myKernelPixel);
-						} else {
-	                        getPix<PIXELTYPE>(theSource, theRealWidth-1,y, myKernelPixel);
-						}
-					}
+                    } else {
+                        if (xs < 0) {
+                            getPix<PIXELTYPE>(theSource, 0,y, myKernelPixel);
+                        } else {
+                            getPix<PIXELTYPE>(theSource, theRealWidth-1,y, myKernelPixel);
+                        }
+                    }
                     multAndStore(myColor, &myKernelPixel, theKernel[w]);
                     xs = x + w;
-                    if (xs>=0 && xs<theRealWidth) {
+                    if (xs>=0 && static_cast<unsigned>(xs)<theRealWidth) {
                         getPix<PIXELTYPE>(theSource, xs,y, myKernelPixel);
-					} else {
-						if (xs < 0) {
-							getPix<PIXELTYPE>(theSource, 0,y, myKernelPixel);
-						} else {
-							getPix<PIXELTYPE>(theSource, theRealWidth-1,y, myKernelPixel);
-						}
+                    } else {
+                        if (xs < 0) {
+                            getPix<PIXELTYPE>(theSource, 0,y, myKernelPixel);
+                        } else {
+                            getPix<PIXELTYPE>(theSource, theRealWidth-1,y, myKernelPixel);
+                        }
                     }
-					multAndStore(myColor, &myKernelPixel, theKernel[w+myIntRadius]);
-				}
+                    multAndStore(myColor, &myKernelPixel, theKernel[w+myIntRadius]);
+                }
                 myTempBmp->SetPixel(x,y,myColor);                
             }
         }
     }
 
-    for(int x=0; x<myDestWidth; ++x) {
-        for (int y=0; y < myDestHeight; ++y) {
+    for(unsigned x=0; x<myDestWidth; ++x) {
+        for (unsigned y=0; y < myDestHeight; ++y) {
             PIXELTYPE myColor;
-			clearPixel(myColor);      
+            clearPixel(myColor);      
             for(int w=0; w<myIntRadius; ++w) {
                 int ys = y + w - myOffset;
                 PIXELTYPE myKernelPixel;
 
-                if (ys>=0 && ys<theRealHeight) {
+                if (ys>=0 && static_cast<unsigned>(ys)<theRealHeight) {
                     getPix<PIXELTYPE>(myTempBmp, x,ys, myKernelPixel);
-				} else {
-					if (ys < 0) {
-						getPix<PIXELTYPE>(myTempBmp, x,0, myKernelPixel);
-					} else {
-						getPix<PIXELTYPE>(myTempBmp, x,theRealHeight-1, myKernelPixel);
-					}
+                } else {
+                    if (ys < 0) {
+                        getPix<PIXELTYPE>(myTempBmp, x,0, myKernelPixel);
+                    } else {
+                        getPix<PIXELTYPE>(myTempBmp, x,theRealHeight-1, myKernelPixel);
+                    }
                 }
                 multAndStore(myColor, &myKernelPixel, theKernel[w]);
                 ys = y + w;
-                if (ys>=0 && ys<theRealHeight) {
+                if (ys>=0 && static_cast<unsigned>(ys)<theRealHeight) {
                     getPix<PIXELTYPE>(myTempBmp, x,ys, myKernelPixel);
-				} else {
-					if (ys < 0) {
-						getPix<PIXELTYPE>(myTempBmp, x,0, myKernelPixel);
-					} else {
-						getPix<PIXELTYPE>(myTempBmp, x,theRealHeight-1, myKernelPixel);
-					}
+                } else {
+                    if (ys < 0) {
+                        getPix<PIXELTYPE>(myTempBmp, x,0, myKernelPixel);
+                    } else {
+                        getPix<PIXELTYPE>(myTempBmp, x,theRealHeight-1, myKernelPixel);
+                    }
                 }
                 multAndStore(myColor, &myKernelPixel, theKernel[w+myIntRadius]);
-			}
+            }
             theDestination->SetPixel(x,y,myColor);                
         }
     }
-	delete myTempBmp;
+    delete myTempBmp;
 } 
 
 void
@@ -193,10 +199,10 @@ PLFilterGaussianBlur::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
         myRecalcKernelFlag = true;
     }
     if (myRecalcKernelFlag) {
-		AC_WARNING << "Radius to high -> set to " << _myRadius << " and recalculate kernel";
-		calcKernel();
+        AC_WARNING << "Radius to high -> set to " << _myRadius << " and recalculate kernel";
+        calcKernel();
     }
-	switch (theSource->GetBitsPerPixel()) {
+    switch (theSource->GetBitsPerPixel()) {
         case 32:
             gaussianblur<PLPixel32>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
@@ -207,12 +213,12 @@ PLFilterGaussianBlur::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
             gaussianblur<PLPixel16>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         case 8:
-			gaussianblur<PLPixel8>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
+            gaussianblur<PLPixel8>(theSource, theDestination, _myKernel, _myRadius, _myRealWidth, _myRealHeight, _mySigma);
             break;
         default:
             throw (PLTextException (PL_ERRFORMAT_NOT_SUPPORTED, "Unsupported."));
     };
-        
+
 }
 
 
@@ -230,7 +236,7 @@ void PLFilterGaussianBlur::calcKernel() const
     _myKernel.resize(_myKernelWidth);
     double mySum = 0;
     for (int i=0; i<= myIntRadius; ++i) {
-        
+
         // triangle kernel -- myFloatKernel[myIntRadius+i] = (0.5+0.5*i/myIntRadius)/(0.75*myIntRadius); // exp(-i*double(i/_myRadius)-1)/sqrt(2*PI);
         // original gauus without sigma --  myFloatKernel[myIntRadius+i] = exp(-i*double(i/_myRadius)-1)/sqrt(2*PI);
         myFloatKernel[myIntRadius+i] = exp((-i*double(i/_myRadius)-1)/mySigma22)/mySqrtSigmaPi;

@@ -57,15 +57,15 @@ namespace asl {
             weakCount(theWeakCount)
         {}
 
-        inline ReferenceCounter<ThreadingModel>* getNextPtr() const {
+        ReferenceCounter<ThreadingModel>* getNextPtr() const {
             return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((long)smartCount);
         }
 
-        inline void setNextPtr(ReferenceCounter<ThreadingModel> * theNext) {
+        void setNextPtr(ReferenceCounter<ThreadingModel> * theNext) {
             smartCount.set(reinterpret_cast<long>(theNext));
         }
 
-        inline void init() {
+        void init() {
             smartCount.set(1);
             weakCount.set(1);
         }
@@ -87,7 +87,7 @@ namespace asl {
         public:
             typedef MultiProcessor ThreadingModel;
 
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
 
                 while (!_theThreadLock_.decrement_and_test()) {
                     _theThreadLock_.increment();
@@ -104,7 +104,7 @@ namespace asl {
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 while (!_theThreadLock_.decrement_and_test()) {
                     _theThreadLock_.increment();
                 }
@@ -139,7 +139,7 @@ namespace asl {
     class PtrThreadSpecificFreeListAllocator {
         public:
             typedef TheThreadingModel ThreadingModel;
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
                 // make sure pthread_key_create is called only once
                 static int _theKeyStatus_ = pthread_key_create(&_theKey_,0);
                 ReferenceCounter<ThreadingModel> * myHead = reinterpret_cast<ReferenceCounter<ThreadingModel> *>
@@ -152,7 +152,7 @@ namespace asl {
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 anOldPtr->setNextPtr(reinterpret_cast<ReferenceCounter<ThreadingModel>*>(pthread_getspecific(_theKey_)));
                 int status = pthread_setspecific(_theKey_,anOldPtr);
             }
@@ -171,13 +171,14 @@ namespace asl {
         public:
             typedef MultiProcessor ThreadingModel;
             typedef ReferenceCounter<ThreadingModel> RefCount;
-            inline static RefCount * allocate() {
+            static RefCount * allocate() {
                 // make sure pthread_key_create is called only once
                 static int _theKeyStatus_ = pthread_key_create(&_theKey_,0);
                 RefCount * myHead = reinterpret_cast<RefCount *>(pthread_getspecific(_theKey_));
                 if (myHead) {
                     int status = pthread_setspecific(_theKey_,myHead->getNextPtr());
                     myHead->init();
+                    (void)status;
                     return myHead;
                 } else {
                     const int CHUNK_SIZE = 64;
@@ -188,12 +189,14 @@ namespace asl {
                     myNewChunk[CHUNK_SIZE-1].setNextPtr(0);
                     int status = pthread_setspecific(_theKey_,myNewChunk+1);
                     myNewChunk->init();
+                    (void)status;
                     return myNewChunk;
                 }
             }
-            inline static void free(RefCount * anOldPtr) {
+            static void free(RefCount * anOldPtr) {
                 anOldPtr->setNextPtr(reinterpret_cast<RefCount*>(pthread_getspecific(_theKey_)));
                 int status = pthread_setspecific(_theKey_,anOldPtr);
+                (void)status;
             }
         private:
             static pthread_key_t _theKey_;
@@ -203,7 +206,7 @@ namespace asl {
     class MutexPtrFreeListAllocator {
         public:
             typedef MultiProcessor ThreadingModel;
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
                 static int myStatus = pthread_mutex_init(&_theMutex_,0);
                 pthread_mutex_lock(&_theMutex_);
                 if (_theFreeListHead_) {
@@ -217,7 +220,7 @@ namespace asl {
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 pthread_mutex_lock(&_theMutex_);
                 anOldPtr->setNextPtr(_theFreeListHead_);
                 _theFreeListHead_ = anOldPtr;
@@ -233,7 +236,7 @@ namespace asl {
     class PtrMultiFreeListAllocator {
         public:
            typedef MultiProcessor ThreadingModel;
-           inline static ReferenceCounter<ThreadingModel> * allocate() {
+           static ReferenceCounter<ThreadingModel> * allocate() {
             int myIndex = _theIndex_.post_increment()&MASK;
                 if (_theFreeListHead_[myIndex]) {
                     ReferenceCounter<ThreadingModel> * result = _theFreeListHead_[myIndex];
@@ -245,7 +248,7 @@ namespace asl {
                     return result;
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 int myIndex = _theIndex_.post_increment()&MASK;
                 anOldPtr->setNextPtr(_theFreeListHead_[myIndex]);
                 _theFreeListHead_[myIndex] = anOldPtr;
@@ -261,7 +264,7 @@ namespace asl {
     class PtrFreeListAllocator {
         public:
             typedef SingleThreaded ThreadingModel;
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
                 if (_theFreeListHead_) {
                     ReferenceCounter<ThreadingModel> * result = _theFreeListHead_;
                     _theFreeListHead_ = result->getNextPtr();
@@ -271,7 +274,7 @@ namespace asl {
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 anOldPtr->setNextPtr( _theFreeListHead_ );
                 _theFreeListHead_ = anOldPtr;
             }
@@ -304,7 +307,7 @@ namespace asl {
     class PtrFreeListChunkAllocator {
         public:
             typedef TheThreadingModel ThreadingModel;
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
                 DBP2(std::cerr << "allocate(1): _theFreeListHead_ = "<<_theFreeListHead_<<std::endl);
                 DBP2(printList(_theFreeListHead_));
                 if (_theFreeListHead_) {
@@ -331,7 +334,7 @@ namespace asl {
                     return &myNewChunk[0];
                 }
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 DBP2(std::cerr << "free(1): anOldPtr = "<<anOldPtr<<", _theFreeListHead_ = "<<_theFreeListHead_<<std::endl);
                 DBP2(printList(_theFreeListHead_));
                 anOldPtr->setNextPtr(_theFreeListHead_);
@@ -355,10 +358,10 @@ namespace asl {
     template <class ThreadingModel>
     class PtrHeapAllocator {
         public:
-            inline static ReferenceCounter<ThreadingModel> * allocate() {
+            static ReferenceCounter<ThreadingModel> * allocate() {
                 return new ReferenceCounter<ThreadingModel>;
             }
-            inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
+            static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 delete anOldPtr;
             }
     };
@@ -412,7 +415,7 @@ namespace asl {
 
         explicit Ptr(C * nativePtr = 0) : _myNativePtr(nativePtr), _myRefCountPtr(0) {
             if (_myNativePtr) {
-                _myRefCountPtr = reinterpret_cast<asl::ReferenceCounter<ThreadingModel>*>(Allocator::allocate());
+                _myRefCountPtr = reinterpret_cast<ReferenceCounter<ThreadingModel>*>(Allocator::allocate());
             }
         }
 
@@ -461,7 +464,7 @@ namespace asl {
             return *this;
         }
 
-        inline const Ptr& operator=(const Ptr & otherPtr) {
+        const Ptr& operator=(const Ptr & otherPtr) {
             if (&otherPtr != this) {
                 unreference();
                 _myNativePtr = otherPtr._myNativePtr;
@@ -478,54 +481,60 @@ namespace asl {
             unreference();
         }
 
-        inline bool operator==(const Ptr& otherPtr) const {
-            return _myNativePtr == otherPtr._myNativePtr;
+        operator const void*() const {
+            return _myNativePtr ? this : NULL;
         }
 
-        inline bool operator!=(const Ptr& otherPtr) const {
-            return !operator==(otherPtr);
-        }
-
-        inline operator bool() const {
-            return (_myNativePtr != 0);
-        }
-
-        inline C & operator*() {
+        C & operator*() {
             return *_myNativePtr;
         }
 
-        inline const C& operator*() const {
+        const C& operator*() const {
             return *_myNativePtr;
         }
 
-        inline C * operator->() {
+        C * operator->() {
             return _myNativePtr;
         }
 
-        inline const C * operator->() const {
+        const C * operator->() const {
             return _myNativePtr;
         }
 
-        inline C * getNativePtr() const {
+        C * getNativePtr() const {
             return _myNativePtr;
         }
 
-        inline ReferenceCounter<ThreadingModel> * getRefCountPtr() const {
+        ReferenceCounter<ThreadingModel> * getRefCountPtr() const {
             return _myRefCountPtr;
         }
         
-        inline long getRefCount() const {
+        long getRefCount() const {
             if (_myRefCountPtr) {
                 return _myRefCountPtr->smartCount;
             }
             return 0;
         }
         
+        bool operator==(const Ptr& rhs) const {return getNativePtr() == rhs.getNativePtr();}
+        bool operator!=(const Ptr& rhs) const {return !(*this==rhs);}
+        bool operator< (const Ptr& rhs) const {return getNativePtr() < rhs.getNativePtr();}
+        bool operator> (const Ptr& rhs) const {return rhs < *this;}
+        bool operator<=(const Ptr& rhs) const {return !(*this>rhs);}
+        bool operator>=(const Ptr& rhs) const {return !(*this<rhs);}
+
+        bool operator==(const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+        bool operator!=(const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+        bool operator< (const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+        bool operator> (const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+        bool operator<=(const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+        bool operator>=(const WeakPtr<C,ThreadingModel,Allocator>& rhs) const;
+
     private:
         C *    _myNativePtr;
         ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
-        inline bool reference() {
+        bool reference() {
             DBP2(std::cerr<<"Ptr::reference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
             if (_myNativePtr) {
                 if (!_myRefCountPtr || !_myRefCountPtr->smartCount.conditional_increment()) {
@@ -537,7 +546,7 @@ namespace asl {
         }
 
         // Ptr::
-        inline void unreference() {
+        void unreference() {
             DBP2(std::cerr<<"Ptr::unreference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
             if (_myNativePtr) {
                 DBP2(std::cerr<<"Ptr::unreference weakCount = "<<_myRefCountPtr->weakCount<<std::endl);
@@ -557,61 +566,28 @@ namespace asl {
             }
         }
     
-    public:
-        bool operator==(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return _myRefCountPtr == otherPtr._myRefCountPtr;
-        }
-
-        bool operator!=(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return _myRefCountPtr != otherPtr._myRefCountPtr;
-        }
-    
-        bool operator<(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return _myNativePtr < otherPtr._myNativePtr;
-        }
-    
-        bool operator>(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return otherPtr._myNativePtr < _myNativePtr;
-        }
-    
-        bool operator<=(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return !operator>(_myNativePtr,otherPtr._myNativePtr);
-        }
-    
-        bool operator>=(const WeakPtr<C, ThreadingModel, Allocator> & otherPtr) const {
-            return !operator<(_myNativePtr,otherPtr._myNativePtr);
-        }
-    
     private:
         // do not allow comparison with other types and forbid comparison of bool results
-        template<class D>
-        bool operator==(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const {
-            throw Forbidden(JUST_FILE_LINE);
-        }
-
-        template<class D>
-        bool operator!=(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const {
-            throw Forbidden(JUST_FILE_LINE);
-        }
+        // template<class D> bool operator==(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const;
+        // template<class D> bool operator!=(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const;
     };
-
 
     template <class T,
               class ThreadingModel,
               class Allocator>
     class WeakPtr {
-        friend class Ptr<T, ThreadingModel, Allocator>;
+            friend class Ptr<T,ThreadingModel,Allocator>;
         public:
             WeakPtr() :
                 _myNativePtr(0),
                 _myRefCountPtr(0)
-            {};
+            {}
             WeakPtr(const Ptr<T, ThreadingModel, Allocator> & theSmartPtr) :
                 _myNativePtr(theSmartPtr.getNativePtr()),
                 _myRefCountPtr(theSmartPtr.getRefCountPtr())
             {
                 reference();
-            };
+            }
 
             WeakPtr(const WeakPtr & otherWeakPtr) :
                 _myNativePtr(otherWeakPtr._myNativePtr),
@@ -624,7 +600,7 @@ namespace asl {
                 unreference();
             }
 
-            inline const WeakPtr & operator=(const WeakPtr & otherPtr) {
+            const WeakPtr & operator=(const WeakPtr & otherPtr) {
                 if (this != & otherPtr) {
                     unreference();
                     _myNativePtr = otherPtr._myNativePtr;
@@ -634,15 +610,15 @@ namespace asl {
                 return *this;
             }
 
-            operator bool() const {
-                return isValid();
+            operator const void*() const {
+                return isValid() ? this : NULL;
             }
 
-            inline ReferenceCounter<ThreadingModel> * getRefCountPtr() const {
+            ReferenceCounter<ThreadingModel> * getRefCountPtr() const {
                 return _myRefCountPtr;
             }
 
-            inline Ptr<T, ThreadingModel, Allocator> lock() {
+            Ptr<T, ThreadingModel, Allocator> lock() {
                 if (isValid()) {
                     try {
                         return Ptr<T, ThreadingModel, Allocator>(_myNativePtr, _myRefCountPtr);
@@ -654,7 +630,7 @@ namespace asl {
                 return Ptr<T, ThreadingModel, Allocator>(0);
             }
 
-            inline const Ptr<T, ThreadingModel, Allocator> lock() const {
+            const Ptr<T, ThreadingModel, Allocator> lock() const {
                 if (isValid()) {
                     try {
                         return Ptr<T, ThreadingModel, Allocator>(_myNativePtr, _myRefCountPtr);
@@ -667,24 +643,38 @@ namespace asl {
             }
 
             // only use for debugging and tests
-            inline long getRefCount() const {
+            long getRefCount() const {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->smartCount;
                 }
                 return 0;
             }
-            inline long getWeakCount() const {
+            long getWeakCount() const {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->weakCount;
                 }
                 return 0;
             }
 
+            bool operator==(const WeakPtr& rhs) const {return _myNativePtr == rhs._myNativePtr;}
+            bool operator!=(const WeakPtr& rhs) const {return !(*this==rhs);}
+            bool operator< (const WeakPtr& rhs) const {return _myNativePtr < rhs._myNativePtr;}
+            bool operator> (const WeakPtr& rhs) const {return rhs < *this;}
+            bool operator<=(const WeakPtr& rhs) const {return !(*this>rhs);}
+            bool operator>=(const WeakPtr& rhs) const {return !(*this<rhs);}
+
+            bool operator==(const Ptr<T,ThreadingModel,Allocator>& rhs) const {return _myNativePtr == rhs.getNativePtr();}
+            bool operator!=(const Ptr<T,ThreadingModel,Allocator>& rhs) const {return !(*this==rhs);}
+            bool operator< (const Ptr<T,ThreadingModel,Allocator>& rhs) const {return _myNativePtr < rhs.getNativePtr();}
+            bool operator> (const Ptr<T,ThreadingModel,Allocator>& rhs) const {return rhs < *this;}
+            bool operator<=(const Ptr<T,ThreadingModel,Allocator>& rhs) const {return !(*this>rhs);}
+            bool operator>=(const Ptr<T,ThreadingModel,Allocator>& rhs) const {return !(*this<rhs);}
+
         private:
             T *                                _myNativePtr;
             ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
-            inline bool isValid() const {
+            bool isValid() const {
                 if (_myRefCountPtr && _myRefCountPtr->smartCount != 0) {
                     return true;
                 }
@@ -692,7 +682,7 @@ namespace asl {
             }
 
 
-            inline void reference() {
+            void reference() {
                 DBP2(std::cerr<<"WeakPtr::reference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
                 if (_myNativePtr) {
                     _myRefCountPtr->weakCount.increment();
@@ -700,7 +690,7 @@ namespace asl {
             }
 
             // WeakPtr::
-            inline void unreference() {
+            void unreference() {
                 DBP2(std::cerr<<"WeakPtr::unreference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
                 if (_myNativePtr) {
                     DBP2(std::cerr<<"WeakPtr::unreference weakCount = "<<_myRefCountPtr->weakCount<<std::endl);
@@ -715,38 +705,45 @@ namespace asl {
                 }
             }
 
-           public:
-                bool operator==(const WeakPtr & otherPtr) const {
-                    return _myRefCountPtr == otherPtr._myRefCountPtr;
-                }
-                bool operator!=(const WeakPtr & otherPtr) const {
-                    return _myRefCountPtr != otherPtr._myRefCountPtr;
-                }
-                bool operator==(const Ptr<T, ThreadingModel, Allocator> & otherPtr) const {
-                    return _myRefCountPtr == otherPtr._myRefCountPtr;
-                }
-                bool operator!=(const Ptr<T, ThreadingModel, Allocator> & otherPtr) const {
-                    return _myRefCountPtr != otherPtr._myRefCountPtr;
-                }
            private:
                 // do not allow comparison with other types and forbid comparison of bool results
-                template<class D>
-                bool operator==(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator!=(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator==(const Ptr<D, ThreadingModel, Allocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
-                template<class D>
-                bool operator!=(const Ptr<D, ThreadingModel, Allocator> & otherPtr) const {
-                    throw Forbidden(JUST_FILE_LINE);
-                }
+                // template<class D> bool operator==(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const;
+                // template<class D> bool operator!=(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const;
+                // template<class D> bool operator==(const Ptr<D, ThreadingModel, Allocator> & otherPtr) const;
+                // template<class D> bool operator!=(const Ptr<D, ThreadingModel, Allocator> & otherPtr) const;
     };
+    
+    //==============================================================================
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator==(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return getNativePtr() == rhs._myNativePtr;
+    }
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator!=(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return !(*this==rhs);
+    }
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator<(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return getNativePtr() < rhs._myNativePtr;
+    }
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator>(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return rhs < *this;
+    }
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator<=(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return !(*this>rhs);
+    }
+
+    template<class C, class ThreadingModel, class Allocator >
+    inline bool Ptr<C,ThreadingModel,Allocator>::operator>=(const asl::WeakPtr<C,ThreadingModel,Allocator>& rhs) const {
+        return !(*this<rhs);
+    }
 
 } //namespace
 

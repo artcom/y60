@@ -43,7 +43,7 @@ JSRequest::onError(CURLcode theErrorCode) {
         jsval argv[1], rval;
         argv[0] = as_jsval(_myJSContext, theErrorCode);
 
-        JSBool ok = JSA_CallFunctionName(_myJSContext, _myJSListener, "onError", 1, argv, &rval);
+        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onError", 1, argv, &rval);
     }
 }
 
@@ -55,7 +55,7 @@ JSRequest::hasCallback(const char * theName) {
             << ", Listener=" << _myJSListener << endl);
     jsval myListenerValue = OBJECT_TO_JSVAL(_myJSListener);
     DB(AC_TRACE << "myListenerValue=" << myListenerValue << endl);
-    JSType myType = JS_TypeOfValue(_myJSContext, myListenerValue);
+    /*JSType myType =*/ JS_TypeOfValue(_myJSContext, myListenerValue);
     DB(AC_TRACE << "myListenerType=" << myType << endl);
     if (JS_GetProperty(_myJSContext, _myJSListener, theName, &myValue)) {
          DB(AC_TRACE << "property for '" << theName << "' found" << endl);
@@ -99,7 +99,7 @@ JSRequest::onDone() {
     DB(AC_TRACE << "onDone for '" << getURL() << "' triggered" << endl); 
     if (hasCallback("onDone")) {
         jsval argv[1], rval;
-        JSBool ok = JSA_CallFunctionName(_myJSContext, _myJSListener, "onDone", 0, argv, &rval);
+        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onDone", 0, argv, &rval);
     }
 }
 

@@ -118,7 +118,7 @@ namespace y60 {
                     MAKE_SCOPE_TIMER(Shape_intersect);
                     bool myResult = false;
                     AC_TRACE << "Intersecting " << _myPrimitives.size() << " primitives";
-                    for (int i = 0; i < _myPrimitives.size();++i) {
+                    for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {
                         if (_myPrimitives[i]->intersect(theStick, theIntersectionInfo)) {
                             myResult = true;
                         }

@@ -22,19 +22,26 @@
 //=============================================================================
 
 #include "TextureDefinition.h"
-#include "LayerDefinition.h"
-#include "XmlHelper.h"
+
+#include <assert.h>
+#include <stdexcept>
 
 #include <asl/dom/Nodes.h>
 #include <asl/base/string_functions.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/planydec.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <assert.h>
-#include <stdexcept>
+#include "LayerDefinition.h"
+#include "XmlHelper.h"
 
 using namespace std; 
 
@@ -54,11 +61,11 @@ TextureDefinition::TextureDefinition (int myIndex)
 }
 
 TextureDefinition::~TextureDefinition() {
-   for(int i=0;i<_myLayers.size(); delete _myLayers[i++] ); 
+   for(std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); delete _myLayers[i++] ); 
 }
 
 void TextureDefinition::setTileSize (double myTileSize) {
-    for(int i=0;i<_myLayers.size(); _myLayers[i++]->setTileSize (myTileSize) ); 
+    for(std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); _myLayers[i++]->setTileSize (myTileSize) ); 
 }
  
 int TextureDefinition::getIndex () const {

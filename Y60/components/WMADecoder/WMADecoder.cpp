@@ -353,9 +353,9 @@ WMADecoder::setupAudio() {
     HRESULT hr = _myReader->GetOutputCount(&myOutputCount);
     checkForWMError(hr, "Could not get output count.", PLUS_FILE_LINE);
 
-    _myAudioOutputId = -1;
+    _myAudioOutputId = static_cast<WORD>(-1);
 
-    for (unsigned i = 0; i < myOutputCount; ++i) {
+    for (WORD i = 0; i < myOutputCount; ++i) {
         IWMOutputMediaProps * myOutputProperties = 0;
         HRESULT hr = _myReader->GetOutputProps(i, &myOutputProperties);
         checkForWMError(hr, string("Could not get output properties ") + asl::as_string(i) +

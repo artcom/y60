@@ -24,14 +24,20 @@
 #if !defined(INCL_TESTFILTERTILE)
 #define INCL_TESTFILTERTILE
 
-#include "FilterTile.h"
+#include <vector>
 
 #include <asl/base/UnitTest.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/Filter/plfilter.h>
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <vector>
+#include "FilterTile.h"
 
 class TestFilterTile: public UnitTest {
 public:

@@ -116,7 +116,7 @@ SerialTransport::establishConnection() {
                 _mySerialPort->setStatusLine( SerialDevice::RTS);
 
                 setState( SYNCHRONIZING );
-            } catch (const asl::SerialPortException & ex) {
+            } catch (const asl::SerialPortException & /*ex*/) {
                 if ( _mySerialPort ) {
                     delete _mySerialPort;
                     _mySerialPort = 0;
@@ -163,7 +163,7 @@ SerialTransport::readData() {
         _myTmpBuffer.insert( _myTmpBuffer.end(),
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
         //dumpBuffer( _myFrameBuffer );
-    } catch (const SerialPortException & ex) {
+    } catch (const SerialPortException & /*ex*/) {
         //AC_WARNING << ex;
         //_myDriver->createTransportLayerEvent( "lost_communication" );
         MAKE_SCOPE_TIMER(SerialTransport_serialPortException);
@@ -194,7 +194,7 @@ SerialTransport::closeConnection() {
         //     retrive the current state of the outbound lines...
         try {
             _mySerialPort->setStatusLine( 0 );
-        } catch ( const asl::SerialPortException & ex ) {
+        } catch ( const asl::SerialPortException & /*ex*/ ) {
             //AC_WARNING << "Failed to disable RTS line: " << ex;
         }
 

@@ -14,14 +14,19 @@
 #define INCL_PLDEBUG
 
 #ifdef _DEBUG
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN  /* Prevent including <winsock*.h> in <windows.h> */
-#define VC_EXTRALEAN  // Exclude rarely-used stuff from Windows headers
-#include <windows.h>  // For OutputDebugString
-#endif
+#   include <stdarg.h>
+#   include <stdio.h>
+#   include <stdlib.h>
+#   ifdef _WIN32
+#       define NOMINMAX
+#       if !defined(WIN32_LEAN_AND_MEAN)
+#           define WIN32_LEAN_AND_MEAN  /* Prevent including <winsock*.h> in <windows.h> */
+#       endif
+#       if !defined(VC_EXTRALEAN)
+#           define VC_EXTRALEAN  // Exclude rarely-used stuff from Windows headers
+#       endif
+#       include <windows.h>  // For OutputDebugString
+#   endif
 #endif
 
 //------------- PLASSERT_VALID

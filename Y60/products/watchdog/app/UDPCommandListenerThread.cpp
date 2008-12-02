@@ -15,7 +15,9 @@
 
 #include "Projector.h"
 
+#if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x500
+#endif
 
 #include <asl/net/UDPSocket.h>
 #include <asl/net/net.h>
@@ -104,7 +106,7 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
 
     if (_myProjectors.size() > 0 ) {
         cout << "Projectors: " << endl;    
-        for (int i = 0; i < _myProjectors.size(); i++) {
+        for (std::vector<Projector*>::size_type i = 0; i < _myProjectors.size(); i++) {
             cout << (i+1) << ": " << _myProjectors[i]->getDescription()<< endl;;
         }
     }
@@ -189,7 +191,7 @@ UDPCommandListenerThread::run() {
     try {
         UDPSocket myUDPServer(INADDR_ANY, _myUDPPort);
 
-        while (true) {
+        for (;;) {
             char myInputBuffer[2048];
             unsigned myBytesRead = myUDPServer.receiveFrom(0,0,myInputBuffer,sizeof(myInputBuffer)-1);
             myInputBuffer[myBytesRead] = 0;

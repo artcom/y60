@@ -15,7 +15,14 @@
 
 #include <y60/jsbase/jssettings.h>
 #include <js/spidermonkey/jsapi.h>
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 extern bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject);
 

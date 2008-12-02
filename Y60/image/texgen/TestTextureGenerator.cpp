@@ -26,17 +26,23 @@
 
 #include "TestTextureGenerator.h"
 
-#include "TextureGenerator.h"
+#include <stdexcept>
+#include <fstream>
 
-#include <asl/dom/Nodes.h>
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plrect.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <stdexcept>
-#include <fstream>
+#include <asl/dom/Nodes.h>
+
+#include "TextureGenerator.h"
 
 using namespace dom;
 using namespace std;

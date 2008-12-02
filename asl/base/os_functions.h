@@ -100,7 +100,7 @@ namespace asl {
         try {
             get_environment_var_as(theVariable, myResult);
         }
-        catch (asl::ParseException & ex) {
+        catch (asl::ParseException & /*ex*/) {
             throw asl::ParseException(std::string("Could not convert value of environment variable '"+theVariable+"' to type "+
                                       typeid(myResult).name()), PLUS_FILE_LINE); 
         }

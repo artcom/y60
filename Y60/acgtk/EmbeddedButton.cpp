@@ -37,13 +37,13 @@ EmbeddedButton::setup() {
 }
 
 bool 
-EmbeddedButton::on_leave_notify_event(GdkEventCrossing * theEvent) {
+EmbeddedButton::on_leave_notify_event(GdkEventCrossing * /*theEvent*/) {
     leave();
     return true;
 }
 
 bool 
-EmbeddedButton::on_button_press_event(GdkEventButton * theEvent) {
+EmbeddedButton::on_button_press_event(GdkEventButton * /*theEvent*/) {
     pressed();
     return true;
 }
@@ -70,7 +70,7 @@ EmbeddedButton::leave() {
 }
 
 bool 
-EmbeddedButton::on_button_release_event(GdkEventButton * theEvent) {
+EmbeddedButton::on_button_release_event(GdkEventButton * /*theEvent*/) {
     released();
     return true;
 }

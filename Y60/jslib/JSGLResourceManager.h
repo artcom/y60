@@ -13,7 +13,7 @@
 
 #include <y60/jsbase/JSWrapper.h>
 
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 
 namespace jslib {
 

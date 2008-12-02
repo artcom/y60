@@ -143,7 +143,7 @@ JSGrayScale::initClass(JSContext *cx, JSObject *theGlobalObject) {
     }
     jsval myConstructorFuncObjVal;
     if (JS_GetProperty(cx, theGlobalObject, ClassName(), &myConstructorFuncObjVal)) {
-        JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
+        //JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         //JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
         cerr << "JSGrayScale::initClass: constructor function object not found, could not initialize static members"<<endl;

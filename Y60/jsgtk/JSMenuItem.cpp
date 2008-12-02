@@ -11,6 +11,7 @@
 #include "JSMenuItem.h"
 #include "JSBin.h"
 #include "JSSignalProxy0.h"
+#include "JSMenu.h"
 #include "jsgtk.h"
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>

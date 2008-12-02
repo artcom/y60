@@ -29,11 +29,14 @@
 #include <sstream>
 #include <string.h>
 
-#include <atlconv.h>
+#pragma warning(push)
+#pragma warning(disable: 4201)
+//#include <atlconv.h>
 #include <mmsystem.h>
 #include <Mmreg.h>
 #include <Ks.h>
 #include <Ksmedia.h>
+#pragma warning(pop)
 
 using namespace std;
 
@@ -229,9 +232,9 @@ void DirectSoundPump::initPrimaryBuffer() {
     DSBUFFERDESC dsbdesc;
     ZeroMemory(&wfx, sizeof(WAVEFORMATEX));
     wfx.wFormatTag = WAVE_FORMAT_PCM;
-    wfx.nChannels = getNumOutputChannels();
+    wfx.nChannels = static_cast<WORD>(getNumOutputChannels());
     wfx.nSamplesPerSec = getNativeSampleRate();
-    wfx.wBitsPerSample = getBytesPerSample(getNativeSampleFormat())*8;
+    wfx.wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
     wfx.nBlockAlign = 4;
     wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
     wfx.cbSize = 0;
@@ -260,11 +263,11 @@ void DirectSoundPump::initSecondaryBuffer() {
                 // Set up wave format structure. 
                 memset(myWF, 0, sizeof(WAVEFORMATEX));
                 myWF->wFormatTag = WAVE_FORMAT_PCM; 
-                myWF->nChannels = getNumOutputChannels(); 
-	            // This is really frames (samples per channel) per second...
+                myWF->nChannels = static_cast<WORD>(getNumOutputChannels());
+                // This is really frames (samples per channel) per second...
                 myWF->nSamplesPerSec = getNativeSampleRate(); 
-                myWF->wBitsPerSample = getBytesPerSample(getNativeSampleFormat())*8; 
-                myWF->nBlockAlign = getOutputBytesPerFrame(); 
+                myWF->wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8); 
+                myWF->nBlockAlign = static_cast<WORD>(getOutputBytesPerFrame());
                 myWF->nAvgBytesPerSec = myWF->nSamplesPerSec * myWF->nBlockAlign;
                 myWF->cbSize = sizeof(WAVEFORMATEX);
             }
@@ -276,15 +279,15 @@ void DirectSoundPump::initSecondaryBuffer() {
                 // Set up wave format structure. 
                 memset(myFloatWF, 0, sizeof(WAVEFORMATEXTENSIBLE));
                 myFloatWF->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE; 
-                myFloatWF->Format.nChannels = getNumOutputChannels(); 
-	            // This is really frames (samples per channel) per second...
+                myFloatWF->Format.nChannels = static_cast<WORD>(getNumOutputChannels());
+                // This is really frames (samples per channel) per second...
                 myFloatWF->Format.nSamplesPerSec = getNativeSampleRate(); 
-                myFloatWF->Format.wBitsPerSample = getBytesPerSample(getNativeSampleFormat())*8; 
-                myFloatWF->Format.nBlockAlign = getOutputBytesPerFrame(); 
+                myFloatWF->Format.wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
+                myFloatWF->Format.nBlockAlign = static_cast<WORD>(getOutputBytesPerFrame());
                 myFloatWF->Format.nAvgBytesPerSec = myFloatWF->Format.nSamplesPerSec * 
                         myFloatWF->Format.nBlockAlign;
                 myFloatWF->Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE);
-                myFloatWF->Samples.wValidBitsPerSample = getBytesPerSample(getNativeSampleFormat())*8;
+                myFloatWF->Samples.wValidBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
                 myFloatWF->dwChannelMask = 0; // SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT; ?!
                 myFloatWF->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
                 myWF = (WAVEFORMATEX *)myFloatWF;

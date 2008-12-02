@@ -24,20 +24,23 @@
 #include <asl/base/Block.h>
 #include <asl/base/MappedBlock.h>
 
-#ifdef WIN32
-#pragma warning(push)
-#pragma warning(disable:4244)
-#define EMULATE_INTTYPES
-#endif
-
-extern "C" {
 #ifdef OSX
-#include <libavformat/avformat.h>
+    extern "C" {
+#       include <libavformat/avformat.h>
+    }
+#   undef AV_NOPTS_VALUE
+#   define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
-#include <ffmpeg/avformat.h>
+#   if defined(_MSC_VER)
+#       pragma warning(push,1)
+#   endif
+    extern "C" {
+#       include <ffmpeg/avformat.h>
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 #endif
-}
-
 
 using namespace asl;
 using namespace std;
@@ -105,22 +108,22 @@ static int acstream_read(URLContext *h, unsigned char *buf, int size) {
 }    
 
 static offset_t acstream_seek(URLContext *h, offset_t pos, int whence) {
-    offset_t myOffset = 0;
+    //offset_t myOffset = 0;
     RelativeReadableStream * mySource 
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
-    
-    return mySource->seek(pos, whence);
-        
+
+    return mySource->seek( static_cast<int>(pos), whence);
+
 }
 
 static int acstream_close(URLContext *h) {
     RelativeReadableStream * mySource 
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
-    
+
     freeStream(mySource);
     return 0;
 }
-    
+
 // FFMpeg URLProtocol api
 URLProtocol acstream_protocol = {
     "acstream",

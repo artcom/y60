@@ -66,7 +66,7 @@ Attach(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        int xOptions; // Gtk::AttachOptions
+        int xOptions = 0; // Gtk::AttachOptions
         if (argc > 5) {
             if (!convertFrom(cx, argv[5], xOptions)) {
                 JS_ReportError(cx, "JSTable::attach(): argument #5 must be a Gtk.AttachOptions ");
@@ -74,7 +74,7 @@ Attach(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
         }
 
-        int yOptions; // Gtk::AttachOptions
+        int yOptions = 0; // Gtk::AttachOptions
         if (argc > 6) {
             if (!convertFrom(cx, argv[6], yOptions)) {
                 JS_ReportError(cx, "JSTable::attach(): argument #6 must be a Gtk.AttachOptions ");
@@ -82,7 +82,7 @@ Attach(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
         }
 
-        unsigned int xPadding;
+        unsigned int xPadding = 0;
         if (argc > 7) {
             if (!convertFrom(cx, argv[7], xPadding)) {
                 JS_ReportError(cx, "JSTable::attach(): argument #7 must be an unsigned int ");
@@ -90,7 +90,7 @@ Attach(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
         }
 
-        unsigned int yPadding;
+        unsigned int yPadding = 0;
         if (argc > 8) {
             if (!convertFrom(cx, argv[8], yPadding)) {
                 JS_ReportError(cx, "JSTable::attach(): argument #8 must be an unsigned int ");

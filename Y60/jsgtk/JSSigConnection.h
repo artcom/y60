@@ -14,24 +14,24 @@
 #include <y60/jsbase/JSWrapper.h>
 
 #ifdef OSX
-namespace SigC { typedef ::sigc::connection Connection; }
+namespace sigc { typedef ::sigc::connection Connection; }
 #endif
 
 #include <sigc++/connection.h>
 
 namespace jslib {
 
-class JSSigConnection : public JSWrapper<SigC::Connection, asl::Ptr<SigC::Connection>, StaticAccessProtocol> {
+class JSSigConnection : public JSWrapper<sigc::connection, asl::Ptr<sigc::connection>, StaticAccessProtocol> {
         JSSigConnection();  // hide default constructor
     public:
         virtual ~JSSigConnection() {
         }
-        typedef SigC::Connection NATIVE;
-        typedef asl::Ptr<SigC::Connection> OWNERPTR;
+        typedef sigc::connection NATIVE;
+        typedef asl::Ptr<sigc::connection> OWNERPTR;
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "SigConnection";
+            return "sigconnection";
         };
         static JSFunctionSpec * Functions();
 

@@ -26,8 +26,8 @@ TestServer::TestServer(TCPPolicy::Handle theHandle) : ConduitServer<TCPPolicy>(t
 {}; 
 
 void 
-TestServer::sendSlowly(const std::string theData) {
-    for (int i = 0; i < theData.length(); ++i) {
+TestServer::sendSlowly(const std::string & theData) {
+    for (std::string::size_type i = 0; i < theData.length(); ++i) {
         this->sendData(&theData[i], 1);
         msleep(1);
     }

@@ -48,7 +48,7 @@ namespace y60 {
                 WindowFunction * myWindowFunction = dynamic_cast<WindowFunction* >(theEffect);
                 ASSURE(myWindowFunction);
                 const std::vector<float> & theWindow = myWindowFunction->getWindow();
-                float theOverlapFactor = myWindowFunction->getOverlapFactor();
+                //float theOverlapFactor = myWindowFunction->getOverlapFactor();
 
                 SAMPLE * curSample = theBuffer.begin();
                 unsigned thisRange = theBuffer.getNumFrames();

@@ -51,10 +51,10 @@ namespace y60 {
         }   
     }
 
-	void 
+    void 
     DumbScale::onFrame(double t) {
         
-        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {

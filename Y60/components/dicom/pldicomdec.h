@@ -11,9 +11,15 @@
 #ifndef INCL_PLDICOMDEC
 #define INCL_PLDICOMDEC
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #ifndef INCL_PLPICDEC
 #include <paintlib/plpicdec.h>
 #endif
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 class PLProducer;
 class PLInputStream;

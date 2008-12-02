@@ -38,6 +38,10 @@ SoundManager::SoundManager()
     
     _myFFMpegAudioDecoderFactory = new FFMpegAudioDecoderFactory;
     registerDecoderFactory(_myFFMpegAudioDecoderFactory);
+
+    // XXX: forking here is dangerous because virtuals are not yet
+    //      initialized. this can lead to hard-to-catch bugs and
+    //      can only be prevented by letting the client call fork(). [IA]
     fork();
 }
 
@@ -217,38 +221,35 @@ unsigned SoundManager::getNumItemsInCache() const {
 }
 
 void SoundManager::stopAll() {
+    AC_TRACE << "SoundManager::stopAll";
+    unsigned myNumSoundsStopped = 0;
+    
+    std::vector<SoundPtr> mySounds;
+    
     {
-        AC_TRACE << "SoundManager::stopAll";
-        std::vector < SoundWeakPtr >::iterator it;
-        unsigned myNumSoundsStopped = 0;
-        // Here, we'd like to just lock the Sounds, iterate through the sounds and
-        // call stop on all of them. This takes too long, though, so we can't lock 
-        // the whole time. That in turn means that the list of sounds might change 
-        // while we're iterating through it.
-        for (int i = _mySounds.size()-1; i >= 0; --i) {
-            AutoLocker<ThreadLock> myLocker(_myLock);
-            if (i >= _mySounds.size()) {
-                // This can happen if sounds have been deleted in the meantime.
-                i = _mySounds.size()-1;
-                if (i<0) {
-                    break;
-                }
+        AutoLocker<ThreadLock> myLocker(_myLock);
+        std::vector<SoundWeakPtr>::iterator wi;
+        for (wi = _mySounds.begin(); wi != _mySounds.end(); wi++) {
+            SoundPtr p = wi->lock();
+            if(p) {
+                mySounds.push_back(p);
             }
-            SoundPtr curSound = _mySounds[i].lock();
-            if (curSound) {
-                AC_TRACE << "stopAll: Stopping " << curSound->getName();
-                curSound->stop();
-                myNumSoundsStopped++;
-            }
-            msleep(1);
-        }
-        if (myNumSoundsStopped) {
-            AC_TRACE << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
         }
     }
-    msleep(100);
+    
+    std::vector<SoundPtr>::iterator si;
+    for(si = mySounds.begin(); si != mySounds.end(); si++) {
+        AC_TRACE << "stopAll: Stopping " << (*si)->getName();
+        (*si)->stop();
+        myNumSoundsStopped++;
+    }
+    
+    if (myNumSoundsStopped) {
+        AC_TRACE << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
+    }
 
     update();
+
     AC_TRACE << "SoundManager::stopAll end";
 }
 
@@ -278,7 +279,7 @@ void SoundManager::run() {
 IAudioDecoder * SoundManager::createDecoder(const std::string & theURI) {
     IAudioDecoder * myDecoder = 0;
     AC_DEBUG << "createDecoder: " << _myDecoderFactories.size() << " factories registered.";
-    for (int i=0; i<_myDecoderFactories.size(); ++i) {
+    for (std::vector<IAudioDecoderFactory*>::size_type i=0; i<_myDecoderFactories.size(); ++i) {
         IAudioDecoderFactory* myCurrentFactory = _myDecoderFactories[i];
         try {
             myDecoder = myCurrentFactory->tryCreateDecoder(theURI);

@@ -23,7 +23,6 @@
 namespace asl {
 
 using namespace std;
-using namespace asl;
 
 HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat, 
                            unsigned mySampleRate, unsigned numChannels)

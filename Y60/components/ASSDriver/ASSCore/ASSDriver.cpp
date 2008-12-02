@@ -63,7 +63,7 @@ namespace y60 {
 
     const unsigned int BEST_VERSION( 260 );
 
-    const bool RESAMPLING = false;
+    bool RESAMPLING = false;
     const unsigned int GRID_SCALE_X = 2;
     const unsigned int GRID_SCALE_Y = 2;
 
@@ -270,8 +270,8 @@ namespace y60 {
             for (int x = 0; x < mat.hsize(); x++) {
                 if(mat(x,y).get() > res.max) {
                     res.max = mat(x,y).get();
-                    res.center[0] = x;
-                    res.center[1] = y;
+                    res.center[0] = static_cast<float>(x);
+                    res.center[1] = static_cast<float>(y);
                 }   
             }   
         }       
@@ -300,13 +300,13 @@ namespace y60 {
 
         if (theLineNo == 0) {
             myUpperNeighbour = myLowerNeighbour = myBrokenLine + _myPoTSize[0];
-        } else if ( theLineNo == _myGridSize[1] - 1 ) {
+        } else if ( theLineNo == static_cast<unsigned>(_myGridSize[1]) - 1 ) {
             myUpperNeighbour = myLowerNeighbour = myBrokenLine - _myPoTSize[0];
         } else {
             myUpperNeighbour = myBrokenLine - _myPoTSize[0];
             myLowerNeighbour = myBrokenLine + _myPoTSize[0];
         }
-        for (unsigned i = 0; i < _myGridSize[0]; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myGridSize[0]); ++i) {
             *myBrokenLine = (int(*myUpperNeighbour++) +  int(*myLowerNeighbour++)) >> 1;
             myBrokenLine++;
         }
@@ -319,12 +319,12 @@ namespace y60 {
         unsigned char * myLeftNeighbour = 0;
         unsigned char * myRightNeighbour = 0;
 
-        for (unsigned i = 0; i < _myGridSize[1]; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myGridSize[1]); ++i) {
             myBrokenPoint = _myRawRaster.raster->pixels().begin() + i * _myPoTSize[0] + theRowNo;
 
             if (theRowNo == 0) {
                 myLeftNeighbour = myRightNeighbour = myBrokenPoint + 1;
-            } else if ( theRowNo == _myGridSize[0] - 1 ) {
+            } else if ( theRowNo == static_cast<unsigned>(_myGridSize[0]) - 1 ) {
                 myLeftNeighbour = myRightNeighbour = myBrokenPoint - 1;
             } else {
                 myLeftNeighbour = myBrokenPoint - 1;
@@ -354,7 +354,7 @@ namespace y60 {
 
         if (theY == 0) {
             myNeighbours[UPPER] = 0;
-        } else if ( theY == _myGridSize[1] - 1 ) {
+        } else if ( theY == static_cast<unsigned>(_myGridSize[1]) - 1 ) {
             myNeighbours[LOWER] = 0;
         } else {
             myNeighbours[UPPER] = myBrokenPoint - _myPoTSize[0];
@@ -363,7 +363,7 @@ namespace y60 {
     
         if (theX == 0) {
             myNeighbours[LEFT] = 0;
-        } else if ( theX == _myGridSize[0] - 1 ) {
+        } else if ( theX == static_cast<unsigned>(_myGridSize[0]) - 1 ) {
             myNeighbours[RIGHT] = 0;
         } else {
             myNeighbours[LEFT] = myBrokenPoint - 1;
@@ -390,14 +390,14 @@ namespace y60 {
         for(unsigned int i=0; i<_myCureVLines.size(); i++) {
             if( _myCureVLines[i] != -1 && _myCureVLines[i] < _myGridSize[0]) {
                 //AC_PRINT << "cure v line " << _myCureVLines[i] << " i " << i;
-                cureVLine(_myCureVLines[i]);
+                cureVLine(static_cast<unsigned>(_myCureVLines[i]));
             }
         }
 
         for(unsigned int i=0; i<_myCureHLines.size(); i++) {
             if( _myCureHLines[i] != -1 && _myCureVLines[i] < _myGridSize[1]) {
                 //AC_PRINT << "cure h line " << _myCureHLines[i] << " i " << i;
-                cureHLine(_myCureHLines[i]);
+                cureHLine(static_cast<unsigned>(_myCureHLines[i]));
             }
         }
 
@@ -405,7 +405,8 @@ namespace y60 {
             if( _myCurePoints[i][0] != -1 && _myCurePoints[i][1] != -1 &&
                 _myCurePoints[i][0] < _myGridSize[0] && _myCurePoints[i][1] < _myGridSize[1]) {
                 //AC_PRINT << "cure point " << _myCurePoints[i][0] << "  " << _myCurePoints[i][1] << " i " << i;
-                curePoint(_myCurePoints[i][0], _myCurePoints[i][1]);
+                curePoint( static_cast<unsigned>(_myCurePoints[i][0])
+                         , static_cast<unsigned>(_myCurePoints[i][1]) );
             }
         }
 
@@ -428,7 +429,7 @@ namespace y60 {
 
         std::transform( myRawRaster.begin(), myRawRaster.end(),
                         myDenoisedRaster.begin(),
-                        Threshold<gray<unsigned char> >( _myNoiseThreshold));
+                        Threshold<gray<unsigned char> >( static_cast<unsigned char>(_myNoiseThreshold)));
 
         std::transform( myDenoisedRaster.begin(), myDenoisedRaster.end(),
                         myMomentRaster.begin(),
@@ -478,10 +479,11 @@ namespace y60 {
             for(unsigned y=0; y<height; y++) {
                 for(unsigned x=0; x<width; x++) {
                     asl::GRAY val = *(pixels + myResampledRaster.offset(x,y));
-                    asl::gray<unsigned char> threshold = _myComponentThreshold;
+                    asl::gray<unsigned char> threshold = static_cast<unsigned char>(_myComponentThreshold);
                     if( val.get() > _myComponentThreshold ){
                         //AC_PRINT << val;
-                        _myTmpPositions.push_back(Vector2f(x/GRID_SCALE_X,y/GRID_SCALE_Y));
+                        _myTmpPositions.push_back( Vector2f(static_cast<float>(x/GRID_SCALE_X)
+                                                           ,static_cast<float>(y/GRID_SCALE_Y)));
                     }
                 }   
             }       
@@ -518,23 +520,23 @@ namespace y60 {
         float x2y0 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]-1).get();
 
         float x0y1 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]).get();
-        float x1y1 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]).get();
+        //float x1y1 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]).get();
         float x2y1 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]).get();
 
         float x0y2 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]+1).get();
         float x1y2 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]+1).get();
         float x2y2 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]+1).get();
-    
+
         float x = theCenter[0]
-            + 0.125 * ((- (x0y0 / theMaximum)) + (x2y0 / theMaximum))
-            + 0.75  * ((- (x0y1 / theMaximum)) + (x2y1 / theMaximum))
-            - 0.125 * ((- (x0y2 / theMaximum)) + (x2y2 / theMaximum));
+                + 0.125f * ((- (x0y0 / theMaximum)) + (x2y0 / theMaximum))
+                + 0.75f  * ((- (x0y1 / theMaximum)) + (x2y1 / theMaximum))
+                - 0.125f * ((- (x0y2 / theMaximum)) + (x2y2 / theMaximum));
 
         float y = theCenter[1]
-            + 0.125 * ((- (x0y0 / theMaximum)) + (x0y2 / theMaximum))
-            + 0.75  * ((- (x1y0 / theMaximum)) + (x1y2 / theMaximum))
-            - 0.125 * ((- (x2y0 / theMaximum)) + (x2y2 / theMaximum));
-    
+                + 0.125f * ((- (x0y0 / theMaximum)) + (x0y2 / theMaximum))
+                + 0.75f  * ((- (x1y0 / theMaximum)) + (x1y2 / theMaximum))
+                - 0.125f * ((- (x2y0 / theMaximum)) + (x2y2 / theMaximum));
+
         myResult[0] = x;
         myResult[1] = y;
 
@@ -635,10 +637,10 @@ namespace y60 {
 
     void 
     ASSDriver::updateCursors(double theDeltaT, const ASSEvent & theEvent) {
-        y60::RasterOfGRAY & myDenoisedRaster = *
+        /*y60::RasterOfGRAY & myDenoisedRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
 
-        y60::RasterOfGRAY & myRawRaster = *
+        /*y60::RasterOfGRAY & myRawRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
         CursorMap::iterator myCursorIt = _myCursors.begin();
@@ -773,7 +775,7 @@ namespace y60 {
 
     {
 
-        y60::RasterOfGRAY & myRawRaster = *
+        /*y60::RasterOfGRAY & myRawRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
         Matrix4f myTransform = getTransformationMatrix();
@@ -785,7 +787,7 @@ namespace y60 {
         DistanceMap myDistanceMap;
         float myDistanceThreshold = 4.0;
         if (_myTransportLayer->getGridSpacing() > 0) {
-            myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
+            myDistanceThreshold *= 100.0f / _myTransportLayer->getGridSpacing();
         }
         AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
         CursorMap::iterator myCursorIt  = _myCursors.begin();
@@ -887,7 +889,7 @@ namespace y60 {
 
     {
 
-        y60::RasterOfGRAY & myRawRaster = *
+        /*y60::RasterOfGRAY & myRawRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
         Matrix4f myTransform = getTransformationMatrix();
@@ -899,7 +901,7 @@ namespace y60 {
         DistanceMap myDistanceMap;
         float myDistanceThreshold = 4.0;
         if (_myTransportLayer->getGridSpacing() > 0) {
-            myDistanceThreshold *= 100.0 / _myTransportLayer->getGridSpacing();
+            myDistanceThreshold *= 100.0f / _myTransportLayer->getGridSpacing();
         }
         AC_TRACE << "cursors: " <<_myCursors.size()<< " current positions: " << theCurrentPositions.size() << "; distance threshold: " << myDistanceThreshold;
         CursorMap::iterator myCursorIt  = _myCursors.begin();
@@ -1099,11 +1101,11 @@ namespace y60 {
     ASSDriver::drawGrid() {
         glColor4fv( _myGridColor.begin() );
         glBegin( GL_LINES );
-        for (unsigned i = 0; i < _myGridSize[0]; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myGridSize[0]); ++i) {
             glVertex2f(float(i), 0.0);
             glVertex2f(float(i), float(_myGridSize[1] - 1));
         }
-        for (unsigned i = 0; i < _myGridSize[1]; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myGridSize[1]); ++i) {
             glVertex2f( 0.0, float(i));
             glVertex2f( float(_myGridSize[0] - 1), float(i));
         }
@@ -1546,13 +1548,13 @@ namespace y60 {
     void
     ASSDriver::copyFrame(unsigned char * theData ) {
     
-        y60::RasterOfGRAY & myRaster = *
+        /*y60::RasterOfGRAY & myRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
 
         unsigned char * myDstPtr = _myRawRaster.raster->pixels().begin();
         unsigned char * mySrcPtr = theData;
-        for (unsigned y = 0; y < _myGridSize[1]; ++y) {
+        for (unsigned y = 0; y < static_cast<unsigned>(_myGridSize[1]); ++y) {
             memcpy( myDstPtr, mySrcPtr, _myGridSize[0]);
             myDstPtr += _myPoTSize[0];
             mySrcPtr += _myGridSize[0];

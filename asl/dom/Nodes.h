@@ -562,9 +562,10 @@ namespace dom {
         /** query parsing success returns true if everything was parsed,
             false if parsing was aborted due to malformed xml data
         */
-        /*virtual*/ operator bool() const {
-            return (nodeType()!=X_NO_NODE) && (_myParseCompletionPos == _myDocSize)
-                && (nodeType()!=DOCUMENT_NODE || hasLazyChildren() || getChildren().size());
+        /*virtual*/ operator const void*() const {
+            return ( (nodeType()!=X_NO_NODE) && (_myParseCompletionPos == _myDocSize)
+                  && (nodeType()!=DOCUMENT_NODE || hasLazyChildren() || getChildren().size()) )
+                  ? this : NULL;
         }
         /// returns the position past the last character processed Parse()
         /*virtual*/ int parsedUntil() const {
@@ -618,7 +619,7 @@ namespace dom {
             return appendChild(NodePtr(child.cloneNode(DEEP)));
         }
         /// returns what the name promises
-        int childNodesLength() const {
+        NodeList::size_type childNodesLength() const {
             return getChildren().length();
         }
         /// returns what the name promises
@@ -640,7 +641,7 @@ namespace dom {
         /** @return a read only pointer to node's i'th child
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
-        const NodePtr childNode(int i) const {
+        const NodePtr childNode(NodeList::size_type i) const {
             if (i < 0 || i >= getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
@@ -649,21 +650,21 @@ namespace dom {
         /** @return a pointer to node's i'th child
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
-        NodePtr childNode(int i)  {
+        NodePtr childNode(NodeList::size_type i)  {
             if (i < 0 || i >=getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
             return getChildren().item(i);
         }
         /// returns the number of children of this node with this name
-        int childNodesLength(const DOMString & name) const {
+        NamedNodeMap::size_type childNodesLength(const DOMString & name) const {
             return NamedNodeMap::countNodesNamed(name,getChildren());
         }
         /** @return a read only pointer to node's i'th child
             of this node with this name or 0 if it does not exist
         */
-        const NodePtr childNode(const DOMString & name, int n) const {
-            int i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
+        const NodePtr childNode(const DOMString & name, NodeList::size_type n) const {
+            NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
             if (i<getChildren().size()) {
                 return getChildren().item(i);
             }
@@ -676,8 +677,8 @@ namespace dom {
         /** @return a pointer to node's i'th child
             of this node with this name or 0 if it does not exist
         */
-        NodePtr childNode(const DOMString & name, int n) {
-            int i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
+        NodePtr childNode(const DOMString & name, NodeList::size_type n) {
+            NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,n,getChildren());
             if (i<getChildren().size()) {
                 return getChildren().item(i);
             }
@@ -864,14 +865,14 @@ namespace dom {
         }
 
         /// returns the number of attribute nodes in this node
-        int attributesLength() const {
+        NodeList::size_type attributesLength() const {
             return _myAttributes.size();
         }
 
         /** @return a read only pointer to the i'th attribute node
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..attributesLength()-1]
         */
-        const NodePtr getAttribute(int i) const {
+        const NodePtr getAttribute(NodeList::size_type i) const {
             if (i < 0 || i >=_myAttributes.size())
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             return _myAttributes.item(i);
@@ -880,13 +881,13 @@ namespace dom {
         /** @return a pointer to the i'th attribute node
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..attributesLength()-1]
         */
-        NodePtr getAttribute(int i) {
+        NodePtr getAttribute(NodeList::size_type i) {
             if (i < 0 || i >=_myAttributes.size())
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             return _myAttributes.item(i);
         }
         /// returns the number of attribute nodes in this node with this name
-        int attributesLength(const DOMString & name) const {
+        NamedNodeMap::size_type attributesLength(const DOMString & name) const {
             return NamedNodeMap::countNodesNamed(name,_myAttributes);
         }
 
@@ -894,7 +895,7 @@ namespace dom {
             or 0 if no attribute with given name exists
         */
         const NodePtr getAttribute(const DOMString & name) const {
-            int i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
+            NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
             if (i<_myAttributes.size()) return _myAttributes.item(i);
             return NodePtr(0);
         }
@@ -903,7 +904,7 @@ namespace dom {
             or 0 if no attribute with given name exists
         */
         NodePtr getAttribute(const DOMString & name) {
-            int i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
+            NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
             if (i<_myAttributes.size()) return _myAttributes.item(i);
             return NodePtr(0);
         }
@@ -983,7 +984,7 @@ namespace dom {
         }
         void binarize(asl::WriteableStream & theDest) const {
             Dictionaries myDicts;
-            binarize(theDest, myDicts, 0, B60_MAGIC);
+            binarize(theDest, myDicts, 0, static_cast<asl::Unsigned32>(B60_MAGIC));
         }
          void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl::Unsigned32 theMagic) const {
             binarize(theDest, theDicts, 0, theMagic);
@@ -1026,7 +1027,7 @@ namespace dom {
           
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
             Dictionaries myDicts;
-            binarize(thePatch, myDicts, theOldVersion + 1, P60_MAGIC);
+            binarize(thePatch, myDicts, theOldVersion + 1, static_cast<asl::Unsigned32>(P60_MAGIC));
         }
         /// return true if something has changed
         bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0) {
@@ -1041,7 +1042,7 @@ namespace dom {
         NodePtr loadPathById(const DOMString & theId, const DOMString & theIdAttribute);
         void collectOffsets(NodeOffsetCatalog & theCatalog, asl::AC_SIZE_TYPE theParentIndex = asl::AC_SIZE_TYPE(-1)) const {
             theParentIndex = theCatalog.enterUID(_myUniqueId, _mySavePosition, _mySaveEndPosition, theParentIndex);
-            for (unsigned i = 0; i < getChildren().size(); ++i) {
+            for (NodeList::size_type i = 0; i < getChildren().size(); ++i) {
                 getChildren()[i].collectOffsets(theCatalog, theParentIndex);
             }
         }
@@ -1286,7 +1287,7 @@ Dependent on node type allowed children are:<p>
  
         void reparent(Node * theNewParent, Node * theTopNewParent);
 
-        int parseNextNode(const DOMString & is, int pos,
+        std::string::size_type parseNextNode(const DOMString & is, std::string::size_type pos,
                              const Node * parent, const Node * doctype);
         // parse eg.  name="bla" width="10"
         int parseAttributes(const DOMString & is, int pos, int global_pos, const Node * doctype);
@@ -1411,7 +1412,7 @@ Dependent on node type allowed children are:<p>
         }
         bool parse(const DOMString & xml) {
             Node::parseAll(xml);
-            return operator bool();
+            return 0 != operator const void*();
         }
     };
 
@@ -1429,7 +1430,7 @@ Dependent on node type allowed children are:<p>
         /// fill document fragment node from xml string, true if successful
         bool parse(const DOMString & xml) {
             Node::parseAll(xml);
-            return operator bool();
+            return 0 != operator const void*();
         }
     };
 
@@ -1563,7 +1564,7 @@ Dependent on node type allowed children are:<p>
     inline
     unsigned int countNodes(const Node & theDom) {
         unsigned int myNodeCount = 1 + theDom.attributesLength();
-        for (int i = 0; i < theDom.childNodesLength();++i) {
+        for (NodeList::size_type i = 0; i < theDom.childNodesLength();++i) {
             myNodeCount += countNodes(*theDom.childNode(i));
         }
         return myNodeCount;

@@ -98,7 +98,7 @@ RemoveMessage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
         guint theMessageId;
         convertFrom(cx, argv[0], theMessageId);
 
-        guint theContextId;
+        guint theContextId = 0;
         if (argc > 1) {
             convertFrom(cx, argv[1], theContextId);
         }

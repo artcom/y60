@@ -49,7 +49,7 @@ namespace y60 {
         }   
     }
 
-	void 
+    void 
     AdaptiveBackground::onFrame(double t) {
         if (_myCounter < 10) {
             _myCounter++;
@@ -70,8 +70,8 @@ namespace y60 {
             float myWeight = (static_cast<float>((*itBlob)[0]) / 256.0f);
             
             for (unsigned int i=0; i<3; ++i) {
-                    (*itTarg)[i] = static_cast<unsigned char>((*itTarg)[i]) * myWeight;
-                    (*itTarg)[i] += static_cast<unsigned char>((*itSrc)[i]) * (1-myWeight);
+                (*itTarg)[i] = static_cast<asl::pchar>((*itTarg)[i] * myWeight);
+                (*itTarg)[i] += static_cast<asl::pchar>((*itSrc)[i] * (1-myWeight));
             }
         }
 

@@ -50,7 +50,7 @@ ConsoleView::append(const Glib::ustring & theText, const Glib::ustring & theTagN
         Gtk::TextIter myEnd = myBuffer->end();
         scroll_to( myEnd, 0.0);
 
-        while ( myBuffer->get_line_count() > _myScrollback) {
+        while ( myBuffer->get_line_count() > static_cast<int>(_myScrollback) ) {
             myBuffer->erase( myBuffer->begin(), myBuffer->get_iter_at_line( 1 ));
         }
     }

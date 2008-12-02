@@ -217,7 +217,7 @@ namespace asl {
     std::ostream & operator << (std::ostream & os, const Sphere<Number> & theSphere) {
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printSphere(os, theSphere,
-                    os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                    0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );

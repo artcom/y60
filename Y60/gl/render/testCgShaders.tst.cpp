@@ -57,7 +57,7 @@ int main(int argc, char * argv[]) {
         myProfiles.push_back(std::make_pair("vp40", "fp40"));
         myProfiles.push_back(std::make_pair("gp4vp", "gp4fp"));
         
-        for (int i = 0; i < myProfiles.size(); ++i) {
+        for (std::vector<std::pair<std::string, std::string> >::size_type i = 0; i < myProfiles.size(); ++i) {
             //testShaderLibrary(myLibraryDir+"toonshaders.xml", myProfiles[i].first, myProfiles[i].second);
             testShaderLibrary(myLibraryDir+"shaderlibrary.xml", myProfiles[i].first, myProfiles[i].second);
         }

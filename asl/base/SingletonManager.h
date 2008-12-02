@@ -110,7 +110,7 @@ private:
     class LessTypeInfoPtr {  
     public:  
         bool operator()(const std::type_info *theLeft, const std::type_info *theRight) const {  
-            return theLeft->before(*theRight);  
+            return 0 != theLeft->before(*theRight);  
         }  
     };  
   

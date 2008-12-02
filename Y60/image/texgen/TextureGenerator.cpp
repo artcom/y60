@@ -24,21 +24,25 @@
 //
 //=============================================================================
 
+#include <assert.h>
+#include <stdexcept>
+#include <stdlib.h>
+#include <algorithm>
+#include <stdio.h>
+#include <math.h>
+
 
 #include <asl/base/settings.h>
-
-#ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
-#pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
-#endif
+#include <asl/base/string_functions.h>
+#include <asl/dom/Nodes.h>
 
 #include "TextureGenerator.h"
 #include "LitTerrainTexGen.h"
 #include "XmlHelper.h"
 
-#include <asl/base/string_functions.h>
-
-#include <asl/dom/Nodes.h>
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
 #include <paintlib/plpoint.h>
 #include <paintlib/plpngenc.h>
@@ -46,13 +50,9 @@
 #include <paintlib/Filter/plfiltercrop.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
 #include <paintlib/Filter/plfilterfill.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <stdlib.h>
-#include <algorithm>
-#include <stdio.h>
-#include <math.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace dom;
@@ -258,12 +258,12 @@ TextureGenerator::blendBitmaps
         PLPixel32 * myResultLine = myResultBmp.GetLineArray32()[y];
         PLPixel32 * myBlendLine = myBlendBmp.GetLineArray32()[y];
         for (int x = 0; x < myResultBmp.GetWidth(); x++) {
-            myResultLine[x].SetR(int (myResultLine[x].GetR()*myBlendFactor + 
-                                     myBlendLine[x].GetR()*(1-myBlendFactor)));
-            myResultLine[x].SetG(int (myResultLine[x].GetG()*myBlendFactor + 
-                                     myBlendLine[x].GetG()*(1-myBlendFactor)));
-            myResultLine[x].SetB(int (myResultLine[x].GetB()*myBlendFactor + 
-                                     myBlendLine[x].GetB()*(1-myBlendFactor)));
+            myResultLine[x].SetR( static_cast<PLBYTE>( int(myResultLine[x].GetR()*   myBlendFactor + 
+                                                           myBlendLine [x].GetR()*(1-myBlendFactor))) );
+            myResultLine[x].SetG( static_cast<PLBYTE>( int (myResultLine[x].GetG()*   myBlendFactor + 
+                                                            myBlendLine [x].GetG()*(1-myBlendFactor))) );
+            myResultLine[x].SetB( static_cast<PLBYTE>( int (myResultLine[x].GetB()*    myBlendFactor + 
+                                                            myBlendLine [x].GetB()*(1-myBlendFactor))) );
         }
     }
 

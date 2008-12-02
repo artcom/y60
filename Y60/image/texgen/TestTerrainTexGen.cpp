@@ -21,17 +21,16 @@
 //
 //=============================================================================
 
-#include <asl/base/settings.h>
-
-#ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
-#pragma warning(disable:4786)  
-#endif
-
-#include "TerrainTexGen.h"
-#include "LayerDefinition.h"
-#include "TextureDefinition.h"
 #include "TestTerrainTexGen.h"
 
+#include <typeinfo>
+#include <stdexcept>
+#include <assert.h>
+#include <sstream>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plpixel32.h>
@@ -42,12 +41,15 @@
 #include <paintlib/plpngenc.h>
 #include <paintlib/Filter/plfilterfillrect.h>
 #include <paintlib/Filter/plfiltercrop.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <typeinfo>
-#include <stdexcept>
-#include <assert.h>
+#include <asl/base/settings.h>
 
-#include <sstream>
+#include "TerrainTexGen.h"
+#include "LayerDefinition.h"
+#include "TextureDefinition.h"
 
 using namespace TexGen;
 using namespace std;

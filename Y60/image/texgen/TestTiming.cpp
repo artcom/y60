@@ -22,12 +22,14 @@
 //=============================================================================
 
 #include "TestTiming.h"
-#include "TextureGenerator.h"
 
-#include <asl/dom/Nodes.h>
-#include <asl/base/string_functions.h>
-#include <asl/base/Time.h>
+#include <stdexcept>
+#include <fstream>
+#include <math.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plpixel32.h>
@@ -35,10 +37,15 @@
 #include <paintlib/plrect.h>
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <stdexcept>
-#include <fstream>
-#include <math.h>
+#include <asl/dom/Nodes.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Time.h>
+
+#include "TextureGenerator.h"
 
 using namespace TexGen;
 using namespace dom;

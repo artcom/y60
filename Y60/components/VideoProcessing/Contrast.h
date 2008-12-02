@@ -15,30 +15,30 @@
 #include "Algorithm.h"
 
 namespace y60 {
-	class Contrast : public Algorithm {
-		public:
-            Contrast(const std::string & theName);
+    class Contrast : public Algorithm {
+    public:
+        Contrast(const std::string & theName);
 
-			static std::string getName() { return "contrast"; }
-		    void onFrame(double t);
-            
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
+        static std::string getName() { return "contrast"; }
+        void onFrame(double t);
 
-		private:
-            void updateLookupTable();
-            dom::Element  _myResultNode;
-            y60::ImagePtr _mySourceImage;
-            y60::ImagePtr _myTargetImage;
-            
-            float _myUpper;
-            float _myLower;
-           
-            unsigned _myImageNodeVersion;
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
 
-            std::vector<unsigned char> _myLookupTable;
+    private:
+        void updateLookupTable();
+        dom::Element  _myResultNode;
+        y60::ImagePtr _mySourceImage;
+        y60::ImagePtr _myTargetImage;
+
+        float _myUpper;
+        float _myLower;
+
+        asl::Unsigned64 _myImageNodeVersion;
+
+        std::vector<unsigned char> _myLookupTable;
     };
 }
 

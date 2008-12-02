@@ -16,10 +16,18 @@
 #include <asl/base/Logger.h>
 
 #include <iostream>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4413 4244)
+#endif //defined(_MSC_VER)
 #include <gtkmm/main.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>
 #include <gdkmm/drawable.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 

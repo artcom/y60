@@ -55,8 +55,7 @@ namespace y60 {
 
     void
     BuilderBase::removeNodeById(dom::NodePtr theListNode, const std::string & theId) {
-        unsigned int myNumChilds = theListNode->childNodesLength();
-        for(int i = 0; i< myNumChilds; i++) {
+        for(dom::NodeList::size_type i = 0; i< theListNode->childNodesLength(); i++) {
             dom::NodePtr myChild = theListNode->childNode(i);
             if (myChild->getAttributeString(ID_ATTRIB) == theId) {
                 theListNode->removeChild(myChild);

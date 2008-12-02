@@ -284,7 +284,6 @@ getStaticProperty(JSContext *cx, JSObject * obj, jsval id, jsval * vp) {
         DISPATCH_CURSOR( AC_EDIT_ANGLE3 );
         default:
             JS_ReportError(cx,"JSGdkCursor::getStaticProperty: index %d out of range", myID);
-            return JS_FALSE;
     }
     return JS_FALSE;
 }
@@ -296,8 +295,6 @@ setStaticProperty(JSContext *cx, JSObject * obj, jsval id, jsval * vp) {
         case 0:
         default:
             JS_ReportError(cx,"JSGdkCursor::setStaticProperty: index %d out of range", myID);
-            return JS_FALSE;
-
     }
     return JS_FALSE;
 }

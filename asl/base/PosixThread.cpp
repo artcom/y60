@@ -39,7 +39,7 @@ namespace asl {
 void *
 threadFunc (void * This) {
     int bla;
-    int *blabla = &bla;
+    int *blabla = &bla; (void)blabla;
     DB(AC_TRACE << "stack address is = " << blabla << endl);
 
     DB(AC_TRACE << "threadFunc This= " << This << endl);

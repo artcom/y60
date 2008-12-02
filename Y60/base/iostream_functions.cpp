@@ -70,7 +70,7 @@ namespace asl {
         for (unsigned i = 0; i < theStringVector.size(); ++i) {
             const std::string & myString = theStringVector[i];
             theStream << "`";
-            for (int j = 0; j < myString.size();++j) {
+            for (std::string::size_type j = 0; j < myString.size();++j) {
                 const char & c = myString[j];
                 if (c == '`' || c == '[' || c == ']' || c == ',' || c == '\\') {
                     theStream << '\\';

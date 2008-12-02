@@ -42,7 +42,7 @@ public:
     void run() {
         PIX blackPixel;
         //DPRINT(&blackPixel);
-        fill(begin(blackPixel),end(blackPixel),0);
+        fill(begin(blackPixel),end(blackPixel),0.0);
         //DPRINT(blackPixel);
         PIX firstPixel = blackPixel;
         //DPRINT(firstPixel);
@@ -78,7 +78,7 @@ public:
         ENSURE(secondPixel == firstPixel);
 
         std::multiplies<PIX> myMultiplier;
-        PIX somePix = myMultiplier(firstPixel, secondPixel);
+        /*PIX somePix =*/ myMultiplier(firstPixel, secondPixel);
 
         typename SumTraits<PIX>::type mySum = typename SumTraits<PIX>::type(firstPixel) + typename SumTraits<PIX>::type(secondPixel);
         ENSURE(mySum == typename SumTraits<PIX>::type(firstPixel + secondPixel));

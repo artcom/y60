@@ -32,7 +32,7 @@ namespace y60 {
         std::string myName( theName );
 
         if (myName.length() >= 2 && myName[myName.length() - 2] == '.') {
-            char myLastChar = tolower(myName[myName.length() - 1]);
+            char myLastChar = static_cast<char>(tolower(myName[myName.length() - 1]));
             switch (myLastChar) {
                 case 'x':
                 case 'r':
@@ -118,7 +118,7 @@ namespace y60 {
                 dom::NodePtr myPropPtr = myAnimatedNode->childNode(PROPERTY_LIST_NAME);
 
                 dom::NodePtr myNode;
-                for (int i=0; i<myPropPtr->childNodes().length(); ++i) {
+                for (dom::NodeList::size_type i=0; i<myPropPtr->childNodes().length(); ++i) {
                     myNode = myPropPtr->childNode(i);
                     if (myNode->getAttribute("name")->nodeValue() == myAttributeRef) {
                         myAnimatedAttribute = myNode->firstChild();

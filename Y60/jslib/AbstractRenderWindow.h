@@ -18,7 +18,7 @@
 
 #include <y60/scene/Canvas.h>
 #include <y60/scene/IFrameBuffer.h>
-#include <y60/render/Renderer.h>
+#include <y60/glrender/Renderer.h>
 #include <y60/gltext/TTFTextRenderer.h>
 #include <y60/glutil/IGLContextManager.h>
 #include <y60/inet/RequestManager.h>

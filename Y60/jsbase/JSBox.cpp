@@ -83,23 +83,23 @@ intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_FALSE;
 }
 
-static JSBool
-intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Intersect the Box with another one.");
-    DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX3F);
-    DOC_END;
-    if (argc == 1) {
-        if (JSBox3f::matchesClassOf(cx, argv[0])) {
-            typedef void (NATIVE::*MyMethod)(const asl::Box3<Number> &);
-            return Method<NATIVE>::call((MyMethod)&NATIVE::intersects,cx,obj,argc,argv,rval);
-        } else {
-            JS_ReportError(cx,"JSBox3f::intersect: bad arguments, Box3f expected");
-            return JS_FALSE;
-        }
-    }
-    JS_ReportError(cx,"JSBox3f::intersect: bad number of arguments, 1 expected");
-    return JS_FALSE;
-}
+//static JSBool
+//intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//    DOC_BEGIN("Intersect the Box with another one.");
+//    DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX3F);
+//    DOC_END;
+//    if (argc == 1) {
+//        if (JSBox3f::matchesClassOf(cx, argv[0])) {
+//            typedef void (NATIVE::*MyMethod)(const asl::Box3<Number> &);
+//            return Method<NATIVE>::call((MyMethod)&NATIVE::intersects,cx,obj,argc,argv,rval);
+//        } else {
+//            JS_ReportError(cx,"JSBox3f::intersect: bad arguments, Box3f expected");
+//            return JS_FALSE;
+//        }
+//    }
+//    JS_ReportError(cx,"JSBox3f::intersect: bad number of arguments, 1 expected");
+//    return JS_FALSE;
+//}
 static JSBool
 contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Check if the Box contains a point/box.");
@@ -218,21 +218,21 @@ JSBox3f::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         /* name                native          nargs    */
-        {"makeEmpty",          makeEmpty,               0},
-        {"makeFull",           makeFull,                0},
-        {"makeCorrect",        makeCorrect,             0},
-        {"extendBy",           extendBy,                1}, // point, box
-        {"contains",           contains,                0}, // point, box
-        {"intersects",         intersects,              1}, // box
-        {"intersect",         intersects,               1}, // box
-        {"envelopes",          envelopes,               1},
-        {"touches",            touches,                 1},
-        {"setBounds",          setBounds,               2},
-        {"add",                add,                     1},
-        {"sub",                sub,                     1},
-        {"mult",               mult,                    1},
-        {"div",                div,                     1},
-        {"toString",           toString,                0},
+        {"makeEmpty",          makeEmpty,      0         },
+        {"makeFull",           makeFull,       0         },
+        {"makeCorrect",        makeCorrect,    0         },
+        {"extendBy",           extendBy,       1         }, // point, box
+        {"contains",           contains,       0         }, // point, box
+        {"intersects",         intersects,     1         }, // box
+        {"intersect",          intersects,     1         }, // box
+        {"envelopes",          envelopes,      1         },
+        {"touches",            touches,        1         },
+        {"setBounds",          setBounds,      2         },
+        {"add",                add,            1         },
+        {"sub",                sub,            1         },
+        {"mult",               mult,           1         },
+        {"div",                div,            1         },
+        {"toString",           toString,       0         },
         {0}
     };
     return myFunctions;

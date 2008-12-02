@@ -18,41 +18,39 @@
 //
 //=============================================================================
 
-#include "TextureCompressor.h"
-#include "GLUtils.h"
-#include "PixelEncodingInfo.h"
-
-#include <asl/base/settings.h>
-#include <asl/base/file_functions.h>
-#include <asl/base/Logger.h>
-
-#ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
-#pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
-#endif
-
-#include <stdexcept>
-#include <paintlib/planybmp.h>
-#include <paintlib/planydec.h>
-#include <paintlib/pltiffenc.h>
-#include <paintlib/Filter/plfilterflip.h>
-
-
-
 #include <iostream>
 #include <cstring>
 #include <errno.h>
+#include <stdexcept>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
+
+#include <asl/base/settings.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/Logger.h>
 #include <asl/math/numeric_functions.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/planybmp.h>
+#include <paintlib/planydec.h>
+#include <paintlib/pltiffenc.h>
+#include <paintlib/Filter/plfilterflip.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "TextureCompressor.h"
+#include "GLUtils.h"
+#include "PixelEncodingInfo.h"
 
 namespace y60 {
 
     using namespace std;
-    using namespace y60;
 
 
     TextureCompressor::TextureCompressor (PixelEncoding myFormat)

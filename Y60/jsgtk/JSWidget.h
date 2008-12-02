@@ -14,9 +14,17 @@
 #include "JSRenderArea.h"
 
 #include <y60/jsbase/JSWrapper.h>
-#include <gtkmm/widget.h>
 #include <y60/jslib/JSAbstractRenderWindow.h>
 #include <asl/base/string_functions.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244 4251)
+#endif //defined(_MSC_VER)
+#include <gtkmm/widget.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 namespace jslib {
 

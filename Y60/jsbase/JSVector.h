@@ -43,21 +43,40 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
 bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
 bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
 
-template <template<class> class NATIVE_VECTOR, class NUMBER>
-jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<NUMBER> & theValue) {
-    JSObject * myReturnObject = JSVector<NATIVE_VECTOR<NUMBER> >::Construct(cx, theValue);
-    return OBJECT_TO_JSVAL(myReturnObject);
+namespace detail {
+    template <template<class> class NATIVE_VECTOR, class NUMBER>
+    struct as_jsval_helper {
+        static jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<NUMBER> & theValue) {
+            JSObject * myReturnObject = JSVector<NATIVE_VECTOR<NUMBER> >::Construct(cx, theValue);
+            return OBJECT_TO_JSVAL(myReturnObject);
+        }
+    };
+    template <template<class> class NATIVE_VECTOR>
+    struct as_jsval_helper<NATIVE_VECTOR,asl::AC_SIZE_TYPE> {
+        static jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<asl::AC_SIZE_TYPE> & theValue) {
+            NATIVE_VECTOR<int> tmp( reinterpret_cast<const int*>(&*theValue.begin())
+                                  , reinterpret_cast<const int*>(&*theValue.end  ()) );
+            JSObject * myReturnObject = JSVector<NATIVE_VECTOR<int> >::Construct(cx, tmp);
+            return OBJECT_TO_JSVAL(myReturnObject);
+        }
+    };
 }
 
 template <template<class> class NATIVE_VECTOR, class NUMBER>
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, NATIVE_VECTOR<NUMBER> *) {
+inline jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<NUMBER> & theValue) {
+    return detail::as_jsval_helper<NATIVE_VECTOR,NUMBER>::as_jsval(cx,theValue);
+}
+
+template <template<class> class NATIVE_VECTOR, class NUMBER>
+inline jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, NATIVE_VECTOR<NUMBER> *) {
     JSObject * myReturnObject = JSVector<NATIVE_VECTOR<NUMBER> >::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
 template <template <class> class NATIVE_VECTOR, class NUMBER>
-jsval as_jsval(JSContext *cx,
-               asl::Ptr<dom::VectorValue<NATIVE_VECTOR<NUMBER> >,dom::ThreadingModel> theValue)
+inline jsval as_jsval(JSContext *cx,
+                      asl::Ptr<dom::VectorValue<NATIVE_VECTOR<NUMBER> >,
+                      dom::ThreadingModel> theValue)
 {
     JSObject * myReturnObject = JSVector<NATIVE_VECTOR<NUMBER> >::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myReturnObject);

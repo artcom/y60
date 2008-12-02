@@ -82,7 +82,8 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     _myCurrentMultiplex( 0 ),
     _myMultiplexMax( 0 )
 {
-    getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 100);
+    getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 
+                      static_cast<std::queue<ASSEvent>::size_type>(100u));
 
 #ifdef TL_LATENCY_TEST
     _myLatencyTestPort = getSerialDevice(0);
@@ -189,7 +190,6 @@ TransportLayer::getBytesPerStatusLine() {
     }
     throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
             PLUS_FILE_LINE );
-    return MAX_STATUS_LINE_LENGTH; // never get here ... just avoid the warning
 }
 
 size_t
@@ -209,7 +209,7 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
             std::vector<unsigned char>::iterator myIt = _myTmpBuffer.begin() + 2;
             _myFirmwareVersion = readStatusToken( myIt, 'V' );
             Vector2i myGridSize;
-            unsigned myChecksum;
+            unsigned myChecksum = 0;
             bool myHasChecksumFlag = true;
             if ( _myFirmwareVersion < 260 ) {
                 myGridSize[0] = 20;
@@ -345,7 +345,7 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             int myRowIdx = _myTmpBuffer[1] - 1;
             //AC_PRINT << "Got row: " << myRowIdx;
 
-            size_t byteCount = (_myTmpBuffer.begin() + 2 + valuesPerLine() ) - (_myTmpBuffer.begin() + 2);
+            //size_t byteCount = (_myTmpBuffer.begin() + 2 + valuesPerLine() ) - (_myTmpBuffer.begin() + 2);
             if ( ! _myFrameBuffer ) {
                 // TODO use smart pointers 
                 _myFrameBuffer = new unsigned char[ _myGridSize[0] * _myGridSize[1] ];

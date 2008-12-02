@@ -174,7 +174,7 @@ JSListStore::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
         return JS_FALSE;
     }
 
-    NATIVE * newNative = 0;
+    //NATIVE * newNative = 0;
 
     JSListStore * myNewObject = 0;
 

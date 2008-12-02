@@ -12,11 +12,18 @@
 #define _Y60_ACGTKSHELL_JSRENDERAREA_INCLUDED_
 
 #include <y60/acgtk/RenderArea.h>
-
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244 4251)
+#endif //defined(_MSC_VER)
 #include <gtkmm/window.h>
 #include <gtkmm/widget.h>
 #include <gtkmm/container.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 

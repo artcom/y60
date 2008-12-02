@@ -487,34 +487,32 @@ namespace asl {
      */
     template <class NUMBER>
     Quaternion<NUMBER>
-    slerp(const Quaternion<NUMBER> & q, const Quaternion<NUMBER> & r, const NUMBER & theT) {
-        Quaternion<NUMBER> myResult;
-    	NUMBER myDot;
-    	myDot = dot(q, r);
+        slerp(const Quaternion<NUMBER> & q, const Quaternion<NUMBER> & r, const NUMBER & theT) {
+            Quaternion<NUMBER> myResult;
+            NUMBER myDot;
+            myDot = dot(q, r);
 
-    	/*
-    	myDot = cos(theta)
-    	if (myDot < 0), q and r are more than 90 degrees apart,
-    	so we can invert one to reduce spinning
-    	*/
-    	if (myDot < 0) {
-    		myDot = -myDot;
-    		myResult = r * NUMBER(-1.0);
-    	} else {
-    		myResult = r;
-    	}
-    	if (myDot < 0.95f) {
-    		NUMBER myAngle = static_cast<float>(acos(myDot));
-    		NUMBER mySinA, mySinAt, mySinAomt;
-    		mySinA = static_cast<NUMBER>(sin(myAngle));
-    		mySinAt = static_cast<NUMBER>(sin(myAngle * theT));
-    		mySinAomt = static_cast<NUMBER>(sin(myAngle*(1-theT)));
-    		return (q * mySinAomt + myResult*mySinAt ) / mySinA;
-    	} else {
+            /*
+            myDot = cos(theta)
+            if (myDot < 0), q and r are more than 90 degrees apart,
+            so we can invert one to reduce spinning
+            */
+            if (myDot < 0) {
+                myDot = -myDot;
+                myResult = r * NUMBER(-1.0);
+            } else {
+                myResult = r;
+            }
+            if (myDot < 0.95f) {
+                NUMBER myAngle = static_cast<float>(acos(myDot));
+                NUMBER mySinA, mySinAt, mySinAomt;
+                mySinA = static_cast<NUMBER>(sin(myAngle));
+                mySinAt = static_cast<NUMBER>(sin(myAngle * theT));
+                mySinAomt = static_cast<NUMBER>(sin(myAngle*(1-theT)));
+                return (q * mySinAomt + myResult*mySinAt ) / mySinA;
+            } 
             // if the myAngle is small, use linear interpolation
-    		return lerp( q, myResult, theT);
-    	}
-        return myResult;
+            return lerp( q, myResult, theT);
     }
 
     typedef Quaternion<float>  Quaternionf;

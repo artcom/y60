@@ -22,7 +22,9 @@
 #include <asl/base/Ptr.h>
 #include <string>
 #include <vector>
+#if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0501
+#endif
 #include <windows.h>
 
 namespace y60 {

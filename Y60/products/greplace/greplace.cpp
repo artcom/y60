@@ -38,9 +38,9 @@ bool isNameChar(char c) {
 };
 
 
-bool isQuoted(const string & myLine, int myPosInLine) {
+bool isQuoted(const string & myLine, string::size_type myPosInLine) {
     int myApostrophCount = 0;
-    int myPos = myPosInLine;
+    string::size_type myPos = myPosInLine;
     while ((myPos = myLine.rfind('"', myPos)) != string::npos) {
         //cerr << "myPos=" << myPos << endl;
         if (myPos > 0) {
@@ -58,25 +58,25 @@ bool isQuoted(const string & myLine, int myPosInLine) {
     return myApostrophCount % 2 != 0;
 }
 
-bool isCppComment(const string & myLine, int myPosInLine) {
+bool isCppComment(const string & myLine, string::size_type myPosInLine) {
     if ((myPosInLine = myLine.rfind("//", myPosInLine)) != string::npos) {
         return !isQuoted(myLine, myPosInLine);
     }
     return false;
 }
 
-void getLine(const string & myFile, int myPosInFile, string & myLine, int & myPosInLine) {
-    int myLineStart = myFile.rfind('\n',myPosInFile) + 1;
-    int myLineEnd = myFile.find('\n',myPosInFile);
+void getLine(const string & myFile, string::size_type myPosInFile, string & myLine, string::size_type & myPosInLine) {
+    string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
+    string::size_type myLineEnd = myFile.find('\n',myPosInFile);
     myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
     myPosInLine = myPosInFile - myLineStart;
 }
 
-int find_C_CommentToken(const string & myFile, int myPosInFile, const string & myToken) {
-    int myTokenPos = myPosInFile;
+string::size_type find_C_CommentToken(const string & myFile, string::size_type myPosInFile, const string & myToken) {
+    string::size_type myTokenPos = myPosInFile;
     while ((myTokenPos = myFile.rfind(myToken, myTokenPos)) != string::npos) {
         string myLine;
-        int myPosInLine;
+        string::size_type myPosInLine;
         getLine(myFile, myTokenPos, myLine, myPosInLine);
         if (!isCppComment(myLine, myPosInLine) && !isQuoted(myLine, myPosInLine)) {
             // this is our normal positive exit
@@ -88,11 +88,11 @@ int find_C_CommentToken(const string & myFile, int myPosInFile, const string & m
     return myTokenPos;
 }
 
-bool isCComment(const string & myFile, int myPosInFile) {
-    int myCommentStartPos = find_C_CommentToken(myFile, myPosInFile, "/*");
+bool isCComment(const string & myFile, string::size_type myPosInFile) {
+    string::size_type myCommentStartPos = find_C_CommentToken(myFile, myPosInFile, "/*");
     if (myCommentStartPos != string::npos) {
         // we have found a real opening comment now, look for the latest closing comment
-        int myCommentEndPos = find_C_CommentToken(myFile, myPosInFile, "*/");
+        string::size_type myCommentEndPos = find_C_CommentToken(myFile, myPosInFile, "*/");
         if (myCommentEndPos != string::npos) {
             return myCommentEndPos < myCommentStartPos;
         }
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
                 string myFile;
                 bool hasBeenModified = false;
                 if (readFile(myArguments.getArgument(i), myFile)) {
-                    int matchPos = 0; 
+                    string::size_type matchPos = 0; 
                     while ((matchPos = myFile.find(searchForString, matchPos)) != string::npos) {
                         if (myArguments.haveOption("-w")) {
                             if (matchPos>0) {
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
                         {
                             
                             string myLine;
-                            int myPosInLine;
+                            string::size_type myPosInLine;
                             getLine(myFile, matchPos, myLine, myPosInLine);
 
                             if (myArguments.haveOption("-q")) {
@@ -214,3 +214,4 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
+

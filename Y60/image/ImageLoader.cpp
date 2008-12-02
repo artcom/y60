@@ -12,12 +12,6 @@
 //
 //=============================================================================
 
-#include "ImageLoader.h"
-#include "PLFilterResizePadded.h"
-#include "HeightToNormalMap.h"
-#include "PLFilterFactory.h"
-#include "I60Header.h"
-
 #include <asl/base/MappedBlock.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/file_functions.h>
@@ -26,10 +20,22 @@
 #include <asl/zip/PackageManager.h>
 #include <asl/base/Logger.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "ImageLoader.h"
+#include "PLFilterResizePadded.h"
+#include "HeightToNormalMap.h"
+#include "PLFilterFactory.h"
+#include "I60Header.h"
 
 using namespace std;
 using namespace asl;
@@ -42,7 +48,7 @@ namespace y60 {
         if (theFilterName.size() != theFilterparams.size()) {
             throw ImageLoaderException(std::string("Sorry, filter and params count do not match."), PLUS_FILE_LINE);
         }
-        for (int myFilterIndex = 0; myFilterIndex < theFilterName.size(); myFilterIndex++) {
+        for (VectorOfString::size_type myFilterIndex = 0; myFilterIndex < theFilterName.size(); myFilterIndex++) {
             applyCustomFilter(theBitmap, theFilterName[myFilterIndex], theFilterparams[myFilterIndex]);
         }
     }
@@ -82,10 +88,6 @@ namespace y60 {
         _myTextureManager(theTextureManager)
     {
         AC_DEBUG << "ImageLoader::ImageLoader (default)";
-        // classes derived from PLBmpBase need to allocate
-        // the palette.
-        m_pClrTab = new PLPixel32[256];
-        m_pLineArray = 0;
         _myImageMatrix.makeIdentity();
     }
 
@@ -100,10 +102,6 @@ namespace y60 {
         _myTextureManager(theTextureManager)
     {
         AC_DEBUG << "ImageLoader::ImageLoader '" << theFilename << "'";
-        // classes derived from PLBmpBase need to allocate
-        // the palette.
-        m_pClrTab = new PLPixel32[256];
-        m_pLineArray = 0;
         _myImageMatrix.makeIdentity();
         // Cubemaps are encoded as
         // theFrontFileName + "|" + theRightFileName + "|" + theBackFileName + "|" + theLeftFileName + "|"
@@ -157,10 +155,6 @@ namespace y60 {
         _myTextureManager(theTextureManager)
     {
         AC_DEBUG << "ImageLoader::ImageLoader '" << _myFilename << "'";
-        // classes derived from PLBmpBase need to allocate
-        // the palette.
-        m_pClrTab = new PLPixel32[256];
-        m_pLineArray = 0;
         _myImageMatrix.makeIdentity();
         loadSingleImage(theInputData);
     }
@@ -235,8 +229,8 @@ namespace y60 {
                     as_string(IsGreyscale()), PLUS_FILE_LINE);
             }
 
-            unsigned myTargetWidth  = GetWidth();
-            unsigned myTargetHeight = GetHeight() / 6 / theDepth;
+            int myTargetWidth  = GetWidth();
+            int myTargetHeight = GetHeight() / 6 / theDepth;
             if (myFaceBmp.GetWidth() != myTargetWidth || myFaceBmp.GetHeight() != myTargetHeight) {
                 AC_WARNING << "Resizing bitmap " << myDescription << " to " << myTargetWidth << "x" << myTargetHeight << ".";
                 myFaceBmp.ApplyFilter(PLFilterResizeBilinear(myTargetWidth, myTargetHeight));
@@ -246,9 +240,9 @@ namespace y60 {
             PLBYTE ** mySrcLines = myFaceBmp.GetLineArray();
             PLBYTE ** myDstLines = GetLineArray();
 
-            unsigned myFaceHeight = myFaceBmp.GetHeight();
+            unsigned int myFaceHeight = myFaceBmp.GetHeight();
             long myLineSize = GetBytesPerLine();
-            for (int y = 0; y < myFaceHeight; ++y) {
+            for (unsigned int y = 0; y < myFaceHeight; ++y) {
                 memcpy(myDstLines[y + myFaceHeight * i], mySrcLines[y], myLineSize);
             }
         }
@@ -330,6 +324,11 @@ namespace y60 {
 
     void
     ImageLoader::initLineArray () {
+        if (GetBitsPerPixel() <= 8) {
+            // note: this is not a nice place to plug this in, 
+            // but there seems to be no other place
+            m_pClrTab = new PLPixel32[256];
+        }
         m_pLineArray = new unsigned char * [GetHeight()];
         updateLineArray();
     }
@@ -407,7 +406,7 @@ namespace y60 {
 
             unsigned myHeight = GetHeight();
             unsigned myWidth  = GetWidth();
-            unsigned myLineStride = GetBytesPerLine();
+            //unsigned myLineStride = GetBytesPerLine();
 
             asl::Ptr<Block> myDestinationBlock = asl::Ptr<Block>(new Block());
             myDestinationBlock->resize(myHeight * myWidth * 3);
@@ -454,7 +453,7 @@ namespace y60 {
                                   unsigned theDepth, const asl::Vector2i * theTile)
     {
         // limit texture size
-        unsigned myTextureSizeLimit = 0;
+        int myTextureSizeLimit = 0;
         if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
             myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
             AC_INFO << "Texture size limit set to " << myTextureSizeLimit;
@@ -480,7 +479,7 @@ namespace y60 {
             myIsCubemapFlag = (myNumTiles == 6 ? true : false);
         }
         try {
-            unsigned myWidthFactor = 1, myHeightFactor = theDepth;
+            int myWidthFactor = 1, myHeightFactor = theDepth;
             if (myIsCubemapFlag) {
                 myWidthFactor *= (*theTile)[0];
                 myHeightFactor *= (*theTile)[1];
@@ -506,8 +505,8 @@ namespace y60 {
             AC_DEBUG << "myWidthFactor = " << myWidthFactor;
             AC_DEBUG << "myHeightFactor = " << myHeightFactor;
 
-            unsigned myTargetWidth = GetWidth();
-            unsigned myTargetHeight = GetHeight();
+            int myTargetWidth = GetWidth();
+            int myTargetHeight = GetHeight();
              if (!powerOfTwo(GetWidth() / myWidthFactor) || !powerOfTwo(GetHeight() / myHeightFactor)) {
                 myTargetWidth  = nextPowerOfTwo(GetWidth() / myWidthFactor) * myWidthFactor;
                 myTargetHeight = nextPowerOfTwo(GetHeight() / myHeightFactor) * myHeightFactor;

@@ -59,7 +59,7 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     int i = 0;
     while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "")
             && i < MAX_OPTIONS) {
-        if (allowedOptions[i].theName != "") {
+                if ( !std::string(allowedOptions[i].theName).empty() ) {
             _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
         } else {
             _argumentNames.push_back(allowedOptions[i].theArgumentName);
@@ -113,7 +113,7 @@ bool
 Arguments::parse(std::vector<string> myArgs, StringEncoding theEncoding, int errorHandlingPolicy) {
     vector<const char *> myArgv;
 
-    for (int i = 0; i < myArgs.size(); ++i) {
+    for (std::vector<string>::size_type i = 0; i < myArgs.size(); ++i) {
         myArgv.push_back(myArgs[i].c_str());
     }
     return parse(myArgv.size(), &(*myArgv.begin()), theEncoding, errorHandlingPolicy);

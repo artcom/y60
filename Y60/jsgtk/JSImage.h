@@ -16,7 +16,13 @@
 #include <asl/base/string_functions.h>
 #include <y60/jsbase/JSWrapper.h>
 
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm/image.h>
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 
 
 namespace jslib {

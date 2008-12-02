@@ -11,7 +11,15 @@
 #ifndef ACGTK_CONSOLE_VIEW_INCLUDED
 #define ACGTK_CONSOLE_VIEW_INCLUDED
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4413 4244 4512)
+#endif //defined(_MSC_VER)
 #include <gtkmm/textview.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
+
 #include <asl/math/Vector234.h>
 
 namespace acgtk {
@@ -36,3 +44,4 @@ class ConsoleView : public Gtk::TextView {
 } // end of namespace 
 
 #endif // ACGTK_CONSOLE_VIEW_INCLUDED
+

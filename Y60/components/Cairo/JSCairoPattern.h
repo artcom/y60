@@ -87,6 +87,12 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, JSCairoPattern::NATIVE * thePattern);
     jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, cairo_pattern_t * thePattern);
+    inline jsval as_jsval(JSContext *cx, cairo_pattern_t * thePattern)
+    {
+        JSCairoPatternWrapper* theOwner = JSCairoPatternWrapper::get(thePattern);
+        assert(theOwner);
+        return as_jsval(cx,theOwner->getWrappedPtr(),thePattern);
+    }
     
     bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTarget);
     bool convertFrom(JSContext *cx, jsval theValue, cairo_pattern_t *& thePattern);

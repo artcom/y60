@@ -25,11 +25,11 @@
 #include <y60/scene/MaterialParameter.h>
 
 #ifdef WIN32
-    #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN 1
-    #endif
-    #include <windows.h>
-    #undef max
+#    define NOMINMAX
+#    ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN 1
+#    endif
+#    include <windows.h>
 #endif
 
 #if defined(LINUX)
@@ -43,7 +43,6 @@
 
 // window system extensions
 #ifdef WIN32
-#    include <GL/wglew.h>
 #endif
 
 
@@ -134,7 +133,7 @@ namespace y60 {
      * @param theNeededExtensions DEPRECATED.
      * @param theVerboseFlag DEPRECATED.
      */
-    
+
     /// Query for supported capability.
     bool hasCap(unsigned int theCap);
     /// Query for supported OpenGL *extension*.

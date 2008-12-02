@@ -42,9 +42,14 @@
 
 #include <asl/base/Logger.h>
 #include <asl/base/Time.h>
-#include <curl/curl.h>
 
 #include <string>
+
+#if defined(_WINSOCKAPI_)
+#undef _WINSOCKAPI_
+#endif //defined(_WINSOCKAPI_)
+#include <curl/curl.h>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -151,7 +156,7 @@ namespace inet {
 
             // Check several websites. If one of them reacts, we have internet.
             bool myINetAvailable = false;
-            for (int i=0; i<_myHostNames.size(); i++) {
+            for (std::vector<std::string>::size_type i=0; i<_myHostNames.size(); i++) {
                 if (testWebsite (_myHostNames[i])) {
                     myINetAvailable = true;
                 }

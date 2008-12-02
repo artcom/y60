@@ -97,7 +97,7 @@ JSMisc::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
-    return JS_TRUE;
+    //return JS_TRUE;
 }
 
 JSBool

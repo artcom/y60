@@ -60,7 +60,7 @@ namespace dom {
 
         clearPrecursorFields();
 
-        for (int i = 0; i < theField._myPrecursorFields.size(); ++i)  {
+        for (std::vector<FieldPtr>::size_type i = 0; i < theField._myPrecursorFields.size(); ++i)  {
             FieldPtr myPrecursorField = theField._myPrecursorFields[i];
             if (myPrecursorField) {
                 myPrecursorField->registerDependend(_mySelf.lock());
@@ -71,7 +71,7 @@ namespace dom {
 
         clearDependendFields();
 
-        for (int i = 0; i < theField._myDependendFields.size(); ++i)  {
+        for (std::vector<FieldWeakPtr>::size_type i = 0; i < theField._myDependendFields.size(); ++i)  {
             FieldPtr myDependantField = theField._myDependendFields[i].lock();
             if (myDependantField) {
                 myDependantField->registerPrecursor(_mySelf.lock());
@@ -97,7 +97,7 @@ namespace dom {
             DB(AC_TRACE << "clearPrecursorFields() on "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
             _myCalculator = CallBackPtr(0);
 
-            for (int i = 0; i < _myPrecursorFields.size(); ++i)  {
+            for (std::vector<FieldWeakPtr>::size_type i = 0; i < _myPrecursorFields.size(); ++i)  {
                 FieldPtr myPrecursorField = _myPrecursorFields[i];
                 if (myPrecursorField) {
                     myPrecursorField->eraseDependend(_mySelf);
@@ -111,7 +111,7 @@ namespace dom {
     Field::clearDependendFields() {
         if (_myDependendFields.size()) {
             DB(AC_TRACE << "clearDependendFields() on "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-            for (int i = 0; i < _myDependendFields.size(); ++i)  {
+            for (std::vector<FieldWeakPtr>::size_type i = 0; i < _myDependendFields.size(); ++i)  {
                 FieldPtr myDependantField = _myDependendFields[i].lock();
                 if (myDependantField) {
                     myDependantField->erasePrecursor(_mySelf.lock());
@@ -257,7 +257,7 @@ namespace dom {
         } else {
             cerr << TTYGREEN << " (dep. up-to-date)" << ENDCOLOR << endl;
         }
-       for (int i = 0; i < _myDependendFields.size(); ++i)  {
+       for (std::vector<FieldWeakPtr>::size_type i = 0; i < _myDependendFields.size(); ++i)  {
         if (myPrefix.size() == 0) {
             _myDependendFields[i].lock()->printDependendGraph(myPrefix+"|-->");
             } else {
@@ -283,7 +283,7 @@ namespace dom {
             cerr << TTYGREEN << " (dep. up-to-date)" << ENDCOLOR << endl;
         }
 
-        for (int i = 0; i < _myPrecursorFields.size(); ++i)  {
+        for (std::vector<FieldPtr>::size_type i = 0; i < _myPrecursorFields.size(); ++i)  {
             if (myPrefix.size() == 0) {
                 _myPrecursorFields[i]->printPrecursorGraph(myPrefix+"|<--");
             } else {

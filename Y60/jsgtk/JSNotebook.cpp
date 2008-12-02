@@ -145,7 +145,7 @@ int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ust
         
         // first argument must be a widget or an int
         Gtk::Widget * myPageToRemove = 0;
-        int myIndexToRemove;
+        int myIndexToRemove = 0;
 
         if (!convertFrom(cx, argv[0], myPageToRemove)) {
             if (!convertFrom(cx, argv[0], myIndexToRemove)) {

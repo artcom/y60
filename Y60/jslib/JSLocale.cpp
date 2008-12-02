@@ -52,7 +52,6 @@ parseFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;
 }
 
 static JSBool 
@@ -71,7 +70,6 @@ formatFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         *rval = as_jsval(cx, myStream.str());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;
 }
 
 JSFunctionSpec *
@@ -156,10 +154,10 @@ JSLocale::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSLocale::getProperty: index %d out of range", theID);
-            return JS_FALSE;
+            ;
     }
-    return JS_TRUE;
+    JS_ReportError(cx,"JSLocale::getProperty: index %d out of range", theID);
+    return JS_FALSE;
 };
 
 // setproperty handling

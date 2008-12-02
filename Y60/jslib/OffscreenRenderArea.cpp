@@ -157,7 +157,8 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theTextureNode) {
     }
 
     ResizeableRasterPtr myRaster = myImage->getRasterPtr();
-    if (myRaster->width() != getWidth() || myRaster->height() != getHeight()) {
+    if ( static_cast<int>(myRaster->width ()) != getWidth()
+      || static_cast<int>(myRaster->height()) != getHeight()) {
         AC_DEBUG << "Resizing image id=" << myImage->get<IdTag>() << " to " << getWidth() << "x" << getHeight();
         myRaster->resize(getWidth(), getHeight());
     }
@@ -167,7 +168,7 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theTextureNode) {
 void
 OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
-    OffscreenBuffer::setUseFBO(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
+    OffscreenBuffer::setUseFBO( 0 != (theRenderingCaps & y60::FRAMEBUFFER_SUPPORT) );
 }
 
 void

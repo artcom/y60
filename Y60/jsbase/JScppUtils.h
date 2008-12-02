@@ -11,6 +11,9 @@
 #ifndef _Y60_JSCPPUTILS_INCLUDED_
 #define _Y60_JSCPPUTILS_INCLUDED_
 
+#include <iostream>
+#include <limits>
+
 #include "jssettings.h"
 
 #include <js/spidermonkey/jspubtd.h>
@@ -28,9 +31,14 @@
 #include <y60/base/AcBool.h>
 #include <asl/dom/Value.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plexcept.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <iostream>
 // Undefine stuff to undo Apple namespace pollution
 #ifdef check
 #undef check
@@ -43,10 +51,6 @@
 #ifdef DestroyNotify
 #undef DestroyNotify
 #endif
-
-//#include <glibmm.h>
-
-#include <limits>
 
 #define IF_NOISY(x)  // x
 #define IF_NOISY2(x) // x
@@ -95,19 +99,19 @@ namespace jslib {
 
 #define HANDLE_CPP_EXCEPTION\
     catch (asl::Exception & ex) {\
-        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);(void)myRuntime;\
         JS_ReportError(cx,"%s", asl::as_string(ex).c_str());\
         return JS_FALSE;\
     } catch (std::exception & ex) {\
-        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);(void)myRuntime;\
         JS_ReportError(cx,"%s", ex.what());\
         return JS_FALSE;\
     } catch (const PLTextException & ex) {\
-        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);(void)myRuntime;\
         JS_ReportError(cx,"%s", asl::as_string(ex).c_str());\
         return JS_FALSE;\
     } catch (...) {\
-        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);(void)myRuntime;\
         JS_ReportError(cx,"Unknown Exception caught");\
         return JS_FALSE;\
     }
@@ -271,6 +275,7 @@ struct JValueTypeTraits<unsigned int> {
     enum {SIZE = 1};
 };
 
+jsval as_jsval(JSContext *cx, time_t theValue);
 jsval as_jsval(JSContext *cx, bool theValue);
 jsval as_jsval(JSContext *cx, double theValue);
 jsval as_jsval(JSContext *cx, float theValue); 

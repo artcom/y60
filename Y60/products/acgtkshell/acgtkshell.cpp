@@ -18,9 +18,15 @@
 //=============================================================================
 
 #include <y60/jsgtk/GTKApp.h>
-
 #include <y60/jsbase/jssettings.h>
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244 4251)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/Arguments.h>
 #include <asl/base/string_functions.h>

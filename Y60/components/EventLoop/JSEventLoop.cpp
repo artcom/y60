@@ -44,7 +44,7 @@ namespace jslib {
 
         y60::EventDispatcher::get().addSink(this);
 
-        while (true) {
+        for(;;) {
             
             y60::EventDispatcher::get().dispatch();
             

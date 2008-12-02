@@ -48,7 +48,7 @@ inline double degFromRad(double theRadiant) { return (theRadiant * 180.0) / PI; 
 inline 
 bool isNaN(const double theNumber) {
 #if defined(WIN32)
-	return _isnan(theNumber);
+	return 0 != _isnan(theNumber);
 #else //defined(WIN32)
 	return std::isnan(theNumber);
 #endif //defined(WIN32)
@@ -57,7 +57,7 @@ bool isNaN(const double theNumber) {
 inline 
 bool isFinite(const double theNumber) {
 #if defined(WIN32)
-	return _finite(theNumber);
+	return 0 != _finite(theNumber);
 #else //defined(WIN32)
 	return std::isfinite(theNumber);
 #endif //defined(WIN32)
@@ -300,11 +300,11 @@ bool & interpolate(bool & a, bool & b, const double & theAlpha) {
 
 template <class T>
 T interpolate(T & a, T & b, const double & theAlpha) {
-    return T(a + (b - a) * theAlpha);
+    return static_cast<T>(a + (b - a) * theAlpha);
 }
 template <class T>
 T interpolate(const T & a, const T & b, const double & theAlpha) {
-    return T(a + (b - a) * theAlpha);
+    return static_cast<T>(a + (b - a) * theAlpha);
 }
 
 #undef min
@@ -331,14 +331,14 @@ template<> struct NumberSignedIntegerTraits<true,false> {
 template<> struct NumberSignedIntegerTraits<false,true> {
     template <class T>
     static
-    T min(T max) {
+    T min(T /*max*/) {
         return 0;
     }
 };
 template<> struct NumberSignedIntegerTraits<false,false> {
     template <class T>
     static
-    T min(T max) {
+    T min(T /*max*/) {
         return 0;
     }
 };

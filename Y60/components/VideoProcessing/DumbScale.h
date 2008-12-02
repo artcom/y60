@@ -16,32 +16,32 @@
 
 namespace y60 {
 
-	class DumbScale : public Algorithm {
-		public:
-            DumbScale(const std::string & theName);
+    class DumbScale : public Algorithm {
+    public:
+        DumbScale(const std::string & theName);
 
-			static std::string getName() { return "dumpscale"; }
-		    void onFrame(double t);
-            
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
+        static std::string getName() { return "dumpscale"; }
+        void onFrame(double t);
 
-		private:
-            dom::Element _myResultNode;
-            dom::ValuePtr _mySourceRaster;
-            dom::ValuePtr _myTargetRaster;
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
 
-            // const raster<asl::BGR> * mySourceRaster = dynamic_cast_Value<raster<asl::BGR> >(&*_mySourceImage->getRasterValue());
-            // const raster<asl::BGR> * myTargetRaster = dynamic_cast_Value<raster<asl::GRAY> >(&*_mySourceImage->getRasterValue());
-            
-            y60::ImagePtr _myTargetImage;
-            y60::ImagePtr _mySourceImage;
+    private:
+        dom::Element _myResultNode;
+        dom::ValuePtr _mySourceRaster;
+        dom::ValuePtr _myTargetRaster;
 
-            unsigned int _myImageNodeVersion;
-            unsigned int _myWidth;
-            unsigned int _myHeight;
+        // const raster<asl::BGR> * mySourceRaster = dynamic_cast_Value<raster<asl::BGR> >(&*_mySourceImage->getRasterValue());
+        // const raster<asl::BGR> * myTargetRaster = dynamic_cast_Value<raster<asl::GRAY> >(&*_mySourceImage->getRasterValue());
+
+        y60::ImagePtr _myTargetImage;
+        y60::ImagePtr _mySourceImage;
+
+        asl::Unsigned64 _myImageNodeVersion;
+        unsigned int _myWidth;
+        unsigned int _myHeight;
     };
 }
 

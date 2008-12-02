@@ -34,7 +34,7 @@ namespace asl {
 double calculatePolyhedraVolume(const vector<Point3f> & theTriangleVertices)
 {
     double myVolume = 0;
-    for(int i = 0;i < theTriangleVertices.size(); i += 3) {
+    for(vector<Point3f>::size_type i = 0;i < theTriangleVertices.size(); i += 3) {
         const Triangle<float> & myTriangle = asTriangle(theTriangleVertices[i]);
         Vector3f myNormal = myTriangle.normal();
         Vector3f myPosition = myTriangle.centroid(); //this is just fancy. we could take a vertex instead

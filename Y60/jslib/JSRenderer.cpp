@@ -192,7 +192,6 @@ drawFrustum(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 

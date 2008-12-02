@@ -48,7 +48,7 @@ bool asl::isTTY(ostream & os) {
         myFD = _fileno(stderr);
     }
 
-    return _isatty( myFD );
+    return 0 != _isatty( myFD );
 #endif
 }
 

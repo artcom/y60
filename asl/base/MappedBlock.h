@@ -274,8 +274,8 @@ void * mmap(void * start, size_t length, int prot, int flags, FD_t fd, OFF_T off
         throw UnsupportedParameters(JUST_FILE_LINE);
     }
 
-    DWORD dwMaximumSizeHigh = 0;
-    DWORD dwMaximumSizeLow = length&0xfffffff;
+    //DWORD dwMaximumSizeHigh = 0;
+    //DWORD dwMaximumSizeLow = length&0xfffffff;
     myMapInfo.mappingHandle = CreateFileMapping(
                                                 fd,
                                                 0, // LPSECURITY_ATTRIBUTES
@@ -355,8 +355,8 @@ void * mremap(void * old_address, size_t old_size, size_t new_size, unsigned lon
     }
 
     // create new file mapping object
-    DWORD dwMaximumSizeHigh = 0;
-    DWORD dwMaximumSizeLow = new_size&0xfffffff;
+    //DWORD dwMaximumSizeHigh = 0;
+    //DWORD dwMaximumSizeLow = new_size&0xfffffff;
     HANDLE myMapping = CreateFileMapping(
                                          oldMappingInfo.fd,
                                          0, // LPSECURITY_ATTRIBUTES
@@ -438,7 +438,7 @@ namespace asl {
         static bool setFileSize(FD_t fd, OFF_T theNewSize) {
             // enlarge or shrink file
             // move file pointer to desired position
-	    DWORD myResult = SetFilePointer(fd, theNewSize, 0, FILE_BEGIN);
+            DWORD myResult = SetFilePointer(fd, theNewSize, 0, FILE_BEGIN);
             if (myResult == INVALID_SET_FILE_POINTER && lastError() != CALL_HAS_SUCCEEDED) {
                 LAST_ERROR_TYPE err = lastError();
                 AC_ERROR << "setFileSize: SetFilePointer failed, reason:" << asl::errorDescription(err) << std::endl;
@@ -457,26 +457,26 @@ namespace asl {
         }
 #endif
     static void setFileSize(FD_t fd, AC_SIZE_TYPE theNewSize) {
-			AC_SIZE_TYPE mySize = SetFilePointer(fd, theNewSize, 0, FILE_BEGIN);
-			bool success = SetEndOfFile(fd);
-			if (mySize!=theNewSize) {
-				LAST_ERROR_TYPE err = lastError();
-				throw MappedIO::SeekFailed(std::string("fd=")+asl::as_string(fd)+", requested size ="
-					+as_string(theNewSize)+",reason:"+asl::errorDescription(err),PLUS_FILE_LINE);
-			}
-			if (SetEndOfFile(fd) == 0) {
-				LAST_ERROR_TYPE err = lastError();
-				throw MappedIO::SetFileSizeFailed(std::string("fd=")+asl::as_string(fd)+", requested size ="
-					+as_string(theNewSize)+",reason:"+asl::errorDescription(err),PLUS_FILE_LINE);
-			}
-		}
-		static void getFileSize(FD_t fd, OFF_T & theSize) {
-			theSize = GetFileSize(fd,0);
-			if (theSize == INVALID_FILE_SIZE) {
-				LAST_ERROR_TYPE err = lastError();
-				throw MappedIO::GetFileSizeFailed(std::string("reason:")+asl::errorDescription(err),PLUS_FILE_LINE);
-			}
-		}
+        AC_SIZE_TYPE mySize = SetFilePointer(fd, theNewSize, 0, FILE_BEGIN);
+        //bool success = 0 != SetEndOfFile(fd);
+        if (mySize!=theNewSize) {
+            LAST_ERROR_TYPE err = lastError();
+            throw MappedIO::SeekFailed(std::string("fd=")+asl::as_string(fd)+", requested size ="
+                +as_string(theNewSize)+",reason:"+asl::errorDescription(err),PLUS_FILE_LINE);
+        }
+        if (SetEndOfFile(fd) == 0) {
+            LAST_ERROR_TYPE err = lastError();
+            throw MappedIO::SetFileSizeFailed(std::string("fd=")+asl::as_string(fd)+", requested size ="
+                +as_string(theNewSize)+",reason:"+asl::errorDescription(err),PLUS_FILE_LINE);
+        }
+    }
+    static void getFileSize(FD_t fd, OFF_T & theSize) {
+        theSize = GetFileSize(fd,0);
+        if (theSize == INVALID_FILE_SIZE) {
+            LAST_ERROR_TYPE err = lastError();
+            throw MappedIO::GetFileSizeFailed(std::string("reason:")+asl::errorDescription(err),PLUS_FILE_LINE);
+        }
+    }
 #else
 
 #if 1
@@ -523,7 +523,7 @@ namespace asl {
             fd = OPEN(theFilename.toLocale().c_str(), O_RDONLY, 0);
             if (fd == FD_INVALID) {
                 LAST_ERROR_TYPE err = lastError();
-                throw MappedIO::OpenReadOnlyFailed(std::string("filename=")+theFilename.toLocale()+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
+                throw MappedIO::OpenReadOnlyFailed(std::string("filename='")+theFilename.toLocale()+"' ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
             }
         }
 
@@ -764,8 +764,8 @@ namespace asl {
         AC_SIZE_TYPE size() const {
             return nbytes();
         }
-        operator bool() const {
-            return isGood();
+        operator const void*() const {
+            return isGood() ? this : NULL;
         }
     private:
         void openFile(const Path & theFilename, FD_t & fd) {
@@ -821,8 +821,8 @@ namespace asl {
                                          "WriteableMappedBlock::assign()");
             std::copy(theSource.begin(),theSource.end(), begin());
         }
-        operator bool() const {
-            return isGood();
+        operator const void*() const {
+            return isGood() ? this : NULL;
         }
     private:
         void openFile(const Path & theFilename, FD_t & fd) {
@@ -868,8 +868,8 @@ namespace asl {
                                          "NewMappedBlock::assign()");
             std::copy(theSource.begin(),theSource.end(), begin());
         }
-        operator bool() const {
-            return isGood();
+        operator const void*() const {
+            return isGood() ? this : NULL;
         }
     private:
         void openFile(const Path & theFilename, FD_t & fd) {
@@ -943,8 +943,8 @@ namespace asl {
             DB(AC_TRACE << "MappedBlock::reserve("<<theCapacity<<")"<<std::endl);
             resizeMapping(theCapacity);
         }
-        operator bool() const {
-            return isGood();
+        operator const void*() const {
+            return isGood() ? this : NULL;
         }
     private:
         enum { MIN_CAPACITY = 4096 };

@@ -214,7 +214,7 @@ namespace dom {
             int pubid_end_pos = read_quoted_text(is, pubid_start_pos);
             if (pubid_end_pos > pubid_start_pos) {
                 asl::copy_between_quotes(is,pubid_start_pos,pubid_end_pos ,PubidLiteral);
-                for (int i = 0; i < PubidLiteral.size(); ++i) {
+                for (String::size_type i = 0; i < PubidLiteral.size(); ++i) {
                     if (!is_pubid(PubidLiteral[i])) {
                         throw ParseException("bad character in PUBLIC id",
                                               PLUS_FILE_LINE,pubid_start_pos + i + 1);
@@ -223,11 +223,9 @@ namespace dom {
                 new_pos = pubid_end_pos;
                 goto readSystemLiteral;
                 //return pubid_end_pos;
-            } else {
-                throw ParseException("PUBLIC id literal missing",
-                        PLUS_FILE_LINE,pubid_end_pos);
             }
-            return pos;
+            throw ParseException("PUBLIC id literal missing",
+                    PLUS_FILE_LINE,pubid_end_pos);
         }
         if (new_pos > pos) {
             readSystemLiteral:
@@ -433,7 +431,7 @@ namespace dom {
     String entity_encode_data(const String & s, Char quote_char) {
         String result;
         result.reserve(s.size() + s.size()/10);
-        for (int i = 0 ; i < s.size();++i) {
+        for (String::size_type i = 0 ; i < s.size();++i) {
             switch (s[i]) {
             case AMP: result.append(ENT_AMP);
                 break;
@@ -476,10 +474,10 @@ namespace dom {
     String entity_decode_data(const String & s, int global_pos, const Node * doctype) {
         String result;
         result.reserve(s.size());
-        int i = 0;
+        String::size_type i = 0;
         while (i < s.size()) {
             if (s[i] == AMP) {
-                int next_pos = i;
+                std::string::size_type next_pos = i;
                 if ((next_pos = asl::read_if_string(s,i,ENT_AMP)) > i)
                     result+=AMP;
                 else if ((next_pos = asl::read_if_string(s,i,ENT_LT)) > i)
@@ -503,12 +501,12 @@ namespace dom {
                         asl::copy_between(s,i,ENT_DEC,ENT_SEMI,next_pos,entity_name);
                         unsigned int value;
                         if (asl::is_decimal_number(entity_name,value)) {
-                            result+=value;
+                            result += static_cast<char>(value);
                         } else
                             if (entity_name[0] == Cx) {
                                 String hex_string = entity_name.substr(1);
                                 if (asl::is_hex_number(hex_string,value)) {
-                                    result+=value;
+                                    result += static_cast<char>(value);
                                 } else {
                                     String error_msg;
                                     error_msg = "illegal entity number code '" + s.substr(i,next_pos) + "'";
@@ -527,7 +525,7 @@ namespace dom {
                         asl::copy_between_quotes(s,i,next_pos,entity_name);
                         bool found = false;
                         if (doctype) {
-                            for (int child = 0; child < doctype->childNodesLength(); ++child) {
+                            for (NodeList::size_type child = 0; child < doctype->childNodesLength(); ++child) {
                                 if (doctype->childNode(child)->nodeType() == Node::ENTITY_NODE &&
                                     doctype->childNode(child)->nodeName() == entity_name) {
                                         result+=doctype->childNode(child)->nodeValue();
@@ -763,7 +761,7 @@ dom::Node::bumpVersion() {
 asl::Unsigned64 
 dom::Node::bumpVersion() {
     Node * myNode = this;
-    asl::Unsigned64 myVersion;
+    asl::Unsigned64 myVersion=0;
     Node * myParent = 0;
     do {
         myParent = myNode->parentNode();
@@ -812,7 +810,7 @@ void
 dom::Node::loadSchemas(const DOMString & theURLList)  {
     std::vector<DOMString> myURLs = asl::splitString(theURLList," \t\n\r");
 
-    for (int i = 0; i < myURLs.size();++i) {
+    for (std::vector<DOMString>::size_type i = 0; i < myURLs.size();++i) {
         if (myURLs[i].find("urn:") == 0) {
             // ignore urn
         } else {
@@ -840,7 +838,7 @@ dom::Node::childNodeByAttribute(const DOMString & theElementName,
                                 const DOMString & theAttributeValue,
                                 int theIndex) const
 {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
         DB(AC_TRACE << "dom::Node::childNodeByAttribute: index="<<i<<endl);
         if (childNode(i)->nodeType() == dom::Node::ELEMENT_NODE) {
             DB(AC_TRACE << "dom::Node::childNodeByAttribute: ELEMENT_NODE"<<endl);
@@ -867,7 +865,7 @@ dom::Node::childNodeByAttribute(const DOMString & theElementName,
                                 const DOMString & theAttributeValue,
                                 int theIndex)
 {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
         DB(AC_TRACE << "dom::Node::childNodeByAttribute: index="<<i<<endl);
         if (childNode(i)->nodeType() == dom::Node::ELEMENT_NODE) {
             DB(AC_TRACE << "dom::Node::childNodeByAttribute: ELEMENT_NODE"<<endl);
@@ -895,7 +893,7 @@ Node::getNodesByAttribute(const DOMString & theElementName,
                           bool theDeepSearchFlag,                          
                           std::vector<NodePtr> & theResults) const
 {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
         const NodePtr myChild = childNode(i);
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const NodePtr myAttribute      = myChild->getAttribute(theAttributeName);
@@ -919,7 +917,7 @@ Node::getNodesByTagName(const DOMString & theElementName,
                         bool theDeepSearchFlag,
                         std::vector<NodePtr> & theResults) const
 {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (String::size_type i = 0; i < childNodes().length(); ++i) {
         const NodePtr myChild = childNode(i);
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const DOMString & myElementName  = myChild->nodeName();
@@ -935,7 +933,7 @@ Node::getNodesByTagName(const DOMString & theElementName,
 
 const NodePtr
 Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (String::size_type i = 0; i < childNodes().length(); ++i) {
         const NodePtr myChild = childNode(i);
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const NodePtr myIdAttribute = myChild->getAttribute(theIdAttribute);
@@ -956,7 +954,7 @@ Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttrib
 
 NodePtr
 Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) {
-    for (int i = 0; i < childNodes().length(); ++i) {
+    for (String::size_type i = 0; i < childNodes().length(); ++i) {
         const NodePtr myChild = childNode(i);
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const NodePtr myIdAttribute = myChild->getAttribute(theIdAttribute);
@@ -984,7 +982,7 @@ Node::loadPathById(const DOMString & theId, const DOMString & theIdAttribute) {
             myIDRegistry->getDictionaries()) 
     {
         DictionariesPtr myDictsPtr = myIDRegistry->getDictionaries();
-        asl::ReadableStream & mySource = myIDRegistry->getStorage()->getStream();
+        //asl::ReadableStream & mySource = myIDRegistry->getStorage()->getStream();
         NodeOffsetCatalog & myCatalog = myIDRegistry->getOffsetCatalog();
         if (myCatalog.getElementOffsetById(theId, theIdAttribute, myOffset)) {
             // search for index in offset list
@@ -1000,7 +998,7 @@ AC_TRACE << "pushing " << myIndex;
 AC_TRACE << "done " << myPath.size();
                 // traverse downstream from root loading children on path
                 Node * myNode = getRealRootNode(); 
-                for (int i = 0; i < myPath.size(); ++i) {
+                for (std::deque<asl::AC_SIZE_TYPE>::size_type i = 0; i < myPath.size(); ++i) {
 AC_TRACE << "myPath["<<i<<"]= " << myPath[i];
 AC_TRACE << "myNode->nodeName = '"<<myNode->nodeName()<<"'";
                     asl::AC_SIZE_TYPE myChildIndex;
@@ -1155,10 +1153,10 @@ dom::Node::Node(const Node & n, Node * theParent) :
     if (_myValue) {
         _myValue->update();
     }
-    for (int child = 0; child < n.getChildren().size(); ++child) {
+    for (NodeList::size_type child = 0; child < n.getChildren().size(); ++child) {
         getChildren().append(n.getChildren().item(child)->cloneNode(DEEP,this));
     }
-    for (int attr = 0; attr < n._myAttributes.size(); ++attr) {
+    for (TypedNamedNodeMap::size_type attr = 0; attr < n._myAttributes.size(); ++attr) {
         _myAttributes.append(n._myAttributes.item(attr)->cloneNode(DEEP,this));
     }
 }
@@ -1177,10 +1175,10 @@ dom::Node::Node(const Node & n) :
     _lazyChildren(false),
     _myVersion(0)
 {
-    for (int attr = 0; attr < n._myAttributes.size(); ++attr) {
+    for (TypedNamedNodeMap::size_type attr = 0; attr < n._myAttributes.size(); ++attr) {
         _myAttributes.appendWithoutReparenting(n._myAttributes.item(attr)->cloneNode(DEEP,this));
     }
-    for (int child = 0; child < n.getChildren().size(); ++child) {
+    for (NodeList::size_type child = 0; child < n.getChildren().size(); ++child) {
         getChildren().appendWithoutReparenting(n.getChildren().item(child)->cloneNode(DEEP,this));
     }
 }
@@ -1223,7 +1221,7 @@ dom::Node::cloneNode(CloneDepth depth, Node * theParent) const {
         myCloneValue->setNodePtr(&(*result));
     }
 
-    for (int attr = 0; attr < _myAttributes.size(); ++attr) {
+    for (TypedNamedNodeMap::size_type attr = 0; attr < _myAttributes.size(); ++attr) {
         result->appendAttribute(_myAttributes.item(attr)->cloneNode(DEEP,&(*result)));
     }
     return result;
@@ -1244,12 +1242,12 @@ dom::Node::print(std::ostream & os, const String& indent) const {
         case ELEMENT_NODE:
             {
                 os << indent << "<" << _myName;
-                for (int attr = 0; attr < _myAttributes.size();++attr) {
+                for (TypedNamedNodeMap::size_type attr = 0; attr < _myAttributes.size();++attr) {
                     os << " " << _myAttributes.item(attr)->nodeName() << "=";
 
                     const NodePtr myAttribute = _myAttributes.item(attr);
                     DOMString myAttributeValue;
-                    unsigned int myChildCount = myAttribute->childNodes().length();
+                    TypedNamedNodeMap::size_type myChildCount = myAttribute->childNodes().length();
                     if (myChildCount == 0) {
                         myAttributeValue = myAttribute->nodeValue();
                     }
@@ -1262,7 +1260,7 @@ dom::Node::print(std::ostream & os, const String& indent) const {
                     }
                     os << myQuote << entity_encode_data(myAttributeValue,myQuote);
 
-                    for (int i = 0; i<myChildCount;++i) {
+                    for (TypedNamedNodeMap::size_type i = 0; i<myChildCount;++i) {
                         if (myAttribute->childNode(i)->nodeType() == dom::Node::TEXT_NODE) {
                             os << entity_encode_data(myAttribute->childNode(i)->nodeValue(),myQuote);
                         } else {
@@ -1320,7 +1318,7 @@ dom::Node::print(std::ostream & os, const String& indent) const {
                 ",val = " << (mayHaveValue() ? nodeValue() : DOMString()) << "-->" << std::endl;
     }
 
-    for (int child = 0; child < getChildren().size();++child) {
+    for (NodeList::size_type child = 0; child < getChildren().size();++child) {
         if (nodeType() == DOCUMENT_NODE ||
                 (getChildren().size() == 1 &&
                     getChildren()[0]._myType != ELEMENT_NODE &&
@@ -1485,7 +1483,7 @@ Node::checkSchemaForText(asl::AC_SIZE_TYPE theParsePos) {
             DBS(AC_TRACE<<"dom::Node::checkSchemaForText(): found type with name = "<< myTypeNameAttr->nodeValue()<<endl);
             return;
         }
-        while (true) {
+        for(;;) {
             NodePtr mySimpleContent = myParentType->childNode(XS_SIMPLECONTENT);
             if (mySimpleContent) {
                 DBS(AC_TRACE<<"dom::Node::checkSchemaForText(): mySimpleContent = "<< *mySimpleContent<<endl);
@@ -1650,15 +1648,15 @@ Node::checkSchemaForElement(const DOMString & theName, asl::AC_SIZE_TYPE thePars
     _mySchemaInfo->_myType = _mySchemaInfo->getSchema()->findType(_mySchemaInfo->_mySchemaDeclaration, theParsePos);
     return _mySchemaInfo->_myType;
 }
-int
-dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const Node * doctype) {
+std::string::size_type
+dom::Node::parseNextNode(const String & is, std::string::size_type pos, const Node * parent, const Node * doctype) {
     _myDocSize = is.size();
-    int nw_pos;
+    std::string::size_type nw_pos;
     while ((nw_pos = asl::read_whitespace(is,pos)) < is.size()) {
 
         // check for comment
         String myValueString;
-        int e_end_pos = read_comment(is,nw_pos,myValueString);
+        std::string::size_type e_end_pos = read_comment(is,nw_pos,myValueString);
         if (e_end_pos > nw_pos) {
             // is comment
             _myType = COMMENT_NODE;
@@ -1671,7 +1669,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
 
         // check for doctype node
         String pubid;
-        int dt_child_pos = read_document_type_start(is,nw_pos,_myName, pubid, myValueString);
+        std::string::size_type dt_child_pos = read_document_type_start(is,nw_pos,_myName, pubid, myValueString);
         if (dt_child_pos > nw_pos) {
             // is document_type
             _myType = DOCUMENT_TYPE_NODE;
@@ -1768,7 +1766,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
         //String params;
         int params_begin = 0;
         int params_end = 0;
-        int tag_end_pos = read_empty_tag(is,nw_pos,_myName,params_begin,params_end);
+        std::string::size_type tag_end_pos = read_empty_tag(is,nw_pos,_myName,params_begin,params_end);
         if (tag_end_pos > nw_pos) {
             // is empty tag
             _myType = ELEMENT_NODE;
@@ -1821,7 +1819,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
                 }
             }
             // params ready, check for child nodes now
-            int completed_pos = tag_end_pos;
+            std::string::size_type completed_pos = tag_end_pos;
             do {
                 tag_end_pos = completed_pos;
                 NodePtr new_child(new Node(is,tag_end_pos,this,doctype));
@@ -1846,7 +1844,7 @@ dom::Node::parseNextNode(const String & is, int pos, const Node * parent, const 
 
         // check for some text before the next markup starts
         // int text_start_pos = asl::read_whitespace(is,pos);
-        int text_end_pos = asl::read_text(is,nw_pos, LT);
+        std::string::size_type text_end_pos = asl::read_text(is,nw_pos, LT);
         if (text_end_pos > nw_pos) {
             if (text_end_pos == is.size()) {
                 throw ParseException("trailing text outside of element node",
@@ -2007,7 +2005,7 @@ dom::Node::appendChild(NodePtr theNewChild) {
             }
             myNewNodes.push_back(getChildren().appendWithoutReparenting(myNewChild));
         }
-        for (int i = 0; i < myNewNodes.size(); ++i) {
+        for (std::vector<NodePtr>::size_type i = 0; i < myNewNodes.size(); ++i) {
             checkAndUpdateChildrenSchemaInfo(*myNewNodes[i], this);
         }
         return NodePtr(0);
@@ -2058,7 +2056,7 @@ dom::Node::compareByDocumentOrder(const NodePtr theNode) const
 
     assert(*lhsIt==*rhsIt);  // nodes must be in same document
 
-    while( *lhsIt==*rhsIt && lhsIt!=lhsParents.rend() && rhsIt!=rhsParents.rend() ) {
+    while( lhsIt!=lhsParents.rend() && rhsIt!=rhsParents.rend() && *lhsIt==*rhsIt ) {
         ++lhsIt;
         ++rhsIt;
     }
@@ -2090,7 +2088,7 @@ dom::Node::insertBefore(NodePtr theNewChild, NodePtr theRefChild) {
     }
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
-        for (int i = 0; i < theNewChild->childNodesLength();++i) {
+        for (NodeList::size_type i = 0; i < theNewChild->childNodesLength();++i) {
             insertBefore(theNewChild->childNode(i), theRefChild);
         }
         return NodePtr(0);
@@ -2143,7 +2141,7 @@ dom::Node::checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theT
                     std::string("Element <")+nodeName()+"> attribute '"+theNewAttribute.nodeName()+"' type declaration has no type name",
                                 "dom::Node::checkAndUpdateAttributesSchemaInfo");
             }
-            const string & myDataTypeName = myDataTypeNameAttr->nodeValue();
+            //const string & myDataTypeName = myDataTypeNameAttr->nodeValue();
 
             theNewAttribute._mySchemaInfo->_mySchemaDeclaration = myAttributeDecl;
             theNewAttribute._mySchemaInfo->_myType = myAttributeType;
@@ -2182,10 +2180,10 @@ dom::Node::checkAndUpdateChildrenSchemaInfo(Node & theNewChild, Node * theTopNew
     if (theNewChild._myValue) {
         theNewChild._myValue->setNodePtr(&theNewChild);
     }
-    for (int i = 0; i< theNewChild.attributes().length();++i) {
+    for (NamedNodeMap::size_type i = 0; i< theNewChild.attributes().length();++i) {
         theNewChild.checkAndUpdateAttributeSchemaInfo(*theNewChild.getAttribute(i), theTopNewParent);
     }
-    for (int i = 0; i< theNewChild.childNodes().length();++i) {
+    for (NodeList::size_type i = 0; i< theNewChild.childNodes().length();++i) {
         theNewChild.checkAndUpdateChildrenSchemaInfo(*theNewChild.childNode(i), theTopNewParent);
     }
 }
@@ -2386,7 +2384,7 @@ dom::Node::checkName(const String& name, NodeType type) {
 int
 dom::Node::getNumberOfChildrenWithType(NodeType type) const {
     int counter = 0;
-    for (int i = 0; i < getChildren().size(); ++i)
+    for (NodeList::size_type i = 0; i < getChildren().size(); ++i)
         if (type == getChildren()[i].nodeType()) ++counter;
         return counter;
 }
@@ -2488,7 +2486,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
 void
 dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl::Unsigned64 theIncludeVersion) const {
     storeSavePosition(theDest.getByteCounter());
-    unsigned short myNodeType = nodeType();
+    unsigned short myNodeType = static_cast<unsigned short>(nodeType());
     if (_myVersion < theIncludeVersion) {
         myNodeType|=isUnmodifiedProxy;
     }
@@ -2595,7 +2593,7 @@ Node::binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCat
         _myParent->binarize(theDataDest, theCatalogDest);
     } else {
         Dictionaries myDicts;
-        binarize(theDataDest, myDicts, 0, D60_MAGIC);
+        binarize(theDataDest, myDicts, 0, static_cast<asl::Unsigned32>(D60_MAGIC));
         asl::Unsigned64 myStartPos = theCatalogDest.getByteCounter();
         myDicts.binarize(theCatalogDest);
         NodeOffsetCatalog & myCatalog = const_cast<Node*>(this)->getIDRegistry()->getOffsetCatalog();
@@ -2629,11 +2627,12 @@ dom::Node::loadChildren() {
     if (!myIDRegistry->getDictionaries()) {
         throw NoDictionaries(JUST_FILE_LINE);
     }
-    NodeOffsetCatalog & myCatalog = myIDRegistry->getOffsetCatalog();
+    //NodeOffsetCatalog & myCatalog = myIDRegistry->getOffsetCatalog();
     DictionariesPtr myDictsPtr = myIDRegistry->getDictionaries();
     asl::ReadableStream & mySource = myIDRegistry->getStorage()->getStream();
 
     asl::AC_SIZE_TYPE myPos = _myChildrenList.debinarize(mySource, asl::AC_SIZE_TYPE(getChildrenPosition()), *myDictsPtr, LAZY);
+    (void)myPos;
     _lazyChildren = false;
 }
 
@@ -2654,6 +2653,7 @@ dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource) {
 
     bool myUnmodifiedProxyFlag;
     asl::AC_SIZE_TYPE myPos = debinarize(mySource, 0 , *myDictsPtr, LAZY, myUnmodifiedProxyFlag);
+    (void)myPos;
     AC_DEBUG << "debinarizeLazy done: catalog size = " << getIDRegistry()->getOffsetCatalog().size();
     return true; // TODO: return false in failure
 }
@@ -2666,7 +2666,7 @@ dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource, asl::Pt
     // allocate and load dicts and catalog
     DictionariesPtr myDictsPtr = DictionariesPtr(new Dictionaries);
     asl::Ptr<NodeOffsetCatalog> myCatalogPtr = asl::Ptr<NodeOffsetCatalog> (new NodeOffsetCatalog);
-    loadDictionariesAndCatalog(mySource, theCatalogSource, *myDictsPtr, *myCatalogPtr);
+    loadDictionariesAndCatalog(theCatalogSource->getStream(), *myDictsPtr, *myCatalogPtr);
 
     NodeIDRegistryPtr myIDRegistry = getIDRegistry();
     myIDRegistry->setOffsetCatalog(myCatalogPtr);
@@ -2675,6 +2675,7 @@ dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource, asl::Pt
 
     bool myUnmodifiedProxyFlag;
     asl::AC_SIZE_TYPE myPos = debinarize(mySource, 0 , *myDictsPtr, LAZY, myUnmodifiedProxyFlag);
+    (void)myPos;
     AC_DEBUG << "debinarizeLazy done: catalog size = " << getIDRegistry()->getOffsetCatalog().size();
     return true; // TODO: return false in failure
 }
@@ -2714,7 +2715,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
     DB(AC_TRACE << "Read myNodeType (Word) = " << myNodeType << endl);
     DB(dumpType(myNodeType));
 
-    theUnmodifiedProxyFlag = myNodeType&isUnmodifiedProxy;
+    theUnmodifiedProxyFlag = 0 != ( myNodeType & isUnmodifiedProxy );
     if (theUnmodifiedProxyFlag) {
         PS(++theDicts._myPatchStat.unmodifiedNodes);
         if (theLoadMode != PATCH) {
@@ -2832,7 +2833,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
             // LAZY MODE
             // advance to the position where we would be if we had actually read all the children
             NodeOffsetCatalog & myCatalog = getIDRegistry()->getOffsetCatalog();
-            asl::AC_SIZE_TYPE myIndex = NodeOffsetCatalog::InvalidIndex;
+            asl::AC_SIZE_TYPE myIndex = static_cast<asl::AC_SIZE_TYPE>(NodeOffsetCatalog::InvalidIndex);
             if (myCatalog.findNodeOffset(getSavePosition(), myIndex)) {
                 thePos = asl::AC_SIZE_TYPE(myCatalog.getNodeEndOffset(myIndex));
             } else {
@@ -2958,10 +2959,10 @@ Node::hasFacade() const {
         FacadeFactoryPtr myFactory = getFacadeFactory();
         if (myFactory) {
             _myFacade = FacadePtr(myFactory->createFacade(nodeName(), *const_cast<Node*>(this)));
-			if (!_myFacade && parentNode()) {
+            if (!_myFacade && parentNode()) {
                 _myFacade = FacadePtr(myFactory->createFacade(nodeName(), 
                     *const_cast<Node*>(this), parentNode()->nodeName()));
-			}
+            }
         }
         if (_myFacade) {
             _myFacade->setSelf(_myFacade);
@@ -2974,7 +2975,7 @@ Node::hasFacade() const {
 
 bool
 Node::hasExistingFacade() const {
-    return _myFacade;
+    return _myFacade != 0;
 }
 
 
@@ -3029,7 +3030,7 @@ Node::freeCaches() const {
     _myAttributes.freeCaches();
     getChildren().freeCaches();
  }
- 
+
 bool
 Node::flushUnusedChildren() const {
     if (!getIDRegistry()->hasOffsetCatalog()) {
@@ -3041,7 +3042,7 @@ Node::flushUnusedChildren() const {
         return true;
     }
     bool flushMyChildren = true;   
-    for (int i = 0; i< getChildren().length(); ++i) {
+    for (NodeList::size_type i = 0; i< getChildren().length(); ++i) {
         if (!getChildren()[i].flushUnusedChildren()) {
             AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because child " << i << " is modified or referenced"; 
             flushMyChildren = false;
@@ -3065,7 +3066,7 @@ Node::flushUnusedChildren() const {
         AC_DEBUG << "flushUnusedChildren() attribute " << getUniqueId() << ", name="<<nodeName() << " is unchanged and not externally referenced, flushMyChildren="<<flushMyChildren; 
         return flushMyChildren;
     }
-    for (int i = 0; i< _myAttributes.length(); ++i) {
+    for (NamedNodeMap::size_type i = 0; i< _myAttributes.length(); ++i) {
         if (!_myAttributes[i].flushUnusedChildren()) {
             AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because attribute " << i << " is modified or referenced"; 
             return false;
@@ -3099,7 +3100,7 @@ Node::registerName() {
  
 void
 Node::reparent(Node * theNewParent, Node * theTopNewParent) {
-    Node * myOldParent = _myParent;
+    //Node * myOldParent = _myParent;
     _myParent = theNewParent;
     unregisterName();
     if (theTopNewParent) {
@@ -3240,7 +3241,7 @@ dom::Node::dispatchEvent(EventPtr evt) {
         }
         // perform capturing phase event dispatch
         evt->eventPhase(Event::CAPTURING_PHASE);
-        for (int i = myTargets.size() - 1; i > 0  &&
+        for (std::vector<NodePtr>::size_type i = myTargets.size() - 1; i > 0  &&
                 !evt->isPropagationStopped(); --i)
         {
             myTargets[i]->callListeners(myTargets[i]->_myCapturingEventListeners, evt);
@@ -3260,7 +3261,7 @@ dom::Node::dispatchEvent(EventPtr evt) {
     if (!evt->targetOnly()) {
         if (evt->bubbles()) {
             evt->eventPhase(Event::BUBBLING_PHASE);
-            for (int i = 1;  i < myTargets.size() &&
+            for (std::vector<NodePtr>::size_type i = 1;  i < myTargets.size() &&
                     !evt->isPropagationStopped(); ++i)
             {
                 myTargets[i]->callListeners(myTargets[i]->_myEventListeners, evt);
@@ -3330,10 +3331,10 @@ dom::Node::printChangedNodes(unsigned long long theLastVersion, int theLevel) co
             }
             cerr << endl;
         }
-         for (unsigned i = 0; i < attributesLength(); ++i ) {
+        for (NodeList::size_type i = 0; i < attributesLength(); ++i ) {
             attributes().item(i)->printChangedNodes(theLastVersion, theLevel+1);
         }
-        for (unsigned i = 0; i < childNodesLength(); ++i ) {
+        for (NodeList::size_type i = 0; i < childNodesLength(); ++i ) {
             childNode(i)->printChangedNodes(theLastVersion, theLevel+1);
         }
     }

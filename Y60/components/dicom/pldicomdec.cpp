@@ -10,7 +10,16 @@
 */
 
 #include "pldicomdec.h"
+
+#include <vector>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plexcept.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 #include <osconfig.h>
 #include <dcfilefo.h>
@@ -18,8 +27,6 @@
 #include <djdecode.h>
 #include <dcmimage.h>
 #include <dcistrma.h>
-
-#include <vector>
 
 using namespace std;
 

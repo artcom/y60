@@ -29,7 +29,7 @@ BOOL IsWin2kSP4OrLater()
 {
    OSVERSIONINFOEX osvi;
    DWORDLONG dwlConditionMask = 0;
-   int op=VER_GREATER_EQUAL;
+   BYTE op=VER_GREATER_EQUAL;
 
    // Initialize the OSVERSIONINFOEX structure.
 

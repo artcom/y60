@@ -20,15 +20,21 @@
 //
 //=============================================================================
 
-#include "PLFilterWindowCW.h"
-
-#include <asl/math/numeric_functions.h>
-
-#include <paintlib/plbitmap.h>
-
 #include <iostream>
 #include <sstream>
 #include <vector>
+
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
+#include <paintlib/plbitmap.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
+
+#include <asl/math/numeric_functions.h>
+
+#include "PLFilterWindowCW.h"
 
 #define DB(x) // x
 
@@ -89,13 +95,14 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     PLBYTE ** pDstLineArray = theDestination->GetLineArray();
 
     unsigned myBytesPerPixel    = theSource->GetBitsPerPixel() / 8;
+    (void)myBytesPerPixel;
     DB(cerr << "myBytesPerPixel=" << myBytesPerPixel << endl);
-	unsigned mySrcBytesPerLine  = myBytesPerPixel * theSource->GetWidth();
-    unsigned myDestBytesPerLine = 1  * theSource->GetWidth();
+    //unsigned mySrcBytesPerLine  = myBytesPerPixel * theSource->GetWidth();
+    //unsigned myDestBytesPerLine = 1  * theSource->GetWidth();
     unsigned mySourceHeight     = theSource->GetHeight();
     unsigned mySourceWidth		= theSource->GetWidth();
-	if (mySrcBPP == 8) {
-	    
+    if (mySrcBPP == 8) {
+
         for (unsigned y = 0; y < mySourceHeight; ++y) {
             unsigned char * pSrcLine = pSrcLineArray[y];
             unsigned char* pDstLine = pDstLineArray[y];            

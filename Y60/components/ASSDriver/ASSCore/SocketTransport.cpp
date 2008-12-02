@@ -62,16 +62,15 @@ namespace y60 {
     SocketTransport::establishConnection() {
         AC_PRINT << "SocketTransport::establishConnection()";
         _mySocket = TCPClientSocketPtr(new TCPClientSocket());
-        
+
         Unsigned32 inHostAddress = getHostAddress(_myIpAddressString.c_str());
         _mySocket->setConnectionTimeout(2);
-        _mySocket->setRemoteAddr(inHostAddress, _myPort);
+        _mySocket->setRemoteAddr(inHostAddress, static_cast<asl::Unsigned16>(_myPort));
         _mySocket->connect();
         if (!_mySocket->isValid()) {
             _mySocket->retry(10);
-        }    
+        }
 
-    
         if (_mySocket->isValid()) {
             setState( SYNCHRONIZING );
             std::vector<unsigned char> myTrashBuffer;

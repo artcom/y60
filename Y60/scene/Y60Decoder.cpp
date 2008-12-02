@@ -71,7 +71,7 @@ namespace y60 {
     bool 
     Y60Decoder::addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
         _mySources.push_back(theSource);
-        return theSource;
+        return theSource != 0;
     }
  
     bool 
@@ -93,7 +93,7 @@ namespace y60 {
         if (myBinaryFlag) {
             AC_DEBUG << "  Y60Decoder::decodeScene: using binary xml loader, lazy="<<getLazy();
             myFileSize = theStream.size();
-            double myLoadTime = asl::Time() - loadStart;
+            //double myLoadTime = asl::Time() - loadStart;
             if (dynamic_cast<asl::MappedBlock*>(&theStream)) {
                 AC_INFO << "  Mapped Block size " << myFileSize << " bytes ";
             } else  {

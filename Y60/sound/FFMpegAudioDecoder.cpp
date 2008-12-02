@@ -110,7 +110,7 @@ void FFMpegAudioDecoder::open() {
         }
         // find first audio stream
         _myStreamIndex = -1;
-        for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
+        for (int i = 0; i < _myFormatContext->nb_streams; ++i) {
 #if (LIBAVCODEC_BUILD >= 0x4910)
             if (_myFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
 #else

@@ -53,7 +53,7 @@ class ProxyGeometryUnitTest : public UnitTest {
             }
             Matrix4f myTransformation = theCameraMatrix;
             //myTransformation.invert();
-            for (int i = 0; i < theReference.size(); ++i) {
+            for (VectorOfVector3f::size_type i = 0; i < theReference.size(); ++i) {
                 Point3f myPoint = Point3f(theReference[i]);
                 Vector3f myTransformedReference = product(myPoint, myTransformation);
                 if (!almostEqual(theCandidate[i], myTransformedReference)) {
@@ -106,7 +106,7 @@ class ProxyGeometryUnitTest : public UnitTest {
                     myModelMatrix, myCameraMatrix, myVolumeSize, mySampleRate,
                     myMaterial->getAttributeString(ID_ATTRIB), "VoxelProxy");
             ENSURE(extractPositions(myShape, myReference));
-            myCameraMatrix.makeXRotating(asl::PI/2);
+            myCameraMatrix.makeXRotating( static_cast<float>(asl::PI/2) );
             myShape = createVoxelProxyGeometry(myScene, myVoxelBox, myModelMatrix, myCameraMatrix,
                     myVolumeSize, mySampleRate, myMaterial->getAttributeString(ID_ATTRIB),
                     "VoxelProxy");
@@ -129,6 +129,7 @@ public:
         {
             SUCCESS("TODO: NOTHING TESTED HERE YET");
             return;
+            /*
             TextureManager * myTextureManager = 0;
             PackageManagerPtr myPackageManager( new PackageManager );
             ScenePtr myScene = Scene::createStubs(myPackageManager);
@@ -147,6 +148,7 @@ public:
                   y60::ConstColor());
 
             cerr << *myScene->getSceneDom();
+            */
         }
     }
 };

@@ -106,7 +106,7 @@ namespace y60 {
             _onRenderEventEnabled = false;
             _onFirstRenderEventEnabled = false;
             bool someEventEnabled = false;
-            for (int i = 0; i < myEvents.size();++i) {
+            for (VectorOfString::size_type i = 0; i < myEvents.size();++i) {
                 AC_TRACE << "TransformHierarchyFacade::updateEventTrigger() event="<<myEvents[i];
                 if (myEvents[i] == "onRender") {
                     _onRenderEventEnabled = true;
@@ -276,7 +276,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < getNode().childNodesLength(); ++i) {
             NodePtr myChildNode = getNode().childNode(i);
-            if (myChildNode == Node::ELEMENT_NODE) {
+            if (myChildNode->nodeType() == Node::ELEMENT_NODE) {
                 TransformHierarchyFacadePtr myChild = myChildNode->tryGetFacade<TransformHierarchyFacade>();
                 if (myChild) {
                     myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());

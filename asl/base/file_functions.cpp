@@ -287,7 +287,7 @@ namespace asl {
        std::vector<std::string> mySearchPaths;
        splitPaths(theSearchPath, mySearchPaths);
 
-       for (int i = 0; i < mySearchPaths.size(); ++i) {
+       for (std::vector<std::string>::size_type i = 0; i < mySearchPaths.size(); ++i) {
             std::string myPath = mySearchPaths[i];
 
             if (myPath.at(myPath.size() - 1) != '/') {
@@ -327,7 +327,7 @@ namespace asl {
             return false;
         }
 
-        const unsigned CHUNK_SIZE = 65536;
+        //const unsigned CHUNK_SIZE = 65536;
         unsigned long myPos = 0;
         while (inFile && myPos < theContent.size()) {
             unsigned myChunkSize = theContent.size() - myPos;

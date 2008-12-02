@@ -89,6 +89,7 @@ class ArgumentsUnitTest : public UnitTest {
                 "dummyProgramName", "firstFileName", "--bottles-in-fridge", "12" ,
                 "--check-beer-in-the-fridge", "someFileName", "anotherFileName"}; 
 
+            std::cout << "AHER!" << std::endl;
             ENSURE( myArguments.parse( 1, dummyArgvBad ));    
 
             ENSURE( ! myArguments.parse(dummyArgcBad, dummyArgvBad));

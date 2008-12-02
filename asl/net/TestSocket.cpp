@@ -146,10 +146,10 @@ void TestSocket::BaseTest() {
 
 TCPServer * TestSocket::createTCPServer(){
 
-    TCPServer * myTCPServer;
-    int serverPort;
-    const int MIN_PORT = 8000;
-    const int MAX_PORT = 8080;
+    TCPServer * myTCPServer = NULL;
+    asl::Unsigned16 serverPort;
+    const asl::Unsigned16 MIN_PORT = 8000;
+    const asl::Unsigned16 MAX_PORT = 8080;
 
     // TODO: linux test (not that easy, socket to be reused must be in state TIME_WAIT
     // see http://www.unixguide.net/network/socketfaq/4.5.shtml for more info
@@ -273,10 +273,10 @@ void * TestSocket::TCPServerThread(void *arg) {
 void TestSocket::UDPTest() {
     pthread_t myThread;
     int myResult;
-    int serverPort;
-    int clientPort;
-    const int MIN_PORT = 8000;
-    const int MAX_PORT = 8080;
+    asl::Unsigned16 serverPort;
+    asl::Unsigned16 clientPort;
+    const asl::Unsigned16 MIN_PORT = 8000;
+    const asl::Unsigned16 MAX_PORT = 8080;
 
     UDPSocket * myUDPServer=0;
     UDPSocket * myUDPClient=0;

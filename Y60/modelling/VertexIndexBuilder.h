@@ -38,7 +38,7 @@ namespace y60 {
             if (theXVertexCount < 1 || theYVertexCount < 1) {
                 throw asl::Exception("Need at least 1 vertex in X and Y direction", PLUS_FILE_LINE);
             }
-            const unsigned myXSubdivision = theXVertexCount - 1;
+            //const unsigned myXSubdivision = theXVertexCount - 1;
             const unsigned myYSubdivision = theYVertexCount - 1;
             for (unsigned y = 0; y < theYVertexCount; ++y) {
                 for (unsigned x = 0; x < theXVertexCount; ++x) {
@@ -59,7 +59,7 @@ namespace y60 {
         }
 
         void createIndices(ElementBuilder & theElementBuilder, unsigned theXVertexCount,
-						   unsigned theYVertexCount, unsigned theOffset = 0) const
+                          unsigned theYVertexCount, unsigned theOffset = 0) const
         {
             if (theXVertexCount < 2 || theYVertexCount < 2) {
                 throw asl::Exception("Need at least 2 vertices in X and Y direction", PLUS_FILE_LINE);

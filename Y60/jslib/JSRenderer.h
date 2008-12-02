@@ -19,7 +19,7 @@
 #include <y60/jsbase/JSMatrix.h>
 #include <y60/jsbase/JSNode.h>
 
-#include <y60/render/Renderer.h>
+#include <y60/glrender/Renderer.h>
 
 #include <asl/math/Vector234.h>
 #include <asl/math/numeric_functions.h>

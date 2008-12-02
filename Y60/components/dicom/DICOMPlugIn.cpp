@@ -27,9 +27,15 @@
 #include <asl/base/PlugInBase.h>
 
 #ifdef PL_DECODER
-#include "pldicomdec.h"
-#include <y60/image/IPaintLibExtension.h>
-#include <paintlib/pldecoderfactory.h>
+#   if defined(_MSC_VER)
+#       pragma warning (push,1)
+#   endif //defined(_MSC_VER)
+#   include <paintlib/pldecoderfactory.h>
+#   if defined(_MSC_VER)
+#       pragma warning (pop)
+#   endif //defined(_MSC_VER)
+#   include <y60/image/IPaintLibExtension.h>
+#   include "pldicomdec.h"
 #endif
 
 namespace y60 {

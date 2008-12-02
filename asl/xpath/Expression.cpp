@@ -772,6 +772,7 @@ namespace {
         assert(itFT != ft2FdiMap.end());
         const FuncDict::const_iterator itFD = itFT->second;
         const FunctionCallExpr::FunctionInfo& functionInfo = itFD->second;
+        (void)functionInfo;
         assert(type==functionInfo.functionType);
         return itFD;
     }

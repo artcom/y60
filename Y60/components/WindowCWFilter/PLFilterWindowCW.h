@@ -25,8 +25,14 @@
 
 #include <asl/base/Exception.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpaintlibdefs.h>
 #include <paintlib/Filter/plfilter.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 DEFINE_EXCEPTION(UnsupportedPixelFormat, asl::Exception)
 

@@ -1,4 +1,4 @@
-//
+//============================================================================
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
@@ -19,14 +19,20 @@
 
 #include "SDLSplashScreen.h"
 
-#include <paintlib/planydec.h>
-#include <paintlib/planybmp.h>
-
-#include <asl/base/os_functions.h>
-
-#include <SDL/SDL_getenv.h>
 #include <sstream>
 #include <iostream>
+
+#include <asl/base/os_functions.h>
+#include <SDL/SDL_getenv.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/planydec.h>
+#include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 SDLSplashScreen * SDLSplashScreen::_instance = 0;
 
@@ -81,15 +87,14 @@ SDLSplashScreen::enable(const std::string& theBMPFilePath, int theXPos, int theY
         
         // setting up SDL_Surface
         _myImage = SDL_CreateRGBSurface(SDL_SWSURFACE, myWidth, myHeight, 32, rmask, gmask, bmask, amask);
-        SDL_PixelFormat * mySurfaceFormat = _myImage->format;
         
         // setting surface pixels
         if (myBitsPerPixel == 24) {
-            PLPixel24 * myBmpPixel;
+            PLPixel24 * myBmpPixel = NULL;
             PLPixel24 ** myBmpPixels = myBmp.GetLineArray24();
             setSurfacePixels(myBmpPixel, myBmpPixels, _myImage, myHeight, myWidth);
         } else {
-            PLPixel32 * myBmpPixel;
+            PLPixel32 * myBmpPixel = NULL;
             PLPixel32 ** myBmpPixels = myBmp.GetLineArray32();
             setSurfacePixels(myBmpPixel, myBmpPixels, _myImage, myHeight, myWidth);
         }

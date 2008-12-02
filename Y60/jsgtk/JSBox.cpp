@@ -47,12 +47,12 @@ pack_start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        int myPackOptions;
+        int myPackOptions = 0;
         if (argc > 1) {
             convertFrom(cx, argv[1], myPackOptions);
         }
 
-        guint myPadding;
+        guint myPadding = 0;
         if (argc > 2) {
             convertFrom(cx, argv[2], myPadding);
         }
@@ -90,13 +90,12 @@ pack_end(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        int myPackOptions;
+        int myPackOptions = 0;
         if (argc > 1) {
             convertFrom(cx, argv[1], myPackOptions);
-            Gtk::PackOptions myPOpts = static_cast<Gtk::PackOptions>(myPackOptions);
         }
 
-        guint myPadding;
+        guint myPadding = 0;
         if (argc > 2) {
             convertFrom(cx, argv[2], myPadding);
         }

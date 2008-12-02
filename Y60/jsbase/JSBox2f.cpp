@@ -149,7 +149,6 @@ touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     typedef bool (NATIVE::*MyMethod)(const asl::Box2<Number> &) const;
     return Method<NATIVE>::call((MyMethod)&NATIVE::touches,cx,obj,argc,argv,rval);
-    return JS_FALSE;
 }
 static JSBool
 setBounds(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

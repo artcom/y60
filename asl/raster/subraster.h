@@ -49,8 +49,8 @@ class subraster_base_iterator
 			typename RASTER::reference>
 {
     public:
+        typedef typename RASTER::value_type value_type;
         typedef typename RASTER::pointer base_ptr;
-        
         typedef typename RASTER::reference reference;
         typedef typename RASTER::difference_type difference_type;
 
@@ -115,7 +115,8 @@ class subraster_base_iterator
             return (x_>0) && (y_>0) && (x_<_map->xsize()) && (y_<_map->ysize());
         }
 
-        operator void*() const {return static_cast<void*>(_cur);}
+        // TODO: Find a way to remove the const_cast again!
+        operator void* const() {return static_cast<void*>(const_cast<value_type*>(_cur));}
 };
 
 
@@ -207,6 +208,7 @@ class subraster_iterator : public subraster_base_iterator<RASTER>
 
         bool operator==(const subraster_iterator& it) const { return this->_cur == it._cur; }
         bool operator!=(const subraster_iterator& it) const { return this->_cur != it._cur; };
+
 };
 
 /// const version of subraster_iterator
@@ -339,7 +341,7 @@ class const_subraster
         typedef T value_type;
         typedef const T * pointer;
         typedef size_t size_type;
-        typedef AC_OFFSET_TYPE difference_type;
+        typedef D difference_type;
         typedef const value_type & reference;
         typedef const value_type & const_reference;
 
@@ -485,8 +487,11 @@ class const_subraster
         }
     public: // OPERATORS
         const_reference operator()(D X, D Y) const { return *(find(X, Y)); }
-
+#if _MSC_VER == 1500
+    public:
+#else
     protected: // MEMBER FUNCTIONS
+#endif
         const T * get_ptr(D X, D Y) const { 
             return _dataptr + _stride * Y + X;
         }
@@ -574,11 +579,11 @@ class subraster : public const_subraster<T, D>
 
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
-/*
-        friend class subraster_base_iterator<T, Alloc, D>;
-        friend class iterator;
-        friend class const_iterator;
-*/
+
+        friend class subraster_base_iterator<raster_type>;
+        friend class subraster_iterator<raster_type>;
+        //friend class const_iterator; // fails with GCC 4.2.3; according to como, typedefs may not be used in an elaborated type specifier
+
     public:  // CONSTRUCTORS
 
         subraster() { }

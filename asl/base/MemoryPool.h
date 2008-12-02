@@ -107,7 +107,7 @@ MemoryPool<T>::alloc(Size theSize) {
         return malloc(theSize);
         //throw BadAllocSize(std::string("Required ") +asl::as_string(theSize)+"expected "+asl::as_string(sizeof(T)),PLUS_FILE_LINE);
     }
-    MemoryPool<T> * myPool = _myNextPool;
+    //MemoryPool<T> * myPool = _myNextPool;
     if (!_myNextPool) {
         expandTheFreeList();
     }

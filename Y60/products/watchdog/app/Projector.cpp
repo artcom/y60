@@ -14,6 +14,8 @@
 
 #include "Projector.h"
 
+#include <string>
+
 #include "NecProjector.h"
 #include "PdF1Projector.h"
 #include "PanasonicProjector.h"
@@ -147,7 +149,7 @@ Projector::command(const std::string & theCommand)
         lampPower(true);
     }
     else if (theCommand.substr(0, 22) == "projector_input_select") {
-        int myIndex = theCommand.find("=", 0);
+        std::string::size_type myIndex = theCommand.find("=", 0);
         if (myIndex != std::string::npos) {
             std::string mySource = theCommand.substr(myIndex+1);
             selectInput(mySource);

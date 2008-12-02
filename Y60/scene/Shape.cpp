@@ -185,7 +185,7 @@ namespace y60 {
             }
         }
         throw ShapeException(std::string("Could not find vertex data '")+theDataName+"' in shape '"+get<IdTag>()+"'", "Scene::getListData()");
-        return NodePtr(0);
+        //return NodePtr(0);
     }
 
 #if 0 
@@ -254,7 +254,7 @@ namespace y60 {
     {
         MAKE_SCOPE_TIMER(Shape_collide);
         bool myResult = false;
-        for (int i = 0; i < _myPrimitives.size();++i) {
+        for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {
             if (_myPrimitives[i]->collide(theSphere, theMotion, theTransformation, theSphereContacts)) {
                 myResult = true;
             }
@@ -271,7 +271,7 @@ namespace y60 {
         MAKE_SCOPE_TIMER(Shape_collide_first);
         const asl::SweptSphereContact<float> * myCurrentContact = &theCurrentContact;
         bool myResult = false;
-        for (int i = 0; i < _myPrimitives.size();++i) {
+        for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {
             if (_myPrimitives[i]->collide(theSphere, theMotion, theTransformation, *myCurrentContact, theNewContactInfo)) {
                 myCurrentContact = &(theNewContactInfo._myMinContact);
                 myResult = true;

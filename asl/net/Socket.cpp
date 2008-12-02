@@ -58,6 +58,10 @@
 
 #include <asl/base/string_functions.h>
 
+#ifdef min
+#undef min
+#endif
+
 using namespace std;
 using namespace asl;
 
@@ -110,7 +114,13 @@ namespace inet {
 
             fd_set readset;
             FD_ZERO(&readset);
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
             FD_SET(fd, &readset);
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
             // Initialize time out struct
             tv.tv_sec = getConnectionTimeout();
@@ -141,7 +151,7 @@ namespace inet {
     unsigned Socket::send(const void *data, unsigned len)
     {
         int byteswritten;
-        if ((byteswritten=::send(fd, (char*)data, len, 0)) != len)
+        if ((byteswritten=::send(fd, (char*)data, len, 0)) != static_cast<int>(len))
         {
             int err = getLastSocketError();
             throw SocketException(err, "Socket::write() failed.");
@@ -187,7 +197,7 @@ namespace inet {
             int err = getLastSocketError();
             throw SocketException(err, "Socket::peek() failed.");
         }
-        return min(theBytesInBuffer, n);  // For compatibility with the linux version.
+        return min(theBytesInBuffer, static_cast<u_long>(n));  // For compatibility with the linux version.
 #endif
     }
 

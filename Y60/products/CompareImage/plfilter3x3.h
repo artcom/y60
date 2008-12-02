@@ -11,13 +11,16 @@
 #ifndef FILTER3x3_H
 #define FILTER3x3_H
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
 #include <asl/math/Matrix4.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/Filter/plfilter.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace asl {
     // TODO: Move this to somewhere in asl/Math

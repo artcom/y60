@@ -164,8 +164,8 @@ class AudioBuffer: public AudioBufferBase {
                         unsigned theSrcStartFrame, unsigned numFrames) 
         {
             const AudioBuffer<SAMPLE>* mySrcBuffer = getBufferFromInterface(theSrcBuffer);
-            unsigned theSrcNumFrames = theSrcBuffer.getNumFrames();
-            unsigned theDestNumFrames = getNumFrames();
+            //unsigned theSrcNumFrames = theSrcBuffer.getNumFrames();
+            //unsigned theDestNumFrames = getNumFrames();
 //             AC_PRINT << "AudioBuffer::partialAdd:\n"
 //                      << "theDestStartFrame=" << theDestStartFrame << ", "
 //                      << "theSrcStartFrame=" << theSrcStartFrame << ", "
@@ -199,8 +199,8 @@ class AudioBuffer: public AudioBufferBase {
             ASSURE(theSrcBuffer.getNumFrames() - theSrcStartFrame >= numFrames);
             ASSURE(theDestStartFrame + numFrames <= getNumFrames());
 
-            SAMPLE * curOutSample = begin()+myDestStartSample;
-            const SAMPLE * curInSample = mySrcBuffer->begin()+mySrcStartSample;
+            //SAMPLE * curOutSample = begin()+myDestStartSample;
+            //const SAMPLE * curInSample = mySrcBuffer->begin()+mySrcStartSample;
             ASSURE (mySrcBuffer->getNumChannels() == getNumChannels());
             memcpy(begin()+myDestStartSample, mySrcBuffer->begin()+mySrcStartSample, numBytes);
         }
@@ -319,11 +319,11 @@ class AudioBuffer: public AudioBufferBase {
         // Adds a marker into the buffer that can be seen in a waveform editor :-). 
         void setMarker(float theValue) {
             SAMPLE * myPtr = begin();
-            int numSamples = 20;
+            unsigned numSamples = 20;
             if (_numFrames*_numChannels < numSamples) {
                 numSamples = _numFrames*_numChannels;
             }
-            for (int i=0; i<numSamples; i++) {
+            for (unsigned i=0; i<numSamples; i++) {
                 *myPtr = floatToSample(theValue);
                 ++myPtr;
             }

@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-
 #ifdef OSX
 #include <y60/glutil/GLUtils.h>
 #undef check
@@ -26,18 +25,26 @@
 #include <y60/jslib/JSApp.h>
 #include <y60/glutil/ScopedGLContext.h>
 #include <y60/input/EventDispatcher.h>
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 #include <y60/glutil/GLUtils.h>
 
-#include <glade/glade.h>
+//#include <glade/glade.h>
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtk/gtkgl.h>
 #include <gtkmm/drawingarea.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <iostream>
 #include <math.h>
 
 #ifdef WIN32
+#if !defined(WIN32_LEAN_AND_MEAN)
 #define WIN32_LEAN_AND_MEAN 1
+#endif
 #include <windows.h>
 #endif
 
@@ -154,7 +161,7 @@ RenderArea::swapBuffers() {
 bool
 RenderArea::on_expose_event (GdkEventExpose *event) {
     try {
-        GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
+        /*GdkGLDrawable *gldrawable =*/ gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
         ScopedGLContext myContext(this);
 
         if (_myRenderer && _myScene) {
@@ -353,52 +360,52 @@ RenderArea::setIdleMode(bool theEnabledFlag) {
 
 bool
 RenderArea::on_map_event (GdkEventAny *event) {
-    try {
-        // idle_add ();
+    //try {
+    //    idle_add ();
 
-    } catch (const asl::Exception & ex) {
-        AC_FATAL << "Exception caught: " << ex;
-    } catch (const exception & ex) {
-        AC_FATAL << "Exception caught: " << ex.what();
-    } catch (...) {
-        AC_FATAL << "Unknown exception";
-    }
+    //} catch (const asl::Exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex;
+    //} catch (const exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex.what();
+    //} catch (...) {
+    //    AC_FATAL << "Unknown exception";
+    //}
     return true;
 }
 
 bool
 RenderArea::on_unmap_event (GdkEventAny *event) {
-    try {
-        // idle_remove ();
+    //try {
+    //    idle_remove ();
 
-    } catch (const asl::Exception & ex) {
-        AC_FATAL << "Exception caught: " << ex;
-    } catch (const exception & ex) {
-        AC_FATAL << "Exception caught: " << ex.what();
-    } catch (...) {
-        AC_FATAL << "Unknown exception";
-    }
+    //} catch (const asl::Exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex;
+    //} catch (const exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex.what();
+    //} catch (...) {
+    //    AC_FATAL << "Unknown exception";
+    //}
     return true;
 }
 
 bool
 RenderArea::on_visibility_notify_event (GdkEventVisibility *event) {
-    try {
-        /*
-           if (event->state == GDK_VISIBILITY_FULLY_OBSCURED)
-           idle_remove ();
-           else
-           idle_add ();
-         */
+    //try {
+    //    
+    //    if (event->state == GDK_VISIBILITY_FULLY_OBSCURED)
+    //    idle_remove ();
+    //    else
+    //    idle_add ();
+    //    
 
 
-    } catch (const asl::Exception & ex) {
-        AC_FATAL << "Exception caught: " << ex;
-    } catch (const exception & ex) {
-        AC_FATAL << "Exception caught: " << ex.what();
-    } catch (...) {
-        AC_FATAL << "Unknown exception";
-    }
+    //} catch (const asl::Exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex;
+    //} catch (const exception & ex) {
+    //    AC_FATAL << "Exception caught: " << ex.what();
+    //} catch (...) {
+    //    AC_FATAL << "Unknown exception";
+    //}
     return true;
 }
 

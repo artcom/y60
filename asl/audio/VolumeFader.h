@@ -56,7 +56,7 @@ private:
                     }
                     myFader->_myCurrentVolume = myFader->_myBeginVolume+
                             myFadePercent*myVolumeDiff;
-                    for (int myChannel = 0; myChannel<theBuffer.getNumChannels(); 
+                    for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels(); 
                             ++myChannel) 
                     {
                         *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolume);

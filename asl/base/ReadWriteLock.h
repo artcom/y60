@@ -176,6 +176,7 @@ DB3(cycles_t _cycles);
             if (myPriority == 0) {
                 myPriority = new Priority;
                 int status = pthread_setspecific(_normalPriorityKey,reinterpret_cast<void*>(myPriority));
+                (void)status;
             }
             return myPriority;
         }

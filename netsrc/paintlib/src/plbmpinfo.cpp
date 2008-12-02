@@ -25,13 +25,13 @@ const char szInfoFormatString[] =
 
 PLBmpInfo::PLBmpInfo (const PLPoint& Size, const PLPoint& Resolution,
                       const PLPixelFormat & pf)
-  : m_pf(PLPixelFormat::DONTCARE)
+  : m_Size(), m_Resolution(), m_pf(PLPixelFormat::DONTCARE)
 {
   SetBmpInfo (Size, Resolution, pf);
 }
 
 PLBmpInfo::PLBmpInfo (const char * pszInfo)
-  : m_pf(PLPixelFormat::DONTCARE)
+  : m_Size(), m_Resolution(), m_pf(PLPixelFormat::DONTCARE)
 {
   vector<char> pf(128);
   int NumFields = sscanf (pszInfo, szInfoFormatString,

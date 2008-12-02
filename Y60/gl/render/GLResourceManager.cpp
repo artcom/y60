@@ -195,26 +195,26 @@ namespace y60 {
     }
 
     bool 
-	GLResourceManager::imageMatchesGLTexture2D(TexturePtr theTexture) const {
+    GLResourceManager::imageMatchesGLTexture2D(TexturePtr theTexture) const {
         AC_DEBUG << "imageMatchesGLTexture2D() binding Texture " << theTexture->getTextureId();
         glBindTexture(GL_TEXTURE_2D, theTexture->getTextureId());
         CHECK_OGL_ERROR;
 
-		// get current uploaded image size
-		GLint myUploadedWidth          = -1;
-		GLint myUploadedHeight         = -1;
-		GLint myUploadedInternalFormat = -1;
-		GLint myUploadedMinFilter      = -1;
+        // get current uploaded image size
+        GLint myUploadedWidth          = -1;
+        GLint myUploadedHeight         = -1;
+        GLint myUploadedInternalFormat = -1;
+        GLint myUploadedMinFilter      = -1;
         glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
         CHECK_OGL_ERROR;
-		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
         CHECK_OGL_ERROR;
-		glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT, 
-                                 &myUploadedInternalFormat);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT, 
+            &myUploadedInternalFormat);
         CHECK_OGL_ERROR;
 
-		glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
-		
+        glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
+
         CHECK_OGL_ERROR;
         ImagePtr myImage = theTexture->getImage();
         unsigned int myWidth = myImage->get<ImageWidthTag>();
@@ -226,13 +226,13 @@ namespace y60 {
 
         GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
 
-		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
+        bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+            myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
+            myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
+            myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
         bool myMipMapMatch = theTexture->get<TextureMipmapTag>() == myOpenGLMipMapSetting;
-        bool mySizeMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight); 
-        bool myInternalFormatMatch = myInternalFormat == myUploadedInternalFormat;
+        bool mySizeMatch = (static_cast<GLint>(myWidth) == myUploadedWidth) && (static_cast<GLint>(myHeight) == myUploadedHeight); 
+        bool myInternalFormatMatch = static_cast<GLint>(myInternalFormat) == myUploadedInternalFormat;
         AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
         AC_DEBUG << "Width match: " << mySizeMatch;
         AC_DEBUG << "Image size: " << myWidth << "x" << myHeight;
@@ -241,32 +241,32 @@ namespace y60 {
         AC_DEBUG << "Uploaded InternalFormat: " << getGLEnumString(myUploadedInternalFormat);
         AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
 
-		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
+        return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
     }
-   bool 
-	GLResourceManager::imageMatchesGLTexture3D(TexturePtr theTexture) const {
+    bool 
+    GLResourceManager::imageMatchesGLTexture3D(TexturePtr theTexture) const {
         AC_DEBUG << "imageMatchesGLTexture3D() binding Texture " << theTexture->getTextureId();
         glBindTexture(GL_TEXTURE_3D, theTexture->getTextureId());
         CHECK_OGL_ERROR;
 
-		// get current uploaded image size
-		GLint myUploadedWidth          = -1;
-		GLint myUploadedHeight         = -1;
-		GLint myUploadedDepth          = -1;
-		GLint myUploadedInternalFormat = -1;
-		GLint myUploadedMinFilter      = -1;
+        // get current uploaded image size
+        GLint myUploadedWidth          = -1;
+        GLint myUploadedHeight         = -1;
+        GLint myUploadedDepth          = -1;
+        GLint myUploadedInternalFormat = -1;
+        GLint myUploadedMinFilter      = -1;
         glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_WIDTH, &myUploadedWidth);
         CHECK_OGL_ERROR;
-		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
+        glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_HEIGHT, &myUploadedHeight);
         CHECK_OGL_ERROR;
-		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_DEPTH, &myUploadedDepth);
+        glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_DEPTH, &myUploadedDepth);
         CHECK_OGL_ERROR;
-		glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_INTERNAL_FORMAT, 
-                                 &myUploadedInternalFormat);
+        glGetTexLevelParameteriv(GL_TEXTURE_3D,0,GL_TEXTURE_INTERNAL_FORMAT, 
+            &myUploadedInternalFormat);
         CHECK_OGL_ERROR;
 
-		glGetTexParameteriv(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
-		
+        glGetTexParameteriv(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER, &myUploadedMinFilter);
+
         CHECK_OGL_ERROR;
         ImagePtr myImage = theTexture->getImage();
         unsigned int myWidth = myImage->get<ImageWidthTag>();
@@ -280,13 +280,15 @@ namespace y60 {
 
         GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
 
-		bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
-			                         myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
+        bool myOpenGLMipMapSetting = myUploadedMinFilter == GL_NEAREST_MIPMAP_NEAREST || 
+            myUploadedMinFilter == GL_NEAREST_MIPMAP_LINEAR || 
+            myUploadedMinFilter == GL_LINEAR_MIPMAP_NEAREST || 
+            myUploadedMinFilter == GL_LINEAR_MIPMAP_LINEAR;
         bool myMipMapMatch = theTexture->get<TextureMipmapTag>() == myOpenGLMipMapSetting;
-        bool mySizeMatch = (myWidth == myUploadedWidth) && (myHeight == myUploadedHeight) && (myDepth == myUploadedDepth); 
-        bool myInternalFormatMatch = myInternalFormat == myUploadedInternalFormat;
+        bool mySizeMatch = (static_cast<GLint>(myWidth) == myUploadedWidth)
+                        && (static_cast<GLint>(myHeight) == myUploadedHeight)
+                        && (static_cast<GLint>(myDepth) == myUploadedDepth); 
+        bool myInternalFormatMatch = static_cast<GLint>(myInternalFormat) == myUploadedInternalFormat;
         AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
         AC_DEBUG << "Width match: " << mySizeMatch;
         AC_DEBUG << "Image size: " << myWidth << "x" << myHeight << "x" << myDepth;
@@ -295,26 +297,26 @@ namespace y60 {
         AC_DEBUG << "Uploaded InternalFormat: " << getGLEnumString(myUploadedInternalFormat);
         AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
 
-		return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
+        return myMipMapMatch && mySizeMatch && myInternalFormatMatch; 
     }
     
     bool 
-	GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
+    GLResourceManager::imageMatchesGLTexture(TexturePtr theTexture) const {
         AC_DEBUG << "imageMatchesGLTexture()";
         if (theTexture->getTextureId() == 0) {
             AC_DEBUG << "imageMatchesGLTexture(): return false, texture has not been uploaded yet";
             return false;
         }
         CHECK_OGL_ERROR;
-	    if (theTexture->getType() == TEXTURE_2D) {
-	        return imageMatchesGLTexture2D(theTexture);
-	    }
-	    if (theTexture->getType() == TEXTURE_3D) {
-	        return imageMatchesGLTexture3D(theTexture);
-	    }
+        if (theTexture->getType() == TEXTURE_2D) {
+            return imageMatchesGLTexture2D(theTexture);
+        }
+        if (theTexture->getType() == TEXTURE_3D) {
+            return imageMatchesGLTexture3D(theTexture);
+        }
         AC_DEBUG << "imageMatchesGLTexture() returning false, unknown texture type (not TEXTURE_2D or TEXTURE_3D), id=  " << theTexture->getTextureId();
         return false; 
-	}
+    }
 
     void
     GLResourceManager::setTexturePriority(const TexturePtr & theTexture, float thePriority) {

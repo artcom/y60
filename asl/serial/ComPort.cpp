@@ -75,7 +75,7 @@ namespace asl {
             checkError(PLUS_FILE_LINE);
         }
         myDCB.BaudRate = convertBaudRate(theBaudRate);
-        myDCB.ByteSize = theDataBits;
+        myDCB.ByteSize = static_cast<BYTE>(theDataBits);
         myDCB.Parity   = convertParity(theParityMode);
         myDCB.StopBits = convertStopBits(theStopBits);
         myDCB.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
@@ -155,7 +155,7 @@ namespace asl {
     ComPort::readBlocking(unsigned char * theBuffer, size_t & theSize) {
         size_t myMinReadBytes = _myMinReadBytes == 0 ? theSize : _myMinReadBytes;
         if (_myBuffer.size() < myMinReadBytes) {
-            size_t myBytesToRead = myMinReadBytes - _myBuffer;
+            size_t myBytesToRead = myMinReadBytes - _myBuffer.size();
             asl::Block myTmpBuffer(myBytesToRead);
             readFromDevice(myTmpBuffer.begin(), myBytesToRead);
             myTmpBuffer.resize( myBytesToRead );

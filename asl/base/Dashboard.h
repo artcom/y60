@@ -128,21 +128,22 @@ namespace asl {
             return _myLines.size()-1;
         }
         void setField(const std::string & theColumnID, std::string theValue, int theLine = -1) {
+            std::vector<std::map<std::string,std::string> >::size_type thelineIdx = theLine;
             if (_myLines.size() == 0) {
                 addRow();
             }
             if (theLine == -1) {
-                theLine = _myLines.size()-1;
+                thelineIdx = _myLines.size()-1;
             }
-            if (_myLines.size()<theLine+1) {
-                _myLines.resize(theLine+1);
+            if (_myLines.size()<thelineIdx+1) {
+                _myLines.resize(thelineIdx+1);
             }
 
             std::map<std::string,unsigned long>::const_iterator cit =
                 _myColumnIDs.find(theColumnID);
             if (cit!=_myColumnIDs.end()) {
                 adjustWidths(theValue,_myColumns[cit->second],_myColumns[cit->second].justify);
-                _myLines[theLine][theColumnID] = theValue;
+                _myLines[thelineIdx][theColumnID] = theValue;
             } else {
                 AC_ERROR << "Table::setField: unknown column id:"<<theColumnID<<std::endl;
             }

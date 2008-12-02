@@ -101,7 +101,7 @@ int dom_test2() {
 	std::cout << "DEBUG: dom_test2() adding content" << std::endl;
 
         root("scene")["version"]="1.0";
-        const char * dp = root("scene")["version"].nodeValue().c_str();
+        /*const char * dp =*/ root("scene")["version"].nodeValue().c_str();
 
 	std::cout << "DEBUG: dom_test2() YES!!!" << std::endl;
 
@@ -155,9 +155,9 @@ int dom_test2() {
         
         try {
             const dom::Node & scene = root2("scene");
-            const dom::Node & version = scene["version"];
+            /*const dom::Node & version =*/ scene["version"];
 
-            const char * dp = root2("scene")["version"].nodeValue().c_str();
+            /*const char * dp =*/ root2("scene")["version"].nodeValue().c_str();
 
             TESTIF(root2("scene")["version"].nodeValue()=="1.0");
             TESTIF(root2("scene").getAttributeString("version") == "1.0");

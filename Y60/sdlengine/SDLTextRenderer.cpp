@@ -11,26 +11,32 @@
 
 #include "SDLTextRenderer.h"
 
-#include <y60/image/Image.h>
+#include <iostream>
 
 #include <asl/math/numeric_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/Dashboard.h>
 #include <asl/base/Logger.h>
 
-#include <iostream>
+#include <y60/image/Image.h>
 
 #include <sdl/ttf2/SDL_ttf.h>
 
-#define DB(x) //x
-#define DB2(x) //x
-
 //#define DUMP_TEXT_AS_PNG
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #ifdef DUMP_TEXT_AS_PNG
 #include <paintlib/plpngenc.h>
 #include <paintlib/pltiffenc.h>
 #include <paintlib/planybmp.h>
 #endif
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#define DB(x) //x
+#define DB2(x) //x
 
 using namespace std;
 using namespace asl;
@@ -387,8 +393,8 @@ namespace y60 {
     // returns offset past end of s if s is the exact next part
     inline unsigned
     read_if_string(const std::string & is, unsigned pos, const std::string & s) {
-        int i = 0;
-        int n = asl::minimum(s.size(),is.size()-pos);
+        std::string::size_type i = 0;
+        std::string::size_type n = asl::minimum(s.size(),is.size()-pos);
         while (i < n && pos < is.size() && is[pos+i] == s[i]) {
             ++i;
         }
@@ -492,7 +498,7 @@ namespace y60 {
                 myNextWordOffset = 0;
             }
             
-            if (myOffset = parseNewline(theText, myTextPos)) {
+            if ( 0 != (myOffset = parseNewline(theText, myTextPos)) ) {
                 theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                 theResult.back().newline = true;
                 theResult.back().format  = myFormat;
@@ -500,7 +506,7 @@ namespace y60 {
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
                 DB2(AC_TRACE << "Found newline, word: '" << theResult.back().text << "' new start: " << myWordStart << endl;)
-            } else if (myOffset = parseHtmlTag(theText, myTextPos, myNewFormat)) {
+            } else if ( 0 != (myOffset = parseHtmlTag(theText, myTextPos, myNewFormat)) ) {
                 DB2(AC_TRACE << "Found tag: bold: " << myNewFormat.bold << " italics: " << myNewFormat.italics << " underline: "
                      << myNewFormat.underline << endl;)
                 if (myWordStart != myWordEnd) {
@@ -512,7 +518,7 @@ namespace y60 {
                 myTextPos  += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
-            } else if (myOffset = parseWord(theText, myTextPos)) {  
+            } else if ( 0 != (myOffset = parseWord(theText, myTextPos))) {  
                 if (_myHorizontalAlignment == RIGHT_ALIGNMENT) {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                     myNextWordOffset = myOffset; 

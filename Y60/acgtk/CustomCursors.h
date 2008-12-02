@@ -15,7 +15,15 @@
 //
 //=============================================================================
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4413 4244 4512)
+#endif //defined(_MSC_VER)
 #include <gdkmm.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
+
 #include <iostream>
 
 using namespace std;

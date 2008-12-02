@@ -320,7 +320,7 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
             int mySetBitCount = 0;
             int myTotalBitCount = this->count();
 
-            for (int i = 0; i < this->size(); ++i) {
+            for (std::size_t i = 0; i < this->size(); ++i) {
                 if (this->test(i)) {
                     //os << THE_ENUM(static_cast<typename THE_ENUM::Native>(i));
                     os << THE_ENUM::getString(i);

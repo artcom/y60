@@ -29,7 +29,7 @@ public:
              const PLPixelFormat & pf);
 
   //! Creates an uninitialized info object.
-  PLBmpInfo () : m_pf(PLPixelFormat::DONTCARE) {}
+  PLBmpInfo () : m_Size(), m_Resolution(), m_pf(PLPixelFormat::DONTCARE) {}
 
   //! Creates an info object from an ascii representation. This ascii representation
   //! can be created using AsString();

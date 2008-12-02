@@ -22,15 +22,22 @@
 //=============================================================================
 
 #include "TestFilterTile.h"
-#include "FilterTile.h"
 
+#include <typeinfo>
+#include <stdexcept>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plpixel32.h>
 #include <paintlib/Filter/plfilterfill.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <typeinfo>
-#include <stdexcept>
+#include "FilterTile.h"
 
 using namespace TexGen;
 using namespace std;
@@ -58,9 +65,9 @@ void TestFilterTile::setupComplexTextures () {
             PLPixel32 * texLine = (PLPixel32*)texLines[y];
             for (int x=0; x<_texSize; x++) {
                 if (i==0) {
-                    texLine[x] = PLPixel32 (0,0,x+y,0);
+                    texLine[x] = PLPixel32 (0,0,static_cast<PLBYTE>(x+y),0);
                 } else {
-                    texLine[x] = PLPixel32 (x+y,0,0,0);
+                    texLine[x] = PLPixel32 (static_cast<PLBYTE>(x+y),0,0,0);
                 }
             }
         }
@@ -108,7 +115,6 @@ void TestFilterTile::runGeneratorTest (int numSquares, int texSize, bool simple)
         cerr << getTracePrefix() << "complex textures." << endl;
     }
 
-    PLBYTE ** indexBmpLines = _indexBmp.GetLineArray();
     _myGenerator->Apply (&_indexBmp, &_resultBmp);
 
     // We should have a large checkboard pattern now...
@@ -173,7 +179,6 @@ void TestFilterTile::runIndexExceptionTest() {
 }
 
 void TestFilterTile::runTexSizeExceptionTest() {
-    PLBYTE ** indexBmpLines = _indexBmp.GetLineArray();
     _texBmps[0]->Create (2, 5, PLPixelFormat::X8R8G8B8);
     bool ok = false;
     try {

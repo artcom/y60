@@ -40,7 +40,7 @@ getASSSettings(dom::NodePtr theSettings) {
 void dumpBuffer(std::vector<unsigned char> & theBuffer) {
     if ( ! theBuffer.empty()) {
         cerr << "=========== buffer: " << endl;
-        unsigned myMax = asl::minimum( unsigned(theBuffer.size()), unsigned(80));
+        //unsigned myMax = asl::minimum( unsigned(theBuffer.size()), unsigned(80));
         cerr.setf( std::ios::hex, std::ios::basefield );
         cerr.setf( std::ios::showbase );
         for (unsigned i = 0; i < /*myMax*/ theBuffer.size(); ++i) {

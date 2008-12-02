@@ -73,11 +73,10 @@ namespace y60 {
             myCWD = thePath;
         }
 
-        bool myResult = CreateProcess(
-            NULL, &theCommand[0],
-            NULL, NULL, TRUE, 0,
-            NULL, myCWD.c_str(), &myStartupInfo,
-            &_myProcessInfo);
+        bool myResult = 0 != CreateProcess( NULL, &theCommand[0],
+                                            NULL, NULL, TRUE, 0,
+                                            NULL, myCWD.c_str(), &myStartupInfo,
+                                            &_myProcessInfo);
 
         // Error handling
         if (!myResult) {

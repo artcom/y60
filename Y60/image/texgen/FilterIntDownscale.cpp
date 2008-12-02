@@ -23,10 +23,16 @@
 
 #include "FilterIntDownscale.h"
 
+#include <assert.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel32.h>
 #include <paintlib/plbitmap.h>
-
-#include <assert.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace TexGen {
 
@@ -56,7 +62,9 @@ void FilterIntDownscale::Apply (PLBmp* mySourceBmp, PLBmp* myDestBmp) const {
                     b += srcPixel.GetB();
                 }
             }
-            myDestBmp->SetPixel(x,y, PLPixel32 (r/numPixels,g/numPixels,b/numPixels));
+            myDestBmp->SetPixel( x, y, PLPixel32( static_cast<PLBYTE>(r/numPixels)
+                                                , static_cast<PLBYTE>(g/numPixels)
+                                                , static_cast<PLBYTE>(b/numPixels) ) );
         }
     }
 }

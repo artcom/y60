@@ -434,7 +434,7 @@ bool
 Time::parse(const std::string & theString) {
     time_t myValue = Curl_parsedate(theString.c_str());
     if (myValue >= 0) {
-        when.tv_sec = myValue;
+        when.tv_sec = static_cast<long>(myValue);
         when.tv_usec = 0;
         return true;
     }

@@ -55,8 +55,8 @@ public:
             SvgPath myPath("M0,0h100l50,50");
             ENSURE(almostEqual(myPath.getLength(), 170.71067f));
 
-            DPRINT(myPath.nearest(Vector3f(42,2.3,0)));
-            ENSURE(almostEqual(myPath.nearest(Vector3f(42,2.3,0)), Vector3f(42,0,0)));
+            DPRINT(myPath.nearest(Vector3f(42,2.3f,0)));
+            ENSURE(almostEqual(myPath.nearest(Vector3f(42,2.3f,0)), Vector3f(42,0,0)));
 
             SvgPath::PathNormal myNormal = myPath.normal(Vector3f(130,20,0));
             ENSURE(almostEqual(myNormal.normal, normalized(Vector3f(-1,1,0))));

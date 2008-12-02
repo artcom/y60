@@ -207,10 +207,10 @@ namespace y60 {
         }
     }
 
-	bool
-	Primitive::hasVertexData(VertexDataRole theRole) const {
-		return _myVertexData.size() > theRole && _myVertexData[theRole];
-	}
+    bool
+    Primitive::hasVertexData(VertexDataRole theRole) const {
+        return _myVertexData.size() > static_cast<std::vector<VertexDataBasePtr>::size_type>(theRole && _myVertexData[theRole]);
+    }
 
     const VertexDataBasePtr
     Primitive::getVertexDataPtr(VertexDataRole theRole) const {
@@ -247,8 +247,8 @@ namespace y60 {
             dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
             const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
             dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
-            const VectorOfUnsignedInt & myIndices = myIndicesNode->
-                childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
+            //const VectorOfUnsignedInt & myIndices = myIndicesNode->
+            //    childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
             //TODO: find mechanism for selective range update with dirty flags/regions
             unload(myIndicesNode, myDataNode);
         }
@@ -571,7 +571,7 @@ namespace y60 {
         }
         if (!theTree.isLeaf()) {
             bool myHit = false;
-            for (int i = 0; i < theTree.myChildren.size(); ++i) {
+            for (std::vector<BoundingBoxTreePtr>::size_type i = 0; i < theTree.myChildren.size(); ++i) {
                 myHit |= scanHierarchy(theDetector, *theTree.myChildren[i], thePositions, theNormals);
             }
             return myHit;
@@ -594,7 +594,7 @@ namespace y60 {
                 //dk TODO Copy/Paste from scanElements ?
                 return false;
             case TRIANGLE_FAN:
-				{AC_TRACE << "scanHierarchy " << thePositions.size() << " positions.";}
+                {AC_TRACE << "scanHierarchy " << thePositions.size() << " positions.";}
                 {
                     asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
                             asl::asPoint(thePositions[i]),

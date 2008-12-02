@@ -21,14 +21,20 @@
 #if !defined(INCL_TILEDEFINITION)
 #define INCL_TILEDEFINITION
 
-#include "LayerDefinition.h"
-
-#include <paintlib/plpixel32.h>
-#include <paintlib/plbitmap.h>
-
 #include <assert.h>
 #include <vector>
 #include <string>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpixel32.h>
+#include <paintlib/plbitmap.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "LayerDefinition.h"
 
 namespace dom {
     class Node;
@@ -55,7 +61,7 @@ public:
     PLPixel32 getAvgColor () const 
     { 
         PLPixel32 answer(0,0,0,0); 
-        for (int i=0;i<_myLayers.size(); answer += _myLayers[i++]->getAvgColor() );
+        for (std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); answer += _myLayers[i++]->getAvgColor() );
         return answer;
     }
     void addLayer (LayerDefinition* myLayer);
@@ -76,7 +82,7 @@ typedef std::map<int, TextureDefinition *> TextureDefinitionMap;
 
 inline const PLPixel32 TextureDefinition::getPixel(int x, int y) const {
     PLPixel32 answer(0,0,0,0); 
-    for (int i=0;i<_myLayers.size(); answer += _myLayers[i++]->getPixel(x,y) );
+    for (std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); answer += _myLayers[i++]->getPixel(x,y) );
     return answer;
 }
 

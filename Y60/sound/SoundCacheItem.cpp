@@ -122,7 +122,7 @@ bool SoundCacheItem::queueSamples(asl::AudioBufferPtr& theBuffer) {
         BufferMap::iterator it = _myBuffers.end();
         --it;
         AudioBufferPtr myLastBuffer = it->second;
-        int myLastFrame = myLastBuffer->getEndFrame();
+        //int myLastFrame = myLastBuffer->getEndFrame();
         ASSURE_MSG(theBuffer->getStartFrame() == myLastBuffer->getEndFrame()+1, 
                 "Adding buffer to SoundCacheItem that doesn't fit to end of current buffer list.");
     }

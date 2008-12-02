@@ -426,10 +426,10 @@ setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        bool myNoisyFlag;
-        if (argc == 0) {
-            myNoisyFlag = true;
-        }
+        bool myNoisyFlag = true;
+        //if (argc == 0) {
+        //    myNoisyFlag = true;
+        //}
 
         if (argc == 1) {
             if (JSVAL_IS_VOID(argv[0])) {

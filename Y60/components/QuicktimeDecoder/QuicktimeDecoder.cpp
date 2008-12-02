@@ -206,21 +206,21 @@ namespace y60 {
     QuicktimeDecoder::getFramecount(::Movie theMovie) {
         int      frameCount = 0;
         OSType      whichMediaType = VIDEO_TYPE;
-        unsigned int flags = nextTimeMediaSample + nextTimeEdgeOK; // nextTimeStep;
+        short flags = nextTimeMediaSample + nextTimeEdgeOK; // nextTimeStep;
         TimeValue   duration;
         TimeValue   theTime = 0;
 
 
         while (theTime >= 0) {
             frameCount++;
-            GetMovieNextInterestingTime(theMovie,
-                                flags,
-                                1,
-                                &whichMediaType,
-                                theTime,
-                                1,
-                                &theTime,
-                                &duration);
+            GetMovieNextInterestingTime( theMovie,            
+                                         flags,               
+                                         1,                   
+                                         &whichMediaType,     
+                                         theTime,             
+                                         1,                   
+                                         &theTime,            
+                                         &duration );         
 
             // after the first interesting time, don't include the time we
             //  are currently at.
@@ -239,7 +239,7 @@ namespace y60 {
     QuicktimeDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
         AC_INFO << "Timestamp : " << theTime << "Read frame: " << theFrame << ", last decoded frame: " << _myLastDecodedFrame;
 
-        if (theFrame >= getFrameCount() -1) {
+        if (static_cast<int>(theFrame) >= (getFrameCount() -1) ) {
             setEOF(true);
             return theTime;
         }
@@ -274,14 +274,14 @@ namespace y60 {
         AC_INFO << "myDesiredMovieTime: " << myDesiredMovieTime;
 
         // skip to the next interesting time and get the duration for that frame
-        GetMovieNextInterestingTime(_myMovie,
-                  myFlags,
-                  1,
-                  &myMediaType,
-                  myDesiredMovieTime,
-                  0,
-                  &_myInternalMovieTime,
-                  &myDuration);
+        GetMovieNextInterestingTime( _myMovie,
+                                     myFlags,
+                                     1,
+                                     &myMediaType,
+                                     myDesiredMovieTime,
+                                     0,
+                                     &_myInternalMovieTime,
+                                     &myDuration );
         // set the time for the frame and give time to the movie toolbox
         SetMovieTimeValue(_myMovie, _myInternalMovieTime);
 

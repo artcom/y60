@@ -111,7 +111,7 @@ Frustum::changeAspectRatio( ResizePolicy thePolicy, float theNewAspect) {
     // save values before members are modified
     float myOldWidth  = getWidth();
     float myOldHeight = getHeight();
-    float myOldAspect = myOldWidth / myOldHeight;
+    //float myOldAspect = myOldWidth / myOldHeight;
 
     switch (thePolicy) {
         case ADAPT_VERTICAL:

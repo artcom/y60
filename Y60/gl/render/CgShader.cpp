@@ -160,8 +160,8 @@ namespace y60 {
         GLShader::loadShaderProperties(theShaderNode, theShader);
         
         theShader._myPossibleProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
-        int myProfileIndex = -1;
-        for (int i=0; i<theShader._myPossibleProfileNames.size();++i) {
+        VectorOfString::size_type myProfileIndex = static_cast<VectorOfString::size_type>(-1);
+        for (VectorOfString::size_type i=0; i<theShader._myPossibleProfileNames.size();++i) {
             if (theShader._myPossibleProfileNames[i] == theProfileName) {
                 myProfileIndex = i;
                 break;
@@ -180,7 +180,7 @@ namespace y60 {
 
         // now select matching file parameters; either one file for all profiles or exactly one per profile are allowed
         const VectorOfString myFilenames = theShaderNode->getAttributeValue<VectorOfString>(CG_FILES_PROPERTY);
-        int myFileIndex = 0;
+        VectorOfString::size_type myFileIndex = 0;
         if (theShader._myPossibleProfileNames.size() == myFilenames.size()) {
             myFileIndex = myProfileIndex;
         } else  {
@@ -200,8 +200,8 @@ namespace y60 {
         }    
         
         // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
-        int myEntryIndex = 0;
         const VectorOfString myEntryFunctions = theShaderNode->getAttributeValue<VectorOfString>(CG_ENTRY_FUNCTIONS_PROPERTY);
+        VectorOfString::size_type myEntryIndex = 0;
         if (theShader._myPossibleProfileNames.size() == myEntryFunctions.size()) {
             myEntryIndex = myProfileIndex;
         } else  {
@@ -223,7 +223,7 @@ namespace y60 {
         // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
         if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
             const VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
-            int myCompilerArgsIndex = 0;
+            VectorOfVectorOfString::size_type myCompilerArgsIndex = 0;
             if (theShader._myPossibleProfileNames.size() == myCompilerArgs.size()) {
                 myCompilerArgsIndex = myProfileIndex;
             } else  {
@@ -352,12 +352,12 @@ namespace y60 {
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
         if (_myVertexProgram) {
-            bool b = _myVertexProgram->reloadIfRequired(theLights, theMaterial);
+            /*bool b =*/ _myVertexProgram->reloadIfRequired(theLights, theMaterial);
             _myVertexProgram->bindBodyParams(theMaterial, theLights, theViewport, theBody, theCamera);
             _myVertexProgram->bind();
         }
         if (_myFragmentProgram) {
-            bool b = _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
+            /*bool b =*/ _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
             _myFragmentProgram->bindBodyParams(theMaterial, theLights, theViewport, theBody, theCamera);
             _myFragmentProgram->bind();
         }

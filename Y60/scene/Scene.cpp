@@ -235,9 +235,7 @@ namespace y60 {
             bool useSchema, bool loadLazy)
     {
         //_myTextureManager->setPackageManager(thePackageManager);
-        if (theFilename.empty() || theFilename == "null") {
-            return load(asl::Ptr<asl::ReadableStreamHandle>(0), "empty scene", theNotifier, useSchema, loadLazy);
-        } else {
+        if (!theFilename.empty() && theFilename != "null") {
             asl::Ptr<ReadableStreamHandle> mySource = thePackageManager->readStream(theFilename);
             if (!mySource) {
                 throw IOError(std::string("Can not open or read scene file '") + theFilename + "'", PLUS_FILE_LINE);
@@ -249,7 +247,7 @@ namespace y60 {
                 throw ex;
             }
         }
-        return ScenePtr(0);
+        return load(asl::Ptr<asl::ReadableStreamHandle>(0), "empty scene", theNotifier, useSchema, loadLazy);
     }
 
     ScenePtr
@@ -1053,7 +1051,7 @@ namespace y60 {
    Scene::updateLights() {
         _myLights = getNode().getAllFacades<Light>(LIGHT_NODE_NAME);
         AC_TRACE << "lights = "<< _myLights.size();
-        for (int i = 0; i < _myLights.size();++i) {
+        for (LightVector::size_type i = 0; i < _myLights.size();++i) {
             AC_TRACE << "light["<<i<<"] = "<< _myLights[i]->getNode();
         }
     }

@@ -308,7 +308,7 @@ namespace y60 {
         const dom::Node & myX3dScene = myDom("X3D")("Scene");
         _myNodesToProcess = getDeepNodeCount(myX3dScene);
         _myNodesProcessed = 0;
-        for( int i = 0; i < myX3dScene.childNodesLength(); ++i) {
+        for( dom::NamedNodeMap::size_type i = 0; i < myX3dScene.childNodesLength(); ++i) {
             processNode(myX3dScene.childNode(i));
             countNodesProcessed(1);
         }
@@ -331,9 +331,9 @@ namespace y60 {
 
     unsigned 
     X3dImport::getDeepNodeCount(const dom::Node & theNode) const {
-        unsigned myNodeCount = 1;
-        unsigned myChildCount = theNode.childNodesLength();
-        for (int i = 0; i < myChildCount; ++i) {
+        dom::NamedNodeMap::size_type myNodeCount = 1;
+        dom::NamedNodeMap::size_type myChildCount = theNode.childNodesLength();
+        for (dom::NamedNodeMap::size_type i = 0; i < myChildCount; ++i) {
             myNodeCount += getDeepNodeCount(*(theNode.childNode(i)));
         }
         return myNodeCount;
@@ -384,7 +384,7 @@ namespace y60 {
     void
     X3dImport::processGroupNode(const dom::NodePtr theNode) {
         AC_DEBUG  << ">>> start grouping " << theNode->nodeName();
-        for( int i = 0; i < theNode->childNodesLength(); ++i) {
+        for( dom::NamedNodeMap::size_type i = 0; i < theNode->childNodesLength(); ++i) {
             countNodesProcessed(1);
             processNode( theNode->childNode(i) );
         }
@@ -458,7 +458,7 @@ namespace y60 {
         std::string myMaterialId;
 
         //make sure we process the appearance node first to get the materialId
-        for (int i = 0; i < theShapeNode->childNodesLength(); ++i) {
+        for (dom::NamedNodeMap::size_type i = 0; i < theShapeNode->childNodesLength(); ++i) {
             dom::NodePtr myChildNode = theShapeNode->childNode(i);
             if (myChildNode->nodeName() == getX3DNodeName(APPEARANCE_X3D_NODE) ) {
                 processAppearanceNode(myChildNode, myMaterialId);
@@ -466,7 +466,7 @@ namespace y60 {
             }
         }
 
-        for (int i = 0; i < theShapeNode->childNodesLength(); ++i) {
+        for (dom::NamedNodeMap::size_type i = 0; i < theShapeNode->childNodesLength(); ++i) {
             dom::NodePtr myChildNode = theShapeNode->childNode(i);
             if (myChildNode->nodeName() != getX3DNodeName(APPEARANCE_X3D_NODE) ) {
                 processGeometryNode(myChildNode, myMaterialId);
@@ -488,7 +488,7 @@ namespace y60 {
         y60::MaterialBuilder myMaterialBuilder(myMaterialName, false);
         theMaterialId = _mySceneBuilder->appendMaterial(myMaterialBuilder);
 
-        for (int i = 0; i < theAppearanceNode->childNodesLength(); ++i) {
+        for (dom::NamedNodeMap::size_type i = 0; i < theAppearanceNode->childNodesLength(); ++i) {
             dom::NodePtr myChildNode = theAppearanceNode->childNode(i);
 
             switch ( getX3DNodeType(myChildNode->nodeName()) ) {
@@ -661,8 +661,8 @@ namespace y60 {
                 = myShapeBuilder.getNode()->childNode(y60::PRIMITIVE_LIST_NAME)->childNode(0);
             const y60::VectorOfUnsignedInt & myPositionIndices
                 = myElementNode->childNode("indices")->childNode("#text")->nodeValueRef<y60::VectorOfUnsignedInt>();
-            
-            for(int i = 0, p = 0;i < myFaceCount; ++i) {
+
+            for(unsigned int i = 0, p = 0;i < myFaceCount; ++i) {
                 const asl::Vector3f & myPositionA(myPositions[myPositionIndices[p++]]);
                 const asl::Vector3f & myPositionB(myPositions[myPositionIndices[p++]]);
                 const asl::Vector3f & myPositionC(myPositions[myPositionIndices[p++]]);
@@ -738,7 +738,7 @@ namespace y60 {
 
         // UH: the y60::ShapeBuilder:: prefix is necessary for gcc to work
         theShapeBuilder.y60::ShapeBuilder::createVertexDataBin<T>(myRole, theVertexCount);
-        int myVertexCount = 0;
+        unsigned int myVertexCount = 0;
         while ( ! myStream.eof() ) {
             T myVertex;
             myStream >> myVertex;

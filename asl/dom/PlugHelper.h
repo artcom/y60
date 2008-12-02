@@ -43,7 +43,7 @@ namespace dom {
        }
        static bool checkValueType(const ValuePtr theValueHolder) {
            const WrapperPtr myTypedValuePtr = dynamic_cast_Ptr<WRAPPER>(theValueHolder);
-           return myTypedValuePtr;
+           return myTypedValuePtr != 0;
        }
     };
 
@@ -62,7 +62,7 @@ namespace dom {
         }
         static bool checkValueType(const ValuePtr theValueHolder) {
            const WrapperPtr myTypedValuePtr = dynamic_cast_Ptr<StringValue>(theValueHolder);
-           return myTypedValuePtr;
+           return myTypedValuePtr != 0;
         }
     };
 

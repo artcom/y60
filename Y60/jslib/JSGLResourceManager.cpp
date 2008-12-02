@@ -11,7 +11,7 @@
 #include "JSGLResourceManager.h"
 #include "JSApp.h"
 #include <y60/jsbase/JSWrapper.impl>
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 #include <asl/base/os_functions.h>
 
 using namespace std;

@@ -45,7 +45,7 @@ namespace jslib {
         _myScene(0), _myRenderer(0),
         _myEventListener(0),
         _myJSContext(0),
-        _myRenderingCaps(~0), // enable all (~)
+        _myRenderingCaps(static_cast<unsigned int>(~0)), // enable all (~)
         _myMultisamples(0),
         _myErrorReporter(theErrorReporter),
         _myFixedDeltaT(0.0),
@@ -950,7 +950,7 @@ namespace jslib {
 
                     unsigned myUsedBytesPerPixel = getBytesRequired(1, myImage->getRasterEncoding());
                     for (unsigned i = 0; i < myUsedBytesPerPixel; ++i) {
-                        *(myPixelPtr + i) = theColor[i];
+                        *(myPixelPtr + i) = static_cast<unsigned char>(theColor[i]);
                     }
                     return true;
                 }

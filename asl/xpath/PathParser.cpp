@@ -187,7 +187,7 @@ namespace xpath {
                 if( result.first == axisDict.end() ) {
                     return Type_Child;
                 }
-                if( result.first->first.size() != result.second-oldBegin ) {
+                if( result.first->first.size() != static_cast<std::size_t>(result.second-oldBegin) ) {
                     return Type_Child;
                 }
                 pi.forwardTo(result.second);
@@ -337,7 +337,7 @@ namespace xpath {
                     switch( result.getType() ) {
                     case Value_Number : 
                         return evContext.proximityPos
-                            == static_cast<int>(result.as<NumberValue>().getValue());
+                            == static_cast<std::size_t>(result.as<NumberValue>().getValue());
                     case Value_NodeSet: // FALL THROUGH
                     case Value_Boolean: // FALL THROUGH
                     case Value_String : // FALL THROUGH
@@ -451,3 +451,4 @@ namespace xpath {
 }
 
 /**********************************************************************************************/
+

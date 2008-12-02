@@ -11,13 +11,14 @@
 #ifndef _SynergyServer_h_
 #define _SynergyServer_h_
 
+#include <queue>
+
 #include <asl/base/PosixThread.h>
 #include <asl/net/TCPServer.h>
 #include <asl/base/Logger.h>
 #include <asl/base/ThreadLock.h>
 #include <asl/math/Vector234.h>
 #include <asl/base/Auto.h>
-#include <queue>
 
 // debug helper
 void printVectorAsHex( const std::vector<unsigned char> & theMessage );
@@ -56,13 +57,14 @@ class SynergyPacket {
                 return false;
             }
 
-            unsigned myLen = ((*_myPacketIt++) << 24) 
-                             + ((*_myPacketIt++) << 16) 
-                             + ((*_myPacketIt++) << 8) 
-                             + (*_myPacketIt++); 
-
+            unsigned int myLen =   ((*_myPacketIt  ) << 24) 
+                                 + ((*_myPacketIt+1) << 16) 
+                                 + ((*_myPacketIt+2) <<  8) 
+                                 +  (*_myPacketIt+3); 
+            _myPacketIt+=4;
+                    
             AC_TRACE << "message length: " << myLen;
-            if (myLen > _myPacket.end() - _myPacketIt) {
+            if (static_cast<long>(myLen) > static_cast<long>(_myPacket.end() - _myPacketIt)) {
                 // broken packet
                 _myPacketIt = _myPacket.end();
                 return false;

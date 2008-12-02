@@ -20,7 +20,7 @@ JSGladeSignalAdapter::JSGladeSignalAdapter(const gchar *theHandlerName,
         _handlerName(theHandlerName), 
         _gtkSignalSource(theSignalSource),
         _connectObejct(theConnectObject),
-        _callAfterFlag(theCallAfterFlag),
+        _callAfterFlag(0 != theCallAfterFlag),
         _jsContext(theContext),
         _jsTarget(theTarget) 
 {
@@ -68,7 +68,7 @@ JSGladeSignalAdapter::trigger(GdkEvent * theEvent) {
     // does the required function object exists?
     AC_DEBUG << "triggering " << _handlerName << endl;
     jsval myVal;
-    JSBool bOK = JS_GetProperty(_jsContext, _jsTarget, _handlerName.c_str(), &myVal);
+    /*JSBool bOK =*/ JS_GetProperty(_jsContext, _jsTarget, _handlerName.c_str(), &myVal);
     if (myVal == JSVAL_VOID) {
         AC_WARNING << "JS event handler for event '" << _handlerName << "' missing." << endl;
         return false;
@@ -86,6 +86,6 @@ JSGladeSignalAdapter::trigger(GdkEvent * theEvent) {
     }
     JSBool ok = JSA_CallFunctionName(_jsContext, _jsTarget, _handlerName.c_str(), myArgCount, argv, &rval);
     AC_TRACE << "trigger " << _handlerName << " retval=" << ok << endl;
-    return ok;
+    return 0 != ok;
 }
 

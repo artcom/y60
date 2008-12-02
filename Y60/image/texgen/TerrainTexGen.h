@@ -9,6 +9,17 @@
 #if !defined(INCL_FILTERTEXGEN)
 #define INCL_FILTERTEXGEN
 
+#include <map>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpixel32.h>
+#include <paintlib/plpoint.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 #include "TextureDefinition.h"
 
 #include <asl/dom/Nodes.h>
@@ -18,11 +29,6 @@
 #ifdef TEXGEN_GENERATE_STATISTICS
 #include <pm/ptime.h>
 #endif
-
-#include <paintlib/plpixel32.h>
-#include <paintlib/plpoint.h>
-
-#include <map>
 
 class PLBmp;
 class PLAnyBmp;

@@ -26,7 +26,7 @@ void MaskPerson::onFrame( double t ) {
 
     raster<asl::GRAY> myBinaryRaster(mySourceRaster->hsize(), mySourceRaster->vsize());
     discriminate(myBlurRaster.begin(), myBlurRaster.end(), myBinaryRaster.begin(), 
-                 asl::GRAY(_myThreshold), asl::GRAY(255), asl::GRAY(0)); 
+        asl::GRAY(static_cast<asl::pchar>(_myThreshold)), asl::GRAY(255), asl::GRAY(0)); 
 
     std::copy(myBinaryRaster.begin(), myBinaryRaster.end(), myMaskRaster.begin());
     
@@ -48,7 +48,9 @@ void MaskPerson::onFrame( double t ) {
          itTrgt != myTargetRaster.end(); 
          ++itTrgt, ++itHGrad, ++itVGrad, ++itBlur)
     {
-        (*itTrgt) = asl::BGR((itHGrad->get() + 255)/2 , (itVGrad->get()+255)/2, itBlur->get());
+        (*itTrgt) = asl::BGR( static_cast<asl::pchar>((itHGrad->get() + 255)/2)
+                            , static_cast<asl::pchar>((itVGrad->get() + 255)/2)
+                            , itBlur->get());
     }
 }
 

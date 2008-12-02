@@ -79,6 +79,7 @@ public:
 
 inline PLPoint::PLPoint
 ()
+: x(), y()
 {}
 
 
@@ -86,6 +87,7 @@ inline PLPoint::PLPoint
 ( int X,
   int Y
 )
+: x(), y()
 {
   x = X;
   y = Y;

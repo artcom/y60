@@ -21,23 +21,18 @@
 //
 //=============================================================================
 
-
-#include <asl/base/settings.h>
-
-#ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
-#pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
-#endif
-
 #include "TerrainTexGen.h"
 
-#include "TextureDefinition.h"
-#include "XmlHelper.h"
-#include "LitTerrainTexGen.h"
-#include "FilterIntDownscale.h"
+#include <assert.h>
+#include <stdexcept>
+#include <stdlib.h>
+#include <algorithm>
+#include <stdio.h>
+#include <math.h>
 
-#include <asl/base/string_functions.h>
-#include <asl/dom/Nodes.h>
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/planydec.h>
@@ -47,13 +42,19 @@
 #include <paintlib/Filter/plfiltercrop.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
 #include <paintlib/Filter/plfilterfill.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <assert.h>
-#include <stdexcept>
-#include <stdlib.h>
-#include <algorithm>
-#include <stdio.h>
-#include <math.h>
+#include <asl/base/settings.h>
+#include <asl/base/string_functions.h>
+#include <asl/dom/Nodes.h>
+
+#include "TextureDefinition.h"
+#include "XmlHelper.h"
+#include "LitTerrainTexGen.h"
+#include "FilterIntDownscale.h"
+
 
 using namespace asl;
 using namespace std;
@@ -141,8 +142,8 @@ TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureMap,
 
 TerrainTexGen::~TerrainTexGen() {
 
-    for (int i=0; i<_myMipMaps.size(); i++)  
-     delete _myMipMaps[i];
+    for (std::vector<PLBmp*>::size_type i=0; i<_myMipMaps.size(); i++)  
+        delete _myMipMaps[i];
 
     delete _myIndexBmp;
     delete _myAttenuationMapBmp;
@@ -483,18 +484,18 @@ void TerrainTexGen::createTexture (const PLPoint & resultSize,
 
 
 void TerrainTexGen::createPalette () const {
-    TextureDefinitionMap::const_iterator iter;
     for (int i=0; i<256; i++) {
-        _myIndexBmp->SetPaletteEntry (i, 255, 0, 0, 255);
+        _myIndexBmp->SetPaletteEntry ( static_cast<PLBYTE>(i), 255, 0, 0, 255);
     }
-    for (iter=_myTextureDefinitionMap.begin(); 
+    for (TextureDefinitionMap::const_iterator iter=_myTextureDefinitionMap.begin(); 
          iter != _myTextureDefinitionMap.end(); 
          ++iter) 
     {
         TextureDefinition* curDefinition = iter->second;
         PLPixel32 curColor = curDefinition->getAvgColor();
-        _myIndexBmp->SetPaletteEntry(iter->first, curColor.GetR(), 
-                                     curColor.GetG(), curColor.GetB(), 255);
+        _myIndexBmp->SetPaletteEntry(static_cast<PLBYTE>(iter->first), 
+                                     curColor.GetR(), curColor.GetG(), curColor.GetB(), 
+                                     255 );
     }
    
 }

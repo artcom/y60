@@ -448,7 +448,7 @@ namespace y60 {
             Vector3f myNormalTip;
 
             glBegin(GL_LINES);
-            for (int i = 0; i < myPositions.size(); ++i) {
+            for (VertexData3f::size_type i = 0; i < myPositions.size(); ++i) {
                 glVertex3fv(myPositions[i].begin());
                 myNormalTip = myPositions[i] + (myNormals[i] * theNormalScale);
                 glVertex3fv(myNormalTip.begin());
@@ -1362,7 +1362,7 @@ namespace y60 {
         }
 
         // Disable remaining lights
-        for (unsigned i = myActiveLightCount; i < myMaxLights; ++i) {
+        for (GLint i = myActiveLightCount; i < myMaxLights; ++i) {
             glDisable(asGLLightEnum(i));
         }
 

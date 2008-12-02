@@ -57,9 +57,9 @@ GtkEventAdapter::addMouseScrollEvent(GdkEventScroll * theEvent) {
             break;
     }
     EventPtr myEvent = EventPtr(new MouseEvent(Event::MOUSE_WHEEL, 
-                theEvent->state & GDK_BUTTON1_MASK, 
-                theEvent->state & GDK_BUTTON2_MASK,
-                theEvent->state & GDK_BUTTON3_MASK, int(theEvent->x),
+                0 != (theEvent->state & GDK_BUTTON1_MASK), 
+                0 != (theEvent->state & GDK_BUTTON2_MASK),
+                0 != (theEvent->state & GDK_BUTTON3_MASK), int(theEvent->x),
             int(theEvent->y), deltaX, deltaY ));
 
     _myEventQueue.push_back(myEvent);
@@ -69,9 +69,9 @@ GtkEventAdapter::addMouseScrollEvent(GdkEventScroll * theEvent) {
 void
 GtkEventAdapter::addMouseMotionEvent(GdkEventMotion * theEvent) {
     EventPtr myEvent = EventPtr(new MouseEvent(Event::MOUSE_MOTION, 
-                theEvent->state & GDK_BUTTON1_MASK, 
-                theEvent->state & GDK_BUTTON2_MASK,
-                theEvent->state & GDK_BUTTON3_MASK, int(theEvent->x),
+                0 != (theEvent->state & GDK_BUTTON1_MASK), 
+                0 != (theEvent->state & GDK_BUTTON2_MASK),
+                0 != (theEvent->state & GDK_BUTTON3_MASK), int(theEvent->x),
             int(theEvent->y), 0,0));
 
     _myEventQueue.push_back(myEvent);
@@ -109,9 +109,9 @@ GtkEventAdapter::addMouseButtonEvent(GdkEventButton * theEvent) {
             myButton = static_cast<MouseEvent::Button>(theEvent->button);
     }
     EventPtr myEvent = EventPtr(new MouseEvent(myType, 
-                theEvent->state & GDK_BUTTON1_MASK, 
-                theEvent->state & GDK_BUTTON2_MASK,
-                theEvent->state & GDK_BUTTON3_MASK, 
+                0 != (theEvent->state & GDK_BUTTON1_MASK), 
+                0 != (theEvent->state & GDK_BUTTON2_MASK),
+                0 != (theEvent->state & GDK_BUTTON3_MASK), 
                 int(theEvent->x),int(theEvent->y),0,0, myButton));
 
     _myEventQueue.push_back(myEvent);

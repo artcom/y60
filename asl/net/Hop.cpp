@@ -61,7 +61,7 @@ namespace inet {
 
     ostream& operator<<(ostream& s, const Route & theRoute)
     {
-        for (int i = 0 ; i < theRoute.size(); i++) {
+        for (std::vector<Hop>::size_type i = 0 ; i < theRoute.size(); i++) {
             s << theRoute[i];
         }
         return s;

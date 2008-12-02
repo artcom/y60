@@ -106,10 +106,10 @@ namespace y60 {
         
         //AC_DEBUG << " analyzing " << myShape.get<NameTag>() 
         //         << myPrimitives.size() << " primitives " << endl; 
-        
-        for (int i = 0; i < myPrimitives.size(); ++i) {
-            
-        
+
+        for (PrimitiveVector::size_type i = 0; i < myPrimitives.size(); ++i) {
+
+
             if ( ! isSupportedPrimitive(*myPrimitives[i])) {
                 /*AC_ERROR << " at shape " << myShape.get<NameTag>()
                          << " skipping unsupported primitive of type " 
@@ -126,7 +126,7 @@ namespace y60 {
             AC_DEBUG << " applying global transform " << myBodyMatrix << endl; 
 
             vector<Point3f> myTriangles(myPositions.size());
-            for(int j = 0;j < myPositions.size(); ++j) {
+            for(VertexData3f::size_type j = 0;j < myPositions.size(); ++j) {
                 myTriangles[j] = product( asPoint(myPositions[j]), myBodyMatrix);
                 //AC_DEBUG << "P " << myPositions[j] << " - " << myTriangles[j] << endl; 
             }

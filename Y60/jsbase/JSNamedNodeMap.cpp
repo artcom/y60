@@ -58,7 +58,7 @@ JSNamedNodeMap::item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
     DOC_RVAL("The node from the nodelist at the specified index", DOC_TYPE_NODE);
     DOC_END;
-    typedef dom::NodePtr (NamedNodeMap::*MyMethod)(int);
+    typedef dom::NodePtr (NamedNodeMap::*MyMethod)(NamedNodeMap::size_type);
     return Method<NamedNodeMap>::call((MyMethod)&NamedNodeMap::item,cx,obj,argc,argv,rval);
 }
 

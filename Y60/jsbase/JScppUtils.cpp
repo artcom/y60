@@ -41,9 +41,12 @@ as_string(JSContext *cx, jsval theVal) {
     if (!myJSStr) {
         throw asl::Exception("Value is not a string", PLUS_FILE_LINE);
     }
-    size_t srcLen = JS_GetStringLength(myJSStr);
 #ifdef WIN32
+#if _MSC_VER >= 1500
+    const LPWSTR myWChars = reinterpret_cast<LPWSTR>(JS_GetStringChars(myJSStr));
+#else 
     const LPWSTR myWChars = static_cast<LPWSTR>(JS_GetStringChars(myJSStr));
+#endif
     AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
     if (myUTF8Size == 0) {
         DWORD myLastError = GetLastError();
@@ -55,6 +58,8 @@ as_string(JSContext *cx, jsval theVal) {
     delete [] myUTF8Chars;
     return myResult;
 #else    
+    size_t srcLen = JS_GetStringLength(myJSStr);
+
     // get pointer to 16-bit chars
     gunichar2 * myData = reinterpret_cast<gunichar2*>(JS_GetStringChars(myJSStr));
 
@@ -95,6 +100,14 @@ std::string as_string(JSType theType) {
 }
 
 namespace jslib {
+
+
+#if _MSC_VER >= 1500
+    // used for 'std::time_t'
+    jsval as_jsval(JSContext *cx, __int64 theValue) {
+        return as_jsval(cx, double(theValue));
+    }
+#endif
 
 jsval as_jsval(JSContext *cx, bool theValue) {
     return BOOLEAN_TO_JSVAL(theValue);
@@ -193,10 +206,10 @@ template jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
 
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
-    if (argc < theMinCount) {
+    if ( static_cast<int>(argc) < theMinCount) {
         throw Exception(string("Not enough arguments, ")+as_string(theMinCount)+" expected.");
     }
-    if (theMaxCount && argc > theMaxCount) {
+    if (theMaxCount && static_cast<int>(argc) > theMaxCount) {
         throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.");
     }
 };
@@ -233,7 +246,7 @@ dumpJSStack(JSContext *cx, FILE * theTarget) {
 
 JSStackFrame *
 getStackFrame(int i, JSContext *cx) {
-    try {
+    /*try*/ {
         JSStackFrame* fp;
         JSStackFrame* iter = 0;
         int num = 0;
@@ -246,7 +259,7 @@ getStackFrame(int i, JSContext *cx) {
             ++num;
         }
         return 0;
-    } HANDLE_CPP_EXCEPTION;
+    } /*HANDLE_CPP_EXCEPTION;*/
 }
 
 bool
@@ -296,6 +309,7 @@ JSA_AddFunctions(JSContext *cx, JSObject *theClassCtr, JSFunctionSpec * theFunct
         DB(AC_TRACE << "adding function " << theFunctions->name << " to " << theClassCtr << endl);
         JSFunction * myFunction = JS_DefineFunction(cx, theClassCtr, theFunctions->name, theFunctions->call,
                 theFunctions->nargs, 0);
+        (void)myFunction;
         DB(AC_TRACE << "return:" << myFunction << endl);
         ++theFunctions;
     }
@@ -945,7 +959,7 @@ bool convertFrom(JSContext *cx, jsval theValue, bool & theDest) {
     JSBool myBool;
     if (JS_ValueToBoolean(cx, theValue, &myBool))
     {
-        theDest = bool(myBool);
+        theDest = 0 != myBool;
         return true;
     }
     return false;

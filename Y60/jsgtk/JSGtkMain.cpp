@@ -157,7 +157,7 @@ connect_timeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             return JS_FALSE;
         }
 
-        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new sigc::connection);
         *myConnection = Glib::signal_timeout().connect( sigc::bind<JSContext*, JSObject*, std::string>(
                 sigc::ptr_fun( & JSGtkMain::on_timeout ), cx, myTarget, myMethodName), myInterval);
 
@@ -178,16 +178,16 @@ connect_timeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 bool 
 JSGtkMain::on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
     jsval myVal;
-    JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
+    /*JSBool bOK =*/ JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
     if (myVal == JSVAL_VOID) {
         AC_WARNING << "no JS event handler for event '" << theMethodName << "'";
     }
     // call the function
     jsval rval;
     AC_TRACE << "GtkMain::on_timeout calling JS event handler '" << theMethodName << "'";
-    JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
+    /*JSBool ok =*/ jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
 
-    bool myResult;
+    bool myResult = false;
     convertFrom(cx, rval, myResult);
     return myResult;
 }
@@ -221,7 +221,7 @@ connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
             return JS_FALSE;
         }*/
 
-        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new sigc::connection);
         *myConnection = Glib::signal_idle().connect( sigc::bind<JSContext*, JSObject*, std::string>(
                 sigc::ptr_fun( & JSGtkMain::on_idle ), cx, myTarget, myMethodName), Glib::PRIORITY_DEFAULT_IDLE);
 
@@ -242,16 +242,16 @@ connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 int 
 JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
     jsval myVal;
-    JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
+    /*JSBool bOK =*/ JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
     if (myVal == JSVAL_VOID) {
         AC_WARNING << "no JS event handler for event '" << theMethodName << "'";
     }
     // call the function
     jsval rval;
     AC_TRACE << "GtkMain::on_idle calling JS event handler '" << theMethodName << "'";
-    JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
+    /*JSBool ok =*/ jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
 
-    int myResult;
+    int myResult = 0;
     convertFrom(cx, rval, myResult);
     return myResult;
 }

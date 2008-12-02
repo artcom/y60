@@ -34,19 +34,19 @@ namespace asl {
     /* @{ */
 
     /** A 2-tupel of arbitrary (nummeric) type. 
-     *  @f[ \vec{a} = (a_1, a_2) @f]
-     */
-	template<class T>
-	class PairOf : public FixedVector<2,T>{
-	public:
+    *  @f[ \vec{a} = (a_1, a_2) @f]
+    */
+    template<class T>
+    class PairOf : public FixedVector<2,T>{
+    public:
         typedef FixedVector<2,T> Base;
         typedef typename FixedVector<2,T>::iterator iterator;
         /** Default constructor. */
-		PairOf() {};
+        PairOf() {};
         /** Converts any FixedVector<2, T> into a PairOf<T>. */
-		PairOf(const Base & t) : Base(t) {}
+        PairOf(const Base & t) : Base(t) {}
         /** Copy constructor. */
-		PairOf(const PairOf & t) : Base(t) {}
+        PairOf(const PairOf & t) : Base(t) {}
         /** Construct from two pointers/iterators. */
         explicit PairOf(const T * theBegin, const T * theEnd) : Base(theBegin, theEnd) {}
 
@@ -58,89 +58,89 @@ namespace asl {
         /** Construct from C style array. */
         PairOf(const T * t) : Base(t) {}
         /** Construct from two scalar values. */
-		PairOf(T a, T b) {
+        PairOf(T a, T b) {
             this->val[0]=a;this->val[1]=b;
-		}
-	};
+        }
+    };
 
     /** A Triple of arbitrary (nummeric) type.
-     *  @f[ \vec{a} = (a_1, a_2, a_3) @f]
-     */
-	template<class T>
-	class TripleOf : public FixedVector<3,T> {
-	public:
+    *  @f[ \vec{a} = (a_1, a_2, a_3) @f]
+    */
+    template<class T>
+    class TripleOf : public FixedVector<3,T> {
+    public:
         typedef FixedVector<3,T> Base;
         typedef typename FixedVector<3,T>::iterator iterator;
         /** Default constructor. */
-		TripleOf() {};
+        TripleOf() {};
         /** Copy constructor. */
-		TripleOf(const TripleOf & t) : Base(t) {}
+        TripleOf(const TripleOf & t) : Base(t) {}
         /** Converts any FixedVector<3, T> into a TripleOf<T>. */
-		TripleOf(const Base & t) : Base(t) {}
+        TripleOf(const Base & t) : Base(t) {}
         /** Construct from C style array. */
-		TripleOf(const T * t) : Base(t) {}
+        TripleOf(const T * t) : Base(t) {}
         /** Construct from two pointers/iterators. */
         TripleOf(const T * theBegin, const T * theEnd) : Base(theBegin, theEnd) {}
         /** Assignment operator. */
-		TripleOf & operator=(const TripleOf & t) {
+        TripleOf & operator=(const TripleOf & t) {
             assign(t);
             return *this;
         }
         /** Construct from three scalar values. */
-    	TripleOf(T a, T b, T c) {
+        TripleOf(T a, T b, T c) {
             this->val[0]=a;this->val[1]=b;this->val[2]=c;
-  		}
-	};
+        }
+    };
 
     /** A Quadruple of arbitrary (nummeric) type.
-     *  @f[ \vec{a} = (a_1, a_2, a_3, a_4) @f]
-     */
-	template<class T>
-	class QuadrupleOf : public FixedVector<4,T> {
-	public:
+    *  @f[ \vec{a} = (a_1, a_2, a_3, a_4) @f]
+    */
+    template<class T>
+    class QuadrupleOf : public FixedVector<4,T> {
+    public:
         typedef FixedVector<4,T> Base;
         /** Default constructor. */
         QuadrupleOf() : FixedVector<4, T>() {}
         /** Copy constructor. */
-		QuadrupleOf(const QuadrupleOf & t) : Base(t) {}
+        QuadrupleOf(const QuadrupleOf & t) : Base(t) {}
         /** Converts any FixedVector<4, T> into a QuadrupleOf<T>. */
-		QuadrupleOf(const Base & t) : Base(t) {}
+        QuadrupleOf(const Base & t) : Base(t) {}
         /** Construct from C style array. */
-		QuadrupleOf(const T* t) : Base(t) {}
+        QuadrupleOf(const T* t) : Base(t) {}
         /** Construct from two pointers/iterators. */
         QuadrupleOf(const T * theBegin, const T * theEnd) : Base(theBegin, theEnd) {}
         /** Construct from four scalar values. */
-		QuadrupleOf(T a, T b, T c, T d) {
+        QuadrupleOf(T a, T b, T c, T d) {
             this->val[0]=a;this->val[1]=b;this->val[2]=c;this->val[3]=d;
-		}
+        }
         /** Assignment operator. */
-		QuadrupleOf & operator=(const QuadrupleOf & t) {
+        QuadrupleOf & operator=(const QuadrupleOf & t) {
             assign(t);
             return *this;
         }
-	};
+    };
 
     /** A two dimensional vector 
-     * @f[ \vec{v} = (v_x, v_y) @f] 
-     */
+    * @f[ \vec{v} = (v_x, v_y) @f] 
+    */
     template<class Number>
-	class Vector2 : public PairOf<Number> {
-	public:
+    class Vector2 : public PairOf<Number> {
+    public:
         typedef PairOf<Number> Base;
         /** Default constructor. */
         Vector2() : Base() {};
         /** Copy constructor. */
-		Vector2(const Vector2<Number> & p) : Base(p) {};
+        Vector2(const Vector2<Number> & p) : Base(p) {};
         /** Converts any FixedVector<2, T> into a Vector2. */
-		Vector2(const FixedVector<2, Number> & p) : PairOf<Number>(p) {};
+        Vector2(const FixedVector<2, Number> & p) : PairOf<Number>(p) {};
         /** Construct from two scalar values. */
-		Vector2(Number a, Number b) : Base(a,b) { }
+        Vector2(Number a, Number b) : Base(a,b) { }
         /** Construct from C style array. */
-		Vector2(const Number * t) : Base(t) {};
+        Vector2(const Number * t) : Base(t) {};
         /** Construct from two pointers/iterators. */
         explicit Vector2(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
         /** Assignment operator. */
-		Vector2 & operator=(const Vector2 & t) {
+        Vector2 & operator=(const Vector2 & t) {
             assign(t);
             return *this;
         }
@@ -285,38 +285,38 @@ namespace asl {
         }
     };
     /** Reinterprets a pointer as a Vector2. Use with caution.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template <class Number>
     Vector2<Number> * asVector2(Number * the2Numbers) {
         return reinterpret_cast<Vector2<Number>*>(the2Numbers);
     }
     /** Reinterprets a pointer as a Vector2. Use with caution.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template <class Number>
     const Vector2<Number> * asVector2(const Number * the2Numbers) {
         return reinterpret_cast<const Vector2<Number>*>(the2Numbers);
     }
 
     /** Reinterprets a reference as a Vector2. Use with caution.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template <class Number>
     Vector2<Number> & asVector2(Number & the2Numbers) {
         return reinterpret_cast<Vector2<Number>&>(the2Numbers);
     }
     /** Reinterprets a reference as a Vector2. Use with caution.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template <class Number>
     const Vector2<Number> & asVector2(const Number & the2Numbers) {
         return reinterpret_cast<const Vector2<Number>&>(the2Numbers);
     }
 
     /** Multiplies a Vector2 with a scalar and returns the result.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template <class Number>
     Vector2<Number> product(const Vector2<Number> & v, Number y) {
         Vector2<Number> result(v);
@@ -325,41 +325,41 @@ namespace asl {
     }
 
     /** Multiplies a float with a Vector2 and returns the result.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template<class Number>
     Vector2<Number> operator*(const float & y, const Vector2<Number> & v) {
         return product(v, typename Vector2<Number>::value_type(y));
     }
     /** Multiplies a double with a Vector2 and returns the result.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template<class Number>
     Vector2<Number> operator*(const double & y, const Vector2<Number> & v) {
         return product(v, typename Vector2<Number>::value_type(y));
     }
     /** Multiplies an int with a Vector2 and returns the result.
-     * @relates Vector2
-     */
+    * @relates Vector2
+    */
     template<class Number>
     Vector2<Number> operator*(const int & y, const Vector2<Number> & v) {
         return product(v, typename Vector2<Number>::value_type(y));
     }
 
     /** A three dimensional vector 
-     * @f[ \vec{v} = (v_x, v_y, v_z) @f] 
-     */
+    * @f[ \vec{v} = (v_x, v_y, v_z) @f] 
+    */
     template<class Number>
     class Vector3 : public TripleOf<Number> {
-	public:
+    public:
         typedef TripleOf<Number> Base;
         Vector3() : Base() {};
-		Vector3(const Vector3<Number> & p) : Base(TripleOf<Number>(p)) {};
-		Vector3(const FixedVector<3, Number> & p) : TripleOf<Number>(p) {};
-		Vector3(Number a, Number b, Number c) : Base(TripleOf<Number>(a,b,c)) { }
-		Vector3(const Number* t) : Base(TripleOf<Number>(t)) {};
+        Vector3(const Vector3<Number> & p) : Base(TripleOf<Number>(p)) {};
+        Vector3(const FixedVector<3, Number> & p) : TripleOf<Number>(p) {};
+        Vector3(Number a, Number b, Number c) : Base(TripleOf<Number>(a,b,c)) { }
+        Vector3(const Number* t) : Base(TripleOf<Number>(t)) {};
         Vector3(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
-		Vector3 & operator=(const Vector3 & t) {
+        Vector3 & operator=(const Vector3 & t) {
             assign(t);
             return *this;
         }
@@ -497,19 +497,19 @@ namespace asl {
     }
 
     /** A four dimensional vector 
-     * @f[ \vec{v} = (v_x, v_y, v_z, v_w) @f] 
-     */
+    * @f[ \vec{v} = (v_x, v_y, v_z, v_w) @f] 
+    */
     template<class Number>
-	class Vector4 : public QuadrupleOf<Number> {
-	public:
+    class Vector4 : public QuadrupleOf<Number> {
+    public:
         typedef QuadrupleOf<Number> Base;
         Vector4() : Base() {};
-		Vector4(const Vector4<Number> & p) : Base(QuadrupleOf<Number>(p)) {};
-		Vector4(const FixedVector<4, Number> & p) : QuadrupleOf<Number>(p) {};
-		Vector4(Number a, Number b, Number c, Number d) : Base(QuadrupleOf<Number>(a,b,c,d)) { }
-		Vector4(const Number* t) : Base(QuadrupleOf<Number>(t)) {};
+        Vector4(const Vector4<Number> & p) : Base(QuadrupleOf<Number>(p)) {};
+        Vector4(const FixedVector<4, Number> & p) : QuadrupleOf<Number>(p) {};
+        Vector4(Number a, Number b, Number c, Number d) : Base(a,b,c,d) { }
+        Vector4(const Number* t) : Base(QuadrupleOf<Number>(t)) {};
         Vector4(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
-		Vector4 & operator=(const Vector4 & t) {
+        Vector4 & operator=(const Vector4 & t) {
             assign(t);
             return *this;
         }
@@ -687,45 +687,45 @@ namespace asl {
 
 
     template<class Number>
-	Number dot(const Vector2<Number> & a, const Vector2<Number> & b) {
-		return a[0] * b[0] + a[1] * b[1];
-	}
+    Number dot(const Vector2<Number> & a, const Vector2<Number> & b) {
+        return a[0] * b[0] + a[1] * b[1];
+    }
     template<class Number>
-	Number dot(const Vector3<Number> & a, const Vector3<Number> & b) {
-		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-	}
+    Number dot(const Vector3<Number> & a, const Vector3<Number> & b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
     template<class Number>
-	Number dot(const Vector4<Number> & a, const Vector4<Number> & b) {
-		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
-	}
+    Number dot(const Vector4<Number> & a, const Vector4<Number> & b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+    }
 
 
     template<class Number>
-	Number length(const Vector2<Number> & a) {
-		return static_cast<Number>(sqrt(dot(a, a)));
-	}
+    Number length(const Vector2<Number> & a) {
+        return static_cast<Number>(sqrt(dot(a, a)));
+    }
 
     template<class Number>
-	Number length(const Vector3<Number> & a) {
-		return static_cast<Number>(sqrt(dot(a, a)));
-	}
+    Number length(const Vector3<Number> & a) {
+        return static_cast<Number>(sqrt(dot(a, a)));
+    }
     template<class Number>
-	Number length(const Vector4<Number> & a) {
-		return static_cast<Number>(sqrt(dot(a, a)));
-	}
+    Number length(const Vector4<Number> & a) {
+        return static_cast<Number>(sqrt(dot(a, a)));
+    }
 
     inline
-	int length(const Vector2<int> & a) {
-		return static_cast<int>(sqrt(double(dot(a, a))));
-	}
+        int length(const Vector2<int> & a) {
+            return static_cast<int>(sqrt(double(dot(a, a))));
+    }
     inline
-	int length(const Vector3<int> & a) {
-		return static_cast<int>(sqrt(double(dot(a, a))));
-	}
+        int length(const Vector3<int> & a) {
+            return static_cast<int>(sqrt(double(dot(a, a))));
+    }
     inline
-	int length(const Vector4<int> & a) {
-		return static_cast<int>(sqrt(double(dot(a, a))));
-	}
+        int length(const Vector4<int> & a) {
+            return static_cast<int>(sqrt(double(dot(a, a))));
+    }
     template <class Number, template <class> class VECTOR>
     Number magnitude(const VECTOR<Number> & v) {
         return length(v);
@@ -745,41 +745,41 @@ namespace asl {
     }
 
     template<class Number>
-	Number cosAngle(const Vector2<Number> & a, const Vector2<Number> & b) {
-		return dot(a, b)/(length(a) * length(b));
-	}
+    Number cosAngle(const Vector2<Number> & a, const Vector2<Number> & b) {
+        return dot(a, b)/(length(a) * length(b));
+    }
     template<class Number>
-	Number cosAngle(const Vector3<Number> & a, const Vector3<Number> & b) {
-		return dot(a, b)/(length(a) * length(b));
-	}
+    Number cosAngle(const Vector3<Number> & a, const Vector3<Number> & b) {
+        return dot(a, b)/(length(a) * length(b));
+    }
 
     template<class Number>
-	Vector2<Number> normalized(const Vector2<Number> & v) {
-		Number l = length(v);
-		if (l==0) return v;
-		return v / l;
-	}
+    Vector2<Number> normalized(const Vector2<Number> & v) {
+        Number l = length(v);
+        if (l==0) return v;
+        return v / l;
+    }
 
     template<class Number>
-	Vector3<Number> normalized(const Vector3<Number> & v) {
-		Number l = length(v);
-		if (l==0) return v;
-		return v / l;
-	}
+    Vector3<Number> normalized(const Vector3<Number> & v) {
+        Number l = length(v);
+        if (l==0) return v;
+        return v / l;
+    }
     template<class Number>
-	Vector4<Number> normalized(const Vector4<Number> & v) {
-		Number l = length(v);
-		if (l==0) return v;
-		return v / l;
-	}
+    Vector4<Number> normalized(const Vector4<Number> & v) {
+        Number l = length(v);
+        if (l==0) return v;
+        return v / l;
+    }
 
     // Note: cross product for Vector2 and Vector4 this is not defined in a geometrically useful way
     // and is therefore omitted
     template<class Number>
-	Vector3<Number> cross(const Vector3<Number> & a, const Vector3<Number> & b) {
-	    return Vector3<Number>( (a[1] * b[2] - a[2] * b[1]),
-	                            (a[2] * b[0] - a[0] * b[2]),
-	                            (a[0] * b[1] - a[1] * b[0]) );
+    Vector3<Number> cross(const Vector3<Number> & a, const Vector3<Number> & b) {
+        return Vector3<Number>( (a[1] * b[2] - a[2] * b[1]),
+            (a[2] * b[0] - a[0] * b[2]),
+            (a[0] * b[1] - a[1] * b[0]) );
     }
 
     template<class Number>
@@ -788,16 +788,16 @@ namespace asl {
     }
 
     /*!
-     *  Computes an orthonormal vector to a that lies in the plane that is spanned by a
-     *  and b.
-     *  T = b - dot(a, b) * a
-     */
+    *  Computes an orthonormal vector to a that lies in the plane that is spanned by a
+    *  and b.
+    *  T = b - dot(a, b) * a
+    */
     template <class Number>
     Vector3<Number>
-    orthonormal(const Vector3<Number> & a, const Vector3<Number> & b) {
-        Vector3<Number> myAn = normalized(a);
-        Number myDotProduct = dot(myAn, b);
-        return normalized( b - myDotProduct * myAn);
+        orthonormal(const Vector3<Number> & a, const Vector3<Number> & b) {
+            Vector3<Number> myAn = normalized(a);
+            Number myDotProduct = dot(myAn, b);
+            return normalized( b - myDotProduct * myAn);
     }
 
     template <class Number>
@@ -807,29 +807,29 @@ namespace asl {
 
     template <class Number>
     Number det3x3(Number a1, Number a2, Number a3,
-                  Number b1, Number b2, Number b3,
-                  Number c1, Number c2, Number c3 )
+        Number b1, Number b2, Number b3,
+        Number c1, Number c2, Number c3 )
     {
         return a1 * det2x2( b2, b3, c2, c3 )
-             - b1 * det2x2( a2, a3, c2, c3 )
-             + c1 * det2x2( a2, a3, b2, b3 );
+            - b1 * det2x2( a2, a3, c2, c3 )
+            + c1 * det2x2( a2, a3, b2, b3 );
     }
 
     template <class Number>
     Number det3x3(const Vector3<Number> & a,
-                  const Vector3<Number> & b,
-                  const Vector3<Number> & c)
+        const Vector3<Number> & b,
+        const Vector3<Number> & c)
     {
         return a[0] * det2x2( b[1], b[2], c[1], c[2] )
-             - b[0] * det2x2( a[1], a[2], c[1], c[2] )
-             + c[0] * det2x2( a[1], a[2], b[1], b[2] );
+            - b[0] * det2x2( a[1], a[2], c[1], c[2] )
+            + c[0] * det2x2( a[1], a[2], b[1], b[2] );
     }
 
     template<class Number>
-	Vector3<Number> projection(const Vector3<Number> & v1, const Vector3<Number> & v2) {
-	    Vector3<Number> v3 = normalized(v2);
+    Vector3<Number> projection(const Vector3<Number> & v1, const Vector3<Number> & v2) {
+        Vector3<Number> v3 = normalized(v2);
         return dot(v1, v3) * v3;
-	}
+    }
 
     /* @} */
 

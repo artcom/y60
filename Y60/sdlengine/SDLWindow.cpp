@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 
 #ifdef OSX
 #include <Carbon/Carbon.h>
@@ -31,7 +31,7 @@
 #include <asl/math/GeometryUtils.h>
 #include <asl/math/Box.h>
 
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 #include <y60/jsbase/JSBox.h>
 #include <y60/jsbase/JSLine.h>
 #include <y60/jsbase/JSTriangle.h>
@@ -43,7 +43,7 @@
 #include <y60/jslib/JSApp.h>
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/glutil/GLAlloc.h>
-#include <y60/render/ShaderLibrary.h>
+#include <y60/glrender/ShaderLibrary.h>
 #include <y60/jsbase/ArgumentHolder.impl>
 
 #include <asl/xpath/xpath_api.h>
@@ -296,7 +296,7 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         if (_myScene) {        
             xpath::NodeList myResult;
             xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
-            for (int myIndex = 0; myIndex < myResult.size(); myIndex++) {
+            for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); myIndex++) {
                ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
                myShape->enforceReload();             
             }
@@ -409,7 +409,7 @@ SDLWindow::createCursor(dom::NodePtr & theCursorInfo) {
         throw SDLWindowException(string("Sorry, cursor dimensions must be dividable by 8: ") + as_string(*theCursorInfo), PLUS_FILE_LINE);
     }
 
-    if (image.size() != mySize[0] * mySize[1]) {
+    if ( static_cast<int>(image.size()) != mySize[0] * mySize[1]) {
         throw SDLWindowException(string("Sorry, cursor image data is not correct: ") +  as_string(*theCursorInfo), PLUS_FILE_LINE);
     }
     vector<char> myData(4*mySize[0]);
@@ -630,14 +630,14 @@ bool
 SDLWindow::getShowTaskbar() const {
 #ifdef WIN32
     HWND myWindowHandle = FindWindow("Shell_TrayWnd", 0);
-    return (GetWindowLong(myWindowHandle, GWL_STYLE) & WS_VISIBLE);
+    return 0!= (GetWindowLong(myWindowHandle, GWL_STYLE) & WS_VISIBLE);
 #else
     return true;
 #endif
 }
 
 void SDLWindow::setMousePosition(int theX, int theY) {
-    SDL_WarpMouse(theX, theY);
+    SDL_WarpMouse( static_cast<Uint16>(theX), static_cast<Uint16>(theY) );
 }
 
 void

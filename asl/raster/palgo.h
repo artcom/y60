@@ -357,7 +357,7 @@ void scale_down(const Srcmat& src, Destmat& dest, int xfactor, int yfactor, cons
 {
     typedef typename Destmat::value_type dest_value_type;
 
-    const int xsrcsize = src.xsize();
+    //const int xsrcsize = src.xsize();
     const int xdestsize = dest.xsize();
     const int ns = xfactor * yfactor;
 
@@ -386,7 +386,7 @@ void halfsize(const Srcmat& src, Destmat& dest, const SumT& initval)
     {
         throw asl::SizeMismatchException(JUST_FILE_LINE);
     }
-    const int xsrcsize = src.xsize();
+    //const int xsrcsize = src.xsize();
     const int xdestsize = dest.xsize();
 
     for (int y = 0; y < dest.ysize();y++) {

@@ -12,9 +12,16 @@
 #define _Y60_ACGTKSHELL_JSCONTAINER_INCLUDED_
 
 #include "JSWidget.h"
-
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244 4251)
+#endif //defined(_MSC_VER)
 #include <gtkmm/container.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 
@@ -84,6 +91,12 @@ struct JSClassTraits<JSContainer::NATIVE>
     : public JSClassTraitsWrapper<JSContainer::NATIVE, JSContainer> {};
 
 jsval as_jsval(JSContext *cx, JSContainer::OWNERPTR theOwner, JSContainer::NATIVE * theContainer);
+
+inline 
+jsval 
+as_jsval(JSContext *cx, JSContainer::NATIVE * theContainer) {
+    return as_jsval(cx,JSContainer::OWNERPTR(),theContainer);
+}
 
 } // namespace
 

@@ -26,10 +26,6 @@
 
 #include <asl/base/UnitTest.h>
 
-#include <paintlib/planybmp.h>
-
-#include <vector>
-
 class TestTiming: public UnitTest {
 public:
     explicit TestTiming (): UnitTest ("TestTiming")

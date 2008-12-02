@@ -169,8 +169,8 @@ JSTreeIter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     }
     JS_ReportError(cx,"JSTreeIter::Constructor: bad parameters");
     return JS_FALSE;
-    JS_ReportError(cx,"%s is abstract and can not be instatiated", ClassName() );
-    return JS_FALSE;
+    //JS_ReportError(cx,"%s is abstract and can not be instatiated", ClassName() );
+    //return JS_FALSE;
 }
 
 void
@@ -189,7 +189,7 @@ JSTreeIter::initClass(JSContext *cx, JSObject *theGlobalObject) {
     }
     jsval myConstructorFuncObjVal;
     if (JS_GetProperty(cx, theGlobalObject, ClassName(), &myConstructorFuncObjVal)) {
-        JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
+        //JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
     } else {
         cerr << "JSTreeIter::initClass: constructor function object not found, could not initialize static members"<<endl;
     }

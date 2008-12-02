@@ -122,7 +122,7 @@ WatchDog::watch() {
         //    _mySplashScreen->hide();
                 
         // Main loop
-        while (true) {
+        for (;;) {
             std::string myReturnString;
             if (!_myAppToWatch.paused()) {
                 myReturnString = "Internal quit.";

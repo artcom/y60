@@ -33,11 +33,12 @@ namespace asl {
     /* @{ */
 
     typedef std::vector<float> dvector;
-    
-    static void
+
+    inline 
+    void
     debug_print(const char * theStr, dvector theVector) {
         AC_TRACE << theStr << " : ";
-        for (int i = 0; i < theVector.size(); i++) {
+        for (dvector::size_type i = 0; i < theVector.size(); i++) {
             AC_TRACE << theVector[i] << "," ;
         }
         AC_TRACE << std::endl;

@@ -72,7 +72,7 @@ public abstract class DevStudioCompatibleCCompiler
             mindex += 1;
             args.addElement("/Zi");
             args.addElement("/Od");
-            args.addElement("/GZ");
+            //args.addElement("/GZ");
             args.addElement("/D_DEBUG");
         } else {
                 if (optimization != null) {

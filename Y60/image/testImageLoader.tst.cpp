@@ -19,24 +19,23 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "ImageLoader.h"
+#include <iostream>
+
 #include <asl/zip/PackageManager.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/UnitTest.h>
-#include <iostream>
-// Dumb hack since paintlib is installed as a non-debug variant
-#ifdef _DEBUG
-#undef _DEBUG
-#include <paintlib/planybmp.h>
-#include <paintlib/plbitmap.h>
-#include <paintlib/planydec.h>
-#define _DEBUG
-#else
-#include <paintlib/planybmp.h>
-#include <paintlib/plbitmap.h>
-#include <paintlib/planydec.h>
-#endif
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/planybmp.h>
+#include <paintlib/plbitmap.h>
+#include <paintlib/planydec.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "ImageLoader.h"
 
 using namespace std;
 using namespace asl;

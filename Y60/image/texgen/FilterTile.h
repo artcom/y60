@@ -24,10 +24,16 @@
 #if !defined(INCL_FILTERTILE)
 #define INCL_FILTERTILE
 
+#include <vector>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/Filter/plfilter.h>
 #include <paintlib/plpixel32.h>
-
-#include <vector>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 class PLBmp;
 

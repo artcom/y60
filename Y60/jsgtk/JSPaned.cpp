@@ -100,7 +100,6 @@ pack1(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         mySelf->pack1(*myWidgetToAdd, myResizeFlag, myShrinkFlag);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 static JSBool
@@ -134,7 +133,6 @@ pack2(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         mySelf->pack2(*myWidgetToAdd, myResizeFlag, myShrinkFlag);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 JSFunctionSpec *

@@ -25,7 +25,7 @@
 
 #include <asl/base/Stream.h>
 #include <asl/base/Block.h>
-#include <asl/xpath/Path.h>
+#include <asl/base/Path.h>
 #include <string>
 
 namespace asl {

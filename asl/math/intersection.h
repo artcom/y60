@@ -16,6 +16,8 @@
 #ifndef _included_asl_intersection_
 #define _included_asl_intersection_
 
+#include <cassert>
+
 #include "Vector234.h"
 #include "linearAlgebra.h"
 #include "Matrix4.h"
@@ -34,75 +36,75 @@ namespace asl {
     // Sphere/Sphere intersection
     template<class Number>
     bool intersection(const Sphere<Number> & s0, const Sphere<Number> & s1,
-                      Point3<Number> & P) {
-        Vector3<Number> distanceVec = s1.center - s0.center;
-        float distance = magnitude(distanceVec);
-        float radius = s0.radius + s1.radius;
+        Point3<Number> & P) {
+            Vector3<Number> distanceVec = s1.center - s0.center;
+            float distance = magnitude(distanceVec);
+            float radius = s0.radius + s1.radius;
 
-        if (distance <= radius) {
-            P = s0.center + normalized(distanceVec) * (s0.radius - (radius - distance) * 0.5f);
-            return true;
-        }
-        return false;
+            if (distance <= radius) {
+                P = s0.center + normalized(distanceVec) * (s0.radius - (radius - distance) * 0.5f);
+                return true;
+            }
+            return false;
     }
 
     // LineSegment/Sphere intersection
     template<class Number>
     bool intersection(const Sphere<Number> & s, const LineSegment<Number> & l,
-                      std::vector<Point3<Number> > & P) {
-        Vector3<Number> line = l.end - l.origin;
-        Vector3<Number> direction = normalized(line);
-		Vector3<Number> G = l.origin - s.center;
-		Number a = dot(direction,direction);
-		Number b = 2*dot(direction,G);
-		Number c = dot(G,G) - s.radius*s.radius;
-		Number d = b*b - 4*a*c;
-		if (d < 0) {
-			return false;
-		}
-		Number wd = static_cast<Number>(sqrt(d));
-        Number u1 = (-b + wd) / (Number(2) * a);
-        Number u2 = (-b - wd) / (Number(2) * a);
-        Number lineLen = magnitude(line);
-        if (u1 >= Number(0) && u1 <= lineLen) {
-            P.push_back(l.origin + direction * u1);
-        }
-        if (u2 >= Number(0) && u2 <= lineLen && u2 != u1) {
-		    P.push_back(l.origin + direction * u2);
-        }
-		return true;
+        std::vector<Point3<Number> > & P) {
+            Vector3<Number> line = l.end - l.origin;
+            Vector3<Number> direction = normalized(line);
+            Vector3<Number> G = l.origin - s.center;
+            Number a = dot(direction,direction);
+            Number b = 2*dot(direction,G);
+            Number c = dot(G,G) - s.radius*s.radius;
+            Number d = b*b - 4*a*c;
+            if (d < 0) {
+                return false;
+            }
+            Number wd = static_cast<Number>(sqrt(d));
+            Number u1 = (-b + wd) / (Number(2) * a);
+            Number u2 = (-b - wd) / (Number(2) * a);
+            Number lineLen = magnitude(line);
+            if (u1 >= Number(0) && u1 <= lineLen) {
+                P.push_back(l.origin + direction * u1);
+            }
+            if (u2 >= Number(0) && u2 <= lineLen && u2 != u1) {
+                P.push_back(l.origin + direction * u2);
+            }
+            return true;
     }
     template<class Number>
     bool intersection(const LineSegment<Number> & l, const Sphere<Number> & s, 
-                      std::vector<Point3<Number> > & P) {
-        return intersection(s,l, P);
+        std::vector<Point3<Number> > & P) {
+            return intersection(s,l, P);
     }
 
     // Line/Sphere intersection
     template<class Number>
-	bool intersection(const Sphere<Number> & s, const Line<Number> & l, Point3<Number> & P1, Point3<Number> & P2) {
-		Vector3<Number> G = l.origin - s.center;
-		Number a = dot(l.direction,l.direction);
-		Number b = 2*dot(l.direction,G);
-		Number c = dot(G,G) - s.radius*s.radius;
-		Number d = b*b - 4*a*c;
-		if (d < 0) {
-			return false;
-		}
-		Number wd = static_cast<Number>(sqrt(d));
-		P1 = l.origin + l.direction * (-b + wd)/Number(2)*a;
-		P2 = l.origin + l.direction * (-b - wd)/Number(2)*a;
-		return true;
-	}
+    bool intersection(const Sphere<Number> & s, const Line<Number> & l, Point3<Number> & P1, Point3<Number> & P2) {
+        Vector3<Number> G = l.origin - s.center;
+        Number a = dot(l.direction,l.direction);
+        Number b = 2*dot(l.direction,G);
+        Number c = dot(G,G) - s.radius*s.radius;
+        Number d = b*b - 4*a*c;
+        if (d < 0) {
+            return false;
+        }
+        Number wd = static_cast<Number>(sqrt(d));
+        P1 = l.origin + l.direction * (-b + wd)/Number(2)*a;
+        P2 = l.origin + l.direction * (-b - wd)/Number(2)*a;
+        return true;
+    }
     template<class Number>
-	bool intersection(const Line<Number> & l, const Sphere<Number> & s, Point3<Number> & P1, Point3<Number> & P2) {
+    bool intersection(const Line<Number> & l, const Sphere<Number> & s, Point3<Number> & P1, Point3<Number> & P2) {
         return intersection(s, l, P1, P2);
     }
 
     // Line/Line intersection (G.Gems pp 304)
     template<class Number>
-	bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result, 
-                        Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result, 
+        Number & t, Number & s) 
     {
         const Point3<Number> & p1 = l1.origin;
         const Point3<Number> & p2 = l2.origin;
@@ -110,7 +112,7 @@ namespace asl {
         const Vector3<Number> & v2 = l2.direction;
         Vector3<Number> cv = cross(v1,v2);
         Number cv2 = dot(cv,cv);
-        
+
         if (almostEqual(cv2,0)) {
             //lines are parallel
             return false;                
@@ -124,20 +126,20 @@ namespace asl {
             result = p1 + t*v1;
             return true;
         }
-        
+
         //lines are skew
-		return false;
+        return false;
     }
     template<class Number>
-	bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result)
+    bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(l1,l2,result,t,s);
     }
 
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
         Line<Number> l2(ls2.origin, ls2.getDirection());
@@ -146,15 +148,15 @@ namespace asl {
         return mayIntersect && t >= 0 && t <= 1 && s >= 0 && s <= 1;
     }
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2, Point3<Number> & result)
+    bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(ls1,ls2,result,t,s);
     }
-    
+
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
         bool mayIntersect = intersection(l1, l2, result, t, s);        
@@ -162,20 +164,20 @@ namespace asl {
         return mayIntersect && t >= 0 && t <= 1;
     }
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2, Point3<Number> & result)
+    bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(ls1,l2,result,t,s);
     }
-    
+
     template<class Number>
-	bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         return intersection(ls2,l1,result,s,t);
     }
     template<class Number>
-	bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2, Point3<Number> & result)
+    bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(l1,ls2,result,t,s);
@@ -184,8 +186,8 @@ namespace asl {
 
     //line segment - ray intersection
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
         const Line<Number> & l2 = asLine(r2);
@@ -194,20 +196,20 @@ namespace asl {
         return mayIntersect && t >= 0 && t <= 1 && s >= 0;
     }
     template<class Number>
-	bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2, Point3<Number> & result)
+    bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(ls1,r2,result,t,s);
     }
-    
+
     template<class Number>
-	bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         return intersection(ls2,r1,result,s,t);
     }
     template<class Number>
-	bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2, Point3<Number> & result)
+    bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(r1,ls2,result,t,s);
@@ -215,8 +217,8 @@ namespace asl {
 
     //line - ray intersection
     template<class Number>
-	bool intersection(const Line<Number> & l1,const Ray<Number> & r2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const Ray<Number> & r2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         const Line<Number> & l2 = asLine(r2);
         bool mayIntersect = intersection(l1, l2, result, t, s);        
@@ -224,140 +226,147 @@ namespace asl {
         return mayIntersect && s >= 0;
     }
     template<class Number>
-	bool intersection(const Line<Number> & l1,const Ray<Number> & r2, Point3<Number> & result)
+    bool intersection(const Line<Number> & l1,const Ray<Number> & r2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(l1,r2,result,t,s);
     }
-    
+
     template<class Number>
-	bool intersection(const Ray<Number> & r1,const Line<Number> & l2, 
-                        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Ray<Number> & r1,const Line<Number> & l2, 
+        Point3<Number> & result, Number & t, Number & s) 
     {
         return intersection(l2,r1,result,s,t);
     }
     template<class Number>
-	bool intersection(const Ray<Number> & r1,const Line<Number> & l2, Point3<Number> & result)
+    bool intersection(const Ray<Number> & r1,const Line<Number> & l2, Point3<Number> & result)
     {
         Number t,s;
         return intersection(r1,l2,result,t,s);
     }
-    
 
 
-    
+
+
     // Line/Plane intersection
     template<class Number>
-	bool intersection(const Line<Number> & l, const Plane<Number> & j, Point3<Number> & result, Number & t) {
-		Number d = dot(l.direction,j.normal);
+    bool intersection(const Line<Number> & l, const Plane<Number> & j, Point3<Number> & result, Number & t) {
+        Number d = dot(l.direction,j.normal);
         if (almostEqual(d,0)) {
-			return false;
+            return false;
         }
-		t = -(j.offset + dot(asVector(l.origin),j.normal)) / d;
+        t = -(j.offset + dot(asVector(l.origin),j.normal)) / d;
         result = l.origin + l.direction * t;
-		return true;
-	}
+        return true;
+    }
 
     // Line/Plane intersection
     template<class Number>
-	bool intersection(const Line<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
-		Number t;
+    bool intersection(const Line<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
+        Number t;
         return intersection(l,j,result,t);
-	}
+    }
     template<class Number>
-	bool intersection(const Plane<Number> & j, const Line<Number> & l,Point3<Number> & result) {
-		Number t;
+    bool intersection(const Plane<Number> & j, const Line<Number> & l,Point3<Number> & result) {
+        Number t;
         return intersection(l,j,result,t);
-	}
+    }
     // Ray/Plane intersection
     template<class Number>
-	bool intersection(const Ray<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
-		Number t;
+    bool intersection(const Ray<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
+        Number t;
         if (intersection(asLine(l),j,result,t)) {
             return t >= 0;
         }
         return false;
-	}
+    }
 
     template<class Number>
-	bool intersection(const Plane<Number> & j, const Ray<Number> & l, Point3<Number> & result) {
+    bool intersection(const Plane<Number> & j, const Ray<Number> & l, Point3<Number> & result) {
         return intersection(l,j,result);
     }
 
-	//nearest point to p on a line l
+    //nearest point to p on a line l
     template<class Number>
-	Point3<Number> nearest(const Point3<Number> & p, const Line<Number> & l) {
-		Point3<Number> result;
-		if (intersection(l, Plane<Number>(l.direction,-dot(asVector(p),l.direction)), result)) {
-			return result;
-		}
-		return p;
-	}
+    Point3<Number> nearest(const Point3<Number> & p, const Line<Number> & l) {
+        Point3<Number> result;
+        if (intersection(l, Plane<Number>(l.direction,-dot(asVector(p),l.direction)), result)) {
+            return result;
+        }
+        return p;
+    }
     template<class Number>
-	Point3<Number> nearest(const Line<Number> & l, const Point3<Number> & p) {
+    Point3<Number> nearest(const Line<Number> & l, const Point3<Number> & p) {
         return nearest(p, l);
     }
 
     template<class Number>
-	Point3<Number> nearest(const Point3<Number> & p, const LineSegment<Number> & l, float * factor=0) {
+    Point3<Number> nearest(const Point3<Number> & p, const LineSegment<Number> & l, float& factor) {
         Vector3<Number> direction = l.getDirection();
         Number distance = magnitude(direction); //l.getDirection());
         Number f = 0.0;
         if (distance != 0.0) {
             f = dot(p-l.origin, normalized(direction))/distance;
         }
-        if (factor) {
-            *factor = f;
-        }
+        factor = f;
         //Number dist = clamp(dot(direction, p-l.origin),0.0f,1.0f);
         return l.origin + direction * clamp(f, 0.0f, 1.0f); 
-	}
+    }
     template<class Number>
-	Point3<Number> nearest(const LineSegment<Number> & l, const Point3<Number> & p, float * factor = 0) {
+    Point3<Number> nearest(const Point3<Number> & p, const LineSegment<Number> & l) {
+        float factor = 0.0;
         return nearest(p,l,factor);
+    }
+    template<class Number>
+    Point3<Number> nearest(const LineSegment<Number> & l, const Point3<Number> & p, float& factor) {
+        return nearest(p,l,factor);
+    }
+    template<class Number>
+    Point3<Number> nearest(const LineSegment<Number> & l, const Point3<Number> & p) {
+        return nearest(p,l);
     }
 
     // point/line distance
     template<class Number>
-	Number distance(const Point3<Number> & p, const Line<Number> & l) {
-		return distance(p, nearest(p,l));
-	}
+    Number distance(const Point3<Number> & p, const Line<Number> & l) {
+        return distance(p, nearest(p,l));
+    }
     template<class Number>
-	Number distance(const Line<Number> & l, const Point3<Number> & p) {
-		return distance(p, l);
-	}
+    Number distance(const Line<Number> & l, const Point3<Number> & p) {
+        return distance(p, l);
+    }
 
     template<class Number>
-	Number distance(const Point3<Number> & p, const LineSegment<Number> & l) {
-		return distance(p, nearest(p,l));
-	}
+    Number distance(const Point3<Number> & p, const LineSegment<Number> & l) {
+        return distance(p, nearest(p,l));
+    }
     template<class Number>
-	Number distance(const LineSegment<Number> & l, const Point3<Number> & p) {
-		return distance(p, l);
-	}
+    Number distance(const LineSegment<Number> & l, const Point3<Number> & p) {
+        return distance(p, l);
+    }
 
     // LineSegment/Plane intersection
     // [TS+DS] Unwrappable due to 4 arguments
     template<class Number>
-	bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result, Number theEpsilon) {
-		Number t;
+    bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result, Number theEpsilon) {
+        Number t;
         Line<Number> myLine(l.origin, l.end);
         if (intersection(myLine, j, result, t)) {
             return (t + theEpsilon >= 0) && (t - theEpsilon <= distance(l.origin,l.end));
         }
         return false;
-	}
+    }
 
     // LineSegment/Plane intersection
     // for wrapper access
     template<class Number>
-	bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
+    bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
         return intersection(l, j, result, Number(0.0));
-	}
+    }
 
 
     template<class Number>
-	bool intersection(const Plane<Number> & j, const LineSegment<Number> & l, Point3<Number> & result) {
+    bool intersection(const Plane<Number> & j, const LineSegment<Number> & l, Point3<Number> & result) {
         return intersection(l,j,result);
     }
 
@@ -392,10 +401,10 @@ namespace asl {
 
     // three plane intersection
     template<class Number>
-	bool intersection(const Plane<Number> & p1,
-                      const Plane<Number> & p2,
-                      const Plane<Number> & p3,
-                      Point3<Number> & theResult)
+    bool intersection(const Plane<Number> & p1,
+        const Plane<Number> & p2,
+        const Plane<Number> & p3,
+        Point3<Number> & theResult)
     {
         Number myDet = det3x3(p1.normal,p2.normal,p3.normal);
         if (almostEqual(myDet,0)) {
@@ -405,15 +414,15 @@ namespace asl {
         Vector3<Number> pop2 = - p2.normal * p2.offset;
         Vector3<Number> pop3 = - p3.normal * p3.offset;
         theResult = (dot(pop1, p1.normal) * cross(p2.normal, p3.normal) +
-                     dot(pop2, p2.normal) * cross(p3.normal, p1.normal) +
-                     dot(pop3, p3.normal) * cross(p1.normal, p2.normal)) / myDet;
+            dot(pop2, p2.normal) * cross(p3.normal, p1.normal) +
+            dot(pop3, p3.normal) * cross(p1.normal, p2.normal)) / myDet;
         return true;
     }
 
     template <class Number>
     bool intersection(const Plane<Number> & p1,
-                      const Plane<Number> & p2,
-                      Line<Number> & theResult) 
+        const Plane<Number> & p2,
+        Line<Number> & theResult) 
     {
         Vector3<Number> myDirection = cross(p1.normal, p2.normal);
         if (almostEqual(dot(myDirection, myDirection), 0)) {
@@ -450,17 +459,18 @@ namespace asl {
     // see Graphics GEMS 1 Pg. 393
     template<class Number>
     bool inside(const Triangle<Number> & tri,
-                const Vector3<Number> & theNormal,
-                const Point3<Number> & P,
-                Number & alpha,
-                Number & beta)
+        const Vector3<Number> & theNormal,
+        const Point3<Number> & P,
+        Number & alpha,
+        Number & beta)
     {
         unsigned i0 =  maxindex<Number>(theNormal);
-        int i1, i2;
+        int i1 = 0, i2 = 0;
         switch (i0) {
             case 0: i1 = 1; i2 = 2; break;
             case 1: i1 = 0; i2 = 2; break;
             case 2: i1 = 0; i2 = 1; break;
+            default: assert(false); // 'i1' and 'i2' not initalized
         };
         Number u0 = P[i1] - tri[0][i1];
         Number v0 = P[i2] - tri[0][i2];
@@ -490,9 +500,9 @@ namespace asl {
     //
     // return true and intersection point in "theResult" when they intersects
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Line<Number> & theLine,
-                      Point3<Number> & theResult)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Line<Number> & theLine,
+        Point3<Number> & theResult)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
@@ -502,18 +512,18 @@ namespace asl {
         return false;
     }
     template<class Number>
-	bool intersection(const Line<Number> & theLine,
-                      const Triangle<Number> & theTriangle,
-                      Point3<Number> & theResult)
+    bool intersection(const Line<Number> & theLine,
+        const Triangle<Number> & theTriangle,
+        Point3<Number> & theResult)
     {
         return intersection(theTriangle, theLine, theResult);
     }
     // same as above, but returns also the computed plane normal to avoid recomputation
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Line<Number> & theLine,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Line<Number> & theLine,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
@@ -524,35 +534,35 @@ namespace asl {
         }
         return false;
     }
-    
+
     // same as above but returns interpolated normal from supplied normals
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Vector3<Vector3<Number> > & theNormals,
-                      const Line<Number> & theLine,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Vector3<Vector3<Number> > & theNormals,
+        const Line<Number> & theLine,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
             Number alpha, beta;
             if (inside(theTriangle, myPlane.normal, theResult, alpha, beta)) {
                 theResultNormal = theNormals[0] * (1.0 - (alpha+beta)) +
-                                  theNormals[1] * alpha +
-                                  theNormals[2] * beta;
+                    theNormals[1] * alpha +
+                    theNormals[2] * beta;
                 return true;
             }
         }
         return false;
     }
-    
+
     //============== Triangle/Ray intersection ===================
     //
     // return true and intersection point in "theResult" when they intersects
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Ray<Number> & theRay,
-                      Point3<Number> & theResult)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Ray<Number> & theRay,
+        Point3<Number> & theResult)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theRay,myPlane,theResult)) {
@@ -562,18 +572,18 @@ namespace asl {
         return false;
     }
     template<class Number>
-	bool intersection(const Ray<Number> & theRay,
-                      const Triangle<Number> & theTriangle,
-                      Point3<Number> & theResult)
+    bool intersection(const Ray<Number> & theRay,
+        const Triangle<Number> & theTriangle,
+        Point3<Number> & theResult)
     {
         return intersection(theTriangle, theRay, theResult);
     }
     // same as above, but returns also the computed plane normal to avoid recomputation
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Ray<Number> & theRay,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Ray<Number> & theRay,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theRay,myPlane,theResult)) {
@@ -586,19 +596,19 @@ namespace asl {
     }
     // same as above but returns interpolated normal from supplied normals
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Vector3<Vector3<Number> > & theNormals,
-                      const Ray<Number> & theRay,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Vector3<Vector3<Number> > & theNormals,
+        const Ray<Number> & theRay,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theRay,myPlane,theResult)) {
             Number alpha, beta;
             if (inside(theTriangle, myPlane.normal, theResult, alpha, beta)) {
                 theResultNormal = theNormals[0] * (1.0 - (alpha+beta)) +
-                                  theNormals[1] * alpha +
-                                  theNormals[2] * beta;
+                    theNormals[1] * alpha +
+                    theNormals[2] * beta;
                 return true;
             }
         }
@@ -610,9 +620,9 @@ namespace asl {
     //
     // return true and intersection point in "theResult" when they intersects
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const LineSegment<Number> & theLine,
-                      Point3<Number> & theResult)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const LineSegment<Number> & theLine,
+        Point3<Number> & theResult)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
@@ -622,19 +632,19 @@ namespace asl {
         return false;
     }
     template<class Number>
-	bool intersection(const LineSegment<Number> & theLine,
-                      const Triangle<Number> & theTriangle,
-                      Point3<Number> & theResult)
+    bool intersection(const LineSegment<Number> & theLine,
+        const Triangle<Number> & theTriangle,
+        Point3<Number> & theResult)
     {
         return intersection(theTriangle, theLine, theResult);
     }
 
-   // same as above, but returns also the computed plane normal to avoid recomputation
+    // same as above, but returns also the computed plane normal to avoid recomputation
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const LineSegment<Number> & theLine,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const LineSegment<Number> & theLine,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
@@ -646,26 +656,26 @@ namespace asl {
         return false;
     }
     template<class Number>
-	bool intersection(const Triangle<Number> & theTriangle,
-                      const Vector3<Vector3<Number> > & theNormals,
-                      const LineSegment<Number> & theLine,
-                      Point3<Number> & theResult,
-                      Vector3<Number> & theResultNormal)
+    bool intersection(const Triangle<Number> & theTriangle,
+        const Vector3<Vector3<Number> > & theNormals,
+        const LineSegment<Number> & theLine,
+        Point3<Number> & theResult,
+        Vector3<Number> & theResultNormal)
     {
         Plane<Number> myPlane = theTriangle.plane();
         if (intersection(theLine,myPlane,theResult)) {
             Number alpha, beta;
             if (inside(theTriangle, myPlane.normal, theResult, alpha, beta)) {
                 theResultNormal = theNormals[0] * (1.0 - (alpha+beta)) +
-                                  theNormals[1] * alpha +
-                                  theNormals[2] * beta;
+                    theNormals[1] * alpha +
+                    theNormals[2] * beta;
                 return true;
             }
         }
         return false;
     }
 
- 
+
     // line/box intersection see http://www.cs.utah.edu/~awilliam/box/
     template<class Number>
     bool intersection(const Box3<Number> & b, const Line<Number> & r, Number & tmin, Number & tmax)
@@ -680,8 +690,8 @@ namespace asl {
         sign[Y] = (invDirection[Y] < 0);
         sign[Z] = (invDirection[Z] < 0);
 
-               tmin  = (b[    sign[X]][X] - r.origin[X]) * invDirection[X];
-               tmax  = (b[1 - sign[X]][X] - r.origin[X]) * invDirection[X];
+        tmin  = (b[    sign[X]][X] - r.origin[X]) * invDirection[X];
+        tmax  = (b[1 - sign[X]][X] - r.origin[X]) * invDirection[X];
         Number tymin = (b[    sign[Y]][Y] - r.origin[Y]) * invDirection[Y];
         Number tymax = (b[1 - sign[Y]][Y] - r.origin[Y]) * invDirection[Y];
 
@@ -784,8 +794,8 @@ namespace asl {
     }
     template<class Number>
     bool visible(const Box3<Number> & theObjectBounds,
-                 const Matrix4<Number> & theProjection,
-                 const Box3<Number> & theScreen)
+        const Matrix4<Number> & theProjection,
+        const Box3<Number> & theScreen)
     {
         Box3<Number> myScreenSpaceBounds = theObjectBounds * theProjection;
         return myScreenSpaceBounds.touches(theScreen);

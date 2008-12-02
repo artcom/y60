@@ -74,7 +74,7 @@ createFormatter(const char * theFormatterNameVar, const char * theDefaultFormatt
                  << theFormatterNameVar << ") for sink "
                  <<theSinkName<<"', using formatter '"<<theDefaultFormatterName<<"'"
                  << ", valid formatters are: ";
-            for (int i=0; i < myTriedNames.size(); ++i) {
+            for (std::vector<std::string>::size_type i=0; i < myTriedNames.size(); ++i) {
                 std::cerr << "'"<<myTriedNames[i]<<"' ";
             }
             std::cerr << std::endl;
@@ -215,7 +215,7 @@ Logger::log(Time theTime, Severity theSeverity, const char * theModule, int theI
     } else {
         myMessage = theText;
     }
-    for (int i = 0; i < _myMessageSinks.size(); ++i) {     
+    for (std::vector<Ptr<MessageSink> >::size_type i = 0; i < _myMessageSinks.size(); ++i) {     
         if (theSeverity > SEV_PRINT) {
             if (_mySinkFormatter[i]) {
                 myMessage = _mySinkFormatter[i]->format(theTime, theSeverity, theModule, theId, theText);
@@ -323,7 +323,7 @@ Logger::setMessageFormatter(Ptr<LogMessageFormatter> theFormatter) {
 
 void
 Logger::setMessageFormatter(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> theFormatter, Severity theSeverityFilter) {
-    for (int i = 0; i < _myMessageSinks.size(); ++i) {
+    for (std::vector<Ptr<MessageSink> >::size_type i = 0; i < _myMessageSinks.size(); ++i) {
         if (theSink == _myMessageSinks[i]) {
             _mySinkFormatter[i] = theFormatter;
             _mySinkSeverityFilter[i] = theSeverityFilter;

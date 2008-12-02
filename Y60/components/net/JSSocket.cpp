@@ -306,10 +306,8 @@ JSSocket::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
             return JS_FALSE;
         case PROP_sendBufferSize:
             return Method<NATIVE>::call(&NATIVE::setSendBufferSize, cx, obj, 1, vp, &dummy);
-            return JS_TRUE;
         case PROP_receiveBufferSize:
             return Method<NATIVE>::call(&NATIVE::setReceiveBufferSize, cx, obj, 1, vp, &dummy);
-            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSSocket::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;

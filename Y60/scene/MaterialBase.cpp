@@ -520,7 +520,7 @@ namespace y60 {
     void
     MaterialPropertiesFacade::registerDependenciesRegistrators() {
         MaterialPropGroup1HashTag::Plug::setReconnectFunction(&MaterialPropertiesFacade::registerDependenciesForMaterialPropGroup1HashTag);
-        int myHash = get<MaterialPropGroup1HashTag>();
+        /*int myHash =*/ get<MaterialPropGroup1HashTag>();
     }
 
     void

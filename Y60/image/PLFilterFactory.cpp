@@ -20,8 +20,12 @@
 //=============================================================================
 
 #include "PLFilterFactory.h"
-#include "PLFilterGaussianBlur.h"
 
+#include <iostream>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/Filter/plfiltergrayscale.h>
 #include <paintlib/Filter/plfiltervideoinvert.h>
 #include <paintlib/Filter/plfilterflip.h>
@@ -41,9 +45,11 @@
 #include <paintlib/Filter/plfilterresizehamming.h>
 #include <paintlib/Filter/plfilterintensity.h>
 #include <paintlib/Filter/plfiltercrop.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-
-#include <iostream>
+#include "PLFilterGaussianBlur.h"
 
 using namespace std;
 using namespace asl;

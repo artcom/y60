@@ -20,20 +20,26 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "HeightToNormalMap.h"
+#include <string>
+#include <iostream>
 
 #include <asl/math/linearAlgebra.h>
 #include <asl/math/numeric_functions.h>
-#include <paintlib/plpaintlibdefs.h>
 
 #include <asl/base/UnitTest.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpaintlibdefs.h>
 #include <paintlib/plpixel8.h>
 #include <paintlib/plpixel32.h>
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <string>
-#include <iostream>
+#include "HeightToNormalMap.h"
 
 using namespace std;  // automatically added!
 using namespace asl;  // automatically added!

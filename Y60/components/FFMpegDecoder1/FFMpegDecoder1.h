@@ -18,28 +18,22 @@
 #include <string>
 #include <vector>
 
-#ifdef WIN32
-// Disable FFMPeg Warning in Windows
-#pragma warning(push)
-#pragma warning(disable:4244)
-#define EMULATE_INTTYPES
-#endif
-
 #ifdef OSX
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#undef AV_NOPTS_VALUE
-#define AV_NOPTS_VALUE 0x8000000000000000LL
+    extern "C" {
+#       include <libavformat/avformat.h>
+    }
+#   undef AV_NOPTS_VALUE
+#   define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
-extern "C" {
-#include <ffmpeg/avformat.h>
-}
-#endif
-
-#ifdef WIN32
-// Reenable Warning in Windows
-#pragma warning(pop)
+#   if defined(_MSC_VER)
+#       pragma warning(push,1)
+#   endif
+    extern "C" {
+#       include <ffmpeg/avformat.h>
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 #endif
 
 namespace y60 {

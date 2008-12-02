@@ -19,7 +19,15 @@
 #undef nil
 #endif
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4413 4244)
+#endif //defined(_MSC_VER)
 #include <gtkmm/drawingarea.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
+
 #include <sigc++/sigc++.h>
 
 namespace acgtk {

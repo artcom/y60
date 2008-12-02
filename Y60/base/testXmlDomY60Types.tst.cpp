@@ -106,7 +106,7 @@ public:
 		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,
-            asl::ReadableBlockAdapter(&(*_someVariable.begin()),&(*_someVariable.end())),0));
+            asl::ReadableBlockAdapter(&(*_someVariable.begin()),&*_someVariable.begin() + _someVariable.size()),0));
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
 		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
@@ -120,7 +120,7 @@ template <class T>
 bool operator==(const std::vector<T> & a, const std::vector<T> & b)
 {
     if (a.size() == b.size()) {
-        for (int i = 0; i < a.size(); ++i) {
+        for (typename std::vector<T>::size_type i = 0; i < a.size(); ++i) {
             if (a[i] != b[i]) {
                 return false;
             }

@@ -14,6 +14,7 @@
 #include "ResourceManager.h"
 #include "VertexData.h"
 #include "VertexMemoryBase.h"
+#include "Texture.h"
 
 
 namespace y60 {
@@ -58,7 +59,7 @@ class MemoryResourceManager : public ResourceManager {
          */
         void unbindTexture(Texture * theTexture) {}
         void updateTextureParams(const TexturePtr & theTexture) {}
-		bool imageMatchesGLTexture(TexturePtr theTexture) const { return true; }
+        bool imageMatchesGLTexture(TexturePtr theTexture) const { return true; }
         IShaderLibraryPtr getShaderLibrary() const {
             return IShaderLibraryPtr(0);
         }

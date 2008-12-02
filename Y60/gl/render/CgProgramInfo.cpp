@@ -117,7 +117,7 @@ namespace y60 {
             DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_loadFromFile));
 
             // create null terminated array of null terminated strings
-            for (int i=0; i < _myShader._myCompilerArgs.size(); ++i) {
+            for (std::vector<std::string>::size_type i=0; i < _myShader._myCompilerArgs.size(); ++i) {
                 AC_DEBUG << "Using arg " << _myShader._myCompilerArgs[i].c_str() << endl;
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
@@ -602,7 +602,7 @@ namespace y60 {
             }
             case TEXTURE_MATRICES:
             {
-                int mySize = cgGetArraySize(curParam._myParameter, 0);
+                unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
                 for (unsigned i = 0; i < mySize; ++i) {
                     CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
                     Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
@@ -846,14 +846,14 @@ namespace y60 {
     {
         int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
         // int mySize = cgGetArraySize(theParam._myParameter, 0);
-        if (mySize != theValue.size()) {
+        if (mySize != static_cast<int>(theValue.size())) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
                 " elements, have " << theValue.size() << "(" << _myPathName << ")";
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
             //AC_TRACE << "setting component " << i << " to " << theValue[i];
-            if (i < theValue.size()) {
+            if (i < static_cast<int>(theValue.size())) {
                 cgSetParameter1f(myElement, theValue[i]);
             }
         }
@@ -866,14 +866,14 @@ namespace y60 {
     {
         int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
         // int mySize = cgGetArraySize(theParam._myParameter, 0);
-        if (mySize != theValue.size()) {
+        if (mySize != static_cast<int>(theValue.size())) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
                 " elements, have " << theValue.size() << "(" << _myPathName << ")";
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
             //AC_TRACE << "setting component " << i << " to " << theValue[i];
-            if (i < theValue.size()) {
+            if (i < static_cast<int>(theValue.size())) {
                 cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
             }
         }
@@ -886,11 +886,11 @@ namespace y60 {
     {
         int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
         // int mySize = cgGetArraySize(theParam._myParameter, 0);
-        if (mySize != theValue.size()) {
+        if (mySize != static_cast<int>(theValue.size())) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
                 " elements, have " << theValue.size();
         }
-        for(unsigned i = 0; i < mySize; ++i) {
+        for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
             //AC_TRACE << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);

@@ -10,25 +10,32 @@
 //============================================================================
 
 #include "OpenEXRDecoder.h"
-#include "PLDataSourceStreamAdapter.h"
 
-#include <paintlib/plexcept.h>
 #include <iostream>
 
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
+#include <paintlib/plexcept.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
+
 #include <asl/base/file_functions.h>
-//#include <OpenEXR/ImfCRgbaFile.h>
+
+#include "PLDataSourceStreamAdapter.h"
 
 using namespace asl;
 using namespace std;
 using namespace Imf;
 
-OpenEXRDecoder::OpenEXRDecoder() : PLPicDecoder() {
+OpenEXRDecoder::OpenEXRDecoder() : PLPicDecoder(), _myDataStream(), _myOpenEXRFile() {
 }
 
 
 OpenEXRDecoder::~OpenEXRDecoder() {
-    delete _myDataStream;
-    delete _myOpenEXRFile;
+    delete _myOpenEXRFile;  // note: order matters here as '_myDataStream' is accessed by 
+    delete _myDataStream;   //       '_myOpenEXRFile's dtor!
 }
 
 void
@@ -72,7 +79,7 @@ void
 OpenEXRDecoder::GetImage(PLBmpBase & Bmp)
 {
     unsigned int myWidth  = Bmp.GetWidth();
-    unsigned int myHeight = Bmp.GetHeight();
+    //unsigned int myHeight = Bmp.GetHeight();
 
     PLBYTE ** myBmpLines = Bmp.GetLineArray();
     _myOpenEXRFile->setFrameBuffer((Rgba*)myBmpLines[0], 1, myWidth);

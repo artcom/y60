@@ -200,8 +200,8 @@ namespace y60 {
         Vector3f myXStep = myXVector * ( 1.0 / theHSubdivision );
         Vector3f myYStep = myYVector * ( 1.0 / theVSubdivision );
 
-        Vector2f myUStep( 1.0 / theHSubdivision, 0.0);
-        Vector2f myVStep( 0.0, 1.0 / theVSubdivision);
+        Vector2f myUStep( 1.0f / theHSubdivision, 0.0f);
+        Vector2f myVStep( 0.0f, 1.0f / theVSubdivision);
 
         return createPlane(theScene, theHSubdivision +1, theVSubdivision + 1, "myPlane", theMaterialId,
             QuadBuilder(),
@@ -218,12 +218,13 @@ namespace y60 {
         asl::Vector2<unsigned> theSubdivision)
     {
 AC_DEBUG << "createSphericalPlane:" << " theSphere = " << theSphere << ", thePolarBounds = " << thePolarBounds << ", theSubdivision = " << theSubdivision;
-        asl::Vector2f mySubDivision = asl::Vector2f(theSubdivision[0], theSubdivision[1]);
+        asl::Vector2f mySubDivision = asl::Vector2f( static_cast<float>(theSubdivision[0])
+                                                   , static_cast<float>(theSubdivision[1]) );
         asl::Vector2f myPolarUVector = asl::Vector2f(thePolarBounds.getSize()[0], 0)/mySubDivision;
         asl::Vector2f myPolarVVector = asl::Vector2f(0, thePolarBounds.getSize()[1])/mySubDivision;
         
-        Vector2f myUStep( 1.0 / mySubDivision[0], 0.0);
-        Vector2f myVStep( 0.0, 1.0 / mySubDivision[1]);
+        Vector2f myUStep( 1.0f / mySubDivision[0], 0.0f);
+        Vector2f myVStep( 0.0f, 1.0f / mySubDivision[1]);
 
 AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector << ", myPolarVVector = " << myPolarVVector << ", mySubDivision = " << mySubDivision;
 
@@ -373,11 +374,11 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         }
 
         // direction factor (outer vs inner angles)
-        const float myDirectionFactor = (theSweepDegrees >= 180.0 && theSweepDegrees < 360.0) ? -1.0 : +1.0;
+        const float myDirectionFactor = (theSweepDegrees >= 180.0 && theSweepDegrees < 360.0) ? -1.0f : +1.0f;
 
         // convert to radians
-        const float myStartRadians = theStartDegrees * ( PI/180 );
-        const float mySweepRadians = theSweepDegrees * ( PI/180 );
+        const float myStartRadians = static_cast<float>(theStartDegrees * ( PI/180 ));
+        const float mySweepRadians = static_cast<float>(theSweepDegrees * ( PI/180 ));
         const float myEndRadians   = myStartRadians + mySweepRadians;
 
         // positioning
@@ -391,7 +392,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         // tesselation
         const unsigned myFullCircleSubdivisions = theSteps;
-        const unsigned myDiskSubdivisions = maximum<unsigned>(1, round<float>(myFullCircleSubdivisions / (2*PI / mySweepRadians)));
+        const unsigned myDiskSubdivisions = maximum<unsigned>(1, round<float>(static_cast<float>(myFullCircleSubdivisions / (2*PI / mySweepRadians))));
         const unsigned myDiskVertices     = myDiskSubdivisions + 1;
         const float    myVertexRadians    = (myDiskSubdivisions > 1) ? mySweepRadians / myDiskSubdivisions : mySweepRadians;
 
@@ -912,12 +913,12 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         // loop through all primitives/elements,
         // collect the index arrays
         dom::NodePtr myPrimitivesNode = theShape->childNode(PRIMITIVE_LIST_NAME);
-        int myElementCount = myPrimitivesNode->childNodesLength();
+        dom::NodeList::size_type myElementCount = myPrimitivesNode->childNodesLength();
 
         vector<const VectorOfUnsignedInt*> myPositionIndices(myElementCount);
         vector<const VectorOfUnsignedInt*> myNormalIndices(myElementCount);
 
-        for (unsigned int i = 0; i < myElementCount; ++i) {
+        for (dom::NodeList::size_type i = 0; i < myElementCount; ++i) {
             dom::NodePtr myElementNode = myPrimitivesNode->childNode(i);
             if (myElementNode->nodeName() == ELEMENTS_NODE_NAME) {
                 dom::NodePtr myElementPositionIndices =
@@ -930,11 +931,11 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             }
         }
         // clear the normals
-        for (unsigned int i=0; i < myNormals.size(); ++i) {
+        for (VectorOfVector3f::size_type i=0; i < myNormals.size(); ++i) {
             myNormals[i] = Vector3f(0,0,0);
         }
         // sum up the normals for each element
-        for (unsigned int i = 0; i < myElementCount; ++i) {
+        for (dom::NodeList::size_type  i = 0; i < myElementCount; ++i) {
             dom::NodePtr myElementNode = myPrimitivesNode->childNode(ELEMENTS_NODE_NAME, i);
             //PrimitiveType myType = Primitive::getTypeFromNode(myElementNode);
             PrimitiveType myType = myElementNode->getFacade<Primitive>()->get<PrimitiveTypeTag>();
@@ -1110,7 +1111,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         dom::NodePtr myIndexNode = myElementBuilder.createIndex(POSITION_ROLE, POSITIONS);
         vector<unsigned> * myIndices = myIndexNode->nodeValuePtrOpen<vector<unsigned int> >();
 
-        float mySampleDistance =  (myMaxZ - myMinZ) * theSampleRate; // XXX TODO: non-cubic voxels
+        //float mySampleDistance = (myMaxZ - myMinZ) * theSampleRate; // XXX TODO: non-cubic voxels
         unsigned myVertexCount = 0;
         float myEpsilon = 1e-6f;
 
@@ -1125,7 +1126,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             if ( ! myIntersections.empty()) {
 
                 Point3f myCenter = averageVertices( myIntersections );
-                int myNumIntersections = myIntersections.size();
+                std::vector<Point3f>::size_type myNumIntersections = myIntersections.size();
 
                 // sort vertices in CCW order
                 std::sort(myIntersections.begin(), myIntersections.end(), PseudoAngle(myCenter) );
@@ -1135,7 +1136,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                 myUVSet->push_back(calcUV(myCenter, theVoxelBox, myInverseModelView));
                 myVertexCount++;
 
-                for (unsigned j = 0; j < myNumIntersections; ++j) {
+                for (std::vector<Point3f>::size_type j = 0; j < myNumIntersections; ++j) {
                     myVertices->push_back(product(myIntersections[j], myInverseModelView));
 
                     myUVSet->push_back(calcUV(myIntersections[j], theVoxelBox, myInverseModelView));

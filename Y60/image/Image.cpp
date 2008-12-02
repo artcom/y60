@@ -9,25 +9,30 @@
 //=============================================================================
 
 #include "Image.h"
-#include "ImageLoader.h"
-
-#include <y60/base/IScene.h>
-
 #include <asl/dom/Field.h>
 
-#include <asl/base/string_functions.h>
-#include <asl/zip/PackageManager.h>
-
-#include <asl/raster/subraster.h>
-#include <asl/raster/palgo.h>
-#include <asl/raster/pixels.h>
-#include <asl/raster/standard_pixel_types.h>
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixelformat.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/pljpegenc.h>
 #include <paintlib/pltiffenc.h>
 #include <paintlib/Filter/plfilterflip.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include <asl/base/string_functions.h>
+#include <asl/zip/PackageManager.h>
+#include <asl/raster/subraster.h>
+#include <asl/raster/palgo.h>
+#include <asl/raster/pixels.h>
+#include <asl/raster/standard_pixel_types.h>
+
+#include <y60/base/IScene.h>
+
+#include "ImageLoader.h"
 
 using namespace asl;
 using namespace std;
@@ -255,7 +260,7 @@ namespace y60 {
 
     void
     Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
-            const asl::Box2i * theSourceRect)
+                     const asl::Box2i * theSourceRect)
     {
         if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() ||
             get<RasterPixelFormatTag>() != theSourceImage->get<RasterPixelFormatTag>()) {
@@ -265,8 +270,8 @@ namespace y60 {
         int sourceWidth = theSourceRect ? theSourceRect->getSize()[0] : theSourceImage->get<ImageWidthTag>();
         int sourceHeight = theSourceRect ? theSourceRect->getSize()[1] : theSourceImage->get<ImageHeightTag>();
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
-        if (theTargetPos[0] + sourceWidth <= get<ImageWidthTag>() &&
-            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>())
+        if (theTargetPos[0] + sourceWidth  <= static_cast<int>(get<ImageWidthTag >()) &&
+            theTargetPos[1] + sourceHeight <= static_cast<int>(get<ImageHeightTag>()))
         {
             // everything super, subimage fits without resizing the image
             if (!myRaster) {
@@ -306,12 +311,12 @@ namespace y60 {
         getRasterPtr()->resize(theBitmap.GetWidth(), theBitmap.GetHeight());
         PLBYTE ** mySrcLines = theBitmap.GetLineArray();
 
-        unsigned myFaceHeight = theBitmap.GetHeight();
+        unsigned int myFaceHeight = theBitmap.GetHeight();
         long myLineSize = theBitmap.GetBytesPerLine();
         int myBytesPerLine = theBitmap.GetPixelFormat().GetBitsPerPixel() * theBitmap.GetWidth() / 8;
         unsigned char *myData = getRasterPtr()->pixels().begin();
 
-        for (int y = 0; y < myFaceHeight; ++y) {
+        for (unsigned int y = 0; y < myFaceHeight; ++y) {
             memcpy(myData + myBytesPerLine *y, mySrcLines[y], myLineSize);
         }
     }

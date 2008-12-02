@@ -19,22 +19,22 @@ public:
             Int b = 6035;
             Int c = 17;
 
-            Int zero(0);
+            //Int zero(0);
             Int one(1);
             Int two(2);
             Int three(3);
             Int four(4);
-            Int five(5);
-            Int six(6);
-            Int seven(7);
+            //Int five(5);
+            //Int six(6);
+            //Int seven(7);
             Int eight(8);
-            Int nine(9);
-            Int ten(10);
+            //Int nine(9);
+            //Int ten(10);
             Int twelve(12);
 
-            Int minusone(-1);
-            Int minustwo(-2);
-            Int minusthree(-3);
+            //Int minusone(-1);
+            //Int minustwo(-2);
+            //Int minusthree(-3);
 
             ENSURE(gcd(a, b) == c);
             ENSURE(gcd(one, one) == one);

@@ -28,8 +28,8 @@ GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
     DrawingArea::on_expose_event(theEvent);
     _myWindow->clear();
     if (_myTransferFunction) {
-        int mySelectedCenter;
-        int mySelectedWidth;
+        int mySelectedCenter = 0;
+        int mySelectedWidth = 0;
         if (_mySelectedColor) {
             mySelectedCenter = _mySelectedColor->getAttributeValue<int>("value");
             mySelectedWidth = _mySelectedColor->getAttributeValue<int>("width");

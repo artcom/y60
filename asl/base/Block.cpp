@@ -15,7 +15,7 @@
 //
 // Description:  Memory Block handling functions; consider to use them whenever
 //               you think about using memcpy; here you get typesafe conversion,
-//				 read-write control, convenient windows api interfaces and
+//               read-write control, convenient windows api interfaces and
 //               also a copy-on-write (COW) implementation if you want.
 //
 //
@@ -158,7 +158,7 @@ asl::ascii_to_bin(char & theDigit) {
 /// reads a fixed sized theBlock as hex sequence from a istream
 std::istream&
 asl::operator>>(std::istream& is, WriteableBlock & theBlock) {
-    const char * hex_digit = "0123456789ABCDEF";
+    //const char * hex_digit = "0123456789ABCDEF";
     for (WriteableBlock::iterator it = theBlock.begin(); it != theBlock.end(); ++it) {
         char msd;
         is.get(msd);
@@ -180,7 +180,7 @@ asl::operator>>(std::istream& is, WriteableBlock & theBlock) {
 /// reads a variable sized theBlock as hex sequence from a istream
 std::istream&
 asl::operator>>(std::istream& is, ResizeableBlock & theBlock) {
-    const char * hex_digit = "0123456789ABCDEF";
+    //const char * hex_digit = "0123456789ABCDEF";
     do {
         char msd;
         if (!(is.get(msd)) || msd == ' ') {

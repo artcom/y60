@@ -175,7 +175,7 @@ public:
     void closeStation();
     void broadcast(const asl::ReadableBlock & theData);
     bool receive(asl::ResizeableBlock & theData, unsigned long & theSenderAddress, unsigned long & theStationID);
-    operator bool() const { return _good;}
+    operator const void*() const { return _good ? this : NULL;}
     unsigned long getOutgoingMessageNumber() const {
         return _myOutgoingMessageNumber;
     }

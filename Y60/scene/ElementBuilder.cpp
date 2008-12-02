@@ -163,10 +163,10 @@ namespace y60 {
             AC_ERROR << myHalfEdges.size() << " = myHalfEdges->size() != myPositions.size() = " << myPositions.size();
         }
         AC_INFO << "Generating HalfEdges for " << myPositions.size() << " vertices";
-        for (int i=0; i < myPositions.size(); ++i) {
+        for (VectorOfUnsignedInt::size_type i=0; i < myPositions.size(); ++i) {
             EdgeId myEdgeId;
             myEdgeId.first = myPositions[i];
-            if ((i % myNumFaceVertices) != (myNumFaceVertices-1)) {
+            if (static_cast<int>(i % myNumFaceVertices) != (myNumFaceVertices-1)) {
                 myEdgeId.second = myPositions[i+1];
             } else {
                 myEdgeId.second = myPositions[i-myNumFaceVertices+1];

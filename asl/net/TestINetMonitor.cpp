@@ -89,11 +89,11 @@ void* TestINetMonitor::startDummyServer(void *arg) {
 void
 TestINetMonitor::run() {
 
-    int myServerPort = 2000;
-    int serverPort;
-    const int MIN_PORT = 8000;
-    const int MAX_PORT = 8080;
-    TCPServer * myTCPServer;
+    //int myServerPort = 2000;
+    asl::Unsigned16 serverPort;
+    const asl::Unsigned16 MIN_PORT = 8000;
+    const asl::Unsigned16 MAX_PORT = 8080;
+    TCPServer * myTCPServer = NULL;
 
     // start dummy webserver
     // try to find a free server port between MIN_PORT and MAX_PORT;

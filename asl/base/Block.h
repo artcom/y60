@@ -92,6 +92,10 @@ namespace asl {
         virtual AC_SIZE_TYPE size() const {
             return end()-begin();
         }
+        /// returns the number of bytes in the theBlock
+        virtual bool empty() const {
+            return size() == 0;
+        }
         /// returns a read-only reference to the i th character in the theBlock
         virtual const unsigned char& operator[](AC_SIZE_TYPE i) const {
             return begin()[i];
@@ -315,7 +319,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
         }
         /// appends all the bytes from theSource at the end of the block.
         virtual WriteableStream & append(const ReadableBlock & theSource) {
-            return append(theSource.begin(), theSource.size());
+            append(theSource.begin(), theSource.size());
             return *this;
         }
 
@@ -481,8 +485,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     **/
     class Block : public VariableCapacityBlock {
     public:
-        operator bool() const {
-            return true;
+        operator const void*() const {
+            return this;
         }
         virtual const unsigned char * begin() const {
             return &(*_myData.begin());
@@ -680,8 +684,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     template <class T>
     class FixedBlock : public FixedCapacityBlock {
     public: /* implement ResizeableBlock first */
-        operator bool() const {
-            return true;
+        operator const void*() const {
+            return this;
         }
         virtual const unsigned char * begin() const {
             return reinterpret_cast<const unsigned char *>(&_myData);
@@ -776,8 +780,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
             return _myEnd;
         }
     public:
-        operator bool() const {
-            return _myBegin != 0;
+        operator const void*() const {
+            return _myBegin;
         }
         ReadableBlockAdapter() : _myBegin(0), _myEnd(0) {}
 
@@ -819,8 +823,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     **/
     class WriteableBlockAdapter : public WriteableBlock {
     public:
-        operator bool() const {
-            return _myBegin != 0;
+        operator const void*() const {
+            return _myBegin;
         }
         virtual const unsigned char * begin() const {
             return _myBegin;
@@ -887,8 +891,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     **/
     class FixedBlockAdapter : public FixedCapacityBlock {
     public:
-        operator bool() const {
-            return _myBegin != 0;
+        operator const void*() const {
+            return _myBegin;
         }
         virtual const unsigned char * begin() const {
             return _myBegin;
@@ -988,8 +992,8 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
             unsigned long _myRefCount;
         };
     public:
-        operator bool() const {
-            return true;
+        operator const void*() const {
+            return this;
         }
         virtual const unsigned char * begin() const {
             if (!_myRep) return 0;

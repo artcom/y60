@@ -14,23 +14,24 @@
 #include <Carbon/Carbon.h>
 #endif
 
-#ifdef WIN32
-#pragma warning( disable : 4244 ) // Disable ffmpeg warning
-#define EMULATE_INTTYPES
-#endif
-
-extern "C" {
 #ifdef OSX
-#   include <libavcodec/avcodec.h>
-#   include <libavformat/avformat.h>
+    extern "C" {
+#       include <libavcodec/avcodec.h>
+#       include <libavformat/avformat.h>
+    }
+#   undef AV_NOPTS_VALUE
+#   define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
-#   include <ffmpeg/avcodec.h>
-#   include <ffmpeg/avformat.h>
-#endif
-}
-
-#ifdef WIN32
-#pragma warning( default : 4244 ) // Renable ffmpeg warning
+#   if defined(_MSC_VER)
+#       pragma warning(push,1)
+#   endif
+    extern "C" {
+#       include <ffmpeg/avcodec.h>
+#       include <ffmpeg/avformat.h>
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 #endif
 
 #include <asl/base/string_functions.h>
@@ -161,7 +162,7 @@ namespace y60 {
 
     long long
     FrameAnalyser::advance() const {
-        int64_t   myLastDTS;
+        int64_t   myLastDTS = 0;
         AVPacket  myPacket;
         AVFrame * myFrame = avcodec_alloc_frame();
         int myFoundPictureFlag = 0;
@@ -251,7 +252,7 @@ namespace y60 {
         }
 
         // We got to a key frame. Forward until we get to the frame we want.
-        while (true) {
+        for(;;) {
             long long myLastDTS = advance();
 
             if (myLastDTS == UINT_MAX) {
@@ -295,7 +296,7 @@ namespace y60 {
         if (theNumberOfFrames <= 0) {
             theNumberOfFrames = 100;
         }
-        while (true) {
+        for(;;) {
             bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
             if (myEndOfFileFlag) {
                 cerr << "END OF FILE!" << endl;

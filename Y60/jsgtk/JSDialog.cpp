@@ -12,6 +12,7 @@
 #include "JSDialog.h"
 #include "JSStockID.h"
 #include "JSSignalProxies.h"
+#include "JSButton.h"
 #include "jsgtk.h"
 #include "JSVBox.h"
 #include <y60/jsbase/JScppUtils.h>
@@ -70,7 +71,6 @@ Set_response_sensitive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 static JSBool
@@ -90,7 +90,6 @@ Set_default_response(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 static JSBool

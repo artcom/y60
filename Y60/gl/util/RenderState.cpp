@@ -134,7 +134,7 @@ namespace y60 {
             glEnable(myGLPlaneId);
             glClipPlane(myGLPlaneId, thePlanes[i].getCoefficients<double>().begin());
         }
-        for (unsigned i = thePlanes.size(); i < _myEnabledClippingPlanes; ++i) {
+        for (int i = thePlanes.size(); i < _myEnabledClippingPlanes; ++i) {
             glDisable(asGLClippingPlaneId(i));
         }
         _myEnabledClippingPlanes = thePlanes.size();

@@ -95,7 +95,7 @@ namespace asl {
             if (!hex_to_num(theString[i*2+1], lowerNibble)) {
                 return false;
             }
-            theData[i] = upperNibble << 4 | lowerNibble;
+            theData[i] = static_cast<unsigned char>(upperNibble << 4 | lowerNibble);
         }
         return true;
     }
@@ -103,7 +103,7 @@ namespace asl {
     std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators) {
         std::vector<std::string> theResult;
         theResult.push_back("");
-        for (int i = 0; i < theString.size();++i) {
+        for (std::string::size_type i = 0; i < theString.size();++i) {
             if (theSeparators.find(theString[i]) == std::string::npos) {
                 theResult.back().push_back(theString[i]);
             } else {
@@ -148,8 +148,8 @@ namespace asl {
             return theSource;
         }
         std::string theResult;
-        long theMatchPos = 0;
-        long theLastMatchPos = 0;
+        std::string::size_type theMatchPos = 0;
+        std::string::size_type theLastMatchPos = 0;
         while ((theMatchPos = theSource.find(theSearchString, theLastMatchPos)) != string::npos) {
             theResult+=theSource.substr(theLastMatchPos, theMatchPos - theLastMatchPos);
             theResult+=theReplaceString;
@@ -269,7 +269,7 @@ namespace asl {
     }
     
     std::string getNextLine(int& theCurPos, const string& theString) {
-        int myCRPos = theString.find("\n", theCurPos);
+        std::string::size_type myCRPos = theString.find("\n", theCurPos);
         if (myCRPos == string::npos) {
             return "";
         } else {

@@ -18,6 +18,15 @@
 //=============================================================================
 
 #include "DicomFile.h"
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plsubbmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 #include <asl/base/Block.h>
 #include <asl/base/MappedBlock.h>
 #include <y60/image/PLFilterFactory.h>
@@ -31,7 +40,6 @@
 #include <dicom/dcmdata/dcmetinf.h>
 #include <dicom/dcmdata/dcdeftag.h>
 #include <dicom/dcmimgle/dcmimage.h>
-#include <paintlib/plsubbmp.h>
 
 using namespace asl;
 using namespace std;

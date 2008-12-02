@@ -144,7 +144,7 @@ TNTMeasurementList::createDummyRows() {
     for (unsigned i = 0; i < 15; ++i) {
         for (unsigned j = 0; j < myTypeList.size(); ++j) {
             myRow = *(_myListModel->append());
-            myRow[_myColumns.is_visible] =  i % 2;
+            myRow[_myColumns.is_visible] =  0 != (i % 2);
             myRow[_myColumns.type_icon] = myTypeList[j];
             myRow[_myColumns.name] = std::string("foo");
             myRow[_myColumns.value] = "23.0";

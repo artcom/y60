@@ -14,7 +14,6 @@
 #include "JSSignalProxyUtils.h"
 #include "JSSigConnection.h"
 #include "jsgtk.h"
-
 #include <y60/acgtk/GCObserver.h>
 
 #include <y60/jsbase/JSWrapper.h>
@@ -49,7 +48,7 @@ class JSSignalAdapter0<void> : public JSSignalAdapterBase {
         {
             AC_TRACE << "JSSignalAdapter0 calling JS event handler '" << theMethodName << "'";
             jsval rval;
-            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 0, 0, &rval);
+            /*JSBool ok =*/ jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 0, 0, &rval);
         }
 };
 
@@ -87,9 +86,9 @@ class JSSignal0 : public JSWrapper<sigc::signal0<R>, asl::Ptr<sigc::signal0<R> >
                 Glib::ustring myMethodName;
                 convertFrom(cx, argv[1], myMethodName);
 
-                SigC::Slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
+                sigc::slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
                     sigc::ptr_fun( & JSSignalAdapter0<R>::on_signal ), cx, myTarget, myMethodName);
-                JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+                JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new sigc::connection);
                 AC_TRACE << "JSSignal0 connecting to '" << myMethodName << "'";
 
                 *myConnection = myOwner->connect(mySlot);

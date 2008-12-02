@@ -47,25 +47,25 @@ namespace y60 {
             struct Key {
                 Key(const MaterialBase * theMaterial, const Body * theBody, asl::Unsigned16 theAlphaBit_ZDepth) :
                         alphaBit_ZDepth(theAlphaBit_ZDepth),
-                        material(theMaterial), 
-                        body(theBody)
-                {}
+                            material(theMaterial), 
+                            body(theBody)
+                        {}
 
-		        bool operator <(const Key & second) const {
-                    if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
-                        return true;
-                    } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
-                        if (this->material < second.material) {
-                            return true;
-                        } else if (this->material == second.material) {
-                            return (this->body < second.body);
+                        bool operator <(const Key & second) const {
+                            if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
+                                return true;
+                            } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
+                                if (this->material < second.material) {
+                                    return true;
+                                } else if (this->material == second.material) {
+                                    return (this->body < second.body);
+                                }
+                            } 
+                            return false;
                         }
-                    } 
-                    return false;
-		        }
 
                 bool getTransparencyFlag() const {
-                    return (alphaBit_ZDepth >> 15);
+                    return 0 != (alphaBit_ZDepth >> 15);
                 }
                 
                 asl::Unsigned16      alphaBit_ZDepth;

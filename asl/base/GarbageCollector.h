@@ -460,6 +460,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
         MemKey & operator=(const MemKey & theKey) {
             myMemory=theKey.myMemory;
             mySize=theKey.mySize;
+            return *this;
         }
 
         void * myMemory;
@@ -1226,8 +1227,9 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
             return !operator==(otherPtr);
         }
 
-        inline operator bool() const {
-            return (Base::myDescriptorPtr && Base::myDescriptorPtr->myNativePtr);
+        inline operator const void*() const {
+            return (Base::myDescriptorPtr && Base::myDescriptorPtr->myNativePtr)
+                ? Base::myDescriptorPtr->myNativePtr : NULL;
         }
 
         inline C & operator*() {
@@ -1311,8 +1313,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
             return *this;
         }
 
-        operator bool() const {
-            return isValid();
+        operator const void*() const {
+            return isValid() ? this : NULL;
         }
 
         inline ObjectDescriptor<ThreadingModel, RefCountAllocator> * getDescriptorPtr() const {
@@ -1431,8 +1433,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
             Base::operator=(otherPtr);
             return *this;
         }
-        operator bool() const {
-            return Base::isValid();
+        operator const void*() const {
+            return Base::isValid() ? this : NULL;
         }
 
         inline ObjectDescriptor<ThreadingModel, RefCountAllocator> * getDescriptorPtr() const {

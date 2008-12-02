@@ -11,6 +11,8 @@
 #ifndef _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 #define _Y60_CAIRO_JSCAIROSURFACE_INCLUDED_
 
+#include <cassert>
+
 #include <asl/dom/Nodes.h>
 #include <asl/dom/Value.h>
 
@@ -98,6 +100,12 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theSurface);
     jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theSurface);
+    inline jsval as_jsval(JSContext *cx, cairo_surface_t * theSurface)
+    {
+        JSCairoSurfaceWrapper* theOwner = JSCairoSurfaceWrapper::get(theSurface);
+        assert(theOwner);
+        return as_jsval(cx,theOwner->getWrappedPtr(),theSurface);
+    }
     
     bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget);
     bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget);

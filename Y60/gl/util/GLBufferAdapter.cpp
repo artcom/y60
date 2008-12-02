@@ -8,27 +8,34 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "GLBufferAdapter.h"
-#include "GLUtils.h"
-#include "PixelEncodingInfo.h"
-
-#include <asl/base/string_functions.h>
-#include <y60/image/PixelEncoding.h>
-
-#include <paintlib/plpngenc.h>
-#include <paintlib/pljpegenc.h>
-#include <paintlib/plbmpenc.h>
-#include <paintlib/pltiffenc.h>
-#include <paintlib/planybmp.h>
-#include <paintlib/Filter/plfilterfliprgb.h>
-
 #include <iostream>
 
 #ifdef WIN32
 #   include <windows.h>
 #endif
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpngenc.h>
+#include <paintlib/pljpegenc.h>
+#include <paintlib/plbmpenc.h>
+#include <paintlib/pltiffenc.h>
+#include <paintlib/planybmp.h>
+#include <paintlib/Filter/plfilterfliprgb.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include <GL/gl.h>
 #include <GL/glew.h>
+
+#include <asl/base/string_functions.h>
+#include <y60/image/PixelEncoding.h>
+
+#include "GLBufferAdapter.h"
+#include "GLUtils.h"
+#include "PixelEncodingInfo.h"
 
 using namespace std;
 using namespace asl;

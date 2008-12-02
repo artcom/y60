@@ -55,7 +55,7 @@ void initiateSystemReboot() {
     TOKEN_PRIVILEGES tkp;
 
     // Get a token for this process.
-    bool ok = OpenProcessToken(GetCurrentProcess(),
+    BOOL ok = OpenProcessToken(GetCurrentProcess(),
             TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
     if (!ok) {
         dumpLastError ("OpenProcessToken");
@@ -106,7 +106,7 @@ void initiateSystemShutdown() {
     TOKEN_PRIVILEGES tkp;
 
     // Get a token for this process.
-    bool ok = OpenProcessToken(GetCurrentProcess(),
+    BOOL ok = OpenProcessToken(GetCurrentProcess(),
             TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
     if (!ok) {
         dumpLastError ("OpenProcessToken");
@@ -201,12 +201,12 @@ bool launchApp( const std::string & theFileName,
         myCommandLine += theArguments[i];
     }
 
-    return CreateProcess(NULL, &(myCommandLine[0]),
-                         NULL, NULL, TRUE, 0,
-                         NULL, 
-                         theWorkingDirectory.empty() ? NULL : theWorkingDirectory.c_str(), 
-                         &StartupInfo,
-                         &theProcessInfo);
+    return 0 != CreateProcess(NULL, &(myCommandLine[0]),
+                              NULL, NULL, TRUE, 0,
+                              NULL, 
+                              theWorkingDirectory.empty() ? NULL : theWorkingDirectory.c_str(), 
+                              &StartupInfo,
+                              &theProcessInfo);
 
 
 #elif defined(LINUX) || defined(OSX)
@@ -255,7 +255,7 @@ void closeApp( const std::string & theWindowTitle, const ProcessInfo & theProces
         } else {
             // Find process handle for window
             DWORD myWindowProcessId;
-            DWORD myWindowThreadId = GetWindowThreadProcessId(myHWnd, &myWindowProcessId);
+            /*DWORD myWindowThreadId =*/ GetWindowThreadProcessId(myHWnd, &myWindowProcessId);
 
             SendMessage(myHWnd, WM_CLOSE, 0, 0);
             theLogger.logToFile("WM_CLOSE sent.");

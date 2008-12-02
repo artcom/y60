@@ -77,7 +77,7 @@ namespace y60 {
         }
 
         // find video/audio streams
-        for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
+        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
 #if LIBAVCODEC_BUILD >= 0x5100
             int myCodecType = _myFormatContext->streams[i]->codec->codec_type;
 #else
@@ -207,7 +207,7 @@ namespace y60 {
     bool
     DecoderContext::decodeVideo(AVFrame * theVideoFrame) {
         DB(cerr << "decodeVideo" << endl;)
-        AVPacket * myPacket;
+        AVPacket * myPacket = 0;
  
         int64_t myStartTime = 0;
         if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
@@ -266,7 +266,7 @@ namespace y60 {
             DB(cerr << "Audio: eof" << endl;)
             return true;
         }
-        bool myFrameDecoded = false;
+        //bool myFrameDecoded = false;
         int myFrameSize = -1;
         int64_t myPacketTime;
         while (myFrameSize < 0) {
@@ -343,7 +343,7 @@ namespace y60 {
         }
 
         // We got to a key frame. Forward until we get to the frame we want.
-        while (true) {
+        for(;;) {
             long long myLastDTS = advance();
             if (myLastDTS == UINT_MAX) {
                 AC_WARNING << "Seek reached end of file";
@@ -365,7 +365,7 @@ namespace y60 {
 
     long long
     DecoderContext::advance() const {
-        int64_t   myLastDTS;
+        int64_t   myLastDTS = 0;
         AVPacket  myPacket;        
         int myFoundPictureFlag = 0;
 

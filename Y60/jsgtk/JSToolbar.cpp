@@ -45,7 +45,6 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
         
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 JSFunctionSpec *
@@ -97,7 +96,7 @@ JSToolbar::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             * vp = as_jsval(cx, static_cast<int>( theNative.get_toolbar_style()));
             return JS_TRUE;
         default:
-            return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
+            ;
     }
     return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
 }
@@ -123,7 +122,7 @@ JSToolbar::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:
-            return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
+            ;
     }
     return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
 }

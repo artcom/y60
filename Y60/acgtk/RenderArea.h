@@ -22,12 +22,20 @@
 #ifndef _tnt_renderarea_included_
 #define _tnt_renderarea_included_
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4413 4244 4127 4512 4520 4251)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
-
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 #include "GtkEventAdapter.h"
 
 #include <y60/jslib/AbstractRenderWindow.h>
+
 #include <gdk/gdkgltypes.h>
+
 #include <string>
 #include <sigc++/connection.h>
 

@@ -7,8 +7,7 @@
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-*/
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __ */
 
 
 #ifndef _xml_Value_h_
@@ -412,8 +411,8 @@ namespace dom {
         virtual const unsigned char * end() const {
             return reinterpret_cast<const unsigned char*>(&(*_myStringValue.end()));
         }
-        operator bool() const {
-            return true;
+        operator const void*() const {
+            return this;
         }
     public:
         virtual asl::AC_SIZE_TYPE size() const {
@@ -591,7 +590,7 @@ namespace dom {
             return 0;
         }
         bool hasOffsetCatalog() const {
-            return _myOffsets;
+            return _myOffsets != 0;
         }
         NodeOffsetCatalog & getOffsetCatalog();
         const NodeOffsetCatalog & getOffsetCatalog() const;
@@ -656,7 +655,7 @@ namespace dom {
                     return myIndex;
             }
             void debug() {
-                for (int i = 0; i < _myParentIndex.size();++i) {
+                for (std::vector<asl::AC_SIZE_TYPE>::size_type i = 0; i < _myParentIndex.size();++i) {
                     AC_PRINT<<"debug:" <<" theOffset="<<_myNodeOffsets[i]<<", theEndOffset="<<_myNodeEndOffsets[i]<<", theParentIndex="<<_myParentIndex[i];
                 }
             }
@@ -1056,7 +1055,7 @@ namespace dom {
         virtual ~ResizeableRaster() {}
         virtual asl::AC_SIZE_TYPE width() const = 0;
         virtual asl::AC_SIZE_TYPE height() const = 0;
-        virtual asl::Vector2<float> getSize() const = 0;
+        virtual asl::Vector2<asl::AC_SIZE_TYPE> getSize() const = 0;
         virtual const asl::ReadableBlock & pixels() const = 0;
         virtual asl::WriteableBlock & pixels() = 0;
         virtual void assign(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight, const asl::ReadableBlock & thePixels) = 0;
@@ -1120,8 +1119,8 @@ namespace dom {
 
         MakeResizeableRaster(RASTER_VALUE & theRasterValue) : _myRasterValue(theRasterValue) {}
 
-        asl::Vector2<float> getSize() const {
-            return asl::Vector2<float>(width(), height());
+        asl::Vector2<asl::AC_SIZE_TYPE> getSize() const {
+            return asl::Vector2<asl::AC_SIZE_TYPE>(width(), height());
         }
         asl::AC_SIZE_TYPE width() const {
             return _myRasterValue.getValue().hsize();
@@ -1170,8 +1169,8 @@ namespace dom {
 
         virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & theColor) {
             const T & myNativeReadOnlyRaster = _myRasterValue.getValue();
-            if (x < myNativeReadOnlyRaster.hsize() &&
-                y < myNativeReadOnlyRaster.vsize()) 
+            if (x < static_cast<asl::AC_SIZE_TYPE>(myNativeReadOnlyRaster.hsize()) &&
+                y < static_cast<asl::AC_SIZE_TYPE>(myNativeReadOnlyRaster.vsize())) 
             {
                 T & myNativeRaster = _myRasterValue.openWriteableValue();
                 setPixel(myNativeRaster(x,y), theColor);
@@ -1205,8 +1204,8 @@ namespace dom {
         {
             T & myNativeRaster = _myRasterValue.openWriteableValue();
             
-            for (unsigned x=0; x<myNativeRaster.hsize(); ++x) {
-                for (unsigned y=0; y<myNativeRaster.vsize(); ++y) {
+            for (unsigned x=0; x<static_cast<unsigned>(myNativeRaster.hsize()); ++x) {
+                for (unsigned y=0; y<static_cast<unsigned>(myNativeRaster.vsize()); ++y) {
                     asl::Vector4f myColor = asl::Vector4f(0.0, 0.0, 0.0, 0.0);
 
                     for (unsigned i=0; i<4; ++i) {
@@ -1248,7 +1247,7 @@ namespace dom {
                 AC_ERROR << "pasteRaster: target rectangle is outside target raster, target raster="<< myTargetRasterRect << ", target rect="<<myTargetRect;
                 return;
             }
-            const ResizeableRaster & mySourceRaster = raster_cast( theSource );
+            //const ResizeableRaster & mySourceRaster = raster_cast( theSource );
             const T * myNativeSource = dynamic_cast_Value<T>( & theSource );
             
             if (sourceWidth == 0) {
@@ -1302,13 +1301,14 @@ namespace dom {
        virtual void resample(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
             T & myNative = _myRasterValue.openWriteableValue();
             asl::raster<PIXEL> myTmp(newWidth, newHeight);
-#ifndef WIN32
-            asl::resample(myNative, myTmp, SumType());
-#else
+#ifdef WIN32
+            (void)myNative;
             throw asl::NotYetImplemented(JUST_FILE_LINE);                                
-#endif            
+#else
+            asl::resample(myNative, myTmp, SumType());
             std::swap(myTmp, myNative);
            _myRasterValue.closeWriteableValue();
+#endif
         }
 
         template <class BINARY_FUNCTION>
@@ -1496,7 +1496,7 @@ namespace dom {
             if (theIndex < length()) {
                 asl::AC_SIZE_TYPE myLength = length()-1;
                 T & myValue = _myVectorValue.openWriteableValue();
-                for (int i = theIndex; i < myLength; ++i) {
+                for (asl::AC_SIZE_TYPE i = theIndex; i < myLength; ++i) {
                     myValue[i] = myValue[i+1];
                 }
                 myValue.resize(myLength);
@@ -1511,7 +1511,7 @@ namespace dom {
                 asl::AC_SIZE_TYPE myLength = length();
                 T & myValue = _myVectorValue.openWriteableValue();
                 myValue.resize(myLength+1);
-                for (int i = theIndex; i < myLength; ++i) {
+                for (asl::AC_SIZE_TYPE i = theIndex; i < myLength; ++i) {
                     myValue[i+1] = myValue[i];
                 }
                 myValue[theIndex]=*myElem;
@@ -1617,16 +1617,16 @@ namespace dom {
         }
     protected:
         virtual unsigned char * begin() {
-            return reinterpret_cast<unsigned char*>(&(*_myLockedValue->begin()));
+            return reinterpret_cast<unsigned char*>(doBegin());
         }
         virtual unsigned char * end() {
-            return reinterpret_cast<unsigned char*>(&(*_myLockedValue->end()));
+            return reinterpret_cast<unsigned char*>(doBegin() + _myLockedValue->size());
         }
         virtual const unsigned char * begin() const {
-            return reinterpret_cast<const unsigned char*>(&(*(this->getValue()).begin()));
+            return reinterpret_cast<const unsigned char*>(doBegin());
         }
         virtual const unsigned char * end() const {
-            return reinterpret_cast<const unsigned char*>(&(*(this->getValue()).end()));
+            return reinterpret_cast<const unsigned char*>(doBegin() + this->getValue().size());
         }
     public:
         virtual asl::AC_SIZE_TYPE size() const {
@@ -1649,6 +1649,12 @@ namespace dom {
         }
     private:
         T * _myLockedValue;
+        virtual ELEM * doBegin() {
+            return _myLockedValue->empty() ? NULL : &*_myLockedValue->begin();
+        }
+        virtual const ELEM * doBegin() const {
+            return this->getValue().empty() ? NULL : &*(this->getValue().begin());
+        }
     };
 
 

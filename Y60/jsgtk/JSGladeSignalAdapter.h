@@ -29,7 +29,15 @@
 #include <vector>
 
 #include <glib-object.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244 4251)
+#endif //defined(_MSC_VER)
 #include <gtkmm/widget.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 struct JSAutoconnectInfo {
     JSObject * object;

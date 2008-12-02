@@ -13,7 +13,14 @@
 
 #include "JSBin.h"
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm/button.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 
@@ -92,6 +99,12 @@ struct JSClassTraits<JSButton::NATIVE>
     : public JSClassTraitsWrapper<JSButton::NATIVE, JSButton> {};
 
 jsval as_jsval(JSContext *cx, JSButton::OWNERPTR theOwner, JSButton::NATIVE * theButton);
+
+inline
+jsval
+as_jsval(JSContext *cx, JSButton::NATIVE * theNative) {
+    return as_jsval(cx,JSButton::OWNERPTR(),theNative);
+}
 
 } // namespace
 

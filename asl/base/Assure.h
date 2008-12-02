@@ -119,14 +119,15 @@ namespace AssurePolicy {
 
 template <class Policy>
 struct Assure {
-    
+
 //   static void check(bool myExpressionResult,
-    Assure(bool myExpressionResult,
+    template< typename T >
+    Assure(const T& myExpressionResult,
            const char * myExpression, 
            const char * mySourceFileName,
            unsigned long mySourceLine)
     {
-        Policy::check(myExpressionResult, myExpression, mySourceFileName, mySourceLine);
+        Policy::check(0!=myExpressionResult, myExpression, mySourceFileName, mySourceLine);
     }
 };
 

@@ -18,13 +18,13 @@ using namespace asl;
 
 namespace jslib {
 
-template class JSWrapper<SigC::Connection, asl::Ptr<SigC::Connection>, StaticAccessProtocol>;
+template class JSWrapper<sigc::connection, asl::Ptr<sigc::connection>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("SigC::Connection@") + as_string(obj);
+    std::string myStringRep = string("sigc::connection@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -33,7 +33,7 @@ static JSBool
 disconnect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    SigC::Connection * myNative(0);
+    sigc::connection * myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
     myNative->disconnect();
     return JS_TRUE;
@@ -119,7 +119,7 @@ JSSigConnection::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
     jsval myConstructorFuncObjVal;
     if (JS_GetProperty(cx, theGlobalObject, ClassName(), &myConstructorFuncObjVal)) {
-        JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
+        /*JSObject * myConstructorFuncObj =*/ JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         //JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
         cerr << "JSSigConnection::initClass: constructor function object not found, could not initialize static members"<<endl;

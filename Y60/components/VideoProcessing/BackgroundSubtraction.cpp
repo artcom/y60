@@ -65,7 +65,7 @@ namespace y60 {
 	void 
     BackgroundSubtraction::onFrame(double t) {
         
-        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {
@@ -84,8 +84,8 @@ namespace y60 {
 
         GRAYRaster & myTargetFrame = myTargetLock.get();
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
-        
-        float myAlpha = _myWeight;
+
+        //float myAlpha = _myWeight;
         asl::gray<unsigned char> mySrcIntensity;
         asl::gray<unsigned char> myBgIntensity;   
         asl::gray<unsigned char> myTrgtIntensity;

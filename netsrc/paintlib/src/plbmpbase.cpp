@@ -25,7 +25,7 @@ void createTrueColorCopy (PLBmp & DestBmp, const PLBmpBase & SrcBmp,
 PLBmpBase::PLBmpBase ()
   : m_DitherPaletteType(PLDTHPAL_MEDIAN),   // defaults for 8Bit color quantization
     m_DitherType(PLDTH_ORDERED),
-    m_pClrTab(0)
+    m_pClrTab(0), m_pLineArray(0)
 {
 }
 

@@ -158,10 +158,10 @@ NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
 
 void
 NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
-    theDest.appendUnsigned32(CatalogMagic);
+    theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogMagic));
     theDest.appendUnsigned(_myIDMaps.size());
     for (IDMaps::const_iterator it = _myIDMaps.begin(); it != _myIDMaps.end(); ++it) {
-        theDest.appendUnsigned32(CatalogEntriesMagic);
+        theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogEntriesMagic));
         theDest.appendCountedString(it->first);
         theDest.appendUnsigned(it->second.size());
         for (IDMap::const_iterator mit = it->second.begin();
@@ -171,7 +171,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
             theDest.appendUnsigned(mit->second);
         }
     }
-    theDest.appendUnsigned32(UIDCatalogMagic);
+    theDest.appendUnsigned32(static_cast<asl::Unsigned32>(UIDCatalogMagic));
     binarizePODT(_myNodeOffsets, theDest);
     binarizePODT(_myNodeEndOffsets, theDest);
     binarizePODT(_myParentIndex, theDest);
@@ -183,7 +183,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
         theDest.appendUnsigned(mit->second);
     }
 #endif
-    theDest.appendUnsigned32(CatalogEndMagic);
+    theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogEndMagic));
  }
 
 asl::AC_SIZE_TYPE
@@ -265,7 +265,7 @@ NodeOffsetCatalog::getElementOffsetById(const DOMString & theId, const DOMString
     if (myMap != _myIDMaps.end()) {
         IDMap::const_iterator myEntry = myMap->second.find(theId);
         if (myEntry != myMap->second.end()) {
-            return theOffset = myEntry->second;
+            theOffset = myEntry->second;
             return true;
         }
     }
@@ -328,7 +328,6 @@ IDValue::registerID(const DOMString & theCurrentValue) const {
 
 void
 IDValue::unregisterID() const {
-    Node * myNode = const_cast<IDValue*>(this)->getNodePtr();
     if (_myRegistry && _myOldValue.size()) {
         Node * myNode = const_cast<IDValue*>(this)->getNodePtr();
         DB(AC_TRACE << "IDValue::unregister(): unregisterID node="<<(void*)myNode<<","<<myNode->nodeName()<<"='"<<_myOldValue<<"'"<<endl);

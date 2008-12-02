@@ -23,11 +23,17 @@
 
 #include "FilterTile.h"
 
-#include <paintlib/plbitmap.h>
-
 #include <assert.h>
 #include <stdexcept>
 #include <sstream>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plbitmap.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 

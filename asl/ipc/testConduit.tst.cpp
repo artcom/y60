@@ -165,7 +165,7 @@ class BrokenPipeTest : public TemplateUnitTest {
 #ifdef WIN32
             int myIterations = 10; // aborting is VERY slow in windows.
 #else
-            int myIterations = 1000;
+            int myIterations = 100; // don't increase this or the socket table will fill up with TIME_WAIT sockets, waiting to die
 #endif            
             for (int i = 0; i < myIterations; ++i) {
                 // start server thread

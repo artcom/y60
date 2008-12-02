@@ -44,9 +44,9 @@ namespace y60 {
     MouseEvent::MouseEvent(const dom::NodePtr & theNode)
         : Event(getType(theNode), theNode),
         button(Button(theNode->getAttributeValue<int>("button"))),
-        leftButtonState(theNode->getAttributeValue<int>("leftbuttonstate")),
-        middleButtonState(theNode->getAttributeValue<int>("middlebuttonstate")),
-        rightButtonState(theNode->getAttributeValue<int>("rightbuttonstate")),
+        leftButtonState(0 != theNode->getAttributeValue<int>("leftbuttonstate")),
+        middleButtonState(0 != theNode->getAttributeValue<int>("middlebuttonstate")),
+        rightButtonState(0 != theNode->getAttributeValue<int>("rightbuttonstate")),
         position(theNode->getAttributeValue<asl::Vector2i>("position")),
         delta(theNode->getAttributeValue<asl::Vector2i>("delta"))
     {

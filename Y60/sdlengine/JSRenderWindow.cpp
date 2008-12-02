@@ -24,7 +24,7 @@
 #include "JSRenderWindow.h"
 
 #include <y60/glutil/GLAlloc.h>
-#include <y60/render/Renderer.h>
+#include <y60/glrender/Renderer.h>
 
 #include <y60/input/Event.h>
 

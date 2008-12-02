@@ -23,7 +23,7 @@ class TestServer : public asl::ConduitServer<asl::TCPPolicy> {
         static asl::ConduitServer<asl::TCPPolicy>::Ptr create(asl::TCPPolicy::Handle theHandle);
     private:
         TestServer(asl::TCPPolicy::Handle theHandle);
-        void sendSlowly(const std::string theData);
+        void sendSlowly(const std::string & theData);
         void sendResponseHeader(int theResponseCode);
         void sendResponseHeader(int theResponseCode, const std::string & theCharset);
         void sendResponseBody(const std::string & theBody);

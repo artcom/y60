@@ -129,7 +129,7 @@ virtual bool processData() {
             ThreadedConduit<POLICY> * mySelf = 
                 reinterpret_cast<ThreadedConduit<POLICY>*>(theThisPointer);
             try {
-                do {
+                for(;;) {
                     pthread_testcancel();
                     if (!mySelf->isValid()) {
                         break;
@@ -139,7 +139,7 @@ virtual bool processData() {
                         break;
                     }
                     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
-                } while (true);
+                }
             } catch (ConduitException & ex) {
                 AC_ERROR << ex;
             }

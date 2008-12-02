@@ -36,11 +36,17 @@
 
 //#define CREATE_PNG_FROM_TEXT
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #ifdef CREATE_PNG_FROM_TEXT
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/planydec.h>
 #endif
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;

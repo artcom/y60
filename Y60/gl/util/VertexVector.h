@@ -33,7 +33,7 @@ namespace y60 {
 
     inline GLenum asGLEnum(VertexBufferUsage & theEnum) {
         switch (theEnum) {
-            case VERTEX_USAGE_STREAM_DRAW:                
+            case VERTEX_USAGE_STREAM_DRAW:
                 return GL_STREAM_DRAW_ARB;
             case VERTEX_USAGE_STREAM_READ:
                 return GL_STREAM_READ_ARB;
@@ -51,11 +51,9 @@ namespace y60 {
                 return GL_DYNAMIC_READ_ARB;
             case VERTEX_USAGE_DYNAMIC_COPY:
                 return GL_DYNAMIC_COPY_ARB;
-            default:
-                throw VertexVectorException(std::string("Unknown VBO usage flag '") + theEnum.asString() + "'", PLUS_FILE_LINE);
-                break;                        
+            default: break;
         }
-        return GLenum(0);   
+        throw VertexVectorException(std::string("Unknown VBO usage flag '") + theEnum.asString() + "'", PLUS_FILE_LINE);
     }
 
   

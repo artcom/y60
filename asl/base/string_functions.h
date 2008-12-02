@@ -26,12 +26,12 @@
 #include <string>
 #include <vector>
 #include <ctype.h>
-
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
 #  include <strstream.h>
 #else
 #  include <sstream>
 #endif
+
 #include "Exception.h"
 
 namespace asl {
@@ -213,7 +213,7 @@ namespace asl {
         std::string myString;
         myString.resize(theString.size());
         for (unsigned i = 0; i < theString.size(); ++i) {
-            myString[i] = ::toupper(theString[i]);
+            myString[i] = static_cast<char>(::toupper(theString[i]));
         }
         return myString;
     }
@@ -222,7 +222,7 @@ namespace asl {
         std::string myString;
         myString.resize(theString.size());
         for (unsigned i = 0; i < theString.size(); ++i) {
-            myString[i] = ::tolower(theString[i]);
+            myString[i] = static_cast<char>(::tolower(theString[i]));
         }
         return myString;
     }
@@ -234,7 +234,7 @@ namespace asl {
     // After the call, theCurPos points to the start of the next line in the
     // string. 
     // Rudimentary, but very helpful when parsing line-based files.
-    std::string getNextLine(int& theCurPos, const std::string& theString);
+    std::string getNextLine(std::string::size_type& theCurPos, const std::string& theString);
 
     inline bool is_ascii(Char c) {
         return (c <= 0x7f);
@@ -308,7 +308,7 @@ namespace asl {
     }
 
     // returns the position of the first non-whitespace char
-    inline int read_whitespace(const std::string & is, int pos) {
+    inline std::string::size_type read_whitespace(const std::string & is, std::string::size_type pos) {
         while (pos < is.size() && (is_space(is[pos]))) {
             ++pos;
         }
@@ -330,8 +330,10 @@ namespace asl {
     }
 
     template< typename StartCharFunc, typename CharFunc >
-    inline int read_object( const std::string& is, int pos
-                          , StartCharFunc is_start_char_func, CharFunc is_char_func) {
+    inline std::string::size_type read_object( const std::string& is
+                                             , std::string::size_type pos
+                                             , StartCharFunc is_start_char_func
+                                             , CharFunc is_char_func) {
         if ( is_start_char_func(is[pos]) && pos < is.size() ) {
             ++pos;
             while (is_char_func(is[pos]) && pos < is.size() ) {
@@ -342,17 +344,17 @@ namespace asl {
     }
 
     // returns the position of the first non-namechar
-    inline int read_name(const std::string& is,int pos) {
+    inline std::string::size_type read_name(const std::string& is,std::string::size_type pos) {
         return read_object(is,pos,is_name_start_char,is_name_char);
     }
 
     // returns the position of the first non-identifier char
-    inline int read_identifier(const std::string& is,int pos) {
+    inline std::string::size_type read_identifier(const std::string& is,std::string::size_type pos) {
         return read_object(is,pos,is_identifier_start_char,is_identifier_char);
     }
 
     // returns pos + 1 if c is at pos
-    inline int read_if_char(const std::string & is,int pos, Char c) {
+    inline std::string::size_type read_if_char(const std::string & is,std::string::size_type pos, Char c) {
         if ( is[pos] == c && pos < is.size() ) {
             return pos + 1;
         }
@@ -360,9 +362,9 @@ namespace asl {
     }
 
     // returns position past end of s if s is the exact next part
-    inline int read_if_string(const std::string & is,int pos, const std::string & s) {
-        int i = 0;
-        int n = s.size()<is.size()-pos?s.size():is.size()-pos;
+    inline std::string::size_type read_if_string(const std::string & is,std::string::size_type pos, const std::string & s) {
+        std::string::size_type i = 0;
+        std::string::size_type n = s.size()<is.size()-pos?s.size():is.size()-pos;
         while (i<n && pos < is.size() && is[pos+i] == s[i]) {
             ++i;
         }
@@ -372,8 +374,8 @@ namespace asl {
     }
 
     // returns pos of next delim
-    inline int read_text(const std::string & is,int pos, Char delim) {
-        int last_non_white = pos;
+    inline std::string::size_type read_text(const std::string & is,std::string::size_type pos, Char delim) {
+        std::string::size_type last_non_white = pos;
         while ( pos < is.size() && is[pos] != delim ) {
             if (!is_space(is[pos])) last_non_white = pos;
             ++pos;
@@ -381,7 +383,7 @@ namespace asl {
         return last_non_white+1;
     }
     // returns position past second quote char if at pos is a quote char
-    inline int read_quoted_text(const std::string & is,int pos,
+    inline std::string::size_type read_quoted_text(const std::string & is,std::string::size_type pos,
         Char opening_qoute,Char closing_qoute ) {
         if (is[pos]==opening_qoute) {
             ++pos;
@@ -393,15 +395,15 @@ namespace asl {
         return pos;
     }
 
-    inline void copy_between_quotes(const std::string& is,int pos, int end_pos, std::string & dest) {
+    inline void copy_between_quotes(const std::string& is,std::string::size_type pos, std::string::size_type end_pos, std::string & dest) {
         dest=is.substr(pos+1,end_pos-pos-2);
     }
     // returns position past "right" if sequence starts with "left"
-    inline int read_if_between(const std::string & is,int pos, const std::string & left, const std::string & right)
+    inline std::string::size_type read_if_between(const std::string & is,std::string::size_type pos, const std::string & left, const std::string & right)
     {
-        int left_end = read_if_string(is,pos,left);
+        std::string::size_type left_end = read_if_string(is,pos,left);
         if (left_end > pos) {
-            int right_begin = is.find(right,left_end);
+            std::string::size_type right_begin = is.find(right,left_end);
             if (right_begin != std::string::npos)
                 pos = right_begin + right.size();
         }
@@ -409,10 +411,10 @@ namespace asl {
     }
 
     // utility for previous function to copy what's between into string dest
-    inline void copy_between(const std::string & is,int pos, const std::string & left, const std::string & right,
-        int right_end_pos, std::string & dest)
+    inline void copy_between(const std::string & is,std::string::size_type pos, const std::string & left, const std::string & right,
+        std::string::size_type right_end_pos, std::string & dest)
     {
-        int begin = pos+left.size();
+        std::string::size_type begin = pos+left.size();
         dest = is.substr(begin,right_end_pos-begin-right.size());
     }
 

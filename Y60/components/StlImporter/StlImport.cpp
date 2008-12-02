@@ -116,7 +116,7 @@ namespace y60 {
                 DB(cerr << "STL binary big endian import file position " << myPos << endl);
                 myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
             }
-            ok = myPos;
+            ok = 0 != myPos;
             AC_INFO << "Loaded STL binary big endian file";
         } else if (isLittleEndian(theSource)) {
             asl::ReadableStreamAdapter<X86ByteOrder, AC_HOST_BYTE_ORDER> myAdapter(theSource);
@@ -125,7 +125,7 @@ namespace y60 {
                 DB(cerr << "STL binary little endian file position " << myPos << endl);
                 myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
             }
-            ok = myPos;
+            ok = 0 != myPos;
             AC_INFO << "Loaded STL binary little endian file";
         } else {
             throw ImportException(std::string("This file is not in STL binary format. Tried big- and little-endian."), 
@@ -153,7 +153,7 @@ namespace y60 {
         TransformBuilder transformBuilder("Main");
         worldBuilder.appendObject(transformBuilder);
         // body
-        for (int i=0; i < _myStlShapes.size(); ++i) {
+        for (std::vector<dom::NodePtr>::size_type i=0; i < _myStlShapes.size(); ++i) {
             BodyBuilder bodyBuilder(_myStlShapes[i]->getAttribute("id")->nodeValue(),
                                      _myStlShapes[i]->getAttribute("name")->nodeValue());
             transformBuilder.appendObject(bodyBuilder);

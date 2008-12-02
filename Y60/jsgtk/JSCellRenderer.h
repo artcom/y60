@@ -12,7 +12,15 @@
 #define _Y60_ACGTKSHELL_JSCELL_RENDERER_INCLUDED_
 
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244)
+#endif //defined(_MSC_VER)
 #include <gtkmm/cellrenderer.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 
@@ -84,6 +92,13 @@ struct JSClassTraits<JSCellRenderer::NATIVE>
 jsval
 as_jsval(JSContext *cx, JSCellRenderer::OWNERPTR theOwner,
          JSCellRenderer::NATIVE * theCellRenderer);
+
+inline
+jsval
+as_jsval(JSContext *cx, JSCellRenderer::NATIVE * theCellRenderer) {
+    return as_jsval(cx,JSCellRenderer::OWNERPTR(),theCellRenderer);
+}
+
 }
 
 #endif

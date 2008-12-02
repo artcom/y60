@@ -251,7 +251,7 @@ inline std::istream&  operator>>(std::istream & is, Pixel<THECOLOR,unsigned char
 {
     int v;
     if (is >> v && int((unsigned char)(v)) == v) {
-        s.set(v);
+        s.set( static_cast<unsigned char>(v) );
     } else {
         is.setstate(std::ios::failbit);
     }
@@ -347,7 +347,7 @@ VALUE getGrayValue(const PIXEL<VALUE> & thePixel) {
 }
 template <template <class> class PIXEL, class VALUE, class SRC_VALUE>
 void setGrayValue(PIXEL<VALUE> & thePixel, SRC_VALUE theValue) {
-    thePixel.set(theValue);
+    thePixel.set( static_cast<unsigned char>(theValue) );
 }
 
 template <class VALUE>

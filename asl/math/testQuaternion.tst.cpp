@@ -82,7 +82,7 @@ class QuaternionTest : public TemplateUnitTest {
                         "Euler Constructor, neutral");
 
                 Quaternion<T> myQuat1 = Quaternion<T>::createFromEuler(Vector3<T>(T(PI_2),0,0));
-                T mySquareRootTwoHalf = static_cast<T>(sqrt(2.0)) * 0.5;
+                T mySquareRootTwoHalf = static_cast<T>(sqrt(2.0f)) * 0.5f;
                 ENSURE_MSG(almostEqual(myQuat1, Quaternion<T>(-mySquareRootTwoHalf,T(0),T(0),
                                 mySquareRootTwoHalf)), "Euler Constructor, X+90");
 

@@ -302,7 +302,7 @@ namespace jslib {
 
         std::vector<JSFunctionSpec> myFunctions = mergeFunctions( theFunctions, Functions());
         std::vector<JSFunctionSpec> myStaticFunctions = mergeFunctions( theStaticFunctions, StaticFunctions());
-        JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
+        /*JSObject * myClassObject =*/ JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
                 Constructor, 0, Properties(), & ( * myFunctions.begin()), 0,
                 & ( * myStaticFunctions.begin()));
 
@@ -339,8 +339,7 @@ namespace jslib {
 
     bool convertFrom(JSContext * cx, jsval theValue, IScriptablePluginPtr & thePtr) {
         if (JSVAL_IS_OBJECT(theValue)) {
-            JSObject * obj;
-            JSObject * obj2 = JSVAL_TO_OBJECT(theValue);
+            JSObject * obj = JSVAL_TO_OBJECT(theValue);
             if (JS_ValueToObject(cx, theValue, &obj)) {
                 thePtr = JSScriptablePlugin::getNative(cx, obj);
                 return true;

@@ -61,7 +61,7 @@ namespace y60 {
             static unsigned int s_folderIDSize = sizeof(s_folderID) / sizeof(s_folderID[0]);
 
             string myUpperCaseFolderName = asl::toUpperCase(theFolderName); 
-            for (int i = 0; i < s_folderIDSize; ++i) {
+            for (unsigned int i = 0; i < s_folderIDSize; ++i) {
                 if (s_folderID[i].key == myUpperCaseFolderName) {
                     return s_folderID[i].value;
                 }

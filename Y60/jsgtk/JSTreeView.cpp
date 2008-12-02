@@ -189,6 +189,7 @@ GetColumnCellRenderer(JSContext * cx, JSObject  * obj, uintN argc, jsval * argv,
                         }
                     }
 
+                /*
                 case JSCellRenderer::PROP_CELL_RENDERER_PIXBUF:
                     {
                         Gtk::CellRendererPixbuf * myPixbufCellRenderer(0);
@@ -200,6 +201,7 @@ GetColumnCellRenderer(JSContext * cx, JSObject  * obj, uintN argc, jsval * argv,
                             break;
                         }
                     }
+                */
 
                 /*
                 case JSCellRenderer::PROP_CELL_RENDERER_PROGRESS:
@@ -215,6 +217,7 @@ GetColumnCellRenderer(JSContext * cx, JSObject  * obj, uintN argc, jsval * argv,
                     }
                  */
 
+                /*
                 case JSCellRenderer::PROP_CELL_RENDERER_TOGGLE:
                     {
                         Gtk::CellRendererToggle * myToggleCellRenderer(0);
@@ -226,6 +229,7 @@ GetColumnCellRenderer(JSContext * cx, JSObject  * obj, uintN argc, jsval * argv,
                             break;
                         }
                     }
+                */
 
                 /*
                 case JSCellRenderer::PROP_CELL_RENDERER_COMBO:
@@ -243,7 +247,6 @@ GetColumnCellRenderer(JSContext * cx, JSObject  * obj, uintN argc, jsval * argv,
 
                 default:
                     throw asl::Exception("Unknown cell renderer type.", PLUS_FILE_LINE);
-                    return JS_FALSE;
             }
         } else {
             *rval = as_jsval(cx, myCellRenderer);
@@ -378,13 +381,13 @@ JSTreeView::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                     vector<Glib::ustring> myStrings;
                     convertFrom(cx, *vp, myStrings);
 
-                    int myColCount = theNative.get_model()->get_n_columns();
+                    unsigned int myColCount = theNative.get_model()->get_n_columns();
                     if (myColCount != myStrings.size()+1) {
                         JS_ReportError(cx,"selected_row_values: expected %d strings, got %d",
                                 myColCount-1, myStrings.size());
                         return JS_FALSE;
                     }
-                    for (int i=1; i < myColCount; ++i) {
+                    for (unsigned int i=1; i < myColCount; ++i) {
                         iter->set_value(i, myStrings[i-1]);
                     }
                 }

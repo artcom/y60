@@ -128,6 +128,7 @@ Copyright 2001-2004 The Ant-Contrib project
     <javac srcdir="${java.dir}"
            destdir="${build.classes}"
            debug="${debug}"
+           source="1.2"
            target="1.1"
            deprecation="${deprecation}"
            optimize="${optimize}" >

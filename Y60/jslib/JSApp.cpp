@@ -8,21 +8,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <errno.h>
+#include <stdio.h>
+#include <vector>
+#include <string>
+#include <list>
+#include <map>
+
 #include "JSApp.h"
-#include "IRendererExtension.h"
-
-#include "jscpp.h"
-#include <y60/jsbase/JScppUtils.h>
-#include <y60/jsbase/JScppUtils.impl>
-#include <y60/jsbase/JSNode.h>
-#include <y60/jsbase/JSBlock.h>
-#include <y60/jsbase/JSVector.h>
-#include <y60/jsbase/JSScriptablePlugin.h>
-#include <y60/jsbase/IScriptablePlugin.h>
-#include <y60/jsbase/IFactoryPlugin.h>
-#include <y60/jsbase/QuitFlagSingleton.h>
-#include <y60/jsbase/Documentation.h>
-
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/zip/DirectoryPackage.h>
@@ -40,6 +33,27 @@
 #   include <asl/base/signal_functions.h>
 #endif
 
+#include <y60/base/IDecoder.h>
+#include <y60/base/DecoderManager.h>
+#include <y60/base/CommonTags.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/EventDispatcher.h>
+#include <y60/image/Image.h>
+#include <y60/image/IPaintLibExtension.h>
+#include <y60/scene/Texture.h>
+#include <y60/inet/Request.h>
+
+#include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JScppUtils.impl>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSBlock.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jsbase/IFactoryPlugin.h>
+#include <y60/jsbase/QuitFlagSingleton.h>
+#include <y60/jsbase/Documentation.h>
+
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -50,26 +64,16 @@
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsdbgapi.h>
 
-#include <y60/image/IPaintLibExtension.h>
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planydec.h>
-
-#include <y60/base/IDecoder.h>
-#include <y60/base/DecoderManager.h>
-#include <y60/input/IEventSource.h>
-#include <y60/input/EventDispatcher.h>
-#include <y60/image/Image.h>
-#include <y60/scene/Texture.h>
-#include <y60/base/CommonTags.h>
-#include <y60/inet/Request.h>
-
-#include <errno.h>
-#include <stdio.h>
-#include <vector>
-#include <string>
-#include <list>
-#include <map>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 #include "IRendererExtension.h"
+#include "jscpp.h"
 
 #define DB(x) // x
 
@@ -146,20 +150,21 @@ JSApp::setQuitFlag(bool theFlag) {
 void
 throwException(JSContext * cx, const char * theMessage, std::string theFilename, unsigned theLine) {
     //cerr << "Throw Exception: " << theMessage << ", file: " << theFilename << ", line: " << theLine << endl;
-    JSString* jsstr;
+    JSString* jsstr = JS_NewStringCopyZ(cx, theMessage);
 
     // if we get errors during error reporting we report those
-    if (((jsstr=JS_NewStringCopyZ(cx, theMessage))) && (JS_AddNamedRoot(cx, &jsstr, "jsstr"))) {
+    if ( jsstr && (JS_AddNamedRoot(cx, &jsstr, "jsstr")) ) {
         jsval dummy;
 
         // We can't use JS_EvaluateScript since the stack would be wrong
-        JSFunction * func;
         JSObject   * fobj;
         const char * fbody = "throw new Error(msg, file, line);";
         const char * argnames[] = {"msg", "file", "line"};
-        if ((func = JS_CompileFunction(cx, NULL, NULL, 3, argnames, fbody, strlen(fbody), NULL, 0))) {
+        JSFunction * func = JS_CompileFunction(cx, NULL, NULL, 3, argnames, fbody, strlen(fbody), NULL, 0);
+        if (func) {
+            fobj = JS_GetFunctionObject(func);
             // root function
-            if (((fobj = JS_GetFunctionObject(func))) && (JS_AddNamedRoot(cx, &fobj, "fobj"))) {
+            if ( fobj && (JS_AddNamedRoot(cx, &fobj, "fobj"))) {
                 jsval args[] = {STRING_TO_JSVAL(jsstr), as_jsval(cx, theFilename), as_jsval(cx, theLine)};
                 JS_CallFunction(cx, NULL, func, 3, args, &dummy);
                 JS_RemoveRoot(cx, &fobj);
@@ -459,7 +464,7 @@ being handed input arguments and comparing them with a list of allowed arguments
         };
         // add the command-line options as properties to the "options" object
         vector<string> myOptionNames = myArguments.getOptionNames();
-        for (int i = 0; i < myOptionNames.size(); ++i) {
+        for (vector<string>::size_type i = 0; i < myOptionNames.size(); ++i) {
             const string & myOptionArgument = myArguments.getOptionArgument(myOptionNames[i]);
             jsval myOptionArgumentValue;
             if (myOptionArgument.empty()) {
@@ -783,15 +788,10 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("...", "You can provide any number of files to use", DOC_TYPE_STRING);
     DOC_END;
     try {
-        uintN i;
         string myIncludeFile;
-        JSScript *script;
-        JSBool ok;
-        jsval result;
-        const char * myCurrentFile;
-        int myLine;
+        JSScript *script = NULL;
 
-        for (i = 0; i < argc; i++) {
+        for (uintN i = 0; i < argc; i++) {
 
             if (!convertFrom(cx, argv[0], myIncludeFile)) {
                 JS_ReportError(cx, "Use could not convert argument value to string.");
@@ -800,6 +800,8 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             AC_DEBUG << "use: myIncludeFile=" << myIncludeFile;
 
             // Compute file path relative to file in which the use() statement was called
+            const char * myCurrentFile;
+            int myLine;
             if (!getFileLine(cx, obj, argc, argv, myCurrentFile, myLine)) {
                 return JS_FALSE;
             }
@@ -831,15 +833,15 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
             if (!script) {
                 AC_WARNING << "use: compilation of " << myIncludeFileWithPath << " failed.";
-                ok = JS_FALSE;
+                return JS_FALSE;
             } else {
-                ok = JS_ExecuteScript(cx, obj, script, &result);
+                jsval result;
+                JSBool ok = JS_ExecuteScript(cx, obj, script, &result);
                 AC_DEBUG << "use: executed: " << myIncludeFileWithPath <<", status = "<<ok;
                 JS_DestroyScript(cx, script);
-            }
-
-            if (!ok) {
-                return JS_FALSE;
+                if( !ok ) {
+                    return JS_FALSE;
+                }
             }
         }
         return JS_TRUE;
@@ -1416,9 +1418,9 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     };    
     PROCESS_INFORMATION myProcessInfo;    
     DWORD myProcessResult = 0;    
-    bool myResult = CreateProcess(
+    /*bool myResult =*/ CreateProcess(
             NULL, &myExecutionCommand[0],
-            NULL, NULL, TRUE, 0,
+            NULL, NULL, true, 0,
             NULL, myCWD.c_str(), 
             &myStartupInfo,
             &myProcessInfo);

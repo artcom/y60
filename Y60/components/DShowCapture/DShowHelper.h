@@ -11,6 +11,8 @@
 #ifndef _DShowHelper_H_
 #define _DShowHelper_H_
 
+#define NO_DSHOW_STRSAFE // avoid a bunch of useless warnings and an error that <dshow.h> drags in
+
 #include <dshow.h>
 
 #include <string>

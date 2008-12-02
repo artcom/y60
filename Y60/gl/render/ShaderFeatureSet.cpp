@@ -73,7 +73,7 @@ ShaderFeatureSet::load(const dom::NodePtr theNode) {
             VectorOfString myFeatures = myFeatureNode->getAttributeValue<VectorOfString>("values");
             if (myFeatureClass == TEXTURE_LIST_NAME) {
                 _myTextureFeature.clear();
-                for (int i = 0; i< myFeatures.size(); i++) {
+                for (VectorOfString::size_type i = 0; i< myFeatures.size(); i++) {
                     TextureUsage myUsage;
                     myUsage.fromString(myFeatures[i]);
                     _myTextureFeature.push_back(myUsage);

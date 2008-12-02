@@ -21,30 +21,30 @@
 //
 //=============================================================================
 
-
-#include <asl/base/settings.h>
 #include "TestXMLTexGen.h"
-
-#include "TerrainTexGen.h"
-#include <asl/dom/Nodes.h>
-//#include <asl/XmlTypes.h>
-
-#ifdef _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
-#pragma warning(disable:4786)  // Debug symbols too long for std::map :-(
-#endif
-
-#include <paintlib/planybmp.h>
-#include <paintlib/plpngenc.h>
-#include <paintlib/planydec.h>
-#include <paintlib/plrect.h>
-#include <paintlib/Filter/plfiltercrop.h>
 
 #include <string>
 #include <iomanip>
 #include <fstream>  
 #include <stdexcept>
-
 #include <sstream>
+
+#include <asl/base/settings.h>
+#include <asl/dom/Nodes.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/planybmp.h>
+#include <paintlib/plpngenc.h>
+#include <paintlib/planydec.h>
+#include <paintlib/plrect.h>
+#include <paintlib/Filter/plfiltercrop.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "TerrainTexGen.h"
 
 using namespace asl;
 using namespace TexGen;

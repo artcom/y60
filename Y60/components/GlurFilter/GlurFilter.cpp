@@ -22,12 +22,18 @@
 
 #include "GlurFilter.h"
 
-#include <asl/math/numeric_functions.h>
+#include <iostream>
 
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
 
-#include <iostream>
+#include <asl/math/numeric_functions.h>
 
 #define DB(x) // x
 
@@ -47,7 +53,7 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
         ((int)(_myColor[1] * 255.0f) << 8) |
         (int)(_myColor[2] * 255.0f);
 
-    _myAlpha = (int)(_myColor[3] * 255.0f);
+    _myAlpha = static_cast<unsigned char>(_myColor[3] * 255.0f);
     
     _myRadius = (int)theParameters.size() - 4;
     _myLUT.resize(_myRadius*256);
@@ -57,7 +63,7 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
     // a destination pixel value
     for(int r=0; r<_myRadius; ++r) {
         for(int i=0; i<256; ++i) {
-            int d = (int)(theParameters[4 + r] * i);
+            unsigned char d = static_cast<unsigned char>(theParameters[4 + r] * i);
             if (d>255) {
                 d=255;
             }
@@ -67,9 +73,9 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
     
     if (_myAlpha > 0) {
         _myAlphaLUT.resize(256*256);
-        for (int i=0; i<256; ++i) {
-            for (int mySourceAlpha=0; mySourceAlpha<256; ++mySourceAlpha) {
-                _myAlphaLUT[(mySourceAlpha<<8)+i] = (i * _myAlpha * mySourceAlpha) / 255 / 255;
+        for (unsigned char i=0; i<256; ++i) {
+            for (unsigned char mySourceAlpha=0; mySourceAlpha<256; ++mySourceAlpha) {
+                _myAlphaLUT[(mySourceAlpha<<8)+i] = static_cast<unsigned char>((i * _myAlpha * mySourceAlpha) / 255 / 255);
             }
         }    
     }

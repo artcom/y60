@@ -14,13 +14,14 @@
 #include "TextureTags.h"
 #include <y60/base/CommonTags.h>
 #include <y60/base/NodeValueNames.h>
-#include <y60/base/IResourceManager.h>
 
 #include <asl/dom/AttributePlug.h>
 #include <asl/dom/Facade.h>
 
 
 namespace y60 {
+
+    class IResourceManager;
 
     /**
      * Exception

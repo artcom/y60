@@ -36,21 +36,21 @@ namespace y60 {
 
     const IdTag::TYPE IdTag::getDefault() {
         asl::Block myIdBlock;
-        unsigned myCounter = ++IdTag::get().counter;
+        unsigned int myCounter = ++IdTag::get().counter;
         if (myCounter == 0) {
             IdTag::get().myStartTime = asl::Time().secs() - 1117122059;
         }
 
         // Most significant bytes first improves legibility and map lookup-speed
-        myIdBlock.appendUnsigned8(myCounter);
+        myIdBlock.appendUnsigned8( static_cast<unsigned char>(myCounter) );
         if (myCounter > 0xff) {
-            myIdBlock.appendUnsigned8(myCounter >> 8);
+            myIdBlock.appendUnsigned8( static_cast<unsigned char>(myCounter >> 8) );
         }
         if (myCounter > 0xffff) {
-            myIdBlock.appendUnsigned8(myCounter >> 16);
+            myIdBlock.appendUnsigned8( static_cast<unsigned char>(myCounter >> 16) );
         }
         if (myCounter > 0xffffff) {
-            myIdBlock.appendUnsigned8(myCounter >> 24);
+            myIdBlock.appendUnsigned8( static_cast<unsigned char>(myCounter >> 24) );
         }
         myIdBlock.appendUnsigned16((unsigned short)asl::getThreadId() & 0xFFFF);
         myIdBlock.appendUnsigned(IdTag::get().myStartTime);

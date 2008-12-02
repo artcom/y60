@@ -46,7 +46,7 @@ class ProgressCallback : public y60::IProgressNotifier {
 
         virtual void onProgress(float theProgress, const std::string & theMessage="") {
             jsval myVal;
-            JSBool bOK = JS_GetProperty(_jsContext, _jsTarget, _handlerName.c_str(), &myVal);
+            /*JSBool bOK =*/ JS_GetProperty(_jsContext, _jsTarget, _handlerName.c_str(), &myVal);
             if (myVal == JSVAL_VOID) {
                 AC_WARNING << "JS event handler for event '" << _handlerName << "' missing." << endl;
                 return;
@@ -296,7 +296,6 @@ optimize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         myNative->optimize(myRootNode);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return Method<NATIVE>::call(&NATIVE::optimize,cx,obj,argc,argv,rval);
 }
 
 /*static JSBool

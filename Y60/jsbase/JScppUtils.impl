@@ -33,7 +33,7 @@ bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
             if (JS_HasArrayLength(cx,myArgument,&myArrayLength)) {
                 theDest.resize(myArrayLength);
                 jsval myArgElem;
-                for (int i = 0; i < myArrayLength; ++i) {
+                for (jsuint i = 0; i < myArrayLength; ++i) {
                     if (JS_GetElement(cx, myArgument, i, &myArgElem)) {
                         T myResult;
                         if (convertFrom(cx, myArgElem, myResult)) {

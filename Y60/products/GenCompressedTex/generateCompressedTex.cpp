@@ -9,9 +9,17 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 
+#include <asl/base/Arguments.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/base/file_functions.h>
+#include <asl/base/MappedBlock.h>
+#include <asl/base/os_functions.h>
+
+#include <asl/dom/Nodes.h>
+
 #include <y60/glutil/GLUtils.h>
 #include <y60/sdlengine/SDLWindow.h>
-#include <y60/render/GLResourceManager.h>
+#include <y60/glrender/GLResourceManager.h>
 
 #include <y60/image/PixelEncoding.h>
 #include <y60/glutil/TextureCompressor.h>
@@ -26,19 +34,17 @@
 #endif
 #endif
 
-#include <asl/base/Arguments.h>
-#include <asl/math/numeric_functions.h>
-#include <asl/base/file_functions.h>
-#include <asl/base/MappedBlock.h>
-#include <asl/base/os_functions.h>
-
-#include <asl/dom/Nodes.h>
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planydec.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
 #include <paintlib/Filter/plfilterflip.h>
 #include <paintlib/Filter/plfiltercrop.h>
 #include <paintlib/plpngenc.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 #include <SDL/SDL.h>
 
@@ -198,7 +204,8 @@ updateNeeded(const string & theSourceFilename, const asl::Arguments & theArgumen
                     cout << "Target " << myTargetFileName << " does not exist" << endl;
                     return true;
                 }
-                if (myTargetSize > 0 && (getFileSize(myTargetFileName) != myTargetSize)) {
+                if (myTargetSize > 0 
+                && (static_cast<unsigned>(getFileSize(myTargetFileName)) != myTargetSize)) {
                     cout << "Target " << myTargetFileName << " has wrong size" << endl;
                     cout << "Found target size:" << getFileSize(myTargetFileName) << ", expected: " << myTargetSize << endl;
                     return true;
@@ -215,7 +222,8 @@ updateNeeded(const string & theSourceFilename, const asl::Arguments & theArgumen
             cout << "Target " << myTargetFileName << " does not exist" << endl;
             return true;
         }
-        if (myTargetSize > 0 && (getFileSize(myTargetFileName) != myTargetSize)) {
+        if (myTargetSize > 0
+        && (static_cast<unsigned>(getFileSize(myTargetFileName)) != myTargetSize)) {
             cout << "Target " << myTargetFileName << " has wrong size" << endl;
             cout << "Found target size:" << getFileSize(myTargetFileName) << ", expected: " << myTargetSize << endl;
             return true;
@@ -239,7 +247,7 @@ void
 preProcessSource(PLAnyBmp & theSourceBitMap, const asl::Arguments & theArguments) {
     int pre_x_size = theSourceBitMap.GetWidth();
     int pre_y_size = theSourceBitMap.GetHeight();
-    bool pre_scale = false;
+    //bool pre_scale = false;
     if (theArguments.haveOption("--pre-xsize")) {
         pre_x_size = asl::as<int>(theArguments.getOptionArgument("--pre-xsize"));
     }
@@ -484,7 +492,7 @@ int main(int argc, char *argv[]) {
         string myImageDirectory = myArguments.getOptionArgument("--img-dir");
         DIR * myDir = opendir(myImageDirectory.c_str());
         dirent * myDirEntry = 0;
-        while ( (myDirEntry = readdir(myDir))) {
+        while ( 0 != (myDirEntry = readdir(myDir))) {
             string myFilename(myDirEntry->d_name);
             if (myFilename[0] != '.') {
                 mySourceFiles.push_back(string(myDirEntry->d_name));

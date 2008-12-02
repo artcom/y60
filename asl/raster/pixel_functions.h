@@ -174,7 +174,7 @@ struct offset : public std::unary_function<SRC, DEST> {
     }
 };
 
-template <class PIXEL, class COMPONENT>
+template <class COMPONENT, class PIXEL>
 COMPONENT channel_sum(const PIXEL & p, const COMPONENT & c) {
     COMPONENT result(c);
     for (int i = 0;i<p.size();i++) {

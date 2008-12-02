@@ -227,6 +227,7 @@ SimWater::loadTexturesFromConfig(const dom::Node & theConfig, WaterRepresentatio
             string fileName = DATA_DIR + "/" + myFileNode["name"].nodeValue();
             short objectID = asl::as<short>(myFileNode["objectid"].nodeValue());
             bool loadOK = _myWaterRepresentation->loadTexture(theClassID,objectID,fileName.c_str());
+            (void)loadOK;
             assert(loadOK);
         }
     } catch (const asl::Exception & ex) {
@@ -263,7 +264,7 @@ SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     
     asl::Time myCurrentTime;
     myCurrentTime.setNow();
-    double myRunTime = myCurrentTime - _myStartTime;
+    //double myRunTime = myCurrentTime - _myStartTime;
 
     if (_myRunSimulationFlag) {
         if (_myIntegrationsPerFrame == 1) {
@@ -348,16 +349,16 @@ SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
 
 int 
 SimWater::addFloormap(const std::string & theFilename) {
-    bool loadOk = _myWaterRepresentation->loadTexture(WaterRepresentation::floormaps, _myFloormapCounter, theFilename.c_str());
-    _myWaterRepresentation->activateTexture(WaterRepresentation::floormaps, _myFloormapCounter );
+    /*bool loadOk =*/ _myWaterRepresentation->loadTexture(WaterRepresentation::floormaps, static_cast<short>(_myFloormapCounter), theFilename.c_str());
+    _myWaterRepresentation->activateTexture(WaterRepresentation::floormaps,static_cast<short>( _myFloormapCounter) );
     return _myFloormapCounter++;
 }
 
 int 
 SimWater::addCubemap(const std::string theFilenames[]) {
-    bool loadOk = _myWaterRepresentation->loadCubeMapTexture(WaterRepresentation::cubemaps, _myCubemapCounter,
+    /*bool loadOk =*/ _myWaterRepresentation->loadCubeMapTexture(WaterRepresentation::cubemaps, static_cast<short>(_myCubemapCounter),
             theFilenames);
-    _myWaterRepresentation->activateTexture(WaterRepresentation::cubemaps, _myCubemapCounter );
+    _myWaterRepresentation->activateTexture(WaterRepresentation::cubemaps, static_cast<short>(_myCubemapCounter) );
     return _myCubemapCounter++;
 }
 

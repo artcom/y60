@@ -14,7 +14,15 @@
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/jssettings.h>
 #include <js/spidermonkey/jsapi.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4244 4512 4413 4251 4127 4520)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 namespace jslib {
 

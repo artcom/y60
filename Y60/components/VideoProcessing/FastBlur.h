@@ -15,32 +15,33 @@
 #include "Algorithm.h"
 
 namespace y60 {
-	class FastBlur : public Algorithm {
-		public:
-            FastBlur(const std::string & theName);
-            virtual ~FastBlur();
 
-			static std::string getName() { return "fastblur"; }
-		    void onFrame(double t);
-            
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
+    class FastBlur : public Algorithm {
+    public:
+        FastBlur(const std::string & theName);
+        virtual ~FastBlur();
 
-		private:
-            float lookup(float theValue);
-            float revlookup(float theValue);
-            dom::Element  _myResultNode;
-            y60::ImagePtr _mySourceImage;
-            y60::ImagePtr _myTargetImage;
-            
-            float * _myFloatImage;
-            float _myStrength;
-            unsigned int _myWidth;
-            unsigned int _myHeight;
-            
-            unsigned int _myImageNodeVersion;
+        static std::string getName() { return "fastblur"; }
+        void onFrame(double t);
+
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
+
+    private:
+        float lookup(float theValue);
+        float revlookup(float theValue);
+        dom::Element  _myResultNode;
+        y60::ImagePtr _mySourceImage;
+        y60::ImagePtr _myTargetImage;
+
+        float * _myFloatImage;
+        float _myStrength;
+        unsigned int _myWidth;
+        unsigned int _myHeight;
+
+        asl::Unsigned64 _myImageNodeVersion;
     };
 }
 

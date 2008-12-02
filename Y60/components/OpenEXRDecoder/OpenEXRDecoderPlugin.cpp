@@ -9,16 +9,20 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#pragma warning( push )
-#pragma warning( disable : 4290 ) // Disable "C++ Exception Specification ignored" warning
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
+#   include <paintlib/pldecoderfactory.h>
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
 
-#include "OpenEXRDecoder.h"
+#include <OpenEXR/ImfVersion.h>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/image/IPaintLibExtension.h>
 
-#include <paintlib/pldecoderfactory.h>
-#include <OpenEXR/ImfVersion.h>
+#include "OpenEXRDecoder.h"
 
 using namespace std;
 using namespace asl;

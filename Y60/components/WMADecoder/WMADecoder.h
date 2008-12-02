@@ -19,18 +19,30 @@
 
 #include <wmsdk/wmsdk.h>
 
-#ifdef WIN32
-#define EMULATE_INTTYPES
+#ifdef OSX
+    extern "C" {
+#       include <libavformat/avformat.h>
+    }
+#   undef AV_NOPTS_VALUE
+#   define AV_NOPTS_VALUE 0x8000000000000000LL
+#else
+#   if defined(_MSC_VER)
+#       define EMULATE_INTTYPES
+#       pragma warning(push,1)
+#   endif
+    extern "C" {
+#       include <ffmpeg/avformat.h>
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 #endif
-extern "C" {
-#include <ffmpeg/avformat.h> // For resampling
-}
 
 namespace y60 {
 
 class WMADecoder: public IAudioDecoder, public IWMReaderCallback
 {
-	    static const MAX_TIMEOUT_FOR_EVENT = 15000;
+        static const unsigned int MAX_TIMEOUT_FOR_EVENT = 15000;
     public:
     
         WMADecoder (const std::string& myURI);

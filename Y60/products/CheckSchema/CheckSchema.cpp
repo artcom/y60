@@ -26,7 +26,7 @@ bool parseFile(string theFilename, NodePtr theDocument) {
     string myXmlString;
     if (asl::readFile(theFilename, myXmlString)) {
         cout << "Parsing file " << theFilename << "." << endl;
-        int LastParsePos = theDocument->parseAll(myXmlString);
+        unsigned int LastParsePos = theDocument->parseAll(myXmlString);
         if (LastParsePos != myXmlString.length()) {
             return false;
         }

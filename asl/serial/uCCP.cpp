@@ -180,15 +180,21 @@ namespace asl {
                     _myCRCErrors++;
                     return false;
                 }
-                theData.pop_back();
+                if (!theData.empty()) {
+                    theData.pop_back();
+                }
                 break;
             case CHECKSUM_CHECKING:
                 if (checksum(theData.begin(), theData.size()) != 0) {
                     _myCRCErrors++;
                     return false;
                 }
-                theData.pop_back();
-                theData.pop_back();
+                if (!theData.empty()) {
+                    theData.pop_back();
+                }
+                if (!theData.empty()) {
+                    theData.pop_back();
+                }
                 break;
             default:
                 return true;

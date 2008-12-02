@@ -143,6 +143,8 @@ namespace asl {
             case DSERR_UNSUPPORTED:
                 msg = "The function called is not supported at this time.";
                 break;
+            default:
+                msg = "#ERROR'";
             }
             return std::string(msg);
         }

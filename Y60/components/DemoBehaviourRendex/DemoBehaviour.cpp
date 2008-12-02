@@ -51,6 +51,7 @@ namespace y60 {
     void
     DemoBehaviour::onKey(y60::Event & theEvent) {
         y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
+        (void)myKeyEvent;
         DB(
 			cerr << "Key Event" << endl;
 			cerr << "    string: " << myKeyEvent.keyString << endl;
@@ -64,6 +65,7 @@ namespace y60 {
     void
     DemoBehaviour::onMouseButton(y60::Event & theEvent) {
         y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
+        (void)myMouseEvent;
         DB(
 			cerr << "MouseButton Event" << endl;
 			cerr << "    button: " << myMouseEvent.button << endl;

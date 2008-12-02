@@ -68,7 +68,7 @@ dumpAttributes(const MObject & theObject) {
     MStatus myStatus;
 
     cerr << "--- Attributes: --- " << endl;
-    for (int i = 0; i < myNode.attributeCount(&myStatus); ++i) {
+    for (unsigned int i = 0; i < myNode.attributeCount(&myStatus); ++i) {
         MObject myAttribute = myNode.attribute(i, &myStatus);
         if (!myStatus) {
             cerr << "#### attribute Error" << endl;

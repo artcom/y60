@@ -9,14 +9,16 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-
-#ifdef WIN32
-    #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN 1
-    #endif
-    #include <windows.h>
-    #undef max
+#if defined(_MSC_VER)
+#   pragma warning(push,1)
+#   ifndef WIN32_LEAN_AND_MEAN
+#   define WIN32_LEAN_AND_MEAN 1
+#   endif
+#   define NOMINMAX
+#   include <windows.h>
+#   undef max
 #endif
+
 
 #include <stdio.h>
 #include <iostream>
@@ -501,7 +503,7 @@ WaterSimulation::sinoidSplash(int xpos, int ypos, float magnitude, int radius, i
 void
 WaterSimulation::ComputeThread::run() {
     
-    while (1) {
+    for(;;) {
 
 //        cerr << "WaterSimulation::ComputeThread::run() START" << endl;
         

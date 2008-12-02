@@ -79,8 +79,8 @@ namespace y60 {
                     mySrcPict.linesize[2] = myLineSizeBytes;
 
                     int myDestPixelFormat = PIX_FMT_YUV444P;
-                    int myImgConvertResult1 = img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());                    
-                    int myDeinterlaceResult = avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());                    
+                    /*int myImgConvertResult1 =*/ img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());                    
+                    /*int myDeinterlaceResult =*/ avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());                    
 
                     AVPicture myDestPict;
                     myDestPict.data[0] = theTargetRaster->pixels().begin();
@@ -90,7 +90,7 @@ namespace y60 {
                     myDestPict.linesize[1] = myLineSizeBytes;
                     myDestPict.linesize[2] = myLineSizeBytes;
 
-                    int myImgConvertResult2 = img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());
+                    /*int myImgConvertResult2 =*/ img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());
                     
                 } else {
                     memcpy(theTargetRaster->pixels().begin(), myData, myBufferLength);
@@ -107,14 +107,14 @@ namespace y60 {
 
         int myFrameWidth = 0;//getFrameWidth();
         int myFrameHeight = 0;//getFrameHeight();
-        unsigned myFrameRate = (unsigned)getFrameRate();
+        unsigned myFrameRate = static_cast<unsigned>(getFrameRate());
         unsigned myBitsPerPixel = 24;
         unsigned myInputPinNumber = 0;
         unsigned myDeviceId = getDevice();
-        unsigned myWhitebalanceU;
-        unsigned myWhitebalanceV;
-        unsigned myShutter;
-        unsigned myGain;
+        unsigned myWhitebalanceU = 0;
+        unsigned myWhitebalanceV = 0;
+        unsigned myShutter = 0;
+        unsigned myGain = 0;
 
         if (myFrameWidth == 0) {
             myFrameWidth = 320;
@@ -133,7 +133,7 @@ namespace y60 {
 
         setPixelFormat(BGR);
 
-        int idx = theFilename.find("width=");
+        std::string::size_type idx = theFilename.find("width=");
         if (idx != std::string::npos) {
             myFrameWidth = asl::as_int(theFilename.substr(idx+6));
         }

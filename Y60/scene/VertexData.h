@@ -98,6 +98,7 @@ namespace y60 {
 
     class VertexDataBase  {
         public:
+            typedef std::size_t size_type;
             VertexDataBase(const TypeId & theType) : _myType(theType)  {};
             virtual ~VertexDataBase() {};
             VertexDataBase() {};
@@ -106,8 +107,8 @@ namespace y60 {
                 return _myType;
             }
 
-            virtual size_t size() const = 0;
-            virtual size_t getElementSize() const = 0;
+            virtual size_type size() const = 0;
+            virtual size_type getElementSize() const = 0;
 #if 0
             virtual const void * getDataPtr() const = 0;
             virtual void * getDataPtr() = 0;
@@ -168,7 +169,7 @@ namespace y60 {
         VertexData() : VertexDataBase(TypeIdTraits<T>::type_id())  {};
         virtual ~VertexData() {};
 
-        virtual size_t getElementSize() const {
+        virtual size_type getElementSize() const {
             return VertexDataSizeTraits<T>::size();
         }
         virtual void push_back(const T & theElement) = 0;

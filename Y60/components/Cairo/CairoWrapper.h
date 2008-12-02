@@ -64,14 +64,10 @@ protected:
     WEAKPTR                _myWeakReference;
 
     // dummy implementation
-    virtual void reference() {
-        throw "XXX";
-    }
+    virtual void reference();
 
     // dummy implementation
-    virtual void unreference() {
-        throw "XXX";
-    }
+    virtual void unreference();
 };
 
 }

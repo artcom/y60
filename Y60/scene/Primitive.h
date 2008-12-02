@@ -346,7 +346,7 @@ namespace y60 {
             myMaxIndex = asl::maximum(myMaxIndex, theIndex);
              ++myTotalChildren;
             BoundingBoxTreePtr emptiestContainingChild(0);
-            for (int i = 0; i < myChildren.size();++i) {
+            for (std::vector<BoundingBoxTreePtr>::size_type i = 0; i < myChildren.size();++i) {
                 if (myChildren[i]->myBox.contains(theBox)) {
                     if (emptiestContainingChild) {
                         if (myChildren[i]->myTotalChildren < emptiestContainingChild->myTotalChildren) {
@@ -364,7 +364,7 @@ namespace y60 {
             }
             // now try if there is a child that intersects
             BoundingBoxTreePtr emptiestIntersectingChild(0);
-            for (int i = 0; i < myChildren.size();++i) {
+            for (std::vector<BoundingBoxTreePtr>::size_type i = 0; i < myChildren.size();++i) {
                 if (myChildren[i]->myBox.touches(theBox)) {
                     if (emptiestIntersectingChild) {
                         if (myChildren[i]->myTotalChildren < emptiestIntersectingChild->myTotalChildren) {

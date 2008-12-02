@@ -21,9 +21,15 @@
 #if !defined(INCL_FILTERINTDOWNSCALE)
 #define INCL_FILTERINTDOWNSCALE
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel32.h>
 #include <paintlib/plbitmap.h>
 #include <paintlib/Filter/plfilter.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace TexGen {
 

@@ -109,6 +109,7 @@ void TestPump::playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration
 
 void TestPump::testUnderrun() {
     Pump & myPump = Pump::get();
+    (void)myPump;
     HWSampleSinkPtr mySampleSink = 
         createSampleSink("TestSink", 44100, 2);
     mySampleSink->play();
@@ -147,6 +148,7 @@ void TestPump::testMix() {
 
 void TestPump::testMultiplePlay() {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     // Stop and play again.
     HWSampleSinkPtr myStopSampleSink = 
@@ -174,6 +176,7 @@ void TestPump::testMultiplePlay() {
 
 void TestPump::testSimultaneousPlay() {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     // Play two sounds and stop them at the same time.
     HWSampleSinkPtr myStopSampleSink1 = 
@@ -192,6 +195,7 @@ void TestPump::testSimultaneousPlay() {
 
 void TestPump::testConversions() {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     HWSampleSinkPtr myMonoSampleSink = 
         createSampleSink("TestMonoSink", 44100, 1);
@@ -215,6 +219,7 @@ void TestPump::testConversions() {
 
 void TestPump::testRunUntilEmpty() {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     HWSampleSinkPtr mySink = 
         createSampleSink("TestRunUntilEmptySink", 44100, 2);
@@ -230,6 +235,7 @@ void TestPump::testRunUntilEmpty() {
 
 void TestPump::testDelayed() {
     Pump & myPump = Pump::get();
+    (void)myPump;
     Time curTime; 
     HWSampleSinkPtr mySink; 
 
@@ -371,6 +377,7 @@ void TestPump::testPumpTimer() {
 
 void TestPump::testSinkTimer() {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     HWSampleSinkPtr mySampleSink = 
         createSampleSink("TestTimerSink", 44100, 2);
@@ -417,6 +424,7 @@ HWSampleSinkPtr TestPump::createSampleSink (const string & theName,
 
 void TestPump::stressTest(double myDuration) {
     Pump & myPump = Pump::get();
+    (void)myPump;
 
     vector<HWSampleSinkPtr> mySinks;
     vector<int> myTimeRunning;
@@ -436,7 +444,7 @@ void TestPump::stressTest(double myDuration) {
             << AudioBufferBase::getNumBuffersAllocated() << endl;
         cerr << ".";
         if (mySinks[i]->getState() == HWSampleSink::STOPPED) {
-            int myBufferSize = 16+int(1000.0*rand()/(RAND_MAX+1.0));
+            //int myBufferSize = 16+int(1000.0*rand()/(RAND_MAX+1.0));
             queueSineBuffers(mySinks[i], SF_F32, 512, 2, 
                     unsigned(440*(0.5+i/(float)numTestSounds)), 44100, 3, 0.1);
             mySinks[i]->play();

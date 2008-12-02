@@ -239,12 +239,12 @@ JSBool
 JSGlade::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
         case PROP_filename:
-			{
-				// using the c++ API crashed on Win32-dbg.
-				// don't know why, be using the C-API works
-				string myFilename = string(JSClassTraits<JSGlade::NATIVE>::getNativeOwner(cx, obj)->gobj()->filename);
-	            *vp = as_jsval(cx, myFilename);
-			}
+            {
+                // using the c++ API crashed on Win32-dbg.
+                // don't know why, be using the C-API works
+                string myFilename = string(JSClassTraits<JSGlade::NATIVE>::getNativeOwner(cx, obj)->gobj()->filename);
+                *vp = as_jsval(cx, myFilename);
+            }
             return JS_TRUE;
         default:
             JS_ReportError(cx,"JSRenderer::getProperty: index %d out of range", theID);

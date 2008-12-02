@@ -107,9 +107,9 @@ class JSSignal3 : public JSWrapper<sigc::signal3<R, P0, P1, P2>, asl::Ptr<sigc::
                 Glib::ustring myMethodName;
                 convertFrom(cx, argv[1], myMethodName);
 
-                SigC::Slot3<R, P0, P1, P2> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
+                sigc::slot3<R, P0, P1, P2> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
                     sigc::ptr_fun( & JSSignalAdapter3<R, P0, P1, P2>::on_signal ), cx, myTarget, myMethodName);
-                JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+                JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new sigc::connection);
 
                 *myConnection = myOwner->connect(mySlot);
 

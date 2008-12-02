@@ -9,7 +9,14 @@
 //============================================================================
 
 #include "PixelEncoding.h"
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixelformat.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace y60 {
 

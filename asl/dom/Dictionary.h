@@ -82,9 +82,9 @@ namespace dom {
             return _myList[theIndex]->_myName;
         }
         void binarize(asl::WriteableStream & theDest) {
-            theDest.appendUnsigned32(DictMagic);
+            theDest.appendUnsigned32(static_cast<asl::Unsigned32>(DictMagic));
             theDest.appendUnsigned(_myList.size());
-            for (int i = 0; i < _myList.size(); ++i) {
+            for (EntryList::size_type i = 0; i < _myList.size(); ++i) {
                 theDest.appendCountedString(_myList[i]->_myName);
             }
         }

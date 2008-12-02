@@ -24,11 +24,17 @@
 #if !defined(INCL_TESTTEXTUREDEFINITION)
 #define INCL_TESTTEXTUREDEFINITION
 
-#include "TextureDefinition.h"
-
 #include <asl/base/UnitTest.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "TextureDefinition.h"
 
 class TestTextureDefinition: public UnitTest {
 public:

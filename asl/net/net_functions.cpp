@@ -80,23 +80,19 @@ namespace asl {
     unsigned long from_dotted_address(const string & dottedAddress) {
         unsigned long myResultAddress = 0;
 
-        string::const_iterator it = dottedAddress.begin();
+        string::size_type idx = 0;
 
-        for (int i = 0; i < 4; ++i) {
-            string::const_iterator dotPos = find(it,dottedAddress.end(),'.');
+        for (int i = 0; i<4 && idx<dottedAddress.size(); ++i,++idx) {
+            const string::size_type dotPos = dottedAddress.find_first_of('.',idx);
+            const string& myPartString = dottedAddress.substr(idx,std::min(dotPos,dottedAddress.size())-idx);
             unsigned int myPart;
-            string myPartString = string(&(*it),dotPos-it) ;
             if (fromString(myPartString, myPart)) {
-
                 if (myPart > 255) {
                     return 0;
                 }
                 myResultAddress=myResultAddress | myPart<<((3-i)*8);
             }
-            it = dotPos;
-            if (it != dottedAddress.end()) {
-                ++it;
-            }
+            idx = dotPos;
         }
         return myResultAddress;
     }

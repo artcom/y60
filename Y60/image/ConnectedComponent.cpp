@@ -61,7 +61,7 @@ Blob::merge(BlobPtr otherBlob) {
 
 Vector2f
 Blob::center() {
-    Vector2f d(0.0, 0.0);
+    Vector2f d(0.0f, 0.0f);
     int c = 0;
     for(RunList::iterator r = _myRuns.begin(); r != _myRuns.end(); r++){
         d += (*r)->center();
@@ -148,7 +148,7 @@ BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_thres
     ComponentMap comps;
     const unsigned char *pixels = image->pixels().begin();
     int stride = image->width();
-    Vector2i size( image->width(), image->height());
+    Vector2i size( static_cast<int>(image->width()), static_cast<int>(image->height()) );
     RunList *runs1=new RunList();
     RunList *runs2=new RunList();
     RunList *tmp;

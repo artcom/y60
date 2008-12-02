@@ -339,8 +339,8 @@ NamedPipePolicy::onWriteCompleted(DWORD theError, DWORD theBytesTransferred, LPO
     DBT(*myHandle << " sent '" << string(&((*myHandle->outBuffer)[0]), theBytesTransferred) << "' Overlap@" << theOverlap << endl);
     if (theBytesTransferred < myHandle->outBuffer->size()) {
         // not everything was transferred, reinsert the rest of the buffer
-        char * myBufferStart = &((*myHandle->outBuffer)[0]);
-        myHandle->outBuffer->erase(myBufferStart, myBufferStart+theBytesTransferred);
+        myHandle->outBuffer->erase(myHandle->outBuffer->begin(), 
+                                   myHandle->outBuffer->begin() + theBytesTransferred);
     } else {
         myHandle->outBuffer = asl::Ptr<CharBuffer>(0);
     }

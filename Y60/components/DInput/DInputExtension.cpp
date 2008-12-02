@@ -222,9 +222,9 @@ DInputExtension::poll() {
                     if (myJEvent.dwOfs == DIJOFS_BUTTON(myButtonIndex)) {
                         Event::Type myType;
                         if (myJEvent.dwData > 127) {
-                            myType = Event::Type::BUTTON_DOWN;
+                            myType = Event::BUTTON_DOWN;
                         } else {
-                            myType = Event::Type::BUTTON_UP;
+                            myType = Event::BUTTON_UP;
                         }
                         curEvents.push_back(EventPtr(new ButtonEvent(myType, i, myButtonIndex)));
                     }

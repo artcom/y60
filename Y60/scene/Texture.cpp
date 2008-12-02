@@ -12,6 +12,9 @@
 
 #include <y60/base/IScene.h>
 #include <asl/dom/Field.h>
+#include <y60/base/IScene.h>
+#include <asl/dom/Field.h>
+#include <y60/base/IResourceManager.h>
 
 using namespace asl;
 using namespace std;
@@ -338,7 +341,7 @@ namespace y60 {
             }
 
             //_myImageNodeVersion = myImage->getNode().nodeVersion();
-            _myImageNodeVersion = myImage->getRasterValueNode()->nodeVersion();
+            _myImageNodeVersion = static_cast<unsigned>(myImage->getRasterValueNode()->nodeVersion());
         } 
 
         // perform actions

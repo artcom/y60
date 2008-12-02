@@ -62,6 +62,13 @@ public:
                 const char * mySourceFileName,
                 unsigned long mySourceLine,
                 bool myExpectedResult = true);
+    template< typename T >
+    void ensure(const T& myExpressionResult,
+                const char * myExpression,
+                const char * mySourceFileName,
+                unsigned long mySourceLine,
+                bool myExpectedResult = true)
+    {ensure(myExpressionResult!=0,myExpression,mySourceFileName,mySourceLine,myExpectedResult);}
 protected:
     virtual void setPassedCount(unsigned int passedTests);
     virtual void setFailedCount(unsigned int failedTests);

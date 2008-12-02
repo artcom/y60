@@ -35,7 +35,7 @@ using namespace std;
 using namespace dom;
 
 dom::NodePtr
-dom::NodeList::removeItem(int i) {
+dom::NodeList::removeItem(size_type i) {
 	if (i>=0 && i<size()) {
 		NodePtr myResult = item(i);
 		_myNodes.erase(_myNodes.begin()+i);
@@ -50,7 +50,7 @@ dom::NodeList::removeItem(int i) {
 
 void 
 dom::NodeList::clear() {
-	for (int i = 0; i < size();++i) {
+	for (size_type i = 0; i < size();++i) {
 	    if (_myNodes[i]->parentNode() == _myShell) {
 	        _myNodes[i]->reparent(0, 0);
 	    }
@@ -63,7 +63,7 @@ dom::NodeList::clear() {
 
 void 
 dom::NodeList::flush() {
-	for (int i = 0; i < size();++i) {
+	for (size_type i = 0; i < size();++i) {
 	    if (_myNodes[i]->parentNode() == _myShell) {
 	        _myNodes[i]->reparent(0, 0);
 	    }
@@ -77,7 +77,7 @@ dom::NodeList::NodeList(Node * theShell):_myShell(theShell) {
 };
 
 dom::NodeList::~NodeList() {
-	for (int i = 0; i < size();++i) {
+	for (size_type i = 0; i < size();++i) {
 	    if (_myNodes[i]->parentNode() == _myShell) {
 	        _myNodes[i]->reparent(0, 0);
 	    }
@@ -86,7 +86,7 @@ dom::NodeList::~NodeList() {
 
 void
 dom::NodeList::setVersion(unsigned long long theVersion) {
-    for (int i = 0; i < size();++i) {
+    for (size_type i = 0; i < size();++i) {
         _myNodes[i]->setVersion(theVersion);
     }
 }
@@ -95,18 +95,18 @@ dom::NodeList::NodeList(const NodeList & theOtherList, Node * theShell) : _myShe
 	_myNodes = theOtherList._myNodes;
 }
 
-int dom::NodeList::findIndex(const Node * theNode) const {
-	for (int i=0; i < length();++i) {
+dom::NodeList::size_type dom::NodeList::findIndex(const Node * theNode) const {
+	for (size_type i=0; i < length();++i) {
 		if (&(*item(i)) == theNode) {
 			return i;
 		}
 	}
-	return -1;
+	return static_cast<size_type>(-1);
 };
 
 bool
 dom::NodeList::findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theIndex) const {
-	for (int i=0; i < length();++i) {
+	for (size_type i=0; i < length();++i) {
         AC_TRACE << "NodeList::findByOffset i = "<<i<<", savepos = "<<item(i)->getSavePosition();
 		if (item(i)->getSavePosition() == myOffset) {
             theIndex = i;
@@ -118,7 +118,7 @@ dom::NodeList::findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theInd
 
 NodePtr
 dom::NodeList::nextSibling(const Node * theNode) {
-	int myIndex = findIndex(theNode);
+	size_type myIndex = findIndex(theNode);
 	if (myIndex >= 0 && myIndex+1 < length()) {
 		return item(myIndex+1);
 	}
@@ -127,7 +127,7 @@ dom::NodeList::nextSibling(const Node * theNode) {
 
 const NodePtr
 dom::NodeList::nextSibling(const Node * theNode) const {
-	int myIndex = findIndex(theNode);
+	size_type myIndex = findIndex(theNode);
 	if (myIndex >= 0 && myIndex+1 < length()) {
 		return item(myIndex+1);
 	}
@@ -135,7 +135,7 @@ dom::NodeList::nextSibling(const Node * theNode) const {
 }
 NodePtr
 dom::NodeList::previousSibling(const Node * theNode) {
-	int myIndex = findIndex(theNode);
+	size_type myIndex = findIndex(theNode);
 	if (myIndex >= 1 && myIndex < length()) {
 		return item(myIndex-1);
 	}
@@ -144,41 +144,41 @@ dom::NodeList::previousSibling(const Node * theNode) {
 
 const NodePtr
 dom::NodeList::previousSibling(const Node * theNode) const {
-	int myIndex = findIndex(theNode);
+	size_type myIndex = findIndex(theNode);
 	if (myIndex >= 1 && myIndex < length()) {
 		return item(myIndex-1);
 	}
 	return NodePtr(0);
 }
 
-Node & dom::NodeList::operator[](int i) {
+Node & dom::NodeList::operator[](size_type i) {
     return *item(i);
 }
-const Node & dom::NodeList::operator[](int i) const {
+const Node & dom::NodeList::operator[](size_type i) const {
     return *item(i);
 }
-NodePtr dom::NodeList::item(int i) {
+NodePtr dom::NodeList::item(size_type i) {
     if (i < 0 || i >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     return _myNodes[i];
 }
-const NodePtr dom::NodeList::item(int i) const {
+const NodePtr dom::NodeList::item(size_type i) const {
     if (i < 0 || i >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     return _myNodes[i];
 }
-int dom::NodeList::length() const {
+dom::NodeList::size_type dom::NodeList::length() const {
     return _myNodes.size();
 }
-int dom::NodeList::size() const {
+dom::NodeList::size_type dom::NodeList::size() const {
     return _myNodes.size();
 }
 
 void
 dom::NodeList::freeCaches() const {
-	for (int i = 0; i < size();++i) {
+	for (size_type i = 0; i < size();++i) {
 		_myNodes[i]->freeCaches();
 	}
 }
@@ -186,7 +186,7 @@ dom::NodeList::freeCaches() const {
 void 
 dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, unsigned long long theIncludeVersion) const {
 	theDest.appendUnsigned(size());
-	for (int i = 0; i < size();++i) {
+	for (size_type i = 0; i < size();++i) {
 		_myNodes[i]->binarize(theDest, theDict, theIncludeVersion);
 	}
 }
@@ -287,7 +287,7 @@ dom::NodeList::appendWithoutReparenting(NodePtr theNewNode) {
     return theNewNode;
 }
 
-void dom::NodeList::insert(int theIndex, NodePtr theNewNode) {
+void dom::NodeList::insert(size_type theIndex, NodePtr theNewNode) {
     if (theIndex < 0 || theIndex >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
@@ -298,7 +298,7 @@ void dom::NodeList::insert(int theIndex, NodePtr theNewNode) {
     theNewNode->self(theNewNode);
 }
 
-void dom::NodeList::setItem(int theIndex, NodePtr theNewItem) {
+void dom::NodeList::setItem(size_type theIndex, NodePtr theNewItem) {
     _myNodes[theIndex] = theNewItem;
     if (_myShell) {
 	    theNewItem->reparent(_myShell, _myShell);
@@ -312,7 +312,7 @@ void dom::NodeList::resize(asl::AC_SIZE_TYPE newSize) {
 void 
 dom::NodeList::reparent(Node * theNewParent, Node * theTopNewParent) {
     _myShell = theNewParent;
-    for (int i = 0; i < _myNodes.size(); ++i) {
+    for (_myNodeListType::size_type i = 0; i < _myNodes.size(); ++i) {
 		_myNodes[i]->reparent(theNewParent, theTopNewParent);
     }
 }
@@ -321,10 +321,10 @@ dom::NodeList::reparent(Node * theNewParent, Node * theTopNewParent) {
 
 NamedNodeMap::NamedNodeMap(Node * theShell) : NodeList(theShell) {}
 NamedNodeMap::NamedNodeMap(const NamedNodeMap & other, Node * theShell) : NodeList(other, theShell) {}
-Node & NamedNodeMap::operator[](int i) {
+Node & NamedNodeMap::operator[](size_type i) {
     return NodeList::operator[](i);
 }
-const Node & NamedNodeMap::operator[](int i) const {
+const Node & NamedNodeMap::operator[](size_type i) const {
     return NodeList::operator[](i);
 }
 Node & NamedNodeMap::operator[](const DOMString & name) {
@@ -335,18 +335,18 @@ const Node & NamedNodeMap::operator[](const DOMString & name) const {
     return *getNamedItem(name);
 }
 NodePtr NamedNodeMap::getNamedItem(const DOMString & name) {
-	int i = findNthNodeNamed(name,0,*this);
+	size_type i = findNthNodeNamed(name,0,*this);
 	if (i<size()) return item(i);
 	return NodePtr(0);
 }
 const NodePtr NamedNodeMap::getNamedItem(const DOMString & name) const {
-	int i = findNthNodeNamed(name,0,*this);
+	size_type i = findNthNodeNamed(name,0,*this);
 	if (i<size()) return item(i);
 	return NodePtr(0);
 }
 
 NodePtr NamedNodeMap::setNamedItem(NodePtr node) {
-	int i = findNthNodeNamed(node->nodeName(),0,*this);
+	size_type i = findNthNodeNamed(node->nodeName(),0,*this);
 	if (i<size()) {
 		setItem(i, node);
 	} else {
@@ -355,10 +355,10 @@ NodePtr NamedNodeMap::setNamedItem(NodePtr node) {
 	return node;
 }
 
-int
+dom::NamedNodeMap::size_type
 dom::NamedNodeMap::countNodesNamed(const String& name, const dom::NodeList & nodes) {
-    int counter = 0;
-    for (int i = 0; i < nodes.size(); ++i) {
+    size_type counter = 0;
+    for (size_type i = 0; i < nodes.size(); ++i) {
 		if (name == nodes[i].nodeName() && nodes[i].nodeType() != dom::Node::DOCUMENT_TYPE_NODE) {
             ++counter;
         }
@@ -366,11 +366,11 @@ dom::NamedNodeMap::countNodesNamed(const String& name, const dom::NodeList & nod
     return counter;
 }
 
-int
-dom::NamedNodeMap::findNthNodeNamed(const String& name, int n, const dom::NodeList & nodes)
+dom::NamedNodeMap::size_type
+dom::NamedNodeMap::findNthNodeNamed(const String& name, size_type n, const dom::NodeList & nodes)
 {
-    int counter = 0;
-    for (int i = 0; i < nodes.size(); ++i) {
+    size_type counter = 0;
+    for (size_type i = 0; i < nodes.size(); ++i) {
         if (name == nodes[i].nodeName() && nodes[i].nodeType() != dom::Node::DOCUMENT_TYPE_NODE) {
             if (counter == n) {
                 return i;
@@ -385,7 +385,7 @@ dom::NamedNodeMap::findNthNodeNamed(const String& name, int n, const dom::NodeLi
 
 NodePtr
 dom::NamedNodeMap::append(NodePtr theNewNode) {
-	int i = findNthNodeNamed(theNewNode->nodeName(),0,*this);
+	size_type i = findNthNodeNamed(theNewNode->nodeName(),0,*this);
 	if (i<size()) {
 		std::string errorMessage;
 		errorMessage += "attribute with name '";
@@ -398,7 +398,7 @@ dom::NamedNodeMap::append(NodePtr theNewNode) {
 
 NodePtr
 dom::NamedNodeMap::appendWithoutReparenting(NodePtr theNewNode) {
-	int i = findNthNodeNamed(theNewNode->nodeName(),0,*this);
+	size_type i = findNthNodeNamed(theNewNode->nodeName(),0,*this);
 	if (i<size()) {
 		std::string errorMessage;
 		errorMessage += "attribute with name '";
@@ -409,8 +409,8 @@ dom::NamedNodeMap::appendWithoutReparenting(NodePtr theNewNode) {
     return NodeList::appendWithoutReparenting(theNewNode);
 }
 
-void dom::NamedNodeMap::setItem(int theIndex, NodePtr theNewItem) {
-	int i = findNthNodeNamed(theNewItem->nodeName(),0,*this);
+void dom::NamedNodeMap::setItem(size_type theIndex, NodePtr theNewItem) {
+	size_type i = findNthNodeNamed(theNewItem->nodeName(),0,*this);
 	if (i<size() && i != theIndex) {
 		std::string errorMessage;
 		errorMessage += "attribute with name '";
@@ -421,8 +421,8 @@ void dom::NamedNodeMap::setItem(int theIndex, NodePtr theNewItem) {
     NodeList::setItem(theIndex, theNewItem);
 }
 
-void dom::NamedNodeMap::insert(int theIndex, NodePtr theNewItem) {
-	int i = findNthNodeNamed(theNewItem->nodeName(),0,*this);
+void dom::NamedNodeMap::insert(size_type theIndex, NodePtr theNewItem) {
+	size_type i = findNthNodeNamed(theNewItem->nodeName(),0,*this);
 	if (i<size() && i != theIndex) {
 		std::string errorMessage;
 		errorMessage += "attribute with name '";
@@ -464,11 +464,11 @@ dom::TypedNamedNodeMap::appendWithoutReparenting(NodePtr theNewNode) {
     return NamedNodeMap::appendWithoutReparenting(theNewNode);
 }
 
-void dom::TypedNamedNodeMap::setItem(int theIndex, NodePtr theNewItem) {
+void dom::TypedNamedNodeMap::setItem(size_type theIndex, NodePtr theNewItem) {
     checkType(theNewItem);
     NamedNodeMap::setItem(theIndex, theNewItem);
 }
-void dom::TypedNamedNodeMap::insert(int theIndex, NodePtr theNewItem) {
+void dom::TypedNamedNodeMap::insert(size_type theIndex, NodePtr theNewItem) {
     checkType(theNewItem);
     NamedNodeMap::insert(theIndex, theNewItem);
 }

@@ -65,7 +65,7 @@ Schema::collectDeclarations(const NodePtr theNode,
 		}
 	}
 	if (theDepth < theMaxDepth || theMaxDepth<0) {
-		for (int i = 0; i < theNode->childNodes().length(); ++i) {
+		for (NodeList::size_type i = 0; i < theNode->childNodes().length(); ++i) {
 			collectDeclarations(theNode->childNodes().item(i),
 				theNodeName, theAttributeName, theDepth+1, theMaxDepth, theResults, theNSPrefix);
 		}
@@ -102,7 +102,7 @@ Schema::collectSubstitutionGroups(const NodePtr theNode,
 		}
 	}
 	if (theDepth < theMaxDepth || theMaxDepth<0) {
-		for (int i = 0; i < theNode->childNodes().length(); ++i) {
+		for (NodeList::size_type i = 0; i < theNode->childNodes().length(); ++i) {
 			collectSubstitutionGroups(theNode->childNodes().item(i),
 				theNodeName, theGroupAttributeName, theNameAttributeName, theDepth+1, theMaxDepth, theResults, theNSPrefix);
 		}
@@ -132,7 +132,7 @@ Schema::checkDeclarationReferences(const NodePtr theNode,
 		}
 	}
 	if (theDepth < theMaxDepth || theMaxDepth<0) {
-		for (int i = 0; i < theNode->childNodes().length(); ++i) {
+		for (NodeList::size_type i = 0; i < theNode->childNodes().length(); ++i) {
 			checkDeclarationReferences(theNode->childNodes().item(i),
 				theElementName,theAttributeName, theDepth+1, theMaxDepth, theLookupMap, theBuiltInMap);
 		}
@@ -365,7 +365,7 @@ dom::Schema::tryFindElementDeclaration(const DOMString & theParentElementName,
 			// for a child with our name
 			// TODO: check our order and restrictions here, for now we just see if our element
 			//       is mentioned in the sequence at all
-            for (int i = 0; i < myModelGroup->childNodes().length();++i) {
+            for (NodeList::size_type i = 0; i < myModelGroup->childNodes().length();++i) {
 			    NodePtr myDecl = myModelGroup->childNode(i);
                 DB(AC_TRACE << "Schema::tryFindElementDeclaration: check modelgroup child="<<*myDecl << endl;)
 				if (myDecl->nodeName() == XS_ELEMENT) {

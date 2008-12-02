@@ -23,12 +23,18 @@
 
 #include "LayerDefinition.h"
 
+#include <assert.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/Filter/pl2passscale.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
-
-#include <assert.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 
@@ -101,9 +107,9 @@ void LayerDefinition::calcAvgColor () {
         }
      }
     int bitmapSize = _myBmp->GetHeight()*_myBmp->GetWidth();
-    _myAvgColor.Set ((tempRedColor/bitmapSize), 
-                     (tempGreenColor/bitmapSize), 
-                     (tempBlueColor/bitmapSize), 255);
+    _myAvgColor.Set ( static_cast<PLBYTE>(tempRedColor/bitmapSize), 
+                      static_cast<PLBYTE>(tempGreenColor/bitmapSize), 
+                      static_cast<PLBYTE>(tempBlueColor/bitmapSize), 255 );
     _myAvgColor = _myAvgColor*_myOpacity;
 
 }

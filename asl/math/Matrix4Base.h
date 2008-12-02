@@ -512,15 +512,15 @@ namespace asl {
 
         Angle getXRotation() const {
             throw NotYetImplemented(JUST_FILE_LINE);
-            return 0.0;
+            //return 0.0;
         }
         Angle getYRotation() const {
             throw NotYetImplemented(JUST_FILE_LINE);
-            return 0.0;
+            //return 0.0;
         }
         Angle getZRotation() const {
             throw NotYetImplemented(JUST_FILE_LINE);
-            return 0.0;
+            //return 0.0;
         }
         // GEMS PG 466
         // find axis and angle of rotation from a given matrix

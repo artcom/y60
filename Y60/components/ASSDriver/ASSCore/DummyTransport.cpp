@@ -66,7 +66,7 @@ void DummyTransport::readData() {
 
     _myTmpBuffer.insert( _myTmpBuffer.end(), _myStatusLine.begin(), _myStatusLine.end() );
     
-    for (unsigned i = 1; i <= _myGridHeight; i++) {
+    for (unsigned char i = 1; i <= _myGridHeight; i++) {
         _myTmpBuffer.push_back(255);
         _myTmpBuffer.push_back(i);
 

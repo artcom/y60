@@ -436,7 +436,7 @@ namespace y60 {
     void 
     FrameConveyor::initResample(int theNumInputChannels, int theInputSampleRate) {
         // TODO: Convert num. of channels here?
-        if (theInputSampleRate != Pump::get().getNativeSampleRate()) {
+        if (theInputSampleRate != static_cast<int>(Pump::get().getNativeSampleRate())) {
             _myResampleContext = audio_resample_init(theNumInputChannels, theNumInputChannels,
                     Pump::get().getNativeSampleRate(), theInputSampleRate);
         }

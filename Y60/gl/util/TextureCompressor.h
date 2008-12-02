@@ -24,14 +24,22 @@
 #ifndef AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 #define AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 
+#include <stdio.h>
+
 #include <y60/image/PixelEncoding.h>
 
 #include <asl/base/Block.h>
 #include <asl/base/Exception.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <stdio.h>
 namespace y60 {
 
     DEFINE_EXCEPTION(GLTextureCompressionException, asl::Exception);

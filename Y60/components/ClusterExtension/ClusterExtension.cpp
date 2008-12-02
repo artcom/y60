@@ -517,6 +517,7 @@ ClusterExtension :: handle(AbstractRenderWindow * theWindow, y60::EventPtr theEv
 void
 ClusterExtension::onKey(y60::Event & theEvent) {
     y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
+    (void)myKeyEvent;
     DB(
         cerr << "Key Event" << endl;
     cerr << "    string: " << myKeyEvent.keyString << endl;

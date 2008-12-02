@@ -113,7 +113,7 @@ getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     cairo_surface_t *myTarget = cairo_get_target(myContext);
 
     *rval = as_jsval(cx, myTarget);
-    
+
     return checkForErrors(cx, myContext);
 }
 
@@ -1198,8 +1198,8 @@ userToDevice(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     cairo_user_to_device(myContext, &myX, &myY);
 
     Vector2f myResult;
-    myResult[0] = myX;
-    myResult[1] = myY;
+    myResult[0] = static_cast<float>(myX);
+    myResult[1] = static_cast<float>(myY);
 
     *rval = as_jsval(cx, myResult);
 
@@ -1225,8 +1225,8 @@ userToDeviceDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     cairo_user_to_device_distance(myContext, &myX, &myY);
 
     Vector2f myResult;
-    myResult[0] = myX;
-    myResult[1] = myY;
+    myResult[0] = static_cast<float>(myX);
+    myResult[1] = static_cast<float>(myY);
 
     *rval = as_jsval(cx, myResult);
 
@@ -1252,8 +1252,8 @@ deviceToUser(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     cairo_device_to_user(myContext, &myX, &myY);
 
     Vector2f myResult;
-    myResult[0] = myX;
-    myResult[1] = myY;
+    myResult[0] = static_cast<float>(myX);
+    myResult[1] = static_cast<float>(myY);
 
     *rval = as_jsval(cx, myResult);
 
@@ -1279,8 +1279,8 @@ deviceToUserDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     cairo_device_to_user(myContext, &myX, &myY);
 
     Vector2f myResult;
-    myResult[0] = myX;
-    myResult[1] = myY;
+    myResult[0] = static_cast<float>(myX);
+    myResult[1] = static_cast<float>(myY);
 
     *rval = as_jsval(cx, myResult);
 

@@ -47,7 +47,7 @@ JSDomEventListener::handleEvent(dom::EventPtr theEvent) {
     if (myGenericEvent) {
         jsval argv[1], rval;
         argv[0] = as_jsval(_myJSContext, theEvent);
-        JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
+        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
     } else {
         AC_ERROR << "JSDomEventListener::handleEvent: not a GenericJSDomEvent" << std::endl;
     }
@@ -213,8 +213,8 @@ JSDomEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             //return Method<NATIVE>::call(&NATIVE::isOpen, cx, obj, 1, vp, &dummy);
             return JS_FALSE;
       //  default:
-            JS_ReportError(cx,"JSDomEvent::setPropertySwitch: index %d out of range", theID);
-            return JS_FALSE;
+            //JS_ReportError(cx,"JSDomEvent::setPropertySwitch: index %d out of range", theID);
+            //return JS_FALSE;
     //}
 }
 

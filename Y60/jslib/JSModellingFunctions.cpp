@@ -793,11 +793,11 @@ CreatePhongMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
             }
         }
         
-        bool myTransparencyFlag;
+        bool myTransparencyFlag = false;
         if (argc > 3) {
             convertFrom(cx, argv[3], myTransparencyFlag);
         }
-        bool mySpriteFlag;
+        bool mySpriteFlag = false;
         if (argc > 4) {
             convertFrom(cx, argv[4], mySpriteFlag);
         }
@@ -875,15 +875,15 @@ CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
             }
         }
         
-        bool myTransparencyFlag;
+        bool myTransparencyFlag = false;
         if (argc > 4) {
             convertFrom(cx, argv[4], myTransparencyFlag);
         }
-        bool mySpriteFlag;
+        bool mySpriteFlag = false;
         if (argc > 5) {
             convertFrom(cx, argv[5], mySpriteFlag);
         }
-        unsigned myDepth;
+        unsigned myDepth = 0;
         if (argc > 6) {
             convertFrom(cx, argv[6], myDepth);
         }
@@ -954,11 +954,11 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         if (argc > 2) {
             convertFrom(cx, argv[2], myName);
         }
-        bool myTransparencyFlag;
+        bool myTransparencyFlag = false;
         if (argc > 3) {
             convertFrom(cx, argv[3], myTransparencyFlag);
         }
-        bool mySpriteFlag;
+        bool mySpriteFlag = false;
         if (argc > 4) {
             convertFrom(cx, argv[4], mySpriteFlag);
         }
@@ -966,7 +966,7 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         if (argc > 5) {
             convertFrom(cx, argv[5], myColor);
         }
-        unsigned myDepth;
+        unsigned myDepth = 0;
         if (argc > 6) {
             convertFrom(cx, argv[6], myDepth);
             if (myImageNode) {

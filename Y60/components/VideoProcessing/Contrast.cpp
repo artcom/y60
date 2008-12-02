@@ -55,24 +55,27 @@ namespace y60 {
     void 
     Contrast::updateLookupTable() {
         _myLookupTable.clear();
-        
-        unsigned char myRange = _myUpper -_myLower;
-        
-        for (unsigned int i=0; i<_myLower; i++) {
+
+        const unsigned char myUpper = static_cast<unsigned char>(_myUpper);
+        const unsigned char myLower = static_cast<unsigned char>(_myLower);
+
+        unsigned char myRange = static_cast<asl::pchar>(myUpper - myLower);
+
+        for (unsigned char i=0; i<_myLower; i++) {
             _myLookupTable.push_back(0);
         }
-        for (unsigned int i=_myLower, value = 1; i<_myUpper; i++, value++) {
+        for (unsigned char i=myLower, value = 1; i<myUpper; i++, value++) {
             unsigned char myValue = value * 255 / myRange;
             _myLookupTable.push_back(myValue);
         }
-        for (unsigned int i=_myUpper; i<256; i++) {
+        for (unsigned char i=myUpper; i<256; i++) {
             _myLookupTable.push_back(255);
         }
     }
 
-	void 
+    void 
     Contrast::onFrame(double t) {
-        unsigned myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {

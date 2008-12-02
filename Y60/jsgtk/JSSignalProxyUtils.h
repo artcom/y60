@@ -19,7 +19,14 @@
 #ifndef _Y60_ACGTKSHELL_JSSIGNAL_PROXY_UTILS_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSIGNAL_PROXY_UTILS_INCLUDED_
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512)
+#endif //defined(_MSC_VER)
 #include <sigc++/connection.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 #include <typeinfo>
 #include <string>
 

@@ -75,11 +75,11 @@ namespace jslib {
     // getproperty handling
     JSBool
     JSOscReceiver::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-        default:
+        //switch (theID) {
+        //default:
             JS_ReportError(cx,"JSOscReceiver::getProperty: index %d out of range", theID);
             return JS_FALSE;
-        }
+        //}
     }
 
     // setproperty handling
@@ -101,21 +101,18 @@ namespace jslib {
                 return JS_FALSE;
             }
 
-            int myPort;
+            OWNERPTR myNewNative;
             if (argc == 1) {
+                int myPort;
                 if (!convertFrom(cx, argv[0], myPort)) {
                     JS_ReportError(cx, "JSOscReceiver::Constructor(): argument #1 must be the port as integer");
                     return JS_FALSE;
                 }
-            }
-
-            OWNERPTR myNewNative;
-            if (argc != 1) {
+                myNewNative = OscReceiverPtr(new OscReceiver(myPort));
+            } else {
                 // Construct empty OscReceiver that will be filled by copy Construct()
                 AC_PRINT << "JSOscReceiver::Constructor: empty";
                 myNewNative = OWNERPTR(0);
-            } else {
-                myNewNative = OscReceiverPtr(new OscReceiver(myPort));
             }
 
             JSOscReceiver * myNewObject = new JSOscReceiver(myNewNative, &(*myNewNative));

@@ -57,15 +57,15 @@ class GeometryUtilsUnitTest : public UnitTest {
 			// test vertexnormal generation
 			VertexNormalBuilder<float> myBuilder;
 			Vector3f myOrigin(0,1,0);
-			long myOriginIndex = myBuilder.addVertex(myOrigin);
-			long myVertex1 = myBuilder.addVertex(Vector3f(1,0,-1));
-			long myVertex2 = myBuilder.addVertex(Vector3f(0,0,-1));
-			long myVertex3 = myBuilder.addVertex(Vector3f(1,0,0));
-			long myVertex4 = myBuilder.addVertex(Vector3f(1,0,1));
-			long myVertex5 = myBuilder.addVertex(Vector3f(0,0,1));
-			long myVertex6 = myBuilder.addVertex(Vector3f(-1,0,1));
-			long myVertex7 = myBuilder.addVertex(Vector3f(-1,0,0));
-			long myVertex8 = myBuilder.addVertex(Vector3f(-1,0,-1));
+			long myOriginIndex = myBuilder.addVertex(myOrigin) - 1;
+			long myVertex1 = myBuilder.addVertex(Vector3f(1,0,-1)) - 1;
+			long myVertex2 = myBuilder.addVertex(Vector3f(0,0,-1)) - 1;
+			long myVertex3 = myBuilder.addVertex(Vector3f(1,0,0)) - 1;
+			long myVertex4 = myBuilder.addVertex(Vector3f(1,0,1)) - 1;
+			long myVertex5 = myBuilder.addVertex(Vector3f(0,0,1)) - 1;
+			long myVertex6 = myBuilder.addVertex(Vector3f(-1,0,1)) - 1;
+			long myVertex7 = myBuilder.addVertex(Vector3f(-1,0,0)) - 1;
+			long myVertex8 = myBuilder.addVertex(Vector3f(-1,0,-1)) - 1;
 
 			myBuilder.addFace(myOriginIndex, myVertex1, myVertex2); // poly 1
 			myBuilder.addFace(myOriginIndex, myVertex3, myVertex1); // poly 2
@@ -122,7 +122,7 @@ class GeometryUtilsUnitTest : public UnitTest {
                 
                 
                 double myVolume = calculatePolyhedraVolume(myCube);
-                double myRealVolume = 1;  
+                //double myRealVolume = 1;  
                 
                 // cerr << myVolume << " - " << myRealVolume << endl;
                 ENSURE_MSG(almostEqual(myVolume, 1), "calculatePolyhedraVolume");

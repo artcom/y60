@@ -297,11 +297,11 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myPower = getSetting(theSettings, "power", _myPower);
     _myGamma = getSetting(theSettings, "gamma", _myGamma);
 
-    _myPreGridFlag = (int) getSetting(theSettings, "preGridFlag", (int) _myPreGridFlag);
-    _myPostGridFlag = (int) getSetting(theSettings, "postGridFlag", (int) _myPostGridFlag);
-    _myBlendingFlag = (int) getSetting(theSettings, "blendingFlag", (int) _myBlendingFlag);
-    _myBlackLevelFlag = (int) getSetting(theSettings, "blacklevelFlag", (int) _myBlackLevelFlag);
-    _myCopyFrameBufferFlag = (int) getSetting(theSettings, "copyFrameBufferFlag", (int) _myCopyFrameBufferFlag);
+    _myPreGridFlag = 0 != getSetting(theSettings, "preGridFlag", int(_myPreGridFlag));
+    _myPostGridFlag = 0 != getSetting(theSettings, "postGridFlag", int(_myPostGridFlag));
+    _myBlendingFlag = 0 != getSetting(theSettings, "blendingFlag", int(_myBlendingFlag));
+    _myBlackLevelFlag = 0 != getSetting(theSettings, "blacklevelFlag", int(_myBlackLevelFlag));
+    _myCopyFrameBufferFlag = 0 != getSetting(theSettings, "copyFrameBufferFlag", int(_myCopyFrameBufferFlag));
     _myFrameBufferArea = getSetting(theSettings, "frameBufferArea", _myFrameBufferArea);
     
 }
@@ -511,7 +511,7 @@ EdgeBlender::renderBlending() {
 void
 EdgeBlender::preRender() {
     // disable all texture units except the first
-    for (unsigned i = 1; i < _myMaxTexUnits; ++i) {
+    for (int i = 1; i < _myMaxTexUnits; ++i) {
         glActiveTexture(GL_TEXTURE0_ARB + i);
         glDisable(GL_TEXTURE_2D);
     }

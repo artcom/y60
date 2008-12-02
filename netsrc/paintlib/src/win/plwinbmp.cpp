@@ -27,6 +27,10 @@
 
 #include <stdio.h>
 
+#include <algorithm> // min/max
+
+using std::min;
+using std::max;
 
 PLWinBmp::PLWinBmp ()
   : PLBmp(),

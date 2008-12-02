@@ -100,7 +100,7 @@ namespace y60 {
 
     void
     ShaderLibrary::reload() {
-        for (int i = 0; i < _myShaders.size(); ++i) {
+        for (GLShaderVector::size_type i = 0; i < _myShaders.size(); ++i) {
             if (_myShaders[i]->isLoaded()) {
                 _myShaders[i]->unload();
                 _myShaders[i]->load(*this);
@@ -145,10 +145,10 @@ namespace y60 {
 
         AC_INFO << "Engine wants vertex profile '" << _myVertexProfileName << "', fragment profile '" << _myFragmentProfileName << "'";
 
-        int myVertexShaderProfile = asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
-        int myFragmentShaderProfile = asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
+        /*int myVertexShaderProfile =*/ asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
+        /*int myFragmentShaderProfile =*/ asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
 
-        for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
+        for (NodeList::size_type i = 0; i < theNode->childNodesLength("shader"); i++) {
             const dom::NodePtr theShaderNode = theNode->childNode("shader", i);
             GLShaderPtr myGLShader(0);
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
@@ -194,9 +194,9 @@ namespace y60 {
     IShaderPtr
     ShaderLibrary::findShader(MaterialBasePtr theMaterial) {
         DB(AC_DEBUG << "ShaderLibrary::findShader for material: " << theMaterial->getNode());
-		// we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
+        // we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
 
-		MaterialRequirementFacadePtr myReqFacade = theMaterial->getChild<MaterialRequirementTag>();
+        MaterialRequirementFacadePtr myReqFacade = theMaterial->getChild<MaterialRequirementTag>();
         Facade::PropertyMap & myRequirementMap = myReqFacade->getProperties();
         vector<ShaderScore> myScoreBoard(_myShaders.size());
 
@@ -205,27 +205,27 @@ namespace y60 {
 
         Facade::PropertyMap::iterator myIter = myRequirementMap.begin();
         for (; myIter != myRequirementMap.end(); myIter++) {
-			const NodePtr myRequirementNode = myIter->second;
+            const NodePtr myRequirementNode = myIter->second;
             const std::string & myRequiredFeatureClass = myIter->first;
             VectorOfRankedFeature myRequiredFeature = myRequirementNode->nodeValueAs<VectorOfRankedFeature>();
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
             AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << asl::as_string(myRequiredFeature) << endl;
-            for (int j = 0; j < myRequiredFeature.size(); j++) {
+            for (VectorOfRankedFeature::size_type j = 0; j < myRequiredFeature.size(); j++) {
                 const VectorOfString & myRequiredFeatureCombo = myRequiredFeature[j]._myFeature;
 
-                for (int i = 0 ; i < _myShaders.size(); i++) {
+                for (GLShaderVector::size_type i = 0 ; i < _myShaders.size(); i++) {
                     GLShaderPtr myGLShader = _myShaders[i];
-					GLShader::ShaderMatch myShaderMatchResult = myGLShader->matches(myRequiredFeatureClass, myRequiredFeatureCombo);
-					if (myShaderMatchResult != GLShader::NO_MATCH) {
+                    GLShader::ShaderMatch myShaderMatchResult = myGLShader->matches(myRequiredFeatureClass, myRequiredFeatureCombo);
+                    if (myShaderMatchResult != GLShader::NO_MATCH) {
                         DB(AC_DEBUG << "Match: Shader '"<<myGLShader->getName()<<"' matches "<< asl::as_string(myRequiredFeatureCombo) << " in class '"<<asl::as_string(myRequiredFeatureClass)<<"'"<<endl);
                         myScoreBoard[i].featurehits++;
                         myScoreBoard[i].points += (myGLShader->getCosts()) == 0 ?
-                                                  0.0f : ( myRequiredFeature[j]._myRanking /
-                                                           myGLShader->getCosts());
-						// if the shader has a full match add another score point
-						// wildcard match will have a lower score (vs)
-						myScoreBoard[i].points += myShaderMatchResult == GLShader::FULL_MATCH ? 1 : 0;
+                            0.0f : ( myRequiredFeature[j]._myRanking /
+                            myGLShader->getCosts());
+                        // if the shader has a full match add another score point
+                        // wildcard match will have a lower score (vs)
+                        myScoreBoard[i].points += myShaderMatchResult == GLShader::FULL_MATCH ? 1 : 0;
                         oneShaderCanHandleMaterial = true;
 
                     } else {
@@ -233,7 +233,7 @@ namespace y60 {
                         if ( myRequiredFeatureCombo.size() == 1 &&
                             myRequiredFeatureCombo[0] == FEATURE_DROPPED) {
                                 myFeatureCanBedropped = true;
-                            }
+                        }
                     }
                 }
             }
@@ -250,20 +250,20 @@ namespace y60 {
         }
 
         // remove all the dropped features
-        for (int i = 0; i <  myDropRequirements.size(); i++ ) {
+        for (vector<string>::size_type i = 0; i <  myDropRequirements.size(); i++ ) {
             const string & myFeatureToDrop = myDropRequirements[i];
             Facade::PropertyMap::iterator it = myRequirementMap.find(myFeatureToDrop);
-			if (it != myRequirementMap.end()) {
+            if (it != myRequirementMap.end()) {
                 AC_WARNING << "### WARNING Dropping feature: " <<  myFeatureToDrop
                     << " of material: " << theMaterial->get<NameTag>() << endl;
-				myRequirementMap.erase(it);
-			}
+                myRequirementMap.erase(it);
+            }
         }
         // find the shader that supports all features required (the score equals the feature count)
         // implement a magic algorithm to find the best shader that serves the requirements
             
         AC_DEBUG << "---- Shader search rubberpoint scoreboard for material: " << theMaterial->get<NameTag>() << " ----" << endl;
-        for (int i = 0; i <myScoreBoard.size(); i++ )
+        for (vector<ShaderScore>::size_type i = 0; i <myScoreBoard.size(); i++ )
         {
             const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
             bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
@@ -279,7 +279,7 @@ namespace y60 {
 
         GLShaderPtr myLeadingShader(0);
         float myMaxPoints = 0.0;
-        for (int i = 0; i < myScoreBoard.size(); i++ ) {
+        for (vector<ShaderScore>::size_type i = 0; i < myScoreBoard.size(); i++ ) {
             const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
             // all material requirements must be matched with the shaders feature
             bool matchAllMaterialRequirements = myScoreBoard[i].featurehits == myRequirementMap.size();

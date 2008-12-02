@@ -136,7 +136,7 @@ namespace asl {
         int myNewesindex = -1;
         time_t myHighestTimeStamp = 0;
         vector<int> myFilesToDelete;
-        for (int myFileIndex = 0; myFileIndex != myFiles.size(); myFileIndex++) {
+        for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFiles.size(); myFileIndex++) {
             string myFilename = myFiles[myFileIndex];//getDirectoryPart(_myOutputFilename) + myFiles[myFileIndex];
             string mySearchString(removeExtension(_myOutputFilename) + "logarchive_" );                    
             size_t myPos = myFilename.rfind(mySearchString.c_str() ,0, mySearchString.size());
@@ -149,7 +149,7 @@ namespace asl {
                 myFilesToDelete.push_back(myFileIndex);
             }
         }
-        for (int myFileIndex = 0; myFileIndex != myFilesToDelete.size(); myFileIndex++) {
+        for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFilesToDelete.size(); myFileIndex++) {
             if (myFilesToDelete[myFileIndex] != myNewesindex ) {
                 deleteFile(getDirectoryPart(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);                        
             } else {

@@ -68,7 +68,7 @@ public:
 		ENSURE(readFile(testFileName,fromFile));
 		ENSURE(fromFile == testContent);  
 		ENSURE(fileExists(testFileName));
-		ENSURE(getFileSize(testFileName) == testContent.size());
+        ENSURE( static_cast<asl::AC_SIZE_TYPE>(getFileSize(testFileName)) == testContent.size());
         
         {
             ConstMappedBlock myBlock(testFileName);
@@ -86,7 +86,7 @@ public:
 			WriteableMappedBlock myWriteableBlock(otherTestFileName);
 			ENSURE(testContent == myWriteableBlock);
 			otherContent.resize(testContent.size());
-			for (int i = 0; i< testContent.size(); ++i) {
+            for (asl::ReadableBlock::size_type i = 0; i< testContent.size(); ++i) {
 				myWriteableBlock[i] = 'A' + i%26;
 				otherContent[i] = myWriteableBlock[i];
 			}

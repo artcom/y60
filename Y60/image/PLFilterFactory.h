@@ -53,12 +53,14 @@ fillrect        PLPoint min, PLPoint max, const PixelC& Color
 #ifndef _PAINTLIB_FILTER_FACTORY_INCLUDED_
 #define _PAINTLIB_FILTER_FACTORY_INCLUDED_
 
-#include <y60/base/typedefs.h>
+#include <map>
+#include <vector>
+
 #include <asl/base/Ptr.h>
 #include <asl/base/Singleton.h>
 #include <asl/base/Exception.h>
-#include <map>
-#include <vector>
+
+#include <y60/base/typedefs.h>
 
 class PLFilter;
 

@@ -46,7 +46,6 @@ public:
         ASSURE(2 * 2 == 4);
         SUCCESS("AssurePolicy::Ignore true expression");
         ASSURE(2 * 2 == 5);
-        int myFooBar = 5;
         SUCCESS("AssurePolicy::Ignore false expression");
         ASSURE(isBigger(0,23));
         SUCCESS("Testing function call within ASSURE()");

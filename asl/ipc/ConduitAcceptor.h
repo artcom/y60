@@ -124,7 +124,7 @@ class ConduitAcceptor {
        
         void stopAllServers() {
             DB(AC_TRACE << "ACCEPTOR: stopping all servers\n");
-			int myServerCount = _myServers.size();
+			//int myServerCount = _myServers.size();
             for (typename ServerList::iterator i = _myServers.begin(); i != _myServers.end(); ++i) {
                 (*i)->stop();
             }
@@ -157,7 +157,7 @@ class ConduitAcceptor {
             DB(AC_TRACE << "ACCEPTOR: Thread:: init" << std::endl);
             ConduitAcceptor<POLICY> * mySelf = 
                 reinterpret_cast<ConduitAcceptor<POLICY>*>(theThisPointer);
-            while (1) {
+            for(;;) {
                 try {
                     pthread_testcancel();
                     mySelf->processNewConnections(100);

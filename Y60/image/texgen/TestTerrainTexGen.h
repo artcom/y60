@@ -24,14 +24,20 @@
 #if !defined(INCL_TESTFILTERTEXGEN)
 #define INCL_TESTFILTERTEXGEN
 
-#include "TerrainTexGen.h"
-#include "TextureDefinition.h"
+#include <vector>
 
 #include <asl/base/UnitTest.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
-#include <vector>
+#include "TerrainTexGen.h"
+#include "TextureDefinition.h"
 
 class TestTerrainTexGen: public UnitTest {
 public:

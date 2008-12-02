@@ -514,8 +514,13 @@ namespace jslib {
 
         JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
         *rval = OBJECT_TO_JSVAL(myReturnObject);
-        if (!JS_DefineProperty(cx, myReturnObject, "point", as_jsval(cx, static_cast<asl::Vector3f>(myPathPoint)), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-        if (!JS_DefineProperty(cx, myReturnObject, "element", as_jsval(cx, myPathPoint.element), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+        if (!JS_DefineProperty(cx, myReturnObject, "point", as_jsval(cx, static_cast<asl::Vector3f>(myPathPoint)), 0,0, JSPROP_ENUMERATE)) { 
+            return JS_FALSE;
+        }
+        
+        if (!JS_DefineProperty(cx, myReturnObject, "element", as_jsval(cx, myPathPoint.element), 0,0, JSPROP_ENUMERATE)) { 
+            return JS_FALSE;
+        }
 
         return JS_TRUE;
     }
@@ -539,17 +544,22 @@ namespace jslib {
 
         // convert to simple arrays
         std::vector<asl::Vector3f> myPoints;
-        std::vector<unsigned> myElements;
-        for (unsigned i = 0; i < myResult.size(); ++i) {
+        std::vector<unsigned int> myElements;
+        for (unsigned int i = 0; i < myResult.size(); ++i) {
             myPoints.push_back(myResult[i]);
             myElements.push_back(myResult[i].element);
         }
 
         JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
         *rval = OBJECT_TO_JSVAL(myReturnObject);
-        if (!JS_DefineProperty(cx, myReturnObject, "points", as_jsval(cx, myPoints), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-        if (!JS_DefineProperty(cx, myReturnObject, "elements", as_jsval(cx, myElements), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-
+        if (!JS_DefineProperty(cx, myReturnObject, "points", as_jsval(cx, myPoints), 0,0, JSPROP_ENUMERATE)) {
+            return JS_FALSE;
+        }
+        
+        if (!JS_DefineProperty(cx, myReturnObject, "elements", as_jsval(cx, myElements), 0,0, JSPROP_ENUMERATE)) {
+            return JS_FALSE;
+        }
+        
         return JS_TRUE;
     }
 
@@ -759,10 +769,10 @@ namespace jslib {
         case PROP_numsegments:
             return Method<JSSvgPath::NATIVE>::call(&JSSvgPath::NATIVE::setNumSegments, cx, obj, 1, vp, &dummy);
         default:
-            JS_ReportError(cx,"JSSvgPath::setProperty: index %d out of range", theID);
-            return JS_FALSE;
+            ;
         }
-        return JS_TRUE;
+        JS_ReportError(cx,"JSSvgPath::setProperty: index %d out of range", theID);
+        return JS_FALSE;
     }
 
     JSBool JSSvgPath::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -805,7 +815,7 @@ namespace jslib {
                 isMatrix = true;
             }
 
-            float mySegmentLength;
+            float mySegmentLength  = 0.0f;
             if ( ! isMatrix ) {
                 if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], mySegmentLength)) {
                     JS_ReportError(cx, "JSSvgPath: argument #2 must be a float or a matrix");

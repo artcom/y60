@@ -46,16 +46,17 @@ struct FixedVectorPOD {
     typedef T FixedVector_type[SIZE];
     typedef T * iterator;
     typedef const T * const_iterator;
-    static int size() { return SIZE;}
+    typedef std::size_t size_type;
+    static size_type size() { return SIZE;}
     enum {VECTOR_SIZE = SIZE};
 
     template <class ANYPOD>
     FixedVectorPOD(ANYPOD &) {}
 
-    T& operator[](int i) {
+    T& operator[](size_type i) {
         return reinterpret_cast<T*>(this)[i];
     }
-    const T& operator[](int i) const {
+    const T& operator[](size_type i) const {
         return reinterpret_cast<const T*>(this)[i];
     }
     
@@ -91,6 +92,7 @@ struct FixedVector  {
     typedef T FixedVector_type[SIZE];
     typedef T * iterator;
     typedef const T * const_iterator;
+    typedef std::size_t size_type;
 
     /** Default constructor. */
     FixedVector() {}
@@ -98,7 +100,7 @@ struct FixedVector  {
      * @param t
      */
     explicit FixedVector(const T * t) {
-        int i;
+        size_type i;
         for (i=0;i<SIZE;i++) {
             val[i] = t[i]; 
         }
@@ -115,7 +117,7 @@ struct FixedVector  {
         if (mySize > SIZE) {
             mySize = SIZE;
         }
-        for (int i=0;i<mySize;i++) {
+        for (size_type i=0;i<mySize;i++) {
             val[i] = theBegin[i]; 
         }
     }
@@ -123,8 +125,7 @@ struct FixedVector  {
      * @param otherVector
      */
     FixedVector(const FixedVector & otherVector) {
-        int i;
-        for (i=0;i<SIZE;i++) {
+        for (size_type i=0;i<SIZE;i++) {
             val[i] = otherVector[i]; 
         }
     }
@@ -132,8 +133,7 @@ struct FixedVector  {
      * @param s
      */
     void assign(const FixedVector & s) {
-        int i;
-        for (i=0;i<SIZE;i++) {
+        for (size_type i=0;i<SIZE;i++) {
             val[i] = s[i]; 
         }
     }
@@ -146,8 +146,7 @@ struct FixedVector  {
     }
     /*
     FixedVector(const T & v) {
-        int i;
-        for (i=0;i<SIZE;i++) {
+        for (size_type i=0;i<SIZE;i++) {
             val[i] = v; 
         }
     }
@@ -155,20 +154,20 @@ struct FixedVector  {
     /** Subscription operator.
      * @param i
      */
-    T & operator[](int i) {
+    T & operator[](size_type i) {
         return val[i];
     }
     /** Subscription operator.
      * @param i
      */
-    const T & operator[](int i) const {
+    const T & operator[](size_type i) const {
         return val[i];
     };
     /**
      * @name STL Style Methods */
     // @{
     /** Returns the size of the vector. */
-    static int size() { return SIZE;}
+    static size_type size() { return SIZE;}
     /** Returns an iterator pointing to the first element of the vector. */
     T * begin() {
         return &val[0];
@@ -191,55 +190,55 @@ struct FixedVector  {
     // @{
     /** Component wise addition. */
     void add(const FixedVector & v) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]+=v.val[i];
         }
     }
     /** Component wise subtraction. */
     void sub(const FixedVector & v) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]-=v.val[i];
         }
     }
     /** Component wise multiplication. */
     void mult(const FixedVector & v) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]*=v.val[i];
         }
     }
     /** Component wise division. */
     void div(const FixedVector & v) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]/=v.val[i];
         }
     }
     /** Scalar addition. */
     void add(const T & n) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]+=n;
         }
     }
     /** Scalar subtraction. */
     void sub(const T & n) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]-=n;
         }
     }
     /** Scalar multiplication. */
     void mult(const T & n) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]*=n;
         }
     }
     /** Scalar division. */
     void div(const T & n) {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i]/=n;
         }
     }
     /** Negation. */
     void negate() {
-        for (int i = 0; i < SIZE; ++ i) {
+        for (size_type i = 0; i < SIZE; ++ i) {
             val[i] = -val[i];
         }
     }
@@ -256,7 +255,7 @@ struct FixedVector  {
      */
     T getSquaredLength() {
         T myResult = 0;
-        for (unsigned i = 0; i < SIZE; ++i) {
+        for (size_type i = 0; i < SIZE; ++i) {
             myResult += val[i] * val[i];
         }
         return myResult;
@@ -269,6 +268,10 @@ struct FixedVector  {
      */
     T getLength() {
         return T(sqrt(double(getSquaredLength())));
+    }
+
+    bool empty() const {
+        return false;
     }
     // @}
 
@@ -289,7 +292,7 @@ FixedVector<SIZE, Number> operator*(const RealType & y, const FixedVector<SIZE, 
  */
 template <int SIZE, class T>
 bool equal(const FixedVector<SIZE, T> & a, const FixedVector<SIZE, T> & b) {
-    for (int i = 0; i < SIZE;++i) {
+    for (typename FixedVector<SIZE, T>::size_type i = 0; i < SIZE;++i) {
         if (a[i] != b[i]) return false;
     }
     return true;
@@ -310,7 +313,7 @@ bool operator==(const FixedVector<SIZE,T> & a, const FixedVector<SIZE,T> & b) {
  */
 template <int SIZE, class T>
 bool unequal(const FixedVector<SIZE, T> & a, const FixedVector<SIZE, T> & b) {
-    for (int i = 0; i < SIZE;++i) {
+    for (typename FixedVector<SIZE, T>::size_type i = 0; i < SIZE;++i) {
         if (a[i] != b[i]) return true;
     }
     return false;
@@ -351,7 +354,7 @@ template <int SIZE, class T>
 T
 dot(const FixedVector<SIZE, T> & a, const FixedVector<SIZE, T> & b) {
     T myResult = 0;
-    for (unsigned i = 0; i < SIZE; ++i) {
+    for (typename FixedVector<SIZE, T>::size_type i = 0; i < SIZE; ++i) {
         myResult += a[i] * b[i];
     }
     return myResult;
@@ -398,8 +401,8 @@ std::istream & parseVector(std::istream & is, T & v,
         return is;
     }
 
-    int mySize = v.size(); 
-    for (unsigned i = 0; i < mySize; ++i) {
+    typename T::size_type mySize = v.size(); 
+    for (typename T::size_type i = 0; i < mySize; ++i) {
         is >> v[i];
 
         if (!is) {
@@ -436,7 +439,7 @@ std::ostream & operator<<(std::ostream & os,
 {
     if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
         return printVector(os, f, 
-                os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)), 
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );
@@ -457,7 +460,7 @@ std::ostream & operator<<(std::ostream & os,
 {
     if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
         return printVector(os, f, 
-                os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)), 
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );

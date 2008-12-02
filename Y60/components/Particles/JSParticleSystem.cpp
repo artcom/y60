@@ -26,10 +26,9 @@ using namespace jslib;
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns information about the ParticleSystem."); DOC_END;
-    const ParticleSystem & myParticleSystem = JSParticleSystem::getJSWrapper(cx,obj).getNative();
+    //const ParticleSystem & myParticleSystem = JSParticleSystem::getJSWrapper(cx,obj).getNative();
 
-    std::string myStatusString = "";
-    myStatusString = std::string("\nStatus: is emitting..."); 
+    std::string myStatusString("\nStatus: is emitting..."); 
     
     *rval = as_jsval(cx, myStatusString);
     return JS_TRUE;
@@ -184,11 +183,11 @@ JSParticleSystem::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
 JSBool
 JSParticleSystem::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     
-    switch (theID) {
-        default:
+    //switch (theID) {
+    //    default:
             JS_ReportError(cx,"JSParticleSystem::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
-    }
+    //}
 }
 
 JSBool

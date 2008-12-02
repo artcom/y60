@@ -115,6 +115,8 @@ namespace asl {
 
             private:
                 T &  _myLock;
+                AutoLocker(const AutoLocker&);
+                AutoLocker& operator=(const AutoLocker&);
         };
 
     template <class T>
@@ -130,6 +132,8 @@ namespace asl {
 
             private:
                 T &  _myLock;
+                AutoReadLocker(const AutoReadLocker&);
+                AutoReadLocker& operator=(const AutoReadLocker&);
         };
 
     template <class T>
@@ -145,6 +149,8 @@ namespace asl {
 
             private:
                 T &  _myLock;
+                AutoWriteLocker(const AutoWriteLocker&);
+                AutoWriteLocker& operator=(const AutoWriteLocker&);
         };
 /* @} */
 

@@ -91,6 +91,7 @@ class Conduit {
                 handleIO(static_cast<int>(myTimeLeft));
                 myTimer.setNow();
                 long long myTimeLeft = myEndTime - myTimer.millis();
+                (void)myTimeLeft;
             }
             return _myOutQueue.empty();
         }
@@ -183,6 +184,7 @@ class Conduit {
                 hasReceived = receive(myReceivedString); 
                 myTimer.setNow();
                 long long myTimeLeft = myEndTime - myTimer.millis();
+                (void)myTimeLeft;
             }
             return hasReceived;
         }

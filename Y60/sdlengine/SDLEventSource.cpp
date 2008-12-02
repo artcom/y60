@@ -107,21 +107,27 @@ SDLEventSource::poll() {
 
 EventPtr
 SDLEventSource::createMouseMotionEvent(Event::Type theType, const SDL_Event & theSDLEvent) {
-    return EventPtr(new MouseEvent(theType, theSDLEvent.motion.state & SDL_BUTTON(1),
-                theSDLEvent.motion.state & SDL_BUTTON(3), theSDLEvent.motion.state & SDL_BUTTON(2),
-                theSDLEvent.motion.x, theSDLEvent.motion.y, theSDLEvent.motion.xrel, theSDLEvent.motion.yrel));
+    return EventPtr(new MouseEvent( theType
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(1))
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(3))
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(2))
+                                  , theSDLEvent.motion.x, theSDLEvent.motion.y
+                                  , theSDLEvent.motion.xrel, theSDLEvent.motion.yrel));
 }
 
 EventPtr
 SDLEventSource::createMouseWheelEvent(Event::Type theType, const SDL_Event & theSDLEvent) {
-    return EventPtr(new MouseEvent(theType, theSDLEvent.motion.state & SDL_BUTTON(1),
-                theSDLEvent.motion.state & SDL_BUTTON(3), theSDLEvent.motion.state & SDL_BUTTON(2),
-                0, 0, theSDLEvent.motion.xrel, theSDLEvent.motion.yrel));
+    return EventPtr(new MouseEvent( theType
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(1))
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(3))
+                                  , 0 != (theSDLEvent.motion.state & SDL_BUTTON(2))
+                                  , 0, 0
+                                  , theSDLEvent.motion.xrel, theSDLEvent.motion.yrel));
 }
 
 EventPtr
 SDLEventSource::createMouseButtonEvent(Event::Type theType, const SDL_Event & theSDLEvent) {
-    MouseEvent::Button myButton;
+    MouseEvent::Button myButton = MouseEvent::NONE;
     switch (theSDLEvent.button.button) {
         case SDL_BUTTON_LEFT:
             myButton = MouseEvent::LEFT;

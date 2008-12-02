@@ -113,7 +113,7 @@ class string_functions_UnitTest : public UnitTest {
 			ENSURE(myList1[0] == "eins");
 
 			std::vector<std::string> myList2 = splitString(" eins zwei,drei  vier, fuenf "," ,;");
-			for (int i = 0; i < myList2.size();++i) {
+            for (std::vector<std::string>::size_type i = 0; i < myList2.size();++i) {
 				DPRINT(i);
 				DPRINT(myList2[i]);
 			}
@@ -134,9 +134,9 @@ class string_functions_UnitTest : public UnitTest {
 			ENSURE(myList3[3] == "fuenf");
 
 			{
-			    ENSURE(getStringFromEnum(apfel, myStringList) == "apfel");
-			    ENSURE(getStringFromEnum(birne, myStringList) == "birne");
-			    ENSURE(getStringFromEnum(kiwi, myStringList)  == "kiwi");
+                ENSURE(getStringFromEnum(apfel, myStringList) == std::string("apfel"));
+			    ENSURE(getStringFromEnum(birne, myStringList) == std::string("birne"));
+			    ENSURE(getStringFromEnum(kiwi, myStringList)  == std::string("kiwi"));
 			    ENSURE_EXCEPTION(getStringFromEnum(banane, myStringList), ParseException);
 
 			    ENSURE(getEnumFromString("apfel", myStringList) == apfel);
@@ -284,8 +284,8 @@ class string_functions_UnitTest : public UnitTest {
             {
                 string myInput;
                 myInput.resize(256);
-                for (unsigned i = 0; i < 256; ++i) {
-                    myInput[i] = i;
+                for (unsigned int i = 0; i < 256; ++i) {
+                    myInput[i] = static_cast<unsigned char>(i);
                 }
                 char * myOutput =
                     "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIj"

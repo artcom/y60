@@ -1942,9 +1942,9 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeLookAt(myEye, myCenter, myUp);
 
             ENSURE(myMatrix.getTranslation() == Vector3<T>(-1,-1,-1)); 
-            ENSURE(almostEqual(myMatrix.getRow(0), Vector4<T>(0.57735,0,-0.57735,0))); 
-            ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333,0.666667,-0.333333,0))); 
-            ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735,0.57735,0.57735,0))); 
+            ENSURE(almostEqual(myMatrix.getRow(0), Vector4<T>(0.57735f,0,-0.57735f,0))); 
+            ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333f,0.666667f,-0.333333f,0))); 
+            ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735f,0.57735f,0.57735f,0))); 
 
             //std::cout << myMatrix << std::endl;
         }

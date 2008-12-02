@@ -62,7 +62,7 @@ TNTThresholdList::refresh(dom::NodePtr thePaletteNode) {
 
 void
 TNTThresholdList::select(dom::NodePtr theNode) {
-    int myIndex = theNode->getAttributeValue<int>("index");    
+    unsigned int myIndex = theNode->getAttributeValue<unsigned int>("index");
     typedef Gtk::TreeModel::Children ChildrenT;
     ChildrenT myChildren = _myListModel->children();
     for(ChildrenT::iterator it = myChildren.begin(); it != myChildren.end(); ++it) {

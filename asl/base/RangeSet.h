@@ -135,7 +135,7 @@ typedef unsigned long Size;
 
         unsigned size() const {
             unsigned mySize = 0;
-            for (int i = 0; i< myValues.size(); i+=2) {
+            for (typename RangeVector::size_type i = 0; i< myValues.size(); i+=2) {
                 mySize+=myValues[i+1] - myValues[i];
             }
             return mySize;

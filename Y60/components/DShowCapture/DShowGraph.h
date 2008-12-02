@@ -11,6 +11,8 @@
 #ifndef _ac_DShowCapture_DShowGraph_h_
 #define _ac_DShowCapture_DShowGraph_h_
 
+#define NO_DSHOW_STRSAFE // avoid a bunch of useless warnings and an error that <dshow.h> drags in
+
 #include <dshow.h>
 #include <qedit.h>
 #include <string>

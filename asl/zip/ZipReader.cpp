@@ -62,7 +62,7 @@ ZipReader::readDirectory() {
     unz_global_info globalInfo;
     CHECK_UNZIP(unzGetGlobalInfo (_myInputStream, &globalInfo));
     
-    for (int i=0;i<globalInfo.number_entry;i++)
+    for (uLong i=0;i<globalInfo.number_entry;i++)
     {
         char filename_inzip[4096];
         unz_file_info file_info;
@@ -112,7 +112,7 @@ ZipReader::getFile(int theFileIndex) {
 Ptr<ReadableBlockHandle> 
 ZipReader::getFile(const std::string & theFilePath) {
     Path myPath(theFilePath, UTF8);
-    for (int i = 0; i < _myDirectory.size(); ++i) {
+    for (Directory::size_type i = 0; i < _myDirectory.size(); ++i) {
         DB(AC_TRACE << "cmp:" << _myDirectory[i].filename << "==" << theFilePath << endl);
         if (myPath == _myDirectory[i].filename) {
             DB(AC_TRACE << "OK" << endl);

@@ -1,11 +1,17 @@
 #include "HeightToNormalMap.h"
 
+#include <iostream>
+
 #include <asl/math/numeric_functions.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>
-
-#include <iostream>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;
@@ -23,7 +29,7 @@ HeightToNormalMap::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     PLPixel8 ** mySourceLines = (PLPixel8**)theSource->GetLineArray();
     PLPixel32 ** myDestinationLines = (PLPixel32**)theDestination->GetLineArray();
 
-    for (unsigned y = 0; y < theSource->GetHeight(); ++y) {
+    for (int y = 0; y < theSource->GetHeight(); ++y) {
         PLPixel8  * mySourceLine = mySourceLines[y];
         PLPixel32 * myDestinationLine = myDestinationLines[y];
         
@@ -33,7 +39,7 @@ HeightToNormalMap::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
         } else {
             myNextLine = mySourceLines[y + 1];
         }
-        for (unsigned x = 0; x < theSource->GetWidth(); ++x) {
+        for (int x = 0; x < theSource->GetWidth(); ++x) {
             float myHeight = mySourceLine->Get();
             float aboveNeighbourHeight = myNextLine->Get();
             float rightNeighbourHeight;

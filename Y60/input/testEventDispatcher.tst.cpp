@@ -83,7 +83,7 @@ class EventDispatcherTest : public UnitTest, IEventSink {
 
             _myExpectedEvents.assign(theTestEvents.begin(),theTestEvents.end());
 
-            for (int i=0; i<theTestEvents.size(); i++) {
+            for (vector<EventPtr>::size_type i=0; i<theTestEvents.size(); i++) {
                 _testDispatcher.dispatch();
             }
             ENSURE(_myExpectedEvents.empty());

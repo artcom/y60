@@ -22,13 +22,19 @@
 
 #include "PLFilterResizePadded.h"
 
+#include <iostream>
+
 #include <asl/math/numeric_functions.h>
 #include <asl/base/Logger.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>
-
-#include <iostream>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 #define DB(x) // x
 
@@ -37,8 +43,8 @@ using namespace asl;
 
 void
 PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
-    PLASSERT(_myNewWidth  >= theSource->GetWidth());
-    PLASSERT(_myNewHeight >= theSource->GetHeight());
+    PLASSERT(_myNewWidth  >= static_cast<unsigned int>(theSource->GetWidth()));
+    PLASSERT(_myNewHeight >= static_cast<unsigned int>(theSource->GetHeight()));
 
     DB(cerr << "creating dest bitmap (" << _myNewWidth << "x" << _myNewHeight << ")" << endl);
     theDestination->Create(_myNewWidth, _myNewHeight, theSource->GetPixelFormat(), 0, 0, theSource->GetResolution());
@@ -52,8 +58,8 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
     unsigned mySrcBytesPerLine  = myBytesPerPixel * theSource->GetWidth();
     unsigned myDestBytesPerLine = myBytesPerPixel * _myNewWidth;
     unsigned mySourceHeight     = theSource->GetHeight();
-    
-    int myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;    
+
+    unsigned myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;    
     //AC_PRINT << "myRemainingBytes: " << myRemainingBytes << " bytesPerPixel: " << myBytesPerPixel;
     for (unsigned y = 0; y < mySourceHeight; ++y) {
         PLBYTE * pSrcLine = pSrcLineArray[y];

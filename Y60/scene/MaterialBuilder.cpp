@@ -9,15 +9,8 @@
 //============================================================================
 
 #include "MaterialBuilder.h"
-#include "SceneBuilder.h"
-#include "ImageBuilder.h"
-#include "MovieBuilder.h"
-#include "TextureBuilder.h"
 
-#include "TextureUnit.h"
-#include <y60/base/NodeNames.h>
-#include <y60/base/iostream_functions.h>
-#include <y60/base/property_functions.h>
+#include <algorithm>
 
 #include <asl/dom/Nodes.h>
 #include <asl/dom/Value.h>
@@ -25,11 +18,26 @@
 #include <asl/base/Dashboard.h>
 #include <asl/base/file_functions.h>
 
-#include <algorithm>
+#include "TextureUnit.h"
+#include <y60/base/NodeNames.h>
+#include <y60/base/iostream_functions.h>
+#include <y60/base/property_functions.h>
 
+#include "SceneBuilder.h"
+#include "ImageBuilder.h"
+#include "MovieBuilder.h"
+#include "TextureBuilder.h"
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
 #include <paintlib/planydec.h>
 #include <paintlib/Filter/plfilterresizebilinear.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 
 using namespace std;
 using namespace asl;
@@ -312,7 +320,7 @@ namespace y60 {
         }
 
         ImageBuilder myImageBuilder(theName);
-        const string & myId = theSceneBuilder.appendImage(myImageBuilder);
+        /*const string & myId =*/ theSceneBuilder.appendImage(myImageBuilder);
         myImageBuilder.setDepth(theDepth);
 
         if (theType == CUBEMAP) {
@@ -344,7 +352,7 @@ namespace y60 {
         }
 
         MovieBuilder myMovieBuilder(theName, myFileName);
-        const string & myId = theSceneBuilder.appendMovie(myMovieBuilder);
+        /*const string & myId =*/ theSceneBuilder.appendMovie(myMovieBuilder);
         myMovieBuilder.setLoopCount(theLoopCount);
 
         return myMovieBuilder.getNode();

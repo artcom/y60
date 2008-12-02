@@ -26,10 +26,17 @@
 #ifndef INCL_XMLHELPER
 #define INCL_XMLHELPER
 
-#include <paintlib/plpixel32.h>
+#include <string>
 
 #include <asl/dom/Nodes.h>
-#include <string>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpixel32.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace TexGen {
 

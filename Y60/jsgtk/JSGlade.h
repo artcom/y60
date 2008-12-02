@@ -12,7 +12,14 @@
 #define _Y60_ACGTKSHELL_JSGLADE_INCLUDED_
 
 #include <y60/jsbase/JSWrapper.h>
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4512 4413 4244)
+#endif //defined(_MSC_VER)
 #include <libglademm/xml.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 

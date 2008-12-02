@@ -88,7 +88,6 @@ GTKApp::addSignalHandler(const gchar *theHandlerName, GObject *theSource, const 
                 G_CALLBACK(GTKApp::deleteSignalHandler), mySignalSource);
     }
 
-    gulong myCallbackId = 0;
     JSGladeSignalAdapterPtr myAdapter(new JSGladeSignalAdapter(theHandlerName, mySignalSource, theSignalName, 
                 theSignalData, theConnectObject, theAfterFlag, myInfo->context, myInfo->object));
     it->second.push_back(myAdapter);

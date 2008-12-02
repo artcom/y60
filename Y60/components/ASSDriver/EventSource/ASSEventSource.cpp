@@ -57,7 +57,7 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
     myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
     myNode->appendAttribute<Box2f>("roi", theROI);
     myNode->appendAttribute<float>("intensity", theIntensity);
-    myNode->appendAttribute<float>("frameno", theEvent.frameno);
+    myNode->appendAttribute<float>("frameno", static_cast<float>(theEvent.frameno));
     _myEvents.push_back( myEvent );
 }
 

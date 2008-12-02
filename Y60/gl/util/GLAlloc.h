@@ -46,19 +46,19 @@ namespace asl {
         void flushGLAGPMemory();
         bool  _myAGPMemoryIsFlushed;
     };
-	class GLMemory : public FixedCapacityBlock {
-	public:
-		enum MemoryType {MainMemoryType=0, AGPMemoryType=1, GPUMemoryType=2};
-		GLMemory(MemoryType theMemoryType)
-			: _myMem(0),
-			_mySize(0),
-			_myCapacity(0),
-			_myFreeStoreBytes(0),
-			_myTotalUsedBytes(0),
-			_myMemoryType(theMemoryType) {}
+    class GLMemory : public FixedCapacityBlock {
+    public:
+        enum MemoryType {MainMemoryType=0, AGPMemoryType=1, GPUMemoryType=2};
+        GLMemory(MemoryType theMemoryType)
+            : _myMem(0),
+            _mySize(0),
+            _myCapacity(0),
+            _myFreeStoreBytes(0),
+            _myTotalUsedBytes(0),
+            _myMemoryType(theMemoryType) {}
 
-        operator bool() const {
-            return _myMem != 0;
+        operator const void*() const {
+            return _myMem;
         }
 		bool claim(asl::AC_SIZE_TYPE theCapacity);
 		void release();
@@ -126,7 +126,7 @@ namespace asl {
         enum { DISABLED = UINT_MAX , UNKNOWN = UINT_MAX-1 };
 
         static unsigned getDefaultCapacity() {
-            static unsigned myDefaultCapacity = UNKNOWN;
+            static unsigned myDefaultCapacity = static_cast<unsigned>(UNKNOWN);
             if (myDefaultCapacity == UNKNOWN) {
                 char * myCapacityString = ::getenv("Y60_AGP_VERTEX_MEMORY");
                 if (myCapacityString) {
@@ -134,7 +134,7 @@ namespace asl {
                     if (myCapacity > 0) {
                         myDefaultCapacity = myCapacity * 1024 * 1024;
                     } else {
-                        myDefaultCapacity = DISABLED;
+                        myDefaultCapacity = static_cast<unsigned>(DISABLED);
                     }
                 } else {
                     AC_INFO << "Y60_AGP_VERTEX_MEMORY not set - guessing hardware..";
@@ -142,7 +142,7 @@ namespace asl {
                     AC_INFO << "found '" << myHardwareString << "'";
                     if (myHardwareString.find("/AGP") == std::string::npos) {
                         AC_INFO << "no AGP found, using main memory." << std::endl;
-                        myDefaultCapacity = DISABLED;
+                        myDefaultCapacity = static_cast<unsigned>(DISABLED);
                     } else {
                         AC_INFO << "AGP found." << std::endl;
                         myDefaultCapacity = 64 * 1024 * 1024;
@@ -168,6 +168,8 @@ namespace asl {
         typedef T&        reference;
         typedef const T&  const_reference;
         typedef T         value_type;
+
+        template<typename U> friend class GLAlloc;
 
     public:
         // Constructors

@@ -393,7 +393,7 @@ namespace y60 {
         // find dst elements node where the source elements will fit into
         unsigned myDstElementCounter = 0;
         dom::NodePtr mySrcIndex = theElements->childNode(0);
-        const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
+        //const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
 
         PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);            
         dom::NodePtr myDstIndex         = myDstElements->getIndex(POSITION_ROLE, POSITION_ROLE);
@@ -561,7 +561,7 @@ namespace y60 {
                     
                     unsigned int myCount = (myEndIndex - myBeginIndex)+1;
                     float myDivisor = (float)myCount / (myDivisorTarget);
-                    size_t myEndIndex = (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1;
+                    size_t myEndIndex = static_cast<size_t>( (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1 );
                     mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles, myBeginIndex, myEndIndex);
                     size_t myOldEndIndex = myEndIndex;
                     myBeginIndex = myEndIndex+1;

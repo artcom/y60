@@ -46,7 +46,6 @@ setGroupFromItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         myNative->set_group(myGroup);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 JSFunctionSpec *

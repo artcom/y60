@@ -135,13 +135,13 @@ namespace y60 {
         AC_INFO << "TextureManager::reloadTextures preload() disabled";
         AC_INFO << StackTrace();
         return;
-        unsigned myTextureCount = _myTextureList->childNodesLength();
-        for (unsigned i = 0; i < myTextureCount; ++i) {
-            dom::NodePtr myTextureNode = _myTextureList->childNode(i);
-            if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                myTextureNode->getFacade<Texture>()->preload();
-            }
-        }
+        //unsigned myTextureCount = _myTextureList->childNodesLength();
+        //for (unsigned i = 0; i < myTextureCount; ++i) {
+        //    dom::NodePtr myTextureNode = _myTextureList->childNode(i);
+        //    if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
+        //        myTextureNode->getFacade<Texture>()->preload();
+        //    }
+        //}
     }
 
     TexturePtr

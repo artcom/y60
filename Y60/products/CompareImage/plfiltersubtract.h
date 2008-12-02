@@ -11,12 +11,15 @@
 #ifndef FILTERSUBTRACT_H
 #define FILTERSUBTRACT_H
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/Filter/plfilter.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 
 //! Subtracts one bitmap from another 
 class PLFilterSubtract : public PLFilter  

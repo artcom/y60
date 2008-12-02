@@ -39,7 +39,9 @@
 #define UNICODE
 #endif
 #ifdef UNICODE
+#ifndef _UNICODE
 #define _UNICODE
+#endif
 #endif
 
 #include <tchar.h>

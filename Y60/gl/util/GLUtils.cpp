@@ -135,10 +135,9 @@ namespace y60 {
             return GL_TEXTURE_3D;
         case TEXTURE_CUBEMAP:
             return GL_TEXTURE_CUBE_MAP_ARB;
-        default:
-            throw GlTextureFunctionException("Unknown texture type.", PLUS_FILE_LINE);
+        default: break;
         }
-        return 0;
+        throw GlTextureFunctionException("Unknown texture type.", PLUS_FILE_LINE);
     }
 
     GLenum
@@ -158,10 +157,9 @@ namespace y60 {
                 return GL_SUBTRACT;
             case COMBINE:
                 return GL_COMBINE_ARB;
-            default:
-                throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
+            default: break;
         }
-        return 0;
+        throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
     }
 
     GLenum
@@ -177,11 +175,9 @@ namespace y60 {
                 return GL_FUNC_SUBTRACT;
             case EQUATION_REVERSE_SUBTRACT:
                 return GL_FUNC_REVERSE_SUBTRACT;
-            default:
-                throw GLUnknownBlendEquation("Unknown blend equation.", PLUS_FILE_LINE);
-                break;
+            default: break;
         }
-        return GLenum(0);
+        throw GLUnknownBlendEquation("Unknown blend equation.", PLUS_FILE_LINE);
     }
 
     DEFINE_EXCEPTION(GlCubemapIndexOutOfRange, asl::Exception);
@@ -200,10 +196,9 @@ namespace y60 {
                 return GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB;
             case CUBEMAP_BOTTOM:
                 return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
-            default:
-                throw GlCubemapIndexOutOfRange("Unknown cubemap face.", PLUS_FILE_LINE);
+            default: break;
         }
-        return GLenum(0);
+        throw GlCubemapIndexOutOfRange("Unknown cubemap face.", PLUS_FILE_LINE);
     };
 
 
@@ -264,10 +259,9 @@ namespace y60 {
             case TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT1_EXT: return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
             case TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT3_EXT: return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             case TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT: return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-            default:
-                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
+            default: break;
         }
-        return GLenum(0);
+        throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
     };
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat) {
@@ -325,10 +319,9 @@ namespace y60 {
             case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT1_EXT;
             case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-            default:
-                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
+            default: break;
         }
-        return TextureInternalFormat(0);
+        throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
     };
 
     DEFINE_EXCEPTION(GLBlendFunctionOutOfRangeException, asl::Exception);
@@ -397,7 +390,7 @@ namespace y60 {
             glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
         }
 
-        if (theLightNum <= myMaxLights) {
+        if (static_cast<GLint>(theLightNum) <= myMaxLights) {
             return GL_LIGHT0 + theLightNum;
         }
         throw GlLightOutOfRangeException(string("light source out of range: ") + asl::as_string(theLightNum) + ", max: " + asl::as_string(myMaxLights),PLUS_FILE_LINE);
@@ -419,7 +412,7 @@ namespace y60 {
         if (myMaxTextureUnits == 0) {
             glGetIntegerv(GL_MAX_TEXTURE_UNITS, &myMaxTextureUnits);
         }
-        if (theIndex < myMaxTextureUnits) {
+        if (static_cast<GLint>(theIndex) < myMaxTextureUnits) {
             return GL_TEXTURE0 + theIndex;
         }
         throw GlTextureOutOfRangeException(string("texture unit out of range: ") + asl::as_string(theIndex) + ", max: " + asl::as_string(myMaxTextureUnits),PLUS_FILE_LINE);
@@ -444,10 +437,9 @@ namespace y60 {
                 return GL_TEXTURE6;
             case TEXCOORD7_REGISTER:
                 return GL_TEXTURE7;
-            default:
-                throw GlTextureOutOfRangeException(std::string("texture register out of range: ") + asl::as_string(theRegister), PLUS_FILE_LINE);
+            default: break;
         }
-        return GL_TEXTURE0;
+        throw GlTextureOutOfRangeException(std::string("texture register out of range: ") + asl::as_string(theRegister), PLUS_FILE_LINE);
     }
 
     GLenum
@@ -461,10 +453,9 @@ namespace y60 {
                 return GL_SPHERE_MAP;
             case REFLECTION:
                 return GL_REFLECTION_MAP_EXT;
-            default:
-                throw asl::Exception(std::string("Unkown TexCoordMode ") + asl::as_string(theMode), PLUS_FILE_LINE);
+            default: break;
         }
-        return GL_OBJECT_LINEAR;
+        throw asl::Exception(std::string("Unkown TexCoordMode ") + asl::as_string(theMode), PLUS_FILE_LINE);
     }
 
 #ifdef AC_USE_OSX_CGL
@@ -612,10 +603,9 @@ void * aglGetProcAddress (char * pszProc)
             case FRAMEBUFFER_SUPPORT:
                 myResult = hasCap("GL_EXT_framebuffer_object");
                 break;
-            default:
-             throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
+            default: break;
         }
-        return myResult;
+        throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
     }
 
     std::string

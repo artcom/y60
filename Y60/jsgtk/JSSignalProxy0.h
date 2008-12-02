@@ -64,21 +64,21 @@ class JSSignalProxy0 : public JSWrapper<Glib::SignalProxy0<R>, asl::Ptr<Glib::Si
                 Glib::ustring myMethodName;
                 convertFrom(cx, argv[1], myMethodName);
 
-                bool myAfterFlag;
+                bool myAfterFlag = false;;
                 if (argc > 2) {
                     convertFrom(cx, argv[2], myAfterFlag);
                 }
 
-                SigC::Slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
+                sigc::slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
                     sigc::ptr_fun( & JSSignalAdapter0<R>::on_signal ), cx, myTarget, myMethodName);
                 JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR( new sigc::connection);
                 switch (argc) {
                     case 2 :
-						{AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "'";}
+                        {AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "'";}
                         *myConnection = myOwner->connect(mySlot);
                         break;
                     case 3 :
-						{AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "', after=" << myAfterFlag;}
+                        {AC_TRACE << "JSSignalProxy0 connecting to '" << myMethodName << "', after=" << myAfterFlag;}
                         *myConnection = myOwner->connect(mySlot, myAfterFlag);
                         break;
                 }

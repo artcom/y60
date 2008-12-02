@@ -12,8 +12,14 @@
 
 #include <math.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plbitmap.h>
 #include <paintlib/plpoint.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 
 //////////////////////////////////////////////////////////////////////
@@ -45,10 +51,10 @@ void PLFilterSubtract::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
           y < m_pBmpSubtrahend->GetHeight())
       {
         PLPixel32 substrahendPixel = m_pBmpSubtrahend->GetPixel32(x,y);
-        differencePixel.SetR(abs(srcPixel.GetR() - substrahendPixel.GetR()));
-        differencePixel.SetG(abs(srcPixel.GetG() - substrahendPixel.GetG()));
-        differencePixel.SetB(abs(srcPixel.GetB() - substrahendPixel.GetB()));
-        differencePixel.SetA(abs(srcPixel.GetA() - substrahendPixel.GetA()));
+        differencePixel.SetR( static_cast<PLBYTE>(abs(srcPixel.GetR() - substrahendPixel.GetR())) );
+        differencePixel.SetG( static_cast<PLBYTE>(abs(srcPixel.GetG() - substrahendPixel.GetG())) );
+        differencePixel.SetB( static_cast<PLBYTE>(abs(srcPixel.GetB() - substrahendPixel.GetB())) );
+        differencePixel.SetA( static_cast<PLBYTE>(abs(srcPixel.GetA() - substrahendPixel.GetA())) );
       } else {
         differencePixel = srcPixel;
       }

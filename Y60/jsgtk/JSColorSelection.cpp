@@ -112,8 +112,6 @@ JSColorSelection::getPropertySwitch(NATIVE & theNative, unsigned long theID,
                 }
                 asl::Vector4f myColor(myRed, myGreen, myBlue, myAlpha);
                 * vp = as_jsval(cx, myColor);
-
-                return JS_TRUE;
             }
             return JS_TRUE;
         case PROP_has_opacity_control:
@@ -174,7 +172,6 @@ JSColorSelection::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 bool myHasPaletteFlag;
                 convertFrom(cx, * vp, myHasPaletteFlag);
                 theNative.set_has_palette(myHasPaletteFlag);
-                return JS_TRUE;
             }
             return JS_TRUE;
         default:

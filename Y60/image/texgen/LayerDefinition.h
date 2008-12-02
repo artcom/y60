@@ -21,11 +21,17 @@
 #if !defined(INCL_LAYERDEFINITION)
 #define INCL_LAYERDEFINITION
 
-#include <paintlib/plpixel32.h>
-#include <paintlib/plbitmap.h>
-
 #include <assert.h>
 #include <map>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpixel32.h>
+#include <paintlib/plbitmap.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace TexGen {
 

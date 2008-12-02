@@ -23,11 +23,18 @@
 #ifndef _ac_y60_PLFilterGaussianBlur_h_
 #define _ac_y60_PLFilterGaussianBlur_h_
 
-#include <paintlib/plpaintlibdefs.h>
-#include <paintlib/Filter/plfilter.h>
-
 #include <vector>
 #include <asl/base/Logger.h>
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/plpaintlibdefs.h>
+#include <paintlib/Filter/plfilter.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 class PLBmp;
 
 typedef std::vector<int> KernelVec;

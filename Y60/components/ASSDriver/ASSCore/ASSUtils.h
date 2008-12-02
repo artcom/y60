@@ -83,11 +83,9 @@ settingChanged(dom::NodePtr theSettings, const std::string & theName, T & theVal
         } else {
             return false;
         }
-    } else {
-        throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
-                "' does not have a text child." , PLUS_FILE_LINE);
     }
-    return true; // avoid a warning
+    throw asl::Exception(std::string("Node '") + myNode->nodeName() + 
+            "' does not have a text child." , PLUS_FILE_LINE);
 }
 
 

@@ -137,7 +137,7 @@ JSEnum<ENUM>::initClass(JSContext *cx, JSObject *theGlobalObject) {
         if (JS_GetProperty(cx, theGlobalObject, ClassName(), &myConstructorFuncObjVal)) {
             uintN myFlags = JSPROP_READONLY | JSPROP_PERMANENT;
             for (unsigned i = 0; i < ENUM::MAX; ++i) {
-                JSBool myOK = JS_DefineProperty(cx, JSVAL_TO_OBJECT(myConstructorFuncObjVal), ENUM::getString(i),
+                /*JSBool myOK =*/ JS_DefineProperty(cx, JSVAL_TO_OBJECT(myConstructorFuncObjVal), ENUM::getString(i),
                         as_jsval(cx, ENUM::getString(i)), NULL, NULL, myFlags);
             }
         }

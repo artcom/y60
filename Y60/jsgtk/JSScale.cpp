@@ -49,7 +49,6 @@ setRange(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         myNative->set_range(myMin, myMax);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
 }
 
 JSFunctionSpec *

@@ -407,7 +407,7 @@ double ourLastAudioTimeStamp = 0.0;
     WMVDecoder::closeMovie() {
         AC_INFO << "WMVDecoder::closeMovie";
         if (_myReader) {
-            HRESULT hr = _myReader->Close();
+            /*HRESULT hr =*/ _myReader->Close();
             //checkForError(hr, "Could not close Reader.", PLUS_FILE_LINE);
             waitForEvent();
             //checkForError(_myEventResult, "Stopping playback failed.", PLUS_FILE_LINE);
@@ -637,8 +637,8 @@ double ourLastAudioTimeStamp = 0.0;
         myMovie->set<FrameRateTag>(_myFrameRate);
 
         // Setup video size and image matrix
-        float myXResize = float(myVideoWidth) / asl::nextPowerOfTwo(myVideoWidth);
-        float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
+        //float myXResize = float(myVideoWidth) / asl::nextPowerOfTwo(myVideoWidth);
+        //float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(1, -1, 1.0f));
@@ -721,7 +721,7 @@ double ourLastAudioTimeStamp = 0.0;
     {
         double myTimeStamp = theSampleTime / 10000000.0;
 
-        if (theOutputNumber == _myVideoOutputId) {
+        if (theOutputNumber == static_cast<DWORD>(_myVideoOutputId)) {
             //AC_TRACE << "VideoSample arrived: " << myTimeStamp << "s";
             asl::AutoLocker<ThreadLock> myLocker(_myLock);
 
@@ -749,7 +749,7 @@ double ourLastAudioTimeStamp = 0.0;
 
             // Signal, new buffer is ready
             //SetEvent(_myEvent);
-        } else if (_myAudioSink && theOutputNumber == _myAudioOutputId) {
+        } else if (_myAudioSink && theOutputNumber == static_cast<DWORD>(_myAudioOutputId)) {
             //AC_TRACE << ">>> AudioSample arrived: " << myTimeStamp << "s";
 
             BYTE * myBuffer;
@@ -773,7 +773,7 @@ double ourLastAudioTimeStamp = 0.0;
             _myAudioSink->queueSamples(myAudioBuffer);
 
             _myLastAudioTimeStamp = myTimeStamp;
-        } else if (theOutputNumber != _myAudioOutputId) {
+        } else if (theOutputNumber != static_cast<DWORD>(_myAudioOutputId)) {
             AC_TRACE << "Unexpected output=" << theOutputNumber;
         }
 
@@ -955,7 +955,7 @@ double ourLastAudioTimeStamp = 0.0;
         }
 
         // Multichannel formats, if available, are returned first
-        for(int j = 0; j < formats;j++)
+        for(DWORD j = 0; j < formats;j++)
         {
             CComPtr<IWMOutputMediaProps> pProps;
             hr = _myReader->GetOutputFormat(dwAudioOutput, j, &pProps);

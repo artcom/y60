@@ -1036,7 +1036,7 @@ namespace asl {
     std::ostream & operator << (std::ostream & os, const asl::Box2<T> & theBox) {
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printBox(os, theBox,
-                    os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                    0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );
@@ -1049,7 +1049,7 @@ namespace asl {
     std::ostream & operator << (std::ostream & os, const asl::Box3<T> & theBox) {
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printBox(os, theBox,
-                    os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                    0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );

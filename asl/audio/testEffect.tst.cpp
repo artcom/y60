@@ -33,9 +33,9 @@ private:
                 virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer, 
                         Unsigned64 theAbsoluteFrame) {
                     SAMPLE * curSample = theBuffer.begin();
-                    for (int curFrame = 0; curFrame<theBuffer.getNumFrames(); ++curFrame)
+                    for (unsigned curFrame = 0; curFrame<theBuffer.getNumFrames(); ++curFrame)
                     {
-                        for (int myChannel = 0; myChannel<theBuffer.getNumChannels(); 
+                        for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels(); 
                                 ++myChannel) 
                         {
                             *curSample = (SAMPLE)((*curSample) * 0.5);

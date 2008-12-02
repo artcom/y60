@@ -82,7 +82,7 @@ class JSBitset : public JSWrapper<BITSET> {
             }
             JSBitset * myNewObject = 0;
             NativeValuePtr myNewValue = NativeValuePtr(new dom::SimpleValue<BITSET>(0));
-            BITSET & myNewBitset = myNewValue->openWriteableValue(); // we close it only on success, otherwise we trash it anyway
+            /*BITSET & myNewBitset =*/ myNewValue->openWriteableValue(); // we close it only on success, otherwise we trash it anyway
             if (argc == 0) {
                 // construct empty
                 myNewObject = new JSBitset(myNewValue);
@@ -257,8 +257,8 @@ JSBitset<BITSET>::initClass(JSContext *cx, JSObject *theGlobalObject) {
             Functions(), 0, 0, 0);
     if (myClassObject) {
         uintN myFlags = JSPROP_ENUMERATE | JSPROP_PERMANENT;
-        for (unsigned i = 0; i < BITSET::Flags::MAX; ++i) {
-            JSBool myOK = JS_DefinePropertyWithTinyId(cx, myClassObject, BITSET::Flags::getString(i), i,
+        for (int8 i = 0; i < BITSET::Flags::MAX; ++i) {
+            /*JSBool myOK =*/ JS_DefinePropertyWithTinyId(cx, myClassObject, BITSET::Flags::getString(i), i,
                     JS_FALSE, NULL, NULL, myFlags);
         }
         /*

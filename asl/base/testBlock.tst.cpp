@@ -282,8 +282,8 @@ public:
 		}
 
 		myTestData.resize(9);
-		for (int i = 0; i < 9; ++i) {
-			myTestData[i] = i;
+        for (asl::AC_SIZE_TYPE i = 0; i < 9; ++i) {
+			myTestData[i] = static_cast<unsigned char>(i);
 		}
 		theBlock.resize(myTestData.size());
 		testWriteable(theBlock, myTestData);
@@ -356,8 +356,8 @@ public:
 		DTITLE("Starting Adapter Tests");
 
 		Block anotherBlock(30);
-		for (int i=0; i< anotherBlock.size();++i) {
-			anotherBlock[i] = i;
+		for (AC_SIZE_TYPE i=0; i< anotherBlock.size();++i) {
+			anotherBlock[i] = static_cast<unsigned char>(i);
 		};
 		DTITLE("Starting Readable Block Adapter Tests");
 

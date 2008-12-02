@@ -1017,7 +1017,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
             *vp = as_jsval(cx, theNative.getCurrentScene());
             return JS_TRUE;
         case PROP_eventListener:
-            *vp = as_jsval(cx, theNative.getEventListener());
+            *vp = OBJECT_TO_JSVAL(theNative.getEventListener());
             return JS_TRUE;
         case PROP_width:
             *vp = as_jsval(cx, theNative.getWidth());

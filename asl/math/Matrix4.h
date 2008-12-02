@@ -1596,7 +1596,7 @@ unknown:
         os << theMatrix.getType();
         if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
             return printVector(os, theMatrix.getBase(),
-                    os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
+                    0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                     static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );

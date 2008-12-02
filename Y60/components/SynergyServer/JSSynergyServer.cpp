@@ -117,11 +117,11 @@ JSBool
 JSSynergyServer::getPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj, 
                                     jsval id, jsval *vp) 
 {
-    switch (theID) {
-    default:
+    //switch (theID) {
+    //default:
         JS_ReportError(cx,"JSSynergyServer::getProperty: index %d out of range", theID);
         return JS_FALSE;
-    }
+    //}
 }
 
 // setproperty handling
@@ -129,13 +129,12 @@ JSBool
 JSSynergyServer::setPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj, 
                                     jsval id, jsval *vp) 
 {
-    jsval dummy;
-    switch (theID) {
-    default:
+    //switch (theID) {
+    //default:
         JS_ReportError( cx,"JSSynergyServer::setPropertySwitch: index %d out of range", 
                         theID);
         return JS_FALSE;
-    }
+    //}
 }
 
 JSBool

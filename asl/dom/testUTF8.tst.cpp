@@ -22,8 +22,7 @@
 
 #include "Nodes.h"
 #include <asl/base/UnitTest.h>
-#ifdef OSX
-#else
+#ifdef LINUX
 #include <glib.h>
 #endif
 #include <sstream>

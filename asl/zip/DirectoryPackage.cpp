@@ -59,7 +59,7 @@ DirectoryPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag
         } else if (theRecurseFlag) {
             // recurse into directory
             std::vector<string> mySubdirList = getFileList(mySubPath, theRecurseFlag);
-            for (int i = 0; i < mySubdirList.size(); ++i) {
+            for (std::vector<string>::size_type i = 0; i < mySubdirList.size(); ++i) {
                 myFileList.push_back(mySubdirList[i]);
             }
         }

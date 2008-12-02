@@ -167,8 +167,8 @@ namespace y60 {
     }
     void OscReceiver::ProcessBundle( const osc::ReceivedBundle& theBundle, 
                                      const IpEndpointName& remoteEndpoint ) {
-        _myCurrentBundleTimeTag = theBundle.TimeTag();                                        
-        OscPacketListener::ProcessBundle(theBundle, remoteEndpoint);                                        
+        _myCurrentBundleTimeTag = static_cast<long>(theBundle.TimeTag());
+        OscPacketListener::ProcessBundle(theBundle, remoteEndpoint);
     }
 
     void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage, 

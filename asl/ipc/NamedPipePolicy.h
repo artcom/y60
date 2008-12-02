@@ -75,7 +75,7 @@ class NamedPipePolicy : public ConduitPolicy {
                 {
                     memset(&accept_overlap,0,sizeof(OVERLAPPED));
                 };
-            inline operator bool () const { return pipeInstance!=0; };
+                inline operator const void*() const { return pipeInstance ? this : NULL; };
             HANDLE pipeInstance;
             Endpoint pipeName;
             OVERLAPPED accept_overlap;

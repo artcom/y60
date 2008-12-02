@@ -150,12 +150,12 @@ namespace y60 {
             int myHeight = myVideoStream->codec.height;
 #endif
             // Setup image matrix
-            float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
-            float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
+            //float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
+            //float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
 
-            /*asl::Matrix4f myMatrix;
-            myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-            myMovie->set<ImageMatrixTag>(myMatrix);*/
+            //asl::Matrix4f myMatrix;
+            //myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
+            //myMovie->set<ImageMatrixTag>(myMatrix);
 
             myMovie->set<FrameRateTag>(theContext->getFrameRate());
 

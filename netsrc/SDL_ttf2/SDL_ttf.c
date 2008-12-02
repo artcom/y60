@@ -39,10 +39,11 @@
 #define FREEA(p) free(p)
 #endif
 
+#include <ft2build.h>
 #include <freetype/freetype.h>
 #include <freetype/ftoutln.h>
 #include <freetype/ttnameid.h>
-#include <freetype/internal/ftobjs.h>
+// #include <freetype/internal/ftobjs.h>
 
 #ifndef FT_OPEN_STREAM
 #define FT_OPEN_STREAM ft_open_stream
@@ -274,7 +275,6 @@ static unsigned long RWread(
 	SDL_RWseek( src, (int)offset, SEEK_SET );
 	return SDL_RWread( src, buffer, 1, (int)count );
 }
-
 TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long index )
 {
 	TTF_Font* font;
@@ -314,7 +314,7 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 	}
 	memset(stream, 0, sizeof(*stream));
 
-	stream->memory = library->memory;
+	// stream->memory = library->memory;
 	stream->read = RWread;
 	stream->descriptor.pointer = src;
 	stream->pos = (unsigned long)position;

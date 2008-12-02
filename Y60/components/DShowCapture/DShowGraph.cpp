@@ -533,7 +533,7 @@ HRESULT DShowGraph::selectVideoFormat() {
     }
 
     BITMAPINFOHEADER bih;
-    bih.biBitCount = _myDesiredBits;
+    bih.biBitCount = static_cast<WORD>(_myDesiredBits);
     bih.biClrImportant = 0;
     bih.biClrUsed = 0;
     bih.biCompression = 0;
@@ -566,13 +566,13 @@ HRESULT DShowGraph::selectVideoFormat() {
     pmt->lSampleSize = _myDesiredHeight * _myDesiredWidth * _myDesiredBits / 8; //UYVY format //640* 480* 24 / 8;
     pmt->majortype = MEDIATYPE_Video;
     //pmt->subtype = MEDIASUBTYPE_RGB24;
-    //pmt->subtype = MEDIASUBTYPE_UYVY;
+    pmt->subtype = MEDIASUBTYPE_UYVY;
     pmt->pbFormat = (unsigned char *)&vih;
     pmt->pUnk = 0;
 
     AC_DEBUG << "w=" << _myDesiredWidth << ", h=" << _myDesiredHeight << ", framerate=" << _myDesiredFrameRate << ", bits=" << _myDesiredBits;
     
-    hr = pSC->SetFormat(NULL);
+    hr = pSC->SetFormat(pmt);
     if (FAILED(hr)) {
         checkForDShowError(hr, "Set stream format 'SetFormat()' failed", PLUS_FILE_LINE);
     }
@@ -715,12 +715,12 @@ void DShowGraph::traceCrossbarInfo(IAMCrossbar *pXBar)
 
     for (long i = 0; i < cOutput; i++)
     {
-        long lRelated = -1, lType = -1, lRouted = -1;
+        long lRelated = -1, lType = -1;
         hr = pXBar->get_CrossbarPinInfo(FALSE, i, &lRelated, &lType);
         AC_DEBUG << "Output pin " << i << ": " << pinToString(lType);
     }
 
-    for (i = 0; i < cInput; i++)
+    for (long i = 0; i < cInput; i++)
     {
         long lRelated = -1, lType = -1;
         hr = pXBar->get_CrossbarPinInfo(TRUE, i, &lRelated, &lType);

@@ -88,7 +88,6 @@ namespace asl {
     inline typename CONTAINER<ELEM>::const_iterator end(const CONTAINER<ELEM> & c) {
         return c.end();
     }
-
     //! begin iterator into C array
     template <typename T, const std::size_t N>
     inline T* begin(T (&array)[N]) {
@@ -108,8 +107,8 @@ namespace asl {
     }
 
     namespace detail { // disregard
-	    template <typename T, const std::size_t N>
-	    const char ( &static_array_size_(T const (&)[N]) ) [N];
+        template <typename T, const std::size_t N>
+        const char ( &static_array_size_(T const (&)[N]) ) [N];
     }
 
     //! size of C array, yields a compile-time const

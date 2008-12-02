@@ -23,10 +23,16 @@
 
 #include "TestTextureDefinition.h"
 
-#include "TextureDefinition.h"
-
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
 #include <paintlib/plpixel32.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include "TextureDefinition.h"
 
 using namespace TexGen;
 using namespace std;

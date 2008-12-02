@@ -203,7 +203,7 @@ int main( int argc, char *argv[])  {
             string mySourceDirectory = myArguments.getOptionArgument("--source-dir");
             DIR * myDir = opendir(mySourceDirectory.c_str());
             dirent * myDirEntry = 0;
-            while ( (myDirEntry = readdir(myDir))) {
+            while ( 0 != (myDirEntry = readdir(myDir))) {
                 string myFilename(myDirEntry->d_name);
                 string myPathname = mySourceDirectory + theDirectorySeparator + myFilename;
                 if (isDirectory(myPathname)) {
@@ -264,7 +264,7 @@ int main( int argc, char *argv[])  {
            string::iterator myIter = myResizeMode.begin();
            string::iterator myEnd  = myResizeMode.end();
            for (;myIter!=myEnd;++myIter) {
-               *myIter = tolower(*myIter);
+               *myIter = static_cast<char>(tolower(*myIter));
            }
         } else {
             cout << "Using default resize mode '" << myResizeMode << "'" << endl;

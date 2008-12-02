@@ -17,7 +17,14 @@
 #include <asl/raster/raster.h>
 #include <asl/dom/Value.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpicdec.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
 #include <OpenEXR/half.h>
 #include <OpenEXR/ImfRgbaFile.h>
 
@@ -46,3 +53,4 @@ class OpenEXRDecoder : public PLPicDecoder {
 };
 
 #endif
+

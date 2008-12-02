@@ -105,10 +105,10 @@ JSMessageDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
     Glib::ustring myMessage;
     convertFrom(cx, argv[0], myMessage);
 
-    bool myUseMarkupFlag;
-    int  myMessageType;
-    int  myButtonsType;
-    bool myBeModalFlag;
+    bool myUseMarkupFlag = false;
+    int  myMessageType = 0;
+    int  myButtonsType = 0;
+    bool myBeModalFlag = false;
 
     if (argc > 1) {
         convertFrom(cx, argv[1], myUseMarkupFlag);

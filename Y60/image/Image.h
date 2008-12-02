@@ -19,7 +19,13 @@
 #include <asl/dom/AttributePlug.h>
 #include <asl/dom/Facade.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 namespace asl {
     class PackageManager;
@@ -188,8 +194,8 @@ namespace y60 {
         switch (theUsage) {
             case BUMP:
                 return HEIGHT_TO_NORMALMAP;
-            default:
-                return NO_FILTER;
+            //default:
+            //    return NO_FILTER;
         }
         return NO_FILTER; // avoid gcc4.0 warning
     }

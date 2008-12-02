@@ -1033,26 +1033,14 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             { // LineSegment
-                LineSegment<float> myLineSegment;
-                convertFrom(cx, argv[0], myLineSegment);
-
-                Point3f myPoint;
-                convertFrom(cx, argv[1], myPoint);
-
-                float factor;
-                *rval = as_jsval(cx, asl::nearest(myLineSegment, myPoint, &factor));
-                return JS_TRUE;
+                typedef Point3<LineNumber> (*NearestLineSegmentPoint)(const Point3<LineNumber> &, const Sphere<LineNumber> &);
+                myStatus = VectorObjectFunction((NearestLineSegmentPoint)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
             }
-                Point3f myPoint;
-                convertFrom(cx, argv[0], myPoint);
-
-                LineSegment<float> myLineSegment;
-                convertFrom(cx, argv[1], myLineSegment);
-
-                float factor;
-                *rval = as_jsval(cx, asl::nearest(myLineSegment, myPoint, &factor));
-                return JS_TRUE;
             {
+                typedef Point3<LineNumber> (*NearestLineSegmentPoint)(const LineSegment<LineNumber> &, const Point3<LineNumber> &);
+                myStatus = ObjectVectorFunction((NearestLineSegmentPoint)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             JS_ReportError(cx,"nearestDispatcher: no 'nearest' function found for this two argument types");
         } else {
@@ -1097,35 +1085,35 @@ transformedNormalDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     return JS_FALSE;
 }
 
-static JSBool
-inverseDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Calculates the inverse matrix");
-    DOC_PARAM("theMatrix to invert", "", DOC_TYPE_MATRIX4F);
-    DOC_RVAL("The inverted matrix", DOC_TYPE_MATRIX4F);
-    DOC_END;
-    if (argc == 2) {
-        JSObject * myObj0 = 0;
-        if (!JSVAL_IS_OBJECT(argv[0])) {
-             JS_ReportError(cx,"inverseDispatcher: passed 'undefined' as argument");
-             return JS_FALSE;
-        }
-        if (JS_ValueToObject(cx, argv[0], &myObj0) == JS_TRUE)
-        {
-            CallStatus myStatus = NOT_FOUND;
-            {
-                typedef Matrix4<float> (*MatrixInversion)(const Matrix4<float> &);
-                myStatus = ObjectFunction((MatrixInversion)&inverse, cx, myObj0, rval);
-                if (myStatus != NOT_FOUND) return JS_TRUE;
-            }
-            JS_ReportError(cx,"inverseDispatcher: no 'inverse' function found for this two argument types");
-        } else {
-            JS_ReportError(cx,"inverseDispatcher: both arguments for 'inverse' arguments must be objects");
-        }
-        return JS_FALSE;
-    }
-    JS_ReportError(cx,"inverseDispatcher: bad number of arguments for 'inverse'");
-    return JS_FALSE;
-}
+//static JSBool
+//inverseDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+//    DOC_BEGIN("Calculates the inverse matrix");
+//    DOC_PARAM("theMatrix to invert", "", DOC_TYPE_MATRIX4F);
+//    DOC_RVAL("The inverted matrix", DOC_TYPE_MATRIX4F);
+//    DOC_END;
+//    if (argc == 2) {
+//        JSObject * myObj0 = 0;
+//        if (!JSVAL_IS_OBJECT(argv[0])) {
+//             JS_ReportError(cx,"inverseDispatcher: passed 'undefined' as argument");
+//             return JS_FALSE;
+//        }
+//        if (JS_ValueToObject(cx, argv[0], &myObj0) == JS_TRUE)
+//        {
+//            CallStatus myStatus = NOT_FOUND;
+//            {
+//                typedef Matrix4<float> (*MatrixInversion)(const Matrix4<float> &);
+//                myStatus = ObjectFunction((MatrixInversion)&inverse, cx, myObj0, rval);
+//                if (myStatus != NOT_FOUND) return JS_TRUE;
+//            }
+//            JS_ReportError(cx,"inverseDispatcher: no 'inverse' function found for this two argument types");
+//        } else {
+//            JS_ReportError(cx,"inverseDispatcher: both arguments for 'inverse' arguments must be objects");
+//        }
+//        return JS_FALSE;
+//    }
+//    JS_ReportError(cx,"inverseDispatcher: bad number of arguments for 'inverse'");
+//    return JS_FALSE;
+//}
 
 static JSBool
 signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

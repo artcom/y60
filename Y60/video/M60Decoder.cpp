@@ -111,7 +111,7 @@ namespace y60 {
     M60Decoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
         DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame << ", theTime: " << theTime);
 
-        if (theFrame >= getFrameCount()) {
+        if (static_cast<int>(theFrame) >= getFrameCount()) {
             setEOF(true);
             return theTime;
         }

@@ -35,9 +35,9 @@ namespace y60 {
     
     const LightSourceType 
     LightSource::getType() {
-        if (true /* node version changed */) {
+        //if (true /* node version changed */) {
             _myType = LightSourceType(asl::getEnumFromString(get<LightSourceTypeTag>(), LightSourceTypeString));
-        }
+        //}
         return _myType;
     }
 } 

@@ -154,7 +154,9 @@ void PdF1Projector::sendPacket(unsigned char* packet, unsigned int packetLen)
 #endif
 
     // pre-computed CRC
+#if 0
     unsigned short givenCrc = (packet[6] << 8) | packet[5];
+#endif
     packet[5] = packet[6] = 0x00;
 
     // calculate CRC, check against pre-computed

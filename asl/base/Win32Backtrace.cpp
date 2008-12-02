@@ -559,7 +559,7 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 		return false;
 				
 	StackFrame myItem;
-	char buf [512] = {0};
+	//char buf [512] = {0};
 	char fbuf[512] = {0};
 	char sbuf[512] = {0};
 

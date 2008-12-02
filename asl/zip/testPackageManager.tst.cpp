@@ -100,7 +100,7 @@ class PackageManagerUnitTest : public UnitTest {
                 
                 //list all files in relative dir. testfiles/
                 myEntries = myPackageManager.findFiles("testfiles");                 
-                for(int i = 0;i < myEntries.size(); ++i) {
+                for(IPackage::FileList::size_type i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 //list all files in package ../../testfiles
@@ -112,7 +112,7 @@ class PackageManagerUnitTest : public UnitTest {
                 }
                 //list all files in package ../../testfiles/test.zip
                 myEntries = myPackageManager.findFiles("","../../testfiles/test.zip"); 
-                for(int i = 0;i < myEntries.size(); ++i) {
+                for(IPackage::FileList::size_type i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 

@@ -18,6 +18,33 @@
 
 using namespace std;
 
+namespace {
+
+    template< typename Value >
+    class NativeRef {
+    public:
+        NativeRef(JSContext *cx, JSObject *obj)
+            : cx_(cx), obj_(obj), value_(jslib::JSClassTraits<Value>::openNativeRef(cx, obj))
+        {
+        }
+
+        Value& getValue()
+        {
+            return value_;
+        }
+
+        ~NativeRef()
+        {
+            jslib::JSClassTraits<Value>::closeNativeRef(cx_, obj_);
+        }
+    private:
+        JSContext *cx_;
+        JSObject  *obj_;
+        Value&    value_;
+    };
+
+}
+
 namespace jslib {
 typedef dom::ResizeableRaster NATIVE;
 typedef JSWrapper<NATIVE,dom::ValuePtr> Base;
@@ -97,7 +124,7 @@ assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("thePixels", "Block of raw memory containing pixel data", DOC_TYPE_BLOCK); 
     DOC_END;
-    dom::ResizeableRaster & myObject = JSClassTraits<dom::ResizeableRaster>::openNativeRef(cx, obj);
+    NativeRef<dom::ResizeableRaster> myNativeRef(cx, obj);
     try {
         ensureParamCount(argc, 3);
         asl::AC_SIZE_TYPE myWidth;
@@ -106,12 +133,10 @@ assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         convertFrom(cx, argv[1], myHeight);
         asl::Block * myPixels = 0;
         convertFrom(cx, argv[1], myPixels);
-        myObject.assign(myWidth, myHeight, *myPixels);
+        myNativeRef.getValue().assign(myWidth, myHeight, *myPixels);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
 }
-
 
 static JSBool
 pasteRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -132,24 +157,22 @@ pasteRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         return JS_FALSE;
     }
 
-    dom::ResizeableRaster & myObject = JSClassTraits<dom::ResizeableRaster>::openNativeRef(cx, obj);
+    NativeRef<dom::ResizeableRaster> myNativeRef(cx,obj);
     try {
         if (!JSVAL_IS_OBJECT(argv[0])) {
             throw BadArgumentException("pasteRaster: argument 0 is not a raster",PLUS_FILE_LINE); 
         }
         const dom::ResizeableRaster & mySourceRaster = JSClassTraits<dom::ResizeableRaster>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[0]));
         asl::AC_OFFSET_TYPE myArg[8]={0,0,0,0,0,0,0,0};
-        for (int i = 0; i < argc-1; ++i) {
+        for (uintN i = 0; i < argc-1; ++i) {
             if (!convertFrom(cx,argv[i+1],myArg[i])) {
                 throw BadArgumentException(std::string("pasteRaster: argument ")+asl::as_string(i+1)+" is not a valid number",PLUS_FILE_LINE); 
             }
         }
         const dom::ValueBase & myRasterValue = dynamic_cast<const dom::ValueBase &>(mySourceRaster);
-        myObject.pasteRaster(myRasterValue, myArg[0], myArg[1], myArg[2], myArg[3], myArg[4], myArg[5], myArg[6], myArg[7]);
+        myNativeRef.getValue().pasteRaster(myRasterValue, myArg[0], myArg[1], myArg[2], myArg[3], myArg[4], myArg[5], myArg[6], myArg[7]);
+        return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-
-    JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
-    return JS_TRUE;
 }
 
 static JSBool
@@ -167,10 +190,11 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     //JS_ReportError(cx, "save(): not yet implemented, use saveImage instead");
     return JS_FALSE;
 
+/*
     try {
         const dom::ResizeableRaster & mySourceRaster = JSClassTraits<dom::ResizeableRaster>::getNativeRef(cx, obj);
        if (argc != 1) {
-			JS_ReportError(cx, "raster.save(): expects at one argument: file name.");
+           JS_ReportError(cx, "raster.save(): expects at one argument: file name.");
             return JS_FALSE;
         }
 
@@ -187,6 +211,7 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         myFile.WriteableStream::append(mySourceRaster.pixels());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
+*/
 }
 
 static JSBool
@@ -196,7 +221,7 @@ load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("theFileName", "raw file containing pixel data", DOC_TYPE_STRING); 
     DOC_END;
-    dom::ResizeableRaster & myObject = JSClassTraits<dom::ResizeableRaster>::openNativeRef(cx, obj);
+    NativeRef<dom::ResizeableRaster> myNativeRef(cx, obj);
     try {
         ensureParamCount(argc, 3);
         asl::AC_SIZE_TYPE myWidth;
@@ -211,19 +236,18 @@ load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
             return JS_FALSE;
         }
-        myObject.resize(myWidth, myHeight);
-        if (myObject.pixels().size() == myFile.size()) {
-            myFile.readBytes(myObject.pixels().begin(), myObject.pixels().size(), 0);
+        myNativeRef.getValue().resize(myWidth, myHeight);
+        if (myNativeRef.getValue().pixels().size() == myFile.size()) {
+            myFile.readBytes(myNativeRef.getValue().pixels().begin(), myNativeRef.getValue().pixels().size(), 0);
             JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
         } else {
             JS_ReportError(cx, "raster.load: could not read pixels from file '%s', file size = %d, pixel map size = %d",
-                           myFileName.c_str(), myFile.size(), myObject.pixels().size());
+                           myFileName.c_str(), myFile.size(), myNativeRef.getValue().pixels().size());
             JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
             return JS_FALSE;
         }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    JSClassTraits<dom::ResizeableRaster>::closeNativeRef(cx, obj);
 }
 
 
@@ -292,7 +316,7 @@ JSResizeableRaster::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
                 return JS_TRUE;
             case PROP_size:
                 *vp = as_jsval(cx, getNative().getSize());
-				{AC_DEBUG << "getNative().getSize() = " << getNative().getSize();}
+                {AC_DEBUG << "getNative().getSize() = " << getNative().getSize();}
                 return JS_TRUE;
              default:
                 JS_ReportError(cx,"JSResizeableRaster::getProperty: index %d out of range", theID);

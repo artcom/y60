@@ -550,8 +550,8 @@ namespace dys {
 
     class ValueBase : public asl::ReadableBlock { //: public Expression {
     public:
-        operator bool() const {
-            return getBool();
+        operator const void*() const {
+            return getBool() ? this : NULL;
         }
         virtual bool getBool() const = 0;
         virtual void setBool(bool b) = 0;

@@ -211,7 +211,7 @@ public:
             << ", xsize = " << xsize << ", ysize = " << ysize << ":" << endl;
         typename MMAT::const_sub_iterator bgn = m.begin(x,y,xsize,ysize);
         typename MMAT::const_sub_iterator end = m.end(x,y,xsize,ysize);
-        PIX px = *bgn;
+        //PIX px = *bgn;
         DPRINT((const void*)&(*bgn));
         DPRINT((const void*)&(*end));
         int subsize = end - bgn;

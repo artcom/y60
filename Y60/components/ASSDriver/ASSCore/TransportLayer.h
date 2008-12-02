@@ -140,7 +140,7 @@ class TransportLayer :  public asl::PosixThread {
         asl::ThreadLock _myCommandQueueLock;
         CommandState _myConfigureState;
         double       _myLastCommandTime;
-        int          _myEventQueueSize;
+        std::queue<ASSEvent>::size_type _myEventQueueSize;
 
         // Controller Status
         // TODO: expose to JavaScript

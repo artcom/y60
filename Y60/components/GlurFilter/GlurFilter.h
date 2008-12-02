@@ -23,12 +23,18 @@
 #ifndef _GLUR_FILTER_h_
 #define _GLUR_FILTER_h_
 
+#include <vector>
+
 #include <y60/base/DataTypes.h>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/plpaintlibdefs.h>
 #include <paintlib/Filter/plfilter.h>
-
-#include <vector>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 class PLBmp;
 

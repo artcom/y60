@@ -68,7 +68,7 @@ static bool fillPrimitiveElement(JSContext *cx, JSObject * myObject,
         const asl::Point3f * myPolygonPtr = &asl::asPoint(myPositions[theElement._myStartVertex]);
         std::vector<asl::Point3f> myPolygon(myPolygonPtr, myPolygonPtr + theElement._myVertexCount);
         if (theTransformation) {
-            for (int i = 0; i < theElement._myVertexCount; ++i) {
+            for (unsigned int i = 0; i < theElement._myVertexCount; ++i) {
                 myPolygon[i] = myPolygon[i] * (*theTransformation);
             }
         }
@@ -108,7 +108,7 @@ jsval as_jsval(JSContext *cx,
 {
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
-    for (int i = 0; i < theVector.size(); ++i) {
+    for (y60::Primitive::IntersectionList::size_type i = 0; i < theVector.size(); ++i) {
         jsval myValue = as_jsval(cx, theVector[i], theMatrix, theInverseMatrix);
         if (!JS_SetElement(cx, myReturnObject, i, &myValue)) {
             return JS_FALSE;
@@ -189,7 +189,7 @@ jsval as_jsval(JSContext *cx,
 {
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
-    for (int i = 0; i < theVector.size(); ++i) {
+    for (y60::Primitive::SphereContactsList::size_type i = 0; i < theVector.size(); ++i) {
         jsval myValue = as_jsval(cx, theVector[i], theTransformation);
         if (!JS_SetElement(cx, myReturnObject, i, &myValue)) {
             return JS_FALSE;

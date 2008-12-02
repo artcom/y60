@@ -106,7 +106,7 @@ namespace y60 {
                 return NO_MATCH;
             }
             // check if we have any wildcards to ignore
-            for (int myIndex = 0; myIndex < myFeaturesLeft->size(); myIndex++) {
+            for (VectorOfString::size_type myIndex = 0; myIndex < myFeaturesLeft->size(); myIndex++) {
                 if ((*myFeaturesLeft)[myIndex] != theRequirementList[myIndex] &&
                     (*myFeaturesLeft)[myIndex] != "*" ) {
                         return NO_MATCH;
@@ -202,7 +202,7 @@ namespace y60 {
                                     GL_CONSTANT_ALPHA,
                                     GL_ONE_MINUS_SRC_ALPHA);
                 CHECK_OGL_ERROR;
-                float myGlow = myMaterialPropFacade->get<GlowTag>() + 0.01; // add 0.01 to workaround an alpha test bug
+                float myGlow = myMaterialPropFacade->get<GlowTag>() + 0.01f; // add 0.01 to workaround an alpha test bug
                 glBlendColor(1.0f,1.0f,1.0f, myGlow);
                 CHECK_OGL_ERROR;
             } else {
@@ -251,7 +251,7 @@ namespace y60 {
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
-            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
+            glLineStipple(1, myLineStippleProp->nodeValueAs<GLushort>());
         }
         CHECK_OGL_ERROR;
 
@@ -410,7 +410,7 @@ namespace y60 {
         theShader._myVertexParameters.clear();
 
         dom::NodePtr myParameterListNode = theParameterListNode->childNode(PARAMETER_LIST_NAME);
-        int myParameterCount = myParameterListNode->childNodesLength();
+        NodeList::size_type myParameterCount = myParameterListNode->childNodesLength();
         for (unsigned i = 0; i < myParameterCount; ++i) {
             dom::NodePtr myParameterNode = myParameterListNode->childNode(i);
             if (myParameterNode->nodeType() != dom::Node::COMMENT_NODE) {
@@ -472,7 +472,8 @@ namespace y60 {
 
         // projector projection matrix
         TexturePtr myTexture = theTextureUnit.getTexture();
-        Vector4f myPoTSize(myTexture->get<TextureWidthTag>(), myTexture->get<TextureHeightTag>(), 0.0f, 1.0f);
+        Vector4f myPoTSize( static_cast<float>(myTexture->get<TextureWidthTag>())
+                          , static_cast<float>(myTexture->get<TextureHeightTag>()), 0.0f, 1.0f );
         const Matrix4f & myImageMatrix = myTexture->getImage()->get<ImageMatrixTag>();
         Vector4f mySize = myPoTSize * myImageMatrix;
         float myAspect( mySize[0] / mySize[1] ); // XXX [DS] this aspect already contains the image matrix

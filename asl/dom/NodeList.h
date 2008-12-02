@@ -43,31 +43,35 @@ namespace dom {
     */
 
     class NodeList {
+    private:
+        typedef std::vector<NodePtr> _myNodeListType;
     public:
         friend class Node;
+
+        typedef _myNodeListType::size_type size_type;
 
         NodeList(Node * theShell);
         NodeList(const NodeList & theOtherList, Node * theShell);
         virtual ~NodeList();
-        virtual Node & operator[](int i);
-        virtual const Node & operator[](int i) const;
-        NodePtr item(int i);
-        const NodePtr item(int i) const;
-        int length() const;
-        int size() const;
+        virtual Node & operator[](size_type i);
+        virtual const Node & operator[](size_type i) const;
+        NodePtr item(size_type i);
+        const NodePtr item(size_type i) const;
+        size_type length() const;
+        size_type size() const;
         void binarize(asl::WriteableStream & theDest, Dictionaries & theDicts,unsigned long long theIncludeVersion) const;
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDicts, OpMode theLoadMode);
-        int findIndex(const Node * theNode) const;
+        size_type findIndex(const Node * theNode) const;
         NodePtr previousSibling(const Node * theNode);
         const NodePtr previousSibling(const Node * theNode) const;
         NodePtr nextSibling(const Node * theNode);
         const NodePtr nextSibling(const Node * theNode) const;
         bool findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theIndex) const;
-        
-        virtual NodePtr removeItem(int i);
+
+        virtual NodePtr removeItem(size_type i);
         virtual NodePtr append(NodePtr theNewNode);
-        virtual void setItem(int theIndex, NodePtr theNewNode);
-        virtual void insert(int theIndex, NodePtr theNewNode);
+        virtual void setItem(size_type theIndex, NodePtr theNewNode);
+        virtual void insert(size_type theIndex, NodePtr theNewNode);
         virtual void clear();
 
         void setVersion(unsigned long long theVersion);
@@ -83,54 +87,54 @@ namespace dom {
         virtual void flush(); // is a clear() with version bumping
         Node * _myShell;
     private:
-        std::vector<NodePtr> _myNodes;
+        _myNodeListType _myNodes;
     };
 
-	class NamedNodeMap : public NodeList {
-	public:
-		friend class Node;
+    class NamedNodeMap : public NodeList {
+    public:
+        friend class Node;
 
         NamedNodeMap(Node * theShell);
-		NamedNodeMap(const NamedNodeMap & other, Node * theShell);
-		virtual Node & operator[](int i);
-		virtual const Node & operator[](int i) const;
-		virtual Node & operator[](const DOMString & name);
-		virtual const Node & operator[](const DOMString & name) const;
-		virtual NodePtr getNamedItem(const DOMString & name);
-		virtual const NodePtr getNamedItem(const DOMString & name) const;
-		virtual NodePtr setNamedItem(NodePtr node);
+        NamedNodeMap(const NamedNodeMap & other, Node * theShell);
+        virtual Node & operator[](size_type i);
+        virtual const Node & operator[](size_type i) const;
+        virtual Node & operator[](const DOMString & name);
+        virtual const Node & operator[](const DOMString & name) const;
+        virtual NodePtr getNamedItem(const DOMString & name);
+        virtual const NodePtr getNamedItem(const DOMString & name) const;
+        virtual NodePtr setNamedItem(NodePtr node);
 
         virtual NodePtr append(NodePtr theNewNode);
-        virtual void setItem(int theIndex, NodePtr theNewItem);
-        virtual void insert(int theIndex, NodePtr theNewNode);
+        virtual void setItem(size_type theIndex, NodePtr theNewItem);
+        virtual void insert(size_type theIndex, NodePtr theNewNode);
 
-        static int countNodesNamed(const DOMString & name, const NodeList & nodes);
-        static int findNthNodeNamed(const DOMString & name, int n, const NodeList & nodes);
+        static size_type countNodesNamed(const DOMString & name, const NodeList & nodes);
+        static size_type findNthNodeNamed(const DOMString & name, size_type n, const NodeList & nodes);
     protected:
         NodePtr appendWithoutReparenting(NodePtr theNewNode);
-	};
+    };
 
-	class TypedNamedNodeMap : public NamedNodeMap {
-	public:
-		friend class Node;
+    class TypedNamedNodeMap : public NamedNodeMap {
+    public:
+        friend class Node;
 
         TypedNamedNodeMap(unsigned short theAllowedType, Node * theShell) : NamedNodeMap(theShell), allowedType(theAllowedType) {}
         TypedNamedNodeMap(Node * theShell) : NamedNodeMap(theShell), allowedType(0) {}
-		TypedNamedNodeMap(const NamedNodeMap & other, unsigned short theAllowedType, Node * theShell)
-			: NamedNodeMap(other, theShell), allowedType(theAllowedType)  {}
-		TypedNamedNodeMap(const TypedNamedNodeMap & other, Node * theShell)
-			: NamedNodeMap(other, theShell), allowedType(other.allowedType) {}
- 		virtual NodePtr setNamedItem(NodePtr node);
+        TypedNamedNodeMap(const NamedNodeMap & other, unsigned short theAllowedType, Node * theShell)
+            : NamedNodeMap(other, theShell), allowedType(theAllowedType)  {}
+        TypedNamedNodeMap(const TypedNamedNodeMap & other, Node * theShell)
+            : NamedNodeMap(other, theShell), allowedType(other.allowedType) {}
+        virtual NodePtr setNamedItem(NodePtr node);
         virtual NodePtr append(NodePtr theNewNode);
-        virtual void setItem(int theIndex, NodePtr theNewItem);
-        virtual void insert(int theIndex, NodePtr theNewNode);
+        virtual void setItem(size_type theIndex, NodePtr theNewItem);
+        virtual void insert(size_type theIndex, NodePtr theNewNode);
     protected:
         NodePtr appendWithoutReparenting(NodePtr theNewNode);
-	private:
+    private:
         void checkType(NodePtr theNewNode);
-		unsigned short allowedType;
-	};
-     /* @} */
+        unsigned short allowedType;
+    };
+    /* @} */
 } //Namespace dom
 
 

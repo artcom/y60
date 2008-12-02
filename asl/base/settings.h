@@ -68,6 +68,12 @@
     #define _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
 #endif
 
+#ifdef _MSC_VER
+// C4355 : 'this' : used in base member initializer list
+// C4239 : nonstandard extension used : 'type cast' : conversion from '<temporary>' to '<non-const reference>'
+// C4396: 'func' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+#pragma warning( disable: 4355 /*4239*/ 4396 )
+#endif // _MSC_VER
 
 // this is not exactly accurate
 #ifdef OSX_PPC
@@ -164,8 +170,9 @@ namespace asl {
 /* @{ */
 	inline int disableHeapDebug(int theFlags = 0) {
 #ifdef DEBUG_VARIANT
-		return _CrtSetDbgFlag(theFlags);
+        return _CrtSetDbgFlag(theFlags);
 #else
+        (void)theFlags;
         return 0;
 #endif
 	}

@@ -96,16 +96,17 @@ int getDefaultedIntXMLParam (const dom::Node & theNode,
 }
 
 PLPixel32 getXMLColorNode (const dom::Node & theNode) {
-    int r,g,b; // Not styleguide conform! 
-               // TODO: Start big discussion.
-    string s = theNode("#text").nodeValue();
-    int numConverted = sscanf (s.c_str(), "%d,%d,%d", &r, &g, &b);
+    int r;
+    int g;
+    int b;
+    int numConverted = sscanf (theNode("#text").nodeValue().c_str(), "%d,%d,%d", &r, &g, &b);
     if (numConverted != 3) {
-        string s;
-        s = "Field " + asl::as_string (theNode) + " should contain a color value.\n";
-        throw (invalid_argument (s.c_str()));
+        const string s = "Field " + asl::as_string (theNode) + " should contain a color value.\n";
+        throw invalid_argument(s.c_str());
     }
-    return PLPixel32 (r,g,b,0);
+    return PLPixel32 ( static_cast<PLBYTE>(r)
+                     , static_cast<PLBYTE>(g)
+                     , static_cast<PLBYTE>(b), 0 );
 }
 
 

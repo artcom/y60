@@ -218,15 +218,15 @@ namespace asl {
 
 #define MAKEUNIQUE(x) myVar_##x
 #ifdef WIN32
-#define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
-#ifdef DEBUG
-#define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
+#   define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
+#   if defined(DEBUG)
+#       define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
+#   else
+#       define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
+#   endif
 #else
-#define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (std::ostream&)(asl::MessagePort(SEVERITY,MODULE,MSGID).stream)
-#endif
-#else
-#define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
-#define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
+#   define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
+#   define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && (asl::MessagePort(SEVERITY,MODULE,MSGID).getStream())
 #endif
 
 // Although it might look obscure, this macro should generate no code at all and remove the logging

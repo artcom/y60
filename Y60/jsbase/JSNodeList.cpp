@@ -29,7 +29,7 @@ namespace jslib {
         DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
         DOC_RVAL("The node from the nodelist at the specified index", DOC_TYPE_NODE);
         DOC_END;
-        typedef dom::NodePtr (NodeList::*MyMethod)(int);
+        typedef dom::NodePtr (NodeList::*MyMethod)(NodeList::size_type);
         return Method<NodeList>::call((MyMethod)&NodeList::item,cx,obj,argc,argv,rval);
     }
 

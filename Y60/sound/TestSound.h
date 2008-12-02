@@ -228,9 +228,23 @@ class TestStopAll: public SoundTestBase {
                 mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
                 mySound->play();
             }
+
             msleep(700);
+
             getSoundManager().stopAll();
-            ENSURE(getSoundManager().getNumSounds() == 0);
+
+            // Wait for all sounds to stop.
+            // This is necessary because the SoundManager
+            // interface is asynchronous.
+            bool allStopped = false;
+            for(unsigned int i = 0; i < 5; i++) {
+                msleep(200);
+                if(getSoundManager().getNumSounds() == 0) {
+                    allStopped = true;
+                    break;
+                }
+            }
+            ENSURE(allStopped);
         }
 };
 

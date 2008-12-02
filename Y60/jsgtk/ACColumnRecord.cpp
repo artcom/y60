@@ -21,7 +21,7 @@
 ACColumnRecord::ACColumnRecord(unsigned int theColCount) {
     add(_myRecId);
     _myColumns.resize(theColCount);
-    for (int i = 0; i < theColCount; ++i) {
+    for (unsigned int i = 0; i < theColCount; ++i) {
         add(_myColumns[i]);
     }
 }

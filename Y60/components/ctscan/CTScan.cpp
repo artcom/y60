@@ -17,20 +17,24 @@
 //=============================================================================
 
 #include "CTScan.h"
-#include "PLFile.h"
-#include "DicomFile.h"
-#include "MarchingCubes.h"
 
-#include <y60/scene/WorldBuilder.h>
-#include <y60/scene/TransformBuilder.h>
-#include <y60/scene/BodyBuilder.h>
-#include <y60/scene/MaterialBuilder.h>
-#include <y60/scene/CameraBuilder.h>
-#include <y60/scene/Camera.h>
-#include <y60/image/Image.h>
-#include <y60/scene/Facades.h>
+#include <fstream>
+#include <algorithm>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
+#include <paintlib/Filter/plfilterresizebilinear.h>
+#include <paintlib/plpixelformat.h>
+#include <paintlib/planybmp.h>
+#include <paintlib/plsubbmp.h>
+#include <paintlib/plpngenc.h>
 #include <paintlib/plexcept.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
+
+#include <asl/base/Assure.h>
 #include <asl/base/MappedBlock.h>
 #include <asl/base/Logger.h>
 #include <asl/zip/PackageManager.h>
@@ -39,16 +43,19 @@
 
 #include <y60/base/property_functions.h>
 #include <y60/base/PropertyNames.h>
-
+#include <y60/scene/WorldBuilder.h>
+#include <y60/scene/TransformBuilder.h>
+#include <y60/scene/BodyBuilder.h>
+#include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/CameraBuilder.h>
+#include <y60/scene/Camera.h>
+#include <y60/image/Image.h>
 #include <y60/image/PLFilterResizePadded.h>
-#include <paintlib/Filter/plfilterresizebilinear.h>
-#include <paintlib/plpixelformat.h>
-#include <paintlib/planybmp.h>
-#include <paintlib/plsubbmp.h>
-#include <paintlib/plpngenc.h>
-#include <asl/base/Assure.h>
-#include <fstream>
-#include <algorithm>
+#include <y60/scene/Facades.h>
+
+#include "PLFile.h"
+#include "DicomFile.h"
+#include "MarchingCubes.h"
 
 using namespace asl;
 using namespace std;

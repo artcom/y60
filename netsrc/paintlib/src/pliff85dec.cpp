@@ -261,8 +261,8 @@ void PLIFF85Decoder::Open(PLDataSource * pDataSrc)
 
   // Too many CMAP entries probably indicates an error.
   const int maxExpectedCMapElements = int(((m_viewMode & PLIFF85::viewHAM) != 0) ?
-    pow(2, m_bitmapHeader.nPlanes - 2) :
-    pow(2, m_bitmapHeader.nPlanes));
+    pow(2.0, m_bitmapHeader.nPlanes - 2) :
+    pow(2.0, m_bitmapHeader.nPlanes));
 
   if (numCMapElements > maxExpectedCMapElements)
   {

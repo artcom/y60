@@ -18,33 +18,33 @@
 
 namespace y60 {
 
-	class BackgroundSubtraction : public Algorithm {
-		public:
-            BackgroundSubtraction(const std::string & theName);
+    class BackgroundSubtraction : public Algorithm {
+    public:
+        BackgroundSubtraction(const std::string & theName);
 
-			static std::string getName() { return "backgroundsubtraction"; }
-		    void onFrame(double t);
-            
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
+        static std::string getName() { return "backgroundsubtraction"; }
+        void onFrame(double t);
+
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
 
 
 
-		private:
-            unsigned char clampedSub(unsigned char theFirstValue, unsigned char theSecondValue);
-            
-            dom::Element _myResultNode;
-            y60::ImagePtr _mySourceImage;
-            y60::ImagePtr _myTargetImage;
-            y60::ImagePtr _myBackgroundImage;
-    
-            unsigned _myImageNodeVersion;
+    private:
+        unsigned char clampedSub(unsigned char theFirstValue, unsigned char theSecondValue);
 
-            float _myThreshold;
-            float _myWeight;
-            unsigned int _myCounter;
+        dom::Element _myResultNode;
+        y60::ImagePtr _mySourceImage;
+        y60::ImagePtr _myTargetImage;
+        y60::ImagePtr _myBackgroundImage;
+
+        asl::Unsigned64 _myImageNodeVersion;
+
+        float _myThreshold;
+        float _myWeight;
+        unsigned int _myCounter;
     };
 }
 

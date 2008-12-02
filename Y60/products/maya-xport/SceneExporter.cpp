@@ -139,11 +139,11 @@ SceneExporter::parseOptions(const MString & theOptionString) {
             myOption.clear();
             myOptionList[i].split('=', myOption);
             if (myOption[0] == MString("binary")) {
-                myExportOptions.binaryFlag = myOption[1].asInt();
+                myExportOptions.binaryFlag = 0 != myOption[1].asInt();
             } else if (myOption[0] == MString("inlineTextures")) {
-                myExportOptions.inlineTexturesFlag = myOption[1].asInt();
+                myExportOptions.inlineTexturesFlag = 0 != myOption[1].asInt();
             } else if (myOption[0] == MString("progressBar")) {
-                myExportOptions.enableProgressBar = myOption[1].asInt();
+                myExportOptions.enableProgressBar = 0 != myOption[1].asInt();
             }
         }
     }
@@ -516,7 +516,7 @@ SceneExporter::resolveSkinAndBones() {
                     myMatrixPlugs.name().asChar()+"' is not an array. aborting.",
                     "SceneExporter::resolveSkinAndBones()");
         }
-        for (int i = 0; i < myMatrixPlugs.numElements(); ++i) {
+        for (unsigned int i = 0; i < myMatrixPlugs.numElements(); ++i) {
             MPlugArray myWorldMatrixPlugs;
             myMatrixPlugs[i].connectedTo(myWorldMatrixPlugs, true, false, & myStatus);
             if (!myStatus) {

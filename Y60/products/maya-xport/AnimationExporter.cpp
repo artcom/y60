@@ -57,7 +57,7 @@ doNotConvert(float & theValue) {
 
 void
 transparencyToAlpha(float & theValue) {
-    theValue = 1.0 - theValue;
+    theValue = 1.0f - theValue;
 }
 
 template <class T>
@@ -182,7 +182,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
     _mySceneBuilder.appendCharacter(myCharacterBuilder);
 
     // get character clips
-    int myNumClips 	= myCharacterNode.getSourceClipCount(&myStatus);
+    unsigned int myNumClips 	= myCharacterNode.getSourceClipCount(&myStatus);
     if (myStatus != MStatus::kSuccess) {
         throw ExportException(std::string("Character does not have any clips."),
                 PLUS_FILE_LINE);

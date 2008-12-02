@@ -137,7 +137,7 @@ namespace y60 {
 
         const char * getName() const { return "y60WMVDecoder"; }
     private:
-        static const MAX_TIMEOUT_FOR_EVENT = 60000;
+        static const unsigned int MAX_TIMEOUT_FOR_EVENT = 60000;
 
         bool checkNetworkConfig();
         const std::string getProxyForProtocol(IWMReaderNetworkConfig * theNetworkConfig,

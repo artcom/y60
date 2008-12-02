@@ -142,7 +142,12 @@ namespace dom {
         */
     };
 
-    template <class PAYLOAD>
+    
+#ifdef GenericEvent 
+#error Bla
+#endif
+
+    template <class AC_PAYLOAD_TPL>
     class GenericEvent : public Event {
     public:
         GenericEvent(const DOMString theType,
@@ -150,7 +155,7 @@ namespace dom {
                      bool cancelableArg = true,
                      bool targetOnly = false,
                      DOMTimeStamp theTimeStamp = DOMTimeStamp(),
-                     asl::Ptr<PAYLOAD> thePayload = asl::Ptr<PAYLOAD>(0))
+                     asl::Ptr<AC_PAYLOAD_TPL> thePayload = asl::Ptr<AC_PAYLOAD_TPL>(0))
                      : 
         _myType(theType),
         _myBubblesFlag(canBubbleArg),
@@ -223,13 +228,13 @@ namespace dom {
                                         in boolean canBubbleArg, 
                                         in boolean cancelableArg);
         */
-        asl::Ptr<PAYLOAD> getPayload() {
+        asl::Ptr<AC_PAYLOAD_TPL> getPayload() {
             return _myPayload;
         }
-        const asl::Ptr<PAYLOAD> & getPayload() const {
+        const asl::Ptr<AC_PAYLOAD_TPL> & getPayload() const {
             return _myPayload;
         }
-        void setPayload(asl::Ptr<PAYLOAD> thePayload) {
+        void setPayload(asl::Ptr<AC_PAYLOAD_TPL> thePayload) {
             _myPayload = thePayload;
         }
         // added functions for automatic dispatch and propagation
@@ -263,7 +268,7 @@ namespace dom {
         DOMTimeStamp _myTimeStamp;
         bool _myPropagationStopped;
         bool _myDefaultPrevented;
-        asl::Ptr<PAYLOAD> _myPayload;
+        asl::Ptr<AC_PAYLOAD_TPL> _myPayload;
     };
 
     class EventFactory {

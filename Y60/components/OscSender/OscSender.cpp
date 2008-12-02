@@ -39,8 +39,8 @@ namespace y60 {
         _myReceiverAddress = theReceiverAddress;
         _myReceiverPort    = theReceiverPort;
         
-        _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, theSenderPort ));
-        _myReceiverUDPConnection->connect( getHostAddress( theReceiverAddress.c_str() ), theReceiverPort);       
+        _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(theSenderPort) ));
+        _myReceiverUDPConnection->connect( getHostAddress( theReceiverAddress.c_str() ), static_cast<asl::Unsigned16>(theReceiverPort));
         AC_DEBUG << "Connected to : " << theReceiverAddress << " with port : " << theReceiverPort << " and sender port: " << theSenderPort;
         return true; 
     }

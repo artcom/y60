@@ -88,7 +88,13 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
     fd_set myReadSet;
 
     FD_ZERO(&myReadSet);
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
     FD_SET(theListenHandle, &myReadSet);
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
     if (theTimeout >= 0) {
         struct timeval tv;
         tv.tv_sec = theTimeout / 1000;
@@ -134,10 +140,22 @@ SocketPolicy::handleIO(Handle & theHandle, BufferQueue & theInQueue, BufferQueue
     fd_set myWriteSet;
 
     FD_ZERO(&myReadSet);
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
     FD_SET(theHandle, &myReadSet);
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
     FD_ZERO(&myWriteSet);
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
     FD_SET(theHandle, &myWriteSet);
-    
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
+
     if (theTimeout >= 0) {
         struct timeval tv;
         tv.tv_sec = theTimeout / 1000;
@@ -221,16 +239,16 @@ SocketPolicy::sendData(Handle & theHandle, BufferQueue & theOutQueue)
     {
         int myLastError = getLastSocketError();
         switch (myLastError) {
-			case EPIPE:{
+            case EPIPE:{
                 AC_WARNING << "broken pipe: send failed";
-				return false;}
+                return false;}
             default:
                 throw ConduitException(string("SocketPolicy::send failed - ") +
                     getSocketErrorMessage(myLastError), PLUS_FILE_LINE);
         }
     }
     DB(AC_TRACE << "sent " << byteswritten << " bytes " << endl);
-    if (byteswritten < myOutBuffer->size()) {
+    if (static_cast<CharBuffer::size_type>(byteswritten) < myOutBuffer->size()) {
         myOutBuffer->erase(myOutBuffer->begin(), myOutBuffer->begin()+byteswritten);
         theOutQueue.push_front(myOutBuffer);
     }

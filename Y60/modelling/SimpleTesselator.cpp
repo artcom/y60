@@ -50,15 +50,15 @@ namespace y60 {
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myTotalVerticesCount);
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, myTotalVerticesCount);
         myShapeBuilder.appendVertexData(NORMAL_ROLE, Vector3f(0,0,1));
-        
+
         unsigned mySegmentCounter = 1;
-        
-        VectorOfVector2f a;            
-        
-        for (int myPointIndex = 0; myPointIndex < theContour.size(); myPointIndex++, mySegmentCounter++) {
+
+        VectorOfVector2f a;
+
+        for (VectorOfVector2f::size_type myPointIndex = 0; myPointIndex < theContour.size(); myPointIndex++, mySegmentCounter++) {
             Vector2f myTmp = theContour[myPointIndex];
             bool myAlreadyInListFlag = false;            
-            for (int j = 0; j < a.size(); j++) {
+            for (VectorOfVector2f::size_type j = 0; j < a.size(); j++) {
                 if (almostEqual(a[j], myTmp, theEqualPointsThreshold)) {
                     AC_TRACE << "points equal at index:  " << j << " liste : " << a[j] <<  " new point" <<  myTmp;
                     myAlreadyInListFlag = true;

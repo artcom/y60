@@ -14,7 +14,9 @@
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
 
+#if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0501
+#endif
 #include <windows.h>
 #include <string>
 
@@ -81,7 +83,7 @@ namespace y60 {
             bool isVisible() const;
 
             static bool windowExists(std::string theWindowTitle) {
-                return FindWindow(0, theWindowTitle.c_str());
+                return 0 != FindWindow(0, theWindowTitle.c_str());
             }
 
         private:

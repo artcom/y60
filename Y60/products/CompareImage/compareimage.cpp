@@ -9,16 +9,22 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 
-#include "plfiltersubtract.h"
-#include "plfilter3x3.h"
-
 #include <asl/base/Arguments.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/Logger.h>
 
+#include "plfiltersubtract.h"
+#include "plfilter3x3.h"
+
+#if defined(_MSC_VER)
+#   pragma warning (push,1)
+#endif //defined(_MSC_VER)
 #include <paintlib/planydec.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;

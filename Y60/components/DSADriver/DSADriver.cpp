@@ -83,8 +83,8 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                 typedef std::vector< std::vector< asl::Vector3i > > VectorOfVectorOfVector3i;
                 VectorOfVectorOfVector3i mySensorMapping = asl::as<VectorOfVectorOfVector3i>(myData);
 
-                for (unsigned row = 0; row < myGridSize[1]; ++row) {
-                    for (unsigned col = 0; col < myGridSize[0]; ++col) {
+                for (int row = 0; row < myGridSize[1]; ++row) {
+                    for (int col = 0; col < myGridSize[0]; ++col) {
 
                         unsigned myPortId, myControllerId, myBitNumber;
                         myPortId = mySensorMapping[row][col][0];

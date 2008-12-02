@@ -129,9 +129,10 @@ main(int argc, char **argv) {
     // "Issuing a return statement from the main function is equivalent to calling the exit
     // function with the return value as its argument."
     exit(rv);
+#else
+    return rv;
 #endif
 
-    return rv;
 }
 
 #if 0

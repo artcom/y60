@@ -13,7 +13,14 @@
 
 #include "JSMenuShell.h"
 #include <y60/jsbase/JSWrapper.h>
+
+#if defined(_MSC_VER)
+#pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm/menu.h>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #include <asl/base/string_functions.h>
 
@@ -78,6 +85,12 @@ struct JSClassTraits<JSMenu::NATIVE>
     : public JSClassTraitsWrapper<JSMenu::NATIVE, JSMenu> {};
 
 jsval as_jsval(JSContext *cx, JSMenu::OWNERPTR theOwner, JSMenu::NATIVE * theMenu);
+
+inline
+jsval 
+as_jsval(JSContext *cx, JSMenu::NATIVE * theMenu) {
+    return as_jsval(cx,JSMenu::OWNERPTR(),theMenu);
+}
 
 } // namespace
 
