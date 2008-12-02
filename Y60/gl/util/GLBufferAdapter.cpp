@@ -27,8 +27,8 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
-#include <GL/gl.h>
 #include <GL/glew.h>
+#include <GL/gl.h>
 
 #include <asl/base/string_functions.h>
 #include <y60/image/PixelEncoding.h>
