@@ -18,7 +18,8 @@
 #include <asl/math/Vector234.h>
 #include <asl/base/string_functions.h>
 
-#include <GL/gl.h>
+#include <y60/glutil/GLUtils.h>
+
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
