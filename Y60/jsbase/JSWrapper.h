@@ -788,7 +788,7 @@ AC_INFO<<"Registering function "<<theName;
         AC_INFO<<"Registering property "<<theName;
         JSPropertySpec mySpec;
         mySpec.name = theName;
-        mySpec.tinyid = theList.size()-100;
+        mySpec.tinyid = static_cast<int8>(theList.size()-100);
         mySpec.getter = theGetter;
         mySpec.setter = theSetter;
         uint8 myFlags = JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED;
