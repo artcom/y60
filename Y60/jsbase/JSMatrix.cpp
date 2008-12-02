@@ -25,6 +25,232 @@ typedef asl::Matrix4<Number> NATIVE;
 
 template class JSWrapper<asl::Matrix4f>;
 
+#define WRAP_METHOD_BEGIN2(NAME,CPP_NAME,DOCSTR) \
+static JSBool \
+Call_##CPP_NAME(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { \
+    DOC_BEGIN(DOCSTR)
+
+#define WRAP_METHOD_BEGIN(NAME,DOCSTR) WRAP_METHOD_BEGIN2(NAME,NAME,DOCSTR)
+
+#define WRAP_METHOD_SINGLE_CALL(CPP_NAME) return Method<NATIVE>::call(&NATIVE::CPP_NAME,cx,obj,argc,argv,rval);
+
+#define WRAP_METHOD_END }
+
+#define WRAP_METHOD_REGISTER2(NAME,CPP_NAME) \
+static bool Register_##CPP_NAME = JSClassTraits<NATIVE>::registerMethod(# NAME,&Call_##CPP_NAME,0);
+
+#define WRAP_METHOD_REGISTER(NAME) WRAP_METHOD_REGISTER2(NAME,NAME)
+
+// wrap and register a single, non-overlaoded method
+#define WRAP_AND_REGISTER_METHOD2(NAME,CPP_NAME) \
+DOC_END \
+WRAP_METHOD_SINGLE_CALL(CPP_NAME) \
+WRAP_METHOD_END \
+WRAP_METHOD_REGISTER2(NAME,CPP_NAME)
+
+#define WRAP_AND_REGISTER_METHOD(NAME) WRAP_AND_REGISTER_METHOD2(NAME,NAME)
+
+
+#define WRAP_METHOD_OVERLOADED_CALL(RETURN_TYPE,CPP_NAME,ARG_TYPES) \
+{ \
+typedef RETURN_TYPE (NATIVE::*MyMethod)ARG_TYPES; \
+return Method<NATIVE>::call((MyMethod)&NATIVE::CPP_NAME,cx,obj,argc,argv,rval); \
+}
+
+// wrap and register a single overlaoded method
+#define WRAP_AND_REGISTER_OVERLOADED_METHOD2(NAME,RETURN_TYPE,CPP_NAME,ARG_TYPES) \
+DOC_END \
+WRAP_METHOD_OVERLOADED_CALL(RETURN_TYPE,CPP_NAME,ARG_TYPES) \
+WRAP_METHOD_END \
+WRAP_METHOD_REGISTER2(NAME,CPP_NAME)
+
+#define WRAP_AND_REGISTER_OVERLOADED_METHOD(RETURN_TYPE,NAME,ARG_TYPES) \
+WRAP_AND_REGISTER_OVERLOADED_METHOD2(NAME,RETURN_TYPE,NAME,ARG_TYPES)
+
+
+//---------------------- property wrapping
+
+#define WRAP_PROPERTY_REGISTER(NAME,GETTER,SETTER) \
+static bool RegisterProperty_##NAME = JSClassTraits<NATIVE>::registerProperty(# NAME,GETTER,SETTER);
+
+
+#define WRAP_PROPERTY_WITH_GETTER(NAME,GETTER) \
+static JSBool getProperty_##NAME(JSContext *cx, JSObject *obj, jsval id, jsval *vp) { \
+    const NATIVE & myNative = JSClassTraits<NATIVE>::getNativeRef(cx, obj); \
+    *vp = as_jsval(cx, myNative.GETTER()); \
+    return JS_TRUE; \
+} \
+WRAP_PROPERTY_REGISTER(NAME, getProperty_##NAME, 0)
+
+WRAP_PROPERTY_WITH_GETTER(type,getType); 
+WRAP_PROPERTY_WITH_GETTER(typename,getTypeString); 
+
+#if 1
+WRAP_METHOD_BEGIN2(setRow, assignRow, "Set a row of the matrix.");
+    DOC_PARAM("theIndex", "index of the row [0-3] to set", DOC_TYPE_INTEGER);
+    DOC_PARAM("theVector", "Row vector to set.", DOC_TYPE_VECTOR4F);
+WRAP_AND_REGISTER_METHOD2(setRow, assignRow);
+
+WRAP_METHOD_BEGIN(getRow, "Get a row from the matrix.");
+    DOC_PARAM("theIndex", "index of the row to get", DOC_TYPE_INTEGER);
+    DOC_RVAL("Row vector", DOC_TYPE_VECTOR4F);
+WRAP_AND_REGISTER_METHOD(getRow);
+
+WRAP_METHOD_BEGIN2(setColumn, assignColumn, "Set a column of the matrix.");
+    DOC_PARAM("theIndex", "index of the column to set", DOC_TYPE_INTEGER);
+    DOC_PARAM("theVector", "Column vector to set.", DOC_TYPE_VECTOR4F);
+WRAP_AND_REGISTER_METHOD2(setColumn, assignColumn);
+
+WRAP_METHOD_BEGIN(getColumn, "Get a column from the matrix.");
+    DOC_PARAM("theIndex", "index of the column to get", DOC_TYPE_INTEGER);
+    DOC_RVAL("Column vector", DOC_TYPE_VECTOR4F);
+WRAP_AND_REGISTER_METHOD(getColumn);
+
+WRAP_METHOD_BEGIN(makeIdentity, "Make this matrix an identity matrix.");
+WRAP_AND_REGISTER_METHOD(makeIdentity);
+
+WRAP_METHOD_BEGIN(makeXRotating, "Make this matrix a X-axis rotation matrix.");
+    DOC_PARAM("theAngle", "Angle around the X-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(makeXRotating);
+
+WRAP_METHOD_BEGIN(makeYRotating, "Make this matrix a Y-axis rotation matrix.");
+    DOC_PARAM("theAngle", "Angle around the Y-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(makeYRotating);
+
+WRAP_METHOD_BEGIN(makeZRotating, "Make this matrix a Z-axis rotation matrix.");
+    DOC_PARAM("theAngle", "Angle around the Z-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(makeZRotating);
+
+WRAP_METHOD_BEGIN(makeXYZRotating, "Make this matrix a XYZ rotation matrix.");
+    DOC_PARAM("theAngles", "Angles of rotation around XYZ axis", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(makeXYZRotating);
+
+WRAP_METHOD_BEGIN(makeRotating, "Make this matrix a general rotation matrix.");
+    DOC_PARAM("theAxis", "Axis to rotate around", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theAngle", "Angle around the axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(makeRotating);
+
+
+WRAP_METHOD_BEGIN(makeScaling, "Make this matrix a scaling matrix.");
+    DOC_PARAM("theScale", "Scaling factors for the XYZ axis", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(makeScaling);
+
+WRAP_METHOD_BEGIN(makeTranslating, "Make this matrix a translation matrix.");
+    DOC_PARAM("theTranslation", "Translation values for the XYZ axis.", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(makeTranslating);
+
+
+WRAP_METHOD_BEGIN(makeLookAt, "Make this matrix a transform which looks from eye to center.");
+    DOC_PARAM("theEye", "Eye Position", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theCenter", "Center Position", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theUp", "Up Vector", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(makeLookAt);
+
+WRAP_METHOD_BEGIN(makePerspective, "Make this matrix a projection matrix.");
+    DOC_PARAM("theFovy", "Field of View", DOC_TYPE_FLOAT);
+    DOC_PARAM("theAspect", "Aspect ratio", DOC_TYPE_FLOAT);
+    DOC_PARAM("theZNear", "Near Plane Distance", DOC_TYPE_FLOAT);
+    DOC_PARAM("theZFar", "Far Plane Distance", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(makePerspective);
+
+WRAP_METHOD_BEGIN(rotateX, "Rotate this matrix around the X axis.");
+    DOC_PARAM("theAngle", "Angle around the X-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_OVERLOADED_METHOD(void, rotateX, (Number) );
+
+WRAP_METHOD_BEGIN(rotateY, "Rotate this matrix around the Y axis.");
+    DOC_PARAM("theAngle", "Angle around the Y-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_OVERLOADED_METHOD(void, rotateY, (Number) );
+
+WRAP_METHOD_BEGIN(rotateZ, "Rotate this matrix around the Z axis.");
+    DOC_PARAM("theAngle", "Angle around the Z-axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_OVERLOADED_METHOD(void, rotateZ, (Number) );
+
+WRAP_METHOD_BEGIN(rotateXYZ, "Rotate this matrix around the XYZ axis.");
+    DOC_PARAM("theAngles", "Angles of rotation around XYZ axis", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(rotateXYZ);
+
+WRAP_METHOD_BEGIN(rotate, "Rotate this matrix around an arbitrary axis.");
+    DOC_PARAM("theAxis", "Axis to rotate around", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theAngle", "Angle around the axis", DOC_TYPE_FLOAT);
+WRAP_AND_REGISTER_METHOD(rotate);
+
+WRAP_METHOD_BEGIN(scale, "Scale this matrix.");
+    DOC_PARAM("theScale", "Scaling factors for the XYZ axis", DOC_TYPE_VECTOR3F);
+ WRAP_AND_REGISTER_METHOD(scale);
+
+WRAP_METHOD_BEGIN(translate, "Translate this matrix.");
+    DOC_PARAM("theTranslation", "Translation values for the XYZ axis.", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(translate);
+
+WRAP_METHOD_BEGIN(postMultiply, "Multiply this matrix by another matrix.");
+    DOC_PARAM("theMatrix", "", DOC_TYPE_MATRIX4F);
+WRAP_AND_REGISTER_METHOD(postMultiply);
+
+WRAP_METHOD_BEGIN(invert, "Invert this matrix.");
+WRAP_AND_REGISTER_METHOD(invert);
+
+WRAP_METHOD_BEGIN(getTranslation, "Get translation part of this matrix.");
+    DOC_RVAL("Translation vector", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(getTranslation);
+
+WRAP_METHOD_BEGIN(getScale, "Get scaling part of this matrix.");
+    DOC_RVAL("Scale vector", DOC_TYPE_VECTOR3F);
+WRAP_AND_REGISTER_METHOD(getScale);
+
+
+WRAP_METHOD_BEGIN(getRotation, "Get orientation part of this matrix.");
+    DOC_RVAL("orientation vector", DOC_TYPE_VECTOR3F);
+    DOC_END;
+    asl::Matrix4f myObj;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj), myObj)) {
+        asl::Vector3<float> myRotation;
+        myObj.getRotation(myRotation);
+        *rval = as_jsval(cx, myRotation);
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}
+WRAP_METHOD_REGISTER(getRotation);
+
+WRAP_METHOD_BEGIN(decompose, "Decompose matrix into it's components.");
+    DOC_RVAL("{scale,shear,orientation,position}", DOC_TYPE_OBJECT);
+    DOC_END;
+    if (argc != 0) {
+        JS_ReportError(cx,"Matrix.decompose: wrong number of parameters: %d, 0 expected", argc);
+        return JS_FALSE;
+    }
+    typedef JSMatrix::NativeValuePtr TYPED_PTR;
+    TYPED_PTR myObjValPtr;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj),myObjValPtr)) {
+        asl::Vector3<float> myScale;
+        asl::Vector3<float> myShear;
+        asl::Quaternionf myOrientation;
+        asl::Vector3<float> myPosition;
+        if  (myObjValPtr->getValue().decompose(myScale, myShear, myOrientation, myPosition)) {
+            JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+            if (!JS_DefineProperty(cx, myReturnObject, "scale",       as_jsval(cx, myScale),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "shear",       as_jsval(cx, myShear),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "orientation", as_jsval(cx, myOrientation),  0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "position",    as_jsval(cx, myPosition),     0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            *rval = OBJECT_TO_JSVAL(myReturnObject);
+            return JS_TRUE;
+        }
+        *rval = JSVAL_VOID;
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}
+WRAP_METHOD_REGISTER(decompose);
+
+WRAP_METHOD_BEGIN(toString, "Returns string representation for this matrix.");
+    DOC_END;
+    std::string myStringRep = asl::as_string(JSMatrix::getJSWrapper(cx,obj).getNative());
+    *rval = as_jsval(cx, myStringRep);
+    return JS_TRUE;
+}
+WRAP_METHOD_REGISTER(toString);
+
+#else
 static JSBool
 setRow(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set a row of the matrix.");
@@ -275,13 +501,17 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+#endif
+
 JSMatrix::~JSMatrix() {
     DB(AC_TRACE << "JSMatrix DTOR " << this); 
 }
- 
+#if 0 
 JSFunctionSpec *
 JSMatrix::Functions() {
     AC_DEBUG << "Registering class '" << ClassName() << "'";
+    JSFunctionSpec * myFunctions = Base::getMethods();
+#if 0
     static JSFunctionSpec myFunctions[] = {
         /* name                native          nargs    */
         {"setRow",             setRow,                  2},
@@ -316,9 +546,12 @@ JSMatrix::Functions() {
         {"toString",           toString,                0},
         {0}
     };
+#endif
     return myFunctions;
 }
+#endif
 
+#if 0
 JSPropertySpec *
 JSMatrix::Properties() {
     static JSPropertySpec myProperties[] = {
@@ -328,6 +561,8 @@ JSMatrix::Properties() {
     };
     return myProperties;
 }
+#endif
+
 
 #define DEFINE_MATRIXTYPE(NAME) { #NAME, PROP_ ## NAME , asl::NAME }
 
@@ -433,9 +668,6 @@ JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
                 JS_ReportError(cx,"JSMatrix::Constructor: parameter %d must be a number",i);
                 return JS_FALSE;
             }
-#if 0
-            myNewMatrix[i/4][i%4] = float(myArgs[i]);
-#endif
         }
         myNewMatrix.assign(float(myArgs[0]), float(myArgs[1]), 
                            float(myArgs[2]), float(myArgs[3]),
@@ -444,7 +676,7 @@ JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
                            float(myArgs[8]), float(myArgs[9]), 
                            float(myArgs[10]),float(myArgs[11]),
                            float(myArgs[12]),float(myArgs[13]),
-                           float(myArgs[14]),float(myArgs[15])  );
+                           float(myArgs[14]),float(myArgs[15]));
 
         myNewObject = new JSMatrix(myNewValue);
     } else if (argc == 1) {

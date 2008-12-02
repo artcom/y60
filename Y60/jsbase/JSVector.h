@@ -331,6 +331,8 @@ struct JSVector  {
     typedef typename JValueTypeTraits<NATIVE_VECTOR>::elem_type ELEM;
     typedef typename JValueTypeTraits<NATIVE_VECTOR>::vector_type vector_type;
     typedef JSVector Base;
+    typedef JSBool (*NativePropertyGetter)(const NATIVE_VECTOR & theNative, JSContext *cx, jsval *vp);
+    typedef JSBool (*NativePropertySetter)(const NATIVE_VECTOR & theNative, JSContext *cx, jsval *vp);
 
     static
     JSVector * getJSWrapperPtr(JSContext *cx, JSObject *obj);

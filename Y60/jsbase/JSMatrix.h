@@ -22,17 +22,6 @@
 
 namespace jslib {
 
-/*
-typedef asl::Ptr<dom::SimpleValue<asl::Matrix4f>, dom::ThreadingModel > JSMatrix::NativeValuePtr;
-typedef JSWrapper<
-            asl::Matrix4f,
-            JSMatrix::NativeValuePtr,
-            ValueAccessProtocol<
-                asl::Matrix4f,
-                JSMatrix::NativeValuePtr
-            >
-        > Matrix4fWrapper;
-*/
 class JSMatrix : public JSWrapper<asl::Matrix4f>
 {
 public:
@@ -41,7 +30,7 @@ public:
     static const char * ClassName() {
         return "Matrix4f";
     }
-    static JSFunctionSpec * Functions();
+    // static JSFunctionSpec * Functions();
 
     enum PropertyNumbers {
         PROP_type = -100,
@@ -57,7 +46,7 @@ public:
         PROP_AFFINE,
         PROP_UNKNOWN
     };
-    static JSPropertySpec * Properties();
+    //static JSPropertySpec * Properties();
     static JSConstIntPropertySpec * ConstIntProperties();
     static JSPropertySpec * StaticProperties();
     static JSFunctionSpec * StaticFunctions();

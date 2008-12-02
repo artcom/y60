@@ -576,6 +576,7 @@ public:
     virtual ~JSWrapperBase() {}; 
 };
 
+
 template <class NATIVE,
           class OWNERPTR=asl::Ptr<typename dom::ValueWrapper<NATIVE>::Type, dom::ThreadingModel>,
           template<class,class> class ACCESS_PROTOCOL = ValueAccessProtocol>
@@ -620,6 +621,15 @@ public:
     
     virtual JSBool setPropertyByLiteralId(const std::string & theID, JSContext *cx, 
             JSObject *obj, jsval id, jsval *vp);
+
+    static JSFunctionSpec * Functions() {
+        JSFunctionSpec * myFunctions = getMethods();
+        return myFunctions;
+    }
+    static JSPropertySpec * Properties() {
+        JSPropertySpec * myProperties = getProperties();
+        return myProperties;
+    }
 
 // This should be private to enforce the usage of (scoped) WritableNative
 // which is being closed, even in case of exceptions between open and close
@@ -673,7 +683,19 @@ public:
             }
             return &_myJSClass;
         }
-    private:
+        std::vector<JSFunctionSpec> & getMethodsRef() {
+            return myMethods;
+        } 
+        std::vector<JSPropertySpec> & getPropertiesRef() {
+            return  myProperties; 
+        }
+        std::vector<JSFunctionSpec> & getStaticFunctionsRef() {
+            return myStaticFunctions;
+        } 
+        std::vector<JSPropertySpec> & getStaticPropertiesRef() {
+            return myStaticProperties;
+        } 
+     private:
         JSClassSingleton() {
             JSClass myTempClass = {
                 "<notsetyet>",                        // const char          *name;
@@ -714,6 +736,10 @@ public:
         }
     private:
         JSClass _myJSClass;
+        std::vector<JSFunctionSpec> myMethods; 
+        std::vector<JSPropertySpec> myProperties; 
+        std::vector<JSFunctionSpec> myStaticFunctions; 
+        std::vector<JSPropertySpec> myStaticProperties; 
     }; // end JSClassSingleton
 
     static JSClass * Class(const char * theName = 0); 
@@ -744,7 +770,60 @@ protected:
         JSPropertySpec * theStaticProperties = 0,
         JSFunctionSpec * theStaticFunctions = 0 );
 
-private:
+    static bool registerFunction(std::vector<JSFunctionSpec> & theList, const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+AC_INFO<<"Registering function "<<theName;
+        JSFunctionSpec mySpec;
+        mySpec.name = theName;
+        mySpec.call = theFunction;
+        mySpec.nargs = theMinArgCount;
+        mySpec.flags = 0;
+        mySpec.extra = 0;
+        theList.push_back(mySpec);
+        return true;
+    }
+    static bool registerProperty(std::vector<JSPropertySpec> & theList,
+                                 const char * theName,
+                                 JSPropertyOp theGetter,
+                                 JSPropertyOp theSetter) {
+        AC_INFO<<"Registering property "<<theName;
+        JSPropertySpec mySpec;
+        mySpec.name = theName;
+        mySpec.tinyid = theList.size()-100;
+        mySpec.getter = theGetter;
+        mySpec.setter = theSetter;
+        uint8 myFlags = JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED;
+        if (!theSetter) {
+            myFlags |= JSPROP_READONLY;
+        }
+        mySpec.flags = 0;
+        theList.push_back(mySpec);
+        return true;
+    }
+    static JSFunctionSpec * getMethods() {
+        registerMethod(0,0,0); // appends end delimiter
+        return &JSClassSingleton::get().getMethodsRef()[0];
+    }
+    static JSFunctionSpec * getStaticFunctions() {
+        registerStaticFunction(0,0,0); // appends end delimiter
+        return &JSClassSingleton::get().getStaticFunctionsRef()[0];
+    }
+    static JSPropertySpec * getProperties() {
+        registerProperty(0,0,0); // appends end delimiter
+        return &JSClassSingleton::get().getPropertiesRef()[0];
+    }
+ public:
+    static bool registerMethod(const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+        return registerFunction(JSClassSingleton::get().getMethodsRef(), theName, theFunction, theMinArgCount);
+    }
+    static bool registerStaticFunction(const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+        return registerFunction(JSClassSingleton::get().getStaticFunctionsRef(), theName, theFunction, theMinArgCount);
+    }
+    static bool registerProperty(const char * theName,
+                                 JSPropertyOp theGetter,
+                                 JSPropertyOp theSetter) {
+        return registerProperty(JSClassSingleton::get().getPropertiesRef(), theName, theGetter, theSetter);
+    }
+private:    
     OWNERPTR _myOwner;
     NATIVE * _myNative; // only used when instantiated with NATIVE_ACCESS_PROTOCOL = StaticAccessProtocol
 };
@@ -767,7 +846,12 @@ struct JSClassTraitsWrapper {
     static const NATIVE & getNativeRef(JSContext *cx, JSObject * theJSObj) {
         return JSWRAPPER::getJSWrapper(cx, theJSObj).getNative();
     }
-
+    static bool registerMethod(const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+        return JSWRAPPER::registerMethod(theName, theFunction, theMinArgCount);
+    }
+    static bool registerProperty(const char * theName, JSPropertyOp theGetter, JSPropertyOp theSetter) {
+        return JSWRAPPER::registerProperty(theName, theGetter, theSetter);
+    }
 
     struct ScopedNativeRef {
         ScopedNativeRef(JSContext *cx, JSObject * theJSObj)
