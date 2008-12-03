@@ -89,6 +89,7 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     {
         throw asl::Exception("RenderArea: could not create GL context!", PLUS_FILE_LINE);
     }
+ 
     // enable mouse events
     Gdk::EventMask flags = get_events();
     flags |= Gdk::BUTTON_PRESS_MASK;
@@ -129,6 +130,15 @@ RenderArea::activateGLContext() {
         GdkGLContext *glcontext = gtk_widget_get_gl_context (GTK_WIDGET(gobj()));
         GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
         gdk_gl_drawable_gl_begin (gldrawable, glcontext);
+   
+        // init glew 
+        unsigned int myGlewError = glewInit();
+        if (GLEW_OK != myGlewError) {
+            throw RendererException(std::string("Glew Initialization Error: ") +  
+                    std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))), 
+                    PLUS_FILE_LINE);
+        }
+        GLResourceManager::get().initCaps();
     }
 }
 
