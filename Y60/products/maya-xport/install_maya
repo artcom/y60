@@ -46,6 +46,7 @@ CYGWIN*)
     cp -vf $PRO/lib/libcurl.dll "$MAYA_SDK/bin/"
     cp -vf $PRO/lib/pthreadVC.dll "$MAYA_SDK/bin/"
     cp -vf $PRO/lib/ssleay32.dll "$MAYA_SDK/bin/"
+    cp -vr $PRO/lib/Half.dll "$MAYA_SDK/bin/"
 
     mkdir -p $MAYA_SDK/plug-ins
     mkdir -p $MAYA_SDK/scripts/others
