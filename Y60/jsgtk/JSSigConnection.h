@@ -14,7 +14,7 @@
 #include <y60/jsbase/JSWrapper.h>
 
 #ifdef OSX
-namespace sigc { typedef ::sigc::connection Connection; }
+//namespace sigc { typedef ::sigc::connection Connection; }
 #endif
 
 #include <sigc++/connection.h>
