@@ -771,7 +771,7 @@ protected:
         JSFunctionSpec * theStaticFunctions = 0 );
 
     static bool registerFunction(std::vector<JSFunctionSpec> & theList, const char * theName, JSNative theFunction, uint8 theMinArgCount) {
-AC_INFO<<"Registering function "<<theName;
+//AC_INFO<<"Registering function "<<theName;
         JSFunctionSpec mySpec;
         mySpec.name = theName;
         mySpec.call = theFunction;
@@ -785,7 +785,7 @@ AC_INFO<<"Registering function "<<theName;
                                  const char * theName,
                                  JSPropertyOp theGetter,
                                  JSPropertyOp theSetter) {
-        AC_INFO<<"Registering property "<<theName;
+//        AC_INFO<<"Registering property "<<theName;
         JSPropertySpec mySpec;
         mySpec.name = theName;
         mySpec.tinyid = static_cast<int8>(theList.size()-100);
