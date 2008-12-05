@@ -23,21 +23,7 @@ sub runLocalMakedist($) {
     copyIfMoreRecent("$ENV{PRO}/build/bin/make_project.sh", $theDistDir);
 
     if ($ourPlatform eq "WIN") {
-        copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcp71.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcr71.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libeay32.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/ssleay32.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libglib-2.0-0.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/iconv.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/intl.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libgobject-2.0-0.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libgmodule-2.0-0.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/freetype6.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/zlib1.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libcairo-2.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libpng12.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/lib/libfontconfig-1.dll", $theDistDir);
-        copyIfMoreRecent("$ENV{PRO}/build/Installer/uuidgen.exe", $theDistDir);
+
     }
 
     # Install dependencies
