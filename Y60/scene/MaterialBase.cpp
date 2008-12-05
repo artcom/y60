@@ -272,7 +272,7 @@ namespace y60 {
             myReqFacade->getProperty(theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
 
         if (!myMaterialProperty) {
-            // the shader has properties not in the material liste, add'em
+            // the shader has properties not in the material list, add'em
             if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
                 theShaderPropertyNode->nodeName() != "#comment") 
             {
@@ -282,9 +282,9 @@ namespace y60 {
                 AC_TRACE << "MaterialBase::mergeProperties(): done: adding property from shader to material:" << getNode();
             }
         } else {
-            // set the value of the material with the shaders value
-            // in is case the material has not the properties but the created facade has them,
-            // so the default value of the facade are overwritten from the shader ones
+            // set the value of the material property with the shader's property
+            // in case the property was created by the facade using a default value
+            // because the property did not exist in the material node
             
             AC_TRACE << "MaterialBase::mergeProperties(): setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
             
