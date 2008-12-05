@@ -526,7 +526,7 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
 
     // Iterate over all texture layers
     // Maya shades the first texture last, therefore we reverse the order
-    for (unsigned int i = myInputPlug.numElements() - 1; i >= 0; --i) {
+    for (int i = static_cast<int>(myInputPlug.numElements()) - 1; i >= 0; --i) {
         // Export alpha and blend mode for the texture
         float myAlpha = 1.0;
         MPlug myAlphaPlug;
