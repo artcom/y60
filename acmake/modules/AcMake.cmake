@@ -22,7 +22,6 @@ include(AcPlatform)
 include(AcUtils)
 
 include(AcCommon)
-include(AcProject)
 include(AcAddExecutable)
 include(AcAddLibrary)
 include(AcAddPlugin)
