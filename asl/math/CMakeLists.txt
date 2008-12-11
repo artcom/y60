@@ -61,7 +61,7 @@ VectorStream
 )
 
 ac_add_library(
-    aslmath
+    aslmath asl/math
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase

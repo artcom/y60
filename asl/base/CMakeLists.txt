@@ -147,7 +147,7 @@ endif(WIN32)
 
 
 ac_add_library(
-    aslbase
+    aslbase asl/base
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     EXTERNS ${EXTERNALS}
@@ -155,7 +155,7 @@ ac_add_library(
 )
 
 ac_add_plugin(
-    asltestplugin
+    asltestplugin asl/testplugin
     SOURCES testPlugIn.cpp
     HEADERS testPlugIn.h
     DONT_INSTALL

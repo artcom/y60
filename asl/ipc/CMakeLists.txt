@@ -29,7 +29,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_library(
-    aslipc
+    aslipc asl/ipc
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS ${TESTS}

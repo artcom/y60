@@ -18,7 +18,7 @@ Pixels
 )
 
 ac_add_library(
-    aslraster
+    aslraster asl/raster
     HEADERS ${HEADERS}
     DEPENDS aslbase
     TESTS   ${TESTS}

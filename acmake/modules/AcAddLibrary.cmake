@@ -12,17 +12,14 @@
 #
 #============================================================================
 
-macro(ac_add_library LIBRARY_NAME)
+macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     parse_arguments(THIS_LIBRARY
         "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;"
         "HEADER_ONLY;DONT_INSTALL;"
         ${ARGN})
     
-    # compute full name
     set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
-    
-    # compute path within project
-    set(THIS_LIBRARY_PATH "${CMAKE_PROJECT_NAME}/${LIBRARY_NAME}")
+    set(THIS_LIBRARY_PATH "${LIBRARY_PATH}")
     
     if(THIS_LIBRARY_HEADER_ONLY)
         # for a header-only-library

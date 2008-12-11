@@ -12,22 +12,20 @@
 #
 #============================================================================
 
-macro(ac_add_plugin PLUGIN_NAME)
+macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     parse_arguments(THIS_PLUGIN
         "SOURCES;HEADERS;DEPENDS;EXTERNS;FRAMEWORK;"
         "DONT_INSTALL;"
         ${ARGN})
     
-    # compute full name
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
-    
-    # compute path within project
-    set(THIS_PLUGIN_PATH "${CMAKE_PROJECT_NAME}/${PLUGIN_NAME}")
+    set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
     
     # define the target
     add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES})
     
     # link to aslbase because it contains asl::PluginBase
+    #   XXX: acmake should not be asl-specific
     target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
     
     # attach headers to target

@@ -28,7 +28,7 @@ ZipFile
 )
 
 ac_add_library(
-    zip
+    aslzip asl/zip
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS ${TESTS}

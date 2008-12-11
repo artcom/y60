@@ -22,7 +22,7 @@ XPath
 )
 
 ac_add_library(
-    aslxpath
+    aslxpath asl/xpath
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS ${TESTS}
