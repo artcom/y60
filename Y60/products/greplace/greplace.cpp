@@ -72,6 +72,13 @@ void getLine(const string & myFile, string::size_type myPosInFile, string & myLi
     myPosInLine = myPosInFile - myLineStart;
 }
 
+void getLine(const string & myFile, string::size_type myPosInFile, string::size_type myMatchSize, string & myLine, string::size_type & myPosInLine) {
+    string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
+    string::size_type myLineEnd = myFile.find('\n',myPosInFile+myMatchSize);
+    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
+    myPosInLine = myPosInFile - myLineStart;
+}
+
 string::size_type find_C_CommentToken(const string & myFile, string::size_type myPosInFile, const string & myToken) {
     string::size_type myTokenPos = myPosInFile;
     while ((myTokenPos = myFile.rfind(myToken, myTokenPos)) != string::npos) {
@@ -155,24 +162,24 @@ int main(int argc, char *argv[]) {
                             }
                         }
                         if (!myArguments.haveOption("-s") || 
-                             myArguments.haveOption("-q") || 
-                             myArguments.haveOption("-Q") || 
-                             myArguments.haveOption("-c") || 
-                             myArguments.haveOption("-C"))
+                                myArguments.haveOption("-q") || 
+                                myArguments.haveOption("-Q") || 
+                                myArguments.haveOption("-c") || 
+                                myArguments.haveOption("-C"))
                         {
-                            
+
                             string myLine;
                             string::size_type myPosInLine;
-                            getLine(myFile, matchPos, myLine, myPosInLine);
+                            getLine(myFile, matchPos, matchLen, myLine, myPosInLine);
 
                             if (myArguments.haveOption("-q")) {
-                               if (isQuoted(myLine, myPosInLine)) {
+                                if (isQuoted(myLine, myPosInLine)) {
                                     ++matchPos;
                                     continue;
                                 }
                             }
                             if (myArguments.haveOption("-Q")) {
-                               if (!isQuoted(myLine, myPosInLine)) {
+                                if (!isQuoted(myLine, myPosInLine)) {
                                     ++matchPos;
                                     continue;
                                 }
@@ -183,13 +190,13 @@ int main(int argc, char *argv[]) {
                                     continue;
                                 }
                             }
-                             if (myArguments.haveOption("-C")) {
+                            if (myArguments.haveOption("-C")) {
                                 if (!isCppComment(myLine, myPosInLine) && !isCComment(myFile, matchPos)) {
                                     ++matchPos;
                                     continue;
                                 }
                             }
-                                
+
                             if (myArguments.haveOption("-v")) {
                                 cerr << "Match in file '" << myArguments.getArgument(i) << "', pos " 
                                     << matchPos << ":" << endl;
@@ -213,7 +220,7 @@ int main(int argc, char *argv[]) {
                 }
             }
         } else {
-            cerr << "usage: greplace  [-n] [-v] [-s] search-string replace-string file [file2...fileN]" << endl;
+            cerr << "usage: greplace [options] search-string [until-string] replace-string file [file2...fileN]" << endl;
             cerr << "    -s : enable silent mode " << endl;
             cerr << "    -v : enable verbose mode " << endl;
             cerr << "    -n : do not write back file " << endl;
@@ -222,6 +229,7 @@ int main(int argc, char *argv[]) {
             cerr << "    -Q : do only match strings between quotes ("")" << endl;
             cerr << "    -c : do not match strings in c/c++ comments" << endl;
             cerr << "    -C : do only match strings in c/c++ comments" << endl;
+            cerr << "    -2 : replace all characters from <search-string> up to (including) <until-string>" << endl;
             return -1;
         }
     }
