@@ -1,9 +1,9 @@
 
 set(SOURCES
 Expression.cpp
-Path.cpp
 PathParser.cpp
-Value.cpp
+XPathPath.cpp
+XPathValue.cpp
 xpath_api.cpp
 )
 
