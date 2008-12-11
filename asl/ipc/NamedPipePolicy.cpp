@@ -228,7 +228,7 @@ NamedPipePolicy::receiveNextBuffer(Handle & theHandle) {
     myOverlap->hEvent = &theHandle;
     ReadFileEx( 
          theHandle.pipeInstance,        // handle to pipe 
-         &(theHandle.inBuffer[0]),      // buffer to write from 
+         &(theHandle.inBuffer[0]),      // buffer to read into
          theHandle.inBuffer.size(), // number of bytes to write 
          myOverlap,     
          NamedPipePolicy::onReadCompleted);
