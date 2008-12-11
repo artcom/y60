@@ -41,13 +41,15 @@
 
 #ifdef WIN32
 
-#include "NamedPipePolicy.h"
-namespace asl {
-/*! \addtogroup ipcPolicies */
-/* @{ */
-    typedef NamedPipePolicy LocalPolicy;
-/* @} */
-}
+#error Named pipes cause Unit test failures in continuous build on Windows. 
+
+//#include "NamedPipePolicy.h"
+//namespace asl {
+///*! \addtogroup ipcPolicies */
+///* @{ */
+//    typedef NamedPipePolicy LocalPolicy;
+///* @} */
+//}
 
 #else
 
@@ -55,7 +57,7 @@ namespace asl {
 namespace asl {
 /*! \addtogroup ipcPolicies */
 /* @{ */
-    /// Plattform abstraction: This typedefed to UnixSocketPolicy (POSIX) or NamedPipePolicy (Win32).
+    /// Platform abstraction: This typedefed to UnixSocketPolicy (POSIX) or NamedPipePolicy (Win32).
     typedef UnixSocketPolicy LocalPolicy;
 /* @} */
 }
