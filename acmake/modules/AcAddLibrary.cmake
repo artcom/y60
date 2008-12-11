@@ -64,7 +64,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     endif(THIS_LIBRARY_HEADER_ONLY)
     
     # create tests
-    foreach(TEST ${TESTS})
+    foreach(TEST ${THIS_LIBRARY_TESTS})
         # define the target
         ac_add_executable(
             test${TEST}
