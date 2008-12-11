@@ -1,12 +1,12 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2007, ART+COM AG Berlin, Germany
+// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
 //
-// These coded instructions, statements, and computer programs contain
-// unpublished proprietary information of ART+COM AG Berlin, and
-// are copy protected by law. They may not be disclosed to third parties
-// or copied or duplicated in any form, in whole or in part, without the
-// specific, prior written permission of ART+COM AG Berlin.
+// This file is part of the ART+COM Standard Library (asl).
+//
+// It is distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)             
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: 
@@ -752,104 +752,4 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
     }
 }
 
-//==============================================================================
-//
-// $Log: Station.cpp,v $
-// Revision 1.10  2005/04/24 00:30:19  pavel
-// make use of  asl::Logger for majority of messages
-//
-// Revision 1.9  2004/10/30 19:16:10  martin
-// fixed blocking sends problem
-//
-// Revision 1.8  2004/10/30 15:34:04  pavel
-// completed windows station
-// changed station interface to use asl::Block
-//
-// Revision 1.7  2004/10/19 17:51:00  janbo
-// - bugfix
-//
-// Revision 1.6  2004/09/10 13:10:48  david
-//  - fixed linux build
-//
-// Revision 1.5  2004/09/10 12:50:29  david
-//  - mac os x port in progress
-//
-// Revision 1.4  2004/07/17 18:25:15  pavel
-// fixed station build problems for windows; however, station has not been tested yet
-//
-// Revision 1.3  2003/07/03 13:49:01  pavel
-// minor cleanup
-//
-// Revision 1.2  2003/07/03 12:56:05  david
-// using namespace std added
-//
-// Revision 1.1.1.1  2003/05/12 14:20:23  uzadow
-// no message
-//
-// Revision 1.3  2002/09/26 16:15:50  wolfger
-// removed some compiler warnings.
-//
-// Revision 1.2  2002/09/25 15:26:52  wolfger
-// removed libzlib.so/a from lib directory.
-//
-// Revision 1.1.1.1  2002/09/17 15:37:04  wolfger
-// initial checkin
-//
-// Revision 1.2  2002/09/06 18:14:00  valentin
-// merged linuxport_2nd_try branch into trunk
-// -branch tag before merge : branch_before_merge_final
-// -trunk tag before merge  : trunk_before_merge
-//
-//
-// -Merge conflicts:
-//  image/glutShowImage/Makefile
-//  image/glutShowImage/glShowImage.C
-//  loader/libPfIv/pfiv.c++
-//  lso/script/vrfm/Intercom.h
-//  tools/Pfconvert/pfconvert.c
-//  vrap/libMover/HMD.c++
-//
-//  - compiled && testrun
-//  - commit
-//  - merged trunk tag : trunk_after_merge
-//
-// Revision 1.1.2.13  2002/08/30 16:25:41  martin
-// more std-ization
-//
-// Revision 1.1.2.12  2002/06/06 20:17:49  pavel
-// fixed broken WhiteBoardStation protocol - first usable version
-//
-// Revision 1.1.2.11  2002/05/29 23:31:30  david
-// *** empty log message ***
-//
-// Revision 1.1.2.10  2002/05/28 22:25:25  pavel
-// added facilities for multiple Station users on one host
-//
-// Revision 1.1.2.9  2002/05/16 05:50:40  pavel
-// more stuff
-//
-// Revision 1.1.2.8  2002/05/16 01:26:59  pavel
-// improved Station.h dependencies, added station packet payload compression
-//
-// Revision 1.1.2.7  2002/05/15 19:42:41  pavel
-// major station protocol change
-//
-// Revision 1.1.2.6  2002/05/15 13:35:00  david
-// another step towards a new great future
-//
-// Revision 1.1.2.5  2002/05/13 23:17:51  david
-// fixed send/receive bug
-//
-// Revision 1.1.2.4  2002/05/13 19:38:18  david
-// added more sophisticated copy strategies
-//
-// Revision 1.1.2.3  2002/05/13 12:36:21  pavel
-// some interface modifications due to first integration
-//
-// Revision 1.1.2.2  2002/05/12 23:26:33  pavel
-// first possibly working version of Station with Whiteboard
-//
-// Revision 1.1.2.1  2002/05/11 21:44:36  pavel
-// initial version, just compiles but has never been executed
-//
-//==============================================================================
+

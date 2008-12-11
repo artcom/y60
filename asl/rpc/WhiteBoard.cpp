@@ -1,15 +1,43 @@
 
-//==============================================================================
-// Copyright (c) 2002 ART+COM AG Berlin
-// All rights reserved.
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// These coded instructions, statements, and computer programs contain
-// unpublished proprietary information of ART+COM AG Berlin, and
-// are copy protected by law. They may not be disclosed to third parties
-// or copied or duplicated in any form, in whole or in part, without the
-// specific, prior written permission of ART+COM AG Berlin.
+// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
 //
-//==============================================================================
+// This file is part of the ART+COM Standard Library (asl).
+//
+// It is distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)             
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+//
+// Description: TODO  
+//
+// Last Review: NEVER, NOONE
+//
+//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
+//    usefullness            : unknown
+//    formatting             : unknown
+//    documentation          : unknown
+//    test coverage          : unknown
+//    names                  : unknown
+//    style guide conformance: unknown
+//    technical soundness    : unknown
+//    dead code              : unknown
+//    readability            : unknown
+//    understandabilty       : unknown
+//    interfaces             : unknown
+//    confidence             : unknown
+//    integration            : unknown
+//    dependencies           : unknown
+//    cheesyness             : unknown
+//
+//    overall review status  : unknown
+//
+//    recommendations: 
+//       - unknown
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+*/
 //
 // $Id: WhiteBoard.cpp,v 1.1.1.1 2003/05/12 14:20:23 uzadow Exp $
 // $Author: uzadow $
@@ -881,162 +909,4 @@ StationWhiteBoard::update() {
     return updated;
 }
 
-//==============================================================================
-//
-// $Log: WhiteBoard.cpp,v $
-// Revision 1.1.1.1  2003/05/12 14:20:23  uzadow
-// no message
-//
-// Revision 1.1.1.1  2002/09/17 15:37:04  wolfger
-// initial checkin
-//
-// Revision 1.2  2002/09/06 18:14:00  valentin
-// merged linuxport_2nd_try branch into trunk
-// -branch tag before merge : branch_before_merge_final
-// -trunk tag before merge  : trunk_before_merge
-//
-//
-// -Merge conflicts:
-//  image/glutShowImage/Makefile
-//  image/glutShowImage/glShowImage.C
-//  loader/libPfIv/pfiv.c++
-//  lso/script/vrfm/Intercom.h
-//  tools/Pfconvert/pfconvert.c
-//  vrap/libMover/HMD.c++
-//
-//  - compiled && testrun
-//  - commit
-//  - merged trunk tag : trunk_after_merge
-//
-// Revision 1.1.2.33  2002/08/30 16:25:41  martin
-// more std-ization
-//
-// Revision 1.1.2.32  2002/08/16 15:50:59  christian
-// added return values / removed return parameters from setter functions (to avoid warnings)
-//
-// Revision 1.1.2.31  2002/06/06 20:17:49  pavel
-// fixed broken WhiteBoardStation protocol - first usable version
-//
-// Revision 1.1.2.30  2002/05/30 04:16:47  david
-// bugfixes and setup changes
-//
-// Revision 1.1.2.29  2002/05/24 09:43:10  david
-// -enabled "not implemented" messages
-//
-// Revision 1.1.2.28  2002/05/16 01:48:26  pavel
-// reduced received packet re-broadcast minimum time from 1 sec. to _defaultMaxAge_
-//
-// Revision 1.1.2.27  2002/05/16 01:26:59  pavel
-// improved Station.h dependencies, added station packet payload compression
-//
-// Revision 1.1.2.26  2002/05/15 22:26:37  david
-// another brick in the wall
-//
-// Revision 1.1.2.25  2002/05/15 13:35:00  david
-// another step towards a new great future
-//
-// Revision 1.1.2.24  2002/05/13 23:17:51  david
-// fixed send/receive bug
-//
-// Revision 1.1.2.23  2002/05/13 19:38:18  david
-// added more sophisticated copy strategies
-//
-// Revision 1.1.2.22  2002/05/13 12:36:21  pavel
-// some interface modifications due to first integration
-//
-// Revision 1.1.2.21  2002/05/13 08:34:43  chris
-// Moved StationWhiteBoard::update() to .cpp file
-//
-// Revision 1.1.2.20  2002/05/12 23:26:33  pavel
-// first possibly working version of Station with Whiteboard
-//
-// Revision 1.1.2.19  2002/05/11 21:45:39  pavel
-// added a copy filter function interface for more flexibility
-//
-// Revision 1.1.2.18  2002/05/10 20:23:09  pavel
-// added xml input/output function and a change-copier
-//
-// Revision 1.1.2.17  2002/05/08 06:51:29  pavel
-// added lock sand copying stuff
-//
-// Revision 1.1.2.16  2002/05/08 03:39:54  pavel
-// added copy feature to WhiteBoard
-//
-// Revision 1.1.2.15  2002/05/07 16:07:41  pavel
-// added priority ceiling locks
-//
-// Revision 1.1.2.14  2002/05/06 22:55:10  pavel
-// added BufferedWhiteBoard
-//
-// Revision 1.1.2.13  2002/05/06 20:58:50  pavel
-// made locking configuerabel and configured for the fastest version:
-// RW-Board level locking and no Sheet level locking
-//
-// Revision 1.1.2.12  2002/05/03 19:31:53  pavel
-// added tons of sophisticated locking mechanisms without actually improving performance
-//
-// Revision 1.1.2.11  2002/05/02 09:48:55  pavel
-// refactored to use map<string,ptr> for preparation of sheet level locking, but
-// still using pessimistic whiteboard-level locking yet
-//
-// Revision 1.1.2.10  2002/05/01 11:36:39  pavel
-// some name changes
-//
-// Revision 1.1.2.9  2002/04/30 18:02:26  david
-// /tmp/cvsY4pYkq
-//
-// Revision 1.1.2.8  2002/04/30 16:36:25  pavel
-// added tests and testoutput, changed createsheet behaviour
-//
-// Revision 1.1.2.7  2002/04/30 13:21:01  christian
-// removed exception from sheet destructor
-//
-// Revision 1.1.2.6  2002/04/29 17:11:11  david
-// debug level back to 1
-//
-// Revision 1.1.2.5  2002/04/26 17:31:14  david
-// fixed sync problems and simplified some code
-//
-// Revision 1.1.2.4  2002/04/25 16:45:48  christian
-// beautified debug output
-//
-// Revision 1.1.2.3  2002/04/19 11:36:11  david
-//  - merged wittestrasse source tree into the repository
-//
-// Revision 1.1.2.2  2002/04/16 13:42:29  uzadow
-// Added DumpWhiteboard tool
-//
-// Revision 1.1.2.1  2002/04/16 12:07:36  uzadow
-// Moved Whiteboard implementation to WhiteBoard.cpp.
-//
-// Revision 1.1.2.10  2002/04/08 12:22:29  stefan
-// made WhiteBoard thread-safe
-//
-// Revision 1.1.2.9  2002/04/04 20:01:35  christian
-// changed DB makro to AC_DB, ERROR to AC_ERROR, WARNING to AC_WARNING
-//
-// Revision 1.1.2.8  2002/04/04 09:21:02  stefan
-// WARNINGS ARE BAD BAD BAD BAD BAD
-//
-// Revision 1.1.2.7  2002/04/03 13:03:39  christian
-// added support for pure xml-nodes
-//
-// Revision 1.1.2.6  2002/03/28 12:15:03  christian
-// added getName() to SheetBase
-//
-// Revision 1.1.2.5  2002/03/27 16:57:38  uzadow
-// *** empty log message ***
-//
-// Revision 1.1.2.4  2002/03/27 11:19:06  pavel
-// Added capability to specify getter id explicitly
-//
-// Revision 1.1.2.3  2002/03/22 20:14:43  pavel
-// ACMControlParser is now using common/xmlcom/WhiteBoard.h
-//
-// Revision 1.1.2.2  2002/03/22 15:45:44  pavel
-// moved some functions to separate os_functions file in asl
-//
-// Revision 1.1.2.1  2002/03/21 17:55:00  pavel
-// initial WhiteBoard Library version
-//
-//==============================================================================
+

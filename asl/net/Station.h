@@ -1,12 +1,12 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2007, ART+COM AG Berlin, Germany
+// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
 //
-// These coded instructions, statements, and computer programs contain
-// unpublished proprietary information of ART+COM AG Berlin, and
-// are copy protected by law. They may not be disclosed to third parties
-// or copied or duplicated in any form, in whole or in part, without the
-// specific, prior written permission of ART+COM AG Berlin.
+// This file is part of the ART+COM Standard Library (asl).
+//
+// It is distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)             
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: 
@@ -269,73 +269,4 @@ Station::Statistic operator/(const Station::Statistic & theOne, double theTime);
 Station::Statistic maximum(const Station::Statistic & theOne, const Station::Statistic & theOther);
 #endif
 
-//==============================================================================
-//
-// $Log: Station.h,v $
-// Revision 1.6  2004/10/30 15:34:04  pavel
-// completed windows station
-// changed station interface to use asl::Block
-//
-// Revision 1.5  2004/09/10 12:50:29  david
-//  - mac os x port in progress
-//
-// Revision 1.4  2004/07/22 14:34:06  christian
-// - fixed bug in Station.h
-// - turned off station test again, because there are several issues
-// - added z-lib to extern install to allow station test build
-//
-// Revision 1.3  2004/07/17 18:25:15  pavel
-// fixed station build problems for windows; however, station has not been tested yet
-//
-// Revision 1.2  2003/07/01 13:59:00  uzadow
-// Initial windows port.
-//
-// Revision 1.1.1.1  2003/05/12 14:20:23  uzadow
-// no message
-//
-// Revision 1.1.1.1  2002/09/17 15:37:04  wolfger
-// initial checkin
-//
-// Revision 1.2  2002/09/06 18:14:00  valentin
-// merged linuxport_2nd_try branch into trunk
-// -branch tag before merge : branch_before_merge_final
-// -trunk tag before merge  : trunk_before_merge
-//
-//
-// -Merge conflicts:
-//  image/glutShowImage/Makefile
-//  image/glutShowImage/glShowImage.C
-//  loader/libPfIv/pfiv.c++
-//  lso/script/vrfm/Intercom.h
-//  tools/Pfconvert/pfconvert.c
-//  vrap/libMover/HMD.c++
-//
-//  - compiled && testrun
-//  - commit
-//  - merged trunk tag : trunk_after_merge
-//
-// Revision 1.1.2.8  2002/08/30 13:41:11  martin
-// std-ized header files
-//
-// Revision 1.1.2.7  2002/06/06 20:17:49  pavel
-// fixed broken WhiteBoardStation protocol - first usable version
-//
-// Revision 1.1.2.6  2002/05/28 22:25:25  pavel
-// added facilities for multiple Station users on one host
-//
-// Revision 1.1.2.5  2002/05/16 01:26:59  pavel
-// improved Station.h dependencies, added station packet payload compression
-//
-// Revision 1.1.2.4  2002/05/15 19:42:41  pavel
-// major station protocol change
-//
-// Revision 1.1.2.3  2002/05/13 12:36:21  pavel
-// some interface modifications due to first integration
-//
-// Revision 1.1.2.2  2002/05/12 23:26:33  pavel
-// first possibly working version of Station with Whiteboard
-//
-// Revision 1.1.2.1  2002/05/11 21:44:36  pavel
-// initial version, just compiles but has never been executed
-//
-//==============================================================================
+
