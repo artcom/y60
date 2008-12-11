@@ -112,6 +112,7 @@ int main(int argc, char *argv[]) {
         {"-Q", ""},
         {"-c", ""},
         {"-C", ""},
+        {"-2", ""},
         {"", ""}
     };
 
@@ -121,17 +122,33 @@ int main(int argc, char *argv[]) {
 
         if (myArguments.parse(argc,argv) && myArguments.getCount()>=3) {
             string searchForString = myArguments.getArgument(0);
-            string replaceWithString = myArguments.getArgument(1);
-            for (int i = 2; i < myArguments.getCount(); ++i) {
+            string replaceUntilString;
+            unsigned firstFileArgument = 2;
+            if (myArguments.haveOption("-2")) {
+                replaceUntilString = myArguments.getArgument(1);
+                ++firstFileArgument;
+            }
+            string replaceWithString = myArguments.getArgument(firstFileArgument-1);
+            for (int i = firstFileArgument; i < myArguments.getCount(); ++i) {
                 string myFile;
                 bool hasBeenModified = false;
                 if (readFile(myArguments.getArgument(i), myFile)) {
                     string::size_type matchPos = 0; 
+                    string::size_type matchLen = searchForString.size(); 
                     while ((matchPos = myFile.find(searchForString, matchPos)) != string::npos) {
+                        string::size_type matchPos2 = 0; 
+                        if (myArguments.haveOption("-2")) {
+                            matchPos2 = myFile.find(replaceUntilString, matchPos);
+                            if (matchPos2 == string::npos) {
+                                continue;
+                            }
+                            matchLen = matchPos2 - matchPos + replaceUntilString.size();
+                        }
+                        
                         if (myArguments.haveOption("-w")) {
                             if (matchPos>0) {
                                 if (isNameChar(myFile[matchPos-1]) || 
-                                        isNameChar(myFile[matchPos+searchForString.size()])) {
+                                        isNameChar(myFile[matchPos+matchLen])) {
                                     ++matchPos;
                                     continue;
                                 }
@@ -179,11 +196,11 @@ int main(int argc, char *argv[]) {
                                 cerr << "Replacing :" << myLine << endl;
                                 cerr << "     with :"; 
                             }
-                            myLine.replace(myPosInLine, searchForString.size(), replaceWithString);
+                            myLine.replace(myPosInLine, matchLen, replaceWithString);
                             cout << myLine << endl;
                         } 
                         hasBeenModified = true;
-                        myFile.replace(matchPos, searchForString.size(), replaceWithString);
+                        myFile.replace(matchPos, matchLen, replaceWithString);
                         matchPos+=replaceWithString.size();
                     };
                 } else {
