@@ -209,7 +209,7 @@
         <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
             <properties>
                 <sampler2d name="occlusionTex">0</sampler2d>
-                <vectorofstring name="blendfunction">[`src_alpha`,`one_minus_src_alpha`]</vectorofstring>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
             </properties>
         </fragmentshader>
     </shader>
