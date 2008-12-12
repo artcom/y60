@@ -46,6 +46,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         endif(THIS_PLUGIN_FRAMEWORK)
         install(
             TARGETS ${THIS_PLUGIN_NAME}
+            EXPORT  ${CMAKE_PROJECT_NAME}
             LIBRARY
                 DESTINATION lib # XXX: depends on container
             PUBLIC_HEADER

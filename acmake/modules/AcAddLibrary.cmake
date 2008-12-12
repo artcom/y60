@@ -54,6 +54,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         if(NOT THIS_LIBRARY_DONT_INSTALL)
             install(
                 TARGETS ${THIS_LIBRARY_NAME}
+                EXPORT  ${CMAKE_PROJECT_NAME}
                 LIBRARY
                     DESTINATION lib
                 PUBLIC_HEADER

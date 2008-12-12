@@ -35,6 +35,7 @@ macro(ac_add_executable EXECUTABLE_NAME)
     if(NOT THIS_EXECUTABLE_DONT_INSTALL)
         install(
             TARGETS ${THIS_EXECUTABLE_NAME}
+            EXPORT  ${CMAKE_PROJECT_NAME}
             RUNTIME
                 DESTINATION bin
         )

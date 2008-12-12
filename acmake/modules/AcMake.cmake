@@ -25,3 +25,8 @@ include(AcCommon)
 include(AcAddExecutable)
 include(AcAddLibrary)
 include(AcAddPlugin)
+
+install(
+    EXPORT ${CMAKE_PROJECT_NAME}
+    DESTINATION lib/cmake
+)
