@@ -44,6 +44,13 @@ include_directories(${CMAKE_INSTALL_PREFIX}/include)
 
 add_definitions(-DAC_BUILT_WITH_CMAKE)
 
+macro(y60_add_component COMPONENT_NAME)
+    ac_add_plugin(
+        ${COMPONENT_NAME} y60/components/${COMPONENT_NAME}
+        ${ARGN}
+    )
+endmacro(y60_add_component)
+
 add_subdirectory(base)
 add_subdirectory(sound)
 add_subdirectory(image)
@@ -60,4 +67,4 @@ add_subdirectory(jslib)
 add_subdirectory(sdlengine)
 
 add_subdirectory(products)
-
+add_subdirectory(components)
