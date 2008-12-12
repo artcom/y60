@@ -1991,7 +1991,7 @@ static JSClass global_class = {
 };
 
 int
-mymain(int argc, char **argv)
+main(int argc, char **argv)
 {
     JSVersion version;
     JSRuntime *rt;

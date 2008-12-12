@@ -9,7 +9,6 @@ jsarena.c
 jsarray.c
 jsatom.c
 jsbool.c
-js.c
 jscntxt.c
 jsdate.c
 jsdbgapi.c
@@ -121,6 +120,20 @@ set_target_properties(
     spidermonkey
     PROPERTIES
         PUBLIC_HEADER "${HEADERS}"
+)
+
+add_executable(
+    monkey
+    js.c
+)
+
+target_link_libraries(monkey spidermonkey m)
+
+install(
+    TARGETS monkey
+    EXPORT  spidermonkey
+    RUNTIME
+        DESTINATION bin
 )
 
 install(
