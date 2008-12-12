@@ -44,7 +44,7 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
 }
 
 int main(int argc, char * argv[]) {
-    const std::string myLibraryDir = "../../../../shader/";
+    const std::string myLibraryDir = "../../../shader/";
 //const std::string myLibraryDir = "../../shader/";
 
     try {
