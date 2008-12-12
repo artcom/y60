@@ -1,0 +1,40 @@
+#ifndef _BitFont_h_
+#define _BitFont_h_
+
+/// Structure to store the data of one Bitmap Character
+struct BitChar {
+  int width;
+  int height;
+  float xorig;
+  float yorig;
+  float advance;
+  const unsigned char *bitmap;
+} ;
+
+/** 
+  Structure for storing all the characters of one Bitmap Font.
+  
+  There are no functions to enumrate the various fonts, retrieve them by name
+  or do other fancy stuff. This would require a constructor to run for each
+  font that has been compiled in - a confusing perspective...
+ */
+
+struct BitFont {
+  char *name;
+  int num_chars;
+  int first;
+  const BitChar **ch;
+  int ascent;
+  int descent;
+  char *short_name;
+};
+
+void
+getStringSize(const BitFont & font, const char * text,
+              int & x_ret, int & y_ret,
+              int & w_ret, int & h_ret);
+
+void
+getFontSize(int & ascent, int & descent, const BitFont & font);
+
+#endif // _BitFont_h_
