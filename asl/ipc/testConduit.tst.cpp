@@ -42,9 +42,7 @@
 #include <algorithm>
 #include "ConduitAcceptor.h"
 #include "TCPPolicy.h"
-#ifndef WIN32
-#   include "LocalPolicy.h"
-#endif
+#include "LocalPolicy.h"
 #include "MessageAcceptor.h"
 
 #include <asl/base/os_functions.h>
@@ -337,12 +335,12 @@ public:
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
 #ifndef WIN32
         deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit");
+#endif   
         addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));
         addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));
         addTest(new BrokenPipeTest<LocalPolicy>("LocalPolicy", "TestConduit"));
-#endif   
     }
 };
 

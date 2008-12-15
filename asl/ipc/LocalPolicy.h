@@ -41,15 +41,13 @@
 
 #ifdef WIN32
 
-#error Named pipes cause Unit test failures in continuous build on Windows. 
-
-//#include "NamedPipePolicy.h"
-//namespace asl {
-///*! \addtogroup ipcPolicies */
-///* @{ */
-//    typedef NamedPipePolicy LocalPolicy;
-///* @} */
-//}
+#include "NamedPipePolicy.h"
+namespace asl {
+/*! \addtogroup ipcPolicies */
+/* @{ */
+    typedef NamedPipePolicy LocalPolicy;
+/* @} */
+}
 
 #else
 
