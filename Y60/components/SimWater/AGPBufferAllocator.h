@@ -61,16 +61,13 @@
 
 #include "WaterRepresentation.h"
 
-#if defined(LINUX) || defined(OSX)
-    #include <GL/glx.h>
-#endif
-
 #include <y60/glutil/GLUtils.h>
 
 #define USE_AGP_MEMORY
 
 #if defined(LINUX) || defined(OSX)
     #define AC_USE_X11
+#include <GL/glxew.h>
 #endif
     
 namespace y60 {

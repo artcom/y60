@@ -78,7 +78,9 @@
     #include <unistd.h>
 #endif
 
-#include <GL/gl.h>
+#include <y60/glutil/GLUtils.h>
+
+#include <GL/glxew.h>
 
 
 #include "WaterSimulation.h"
