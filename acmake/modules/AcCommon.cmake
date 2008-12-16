@@ -16,7 +16,6 @@
 # attach local local libraries to TARGET
 macro(_ac_attach_depends TARGET)
     foreach(DEPEND ${ARGN})
-        message("Target ${TARGET} will be linked to ${DEPEND}")
         get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
         if("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
                 OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
@@ -29,7 +28,6 @@ endmacro(_ac_attach_depends)
 # attach external libraries to TARGET
 macro(_ac_attach_externs TARGET)
     foreach(EXTERN ${ARGN})
-        message("Target ${TARGET} will be linked to extern ${EXTERN}")
         if(EXTERN MATCHES ".*\\.framework/?$")
             target_link_libraries(${TARGET} ${EXTERN})
         else(EXTERN MATCHES ".*\\.framework/?$")
@@ -41,7 +39,6 @@ endmacro(_ac_attach_externs)
 # declare searchpath for headers and libraries for the *upcoming* target
 macro(_ac_declare_searchpath)
     foreach(EXTERN ${ARGN})
-        message("Declaring search paths for extern ${EXTERN}")
         if(NOT EXTERN MATCHES ".*\\.framework/?$")
             link_directories(${${EXTERN}_LIBRARY_DIRS})
             include_directories(${${EXTERN}_INCLUDE_DIRS})

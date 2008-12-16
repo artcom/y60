@@ -12,6 +12,6 @@ y60_add_component(
     GlurFilter
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

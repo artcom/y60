@@ -13,6 +13,6 @@ y60_add_component(
     OpenEXRDecoder
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

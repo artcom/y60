@@ -20,7 +20,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     
     set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
     set(THIS_LIBRARY_PATH "${LIBRARY_PATH}")
-    
+
     if(THIS_LIBRARY_HEADER_ONLY)
         # for a header-only-library
         

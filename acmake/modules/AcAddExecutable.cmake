@@ -17,7 +17,7 @@ macro(ac_add_executable EXECUTABLE_NAME)
         "SOURCES;DEPENDS;EXTERNS;"
         "DONT_INSTALL;"
         ${ARGN})
-    
+
     # compute full name
     set(THIS_EXECUTABLE_NAME "${EXECUTABLE_NAME}")
     
@@ -35,7 +35,7 @@ macro(ac_add_executable EXECUTABLE_NAME)
     if(NOT THIS_EXECUTABLE_DONT_INSTALL)
         install(
             TARGETS ${THIS_EXECUTABLE_NAME}
-            EXPORT  ${CMAKE_PROJECT_NAME}
+            EXPORT ${CMAKE_PROJECT_NAME}
             RUNTIME
                 DESTINATION bin
         )

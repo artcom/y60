@@ -12,5 +12,5 @@ y60_add_component(
     ProcFunctions
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )

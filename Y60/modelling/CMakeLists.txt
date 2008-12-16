@@ -27,8 +27,8 @@ ac_add_library(
     y60modelling y60/modelling
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS aslbase aslmath asldom aslzip y60base y60image y60video y60scene paintlib
-    EXTERNS OPENEXR
+    DEPENDS aslbase aslmath asldom aslzip y60base y60image y60video y60scene
+    EXTERNS OPENEXR PAINTLIB
     TESTS   ${TESTS}
 )
 

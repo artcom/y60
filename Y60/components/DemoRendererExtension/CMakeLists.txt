@@ -10,6 +10,6 @@ y60_add_component(
     DemoRendererExtension
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

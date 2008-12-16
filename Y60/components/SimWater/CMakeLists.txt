@@ -17,6 +17,6 @@ y60_add_component(
     SimWater
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

@@ -113,6 +113,9 @@ tif_msrc.h
 include_directories(.)
 include_directories(./Filter)
 
+include_directories(${PNG_INCLUDE_DIRS} ${GIF_INCLUDE_DIRS} ${TIFF_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS})
+link_directories(${PNG_LIBRARY_DIRS} ${GIF_LIBRARY_DIRS} ${TIFF_LIBRARY_DIRS} ${JPEG_LIBRARY_DIRS})
+
 add_library(
     paintlib SHARED ${SOURCES}
 )
@@ -123,11 +126,11 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
-target_link_libraries(paintlib paintlibfilter)
+target_link_libraries(paintlib paintlibfilter ${PNG_LIBRARIES} ${GIF_LIBRARIES} ${TIFF_LIBRARIES} ${JPEG_LIBRARIES})
 
 install(
     TARGETS paintlib
-    EXPORT  paintlib
+    EXPORT paintlib
     LIBRARY
         DESTINATION lib
     PUBLIC_HEADER

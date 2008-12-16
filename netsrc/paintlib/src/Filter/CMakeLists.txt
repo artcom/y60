@@ -68,7 +68,7 @@ set_target_properties(
 
 install(
     TARGETS paintlibfilter
-    EXPORT  paintlib
+    EXPORT paintlib
     LIBRARY
          DESTINATION lib
     PUBLIC_HEADER

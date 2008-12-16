@@ -11,6 +11,6 @@ y60_add_component(
     DemoBehaviourRendex
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

@@ -1,0 +1,9 @@
+
+include(SpidermonkeyDefinitions)
+include(SpidermonkeyDependencies)
+include(SpidermonkeyExport)
+
+set(SPIDERMONKEY_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
+set(SPIDERMONKEY_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
+set(SPIDERMONKEY_LIBRARIES spidermonkey)
+

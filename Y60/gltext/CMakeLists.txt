@@ -48,7 +48,7 @@ ac_add_library(
     y60gltext y60/gltext
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS GLEW OPENEXR
+    EXTERNS GLEW OPENEXR PAINTLIB
     DEPENDS aslbase aslmath asldom
             y60base y60scene y60image y60video y60glutil
     TESTS   ${TESTS}

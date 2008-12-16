@@ -40,6 +40,6 @@ y60_add_component(
     VideoProcessing
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

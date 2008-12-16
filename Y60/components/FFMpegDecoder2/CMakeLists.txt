@@ -19,6 +19,6 @@ y60_add_component(
     FFMpegDecoder2
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

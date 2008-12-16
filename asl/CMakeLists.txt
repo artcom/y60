@@ -10,32 +10,16 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-project(asl)
+project(ASL)
 
-set(CMAKE_MODULE_PATH ../acmake/modules ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${ASL_SOURCE_DIR} $ENV{ACMAKE}/modules $ENV{ACMAKE_PATH})
+
 include(AcMake)
-include(FindPkgConfig)
 
-# dependencies
-find_package(ZLIB)
-pkg_search_module(GLIB2    REQUIRED glib-2.0)
-pkg_search_module(CURL     REQUIRED libcurl)
-pkg_search_module(OPENEXR  REQUIRED OpenEXR)
-
-if(LINUX)
-    pkg_search_module(ALSA REQUIRED alsa)
-endif(LINUX)
-
-if(OSX)
-    find_library( CARBON Carbon )
-    find_library( AUDIO_UNIT AudioUnit )
-endif(OSX)
-
-# declarations
+include(ASLDefinitions)
+include(ASLDependencies)
 
 include_directories(../)
-
-add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 add_subdirectory(base)
 add_subdirectory(math)
@@ -47,4 +31,28 @@ add_subdirectory(serial)
 add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
+
+if(NOT ASL_INTEGRATED_BUILD)
+configure_file(
+    ${ASL_SOURCE_DIR}/FindASL.cmake.in
+    ${ASL_BINARY_DIR}/FindASL.cmake
+    @ONLY
+)
+
+install(
+    FILES ASLDependencies.cmake ASLDefinitions.cmake
+    DESTINATION lib/cmake
+)
+
+install(
+    FILES ${ASL_BINARY_DIR}/FindASL.cmake
+    DESTINATION lib/cmake
+)
+
+install(
+    EXPORT ASL
+    DESTINATION lib/cmake
+    FILE ASLExport.cmake
+)
+endif(NOT ASL_INTEGRATED_BUILD)
 

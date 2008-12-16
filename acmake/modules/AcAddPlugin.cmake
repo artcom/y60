@@ -44,7 +44,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     if(NOT THIS_PLUGIN_DONT_INSTALL)
         install(
             TARGETS ${THIS_PLUGIN_NAME}
-            EXPORT  ${CMAKE_PROJECT_NAME}
+            EXPORT ${CMAKE_PROJECT_NAME}
             LIBRARY
                 DESTINATION lib/${THIS_PLUGIN_PATH}
             PUBLIC_HEADER

@@ -74,8 +74,7 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom aslxpath
             y60base y60scene y60image
-	    paintlib spidermonkey
-    EXTERNS OPENEXR GLIB
+    EXTERNS OPENEXR GLIB SPIDERMONKEY PAINTLIB
     TESTS   ${TESTS}
 )
 

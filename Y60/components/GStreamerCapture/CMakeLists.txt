@@ -11,6 +11,6 @@ y60_add_component(
     GStreamerCapture
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

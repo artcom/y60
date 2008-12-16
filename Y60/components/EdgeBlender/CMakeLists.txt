@@ -10,6 +10,6 @@ y60_add_component(
     EdgeBlender
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR SPIDERMONKEY
 )
 

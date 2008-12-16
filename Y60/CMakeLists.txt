@@ -10,46 +10,26 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-project(y60)
+project(Y60)
 
-set(CMAKE_MODULE_PATH ../acmake/modules ${CMAKE_INSTALL_PREFIX}/lib/cmake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${Y60_SOURCE_DIR} $ENV{ACMAKE}/modules $ENV{ACMAKE_PATH})
 
 include(AcMake)
-include(FindPkgConfig)
 
-# our own dependencies
-include(asl)
-include(paintlib)
-include(spidermonkey)
-include(sdlttf)
+include(Y60Definitions)
+include(Y60Dependencies)
 
-# external dependencies
-find_package(GLEW)
-find_package(Cg)
-
-# paintlib transitive
-find_package(PNG)
-find_package(GIF)
-find_package(TIFF)
-find_package(JPEG)
-
-pkg_search_module(OPENEXR REQUIRED OpenEXR)
-pkg_search_module(GLIB REQUIRED glib-2.0)
-pkg_search_module(CURL REQUIRED libcurl)
-pkg_search_module(AVCODEC  REQUIRED libavcodec)
-pkg_search_module(AVFORMAT REQUIRED libavformat)
+# declarations
 
 include_directories(../)
-include_directories(${CMAKE_INSTALL_PREFIX}/include)
-
-add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 macro(y60_add_component COMPONENT_NAME)
     ac_add_plugin(
-        ${COMPONENT_NAME} y60/components/${COMPONENT_NAME}
+        ${COMPONENT_NAME} y60/components
         ${ARGN}
     )
 endmacro(y60_add_component)
+
 
 add_subdirectory(base)
 add_subdirectory(sound)
@@ -68,3 +48,27 @@ add_subdirectory(sdlengine)
 
 add_subdirectory(products)
 add_subdirectory(components)
+
+if(NOT Y60_INTEGRATED_BUILD)
+configure_file(
+    ${Y60_SOURCE_DIR}/FindY60.cmake.in
+    ${Y60_BINARY_DIR}/FindY60.cmake
+    @ONLY
+)
+
+install(
+    FILES Y60Dependencies.cmake Y60Definitions.cmake
+    DESTINATION lib/cmake
+)
+
+install(
+    FILES ${Y60_BINARY_DIR}/FindY60.cmake
+    DESTINATION lib/cmake
+)
+
+install(
+    EXPORT Y60
+    DESTINATION lib/cmake
+    FILE Y60Export.cmake
+)
+endif(NOT Y60_INTEGRATED_BUILD)
