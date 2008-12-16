@@ -80,7 +80,9 @@
 
 #include <y60/glutil/GLUtils.h>
 
+#if defined(LINUX)
 #include <GL/glxew.h>
+#endif
 
 
 #include "WaterSimulation.h"
