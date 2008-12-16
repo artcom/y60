@@ -46,11 +46,6 @@
 #endif
 
 
-#ifdef AC_USE_X11
-    #include <GL/glx.h>
-    #include <GL/glxext.h>
-#endif
-
 namespace y60 {
     DEFINE_EXCEPTION(OpenGLException, asl::Exception);
     DEFINE_EXCEPTION(CantParseOpenGLVersion, asl::Exception);
