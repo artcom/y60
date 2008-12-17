@@ -68,8 +68,9 @@ ac_add_library(
     y60jslib y60/jslib
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS aslbase aslmath asldom aslxpath
-            y60base y60scene y60image y60video y60input y60inet y60glrender y60glutil y60gltext y60jsbase
+    DEPENDS aslbase aslmath asldom aslxpath aslserial
+            y60base y60scene y60image y60video y60input y60inet y60glrender
+            y60glutil y60gltext y60jsbase y60modelling
     EXTERNS OPENEXR PAINTLIB SPIDERMONKEY
     TESTS   ${TESTS}
 )

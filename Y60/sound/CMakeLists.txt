@@ -44,7 +44,7 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath aslaudio
-    EXTERNS AVFORMAT
+    EXTERNS AVFORMAT AVCODEC
     TESTS   ${TESTS}
 )
 

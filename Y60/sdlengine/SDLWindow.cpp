@@ -708,7 +708,8 @@ SDLWindow::setCaptureMouseCursor(bool theCaptureFlag) {
     } else {
         ClipCursor(NULL); // free to move
     }
-#else
+#endif
+#ifdef AC_USE_X11
     SDL_SysWMinfo wminfo;
     SDL_VERSION(&wminfo.version);
     if (SDL_GetWMInfo(&wminfo) < 0) {
@@ -725,6 +726,8 @@ SDLWindow::setCaptureMouseCursor(bool theCaptureFlag) {
     }
     XSync(wminfo.info.x11.display, true);
     wminfo.info.x11.unlock_func();
+#elif defined( OSX )
+#   warning Mac OS X implementation of setCaptureMouseCursor() is missing
 #endif
     _myCaptureMouseCursorFlag = theCaptureFlag;
 }
@@ -923,6 +926,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 #endif
 #ifdef AC_USE_X11
+#error XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     if (_myHasVideoSync) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working

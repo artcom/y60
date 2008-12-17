@@ -1,3 +1,7 @@
+
+add_subdirectory(Filter)
+
+
 set(SOURCES
 tif_msrc.c
 jmemdest.cpp
@@ -113,8 +117,10 @@ tif_msrc.h
 include_directories(.)
 include_directories(./Filter)
 
-include_directories(${PNG_INCLUDE_DIRS} ${GIF_INCLUDE_DIRS} ${TIFF_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS})
-link_directories(${PNG_LIBRARY_DIRS} ${GIF_LIBRARY_DIRS} ${TIFF_LIBRARY_DIRS} ${JPEG_LIBRARY_DIRS})
+include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR} ${JPEG_INCLUDE_DIR}
+                    ${CURL_INCLUDE_DIR})
+link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR} ${JPEG_LIBRARY_DIR}
+                 ${CURL_LIBRARY_DIR})
 
 add_library(
     paintlib SHARED ${SOURCES}
@@ -126,7 +132,8 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
-target_link_libraries(paintlib paintlibfilter ${PNG_LIBRARIES} ${GIF_LIBRARIES} ${TIFF_LIBRARIES} ${JPEG_LIBRARIES})
+target_link_libraries(paintlib paintlibfilter ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY} ${JPEG_LIBRARY}
+                ${CURL_LIBRARY} Half)
 
 install(
     TARGETS paintlib
@@ -136,6 +143,4 @@ install(
     PUBLIC_HEADER
         DESTINATION include/paintlib
 )
-
-add_subdirectory(Filter)
 

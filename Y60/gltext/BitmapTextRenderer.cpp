@@ -42,7 +42,7 @@
 #include <windows.h>
 #endif
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <iostream>
 
 using namespace std;

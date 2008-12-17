@@ -21,3 +21,6 @@ pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(AVCODEC  REQUIRED libavcodec)
 pkg_search_module(AVFORMAT REQUIRED libavformat)
 
+if( OSX )
+    find_library( COCOA_LIBRARIES NAMES Cocoa)
+endif( OSX )

@@ -5,6 +5,8 @@ project(Paintlib)
 
 set(CMAKE_MODULE_PATH ${Paintlib_SOURCE_DIR})
 
+include(FindPkgConfig)
+
 include(PaintlibDefinitions)
 include(PaintlibDependencies)
 

@@ -66,6 +66,14 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
+if(UNIX AND APPLE)
+    set_target_properties(
+        paintlibfilter
+        PROPERTIES
+            LINK_FLAGS "-undefined dynamic_lookup"
+    )
+endif(UNIX AND APPLE)
+
 install(
     TARGETS paintlibfilter
     EXPORT paintlib
