@@ -926,7 +926,6 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 #endif
 #ifdef AC_USE_X11
-#error XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     if (_myHasVideoSync) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working
