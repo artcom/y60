@@ -11,6 +11,7 @@ y60_add_component(
     EventLoop
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS y60jslib
+    EXTERNS SPIDERMONKEY
 )
 

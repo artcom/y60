@@ -15,6 +15,7 @@ y60_add_component(
     JSSound
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS y60jslib y60sound
+    EXTERNS SPIDERMONKEY
 )
 

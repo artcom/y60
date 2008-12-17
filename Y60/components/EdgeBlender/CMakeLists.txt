@@ -10,6 +10,7 @@ y60_add_component(
     EdgeBlender
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS y60jslib
+    EXTERNS SPIDERMONKEY OPENGL
 )
 

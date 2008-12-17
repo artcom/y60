@@ -16,6 +16,5 @@ y60_add_component(
     DVB
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
 )
 

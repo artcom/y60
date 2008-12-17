@@ -12,5 +12,6 @@ y60_add_component(
     ProcFunctions
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS y60jslib
+    EXTERNS SPIDERMONKEY
 )

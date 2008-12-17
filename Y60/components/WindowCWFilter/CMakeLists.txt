@@ -12,6 +12,7 @@ y60_add_component(
     WindowCWFilter
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS y60image
+    EXTERNS PAINTLIB
 )
 

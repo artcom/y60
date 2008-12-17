@@ -19,6 +19,8 @@ y60_add_component(
     FFMpegDecoder2
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
+    DEPENDS asldom aslaudio
+            y60video
+    EXTERNS PAINTLIB AVFORMAT AVCODEC
 )
 

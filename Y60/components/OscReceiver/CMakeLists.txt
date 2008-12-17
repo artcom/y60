@@ -16,6 +16,5 @@ y60_add_component(
     OscReceiver
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR SPIDERMONKEY
 )
 
