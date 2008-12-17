@@ -17,6 +17,39 @@ set(SOURCES
     prmjtime.c
 )
 
+# declspec magic
+set_source_files_properties( ${SOURCES}
+        PROPERTIES
+            COMPILE_DEFINITIONS EXPORT_JS_API  )
+
+# XXX This is a separate library in the original spidermonkey build
+#     Lets keep things simple and just mix in the sources for now.
+if (WIN32)
+    list( APPEND SOURCES fdlibm/e_acos.c fdlibm/e_acosh.c fdlibm/e_asin.c
+            fdlibm/e_atan2.c fdlibm/e_atanh.c fdlibm/e_cosh.c fdlibm/e_exp.c
+            fdlibm/e_fmod.c fdlibm/e_gamma.c fdlibm/e_gamma_r.c
+            fdlibm/e_hypot.c fdlibm/e_j0.c fdlibm/e_j1.c fdlibm/e_jn.c
+            fdlibm/e_lgamma.c fdlibm/e_lgamma_r.c fdlibm/e_log.c
+            fdlibm/e_log10.c fdlibm/e_pow.c fdlibm/e_rem_pio2.c
+            fdlibm/e_remainder.c fdlibm/e_scalb.c fdlibm/e_sinh.c
+            fdlibm/e_sqrt.c fdlibm/k_cos.c fdlibm/k_rem_pio2.c fdlibm/k_sin.c
+            fdlibm/k_standard.c fdlibm/k_tan.c fdlibm/s_asinh.c fdlibm/s_atan.c
+            fdlibm/s_cbrt.c fdlibm/s_ceil.c fdlibm/s_copysign.c fdlibm/s_cos.c
+            fdlibm/s_erf.c fdlibm/s_expm1.c fdlibm/s_fabs.c fdlibm/s_finite.c
+            fdlibm/s_floor.c fdlibm/s_frexp.c fdlibm/s_ilogb.c fdlibm/s_isnan.c
+            fdlibm/s_ldexp.c fdlibm/s_lib_version.c fdlibm/s_log1p.c
+            fdlibm/s_logb.c fdlibm/s_matherr.c fdlibm/s_modf.c
+            fdlibm/s_nextafter.c fdlibm/s_rint.c fdlibm/s_scalbn.c
+            fdlibm/s_signgam.c fdlibm/s_significand.c fdlibm/s_sin.c
+            fdlibm/s_tan.c fdlibm/s_tanh.c fdlibm/w_acos.c fdlibm/w_acosh.c
+            fdlibm/w_asin.c fdlibm/w_atan2.c fdlibm/w_atanh.c fdlibm/w_cosh.c
+            fdlibm/w_exp.c fdlibm/w_fmod.c fdlibm/w_gamma.c fdlibm/w_gamma_r.c
+            fdlibm/w_hypot.c fdlibm/w_j0.c fdlibm/w_j1.c fdlibm/w_jn.c
+            fdlibm/w_lgamma.c fdlibm/w_lgamma_r.c fdlibm/w_log.c
+            fdlibm/w_log10.c fdlibm/w_pow.c fdlibm/w_remainder.c
+            fdlibm/w_scalb.c fdlibm/w_sinh.c fdlibm/w_sqrt.c)
+endif (WIN32)
+
 # XXX: there are probably non-public headers in here
 set(HEADERS
     jsapi.h jsarena.h jsarray.h jsatom.h jsbit.h jsbool.h
@@ -47,7 +80,6 @@ set_target_properties(
 install(
     TARGETS spidermonkey
     EXPORT Spidermonkey
-    LIBRARY
         DESTINATION lib
     PUBLIC_HEADER
         DESTINATION include/js/spidermonkey
@@ -59,7 +91,11 @@ add_executable(
     js.c
 )
 
-target_link_libraries(monkey spidermonkey m)
+if (WIN32)
+    target_link_libraries(monkey spidermonkey)
+else (WIN32)
+    target_link_libraries(monkey spidermonkey m)
+endif (WIN32)
 
 install(
     TARGETS monkey

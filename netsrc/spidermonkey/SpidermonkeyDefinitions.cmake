@@ -9,6 +9,6 @@ if(UNIX)
     endif(APPLE)
 else(UNIX)
     # Microsoft Windows
-    add_definitions(-DXP_WIN -D_WINDOWS -D_X86_=1 -DEXPORT_JS_API -DJSFILE)
+    add_definitions(-DXP_WIN -D_WINDOWS -D_X86_=1 -DJSFILE)
 endif(UNIX)
 
