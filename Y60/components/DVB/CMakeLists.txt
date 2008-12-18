@@ -16,5 +16,7 @@ y60_add_component(
     DVB
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
+    DEPENDS y60jslib
+    EXTERNS SPIDERMONKEY
 )
 
