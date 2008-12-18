@@ -1,0 +1,14 @@
+
+#ifndef ONE_PATHS_HEADER
+#define ONE_PATHS_HEADER
+
+#define CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@"
+#define CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@"
+
+#define CMAKE_CURRENT_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@"
+#define CMAKE_CURRENT_BINARY_DIR "@CMAKE_CURRENT_BINARY_DIR@"
+
+#else
+#error "You have included more than one paths header."
+#endif
+
