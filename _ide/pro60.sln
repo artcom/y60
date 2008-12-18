@@ -199,7 +199,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-y60", "..\Y60\products\
 		{B7E66AFF-2D1B-456A-89CE-6CC566949F0C} = {B7E66AFF-2D1B-456A-89CE-6CC566949F0C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\Y60\gl\render\_ide\lib-y60-gl-render.vcproj", "{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\Y60\glrender\_ide\lib-y60-gl-render.vcproj", "{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -210,7 +210,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\Y60\gl\
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\Y60\gl\text\_ide\lib-y60-gl-text.vcproj", "{CB8BD9BE-6BD0-4A62-87D6-C4ABA5DCF161}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\Y60\gltext\_ide\lib-y60-gl-text.vcproj", "{CB8BD9BE-6BD0-4A62-87D6-C4ABA5DCF161}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -218,7 +218,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\Y60\gl\te
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util", "..\Y60\gl\util\_ide\lib-y60-gl-util.vcproj", "{2DA9A95F-0572-4537-B206-4B3A3D77A952}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util", "..\Y60\glutil\_ide\lib-y60-gl-util.vcproj", "{2DA9A95F-0572-4537-B206-4B3A3D77A952}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -633,12 +633,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testRealSound", "
 		{22C707C2-3E8D-4518-933B-978ED6BE9843} = {22C707C2-3E8D-4518-933B-978ED6BE9843}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util-testGetProcAddress", "..\Y60\gl\util\_ide\y60-gl-util-testGetProcAddress.vcproj", "{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util-testGetProcAddress", "..\Y60\glutil\_ide\y60-gl-util-testGetProcAddress.vcproj", "{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2DA9A95F-0572-4537-B206-4B3A3D77A952} = {2DA9A95F-0572-4537-B206-4B3A3D77A952}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render-testCgShaders", "..\Y60\gl\render\_ide\y60-gl-render-testCgShaders.vcproj", "{859E934C-45B3-41A2-980D-20493B28F9B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render-testCgShaders", "..\Y60\glrender\_ide\y60-gl-render-testCgShaders.vcproj", "{859E934C-45B3-41A2-980D-20493B28F9B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5} = {7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}
 	EndProjectSection
