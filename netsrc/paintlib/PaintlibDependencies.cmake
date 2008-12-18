@@ -5,5 +5,5 @@ find_package(TIFF)
 find_package(JPEG)
 find_package(CURL)
 # Contains libHalf
-pkg_search_module(OPENEXR  REQUIRED OpenEXR)
+find_package(OPENEXR)
 

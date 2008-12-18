@@ -1,7 +1,4 @@
 
-add_subdirectory(Filter)
-
-
 set(SOURCES
 tif_msrc.c
 jmemdest.cpp
@@ -46,7 +43,36 @@ pltiffdec.cpp
 pltiffenc.cpp
 pltiffencex.cpp
 plurlsrc.cpp
+
+
+Filter/plfiltercolorize.cpp
+Filter/plfiltercontrast.cpp
+Filter/plfilter.cpp
+Filter/plfiltercrop.cpp
+Filter/plfilterflip.cpp
+Filter/plfilterfliprgb.cpp
+Filter/plfiltergetalpha.cpp
+Filter/plfiltergrayscale.cpp
+Filter/plfilterintensity.cpp
+Filter/plfilterlightness.cpp
+Filter/plfiltermirror.cpp
+Filter/plfilterquantize.cpp
+Filter/plfilterresizebilinear.cpp
+Filter/plfilterresizebox.cpp
+Filter/plfilterresize.cpp
+Filter/plfilterresizegaussian.cpp
+Filter/plfilterresizehamming.cpp
+Filter/plfilterrotate.cpp
+Filter/plfilterthreshold.cpp
+Filter/plfiltervideoinvert.cpp
+Filter/plhsvconvert.cpp
+Filter/plinplacefilter.cpp
 )
+
+if (WIN32)
+    list( APPEND SOURCES win/plwemfdec.cpp win/plressrc.cpp win/plwinbmp.cpp)
+endif (WIN32)
+
 
 set(HEADERS
 config.h
@@ -112,15 +138,47 @@ plurlsrc.h
 plwindefs.h
 qdraw.h
 tif_msrc.h
+
+
+
+Filter/pl2passscale.h
+Filter/plcontribdefs.h
+Filter/plfiltercolorize.h
+Filter/plfiltercontrast.h
+Filter/plfiltercrop.h
+Filter/plfilterfill.h
+Filter/plfilterfillrect.h
+Filter/plfilterflip.h
+Filter/plfilterfliprgb.h
+Filter/plfiltergetalpha.h
+Filter/plfiltergrayscale.h
+Filter/plfilter.h
+Filter/plfilterintensity.h
+Filter/plfilterlightness.h
+Filter/plfiltermirror.h
+Filter/plfilterpixel.h
+Filter/plfilterquantize.h
+Filter/plfilterresizebilinear.h
+Filter/plfilterresizebox.h
+Filter/plfilterresizegaussian.h
+Filter/plfilterresize.h
+Filter/plfilterresizehamming.h
+Filter/plfilterrotate.h
+Filter/plfilterthreshold.h
+Filter/plfiltervideoinvert.h
+Filter/plhsvconvert.h
+Filter/plinplacefilter.h
 )
 
 include_directories(.)
 include_directories(./Filter)
 
-include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR} ${JPEG_INCLUDE_DIR}
-                    ${CURL_INCLUDE_DIR})
-link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR} ${JPEG_LIBRARY_DIR}
-                 ${CURL_LIBRARY_DIR})
+include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR}
+        ${JPEG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${OPENEXR_INCLUDE_DIR})
+link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR}
+        ${JPEG_LIBRARY_DIR} ${CURL_LIBRARY_DIR} ${OPENEXR_LIBRARY_DIR})
+
+add_definitions( ${OPENEXR_DEFINITIONS} )
 
 add_library(
     paintlib SHARED ${SOURCES}
@@ -132,15 +190,13 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
-target_link_libraries(paintlib paintlibfilter ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY} ${JPEG_LIBRARY}
-                ${CURL_LIBRARY} Half)
+target_link_libraries(paintlib ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY}
+        ${JPEG_LIBRARY} ${CURL_LIBRARY} ${OPENEXR_LIBRARIES} )
 
 install(
     TARGETS paintlib
     EXPORT paintlib
-    LIBRARY
         DESTINATION lib
     PUBLIC_HEADER
         DESTINATION include/paintlib
 )
-

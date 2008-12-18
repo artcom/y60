@@ -16,7 +16,7 @@
 
 #include <math.h>
 #include <iostream>
-#include <OpenEXR/half.h>
+#include <half.h>
 
 // Not every math.h defines this :-(.
 #ifndef  min

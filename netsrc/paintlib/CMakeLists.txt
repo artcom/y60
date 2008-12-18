@@ -3,12 +3,15 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Paintlib)
 
-set(CMAKE_MODULE_PATH ${Paintlib_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${Paintlib_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 
 include(FindPkgConfig)
 
 include(PaintlibDefinitions)
 include(PaintlibDependencies)
+
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
+        -D_SCL_SECURE_NO_WARNINGS)
 
 add_subdirectory(src)
 

@@ -57,6 +57,10 @@ if(UNIX)
 else(UNIX)
     
     if(WIN32)
+        # suppress superflous, verbose warnings
+        add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+        add_definitions( -D_CRT_NONSTDC_NO_WARNINGS )
+        add_definitions( -D_SCL_SECURE_NO_WARNINGS )
     endif(WIN32)
     
 endif(UNIX)

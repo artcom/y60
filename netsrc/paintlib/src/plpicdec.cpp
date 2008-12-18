@@ -17,7 +17,7 @@
 #include "plpicdec.h"
 #include "plfilesrc.h"
 #ifdef _WIN32
-#include "plressrc.h"
+#include "win/plressrc.h"
 #endif
 #include "plmemsrc.h"
 #ifdef PL_SUPPORT_CURL

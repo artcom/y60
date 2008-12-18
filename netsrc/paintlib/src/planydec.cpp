@@ -47,7 +47,7 @@
 #endif
 
 #ifdef PL_SUPPORT_WEMF
-#include "plwemfdec.h"
+#include "win/plwemfdec.h"
 #endif
 
 #ifdef PL_SUPPORT_PCX
