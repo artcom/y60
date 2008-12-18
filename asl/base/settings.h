@@ -133,6 +133,8 @@ namespace asl {
 };
 
 #ifdef WIN32
+    // XXX: rename theDirectorySeparator to ourDirectorySeparator
+
     #define _SETTING_VC_TEMPLATE_BUG_WORKAROUND_
 
     // Debug symbols too long for std::map etc. in MSVC 6.0

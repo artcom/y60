@@ -19,6 +19,11 @@
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
+#ifdef ASL_BUILT_WITH_CMAKE
+#include "aslbase_paths.h"
+#endif
+
 #include <string>
 #include <iostream>
 
@@ -66,7 +71,13 @@ int main(int argc, char *argv[]) {
     string myProgramName = asl::getFilenamePart(argv[0]);
     cerr << myProgramName << " started in directory " << myDirectoryName << endl;
 
-    string myScriptName = string("../../") + myProgramName + ".sh"; 
+    string myScriptName =
+#ifdef ASL_BUILT_WITH_CMAKE
+        string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator
+#else
+        string("../../")
+#endif
+        + myProgramName + ".sh"; 
 
     cerr << myProgramName << ": executing script '" << myScriptName << "'" << endl;
 
