@@ -16,7 +16,12 @@
 
 #include <math.h>
 #include <iostream>
-#include <half.h>
+
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <half.h>
+#else
+#   include <OpenEXR/half.h>
+#endif
 
 // Not every math.h defines this :-(.
 #ifndef  min

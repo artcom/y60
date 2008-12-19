@@ -10,8 +10,12 @@ include(FindPkgConfig)
 include(PaintlibDefinitions)
 include(PaintlibDependencies)
 
-add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
-        -D_SCL_SECURE_NO_WARNINGS)
+if (WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
+            -D_SCL_SECURE_NO_WARNINGS)
+endif (WIN32)
+
+add_definitions( -DAC_BUILT_WITH_CMAKE )
 
 add_subdirectory(src)
 
