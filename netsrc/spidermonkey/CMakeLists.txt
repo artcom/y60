@@ -87,18 +87,18 @@ install(
 
 
 add_executable(
-    monkey
+    smonkey
     js.c
 )
 
 if (WIN32)
-    target_link_libraries(monkey spidermonkey)
+    target_link_libraries(smonkey spidermonkey)
 else (WIN32)
-    target_link_libraries(monkey spidermonkey m)
+    target_link_libraries(smonkey spidermonkey m)
 endif (WIN32)
 
 install(
-    TARGETS monkey
+    TARGETS smonkey
     EXPORT Spidermonkey
     RUNTIME
         DESTINATION bin
