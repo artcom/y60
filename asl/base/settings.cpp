@@ -86,6 +86,6 @@ namespace {
 
 namespace asl {
 	void initialize() {
-		(void)&theAslInitializer;
+		(void)&ourAslInitializer;
 	}
 } // namespace asl
