@@ -164,38 +164,11 @@ namespace asl {
     #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
 #endif
 
-#ifdef WIN32
-	#include <crtdbg.h>
-	// disable heap checking for debug builds by default, you must call this in main()
-namespace asl {
-/*! \addtogroup aslbase */
-/* @{ */
-	inline int disableHeapDebug(int theFlags = 0) {
-#ifdef DEBUG_VARIANT
-        return _CrtSetDbgFlag(theFlags);
-#else
-        (void)theFlags;
-        return 0;
-#endif
-	}
-/* @} */
-} // namespace asl
-#else
-namespace asl {
-/*! \addtogroup aslbase */
-/* @{ */
-		inline int disableHeapDebug(int theFlags = 0) {return 0;}
-/* @} */
-} // namespace asl
-#endif
-
 //#define PROFILING_LEVEL_NORMAL 1
 //#define PROFILING_LEVEL_FULL 1
 
 namespace asl {
-	inline void initialize() {
-		disableHeapDebug();
-	}
+	void initialize();
 } // namespace asl
 
 #define DESTRACE(x) //x
