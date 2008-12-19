@@ -141,42 +141,42 @@ tif_msrc.h
 
 
 
-Filter/pl2passscale.h
-Filter/plcontribdefs.h
-Filter/plfiltercolorize.h
-Filter/plfiltercontrast.h
-Filter/plfiltercrop.h
-Filter/plfilterfill.h
-Filter/plfilterfillrect.h
-Filter/plfilterflip.h
-Filter/plfilterfliprgb.h
-Filter/plfiltergetalpha.h
-Filter/plfiltergrayscale.h
-Filter/plfilter.h
-Filter/plfilterintensity.h
-Filter/plfilterlightness.h
-Filter/plfiltermirror.h
-Filter/plfilterpixel.h
-Filter/plfilterquantize.h
-Filter/plfilterresizebilinear.h
-Filter/plfilterresizebox.h
-Filter/plfilterresizegaussian.h
-Filter/plfilterresize.h
-Filter/plfilterresizehamming.h
-Filter/plfilterrotate.h
-Filter/plfilterthreshold.h
-Filter/plfiltervideoinvert.h
-Filter/plhsvconvert.h
-Filter/plinplacefilter.h
+#Filter/pl2passscale.h
+#Filter/plcontribdefs.h
+#Filter/plfiltercolorize.h
+#Filter/plfiltercontrast.h
+#Filter/plfiltercrop.h
+#Filter/plfilterfill.h
+#Filter/plfilterfillrect.h
+#Filter/plfilterflip.h
+#Filter/plfilterfliprgb.h
+#Filter/plfiltergetalpha.h
+#Filter/plfiltergrayscale.h
+#Filter/plfilter.h
+#Filter/plfilterintensity.h
+#Filter/plfilterlightness.h
+#Filter/plfiltermirror.h
+#Filter/plfilterpixel.h
+#Filter/plfilterquantize.h
+#Filter/plfilterresizebilinear.h
+#Filter/plfilterresizebox.h
+#Filter/plfilterresizegaussian.h
+#Filter/plfilterresize.h
+#Filter/plfilterresizehamming.h
+#Filter/plfilterrotate.h
+#Filter/plfilterthreshold.h
+#Filter/plfiltervideoinvert.h
+#Filter/plhsvconvert.h
+#Filter/plinplacefilter.h
 )
 
 include_directories(.)
 include_directories(./Filter)
 
 include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR}
-        ${JPEG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${OPENEXR_INCLUDE_DIR})
+        ${JPEG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${OPENEXR_INCLUDE_DIRS})
 link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR}
-        ${JPEG_LIBRARY_DIR} ${CURL_LIBRARY_DIR} ${OPENEXR_LIBRARY_DIR})
+        ${JPEG_LIBRARY_DIR} ${CURL_LIBRARY_DIR} ${OPENEXR_LIBRARY_DIRS})
 
 add_definitions( ${OPENEXR_DEFINITIONS} )
 
@@ -192,6 +192,15 @@ set_target_properties(
 
 target_link_libraries(paintlib ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY}
         ${JPEG_LIBRARY} ${CURL_LIBRARY} ${OPENEXR_LIBRARIES} )
+
+# install additional headers from Filter/ directory to an appropriate destination
+install(
+    DIRECTORY Filter
+    DESTINATION include/paintlib
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN .svn EXCLUDE
+)
+
 
 install(
     TARGETS paintlib
