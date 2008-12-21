@@ -33,6 +33,7 @@ Time.cpp
 TimeStreamFormater.cpp
 TraceUtils.cpp
 UnitTest.cpp
+settings.cpp
 )
 
 set(HEADERS
