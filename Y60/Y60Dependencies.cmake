@@ -1,4 +1,6 @@
 
+include(AcPlatform)
+
 include(FindPkgConfig)
 
 # integrated dependencies
@@ -17,6 +19,10 @@ find_package(Cg)
 
 pkg_search_module(GLIB REQUIRED glib-2.0)
 
+pkg_search_module(GTKMM OPTIONAL gtkmm-2.4)
+pkg_search_module(GLADEMM OPTIONAL libglademm-2.4)
+pkg_search_module(GTKGLEXT OPTIONAL gtkglext-1.0)
+
 # ffmpeg
 pkg_search_module(AVCODEC  REQUIRED libavcodec)
 pkg_search_module(AVFORMAT REQUIRED libavformat)
@@ -24,3 +30,4 @@ pkg_search_module(AVFORMAT REQUIRED libavformat)
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)
 endif( OSX )
+

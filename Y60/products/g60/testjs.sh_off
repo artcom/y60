@@ -18,11 +18,11 @@ if [ $UNAME == "Cygwin" ]; then
     PLATFORM=WIN
 fi
 
-APPLICATION=acgtkshell
+APPLICATION=g60
 if [ "$DEBUG" == "1" ] ; then
     mkdir -p o.ANT.${PLATFORM}.DBG/tests
     cd o.ANT.${PLATFORM}.DBG/tests
-    APPLICATION=acgtkshellDBG
+    APPLICATION=g60DBG
 else
     mkdir -p o.ANT.${PLATFORM}.OPT/tests
     cd o.ANT.${PLATFORM}.OPT/tests

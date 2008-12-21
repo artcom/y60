@@ -33,7 +33,7 @@ Javascript bindings for GTK/GTKmm.
 
 products/:
 Executable build products.
-(y60, acgtkshell, maya exporter, testing tools...)
+(y60, g60, maya exporter, testing tools...)
 
 sdlengine/:
 SDL-specific code.

@@ -16,7 +16,7 @@ else
     fi
 fi
 
-APPLICATION="acgtkshell"
+APPLICATION="g60"
 if [ "$DEBUG" == "1" ]; then
     APPLICATION="${APPLICATION}DBG"
 fi

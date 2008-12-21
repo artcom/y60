@@ -909,7 +909,7 @@ Version(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Prints the build date and time of acxpshell/acgtkshell.");
+    DOC_BEGIN("Prints the build date and time of the engine binary.");
     DOC_END;
     try {
         AC_PRINT << "built on " << __DATE__<< " at " << __TIME__;

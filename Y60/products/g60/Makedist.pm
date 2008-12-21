@@ -1,8 +1,8 @@
 package Makedist;
 use MakedistTools;
 
-$PRODUCT_NAME   = "acgtkshell";
-$ICON_FILE      = "acgtkshell.ico";
+$PRODUCT_NAME   = "g60";
+$ICON_FILE      = "g60.ico";
 
 sub runLocalMakedist($) {
     my $theDistDir = $_[0];
@@ -29,7 +29,7 @@ sub runLocalMakedist($) {
         copyIfMoreRecent("$ENV{PRO}/lib/LIBXML2.dll", $theDistDir);
         copyIfMoreRecent("$ENV{PRO}/lib/zlib1.dll", $theDistDir);
         copyIfMoreRecent("$ENV{PRO}/lib/libpng12.dll", $theDistDir);
-        copyIfMoreRecent("acgtkshell.ico", $theDistDir);
+        copyIfMoreRecent("g60.ico", $theDistDir);
 
         copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcp71.dll", $theDistDir);
         copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcr71.dll", $theDistDir);
@@ -47,11 +47,11 @@ sub runLocalMakedist($) {
 sub runLocalMakeInstaller() {
     addShortcut("rendergirl",
                 "-I [TARGETDIR]/js [TARGETDIR]/js/sv.js \"%1\" [TARGETDIR]/shader/shaderlibrary_nocg.xml",
-                "acgtkshell.exe");
+                "g60.exe");
 
     addFileType("rendergirl model", "x60;m60",
                 "-I [TARGETDIR]/js [TARGETDIR]/js/sv.js \"%1\" [TARGETDIR]/shader/shaderlibrary_nocg.xml",
-                "acgtkshell.exe");
+                "g60.exe");
 }
 
 1;

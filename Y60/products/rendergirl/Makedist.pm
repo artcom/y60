@@ -15,16 +15,16 @@ sub runLocalMakedist($) {
     copyDirTree("SCRIPTS", $theDistDir);
 
     # Install dependencies
-    depends("Y60/products/acgtkshell");
+    depends("Y60/products/g60");
 }
 
 sub runLocalMakeInstaller() {
     my $myArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS\" \"[TARGETDIR]SCRIPTS/rendergirl.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1\"";
     my $myFlighrecorderArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS\" \"[TARGETDIR]SCRIPTS/FlightRecorder.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1\"";
-    addShortcut("Rendergirl", $myArguments, "acgtkshell.exe");
-    addFileType("Rendergirl Model", "x60", $myArguments, "acgtkshell.exe");
-    addFileType("Rendergirl Binary Model", "b60", $myArguments, "acgtkshell.exe");
-    addFileType("Rendergirl Flight", "f60", $myFlighrecorderArguments, "acgtkshell.exe");
+    addShortcut("Rendergirl", $myArguments, "g60.exe");
+    addFileType("Rendergirl Model", "x60", $myArguments, "g60.exe");
+    addFileType("Rendergirl Binary Model", "b60", $myArguments, "g60.exe");
+    addFileType("Rendergirl Flight", "f60", $myFlighrecorderArguments, "g60.exe");
 }
 
 1;

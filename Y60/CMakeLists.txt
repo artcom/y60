@@ -18,19 +18,13 @@ include(AcMake)
 
 include(Y60Definitions)
 include(Y60Dependencies)
+include(Y60Utilities)
 
 # declarations
 
 include_directories(../)
 
-macro(y60_add_component COMPONENT_NAME)
-    ac_add_plugin(
-        ${COMPONENT_NAME} y60/components
-        ${ARGN}
-    )
-endmacro(y60_add_component)
-
-
+# engine libraries
 add_subdirectory(base)
 add_subdirectory(sound)
 add_subdirectory(image)
@@ -46,9 +40,38 @@ add_subdirectory(jsbase)
 add_subdirectory(jslib)
 add_subdirectory(sdlengine)
 
+# libraries depending on gtk
+if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+    add_subdirectory(acgtk)
+    add_subdirectory(jsgtk)
+endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+
+# executables and plugins
 add_subdirectory(products)
 add_subdirectory(components)
 
+# install script library
+install(
+    DIRECTORY js
+    DESTINATION lib/y60
+    FILES_MATCHING
+        PATTERN "*.js"
+        PATTERN ".svn" EXCLUDE
+)
+
+# install shader library
+install(
+    DIRECTORY shader
+    DESTINATION lib/y60
+    FILES_MATCHING
+        PATTERN "*.cg"
+        PATTERN "*.xml"
+        PATTERN "*.png"
+        PATTERN "*.rgb"
+        PATTERN ".svn" EXCLUDE
+)
+
+# export cmake package
 if(NOT Y60_INTEGRATED_BUILD)
 configure_file(
     ${Y60_SOURCE_DIR}/FindY60.cmake.in
@@ -57,7 +80,7 @@ configure_file(
 )
 
 install(
-    FILES Y60Dependencies.cmake Y60Definitions.cmake
+    FILES Y60Dependencies.cmake Y60Definitions.cmake Y60Utilities.cmake
     DESTINATION lib/cmake
 )
 
@@ -72,3 +95,4 @@ install(
     FILE Y60Export.cmake
 )
 endif(NOT Y60_INTEGRATED_BUILD)
+

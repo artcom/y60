@@ -18,12 +18,12 @@ export __GL_SYNC_TO_VBLANK=1
 #
 # debug or release mode
 #
-SHELL="acgtkshell"
+SHELL="g60"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
-    SHELL="acgtkshellDBG"
+    SHELL="g60DBG"
 fi
 
-APP="$SCRIPTS_DIR/gtkviewer.js"
+APP="$SCRIPTS_DIR/multiscene.js"
 CMD="$SHELL -I $Y60_DIR/js;$PRO/lib $APP $SHADERLIB $ARG"
 
 echo "### $CMD" "$@"

@@ -14,7 +14,7 @@ else
 fi
 shift
 
-APPLICATION=acgtkshell
+APPLICATION=g60
 if [ "$DEBUG" == "1" ] ; then
     APPLICATION=${APPLICATION}DBG
 fi
