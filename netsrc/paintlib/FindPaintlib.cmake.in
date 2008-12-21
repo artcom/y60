@@ -5,4 +5,4 @@ include(PaintlibExport)
 
 set(PAINTLIB_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
 set(PAINTLIB_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
-set(PAINTLIB_LIBRARIES paintlib paintlibfilter)
+set(PAINTLIB_LIBRARIES paintlib)
