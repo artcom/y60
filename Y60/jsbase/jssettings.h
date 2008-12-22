@@ -70,15 +70,21 @@
 #undef JS_THREADSAFE
 
 #ifdef WIN32    
+    #ifndef XP_WIN
     #define XP_WIN    
+    #endif
 #endif
 
 #ifdef LINUX
+    #ifndef XP_UNIX
     #define XP_UNIX    
+    #endif
 #endif
 
 #ifdef OSX
+    #ifndef XP_UNIX
     #define XP_UNIX    
+    #endif
 #endif
 
 // undefine to use tracemonkey

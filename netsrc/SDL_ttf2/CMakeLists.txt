@@ -8,6 +8,7 @@ set(CMAKE_MODULE_PATH ${SDLTTF_SOURCE_DIR})
 include(SDLTTFDefinitions)
 include(SDLTTFDependencies)
 
+add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 include_directories(.)
 

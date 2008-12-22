@@ -59,7 +59,11 @@
 #ifndef _ac_y60_PLDataSourceStreamAdapter_h_
 #define _ac_y60_PLDataSourceStreamAdapter_h_
 
+#ifdef AC_BUILT_WITH_CMAKE
+#include <ImfIO.h>
+#else
 #include <OpenEXR/ImfIO.h>
+#endif
 
 class PLDataSourceStreamAdapter : public Imf::IStream {
     public:

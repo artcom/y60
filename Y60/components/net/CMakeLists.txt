@@ -15,6 +15,6 @@ y60_add_component(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslinet y60jslib
-    EXTERNS SPIDERMONKEY
+    EXTERNS SPIDERMONKEY OPENEXR
 )
 

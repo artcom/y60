@@ -72,9 +72,13 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
+#ifdef AC_BUILT_WITH_CMAKE
+#include <half.h>
+#include <ImfRgbaFile.h>
+#else
 #include <OpenEXR/half.h>
 #include <OpenEXR/ImfRgbaFile.h>
-
+#endif
 class PLDataSourceStreamAdapter;
 
 DEFINE_EXCEPTION(OpenEXRException, asl::Exception);

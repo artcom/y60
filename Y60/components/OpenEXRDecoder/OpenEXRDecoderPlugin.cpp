@@ -64,7 +64,11 @@
 #    pragma warning(pop)
 #endif
 
+#ifdef AC_BUILT_WITH_CMAKE
+#include <ImfVersion.h>
+#else
 #include <OpenEXR/ImfVersion.h>
+#endif
 
 #include <asl/base/PlugInBase.h>
 #include <y60/image/IPaintLibExtension.h>

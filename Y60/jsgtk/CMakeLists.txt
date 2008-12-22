@@ -218,6 +218,11 @@ ac_add_library(
             y60base y60image y60video y60inet y60scene y60input
             y60glrender y60glutil y60gltext y60modelling y60jslib
             y60acgtk
-    EXTERNS PAINTLIB SPIDERMONKEY GTKMM GTKGLEXT GLADEMM
+    EXTERNS PAINTLIB SPIDERMONKEY GTKMM GTKGLEXT GLADEMM OPENEXR
 )
+
+# fix OpenGL/X11 link cycle problem
+if(OSX)
+    set_property(TARGET y60jsgtk APPEND PROPERTY LINK_FLAGS " -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+endif(OSX)
 

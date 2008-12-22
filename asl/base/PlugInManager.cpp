@@ -66,7 +66,7 @@ string PlugInManager :: getPlugInFileName(const string & theLibraryName, const c
     myFilename += "lib";
 #endif
     myFilename += theLibraryName;
-#ifndef ASL_BUILT_WITH_CMAKE
+#ifndef ACL_BUILT_WITH_CMAKE
     if (!theVariant) {
 #ifdef DEBUG_VARIANT
         myFilename += "DBG";

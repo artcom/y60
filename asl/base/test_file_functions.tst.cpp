@@ -10,7 +10,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifdef ASL_BUILT_WITH_CMAKE
+#ifdef AC_BUILT_WITH_CMAKE
 #include "aslbase_paths.h"
 #endif
 
@@ -103,7 +103,7 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getParentDirectory("")=="");
             ENSURE(getParentDirectory("X")=="");
 
-#ifndef ASL_BUILT_WITH_CMAKE
+#ifndef AC_BUILT_WITH_CMAKE
             // XXX: fix these up to work with the cmake build
             ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));            
             ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
@@ -239,7 +239,7 @@ class DirectoryTest : public UnitTest {
             // use getdir utility function instead
 
             string myDir =
-#ifdef ASL_BUILT_WITH_CMAKE
+#ifdef AC_BUILT_WITH_CMAKE
                 string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator
 #else
                 string("..") + theDirectorySeparator + string("..") + theDirectorySeparator
@@ -260,7 +260,7 @@ class DirectoryTest : public UnitTest {
             ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
 
             ENSURE(isDirectory("."));
-#ifdef ASL_BUILT_WITH_CMAKE
+#ifdef AC_BUILT_WITH_CMAKE
 	    ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR)));
 	    ENSURE(isDirectory(string(CMAKE_CURRENT_BINARY_DIR)));
 	    ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + string("testdir")));
@@ -279,7 +279,7 @@ class DirectoryTest : public UnitTest {
 
             // last modified stuff
             std::string myFile =
-#ifdef ASL_BUILT_WITH_CMAKE
+#ifdef AC_BUILT_WITH_CMAKE
                 string(CMAKE_CURRENT_BINARY_DIR)
 #else
                 string("../../")

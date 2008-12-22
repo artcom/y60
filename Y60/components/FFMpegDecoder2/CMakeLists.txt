@@ -21,6 +21,6 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS asldom aslaudio
             y60video
-    EXTERNS PAINTLIB AVFORMAT AVCODEC
+    EXTERNS PAINTLIB AVFORMAT AVCODEC OPENEXR
 )
 

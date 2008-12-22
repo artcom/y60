@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Paintlib)
 
-set(CMAKE_MODULE_PATH ${Paintlib_SOURCE_DIR} ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${Paintlib_SOURCE_DIR} ${CMAKE_MODULE_PATH} $ENV{ACMAKE}/modules)
 
 include(FindPkgConfig)
 

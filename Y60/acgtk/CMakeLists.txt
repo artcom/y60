@@ -37,6 +37,14 @@ TNTMeasurementList.h
 TNTThresholdList.h
 )
 
+
+# if(OSX)
+#     list(REMOVE_ITEM GTKMM_LIBRARIES "X11" "Xmu" "Xt" "ICE" "SM" "Xrender") 
+#     list(REMOVE_ITEM GTKGLEXT_LIBRARIES "X11" "Xmu" "Xt" "GL" "GLU" "ICE" "SM" "Xrender")
+#     message(${GTKMM_LIBRARIES})
+#     message(${GTKGLEXT_LIBRARIES})
+# endif(OSX)
+
 ac_add_library(
     y60acgtk y60/acgtk
     SOURCES ${SOURCES}
@@ -44,6 +52,11 @@ ac_add_library(
     DEPENDS aslbase aslmath aslserial aslnet asldom aslxpath aslzip
             y60base y60image y60video y60inet y60scene y60input
             y60glrender y60glutil y60gltext y60modelling y60jslib
-    EXTERNS PAINTLIB SPIDERMONKEY GTKMM GTKGLEXT
+    EXTERNS PAINTLIB SPIDERMONKEY GTKMM GTKGLEXT OPENEXR
 )
+
+# fix OpenGL/X11 link cycle problem
+if(OSX)
+    set_property(TARGET y60acgtk APPEND PROPERTY LINK_FLAGS " -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+endif(OSX)
 

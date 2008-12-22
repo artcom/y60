@@ -7,6 +7,12 @@ ac_add_executable(
           y60glrender y60glutil y60gltext y60jsbase y60jslib
           y60modelling y60sdlengine y60acgtk y60jsgtk
           aslzip
-  EXTERNS GTKMM GLADEMM GTKGLEXT SPIDERMONKEY
+  EXTERNS GTKMM GLADEMM GTKGLEXT SPIDERMONKEY OPENEXR
 )
+
+# fix OpenGL/X11 link cycle problem
+if(OSX)
+    set_property(TARGET g60 APPEND PROPERTY LINK_FLAGS " -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+endif(OSX)
+
 

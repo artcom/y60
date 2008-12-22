@@ -30,8 +30,13 @@
 #ifndef _SDL_TTF_H
 #define _SDL_TTF_H
 
+#ifdef AC_BUILT_WITH_CMAKE
+#include <SDL.h>
+#include <begin_code.h>
+#else
 #include <SDL/SDL.h>
 #include <SDL/begin_code.h>
+#endif
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -248,6 +253,10 @@ extern DECLSPEC Uint16 *UTF8_to_UNICODE(Uint16 *unicode, const char *utf8, int l
 #ifdef __cplusplus
 }
 #endif
+#ifdef AC_BUILT_WITH_CMAKE
+#include <close_code.h>
+#else
 #include <SDL/close_code.h>
+#endif
 
 #endif /* _SDL_TTF_H */

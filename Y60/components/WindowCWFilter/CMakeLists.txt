@@ -13,6 +13,6 @@ y60_add_component(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60image
-    EXTERNS PAINTLIB
+    EXTERNS PAINTLIB OPENEXR
 )
 
