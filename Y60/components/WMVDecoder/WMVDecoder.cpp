@@ -689,9 +689,7 @@ double ourLastAudioTimeStamp = 0.0;
         //float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
 
         asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(1, -1, 1.0f));
-        //myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));
-        //myMatrix.translate(asl::Vector3f(0, myYResize, 0));
+        myMatrix.assign(1,0,0,0, 0,-1,0,0, 0,0,1,0, 0,1,0,1);    
         myMovie->set<ImageMatrixTag>(myMatrix);
 
         AC_DEBUG << "Video: frame=" << myVideoWidth << "x" << myVideoHeight << " pixelFormat=" << asl::getStringFromEnum(myMovie->getRasterEncoding(), y60::PixelEncodingString);
