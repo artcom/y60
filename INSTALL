@@ -1,0 +1,104 @@
+INSTALLATION INSTRUCTIONS
+=========================
+
+We are currently working on a new CMake based build system. Because the toplevel
+Makefile is still missing, it is necessary to trigger a couple of sub-builds by
+Hand. The required CMake version is 2.6.
+
+Dependencies:
+=============
+There are alot of them. On Linux and Mac OS X this should not be a problem. Most
+of them are pretty common and they should come with your distro. On Mac OS they
+can be installed using ports/fink or somesuch.
+
+    - libpng
+    - libtiff
+    - libjpeg
+    - lib(un)gif
+    - OpenEXR
+    - glib
+    - ffmpeg (svn revision 12506; can be found [ROOT]/extern/common)
+    - libcurl
+    - gtkmm
+    - gtkglext
+    - libsdl
+
+There are also a couple of other third party libraries that currently come with
+the distribution:
+    - spidermonkey
+    - libsdlttf
+    - paintlib
+
+They come with custom CMake build files.
+
+Installation:
+=============
+1. Set the ACMAKE environment variable to point to [ROOT]/src/acmake
+
+2. Create a build tree directory structure, like this:
+    - builds
+        - paintlib
+        - spidermonkey
+        - SDL_ttf2
+        - y60_full
+
+3. To install the dependencies, cd into each of the build directories (in th
+   given order) and issue the following commands
+    
+        $ cmake -DCMAKE_BUILD_TYPE=RELEASE \
+                [ROOT]/src/netsrc/{paintlib,spidermonkey,...}
+
+   This creates the build system. The default install prefix is '/usr/local'. To change
+   that add the following option:
+
+        -DCMAKE_INSTALL_PREFIX=/some/other/directory
+   
+   On Windows you can choose to create either Visual Studio build files by adding
+        -G "Visual Studio 9 2008"
+   to the command line or if you prefer nmake makefiles
+        -G "NMake Makefiles"
+   On Mac OS X
+        -G "Xcode"
+   will generate XCode project files.
+
+   If you want a debug build set:
+        -DCMAKE_BUILD_TYPE=DEBUG
+
+   Now build the source by invoking
+
+        $ make
+
+   ...vcbuild.exe, nmake, xcode or whatever your build tool might be. After
+   that run the equivalent of
+
+        $ make install
+
+4. Build asl and Y60. Cd into builds/y60_full and again run 
+
+   $ cmake -DCMAKE_BUILD_TYPE=RELEASE [ROOT]/src/
+
+   After that invoke your build tool and have coffee.
+
+
+Known Issues:
+=============
+
+ * Gathering the dependencies on Windows is a nightmare. There is a (bash)
+   script that might help a bit:
+
+        $ [ROOT]/build/bin/install_externals [ROOT]/extern <DST>
+
+    However it's more than a little kludgy and your mileage might vary.
+
+ * On Mac OS X CMake currently repeates the following error many times:
+
+        CMake Internal Error (please report a bug) in y60/CMakeLists.txt:
+        GetLibraryNamesInternal called on imported target: spidermonkey
+
+   However, the resulting Makefiles seem to work Ok.
+
+
+    
+
+
+
