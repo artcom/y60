@@ -62,7 +62,7 @@ namespace asl {
         _myPacketsReceived(0),
         _myStartToken(0xffU),
         _myEndToken(0xfeU),
-        _myPayloadSize(UINT_MAX),
+        _myPayloadSize(std::numeric_limits<unsigned>::max()),
         _myErrorChecking(CRC8_CHECKING)
     {}
 
@@ -104,7 +104,7 @@ namespace asl {
             throw uCCPException("Serial port is not initialized (null pointer).", PLUS_FILE_LINE);
         }
 
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             if (thePacket.size() > 255) {
                 throw uCCPException(string("Can not send ") + as_string(thePacket.size()) +
                                     " bytes. uCCP can only handle up to 255 bytes.", PLUS_FILE_LINE);
@@ -120,7 +120,7 @@ namespace asl {
         Frame myFrame;
 
         // (1) Size field
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myFrame.push_back((unsigned char)(thePacket.size()));
         }
 
@@ -235,7 +235,7 @@ namespace asl {
     bool
     uCCP::parseSize(Frame & theData) {
         unsigned myPayloadSize = _myPayloadSize;
-        if (myPayloadSize == UINT_MAX) {
+        if (myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myPayloadSize = theData.front();
             _myCurrentFrame.pop_front();
         }
@@ -288,7 +288,7 @@ namespace asl {
             throw uCCPException("Payload size of zero bytes is illegal.", PLUS_FILE_LINE);
         }
 
-        if (theSize != UINT_MAX && theSize > 255) {
+        if (theSize != std::numeric_limits<unsigned>::max() && theSize > 255) {
             throw uCCPException(string("Illegal payload size of ") + asl::as_string(theSize) +
                         " bytes. uCCP can only handle up to 255 bytes.", PLUS_FILE_LINE);
         }
@@ -366,7 +366,7 @@ namespace asl {
         // Table header
         myTable.addColumn("start",   "Start Token", Table::JUSTIFIED_MIDDLE);
 
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myTable.addColumn("length",  "Length", Table::JUSTIFIED_MIDDLE);
         }
 
@@ -383,10 +383,10 @@ namespace asl {
         // Size row
         myTable.addRow();
         myTable.setField("start", " 1 Byte ");
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myTable.setField("length", " 1 Byte ");
         }
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myTable.setField("payload", " 1 - 255 Bytes ");
         } else {
             myTable.setField("payload", asl::as_string(_myPayloadSize));
@@ -402,10 +402,10 @@ namespace asl {
         myTable.addRow();
         myTable.addRow();
         myTable.setField("start", asl::as_string((unsigned)_myStartToken));
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myTable.setField("length", "$XX");
         }
-        if (_myPayloadSize == UINT_MAX) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
             myTable.setField("payload", "$XX ... $XX");
         } else {
             string myPayloadString("$XX ", _myPayloadSize);

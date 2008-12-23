@@ -22,6 +22,8 @@
 #ifndef _included_asl_RunLengthEncoder_
 #define _included_asl_RunLengthEncoder_
 
+#include <cstring>
+
 #include "Block.h"
 #include "Exception.h"
 

@@ -41,6 +41,7 @@
 #include "TraceUtils.h"
 
 #include <string>
+#include <cstdlib>
 
 #ifndef WIN32
 #include <cxxabi.h>

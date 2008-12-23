@@ -39,6 +39,9 @@
 */
 
 #include "Logger.h"
+
+#include <cstdlib>
+
 #include "LogMessageFormatters.h"
 #include "LogMessageSinks.h"
 

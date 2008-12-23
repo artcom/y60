@@ -26,6 +26,7 @@
 
 #include <asl/base/UnitTest.h>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 using namespace asl;
@@ -124,7 +125,7 @@ class Matrix4BaseUnitTest : public UnitTest {
         }
 
    		unsigned getNextPrime(unsigned myNumber) {
-			while(myNumber < INT_MAX) {
+			while(myNumber < std::numeric_limits<unsigned>::max()) {
 				myNumber++;
 				unsigned i = 2;
 				for (; i < myNumber; ++i) {

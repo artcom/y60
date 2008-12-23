@@ -26,6 +26,7 @@
 
 #include <string>
 #include <iostream>
+#include <cstring>
 
 #include <sys/types.h>
 #include <unistd.h>

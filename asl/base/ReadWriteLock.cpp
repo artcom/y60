@@ -54,6 +54,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <cstring>
 #include <iostream>
 
 using namespace std;  // automatically added!

@@ -44,6 +44,7 @@
 #include <asl/base/string_functions.h>
 #include <asl/base/Logger.h>
 
+#include <cstring>
 #include <algorithm>
 
 #ifdef WIN32

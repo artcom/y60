@@ -47,6 +47,7 @@
 
 #include <vector>
 #include <bitset>
+#include <cstdlib>
 
 namespace asl {
 

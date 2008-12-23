@@ -46,6 +46,7 @@
 
 #include "string_functions.h"
 
+#include <typeinfo>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>

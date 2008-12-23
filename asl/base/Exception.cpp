@@ -21,6 +21,9 @@
 
 #include "settings.h"
 #include "Exception.h"
+
+#include <cstdlib>
+
 #include "string_functions.h"
 #include "os_functions.h"
 

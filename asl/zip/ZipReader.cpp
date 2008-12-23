@@ -16,7 +16,11 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+
 #include "ZipReader.h"
+
+#include <cstring>
+
 #include "unzip.h"
 #include "zlib.h"
 #include "ioapi.h"

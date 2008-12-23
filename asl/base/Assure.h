@@ -41,6 +41,8 @@
 #ifndef _ac_assure_h_
 #define _ac_assure_h_
 
+#include <cstdlib>
+
 #include "Exception.h"
 #include "Logger.h"
 

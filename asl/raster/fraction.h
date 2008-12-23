@@ -26,6 +26,7 @@
 #define _ASL_RASTER_FRACTION_H_INCLUDED_
 
 #include <math.h>
+#include <iostream>
 
 namespace asl {
 

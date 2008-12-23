@@ -48,6 +48,7 @@
 #include "Exception.h"
 
 #include <errno.h>
+#include <cstring>
 
 #ifdef OSX
 #include <Carbon/Carbon.h>

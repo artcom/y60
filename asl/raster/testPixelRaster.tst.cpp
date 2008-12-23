@@ -22,6 +22,8 @@
 
 #define USE_FORMATTED_TEST_RASTER_OUTPUT_OPERATOR
 
+#include <cstring>
+
 #include "pixels.h"
 #include "raster.h"
 #include "subraster.h"

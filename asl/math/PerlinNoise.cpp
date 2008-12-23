@@ -55,6 +55,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 using namespace asl;

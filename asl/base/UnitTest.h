@@ -26,6 +26,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 
 
 /*! \addtogroup aslbase */

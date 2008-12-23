@@ -42,6 +42,7 @@
 
 #include "Logger.h"
 
+#include <cstdlib>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>

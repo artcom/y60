@@ -21,6 +21,8 @@
 
 #include "string_functions.h"
 
+#include <cstring>
+
 using namespace std;
 
 namespace asl {

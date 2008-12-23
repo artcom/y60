@@ -40,6 +40,11 @@
 
 
 #include "StdOutputRedirector.h"
+
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
 #include "TimeStreamFormater.h"
 #include "file_functions.h"
 
@@ -47,9 +52,6 @@
 #include "os_functions.h"
 #include "string_functions.h"
 #include "Time.h"
-
-#include <iostream>
-#include <sstream>
 
 using namespace std;
 

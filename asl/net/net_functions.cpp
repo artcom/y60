@@ -37,6 +37,7 @@
 
 // cycle counter
 
+#include <cstring>
 #include <string>
 #include <algorithm>
 

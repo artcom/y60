@@ -51,6 +51,8 @@
 #ifndef _included_asl_Matrix4Base_
 #define _included_asl_Matrix4Base_
 
+#include <cstring>
+
 #include "Vector234.h"
 #include "Point234.h"
 

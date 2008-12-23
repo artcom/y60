@@ -55,6 +55,7 @@
 #include <string>  
 #include <map>  
 #include <list>  
+#include <typeinfo>  
   
 #include "Ptr.h"  
 #include "Exception.h"  

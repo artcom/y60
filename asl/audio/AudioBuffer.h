@@ -44,17 +44,17 @@
 #include "AudioBufferBase.h"
 #include "SampleFormat.h"
 
+#include <cstring>
+#include <iostream>
+#include <limits.h>
+#include <vector>
+
 //#define ASSURE_POLICY AssurePolicy::Exit
 #include <asl/base/Block.h>
 #include <asl/base/Logger.h>
 #include <asl/base/Assure.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/settings.h>
-
-
-#include <iostream>
-#include <limits.h>
-#include <vector>
 
 namespace asl {
 

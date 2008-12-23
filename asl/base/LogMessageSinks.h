@@ -41,6 +41,8 @@
 #ifndef _ac_asl_LogMessageSinks_h_
 #define _ac_asl_LogMessageSinks_h_
 
+#include <cstdlib>
+
 #include "Logger.h"
 #include "console_functions.h"
 

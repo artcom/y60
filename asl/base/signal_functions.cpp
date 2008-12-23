@@ -40,6 +40,8 @@
 
 #include "signal_functions.h"
 
+#include <cstring>
+
 #include "Exception.h"
 #include "StackTrace.h"
 #include "string_functions.h"

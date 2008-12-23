@@ -29,6 +29,7 @@
 #include <asl/math/Box.h>
 
 #include <stddef.h>
+#include <cstring>
 #include <algorithm>
 #include <functional>
 

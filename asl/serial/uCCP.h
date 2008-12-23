@@ -51,6 +51,7 @@
 #include <asl/base/Exception.h>
 #include <asl/base/Block.h>
 
+#include <limits>
 #include <deque>
 #include <queue>
 
@@ -83,7 +84,7 @@ namespace asl {
             }
 
             void setVariablePayloadSize() {
-                _myPayloadSize = UINT_MAX;
+                _myPayloadSize = std::numeric_limits<unsigned>::max();
             }
 
             void setFixedPayloadSize(unsigned theSize);
