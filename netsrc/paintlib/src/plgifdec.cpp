@@ -14,6 +14,7 @@
 #include "plgifdec.h"
 #include "planybmp.h"
 
+#include <cstring>
 #include <stdio.h>
 
 extern "C"

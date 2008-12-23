@@ -12,6 +12,7 @@
 #include "plpcxdec.h"
 #include "plexcept.h"
 
+#include <cstring>
 #include <iostream>
 
 PLPCXDecoder::PLPCXDecoder()

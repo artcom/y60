@@ -23,6 +23,7 @@
 #define JPEG_INTERNALS
 #include <jmorecfg.h>
 
+#include <cstring> // memcpy() & co.
 #include <algorithm> // min/max
 
 using std::min;

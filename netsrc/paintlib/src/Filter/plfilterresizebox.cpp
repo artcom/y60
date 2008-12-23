@@ -12,6 +12,7 @@
 #include "plbitmap.h"
 #include "pl2passscale.h"
 
+#include <cstring>
 
 PLFilterResizeBox::PLFilterResizeBox (int NewXSize, int NewYSize)
   : PLFilterResize (NewXSize, NewYSize)

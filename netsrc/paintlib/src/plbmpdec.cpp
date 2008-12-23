@@ -16,6 +16,8 @@
 #include "plbmpdec.h"
 #include "plexcept.h"
 
+#include <string.h>
+
 PLBmpDecoder::PLBmpDecoder
 () : PLPicDecoder (),
      m_pBMI (0)

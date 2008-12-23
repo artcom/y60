@@ -12,6 +12,8 @@
 #include "plsgidec.h"
 #include "plexcept.h"
 
+#include <cstring>
+
 const PLWORD SGI_MAGIC = 474;
 
 const int STORAGE_VERBATIM = 0;

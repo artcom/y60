@@ -30,6 +30,7 @@ extern "C"
 #define JPEG_INTERNALS
 #include <jmorecfg.h>
 
+#include <cstring>
 #include <stdio.h>
 
 /////////////////////////////////////////////////////////////////////

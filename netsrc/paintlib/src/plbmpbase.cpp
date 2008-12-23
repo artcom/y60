@@ -13,6 +13,7 @@
 #include "Filter/plfilter.h"
 #include "Filter/plfilterquantize.h"
 
+#include <cstring> // memcpy() & co.
 #include <iostream>
 
 using namespace std;

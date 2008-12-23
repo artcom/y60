@@ -32,6 +32,8 @@
 #include "plbitmap.h"
 #include "plexcept.h"
 
+#include <cstring>
+
 #ifndef  min
 #define min(a, b)       ((a) < (b) ? (a) : (b))
 #endif

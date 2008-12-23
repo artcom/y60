@@ -15,6 +15,7 @@
 #include "pltiffdec.h"
 #include "plexcept.h"
 
+#include <cstring>
 #include <iostream>
 
 extern "C"

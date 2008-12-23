@@ -14,6 +14,7 @@
 #include "plpixel8.h"
 #include "plfilesrc.h"
 
+#include <cstring>
 #include <stdio.h>
 
 using namespace std;

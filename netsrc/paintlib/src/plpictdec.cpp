@@ -24,6 +24,7 @@
 #include "ploptable.h"
 #include "plexcept.h"
 
+#include <cstring>
 #include <stdio.h>
 
 PLPictDecoder::PLPictDecoder

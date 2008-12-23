@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <memory>
 #include <cmath>
+#include <cstring>
 
 #include <iostream> 
 

@@ -14,6 +14,7 @@
 #include "plexcept.h"
 #include "pl2passscale.h"
 
+#include <cstring>
 
 using namespace std;
 

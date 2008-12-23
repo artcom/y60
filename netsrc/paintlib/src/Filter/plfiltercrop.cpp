@@ -12,6 +12,7 @@
 #include "plbitmap.h"
 #include "plrect.h"
 
+#include <cstring>
 
 PLFilterCrop::PLFilterCrop(int XMin, int YMin, int XMax, int YMax)
   : PLFilter(),

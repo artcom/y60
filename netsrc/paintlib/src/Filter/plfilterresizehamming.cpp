@@ -12,6 +12,7 @@
 #include "plbitmap.h"
 #include "pl2passscale.h"
 
+#include <cstring>
 
 PLFilterResizeHamming::PLFilterResizeHamming (int NewXSize, int NewYSize, double NewRadius)
   : PLFilterResize (NewXSize, NewYSize),

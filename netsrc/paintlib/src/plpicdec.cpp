@@ -26,6 +26,7 @@
 #include "plexcept.h"
 #include "planybmp.h"
 
+#include <cstring>
 #include <stdio.h>
 
 // Set default Trace configuration here. The defined levels are

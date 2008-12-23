@@ -17,6 +17,7 @@
 #include "plfilterquantize.h"
 
 #include <iostream>
+#include <cstring> // memcpy()
 
 using namespace std;
 

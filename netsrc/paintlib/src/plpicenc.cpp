@@ -18,6 +18,7 @@
 // only for the tracing facility. This really shouldn't be here.
 #include "plpicdec.h"
 
+#include <cstring>
 #include <errno.h>
 
 PLPicEncoder::PLPicEncoder()
