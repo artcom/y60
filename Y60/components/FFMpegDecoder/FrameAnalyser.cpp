@@ -58,6 +58,9 @@
 
 #include "FrameAnalyser.h"
 
+#include <limits>
+#include <cstdlib>
+
 #ifdef OSX
 #include <Carbon/Carbon.h>
 #endif
@@ -250,7 +253,7 @@ namespace y60 {
 #endif
         }
         if (!myFoundPictureFlag) {
-            myLastDTS = UINT_MAX;
+            myLastDTS = std::numeric_limits<unsigned>::max();
         }
 
         av_free(myFrame);
@@ -303,7 +306,7 @@ namespace y60 {
         for(;;) {
             long long myLastDTS = advance();
 
-            if (myLastDTS == UINT_MAX) {
+            if (myLastDTS == std::numeric_limits<unsigned>::max()) {
                 cerr << "### WARNING: seek reached end of file" << endl;
                 return;
             }

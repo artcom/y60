@@ -68,6 +68,7 @@
 #include "Event.h"
 
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -108,8 +109,7 @@ namespace y60 {
 
     void
     EventDispatcher::removeSource(IEventSource * theSource) {
-        _myEventSources.erase(remove(_myEventSources.begin(),
-                    _myEventSources.end(), theSource));
+        std::remove(_myEventSources.begin(), _myEventSources.end(), theSource);
     }
 
     void
@@ -118,7 +118,6 @@ namespace y60 {
     }
     void
     EventDispatcher::removeSink(IEventSink * theSink) {
-        _myEventSinks.erase(remove(_myEventSinks.begin(),
-                    _myEventSinks.end(), theSink));
+        std::remove(_myEventSinks.begin(), _myEventSinks.end(), theSink);
     }
 }

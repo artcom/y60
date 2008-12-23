@@ -14,6 +14,7 @@
 #include "plcontribdefs.h"
 #include "../plpaintlibdefs.h"
 
+#include <cstring>
 #include <math.h>
 #include <iostream>
 

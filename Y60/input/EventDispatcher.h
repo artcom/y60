@@ -74,6 +74,8 @@
 
 namespace y60 {
 
+    DEFINE_EXCEPTION(EventDispatcherException, asl::Exception);
+
     class EventDispatcher : public asl::Singleton<EventDispatcher> {
     public:
         virtual ~EventDispatcher();

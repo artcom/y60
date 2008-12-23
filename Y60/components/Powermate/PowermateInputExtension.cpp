@@ -66,6 +66,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <cstring>
 
 using namespace std;
 using namespace y60;

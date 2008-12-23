@@ -96,7 +96,7 @@ namespace y60 {
         }
 
         unsigned myMax = 0;
-        unsigned myMin = UINT_MAX;
+        unsigned myMin = std::numeric_limits<unsigned>::max();
         for (unsigned i = 0; i < 360; ++i) {
             if (myHistogram[i] > myMax) {
                 myMax = myHistogram[i];

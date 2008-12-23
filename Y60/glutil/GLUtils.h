@@ -18,6 +18,8 @@
 #   include <GL/glxew.h>
 #endif
 
+#include <limits.h>
+
 #include <asl/base/Exception.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/Dashboard.h>

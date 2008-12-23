@@ -58,6 +58,7 @@
 
 #include "Demux.h"
 
+#include <cstring>
 #include <asl/base/Logger.h>
 
 using namespace std;

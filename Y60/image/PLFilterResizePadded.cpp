@@ -71,6 +71,7 @@
 #include "PLFilterResizePadded.h"
 
 #include <iostream>
+#include <cstring>
 
 #include <asl/math/numeric_functions.h>
 #include <asl/base/Logger.h>

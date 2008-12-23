@@ -58,6 +58,8 @@
 
 #include "M60Decoder.h"
 
+#include <limits>
+
 #include "Movie.h"
 #include "MovieEncoding.h"
 #include <asl/base/Ptr.h>
@@ -86,7 +88,7 @@ using namespace asl;
 namespace y60 {
 
     M60Decoder::M60Decoder() :
-        _myLastDecodedFrame(UINT_MAX), _myFilePos(0), _myMovieHeaderSize(0)
+        _myLastDecodedFrame(std::numeric_limits<unsigned>::max()), _myFilePos(0), _myMovieHeaderSize(0)
     {}
 
     M60Decoder::~M60Decoder() {
@@ -152,7 +154,7 @@ namespace y60 {
 
     void
     M60Decoder::stopMovie(bool theStopAudioFlag) {
-        _myLastDecodedFrame = UINT_MAX;
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
     }
 
     double
@@ -167,7 +169,7 @@ namespace y60 {
         
         // Handle frame wrap around
         if (_myLastDecodedFrame > theFrame) {
-            if ( _myLastDecodedFrame != UINT_MAX  && !myReverseFlag) {
+            if ( _myLastDecodedFrame != std::numeric_limits<unsigned>::max()  && !myReverseFlag) {
                 setEOF(true);
                 DB(AC_DEBUG << "Wraparound detected");
                 return theTime;                

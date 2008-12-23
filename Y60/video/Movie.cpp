@@ -57,6 +57,10 @@
 */
 
 #include "Movie.h"
+
+#include <limits>
+#include <string.h>
+
 #include "MovieDecoderBase.h"
 #include "M60Decoder.h"
 
@@ -68,7 +72,6 @@
 #include <asl/base/PlugInManager.h>
 #include <asl/base/Assure.h>
 #include <asl/base/Dashboard.h>
-#include <string.h>
 
 using namespace dom;
 using namespace std;
@@ -99,7 +102,7 @@ namespace y60 {
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
         _myDecoder(0),
-        _myLastDecodedFrame(UINT_MAX),
+        _myLastDecodedFrame(std::numeric_limits<unsigned>::max()),
         _myLastCurrentTime(-1.0),
         _myCurrentLoopCount(0),
         _myPlayMode(PLAY_MODE_STOP),
@@ -147,7 +150,7 @@ namespace y60 {
         }
         set<PlayModeTag>(asl::getStringFromEnum(PLAY_MODE_STOP, MoviePlayModeStrings));
         set<CurrentFrameTag>(0);
-        _myLastDecodedFrame = UINT_MAX;
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         _myNextUsedBuffer = PRIMARY_BUFFER;
         _myCurrentLoopCount = 0;
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
@@ -166,7 +169,7 @@ namespace y60 {
             _myNextUsedBuffer = PRIMARY_BUFFER;
             double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
             decodeFrame(myMovieTime, 0);
-            //		_myLastDecodedFrame = UINT_MAX;
+            //		_myLastDecodedFrame = std::numeric_limits<unsigned>::max();
     }
 
 
@@ -385,7 +388,7 @@ namespace y60 {
             if (get<FrameBlendingTag>()) {
                 // create correct start position -> 
                 // frame 0 in PRIMARY_BUFFER && frame 1 in SECONDARY_BUFFER
-                if (_myLastDecodedFrame == UINT_MAX) {
+                if (_myLastDecodedFrame == std::numeric_limits<unsigned>::max()) {
                     _myNextUsedBuffer = PRIMARY_BUFFER;
                     decodeFrame(0,0);
                 }
@@ -546,7 +549,7 @@ namespace y60 {
                 _myDecoder->stopMovie();
             }
             //set<CurrentFrameTag>(0);
-            _myLastDecodedFrame = UINT_MAX;
+            _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
             _myCurrentLoopCount = 0;
 
             _myPlayMode = PLAY_MODE_STOP;

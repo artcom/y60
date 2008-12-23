@@ -42,6 +42,8 @@
 
 #include "ConduitPolicy.h"
 
+#include <cstring>
+
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/base/Time.h>

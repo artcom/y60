@@ -25,6 +25,7 @@
 #include <limits>
 #include <iostream>
 #include <map>
+#include <limits.h>
 
 #include <asl/base/Block.h>
 #include <asl/base/Ptr.h>

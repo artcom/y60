@@ -295,7 +295,7 @@ namespace asl
 
     GLMemoryPtr
         VertexMemory(GLMemory::MemoryType theMemoryType, asl::AC_SIZE_TYPE theCapacity) {
-            if (!initializeGLMemoryExtensions() || theCapacity == UINT_MAX) {
+            if (!initializeGLMemoryExtensions() || theCapacity == std::numeric_limits<unsigned>::max()) {
                 theMemoryType = GLMemory::MainMemoryType;
             }
 
