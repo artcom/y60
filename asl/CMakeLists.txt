@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(ASL)
 
-set(CMAKE_MODULE_PATH ${ASL_SOURCE_DIR} $ENV{ACMAKE}/modules $ENV{ACMAKE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ASL_SOURCE_DIR})
 
 include(AcMake)
 

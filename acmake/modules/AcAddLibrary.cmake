@@ -22,9 +22,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     set(THIS_LIBRARY_PATH "${LIBRARY_PATH}")
 
     configure_file(
-        $ENV{ACMAKE}/share/paths.h.in
-	${CMAKE_CURRENT_BINARY_DIR}/${THIS_LIBRARY_NAME}_paths.h
-	@ONLY
+        ${CMAKE_SOURCE_DIR}/acmake/share/paths.h.in
+	      ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LIBRARY_NAME}_paths.h
+	      @ONLY
     )
     
     include_directories(${CMAKE_CURRENT_BINARY_DIR})

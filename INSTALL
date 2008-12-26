@@ -34,15 +34,15 @@ the rest of Y60.
 
 Installation:
 =============
-1. Set the ACMAKE environment variable to point to [ROOT]/src/acmake
 
-2. Create a directory for your out-of-source build:
+2. Create an arbitray directory for your out-of-source build:
     
         $ mkdir y60build
     
-3. Create the build system. Cd into y60build and run 
+3. Setup the build system:
 
-   $ cmake -DCMAKE_BUILD_TYPE=RELEASE [ROOT]/src/
+        $ cd y60build 
+        $ cmake -DCMAKE_BUILD_TYPE=RELEASE [ROOT]/src/
 
    The default install prefix is '/usr/local'. To change that add the 
    following option:
@@ -87,9 +87,5 @@ Known Issues:
         GetLibraryNamesInternal called on imported target: spidermonkey
 
    However, the resulting Makefiles seem to work Ok.
-
-
-    
-
 
 
