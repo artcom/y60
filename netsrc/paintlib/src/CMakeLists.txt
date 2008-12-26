@@ -193,6 +193,14 @@ set_target_properties(
 target_link_libraries(paintlib ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY}
         ${JPEG_LIBRARY} ${CURL_LIBRARY} ${OPENEXR_LIBRARIES} )
 
+
+foreach (H_FILE ${HEADERS})
+  configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
+      ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${H_FILE}
+      COPYONLY)
+endforeach(H_FILE)
+
 # install additional headers from Filter/ directory to an appropriate destination
 install(
     DIRECTORY Filter

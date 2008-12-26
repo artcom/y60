@@ -29,27 +29,23 @@ the distribution:
     - libsdlttf
     - paintlib
 
-They come with custom CMake build files.
+They come with custom CMake build files and will be build automaticly with 
+the rest of Y60.
 
 Installation:
 =============
 1. Set the ACMAKE environment variable to point to [ROOT]/src/acmake
 
-2. Create a build tree directory structure, like this:
-    - builds
-        - paintlib
-        - spidermonkey
-        - SDL_ttf2
-        - y60_full
-
-3. To install the dependencies, cd into each of the build directories (in th
-   given order) and issue the following commands
+2. Create a directory for your out-of-source build:
     
-        $ cmake -DCMAKE_BUILD_TYPE=RELEASE \
-                [ROOT]/src/netsrc/{paintlib,spidermonkey,...}
+        $ mkdir y60build
+    
+3. Create the build system. Cd into y60build and run 
 
-   This creates the build system. The default install prefix is '/usr/local'. To change
-   that add the following option:
+   $ cmake -DCMAKE_BUILD_TYPE=RELEASE [ROOT]/src/
+
+   The default install prefix is '/usr/local'. To change that add the 
+   following option:
 
         -DCMAKE_INSTALL_PREFIX=/some/other/directory
    
@@ -68,16 +64,11 @@ Installation:
 
         $ make
 
-   ...vcbuild.exe, nmake, xcode or whatever your build tool might be. After
-   that run the equivalent of
+   ...vcbuild.exe, nmake, xcode or whatever your build tool might be and have 
+   coffee. After the build is finished run your build tool equivalent of
 
         $ make install
 
-4. Build asl and Y60. Cd into builds/y60_full and again run 
-
-   $ cmake -DCMAKE_BUILD_TYPE=RELEASE [ROOT]/src/
-
-   After that invoke your build tool and have coffee.
 
 
 Known Issues:

@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Y60)
 
-set(CMAKE_MODULE_PATH ${Y60_SOURCE_DIR} $ENV{ACMAKE}/modules $ENV{ACMAKE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Y60_SOURCE_DIR} $ENV{ACMAKE}/modules $ENV{ACMAKE_PATH})
 
 include(AcMake)
 

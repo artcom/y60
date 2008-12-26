@@ -25,6 +25,7 @@ configure_file(
     @ONLY
 )
 
+
 install(
     FILES PaintlibDependencies.cmake PaintlibDefinitions.cmake
     DESTINATION lib/cmake
