@@ -38,12 +38,12 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     if(THIS_LIBRARY_HEADER_ONLY)
         # for a header-only-library
         
-        if(NOT THIS_LIBRARY_NO_INSTALL)
+        if(NOT THIS_LIBRARY_DONT_INSTALL)
             install(
                 FILES ${THIS_LIBRARY_HEADERS}
                     DESTINATION include/${THIS_LIBRARY_PATH}
             )
-        endif(NOT THIS_LIBRARY_NO_INSTALL)
+        endif(NOT THIS_LIBRARY_DONT_INSTALL)
         
     else(THIS_LIBRARY_HEADER_ONLY)
         # for a full library
