@@ -584,7 +584,7 @@ int main(int argc, char *argv[]) {
            //rv = myApp.run(myFilename, myIncludePath, myScriptArgs);
            //std::string myProPath;
            //if (asl::get_environment_var("PRO", myProPath)) {
-           //     y60::GLResourceManager::get().prepareShaderLibrary(myProPath+"/src/Y60/shader/shaderlibrary.xml","","");
+           //     y60::GLResourceManager::get().prepareShaderLibrary(myProPath+"/src/y60/shader/shaderlibrary.xml","","");
            //}
            asl::Ptr<y60::SDLWindow> myWindow = y60::SDLWindow::create();
            //myWindow->initDisplay();

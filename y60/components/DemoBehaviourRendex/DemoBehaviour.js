@@ -160,7 +160,7 @@ DemoBehaviourRendexApp.prototype.Constructor = function(self, theArguments) {
     ////////////// private members ////////////
 
     function createTextOverlay() {
-        window.loadTTF("Arial", "${PRO}/src/Y60/gl/text/fonts/arial.ttf", 18);
+        window.loadTTF("Arial", "${PRO}/src/y60/gl/text/fonts/arial.ttf", 18);
         window.setTextPadding(10,10,10,10);
         window.setTextColor([0.2,0.2,1,1]);
 

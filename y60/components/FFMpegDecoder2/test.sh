@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Y60_DIR="$PRO/src/Y60"
+Y60_DIR="$PRO/src/y60"
 APP_DIR=`dirname $0`
 PLUGIN_DIR="$PRO/lib"
 
@@ -12,7 +12,7 @@ fi
 
 function startJSTest {
     JSFilename=$1
-    ARGS="-I $PRO/lib;$PRO/src/Y60/js ${JSFilename} $PRO/src/Y60/shader/shaderlibrary.xml"
+    ARGS="-I $PRO/lib;$PRO/src/y60/js ${JSFilename} $PRO/src/y60/shader/shaderlibrary.xml"
     COMMAND="$APP $ARGS"
 
     if [ "$DEBUG" = "vc" ]; then

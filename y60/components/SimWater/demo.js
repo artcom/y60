@@ -162,7 +162,7 @@ if (__main__ == "SimWaterTest") {
     print("SimWaterTest");
     try {
         var ourSimWaterTestApp = new SimWaterTestApp(
-                [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+                [expandEnvironment("${PRO}") + "/src/y60/shader/shaderlibrary_nocg.xml"]);
         ourSimWaterTestApp.setup(600, 600, "SimWaterTest");
         ourSimWaterTestApp.go();
     } catch (ex) {

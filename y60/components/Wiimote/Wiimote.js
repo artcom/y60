@@ -489,7 +489,7 @@ if (__main__ == "WiimoteTest") {
     try {
         var ourWiimoteTestApp = new WiimoteTestApp(arguments);
         //var ourWiimoteTestApp = new WiimoteTestApp(
-        //    [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+        //    [expandEnvironment("${PRO}") + "/src/y60/shader/shaderlibrary_nocg.xml"]);
         //ourWiimoteTestApp.setup(600, 600, "WiimoteTest");
         ourWiimoteTestApp.setup(1400, 1050, "Wiimote");
         ourWiimoteTestApp.go();

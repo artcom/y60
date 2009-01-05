@@ -1,6 +1,6 @@
 #! /bin/bash
 
-Y60_DIR="$PRO/src/Y60"
+Y60_DIR="$PRO/src/y60"
 APP_DIR=`dirname $0`
 PLUGIN_DIR="$PRO/lib"
 

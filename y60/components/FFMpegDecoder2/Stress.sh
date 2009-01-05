@@ -5,7 +5,7 @@ fi
 
 #export AC_LOG_MODULE_VERBOSITY=TRACE/FFMpegDecoder.cpp
 
-ARGS="-I $PRO/lib;$PRO/src/Y60/js StressTest.js $PRO/src/Y60/shader/shaderlibrary.xml"
+ARGS="-I $PRO/lib;$PRO/src/y60/js StressTest.js $PRO/src/y60/shader/shaderlibrary.xml"
 COMMAND="$APP $ARGS"
 
 if [ "$DEBUG" = "vc" ]; then

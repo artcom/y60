@@ -10,9 +10,9 @@ if [ $# -gt 0 ]; then
     shift
 else
     if [ "$USE_CG" == "1" ] ; then
-        SHADERLIB="$PRO/src/Y60/shader/shaderlibrary.xml"
+        SHADERLIB="$PRO/src/y60/shader/shaderlibrary.xml"
     else
-    	SHADERLIB="$PRO/src/Y60/shader/shaderlibrary_nocg.xml"
+    	SHADERLIB="$PRO/src/y60/shader/shaderlibrary_nocg.xml"
     fi
 fi
 
@@ -30,11 +30,11 @@ esac
 
 SCRIPTS="${BASEDIR}/SCRIPTS"
 if [ ! -d ${SCRIPTS} ]; then
-    SCRIPTS="${PRO}/src/Y60/products/rendergirl/SCRIPTS"
+    SCRIPTS="${PRO}/src/y60/products/rendergirl/SCRIPTS"
 fi
 SCRIPT="${SCRIPTS}/rendergirl.js"
 
-COMMAND="${APPLICATION} -I ${SCRIPTS};${PRO}/src/Y60/js;${PRO}/lib ${SCRIPT} ${MODELNAME} ${SHADERLIB} $*"
+COMMAND="${APPLICATION} -I ${SCRIPTS};${PRO}/src/y60/js;${PRO}/lib ${SCRIPT} ${MODELNAME} ${SHADERLIB} $*"
 echo $COMMAND
 $COMMAND
 exit $?

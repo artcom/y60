@@ -121,7 +121,7 @@ RendererExtensionTestApp.prototype.Constructor = function(self, theArguments) {
 if (__main__ == "RendererExtensionTest") {
     print("RendererExtensionTest");
     try {
-        var ourRendererExtensionTestApp = new RendererExtensionTestApp([expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
+        var ourRendererExtensionTestApp = new RendererExtensionTestApp([expandEnvironment("${PRO}") + "/src/y60/shader/shaderlibrary_nocg.xml"]);
         ourRendererExtensionTestApp.setup(320, 200, "RendererExtensionTest");
         ourRendererExtensionTestApp.go();
     } catch (ex) {

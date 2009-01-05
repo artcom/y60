@@ -6,4 +6,4 @@ if [[ "$1" == "" ]] ; then
 else
     SCENE=""
 fi
-acxpshellOPT -I $PRO/src/Y60/js $SCENE $*
+acxpshellOPT -I $PRO/src/y60/js $SCENE $*

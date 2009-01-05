@@ -1,12 +1,12 @@
 #! /bin/bash
 if [ "$USE_CG" == "1" ] ; then
-    SHADERLIB=$PRO/src/Y60/shader/shaderlibrary.xml
+    SHADERLIB=$PRO/src/y60/shader/shaderlibrary.xml
 else
-	SHADERLIB=$PRO/src/Y60/shader/shaderlibrary_nocg.xml
+	SHADERLIB=$PRO/src/y60/shader/shaderlibrary_nocg.xml
 fi
 
 APPLICATION=y60
-ARGS="-I $PRO/src/Y60/js;$PRO/lib $PRO/src/Y60/js/ImageViewer.js $SHADERLIB $*"
+ARGS="-I $PRO/src/y60/js;$PRO/lib $PRO/src/y60/js/ImageViewer.js $SHADERLIB $*"
 
 if [ "$DEBUG" == "1" ] ; then
     APPLICATION=y60DBG

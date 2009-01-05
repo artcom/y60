@@ -29,8 +29,8 @@ else
 fi
 
 for JSCRIPT in $JSCRIPTS ; do
-    echo $APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
-    $APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
+    echo $APPLICATION -I "$PRO/src/y60/js;$PLUGIN_DIR" $JSCRIPT $*
+    $APPLICATION -I "$PRO/src/y60/js;$PLUGIN_DIR" $JSCRIPT $*
     if [ "$?" != "0" ] ; then
         echo "test {$JSCRIPT} failed"
         exit 1

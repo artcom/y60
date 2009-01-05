@@ -6,7 +6,7 @@ if [ "$DEBUG" == "1" ] ; then
     APPLICATION=y60DBG
 fi
 
-echo $APPLICATION -I $PRO/src/Y60/js $PRO/src/Y60/js/convert_x60_EulerToQuaternion.js  $*
-$APPLICATION -I $PRO/src/Y60/js $PRO/src/Y60/js/convert_x60_EulerToQuaternion.js $*
+echo $APPLICATION -I $PRO/src/y60/js $PRO/src/y60/js/convert_x60_EulerToQuaternion.js  $*
+$APPLICATION -I $PRO/src/y60/js $PRO/src/y60/js/convert_x60_EulerToQuaternion.js $*
 exit $?
 

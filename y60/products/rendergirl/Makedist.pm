@@ -15,7 +15,7 @@ sub runLocalMakedist($) {
     copyDirTree("SCRIPTS", $theDistDir);
 
     # Install dependencies
-    depends("Y60/products/g60");
+    depends("y60/products/g60");
 }
 
 sub runLocalMakeInstaller() {

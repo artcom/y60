@@ -27,7 +27,7 @@ sub runLocalMakedist($) {
     }
 
     # Install dependencies
-    depends("Y60/js", "Y60/shader", "y60/components", "Y60/products/watchdog/app");
+    depends("y60/js", "y60/shader", "y60/components", "y60/products/watchdog/app");
 }
 
 sub runLocalMakeInstaller() {

@@ -9,9 +9,9 @@ shift
 
 # determine shader library
 if [ "$USE_CG" == "1" ] ; then
-    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary.xml"
+    SHADERLIB="$PRO/src/y60/shader/shaderlibrary.xml"
 else
-    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary_nocg.xml"
+    SHADERLIB="$PRO/src/y60/shader/shaderlibrary_nocg.xml"
 fi
 if [ ! -f "$SHADERLIB" ]; then
     echo "Shaderlibrary '$SHADERLIB' not found"
@@ -37,13 +37,13 @@ elif [ "$DEBUG" == "1" ] ; then
     APPLICATION="${APPLICATION}DBG"
 fi
 
-SCRIPT="$PRO/src/Y60/js/sv.js"
+SCRIPT="$PRO/src/y60/js/sv.js"
 BASENAME="${MODELNAME%.*}"
 if [ -e ${BASENAME}.js ]; then
     SCRIPT=${BASENAME}.js
 fi
 
-ARGS="-I $PRO/lib;$PRO/src/Y60/js;$PRO/src/Y60/shader $SCRIPT $MODELNAME $SHADERLIB -- $*"
+ARGS="-I $PRO/lib;$PRO/src/y60/js;$PRO/src/y60/shader $SCRIPT $MODELNAME $SHADERLIB -- $*"
 COMMAND="$APPLICATION $ARGS"
 
 echo $COMMAND
