@@ -1,8 +1,0 @@
-
-include(SDLTTFDefinitions)
-include(SDLTTFDependencies)
-include(SDLTTFExport)
-
-set(SDLTTF_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
-set(SDLTTF_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
-set(SDLTTF_LIBRARIES sdlttf)

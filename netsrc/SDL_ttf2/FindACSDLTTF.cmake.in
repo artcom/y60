@@ -1,0 +1,8 @@
+
+include(ACSDLTTFDefinitions)
+include(ACSDLTTFDependencies)
+include(ACSDLTTFExport)
+
+set(ACSDLTTF_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
+set(ACSDLTTF_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
+set(ACSDLTTF_LIBRARIES acsdlttf)

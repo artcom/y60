@@ -11,7 +11,7 @@ endif(NOT ASL_INTEGRATED_BUILD)
 # exported dependencies
 find_package(Paintlib)
 find_package(Spidermonkey)
-find_package(SDLTTF)
+find_package(ACSDLTTF)
 
 # external dependencies
 find_package(GLEW)
