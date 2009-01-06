@@ -21,11 +21,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
     set(THIS_LIBRARY_PATH "${LIBRARY_PATH}")
 
-    if("XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
-      set(THIS_LIBRARY_PATHS_TEMPLATE ${CMAKE_SOURCE_DIR}/acmake/share/paths.h.in)
-    else("XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
-      set(THIS_LIBRARY_PATHS_TEMPLATE $ENV{ACMAKE}/share/paths.h.in)
-    endif("XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
+    set(THIS_LIBRARY_PATHS_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/AcPaths.h.in)
 
     configure_file(
          ${THIS_LIBRARY_PATHS_TEMPLATE}

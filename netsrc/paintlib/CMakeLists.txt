@@ -11,8 +11,11 @@ include(PaintlibDefinitions)
 include(PaintlibDependencies)
 
 if (WIN32)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
-            -D_SCL_SECURE_NO_WARNINGS)
+    add_definitions(
+            -D_CRT_SECURE_NO_WARNINGS
+	    -D_CRT_NONSTDC_NO_WARNINGS
+            -D_SCL_SECURE_NO_WARNINGS
+    )
 endif (WIN32)
 
 add_definitions( -DAC_BUILT_WITH_CMAKE )
@@ -25,19 +28,21 @@ configure_file(
     @ONLY
 )
 
-
+if(NOT PAINTLIB_INTEGRATED_BUILD)
 install(
     FILES PaintlibDependencies.cmake PaintlibDefinitions.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     FILES ${Paintlib_BINARY_DIR}/FindPaintlib.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     EXPORT paintlib
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
     FILE PaintlibExport.cmake
 )
+endif(NOT PAINTLIB_INTEGRATED_BUILD)
+

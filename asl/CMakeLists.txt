@@ -12,11 +12,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(ASL)
 
-list(APPEND CMAKE_MODULE_PATH ${ASL_SOURCE_DIR})
-
-if(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
-  list(APPEND CMAKE_MODULE_PATH $ENV{ACMAKE}/modules)
-endif(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
+list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
 
 include(AcMake)
 
@@ -45,17 +41,17 @@ configure_file(
 
 install(
     FILES ASLDependencies.cmake ASLDefinitions.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     FILES ${ASL_BINARY_DIR}/FindASL.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     EXPORT ASL
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
     FILE ASLExport.cmake
 )
 endif(NOT ASL_INTEGRATED_BUILD)

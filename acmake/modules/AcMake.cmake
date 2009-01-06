@@ -18,6 +18,13 @@ enable_testing()
 
 include(FindPkgConfig)
 
+if(NOT ACMAKE_INTEGRATED_BUILD)
+include(AcMakeConfig)
+else(NOT ACMAKE_INTEGRATED_BUILD)
+set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
+set(ACMAKE_TEMPLATES_DIR ${AcMake_SOURCE_DIR}/templates)
+endif(NOT ACMAKE_INTEGRATED_BUILD)
+
 include(AcPlatform)
 include(AcUtils)
 

@@ -1,9 +1,9 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-project(SDLTTF)
+project(ACSDLTTF)
 
-set(CMAKE_MODULE_PATH ${SDLTTF_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${ACSDLTTF_SOURCE_DIR})
 
 include(ACSDLTTFDefinitions)
 include(ACSDLTTFDependencies)
@@ -36,25 +36,29 @@ install(
 
 
 configure_file(
-    ${SDLTTF_SOURCE_DIR}/FindACSDLTTF.cmake.in
-    ${SDLTTF_BINARY_DIR}/FindACSDLTTF.cmake
+    ${ACSDLTTF_SOURCE_DIR}/FindACSDLTTF.cmake.in
+    ${ACSDLTTF_BINARY_DIR}/FindACSDLTTF.cmake
     @ONLY
 )
 
+if(NOT ACSDLTTF_INTEGRATED_BUILD)
+
 install(
-    FILES ${SDLTTF_BINARY_DIR}/FindACSDLTTF.cmake
-    DESTINATION lib/cmake
+    FILES ${ACSDLTTF_BINARY_DIR}/FindACSDLTTF.cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 
 install(
     FILES ACSDLTTFDependencies.cmake ACSDLTTFDefinitions.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     EXPORT ACSDLTTF
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
     FILE ACSDLTTFExport.cmake
 )
+
+endif(NOT ACSDLTTF_INTEGRATED_BUILD)
 

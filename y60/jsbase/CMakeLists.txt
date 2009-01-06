@@ -73,8 +73,8 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom aslxpath
-            y60base y60scene y60image
-    EXTERNS OPENEXR GLIB SPIDERMONKEY PAINTLIB
+            y60base y60scene y60image spidermonkey
+    EXTERNS OPENEXR GLIB PAINTLIB
     TESTS   ${TESTS}
 )
 

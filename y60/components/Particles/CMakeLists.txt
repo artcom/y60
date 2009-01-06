@@ -11,7 +11,7 @@ ParticleSystem.h
 )
 
 y60_add_component(
-    Particles
+    GPUParticles
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

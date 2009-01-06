@@ -112,7 +112,7 @@ install(
         DESTINATION bin
 )
 
-
+if(NOT SPIDERMONKEY_INTEGRATED_BUILD)
 configure_file(
     ${Spidermonkey_SOURCE_DIR}/FindSpidermonkey.cmake.in
     ${Spidermonkey_BINARY_DIR}/FindSpidermonkey.cmake
@@ -121,18 +121,19 @@ configure_file(
 
 install(
     FILES ${Spidermonkey_BINARY_DIR}/FindSpidermonkey.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 
 install(
     FILES SpidermonkeyDependencies.cmake SpidermonkeyDefinitions.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 
 install(
     EXPORT Spidermonkey
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
     FILE SpidermonkeyExport.cmake
 )
+endif(NOT SPIDERMONKEY_INTEGRATED_BUILD)
