@@ -5,7 +5,7 @@ find_package(ZLIB)
 
 pkg_search_module(GLIB2    REQUIRED glib-2.0)
 find_package(CURL)
-find_package(OPENEXR)
+find_package(OpenEXR)
 
 if(LINUX)
     pkg_search_module(ALSA REQUIRED alsa)
