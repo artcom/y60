@@ -13,6 +13,7 @@ y60_add_component(
     OpenEXRDecoder
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR PAINTLIB
+    EXTERNS OPENEXR 
+    DEPENDS paintlib
 )
 
