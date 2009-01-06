@@ -16,6 +16,13 @@ set(Y60_INTEGRATED_BUILD YES)
 
 add_subdirectory(acmake)
 add_subdirectory(netsrc)
+
+include_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/spidermonkey/include
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/SDL_ttf2/include
+)
+
 add_subdirectory(asl)
 add_subdirectory(y60)
 

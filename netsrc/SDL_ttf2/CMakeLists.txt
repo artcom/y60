@@ -41,6 +41,10 @@ configure_file(
     @ONLY
 )
 
+if(ACSDLTTF_INTEGRATED_BUILD)
+    configure_file(SDL_ttf.h ${CMAKE_CURRENT_BINARY_DIR}/include/sdl/ttf2/SDL_ttf.h)
+endif(ACSDLTTF_INTEGRATED_BUILD)
+
 if(NOT ACSDLTTF_INTEGRATED_BUILD)
 
 install(

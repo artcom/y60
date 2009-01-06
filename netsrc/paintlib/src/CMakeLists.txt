@@ -138,36 +138,36 @@ plurlsrc.h
 plwindefs.h
 qdraw.h
 tif_msrc.h
+)
 
-
-
-#Filter/pl2passscale.h
-#Filter/plcontribdefs.h
-#Filter/plfiltercolorize.h
-#Filter/plfiltercontrast.h
-#Filter/plfiltercrop.h
-#Filter/plfilterfill.h
-#Filter/plfilterfillrect.h
-#Filter/plfilterflip.h
-#Filter/plfilterfliprgb.h
-#Filter/plfiltergetalpha.h
-#Filter/plfiltergrayscale.h
-#Filter/plfilter.h
-#Filter/plfilterintensity.h
-#Filter/plfilterlightness.h
-#Filter/plfiltermirror.h
-#Filter/plfilterpixel.h
-#Filter/plfilterquantize.h
-#Filter/plfilterresizebilinear.h
-#Filter/plfilterresizebox.h
-#Filter/plfilterresizegaussian.h
-#Filter/plfilterresize.h
-#Filter/plfilterresizehamming.h
-#Filter/plfilterrotate.h
-#Filter/plfilterthreshold.h
-#Filter/plfiltervideoinvert.h
-#Filter/plhsvconvert.h
-#Filter/plinplacefilter.h
+set(FILTER_HEADERS
+Filter/pl2passscale.h
+Filter/plcontribdefs.h
+Filter/plfiltercolorize.h
+Filter/plfiltercontrast.h
+Filter/plfiltercrop.h
+Filter/plfilterfill.h
+Filter/plfilterfillrect.h
+Filter/plfilterflip.h
+Filter/plfilterfliprgb.h
+Filter/plfiltergetalpha.h
+Filter/plfiltergrayscale.h
+Filter/plfilter.h
+Filter/plfilterintensity.h
+Filter/plfilterlightness.h
+Filter/plfiltermirror.h
+Filter/plfilterpixel.h
+Filter/plfilterquantize.h
+Filter/plfilterresizebilinear.h
+Filter/plfilterresizebox.h
+Filter/plfilterresizegaussian.h
+Filter/plfilterresize.h
+Filter/plfilterresizehamming.h
+Filter/plfilterrotate.h
+Filter/plfilterthreshold.h
+Filter/plfiltervideoinvert.h
+Filter/plhsvconvert.h
+Filter/plinplacefilter.h
 )
 
 include_directories(.)
@@ -193,13 +193,20 @@ set_target_properties(
 target_link_libraries(paintlib ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY}
         ${JPEG_LIBRARY} ${CURL_LIBRARY} ${OPENEXR_LIBRARIES} )
 
-
+if(PAINTLIB_INTEGRATED_BUILD)
 foreach (H_FILE ${HEADERS})
   configure_file(
       ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
       ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${H_FILE}
       COPYONLY)
 endforeach(H_FILE)
+foreach(H_FILE ${FILTER_HEADERS})
+  configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
+      ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${H_FILE}
+      COPYONLY)
+endforeach(H_FILE)
+endif(PAINTLIB_INTEGRATED_BUILD)
 
 # install additional headers from Filter/ directory to an appropriate destination
 install(

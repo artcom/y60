@@ -71,12 +71,14 @@ add_library(
     spidermonkey SHARED ${SOURCES}
 )
 
+if(SPIDERMONKEY_INTEGRATED_BUILD)
 foreach (H_FILE ${HEADERS})
   configure_file(
       ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
       ${CMAKE_CURRENT_BINARY_DIR}/include/js/spidermonkey/${H_FILE}
       COPYONLY)
 endforeach(H_FILE)
+endif(SPIDERMONKEY_INTEGRATED_BUILD)
 
 
 set_target_properties(
