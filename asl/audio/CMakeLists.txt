@@ -44,7 +44,7 @@ set(EXTERNS)
 if(OSX)
     set(SOURCES ${SOURCES} CoreAudioPump.cpp)
     set(HEADERS ${HEADERS} CoreAudioPump.h)
-    list(APPEND EXTERNS ${AUDIO_UNIT} )
+    list(APPEND EXTERNS ${AUDIO_UNIT}) # XXX: framework reference
 endif(OSX)
 
 if(LINUX)
@@ -65,5 +65,5 @@ ac_add_library(
     HEADERS ${HEADERS}
     EXTERNS ${EXTERNS}
     DEPENDS aslbase
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
 )

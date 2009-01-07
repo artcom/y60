@@ -33,7 +33,7 @@ ac_add_library(
     aslipc asl/ipc
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
     EXTERNS ${EXTERNALS}
     DEPENDS aslbase aslnet
 )

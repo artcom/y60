@@ -47,7 +47,7 @@ ac_add_library(
     asldom asl/dom
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
     DEPENDS aslbase aslraster
     EXTERNS ${EXTERNALS}
 )

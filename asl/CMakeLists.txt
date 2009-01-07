@@ -1,34 +1,26 @@
-#============================================================================
-# Copyright (C) 2008, ART+COM Technologies GmbH Berlin
-#
-# These coded instructions, statements, and computer programs contain
-# unpublished proprietary information of ART+COM AG Berlin, and
-# are copy protected by law. They may not be disclosed to third parties
-# or copied or duplicated in any form, in whole or in part, without the
-# specific, prior written permission of ART+COM AG Berlin.
-#============================================================================
 
 cmake_minimum_required(VERSION 2.6)
 
 project(ASL)
 
+# Make our build definitions available
 list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
 
+# XXX: There is no way for adding this in the UI on WIN32.
+#      It's goddamn ugly though.
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/../acmake/modules c:/installation/share/cmake-2.6/Modules )
-
-if(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
-  list(APPEND CMAKE_MODULE_PATH $ENV{ACMAKE}/modules)
-endif(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
-
-
+# Include ACMake
 include(AcMake)
 
+# Define some things and discover dependencies
 include(ASLDefinitions)
 include(ASLDependencies)
 
+# Make sure we can access our includes without staging
 include_directories(../)
 
+# Traverse our subdirectories
 add_subdirectory(base)
 add_subdirectory(math)
 add_subdirectory(audio)
@@ -40,6 +32,7 @@ add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
 
+# Generate exports unless in an integrated build
 if(NOT ASL_INTEGRATED_BUILD)
 configure_file(
     ${ASL_SOURCE_DIR}/FindASL.cmake.in
@@ -63,4 +56,3 @@ install(
     FILE ASLExport.cmake
 )
 endif(NOT ASL_INTEGRATED_BUILD)
-

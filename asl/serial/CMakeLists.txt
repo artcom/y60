@@ -31,7 +31,7 @@ ac_add_library(
     aslserial asl/serial
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
     DEPENDS aslbase
     EXTERNS ${EXTERNALS}
 )

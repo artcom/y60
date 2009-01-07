@@ -1,3 +1,4 @@
+# This file resolves the dependencies of Y60
 
 include(AcPlatform)
 

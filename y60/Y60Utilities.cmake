@@ -1,3 +1,4 @@
+# Some utilities for building Y60-related things
 
 include(AcMake)
 

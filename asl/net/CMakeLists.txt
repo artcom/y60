@@ -47,8 +47,7 @@ ac_add_library(
     aslnet asl/net
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
     DEPENDS aslbase
     EXTERNS CURL ZLIB
 )
-

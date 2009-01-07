@@ -25,7 +25,7 @@ ac_add_library(
     aslxpath asl/xpath
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    TESTS ${TESTS}
+    TESTS   ${TESTS}
     DEPENDS aslbase asldom aslraster
     EXTERNS OPENEXR
 )

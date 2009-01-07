@@ -1,8 +1,8 @@
+# This file resolves the dependencies of the ASL
 
 include(FindPkgConfig)
 
 find_package(ZLIB)
-
 
 find_package(GLIB2)
 find_package(CURL)
@@ -13,7 +13,7 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
-    find_package( PTHREADVC )
+    find_package(PTHREADVC)
 endif(WIN32)
 
 if(OSX)

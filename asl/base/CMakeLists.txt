@@ -132,13 +132,13 @@ UnitTest
 if(OSX)
     set(SOURCES ${SOURCES} MachOBacktrace.cpp)
     set(HEADERS ${HEADERS} MachOBacktrace.h)
-    list(APPEND EXTERNALS ${CARBON} )
+    list(APPEND EXTERNS ${CARBON}) # XXX: framework reference
 endif(OSX)
 
 if(LINUX)
     set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
     set(HEADERS ${HEADERS} GlibcBacktrace.h)
-    list(APPEND EXTERNALS GLIB2)
+    list(APPEND EXTERNS GLIB2)
 endif(LINUX)
 
 if(WIN32)
@@ -156,7 +156,7 @@ ac_add_library(
     aslbase asl/base
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS ${EXTERNALS}
+    EXTERNS ${EXTERNS}
     TESTS   ${TESTS}
 )
 
