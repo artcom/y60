@@ -37,8 +37,10 @@ XmlDom
 Xml
 )
 
+list( APPEND EXTERNALS OPENEXR )
+
 if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC OPENEXR )
+    list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(
