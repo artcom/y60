@@ -23,13 +23,13 @@ add_definitions( -DAC_BUILT_WITH_CMAKE )
 
 add_subdirectory(src)
 
+if(NOT PAINTLIB_INTEGRATED_BUILD)
 configure_file(
     ${Paintlib_SOURCE_DIR}/FindPaintlib.cmake.in
     ${Paintlib_BINARY_DIR}/FindPaintlib.cmake
     @ONLY
 )
 
-if(NOT PAINTLIB_INTEGRATED_BUILD)
 install(
     FILES PaintlibDependencies.cmake PaintlibDefinitions.cmake
     DESTINATION share/cmake-2.6/Modules
