@@ -21,6 +21,8 @@
 #ifndef _included_asl_string_functions_
 #define _included_asl_string_functions_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 
 #include <string>
@@ -42,9 +44,9 @@ namespace asl {
     typedef unsigned char Char;
     const int MAX_CHAR_VALUE = 255;
 
-    extern const Char cb64[];
-    extern const Char cb66[];
-    extern const Char cb67[];
+    ASL_BASE_EXPORT extern const Char cb64[];
+    ASL_BASE_EXPORT extern const Char cb66[];
+    ASL_BASE_EXPORT extern const Char cb67[];
 
     enum StringEncoding {
         Locale,
@@ -94,7 +96,7 @@ namespace asl {
 #endif
 
 
-    bool fromString(const std::string & theString, bool & outValue);
+    ASL_BASE_EXPORT bool fromString(const std::string & theString, bool & outValue);
 
     inline
     bool fromString(const std::string & theString, std::string & outValue) {
@@ -164,10 +166,10 @@ namespace asl {
     /// returns false if not a hex digit
     bool hex_to_num(Char digit, unsigned int & num);
 
-    void binToString(unsigned char * theData, unsigned int theLength, std::string & theDest);
-    bool stringToBin(const std::string & theString, unsigned char * theData, unsigned int maxLength);
+    ASL_BASE_EXPORT void binToString(unsigned char * theData, unsigned int theLength, std::string & theDest);
+    ASL_BASE_EXPORT bool stringToBin(const std::string & theString, unsigned char * theData, unsigned int maxLength);
 
-    std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators = " \n\r\t");
+    ASL_BASE_EXPORT std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators = " \n\r\t");
 
     // Converts an enum into a string, given a string list with the same layout as the enum
     // and a zero at the end
@@ -187,10 +189,10 @@ namespace asl {
 
     // Converts a string into an enum, given a string list with the same layout as the enum
     // and a zero at the end
-    int getEnumFromString(const std::string & theString, const char * theStringList[]);
+    ASL_BASE_EXPORT int getEnumFromString(const std::string & theString, const char * theStringList[]);
 
-    void findAndReplace(std::string & theString, const char * theSearchString, const char * theReplaceString);
-    std::string foundAndReplaced(const std::string & theSource,
+    ASL_BASE_EXPORT void findAndReplace(std::string & theString, const char * theSearchString, const char * theReplaceString);
+    ASL_BASE_EXPORT std::string foundAndReplaced(const std::string & theSource,
                                  const std::string & theSearchString,
                                  const std::string & theReplaceString);
 
@@ -227,8 +229,8 @@ namespace asl {
         return myString;
     }
 
-    void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const Char * theCodeTable = cb66);
-    unsigned base64ToBin(const std::string & theSource, unsigned char * theDest, unsigned int maxLength);
+    ASL_BASE_EXPORT void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const Char * theCodeTable = cb66);
+    ASL_BASE_EXPORT unsigned base64ToBin(const std::string & theSource, unsigned char * theDest, unsigned int maxLength);
 
     // Returns the line in theString starting at theCurPos and ending in \n. 
     // After the call, theCurPos points to the start of the next line in the

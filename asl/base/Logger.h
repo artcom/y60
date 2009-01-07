@@ -43,6 +43,8 @@
 #ifndef _ac_asl_Logger_h_included_
 #define _ac_asl_Logger_h_included_
 
+#include "asl_base_settings.h"
+
 #include "Time.h"
 #include "Ptr.h"
 #include "Singleton.h"
@@ -101,7 +103,7 @@ namespace asl {
      * AC_MODULE_VERBOSITY := MODULE_VERBOSITY | AC_MODULE_VERBOSITY:MODULE_VERBOSITY
      * MODULE_VERBOSITY := <LEVEL>/<MODULE>[/<FROMLINE>[/<TOLINE>]]
      */
-    class Logger : public Singleton<Logger> {
+    class ASL_BASE_EXPORT Logger : public Singleton<Logger> {
         struct ModuleVerbosity {
             ModuleVerbosity() {}
             ModuleVerbosity(Severity theVerbosity,int theMinId, int myMaxId)

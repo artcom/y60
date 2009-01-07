@@ -41,6 +41,8 @@
 #ifndef _asl_MultiThreadedUnitTest_included_
 #define _asl_MultiThreadedUnitTest_included_
 
+#include "asl_base_settings.h"
+
 #include "UnitTest.h"
 
 #include "PosixThread.h"

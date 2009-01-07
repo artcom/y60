@@ -20,7 +20,6 @@
 */
 
 #include "UnitTest.h"
-#include "settings.h"
 #include "console_functions.h"
 
 #ifdef WIN32

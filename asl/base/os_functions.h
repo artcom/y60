@@ -44,6 +44,8 @@
 #ifndef _included_asl_os_functions_
 #define _included_asl_os_functions_
 
+#include "asl_base_settings.h"
+
 #include "string_functions.h"
 
 #include <typeinfo>
@@ -69,14 +71,14 @@ namespace asl {
     // returns the hostname
     // @warning Returns only the NetBIOS name under Win9x,
     //          all other Windows versions return the fully qualified DNS name.
-    const std::string & hostname();
+    ASL_BASE_EXPORT const std::string & hostname();
 
     // returns the name of the application without path and possibly truncated
     // to a handsome length
-    const std::string & appname();
+    ASL_BASE_EXPORT const std::string & appname();
 
     // return a concatenation of hostname and appname separated by a colon (':')
-    const std::string & hostappid();
+    ASL_BASE_EXPORT const std::string & hostappid();
 
     // returns a string identifying login session
     std::string getSessionId();
@@ -88,12 +90,12 @@ namespace asl {
     // environment variable handling
 
     // expands embedded ${ENVVAR} with their values
-    std::string expandEnvironment(const std::string & theString);
-    bool get_environment_var(const std::string & theVariable, std::string & theValue);
+    ASL_BASE_EXPORT std::string expandEnvironment(const std::string & theString);
+    ASL_BASE_EXPORT bool get_environment_var(const std::string & theVariable, std::string & theValue);
     void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
     template <class T>
-    bool get_environment_var_as(const std::string & theVariable, T& theValue);
+    ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, T& theValue);
     
     template <class T>
     T getenv(const std::string & theVariable, const T & theDefaultValue) {

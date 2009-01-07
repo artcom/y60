@@ -1,5 +1,8 @@
 
 include(FindPkgConfig)
 
-pkg_search_module(SDL      REQUIRED sdl)
-pkg_search_module(FREETYPE REQUIRED freetype2)
+find_package(SDL)
+find_package(FREETYPE)
+
+
+#pkg_search_module(FREETYPE REQUIRED freetype2)

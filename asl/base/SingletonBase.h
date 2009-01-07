@@ -51,13 +51,15 @@
 #ifndef _SINGLETON_BASE_INCLUDED_
 #define _SINGLETON_BASE_INCLUDED_
 
+#include "asl_base_settings.h"
+
 namespace asl {
 
 
 /*! \addtogroup aslbase */
 /* @{ */
 
-class SingletonBase {
+class ASL_BASE_EXPORT SingletonBase {
 public:
     // The Singleton Manager will call this method on all singletons before it starts deleting them.
     // This way singletons can correctly shut down, independent of the order of destruction.

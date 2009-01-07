@@ -50,12 +50,14 @@
 #ifndef ASL_VECTOR_MANIPULATOR_INCLUDED
 #define ASL_VECTOR_MANIPULATOR_INCLUDED
 
+#include "asl_math_settings.h"
+
 #include <iostream>
 #include <ios>
 
 namespace asl {
 
-class FixedVectorStreamFormatter {
+class ASL_MATH_EXPORT FixedVectorStreamFormatter {
     public:
         FixedVectorStreamFormatter(const char theStartToken, 
                                    const char theEndToken, 

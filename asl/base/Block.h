@@ -48,6 +48,8 @@
 #ifndef _included_asl_Block_
 #define _included_asl_Block_
 
+#include "asl_base_settings.h"
+
 #include "Exception.h"
 #include "string_functions.h"
 #include "Stream.h"
@@ -75,7 +77,7 @@ namespace asl {
     **/
     class WriteableBlock;
 
-    class ReadableBlock : public ReadableStream {
+    class ASL_BASE_EXPORT ReadableBlock : public ReadableStream {
     public:
         typedef unsigned char Byte;
 
@@ -190,7 +192,7 @@ namespace asl {
       so it is just consequent to derive WriteableBlock from ReadableBlock.
       Consequentially we can not have Write-Only Blocks.
     */
-    class WriteableBlock : public ReadableBlock {
+    class ASL_BASE_EXPORT WriteableBlock : public ReadableBlock {
     public:
         typedef unsigned char * iterator;
 
@@ -288,7 +290,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
       a resizeable Block that is not writeable because we might need to relocate
       the block, so it seems to be natural to derive ResizeableBlock from WriteableBlock.
     */
-    class ResizeableBlock : public WriteableBlock, public WriteableStream {
+    class ASL_BASE_EXPORT ResizeableBlock : public WriteableBlock, public WriteableStream {
     protected:
         ResizeableBlock() {};
     public:
@@ -979,7 +981,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
         copying. CowBlock can be used in any standard container
         and initialized with data from any ReadableBlock
     **/
-    class CowBlock : public ResizeableBlock {
+    class ASL_BASE_EXPORT CowBlock : public ResizeableBlock {
     private:
         typedef Block T;
         struct Representation {
@@ -1080,13 +1082,13 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     };
 
     /// copies theSource to theDest, throws SizeMismatchException() when theSource and theDest are not equal
-    void copy(const ReadableBlock & theSource, WriteableBlock & theDest);
+    ASL_BASE_EXPORT void copy(const ReadableBlock & theSource, WriteableBlock & theDest);
 
     /// copies theSource to theDest and resizes theDest if necessary
-    void copy(const ReadableBlock & theSource, ResizeableBlock & theDest);
+    ASL_BASE_EXPORT void copy(const ReadableBlock & theSource, ResizeableBlock & theDest);
 
     /// writes a theBlock as hex sequence to an ostream
-    std::ostream& operator<<(std::ostream& os, const ReadableBlock & theBlock);
+    ASL_BASE_EXPORT std::ostream& operator<<(std::ostream& os, const ReadableBlock & theBlock);
 
     /// convert a ascii hex theDigit to its binary value. Examples: '2' -> 2, 'A' -> 10,
     bool ascii_to_bin(char & theDigit);
@@ -1095,17 +1097,17 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     std::istream& operator>>(std::istream& is, WriteableBlock & theBlock);
 
     /// reads a variable sized Block as hex sequence from a istream
-    std::istream& operator>>(std::istream& is, ResizeableBlock & theBlock);
+    ASL_BASE_EXPORT std::istream& operator>>(std::istream& is, ResizeableBlock & theBlock);
 
     /// returns true if both Blocks contain the same data
-    bool operator==(const ReadableBlock & lhs, const ReadableBlock & rhs);
+    ASL_BASE_EXPORT bool operator==(const ReadableBlock & lhs, const ReadableBlock & rhs);
 
     /// returns true if both Blocks do not contain the same data
     inline bool operator!=(const ReadableBlock & lhs, const ReadableBlock & rhs) {
         return !(lhs==rhs);
     }
     /// returns true if the content of lhs is lexicographically less than the content of rhs
-    bool operator<(const ReadableBlock & lhs, const ReadableBlock & rhs);
+    ASL_BASE_EXPORT bool operator<(const ReadableBlock & lhs, const ReadableBlock & rhs);
 
     /// returns true if the content of lhs is lexicographically greater than the content of rhs
     inline bool operator>(const ReadableBlock & lhs, const ReadableBlock & rhs) {

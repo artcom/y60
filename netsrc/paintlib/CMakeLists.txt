@@ -5,16 +5,17 @@ project(Paintlib)
 
 include(FindPkgConfig)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Paintlib_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Paintlib_SOURCE_DIR}
+		${PROJECT_SOURCE_DIR}/../../acmake/modules)
 
 include(PaintlibDefinitions)
 include(PaintlibDependencies)
 
 if (WIN32)
     add_definitions(
-            -D_CRT_SECURE_NO_WARNINGS
+        -D_CRT_SECURE_NO_WARNINGS
 	    -D_CRT_NONSTDC_NO_WARNINGS
-            -D_SCL_SECURE_NO_WARNINGS
+        -D_SCL_SECURE_NO_WARNINGS
     )
 endif (WIN32)
 

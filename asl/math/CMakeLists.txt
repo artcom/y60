@@ -12,6 +12,7 @@ VectorManipulator.cpp
 )
 
 set(HEADERS
+asl_math_settings.h
 Box.h
 BSpline.h
 Capsule.h
@@ -60,10 +61,15 @@ SvgPath
 VectorStream
 )
 
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)	
+	
 ac_add_library(
     aslmath asl/math
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
+    EXTERNS ${EXTERNALS}
     DEPENDS aslbase
     TESTS   ${TESTS}
 )

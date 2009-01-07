@@ -20,7 +20,7 @@ proc_functions.cpp
 Ptr.cpp
 ReadWriteLock.cpp
 Revision.cpp
-signal_functions.cpp
+
 SingletonManager.cpp
 StackTrace.cpp
 StdOutputRedirector.cpp
@@ -38,6 +38,7 @@ settings.cpp
 
 set(HEADERS
 Arguments.h
+asl_base_settings.h
 Assure.h
 AtomicCount.h
 Auto.h
@@ -72,7 +73,6 @@ ReadWriteLock.h
 Revision.h
 RunLengthEncoder.h
 settings.h
-signal_functions.h
 SingletonBase.h
 Singleton.h
 SingletonManager.h
@@ -144,6 +144,11 @@ endif(LINUX)
 if(WIN32)
     set(SOURCES ${SOURCES} Win32Backtrace.cpp)
     set(HEADERS ${HEADERS} Win32Backtrace.h)
+	set(PSAPI_LIBRARIES Psapi )
+    list( APPEND EXTERNALS PTHREADVC PSAPI )
+else(WIN32) # All *nix
+	list( APPEND SOURCES signal_functions.cpp )
+	list( APPEND HEADERS signal_functions.h )
 endif(WIN32)
 
 

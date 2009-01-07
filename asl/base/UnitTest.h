@@ -21,6 +21,8 @@
 #ifndef _included_UnitTest_
 #define _included_UnitTest_
 
+#include "asl_base_settings.h"
+
 #include "Exception.h"
 
 #include <iostream>
@@ -33,7 +35,7 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-class UnitTest {
+class ASL_BASE_EXPORT UnitTest {
 public:
     virtual void run() = 0;
     unsigned int getPassedCount() const;
@@ -53,7 +55,7 @@ public:
     virtual unsigned getProfileRepeatCount() const;
     virtual void setProfileRepeatCount(unsigned theCount);
 private:
-    UnitTest();
+	UnitTest();
     UnitTest(const UnitTest &);
     const UnitTest & operator=(const UnitTest &);
 protected:
@@ -89,7 +91,7 @@ private:
     void reportResult(bool myExpressionResult,bool myExpectedResult);
 };
 
-class UnitTestSuite : public UnitTest {
+class ASL_BASE_EXPORT UnitTestSuite : public UnitTest {
 public:
     explicit UnitTestSuite(const char * myName, int argc, char *argv[]) 
         : UnitTest(myName), _argc(argc), _argv(argv) {
@@ -97,7 +99,11 @@ public:
     ~UnitTestSuite() {
         destroyMyTests();
     }
+private:
+	UnitTestSuite(UnitTestSuite const& other);
+	const UnitTestSuite & operator=(const UnitTestSuite &);
 
+public:
     virtual void addTest(UnitTest * theTest, unsigned int theProfileRepeatCount = 1) {
         if (theTest) {
             _myTests.push_back(theTest);

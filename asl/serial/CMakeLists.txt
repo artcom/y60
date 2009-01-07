@@ -21,6 +21,7 @@ SerialDevice
 if(WIN32)
     set(SOURCES ${SOURCES} ComPort.cpp)
     set(HEADERS ${HEADERS} ComPort.h)
+    list( APPEND EXTERNALS PTHREADVC )
 else(WIN32)
     set(SOURCES ${SOURCES} TTYPort.cpp)
     set(HEADERS ${HEADERS} TTYPort.h)  
@@ -32,4 +33,5 @@ ac_add_library(
     HEADERS ${HEADERS}
     TESTS ${TESTS}
     DEPENDS aslbase
+    EXTERNS ${EXTERNALS}
 )

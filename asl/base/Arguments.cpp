@@ -35,7 +35,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "settings.h"
 #include "Arguments.h"
 #include "Path.h"
 #include "Logger.h"

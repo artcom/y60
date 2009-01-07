@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(ACSDLTTF)
 
-set(CMAKE_MODULE_PATH ${ACSDLTTF_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${ACSDLTTF_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/../../acmake/modules)
 
 include(ACSDLTTFDefinitions)
 include(ACSDLTTFDependencies)
@@ -12,8 +12,8 @@ add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 include_directories(.)
 
-link_directories(${SDL_LIBRARY_DIRS} ${FREETYPE_LIBRARY_DIRS})
-include_directories(${SDL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+link_directories(${SDL_LIBRARY_DIR} ${FREETYPE_LIBRARY_DIRS})
+include_directories(${SDL_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS})
 
 add_library(acsdlttf SHARED SDL_ttf.c)
 
@@ -23,10 +23,12 @@ set_target_properties(
         PUBLIC_HEADER "SDL_ttf.h"
 )
 
-target_link_libraries(acsdlttf ${SDL_LIBRARIES} ${FREETYPE_LIBRARIES})
+target_link_libraries(acsdlttf ${SDL_LIBRARY} ${FREETYPE_LIBRARIES})
 
 install(
     TARGETS acsdlttf
+        DESTINATION foobar # XXX: This is a hack! TARGETS does not need or have a DESTINATION.
+                           #	But for some reason it does not work without it! [DS]
     EXPORT ACSDLTTF
     LIBRARY
          DESTINATION lib

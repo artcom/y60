@@ -41,6 +41,8 @@
 #ifndef included_asl_Arguments_h
 #define included_asl_Arguments_h
 
+#include "asl_base_settings.h"
+
 #include "Exception.h"
 #include "string_functions.h"
 
@@ -54,7 +56,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
-class Arguments {
+class ASL_BASE_EXPORT Arguments {
 public:
     enum { MAX_OPTIONS = 100 };
 

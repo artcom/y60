@@ -22,6 +22,8 @@
 #ifndef _included_asl_CoordSpline_
 #define _included_asl_CoordSpline_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "Matrix4.h"
 #include "Quaternion.h"
@@ -162,7 +164,7 @@ namespace asl {
               
     };    
     
-    class CoordSpline
+    class ASL_MATH_EXPORT CoordSpline
     {
       public:
     	    CoordSpline		    ( void );

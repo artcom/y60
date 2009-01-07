@@ -41,6 +41,8 @@
 #ifndef _included_asl_ExceptionBase_
 #define _included_asl_ExceptionBase_
 
+#include "asl_base_settings.h"
+
 #include "StackTrace.h"
 
 #include <iostream>
@@ -51,7 +53,7 @@ namespace asl {
     /*! \addtogroup aslbase */
     /* @{ */
 
-    class Exception {
+    class ASL_BASE_EXPORT Exception {
     public:
 
         Exception(const std::string & what = "", const std::string & where ="");
@@ -105,11 +107,11 @@ namespace asl {
         static bool _ourDumpStackTraceFlag;
     };
 
-	std::string file_string(const char* file_name);
-    std::string line_string(unsigned line_number);
-    std::string location_string(const char* file_name, unsigned line_number);
+	ASL_BASE_EXPORT std::string file_string(const char* file_name);
+    ASL_BASE_EXPORT std::string line_string(unsigned line_number);
+    ASL_BASE_EXPORT std::string location_string(const char* file_name, unsigned line_number);
 
-    std::string compose_message(const Exception & ex);
+    ASL_BASE_EXPORT std::string compose_message(const Exception & ex);
 
     inline
     std::ostream& operator<<(std::ostream& os,const Exception & ex) {

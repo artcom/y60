@@ -52,6 +52,8 @@
 #ifndef INCL_POSIXTHREAD
 #define INCL_POSIXTHREAD
 
+#include "asl_base_settings.h"
+
 #include <pthread.h>
 #include <signal.h>
 
@@ -60,7 +62,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
-class PosixThread {
+class ASL_BASE_EXPORT PosixThread {
     public:
         typedef void (WorkFunc)(PosixThread &);
 

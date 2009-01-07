@@ -26,6 +26,7 @@ set(TESTS
 if(WIN32)
     set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
     set(HEADERS ${HEADERS} NamedPipePolicy.h)
+	list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(
@@ -33,5 +34,6 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS ${TESTS}
+    EXTERNS ${EXTERNALS}
     DEPENDS aslbase aslnet
 )

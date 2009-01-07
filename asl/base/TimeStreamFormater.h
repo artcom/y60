@@ -53,6 +53,8 @@
 #ifndef ASL_TIME_STREAM_FORMATER_INCLUDED
 #define ASL_TIME_STREAM_FORMATER_INCLUDED
 
+#include "asl_base_settings.h"
+
 #include <iostream>
 
 namespace asl {
@@ -61,7 +63,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
     
-class TimeStreamFormater {
+class ASL_BASE_EXPORT TimeStreamFormater {
     public:
         TimeStreamFormater(const char * theFormatString);
         TimeStreamFormater(const TimeStreamFormater & otherFormater);

@@ -22,6 +22,8 @@
 #ifndef _included_asl_Spline_
 #define _included_asl_Spline_
 
+#include "asl_math_settings.h"
+
 #include <asl/base/Logger.h>
 #include <vector>
 #include <iostream>
@@ -50,7 +52,7 @@ namespace asl {
     //
     ////////////////////////////////////////////////////////////////////////////////
     
-    class YrSpline
+    class ASL_MATH_EXPORT YrSpline
     {
       public:
     		    YrSpline	    ( void ) { }
@@ -72,7 +74,7 @@ namespace asl {
     
     enum HermiteInitMode { catmull_rom, minimize_fluctuations, minimize_fluctuations_forward, weighted_ratio };	// how to init Hermite
     
-    class Hermite : public YrSpline
+    class ASL_MATH_EXPORT Hermite : public YrSpline
     {
       public:
     		    Hermite	    ( void );

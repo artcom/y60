@@ -15,6 +15,7 @@ VolumeFader.cpp
 )
 
 set(HEADERS
+asl_audio_settings.h
 AudioBufferBase.h
 AudioBuffer.h
 AudioException.h
@@ -55,6 +56,7 @@ endif(LINUX)
 if(WIN32)
     set(SOURCES ${SOURCES} DirectSoundPump.cpp)
     set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
+	list( APPEND EXTERNS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(

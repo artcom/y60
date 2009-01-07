@@ -50,6 +50,8 @@
   
 #ifndef _SINGLETON_MANAGER_INCLUDED_  
 #define _SINGLETON_MANAGER_INCLUDED_  
+
+#include "asl_base_settings.h"
   
 #include <iostream>  
 #include <string>  
@@ -88,7 +90,7 @@ namespace asl {
  * was destroyed!  
  */
 
-class SingletonManager {  
+class ASL_BASE_EXPORT SingletonManager {  
 public:  
     ~SingletonManager();
 

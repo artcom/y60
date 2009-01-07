@@ -19,7 +19,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "settings.h"
 #include "file_functions.h"
 #include "os_functions.h"
 #include "string_functions.h"

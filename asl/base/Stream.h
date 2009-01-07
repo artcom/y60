@@ -25,7 +25,8 @@
 #ifndef _included_asl_Stream_
 #define _included_asl_Stream_
 
-#include "settings.h"
+#include "asl_base_settings.h"
+
 #include "Exception.h"
 #include "string_functions.h"
 
@@ -39,7 +40,7 @@
 
 namespace asl {
 
-    off_t getFileSize(const std::string& theFileName);
+    ASL_BASE_EXPORT off_t getFileSize(const std::string& theFileName);
 
     /*! \addtogroup aslbase */
     /* @{ */

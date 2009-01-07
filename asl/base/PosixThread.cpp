@@ -49,7 +49,6 @@
 //=============================================================================
 
 #include "PosixThread.h"
-#include "settings.h"
 #include "Logger.h"
 
 #include <errno.h>

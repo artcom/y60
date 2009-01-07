@@ -40,6 +40,8 @@
 #ifndef _included_asl_file_functions_
 #define _included_asl_file_functions_
 
+#include "asl_base_settings.h"
+
 #include "Exception.h"
 #include "Block.h"
 #include "PlugInManager.h"
@@ -61,23 +63,23 @@ DEFINE_EXCEPTION(OpenDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(GetAppDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(PathException, asl::Exception);
 
-std::vector<std::string> getDirectoryEntries(const std::string & thePath);
+ASL_BASE_EXPORT std::vector<std::string> getDirectoryEntries(const std::string & thePath);
 
 /** creates a new directory in an existing directory */
-void createDirectory(const std::string & theDirectory);
+ASL_BASE_EXPORT void createDirectory(const std::string & theDirectory);
 
 /** removes an empty directory directory */
-void removeDirectory(const std::string & theDirectory);
+ASL_BASE_EXPORT void removeDirectory(const std::string & theDirectory);
 
 /** creates a new directory and all necessary parent directories */
-void createPath(const std::string & theDirectory);
+ASL_BASE_EXPORT void createPath(const std::string & theDirectory);
 
 std::string getTempDirectory();
 std::string getAppDataDirectory(const std::string & theAppName);
-std::string getAppDirectory();
+ASL_BASE_EXPORT std::string getAppDirectory();
 
 /// returns true if theDirectory is a readable directory, false otherwise
-bool isDirectory(const std::string & theDirectory);
+ASL_BASE_EXPORT bool isDirectory(const std::string & theDirectory);
 /// converts backslashes to slashes & reduces double slashes to single slashes.
 std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
 
@@ -85,18 +87,18 @@ std::string normalizeDirectory(const std::string & theDirectory, bool stripTrail
 std::string getCWD();
 
 /// returns filename without directory     
-std::string getFilenamePart(const std::string & theFileName);
+ASL_BASE_EXPORT std::string getFilenamePart(const std::string & theFileName);
 /// returns directory without filename     
-std::string getDirectoryPart(const std::string & theFileName);
+ASL_BASE_EXPORT std::string getDirectoryPart(const std::string & theFileName);
 
 /// returns path shortened by last directory component     
-std::string getParentDirectory(const std::string & theDirectoryName);
+ASL_BASE_EXPORT std::string getParentDirectory(const std::string & theDirectoryName);
 
 /// return filename extension, or "" if none was found
 // @note: this function should be changed. Now it returns the extension without the "."
 // This is a bad idea, since the filename "foo" and "foo." both return the same string.
 // this makes it impossible to reconstruct the filename from its components. 
-std::string getExtension(const std::string & theFileName);
+ASL_BASE_EXPORT std::string getExtension(const std::string & theFileName);
 
 /// returns theFileName without extension
 std::string removeExtension(const std::string & theFileName);
@@ -110,16 +112,16 @@ void
 parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath);
 
 /// returns the Host:Port part of an URI
-std::string getHostPortPart(const std::string & theURI);
+ASL_BASE_EXPORT std::string getHostPortPart(const std::string & theURI);
 
 /// returns the Host part of an URI
-std::string getHostPart(const std::string & theURI);
+ASL_BASE_EXPORT std::string getHostPart(const std::string & theURI);
 
 /// splits a delimited path list (semicolon or colon delimited) into its components
 unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::string> & thePathVector);
 
 /// return relative path from base directory to absolute path.
-std::string evaluateRelativePath(const std::string & theBaseDirectory, const std::string & theAbsolutePath, bool theForceRelativePathFlag = false);
+ASL_BASE_EXPORT std::string evaluateRelativePath(const std::string & theBaseDirectory, const std::string & theAbsolutePath, bool theForceRelativePathFlag = false);
 
 /// searches a file in a semicolon-seperated list of pathes, 
 /// returns the path + file. Embedded environment variables 
@@ -128,17 +130,17 @@ std::string evaluateRelativePath(const std::string & theBaseDirectory, const std
 std::string searchFile(const std::string & theFileName, const std::string & theSearchPath);
 
 /// read a complete file into a string
-std::string readFile(const std::string& theFileName);
-bool readFile(const std::string& theFileName, std::string & theContent);
-bool readFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
-bool writeFile(const std::string& theFileName, const std::string & theContent);
-bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
+ASL_BASE_EXPORT std::string readFile(const std::string& theFileName);
+ASL_BASE_EXPORT bool readFile(const std::string& theFileName, std::string & theContent);
+ASL_BASE_EXPORT bool readFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
+ASL_BASE_EXPORT bool writeFile(const std::string& theFileName, const std::string & theContent);
+ASL_BASE_EXPORT bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
 
-bool deleteFile(const std::string& theFileName);
-bool copyFile(const std::string& theOldFileName, const std::string & theNewFileName);
-bool moveFile(const std::string& theOldFileName, const std::string & theNewFileName);
-bool setLastModified(const std::string & theFilename, time_t theModificationDate);
-time_t getLastModified(const std::string & theFilename);
+ASL_BASE_EXPORT bool deleteFile(const std::string& theFileName);
+ASL_BASE_EXPORT bool copyFile(const std::string& theOldFileName, const std::string & theNewFileName);
+ASL_BASE_EXPORT bool moveFile(const std::string& theOldFileName, const std::string & theNewFileName);
+ASL_BASE_EXPORT bool setLastModified(const std::string & theFilename, time_t theModificationDate);
+ASL_BASE_EXPORT time_t getLastModified(const std::string & theFilename);
 
 #ifdef OSX
 #  define STAT64   stat
@@ -154,14 +156,14 @@ time_t getLastModified(const std::string & theFilename);
 #endif
 
 /// returns true if file or directory exists
-bool fileExists(const std::string& theUTF8Filename);
+ASL_BASE_EXPORT bool fileExists(const std::string& theUTF8Filename);
 
 DEFINE_EXCEPTION(IO_Failure,asl::Exception)
 
 
 // Warning: off_t is 32 bit (at least) under windows. This function will
 // return incorrect values for files > 2 gb.
-off_t getFileSize(const std::string& theUTF8Filename);
+ASL_BASE_EXPORT off_t getFileSize(const std::string& theUTF8Filename);
 /* @} */
 
 } //Namespace asl
@@ -180,9 +182,9 @@ struct dirent
     char *d_name;
 };
 
-DIR           *opendir(const char *);
-int           closedir(DIR *);
-struct dirent *readdir(DIR *);
+ASL_BASE_EXPORT DIR           *opendir(const char *);
+ASL_BASE_EXPORT int           closedir(DIR *);
+ASL_BASE_EXPORT struct dirent *readdir(DIR *);
 void          rewinddir(DIR *);
 
 #else // Linux and Mac Os X

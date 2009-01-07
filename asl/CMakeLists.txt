@@ -14,6 +14,14 @@ project(ASL)
 
 list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
 
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/../acmake/modules c:/installation/share/cmake-2.6/Modules )
+
+if(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
+  list(APPEND CMAKE_MODULE_PATH $ENV{ACMAKE}/modules)
+endif(NOT "XX$ENV{ACMAKE}XX" STREQUAL "XXXX")
+
+
 include(AcMake)
 
 include(ASLDefinitions)

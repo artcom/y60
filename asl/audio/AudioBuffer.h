@@ -41,6 +41,8 @@
 #ifndef INCL_AUDIOBUFFER
 #define INCL_AUDIOBUFFER
 
+#include "asl_audio_settings.h"
+
 #include "AudioBufferBase.h"
 #include "SampleFormat.h"
 

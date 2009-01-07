@@ -41,6 +41,8 @@
 #ifndef _asl_base_Dashboard_h_included_
 #define _asl_base_Dashboard_h_included_
 
+#include "asl_base_settings.h"
+
 #include "Time.h"
 #include "Ptr.h"
 #include "Singleton.h"
@@ -379,7 +381,7 @@ namespace asl {
             Counter _myCounter;
     };
 
-    class Dashboard : public Singleton<Dashboard> {
+    class ASL_BASE_EXPORT Dashboard : public Singleton<Dashboard> {
         public:
             Dashboard() : _myLastFrameRateTime(0), _myFrameRate(0) {}
             TimerPtr getTimer(const std::string & theName);
@@ -421,7 +423,7 @@ namespace asl {
 		TimerPtr _myTimer;
 	};
 
-    extern Dashboard & getDashboard();
+    ASL_BASE_EXPORT extern Dashboard & getDashboard();
     inline TimerPtr getDashboardTimer(const std::string theName) {
         return getDashboard().getTimer(theName);
     }

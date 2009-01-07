@@ -15,6 +15,8 @@
 #ifndef _asl_proc_functions_
 #define _asl_proc_functions_
 
+#include "asl_base_settings.h"
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -27,13 +29,13 @@ namespace asl {
     /* @{ */
  
     /// Get amount of system memory in KB.
-    unsigned getTotalMemory();
+    ASL_BASE_EXPORT unsigned getTotalMemory();
 
     /// Get amount of used system memory in KB.
-    unsigned getUsedMemory();
+    ASL_BASE_EXPORT unsigned getUsedMemory();
 
     /// Get amount of free system memory in KB.
-    unsigned getFreeMemory();
+    ASL_BASE_EXPORT unsigned getFreeMemory();
 
     /**
      * Get process memory usage in KB.
@@ -44,7 +46,7 @@ namespace asl {
 #else
     typedef pid_t ProcessID;
 #endif
-    unsigned getProcessMemoryUsage(ProcessID thePid = 0);
+    ASL_BASE_EXPORT unsigned getProcessMemoryUsage(ProcessID thePid = 0);
 
     /* @} */
 }

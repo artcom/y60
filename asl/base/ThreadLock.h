@@ -53,6 +53,8 @@
 #ifndef INCL_THREADLOCK
 #define INCL_THREADLOCK
 
+#include "asl_base_settings.h"
+
 #include <pthread.h>
 
 
@@ -64,7 +66,7 @@ namespace asl {
  * 
  * 
  */
-class ThreadLock {
+class ASL_BASE_EXPORT ThreadLock {
     public:
         ThreadLock();
         virtual ~ThreadLock();

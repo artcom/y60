@@ -19,7 +19,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "settings.h"
+
 #include "Exception.h"
 
 #include <cstdlib>
