@@ -1,0 +1,211 @@
+struct a2v 
+{
+    float4 pos       : POSITION;
+    float3 normal    : NORMAL;
+    float2 texcoord  : TEXCOORD0;
+    float3 tangent   : TEXCOORD1; //TANGENT0;
+};
+
+struct v2f
+{
+    float4 hpos      : POSITION;
+    float3 vpos      : TEXCOORD0;
+    float2 texcoord  : TEXCOORD1;
+    float3 view      : TEXCOORD2;
+    float3 light     : TEXCOORD3;
+    float4 scale     : TEXCOORD4;
+    float2 curvature : TEXCOORD5;
+};
+
+struct f2s
+{   
+   float4 color : COLOR;
+#ifdef RM_DEPTHCORRECT
+   float depth : DEPTH; 
+#endif
+};
+
+v2f mainVertex(a2v IN,
+   uniform float4 lightpos,
+   uniform float depth,
+   uniform float tile)
+{
+   v2f OUT;
+
+   // vertex position in object space
+   float4 myPosition = float4(IN.pos.x, IN.pos.y, IN.pos.z, 1.0);
+
+   // vertex position in clip space
+   OUT.hpos = mul(glstate.matrix.mvp,myPosition);
+
+   // copy texture coordinates
+   OUT.texcoord = IN.texcoord*tile;
+
+   // compute modelview rotation only part
+   float3x3 modelviewrot = float3x3(glstate.matrix.modelview[0]);
+
+   // vertex position in view space (with model transformations)
+   OUT.vpos = mul(glstate.matrix.modelview[0], myPosition).xyz;
+ 
+   // tangent vectors in view space
+   float3 tangent  = mul(modelviewrot, IN.tangent);
+   float3 binormal = cross(IN.tangent, IN.normal);
+   
+   binormal = mul(modelviewrot, binormal);
+   float3 normal = mul(modelviewrot, IN.normal);
+   float3x3 tangentspace = float3x3(tangent, binormal, normal);
+
+   // scale and curvature
+   //OUT.scale=float4(IN.tangent.w,IN.binormal.w,depth,tile*tile)/tile;
+   OUT.scale=float4(1,1,depth,tile*tile)/tile;
+   //OUT.curvature=IN.curvature;
+
+   // view and light in tangent space
+   OUT.view=mul(tangentspace,OUT.vpos);
+   OUT.light=mul(tangentspace,lightpos.xyz-OUT.vpos);
+
+   return OUT;
+}
+
+void ray_intersect_rm_linear(
+      in sampler2D reliefmap,
+      inout float3 p, 
+      inout float3 v)
+{
+#ifdef RM_DOUBLEPRECISION
+   const int linear_search_steps=20;
+#else
+   const int linear_search_steps=10;
+#endif
+
+   v/=linear_search_steps;
+
+   for( int i=0;i<linear_search_steps-1;i++ )
+   {
+      float4 t=tex2D(reliefmap,p.xy);
+      if (p.z<t.w)
+         p+=v;
+   }
+}
+
+void ray_intersect_rm_binary(
+      in sampler2D reliefmap,
+      inout float3 p, 
+      inout float3 v)
+{
+   const int binary_search_steps=6;
+   
+   for( int i=0;i<binary_search_steps;i++ )
+   {
+      v*=0.5;
+      float4 t=tex2D(reliefmap,p.xy);
+      if (p.z<t.w)
+         p+=2*v;
+      p-=v;
+   }
+}
+
+f2s mainFragment(
+   v2f IN,
+   uniform sampler2D tex0:TEXUNIT0,      // rm texture map 
+   uniform sampler2D tex1:TEXUNIT1,   // color texture map 
+   uniform float4 ambient,         // ambient color
+   uniform float4 diffuse,         // diffuse color
+   uniform float4 specular,      // specular color
+   uniform float2 planes)         // near and far plane information
+
+{
+   f2s OUT;
+
+   // view vector in eye space
+   float3 view = normalize(IN.view);
+   view.z = -view.z;
+
+   // scale view vector to texture space using depth factor
+#ifdef RM_DEPTHBIAS
+   float depth_bias=(2*view.z-view.z*view.z);
+   view.xy*=depth_bias;
+#endif
+   view*=IN.scale.z/(IN.scale.xyz*view.z);
+
+   // ray intersect depth map 
+   float3 p=float3(IN.texcoord,0);
+   ray_intersect_rm_linear(tex0,p,view);
+   ray_intersect_rm_binary(tex0,p,view);
+
+   float alpha=1;
+// #ifdef RM_BORDERCLAMP
+   if (p.x<0) alpha=0;
+   if (p.y<0) alpha=0;
+   if (p.x>IN.scale.w) alpha=0;
+   if (p.y>IN.scale.w) alpha=0;
+// #endif
+
+#ifdef RM_VIEWDEPTH
+   OUT.color=float4(p.zzz,1.0);
+   return OUT;
+#endif
+
+   // get normal and color
+   float4 n=tex2D(tex0,p.xy);
+   float4 c=tex2D(tex1,p.xy);
+
+#ifdef RM_VIEWNORMAL
+   OUT.color=float4(n.xyz,1.0);
+   return OUT;
+#endif
+
+   // expand normal from normal map
+   n.xyz=normalize(n.xyz-0.5);
+
+   // restore view vector
+   view=normalize(IN.view);
+
+#ifdef RM_DEPTHCORRECT
+   // a=-far/(far-near)
+   // b=-far*near/(far-near)
+   // Z=(a*z+b)/-z
+   float3 pos=IN.vpos-normalize(IN.vpos)*p.z*IN.scale.z/view.z;
+   OUT.depth=((planes.x*pos.z+planes.y)/-pos.z);
+#endif
+
+   float3 light=normalize(IN.light);
+
+   // compute diffuse and specular terms
+   float diff=saturate(dot(light,n.xyz));
+   float spec=saturate(dot(normalize(light-view),n.xyz));
+
+   // attenuation factor
+   float att = 1.0-max(0,light.z); 
+   att = 1.0-att*att;
+
+   // ambient term
+   float4 finalcolor = ambient*c;
+
+#ifdef RM_SHADOWS
+   // compute light ray vector in texture space
+   float light_depth_bias=(2*light.z-light.z*light.z);
+   light.xy*=light_depth_bias;
+   light.z=-light.z;
+   light*=IN.scale.z/(IN.scale*light.z);
+
+   // compute light ray entry point in texture space
+   float3 lp=p-light*p.z;
+   ray_intersect_rm_linear(tex0,lp,light);
+
+   if (lp.z<p.z-0.05) // if pixel in shadow
+   {
+     diff*=0.25;
+     spec=0;
+   }
+#endif
+
+   // compute final color
+   finalcolor.xyz += att*(c.xyz*diffuse.xyz*diff + 
+      specular.xyz*pow(spec,specular.w));
+   // finalcolor.w=alpha;
+
+   OUT.color = finalcolor;
+   // OUT.color = float4(p.xy, 0, 1);
+   return OUT;
+}

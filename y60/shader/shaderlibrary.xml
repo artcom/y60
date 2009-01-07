@@ -1744,6 +1744,34 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="relief_unlit" name="relief" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="option" values="[`relief`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`relief.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`relief.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <vector2f name="center">[0.0,0.0]</vector2f>
+                <vector2f name="planes">[0.1,10000.0]</vector2f>
+                <vector3f name="lightpos">[-20,-20,-20]</vector3f>
+                <float name="depth">0.10</float>
+                <float name="tile">1.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->
