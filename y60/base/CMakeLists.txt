@@ -40,15 +40,6 @@ DataTypes
 XmlDomY60Types
 )
 
-if(OSX)
-endif(OSX)
-
-if(LINUX)
-endif(LINUX)
-
-if(WIN32)
-endif(WIN32)
-
 ac_add_library(
     y60base y60/base
     SOURCES ${SOURCES}

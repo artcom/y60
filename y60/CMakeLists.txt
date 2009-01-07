@@ -10,6 +10,16 @@ list(INSERT CMAKE_MODULE_PATH 0 ${Y60_SOURCE_DIR})
 #      It's goddamn ugly though.
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
 
+# XXX: Make headers from our netsrc dependencies available.
+#      This is needed because we do not handle paths for
+#      cmake-exported libraries correctly at the moment.
+#      It would work if the references in our libs would
+#      be EXTERNS, but since they are DEPENDS, we do not add 
+#      include paths anywhere and need this hack for now.
+if(NOT Y60_INTEGRATED_BUILD)
+    include_directories(${CMAKE_INSTALL_PREFIX}/include)
+endif(NOT Y60_INTEGRATED_BUILD)
+
 # Include ACMake
 include(AcMake)
 
@@ -17,6 +27,11 @@ include(AcMake)
 include(Y60Definitions)
 include(Y60Dependencies)
 include(Y60Utilities)
+
+# XXX: Transient includes.
+if(NOT Y60_INTEGRATED_BUILD)
+    include_directories(${SDL_INCLUDE_DIR})
+endif(NOT Y60_INTEGRATED_BUILD)
 
 # Make sure we can access our includes without staging
 include_directories(../)

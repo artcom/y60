@@ -217,8 +217,8 @@ ac_add_library(
     DEPENDS aslbase aslmath aslserial aslnet asldom aslxpath aslzip
             y60base y60image y60video y60inet y60scene y60input
             y60glrender y60glutil y60gltext y60modelling y60jslib
-            y60acgtk
-    EXTERNS PAINTLIB SPIDERMONKEY GTKMM GTKGLEXT GLADEMM OPENEXR
+            y60acgtk spidermonkey
+    EXTERNS GTKMM GTKGLEXT GLADEMM OPENEXR
 )
 
 # fix OpenGL/X11 link cycle problem

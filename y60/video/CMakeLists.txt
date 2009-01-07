@@ -33,8 +33,8 @@ ac_add_library(
     y60video y60/video
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS aslbase asldom aslmath aslzip y60base y60image
-    EXTERNS OPENEXR PAINTLIB
+    DEPENDS aslbase asldom aslmath aslzip y60base y60image paintlib
+    EXTERNS OPENEXR
     TESTS   ${TESTS}
 )
 

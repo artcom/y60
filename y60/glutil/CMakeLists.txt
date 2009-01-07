@@ -39,7 +39,7 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom aslzip
             y60base y60scene y60image y60video
-    EXTERNS GLEW OPENEXR PAINTLIB CG
+    EXTERNS GLEW OPENEXR CG
     TESTS   ${TESTS}
 )
 
