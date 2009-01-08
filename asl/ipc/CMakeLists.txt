@@ -23,16 +23,12 @@ set(TESTS
 )
 
 if(WIN32)
-    set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
-    set(HEADERS ${HEADERS} NamedPipePolicy.h)
+    list(APPEND SOURCES NamedPipePolicy.cpp)
+    list(APPEND HEADERS NamedPipePolicy.h)
 	list( APPEND EXTERNALS PTHREADVC )
 else(WIN32)
-    set(SOURCES
-    UnixSocketPolicy.cpp
-    )
-    set(HEADERS
-    UnixSocketPolicy.h
-    )
+    list(APPEND SOURCES UnixSocketPolicy.cpp)
+    list(APPEND HEADERS UnixSocketPolicy.h)
 endif(WIN32)
 
 ac_add_library(
