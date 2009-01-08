@@ -103,7 +103,6 @@ Enum
 Exception
 _file_functions
 #GarbageCollector
-Itimer
 Logger
 MappedBlock
 MemoryPool
@@ -113,12 +112,10 @@ _os_functions
 Path
 PlugInManager
 PosixThread
-PrioCeilingRWLock
 _proc_functions
 Ptr
 ReadWriteLock
 RunLengthEncoder
-ShellScript
 StackTrace
 Stream
 _string_functions
@@ -145,8 +142,9 @@ if(WIN32)
     set(SOURCES ${SOURCES} Win32Backtrace.cpp)
     set(HEADERS ${HEADERS} Win32Backtrace.h)
 	set(PSAPI_LIBRARIES Psapi )
-    list( APPEND EXTERNALS PTHREADVC PSAPI )
+    list( APPEND EXTERNS PTHREADVC PSAPI )
 else(WIN32) # All *nix
+    list( APPEND TESTS ShellScript Itimer PrioCeilingRWLock )
 	list( APPEND SOURCES signal_functions.cpp )
 	list( APPEND HEADERS signal_functions.h )
 endif(WIN32)
