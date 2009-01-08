@@ -392,7 +392,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
 /** Helper macro. Creates a typedef.
  * @relates asl::Enum
  */
-#define DEFINE_ENUM( THE_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
+#define DEFINE_ENUM( THE_NAME, THE_ENUM/*, DLL_EXPORT_TOKEN*/) \
     /*template class DLL_EXPORT_TOKEN asl::Enum<THE_ENUM, THE_ENUM ## _MAX>;*/ \
     typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
 
