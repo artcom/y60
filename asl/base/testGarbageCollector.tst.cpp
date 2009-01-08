@@ -21,6 +21,8 @@
 
 #include "settings.h"
 
+#include "initialization.h"
+
 #include "GarbageCollector.h"
 #include "Time.h"
 #include "Dashboard.h"
