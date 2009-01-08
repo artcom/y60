@@ -7,8 +7,10 @@ project(ASL)
 list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
 
 # XXX: There is no way for adding this in the UI on WIN32.
-#      It's goddamn ugly though.
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
+#      It's goddamn ugly though. Also note that we APPEND.
+if(NOT ASL_INTEGRATED_BUILD)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
+endif(NOT ASL_INTEGRATED_BUILD)
 
 # XXX: Make headers from our netsrc dependencies available.
 #      This is needed because we do not handle paths for

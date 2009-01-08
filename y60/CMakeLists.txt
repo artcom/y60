@@ -7,8 +7,10 @@ project(Y60)
 list(INSERT CMAKE_MODULE_PATH 0 ${Y60_SOURCE_DIR})
 
 # XXX: There is no way for adding this in the UI on WIN32.
-#      It's goddamn ugly though.
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
+#      It's goddamn ugly though. Also note that we APPEND.
+if(NOT Y60_INTEGRATED_BUILD)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
+endif(NOT Y60_INTEGRATED_BUILD)
 
 # XXX: Make headers from our netsrc dependencies available.
 #      This is needed because we do not handle paths for
@@ -27,11 +29,6 @@ include(AcMake)
 include(Y60Definitions)
 include(Y60Dependencies)
 include(Y60Utilities)
-
-# XXX: Transient includes.
-if(NOT Y60_INTEGRATED_BUILD)
-    include_directories(${SDL_INCLUDE_DIR})
-endif(NOT Y60_INTEGRATED_BUILD)
 
 # Make sure we can access our includes without staging
 include_directories(../)
