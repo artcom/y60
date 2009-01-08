@@ -59,7 +59,11 @@
 #include <y60/jsbase/jssettings.h>
 #include <y60/sdlengine/SDLApp.h>
 
+#ifdef AC_BUILT_WITH_CMAKE
+#include <SDL.h>
+#else
 #include <SDL/SDL.h>
+#endif
 
 #include <asl/base/Arguments.h>
 #include <asl/base/StdOutputRedirector.h>

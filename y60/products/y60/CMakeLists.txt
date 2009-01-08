@@ -7,6 +7,6 @@ ac_add_executable(
           y60glrender y60glutil y60gltext y60jsbase y60jslib
           y60modelling y60sdlengine
           aslzip acsdlttf
-  EXTERNS SPIDERMONKEY FREETYPE
+  EXTERNS SPIDERMONKEY FREETYPE SDL OPENEXR
 )
 
