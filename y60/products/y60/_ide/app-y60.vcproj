@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Netapi32.lib Iphlpapi.lib ws2_32.lib OpenGL32.lib Cg.lib CgGL.lib Glu32.lib SDL.lib SDLmain.lib libpng.lib libtiff.lib libjpeg.lib libungif.lib pthreadVC.lib freetype.lib dxguid.lib zdll.lib Half.lib libcurl.lib paintlib$(ConfigurationName).lib jsspidermonkey$(ConfigurationName).lib sdlttf2$(ConfigurationName).lib"
+				AdditionalDependencies="Netapi32.lib Iphlpapi.lib ws2_32.lib OpenGL32.lib Cg.lib CgGL.lib Glu32.lib SDL.lib SDLmain.lib libpng.lib libtiff.lib libjpeg.lib libungif.lib pthreadVC.lib freetype.lib dxguid.lib zdll.lib Half.lib libcurl.lib paintlib$(ConfigurationName).lib jsspidermonkey$(ConfigurationName).lib sdlttf2$(ConfigurationName).lib glew32.lib"
 				AdditionalLibraryDirectories="$(SolutionDir)..\..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -145,7 +145,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Netapi32.lib Iphlpapi.lib ws2_32.lib OpenGL32.lib Cg.lib CgGL.lib Glu32.lib SDL.lib SDLmain.lib libpng.lib libtiff.lib libjpeg.lib libungif.lib pthreadVC.lib freetype.lib dxguid.lib zdll.lib Half.lib libcurl.lib paintlib$(ConfigurationName).lib jsspidermonkey$(ConfigurationName).lib sdlttf2$(ConfigurationName).lib"
+				AdditionalDependencies="Netapi32.lib Iphlpapi.lib ws2_32.lib OpenGL32.lib Cg.lib CgGL.lib Glu32.lib SDL.lib SDLmain.lib libpng.lib libtiff.lib libjpeg.lib libungif.lib pthreadVC.lib freetype.lib dxguid.lib zdll.lib Half.lib libcurl.lib paintlib$(ConfigurationName).lib jsspidermonkey$(ConfigurationName).lib sdlttf2$(ConfigurationName).lib glew32.lib"
 				AdditionalLibraryDirectories="$(SolutionDir)..\..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
