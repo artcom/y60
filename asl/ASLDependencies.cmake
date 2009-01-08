@@ -14,6 +14,7 @@ endif(LINUX)
 
 if(WIN32)
     find_package(PTHREADVC)
+    find_package( DirectX )
 endif(WIN32)
 
 if(OSX)

@@ -167,9 +167,6 @@ namespace asl {
 //#define PROFILING_LEVEL_NORMAL 1
 //#define PROFILING_LEVEL_FULL 1
 
-namespace asl {
-	void initialize();
-} // namespace asl
 
 #define DESTRACE(x) //x
 
@@ -181,6 +178,7 @@ namespace asl {
 #   define AC_DLL_EXPORT
 #   define AC_DLL_IMPORT
 #endif
+
 
 #endif // _included_asl_settings_
 

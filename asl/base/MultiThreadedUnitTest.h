@@ -126,13 +126,13 @@ namespace asl {
                 MyThread _myThread;
         };
 
-    class MultiThreadedTestSuite : public UnitTestSuite {
+    class ASL_BASE_EXPORT MultiThreadedTestSuite : public UnitTestSuite {
         public:
             MultiThreadedTestSuite(const char * theName, int argc, char *argv[]) : UnitTestSuite(theName, argc, argv) {  }
             virtual void run();
     };
 
-    class CatchingUnitTestSuite : public UnitTestSuite {
+    class ASL_BASE_EXPORT CatchingUnitTestSuite : public UnitTestSuite {
         public:
             CatchingUnitTestSuite(const char * theName, int argc, char *argv[]) : UnitTestSuite(theName, argc, argv) {  }
             virtual void run();

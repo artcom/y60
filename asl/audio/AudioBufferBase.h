@@ -41,6 +41,8 @@
 #ifndef INCL_AUDIOBUFFERBASE
 #define INCL_AUDIOBUFFERBASE
 
+#include "asl_audio_settings.h"
+
 #include "SampleFormat.h"
 
 #include <asl/base/Ptr.h>
@@ -53,7 +55,7 @@
 
 namespace asl {
 
-class AudioBufferBase {
+class ASL_AUDIO_EXPORT AudioBufferBase {
     public:
         AudioBufferBase();
         virtual ~AudioBufferBase();

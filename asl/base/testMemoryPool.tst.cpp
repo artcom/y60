@@ -19,7 +19,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "settings.h"
+#include "initialization.h"
 #include "MemoryPool.h"
 #include "MultiThreadedUnitTest.h"
 #include "string_functions.h"

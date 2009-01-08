@@ -41,6 +41,8 @@
 #ifndef _y60_SvgPath_h_
 #define _y60_SvgPath_h_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "BSpline.h"
 #include "Line.h"
@@ -60,7 +62,7 @@ namespace asl {
      *   - linear path segments are now stored as bezier snippets, too.
      *  
      */
-    class SvgPath {
+    class ASL_MATH_EXPORT SvgPath {
     public:
         /**
          * Point-on-path.

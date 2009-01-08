@@ -399,7 +399,7 @@ class AudioBuffer: public AudioBufferBase {
         unsigned _mySampleRate;
 };
 
-AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFrames,
+ASL_AUDIO_EXPORT AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFrames,
         unsigned numChannels, unsigned mySampleRate);
 
 template<>

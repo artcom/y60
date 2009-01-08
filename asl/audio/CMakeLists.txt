@@ -56,7 +56,8 @@ endif(LINUX)
 if(WIN32)
     set(SOURCES ${SOURCES} DirectSoundPump.cpp)
     set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
-	list( APPEND EXTERNS PTHREADVC )
+    set(WINMM_LIBRARIES Winmm ) #  XXX
+    list( APPEND EXTERNS PTHREADVC WINMM DIRECTX )
 endif(WIN32)
 
 ac_add_library(

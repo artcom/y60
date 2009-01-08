@@ -41,6 +41,8 @@
 #ifndef INCL_EFFECT
 #define INCL_EFFECT
 
+#include "asl_audio_settings.h"
+
 #include "AudioBuffer.h"
 #include "SampleFormat.h"
 
@@ -57,7 +59,7 @@ class EffectFunctorBase {
 /**
  * Mostly-abstract base class for Effects.
  */
-class Effect {
+class ASL_AUDIO_EXPORT Effect {
 public:
     Effect(asl::Ptr<EffectFunctorBase> myFunctor);
     virtual ~Effect() {}
@@ -110,7 +112,7 @@ asl::Ptr<EffectFunctorBase> createEffectFunctor(SampleFormat theSampleFormat) {
 /**
  * NullEffect that effectively does not affect anybody.
  */
-class NullEffect: public Effect {
+class ASL_AUDIO_EXPORT NullEffect: public Effect {
 public:
     NullEffect(SampleFormat theSampleFormat);
         

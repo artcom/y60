@@ -42,6 +42,8 @@
 #ifndef ASL_SERIAL_DEVICE_FACTORY_INCLUDED
 #define ASL_SERIAL_DEVICE_FACTORY_INCLUDED
 
+#include "asl_serial_settings.h"
+
 #include <string>
 
 namespace asl {
@@ -57,7 +59,7 @@ namespace asl {
      * the returned object.
      * @param theIndex Zero based index of serial port (0 gives COM1/ttyS0)
      */
-    SerialDevice * getSerialDevice(unsigned int theIndex);
+    ASL_SERIAL_EXPORT SerialDevice * getSerialDevice(unsigned int theIndex);
     /*! This function creates a new serial device. The returned object is 
      * either of type TTYPort (*nix like systems) or ComPort (Win32),
      * depending on the platform. The application is responsible to delete
@@ -65,7 +67,7 @@ namespace asl {
      * @param theDevice The name of the device to use. Usefull for stuff like
      *                  /dev/ttyUSB0
      */
-    SerialDevice * getSerialDeviceByName(const std::string & theDevice);
+    ASL_SERIAL_EXPORT SerialDevice * getSerialDeviceByName(const std::string & theDevice);
 
     /* @} */
 }

@@ -41,7 +41,7 @@
 #ifndef _included_asl_AtomicCount_
 #define _included_asl_AtomicCount_
 
-#include "settings.h"
+#include "asl_base_settings.h"
 
 #include <iostream>
 
@@ -430,7 +430,7 @@ namespace asl
     template <class Threading> class AtomicCount;
 
     template <>
-    class AtomicCount<SingleThreaded> {
+    class ASL_BASE_EXPORT AtomicCount<SingleThreaded> {
         public:
             explicit AtomicCount(long v) {
 				value = v;

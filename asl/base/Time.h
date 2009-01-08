@@ -53,6 +53,8 @@
 #ifndef included_asl_Time_h
 #define included_asl_Time_h
 
+#include "asl_base_settings.h"
+
 #include "TimeStreamFormater.h"
 #include "Exception.h"
 #include "settings.h"
@@ -124,7 +126,7 @@ namespace asl {
          * Wrapper around a milliseconds precise time.
          *
          */
-        class Time {
+        class ASL_BASE_EXPORT Time {
         private:
 #ifdef WIN32
         static const long long SECS_BETWEEN_EPOCHS = 11644473600;

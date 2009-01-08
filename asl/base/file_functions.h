@@ -81,7 +81,7 @@ ASL_BASE_EXPORT std::string getAppDirectory();
 /// returns true if theDirectory is a readable directory, false otherwise
 ASL_BASE_EXPORT bool isDirectory(const std::string & theDirectory);
 /// converts backslashes to slashes & reduces double slashes to single slashes.
-std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
+ASL_BASE_EXPORT std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
 
 /// returns the current working directory
 std::string getCWD();
@@ -118,7 +118,7 @@ ASL_BASE_EXPORT std::string getHostPortPart(const std::string & theURI);
 ASL_BASE_EXPORT std::string getHostPart(const std::string & theURI);
 
 /// splits a delimited path list (semicolon or colon delimited) into its components
-unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::string> & thePathVector);
+ASL_BASE_EXPORT unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::string> & thePathVector);
 
 /// return relative path from base directory to absolute path.
 ASL_BASE_EXPORT std::string evaluateRelativePath(const std::string & theBaseDirectory, const std::string & theAbsolutePath, bool theForceRelativePathFlag = false);

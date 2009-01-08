@@ -24,6 +24,8 @@
 #ifndef _xml_Events_h_included_
 #define _xml_Events_h_included_
 
+#include "asl_dom_settings.h"
+
 #include <asl/base/settings.h>
 #include "typedefs.h"
 #include <map>
@@ -35,9 +37,9 @@ namespace dom {
 
     // Introduced in DOM Level 2:
 
-    extern const char * PhaseTypeName[];
+    ASL_DOM_EXPORT extern const char * PhaseTypeName[];
 
-    class Event {
+    class ASL_DOM_EXPORT Event {
     public:
         // PhaseType
         enum PhaseType { CAPTURING_PHASE                = 1,
@@ -91,7 +93,7 @@ namespace dom {
     };
 
     // Introduced in DOM Level 2:
-    class EventTarget {
+    class ASL_DOM_EXPORT EventTarget {
     public:
         virtual ~EventTarget() {}
         virtual void addEventListener(const DOMString & type, 
@@ -271,7 +273,7 @@ namespace dom {
         asl::Ptr<AC_PAYLOAD_TPL> _myPayload;
     };
 
-    class EventFactory {
+    class ASL_DOM_EXPORT EventFactory {
     public:
 		EventFactory();
 		EventPtr createEvent(const DOMString & theType) const;
@@ -282,7 +284,7 @@ namespace dom {
 		ProtoMap _myPrototypes;
 	};
 
-	extern void registerStandardTypes(EventFactory & theFactory);
+	ASL_DOM_EXPORT extern void registerStandardTypes(EventFactory & theFactory);
 
     inline
     EventFactory &

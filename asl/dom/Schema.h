@@ -24,6 +24,8 @@
 #ifndef _xml_Schema_h_included_
 #define _xml_Schema_h_included_
 
+#include "asl_dom_settings.h"
+
 #include "Nodes.h"
 #include "SchemaStrings.h"
 
@@ -53,7 +55,7 @@ namespace dom {
 /*! \addtogroup aslxml */
 /* @{ */
 
-class Schema : public DocumentFragment {
+class ASL_DOM_EXPORT Schema : public DocumentFragment {
 	public:
 		DEFINE_NESTED_EXCEPTION(dom::Schema,Exception,asl::Exception);
 		DEFINE_NESTED_EXCEPTION(dom::Schema,DuplicateDeclaration,Exception);

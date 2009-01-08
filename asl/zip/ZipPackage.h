@@ -23,12 +23,14 @@
 #ifndef __asl__ZipPackage_h_included__
 #define __asl__ZipPackage_h_included__
 
+#include "asl_zip_settings.h"
+
 #include "IPackage.h"
 #include "ZipReader.h"
 
 namespace asl {
 
-class ZipPackage : public IPackage {
+class ASL_ZIP_EXPORT ZipPackage : public IPackage {
     public:
         ZipPackage(const std::string & theZipReader);
         ~ZipPackage();

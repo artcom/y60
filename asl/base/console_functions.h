@@ -46,6 +46,8 @@
 #ifndef _included_asl_console_functions_h_
 #define _included_asl_console_functions_h_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 
 #include <iostream>
@@ -56,13 +58,13 @@ namespace asl {;
 /* @{ */
     bool isTTY(std::ostream & os);
 
-    std::ostream & TTYGREEN (std::ostream & os );
+    ASL_BASE_EXPORT std::ostream & TTYGREEN (std::ostream & os );
 
-    std::ostream & TTYRED (std::ostream & os );
-    std::ostream & TTYYELLOW (std::ostream & os );
-    std::ostream & TTYBLUE (std::ostream & os );
+    ASL_BASE_EXPORT std::ostream & TTYRED (std::ostream & os );
+    ASL_BASE_EXPORT std::ostream & TTYYELLOW (std::ostream & os );
+    ASL_BASE_EXPORT std::ostream & TTYBLUE (std::ostream & os );
 
-    std::ostream & ENDCOLOR (std::ostream & os );
+    ASL_BASE_EXPORT std::ostream & ENDCOLOR (std::ostream & os );
 /* @} */
 }
 

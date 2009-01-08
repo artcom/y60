@@ -21,6 +21,8 @@
 #ifndef _xml_Facade_h_
 #define _xml_Facade_h_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include "NodeList.h"
 #include "Value.h"
@@ -42,7 +44,7 @@ namespace dom {
     typedef asl::Ptr<Facade,ThreadingModel> FacadePtr;
     typedef asl::WeakPtr<Facade,ThreadingModel> FacadeWeakPtr;
 
-    class Facade : public TypedNamedNodeMap {
+    class ASL_DOM_EXPORT Facade : public TypedNamedNodeMap {
         public:
             DEFINE_NESTED_EXCEPTION(Facade, Exception, asl::Exception);
             DEFINE_NESTED_EXCEPTION(Facade, InvalidNullPointerPassed, Exception);
@@ -162,7 +164,7 @@ namespace dom {
                      this->_myParentName < second._myParentName) );
         }
     };
-    class FacadeFactory {
+    class ASL_DOM_EXPORT FacadeFactory {
         public:
             FacadeFactory() {};
             Facade * createFacade(const DOMString & theType, Node & theNode,

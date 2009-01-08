@@ -24,6 +24,8 @@
 #ifndef _xml_NodeList_h_included_
 #define _xml_NodeList_h_included_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include "Dictionary.h"
 #include <asl/base/Block.h>
@@ -41,7 +43,7 @@ namespace dom {
        with the original dom IDRRegistry.
     */
 
-    class NodeList {
+    class ASL_DOM_EXPORT NodeList {
     private:
         typedef std::vector<NodePtr> _myNodeListType;
     public:
@@ -89,7 +91,7 @@ namespace dom {
         _myNodeListType _myNodes;
     };
 
-    class NamedNodeMap : public NodeList {
+    class ASL_DOM_EXPORT NamedNodeMap : public NodeList {
     public:
         friend class Node;
 
@@ -113,7 +115,7 @@ namespace dom {
         NodePtr appendWithoutReparenting(NodePtr theNewNode);
     };
 
-    class TypedNamedNodeMap : public NamedNodeMap {
+    class ASL_DOM_EXPORT TypedNamedNodeMap : public NamedNodeMap {
     public:
         friend class Node;
 

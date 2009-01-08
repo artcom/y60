@@ -18,6 +18,8 @@
 #ifndef _ASL_PATH_INCLUDED_
 #define _ASL_PATH_INCLUDED_
 
+#include "asl_base_settings.h"
+
 #include "string_functions.h"
 
 #include <iostream>
@@ -32,7 +34,7 @@
 
 namespace asl {
 
-class Path {
+class ASL_BASE_EXPORT Path {
 public:
     Path();
     Path(const char * theString, StringEncoding theEncoding);
@@ -55,7 +57,7 @@ private:
     void free();
 };
 
-std::ostream & operator << (std::ostream & os, const asl::Path & thePath);
+ASL_BASE_EXPORT std::ostream & operator << (std::ostream & os, const asl::Path & thePath);
 
 }
 

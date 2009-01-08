@@ -54,6 +54,8 @@
 #if !defined(XPATH_API_H)
 #define XPATH_API_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include <vector>
 /**********************************************************************************************/
@@ -71,7 +73,7 @@ namespace xpath {
 
     dom::NodePtr find(const Path&, const dom::NodePtr);
 
-    void findAll(const Path&, const dom::NodePtr, NodeList&);
+    ASL_XPATH_EXPORT void findAll(const Path&, const dom::NodePtr, NodeList&);
 
     NodeList findAll(const Path&, const dom::NodePtr);
 

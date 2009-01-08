@@ -103,6 +103,8 @@ needs to be added; exposing the file descriptor should be enough to do that.
 #ifndef AC_STATION_H_INCLUDED
 #define AC_STATION_H_INCLUDED
 
+#include "asl_net_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/base/Block.h>
@@ -130,7 +132,7 @@ needs to be added; exposing the file descriptor should be enough to do that.
 #include <vector>
 #include <algorithm>
 
-class Station {
+class ASL_NET_EXPORT Station {
 public:
     DEFINE_NAMED_EXCEPTION(Exception,Station::Exception,asl::Exception);
     DEFINE_NAMED_EXCEPTION(SocketFailed,Station::SocketFailed,Exception);

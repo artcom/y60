@@ -54,6 +54,8 @@
 #if !defined(XPATH_PATH_H)
 #define XPATH_PATH_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include <string>
 #include <iosfwd>
@@ -75,7 +77,7 @@ namespace xpath {
     ** 
     ** Paths are immutable and cheap to copy. 
     */
-    class Path {
+    class ASL_XPATH_EXPORT Path {
     public:
         struct StepList;
     

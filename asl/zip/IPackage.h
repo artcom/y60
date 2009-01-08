@@ -23,6 +23,8 @@
 #ifndef __asl__IPackage_h_included__
 #define __asl__IPackage_h_included__
 
+#include "asl_zip_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/base/Block.h>
@@ -35,7 +37,7 @@ DEFINE_EXCEPTION(PackageException, asl::Exception);
 /* @{ */
 
 /// interface for file packages
-class IPackage {
+class ASL_ZIP_EXPORT IPackage {
     public:
         typedef std::vector<std::string> FileList;
 

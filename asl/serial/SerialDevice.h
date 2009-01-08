@@ -41,6 +41,8 @@
 #ifndef ASL_SERIAL_DEVICE_INCLUDED
 #define ASL_SERIAL_DEVICE_INCLUDED
 
+#include "asl_serial_settings.h"
+
 #include <asl/base/Enum.h>
 #include <asl/base/Exception.h>
 #include <string>
@@ -55,7 +57,7 @@ namespace asl {
      * getSerialDevice() or getSerialDeviceByName() to obtain the right
      * object for the current platform.
      */
-    class SerialDevice {
+    class ASL_SERIAL_EXPORT SerialDevice {
         public:
             virtual ~SerialDevice();
 
@@ -67,7 +69,7 @@ namespace asl {
                 ParityModeEnum_MAX
             };
 
-            DEFINE_ENUM( ParityMode, ParityModeEnum );
+            DEFINE_ENUM( ParityMode, ParityModeEnum, ASL_SERIAL_EXPORT );
 
             /// Status line bits.
             enum StatusBits {

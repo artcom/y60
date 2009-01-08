@@ -40,12 +40,14 @@
 #ifndef INCL_TESTSOCKETS
 #define INCL_TESTSOCKETS
 
+#include "asl_net_settings.h"
+
 #include <string>
 #include <asl/base/UnitTest.h>
 
 #include "TCPServer.h"
 
-class TestSocket: public UnitTest{
+class ASL_NET_EXPORT TestSocket: public UnitTest{
     public:
         TestSocket ()
             : UnitTest("TestSocket") {}

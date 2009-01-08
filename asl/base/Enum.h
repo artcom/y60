@@ -42,6 +42,8 @@
 #ifndef _asl_base_Enum_h_included_
 #define _asl_base_Enum_h_included_
 
+//#include "asl_base_settings.h"
+
 #include "Exception.h"
 #include "settings.h"
 
@@ -135,7 +137,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * }
  * @endcode
  */
-template <class ENUM, int THE_MAX>
+template <class ENUM, int THE_MAX >
 class Enum {
     public:
         typedef ENUM Native;
@@ -162,7 +164,7 @@ class Enum {
             MAX = THE_MAX
         };
         ENUM max() const {
-            return THE_MAX;
+            return ENUM(THE_MAX);
         }
         /** Converts @p theString to an enum. 
          * @throw IllegalEnumValue @p theString is not a legal identifier.
@@ -261,6 +263,7 @@ class Enum {
         static const char * _ourName ;
         static bool  _ourVerifiedFlag; 
 };
+
 
 #define BIT( theBit ) (1 << theBit )
 
@@ -389,7 +392,8 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
 /** Helper macro. Creates a typedef.
  * @relates asl::Enum
  */
-#define DEFINE_ENUM( THE_NAME, THE_ENUM) \
+#define DEFINE_ENUM( THE_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
+    template class DLL_EXPORT_TOKEN asl::Enum<THE_ENUM, THE_ENUM ## _MAX>; \
     typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
 
 /** Helper macro. Creates a typedef.

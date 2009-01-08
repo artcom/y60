@@ -53,7 +53,7 @@
 #ifndef _asl_ReadWriteLock_h_included_
 #define _asl_ReadWriteLock_h_included_
 
-#include "settings.h"
+#include "asl_base_settings.h"
 #include "Exception.h"
 #include "Logger.h"
 #include <pthread.h>
@@ -77,7 +77,7 @@ namespace asl {
             bool _myWriteLockFlag;
     };
 
-    class ReadWriteLock {
+    class ASL_BASE_EXPORT ReadWriteLock {
         public:
             DEFINE_NAMED_EXCEPTION(Exception,ReadWriteLock::Exception,asl::Exception);
 

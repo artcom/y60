@@ -11,6 +11,7 @@ XmlSchemaString.cpp
 )
 
 set(HEADERS
+asl_dom_settings.h
 AttributePlug.h
 ChildNodePlug.h
 Dictionary.h

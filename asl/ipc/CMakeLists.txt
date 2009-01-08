@@ -2,10 +2,10 @@
 set(SOURCES
 SocketPolicy.cpp
 TCPPolicy.cpp
-UnixSocketPolicy.cpp
 )
 
 set(HEADERS
+asl_ipc_settings.h
 ConduitAcceptor.h
 Conduit.h
 ConduitPolicy.h
@@ -16,7 +16,6 @@ MessageServer.h
 SocketPolicy.h
 TCPPolicy.h
 ThreadedConduit.h
-UnixSocketPolicy.h
 )
 
 set(TESTS
@@ -27,6 +26,13 @@ if(WIN32)
     set(SOURCES ${SOURCES} NamedPipePolicy.cpp)
     set(HEADERS ${HEADERS} NamedPipePolicy.h)
 	list( APPEND EXTERNALS PTHREADVC )
+else(WIN32)
+    set(SOURCES
+    UnixSocketPolicy.cpp
+    )
+    set(HEADERS
+    UnixSocketPolicy.h
+    )
 endif(WIN32)
 
 ac_add_library(

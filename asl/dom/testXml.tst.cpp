@@ -45,6 +45,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <asl/base/initialization.h>
 #include <asl/base/Time.h>
 #include <asl/base/file_functions.h>
 #include <asl/math/numeric_functions.h>

@@ -23,6 +23,8 @@
 #ifndef __asl_zipwriter_included_
 #define __asl_zipwriter_included_
 
+#include "asl_zip_settings.h"
+
 #include <asl/base/Stream.h>
 #include <asl/base/Block.h>
 #include <string>
@@ -31,7 +33,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(ZipWriterException, asl::Exception);
     
-class ZipWriter {
+class ASL_ZIP_EXPORT ZipWriter {
     public:
         ZipWriter(const char * theOutputFileName);
         ZipWriter(const std::string & theOutputFileName);

@@ -49,6 +49,8 @@
 #ifndef _ac_base_ThreadSemaphore_h_
 #define _ac_base_ThreadSemaphore_h_
 
+#include "asl_base_settings.h"
+
 #include <pthread.h>
 #include "Exception.h"
 
@@ -62,7 +64,7 @@ namespace asl {
      * is 0, a call to wait blocks until the semaphore is incremented
      * from somewhere else.
      */
-    class ThreadSemaphore {
+    class ASL_BASE_EXPORT ThreadSemaphore {
     public:
         enum {
             WAIT_INFINITE = ~0  ///< Wait forever or until the condition is met

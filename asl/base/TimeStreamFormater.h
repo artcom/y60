@@ -80,11 +80,11 @@ class ASL_BASE_EXPORT TimeStreamFormater {
         const char * _myFormatString;
 };
 
-TimeStreamFormater
+ASL_BASE_EXPORT TimeStreamFormater
 formatTime(const char * theFormatString);
 
-std::ostream &
-operator << (std::ostream & theStream, const TimeStreamFormater & theFormater);
+ASL_BASE_EXPORT std::ostream &
+operator<< (std::ostream & theStream, const TimeStreamFormater & theFormater);
 
 }
 

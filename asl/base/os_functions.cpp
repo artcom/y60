@@ -46,14 +46,14 @@ using namespace std;
 
 namespace asl {
 
-    template bool get_environment_var_as(const std::string & theVariable, double& theValue);
-    template bool get_environment_var_as(const std::string & theVariable, int& theValue);
-    template bool get_environment_var_as(const std::string & theVariable, 
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, double& theValue);
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, int& theValue);
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, 
             unsigned int& theValue);
-    template bool get_environment_var_as(const std::string & theVariable, string& theValue);
-    template bool get_environment_var_as(const std::string & theVariable, 
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, string& theValue);
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, 
             asl::Unsigned16& theValue);
-    template bool get_environment_var_as(const std::string & theVariable, bool& theValue);
+    template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, bool& theValue);
 
 #ifdef WIN32
     // This is executed once on program start.

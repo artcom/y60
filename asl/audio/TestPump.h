@@ -41,6 +41,8 @@
 #ifndef INCL_TESTPUMP
 #define INCL_TESTPUMP
 
+#include "asl_audio_settings.h"
+
 #ifdef _MSC_VER
 // For M_PI
 #define _USE_MATH_DEFINES 
@@ -53,7 +55,7 @@
 #include <string>
 #include <asl/base/UnitTest.h>
 
-class TestPump: public UnitTest{
+class ASL_AUDIO_EXPORT TestPump: public UnitTest{
     public:
         TestPump (const char * myName)
             : UnitTest(myName) {}

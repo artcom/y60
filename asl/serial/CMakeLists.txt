@@ -7,6 +7,7 @@ uCCP.cpp
 )
 
 set(HEADERS
+asl_serial_settings.h
 CRC8.h
 DebugPort.h
 SerialDeviceFactory.h

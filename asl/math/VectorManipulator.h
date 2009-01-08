@@ -86,16 +86,16 @@ class ASL_MATH_EXPORT FixedVectorStreamFormatter {
         bool       _myOneElementPerLineFlag; 
 };
 
-FixedVectorStreamFormatter
+ASL_MATH_EXPORT FixedVectorStreamFormatter
 formatFixedVector(const char theStartToken, 
                   const char theEndToken, 
                   const char theDelimiter, 
                   bool theOneElementPerLineFlag);
 
-std::ostream &
+ASL_MATH_EXPORT std::ostream &
 operator << (std::ostream & theStream, const FixedVectorStreamFormatter & theFormatter);
 
-std::istream &
+ASL_MATH_EXPORT std::istream &
 operator >> (std::istream & theStream, const FixedVectorStreamFormatter & theFormatter);
 
 }

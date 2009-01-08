@@ -40,6 +40,8 @@
 #ifndef INCL_INET_SOCKET
 #define INCL_INET_SOCKET
 
+#include "asl_net_settings.h"
+
 #include "SocketException.h"
 #include "INetEndpoint.h"
 #include "address.h"
@@ -59,7 +61,7 @@ const int MAX_UDP_PACKET_SIZE = 1472;
  *  Low-Level Socket operations.
  *
  **/
-class Socket {
+class ASL_NET_EXPORT Socket {
     public:
         /// creates a new socket with local endpoint on theport and interface thehost.
         Socket(asl::Unsigned32 thehost, asl::Unsigned16 theport);

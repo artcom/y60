@@ -13,6 +13,8 @@
 #ifndef _xml_Value_h_
 #define _xml_Value_h_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include "Exceptions.h"
 #include "Dictionary.h"
@@ -373,7 +375,7 @@ namespace dom {
         virtual const std::type_info & getTypeInfo() const {
             return typeid(DOMString);
         }
-        virtual void bumpVersion();
+        ASL_DOM_EXPORT virtual void bumpVersion();
         virtual void binarize(asl::WriteableStream & theDest) const {
             onGetValue();
             theDest.appendCountedString(_myStringValue);
@@ -509,7 +511,7 @@ namespace dom {
 
     struct UniqueId {
         friend class Node;
-        friend std::ostream & operator<<(std::ostream& os, const UniqueId & uid);
+        friend ASL_DOM_EXPORT std::ostream & operator<<(std::ostream& os, const UniqueId & uid);
         
         UniqueId() : _myCount(_myCounter++), _ptrValue((ptrdiff_t)this)
         { }
@@ -553,7 +555,7 @@ namespace dom {
         static asl::Unsigned32 _myCounter;
     };
 
-    std::ostream& operator<<(std::ostream& os, const UniqueId & uid);
+    ASL_DOM_EXPORT std::ostream& operator<<(std::ostream& os, const UniqueId & uid);
 
     class NodeOffsetCatalog;
 
@@ -621,7 +623,7 @@ namespace dom {
     };
 
     // collects node offsets during serialization to provide fast random access by id into binarized doms (.b60 files)
-    class NodeOffsetCatalog {
+    class ASL_DOM_EXPORT NodeOffsetCatalog {
         public:
             typedef std::map<DOMString, asl::Unsigned64> IDMap;
             typedef std::map<DOMString, IDMap> IDMaps;
@@ -1969,7 +1971,7 @@ namespace dom {
     // A prototype-based factory to create Value-types based on a type name
     // and giving a text oder binary representation to initialize the boxed
     // native value.
-    class ValueFactory {
+    class ASL_DOM_EXPORT ValueFactory {
     public:
         ValueFactory();
         ValuePtr createValue(const DOMString & theType, Node * theNode) const;
@@ -1999,7 +2001,7 @@ namespace dom {
 
     typedef asl::Ptr<ValueFactory> ValueFactoryPtr;
 
-    extern void registerStandardTypes(ValueFactory & theFactory);
+    ASL_DOM_EXPORT extern void registerStandardTypes(ValueFactory & theFactory);
 
     /* @} */
 } //Namespace dom

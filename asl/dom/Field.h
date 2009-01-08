@@ -24,6 +24,8 @@
 #ifndef _xml_Field_h_
 #define _xml_Field_h_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include "Exceptions.h"
 #include <vector>
@@ -68,7 +70,7 @@ namespace dom {
     class Connector;
     class Facade;
 
-    class Field {
+    class ASL_DOM_EXPORT Field {
         friend class ValueFactory;
         friend class Connector;
         friend class Facade;

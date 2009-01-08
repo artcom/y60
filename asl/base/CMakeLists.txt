@@ -7,6 +7,7 @@ Dashboard.cpp
 Exception.cpp
 ExitHandler.cpp
 file_functions.cpp
+initialization.cpp
 Logger.cpp
 LogMessageFormatters.cpp
 LogMessageSinks.cpp
@@ -20,7 +21,6 @@ proc_functions.cpp
 Ptr.cpp
 ReadWriteLock.cpp
 Revision.cpp
-
 SingletonManager.cpp
 StackTrace.cpp
 StdOutputRedirector.cpp
@@ -33,7 +33,6 @@ Time.cpp
 TimeStreamFormater.cpp
 TraceUtils.cpp
 UnitTest.cpp
-settings.cpp
 )
 
 set(HEADERS
@@ -54,6 +53,7 @@ Exception.h
 ExitHandler.h
 file_functions.h
 GarbageCollector.h
+initialization.h
 ITimeSource.h
 Logger.h
 LogMessageFormatters.h

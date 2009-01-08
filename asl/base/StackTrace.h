@@ -41,6 +41,8 @@
 #ifndef STACK_TRACE_INCLUDED
 #define STACK_TRACE_INCLUDED
 
+#include "asl_base_settings.h"
+
 #ifdef LINUX
 #include "GlibcBacktrace.h"
 #elif defined( OSX )
@@ -59,7 +61,7 @@ namespace asl {
  * StackTrace instead.
  */
 template <class TRACE_POLICY>
-class StackTracer {
+class ASL_BASE_EXPORT StackTracer {
     public:
         StackTracer();
 

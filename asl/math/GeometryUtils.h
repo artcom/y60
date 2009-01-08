@@ -41,6 +41,8 @@
 #ifndef _asl_geometryUtils_h_
 #define _asl_geometryUtils_h_
 
+#include "asl_math_settings.h"
+
 #include "linearAlgebra.h"
 
 #include <vector>
@@ -208,7 +210,7 @@ namespace asl {
 	}
 
 
-    double calculatePolyhedraVolume(const std::vector<Point3f> & theTriangleVertices);
+    ASL_MATH_EXPORT double calculatePolyhedraVolume(const std::vector<Point3f> & theTriangleVertices);
     /* @} */
 };
 

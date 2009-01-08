@@ -40,6 +40,8 @@
 #ifndef __asl_ConduitPolicy_included
 #define __asl_ConduitPolicy_included
 
+#include "asl_ipc_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/base/Block.h>
@@ -67,7 +69,7 @@ typedef std::deque<CharBufferPtr> BufferQueue;
   message-based communication with asl::Block based payloads) to provide Messages-over-tcp (MessageAcceptor<TCPPolicy>)
   or Messages-over-Named Pipes (MessageAcceptor<NamedPipePolicy>).
 **/
-class ConduitPolicy {
+class ASL_IPC_EXPORT ConduitPolicy {
     public:
 //        enum State { COMPLETED, PENDING, NO_CONNECTION };
         

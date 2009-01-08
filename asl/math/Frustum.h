@@ -49,6 +49,8 @@
 #ifndef AC_ASL_FRUSTUM_INCLUDED
 #define AC_ASL_FRUSTUM_INCLUDED
 
+#include "asl_math_settings.h"
+
 #include "Plane.h"
 #include "Point234.h"
 #include "Matrix4.h"
@@ -69,7 +71,7 @@ enum ProjectionTypeEnum {
 };
 
 /** @relates Frustum */
-DEFINE_ENUM( ProjectionType, ProjectionTypeEnum );
+DEFINE_ENUM( ProjectionType, ProjectionTypeEnum, ASL_MATH_EXPORT );
 
 /** @relates Frustum
  * The resize olicy is used to change the aspect ratio of the frustum if the viewports
@@ -87,10 +89,10 @@ enum ResizePolicyEnum {
     ResizePolicyEnum_MAX
 };
 
-DEFINE_ENUM(ResizePolicy, ResizePolicyEnum);   
+DEFINE_ENUM(ResizePolicy, ResizePolicyEnum, ASL_MATH_EXPORT);   
 
 /** This class models perspective and orthonormal viewing volumes. */
-class Frustum {
+class ASL_MATH_EXPORT Frustum {
     public:
         Frustum();
         Frustum(const Frustum & otherFrustum);
@@ -212,7 +214,7 @@ bool
 intersection(const asl::Box3f & theBox, const Frustum & theFrustum);
 
 /// intersect also returns partial overlap - used in culling
-bool
+ASL_MATH_EXPORT bool
 intersection(const asl::Box3f & theBox, const Frustum & theFrustum, bool & theOverlapFlag);
 
 std::ostream & operator << (std::ostream & os, const Frustum & theFrustum);

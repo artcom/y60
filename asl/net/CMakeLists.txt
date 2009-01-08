@@ -20,6 +20,7 @@ UDPSocket.cpp
 
 set(HEADERS
 address.h
+asl_net_settings.h
 Hop.h
 INetEndpoint.h
 INetMonitor.h
@@ -43,11 +44,19 @@ _net_functions
 Station
 )
 
+list( APPEND EXTERNS CURL ZLIB )
+
+if(WIN32)
+    set(WS2_32_LIBRARIES Ws2_32 ) #  XXX
+    set(IPHLPAPI_LIBRARIES Iphlpapi )
+    list( APPEND EXTERNS WS2_32 IPHLPAPI )
+endif(WIN32)
+
 ac_add_library(
     aslnet asl/net
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS   ${TESTS}
     DEPENDS aslbase
-    EXTERNS CURL ZLIB
+    EXTERNS ${EXTERNS}
 )

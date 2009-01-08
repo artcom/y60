@@ -23,6 +23,8 @@
 #ifndef __asl_zipfile_included_
 #define __asl_zipfile_included_
 
+#include "asl_zip_settings.h"
+
 #include <asl/base/Stream.h>
 #include <asl/base/Block.h>
 #include <asl/base/Path.h>
@@ -32,7 +34,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(ZipFileException, asl::Exception);
     
-class ZipReader {
+class ASL_ZIP_EXPORT ZipReader {
     public:
         struct Entry {
             Path filename;

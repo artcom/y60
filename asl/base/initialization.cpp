@@ -38,7 +38,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "settings.h"
+#include "initialization.h"
+
 
 #if defined(WIN32)
 #   include <crtdbg.h>
@@ -55,9 +56,8 @@ namespace {
         }
 
         inline void init_platform() {
-            // disable heap checking for debug builds by default
 #           ifdef DEBUG_VARIANT
-                _CrtSetDbgFlag(0);
+                _CrtSetDbgFlag(0); // disable heap checking for debug builds by default
                 setCrtReportModeToFile(_CRT_WARN  );
                 setCrtReportModeToFile(_CRT_ERROR );
                 setCrtReportModeToFile(_CRT_ASSERT);
@@ -75,14 +75,17 @@ namespace {
 #       error Unknown Platform!
 #   endif
 
-    struct AslInitializer {
-        AslInitializer()
-        {
-            init_platform();
-        }
-    } ourAslInitializer;
 
 }
+
+
+struct AslInitializer {
+    AslInitializer()
+    {
+        init_platform();
+    }
+} ourAslInitializer;
+
 
 namespace asl {
 	void initialize() {

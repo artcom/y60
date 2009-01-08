@@ -56,4 +56,4 @@ static const char * MatrixTypeStrings[] =
     ""
 };
 
-IMPLEMENT_ENUM( asl::MatrixType, MatrixTypeStrings );
+IMPLEMENT_ENUM( asl::MatrixType, MatrixTypeStrings, ASL_MATH_EXPORT );

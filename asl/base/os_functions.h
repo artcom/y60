@@ -95,7 +95,7 @@ namespace asl {
     void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
     template <class T>
-    ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, T& theValue);
+    bool get_environment_var_as(const std::string & theVariable, T& theValue);
     
     template <class T>
     T getenv(const std::string & theVariable, const T & theDefaultValue) {

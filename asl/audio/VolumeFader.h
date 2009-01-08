@@ -41,6 +41,8 @@
 #ifndef INCL_ASL_VOLUMEFADER_H
 #define INCL_ASL_VOLUMEFADER_H
 
+#include "asl_audio_settings.h"
+
 #include "Effect.h"
 
 #include <asl/base/settings.h>
@@ -48,7 +50,7 @@
 
 namespace asl {
 
-class VolumeFader: public Effect {
+class ASL_AUDIO_EXPORT VolumeFader: public Effect {
 public:
     static const unsigned DEFAULT_FADE_FRAMES = 200;
     VolumeFader(SampleFormat theSampleFormat); 

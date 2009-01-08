@@ -16,6 +16,7 @@ zip.c
 )
 
 set(HEADERS
+asl_zip_settings.h
 # aslzip source
 DirectoryPackage.h
 IPackage.h
@@ -32,11 +33,17 @@ set(TESTS
 ZipFile
 )
 
+list( APPEND EXTERNALS ZLIB )
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)	
+
 ac_add_library(
     aslzip asl/zip
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS   ${TESTS}
     DEPENDS aslbase
-    EXTERNS ZLIB
+    EXTERNS ${EXTERNALS}
 )

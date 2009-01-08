@@ -42,6 +42,8 @@
 #ifndef INCL_INET_TCPSERVER
 #define INCL_INET_TCPSERVER
 
+#include "asl_net_settings.h"
+
 #include "TCPSocket.h"
 #include "INetEndpoint.h"
 
@@ -71,7 +73,7 @@ namespace inet {
      * delete mySocket; // disconnect from the client
      * @endcode
      */
-    class TCPServer {
+    class ASL_NET_EXPORT TCPServer {
         public:
             /// creates a new TCPServer listening on port theport on address fromhost.
             TCPServer(asl::Unsigned32 myHost, asl::Unsigned16 myPort, bool theReusePortFlag=false);

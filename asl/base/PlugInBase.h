@@ -42,6 +42,8 @@
 #ifndef _PLUGIN_BASE_INCLUDED_
 #define _PLUGIN_BASE_INCLUDED_
 
+#include "asl_base_settings.h"
+
 #include <iostream>
 
 #include "SingletonManager.h"
@@ -63,7 +65,7 @@
 
 namespace asl {
 
-class PlugInBase {
+class ASL_BASE_EXPORT PlugInBase {
 public:
 	PlugInBase(DLHandle theDLHandle);
 	virtual ~PlugInBase() {}

@@ -41,12 +41,14 @@
 #ifndef INCL_INET_NET
 #define INCL_INET_NET
 
+#include "asl_net_settings.h"
+
 #include <string>
 
 namespace inet {
-    void initSockets();
-    void terminateSockets();
-    int getLastSocketError();
-    std::string getSocketErrorMessage(int ErrorID);
+    ASL_NET_EXPORT void initSockets();
+    ASL_NET_EXPORT void terminateSockets();
+    ASL_NET_EXPORT int getLastSocketError();
+    ASL_NET_EXPORT std::string getSocketErrorMessage(int ErrorID);
 }
 #endif

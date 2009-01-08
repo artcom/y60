@@ -41,6 +41,8 @@
 #ifndef INCL_SAMPLEFORMAT
 #define INCL_SAMPLEFORMAT
 
+#include "asl_audio_settings.h"
+
 #include <iostream>
 
 namespace asl {
@@ -59,7 +61,7 @@ enum SampleFormat
 };
 
 unsigned getBytesPerSample(SampleFormat theSampleFormat);
-std::ostream & operator<<(std::ostream & s, SampleFormat SF); 
+ASL_AUDIO_EXPORT std::ostream & operator<<(std::ostream & s, SampleFormat SF); 
 
 }
 

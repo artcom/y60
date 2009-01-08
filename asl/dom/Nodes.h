@@ -24,6 +24,8 @@
 #ifndef _xml_Nodes_h_included_
 #define _xml_Nodes_h_included_
 
+#include "asl_dom_settings.h"
+
 #include <asl/base/settings.h>
 
 #include "typedefs.h"
@@ -159,7 +161,7 @@ namespace dom {
      * Not yet implemented node types are:
      *  - NOTATION_NODE
      */
-    class Node : public asl::PoolAllocator<Node>, public EventTarget {
+    class ASL_DOM_EXPORT Node : public asl::PoolAllocator<Node>, public EventTarget {
     protected:
          struct SchemaInfo : public asl::PoolAllocator<SchemaInfo> {
             SchemaInfo();
@@ -1385,7 +1387,7 @@ Dependent on node type allowed children are:<p>
     /** standard output operator for node type
     @see dom::Node::Parse for details
     */
-    std::istream& operator>>(std::istream& is, Node& n);
+    ASL_DOM_EXPORT std::istream& operator>>(std::istream& is, Node& n);
 
 
 
@@ -1417,7 +1419,7 @@ Dependent on node type allowed children are:<p>
     };
 
     /// use to create a document-fragment node, serving as a "invisible" root node for children
-    class DocumentFragment : public Node {
+    class ASL_DOM_EXPORT DocumentFragment : public Node {
     public:
         /// create empty document-fragment node
         DocumentFragment(Node * theParent = 0)

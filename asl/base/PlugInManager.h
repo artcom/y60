@@ -41,6 +41,8 @@
 #ifndef _PLUGIN_MANAGER_INCLUDED_
 #define _PLUGIN_MANAGER_INCLUDED_
 
+#include "asl_base_settings.h"
+
 #include <iostream>
 #include <string>
 #include <map>
@@ -58,7 +60,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(PlugInException, Exception)
 
-class PlugInManager :
+class ASL_BASE_EXPORT PlugInManager :
     public Singleton<PlugInManager>
 {
 public:
