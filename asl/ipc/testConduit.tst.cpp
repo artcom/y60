@@ -45,6 +45,8 @@
 #include "LocalPolicy.h"
 #include "MessageAcceptor.h"
 
+#include <asl/base/initialization.h>
+
 #include <asl/base/os_functions.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
@@ -346,6 +348,9 @@ public:
 
 
 int main(int argc, char *argv[]) {
+
+    asl::initialize();
+
 #ifdef LINUX
     // enable coredump in case a SIGPIPE gets through (shouldn't happen!)
     sighandler_t myReturnCode = signal( SIGPIPE , (void (*) (int)) &abort );
