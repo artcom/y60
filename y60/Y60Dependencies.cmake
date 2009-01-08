@@ -21,6 +21,7 @@ if(NOT ACSDLTTF_INTEGRATED_BUILD)
 endif(NOT ACSDLTTF_INTEGRATED_BUILD)
 
 # external dependencies
+find_package(SDL)
 find_package(GLEW)
 find_package(Cg)
 
