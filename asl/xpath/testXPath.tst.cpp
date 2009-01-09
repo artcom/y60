@@ -43,7 +43,7 @@
 #include <asl/base/UnitTest.h>
 
 #include "xpath_api.h"
-#include "Value.h"
+#include "XPathValue.h"
 
 namespace {
 

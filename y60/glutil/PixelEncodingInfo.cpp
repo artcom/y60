@@ -9,7 +9,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+// own header
 #include "PixelEncodingInfo.h"
+
 
 using namespace std;
 

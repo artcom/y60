@@ -8,10 +8,12 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+//own header
+#include "FFShader.h"
+
 #include <y60/glutil/GLUtils.h>
 #include <asl/base/Logger.h>
 
-#include "FFShader.h"
 #include <y60/glutil/glExtensions.h>
 
 #include <y60/scene/Texture.h>

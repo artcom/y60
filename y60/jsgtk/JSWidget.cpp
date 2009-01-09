@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSWidget.h"
+
 #include "JSWindow.h"
 #include "JSRenderArea.h"
 #include "jsgtk.h"

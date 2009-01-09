@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+//own header
 #include "DecoderManager.h"
+
 #include <asl/base/Logger.h>
 
 namespace y60 {

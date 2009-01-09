@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "BodyBuilder.h"
+
 #include "Body.h"
 #include <y60/base/iostream_functions.h>
 #include <y60/base/NodeNames.h>

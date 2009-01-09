@@ -56,7 +56,7 @@
 #include <asl/dom/Nodes.h>
 
 /**********************************************************************************************/
-#include "Path.h"
+#include "XPathPath.h"
 #include "PathParser.h"
 #include "xpath_api_impl.h"
 

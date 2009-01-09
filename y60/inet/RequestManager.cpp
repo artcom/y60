@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "RequestManager.h"
+
 
 #include <asl/base/string_functions.h>
 #include <asl/base/Logger.h>

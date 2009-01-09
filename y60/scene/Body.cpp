@@ -65,10 +65,12 @@
 //
 //=============================================================================
 
+// own header
+#include "Body.h"
+
 #include <asl/base/Logger.h>
 #include <asl/math/Matrix4.h>
 #include <asl/math/GeometryUtils.h>
-#include "Body.h"
 #include "Scene.h"
 #include "Primitive.h"
 

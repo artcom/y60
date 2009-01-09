@@ -39,9 +39,10 @@
 //                     explain use of this class, move example to tests
 */
 
-#include <errno.h>
-
+//own header
 #include "TCPServer.h"
+
+#include <errno.h>
 #include <asl/base/Logger.h>
 #include <asl/base/Time.h>
 

@@ -65,7 +65,9 @@
 //
 //=============================================================================
 
+// own header
 #include "Primitive.h"
+
 #include "Shape.h"
 #include "Scene.h"
 

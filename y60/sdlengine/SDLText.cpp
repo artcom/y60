@@ -68,7 +68,9 @@
 //
 //=============================================================================
 
+// own header
 #include "SDLText.h"
+
 #include <y60/gltext/TextRenderer.h>
 
 #include <asl/math/numeric_functions.h>

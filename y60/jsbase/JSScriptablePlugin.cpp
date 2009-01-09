@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSScriptablePlugin.h"
+
 #include "IFactoryPlugin.h"
 #include "JSNode.h"
 #include "ClassMapSingleton.h"

@@ -44,6 +44,7 @@
 //
 //=============================================================================
 
+//own header
 #include "TTYPort.h"
 
 #include <asl/base/string_functions.h>

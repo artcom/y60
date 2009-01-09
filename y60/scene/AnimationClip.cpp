@@ -65,7 +65,9 @@
 //
 //=============================================================================
 
+// own header
 #include "AnimationClip.h"
+
 #include "AnimationManager.h"
 
 #include <y60/base/NodeNames.h>

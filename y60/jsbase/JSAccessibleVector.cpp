@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "JSAccessibleVector.h"
+
 #include "JSNode.h"
 #include "JSWrapper.impl"
 

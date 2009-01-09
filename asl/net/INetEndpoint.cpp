@@ -39,7 +39,9 @@
 //                     explain use of this class
 */
 
+//own header
 #include "INetEndpoint.h"
+
 #include "net_functions.h"
 
 #include <string.h>

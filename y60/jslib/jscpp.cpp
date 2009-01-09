@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include <y60/glutil/GLUtils.h>
+// own header
+#include "jscpp.h"
 
+#include <y60/glutil/GLUtils.h>
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"
@@ -77,8 +79,6 @@
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
 #include "JSSerial.h"
-
-#include "jscpp.h"
 
 #include <y60/jsbase/JSSphere.h>
 #include <y60/jsbase/JSBox.h>

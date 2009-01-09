@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSStatusBar.h"
+
 #include "JSBox.h"
 #include "JSSignalProxies.h"
 #include "jsgtk.h"

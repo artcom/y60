@@ -21,7 +21,9 @@
 //
 //=============================================================================
 
+// own header
 #include "BitmapTextRenderer.h"
+
 #include "textUtilities.h"
 
 #include "Bookman72.h"

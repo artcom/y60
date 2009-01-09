@@ -36,7 +36,9 @@
 //
 //    recommendations:  delete this class 
 */
+//own header
 #include "Hop.h"
+
 #include <iostream>
 
 using namespace std;  // automatically added!

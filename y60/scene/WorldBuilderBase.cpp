@@ -69,7 +69,9 @@
 //
 //=============================================================================
 
+// own header
 #include "WorldBuilderBase.h"
+
 #include "Facades.h"
 #include <y60/base/NodeNames.h>
 #include <asl/dom/Nodes.h>

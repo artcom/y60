@@ -39,7 +39,7 @@
 */
 
 /*!
-** \file xpath/Value.h
+** \file xpath/XPathValue.h
 **
 ** \brief XPath values
 **

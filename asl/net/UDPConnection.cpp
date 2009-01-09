@@ -38,7 +38,9 @@
 //    recommendations: change namespace, styleguide conformance
 */
 
+//own header
 #include "UDPConnection.h"
+
 #include "SocketException.h"
 #include "net.h"
 

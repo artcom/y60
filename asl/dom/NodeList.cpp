@@ -20,8 +20,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "typedefs.h"
+//own header
 #include "NodeList.h"
+
+#include "typedefs.h"
 #include "Nodes.h"
 
 #include <vector>

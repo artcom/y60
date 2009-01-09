@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSVector.h"
+// own header
 #include "JSPlane.h"
+
+#include "JSVector.h"
 #include "JSLine.h"
 #include "JSWrapper.impl"
 #include <asl/math/intersection.h>

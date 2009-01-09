@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "QuitFlagSingleton.h"
+// own header
 #include "JScppUtils.h"
+
+#include "QuitFlagSingleton.h"
 #include "JSNode.h"
 #include "JScppUtils.impl"
 

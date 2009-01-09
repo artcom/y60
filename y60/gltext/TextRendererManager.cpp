@@ -9,7 +9,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+//own header
 #include "TextRendererManager.h"
+
 #include <y60/glutil/GLUtils.h>
 #include <asl/dom/Nodes.h>
 #include <asl/math/Vector234.h>

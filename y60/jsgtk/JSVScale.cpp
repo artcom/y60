@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSVScale.h"
+
 #include "JSWidget.h"
 #include "JSSignalProxies.h"
 #include "jsgtk.h"

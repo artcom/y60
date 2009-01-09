@@ -21,7 +21,9 @@
 //
 //=============================================================================
 
+// own header
 #include "GLContext.h"
+
 #include "GLUtils.h"
 
 #include <asl/base/Logger.h>

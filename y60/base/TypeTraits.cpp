@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
 #include "TypeTraits.h"
+
 #ifdef OSX
 #undef verify
 #endif

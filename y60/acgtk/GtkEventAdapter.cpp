@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+//own header
 #include "GtkEventAdapter.h"
+
 #include <y60/input/EventDispatcher.h>
 #include <y60/input/MouseEvent.h>
 #include <y60/input/WindowEvent.h>

@@ -23,7 +23,9 @@
   #define _WIN32_WINNT 0x0500
 #endif
 
+//own header
 #include "net_functions.h"
+
 #include "SocketException.h"
 
 #include <asl/base/os_functions.h>

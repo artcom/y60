@@ -8,7 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+// own header
 #include "OffscreenBuffer.h"
+
 #include "PixelEncodingInfo.h"
 #include "GLUtils.h"
 

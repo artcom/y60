@@ -58,7 +58,9 @@
 
 // this is actually a wrapper of a combobox which holds only one column of text
 
+// own header
 #include "JSComboBox.h"
+
 #include "JSContainer.h"
 #include "JSTreeIter.h"
 #include "JSCellRenderer.h"

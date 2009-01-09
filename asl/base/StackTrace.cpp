@@ -38,6 +38,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "StackTrace.h"
 
 #include "Dashboard.h" // contains the class Table

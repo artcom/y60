@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSCoordSpline.h"
+
 #include <y60/jsbase/JSVector.h>
 #include "JSKeyframe.h"
 #include <y60/jsbase/JSWrapper.impl>

@@ -48,7 +48,9 @@
 //
 //=============================================================================
 
+// own header
 #include "PlugInManager.h"
+
 #include "Logger.h"
 #include "string_functions.h"
 #include "file_functions.h"

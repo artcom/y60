@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSRequestWrapper.h"
+// own header
 #include "JSRequestManager.h"
+
+#include "JSRequestWrapper.h"
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>

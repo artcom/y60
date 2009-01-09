@@ -9,13 +9,16 @@
 //=============================================================================
 
 /* 
-PM: We might consider to rewrite the texture handling od GLResourceManger and scene/Texture in a way that the
-Resourcemanager does not modify any state in texture, but that texture more directly reflects the GL state.
+PM: We might consider to rewrite the texture handling or GLResourceManger and scene/Texture in 
+a way that the ResourceManager does not modify any state in texture, but that texture more 
+directly reflects the GL state. 
 E.g. modifying the texture size should then result in an actual resize of the gl texture.
 We need to find a clean way to deal with NPOT textures then.
 */
 
+//own header
 #include "GLResourceManager.h"
+
 
 #include <y60/image/Image.h>
 #include <y60/image/PixelEncoding.h>

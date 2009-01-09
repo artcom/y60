@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSArrow.h"
+
 #include "jsgtk.h"
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>

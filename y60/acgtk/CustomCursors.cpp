@@ -63,6 +63,7 @@
 //
 //=============================================================================
 
+//own header
 #include "CustomCursors.h"
 
 #include "cursors/cursor_add_point.xbm"

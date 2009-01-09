@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "MovieBuilder.h"
+
 #include <y60/base/NodeNames.h>
 #include <y60/video/Movie.h>
 #include <asl/dom/Nodes.h>

@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSAbstractRenderWindow.h"
+// own header
 #include "JSOffscreenRenderArea.h"
+
+#include "JSAbstractRenderWindow.h"
 #include "JSAbstractRenderWindow.impl"
 #include <y60/jsbase/JSWrapper.impl>
 #include <y60/jsbase/JSNode.h>

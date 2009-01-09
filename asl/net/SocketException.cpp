@@ -38,7 +38,9 @@
 //    recommendations: change namespace, fix names
 */
 
+//own header
 #include "SocketException.h"
+
 #include "net.h"
 
 #include <asl/base/string_functions.h>

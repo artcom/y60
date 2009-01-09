@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSMisc.h"
+
 #include "JSWidget.h"
 #include "jsgtk.h"
 #include <y60/jsbase/JScppUtils.h>

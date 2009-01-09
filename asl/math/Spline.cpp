@@ -18,9 +18,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include <math.h>
-
+//own header
 #include "Spline.h"
+
+#include <math.h>
 
 using namespace std;  // automatically added!
 

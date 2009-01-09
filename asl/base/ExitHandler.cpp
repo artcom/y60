@@ -10,7 +10,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "ExitHandler.h"
+
 #include "SingletonManager.h"
 #include "string_functions.h"
 #include "Logger.h"

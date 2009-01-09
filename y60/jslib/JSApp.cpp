@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "JSApp.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <vector>
@@ -63,7 +66,6 @@
 #include <list>
 #include <map>
 
-#include "JSApp.h"
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/zip/DirectoryPackage.h>

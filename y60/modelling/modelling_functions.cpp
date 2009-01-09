@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "modelling_functions.h"
+
 #include "SimpleTesselator.h"
 
 #include <y60/scene/TransformBuilder.h>

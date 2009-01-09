@@ -68,6 +68,7 @@
 //
 //=============================================================================
 
+// own header
 #include "PLFilterResizePadded.h"
 
 #include <iostream>

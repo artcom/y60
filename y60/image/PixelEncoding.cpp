@@ -56,6 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "PixelEncoding.h"
 
 #if defined(_MSC_VER)

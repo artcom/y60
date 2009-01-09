@@ -65,7 +65,9 @@
 //
 //=============================================================================
 
+// own header
 #include "AnimationCharacter.h"
+
 #include "AnimationManager.h"
 
 #include <y60/base/NodeNames.h>

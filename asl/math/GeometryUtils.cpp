@@ -50,7 +50,9 @@
 //
 //=============================================================================
 
+//own header
 #include "GeometryUtils.h"
+
 #include "Triangle.h"
 #include <asl/base/string_functions.h>
 

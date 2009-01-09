@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSDomEvent.h"
+
 #include "JSNode.h"
 #include "JScppUtils.h"
 #include "JSWrapper.impl"

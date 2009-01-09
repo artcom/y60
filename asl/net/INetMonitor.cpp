@@ -38,6 +38,7 @@
 //    recommendations: move this to its own component 
 */
 
+//own header
 #include "INetMonitor.h"
 
 #include <asl/base/Logger.h>

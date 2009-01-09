@@ -39,7 +39,9 @@
 //                     explain use of this class
 */
 
+//own header
 #include "UDPSocket.h"
+
 #include "SocketException.h"
 #include <asl/base/Logger.h>
 

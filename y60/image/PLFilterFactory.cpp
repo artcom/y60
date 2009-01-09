@@ -67,6 +67,7 @@
 //
 //=============================================================================
 
+// own header
 #include "PLFilterFactory.h"
 
 #include <iostream>

@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSEmbeddedButton.h"
+
 #include "JSSignal0.h"
 #include "JSSignal2.h"
 #include "jsgtk.h"

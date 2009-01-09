@@ -12,6 +12,10 @@
 //
 //
 
+//own header
+#include "raster.h"
+
+
 namespace asl {
 
 } // namespace asl

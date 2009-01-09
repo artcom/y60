@@ -44,7 +44,9 @@
 //
 //=============================================================================
 
+//own header
 #include "ComPort.h"
+
 #include <asl/base/Block.h>
 #include <asl/base/Logger.h>
 

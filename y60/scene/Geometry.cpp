@@ -65,7 +65,9 @@
 //
 //=============================================================================
 
+// own header
 #include "Geometry.h"
+
 #include "Scene.h"
 
 #include <asl/base/Logger.h>

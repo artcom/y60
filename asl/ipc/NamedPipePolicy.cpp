@@ -38,6 +38,7 @@
 //    recommendations: add high-level documentation, improve doxygen documentation 
 */
 
+//own header
 #include "NamedPipePolicy.h"
 
 #include <asl/base/error_functions.h>

@@ -46,6 +46,7 @@
 //
 //=============================================================================
 
+//own header
 #include "VectorManipulator.h"
 
 namespace asl {

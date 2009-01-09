@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSVector.h"
+// own header
 #include "JSFrustum.h"
+
+#include "JSVector.h"
 #include "JSPlane.h"
 #include "JSMatrix.h"
 #include "JSWrapper.impl"

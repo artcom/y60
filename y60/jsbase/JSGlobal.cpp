@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "JSGlobal.h"
+
 #include "JScppUtils.h"
 #include "JSVector.h"
 #include "JSMatrix.h"
@@ -66,8 +69,6 @@
 #include "JSQuaternion.h"
 #include "JSBox.h"
 #include "JSFrustum.h"
-
-#include "JSGlobal.h"
 
 #include <asl/math/linearAlgebra.h>
 #include <asl/math/intersection.h>

@@ -19,7 +19,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "Stream.h"
+
 #include "Block.h"
 #include "Exception.h"
 #include "file_functions.h"

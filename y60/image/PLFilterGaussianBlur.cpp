@@ -68,6 +68,7 @@
 //
 //=============================================================================
 
+// own header
 #include "PLFilterGaussianBlur.h"
 
 #include <iostream>

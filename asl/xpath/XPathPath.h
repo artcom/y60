@@ -39,7 +39,7 @@
 */
 
 /*!
-** \file xpath/Path.h
+** \file xpath/XPathPath.h
 **
 ** \brief XPath parsed paths
 **

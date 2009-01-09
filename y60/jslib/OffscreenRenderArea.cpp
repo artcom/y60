@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "OffscreenRenderArea.h"
+
 #include "JSApp.h"
 
 #include <y60/image/Image.h>

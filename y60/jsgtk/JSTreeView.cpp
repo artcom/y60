@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSTreeView.h"
+
 #include "JSContainer.h"
 #include "JSTreeIter.h"
 #include "JSCellRenderer.h"

@@ -64,8 +64,10 @@
 //
 //=============================================================================
 
-#include "JSNodeList.h"
+// own header
 #include "JSNamedNodeMap.h"
+
+#include "JSNodeList.h"
 #include "JSWrapper.impl"
 #include <iostream>
 

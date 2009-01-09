@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSKeyframe.h"
+
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JScppUtils.impl>
 #include <y60/jsbase/JSNode.h>

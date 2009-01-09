@@ -38,7 +38,9 @@
 //    recommendations: merge with net_functions.h
 */
 
+//own header
 #include "net.h"
+
 #include "SocketException.h"
 
 #include <asl/base/string_functions.h>

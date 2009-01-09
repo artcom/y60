@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "Image.h"
+
 #include <asl/dom/Field.h>
 
 #if defined(_MSC_VER)

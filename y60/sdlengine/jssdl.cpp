@@ -64,6 +64,9 @@
 //
 //=============================================================================
 
+// own header
+#include "jssdl.h"
+
 #include "JSRenderWindow.h"
 
 using namespace jslib;

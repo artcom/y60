@@ -8,6 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+// own header
+#include "GLBufferAdapter.h"
+
 #include <iostream>
 
 #ifdef WIN32
@@ -32,7 +35,6 @@
 #include <asl/base/string_functions.h>
 #include <y60/image/PixelEncoding.h>
 
-#include "GLBufferAdapter.h"
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 

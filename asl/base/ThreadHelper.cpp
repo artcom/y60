@@ -50,7 +50,9 @@
 //
 //=============================================================================
 
+// own header
 #include "ThreadHelper.h"
+
 #include "PosixThread.h"
 #include "Logger.h"
 

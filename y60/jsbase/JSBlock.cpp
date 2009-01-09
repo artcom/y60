@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "JSBlock.h"
+
 #include "JScppUtils.h"
 #include "JSWrapper.impl"
 

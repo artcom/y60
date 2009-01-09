@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSRequestWrapper.h"
+
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSEnum.h>
 #include <y60/jsbase/JSBlock.h>

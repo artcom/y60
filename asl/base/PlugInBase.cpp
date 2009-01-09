@@ -48,9 +48,11 @@
 //
 //=============================================================================
 
+// own header
+#include "PlugInBase.h"
+
 #include <iostream>
 
-#include "../base/PlugInBase.h"
 #include "../base/SingletonManager.h"
 #include "../base/Logger.h"
 

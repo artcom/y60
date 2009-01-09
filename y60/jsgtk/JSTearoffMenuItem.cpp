@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSTearoffMenuItem.h"
+
 #include "JSMenuItem.h"
 //#include "JSSignalProxy0.h"
 #include "jsgtk.h"

@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSGLResourceManager.h"
+
 #include "JSApp.h"
 #include <y60/jsbase/JSWrapper.impl>
 #include <y60/glrender/GLResourceManager.h>

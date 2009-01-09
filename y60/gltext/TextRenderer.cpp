@@ -21,7 +21,9 @@
 //
 //=============================================================================
 
+//own header
 #include "TextRenderer.h"
+
 
 #include <y60/glutil/GLUtils.h>
 

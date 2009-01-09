@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSGlade.h"
+
 #include "JSWindow.h"
 #include "GTKApp.h"
 #include "jsgtk.h"

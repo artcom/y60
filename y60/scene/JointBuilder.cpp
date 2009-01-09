@@ -68,7 +68,9 @@
 //
 //=============================================================================
 
+// own header
 #include "JointBuilder.h"
+
 #include <y60/base/NodeNames.h>
 #include <asl/dom/Nodes.h>
 

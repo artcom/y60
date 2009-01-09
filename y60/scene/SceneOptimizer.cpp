@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "SceneOptimizer.h"
+
 #include "TransformHierarchyFacade.h"
 #include "TransformBuilder.h"
 #include <asl/base/Logger.h>

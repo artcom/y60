@@ -69,7 +69,9 @@
 //
 //=============================================================================
 
+// own header
 #include "LightSourceBuilder.h"
+
 #include "LightSource.h"
 #include <y60/base/NodeNames.h>
 #include <y60/base/PropertyNames.h>

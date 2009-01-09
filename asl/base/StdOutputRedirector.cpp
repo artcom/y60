@@ -39,6 +39,7 @@
 */
 
 
+// own header
 #include "StdOutputRedirector.h"
 
 #include <iostream>

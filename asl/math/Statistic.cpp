@@ -50,7 +50,9 @@
 //
 //=============================================================================
 
+//own header
 #include "Statistic.h"
+
 #include <asl/base/Time.h>
 #include <asl/base/Logger.h>
 

@@ -60,7 +60,7 @@
 #include <asl/base/string_functions.h>
 
 /**********************************************************************************************/
-#include "Path.h"
+#include "XPathPath.h"
 #include "ParseInput.h"
 #include "PathParser.h"
 #include "xpath_api_impl.h"

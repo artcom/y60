@@ -18,7 +18,9 @@
   #define _WIN32_WINNT 0x0500
 #endif
 
+// own header
 #include "os_functions.h"
+
 #include "os_functions.impl"
 #include "Exception.h"
 #include "string_functions.h"

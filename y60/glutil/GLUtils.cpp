@@ -14,6 +14,7 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 }
 
 #define _ac_render_GLUtils_cpp_
+// own header
 #include "GLUtils.h"
 
 #include <iostream>

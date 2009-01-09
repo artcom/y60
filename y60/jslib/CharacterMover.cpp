@@ -56,6 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "CharacterMover.h"
 
 #include <asl/base/Logger.h>

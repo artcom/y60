@@ -40,7 +40,9 @@
 //                     remove CVS log 
 */
 
+//own header
 #include "Station.h"
+
 #include "net_functions.h"
 #include <asl/base/string_functions.h>
 #include <asl/math/numeric_functions.h>

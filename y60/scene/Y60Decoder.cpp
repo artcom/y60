@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "Y60Decoder.h"
+
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>

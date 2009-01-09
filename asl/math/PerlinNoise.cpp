@@ -50,7 +50,9 @@
 //=============================================================================
  
 
+//own header
 #include "PerlinNoise.h"
+
 #include "numeric_functions.h"
 
 #include <iostream>

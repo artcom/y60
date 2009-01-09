@@ -38,7 +38,9 @@
 //    recommendations: change namespace
 */
 
+//own header
 #include "TCPSocket.h"
+
 #include "SocketException.h"
 
 using namespace asl;

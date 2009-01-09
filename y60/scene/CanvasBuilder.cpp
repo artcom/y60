@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "CanvasBuilder.h"
+
 #include "Canvas.h"
 #include <y60/base/PropertyNames.h>
 #include <y60/base/property_functions.h>

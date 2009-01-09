@@ -60,6 +60,9 @@
 //
 //=============================================================================
 
+// own header
+#include "ImageLoader.h"
+
 #include <asl/base/MappedBlock.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/file_functions.h>
@@ -79,7 +82,6 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
-#include "ImageLoader.h"
 #include "PLFilterResizePadded.h"
 #include "HeightToNormalMap.h"
 #include "PLFilterFactory.h"

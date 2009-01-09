@@ -69,7 +69,9 @@
 //
 //=============================================================================
 
+// own header
 #include "AnimationBuilder.h"
+
 #include <y60/base/DataTypes.h>
 
 #include <asl/dom/Nodes.h>

@@ -37,7 +37,9 @@
 //    recommendations: change namespace, check coding conventions, check TODOs             
 */
 
+//own header
 #include "Socket.h"
+
 #include "SocketException.h"
 #include "net.h"
 #include "net_functions.h"

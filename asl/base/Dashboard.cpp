@@ -47,7 +47,9 @@
 //
 //=============================================================================
 
+//own header
 #include "Dashboard.h"
+
 #include "string_functions.h"
 
 #include <iomanip>

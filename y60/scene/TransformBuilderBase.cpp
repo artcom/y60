@@ -65,7 +65,9 @@
 //
 //=============================================================================
 
+// own header
 #include "TransformBuilderBase.h"
+
 #include "TransformHierarchyFacade.h"
 #include "Shape.h"
 #include <y60/base/NodeNames.h>

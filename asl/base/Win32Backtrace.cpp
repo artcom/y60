@@ -58,8 +58,9 @@
 */
 
 
-
+// own header
 #include "Win32Backtrace.h"
+
 #include "TraceUtils.h"
 
 #include <malloc.h> 

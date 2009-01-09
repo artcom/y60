@@ -8,7 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+//own header
 #include "ShaderLibrary.h"
+
 #include "ShaderLibraryxsd.h"
 #include "FFShader.h"
 

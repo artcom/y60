@@ -19,10 +19,12 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "MultiThreadedUnitTest.h"
+
 #include "UnitTest.h"
 #include "Time.h"
 
-#include "MultiThreadedUnitTest.h"
 #include "string_functions.h"
 
 #include <iostream>

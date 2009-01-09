@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSWindow.h"
+// own header
 #include "JSDialog.h"
+
+#include "JSWindow.h"
 #include "JSStockID.h"
 #include "JSSignalProxies.h"
 #include "JSButton.h"

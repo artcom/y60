@@ -17,8 +17,9 @@
 //
 //=============================================================================
 
+// own header
 #include "BitFont.h"
-//#include <values.h>
+
 #include <limits>
 
 static inline void

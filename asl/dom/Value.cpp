@@ -10,7 +10,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
 #include "Value.h"
+
 #include "Nodes.h"
 #include <asl/base/Logger.h>
 

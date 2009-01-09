@@ -19,8 +19,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "Spline.h"
+//own header
 #include "CoordSpline.h"
+
+#include "Spline.h"
 #include "integrate_function.h"
 #include "Matrix4.h"
 

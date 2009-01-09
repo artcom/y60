@@ -17,7 +17,9 @@
 //
 //============================================================================
 
+//own header
 #include "textUtilities.h"
+
 
 #ifdef WIN32
 #include <windows.h>

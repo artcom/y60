@@ -2,8 +2,10 @@
 // GENERATED FILE -- DO NOT MODIFY 
 //
 
-#include "BitFont.h"
+//own header
 #include "SyntaxBold18.h"
+
+#include "BitFont.h"
 
 static const BitChar ch32 = {0,0,0,0,5,0};
 

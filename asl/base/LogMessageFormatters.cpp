@@ -47,7 +47,9 @@
 //
 //=============================================================================
 
+// own header
 #include "LogMessageFormatters.h"
+
 #include "TimeStreamFormater.h"
 #include "string_functions.h"
 #include "os_functions.h"

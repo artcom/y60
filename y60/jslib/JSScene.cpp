@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "JSScene.h"
+
 #include <y60/jsbase/JSVector.h>
 #include <y60/jsbase/JSNode.h>
 #include <y60/jsbase/JSNodeList.h>
@@ -64,7 +67,6 @@
 #include <y60/jsbase/JSSphere.h>
 #include <y60/jsbase/JSMatrix.h>
 #include "JSintersection_functions.h"
-#include "JSScene.h"
 #include "JSApp.h"
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>

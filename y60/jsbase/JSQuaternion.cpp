@@ -64,8 +64,10 @@
 //
 //=============================================================================
 
-#include "JSVector.h"
+// own header
 #include "JSQuaternion.h"
+
+#include "JSVector.h"
 #include "JSWrapper.impl"
 #include <iostream>
 

@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "GTKApp.h"
+
 #include "jsgtk.h"
 #include "JSSignal1.h"
 #include <y60/acgtk/GCObserver.h>

@@ -38,7 +38,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
 #include "SvgPath.h"
+
 #include "intersection.h"
 #include "linearAlgebra.h"
 

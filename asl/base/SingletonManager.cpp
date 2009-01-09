@@ -48,7 +48,9 @@
 //
 //=============================================================================
 
+// own header
 #include "SingletonManager.h"
+
 #include "Logger.h"
 
 using namespace std;

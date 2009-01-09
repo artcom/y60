@@ -57,7 +57,9 @@
 */
 
 
+// own header
 #include "GrainSource.h"
+
 #include <asl/audio/AudioBuffer.h>
 #include <asl/audio/VolumeFader.h>
 #include <asl/base/Auto.h>

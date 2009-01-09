@@ -40,7 +40,9 @@
 
 // foobar
 
+//own header
 #include "uCCP.h"
+
 #include "CRC8.h"
 #include "SerialDevice.h"
 

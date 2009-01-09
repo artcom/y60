@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSGdkEvent.h"
+
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>

@@ -37,7 +37,9 @@
 //
 //    recommendations: move to inner class of *.tst.cpp file 
 */
+//own header
 #include "TestINetMonitor.h"
+
 #include "INetMonitor.h"
 #include "TCPServer.h"
 #include "SocketException.h"

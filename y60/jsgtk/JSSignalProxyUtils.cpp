@@ -57,7 +57,9 @@
 */
 
 
+// own header
 #include "JSSignalProxyUtils.h"
+
 #include <asl/base/Logger.h>
 
 namespace jslib {

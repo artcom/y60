@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSLine.h"
+
 #include "JSLine.impl"
 #include "JSVector.h"
 #include "JSWrapper.impl"

@@ -18,6 +18,9 @@
 //
 //=============================================================================
 
+// own header
+#include "TextureCompressor.h"
+
 #include <iostream>
 #include <cstring>
 #include <errno.h>
@@ -44,7 +47,6 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
-#include "TextureCompressor.h"
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 

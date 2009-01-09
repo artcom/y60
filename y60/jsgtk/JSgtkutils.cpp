@@ -57,7 +57,9 @@
 */
 
 
+// own header
 #include "JSgtkutils.h"
+
 
 #include <y60/jsbase/QuitFlagSingleton.h>
 #include <asl/base/Logger.h>

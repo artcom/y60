@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSLogger.h"
+
 #include <y60/jsbase/Documentation.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <asl/base/LogMessageSinks.h>

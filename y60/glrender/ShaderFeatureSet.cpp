@@ -17,7 +17,9 @@
 //
 //=============================================================================
 
+//own header
 #include "ShaderFeatureSet.h"
+
 
 #include <y60/scene/IShader.h>
 #include <asl/base/string_functions.h>

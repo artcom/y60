@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSColorSelectionDialog.h"
+
 #include "JSColorSelection.h"
 #include "JSButton.h"
 #include "jsgtk.h"

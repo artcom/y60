@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "EventDispatcher.h"
+
 #include "Event.h"
 
 #include <queue>

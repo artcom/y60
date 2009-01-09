@@ -8,7 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+//own header
 #include "CgShader.h"
+
 
 #include <y60/glutil/GLUtils.h>
 #include <y60/base/NodeNames.h>

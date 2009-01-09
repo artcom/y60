@@ -8,7 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+//own header
 #include "GLShader.h"
+
 
 #include "ShaderLibrary.h"
 

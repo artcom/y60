@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "Shape.h"
+
 #include "Scene.h"
 
 using namespace dom;

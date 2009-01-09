@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "JSRenderWindow.h"
+
 #include <asl/base/settings.h>
 
 #include <iostream>
@@ -73,8 +76,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
 #endif
-
-#include "JSRenderWindow.h"
 
 #include <y60/glutil/GLAlloc.h>
 #include <y60/glrender/Renderer.h>

@@ -57,8 +57,10 @@
 */
 
 
-#include "JSSignalProxies.h"
+// own header
 #include "JSColorSelection.h"
+
+#include "JSSignalProxies.h"
 #include "JSBox.h"
 #include "jsgtk.h"
 #include <y60/jsbase/JScppUtils.h>

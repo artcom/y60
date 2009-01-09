@@ -56,16 +56,18 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
+#include "RenderArea.h"
+
 #ifdef OSX
 #include <y60/glutil/GLUtils.h>
+
 #undef check
 #undef notify
 #undef verify
 #undef nil
 #undef DestroyNotify
 #endif
-
-#include "RenderArea.h"
 
 #include <asl/base/file_functions.h>
 #include <asl/base/os_functions.h>

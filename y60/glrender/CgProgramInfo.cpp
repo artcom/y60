@@ -8,12 +8,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+//own header
+#include "CgProgramInfo.h"
+
 #include <y60/glutil/GLUtils.h>
 #include <y60/base/NodeValueNames.h>
 #include <asl/base/string_functions.h>
 #include <asl/dom/Nodes.h>
 
-#include "CgProgramInfo.h"
 #include "Renderer.h"
 
 // #ifdef WIN32

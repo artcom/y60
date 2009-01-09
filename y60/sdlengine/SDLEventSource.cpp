@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "SDLEventSource.h"
+
 #include <y60/input/MouseEvent.h>
 #include <y60/input/WindowEvent.h>
 #include <y60/input/AxisEvent.h>

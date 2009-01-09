@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSSvgPath.h"
+
 #include <y60/jsbase/JSVector.h>
 #include <y60/jsbase/JSMatrix.h>
 #include <y60/jsbase/JSLine.h>

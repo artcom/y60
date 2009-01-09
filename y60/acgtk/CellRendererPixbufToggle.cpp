@@ -63,6 +63,7 @@
 //
 //=============================================================================
 
+//own header
 #include "CellRendererPixbufToggle.h"
 
 #if defined(_MSC_VER)

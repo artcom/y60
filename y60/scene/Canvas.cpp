@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "Scene.h"
+// own header
 #include "Canvas.h"
+
+#include "Scene.h"
 #include <asl/dom/Nodes.h>
 
 using namespace std;

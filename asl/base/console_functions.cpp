@@ -19,7 +19,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
 #include "console_functions.h"
+
 #include "settings.h"
 #ifdef WIN32
 #include <windows.h>

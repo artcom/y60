@@ -48,7 +48,9 @@
 //
 //=============================================================================
 
+// own header
 #include "PosixThread.h"
+
 #include "Logger.h"
 
 #include <errno.h>

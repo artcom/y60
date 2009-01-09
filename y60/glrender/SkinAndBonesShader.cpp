@@ -8,7 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+//own header
 #include "SkinAndBonesShader.h"
+
 
 #include <y60/scene/TransformHierarchyFacade.h>
 #include <y60/base/DataTypes.h>

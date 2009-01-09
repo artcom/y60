@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "TextureManager.h"
+
 #include "Texture.h"
 
 #include <y60/image/ImageLoader.h>

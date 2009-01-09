@@ -38,7 +38,9 @@
 //    recommendations: change namespace, fix unreferenced local variable work-around
 */
 
+//own header
 #include "TCPClientSocket.h"
+
 #include "net.h"
 
 #include <asl/base/Logger.h>

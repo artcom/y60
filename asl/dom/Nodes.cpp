@@ -20,9 +20,11 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+//own header
+#include "Nodes.h"
+
 #include <asl/base/string_functions.h>
 
-#include "Nodes.h"
 #include "Schema.h"
 #include "SchemaStrings.h"
 

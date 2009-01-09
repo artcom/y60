@@ -64,7 +64,9 @@
 //
 //=============================================================================
 
+// own header
 #include "CharacterBuilder.h"
+
 #include "ClipBuilder.h"
 #include <y60/base/NodeNames.h>
 

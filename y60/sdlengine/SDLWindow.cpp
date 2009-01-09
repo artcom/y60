@@ -56,13 +56,15 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "SDLWindow.h"
+
 #include <y60/glrender/GLResourceManager.h>
 
 #ifdef OSX
 #include <Carbon/Carbon.h>
 #endif
 
-#include "SDLWindow.h"
 #include "SDLTextRenderer.h"
 
 #include <y60/jsbase/JScppUtils.h>

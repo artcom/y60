@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSNode.h"
+
 #include "JSNodeList.h"
 #include "JSNamedNodeMap.h"
 #include "JScppUtils.h"

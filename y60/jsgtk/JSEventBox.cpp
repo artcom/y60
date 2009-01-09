@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSSignalProxies.h"
+// own header
 #include "JSEventBox.h"
+
+#include "JSSignalProxies.h"
 #include "jsgtk.h"
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSVector.h>

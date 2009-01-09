@@ -56,6 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "JSintersection_functions.h"
 
 #include <y60/jsbase/JSLine.h>

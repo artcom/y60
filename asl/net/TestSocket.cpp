@@ -38,8 +38,10 @@
 //    recommendations: move to inner class of *.tst.cpp file 
 */
 
-#include "Socket.h"
+//own header
 #include "TestSocket.h"
+
+#include "Socket.h"
 #include "TCPClientSocket.h"
 #include "UDPSocket.h"
 #include "UDPConnection.h"

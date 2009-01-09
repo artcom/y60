@@ -48,7 +48,9 @@
 //
 //=============================================================================
 
+// own header
 #include "ThreadLock.h"
+
 #include "Logger.h"
 #include <stdio.h>
 #include <stdlib.h>

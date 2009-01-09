@@ -38,7 +38,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "GlibcBacktrace.h"
+
 #include "TraceUtils.h"
 
 #include <execinfo.h>

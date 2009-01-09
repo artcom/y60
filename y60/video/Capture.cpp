@@ -56,7 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
 #include "Capture.h"
+
 #include <asl/base/Logger.h>
 #include "CaptureDevice.h"
 #include <y60/base/DecoderManager.h>

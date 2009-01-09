@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include <y60/jsbase/JSVector.h>
+// own header
 #include "JSBSpline.h"
+
+#include <y60/jsbase/JSVector.h>
 #include <y60/jsbase/JSWrapper.impl>
 
 namespace jslib {

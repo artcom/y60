@@ -56,8 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSVector.h"
+// own header
 #include "JSBox2f.h"
+
+#include "JSVector.h"
 #include "JSWrapper.impl"
 #include "JScppUtils.impl"
 #include <asl/math/Box.h>

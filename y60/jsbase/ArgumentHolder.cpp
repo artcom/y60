@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+// own header
+#include "ArgumentHolder.h"
+
 #include "JSWrapper.h"
 #include "JSNode.h"
 #include "JSDomEvent.h"

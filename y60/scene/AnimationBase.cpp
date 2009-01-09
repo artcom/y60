@@ -65,6 +65,7 @@
 //
 //=============================================================================
 
+// own header
 #include "AnimationBase.h"
 
 #include <y60/base/NodeNames.h>
