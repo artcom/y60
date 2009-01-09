@@ -8,7 +8,6 @@ OffscreenBuffer.cpp
 PixelEncodingInfo.cpp
 RenderState.cpp
 TextureCompressor.cpp
-glExtensions.cpp
 )
 
 set(HEADERS
