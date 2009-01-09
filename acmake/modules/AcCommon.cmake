@@ -33,6 +33,11 @@ macro(_ac_attach_externs TARGET)
         else(EXTERN MATCHES ".*\\.framework/?$")
             target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
         endif(EXTERN MATCHES ".*\\.framework/?$")
+        if ( ${EXTERN}_DEFINITIONS )
+            set_target_properties( ${TARGET} 
+                    PROPERTIES
+                        COMPILE_DEFINITIONS ${EXTERN}_DEFINITIONS )
+        endif ( ${EXTERN}_DEFINITIONS )
     endforeach(EXTERN)
 endmacro(_ac_attach_externs)
 
