@@ -12,16 +12,6 @@ if(NOT Y60_INTEGRATED_BUILD)
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
 endif(NOT Y60_INTEGRATED_BUILD)
 
-# XXX: Make headers from our netsrc dependencies available.
-#      This is needed because we do not handle paths for
-#      cmake-exported libraries correctly at the moment.
-#      It would work if the references in our libs would
-#      be EXTERNS, but since they are DEPENDS, we do not add 
-#      include paths anywhere and need this hack for now.
-if(NOT Y60_INTEGRATED_BUILD)
-    include_directories(${CMAKE_INSTALL_PREFIX}/include)
-endif(NOT Y60_INTEGRATED_BUILD)
-
 # Include ACMake
 include(AcMake)
 
@@ -32,6 +22,16 @@ include(Y60Utilities)
 
 # Make sure we can access our includes without staging
 include_directories(../)
+
+# XXX: Make headers from our netsrc dependencies available.
+#      This is needed because we do not handle paths for
+#      cmake-exported libraries correctly at the moment.
+#      It would work if the references in our libs would
+#      be EXTERNS, but since they are DEPENDS, we do not add 
+#      include paths anywhere and need this hack for now.
+if(NOT Y60_INTEGRATED_BUILD)
+    include_directories(${CMAKE_INSTALL_PREFIX}/include)
+endif(NOT Y60_INTEGRATED_BUILD)
 
 # Traverse our subdirectories
 add_subdirectory(base)
@@ -78,6 +78,23 @@ install(
         PATTERN ".svn" EXCLUDE
 )
 
+# Generate standard documentation
+ac_add_doxygen(Y60 ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
+ac_add_xsddoc(Y60 ${CMAKE_CURRENT_SOURCE_DIR}/base/Y60.xsd ${CMAKE_CURRENT_BINARY_DIR}/doc/schema)
+
+# Generate Y60 javascript api reference
+make_directory(${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi)
+add_custom_target(
+    Y60-jsapi
+    ${CMAKE_CURRENT_BINARY_DIR}/products/y60/y60
+        -I "${CMAKE_CURRENT_SOURCE_DIR}/js;"
+	${CMAKE_CURRENT_SOURCE_DIR}/js/create_documentation_xml.js
+	${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}    
+    DEPENDS y60
+    VERBATIM
+)
+
 # Export cmake package unless in an integrated build
 if(NOT Y60_INTEGRATED_BUILD)
 configure_file(
@@ -88,17 +105,17 @@ configure_file(
 
 install(
     FILES Y60Dependencies.cmake Y60Definitions.cmake Y60Utilities.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     FILES ${Y60_BINARY_DIR}/FindY60.cmake
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
 )
 
 install(
     EXPORT Y60
-    DESTINATION lib/cmake
+    DESTINATION share/cmake-2.6/Modules
     FILE Y60Export.cmake
 )
 endif(NOT Y60_INTEGRATED_BUILD)

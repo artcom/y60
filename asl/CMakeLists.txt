@@ -12,6 +12,16 @@ if(NOT ASL_INTEGRATED_BUILD)
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
 endif(NOT ASL_INTEGRATED_BUILD)
 
+# Include cmake libraries
+include(AcMake)
+
+# Define some things and discover dependencies
+include(ASLDefinitions)
+include(ASLDependencies)
+
+# Make sure we can access our includes without staging
+include_directories(../)
+
 # XXX: Make headers from our netsrc dependencies available.
 #      This is needed because we do not handle paths for
 #      cmake-exported libraries correctly at the moment.
@@ -21,16 +31,6 @@ endif(NOT ASL_INTEGRATED_BUILD)
 if(NOT ASL_INTEGRATED_BUILD)
     include_directories(${CMAKE_INSTALL_PREFIX}/include)
 endif(NOT ASL_INTEGRATED_BUILD)
-
-# Include ACMake
-include(AcMake)
-
-# Define some things and discover dependencies
-include(ASLDefinitions)
-include(ASLDependencies)
-
-# Make sure we can access our includes without staging
-include_directories(../)
 
 # Traverse our subdirectories
 add_subdirectory(base)
@@ -43,6 +43,8 @@ add_subdirectory(serial)
 add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
+
+ac_add_doxygen(ASL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 
 # Generate exports unless in an integrated build
 if(NOT ASL_INTEGRATED_BUILD)
