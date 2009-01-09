@@ -196,15 +196,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Path.h"
-				>
-			</File>
-			<File
 				RelativePath="..\PathParser.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Value.h"
 				>
 			</File>
 			<File
@@ -213,6 +205,14 @@
 			</File>
 			<File
 				RelativePath="..\xpath_api_impl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\XPathPath.h"
+				>
+			</File>
+			<File
+				RelativePath="..\XPathValue.h"
 				>
 			</File>
 		</Filter>
