@@ -56,7 +56,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asl-zip", "..\asl\zip\_ide\
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base", "..\Y60\base\_ide\lib-y60-base.vcproj", "{E22E7FC5-C718-496B-8043-EC9436E0D69F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base", "..\y60\base\_ide\lib-y60-base.vcproj", "{E22E7FC5-C718-496B-8043-EC9436E0D69F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
 		{32BB4AC1-1F61-4310-B0FA-D0602CB70380} = {32BB4AC1-1F61-4310-B0FA-D0602CB70380}
@@ -64,14 +64,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base", "..\Y60\base\_id
 		{B7E66AFF-2D1B-456A-89CE-6CC566949F0C} = {B7E66AFF-2D1B-456A-89CE-6CC566949F0C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound", "..\Y60\sound\_ide\lib-y60-sound.vcproj", "{22C707C2-3E8D-4518-933B-978ED6BE9843}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound", "..\y60\sound\_ide\lib-y60-sound.vcproj", "{22C707C2-3E8D-4518-933B-978ED6BE9843}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
 		{FA0FF3AB-FF45-4E98-A91A-9FEC38301A61} = {FA0FF3AB-FF45-4E98-A91A-9FEC38301A61}
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image", "..\Y60\image\_ide\lib-y60-image.vcproj", "{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image", "..\y60\image\_ide\lib-y60-image.vcproj", "{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
 		{0D1A3F8E-82ED-4627-82E0-E9EB8D508C39} = {0D1A3F8E-82ED-4627-82E0-E9EB8D508C39}
@@ -80,7 +80,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image", "..\Y60\image\_
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-video", "..\Y60\video\_ide\lib-y60-video.vcproj", "{4105BF9F-B33B-435D-B9E0-AC4E3BEC9614}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-video", "..\y60\video\_ide\lib-y60-video.vcproj", "{4105BF9F-B33B-435D-B9E0-AC4E3BEC9614}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
 		{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9} = {4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}
@@ -91,7 +91,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-video", "..\Y60\video\_
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene", "..\Y60\scene\_ide\lib-y60-scene.vcproj", "{640BB109-090B-410D-94C3-1FCE10CBE1F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene", "..\y60\scene\_ide\lib-y60-scene.vcproj", "{640BB109-090B-410D-94C3-1FCE10CBE1F4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D} = {DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -103,20 +103,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene", "..\Y60\scene\_
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-input", "..\Y60\input\_ide\lib-y60-input.vcproj", "{F0A572E3-AEE7-4330-8571-20CA95526EEB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-input", "..\y60\input\_ide\lib-y60-input.vcproj", "{F0A572E3-AEE7-4330-8571-20CA95526EEB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
 		{32BB4AC1-1F61-4310-B0FA-D0602CB70380} = {32BB4AC1-1F61-4310-B0FA-D0602CB70380}
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-inet", "..\Y60\inet\_ide\lib-y60-inet.vcproj", "{3E997580-DA00-4FF9-8B13-FACEB9121D48}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-inet", "..\y60\inet\_ide\lib-y60-inet.vcproj", "{3E997580-DA00-4FF9-8B13-FACEB9121D48}"
 	ProjectSection(ProjectDependencies) = postProject
 		{956AFD27-712D-4164-AB51-D53D3EF79A6D} = {956AFD27-712D-4164-AB51-D53D3EF79A6D}
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-modelling", "..\Y60\modelling\_ide\lib-y60-modelling.vcproj", "{731AC196-4CC4-48E4-B593-7FBEBB12001B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-modelling", "..\y60\modelling\_ide\lib-y60-modelling.vcproj", "{731AC196-4CC4-48E4-B593-7FBEBB12001B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{E0EDF23E-1898-4D78-BCB8-13783BA0F081} = {E0EDF23E-1898-4D78-BCB8-13783BA0F081}
@@ -125,7 +125,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-modelling", "..\Y60\mod
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsbase", "..\Y60\jsbase\_ide\lib-y60-jsbase.vcproj", "{E0EDF23E-1898-4D78-BCB8-13783BA0F081}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsbase", "..\y60\jsbase\_ide\lib-y60-jsbase.vcproj", "{E0EDF23E-1898-4D78-BCB8-13783BA0F081}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D} = {DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -136,7 +136,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsbase", "..\Y60\jsbase
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jslib", "..\Y60\jslib\_ide\lib-y60-jslib.vcproj", "{FEDE10C7-86F5-4EA5-82F7-2FFBF051443F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jslib", "..\y60\jslib\_ide\lib-y60-jslib.vcproj", "{FEDE10C7-86F5-4EA5-82F7-2FFBF051443F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{E0EDF23E-1898-4D78-BCB8-13783BA0F081} = {E0EDF23E-1898-4D78-BCB8-13783BA0F081}
@@ -155,7 +155,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jslib", "..\Y60\jslib\_
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sdlengine", "..\Y60\sdlengine\_ide\lib-y60-sdlengine.vcproj", "{EED8E94A-E34B-4721-B38F-886AA4BDB6EC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sdlengine", "..\y60\sdlengine\_ide\lib-y60-sdlengine.vcproj", "{EED8E94A-E34B-4721-B38F-886AA4BDB6EC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D} = {DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D}
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
@@ -171,7 +171,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sdlengine", "..\Y60\sdl
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-y60", "..\Y60\products\y60\_ide\app-y60.vcproj", "{871D3ECD-2A54-4235-B6E1-94119992F807}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-y60", "..\y60\products\y60\_ide\app-y60.vcproj", "{871D3ECD-2A54-4235-B6E1-94119992F807}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D} = {DDBDD806-F4F3-4D1B-823B-3BB542FC4A3D}
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
@@ -199,7 +199,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-y60", "..\Y60\products\
 		{B7E66AFF-2D1B-456A-89CE-6CC566949F0C} = {B7E66AFF-2D1B-456A-89CE-6CC566949F0C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\Y60\glrender\_ide\lib-y60-gl-render.vcproj", "{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\y60\glrender\_ide\lib-y60-gl-render.vcproj", "{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -210,7 +210,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render", "..\Y60\glr
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\Y60\gltext\_ide\lib-y60-gl-text.vcproj", "{CB8BD9BE-6BD0-4A62-87D6-C4ABA5DCF161}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\y60\gltext\_ide\lib-y60-gl-text.vcproj", "{CB8BD9BE-6BD0-4A62-87D6-C4ABA5DCF161}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -218,7 +218,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-text", "..\Y60\gltex
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util", "..\Y60\glutil\_ide\lib-y60-gl-util.vcproj", "{2DA9A95F-0572-4537-B206-4B3A3D77A952}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util", "..\y60\glutil\_ide\lib-y60-gl-util.vcproj", "{2DA9A95F-0572-4537-B206-4B3A3D77A952}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -543,107 +543,102 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asl-zip-testZipFile", "..\a
 		{0D1A3F8E-82ED-4627-82E0-E9EB8D508C39} = {0D1A3F8E-82ED-4627-82E0-E9EB8D508C39}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base-testDataTypes", "..\Y60\base\_ide\y60-base-testDataTypes.vcproj", "{0A5E3C03-B4ED-4376-B9D4-CCC2B530F79A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base-testDataTypes", "..\y60\base\_ide\y60-base-testDataTypes.vcproj", "{0A5E3C03-B4ED-4376-B9D4-CCC2B530F79A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E22E7FC5-C718-496B-8043-EC9436E0D69F} = {E22E7FC5-C718-496B-8043-EC9436E0D69F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base-testXmlDomY60Types", "..\Y60\base\_ide\y60-base-testXmlDomY60Types.vcproj", "{196FC74F-1CE2-40D4-9E5F-0C23B0537972}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-base-testXmlDomY60Types", "..\y60\base\_ide\y60-base-testXmlDomY60Types.vcproj", "{196FC74F-1CE2-40D4-9E5F-0C23B0537972}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E22E7FC5-C718-496B-8043-EC9436E0D69F} = {E22E7FC5-C718-496B-8043-EC9436E0D69F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testHeightToNormalMap", "..\Y60\image\_ide\y60-image-testHeightToNormalMap.vcproj", "{986983E8-EE63-48F3-8B3C-F9A7EB4FF55A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testHeightToNormalMap", "..\y60\image\_ide\y60-image-testHeightToNormalMap.vcproj", "{986983E8-EE63-48F3-8B3C-F9A7EB4FF55A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9} = {4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testImageLoader", "..\Y60\image\_ide\y60-image-testImageLoader.vcproj", "{91F21913-7EBB-46AF-A76A-F3CC73734B04}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testImageLoader", "..\y60\image\_ide\y60-image-testImageLoader.vcproj", "{91F21913-7EBB-46AF-A76A-F3CC73734B04}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9} = {4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testRaster", "..\Y60\image\_ide\y60-image-testRaster.vcproj", "{3E2FB799-6326-4527-A91C-8F1804806498}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-image-testRaster", "..\y60\image\_ide\y60-image-testRaster.vcproj", "{3E2FB799-6326-4527-A91C-8F1804806498}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4CF53C68-DE16-42EA-8528-18DAF4DDD5F9} = {4CF53C68-DE16-42EA-8528-18DAF4DDD5F9}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-inet-testRequest", "..\Y60\inet\_ide\y60-inet-testRequest.vcproj", "{D68E1862-7B39-4F11-A762-EDB737226373}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-inet-testRequest", "..\y60\inet\_ide\y60-inet-testRequest.vcproj", "{D68E1862-7B39-4F11-A762-EDB737226373}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3E997580-DA00-4FF9-8B13-FACEB9121D48} = {3E997580-DA00-4FF9-8B13-FACEB9121D48}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-input-testEventDispatcher", "..\Y60\input\_ide\y60-input-testEventDispatcher.vcproj", "{DB6F6A33-16A2-4992-A45F-173CCDCBD741}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-input-testEventDispatcher", "..\y60\input\_ide\y60-input-testEventDispatcher.vcproj", "{DB6F6A33-16A2-4992-A45F-173CCDCBD741}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F0A572E3-AEE7-4330-8571-20CA95526EEB} = {F0A572E3-AEE7-4330-8571-20CA95526EEB}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsbase-testGarbageCollection", "..\Y60\jsbase\_ide\y60-jsbase-testGarbageCollection.vcproj", "{730DF8DA-C660-4B86-9711-E346ACC74E35}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsbase-testGarbageCollection", "..\y60\jsbase\_ide\y60-jsbase-testGarbageCollection.vcproj", "{730DF8DA-C660-4B86-9711-E346ACC74E35}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E0EDF23E-1898-4D78-BCB8-13783BA0F081} = {E0EDF23E-1898-4D78-BCB8-13783BA0F081}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-modelling-testModellingFunctions", "..\Y60\modelling\_ide\y60-modelling-testModellingFunctions.vcproj", "{103A25BB-C450-4997-BEA2-FE85F0ACC6C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-modelling-testModellingFunctions", "..\y60\modelling\_ide\y60-modelling-testModellingFunctions.vcproj", "{103A25BB-C450-4997-BEA2-FE85F0ACC6C0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{731AC196-4CC4-48E4-B593-7FBEBB12001B} = {731AC196-4CC4-48E4-B593-7FBEBB12001B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testAnimationBuilder", "..\Y60\scene\_ide\y60-scene-testAnimationBuilder.vcproj", "{A4B88EDD-32DD-4CF5-ACF2-EC16D486A839}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testAnimationBuilder", "..\y60\scene\_ide\y60-scene-testAnimationBuilder.vcproj", "{A4B88EDD-32DD-4CF5-ACF2-EC16D486A839}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testCamera", "..\Y60\scene\_ide\y60-scene-testCamera.vcproj", "{A99F52CF-A778-4B82-8CDF-36C379CDB0ED}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testCamera", "..\y60\scene\_ide\y60-scene-testCamera.vcproj", "{A99F52CF-A778-4B82-8CDF-36C379CDB0ED}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testLights", "..\Y60\scene\_ide\y60-scene-testLights.vcproj", "{674497C9-AAE0-4AB4-A1A5-B11B57DDB5F3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testLights", "..\y60\scene\_ide\y60-scene-testLights.vcproj", "{674497C9-AAE0-4AB4-A1A5-B11B57DDB5F3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testLightSourceBuilder", "..\Y60\scene\_ide\y60-scene-testLightSourceBuilder.vcproj", "{24636506-9D9E-4664-B241-6FACED7F407D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testLightSourceBuilder", "..\y60\scene\_ide\y60-scene-testLightSourceBuilder.vcproj", "{24636506-9D9E-4664-B241-6FACED7F407D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testScene", "..\Y60\scene\_ide\y60-scene-testScene.vcproj", "{082CE4AE-85D9-445E-BFCF-DE3376B63CDD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testScene", "..\y60\scene\_ide\y60-scene-testScene.vcproj", "{082CE4AE-85D9-445E-BFCF-DE3376B63CDD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testShapeBuilder", "..\Y60\scene\_ide\y60-scene-testShapeBuilder.vcproj", "{DAF386AA-B201-4F8B-AF19-D69A58FD1DFD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-scene-testShapeBuilder", "..\y60\scene\_ide\y60-scene-testShapeBuilder.vcproj", "{DAF386AA-B201-4F8B-AF19-D69A58FD1DFD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{640BB109-090B-410D-94C3-1FCE10CBE1F4} = {640BB109-090B-410D-94C3-1FCE10CBE1F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testDummySound", "..\Y60\sound\_ide\y60-sound-testDummySound.vcproj", "{22EB773D-61CF-42D3-B7F7-81AE7AD720B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testDummySound", "..\y60\sound\_ide\y60-sound-testDummySound.vcproj", "{22EB773D-61CF-42D3-B7F7-81AE7AD720B3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{22C707C2-3E8D-4518-933B-978ED6BE9843} = {22C707C2-3E8D-4518-933B-978ED6BE9843}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testGrainSource", "..\Y60\sound\_ide\y60-sound-testGrainSource.vcproj", "{7685694E-1908-4524-8BDD-5E4C50158584}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testGrainSource", "..\y60\sound\_ide\y60-sound-testGrainSource.vcproj", "{7685694E-1908-4524-8BDD-5E4C50158584}"
 	ProjectSection(ProjectDependencies) = postProject
 		{22C707C2-3E8D-4518-933B-978ED6BE9843} = {22C707C2-3E8D-4518-933B-978ED6BE9843}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testRealSound", "..\Y60\sound\_ide\y60-sound-testRealSound.vcproj", "{5EC3BDE2-1144-4923-AAAD-B95B97A3EF05}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-sound-testRealSound", "..\y60\sound\_ide\y60-sound-testRealSound.vcproj", "{5EC3BDE2-1144-4923-AAAD-B95B97A3EF05}"
 	ProjectSection(ProjectDependencies) = postProject
 		{22C707C2-3E8D-4518-933B-978ED6BE9843} = {22C707C2-3E8D-4518-933B-978ED6BE9843}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-util-testGetProcAddress", "..\Y60\glutil\_ide\y60-gl-util-testGetProcAddress.vcproj", "{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2DA9A95F-0572-4537-B206-4B3A3D77A952} = {2DA9A95F-0572-4537-B206-4B3A3D77A952}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render-testCgShaders", "..\Y60\glrender\_ide\y60-gl-render-testCgShaders.vcproj", "{859E934C-45B3-41A2-980D-20493B28F9B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-gl-render-testCgShaders", "..\y60\glrender\_ide\y60-gl-render-testCgShaders.vcproj", "{859E934C-45B3-41A2-980D-20493B28F9B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5} = {7FDDB66B-9002-44BF-BEB5-A6DA2F9878F5}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-acgtk", "..\Y60\acgtk\_ide\lib-y60-acgtk.vcproj", "{EC0B6B62-627B-4633-A5D8-7248560D13DD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-acgtk", "..\y60\acgtk\_ide\lib-y60-acgtk.vcproj", "{EC0B6B62-627B-4633-A5D8-7248560D13DD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E0EDF23E-1898-4D78-BCB8-13783BA0F081} = {E0EDF23E-1898-4D78-BCB8-13783BA0F081}
 		{CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81} = {CCF6AE43-FBFE-4892-874E-0E6AB8CBCF81}
@@ -655,17 +650,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-acgtk", "..\Y60\acgtk\_
 		{8FD52EF5-21DF-486C-A2A5-53780F3A0F6D} = {8FD52EF5-21DF-486C-A2A5-53780F3A0F6D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsgtk", "..\Y60\jsgtk\_ide\lib-y60-jsgtk.vcproj", "{946F77E7-6A42-4E1A-ADC8-3053F7D8B5C4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-jsgtk", "..\y60\jsgtk\_ide\lib-y60-jsgtk.vcproj", "{946F77E7-6A42-4E1A-ADC8-3053F7D8B5C4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EC0B6B62-627B-4633-A5D8-7248560D13DD} = {EC0B6B62-627B-4633-A5D8-7248560D13DD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-acgtk-testNothing", "..\Y60\acgtk\_ide\y60-acgtk-testNothing.vcproj", "{B2541D2B-15F1-474F-8357-9BCE08B9FFEB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "y60-acgtk-testNothing", "..\y60\acgtk\_ide\y60-acgtk-testNothing.vcproj", "{B2541D2B-15F1-474F-8357-9BCE08B9FFEB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EC0B6B62-627B-4633-A5D8-7248560D13DD} = {EC0B6B62-627B-4633-A5D8-7248560D13DD}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "netsrc-paintlib", "..\netsrc\paintlib\src\_ide\lib-netsrc-paintlib.vcproj", "{E2C774B9-93EE-4408-963C-569712AF3C6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1361,12 +1354,6 @@ Global
 		{5EC3BDE2-1144-4923-AAAD-B95B97A3EF05}.OPT Tests|Win32.ActiveCfg = OPT Tests|Win32
 		{5EC3BDE2-1144-4923-AAAD-B95B97A3EF05}.OPT Tests|Win32.Build.0 = OPT Tests|Win32
 		{5EC3BDE2-1144-4923-AAAD-B95B97A3EF05}.OPT|Win32.ActiveCfg = OPT|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.DBG Tests|Win32.ActiveCfg = DBG Tests|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.DBG Tests|Win32.Build.0 = DBG Tests|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.DBG|Win32.ActiveCfg = DBG|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.OPT Tests|Win32.ActiveCfg = OPT Tests|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.OPT Tests|Win32.Build.0 = OPT Tests|Win32
-		{B6E825BA-C0D4-49FC-A934-0E997A41D4BE}.OPT|Win32.ActiveCfg = OPT|Win32
 		{859E934C-45B3-41A2-980D-20493B28F9B2}.DBG Tests|Win32.ActiveCfg = DBG Tests|Win32
 		{859E934C-45B3-41A2-980D-20493B28F9B2}.DBG Tests|Win32.Build.0 = DBG Tests|Win32
 		{859E934C-45B3-41A2-980D-20493B28F9B2}.DBG|Win32.ActiveCfg = DBG|Win32
@@ -1385,14 +1372,6 @@ Global
 		{B2541D2B-15F1-474F-8357-9BCE08B9FFEB}.DBG|Win32.ActiveCfg = DBG|Win32
 		{B2541D2B-15F1-474F-8357-9BCE08B9FFEB}.OPT Tests|Win32.ActiveCfg = OPT Tests|Win32
 		{B2541D2B-15F1-474F-8357-9BCE08B9FFEB}.OPT|Win32.ActiveCfg = OPT|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.DBG Tests|Win32.ActiveCfg = DBG|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.DBG Tests|Win32.Build.0 = DBG|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.DBG|Win32.ActiveCfg = DBG|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.DBG|Win32.Build.0 = DBG|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.OPT Tests|Win32.ActiveCfg = OPT|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.OPT Tests|Win32.Build.0 = OPT|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.OPT|Win32.ActiveCfg = OPT|Win32
-		{E2C774B9-93EE-4408-963C-569712AF3C6B}.OPT|Win32.Build.0 = OPT|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

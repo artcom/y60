@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\initialization.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Logger.cpp"
 				>
 			</File>
