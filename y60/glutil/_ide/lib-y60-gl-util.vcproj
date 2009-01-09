@@ -174,10 +174,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\glExtensions.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\GLUtils.cpp"
 				>
 			</File>
