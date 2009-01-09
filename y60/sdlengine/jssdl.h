@@ -67,6 +67,8 @@
 #ifndef __Y60_ACXPSHELL_SDLCPP_INCLUDED__
 #define __Y60_ACXPSHELL_SDLCPP_INCLUDED__
 
+#include <y60/jsbase/jssettings.h>
+
 #include <js/spidermonkey/jsapi.h>
 
 extern bool initSdlClasses(JSContext *cx, JSObject *theGlobalObject);

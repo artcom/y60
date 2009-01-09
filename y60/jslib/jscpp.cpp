@@ -60,6 +60,7 @@
 #include "jscpp.h"
 
 #include <y60/glutil/GLUtils.h>
+
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"
