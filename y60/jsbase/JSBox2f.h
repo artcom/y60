@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 
+#include "JSVector.h"
+
 #include "JSWrapper.h"
 
 #include <asl/math/Vector234.h>
