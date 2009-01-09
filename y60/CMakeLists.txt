@@ -20,6 +20,9 @@ include(Y60Definitions)
 include(Y60Dependencies)
 include(Y60Utilities)
 
+# XXX: Spidermonkey definitions should be dependency-propagated.
+add_definitions(${SPIDERMONKEY_DEFINITIONS})
+
 # Make sure we can access our includes without staging
 include_directories(../)
 

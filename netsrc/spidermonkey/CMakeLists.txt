@@ -8,6 +8,8 @@ set(CMAKE_MODULE_PATH ${Spidermonkey_SOURCE_DIR})
 include(SpidermonkeyDefinitions)
 include(SpidermonkeyDependencies)
 
+add_definitions(${SPIDERMONKEY_DEFINITIONS})
+
 set(SOURCES
     jsapi.c jsarena.c jsarray.c jsatom.c jsbool.c jscntxt.c jsdate.c
     jsdbgapi.c jsdhash.c jsdtoa.c jsemit.c jsexn.c jsfile.c jsfun.c
@@ -16,11 +18,6 @@ set(SOURCES
     jsscan.c jsscope.c jsscript.c jsstr.c jsutil.c jsxdrapi.c
     prmjtime.c
 )
-
-# declspec magic
-set_source_files_properties( ${SOURCES}
-        PROPERTIES
-            COMPILE_DEFINITIONS EXPORT_JS_API  )
 
 # XXX This is a separate library in the original spidermonkey build
 #     Lets keep things simple and just mix in the sources for now.
@@ -85,6 +82,7 @@ set_target_properties(
     spidermonkey
     PROPERTIES
         PUBLIC_HEADER "${HEADERS}"
+	COMPILE_DEFINITIONS "EXPORT_JS_API"
 )
 
 install(
