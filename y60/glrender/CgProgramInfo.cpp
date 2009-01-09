@@ -8,10 +8,11 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <y60/glutil/GLUtils.h> // must be included first for <GL/glew.h>
+
 //own header
 #include "CgProgramInfo.h"
 
-#include <y60/glutil/GLUtils.h>
 #include <y60/base/NodeValueNames.h>
 #include <asl/base/string_functions.h>
 #include <asl/dom/Nodes.h>
