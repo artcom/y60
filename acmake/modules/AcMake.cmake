@@ -33,6 +33,9 @@ include(AcCommon)
 include(AcAddExecutable)
 include(AcAddLibrary)
 include(AcAddPlugin)
-include(AcBuildTypes)
+
+include(AcCoverage)
+include(AcProfiling)
+
 include(AcDocumentation)
 
