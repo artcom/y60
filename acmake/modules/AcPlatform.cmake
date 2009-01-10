@@ -1,12 +1,14 @@
-#============================================================================
-# Copyright (C) 2008, ART+COM Technologies GmbH Berlin
+# __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# These coded instructions, statements, and computer programs contain
-# unpublished proprietary information of ART+COM AG Berlin, and
-# are copy protected by law. They may not be disclosed to third parties
-# or copied or duplicated in any form, in whole or in part, without the
-# specific, prior written permission of ART+COM AG Berlin.
-#============================================================================
+# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+#
+# This file is part of the ART+COM CMake Library (acmake).
+#
+# It is distributed under the Boost Software License, Version 1.0. 
+# (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)             
+# __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+#
 #
 # This file declares cmake- and c-level discrimination
 # variables for each platform supported by acmake.
@@ -20,7 +22,10 @@
 #  - posix realtime library should be available
 #  - dlopen should be available (XXX: not on windows)
 #
-#============================================================================
+# XXX: This file might need some re-thinking. Works for now though.
+#
+# __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+#
 
 if(UNIX)
     if(APPLE)

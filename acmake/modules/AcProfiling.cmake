@@ -13,6 +13,7 @@
 # Profiling build type (only for gcc)
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+#
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(AC_PROFILING_FLAGS "-pg")

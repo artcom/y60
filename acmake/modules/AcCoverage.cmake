@@ -13,6 +13,7 @@
 # Coverage build type (only for gcc)
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+#
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(AC_COVERAGE_FLAGS "-fprofile-arcs -ftest-coverage")
