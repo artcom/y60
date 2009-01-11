@@ -58,6 +58,7 @@
 #include "numeric_functions.h"
 
 #include <asl/base/Enum.h>
+#include <asl/base/Logger.h>
 
 namespace asl {
 
@@ -566,13 +567,23 @@ namespace asl {
             base::makeXYZRotating(theRotation);
             _myType = ROTATING;
         }
-
+        // warning: this actually does XYZ-Rotation
+        void makeZYXRotating(const Vector3<Number> & theRotation) {
+            base::makeZYXRotating(theRotation);
+            _myType = ROTATING;
+        }
+        
         void rotateXYZ(const Vector3<Number> & theEulerVector) {
             rotateX(theEulerVector[0]);
             rotateY(theEulerVector[1]);
             rotateZ(theEulerVector[2]);
         }
 
+        void rotate(const Quaternion<Number> & theRotation) {
+            Matrix4<Number> myRotation(theRotation);
+            this->postMultiply(myRotation);
+        }
+        
         bool getRotation(Vector3<Number> & axis, Angle & a) const {
             return base::getRotation(axis,a);
         }
@@ -691,6 +702,45 @@ namespace asl {
             theRotation[2] = - myZ;
         }
 
+        void getRotation(Quaternion<Number> & theOrientation) const {
+            float trace = this->val[0][0] + this->val[1][1] + this->val[2][2] + 1.0f;
+            Number & qw = theOrientation[3];
+            Number & qx = theOrientation[0];
+            Number & qy = theOrientation[1];
+            Number & qz = theOrientation[2];
+
+            if( trace > 0 && !almostEqual(trace,0) ) {
+                float s = sqrtf(trace) * 2;
+                qw = 0.25f * s;
+                qx = ( this->val[2][1] - this->val[1][2] ) / s;
+                qy = ( this->val[0][2] - this->val[2][0] ) / s;
+                qz = ( this->val[1][0] - this->val[0][1] ) / s;
+            } else {
+                if ( this->val[0][0] > this->val[1][1] && this->val[0][0] > this->val[2][2] ) {
+                    float s = 2.0f * sqrtf( 1.0f + this->val[0][0] - this->val[1][1] - this->val[2][2]);
+                    qx = 0.25f * s;
+                    qy = (this->val[0][1] + this->val[1][0] ) / s;
+                    qz = (this->val[0][2] + this->val[2][0] ) / s;
+                    qw = (this->val[2][1] - this->val[1][2] ) / s;
+
+                } else if (this->val[1][1] > this->val[2][2]) {
+                    float s = 2.0f * sqrtf( 1.0f + this->val[1][1] - this->val[0][0] - this->val[2][2]);
+                    qx = (this->val[0][1] + this->val[1][0] ) / s;
+                    qy = 0.25f * s;
+                    qz = (this->val[1][2] + this->val[2][1] ) / s;
+                    qw = (this->val[0][2] - this->val[2][0] ) / s;
+                } else {
+                    float s = 2.0f * sqrtf( 1.0f + this->val[2][2] - this->val[0][0] - this->val[1][1] );
+                    qx = (this->val[0][2] + this->val[2][0] ) / s;
+                    qy = (this->val[1][2] + this->val[2][1] ) / s;
+                    qz = 0.25f * s;
+                    qw = (this->val[1][0] - this->val[0][1] ) / s;
+                }
+            }
+            theOrientation.normalize();
+        }    
+        
+        
         void scaleDispatch(const Vector3<Number> & s) {
             if (_myType == IDENTITY) {
                 base::makeScaling(s);
@@ -1029,10 +1079,23 @@ unknown:
         //           to the original values, but to equivalent ones. (e.g. scale [-1,0,0] might return
         //           rotation [0,PI_2,0] or [0,0,PI_2])
         // From gems II, page 320
+        
+        // Combinations of rotation and scale in fact might return wrong results -> better use decompose with quaternions anyway!! (gm)
+        
         bool decompose(Vector3<Number> & theScale,
                        Vector3<Number> & theShear,
                        Vector3<Number> & theOrientation,
-                       Vector3<Number> & thePosition) const
+                       Vector3<Number> & thePosition,
+                       RotationOrder theOrder = ROTATION_ORDER_XYZ) const
+        {
+            return decomposeEuler(theScale, theShear, theOrientation, thePosition, theOrder);
+        }
+        
+        bool decomposeEuler(Vector3<Number> & theScale,
+                       Vector3<Number> & theShear,
+                       Vector3<Number> & theOrientation,
+                       Vector3<Number> & thePosition,
+                       RotationOrder theOrder = ROTATION_ORDER_XYZ) const
         {
             if (_myType == UNKNOWN) {
                 // Decomposition is possible (descriped in gems)
@@ -1042,7 +1105,6 @@ unknown:
                 //throw NotYetImplemented(JUST_FILE_LINE);
                 return false;
             }
-
             thePosition = getTranslation();
 
             // Get the upper left 3x3 matrix
@@ -1066,7 +1128,9 @@ unknown:
             theScale[1] = length(myM3[1]);
             normalized(myM3[1]);
 
-            theShear[0] /= theScale[1];
+            if(theScale[1] != 0) {
+                theShear[0] /= theScale[1];
+            }
 
             // Compute XZ and YZ shears, orthogonalize 3rd row.
             theShear[1] = dot(myM3[0], myM3[2]);
@@ -1075,15 +1139,17 @@ unknown:
             myM3[2][2] = myM3[2][2] - theShear[1] * myM3[0][2];
 
             theShear[2] = dot(myM3[1], myM3[2]);
-            myM3[2][0] = myM3[2][0] - theShear[2] * myM3[0][0];
-            myM3[2][1] = myM3[2][1] - theShear[2] * myM3[0][1];
-            myM3[2][2] = myM3[2][2] - theShear[2] * myM3[0][2];
+            myM3[2][0] = myM3[2][0] - theShear[2] * myM3[1][0];
+            myM3[2][1] = myM3[2][1] - theShear[2] * myM3[1][1];
+            myM3[2][2] = myM3[2][2] - theShear[2] * myM3[1][2];
 
             // Next, get Z scale and normalize 3rd row.
             theScale[2] = length(myM3[2]);
             normalized(myM3[2]);
-            theShear[1] /= theScale[2];
-            theShear[2] /= theScale[2];
+            if(theScale[2] != 0) {
+                theShear[1] /= theScale[2];
+                theShear[2] /= theScale[2];
+            }
 
             // At this point, the matrix is orthonormal.
             // Check for a coordinate system flip.  If the determinant
@@ -1095,47 +1161,167 @@ unknown:
                 theScale *= -1;
             }
 
-            // Now, get the rotations (from "Eberly - 3D Game Engine Design", page 19)
-            // Sorry, for that (vs)
-            if (myM3[2][0] < -1.0) {
-                myM3[2][0] = -1.0;
+            // Now, get the rotations (from "Eberly - 3D Game Engine Design", page 19)(vs)
+             
+            switch (theOrder) {
+                case ROTATION_ORDER_XYZ:
+                    if (myM3[0][2] < -1.0) {
+                        myM3[0][2] = -1.0;
+                    }
+                    if (myM3[0][2] > 1.0) {
+                        myM3[0][2] = 1.0;
+                    }
+                    
+                    theOrientation[1] = asin(myM3[0][2]);
+                    if (theOrientation[1] < PI_2) {
+                        if (theOrientation[1] > - PI_2) {
+                            theOrientation[0] = atan2(-myM3[1][2], myM3[2][2]);
+                            theOrientation[2] = atan2(-myM3[0][1], myM3[0][0]);
+                        } else {
+                            theOrientation[0] = - atan2(myM3[1][0], myM3[1][1]);
+                            theOrientation[2] = 0;
+                        }
+                    } else {
+                        theOrientation[0] = atan2(myM3[1][0], myM3[1][1]);
+                        theOrientation[2] = 0;
+                    }
+                    
+                    break;
+                
+                case ROTATION_ORDER_ZYX:
+                    if (myM3[2][0] < -1.0) {
+                        myM3[2][0] = -1.0;
+                    }
+                    if (myM3[2][0] > 1.0) {
+                        myM3[2][0] = 1.0;
+                    }
+                    
+                    theOrientation[1] = asin(-myM3[2][0]);
+                    if (theOrientation[1] < PI_2) {
+                        if (theOrientation[1] > - PI_2) {
+                            theOrientation[0] = atan2(myM3[2][1], myM3[2][2]);
+                            theOrientation[2] = atan2(myM3[1][0], myM3[0][0]);
+                        } else {
+                            // not a unique solution
+                            theOrientation[0] = -atan2(-myM3[0][1], myM3[1][1]);
+                            theOrientation[2] = 0;
+                        }
+                    } else {
+                        // not a unique solution
+                        theOrientation[0] = atan2(-myM3[0][1], myM3[1][1]);
+                        theOrientation[2] = 0;
+                    }
+                    
+                    break;
+                case ROTATION_ORDER_XZY:
+                    if (myM3[0][1] < -1.0) {
+                        myM3[0][1] = -1.0;
+                    }
+                    if (myM3[0][1] > 1.0) {
+                        myM3[0][1] = 1.0;
+                    }
+                    
+                    theOrientation[2] = asin(-myM3[0][1]);
+                    if (theOrientation[2] < PI_2) {
+                        if (theOrientation[2] > - PI_2) {
+                            theOrientation[0] = atan2(myM3[2][1], myM3[1][1]);
+                            theOrientation[1] = atan2(myM3[0][2], myM3[0][0]);
+                        } else {
+                            theOrientation[0] = - atan2(-myM3[2][0], myM3[2][2]);
+                            theOrientation[1] = 0;
+                        }
+                    } else {
+                        theOrientation[0] = atan2(-myM3[2][0], myM3[2][2]);
+                        theOrientation[1] = 0;
+                    }
+                    break;
+                case ROTATION_ORDER_YXZ:
+                    if (myM3[1][2] < -1.0) {
+                        myM3[1][2] = -1.0;
+                    }
+                    if (myM3[1][2] > 1.0) {
+                        myM3[1][2] = 1.0;
+                    }
+                    theOrientation[0] = asin(-myM3[1][2]);
+                    if (theOrientation[0] < PI_2) {
+                        if (theOrientation[0] > - PI_2) {
+                            theOrientation[1] = atan2(myM3[0][2], myM3[2][2]);
+                            theOrientation[2] = atan2(myM3[1][0], myM3[1][1]);
+                        } else {
+                            theOrientation[1] = - atan2(-myM3[0][1], myM3[0][0]);
+                            theOrientation[2] = 0;
+                        }
+                    } else {
+                        theOrientation[1] = atan2(-myM3[0][1], myM3[0][0]);
+                        theOrientation[2] = 0;
+                    }
+                    break;
+                case ROTATION_ORDER_YZX:
+                    if (myM3[1][0] < -1.0) {
+                        myM3[1][0] = -1.0;
+                    }
+                    if (myM3[1][0] > 1.0) {
+                        myM3[1][0] = 1.0;
+                    }
+                    theOrientation[2] = asin(myM3[1][0]);
+                    if (theOrientation[2] < PI_2) {
+                        if (theOrientation[2] > - PI_2) {
+                            theOrientation[1] = atan2(-myM3[2][0], myM3[0][0]);
+                            theOrientation[0] = atan2(-myM3[1][2], myM3[1][1]);
+                        } else {
+                            theOrientation[1] = - atan2(myM3[2][1], myM3[2][2]);
+                            theOrientation[0] = 0;
+                        }
+                    } else {
+                        theOrientation[1] = atan2(myM3[2][1], myM3[2][2]);
+                        theOrientation[0] = 0;
+                    }
+                    break;
+                case ROTATION_ORDER_ZXY:
+                    if (myM3[2][1] < -1.0) {
+                        myM3[2][1] = -1.0;
+                    }
+                    if (myM3[2][1] > 1.0) {
+                        myM3[2][1] = 1.0;
+                    }
+                    theOrientation[0] = asin(myM3[2][1]);
+                    if (theOrientation[0] < PI_2) {
+                        if (theOrientation[0] > - PI_2) {
+                            theOrientation[2] = atan2(-myM3[0][1], myM3[1][1]);
+                            theOrientation[1] = atan2(-myM3[2][0], myM3[2][2]);
+                        } else {
+                            theOrientation[2] = - atan2(myM3[0][2], myM3[0][0]);
+                            theOrientation[1] = 0;
+                        }
+                    } else {
+                        theOrientation[2] = atan2(myM3[0][2], myM3[0][0]);
+                        theOrientation[1] = 0;
+                    }
+                    break;
             }
-            if (myM3[2][0] > 1.0) {
-                myM3[2][0] = 1.0;
-            }
-            theOrientation[1] = asin(myM3[2][0]);
-            if (theOrientation[1] < PI_2) {
-                if (theOrientation[1] > - PI_2) {
-                    theOrientation[0] = atan2(-myM3[2][1], myM3[2][2]);
-                    theOrientation[2] = atan2(-myM3[1][0], myM3[0][0]);
-                } else {
-                    // not a unique solution
-                    theOrientation[0] = -atan2(myM3[0][1], myM3[1][1]);
-                    theOrientation[2] = 0;
-                }
-            } else {
-                // not a unique solution
-                theOrientation[0] = atan2(myM3[0][1], myM3[1][1]);
-                theOrientation[2] = 0;
-            }
+            theOrientation[0] = - theOrientation[0];
+            theOrientation[1] = - theOrientation[1];
+            theOrientation[2] = - theOrientation[2];
+            
             return true;
         }
-        // Decomposes affine matrices into a transformation sequence:
-        // M = Scale * ShearXY * ShearXZ * ShearYZ * RotateX * RotateY * RotateZ * Translate
-        // Be aware: Combinations of rotation and scale (and possibly others) cannot be decomposed
-        //           to the original values, but to equivalent ones. (e.g. scale [-1,0,0] might return
-        //           rotation [0,PI_2,0] or [0,0,PI_2])
-        // From gems II, page 320
+        
+        // Decomposes affine matrices into a transformation sequence
+        // shearing is not taken in account yet!
         bool decompose(Vector3<Number> & theScale,
                        Vector3<Number> & theShear,
                        Quaternion<Number> & theOrientation,
                        Vector3<Number> & thePosition) const
         {
+            return decomposeQuaterion(theScale, theShear, theOrientation, thePosition);
+        }
+
+        bool decomposeQuaterion(Vector3<Number> & theScale,
+                       Vector3<Number> & theShear,
+                       Quaternion<Number> & theOrientation,
+                       Vector3<Number> & thePosition) const
+        {
             if (_myType == UNKNOWN) {
-                // Decomposition is possible (descriped in gems)
-                // Steps to do:
-                // (1) Normaize matrix
-                // (2) Solve for perspective
                 //throw NotYetImplemented(JUST_FILE_LINE);
                 return false;
             }
@@ -1149,40 +1335,30 @@ unknown:
                 Vector3<Number>(this->val[1][0],this->val[1][1],this->val[1][2]),
                 Vector3<Number>(this->val[2][0],this->val[2][1],this->val[2][2]));
 
-            // Compute X scale factor and normalize first row.
+            // Compute scale factors
             theScale[0] = length(myM3[0]);
-            normalized(myM3[0]);
-
-            // Compute XY shear factor and make 2nd row orthogonal to 1st.
-            theShear[0] = dot(myM3[0], myM3[1]);
-            myM3[1][0] = myM3[1][0] - theShear[0] * myM3[0][0];
-            myM3[1][1] = myM3[1][1] - theShear[0] * myM3[0][1];
-            myM3[1][2] = myM3[1][2] - theShear[0] * myM3[0][2];
-
-            // Now, compute Y scale and normalize 2nd row.
             theScale[1] = length(myM3[1]);
-            normalized(myM3[1]);
-
-            theShear[0] /= theScale[1];
-
-            // Compute XZ and YZ shears, orthogonalize 3rd row.
-            theShear[1] = dot(myM3[0], myM3[2]);
-            myM3[2][0] = myM3[2][0] - theShear[1] * myM3[0][0];
-            myM3[2][1] = myM3[2][1] - theShear[1] * myM3[0][1];
-            myM3[2][2] = myM3[2][2] - theShear[1] * myM3[0][2];
-
-            theShear[2] = dot(myM3[1], myM3[2]);
-            myM3[2][0] = myM3[2][0] - theShear[2] * myM3[0][0];
-            myM3[2][1] = myM3[2][1] - theShear[2] * myM3[0][1];
-            myM3[2][2] = myM3[2][2] - theShear[2] * myM3[0][2];
-
-            // Next, get Z scale and normalize 3rd row.
             theScale[2] = length(myM3[2]);
-            normalized(myM3[2]);
-            theShear[1] /= theScale[2];
-            theShear[2] /= theScale[2];
-
-            // At this point, the matrix is orthonormal.
+           
+            if(theScale[0] != 0)
+            {
+                myM3[0][0] /= theScale[0];
+                myM3[0][1] /= theScale[0];
+                myM3[0][2] /= theScale[0];
+            }
+            if(theScale[1] != 0)
+            {
+                myM3[1][0] /= theScale[1];
+                myM3[1][1] /= theScale[1];
+                myM3[1][2] /= theScale[1];
+            }
+            if(theScale[2] != 0)
+            {
+                myM3[2][0] /= theScale[2];
+                myM3[2][1] /= theScale[2];
+                myM3[2][2] /= theScale[2];
+            }
+        
             // Check for a coordinate system flip.  If the determinant
             // is -1, then negate the matrix and the scaling factors.
             if (dot(myM3[0], cross(myM3[1], myM3[2])) < 0) {
@@ -1191,71 +1367,21 @@ unknown:
                 }
                 theScale *= -1;
             }
-
-            // Now, get the rotations (from "Eberly - 3D Game Engine Design", page 19)
-            // Sorry, for that (vs)
-            /*
-            if (myM3[2][0] < -1.0) {
-                myM3[2][0] = -1.0;
+            
+            Matrix4<Number> myM4;
+            for(int x=0;x<3;x++)
+            {
+                myM4[x][0] = myM3[x][0];
+                myM4[x][1] = myM3[x][1];
+                myM4[x][2] = myM3[x][2];
+                myM4[x][3] = 0;
+                myM4[3][x] = 0;
             }
-            if (myM3[2][0] > 1.0) {
-                myM3[2][0] = 1.0;
-            }
-            theOrientation[1] = asin(myM3[2][0]);
-            if (theOrientation[1] < PI_2) {
-                if (theOrientation[1] > - PI_2) {
-                    theOrientation[0] = atan2(-myM3[2][1], myM3[2][2]);
-                    theOrientation[2] = atan2(-myM3[1][0], myM3[0][0]);
-                } else {
-                    // not a unique solution
-                    theOrientation[0] = -atan2(myM3[0][1], myM3[1][1]);
-                    theOrientation[2] = 0;
-                }
-            } else {
-                // not a unique solution
-                theOrientation[0] = atan2(myM3[0][1], myM3[1][1]);
-                theOrientation[2] = 0;
-            }
-            */
-
-            float trace = myM3[0][0] + myM3[1][1] + myM3[2][2] + 1.0f;
-            Number & qw = theOrientation[3];
-            Number & qx = theOrientation[0];
-            Number & qy = theOrientation[1];
-            Number & qz = theOrientation[2];
-
-            if( trace > 0 && !almostEqual(trace,0) ) {
-                float s = 0.5f / sqrtf(trace);
-                qw = 0.25f / s;
-                qx = ( myM3[2][1] - myM3[1][2] ) * s;
-                qy = ( myM3[0][2] - myM3[2][0] ) * s;
-                qz = ( myM3[1][0] - myM3[0][1] ) * s;
-            } else {
-                if ( myM3[0][0] > myM3[1][1] && myM3[0][0] > myM3[2][2] ) {
-                    float s = 2.0f * sqrtf( 1.0f + myM3[0][0] - myM3[1][1] - myM3[2][2]);
-                    qx = 0.25f * s;
-                    qy = (myM3[0][1] + myM3[1][0] ) / s;
-                    qz = (myM3[0][2] + myM3[2][0] ) / s;
-                    qw = (myM3[1][2] - myM3[2][1] ) / s;
-
-                } else if (myM3[1][1] > myM3[2][2]) {
-                    float s = 2.0f * sqrtf( 1.0f + myM3[1][1] - myM3[0][0] - myM3[2][2]);
-                    qx = (myM3[0][1] + myM3[1][0] ) / s;
-                    qy = 0.25f * s;
-                    qz = (myM3[1][2] + myM3[2][1] ) / s;
-                    qw = (myM3[0][2] - myM3[2][0] ) / s;
-                } else {
-                    float s = 2.0f * sqrtf( 1.0f + myM3[2][2] - myM3[0][0] - myM3[1][1] );
-                    qx = (myM3[0][2] + myM3[2][0] ) / s;
-                    qy = (myM3[1][2] + myM3[2][1] ) / s;
-                    qz = 0.25f * s;
-                    qw = (myM3[0][1] - myM3[1][0] ) / s;
-                }
-            }
-            theOrientation.normalize();
+            
+            myM4.getRotation(theOrientation);
             return true;
         }
-
+        
         void adjoint() {
             base::adjoint();
         }

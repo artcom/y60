@@ -42,6 +42,7 @@ bool ourPerformanceTest = true;
     const int ourNumberOfMults = 250000;
 #endif
 
+const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 1000000;
 
 template <class T>
 class Matrix4UnitTest : public UnitTest {
@@ -73,6 +74,7 @@ class Matrix4UnitTest : public UnitTest {
             testTranspose();
             testInversion();
             testInvertClassify();
+            testMatrixDecompositionEuler();
             testMatrixDecomposition();
             testGetRotation();
             testTypeInvariance();
@@ -80,6 +82,9 @@ class Matrix4UnitTest : public UnitTest {
             testTransformedNormal();
             testEasyMatrixAccess();
             testMakeLookAt();
+            //testRotationOrderXYZEuler();
+            testRotationOrderXYZ();
+            testRandomMatrixDecomposition(RANDOM_DECOMPOSITION_TEST_COUNT);
 
             if (ourPerformanceTest) {
                 finalPerformanceTest();
@@ -975,6 +980,290 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
             testRotateHelper(myMatrix1, UNKNOWN);
         }
+        
+        void testRandomMatrixDecomposition(const unsigned theTestCount) {
+            unsigned mySuccededTests = 0;
+            DecomposedQuaternionMatrix myResult;
+            Vector3<T> myEulerRot(0,0,0);
+            bool myFailure = false;
+            while(mySuccededTests < theTestCount) {
+                ++mySuccededTests;
+                myResult.scale       = Vector3<T>(randomHelper(-10, 10, 0), randomHelper(-10, 10, 0), randomHelper(-10, 10, 0));
+                myEulerRot = Vector3<T>(randomHelper(-10, 10), randomHelper(-10, 10), randomHelper(-10, 10));
+                myResult.orientation = Quaternion<T>::createFromEuler(myEulerRot);
+                myResult.position    = Vector3<T>(randomHelper(-10, 10), randomHelper(-10, 10), randomHelper(-10, 10));
+                AC_INFO<<"original values: "<<myResult.scale<<" , "<<myResult.orientation<<" , "<<myEulerRot;
+                Matrix4<T> myMatrix;
+                myMatrix.makeScaling(myResult.scale);
+                Matrix4<T> myRotation(myResult.orientation);
+                myMatrix.postMultiply(myRotation);
+                myMatrix.translate(myResult.position);
+                myFailure = testRandomMatrixDecompositionHelper(myMatrix, myResult);
+                if(!myFailure) {
+                    break;
+                } else {
+                    // Clear result
+                    myResult.scale       = Vector3<T>(1,1,1);
+                    myResult.orientation = Quaternion<T>(0,0,0,1);
+                    myResult.position    = Vector3<T>(0,0,0);
+                }
+            }
+            std::stringstream ss;
+            ss << mySuccededTests << " random Matrix decompositions done";
+            ENSURE_MSG(myFailure, (ss.str()).c_str());
+            if(!myFailure) {
+                AC_PRINT<<"test failed scale: "<<myResult.scale<<" rotation: "<<myEulerRot<<" position: "<<myResult.position;
+                exit(1);
+            }
+
+        }
+        float randomHelper(int theLowerbound, int theUpperbound, int theBadValue = INT_MAX) {
+           assert(theUpperbound - theLowerbound < RAND_MAX);
+           float myRandom = (float) theLowerbound + (float) (std::rand() % ((theUpperbound - theLowerbound + 1)*1000))/1000.f;
+           if (almostEqual(myRandom, theBadValue)){
+               return randomHelper(theLowerbound, theUpperbound, theBadValue);
+           } else {
+               return myRandom;
+           }
+        }
+        
+        void testRotationOrderXYZ() {
+            Quaternion<T> myOrientation;
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Vector3<T> myPosition;
+            
+            Matrix4<T> myMatrix1;
+            myMatrix1.makeXRotating(T(1.234));
+            Matrix4<T> myMatrix2;
+            myMatrix2.makeYRotating(T(1.234));
+            Matrix4<T> myMatrix3;
+            myMatrix3.makeZRotating(T(1.234));
+            myMatrix1.postMultiply(myMatrix2);
+            myMatrix1.postMultiply(myMatrix3);
+            Matrix4<T> myResultMatrix = myMatrix1;
+            
+            // test makeRotating
+            myMatrix1.makeRotating(Vector3<T>(1,0,0), T(1.234));
+            myMatrix2.makeRotating(Vector3<T>(0,1,0), T(1.234));
+            myMatrix3.makeRotating(Vector3<T>(0,0,1), T(1.234));
+            myMatrix1.postMultiply(myMatrix2);
+            myMatrix1.postMultiply(myMatrix3);
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            
+            
+            // test makeXYZRotating
+            myMatrix1.makeXYZRotating(Vector3<T>(1.234,1.234,1.234));
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+            //    (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+            //    (string("Matrix makeXYZRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            
+            // test rotateXYZ
+            myMatrix1.makeIdentity();
+            myMatrix1.rotateXYZ(Vector3<T>(1.234,1.234,1.234));
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix rotateXYZ() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix rotateXYZ() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            // test Matrix  Quaternion ctor
+            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>(1.234,1.234,1.234)));
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix Quaternion Ctor && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotate(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix Quaternion Ctor && decompose() , type: " + myMatrix1.getTypeString())).c_str());
+            
+        }
+        
+        void testRotationOrderXYZEuler() {
+            Vector3<T> myOrientation;
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Vector3<T> myPosition;
+            
+            Matrix4<T> myMatrix1;
+            myMatrix1.makeXRotating(T(1.234));
+            Matrix4<T> myMatrix2;
+            myMatrix2.makeYRotating(T(1.234));
+            Matrix4<T> myMatrix3;
+            myMatrix3.makeZRotating(T(1.234));
+            myMatrix1.postMultiply(myMatrix2);
+            myMatrix1.postMultiply(myMatrix3);
+            Matrix4<T> myResultMatrix = myMatrix1;
+            
+            // test makeRotating
+            myMatrix1.makeRotating(Vector3<T>(1,0,0), T(1.234));
+            myMatrix2.makeRotating(Vector3<T>(0,1,0), T(1.234));
+            myMatrix3.makeRotating(Vector3<T>(0,0,1), T(1.234));
+            myMatrix1.postMultiply(myMatrix2);
+            myMatrix1.postMultiply(myMatrix3);
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            
+            
+            // test makeXYZRotating
+            myMatrix1.makeXYZRotating(Vector3<T>(1.234,1.234,1.234));
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+            //    (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+            //    (string("Matrix makeXYZRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            
+            // test rotateXYZ
+            myMatrix1.makeIdentity();
+            myMatrix1.rotateXYZ(Vector3<T>(1.234,1.234,1.234));
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix rotateXYZ() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix rotateXYZ() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            // test Matrix  Quaternion ctor
+            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>(1.234,1.234,1.234)));
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix1.getRotation(myOrientation);
+            //myScale = myMatrix1.getScale();
+            myPosition = myMatrix1.getTranslation();
+            
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix Quaternion Ctor && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
+            
+            myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myMatrix2.makeIdentity();
+            myMatrix2.scale(myScale);
+            myMatrix2.rotateXYZ(myOrientation);
+            myMatrix2.translate(myPosition);
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix Quaternion Ctor && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
+            
+        }
 
         void testPostMultiply() {
             Matrix4<T> myIdentityMatrix;
@@ -1485,48 +1774,258 @@ class Matrix4UnitTest : public UnitTest {
             Vector3<T> orientation;
             Vector3<T> position;
         };
+        
+        struct DecomposedQuaternionMatrix {
+            Vector3<T> scale;
+            Quaternion<T> orientation;
+            Vector3<T> position;
+        };
+        
 
-        void testDecompositionHelper(const Matrix4<T> & theMatrix,
-                                     DecomposedMatrix & theResult)
+        bool
+        testEulerDecompositionHelper(const Matrix4<T> & theMatrix,
+                                     DecomposedMatrix & theResult,
+                                     typename Matrix4<T>::RotationOrder theOrder = Matrix4<T>::ROTATION_ORDER_XYZ)
         {
             Vector3<T> myScale;
             Vector3<T> myShear;
             Vector3<T> myOrientation;
             Vector3<T> myPosition;
-            theMatrix.decompose(myScale, myShear, myOrientation, myPosition);
-            ENSURE_MSG(almostEqual(myShear, Vector3<T>(0,0,0)),
-                (string("Matrix decomposition (shear), type: " + theMatrix.getTypeString())).c_str());
-            ENSURE_MSG(almostEqual(myScale, theResult.scale),
-                (string("Matrix decomposition (scale), type: " + theMatrix.getTypeString())).c_str());
-            ENSURE_MSG(almostEqual(myPosition, theResult.position),
-                (string("Matrix decomposition (position), type: " + theMatrix.getTypeString())).c_str());
-
-            ENSURE_MSG(rotationIsEquivalent(myOrientation, theResult.orientation),
-                (string("Matrix decomposition (orientation), type: " + theMatrix.getTypeString())).c_str());
-
+            theMatrix.decomposeEuler(myScale, myShear, myOrientation, myPosition, theOrder);
+            Matrix4<T> myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(myScale);
+            Matrix4<T> myRotation = Matrix4<T>::Identity();
+            
+            switch (theOrder) {
+                case Matrix4<T>::ROTATION_ORDER_XYZ:
+                    myRotation.rotateXYZ(myOrientation);
+                    break;
+                case Matrix4<T>::ROTATION_ORDER_ZYX:
+                    myRotation.makeXYZRotating(myOrientation);
+                    break;
+                case Matrix4<T>::ROTATION_ORDER_XZY:
+                    
+                    break;
+                case Matrix4<T>::ROTATION_ORDER_YXZ:
+                    
+                    break;
+                case Matrix4<T>::ROTATION_ORDER_YZX:
+                    
+                    break;
+                case Matrix4<T>::ROTATION_ORDER_ZXY:
+                    break;
+            }
+            
+            myMatrix.postMultiply(myRotation);
+            myMatrix.translate(myPosition);
+            bool myResult = transformationIsEquivalent(myMatrix, theMatrix);
+            ENSURE_MSG(myResult,
+                (string("Matrix decomposition , type: " + theMatrix.getTypeString())).c_str());
+            
             // Clear result
             theResult.scale       = Vector3<T>(1,1,1);
             theResult.orientation = Vector3<T>(0,0,0);
             theResult.position    = Vector3<T>(0,0,0);
+            return myResult;
         }
-
+        
         bool
-        rotationIsEquivalent(Vector3<T> a, Vector3<T> b) {
-            Matrix4<T> myMatrix1;
-            myMatrix1.makeXRotating(a[0]);
-            myMatrix1.rotateY(a[1]);
-            myMatrix1.rotateZ(a[2]);
-            Matrix4<T> myMatrix2;
-            myMatrix2.makeXRotating(b[0]);
-            myMatrix2.rotateY(b[1]);
-            myMatrix2.rotateZ(b[2]);
-            return almostEqual(Point3<T>(1,1,1) * myMatrix1, Point3<T>(1,1,1) * myMatrix2);
+        testDecompositionHelper(const Matrix4<T> & theMatrix,
+                                     DecomposedQuaternionMatrix & theResult)
+        {
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Quaternion<T> myOrientation;
+            Vector3<T> myPosition;
+            AC_INFO<<theMatrix;
+            theMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+            Matrix4<T> myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(myScale);
+            Matrix4<T> myRotation(myOrientation);
+            myMatrix.postMultiply(myRotation);
+            myMatrix.translate(myPosition);
+            AC_INFO<<myScale<<" , "<<myOrientation;
+            bool myResult = transformationIsEquivalent(myMatrix, theMatrix);
+            ENSURE_MSG(myResult,
+                (string("Matrix decomposition , type: " + theMatrix.getTypeString())).c_str());
+            // Clear result
+            theResult.scale       = Vector3<T>(1,1,1);
+            theResult.orientation = Quaternion<T>(0,0,0,1);
+            theResult.position    = Vector3<T>(0,0,0);
+            return myResult;
+        }
+        
+        bool
+        testRandomMatrixDecompositionHelper(const Matrix4<T> & theMatrix,
+                                     DecomposedQuaternionMatrix & theResult)
+        {
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Quaternion<T> myOrientation;
+            Vector3<T> myPosition;
+            AC_INFO<<theMatrix;
+            theMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+            Matrix4<T> myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(myScale);
+            Matrix4<T> myRotation(myOrientation);
+            myMatrix.postMultiply(myRotation);
+            myMatrix.translate(myPosition);
+            AC_INFO<<myScale<<" , "<<myOrientation;
+            return transformationIsEquivalent(myMatrix, theMatrix);
+        }
+        
+        bool
+        transformationIsEquivalent(Matrix4<T> a, Matrix4<T> b) {
+            AC_INFO<<Point3<T>(1,1,1) * a<<", "<<Point3<T>(1,1,1) * b;
+            return almostEqual(Point3<T>(1,1,1) * a, Point3<T>(1,1,1) * b, 1E-3);
         }
 
-        void testMatrixDecomposition() {
+        
+        void testMatrixDecompositionEuler() {
             DecomposedMatrix myResult;
             myResult.scale       = Vector3<T>(1,1,1);
             myResult.orientation = Vector3<T>(0,0,0);
+            myResult.position    = Vector3<T>(0,0,0);
+
+            // Test identity
+            Matrix4<T> myMatrix;
+            myMatrix.makeIdentity();
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test translating only
+            myResult.position = Vector3<T>(1,2,3);
+            myMatrix.makeTranslating(myResult.position);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test scaling only
+            myResult.scale = Vector3<T>(3,2,1);
+            myMatrix.makeScaling(myResult.scale);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test rotation only
+            myMatrix.makeXRotating(T(PI_4));
+            myResult.orientation = Vector3<T>(T(PI_4),0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeYRotating(T(PI_4));
+            myResult.orientation = Vector3<T>(0,T(PI_4),0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeZRotating(T(PI_4));
+            myResult.orientation = Vector3<T>(0,0,T(PI_4));
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeXRotating(1);
+            myResult.orientation = Vector3<T>(1,0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeYRotating(-1);
+            myResult.orientation = Vector3<T>(0,-1,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeZRotating(4);
+            myResult.orientation = Vector3<T>(0,0,4);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeXRotating(T(5.123));
+            myResult.orientation = Vector3<T>(T(5.123),0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeYRotating(-5);
+            myResult.orientation = Vector3<T>(0,-5,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeZRotating(0);
+            myResult.orientation = Vector3<T>(0,0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeXRotating(312);
+            myResult.orientation = Vector3<T>(312,0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeYRotating(T(-0.111));
+            myResult.orientation = Vector3<T>(0,T(-0.111),0);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myMatrix.makeZRotating(T(PI));
+            myResult.orientation = Vector3<T>(0,0,T(PI));
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test composition of rotations
+            myResult.orientation = Vector3<T>(1,2,3);
+            myMatrix.makeXYZRotating(myResult.orientation);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            myResult.orientation = Vector3<T>(-1,0,-3);
+            myMatrix.makeXYZRotating(myResult.orientation);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test composition of scale and translation
+            myResult.scale = Vector3<T>(3,2,1);
+            myResult.position = Vector3<T>(-4,-5,6);
+            myMatrix.makeScaling(myResult.scale);
+            myMatrix.translate(myResult.position);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test composition of rotation and translation
+            myResult.orientation = Vector3<T>(10,0,0);
+            myResult.position = Vector3<T>(-1,-2,-3);
+            myMatrix.makeXRotating(10);
+            myMatrix.translate(myResult.position);
+            testEulerDecompositionHelper(myMatrix, myResult);
+
+            // Test composition of rotation and scale - these tests fail with Euler decompose!!
+            myResult.scale = Vector3<T>(3,2,1);
+            myResult.orientation = Vector3<T>(-5,0,0);
+            myMatrix.makeScaling(myResult.scale);
+            myMatrix.rotateX(-5);
+            
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Vector3<T> myOrientation;
+            Vector3<T> myPosition;
+            myMatrix.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            Matrix4<T> myResultMatrix = Matrix4<T>::Identity();
+            myResultMatrix.scale(myScale);
+            Matrix4<T> myRotation(Quaternion<T>::createFromEuler(myOrientation));
+            myResultMatrix.postMultiply(myRotation);
+            myResultMatrix.translate(myPosition);
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix));
+            
+            // clear tmp vectors
+            myScale = Vector3<T>(1,1,1);
+            myShear = Vector3<T>(0,0,0);
+            myOrientation = Vector3<T>(0,0,0);
+            myPosition = Vector3<T>(0,0,0);
+            
+            myResult.scale = Vector3<T>(-3,-2,-1);
+            myResult.orientation = Vector3<T>(1,0,0);
+            myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(myResult.scale);
+            Matrix4<T> myRotation2(Quaternion<T>::createFromEuler(myResult.orientation));
+            myMatrix.postMultiply(myRotation2);
+            
+            myMatrix.decomposeEuler(myScale, myShear, myOrientation, myPosition);
+            myResultMatrix.makeIdentity();
+            myResultMatrix.scale(myScale);
+            Matrix4<T> myRotation3(Quaternion<T>::createFromEuler(myOrientation));
+            myResultMatrix.postMultiply(myRotation3);
+            myResultMatrix.translate(myPosition);
+            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix));
+            
+            // Test scale which results in combination of scaling & rotation
+            myResult.orientation = Vector3<T>(0,0,0);
+            myResult.scale = Vector3<T>(-0.5,-0.5,1);
+            myMatrix.makeScaling(Vector3<T>(-0.5,-0.5,1));
+            testEulerDecompositionHelper(myMatrix, myResult);
+            
+        }
+        
+        
+        void testMatrixDecomposition() {
+            DecomposedQuaternionMatrix myResult;
+            myResult.scale       = Vector3<T>(1,1,1);
+            myResult.orientation = Quaternion<T>(0,0,0,1);
             myResult.position    = Vector3<T>(0,0,0);
 
             // Test identity
@@ -1546,60 +2045,60 @@ class Matrix4UnitTest : public UnitTest {
 
             // Test rotation only
             myMatrix.makeXRotating(T(PI_4));
-            myResult.orientation = Vector3<T>(T(PI_4),0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),0,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeYRotating(T(PI_4));
-            myResult.orientation = Vector3<T>(0,T(PI_4),0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,T(PI_4),0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeZRotating(T(PI_4));
-            myResult.orientation = Vector3<T>(0,0,T(PI_4));
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_4)));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeXRotating(1);
-            myResult.orientation = Vector3<T>(1,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(1,0,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeYRotating(-1);
-            myResult.orientation = Vector3<T>(0,-1,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,-1,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeZRotating(4);
-            myResult.orientation = Vector3<T>(0,0,4);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,0,4));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeXRotating(T(5.123));
-            myResult.orientation = Vector3<T>(T(5.123),0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(T(5.123),0,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeYRotating(-5);
-            myResult.orientation = Vector3<T>(0,-5,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,-5,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeZRotating(0);
-            myResult.orientation = Vector3<T>(0,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,0,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeXRotating(312);
-            myResult.orientation = Vector3<T>(312,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(312,0,0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeYRotating(T(-0.111));
-            myResult.orientation = Vector3<T>(0,T(-0.111),0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,T(-0.111),0));
             testDecompositionHelper(myMatrix, myResult);
 
             myMatrix.makeZRotating(T(PI));
-            myResult.orientation = Vector3<T>(0,0,T(PI));
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI)));
             testDecompositionHelper(myMatrix, myResult);
 
             // Test composition of rotations
-            myResult.orientation = Vector3<T>(1,2,3);
-            myMatrix.makeXYZRotating(myResult.orientation);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(1,2,3));
+            myMatrix.makeXYZRotating(Vector3<T>(1,2,3));
             testDecompositionHelper(myMatrix, myResult);
 
-            myResult.orientation = Vector3<T>(-1,0,-3);
-            myMatrix.makeXYZRotating(myResult.orientation);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(-1,0,-3));
+            myMatrix.makeXYZRotating(Vector3<T>(-1,0,-3));
             testDecompositionHelper(myMatrix, myResult);
 
             // Test composition of scale and translation
@@ -1610,7 +2109,7 @@ class Matrix4UnitTest : public UnitTest {
             testDecompositionHelper(myMatrix, myResult);
 
             // Test composition of rotation and translation
-            myResult.orientation = Vector3<T>(10,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(10,0,0));
             myResult.position = Vector3<T>(-1,-2,-3);
             myMatrix.makeXRotating(10);
             myMatrix.translate(myResult.position);
@@ -1618,35 +2117,23 @@ class Matrix4UnitTest : public UnitTest {
 
             // Test composition of rotation and scale
             myResult.scale = Vector3<T>(3,2,1);
-            myResult.orientation = Vector3<T>(-5,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(-5,0,0));
             myMatrix.makeScaling(myResult.scale);
             myMatrix.rotateX(-5);
             testDecompositionHelper(myMatrix, myResult);
 
-            // [CH] This does not work, yet - sorry
-
             myResult.scale = Vector3<T>(-3,-2,-1);
-            myResult.orientation = Vector3<T>(1,0,0);
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(1,0,0));
             myMatrix.makeScaling(myResult.scale);
             myMatrix.rotateX(1);
             testDecompositionHelper(myMatrix, myResult);
 
-/*
-            myResult.scale = Vector3<T>(3,2,1);
-            myResult.orientation = Vector3<T>(3,4,5);
-            myMatrix.makeScaling(myResult.scale);
-            myMatrix.rotateHPR(Vector3<T>(4,3,5));
+            // Test scale which results in combination of scaling & euler rotation
+            myResult.orientation = Quaternion<T>::createFromEuler(Vector3<T>(0,0,0));
+            myResult.scale = Vector3<T>(-0.5,-0.5,1);
+            myMatrix.makeScaling(Vector3<T>(-0.5,-0.5,1));
             testDecompositionHelper(myMatrix, myResult);
-
-            // Test composition of scale, rotation and translation
-            myResult.scale = Vector3<T>(2,4,75);
-            myResult.orientation = Vector3<T>(1,9,3);
-            myResult.position = Vector3<T>(3,8,0);
-            myMatrix.makeScaling(myResult.scale);
-            myMatrix.rotateHPR(Vector3<T>(9,1,3));
-            myMatrix.translate(myResult.position);
-            testDecompositionHelper(myMatrix, myResult);
-*/
+            
         }
 
         void testGetRotationHelper(const Vector3<T> & theRotation) {
@@ -1773,60 +2260,7 @@ class Matrix4UnitTest : public UnitTest {
             testGetRotationHelper(Vector3<T>(40,50,60));
             testGetRotationHelper(Vector3<T>(-40,50,-0.5));
             testGetRotationHelper(Vector3<T>(0,0,0));
-/*
-            myMatrix.makeYRotating(T(PI_4));
-            myResult.orientation = Vector3<T>(0,T(PI_4),0);
-            testDecompositionHelper(myMatrix, myResult);
 
-            myMatrix.makeZRotating(T(PI_4));
-            myResult.orientation = Vector3<T>(0,0,T(PI_4));
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeXRotating(1);
-            myResult.orientation = Vector3<T>(1,0,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeYRotating(-1);
-            myResult.orientation = Vector3<T>(0,-1,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeZRotating(4);
-            myResult.orientation = Vector3<T>(0,0,4);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeXRotating(T(5.123));
-            myResult.orientation = Vector3<T>(T(5.123),0,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeYRotating(-5);
-            myResult.orientation = Vector3<T>(0,-5,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeZRotating(0);
-            myResult.orientation = Vector3<T>(0,0,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeXRotating(312);
-            myResult.orientation = Vector3<T>(312,0,0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeYRotating(T(-0.111));
-            myResult.orientation = Vector3<T>(0,T(-0.111),0);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myMatrix.makeZRotating(T(PI));
-            myResult.orientation = Vector3<T>(0,0,T(PI));
-            testDecompositionHelper(myMatrix, myResult);
-
-            // Test composition of rotations
-            myResult.orientation = Vector3<T>(1,2,3);
-            myMatrix.makeXYZRotating(myResult.orientation);
-            testDecompositionHelper(myMatrix, myResult);
-
-            myResult.orientation = Vector3<T>(-1,0,-3);
-            myMatrix.makeXYZRotating(myResult.orientation);
-            testDecompositionHelper(myMatrix, myResult);
-  */
         }
 
         void testTypeInvariance() {

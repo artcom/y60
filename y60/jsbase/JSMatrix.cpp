@@ -219,10 +219,43 @@ WRAP_METHOD_BEGIN(rotateXYZ, "Rotate this matrix around the XYZ axis.");
     DOC_PARAM("theAngles", "Angles of rotation around XYZ axis", DOC_TYPE_VECTOR3F);
 WRAP_AND_REGISTER_METHOD(rotateXYZ);
 
-WRAP_METHOD_BEGIN(rotate, "Rotate this matrix around an arbitrary axis.");
+WRAP_METHOD_BEGIN(rotate, "Rotate this matrix.");
     DOC_PARAM("theAxis", "Axis to rotate around", DOC_TYPE_VECTOR3F);
     DOC_PARAM("theAngle", "Angle around the axis", DOC_TYPE_FLOAT);
-WRAP_AND_REGISTER_METHOD(rotate);
+    DOC_RESET;
+    DOC_PARAM("theRotation", "Quaternion representation of the Euler angle", DOC_TYPE_QUATERNIONF);    
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, 2);
+        JSClassTraits<NATIVE>::ScopedNativeRef myObjRef(cx, obj);
+
+        if (argc == 2) {
+            asl::Vector3<Number> myAxis;
+            if (!convertFrom(cx, argv[0], myAxis)) {
+                JS_ReportError(cx, "rotate(): argument must be a Vector3f (rotation axis)");
+                return JS_FALSE;
+            }
+            Number myAngle;
+            if (!convertFrom(cx, argv[1], myAngle)) {
+                JS_ReportError(cx, "rotate(): argument must be a float (angle)");
+                return JS_FALSE;
+            }
+            myObjRef.getNative().rotate(myAxis, myAngle);
+        } else if (argc ==1) {
+            asl::Quaternion<Number> myRotation;
+            if (!convertFrom(cx, argv[0], myRotation)) {
+                JS_ReportError(cx, "rotate(): argument must be a quaternion (rotation)");
+                return JS_FALSE;
+            }
+            myObjRef.getNative().rotate(myRotation);
+        } else {
+            throw asl::Exception(string("Not enough arguments, must be 2 (rotation axis, angle) or 1(rotation)."));
+        }
+        return JS_TRUE;
+         
+    } HANDLE_CPP_EXCEPTION;
+}
+WRAP_METHOD_REGISTER(rotate);
 
 WRAP_METHOD_BEGIN(scale, "Scale this matrix.");
     DOC_PARAM("theScale", "Scaling factors for the XYZ axis", DOC_TYPE_VECTOR3F);
@@ -447,11 +480,41 @@ rotateXYZ(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Rotate this matrix around an arbitrary axis.");
+    DOC_BEGIN("Rotate this matrix.");
     DOC_PARAM("theAxis", "Axis to rotate around", DOC_TYPE_VECTOR3F);
     DOC_PARAM("theAngle", "Angle around the axis", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("theRotation", "Quaternion representation of the Euler angle", DOC_TYPE_QUATERNIONF);    
     DOC_END;
-    return Method<NATIVE>::call(&NATIVE::rotate,cx,obj,argc,argv,rval);
+    try {
+        ensureParamCount(argc, 1, 2);
+        JSClassTraits<NATIVE>::ScopedNativeRef myObjRef(cx, obj);
+
+        if (argc == 2) {
+            asl::Vector3<Number> myAxis;
+            if (!convertFrom(cx, argv[0], myAxis)) {
+                JS_ReportError(cx, "rotate(): argument must be a Vector3f (rotation axis)");
+                return JS_FALSE;
+            }
+            Number myAngle;
+            if (!convertFrom(cx, argv[1], myAngle)) {
+                JS_ReportError(cx, "rotate(): argument must be a float (angle)");
+                return JS_FALSE;
+            }
+            myObjRef.getNative().rotate(myAxis, myAngle);
+        } else if (argc ==1) {
+            asl::Quaternion<Number> myRotation;
+            if (!convertFrom(cx, argv[0], myRotation)) {
+                JS_ReportError(cx, "rotate(): argument must be a quaternion (rotation)");
+                return JS_FALSE;
+            }
+            myObjRef.getNative().rotate(myRotation);
+        } else {
+            throw asl::Exception(string("Not enough arguments, must be 2 (rotation axis, angle) or 1(rotation)."));
+        }
+        return JS_TRUE;
+         
+    } HANDLE_CPP_EXCEPTION;
 }
 static JSBool
 scale(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
