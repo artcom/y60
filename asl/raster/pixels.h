@@ -25,6 +25,8 @@
 #ifndef _ASL_RASTER_PIXELS_H_INCLUDED_
 #define _ASL_RASTER_PIXELS_H_INCLUDED_
 
+#include "asl_raster_settings.h"
+
 #include "contain.h"
 #include <asl/base/begin_end.h>
 #include <functional>

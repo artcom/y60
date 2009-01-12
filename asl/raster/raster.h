@@ -25,6 +25,8 @@
 #ifndef _ASL_RASTER_RASTER_H_INCLUDED_
 #define _ASL_RASTER_RASTER_H_INCLUDED_
 
+#include "asl_raster_settings.h"
+
 #include <stddef.h>
 #include <algorithm>
 #include <vector>

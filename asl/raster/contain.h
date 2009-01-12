@@ -26,6 +26,8 @@
 #ifndef _ASL_RASTER_CONTAIN_H_INCLUDED_
 #define _ASL_RASTER_CONTAIN_H_INCLUDED_
 
+#include "asl_raster_settings.h"
+
 #include <iostream>
 
 namespace asl {

@@ -46,6 +46,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+#include "asl_raster_settings.h"
+
 #include <asl/base/settings.h>
 #include <asl/math/numeric_functions.h>
 #include <assert.h>

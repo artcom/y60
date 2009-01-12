@@ -25,6 +25,8 @@
 #ifndef _ASL_RASTER_PALGO_H_INCLUDED_
 #define _ASL_RASTER_PALGO_H_INCLUDED_
 
+#include "asl_raster_settings.h"
+
 #include <asl/math/Vector234.h>
 #include <asl/math/Box.h>
 
