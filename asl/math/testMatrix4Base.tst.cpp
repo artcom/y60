@@ -225,20 +225,35 @@ class Matrix4BaseUnitTest : public UnitTest {
             myExpectedResult.assign(c,s,0,0,-s,c,0,0,0,0,1,0,0,0,0,1);  
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeZRotating");
             
+            // test ZYX-Rotating
             myMatrix.makeIdentity();
             myMatrix.makeZRotating(3);
             myMatrix.rotateY(2);
             myMatrix.rotateX(1);
-            myExpectedResult.makeXYZRotating(Vector3<T>(1,2,3));  
-            ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeXYZRotating");
+            myExpectedResult.makeZYXRotating(Vector3<T>(1,2,3));  
+            ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeZYXRotating");
 
             myMatrix.makeIdentity();
             myMatrix.makeZRotating(-10);
             myMatrix.rotateY(-20);
             myMatrix.rotateX(0.5);
+            myExpectedResult.makeZYXRotating(Vector3<T>(0.5,-20,-10));  
+            ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeZYXRotating");
+            
+            // test XYZ-Rotating
+            myMatrix.makeIdentity();
+            myMatrix.makeXRotating(1);
+            myMatrix.rotateY(2);
+            myMatrix.rotateZ(3);
+            myExpectedResult.makeXYZRotating(Vector3<T>(1,2,3));  
+            ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeXYZRotating");
+
+            myMatrix.makeIdentity();
+            myMatrix.makeXRotating(0.5);
+            myMatrix.rotateY(-20);
+            myMatrix.rotateZ(-10);
             myExpectedResult.makeXYZRotating(Vector3<T>(0.5,-20,-10));  
             ENSURE_MSG(almostEqual(myMatrix, myExpectedResult), "Testing makeXYZRotating");
-            
         }
 
         void testGetXYZRotation() {

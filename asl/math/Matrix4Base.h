@@ -482,11 +482,11 @@ namespace asl {
         }
 
         // From 3d engine desing, page 19
-        // This is equithis->valent to calling:
-        // myMatrix.makeZRotating(theVector[2]);
+        // This is equivalent to calling:
+        // myMatrix.makeZRotating(theVector[0]);
         // myMatrix.rotateY(theVector[1]);
-        // myMatrix.rotateX(theVecotr[0]);
-        void makeXYZRotating(const Vector3<Number> & theVector) {
+        // myMatrix.rotateX(theVecotr[2]);
+        void makeZYXRotating(const Vector3<Number> & theVector) {
             Number cx = static_cast<Number>(cos(theVector[0]));
             Number sx = static_cast<Number>(sin(theVector[0]));
             Number cy = static_cast<Number>(cos(theVector[1]));
@@ -513,11 +513,11 @@ namespace asl {
         }
 
         // From 3d engine desing, page 23
-        // This is equithis->valent to calling:
-        // myMatrix.makeXRotating(theVector[2]);
+        // This is equivalent to calling:
+        // myMatrix.makeXRotating(theVector[0]);
         // myMatrix.rotateY(theVector[1]);
-        // myMatrix.rotateZ(theVecotr[0]);
-        void makeZYXRotating(const Vector3<Number> & theVector) {
+        // myMatrix.rotateZ(theVecotr[2]);
+        void makeXYZRotating(const Vector3<Number> & theVector) {
             Number cx = static_cast<Number>(cos(theVector[0]));
             Number sx = static_cast<Number>(sin(theVector[0]));
             Number cy = static_cast<Number>(cos(theVector[1]));

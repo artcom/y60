@@ -69,16 +69,17 @@ namespace asl {
     class EulerKeyframe 
     {
       public:
+            // XXX don't know if here's actually ZYXRotating needed (gm)
     		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeStamp, float theSpeed ) 
     		        : xyz(coord), t(theTimeStamp), speed(theSpeed) , rotation(orientation) 
     		 {
-                _myOrientationMatrix.makeXYZRotating(rotation);
+                _myOrientationMatrix.makeZYXRotating(rotation);
     		 }
 
     		EulerKeyframe( const EulerKeyframe& theKeyframe) {
                 xyz = theKeyframe.xyz; t = theKeyframe.t; speed = theKeyframe.speed;
                 rotation = theKeyframe.rotation;
-                _myOrientationMatrix.makeXYZRotating(rotation);
+                _myOrientationMatrix.makeZYXRotating(rotation);
 		    }
             EulerKeyframe & operator=(const EulerKeyframe & theKeyframe) { 
                 xyz = theKeyframe.xyz; 
@@ -104,7 +105,7 @@ namespace asl {
     		const asl::Vector3f & getOrientation() const { return rotation; }
     		void setOrientation(const asl::Vector3f & theOrientation) {
     		     rotation = theOrientation; 
-                _myOrientationMatrix.makeXYZRotating(rotation);
+                _myOrientationMatrix.makeZYXRotating(rotation);
     		}
     		const asl::Matrix4f & getOrientationMatrix() const { return _myOrientationMatrix; }                		
 

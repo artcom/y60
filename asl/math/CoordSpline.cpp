@@ -106,7 +106,6 @@ namespace asl {
             //AC_TRACE << "+++++ Spline define : " << i << " orientation: " << myRotation << endl;
 
             //asl::Matrix4f myMatrix;
-            //myMatrix.makeXYZRotating(myRotation);
             asl::Vector4f myUpVector    = (*it).getOrientationMatrix().getRow(1);
             asl::Vector3f myUpVector3(myUpVector[0], myUpVector[1], myUpVector[2]);
             asl::Vector4f myViewVector  = (*it).getOrientationMatrix().getRow(2);

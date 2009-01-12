@@ -565,12 +565,12 @@ namespace asl {
                 _myType = AFFINE;
             }
         }
-        // warning: this actually does ZYX-Rotation
+        
         void makeXYZRotating(const Vector3<Number> & theRotation) {
             base::makeXYZRotating(theRotation);
             _myType = ROTATING;
         }
-        // warning: this actually does XYZ-Rotation
+        
         void makeZYXRotating(const Vector3<Number> & theRotation) {
             base::makeZYXRotating(theRotation);
             _myType = ROTATING;

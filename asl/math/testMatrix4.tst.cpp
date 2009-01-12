@@ -700,6 +700,9 @@ class Matrix4UnitTest : public UnitTest {
 
             myMatrix.makeXYZRotating(Vector3<T>(1,2,3));
             ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
+            
+            myMatrix.makeZYXRotating(Vector3<T>(1,2,3));
+            ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
         }
 
         void testRotateXYZ() {
@@ -1121,18 +1124,16 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
             myMatrix2.translate(myPosition);
-            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
-            //    (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
             
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
             myMatrix2.translate(myPosition);
-            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
-            //    (string("Matrix makeXYZRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeXYZRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
                         
             // test rotateXYZ
             myMatrix1.makeIdentity();
@@ -1240,18 +1241,16 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
-            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
-            //    (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
             
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
-            //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
-            //    (string("Matrix makeXYZRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
+            ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
+                (string("Matrix makeXYZRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
             
             // test rotateXYZ
             myMatrix1.makeIdentity();
@@ -1838,7 +1837,7 @@ class Matrix4UnitTest : public UnitTest {
                     myRotation.rotateXYZ(myOrientation);
                     break;
                 case Matrix4<T>::ROTATION_ORDER_ZYX:
-                    myRotation.makeXYZRotating(myOrientation);
+                    myRotation.makeZYXRotating(myOrientation);
                     break;
                 case Matrix4<T>::ROTATION_ORDER_XZY:
                     
