@@ -1339,45 +1339,49 @@ unknown:
             theScale[0] = length(myM3[0]);
             theScale[1] = length(myM3[1]);
             theScale[2] = length(myM3[2]);
-           
-            if(theScale[0] != 0)
-            {
+            
+             
+            if(theScale[0] != 0) {
                 myM3[0][0] /= theScale[0];
                 myM3[0][1] /= theScale[0];
                 myM3[0][2] /= theScale[0];
             }
-            if(theScale[1] != 0)
-            {
+            if(theScale[1] != 0) {
                 myM3[1][0] /= theScale[1];
                 myM3[1][1] /= theScale[1];
                 myM3[1][2] /= theScale[1];
             }
-            if(theScale[2] != 0)
-            {
+            if(theScale[2] != 0) {
                 myM3[2][0] /= theScale[2];
                 myM3[2][1] /= theScale[2];
                 myM3[2][2] /= theScale[2];
             }
-        
+  
             // Check for a coordinate system flip.  If the determinant
             // is -1, then negate the matrix and the scaling factors.
             if (dot(myM3[0], cross(myM3[1], myM3[2])) < 0) {
-                for (unsigned i = 0; i < 3; ++i) {
-                    myM3[i] *= -1;
-                }
+                myM3[0] *= -1;
+                myM3[1] *= -1;
+                myM3[2] *= -1;
                 theScale *= -1;
             }
             
             Matrix4<Number> myM4;
-            for(int x=0;x<3;x++)
-            {
-                myM4[x][0] = myM3[x][0];
-                myM4[x][1] = myM3[x][1];
-                myM4[x][2] = myM3[x][2];
-                myM4[x][3] = 0;
-                myM4[3][x] = 0;
-            }
-            
+            myM4[0][0] = myM3[0][0];
+            myM4[0][1] = myM3[0][1];
+            myM4[0][2] = myM3[0][2];
+            myM4[0][3] = 0;
+            myM4[1][0] = myM3[1][0];
+            myM4[1][1] = myM3[1][1];
+            myM4[1][2] = myM3[1][2];
+            myM4[1][3] = 0;
+            myM4[2][0] = myM3[2][0];
+            myM4[2][1] = myM3[2][1];
+            myM4[2][2] = myM3[2][2];
+            myM4[3][0] = 0;
+            myM4[3][1] = 0;
+            myM4[3][2] = 0;
+            myM4[3][3] = 1;
             myM4.getRotation(theOrientation);
             return true;
         }

@@ -37,12 +37,15 @@ using namespace asl;
 bool ourPerformanceTest = true;
 #ifdef DEBUG_VARIANT
     const int ourNumberOfMults = 2500;
+    const int ourNumberOfDecomps = 10000;
+    const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 10000;
 #else
 //    const int ourNumberOfMults = 1000000;
     const int ourNumberOfMults = 250000;
+    const int ourNumberOfDecomps = 1000000;
+    const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 1000000;
 #endif
 
-const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 1000000;
 
 template <class T>
 class Matrix4UnitTest : public UnitTest {
@@ -82,14 +85,14 @@ class Matrix4UnitTest : public UnitTest {
             testTransformedNormal();
             testEasyMatrixAccess();
             testMakeLookAt();
-            //testRotationOrderXYZEuler();
+            testRotationOrderXYZEuler();
             testRotationOrderXYZ();
             testRandomMatrixDecomposition(RANDOM_DECOMPOSITION_TEST_COUNT);
-
             if (ourPerformanceTest) {
                 finalPerformanceTest();
                 testInvertPerformance();
                 testMultiplyPerformance();
+                testDecomposePerformance();
             }
         }
 
@@ -1042,7 +1045,6 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix1.postMultiply(myMatrix2);
             myMatrix1.postMultiply(myMatrix3);
             Matrix4<T> myResultMatrix = myMatrix1;
-            
             // test makeRotating
             myMatrix1.makeRotating(Vector3<T>(1,0,0), T(1.234));
             myMatrix2.makeRotating(Vector3<T>(0,1,0), T(1.234));
@@ -1051,10 +1053,10 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix1.postMultiply(myMatrix3);
             
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
+            
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
@@ -1069,7 +1071,6 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-            
             
             
             // test makeXYZRotating
@@ -1096,7 +1097,7 @@ class Matrix4UnitTest : public UnitTest {
             //ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
             //    (string("Matrix makeXYZRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
             ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix2));
-            
+                        
             // test rotateXYZ
             myMatrix1.makeIdentity();
             myMatrix1.rotateXYZ(Vector3<T>(1.234,1.234,1.234));
@@ -1880,6 +1881,58 @@ class Matrix4UnitTest : public UnitTest {
             return almostEqual(Point3<T>(1,1,1) * a, Point3<T>(1,1,1) * b, 1E-3);
         }
 
+        void
+        testDecomposePerformance() {
+            std::string myOutLine;
+            cerr << myOutLine;
+            _myPerformanceString += myOutLine;
+            
+            Matrix4<T> myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(Vector3<T>(randomHelper(-10,10,0), randomHelper(-10,10,0), randomHelper(-10,10,0)));
+            Matrix4<T> myRotation(Quaternion<T>::createFromEuler(Vector3<T>(randomHelper(-10,10), randomHelper(-10,10), randomHelper(-10,10))));
+            myMatrix.postMultiply(myRotation);
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Vector3<T> myOrientationV;
+            Quaternion<T> myOrientation;
+            Vector3<T> myPosition;
+            
+            // decompose with euler angle
+            asl::NanoTime myFullTimer;
+            for (unsigned i = 0; i < ourNumberOfDecomps; ++i) {
+                myMatrix.decompose(myScale, myShear, myOrientationV, myPosition);
+            }
+            asl::NanoTime myFullTime = asl::NanoTime() - myFullTimer;
+            double myFullCount = double(ourNumberOfDecomps) / double(myFullTime.millis());
+            myOutLine = string("Matrix decompose(EULER): ") + as_string(myFullCount)+ "[T="+as_string(myFullTime.millis()) + string("]\t");
+            cerr << myOutLine;
+            _myPerformanceString += myOutLine;
+
+            // decompose with quaternion
+
+            asl::NanoTime mySmartTimer;
+            for (unsigned i = 0; i < ourNumberOfDecomps; ++i) {
+                myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+            }
+            asl::NanoTime mySmartTime = asl::NanoTime() - mySmartTimer;
+            double mySmartCount = double(ourNumberOfDecomps) / double(mySmartTime.millis());
+            myOutLine = string(" | decompose(QUATERNION): ") + as_string(mySmartCount) +  "[T="+as_string(mySmartTime.millis()) + string("]\t");
+            cerr << myOutLine;
+            _myPerformanceString += myOutLine;
+
+            if (mySmartCount < myFullCount) {
+                myOutLine = string("    ### ") +
+                    as_string((myFullCount/mySmartCount - 1) * 100) +
+                    "% slower.\n";
+            } else {
+                myOutLine = string("    >>> ") +
+                    as_string((mySmartCount/myFullCount - 1) * 100) +
+                    "% faster.\n";
+            }
+            cerr << myOutLine;
+            _myPerformanceString += myOutLine;
+            
+        }
         
         void testMatrixDecompositionEuler() {
             DecomposedMatrix myResult;
