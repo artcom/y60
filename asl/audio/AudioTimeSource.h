@@ -41,6 +41,8 @@
 #ifndef ASL_AUDIO_TIME_SOURCE_INCLUDED
 #define ASL_AUDIO_TIME_SOURCE_INCLUDED
 
+#include "asl_audio_settings.h"
+
 #include "TimeSource.h"
 
 #include <asl/base/Time.h>
@@ -49,7 +51,7 @@
 
 namespace asl {
  
-class AudioTimeSource {
+class ASL_AUDIO_EXPORT AudioTimeSource {
     public:
         AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate);
         virtual ~AudioTimeSource();

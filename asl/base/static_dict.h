@@ -20,6 +20,9 @@
 #define STATIC_DICT_H
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#include "asl_base_settings.h"
+
 #include <iterator>
 #include <string>
 #include <functional>

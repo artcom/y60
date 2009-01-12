@@ -40,6 +40,8 @@
 #ifndef _asl_ipc_threadedConduit_included_
 #define _asl_ipc_threadedConduit_included_
 
+#include "asl_ipc_settings.h"
+
 #include "Conduit.h"
 #include <asl/base/Ptr.h>
 #include <asl/base/Logger.h>

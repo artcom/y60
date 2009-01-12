@@ -47,6 +47,8 @@
 #ifndef ASL_COM_PORT_INCLUDED
 #define ASL_COM_PORT_INCLUDED
 
+#include "asl_serial_settings.h"
+
 #include "SerialDevice.h"
 #include <asl/base/Block.h>
 #include <string>

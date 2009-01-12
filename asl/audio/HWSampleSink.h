@@ -41,6 +41,8 @@
 #ifndef INCL_HWSAMPLESINK
 #define INCL_HWSAMPLESINK
 
+#include "asl_audio_settings.h"
+
 #include "ISampleSink.h"
 #include "AudioTimeSource.h"
 #include "SampleSource.h"
@@ -69,7 +71,7 @@ namespace asl {
     typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
     typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
     
-    class HWSampleSink: public SampleSource, public AudioTimeSource, public ISampleSink
+    class ASL_AUDIO_EXPORT HWSampleSink: public SampleSource, public AudioTimeSource, public ISampleSink
     {
     public:
         enum State {STOPPED,            // No sound is playing.

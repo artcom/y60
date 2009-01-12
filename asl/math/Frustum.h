@@ -71,7 +71,7 @@ enum ProjectionTypeEnum {
 };
 
 /** @relates Frustum */
-DEFINE_ENUM( ProjectionType, ProjectionTypeEnum/*, ASL_MATH_EXPORT*/ );
+DEFINE_ENUM( ProjectionType, ProjectionTypeEnum, ASL_MATH_EXPORT );
 
 /** @relates Frustum
  * The resize olicy is used to change the aspect ratio of the frustum if the viewports
@@ -89,7 +89,7 @@ enum ResizePolicyEnum {
     ResizePolicyEnum_MAX
 };
 
-DEFINE_ENUM(ResizePolicy, ResizePolicyEnum/*, ASL_MATH_EXPORT*/);
+DEFINE_ENUM(ResizePolicy, ResizePolicyEnum, ASL_MATH_EXPORT);
 
 /** This class models perspective and orthonormal viewing volumes. */
 class ASL_MATH_EXPORT Frustum {
@@ -217,8 +217,8 @@ intersection(const asl::Box3f & theBox, const Frustum & theFrustum);
 ASL_MATH_EXPORT bool
 intersection(const asl::Box3f & theBox, const Frustum & theFrustum, bool & theOverlapFlag);
 
-std::ostream & operator << (std::ostream & os, const Frustum & theFrustum);
-std::istream & operator >> (std::istream & os, Frustum & theFrustum);
+ASL_MATH_EXPORT std::ostream & operator << (std::ostream & os, const Frustum & theFrustum);
+ASL_MATH_EXPORT std::istream & operator >> (std::istream & os, Frustum & theFrustum);
 
 } // end of namespace
 #endif

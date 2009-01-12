@@ -41,6 +41,8 @@
 #ifndef INCL_SOUNDEXCEPTION
 #define INCL_SOUNDEXCEPTION 
 
+#include "asl_audio_settings.h"
+
 #include <asl/base/Exception.h>
 
 namespace asl {

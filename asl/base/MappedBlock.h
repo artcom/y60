@@ -44,6 +44,8 @@
 #ifndef _included_asl_MappedBlock_
 #define _included_asl_MappedBlock_
 
+#include "asl_base_settings.h"
+
 #include "Block.h"
 #include "string_functions.h"
 #include "file_functions.h"

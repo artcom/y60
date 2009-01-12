@@ -60,7 +60,7 @@ enum SampleFormat
     SF_F32
 };
 
-unsigned getBytesPerSample(SampleFormat theSampleFormat);
+ASL_AUDIO_EXPORT unsigned getBytesPerSample(SampleFormat theSampleFormat);
 ASL_AUDIO_EXPORT std::ostream & operator<<(std::ostream & s, SampleFormat SF); 
 
 }

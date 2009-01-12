@@ -51,6 +51,8 @@
 #ifndef _included_asl_Quaternion_
 #define _included_asl_Quaternion_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "Sphere.h"
 #include <asl/base/Exception.h>

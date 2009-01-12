@@ -41,6 +41,8 @@
 #ifndef ASL_TIME_SOURCE_INCLUDED
 #define ASL_TIME_SOURCE_INCLUDED
 
+#include "asl_audio_settings.h"
+
 #include <asl/base/Time.h>
 #include <asl/base/ThreadLock.h>
 #include <asl/base/settings.h>

@@ -52,6 +52,8 @@
 #ifndef ASL_MATH_PERLIN_NOISE_INCLUDED
 #define ASL_MATH_PERLIN_NOISE_INCLUDED
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "numeric_functions.h"
 

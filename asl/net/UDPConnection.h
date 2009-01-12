@@ -43,6 +43,8 @@
 #ifndef INCL_INET_UDPCONNECTION
 #define INCL_INET_UDPCONNECTION
 
+#include "asl_net_settings.h"
+
 #include "UDPSocket.h"
 
 #include <asl/base/Ptr.h>

@@ -40,6 +40,8 @@
 #ifndef __asl_SocketPolicy_included
 #define __asl_SocketPolicy_included
 
+#include "asl_ipc_settings.h"
+
 #include "ConduitPolicy.h"
 
 #include <asl/net/INetEndpoint.h>
@@ -52,7 +54,7 @@ namespace asl {
 
 //! Abstract base class for all socket-based conduit policies.  
     
-class SocketPolicy : public ConduitPolicy {
+class ASL_IPC_EXPORT SocketPolicy : public ConduitPolicy {
     public:
         typedef int Handle; 
 

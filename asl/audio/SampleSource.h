@@ -41,6 +41,8 @@
 #ifndef INCL_SAMPLESOURCE
 #define INCL_SAMPLESOURCE
 
+#include "asl_audio_settings.h"
+
 #include "AudioBufferBase.h"
 #include "SampleFormat.h"
 #include "AudioBufferBase.h"
@@ -52,7 +54,7 @@
 
 namespace asl {
 
-    class SampleSource;
+    class ASL_AUDIO_EXPORT SampleSource;
 
     // Use this pointer as smart pointer to SampleSource. If you use the default Ptr,
     // you'll get thread-specific free lists. Since lots of pointers are allocated 

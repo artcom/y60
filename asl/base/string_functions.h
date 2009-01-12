@@ -58,7 +58,7 @@ namespace asl {
     /// return every type that has a operator>>(ostream) as string
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
     template <class T>
-    std::string as_string(const T& x) {
+    inline std::string as_string(const T& x) {
         std::ostrstream streamer;
         //streamer << x  << std::string::traits_type::eos();
         streamer << x << '\0';
@@ -71,21 +71,21 @@ namespace asl {
     }
 
     template <class T>
-    bool fromString(const std::string & theString, T & outValue) {
+    inline bool fromString(const std::string & theString, T & outValue) {
         istrstream myStream(theString.c_str());
         return myStream >> outValue;
     }
 
 #else
     template <class T>
-    std::string as_string(const T& x) {
+    inline std::string as_string(const T& x) {
         std::ostringstream streamer;
         streamer << x;
         return streamer.str();
     }
 
     template <class T>
-    bool fromString(const std::string & theString, T & outValue) {
+    inline bool fromString(const std::string & theString, T & outValue) {
         std::istringstream myStream(theString);
         myStream >> outValue;
         return (myStream != 0); // Shouldn't this be (myStream.good() || myStream.eof()) ? (MS)

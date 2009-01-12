@@ -25,6 +25,8 @@
 #define _included_asl_settings_
 
 
+#include "asl_base_settings.h"
+
 /*! \addtogroup aslbase */
 /* @{ */
 

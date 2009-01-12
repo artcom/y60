@@ -40,6 +40,8 @@
 #ifndef _included_asl_GarbageCollector_h_
 #define _included_asl_GarbageCollector_h_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 #include "RangeSet.h"
 #include "Exception.h"

@@ -38,6 +38,9 @@
 //    recommendations:
 */
 #ifndef __asl_LocalPolicy_included
+#define __asl_LocalPolicy_included
+
+#include "asl_ipc_settings.h"
 
 #ifdef WIN32
 

@@ -48,6 +48,8 @@
 #ifndef BOOST_CHECKED_DELETE_HPP_INCLUDED
 #define BOOST_CHECKED_DELETE_HPP_INCLUDED
 
+#include "asl_base_settings.h"
+
 #if _MSC_VER >= 1020
 #pragma once
 #endif

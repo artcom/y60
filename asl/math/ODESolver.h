@@ -51,6 +51,8 @@
 #ifndef _included_asl_ODESolver_
 #define _included_asl_ODESolver_
 
+#include "asl_math_settings.h"
+
 namespace asl {	
 
     /*! @addtogroup aslmath */

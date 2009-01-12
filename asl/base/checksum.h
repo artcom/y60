@@ -41,6 +41,8 @@
 #ifndef _included_asl_checksum_
 #define _included_asl_checksum_
 
+#include "asl_base_settings.h"
+
 #include "zlib.h"
 #include <string.h>
 

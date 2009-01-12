@@ -39,6 +39,8 @@
 #ifndef INCL_HOP
 #define INCL_HOP
 
+#include "asl_net_settings.h"
+
 #include <string>
 #include <vector>
 

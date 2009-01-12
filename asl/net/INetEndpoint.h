@@ -41,6 +41,8 @@
 #ifndef INCL_INET_ENDPOINT
 #define INCL_INET_ENDPOINT
 
+#include "asl_net_settings.h"
+
 #include <asl/base/settings.h>
 
 #ifdef WIN32
@@ -59,7 +61,7 @@
 namespace asl {
 
     // This is a POD type. Don't add virtual functions.
-    class INetEndpoint: public sockaddr_in {
+    class ASL_NET_EXPORT INetEndpoint: public sockaddr_in {
         public:
             INetEndpoint(const char * myHost, asl::Unsigned16 myPort);
             INetEndpoint(asl::Unsigned32 myHost, asl::Unsigned16 myPort);

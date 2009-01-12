@@ -54,6 +54,8 @@
 #if !defined(XPATH_VALUE_H)
 #define XPATH_VALUE_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include <string>
 #include <set>

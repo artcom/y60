@@ -54,6 +54,8 @@
 #if !defined(XPATH_API_IMPL_H)
 #define XPATH_API_IMPL_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include "xpath_api.h"
 

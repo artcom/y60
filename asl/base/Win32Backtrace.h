@@ -41,6 +41,8 @@
 #ifndef WIN32_BACKTRACE_INCLUDED
 #define WIN32_BACKTRACE_INCLUDED
 
+#include "asl_base_settings.h"
+
 #include "TraceUtils.h"
 
 #define _WINSOCKAPI_ // prevent winsock.h #include's

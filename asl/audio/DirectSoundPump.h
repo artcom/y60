@@ -41,6 +41,8 @@
 #ifndef INCL_AUDIO_DIRECTSOUNDPUMP
 #define INCL_AUDIO_DIRECTSOUNDPUMP
 
+#include "asl_audio_settings.h"
+
 #include "Pump.h"
 #include "SampleFormat.h"
 

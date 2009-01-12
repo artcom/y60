@@ -51,6 +51,7 @@
 #ifndef _included_asl_Matrix4_
 #define _included_asl_Matrix4_
 
+#include "asl_math_settings.h"
 
 #include "Matrix4Base.h"
 #include "Quaternion.h"
@@ -164,7 +165,7 @@ namespace asl {
      
      //template class ASL_MATH_EXPORT asl::Enum<MatrixTypeEnum, MatrixTypeEnum_MAX>;
      
-     DEFINE_ENUM( MatrixType, MatrixTypeEnum/*, ASL_MATH_EXPORT*/ );
+     DEFINE_ENUM( MatrixType, MatrixTypeEnum, ASL_MATH_EXPORT );
 
 
     template <class Number>

@@ -49,6 +49,8 @@
 #ifndef ASL_CRC8_INCLUDED
 #define ASL_CRC8_INCLUDED
 
+#include "asl_serial_settings.h"
+
 #include <asl/base/Block.h>
 
 namespace asl {

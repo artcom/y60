@@ -40,6 +40,8 @@
 #ifndef __asl_TCPPolicy_included
 #define __asl_TCPPolicy_included
 
+#include "asl_ipc_settings.h"
+
 #include "SocketPolicy.h"
 
 #include <asl/net/INetEndpoint.h>
@@ -52,7 +54,7 @@ namespace asl {
 
 //! Conduit policy for TCP-based communication.   
 
-class TCPPolicy : public SocketPolicy {
+class ASL_IPC_EXPORT TCPPolicy : public SocketPolicy {
     public:
         typedef INetEndpoint Endpoint;
         /// Creates a (client) conduit connected to the remote endpoint

@@ -21,6 +21,8 @@
 #ifndef _xml_PlugHelper_h_
 #define _xml_PlugHelper_h_
 
+#include "asl_dom_settings.h"
+
 #include "Nodes.h"
 
 namespace dom {

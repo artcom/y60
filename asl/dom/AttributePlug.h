@@ -21,6 +21,8 @@
 #ifndef _xml_AttributePlug_h_
 #define _xml_AttributePlug_h_
 
+#include "asl_dom_settings.h"
+
 #include "Nodes.h"
 #include "PlugHelper.h"
 #include "PropertyPlug.h"
@@ -30,21 +32,30 @@ namespace dom {
     /*! \addtogroup aslxml */
     /* @{ */
 
-#define DEFINE_ATTRIBUT_TAG(theTagName, theType, theAttributeName, theDefault) \
+#if defined(AC_BUILT_WITH_CMAKE) && defined(WIN32)
+#   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken) template class theExportToken thePlugName<theTagName>;
+#else
+#   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken)
+#endif
+
+#define DEFINE_ATTRIBUT_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
     struct theTagName { \
-    typedef theType TYPE; \
-    typedef dom::AttributePlug<theTagName> Plug; \
-    static const char * getName() { return theAttributeName; } \
-    static const TYPE getDefault() { return theDefault; } \
+        typedef theType TYPE; \
+        static const char * getName() { return theAttributeName; } \
+        static const TYPE getDefault() { return theDefault; } \
+        ASL_DOM_EXPORT_STATICS(dom::AttributePlug,theTagName,theExportToken) \
+        typedef dom::AttributePlug<theTagName> Plug; \
+    }; 
+
+#define DEFINE_FACADE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
+    struct theTagName { \
+        typedef theType TYPE; \
+        static const char * getName() { return theAttributeName; } \
+        static const TYPE getDefault() { return theDefault; } \
+        ASL_DOM_EXPORT_STATICS(dom::FacadeAttributePlug,theTagName,theExportToken) \
+        typedef dom::FacadeAttributePlug<theTagName> Plug; \
     };
 
-#define DEFINE_FACADE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault) \
-    struct theTagName { \
-    typedef theType TYPE; \
-    typedef dom::FacadeAttributePlug<theTagName> Plug; \
-    static const char * getName() { return theAttributeName; } \
-    static const TYPE getDefault() { return theDefault; } \
-    };
     class Connector {
     public:
         template <class THE_FIRST, class THE_SECOND>

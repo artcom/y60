@@ -42,6 +42,8 @@
 #ifndef INCL_INET_TCPCLIENTSOCKET
 #define INCL_INET_TCPCLIENTSOCKET
 
+#include "asl_net_settings.h"
+
 #include "TCPSocket.h"
 
 namespace inet {

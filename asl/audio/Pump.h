@@ -41,6 +41,8 @@
 #ifndef INCL_AUDIO_PUMP
 #define INCL_AUDIO_PUMP
 
+#include "asl_audio_settings.h"
+
 #include "SampleFormat.h"
 #include "SampleSource.h"
 #include "HWSampleSink.h"
@@ -56,7 +58,7 @@
 
 namespace asl {
 
-class Pump : public AudioTimeSource, private PosixThread 
+class ASL_AUDIO_EXPORT Pump : public AudioTimeSource, private PosixThread 
 {
     public:
         Pump(SampleFormat mySF, unsigned myTimeStartDelay);

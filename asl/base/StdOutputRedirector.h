@@ -41,6 +41,7 @@
 #ifndef _ac_asl_StdOutputRedirector_h_
 #define _ac_asl_StdOutputRedirector_h_
 
+#include "asl_base_settings.h"
 
 #include <fstream>
 #include <assert.h>

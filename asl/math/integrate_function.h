@@ -23,6 +23,8 @@
 #ifndef _included_asl_integrate_function
 #define _included_asl_integrate_function
 
+#include "asl_math_settings.h"
+
 namespace asl {
     
     ////////////////////////////////////////////////////////////////////////////////

@@ -42,6 +42,8 @@
 #ifndef _included_asl_Auto_
 #define _included_asl_Auto_
 
+#include "asl_base_settings.h"
+
 namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */

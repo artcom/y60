@@ -24,6 +24,8 @@
 #ifndef _xml_Exception_h_included_
 #define _xml_Exception_h_included_
 
+#include "asl_dom_settings.h"
+
 #include <asl/base/settings.h>
 #include <asl/base/Exception.h>
 

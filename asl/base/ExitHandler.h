@@ -13,6 +13,8 @@
 #ifndef _included_asl_ExitHandler_
 #define _included_asl_ExitHandler_
 
+#include "asl_base_settings.h"
+
 namespace asl {
 
 // This class exists so the constructor gets called once on initialization

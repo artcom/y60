@@ -44,6 +44,8 @@
 #ifndef INCL_DSMESSAGES
 #define INCL_DSMESSAGES
 
+#include "asl_audio_settings.h"
+
 #include "AudioException.h"
 #include <windows.h>
 #include <dsound.h>

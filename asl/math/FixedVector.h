@@ -41,6 +41,8 @@
 #ifndef _asl_fixedVector_h_
 #define _asl_fixedVector_h_
 
+#include "asl_math_settings.h"
+
 #include "VectorManipulator.h"
 #include "numeric_functions.h"
 

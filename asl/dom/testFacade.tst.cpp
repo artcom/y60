@@ -38,14 +38,16 @@ using namespace std;
 using namespace dom;
 using namespace asl;
 
+#define NO_EXPORT
+
 //                       theTagName     theType         theAttributeName  theDefault
-DEFINE_ATTRIBUT_TAG        (IdTag,         std::string,    "id",             "");
-DEFINE_ATTRIBUT_TAG        (FloatTag,      float,          "float",          1);
-DEFINE_FACADE_ATTRIBUTE_TAG(Float2Tag,     float,          "float2",         1);
-DEFINE_ATTRIBUT_TAG        (BoolTag,       bool,           "bool",           false);
-DEFINE_FACADE_ATTRIBUTE_TAG(HalfFloatTag,  float,          "halffloat",      0.5);
-DEFINE_FACADE_ATTRIBUTE_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2);
-DEFINE_FACADE_ATTRIBUTE_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0);
+DEFINE_ATTRIBUT_TAG        (IdTag,         std::string,    "id",             "",    NO_EXPORT);
+DEFINE_ATTRIBUT_TAG        (FloatTag,      float,          "float",          1,     NO_EXPORT);
+DEFINE_FACADE_ATTRIBUTE_TAG(Float2Tag,     float,          "float2",         1,     NO_EXPORT);
+DEFINE_ATTRIBUT_TAG        (BoolTag,       bool,           "bool",           false, NO_EXPORT);
+DEFINE_FACADE_ATTRIBUTE_TAG(HalfFloatTag,  float,          "halffloat",      0.5,   NO_EXPORT);
+DEFINE_FACADE_ATTRIBUTE_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2,  NO_EXPORT);
+DEFINE_FACADE_ATTRIBUTE_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0,   NO_EXPORT);
 
 DEFINE_PROPERTY_TAG(FloatPropTag,  TestPropertiesFacade, float, "float", "floatproperty",  "properties", 0.5);
 
@@ -246,10 +248,10 @@ class ChildFacade :
 };
 
 
-DEFINE_ATTRIBUT_TAG(WidthTag,          float,    "width",      0);
-DEFINE_ATTRIBUT_TAG(HeightTag,         float,    "height",     0);
-DEFINE_ATTRIBUT_TAG(AspectRatioTag,    float,    "aspect",     0);
-DEFINE_ATTRIBUT_TAG(InvAspectRatioTag, float,    "inv-aspect", 0);
+DEFINE_ATTRIBUT_TAG(WidthTag,          float,    "width",      0, NO_EXPORT);
+DEFINE_ATTRIBUT_TAG(HeightTag,         float,    "height",     0, NO_EXPORT);
+DEFINE_ATTRIBUT_TAG(AspectRatioTag,    float,    "aspect",     0, NO_EXPORT);
+DEFINE_ATTRIBUT_TAG(InvAspectRatioTag, float,    "inv-aspect", 0, NO_EXPORT);
 
 class DynamicFacade :
     public IdFacade,

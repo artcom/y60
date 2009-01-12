@@ -42,6 +42,8 @@
 #ifndef _ac_asl_LogMessageFormatters_h_
 #define _ac_asl_LogMessageFormatters_h_
 
+#include "asl_base_settings.h"
+
 #include "Logger.h"
 
 namespace asl {

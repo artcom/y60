@@ -40,6 +40,8 @@
 #ifndef INCL_TESTINETMONITOR
 #define INCL_TESTINETMONITOR
 
+#include "asl_net_settings.h"
+
 #include <string>
 #include <asl/base/UnitTest.h>
 

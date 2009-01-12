@@ -160,7 +160,7 @@ class AudioBuffer: public AudioBufferBase {
             return _mySampleRate;
         }
 
-        SampleFormat getSampleFormat() const;
+        ASL_AUDIO_EXPORT SampleFormat getSampleFormat() const;
 
         unsigned getBytesPerFrame() const {
             ASSURE_MSG(_numChannels != 0,

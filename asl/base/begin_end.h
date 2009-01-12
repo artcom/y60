@@ -44,6 +44,8 @@
 #ifndef _ASL_BEGIN_END_H_INCLUDED_
 #define _ASL_BEGIN_END_H_INCLUDED_
 
+#include "asl_base_settings.h"
+
 namespace asl {
 
     /*! \addtogroup aslbase */

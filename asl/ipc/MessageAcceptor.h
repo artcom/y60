@@ -40,6 +40,8 @@
 #ifndef _asl_message_acceptor_included
 #define _asl_message_acceptor_included
 
+#include "asl_ipc_settings.h"
+
 #include "ConduitServer.h"
 #include "ConduitAcceptor.h"
 

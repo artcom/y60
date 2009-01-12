@@ -41,6 +41,8 @@
 #ifndef INCL_AUDIO_DUMMYPUMP
 #define INCL_AUDIO_DUMMYPUMP
 
+#include "asl_audio_settings.h"
+
 #include "Pump.h"
 #include "SampleFormat.h"
 #include "HWSampleSink.h"

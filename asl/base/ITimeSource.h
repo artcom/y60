@@ -44,6 +44,8 @@
 #ifndef ASL_I_TIME_SOURCE_INCLUDED
 #define ASL_I_TIME_SOURCE_INCLUDED
 
+#include "asl_base_settings.h"
+
 namespace asl {
 
 /*! \addtogroup aslbase */

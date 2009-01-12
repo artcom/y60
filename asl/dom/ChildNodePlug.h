@@ -21,6 +21,8 @@
 #ifndef _xml_ChildNodePlug_h_
 #define _xml_ChildNodePlug_h_
 
+#include "asl_dom_settings.h"
+
 #include "Nodes.h"
 #include <asl/base/Exception.h>
 

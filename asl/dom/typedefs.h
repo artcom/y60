@@ -24,6 +24,8 @@
 #ifndef _asl_xml_typedefs_included_
 #define _asl_xml_typedefs_included_
 
+#include "asl_dom_settings.h"
+
 #include "ThreadingModel.h" 
 #include <asl/base/Ptr.h>
 #include <asl/base/Time.h>

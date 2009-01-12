@@ -40,6 +40,8 @@
 #ifndef _asl_message_server_included
 #define _asl_message_server_included
 
+#include "asl_ipc_settings.h"
+
 #include "ConduitServer.h"
 
 #include <asl/base/Ptr.h>

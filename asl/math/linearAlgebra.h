@@ -64,6 +64,8 @@ TODO list:
 #ifndef _included_asl_linearAlgebra_
 #define _included_asl_linearAlgebra_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "Matrix4.h"
 #include "Point234.h"

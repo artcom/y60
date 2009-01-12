@@ -69,7 +69,7 @@ namespace asl {
                 ParityModeEnum_MAX
             };
 
-            DEFINE_ENUM( ParityMode, ParityModeEnum/*, ASL_SERIAL_EXPORT*/ );
+            DEFINE_ENUM( ParityMode, ParityModeEnum, ASL_SERIAL_EXPORT );
 
             /// Status line bits.
             enum StatusBits {

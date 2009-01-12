@@ -47,6 +47,8 @@
 #ifndef ASL_DEBUG_PORT_INCLUDED
 #define ASL_DEBUG_PORT_INCLUDED
 
+#include "asl_serial_settings.h"
+
 #include "SerialDevice.h"
 #include <asl/math/numeric_functions.h>
 #include <asl/base/Logger.h>

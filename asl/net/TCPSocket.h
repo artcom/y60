@@ -42,6 +42,8 @@
 #ifndef INCL_INET_TCPSOCKET
 #define INCL_INET_TCPSOCKET
 
+#include "asl_net_settings.h"
+
 #include "Socket.h"
 #include <asl/base/Ptr.h>
 

@@ -23,6 +23,8 @@
 #ifndef __asl_packagemanager_h_included__
 #define __asl_packagemanager_h_included__
 
+#include "asl_zip_settings.h"
+
 #include "IPackage.h"
 
 #include <asl/base/Block.h>
@@ -40,7 +42,7 @@ namespace asl {
 /** allows the efficient search for and opening of files contained in packages (see asl::IPackage).
  *  Example packages are asl::DirectoryPackage and asl::ZipPackage
 */
-class PackageManager {
+class ASL_ZIP_EXPORT PackageManager {
     public:
         PackageManager() {};
         virtual ~PackageManager() {};

@@ -41,6 +41,8 @@
 #ifndef INCL_INET_ADDRESS
 #define INCL_INET_ADDRESS
 
+#include "asl_net_settings.h"
+
 #include "SocketException.h"
 
 #include <asl/base/settings.h>

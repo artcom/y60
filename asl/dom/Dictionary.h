@@ -24,6 +24,8 @@
 #ifndef _asl_xml_Dictionary_included_
 #define _asl_xml_Dictionary_included_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include "ThreadingModel.h"
 #include "Exceptions.h"

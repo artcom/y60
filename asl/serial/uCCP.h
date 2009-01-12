@@ -46,7 +46,10 @@
 //
 //=============================================================================
 
+#ifndef ASL_UCCP_INCLUDED
+#define ASL_UCCP_INCLUDED
 
+#include "asl_serial_settings.h"
 
 #include <asl/base/Exception.h>
 #include <asl/base/Block.h>
@@ -143,3 +146,5 @@ namespace asl {
         return (unsigned char)(256 - mySum % 256);
     }
 }
+
+#endif  // ASL_UCCP_INCLUDED

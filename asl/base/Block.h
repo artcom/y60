@@ -356,7 +356,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
       blocks with fixed capacity and thus derive them from ResizeableBlock.
       We can just use a WriteableBlock if we have a true fixed sized block.
     */
-    class FixedCapacityBlock : public ResizeableBlock {
+    class ASL_BASE_EXPORT FixedCapacityBlock : public ResizeableBlock {
     public:
         virtual FixedCapacityBlock & operator=(FixedCapacityBlock & theSource) {
             assign(theSource);

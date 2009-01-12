@@ -41,6 +41,8 @@
 #ifndef _asl_BSpline_
 #define _asl_BSpline_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include <math.h>
 #include <asl/base/Ptr.h>

@@ -41,13 +41,15 @@
 #ifndef INCL_ISAMPLESINK
 #define INCL_ISAMPLESINK
 
+#include "asl_audio_settings.h"
+
 #include "AudioBufferBase.h"
 
 #include <asl/base/Ptr.h>
 
 namespace asl {
 
-class ISampleSink
+class ASL_AUDIO_EXPORT ISampleSink
 {
     public:
         virtual ~ISampleSink() {};

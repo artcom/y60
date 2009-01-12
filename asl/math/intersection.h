@@ -45,6 +45,8 @@
 #ifndef _included_asl_intersection_
 #define _included_asl_intersection_
 
+#include "asl_math_settings.h"
+
 #include <cassert>
 
 #include "Vector234.h"

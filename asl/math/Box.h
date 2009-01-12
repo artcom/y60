@@ -51,6 +51,8 @@
 #ifndef _included_asl_Box_
 #define _included_asl_Box_
 
+#include "asl_math_settings.h"
+
 #include "Vector234.h"
 #include "Point234.h"
 #include "numeric_functions.h"

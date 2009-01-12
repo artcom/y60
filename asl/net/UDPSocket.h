@@ -42,6 +42,7 @@
 #ifndef INCL_INET_UDPSOCKET
 #define INCL_INET_UDPSOCKET
 
+#include "asl_net_settings.h"
 
 #include "Socket.h"
 

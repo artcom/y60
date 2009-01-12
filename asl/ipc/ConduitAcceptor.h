@@ -40,6 +40,8 @@
 #ifndef __asl_ConduitAcceptor_included
 #define __asl_ConduitAcceptor_included
 
+#include "asl_ipc_settings.h"
+
 #include "ConduitServer.h"
 #include <asl/base/Ptr.h>
 #include <asl/base/Logger.h>

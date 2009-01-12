@@ -42,6 +42,8 @@
 #ifndef _included_asl_MemoryPool_
 #define _included_asl_MemoryPool_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 #include "Exception.h"
 #include "string_functions.h"

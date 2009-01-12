@@ -41,6 +41,8 @@
 #ifndef _ac_assure_h_
 #define _ac_assure_h_
 
+#include "asl_base_settings.h"
+
 #include <cstdlib>
 
 #include "Exception.h"

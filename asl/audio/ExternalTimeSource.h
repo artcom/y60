@@ -41,6 +41,8 @@
 #ifndef ASL_EXTERNAL_TIME_SOURCE_INCLUDED
 #define ASL_EXTERNAL_TIME_SOURCE_INCLUDED
 
+#include "asl_audio_settings.h"
+
 #include "TimeSource.h"
 #include "AudioTimeSource.h"
 

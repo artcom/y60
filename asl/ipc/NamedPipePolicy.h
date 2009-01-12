@@ -40,6 +40,8 @@
 #ifndef __asl_NamedPipePolicy_included
 #define __asl_NamedPipePolicy_included
 
+#include "asl_ipc_settings.h"
+
 #include "ConduitPolicy.h"
 #include <asl/base/Ptr.h>
 

@@ -101,7 +101,7 @@ ASL_BASE_EXPORT std::string getParentDirectory(const std::string & theDirectoryN
 ASL_BASE_EXPORT std::string getExtension(const std::string & theFileName);
 
 /// returns theFileName without extension
-std::string removeExtension(const std::string & theFileName);
+ASL_BASE_EXPORT std::string removeExtension(const std::string & theFileName);
 
 /// returns the Host:Port part of an URI
 // URI's are formated as protocol://login/path
@@ -127,7 +127,7 @@ ASL_BASE_EXPORT std::string evaluateRelativePath(const std::string & theBaseDire
 /// returns the path + file. Embedded environment variables 
 /// in the form ${VARNAME} are expanded.
 /// @deprecated see asl::PackageManager, which can also search in zip files.
-std::string searchFile(const std::string & theFileName, const std::string & theSearchPath);
+ASL_BASE_EXPORT std::string searchFile(const std::string & theFileName, const std::string & theSearchPath);
 
 /// read a complete file into a string
 ASL_BASE_EXPORT std::string readFile(const std::string& theFileName);

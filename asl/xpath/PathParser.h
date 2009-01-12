@@ -54,6 +54,8 @@
 #if !defined(XPATH_PATHPARSER_H)
 #define XPATH_PATHPARSER_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include "XPathPath.h"
 

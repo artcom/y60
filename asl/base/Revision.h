@@ -41,10 +41,12 @@
 #ifndef AC_ASL_REVISION_INCLUDED
 #define AC_ASL_REVISION_INCLUDED
 
+#include "asl_base_settings.h"
+
 #include <string>
 
 namespace asl {
-    extern std::string ourRevision;
+    extern ASL_BASE_EXPORT std::string ourRevision;
 }
 
 #endif

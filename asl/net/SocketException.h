@@ -41,6 +41,8 @@
 #ifndef SocketException_class
 #define SocketException_class
 
+#include "asl_net_settings.h"
+
 #include <string>
 #include <asl/base/Exception.h>
 

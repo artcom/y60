@@ -40,6 +40,8 @@
 #ifndef __asl_Conduit_server_included_
 #define __asl_Conduit_server_included_
 
+#include "asl_ipc_settings.h"
+
 #include "ThreadedConduit.h"
 
 #include <string>

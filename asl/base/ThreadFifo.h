@@ -24,6 +24,8 @@
 #ifndef _included_ThreadFifo_h_
 #define _included_ThreadFifo_h_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 #include "ReadWriteLock.h"
 

@@ -40,6 +40,8 @@
 #ifndef _included_asl_RangeSet_h_
 #define _included_asl_RangeSet_h_
 
+#include "asl_base_settings.h"
+
 #include "settings.h"
 #include "Exception.h"
 #include "string_functions.h"

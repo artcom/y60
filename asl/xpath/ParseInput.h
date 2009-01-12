@@ -54,6 +54,8 @@
 #if !defined(XPATH_PARSEINPUT_H)
 #define XPATH_PARSEINPUT_H
 
+#include "asl_xpath_settings.h"
+
 /**********************************************************************************************/
 #include <string>
 

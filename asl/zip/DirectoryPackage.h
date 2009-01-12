@@ -19,6 +19,8 @@
 #ifndef __asl__DirectoryPackage_h_included__
 #define __asl__DirectoryPackage_h_included__
 
+#include "asl_zip_settings.h"
+
 #include "IPackage.h"
 
 namespace asl {

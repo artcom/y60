@@ -83,7 +83,7 @@ namespace asl {
     // returns a string identifying login session
     std::string getSessionId();
 
-    unsigned long getThreadId();
+    ASL_BASE_EXPORT unsigned long getThreadId();
 
     void precision_sleep(double theSeconds);
 

@@ -44,6 +44,8 @@
 #ifndef _included_asl_error_functions_
 #define _included_asl_error_functions_
 
+#include "asl_base_settings.h"
+
 #include "string_functions.h"
 #include "Exception.h"
 

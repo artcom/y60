@@ -20,6 +20,9 @@
 #define STATIC_VECTOR_H
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#include "asl_base_settings.h"
+
 #include <iterator>
 #include <algorithm>
 #include <memory>

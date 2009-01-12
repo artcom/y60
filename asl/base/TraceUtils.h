@@ -41,6 +41,8 @@
 #ifndef TRACE_UTILS_INCLUDED
 #define TRACE_UTILS_INCLUDED
 
+#include "asl_base_settings.h"
+
 #include <string>
 
 struct StackFrameBase {

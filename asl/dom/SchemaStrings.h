@@ -23,6 +23,8 @@
 #ifndef _xml_SchemaStrings_h_included_
 #define _xml_SchemaStrings_h_included_
 
+#include "asl_dom_settings.h"
+
 #include "typedefs.h"
 #include <string>
 

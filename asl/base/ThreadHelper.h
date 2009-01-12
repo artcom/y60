@@ -52,6 +52,8 @@
 #ifndef INCL_THREADHELPER
 #define INCL_THREADHELPER
 
+#include "asl_base_settings.h"
+
 #include <pthread.h>
 
 #include <string>
