@@ -88,6 +88,7 @@ class Matrix4UnitTest : public UnitTest {
             testRotationOrderXYZEuler();
             testRotationOrderXYZ();
             testRandomMatrixDecomposition(RANDOM_DECOMPOSITION_TEST_COUNT);
+            //testRandomMatrixDecompositionWithEuler(RANDOM_DECOMPOSITION_TEST_COUNT);
             if (ourPerformanceTest) {
                 finalPerformanceTest();
                 testInvertPerformance();
@@ -1020,6 +1021,41 @@ class Matrix4UnitTest : public UnitTest {
             }
 
         }
+        
+        void testRandomMatrixDecompositionWithEuler(const unsigned theTestCount) {
+            unsigned mySuccededTests = 0;
+            DecomposedMatrix myResult;
+            bool myFailure = false;
+            while(mySuccededTests < theTestCount) {
+                ++mySuccededTests;
+                myResult.scale       = Vector3<T>(randomHelper(-10, 10, 0), randomHelper(-10, 10, 0), randomHelper(-10, 10, 0));
+                myResult.orientation = Vector3<T>(randomHelper(-10, 10), randomHelper(-10, 10), randomHelper(-10, 10));
+                myResult.position    = Vector3<T>(randomHelper(-10, 10), randomHelper(-10, 10), randomHelper(-10, 10));
+                AC_INFO<<"original values: "<<myResult.scale<<" , "<<myResult.orientation;
+                Matrix4<T> myMatrix;
+                myMatrix.makeScaling(myResult.scale);
+                myMatrix.rotateXYZ(myResult.orientation);
+                myMatrix.translate(myResult.position);
+                myFailure = testRandomMatrixDecompositionHelperEuler(myMatrix, myResult);
+                if(!myFailure) {
+                    break;
+                } else {
+                    // Clear result
+                    myResult.scale       = Vector3<T>(1,1,1);
+                    myResult.orientation = Vector3<T>(0,0,1);
+                    myResult.position    = Vector3<T>(0,0,0);
+                }
+            }
+            std::stringstream ss;
+            ss << mySuccededTests << " random Matrix decompositions with euler done";
+            ENSURE_MSG(myFailure, (ss.str()).c_str());
+            if(!myFailure) {
+                AC_PRINT<<"test failed scale: "<<myResult.scale<<" rotation: "<<myResult.orientation<<" position: "<<myResult.position;
+                exit(1);
+            }
+
+        }
+        
         float randomHelper(int theLowerbound, int theUpperbound, int theBadValue = INT_MAX) {
            assert(theUpperbound - theLowerbound < RAND_MAX);
            float myRandom = (float) theLowerbound + (float) (std::rand() % ((theUpperbound - theLowerbound + 1)*1000))/1000.f;
@@ -1875,6 +1911,26 @@ class Matrix4UnitTest : public UnitTest {
             return transformationIsEquivalent(myMatrix, theMatrix);
         }
         
+        
+        bool
+        testRandomMatrixDecompositionHelperEuler(const Matrix4<T> & theMatrix,
+                                     DecomposedMatrix & theResult)
+        {
+            Vector3<T> myScale;
+            Vector3<T> myShear;
+            Vector3<T> myOrientation;
+            Vector3<T> myPosition;
+            AC_INFO<<theMatrix;
+            theMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+            Matrix4<T> myMatrix = Matrix4<T>::Identity();
+            myMatrix.scale(myScale);
+            myMatrix.rotateXYZ(myOrientation);
+            myMatrix.translate(myPosition);
+            AC_INFO<<myScale<<" , "<<myOrientation;
+            return transformationIsEquivalent(myMatrix, theMatrix);
+        }
+        
+        
         bool
         transformationIsEquivalent(Matrix4<T> a, Matrix4<T> b) {
             AC_INFO<<Point3<T>(1,1,1) * a<<", "<<Point3<T>(1,1,1) * b;
@@ -2032,24 +2088,7 @@ class Matrix4UnitTest : public UnitTest {
             myResult.orientation = Vector3<T>(-5,0,0);
             myMatrix.makeScaling(myResult.scale);
             myMatrix.rotateX(-5);
-            
-            Vector3<T> myScale;
-            Vector3<T> myShear;
-            Vector3<T> myOrientation;
-            Vector3<T> myPosition;
-            myMatrix.decomposeEuler(myScale, myShear, myOrientation, myPosition);
-            Matrix4<T> myResultMatrix = Matrix4<T>::Identity();
-            myResultMatrix.scale(myScale);
-            Matrix4<T> myRotation(Quaternion<T>::createFromEuler(myOrientation));
-            myResultMatrix.postMultiply(myRotation);
-            myResultMatrix.translate(myPosition);
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix));
-            
-            // clear tmp vectors
-            myScale = Vector3<T>(1,1,1);
-            myShear = Vector3<T>(0,0,0);
-            myOrientation = Vector3<T>(0,0,0);
-            myPosition = Vector3<T>(0,0,0);
+            testEulerDecompositionHelper(myMatrix, myResult);
             
             myResult.scale = Vector3<T>(-3,-2,-1);
             myResult.orientation = Vector3<T>(1,0,0);
@@ -2057,14 +2096,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.scale(myResult.scale);
             Matrix4<T> myRotation2(Quaternion<T>::createFromEuler(myResult.orientation));
             myMatrix.postMultiply(myRotation2);
-            
-            myMatrix.decomposeEuler(myScale, myShear, myOrientation, myPosition);
-            myResultMatrix.makeIdentity();
-            myResultMatrix.scale(myScale);
-            Matrix4<T> myRotation3(Quaternion<T>::createFromEuler(myOrientation));
-            myResultMatrix.postMultiply(myRotation3);
-            myResultMatrix.translate(myPosition);
-            ENSURE_FAIL_EXPECTED(transformationIsEquivalent(myResultMatrix, myMatrix));
+            testEulerDecompositionHelper(myMatrix, myResult);
             
             // Test scale which results in combination of scaling & rotation
             myResult.orientation = Vector3<T>(0,0,0);

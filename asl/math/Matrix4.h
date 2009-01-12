@@ -1116,7 +1116,7 @@ unknown:
 
             // Compute X scale factor and normalize first row.
             theScale[0] = length(myM3[0]);
-            normalized(myM3[0]);
+            myM3[0] = normalized(myM3[0]);
 
             // Compute XY shear factor and make 2nd row orthogonal to 1st.
             theShear[0] = dot(myM3[0], myM3[1]);
@@ -1126,7 +1126,7 @@ unknown:
 
             // Now, compute Y scale and normalize 2nd row.
             theScale[1] = length(myM3[1]);
-            normalized(myM3[1]);
+            myM3[1] = normalized(myM3[1]);
 
             if(theScale[1] != 0) {
                 theShear[0] /= theScale[1];
@@ -1145,7 +1145,7 @@ unknown:
 
             // Next, get Z scale and normalize 3rd row.
             theScale[2] = length(myM3[2]);
-            normalized(myM3[2]);
+            myM3[2] = normalized(myM3[2]);
             if(theScale[2] != 0) {
                 theShear[1] /= theScale[2];
                 theShear[2] /= theScale[2];
