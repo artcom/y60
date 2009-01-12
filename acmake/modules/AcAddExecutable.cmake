@@ -17,7 +17,7 @@
 
 macro(ac_add_executable EXECUTABLE_NAME)
     parse_arguments(THIS_EXECUTABLE
-        "SOURCES;DEPENDS;EXTERNS;"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;"
         "DONT_INSTALL;"
         ${ARGN})
 
@@ -28,7 +28,8 @@ macro(ac_add_executable EXECUTABLE_NAME)
     _ac_declare_searchpath(${THIS_EXECUTABLE_EXTERNS})
 
     # define the target
-    add_executable(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_SOURCES})
+    add_executable(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_SOURCES}
+            ${THIS_EXECUTABLE_HEADERS})
     
     # attach depends and externs
     _ac_attach_depends(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_DEPENDS})

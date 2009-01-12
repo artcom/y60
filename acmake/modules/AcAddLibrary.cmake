@@ -51,7 +51,8 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         _ac_declare_searchpath(${THIS_LIBRARY_EXTERNS})
 
         # define the target
-        add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES})
+        add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES}
+                ${THIS_LIBRARY_HEADERS})
         
         # attach headers to target
         set_target_properties(
