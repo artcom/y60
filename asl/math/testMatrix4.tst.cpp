@@ -2221,6 +2221,20 @@ class Matrix4UnitTest : public UnitTest {
             
         }
 
+        void testGetRotationQuaternionHelper(const Quaternion<T> & theRotation) {
+            Matrix4<T> myMatrix(theRotation);
+            Quaternion<T> myResult;
+
+            myMatrix.getRotation(myResult);
+
+            Matrix4<T> myResultMatrix(myResult);
+            
+            ENSURE_MSG(almostEqual(myMatrix, myResultMatrix),
+                (string("getRotation(Quaternion), rotation: " + as_string(theRotation) +
+                 " result: ") + as_string(myResult)).c_str());
+
+        }
+        
         void testGetRotationHelper(const Vector3<T> & theRotation) {
             Matrix4<T> myMatrix;
             Matrix4<T> myResultMatrix;
@@ -2345,6 +2359,28 @@ class Matrix4UnitTest : public UnitTest {
             testGetRotationHelper(Vector3<T>(40,50,60));
             testGetRotationHelper(Vector3<T>(-40,50,-0.5));
             testGetRotationHelper(Vector3<T>(0,0,0));
+            
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),0,0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,T(PI_4),0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_4))));
+
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(1,0,0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,2,0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,0,3)));
+
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),T(PI_4),0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,T(PI_4),T(PI_4))));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),0,T(PI_4))));
+
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(1,2,0)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,3,4)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(-1,0,-2)));
+
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),T(PI_4),T(PI_4))));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(1,2,3)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(40,50,60)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(-40,50,-0.5)));
+            testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,0,0)));
 
         }
 

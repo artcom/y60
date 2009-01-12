@@ -338,6 +338,8 @@ namespace asl {
             }
 		}
 
+        // BEWARE: getScale only work for non-rotating matrices
+        // any other matrix type use matrix::decompose instead!!
 		Vector3<Number> getScale() const {
             return Matrix4Base<Number>::getScale();
 		}
@@ -597,6 +599,8 @@ namespace asl {
             ROTATION_ORDER_ZYX
         };
 
+        // BEWARE: getRotation methods only work for non-scaled matrices
+        // any other matrix type use matrix::decompose instead!!
         // From 3D-Game Engine Design, page 19
         void getRotation(Vector3<Number> & theRotation, RotationOrder theOrder = ROTATION_ORDER_XYZ) const {
             Angle myX = 0;
@@ -702,6 +706,8 @@ namespace asl {
             theRotation[2] = - myZ;
         }
 
+        // BEWARE: getRotation methods only work for <=ROTATING matrices
+        // any other matrix type use matrix::decompose instead!!
         void getRotation(Quaternion<Number> & theOrientation) const {
             float trace = this->val[0][0] + this->val[1][1] + this->val[2][2] + 1.0f;
             Number & qw = theOrientation[3];

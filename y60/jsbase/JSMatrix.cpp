@@ -295,6 +295,21 @@ WRAP_METHOD_BEGIN(getRotation, "Get orientation part of this matrix.");
 }
 WRAP_METHOD_REGISTER(getRotation);
 
+WRAP_METHOD_BEGIN(getRotationQuaternion, "Get orientation part of this matrix.");
+    DOC_RVAL("orientation quaternion", DOC_TYPE_VECTOR3F);
+    DOC_END;
+    asl::Matrix4f myObj;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj), myObj)) {
+        asl::Quaternion<float> myRotation;
+        myObj.getRotation(myRotation);
+        *rval = as_jsval(cx, myRotation);
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}
+WRAP_METHOD_REGISTER(getRotationQuaternion);
+
+
 WRAP_METHOD_BEGIN(decompose, "Decompose matrix into it's components.");
     DOC_RVAL("{scale,shear,orientation,position}", DOC_TYPE_OBJECT);
     DOC_END;
@@ -567,6 +582,22 @@ getRotation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     asl::Matrix4f myObj;
     if (convertFrom(cx, OBJECT_TO_JSVAL(obj), myObj)) {
         asl::Vector3<float> myRotation;
+        myObj.getRotation(myRotation);
+        *rval = as_jsval(cx, myRotation);
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}
+
+
+static JSBool
+getRotationQuaternion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Get orientation part of this matrix.");
+    DOC_RVAL("orientation quaternion", DOC_TYPE_QUATERNIONF);
+    DOC_END;
+    asl::Matrix4f myObj;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj), myObj)) {
+        asl::Quaternion<float> myRotation;
         myObj.getRotation(myRotation);
         *rval = as_jsval(cx, myRotation);
         return JS_TRUE;
