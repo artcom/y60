@@ -11,9 +11,9 @@ set(HEADERS
 asl_xpath_settings.h
 Expression.h
 ParseInput.h
-Path.h
+XPathPath.h
 PathParser.h
-Value.h
+XPathValue.h
 xpath_api.h
 xpath_api_impl.h
 )
