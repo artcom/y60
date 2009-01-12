@@ -30,16 +30,21 @@ endmacro(_ac_attach_depends)
 
 # attach external libraries to TARGET
 macro(_ac_attach_externs TARGET)
+
+    #message("_ac_attach_externs for ${TARGET} libs: ${ARGN}")
+
     foreach(EXTERN ${ARGN})
         if(EXTERN MATCHES ".*\\.framework/?$")
             target_link_libraries(${TARGET} ${EXTERN})
         else(EXTERN MATCHES ".*\\.framework/?$")
             target_link_libraries(${TARGET} ${${EXTERN}_LIBRARIES})
         endif(EXTERN MATCHES ".*\\.framework/?$")
+        #message("defs for ${TARGET}: from lib ${EXTERN} defs: ${${EXTERN}_DEFINITIONS}")
         if ( ${EXTERN}_DEFINITIONS )
+
             set_target_properties( ${TARGET} 
                     PROPERTIES
-                        COMPILE_DEFINITIONS ${EXTERN}_DEFINITIONS )
+                        COMPILE_DEFINITIONS ${${EXTERN}_DEFINITIONS} )
         endif ( ${EXTERN}_DEFINITIONS )
     endforeach(EXTERN)
 endmacro(_ac_attach_externs)
