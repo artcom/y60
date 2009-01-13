@@ -65,7 +65,9 @@
 
 #include <map>
 
-DEFINE_EXCEPTION (CMSCacheException, asl::Exception);
+#define NOPARAM
+DEFINE_EXCEPTION (CMSCacheException, asl::Exception, NOPARAM);
+
 
 namespace y60 {
 
@@ -81,7 +83,8 @@ static const char * BackendTypeStrings[] = {
     ""
 };
 
-DEFINE_ENUM(BackendType, BackendTypeEnum);
+DEFINE_ENUM(BackendType, BackendTypeEnum,NOPARAM);
+#undef NOPARAM
 
 class CMSCache {
     public:

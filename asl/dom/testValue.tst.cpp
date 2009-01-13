@@ -578,8 +578,10 @@ static const char * AnimalPropertyStrings[] = {
     "" 
 };
 
-DEFINE_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyEnum );
+#define NOPARAMETER
+DEFINE_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyEnum, NOPARAMETER);
 IMPLEMENT_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyStrings );
+#undef NOPARAMETER
 
 class BitsetValueUnitTest : public UnitTest {
     public:

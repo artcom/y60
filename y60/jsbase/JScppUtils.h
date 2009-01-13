@@ -114,9 +114,9 @@
 
 namespace asl {
 
-    std::string as_string(JSContext *cx, jsval theVal);
-    std::string as_string(JSContext *cx, JSObject *theObj);
-    std::string as_string(JSType theType);
+    Y60_JSBASE_EXPORT std::string as_string(JSContext *cx, jsval theVal);
+    Y60_JSBASE_EXPORT std::string as_string(JSContext *cx, JSObject *theObj);
+    Y60_JSBASE_EXPORT std::string as_string(JSType theType);
 }
 
 namespace jslib {

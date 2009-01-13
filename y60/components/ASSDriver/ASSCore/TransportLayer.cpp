@@ -79,7 +79,9 @@ static const char * DriverStateStrings[] = {
     ""
 };
 
-IMPLEMENT_ENUM( y60::DriverState, DriverStateStrings );
+
+IMPLEMENT_ENUM( y60::DriverState, DriverStateStrings);
+
 
 namespace y60 {
 

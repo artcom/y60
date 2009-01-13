@@ -88,7 +88,7 @@ namespace jslib {
      * Base class for RenderWindows. RenderWindows are used to render
      * scenes.
      */
-    class AbstractRenderWindow : public y60::IEventSink,
+    class Y60_JSLIB_EXPORT AbstractRenderWindow : public y60::IEventSink,
                                  public y60::IFrameBuffer,
                                  public y60::IGLContextManager {
     public:

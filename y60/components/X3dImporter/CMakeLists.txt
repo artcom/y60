@@ -5,6 +5,7 @@ X3dImport.cpp
 
 set(HEADERS
 X3dImport.h
+y60_x3dimporter_settings.h
 )
 
 y60_add_component(

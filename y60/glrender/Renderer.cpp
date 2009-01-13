@@ -730,7 +730,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::Vector3f & thePoint,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::Vector3f & thePoint,
                         const asl::Vector4f & theColor,
                         const asl::Matrix4f & theTransformation,
                         float theSize,
@@ -746,7 +746,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::LineSegment<float> & theLine,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::LineSegment<float> & theLine,
                         const asl::Vector4f & theColor,
                         const asl::Matrix4f & theTransformation,
                         float theSize,
@@ -763,7 +763,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::Sphere<float> & theSphere,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::Sphere<float> & theSphere,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
             float theSize,
@@ -800,7 +800,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::Box3<float> & theBox,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::Box3<float> & theBox,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
             float theSize,
@@ -819,7 +819,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::Triangle<float> & theTriangle,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::Triangle<float> & theTriangle,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
             float theSize,
@@ -837,7 +837,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::BSpline<float> & theBSpline,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::BSpline<float> & theBSpline,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
             float theSize,
@@ -857,7 +857,7 @@ namespace y60 {
     }
 
     template <>
-    void Renderer::draw(const asl::SvgPath & thePath,
+    Y60_GLRENDER_EXPORT void Renderer::draw(const asl::SvgPath & thePath,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
             float theSize,

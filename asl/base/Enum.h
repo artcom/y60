@@ -390,23 +390,27 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
 } // end of namespace
 
 #if defined(AC_BUILT_WITH_CMAKE) && defined(WIN32)
-#   define ASL_BASE_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN) template class DLL_EXPORT_TOKEN asl::Enum<THE_ENUM, THE_ENUM ## _MAX>;
+#   define ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN) template class DLL_EXPORT_TOKEN asl::Enum<THE_ENUM, THE_ENUM ## _MAX>;
+#   define ASL_BASE_BITSET_EXPORT_STATICS(THE_ENUM_NAME, DLL_EXPORT_TOKEN) template class DLL_EXPORT_TOKEN asl::Bitset<THE_ENUM_NAME>;
 #else
-#   define ASL_BASE_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN)
+#   define ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN)
+#   define ASL_BASE_BITSET_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN)
 #endif
 
 /** Helper macro. Creates a typedef.
  * @relates asl::Enum
  */
 #define DEFINE_ENUM( THE_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
-    ASL_BASE_EXPORT_STATICS(THE_ENUM,DLL_EXPORT_TOKEN) \
+    ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM,DLL_EXPORT_TOKEN) \
     typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
+
 
 /** Helper macro. Creates a typedef.
  * @relates asl::Bitset
  */
 #define DEFINE_BITSET( THE_BITSET_NAME, THE_ENUM_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
-    DEFINE_ENUM( THE_ENUM_NAME, THE_ENUM, DLL_EXPORT_TOKEN ); \
+    DEFINE_ENUM( THE_ENUM_NAME, THE_ENUM, DLL_EXPORT_TOKEN ) \
+    ASL_BASE_BITSET_EXPORT_STATICS(THE_ENUM_NAME,DLL_EXPORT_TOKEN) \
     typedef asl::Bitset<THE_ENUM_NAME> THE_BITSET_NAME; 
 
 /** Helper macro. Runs the verify() method during static initialization.

@@ -921,14 +921,14 @@ struct JSClassTraitsWrapper {
 
 DEFINE_EXCEPTION(BadArgumentException, asl::Exception);
 
-void
+Y60_JSBASE_EXPORT void
 checkForUndefinedArguments(const std::string & theMethodName, uintN argc, jsval *argv);
 
-void
+Y60_JSBASE_EXPORT void
 checkArguments(const std::string & theMethodName, uintN argc, jsval *argv, 
         unsigned theRequiredArguments);
 
-bool
+Y60_JSBASE_EXPORT bool
 isCalledForConversion(JSContext * cx, uintN argc, jsval * argv);
 
 }

@@ -95,7 +95,9 @@ enum CommandResponse {
     RESPONSE_TIMEOUT
 };
 
-DEFINE_ENUM( DriverState, DriverStateEnum );
+#define NOPARAM
+DEFINE_ENUM( DriverState, DriverStateEnum, NOPARAM );
+#undef NOPARAM
 
 class ASSDriver;
 
