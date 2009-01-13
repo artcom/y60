@@ -137,7 +137,7 @@ template <>
 struct JSClassTraits<JSToggleButton::NATIVE>
     : public JSClassTraitsWrapper<JSToggleButton::NATIVE, JSToggleButton> {};
 
-jsval as_jsval(JSContext *cx, JSToggleButton::OWNERPTR theOwner, JSToggleButton::NATIVE * theToggleButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSToggleButton::OWNERPTR theOwner, JSToggleButton::NATIVE * theToggleButton);
 
 } // namespace
 

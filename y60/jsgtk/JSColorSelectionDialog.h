@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSColorSelectionDialog::NATIVE>
     : public JSClassTraitsWrapper<JSColorSelectionDialog::NATIVE, JSColorSelectionDialog> {};
 
-jsval as_jsval(JSContext *cx, JSColorSelectionDialog::OWNERPTR theOwner, JSColorSelectionDialog::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSColorSelectionDialog::OWNERPTR theOwner, JSColorSelectionDialog::NATIVE * theNative);
 
 } // namespace
 

@@ -141,7 +141,7 @@ template <>
 struct JSClassTraits<JSMisc::NATIVE>
     : public JSClassTraitsWrapper<JSMisc::NATIVE, JSMisc> {};
 
-jsval as_jsval(JSContext *cx, JSMisc::OWNERPTR theOwner, JSMisc::NATIVE * theMisc);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSMisc::OWNERPTR theOwner, JSMisc::NATIVE * theMisc);
 
 } // namespace
 

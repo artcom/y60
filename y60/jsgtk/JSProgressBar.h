@@ -143,7 +143,7 @@ template <>
 struct JSClassTraits<JSProgressBar::NATIVE>
     : public JSClassTraitsWrapper<JSProgressBar::NATIVE, JSProgressBar> {};
 
-jsval as_jsval(JSContext *cx, JSProgressBar::OWNERPTR theOwner, JSProgressBar::NATIVE * theProgressBar);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSProgressBar::OWNERPTR theOwner, JSProgressBar::NATIVE * theProgressBar);
 
 } // namespace
 

@@ -39,7 +39,7 @@ namespace y60 {
         float    points;
     };
 
-    class ShaderLibrary : public IShaderLibrary {
+    class Y60_GLRENDER_EXPORT ShaderLibrary : public IShaderLibrary {
         public:
             DEFINE_EXCEPTION(ShaderLibraryException, asl::Exception);
             ShaderLibrary();

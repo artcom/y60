@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSTNTMeasurementList::NATIVE>
     : public JSClassTraitsWrapper<JSTNTMeasurementList::NATIVE, JSTNTMeasurementList> {};
 
-jsval as_jsval(JSContext *cx, JSTNTMeasurementList::OWNERPTR theOwner, JSTNTMeasurementList::NATIVE * theTNTMeasurementList);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTNTMeasurementList::OWNERPTR theOwner, JSTNTMeasurementList::NATIVE * theTNTMeasurementList);
 
 } // namespace
 

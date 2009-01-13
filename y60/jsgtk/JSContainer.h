@@ -140,7 +140,7 @@ template <>
 struct JSClassTraits<JSContainer::NATIVE>
     : public JSClassTraitsWrapper<JSContainer::NATIVE, JSContainer> {};
 
-jsval as_jsval(JSContext *cx, JSContainer::OWNERPTR theOwner, JSContainer::NATIVE * theContainer);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSContainer::OWNERPTR theOwner, JSContainer::NATIVE * theContainer);
 
 inline 
 jsval 

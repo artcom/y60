@@ -140,7 +140,7 @@ template <>
 struct JSClassTraits<JSSpinButton::NATIVE>
     : public JSClassTraitsWrapper<JSSpinButton::NATIVE, JSSpinButton> {};
 
-jsval as_jsval(JSContext *cx, JSSpinButton::OWNERPTR theOwner, JSSpinButton::NATIVE * theSpinButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSSpinButton::OWNERPTR theOwner, JSSpinButton::NATIVE * theSpinButton);
 
 } // namespace
 

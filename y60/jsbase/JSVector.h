@@ -409,7 +409,7 @@ struct JSVector  {
     static
     JSVector & getJSWrapper(JSContext *cx, JSObject *obj);
 
-    static
+    Y60_JSBASE_EXPORT static
     bool matchesClassOf(JSContext *cx, jsval theVal); 
 
     // This functions must be called only on JSObjects containing the correct
@@ -562,16 +562,16 @@ struct JSVector  {
 
     ~JSVector(); 
 
-    static
+    Y60_JSBASE_EXPORT static
     JSObject * Construct(JSContext *cx, jsval theVectorArgument); 
     
-    static
+    Y60_JSBASE_EXPORT static
     JSObject * Construct(JSContext *cx, uintN argc, jsval *argv);
 
-    static
+    Y60_JSBASE_EXPORT static
     JSObject * Construct(JSContext *cx, const NATIVE_VECTOR & theVector);
 
-    static
+    Y60_JSBASE_EXPORT static
     JSObject * Construct(JSContext *cx, NativeValuePtr theVector); 
 
     //TODO: implement the following three functions according to those in JSWrapper

@@ -31,7 +31,7 @@ namespace y60 {
 
     class TextRenderer;
 
-    class Text {
+    class Y60_GLTEXT_EXPORT Text {
         public:
             Text(TextRenderer * theRenderer,
                  const asl::Vector2f & thePos,

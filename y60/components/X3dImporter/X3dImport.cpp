@@ -56,6 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+#include "X3dImport.h"
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -78,7 +80,6 @@
 #include <y60/base/property_functions.h>
 #include <y60/base/PropertyNames.h>
 
-#include "X3dImport.h"
 
 
 /* Specs for X3D at

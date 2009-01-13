@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSMenuItem::NATIVE>
     : public JSClassTraitsWrapper<JSMenuItem::NATIVE, JSMenuItem> {};
 
-jsval as_jsval(JSContext *cx, JSMenuItem::OWNERPTR theOwner, JSMenuItem::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSMenuItem::OWNERPTR theOwner, JSMenuItem::NATIVE * theNative);
 
 } // namespace
 

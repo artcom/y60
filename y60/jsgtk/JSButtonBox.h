@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSButtonBox::NATIVE>
     : public JSClassTraitsWrapper<JSButtonBox::NATIVE, JSButtonBox> {};
 
-jsval as_jsval(JSContext *cx, JSButtonBox::OWNERPTR theOwner, JSButtonBox::NATIVE * theBox);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSButtonBox::OWNERPTR theOwner, JSButtonBox::NATIVE * theBox);
 
 } // namespace
 

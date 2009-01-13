@@ -149,7 +149,7 @@ template <>
 struct JSClassTraits<JSLabel::NATIVE>
     : public JSClassTraitsWrapper<JSLabel::NATIVE, JSLabel> {};
 
-jsval as_jsval(JSContext *cx, JSLabel::OWNERPTR theOwner, JSLabel::NATIVE * theLabel);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSLabel::OWNERPTR theOwner, JSLabel::NATIVE * theLabel);
 
 } // namespace
 

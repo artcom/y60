@@ -82,7 +82,7 @@ jsval as_jsval(JSContext *cx, dom::Node::NodeType theValue) {
 }
 
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValue);
 
 // this function will take a jsval and try create a ValuePtr from it
 //bool convertFrom(JSContext *cx, jsval theValue, dom::ValuePtr & theValuePtr);

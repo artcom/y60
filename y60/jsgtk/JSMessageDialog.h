@@ -146,7 +146,7 @@ template <>
 struct JSClassTraits<JSMessageDialog::NATIVE>
     : public JSClassTraitsWrapper<JSMessageDialog::NATIVE, JSMessageDialog> {};
 
-jsval as_jsval(JSContext *cx, JSMessageDialog::OWNERPTR theOwner, JSMessageDialog::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSMessageDialog::OWNERPTR theOwner, JSMessageDialog::NATIVE * theNative);
 
 } // namespace
 

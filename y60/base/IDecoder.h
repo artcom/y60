@@ -76,7 +76,7 @@
 
 namespace y60 {
 
-class IDecoder {
+class Y60_BASE_EXPORT IDecoder {
     public:
         typedef asl::WeakPtr<IDecoder> WPtr;
 

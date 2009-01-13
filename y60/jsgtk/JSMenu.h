@@ -134,7 +134,7 @@ template <>
 struct JSClassTraits<JSMenu::NATIVE>
     : public JSClassTraitsWrapper<JSMenu::NATIVE, JSMenu> {};
 
-jsval as_jsval(JSContext *cx, JSMenu::OWNERPTR theOwner, JSMenu::NATIVE * theMenu);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSMenu::OWNERPTR theOwner, JSMenu::NATIVE * theMenu);
 
 inline
 jsval 

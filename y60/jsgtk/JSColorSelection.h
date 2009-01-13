@@ -140,7 +140,7 @@ template <>
 struct JSClassTraits<JSColorSelection::NATIVE>
     : public JSClassTraitsWrapper<JSColorSelection::NATIVE, JSColorSelection> {};
 
-jsval as_jsval(JSContext *cx, JSColorSelection::OWNERPTR theOwner,
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSColorSelection::OWNERPTR theOwner,
                JSColorSelection::NATIVE * theColorSelection);
 
 } // namespace

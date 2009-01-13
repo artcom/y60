@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSTearoffMenuItem::NATIVE>
     : public JSClassTraitsWrapper<JSTearoffMenuItem::NATIVE, JSTearoffMenuItem> {};
 
-jsval as_jsval(JSContext *cx, JSTearoffMenuItem::OWNERPTR theOwner, JSTearoffMenuItem::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTearoffMenuItem::OWNERPTR theOwner, JSTearoffMenuItem::NATIVE * theNative);
 
 } // namespace
 

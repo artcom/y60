@@ -74,7 +74,7 @@
 
 namespace y60 {
 
-    struct KeyEvent : public Event {
+    struct Y60_INPUT_EXPORT KeyEvent : public Event {
         KeyEvent(Type theEventType,
                 unsigned char theScanCode,
                 KeyCode theKeyCode,

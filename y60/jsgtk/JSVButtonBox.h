@@ -135,7 +135,7 @@ template <>
 struct JSClassTraits<JSVButtonBox::NATIVE>
     : public JSClassTraitsWrapper<JSVButtonBox::NATIVE, JSVButtonBox> {};
 
-jsval as_jsval(JSContext *cx, JSVButtonBox::OWNERPTR theOwner, JSVButtonBox::NATIVE * theVButtonBox);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSVButtonBox::OWNERPTR theOwner, JSVButtonBox::NATIVE * theVButtonBox);
 
 } // namespace
 

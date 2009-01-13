@@ -137,7 +137,7 @@ template <>
 struct JSClassTraits<JSTextView::NATIVE>
     : public JSClassTraitsWrapper<JSTextView::NATIVE, JSTextView> {};
 
-jsval as_jsval(JSContext *cx, JSTextView::OWNERPTR theOwner, JSTextView::NATIVE * theBin);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTextView::OWNERPTR theOwner, JSTextView::NATIVE * theBin);
 
 } // namespace
 

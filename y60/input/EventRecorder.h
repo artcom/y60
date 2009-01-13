@@ -72,7 +72,7 @@
 
 namespace y60 {
 
-    class EventRecorder : public IEventSource, public IEventSink {
+    class Y60_INPUT_EXPORT EventRecorder : public IEventSource, public IEventSink {
         public:
             /// Recorder modes.
             enum Mode {

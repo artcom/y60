@@ -138,7 +138,7 @@ template <>
 struct JSClassTraits<JSStatusBar::NATIVE>
     : public JSClassTraitsWrapper<JSStatusBar::NATIVE, JSStatusBar> {};
 
-jsval as_jsval(JSContext *cx, JSStatusBar::OWNERPTR theOwner, JSStatusBar::NATIVE * theStatusBar);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSStatusBar::OWNERPTR theOwner, JSStatusBar::NATIVE * theStatusBar);
 
 } // namespace
 

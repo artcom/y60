@@ -135,7 +135,7 @@ template <>
 struct JSClassTraits<JSCheckButton::NATIVE>
     : public JSClassTraitsWrapper<JSCheckButton::NATIVE, JSCheckButton> {};
 
-jsval as_jsval(JSContext *cx, JSCheckButton::OWNERPTR theOwner, JSCheckButton::NATIVE * theCheckButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSCheckButton::OWNERPTR theOwner, JSCheckButton::NATIVE * theCheckButton);
 
 } // namespace
 

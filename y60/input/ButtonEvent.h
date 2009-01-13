@@ -65,7 +65,7 @@
 
 namespace y60 {
 
-    struct ButtonEvent : public Event {
+    struct Y60_INPUT_EXPORT ButtonEvent : public Event {
         ButtonEvent(Type theEventType, int myDevice, int myButton);
         ButtonEvent(const dom::NodePtr & theNode);
         virtual ~ButtonEvent();

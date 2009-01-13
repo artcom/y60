@@ -73,7 +73,7 @@
 
 namespace y60 {
 
-    struct WindowEvent : public Event {
+    struct Y60_INPUT_EXPORT WindowEvent : public Event {
         WindowEvent(Type theEventType,
                 int theWidth,
                 int theHeight);

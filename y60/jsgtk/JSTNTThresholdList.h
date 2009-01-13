@@ -129,7 +129,7 @@ template <>
 struct JSClassTraits<JSTNTThresholdList::NATIVE>
     : public JSClassTraitsWrapper<JSTNTThresholdList::NATIVE, JSTNTThresholdList> {};
 
-jsval as_jsval(JSContext *cx, JSTNTThresholdList::OWNERPTR theOwner, JSTNTThresholdList::NATIVE * theTNTThresholdList);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTNTThresholdList::OWNERPTR theOwner, JSTNTThresholdList::NATIVE * theTNTThresholdList);
 
 } // namespace
 

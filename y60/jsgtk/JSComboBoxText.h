@@ -138,7 +138,7 @@ template <>
 struct JSClassTraits<JSComboBoxText::NATIVE>
     : public JSClassTraitsWrapper<JSComboBoxText::NATIVE, JSComboBoxText> {};
 
-jsval as_jsval(JSContext *cx, JSComboBoxText::OWNERPTR theOwner, JSComboBoxText::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSComboBoxText::OWNERPTR theOwner, JSComboBoxText::NATIVE * theNative);
 
 } // namespace _Y60_ACGTKSHELL_JSCOMBOBOXTEXT_INCLUDED_
 

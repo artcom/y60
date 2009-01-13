@@ -131,7 +131,7 @@ template <>
 struct JSClassTraits<JSConsoleView::NATIVE>
     : public JSClassTraitsWrapper<JSConsoleView::NATIVE, JSConsoleView> {};
 
-jsval as_jsval(JSContext *cx, JSConsoleView::OWNERPTR theOwner, JSConsoleView::NATIVE * theBin);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSConsoleView::OWNERPTR theOwner, JSConsoleView::NATIVE * theBin);
 
 } // namespace
 

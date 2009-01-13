@@ -134,7 +134,7 @@ template <>
 struct JSClassTraits<JSEventBox::NATIVE>
     : public JSClassTraitsWrapper<JSEventBox::NATIVE, JSEventBox> {};
 
-jsval as_jsval(JSContext *cx, JSEventBox::OWNERPTR theOwner, JSEventBox::NATIVE * theEventBox);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSEventBox::OWNERPTR theOwner, JSEventBox::NATIVE * theEventBox);
 
 } // namespace
 

@@ -43,7 +43,7 @@ namespace y60 {
 }
 namespace asl {
     bool initializeGLMemoryExtensions();
-    struct AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
+    struct Y60_GLUTIL_EXPORT AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
     {
         void resetGLAGPMemoryFlush();
         void flushGLAGPMemory();

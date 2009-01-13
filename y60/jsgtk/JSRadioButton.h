@@ -135,7 +135,7 @@ template <>
 struct JSClassTraits<JSRadioButton::NATIVE>
     : public JSClassTraitsWrapper<JSRadioButton::NATIVE, JSRadioButton> {};
 
-jsval as_jsval(JSContext *cx, JSRadioButton::OWNERPTR theOwner, JSRadioButton::NATIVE * theRadioButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSRadioButton::OWNERPTR theOwner, JSRadioButton::NATIVE * theRadioButton);
 
 } // namespace
 

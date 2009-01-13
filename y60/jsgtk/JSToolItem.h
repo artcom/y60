@@ -134,7 +134,7 @@ template <>
 struct JSClassTraits<JSToolItem::NATIVE>
     : public JSClassTraitsWrapper<JSToolItem::NATIVE, JSToolItem> {};
 
-jsval as_jsval(JSContext *cx, JSToolItem::OWNERPTR theOwner, JSToolItem::NATIVE * theToolItem);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSToolItem::OWNERPTR theOwner, JSToolItem::NATIVE * theToolItem);
 
 } // namespace
 

@@ -138,7 +138,7 @@ template <>
 struct JSClassTraits<JSToolbar::NATIVE>
     : public JSClassTraitsWrapper<JSToolbar::NATIVE, JSToolbar> {};
 
-jsval as_jsval(JSContext *cx, JSToolbar::OWNERPTR theOwner, JSToolbar::NATIVE * theBin);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSToolbar::OWNERPTR theOwner, JSToolbar::NATIVE * theBin);
 
 } // namespace
 

@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSNotebook::NATIVE>
     : public JSClassTraitsWrapper<JSNotebook::NATIVE, JSNotebook> {};
 
-jsval as_jsval(JSContext *cx, JSNotebook::OWNERPTR theOwner, JSNotebook::NATIVE * theNotebook);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSNotebook::OWNERPTR theOwner, JSNotebook::NATIVE * theNotebook);
 
 } // namespace
 
