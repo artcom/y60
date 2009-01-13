@@ -72,9 +72,13 @@
 #include <asl/dom/Nodes.h>
 #include <asl/base/Singleton.h>
 
+
+
+
 #include <set>
 
 namespace jslib {
+
 
 template<class T>
 struct Argument {
@@ -149,6 +153,11 @@ struct ResultConverter {
     static void
     storeResult(JSCallArgs & theJSArgs, const T & theResult);
 };
+
+
+
+
+
 
 }
 

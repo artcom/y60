@@ -309,7 +309,7 @@ namespace asl {
         
     };
 
-    std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
+    ASL_MATH_EXPORT std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
 
 } // namespace
 

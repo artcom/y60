@@ -377,12 +377,12 @@ Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Block & t
 template <class T>
 bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest);
 
-JSBool JSA_charArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
+Y60_JSBASE_EXPORT JSBool JSA_charArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
 
 // Converts an array into a string, if argv is not an array it returns false.
-JSBool JSA_ArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
+Y60_JSBASE_EXPORT JSBool JSA_ArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
 
-std::string
+Y60_JSBASE_EXPORT std::string
 searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                               const std::string & theFile);
 

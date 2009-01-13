@@ -573,6 +573,20 @@ struct JSVector  {
 
     static
     JSObject * Construct(JSContext *cx, NativeValuePtr theVector); 
+
+    //TODO: implement the following three functions according to those in JSWrapper
+    static bool registerMethod(const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+        //return registerFunction(JSClassSingleton::get().getMethodsRef(), theName, theFunction, theMinArgCount);
+        return false;
+    }
+    static bool registerStaticFunction(const char * theName, JSNative theFunction, uint8 theMinArgCount) {
+        //return registerFunction(JSClassSingleton::get().getStaticFunctionsRef(), theName, theFunction, theMinArgCount);
+        return false;
+    }
+    static bool registerProperty(const char * theName, JSPropertyOp theGetter, JSPropertyOp theSetter) {
+        // return registerProperty(JSClassSingleton::get().getPropertiesRef(), theName, theGetter, theSetter);
+        return false;
+    }
 private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -584,6 +598,7 @@ private:
 #define DEFINE_VECTOR_CLASS_TRAITS(TYPE) \
 template <> \
 struct Y60_JSBASE_EXPORT JSClassTraits<TYPE> : public JSClassTraitsWrapper<TYPE, JSVector<TYPE> > {};
+
 
 DEFINE_VECTOR_CLASS_TRAITS(asl::Vector2f)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Vector3f)

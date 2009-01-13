@@ -75,104 +75,104 @@
 #include <vector>
 
 namespace jslib {
-    template struct ArgumentHolder<bool>;
-    template struct ArgumentHolder<short>;
-    template struct ArgumentHolder<unsigned short>;
-    template struct ArgumentHolder<char>;
-    template struct ArgumentHolder<unsigned char>;
-    template struct ArgumentHolder<int>;
-    template struct ArgumentHolder<unsigned int>;
-    template struct ArgumentHolder<unsigned int const &>;
-    template struct ArgumentHolder<long>;
-    template struct ArgumentHolder<long const &>;
-    template struct ArgumentHolder<unsigned long>;
-    template struct ArgumentHolder<unsigned long const &>;
-    template struct ArgumentHolder<float>;
-    template struct ArgumentHolder<float const &>;
-    template struct ArgumentHolder<double>;
-    template struct ArgumentHolder<double const &>;
-
-    template struct ArgumentHolder<asl::Vector2<int> >;
-    template struct ArgumentHolder<asl::Vector3<int> >;
-    template struct ArgumentHolder<asl::Vector4<int> >;
-    template struct ArgumentHolder<asl::Vector2<float> >;
-    template struct ArgumentHolder<asl::Vector3<float> >;
-    template struct ArgumentHolder<asl::Vector4<float> >;
-    template struct ArgumentHolder<asl::Vector2<double> >;
-    template struct ArgumentHolder<asl::Vector3<double> >;
-    template struct ArgumentHolder<asl::Vector4<double> >;
-    template struct ArgumentHolder<asl::Point2<float> >;
-    template struct ArgumentHolder<asl::Point3<float> >;
-    template struct ArgumentHolder<asl::Point4<float> >;
-    template struct ArgumentHolder<asl::Time>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<bool>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<short>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned short>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<char>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned char>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<int>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned int>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned int const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<long>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<long const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned long>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<unsigned long const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<float>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<float const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<double>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<double const &>;
+                 
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<int> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<int> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<int> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<double> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<double> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<double> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point2<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point3<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point4<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Time>;
  
-    template struct ArgumentHolder<asl::Vector2<int> const &>;
-    template struct ArgumentHolder<asl::Vector3<int> const &>;
-    template struct ArgumentHolder<asl::Vector4<int> const &>;
-    template struct ArgumentHolder<asl::Vector2<float> const &>;
-    template struct ArgumentHolder<asl::Vector3<float> const &>;
-    template struct ArgumentHolder<asl::Vector4<float> const &>;
-    template struct ArgumentHolder<asl::Vector2<double> const &>;
-    template struct ArgumentHolder<asl::Vector3<double> const &>;
-    template struct ArgumentHolder<asl::Vector4<double> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<int> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<int> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<int> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector2<double> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector3<double> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Vector4<double> const &>;
+                    
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point2<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point3<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Point4<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Time const&>;
+                
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<std::vector<unsigned int> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<std::vector<float> >;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<std::vector<std::string> const &>;
+                 
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Quaternion<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Sphere<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Box2<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Box3<float> const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<asl::Matrix4<float> const &>;
+               
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<std::string>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<std::string const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::Node const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::NodePtr>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::NodePtr const>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::NodePtr &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::NodePtr const &>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::Node::CloneDepth>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::EventListenerPtr>;
+    template struct Y60_JSBASE_EXPORT ArgumentHolder<dom::EventPtr>;
 
-    template struct ArgumentHolder<asl::Point2<float> const &>;
-    template struct ArgumentHolder<asl::Point3<float> const &>;
-    template struct ArgumentHolder<asl::Point4<float> const &>;
-    template struct ArgumentHolder<asl::Time const&>;
-    
-    template struct ArgumentHolder<std::vector<unsigned int> const &>;
-    template struct ArgumentHolder<std::vector<float> >;
-    template struct ArgumentHolder<std::vector<std::string> const &>;
-
-    template struct ArgumentHolder<asl::Quaternion<float> const &>;
-    template struct ArgumentHolder<asl::Sphere<float> const &>;
-    template struct ArgumentHolder<asl::Box2<float> const &>;
-    template struct ArgumentHolder<asl::Box3<float> const &>;
-    template struct ArgumentHolder<asl::Matrix4<float> const &>;
-
-    template struct ArgumentHolder<std::string>;
-    template struct ArgumentHolder<std::string const &>;
-    template struct ArgumentHolder<dom::Node const &>;
-    template struct ArgumentHolder<dom::NodePtr>;
-    template struct ArgumentHolder<dom::NodePtr const>;
-    template struct ArgumentHolder<dom::NodePtr &>;
-    template struct ArgumentHolder<dom::NodePtr const &>;
-    template struct ArgumentHolder<dom::Node::CloneDepth>;
-    template struct ArgumentHolder<dom::EventListenerPtr>;
-    template struct ArgumentHolder<dom::EventPtr>;
-
-    template struct ResultConverter<bool>;
-    template struct ResultConverter<unsigned short>;
-    template struct ResultConverter<unsigned long>;
-    template struct ResultConverter<int>;
-    template struct ResultConverter<unsigned int>;
-    template struct ResultConverter<long>;
-    template struct ResultConverter<float>;
-    template struct ResultConverter<double>;
-    template struct ResultConverter<asl::Vector2<int> >;
-    template struct ResultConverter<asl::Vector3<int> >;
-    template struct ResultConverter<asl::Vector4<int> >;
-    template struct ResultConverter<asl::Vector2<float> >;
-    template struct ResultConverter<asl::Vector3<float> >;
-    template struct ResultConverter<asl::Vector4<float> >;
-    template struct ResultConverter<asl::Vector2<double> >;
-    template struct ResultConverter<asl::Vector3<double> >;
-    template struct ResultConverter<asl::Vector4<double> >;
-    template struct ResultConverter<std::vector<asl::Vector3<float> > >;
-   
-    template struct ResultConverter<asl::Point2<int> >;
-    template struct ResultConverter<asl::Point3<int> >;
-    template struct ResultConverter<asl::Point4<int> >;
-    template struct ResultConverter<asl::Point2<float> >;
-    template struct ResultConverter<asl::Point3<float> >;
-    template struct ResultConverter<asl::Point4<float> >;
-    template struct ResultConverter<asl::Point2<double> >;
-    template struct ResultConverter<asl::Point3<double> >;
-    template struct ResultConverter<asl::Point4<double> >;
-    
-    template struct ResultConverter<std::vector<asl::Point3<float> > >;
-    template struct ResultConverter<asl::Quaternion<float> >;
-    template struct ResultConverter<dom::NodePtr>;
-    template struct ResultConverter<dom::ValuePtr>;
-}
+    template struct Y60_JSBASE_EXPORT ResultConverter<bool>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<unsigned short>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<unsigned long>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<int>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<unsigned int>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<long>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<float>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<double>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector2<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector3<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector4<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector2<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector3<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector4<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector2<double> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector3<double> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Vector4<double> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<std::vector<asl::Vector3<float> > >;
+                 
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point2<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point3<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point4<int> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point2<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point3<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point4<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point2<double> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point3<double> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Point4<double> >;
+                   
+    template struct Y60_JSBASE_EXPORT ResultConverter<std::vector<asl::Point3<float> > >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<asl::Quaternion<float> >;
+    template struct Y60_JSBASE_EXPORT ResultConverter<dom::NodePtr>;
+    template struct Y60_JSBASE_EXPORT ResultConverter<dom::ValuePtr>;
+}                   

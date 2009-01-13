@@ -753,7 +753,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    JSObject * JSVector<NATIVE_VECTOR>::initClass(JSContext *cx, JSObject *theGlobalObject) {
+    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::initClass(JSContext *cx, JSObject *theGlobalObject) {
         DOC_MODULE_CREATE("Math",JSVector);
         JSObject * myProtoObj = JS_InitClass(cx, theGlobalObject, NULL, Class(),
                 /* native constructor function and min arg count */

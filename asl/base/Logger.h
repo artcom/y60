@@ -67,7 +67,7 @@ namespace asl {
     enum Severity {SEV_PRINT, SEV_FATAL, SEV_ERROR, SEV_WARNING, SEV_INFO, SEV_DEBUG, SEV_TRACE, SEV_DISABLED};
     extern const char * SeverityName[];
 
-    class MessageSink {
+    class ASL_BASE_EXPORT MessageSink {
     public:
         virtual void push(Severity theSeverity, const std::string & theMessage) = 0;
     };
