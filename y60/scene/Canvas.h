@@ -59,7 +59,7 @@
 #ifndef _scene_Canvas_h_
 #define _scene_Canvas_h_
 
-#include "Y60_scene_settings.h"
+#include "y60_scene_settings.h"
 
 #include "IFrameBuffer.h"
 
