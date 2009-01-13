@@ -27,7 +27,8 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     _ac_declare_searchpath(${THIS_PLUGIN_EXTERNS})
     
     # define the target
-    add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES})
+    add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES}
+        ${THIS_PLUGIN_HEADERS})
     
     # link to aslbase because it contains asl::PluginBase
     #   XXX: acmake should not be asl-specific

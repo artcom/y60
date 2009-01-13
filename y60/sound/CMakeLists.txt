@@ -43,8 +43,6 @@ if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
-message("Sound Externals ${EXTERNALS}")
-
 ac_add_library(
     y60sound y60/sound
     SOURCES ${SOURCES}
