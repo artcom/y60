@@ -68,7 +68,7 @@
 #ifndef _scene_Camera_h_
 #define _scene_Camera_h_
 
-#include "Y60_scene_settings.h"
+#include "y60_scene_settings.h"
 
 #include "TransformHierarchyFacade.h"
 #include <y60/base/FrustumValue.h>
