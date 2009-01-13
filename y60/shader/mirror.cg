@@ -1,0 +1,65 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#define FRESNEL_POWER  2.0
+#define FRESNEL_SCALE  0.8
+#define FRESNEL_BIAS   0.5
+
+struct vert2frag {
+    float4 normal      : TEXCOORD3;
+    float4 position    : POSITION;
+    float2 texCoord0   : TEXCOORD0;
+    float4 texCoord1   : TEXCOORD1;
+    float3 viewVector  : TEXCOORD2;
+    // float3 worldNormal : TEXCOORD3;
+};
+
+vert2frag mainVertex(float4 thePosition  : POSITION,
+                     float4 theTexCoord0 : TEXCOORD0,
+                     float4 theNormal    : NORMAL,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 AC_OBJECTWORLD_IT,
+                     uniform float4x4 AC_OBJECTWORLD,
+                     uniform float3 AC_CAMERA_POSITION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+    OUT.position  = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord0 = mul(GL_TEXTURE, theTexCoord0).xy;
+    OUT.texCoord1 = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, thePosition).xyz;
+    // OUT.worldNormal        = normalize(mul(AC_OBJECTWORLD_IT, theNormal).xyz);
+    OUT.viewVector         = normalize(myWorldPosition - AC_CAMERA_POSITION);
+    OUT.normal             = theNormal;
+
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform float time,
+                    uniform float4x4 AC_OBJECTWORLD_IT,
+                    uniform sampler2D tex0,
+                    uniform sampler2D tex1) : COLOR
+{
+    float4 myNormal = tex2D(tex0, IN.texCoord0.xy + float2(-time)) * 2.0 - 1.0;
+    myNormal += tex2D(tex0, IN.texCoord0.yx + float2(time)) * 2.0 - 1.0;
+    
+    float3 myFresnelNormal = normalize(mul(AC_OBJECTWORLD_IT, myNormal + IN.normal).xyz);
+    
+    float myReflectionFactor = (FRESNEL_BIAS + FRESNEL_SCALE *
+        pow(1+dot(IN.viewVector, myFresnelNormal), FRESNEL_POWER));
+    
+    float4 myReturn = tex2D(tex1, ((IN.texCoord1.xy/IN.texCoord1.w + myNormal.xy / 4.0) + 1.0) / 2.0);
+    myReturn.a = myReflectionFactor; 
+    myReturn.rgb *=  myReflectionFactor; 
+    
+    return myReturn;
+}

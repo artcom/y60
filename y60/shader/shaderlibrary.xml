@@ -1772,6 +1772,28 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="mirror" name="mirror" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`mirror`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`mirror.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`mirror.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->
