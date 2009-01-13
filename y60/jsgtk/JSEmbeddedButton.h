@@ -59,6 +59,8 @@
 #ifndef TNT_JS_EMBEDDED_BUTTON
 #define TNT_JS_EMBEDDED_BUTTON
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSEventBox.h"
 
 #include <y60/acgtk/EmbeddedButton.h>
@@ -143,8 +145,8 @@ template <>
 struct JSClassTraits<JSEmbeddedButton::NATIVE> 
     : public JSClassTraitsWrapper<JSEmbeddedButton::NATIVE, JSEmbeddedButton> {};
 
-jsval as_jsval(JSContext *cx, JSEmbeddedButton::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedButton> & theEmbeddedButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSEmbeddedButton::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedButton> & theEmbeddedButton);
 
 } // namespace
 

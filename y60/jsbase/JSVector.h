@@ -73,25 +73,25 @@ namespace jslib {
 
 template<class NATIVE_VECTOR> struct JSVector;
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2d & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3d & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4d & theVector);
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point2i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point3i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point4i & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point2f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point3f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point4f & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4i & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4f & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
 
 namespace detail {
     template <template<class> class NATIVE_VECTOR, class NUMBER>
@@ -577,13 +577,13 @@ private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 public:
-    static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
+    Y60_JSBASE_EXPORT static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 private:
     NativeValuePtr _myOwner;
 };
 #define DEFINE_VECTOR_CLASS_TRAITS(TYPE) \
 template <> \
-struct JSClassTraits<TYPE> : public JSClassTraitsWrapper<TYPE, JSVector<TYPE> > {};
+struct Y60_JSBASE_EXPORT JSClassTraits<TYPE> : public JSClassTraitsWrapper<TYPE, JSVector<TYPE> > {};
 
 DEFINE_VECTOR_CLASS_TRAITS(asl::Vector2f)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Vector3f)
@@ -608,6 +608,8 @@ DEFINE_VECTOR_CLASS_TRAITS(asl::Point4d)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point2i)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point3i)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point4i)
+
+#undef DEFINE_VECTOR_CLASS_TRAITS
 
 } // namespace
 

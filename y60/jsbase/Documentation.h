@@ -210,14 +210,14 @@ namespace jslib {
              DocumentationMap _myDocumentation;
     };
 
-    void documentConstructor(const char *theModule, const char *theClassName,
+    Y60_JSBASE_EXPORT void documentConstructor(const char *theModule, const char *theClassName,
         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval));
 
-    void describeFunctionParameter(FunctionDescription *myFunctionDescription,
+    Y60_JSBASE_EXPORT void describeFunctionParameter(FunctionDescription *myFunctionDescription,
         const std::string & theName, const std::string & theDescription, const DocType & theType, const std::string & theDefaultValue);
 
 
-    void
+    Y60_JSBASE_EXPORT void
     createClassModuleDocumentation(const char *theModule, const char * theClassName,
             JSPropertySpec * theProperties,
             JSFunctionSpec * theFunctions,
@@ -226,7 +226,7 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions = 0,
             const char * theBaseClassName = 0);
 
-    void
+    Y60_JSBASE_EXPORT void
     createClassDocumentation(const char * theClassName,
             JSPropertySpec * theProperties,
             JSFunctionSpec * theFunctions,
@@ -235,7 +235,7 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions = 0,
             const char * theBaseClassName = 0);
 
-    void
+    Y60_JSBASE_EXPORT void
     createFunctionDocumentation(const char * theSection, JSFunctionSpec * theFunctions);
 }
 

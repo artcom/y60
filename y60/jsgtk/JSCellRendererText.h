@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSCELL_RENDERER_TEXT_INCLUDED_
 #define _Y60_ACGTKSHELL_JSCELL_RENDERER_TEXT_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSCellRenderer.h"
 
 #include <y60/jsbase/JSWrapper.h>

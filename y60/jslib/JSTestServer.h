@@ -122,10 +122,10 @@ template <>
 struct JSClassTraits<JSTestServer::NATIVE>
     : public JSClassTraitsWrapper<JSTestServer::NATIVE, JSTestServer> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSTestServer::OWNERPTR & theRequest);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSTestServer::OWNERPTR & theRequest);
 
-jsval as_jsval(JSContext *cx, JSTestServer::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSTestServer::OWNERPTR theOwner, JSTestServer::NATIVE * theSerial);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSTestServer::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSTestServer::OWNERPTR theOwner, JSTestServer::NATIVE * theSerial);
 
 }
 

@@ -129,11 +129,11 @@ template <>
 struct JSClassTraits<asl::Plane<PlaneNumber> >
     : public JSClassTraitsWrapper<asl::Plane<PlaneNumber> , JSPlane> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<PlaneNumber>  & thePlane);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<PlaneNumber>  & thePlane);
 
-jsval as_jsval(JSContext *cx, const asl::Plane<PlaneNumber>  & theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Plane<PlaneNumber>  & theValue);
 
-jsval as_jsval(JSContext *cx, JSPlane::NativeValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSPlane::NativeValuePtr theValue);
 // NOT IMPLEMENTED jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Plane<PlaneNumber>  * thePlane);
 
 }

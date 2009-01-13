@@ -134,12 +134,12 @@ struct JSClassTraits<inet::Request>
     : public JSClassTraitsWrapper<inet::Request, JSRequestWrapper> {};
 
 
-bool convertFrom(JSContext *cx, jsval theValue, inet::RequestPtr & theRequest);
-bool convertFrom(JSContext *cx, jsval theValue, JSRequestWrapper::OWNERPTR & theRequest);
-bool convertFrom(JSContext *cx, jsval theValue, JSRequestWrapper::NATIVE & theRequest);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, inet::RequestPtr & theRequest);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSRequestWrapper::OWNERPTR & theRequest);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSRequestWrapper::NATIVE & theRequest);
 
-jsval as_jsval(JSContext *cx, JSRequestWrapper::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSRequestWrapper::OWNERPTR theOwner, JSRequestWrapper::NATIVE * theSerial);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSRequestWrapper::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSRequestWrapper::OWNERPTR theOwner, JSRequestWrapper::NATIVE * theSerial);
 
 }
 

@@ -61,6 +61,8 @@
 #ifndef __acgtkshell__test_subject
 #define __acgtkshell__test_subject
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSSignal0.h"
 
 namespace jslib {
@@ -136,8 +138,8 @@ template <>
 struct JSClassTraits<JSTestSubject::NATIVE> 
     : public JSClassTraitsWrapper<JSTestSubject::NATIVE, JSTestSubject> {};
 
-jsval as_jsval(JSContext *cx, JSTestSubject::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<TestSubject> & theTestSubject);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTestSubject::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<TestSubject> & theTestSubject);
 }
 
 #endif

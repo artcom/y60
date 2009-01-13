@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSSTOCKID_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSTOCKID_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSWindow.h"
 #include <y60/jsbase/JSWrapper.h>
 
@@ -211,9 +213,9 @@ template <>
 struct JSClassTraits<JSStockID::NATIVE>
     : public JSClassTraitsWrapper<JSStockID::NATIVE, JSStockID> {};
 
-jsval as_jsval(JSContext *cx, JSStockID::OWNERPTR theOwner, JSStockID::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSStockID::OWNERPTR theOwner, JSStockID::NATIVE * theNative);
 
-bool convertFrom(JSContext *cx, jsval theValue, JSStockID::NATIVE * & theStockId);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSStockID::NATIVE * & theStockId);
  
 
 } // namespace

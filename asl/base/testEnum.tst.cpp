@@ -64,7 +64,9 @@ static const char * AnimalStrings[] = {
     ""
 };
 
-DEFINE_ENUM( Animal, AnimalEnum,);
+#define NOPARAMETER
+
+DEFINE_ENUM( Animal, AnimalEnum, NOPARAMETER);
 IMPLEMENT_ENUM( Animal, AnimalStrings);
 
 enum PropertyEnum {
@@ -84,7 +86,7 @@ static const char * PropertyStrings[] = {
 };
 
 
-DEFINE_BITSET( Properties, Property, PropertyEnum, );
+DEFINE_BITSET( Properties, Property, PropertyEnum, NOPARAMETER);
 IMPLEMENT_BITSET( Properties, Property, PropertyStrings );
 
 class EnumUnitTest : public UnitTest {

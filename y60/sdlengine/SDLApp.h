@@ -67,7 +67,7 @@
 #ifndef __Y60_SDLAPP_INCLUDED__
 #define __Y60_SDLAPP_INCLUDED__
 
-#include "y60_sdlengine_settins.h"
+#include "y60_sdlengine_settings.h"
 
 #include <y60/jslib/JSApp.h>
 

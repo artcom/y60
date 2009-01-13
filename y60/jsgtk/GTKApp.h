@@ -67,6 +67,8 @@
 #ifndef __Y60_GTKAPP_INCLUDED__
 #define __Y60_GTKAPP_INCLUDED__
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSGladeSignalAdapter.h"
 
 #include <y60/jslib/JSApp.h>

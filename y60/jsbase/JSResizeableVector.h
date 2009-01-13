@@ -120,7 +120,7 @@ template <>
 struct JSClassTraits<dom::ResizeableVector>
     : public JSClassTraitsWrapper<dom::ResizeableVector, JSResizeableVector> {};
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableVector * theVectorPtr);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableVector * theVectorPtr);
 
 }
 

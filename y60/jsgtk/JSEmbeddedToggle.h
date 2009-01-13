@@ -59,6 +59,8 @@
 #ifndef TNT_JS_EMBEDDED_TOGGLE
 #define TNT_JS_EMBEDDED_TOGGLE
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSEmbeddedButton.h"
 
 #include <y60/acgtk/EmbeddedToggle.h>
@@ -144,8 +146,8 @@ template <>
 struct JSClassTraits<JSEmbeddedToggle::NATIVE> 
     : public JSClassTraitsWrapper<JSEmbeddedToggle::NATIVE, JSEmbeddedToggle> {};
 
-jsval as_jsval(JSContext *cx, JSEmbeddedToggle::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedToggle> & theEmbeddedToggle);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSEmbeddedToggle::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedToggle> & theEmbeddedToggle);
 
 } // namespace
 

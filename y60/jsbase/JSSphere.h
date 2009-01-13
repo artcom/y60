@@ -137,13 +137,13 @@ template <>
 struct JSClassTraits<asl::Sphere<SphereNumber> >
     : public JSClassTraitsWrapper<asl::Sphere<SphereNumber> , JSSphere> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Sphere<SphereNumber>  & theSphere);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Sphere<SphereNumber>  & theSphere);
 
 // jsval as_jsval(JSContext *cx, const asl::Sphere<SphereNumber>  & theValue);
 
-jsval as_jsval(JSContext *cx, asl::Sphere<SphereNumber> theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, asl::Sphere<SphereNumber> theValue);
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Sphere<SphereNumber>  * theSphere);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Sphere<SphereNumber>  * theSphere);
 
 }
 

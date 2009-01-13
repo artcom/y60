@@ -208,6 +208,7 @@ JSVScale.h
 JSVSeparator.h
 JSWidget.h
 JSWindow.h
+y60_jsgtk_settings.h
 )
 
 ac_add_library(

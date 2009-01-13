@@ -154,11 +154,11 @@ template <>
 struct JSClassTraits<asl::Frustum >
     : public JSClassTraitsWrapper<asl::Frustum , JSFrustum> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSFrustum::NativeValuePtr & theFrustum);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Frustum  & theFrustum);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSFrustum::NativeValuePtr & theFrustum);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Frustum  & theFrustum);
 
-jsval as_jsval(JSContext *cx, const asl::Frustum  & theValue);
-jsval as_jsval(JSContext *cx, JSFrustum::NativeValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Frustum  & theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSFrustum::NativeValuePtr theValue);
 
 }
 

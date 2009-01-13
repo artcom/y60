@@ -129,9 +129,9 @@ template <>
 struct JSClassTraits<y60::Scene>
     : public JSClassTraitsWrapper<y60::Scene, JSScene> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene, dom::ThreadingModel> & theScene);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene, dom::ThreadingModel> & theScene);
 
-jsval as_jsval(JSContext *cx, JSScene::OWNERPTR theScene);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSScene::OWNERPTR theScene);
 
 }
 

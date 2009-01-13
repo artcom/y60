@@ -125,8 +125,8 @@ class JSKeyframe : public JSWrapper<asl::QuaternionKeyframe, asl::Ptr<asl::Quate
     private:
 };
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::QuaternionKeyframe & theKeyframe);
-jsval as_jsval(JSContext *cx, const asl::QuaternionKeyframe  & theValue);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::QuaternionKeyframe & theKeyframe);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const asl::QuaternionKeyframe  & theValue);
 
 template <>
 struct JSClassTraits<asl::QuaternionKeyframe> : public JSClassTraitsWrapper<asl::QuaternionKeyframe, JSKeyframe> {};

@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSDIALOG_INCLUDED_
 #define _Y60_ACGTKSHELL_JSDIALOG_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSWindow.h"
 #include <y60/jsbase/JSWrapper.h>
 

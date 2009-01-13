@@ -131,11 +131,11 @@ class Y60_JSBASE_EXPORT JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Blo
 template <>
 struct JSClassTraits<asl::Block> : public JSClassTraitsWrapper<asl::Block, JSBlock> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock);
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::OWNERPTR & theBlock);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSBlock::OWNERPTR & theBlock);
 
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner, JSBlock::NATIVE * theBlock);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner, JSBlock::NATIVE * theBlock);
 
 }
 

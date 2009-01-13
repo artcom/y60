@@ -141,11 +141,11 @@ template <>
 struct JSClassTraits<asl::Quaternion<QuaternionNumber> >
     : public JSClassTraitsWrapper<asl::Quaternion<QuaternionNumber> , JSQuaternion> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSQuaternion::NativeValuePtr & theQuaternion);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Quaternion<QuaternionNumber>  & theQuaternion);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSQuaternion::NativeValuePtr & theQuaternion);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Quaternion<QuaternionNumber>  & theQuaternion);
 
-jsval as_jsval(JSContext *cx, const asl::Quaternion<QuaternionNumber> & theValue);
-jsval as_jsval(JSContext *cx, JSQuaternion::NativeValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Quaternion<QuaternionNumber> & theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSQuaternion::NativeValuePtr theValue);
 
 }
 

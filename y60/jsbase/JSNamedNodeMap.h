@@ -123,7 +123,7 @@ template <>
 struct JSClassTraits<dom::NamedNodeMap>
     : public JSClassTraitsWrapper<dom::NamedNodeMap, JSNamedNodeMap> {};
 
-jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap);
 
 }
 

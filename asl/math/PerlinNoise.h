@@ -66,7 +66,7 @@ namespace asl {
 
 typedef std::vector<asl::Vector3i> NoiseSeed;
 
-class PrimePool {
+class ASL_MATH_EXPORT PrimePool {
     public:
         static void createNoiseSeed(unsigned theOctaveCount, NoiseSeed & theSeed);
 
@@ -80,7 +80,7 @@ class PrimePool {
         static std::vector<int> _myPool3;
 };
 
-class PerlinNoise2D {
+class ASL_MATH_EXPORT PerlinNoise2D {
     public:
         PerlinNoise2D(float thePersistence);
         PerlinNoise2D(const NoiseSeed & theSeeds, float thePersistence);
@@ -108,7 +108,7 @@ class PerlinNoise2D {
         float     _myPersistence;
 };
 
-class PerlinNoise3D {
+class ASL_MATH_EXPORT PerlinNoise3D {
     public:
         PerlinNoise3D(unsigned theOctaveCount, float theAmplitudeFalloff = 0.5);
 

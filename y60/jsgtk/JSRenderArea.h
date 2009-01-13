@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSRENDERAREA_INCLUDED_
 #define _Y60_ACGTKSHELL_JSRENDERAREA_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/acgtk/RenderArea.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -135,8 +137,8 @@ template <>
 struct JSClassTraits<JSRenderArea::NATIVE>
     : public JSClassTraitsWrapper<JSRenderArea::NATIVE, JSRenderArea> {};
 
-jsval as_jsval(JSContext *cx, JSRenderArea::OWNERPTR theOwner, JSRenderArea::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::RenderArea> & theRenderArea);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSRenderArea::OWNERPTR theOwner, JSRenderArea::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::RenderArea> & theRenderArea);
 
 } // namespace
 

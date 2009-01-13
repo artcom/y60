@@ -119,10 +119,10 @@ class JSZipWriter : public JSWrapper<asl::ZipWriter, asl::Ptr<asl::ZipWriter>, S
 template <>
 struct JSClassTraits<asl::ZipWriter> : public JSClassTraitsWrapper<asl::ZipWriter, JSZipWriter> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSZipWriter::NATIVE *& theZipWriter);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSZipWriter::NATIVE *& theZipWriter);
 
-jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner, JSZipWriter::NATIVE * theZipWriter);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner, JSZipWriter::NATIVE * theZipWriter);
 
 }
 

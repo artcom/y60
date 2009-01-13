@@ -59,6 +59,8 @@
 #ifndef __Y60_ACXPSHELL_GTKCPP_INCLUDED__
 #define __Y60_ACXPSHELL_GTKCPP_INCLUDED__
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSgtkutils.h"
 
 #include <y60/jsbase/jssettings.h>
@@ -93,7 +95,7 @@ bool convertFrom(JSContext *cx, jsval theValue, Glib::RefPtr<TARGET> & theTarget
     return ConvertFrom<TARGET>::convert(cx, theValue, theTarget);
 }
 
-jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership = false);
+Y60_JSGTK_EXPORT jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership = false);
 
 
 } // namespace

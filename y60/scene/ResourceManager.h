@@ -79,7 +79,7 @@ namespace y60 {
      *
      * @ingroup Y60scene
      */ 
-    class ResourceManager : public IResourceManager {
+    class Y60_SCENE_EXPORT ResourceManager : public IResourceManager {
         public:
             ResourceManager() :_myHaveValidGLContextFlag(false) {}
             virtual IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }

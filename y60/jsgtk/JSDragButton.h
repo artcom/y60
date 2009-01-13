@@ -59,6 +59,8 @@
 #ifndef TNT_JS_DRAG_BUTTON
 #define TNT_JS_DRAG_BUTTON
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSEmbeddedButton.h"
 
 #include <y60/acgtk/DragButton.h>
@@ -145,8 +147,8 @@ template <>
 struct JSClassTraits<JSDragButton::NATIVE> 
     : public JSClassTraitsWrapper<JSDragButton::NATIVE, JSDragButton> {};
 
-jsval as_jsval(JSContext *cx, JSDragButton::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::DragButton> & theDragButton);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSDragButton::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::DragButton> & theDragButton);
 
 } // namespace
 

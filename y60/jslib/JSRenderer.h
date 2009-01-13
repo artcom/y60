@@ -139,10 +139,10 @@ private:
 template <>
 struct JSClassTraits<y60::Renderer> : public JSClassTraitsWrapper<y60::Renderer, JSRenderer> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, y60::Renderer *& theRenderer);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Renderer> & theRenderer);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, y60::Renderer *& theRenderer);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Renderer> & theRenderer);
 
-jsval as_jsval(JSContext *cx, JSRenderer::OWNERPTR & theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSRenderer::OWNERPTR & theOwner);
 
 }
 

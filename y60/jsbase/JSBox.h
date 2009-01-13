@@ -140,11 +140,11 @@ template <>
 struct JSClassTraits<asl::Box3<BoxNumber> >
     : public JSClassTraitsWrapper<asl::Box3<BoxNumber> , JSBox3f> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Box3<BoxNumber>  & theBox3f);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Box3<BoxNumber>  & theBox3f);
 
-jsval as_jsval(JSContext *cx, const asl::Box3<BoxNumber>  & theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Box3<BoxNumber>  & theValue);
 
-jsval as_jsval(JSContext *cx, JSBox3f::NativeValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSBox3f::NativeValuePtr theValue);
 
 }
 

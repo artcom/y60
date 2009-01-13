@@ -130,11 +130,11 @@ template <>
 struct JSClassTraits<asl::Triangle<TriangleNumber> >
     : public JSClassTraitsWrapper<asl::Triangle<TriangleNumber> , JSTriangle> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Triangle<TriangleNumber>  & theTriangle);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Triangle<TriangleNumber>  & theTriangle);
 
-jsval as_jsval(JSContext *cx, const asl::Triangle<TriangleNumber>  & theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Triangle<TriangleNumber>  & theValue);
 
-jsval as_jsval(JSContext *cx, JSTriangle::NativeValuePtr theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSTriangle::NativeValuePtr theValue);
 
 }
 

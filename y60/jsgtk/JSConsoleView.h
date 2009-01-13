@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTK_CONSOLE_VIEW_INCLUDED_
 #define _Y60_ACGTK_CONSOLE_VIEW_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSTextView.h"
 
 #include <y60/acgtk/ConsoleView.h>

@@ -129,7 +129,7 @@ template <>
 struct JSClassTraits<dom::AccessibleVector>
     : public JSClassTraitsWrapper<dom::AccessibleVector, JSAccessibleVector> {};
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::AccessibleVector * theVectorPtr);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::AccessibleVector * theVectorPtr);
 
 }
 

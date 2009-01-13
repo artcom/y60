@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSGLADE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSGLADE_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #if defined(_MSC_VER)
     #pragma warning(push)

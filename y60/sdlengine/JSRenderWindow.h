@@ -59,7 +59,7 @@
 #ifndef _Y60_ACXPSHELL_JSRENDERER_INCLUDED_
 #define _Y60_ACXPSHELL_JSRENDERER_INCLUDED_
 
-#include "y60_sdlengine_settins.h"
+#include "y60_sdlengine_settings.h"
 
 #include "SDLWindow.h"
 
@@ -136,10 +136,10 @@ struct JSClassTraits<y60::SDLWindow> : public JSClassTraitsWrapper<y60::SDLWindo
     }
 };
 
-bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
-bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
+Y60_SDLENGINE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
+Y60_SDLENGINE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
 
-jsval as_jsval(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner);
+Y60_SDLENGINE_EXPORT as_jsval(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner);
 
 }
 

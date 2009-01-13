@@ -67,6 +67,8 @@
 #ifndef _Y60_ACGTKSHELL_ACCOLUMNRECORD_INCLUDED_
 #define _Y60_ACGTKSHELL_ACCOLUMNRECORD_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #if defined(_MSC_VER)
 #pragma warning(push,1)
 #endif //defined(_MSC_VER)

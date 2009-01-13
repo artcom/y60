@@ -67,6 +67,8 @@
 #ifndef _Y60_ACGTKSHELL_JSSIGNAL_PROXY_2_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSIGNAL_PROXY_2_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSSigConnection.h"
 #include "JSSignal2.h"
 #include "JSSignalProxyUtils.h"

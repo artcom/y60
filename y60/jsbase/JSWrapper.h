@@ -613,7 +613,7 @@ struct VectorValueAccessProtocol {
     }
 };
 
-class JSWrapperBase {
+class Y60_JSBASE_EXPORT JSWrapperBase {
 public:
     static JSWrapperBase * getBasePtr(JSContext *cx, JSObject *obj) {
         JSWrapperBase * myJSWrapper = static_cast<JSWrapperBase*>(JS_GetPrivate(cx,obj));

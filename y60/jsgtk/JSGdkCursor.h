@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JS_GDK_CURSOR_INCLUDED_
 #define _Y60_ACGTKSHELL_JS_GDK_CURSOR_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 
 #if defined(_MSC_VER)
@@ -124,9 +126,9 @@ template <>
 struct JSClassTraits<JSGdkCursor::NATIVE>
     : public JSClassTraitsWrapper<JSGdkCursor::NATIVE, JSGdkCursor> {};
 
-jsval as_jsval(JSContext *cx, JSGdkCursor::OWNERPTR theOwner, JSGdkCursor::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGdkCursor::OWNERPTR theOwner, JSGdkCursor::NATIVE * theNative);
 
-bool convertFrom(JSContext *cx, jsval theValue, JSGdkCursor::NATIVE * & theCursor);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSGdkCursor::NATIVE * & theCursor);
 
 } // namespace
 

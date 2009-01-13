@@ -122,11 +122,11 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject * theGlobalObject);
 };
 
-bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE *& theBSpline);
-bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE & theBSpline);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE *& theBSpline);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE & theBSpline);
 
-jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner);
-jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner, JSBSpline::NATIVE * theBSpline);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner, JSBSpline::NATIVE * theBSpline);
 
 } // namespace
 

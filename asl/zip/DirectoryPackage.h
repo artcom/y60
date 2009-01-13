@@ -25,7 +25,7 @@
 
 namespace asl {
 
-class DirectoryPackage : public IPackage {
+class ASL_ZIP_EXPORT DirectoryPackage : public IPackage {
     public:
         DirectoryPackage(const std::string & theDirectory, bool theIgnoreDotFiles = true);
         const std::string & getPath() const { return _myDirectory; };

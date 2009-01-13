@@ -60,6 +60,8 @@
 #ifndef _Y60_ACGTKSHELL_JSHBUTTONBOX_INCLUDED_
 #define _Y60_ACGTKSHELL_JSHBUTTONBOX_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSButtonBox.h"
 #include <y60/jsbase/JSWrapper.h>
 

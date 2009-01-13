@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSVSCALE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSVSCALE_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSScale.h"
 
 #include <y60/jsbase/JSWrapper.h>

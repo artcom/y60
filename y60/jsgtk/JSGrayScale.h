@@ -59,6 +59,8 @@
 #ifndef TNT_JS_GRAY_SCALE
 #define TNT_JS_GRAY_SCALE
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSDrawingArea.h"
 
 #include <y60/acgtk/GrayScale.h>
@@ -142,8 +144,8 @@ template <>
 struct JSClassTraits<JSGrayScale::NATIVE> 
     : public JSClassTraitsWrapper<JSGrayScale::NATIVE, JSGrayScale> {};
 
-jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GrayScale> & theGrayScale);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GrayScale> & theGrayScale);
 
 } // namespace
 

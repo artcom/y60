@@ -59,6 +59,8 @@
 #ifndef _ac_jsgtk_JSVSeparator_h_
 #define _ac_jsgtk_JSVSeparator_h_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSSeparator.h"
 #include <y60/jsbase/JSWrapper.h>
 

@@ -216,45 +216,45 @@ JSA_GetClass(JSContext *cx, JSObject *obj) {
 #endif
 }
 
-void ensureParamCount(uintN argc, int theMinCount, int theMaxCount = 0);
+Y60_JSBASE_EXPORT void ensureParamCount(uintN argc, int theMinCount, int theMaxCount = 0);
 
-void dumpJSStack(JSContext *cx, FILE * theTarget = stderr);
-JSStackFrame * getStackFrame(int i, JSContext *cx);
-bool getFileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, const char * & filename, int & lineno);
+Y60_JSBASE_EXPORT void dumpJSStack(JSContext *cx, FILE * theTarget = stderr);
+Y60_JSBASE_EXPORT JSStackFrame * getStackFrame(int i, JSContext *cx);
+Y60_JSBASE_EXPORT bool getFileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, const char * & filename, int & lineno);
 
-void JSA_AddFunctions(JSContext *cx, JSObject *theClassCtr, JSFunctionSpec * theFunctions);
-void JSA_AddProperties(JSContext *cx, JSObject *theClassCtr, JSPropertySpec * theProperties);
-JSBool JSA_DefineConstInts(JSContext *cx, JSObject *obj, JSConstIntPropertySpec *cds);
+Y60_JSBASE_EXPORT void JSA_AddFunctions(JSContext *cx, JSObject *theClassCtr, JSFunctionSpec * theFunctions);
+Y60_JSBASE_EXPORT void JSA_AddProperties(JSContext *cx, JSObject *theClassCtr, JSPropertySpec * theProperties);
+Y60_JSBASE_EXPORT JSBool JSA_DefineConstInts(JSContext *cx, JSObject *obj, JSConstIntPropertySpec *cds);
 
-std::string ValType(JSContext *cx, jsval theVal);
+Y60_JSBASE_EXPORT std::string ValType(JSContext *cx, jsval theVal);
 
-void printParams(const char *name, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-void printParams(const char *name, JSContext *cx, JSObject *obj, JSType type, jsval *vp);
-void printParams(const char *name, JSContext *cx, JSObject *obj, jsval id);
-void printParams(const char *name, JSContext *cx, JSObject *obj);
+Y60_JSBASE_EXPORT void printParams(const char *name, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+Y60_JSBASE_EXPORT void printParams(const char *name, JSContext *cx, JSObject *obj, JSType type, jsval *vp);
+Y60_JSBASE_EXPORT void printParams(const char *name, JSContext *cx, JSObject *obj, jsval id);
+Y60_JSBASE_EXPORT void printParams(const char *name, JSContext *cx, JSObject *obj);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyAddProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyDelProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyGetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisySetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyEnumerate(JSContext *cx, JSObject *obj);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyResolve(JSContext *cx, JSObject *obj, jsval id);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyNewResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **objp);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 NoisyConvert(JSContext *cx, JSObject *obj, JSType type, jsval *vp);
 
 #ifndef JS_STATIC_DLL_CALLBACK

@@ -59,6 +59,8 @@
 #ifndef TNT_JS_CW_RULER
 #define TNT_JS_CW_RULER
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSDrawingArea.h"
 
 #include <y60/acgtk/CWRuler.h>
@@ -155,8 +157,8 @@ template <>
 struct JSClassTraits<JSCWRuler::NATIVE> 
     : public JSClassTraitsWrapper<JSCWRuler::NATIVE, JSCWRuler> {};
 
-jsval as_jsval(JSContext *cx, JSCWRuler::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::CWRuler> & theCWRuler);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSCWRuler::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::CWRuler> & theCWRuler);
 
 } // namespace
 

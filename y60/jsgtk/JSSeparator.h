@@ -60,6 +60,8 @@
 #ifndef _ac_jsgtk_JSSeparator_h_
 #define _ac_jsgtk_JSSeparator_h_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSWidget.h"
 #include <y60/jsbase/JSWrapper.h>
 

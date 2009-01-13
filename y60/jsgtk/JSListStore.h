@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSLISTSTORE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSLISTSTORE_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSTreeModel.h"
 #include <y60/jsbase/JSWrapper.h>
 

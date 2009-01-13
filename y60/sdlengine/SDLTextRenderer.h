@@ -59,7 +59,7 @@
 #ifndef AC_Y60_SDLTEXTRENDERER
 #define AC_Y60_SDLTEXTRENDERER
 
-#include "y60_sdlengine_settins.h"
+#include "y60_sdlengine_settings.h"
 
 #include <y60/glutil/GLUtils.h>
 #include "SDLText.h"

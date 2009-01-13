@@ -67,6 +67,8 @@
 #ifndef _Y60_ACGTKSHELL_JSGLADE_SIGNALADAPTER_INCLUDED_
 #define _Y60_ACGTKSHELL_JSGLADE_SIGNALADAPTER_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <asl/base/Ptr.h>
 
 #include <y60/jsbase/jssettings.h>

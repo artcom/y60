@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 #define _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 
 #ifdef OSX
@@ -117,9 +119,9 @@ template <>
 struct JSClassTraits<JSSigConnection::NATIVE>
     : public JSClassTraitsWrapper<JSSigConnection::NATIVE, JSSigConnection> {};
 
-jsval as_jsval(JSContext *cx, JSSigConnection::OWNERPTR theOwner, JSSigConnection::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSSigConnection::OWNERPTR theOwner, JSSigConnection::NATIVE * theNative);
 
-bool convertFrom(JSContext *cx, jsval theValue, JSSigConnection::NATIVE * & theConnection);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSigConnection::NATIVE * & theConnection);
 
 } // namespace
 

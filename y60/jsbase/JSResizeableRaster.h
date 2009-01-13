@@ -118,7 +118,7 @@ template <>
 struct JSClassTraits<dom::ResizeableRaster>
     : public JSClassTraitsWrapper<dom::ResizeableRaster, JSResizeableRaster> {};
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableRaster * theVectorPtr);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableRaster * theVectorPtr);
 
 }
 

@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSTREEITER_INCLUDED_
 #define _Y60_ACGTKSHELL_JSTREEITER_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 
 #if defined(_MSC_VER)
@@ -134,9 +136,9 @@ template <>
 struct JSClassTraits<JSTreeIter::NATIVE>
     : public JSClassTraitsWrapper<JSTreeIter::NATIVE, JSTreeIter> {};
 
-jsval as_jsval(JSContext *cx, JSTreeIter::OWNERPTR theOwner, JSTreeIter::NATIVE * theNative);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTreeIter::OWNERPTR theOwner, JSTreeIter::NATIVE * theNative);
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Gtk::TreeIter> & theNativePtr);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Gtk::TreeIter> & theNativePtr);
 
 }
 

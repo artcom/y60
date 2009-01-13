@@ -104,8 +104,8 @@ namespace jslib {
             IScriptablePluginPtr _myNative;
     };
 
-    jsval as_jsval(JSContext *cx, IScriptablePluginPtr theOwner);
-    bool convertFrom(JSContext *cx, jsval theValue, IScriptablePluginPtr & theDest);
+    Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, IScriptablePluginPtr theOwner);
+    Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, IScriptablePluginPtr & theDest);
 
     template <class T>
     asl::Ptr<T> getNativeAs(JSContext *cx, JSObject *obj) {

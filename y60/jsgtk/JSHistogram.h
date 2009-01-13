@@ -59,6 +59,8 @@
 #ifndef TNT_JS_HISTOGRAM
 #define TNT_JS_HISTOGRAM
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSDrawingArea.h"
 
 #include <y60/acgtk/Histogram.h>
@@ -149,8 +151,8 @@ template <>
 struct JSClassTraits<JSHistogram::NATIVE> 
     : public JSClassTraitsWrapper<JSHistogram::NATIVE, JSHistogram> {};
 
-jsval as_jsval(JSContext *cx, JSHistogram::NATIVE * theWindow);
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::Histogram> & theHistogram);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSHistogram::NATIVE * theWindow);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::Histogram> & theHistogram);
 
 } // namespace
 

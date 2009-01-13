@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSEVENT_BUTTON_INCLUDED_
 #define _Y60_ACGTKSHELL_JSEVENT_BUTTON_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <gdk/gdk.h>
 #include <asl/base/string_functions.h>

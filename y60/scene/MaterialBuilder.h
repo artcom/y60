@@ -173,7 +173,7 @@ namespace y60 {
 
     typedef asl::Ptr<MaterialBuilder>  MaterialBuilderPtr;
 
-    void Y60_SCENE_EXPORT createLightingFeature(VectorOfRankedFeature & theRequirement,
+    Y60_SCENE_EXPORT void createLightingFeature(VectorOfRankedFeature & theRequirement,
                                LightingModel  theLightingModelType);
 }
 

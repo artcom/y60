@@ -67,6 +67,8 @@
 #ifndef _Y60_ACGTKSHELL_JSSIGNAL_PROXY_UTILS_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSIGNAL_PROXY_UTILS_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4512)

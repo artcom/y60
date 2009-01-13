@@ -119,20 +119,20 @@ typedef JSGenericLine<asl::Line<LineNumber> > JSLine;
 typedef JSGenericLine<asl::Ray<LineNumber> > JSRay;
 typedef JSGenericLine<asl::LineSegment<LineNumber> > JSLineSegment;
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Line<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::Line<LineNumber>  & theValue);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Line<LineNumber> & theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Line<LineNumber>  & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Line<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSLine::NativeValuePtr theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSLine::NativeValuePtr theLine);
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ray<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::Ray<LineNumber>  & theValue);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ray<LineNumber> & theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Ray<LineNumber>  & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Ray<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSRay::NativeValuePtr theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSRay::NativeValuePtr theLine);
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::LineSegment<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::LineSegment<LineNumber> & theValue);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::LineSegment<LineNumber> & theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::LineSegment<LineNumber> & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::LineSegment<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
 
 template <class NATIVE_LINE>
 struct JSLineClassTraits : public JSClassTraitsWrapper<NATIVE_LINE, JSGenericLine<NATIVE_LINE> > {};

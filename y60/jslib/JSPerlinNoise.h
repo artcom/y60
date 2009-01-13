@@ -121,10 +121,10 @@ class JSPerlinNoise : public JSWrapper<asl::PerlinNoise3D, asl::Ptr<asl::PerlinN
 template <>
 struct JSClassTraits<asl::PerlinNoise3D> : public JSClassTraitsWrapper<asl::PerlinNoise3D, JSPerlinNoise> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSPerlinNoise::NATIVE & thePerlinNoise);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSPerlinNoise::NATIVE & thePerlinNoise);
 
-jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner, JSPerlinNoise::NATIVE * thePerlinNoise);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner, JSPerlinNoise::NATIVE * thePerlinNoise);
 
 }
 

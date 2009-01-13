@@ -109,8 +109,8 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 };
 
-jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
-bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList);
 }
 
 #endif

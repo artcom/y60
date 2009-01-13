@@ -146,12 +146,12 @@ struct JSClassTraits<GenericJSDomEvent> : public JSClassTraitsWrapper<GenericJSD
 template <>
 struct JSClassTraits<dom::Event> : public JSClassTraitsWrapper<GenericJSDomEvent, JSDomEvent> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
 
-jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
-jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
 
-jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
 
 struct JSDomEventListener : public dom::EventListener {
     JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName = "handleEvent");

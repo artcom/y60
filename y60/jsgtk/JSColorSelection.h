@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_COLOR_SELECTION_INCLUDED_
 #define _Y60_ACGTKSHELL_COLOR_SELECTION_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSBox.h"
 #include <y60/jsbase/JSWrapper.h>
 

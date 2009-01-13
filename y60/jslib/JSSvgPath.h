@@ -118,11 +118,11 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject * theGlobalObject);
 };
 
-bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath *& theSvgPath);
-bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath & theSvgPath);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath *& theSvgPath);
+Y60_JSLIB_EXPORT bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath & theSvgPath);
 
-jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner);
-jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner, JSSvgPath::NATIVE * theSvgPath);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner);
+Y60_JSLIB_EXPORT jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner, JSSvgPath::NATIVE * theSvgPath);
 
 } // namespace
 

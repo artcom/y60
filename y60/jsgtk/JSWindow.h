@@ -59,6 +59,8 @@
 #ifndef _Y60_ACGTKSHELL_JSWINDOW_INCLUDED_
 #define _Y60_ACGTKSHELL_JSWINDOW_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include "JSBin.h"
 #include <y60/jsbase/JSWrapper.h>
 #if defined(_MSC_VER)

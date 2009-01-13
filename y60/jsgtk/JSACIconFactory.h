@@ -59,6 +59,8 @@
 #ifndef _Y60_AC_ICON_FACTORY_INCLUDED_
 #define _Y60_AC_ICON_FACTORY_INCLUDED_
 
+#include "y60_jsgtk_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/acgtk/ACIconFactory.h>
 
@@ -120,10 +122,10 @@ template <>
 struct JSClassTraits<JSACIconFactory::NATIVE>
     : public JSClassTraitsWrapper<JSACIconFactory::NATIVE, JSACIconFactory> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theRequest);
+Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theRequest);
 
-jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner);
-//jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner, JSACIconFactory::NATIVE * theSerial);
+Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner);
+//Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner, JSACIconFactory::NATIVE * theSerial);
 
 }
 
