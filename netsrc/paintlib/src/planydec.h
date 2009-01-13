@@ -11,7 +11,7 @@
 #ifndef INCL_PLANYDEC
 #define INCL_PLANYDEC
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #ifndef INCL_PLPICDEC
 #include "plpicdec.h"

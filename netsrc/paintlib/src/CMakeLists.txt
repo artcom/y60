@@ -78,7 +78,7 @@ set(HEADERS
 config.h
 jmemdest.h
 jmemsrc.h
-netsrc_paintlib_settings.h
+paintlib_settings.h
 planybmp.h
 planydec.h
 plbitmap.h
@@ -192,7 +192,7 @@ foreach( DEF ${OPENEXR_DEFINITIONS} )
 endforeach( DEF ${OPENEXR_DEFINITIONS} )
 
 add_library(
-    paintlib SHARED ${SOURCES}
+    paintlib SHARED ${SOURCES} ${HEADERS}
 )
 
 set_target_properties(

@@ -11,6 +11,8 @@
 #ifndef INCL_PLDATASRC
 #define INCL_PLDATASRC
 
+#include "paintlib_settings.h"
+
 #include "plexcept.h"
 #include "plpaintlibdefs.h"
 
@@ -28,7 +30,7 @@ class PLIProgressNotification;
 //! It defines methods to open, close, and read from data sources.
 //! Does byte-order-conversions in the ReadByte, ReadWord, and
 //! ReadLong routines.
-class PLDataSource : public PLObject
+class NETSRC_PAINTLIB_EXPORT PLDataSource : public PLObject
 {
 
 public:

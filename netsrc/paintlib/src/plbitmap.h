@@ -11,7 +11,7 @@
 #ifndef INCL_PLBITMAP
 #define INCL_PLBITMAP
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #include "plbmpbase.h"
 #include "plpoint.h"

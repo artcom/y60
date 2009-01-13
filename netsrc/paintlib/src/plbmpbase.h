@@ -11,7 +11,7 @@
 #ifndef INCL_PLBMPBASE
 #define INCL_PLBMPBASE
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #include "plbmpinfo.h"
 #include "plpoint.h"

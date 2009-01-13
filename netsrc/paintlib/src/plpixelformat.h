@@ -11,7 +11,7 @@
 #ifndef INCL_PLPIXELFORMAT
 #define INCL_PLPIXELFORMAT
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #include "pldebug.h"
 #include "plexcept.h"

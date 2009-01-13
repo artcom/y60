@@ -12,7 +12,7 @@
 #ifndef INCL_PLBMPENC
 #define INCL_PLBMPENC
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"

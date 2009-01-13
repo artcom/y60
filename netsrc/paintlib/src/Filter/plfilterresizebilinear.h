@@ -11,7 +11,7 @@
 #ifndef FILTERResizeBILINEAR_H
 #define FILTERResizeBILINEAR_H
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once

@@ -11,7 +11,7 @@
 #if !defined(AFX_FILTER_H__3CED06E1_1B40_11D3_B142_444553540000__INCLUDED_)
 #define AFX_FILTER_H__3CED06E1_1B40_11D3_B142_444553540000__INCLUDED_
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once

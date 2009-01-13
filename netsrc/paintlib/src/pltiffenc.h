@@ -11,7 +11,7 @@
 #ifndef INCL_PLTIFFENC
 #define INCL_PLTIFFENC
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"

@@ -5,7 +5,7 @@
 #if !defined(AFX_PLOBJECT_H__E40881E3_C809_11D3_97BC_0050046F615E__INCLUDED_)
 #define AFX_PLOBJECT_H__E40881E3_C809_11D3_97BC_0050046F615E__INCLUDED_
 
-#include "netsrc_paintlib_settings.h"
+#include "paintlib_settings.h"
 
 #if _MSC_VER > 1000
 #pragma once
