@@ -45,6 +45,9 @@ if (WIN32)
             fdlibm/w_lgamma.c fdlibm/w_lgamma_r.c fdlibm/w_log.c
             fdlibm/w_log10.c fdlibm/w_pow.c fdlibm/w_remainder.c
             fdlibm/w_scalb.c fdlibm/w_sinh.c fdlibm/w_sqrt.c)
+
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
+            -D_SCL_SECURE_NO_WARNINGS)
 endif (WIN32)
 
 # XXX: there are probably non-public headers in here

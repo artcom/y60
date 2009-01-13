@@ -120,6 +120,9 @@ Scene
 ShapeBuilder
 )
 
+
+list( APPEND EXTERNS GLEW OPENEXR )
+
 if(OSX)
 endif(OSX)
 
@@ -127,14 +130,16 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
+    list( APPEND EXTERNS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(
     y60scene y60/scene
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS aslbase asldom aslxpath aslmath aslzip y60base y60image y60video paintlib
-    EXTERNS GLEW OPENEXR
+    DEPENDS aslbase asldom aslxpath aslmath aslzip y60base y60image y60video 
+            paintlib
+    EXTERNS ${EXTERNS}
     TESTS   ${TESTS}
 )
 

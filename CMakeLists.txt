@@ -8,6 +8,10 @@ project(PRO60)
 # make build-integrated acmake available
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/acmake/modules)
 
+if(WIN32)
+    list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
+endif(WIN32)
+
 # set some flags telling sub-packages that
 # they are being built as a subpackage
 set(ACMAKE_INTEGRATED_BUILD YES)

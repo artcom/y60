@@ -42,3 +42,5 @@ include(AcProfiling)
 
 include(AcDocumentation)
 
+include(AcAddWindowsDependencies)
+

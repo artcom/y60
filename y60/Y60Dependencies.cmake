@@ -27,21 +27,20 @@ find_package(Cg)
 find_package(OpenEXR)
 
 find_package(GLIB2)
-#pkg_search_module(GLIB REQUIRED glib-2.0)
 
 pkg_search_module(GTKMM OPTIONAL gtkmm-2.4)
 pkg_search_module(GLADEMM OPTIONAL libglademm-2.4)
 pkg_search_module(GTKGLEXT OPTIONAL gtkglext-1.0)
 
 if(WIN32)
+    find_package(PthreadVC)
     pkg_search_module(CAIRO REQUIRED cairo-win32)
 else(WIN32)
     pkg_search_module(CAIRO REQUIRED cairo-xlib)
 endif(WIN32)
-
-# ffmpeg
-find_package(Ffmpeg)
-
+#find_package(Ffmpeg)
+find_package( Avcodec )
+find_package( Avformat )
 
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)

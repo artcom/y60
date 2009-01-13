@@ -5,6 +5,10 @@ project(ACSDLTTF)
 
 set(CMAKE_MODULE_PATH ${ACSDLTTF_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/../../acmake/modules)
 
+if(WIN32)
+    list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
+endif(WIN32)
+
 include(ACSDLTTFDefinitions)
 include(ACSDLTTFDependencies)
 
@@ -27,7 +31,7 @@ target_link_libraries(acsdlttf ${SDL_LIBRARY} ${FREETYPE_LIBRARIES})
 
 install(
     TARGETS acsdlttf
-        DESTINATION foobar # XXX: This is a hack! TARGETS does not need or have a DESTINATION.
+        DESTINATION lib # XXX: This is a hack! TARGETS does not need or have a DESTINATION.
                            #	But for some reason it does not work without it! [DS]
     EXPORT ACSDLTTF
     LIBRARY

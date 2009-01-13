@@ -126,21 +126,28 @@ Time
 UnitTest
 )
 
+if( UNIX )
+    list( APPEND SOURCES signal_functions.cpp )
+    list( APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
+endif( UNIX)
+
 if(OSX)
-    set(SOURCES ${SOURCES} MachOBacktrace.cpp)
-    set(HEADERS ${HEADERS} MachOBacktrace.h)
+    list(APPEND SOURCES MachOBacktrace.cpp)
+    list(APPEND HEADERS MachOBacktrace.h)
     list(APPEND EXTERNS ${CARBON}) # XXX: framework reference
 endif(OSX)
 
 if(LINUX)
-    set(SOURCES ${SOURCES} GlibcBacktrace.cpp)
-    set(HEADERS ${HEADERS} GlibcBacktrace.h)
+    list(APPEND SOURCES GlibcBacktrace.cpp)
+    list(APPEND HEADERS GlibcBacktrace.h)
     list(APPEND EXTERNS GLIB2)
 endif(LINUX)
 
 if(WIN32)
-    set(SOURCES ${SOURCES} Win32Backtrace.cpp)
-    set(HEADERS ${HEADERS} Win32Backtrace.h)
+    list(APPEND SOURCES Win32Backtrace.cpp)
+    list(APPEND HEADERS Win32Backtrace.h)
+    set( PSAPI_LIBRARY Psapi )
+    list(APPEND EXTERNALS PSAPI )
 	set(PSAPI_LIBRARIES Psapi )
     list( APPEND EXTERNS PTHREADVC PSAPI )
 else(WIN32) # All *nix

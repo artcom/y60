@@ -68,7 +68,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         if(NOT THIS_LIBRARY_DONT_INSTALL)
             install(
                 TARGETS ${THIS_LIBRARY_NAME}
-                    DESTINATION cmake_parser_hack_foobar
+                    DESTINATION lib
                 EXPORT  ${CMAKE_PROJECT_NAME}
                 LIBRARY
                     DESTINATION lib
