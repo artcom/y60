@@ -190,7 +190,7 @@ namespace y60 {
             CgProgramAutoParams         _myAutoParams;     // other automatic CG parameters (e.g. CameraPosition)
             CgProgramNamedParamVector   _myTextureParams;  // Texture parameters
             CgProgramNamedParamVector   _myMiscParams;     // material parameter
-            
+            std::string                 _myCWD;            // CWD on CG Compilation
             std::map<int,int> _myUnsizedArrayAutoParamSizes;
 
             std::vector<const char *> _myCachedCompilerArgs;

@@ -13,8 +13,13 @@
 //own header
 #include "CgProgramInfo.h"
 
+#ifdef WIN32
+#    include <direct.h>
+#endif
+
 #include <y60/base/NodeValueNames.h>
 #include <asl/base/string_functions.h>
+#include <asl/base/file_functions.h>
 #include <asl/dom/Nodes.h>
 
 #include "Renderer.h"
@@ -139,15 +144,26 @@ namespace y60 {
             //DK: we cannot keep a compiled version
             //    because unsized arrays of size 0 are completely gone after compilation
             _myCgProgramString = cgGetProgramString(_myCgProgramID, CG_PROGRAM_SOURCE);
-
+            _myCWD = getDirectoryPart(_myPathName);
         } else {
             AC_DEBUG << "destroying and reloading from string";
             DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_destroyReload));
 
             cgDestroyProgram(_myCgProgramID);
+            std::string myCWD = getCWD();
+#ifdef WIN32
+             _chdir( _myCWD.c_str());
+#else
+             chdir( _myCWD.c_str());
+#endif             
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                                              asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
                                              &(*_myCachedCompilerArgs.begin()));
+#ifdef WIN32
+            _chdir( myCWD.c_str());                                     
+#else
+            chdir( myCWD.c_str());                                     
+#endif
             assertCg(PLUS_FILE_LINE, _myContext);
         }
 
