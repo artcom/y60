@@ -67,6 +67,8 @@
 #ifndef _Y60_INPUT_ASSEVENT_ACCESS_INCLUDED_
 #define _Y60_INPUT_ASSEVENT_ACCESS_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include <string>
 
 namespace y60 {

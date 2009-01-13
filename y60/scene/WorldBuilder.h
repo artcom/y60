@@ -59,13 +59,15 @@
 #ifndef AC_SOM_WORLD_BUILDER_INCLUDED
 #define AC_SOM_WORLD_BUILDER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "WorldBuilderBase.h"
 
 #include <string>
 
 namespace y60 {
 
-    class WorldBuilder : public WorldBuilderBase {
+    class Y60_SCENE_EXPORT WorldBuilder : public WorldBuilderBase {
         public:
             WorldBuilder();
             WorldBuilder(dom::NodePtr theNode) : WorldBuilderBase(theNode) {};

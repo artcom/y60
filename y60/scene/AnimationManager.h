@@ -68,6 +68,8 @@
 #ifndef _ac_scene_AnimationManager_h_
 #define _ac_scene_AnimationManager_h_
 
+#include "y60_scene_settings.h"
+
 #include "AnimationBase.h"
 #include "AnimationCharacter.h"
 
@@ -81,7 +83,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(AnimationManagerException, asl::Exception);
 
-    class AnimationManager {
+    class Y60_SCENE_EXPORT AnimationManager {
         public:
             AnimationManager();
             virtual ~AnimationManager();

@@ -11,6 +11,8 @@
 #ifndef FILTERResize_H
 #define FILTERResize_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -18,7 +20,7 @@
 #include "plfilter.h"
 
 //! Base class for filters that resize the image.
-class PLFilterResize : public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLFilterResize : public PLFilter  
 {
 public:
   //! 

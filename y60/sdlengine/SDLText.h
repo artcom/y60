@@ -68,6 +68,8 @@
 #ifndef AC_Y60_SDLTEXT
 #define AC_Y60_SDLTEXT
 
+#include "y60_sdlengine_settins.h"
+
 #include <y60/gltext/Text.h>
 #include <y60/glutil/GLUtils.h>
 

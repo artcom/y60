@@ -11,6 +11,8 @@
 #ifndef INCL_PLANYDEC
 #define INCL_PLANYDEC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICDEC
 #include "plpicdec.h"
 #endif
@@ -59,7 +61,7 @@ class PLIFF85Decoder;
 //! It auto-detects the format to use and delegates the work to one of
 //! the other decoder classes.
 //! The interface to PLAnyPicDecoder is the same as PLPicDecoder.
-class PLAnyPicDecoder : public PLPicDecoder
+class NETSRC_PAINTLIB_EXPORT PLAnyPicDecoder : public PLPicDecoder
 {
 
 public:

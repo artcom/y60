@@ -71,11 +71,13 @@
 #ifndef _ac_Y60_WorldBuilderBase_h_
 #define _ac_Y60_WorldBuilderBase_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 
 namespace y60 {
 
-    class WorldBuilderBase : public BuilderBase {
+    class Y60_SCENE_EXPORT WorldBuilderBase : public BuilderBase {
         public:
             WorldBuilderBase(const std::string & theNodeName);
 

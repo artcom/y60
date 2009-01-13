@@ -59,6 +59,8 @@
 #ifndef _ac_y60_ShapeBuiler_h_
 #define _ac_y60_ShapeBuiler_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/NodeNames.h>
 #include <y60/base/TypeTraits.h>
@@ -77,7 +79,7 @@ namespace y60 {
     class ElementBuilder;
     class CameraBuilder;
 
-    class ShapeBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT ShapeBuilder : public BuilderBase {
     public:
         ShapeBuilder(const std::string & theName,
                      bool theTestAlmostEqualFlag = false);

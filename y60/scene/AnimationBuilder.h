@@ -72,6 +72,8 @@
 #ifndef _ac_y60_AnimationBuilder_h_
 #define _ac_y60_AnimationBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/DataTypes.h>
 #include <y60/base/NodeValueNames.h>
@@ -79,7 +81,7 @@
 #include <asl/dom/Nodes.h>
 
 namespace y60 {
-    class AnimationBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT AnimationBuilder : public BuilderBase {
         public:
             AnimationBuilder();
             virtual ~AnimationBuilder();

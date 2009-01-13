@@ -65,8 +65,9 @@
 
 namespace y60 {
 
-    IdTag::IdTag() : counter(0) {
-        myStartTime = asl::Time().secs() - 1117122059;
+    IdTag::IdTag()
+        : counter(0), myStartTime(asl::Time().secs() - 1117122059)
+    {
     }
     const char * IdTag::getName() {
         return ID_ATTRIB;

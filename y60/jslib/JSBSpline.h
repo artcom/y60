@@ -59,6 +59,8 @@
 #ifndef _Y60_JSBSPLINE_H_
 #define _Y60_JSBSPLINE_H_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 
 #include <asl/math/Vector234.h>

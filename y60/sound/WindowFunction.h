@@ -59,6 +59,8 @@
 #ifndef INCL_Y60_WINDOWFUNCTION_H
 #define INCL_Y60_WINDOWFUNCTION_H
 
+#include "y60_sound_settings.h"
+
 #include <asl/audio/Effect.h>
 #include <asl/base/settings.h>
 #include <asl/base/Ptr.h>

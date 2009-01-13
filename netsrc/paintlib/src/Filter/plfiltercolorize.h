@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERCOLORIZE)
 #define INCL_PLFILTERCOLORIZE
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -22,7 +24,7 @@ class PLBmp;
 //! Filter that colorizes a bitmap given a hue and saturation. Corresponds
 //! loosely to the photoshop hue/saturation control when set to 'colorize'.
 //! The range of hue is 0..359, the range of saturation is 0..100.
-class PLFilterColorize : public PLInPlaceFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterColorize : public PLInPlaceFilter
 {
 public:
   PLFilterColorize(double Hue, double Saturation);

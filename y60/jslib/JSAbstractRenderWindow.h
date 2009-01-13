@@ -59,6 +59,8 @@
 #ifndef _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 #define _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include "AbstractRenderWindow.h"
 #include <y60/scene/Viewport.h>

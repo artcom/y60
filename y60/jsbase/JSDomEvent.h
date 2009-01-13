@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSDomEvent_INCLUDED_
 #define _Y60_ACXPSHELL_JSDomEvent_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 
 #include <asl/dom/Events.h>
@@ -71,7 +73,7 @@ namespace jslib {
 
 typedef dom::GenericEvent<JSObject*> GenericJSDomEvent;
 
-class JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, StaticAccessProtocol>
+class Y60_JSBASE_EXPORT JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, StaticAccessProtocol>
 {
         JSDomEvent() {}
     public:

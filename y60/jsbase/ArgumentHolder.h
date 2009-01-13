@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_ARGUMENTHOLDER_H_INCLUDED_
 #define _Y60_ACXPSHELL_ARGUMENTHOLDER_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "Documentation.h"
 #include "JScppUtils.h"
 #include <js/spidermonkey/jspubtd.h>

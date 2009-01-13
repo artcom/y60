@@ -25,6 +25,7 @@ add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 # Make sure we can access our includes without staging
 include_directories(../)
+include_directories(../netsrc/paintlib/src)
 
 # XXX: Make headers from our netsrc dependencies available.
 #      This is needed because we do not handle paths for

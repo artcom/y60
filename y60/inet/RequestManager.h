@@ -66,6 +66,8 @@
 #ifndef _Y60_INET_REQUESTManager_INCLUDED_
 #define _Y60_INET_REQUESTManager_INCLUDED_
 
+#include "y60_inet_settings.h"
+
 #include "Request.h"
 
 #include <vector>
@@ -79,7 +81,8 @@ namespace inet {
      *
      * @relates Request
      *
-     */    class RequestManager {
+     */    
+    class Y60_INET_EXPORT RequestManager {
         public:
             RequestManager();
             ~RequestManager();

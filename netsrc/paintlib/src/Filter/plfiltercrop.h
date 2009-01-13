@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERCROP)
 #define INCL_PLFILTERCROP
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -22,7 +24,7 @@ class PLRect;
 
 //! Filter that cuts part of the image off. XMin and YMin are included
 //! in the rectangle, XMax and YMax aren't.
-class PLFilterCrop : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterCrop : public PLFilter
 {
 public:
 

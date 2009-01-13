@@ -11,6 +11,8 @@
 #ifndef INCL_PLBITMAP
 #define INCL_PLBITMAP
 
+#include "netsrc_paintlib_settings.h"
+
 #include "plbmpbase.h"
 #include "plpoint.h"
 #include "pldebug.h"
@@ -37,7 +39,7 @@ class PLFilter;
 //! bitmap can be replaced by a different one by calling
 //! SetAlphaChannel(). A 0 in an alpha channel entry is completely
 //! transparent; a 255 is completely opaque.
-class PLBmp : public PLBmpBase
+class NETSRC_PAINTLIB_EXPORT PLBmp : public PLBmpBase
 {
 
 public:

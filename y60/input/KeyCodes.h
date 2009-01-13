@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_KEYCODES_INCLUDED_
 #define _Y60_INPUT_KEYCODES_INCLUDED_
 
+#include "y60_input_settings.h"
+
 namespace y60 {
 
 /* Enumeration of valid key mods (possibly OR'd together) */

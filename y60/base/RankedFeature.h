@@ -59,6 +59,8 @@
 #ifndef _ac_y60_rankedfeature_h_
 #define _ac_y60_rankedfeature_h_
 
+#include "y60_base_settings.h"
+
 #include <asl/base/Stream.h>
 
 #include <string>
@@ -112,13 +114,13 @@ namespace y60 {
 
 namespace asl {
     
-    std::ostream & operator << (std::ostream & theStream, const y60::RankedFeature & theRankedFeature);
-    std::istream & operator >> (std::istream & theStream, y60::RankedFeature & theRankedFeature);
+    Y60_BASE_EXPORT std::ostream & operator << (std::ostream & theStream, const y60::RankedFeature & theRankedFeature);
+    Y60_BASE_EXPORT std::istream & operator >> (std::istream & theStream, y60::RankedFeature & theRankedFeature);
 }
 
 namespace dom {
-    void binarize(const y60::RankedFeature & myValue, asl::WriteableStream & theDest);
-	asl::AC_SIZE_TYPE debinarize(y60::RankedFeature & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0);
+    Y60_BASE_EXPORT void binarize(const y60::RankedFeature & myValue, asl::WriteableStream & theDest);
+	Y60_BASE_EXPORT asl::AC_SIZE_TYPE debinarize(y60::RankedFeature & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0);
 }
 
 #endif

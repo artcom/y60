@@ -11,13 +11,15 @@
 #ifndef INCL_PLPIXELFORMAT
 #define INCL_PLPIXELFORMAT
 
+#include "netsrc_paintlib_settings.h"
+
 #include "pldebug.h"
 #include "plexcept.h"
 
 #include <string>
 #include <list>
 
-class PLPixelFormat {
+class NETSRC_PAINTLIB_EXPORT PLPixelFormat {
 public:
 	static const PLPixelFormat DONTCARE;
 

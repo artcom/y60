@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSTRIANGLE_INCLUDED_
 #define _Y60_ACXPSHELL_JSTRIANGLE_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSVector.h"
 
 #include "JSWrapper.h"
@@ -74,7 +76,7 @@ namespace jslib {
 
 typedef float TriangleNumber;
 
-class JSTriangle : public JSWrapper<asl::Triangle<TriangleNumber> > {
+class Y60_JSBASE_EXPORT JSTriangle : public JSWrapper<asl::Triangle<TriangleNumber> > {
     JSTriangle() {}
 public:
     typedef JSWrapper<asl::Triangle<TriangleNumber> > Base;

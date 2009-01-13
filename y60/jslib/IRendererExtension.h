@@ -59,6 +59,8 @@
 #ifndef _IRENDERER_EXTENSION_INCLUDED
 #define _IRENDERER_EXTENSION_INCLUDED
 
+#include "y60_jslib_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <y60/input/Event.h>
 

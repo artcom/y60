@@ -15,10 +15,13 @@ M60Header.h
 Movie.h
 MovieDecoderBase.h
 MovieEncoding.h
+y60_video_settings.h
 )
 
 set(TESTS
 )
+
+list( APPEND EXTERNALS OPENEXR )
 
 if(OSX)
 endif(OSX)
@@ -27,6 +30,7 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(
@@ -34,7 +38,7 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase asldom aslmath aslzip y60base y60image paintlib
-    EXTERNS OPENEXR
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
 

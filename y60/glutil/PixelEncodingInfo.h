@@ -12,6 +12,8 @@
 #ifndef INCL_TEXTURE_COMPRESSION_TYPE
 #define INCL_TEXTURE_COMPRESSION_TYPE
 
+#include "y60_glutil_settings.h"
+
 #include <asl/base/string_functions.h>
 #include <asl/base/Exception.h>
 #include <y60/image/PixelEncoding.h>
@@ -44,8 +46,8 @@ namespace y60 {
         float    bytesPerPixel;
         bool     compressedFlag;
     };
-    PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
-    std::string getGLEnumString(GLenum theFormat);
+    Y60_GLUTIL_EXPORT PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
+    Y60_GLUTIL_EXPORT std::string getGLEnumString(GLenum theFormat);
     inline
     std::ostream & operator<<(std::ostream & os, const PixelEncodingInfo & theInfo) {
         os << "externalformat: " << getGLEnumString(theInfo.externalformat);

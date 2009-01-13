@@ -59,6 +59,8 @@
 #ifndef _ac_scene_Material_types_h_
 #define _ac_scene_Material_types_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/TypeTraits.h>
 #include <y60/base/NodeValueNames.h>
 

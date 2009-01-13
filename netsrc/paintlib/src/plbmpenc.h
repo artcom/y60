@@ -12,13 +12,15 @@
 #ifndef INCL_PLBMPENC
 #define INCL_PLBMPENC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"
 #endif
 
 //! Encoder class for windows bmp files. Writes 1, 8 and 24 bpp. 32 bpp bitmaps 
 //! are written as 24 bpp.
-class PLBmpEncoder : public PLPicEncoder
+class NETSRC_PAINTLIB_EXPORT PLBmpEncoder : public PLPicEncoder
 {
 
 public:

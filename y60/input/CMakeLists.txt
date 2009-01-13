@@ -31,17 +31,25 @@ KeyEvent.h
 MouseEvent.h
 TouchEvent.h
 WindowEvent.h
+y60_input_settings.h
 )
 
 set(TESTS
 EventDispatcher
 )
 
+list( APPEND EXTERNALS OPENEXR )
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)
+
+
 ac_add_library(
     y60input y60/input
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom
-    EXTERNS OPENEXR
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )

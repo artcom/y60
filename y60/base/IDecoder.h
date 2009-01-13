@@ -67,6 +67,8 @@
 #ifndef _IDECODER_INCLUDED
 #define _IDECODER_INCLUDED
 
+#include "y60_base_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/base/Stream.h>
 

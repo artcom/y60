@@ -67,6 +67,8 @@
 #ifndef _ac_video_CaptureDevice_h_
 #define _ac_video_CaptureDevice_h_
 
+#include "y60_video_settings.h"
+
 #include "Capture.h"
 #include <y60/base/NodeNames.h>
 #include <y60/base/NodeValueNames.h>

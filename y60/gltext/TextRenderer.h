@@ -20,6 +20,8 @@
 #ifndef AC_Y60_TEXTRENDERER
 #define AC_Y60_TEXTRENDERER
 
+#include "y60_gltext_settings.h"
+
 #include "Text.h"
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
@@ -32,7 +34,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(GLTextRendererException, asl::Exception);
 
-    class TextRenderer {
+    class Y60_GLTEXT_EXPORT TextRenderer {
         public:
             enum TextAligment {
                 CENTER_ALIGNMENT,

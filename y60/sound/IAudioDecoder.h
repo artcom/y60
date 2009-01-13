@@ -59,12 +59,14 @@
 #ifndef _IAudioDecoder_H_
 #define _IAudioDecoder_H_
 
+#include "y60_sound_settings.h"
+
 #include <asl/audio/ISampleSink.h>
 #include <asl/base/Time.h>
 
 namespace y60 {
 
-class IAudioDecoder
+class Y60_SOUND_EXPORT IAudioDecoder
 {
     public:
         virtual ~IAudioDecoder() {};

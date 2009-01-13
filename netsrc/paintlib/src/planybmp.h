@@ -11,6 +11,8 @@
 #ifndef INCL_PLANYBMP
 #define INCL_PLANYBMP
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLBITMAP
 #include "plbitmap.h"
 #endif
@@ -19,7 +21,7 @@
 //! Supported data formats are 1, 8, 16, 24 and 32 bpp. The data is stored
 //! sequentially without padding in the bitmap. The class implements exactly
 //! the interface defined by PLBmp without additions.
-class PLAnyBmp : public PLBmp
+class NETSRC_PAINTLIB_EXPORT PLAnyBmp : public PLBmp
 {
 
 public:

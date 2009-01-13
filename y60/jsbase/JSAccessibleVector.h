@@ -67,12 +67,14 @@
 #ifndef _Y60_ACXPSHELL_JSACCESSIBLEVECTOR_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSACCESSIBLEVECTOR_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include <asl/dom/Value.h>
 
 namespace jslib {
 
-class JSAccessibleVector
+class Y60_JSBASE_EXPORT JSAccessibleVector
     : public JSWrapper<dom::AccessibleVector,
                        dom::ValuePtr,
                        VectorValueAccessProtocol> // TODO: verify if correct, probably is not

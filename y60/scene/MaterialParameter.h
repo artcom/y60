@@ -68,6 +68,8 @@
 #ifndef AC_Y60_MATERIAL_PARAMETER_INCLUDED
 #define AC_Y60_MATERIAL_PARAMETER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "MaterialTypes.h"
 
 #include <y60/base/VertexDataRoles.h>

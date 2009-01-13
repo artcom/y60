@@ -67,6 +67,8 @@
 #ifndef _ac_y60_MovieDecoderBase_h_
 #define _ac_y60_MovieDecoderBase_h_
 
+#include "y60_video_settings.h"
+
 #include <y60/image/PixelEncoding.h>
 #include <y60/base/NodeValueNames.h>
 #include <y60/base/IDecoder.h>

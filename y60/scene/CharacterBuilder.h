@@ -72,6 +72,8 @@
 #ifndef _ac_y60_CharacterBuilder_h_
 #define _ac_y60_CharacterBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 
 namespace y60 {

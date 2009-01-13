@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSScriptablePlugin_h_
 #define _ac_jslib_JSScriptablePlugin_h_
 
+#include "y60_jsbase_settings.h"
+
 #include "IScriptablePlugin.h"
 
 namespace jslib {

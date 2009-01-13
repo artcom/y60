@@ -24,6 +24,8 @@
 #ifndef AC_Y60_FRAMEBUFFER_INCLUDED
 #define AC_Y60_FRAMEBUFFER_INCLUDED
 
+#include "y60_glutil_settings.h"
+
 #include "GLContext.h"
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>

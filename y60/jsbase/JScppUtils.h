@@ -59,6 +59,8 @@
 #ifndef _Y60_JSCPPUTILS_INCLUDED_
 #define _Y60_JSCPPUTILS_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include <iostream>
 #include <limits>
 
@@ -183,7 +185,7 @@ DEFINE_EXCEPTION(UnicodeException, asl::Exception);
 
 JSBool JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval);
 
 JSBool
@@ -195,7 +197,7 @@ JSA_CallFunctionValue(JSContext * cx, JSObject * obj, jsval fval, int argc, jsva
 void
 dumpJSObj(JSContext * cx, JSObject * obj);
 
-JSBool
+Y60_JSBASE_EXPORT JSBool
 JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName);
 
 struct JSConstIntPropertySpec {
@@ -323,19 +325,19 @@ struct JValueTypeTraits<unsigned int> {
     enum {SIZE = 1};
 };
 
-jsval as_jsval(JSContext *cx, time_t theValue);
-jsval as_jsval(JSContext *cx, bool theValue);
-jsval as_jsval(JSContext *cx, double theValue);
-jsval as_jsval(JSContext *cx, float theValue); 
-jsval as_jsval(JSContext *cx, long theValue);
-jsval as_jsval(JSContext *cx, unsigned long theValue); 
-jsval as_jsval(JSContext *cx, int theValue); 
-jsval as_jsval(JSContext *cx, unsigned int theValue); 
-jsval as_jsval(JSContext *cx, char theValue); 
-jsval as_jsval(JSContext *cx, unsigned char theValue); 
-jsval as_jsval(JSContext *cx, const char * theU8String);
-jsval as_jsval(JSContext *cx, const std::string & theValue); 
-jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, time_t theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, bool theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, double theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, float theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, long theValue);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, unsigned long theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, int theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, unsigned int theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, char theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, unsigned char theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const char * theU8String);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::string & theValue); 
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
 
 template <class T>
 jsval as_jsval(JSContext *cx, const std::vector<T> & theVector);
@@ -356,21 +358,21 @@ bool convertFrom(JSContext *cx, jsval theValue, typename dom::ValueWrapper<T>::T
     return false;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, double & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, float & theDest);
-bool convertFrom(JSContext *cx, jsval theValue, short & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, int & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, long & theDest);
-bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, char & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, bool & theDest);
-bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Block & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, double & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, float & theDest);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, short & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, int & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, long & theDest);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, char & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, bool & theDest);
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest); 
+Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Block & theDest); 
 
 template <class T>
 bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest);

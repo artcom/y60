@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_IEVENTSOURCE_INCLUDED_
 #define _Y60_INPUT_IEVENTSOURCE_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 #include <asl/base/Ptr.h>
 #include <vector>

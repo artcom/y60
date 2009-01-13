@@ -11,6 +11,8 @@
 #ifndef _ac_renderer_Renderer_h_
 #define _ac_renderer_Renderer_h_
 
+#include "y60_glrender_settings.h"
+
 #include <y60/glutil/GLUtils.h>
 #include "BodyPart.h"
 
@@ -56,7 +58,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(RendererException, asl::Exception);
 
-    class Renderer {
+    class Y60_GLRENDER_EXPORT Renderer {
         public:
             Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps = -1 /*get em all*/);
             virtual ~Renderer();

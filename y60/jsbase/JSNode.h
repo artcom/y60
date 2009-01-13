@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSNODE_INCLUDED_
 #define _Y60_ACXPSHELL_JSNODE_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JScppUtils.h"
 #include "JSWrapper.h"
 
@@ -96,7 +98,7 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::Node & thePtr);
 #if 1
 bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
 #endif
-class JSNode : public JSWrapperBase {
+class Y60_JSBASE_EXPORT JSNode : public JSWrapperBase {
 public:
     typedef dom::NodePtr NativeValuePtr;
 

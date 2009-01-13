@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSNODELIST_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSNODELIST_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include "JSNode.h"
 
@@ -68,7 +70,7 @@
 
 namespace jslib {
 
-class JSNodeList: public JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> {
+class Y60_JSBASE_EXPORT JSNodeList: public JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> {
 public:
     typedef JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> Base;
 

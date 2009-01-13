@@ -72,6 +72,8 @@
 #ifndef _ac_y60_PrimitivesBuiler_h_
 #define _ac_y60_PrimitivesBuiler_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/VertexDataRoles.h>
 #include <y60/base/typedefs.h>
@@ -102,7 +104,7 @@ namespace y60 {
 
     typedef std::vector<VertexIndexBin> VertexIndexBinMap;
 
-    class ElementBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT ElementBuilder : public BuilderBase {
         public:
             ElementBuilder(const std::string & thePrimitiveType,
                            const std::string & theMaterial);

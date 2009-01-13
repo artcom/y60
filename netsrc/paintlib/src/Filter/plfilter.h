@@ -11,6 +11,8 @@
 #if !defined(AFX_FILTER_H__3CED06E1_1B40_11D3_B142_444553540000__INCLUDED_)
 #define AFX_FILTER_H__3CED06E1_1B40_11D3_B142_444553540000__INCLUDED_
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -26,7 +28,7 @@ class PLBmp;
 //! to override either the ApplyInPlace or the Apply function. The base-class
 //! versions of these functions simply implement one function in terms of the
 //! other.
-class PLFilter : public PLObject  
+class NETSRC_PAINTLIB_EXPORT PLFilter : public PLObject  
 {
 public:
   //!

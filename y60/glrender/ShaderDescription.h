@@ -1,6 +1,8 @@
 #ifndef AC_Y60_SHADER_DESCRIPTION_INCLUDED
 #define AC_Y60_SHADER_DESCRIPTION_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include "ShaderTypes.h"
 
 #include <y60/scene/MaterialParameter.h>

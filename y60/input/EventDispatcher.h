@@ -65,6 +65,8 @@
 #ifndef _Y60_INPUT_EVENTDISPATCHER_INCLUDED_
 #define _Y60_INPUT_EVENTDISPATCHER_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include <asl/base/Singleton.h>
 
 #include "IEventSink.h"
@@ -76,7 +78,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(EventDispatcherException, asl::Exception);
 
-    class EventDispatcher : public asl::Singleton<EventDispatcher> {
+    class Y60_INPUT_EXPORT EventDispatcher : public asl::Singleton<EventDispatcher> {
     public:
         virtual ~EventDispatcher();
         void dispatch();

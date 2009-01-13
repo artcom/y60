@@ -22,6 +22,7 @@ SoundManager.h
 TestGrainSource.h
 TestSound.h
 WindowFunction.h
+y60_sound_settings.h
 )
 
 set(TESTS
@@ -30,6 +31,8 @@ GrainSource
 RealSound
 )
 
+list( APPEND EXTERNALS AVFORMAT AVCODEC )
+
 if(OSX)
 endif(OSX)
 
@@ -37,6 +40,7 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
 ac_add_library(
@@ -44,7 +48,7 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath aslaudio
-    EXTERNS AVFORMAT AVCODEC
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
 

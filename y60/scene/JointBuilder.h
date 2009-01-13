@@ -72,6 +72,8 @@
 #ifndef AC_SOM_JOINT_BUILDER_INCLUDED
 #define AC_SOM_JOINT_BUILDER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "TransformBuilderBase.h"
 
 namespace y60 {

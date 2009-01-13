@@ -64,7 +64,7 @@ static const char * AnimalStrings[] = {
     ""
 };
 
-DEFINE_ENUM( Animal, AnimalEnum);
+DEFINE_ENUM( Animal, AnimalEnum,);
 IMPLEMENT_ENUM( Animal, AnimalStrings);
 
 enum PropertyEnum {

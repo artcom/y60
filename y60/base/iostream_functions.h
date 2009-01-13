@@ -69,6 +69,8 @@
 #ifndef _ac_y60_stream_functions_h_
 #define _ac_y60_stream_functions_h_
 
+#include "y60_base_settings.h"
+
 #include "RankedFeature.h" // Needed to make sure [de]binarize(RankedFeature) gets called :-(.
 #include "typedefs.h"
 
@@ -120,25 +122,25 @@ namespace asl {
         return asl::parseVector<T>(is, t);
     }
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfBool & theVector);
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfUnsignedInt & theVector);
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfSignedInt & theVector);
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfFloat & theVector);
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfString & theStringVector);
 
-    std::istream &
+    Y60_BASE_EXPORT std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 
-    std::ostream &
+    Y60_BASE_EXPORT std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);
 
 //

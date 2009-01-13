@@ -67,12 +67,14 @@
 #ifndef _ISCENE_INCLUDED
 #define _ISCENE_INCLUDED
 
+#include "y60_base_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/dom/ThreadingModel.h>
 
 namespace y60 {
     class IResourceManager;
-    class IScene {
+    class Y60_BASE_EXPORT IScene {
         public:
             virtual ~IScene();
             virtual const IResourceManager * getResourceManager() const = 0;

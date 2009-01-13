@@ -59,6 +59,9 @@
 #ifndef _xml_CommonTags_h_
 #define _xml_CommonTags_h_
 
+#include "y60_base_settings.h"
+
+#include "DataTypes.h"
 #include "NodeNames.h"
 #include <asl/dom/AttributePlug.h>
 #include <asl/math/Frustum.h>
@@ -69,26 +72,36 @@
 namespace y60 {
 
     //                  theTagName       theType        theAttributeName      theDefault
-    DEFINE_ATTRIBUT_TAG(NameTag,         std::string,   NAME_ATTRIB,     "JohnDoe");
-    DEFINE_ATTRIBUT_TAG(VisibleTag,      bool,          VISIBLE_ATTRIB,  true);
-    DEFINE_ATTRIBUT_TAG(Position2DTag,   asl::Vector2f, POSITION_ATTRIB, asl::Vector2f(0.f,0.f));
-    DEFINE_FACADE_ATTRIBUTE_TAG(LastActiveFrameTag, asl::Unsigned64, "lastActiveFrame", 0);    
+    DEFINE_ATTRIBUT_TAG(NameTag,         std::string,   NAME_ATTRIB,     "JohnDoe",              Y60_BASE_EXPORT);
+    //struct NameTag { 
+    //    typedef std::string TYPE; 
+    //    static const char * getName() { return NAME_ATTRIB; } 
+    //    static const TYPE getDefault() { return "JohnDoe"; } 
+    //    template class Y60_BASE_EXPORT dom::AttributePlug<NameTag>;
+    //    typedef dom::AttributePlug<NameTag> Plug; 
+    //}; 
+
+    DEFINE_ATTRIBUT_TAG(VisibleTag,      bool,          VISIBLE_ATTRIB,  true,                   Y60_BASE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(Position2DTag,   asl::Vector2f, POSITION_ATTRIB, asl::Vector2f(0.f,0.f), Y60_BASE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(LastActiveFrameTag, asl::Unsigned64, "lastActiveFrame", 0, Y60_BASE_EXPORT);    
 
     // used by textures and viewports
-    DEFINE_ATTRIBUT_TAG(ResizePolicyTag, asl::ResizePolicy, RESIZE_POLICY_ATTRIB, asl::ADAPT_VERTICAL);
+    DEFINE_ATTRIBUT_TAG(ResizePolicyTag, asl::ResizePolicy, RESIZE_POLICY_ATTRIB, asl::ADAPT_VERTICAL, Y60_BASE_EXPORT);
 
-    struct IdTag : public asl::Singleton<IdTag> {
+    struct Y60_BASE_EXPORT IdTag : public asl::Singleton<IdTag> {
         typedef std::string TYPE;
+        ASL_DOM_EXPORT_STATICS(dom::AttributePlug,IdTag,Y60_BASE_EXPORT) \
         typedef dom::AttributePlug<IdTag> Plug;
-        IdTag();
         static const char * getName();
         static const TYPE getDefault();
         unsigned counter;
         unsigned myStartTime;
+        IdTag();
     };
 
     struct BoundingBoxTag {
         typedef asl::Box3f TYPE;
+        ASL_DOM_EXPORT_STATICS(dom::FacadeAttributePlug,BoundingBoxTag,Y60_BASE_EXPORT) \
         typedef dom::FacadeAttributePlug<BoundingBoxTag> Plug;
         static const char * getName() { return BOUNDING_BOX_ATTRIB; }
         static const TYPE getDefault() {

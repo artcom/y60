@@ -68,23 +68,25 @@
 #ifndef _scene_Camera_h_
 #define _scene_Camera_h_
 
+#include "Y60_scene_settings.h"
+
 #include "TransformHierarchyFacade.h"
 #include <y60/base/FrustumValue.h>
 
 namespace y60 {
 
-    DEFINE_ATTRIBUT_TAG(FrustumTag,       asl::Frustum, FRUSTUM_ATTRIB, asl::Frustum());
+    DEFINE_ATTRIBUT_TAG(FrustumTag,       asl::Frustum, FRUSTUM_ATTRIB, asl::Frustum(), Y60_SCENE_EXPORT);
     //                  theTagName        theType  theAttributeName      theDefault
     // XXX [DS] these attributes are here for backward compatibility only ...
     // please use the frustum tag instead
     /*
-    DEFINE_ATTRIBUT_TAG(HfovTag,          float,   HORIZONTAL_FOV_ATTRIB, 54.0f);
-    DEFINE_ATTRIBUT_TAG(OrthoWidthTag,    float,   ORTHO_WIDTH_ATTRIB,    0.0f);
-    DEFINE_ATTRIBUT_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f);
-    DEFINE_ATTRIBUT_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f);
+    DEFINE_ATTRIBUT_TAG(HfovTag,          float,   HORIZONTAL_FOV_ATTRIB, 54.0f, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(OrthoWidthTag,    float,   ORTHO_WIDTH_ATTRIB,    0.0f, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f, Y60_SCENE_EXPORT);
 */
 
-    class ProjectiveNode : 
+    class Y60_SCENE_EXPORT ProjectiveNode : 
         public TransformHierarchyFacade,
         public FrustumTag::Plug
         // [DS] backward compatibility
@@ -112,7 +114,7 @@ namespace y60 {
 
     typedef asl::Ptr<ProjectiveNode, dom::ThreadingModel> ProjectiveNodePtr;
 
-    class Camera : public ProjectiveNode {
+    class Y60_SCENE_EXPORT Camera : public ProjectiveNode {
         public:
             Camera(dom::Node & theNode); 
 
@@ -121,7 +123,7 @@ namespace y60 {
 
     typedef asl::Ptr<Camera, dom::ThreadingModel> CameraPtr;
 
-    class Projector : public ProjectiveNode {
+    class Y60_SCENE_EXPORT Projector : public ProjectiveNode {
         public:
             Projector(dom::Node & theNode); 
 

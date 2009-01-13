@@ -11,12 +11,15 @@
 #ifndef _ac_renderer_CgProgramInfo_h_
 #define _ac_renderer_CgProgramInfo_h_
 
+#include "y60_glrender_settings.h"
+
 #include "ShaderDescription.h"
 
 #include <y60/scene/Viewport.h>
 #include <y60/scene/Camera.h>
 #include <y60/scene/Body.h>
 #include <y60/scene/Light.h>
+#include <GL/glew.h>
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
 
@@ -83,7 +86,7 @@ namespace y60 {
 
     void assertCg(const std::string & theWhere, const CGcontext theCgContext);
 
-    class CgProgramInfo {
+    class Y60_GLRENDER_EXPORT CgProgramInfo {
         public:
             CgProgramInfo(const ShaderDescription & theShader,
                     const CGcontext theCgContext);

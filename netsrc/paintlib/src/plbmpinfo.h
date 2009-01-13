@@ -11,6 +11,8 @@
 #ifndef INCL_PLBMPINFO
 #define INCL_PLBMPINFO
 
+#include "netsrc_paintlib_settings.h"
+
 #include "plobject.h"
 #include "plpoint.h"
 #include "plpixelformat.h"
@@ -20,7 +22,7 @@
 //! This is a simple base class that holds bitmap metainformation. It is
 //! used as a base class by PLPicDecoder and PLBmp and can be used standalone
 //! as well.
-class PLBmpInfo : public PLObject
+class NETSRC_PAINTLIB_EXPORT PLBmpInfo : public PLObject
 {
 
 public:

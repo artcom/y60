@@ -11,6 +11,8 @@
 #ifndef FILTERResizeBILINEAR_H
 #define FILTERResizeBILINEAR_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -19,7 +21,7 @@
 
 //! Resizes a 32 bpp bitmap using bilinear interpolation. This is the best-optimized
 //! of the resize filters.
-class PLFilterResizeBilinear : public PLFilterResize
+class NETSRC_PAINTLIB_EXPORT PLFilterResizeBilinear : public PLFilterResize
 {
 public:
   PLFilterResizeBilinear (int NewXSize, int NewYSize);

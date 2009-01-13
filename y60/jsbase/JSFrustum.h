@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSFRUSTUM_INCLUDED_
 #define _Y60_ACXPSHELL_JSFRUSTUM_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include "JSEnum.h"
 
@@ -71,7 +73,7 @@
 
 namespace jslib {
 
-class JSFrustum : public JSWrapper<asl::Frustum > {
+class Y60_JSBASE_EXPORT JSFrustum : public JSWrapper<asl::Frustum > {
     JSFrustum() {}
 public:
     typedef JSWrapper<asl::Frustum > Base;

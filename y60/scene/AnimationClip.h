@@ -68,6 +68,8 @@
 #ifndef _ac_scene_AnimationClip_h_
 #define _ac_scene_AnimationClip_h_
 
+#include "y60_scene_settings.h"
+
 #include "AnimationBase.h"
 
 #include <asl/dom/Nodes.h>

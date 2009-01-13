@@ -59,6 +59,8 @@
 #ifndef _ac_scene_ResourceManager_h_
 #define _ac_scene_ResourceManager_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/IResourceManager.h>
 
 #include <asl/base/Ptr.h>

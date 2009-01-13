@@ -68,6 +68,8 @@
 #ifndef _ac_scene_AnimationCharacter_h_
 #define _ac_scene_AnimationCharacter_h_
 
+#include "y60_scene_settings.h"
+
 #include "AnimationClip.h"
 #include <asl/dom/Nodes.h>
 #include <asl/base/Exception.h>

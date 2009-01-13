@@ -59,6 +59,8 @@
 #ifndef _IPAINTLIB_EXTENSION_INCLUDED
 #define _IPAINTLIB_EXTENSION_INCLUDED
 
+#include "y60_image_settings.h"
+
 #include <asl/base/Ptr.h>
 
 #if defined(_MSC_VER)

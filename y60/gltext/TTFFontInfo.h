@@ -20,6 +20,8 @@
 #ifndef AC_Y60_TTFFONTINFO
 #define AC_Y60_TTFFONTINFO
 
+#include "y60_gltext_settings.h"
+
 namespace y60 {
 
     static const char * FontTypeStrings[] = {

@@ -59,6 +59,8 @@
 #ifndef _ac_y60_PixelEncoding_h_
 #define _ac_y60_PixelEncoding_h_
 
+#include "y60_image_settings.h"
+
 #include <asl/base/Logger.h>
 #include <y60/base/DataTypes.h>
 #include <asl/base/string_functions.h>
@@ -281,11 +283,11 @@ namespace y60 {
         return unsigned(myBytesUsed);
     }
 
-    bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
+    Y60_IMAGE_EXPORT bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
             PLPixelFormat & theFormat);
-    bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
+    Y60_IMAGE_EXPORT bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
             PixelEncoding & theEncoding);
-    TextureInternalFormat getInternalPixelFormat(PixelEncoding theEncoding);
+    Y60_IMAGE_EXPORT TextureInternalFormat getInternalPixelFormat(PixelEncoding theEncoding);
 }
 
 #endif

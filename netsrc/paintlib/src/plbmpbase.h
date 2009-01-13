@@ -11,6 +11,8 @@
 #ifndef INCL_PLBMPBASE
 #define INCL_PLBMPBASE
 
+#include "netsrc_paintlib_settings.h"
+
 #include "plbmpinfo.h"
 #include "plpoint.h"
 #include "pldebug.h"
@@ -24,7 +26,7 @@ class PLFilter;
 //! Base class for PLBmp and PLSubBmp. PLBmpBase supports all operations
 //! on a bitmap that PLBmp supports except those that depend on being able
 //! to change the size or bpp.
-class PLBmpBase : public PLBmpInfo
+class NETSRC_PAINTLIB_EXPORT PLBmpBase : public PLBmpInfo
 {
 
 public:

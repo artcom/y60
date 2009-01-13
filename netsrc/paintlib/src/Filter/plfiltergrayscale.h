@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERGRAYSCALE)
 #define INCL_PLFILTERGRAYSCALE
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -20,7 +22,7 @@
 class PLBmp;
 
 //! Creates a grayscale version of a 32 bpp bitmap.
-class PLFilterGrayscale : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterGrayscale : public PLFilter
 {
 public:
   PLFilterGrayscale();

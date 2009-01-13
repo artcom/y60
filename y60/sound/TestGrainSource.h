@@ -59,6 +59,8 @@
 #ifndef _TESTGRAINSOURCE_H_
 #define _TESTGRAINSOURCE_H_
 
+#include "y60_sound_settings.h"
+
 #include <asl/base/UnitTest.h>
 #include <asl/audio/Pump.h>
 #include <y60/sound/FFMpegAudioDecoder.h>

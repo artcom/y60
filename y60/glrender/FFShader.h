@@ -20,6 +20,8 @@
 #ifndef AC_Y60_RENDERER_FFSHADER_INCLUDED
 #define AC_Y60_RENDERER_FFSHADER_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include "GLShader.h"
 
 namespace y60 {

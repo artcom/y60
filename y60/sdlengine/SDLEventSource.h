@@ -66,6 +66,8 @@
 #ifndef _Y60_INPUT_SDLEVENTSOURCE_INCLUDED_
 #define _Y60_INPUT_SDLEVENTSOURCE_INCLUDED_
 
+#include "y60_sdlengine_settins.h"
+
 #include <y60/input/Event.h>
 #include <y60/input/IEventSource.h>
 #include <y60/input/KeyCodes.h>

@@ -24,6 +24,8 @@
 #ifndef AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 #define AC_Y60_GLTEXTURE_COMPRESSOR_INCLUDED
 
+#include "y60_glutil_settings.h"
+
 #include <stdio.h>
 
 #include <y60/image/PixelEncoding.h>

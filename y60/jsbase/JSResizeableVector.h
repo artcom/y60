@@ -59,13 +59,15 @@
 #ifndef _Y60_ACXPSHELL_JSRESIZEABLEVECTOR_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSRESIZEABLEVECTOR_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 
 #include <asl/dom/Value.h>
 
 namespace jslib {
 
-class JSResizeableVector
+class Y60_JSBASE_EXPORT JSResizeableVector
     : public JSWrapper<dom::ResizeableVector, dom::ValuePtr, VectorValueAccessProtocol>
 {
 public:

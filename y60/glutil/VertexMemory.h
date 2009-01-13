@@ -11,6 +11,8 @@
 #ifndef _ac_scene_VertexMemory_h
 #define _ac_scene_VertexMemory_h
 
+#include "y60_glutil_settings.h"
+
 #include <y60/scene/VertexDataImpl.h>
 #include <y60/scene/VertexMemoryBase.h>
 

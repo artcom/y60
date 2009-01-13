@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JScppUtils.h>
 
 #include <y60/inet/Request.h>

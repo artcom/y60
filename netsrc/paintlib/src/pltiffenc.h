@@ -11,6 +11,8 @@
 #ifndef INCL_PLTIFFENC
 #define INCL_PLTIFFENC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"
 #endif
@@ -18,7 +20,7 @@
 typedef struct tiff TIFF;
 
 //! TIFF file encoder. Uses LIBTIFF to do the actual conversion.
-class PLTIFFEncoder : public PLPicEncoder
+class NETSRC_PAINTLIB_EXPORT PLTIFFEncoder : public PLPicEncoder
 {
 
 public:

@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSPLANE_INCLUDED_
 #define _Y60_ACXPSHELL_JSPLANE_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSVector.h"
 
 #include "JSWrapper.h"
@@ -73,7 +75,7 @@ namespace jslib {
 
 typedef float PlaneNumber;
 
-class JSPlane : public JSWrapper<asl::Plane<PlaneNumber> > {
+class Y60_JSBASE_EXPORT JSPlane : public JSWrapper<asl::Plane<PlaneNumber> > {
     JSPlane() {}
 public:
     typedef JSWrapper<asl::Plane<PlaneNumber> > Base;

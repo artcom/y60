@@ -59,13 +59,15 @@
 #ifndef AC_SOM_CAMERA_BUILDER_INCLUDED
 #define AC_SOM_CAMERA_BUILDER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "TransformBuilderBase.h"
 
 #include <asl/math/Frustum.h>
 
 namespace y60 {
 
-    class CameraBuilder : public TransformBuilderBase {
+    class Y60_SCENE_EXPORT CameraBuilder : public TransformBuilderBase {
         public:
             CameraBuilder(const std::string & theName);
             virtual ~CameraBuilder();

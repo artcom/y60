@@ -20,6 +20,8 @@
 #ifndef AC_Y60_BITMAPTEXTRENDERER
 #define AC_Y60_BITMAPTEXTRENDERER
 
+#include "y60_gltext_settings.h"
+
 #include "TextRenderer.h"
 
 #include <asl/base/Exception.h>
@@ -56,7 +58,7 @@ namespace y60 {
         0
     };
 
-    class BitmapTextRenderer : public TextRenderer{
+    class Y60_GLTEXT_EXPORT BitmapTextRenderer : public TextRenderer{
     	public:
     		BitmapTextRenderer();
     		~BitmapTextRenderer();

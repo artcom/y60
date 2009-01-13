@@ -71,6 +71,8 @@
 #ifndef _ac_y60_PLFilterResizePadded_h_
 #define _ac_y60_PLFilterResizePadded_h_
 
+#include "y60_image_settings.h"
+
 #if defined(_MSC_VER)
 #   pragma warning (push,1)
 #endif //defined(_MSC_VER)

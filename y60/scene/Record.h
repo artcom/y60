@@ -61,6 +61,8 @@
 #ifndef _ac_scene_record_h_
 #define _ac_scene_record_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/DataTypes.h>
 #include <y60/base/CommonTags.h>
 #include <y60/base/NodeValueNames.h>

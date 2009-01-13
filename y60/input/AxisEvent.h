@@ -67,6 +67,8 @@
 #ifndef _Y60_INPUT_AXISEVENT_INCLUDED_
 #define _Y60_INPUT_AXISEVENT_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 
 namespace y60 {

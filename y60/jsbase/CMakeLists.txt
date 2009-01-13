@@ -62,11 +62,18 @@ JScppUtils.h
 PropertyValue.h
 QuitFlagSingleton.h
 jssettings.h
+y60_jsbase_settings.h
 )
 
 set(TESTS
 GarbageCollection
 )
+
+list( APPEND EXTERNALS OPENEXR GLIB GLEW)   
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)
 
 ac_add_library(
     y60jsbase y60/jsbase
@@ -75,7 +82,7 @@ ac_add_library(
     DEPENDS aslbase aslmath asldom aslxpath
             y60base y60scene y60image spidermonkey
             paintlib
-    EXTERNS OPENEXR GLIB
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
 

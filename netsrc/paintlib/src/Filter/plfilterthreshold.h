@@ -10,6 +10,8 @@
 #if !defined(INCL_PLFILTERTHRESHOLD)
 #define INCL_PLFILTERTHRESHOLD
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -21,7 +23,7 @@ class PLBmp;
 //! Returns an 8 bpp grayscale bitmap that contains only the channel
 //! selected and is black wherever this channel has values <= threshold_min
 //! or >= threshold_max.
-class PLFilterThreshold : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterThreshold : public PLFilter
 {
 public:
   //! 

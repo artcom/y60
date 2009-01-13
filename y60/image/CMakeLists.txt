@@ -23,6 +23,7 @@ PLFilterFactory.h
 PLFilterGaussianBlur.h
 PLFilterResizePadded.h
 PixelEncoding.h
+y60_image_settings.h
 )
 
 set(TESTS

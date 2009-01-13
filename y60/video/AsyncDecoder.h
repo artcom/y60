@@ -67,6 +67,8 @@
 #ifndef _ac_video_AsyncDecoder_h_
 #define _ac_video_AsyncDecoder_h_
 
+#include "y60_video_settings.h"
+
 #include <y60/video/MovieDecoderBase.h>
 
 #include <asl/base/ThreadLock.h>

@@ -59,6 +59,8 @@
 #ifndef _y60_abstractrenderwindow_included_
 #define _y60_abstractrenderwindow_included_
 
+#include "y60_jslib_settings.h"
+
 #include "IRendererExtension.h"
 #include "Timeout.h"
 #include "JSRequestWrapper.h"

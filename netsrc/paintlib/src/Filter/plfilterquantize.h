@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERQUANTIZE)
 #define INCL_PLFILTERQUANTIZE
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -31,7 +33,7 @@
 
 //! Returns an 8 bpp bitmap containing a best-fit representation of the
 //! source 32 bpp bitmap.
-class PLFilterQuantize : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterQuantize : public PLFilter
 {
 public:
   //! DitherPaletteType and DitherType determine the type of quantization:

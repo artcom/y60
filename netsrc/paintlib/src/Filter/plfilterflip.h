@@ -12,6 +12,8 @@
 #ifndef FILTERFLIP_H
 #define FILTERFLIP_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -19,7 +21,7 @@
 #include "plfilter.h"
 
 //! Flips a 32 bpp bitmap upside-down
-class PLFilterFlip: public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterFlip: public PLFilter
 {
 public:
   PLFilterFlip();

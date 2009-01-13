@@ -66,6 +66,8 @@
 #ifndef _Y60_INPUT_DEBUGEVENTSINK_INCLUDED_
 #define _Y60_INPUT_DEBUGEVENTSINK_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 #include "IEventSink.h"
 

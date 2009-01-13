@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_IScriptablePlugin_h_
 #define _ac_jslib_IScriptablePlugin_h_
 
+#include "y60_jsbase_settings.h"
+
 #include "PropertyValue.h"
 #include <js/spidermonkey/jsapi.h>
 #include <asl/base/Ptr.h>

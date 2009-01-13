@@ -78,6 +78,7 @@ set(HEADERS
 config.h
 jmemdest.h
 jmemsrc.h
+netsrc_paintlib_settings.h
 planybmp.h
 planydec.h
 plbitmap.h
@@ -185,7 +186,10 @@ include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR}
 link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR}
         ${JPEG_LIBRARY_DIR} ${CURL_LIBRARY_DIR} ${OPENEXR_LIBRARY_DIRS})
 
-add_definitions( ${OPENEXR_DEFINITIONS} )
+        
+foreach( DEF ${OPENEXR_DEFINITIONS} )
+    add_definitions( -D${DEF} )
+endforeach( DEF ${OPENEXR_DEFINITIONS} )
 
 add_library(
     paintlib SHARED ${SOURCES}

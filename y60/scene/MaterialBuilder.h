@@ -59,6 +59,8 @@
 #ifndef _ac_MaterialBuilder_h_
 #define _ac_MaterialBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/RankedFeature.h>
 #include <y60/base/NodeValueNames.h>
@@ -73,7 +75,7 @@
 namespace y60 {
     class SceneBuilder;
 
-    class MaterialBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT MaterialBuilder : public BuilderBase {
     public:
         DEFINE_EXCEPTION(MaterialBuilderException, asl::Exception);
 
@@ -171,7 +173,7 @@ namespace y60 {
 
     typedef asl::Ptr<MaterialBuilder>  MaterialBuilderPtr;
 
-    void createLightingFeature(VectorOfRankedFeature & theRequirement,
+    void Y60_SCENE_EXPORT createLightingFeature(VectorOfRankedFeature & theRequirement,
                                LightingModel  theLightingModelType);
 }
 

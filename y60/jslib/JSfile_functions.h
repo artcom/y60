@@ -59,6 +59,8 @@
 #ifndef __y60_jslib_jsfile_functions_h_included_
 #define __y60_jslib_jsfile_functions_h_included_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JScppUtils.h>
 
 namespace jslib {

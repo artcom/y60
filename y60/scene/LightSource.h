@@ -68,6 +68,8 @@
 #ifndef _ac_scene_LightSource_h_
 #define _ac_scene_LightSource_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/DataTypes.h>
 #include <y60/base/CommonTags.h>
 #include <y60/base/NodeValueNames.h>
@@ -87,7 +89,7 @@
 namespace y60 {
 
     //                  TagName             Type           PropertyName                    Default
-    DEFINE_ATTRIBUT_TAG(LightSourceTypeTag, std::string,   LIGHTSOURCE_TYPE_ATTRIB,   "unsupported");
+    DEFINE_ATTRIBUT_TAG(LightSourceTypeTag, std::string,   LIGHTSOURCE_TYPE_ATTRIB,   "unsupported", Y60_SCENE_EXPORT);
 
     DEFINE_LIGHT_PROPERTY_TAG(LightAmbientTag,     asl::Vector4f, AMBIENT_PROPERTY,          asl::Vector4f(0.2f,0.2f,0.2f,1));
     DEFINE_LIGHT_PROPERTY_TAG(LightDiffuseTag,     asl::Vector4f, DIFFUSE_PROPERTY,          asl::Vector4f(0.8f,0.8f,0.8f,1));
@@ -122,7 +124,7 @@ namespace y60 {
 
 	DEFINE_CHILDNODE_TAG(LightPropertiesTag, LightSource, LightPropertiesFacade, "properties");
 
-    class LightSource :
+    class Y60_SCENE_EXPORT LightSource :
 		public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

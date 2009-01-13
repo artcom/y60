@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSLine_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSLine_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include "JSVector.h"
 
@@ -78,7 +80,7 @@ typedef float RayNumber;
 typedef float LineSegmentNumber;
 
 template <class NATIVE_LINE>
-class JSGenericLine : public JSWrapper<NATIVE_LINE>
+class Y60_JSBASE_EXPORT JSGenericLine : public JSWrapper<NATIVE_LINE>
 {
     typedef JSWrapper<NATIVE_LINE> Base;
     JSGenericLine() {}

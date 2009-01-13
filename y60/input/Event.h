@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_EVENT_INCLUDED_
 #define _Y60_INPUT_EVENT_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/base/Time.h>
 #include <functional>
@@ -71,7 +73,7 @@ namespace y60 {
     struct Event;
     typedef asl::Ptr<Event> EventPtr;
 
-    struct Event {
+    struct Y60_INPUT_EXPORT Event {
         enum Type {
             KEY_UP,
             KEY_DOWN,

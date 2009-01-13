@@ -59,6 +59,8 @@
 #ifndef AC_Y60_SHADER_INTERFACE_INCLUDED
 #define AC_Y60_SHADER_INTERFACE_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "MaterialParameter.h"
 #include <y60/base/DataTypes.h>
 #include <y60/base/NodeValueNames.h>
@@ -81,7 +83,7 @@ namespace y60 {
     class Light;
     typedef std::vector<asl::Ptr<Light, dom::ThreadingModel> > LightVector;
 
-    class IShader {
+    class Y60_SCENE_EXPORT IShader {
         public:
             virtual const std::string & getName() const = 0;
             virtual unsigned getPropertyNodeCount() const =0;

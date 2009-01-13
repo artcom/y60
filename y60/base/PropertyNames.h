@@ -63,6 +63,8 @@
 #ifndef _ac_PropertyNames_h_
 #define _ac_PropertyNames_h_
 
+#include "y60_base_settings.h"
+
 namespace y60 {
 
     //=== Standard property names =================================================

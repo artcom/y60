@@ -11,6 +11,8 @@
 #ifndef AC_Y60_TEXTRENDERERMANAGER
 #define AC_Y60_TEXTRENDERERMANAGER
 
+#include "y60_gltext_settings.h"
+
 #include "Text.h"
 #include "TextRenderer.h"
 #include "BitmapTextRenderer.h"
@@ -32,7 +34,7 @@
 namespace y60 {
 
     DEFINE_EXCEPTION(TextRendererManagerException, asl::Exception);
-    class TextRendererManager {
+    class Y60_GLTEXT_EXPORT TextRendererManager {
         public:
             TextRendererManager();
             virtual ~TextRendererManager();

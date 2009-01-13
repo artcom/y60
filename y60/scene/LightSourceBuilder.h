@@ -72,13 +72,15 @@
 #ifndef _ac_y60_LightSourceBuilder_h_
 #define _ac_y60_LightSourceBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/NodeValueNames.h>
 #include <asl/math/Vector234.h>
 
 namespace y60 {
 
-    class LightSourceBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT LightSourceBuilder : public BuilderBase {
         public:
             LightSourceBuilder(const std::string & theName);
             virtual ~LightSourceBuilder();

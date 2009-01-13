@@ -1,6 +1,8 @@
 #ifndef _BitFont_h_
 #define _BitFont_h_
 
+#include "y60_gltext_settings.h"
+
 /// Structure to store the data of one Bitmap Character
 struct BitChar {
   int width;
@@ -29,12 +31,12 @@ struct BitFont {
   char *short_name;
 };
 
-void
+Y60_GLTEXT_EXPORT void
 getStringSize(const BitFont & font, const char * text,
               int & x_ret, int & y_ret,
               int & w_ret, int & h_ret);
 
-void
+Y60_GLTEXT_EXPORT void
 getFontSize(int & ascent, int & descent, const BitFont & font);
 
 #endif // _BitFont_h_

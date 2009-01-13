@@ -73,6 +73,8 @@
 #ifndef _ac_y60_MovieEncoding_h_
 #define _ac_y60_MovieEncoding_h_
 
+#include "y60_video_settings.h"
+
 namespace y60 {
     /*! @addtogroup Y60video */
     /* @{ */

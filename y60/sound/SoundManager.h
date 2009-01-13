@@ -59,6 +59,8 @@
 #ifndef _ac_y60_SoundManager_h_
 #define _ac_y60_SoundManager_h_
 
+#include "y60_sound_settings.h"
+
 #include "Sound.h"
 #include "SoundCacheItem.h"
 #include "IAudioDecoderFactory.h"

@@ -59,6 +59,8 @@
 #ifndef Y60_CLASS_MAP_SINGLETON_INCLUDED
 #define Y60_CLASS_MAP_SINGLETON_INCLUDED
 
+#include "y60_jsbase_settings.h"
+
 #include <asl/base/Singleton.h>
 
 #include <map>

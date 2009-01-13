@@ -59,6 +59,7 @@
 #ifndef _ac_y60_TypeTraits_h_
 #define _ac_y60_TypeTraits_h_
 
+#include "y60_base_settings.h"
 
 #include "NodeNames.h"
 #include "NodeValueNames.h"
@@ -144,7 +145,7 @@ namespace y60 {
         "texturewrapmode",
         ""
     };
-    DEFINE_ENUM(TypeId, TypeIdEnum);   
+    DEFINE_ENUM(TypeId, TypeIdEnum, Y60_BASE_EXPORT);   
 
     template <class T> struct NO_SUCH_SPECIALIZATION;
 

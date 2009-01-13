@@ -59,6 +59,8 @@
 #ifndef _CacheReader_H_
 #define _CacheReader_H_
 
+#include "y60_sound_settings.h"
+
 #include "IAudioDecoder.h"
 #include "SoundCacheItem.h"
 

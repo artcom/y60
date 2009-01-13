@@ -11,6 +11,8 @@
 #ifndef _ac_render_GLBufferAdapter_h_
 #define _ac_render_GLBufferAdapter_h_
 
+#include "y60_glutil_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/base/Block.h>
 
@@ -33,7 +35,7 @@ namespace y60 {
     };   
 
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
-    class BufferAdapter {
+    class Y60_GLUTIL_EXPORT BufferAdapter {
         public:
             BufferAdapter(unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferAdapter();
@@ -71,7 +73,7 @@ namespace y60 {
 #define PL_FT_SGI    15
 */
     
-    class BufferToFile : public BufferAdapter {
+    class Y60_GLUTIL_EXPORT BufferToFile : public BufferAdapter {
         public:
             BufferToFile(const std::string & theFilename, unsigned theFormat,
                          unsigned theWidth, unsigned theHeight, unsigned theComponents);
@@ -82,7 +84,7 @@ namespace y60 {
             unsigned _myFormat;
     };
  
-    class BufferToTexture : public BufferAdapter {
+    class Y60_GLUTIL_EXPORT BufferToTexture : public BufferAdapter {
         public:
             BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag = false);
             virtual ~BufferToTexture();

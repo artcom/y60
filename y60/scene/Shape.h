@@ -59,6 +59,8 @@
 #ifndef AC_Y60_SCENE_SHAPE_INCLUDED
 #define AC_Y60_SCENE_SHAPE_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "Primitive.h"
 
 #include <asl/base/Dashboard.h>
@@ -82,7 +84,7 @@ namespace y60 {
 
     class Scene;
 
-    class Shape :
+    class Y60_SCENE_EXPORT Shape :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

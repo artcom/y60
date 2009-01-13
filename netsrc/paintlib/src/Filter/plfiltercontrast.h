@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERCONTRAST)
 #define INCL_PLFILTERCONTRAST
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -30,7 +32,7 @@ class PLBmp;
 //! unbalanced dark/light ratio of pixels. The best you can do here
 //! is play around with the threshold.)
 //! Works for 24 and 32 bpp bitmaps.
-class PLFilterContrast : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterContrast : public PLFilter
 {
 public:
   //! contrast is the slope of the function. offset is the intensity

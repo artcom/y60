@@ -24,6 +24,8 @@
 #ifndef AC_Y60_GLCONTEXT_INCLUDED
 #define AC_Y60_GLCONTEXT_INCLUDED
 
+#include "y60_glutil_settings.h"
+
 #include <asl/base/Exception.h>
 
 #include "GLUtils.h"

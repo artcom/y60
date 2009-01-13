@@ -33,6 +33,7 @@ Y60xsd.h
 iostream_functions.h
 property_functions.h
 typedefs.h
+y60_base_settings.h
 )
 
 set(TESTS
@@ -40,12 +41,18 @@ DataTypes
 XmlDomY60Types
 )
 
+list( APPEND EXTERNALS OPENEXR )
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)
+
 ac_add_library(
     y60base y60/base
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom
-    EXTERNS OPENEXR
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
 

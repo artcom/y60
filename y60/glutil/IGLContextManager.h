@@ -22,6 +22,8 @@
 #ifndef _y60_gl_icontextmanager_included_
 #define _y60_gl_icontextmanager_included_
 
+#include "y60_glutil_settings.h"
+
 namespace y60 {
 
 class IGLContextManager {

@@ -67,6 +67,8 @@
 #ifndef _ac_video_Capture_h_
 #define _ac_video_Capture_h_
 
+#include "y60_video_settings.h"
+
 #include "Movie.h"
 #include <y60/base/NodeNames.h>
 
@@ -76,10 +78,10 @@ namespace y60 {
     /* @{ */
 
     //                  theTagName    theType      theAttributeName            theDefault
-    DEFINE_ATTRIBUT_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL");
-    DEFINE_ATTRIBUT_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0);
+    DEFINE_ATTRIBUT_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_EXPORT);
 
-    class CaptureDevice;
+    class Y60_VIDEO_EXPORT CaptureDevice;
 
     /**
      * @ingroup y60-video
@@ -92,7 +94,7 @@ namespace y60 {
      *
      * @see MovieDecoder
      */
-    class Capture : public Image,
+    class Y60_VIDEO_EXPORT Capture : public Image,
         public DeviceTag::Plug,
         public NormTag::Plug,
         public FrameRateTag::Plug,

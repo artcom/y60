@@ -59,6 +59,8 @@
 #ifndef AC_SOM_TRANSFORM_BUILDER_BASE_INCLUDED
 #define AC_SOM_TRANSFORM_BUILDER_BASE_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "WorldBuilderBase.h"
 
 #include <asl/math/Vector234.h>
@@ -66,7 +68,7 @@
 #include <string>
 
 namespace y60 {
-    class TransformBuilderBase : public WorldBuilderBase {
+    class Y60_SCENE_EXPORT TransformBuilderBase : public WorldBuilderBase {
         public:
             enum BillboardType { BB_NONE, BB_AXIS, BB_POINT };
 

@@ -65,6 +65,8 @@
 //=============================================================================
 
 
+#include "y60_jsbase_settings.h"
+
 #include <asl/base/Exception.h>
 
 #include "JScppUtils.h"
@@ -76,7 +78,7 @@ DEFINE_EXCEPTION(DoesNotExist, asl::Exception);
 template <class T> struct JSClassTraits;
 
 struct Global {
-    static JSFunctionSpec * Functions();
+    Y60_JSBASE_EXPORT static JSFunctionSpec * Functions();
 };
 
 }

@@ -66,6 +66,8 @@
 #ifndef _ac_scene_Body_h_
 #define _ac_scene_Body_h_
 
+#include "y60_scene_settings.h"
+
 #include "TransformHierarchyFacade.h"
 #include "Shape.h"
 #include <asl/dom/Nodes.h>
@@ -74,13 +76,13 @@ namespace y60 {
     class Scene;
 
     //                  theTagName   theType                   theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(ShapeTag,    std::string,              BODY_SHAPE_ATTRIB, "");
-    DEFINE_ATTRIBUT_TAG(SkeletonTag, std::vector<std::string>, SKELETON_ATTRIB,   TYPE());
+    DEFINE_ATTRIBUT_TAG(ShapeTag,    std::string,              BODY_SHAPE_ATTRIB, "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(SkeletonTag, std::vector<std::string>, SKELETON_ATTRIB,   TYPE(), Y60_SCENE_EXPORT);
 
     class Body;
     typedef asl::Ptr<Body, dom::ThreadingModel> BodyPtr;
 
-    class Body :
+    class Y60_SCENE_EXPORT Body :
         public TransformHierarchyFacade,
         public ShapeTag::Plug,
         public SkeletonTag::Plug

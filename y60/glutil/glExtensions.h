@@ -20,6 +20,8 @@
 #ifndef _ac_glExtensions_h_
 #define _ac_glExtensions_h_
 
+#include "y60_glutil_settings.h"
+
 #ifndef GL_ARB_point_sprite
 #define GL_ARB_point_sprite
 #define GL_POINT_SPRITE_ARB               0x8861

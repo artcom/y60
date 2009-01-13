@@ -62,7 +62,9 @@
 #ifndef AC_Y60_XSD_INCLUDED
 #define AC_Y60_XSD_INCLUDED
 
+#include "y60_base_settings.h"
+
 #include <string>
-extern std::string ourY60xsd;
+extern Y60_BASE_EXPORT std::string ourY60xsd;
 
 #endif

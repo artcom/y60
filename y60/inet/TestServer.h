@@ -59,12 +59,14 @@
 #ifndef y60_inet_testserver_included
 #define y60_inet_testserver_included
 
+#include "y60_inet_settings.h"
+
 #include <asl/ipc/ConduitAcceptor.h>
 #include <asl/ipc/TCPPolicy.h>
 
 namespace inet {
     
-class TestServer : public asl::ConduitServer<asl::TCPPolicy> {
+class Y60_INET_EXPORT TestServer : public asl::ConduitServer<asl::TCPPolicy> {
     public:
         static asl::ConduitServer<asl::TCPPolicy>::Ptr create(asl::TCPPolicy::Handle theHandle);
     private:

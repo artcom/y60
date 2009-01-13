@@ -68,6 +68,8 @@
 #ifndef _ac_y60_Movie_h_
 #define _ac_y60_Movie_h_
 
+#include "y60_video_settings.h"
+
 #include <y60/image/Image.h>
 #include <y60/base/NodeNames.h>
 
@@ -88,22 +90,22 @@ namespace y60 {
     DEFINE_EXCEPTION(MovieException, asl::Exception);
 
     //                  theTagName       theType      theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(AVDelayTag,      double,      MOVIE_AVDELAY_ATTRIB,     0);
-    DEFINE_ATTRIBUT_TAG(CacheSizeTag,    int,         MOVIE_FRAME_CACHE_ATTRIB, 0);
-    DEFINE_ATTRIBUT_TAG(MaxCacheSizeTag, unsigned,    MOVIE_FRAME_MAX_CACHE_ATTRIB, 32);
-    DEFINE_ATTRIBUT_TAG(CurrentFrameTag, int,         MOVIE_FRAME_ATTRIB,       0);
-    DEFINE_ATTRIBUT_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1);
-    DEFINE_ATTRIBUT_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25);
-    DEFINE_ATTRIBUT_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1);
-    DEFINE_ATTRIBUT_TAG(FrameBlendingTag,bool,        MOVIE_FRAMEBLENDING_ATTRIB,false);
-    DEFINE_ATTRIBUT_TAG(FrameBlendFactorTag,double,   MOVIE_FRAMEBLENDFACTOR_ATTRIB,  1.0);	
-    DEFINE_ATTRIBUT_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play");
-    DEFINE_ATTRIBUT_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1);
-    DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1);
-    DEFINE_ATTRIBUT_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true);
-    DEFINE_ATTRIBUT_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "");
-    DEFINE_ATTRIBUT_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0);
-    DEFINE_ATTRIBUT_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN");
+    DEFINE_ATTRIBUT_TAG(AVDelayTag,      double,      MOVIE_AVDELAY_ATTRIB,     0, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(CacheSizeTag,    int,         MOVIE_FRAME_CACHE_ATTRIB, 0, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(MaxCacheSizeTag, unsigned,    MOVIE_FRAME_MAX_CACHE_ATTRIB, 32, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(CurrentFrameTag, int,         MOVIE_FRAME_ATTRIB,       0, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FrameBlendingTag,bool,        MOVIE_FRAMEBLENDING_ATTRIB,false, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FrameBlendFactorTag,double,   MOVIE_FRAMEBLENDFACTOR_ATTRIB,  1.0, Y60_VIDEO_EXPORT);	
+    DEFINE_ATTRIBUT_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play", Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "", Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN", Y60_VIDEO_EXPORT);
 
     /**
      * @ingroup Y60video
@@ -112,7 +114,7 @@ namespace y60 {
      * file given in the src attribute.
      *
      */
-    class Movie :
+    class Y60_VIDEO_EXPORT Movie :
         public Image,
         public FrameCountTag::Plug,
         public CurrentFrameTag::Plug,

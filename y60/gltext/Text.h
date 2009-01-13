@@ -20,6 +20,8 @@
 #ifndef AC_Y60_TEXT
 #define AC_Y60_TEXT
 
+#include "y60_gltext_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
 

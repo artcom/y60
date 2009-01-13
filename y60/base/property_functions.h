@@ -72,6 +72,8 @@
 #ifndef _ac_property_functions_h_
 #define _ac_property_functions_h_
 
+#include "y60_base_settings.h"
+
 #include "NodeNames.h"
 #include <asl/dom/Nodes.h>
 #include <asl/base/string_functions.h>

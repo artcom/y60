@@ -20,6 +20,8 @@
 #ifndef _ac_scene_SkinAndBonesShader_h_
 #define _ac_scene_SkinAndBonesShader_h_
 
+#include "y60_glrender_settings.h"
+
 #include "CgShader.h"
 
 #include <asl/dom/Nodes.h>

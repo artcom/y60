@@ -12,6 +12,8 @@
 #ifndef INCL_PLEXCEPT
 #define INCL_PLEXCEPT
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef AFX_PLOBJECT_H__E40881E3_C809_11D3_97BC_0050046F615E__INCLUDED_
 #include "plobject.h"
 #endif
@@ -49,7 +51,7 @@
 //! program; the descriptive string can be output to the user. Error
 //! codes and strings do not correspond 1:1. The strings are more
 //! precise.
-class PLTextException : public PLObject
+class NETSRC_PAINTLIB_EXPORT PLTextException : public PLObject
 {
 
 public:

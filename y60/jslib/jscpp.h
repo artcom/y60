@@ -67,6 +67,8 @@
 #ifndef __Y60_ACXPSHELL_JSCPP_INCLUDED__
 #define __Y60_ACXPSHELL_JSCPP_INCLUDED__
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/jssettings.h>
 
 #include <js/spidermonkey/jsapi.h>

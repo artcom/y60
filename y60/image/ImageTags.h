@@ -59,6 +59,8 @@
 #ifndef _ac_y60_ImageTags_h_
 #define _ac_y60_ImageTags_h_
 
+#include "y60_image_settings.h"
+
 #include <y60/base/NodeNames.h>
 #include <y60/base/NodeValueNames.h>
 #include <y60/base/DataTypes.h>
@@ -68,18 +70,18 @@
 
 namespace y60 {
     //                  theTagName              theType         theAttributeName                 theDefault
-    DEFINE_ATTRIBUT_TAG        (ImageSourceTag,         std::string,    IMAGE_SRC_ATTRIB,                "");
-    DEFINE_ATTRIBUT_TAG(TargetPixelFormatTag,   std::string,    IMAGE_TARGET_PIXELFORMAT_ATTRIB, "");
-    DEFINE_ATTRIBUT_TAG(ImageResizeTag,         std::string,    IMAGE_RESIZE_ATTRIB,             IMAGE_RESIZE_NONE);
-    DEFINE_ATTRIBUT_TAG(ImageDepthTag,          unsigned,       DEPTH_ATTRIB,                    1);
-    DEFINE_ATTRIBUT_TAG(ImageMatrixTag,         asl::Matrix4f,  MATRIX_ATTRIB,                   asl::Matrix4f::Identity());
-    DEFINE_ATTRIBUT_TAG(ImageTileTag,           asl::Vector2i,  IMAGE_TILE_ATTRIB,               asl::Vector2i(1,1));
-    DEFINE_ATTRIBUT_TAG(ImageFilterTag,         std::string,    IMAGE_FILTER_ATTRIB,             IMAGE_FILTER_NONE);
-    DEFINE_ATTRIBUT_TAG(ImageFilterParamsTag,   VectorOfFloat,  IMAGE_FILTER_PARAMS_ATTRIB,      TYPE());
-    DEFINE_FACADE_ATTRIBUTE_TAG(ImageBytesPerPixelTag,  float,          IMAGE_BYTESPERPIXEL_ATTRIB,      0);
-    DEFINE_FACADE_ATTRIBUTE_TAG(RasterPixelFormatTag,   std::string,    IMAGE_RASTER_PIXELFORMAT_ATTRIB, "RGB");
-    DEFINE_FACADE_ATTRIBUTE_TAG(ImageWidthTag,          unsigned,       WIDTH_ATTRIB,                    0);
-    DEFINE_FACADE_ATTRIBUTE_TAG(ImageHeightTag,         unsigned,       HEIGHT_ATTRIB,                   0);
+    DEFINE_ATTRIBUT_TAG        (ImageSourceTag,         std::string,    IMAGE_SRC_ATTRIB,                "", Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TargetPixelFormatTag,   std::string,    IMAGE_TARGET_PIXELFORMAT_ATTRIB, "", Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageResizeTag,         std::string,    IMAGE_RESIZE_ATTRIB,             IMAGE_RESIZE_NONE, Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageDepthTag,          unsigned,       DEPTH_ATTRIB,                    1, Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageMatrixTag,         asl::Matrix4f,  MATRIX_ATTRIB,                   asl::Matrix4f::Identity(), Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageTileTag,           asl::Vector2i,  IMAGE_TILE_ATTRIB,               asl::Vector2i(1,1), Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageFilterTag,         std::string,    IMAGE_FILTER_ATTRIB,             IMAGE_FILTER_NONE, Y60_IMAGE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ImageFilterParamsTag,   VectorOfFloat,  IMAGE_FILTER_PARAMS_ATTRIB,      TYPE(), Y60_IMAGE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(ImageBytesPerPixelTag,  float,          IMAGE_BYTESPERPIXEL_ATTRIB,      0, Y60_IMAGE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(RasterPixelFormatTag,   std::string,    IMAGE_RASTER_PIXELFORMAT_ATTRIB, "RGB", Y60_IMAGE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(ImageWidthTag,          unsigned,       WIDTH_ATTRIB,                    0, Y60_IMAGE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(ImageHeightTag,         unsigned,       HEIGHT_ATTRIB,                   0, Y60_IMAGE_EXPORT);
 }
 
 #endif

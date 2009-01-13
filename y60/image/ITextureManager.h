@@ -59,6 +59,8 @@
 #ifndef _ac_y60_ITextureManager_h_
 #define _ac_y60_ITextureManager_h_
 
+#include "y60_image_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/base/os_functions.h>
 #include <asl/base/Logger.h>
@@ -79,7 +81,7 @@ namespace y60 {
      * Abstract Interface for a Texturemanager. The Interface for the TextureManager
      * is made here, because it is needed in the image module. 
      */
-    class ITextureManager {
+    class Y60_IMAGE_EXPORT  ITextureManager {
     public:
         /**
          * Sets the Priority of the Texture theTexture to thePriority. The Texture priority

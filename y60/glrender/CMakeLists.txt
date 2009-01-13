@@ -26,6 +26,7 @@ ShaderLibrary.h
 ShaderLibraryxsd.h
 ShaderTypes.h
 SkinAndBonesShader.h
+y60_glrender_settings.h
 )
 
 set(TESTS

@@ -68,6 +68,8 @@
 #ifndef _ac_scene_VertexDataImpl_h_
 #define _ac_scene_VertexDataImpl_h_
 
+#include "y60_scene_settings.h"
+
 #include "VertexData.h"
 
 namespace y60 {

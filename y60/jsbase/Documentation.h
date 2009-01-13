@@ -67,6 +67,8 @@
 #ifndef _jslib_Documentation_h_included_
 #define _jslib_Documentation_h_included_
 
+#include "y60_jsbase_settings.h"
+
 #include "jssettings.h"
 #include "JScppUtils.h"
 #include <js/spidermonkey/jsapi.h>
@@ -191,7 +193,7 @@ namespace jslib {
     typedef std::pair<std::string, std::string> DokumentationKey;
     typedef std::map<DokumentationKey, ObjectDocumentation> DocumentationMap;
 
-    class DocumentationSingleton : public asl::Singleton<DocumentationSingleton> {
+    class Y60_JSBASE_EXPORT DocumentationSingleton : public asl::Singleton<DocumentationSingleton> {
         friend class asl::SingletonManager;
         public:
             ObjectDocumentation & operator[](const DokumentationKey & theKey) {

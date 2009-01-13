@@ -59,6 +59,8 @@
 #ifndef _Y60_INET_REQUEST_INCLUDED_
 #define _Y60_INET_REQUEST_INCLUDED_
 
+#include "y60_inet_settings.h"
+
 #ifdef WIN32
     #include <winsock2.h>
     // undefine the windows macro max (thanx bill) [jb]
@@ -96,7 +98,7 @@ namespace inet {
         ""
     };
 
-    DEFINE_ENUM(AuthentType, AuthentTypeEnum);
+    DEFINE_ENUM(AuthentType, AuthentTypeEnum, Y60_INET_EXPORT);
 
     class RequestManager;
 
@@ -104,7 +106,8 @@ namespace inet {
      * @ingroup y60inet
      * HTTP Request.
      *
-     */    class Request {
+     */    
+    class Y60_INET_EXPORT Request {
         friend class RequestManager;
 
         public:

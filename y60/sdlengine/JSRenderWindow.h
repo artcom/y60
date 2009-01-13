@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSRENDERER_INCLUDED_
 #define _Y60_ACXPSHELL_JSRENDERER_INCLUDED_
 
+#include "y60_sdlengine_settins.h"
+
 #include "SDLWindow.h"
 
 #include <y60/jsbase/JSWrapper.h>

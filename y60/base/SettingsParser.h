@@ -59,6 +59,8 @@
 #ifndef __SETTINGS_PARSER_UTILS_INCLUDED__
 #define __SETTINGS_PARSER_UTILS_INCLUDED__
 
+#include "y60_base_settings.h"
+
 namespace y60 {
 
 template <class T>

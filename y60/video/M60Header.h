@@ -67,6 +67,8 @@
 #ifndef _ac_y60_M60Header_h_
 #define _ac_y60_M60Header_h_
 
+#include "y60_video_settings.h"
+
 #include <asl/base/Stream.h>
 
 namespace y60 {

@@ -39,6 +39,7 @@ Times12.h
 Times14.h
 Times144.h
 textUtilities.h
+y60_gltext_settings.h
 )
 
 set(TESTS

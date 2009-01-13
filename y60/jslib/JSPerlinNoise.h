@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSPERLINNOISE_INCLUDED_
 #define _Y60_ACXPSHELL_JSPERLINNOISE_INCLUDED_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <asl/math/PerlinNoise.h>
 

@@ -108,6 +108,7 @@ Viewport.h
 WorldBuilder.h
 WorldBuilderBase.h
 Y60Decoder.h
+y60_scene_settings.h
 )
 
 set(TESTS

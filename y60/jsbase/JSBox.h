@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSBOX_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSBOX_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSVector.h"
 
 #include "JSWrapper.h"
@@ -73,7 +75,7 @@ namespace jslib {
 
 typedef float BoxNumber;
 
-class JSBox3f : public JSWrapper<asl::Box3<BoxNumber> > {
+class Y60_JSBASE_EXPORT JSBox3f : public JSWrapper<asl::Box3<BoxNumber> > {
     JSBox3f() {}
 public:
     typedef JSWrapper<asl::Box3<BoxNumber> > Base;

@@ -67,13 +67,15 @@
 #ifndef _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
 #define _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 
 #include <asl/base/Block.h>
 
 namespace jslib {
 
-class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, VectorValueAccessProtocol>
+class Y60_JSBASE_EXPORT JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, VectorValueAccessProtocol>
 {
         JSBlock() {}
     public:

@@ -59,12 +59,14 @@
 #ifndef _Y60_ACXPSHELL_JSRESIZEABLERASTER_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSRESIZEABLERASTER_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include <asl/dom/Value.h>
 
 namespace jslib {
 
-class JSResizeableRaster
+class Y60_JSBASE_EXPORT JSResizeableRaster
     : public JSWrapper<dom::ResizeableRaster,
                        dom::ValuePtr,
                        VectorValueAccessProtocol> // TODO: verify if correct, probably is not

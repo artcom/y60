@@ -67,6 +67,8 @@
 #ifndef _ac_scene_Y60Decoder_h_
 #define _ac_scene_Y60Decoder_h_
 
+#include "y60_scene_settings.h"
+
 #include "ISceneDecoder.h"
 #include <asl/base/Exception.h>
 

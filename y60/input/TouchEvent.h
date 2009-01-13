@@ -66,6 +66,8 @@
 #ifndef _Y60_INPUT_TOCUHEVENT_INCLUDED_
 #define _Y60_INPUT_TOUCHEVENT_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 
 #include <asl/math/Vector234.h>

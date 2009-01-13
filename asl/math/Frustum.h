@@ -210,7 +210,7 @@ class ASL_MATH_EXPORT Frustum {
 };
 
 /// 'normal' intersection test
-bool
+ASL_MATH_EXPORT bool
 intersection(const asl::Box3f & theBox, const Frustum & theFrustum);
 
 /// intersect also returns partial overlap - used in culling

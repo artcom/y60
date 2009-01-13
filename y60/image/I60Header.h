@@ -67,6 +67,8 @@
 #ifndef _ac_y60_I60Header_h_
 #define _ac_y60_I60Header_h_
 
+#include "y60_image_settings.h"
+
 namespace y60 {
 
     const unsigned long CURRENT_IMAGE_FORMAT_VERSION = 2; // including layers

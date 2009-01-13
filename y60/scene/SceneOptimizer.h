@@ -59,6 +59,8 @@
 #ifndef _ac_scene_SceneOptimizer_h_
 #define _ac_scene_SceneOptimizer_h_
 
+#include "y60_scene_settings.h"
+
 #include "Scene.h"
 #include "Body.h"
 #include "Shape.h"

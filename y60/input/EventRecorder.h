@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_EVENTRECORDER_
 #define _Y60_INPUT_EVENTRECORDER_
 
+#include "y60_input_settings.h"
+
 #include "IEventSource.h"
 #include "IEventSink.h"
 #include "Event.h"

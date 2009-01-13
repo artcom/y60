@@ -59,6 +59,8 @@
 #ifndef Y60_TEXTUREUNIT_INCLUDED
 #define Y60_TEXTUREUNIT_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "TextureManager.h"
 #include "IShader.h"
 #include "Texture.h"
@@ -112,20 +114,20 @@ namespace y60 {
 #endif
 
     //                  theTagName                 theType           theAttributeName              theDefault
-    DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "");
-    DEFINE_ATTRIBUT_TAG(TextureUnitApplyModeTag,   TextureApplyMode, TEXTUREUNIT_APPLYMODE_ATTRIB, MODULATE);
-    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerTag,    std::string,      TEXTUREUNIT_COMBINER_ATTRIB,  "");
-    DEFINE_ATTRIBUT_TAG(TextureUnitEnvColorTag,    asl::Vector4f,    TEXTUREUNIT_ENVCOLOR_ATTRIB,  asl::Vector4f(1,1,1,1));
-    DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false);
-    DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "");
-    DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity());
+    DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitApplyModeTag,   TextureApplyMode, TEXTUREUNIT_APPLYMODE_ATTRIB, MODULATE, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerTag,    std::string,      TEXTUREUNIT_COMBINER_ATTRIB,  "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitEnvColorTag,    asl::Vector4f,    TEXTUREUNIT_ENVCOLOR_ATTRIB,  asl::Vector4f(1,1,1,1), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
 #ifdef BAD_TX
-    DEFINE_ATTRIBUT_TAG(TextureUnitTexturePtrTag,  TextureWeakPtr,   "TextureUnitTexturePtrTag",   TexturePtr(0));
-    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerPtrTag, ICombinerWeakPtr, "TextureUnitCombinerPtrTag",  ICombinerPtr(0));
+    DEFINE_ATTRIBUT_TAG(TextureUnitTexturePtrTag,  TextureWeakPtr,   "TextureUnitTexturePtrTag",   TexturePtr(0), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerPtrTag, ICombinerWeakPtr, "TextureUnitCombinerPtrTag",  ICombinerPtr(0), Y60_SCENE_EXPORT);
 #endif
     DEFINE_EXCEPTION(TextureUnitException, asl::Exception);
 
-    class TextureUnit :
+    class Y60_SCENE_EXPORT TextureUnit :
         public dom::Facade,
         public TextureUnitTextureIdTag::Plug,
         public TextureUnitProjectorIdTag::Plug,

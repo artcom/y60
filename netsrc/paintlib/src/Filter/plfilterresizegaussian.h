@@ -11,6 +11,8 @@
 #ifndef FILTERResizeGAUSSIAN_H
 #define FILTERResizeGAUSSIAN_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -18,7 +20,7 @@
 #include "plfilterresize.h"
 
 //! Resizes a 32 bpp bitmap using a gaussian filter to determine result pixels.
-class PLFilterResizeGaussian : public PLFilterResize
+class NETSRC_PAINTLIB_EXPORT PLFilterResizeGaussian : public PLFilterResize
 {
 public:
   //! 

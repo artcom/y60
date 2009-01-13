@@ -68,6 +68,8 @@
 #ifndef _ac_scene_Scene_h_
 #define _ac_scene_Scene_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/IScene.h>
 
 #include "IShader.h"
@@ -138,7 +140,7 @@ namespace y60 {
      * 3D Scene object.
      *
      */
-    class Scene : public dom::Facade, public IScene {
+    class Y60_SCENE_EXPORT Scene : public dom::Facade, public IScene {
         public:
             struct Statistics {
                 Statistics();

@@ -18,6 +18,7 @@ SDLText.h
 SDLTextRenderer.h
 SDLWindow.h
 jssdl.h
+y60_sdlengine_settings.h
 )
 
 ac_add_library(

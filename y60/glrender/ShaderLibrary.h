@@ -11,6 +11,8 @@
 #ifndef AC_Y60_SHADER_LIBRARY_INCLUDED
 #define AC_Y60_SHADER_LIBRARY_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include "ShaderDescription.h"
 #include "ShaderFeatureSet.h"
 #include "GLShader.h"

@@ -11,6 +11,8 @@
 #if !defined(INCL_PLINPLACEFILTER)
 #define INCL_PLINPLACEFILTER
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -21,7 +23,7 @@ class PLBmp;
 #include "plfilter.h"
 
 //! Base class for filters that can operate in-place on PLBmpBase objects.
-class PLInPlaceFilter : public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLInPlaceFilter : public PLFilter  
 {
 public:
   //!

@@ -59,6 +59,8 @@
 #ifndef _ac_y60_frustumvalue_h_
 #define _ac_y60_frustumvalue_h_
 
+#include "y60_base_settings.h"
+
 #include <asl/dom/Value.h>
 #include <asl/math/Frustum.h>
 
@@ -75,8 +77,8 @@ class FrustumValue : public SimpleValue<asl::Frustum> {
         FrustumValue(const asl::Frustum  & theValue, Node * theNode) : Base(theValue, theNode) {}
         FrustumValue(const DOMString & theStringValue, Node * theNode) : Base(theStringValue, theNode) {}
         FrustumValue(const asl::ReadableBlock & theValue, Node * theNode) : Base(theValue, theNode) {}
-        virtual void binarize(asl::WriteableStream & theDest) const;
-        virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
+        Y60_BASE_EXPORT virtual void binarize(asl::WriteableStream & theDest) const;
+        Y60_BASE_EXPORT virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
 
     virtual ValuePtr clone(Node * theNode) const {
         this->onGetValue();

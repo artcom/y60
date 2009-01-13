@@ -11,6 +11,8 @@
 #ifndef _ac_scene_GLResourceManager_h_
 #define _ac_scene_GLResourceManager_h_
 
+#include "y60_glrender_settings.h"
+
 #include "ShaderLibrary.h"
 
 #include <asl/base/Singleton.h>

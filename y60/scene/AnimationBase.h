@@ -68,6 +68,8 @@
 #ifndef _ac_scene_AnimationBase_h_
 #define _ac_scene_AnimationBase_h_
 
+#include "y60_scene_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/dom/Nodes.h>

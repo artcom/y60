@@ -11,6 +11,8 @@
 #ifndef AC_Y60_TTFTEXTRENDERER
 #define AC_Y60_TTFTEXTRENDERER
 
+#include "y60_gltext_settings.h"
+
 #include <y60/glutil/GLUtils.h>
 #include "TextRenderer.h"
 #include "Text.h"

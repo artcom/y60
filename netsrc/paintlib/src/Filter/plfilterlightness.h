@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERLIGHTNESS)
 #define INCL_PLFILTERLIGHTNESS
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -22,7 +24,7 @@ class PLBmp;
 //! Filter that changes the lightness of a 32 bpp bitmap. lightness
 //! values must be in the range -100..100. A value of 0 leaves the 
 //! image unchanged.
-class PLFilterLightness : public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLFilterLightness : public PLFilter  
 {
 public:
   //!

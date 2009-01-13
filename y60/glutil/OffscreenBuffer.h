@@ -11,6 +11,8 @@
 #include <asl/base/Ptr.h>
 #include <asl/dom/ThreadingModel.h>
 
+#include "y60_glutil_settings.h"
+
 #include <GL/glew.h>
 
 #ifndef _ac_y60_OffscreenBuffer_h_
@@ -22,7 +24,7 @@ namespace y60 {
     class Texture;
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
 
-    class OffscreenBuffer {
+    class Y60_GLUTIL_EXPORT OffscreenBuffer {
         public:        
             /**
             * Allows Offscreen rendering into a texture.

@@ -59,6 +59,8 @@
 #ifndef AC_Y60_SIMPLE_TESSELATOR_FUNCTIONS_INCLUDED
 #define AC_Y60_SIMPLE_TESSELATOR_FUNCTIONS_INCLUDED
 
+#include "y60_modelling_settings.h"
+
 #include <y60/scene/Scene.h>
 
 #include <asl/dom/Nodes.h>

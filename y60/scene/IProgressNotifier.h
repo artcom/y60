@@ -59,6 +59,8 @@
 #ifndef _Y60_IPROGRESSNOTIFIER_INCLUDED
 #define _Y60_IPROGRESSNOTIFIER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <string>
 

@@ -59,6 +59,8 @@
 #ifndef INCL_TESTSOUND
 #define INCL_TESTSOUND
 
+#include "y60_sound_settings.h"
+
 #include <asl/base/UnitTest.h>
 
 #include "SoundManager.h"

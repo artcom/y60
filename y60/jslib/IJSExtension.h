@@ -59,6 +59,8 @@
 #ifndef _IJEXTENSION_INCLUDED
 #define _IJEXTENSION_INCLUDED
 
+#include "y60_jslib_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <y60/jsbase/PropertyValue.h>
 

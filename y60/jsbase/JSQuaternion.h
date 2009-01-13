@@ -67,6 +67,8 @@
 #ifndef _Y60_ACXPSHELL_JSQUATERNION_INCLUDED_
 #define _Y60_ACXPSHELL_JSQUATERNION_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSVector.h"
 
 #include "JSWrapper.h"
@@ -82,7 +84,7 @@ namespace jslib {
 
 typedef float QuaternionNumber;
 
-class JSQuaternion : public JSWrapper<asl::Quaternion<QuaternionNumber> > {
+class Y60_JSBASE_EXPORT JSQuaternion : public JSWrapper<asl::Quaternion<QuaternionNumber> > {
     JSQuaternion() {}
 public:
     typedef JSWrapper<asl::Quaternion<QuaternionNumber> > Base;

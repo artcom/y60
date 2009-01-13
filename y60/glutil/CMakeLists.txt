@@ -27,6 +27,7 @@ VertexBufferObject.h
 VertexMemory.h
 VertexVector.h
 glExtensions.h
+y60_glutil_settings.h
 )
 
 set(TESTS

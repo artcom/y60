@@ -59,6 +59,8 @@
 #ifndef _ac_y60_NodeNames_h_
 #define _ac_y60_NodeNames_h_
 
+#include "y60_base_settings.h"
+
 #include <string>
 
 namespace y60 {

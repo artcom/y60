@@ -11,6 +11,8 @@
 #ifndef INCL_PLPICENC
 #define INCL_PLPICENC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLBITMAP
 #include "plbitmap.h"
 #endif
@@ -31,7 +33,7 @@ class PLBmp;
 //! for all encoders. Encoders for specific file formats can be
 //! derived from this class. Objects of this class interact with a
 //! PLDataSink to encode bitmaps.
-class PLPicEncoder : public PLObject
+class NETSRC_PAINTLIB_EXPORT PLPicEncoder : public PLObject
 {
 
 public:

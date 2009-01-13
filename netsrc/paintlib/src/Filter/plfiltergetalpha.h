@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERGETALPHA)
 #define INCL_PLFILTERGETALPHA
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -21,7 +23,7 @@ class PLBmp;
 
 //! Returns an 8 bpp grayscale bitmap containing only the alpha channel
 //! of the source bitmap.
-class PLFilterGetAlpha : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterGetAlpha : public PLFilter
 {
 public:
   PLFilterGetAlpha();

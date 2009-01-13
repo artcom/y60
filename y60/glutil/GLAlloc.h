@@ -22,6 +22,8 @@
 #ifndef _asl_included_asl_GLAlloc_h_
 #define _asl_included_asl_GLAlloc_h_
 
+#include "y60_glutil_settings.h"
+
 #include <limits>
 #include <iostream>
 #include <map>
@@ -47,7 +49,7 @@ namespace asl {
         void flushGLAGPMemory();
         bool  _myAGPMemoryIsFlushed;
     };
-    class GLMemory : public FixedCapacityBlock {
+    class Y60_GLUTIL_EXPORT GLMemory : public FixedCapacityBlock {
     public:
         enum MemoryType {MainMemoryType=0, AGPMemoryType=1, GPUMemoryType=2};
         GLMemory(MemoryType theMemoryType)
@@ -154,7 +156,7 @@ namespace asl {
         }
     };
 
-    extern GLMemoryPtr VertexMemory(GLMemory::MemoryType theMemoryType = GLMemory::AGPMemoryType,
+    extern Y60_GLUTIL_EXPORT GLMemoryPtr VertexMemory(GLMemory::MemoryType theMemoryType = GLMemory::AGPMemoryType,
                                     asl::AC_SIZE_TYPE theCapacity=0);
 
     template <typename T>

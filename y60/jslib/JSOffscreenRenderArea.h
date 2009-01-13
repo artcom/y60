@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSOffscreenRenderArea_h_
 #define _ac_jslib_JSOffscreenRenderArea_h_
 
+#include "y60_jslib_settings.h"
+
 #include "OffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
 

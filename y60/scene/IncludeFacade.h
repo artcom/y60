@@ -67,13 +67,15 @@
 #ifndef _ac_scene_IncludeFacade_h_
 #define _ac_scene_IncludeFacade_h_
 
+#include "y60_scene_settings.h"
+
 #include <asl/base/Ptr.h>
 #include "TransformHierarchyFacade.h"
 #include <y60/base/NodeValueNames.h>
 
 namespace y60 {
     //                  theTagName     theType      theAttributeName         theDefault
-    DEFINE_ATTRIBUT_TAG(IncludeSrcTag, std::string, INCLUDE_SRC_ATTRIB, "");
+    DEFINE_ATTRIBUT_TAG(IncludeSrcTag, std::string, INCLUDE_SRC_ATTRIB, "", Y60_SCENE_EXPORT);
 
 /**
  * @ingroup y60scene

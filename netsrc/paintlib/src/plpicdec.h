@@ -11,6 +11,8 @@
 #ifndef INCL_PLPICDEC
 #define INCL_PLPICDEC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLBITMAP
 #include "plbitmap.h"
 #endif
@@ -27,7 +29,7 @@
 //! for all decoders. Decoders for specific file formats can be
 //! derived from this class. Objects of this class interact with a
 //! PLDataSource to decode bitmaps.
-class PLPicDecoder : public PLBmpInfo
+class NETSRC_PAINTLIB_EXPORT PLPicDecoder : public PLBmpInfo
 {
 
 public:

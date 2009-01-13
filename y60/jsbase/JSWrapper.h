@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSWRAPPER_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSWRAPPER_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "Documentation.h"
 #include "JScppUtils.h"
 #include "ArgumentHolder.h"

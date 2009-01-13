@@ -11,6 +11,8 @@
 #if !defined(AFX_VIDEOINVERTFILTER_H__5AB120C1_CEB0_11D3_AD70_444553540000__INCLUDED_)
 #define AFX_VIDEOINVERTFILTER_H__5AB120C1_CEB0_11D3_AD70_444553540000__INCLUDED_
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -18,7 +20,7 @@
 #include "plfilter.h"
 
 //!
-class PLFilterVideoInvert : public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLFilterVideoInvert : public PLFilter  
 {
 public:
 	//!

@@ -68,6 +68,8 @@
 #ifndef _ac_scene_Primitive_h_
 #define _ac_scene_Primitive_h_
 
+#include "y60_scene_settings.h"
+
 #include "VertexData.h"
 #include "MaterialBase.h"
 #include "ResourceManager.h"
@@ -147,9 +149,9 @@ namespace y60 {
     typedef asl::Ptr<BoundingBoxTree> BoundingBoxTreePtr;
 
     //                  theTagName      theType       theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE()); 
-    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string()); 
-    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES); 
+    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_EXPORT); 
+    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_EXPORT); 
+    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_EXPORT); 
 
     class Shape;
      /**
@@ -157,7 +159,7 @@ namespace y60 {
      * A list of elements described by their vertexdata. An element is
      * for example a triangle, quad or tringle strip, line, ...
      */
-    class Primitive : 
+    class Y60_SCENE_EXPORT Primitive : 
         public dom::Facade,
         public MaterialIdTag::Plug,
         public PrimitiveTypeTag::Plug,

@@ -59,6 +59,8 @@
 #ifndef _ac_scene_MemoryResourceManager_h_
 #define _ac_scene_MemoryResourceManager_h_
 
+#include "y60_scene_settings.h"
+
 #include "ResourceManager.h"
 #include "VertexData.h"
 #include "VertexMemoryBase.h"

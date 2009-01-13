@@ -68,6 +68,8 @@
 #ifndef AC_Y60_SDLFONTINFO
 #define AC_Y60_SDLFONTINFO
 
+#include "y60_sdlengine_settins.h"
+
 #include <y60/gltext/TTFFontInfo.h>
 
 #include <sdl/ttf2/SDL_ttf.h>

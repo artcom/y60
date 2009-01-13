@@ -59,6 +59,8 @@
 #ifndef _ac_y60_DataTypes_h_
 #define _ac_y60_DataTypes_h_
 
+#include "y60_base_settings.h"
+
 #include "typedefs.h"
 #include "iostream_functions.h"
 #include "RankedFeature.h"
@@ -80,10 +82,10 @@
 
 namespace y60 {
 
-	void registerSomImageTypes(dom::ValueFactory & theFactory);
-	void registerSomMathTypes(dom::ValueFactory & theFactory);
-	void registerSomVectorTypes(dom::ValueFactory & theFactory);
-    void registerSomTypes(dom::ValueFactory & theFactory);
+	Y60_BASE_EXPORT void registerSomImageTypes(dom::ValueFactory & theFactory);
+	Y60_BASE_EXPORT void registerSomMathTypes(dom::ValueFactory & theFactory);
+	Y60_BASE_EXPORT void registerSomVectorTypes(dom::ValueFactory & theFactory);
+    Y60_BASE_EXPORT void registerSomTypes(dom::ValueFactory & theFactory);
 
 }
 

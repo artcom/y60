@@ -69,13 +69,13 @@ namespace xpath {
 
     typedef std::vector<dom::NodePtr>           NodeList;
 
-    void find(const Path&, const dom::NodePtr, dom::NodePtr&);
+    ASL_XPATH_EXPORT void find(const Path&, const dom::NodePtr, dom::NodePtr&);
 
-    dom::NodePtr find(const Path&, const dom::NodePtr);
+    ASL_XPATH_EXPORT dom::NodePtr find(const Path&, const dom::NodePtr);
 
     ASL_XPATH_EXPORT void findAll(const Path&, const dom::NodePtr, NodeList&);
 
-    NodeList findAll(const Path&, const dom::NodePtr);
+    ASL_XPATH_EXPORT NodeList findAll(const Path&, const dom::NodePtr);
 
     inline 
     dom::NodePtr 

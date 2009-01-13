@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERFLIPRGB)
 #define INCL_PLFILTERFLIPRGB
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -20,7 +22,7 @@
 class PLBmp;
 
 //! Filter that flips the R and B components of a bitmap.
-class PLFilterFlipRGB : public PLInPlaceFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterFlipRGB : public PLInPlaceFilter
 {
 public:
   PLFilterFlipRGB();

@@ -67,6 +67,8 @@
 #ifndef _ISCENEDECODER_INCLUDED
 #define _ISCENEDECODER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "IProgressNotifier.h"
 
 #include <y60/base/IDecoder.h>

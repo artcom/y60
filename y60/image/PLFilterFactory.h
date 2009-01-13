@@ -101,6 +101,8 @@ fillrect        PLPoint min, PLPoint max, const PixelC& Color
 #ifndef _PAINTLIB_FILTER_FACTORY_INCLUDED_
 #define _PAINTLIB_FILTER_FACTORY_INCLUDED_
 
+#include "y60_image_settings.h"
+
 #include <map>
 #include <vector>
 

@@ -67,6 +67,8 @@
 #ifndef _Y60_JSSETTINGS_INCLUDED_
 #define _Y60_JSSETTINGS_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #undef JS_THREADSAFE
 
 #ifdef WIN32    

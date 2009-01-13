@@ -59,6 +59,8 @@
 #ifndef AC_Y60_HEIGHT_TO_NORMAL_MAP_INCLUDED
 #define AC_Y60_HEIGHT_TO_NORMAL_MAP_INCLUDED
 
+#include "y60_image_settings.h"
+
 #if defined(_MSC_VER)
 #   pragma warning (push,1)
 #endif //defined(_MSC_VER)
@@ -70,7 +72,7 @@
 
 class PLBmp;
 
-class HeightToNormalMap : public PLFilter {
+class Y60_IMAGE_EXPORT HeightToNormalMap : public PLFilter {
     public:
         HeightToNormalMap();
         virtual ~HeightToNormalMap();

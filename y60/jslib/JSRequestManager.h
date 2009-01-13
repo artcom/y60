@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/inet/RequestManager.h>
 #include <asl/base/Ptr.h>

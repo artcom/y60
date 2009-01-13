@@ -74,8 +74,8 @@ ASL_BASE_EXPORT void removeDirectory(const std::string & theDirectory);
 /** creates a new directory and all necessary parent directories */
 ASL_BASE_EXPORT void createPath(const std::string & theDirectory);
 
-std::string getTempDirectory();
-std::string getAppDataDirectory(const std::string & theAppName);
+ASL_BASE_EXPORT std::string getTempDirectory();
+ASL_BASE_EXPORT std::string getAppDataDirectory(const std::string & theAppName);
 ASL_BASE_EXPORT std::string getAppDirectory();
 
 /// returns true if theDirectory is a readable directory, false otherwise
@@ -84,7 +84,7 @@ ASL_BASE_EXPORT bool isDirectory(const std::string & theDirectory);
 ASL_BASE_EXPORT std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
 
 /// returns the current working directory
-std::string getCWD();
+ASL_BASE_EXPORT std::string getCWD();
 
 /// returns filename without directory     
 ASL_BASE_EXPORT std::string getFilenamePart(const std::string & theFileName);
@@ -108,7 +108,7 @@ ASL_BASE_EXPORT std::string removeExtension(const std::string & theFileName);
 // where login = [username:password@]hostport
 // and hostport = host[:port]
 
-void
+ASL_BASE_EXPORT void
 parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath);
 
 /// returns the Host:Port part of an URI

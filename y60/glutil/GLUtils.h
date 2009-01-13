@@ -11,6 +11,8 @@
 #ifndef _ac_render_GLUtils_h_
 #define _ac_render_GLUtils_h_
 
+#include "y60_glutil_settings.h"
+
 #include <GL/glew.h>
 #ifdef WIN32
 #   include <GL/wglew.h>
@@ -65,7 +67,7 @@ struct GLExceptionHelper {
 }
 
 namespace y60 {
-    class GLScopeTimer {
+    class Y60_GLUTIL_EXPORT GLScopeTimer {
 	public:
 		GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
            if (_flushGL_before_stop) {
@@ -98,19 +100,19 @@ namespace y60 {
     #define CHECK_OGL_ERROR
     #endif
 
-    GLenum asGLBlendFunction(BlendFunction theFunction);
-    GLenum asGLTextureRegister(unsigned theIndex);
-    GLenum asGLTextureRegister(y60::GLRegister theRegister);
-    GLenum asGLLightEnum(unsigned theLightNum);
-    GLenum asGLClippingPlaneId(unsigned thePlaneNum);
-    GLenum asGLTextureTarget(TextureType theTextureType);
-    GLenum asGLTextureApplyMode(TextureApplyMode theApplyMode);
-    GLenum asGLTextureWrapMode(TextureWrapMode theWrapMode);
-    GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
-    GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
-    GLenum asGLTexCoordMode(TexCoordMode theMode);
-    GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
-    GLenum asGLCubemapFace(unsigned theFace);
+    Y60_GLUTIL_EXPORT GLenum asGLBlendFunction(BlendFunction theFunction);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureRegister(unsigned theIndex);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureRegister(y60::GLRegister theRegister);
+    Y60_GLUTIL_EXPORT GLenum asGLLightEnum(unsigned theLightNum);
+    Y60_GLUTIL_EXPORT GLenum asGLClippingPlaneId(unsigned thePlaneNum);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureTarget(TextureType theTextureType);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureApplyMode(TextureApplyMode theApplyMode);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureWrapMode(TextureWrapMode theWrapMode);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
+    Y60_GLUTIL_EXPORT GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
+    Y60_GLUTIL_EXPORT GLenum asGLTexCoordMode(TexCoordMode theMode);
+    Y60_GLUTIL_EXPORT GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
+    Y60_GLUTIL_EXPORT GLenum asGLCubemapFace(unsigned theFace);
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
 
@@ -132,17 +134,17 @@ namespace y60 {
      */
 
     /// Query for supported capability.
-    bool hasCap(unsigned int theCap);
+    Y60_GLUTIL_EXPORT bool hasCap(unsigned int theCap);
     /// Query for supported OpenGL *extension*.
-    bool hasCap(const std::string & theCapsStr);
+    Y60_GLUTIL_EXPORT bool hasCap(const std::string & theCapsStr);
 
-    std::string getGLVersionString();
-    std::string getGLVendorString();
-    std::string getGLRendererString();
+    Y60_GLUTIL_EXPORT std::string getGLVersionString();
+    Y60_GLUTIL_EXPORT std::string getGLVendorString();
+    Y60_GLUTIL_EXPORT std::string getGLRendererString();
 #ifndef _AC_NO_CG_
-    std::string getLatestCgProfileString();
+    Y60_GLUTIL_EXPORT std::string getLatestCgProfileString();
 #endif
-    unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
+    Y60_GLUTIL_EXPORT unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
 }
 
 #endif // _ac_render_GLUtils_h_

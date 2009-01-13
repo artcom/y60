@@ -9,6 +9,7 @@ set(HEADERS
 Request.h
 RequestManager.h
 TestServer.h
+y60_inet_settings.h
 )
 
 set(TESTS

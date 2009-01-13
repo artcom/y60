@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_GENERIC_EVENT_INCLUDED_
 #define _Y60_INPUT_GENERIC_EVENT_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 
 #include <asl/dom/Nodes.h>

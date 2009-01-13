@@ -68,13 +68,15 @@
 #ifndef _ac_scene_PropertyListFacade_h_
 #define _ac_scene_PropertyListFacade_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/PropertyNames.h>
 #include <asl/dom/Facade.h>
 #include <string>
 #include <vector>
 
 namespace y60 {
-	class PropertyListFacade : public dom::Facade {
+	class Y60_SCENE_EXPORT PropertyListFacade : public dom::Facade {
 		public:
 			PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
 			void ensureProperties() const {

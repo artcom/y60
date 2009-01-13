@@ -59,6 +59,8 @@
 #ifndef _IAudioDecoderFactory_H_
 #define _IAudioDecoderFactory_H_
 
+#include "y60_sound_settings.h"
+
 #include "IAudioDecoder.h"
 
 #include <asl/audio/ISampleSink.h>

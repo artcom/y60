@@ -68,6 +68,8 @@
 #ifndef _ac_scene_VertexMemoryBase_h
 #define _ac_scene_VertexMemoryBase_h
 
+#include "y60_scene_settings.h"
+
 #include "VertexDataImpl.h"
 #include <asl/base/Exception.h>
 

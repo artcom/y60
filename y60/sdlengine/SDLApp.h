@@ -67,9 +67,11 @@
 #ifndef __Y60_SDLAPP_INCLUDED__
 #define __Y60_SDLAPP_INCLUDED__
 
+#include "y60_sdlengine_settins.h"
+
 #include <y60/jslib/JSApp.h>
 
-class SDLApp : public jslib::JSApp {
+class Y60_SDLENGINE_EXPORT SDLApp : public jslib::JSApp {
     public:
         SDLApp();
     protected:

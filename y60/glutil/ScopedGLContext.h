@@ -12,6 +12,8 @@
 #ifndef _y60_gl_scopedglcontext_included_
 #define _y60_gl_scopedglcontext_included_
 
+#include "y60_glutil_settings.h"
+
 #include "IGLContextManager.h"
 
 namespace y60 {

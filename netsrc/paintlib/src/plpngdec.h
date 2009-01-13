@@ -11,6 +11,8 @@
 #ifndef INCL_PLPNGDEC
 #define INCL_PLPNGDEC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICDEC
 #include "plpicdec.h"
 #endif
@@ -28,7 +30,7 @@
 //! 8 bits per channel. Images with 16-bit palettes or grayscale 
 //! images with an alpha channel are returned as full 32-bit RGBA 
 //! bitmaps.
-class PLPNGDecoder : public PLPicDecoder
+class NETSRC_PAINTLIB_EXPORT PLPNGDecoder : public PLPicDecoder
 {
 
 

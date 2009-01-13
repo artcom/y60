@@ -11,6 +11,8 @@
 #ifndef FILTERROTATE_H
 #define FILTERROTATE_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -18,7 +20,7 @@
 #include "plfilter.h"
 
 //! Rotates a bitmap 90, 180 or 270 degress
-class PLFilterRotate : public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLFilterRotate : public PLFilter  
 {
 public:
   enum AngleType {ninety, oneeighty, twoseventy};

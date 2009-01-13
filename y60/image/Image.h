@@ -59,6 +59,8 @@
 #ifndef _ac_y60_Image_h_
 #define _ac_y60_Image_h_
 
+#include "y60_image_settings.h"
+
 #include "PixelEncoding.h"
 #include "ImageTags.h"
 #include <y60/base/CommonTags.h>
@@ -91,7 +93,7 @@ namespace y60 {
      * @ingroup y60image
      * Facade for an image node in the dom.
      */
-    class Image :
+    class Y60_IMAGE_EXPORT Image :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

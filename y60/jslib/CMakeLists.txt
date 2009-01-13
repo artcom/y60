@@ -62,6 +62,7 @@ JSintersection_functions.h
 OffscreenRenderArea.h
 Timeout.h
 jscpp.h
+y60_jslib_settings.h
 )
 
 ac_add_library(

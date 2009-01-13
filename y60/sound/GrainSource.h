@@ -59,6 +59,8 @@
 #ifndef INCL_GRAINSOURCE
 #define INCL_GRAINSOURCE
 
+#include "y60_sound_settings.h"
+
 #include <asl/audio/ISampleSink.h>
 #include <asl/audio/SampleSource.h>
 #include <asl/audio/AudioBuffer.h>

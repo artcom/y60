@@ -20,6 +20,8 @@
 #ifndef _ac_render_textUtils_h_
 #define _ac_render_textUtils_h_
 
+#include "y60_gltext_settings.h"
+
 #include "BitFont.h"
 #include "Screen15.h"
 

@@ -25,6 +25,8 @@
 #ifndef AC_GL_RENDERER_SHADERLIBRARY_XSD_INCLUDED
 #define AC_GL_RENDERER_SHADERLIBRARY_XSD_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include <string>
 extern std::string ourShaderLibraryxsd;
 

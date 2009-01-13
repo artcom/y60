@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSBITSET_INCLUDED_
 #define _Y60_ACXPSHELL_JSBITSET_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JScppUtils.h"
 #include "JSWrapper.h"
 

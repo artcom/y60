@@ -59,6 +59,8 @@
 #ifndef _IRESOURCEMANAGER_INCLUDED
 #define _IRESOURCEMANAGER_INCLUDED
 
+#include "y60_base_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/dom/ThreadingModel.h>
 

@@ -68,6 +68,8 @@
 #ifndef _ac_y60_M60Decoder_h_
 #define _ac_y60_M60Decoder_h_
 
+#include "y60_video_settings.h"
+
 #include "MovieDecoderBase.h"
 #include "MovieEncoding.h"
 #include <asl/base/MappedBlock.h>

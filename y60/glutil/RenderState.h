@@ -11,6 +11,8 @@
 #ifndef _ac_y60_RendererState_h_
 #define _ac_y60_RendererState_h_
 
+#include "y60_glutil_settings.h"
+
 #include <asl/math/Plane.h>
 #include <asl/base/Ptr.h>
 #include <asl/math/Box.h>
@@ -45,7 +47,7 @@ namespace y60 {
 
     class Viewport;
 
-    class RenderState {
+    class Y60_GLUTIL_EXPORT RenderState {
         public:
             RenderState();
             void init();

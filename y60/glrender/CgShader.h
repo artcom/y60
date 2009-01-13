@@ -11,6 +11,8 @@
 #ifndef AC_Y60_RENDERER_CGSHADER_INCLUDED
 #define AC_Y60_RENDERER_CGSHADER_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include "GLShader.h"
 #include "CgProgramInfo.h"
 #include "ShaderLibrary.h"
@@ -18,7 +20,7 @@
 #include <string>
 
 namespace y60 {
-    class CgShader : public GLShader {
+    class Y60_GLRENDER_EXPORT CgShader : public GLShader {
         public:
             CgShader(const dom::NodePtr theNode,
                      const std::string & theVertexProfileName,

@@ -67,6 +67,8 @@
 #ifndef _Y60_ACXPSHELL_NAMEDNODEMAP_H_INCLUDED_
 #define _Y60_ACXPSHELL_NAMEDNODEMAP_H_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSNode.h"
 #include "JScppUtils.h"
 #include "JSNodeList.h"
@@ -74,7 +76,7 @@
 
 namespace jslib {
 
-class JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> {
+class Y60_JSBASE_EXPORT JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> {
 public:
     typedef JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> Base;
 

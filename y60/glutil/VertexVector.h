@@ -11,6 +11,8 @@
 #ifndef _asl_included_y60_VertexVector_h_
 #define _asl_included_y60_VertexVector_h_
 
+#include "y60_glutil_settings.h"
+
 #include "GLUtils.h"
 
 #include <limits>

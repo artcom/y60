@@ -59,6 +59,8 @@
 #ifndef _ac_y60_TextureManager_h_
 #define _ac_y60_TextureManager_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/IResourceManager.h>
 #include <y60/image/ITextureManager.h>
 #include <asl/base/Exception.h>
@@ -84,7 +86,7 @@ namespace y60 {
      * @ingroup y60scene
      * Performs texture loading and management
      */
-    class TextureManager : public ITextureManager {
+    class Y60_SCENE_EXPORT TextureManager : public ITextureManager {
         public:
             static asl::Ptr<TextureManager> create();
 

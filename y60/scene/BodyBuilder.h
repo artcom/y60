@@ -59,10 +59,12 @@
 #ifndef AC_SOM_BODY_BUILDER_INCLUDED
 #define AC_SOM_BODY_BUILDER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "TransformBuilderBase.h"
 
 namespace y60 {
-    class BodyBuilder : public TransformBuilderBase {
+    class Y60_SCENE_EXPORT BodyBuilder : public TransformBuilderBase {
         public:
             BodyBuilder(const dom::NodePtr & theNode) :
                 TransformBuilderBase(theNode)

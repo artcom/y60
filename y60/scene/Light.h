@@ -68,6 +68,8 @@
 #ifndef _ac_scene_Light_h_
 #define _ac_scene_Light_h_
 
+#include "y60_scene_settings.h"
+
 #include "TransformHierarchyFacade.h"
 #include "LightSource.h"
 
@@ -75,9 +77,9 @@
 
 namespace y60 {
     //                  theTagName      theType      theAttributeName          theDefault
-    DEFINE_ATTRIBUT_TAG(LightSourceTag, std::string, LIGHT_SOURCE_ATTRIB, "");
+    DEFINE_ATTRIBUT_TAG(LightSourceTag, std::string, LIGHT_SOURCE_ATTRIB, "", Y60_SCENE_EXPORT);
 
-    class Light : 
+    class Y60_SCENE_EXPORT Light : 
         public TransformHierarchyFacade,
         public LightSourceTag::Plug
     {

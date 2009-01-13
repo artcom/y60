@@ -59,6 +59,8 @@
 #ifndef _ac_TextureBuilder_h_
 #define _ac_TextureBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include "Texture.h"
 

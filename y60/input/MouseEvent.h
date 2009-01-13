@@ -59,6 +59,8 @@
 #ifndef _Y60_INPUT_MOUSEEVENT_INCLUDED_
 #define _Y60_INPUT_MOUSEEVENT_INCLUDED_
 
+#include "y60_input_settings.h"
+
 #include "Event.h"
 
 #include <asl/math/Vector234.h>

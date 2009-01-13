@@ -59,6 +59,8 @@
 #ifndef Y60_COMBINER_INCLUDED
 #define Y60_COMBINER_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include <string>
 
 #include <asl/base/Exception.h>

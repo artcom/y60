@@ -59,6 +59,8 @@
 #ifndef _ac_MovieBuilder_h_
 #define _ac_MovieBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "ImageBuilder.h"
 #include <asl/base/Ptr.h>
 

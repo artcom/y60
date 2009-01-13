@@ -67,6 +67,8 @@
 #ifndef _y60_decoder_manager_included_
 #define _y60_decoder_manager_included_
 
+#include "y60_base_settings.h"
+
 #include "IDecoder.h"
 
 #include <asl/base/Logger.h>
@@ -91,7 +93,7 @@ namespace y60 {
       */
     DEFINE_EXCEPTION(DecoderManagerException, asl::Exception);
 
-class DecoderManager : public asl::Singleton<DecoderManager> {
+class Y60_BASE_EXPORT DecoderManager : public asl::Singleton<DecoderManager> {
     public:
         DecoderManager() {};
         virtual ~DecoderManager() {};

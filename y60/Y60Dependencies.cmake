@@ -24,17 +24,24 @@ endif(NOT ACSDLTTF_INTEGRATED_BUILD)
 find_package(SDL)
 find_package(GLEW)
 find_package(Cg)
+find_package(OpenEXR)
 
-pkg_search_module(GLIB REQUIRED glib-2.0)
+find_package(GLIB2)
+#pkg_search_module(GLIB REQUIRED glib-2.0)
+
 pkg_search_module(GTKMM OPTIONAL gtkmm-2.4)
 pkg_search_module(GLADEMM OPTIONAL libglademm-2.4)
 pkg_search_module(GTKGLEXT OPTIONAL gtkglext-1.0)
 
-pkg_search_module(CAIRO REQUIRED cairo-xlib)
+if(WIN32)
+    pkg_search_module(CAIRO REQUIRED cairo-win32)
+else(WIN32)
+    pkg_search_module(CAIRO REQUIRED cairo-xlib)
+endif(WIN32)
 
 # ffmpeg
-pkg_search_module(AVCODEC  REQUIRED libavcodec)
-pkg_search_module(AVFORMAT REQUIRED libavformat)
+find_package(Ffmpeg)
+
 
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)

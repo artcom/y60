@@ -73,6 +73,8 @@
 #ifndef _ac_y60_AcBool_h_
 #define _ac_y60_AcBool_h_
 
+#include "y60_base_settings.h"
+
 namespace y60 {
 
     struct AcBool {

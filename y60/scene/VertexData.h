@@ -68,6 +68,8 @@
 #ifndef _ac_scene_VertexData_h_
 #define _ac_scene_VertexData_h_
 
+#include "y60_scene_settings.h"
+
 #include <y60/base/TypeTraits.h>
 #include <y60/base/DataTypes.h>
 
@@ -144,7 +146,7 @@ namespace y60 {
                                                                     forWriting, forReading) {}
     };
 
-    class VertexDataBase  {
+    class Y60_SCENE_EXPORT VertexDataBase  {
         public:
             typedef std::size_t size_type;
             VertexDataBase(const TypeId & theType) : _myType(theType)  {};

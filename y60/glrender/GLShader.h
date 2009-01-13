@@ -1,6 +1,8 @@
 #ifndef AC_Y60_RENDERER_GLSHADER_INCLUDED
 #define AC_Y60_RENDERER_GLSHADER_INCLUDED
 
+#include "y60_glrender_settings.h"
+
 #include "ShaderDescription.h"
 #include "ShaderFeatureSet.h"
 #include "ShaderTypes.h"
@@ -20,7 +22,7 @@ namespace y60 {
 
     class ShaderLibrary;
 
-    class GLShader : public y60::IShader {
+    class Y60_GLRENDER_EXPORT GLShader : public y60::IShader {
         public:
             enum ShaderMatch {
                 FULL_MATCH, WILDCARD_MATCH, NO_MATCH

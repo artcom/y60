@@ -1,6 +1,7 @@
 #ifndef _ac_renderer_Shader_types_h_
 #define _ac_renderer_Shader_types_h_
 
+#include "y60_glrender_settings.h"
 
 #include <y60/base/NodeValueNames.h>
 #include <asl/base/Exception.h>

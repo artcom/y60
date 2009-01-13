@@ -59,6 +59,8 @@
 #ifndef Y60_TEXTURE_INCLUDED
 #define Y60_TEXTURE_INCLUDED
 
+#include "y60_scene_settings.h"
+
 #include "TextureTags.h"
 #include <y60/base/CommonTags.h>
 #include <y60/base/NodeValueNames.h>
@@ -80,7 +82,7 @@ namespace y60 {
      * @ingroup y60texture
      * Facade for a texture node in the dom.
      */
-    class Texture :
+    class Y60_SCENE_EXPORT Texture :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

@@ -59,6 +59,8 @@
 #ifndef _SoundCacheItem_H_
 #define _SoundCacheItem_H_
 
+#include "y60_sound_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/base/Time.h>
 #include <asl/audio/AudioBufferBase.h>

@@ -59,6 +59,8 @@
 #ifndef _PROPERTY_VALUE_INCLUDED
 #define _PROPERTY_VALUE_INCLUDED
 
+#include "y60_jsbase_settings.h"
+
 #include "JScppUtils.h"
 #include <js/spidermonkey/jsapi.h>
 

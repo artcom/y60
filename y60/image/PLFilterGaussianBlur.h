@@ -71,6 +71,8 @@
 #ifndef _ac_y60_PLFilterGaussianBlur_h_
 #define _ac_y60_PLFilterGaussianBlur_h_
 
+#include "y60_image_settings.h"
+
 #include <vector>
 #include <asl/base/Logger.h>
 

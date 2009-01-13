@@ -71,11 +71,13 @@
 #ifndef _ac_LightBuilder_h_
 #define _ac_LightBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "TransformBuilderBase.h"
 
 namespace y60 {
 
-    class LightBuilder : public TransformBuilderBase {
+    class Y60_SCENE_EXPORT LightBuilder : public TransformBuilderBase {
         public:
             LightBuilder(const std::string & theLightSourceId, const std::string & theName);
             virtual ~LightBuilder();

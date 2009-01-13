@@ -11,6 +11,8 @@
 #ifndef FILTERResizeHAMMING_H
 #define FILTERResizeHAMMING_H
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -18,7 +20,7 @@
 #include "plfilterresize.h"
 
 //! Resizes a 32 bpp bitmap using a hamming filter to determine result pixels.
-class PLFilterResizeHamming : public PLFilterResize
+class NETSRC_PAINTLIB_EXPORT PLFilterResizeHamming : public PLFilterResize
 {
 public:
   //! 

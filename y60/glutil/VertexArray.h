@@ -20,6 +20,8 @@
 #ifndef _ac_gl_vertex_array_h
 #define _ac_gl_vertex_array_h
 
+#include "y60_glutil_settings.h"
+
 #include <y60/scene/VertexDataImpl.h>
 #include "GLAlloc.h"
 

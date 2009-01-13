@@ -67,6 +67,8 @@
 #ifndef __Y60_JSAPP_INCLUDED__
 #define __Y60_JSAPP_INCLUDED__
 
+#include "y60_jslib_settings.h"
+
 #include <y60/jsbase/jssettings.h>
 #include <js/spidermonkey/jsapi.h>
 
@@ -85,7 +87,7 @@ namespace jslib {
 
     extern JSContext * ourJSContext;
 
-    class JSApp {
+    class Y60_JSLIB_EXPORT JSApp {
         public:
             JSApp();
             static asl::PackageManagerPtr getPackageManager();

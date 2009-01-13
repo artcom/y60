@@ -11,6 +11,8 @@
 #ifndef INCL_PLJPEGENC
 #define INCL_PLJPEGENC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"
 #endif
@@ -22,7 +24,7 @@ struct jpeg_error_mgr;
 
 //! JPEG file encoder. Uses the independent JPEG group's library
 //! to do the actual conversion.
-class PLJPEGEncoder : public PLPicEncoder
+class NETSRC_PAINTLIB_EXPORT PLJPEGEncoder : public PLPicEncoder
 {
 
 public:

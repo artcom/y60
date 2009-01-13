@@ -73,6 +73,8 @@
 #ifndef _ac_y60_VertexDataRoles_h_
 #define _ac_y60_VertexDataRoles_h_
 
+#include "y60_base_settings.h"
+
 #include "NodeNames.h"
 
 namespace y60 {

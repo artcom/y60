@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_JSSPHERE_INCLUDED_
 #define _Y60_ACXPSHELL_JSSPHERE_INCLUDED_
 
+#include "y60_jsbase_settings.h"
+
 #include "JSWrapper.h"
 #include <y60/base/DataTypes.h>
 #include <asl/math/Vector234.h>
@@ -72,7 +74,7 @@ namespace jslib {
 
 typedef float SphereNumber;
 
-class JSSphere : public JSWrapper<asl::Sphere<SphereNumber> > {
+class Y60_JSBASE_EXPORT JSSphere : public JSWrapper<asl::Sphere<SphereNumber> > {
     JSSphere() {}
 public:
     typedef JSWrapper<asl::Sphere<SphereNumber> > Base;

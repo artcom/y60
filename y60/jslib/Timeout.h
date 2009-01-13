@@ -59,6 +59,8 @@
 #ifndef __included_Timeout_h__
 #define __included_Timeout_h__
 
+#include "y60_jslib_settings.h"
+
 #include <asl/base/Time.h>
 #include <asl/base/Ptr.h>
 

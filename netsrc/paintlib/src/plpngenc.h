@@ -11,12 +11,14 @@
 #ifndef INCL_PLPNGENC
 #define INCL_PLPNGENC
 
+#include "netsrc_paintlib_settings.h"
+
 #ifndef INCL_PLPICENC
 #include "plpicenc.h"
 #endif
 
 //! PNG file encoder. Uses LIBPNG to do the actual conversion.
-class PLPNGEncoder : public PLPicEncoder
+class NETSRC_PAINTLIB_EXPORT PLPNGEncoder : public PLPicEncoder
 {
 
 public:

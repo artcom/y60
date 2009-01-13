@@ -11,6 +11,8 @@
 #if !defined(INCL_PLFILTERINTENSITY)
 #define INCL_PLFILTERINTENSITY
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -25,7 +27,7 @@ class PLBmp;
 //! with csupp = intensity/pow(255.0, m_exponent);
 //! on the v-Value of the image after a HSV transform.
 //! The bitmap stays unchanged for intensity = 20, offset = 128, exponent = 1.
-class PLFilterIntensity : public PLFilter
+class NETSRC_PAINTLIB_EXPORT PLFilterIntensity : public PLFilter
 {
 public:
   PLFilterIntensity (double intensity, PLBYTE offset, double exponent);

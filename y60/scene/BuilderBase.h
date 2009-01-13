@@ -59,6 +59,8 @@
 #ifndef _ac_BuilderBase_h_
 #define _ac_BuilderBase_h_
 
+#include "y60_scene_settings.h"
+
 #include <asl/dom/typedefs.h>
 #include <asl/base/Exception.h>
 
@@ -66,7 +68,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(SomException, asl::Exception);
 
-    class BuilderBase {
+    class Y60_SCENE_EXPORT BuilderBase {
         public:
             BuilderBase();
             BuilderBase(const std::string & theNodeName);

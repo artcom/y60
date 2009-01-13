@@ -59,6 +59,8 @@
 #ifndef _Y60_ACXPSHELL_SDLWINDOW_INCLUDED_
 #define _Y60_ACXPSHELL_SDLWINDOW_INCLUDED_
 
+#include "y60_sdlengine_settins.h"
+
 #include "SDLEventSource.h"
 #include "SDLApp.h"
 

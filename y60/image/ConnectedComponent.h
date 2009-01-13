@@ -59,6 +59,8 @@
 #ifndef Y60_CONNECTED_COMPONENTS_INCLUDED
 #define Y60_CONNECTED_COMPONENTS_INCLUDED
 
+#include "y60_image_settings.h"
+
 #include <asl/math/Vector234.h>
 #include <asl/math/Box.h>
 #include <asl/base/Ptr.h>

@@ -59,6 +59,8 @@
 #ifndef _ac_y60_ImageLoader_h_
 #define _ac_y60_ImageLoader_h_
 
+#include "y60_image_settings.h"
+
 #include "PixelEncoding.h"
 #include "ITextureManager.h"
 #include <y60/base/NodeValueNames.h>
@@ -104,7 +106,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(ImageLoaderException, asl::Exception);
 
-    class ImageLoader : public PLBmp {
+    class Y60_IMAGE_EXPORT ImageLoader : public PLBmp {
     public:
         //! Creates an empty bitmap.
         ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0));

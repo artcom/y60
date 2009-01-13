@@ -12,6 +12,8 @@
 #ifndef INCL_PLFILTERMIRROR
 #define INCL_PLFILTERMIRROR
 
+#include "netsrc_paintlib_settings.h"
+
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -19,7 +21,7 @@
 #include "plfilter.h"
 
 //! Creates a mirror image of a bitmap.
-class PLFilterMirror: public PLFilter  
+class NETSRC_PAINTLIB_EXPORT PLFilterMirror: public PLFilter  
 {
 public:
   //! 

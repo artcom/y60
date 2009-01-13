@@ -59,6 +59,8 @@
 #ifndef _ac_ImageBuilder_h_
 #define _ac_ImageBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/image/Image.h>
 #include <asl/base/Ptr.h>

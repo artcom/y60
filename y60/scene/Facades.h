@@ -59,6 +59,8 @@
 #ifndef _scene_Facades_h_
 #define _scene_Facades_h_
 
+#include "y60_scene_settings.h"
+
 #include "TransformHierarchyFacade.h"
 #include "LodFacade.h"
 #include "Camera.h"
@@ -88,12 +90,12 @@
 namespace y60 {
 
     //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "");
-    DEFINE_ATTRIBUT_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1);
-    DEFINE_ATTRIBUT_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "");
-    DEFINE_ATTRIBUT_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0));
-    DEFINE_ATTRIBUT_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1));
-    DEFINE_ATTRIBUT_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1);
+    DEFINE_ATTRIBUT_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_EXPORT);
 
     class WorldFacade :
         public TransformHierarchyFacade,
@@ -129,7 +131,7 @@ namespace y60 {
 
 
     //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1));
+    DEFINE_ATTRIBUT_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1), Y60_SCENE_EXPORT);
 
     typedef asl::Ptr<TransformFacade, dom::ThreadingModel> TransformFacadePtr;
 

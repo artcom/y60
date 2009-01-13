@@ -59,6 +59,8 @@
 #ifndef _ac_SceneBuilder_h_
 #define _ac_SceneBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 
 #include <y60/base/typedefs.h>
@@ -96,7 +98,7 @@ namespace y60 {
      * Builds a scene. Wraps an initial scene. Use the appendXYZ methods
      * to add stuff.
      */
-    class SceneBuilder : public BuilderBase {
+    class Y60_SCENE_EXPORT SceneBuilder : public BuilderBase {
         public:
 	    SceneBuilder(dom::DocumentPtr theDocument);
 

@@ -67,6 +67,8 @@
 #ifndef _ac_builder_CanvasBuilder_h_
 #define _ac_builder_CanvasBuilder_h_
 
+#include "y60_scene_settings.h"
+
 #include "BuilderBase.h"
 #include <y60/base/NodeValueNames.h>
 #include <asl/math/Vector234.h>
@@ -77,7 +79,7 @@ namespace y60 {
  * Builder for Canvasses
  * @ingroup Y60builder
  */ 
-class CanvasBuilder : public BuilderBase {
+class Y60_SCENE_EXPORT CanvasBuilder : public BuilderBase {
     public:
         CanvasBuilder(const std::string & theName);
         virtual ~CanvasBuilder();

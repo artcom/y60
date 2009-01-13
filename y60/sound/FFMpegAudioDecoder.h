@@ -59,6 +59,8 @@
 #ifndef _FFMpegAudioDecoder_H_
 #define _FFMpegAudioDecoder_H_
 
+#include "y60_sound_settings.h"
+
 #include "IAudioDecoder.h"
 #include "SoundManager.h"
 
@@ -85,7 +87,7 @@ extern "C" {
 
 namespace y60 {
 
-class FFMpegAudioDecoder: public IAudioDecoder
+class Y60_SOUND_EXPORT FFMpegAudioDecoder: public IAudioDecoder
 {
     public:
         FFMpegAudioDecoder (const std::string& myURI);

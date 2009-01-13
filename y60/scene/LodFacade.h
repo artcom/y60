@@ -60,12 +60,14 @@
 #ifndef _scene_LodFacade_h_
 #define _scene_LodFacade_h_
 
+#include "y60_scene_settings.h"
+
 #include "TransformHierarchyFacade.h"
 
 namespace y60 {
 
     //                  theTagName  theType             theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RangesTag,  VectorOfFloat, LODRANGES_ATTRIB,  TYPE());
+    DEFINE_ATTRIBUT_TAG(RangesTag,  VectorOfFloat, LODRANGES_ATTRIB,  TYPE(), Y60_SCENE_EXPORT);
 /*
     struct RangesTag {
 		typedef VectorOfFloat TYPE;
