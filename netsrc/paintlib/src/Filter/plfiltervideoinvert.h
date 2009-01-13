@@ -11,7 +11,7 @@
 #if !defined(AFX_VIDEOINVERTFILTER_H__5AB120C1_CEB0_11D3_AD70_444553540000__INCLUDED_)
 #define AFX_VIDEOINVERTFILTER_H__5AB120C1_CEB0_11D3_AD70_444553540000__INCLUDED_
 
-#include "paintlib_settings.h"
+#include "../paintlib_settings.h"
 
 #if _MSC_VER > 1000
 #pragma once

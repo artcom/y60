@@ -11,7 +11,7 @@
 #if !defined(INCL_PLFILTERGRAYSCALE)
 #define INCL_PLFILTERGRAYSCALE
 
-#include "paintlib_settings.h"
+#include "../paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once

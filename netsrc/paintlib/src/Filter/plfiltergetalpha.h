@@ -11,7 +11,7 @@
 #if !defined(INCL_PLFILTERGETALPHA)
 #define INCL_PLFILTERGETALPHA
 
-#include "paintlib_settings.h"
+#include "../paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once

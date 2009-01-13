@@ -12,7 +12,7 @@
 #ifndef FILTERFLIP_H
 #define FILTERFLIP_H
 
-#include "paintlib_settings.h"
+#include "../paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once

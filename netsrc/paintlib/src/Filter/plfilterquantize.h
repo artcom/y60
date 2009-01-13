@@ -11,7 +11,7 @@
 #if !defined(INCL_PLFILTERQUANTIZE)
 #define INCL_PLFILTERQUANTIZE
 
-#include "paintlib_settings.h"
+#include "../paintlib_settings.h"
 
 #if _MSC_VER >= 1000
 #pragma once
