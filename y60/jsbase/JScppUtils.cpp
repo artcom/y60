@@ -246,19 +246,19 @@ jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF1
     return STRING_TO_JSVAL(myString);    
 }
 
-template jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<y60::AcBool> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
-template jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
-
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<y60::AcBool> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
+template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
+         
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
     if ( static_cast<int>(argc) < theMinCount) {
         throw Exception(string("Not enough arguments, ")+as_string(theMinCount)+" expected.");
-    }
+    }    
     if (theMaxCount && static_cast<int>(argc) > theMaxCount) {
         throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.");
     }

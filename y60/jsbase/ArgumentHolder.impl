@@ -60,17 +60,6 @@
 
 namespace jslib {
 
-template<class T>
-ArgumentHolder<T>::ArgumentHolder(JSCallArgs & theArgs, int n) {
-    if(!convertFrom(theArgs.cx, theArgs.argv[n], _myArg)) {
-        throw ArgumentConversionFailed(JUST_FILE_LINE);
-    }
-}
-
-template<class T>
-typename ArgumentHolder<T>::PLAIN_TYPE & ArgumentHolder<T>::getArg() {
-    return _myArg;
-};
 
 template <class T>
 void ResultConverter<T>::storeResult(JSCallArgs & theJSArgs, const T & theResult) {
