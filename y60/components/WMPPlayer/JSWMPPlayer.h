@@ -134,10 +134,10 @@ struct JSClassTraits<JSWMPPlayer::NATIVE>
     : public JSClassTraitsWrapper<JSWMPPlayer::NATIVE, JSWMPPlayer> {};
 
 
-Y60_WMPPLAYER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSWMPPlayer::OWNERPTR & theWMPPlayer);
+bool convertFrom(JSContext *cx, jsval theValue, JSWMPPlayer::OWNERPTR & theWMPPlayer);
 
-Y60_WMPPLAYER_EXPORT jsval as_jsval(JSContext *cx, JSWMPPlayer::OWNERPTR theOwner);
-Y60_WMPPLAYER_EXPORT jsval as_jsval(JSContext *cx, JSWMPPlayer::OWNERPTR theOwner, JSWMPPlayer::NATIVE * theWMPPlayer);
+jsval as_jsval(JSContext *cx, JSWMPPlayer::OWNERPTR theOwner);
+jsval as_jsval(JSContext *cx, JSWMPPlayer::OWNERPTR theOwner, JSWMPPlayer::NATIVE * theWMPPlayer);
 
 } // namespace jslib
 #endif

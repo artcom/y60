@@ -120,10 +120,10 @@ struct JSClassTraits<JSMesh::NATIVE>
     : public JSClassTraitsWrapper<JSMesh::NATIVE, JSMesh> {};
 
 
-Y60_CTSCAN_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSMesh::OWNERPTR & theMesh);
+bool convertFrom(JSContext *cx, jsval theValue, JSMesh::OWNERPTR & theMesh);
 
-Y60_CTSCAN_EXPORT jsval as_jsval(JSContext *cx, JSMesh::OWNERPTR theOwner);
-Y60_CTSCAN_EXPORT jsval as_jsval(JSContext *cx, JSMesh::OWNERPTR theOwner, JSMesh::NATIVE * theMesh);
+jsval as_jsval(JSContext *cx, JSMesh::OWNERPTR theOwner);
+jsval as_jsval(JSContext *cx, JSMesh::OWNERPTR theOwner, JSMesh::NATIVE * theMesh);
 
 } // namespace jslib
 #endif

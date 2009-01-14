@@ -72,7 +72,7 @@
 #include <string>
 
 namespace y60 {
-    std::string getASSSchema();
+    Y60_INPUT_EXPORT std::string getASSSchema();
 }
 
 #endif
