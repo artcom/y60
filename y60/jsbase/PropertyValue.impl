@@ -55,7 +55,7 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-/*
+
 namespace y60 {
 
     template<class T>
@@ -76,5 +76,4 @@ namespace y60 {
     }
     
 }
-*/
 /* vim: set filetype=cpp : */
