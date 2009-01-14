@@ -90,7 +90,7 @@ namespace y60 {
      * Abstract base class for Movie Decoders.
      *
      */
-    class MovieDecoderBase : public IDecoder {
+    class Y60_VIDEO_EXPORT MovieDecoderBase : public IDecoder {
         public:
             MovieDecoderBase();
 

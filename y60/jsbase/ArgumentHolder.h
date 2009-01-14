@@ -61,6 +61,8 @@
 
 #include "y60_jsbase_settings.h"
 
+#include "JSWrapper.h"
+
 #include "Documentation.h"
 #include "JScppUtils.h"
 #include <js/spidermonkey/jspubtd.h>
@@ -71,7 +73,6 @@
 #include <js/spidermonkey/jsnum.h>
 #include <asl/dom/Nodes.h>
 #include <asl/base/Singleton.h>
-
 
 
 

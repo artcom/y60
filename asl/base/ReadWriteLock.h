@@ -68,7 +68,7 @@ namespace asl {
     
     class ReadWriteLock;
 
-    class ScopeLocker {
+    class ASL_BASE_EXPORT ScopeLocker {
         public:
             ScopeLocker(ReadWriteLock & theLock, bool theLockWriteFlag=true);
             ~ScopeLocker();

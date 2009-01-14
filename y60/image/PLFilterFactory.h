@@ -123,7 +123,7 @@ struct IPaintLibFilterFactory {
     virtual asl::Ptr<PLFilter> createFilter(const VectorOfFloat & theParameters) = 0;
 };
 
-class PaintLibFilterFactory :
+class Y60_IMAGE_EXPORT PaintLibFilterFactory :
     public asl::Singleton<PaintLibFilterFactory>
 {
 public:

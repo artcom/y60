@@ -1,3 +1,8 @@
+list( APPEND EXTERNALS SPIDERMONKEY FREETYPE SDL OPENEXR )
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)
 
 ac_add_executable(
   y60
@@ -7,6 +12,6 @@ ac_add_executable(
           y60glrender y60glutil y60gltext y60jsbase y60jslib
           y60modelling y60sdlengine
           aslzip acsdlttf
-  EXTERNS SPIDERMONKEY FREETYPE SDL OPENEXR
+  EXTERNS ${EXTERNALS}
 )
 

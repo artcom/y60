@@ -5,13 +5,20 @@ FFMpegDecoder1.cpp
 
 set(HEADERS
 FFMpegDecoder1.h
+y60_ffmpegdecoder1_settings.h
 )
+
+list( APPEND EXTERNALS AVCODEC AVFORMAT PAINTLIB OPENEXR )
+
+if(WIN32)
+    list( APPEND EXTERNALS PTHREADVC )
+endif(WIN32)
 
 y60_add_component(
     FFMpegDecoder1
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60video
-    EXTERNS AVCODEC AVFORMAT PAINTLIB OPENEXR
+    EXTERNS ${EXTERNALS}
 )
 
