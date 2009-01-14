@@ -128,8 +128,9 @@ UnitTest
 
 if( UNIX )
     list( APPEND SOURCES signal_functions.cpp )
+	list( APPEND HEADERS signal_functions.h )
     list( APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
-endif( UNIX)
+endif( UNIX )
 
 if(OSX)
     list(APPEND SOURCES MachOBacktrace.cpp)
@@ -150,12 +151,7 @@ if(WIN32)
     list(APPEND EXTERNALS PSAPI )
 	set(PSAPI_LIBRARIES Psapi )
     list( APPEND EXTERNS PTHREADVC PSAPI )
-else(WIN32) # All *nix
-    list( APPEND TESTS ShellScript Itimer PrioCeilingRWLock )
-	list( APPEND SOURCES signal_functions.cpp )
-	list( APPEND HEADERS signal_functions.h )
-endif(WIN32)
-
+endif(WIN32) # All *nix
 
 ac_add_library(
     aslbase asl/base

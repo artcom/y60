@@ -20,16 +20,19 @@
 */
 
 #include "Matrix4.h"
+
+#include <iostream>
+#include <limits>
+
+#include <asl/base/UnitTest.h>
+#include <asl/base/Time.h>
+
 #include "Plane.h"
 #include "linearAlgebra.h"
 #include "numeric_functions.h"
 
 // temporarily inserted to compare speed with sony library
 //#include "vectormath/c/vectormath_aos.h"
-
-#include <asl/base/UnitTest.h>
-#include <asl/base/Time.h>
-#include <iostream>
 
 using namespace std;
 using namespace asl;
@@ -1059,7 +1062,9 @@ class Matrix4UnitTest : public UnitTest {
 
         }
         
-        float randomHelper(int theLowerbound, int theUpperbound, int theBadValue = INT_MAX) {
+        float randomHelper(int theLowerbound, int theUpperbound,
+                           int theBadValue = std::numeric_limits<int>::max())
+        {
            assert(theUpperbound - theLowerbound < RAND_MAX);
            float myRandom = (float) theLowerbound + (float) (std::rand() % ((theUpperbound - theLowerbound + 1)*1000))/1000.f;
            if (almostEqual(myRandom, theBadValue)){
