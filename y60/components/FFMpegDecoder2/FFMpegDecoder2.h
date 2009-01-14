@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FFMpegDecoder2_h_
 #define _ac_y60_FFMpegDecoder2_h_
 
+#include "y60_ffmpegdecoder2_settings.h"
+
 #include "VideoMsgQueue.h"
 #include "Demux.h"
 

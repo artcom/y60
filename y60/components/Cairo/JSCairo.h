@@ -197,11 +197,11 @@ namespace jslib {
     struct JSClassTraits<JSCairo::NATIVE>
         : public JSClassTraitsWrapper<JSCairo::NATIVE, JSCairo> {};
 
-    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theContext);
-    jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, cairo_t * theContext);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theContext);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, cairo_t * theContext);
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theContext);
-    bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theContext);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theContext);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theContext);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROCONTEXT_INCLUDED_ */

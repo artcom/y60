@@ -67,6 +67,8 @@
 #ifndef _ac_y60_Task_h_
 #define _ac_y60_Task_h_
 
+#include "y60_taskmanager_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <string>
 #include <vector>

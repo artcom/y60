@@ -127,10 +127,10 @@ struct JSClassTraits<JSDicomImage::NATIVE>
 
 } // namespace jslib
 
-// bool convertFrom(JSContext *cx, jsval theValue, JSDicomImage::NATIVE & theSerial);
+//Y60_DICOM_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSDicomImage::NATIVE & theSerial);
 
-jsval as_jsval(JSContext *cx, JSDicomImage::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSDicomImage::OWNERPTR theOwner, JSDicomImage::NATIVE * theSerial);
+Y60_DICOM_EXPORT jsval as_jsval(JSContext *cx, JSDicomImage::OWNERPTR theOwner);
+Y60_DICOM_EXPORT jsval as_jsval(JSContext *cx, JSDicomImage::OWNERPTR theOwner, JSDicomImage::NATIVE * theSerial);
 
 #endif
 

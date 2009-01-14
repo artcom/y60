@@ -59,6 +59,8 @@
 #ifndef _AC_MASK_H_
 #define _AC_MASK_H_
 
+#include "y60_videoprocessing_settings.h"
+
 #include "Algorithm.h"
 
 namespace y60 {

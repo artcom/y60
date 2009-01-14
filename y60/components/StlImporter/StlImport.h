@@ -68,6 +68,8 @@
 #ifndef _ac_scene_StlImport_h_
 #define _ac_scene_StlImport_h_
 
+#include "y60_stlimporter_settings.h"
+
 #include <y60/scene/ISceneDecoder.h>
 #include <y60/scene/SceneBuilder.h>
 #include <y60/scene/ElementBuilder.h>

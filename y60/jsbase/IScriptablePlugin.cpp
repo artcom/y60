@@ -65,25 +65,25 @@
 namespace jslib {
 
     template
-    unsigned IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT unsigned IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, unsigned theDefault);
     template
-    int IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT int IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, int theDefault);
     template
-    bool IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT bool IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, bool theDefault);
     template
-    asl::Vector2f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT asl::Vector2f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, asl::Vector2f theDefault);
     template
-    asl::Vector3f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT asl::Vector3f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, asl::Vector3f theDefault);
     template
-    asl::Vector4f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT asl::Vector4f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, asl::Vector4f theDefault);
     template
-    float IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+    Y60_JSBASE_EXPORT float IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, float theDefault);
 
     JSFunctionSpec * 

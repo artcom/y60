@@ -58,6 +58,8 @@
 
 #include <asl/raster/raster.h>
 
+#include "y60_videoprocessing_settings.h"
+
 namespace asl {
 
     template <class InputIterator,class OutputIterator,class Tin, class Tout>

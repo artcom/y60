@@ -12,9 +12,10 @@ AssetRequest.h
 CMSCache.h
 JSCMSCache.h
 RequestThread.h
+y60_cmscache_settings.h
 )
 
-list( APPEND EXTERNALS SPIDERMONKEY OPENEXR )
+list( APPEND EXTERNALS SPIDERMONKEY OPENEXR NVIDIA_CG )
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )

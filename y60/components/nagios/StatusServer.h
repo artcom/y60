@@ -59,6 +59,8 @@
 #ifndef y60_inet_statusserver_included
 #define y60_inet_statusserver_included
 
+#include "y60_nagios_settings.h"
+
 #include <asl/ipc/ConduitAcceptor.h>
 #include <asl/ipc/TCPPolicy.h>
 #include <asl/base/ReadWriteLock.h>

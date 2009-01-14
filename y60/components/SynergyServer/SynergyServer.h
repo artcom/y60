@@ -59,6 +59,8 @@
 #ifndef _SynergyServer_h_
 #define _SynergyServer_h_
 
+#include "y60_synergyserver_settings.h"
+
 #include <queue>
 
 #include <asl/base/PosixThread.h>

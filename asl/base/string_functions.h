@@ -117,7 +117,7 @@ namespace asl {
         return outValue;
     }
 
-    int as_int(const std::string & theString);
+    ASL_BASE_EXPORT int as_int(const std::string & theString);
 
     inline bool is_space(Char c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\r';

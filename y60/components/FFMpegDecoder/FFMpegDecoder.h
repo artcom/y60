@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FFMpegDecoder_h_
 #define _ac_y60_FFMpegDecoder_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 #include "FrameConveyor.h"
 #include <y60/video/MovieDecoderBase.h>
 #include <asl/base/PlugInBase.h>

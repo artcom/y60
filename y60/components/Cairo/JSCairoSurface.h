@@ -146,8 +146,8 @@ namespace jslib {
     struct JSClassTraits<JSCairoSurface::NATIVE>
         : public JSClassTraitsWrapper<JSCairoSurface::NATIVE, JSCairoSurface> {};
 
-    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theSurface);
-    jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theSurface);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theSurface);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theSurface);
     inline jsval as_jsval(JSContext *cx, cairo_surface_t * theSurface)
     {
         JSCairoSurfaceWrapper* theOwner = JSCairoSurfaceWrapper::get(theSurface);
@@ -155,8 +155,8 @@ namespace jslib {
         return as_jsval(cx,theOwner->getWrappedPtr(),theSurface);
     }
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget);
-    bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROSURFACE_INCLUDED_ */

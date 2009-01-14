@@ -4,6 +4,7 @@ ClusterExtension.cpp
 )
 
 set(HEADERS
+y60_clusterextension_settings.h
 )
 
 y60_add_component(

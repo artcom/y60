@@ -6,6 +6,7 @@ ProcFunctionsPlugIn.cpp
 
 set(HEADERS
 JSproc_functions.h
+y60_procfunctions_settings.h
 )
 
 list( APPEND EXTERNALS SPIDERMONKEY OPENEXR NVIDIA_CG)

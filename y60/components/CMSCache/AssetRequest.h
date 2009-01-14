@@ -59,6 +59,8 @@
 #ifndef __y60__AssetRequest__included
 #define __y60__AssetRequest__included
 
+#include "y60_cmscache_settings.h"
+
 #include <asl/base/Enum.h>
 #include <y60/inet/Request.h>
 #include <asl/dom/Nodes.h>

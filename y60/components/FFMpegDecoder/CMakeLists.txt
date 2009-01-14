@@ -14,6 +14,7 @@ FFMpegPixelEncoding.h
 FrameAnalyser.h
 FrameConveyor.h
 VideoFrame.h
+y60_ffmpegdecoder_settings.h
 )
 
 list( APPEND EXTERNALS AVFORMAT AVCODEC PAINTLIB OPENEXR )

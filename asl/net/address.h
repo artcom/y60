@@ -57,27 +57,27 @@
 namespace inet {
 
     /// Liefert eine asl::Unsigned32 aus einem string vom format a.b.c.d
-    asl::Unsigned32 addrFromStr(const char *dotaddr);
+    ASL_NET_EXPORT asl::Unsigned32 addrFromStr(const char *dotaddr);
     /// Schreibt in einen String eine dezimal dotted adresse a.b.c.d,
     // kann bis zu 16 bytes lang sein
-    void addr2Str(asl::Unsigned32 hostaddr, char *dotaddrdest);
+    ASL_NET_EXPORT void addr2Str(asl::Unsigned32 hostaddr, char *dotaddrdest);
     /// Schreibt in einen String eine dezimal dotted adresse a.b.c.d,
-    std::string addr2Str(asl::Unsigned32 hostaddr);
+    ASL_NET_EXPORT std::string addr2Str(asl::Unsigned32 hostaddr);
 
     /// Schreibt den von gethostbyname(3N) gelieferten String nach namedest
     // und liefert true
     // Wenn hostname nicht bekannt, wird <NAME UNKNOWN> eingetragen und
     // false zurueckgeliefert.
-    int getHostName(asl::Unsigned32 hostaddr, char *namedest, int maxnamelen );
+    ASL_NET_EXPORT int getHostName(asl::Unsigned32 hostaddr, char *namedest, int maxnamelen );
 
     /// returns the value of gethostbyname(3N) in a string.
     // @throws SocketException
-    std::string getHostName(asl::Unsigned32 hostaddr);
+    ASL_NET_EXPORT std::string getHostName(asl::Unsigned32 hostaddr);
     /// returns the host-address from a hostname or a dotted-quad address.
     // @throws SocketException
-    asl::Unsigned32 getHostAddress(const char *hostspec);
+    ASL_NET_EXPORT asl::Unsigned32 getHostAddress(const char *hostspec);
     /// Liefert die Adresse des eigenen Hosts zurueck
-    asl::Unsigned32 getLocalAddr();
+    ASL_NET_EXPORT asl::Unsigned32 getLocalAddr();
     
 }
 #endif

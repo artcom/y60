@@ -59,6 +59,8 @@
 #ifndef _ParticleSystem_h_
 #define _ParticleSystem_h_
 
+#include "y60_particles_settings.h"
+
 #include <asl/base/PlugInBase.h>
 
 #include <y60/jslib/AbstractRenderWindow.h>

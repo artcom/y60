@@ -89,8 +89,8 @@ namespace y60 {
     static asl::TimerPtr myScopeTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
         y60::GLScopeTimer myScopeTimerWrapper ## NAME ( myScopeTimer ## NAME);
 
-    void checkOGLError(const std::string& theLocation);
-    void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
+    Y60_GLUTIL_EXPORT void checkOGLError(const std::string& theLocation);
+    Y60_GLUTIL_EXPORT void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
 
     // [CH+VS]: Do not turn this on in release mode, because each check takes
     // up to 50 ms on a 1 GHz Machine in the renderBodyPart method.

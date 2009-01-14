@@ -4,6 +4,7 @@ DemoModellingRendex.cpp
 )
 
 set(HEADERS
+y60_demomodellingrendex_settings.h
 )
 
 y60_add_component(

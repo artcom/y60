@@ -59,6 +59,8 @@
 #ifndef _ac_y60_DecoderContext_h_
 #define _ac_y60_DecoderContext_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 #include "FFMpegPixelEncoding.h"
 #include <y60/video/MovieDecoderBase.h>
 

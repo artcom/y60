@@ -71,6 +71,8 @@
 #ifndef _ac_som_PLFilterWindowCW_h_
 #define _ac_som_PLFilterWindowCW_h_
 
+#include "y60_windowcwfilter_settings.h"
+
 #include <asl/base/Exception.h>
 
 #if defined(_MSC_VER)

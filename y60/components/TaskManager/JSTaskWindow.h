@@ -67,6 +67,8 @@
 #ifndef _ac_y60_JSTaskWindow_h_
 #define _ac_y60_JSTaskWindow_h_
 
+#include "y60_taskmanager_settings.h"
+
 #include "TaskWindow.h"
 #include <y60/jsbase/JSWrapper.h>
 
@@ -122,8 +124,8 @@ namespace jslib {
             }
     };
 
-    jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner, JSTaskWindow::NATIVE * theNative);
+    Y60_TASKMANAGER_EXPORT jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner);
+    Y60_TASKMANAGER_EXPORT jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner, JSTaskWindow::NATIVE * theNative);
 
     template <>
     struct JSClassTraits<JSTaskWindow::NATIVE>

@@ -6,6 +6,7 @@ WindowCWPlugin.cpp
 
 set(HEADERS
 PLFilterWindowCW.h
+y60_windowcwfilter_settings.h
 )
 
 list( APPEND EXTERNALS PAINTLIB OPENEXR )

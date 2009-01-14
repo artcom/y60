@@ -113,8 +113,8 @@ namespace jslib {
             }
     };
 
-    jsval as_jsval(JSContext *cx, JSOscReceiver::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSOscReceiver::OWNERPTR theOwner, JSOscReceiver::NATIVE * theNative);
+    Y60_OSCRECEIVER_EXPORT jsval as_jsval(JSContext *cx, JSOscReceiver::OWNERPTR theOwner);
+    Y60_OSCRECEIVER_EXPORT jsval as_jsval(JSContext *cx, JSOscReceiver::OWNERPTR theOwner, JSOscReceiver::NATIVE * theNative);
 
     template <>
         struct JSClassTraits<JSOscReceiver::NATIVE> 

@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSSocket_h_
 #define _ac_jslib_JSSocket_h_
 
+#include "y60_net_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <asl/net/Socket.h>
 
@@ -123,11 +125,11 @@ struct JSClassTraits<JSSocket::NATIVE>
 
 } // namespace jslib
 
-bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative);
-bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr);
+Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative);
+Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr);
 
-jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner, JSSocket::NATIVE * theSerial);
+Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner);
+Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner, JSSocket::NATIVE * theSerial);
 
 #endif
 

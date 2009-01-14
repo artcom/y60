@@ -67,6 +67,8 @@
 #ifndef _ac_video_VideoMsgQueue_h_
 #define _ac_video_VideoMsgQueue_h_
 
+#include "y60_ffmpegdecoder2_settings.h"
+
 #include "VideoMsg.h"
 
 #include <asl/base/ThreadSemaphore.h>

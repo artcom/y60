@@ -7,6 +7,7 @@ OpenEXRDecoderPlugin.cpp
 set(HEADERS
 OpenEXRDecoder.h
 PLDataSourceStreamAdapter.h
+y60_openexrdecoder_settings.h
 )
 
 list(APPEND EXTERNS OPENEXR)

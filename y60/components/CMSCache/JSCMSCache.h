@@ -59,6 +59,8 @@
 #ifndef _ac_y60_components_jsCMSCache_h_
 #define _ac_y60_components_jsCMSCache_h_
 
+#include "y60_cmscache_settings.h"
+
 #include "CMSCache.h"
 #include <y60/jsbase/JSWrapper.h>
 
@@ -122,10 +124,10 @@ struct JSClassTraits<JSCMSCache::NATIVE>
     : public JSClassTraitsWrapper<JSCMSCache::NATIVE, JSCMSCache> {};
 
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache);
+Y60_CMSCACHE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache);
 
-jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache);
+Y60_CMSCACHE_EXPORT jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner);
+Y60_CMSCACHE_EXPORT jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache);
 
 } // namespace jslib
 #endif

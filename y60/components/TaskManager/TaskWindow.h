@@ -59,6 +59,8 @@
 #ifndef _ac_y60_TaskWindow_h_
 #define _ac_y60_TaskWindow_h_
 
+#include "y60_taskmanager_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
 

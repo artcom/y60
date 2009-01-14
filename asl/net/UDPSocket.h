@@ -75,7 +75,7 @@ namespace inet {
      *
      * @TODO: create a UDPMulticast subclass (should be easy now)
      **/
-    class UDPSocket : public Socket {
+    class ASL_NET_EXPORT UDPSocket : public Socket {
         public:
             /// create a new socket listening on theport on address thehost
             UDPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport);

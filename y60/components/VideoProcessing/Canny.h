@@ -59,6 +59,8 @@
 #ifndef _CANNY_H_
 #define _CANNY_H_
 
+#include "y60_videoprocessing_settings.h"
+
 #include "Algorithm.h"
 
 namespace y60 {

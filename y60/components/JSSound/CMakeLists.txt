@@ -9,6 +9,7 @@ set(HEADERS
 JSGrainSource.h
 JSSound.h
 JSSoundManager.h
+y60_jssound_settings.h
 )
 
 list( APPEND EXTERNALS SPIDERMONKEY OPENEXR AVFORMAT NVIDIA_CG)

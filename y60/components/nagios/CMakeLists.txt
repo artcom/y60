@@ -6,6 +6,7 @@ StatusServer.cpp
 
 set(HEADERS
 StatusServer.h
+y60_nagios_settings.h
 )
 
 y60_add_component(

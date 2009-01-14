@@ -130,10 +130,10 @@ struct JSClassTraits<JSCTScan::NATIVE>
     : public JSClassTraitsWrapper<JSCTScan::NATIVE, JSCTScan> {};
 
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCTScan::OWNERPTR & theCTScan);
+Y60_CTSCAN_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCTScan::OWNERPTR & theCTScan);
 
-jsval as_jsval(JSContext *cx, JSCTScan::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSCTScan::OWNERPTR theOwner, JSCTScan::NATIVE * theCTScan);
+Y60_CTSCAN_EXPORT jsval as_jsval(JSContext *cx, JSCTScan::OWNERPTR theOwner);
+Y60_CTSCAN_EXPORT jsval as_jsval(JSContext *cx, JSCTScan::OWNERPTR theOwner, JSCTScan::NATIVE * theCTScan);
 
 } // namespace jslib
 #endif

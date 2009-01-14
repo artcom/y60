@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FrameAnalyser_h_
 #define _ac_y60_FrameAnalyser_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 struct AVStream;
 struct AVPacket;
 struct AVFrame;

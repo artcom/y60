@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSSynergyServer_h_
 #define _ac_jslib_JSSynergyServer_h_
 
+#include "y60_synergyserver_settings.h"
+
 #include "SynergyServer.h"
 
 #include <asl/base/PlugInBase.h>
@@ -127,8 +129,8 @@ namespace jslib {
         : public JSClassTraitsWrapper<JSSynergyServer::NATIVE , JSSynergyServer> {};
 
 
-    jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner );
-    jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner, 
+    Y60_SYNERGYSERVER_EXPORT jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner );
+    Y60_SYNERGYSERVER_EXPORT jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner, 
                     JSSynergyServer::NATIVE * theSerial );
 
 

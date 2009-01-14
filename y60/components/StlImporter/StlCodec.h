@@ -59,6 +59,8 @@
 #ifndef _ac_StlImporter_StlCodec_h_
 #define _ac_StlImporter_StlCodec_h_
 
+#include "y60_stlimporter_settings.h"
+
 #include <asl/base/Stream.h>
 #include <y60/scene/Shape.h>
 #include <asl/dom/Nodes.h>

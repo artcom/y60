@@ -13,6 +13,7 @@ FFMpegDecoder2.h
 FFMpegURLProtocol.h
 VideoMsg.h
 VideoMsgQueue.h
+y60_ffmpegdecoder2_settings.h
 )
 
 list( APPEND EXTERNALS PAINTLIB AVFORMAT AVCODEC OPENEXR )

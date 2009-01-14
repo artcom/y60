@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSParticleSystem_h_
 #define _ac_jslib_JSParticleSystem_h_
 
+#include "y60_particles_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include "ParticleSystem.h"
 
@@ -123,8 +125,8 @@ namespace jslib {
     
 } // namespace jslib
 
-jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner, JSParticleSystem::NATIVE * theSerial);
+Y60_PARTICLES_EXPORT jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner);
+Y60_PARTICLES_EXPORT jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner, JSParticleSystem::NATIVE * theSerial);
 
 #endif
 

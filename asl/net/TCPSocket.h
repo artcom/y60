@@ -51,7 +51,7 @@
 
 namespace inet {
 
-    class TCPSocket : public Socket {
+    class ASL_NET_EXPORT TCPSocket : public Socket {
         public:
             TCPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport);
 

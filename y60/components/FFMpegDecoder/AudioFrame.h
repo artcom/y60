@@ -59,6 +59,8 @@
 #ifndef _ac_y60_AudioFrame_h_
 #define _ac_y60_AudioFrame_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 #include <asl/base/Ptr.h>
 
 namespace y60 {

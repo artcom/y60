@@ -59,6 +59,8 @@
 #ifndef _ac_Histogram_h_
 #define _ac_Histogram_h_
 
+#include "y60_videoprocessing_settings.h"
+
 #include "Algorithm.h"
 
 namespace y60 {

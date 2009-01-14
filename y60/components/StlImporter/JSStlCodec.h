@@ -59,6 +59,8 @@
 #ifndef _ac_StlImporter_JSStlCodec_h_
 #define _ac_StlImporter_JSStlCodec_h_
 
+#include "y60_stlimporter_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include "StlCodec.h"
 
@@ -116,10 +118,10 @@ struct JSClassTraits<JSStlCodec::NATIVE>
     : public JSClassTraitsWrapper<JSStlCodec::NATIVE, JSStlCodec> {};
 
 
-bool convertFrom(JSContext *cx, jsval theValue, JSStlCodec::OWNERPTR & theStlCodec);
+Y60_STLIMPORTER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSStlCodec::OWNERPTR & theStlCodec);
 
-jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner, JSStlCodec::NATIVE * theStlCodec);
+Y60_STLIMPORTER_EXPORT jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner);
+Y60_STLIMPORTER_EXPORT jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner, JSStlCodec::NATIVE * theStlCodec);
 
 } // jslib
 

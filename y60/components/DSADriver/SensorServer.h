@@ -68,6 +68,8 @@
 #ifndef _SENSOR_SERVER_INCLUDED
 #define _SENSOR_SERVER_INCLUDED
 
+#include "y60_dsadriver_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/serial/SerialDevice.h>
 #include <asl/base/Time.h>

@@ -58,6 +58,8 @@
 
 #include "Algorithm.h"
 
+#include "y60_videoprocessing_settings.h"
+
 namespace y60 {
     class Convert : public Algorithm {
 

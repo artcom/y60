@@ -133,8 +133,8 @@ namespace jslib {
     struct JSClassTraits<JSCairoPattern::NATIVE>
         : public JSClassTraitsWrapper<JSCairoPattern::NATIVE, JSCairoPattern> {};
 
-    jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, JSCairoPattern::NATIVE * thePattern);
-    jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, cairo_pattern_t * thePattern);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, JSCairoPattern::NATIVE * thePattern);
+    Y60_CAIRO_EXPORT jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, cairo_pattern_t * thePattern);
     inline jsval as_jsval(JSContext *cx, cairo_pattern_t * thePattern)
     {
         JSCairoPatternWrapper* theOwner = JSCairoPatternWrapper::get(thePattern);
@@ -142,8 +142,8 @@ namespace jslib {
         return as_jsval(cx,theOwner->getWrappedPtr(),thePattern);
     }
     
-    bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTarget);
-    bool convertFrom(JSContext *cx, jsval theValue, cairo_pattern_t *& thePattern);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTarget);
+    Y60_CAIRO_EXPORT bool convertFrom(JSContext *cx, jsval theValue, cairo_pattern_t *& thePattern);
 }
 
 #endif /* !_Y60_CAIRO_JSCAIROPATTERN_INCLUDED_ */

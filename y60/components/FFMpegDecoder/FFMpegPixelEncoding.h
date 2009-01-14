@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FFMpegPixelEncoding_h_
 #define _ac_y60_FFMpegPixelEncoding_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 #include <y60/image/PixelEncoding.h>
 #include <string>
 

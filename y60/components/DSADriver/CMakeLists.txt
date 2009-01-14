@@ -9,6 +9,7 @@ set(HEADERS
 DSADriver.h
 SensorArray.h
 SensorServer.h
+y60_dsadriver_settings.h
 )
 
 y60_add_component(

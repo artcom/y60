@@ -59,6 +59,8 @@
 #ifndef __VIDEOPROCESSING_H__
 #define __VIDEOPROCESSING_H__
 
+#include "y60_videoprocessing_settings.h"
+
 #include <asl/base/PlugInBase.h>
 #include <y60/jslib/IRendererExtension.h>
 #include <y60/jsbase/IScriptablePlugin.h>

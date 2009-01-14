@@ -59,6 +59,8 @@
 #ifndef _y60_jslib_jsproc_functions_h_
 #define _y60_jslib_jsproc_functions_h_
 
+#include "y60_procfunctions_settings.h"
+
 #include <y60/jsbase/JScppUtils.h>
 
 namespace jslib {

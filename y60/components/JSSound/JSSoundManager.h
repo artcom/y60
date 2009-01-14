@@ -59,6 +59,8 @@
 #ifndef _ac_y60_JSSoundManager_h_
 #define _ac_y60_JSSoundManager_h_
 
+#include "y60_jssound_settings.h"
+
 #include <y60/sound/SoundManager.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -119,8 +121,8 @@ namespace jslib {
             }
     };
 
-    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
+    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
+    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
             JSSoundManager::NATIVE * theNative);
 
     template <>

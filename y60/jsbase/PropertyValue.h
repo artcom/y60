@@ -72,7 +72,7 @@ public:
         _myCx(cx), _myJsVal(theJSVal)
     {}
 
-    template<class T>
+    /*template<class T>
     T get() const;
 
     template<class T>
@@ -80,6 +80,24 @@ public:
 
     template<class T>
     void set(const T & theValue); 
+*/
+    template<class T>
+    T get() const {
+        T myRet;
+        jslib::convertFrom(_myCx, *_myJsVal, myRet);
+        return myRet;
+    }
+
+    template<class T>
+    bool get(T & theReturnValue) const {
+        return jslib::convertFrom(_myCx, *_myJsVal, theReturnValue);
+    }
+
+    template<class T>
+    void set(const T & theValue) {
+        *_myJsVal = jslib::as_jsval(_myCx, theValue);
+    }
+
     
 private:
     PropertyValue() {}

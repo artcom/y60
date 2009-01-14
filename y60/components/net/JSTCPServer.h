@@ -59,6 +59,8 @@
 #ifndef _ac_jslib_JSTCPServer_h_
 #define _ac_jslib_JSTCPServer_h_
 
+#include "y60_net_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <asl/net/TCPServer.h>
 
@@ -119,10 +121,10 @@ struct JSClassTraits<JSTCPServer::NATIVE>
 
 } // namespace jslib
 
-bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServer);
+Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServer);
 
-jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner, JSTCPServer::NATIVE * theTCPServer);
+Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner);
+Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner, JSTCPServer::NATIVE * theTCPServer);
 
 #endif
 

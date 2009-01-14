@@ -59,6 +59,8 @@
 #include <asl/base/Ptr.h>
 #include <asl/base/Stream.h>
 
+#include "y60_ffmpegdecoder2_settings.h"
+
 namespace y60 {
     
     /**

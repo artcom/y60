@@ -65,7 +65,7 @@
 
 namespace jslib {
 
-    class JSScriptablePlugin {
+    class Y60_JSBASE_EXPORT JSScriptablePlugin {
         public:
             JSScriptablePlugin(IScriptablePluginPtr & theNative) :
                 _myNative(theNative)

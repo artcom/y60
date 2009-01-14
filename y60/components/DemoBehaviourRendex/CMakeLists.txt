@@ -5,6 +5,7 @@ DemoBehaviour.cpp
 
 set(HEADERS
 DemoBehaviour.h
+y60_demobehaviourrendex_settings.h
 )
 
 y60_add_component(

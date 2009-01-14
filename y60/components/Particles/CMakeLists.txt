@@ -8,6 +8,7 @@ ParticleSystem.cpp
 set(HEADERS
 JSParticleSystem.h
 ParticleSystem.h
+y60_particles_settings.h
 )
 
 y60_add_component(

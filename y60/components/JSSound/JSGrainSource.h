@@ -59,6 +59,8 @@
 #ifndef _JSGRAINSOURCE_H_
 #define _JSGRAINSOURCE_H_
 
+#include "y60_jssound_settings.h"
+
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/sound/GrainSource.h>
 
@@ -125,10 +127,10 @@ namespace jslib {
         }
     };
 
-    bool convertFrom(JSContext *cx, jsval theValue, y60::GrainSourcePtr & theGrainSource);
+    Y60_JSSOUND_EXPORT bool convertFrom(JSContext *cx, jsval theValue, y60::GrainSourcePtr & theGrainSource);
 
-    jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner, JSGrainSource::NATIVE * theNative);
+    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner);
+    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner, JSGrainSource::NATIVE * theNative);
 
     template <>
     struct JSClassTraits<JSGrainSource::NATIVE> 

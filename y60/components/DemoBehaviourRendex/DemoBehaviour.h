@@ -69,6 +69,8 @@
 #ifndef _ac_y60_DemoBehaviour_h_
 #define _ac_y60_DemoBehaviour_h_
 
+#include "y60_demobehaviourrendex_settings.h"
+
 #include <y60/jsbase/JSNode.h>
 #include <y60/jsbase/JSVector.h>
 #include <y60/jsbase/JSScriptablePlugin.h>

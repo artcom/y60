@@ -116,11 +116,11 @@ struct JSClassTraits<JSOscSender::NATIVE>
 
 } // namespace jslib
 
-bool convertFrom(JSContext *cx, jsval theValue, JSOscSender::NATIVE & theNative);
-bool convertFrom(JSContext *cx, jsval theValue, JSOscSender::OWNERPTR & theNativePtr);
+Y60_OSCSENDER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSOscSender::NATIVE & theNative);
+Y60_OSCSENDER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSOscSender::OWNERPTR & theNativePtr);
 
-jsval as_jsval(JSContext *cx, JSOscSender::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSOscSender::OWNERPTR theOwner, JSOscSender::NATIVE * theSerial);
+Y60_OSCSENDER_EXPORT jsval as_jsval(JSContext *cx, JSOscSender::OWNERPTR theOwner);
+Y60_OSCSENDER_EXPORT jsval as_jsval(JSContext *cx, JSOscSender::OWNERPTR theOwner, JSOscSender::NATIVE * theSerial);
 
 #endif
 

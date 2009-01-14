@@ -9,6 +9,7 @@ set(HEADERS
 JSStlCodec.h
 StlCodec.h
 StlImport.h
+y60_stlimporter_settings.h
 )
 
 y60_add_component(

@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FrameConveyor_h_
 #define _ac_y60_FrameConveyor_h_
 
+#include "y60_ffmpegdecoder_settings.h"
+
 #include "AudioFrame.h"
 
 #include <asl/audio/HWSampleSink.h>

@@ -4,6 +4,7 @@ JSGLBindingPlugin.cpp
 )
 
 set(HEADERS
+y60_glbinding_settings.h
 )
 
 y60_add_component(

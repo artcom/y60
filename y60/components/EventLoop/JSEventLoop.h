@@ -60,6 +60,8 @@
 #ifndef _AC_JSEVENTLOOP_H_
 #define _AC_JSEVENTLOOP_H_
 
+#include "y60_eventloop_settings.h"
+
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/input/Event.h>

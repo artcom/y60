@@ -68,6 +68,8 @@
 #ifndef _SENSOR_ARRAY_INCLUDED
 #define _SENSOR_ARRAY_INCLUDED
 
+#include "y60_dsadriver_settings.h"
+
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
 

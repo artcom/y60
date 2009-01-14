@@ -1,0 +1,12 @@
+#ifndef Y60_DINPUT_SETTING_INCLUDED
+#define Y60_DINPUT_SETTING_INCLUDED
+
+#include <asl/base/settings.h>
+
+#ifdef DInput_EXPORTS
+#   define Y60_DINPUT_EXPORT AC_DLL_EXPORT
+#else
+#   define Y60_DINPUT_EXPORT AC_DLL_IMPORT
+#endif
+
+#endif // Y60_DINPUT_SETTING_INCLUDED

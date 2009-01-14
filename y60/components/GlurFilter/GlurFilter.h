@@ -71,6 +71,8 @@
 #ifndef _GLUR_FILTER_h_
 #define _GLUR_FILTER_h_
 
+#include "y60_glurfilter_settings.h"
+
 #include <vector>
 
 #include <y60/base/DataTypes.h>

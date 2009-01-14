@@ -58,6 +58,8 @@
 
 #ifndef _AC_CONTRAST_H_
 #define _AC_CONTRAST_H_
+          
+#include "y60_videoprocessing_settings.h"
 
 #include "Algorithm.h"
 

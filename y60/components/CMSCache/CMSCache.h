@@ -59,6 +59,8 @@
 #ifndef __y60__CMSCache_h_included__
 #define __y60__CMSCache_h_included__
 
+#include "y60_cmscache_settings.h"
+
 #include "RequestThread.h"
 
 #include <asl/dom/Nodes.h>

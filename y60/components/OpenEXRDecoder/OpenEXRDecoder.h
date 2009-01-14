@@ -59,6 +59,8 @@
 #ifndef _ac_y60_OpenEXRDecoder_h_
 #define _ac_y60_OpenEXRDecoder_h_
 
+#include "y60_openexrdecoder_settings.h"
+
 #include <asl/base/Exception.h>
 #include <asl/raster/pixels.h>
 #include <asl/raster/raster.h>

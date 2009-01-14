@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef taskmanager_EXPORTS
+#ifdef TaskManager_EXPORTS
 #   define Y60_TASKMANAGER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_TASKMANAGER_EXPORT AC_DLL_IMPORT

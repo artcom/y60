@@ -59,6 +59,8 @@
 #ifndef _ac_VideoProcessing_Algorithm_h_
 #define _ac_VideoProcessing_Algorithm_h_
 
+#include "y60_videoprocessing_settings.h"
+
 #include <y60/image/Image.h>
 #include <y60/scene/Scene.h>
 
@@ -76,7 +78,7 @@ namespace y60 {
 	* parameters should contain necessary image ids
 	* ouput is handled by result()
 	*/
-	class Algorithm {
+	class Y60_VIDEOPROCESSING_EXPORT Algorithm {
 	public:
         Algorithm(const std::string & theName) { 
             _myName = theName;

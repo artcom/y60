@@ -59,6 +59,8 @@
 #ifndef _AC_BLOBS_H_
 #define _AC_BLOBS_H_
 
+#include "y60_videoprocessing_settings.h"
+
 #include "Algorithm.h"
 #include <y60/scene/Overlay.h>
 #include <y60/image/ConnectedComponent.h>
@@ -98,7 +100,7 @@ struct Cursor {
 typedef std::map<int, Cursor> CursorMap;
 
 
-	class Blobs : public Algorithm {
+	class Y60_VIDEOPROCESSING_EXPORT Blobs : public Algorithm {
 		public:
             Blobs(const std::string & theName);
 

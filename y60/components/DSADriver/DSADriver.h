@@ -68,6 +68,8 @@
 #ifndef _DSA_DRIVER_INCLUDED
 #define _DSA_DRIVER_INCLUDED
 
+#include "y60_dsadriver_settings.h"
+
 #include "SensorServer.h"
 #include "SensorArray.h"
 

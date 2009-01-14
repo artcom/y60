@@ -73,7 +73,7 @@ namespace inet {
      *
      * @endcode
      */
-    class UDPConnection : public UDPSocket {
+    class ASL_NET_EXPORT UDPConnection : public UDPSocket {
         public:
             UDPConnection(asl::Unsigned32 thehost, asl::Unsigned16 theport);
             virtual bool connect(asl::Unsigned32 thehost, asl::Unsigned16 theport);

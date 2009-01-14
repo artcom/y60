@@ -126,8 +126,8 @@ struct JSClassTraits<JSDvbTuner::NATIVE>
 
 } // namespace jslib
 
-jsval as_jsval(JSContext *cx, JSDvbTuner::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSDvbTuner::OWNERPTR theOwner, JSDvbTuner::NATIVE * theSerial);
+Y60_DVB_EXPORT jsval as_jsval(JSContext *cx, JSDvbTuner::OWNERPTR theOwner);
+Y60_DVB_EXPORT jsval as_jsval(JSContext *cx, JSDvbTuner::OWNERPTR theOwner, JSDvbTuner::NATIVE * theSerial);
 
 #endif
 

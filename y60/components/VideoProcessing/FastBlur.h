@@ -59,6 +59,8 @@
 #ifndef _AC_FASTBLUR_H_
 #define _AC_FASTBLUR_H_
 
+#include "y60_videoprocessing_settings.h"
+
 #include "Algorithm.h"
 
 namespace y60 {

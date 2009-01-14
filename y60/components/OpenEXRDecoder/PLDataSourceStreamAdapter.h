@@ -59,6 +59,8 @@
 #ifndef _ac_y60_PLDataSourceStreamAdapter_h_
 #define _ac_y60_PLDataSourceStreamAdapter_h_
 
+#include "y60_openexrdecoder_settings.h"
+
 #ifdef AC_BUILT_WITH_CMAKE
 #include <ImfIO.h>
 #else

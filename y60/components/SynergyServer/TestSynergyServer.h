@@ -59,6 +59,8 @@
 #ifndef _TestSynergyServer_h_
 #define _TestSynergyServer_h_
 
+#include "y60_synergyserver_settings.h"
+
 #include "SynergyServer.h"
 #include <asl/base/UnitTest.h>
 #include <asl/net/TCPClientSocket.h>

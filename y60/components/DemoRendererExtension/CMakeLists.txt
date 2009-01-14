@@ -4,6 +4,7 @@ DemoRendererExtension.cpp
 )
 
 set(HEADERS
+y60_demorendererextension_settings.h
 )
 
 y60_add_component(

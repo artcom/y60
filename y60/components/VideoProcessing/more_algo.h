@@ -59,6 +59,8 @@
 #ifndef MORE_ALGO_H
 #define MORE_ALGO_H
 
+#include "y60_videoprocessing_settings.h"
+
 #include <map.h>
 
 #include <pix/matrix.h>

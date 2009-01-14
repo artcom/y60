@@ -34,6 +34,7 @@ ShotDetection.h
 VideoProcessing.h
 cv_algo.h
 more_algo.h
+y60_videoprocessing_settings.h
 )
 
 y60_add_component(
