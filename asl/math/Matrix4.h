@@ -427,8 +427,8 @@ namespace asl {
             if (_myType != IDENTITY && _myType != TRANSLATING) {
                 base::makeIdentity();
             }
+            base::makeTranslating(t);
             if (t[0] != Number(0) || t[1] != Number(0) || t[2] != Number(0)) {
-                base::makeTranslating(t);
                 _myType = TRANSLATING;
             } else {
                 _myType = IDENTITY;
