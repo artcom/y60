@@ -127,10 +127,10 @@ struct JSClassTraits<JSASSOscClient::NATIVE>
     : public JSClassTraitsWrapper<JSASSOscClient::NATIVE, JSASSOscClient> {};
 
 
-Y60_ASSDRIVER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSASSOscClient::OWNERPTR & theASSOscClient);
+bool convertFrom(JSContext *cx, jsval theValue, JSASSOscClient::OWNERPTR & theASSOscClient);
 
-Y60_ASSDRIVER_EXPORT jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner);
-Y60_ASSDRIVER_EXPORT jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner, JSASSOscClient::NATIVE * theASSOscClient);
+jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner);
+jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner, JSASSOscClient::NATIVE * theASSOscClient);
 
 } // namespace jslib
 #endif
