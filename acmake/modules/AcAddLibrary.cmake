@@ -81,14 +81,14 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
 
     # create tests
     if (WIN32)
-        set(TEST_NAMESPACE "_${THIS_LIBRARY_NAME}_")
+        set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}_")
     else (WIN32)
         set(TEST_NAMESPACE "")
     endif(WIN32)
     foreach(TEST ${THIS_LIBRARY_TESTS})
         # define the target
         ac_add_executable(
-            test${TEST_NAMESPACE}${TEST}
+            ${TEST_NAMESPACE}test${TEST}
             SOURCES test${TEST}.tst.cpp
             DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME}
             EXTERNS ${THIS_LIBRARY_EXTERNS}
@@ -98,5 +98,5 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         # tell ctest about it
         add_test(${TEST} test${TEST})
     endforeach(TEST)
-    
+   
 endmacro(ac_add_library)

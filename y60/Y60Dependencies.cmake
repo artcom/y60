@@ -23,7 +23,7 @@ endif(NOT ACSDLTTF_INTEGRATED_BUILD)
 # external dependencies
 find_package(SDL)
 find_package(GLEW)
-find_package(Cg)
+find_package(NvidiaCg)
 find_package(OpenEXR)
 
 find_package(GLIB2)
