@@ -59,6 +59,8 @@
 #ifndef _ac_y60_FFMpegDecoder_h_
 #define _ac_y60_FFMpegDecoder_h_
 
+#include "y60_ffmpegdecoder1_settings.h"
+
 #include <asl/base/PlugInBase.h>
 #include <y60/video/MovieDecoderBase.h>
 
@@ -90,7 +92,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(FFMpegDecoderException, asl::Exception);
 
-    class FFMpegDecoder1 : 
+    class Y60_FFMPEGDECODER1_EXPORT FFMpegDecoder1 : 
         public MovieDecoderBase,
         public asl::PlugInBase
     {

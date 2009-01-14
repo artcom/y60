@@ -61,7 +61,6 @@
 
 #include "y60_jsbase_settings.h"
 
-#include "JSWrapper.h"
 
 #include "Documentation.h"
 #include "JScppUtils.h"
