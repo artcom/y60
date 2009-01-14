@@ -130,14 +130,8 @@ struct ArgumentHolder {
     typedef T ARG_TYPE;
     typedef typename Argument<T>::PlainType PLAIN_TYPE;
 
-    ArgumentHolder(JSCallArgs & theArgs, int n){
-        if ( ! convertFrom( theArgs.cx, theArgs.argv[n], _myArg )) {
-            throw ArgumentConversionFailed(JUST_FILE_LINE);
-        }
-    }
-    PLAIN_TYPE & getArg(){
-        return _myArg;
-    }
+    ArgumentHolder(JSCallArgs & theArgs, int n);
+    PLAIN_TYPE & getArg();
 
 private:
     PLAIN_TYPE _myArg;

@@ -127,10 +127,10 @@ namespace jslib {
         }
     };
 
-    Y60_JSSOUND_EXPORT bool convertFrom(JSContext *cx, jsval theValue, y60::GrainSourcePtr & theGrainSource);
+    bool convertFrom(JSContext *cx, jsval theValue, y60::GrainSourcePtr & theGrainSource);
 
-    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner);
-    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner, JSGrainSource::NATIVE * theNative);
+    jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner);
+    jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner, JSGrainSource::NATIVE * theNative);
 
     template <>
     struct JSClassTraits<JSGrainSource::NATIVE> 

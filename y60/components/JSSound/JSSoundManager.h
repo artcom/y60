@@ -121,8 +121,8 @@ namespace jslib {
             }
     };
 
-    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
-    Y60_JSSOUND_EXPORT jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
             JSSoundManager::NATIVE * theNative);
 
     template <>

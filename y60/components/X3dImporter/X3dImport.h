@@ -74,7 +74,7 @@ namespace y60 {
 
     const std::string MIME_TYPE_X3D = "model/x3d";
 
-    class Y60_X3DIMPORTER_EXPORT X3dImport : public ISceneDecoder, public asl::PlugInBase
+    class X3dImport : public ISceneDecoder, public asl::PlugInBase
     {
     public:
         DEFINE_NESTED_EXCEPTION(y60::X3dImport, ImportException, asl::Exception);
