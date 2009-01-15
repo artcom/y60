@@ -8,7 +8,7 @@ else(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
     find_path( NVIDIA_CG_INCLUDE_DIRS cg.h 
             PATH_SUFFIXES Cg GL )
     get_filename_component( NVIDIA_CG_LIBRARY_DIRS
-            ${NVIDIA_CG_LIBRARY_FULL_PATH} PATH )
+            "${NVIDIA_CG_LIBRARIES}" PATH )
     set(NVIDIA_CG_LIBRARIES Cg CgGL ${OPENGL_LIBRARIES})
 
     find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
