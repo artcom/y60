@@ -364,6 +364,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\initialization.h"
+				>
+			</File>
+			<File
 				RelativePath="..\ITimeSource.h"
 				>
 			</File>
