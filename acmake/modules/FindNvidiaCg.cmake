@@ -3,7 +3,6 @@
 find_library( NVIDIA_CG_LIBRARIES NAMES Cg cg )
 if(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
         set( NVIDIA_CG ${NVIDIA_CG_LIBRARIES} )
-    endif( NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
     # TODO: handle non-framework versions on OSX?
 else(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
     find_path( NVIDIA_CG_INCLUDE_DIRS cg.h 
@@ -14,7 +13,7 @@ else(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
 
     find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
             NVIDIA_CG_LIBRARIES NVIDIA_CG_INCLUDE_DIRS)
-else(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
+endif(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
 
 find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
         NVIDIA_CG_LIBRARIES NVIDIA_CG_INCLUDE_DIRS)
