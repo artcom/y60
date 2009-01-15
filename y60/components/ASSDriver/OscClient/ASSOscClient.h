@@ -59,7 +59,14 @@
 #ifndef ASS_EVENT_SOURCE_INCLUDED
 #define ASS_EVENT_SOURCE_INCLUDED
 
-#include <y60/ASSCore/ASSDriver.h>
+#include "y60_oscclient_settings.h"
+
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <y60/components/ASSDriver/ASSCore/ASSDriver.h>
+#else
+#   include <y60/ASSCore/ASSDriver.h>
+#endif
+
 #include <asl/net/UDPConnection.h>
 
 #include <oscpack/osc/OscOutboundPacketStream.h>

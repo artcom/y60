@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_UTILS_INCLUDED
 #define Y60_ASS_UTILS_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 #include <asl/dom/Nodes.h>
 #include <asl/base/Exception.h>
 #include <y60/base/DataTypes.h>

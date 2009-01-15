@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_TRANSPORT_LAYER_INCLUDED
 #define Y60_ASS_TRANSPORT_LAYER_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 #include "ASSUtils.h"
 
 #include <asl/base/Ptr.h>
@@ -95,9 +97,9 @@ enum CommandResponse {
     RESPONSE_TIMEOUT
 };
 
-#define NOPARAM
-DEFINE_ENUM( DriverState, DriverStateEnum, NOPARAM );
-#undef NOPARAM
+
+DEFINE_ENUM( DriverState, DriverStateEnum, Y60_ASSCORE_EXPORT );
+
 
 class ASSDriver;
 

@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_CURSOR_INCLUDED
 #define Y60_ASS_CURSOR_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 namespace y60 {
 
     struct MaximumResults {

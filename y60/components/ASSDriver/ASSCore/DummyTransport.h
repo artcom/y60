@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_DUMMY_TRANSPORT_INCLUDED
 #define Y60_ASS_DUMMY_TRANSPORT_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 #include "TransportLayer.h"
 
 namespace y60 {

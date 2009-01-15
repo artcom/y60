@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_SERIAL_TRANSPORT_INCLUDED
 #define Y60_ASS_SERIAL_TRANSPORT_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 #include "TransportLayer.h"
 
 #include <asl/serial/SerialDevice.h>

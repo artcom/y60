@@ -59,8 +59,12 @@
 #ifndef ASS_EVENT_SOURCE_INCLUDED
 #define ASS_EVENT_SOURCE_INCLUDED
 
-#include <y60/ASSCore/ASSDriver.h>
-
+#include "y60_eventsource_settings.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <y60/components/ASSDriver/ASSCore/ASSDriver.h>
+#else
+#   include <y60/ASSCore/ASSDriver.h>
+#endif
 
 namespace y60 {
 

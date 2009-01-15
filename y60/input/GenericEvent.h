@@ -67,7 +67,7 @@
 
 namespace y60 {
 
-class GenericEvent : public Event {
+class Y60_INPUT_EXPORT GenericEvent : public Event {
     public:
         GenericEvent(const std::string & theCallback = std::string(""),
                      const dom::NodePtr & theSchemaDoc = dom::NodePtr(0),

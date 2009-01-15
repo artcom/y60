@@ -71,15 +71,15 @@ struct JSObject;
 
 namespace jslib {
 
-    struct IScriptablePlugin {
+    struct Y60_JSBASE_EXPORT IScriptablePlugin {
         virtual ~IScriptablePlugin() {}
-        Y60_JSBASE_EXPORT virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
+        virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
 
 
-        Y60_JSBASE_EXPORT virtual JSFunctionSpec * StaticFunctions();
+        virtual JSFunctionSpec * StaticFunctions();
 
-        Y60_JSBASE_EXPORT virtual JSFunctionSpec * Functions();
-        Y60_JSBASE_EXPORT virtual JSConstIntPropertySpec * ConstIntProperties();
+        virtual JSFunctionSpec * Functions();
+        virtual JSConstIntPropertySpec * ConstIntProperties();
 
         /**
          * Return the name under which the class is visible in js.

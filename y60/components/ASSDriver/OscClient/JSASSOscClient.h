@@ -67,6 +67,8 @@
 #ifndef _ac_y60_components_jsctscan_h_
 #define _ac_y60_components_jsctscan_h_
 
+#include "y60_oscclient_settings.h"
+
 #include "ASSOscClient.h"
 #include <y60/jsbase/JSWrapper.h>
 

@@ -59,6 +59,8 @@
 #ifndef Y60_ASS_DRIVER_INCLUDED
 #define Y60_ASS_DRIVER_INCLUDED
 
+#include "y60_asscore_settings.h"
+
 #include "TransportLayer.h"
 #include "Cursor.h"
 
@@ -88,7 +90,7 @@ namespace y60 {
 //#define ASS_LATENCY_TEST
 
 
-class ASSDriver :
+class Y60_ASSCORE_EXPORT ASSDriver :
     public jslib::IScriptablePlugin,
     public y60::IRendererExtension
 {
