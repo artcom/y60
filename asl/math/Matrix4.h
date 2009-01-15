@@ -707,7 +707,7 @@ namespace asl {
             theRotation[2] = - myZ;
         }
 
-        // BEWARE: getRotation methods only work for <=ROTATING matrices
+        // BEWARE: getRotation methods only work for non-scaling matrices
         // any other matrix type use matrix::decompose instead!!
         void getRotation(Quaternion<Number> & theOrientation) const {
             float trace = this->val[0][0] + this->val[1][1] + this->val[2][2] + 1.0f;
@@ -1087,8 +1087,6 @@ unknown:
         //           rotation [0,PI_2,0] or [0,0,PI_2])
         // From gems II, page 320
         
-        // Combinations of rotation and scale in fact might return wrong results -> better use decompose with quaternions anyway!! (gm)
-        
         bool decompose(Vector3<Number> & theScale,
                        Vector3<Number> & theShear,
                        Vector3<Number> & theOrientation,
@@ -1105,11 +1103,6 @@ unknown:
                        RotationOrder theOrder = ROTATION_ORDER_XYZ) const
         {
             if (_myType == UNKNOWN) {
-                // Decomposition is possible (descriped in gems)
-                // Steps to do:
-                // (1) Normaize matrix
-                // (2) Solve for perspective
-                //throw NotYetImplemented(JUST_FILE_LINE);
                 return false;
             }
             thePosition = getTranslation();
@@ -1329,7 +1322,6 @@ unknown:
                        Vector3<Number> & thePosition) const
         {
             if (_myType == UNKNOWN) {
-                //throw NotYetImplemented(JUST_FILE_LINE);
                 return false;
             }
 
