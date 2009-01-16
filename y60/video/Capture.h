@@ -69,8 +69,11 @@
 
 #include "y60_video_settings.h"
 
-#include "Movie.h"
+#include <asl/zip/PackageManager.h>
 #include <y60/base/NodeNames.h>
+
+#include "Movie.h"
+#include "MovieDecoderBase.h"
 
 namespace y60 {
 

@@ -33,6 +33,7 @@
  * diferences.
  */
 
+
 // set to supress warnings about #undef'ing colliding symbols from system headers
 #define _SETTING_NO_UNDEF_WARNING_ 1
 
@@ -180,5 +181,8 @@ namespace asl {
 #endif
 
 
+
 #endif // _included_asl_settings_
+
+
 

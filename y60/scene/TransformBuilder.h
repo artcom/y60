@@ -61,6 +61,7 @@
 
 #include "y60_scene_settings.h"
 
+#include <asl/dom/Nodes.h>
 #include "TransformBuilderBase.h"
 
 namespace y60 {

@@ -69,15 +69,18 @@
 
 #include "y60_video_settings.h"
 
-#include <y60/image/PixelEncoding.h>
-#include <y60/base/NodeValueNames.h>
-#include <y60/base/IDecoder.h>
+#include <string>
 
 #include <asl/base/Ptr.h>
 #include <asl/math/Matrix4.h>
 #include <asl/base/Stream.h>
-#include <string>
 #include <asl/base/Exception.h>
+#include <asl/zip/PackageManager.h>
+
+#include <y60/image/PixelEncoding.h>
+#include <y60/base/NodeValueNames.h>
+#include <y60/base/IDecoder.h>
+
 
 namespace asl {
     class ReadableBlock;
