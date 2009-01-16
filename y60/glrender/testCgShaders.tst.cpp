@@ -4,7 +4,9 @@
 #include "ShaderTypes.h"
 #include "ShaderLibrary.h"
 
-#include "y60glrender_paths.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#   include "y60glrender_paths.h"
+#endif
 
 #include <asl/base/Exception.h>
 #include <Cg/cg.h>

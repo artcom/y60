@@ -59,7 +59,9 @@
 
 #include <iostream>
 
-#include "y60image_paths.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#   include "y60image_paths.h"
+#endif
 
 #include <asl/zip/PackageManager.h>
 #include <asl/base/string_functions.h>
