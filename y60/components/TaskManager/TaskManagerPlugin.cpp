@@ -63,7 +63,7 @@
 #include <string>
 
 #include <asl/base/string_functions.h>
-#include <asl/xpath/Path.h>
+#include <asl/xpath/XPathPath.h>
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JScppUtils.h>

@@ -4,6 +4,8 @@
 #include "ShaderTypes.h"
 #include "ShaderLibrary.h"
 
+#include "y60glrender_paths.h"
+
 #include <asl/base/Exception.h>
 #include <Cg/cg.h>
 #include <iostream>
@@ -44,11 +46,18 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
 }
 
 int main(int argc, char * argv[]) {
-    const std::string myLibraryDir = "../../../shader/";
+
+#ifdef AC_BUILT_WITH_CMAKE
+#define SHADER_DIR CMAKE_CURRENT_SOURCE_DIR"/../shader/"
+#else
+#define SHADER_DIR "../../../shader/"
+#endif
+
+//    const std::string myLibraryDir = "../../../shader/";
 //const std::string myLibraryDir = "../../shader/";
 
     try {
-        testShaderLibrary(myLibraryDir+"shaderlibrary_nocg.xml","","");
+        testShaderLibrary(SHADER_DIR "shaderlibrary_nocg.xml","","");
         
         std::vector<std::pair<std::string, std::string> > myProfiles;
         myProfiles.push_back(std::make_pair("arbvp1", "arbfp1"));
@@ -59,7 +68,7 @@ int main(int argc, char * argv[]) {
         
         for (std::vector<std::pair<std::string, std::string> >::size_type i = 0; i < myProfiles.size(); ++i) {
             //testShaderLibrary(myLibraryDir+"toonshaders.xml", myProfiles[i].first, myProfiles[i].second);
-            testShaderLibrary(myLibraryDir+"shaderlibrary.xml", myProfiles[i].first, myProfiles[i].second);
+            testShaderLibrary(SHADER_DIR "shaderlibrary.xml", myProfiles[i].first, myProfiles[i].second);
         }
         return 0;
     } catch (const asl::Exception & ex) {

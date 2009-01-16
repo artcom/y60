@@ -159,15 +159,19 @@ public:
 
     void run() {
 
-	/*
+        /*
         generateBaseline();
         return;
-	*/
+        */
 
         FILE *infile = fopen("../../BASELINE", "r");
+        if( !infile ) {
+            AC_PRINT << "Cannot open baseline";
+            return;
+        }
 
         char fileName[1024];
-	int magicNumber;
+        int magicNumber;
 
         while (fscanf(infile, "%s\t%u\n", fileName, &magicNumber) == 2) {
 

@@ -79,6 +79,9 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
+
+
+
 class SoundTestBase: public UnitTest {
     public:
         SoundTestBase(SoundManager& mySoundManager, const char * myName) 
@@ -117,7 +120,7 @@ class TestLeak : public SoundTestBase {
             AC_PRINT << "### INITIAL USAGE:" << getProcessMemoryUsage();
             unsigned myStartUsage = 0;
 
-            const char * mySoundFile = "../../testfiles/Plopp_2a.wav";
+            const char * mySoundFile = TEST_FILES "/Plopp_2a.wav";
             int myDiff;
             
             for (unsigned j=0; j<20; ++j) {
@@ -168,11 +171,11 @@ class TestPlay : public SoundTestBase {
         }
 
         void run() {
-            play("../../testfiles/aussentuer.mp3");
-            play("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
-            play("../../testfiles/stereotest441.wav");
-            play("../../testfiles/stereotest480.wav");
-            play("../../testfiles/Plopp_2a.wav");
+            play(TEST_FILES "/aussentuer.mp3");
+            play(TEST_FILES "/sz5-1_c-beam Warnung_Time_1.WAV");
+            play(TEST_FILES "/stereotest441.wav");
+            play(TEST_FILES "/stereotest480.wav");
+            play(TEST_FILES "/Plopp_2a.wav");
             msleep(100);
             ENSURE(getSoundManager().getNumSounds() == 0);
         }
@@ -195,8 +198,8 @@ class TestBroken : public SoundTestBase {
         }
 
         void run() {
-            play("../../testfiles/leer.wav");
-            play("../../testfiles/broken.wav");
+            play(TEST_FILES "/leer.wav");
+            play(TEST_FILES "/broken.wav");
         }
 
     private:
@@ -226,7 +229,7 @@ class TestFireAndForget: public SoundTestBase {
             Time myDuration;
             {
                 SoundPtr mySound = 
-                        getSoundManager().createSound("../../testfiles/stereotest441.wav");
+                        getSoundManager().createSound(TEST_FILES "/stereotest441.wav");
                 mySound->play();
                 myDuration = mySound->getDuration();
             }
@@ -245,7 +248,7 @@ class TestTwoSounds: public SoundTestBase {
 
         void run() {
             Time myDuration;
-            SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
+            SoundPtr mySound = getSoundManager().createSound(TEST_FILES "/aussentuer.mp3");
             mySound->play();
             myDuration = mySound->getDuration();
             DPRINT(myDuration);
@@ -253,7 +256,7 @@ class TestTwoSounds: public SoundTestBase {
             ENSURE(fabs(myDuration-1.619) < 0.03);
             AC_WARNING << "TODO: check correct value for new version of ffmpeg, original test threshold was 0.01, not 0.03";
 
-            mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
+            mySound = getSoundManager().createSound(TEST_FILES "/stereotest441.wav");
             mySound->play();
             myDuration = maximum(myDuration, mySound->getDuration());
             msleep(unsigned(myDuration*1000));
@@ -271,9 +274,9 @@ class TestStopAll: public SoundTestBase {
             ENSURE(getSoundManager().getNumSounds() == 0);
             {
                 SoundPtr mySound = getSoundManager().createSound(
-                        "../../testfiles/aussentuer.mp3");
+                        TEST_FILES "/aussentuer.mp3");
                 mySound->play();
-                mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
+                mySound = getSoundManager().createSound(TEST_FILES "/stereotest441.wav");
                 mySound->play();
             }
 
@@ -313,7 +316,7 @@ class TestStop: public SoundTestBase {
     private:
         void runLoop(bool theLoop) {
             SoundPtr mySound = getSoundManager().createSound(
-                    "../../testfiles/aussentuer.mp3", theLoop);
+                    TEST_FILES "/aussentuer.mp3", theLoop);
             mySound->play();
             msleep(200);
             checkTime(mySound, 0.2);
@@ -347,22 +350,22 @@ class TestCache: public SoundTestBase {
             ENSURE(getSoundManager().getCacheMemUsed() == 0);
             ENSURE(getSoundManager().getMaxCacheSize() == 0);
             {
-                play("../../testfiles/aussentuer.mp3");
-                play("../../testfiles/stereotest441.wav");
+                play(TEST_FILES "/aussentuer.mp3");
+                play(TEST_FILES "/stereotest441.wav");
             }
             // We'll have one cached item anyway because the check for cache size
             // limits is done when a new sound is played, not before.
             ENSURE(getSoundManager().getNumItemsInCache() == 1);
-            getSoundManager().deleteCacheItem("../../testfiles/stereotest441.wav");
+            getSoundManager().deleteCacheItem(TEST_FILES "/stereotest441.wav");
             ENSURE(getSoundManager().getNumItemsInCache() == 0);
             AC_PRINT << "Testing warning code. Ignore warnings about cache memory usage following this line.";
             getSoundManager().setCacheSize(0,0);
-            play("../../testfiles/aussentuer.mp3");
+            play(TEST_FILES "/aussentuer.mp3");
             ENSURE(getSoundManager().getNumItemsInCache() == 0);
             getSoundManager().setCacheSize(128*1024*1024, 24*1024*1024);
-            getSoundManager().preloadSound("../../testfiles/stereotest441.wav");
+            getSoundManager().preloadSound(TEST_FILES "/stereotest441.wav");
             ENSURE(getSoundManager().getNumItemsInCache() == 1);
-            play("../../testfiles/stereotest441.wav");
+            play(TEST_FILES "/stereotest441.wav");
         }
         
     private:
@@ -383,13 +386,13 @@ class TestStopByItself: public SoundTestBase {
         }
 
         void run() {
-            playFile("../../testfiles/ShutterClick.wav");
+            playFile(TEST_FILES "/ShutterClick.wav");
 
-            playFile("../../testfiles/aussentuer.mp3");
+            playFile(TEST_FILES "/aussentuer.mp3");
             
             {
                 SoundPtr mySound = getSoundManager().createSound
-                        ("../../testfiles/aussentuer.mp3");
+                        (TEST_FILES "/aussentuer.mp3");
                 mySound->play();
                 while(mySound->isPlaying()) {
                     msleep(100);
@@ -434,7 +437,7 @@ class TestPause: public SoundTestBase {
         void run() {
             {
                 SoundPtr mySound = getSoundManager().createSound
-                        ("../../testfiles/aussentuer.mp3");
+                        (TEST_FILES "/aussentuer.mp3");
                 mySound->play();
                 msleep(200);
                 checkTime(mySound, 0.2);
@@ -456,7 +459,7 @@ class TestPause: public SoundTestBase {
         void runLoop(bool theLoop) {
             {
                 SoundPtr mySound = getSoundManager().createSound
-                        ("../../testfiles/aussentuer.mp3", theLoop);
+                        (TEST_FILES "/aussentuer.mp3", theLoop);
                 mySound->play();
                 msleep(200);
                 mySound->pause();
@@ -491,7 +494,7 @@ class TestLoop: public SoundTestBase {
         }
        
         void run() {
-            SoundPtr mySound = getSoundManager().createSound("../../testfiles/crash.wav", true);
+            SoundPtr mySound = getSoundManager().createSound(TEST_FILES "/crash.wav", true);
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
@@ -519,7 +522,7 @@ class TestVolume: public SoundTestBase {
         void run() {
             {   // Sound volume 
                 SoundPtr mySound = getSoundManager().createSound
-                        ("../../testfiles/aussentuer.mp3");
+                        (TEST_FILES "/aussentuer.mp3");
                 mySound->setVolume(0.2f);
                 ENSURE(almostEqual(mySound->getVolume(), 0.2));
                 mySound->play();
@@ -535,7 +538,7 @@ class TestVolume: public SoundTestBase {
             if (_myTestGlobalVolume) {
                 // Global volume
                 SoundPtr mySound = getSoundManager().createSound
-                        ("../../testfiles/aussentuer.mp3");
+                        (TEST_FILES "/aussentuer.mp3");
                 getSoundManager().setVolume(0.2f);
                 mySound->play();
                 msleep(200);
@@ -562,7 +565,7 @@ class TestSeek: public SoundTestBase {
 
         void run() {
             SoundPtr mySound = getSoundManager().createSound
-                    ("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
+                    (TEST_FILES "/sz5-1_c-beam Warnung_Time_1.WAV");
             // Seek at start
             mySound->seek(0.5);
             checkTime(mySound, 0.5);
@@ -620,7 +623,7 @@ class StressTest: public SoundTestBase {
         void doIteration(int i) {
             // No caching.
             SoundPtr mySound = getSoundManager().createSound
-                ("../../testfiles/stereotest441.wav", false, false);
+                (TEST_FILES "/stereotest441.wav", false, false);
             mySound->setVolume(0.02f);
             mySound->play();
             double r1 = rand()/double(RAND_MAX);

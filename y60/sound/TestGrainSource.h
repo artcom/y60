@@ -70,6 +70,14 @@
 using namespace y60;
 using namespace asl;
 
+#include "y60sound_paths.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#   define TEST_FILES CMAKE_CURRENT_SOURCE_DIR"/testfiles"
+#else
+#   define TEST_FILES "../../testfiles"
+#endif
+
+
 class GrainSourceStressTest : public UnitTest {
 
 public: 
@@ -90,7 +98,7 @@ public:
               unsigned myGrainSize = 2*i;
               //unsigned myGrainRate = i;
 
-              std::string mySoundFile = "../../testfiles/ShutterClick.wav";
+              std::string mySoundFile = TEST_FILES "/ShutterClick.wav";
 
               GrainSourcePtr myGrainSource = 
                   GrainSourcePtr(new GrainSource("aGrainSource", 

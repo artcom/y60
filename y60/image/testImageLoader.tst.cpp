@@ -59,6 +59,8 @@
 
 #include <iostream>
 
+#include "y60image_paths.h"
+
 #include <asl/zip/PackageManager.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/UnitTest.h>
@@ -83,15 +85,22 @@ class ImageLoaderTest : public UnitTest {
     public:
         ImageLoaderTest() : UnitTest("ImageLoaderTest") {  }
         void run() {
+
+#ifdef AC_BUILT_WITH_CMAKE
+#define IMAGE_DIR CMAKE_CURRENT_SOURCE_DIR"/testfiles"
+#else
+#define IMAGE_DIR "../../testfiles"
+#endif
+
             PLAnyPicDecoder myDecoder;
             PLAnyBmp myReferenceBmp;
-            myDecoder.MakeBmpFromFile("../../testfiles/testbild00.rgb", &myReferenceBmp, PLPixelFormat::X8R8G8B8);
+            myDecoder.MakeBmpFromFile(IMAGE_DIR "/testbild00.rgb", &myReferenceBmp, PLPixelFormat::X8R8G8B8);
 
-            ImageLoader myAdapter("../../testfiles/testbild00.rgb");
+            ImageLoader myAdapter(IMAGE_DIR "/testbild00.rgb");
 
             ENSURE(myReferenceBmp == myAdapter);
 
-            ImageLoader my3DAdapter("../../testfiles/test3dtexture.jpg", PackageManagerPtr(0), ITextureManagerPtr(0), 8);
+            ImageLoader my3DAdapter(IMAGE_DIR "/test3dtexture.jpg", PackageManagerPtr(0), ITextureManagerPtr(0), 8);
             my3DAdapter.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, 8);
             SUCCESS("Loaded 3D-Texture image");
         }

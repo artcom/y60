@@ -59,6 +59,8 @@
 
 #include <iostream>
 
+#include "y60image_paths.h"
+
 #include <asl/base/string_functions.h>
 #include <asl/base/UnitTest.h>
 
@@ -93,19 +95,27 @@ class RasterTest : public UnitTest {
     public:
         RasterTest() : UnitTest("RasterTest") {  }
         void run() {
-            testImageFile("../../../shader/shadertex/one_white_pixel.png");
-            testImageFile("../../testfiles/white_square_4x4.PNG");
-            testImageFile("../../testfiles/grey_square_4x4.PNG");
-            testImageFile("../../testfiles/checker_square_4x4.PNG");
-            testImageFile("../../testfiles/stripe_square_4x4.PNG");
-            testImageFile("../../testfiles/testbild00.rgb");
+
+            
+#ifdef AC_BUILT_WITH_CMAKE
+#define IMAGE_DIR CMAKE_CURRENT_SOURCE_DIR"/testfiles"
+#else
+#define IMAGE_DIR "../../testfiles"
+#endif
+
+            testImageFile(IMAGE_DIR "/white_square_4x4.PNG");
+            testImageFile(IMAGE_DIR "/grey_square_4x4.PNG");
+            testImageFile(IMAGE_DIR "/checker_square_4x4.PNG");
+            testImageFile(IMAGE_DIR "/stripe_square_4x4.PNG");
+            testImageFile(IMAGE_DIR "/testbild00.rgb");
+            testImageFile(IMAGE_DIR "/one_white_pixel.png");
             /*
             {
 
                 PLAnyPicDecoder myDecoder;
                 PLAnyBmp myReferenceBmp;
-                myDecoder.MakeBmpFromFile("../../testfiles/white_square_4x4.png", &myReferenceBmp, PLPixelFormat::R8G8B8);
-                ImageLoader myImageLoader("../../testfiles/white_square_4x4.png", ".", 1);
+                myDecoder.MakeBmpFromFile(IMAGE_DIR "/white_square_4x4.png", &myReferenceBmp, PLPixelFormat::R8G8B8);
+                ImageLoader myImageLoader( std::string(IMAGE_DIR "/white_square_4x4.png"), ".", 1);
                 ENSURE(myReferenceBmp == myImageLoader);
 
                 ResizeableRasterPtr myRaster = myImageLoader.getRaster();
