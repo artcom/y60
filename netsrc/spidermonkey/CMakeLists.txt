@@ -19,9 +19,13 @@ set(SOURCES
     prmjtime.c
 )
 
-# XXX This is a separate library in the original spidermonkey build
-#     Lets keep things simple and just mix in the sources for now.
 if (WIN32)
+    # Make CMake build all libs in a common directory. Since we build
+    # DLLs the tests need to find their libraries even while they are not
+    # installed in their final locations (during testrun that is).
+    set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+    # XXX This is a separate library in the original spidermonkey build
+    #     Lets keep things simple and just mix in the sources for now.
     list( APPEND SOURCES fdlibm/e_acos.c fdlibm/e_acosh.c fdlibm/e_asin.c
             fdlibm/e_atan2.c fdlibm/e_atanh.c fdlibm/e_cosh.c fdlibm/e_exp.c
             fdlibm/e_fmod.c fdlibm/e_gamma.c fdlibm/e_gamma_r.c

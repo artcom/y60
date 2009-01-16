@@ -21,6 +21,9 @@ enable_testing()
 
 include(FindPkgConfig)
 
+if(WIN32)
+endif(WIN32)
+
 if(NOT ACMAKE_INTEGRATED_BUILD)
     include(AcMakeConfig)
 else(NOT ACMAKE_INTEGRATED_BUILD)

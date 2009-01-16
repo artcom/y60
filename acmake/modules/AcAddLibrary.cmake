@@ -80,15 +80,22 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     endif(THIS_LIBRARY_HEADER_ONLY)
 
     # create tests
-    if (WIN32)
-        set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}_")
-    else (WIN32)
-        set(TEST_NAMESPACE "")
-    endif(WIN32)
+    # TODO: - clean up test naming stuff
+    #       - maybe add test-namespacing to linux, too?
+    set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
     foreach(TEST ${THIS_LIBRARY_TESTS})
-        # define the target
+        if (WIN32)
+            set(TEST_EXE_NAME
+                    "${TEST_NAMESPACE}_test${TEST}")
+            set(TEST_EXE_PATH
+                    "${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAMESPACE}_test${TEST}")
+        else (WIN32)
+            set(TEST_EXE_NAME "test${TEST}" )
+            set(TEST_EXE_PATH ${TEST_EXE_NAME} )
+        endif (WIN32)
+        # define the executable
         ac_add_executable(
-            ${TEST_NAMESPACE}test${TEST}
+            ${TEST_EXE_NAME}
             SOURCES test${TEST}.tst.cpp
             DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME}
             EXTERNS ${THIS_LIBRARY_EXTERNS}
@@ -96,7 +103,6 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         )
 	
         # tell ctest about it
-        add_test(${TEST} test${TEST})
+        add_test(${THIS_LIBRARY_NAME}_${TEST} ${TEST_EXE_PATH})
     endforeach(TEST)
-   
 endmacro(ac_add_library)

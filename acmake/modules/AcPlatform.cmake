@@ -66,6 +66,10 @@ else(UNIX)
         add_definitions( -D_CRT_SECURE_NO_WARNINGS )
         add_definitions( -D_CRT_NONSTDC_NO_WARNINGS )
         add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+        # Make CMake build all libs in a common directory. Since we build
+        # DLLs the tests need to find their libraries even while they are not
+        # installed in their final locations (during testrun that is). 
+        set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
     endif(WIN32)
     
 endif(UNIX)
