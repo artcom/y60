@@ -111,18 +111,18 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
     // a destination pixel value
     for(int r=0; r<_myRadius; ++r) {
         for(int i=0; i<256; ++i) {
-            unsigned char d = static_cast<unsigned char>(theParameters[4 + r] * i);
+            unsigned int d = theParameters[4 + r] * i;
             if (d>255) {
                 d=255;
             }
-            _myLUT[r*256+i]=d;
+            _myLUT[r*256+i] = static_cast<unsigned char>(d);
         }
     }
     
     if (_myAlpha > 0) {
         _myAlphaLUT.resize(256*256);
-        for (unsigned char i=0; i<256; ++i) {
-            for (unsigned char mySourceAlpha=0; mySourceAlpha<256; ++mySourceAlpha) {
+        for (unsigned int i=0; i<256; ++i) {
+            for (unsigned int mySourceAlpha=0; mySourceAlpha<256; ++mySourceAlpha) {
                 _myAlphaLUT[(mySourceAlpha<<8)+i] = static_cast<unsigned char>((i * _myAlpha * mySourceAlpha) / 255 / 255);
             }
         }    
