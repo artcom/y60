@@ -54,9 +54,14 @@ add_subdirectory(jslib)
 add_subdirectory(sdlengine)
 
 if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+    option(Y60_WITH_GTK "Build javascript gtk bindings and g60 frontend" ON)
+endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+
+if(Y60_WITH_GTK)
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
-endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+endif(Y60_WITH_GTK)
+
 
 add_subdirectory(products)
 add_subdirectory(components)

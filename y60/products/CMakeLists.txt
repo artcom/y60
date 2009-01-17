@@ -1,7 +1,7 @@
 
 add_subdirectory(y60)
 
-if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+if(Y60_WITH_GTK)
     add_subdirectory(g60)
-endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
+endif(Y60_WITH_GTK)
 
