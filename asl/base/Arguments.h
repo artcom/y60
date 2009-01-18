@@ -64,6 +64,11 @@ public:
         const char * theName;
         const char * theArgumentName;
     };
+    struct AllowedOptionWithDocumentation {
+        const char * theName;
+        const char * theArgumentName;
+        const char * theDocumentation;
+	};
 
     enum {
         OPTION_START_CHAR = '-',
@@ -74,6 +79,7 @@ public:
     Arguments(const AllowedOption * allowedOptions = 0);
 
     void addAllowedOptions(const AllowedOption * allowedOptions);
+    void addAllowedOptionsWithDocumentation(const AllowedOptionWithDocumentation * allowedOptions);
     const std::string & getOptionArgument(const std::string & option) const;
 
     DEFINE_EXCEPTION(IllegalOptionQuery,asl::Exception)
@@ -85,7 +91,8 @@ public:
     void printRevision() const;
     void printVersion() const;
     void printCopyright() const;
-    void setArgumentDescription(const char * theArgumentDescription);
+    void setShortDescription(const std::string & theDescription);
+    void setLongDescription(const std::string & theDescription);
 
     int getCount() const {
         return _justArguments.size();
@@ -103,13 +110,21 @@ public:
     std::vector<std::string> getOptionNames() const;
 
 private:
+	// storage of the parsed arguments
     std::map<std::string,int> _options;
     std::vector<std::string> _allArguments;
-    std::map<std::string,std::string> _allowedOptions;
-    std::vector<std::string> _argumentNames;
-    std::vector<int> _justArguments;
     std::string _programName;
-    std::string _myArgumentDescription;
+	std::vector<int> _justArguments;
+		
+	// storage of the argument specification
+    std::map<std::string,std::string> _allowedOptions;
+    std::map<std::string,std::string> _optionDescriptions;
+	
+	std::vector<std::string> _argumentNames;
+    std::vector<std::string> _argumentDescriptions;
+
+    std::string _myGeneralShortDescription;
+    std::string _myGeneralLongDescription;
 };
 
 /* @} */

@@ -368,6 +368,7 @@ namespace asl {
             return readString(theDest, myStringLength, theReadOffset);	
         }
         virtual operator const void*() const = 0;
+		virtual ~ReadableArrangedStream() {};
     };
     typedef ReadableArrangedStream<AC_DEFAULT_BYTE_ORDER> ReadableStream;
 
@@ -403,9 +404,10 @@ namespace asl {
         typedef ReadableArrangedStream<EXTERNAL_BYTE_ORDER> Base;
     public:
         ReadableArrangedFile(const std::string & theFileName)
-            : _mySize(getFileSize(theFileName)),
-            _myPosition(0),
-            _myFileName(theFileName, UTF8)
+            : _myFileName(theFileName, UTF8),
+             _mySize(getFileSize(theFileName)),
+            _myPosition(0)
+            
         {
             _myInFile.open(_myFileName.toLocale().c_str() ,std::ios::binary);
         }
@@ -442,11 +444,11 @@ namespace asl {
             return _myFileName.toUTF8();
         }
     private:
-        mutable typename Base::size_type _myPosition;
         // _myFileName must be initialized before the stream
         Path _myFileName;
-        mutable std::ifstream _myInFile;
         typename Base::size_type _mySize;
+        mutable std::ifstream _myInFile;
+        mutable typename Base::size_type _myPosition;
     };
     typedef ReadableArrangedFile<AC_DEFAULT_BYTE_ORDER> ReadableFile;
 
@@ -660,6 +662,7 @@ namespace asl {
         void countBytes(Unsigned64 theCount) {
             _myByteCounter += theCount;
         }
+		virtual ~WriteableArrangedStream() {}
     private:
         Unsigned64 _myByteCounter;
     };

@@ -131,6 +131,7 @@ ASL_BASE_EXPORT std::string searchFile(const std::string & theFileName, const st
 
 /// read a complete file into a string
 ASL_BASE_EXPORT std::string readFile(const std::string& theFileName);
+ASL_BASE_EXPORT bool readFile(const std::string& theFileName, std::vector<std::string> & theLines);
 ASL_BASE_EXPORT bool readFile(const std::string& theFileName, std::string & theContent);
 ASL_BASE_EXPORT bool readFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
 ASL_BASE_EXPORT bool writeFile(const std::string& theFileName, const std::string & theContent);

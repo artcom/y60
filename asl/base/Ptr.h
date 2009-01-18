@@ -176,6 +176,7 @@ namespace asl {
             static RefCount * allocate() {
                 // make sure pthread_key_create is called only once
                 static int _theKeyStatus_ = pthread_key_create(&_theKey_,0);
+				(void)(_theKeyStatus_); // avoid unused warning
                 RefCount * myHead = reinterpret_cast<RefCount *>(pthread_getspecific(_theKey_));
                 if (myHead) {
                     int status = pthread_setspecific(_theKey_,myHead->getNextPtr());
@@ -210,6 +211,7 @@ namespace asl {
             typedef MultiProcessor ThreadingModel;
             static ReferenceCounter<ThreadingModel> * allocate() {
                 static int myStatus = pthread_mutex_init(&_theMutex_,0);
+				(void)(myStatus); // avoid unused Warning
                 pthread_mutex_lock(&_theMutex_);
                 if (_theFreeListHead_) {
                     ReferenceCounter<ThreadingModel> * result = _theFreeListHead_;

@@ -70,6 +70,7 @@ namespace asl {
     class ASL_BASE_EXPORT MessageSink {
     public:
         virtual void push(Severity theSeverity, const std::string & theMessage) = 0;
+		virtual ~MessageSink() {}
     };
     DEFINE_EXCEPTION(UnknownSinkExeption, Exception);
 
@@ -83,6 +84,7 @@ namespace asl {
                                     const std::string & theModule,
                                     int                 theId,
                                     const std::string & theText) = 0;
+		virtual ~LogMessageFormatter() {}
     };
 
  
@@ -121,7 +123,7 @@ namespace asl {
         struct ModuleVerbosityEntry : public ModuleVerbosity {
             ModuleVerbosityEntry() {}
             ModuleVerbosityEntry(const std::string & theModule, Severity theVerbosity,int theMinId, int myMaxId)
-                : myModule(theModule), ModuleVerbosity(theVerbosity,theMinId,myMaxId)
+                :  ModuleVerbosity(theVerbosity,theMinId,myMaxId), myModule(theModule)
             {}
             std::string myModule;
         };

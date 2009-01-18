@@ -450,10 +450,9 @@ namespace asl {
             std::cerr << ":: NoisyScopeTimer ready: " << _myTitle << std::endl;
                 }
         private:
-        std::string _myTitle;
-        int _myCount;
-
-                NanoTime _myStartTime;
+			int _myCount;
+			std::string _myTitle;
+			NanoTime _myStartTime;
         };
     inline std::ostream & operator<<(std::ostream& s, const asl::Time & t) {
         return t.print(s);

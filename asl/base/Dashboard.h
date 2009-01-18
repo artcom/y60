@@ -288,12 +288,13 @@ namespace asl {
                 :
                 _myElapsed(theTimer._myElapsed),
                 _myStartTime(theTimer._myStartTime),
-                _myGroup(theTimer._myGroup),
+                _myMinTime(theTimer._myMinTime),
+                _myMaxTime(theTimer._myMaxTime),
+				_myGroup(theTimer._myGroup),
                 _isRunning(false),
                 _myParent(theTimer._myParent),
-                _myCounter(theTimer._myCounter),
-                _myMinTime(theTimer._myMinTime),
-                _myMaxTime(theTimer._myMaxTime)
+                _myCounter(theTimer._myCounter)
+
             {
             }
             Timer & operator=(const Timer & theTimer) {

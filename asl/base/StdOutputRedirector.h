@@ -71,8 +71,9 @@ namespace asl {
             std::streambuf * _myOutFile;
             long             _myMaximumFileSize;
             std::string      _myOutputFilename;
-            std::string      _myOldArchiveFilename;
+
             long long        _myStartTime;
+            std::string      _myOldArchiveFilename;
             bool             _myRemoveOldArchiveFlag; // always keep only one archive log and one current
             bool             _myLogInOneFileFlag;     // create on file with multiple app starts
             long long        _myFileSizeCheckFrequInSec;

@@ -59,8 +59,9 @@ void
 Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     int i = 0;
     while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "")
-            && i < MAX_OPTIONS) {
-                if ( !std::string(allowedOptions[i].theName).empty() ) {
+            && i < MAX_OPTIONS) 
+	{
+		if ( !std::string(allowedOptions[i].theName).empty() ) {
             _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
         } else {
             _argumentNames.push_back(allowedOptions[i].theArgumentName);
@@ -70,6 +71,22 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     _allowedOptions["--revision"] = "";
     _allowedOptions["--version"] = "";
     _allowedOptions["--copyright"] = "";
+}
+
+void 
+Arguments::addAllowedOptionsWithDocumentation(const AllowedOptionWithDocumentation * allowedOptions) {
+	int i = 0;
+    while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "") && i < MAX_OPTIONS) 
+    {
+		if (!std::string(allowedOptions[i].theName).empty() ) {
+            _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
+            _optionDescriptions[allowedOptions[i].theName] = allowedOptions[i].theDocumentation;
+        } else {
+           _argumentNames.push_back(allowedOptions[i].theArgumentName);
+           _argumentDescriptions.push_back(allowedOptions[i].theDocumentation);
+        }
+        ++i;
+	}
 }
 
 const string &
@@ -184,7 +201,7 @@ Arguments::parse(int argc, const char * const argv[], StringEncoding theEncoding
 
 void
 Arguments::printCopyright() const {
-    AC_PRINT << _programName << " Copyright (C) 2003-2006 ART+COM";
+    AC_PRINT << _programName << " Copyright (C) 2003-2009 ART+COM";
 }
 
 void
@@ -201,8 +218,7 @@ void
 Arguments::printUsage() const {
     ostringstream myUsage;
     myUsage << "Usage: " << _programName << " ";
-    for (map<string,string>::const_iterator it = _allowedOptions.begin();
-            it != _allowedOptions.end(); ++it) {
+    for (map<string,string>::const_iterator it = _allowedOptions.begin(); it != _allowedOptions.end(); ++it) {
         myUsage << "[" << it->first;
         if (it->second != "") {
             myUsage << " <" << it->second << ">";
@@ -212,18 +228,42 @@ Arguments::printUsage() const {
     for (unsigned i = 0; i < _argumentNames.size(); ++i) {
         myUsage << _argumentNames[i] << " ";
     }
-
-    if (_myArgumentDescription.size() > 0) {
-        myUsage << _myArgumentDescription;
+    myUsage << endl;
+    if (_myGeneralShortDescription.size()) {
+        // all in one description
+        myUsage << _myGeneralShortDescription << endl;
+    }
+    if (_optionDescriptions.size()) {
+		for (map<string,string>::const_iterator it = _allowedOptions.begin();
+			 it != _allowedOptions.end(); ++it) 
+		{
+           myUsage << "  " << it->first;
+           if (it->second != "") {
+               myUsage << " <" << it->second << ">";
+		   }
+		   myUsage << ": " << _optionDescriptions.find(it->first)->second << endl;
+        }
+    }
+    if (_argumentDescriptions.size()) {
+        for (unsigned i = 0; i < _argumentNames.size() && i < _argumentDescriptions.size(); ++i) {
+            myUsage << "<" << _argumentNames[i] << "> : " << _argumentDescriptions[i] << endl;
+        }
+    }
+    if (_myGeneralLongDescription.size()) {
+        // all in one description
+        myUsage << _myGeneralLongDescription << endl;
     }
     AC_PRINT << myUsage.str();
 }
 
 void
-Arguments::setArgumentDescription(const char * theArgumentDescription) {
-    _myArgumentDescription = theArgumentDescription;
+Arguments::setShortDescription(const std::string & theDescription) {
+    _myGeneralShortDescription = theDescription;
 }
-
+void
+Arguments::setLongDescription(const std::string & theDescription) {
+    _myGeneralLongDescription = theDescription;
+}
 } // namespace asl
 
 

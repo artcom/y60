@@ -29,6 +29,7 @@
 #include "Path.h"
 
 #include <string>
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <sys/stat.h>
@@ -315,6 +316,23 @@ namespace asl {
             }
         } else {
             return false;
+        }
+        return inFile.eof() && !inFile.bad();
+    }
+    
+    /// read lines from a text file and puts it into a vector of strings
+    bool readFile(const std::string & theUTF8Filename, std::vector<std::string> & theLines) {
+        std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str());
+        if (inFile) {
+            while (inFile) {
+                theLines.push_back(std::string());
+                getline(inFile,theLines.back());
+             }    
+        } else {
+            return false;
+        }
+        if (theLines.size() && theLines.back().size() == 0) {
+            theLines.pop_back();
         }
         return inFile.eof() && !inFile.bad();
     }
