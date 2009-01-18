@@ -192,7 +192,7 @@ int main( int argc, char *argv[])  {
     cout << getFilenamePart(argv[0]) << " copyright (c) 2001-2004 ART+COM AG" << endl;
     string myArgDesc = string("See '") + string(getFilenamePart(argv[0])) +
                               " --help' for more information.";
-    myArguments.setArgumentDescription(myArgDesc.c_str());
+    myArguments.setShortDescription(myArgDesc.c_str());
 
     if (!myArguments.parse( argc, argv )) {
         return 1;

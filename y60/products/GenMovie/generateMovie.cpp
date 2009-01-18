@@ -223,7 +223,7 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
 int main( int argc, char *argv[])  {
     string myArgDesc = string("[image ... ]\nSee '") + string(getFilenamePart(argv[0])) +
                               " --help' for more information.";
-    myArguments.setArgumentDescription(myArgDesc.c_str());
+    myArguments.setShortDescription(myArgDesc.c_str());
 
     if (!myArguments.parse( argc, argv )) {
         return 1;
