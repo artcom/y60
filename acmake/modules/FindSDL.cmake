@@ -52,6 +52,7 @@
 # is #include "SDL.h", not <SDL/SDL.h>. This is done for portability
 # reasons because not all systems place things in SDL/ (see FreeBSD).
 
+
 FIND_PATH(SDL_INCLUDE_DIR SDL.h
   HINTS
   $ENV{SDLDIR}
@@ -93,6 +94,19 @@ FIND_LIBRARY(SDL_LIBRARY_TEMP
   /opt/csw
   /opt
 )
+FIND_LIBRARY(SDL_LIBRARY_TEMP_D 
+  NAMES SDLd SDL-1.1d
+  HINTS
+  $ENV{SDLDIR}
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  /usr/local
+  /usr
+  /sw
+  /opt/local
+  /opt/csw
+  /opt
+)
 
 #MESSAGE("SDL_LIBRARY_TEMP is ${SDL_LIBRARY_TEMP}")
 
@@ -104,6 +118,19 @@ IF(NOT SDL_BUILDING_LIBRARY)
     # necessarily need it.
     FIND_LIBRARY(SDLMAIN_LIBRARY 
       NAMES SDLmain SDLmain-1.1
+      HINTS
+      $ENV{SDLDIR}
+      PATH_SUFFIXES lib64 lib
+      PATHS
+      /usr/local
+      /usr
+      /sw
+      /opt/local
+      /opt/csw
+      /opt
+    )
+    FIND_LIBRARY(SDLMAIN_LIBRARY_D 
+      NAMES SDLmaind SDLmain-1.1d
       HINTS
       $ENV{SDLDIR}
       PATH_SUFFIXES lib64 lib
@@ -134,12 +161,13 @@ IF(MINGW)
 ENDIF(MINGW)
 
 SET(SDL_FOUND "NO")
-IF(SDL_LIBRARY_TEMP)
+IF(SDL_LIBRARY_TEMP AND SDL_LIBRARY_TEMP_D)
   # For SDLmain
   IF(NOT SDL_BUILDING_LIBRARY)
-    IF(SDLMAIN_LIBRARY)
+    IF(SDLMAIN_LIBRARY AND SDLMAIN_LIBRARY_D)
       SET(SDL_LIBRARY_TEMP ${SDLMAIN_LIBRARY} ${SDL_LIBRARY_TEMP})
-    ENDIF(SDLMAIN_LIBRARY)
+      SET(SDL_LIBRARY_TEMP_D ${SDLMAIN_LIBRARY_D} ${SDL_LIBRARY_TEMP_D})
+    ENDIF(SDLMAIN_LIBRARY AND SDLMAIN_LIBRARY_D)
   ENDIF(NOT SDL_BUILDING_LIBRARY)
 
   # For OS X, SDL uses Cocoa as a backend so it must link to Cocoa.
@@ -168,9 +196,14 @@ IF(SDL_LIBRARY_TEMP)
   SET(SDL_LIBRARY ${SDL_LIBRARY_TEMP} CACHE STRING "Where the SDL Library can be found")
   # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
   SET(SDL_LIBRARY_TEMP "${SDL_LIBRARY_TEMP}" CACHE INTERNAL "")
+  # Set the final string here so the GUI reflects the final state.
+  SET(SDL_LIBRARY_D ${SDL_LIBRARY_TEMP_D} CACHE STRING "Where the SDLd Library can be found")
+  # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
+  SET(SDL_LIBRARY_TEMP_D "${SDL_LIBRARY_TEMP_D}" CACHE INTERNAL "")
 
   SET(SDL_FOUND "YES")
-ENDIF(SDL_LIBRARY_TEMP)
+ENDIF(SDL_LIBRARY_TEMP AND SDL_LIBRARY_TEMP_D)
 
 #MESSAGE("SDL_LIBRARY is ${SDL_LIBRARY}")
+#MESSAGE("SDL_LIBRARY_D is ${SDL_LIBRARY_D}")
 

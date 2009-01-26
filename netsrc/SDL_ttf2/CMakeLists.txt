@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(ACSDLTTF)
 
-set(CMAKE_MODULE_PATH ${ACSDLTTF_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/../../acmake/modules)
+list(INSERT CMAKE_MODULE_PATH 0 ${ACSDLTTF_SOURCE_DIR})
 
 if(WIN32)
     list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
@@ -20,7 +20,7 @@ add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 include_directories(.)
 
-link_directories(${SDL_LIBRARY_DIR} ${FREETYPE_LIBRARY_DIRS})
+link_directories(${SDL_LIBRARY_DIR} ${SDL_LIBRARY_DIR_D} ${FREETYPE_LIBRARY_DIRS} ${FREETYPE_LIBRARY_DIRS_D})
 include_directories(${SDL_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS})
 
 add_library(acsdlttf SHARED SDL_ttf.c)
@@ -31,7 +31,17 @@ set_target_properties(
         PUBLIC_HEADER "SDL_ttf.h"
 )
 
-target_link_libraries(acsdlttf ${SDL_LIBRARY} ${FREETYPE_LIBRARIES})
+#_D not found - uses wrong FindSDL here???
+target_link_libraries(acsdlttf 
+        optimized ${FREETYPE_LIBRARIES} debug ${FREETYPE_LIBRARIES_D}
+)
+foreach(SUBLIB ${SDL_LIBRARY})
+    target_link_libraries(acsdlttf optimized ${SUBLIB})
+endforeach(SUBLIB)
+foreach(SUBLIB ${SDL_LIBRARY_D})
+    target_link_libraries(acsdlttf debug ${SUBLIB})
+endforeach(SUBLIB)
+            
 
 install(
     TARGETS acsdlttf

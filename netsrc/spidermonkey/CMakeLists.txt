@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Spidermonkey)
 
-set(CMAKE_MODULE_PATH ${Spidermonkey_SOURCE_DIR})
+list(INSERT CMAKE_MODULE_PATH 0 ${Spidermonkey_SOURCE_DIR})
 
 include(SpidermonkeyDefinitions)
 include(SpidermonkeyDependencies)

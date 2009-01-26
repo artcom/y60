@@ -5,8 +5,7 @@ project(Paintlib)
 
 include(FindPkgConfig)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Paintlib_SOURCE_DIR}
-		${PROJECT_SOURCE_DIR}/../../acmake/modules)
+list(INSERT CMAKE_MODULE_PATH 0 ${Paintlib_SOURCE_DIR})
 
 if(WIN32)
     list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")

@@ -171,8 +171,11 @@ namespace asl {
 
 #define DESTRACE(x) //x
 
+
 #if defined(WIN32) && defined(AC_BUILT_WITH_CMAKE)
-#   pragma warning( disable:  4251)
+    //C4661 (no suitable definition provided for explicit template 
+    //instantiation request) -> ToDo: should be removed
+#   pragma warning( disable:  4251 4661)
 #   define AC_DLL_EXPORT __declspec( dllexport )
 #   define AC_DLL_IMPORT __declspec( dllimport )
 #else

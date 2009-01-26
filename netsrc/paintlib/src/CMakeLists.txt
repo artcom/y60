@@ -201,8 +201,22 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
-target_link_libraries(paintlib ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY}
-        ${JPEG_LIBRARY} ${CURL_LIBRARY} ${OPENEXR_LIBRARIES} )
+
+target_link_libraries(paintlib 
+        optimized ${PNG_LIBRARY} debug ${PNG_LIBRARY_D} 
+        optimized ${GIF_LIBRARY} debug ${GIF_LIBRARY_D} 
+        optimized ${TIFF_LIBRARY} debug ${TIFF_LIBRARY_D}
+        optimized ${JPEG_LIBRARY} debug ${JPEG_LIBRARY_D} 
+        optimized ${CURL_LIBRARY} debug ${CURL_LIBRARY_D}
+)
+#each single library must be preceded with "debug" or "optimized
+foreach( SUBLIB ${OPENEXR_LIBRARIES} )
+    target_link_libraries(paintlib optimized ${SUBLIB})
+endforeach( SUBLIB ${OPENEXR_LIBRARIES} )
+foreach( SUBLIB ${OPENEXR_LIBRARIES_D} )
+    target_link_libraries(paintlib debug ${SUBLIB})
+endforeach( SUBLIB ${OPENEXR_LIBRARIES_D} )
+
 
 if(PAINTLIB_INTEGRATED_BUILD)
 foreach (H_FILE ${HEADERS})

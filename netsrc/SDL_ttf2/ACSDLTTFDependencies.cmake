@@ -1,6 +1,5 @@
 
 #include(FindPkgConfig)
-
 find_package(SDL)
 find_package(Freetype)
 
