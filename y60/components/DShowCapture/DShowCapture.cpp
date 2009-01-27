@@ -74,6 +74,9 @@
 #endif
 extern "C" {
 #include <ffmpeg/avcodec.h>
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#   include <ffmpeg/swscale.h>
+#endif
 }
 
 extern "C"
@@ -127,8 +130,24 @@ namespace y60 {
                     mySrcPict.linesize[2] = myLineSizeBytes;
 
                     int myDestPixelFormat = PIX_FMT_YUV444P;
-                    /*int myImgConvertResult1 =*/ img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());                    
-                    /*int myDeinterlaceResult =*/ avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());                    
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+                    img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat,
+                                _myGraph->getWidth(), _myGraph->getHeight());                    
+#else
+                    int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+                    SwsContext * img_convert_ctx = sws_getContext(_myGraph->getWidth(), _myGraph->getHeight(),
+                        myPixelFormat,
+                        _myGraph->getWidth(), _myGraph->getHeight(),
+                        myDestPixelFormat,
+                        mySWSFlags, NULL, NULL, NULL);
+                    sws_scale(img_convert_ctx, mySrcPict.data, 
+                        mySrcPict.linesize, 0, _myGraph->getHeight(), 
+                        myYUVPict.data, myYUVPict.linesize);
+                    
+                    sws_freeContext(img_convert_ctx);
+#endif        
+                    
+                    avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());                    
 
                     AVPicture myDestPict;
                     myDestPict.data[0] = theTargetRaster->pixels().begin();
@@ -138,7 +157,21 @@ namespace y60 {
                     myDestPict.linesize[1] = myLineSizeBytes;
                     myDestPict.linesize[2] = myLineSizeBytes;
 
-                    /*int myImgConvertResult2 =*/ img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat, _myGraph->getWidth(), _myGraph->getHeight());
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+                    img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat,
+                                _myGraph->getWidth(), _myGraph->getHeight());                    
+#else
+                    img_convert_ctx = sws_getCachedContext(img_convert_ctx, _myGraph->getWidth(), _myGraph->getHeight(),
+                        myDestPixelFormat,
+                        _myGraph->getWidth(), _myGraph->getHeight(),
+                        myPixelFormat,
+                        mySWSFlags, NULL, NULL, NULL);
+                    sws_scale(img_convert_ctx, myYUVPict.data, 
+                        myYUVPict.linesize, 0, _myGraph->getHeight(), 
+                        myDestPict.data, myDestPict.linesize);
+                    
+                    sws_freeContext(img_convert_ctx);
+#endif        
                     
                 } else {
                     memcpy(theTargetRaster->pixels().begin(), myData, myBufferLength);

@@ -79,6 +79,9 @@
 #ifdef OSX
     extern "C" {
 #       include <libavformat/avformat.h>
+#       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#           include <libswscale/swscale.h>
+#       endif
     }
 #   undef AV_NOPTS_VALUE
 #   define AV_NOPTS_VALUE 0x8000000000000000LL
@@ -88,6 +91,9 @@
 #   endif
     extern "C" {
 #       include <ffmpeg/avformat.h>
+#       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#           include <ffmpeg/swscale.h>
+#       endif
     }
 #   if defined(_MSC_VER)
 #       pragma warning(pop)

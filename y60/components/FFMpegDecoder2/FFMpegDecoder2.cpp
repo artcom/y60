@@ -503,9 +503,30 @@ namespace y60 {
         myDestPict.linesize[2] = myLineSizeBytes;
 
         AVCodecContext * myVCodec = _myVStream->codec;
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+        START_TIMER(decodeFrame_img_convert);
         img_convert(&myDestPict, _myDestinationPixelFormat,
                     (AVPicture*)theFrame, myVCodec->pix_fmt,
                     myVCodec->width, myVCodec->height);
+        STOP_TIMER(decodeFrame_img_convert);
+                        
+#else
+    START_TIMER(decodeFrame_sws_scale);
+                
+        int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+        SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
+            myVCodec->pix_fmt,
+            myVCodec->width, myVCodec->height,
+            _myDestinationPixelFormat,
+            mySWSFlags, NULL, NULL, NULL);
+        sws_scale(img_convert_ctx, ((AVPicture*)theFrame)->data, 
+            ((AVPicture*)theFrame)->linesize, 0, myVCodec->height, 
+            myDestPict.data, myDestPict.linesize);
+        
+        sws_freeContext(img_convert_ctx);
+    STOP_TIMER(decodeFrame_sws_scale);
+                
+#endif        
     }
 
     VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {

@@ -248,8 +248,17 @@ bool FFMpegAudioDecoder::decode() {
         
         int myLen = 0;
         while (myDataLen > 0) {
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(28<<8)+0)
+            // "avcodec_decode_audio2" needs the buffer size for initialization
+            myBytesDecoded = _mySamples.size(); 
+            myLen = avcodec_decode_audio2(myCodec,
+                    (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+#else            
             myLen = avcodec_decode_audio(myCodec, (int16_t*)_mySamples.begin(), 
                     &myBytesDecoded, myData, myDataLen);
+#endif
+
+            
             if (myLen > 0 && myBytesDecoded > 0) {
                 int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
                 AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;

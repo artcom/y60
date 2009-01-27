@@ -69,7 +69,6 @@
 #define _ac_WMVDecoder_h_
 
 #include <y60/video/AsyncDecoder.h>
-#include <y60/FFMpegDecoder/FFMpegDecoder.h>
 #include <y60/video/MovieEncoding.h>
 #include <asl/base/PlugInBase.h>
 #include <asl/base/ThreadLock.h>
@@ -79,6 +78,10 @@
 #include <windows.h>
 #include <wmsdk/wmsdk.h>
 #include <deque>
+
+extern "C" {
+#include <ffmpeg/avformat.h>
+}
 
 namespace y60 {
     DEFINE_EXCEPTION(WindowsMediaException, asl::Exception);

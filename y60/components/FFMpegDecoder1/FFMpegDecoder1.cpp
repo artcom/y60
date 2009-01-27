@@ -59,11 +59,19 @@
 #include "FFMpegDecoder1.h"
 
 #include <y60/video/Movie.h>
-
 #include <asl/base/Logger.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/string_functions.h>
 
+// remove ffmpeg macros
+#ifdef START_TIMER
+#   undef START_TIMER
+#endif
+#ifdef STOP_TIMER
+#   undef STOP_TIMER
+#endif
+
+#include <asl/base/Dashboard.h>
 #include <iostream>
 
 #define DB(x) // x
@@ -468,7 +476,30 @@ namespace y60 {
 
 
         AVCodecContext * myVCodec = _myVStream->codec;
-        img_convert(&myDestPict, _myDestinationPixelFormat, (AVPicture*)theFrame,
-                    myVCodec->pix_fmt, myVCodec->width, myVCodec->height);
+        
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+        START_TIMER(decodeFrame_img_convert);
+        img_convert(&myDestPict, _myDestinationPixelFormat,
+                    (AVPicture*)theFrame, myVCodec->pix_fmt,
+                    myVCodec->width, myVCodec->height);
+        STOP_TIMER(decodeFrame_img_convert);
+                        
+#else
+    START_TIMER(decodeFrame_sws_scale);
+                
+        int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+        SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
+            myVCodec->pix_fmt,
+            myVCodec->width, myVCodec->height,
+            _myDestinationPixelFormat,
+            mySWSFlags, NULL, NULL, NULL);
+        sws_scale(img_convert_ctx, ((AVPicture*)theFrame)->data, 
+            ((AVPicture*)theFrame)->linesize, 0, myVCodec->height, 
+            myDestPict.data, myDestPict.linesize);
+        
+        sws_freeContext(img_convert_ctx);
+    STOP_TIMER(decodeFrame_sws_scale);
+                
+#endif
     }
 }
