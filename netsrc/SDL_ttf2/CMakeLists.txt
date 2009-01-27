@@ -20,7 +20,19 @@ add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 include_directories(.)
 
-link_directories(${SDL_LIBRARY_DIR} ${SDL_LIBRARY_DIR_D} ${FREETYPE_LIBRARY_DIRS} ${FREETYPE_LIBRARY_DIRS_D})
+set(LIBRARY_DIRS
+    ${SDL_LIBRARY_DIR} ${FREETYPE_LIBRARY_DIRS}
+)
+
+if(SDL_LIBRARY_DIRS_D)
+    list(APPEND LIBRARY_DIRS ${SDL_LIBRARY_DIRS_D})
+endif(SDL_LIBRARY_DIRS_D)
+
+if(FREETYPE_LIBRARY_DIRS_D)
+    list(APPEND LIBRARY_DIRS ${FREETYPE_LIBRARY_DIRS_D})
+endif(FREETYPE_LIBRARY_DIRS_D)
+
+link_directories(${LIBRARY_DIRS})
 include_directories(${SDL_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS})
 
 add_library(acsdlttf SHARED SDL_ttf.c)
@@ -31,17 +43,27 @@ set_target_properties(
         PUBLIC_HEADER "SDL_ttf.h"
 )
 
-#_D not found - uses wrong FindSDL here???
-target_link_libraries(acsdlttf 
-        optimized ${FREETYPE_LIBRARIES} debug ${FREETYPE_LIBRARIES_D}
-)
-foreach(SUBLIB ${SDL_LIBRARY})
-    target_link_libraries(acsdlttf optimized ${SUBLIB})
-endforeach(SUBLIB)
-foreach(SUBLIB ${SDL_LIBRARY_D})
-    target_link_libraries(acsdlttf debug ${SUBLIB})
-endforeach(SUBLIB)
-            
+# XXX: need to expose all libraries as transitive link deps
+set(OPTIMIZED_LIBRARIES ${FREETYPE_LIBRARIES} ${SDL_LIBRARY})
+
+set(DEBUG_LIBRARIES)
+if(FREETYPE_LIBRARIES_D)
+    list(APPEND DEBUG_LIBRARIES ${FREETYPE_LIBRARIES_D})
+endif(FREETYPE_LIBRARIES_D)
+if(SDL_LIBRARY_D)
+    list(APPEND DEBUG_LIBRARIES ${SDL_LIBRARY_D})
+endif(SDL_LIBRARY_D)
+
+if(DEBUG_LIBRARIES)
+    foreach(SUBLIB ${OPTIMIZED_LIBRARIES})
+        target_link_libraries(acsdlttf optimized ${SUBLIB})
+    endforeach(SUBLIB)
+    foreach(SUBLIB ${DEBUG_LIBRARIES})
+        target_link_libraries(acsdlttf debug ${SUBLIB})
+    endforeach(SUBLIB)
+else(DEBUG_LIBRARIES)
+    target_link_libraries(acsdlttf ${OPTIMIZED_LIBRARIES})
+endif(DEBUG_LIBRARIES)
 
 install(
     TARGETS acsdlttf

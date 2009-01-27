@@ -201,22 +201,33 @@ set_target_properties(
         PUBLIC_HEADER "${HEADERS}"
 )
 
+# XXX: need to expose all libraries as transitive link deps
+set(OPTIMIZED_LIBRARIES ${PNG_LIBRARY} ${GIF_LIBRARY} ${TIFF_LIBRARY} ${JPEG_LIBRARY} ${CURL_LIBRARY})
 
-target_link_libraries(paintlib 
-        optimized ${PNG_LIBRARY} debug ${PNG_LIBRARY_D} 
-        optimized ${GIF_LIBRARY} debug ${GIF_LIBRARY_D} 
-        optimized ${TIFF_LIBRARY} debug ${TIFF_LIBRARY_D}
-        optimized ${JPEG_LIBRARY} debug ${JPEG_LIBRARY_D} 
-        optimized ${CURL_LIBRARY} debug ${CURL_LIBRARY_D}
-)
-#each single library must be preceded with "debug" or "optimized
-foreach( SUBLIB ${OPENEXR_LIBRARIES} )
-    target_link_libraries(paintlib optimized ${SUBLIB})
-endforeach( SUBLIB ${OPENEXR_LIBRARIES} )
-foreach( SUBLIB ${OPENEXR_LIBRARIES_D} )
-    target_link_libraries(paintlib debug ${SUBLIB})
-endforeach( SUBLIB ${OPENEXR_LIBRARIES_D} )
+set(DEBUG_LIBRARIES)
+if(PNG_LIBRARY_D)
+    list(APPEND DEBUG_LIBRARIES ${PNG_LIBRARY_D})
+endif(PNG_LIBRARY_D)
+if(GIF_LIBRARY_D)
+    list(APPEND DEBUG_LIBRARIES ${GIF_LIBRARY_D})
+endif(GIF_LIBRARY_D)
+if(TIFF_LIBRARY_D)
+    list(APPEND DEBUG_LIBRARIES ${TIFF_LIBRARY_D})
+endif(TIFF_LIBRARY_D)
+if(JPEG_LIBRARY_D)
+    list(APPEND DEBUG_LIBRARIES ${JPEG_LIBRARY_D})
+endif(JPEG_LIBRARY_D)
 
+if(DEBUG_LIBRARIES)
+    foreach( SUBLIB ${OPTIMIZED_LIBRARIES})
+        target_link_libraries(paintlib optimized ${SUBLIB})
+    endforeach( SUBLIB ${OPTIMIZED_LIBRARIES})
+    foreach( SUBLIB ${DEBUG_LIBRARIES})
+        target_link_libraries(paintlib debug ${SUBLIB})
+    endforeach( SUBLIB ${DEBUG_LIBRARIES})
+else(DEBUG_LIBRARIES)
+    target_link_libraries(paintlib ${OPTIMIZED_LIBRARIES})
+endif(DEBUG_LIBRARIES)
 
 if(PAINTLIB_INTEGRATED_BUILD)
 foreach (H_FILE ${HEADERS})
