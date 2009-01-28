@@ -74,6 +74,13 @@
 
 #include <errno.h>
 
+#ifdef AC_BUILT_WITH_CMAKE
+#   include "y60jsbase_paths.h"
+#   define TEST_DATA_DIR CMAKE_CURRENT_SOURCE_DIR
+#else
+#   define TEST_DATA_DIR "../.."
+#endif
+
 FILE *gErrFile = stderr;
 FILE *gOutFile = stdout;
 FILE *js_DumpGCHeap = NULL;
@@ -136,7 +143,14 @@ static JSFunctionSpec global_functions[] = {
     {0}
 };
 
-char * filenames[] = { "../../emptyScript.js", "../../testJSObjects.js", "../../testManyObjects.js", "../../testNative.js", "../../perfect.js", NULL };
+char * filenames[] = { 
+    TEST_DATA_DIR "/emptyScript.js",
+    TEST_DATA_DIR "/testJSObjects.js",
+    TEST_DATA_DIR "/testManyObjects.js",
+    TEST_DATA_DIR "/testNative.js",
+    TEST_DATA_DIR "/perfect.js",
+    NULL
+};
 
 #define MAGIC_NUMBER 137
 
@@ -147,7 +161,7 @@ public:
     {}
 
     void generateBaseline() {
-        FILE *outfile = fopen("../../BASELINE", "w+");
+        FILE *outfile = fopen( TEST_DATA_DIR "/BASELINE", "w+");
         for (char **fileName = filenames; *fileName; fileName++) {
             init();
             runTestScript(*fileName);
@@ -159,12 +173,13 @@ public:
 
     void run() {
 
+        // Store a new baseline in the source tree
         /*
         generateBaseline();
         return;
         */
 
-        FILE *infile = fopen("../../BASELINE", "r");
+        FILE *infile = fopen(TEST_DATA_DIR "/BASELINE", "r");
         if( !infile ) {
             AC_PRINT << "Cannot open baseline";
             return;
@@ -177,12 +192,12 @@ public:
 
             init();
             checkInit();
-            runTestScript(fileName);
+            runTestScript((std::string(TEST_DATA_DIR) + "/" + fileName).c_str());
             cleanup(false);
             checkCleanup(magicNumber);
 
             init();
-            runTestScript(fileName);
+            runTestScript((std::string(TEST_DATA_DIR) + "/" + fileName).c_str());
             cleanup(true);
             checkCleanup(magicNumber);
         }
