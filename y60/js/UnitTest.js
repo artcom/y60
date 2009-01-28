@@ -310,8 +310,8 @@ function ENSURE_EQUAL(theExpected, theResult, theMessage) {
     if (myResult){
         myResultMessage = theMessage;
     } else {
-        myResultMessage = theMessage + ": Should be " + 
-            theExpected + " but was " + theResult;
+        myResultMessage = theMessage + ": Should be '" + 
+            theExpected + "' but was '" + theResult + "'";
     }
 
     ourCurrentTest.ensure(myResult, myResultMessage,
@@ -335,8 +335,8 @@ function ENSURE_NOT_EQUAL(theExpected, theResult, theMessage) {
     if (myResult){
         myResultMessage = theMessage;
     } else {
-        myResultMessage = theMessage + ": Should not be " + 
-            theExpected;
+        myResultMessage = theMessage + ": Should not be '" + 
+            theExpected + "' but was '" + theResult + "'";
     }
 
     ourCurrentTest.ensure(myResult, myResultMessage,
