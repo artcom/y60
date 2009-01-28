@@ -50,7 +50,7 @@
 #include <netinet/in.h>
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <arpa/inet.h>
 #define SOCKET_ERROR -1
 #endif
@@ -92,7 +92,7 @@ namespace inet {
     }
 
     void TCPServer::close() {
-#ifdef WIN32
+#ifdef _WIN32
         closesocket(fd);
 #else
         ::close(fd);
@@ -103,7 +103,7 @@ namespace inet {
 
     TCPSocket* TCPServer::waitForConnection() const
     {
-#ifdef WIN32
+#ifdef _WIN32
         int remoteEndpointLen;
 #else
         socklen_t remoteEndpointLen;

@@ -309,7 +309,7 @@ void PosixThread::join () {
     DB(AC_TRACE << "#INFO : PosixThread::join() : has cleared active variable" << endl);
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 bool
 PosixThread::kill(int signalNumber) {
     if (isActive()) {

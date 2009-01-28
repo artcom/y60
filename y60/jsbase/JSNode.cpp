@@ -1673,7 +1673,12 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
                 AC_TRACE << "JSNode::setProperty: myAttrNode-post = " <<*myAttrNode << endl;
-                myAttrNode->nodeValue(as_string(cx,*vp));
+                // Try to convert array to strings
+                std::string myResult;
+                if (!JSA_ArrayToString(cx, vp, myResult)) {
+                    myResult = as_string(cx,*vp);
+                }
+                myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {
                 myNode->appendAttribute(myProperty, as_string(cx,*vp));

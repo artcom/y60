@@ -25,7 +25,7 @@
 #include "string_functions.h"
 #include "Time.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 

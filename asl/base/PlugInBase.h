@@ -53,7 +53,7 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include "windows.h"
 	namespace asl {typedef ::HINSTANCE DLHandle;}
 	#define EXPORT __declspec(dllexport)

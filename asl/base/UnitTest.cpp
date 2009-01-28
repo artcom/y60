@@ -24,12 +24,12 @@
 
 #include "console_functions.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include <windows.h>
 #   include <io.h>
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #   include "signal_functions.h"
 #endif
 
@@ -38,7 +38,7 @@ using namespace asl;
 
 #if 0
 bool isTTY(ostream & os) {
-#ifndef WIN32
+#ifndef _WIN32
     int myFD = -1;
     if (&os == &cout) {
         myFD = fileno(stdout);
@@ -61,7 +61,7 @@ bool isTTY(ostream & os) {
 #endif
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 HANDLE GetConsole(ostream & os) {
     HANDLE myHandle = 0;
     if (&os == &cout) {
@@ -76,7 +76,7 @@ HANDLE GetConsole(ostream & os) {
 
 ostream & TTYRED ( ostream & os ) {
     if (isTTY(os)) {
-#if WIN32
+#if _WIN32
         os.flush();
         SetConsoleTextAttribute(GetConsole(os), FOREGROUND_RED | FOREGROUND_INTENSITY);
 #else
@@ -88,7 +88,7 @@ ostream & TTYRED ( ostream & os ) {
 
 ostream & TTYGREEN ( ostream & os ) {
     if (isTTY(os)) {
-#if WIN32
+#if _WIN32
         os.flush();
         SetConsoleTextAttribute(GetConsole(os), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 #else
@@ -100,7 +100,7 @@ ostream & TTYGREEN ( ostream & os ) {
 
 ostream & asl::TTYYELLOW ( ostream & os ) {
     if (isTTY(os)) {
-#if WIN32
+#if _WIN32
         os.flush();
         SetConsoleTextAttribute(GetConsole(os), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 #else
@@ -111,7 +111,7 @@ ostream & asl::TTYYELLOW ( ostream & os ) {
 }
 ostream & ENDCOLOR ( ostream & os ) {
     if (isTTY(os)) {
-#if WIN32
+#if _WIN32
         os.flush();
         SetConsoleTextAttribute(GetConsole(os), FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
 #else
@@ -299,7 +299,7 @@ UnitTestSuite::run() {
     try {
         try {
             asl::Exception::initExceptionBehaviour();
-#ifndef WIN32
+#ifndef _WIN32
             asl::initSignalHandling();
 #endif
             setup();

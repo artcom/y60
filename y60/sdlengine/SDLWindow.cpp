@@ -160,7 +160,7 @@ SDLWindow::activateGLContext() {
     AC_DEBUG << "SDLWindow::activateGLContext";
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
         ensureSDLSubsystem();
-#ifdef WIN32
+#ifdef _WIN32
         unsigned int myFlags = SDL_OPENGL | SDL_NOFRAME;
 #else
         unsigned int myFlags = SDL_OPENGL;
@@ -177,8 +177,8 @@ SDLWindow::activateGLContext() {
         
         GLResourceManager::get().initCaps();
 
-#ifdef WIN32 
-        _myHasVideoSync = wglewIsSupported("WGL_EXT_swap_control");
+#ifdef _WIN32 
+        _myHasVideoSync = 0 != wglewIsSupported("WGL_EXT_swap_control");
 #elif LINUX
         _myHasVideoSync = glxewIsSupported("GLX_SGI_video_sync");
 #else
@@ -230,7 +230,7 @@ void
 SDLWindow::onResize(Event & theEvent) {
     WindowEvent & myWindowEvent = dynamic_cast<WindowEvent&>(theEvent);
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
-#ifdef WIN32
+#ifdef _WIN32
     if (!_myWinDecoFlag) {
         // Sorry, in case of a non decorated window SDL seems to use getClientRect for getting the window size.
         // This is wrong, because decorations are excluded, and so height and width are not right
@@ -497,7 +497,7 @@ SDLWindow::getScreenSize(unsigned theScreen) const {
     int myWidth  = -1;
     int myHeight = -1;
 
-#ifdef WIN32
+#ifdef _WIN32
     HWND myDesktopWindow = GetDesktopWindow();
     if (myDesktopWindow) {
         RECT myWindowRect;
@@ -533,7 +533,7 @@ void SDLWindow::setVisibility(bool theFlag) {
         AC_ERROR << "SDL_GetWMInfo: " << SDL_GetError() << endl;
         return;
     }
-#ifdef WIN32
+#ifdef _WIN32
     LPCTSTR myRenderGirlWindowName = _myWindowTitle.c_str();
     HWND myRenderGirlWindow = FindWindow(0, myRenderGirlWindowName);
     if (myRenderGirlWindow != wminfo.window) {
@@ -571,7 +571,7 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
         AC_ERROR << "SDL_GetWMInfo: " << SDL_GetError() << endl;
         return;
     }
-#ifdef WIN32
+#ifdef _WIN32
     LPCTSTR myRenderGirlWindowName = _myWindowTitle.c_str();
     HWND myRenderGirlWindow = FindWindow(0, myRenderGirlWindowName);
     if (myRenderGirlWindow != wminfo.window) {
@@ -670,7 +670,7 @@ void SDLWindow::setShowMouseCursor(bool theShowMouseCursor) {
 
 void
 SDLWindow::setShowTaskbar(bool theFlag) {
-#ifdef WIN32
+#ifdef _WIN32
     HWND myWindowHandle = FindWindow("Shell_TrayWnd", 0);
     ShowWindow(myWindowHandle, (theFlag ? SW_SHOW : SW_HIDE));
 #endif
@@ -678,7 +678,7 @@ SDLWindow::setShowTaskbar(bool theFlag) {
 
 bool
 SDLWindow::getShowTaskbar() const {
-#ifdef WIN32
+#ifdef _WIN32
     HWND myWindowHandle = FindWindow("Shell_TrayWnd", 0);
     return 0!= (GetWindowLong(myWindowHandle, GWL_STYLE) & WS_VISIBLE);
 #else
@@ -696,7 +696,7 @@ SDLWindow::setCaptureMouseCursor(bool theCaptureFlag) {
         return;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     if (theCaptureFlag) {
         LPCTSTR myWindowName = _myWindowTitle.c_str();
         HWND myWindow = FindWindow(0, myWindowName);
@@ -789,7 +789,7 @@ SDLWindow::mainLoop() {
     }
 
     while ( ! _myAppQuitFlag ) {
-#ifdef WIN32
+#ifdef _WIN32
         bool isOnTop = false;
         if (_myAutoPauseFlag) {
             LPCTSTR myRenderGirlWindowName = _myWindowTitle.c_str();
@@ -839,7 +839,7 @@ SDLWindow::mainLoop() {
             _myAppQuitFlag = true;
         }
 
-#ifdef WIN32
+#ifdef _WIN32
         if (_myAutoPauseFlag && isOnTop == false) {
             unsigned long mySleepDuration = 40; // in millisec
             asl::msleep(mySleepDuration);
@@ -914,7 +914,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
         return;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     if (_myHasVideoSync) {
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
@@ -972,7 +972,7 @@ SDLWindow::getSwapInterval() {
         return 0;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     if (_myHasVideoSync) {
         return wglGetSwapIntervalEXT();
     } else {

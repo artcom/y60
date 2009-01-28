@@ -46,7 +46,7 @@
 
 #include <asl/base/Logger.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <fcntl.h>
@@ -91,7 +91,7 @@ namespace inet {
     void Socket::close() {
         if (isValid()) {
             int rc;
-#ifdef WIN32        
+#ifdef _WIN32        
             rc = closesocket(fd);
             if (rc == SOCKET_ERROR) {
                 int err = getLastSocketError();
@@ -164,7 +164,7 @@ namespace inet {
     int Socket::peek(int n)
     {
         int rc;
-#ifndef WIN32
+#ifndef _WIN32
         // XXX: This is inefficient. Use blocking calls instead.
         int status;
         char* buf;
@@ -205,7 +205,7 @@ namespace inet {
 
     void PrintStatus(int fd)
     {
-#ifndef WIN32
+#ifndef _WIN32
         int status;
         status=fcntl(fd, F_GETFL, 0);
         AC_INFO << "STATUS of fd:";
@@ -227,7 +227,7 @@ namespace inet {
     }
 
     void Socket::setBlockingMode(bool isBlocking) {
-#ifndef WIN32
+#ifndef _WIN32
         //    PrintStatus(fd);
         long theFlag = O_NONBLOCK;
         if (isBlocking) {
@@ -252,7 +252,7 @@ namespace inet {
 
     void 
     Socket::setSendBufferSize(int theSize) {
-#ifdef WIN32
+#ifdef _WIN32
         if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &theSize, sizeof(theSize)) < 0) {
             AC_ERROR << "Socket::setSendBufferSize: Unable to set SO_SNDBUF" << endl;
         }
@@ -265,7 +265,7 @@ namespace inet {
     Socket::getSendBufferSize() const {
         int mySize = 0;
         int myIntSize = sizeof(mySize);
-#ifdef WIN32        
+#ifdef _WIN32        
         if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &mySize, &myIntSize) < 0) {
             AC_ERROR << "Socket::getSendBufferSize: Unable to set SO_SNDBUF";
         }
@@ -277,7 +277,7 @@ namespace inet {
 
     void 
     Socket::setReceiveBufferSize(int theSize) {
-#ifdef WIN32
+#ifdef _WIN32
         if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &theSize, sizeof(theSize)) < 0) {
             AC_ERROR << "Socket::setReceiveBufferSize: Unable to set SO_SNDBUF" << endl;
         }
@@ -290,7 +290,7 @@ namespace inet {
     Socket::getReceiveBufferSize() const {
         int mySize = 0;
         int myIntSize = sizeof(mySize);
-#ifdef WIN32
+#ifdef _WIN32
         if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &mySize, &myIntSize) < 0) {
             AC_ERROR << "Socket::getReceiveBufferSize: Unable to set SO_SNDBUF";
         }

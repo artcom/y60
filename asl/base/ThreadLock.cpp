@@ -98,7 +98,7 @@ ThreadLock::ThreadLock()
 }
 
 ThreadLock::~ThreadLock() {
-#ifdef WIN32
+#ifdef _WIN32
     pthread_mutex_destroy(&_myMutex);
 #endif
 }

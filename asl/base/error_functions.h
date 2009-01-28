@@ -56,7 +56,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 # include <windows.h>
 #   define LAST_ERROR_TYPE DWORD
 #else
@@ -70,7 +70,7 @@ namespace asl {
 
 inline
 LAST_ERROR_TYPE lastError() {
-#ifdef WIN32
+#ifdef _WIN32
     return GetLastError();
 #else
     return errno;
@@ -80,7 +80,7 @@ LAST_ERROR_TYPE lastError() {
 inline
 void
 setLastError(LAST_ERROR_TYPE theError) {
-#ifdef WIN32
+#ifdef _WIN32
     SetLastError(theError);
 #else
     errno = theError;
@@ -89,7 +89,7 @@ setLastError(LAST_ERROR_TYPE theError) {
 
 inline
 std::string errorDescription(LAST_ERROR_TYPE err) {
-#ifdef WIN32
+#ifdef _WIN32
     LPVOID lpMsgBuf;
     if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                        FORMAT_MESSAGE_FROM_SYSTEM |

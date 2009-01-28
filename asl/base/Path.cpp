@@ -25,7 +25,7 @@
 #include <glib.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 BOOL IsWin2kSP4OrLater() 
 {
@@ -104,7 +104,7 @@ Path::~Path() {
 
 void
 Path::free() {
-#ifdef WIN32
+#ifdef _WIN32
     if (_myLocaleChars) {
         ::free(_myLocaleChars);
     }
@@ -126,7 +126,7 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
         case UTF8:
 #ifdef OSX
 			_myString = CFStringCreateWithCString(NULL, theString, kCFStringEncodingUTF8);
-#elif WIN32
+#elif _WIN32
             {
                 // convert from UTF8 to WideChars
                 AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, getMultibyteToWideCharFlags(), theString, -1, 0, 0);
@@ -153,7 +153,7 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
         case Locale:
 #ifdef OSX
 			_myString = CFStringCreateWithCString(NULL, theString, CFStringGetSystemEncoding());
-#elif WIN32
+#elif _WIN32
             _myLocaleChars = _strdup(theString);
 #else
             _myLocaleChars = g_strdup(theString); 
@@ -198,7 +198,7 @@ Path::toUTF8() const {
 		ASSURE_WITH(AssurePolicy::Throw, myExCharCount == myCharCount);
 	}
 	return myResult;
-#elif WIN32
+#elif _WIN32
     if (_myLocaleChars == 0) {
         return std::string();
     }

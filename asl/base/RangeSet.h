@@ -46,7 +46,7 @@
 #include "Exception.h"
 #include "string_functions.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <stddef.h>
 #endif
 

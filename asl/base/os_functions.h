@@ -56,7 +56,7 @@
 #ifdef LINUX
     #include <unistd.h>
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 	#include <windows.h>
 #endif
 
@@ -110,7 +110,7 @@ namespace asl {
         return myResult;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
 		bool hResultIsOk(HRESULT hr, std::string & theMessage);
 #endif		
     /* @} */

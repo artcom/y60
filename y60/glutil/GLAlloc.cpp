@@ -33,7 +33,7 @@ using namespace std;
 namespace asl
 {    
     bool tryInitializeGLMemoryExtensions() {
-#ifdef WIN32
+#ifdef _WIN32
         return y60::hasCap("GL_NV_vertex_array_range"); 
 #else
 #ifdef AC_USE_X11
@@ -65,7 +65,7 @@ namespace asl
         float thePriority)
     {
         initializeGLMemoryExtensions();
-#ifdef WIN32
+#ifdef _WIN32
         return (void*)(wglAllocateMemoryNV(
             theSize, theReadFrequency, theWriteFrequency, thePriority));
 #else
@@ -82,7 +82,7 @@ namespace asl
 
     void gfxFreeMemoryNV(void * theMemory) {
         initializeGLMemoryExtensions();
-#ifdef WIN32
+#ifdef _WIN32
         if (wglFreeMemoryNV) {
             wglFreeMemoryNV(theMemory);
         }

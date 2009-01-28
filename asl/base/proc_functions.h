@@ -17,7 +17,7 @@
 
 #include "asl_base_settings.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <sys/types.h>
@@ -41,7 +41,7 @@ namespace asl {
      * Get process memory usage in KB.
      * @param thePid process ID, default is to get for own process.
      */
-#ifdef WIN32
+#ifdef _WIN32
     typedef DWORD ProcessID;
 #else
     typedef pid_t ProcessID;

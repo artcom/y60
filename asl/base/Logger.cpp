@@ -158,7 +158,7 @@ Logger::Logger() :
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
     Ptr<LogMessageFormatter> myVisualStudioFormatter = createFormatter(LOG_VISUAL_STUDIO_FORMAT_ENV, VisualStudioLogMessageFormatter::name(), "console");
     Severity myVisualStudioSeverity = getSeverityFromEnv(LOG_VISUAL_STUDIO_FILTER_ENV, SEV_DISABLED);
     if (myVisualStudioSeverity != SEV_DISABLED) {  
@@ -297,7 +297,7 @@ Logger::setModuleVerbosity(Severity theVerbosity,
                            const std::string & theModule,
                            int theMinId, int theMaxId)
 {
-#if defined(WIN32) && defined(DEBUG_VARIANT)
+#if defined(_WIN32) && defined(DEBUG_VARIANT)
     // For whatever reason, __FILE__ is lowercase in debug mode...
     std::string myModule = asl::toLowerCase(theModule);
 #else

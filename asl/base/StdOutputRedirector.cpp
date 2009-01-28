@@ -221,7 +221,7 @@ namespace asl {
                     // rename current log to archive version
                     string myNewFilename = removeExtension(_myOutputFilename) + "logarchive_" + 
                                                            getCurrentTimeString() + (".log");
-#ifdef WIN32
+#ifdef _WIN32
                     MoveFileEx(_myOutputFilename.c_str(), 
                                myNewFilename.c_str(), 
                                MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);                    

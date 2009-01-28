@@ -65,7 +65,7 @@
 #include <asl/base/os_functions.h>
 #include <asl/base/console_functions.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning
 #define EMULATE_INTTYPES
 #endif
@@ -80,7 +80,7 @@ extern "C" {
 #endif
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning( default : 4244 ) // Renable ffmpeg warning
 #endif
 

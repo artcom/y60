@@ -38,7 +38,7 @@
 //    recommendations: add comments 
 */
 
-#ifndef WIN32
+#ifndef _WIN32
 #include "TestINetMonitor.h"
 #endif
 #include "TestSocket.h"
@@ -55,7 +55,7 @@ int main( int argc, char *argv[] ) {
     
     UnitTestSuite mySuite ("INet tests", argc, argv);
 
-#ifndef WIN32
+#ifndef _WIN32
     mySuite.addTest (new TestINetMonitor);
 #endif
     mySuite.addTest (new TestSocket);

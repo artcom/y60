@@ -79,7 +79,7 @@
 #include <asl/math/numeric_functions.h>
 #include <asl/base/checksum.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #   include <asl/base/signal_functions.h>
 #endif
 
@@ -1457,7 +1457,7 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     }
     int myRetVal;
     string myExecutionCommand = myCommand + " " + myArgs;
-#ifdef WIN32
+#ifdef _WIN32
     string myCWD(".");
     STARTUPINFO myStartupInfo =
     {
@@ -1499,7 +1499,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_BEGIN("Returns the name of the operating system");
     DOC_RVAL("WIN32, LINUX or OSX", DOC_TYPE_STRING);
     DOC_END;
-#ifdef WIN32
+#ifdef _WIN32
     string myOsName("WIN32");
 #endif
 #ifdef LINUX
@@ -1678,7 +1678,7 @@ JSApp::run(const std::string & theScriptFilename,
 {
 
     Exception::initExceptionBehaviour();
-#ifndef WIN32
+#ifndef _WIN32
     asl::initSignalHandling();
 #endif
 

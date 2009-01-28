@@ -49,7 +49,7 @@
 #include <cstring>
 #include <algorithm>
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <winsock2.h>
 #else
   #include <errno.h>
@@ -59,7 +59,7 @@ using namespace std;
 
 namespace inet {
     void initSockets() {
-#ifdef WIN32
+#ifdef _WIN32
         WORD wVersionRequested;
         WSADATA wsaData;
         int err;
@@ -81,7 +81,7 @@ namespace inet {
     }
     
     void terminateSockets() {
-#ifdef WIN32
+#ifdef _WIN32
         AC_DEBUG << "Calling WSACleanup().";
         if ( WSACleanup() != 0 ) {
             int err = getLastSocketError();
@@ -92,7 +92,7 @@ namespace inet {
 
     int 
     getLastSocketError() {
-#ifdef WIN32
+#ifdef _WIN32
         return WSAGetLastError();
 #else
         return errno;
@@ -117,7 +117,7 @@ namespace inet {
         }
     };
 
-#ifdef WIN32
+#ifdef _WIN32
     SocketError SocketErrorList[] = {
         SocketError(0,                  "No error"),
         SocketError(WSAEINTR,           "Interrupted system call"),
@@ -176,7 +176,7 @@ namespace inet {
     string 
     getSocketErrorMessage(int ErrorID)
     {
-#ifdef WIN32    
+#ifdef _WIN32    
         string ErrorStr;
 
         // Tack appropriate canned message onto end of supplied message 

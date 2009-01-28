@@ -1271,7 +1271,7 @@ namespace dom {
             if ( myNativeSource ) {
                 const asl::const_subraster<PIXEL> mySourceRegion(*myNativeSource, sourceX, sourceY, sourceWidth, sourceHeight);
                 if (myTargetRect.getSize() !=mySourceRect.getSize()) { 
-#ifndef WIN32
+#ifndef _WIN32
                     asl::resample(mySourceRegion, myTargetRegion, SumType());
 #else
                     throw asl::NotYetImplemented(JUST_FILE_LINE);                    
@@ -1303,7 +1303,7 @@ namespace dom {
        virtual void resample(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
             T & myNative = _myRasterValue.openWriteableValue();
             asl::raster<PIXEL> myTmp(newWidth, newHeight);
-#ifdef WIN32
+#ifdef _WIN32
             (void)myNative;
             throw asl::NotYetImplemented(JUST_FILE_LINE);                                
 #else

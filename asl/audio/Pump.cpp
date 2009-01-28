@@ -42,7 +42,7 @@
 #include "Pump.h"
 #include "DummyPump.h"
 #include "AudioException.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include "DirectSoundPump.h"
 #elif LINUX
 #include "ALSAPump.h"
@@ -77,7 +77,7 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
 {
     AC_INFO << "Pump::Pump";
 
-#ifdef WIN32
+#ifdef _WIN32
     double myLatency= 0.05;
 #else
     double myLatency= 0.05; // 0.04 causes hundreds of underruns in the tests, 0.05 causes none (on caspar64)
@@ -145,7 +145,7 @@ Pump& Pump::get() {
     }
     if (_myUseRealPump) {
         try {
-#ifdef WIN32          
+#ifdef _WIN32          
             return Singleton<DirectSoundPump>::get();
 #elif LINUX
             return Singleton<ALSAPump>::get();
@@ -237,7 +237,7 @@ void Pump::start() {
         AudioTimeSource::run();
         _myRunning = true;
         fork();
-#ifdef WIN32
+#ifdef _WIN32
         int myPriorityClass = SCHED_OTHER;
         int myPriority = THREAD_PRIORITY_TIME_CRITICAL;
 #else
@@ -248,7 +248,7 @@ void Pump::start() {
         if (!amIRoot) {
             setPriority (SCHED_OTHER, PosixThread::getMaxPriority(SCHED_OTHER));
             AC_WARNING << "Audio running at normal priority.";
-#ifndef WIN32
+#ifndef _WIN32
             AC_WARNING << "To get realtime priority, start as root.";
 #endif
         } else {

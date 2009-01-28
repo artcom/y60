@@ -49,7 +49,7 @@
 #include <algorithm>
 #include <string>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <errno.h>
 #endif
 

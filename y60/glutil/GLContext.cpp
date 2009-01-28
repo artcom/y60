@@ -39,7 +39,7 @@ using namespace std;
 namespace y60 {
 
     GLContext::GLContext()
-#ifdef WIN32
+#ifdef _WIN32
         : _myHdc(0), _myHglrc(0)
 #endif
 #ifdef AC_USE_X11
@@ -57,7 +57,7 @@ namespace y60 {
 
     bool
     GLContext::saveCurrent() {
-#ifdef WIN32
+#ifdef _WIN32
         _myHdc   = wglGetCurrentDC();
         _myHglrc = wglGetCurrentContext();
 #endif
@@ -74,7 +74,7 @@ namespace y60 {
 
     bool
     GLContext::activate() const{
-#ifdef WIN32
+#ifdef _WIN32
 
         if (!wglMakeCurrent( _myHdc, _myHglrc)) {
             checkLastError(PLUS_FILE_LINE);
@@ -100,7 +100,7 @@ namespace y60 {
     }
 
     bool GLContext::isActive() {
-#ifdef WIN32
+#ifdef _WIN32
         return (_myHdc && _myHglrc);
 #endif
 #ifdef AC_USE_X11
@@ -115,7 +115,7 @@ namespace y60 {
     void
     GLContext::checkLastError(const std::string & theScope)
     {
-#ifdef WIN32
+#ifdef _WIN32
         DWORD myRetVal = GetLastError();
         switch(myRetVal) {
             case ERROR_INVALID_PIXEL_FORMAT:

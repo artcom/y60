@@ -81,7 +81,7 @@
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
     #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN 1
     #endif
@@ -303,7 +303,7 @@ namespace y60 {
             template <class T, class Alloc>
             void createTangents(std::vector<T, Alloc> & theBin);
            
-#ifdef WIN32            
+#ifdef _WIN32            
             template <>
             void 
             createTangents(GfxVectorOfVector3f & theBin);

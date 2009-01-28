@@ -152,7 +152,7 @@ const string PLURLSource::httpErr2Str(int HTTPCode)
     case 505: return "HTTP Version not supported";
     default: {
        char sz[10];
-#ifdef WIN32       
+#ifdef _WIN32       
       _itoa(HTTPCode, sz, 10);
 #else
       sprintf (sz, "%d", HTTPCode);

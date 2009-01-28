@@ -2,7 +2,7 @@
 /* common/config.h.in.  Generated from configure.ac by autoheader.  */
 
 
-#ifndef WIN32
+#ifndef _WIN32
     /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
        */
     #define HAVE_DIRENT_H 1
@@ -65,7 +65,7 @@
 
     /* Define to 1 if you have the <unistd.h> header file. */
     #define HAVE_UNISTD_H 1
-#endif // #ifndef WIN32
+#endif // #ifndef _WIN32
 
 /* Name of package */
 #define PACKAGE "paintlib"

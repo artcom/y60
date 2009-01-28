@@ -67,7 +67,7 @@
 #include <asl/audio/ISampleSink.h>
 #include <asl/base/Block.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define EMULATE_INTTYPES
 #endif
 

@@ -3348,7 +3348,7 @@ dom::operator>>(std::istream & is, dom::Node & n) {
     while (is) {
         is.read(&(*xml_data_vec.begin()),xml_data_vec.size());
 
-#if WIN32
+#if defined(_WIN32)
         // Sane reallocation strategy. Actually, append should do this. With
         // MS stl, it doesn't.
         if (xml_data.capacity() < xml_data.length()+xml_data_vec.size()) {

@@ -52,7 +52,7 @@ using namespace inet;
 
 namespace asl {
 
-#ifndef WIN32
+#ifndef _WIN32
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 #endif
@@ -61,7 +61,7 @@ namespace asl {
     
 void
 SocketPolicy::disconnect(Handle & theHandle) {
-#ifdef WIN32        
+#ifdef _WIN32        
     closesocket(theHandle);
 #else   
     ::shutdown(theHandle, SHUT_RDWR);
@@ -72,7 +72,7 @@ SocketPolicy::disconnect(Handle & theHandle) {
 
 void 
 SocketPolicy::stopListening(Handle theHandle) {
-#ifdef WIN32        
+#ifdef _WIN32        
     closesocket(theHandle);
 #else
     ::shutdown(theHandle, SHUT_RDWR);
@@ -112,7 +112,7 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
     if ((newFD=accept(theListenHandle, 0, 0))<0) {
         int myLastError = getLastSocketError();
         DB(AC_TRACE << "accept call error " << myLastError << endl);  
-#ifdef WIN32
+#ifdef _WIN32
         if (myLastError == WSAEINTR) { // interrupted system call
 #else
         if (myLastError == EINTR) { // interrupted system call
@@ -202,7 +202,7 @@ SocketPolicy::receiveData(Handle & theHandle, BufferQueue & theInQueue)
     } else if (bytesread < 0) {
         int lastError = getLastSocketError();
         switch (lastError) {
-#ifdef WIN32
+#ifdef _WIN32
             case WSAECONNABORTED :
             case WSAECONNRESET :
 #else

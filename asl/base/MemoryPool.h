@@ -49,7 +49,7 @@
 #include "string_functions.h"
 
 #include "AtomicCount.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <stddef.h>
 #endif
 

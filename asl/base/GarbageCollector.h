@@ -53,7 +53,7 @@
 
 #include "AtomicCount.h"
 #include "MemoryPool.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <stddef.h>
 #endif
 

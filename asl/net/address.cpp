@@ -99,7 +99,7 @@ namespace inet {
 #else
         myHostEnt = gethostbyaddr ((char *)&nethostaddr, sizeof(nethostaddr),AF_INET);
         if (!myHostEnt) {
-#ifdef WIN32
+#ifdef _WIN32
             myErrorCode = WSAGetLastError();
 #endif
 #ifdef OSX
@@ -184,7 +184,7 @@ namespace inet {
 #else
             myHostEnt = gethostbyname(hostspec);
             if (!myHostEnt) {
-#ifdef WIN32
+#ifdef _WIN32
                 myErrorCode = WSAGetLastError();
 #endif
 #ifdef OSX

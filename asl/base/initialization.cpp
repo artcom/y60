@@ -42,13 +42,13 @@
 #include "initialization.h"
 
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #   include <crtdbg.h>
 #endif
 
 namespace {
 
-#   if defined(WIN32)
+#   if defined(_WIN32)
         inline void setCrtReportModeToFile(int reportType)
         {
             _CrtSetReportMode( reportType, _CRTDBG_MODE_DEBUG

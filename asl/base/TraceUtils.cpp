@@ -44,13 +44,13 @@
 #include <string>
 #include <cstdlib>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <cxxabi.h>
 #endif
 
 using namespace std;
 
-#ifndef WIN32
+#ifndef _WIN32
 
 // demangling for gcc
 std::string 

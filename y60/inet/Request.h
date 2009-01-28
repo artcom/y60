@@ -61,7 +61,7 @@
 
 #include "y60_inet_settings.h"
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <winsock2.h>
     // undefine the windows macro max (thanx bill) [jb]
     #undef max

@@ -62,7 +62,7 @@ public:
     SerialDeviceUnitTest() : UnitTest("SerialDeviceUnitTest") {  }
     void run() {
         SerialDevice * myPort = getSerialDevice(0);
-#ifdef WIN32
+#ifdef _WIN32
         ENSURE_MSG(myPort->getDeviceName() == "COM1:", "Testing name factory")
 #else
         ENSURE_MSG(myPort->getDeviceName() == "/dev/ttyS0", "Testing name factory")

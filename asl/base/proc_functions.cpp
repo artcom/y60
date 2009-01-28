@@ -44,7 +44,7 @@
 #include "error_functions.h"
 #include "Logger.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <psapi.h>
 #else
 #include "file_functions.h" // IO_Exception
@@ -224,7 +224,7 @@ namespace asl {
     unsigned getTotalMemory() {
         static unsigned myTotalMemory = 0;
         if (myTotalMemory == 0) {
-#ifdef WIN32
+#ifdef _WIN32
             // GlobalMemoryStatus may returns incorrect values
             // for systems with more than 2 GB. So we have to use (you guess it)
             // GlobalMemoryStatusEx for that.
@@ -248,7 +248,7 @@ namespace asl {
 
     unsigned getUsedMemory() {
         unsigned myUsedMemory = 0;
-#ifdef WIN32
+#ifdef _WIN32
         myUsedMemory = getTotalMemory()-getFreeMemory();
 #elif LINUX
         // Determining used/free memory under Linux is a bit tricky since
@@ -267,7 +267,7 @@ namespace asl {
 
     unsigned getFreeMemory() {
         unsigned myFreeMemory = 0;
-#ifdef WIN32
+#ifdef _WIN32
         MEMORYSTATUSEX myMemStat;
         myMemStat.dwLength = sizeof (myMemStat);
         GlobalMemoryStatusEx (&myMemStat);
@@ -286,7 +286,7 @@ namespace asl {
 
     unsigned getProcessMemoryUsage(ProcessID thePid) {
         if (thePid == 0) {
-#ifdef WIN32
+#ifdef _WIN32
             thePid = GetCurrentProcessId();
 #else
             thePid = getpid();
@@ -298,7 +298,7 @@ namespace asl {
 #endif
         }
         unsigned myMemUsage = 0;
-#ifdef WIN32
+#ifdef _WIN32
         HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, thePid);
         if (hProcess) {
             PROCESS_MEMORY_COUNTERS pmc;

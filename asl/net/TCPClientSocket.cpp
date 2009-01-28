@@ -46,7 +46,7 @@
 #include <asl/base/Logger.h>
 #include <asl/base/Time.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>

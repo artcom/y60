@@ -197,7 +197,7 @@ class string_functions_UnitTest : public UnitTest {
             }
 
             // expand enviroment
-#ifdef WIN32
+#ifdef _WIN32
             _putenv("AC_TEST_VAR=foo");
 #else
             setenv("AC_TEST_VAR","foo",1);
@@ -210,7 +210,7 @@ class string_functions_UnitTest : public UnitTest {
             ENSURE_EXCEPTION(expandEnvironment(string("${XXX${AC_TEST_VAR}}")), ParseException);
             ENSURE_EXCEPTION(expandEnvironment(string("${AC_TEST_VAR")), ParseException);
 
-#ifdef WIN32
+#ifdef _WIN32
             _putenv("AC_TEST_VAR=");
 #else
             unsetenv("AC_TEST_VAR");

@@ -66,7 +66,7 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-#ifndef WIN32
+#ifndef _WIN32
 // for some unknown reason, in Linux (kernel 2.4.20) the remap call does not work
 // as described so we unmap and map to get the desired result
 // DS: The remap() call in Linux is not portable anyway. There is no equivalent
@@ -74,7 +74,7 @@
 #define NO_REMAP
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <sys/mman.h>
 # include <unistd.h>
 # define FD_t            int
@@ -90,7 +90,7 @@
 
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 # include <windows.h>
 # include <io.h>
@@ -435,7 +435,7 @@ namespace asl {
         DEFINE_NESTED_EXCEPTION(MappedIO, GetFileSizeFailed, Failure);
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #if 0
         static bool setFileSize(FD_t fd, OFF_T theNewSize) {
             // enlarge or shrink file

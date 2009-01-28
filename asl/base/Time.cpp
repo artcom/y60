@@ -48,7 +48,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <strings.h>
 #define stricmp strcasecmp 
 #endif

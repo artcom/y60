@@ -46,7 +46,7 @@
 #include <string>
 #include <asl/base/Exception.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 
 #define OS_SOCKET_ERROR(errcode) WSA##errcode

@@ -14,7 +14,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifdef WIN32
+#ifdef _WIN32
   #define _WIN32_WINNT 0x0500
 #endif
 
@@ -34,7 +34,7 @@
 #include <algorithm>
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <windows.h>
 #endif
 
@@ -57,7 +57,7 @@ namespace asl {
             asl::Unsigned16& theValue);
     template ASL_BASE_EXPORT bool get_environment_var_as(const std::string & theVariable, bool& theValue);
 
-#ifdef WIN32
+#ifdef _WIN32
     // This is executed once on program start.
     char * reallyGetHostname() {
         HINSTANCE           myDLL_Handle;
@@ -142,7 +142,7 @@ namespace asl {
 
     const string & appname() {
         static string appname;
-#ifdef WIN32
+#ifdef _WIN32
         int numArgs;
         LPWSTR * theCmdLine = CommandLineToArgvW((LPCWSTR)GetCommandLine(), &numArgs);
         appname = (const char *)theCmdLine[0];
@@ -166,7 +166,7 @@ namespace asl {
     }
 
     string getSessionId() {
-#ifdef WIN32
+#ifdef _WIN32
         HANDLE token;
         DWORD len;
         BOOL result = OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token);
@@ -202,7 +202,7 @@ namespace asl {
     }
 
     void precision_sleep(double theDuration){
-#ifdef WIN32
+#ifdef _WIN32
         Sleep((DWORD)theDuration);
 #else
         asl::Time startTime;
@@ -266,7 +266,7 @@ namespace asl {
 
     void
     set_environment_var(const std::string & theVariable, const std::string & theValue) {
-#ifdef WIN32
+#ifdef _WIN32
         _putenv((theVariable + "=" + theValue).c_str());
 #else
         setenv(theVariable.c_str(), theValue.c_str(), true);
@@ -274,7 +274,7 @@ namespace asl {
     }
 
     unsigned long getThreadId() {
-#ifdef WIN32
+#ifdef _WIN32
         return GetCurrentThreadId();
 #else
         return getpid(); // TODO: check if this ok on Mac OS
@@ -282,7 +282,7 @@ namespace asl {
     }
 
 
-#ifdef WIN32
+#ifdef _WIN32
  bool
  hResultIsOk(HRESULT hr, std::string & theMessage) 
  {

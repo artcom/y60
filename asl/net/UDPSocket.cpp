@@ -46,7 +46,7 @@
 #include <asl/base/Logger.h>
 
 #include <errno.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #else
 #endif
@@ -84,7 +84,7 @@ namespace inet {
 
     unsigned UDPSocket::receiveFrom(asl::Unsigned32* thehost, asl::Unsigned16 * theport, void *data, const int maxlen)
     {
-#ifdef WIN32    
+#ifdef _WIN32    
         int peerAddrSize;
 #else
         unsigned int peerAddrSize;

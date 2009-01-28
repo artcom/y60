@@ -47,7 +47,7 @@
 using namespace std;
 namespace asl {
 
-#ifdef WIN32
+#ifdef _WIN32
 #define EADDRINUSE WSAEADDRINUSE 
 #else
 #define INVALID_SOCKET -1
@@ -100,7 +100,7 @@ TCPPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) 
 
     Handle myHandle=socket(AF_INET,SOCK_STREAM,0);    
    
-#ifndef WIN32    
+#ifndef _WIN32    
     int myReuseSocketFlag = 1;
     if (setsockopt(myHandle, SOL_SOCKET, SO_REUSEADDR, (char*)&myReuseSocketFlag, sizeof(myReuseSocketFlag)) != 0) {
         throw ConduitException("can`t set already bound rcv socket to reuse.", PLUS_FILE_LINE);

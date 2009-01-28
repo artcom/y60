@@ -55,7 +55,7 @@
 #define DB(x) //  x
 #define DB2(x) //  x
 
-#ifndef WIN32
+#ifndef _WIN32
     #include <netinet/in.h>
     #include <unistd.h>
     #include <errno.h>
@@ -74,7 +74,7 @@
     }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <process.h>
     //#define GetLastError WSAGetLastError;
 
@@ -402,7 +402,7 @@ Station::openStation(unsigned long theBroadcastAddress,
         throw SetSockOptFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     // set nonblocking mode in windows here
     u_long myEnableNonBlockingFlag = 1;
     int myError = ioctlsocket(_myFileDescriptor, FIONBIO, &myEnableNonBlockingFlag);
@@ -444,7 +444,7 @@ Station::closeStation() {
     if (_good) {
         _good = false;
         _myOutgoingMessageNumber = 0;
-#ifdef WIN32        
+#ifdef _WIN32        
             closesocket(_myFileDescriptor);
 #else            
             ::close(_myFileDescriptor);
@@ -543,7 +543,7 @@ Station::broadcast(const asl::ReadableBlock & theData) {
         do {
             myResult = sendto(_myFileDescriptor, (char*)&myPacket, myPacketSize, 0, (struct sockaddr*)&_toAddress,sizeof(_toAddress));
             if (myResult < 0) {
-#ifdef WIN32
+#ifdef _WIN32
                 if (lastError() != WSAEWOULDBLOCK) {
 #else
                 if (lastError() != EAGAIN) {
@@ -580,7 +580,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
     for(;;) {
         asl::Ptr<Packet> myNewPacket = asl::Ptr<Packet>(new Packet);
         struct sockaddr_in mySender;
-#ifdef WIN32
+#ifdef _WIN32
         int mySenderAddrSize = sizeof(sockaddr_in);
         // for windows, non-blocking mode has been already enabled in Station::open
         int myResult = recvfrom(_myFileDescriptor, (char*)&(*myNewPacket), sizeof(Packet), 0,

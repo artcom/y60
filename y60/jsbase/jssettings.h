@@ -71,7 +71,7 @@
 
 #undef JS_THREADSAFE
 
-#ifdef WIN32    
+#ifdef _WIN32    
     #ifndef XP_WIN
     #define XP_WIN    
     #endif

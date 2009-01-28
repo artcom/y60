@@ -14,7 +14,7 @@
 #include "y60_glutil_settings.h"
 
 #include <GL/glew.h>
-#ifdef WIN32
+#ifdef _WIN32
 #   include <GL/wglew.h>
 #elif LINUX 
 #   include <GL/glxew.h>
@@ -28,7 +28,7 @@
 #include <y60/base/NodeValueNames.h>
 #include <y60/scene/MaterialParameter.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #    define NOMINMAX
 #    ifndef WIN32_LEAN_AND_MEAN
 #       define WIN32_LEAN_AND_MEAN 1
@@ -46,7 +46,7 @@
 #endif
 
 // window system extensions
-#ifdef WIN32
+#ifdef _WIN32
 #endif
 
 

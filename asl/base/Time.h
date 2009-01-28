@@ -66,7 +66,7 @@
 #include <string>
 #include <pthread.h> /* for timespec */
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <windows.h>
     #include <mmsystem.h>
 #else
@@ -128,7 +128,7 @@ namespace asl {
          */
         class ASL_BASE_EXPORT Time {
         private:
-#ifdef WIN32
+#ifdef _WIN32
         static const long long SECS_BETWEEN_EPOCHS = 11644473600;
         static const long long SECS_TO_100NS = 10000000; /* 10^7 */
                 struct timeval {
@@ -160,7 +160,7 @@ namespace asl {
                  * @return *this
                  */
                 Time& setNow() {
-#ifdef WIN32
+#ifdef _WIN32
 
             long long myBigValue = 0;
             GetSystemTimeAsFileTime((LPFILETIME) &myBigValue);
@@ -297,7 +297,7 @@ namespace asl {
             return s;
         }
 
-#ifdef WIN32
+#ifdef _WIN32
         inline void msleep(unsigned long theMilliSeconds) {
                 Sleep(theMilliSeconds);
         }
@@ -335,7 +335,7 @@ namespace asl {
                 }
 
                 void setNow() {
-#ifdef WIN32
+#ifdef _WIN32
                     QueryPerformanceCounter((LARGE_INTEGER*)&_myCounter);
 #else
     #ifdef OSX
@@ -355,7 +355,7 @@ namespace asl {
                 static unsigned long long perSecond() {
                         static unsigned long long perSecond = 0;
                         if (perSecond == 0) {
-#ifdef WIN32
+#ifdef _WIN32
                                 QueryPerformanceFrequency((LARGE_INTEGER*)&perSecond);
 #else
 #ifdef USE_TIME_OF_DAY                

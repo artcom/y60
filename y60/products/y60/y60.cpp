@@ -65,6 +65,8 @@
 #include <SDL/SDL.h>
 #endif
 
+#include <asl/base/SingletonManager.h>
+
 #include <asl/base/Arguments.h>
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
@@ -98,7 +100,9 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
 
 int
 main(int argc, char **argv) {
+
     int rv = 1;
+
     try {
         ourArguments.addAllowedOptions(ourAllowedOptions);
         if (!ourArguments.parse(argc, argv)) {
@@ -174,8 +178,7 @@ main(int argc, char **argv) {
         AC_FATAL << "Some Errors occured. Hit RETURN to Exit." << endl;
         cin.getline(temp, sizeof(temp));
     }
-
-#ifdef WIN32
+#ifdef _WIN32
     // [CH]: For some strange reason windows will not pass the error code to the shell if it is returned.
     // But this should not hurt, because MSDN says:
     // "Issuing a return statement from the main function is equivalent to calling the exit
@@ -188,7 +191,7 @@ main(int argc, char **argv) {
 }
 
 #if 0
-#ifdef WIN32
+#ifdef _WIN32
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             LPSTR lpCmdLine, int nCmdShow)
 {

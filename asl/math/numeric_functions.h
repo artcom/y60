@@ -29,9 +29,9 @@
 #include <limits>
 #include <string>
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <float.h>
-#endif //defined(WIN32)
+#endif //defined(_WIN32)
 
 namespace asl {
 
@@ -49,20 +49,20 @@ inline double degFromRad(double theRadiant) { return (theRadiant * 180.0) / PI; 
 
 inline 
 bool isNaN(const double theNumber) {
-#if defined(WIN32)
+#if defined(_WIN32)
 	return 0 != _isnan(theNumber);
-#else //defined(WIN32)
+#else //defined(_WIN32)
 	return std::isnan(theNumber);
-#endif //defined(WIN32)
+#endif //defined(_WIN32)
 }
 
 inline 
 bool isFinite(const double theNumber) {
-#if defined(WIN32)
+#if defined(_WIN32)
 	return 0 != _finite(theNumber);
-#else //defined(WIN32)
+#else //defined(_WIN32)
 	return std::isfinite(theNumber);
-#endif //defined(WIN32)
+#endif //defined(_WIN32)
 }
 
 template<class T>

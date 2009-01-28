@@ -13,7 +13,7 @@
 //own header
 #include "CgProgramInfo.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #    include <direct.h>
 #endif
 
@@ -24,7 +24,7 @@
 
 #include "Renderer.h"
 
-// #ifdef WIN32
+// #ifdef _WIN32
 // #   include <GL/glh_extensions.h>
 // #   include <GL/glh_genext.h>
 // #endif
@@ -151,7 +151,7 @@ namespace y60 {
 
             cgDestroyProgram(_myCgProgramID);
             std::string myCWD = getCWD();
-#ifdef WIN32
+#ifdef _WIN32
              _chdir( _myCWD.c_str());
 #else
              chdir( _myCWD.c_str());
@@ -159,7 +159,7 @@ namespace y60 {
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                                              asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
                                              &(*_myCachedCompilerArgs.begin()));
-#ifdef WIN32
+#ifdef _WIN32
             _chdir( myCWD.c_str());                                     
 #else
             chdir( myCWD.c_str());                                     

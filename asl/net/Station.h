@@ -111,13 +111,13 @@ needs to be added; exposing the file descriptor should be enough to do that.
 
 #include <sys/types.h>
 
-#ifndef WIN32
+#ifndef _WIN32
     #include <unistd.h>
     #include <sys/socket.h>
     #include <arpa/inet.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <winsock2.h>
 #endif
 

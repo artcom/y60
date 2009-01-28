@@ -36,7 +36,7 @@
 #include <asl/base/Exception.h>
 #include <asl/math/SvgPath.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include <windows.h>
 #endif
 

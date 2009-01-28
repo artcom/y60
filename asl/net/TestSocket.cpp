@@ -155,7 +155,7 @@ TCPServer * TestSocket::createTCPServer(){
 
     // TODO: linux test (not that easy, socket to be reused must be in state TIME_WAIT
     // see http://www.unixguide.net/network/socketfaq/4.5.shtml for more info
-#ifdef WIN32    
+#ifdef _WIN32    
     // try to create a tcp socket twice (already in use test)
     try {
         myTCPServer = new TCPServer(INADDR_ANY, MIN_PORT);

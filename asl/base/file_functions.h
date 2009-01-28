@@ -151,7 +151,7 @@ ASL_BASE_EXPORT time_t getLastModified(const std::string & theFilename);
 #  define STAT64   stat64
 #  define STAT64F  stat64
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 #  define STAT64   __stat64
 #  define STAT64F  _stat64
 #endif
@@ -174,7 +174,7 @@ extern "C"
 {
         
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 
 typedef struct DIR DIR;
 

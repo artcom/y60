@@ -33,7 +33,7 @@
 #include <vector>
 #include <fstream>
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
 #include <sys/utime.h>
@@ -53,7 +53,7 @@ using namespace std;
 
 namespace asl {
 
-#ifdef WIN32
+#ifdef _WIN32
 #  define STAT   _stat
 #  define STATF  _stat
 #else
@@ -63,7 +63,7 @@ namespace asl {
 
 
     std::string getFilenamePart(const std::string & theFileName) {
-#ifdef WIN32
+#ifdef _WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
         char fname[_MAX_FNAME];
@@ -92,7 +92,7 @@ namespace asl {
         string myPath;
         parseURI(theFileName, &myProtocol, 0, &myPath);
         
-#ifdef WIN32
+#ifdef _WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
         char fname[_MAX_FNAME];
@@ -170,7 +170,7 @@ namespace asl {
         std::string::size_type myDotPos = theFileName.rfind(".");
         if (myDotPos != std::string::npos) {
             std::string::size_type mySlashPos = theFileName.rfind("/");
-#ifdef WIN32
+#ifdef _WIN32
             // on Windows look for both / and backslash
             if (mySlashPos == std::string::npos) {
                 mySlashPos = theFileName.rfind("\\");
@@ -261,7 +261,7 @@ namespace asl {
         thePathVector.clear();
         std::string mySearchPath = expandEnvironment(theDelimitedPaths);
 
-#ifdef WIN32
+#ifdef _WIN32
         static const char * myDelimiters = ";";
 #else
         static const char * myDelimiters = ";:";
@@ -389,7 +389,7 @@ namespace asl {
     }
 
     bool deleteFile(const std::string & theUTF8Filename) {
-#ifdef WIN32
+#ifdef _WIN32
         return _unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
 #else
         return unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
@@ -410,7 +410,7 @@ namespace asl {
         Path myOldFileName(theOldFileName, UTF8);
         Path myNewFileName(theNewFileName, UTF8);
         LAST_ERROR_TYPE myError = 0;
-#ifdef WIN32
+#ifdef _WIN32
         if (MoveFileEx(myOldFileName.toLocale().c_str(), 
                        myNewFileName.toLocale().c_str(), MOVEFILE_COPY_ALLOWED
                                                         +MOVEFILE_REPLACE_EXISTING) == 0)
@@ -432,14 +432,14 @@ namespace asl {
 
     bool
     setLastModified(const std::string & theUTF8Filename, time_t theModificationDate) {
-#ifdef WIN32
+#ifdef _WIN32
         _utimbuf myTimeBuf;
 #else
         utimbuf myTimeBuf;
 #endif
         myTimeBuf.actime = theModificationDate;
         myTimeBuf.modtime = theModificationDate;
-#ifdef WIN32
+#ifdef _WIN32
         return _utime(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myTimeBuf)==0;
 #else
         return utime(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myTimeBuf)==0;
@@ -475,7 +475,7 @@ namespace asl {
     void
     createDirectory(const std::string & theUTF8Path) {
         Path myPath(theUTF8Path, UTF8);
-#ifdef WIN32
+#ifdef _WIN32
         if (CreateDirectory(myPath.toLocale().c_str(), 0) == 0) {
 #else
         if (mkdir(myPath.toLocale().c_str(),0777) != 0) {
@@ -487,7 +487,7 @@ namespace asl {
     void
     removeDirectory(const std::string & theUTF8Path) {
         Path myPath(theUTF8Path, UTF8);
-#ifdef WIN32
+#ifdef _WIN32
         if (RemoveDirectory(myPath.toLocale().c_str()) == 0) {
 #else
         if (rmdir(myPath.toLocale().c_str()) != 0) {
@@ -518,7 +518,7 @@ namespace asl {
     }
 
     std::string getTempDirectory() {
-#ifdef WIN32
+#ifdef _WIN32
         char myTempBuffer[MAX_PATH];
         GetTempPath(MAX_PATH, myTempBuffer);
         Path myTempPath(myTempBuffer, Locale);
@@ -530,7 +530,7 @@ namespace asl {
 
     std::string getAppDataDirectory(const std::string & theAppName) {
         std::string myAppDirectory;
-#ifdef WIN32
+#ifdef _WIN32
         char myTempBuffer[MAX_PATH];
         //SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, myTempBuffer);
         SHGetSpecialFolderPath(NULL, myTempBuffer, CSIDL_APPDATA, true);
@@ -546,7 +546,7 @@ namespace asl {
 
     std::string getAppDirectory() {
         std::string strAppDirectory;
-#ifdef WIN32
+#ifdef _WIN32
         char szAppPath[MAX_PATH] = "";
 
         ::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
@@ -591,7 +591,7 @@ namespace asl {
 
     std::string 
     getCWD() {
-#ifdef WIN32    
+#ifdef _WIN32    
         return std::string(_getcwd( NULL, 0 ));
 #else
         char myBuffer[1024];
@@ -651,7 +651,7 @@ evaluateRelativePath(const std::string & theBaseDirectory,
     unsigned numParts = (myBaseParts.size() < myAbsoluteParts.size() ? myBaseParts.size() : myAbsoluteParts.size());
     unsigned sameCount = 0;
     for (unsigned i = 0; i < numParts; ++i) {
-#ifdef WIN32
+#ifdef _WIN32
         // why should we use something standard like 'strcasecmp' when we can make up our own names instead?
         if (stricmp(myBaseParts[i].c_str(), myAbsoluteParts[i].c_str()) != 0)
 #else
@@ -693,7 +693,7 @@ evaluateRelativePath(const std::string & theBaseDirectory,
 #  define STAT64   stat64
 #  define STAT64F  stat64
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 #  define STAT64   __stat64
 #  define STAT64F  _stat64
 #endif
@@ -721,7 +721,7 @@ extern "C"
 {
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 struct DIR
 {

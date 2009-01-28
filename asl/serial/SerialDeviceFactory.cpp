@@ -45,7 +45,7 @@
 
 #include <string>
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include "ComPort.h"
 #else
 #   include "TTYPort.h"
@@ -55,7 +55,7 @@ namespace asl {
 
 SerialDevice * 
 getSerialDevice(unsigned int theIndex) {
-#ifdef WIN32
+#ifdef _WIN32
     return new ComPort(std::string("COM") + as_string(theIndex + 1) + ":");
 #else
     return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
@@ -63,7 +63,7 @@ getSerialDevice(unsigned int theIndex) {
 }
 
 SerialDevice * getSerialDeviceByName(const std::string & theDevice) {
-#ifdef WIN32
+#ifdef _WIN32
     return new ComPort( theDevice );
 #else
     return new TTYPort( theDevice );

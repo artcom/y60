@@ -135,7 +135,7 @@ SerialTransport::establishConnection() {
         _myLastComTestTime = asl::Time();
         _myNumReceivedBytes = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
         _mySerialPort = getSerialDevice( _myPortNum );
 #endif
 #ifdef LINUX

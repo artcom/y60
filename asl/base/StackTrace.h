@@ -47,7 +47,7 @@
 #include "GlibcBacktrace.h"
 #elif defined( OSX )
 #include "MachOBacktrace.h"
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 #include "Win32Backtrace.h"
 #endif
 
@@ -87,7 +87,7 @@ std::ostream& operator<<(std::ostream& os,const StackTracer<TRACE_POLICY> & theS
 typedef StackTracer<GlibcBacktrace> StackTrace;
 #elif defined( OSX )
 typedef StackTracer<MachOBacktrace> StackTrace;
-#elif defined( WIN32 )
+#elif defined( _WIN32 )
 typedef StackTracer<Win32Backtrace> StackTrace;
 #endif
 

@@ -65,7 +65,7 @@ namespace asl {
     template <class TEST>
         class ThreadedTemplateUnitTest : public TEST, public ThreadInterface {
             public:
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable:4355)     // "this" used in base member initializer list is unsafe.
                 // use of this here is safe because we just store it on construction time
@@ -76,7 +76,7 @@ namespace asl {
                 ThreadedTemplateUnitTest() : TEST(), _myThread(this) {
                     std::cerr << "Created ThreadedTemplateUnitTest this = " << this << ", _myThread = " << &_myThread << std::endl;
                 }
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(pop)
 #endif
                 PosixThread & getThread() {

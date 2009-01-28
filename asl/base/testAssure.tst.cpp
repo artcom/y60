@@ -25,7 +25,7 @@
 
 #include <sys/types.h>
 #include <signal.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
@@ -74,7 +74,7 @@ public:
             cerr << ex << endl;
         }
 
-#ifndef WIN32        
+#ifndef _WIN32        
         ASSURE_WITH(AssurePolicy::Exit, true);
         SUCCESS("Explicit AssurePolicy::Exit true expression");
         pid_t childs_pid = fork();

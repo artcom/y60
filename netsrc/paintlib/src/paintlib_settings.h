@@ -1,7 +1,7 @@
 #ifndef NETSRC_PAINTLIB_SETTING_INCLUDED
 #define NETSRC_PAINTLIB_SETTING_INCLUDED
 
-#if defined(WIN32) && defined(AC_BUILT_WITH_CMAKE)
+#if defined(_WIN32) && defined(AC_BUILT_WITH_CMAKE)
 #   pragma warning( disable:  4251)
 #   define AC_DLL_EXPORT __declspec( dllexport )
 #   define AC_DLL_IMPORT __declspec( dllimport )

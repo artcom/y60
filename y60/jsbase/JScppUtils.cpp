@@ -74,7 +74,7 @@
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsdbgapi.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <glib.h>
 #endif
 
@@ -91,7 +91,7 @@ as_string(JSContext *cx, jsval theVal) {
     if (!myJSStr) {
         throw asl::Exception("Value is not a string", PLUS_FILE_LINE);
     }
-#ifdef WIN32
+#ifdef _WIN32
 #if _MSC_VER >= 1500
     const LPWSTR myWChars = reinterpret_cast<LPWSTR>(JS_GetStringChars(myJSStr));
 #else 
@@ -200,7 +200,7 @@ jsval as_jsval(JSContext *cx, int theValue) {
 jsval 
 as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
-#ifdef WIN32
+#ifdef _WIN32
     AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
     if (myWCharSize == 0) {
         DWORD myLastError = GetLastError();

@@ -364,11 +364,11 @@ void TestPump::testVolume() {
 }
 
 void TestPump::testPumpTimer() {
-#ifdef WIN32
+#ifdef _WIN32
     timeBeginPeriod(1);
 #endif
     Time AudioStartTime = Pump::get().getCurrentTime();
-#ifdef WIN32
+#ifdef _WIN32
     double SystemStartTime = timeGetTime()/1000.0;
 #else
     double SystemStartTime = Time();
@@ -376,7 +376,7 @@ void TestPump::testPumpTimer() {
     double maxErr = 0.0, minErr = 1.0, avrgErr = 0.0;
     for(unsigned i=0; i<500; ++i) {
         Time AudioTime = Pump::get().getCurrentTime() - AudioStartTime;
-#ifdef WIN32
+#ifdef _WIN32
         double SystemTime = timeGetTime()/1000.0-SystemStartTime;
 #else
         double SystemTime = Time()-SystemStartTime;
@@ -394,7 +394,7 @@ void TestPump::testPumpTimer() {
         avrgErr+=myErr;
         msleep(1);
     }
-#ifdef WIN32
+#ifdef _WIN32
     timeEndPeriod(1);
 #endif
     avrgErr /= 500;

@@ -17,7 +17,7 @@
 #include "string_functions.h"
 #include "Logger.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-#ifdef WIN32
+#ifdef _WIN32
 LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
     _EXCEPTION_RECORD * myRecord = theExceptionInfo->ExceptionRecord;
     string myMessage;
@@ -137,7 +137,7 @@ void exitFunction() {
 namespace asl {
 
 ExitHandler::ExitHandler() {
-#ifdef WIN32    
+#ifdef _WIN32
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
 #endif    

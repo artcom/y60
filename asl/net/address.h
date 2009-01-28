@@ -47,7 +47,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <winsock2.h>
 #else
   #include <netdb.h>

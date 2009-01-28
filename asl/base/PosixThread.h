@@ -81,7 +81,7 @@ class ASL_BASE_EXPORT PosixThread {
         void    join();
         bool    isActive();
         void    yield();
-#ifndef WIN32
+#ifndef _WIN32
         bool    kill(int signalNumber=SIGKILL);
 #endif
 

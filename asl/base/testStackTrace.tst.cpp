@@ -62,7 +62,7 @@ public:
 #ifdef LINUX
 		ENSURE( myStack.size() == 7 );
 #ifndef DEBUG
-#elif WIN32
+#elif _WIN32
 		ENSURE( myStack.size() == 8 );
 #endif
 #endif
@@ -74,7 +74,7 @@ public:
 #ifdef LINUX
 		ENSURE( myException.stack().size() == 8 );
 #ifndef DEBUG
-#elif WIN32
+#elif _WIN32
 		ENSURE( myException.stack().size() == 9 );
 #endif
 #endif

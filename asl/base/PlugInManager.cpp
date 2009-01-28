@@ -64,7 +64,7 @@ void PlugInManager :: setSearchPath(const std::string & thePath) {
 
 string PlugInManager :: getPlugInFileName(const string & theLibraryName, const char * theVariant) {
     std::string myFilename;
-#ifndef WIN32
+#ifndef _WIN32
     myFilename += "lib";
 #endif
     myFilename += theLibraryName;
@@ -84,7 +84,7 @@ string PlugInManager :: getPlugInFileName(const string & theLibraryName, const c
 #ifdef OSX
     myFilename += ".dylib";
 #endif
-#ifdef WIN32
+#ifdef _WIN32
     myFilename += ".dll";
 #endif
     return myFilename;
@@ -119,7 +119,7 @@ PlugInManager :: ~PlugInManager() {
 }
 
 void* PlugInManager :: getFunction(DLHandle theHandle, const std::string & theSymbol) {
-#ifdef WIN32
+#ifdef _WIN32
     void * myFunction = GetProcAddress(theHandle, theSymbol.c_str());
 #else
     void * myFunction = dlsym(theHandle, theSymbol.c_str());
@@ -133,7 +133,7 @@ asl::Ptr<PlugInBase> PlugInManager :: loadPlugIn(const std::string & theName) {
         throw PlugInException(string("PlugIn '") +getPlugInFileName(theName)+"' not found in search path '"+ _mySearchPath +"'", PLUS_FILE_LINE);
     }
     AC_INFO << "Plugging '" << myFilename << "'" << endl;
-#ifdef WIN32
+#ifdef _WIN32
     DLHandle myModule = ::LoadLibrary(myFilename.c_str());
 #else
     DLHandle myModule = dlopen (myFilename.c_str(), RTLD_LAZY | RTLD_GLOBAL);
@@ -162,7 +162,7 @@ PlugInManager :: isLoaded(const std::string & theName) const {
 
 string
 PlugInManager :: lastError() const {
-#ifdef WIN32
+#ifdef _WIN32
     DWORD myErrorCode = GetLastError();
     LPVOID lpMsgBuf;
     if (!FormatMessage(

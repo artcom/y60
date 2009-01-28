@@ -97,7 +97,7 @@ namespace asl {
         std::ofstream _myStream;
     };
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "windows.h"
     class OutputWindowPrinter : public MessageSink {
     public:

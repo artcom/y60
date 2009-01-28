@@ -91,7 +91,7 @@ SDLEventSource::SDLEventSource() {
 }
 
 void SDLEventSource::init() {
-#ifndef WIN32
+#ifndef _WIN32
     initJoysticks();
 #endif
 }

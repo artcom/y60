@@ -221,7 +221,7 @@ namespace asl {
 }
 
 #define MAKEUNIQUE(x) myVar_##x
-#ifdef WIN32
+#ifdef _WIN32
 #   define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
 #   if defined(DEBUG)
 #       define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )

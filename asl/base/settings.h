@@ -133,7 +133,7 @@ namespace asl {
 /* @} */
 };
 
-#ifdef WIN32
+#ifdef _WIN32
     // XXX: rename theDirectorySeparator to ourDirectorySeparator
 
     #define _SETTING_VC_TEMPLATE_BUG_WORKAROUND_
@@ -151,7 +151,7 @@ namespace asl {
     #define HAVE_LONGLONG
     #define LONGLONG long long
 #endif
-#ifdef WIN32
+#ifdef _WIN32
     // prevent windows from defining min and max macros
     #define NOMINMAX
     #undef HAVE_LONGLONG
@@ -161,7 +161,7 @@ namespace asl {
     #define _SETTING_USE_MUTEX_BASED_RWLOCK_IMPLEMENTATION_
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
 #endif
 
@@ -172,7 +172,7 @@ namespace asl {
 #define DESTRACE(x) //x
 
 
-#if defined(WIN32) && defined(AC_BUILT_WITH_CMAKE)
+#if defined(_WIN32) && defined(AC_BUILT_WITH_CMAKE)
     //C4661 (no suitable definition provided for explicit template 
     //instantiation request) -> ToDo: should be removed
 #   pragma warning( disable:  4251 4661)

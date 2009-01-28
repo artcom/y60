@@ -62,7 +62,7 @@ namespace y60 {
             bool isActive();
             
          private:
-    #ifdef WIN32
+    #ifdef _WIN32
             HDC         _myHdc;
             HGLRC       _myHglrc;
     #endif

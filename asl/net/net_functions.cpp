@@ -19,7 +19,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifdef WIN32
+#ifdef _WIN32
   #define _WIN32_WINNT 0x0500
 #endif
 
@@ -43,7 +43,7 @@
 #include <string>
 #include <algorithm>
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <windows.h>
   #include <Iphlpapi.h>
 #else
@@ -144,7 +144,7 @@ namespace asl {
     
     asl::Block getHardwareAddress(const std::string & theInterfaceName) {
         asl::Block myHardwareMac;
-#ifdef WIN32
+#ifdef _WIN32
         const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "0");
         // TODO: check interface name or use name as index instead
         PIP_ADAPTER_INFO pAdapterInfo;
