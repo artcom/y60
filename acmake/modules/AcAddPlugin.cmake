@@ -40,6 +40,9 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
             PUBLIC_HEADER "${THIS_PLUGIN_HEADERS}"
     )
     
+    # attach rpath configuration
+    _ac_attach_rpath(${THIS_PLUGIN_NAME})
+
     # attach depends and externs
     _ac_attach_depends(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_DEPENDS})
     _ac_attach_externs(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_EXTERNS})

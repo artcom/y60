@@ -59,6 +59,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             ${THIS_LIBRARY_NAME} PROPERTIES
                 PUBLIC_HEADER "${THIS_LIBRARY_HEADERS}"
         )
+
+        # attach rpath configuration
+        _ac_attach_rpath(${THIS_LIBRARY_NAME})
         
         # attach depends and externs
         _ac_attach_depends(${THIS_LIBRARY_NAME} ${THIS_LIBRARY_DEPENDS})

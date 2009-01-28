@@ -30,7 +30,10 @@ macro(ac_add_executable EXECUTABLE_NAME)
     # define the target
     add_executable(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_SOURCES}
             ${THIS_EXECUTABLE_HEADERS})
-    
+
+    # attach rpath configuration
+    _ac_attach_rpath(${THIS_EXECUTABLE_NAME})
+
     # attach depends and externs
     _ac_attach_depends(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_DEPENDS})
     _ac_attach_externs(${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_EXTERNS})

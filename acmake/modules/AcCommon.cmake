@@ -79,3 +79,15 @@ macro(_ac_declare_searchpath)
         endif(NOT EXTERN MATCHES ".*\\.framework/?$")
     endforeach(EXTERN)
 endmacro(_ac_declare_searchpath)
+
+option(ACMAKE_INSTALL_WITH_RPATH "Should binaries be installed with an rpath?" YES)
+
+macro(_ac_attach_rpath TARGET)
+    if(ACMAKE_INSTALL_WITH_RPATH)
+        set_target_properties(
+            ${TARGET} PROPERTIES
+                INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+                INSTALL_RPATH_USE_LINK_PATH YES
+        )
+    endif(ACMAKE_INSTALL_WITH_RPATH)
+endmacro(_ac_attach_rpath)
