@@ -56,9 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug( "EventLoop" );
-plug( "ASSEventSource" );
-plug( "SynergyServer" );
+plug( "y60EventLoop" );
+plug( "y60ASSEventSource" );
+plug( "y60SynergyServer" );
 
 const DEFAULT_MODE = 0;
 const CLICKONPOINT_MODE = 1;

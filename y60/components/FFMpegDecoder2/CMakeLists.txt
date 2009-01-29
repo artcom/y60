@@ -16,11 +16,13 @@ VideoMsgQueue.h
 y60_ffmpegdecoder2_settings.h
 )
 
-list( APPEND EXTERNALS PAINTLIB AVFORMAT AVCODEC OPENEXR )
+list( APPEND EXTERNALS PAINTLIB AVFORMAT AVCODEC SWSCALE OPENEXR )
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
+
+add_definitions(-D__STDC_CONSTANT_MACROS)
 
 y60_add_component(
     FFMpegDecoder2

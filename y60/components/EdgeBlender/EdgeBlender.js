@@ -57,7 +57,7 @@
 */
 
 use("SceneViewer.js");
-plug("EdgeBlender");
+plug("y60EdgeBlender");
 
 
 function EdgeBlendViewer(theArguments) {

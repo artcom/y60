@@ -60,7 +60,7 @@
 const TEST_SPEED = 1000;
 
 use("UnitTest.js");
-plug("TaskManager");
+plug("y60TaskManager");
 
 function TaskManagerUnitTest() {
     this.Constructor(this, "TestUnitTest");

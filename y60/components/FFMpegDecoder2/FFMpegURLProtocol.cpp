@@ -58,6 +58,8 @@
 
 #include "FFMpegURLProtocol.h"
 
+//#include <CG/glext.h> //offset_h
+
 #include <asl/base/Ptr.h>
 #include <asl/base/Block.h>
 #include <asl/base/MappedBlock.h>
@@ -73,7 +75,7 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#       include <ffmpeg/avformat.h>
+#       include <libavformat/avformat.h>
     }
 #   if defined(_MSC_VER)
 #       pragma warning(pop)
@@ -145,8 +147,8 @@ static int acstream_read(URLContext *h, unsigned char *buf, int size) {
     return mySource->read(buf, size);
 }    
 
-static offset_t acstream_seek(URLContext *h, offset_t pos, int whence) {
-    //offset_t myOffset = 0;
+static int64_t acstream_seek(URLContext *h, int64_t pos, int whence) {
+    //int64_t myOffset = 0;
     RelativeReadableStream * mySource 
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
 

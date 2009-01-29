@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef ASSCore_EXPORTS
+#ifdef y60ASSCore_EXPORTS
 #   define Y60_ASSCORE_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_ASSCORE_EXPORT AC_DLL_IMPORT

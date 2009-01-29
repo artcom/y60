@@ -26,7 +26,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_library(
-    ASSCore y60/components/ASSDriver/ASSCore
+    y60ASSCore y60/components/ASSDriver/ASSCore
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom aslmath y60jsbase y60jslib y60image y60scene 

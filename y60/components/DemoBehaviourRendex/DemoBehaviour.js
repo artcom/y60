@@ -68,7 +68,7 @@ if (__main__ == undefined) var __main__ = "DemoBehaviourRendex";
 
 use("SceneViewer.js");
 
-plug("DemoBehaviour");
+plug("y60DemoBehaviour");
 
 function DemoBehaviourRendexApp(theArguments) {
     this.Constructor(this, theArguments);

@@ -60,7 +60,7 @@ use("Overlay.js");
 use("Exception.js");
 use("UnitTest.js");
 
-plug("ProcFunctions");
+plug("y60ProcFunctions");
 
 const ALLOWED_MEMORY_USAGE = 3*1024*1024;
 

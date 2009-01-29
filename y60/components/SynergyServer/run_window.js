@@ -61,7 +61,7 @@
 
 use("SceneViewer.js");
 use("ASSManager.js");
-plug("SynergyServer");
+plug("y60SynergyServer");
 
 function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
 

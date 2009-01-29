@@ -61,6 +61,8 @@
 #include "AudioFrame.h"
 #include "FrameAnalyser.h"
 
+#include <libswscale/swscale.h>
+
 #include <asl/base/Logger.h>
 #include <asl/base/os_functions.h>
 #include <asl/base/console_functions.h>
@@ -75,8 +77,8 @@ extern "C" {
 #   include <libavcodec/avcodec.h>
 #   include <libavformat/avformat.h>
 #else
-#   include <ffmpeg/avcodec.h>
-#   include <ffmpeg/avformat.h>
+#   include <libavcodec/avcodec.h>
+#   include <libavformat/avformat.h>
 #endif
 }
 
@@ -321,11 +323,11 @@ namespace y60 {
             uint8_t* myCurReadPtr = _myCurrentAudioPacket->data+_myCurPosInAudioPacket;
             int myDataLeftInPacket = _myCurrentAudioPacket->size-_myCurPosInAudioPacket;
 #if LIBAVCODEC_BUILD >= 0x5100
-            int myBytesDecoded = avcodec_decode_audio(_myAudioStream->codec,
+            int myBytesDecoded = avcodec_decode_audio2(_myAudioStream->codec,
                     (int16_t*)(theAudioFrame->getSamples()), &myFrameSize,
                     myCurReadPtr, myDataLeftInPacket);
 #else
-            int myBytesDecoded = avcodec_decode_audio(&_myAudioStream->codec,
+            int myBytesDecoded = avcodec_decode_audio2(&_myAudioStream->codec,
                     (int16_t*)(theAudioFrame->getSamples()), &myFrameSize,
                     myCurReadPtr, myDataLeftInPacket);
 #endif
@@ -575,8 +577,32 @@ namespace y60 {
         myDestPict.linesize[1] = myLineSizeBytes;
         myDestPict.linesize[2] = myLineSizeBytes;
 
-        img_convert(&myDestPict, _myDestinationFormat, (AVPicture*)theFrame,
-                myVCodec->pix_fmt, myVCodec->width, myVCodec->height);
+        //img_convert(&myDestPict, _myDestinationFormat, (AVPicture*)theFrame,
+        //        myVCodec->pix_fmt, myVCodec->width, myVCodec->height);
+
+
+        
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+        img_convert(&myDestPict, _myDestinationPixelFormat,
+                    (AVPicture*)theFrame, myVCodec->pix_fmt,
+                    myVCodec->width, myVCodec->height);
+                       
+#else
+                
+        int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+        SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
+            myVCodec->pix_fmt,
+            myVCodec->width, myVCodec->height,
+            myVCodec->pix_fmt,
+            mySWSFlags, NULL, NULL, NULL);
+        sws_scale(img_convert_ctx, ((AVPicture*)theFrame)->data, 
+            ((AVPicture*)theFrame)->linesize, 0, myVCodec->height, 
+            myDestPict.data, myDestPict.linesize);
+        
+        sws_freeContext(img_convert_ctx);
+                
+#endif
+
     }
 }
 

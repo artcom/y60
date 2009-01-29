@@ -58,7 +58,7 @@
 
 use("UnitTest.js");
 plug("y60JSSound");
-plug("ProcFunctions");
+plug("y60ProcFunctions");
 
 function SoundUnitTest() {
     this.Constructor(this, "SoundUnitTest");

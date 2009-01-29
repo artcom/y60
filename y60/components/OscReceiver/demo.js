@@ -61,7 +61,7 @@
 
 use("SceneViewer.js");
 
-plug("OscReceiver");
+plug("y60OscReceiver");
 
 function OscReceiverDemo(theArguments, theWidth, theHeight, theTitle) {
 

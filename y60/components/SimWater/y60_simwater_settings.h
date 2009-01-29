@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef simwater_EXPORTS
+#ifdef y60simwater_EXPORTS
 #   define Y60_SIMWATER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_SIMWATER_EXPORT AC_DLL_IMPORT

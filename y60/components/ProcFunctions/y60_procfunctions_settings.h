@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef ProcFunctions_EXPORTS
+#ifdef y60ProcFunctions_EXPORTS
 #   define Y60_PROCFUNCTIONS_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_PROCFUNCTIONS_EXPORT AC_DLL_IMPORT

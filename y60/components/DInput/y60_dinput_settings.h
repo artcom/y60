@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef DInput_EXPORTS
+#ifdef y60DInput_EXPORTS
 #   define Y60_DINPUT_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_DINPUT_EXPORT AC_DLL_IMPORT

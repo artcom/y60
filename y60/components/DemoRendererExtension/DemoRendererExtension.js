@@ -67,7 +67,7 @@
 if (__main__ == undefined) var __main__ = "DemoRendererExtension";
 
 use("SceneViewer.js");
-plug("DemoRendererExtension");
+plug("y60DemoRendererExtension");
 
 
 function DemoRendererExtensionApp(theArguments) {

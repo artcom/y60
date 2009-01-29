@@ -69,7 +69,7 @@ use("Overlay.js");
 use("Exception.js");
 use("UnitTest.js");
 
-plug("ProcFunctions");
+plug("y60ProcFunctions");
 
 //const START_FRAMES = 199;
 //const END_FRAMES   = 200;

@@ -8,11 +8,13 @@ FFMpegDecoder1.h
 y60_ffmpegdecoder1_settings.h
 )
 
-list( APPEND EXTERNALS AVCODEC AVFORMAT PAINTLIB OPENEXR )
+list( APPEND EXTERNALS AVCODEC AVFORMAT SWSCALE PAINTLIB OPENEXR )
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
+
+add_definitions(-D__STDC_CONSTANT_MACROS)
 
 y60_add_component(
     FFMpegDecoder1

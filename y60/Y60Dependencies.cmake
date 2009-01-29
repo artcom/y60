@@ -44,6 +44,7 @@ endif(WIN32)
 #find_package(Ffmpeg)
 find_package( Avcodec )
 find_package( Avformat )
+find_package( Swscale )
 
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)

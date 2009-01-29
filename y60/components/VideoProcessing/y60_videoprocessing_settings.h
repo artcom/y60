@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef VideoProcessing_EXPORTS
+#ifdef y60VideoProcessing_EXPORTS
 #   define Y60_VIDEOPROCESSING_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_VIDEOPROCESSING_EXPORT AC_DLL_IMPORT

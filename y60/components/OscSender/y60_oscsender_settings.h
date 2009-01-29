@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef OscSender_EXPORTS
+#ifdef y60OscSender_EXPORTS
 #   define Y60_OSCSENDER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_OSCSENDER_EXPORT AC_DLL_IMPORT

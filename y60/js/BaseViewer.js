@@ -651,7 +651,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.enableNagios = function(thePort) {
-        plug("NagiosPlugin");
+        plug("y60Nagios");
         _myNagiosPlugin = new NagiosPlugin();
         _myNagiosPlugin.port = thePort;
         _myRenderWindow.addExtension(_myNagiosPlugin);

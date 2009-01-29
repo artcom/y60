@@ -95,8 +95,8 @@ class Y60_ASSCORE_EXPORT ASSDriver :
     public y60::IRendererExtension
 {
     public:
-		ASSDriver();
-		virtual ~ASSDriver();
+        ASSDriver();
+        virtual ~ASSDriver();
 
         // IRendererExtension
         void onStartup(jslib::AbstractRenderWindow * theWindow) {}

@@ -61,6 +61,7 @@
 #include <limits>
 #include <cstdlib>
 
+
 #ifdef OSX
 #include <Carbon/Carbon.h>
 #endif
@@ -77,8 +78,8 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#       include <ffmpeg/avcodec.h>
-#       include <ffmpeg/avformat.h>
+#       include <libavcodec/avcodec.h>
+#       include <libavformat/avformat.h>
     }
 #   if defined(_MSC_VER)
 #       pragma warning(pop)

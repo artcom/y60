@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug("ProcFunctions");
+plug("y60ProcFunctions");
 use("Y60JSSL.js");
 use("ImageManager.js");
 use("Overlay.js");

@@ -61,7 +61,7 @@ use("ShapeBuilder.js");
 use("BuildUtils.js");
 //use("Unicode.js");
 
-//plug("GlurFilter");
+//plug("y60GlurFilter");
 
 
 function Character(theUnicode, theUV, theUVSize, theGlyphMetric) {

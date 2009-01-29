@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef GlurFilter_EXPORTS
+#ifdef y60GlurFilter_EXPORTS
 #   define Y60_GLURFILTER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_GLURFILTER_EXPORT AC_DLL_IMPORT

@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef EventLoop_EXPORTS
+#ifdef y60EventLoop_EXPORTS
 #   define Y60_EVENTLOOP_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_EVENTLOOP_EXPORT AC_DLL_IMPORT

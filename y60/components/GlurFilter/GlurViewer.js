@@ -57,7 +57,7 @@
 */
 
 use("Overlay.js");
-plug("GlurFilter");
+plug("y60GlurFilter");
 
 if (arguments.length < 1) {
     print("Usage: GlurViewer filename");

@@ -17,11 +17,13 @@ VideoFrame.h
 y60_ffmpegdecoder_settings.h
 )
 
-list( APPEND EXTERNALS AVFORMAT AVCODEC PAINTLIB OPENEXR )
+list( APPEND EXTERNALS AVFORMAT AVCODEC SWSCALE PAINTLIB OPENEXR )
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
+
+add_definitions(-D__STDC_CONSTANT_MACROS)
 
 y60_add_component(
     FFMpegDecoder

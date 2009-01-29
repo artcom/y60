@@ -58,7 +58,7 @@
 
 // libraries
 use("SceneViewer.js");
-plug("GStreamerCapturePlugin");
+plug("y60GStreamerCapture");
 //plug("y60DC1394");
 
 var ourShow  = null;

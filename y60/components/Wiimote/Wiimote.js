@@ -223,7 +223,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         //window.position = [0, 0];
         window.decorations = false;
         window.resize(theWidth, theHeight);
-        _myWiimoteDriver = plug("Wiimote");
+        _myWiimoteDriver = plug("y60Wiimote");
 
 
         _myMasterWii = getDescendantByAttribute(window.scene.world, "name", "wii_controller");

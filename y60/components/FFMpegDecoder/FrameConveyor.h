@@ -80,7 +80,7 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#       include <ffmpeg/avformat.h>
+#       include <libavformat/avformat.h>
     }
 #   if defined(_MSC_VER)
 #       pragma warning(pop)

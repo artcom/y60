@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef StlImporter_EXPORTS
+#ifdef y60StlImporter_EXPORTS
 #   define Y60_STLIMPORTER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_STLIMPORTER_EXPORT AC_DLL_IMPORT

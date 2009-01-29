@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef QuicktimeDecoder_EXPORTS
+#ifdef y60QuicktimeDecoder_EXPORTS
 #   define Y60_QUICKTIMEDECODER_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_QUICKTIMEDECODER_EXPORT AC_DLL_IMPORT

@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef JSSound_EXPORTS
+#ifdef y60JSSound_EXPORTS
 #   define Y60_JSSOUND_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_JSSOUND_EXPORT AC_DLL_IMPORT

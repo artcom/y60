@@ -90,9 +90,9 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#       include <ffmpeg/avformat.h>
+#       include <libavformat/avformat.h>
 #       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
-#           include <ffmpeg/swscale.h>
+#           include <libswscale/swscale.h>
 #       endif
     }
 #   if defined(_MSC_VER)

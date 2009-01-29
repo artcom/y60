@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef dicom_EXPORTS
+#ifdef y60dicom_EXPORTS
 #   define Y60_DICOM_EXPORT AC_DLL_EXPORT
 #else
 #   define Y60_DICOM_EXPORT AC_DLL_IMPORT

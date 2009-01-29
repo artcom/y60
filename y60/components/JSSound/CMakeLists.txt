@@ -19,7 +19,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    y60JSSound
+    JSSound
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60sound

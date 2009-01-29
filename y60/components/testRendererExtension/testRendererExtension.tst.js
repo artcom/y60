@@ -68,7 +68,7 @@ if (__main__ == undefined) var __main__ = "RendererExtensionTest";
 
 use("SceneViewer.js");
 
-plug("testRendererExtension");
+plug("y60testRendererExtension");
 var _myExtension = new testRendererExtension();
 window = new RenderWindow();
 window.addExtension(_myExtension);
