@@ -31,7 +31,7 @@ GrainSource
 RealSound
 )
 
-list( APPEND EXTERNALS AVFORMAT AVCODEC )
+list( APPEND EXTERNALS FFMPEG )
 
 if(OSX)
 endif(OSX)
