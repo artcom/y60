@@ -80,14 +80,19 @@ macro(_ac_declare_searchpath)
     endforeach(EXTERN)
 endmacro(_ac_declare_searchpath)
 
-option(ACMAKE_INSTALL_WITH_RPATH "Should binaries be installed with an rpath?" YES)
+# optionally add an rpath to installed binaries
+if(NOT WIN32)
+    option(ACMAKE_INSTALL_WITH_RPATH "Should binaries be installed with an rpath?" YES)
+endif(NOT WIN32)
 
 macro(_ac_attach_rpath TARGET)
-    if(ACMAKE_INSTALL_WITH_RPATH)
-        set_target_properties(
-            ${TARGET} PROPERTIES
-                INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-                INSTALL_RPATH_USE_LINK_PATH YES
-        )
-    endif(ACMAKE_INSTALL_WITH_RPATH)
+    if(NOT WIN32)
+        if(ACMAKE_INSTALL_WITH_RPATH)
+            set_target_properties(
+                ${TARGET} PROPERTIES
+                    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+                    INSTALL_RPATH_USE_LINK_PATH YES
+            )
+        endif(ACMAKE_INSTALL_WITH_RPATH)
+    endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
