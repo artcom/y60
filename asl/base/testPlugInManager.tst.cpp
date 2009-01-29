@@ -128,8 +128,12 @@ public:
     setup() {
         UnitTestSuite::setup();
 
-        PlugInManager::get().setSearchPath(".");
-        
+#if defined(_DEBUG)
+        PlugInManager::get().setSearchPath(".;../../lib/Debug");
+#else //defined(DEBUG_VARIANT)
+        PlugInManager::get().setSearchPath(".;../../lib/Release");
+#endif //defined(DEBUG_VARIANT)
+
         addTest(new PlugInManagerTest());
     }
 
