@@ -22,23 +22,20 @@ find_package(Doxygen)
 function(ac_add_doxygen NAME SOURCE_DIR OUTPUT_DIR DOXYFILE_IN)
     if(DOXYGEN_FOUND)
         make_directory(${OUTPUT_DIR})
-	set(AC_DOXYGEN_NAME ${NAME})
-	set(AC_DOXYGEN_SOURCE_DIR ${SOURCE_DIR})
-	set(AC_DOXYGEN_OUTPUT_DIR ${OUTPUT_DIR})
+        set(AC_DOXYGEN_NAME ${NAME})
+        set(AC_DOXYGEN_SOURCE_DIR ${SOURCE_DIR})
+        set(AC_DOXYGEN_OUTPUT_DIR ${OUTPUT_DIR})
         configure_file(
             ${DOXYFILE_IN}
             ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
             @ONLY
-         )
-	 set(AC_DOXYGEN_NAME "")
-	 set(AC_DOXYGEN_SOURCE_DIR "")
-	 set(AC_DOXYGEN_OUTPUT_DIR "")
+        )
         add_custom_target(
             ${NAME}-doxygen
-            ${DOXYGEN_EXECUTABLE} Doxyfile
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMENT "Generating doxygen documentation for ${NAME}"
-            VERBATIM
+                ${DOXYGEN_EXECUTABLE} Doxyfile
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                COMMENT "Generating doxygen documentation for ${NAME}"
+                VERBATIM
         )
     endif(DOXYGEN_FOUND)
 endfunction(ac_add_doxygen PROJECT SOURCE DOXYFILE_IN)
@@ -58,11 +55,11 @@ function(ac_add_xsddoc NAME SCHEMA DESTINATION)
     if(JAVA_RUNTIME)
         make_directory(${DESTINATION})
         add_custom_target(
-	    ${NAME}-xsddoc
-	    java -cp ${AC_XSDDOC_CLASSPATH}
-	        net.sf.xframe.xsddoc.Main -t ${NAME} -o ${DESTINATION} ${SCHEMA}
-	    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	    COMMENT "Generating xml schema documentation for ${SCHEMA}"
-	)
+            ${NAME}-xsddoc
+                ${JAVA_RUNTIME} -cp ${AC_XSDDOC_CLASSPATH}
+                    net.sf.xframe.xsddoc.Main -t ${NAME} -o ${DESTINATION} ${SCHEMA}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                COMMENT "Generating xml schema documentation for ${SCHEMA}"
+        )
     endif(JAVA_RUNTIME)
 endfunction(ac_add_xsddoc NAME SCHEMA DESTINATION)
