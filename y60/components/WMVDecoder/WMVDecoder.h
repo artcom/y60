@@ -80,7 +80,11 @@
 #include <deque>
 
 extern "C" {
-#include <ffmpeg/avformat.h>
+#ifndef AC_BUILT_WITH_CMAKE
+#       include <ffmpeg/avformat.h>
+#else
+#       include <avformat.h>
+#endif
 }
 
 namespace y60 {
