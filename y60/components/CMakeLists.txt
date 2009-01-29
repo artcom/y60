@@ -1,9 +1,9 @@
 
 add_subdirectory(ProcFunctions)
 add_subdirectory(JSSound)
-add_subdirectory(Net1)
+add_subdirectory(Net)
 
-add_subdirectory(Nagios1)
+add_subdirectory(Nagios)
 add_subdirectory(WindowCW)
 add_subdirectory(Cluster)
 add_subdirectory(DemoModellingRendex)

@@ -24,8 +24,6 @@
 #ifndef _included_asl_settings_
 #define _included_asl_settings_
 
-#error This revision is not intended to work.
-
 /*! \addtogroup aslbase */
 /* @{ */
 
