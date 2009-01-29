@@ -78,6 +78,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * OscSender_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60OscSender_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSOscSenderPlugIn(myDLHandle);
 }

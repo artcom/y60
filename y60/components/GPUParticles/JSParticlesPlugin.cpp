@@ -78,6 +78,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * GPUParticles_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60GPUParticles_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSParticlesPlugIn(myDLHandle);
 }

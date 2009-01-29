@@ -173,6 +173,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * TaskManager_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60TaskManager_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::TaskManagerPlugin(myDLHandle);
 }

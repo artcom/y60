@@ -112,6 +112,6 @@ protected:
 };
 
 extern "C"
-EXPORT PlugInBase* plfilterWindowCW_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60WindowCW_instantiatePlugIn(DLHandle myDLHandle) {
     return new WindowCWPlugin(myDLHandle);
 }

@@ -222,7 +222,7 @@ namespace y60 {
 
 
     extern "C"
-        EXPORT asl::PlugInBase* VideoProcessingExtension_instantiatePlugIn(asl::DLHandle myDLHandle) {
+        EXPORT asl::PlugInBase* y60VideoProcessing_instantiatePlugIn(asl::DLHandle myDLHandle) {
         return new VideoProcessingExtension(myDLHandle);
     }
 }

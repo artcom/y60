@@ -85,6 +85,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * Cairo_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60Cairo_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSCairoPlugin(myDLHandle);
 }

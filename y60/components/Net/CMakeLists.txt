@@ -18,7 +18,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    net
+    Net
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslinet y60jslib

@@ -60,7 +60,7 @@
 #include <asl/base/Auto.h>
 
 extern "C"
-EXPORT asl::PlugInBase * GStreamerCapturePlugin_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60GStreamerCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::GStreamerCapturePlugin(myDLHandle);
 }
 

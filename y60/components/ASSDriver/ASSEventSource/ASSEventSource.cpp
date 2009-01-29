@@ -151,7 +151,7 @@ ASSEventSource::onSetProperty(const std::string & thePropertyName,
 
 
 extern "C"
-EXPORT asl::PlugInBase* ASSEventSource_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* y60ASSEventSource_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::ASSEventSource(myDLHandle);
 }
 

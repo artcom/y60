@@ -101,6 +101,6 @@ class ASSSchemaPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin 
 } // end of namespace y60
 
 extern "C"
-EXPORT asl::PlugInBase * ASSSchema_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60ASSSchema_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::ASSSchemaPlugIn(myDLHandle);
 }

@@ -81,6 +81,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * jsnet_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60Net_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSNetPlugIn(myDLHandle);
 }

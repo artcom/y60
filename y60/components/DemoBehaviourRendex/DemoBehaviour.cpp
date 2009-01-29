@@ -170,7 +170,7 @@ namespace y60 {
 	}
 
     extern "C"
-    EXPORT PlugInBase * DemoBehaviour_instantiatePlugIn(DLHandle myDLHandle) {
+    EXPORT PlugInBase * y60DemoBehaviourRendex_instantiatePlugIn(DLHandle myDLHandle) {
         cerr << "DemoBehaviour_instantiatePlugIn" << endl;
         return new DemoBehaviourFactory(myDLHandle);
     }

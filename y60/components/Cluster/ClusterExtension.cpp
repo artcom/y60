@@ -606,6 +606,6 @@ ClusterExtension::onPostRender(AbstractRenderWindow * theWindow) {
 }
 
 extern "C"
-EXPORT PlugInBase* rendexCluster_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60Cluster_instantiatePlugIn(DLHandle myDLHandle) {
     return new ClusterExtension(myDLHandle);
 }

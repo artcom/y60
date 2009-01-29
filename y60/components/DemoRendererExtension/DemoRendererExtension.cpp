@@ -168,6 +168,6 @@ DemoRendererExtension :: onPostRender(AbstractRenderWindow * theRenderer) {
 }
 
 extern "C"
-EXPORT PlugInBase* DemoRendererExtension_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60DemoRendererExtension_instantiatePlugIn(DLHandle myDLHandle) {
     return new DemoRendererExtension(myDLHandle);
 }

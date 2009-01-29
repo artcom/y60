@@ -387,7 +387,7 @@ DInputFFBExtension::printErrorState(const string & theCall, HRESULT hr) {
 }
 
 extern "C"
-EXPORT asl::PlugInBase* Y60DInputFFB_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* y60DInputFFB_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new DInputFFBExtension(myDLHandle);
 }
 

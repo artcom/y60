@@ -210,7 +210,7 @@ TestRendererExtension::Functions() {
 
 
 extern "C"
-EXPORT PlugInBase* testRendererExtension_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60testRendererExtension_instantiatePlugIn(DLHandle myDLHandle) {
     return new TestRendererExtension(myDLHandle);
 }
 

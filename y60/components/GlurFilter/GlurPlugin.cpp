@@ -111,6 +111,6 @@ protected:
 };
 
 extern "C"
-EXPORT PlugInBase* GlurFilter_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60GlurFilter_instantiatePlugIn(DLHandle myDLHandle) {
     return new GlurPlugin(myDLHandle);
 }

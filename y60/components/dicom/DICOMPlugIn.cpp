@@ -155,6 +155,6 @@ DICOMPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 
 
 extern "C"
-EXPORT PlugInBase* pldicom_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* y60DICOM_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::DICOMPlugIn(myDLHandle);
 }

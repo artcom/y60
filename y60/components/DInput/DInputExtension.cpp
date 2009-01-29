@@ -317,7 +317,7 @@ DInputExtension::printErrorState(const string & theCall, HRESULT hr) {
 }
 
 extern "C"
-EXPORT asl::PlugInBase* Y60DInput_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* y60DInput_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new DInputExtension(myDLHandle);
 }
 

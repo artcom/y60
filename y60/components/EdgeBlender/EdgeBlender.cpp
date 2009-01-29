@@ -803,6 +803,6 @@ EdgeBlender::renderTexture(float thePosX, float thePosY,
 }
 
 extern "C"
-EXPORT asl::PlugInBase* EdgeBlender_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* y60EdgeBlender_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new EdgeBlender(myDLHandle);
 }
