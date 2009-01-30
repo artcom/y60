@@ -89,7 +89,10 @@ set_target_properties(
     spidermonkey
     PROPERTIES
         PUBLIC_HEADER "${HEADERS}"
-	COMPILE_DEFINITIONS "EXPORT_JS_API"
+	    COMPILE_DEFINITIONS "EXPORT_JS_API"
+        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+        INSTALL_RPATH_USE_LINK_PATH YES
+        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
 install(
@@ -105,6 +108,16 @@ add_executable(
     smonkey
     js.c
 )
+
+set_target_properties(
+    smonkey
+    PROPERTIES
+        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+        INSTALL_RPATH_USE_LINK_PATH YES
+)
+
+
+
 
 if (WIN32)
     target_link_libraries(smonkey spidermonkey)

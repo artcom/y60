@@ -199,6 +199,9 @@ set_target_properties(
     paintlib
     PROPERTIES
         PUBLIC_HEADER "${HEADERS}"
+        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+        INSTALL_RPATH_USE_LINK_PATH YES
+        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
 # XXX: need to expose all libraries as transitive link deps

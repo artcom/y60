@@ -92,6 +92,7 @@ macro(_ac_attach_rpath TARGET)
                 ${TARGET} PROPERTIES
                     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
                     INSTALL_RPATH_USE_LINK_PATH YES
+                    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
             )
         endif(ACMAKE_INSTALL_WITH_RPATH)
     endif(NOT WIN32)

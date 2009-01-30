@@ -41,6 +41,9 @@ set_target_properties(
     acsdlttf
     PROPERTIES
         PUBLIC_HEADER "SDL_ttf.h"
+        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+        INSTALL_RPATH_USE_LINK_PATH YES
+        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
 # XXX: need to expose all libraries as transitive link deps
