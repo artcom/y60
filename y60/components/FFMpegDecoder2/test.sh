@@ -40,7 +40,7 @@ if [ "$DEBUG" = "1" ] ; then
     APP=$PRO/bin/y60DBG
 fi
 
-#export AC_LOG_MODULE_VERBOSITY=TRACE/FFMpegDecoder.cpp
+#export AC_LOG_MODULE_VERBOSITY=TRACE/FFMpegDecoder2.cpp
 
 startJSTest MovieTest.js
 startJSTest SeekTest.js

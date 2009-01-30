@@ -781,48 +781,47 @@ namespace y60 {
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
         
         myMovie->set<FrameRateTag>(_myFrameRate);
-        if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
-                myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 
-                myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
+        if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
             _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
             unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myTimeUnitsPerSecond);
-            AC_DEBUG << "FFMpegDecoder2::setupVideo(): '" << theFilename
-                    << "' contains no valid duration: "<<myFrameCount;
             
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 || 
                    myVCodec->codec_id == CODEC_ID_WMV3)
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
             _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
-            AC_DEBUG << "FFMpegDecoder2::setupVideo()(wmv): _myVStream->duration="
-                     << _myVStream->duration;
         } else {
-	        myMovie->set<FrameCountTag>(int(_myVStream->duration));
+	        double myDuration = 0.0;
+            if(_myFormatContext->start_time == AV_NOPTS_VALUE) {
+                myDuration = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
+            } else {
+                myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
+            }
+            myMovie->set<FrameCountTag>(int(myDuration));
 	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);//_myFrameRate;
 	        if(_myTimeUnitsPerSecond != _myFrameRate){
 	            AC_DEBUG << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< "time_base: "
                 <<_myTimeUnitsPerSecond;
                 
-                AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< "r_framerate num: "<< _myVStream->r_frame_rate.num;
+                AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
                 AC_DEBUG << " time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
                 AC_DEBUG << " time_base2: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
                 AC_DEBUG << " formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time:"<<_myVStream->start_time;
 	        }
-            AC_DEBUG << "FFMpegDecoder2::setupVideo(): _myVStream->duration="
-                     << _myVStream->duration;
         }
-        AC_DEBUG << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
+        AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< "time_base: "
                 <<_myTimeUnitsPerSecond;
+               
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
         _myStartTimestamp = -1;
+            
     }
-
     void
     FFMpegDecoder2::setupAudio(const std::string & theFilename) {
         AVCodecContext * myACodec = _myAStream->codec;

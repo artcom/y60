@@ -292,16 +292,29 @@ namespace y60 {
 
         // duration
         AVCodecContext * myVCodec = _myVStream->codec;
-        if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
-                myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 
-                myVCodec->codec_id == CODEC_ID_MPEG2VIDEO ) {
+        
+        if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
+        {
+            // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
+            // ffmpeg gives often a wrong value.
             myMovie->set<FrameCountTag>(-1);
+            
+        } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 || 
+                   myVCodec->codec_id == CODEC_ID_WMV3)
+        {
+            myMovie->set<FrameCountTag>(int(_myVStream->duration * myFPS / 1000));
         } else {
-            myMovie->set<FrameCountTag>(int(_myVStream->duration));
-	    //    myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration
-        //                                    * av_q2d(_myVStream->time_base)));
+	        double myDuration = 0.0;
+            if(_myFormatContext->start_time == AV_NOPTS_VALUE) {
+                myDuration = (_myFormatContext->duration )*myFPS/(double)AV_TIME_BASE;
+            } else {
+                myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*myFPS/(double)AV_TIME_BASE;
+            }
+            myMovie->set<FrameCountTag>(int(myDuration));
         }
-
+        AC_INFO << "FFMpegDecoder1::load() " << theFilename << " fps="
+                << myFPS << " framecount=" << getFrameCount();
+               
         _myLastVideoTimestamp = 0;
 
         // Get Starttime
@@ -325,7 +338,7 @@ namespace y60 {
         AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp <<
                 " myTimeUnitsPerSecond=" << myTimeUnitsPerSecond;
         AC_DEBUG << "_myLastVideoTimestamp=" << _myLastVideoTimestamp;
-        if (myFrameTimestamp == _myLastVideoTimestamp) {
+        if ((_myLastVideoTimestamp != 0) && (myFrameTimestamp == _myLastVideoTimestamp)) {
             return theTime;
         }
         if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {

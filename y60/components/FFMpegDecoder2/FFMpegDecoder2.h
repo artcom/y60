@@ -98,6 +98,8 @@
 #       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
 #ifdef AC_BUILT_WITH_CMAKE
 #       include <swscale.h>
+#else
+#       include <ffmpeg/swscale.h>
 #endif
 #       endif
     }
