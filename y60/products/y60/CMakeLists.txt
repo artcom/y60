@@ -15,3 +15,41 @@ ac_add_executable(
   EXTERNS ${EXTERNALS}
 )
 
+
+macro(y60_add_jstest NAME)
+  add_test(${NAME}
+      y60 test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I "${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;." 
+
+  )
+endmacro(y60_add_jstest NAME) 
+
+set(JSTESTS
+Configurator
+Dom
+Enum
+FileFunctions
+HotCoding
+JSApp
+LinAlg
+Locale
+Modelling
+MyClass
+Overlay
+PerlinNoise
+Request
+Scene
+Serial
+Shell
+SimpleBench
+SweptSphereWorld
+UnitTest
+VectorOfString
+WorldIntersection
+Y60JSSL
+)
+
+foreach(TEST ${JSTESTS})
+  y60_add_jstest(${TEST})
+endforeach(TEST)
+
+
