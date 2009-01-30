@@ -9,7 +9,7 @@ else(WIN32)
     pkg_search_module(AVCODEC REQUIRED libavcodec)
     pkg_search_module(AVFORMAT REQUIRED libavformat)
     pkg_search_module(SWSCALE REQUIRED libswscale)
-    pkg_search_module(AVFILTER OPTIONAL libavfilter)
+    pkg_search_module(AVFILTER libavfilter) # optional because it does not exist on linux
     set(FFMPEG_FOUND YES)
 endif(WIN32)
 

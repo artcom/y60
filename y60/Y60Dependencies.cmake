@@ -28,9 +28,9 @@ find_package(OpenEXR)
 
 find_package(GLIB2)
 
-pkg_search_module(GTKMM OPTIONAL gtkmm-2.4)
-pkg_search_module(GLADEMM OPTIONAL libglademm-2.4)
-pkg_search_module(GTKGLEXT OPTIONAL gtkglext-1.0)
+pkg_search_module(GTKMM gtkmm-2.4)
+pkg_search_module(GLADEMM libglademm-2.4)
+pkg_search_module(GTKGLEXT gtkglext-1.0)
 
 if(WIN32)
     find_package(PthreadVC)
