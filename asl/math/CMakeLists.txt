@@ -61,15 +61,10 @@ SvgPath
 VectorStream
 )
 
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)	
-	
 ac_add_library(
     aslmath asl/math
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS ${EXTERNALS}
     DEPENDS aslbase
     TESTS   ${TESTS}
 )

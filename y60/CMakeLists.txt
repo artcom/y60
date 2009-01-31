@@ -20,6 +20,8 @@ include(Y60Definitions)
 include(Y60Dependencies)
 include(Y60Utilities)
 
+ac_add_project(Y60)
+
 # XXX: Spidermonkey definitions should be dependency-propagated.
 add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
@@ -104,27 +106,5 @@ add_custom_target(
     VERBATIM
 )
 
-# Export cmake package unless in an integrated build
-if(NOT Y60_INTEGRATED_BUILD)
-configure_file(
-    ${Y60_SOURCE_DIR}/FindY60.cmake.in
-    ${Y60_BINARY_DIR}/FindY60.cmake
-    @ONLY
-)
+ac_export_project(Y60)
 
-install(
-    FILES Y60Dependencies.cmake Y60Definitions.cmake Y60Utilities.cmake
-    DESTINATION share/cmake-2.6/Modules
-)
-
-install(
-    FILES ${Y60_BINARY_DIR}/FindY60.cmake
-    DESTINATION share/cmake-2.6/Modules
-)
-
-install(
-    EXPORT Y60
-    DESTINATION share/cmake-2.6/Modules
-    FILE Y60Export.cmake
-)
-endif(NOT Y60_INTEGRATED_BUILD)

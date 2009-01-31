@@ -6,7 +6,11 @@ cmake_minimum_required(VERSION 2.6)
 project(PRO60)
 
 # make build-integrated acmake available
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/acmake/modules)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/acmake/modules)
+
+# make build-integrated packages available
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/asl)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/y60)
 
 if(WIN32)
     list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
@@ -33,3 +37,4 @@ add_subdirectory(acmake)
 add_subdirectory(netsrc)
 add_subdirectory(asl)
 add_subdirectory(y60)
+

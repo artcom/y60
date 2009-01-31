@@ -11,10 +11,6 @@ y60_windowcwfilter_settings.h
 
 list( APPEND EXTERNALS PAINTLIB OPENEXR )
 
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
 y60_add_component(
     WindowCW
     SOURCES ${SOURCES}

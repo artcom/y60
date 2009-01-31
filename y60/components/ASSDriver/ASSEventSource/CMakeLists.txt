@@ -8,11 +8,7 @@ ASSEventSource.h
 y60_eventsource_settings.h
 )
 
-list( APPEND EXTERNALS OPENEXR GLEW )   
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
+list(APPEND EXTERNALS GLEW)
 
 y60_add_component(
     ASSEventSource
@@ -21,4 +17,3 @@ y60_add_component(
     DEPENDS aslbase asldom aslmath y60ASSCore y60input y60jsbase 
     EXTERNS ${EXTERNALS}
 )
-

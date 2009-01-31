@@ -38,17 +38,11 @@ XmlDom
 Xml
 )
 
-list( APPEND EXTERNALS OPENEXR )
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
 ac_add_library(
     asldom asl/dom
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS   ${TESTS}
     DEPENDS aslbase aslraster
-    EXTERNS ${EXTERNALS}
+    EXTERNS OPENEXR
 )

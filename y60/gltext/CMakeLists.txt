@@ -42,14 +42,11 @@ textUtilities.h
 y60_gltext_settings.h
 )
 
-set(TESTS
-)
-
 ac_add_library(
     y60gltext y60/gltext
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS GLEW OPENEXR
+    EXTERNS GLEW
     DEPENDS aslbase aslmath asldom
             y60base y60scene y60image y60video y60glutil paintlib
     TESTS   ${TESTS}

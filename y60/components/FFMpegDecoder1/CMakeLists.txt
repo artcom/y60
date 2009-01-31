@@ -8,13 +8,9 @@ FFMpegDecoder1.h
 y60_ffmpegdecoder1_settings.h
 )
 
-list( APPEND EXTERNALS FFMPEG PAINTLIB OPENEXR )
+list(APPEND EXTERNALS FFMPEG)
 
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
-add_definitions(-D__STDC_CONSTANT_MACROS)
+add_definitions(-D__STDC_CONSTANT_MACROS) # XXX: why? what? aeh!?
 
 y60_add_component(
     FFMpegDecoder1
@@ -23,4 +19,3 @@ y60_add_component(
     DEPENDS y60video
     EXTERNS ${EXTERNALS}
 )
-

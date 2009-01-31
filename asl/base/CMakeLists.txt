@@ -126,11 +126,11 @@ Time
 UnitTest
 )
 
-if( UNIX )
-    list( APPEND SOURCES signal_functions.cpp )
-	list( APPEND HEADERS signal_functions.h )
-    list( APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
-endif( UNIX )
+if(UNIX)
+    list(APPEND SOURCES signal_functions.cpp)
+	list(APPEND HEADERS signal_functions.h)
+    list(APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
+endif(UNIX)
 
 if(OSX)
     list(APPEND SOURCES MachOBacktrace.cpp)
@@ -147,11 +147,9 @@ endif(LINUX)
 if(WIN32)
     list(APPEND SOURCES Win32Backtrace.cpp)
     list(APPEND HEADERS Win32Backtrace.h)
-    set( PSAPI_LIBRARY Psapi )
-    list(APPEND EXTERNALS PSAPI )
-	set(PSAPI_LIBRARIES Psapi )
-    list( APPEND EXTERNS PTHREADVC PSAPI )
-endif(WIN32) # All *nix
+	set(PSAPI_LIBRARIES Psapi) # XXX: write find package
+    list(APPEND EXTERNS PTHREADVC PSAPI)
+endif(WIN32)
 
 ac_add_library(
     aslbase asl/base

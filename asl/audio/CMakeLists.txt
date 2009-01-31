@@ -39,8 +39,6 @@ Effect
 RealPump
 )
 
-set(EXTERNS)
-
 if(OSX)
     set(SOURCES ${SOURCES} CoreAudioPump.cpp)
     set(HEADERS ${HEADERS} CoreAudioPump.h)
@@ -48,16 +46,16 @@ if(OSX)
 endif(OSX)
 
 if(LINUX)
-    list(APPEND EXTERNS ALSA)
     set(SOURCES ${SOURCES} ALSAPump.cpp)
     set(HEADERS ${HEADERS} ALSAPump.h)
+    list(APPEND EXTERNS ALSA)
 endif(LINUX)
 
 if(WIN32)
     set(SOURCES ${SOURCES} DirectSoundPump.cpp)
     set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
-    set(WINMM_LIBRARIES Winmm ) #  XXX
-    list( APPEND EXTERNS PTHREADVC WINMM DIRECTX )
+    set(WINMM_LIBRARIES Winmm) # XXX: write find package
+    list(APPEND EXTERNS WINMM DIRECTX)
 endif(WIN32)
 
 ac_add_library(

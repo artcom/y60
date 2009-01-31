@@ -31,17 +31,7 @@ GrainSource
 RealSound
 )
 
-list( APPEND EXTERNALS FFMPEG )
-
-if(OSX)
-endif(OSX)
-
-if(LINUX)
-endif(LINUX)
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
+list(APPEND EXTERNALS FFMPEG)
 
 ac_add_library(
     y60sound y60/sound
@@ -51,4 +41,3 @@ ac_add_library(
     EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
-

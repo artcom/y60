@@ -33,11 +33,7 @@ set(TESTS
 ZipFile
 )
 
-list( APPEND EXTERNALS ZLIB )
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)	
+list(APPEND EXTERNALS ZLIB)
 
 ac_add_library(
     aslzip asl/zip

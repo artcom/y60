@@ -30,14 +30,7 @@ glExtensions.h
 y60_glutil_settings.h
 )
 
-set(TESTS
-)
-
-list( APPEND EXTERNALS GLEW OPENEXR NVIDIA_CG )
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
+list( APPEND EXTERNALS GLEW NVIDIA_CG )
 
 ac_add_library(
     y60glutil y60/glutil
@@ -46,6 +39,4 @@ ac_add_library(
     DEPENDS aslbase aslmath asldom aslzip
             y60base y60scene y60image y60video
     EXTERNS ${EXTERNALS}
-    TESTS   ${TESTS}
 )
-

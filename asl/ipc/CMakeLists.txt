@@ -25,7 +25,6 @@ set(TESTS
 if(WIN32)
     list(APPEND SOURCES NamedPipePolicy.cpp)
     list(APPEND HEADERS NamedPipePolicy.h)
-	list( APPEND EXTERNALS PTHREADVC )
 else(WIN32)
     list(APPEND SOURCES UnixSocketPolicy.cpp)
     list(APPEND HEADERS UnixSocketPolicy.h)

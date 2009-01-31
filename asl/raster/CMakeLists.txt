@@ -1,5 +1,10 @@
 
+set(SOURCES
+dummy.cpp
+)
+
 set(HEADERS
+dummy.h
 contain.h
 fraction.h
 palgo.h
@@ -19,16 +24,11 @@ Pixels
 
 list( INSERT EXTERNALS 0 OPENEXR )
 
-if(WIN32)
-    list( INSERT EXTERNALS 0 PTHREADVC )
-endif(WIN32)	
-
 ac_add_library(
     aslraster asl/raster
+    SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase
     TESTS   ${TESTS}
     EXTERNS ${EXTERNALS}
-    HEADER_ONLY
 )
-

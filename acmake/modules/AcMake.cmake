@@ -17,13 +17,13 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-enable_testing()
+include(CTest)
 
 include(FindPkgConfig)
 
-if(WIN32)
-endif(WIN32)
-
+# Make sure we have our templates and tools available.
+# For an integrated build, this just means setting some vars.
+# For a separate build, we load the installed config file.
 if(NOT ACMAKE_INTEGRATED_BUILD)
     include(AcMakeConfig)
 else(NOT ACMAKE_INTEGRATED_BUILD)
@@ -33,9 +33,12 @@ else(NOT ACMAKE_INTEGRATED_BUILD)
 endif(NOT ACMAKE_INTEGRATED_BUILD)
 
 include(AcPlatform)
-include(AcUtils)
+include(AcBoostUtils)
+include(AcVariableUtils)
 
-include(AcCommon)
+include(AcTarget)
+include(AcProject)
+
 include(AcAddExecutable)
 include(AcAddLibrary)
 include(AcAddPlugin)

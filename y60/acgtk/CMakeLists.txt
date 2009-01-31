@@ -53,7 +53,7 @@ ac_add_library(
             y60base y60image y60video y60inet y60scene y60input
             y60glrender y60glutil y60gltext y60modelling y60jslib
             paintlib
-    EXTERNS GTKMM GTKGLEXT OPENEXR
+    EXTERNS GTKMM GTKGLEXT
 )
 
 # fix OpenGL/X11 link cycle problem

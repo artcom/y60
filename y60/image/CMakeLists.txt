@@ -36,9 +36,7 @@ ac_add_library(
     y60image y60/image
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS OPENEXR CURL
     DEPENDS aslbase asldom aslmath aslzip
             y60base paintlib
     TESTS   ${TESTS}
 )
-

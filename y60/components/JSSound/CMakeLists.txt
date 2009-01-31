@@ -12,17 +12,9 @@ JSSoundManager.h
 y60_jssound_settings.h
 )
 
-list( APPEND EXTERNALS SPIDERMONKEY OPENEXR AVFORMAT NVIDIA_CG)
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
 y60_add_component(
     JSSound
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60sound
-    EXTERNS ${EXTERNALS}
 )
-

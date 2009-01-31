@@ -22,17 +22,10 @@ set(TESTS
 XPath
 )
 
-list( APPEND EXTERNALS OPENEXR )
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
 ac_add_library(
     aslxpath asl/xpath
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS   ${TESTS}
     DEPENDS aslbase asldom aslraster
-    EXTERNS ${EXTERNALS}
 )

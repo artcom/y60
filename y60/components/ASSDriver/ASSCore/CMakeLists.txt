@@ -19,11 +19,7 @@ TransportLayer.h
 y60_asscore_settings.h
 )
 
-list( APPEND EXTERNALS OPENEXR OPENGL GLEW )   
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
+list(APPEND EXTERNALS GLEW)
 
 ac_add_library(
     y60ASSCore y60/components/ASSDriver/ASSCore
@@ -32,4 +28,3 @@ ac_add_library(
     DEPENDS asldom aslmath y60jsbase y60jslib y60image y60scene 
     EXTERNS ${EXTERNALS}
 )
-

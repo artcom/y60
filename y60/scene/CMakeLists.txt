@@ -120,18 +120,7 @@ Scene
 ShapeBuilder
 )
 
-
-list( APPEND EXTERNS GLEW OPENEXR )
-
-if(OSX)
-endif(OSX)
-
-if(LINUX)
-endif(LINUX)
-
-if(WIN32)
-    list( APPEND EXTERNS PTHREADVC )
-endif(WIN32)
+list(APPEND EXTERNS GLEW)
 
 ac_add_library(
     y60scene y60/scene
@@ -142,4 +131,3 @@ ac_add_library(
     EXTERNS ${EXTERNS}
     TESTS   ${TESTS}
 )
-

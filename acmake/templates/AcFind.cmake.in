@@ -1,0 +1,111 @@
+# This file is a project export generated with AcMake for the project @THIS_PROJECT_NAME@
+#
+
+# determine if we are integrated or not
+get_property(@THIS_PROJECT_NAME@_IS_PROJECT GLOBAL PROPERTY @THIS_PROJECT_NAME@_IS_PROJECT)
+if(@THIS_PROJECT_NAME@_IS_PROJECT)
+    set(@THIS_PROJECT_NAME@_IS_IMPORTED   NO)
+    set(@THIS_PROJECT_NAME@_IS_INTEGRATED YES)
+else(@THIS_PROJECT_NAME@_IS_PROJECT)
+    set(@THIS_PROJECT_NAME@_IS_IMPORTED   YES)
+    set(@THIS_PROJECT_NAME@_IS_INTEGRATED NO)
+endif(@THIS_PROJECT_NAME@_IS_PROJECT)
+set(@THIS_PROJECT_NAME@_IS_PROJECT YES)
+
+# find external dependencies
+include(Find@THIS_PROJECT_NAME@Dependencies)
+include(Find@THIS_PROJECT_NAME@Targets)
+
+# set up needed variables
+if(@THIS_PROJECT_NAME@_IS_INTEGRATED)
+    # in integrated mode we just copy global information
+    
+    # NOTE: we can use get_globals in integrated mode because
+    #       AcMake must have been loaded for us to get here.
+    get_globals(@THIS_PROJECT_NAME@ @THIS_PROJECT_NAME@ ${_AC_PROJECT_VARIABLES})
+
+else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
+    # in imported mode, we have to template everything
+
+    # templated variables
+    set(@THIS_PROJECT_NAME@_NAME           @THIS_PROJECT_NAME@)
+    set(@THIS_PROJECT_NAME@_FOUND          YES)
+    set(@THIS_PROJECT_NAME@_BUILD_TYPE     @THIS_PROJECT_BUILD_TYPE@)
+    set(@THIS_PROJECT_NAME@_INSTALL_PREFIX @THIS_PROJECT_INSTALL_PREFIX@)
+    set(@THIS_PROJECT_NAME@_RUNTIME_DIR    @THIS_PROJECT_RUNTIME_DIR@)
+    set(@THIS_PROJECT_NAME@_LIBRARY_DIR    @THIS_PROJECT_LIBRARY_DIR@)
+    set(@THIS_PROJECT_NAME@_INCLUDE_DIR    @THIS_PROJECT_INCLUDE_DIR@)
+    set(@THIS_PROJECT_NAME@_LIBRARIES      @THIS_PROJECT_LIBRARIES@)
+    set(@THIS_PROJECT_NAME@_EXECUTABLES    @THIS_PROJECT_EXECUTABLES@)
+    set(@THIS_PROJECT_NAME@_PLUGIN_DIRS    @THIS_PROJECT_PLUGIN_DIRS@)
+    set(@THIS_PROJECT_NAME@_PLUGINS        @THIS_PROJECT_PLUGINS@)
+    set(@THIS_PROJECT_NAME@_EXTERNS        @THIS_PROJECT_EXTERNS@)
+endif(@THIS_PROJECT_NAME@_IS_INTEGRATED)
+
+# Compute search paths
+set(@THIS_PROJECT_NAME@_EXTERN_INCLUDE_DIRS)
+set(@THIS_PROJECT_NAME@_EXTERN_LIBRARY_DIRS)
+foreach(EXTERN ${@THIS_PROJECT_NAME@_EXTERNS})
+    if(${EXTERN}_LIBRARY_DIRS)
+        list(APPEND @THIS_PROJECT_NAME@_EXTERN_LIBRARY_DIRS ${${EXTERN}_LIBRARY_DIRS})
+    else(${EXTERN}_LIBRARY_DIRS)
+        if(${EXTERN}_LIBRARY_DIR)
+            list(APPEND @THIS_PROJECT_NAME@_EXTERN_LIBRARY_DIRS ${${EXTERN}_LIBRARY_DIR})
+        endif(${EXTERN}_LIBRARY_DIR)
+    endif(${EXTERN}_LIBRARY_DIRS)
+    if(${EXTERN}_INCLUDE_DIRS)
+        list(APPEND @THIS_PROJECT_NAME@_EXTERN_INCLUDE_DIRS ${${EXTERN}_INCLUDE_DIRS})
+    else(${EXTERN}_INCLUDE_DIRS)
+        if(${EXTERN}_INCLUDE_DIR)
+            list(APPEND @THIS_PROJECT_NAME@_EXTERN_INCLUDE_DIRS ${${EXTERN}_INCLUDE_DIR})
+        endif(${EXTERN}_INCLUDE_DIR)
+    endif(${EXTERN}_INCLUDE_DIRS)
+endforeach(EXTERN ${@THIS_PROJECT_NAME@_EXTERNS})
+
+# Compute linkage dependencies
+foreach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
+    foreach(DEPEND ${${LIBRARY}_DEPENDS})
+        list(APPEND ${LIBRARY}_LIBRARIES ${DEPEND})
+        list(APPEND ${LIBRARY}_LIBRARIES ${${DEPEND}_LIBRARIES})
+    endforeach(DEPEND ${${LIBRARY}_DEPENDS})
+    foreach(EXTERN ${${LIBRARY}_EXTERNS})
+        list(APPEND ${LIBRARY}_LIBRARIES ${${EXTERN}_LIBRARIES})
+    endforeach(EXTERN ${${LIBRARY}_EXTERNS})
+endforeach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
+
+# Register libraries as imported
+if(@THIS_PROJECT_NAME@_IS_IMPORTED)
+    # register executables as imported
+    foreach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+        add_executable(${EXECUTABLE} IMPORTED)
+        set_target_properties(
+            ${EXECUTABLE}
+            PROPERTIES
+                IMPORTED_CONFIGURATIONS ${@THIS_PROJECT_NAME@_BUILD_TYPE}
+                IMPORTED_LOCATION ${@THIS_PROJECT_NAME@_RUNTIME_DIR}/${EXECUTABLE} # XXX: proper filename
+        )
+    endforeach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+
+    # register libraries as imported
+    foreach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)
+        add_library(${LIBRARY} SHARED IMPORTED)
+        set_target_properties(
+            ${LIBRARY}
+            PROPERTIES
+                IMPORTED_CONFIGURATIONS ${@THIS_PROJECT_NAME@_BUILD_TYPE}
+                IMPORTED_LOCATION ${@THIS_PROJECT_NAME@_LIBRARY_DIR}/lib${LIBRARY}.so # XXX: proper filename
+                LINK_INTERFACE_LIBRARIES ${${LIBRARY}_LIBRARIES}
+        )
+    endforeach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)
+endif(@THIS_PROJECT_NAME@_IS_IMPORTED)
+
+# Export search paths
+set(@THIS_PROJECT_NAME@_INCLUDE_DIRS ${@THIS_PROJECT_NAME@_INCLUDE_DIR} ${@THIS_PROJECT_NAME@_EXTERN_INCLUDE_DIRS})
+set(@THIS_PROJECT_NAME@_LIBRARY_DIRS ${@THIS_PROJECT_NAME@_LIBRARY_DIR} ${@THIS_PROJECT_NAME@_EXTERN_LIBRARY_DIRS})
+
+# handle requirements and error messages
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+    @THIS_PROJECT_NAME@ DEFAULT_MSG
+    @THIS_PROJECT_NAME@_LIBRARIES @THIS_PROJECT_NAME@_INCLUDE_DIR
+)

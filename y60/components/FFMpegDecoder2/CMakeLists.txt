@@ -16,13 +16,9 @@ VideoMsgQueue.h
 y60_ffmpegdecoder2_settings.h
 )
 
-list( APPEND EXTERNALS PAINTLIB FFMPEG OPENEXR )
+list(APPEND EXTERNALS PAINTLIB FFMPEG)
 
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
-add_definitions(-D__STDC_CONSTANT_MACROS)
+add_definitions(-D__STDC_CONSTANT_MACROS) # XXX: why? what? aeh!?
 
 y60_add_component(
     FFMpegDecoder2

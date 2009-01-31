@@ -44,12 +44,12 @@ _net_functions
 Station
 )
 
-list( APPEND EXTERNS CURL ZLIB )
+list(APPEND EXTERNS CURL ZLIB) # Station uses zlib
 
 if(WIN32)
-    set(WS2_32_LIBRARIES Ws2_32 ) #  XXX
-    set(IPHLPAPI_LIBRARIES Iphlpapi )
-    list( APPEND EXTERNS WS2_32 IPHLPAPI )
+    set(WS2_32_LIBRARIES Ws2_32) # XXX: write find package
+    set(IPHLPAPI_LIBRARIES Iphlpapi) # XXX: write find package
+    list(APPEND EXTERNS WS2_32 IPHLPAPI)
 endif(WIN32)
 
 ac_add_library(

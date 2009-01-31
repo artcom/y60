@@ -24,7 +24,10 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
     
-    _ac_declare_searchpath(${THIS_PLUGIN_EXTERNS})
+    _ac_declare_searchpath(
+        ${THIS_PLUGIN_NAME}
+        "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}"
+    )
     
     # define the target
     add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES}
@@ -44,8 +47,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     _ac_attach_rpath(${THIS_PLUGIN_NAME})
 
     # attach depends and externs
-    _ac_attach_depends(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_DEPENDS})
-    _ac_attach_externs(${THIS_PLUGIN_NAME} ${THIS_PLUGIN_EXTERNS})
+    _ac_attach_depends(${THIS_PLUGIN_NAME} "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}")
     
     # define installation
     if(NOT THIS_PLUGIN_DONT_INSTALL)
@@ -61,4 +63,8 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     
     # XXX: tests?
     
+    if(NOT THIS_PLUGIN_DONT_INSTALL)
+        ac_project_add_target(PLUGINS ${THIS_PLUGIN_NAME})
+    endif(NOT THIS_PLUGIN_DONT_INSTALL)
+
 endmacro(ac_add_plugin)

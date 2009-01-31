@@ -4,10 +4,7 @@ include(AcPlatform)
 
 include(FindPkgConfig)
 
-# integrated dependencies
-if(NOT ASL_INTEGRATED_BUILD)
-    find_package(ASL)
-endif(NOT ASL_INTEGRATED_BUILD)
+find_package(ASL)
 
 # exported dependencies
 if(NOT PAINTLIB_INTEGRATED_BUILD)

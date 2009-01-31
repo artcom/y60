@@ -21,14 +21,19 @@ jssdl.h
 y60_sdlengine_settings.h
 )
 
+set(EXTERNS SDL GLEW)
+
+if(OSX)
+    list(APPEND EXTERNS COCOA)
+endif(OSX)
+
 ac_add_library(
     y60sdlengine y60/sdlengine
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS SDL OPENEXR COCOA GLEW
+    EXTERNS ${EXTERNS}
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
             y60base y60scene y60image y60video y60input y60inet y60glrender
             y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib spidermonkey
-    TESTS   ${TESTS}
 )
 
