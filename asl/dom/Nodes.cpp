@@ -589,7 +589,7 @@ dom::Node::ensureValue() const {
 }
 // check if value exist; otherwise create one
 void
-dom::Node::assignValue(const asl::ReadableBlock & theValue) {
+dom::Node::assignValue(const asl::ReadableBlock & theValue, bool theNotifyChangedFlag) {
     DB2(AC_TRACE << "assignValue("<<NodeTypeName[_myType]<<","<<_myName<<")" << endl);
     if (!_myValue) {
         if (!mayHaveValue()) {
@@ -601,9 +601,11 @@ dom::Node::assignValue(const asl::ReadableBlock & theValue) {
         if (_mySchemaInfo) {
             if (_mySchemaInfo->_myValueFactory) {
                 DB2(AC_TRACE << "assignValue(): creating value for type '" <<_mySchemaInfo->getTypeName()<<"'"<< endl);
-                const_cast<ValuePtr&>(_myValue)
-                    = _mySchemaInfo->_myValueFactory->createValue(_mySchemaInfo->getTypeName(), theValue, this);
+                _myValue = _mySchemaInfo->_myValueFactory->createValue(_mySchemaInfo->getTypeName(), theValue, this);
                 if (_myValue) {
+                    if (theNotifyChangedFlag) {
+                        _myValue->notifyValueChanged();
+                    }
                     return;
                 }
                 AC_WARNING << "no factory method found for type '"<<_mySchemaInfo->getTypeName()<<"'"<<endl;
@@ -1942,7 +1944,7 @@ dom::Node::appendAttribute(NodePtr theNewAttribute) {
                 "', name='" + nodeName() + "'",
                 PLUS_FILE_LINE,DomException::HIERARCHY_REQUEST_ERR);
     }
-    checkAndUpdateAttributeSchemaInfo(*theNewAttribute, this);
+    checkAndUpdateAttributeSchemaInfo(*theNewAttribute, this, true);
     _myAttributes.appendWithoutReparenting(theNewAttribute); // reparenting should have been already done in checkAndUpdateAttributeSchemaInfo
     return theNewAttribute;
 }
@@ -2117,9 +2119,9 @@ dom::Node::insertBefore(NodePtr theNewChild, NodePtr theRefChild) {
 }
 
 void
-dom::Node::checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent) {
+dom::Node::checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent, bool theBumpVersionFlag) {
     DB(AC_TRACE << "checkAndUpdateAttributeSchemaInfo("<<theNewAttribute.nodeName()<<")"<< endl);
-    theNewAttribute.reparent(this, theTopNewParent);
+    theNewAttribute.reparent(this, theTopNewParent, theBumpVersionFlag); // we don't need to bump version because the attribute value will do that for us
     if (_mySchemaInfo) {
         DB(AC_TRACE << "checkAndUpdateAttributeSchemaInfo("<<theNewAttribute.nodeName()<<") parent has SchemaInfo"<< endl);
         if (theNewAttribute.nodeType() == ATTRIBUTE_NODE) {
@@ -2182,7 +2184,7 @@ dom::Node::checkAndUpdateChildrenSchemaInfo(Node & theNewChild, Node * theTopNew
         theNewChild._myValue->setNodePtr(&theNewChild);
     }
     for (NamedNodeMap::size_type i = 0; i< theNewChild.attributes().length();++i) {
-        theNewChild.checkAndUpdateAttributeSchemaInfo(*theNewChild.getAttribute(i), theTopNewParent);
+        theNewChild.checkAndUpdateAttributeSchemaInfo(*theNewChild.getAttribute(i), theTopNewParent, true);
     }
     for (NodeList::size_type i = 0; i< theNewChild.childNodes().length();++i) {
         theNewChild.checkAndUpdateChildrenSchemaInfo(*theNewChild.childNode(i), theTopNewParent);
@@ -2321,6 +2323,7 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                 const string & myDataTypeName = myDataTypeNameAttr->nodeValue();
                 ValuePtr myTypedAttribute;
                 try {
+                    //TODO: create Atribute Node first, then call setSelf and notifyValueChanged on Value, then appendWithoutReparenting should work here
                     myTypedAttribute = _mySchemaInfo->_myValueFactory->createValue(myDataTypeName,myDecodedData,0);
                 }
                 catch (ParseException & ex) {
@@ -2328,7 +2331,7 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
                     throw;
                 }
                 NodePtr new_node(new Node(ATTRIBUTE_NODE,myAttributeName, myTypedAttribute, this));
-                new_node->_myParent = this;
+                new_node->_myParent = this; // this is superflous
                 //_myAttributes.appendWithoutReparenting(new_node);
                 _myAttributes.append(new_node);
                 new_node->makeSchemaInfo(false);
@@ -2481,7 +2484,6 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
     theDest.appendUnsigned32(theMagic);
     theDest.appendUnsigned32(BINARIZER_VERSION);
     binarize(theDest, theDicts, theIncludeVersion);
-    
 }
 
 void
@@ -2551,8 +2553,9 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
 
     if (myNodeType&hasValue) {
         if (myNodeType&hasTypedValue) {
-//#define EXTERNAL_BINARIZE
+#define N_EXTERNAL_BINARIZE
 #ifdef EXTERNAL_BINARIZE
+            //TODO: remove, does not work any more
             //theDest.appendCountedString(_mySchemaInfo->getTypeName());
             DB(AC_TRACE << "Write Binary Len (Count) = " << nodeValueWrapper().size() << endl);
             theDest.appendUnsigned(nodeValueWrapper().accessReadableBlock().size());
@@ -2605,6 +2608,21 @@ Node::binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCat
     }
 }
 
+void
+Node::makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
+    Dictionaries myDicts;
+    binarize(thePatch, myDicts, theOldVersion + 1, static_cast<asl::Unsigned32>(P60_MAGIC));
+}
+
+/// return true if something has changed
+bool 
+Node::applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos) {
+    bool myUnmodifiedProxyFlag = false;
+    Dictionaries myDicts;
+    debinarize(thePatch, thePos, myDicts, PATCH, myUnmodifiedProxyFlag);
+    return !myUnmodifiedProxyFlag;
+}
+        
 #ifdef PATCH_STATISTIC
 #define PS(x) x
 #else
@@ -2694,7 +2712,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
         // check magic and version number
         asl::Unsigned32 myMagic;
         thePos = theSource.readUnsigned32(myMagic, thePos);
-        if (myMagic != B60_MAGIC && myMagic != D60_MAGIC) {
+        if (myMagic != B60_MAGIC && myMagic != D60_MAGIC && myMagic != P60_MAGIC) {
             throw BadMagicNumber("Bad magic number at start of file", PLUS_FILE_LINE);
         }
         asl::Unsigned32 myVersion;
@@ -2786,7 +2804,10 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
             if (!_myParent) {
                 throw Schema::InternalError("Attribute has no parent",PLUS_FILE_LINE);
             }
-            _myParent->checkAndUpdateAttributeSchemaInfo(*this, _myParent);
+            _myParent->checkAndUpdateAttributeSchemaInfo(*this, _myParent, false);
+            break;
+        default:
+            // nothing done yet for all other node type, maybe CDATA should be considered in the future
             break;
     }
     if (myNodeType&hasValue) {
@@ -2800,13 +2821,14 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
                 }
             }
 #ifdef EXTERNAL_BINARIZE
+            // TODO: don't copy Block
             asl::AC_SIZE_TYPE mySize;
             thePos = theSource.readUnsigned(mySize,thePos);
             DB(AC_TRACE << "Read Binary Len (Count) = " << mySize << endl;);
             asl::Block myBlock;
             myBlock.resize(mySize);
             thePos = theSource.readBytes(myBlock.begin(), mySize, thePos);
-            assignValue(myBlock);
+            assignValue(myBlock, false);
             DB(AC_TRACE << "Read nodeValue (Bytes) = " << nodeValueWrapper() << endl);
 #else
             ensureValue();
@@ -2843,7 +2865,9 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
             _lazyChildren = true;
         }
     }
-    _myVersion = 1;
+    if (theLoadMode != PATCH) {
+        _myVersion = 1;
+    }
     storeSaveEndPosition(thePos);
     return thePos;
 }
@@ -3100,7 +3124,7 @@ Node::registerName() {
  }
  
 void
-Node::reparent(Node * theNewParent, Node * theTopNewParent) {
+Node::reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionFlag) {
     //Node * myOldParent = _myParent;
     _myParent = theNewParent;
     unregisterName();
@@ -3139,7 +3163,7 @@ Node::reparent(Node * theNewParent, Node * theTopNewParent) {
         _myParent->markPrecursorDependenciesOutdated();
     }
 #endif
-    if (_myParent) {
+    if (_myParent && theBumpVersionFlag) {
         bumpVersion();
     }
 }

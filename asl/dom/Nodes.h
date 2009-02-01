@@ -1027,17 +1027,11 @@ namespace dom {
             return NodePtr(0); 
         }
           
-        void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
-            Dictionaries myDicts;
-            binarize(thePatch, myDicts, theOldVersion + 1, static_cast<asl::Unsigned32>(P60_MAGIC));
-        }
+        void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const;
+        
         /// return true if something has changed
-        bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0) {
-            bool myUnmodifiedProxyFlag = false;
-            Dictionaries myDicts;
-            debinarize(thePatch, thePos, myDicts, PATCH, myUnmodifiedProxyFlag);
-            return !myUnmodifiedProxyFlag;
-        }
+        bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0);
+        
         virtual void freeCaches() const;
         virtual bool flushUnusedChildren() const;
     protected:
@@ -1287,7 +1281,7 @@ Dependent on node type allowed children are:<p>
         static void checkName(const DOMString & name, NodeType type);
 
  
-        void reparent(Node * theNewParent, Node * theTopNewParent);
+        void reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionFlag = true);
 
         std::string::size_type parseNextNode(const DOMString & is, std::string::size_type pos,
                              const Node * parent, const Node * doctype);
@@ -1297,14 +1291,14 @@ Dependent on node type allowed children are:<p>
         void makeSchemaInfo(bool forceNew);
 
         void ensureValue() const;
-        void assignValue(const asl::ReadableBlock & theValue);
+        void assignValue(const asl::ReadableBlock & theValue, bool theNotifyChangedFlag = true);
         void trashValue() {
             _myValue = ValuePtr(0);
         }
         bool checkMyValueTypeFits() const;
         bool checkValueTypeFits(const ValueBase & theValue) const;
         void checkAndUpdateChildrenSchemaInfo(Node & theNewChild, Node * theTopNewParent);
-        void checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent);
+        void checkAndUpdateAttributeSchemaInfo(Node & theNewAttribute, Node * theTopNewParent, bool theBumpVersionFlag);
 
         void checkForArrayType(NodePtr mySchemaType, asl::AC_SIZE_TYPE theParsePos);
         void storeValue(const DOMString & theValue);

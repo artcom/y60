@@ -414,7 +414,7 @@ IDRefValue::update() const {
     Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
     DB(AC_TRACE << "IDRefValue::update():"<<endl);
     if (myNode) {
-        const DOMString & myCurrentValue = getStringDirect(); // do not make a onSetValue() callback
+        const DOMString & myCurrentValue = getStringDirect(); // do not make a onGetValue() callback
         if (_myOldValue != myCurrentValue) {
             unregisterIDRef();
             registerIDRef(myCurrentValue);
@@ -429,7 +429,7 @@ IDRefValue::reparent() const {
     DB(AC_TRACE << "IDRefValue::reparent(): this="<<(void*)this<<" , vtname="<<name());
     if (myNode) {
         unregisterIDRef();
-        const DOMString & myCurrentValue = getStringDirect(); // do not make a onSetValue() callback
+        const DOMString & myCurrentValue = getStringDirect(); // do not make a onGetValue() callback
         registerIDRef(myCurrentValue);
         myNode->bumpVersion();
     }

@@ -1235,11 +1235,24 @@ public:
                 asl::Block myPatch;
                 cerr << endl << "make patch from version "<< myOldVersion << " -> " <<  myNewDocument.nodeVersion() << endl;
                 myNewDocument.makePatch(myPatch, myOldVersion);
+#define DUMP_NODES
+#ifdef DUMP_NODES
+                cerr <<"myNewDocument:"<<endl;
+                printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);           
+                cerr <<"myOldDocument (pre patch):"<<endl;
+                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);                
+#endif
                 cerr << endl << "applying patch from version "<< myOldVersion << " -> " <<  myNewDocument.nodeVersion() << ", size =" << myPatch.size() << endl;
                 unsigned long long myPrePatchVersion = myOldDocument.nodeVersion();
+                cerr << "myOldVersion=" << myOldVersion << ", myOldDocument.nodeVersion (myPrePatchVersion) = " << myPrePatchVersion << endl;
+
                 myOldDocument.applyPatch(myPatch);
                 SUCCESS("applied patch");
-
+                cerr << "myOldDocument.nodeVersion (post patch version) = " <<  myOldDocument.nodeVersion() << endl;
+#ifdef DUMP_NODES
+                cerr <<"myOldDocument (post patch):"<<endl;
+                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);                
+#endif                
                 // check if the patched document is identical to the original
                 asl::Block myPatchedBlock;
                 cerr << endl << "myNewDocument.binarize (post patch check)"<<endl;
@@ -1262,13 +1275,16 @@ public:
                 cerr << endl << "myNewDocument.binarize (post patch patch gen)"<<endl;
                 myOldDocument.makePatch(myGen2Patch, myPrePatchVersion);
                 ENSURE(myGen2Patch == myPatch);
+                if (myGen2Patch != myPatch) {
+                    cerr << "myPatch    :" << myPatch << endl;
+                    cerr << "myGen2Patch:" << myGen2Patch << endl;
+                }
 
                 // check the total patch from the first document 
                 dom::Document myOriginalDocument;
                 setupDocument(myOriginalDocument);;
                 SUCCESS("setup myOriginalDocument");
                 myOriginalDocument.debinarize(theOriginalDocumentBlock);
-#define DUMP_NODES
 #ifdef DUMP_NODES
                 cerr <<"myOriginalDocument:"<<endl;
                 printChangedNodes(myOriginalDocument, 0xffffffffffffffffULL, 0);                
@@ -1350,6 +1366,7 @@ public:
             unsigned long long myNewDocumentVersion = myIdDocument.nodeVersion(); 
             DPRINT(myNewDocumentVersion);
             ENSURE(myNewDocumentVersion > myDocumentVersion);
+#define PERFORM_TEST_PATCH
 #ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
 #endif
@@ -1473,14 +1490,12 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new XmlCatalogUnitTest);
-#if 1
         addTest(new XmlDomUnitTest);
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
         addTest(new XmlPatchUnitTest);
         addTest(new XmlSchemaUnitTest); 
-#endif
+        addTest(new XmlCatalogUnitTest);
      }
 };
 

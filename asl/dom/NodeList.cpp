@@ -208,13 +208,18 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
 	    for (asl::AC_SIZE_TYPE n=0; n < mySize; ++n) {
 		    NodePtr newNode(new Node);
             if (_myShell) {
- 	            newNode->reparent(_myShell, _myShell);
+ 	            newNode->reparent(_myShell, _myShell, false);
             }
             bool myUnmodifiedProxyFlag = false;
 		    thePos = newNode->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag);
-		    newNode->registerName();
+#define ORIG_LOAD
+#ifdef ORIG_LOAD
             newNode->self(newNode);
 		    _myNodes.push_back(newNode);
+            newNode->registerName();
+#else
+            append(newNode);
+#endif
             PS(++theDict._myPatchStat.newNodes);
 	    }
     } else {
@@ -238,16 +243,21 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
                     // a new node is in the patch
                     NodePtr newNode(new Node);
                     if (_myShell) {
-                        newNode->reparent(_myShell, _myShell);
+                        newNode->reparent(_myShell, _myShell, false);
                     }
                     thePos = newNode->debinarize(theSource, thePos, theDict, IMMEDIATE, myUnmodifiedProxyFlag);
-                    newNode->self(newNode);
+                    // newNode->self(newNode);
                     if (di < length()) {
                         insert(di,newNode);
                         ++si;
                         ++di;
                     } else {
+#ifndef NO_FULL_APPEND
                         append(newNode);
+#else
+                        appendWithoutReparenting(newNode);
+                        newNode->registerName();
+#endif
                         ++si;
                         ++di;
                     }
@@ -272,10 +282,11 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
 NodePtr
 dom::NodeList::append(NodePtr theNewNode) {
     _myNodes.push_back(theNewNode);
-    if (_myShell) {
-        theNewNode->reparent(_myShell, _myShell);
-    }
     theNewNode->self(theNewNode);
+    if (_myShell) {
+        theNewNode->reparent(_myShell, _myShell, true);
+    }
+
     return theNewNode;
 }
 
@@ -293,18 +304,20 @@ void dom::NodeList::insert(size_type theIndex, NodePtr theNewNode) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     _myNodes.insert(_myNodes.begin()+theIndex, theNewNode);
+    theNewNode->self(theNewNode);
     if (_myShell) {
         theNewNode->reparent(_myShell, _myShell);
     }
-    theNewNode->self(theNewNode);
+
 }
 
 void dom::NodeList::setItem(size_type theIndex, NodePtr theNewItem) {
     _myNodes[theIndex] = theNewItem;
+    theNewItem->self(theNewItem);
     if (_myShell) {
 	    theNewItem->reparent(_myShell, _myShell);
     }
-    theNewItem->self(theNewItem);
+
 }
 void dom::NodeList::resize(asl::AC_SIZE_TYPE newSize) {
     _myNodes.resize(newSize);

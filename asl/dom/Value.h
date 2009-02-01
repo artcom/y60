@@ -133,7 +133,8 @@ namespace dom {
         ///create Value from binary representation
         virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const = 0;
         virtual void bumpVersion() = 0;
-
+        virtual void notifyValueChanged() = 0;
+        
         virtual void set(const ReadableBlock & theBlock) {
             DB(AC_TRACE << "ValueBase::set(): this="<<(void*)this<<" , vtname="<<name());
             assign(theBlock);
@@ -360,15 +361,19 @@ namespace dom {
         StringValue(const asl::ReadableBlock & theValue, Node * theNode)
             : _myStringValue(theValue.strbegin(),theValue.size()), _isBlockWriteable(false), _myNode(theNode)
         {
-            update();
-            bumpVersion();
+            //notifyValueChanged();
         }
         StringValue(const DOMString & theStringValue, Node * theNode)
             : _myStringValue(theStringValue), _isBlockWriteable(false), _myNode(theNode)
         {
+            //notifyValueChanged();
+        }
+        virtual void notifyValueChanged() {
             update();
             bumpVersion();
+            onSetValue();
         }
+        
         virtual const char * name() const {
             return typeid(DOMString).name();
         }
@@ -382,9 +387,7 @@ namespace dom {
         }
         virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             thePos = theSource.readCountedString(_myStringValue, thePos);
-            update();
-            bumpVersion();
-            onSetValue();
+            notifyValueChanged();
             return thePos;
         }
         static void binarizeVector(const std::vector<DOMString> & theVector, asl::WriteableStream & theDest) {
@@ -427,9 +430,7 @@ namespace dom {
         }
         virtual void setString(const DOMString & theValue) {
             _myStringValue = theValue;
-            update();
-            bumpVersion();
-            onSetValue();
+            notifyValueChanged();
         }
         virtual void setStringWithoutNotification(const DOMString & theValue) {
             _myStringValue = theValue;
@@ -437,7 +438,9 @@ namespace dom {
         }
          virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
-            return ValuePtr(new StringValue(_myStringValue, theNode));
+            ValuePtr clonedValue = ValuePtr(new StringValue(_myStringValue, theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new StringValue(theNode));
@@ -451,9 +454,7 @@ namespace dom {
        virtual void assign(const asl::ReadableBlock & myOtherBlock) {
             _myStringValue.resize(myOtherBlock.size());
             std::copy(myOtherBlock.begin(),myOtherBlock.end(),&_myStringValue[0]);
-            update();
-            bumpVersion();
-            onSetValue();
+            notifyValueChanged();
         }
         virtual asl::WriteableBlock & openWriteableBlock() {
             if (this->isBlockWriteable()) {
@@ -468,9 +469,7 @@ namespace dom {
                 throw ValueNotBlockWriteable(JUST_FILE_LINE);
             }
             setBlockWriteable(false);
-            update();
-            bumpVersion();
-            onSetValue();
+            notifyValueChanged();
         }
         virtual bool isBlockWriteable() const {
             return _isBlockWriteable;
@@ -718,7 +717,9 @@ namespace dom {
         virtual void reparent() const;
         virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
-            return ValuePtr(new IDValue(getString(), theNode));
+            ValuePtr clonedValue = ValuePtr(new IDValue(getString(), theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new IDValue(theNode));
@@ -778,7 +779,9 @@ namespace dom {
         virtual void reparent() const;
         virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
-            return ValuePtr(new IDRefValue(getString(), theNode));
+            ValuePtr clonedValue = ValuePtr(new IDRefValue(getString(), theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new IDRefValue(theNode));
@@ -980,9 +983,7 @@ namespace dom {
         virtual void setString(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
             _myValueHasChanged = true;
-            this->update();
-            this->bumpVersion();
-            this->onSetValue();
+            this->notifyValueChanged();
         }
         virtual void setStringWithoutNotification(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
@@ -1001,7 +1002,9 @@ namespace dom {
         }
         virtual ValuePtr clone(Node * theNode) const {
             this->onGetValue();
-            return ValuePtr(new SimpleValue<T>(_myValue, theNode));
+            ValuePtr clonedValue = ValuePtr(new SimpleValue<T>(_myValue, theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new SimpleValue<T>(theNode));
@@ -1638,7 +1641,9 @@ namespace dom {
         }
         virtual ValuePtr clone(Node * theNode) const {
             this->onGetValue();
-            return ValuePtr(new VectorValue<T, ACCESS, ELEMENT_VALUE>(this->getValue(), theNode));
+            ValuePtr clonedValue = ValuePtr(new VectorValue<T, ACCESS, ELEMENT_VALUE>(this->getValue(), theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new VectorValue<T, ACCESS, ELEMENT_VALUE>(theNode));
@@ -1821,7 +1826,9 @@ namespace dom {
         virtual ValuePtr clone(Node * theNode) const {
             updateValue();
             this->onGetValue();
-            return ValuePtr(new ComplexValue<T, ACCESS, ELEMENT_VALUE>(_myValue, theNode));
+            ValuePtr clonedValue = ValuePtr(new ComplexValue<T, ACCESS, ELEMENT_VALUE>(_myValue, theNode));
+            clonedValue->notifyValueChanged();
+            return clonedValue;
         }
         virtual ValuePtr create(Node * theNode) const {
             return ValuePtr(new ComplexValue<T, ACCESS, ELEMENT_VALUE>(theNode));
