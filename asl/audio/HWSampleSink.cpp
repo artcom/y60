@@ -152,6 +152,7 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 _myBufferQueue.clear(); 
                 _myPosInInputBuffer = 0;
                 _myStopWhenEmpty = false;
+                _myPumpTimeSource->stop();                
 				break;}
             case STOPPED:
                 _myBufferQueue.clear();
@@ -354,6 +355,8 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
         _myBufferQueue.clear();
         _myPosInInputBuffer = 0;
         _myLockedSelf = HWSampleSinkPtr(0);
+        _myPumpTimeSource->stop();                
+        
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
         changeState(PAUSED);

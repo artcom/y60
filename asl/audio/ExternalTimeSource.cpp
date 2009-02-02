@@ -57,6 +57,7 @@ Time ExternalTimeSource::getCurrentTime() const {
 void ExternalTimeSource::stop() {
     _myTimeOffset = 0;
     _myStartTime = 0;
+    _myPausedTime = 0;
     _myPauseFlag = false;
 }
 
