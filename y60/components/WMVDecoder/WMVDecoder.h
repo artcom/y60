@@ -179,10 +179,10 @@ namespace y60 {
          * reads a frame.
          * @param theTime time of the frame to deliver
          * @param theFrame is ignored by this decoder
-         * @param theTargetRaster image raster to render the frame into
+         * @param theTargetRaster vector of image raster to render the frame into
          * @return timestamp of the frame delivered in theTargetRaster
          */
-        double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
+        double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
         void startMovie(double theStartTime = 0.0f, bool theStartAudioFlag = true);
         void resumeMovie(double theStartTime = 0.0f, bool theResumeAudioFlag = true);

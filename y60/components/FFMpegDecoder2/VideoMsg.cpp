@@ -62,21 +62,21 @@ namespace y60 {
 
 using namespace dom;
     
-VideoMsg::VideoMsg(VideoMsgType theType, double theTime, 
-            unsigned theFrameSize)
+VideoMsg::VideoMsg(VideoMsgType theType, double theTime, std::vector<unsigned> theFrameSizes)
     : _myType(theType),
       _myTime(theTime),
-      _myFrameSize(theFrameSize)
+      _myFramesSizes(theFrameSizes)
 {
-    if (_myFrameSize) {
-        _myFrame = new unsigned char[_myFrameSize];
-    } else {
-        _myFrame = 0;
+    for (unsigned i = 0; i < _myFramesSizes.size(); i++) {
+        _myFrames.push_back(new unsigned char[_myFramesSizes[i]]);
+
     }
 }
 
 VideoMsg::~VideoMsg() {
-    delete[] _myFrame;
+    for (unsigned i = 0; i < _myFrames.size(); i++) {        
+        delete[] _myFrames[i];
+    }
 }
 
 VideoMsg::VideoMsgType VideoMsg::getType() const {
@@ -87,8 +87,11 @@ double VideoMsg::getTime() const {
     return _myTime;
 }
 
-unsigned char * VideoMsg::getBuffer() const {
-    return _myFrame;
+unsigned VideoMsg::getSize(unsigned theBufferNum) const {
+    return _myFramesSizes[theBufferNum];        
+}
+unsigned char * VideoMsg::getBuffer(unsigned theBufferNum) const {
+    return _myFrames[theBufferNum];        
 }
 
 }

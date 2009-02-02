@@ -291,7 +291,6 @@ MaterialOverlay.prototype.Constructor = function(Public, Protected, theScene, th
 		_myMaterial = Node.createElement('material');
 		
 		theScene.materials.appendChild(_myMaterial);
-
 		_myMaterial.id = myMaterialId;
 		_myMaterial.name = Public.name + "M";
 		_myMaterial.transparent = 1;
@@ -560,7 +559,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	// Private
 	///////////////////////////////////////////////////////////////////////////////////////////
 
-	function createTextureFeatureString(theTextureCount, theUsage) {
+	Public.createTextureFeatureString = function(theTextureCount, theUsage) {
 
 		if (theUsage == undefined) {
 			theUsage = "paint";
@@ -622,7 +621,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
             Public.material.requires.appendChild(myFragment);
         }
 
-		Public.material.requires.textures = createTextureFeatureString(theTextureCount);
+		Public.material.requires.textures = Public.createTextureFeatureString(theTextureCount);
 		Public.material.requires.texcoord = createTexcoordFeatureString(theTextureCount);
 	}
 
@@ -801,7 +800,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
 			if (thePixelFormat == undefined) {
 				thePixelFormat = "RGB";
 			}
-			//myImage.texturepixelformat = thePixelFormat;
+			myImage.targetpixelformat = thePixelFormat;
 			if (thePlayMode != undefined) {
 				myImage.playmode = thePlayMode;
 			}
@@ -825,6 +824,29 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
 		Public.width  = mySize.x;
 		Public.height = mySize.y;
 		Protected.addTexture(myImage.id);
+		
+		// YUV targetrasterformat allows us to use a shader to convert YUV2RGB, therefore we need 3 rasters
+		if (myImage.childNodesLength() > 1) {
+		    Public.material.enabled = false;
+		}
+		for (var i = 1; i < myImage.childNodesLength(); i++) {
+    		var myTextureUnit = Public.textureunits.appendChild(Node.createElement("textureunit"));
+    		myTextureUnit.applymode = TextureApplyMode.modulate;
+			var myTexture = Modelling.createTexture(window.scene, myImage);
+			myTexture.image = myImage.id;
+			myTexture.image_index = i;    		
+    		myTextureUnit.texture   = myTexture.id;
+	    }
+	    if (myImage.childNodesLength() > 1) {
+    		Public.material.requires.textures = Public.createTextureFeatureString(myImage.childNodesLength());	
+        }
+        if ( myImage.targetpixelformat == "YUV420") {
+	        Logger.info("using yuv2rgb shader to convert pixelformat");
+    		addMaterialRequirement(Public.material, "option", "[10[yuv2rgb]]");
+        }
+        if (! Public.material.enabled) {
+            Public.material.enabled = true;
+        }
 	}
 
 	setup();

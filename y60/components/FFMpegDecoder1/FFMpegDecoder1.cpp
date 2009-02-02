@@ -234,6 +234,9 @@ namespace y60 {
         if (myMovie->get<TargetPixelFormatTag>() != "") {
             TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
             switch(myTargetPixelFormat) {
+                case TEXTURE_IFMT_YUV420:
+                    myRasterEncoding = YUV420;
+                    break;                
                 case TEXTURE_IFMT_RGBA8:
                     myRasterEncoding = RGBA;
                     break;                
@@ -256,35 +259,38 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGRA);
-                myMovie->addRasterValue(createRasterValue( y60::BGRA, myWidth, myHeight), y60::BGRA, 1);                
                 break;
             case ALPHA:
 				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
-                myMovie->addRasterValue(createRasterValue( y60::ALPHA, myWidth, myHeight), y60::ALPHA, 1);                
                 break;
             case GRAY:
 				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
-                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth, myHeight), y60::GRAY, 1);                
                 break;
+            case YUV420:
+				{AC_TRACE << "Using YUV420 pixels";}
+				_myDestinationPixelFormat = PIX_FMT_YUV420P;
+                myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);                
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);    
+                break;                            
             case RGB:
             default:
 				{AC_TRACE << "Using BGR pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGR);
-                myMovie->addRasterValue(createRasterValue( y60::BGR, myWidth, myHeight), y60::BGR, 1);                
                 break;
         }
-
-        myMovie->getRasterPtr(Movie::PRIMARY_BUFFER)->clear();
-		myMovie->getRasterPtr(Movie::SECONDARY_BUFFER)->clear();
-
+        unsigned myRasterCount = myMovie->getNode().childNodesLength();
+        for (unsigned i = 0; i < myRasterCount; ++i) {
+            myMovie->getRasterPtr(i)->clear();
+        }
         // framerate
         double myFPS;
         myFPS = av_q2d(_myVStream->r_frame_rate);
@@ -330,7 +336,7 @@ namespace y60 {
     }
 
     double
-    FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
         // theTime is in seconds,
         double myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
         double myFrameTimestamp = theTime * myTimeUnitsPerSecond + _myStartTimestamp;
@@ -341,7 +347,7 @@ namespace y60 {
         if ((_myLastVideoTimestamp != 0) && (myFrameTimestamp == _myLastVideoTimestamp)) {
             return theTime;
         }
-        if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
+        if (!decodeFrame(myFrameTimestamp, theTargetRaster[0])) {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
             setEOF(true);
         } else {
@@ -458,7 +464,17 @@ namespace y60 {
             av_free_packet(&myPacket);
         }
 
-        convertFrame(_myFrame, theTargetRaster);
+        if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+            Movie * myMovie = getMovie();            
+            myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
+            myMovie->getRasterPtr(1)->resize(getFrameWidth()/2, getFrameHeight()/2);
+            myMovie->getRasterPtr(2)->resize(getFrameWidth()/2, getFrameHeight()/2);
+            copyPlaneToRaster(myMovie->getRasterPtr(0)->pixels().begin(), _myFrame->data[0], _myFrame->linesize[0], getFrameWidth(), getFrameHeight());
+            copyPlaneToRaster(myMovie->getRasterPtr(1)->pixels().begin(), _myFrame->data[1], _myFrame->linesize[1], getFrameWidth()/2, getFrameHeight()/2);
+            copyPlaneToRaster(myMovie->getRasterPtr(2)->pixels().begin(), _myFrame->data[2], _myFrame->linesize[2], getFrameWidth()/2, getFrameHeight()/2);
+        } else {
+            convertFrame(_myFrame, theTargetRaster);
+        }       
         // store actual timestamp
 
         theTimestamp = double(myPacket.dts);

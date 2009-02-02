@@ -220,11 +220,13 @@ namespace y60 {
 
         CHECK_OGL_ERROR;
         ImagePtr myImage = theTexture->getImage();
-        unsigned int myWidth = myImage->get<ImageWidthTag>();
-        unsigned int myHeight = myImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = myImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = myImage->getRasterPtr(myIndex)->height();
+
         if (only_power_of_two_textures()) {
-            myWidth = nextPowerOfTwo(myImage->get<ImageWidthTag>());
-            myHeight = nextPowerOfTwo(myImage->get<ImageHeightTag>());
+            myWidth = nextPowerOfTwo(myWidth);
+            myHeight = nextPowerOfTwo(myHeight);
         }
 
         GLenum myInternalFormat = asGLTextureInternalFormat(theTexture->getInternalEncoding());
@@ -272,12 +274,14 @@ namespace y60 {
 
         CHECK_OGL_ERROR;
         ImagePtr myImage = theTexture->getImage();
-        unsigned int myWidth = myImage->get<ImageWidthTag>();
-        unsigned int myHeight = myImage->get<ImageHeightTag>();
+
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = myImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = myImage->getRasterPtr(myIndex)->height();        
         unsigned int myDepth = myImage->get<ImageDepthTag>();
         if (only_power_of_two_textures()) {
-            myWidth = nextPowerOfTwo(myImage->get<ImageWidthTag>());
-            myHeight = nextPowerOfTwo(myImage->get<ImageHeightTag>());
+            myWidth = nextPowerOfTwo(myWidth);
+            myHeight = nextPowerOfTwo(myHeight);
             myDepth = nextPowerOfTwo(myImage->get<ImageHeightTag>());
         }
 
@@ -379,9 +383,9 @@ namespace y60 {
                      << " has no image associated";
             return;
         }
-
-        unsigned int myWidth = myImage->get<ImageWidthTag>();
-        unsigned int myHeight = myImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = myImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = myImage->getRasterPtr(myIndex)->height();
         unsigned int myDepth = myImage->get<ImageDepthTag>();
         if (myDepth == 0) {
             myDepth = 1;
@@ -540,8 +544,10 @@ namespace y60 {
             return;
         }
 
-        unsigned int myWidth = myImage->get<ImageWidthTag>();
-        unsigned int myHeight = myImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = myImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = myImage->getRasterPtr(myIndex)->height();        
+
         unsigned int myDepth = myImage->get<ImageDepthTag>();
         if (myDepth == 0) {
             myDepth = 1;
@@ -667,8 +673,12 @@ namespace y60 {
         glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         CHECK_OGL_ERROR;
 
-        GLsizei myWidth  = myImage->get<ImageWidthTag>();
-        GLsizei myHeight = myImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = myImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = myImage->getRasterPtr(myIndex)->height();        
+
+        /*GLsizei myWidth  = myImage->get<ImageWidthTag>();
+        GLsizei myHeight = myImage->get<ImageHeightTag>();*/
 
         // number of tiles must match cubemap
         const asl::Vector2i myTileVec = myImage->get<ImageTileTag>();
@@ -752,14 +762,17 @@ namespace y60 {
     GLResourceManager::updateTexture2D(const TexturePtr & theTexture, ImagePtr & theImage) {
         MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture2D);
 
-        GLsizei myWidth  = theImage->get<ImageWidthTag>();
-        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = theImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = theImage->getRasterPtr(myIndex)->height();        
+
+        /*GLsizei myWidth  = theImage->get<ImageWidthTag>();
+        GLsizei myHeight = theImage->get<ImageHeightTag>();*/
         PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, theImage);
 
         AC_DEBUG << "GLResourceManager::updateTexture2D '" << theTexture->get<NameTag>() 
                  << "' node id=" << theTexture->get<IdTag>() << " size=" << myWidth 
                  << "x" << myHeight;
-        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
         void * myImageData = theImage->getRasterPtr(myIndex)->pixels().begin();
         unsigned int myImageDataLen = theImage->getMemUsed();
 
@@ -807,12 +820,13 @@ namespace y60 {
     GLResourceManager::updateTexture3D(const TexturePtr & theTexture, ImagePtr & theImage) {
         MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture3D);
 
-        GLsizei myWidth  = theImage->get<ImageWidthTag>();
-        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = theImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = theImage->getRasterPtr(myIndex)->height();        
+
         GLsizei myDepth  = theImage->get<ImageDepthTag>();
 
         PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, theImage);
-        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
         void * myImageData = theImage->getRasterPtr(myIndex)->pixels().begin();
 
         AC_DEBUG << "GLResourceManager::updateTexture3D '" << theTexture->get<NameTag>() 
@@ -851,8 +865,10 @@ namespace y60 {
         const asl::Vector2i myTileVec = theImage->get<ImageTileTag>();
         unsigned int myNumTiles = myTileVec[0] * myTileVec[1];
 
-        GLsizei myWidth  = theImage->get<ImageWidthTag>();
-        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        unsigned myIndex = theTexture->get<TextureImageIndexTag>();
+        unsigned int myWidth = theImage->getRasterPtr(myIndex)->width();
+        unsigned int myHeight = theImage->getRasterPtr(myIndex)->height();        
+
         PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, theImage);
 
         GLsizei myTileWidth = myWidth / myTileVec[0];

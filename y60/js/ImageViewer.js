@@ -63,6 +63,7 @@ use("FrameRateLimiter.js");
 //use("AudioController.js");
 use("SoundController.js");
 use("Playlist.js");
+use("BuildUtils.js");
 
 const MINZOOMFACTOR = 0.001;
 const FRAME_RATE    = 100;
@@ -656,12 +657,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             //_myMovieNode.maxcachesize = 128;
-            //_myMovieNode.targetpixelformat = "ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"
+            // YUV420 pixelformat uses shader to convert colorspace
+            var myUseCgFlag = false;
+            if(self.getShaderLibrary().match(/shaderlibrary.xml/)) {
+                myUseCgFlag = true;
+            }
+            _myMovieNode.targetpixelformat = (myUseCgFlag) ? "YUV420" : "RGB";//"RGBA8";//"ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"
             if (theEnsureFrameCount) {
                 window.scene.ensureMovieFramecount(_myMovieNode);
             }
-            _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
-            
         }
 
         if (_myFullSizeMode) {
@@ -674,8 +678,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         } catch (ex) {
             window.scene.images.removeChild(_myMovieNode);
             print(ex);
-            print("### ERROR: loadMovieFrame faild for file: " + theFilename);
+            print("### ERROR: loadMovieFrame failed for file: " + theFilename);
             return;
+        }
+
+        if (!_myMovieOverlay) {
+            _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
         }
 
         _myMovieNode.playmode = "play";

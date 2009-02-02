@@ -258,7 +258,7 @@ namespace y60 {
 double ourLastVideoTimeStamp = 0.0;
 double ourLastAudioTimeStamp = 0.0;
     double
-    WMVDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    WMVDecoder::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
         //AC_PRINT << "WMVDecoder::readFrame: " << theTime;
         // EOF and framecache empty?
         if (_myReadEOF && _myFrameCache.size() <= 1) {
@@ -294,7 +294,7 @@ double ourLastAudioTimeStamp = 0.0;
         if (_myFirstFrameDelivered == false) {
             // Clear raster
             static unsigned char myValue = 0;
-            memset(theTargetRaster->pixels().begin(), myValue++, theTargetRaster->pixels().size());
+            memset(theTargetRaster[0]->pixels().begin(), myValue++, theTargetRaster[0]->pixels().size());
         }
 
         if (_myFrameCache.empty()) {
@@ -366,16 +366,16 @@ double ourLastAudioTimeStamp = 0.0;
         if (checkForError(hr, "GetBufferAndLength failed", PLUS_FILE_LINE)) {
 
             // Copy data to raster
-            theTargetRaster->resize(getFrameWidth(), getFrameHeight());
-            if (myBufferLength == theTargetRaster->pixels().size()) {
-                memcpy(theTargetRaster->pixels().begin(), myBuffer, myBufferLength);
+            theTargetRaster[0]->resize(getFrameWidth(), getFrameHeight());
+            if (myBufferLength == theTargetRaster[0]->pixels().size()) {
+                memcpy(theTargetRaster[0]->pixels().begin(), myBuffer, myBufferLength);
                 _myFirstFrameDelivered = true;
             } else {
-                AC_WARNING << "TargetRaster has wrong size. buffer=" << myBufferLength << " raster=" << theTargetRaster->pixels().size();
+                AC_WARNING << "TargetRaster has wrong size. buffer=" << myBufferLength << " raster=" << theTargetRaster[0]->pixels().size();
             }
         } else {
             AC_ERROR << "GetBufferAndLength failed";
-            memset(theTargetRaster->pixels().begin(), 0xff, theTargetRaster->pixels().size());
+            memset(theTargetRaster[0]->pixels().begin(), 0xff, theTargetRaster[0]->pixels().size());
         }
 
         //return theTime;

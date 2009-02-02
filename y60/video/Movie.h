@@ -82,6 +82,7 @@ namespace asl {
 
 namespace y60 {
 
+
     class MovieDecoderBase;
 
     /*! @addtogroup Y60video */
@@ -134,7 +135,7 @@ namespace y60 {
         public dom::DynamicAttributePlug<DecoderTag, Movie>
     {
         public:
-			enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1, MAX_BUFFER = 2};
+			enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1,  THIRD_BUFFER = 2, MAX_BUFFER = 3};
 
             Movie(dom::Node & theNode);
             virtual ~Movie();

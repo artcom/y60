@@ -87,6 +87,11 @@ namespace asl {
 }
 
 namespace y60 {
+
+    typedef std::vector<dom::ResizeableRasterPtr> RasterVector;
+
+    void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
+    
     class Movie;
     /**
      * @ingroup Y60video
@@ -117,11 +122,10 @@ namespace y60 {
              * Reads a frame from the decoder.
              * @param theTime time of the frame to fetch
              * @param theFrame index of the frame to fetch
-             * @param theTargetRaster raster to read the frame into
+             * @param theTargetRaster vector of image raster to read the frame into
              * @return real time of the frame return in theTargetRaster
              */
-            virtual double readFrame(double theTime, unsigned theFrame, 
-                    dom::ResizeableRasterPtr theTargetRaster) = 0;
+            virtual double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) = 0;
 
             /**
              * loads a movie from the file given by theFilename

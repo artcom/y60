@@ -96,6 +96,7 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLH
 
 namespace y60 {
 
+
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
     asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
@@ -532,19 +533,25 @@ namespace y60 {
     VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {
         AC_DEBUG << "FFMpegDecoder2::createFrame";
 
-        int myBufferSize;
+        int myBufferSize = 0; 
+        vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_RGBA32:
-                myBufferSize = _myFrameWidth * _myFrameHeight * 4;
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 4);
                 break;
             case PIX_FMT_GRAY8:
-                myBufferSize = _myFrameWidth * _myFrameHeight * 1;
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 1);
+                break;
+            case PIX_FMT_YUV420P:
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
                 break;
             default:
-                myBufferSize = _myFrameWidth * _myFrameHeight * 3;
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 3);
                 break;
         }
-        return VideoMsgPtr(new VideoMsg(VideoMsg::MSG_FRAME, theTimestamp, myBufferSize)); 
+        return VideoMsgPtr(new VideoMsg(VideoMsg::MSG_FRAME, theTimestamp, myBufferSizes)); 
     }
 
     void
@@ -554,8 +561,7 @@ namespace y60 {
     }
 
     double
-    FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/,
-            dom::ResizeableRasterPtr theTargetRaster)
+    FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster)
     {
         AC_DEBUG << "readFrame, Time wanted=" << theTime;
         ASSURE(!getEOF());
@@ -631,17 +637,24 @@ namespace y60 {
             if(!myFrameDroppedFlag){
                 _myLastVideoFrame = myVideoMsg;
                 // Current frame is in myVideoMsg now. Convert to a format that Y60 can use.
-                theTargetRaster->resize(getFrameWidth(), getFrameHeight());
+                // we think this is for version bumping
+                for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
+                    theTargetRaster[i]->resize( theTargetRaster[i]->width(), theTargetRaster[i]->height());
+                }
                 if (myVideoMsg) {
                     AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
                             << ", got=" << (myVideoMsg->getTime()- _myStartTimestamp/_myTimeUnitsPerSecond);
                     theTime = myVideoMsg->getTime() - _myStartTimestamp/_myTimeUnitsPerSecond;
-                    memcpy(theTargetRaster->pixels().begin(), myVideoMsg->getBuffer(),
-                            theTargetRaster->pixels().size());
+                    for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
+                        memcpy(theTargetRaster[i]->pixels().begin(), myVideoMsg->getBuffer(i),
+                                theTargetRaster[i]->pixels().size());
+                    }
                 } else {
                     // TODO: Figure out if/why this happens. Delete?
                     AC_WARNING << "readFrame, empty frame.";
-                    memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
+                    for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
+                        memset(theTargetRaster[i]->pixels().begin(), 0, theTargetRaster[i]->pixels().size());
+                    }
                 }
             }
             getMovie()->set<CacheSizeTag>(_myMsgQueue.size());
@@ -682,7 +695,9 @@ namespace y60 {
             AC_TRACE << "---- Updating cache";
             try {
                 if (!decodeFrame() || myAudioEofFlag) {
-                    _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF)));
+                    std::vector<unsigned> myFrameSize;
+                    myFrameSize.push_back(0);
+                    _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
                     isDone = true;
 					AC_DEBUG << "---- EOF Yielding Thread.";
                     continue;
@@ -722,6 +737,9 @@ namespace y60 {
         if (myMovie->get<TargetPixelFormatTag>() != "") {
             TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
             switch(myTargetPixelFormat) {
+                case TEXTURE_IFMT_YUV420:
+                    myRasterEncoding = YUV420;
+                    break;
                 case TEXTURE_IFMT_RGBA8:
                     myRasterEncoding = RGBA;
                     break;
@@ -750,33 +768,38 @@ namespace y60 {
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGRA);
-                myMovie->addRasterValue(createRasterValue( y60::BGRA, _myFrameWidth, _myFrameHeight), y60::BGRA, 1);                
                 break;
             case ALPHA:
 				{AC_TRACE << "Using Alpha pixels";}
 	            _myDestinationPixelFormat = PIX_FMT_GRAY8;
 	            _myBytesPerPixel = 1;
 	            myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::ALPHA);
-	            myMovie->addRasterValue(createRasterValue( y60::ALPHA, _myFrameWidth, _myFrameHeight), y60::ALPHA, 1);                
 	            break;
             case GRAY:
 				{AC_TRACE << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
-                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);                
                 break;
+            case YUV420:
+				{AC_TRACE << "Using YUV420 pixels";}
+				_myDestinationPixelFormat = PIX_FMT_YUV420P;
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);                
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);    
+                break;                            
             case RGB:
             default:
 				{AC_TRACE << "Using BGR pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
-                _myBytesPerPixel = 3;
+                _myBytesPerPixel = 3;                
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::BGR);
-                myMovie->addRasterValue(createRasterValue( y60::BGR, _myFrameWidth, _myFrameHeight), y60::BGR, 1);                
                 break;
         }
-        myMovie->getRasterPtr(Movie::PRIMARY_BUFFER)->clear();
-		myMovie->getRasterPtr(Movie::SECONDARY_BUFFER)->clear();
+        unsigned myRasterCount = myMovie->getNode().childNodesLength();
+        for (unsigned i = 0; i < myRasterCount; i++) {
+            myMovie->getRasterPtr(i)->clear();
+        }
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
         
@@ -848,11 +871,18 @@ namespace y60 {
         AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling "
             << (_myResampleContext != 0);
     }
+    
 
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, double theTime) {
 		AC_DEBUG << "---- try to add frame at " << theTime;
         VideoMsgPtr myVideoFrame = createFrame(theTime);
-        convertFrame(theFrame, myVideoFrame->getBuffer());
+        if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
+            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+        } else {
+            convertFrame(theFrame, myVideoFrame->getBuffer());
+        }       
         _myMsgQueue.push_back(myVideoFrame);
         
         AC_DEBUG << "---- Added Frame to cache, Frame # : "

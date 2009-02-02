@@ -1,0 +1,70 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wave_2d.cg,v $
+//   $Author: valentin $
+//   $Revision: 1.7 $
+//   $Date: 2004/08/25 11:28:17 $
+//
+//  Description: 
+//=============================================================================
+
+struct app2vert { 
+    float4 Position : POSITION;
+    float3 Normal   : NORMAL;
+    float2 TexCoord : TEXCOORD0;
+    float4 Color : COLOR;
+};
+
+struct vert2frag {
+    float4 Vertex    : POSITION;
+    float2 TexCoord0 : TEXCOORD0;
+    float4 Color : COLOR;
+};
+
+
+vert2frag mainVertex(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord0 =  float2(IN.TexCoord).xy;
+    return OUT;
+}
+
+vert2frag mainVertexColor(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord0 =  float2(IN.TexCoord).xy;
+    OUT.Color = IN.Color;
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform sampler2D tex1,
+                    uniform sampler2D tex2,
+                    uniform float4 surfacecolor,
+                    uniform float4 diffuse): COLOR
+{
+    float3 myYUVColor;
+    myYUVColor.x = tex2D(tex0, IN.TexCoord0)-0.0625;
+    myYUVColor.y = tex2D(tex1, IN.TexCoord0)-0.5;
+    myYUVColor.z = tex2D(tex2, IN.TexCoord0)-0.5;
+    float3x3 myMatrix = float3x3(1.16,  0.0,   1.60, 1.16, -0.39, -0.81,1.16,  2.01,  0.0);
+    float4 myRGBColor = float4(mul(myMatrix, myYUVColor), 1);
+    myRGBColor.a = IN.Color.a;
+    return myRGBColor * surfacecolor * diffuse;
+}

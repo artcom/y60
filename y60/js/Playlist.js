@@ -203,6 +203,7 @@ Playlist.prototype.Constructor = function(self) {
             return AUDIO_MEDIA;
         } else if (theUrl.search(/\.m60$/i)  != -1 ||
                    theUrl.search(/\.mp4$/i)  != -1 ||
+                   theUrl.search(/\.mkv$/i)  != -1 ||
                    theUrl.search(/\.mpg$/i)  != -1 ||
                    theUrl.search(/\.mpeg$/i) != -1 ||
                    theUrl.search(/\.divx$/i) != -1 ||
@@ -237,6 +238,7 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/\.mp4$/i) != -1 ||
             theUrl.search(/\.divx$/i) != -1 ||
             theUrl.search(/\.avi$/i)  != -1 ||
+            theUrl.search(/\.mkv$/i)  != -1 ||
             theUrl.search(/\.m2v$/i) != -1 ) {
             if (theSeekableFlag) {                
                 myDecoderHint = "y60FFMpegDecoder2";

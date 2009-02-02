@@ -97,7 +97,10 @@ namespace y60 {
         RGBA_HALF,
         RGB_HALF,
         RGBA_FLOAT,
-        RGB_FLOAT
+        RGB_FLOAT,
+        YUV420,
+        YUV422,
+        YUV444
     };
 
     static const char * PixelEncodingString[] = {
@@ -125,6 +128,9 @@ namespace y60 {
         "RGB_HALF",
         "RGBA_FLOAT",
         "RGB_FLOAT",
+        "YUV420",
+        "YUV422",
+        "YUV444",
         0
     };
     static const char * RasterEncodingString[] = {

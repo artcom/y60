@@ -284,7 +284,7 @@ namespace y60 {
     }
 
     double
-    QuicktimeDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    QuicktimeDecoder::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
         AC_INFO << "Timestamp : " << theTime << "Read frame: " << theFrame << ", last decoded frame: " << _myLastDecodedFrame;
 
         if (static_cast<int>(theFrame) >= (getFrameCount() -1) ) {
@@ -293,14 +293,14 @@ namespace y60 {
         }
         // Handle frame wrap around
         if (_myLastDecodedFrame > theFrame) {
-            decodeFrame(0, theTargetRaster);
+            decodeFrame(0, theTargetRaster[0]);
         }
 
         if (theFrame != _myLastDecodedFrame) {
-            decodeFrame(theFrame, theTargetRaster);
+            decodeFrame(theFrame, theTargetRaster[0]);
         }
 
-        theTargetRaster->resize(getFrameWidth(), getFrameHeight());
+        theTargetRaster[0]->resize(getFrameWidth(), getFrameHeight());
         return theTime;
     }
 

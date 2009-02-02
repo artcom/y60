@@ -146,7 +146,7 @@ namespace y60 {
          * @param theFilename file to load into the decoder
          */
         void load(const std::string & theFilename);
-        double readFrame(double theTime, unsigned, dom::ResizeableRasterPtr theTargetRaster);
+        double readFrame(double theTime, unsigned, RasterVector theTargetRaster);
 
         /**
          * loads a movie from the stream given by theSource

@@ -66,6 +66,19 @@
 using namespace std;
 
 namespace y60 {
+
+    void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight)
+    {
+        unsigned char * mySource = theSource;
+        unsigned char * myDestination = theDestination;
+        for (int y=0; y<theHeight; y++) {
+            memcpy(myDestination, mySource, theWidth);
+            mySource      += theStride;
+            myDestination += theWidth;
+        }
+    
+    }
+    
     MovieDecoderBase::MovieDecoderBase() :
         _myEndOfFileFlag(false), _myMovieTime(0.0), _myLastSystemTime(-1.0), _myDecodeAudioFlag(true)
     {}

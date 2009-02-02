@@ -159,7 +159,7 @@ namespace y60 {
     }
 
     double
-    M60Decoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    M60Decoder::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
         DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame << ", theTime: " << theTime);
 
         if (static_cast<int>(theFrame) >= getFrameCount()) {
@@ -176,14 +176,14 @@ namespace y60 {
                 return theTime;                
             } else {
                 _myFilePos = _myMovieHeaderSize;
-                decodeFrame(0, theTargetRaster);
+                decodeFrame(0, theTargetRaster[0]);
             }
         }
 
         if (_myEncoding == MOVIE_DRLE) {
             // Sequential access
             while (_myLastDecodedFrame < theFrame) {
-                decodeFrame(_myLastDecodedFrame + 1, theTargetRaster);
+                decodeFrame(_myLastDecodedFrame + 1, theTargetRaster[0]);
             }
         } else {
             // Random access
@@ -195,7 +195,7 @@ namespace y60 {
                 myLastFrameRead++;
             }
             if (theFrame != _myLastDecodedFrame) {
-                decodeFrame(theFrame, theTargetRaster);
+                decodeFrame(theFrame, theTargetRaster[0]);
             }
         }
         return theTime;

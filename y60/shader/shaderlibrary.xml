@@ -1794,6 +1794,54 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s14141414" name="movie_yuv2rgb" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>    
+    <shader id="s14141415" name="movie_yuv2rgb" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertexColor`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>    
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->

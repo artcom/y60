@@ -240,8 +240,12 @@ namespace y60 {
     // TODO: frameblending..
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
-        double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
-        //AC_PRINT << "_myAudioSink->play() rein : " << theTime << " raus : " << myReturnTime;
+        RasterVector myMovieRaster;
+        unsigned myRasterCount = getNode().childNodesLength();
+        for (unsigned i = 0; i < myRasterCount; i++) {
+            myMovieRaster.push_back(getRasterPtr(i));
+        }
+        double myReturnTime = _myDecoder->readFrame(theTime, theFrame, myMovieRaster);
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
         } else {

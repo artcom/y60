@@ -107,10 +107,10 @@ namespace y60 {
              * reads a frame.
              * @param theTime is ignored by this decoder
              * @param theFrame frame of the movie to deliver
-             * @param theTargetRaster image raster to render the frame into
+             * @param theTargetRaster vector of image raster to render the frame into
              * @return theTime
              */
-            double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
+            double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
             void stopMovie(bool theStopAudioFlag = true);
         private:

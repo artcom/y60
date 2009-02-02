@@ -74,19 +74,19 @@ public:
     };
     
     // Time is in seconds.
-    VideoMsg(VideoMsgType theType, double theTime = 0, 
-            unsigned theFrameSize = 0);
+    VideoMsg(VideoMsgType theType, double theTime, std::vector<unsigned> theFrameSizes);
     ~VideoMsg();
 
     VideoMsgType getType() const;
     double getTime() const;
-    unsigned char * getBuffer() const;
+    unsigned char * getBuffer(unsigned theBufferNum = 0) const;
+    unsigned getSize(unsigned theBufferNum = 0) const;
 
 private:
     VideoMsgType _myType;
     double _myTime;
-    unsigned _myFrameSize;
-    unsigned char * _myFrame;
+    std::vector<unsigned char *> _myFrames;
+    std::vector<unsigned> _myFramesSizes;
 };
 
 // Needed since the default pointer class uses an allocator with a thread-local
