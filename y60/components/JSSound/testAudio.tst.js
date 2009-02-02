@@ -56,9 +56,15 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 plug("y60JSSound");
 plug("y60ProcFunctions");
+
+
+
+const AUDIO_1 = expandEnvironment("${PRO}/src/y60/sound/testfiles/aussentuer.mp3");
+
 
 function SoundUnitTest() {
     this.Constructor(this, "SoundUnitTest");
@@ -83,7 +89,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
             obj.mySoundManager.volume = 0;
         }
 
-        obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = new Sound(AUDIO_1);
         ENSURE("obj.mySoundManager.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
@@ -91,7 +97,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.volume == 1.0");
 
         ENSURE("!obj.mySound.playing");
-        ENSURE("obj.mySound.src == '../../../../sound/testfiles/aussentuer.mp3'");
+        ENSURE("obj.mySound.src == AUDIO_1");
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
         DPRINT("Math.abs(obj.mySound.duration-1.6195)");
@@ -135,7 +141,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySoundManager.soundcount == 0");
         DPRINT("obj.mySoundManager.soundcount");
 
-        obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = new Sound(AUDIO_1);
         obj.mySound.play();
         ENSURE("obj.mySoundManager.soundcount == 1");
         obj.mySoundManager.stopAll();
@@ -152,7 +158,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.mySoundManager.volume == 1.0;
 
-        const mySoundFile = "../../../../sound/testfiles/Plopp_2a.wav"
+        const mySoundFile = "../../sound/testfiles/Plopp_2a.wav"
         var mySound = null;
 
         for (var i = 0; i < 20; ++i) {

@@ -56,6 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 plug("y60ProcFunctions");
 use("Y60JSSL.js");
 use("ImageManager.js");
@@ -89,7 +90,7 @@ function removeObjects() {
     }
 }
 
-var myShaderLibrary = "../../../../shader/shaderlibrary.xml";
+var myShaderLibrary = "../../shader/shaderlibrary.xml";
 GLResourceManager.prepareShaderLibrary(myShaderLibrary);
 
 var window = new RenderWindow();

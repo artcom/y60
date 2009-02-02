@@ -64,11 +64,12 @@
 //
 //=============================================================================
 
-use("../../../../video/testLeak.js");
+includePath("../..");  //TODO: remove this after deprecating  ant-build
+use("../../video/testLeak.js");
 
-const MOVIE_1 = "../../../../video/testmovies/1.1.mpg";
-const MOVIE_2 = "../../../../video/testmovies/1.4.mpg"
-//const MOVIE_2 = "../../../../video/testmovies/T2_pan_7.mpg";
+const MOVIE_1 = "../../video/testmovies/1.1.mpg";
+const MOVIE_2 = "../../video/testmovies/1.4.mpg"
+//const MOVIE_2 = "../../video/testmovies/T2_pan_7.mpg";
 
 var myTestName = "y60FFMpegDecoder2 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder2";

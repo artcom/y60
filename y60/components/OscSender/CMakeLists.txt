@@ -15,3 +15,6 @@ y60_add_component(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
 )
+
+y60_add_jstest(OscSender)
+

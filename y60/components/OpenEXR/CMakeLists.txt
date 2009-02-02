@@ -17,3 +17,5 @@ y60_add_component(
     DEPENDS y60jslib
     EXTERNS OPENEXR
 )
+
+y60_add_jstest(OpenEXR)

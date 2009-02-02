@@ -57,7 +57,10 @@
 
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
+
+const XMLDOC_1 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/output.xml");
 
 function NodeUnitTest() {
     this.Constructor(this, "NodeUnitTest");
@@ -383,13 +386,13 @@ DomParseUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myDateString = myDate.toLocaleString();
         obj.mySaveDoc = Node.createDocument();
         obj.mySaveDoc.parse('<date>' + obj.myDateString + '</date>');
-        obj.mySaveDoc.saveFile("../../testfiles/output.xml");
+        obj.mySaveDoc.saveFile(XMLDOC_1);
         obj.myLoadDoc = Node.createDocument();
-        obj.myLoadDoc.parseFile("../../testfiles/output.xml");
+        obj.myLoadDoc.parseFile("testfiles/output.xml");
         ENSURE('obj.myLoadDoc.firstChild.firstChild.nodeValue == obj.myDateString');
 
         var myXMLDoc = new Node();
-        myXMLDoc.parseFile("../../testfiles/unicode.xml");
+        myXMLDoc.parseFile("testfiles/unicode.xml");
         var myXMLNode = myXMLDoc.firstChild;
 
         var myUnicode = myXMLNode.firstChild.firstChild.firstChild.nodeValue;

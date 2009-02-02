@@ -59,6 +59,7 @@
 // TODO:
 // - Test parent handling
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 use("Overlay.js");
 use("Y60JSSL.js");
@@ -215,18 +216,18 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.run = function() {
-        GLResourceManager.prepareShaderLibrary("../../../../shader/shaderlibrary.xml");
+        GLResourceManager.prepareShaderLibrary("../../shader/shaderlibrary.xml");
         // Create empty scene
         window = new RenderWindow();
 
         obj.myScene = window.scene;
         var myViewport = getDescendantByTagName(obj.myScene.dom, "viewport", true);
-        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "../../testfiles/black.rgb");
+        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "testfiles/black.rgb");
         obj.myDummyImageId = obj.myScene.images.lastChild.id;
         obj.myOverlay = new Overlay(obj.myScene, new Vector4f(1,2,3,1), [10, 20], [100,200]);
         //testCommonProperties([10,20], [100,200], [1,2,3,1]);
 
-        obj.myOverlay = new ImageOverlay(obj.myScene, "../../testfiles/DiffuseRamp.png", [30, 40]);
+        obj.myOverlay = new ImageOverlay(obj.myScene, "testfiles/DiffuseRamp.png", [30, 40]);
         obj.myImageId = obj.myScene.images.lastChild.id;
         //testCommonProperties([30,40], [32,1], [1,1,1,1]);
 
@@ -236,7 +237,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         //
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        var mySources = ["../../testfiles/black.rgb", "../../testfiles/DiffuseRamp.png"];
+        var mySources = ["testfiles/black.rgb", "testfiles/DiffuseRamp.png"];
         obj.myMultiOverlay = new ImageOverlay(obj.myScene, mySources);
         ENSURE('obj.myMultiOverlay.images.length == 2');
 

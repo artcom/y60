@@ -57,6 +57,7 @@
 
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
 function JSAppUnitTest() {
@@ -75,13 +76,13 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
          *      - I guess this is because of working directory confusion
          */
         /*
-        obj.myReturnCode = exec("../../testfiles/exec.sh", "2");
+        obj.myReturnCode = exec("testfiles/exec.sh", "2");
         ENSURE('obj.myReturnCode == 2');
-        obj.myReturnCode = exec("../../testfiles/exec.sh 3");
+        obj.myReturnCode = exec("testfiles/exec.sh 3");
         ENSURE('obj.myReturnCode == 3');
-        obj.myReturnCode = exec("../../testfiles/test.butt");
+        obj.myReturnCode = exec("testfiles/test.butt");
         ENSURE('obj.myReturnCode == -1');
-        obj.myReturnCode = exec("../../testfiles/exec.sh", "2", false);
+        obj.myReturnCode = exec("testfiles/exec.sh", "2", false);
         ENSURE('obj.myReturnCode == 0');
         if (operatingSystem() == "WIN32") {
             obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2");

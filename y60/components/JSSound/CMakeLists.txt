@@ -18,3 +18,5 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60sound
 )
+
+y60_add_jstest(Audio)

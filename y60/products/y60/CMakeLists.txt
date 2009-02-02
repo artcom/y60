@@ -16,13 +16,6 @@ ac_add_executable(
 )
 
 
-macro(y60_add_jstest NAME)
-  add_test(${NAME}
-      y60 test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I "${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;." 
-
-  )
-endmacro(y60_add_jstest NAME) 
-
 set(JSTESTS
 Configurator
 Dom

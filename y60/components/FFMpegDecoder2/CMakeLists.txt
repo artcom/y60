@@ -29,3 +29,4 @@ y60_add_component(
     EXTERNS ${EXTERNALS}
 )
 
+y60_add_jstest(Leak)

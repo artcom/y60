@@ -19,3 +19,6 @@ y60_add_component(
     DEPENDS y60video
     EXTERNS ${EXTERNALS}
 )
+
+
+y60_add_jstest(Leak)

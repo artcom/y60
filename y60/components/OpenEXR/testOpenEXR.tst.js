@@ -57,6 +57,7 @@
 
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
 function OpenEXRUnitTest() {
@@ -71,12 +72,12 @@ OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         plug("y60OpenEXR");
-        GLResourceManager.prepareShaderLibrary("../../../../shader/shaderlibrary.xml");
+        GLResourceManager.prepareShaderLibrary("../../shader/shaderlibrary.xml");
         var window = new RenderWindow();
 
         //var myScene = new Scene();
         var myScene = window.scene;
-        var myMaterial = Modelling.createUnlitTexturedMaterial(myScene, "../../testimages/Desk.exr");
+        var myMaterial = Modelling.createUnlitTexturedMaterial(myScene, "testimages/Desk.exr");
         var myShape    = Modelling.createQuad(myScene, myMaterial.id, [-0.4,-0.4,0], [0.4,0.4,0]);
         var myBody     = Modelling.createBody(myScene.world, myShape.id);
 

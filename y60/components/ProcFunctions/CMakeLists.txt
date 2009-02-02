@@ -15,3 +15,8 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS y60jslib
 )
+
+
+y60_add_jstest(ProcFunctions )
+y60_add_jstest(ImageLeak )
+y60_add_jstest(SceneLeakage )

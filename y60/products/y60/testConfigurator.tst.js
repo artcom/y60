@@ -57,6 +57,7 @@
 
 */
 
+includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 use("Configurator.js");
 
@@ -64,10 +65,10 @@ function ConfiguratorUnitTest() {
     this.Constructor(this, "ConfiguratorUnitTest");
 };
 
-const COMMON_SETTINGS = "../../testfiles/common_settings.xml";
-const MERGED_SETTINGS = "../../testfiles/merged_settings.xml";
-const LIST_A_SETTINGS = "../../testfiles/settings_list_a.xml";
-const LIST_B_SETTINGS = "../../testfiles/settings_list_b.xml";
+const COMMON_SETTINGS = "testfiles/common_settings.xml";
+const MERGED_SETTINGS = "testfiles/merged_settings.xml";
+const LIST_A_SETTINGS = "testfiles/settings_list_a.xml";
+const LIST_B_SETTINGS = "testfiles/settings_list_b.xml";
 
 ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 

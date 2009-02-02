@@ -17,3 +17,5 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS aslinet y60jslib
 )
+
+y60_add_jstest(Socket)
