@@ -10,8 +10,8 @@ FIND_PATH(MOZJS_INCLUDE_DIR NAMES js/jsapi.h)
 MARK_AS_ADVANCED(MOZJS_INCLUDE_DIR)
 
 # Look for the library.
-FIND_LIBRARY(MOZJS_LIBRARY NAMES mozjs libmozjs)
-FIND_LIBRARY(MOZJS_LIBRARY_D NAMES mozjsd libmozjsd)
+FIND_LIBRARY(MOZJS_LIBRARY NAMES acmozjs libacmozjs)
+FIND_LIBRARY(MOZJS_LIBRARY_D NAMES acmozjsd libacmozjsd)
 MARK_AS_ADVANCED(MOZJS_LIBRARY MOZJS_LIBRARY_D)
 
 #TODO: Use deps/bin/js-config script to get --libs and --cflags
