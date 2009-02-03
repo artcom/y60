@@ -7,4 +7,6 @@ ac_add_executable(
        plfiltersubtract.cpp
     DEPENDS
        aslbase paintlib
+    EXTERNS
+        OPENEXR
 )
