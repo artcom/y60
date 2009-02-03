@@ -923,9 +923,6 @@ function createMirrorCamera(theCamera, thePlane) {
     var myCamUpVec  = new Vector3f(myUp.x, myUp.y, myUp.z);
     var myCamRightVec = new Vector3f(myRight.x, myRight.y, myRight.z);
     
-    // calc new camera view
-	var myViewLine = new Line(myCamPosPoi, new Vector3f(myFwd.x, myFwd.y, myFwd.z));
-    var myNewCameraLookAt          = intersection(myViewLine, thePlane);
 
     // reflect cameraposition
     var myPlaneProjectedCamPosLine = new Line(myCamPosPoi, myInvertedPlaneNormal); 
@@ -947,8 +944,11 @@ function createMirrorCamera(theCamera, thePlane) {
     
     var myNewUpVector = normalized(difference(myNewCameraUpVec, myNewCameraPos));
     
-    // new camera specs
-    var myNewCameraView = normalized(difference(myNewCameraLookAt, myNewCameraPos));
+    
+    // reflect the view vector across the plane
+    var myViewVector = normalized( new Vector3f( -myFwd.x, -myFwd.y, -myFwd.z ) );
+    var myProjection = projection( myViewVector, thePlane.normal );
+    var myNewCameraView = normalized( sum( myViewVector, product( myProjection, -2 ) ) );
     
     var myOrientation = getOrientationFromDirection(myNewCameraView, myNewUpVector);
 
