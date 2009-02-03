@@ -18,13 +18,19 @@
 #
 
 # Add win32 dependency folder
-if(WIN32)
+if(WIN32 OR OSX)
     set(PRO60_DEPS $ENV{PRO60_DEPS})
     if(PRO60_DEPS)
         list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
-        add_subdirectory( ${PRO60_DEPS} ${CMAKE_CURRENT_BINARY_DIR}/pro60_deps )
+        if(WIN32)
+            add_subdirectory( ${PRO60_DEPS} ${CMAKE_CURRENT_BINARY_DIR}/pro60_deps )
+        endif(WIN32)
     else(PRO60_DEPS)
-        message(SEND_ERROR "PRO60_DEPS environment variable not set.")
+        if(WIN32)
+            message(SEND_ERROR "PRO60_DEPS environment variable not set.")
+        else(WIN32)
+            message(SEND_WARNING "PRO60_DEPS environment variable not set, dependencies must be in standard locations")
+        endif(WIN32)
     endif(PRO60_DEPS)
-endif(WIN32)
+endif(WIN32 OR OSX)
 

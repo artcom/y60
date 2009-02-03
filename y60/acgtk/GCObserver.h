@@ -62,7 +62,12 @@
 #include <y60/jsbase/jssettings.h>
 #include <asl/base/Singleton.h>
 
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
+
 #include <sigc++/sigc++.h>
 
 #include <map>
@@ -83,9 +88,13 @@ class GCObserver : public asl::Singleton<GCObserver> {
         JSContext * _myContext;
         JSGCCallback _myPrevCallback;
         ObjectMap _myObjectMap;
-
+#ifdef SPIDERMONK
         static JSBool JS_DLL_CALLBACK callbackHook(JSContext *cx, JSGCStatus status);
         JSBool JS_DLL_CALLBACK onGarbageCollected(JSContext *cx, JSGCStatus status);
+#else
+        static  JS_PUBLIC_API(JSBool) callbackHook(JSContext *cx, JSGCStatus status);
+       JS_PUBLIC_API(JSBool) onGarbageCollected(JSContext *cx, JSGCStatus status);
+#endif
 };
 
 }

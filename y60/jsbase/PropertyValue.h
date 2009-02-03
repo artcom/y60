@@ -62,7 +62,12 @@
 #include "y60_jsbase_settings.h"
 
 #include "JScppUtils.h"
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
 
 namespace y60 {
 

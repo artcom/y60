@@ -77,7 +77,11 @@ GCObserver::~GCObserver() {
 	*/
     AC_TRACE << "DTOR" << endl;
 }
+#ifdef SPIDERMONK
 JSBool JS_DLL_CALLBACK 
+#else
+JS_PUBLIC_API(JSBool)
+#endif
 GCObserver::callbackHook(JSContext *cx, JSGCStatus status) {
     return GCObserver::get().onGarbageCollected(cx, status);
 }
@@ -89,7 +93,11 @@ GCObserver::attach(JSContext * cx) {
      _myPrevCallback = JS_SetGCCallback(_myContext, callbackHook);
 }
 
+#ifdef SPIDERMONK
 JSBool JS_DLL_CALLBACK 
+#else
+JS_PUBLIC_API(JSBool)
+#endif
 GCObserver::onGarbageCollected(JSContext *cx, JSGCStatus status) {
     if (status == JSGC_MARK_END) {
         // now go through all the objects in our map and emit the signal if

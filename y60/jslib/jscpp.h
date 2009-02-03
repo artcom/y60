@@ -71,7 +71,11 @@
 
 #include <y60/jsbase/jssettings.h>
 
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
 
 namespace jslib {
 

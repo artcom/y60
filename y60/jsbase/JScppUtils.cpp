@@ -64,6 +64,8 @@
 #include "JScppUtils.impl"
 
 #include <asl/base/error_functions.h>
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -73,6 +75,17 @@
 #include <js/spidermonkey/jsarena.h>
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsdbgapi.h>
+#else
+#include <js/jsapi.h>
+#include <js/jsprf.h>
+//#include <js/jsparse.h>
+//#include <js/jsscan.h>
+#include <js/jsemit.h>
+#include <js/jsscript.h>
+#include <js/jsarena.h>
+#include <js/jscntxt.h>
+#include <js/jsdbgapi.h>
+#endif
 
 #ifndef _WIN32
 #include <glib.h>

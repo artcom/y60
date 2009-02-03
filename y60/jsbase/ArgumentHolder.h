@@ -64,12 +64,23 @@
 
 #include "Documentation.h"
 #include "JScppUtils.h"
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jspubtd.h>
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsgc.h>
 #include <js/spidermonkey/jslock.h>
 #include <js/spidermonkey/jsnum.h>
+#else
+#include <js/jspubtd.h>
+#include <js/jsapi.h>
+#include <js/jscntxt.h>
+#include <js/jsgc.h>
+#include <js/jslock.h>
+#include <js/jsnum.h>
+#endif
+
 #include <asl/dom/Nodes.h>
 #include <asl/base/Singleton.h>
 

@@ -48,5 +48,5 @@ include(AcProfiling)
 
 include(AcDocumentation)
 
-include(AcAddWindowsDependencies)
+include(AcAddPro60Dependencies)
 

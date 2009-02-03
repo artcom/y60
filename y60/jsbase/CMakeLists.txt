@@ -73,9 +73,10 @@ ac_add_library(
     y60jsbase y60/jsbase
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS GLIB2
+    EXTERNS GLIB2 MOZJS
     DEPENDS aslbase aslmath asldom aslxpath
-            y60base y60scene y60image spidermonkey
+#            y60base y60scene y60image spidermonkey
+            y60base y60scene y60image 
             paintlib
     TESTS   ${TESTS}
 )

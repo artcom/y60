@@ -23,7 +23,7 @@ include(Y60Utilities)
 ac_add_project(Y60)
 
 # XXX: Spidermonkey definitions should be dependency-propagated.
-add_definitions(${SPIDERMONKEY_DEFINITIONS})
+# add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 # Make sure we can access our includes without staging
 include_directories(../)

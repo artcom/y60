@@ -104,6 +104,7 @@
 #include <y60/jsbase/QuitFlagSingleton.h>
 #include <y60/jsbase/Documentation.h>
 
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -113,6 +114,17 @@
 #include <js/spidermonkey/jsarena.h>
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsdbgapi.h>
+#else
+#include <js/jsapi.h>
+#include <js/jsprf.h>
+//#include <js/jsparse.h>
+//#include <js/jsscan.h>
+#include <js/jsemit.h>
+#include <js/jsscript.h>
+#include <js/jsarena.h>
+#include <js/jscntxt.h>
+#include <js/jsdbgapi.h>
+#endif
 
 #if defined(_MSC_VER)
 #   pragma warning (push,1)

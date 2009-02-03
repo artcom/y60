@@ -66,7 +66,12 @@
 #include <map>
 
 #include "jssettings.h"
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
 
 
 class ClassMapSingleton :

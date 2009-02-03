@@ -55,19 +55,13 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: jssettings.h,v $
-//   $Author: janbo $
-//   $Revision: 1.1 $
-//   $Date: 2004/09/24 16:43:13 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_JSSETTINGS_INCLUDED_
 #define _Y60_JSSETTINGS_INCLUDED_
 
 #include "y60_jsbase_settings.h"
+
+#ifndef AC_BUILT_WITH_CMAKE
 
 #undef JS_THREADSAFE
 
@@ -91,6 +85,8 @@
 
 // undefine to use tracemonkey
 #define SPIDERMONK
+
+#endif
 
 
 

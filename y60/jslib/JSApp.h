@@ -70,7 +70,12 @@
 #include "y60_jslib_settings.h"
 
 #include <y60/jsbase/jssettings.h>
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
 
 #include <asl/base/PlugInBase.h>
 #include <asl/base/MappedBlock.h>

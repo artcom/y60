@@ -7,7 +7,8 @@ ac_add_executable(
           y60glrender y60glutil y60gltext y60jsbase y60jslib
           y60modelling y60sdlengine y60acgtk y60jsgtk
           aslzip
-  EXTERNS GTKMM GLADEMM GTKGLEXT SPIDERMONKEY OPENEXR
+# EXTERNS GTKMM GLADEMM GTKGLEXT SPIDERMONKEY OPENEXR
+  EXTERNS GTKMM GLADEMM GTKGLEXT MOZJS OPENEXR
 )
 
 # fix OpenGL/X11 link cycle problem

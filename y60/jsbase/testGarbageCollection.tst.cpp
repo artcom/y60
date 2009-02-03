@@ -56,11 +56,12 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-
 #include <asl/base/UnitTest.h>
 #include <asl/base/Logger.h>
 #include <y60/jsbase/jssettings.h>
 #include <y60/jsbase/JSVector.h>
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -71,6 +72,18 @@
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsdbgapi.h>
 #include <js/spidermonkey/jsscope.h>
+#else
+#include <js/jsapi.h>
+#include <js/jsprf.h>
+//#include <js/jsparse.h>
+//#include <js/jsscan.h>
+#include <js/jsemit.h>
+#include <js/jsscript.h>
+#include <js/jsarena.h>
+#include <js/jscntxt.h>
+#include <js/jsdbgapi.h>
+#include <js/jsscope.h>
+#endif
 
 #include <errno.h>
 
@@ -109,8 +122,9 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     }
 
     rt = cx->runtime;
-
+#ifdef SPIDERMONK
     JS_IncrementalGC(cx, maxObjects);
+#endif
 
 #ifdef JS_GCMETER
     js_DumpGCStats(rt, stdout);
@@ -166,7 +180,9 @@ public:
             init();
             runTestScript(*fileName);
             cleanup(false);
+#ifdef SPIDERMONK
             fprintf(outfile, "%s\t%d\n", *fileName, rt->gcObjects);
+#endif
         }
         fclose(outfile);
     }
@@ -212,7 +228,9 @@ public:
         ENSURE(globalObject);
         ENSURE(JS_DefineFunctions(cx, globalObject, global_functions));
         ENSURE(JS_InitStandardClasses(cx, globalObject));
+#ifdef SPIDERMONK
         AC_PRINT << "GC objects after initialization: " << rt->gcObjects;
+#endif
 
         ENSURE(globalObject);
         ENSURE(JSVector<asl::Vector3f>::initClass(cx, globalObject));
@@ -226,8 +244,10 @@ public:
         JS_ClearScope(cx, globalObject);
 
 	if (incremental) {
-            int j = 10000;
+        int j = 10000;
+#ifdef SPIDERMONK
 	    while (!(JS_IncrementalGC(cx, 100)) && --j > 0);
+#endif
 	    ENSURE_MSG((j >= 0), "GC cycles < 1000");
 	}
         // finally, do a full forced gc to get rid of newborns and the like.
@@ -248,11 +268,15 @@ public:
         fclose(js_DumpGCHeap);
         js_DumpGCHeap = NULL;
 #endif
+#ifdef SPIDERMONK
         AC_PRINT << "GC Objects after execution of test: "
                  << rt->gcObjects << "; theFinalObjectCount = " << theFinalObjectCount;
         ENSURE(rt->gcObjects == theFinalObjectCount);
+#endif
         JS_DestroyContext(cx);
+#ifdef SPIDERMONK
         ENSURE(rt->gcObjects == 0);
+#endif
         JS_DestroyRuntime(rt);
     }
 
@@ -264,8 +288,10 @@ public:
         if (script) {
             (void)JS_ExecuteScript(cx, globalObject, script, &result);
             JS_DestroyScript(cx, script);
+#ifdef SPIDERMONK
             AC_PRINT << "GC Objects after execution of script [" 
                      << theFileName << "]: " << cx->runtime->gcObjects;
+#endif
         } else {
             AC_ERROR << "Could not load testscript [" << theFileName << "]";
         }

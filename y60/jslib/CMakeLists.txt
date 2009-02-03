@@ -71,5 +71,6 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom aslxpath aslserial
             y60base y60scene y60image y60video y60input y60inet y60glrender
-            y60glutil y60gltext y60jsbase y60modelling paintlib spidermonkey
+            y60glutil y60gltext y60jsbase y60modelling paintlib
+#            y60glutil y60gltext y60jsbase y60modelling paintlib spidermonkey
 )

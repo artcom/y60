@@ -64,7 +64,13 @@
 #include "JSgtkutils.h"
 
 #include <y60/jsbase/jssettings.h>
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4512 4413)

@@ -21,7 +21,7 @@ jssdl.h
 y60_sdlengine_settings.h
 )
 
-set(EXTERNS SDL GLEW)
+set(EXTERNS SDL GLEW MOZJS)
 
 if(OSX)
     list(APPEND EXTERNS COCOA)
@@ -34,6 +34,7 @@ ac_add_library(
     EXTERNS ${EXTERNS}
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
             y60base y60scene y60image y60video y60input y60inet y60glrender
-            y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib spidermonkey
+            y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib
+#            y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib spidermonkey
 )
 

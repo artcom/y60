@@ -62,7 +62,13 @@
 #include "y60_jsbase_settings.h"
 
 #include "PropertyValue.h"
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
+
 #include <asl/base/Ptr.h>
 #include <asl/dom/Nodes.h>
 

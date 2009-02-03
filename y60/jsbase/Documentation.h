@@ -71,7 +71,12 @@
 
 #include "jssettings.h"
 #include "JScppUtils.h"
+
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jsapi.h>
+#else
+#include <js/jsapi.h>
+#endif
 
 #include <string>
 #include <vector>

@@ -66,11 +66,19 @@
 
 #include "jssettings.h"
 
+#ifdef SPIDERMONK
 #include <js/spidermonkey/jspubtd.h>
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jscntxt.h>
 #include <js/spidermonkey/jsnum.h>
 #include <js/spidermonkey/jslock.h>
+#else
+#include <js/jspubtd.h>
+#include <js/jsapi.h>
+#include <js/jscntxt.h>
+#include <js/jsnum.h>
+#include <js/jslock.h>
+#endif
 
 #include <asl/base/settings.h>
 #include <asl/base/string_functions.h>
@@ -182,8 +190,9 @@ DEFINE_EXCEPTION(UnicodeException, asl::Exception);
 
 
 //=============================================================================
-
+#ifdef SPIDERMONK
 JSBool JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError);
+#endif
 
 Y60_JSBASE_EXPORT JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval);
