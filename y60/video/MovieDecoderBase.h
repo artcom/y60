@@ -90,7 +90,7 @@ namespace y60 {
 
     typedef std::vector<dom::ResizeableRasterPtr> RasterVector;
 
-    void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
+    Y60_VIDEO_EXPORT void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
     
     class Movie;
     /**
