@@ -83,7 +83,9 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theNa
                 bOK = JS_CallFunctionValue(cx, obj, myVal, argc, argv, rval);
                 if (!bOK && !QuitFlagSingleton::get().getQuitFlag()) {
                     AC_ERROR << "Exception while calling js function '" << theName << "'";
+#ifdef SPIDERMONK
                     JSA_reportUncaughtException(cx, cx->errorReporter);
+#endif
                 }
             }
             g_free(myUTF16);
