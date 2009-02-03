@@ -11,7 +11,7 @@ MARK_AS_ADVANCED(MOZJS_INCLUDE_DIR)
 
 # Look for the library.
 FIND_LIBRARY(MOZJS_LIBRARY NAMES mozjs libmozjs)
-# FIND_LIBRARY(MOZJS_LIBRARY_D NAMES jsd libmozjsd)
+FIND_LIBRARY(MOZJS_LIBRARY_D NAMES mozjsd libmozjsd)
 MARK_AS_ADVANCED(MOZJS_LIBRARY MOZJS_LIBRARY_D)
 
 #TODO: Use deps/bin/js-config script to get --libs and --cflags
