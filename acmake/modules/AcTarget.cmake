@@ -120,15 +120,17 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
         debug_linkage("${TARGET} links against ${LIBRARY} when compiled optimized")
     endforeach(LIBRARY ${OPTIMIZED_LIBRARIES})
 
-    # XXX this leads to all libraries being linked
     # declare all libraries as transient link deps
     # and make extern definitions available to source files
-    #set_target_properties(
-    #    ${TARGET}
-    #    PROPERTIES
-    #        LINK_INTERFACE_LIBRARIES "${ALL_LIBRARIES}"
-    #        COMPILE_DEFINITIONS "${ALL_DEFINITIONS}"
-    #)
+    set_target_properties(
+        ${TARGET}
+        PROPERTIES
+            COMPILE_DEFINITIONS "${ALL_DEFINITIONS}"
+            LINK_INTERFACE_LIBRARIES_RELEASE        "${GENERAL_LIBRARIES} ${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_MINSIZEREL     "${GENERAL_LIBRARIES} ${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_RELWITHDEBINFO "${GENERAL_LIBRARIES} ${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_DEBUG          "${GENERAL_LIBRARIES} ${DEBUG_LIBRARIES}"
+    )
 
 endmacro(_ac_attach_depends)
 

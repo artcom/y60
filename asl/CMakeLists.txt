@@ -15,12 +15,14 @@ include(AcMake)
 # XXX: definition handling
 add_definitions(-DAC_BUILT_WITH_CMAKE)
 
+# Define dependencies
 set(REQ_PACKAGES ZLIB GLIB2 CURL OpenEXR)
+set(REQ_PKGCONFIG)
+
 if(WIN32)
     list(APPEND REQ_PACKAGES PTHREADVC DirectX)
 endif(WIN32)
 
-set(REQ_PKGCONFIG)
 if(LINUX)
     list(APPEND REQ_PKGCONFIG ALSA alsa)
 endif(LINUX)
@@ -31,6 +33,7 @@ if(OSX)
     find_library(AUDIO_UNIT AudioUnit)
 endif(OSX)
 
+# Define the project
 ac_add_project(
     ASL
     REQUIRED_PACKAGES
@@ -41,16 +44,6 @@ ac_add_project(
 
 # Make sure we can access our includes without staging
 include_directories(../)
-
-# XXX: Make headers from our netsrc dependencies available.
-#      This is needed because we do not handle paths for
-#      cmake-exported libraries correctly at the moment.
-#      It would work if the references in our libs would
-#      be EXTERNS, but since they are DEPENDS, we do not add 
-#      include paths anywhere and need this hack for now.
-if(NOT ASL_INTEGRATED_BUILD)
-    include_directories(${CMAKE_INSTALL_PREFIX}/include)
-endif(NOT ASL_INTEGRATED_BUILD)
 
 # Traverse our subdirectories
 add_subdirectory(base)
@@ -64,6 +57,7 @@ add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
 
+# Documentation
 ac_add_doxygen(ASL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 
 ac_export_project(ASL)
