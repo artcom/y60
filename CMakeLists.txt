@@ -26,7 +26,6 @@ set(ASL_INTEGRATED_BUILD YES)
 set(Y60_INTEGRATED_BUILD YES)
 
 # add paths to our internal staged includes
-#    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/spidermonkey/include
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/SDL_ttf2/include
