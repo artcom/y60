@@ -46,7 +46,7 @@ macro(ac_add_project PROJECT_NAME)
     set_global(${PROJECT_NAME}_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     set_global(${PROJECT_NAME}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
     
-    # Also remember the build type
+    # Also remember the build type (if we do not have one, like in VS, just leave it empty)
     set_global(${PROJECT_NAME}_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
 
     # We are of course FOUND
