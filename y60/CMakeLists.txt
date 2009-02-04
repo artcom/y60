@@ -16,14 +16,13 @@ endif(NOT Y60_INTEGRATED_BUILD)
 include(AcMake)
 
 # Define some things and discover dependencies
-include(Y60Definitions)
 include(Y60Dependencies)
 include(Y60Utilities)
 
 ac_add_project(Y60)
 
-# XXX: Spidermonkey definitions should be dependency-propagated.
-# add_definitions(${SPIDERMONKEY_DEFINITIONS})
+# XXX: definition-propagation
+add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 # Make sure we can access our includes without staging
 include_directories(../)
