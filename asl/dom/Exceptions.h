@@ -39,7 +39,7 @@ namespace dom {
     /** this exception is thrown during parsing when the parser
         aborts because of malformed xml data
     */
-    class ParseException : public asl::Exception {
+    class ASL_DOM_EXPORT ParseException : public asl::Exception {
     public:
         ParseException(const std::string & what, const std::string & where, int parsed_until = 0)
             : asl::Exception(what,where,"dom::ParseException"),

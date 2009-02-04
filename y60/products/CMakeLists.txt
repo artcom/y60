@@ -6,3 +6,5 @@ if(Y60_WITH_GTK)
 endif(Y60_WITH_GTK)
 
 add_subdirectory(CompareImage)
+add_subdirectory(GenCompressedTex)
+add_subdirectory(GenMovie)

@@ -8,5 +8,5 @@ ac_add_executable(
     DEPENDS
        aslbase paintlib
     EXTERNS
-        OPENEXR
+       OPENEXR
 )

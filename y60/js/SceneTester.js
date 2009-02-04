@@ -226,7 +226,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             writeStringToFile("saved_binary_testscene.x60", myNewBinScene.dom.toString());
             writeStringToFile("saved_xml_testscene.x60", myNewXmlScene.dom.toString());
             print("inspect 'saved_binary_testscene.x60' and 'saved_xml_testscene.x60' for differences");
-	        exit(1);
+            exit(1);
         }
     }
 
@@ -302,8 +302,8 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
         }
         if (myArgument == "offscreen" && 
-	    operatingSystem() != "OSX" &&
-	    expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1) {
+        operatingSystem() != "OSX" &&
+        expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1) {
             _myOffscreenFlag = true;
         }
     }

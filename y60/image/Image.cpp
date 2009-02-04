@@ -82,6 +82,7 @@
 
 #include <y60/base/IScene.h>
 
+#include "I60Header.h"
 #include "ImageLoader.h"
 
 using namespace asl;

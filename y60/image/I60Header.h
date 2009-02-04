@@ -72,7 +72,7 @@
 namespace y60 {
 
     const unsigned long CURRENT_IMAGE_FORMAT_VERSION = 2; // including layers
-    extern const char * I60_MAGIC_NUMBER; // defined in Image.cpp = "a+c " 
+    extern Y60_IMAGE_EXPORT const char * I60_MAGIC_NUMBER; // defined in Image.cpp = "a+c " 
 
     struct I60Header {
         I60Header() : headersize(sizeof(I60Header)), version(CURRENT_IMAGE_FORMAT_VERSION) {
