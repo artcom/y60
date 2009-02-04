@@ -78,12 +78,12 @@
 
 namespace y60 {
     class ClipBuilder;
-    class CharacterBuilder : public BuilderBase {
+    Y60_SCENE_EXPORT class CharacterBuilder : public BuilderBase {
         public:
-            CharacterBuilder(const std::string & theName);
-            virtual ~CharacterBuilder();
+            Y60_SCENE_EXPORT CharacterBuilder(const std::string & theName);
+            Y60_SCENE_EXPORT virtual ~CharacterBuilder();
 
-            const std::string & appendClip(ClipBuilder & theClip);
+            Y60_SCENE_EXPORT const std::string & appendClip(ClipBuilder & theClip);
         private:
     };
     typedef asl::Ptr<CharacterBuilder> CharacterBuilderPtr;
