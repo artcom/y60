@@ -1,7 +1,7 @@
 #!/bin/bash
-set -e
-set -x
-set -u
+#set -e
+#set -x
+#set -u
 
 BUILD_DIR=_build
 UNAME_OS=`uname -s`
@@ -38,7 +38,7 @@ if [ ! -d $BUILD_DIR ]; then
 fi
 cd $BUILD_DIR
 
-#cmake -G "$CMAKE_GENERATOR" ../src
+cmake -G "$CMAKE_GENERATOR" ../src
 CMAKE_RESULT=$?
 if [ $CMAKE_RESULT -gt 0 ]; then
     echo cmake failed
