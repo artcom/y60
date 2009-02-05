@@ -92,7 +92,7 @@ namespace asl {
     // expands embedded ${ENVVAR} with their values
     ASL_BASE_EXPORT std::string expandEnvironment(const std::string & theString);
     ASL_BASE_EXPORT bool get_environment_var(const std::string & theVariable, std::string & theValue);
-    void set_environment_var(const std::string & theVariable, const std::string & theValue);
+    ASL_BASE_EXPORT void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
     template <class T>
     bool get_environment_var_as(const std::string & theVariable, T& theValue);

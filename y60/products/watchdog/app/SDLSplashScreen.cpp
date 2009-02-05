@@ -73,7 +73,7 @@
 #include <iostream>
 
 #include <asl/base/os_functions.h>
-#include <SDL/SDL_getenv.h>
+#include <SDL_getenv.h>
 
 #if defined(_MSC_VER)
 #   pragma warning (push,1)
