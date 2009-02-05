@@ -37,3 +37,9 @@ add_subdirectory(netsrc)
 add_subdirectory(asl)
 add_subdirectory(y60)
 
+
+# XXX hack for testing the scenetests
+if(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
+  add_subdirectory(../testmodels ${CMAKE_CURRENT_BINARY_DIR}/testmodels)
+endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
+
