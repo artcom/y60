@@ -73,7 +73,11 @@
 #include <iostream>
 
 #include <asl/base/os_functions.h>
-#include <SDL_getenv.h>
+#ifdef AC_BUILT_WITH_CMAKE
+#  include <SDL_getenv.h>
+#else
+#  include <SDL/SDL_getenv.h>
+#endif
 
 #if defined(_MSC_VER)
 #   pragma warning (push,1)

@@ -60,7 +60,11 @@
 #define ac_watchdog_SDLSplashScreen_h
 
 #include <string>
-#include <SDL.h>
+#ifdef AC_BUILT_WITH_CMAKE
+#  include <SDL.h>
+#else
+#  include <SDL/SDL.h>
+#endif
 
 class SDLSplashScreen {
     public:
