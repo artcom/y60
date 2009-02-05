@@ -473,7 +473,7 @@ struct Method {
             JSRuntime * myRuntime=JS_GetRuntime(cx);(void)myRuntime;
             JSCallArgs myJSArgs( cx, obj, argc, argv, rval);
             MethodType<CLASS, METHOD>::callMethodType(theMethod, myJSArgs);
-            return JS_TRUE;
+            return !JS_IsExceptionPending(cx); // propagate js exception when js code was executed from the native function
         } HANDLE_CPP_EXCEPTION;
     }
 
@@ -487,7 +487,7 @@ struct Method {
     {
         try {
             if (argc != 1) {
-                JS_ReportError(cx,"JSNode::callRefResult: wrong number of parameters: %d, 1 expected", argc);
+                JS_ReportError(cx,"callRefResult(1): wrong number of parameters: %d, 1 expected", argc);
                 return JS_FALSE;
             }
             ARG0 myArg0;
@@ -501,8 +501,9 @@ struct Method {
                 } else {
                     *rval = JSVAL_VOID;
                 }
-                return JS_TRUE;
+                return !JS_IsExceptionPending(cx); // propagate js exception when js code was executed from the native function
             }
+            JS_ReportError(cx,"callRefResult(1): can not convert argument 0 to native type %s", typeid(ARG0).name());
             return JS_FALSE;
         } HANDLE_CPP_EXCEPTION;
     }
@@ -524,16 +525,20 @@ struct Method {
             ARG1 myArg1;
             RESULT_TYPE myResult;
 
-            if (convertFrom(cx, argv[0], myArg0) &&
-                convertFrom(cx, argv[1], myArg1) )
-            {
-                typename JSClassTraits<CLASS>::ScopedNativeRef myObj(cx, obj);
-                if (((myObj.getNative()).*theMethod)(myArg0, myArg1, myResult)) {
-                    *rval = as_jsval(cx, myResult);
+            if (convertFrom(cx, argv[0], myArg0)) {
+                if (convertFrom(cx, argv[1], myArg1)) {
+                    typename JSClassTraits<CLASS>::ScopedNativeRef myObj(cx, obj);
+                    if (((myObj.getNative()).*theMethod)(myArg0, myArg1, myResult)) {
+                        *rval = as_jsval(cx, myResult);
+                    } else {
+                        *rval = JSVAL_VOID;
+                    }
+                    return !JS_IsExceptionPending(cx); // propagate js exception when js code was executed from the native function
                 } else {
-                    *rval = JSVAL_VOID;
+                    JS_ReportError(cx,"callRefResult(2): can not convert argument 1 to native type %s", typeid(ARG1).name());
                 }
-                return JS_TRUE;
+            } else {
+                JS_ReportError(cx,"callRefResult(2): can not convert argument 0 to native type %s", typeid(ARG0).name());
             }
             return JS_FALSE;
         } HANDLE_CPP_EXCEPTION;
@@ -548,7 +553,7 @@ struct Method {
     {
         try {
             if (argc != 3) {
-                JS_ReportError(cx,"JSNode::callMethod: wrong number of parameters: %d, 2 expected", argc);
+                JS_ReportError(cx,"callRefResult(3): wrong number of parameters: %d, 3 expected", argc);
                 return JS_FALSE;
             }
             ARG0 myArg0;
@@ -556,17 +561,24 @@ struct Method {
             ARG2 myArg2;
             RESULT_TYPE myResult;
 
-            if (convertFrom(cx, argv[0], myArg0) &&
-                convertFrom(cx, argv[1], myArg1) &&
-                convertFrom(cx, argv[2], myArg2) )
-            {
-                typename JSClassTraits<CLASS>::ScopedNativeRef myObj(cx, obj);
-                if (((myObj.getNative()).*theMethod)(myArg0, myArg1, myArg2, myResult)) {
-                    *rval = as_jsval(cx, myResult);
+            if (convertFrom(cx, argv[0], myArg0)) {
+                if (convertFrom(cx, argv[1], myArg1)) { 
+                    if (convertFrom(cx, argv[2], myArg2)) {
+                        typename JSClassTraits<CLASS>::ScopedNativeRef myObj(cx, obj);
+                        if (((myObj.getNative()).*theMethod)(myArg0, myArg1, myArg2, myResult)) {
+                            *rval = as_jsval(cx, myResult);
+                        } else {
+                            *rval = JSVAL_VOID;
+                        }
+                        return !JS_IsExceptionPending(cx); // propagate js exception when js code was executed from the native function
+                    } else {
+                        JS_ReportError(cx,"callRefResult(2): can not convert argument 2 to native type %s", typeid(ARG2).name());
+                    }
                 } else {
-                    *rval = JSVAL_VOID;
+                    JS_ReportError(cx,"callRefResult(2): can not convert argument 1 to native type %s", typeid(ARG1).name());
                 }
-                return JS_TRUE;
+            } else {
+                JS_ReportError(cx,"callRefResult(2): can not convert argument 0 to native type %s", typeid(ARG0).name());
             }
             return JS_FALSE;
         } HANDLE_CPP_EXCEPTION;

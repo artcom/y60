@@ -661,6 +661,8 @@ namespace jslib {
         DOC_PARAM("theSecondNumber", "", DOC_TYPE_FLOAT);
         DOC_PARAM("...", "", DOC_TYPE_FLOAT);
         DOC_END;
+        
+        try {
 
         IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
         if (JSA_GetClass(cx,obj) != Class()) {
@@ -750,6 +752,8 @@ namespace jslib {
         }
         JS_ReportError(cx,"JSVector<%s>::Constructor: must have either 0 or %d parameters, but got %d",ClassName(),SIZE,argc);
         return JS_FALSE;
+        
+        }  HANDLE_CPP_EXCEPTION;
     }
 
     template<class NATIVE_VECTOR>

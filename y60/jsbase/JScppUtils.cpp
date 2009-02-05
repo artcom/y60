@@ -677,7 +677,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int a
     try {
         JSBool ok = JS_CallFunctionName(cx, obj, theName, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
-            AC_ERROR << "Exception while calling js function '" << theName << "'" << endl;
+            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
 #ifdef SPIDERMONK
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
@@ -691,7 +691,7 @@ JSA_CallFunction(JSContext * cx, JSObject * obj, JSFunction *fun, int argc, jsva
     try {
         JSBool ok = JS_CallFunction(cx, obj, fun, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
-            AC_ERROR << "Exception while calling js function" << endl;
+            AC_DEBUG << "Exception while calling js function" << endl;
 #ifdef SPIDERMONK
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
@@ -704,7 +704,7 @@ JSA_CallFunctionValue(JSContext * cx, JSObject * obj, jsval fval, int argc, jsva
     try {
         JSBool ok = JS_CallFunctionValue(cx, obj, fval, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
-            AC_ERROR << "Exception while calling js function " << endl;
+            AC_DEBUG << "Exception while calling js function " << endl;
 #ifdef SPIDERMONK
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
