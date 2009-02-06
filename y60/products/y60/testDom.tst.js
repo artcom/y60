@@ -61,6 +61,7 @@ includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
 const XMLDOC_1 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/output.xml");
+const XMLDOC_2 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/unicode.xml");
 
 function NodeUnitTest() {
     this.Constructor(this, "NodeUnitTest");
@@ -377,6 +378,7 @@ DomParseUnitTest.prototype.Constructor = function(obj, theName) {
 
         // Test parsing of quoted characters
     	obj.myDocument.parse('<hello myattr="&lt;p&gt;">world&lt;p&gt;</hello>');
+        print("myDoc="+obj.myDocument);
         ENSURE('obj.myDocument.firstChild.nodeName == "hello"');
         ENSURE('obj.myDocument.firstChild.myattr == "<p>"');
         ENSURE('obj.myDocument.firstChild.firstChild.nodeValue == "world<p>"');
@@ -388,11 +390,11 @@ DomParseUnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySaveDoc.parse('<date>' + obj.myDateString + '</date>');
         obj.mySaveDoc.saveFile(XMLDOC_1);
         obj.myLoadDoc = Node.createDocument();
-        obj.myLoadDoc.parseFile("testfiles/output.xml");
+        obj.myLoadDoc.parseFile(XMLDOC_1);
         ENSURE('obj.myLoadDoc.firstChild.firstChild.nodeValue == obj.myDateString');
 
         var myXMLDoc = new Node();
-        myXMLDoc.parseFile("testfiles/unicode.xml");
+        myXMLDoc.parseFile(XMLDOC_2);
         var myXMLNode = myXMLDoc.firstChild;
 
         var myUnicode = myXMLNode.firstChild.firstChild.firstChild.nodeValue;
