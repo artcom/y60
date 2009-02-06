@@ -23,6 +23,8 @@ SceneExporter.h
 ShapeExporter.h
 )
 
+add_definitions(-D_BOOL)
+
 if(WIN32)
     add_definitions(-DNT_PLUGIN)
 endif(WIN32)
