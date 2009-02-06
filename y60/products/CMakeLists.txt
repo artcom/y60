@@ -18,4 +18,7 @@ if(MAYA_FOUND)
 endif(MAYA_FOUND)
 
 add_subdirectory(watchdog)
-#add_subdirectory(cinemax)
+
+if(C4D_FOUND)
+    #add_subdirectory(cinemax)
+endif(C4D_FOUND)

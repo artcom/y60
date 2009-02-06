@@ -1,5 +1,5 @@
 if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
+    list( APPEND EXTERNALS C4D PTHREADVC )
 endif(WIN32)
 
 set(SOURCES
@@ -22,12 +22,11 @@ c4d_include.h
 )
 
 
-ac_add_executable(
+ac_add_plugin(
     ac-cinemax
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}  
     DEPENDS aslbase aslmath aslzip asldom    
             y60base y60image y60video y60scene y60modelling paintlib
-            #c4dapi c4dcustom c4dgv c4dlibs c4dpreview c4dscaling 
     EXTERNS ${EXTERNALS}
 )
