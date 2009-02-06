@@ -9,6 +9,12 @@ else(WIN32)
     pkg_search_module(AVCODEC REQUIRED libavcodec)
     pkg_search_module(AVFORMAT REQUIRED libavformat)
     pkg_search_module(SWSCALE REQUIRED libswscale)
+    # contains av_free etc and is needed on Mac OS X. I think this is because of
+    # incorrect linkage in the ffmpeg build. avformat etc should link avutil instead
+    # of leaving the symbols undefined until the libs are linked (I think they use 
+    # -undefined dynamic_lookup or something).
+    # [DS]
+    pkg_search_module(AVUTIL REQUIRED libavutil ) 
     pkg_search_module(AVFILTER libavfilter) # optional because it does not exist on linux
     set(FFMPEG_FOUND YES)
 endif(WIN32)

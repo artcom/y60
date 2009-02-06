@@ -97,9 +97,22 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
         )
 
+        if( ACMAKE_BUILTIN_SVN_REVISIONS)
+            set( THIS_LIBRARY_REVISION_FILE
+                    "${CMAKE_CURRENT_BINARY_DIR}/${THIS_LIBRARY_NAME}${ACMAKE_REVISION_FILE_SUFFIX}")
+        endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+
         # define the library target
-        add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS})
-        
+        add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES}
+            ${THIS_LIBRARY_HEADERS} ${THIS_LIBRARY_REVISION_FILE})
+
+        if( ACMAKE_BUILTIN_SVN_REVISIONS)
+            # update repository and revision information
+            _ac_add_repository_info( ${THIS_LIBRARY_NAME}
+                    ${THIS_LIBRARY_REVISION_FILE}
+                    "library" )
+        endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+
         # attach headers to target
         set_target_properties(
             ${THIS_LIBRARY_NAME} PROPERTIES
@@ -134,15 +147,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     #      We need a new mechanism.
     set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
     foreach(TEST ${THIS_LIBRARY_TESTS})
-        if (WIN32)
-            set(TEST_EXE_NAME
-                    "${TEST_NAMESPACE}_test${TEST}")
-            set(TEST_EXE_PATH
-                    "${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAMESPACE}_test${TEST}")
-        else (WIN32)
-            set(TEST_EXE_NAME "test${TEST}" )
-            set(TEST_EXE_PATH ${TEST_EXE_NAME} )
-        endif (WIN32)
+        set(TEST_EXE_NAME "${TEST_NAMESPACE}_test${TEST}")
+        set(TEST_EXE_PATH
+                "${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAMESPACE}_test${TEST}")
         # define the executable
         ac_add_executable(
             ${TEST_EXE_NAME}
@@ -150,6 +157,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME} # XXX: asl-specifics
             EXTERNS ${THIS_LIBRARY_EXTERNS}
             DONT_INSTALL
+            NO_REVISION_INFO
         )
 	
         # tell ctest about it

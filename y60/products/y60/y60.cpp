@@ -71,6 +71,7 @@
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
+#include <asl/base/RevisionInfo.h>
 
 #include <iostream>
 
@@ -87,6 +88,7 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"-I", "include path (semicolon-separated)"},
     {"--no-jswarnings", ""},
     {"--pause-on-error", ""},
+    {"--revision","[componentname|all]"},
     {"--std-logfile", "logfile base filename for stdout/stderr"},
 #ifndef SPIDERMONK
     {"--jit", ""},
@@ -139,6 +141,14 @@ main(int argc, char **argv) {
         if (ourArguments.getCount() < 1) {
             ourArguments.printUsage();
             return 1;
+        }
+
+        if (ourArguments.haveOption("--revision")) {
+            std::string component = ourArguments.getOptionArgument("--revision");
+            if (component.empty()) {
+            } else if (component == "all") {
+                std::cout << asl::RevisionInfoPool::get();
+            }
         }
 
         string myIncludePath;

@@ -220,6 +220,7 @@ if(NOT WIN32)
     option(ACMAKE_INSTALL_WITH_RPATH "Should binaries be installed with an rpath?" YES)
 endif(NOT WIN32)
 
+
 macro(_ac_attach_rpath TARGET)
     if(NOT WIN32)
         if(ACMAKE_INSTALL_WITH_RPATH)
@@ -233,3 +234,47 @@ macro(_ac_attach_rpath TARGET)
         endif(ACMAKE_INSTALL_WITH_RPATH)
     endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
+
+#===== Repository information stuff ============================================
+option(ACMAKE_BUILTIN_SVN_REVISIONS
+        "Enable builtin revision and repository information?" YES)
+set(ACMAKE_REVISION_FILE_SUFFIX "_revision.cpp")
+if( ACMAKE_BUILTIN_SVN_REVISIONS )
+    find_program( SVN svn svn.exe )
+    find_program( SVNVERSION svnversion svnversion.exe )
+    if( NOT SVN)
+        message("svn not found. Disabling repository information.")
+        set(ACMAKE_BUILTIN_SVN_REVISIONS NO)
+    endif( NOT SVN)
+    if( NOT SVNVERSION )
+        message("svnversion not found. Disabling repository information.")
+        set(ACMAKE_BUILTIN_SVN_REVISIONS NO)
+    endif( NOT SVNVERSION )
+    if( NOT EXISTS ${PROJECT_SOURCE_DIR}/.svn )
+        message("svnversion not found. Disabling repository information.")
+        set(ACMAKE_BUILTIN_SVN_REVISIONS NO)
+    endif( NOT EXISTS ${PROJECT_SOURCE_DIR}/.svn )
+endif( ACMAKE_BUILTIN_SVN_REVISIONS )
+
+macro(_ac_add_repository_info TARGET_NAME REVISION_FILE TARGET_TYPE)
+    # find out about this libraries repository location and revision
+    # and update the generated file ${REVISION_FILE}
+    # if neccessary.
+    add_custom_target( ${TARGET_NAME}_update_revision ALL
+            cmake -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
+                  -DTARGET_NAME=${TARGET_NAME} 
+                  -DTARGET_TYPE=${TARGET_TYPE}
+                  -DREVISION_FILE=${REVISION_FILE}
+                  -P ${ACMAKE_TOOLS_DIR}/AcUpdateSvnRevisionFile.cmake
+            COMMENT "Checking SVN revision")
+    # tell CMake not to worry if the revision file isn't there yet.
+    # It will be build in time using the custom target above
+    # XXX: All these generated files should somehow depend on
+    #      asl/base/RevisionInfo.h
+    set_source_files_properties(${REVISION_FILE} PROPERTIES GENERATED ON)
+    
+    # now tell CMake to call the custom target above before building
+    # the library. If the custom target updates the revision file the
+    # object is rebuild and the library relinked.
+    add_dependencies(${TARGET_NAME} ${TARGET_NAME}_update_revision)
+endmacro(_ac_add_repository_info )

@@ -38,11 +38,12 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+#include <iostream>
+#include <sstream>
+
 #include "Enum.h"
 #include "UnitTest.h"
 
-#include <iostream>
-#include <sstream>
 
 using namespace std;
 
@@ -295,6 +296,7 @@ int main(int argc, char *argv[]) {
         
     }
     cerr << ">> Finsihed test suite '" << argv[0] << "', return status = " << returnStatus << endl;
+
     return returnStatus;
 
 }
