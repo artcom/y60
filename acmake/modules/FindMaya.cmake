@@ -24,6 +24,15 @@ if(MAYA_SDK AND MAYA_VERSION)
         list(APPEND MAYA_LIBRARIES ${SUBLIB})
     endforeach(SUBLIB ${MAYA_SUBLIBS})
 
+    set(MAYA_DEFINITIONS -D_BOOL)
+
+    if(WIN32)
+        list(APPEND MAYA_DEFINITIONS -DNT_PLUGIN)
+    endif(WIN32)
+
+    if(APPLE)
+        list(APPEND MAYA_DEFINITIONS -DMAC_PLUGIN)
+    endif(APPLE)
 endif(MAYA_SDK AND MAYA_VERSION)
 
 include(FindPackageHandleStandardArgs)
