@@ -128,11 +128,11 @@ getString(const String & theC4dString) {
         myBuffer = new char [mySize];
     }
     
-	theC4dString.GetCString(myBuffer, theC4dString.GetLength() + 1, St7bit);	        		        
-	
-	myString = myBuffer;
-	
-	return myString;
+    theC4dString.GetCString(myBuffer, theC4dString.GetLength() + 1, St7bit);                            
+    
+    myString = myBuffer;
+    
+    return myString;
 }
 
 const String 
@@ -148,8 +148,8 @@ getTreeName(BaseObject * theNode) {
 
 void
 displayChannelProperties(BaseChannel * theChannel) {
-	BaseContainer myBaseContainer = theChannel->GetData();
-	std::string myMessage("Channel Properties - ");
+    BaseContainer myBaseContainer = theChannel->GetData();
+    std::string myMessage("Channel Properties - ");
 
     Vector myColor = myBaseContainer.GetVector(BASECHANNEL_COLOR_EX);
     myMessage += "Color: [" + as_string(myColor.x) + "," + as_string(myColor.y) + "," + as_string(myColor.z) + "] | ";

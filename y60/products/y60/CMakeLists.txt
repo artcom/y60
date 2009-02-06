@@ -20,6 +20,7 @@ set(JSTESTS
 Configurator
 Dom
 Enum
+ErrorHandling
 FileFunctions
 HotCoding
 JSApp

@@ -85,7 +85,7 @@ class ShapeExporter;
 class MaterialExporter;
 
 class SceneExporter : public SceneSaverData {
-	public:
+    public:
         DEFINE_NESTED_EXCEPTION(SceneExporter,Exception,asl::Exception);
         DEFINE_NESTED_EXCEPTION(SceneExporter,IOError,Exception);
         DEFINE_NESTED_EXCEPTION(SceneExporter,OpenFailed,IOError);
@@ -93,18 +93,18 @@ class SceneExporter : public SceneSaverData {
         DEFINE_NESTED_EXCEPTION(SceneExporter,WriteFailed,IOError);
 
         SceneExporter(bool theBinaryFlag);
-	    ~SceneExporter(void);
+        ~SceneExporter(void);
 
-		virtual LONG Save(PluginSceneSaver * theNode, const Filename & theFileName,
+        virtual LONG Save(PluginSceneSaver * theNode, const Filename & theFileName,
                           BaseDocument * theDocument, LONG theFlags);
 
-		static NodeData * Alloc(void) {
-		    return gNew SceneExporter(false);
-		}
+        static NodeData * Alloc(void) {
+            return gNew SceneExporter(false);
+        }
 
-		static NodeData * AllocBinary(void) {
-		    return gNew SceneExporter(true);
-		}
+        static NodeData * AllocBinary(void) {
+            return gNew SceneExporter(true);
+        }
 
     private:
         unsigned countObjects(BaseObject * theNode);
@@ -112,14 +112,14 @@ class SceneExporter : public SceneSaverData {
         BaseObject * polygonizeObject(BaseObject * theNode);
 
         bool writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
-  	                     BaseObject * & theNode,
+                           BaseObject * & theNode,
                          y60::WorldBuilderBasePtr & theParentBuilder,
                          bool theTransformFlag = true,
                          bool theForceFrontBackFacing = false,
                          const std::string & theNameAppendix = "");
 
         void writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
-	                      BaseObject * theNode,
+                          BaseObject * theNode,
                           bool theTransformFlag = true,
                           bool theForceFrontBackFacing = false);
 
@@ -160,8 +160,8 @@ class SceneExporter : public SceneSaverData {
         typedef std::map<BaseObject*, std::string> CameraMap;
         CameraMap _myExportedCameras;
 
-	    unsigned  _myObjectCount;
-	    bool      _myBinaryFlag;
+        unsigned  _myObjectCount;
+        bool      _myBinaryFlag;
 };
 
 #endif

@@ -128,9 +128,9 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                                 BaseContainer * theContainer,
                                 const TextureUsage & theUsage, TextureTag * theTextureTag,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
-								bool isAlphaChannel, bool isEnvMap)
+                                bool isAlphaChannel, bool isEnvMap)
 {
-	String myMaterialName = theMaterial->GetName();
+    String myMaterialName = theMaterial->GetName();
     if (!theContainer) {
         throw ExportException(std::string("Export texture with undefined cinema container"),
                                             "MaterialExporter::writeMaterial()");
@@ -166,9 +166,9 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     // internal texture format
     std::string myInternalFormat = "";
-	if (isAlphaChannel) {
-		myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
-	}
+    if (isAlphaChannel) {
+        myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
+    }
 
     // color scale
     Real myMixStrength = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
@@ -252,8 +252,8 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         }
 
         if (myTextureMappingMode != TEXCOORD_UV_MAP) {
-		    Matrix4f myTexGenMatrix;
-		    myTexGenMatrix.makeIdentity();
+            Matrix4f myTexGenMatrix;
+            myTexGenMatrix.makeIdentity();
 
             Matrix4f myNormalizeObjectCoordsMatrix;
             myNormalizeObjectCoordsMatrix.makeIdentity();
@@ -357,7 +357,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
                                TextureTag * theTextureTag,
                                const asl::Vector3f & theMinCoord, 
                                const asl::Vector3f & theMaxCoord,
-							   bool isAlphaChannel, bool isEnvMap)
+                               bool isAlphaChannel, bool isEnvMap)
 {
     GePrint("exportShader: Material=" + theMaterial->GetName());
 
@@ -401,9 +401,9 @@ MaterialExporter::exportShader(PluginShader * theShader,
             case Xgradient:
             case Xfilter:
             case Xnoise:
-			case Xfusion:
+            case Xfusion:
             case Xbase:
-			case Xnormaldirection:
+            case Xnormaldirection:
                 GePrint("Ignoring Shader: " + theShader->GetName());
                 break;
             default:
@@ -472,22 +472,22 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
                     }
                 }
             }
-		  }
+          }
           if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
             BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
             if (myAlphaChannel) {
-				PluginShader  * myShader = myAlphaChannel->GetShader();
-				if (myShader) {
-					LONG myShaderType = myShader->GetType();
-					if ( myShaderType == Xbitmap) {
-						GeData myData;
-						myTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
-						LONG myCinemaTexCoordMode = myData.GetLong();
-						myExportedMaterialInfo._myTexureMapping.push_back(myCinemaTexCoordMode);
-						myExportedMaterialInfo._myTextureCount++;
-					}
-				}
-			}
+                PluginShader  * myShader = myAlphaChannel->GetShader();
+                if (myShader) {
+                    LONG myShaderType = myShader->GetType();
+                    if ( myShaderType == Xbitmap) {
+                        GeData myData;
+                        myTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
+                        LONG myCinemaTexCoordMode = myData.GetLong();
+                        myExportedMaterialInfo._myTexureMapping.push_back(myCinemaTexCoordMode);
+                        myExportedMaterialInfo._myTextureCount++;
+                    }
+                }
+            }
           }
     }
     return myExportedMaterialInfo;
@@ -604,17 +604,17 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
                 BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
                 if (myAlphaChannel) {
-			        BaseContainer myColorContainer = myAlphaChannel->GetData();
-			        String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
-			        String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
+                    BaseContainer myColorContainer = myAlphaChannel->GetData();
+                    String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
+                    String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
                     GePrint("### " + myMaterial->GetName() + ": Alpha texture=" + myTextureName);
-	                PluginShader  * myShader = myAlphaChannel->GetShader();
+                    PluginShader  * myShader = myAlphaChannel->GetShader();
                     exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
                                  &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
-		        }
-		    }
+                }
+            }
 
-		    myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
+            myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
                                                         (myMaterial->GetChannelState(CHANNEL_TRANSPARENCY)==TRUE) ;
 
             // Specular color
@@ -758,3 +758,4 @@ MaterialExporter::getTexturePath(Filename & theDocumentPath, String & theTexture
 
     return getString(mySearchPath);
 }
+

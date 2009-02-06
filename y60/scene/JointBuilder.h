@@ -78,13 +78,13 @@
 
 namespace y60 {
 
-    Y60_SCENE_EXPORT class JointBuilder : public TransformBuilderBase {
+    class Y60_SCENE_EXPORT JointBuilder : public TransformBuilderBase {
         public:
-            Y60_SCENE_EXPORT JointBuilder(const std::string & theName);
-            Y60_SCENE_EXPORT virtual ~JointBuilder() {};
+            JointBuilder(const std::string & theName);
+            virtual ~JointBuilder() {};
 
-            Y60_SCENE_EXPORT void setJointOrientation(const asl::Vector3f & theOrientation);
-            Y60_SCENE_EXPORT void setJointOrientation(const asl::Quaternionf & theJointOrientation);
+            void setJointOrientation(const asl::Vector3f & theOrientation);
+            void setJointOrientation(const asl::Quaternionf & theJointOrientation);
         private:
     };
 

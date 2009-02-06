@@ -13,3 +13,5 @@ add_subdirectory(GenMovie)
 add_subdirectory(greplace)
 add_subdirectory(namesearch)
 add_subdirectory(watchdog)
+#add_subdirectory(cinemax)
+

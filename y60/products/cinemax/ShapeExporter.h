@@ -86,9 +86,9 @@ namespace asl {
 }
 
 class ShapeExporter {
-	public:
-    	ShapeExporter(y60::SceneBuilder & theSceneBuilder, MaterialExporter & theMaterialExporter);
-	    ~ShapeExporter() {};	
+    public:
+        ShapeExporter(y60::SceneBuilder & theSceneBuilder, MaterialExporter & theMaterialExporter);
+        ~ShapeExporter() {};    
 
         std::vector<std::string> writeShape(BaseObject * theNode, BaseObject * thePolygonizedNode,
                                             bool theForceFrontBackFacing = false);
@@ -99,20 +99,20 @@ class ShapeExporter {
 
         std::string writeSelection(BaseObject * theNode, BaseObject * thePolygonNode,
                                    SelectionTag * theSelection,
-								   SelectionTag * theBaseSelection,
+                                   SelectionTag * theBaseSelection,
                                    const TextureList & theTextureList,
                                    const UVTagList & theUVTagList,
                                    bool theForceFrontBackFacing);
 
-		void setupNormalBuilder(asl::VertexNormalBuilder<float> & theVertexNormalBuilder,
-								BaseObject * theNode);
+        void setupNormalBuilder(asl::VertexNormalBuilder<float> & theVertexNormalBuilder,
+                                BaseObject * theNode);
 
-		void findExtrema(asl::Vector3f & theVector, const Vector & theVertex, bool theMinFlag);
+        void findExtrema(asl::Vector3f & theVector, const Vector & theVertex, bool theMinFlag);
 
         unsigned appendVertexNormal(asl::VertexNormalBuilder<float> & theVertexNormalBuilder, 
-					                y60::ShapeBuilder & theShapeBuilder,
-				                    const asl::Vector3f & theFaceNormal, 
-						            long theVertexIndex, float theSmoothingAngle);
+                                    y60::ShapeBuilder & theShapeBuilder,
+                                    const asl::Vector3f & theFaceNormal, 
+                                    long theVertexIndex, float theSmoothingAngle);
 
         void appendVertexIndices(y60::ElementBuilder & theElementBuilder, 
                                  int thePositionIndex, int theColorIndex, int theNormalIndex,

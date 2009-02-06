@@ -320,7 +320,7 @@ SceneExporter::polygonizeObject(BaseObject * theNode)
 
     // Free unused results
     for (LONG i = 1; i < myNumResults; ++i) {
-		BaseObject * myObject = (BaseObject*)myNodeCommand.result->GetIndex(i);
+        BaseObject * myObject = (BaseObject*)myNodeCommand.result->GetIndex(i);
         BaseObject::Free(myObject);
     }
 #else
@@ -459,8 +459,8 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
                             bool theTransformFlag,
                             bool theForceFrontBackFacing)
 {
-	// Update progress bar
-	ourProgressCounter++;
+    // Update progress bar
+    ourProgressCounter++;
     if (_myObjectCount && !(ourProgressCounter & 63)) {
         StatusSetBar(Real(ourProgressCounter) / Real(_myObjectCount) * 100.0);
     }
@@ -519,7 +519,7 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
 
 bool 
 SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
-	                        BaseObject * & theNode,
+                            BaseObject * & theNode,
                             y60::WorldBuilderBasePtr & theParentBuilder,
                             bool theTransformFlag,
                             bool theForceFrontBackFacing,
@@ -589,18 +589,18 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
                 }
             }
             break;
-		case Osds:
-			{
-				// Write transform
-				theParentBuilder = writeTransform(theTransformBuilder, theNode);
-				BaseObject * myChildNode = theNode->GetDown();
-				while (myChildNode) {
-					writeObjects(theParentBuilder, myChildNode, true, theForceFrontBackFacing);
-					myChildNode = myChildNode->GetNext();
-				}
+        case Osds:
+            {
+                // Write transform
+                theParentBuilder = writeTransform(theTransformBuilder, theNode);
+                BaseObject * myChildNode = theNode->GetDown();
+                while (myChildNode) {
+                    writeObjects(theParentBuilder, myChildNode, true, theForceFrontBackFacing);
+                    myChildNode = myChildNode->GetNext();
+                }
                 return false;
-			}
-			break;
+            }
+            break;
         case Obend:
         case Obulge:
         case Oshear:

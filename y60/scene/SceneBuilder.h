@@ -73,9 +73,6 @@
     #include <sstream>
 #endif
 
-namespace asl {
-    //class WriteableStream;
-}
 
 namespace y60 {
 
@@ -100,7 +97,7 @@ namespace y60 {
      */
     class Y60_SCENE_EXPORT SceneBuilder : public BuilderBase {
         public:
-	    SceneBuilder(dom::DocumentPtr theDocument);
+            SceneBuilder(dom::DocumentPtr theDocument);
 
             virtual ~SceneBuilder();
             const std::string & appendShape(ShapeBuilder & theShape);
