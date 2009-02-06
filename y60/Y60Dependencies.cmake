@@ -25,6 +25,7 @@ find_package(OpenEXR)
 
 find_package(GLIB2)
 find_package(MOZJS)
+find_package(Maya)
 
 pkg_search_module(GTKMM gtkmm-2.4)
 pkg_search_module(GLADEMM libglademm-2.4)

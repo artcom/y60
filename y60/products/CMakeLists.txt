@@ -12,6 +12,10 @@ add_subdirectory(GenCubemap)
 add_subdirectory(GenMovie)
 add_subdirectory(greplace)
 add_subdirectory(namesearch)
+
+if(MAYA_FOUND)
+    add_subdirectory(maya-xport)
+endif(MAYA_FOUND)
+
 add_subdirectory(watchdog)
 #add_subdirectory(cinemax)
-
