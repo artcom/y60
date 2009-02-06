@@ -88,7 +88,7 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"-I", "include path (semicolon-separated)"},
     {"--no-jswarnings", ""},
     {"--pause-on-error", ""},
-    {"--revision","[componentname|all]"},
+    {"--new-revision","[componentname|all]"},
     {"--std-logfile", "logfile base filename for stdout/stderr"},
 #ifndef SPIDERMONK
     {"--jit", ""},
@@ -143,8 +143,8 @@ main(int argc, char **argv) {
             return 1;
         }
 
-        if (ourArguments.haveOption("--revision")) {
-            std::string component = ourArguments.getOptionArgument("--revision");
+        if (ourArguments.haveOption("--new-revision")) {
+            std::string component = ourArguments.getOptionArgument("--new-revision");
             if (component.empty()) {
             } else if (component == "all") {
                 std::cout << asl::RevisionInfoPool::get();
