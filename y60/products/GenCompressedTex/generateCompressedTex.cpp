@@ -75,9 +75,9 @@
 
 #if 0
 #ifdef OSX
-	#include <GLUT/glut.h>
+    #include <GLUT/glut.h>
 #else
-	#include <GL/glut.h>
+    #include <GL/glut.h>
 #endif
 #endif
 
@@ -227,7 +227,9 @@ getTargetFilename(const asl::Arguments & theArguments,
     if (myOutDir.length()) {
         myTargetDir += theDirectorySeparator + myOutDir;
     }
-    return myTargetDir + theDirectorySeparator + myTargetFilenamePart;
+    if(myTargetDir.length()>1)
+        return myTargetDir + theDirectorySeparator + myTargetFilenamePart;
+    return myTargetFilenamePart;
 }
 
 bool

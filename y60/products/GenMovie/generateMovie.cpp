@@ -124,7 +124,7 @@ string
 getTargetFilename(const string & theTargetDir, const string & theSourceFileName) {
 
     return theTargetDir + theDirectorySeparator +
-        theSourceFileName.substr(0,theSourceFileName.find_last_of("."))+".dxt";
+            theSourceFileName.substr(0,theSourceFileName.find_last_of("."))+".dxt";
 }
 
 void writeHeader(asl::WriteableStream & theTargetBlock, MovieEncoding theCompression,
@@ -202,20 +202,20 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
         myNewFrame = myFrame->getData();
     }
     if (theMovieEncoding == MOVIE_RLE || theMovieEncoding == MOVIE_DRLE) {
-		DB(
-			cerr << "  Appending compressed frame with size: " << myNewFrame->accessReadableBlock().size() << endl;
-			cerr << "  at fileposition: " << theTargetBlock.size() << endl;
-		)
-		theTargetBlock.appendUnsigned32(myNewFrame->accessReadableBlock().size());
+        DB(
+            cerr << "  Appending compressed frame with size: " << myNewFrame->accessReadableBlock().size() << endl;
+            cerr << "  at fileposition: " << theTargetBlock.size() << endl;
+        )
+        theTargetBlock.appendUnsigned32(myNewFrame->accessReadableBlock().size());
         theTargetBlock.append(myNewFrame->accessReadableBlock());
-	} else {
-		DB(
-			cerr << "  Appending uncompressed frame with size: " << raster_cast(myNewFrame)->pixels().size() << endl;
-			cerr << "  at fileposition: " << theTargetBlock.size() << endl;
-		)
-		theTargetBlock.appendUnsigned32(raster_cast(myNewFrame)->pixels().size());
-		theTargetBlock.append(raster_cast(myNewFrame)->pixels());
-	}
+    } else {
+        DB(
+            cerr << "  Appending uncompressed frame with size: " << raster_cast(myNewFrame)->pixels().size() << endl;
+            cerr << "  at fileposition: " << theTargetBlock.size() << endl;
+        )
+        theTargetBlock.appendUnsigned32(raster_cast(myNewFrame)->pixels().size());
+        theTargetBlock.append(raster_cast(myNewFrame)->pixels());
+    }
 
     ourPreviousFrame = myFrame;
 }
