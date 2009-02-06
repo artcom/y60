@@ -95,6 +95,13 @@ function fullMatMult2(a, b) {
     return c;
 }
 
+function matVecMult(v, m) {
+    var result = [1,0,0,0]
+    for (var i = 0; i < 4; ++i) {
+        result[0] = v[0] * m[0][i] + v[1] * m[1][i] + v[2] * m[2][i] + v[3] * m[3][i];
+    }
+    return result;
+}
 //###################################
 //# i = i + 1
 
@@ -126,6 +133,7 @@ duration = stop - start
 
 print(n.toString() + " i = my_add(i,1) took "+ duration +"msec. ("+ n/duration/1e3 +" mio. per sec)");
 
+
 //###################################
 //# a = fullMatMult(b, c)
 i = 0
@@ -143,4 +151,34 @@ stop = millisec()
 duration = stop - start
 
 print(n.toString() + " j = fullMatMult took "+ duration +"msec. ("+ n/duration * 1000+" per sec)");
+
+//###################################
+//# a = product(vec,  mat)
+var m = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)
+var v = new Vector4f(2,0,0,0)
+
+start = millisec()
+
+for (i = 0; i < n; i+=1) {
+    var c = product(v, m)
+}
+stop = millisec()
+duration = stop - start
+
+print(n.toString() + "  a = product(vec,  mat) took "+ duration +"msec. ("+ n/duration * 1000+" per sec)");
+
+//###################################
+//# a = product(vec,  mat)
+var m = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+var v = [1,2,3,4]
+
+start = millisec()
+
+for (i = 0; i < n; i+=1) {
+    var c = matVecMult(v, m)
+}
+stop = millisec()
+duration = stop - start
+
+print(n.toString() + "  a = matVecMult(vec,  mat) took "+ duration +"msec. ("+ n/duration * 1000+" per sec)");
 
