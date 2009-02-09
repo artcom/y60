@@ -61,9 +61,12 @@ macro(ac_add_executable EXECUTABLE_NAME)
     _ac_attach_depends(${THIS_EXECUTABLE_NAME} "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}")
 
     if(THIS_EXECUTABLE_OSX_BUNDLE)
+        message("============== BUNDLE ======================")
         set_target_properties( ${THIS_EXECUTABLE_NAME}
                 PROPERTIES
                     MACOSX_BUNDLE ON )
+    else(THIS_EXECUTABLE_OSX_BUNDLE)
+        message("============== NOT A BUNDLE ======================")
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
     # define installation
