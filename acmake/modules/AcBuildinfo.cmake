@@ -75,7 +75,8 @@ macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE SOURCES
         set( ALL_DEPEND_FILES ${SOURCES} ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
         add_custom_command( OUTPUT ${BUILDINFO_FILENAME}
                 COMMAND
-                    cmake -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
+                    ${CMAKE_COMMAND}
+                          -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
                           -DTARGET_NAME=${TARGET_NAME} 
                           -DTARGET_TYPE=${TARGET_TYPE}
                           -DBUILDINFO_FILE=${BUILDINFO_FILENAME}
