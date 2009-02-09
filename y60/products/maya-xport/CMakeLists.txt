@@ -23,6 +23,9 @@ SceneExporter.h
 ShapeExporter.h
 )
 
+# XXX: add definitions for compiling maya plugin
+add_definitions(${MAYA_PLUGIN_DEFINTIONS})
+
 ac_add_plugin(
     maya-xport y60/maya-xport
     SOURCES ${SOURCES}
@@ -30,3 +33,4 @@ ac_add_plugin(
     DEPENDS y60scene y60modelling
     EXTERNS MAYA
 )
+

@@ -86,7 +86,7 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
         endif ( ${EXTERN}_DEFINITIONS )
     endforeach(EXTERN)
     
-    # collect libraries into various subsets
+    # collect and clean definitions
     set(ALL_DEFINITIONS
         ${EXTERN_DEFINITIONS}
     )
@@ -99,6 +99,15 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
         ${EXTERN_LIBRARIES_DEBUG}
         ${EXTERN_LIBRARIES_OPTIMIZED}
     )
+    foreach(DEF ${ALL_DEFINITIONS})
+        if(DEF MATCHES "-D.*")
+            list(REMOVE_ITEM ALL_DEFINITIONS "${DEF}")
+            string(REGEX REPLACE "^-D(.*)$" "\\1" DEF ${DEF})
+            list(APPEND ALL_DEFINITIONS ${DEF})
+        endif(DEF MATCHES "-D.*")
+    endforeach(DEF)
+
+    # collect libraries into various subsets
     if(ALL_LIBRARIES)
         list(REMOVE_DUPLICATES ALL_LIBRARIES)
     endif(ALL_LIBRARIES)
