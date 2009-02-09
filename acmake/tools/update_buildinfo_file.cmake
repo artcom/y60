@@ -94,6 +94,11 @@ endif (SCM)
 
 set(ACMAKE_GENERATOR "${CMAKE_CURRENT_LIST_FILE}" )
 set(ACMAKE_TEMPLATE_FILE "${BUILDINFO_TEMPLATE}" )
+# XXX CMake configure_file is smart. it just updates the file
+# if the content actually will change. In this case we don't want that.
+# Best wy I found so far is to remove the file before updating it :-(
+# [DS]
+file(REMOVE ${BUILDINFO_FILE} "//")
 configure_file( ${BUILDINFO_TEMPLATE}
                 ${BUILDINFO_FILE}
                 @ONLY)
