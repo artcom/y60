@@ -42,8 +42,7 @@ if(ACMAKE_BUILDINFO)
                 set(SVN_OK NO)
             endif( NOT SVNVERSION )
             if(SVN_OK)
-                list(APPEND SVN_ARGS "-DSVN_CMD=${SVN}"
-                                     "-DSVNVERSION_CMD=${SVNVERSION}")
+                set(SVN_ARGS -DSVN_CMD=${SVN} -DSVNVERSION_CMD=${SVNVERSION})
                 set(SVN_DEPEND_FILES "${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries" )
                 list(APPEND DETECTED_SCMS SVN)
             endif(SVN_OK)
@@ -73,7 +72,7 @@ endif( ACMAKE_BUILDINFO )
 
 macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE SOURCES)
     if( ACMAKE_BUILDINFO)
-        list(APPEND ALL_DEPEND_FILES ${SOURCES} ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
+        set( ALL_DEPEND_FILES ${SOURCES} ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
         add_custom_command( OUTPUT ${BUILDINFO_FILENAME}
                 COMMAND
                     cmake -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
