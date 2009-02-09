@@ -29,6 +29,13 @@ macro(debug_searchpath)
     endif(ACMAKE_DEBUG_SEARCHPATH)
 endmacro(debug_searchpath)
 
+option(ACMAKE_DEBUG_DEFINITIONS "Debug acmake preprocessor definition handling" NO)
+macro(debug_definitions)
+    if(ACMAKE_DEBUG_DEFINITIONS)
+        message("DEFINITIONS: ${ARGN}")
+    endif(ACMAKE_DEBUG_DEFINITIONS)
+endmacro(debug_definitions)
+
 # attach libraries from DEPENDS and EXTERNS to TARGET
 macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
@@ -76,11 +83,6 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
         endif(EXTERN MATCHES ".*\\.framework/?$")
         if ( ${EXTERN}_DEFINITIONS )
             list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
-            set_target_properties(
-                ${TARGET} 
-                    PROPERTIES
-                    COMPILE_DEFINITIONS ${EXTERN_DEFINITIONS}
-            )
         endif ( ${EXTERN}_DEFINITIONS )
     endforeach(EXTERN)
     
@@ -125,15 +127,18 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     debug_linkage("${TARGET} always links against ${GENERAL_LIBRARIES}")
     foreach(LIBRARY ${DEBUG_LIBRARIES})
         target_link_libraries(${TARGET} debug ${LIBRARY})
-        debug_linkage("${TARGET} links against ${LIBRARY} when compiled debug")
+        debug_linkage("${TARGET}, when compiled debug, links against ${LIBRARY}")
     endforeach(LIBRARY ${DEBUG_LIBRARIES})
     foreach(LIBRARY ${OPTIMIZED_LIBRARIES})
         target_link_libraries(${TARGET} optimized ${LIBRARY})
-        debug_linkage("${TARGET} links against ${LIBRARY} when compiled optimized")
+        debug_linkage("${TARGET}, when compiled optimized, links against ${LIBRARY}")
     endforeach(LIBRARY ${OPTIMIZED_LIBRARIES})
 
     # declare all libraries as transient link deps
     # and make extern definitions available to source files
+    if(ALL_DEFINITIONS)
+        debug_definitions("${TARGET} will be compiled with definitions ${ALL_DEFINITIONS}")
+    endif(ALL_DEFINITIONS)
     set_target_properties(
         ${TARGET}
         PROPERTIES
