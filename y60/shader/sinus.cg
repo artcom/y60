@@ -1,0 +1,50 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wave_2d.cg,v $
+//   $Author: valentin $
+//   $Revision: 1.7 $
+//   $Date: 2004/08/25 11:28:17 $
+//
+//  Description: 
+//=============================================================================
+
+struct app2vert { 
+    float4 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
+};
+
+const float PI = 3.141592654;
+
+struct vert2frag {
+    float4 Vertex    : POSITION;
+    float2 TexCoord  : TEXCOORD0;
+};
+
+vert2frag mainVertex(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord = IN.TexCoord;
+
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform float amplitude): COLOR
+{
+    float center_distance =  length( 2.0 * ( IN.TexCoord.st - 0.5 ) );
+    float h = amplitude * max(0,cos( 0.5 * PI * center_distance));
+    float4 myColor = float4( h, h ,h, 1.0 );
+    return myColor;
+}

@@ -1,0 +1,79 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wave_2d.cg,v $
+//   $Author: valentin $
+//   $Revision: 1.7 $
+//   $Date: 2004/08/25 11:28:17 $
+//
+//  Description: 
+//=============================================================================
+
+struct app2vert { 
+    float4 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
+};
+
+struct vert2frag {
+    float4 Vertex    : POSITION;
+    float2 TexCoord  : TEXCOORD0;
+};
+
+vert2frag mainVertex(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord = IN.TexCoord;
+
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN, 
+                    uniform sampler2D current_cells,
+                    uniform sampler2D previous_cells,
+                    uniform float damping,
+                    uniform float2 theTexSize): COLOR
+{
+    float s = IN.TexCoord.s;
+    float t = IN.TexCoord.t;
+
+    float ds = 1.0/theTexSize.x;
+    float dt = 1.0/theTexSize.y;
+
+    // sum neighbours from current heightfield
+    // the values are stored in the 2nd (green or y) channel
+    float current_neighbour_sum =
+        tex2D( current_cells, float2( s - ds, t - dt) ).y +
+        tex2D( current_cells, float2( s, t - dt) ).y +
+        tex2D( current_cells, float2( s + ds, t - dt) ).y +
+
+        tex2D( current_cells, float2( s - ds, t) ).y +
+        tex2D( current_cells, float2( s + ds, t) ).y +
+
+        tex2D( current_cells, float2( s - ds, t + dt) ).y +
+        tex2D( current_cells, float2( s, t + dt) ).y +
+        tex2D( current_cells, float2( s + ds, t + dt) ).y;
+
+    // fetch previous height at this position
+    float previous_height = tex2D( previous_cells, IN.TexCoord.st ).y;
+
+    // fetch splash intensity from the red channel of the current buffer
+    float splash = tex2D( current_cells, IN.TexCoord.st).r;
+
+    float new_height =
+        damping * ( current_neighbour_sum / 4.0 - previous_height ) + splash;
+    // output new height in the green channel
+    float4 myColor = float4( 0, new_height, 0, 1);
+//    return float4(1,0,0,1);//myColor;
+    return myColor;
+}

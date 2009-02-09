@@ -1,0 +1,106 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#include "glow_utils.cg"
+
+struct vert2frag {
+    float4 position  : POSITION;
+    float2 texCoord0 : TEXCOORD0;
+};
+
+vert2frag mainVertex(float4 thePosition  : POSITION,
+                     float4 theTexCoord0 : TEXCOORD0,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+    OUT.position  = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord0 = mul(GL_TEXTURE, theTexCoord0).xy;
+
+    return OUT;
+}
+
+
+// Textglow Fragment Shader
+float4 mainFragmentGlow(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform float width,
+                    uniform float height,
+                    uniform float glow_radius,
+                    uniform float4 surfacecolor,
+                    uniform float4 glow_color,
+                    uniform float2 offset) : COLOR
+{    
+    float4 myGlow = float4(0.0);
+    float4 myText = tex2D(tex0, float2(IN.texCoord0.xy));
+    
+    float pixW = 1.0/width;
+    float pixH = 1.0/height;
+
+    if (glow_radius != 0.0) {
+        myGlow = float4(glow_color.rgb, applyGauss(tex0, IN.texCoord0.xy-(offset*float2(pixW, pixH)), 
+                                         glow_radius, pixW, pixH).a);
+        myGlow.a *= glow_color.a;
+    }
+    return calculateTextGlow(myGlow, myText) * surfacecolor;
+}
+
+// Textblur Fragment Shader
+float4 mainFragmentBlur(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform float blur,
+                    uniform float width,
+                    uniform float height,
+                    uniform float4 surfacecolor) : COLOR
+{    
+    float4 myReturn = float4(0.0);
+    float pixW = 1.0/width;
+    float pixH = 1.0/height;
+    
+    if (blur == 0.0) {
+        myReturn = tex2D(tex0, float2(IN.texCoord0.xy));
+    } else {
+        myReturn = applyGauss(tex0, IN.texCoord0.xy, blur, pixW, pixH);
+    }
+    
+    return myReturn*surfacecolor;
+}
+
+// Textglow including Textblur Fragment Shader
+float4 mainFragmentGlowBlur(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform float width,
+                    uniform float height,
+                    uniform float blur,
+                    uniform float glow_radius,
+                    uniform float4 surfacecolor,
+                    uniform float4 glow_color,
+                    uniform float2 offset) : COLOR
+{    
+
+    float4 myGlow = float4(0.0);
+    float4 myText = float4(0.0);
+    
+    float pixW = 1.0/width;
+    float pixH = 1.0/height;
+    
+    if (blur > 0.0) {
+        myText = applyGauss(tex0, IN.texCoord0.xy, blur, pixW, pixH);
+    } else {
+        myText = tex2D(tex0, float2(IN.texCoord0.xy));
+    }
+
+    if (glow_radius != 0.0) {
+        myGlow = float4(glow_color.rgb, applyGauss(tex0, IN.texCoord0.xy-(offset*float2(pixW, pixH)), 
+                                         glow_radius + blur, pixW, pixH).a);
+        myGlow.a *= glow_color.a;
+    }
+    return calculateTextGlow(myGlow, myText) * surfacecolor;
+}
