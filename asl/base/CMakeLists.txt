@@ -128,7 +128,7 @@ UnitTest
 
 if(UNIX)
     list(APPEND SOURCES signal_functions.cpp)
-	list(APPEND HEADERS signal_functions.h)
+    list(APPEND HEADERS signal_functions.h)
     list(APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
 endif(UNIX)
 
@@ -147,7 +147,7 @@ endif(LINUX)
 if(WIN32)
     list(APPEND SOURCES Win32Backtrace.cpp)
     list(APPEND HEADERS Win32Backtrace.h)
-	set(PSAPI_LIBRARIES Psapi) # XXX: write find package
+    set(PSAPI_LIBRARIES Psapi) # XXX: write find package
     list(APPEND EXTERNS PTHREADVC PSAPI)
 endif(WIN32)
 

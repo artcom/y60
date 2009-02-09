@@ -29,20 +29,15 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}"
     )
     
-    if( ACMAKE_BUILTIN_SVN_REVISIONS)
-        set( THIS_PLUGIN_REVISION_FILE
-                "${CMAKE_CURRENT_BINARY_DIR}/${THIS_PLUGIN_NAME}${ACMAKE_REVISION_FILE_SUFFIX}")
-    endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+    _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
     # define the target
     add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES}
-            ${THIS_PLUGIN_HEADERS} ${THIS_PLUGIN_REVISION_FILE})
-    
-    if( ACMAKE_BUILTIN_SVN_REVISIONS)
-        # update repository and revision information
-        _ac_add_repository_info( ${THIS_PLUGIN_NAME} ${THIS_PLUGIN_REVISION_FILE}
-                    "plugin" )
-    endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+            ${THIS_PLUGIN_HEADERS} ${THIS_PLUGIN_BUILDINFO_FILE})
+
+    # update repository and revision information
+    _ac_add_repository_info( ${THIS_PLUGIN_NAME} ${THIS_PLUGIN_BUILDINFO_FILE}
+                PLUGIN ${THIS_PLUGIN_SOURCES} ${THIS_PLUGIN_HEADERS})
 
     # link to aslbase because it contains asl::PluginBase
     #   XXX: acmake should not be asl-specific

@@ -21,7 +21,7 @@
 */
 
 #ifdef AC_BUILT_WITH_CMAKE
-#include "aslbase_paths.h"
+#include <acmake/aslbase_paths.h>
 #endif
 
 #include <string>

@@ -41,8 +41,10 @@
 #include "Path.h"
 #include "Logger.h"
 #include "Revision.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <acmake/buildinfo.h>
+#endif
 
-#include <sstream>
 
 using namespace std;
 
@@ -68,6 +70,7 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
         }
         ++i;
     }
+    // TODO: find a better place for this
     _allowedOptions["--revision"] = "";
     _allowedOptions["--version"] = "";
     _allowedOptions["--copyright"] = "";
@@ -152,6 +155,7 @@ Arguments::parse(int argc, const char * const argv[], StringEncoding theEncoding
         } else if (argv[i][0] == OPTION_START_CHAR) {
             map<string,string>::const_iterator foundItem = _allowedOptions.find(argv[i]);
             if (foundItem != _allowedOptions.end()) {
+                // TODO: find a better place for this
                 if (foundItem->first == "--revision") {
                     printRevision();
                     return false;
@@ -199,6 +203,8 @@ Arguments::parse(int argc, const char * const argv[], StringEncoding theEncoding
     return argc != 0;
 }
 
+// XXX: This certainly has to be removed from the open-source release. Otherwise all
+//      apps that use asl would be claimed by ART+COM.
 void
 Arguments::printCopyright() const {
     AC_PRINT << _programName << " Copyright (C) 2003-2009 ART+COM";
@@ -206,55 +212,87 @@ Arguments::printCopyright() const {
 
 void
 Arguments::printRevision() const {
+#ifdef AC_BUILT_WITH_CMAKE
+    AC_PRINT << _programName << " revision "
+             << acmake::build_information::get().executable().history_id();
+#else
     AC_PRINT << "Revision: " << ourRevision;
+#endif
 }
 
 void
 Arguments::printVersion() const {
+#ifdef AC_BUILT_WITH_CMAKE
+    acmake::build_target_info const& executable = acmake::build_information::get().executable();
+    AC_PRINT << "Build on " << executable.build_date() << " at "
+             << executable.build_time()
+             << " (Rev: " << executable.history_id() << ")";
+#else
     AC_PRINT << "Build on " << __DATE__ << " at " << __TIME__ << " (Rev: " << asl::ourRevision << ")";
+#endif
+}
+
+void
+Arguments::addUsageString(std::ostringstream & os) const {
+    os << "Usage: " << _programName << " ";
+    for (map<string,string>::const_iterator it = _allowedOptions.begin(); it != _allowedOptions.end(); ++it) {
+        os << "[" << it->first;
+        if (it->second != "") {
+            os << " <" << it->second << ">";
+        }
+        os << "] ";
+    }
+    for (unsigned i = 0; i < _argumentNames.size(); ++i) {
+        os << toUpperCase(_argumentNames[i]) << " ";
+    }
+    os << endl;
+    if ( ! _myGeneralShortDescription.empty()) {
+        os << _myGeneralShortDescription << endl;
+    }
+    if ( ! _argumentDescriptions.empty()) {
+        os << "Arguments:" << endl;
+        for (unsigned i = 0; i < _argumentNames.size() && i < _argumentDescriptions.size(); ++i) {
+            os << "   " << toUpperCase(_argumentNames[i]) << " : " << _argumentDescriptions[i] << endl;
+        }
+    }
 }
 
 void
 Arguments::printUsage() const {
     ostringstream myUsage;
-    myUsage << "Usage: " << _programName << " ";
-    for (map<string,string>::const_iterator it = _allowedOptions.begin(); it != _allowedOptions.end(); ++it) {
-        myUsage << "[" << it->first;
-        if (it->second != "") {
-            myUsage << " <" << it->second << ">";
-        }
-        myUsage << "] ";
-    }
-    for (unsigned i = 0; i < _argumentNames.size(); ++i) {
-        myUsage << _argumentNames[i] << " ";
-    }
-    myUsage << endl;
-    if (_myGeneralShortDescription.size()) {
-        // all in one description
-        myUsage << _myGeneralShortDescription << endl;
-    }
-    if (_optionDescriptions.size()) {
-		for (map<string,string>::const_iterator it = _allowedOptions.begin();
-			 it != _allowedOptions.end(); ++it) 
-		{
-           myUsage << "  " << it->first;
-           if (it->second != "") {
-               myUsage << " <" << it->second << ">";
-		   }
-		   myUsage << ": " << _optionDescriptions.find(it->first)->second << endl;
-        }
-    }
-    if (_argumentDescriptions.size()) {
-        for (unsigned i = 0; i < _argumentNames.size() && i < _argumentDescriptions.size(); ++i) {
-            myUsage << "<" << _argumentNames[i] << "> : " << _argumentDescriptions[i] << endl;
-        }
-    }
-    if (_myGeneralLongDescription.size()) {
-        // all in one description
-        myUsage << _myGeneralLongDescription << endl;
+    addUsageString( myUsage );
+    if ( _allowedOptions.find("--help") != _allowedOptions.end()) {
+        myUsage << endl;
+        myUsage << "Type '" << _programName
+                << " --help' for more information.";
     }
     AC_PRINT << myUsage.str();
 }
+
+void
+Arguments::printHelp() const {
+    ostringstream myHelp;
+    addUsageString( myHelp );
+    myHelp << std::endl;
+    if (_optionDescriptions.size()) {
+        myHelp << "Options:" << endl;
+		for (map<string,string>::const_iterator it = _allowedOptions.begin();
+			 it != _allowedOptions.end(); ++it) 
+		{
+           myHelp << "  " << it->first;
+           if (it->second != "") {
+               myHelp << " <" << it->second << ">";
+		   }
+		   myHelp << ": " << _optionDescriptions.find(it->first)->second << endl;
+        }
+    }
+    if (_myGeneralLongDescription.size()) {
+        myHelp << endl;
+        myHelp << _myGeneralLongDescription;
+    }
+    AC_PRINT << myHelp.str();
+}
+
 
 void
 Arguments::setShortDescription(const std::string & theDescription) {

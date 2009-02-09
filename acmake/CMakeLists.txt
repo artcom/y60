@@ -7,11 +7,13 @@ project(AcMake)
 set(ACMAKE_TOOLS_SUB share/cmake-2.6/Tools)
 set(ACMAKE_MODULES_SUB share/cmake-2.6/Modules)
 set(ACMAKE_TEMPLATES_SUB share/cmake-2.6/Templates)
+set(ACMAKE_INCLUDE_SUB include )
 
 # generate config file describing installation
 set(ACMAKE_INSTALLED_TOOLS_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_TOOLS_SUB})
 set(ACMAKE_INSTALLED_MODULES_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_MODULES_SUB})
 set(ACMAKE_INSTALLED_TEMPLATES_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_TEMPLATES_SUB})
+set(ACMAKE_INSTALLED_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_INCLUDE_SUB})
 configure_file(AcMakeConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/AcMakeConfig.cmake @ONLY)
 
 # install config file
@@ -44,5 +46,14 @@ install(
     DESTINATION ${ACMAKE_TOOLS_SUB}
     FILES_MATCHING
         PATTERN "*.jar"
+	PATTERN ".svn" EXCLUDE
+)
+
+#install acmake headers
+install(
+    DIRECTORY include/
+    DESTINATION ${ACMAKE_INCLUDE_SUB}
+    FILES_MATCHING
+        PATTERN "*.h"
 	PATTERN ".svn" EXCLUDE
 )

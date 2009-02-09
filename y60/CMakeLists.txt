@@ -70,30 +70,48 @@ if(Y60_WITH_GTK)
     add_subdirectory(jsgtk)
 endif(Y60_WITH_GTK)
 
+if(OSX)
+    option(Y60_MAC_OS_X_BUNDLE
+            "Build y60 as a Mac OS X bundle instead of a unix executable"
+            OFF)
+endif(OSX)
+
+if(Y60_MAC_OS_X_BUNDLE)
+    file(GLOB_RECURSE Y60_SCRIPT_FILES js/*.js)
+    ac_create_resource_set( Y60_RESOURCES
+                   "${CMAKE_CURRENT_SOURCE_DIR}"
+                   "Resources"
+                   "${Y60_SCRIPT_FILES}")
+    list(APPEND SHADER_EXTENSIONS "*.cg" "*.xml" "*.png" "*.rgb" )
+    foreach( EXT ${SHADER_EXTENSIONS})
+        file(GLOB_RECURSE Y60_SHADER_FILES "shader/${EXT}")
+        ac_add_resources( Y60_RESOURCES "${Y60_SHADER_FILES}")
+    endforeach( EXT SHADER_EXTENSIONS)
+else(Y60_MAC_OS_X_BUNDLE)
+    # Install script library
+    install(
+        DIRECTORY js
+        DESTINATION lib/y60
+        FILES_MATCHING
+            PATTERN "*.js"
+            PATTERN ".svn" EXCLUDE
+    )
+
+    # Install shader library
+    install(
+        DIRECTORY shader
+        DESTINATION lib/y60
+        FILES_MATCHING
+            PATTERN "*.cg"
+            PATTERN "*.xml"
+            PATTERN "*.png"
+            PATTERN "*.rgb"
+            PATTERN ".svn" EXCLUDE
+    )
+endif(Y60_MAC_OS_X_BUNDLE)
 
 add_subdirectory(products)
 add_subdirectory(components)
-
-# Install script library
-install(
-    DIRECTORY js
-    DESTINATION lib/y60
-    FILES_MATCHING
-        PATTERN "*.js"
-        PATTERN ".svn" EXCLUDE
-)
-
-# Install shader library
-install(
-    DIRECTORY shader
-    DESTINATION lib/y60
-    FILES_MATCHING
-        PATTERN "*.cg"
-        PATTERN "*.xml"
-        PATTERN "*.png"
-        PATTERN "*.rgb"
-        PATTERN ".svn" EXCLUDE
-)
 
 # Generate standard documentation
 ac_add_doxygen(Y60 ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)

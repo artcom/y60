@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
         {"--inputfile", "name", "read text from this path"},
         {"--outputfile", "name","write result to this path (default writes to stdout)"},
         {"--maxlines", "count", "split input every <count> lines with concatenator"},
+        {"--help", "", "print this help text and exit"},
         {"", "[text]", "text to be put into commandline"},
         {"", ""}
     };
@@ -103,6 +104,10 @@ int main(int argc, char *argv[]) {
 				cerr << "### ERROR: text given both on commandline and with --inputfile option, please pick one" << myInputFilename << "'"<< endl;
 				return 1;
 			}	
+            if (myArguments.haveOption("--help")) {
+                myArguments.printHelp();
+                return EXIT_SUCCESS;
+            }
             if (myArguments.haveOption("--prolog")) {
                 myProlog = myArguments.getOptionArgument("--prolog");
             }

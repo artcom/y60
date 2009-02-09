@@ -71,7 +71,7 @@
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
-#include <asl/base/RevisionInfo.h>
+#include <acmake/buildinfo.h>
 
 #include <iostream>
 
@@ -83,33 +83,45 @@ asl::Arguments ourArguments;
 #include <iostream>
 #include <sstream>
 
-const asl::Arguments::AllowedOption ourAllowedOptions[] = {
-    {"--jsversion", "VERSION"},
-    {"-I", "include path (semicolon-separated)"},
-    {"--no-jswarnings", ""},
-    {"--pause-on-error", ""},
-    {"--new-revision","[componentname|all]"},
-    {"--std-logfile", "logfile base filename for stdout/stderr"},
+const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
+    {"--jsversion", "version", ""}, // TODO: check was this does exactly
+    {"-I", "include path", "semicolon-separated list of directories"},
+    {"--no-jswarnings", "", "disable javascript warnings"},
+    {"--pause-on-error", "", "if an exception occurs wait for input before quitting"},
+    {"--std-logfile", "basename", "logfile basename for stdout/stderr"},
 #ifndef SPIDERMONK
-    {"--jit", ""},
-    {"--xml", ""},
+    {"--jit", "", "enable javascript just-in-time compiler"},
+    {"--xml", "", ""}, // TODO: check was this does exactly
 #endif
-    {"--help", ""},
+#ifdef AC_BUILT_WITH_CMAKE
+    {"--buildinfo","component|'all'", "print details about this build and exit"},
+#endif
+    {"--help", "", "print this text and exit."},
      //y60 will quit automatically after some frames taking a screen shot.
-    {"", ""}
+    {"", "jsmain",   "file containing javascript code"},
+    //{"", "args,...", "arguments passed to the script"},
+    {"", "", ""}
 };
-
 
 int
 main(int argc, char **argv) {
 
-    int rv = 1;
+    int rv = EXIT_FAILURE;
 
     try {
-        ourArguments.addAllowedOptions(ourAllowedOptions);
+        ourArguments.addAllowedOptionsWithDocumentation(ourAllowedOptions);
         if (!ourArguments.parse(argc, argv)) {
             return 0;
         }
+        ourArguments.setShortDescription(ourArguments.getProgramName() +
+                " is a javascript, xml, and OpenGL based multimedia framework");
+        std::ostringstream myLongDescription;
+        myLongDescription << ourArguments.getProgramName() << " executes "
+                << "its first argument as a javascript file. All other "
+                << "arguments are passed to the script." << endl
+                << "See http://y60.artcom.de/ for more information.";
+        ourArguments.setLongDescription(myLongDescription.str());
+
 
         asl::StdOutputRedirector::get().init(ourArguments);
 
@@ -133,27 +145,39 @@ main(int argc, char **argv) {
 #endif
 
         if (ourArguments.haveOption("--help")) {
-            ourArguments.printUsage();
-            return 0;
+            ourArguments.printHelp();
+            return EXIT_SUCCESS;
         }
 
-
-        if (ourArguments.getCount() < 1) {
-            ourArguments.printUsage();
-            return 1;
-        }
-
-        if (ourArguments.haveOption("--new-revision")) {
-            std::string component = ourArguments.getOptionArgument("--new-revision");
-            if (component.empty()) {
-            } else if (component == "all") {
-                std::cout << asl::RevisionInfoPool::get();
+#ifdef AC_BUILT_WITH_CMAKE
+        if (ourArguments.haveOption("--buildinfo")) {
+            using acmake::build_information;
+            std::string component = ourArguments.getOptionArgument("--buildinfo");
+            if (component == "all") {
+                std::cout << build_information::get();
+                return EXIT_SUCCESS;
+            } else {
+                build_information::const_iterator it = build_information::get().find(component);
+                if (it != build_information::get().end()) {
+                    std::cout << it->second;
+                    return EXIT_SUCCESS;
+                }
+                std::cerr << "Unknown component '" << component << "'" << std::endl
+                          << "Try '" << ourArguments.getProgramName()
+                          << " --buildinfo all'" << std::endl;
+                return EXIT_FAILURE;
             }
         }
+#endif // AC_BUILT_WITH_CMAKE
 
         string myIncludePath;
         if (ourArguments.haveOption("-I")) {
             myIncludePath = ourArguments.getOptionArgument("-I");
+        }
+
+        if (ourArguments.getCount() < 1) {
+            ourArguments.printUsage();
+            return EXIT_FAILURE;
         }
 
         std::string myFilename = ourArguments.getArgument(0);
@@ -166,24 +190,24 @@ main(int argc, char **argv) {
 
         if (SDL_Init(SDL_INIT_NOPARACHUTE) == -1) { // prevents SDL from catching fatal signals
             AC_FATAL << SDL_GetError() << endl;
-            rv = 1;
+            rv = EXIT_FAILURE;
         } else {
             myApp.setProgramName(ourArguments.getProgramName());
             rv = myApp.run(myFilename, myIncludePath, myScriptArgs);
             SDL_Quit();
         }
     } catch (asl::Exception & ex) {
-        rv = 1;
+        rv = EXIT_FAILURE;
         AC_FATAL << "Exception caught in main: " << ex << endl;
     } catch (std::exception & ex) {
-        rv = 1;
+        rv = EXIT_FAILURE;
         AC_FATAL << "std::exception caught in main: " << ex.what() << endl;
     } catch (...) {
-        rv = 1;
+        rv = EXIT_FAILURE;
         AC_FATAL << "unknown exception caught in main" << endl;
     }
 
-    if (rv != 0 && ourArguments.haveOption("--pause-on-error")) {
+    if (rv != EXIT_SUCCESS && ourArguments.haveOption("--pause-on-error")) {
         char temp[100];
         AC_FATAL << "Some Errors occured. Hit RETURN to Exit." << endl;
         cin.getline(temp, sizeof(temp));
@@ -208,4 +232,5 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return main(__argc, __argv);
 }
 #endif
+
 #endif

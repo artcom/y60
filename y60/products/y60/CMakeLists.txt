@@ -13,6 +13,8 @@ ac_add_executable(
           y60modelling y60sdlengine
           aslzip acsdlttf
   EXTERNS ${EXTERNALS}
+  OSX_BUNDLE ${Y60_MAC_OS_X_BUNDLE}
+  OSX_BUNDLE_RESOURCES Y60_RESOURCES
 )
 
 
@@ -45,5 +47,3 @@ Y60JSSL
 foreach(TEST ${JSTESTS})
   y60_add_jstest(${TEST})
 endforeach(TEST)
-
-

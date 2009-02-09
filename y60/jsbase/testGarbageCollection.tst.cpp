@@ -88,7 +88,7 @@
 #include <errno.h>
 
 #ifdef AC_BUILT_WITH_CMAKE
-#   include "y60jsbase_paths.h"
+#   include <acmake/y60jsbase_paths.h>
 #   define TEST_DATA_DIR CMAKE_CURRENT_SOURCE_DIR
 #else
 #   define TEST_DATA_DIR "../.."

@@ -60,7 +60,7 @@
 #include <iostream>
 
 #ifdef AC_BUILT_WITH_CMAKE
-#   include "y60image_paths.h"
+#   include <acmake/y60image_paths.h>
 #endif
 
 #include <asl/base/string_functions.h>

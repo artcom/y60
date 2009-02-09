@@ -30,7 +30,14 @@ else(NOT ACMAKE_INTEGRATED_BUILD)
     set(ACMAKE_TOOLS_DIR ${AcMake_SOURCE_DIR}/tools)
     set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
     set(ACMAKE_TEMPLATES_DIR ${AcMake_SOURCE_DIR}/templates)
+    set(ACMAKE_INCLUDE_DIR ${AcMake_SOURCE_DIR}/include)
 endif(NOT ACMAKE_INTEGRATED_BUILD)
+
+# Store generated files in this subdirectory of ${CMAKE_CURRENT_BINARY_DIR}
+set(ACMAKE_BINARY_SUBDIR "ACMakeFiles")
+
+# All sources may include acmake headers
+include_directories(${ACMAKE_INCLUDE_DIR})
 
 include(AcPlatform)
 include(AcBoostUtils)
@@ -47,6 +54,9 @@ include(AcCoverage)
 include(AcProfiling)
 
 include(AcDocumentation)
+
+include(AcBuildinfo)
+include(AcBundleResources)
 
 include(AcAddPro60Dependencies)
 

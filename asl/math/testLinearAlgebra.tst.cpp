@@ -27,7 +27,6 @@
 #include "Line.h"
 #include "Sphere.h"
 #include "Plane.h"
-#include <asl/base/RevisionInfo.h>
 
 #include <asl/base/UnitTest.h>
 #include <cmath>
@@ -640,8 +639,6 @@ int main(int argc, char *argv[]) {
 
 	std::cerr << ">> Finished test suite '" << argv[0] << "'"
          << ", return status = " << mySuite.returnStatus() << endl;
-
-    cerr << asl::RevisionInfoPool::get() << endl;
 
     return mySuite.returnStatus();
 

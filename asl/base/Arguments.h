@@ -49,6 +49,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <iostream>
 
 namespace asl {
@@ -88,6 +89,7 @@ public:
     bool parse(std::vector<std::string> myArgs, StringEncoding theEncoding=UTF8, int errorHandlingPolicy=BailOnUnknownOptions); 
     bool parse(int argc, const char * const argv[], StringEncoding theEncoding=Locale, int errorHandlingPolicy=BailOnUnknownOptions);
     void printUsage() const;
+    void printHelp() const;
     void printRevision() const;
     void printVersion() const;
     void printCopyright() const;
@@ -110,6 +112,8 @@ public:
     std::vector<std::string> getOptionNames() const;
 
 private:
+    void addUsageString(std::ostringstream & os) const;
+
 	// storage of the parsed arguments
     std::map<std::string,int> _options;
     std::vector<std::string> _allArguments;

@@ -67,13 +67,13 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
 
     configure_file(
          ${THIS_LIBRARY_PATHS_TEMPLATE}
-         ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LIBRARY_NAME}_paths.h
+         ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/acmake/${THIS_LIBRARY_NAME}_paths.h
          @ONLY
     )
     
     # XXX: why?    
     # XXX: because we need the path header
-    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+    include_directories(${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR})
 
     if(THIS_LIBRARY_HEADER_ONLY)
         # for a header-only library
@@ -97,21 +97,17 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
         )
 
-        if( ACMAKE_BUILTIN_SVN_REVISIONS)
-            set( THIS_LIBRARY_REVISION_FILE
-                    "${CMAKE_CURRENT_BINARY_DIR}/${THIS_LIBRARY_NAME}${ACMAKE_REVISION_FILE_SUFFIX}")
-        endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+        _ac_buildinfo_filename("${THIS_LIBRARY_NAME}" THIS_LIBRARY_BUILDINFO_FILE)
 
         # define the library target
         add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES}
-            ${THIS_LIBRARY_HEADERS} ${THIS_LIBRARY_REVISION_FILE})
+            ${THIS_LIBRARY_HEADERS} ${THIS_LIBRARY_BUILDINFO_FILE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries )
 
-        if( ACMAKE_BUILTIN_SVN_REVISIONS)
-            # update repository and revision information
-            _ac_add_repository_info( ${THIS_LIBRARY_NAME}
-                    ${THIS_LIBRARY_REVISION_FILE}
-                    "library" )
-        endif( ACMAKE_BUILTIN_SVN_REVISIONS)
+        # update repository and revision information
+        _ac_add_repository_info( ${THIS_LIBRARY_NAME}
+                "${THIS_LIBRARY_BUILDINFO_FILE}"
+                LIBRARY ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS})
 
         # attach headers to target
         set_target_properties(

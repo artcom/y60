@@ -111,4 +111,3 @@ macro(y60_add_scenetest NAME )
     cmake -P ${CMAKEFILE}
   )
 endmacro(y60_add_scenetest ) 
-

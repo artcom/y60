@@ -5,7 +5,7 @@
 #include "ShaderLibrary.h"
 
 #ifdef AC_BUILT_WITH_CMAKE
-#   include "y60glrender_paths.h"
+#   include <acmake/y60glrender_paths.h>
 #endif
 
 #include <asl/base/Exception.h>
