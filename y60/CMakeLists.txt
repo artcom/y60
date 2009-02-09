@@ -19,7 +19,14 @@ include(AcMake)
 include(Y60Dependencies)
 include(Y60Utilities)
 
-ac_add_project(Y60)
+ac_add_project(Y60
+    REQUIRED_PACKAGES
+        ${REQ_PACKAGES}
+    OPTIONAL_PACKAGES
+        ${OPT_PACKAGES}   
+    REQUIRED_PKGCONFIG
+        ${REQ_PKGCONFIG}
+)
 
 # XXX: definition-propagation
 add_definitions(-DAC_BUILT_WITH_CMAKE)
@@ -98,12 +105,13 @@ add_custom_target(
     Y60-jsapi
     ${CMAKE_CURRENT_BINARY_DIR}/products/y60/y60
         -I "${CMAKE_CURRENT_SOURCE_DIR}/js;"
-	${CMAKE_CURRENT_SOURCE_DIR}/js/create_documentation_xml.js
-	${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi
+    ${CMAKE_CURRENT_SOURCE_DIR}/js/create_documentation_xml.js
+    ${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}    
     DEPENDS y60
     VERBATIM
 )
+
 
 ac_export_project(Y60)
 
