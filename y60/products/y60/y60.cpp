@@ -71,7 +71,9 @@
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
-#include <acmake/buildinfo.h>
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <acmake/buildinfo.h>
+#endif
 
 #include <iostream>
 
