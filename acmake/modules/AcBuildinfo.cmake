@@ -70,18 +70,18 @@ if(ACMAKE_BUILDINFO)
     endif( ACMAKE_BUILDINFO_SCMDATA )
 endif( ACMAKE_BUILDINFO )
 
-macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE SOURCES)
+macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
     if( ACMAKE_BUILDINFO)
-        set( ALL_DEPEND_FILES ${SOURCES} ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
+        set(ALL_DEPEND_FILES ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
         add_custom_command( OUTPUT ${BUILDINFO_FILENAME}
                 COMMAND
                     ${CMAKE_COMMAND}
-                          -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
-                          -DTARGET_NAME=${TARGET_NAME} 
-                          -DTARGET_TYPE=${TARGET_TYPE}
-                          -DBUILDINFO_FILE=${BUILDINFO_FILENAME}
-                          -DBUILDINFO_TEMPLATE=${ACMAKE_BUILDINFO_TEMPLATE}
-                          -DSCM=${ACMAKE_BUILDINFO_SCM}
+                          -D "SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+                          -D "TARGET_NAME=${TARGET_NAME}"
+                          -D "TARGET_TYPE=${TARGET_TYPE}"
+                          -D "BUILDINFO_FILE=${BUILDINFO_FILENAME}"
+                          -D "BUILDINFO_TEMPLATE=${ACMAKE_BUILDINFO_TEMPLATE}"
+                          -D "SCM=${ACMAKE_BUILDINFO_SCM}"
                           ${BUILDINFO_SCM_ARGS}
                           -P ${ACMAKE_TOOLS_DIR}/update_buildinfo_file.cmake
                  DEPENDS ${ALL_DEPEND_FILES}
