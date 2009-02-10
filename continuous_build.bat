@@ -2,7 +2,7 @@ BREAK=ON
 
 set BUILD_DIR=_build
 set CMAKE_GENERATOR=Visual Studio 9 2008
-set VCBUILD_ARGS=PRO60.sln Release|Win32
+set VCBUILD_ARGS="PRO60.sln Release|Win32"
 
 rem === Running on operating system %OS%
 
