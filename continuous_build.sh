@@ -3,6 +3,9 @@ set -e # abort on error
 set -x # print all commands
 set -u # abort on undefined variables
 
+echo "=== Environment"
+env
+
 BUILD_DIR="_build"
 CMAKE_GENERATOR="Unix Makefiles"
 MAKE_ARGS=""
