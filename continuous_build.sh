@@ -1,21 +1,19 @@
 #!/bin/bash
 set -e # abort on error
 set -x # print all commands
-#set -u
+set -u # abort on undefined variables
 
 BUILD_DIR=_build
 UNAME_OS=`uname -s`
 
 case "$UNAME_OS" in
     Cygwin* | cygwin* | CYGWIN* | MINGW*)
-		CMAKE_GENERATOR="Visual Studio 9 2008"
-		MAKE_COMMAND='vcbuild PRO60.sln Release|Win32'
+        echo "Building on windows using a unix shell is not supported"
+        exit 1
+		#CMAKE_GENERATOR="Visual Studio 9 2008"
+		#MAKE_COMMAND='vcbuild PRO60.sln Release|Win32'
         ;;
-    Darwin*)
-		CMAKE_GENERATOR="Unix Makefiles"
-		MAKE_COMMAND=make
-        ;;
-    Linux*)
+    Darwin* | Linux*)
 		CMAKE_GENERATOR="Unix Makefiles"
 		MAKE_COMMAND=make
         ;;
@@ -24,21 +22,16 @@ case "$UNAME_OS" in
 		;;
 esac
 
-echo "=== Running on ${UNAME_OS}"
-echo "=== Configuring cmake build"
+echo "=== Running on operating system ${UNAME_OS}"
 
-if [ ! -d $BUILD_DIR ]; then
-    mkdir $BUILD_DIR
-    MKDIR_RESULT=$?
-    if [ $MKDIR_RESULT -gt 0 ]; then
-        echo Cannot create $PWD/$BUILD_DIR
-        exit 3
-    fi
-fi
+echo "=== Build directory is $BUILD_DIR"
+mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
+echo "=== Configuring cmake build for $CMAKE_GENERATOR"
 cmake -G "$CMAKE_GENERATOR" ..
 
+echo "=== Running $MAKE_COMMAND $MAKE_ARGS"
 $MAKE_COMMAND
 
 echo "Build done"
