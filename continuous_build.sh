@@ -1,41 +1,22 @@
 #!/bin/bash
-set -e # abort on error
-set -x # print all commands
-set -u # abort on undefined variables
-
-echo "=== Environment"
-env
+set -e
 
 BUILD_DIR="_build"
-CMAKE_GENERATOR="Unix Makefiles"
-MAKE_ARGS=""
 
-UNAME_OS=`uname -s`
+if [[ "$VERBOSE" && "$VERBOSE" != "0" ]]; then 
+    set -x
+    env
+fi
 
-case "$UNAME_OS" in
-    Cygwin* | cygwin* | CYGWIN* | MINGW*)
-        echo "Building on windows using a unix shell is not supported."
-        exit 1
-        ;;
-    Darwin* | Linux*)
-        ;;
-	*)
-		echo What?
-		;;
-esac
+if [[ ! "$NUMCORES" || "$NUMCORES" = "0" ]]; then 
+    NUMCORES=1
+fi
 
-echo "=== Running on operating system ${UNAME_OS}"
-
-echo "=== Build directory is $BUILD_DIR"
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
-echo "=== Configuring cmake build for $CMAKE_GENERATOR"
-cmake -G "$CMAKE_GENERATOR" ..
+cmake
+make -j $NUMCORES
 
-echo "=== Running make $MAKE_ARGS"
-make $MAKE_ARGS
-
-echo "Build done"
-
+echo "=== Build done"
 exit 0
