@@ -1,6 +1,6 @@
 #!/bin/bash
-#set -e
-#set -x
+set -e # abort on error
+set -x # print all commands
 #set -u
 
 BUILD_DIR=_build
@@ -24,10 +24,9 @@ case "$UNAME_OS" in
 		;;
 esac
 
+echo "=== Running on ${UNAME_OS}"
+echo "=== Configuring cmake build"
 
-echo configuring cmake build
-
-cd ..
 if [ ! -d $BUILD_DIR ]; then
     mkdir $BUILD_DIR
     MKDIR_RESULT=$?
@@ -38,20 +37,10 @@ if [ ! -d $BUILD_DIR ]; then
 fi
 cd $BUILD_DIR
 
-cmake -G "$CMAKE_GENERATOR" ../src
-CMAKE_RESULT=$?
-if [ $CMAKE_RESULT -gt 0 ]; then
-    echo cmake failed
-    exit 2
-fi
+cmake -G "$CMAKE_GENERATOR" ..
 
 $MAKE_COMMAND
-MAKE_RESULT=$?
-if [ $MAKE_RESULT -gt 0 ]; then
-    echo make failed
-    exit 1
-fi
 
-echo done
+echo "Build done"
 
 exit 0
