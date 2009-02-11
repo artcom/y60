@@ -20,11 +20,13 @@ struct app2vert {
     float4 Position : POSITION;
     float3 Normal   : NORMAL;
     float2 TexCoord : TEXCOORD0;
+    float4 Color : COLOR;
 };
 
 struct vert2frag {
     float4 Vertex    : POSITION;
     float2 TexCoord0 : TEXCOORD0;
+    float4 Color : COLOR;
 };
 
 vert2frag mainVertex(app2vert IN,    
@@ -37,6 +39,16 @@ vert2frag mainVertex(app2vert IN,
     return OUT;
 }
 
+vert2frag mainVertexColor(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord0 =  float2(IN.TexCoord).xy;
+    OUT.Color = IN.Color;
+    return OUT;
+}
 
 float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
