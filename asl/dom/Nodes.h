@@ -239,17 +239,17 @@ namespace dom {
         //@{
         /// default constructor
         Node()
-            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0), _myChildrenList(this)
-            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
-            , _myVersion(0), _mySavePosition()
+            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0),
+            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0), _mySavePosition(0),
+             _myChildrenList(this), _myAttributes(this)
         {}
 
         /// create element node with attributes
         Node(const DOMString & name, const NamedNodeMap & attributes, Node * theParent)
-            : _myType(ELEMENT_NODE), _lazyChildren(false), _myName(name), _myParent(theParent)
-            , _myChildrenList(this), _myAttributes(attributes, ATTRIBUTE_NODE, this)
-            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
-            , _mySavePosition()
+            : _myType(ELEMENT_NODE), _lazyChildren(false), _myName(name), _myParent(theParent), _myDocSize(0),
+            _myParseCompletionPos(0), _myVersion(0),
+            _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+            _myChildrenList(this), _myAttributes(attributes, ATTRIBUTE_NODE, this)
         {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
@@ -261,10 +261,11 @@ namespace dom {
             or any of the above nodes by supplying a special Value Type
             */
         Node(NodeType type, const DOMString & name, const ValueBase & theValue, Node * theParent)
-            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent)
-            , _myValue(theValue.clone(this)), _myChildrenList(this), _myAttributes(this)
-            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
-            , _mySavePosition()
+            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent),
+              _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+              _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+              _myChildrenList(this), _myAttributes(this),
+              _myValue(theValue.clone(this))
         {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
@@ -272,10 +273,11 @@ namespace dom {
             this constructor takes the ownership of ValuePtr.
             */
         Node(NodeType type, const DOMString & name, ValuePtr theValuePtr, Node * theParent)
-            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent)
-            , _myValue(theValuePtr), _myChildrenList(this), _myAttributes(this)
-            , _myParseCompletionPos(0), _myDocSize(0), _myFacade(0), _myVersion(0)
-            , _mySavePosition()
+            : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent),
+            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+            _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+            _myChildrenList(this), _myAttributes(this),
+            _myValue(theValuePtr)
         {
             if (_myValue) {
                 _myValue->setNodePtr(this);
@@ -292,17 +294,19 @@ namespace dom {
         */
         Node(const DOMString & xml, int pos,
             Node * parent, const Node * doctype, NodeType type = X_NO_NODE)
-            : _myType(type), _lazyChildren(false), _myParent(parent), _myChildrenList(this)
-            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
-            , _myVersion(0), _mySavePosition()
+            : _myType(type), _lazyChildren(false), _myParent(parent), 
+            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+            _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+            _myChildrenList(this), _myAttributes(this)
         {
             parseNextNode(xml,pos,parent,doctype);
         }
 
         Node(const DOMString & xml)
-            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0), _myChildrenList(this)
-            , _myAttributes(this), _myParseCompletionPos(0), _myDocSize(0), _myFacade(0)
-            , _myVersion(0), _mySavePosition()
+            : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0),
+            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),            
+            _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+            _myChildrenList(this), _myAttributes(this)
         {
             parseAll(xml);
         }
@@ -1344,29 +1348,37 @@ Dependent on node type allowed children are:<p>
     private:
         void markPrecursorDependenciesOutdated();
 
+        // must be initialized:
         NodeType          _myType;
         mutable bool      _lazyChildren;
         DOMString         _myName;
         Node *            _myParent;
-        NodeWeakPtr       _mySelf;
-        mutable NodeIDRegistryPtr _myIDRegistry;
-        mutable NodeIDRegistryWeakPtr _myNameRegistry;
-        mutable NodeIDRefRegistryPtr _myIDRefRegistry;
-        ValuePtr          _myValue;
-        mutable NodeList  _myChildrenList; // entities when doctype
-        TypedNamedNodeMap _myAttributes; // notations when doctype
-        mutable asl::Unsigned32  _myParseCompletionPos;
         mutable asl::Unsigned32  _myDocSize;
-        SchemaInfoPtr     _mySchemaInfo;
-        mutable FacadePtr _myFacade;
-        EventListenerMap  _myEventListeners;
-        EventListenerMap  _myCapturingEventListeners;
-        static const Node X_NO_NODE_;
+        mutable asl::Unsigned32  _myParseCompletionPos;
         asl::Unsigned64   _myVersion;
-        UniqueId          _myUniqueId;
         mutable asl::Unsigned64   _mySavePosition;
         mutable asl::Unsigned64   _myChildrenPosition;
         mutable asl::Unsigned64   _mySaveEndPosition;
+              
+        // need this ptr
+        mutable NodeList  _myChildrenList; // entities when doctype
+        TypedNamedNodeMap _myAttributes; // notations when doctype
+        
+        // self-initializing:
+        ValuePtr          _myValue;
+        SchemaInfoPtr     _mySchemaInfo;
+        mutable FacadePtr _myFacade;        
+        NodeWeakPtr       _mySelf;
+        UniqueId          _myUniqueId;
+        
+        mutable NodeIDRegistryPtr _myIDRegistry;
+        mutable NodeIDRegistryWeakPtr _myNameRegistry;
+        mutable NodeIDRefRegistryPtr _myIDRefRegistry;
+
+        EventListenerMap  _myEventListeners;
+        EventListenerMap  _myCapturingEventListeners;
+
+        static const Node X_NO_NODE_;
     public:
         static Node Prototype;
     };

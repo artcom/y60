@@ -161,7 +161,7 @@ namespace xpath {
                 typedef asl::Ptr<Expression>            ExpressionPtr;
 
                 struct EvaluationContext {
-                    const dom::Node*contextNode;
+                    const dom::Node * contextNode;
                     std::size_t     nodeSetSize;
                     std::size_t     proximityPos;
                     EvaluationContext(const dom::Node* cn, std::size_t nss, std::size_t pp)
@@ -174,17 +174,17 @@ namespace xpath {
 
                 virtual std::ostream& streamTo(std::ostream& os) const = 0;
 
-                virtual Object doEvaluate(const EvaluationContext& evContext) const = 0;
+                virtual Object doEvaluate(const EvaluationContext & evContext) const = 0;
             };
 
             typedef Expression::ExpressionPtr           ExpressionPtr;
             typedef Expression::EvaluationContext       EvaluationContext;
 
-            static ExpressionPtr readExpression( ParseInput& pi);
+            static ExpressionPtr readExpression( ParseInput & pi);
 
             Predicate()                               : expression_() {}
 
-            Predicate(ParseInput& pi)                 : expression_(readExpression(pi)) {}
+            Predicate(ParseInput & pi)                 : expression_(readExpression(pi)) {}
 
             bool empty() const                        {return !expression_;}
 
@@ -192,9 +192,9 @@ namespace xpath {
 
             std::string toString() const;
 
-            int compare(const Predicate& rhs) const;
+            int compare(const Predicate & rhs) const;
 
-            bool evaluate(const EvaluationContext& evContext) const
+            bool evaluate(const EvaluationContext & evContext) const
                                                       {return expression_ ? expression_->evaluate(evContext) : true;}
 
         private:
@@ -217,7 +217,7 @@ namespace xpath {
             
             std::string toString() const;
 
-            int compare(const LocationStep& rhs) const;
+            int compare(const LocationStep & rhs) const;
 
             const Axis     & getAxis     () const               {return myAxis_;}
             const NodeTest & getNodeTest () const               {return myNodeTest_;}
@@ -230,37 +230,40 @@ namespace xpath {
         };
 
         inline
-        std::ostream& operator<<(std::ostream& os, const Axis& axis)
+        std::ostream& operator<<(std::ostream & os, const Axis& axis)
         {axis.streamTo(os);return os;}
 
         inline
-        std::ostream& operator<<(std::ostream& os, const NodeTest& nodeTest)
+        std::ostream& operator<<(std::ostream & os, const NodeTest& nodeTest)
         {nodeTest.streamTo(os);return os;}
 
         inline
-        std::ostream& operator<<(std::ostream& os, const Predicate& predicate)
+        std::ostream& operator<<(std::ostream & os, const Predicate& predicate)
         {predicate.streamTo(os);return os;}
 
         inline
-        std::ostream& operator<<(std::ostream& os, const Predicate::Expression& expr)
+        std::ostream& operator<<(std::ostream & os, const Predicate::Expression& expr)
         {expr.streamTo(os);return os;}
 
         inline
-        std::ostream& operator<<(std::ostream& os, const LocationStep& step)
+        std::ostream& operator<<(std::ostream & os, const LocationStep& step)
         {step.streamTo(os);return os;}
 
         typedef std::vector<LocationStep>             LocationStepList;
         
         struct StepAppender {
-            virtual void operator()(const LocationStep&) const = 0;
+            virtual void operator()(const LocationStep &) const = 0;
+            virtual ~StepAppender() {}
         };
 
         struct ListStepAppender : public StepAppender {
-            ListStepAppender(LocationStepList& locationSteps)
+            ListStepAppender(LocationStepList & locationSteps)
                 : locationSteps_(locationSteps) {}
-            virtual void operator()(const LocationStep& step) const
-            {locationSteps_.push_back(step);}
-            LocationStepList& locationSteps_;
+            virtual ~ListStepAppender() {}
+            virtual void operator()(const LocationStep& step) const {
+                locationSteps_.push_back(step);
+            }
+            LocationStepList & locationSteps_;
         };
 
         bool parsePath( ParseInput& pi, const StepAppender& appender );

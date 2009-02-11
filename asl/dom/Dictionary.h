@@ -108,7 +108,7 @@ namespace dom {
             asl::Unsigned64 myCount;
             thePos = theSource.readUnsigned(myCount, thePos);
 
-            for (int i = 0; i < myCount; ++i) {
+            for (asl::Unsigned64 i = 0; i < myCount; ++i) {
                 DOMString myName;
                 thePos = theSource.readCountedString(myName, thePos);
                 if (myName.size() == 0) {

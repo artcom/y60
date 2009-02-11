@@ -1072,24 +1072,20 @@ Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) 
   or any of the above nodes
  */
 dom::Node::Node(NodeType type,const DOMString & name, const DOMString & value, Node * theParent)
-    : _myType(type), _myName(name),
-    _myParseCompletionPos(0), _myDocSize(0), _myParent(theParent), _myChildrenList(this),
-    _myAttributes(this), _myFacade(0), _myVersion(0), _lazyChildren(false)
+    : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent),
+     _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+     _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+     _myChildrenList(this), _myAttributes(this)
 {
     storeValue(value); // NVX
 }
 
 // create a node by type;name is set automatically if appropriate
 dom::Node::Node(NodeType type, Node * theParent) :
-    _myType(type),
-    _myParseCompletionPos(0),
-    _myDocSize(0),
-    _myParent(theParent),
-    _myChildrenList(this),
-    _myAttributes(this),
-    _myFacade(0),
-    _lazyChildren(false),
-    _myVersion(0)
+    _myType(type), _lazyChildren(false), _myParent(theParent),
+    _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+    _myChildrenList(this), _myAttributes(this)
 {
     switch (type) {
     case DOCUMENT_NODE:
@@ -1110,15 +1106,10 @@ dom::Node::Node(NodeType type, Node * theParent) :
 
 // create text, comment, cdata  or element node w/o attributes
 dom::Node::Node(NodeType type, const String & name_or_value, Node * theParent) :
-    _myType(type),
-    _myParseCompletionPos(0),
-    _myDocSize(0),
-    _myChildrenList(this),
-    _myAttributes(this),
-    _myParent(theParent),
-    _myFacade(0),
-    _lazyChildren(false),
-    _myVersion(0)
+    _myType(type), _lazyChildren(false), _myParent(theParent),
+    _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
+    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+    _myChildrenList(this), _myAttributes(this)
 {
     switch (type) {
         case TEXT_NODE:
@@ -1140,18 +1131,12 @@ dom::Node::Node(NodeType type, const String & name_or_value, Node * theParent) :
 }
 /// makes a deep copy
 dom::Node::Node(const Node & n, Node * theParent) :
-    _myType(n._myType),
-    _myName(n._myName),
+    _myType(n._myType), _lazyChildren(false), _myName(n._myName),
+    _myParent(theParent), _myDocSize(n._myDocSize), _myParseCompletionPos(n._myParseCompletionPos), _myVersion(0),
+    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
+    _myChildrenList(this), _myAttributes(this),
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
-    _myParseCompletionPos(n._myParseCompletionPos),
-    _myDocSize(n._myDocSize),
-    _myChildrenList(this),
-    _myAttributes(this),
-    _myParent(theParent),
-    _myFacade(0),
-    _mySchemaInfo(n._mySchemaInfo),
-    _lazyChildren(false),
-    _myVersion(0)
+    _mySchemaInfo(n._mySchemaInfo)
 {
     if (_myValue) {
         _myValue->update();
@@ -1165,18 +1150,12 @@ dom::Node::Node(const Node & n, Node * theParent) :
 }
 /// makes a deep copy
 dom::Node::Node(const Node & n) :
-    _myType(n._myType),
-    _myName(n._myName),
+    _myType(n._myType), _lazyChildren(false), _myName(n._myName),
+    _myParent(0), _myDocSize(n._myDocSize), _myParseCompletionPos(n._myParseCompletionPos), _myVersion(0),
+    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),    
+    _myChildrenList(this), _myAttributes(this),
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
-    _myParseCompletionPos(n._myParseCompletionPos),
-    _myDocSize(n._myDocSize),
-    _myChildrenList(this),
-    _myAttributes(this),
-    _myParent(0),
-    _myFacade(0),
-    _mySchemaInfo(n._mySchemaInfo),
-    _lazyChildren(false),
-    _myVersion(0)
+    _mySchemaInfo(n._mySchemaInfo)
 {
     for (TypedNamedNodeMap::size_type attr = 0; attr < n._myAttributes.size(); ++attr) {
         _myAttributes.appendWithoutReparenting(n._myAttributes.item(attr)->cloneNode(DEEP,this));

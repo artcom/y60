@@ -44,17 +44,26 @@ StringValue::bumpVersion() {
 void
 dom::NodeIDRegistry::registerID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue, dom::Node * theElement) {
     DB(AC_TRACE << "Node::registerID: registering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
+#ifndef USE_SINGLE_ID_ATTRIB
     IDMap & myMap = _myIDMaps[theIDAttributeName];
     IDMap::iterator myEntry = myMap.find(theIDAttributeValue);
     if (myEntry != myMap.end()) {
         throw Node::DuplicateIDValue(string("An Element with ID attribute '")+theIDAttributeName+"' of value '"+theIDAttributeValue+"' is already registered at the document", PLUS_FILE_LINE);
     }
     myMap[theIDAttributeValue] = theElement;
+#else
+    IDMap::iterator myEntry = _myIDMap.find(theIDAttributeValue);
+    if (myEntry != _myIDMap.end()) {
+        throw Node::DuplicateIDValue(string("An Element with ID attribute '")+theIDAttributeName+"' of value '"+theIDAttributeValue+"' is already registered at the document", PLUS_FILE_LINE);
+    }
+    _myIDMap[theIDAttributeValue] = theElement;
+#endif
 }
 
 void
 dom::NodeIDRegistry::unregisterID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue) {
     DB(AC_TRACE << "Node::unregisterID: unregistering "<<theIDAttributeName<<"='"<<theIDAttributeValue<<"' at node "<<(void*)this<<endl);
+#ifndef USE_SINGLE_ID_ATTRIB
     IDMaps::iterator myMap = _myIDMaps.find(theIDAttributeName);
     if (myMap == _myIDMaps.end()) {
         throw Node::IDValueNotRegistered(string("Internal Error: No Element with ID attribute '")+theIDAttributeName+"' of any value, especially '"+theIDAttributeValue+"' is registered at the document", PLUS_FILE_LINE);
@@ -67,6 +76,13 @@ dom::NodeIDRegistry::unregisterID(const DOMString & theIDAttributeName, const DO
     if (!myMap->second.size()) {
         _myIDMaps.erase(myMap);
     }
+#else
+    IDMap::iterator myEntry = _myIDMap.find(theIDAttributeValue);
+    if (myEntry == _myIDMap.end()) {
+        throw Node::IDValueNotRegistered(string("Internal Error: No Element with ID attribute '")+theIDAttributeName+"' with value '"+theIDAttributeValue+"' is registered at the document", PLUS_FILE_LINE);
+    }
+    _myIDMap.erase(myEntry);
+#endif
 }
 
 void
@@ -98,6 +114,7 @@ dom::NodeIDRegistry::unregisterNodeName(dom::Node * theNode) {
 
 const NodePtr
 NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
+#ifndef USE_SINGLE_ID_ATTRIB
     IDMaps::const_iterator myMap = _myIDMaps.find(theIdAttribute);
     if (myMap != _myIDMaps.end()) {
         IDMap::const_iterator myEntry = myMap->second.find(theId);
@@ -105,11 +122,18 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
             return myEntry->second->self().lock();
         }
     }
+#else
+    IDMap::const_iterator myEntry = _myIDMap.find(theId);
+    if (myEntry != _myIDMap.end()) {
+        return myEntry->second->self().lock();
+    }
+#endif
     return NodePtr(0);
 }
 
 NodePtr
 NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdAttribute) {
+#ifndef USE_SINGLE_ID_ATTRIB
     IDMaps::iterator myMap = _myIDMaps.find(theIdAttribute);
     if (myMap != _myIDMaps.end()) {
         IDMap::iterator myEntry = myMap->second.find(theId);
@@ -117,6 +141,12 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
             return myEntry->second->self().lock();
         }
     }
+#else
+    IDMap::iterator myEntry = _myIDMap.find(theId);
+    if (myEntry != _myIDMap.end()) {
+        return myEntry->second->self().lock();
+    }
+#endif
     return NodePtr(0);
 }
 
@@ -144,6 +174,7 @@ void
 NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
     clear();
     const NodeIDRegistry & theRegistry = *theRootNode.getIDRegistry();
+#ifndef USE_SINGLE_ID_ATTRIB
     for (NodeIDRegistry::IDMaps::const_iterator it = theRegistry._myIDMaps.begin();
             it != theRegistry._myIDMaps.end(); ++it) {
         _myIDMaps[it->first] = IDMap();
@@ -154,12 +185,19 @@ NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
             myCatalog[mit->first] = mit->second->getSavePosition();
         }
     }
+#else
+        for (NodeIDRegistry::IDMap::const_iterator mit = theRegistry._myIDMap.begin(); mit != theRegistry._myIDMap.end(); ++mit) 
+        {
+            _myIDMap[mit->first] = mit->second->getSavePosition();
+        }
+#endif
     theRootNode.collectOffsets(*this);
 }
 
 void
 NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
     theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogMagic));
+#ifndef USE_SINGLE_ID_ATTRIB
     theDest.appendUnsigned(_myIDMaps.size());
     for (IDMaps::const_iterator it = _myIDMaps.begin(); it != _myIDMaps.end(); ++it) {
         theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogEntriesMagic));
@@ -172,6 +210,15 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
             theDest.appendUnsigned(mit->second);
         }
     }
+#else
+    theDest.appendUnsigned(_myIDMap.size());
+    for (IDMap::const_iterator mit = _myIDMap.begin();
+         mit != _myIDMap.end(); ++mit) 
+    {
+        theDest.appendCountedString(mit->first);
+        theDest.appendUnsigned(mit->second);
+    }
+#endif
     theDest.appendUnsigned32(static_cast<asl::Unsigned32>(UIDCatalogMagic));
     binarizePODT(_myNodeOffsets, theDest);
     binarizePODT(_myNodeEndOffsets, theDest);
@@ -189,7 +236,8 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
 
 asl::AC_SIZE_TYPE
 NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
-    _myIDMaps = IDMaps();
+
+
 
     asl::Unsigned32 myMagic = 0;
     asl::AC_SIZE_TYPE theOldPos = thePos;
@@ -201,6 +249,8 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
         myError += asl::as_string((void*)myMagic);
         throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
     }
+#ifndef USE_SINGLE_ID_ATTRIB    
+    _myIDMaps = IDMaps();
     asl::Unsigned64 myCatalogCount;
     thePos = theSource.readUnsigned(myCatalogCount, thePos);
 
@@ -232,7 +282,20 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
             myCatalog[myName] = myOffset;
         }
     }
-
+#else
+        asl::Unsigned64 myCatalogSize;
+        thePos = theSource.readUnsigned(myCatalogSize, thePos);
+        for (asl::Unsigned64 j = 0; j < myCatalogSize; ++j) {
+            DOMString myName;
+            thePos = theSource.readCountedString(myName, thePos);
+            if (myName.size() == 0) {
+                throw FormatCorrupted("empty catalog entry key",PLUS_FILE_LINE);
+            }
+            asl::Unsigned64 myOffset;
+            thePos = theSource.readUnsigned(myOffset, thePos);
+            _myIDMap[myName] = myOffset;
+        }
+#endif
     asl::Unsigned32 myUIDCatalogMagic = 0;
     thePos = theSource.readUnsigned32(myUIDCatalogMagic, thePos);
     if (myUIDCatalogMagic != UIDCatalogMagic) {
@@ -262,6 +325,7 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
 
 bool 
 NodeOffsetCatalog::getElementOffsetById(const DOMString & theId, const DOMString & theIdAttribute,  asl::Unsigned64 & theOffset) const {
+#ifndef USE_SINGLE_ID_ATTRIB
     IDMaps::const_iterator myMap = _myIDMaps.find(theIdAttribute);
     if (myMap != _myIDMaps.end()) {
         IDMap::const_iterator myEntry = myMap->second.find(theId);
@@ -270,6 +334,13 @@ NodeOffsetCatalog::getElementOffsetById(const DOMString & theId, const DOMString
             return true;
         }
     }
+#else
+    IDMap::const_iterator myEntry = _myIDMap.find(theId);
+    if (myEntry != _myIDMap.end()) {
+        theOffset = myEntry->second;
+        return true;
+    }
+#endif
     return false;
 }
 

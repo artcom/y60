@@ -38,6 +38,9 @@ XmlDom
 Xml
 )
 
+# XXX hack to find boost for OSX
+# include_directories(/opt/local/include)
+
 ac_add_library(
     asldom asl/dom
     SOURCES ${SOURCES}

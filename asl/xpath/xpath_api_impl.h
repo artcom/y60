@@ -249,6 +249,12 @@ namespace xpath {
                                                     return context.currentNodes;
                                                 }
                                                 break;
+                default:
+//TODO:  check warning: enumeration value 'Type_Invalid' not handled in switch
+//TODO:  check warning: enumeration value 'Type_CommentTest' not handled in switch
+//TODO:  check warning:  enumeration value 'Type_TextTest' not handled in switch
+//TODO:  check warning: enumeration value 'Type_ProcessingInstructionTest' not handled in switch
+                                                break;
             }
             NodePtrVec currentNodes;
             for( NodePtrVec::const_iterator it=context.currentNodes.begin(); it!=context.currentNodes.end(); ++it ) {

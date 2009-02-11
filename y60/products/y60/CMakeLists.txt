@@ -41,10 +41,8 @@ Scene
 Serial
 Shell
 SimpleBench
-SweptSphereWorld
 UnitTest
 VectorOfString
-WorldIntersection
 Y60JSSL
 )
 

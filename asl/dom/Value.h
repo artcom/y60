@@ -33,6 +33,12 @@
 #include <asl/base/Logger.h>
 
 #include <map>
+#define USE_SINGLE_ID_ATTRIB
+#ifdef USE_SINGLE_ID_ATTRIB
+    #ifdef USE_HASH_MAP
+        #include <boost/unordered_map.hpp>
+    #endif
+#endif
 #include <set>
 #include <typeinfo>
 
@@ -512,9 +518,9 @@ namespace dom {
         friend class Node;
         friend ASL_DOM_EXPORT std::ostream & operator<<(std::ostream& os, const UniqueId & uid);
         
-        UniqueId() : _myCount(_myCounter++), _ptrValue((ptrdiff_t)this)
+        UniqueId() :  _ptrValue((ptrdiff_t)this), _myCount(_myCounter++)
         { }
-        UniqueId(const UniqueId & theID) : _myCount(theID._myCount), _ptrValue(theID._ptrValue)
+        UniqueId(const UniqueId & theID) : _ptrValue(theID._ptrValue), _myCount(theID._myCount)
         { }
         UniqueId & operator=(const UniqueId & theOther) {
             _ptrValue = theOther._ptrValue;
@@ -550,7 +556,6 @@ namespace dom {
         }
         asl::Unsigned64 _ptrValue;
         asl::Unsigned32 _myCount;
-        
         static asl::Unsigned32 _myCounter;
     };
 
@@ -562,8 +567,16 @@ namespace dom {
     class NodeIDRegistry {
         friend class NodeOffsetCatalog;
     public:
+#ifndef USE_SINGLE_ID_ATTRIB
         typedef std::map<DOMString, Node *> IDMap;
         typedef std::map<DOMString, IDMap> IDMaps;
+#else
+    #ifdef USE_HASH_MAP
+        typedef boost::unordered_map<DOMString, Node *> IDMap;
+    #else
+        typedef std::map<DOMString, Node *> IDMap;
+    #endif
+#endif
         typedef std::set<Node*> NodeSet;
         typedef std::map<DOMString, NodeSet> NodeNameMap;
     public:
@@ -571,6 +584,7 @@ namespace dom {
         void unregisterID(const DOMString & theIDAttributeName, const DOMString & theIDAttributeValue);
         const NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute) const;
         NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute);
+#ifndef USE_SINGLE_ID_ATTRIB
         const IDMap * getIDMap(const DOMString & theIDAttributeName) const {
             IDMaps::const_iterator myMap = _myIDMaps.find(theIDAttributeName);
             if (myMap == _myIDMaps.end()) {
@@ -578,6 +592,7 @@ namespace dom {
             }
             return &myMap->second;
         }
+#endif
         void registerNodeName(dom::Node * theNode);
         void unregisterNodeName(dom::Node * theNode);
         NodeNameMap & getNodeNames() {
@@ -614,7 +629,11 @@ namespace dom {
             return _myStorage;
         }
      private:
+#ifndef USE_SINGLE_ID_ATTRIB
         IDMaps _myIDMaps;
+#else
+        IDMap _myIDMap;
+#endif
         NodeNameMap _myNodeNames;
         mutable asl::Ptr<NodeOffsetCatalog> _myOffsets;
         mutable DictionariesPtr _myDicts;
@@ -640,7 +659,7 @@ namespace dom {
             asl::AC_SIZE_TYPE
             debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
             bool getElementOffsetById(const DOMString & theId, const DOMString & theIdAttribute,  asl::Unsigned64 & theOffset) const;
-
+#ifndef USE_SINGLE_ID_ATTRIB
             const IDMap * getIDMap(const DOMString & theIDAttributeName) const {
                 IDMaps::const_iterator myMap = _myIDMaps.find(theIDAttributeName);
                 if (myMap == _myIDMaps.end()) {
@@ -648,6 +667,7 @@ namespace dom {
                 }
                 return &myMap->second;
             }
+#endif
             asl::AC_SIZE_TYPE enterUID(const UniqueId & theUID, asl::Unsigned64 theOffset, asl::Unsigned64 theEndOffset, asl::AC_SIZE_TYPE theParentIndex) {
                     _myParentIndex.push_back(theParentIndex);
                     asl::AC_SIZE_TYPE myIndex = _myNodeOffsets.size();
@@ -680,7 +700,11 @@ namespace dom {
             }
 
             void clear() {
+#ifndef USE_SINGLE_ID_ATTRIB
                 _myIDMaps.clear();
+#else
+                _myIDMap.clear();
+#endif
                 _myNodeOffsets.clear();
                 _myNodeEndOffsets.clear();
                 _myParentIndex.clear();
@@ -692,7 +716,11 @@ namespace dom {
                 throw CatalogCorrupted(JUST_FILE_LINE);
             }
         private:
+#ifndef USE_SINGLE_ID_ATTRIB
             IDMaps _myIDMaps;
+#else
+            IDMap _myIDMap;
+#endif
             std::vector<asl::Unsigned64> _myNodeOffsets;
             std::vector<asl::Unsigned64> _myNodeEndOffsets;
             std::vector<asl::AC_SIZE_TYPE> _myParentIndex;
@@ -874,12 +902,15 @@ namespace dom {
     class SimpleValue : public Value<T>, public asl::PoolAllocator<SimpleValue<T> > {
     public:
         SimpleValue(Node * theNode) : Value<T>(theNode),
-             _myValueHasChanged(true), _isValueWriteable(false) {}
+             _myValueHasChanged(true), _isValueWriteable(false)
+        {}
         SimpleValue(const T & theValue, Node * theNode) : Value<T>(theNode),
-            _myValueHasChanged(true),  _myValue(theValue), _isValueWriteable(false) {}
+            _myValue(theValue), _myValueHasChanged(true),  _isValueWriteable(false)
+        {}
         SimpleValue(const DOMString & theStringValue, Node * theNode) : Value<T>(theNode),
-            _myValue(Value<T>::asT(theStringValue)),
-            _myValueHasChanged(true), _isValueWriteable(false) {}
+            _myValue(Value<T>::asT(theStringValue)), _myValueHasChanged(true), _isValueWriteable(false)
+        {}
+            
         SimpleValue(const asl::ReadableBlock & theValue, Node * theNode) : Value<T>(theNode),
             _myValueHasChanged(true), _isValueWriteable(false)
         {
@@ -914,7 +945,7 @@ namespace dom {
         template <class TV>
             SimpleValue(const TV * theBegin, const TV * theEnd, Node * theNode)
                 : Value<T>(theNode),
-                _myValueHasChanged(true), _myValue(theBegin, theEnd), _isValueWriteable(false)
+                _myValue(theBegin, theEnd), _myValueHasChanged(true), _isValueWriteable(false)
             {}
 
     public:
@@ -1044,6 +1075,7 @@ namespace dom {
         virtual asl::AC_SIZE_TYPE length() const = 0;
         virtual ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const = 0;
         virtual bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
+        virtual ~AccessibleVector() {};
     };
 
     // interface for vector element access and resizing
@@ -1052,12 +1084,12 @@ namespace dom {
         virtual bool append(const ValueBase & theValue) = 0;
         virtual bool erase(asl::AC_SIZE_TYPE theIndex) = 0;
         virtual bool insertBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
+        virtual ~ResizeableVector() {};
     };
     
     // interface for raster element access and resizing
     // TODO: this should be moved somewhere else
     struct ResizeableRaster {
-        virtual ~ResizeableRaster() {}
         virtual asl::AC_SIZE_TYPE width() const = 0;
         virtual asl::AC_SIZE_TYPE height() const = 0;
         virtual asl::Vector2<asl::AC_SIZE_TYPE> getSize() const = 0;
@@ -1091,7 +1123,7 @@ namespace dom {
                 asl::AC_OFFSET_TYPE sourceWidth = 0, asl::AC_OFFSET_TYPE sourceHeight = 0,
                 asl::AC_OFFSET_TYPE targetX = 0, asl::AC_OFFSET_TYPE targetY = 0,
                 asl::AC_OFFSET_TYPE targetWidth = 0, asl::AC_OFFSET_TYPE targetHeight = 0) = 0;
-
+        virtual ~ResizeableRaster() {};
     };
 
     // helper function to access the native raster type
@@ -1405,6 +1437,7 @@ namespace dom {
         typedef typename T::value_type ELEM;
 
         MakeAccessibleVector(VECTOR_VALUE & theVectorValue) : _myVectorValue(theVectorValue) {}
+
         const char * elementName() const {
             return typeid(ELEM).name();
         }

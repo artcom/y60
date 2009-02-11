@@ -222,21 +222,18 @@ namespace y60 {
             const VertexDataBase & getVertexData(VertexDataRole theRole) const;
             VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole);
             const VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole) const;
-/*
-            static PrimitiveType getTypeFromNode(dom::NodePtr thePrimitiveNode);
-            void setMaterial(MaterialBasePtr theMaterial) {
-                _myMaterial = theMaterial;
+        
+            MaterialBase & getMaterial() {
+                return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
             }
-*/
-            MaterialBase & getMaterial();
-            const MaterialBase & getMaterial() const;
+        
+            const MaterialBase & getMaterial() const {
+                return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
+            }
+        
             Shape & getShape();
             const Shape & getShape() const;
-            /*
-            PrimitiveType getType() const {
-                return _myType;
-            }
-*/
+                      
             //TODO: make complete
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor(bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor(bool forWriting = true, bool  forReading = false);
@@ -342,7 +339,7 @@ namespace y60 {
                                       PLUS_FILE_LINE);
         }
     }
-
+    
 
     struct BoundingBoxTree {
         BoundingBoxTree() : 

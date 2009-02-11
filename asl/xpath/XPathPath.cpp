@@ -97,7 +97,7 @@ namespace xpath {
     class Path::Impl_ : public Path::StepList {
         public:
             unsigned long         references;
-            Impl_()                                 : references(0), Path::StepList() {}
+            Impl_() : Path::StepList(), references(0) {}
         private:
             Impl_(const Impl_&);
             Impl_& operator=(const Impl_&);

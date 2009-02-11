@@ -106,27 +106,18 @@ namespace y60 {
                 PrimitiveTypeTag::Plug(theNode),
                 RenderStylesTag::Plug(theNode),
                 _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr(0))
-    {
-/*
-          _myType(theType),
-          _myShapeId(theShapeId),
-          _myMaterial(theMaterial),
-          _myDomIndex(theDomIndex)
-*/
-    }
+    { }
 
     Primitive::~Primitive() {
         AC_TRACE << "~Primitive()" << this << endl;
     }
     
-    MaterialBase & Primitive::getMaterial() {
-        return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
-        //return *(_myMaterial);
+    Shape & Primitive::getShape() {
+        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
     }
-    const MaterialBase & Primitive::getMaterial() const {
-        return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
-        //return *(_myMaterial);
-    }
+    const Shape & Primitive::getShape() const {
+        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
+    }  
 
     void
     Primitive::load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode)
@@ -266,13 +257,6 @@ namespace y60 {
     Primitive::getVertexDataPtr(VertexDataRole theRole) const {
         VertexDataBasePtr myDataBin = _myVertexData[theRole];
         return myDataBin;
-    }
-
-    Shape & Primitive::getShape() {
-        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
-    }
-    const Shape & Primitive::getShape() const {
-        return *getNode().parentNode()->parentNode()->getFacade<Shape>();
     }
 
     void 

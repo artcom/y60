@@ -74,12 +74,11 @@ int main(int argc, char *argv[]) {
 
     string myScriptName =
 #ifdef AC_BUILT_WITH_CMAKE
-        string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator
+        string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + "testShellScript.sh";
 #else
-        string("../../")
+        string("../../") + myProgramName + ".sh"; 
 #endif
-        + myProgramName + ".sh"; 
-
+        
     cerr << myProgramName << ": executing script '" << myScriptName << "'" << endl;
 
     char * myCommand = strdup(myScriptName.c_str());

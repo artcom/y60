@@ -560,7 +560,7 @@ struct JSVector  {
     
     JSVector & operator=(const JSVector & theVector);
 
-    ~JSVector(); 
+    virtual ~JSVector(); 
 
     Y60_JSBASE_EXPORT static
     JSObject * Construct(JSContext *cx, jsval theVectorArgument); 

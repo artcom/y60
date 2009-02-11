@@ -63,6 +63,12 @@
 
 #include <asl/base/Enum.h>
 
+#ifdef Y60_EXPORT_STRINGS
+    #define DEFINE_STRING(NAME, VALUE) const char * NAME = VALUE;
+#else
+    #define DEFINE_STRING(NAME, VALUE) extern const char * NAME;
+#endif
+    
 namespace y60 {
 
     //=== Lighting Model ==========================================================

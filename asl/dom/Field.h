@@ -40,6 +40,7 @@ namespace dom {
     class CallBackBase {
         public:
             virtual void callback() = 0;
+            virtual ~CallBackBase() {}
     };
 
 
