@@ -25,7 +25,7 @@ add_subdirectory(ASSDriver)
 add_subdirectory(EventLoop)
 add_subdirectory(SynergyServer)
 add_subdirectory(GLBinding)
-#add_subdirectory(Cairo)
+add_subdirectory(Utils)
 
 if(LINUX)
     add_subdirectory(DVB)

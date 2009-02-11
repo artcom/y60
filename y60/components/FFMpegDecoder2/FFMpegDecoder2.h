@@ -172,6 +172,8 @@ namespace y60 {
     private:
         // Called from main thread
         void run();
+
+        void startOverAgain();
         
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);

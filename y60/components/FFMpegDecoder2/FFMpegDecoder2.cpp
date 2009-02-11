@@ -231,12 +231,22 @@ namespace y60 {
         }
     }
 
+    void FFMpegDecoder2::startOverAgain() {
+        join();        
+        doSeek(-1);
+        setState(RUN);
+        decodeFrame();
+        PosixThread::fork();
+    }
+
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myDecodedPacketsPerFrame = 0; // reset counter 
-        decodeFrame();
+        if (!isActive()) {
+            decodeFrame();
+        }
         if (hasAudio() && getDecodeAudioFlag()) {
             readAudio();
         }
@@ -277,12 +287,9 @@ namespace y60 {
             // seek to start (-1 indicates doSeek() to do so)
             // TODO: only do this on loop?
             doSeek(-1);
-/*            
-            avcodec_flush_buffers(_myVStream->codec);
-            if (_myAStream) {
-                avcodec_flush_buffers(_myAStream->codec);
-            }
-*/            
+            Movie * myMovie = getMovie();
+            myMovie->set<CurrentFrameTag>(0);
+            
             _myDemux->clearPacketCache();
             setState(STOP);
             _myMsgQueue.clear();
@@ -612,6 +619,11 @@ namespace y60 {
             if (!useLastVideoFrame) {
                 for(;;) {
                     myVideoMsg = _myMsgQueue.pop_front();
+                    bool myEOFFoundFlag = _myMsgQueue.hasEOF();
+                    if (myEOFFoundFlag && !isActive()) {
+                        startOverAgain();
+                    }
+                    
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
                         return theTime;
@@ -941,8 +953,6 @@ namespace y60 {
             //seek to begin of file
             AC_DEBUG<<"seeking to start"<<" starttime: "<< _myStartTimestamp;
             /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_ANY);
-            Movie * myMovie = getMovie();
-            myMovie->set<CurrentFrameTag>(0);
         } else {
             unsigned myLastIFrameOffset;
             if(_myNumIFramesDecoded == 0){

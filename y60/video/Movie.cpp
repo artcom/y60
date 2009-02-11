@@ -165,7 +165,7 @@ namespace y60 {
     void
         Movie::restart(double theCurrentTime) {
             AC_DEBUG  << "Movie::restart";
-            _myDecoder->stopMovie();
+            //_myDecoder->stopMovie();
             _myDecoder->startMovie(0);
             _myNextUsedBuffer = PRIMARY_BUFFER;
             double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);

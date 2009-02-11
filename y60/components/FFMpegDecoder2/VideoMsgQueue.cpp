@@ -149,6 +149,21 @@ void VideoMsgQueue::dump() {
     }    
     _myListLock.unlock();
 }
+bool VideoMsgQueue::hasEOF() {
+    AC_DEBUG << "VideoMsgQueue::hasEOF";
+    _myListLock.lock();
+    bool hasEOFFlag = false;
+    std::list<VideoMsgPtr>::iterator myItStart = _myList.begin();
+    std::list<VideoMsgPtr>::iterator myItEnd = _myList.end();
+    for (; myItStart != myItEnd; myItStart++) {
+        if ((*myItStart)->getType() == VideoMsg::MSG_EOF) {
+            hasEOFFlag = true;    
+            break;
+        }
+    }    
+    _myListLock.unlock();
+    return hasEOFFlag;
+}
 
 }
 

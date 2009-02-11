@@ -138,6 +138,11 @@ namespace y60 {
         void clear();
 
         /**
+         * Do we have a eof in queue
+         */
+        bool hasEOF();
+
+        /**
          * Dumps the queue.
          */
         void dump();
