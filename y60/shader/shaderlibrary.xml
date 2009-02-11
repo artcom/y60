@@ -1919,14 +1919,14 @@
             <feature class="lighting" values="[`unlit`]"/>
             <feature class="effect"   values="[`blur`]"/>
         </supports>
-        <vertexshader profiles="[`vp30`,`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+        <vertexshader profiles="[`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
             <properties/>
             <vertexparameters>
                 <vector4f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[`fp30`,`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentBlur`]">
+        <fragmentshader profiles="[`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentBlur`]">
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
                 <sampler2d name="tex0">0</sampler2d>
@@ -1943,14 +1943,14 @@
             <feature class="lighting" values="[`unlit`]"/>
             <feature class="effect"   values="[`glow`]"/>
         </supports>
-        <vertexshader profiles="[`vp30`,`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+        <vertexshader profiles="[`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
             <properties/>
             <vertexparameters>
                 <vector4f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[`fp30`,`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlow`]">
+        <fragmentshader profiles="[`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlow`]">
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
                 <sampler2d name="tex0">0</sampler2d>
@@ -1969,14 +1969,14 @@
             <feature class="lighting" values="[`unlit`]"/>
             <feature class="effect"   values="[`glowBlur`]"/>
         </supports>
-        <vertexshader profiles="[`vp30`,`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+        <vertexshader profiles="[`vp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
             <properties/>
             <vertexparameters>
                 <vector4f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[`fp30`,`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlowBlur`]">
+        <fragmentshader profiles="[`fp40`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlowBlur`]">
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
                 <sampler2d name="tex0">0</sampler2d>
@@ -1997,7 +1997,7 @@
             <feature class="effect"   values="[`glowBlur`]"/>
             <feature class="option"   values="[`tropfen`]"/>
         </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainVertex`]">
+        <vertexshader profiles="[`vp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainVertex`]">
             <properties>
             </properties>
             <vertexparameters>
@@ -2005,7 +2005,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainFragmentGlowBlurTropfen`]">
+        <fragmentshader profiles="[`fp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainFragmentGlowBlurTropfen`]">
             <properties>
                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
                 <sampler2d name="tex0">0</sampler2d>
