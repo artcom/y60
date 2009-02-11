@@ -244,6 +244,11 @@ namespace y60 {
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myDecodedPacketsPerFrame = 0; // reset counter 
+
+        if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+            _myAudioSink->stop();
+        } 
+        
         if (!isActive()) {
             decodeFrame();
         }
