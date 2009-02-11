@@ -573,8 +573,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // [CH]: Deprecated, should be removed someday
         _myImageManager = new ImageManager(self);
 
+        // look for settings file
         var mySettingsFile = "";
-        for (var i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
+        var i;
+        for (i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
             if ( fileExists( SETTINGS_FILE_NAMES[i] )) {
                 mySettingsFile = SETTINGS_FILE_NAMES[i];
                 break;
@@ -582,12 +584,34 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 //Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
             }
         }
+        
+        // look for host dependent settings file
+        var myHostSettingsFile = "";
+        var myHostFiles = ["settings-" + hostname() + ".xml",
+                           "CONFIG/settings-" + hostname() + ".xml"];
+        for (i = 0; i < myHostFiles.length; ++i) {
+            if (fileExists( myHostFiles[i] )) {
+                myHostSettingsFile = myHostFiles[i];
+                break;
+            }
+        }
 
+        // look for command line argument of settings file(s)
+        // e.g. "settings mysettings.xml:moresettings.xml"
         var mySettingsList = undefined;
         if ("settings" in self.arguments) {
             var mySettingsListString = self.arguments["settings"];
             if (mySettingsListString) {
                 mySettingsList = mySettingsListString.split(":");
+            }
+        }
+
+        // add host name dependent settings file to the beginning of the file list
+        if (myHostSettingsFile != "") {
+            if (mySettingsList == undefined) {
+                mySettingsList = [myHostSettingsFile];
+            } else {
+                mySettingsList.unshift(myHostSettingsFile);
             }
         }
 

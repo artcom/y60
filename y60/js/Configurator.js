@@ -468,7 +468,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 
         _myCommonSettingsFile = theSettingsFile;
         if (fileExists(_myCommonSettingsFile)) {
-            Logger.info("Parsing settings from '" + _myCommonSettingsFile + "'");
+            print("Parsing settings from '" + _myCommonSettingsFile + "'");
             var myCommonSettingsDom = new Node();
             myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             _myOriginalCommonSettings = myCommonSettingsDom.firstChild;
@@ -483,7 +483,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     mySettingsDom.parseFile( mySettingsFile );
                     var mySettings = mySettingsDom.firstChild;
                     _mySettingsList.push( mySettings );
-                    Logger.info("Using settings from '" + mySettingsFile + "'");
+                    print("Using settings from '" + mySettingsFile + "'");
                     mergeSettings( mySettings );
                 } else {
                     Logger.warning( 'Settings file "' + mySettingsFile 
