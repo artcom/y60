@@ -10,19 +10,7 @@ macro(y60_add_component COMPONENT_NAME)
 endmacro(y60_add_component)
 
 
-macro(y60_add_jstest NAME )
-  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
-  set(TESTPATH ${CMAKE_CURRENT_BINARY_DIR})
-  string(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" TESTPATH ${TESTPATH})
-  add_test(${NAME}
-      ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I 
-      "${TESTPATH};${CMAKE_BINARY_DIR}/lib/Release;${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;."
-  )
-endmacro(y60_add_jstest ) 
-
-macro(write_scenetest NAME)
-  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
-  get_target_property(COMPAREIMAGE_EXECUTABLE ac-compare-image LOCATION_${CMAKE_BUILD_TYPE})
+macro(collect_plugin_dirs PLUGIN_DIRS) 
   get_property(Y60_PLUGINS GLOBAL PROPERTY Y60_PLUGINS)
   set(PLUGIN_DIRS "")
   foreach(PLUGIN_NAME ${Y60_PLUGINS})
@@ -31,7 +19,25 @@ macro(write_scenetest NAME)
     list(APPEND PLUGIN_DIRS ${PLUGIN_DIR})
   endforeach(PLUGIN_NAME ${Y60_PLUGINS})
   list(REMOVE_DUPLICATES PLUGIN_DIRS)
- 
+endmacro(collect_plugin_dirs) 
+
+macro(y60_add_jstest NAME )
+  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
+  collect_plugin_dirs(PLUGIN_DIRS) 
+  set(TESTPATH ${CMAKE_CURRENT_BINARY_DIR})
+  string(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" TESTPATH ${TESTPATH})
+  add_test(${NAME}
+      ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I 
+      "${TESTPATH};${CMAKE_BINARY_DIR}/lib/Release;${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;${PLUGIN_DIRS};."
+  )
+endmacro(y60_add_jstest )
+
+macro(write_scenetest NAME CMAKEFILE)
+  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
+  get_target_property(COMPAREIMAGE_EXECUTABLE ac-compare-image LOCATION_${CMAKE_BUILD_TYPE})
+
+  collect_plugin_dirs(PLUGIN_DIRS) 
+
   file(APPEND ${CMAKEFILE} "#generate image\n")
   file(APPEND ${CMAKEFILE} "execute_process(\n")
   file(APPEND ${CMAKEFILE} "  COMMAND ${Y60_EXECUTABLE} -I \"${CMAKE_BINARY_DIR}/testmodels;${CMAKE_SOURCE_DIR}/y60/js;${PLUGIN_DIRS};${CMAKE_SOURCE_DIR}/y60/shader\" ${SCRIPT} ${SCENE} ${SHADERLIB} rehearsal offscreen outputimage=${CMAKE_BINARY_DIR}/testmodels/TestImages/${NAME} outputsuffix=${IMGSUFFIX}\n")
@@ -102,14 +108,14 @@ macro(y60_add_scenetest NAME )
   if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
     set(ONEVERSION 1)
     file(APPEND ${CMAKEFILE} "message(\"*********************** NO CG *********************\")\n")
-    write_scenetest( ${NAME} )
+    write_scenetest( ${NAME} ${CMAKEFILE})
   endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
   set(SHADERLIB ${CMAKE_SOURCE_DIR}/y60/shader/shaderlibrary.xml)
   set(IMGSUFFIX .cg.png)
   if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
     set(ONEVERSION 1)
     file(APPEND ${CMAKEFILE} "\n\nmessage(\"*********************** CG *********************\")\n")
-    write_scenetest( ${NAME} )
+    write_scenetest( ${NAME} ${CMAKEFILE})
   endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
 
   if(${ONEVERSION} EQUAL 0)  
