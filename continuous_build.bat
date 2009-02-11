@@ -11,5 +11,6 @@ mkdir %BUILD_DIR%
 cd %BUILD_DIR%
 
 cmake -G "%CMAKE_GENERATOR%" ..
+
 call "%VS90COMNTOOLS%..\..\VC\vcvarsall.bat"
 vcbuild PRO60.sln "Release|Win32"

@@ -15,7 +15,7 @@ fi
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
-cmake
+cmake ..
 make -j $NUMCORES
 
 echo "=== Build done"
