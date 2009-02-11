@@ -17,6 +17,6 @@ cd $BUILD_DIR
 
 cmake ..
 make -j $NUMCORES
+make test
 
-echo "=== Build done"
 exit 0
