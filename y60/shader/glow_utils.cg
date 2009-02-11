@@ -1,0 +1,47 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+
+float gauss(float x) {
+	return 0.39894*exp(-0.5*pow(x, 2.0)); 
+}
+
+float4 applyGauss(sampler2D theTexSampler, float2 theTexCoord, float theSize, float pixW, float pixH) {
+    float myWeight = 0.0;
+    float4 myReturn = float4(0.0);
+    
+    for (float i=-theSize; i<theSize; i++) 
+    {
+        for (float j=-theSize; j<theSize; j++)
+        { 
+            float myCenterDistance = length(float2(i, j));
+         
+            float myStrength = gauss((myCenterDistance/(theSize/1.75)));
+            myWeight += myStrength;
+            
+            float4 myBlurTexel = myStrength * tex2D(theTexSampler, theTexCoord + float2(i*pixW, j*pixH));
+            myReturn += myBlurTexel;
+        }
+    }
+        
+    myReturn *= 1.0/myWeight;
+    return myReturn;
+}
+
+float4 calculateTextGlow(float4 theGlow, float4 theText) {
+    float myDiffAlpha = max(0.0, theGlow.a - theText.a);
+    float3 myGlowColor = theGlow.rgb * float3(myDiffAlpha);
+    float3 myTextColor = theText.rgb * float3(theText.a);
+    float3 myResultColor = myGlowColor + myTextColor;
+    float  mySumAlpha = myDiffAlpha + theText.a;
+
+    return float4(myResultColor.rgb/float3(mySumAlpha), mySumAlpha);
+} 
+
