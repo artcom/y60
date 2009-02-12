@@ -76,7 +76,9 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="vcbuild.exe" working-dir="${build.dir}">
+            <executable exe="cmd.exe" working-dir="${build.dir}">
+                <arg>/c</arg><arg>vcbuild_wrapper.bat</arg>
+
                 <arg>/M${NUMCORES}</arg>
                 <arg>PRO60.sln</arg>
                 <arg>${BUILD_TYPE}|Win32</arg>
