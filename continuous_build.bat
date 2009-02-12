@@ -46,14 +46,20 @@ mkdir %BUILD_DIR%
 
 :build_dir_exists
 
+if exist %BUILD_DIR%\%BUILD_TYPE% goto build_type_dir_exists
+
+mkdir %BUILD_DIR%\%BUILD_TYPE%
+
+:build_type_dir_exists
+
 call "%VS90COMNTOOLS%..\..\VC\vcvarsall.bat"
 
-cd %BUILD_DIR%
+cd %BUILD_DIR%\%BUILD_TYPE%
 
 if defined USE_NMAKE goto build_with_namke
 rem === VC build ==============================================================
 
-cmake -G "Visual Studio 9 2008" ..
+cmake -G "Visual Studio 9 2008" ..\..
 if ERRORLEVEL 1 goto error
 
 vcbuild /M%NUMCORES% PRO60.sln "%BUILD_TYPE%|%PLATFORM%"
@@ -71,7 +77,7 @@ exit 0
 rem === NMake build ===========================================================
 :build_with_namke
 
-cmake -G "NMake Makefiles" %CMAKE_ARGS% ..
+cmake -G "NMake Makefiles" %CMAKE_ARGS% ..\..
 if ERRORLEVEL 1 goto error
 
 nmake
@@ -87,6 +93,6 @@ if ERRORLEVEL 1 goto error
 exit 0
 
 :error
-rem XXX
+rem XXX usefull for debugging, but *DO NOT COMMIT* ;-)
 rem pause
 exit 1
