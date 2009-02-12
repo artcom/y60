@@ -5,7 +5,7 @@
     <macro name="prepare_windows_build">
         <command name="create build directory">
             <executable exe="cmd.exe" args="/c mkbuilddir.bat">
-                <environment name="BUILD_DIR" value="${base.dir}/_builds"/>
+                <environment name="BUILD_DIR" value="_builds"/>
                 <environment name="BUILD_TYPE" value="${BUILD_TYPE}"/>
             </executable>
         </command>
