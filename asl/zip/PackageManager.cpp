@@ -214,4 +214,8 @@ PackageManager::getSearchPath() const {
     return mySearchPath;
 }
 
+PackageList PackageManager::getPackageList() const {
+    return _myPackages;
+}
+
 }

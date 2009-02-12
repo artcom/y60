@@ -34,6 +34,8 @@
 #include <string>
 
 namespace asl {
+        
+typedef std::list<IPackagePtr> PackageList;
 
 /*! \addtogroup aslbase */
 /* @{ */
@@ -44,6 +46,9 @@ namespace asl {
 */
 class ASL_ZIP_EXPORT PackageManager {
     public:
+        
+        
+        
         PackageManager() {};
         virtual ~PackageManager() {};
 
@@ -127,10 +132,11 @@ class ASL_ZIP_EXPORT PackageManager {
         */
         std::string getSearchPath() const;
 
+        PackageList getPackageList() const;
+
     private:
         PackageManager(const PackageManager &);
         PackageManager & operator=(const PackageManager &);
-        typedef std::list<IPackagePtr> PackageList;
         PackageList _myPackages;
 
         IPackage::FileList listPackageFiles(IPackagePtr thePackage,

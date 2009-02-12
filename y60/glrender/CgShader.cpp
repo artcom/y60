@@ -224,13 +224,22 @@ namespace y60 {
 
         // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
         if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
-            const VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
+            VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
             VectorOfVectorOfString::size_type myCompilerArgsIndex = 0;
             if (theShader._myPossibleProfileNames.size() == myCompilerArgs.size()) {
                 myCompilerArgsIndex = myProfileIndex;
             } else  {
                 if (myCompilerArgs.size() != 1) {
                     throw ShaderException("bad number of compiler arg sets, must be one or match number of profiles", PLUS_FILE_LINE);
+                }
+            }
+
+            for (int i = 0; i < myCompilerArgs.size(); i++) {
+                PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
+                PackageList::const_iterator it = myPackages.begin();
+                while( it != myPackages.end() ) {
+                    std::string myArg = "-I" + (*it++)->getPath();
+                    myCompilerArgs[i].push_back( myArg );
                 }
             }
 
