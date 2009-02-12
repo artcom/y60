@@ -43,7 +43,7 @@
 
         <command name="build">
             <make args="-j ${NUMCORES}" working-dir="${build.dir}">
-                <process processor="${gcc.pp}"/>
+                <process processor="${gcc_build.pp}"/>
             </make>
         </command>
 
