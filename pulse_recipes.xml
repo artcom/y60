@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project default-recipe="unix_make">
-    <property name="build.dir" value="${base.dir}/_builds/${BUILD_TYPE}/"/>
+    <property name="build.dir" value="_builds/${BUILD_TYPE}/"/>
 
     <macro name="prepare_windows_build">
         <command name="create build directory">
@@ -36,10 +36,10 @@
     </post-processor>
 
     <recipe name="unix_make">
-        <macro-ref macro="prepare_unix_build"/>
+        <macro-ref macro="${prepare_unix_build}"/>
 
         <property name="cmake.generator" value="Unix Makefiles"/>
-        <macro-ref macro="run_cmake"/>
+        <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
             <make args="-j ${NUMCORES}" working-dir="${build.dir}">
@@ -53,10 +53,10 @@
     </recipe>
 
     <recipe name="windows_nmake">
-        <macro-ref macro="prepare_windows_build"/>
+        <macro-ref macro="${prepare_windows_build}"/>
 
         <property name="cmake.generator" value="NMake Makefile"/>
-        <macro-ref macro="run_cmake"/>
+        <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
             <executable exe="nmake.exe" working-dir="${build.dir}">
@@ -70,10 +70,10 @@
     </recipe>
 
     <recipe name="windows_vcbuild">
-        <macro-ref macro="prepare_windows_build"/>
+        <macro-ref macro="${prepare_windows_build}"/>
 
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
-        <macro-ref macro="run_cmake"/>
+        <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
             <executable exe="vcbuild.exe" working-dir="${build.dir}">
