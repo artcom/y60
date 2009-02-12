@@ -72,9 +72,15 @@
 #include "ShapeExporter.h"
 #include "CinemaHelpers.h"
 #include "res/c4d_symbols.h"
+#ifdef AC_BUILT_WITH_CMAKE
+#include "res/description/Facxmlexport.h"
+#include "res/description/Facbinaryexport.h"
+#else 
 #include "res/Facxmlexport.h"
 #include "res/Facbinaryexport.h"
+#endif
 
+#include <asl/base/initialization.h>
 #include <asl/base/settings.h>
 #include <asl/math/linearAlgebra.h>
 #include <asl/math/numeric_functions.h>
@@ -88,6 +94,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+
+#include <c4d.h>
 
 #define LIMIT_LIGHTS
 
@@ -138,7 +146,7 @@ SceneExporter::exportTransformation(y60::TransformBuilderBase & theBuilder,
     if (myBillboardTag) {
         // billboard
         BaseContainer * myContainer = myBillboardTag->GetDataInstance();
-        bool myPitchCamera = myContainer->GetBool(LOOKATCAMERA_PITCH);
+        bool myPitchCamera = 0 != myContainer->GetBool(LOOKATCAMERA_PITCH);
         //GePrint("Billboard " + theNode->GetName());
 
         if (myPitchCamera) {
@@ -656,9 +664,9 @@ SceneExporter::Save(PluginSceneSaver * theNode,
         BaseContainer * myBaseContainer = theNode->GetDataInstance();
         bool myInlineTextures = false;
         if (_myBinaryFlag) {
-            myInlineTextures = myBaseContainer->GetBool(AC_Y60_INLINE_TEXTURES_BIN, false);
+            myInlineTextures = 0 != myBaseContainer->GetBool(AC_Y60_INLINE_TEXTURES_BIN, false);
         } else {
-            myInlineTextures = myBaseContainer->GetBool(AC_Y60_INLINE_TEXTURES, false);
+            myInlineTextures = 0 != myBaseContainer->GetBool(AC_Y60_INLINE_TEXTURES, false);
         }
         GePrint("=== Exporting Y60 '" + theFileName.GetString() + "' " + (myInlineTextures ? "with" : "without") + " inlined textures");
 
@@ -737,7 +745,8 @@ Bool RegisterAcXmlExporter(void)
 
     // decide by name if the plugin shall be registered - just for user convenience
     String myName = GeLoadString(IDS_Y60_XML_EXPORT);
-    if (!myName.Content()) return TRUE;
+    if (!myName.Content()) 
+        return FALSE;
 
     // be sure to use a unique ID obtained from www.plugincafe.com
     if (!RegisterSceneSaverPlugin(1000001, myName, 0, SceneExporter::Alloc, "Facxmlexport", "x60")) {
@@ -745,7 +754,8 @@ Bool RegisterAcXmlExporter(void)
     }
 
     myName = GeLoadString(IDS_Y60_BINARY_EXPORT);
-    if (!myName.Content()) return TRUE;
+    if (!myName.Content()) 
+        return FALSE;
 
     if (!RegisterSceneSaverPlugin(1000002, myName, 0, SceneExporter::AllocBinary, "Facbinaryexport", "b60")) {
         return FALSE;

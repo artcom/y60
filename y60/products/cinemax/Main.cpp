@@ -7,7 +7,7 @@
 /////////////////////////////////////////////////////////////
 
 // Starts the plugin registration
-#include "c4d_include.h" 
+#include <c4d.h> 
 
 
 // forward declarations 

@@ -68,7 +68,9 @@
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
 
-#include "CinemaHelpers.h"
+#include "CinemaHelpers.h"   //include order is mandatory
+#include <c4d.h>
+
 
 using namespace asl;
 

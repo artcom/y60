@@ -81,6 +81,8 @@
 #include <iostream>
 #include <float.h>
 
+#include <c4d.h>
+
 using namespace std;
 using namespace y60;
 using namespace asl;

@@ -58,36 +58,72 @@
 
 #include "MaterialExporter.h"
 
-#include "CinemaHelpers.h"
-
 #include <asl/math/Matrix4.h>
 #include <y60/base/property_functions.h>
 #include <y60/scene/ShapeBuilder.h>
 #include <y60/base/PropertyNames.h>
 #include <y60/image/Image.h>
 
-#if C4D_API_VERSION >= 8500
-#include <Xbitmap.h>
+#include "CinemaHelpers.h"
+
+#include <c4d.h>
+
+#if C4D_API_VERSION >= 8500 && C4D_API_VERSION < 11000
+#   include <Xbitmap.h>
 #endif
 
 #include <string>
 
-using namespace std;
-using namespace asl;
-using namespace y60;
+namespace {
 
-const float AMBIENT_COLOR = 0.4;
+    using namespace std;
+    using namespace asl;
+    using namespace y60;
+
+    struct MaterialTextureTagCombo {
+        TextureTag * _myTextureTag;
+        Material *   _myMaterial;
+    };
+    typedef std::vector<MaterialTextureTagCombo> MaterialList;
+
+    const float AMBIENT_COLOR = 0.4;
+}
+
+struct MaterialExporter::Impl {
+    y60::SceneBuilderPtr    _mySceneBuilder;
+
+    MaterialInfoMap         _myMaterialMap;
+    ExportedMaterialInfo    _myDefaultMaterialInfo;
+    y60::MaterialBuilderPtr _myMaterialBuilder;
+    y60::MaterialBuilderPtr _myDefaultMaterialBuilder;
+    MaterialList            _myMaterials;
+
+    Filename                _myDocumentPath;
+    bool                    _myInlineTextures;
+
+    Impl( y60::SceneBuilderPtr theSceneBuilder,
+          const Filename & theDocumentPath, bool theInlineTextures)
+        : _mySceneBuilder(theSceneBuilder)
+        , _myMaterialMap()
+        , _myDefaultMaterialInfo()
+        , _myMaterialBuilder(0)
+        , _myDefaultMaterialBuilder(0)
+        , _myMaterials()
+        , _myDocumentPath(theDocumentPath)
+        , _myInlineTextures(theInlineTextures)
+    {}
+};
 
 MaterialExporter::MaterialExporter(y60::SceneBuilderPtr theSceneBuilder,
                                    const Filename & theDocumentPath, bool theInlineTextures) :
-    _mySceneBuilder(theSceneBuilder), _myDocumentPath(theDocumentPath), _myInlineTextures(theInlineTextures),
-    _myMaterialBuilder(0), _myDefaultMaterialBuilder(0)
+    _myImpl(new Impl(theSceneBuilder,theDocumentPath,theInlineTextures) )
 {
-    Image::allowInlineFlag = _myInlineTextures;
+    Image::allowInlineFlag = _myImpl->_myInlineTextures;
 }
 
 void
-MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor) {
+MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor)
+{
     BaseContainer myColorContainer = theColorChannel->GetData();
 
     Vector myMaterialColor = myColorContainer.GetVector(BASECHANNEL_COLOR_EX);
@@ -99,27 +135,32 @@ MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor) {
     theColor[3] = 1;
 }
 
+MaterialExporter::~MaterialExporter()
+{
+    delete _myImpl;
+}
+
 ExportedMaterialInfo
 MaterialExporter::createDefaultMaterial() {
-    if (_myDefaultMaterialInfo._myMaterialName == "") {
-        _myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));
-        _myDefaultMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*_myDefaultMaterialBuilder);
-        _myDefaultMaterialInfo._myMaterialName = "default_material";
-        _myDefaultMaterialInfo._myTextureCount = 0;
-        _myDefaultMaterialInfo._myTexureMapping.clear();
+    if (_myImpl->_myDefaultMaterialInfo._myMaterialName == "") {
+        _myImpl->_myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));
+        _myImpl->_myDefaultMaterialInfo._myMaterialId = _myImpl->_mySceneBuilder->appendMaterial(*_myImpl->_myDefaultMaterialBuilder);
+        _myImpl->_myDefaultMaterialInfo._myMaterialName = "default_material";
+        _myImpl->_myDefaultMaterialInfo._myTextureCount = 0;
+        _myImpl->_myDefaultMaterialInfo._myTexureMapping.clear();
 
         VectorOfRankedFeature myLightingRequirements;
         createLightingFeature(myLightingRequirements, y60::LAMBERT);
-           _myDefaultMaterialBuilder->setType(myLightingRequirements);
+           _myImpl->_myDefaultMaterialBuilder->setType(myLightingRequirements);
 
-        setPropertyValue<asl::Vector4f>(_myDefaultMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, Vector4f(0.8, 0.8, 0.8, 1));
-        setPropertyValue<float>(_myDefaultMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, 64);
-        setPropertyValue<asl::Vector4f>(_myDefaultMaterialBuilder->getNode(), "vector4f", y60::SPECULAR_PROPERTY, Vector4f(0, 0, 0, 1));
-        setPropertyValue<asl::Vector4f>(_myDefaultMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, Vector4f(AMBIENT_COLOR, AMBIENT_COLOR, AMBIENT_COLOR, 1));
-        _myDefaultMaterialBuilder->computeRequirements();
+        setPropertyValue<asl::Vector4f>(_myImpl->_myDefaultMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, Vector4f(0.8, 0.8, 0.8, 1));
+        setPropertyValue<float>(_myImpl->_myDefaultMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, 64);
+        setPropertyValue<asl::Vector4f>(_myImpl->_myDefaultMaterialBuilder->getNode(), "vector4f", y60::SPECULAR_PROPERTY, Vector4f(0, 0, 0, 1));
+        setPropertyValue<asl::Vector4f>(_myImpl->_myDefaultMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, Vector4f(AMBIENT_COLOR, AMBIENT_COLOR, AMBIENT_COLOR, 1));
+        _myImpl->_myDefaultMaterialBuilder->computeRequirements();
     }
-    _myMaterialBuilder = _myDefaultMaterialBuilder;
-    return _myDefaultMaterialInfo;
+    _myImpl->_myMaterialBuilder = _myImpl->_myDefaultMaterialBuilder;
+    return _myImpl->_myDefaultMaterialInfo;
 }
 
 bool
@@ -194,7 +235,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
-        std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
+        std::string myTextureFilename = getTexturePath(_myImpl->_myDocumentPath, myTextureName);
         if (theMaterialBuilder->isMovie(myTextureFilename)) {
             myCreateMipmapFlag = false;
             LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
@@ -427,16 +468,16 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
     }
 
     // concatenate material name and collect cinemax materials
-    _myMaterials.clear();
+    _myImpl->_myMaterials.clear();
     std::string myY60MaterialName("");
-    for (int myTextureIndex = 0; myTextureIndex < theTextureList.size(); myTextureIndex++) {
+    for (TextureList::size_type myTextureIndex = 0; myTextureIndex < theTextureList.size(); myTextureIndex++) {
         MaterialTextureTagCombo myMatTexTagCombo;
         myMatTexTagCombo._myTextureTag = theTextureList[myTextureIndex].first;
         myMatTexTagCombo._myMaterial = static_cast<Material *>(myMatTexTagCombo._myTextureTag->GetMaterial());
         if (!myMatTexTagCombo._myMaterial) {
             throw ExportException("Material not defined", "MaterialExporter::writeMaterial()");
         }
-        _myMaterials.push_back(myMatTexTagCombo);
+        _myImpl->_myMaterials.push_back(myMatTexTagCombo);
         if (myTextureIndex == 0) {
             myY60MaterialName = getString(myMatTexTagCombo._myMaterial->GetName());
         } else {
@@ -444,19 +485,19 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
         }
     }
 
-    MaterialInfoMap::iterator myMaterialIt = _myMaterialMap.find(myY60MaterialName);
-    if (myMaterialIt != _myMaterialMap.end()) {
+    MaterialInfoMap::iterator myMaterialIt = _myImpl->_myMaterialMap.find(myY60MaterialName);
+    if (myMaterialIt != _myImpl->_myMaterialMap.end()) {
         return myMaterialIt->second;
     }
 
-    _myMaterialBuilder = y60::MaterialBuilderPtr(new y60::MaterialBuilder(myY60MaterialName, _myInlineTextures));
-    myExportedMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*_myMaterialBuilder);
+    _myImpl->_myMaterialBuilder = y60::MaterialBuilderPtr(new y60::MaterialBuilder(myY60MaterialName, _myImpl->_myInlineTextures));
+    myExportedMaterialInfo._myMaterialId = _myImpl->_mySceneBuilder->appendMaterial(*_myImpl->_myMaterialBuilder);
     myExportedMaterialInfo._myMaterialName = myY60MaterialName;
 
     // count y60 textures that need uvmaps
-    for (int myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); myMaterialIndex++) {
-        Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial;
-        TextureTag * myTextureTag = _myMaterials[myMaterialIndex]._myTextureTag;
+    for (MaterialList::size_type myMaterialIndex = 0; myMaterialIndex < _myImpl->_myMaterials.size(); myMaterialIndex++) {
+        Material * myMaterial = _myImpl->_myMaterials[myMaterialIndex]._myMaterial;
+        TextureTag * myTextureTag = _myImpl->_myMaterials[myMaterialIndex]._myTextureTag;
           if (myMaterial->GetChannelState(CHANNEL_COLOR)) {
               BaseChannel * myColorChannel = myMaterial->GetChannel(CHANNEL_COLOR);
               if (myColorChannel) {
@@ -508,16 +549,16 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
         //myExportedMaterialInfo._myTextureCount = 0;
 
         // Check if material has alread been exported
-        if (_myMaterialMap.find(theMaterialInfo._myMaterialName) != _myMaterialMap.end()) {
+        if (_myImpl->_myMaterialMap.find(theMaterialInfo._myMaterialName) != _myImpl->_myMaterialMap.end()) {
             return;
         }
 
         VectorOfRankedFeature myLightingRequirements;
         bool myMaterialAlphaFlag = false;
 
-        for (unsigned myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); ++myMaterialIndex) {
-            Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial;
-            TextureTag * myTextureTag = _myMaterials[myMaterialIndex]._myTextureTag;
+        for (unsigned myMaterialIndex = 0; myMaterialIndex < _myImpl->_myMaterials.size(); ++myMaterialIndex) {
+            Material * myMaterial = _myImpl->_myMaterials[myMaterialIndex]._myMaterial;
+            TextureTag * myTextureTag = _myImpl->_myMaterials[myMaterialIndex]._myTextureTag;
 
             // Export diffuse color and texture
             y60::LightingModel myLightingType = y60::LAMBERT;
@@ -539,13 +580,13 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                         asl::Vector4f myDiffuseColor(1,1,1,1);
                         getColor(myColorChannel, myDiffuseColor);
                         
-                        setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
+                        setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
 
                         asl::Vector4f myAmbientColor = product(myDiffuseColor, AMBIENT_COLOR);
                         myAmbientColor[3] = 1.0f;
-                        setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myAmbientColor);
+                        setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myAmbientColor);
                     } else {
-                        myDiffuseColorFlag = exportShader(myShader, _myMaterialBuilder,
+                        myDiffuseColorFlag = exportShader(myShader, _myImpl->_myMaterialBuilder,
                                                           myMaterial,theSceneBuilder,
                                                           &myColorContainer, myTextureTag,
                                                           theMinCoord, theMaxCoord);
@@ -554,12 +595,12 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                         Vector4f myColor(1, 1, 1, 1);
                         if (myDiffuseColorFlag) {
                             getColor(myColorChannel, myColor);
-                            setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myColor);
+                            setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myColor);
                         }
 
                         myColor *= AMBIENT_COLOR;
                         myColor[3] = 1.0;
-                        setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myColor);
+                        setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myColor);
                     }
                 }
             }
@@ -574,11 +615,11 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 
                     Vector4f myDiffuseColor(1, 1, 1, 1);
                     getColor(myTransparencyChannel, myDiffuseColor); // we do not know what to do with this color value (vs)
-                    if (hasPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY) ) {
-                        myDiffuseColor = getPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY);
+                    if (hasPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY) ) {
+                        myDiffuseColor = getPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY);
                     }
                     myDiffuseColor[3] = myBrightness;
-                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
+                    setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
                 }
             }
 
@@ -596,7 +637,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     //myEmissiveColor[0] *= myBrightness;
                     //myEmissiveColor[1] *= myBrightness;
                     //myEmissiveColor[2] *= myBrightness;
-                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);
+                    setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);
                 }
             }
 
@@ -609,7 +650,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
                     GePrint("### " + myMaterial->GetName() + ": Alpha texture=" + myTextureName);
                     PluginShader  * myShader = myAlphaChannel->GetShader();
-                    exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
+                    exportShader(myShader, _myImpl->_myMaterialBuilder, myMaterial,theSceneBuilder,
                                  &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
                 }
             }
@@ -658,10 +699,10 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     //                SpecularWidth sharpens the highlight 
                     //                  (OpenGL: 0 -> large hightlight, 128 -> small highlight
                     float myShininess = 128.0 - mySpecularWidth * 128;
-                    setPropertyValue<float>(_myMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
+                    setPropertyValue<float>(_myImpl->_myMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
                     mySpecularColor *= mySpecularHeight;
                     mySpecularColor[3] = 1.0;
-                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::SPECULAR_PROPERTY, mySpecularColor);
+                    setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::SPECULAR_PROPERTY, mySpecularColor);
                 }
             }
 
@@ -675,8 +716,8 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 #if 1
                         GePrint("### " + myMaterial->GetName() + ": Bumpmap is not supported: " + myBumpMapName);
 #else
-                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myContainer, y60::BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
-                        _myMaterialBuilder->needTextureFallback(true);
+                        exportTexture(myMaterial, _myImpl->_myMaterialBuilder, theSceneBuilder, &myContainer, y60::BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
+                        _myImpl->_myMaterialBuilder->needTextureFallback(true);
 #endif
                     }
                 }
@@ -691,7 +732,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     GePrint("### " + myMaterial->GetName() + ": Environment texture=" + myTextureName);
                     if (myTextureName.GetLength() ) {
                         exportTexture(myMaterial,
-                                      _myMaterialBuilder, theSceneBuilder,
+                                      _myImpl->_myMaterialBuilder, theSceneBuilder,
                                       &myContainer, y60::PAINT,
                                       myTextureTag, theMinCoord, theMaxCoord, false, true);
                     }
@@ -700,17 +741,17 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 
             // build material requirements
             createLightingFeature(myLightingRequirements, myLightingType);
-                _myMaterialBuilder->setType(myLightingRequirements);
+                _myImpl->_myMaterialBuilder->setType(myLightingRequirements);
         }
 
-        _myMaterialBuilder->setTransparencyFlag(myMaterialAlphaFlag);
-        //myExportedMaterialInfo._myTextureCount = _myMaterialBuilder->getTextureCount();
-        _myMaterialMap[theMaterialInfo._myMaterialName] = theMaterialInfo;
-        _myMaterialBuilder->computeRequirements();
+        _myImpl->_myMaterialBuilder->setTransparencyFlag(myMaterialAlphaFlag);
+        //myExportedMaterialInfo._myTextureCount = _myImpl->_myMaterialBuilder->getTextureCount();
+        _myImpl->_myMaterialMap[theMaterialInfo._myMaterialName] = theMaterialInfo;
+        _myImpl->_myMaterialBuilder->computeRequirements();
 
         GePrint("+++ Exported material '" + String(theMaterialInfo._myMaterialName.c_str()) + "'");
         //return myExportedMaterialInfo;
-        //return _myMaterialBuilder;
+        //return _myImpl->_myMaterialBuilder;
     } else {
         writeMaterial(theMaterialInfo, theNode->GetUp(), theSceneBuilder,theMinCoord, theMaxCoord);
     }

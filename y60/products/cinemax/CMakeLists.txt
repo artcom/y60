@@ -18,8 +18,19 @@ ShapeExporter.h
 c4d_include.h
 )
 
+
+if(WIN32)
+    add_definitions( -D__PC)
+endif(WIN32)
+if(OSX)
+    add_definitions( -D__MAC)
+endif(OSX)
+
+
+add_definitions( -DC4D_API_VERSION=${C4D_VERSION})
+
 ac_add_plugin(
-    ac-cinemax
+    c4d-xport y60/c4d-xport
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}  
     DEPENDS aslbase aslmath aslzip asldom    
@@ -27,3 +38,6 @@ ac_add_plugin(
     EXTERNS C4D
 )
 
+if(WIN32)
+    set_target_properties(c4d-xport PROPERTIES COMPILE_FLAGS "/vmg /vms")
+endif(WIN32)

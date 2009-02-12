@@ -68,6 +68,10 @@
 #ifndef _ac_c4d_AnimationExporter_h_
 #define _ac_c4d_AnimationExporter_h_
 
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
 
 #include <y60/base/iostream_functions.h>
 #include <y60/scene/AnimationBuilder.h>
@@ -75,11 +79,6 @@
 #include <y60/scene/ClipBuilder.h>
 
 #include "c4d_include.h"
-
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
 
 #undef DB
 #define DB(x) // x

@@ -70,7 +70,7 @@
 
 #include <string>
 
-#include "c4d_include.h" 
+#include "c4d_include.h"
 
 void displayMessage(const std::string & theMessage);
 void displayMessage(const String & theMessage);

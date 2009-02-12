@@ -85,6 +85,9 @@ namespace asl {
     class VertexNormalBuilder;
 }
 
+class SelectionTag;
+struct Vector;
+
 class ShapeExporter {
     public:
         ShapeExporter(y60::SceneBuilder & theSceneBuilder, MaterialExporter & theMaterialExporter);

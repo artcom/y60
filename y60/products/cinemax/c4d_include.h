@@ -68,18 +68,12 @@
 #ifndef _ac_c4d_include_h_
 #define _ac_c4d_include_h_
 
+#define NOMINMAX
 #include <windows.h>
 #include <mmsystem.h>
 
-#undef COLOR_BACKGROUND
-#undef CreateDialog
-#define Polygon CPolygon
-#undef min
-#undef max
-
-#undef API_VERSION
-#include <c4d.h>
-#undef offsetof
+#include <operatingsystem.h>
+#include <c4d_general.h>
 
 #endif
 

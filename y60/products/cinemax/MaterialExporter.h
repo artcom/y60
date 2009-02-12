@@ -70,8 +70,6 @@
 
 #include "Exceptions.h"
 
-#include "c4d_include.h"
-
 #include <y60/scene/MaterialBuilder.h>
 #include <y60/scene/SceneBuilder.h>
 #include <y60/base/DataTypes.h>
@@ -81,6 +79,16 @@
 #include <vector>
 #include <map>
 
+class Filename;
+class TextureTag;
+class UVWTag;
+class BaseObject;
+class BaseChannel;
+class String;
+class Material;
+class PluginShader;
+class BaseContainer;
+
 struct ExportedMaterialInfo {
     std::string _myMaterialName;
     std::string _myMaterialId;
@@ -89,22 +97,18 @@ struct ExportedMaterialInfo {
     ExportedMaterialInfo(): _myMaterialName(""), _myMaterialId(""), _myTextureCount(0) {}
 };
 
-struct MaterialTextureTagCombo {
-    TextureTag * _myTextureTag;
-    Material *   _myMaterial;
-};
 
 typedef std::map<std::string, ExportedMaterialInfo> MaterialInfoMap;
 
 typedef std::vector<std::pair<TextureTag*, UVWTag*> > TextureList;
 typedef std::vector<UVWTag*> UVTagList;
-typedef std::vector<MaterialTextureTagCombo> MaterialList;
 
 class MaterialExporter {
     public:
         MaterialExporter(y60::SceneBuilderPtr theSceneBuilder,
                          const Filename & theDocumentPath, bool theInlineTextures = true);
-        ~MaterialExporter() {};
+
+        ~MaterialExporter();
 
         ExportedMaterialInfo  initiateExport(BaseObject * theNode, TextureList theTextureList,
                                              y60::SceneBuilder & theSceneBuilder);
@@ -118,16 +122,13 @@ class MaterialExporter {
                            const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
 
     private:
-        y60::SceneBuilderPtr  _mySceneBuilder;
+        struct Impl;
+        Impl* _myImpl;
 
-        MaterialInfoMap         _myMaterialMap;
-        ExportedMaterialInfo    _myDefaultMaterialInfo;
-        y60::MaterialBuilderPtr _myMaterialBuilder;
-        y60::MaterialBuilderPtr _myDefaultMaterialBuilder;
-        MaterialList            _myMaterials;
+        // forbidden
+        MaterialExporter(const MaterialExporter&);
+        MaterialExporter& operator=(const MaterialExporter&);
 
-        Filename             _myDocumentPath;
-        bool                 _myInlineTextures;
         void getColor(BaseChannel * theColorChannel, asl::Vector4f & theColor);
         const std::string getTexturePath(Filename & theDocumentpath, String & theTextureFilename);
 

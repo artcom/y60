@@ -79,10 +79,11 @@
 #include <y60/scene/TransformBuilder.h>
 #include <y60/scene/CameraBuilder.h>
 
-#include "c4d_include.h"
+#include <c4d_filterdata.h> // needed for SceneSaverData
 
 class ShapeExporter;
 class MaterialExporter;
+class CameraObject;
 
 class SceneExporter : public SceneSaverData {
     public:

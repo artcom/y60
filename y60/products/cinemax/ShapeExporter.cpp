@@ -66,14 +66,17 @@
 //=============================================================================
 
 #include "ShapeExporter.h"
-#include "CinemaHelpers.h"
+
+#include <c4d.h>
+
+#include <asl/math/GeometryUtils.h>
+#include <asl/math/numeric_functions.h>
 
 #include <y60/scene/ElementBuilder.h>
 #include <y60/scene/SceneBuilder.h>
 #include <y60/scene/ShapeBuilder.h>
 
-#include <asl/math/GeometryUtils.h>
-#include <asl/math/numeric_functions.h>
+#include "CinemaHelpers.h"
 
 using namespace asl;
 using namespace y60;
@@ -109,7 +112,7 @@ ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, boo
     // iterate over selection, collect all textures that use this selection
     TextureList myMaterialList;
     UVTagList myUVTagList;
-    for (LONG si = 0; si < mySelectionList.size(); ++si) {
+    for (std::vector<SelectionTag*>::size_type si = 0; si < mySelectionList.size(); ++si) {
 
         myMaterialList.clear();
         myUVTagList.clear();
@@ -228,7 +231,10 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     std::string myName = getString(theNode->GetName() + "_" + theSelection->GetName());
 
     PolygonObject * myPolygon = ToPoly(thePolygonNode);
-#if API_VERSION >= 9800
+#if API_VERSION >= 11000
+    const Vector  * myVertices      = myPolygon->GetPointR();
+    const CPolygon * myPolygons      = myPolygon->GetPolygonR();
+#elif API_VERSION >= 9800
     const Vector  * myVertices      = myPolygon->GetPointR();
     const Polygon * myPolygons      = myPolygon->GetPolygonR();
 #else
@@ -286,9 +292,10 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 
     map<string,bool> myCreatedUVBins;
     // create uvsets 
-    for (LONG myUVSetIndex = 0; myUVSetIndex < myUVSetCount; ++myUVSetIndex) {
-        if (myMaterialInfo._myTexureMapping.size() > myUVSetIndex && 
-            myMaterialInfo._myTexureMapping[myUVSetIndex] == UV_MAP) {
+    LONG myUVSetIndex = 0;
+    for (; myUVSetIndex < myUVSetCount; ++myUVSetIndex) {
+        if (myMaterialInfo._myTexureMapping.size() > static_cast<std::size_t>(myUVSetIndex)
+         && myMaterialInfo._myTexureMapping[myUVSetIndex] == UV_MAP) {
             std::string myBinName = std::string("UVCoords_") + asl::as_string(myUVSetIndex);
             GePrint(String(myName.c_str()) + ": Creating bin=" + String(myBinName.c_str()));
             myShapeBuilder.createVertexDataBin<Vector2f>(myBinName, 1);
@@ -337,9 +344,10 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     // Create UV indices sets
     for (LONG myTextureIndex = 0; myTextureIndex < myY60TextureCount; ++myTextureIndex) {
         std::string myBinName = std::string("UVCoords_") + asl::as_string(myTextureIndex);
-        if (myMaterialInfo._myTexureMapping.size() > myUVSetIndex && 
-            myMaterialInfo._myTexureMapping[myTextureIndex] == UV_MAP &&
-            myCreatedUVBins.find(myBinName) == myCreatedUVBins.end()) {
+        if (myMaterialInfo._myTexureMapping.size() > static_cast<std::size_t>(myUVSetIndex)
+         && myMaterialInfo._myTexureMapping[myTextureIndex] == UV_MAP &&
+            myCreatedUVBins.find(myBinName) == myCreatedUVBins.end())
+        {
     
 
             // do we have enough uvsets for our Y60 textures, if not,take the first uv set
@@ -516,7 +524,10 @@ ShapeExporter::setupNormalBuilder(asl::VertexNormalBuilder<float> & theVertexNor
     PolygonObject * myPolygon = ToPoly(theNode);
 
     LONG      myVertexCount   = myPolygon->GetPointCount();
-#if API_VERSION >= 9800    
+#if API_VERSION >= 11000
+    const Vector  * myVertices      = myPolygon->GetPointR();
+    const CPolygon * myPolygons      = myPolygon->GetPolygonR();
+#elif API_VERSION >= 9800
     const Polygon * myPolygons      = myPolygon->GetPolygonR();
     const Vector  * myVertices      = myPolygon->GetPointR();
 #else
