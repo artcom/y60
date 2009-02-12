@@ -97,4 +97,5 @@ macro(_ac_buildinfo_filename TARGET_NAME OUTPUT_VARIABLE)
     endif( ACMAKE_BUILDINFO)
 endmacro(_ac_buildinfo_filename)
 
-
+mark_as_advanced( SVN )
+mark_as_advanced( SVNVERSION )

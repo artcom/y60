@@ -218,3 +218,8 @@ ENDIF(SDL_LIBRARY_TEMP_D)
 #MESSAGE("SDL_LIBRARY is ${SDL_LIBRARY}")
 #MESSAGE("SDL_LIBRARY_D is ${SDL_LIBRARY_D}")
 
+mark_as_advanced( SDLMAIN_LIBRARY )
+mark_as_advanced( SDLMAIN_LIBRARY_D )
+mark_as_advanced( SDL_INCLUDE_DIR )
+mark_as_advanced( SDL_LIBRARY )
+mark_as_advanced( SDL_LIBRARY_TEMP_D )

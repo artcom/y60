@@ -29,6 +29,8 @@ endif(LINUX)
 if(OSX)
     find_library(CARBON     Carbon)
     find_library(AUDIO_UNIT AudioUnit)
+    mark_as_advanced( CARBON )
+    mark_as_advanced( AUDIO_UNIT )
 endif(OSX)
 
 ac_add_project(

@@ -38,5 +38,6 @@ list(APPEND REQ_PACKAGES FFMPEG )
 
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)
+    mark_as_advanced( COCOA_LIBRARIES )
 endif( OSX )
 
