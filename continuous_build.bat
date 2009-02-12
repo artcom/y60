@@ -1,5 +1,16 @@
-if not defined %VERBOSE% @ECHO OFF
 BREAK=ON
+if defined %VERBOSE% goto be_verbose
+
+echo OFF
+goto verbose_done
+
+:be_verbose
+
+rem dump environemnt
+set
+
+:verbose_done
+
 
 set BUILD_DIR=_build
 
