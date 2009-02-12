@@ -77,6 +77,7 @@
 #   include <sys/wait.h>
 #   include <errno.h>
 #   include <unistd.h>
+#   include <string.h>
 #else
 #   error Your platform is missing!
 #endif
