@@ -65,7 +65,7 @@
         </command>
 
         <command name="test">
-            <executable exe="nmake.exe" args="test" working-dir="${build.dir}">
+            <executable exe="nmake.exe" args="test" working-dir="${build.dir}"/>
         </command>
     </recipe>
 
@@ -78,7 +78,7 @@
         <command name="build">
             <executable exe="vcbuild.exe" working-dir="${build.dir}">
                 <arg>/M${NUMCORES}</arg>
-                <arga>PRO60.sln</arg>
+                <arg>PRO60.sln</arg>
                 <arg>${BUILD_TYPE}|Win32</arg>
 
                 <process processor="${msvc_build.pp}"/>
@@ -87,7 +87,7 @@
 
         <command name="test">
             <executable exe="vcbuild.exe" working-dir="${build.dir}">
-                <arga>RUN_TESTS.vcproj</arg>
+                <arg>RUN_TESTS.vcproj</arg>
                 <arg>${BUILD_TYPE}|Win32</arg>
             </executable>
         </command>
