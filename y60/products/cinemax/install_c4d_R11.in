@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# XXX: this does not work on OSX
+
+if [ "$C4D_SDK" == "" ] ; then
+    echo "### Error: Environment variable \$C4D_SDK must be set to your Cinema4d resource directory"
+    echo "           e.g. C:\Programme\MAXON\CINEMA 4D R11\resource"
+    exit 1
+fi
+
+BIN_DIR="@CMAKE_BINARY_DIR@/lib"
+SOURCE_DIR="@CMAKE_CURRENT_SOURCE_DIR@"
+
+DIST_BIN_DIR="${C4D_SDK}/modules"
+
+if [ "$DEBUG" == "1" ] ; then
+    BIN_DIR="$BIN_DIR/Debug"
+else
+    BIN_DIR="$BIN_DIR/Release"
+fi
+
+echo "* Creating package directories and copying files"
+cd "$DIST_BIN_DIR"
+rm -rf y60
+mkdir "$DIST_BIN_DIR/y60"
+cp "$BIN_DIR/c4d-xport.dll" "$DIST_BIN_DIR/y60/c4d-xport.cdl"
+cp "$BIN_DIR/c4d-xport.pdb" "$DIST_BIN_DIR/y60/"
+mkdir "$DIST_BIN_DIR/y60/res"
+cp "$SOURCE_DIR/res/c4d_symbols.h" "$DIST_BIN_DIR/y60/res"
+mkdir "$DIST_BIN_DIR/y60/res/description"
+cp "$SOURCE_DIR"/res/description/*.{h,res} "$DIST_BIN_DIR/y60/res/description"
+mkdir "$DIST_BIN_DIR/y60/res/strings_us"
+cp "$SOURCE_DIR/res/strings_us/c4d_strings.str" "$DIST_BIN_DIR/y60/res/strings_us"
+mkdir "$DIST_BIN_DIR/y60/res/strings_us/description"
+cp "$SOURCE_DIR"/res/strings_us/description/*.str "$DIST_BIN_DIR/y60/res/strings_us/description"
+
+echo "* Done"
+
+
