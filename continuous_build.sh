@@ -3,19 +3,23 @@ set -e
 
 BUILD_DIR="_build"
 
-if [[ "$VERBOSE" && "$VERBOSE" != "0" ]]; then 
+if [[ -n "$VERBOSE" && "$VERBOSE" != "0" ]]; then 
     set -x
     env
 fi
 
-if [[ ! "$NUMCORES" || "$NUMCORES" = "0" ]]; then 
+if [[ -n "$BUILD_TYPE" ]]; then 
+    CMAKE_ARGS="$CMAKE_ARGS -D CMAKE_BUILD_TYPE=$BUILD_TYPE"
+fi
+
+if [[ -z "$NUMCORES" || "$NUMCORES" = "0" ]]; then 
     NUMCORES=1
 fi
 
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
-cmake ..
+cmake $CMAKE_ARGS ..
 make -j $NUMCORES
 make test
 
