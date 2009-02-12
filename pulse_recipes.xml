@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<project default-recipe="unix_make">
+    <property name="build.dir" value="${base.dir}/_builds/${BUILD_TYPE}/"/>
+
+    <macro name="prepare_windows_build">
+        <command name="create build directory">
+            <executable exe="cmd.exe" args="/c mkbuilddir.bat">
+                <environment name="BUILD_DIR" value="${base.dir}/_builds"/>
+                <environment name="BUILD_TYPE" value="${BUILD_TYPE}"/>
+            </executable>
+        </command>
+    </macro>
+
+    <macro name="prepare_unix_build">
+        <command name="create build directory">
+            <executable exe="mkdir" args="-p ${build.dir}"/>
+        </command>
+    </macro>
+
+    <macro name="run_cmake">
+        <command name="configure">
+            <executable exe="cmake" working-dir="${build.dir}">
+                <arg>-G</arg><arg>${cmake.generator}</arg>
+                <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${BUILD_TYPE}</arg>
+                <arg>../../</arg>
+            </executable>
+        </command>
+    </macro>
+
+    <post-processor name="gcc_build.pp">
+        <gcc.pp name="gcc.pp"/>
+    </post-processor>
+
+    <post-processor name="msvc_build.pp">
+        <msbuild.pp name="msbuild.pp"/>
+    </post-processor>
+
+    <recipe name="unix_make">
+        <macro-ref macro="prepare_unix_build"/>
+
+        <property name="cmake.generator" value="Unix Makefiles"/>
+        <macro-ref macro="run_cmake"/>
+
+        <command name="build">
+            <make args="-j ${NUMCORES}" working-dir="${build.dir}">
+                <process processor="${gcc.pp}"/>
+            </make>
+        </command>
+
+        <command name="test">
+            <make targets="test" working-dir="${build.dir}"/>
+        </command>
+    </recipe>
+
+    <recipe name="windows_nmake">
+        <macro-ref macro="prepare_windows_build"/>
+
+        <property name="cmake.generator" value="NMake Makefile"/>
+        <macro-ref macro="run_cmake"/>
+
+        <command name="build">
+            <executable exe="nmake.exe" working-dir="${build.dir}">
+                <process processor="${msvc_build.pp}"/>
+            </executable>
+        </command>
+
+        <command name="test">
+            <executable exe="nmake.exe" args="test" working-dir="${build.dir}">
+        </command>
+    </recipe>
+
+    <recipe name="windows_vcbuild">
+        <macro-ref macro="prepare_windows_build"/>
+
+        <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <macro-ref macro="run_cmake"/>
+
+        <command name="build">
+            <executable exe="vcbuild.exe" working-dir="${build.dir}">
+                <arg>/M${NUMCORES}</arg>
+                <arga>PRO60.sln</arg>
+                <arg>${BUILD_TYPE}|Win32</arg>
+
+                <process processor="${msvc_build.pp}"/>
+            </executable>
+        </command>
+
+        <command name="test">
+            <executable exe="vcbuild.exe" working-dir="${build.dir}">
+                <arga>RUN_TESTS.vcproj</arg>
+                <arg>${BUILD_TYPE}|Win32</arg>
+            </executable>
+        </command>
+    </recipe>
+
+</project>
