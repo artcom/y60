@@ -12,7 +12,7 @@ set
 :verbose_done
 
 
-set BUILD_DIR=_build
+set BUILD_DIR=_builds
 
 rem === Check parameters ======================================================
 
