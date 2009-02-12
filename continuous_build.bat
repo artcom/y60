@@ -46,11 +46,14 @@ cmake -G "Visual Studio 9 2008" ..
 if ERRORLEVEL 1 goto error
 
 vcbuild /M%NUMCORES% PRO60.sln "%BUILD_TYPE%|%PLATFORM%"
-rem nmake
 if ERRORLEVEL 1 goto error
+
+if defined %SKIP_TESTS% goto vcbuild_tests_skipped
 
 vcbuild TEST.vcproj
 if ERRORLEVEL 1 goto error
+
+:vcbuild_tests_skipped
 
 exit 0
 
@@ -63,8 +66,12 @@ if ERRORLEVEL 1 goto error
 nmake
 if ERRORLEVEL 1 goto error
 
+if defined %SKIP_TESTS% goto nmake_tests_skipped
+
 nmake test
 if ERRORLEVEL 1 goto error
+
+:nmake_tests_skipped
 
 exit 0
 

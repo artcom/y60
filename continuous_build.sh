@@ -21,6 +21,9 @@ cd $BUILD_DIR
 
 cmake $CMAKE_ARGS ..
 make -j $NUMCORES
-make test
+
+if [[ -z "$SKIP_TESTS" || "$SKIP_TESTS" == "0" ]]; then 
+    make test
+fi
 
 exit 0
