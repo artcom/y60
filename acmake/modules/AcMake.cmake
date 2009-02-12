@@ -21,6 +21,13 @@ include(CTest)
 
 include(FindPkgConfig)
 
+# Force default buildtype to Release.
+# Change helpstring to show Profiling and Coverage
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling [gcc] Coverage [gcc]." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 # Make sure we have our templates and tools available.
 # For an integrated build, this just means setting some vars.
 # For a separate build, we load the installed config file.
