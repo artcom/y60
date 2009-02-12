@@ -47,6 +47,7 @@ set(ACMAKE_BINARY_SUBDIR "ACMakeFiles")
 include_directories(${ACMAKE_INCLUDE_DIR})
 
 include(AcPlatform)
+include(AcCompiler)
 include(AcBoostUtils)
 include(AcVariableUtils)
 
