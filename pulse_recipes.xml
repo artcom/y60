@@ -81,7 +81,7 @@
 
                 <arg>/M${NUMCORES}</arg>
                 <arg>PRO60.sln</arg>
-                <arg>${BUILD_TYPE}|Win32</arg>
+                <arg>&quot;${BUILD_TYPE}|Win32&quot;</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
@@ -90,7 +90,7 @@
         <command name="test">
             <executable exe="vcbuild.exe" working-dir="${build.dir}">
                 <arg>RUN_TESTS.vcproj</arg>
-                <arg>${BUILD_TYPE}|Win32</arg>
+                <arg>&quot;${BUILD_TYPE}|Win32&quot;</arg>
             </executable>
         </command>
     </recipe>
