@@ -77,5 +77,5 @@ exit 0
 
 :error
 rem XXX
-pause
+rem pause
 exit 1
