@@ -100,9 +100,12 @@
         -->
 
         <command name="test">
-            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
+            <executable exe="cmd.exe" working-dir="${build.dir}">
+                <arg>vcbuild_wrapper.bat</arg>
                 <arg>RUN_TESTS.vcproj</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
+
+                <process processor="${msvc_build.pp}"/>
             </executable>
         </command>
     </recipe>
