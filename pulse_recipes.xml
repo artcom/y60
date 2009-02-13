@@ -78,6 +78,7 @@
 
         <command name="build">
             <executable exe="cmd.exe" working-dir="${build.dir}">
+                <arg>/C</arg>
                 <arg>vcbuild_wrapper.bat</arg>
                 <arg>/M${parallel.jobs}</arg>
                 <arg>PRO60.sln</arg>
@@ -101,6 +102,7 @@
 
         <command name="test">
             <executable exe="cmd.exe" working-dir="${build.dir}">
+                <arg>/C</arg>
                 <arg>vcbuild_wrapper.bat</arg>
                 <arg>RUN_TESTS.vcproj</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
