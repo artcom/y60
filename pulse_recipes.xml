@@ -81,7 +81,7 @@
 				<arg>/C</arg>
 				<arg>${env.VS90COMNTOOLS}\\vsvars32.bat</arg>
 				<arg>&amp;&amp;</arg>
-				<arg>${vcbuild.bin} /M${parallel.jobs} PRO60.sln &quot;${build.type}|Win32&quot;</arg>
+				<arg>${vcbuild.bin} /M${parallel.jobs} PRO60.sln \\&quot;${build.type}|Win32\\&quot;</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
