@@ -93,4 +93,35 @@
             </executable>
         </command>
     </recipe>
+
+    <recipe name="windows_incredibuild">
+        <!-- TODO: make these agent properties -->
+        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+        <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
+        <property name="incredibuild.bin" value="BuildConsole.exe"/>
+        <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
+
+        <macro-ref macro="${prepare_build}"/>
+
+        <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <macro-ref macro="${run_cmake}"/>
+
+        <command name="build">
+            <executable exe="${incredibuild..bin}" working-dir="${build.dir}">
+                <arg>PRO60.sln</arg>
+                <arg>/CFG=&quot;${build.type}|Win32&quot;</arg>
+                <arg>/SHOWCMD</arg>
+                <arg>/SHOWAGENT</arg>
+
+                <process processor="${msvc_build.pp}"/>
+            </executable>
+        </command>
+
+        <command name="test">
+            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
+                <arg>RUN_TESTS.vcproj</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
+            </executable>
+        </command>
+    </recipe>
 </project>
