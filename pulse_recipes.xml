@@ -77,10 +77,10 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
-                <arg>/M${parallel.jobs}</arg>
-                <arg>PRO60.sln</arg>
-                <arg>&quot;${build.type}|Win32&quot;</arg>
+            <executable exe="cmd.exe" working-dir="${build.dir}">
+				<arg>${env.VS90COMNTOOLS}\\vsvars32.bat</arg>
+				<arg>&amp;&amp;</arg>
+				<arg>${vcbuild.bin} /M${parallel.jobs} PRO60.sln &quot;${build.type}|Win32&quot;</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
