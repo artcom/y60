@@ -160,7 +160,7 @@ namespace y60 {
 
     void
     M60Decoder::startMovie(double theStartTime, bool theStartAudioFlag) {
-        _myLastDecodedFrame = UINT_MAX;
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         MovieDecoderBase::startMovie(theStartTime, theStartAudioFlag);
         
     }
