@@ -122,7 +122,7 @@ namespace asl {
     }
 
     int
-    getEnumFromString(const std::string & theString, const char * theStringList[]) {
+    getEnumFromString(const std::string & theString, const char * const theStringList[]) {
         int myCounter = -1;
         while(theStringList[++myCounter]) {
             if (theString == theStringList[myCounter]) {

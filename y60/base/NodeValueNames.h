@@ -63,26 +63,20 @@
 
 #include <asl/base/Enum.h>
 
-#ifdef Y60_EXPORT_STRINGS
-    #define DEFINE_STRING(NAME, VALUE) const char * NAME = VALUE;
-#else
-    #define DEFINE_STRING(NAME, VALUE) extern const char * NAME;
-#endif
-    
 namespace y60 {
 
     //=== Lighting Model ==========================================================
     enum LightingModel {
         BLINN, PHONG, GOURAUD, LAMBERT, FLAT, UNLIT, MAX_LIGHTING_MODEL
     };
-    static const char * LIGHTING_MODEL_BLINN = "blinn";
-    static const char * LIGHTING_MODEL_PHONG = "phong";
-    static const char * LIGHTING_MODEL_GOURAUD = "gouraud";
-    static const char * LIGHTING_MODEL_LAMBERT = "lambert";
-    static const char * LIGHTING_MODEL_FLAT = "flat";
-    static const char * LIGHTING_MODEL_UNLIT = "unlit";
+    const char * const LIGHTING_MODEL_BLINN = "blinn";
+    const char * const LIGHTING_MODEL_PHONG = "phong";
+    const char * const LIGHTING_MODEL_GOURAUD = "gouraud";
+    const char * const LIGHTING_MODEL_LAMBERT = "lambert";
+    const char * const LIGHTING_MODEL_FLAT = "flat";
+    const char * const LIGHTING_MODEL_UNLIT = "unlit";
 
-    static const char * LightingModelString[] = {
+    const char * const LightingModelString[] = {
         LIGHTING_MODEL_BLINN,
         LIGHTING_MODEL_PHONG,
         LIGHTING_MODEL_GOURAUD,
@@ -92,33 +86,33 @@ namespace y60 {
         0
     };
 
-    static const char * REGISTER_ATTRIB            = "register";
+    const char * const REGISTER_ATTRIB            = "register";
 
     //=== Material feature names ==================================================
-    static const char * TEXCOORD_FEATURE           = "texcoord";
-    static const char * LIGHTING_FEATURE           = "lighting";
-    static const char * TEXTURE_FEATURE            = "textures";
-    static const char * MAPPING_FEATURE            = "texcoord";
-    static const char * FEATURE_DROPPED            = "drop_feature";
+    const char * const TEXCOORD_FEATURE           = "texcoord";
+    const char * const LIGHTING_FEATURE           = "lighting";
+    const char * const TEXTURE_FEATURE            = "textures";
+    const char * const MAPPING_FEATURE            = "texcoord";
+    const char * const FEATURE_DROPPED            = "drop_feature";
 
      //=== Cg specific property name ===============================================
-    static const char * CG_FILES_PROPERTY           = "files";
-    static const char * CG_PROFILES_PROPERTY        = "profiles";
-    static const char * CG_ENTRY_FUNCTIONS_PROPERTY = "entryfunctions";
-    static const char * CG_COMPILERARGS2_PROPERTY   = "compilerargs";
+    const char * const CG_FILES_PROPERTY           = "files";
+    const char * const CG_PROFILES_PROPERTY        = "profiles";
+    const char * const CG_ENTRY_FUNCTIONS_PROPERTY = "entryfunctions";
+    const char * const CG_COMPILERARGS2_PROPERTY   = "compilerargs";
 
     //=== VertexParameter names ===============================================
-    static const char * VERTEXPARAM_PASS_THROUGH   = "pass_through";
-    static const char * VERTEXPARAM_TANGENT        = "tangent";
+    const char * const VERTEXPARAM_PASS_THROUGH   = "pass_through";
+    const char * const VERTEXPARAM_TANGENT        = "tangent";
 
     //=== Texture apply modes =====================================================
-    static const char * TEXTURE_APPLY_MODULATE   = "modulate";
-    static const char * TEXTURE_APPLY_DECAL      = "decal";
-    static const char * TEXTURE_APPLY_REPLACE    = "replace";
-    static const char * TEXTURE_APPLY_BLEND      = "blend";
-    static const char * TEXTURE_APPLY_ADD        = "add";
-    static const char * TEXTURE_APPLY_SUBTRACT   = "subtract";
-    static const char * TEXTURE_APPLY_COMBINE    = "combine";
+    const char * const TEXTURE_APPLY_MODULATE   = "modulate";
+    const char * const TEXTURE_APPLY_DECAL      = "decal";
+    const char * const TEXTURE_APPLY_REPLACE    = "replace";
+    const char * const TEXTURE_APPLY_BLEND      = "blend";
+    const char * const TEXTURE_APPLY_ADD        = "add";
+    const char * const TEXTURE_APPLY_SUBTRACT   = "subtract";
+    const char * const TEXTURE_APPLY_COMBINE    = "combine";
 
     enum TextureApplyModeEnum {
         MODULATE,
@@ -131,7 +125,7 @@ namespace y60 {
         TextureApplyModeEnum_MAX
     };
 
-    static const char * TextureApplyModeStrings[] = {
+    const char * const TextureApplyModeStrings[] = {
         TEXTURE_APPLY_MODULATE,
         TEXTURE_APPLY_DECAL,
         TEXTURE_APPLY_REPLACE,
@@ -144,8 +138,8 @@ namespace y60 {
     DEFINE_ENUM(TextureApplyMode, TextureApplyModeEnum, Y60_BASE_EXPORT);
 
     //=== Texture magnification filters =====================================================
-    static const char * TEXTURE_SAMPLE_FILTER_NEAREST       = "nearest";
-    static const char * TEXTURE_SAMPLE_FILTER_LINEAR        = "linear";
+    const char * const TEXTURE_SAMPLE_FILTER_NEAREST       = "nearest";
+    const char * const TEXTURE_SAMPLE_FILTER_LINEAR        = "linear";
 
     enum TextureSampleFilterEnum {
         NEAREST,
@@ -153,7 +147,7 @@ namespace y60 {
         TextureSampleFilterEnum_MAX
     };
     
-    static const char * TextureSampleFilterStrings[] = {
+    const char * const TextureSampleFilterStrings[] = {
         TEXTURE_SAMPLE_FILTER_NEAREST,
         TEXTURE_SAMPLE_FILTER_LINEAR,
         ""
@@ -161,10 +155,10 @@ namespace y60 {
     DEFINE_ENUM(TextureSampleFilter, TextureSampleFilterEnum, Y60_BASE_EXPORT);
 
     //=== Texture repeat modes =====================================================
-    static const char * TEXTURE_WRAP_CLAMP           = "clamp";
-    static const char * TEXTURE_WRAP_CLAMP_TO_EDGE   = "clamp_to_edge";
-    static const char * TEXTURE_WRAP_REPEAT          = "repeat";
-    static const char * TEXTURE_WRAP_MIRROR          = "mirror";
+    const char * const TEXTURE_WRAP_CLAMP           = "clamp";
+    const char * const TEXTURE_WRAP_CLAMP_TO_EDGE   = "clamp_to_edge";
+    const char * const TEXTURE_WRAP_REPEAT          = "repeat";
+    const char * const TEXTURE_WRAP_MIRROR          = "mirror";
 
     enum TextureWrapModeEnum {
         CLAMP,
@@ -174,7 +168,7 @@ namespace y60 {
         TextureWrapModeEnum_MAX
     };
 
-    static const char * TextureWrapModeStrings[] = {
+    const char * const TextureWrapModeStrings[] = {
         TEXTURE_WRAP_CLAMP,
         TEXTURE_WRAP_CLAMP_TO_EDGE,
         TEXTURE_WRAP_REPEAT,
@@ -184,63 +178,63 @@ namespace y60 {
     DEFINE_ENUM(TextureWrapMode, TextureWrapModeEnum, Y60_BASE_EXPORT);
 
     //=== Texture Internal Formats ============================================
-    static const char * TEXTURE_INTERNAL_FORMAT_DEPTH               = "DEPTH";
-    static const char * TEXTURE_INTERNAL_FORMAT_ALPHA               = "ALPHA";
-    static const char * TEXTURE_INTERNAL_FORMAT_ALPHA4              = "ALPHA4";
-    static const char * TEXTURE_INTERNAL_FORMAT_ALPHA8              = "ALPHA8";
-    static const char * TEXTURE_INTERNAL_FORMAT_ALPHA12             = "ALPHA12";
-    static const char * TEXTURE_INTERNAL_FORMAT_ALPHA16             = "ALPHA16";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE           = "LUMINANCE";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE4          = "LUMINANCE4";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE8          = "LUMINANCE8";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE12         = "LUMINANCE12";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE16         = "LUMINANCE16";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE_ALPHA     = "LUMINANCE_ALPHA";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE4_ALPHA4   = "LUMINANCE4_ALPHA4";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE6_ALPHA2   = "LUMINANCE6_ALPHA2";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE8_ALPHA8   = "LUMINANCE8_ALPHA8";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE12_ALPHA4  = "LUMINANCE12_ALPHA4";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE12_ALPHA12 = "LUMINANCE12_ALPHA12";
-    static const char * TEXTURE_INTERNAL_FORMAT_LUMINANCE16_ALPHA16 = "LUMINANCE16_ALPHA16";
-    static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY           = "INTENSITY";
-    static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY4          = "INTENSITY4";
-    static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY8          = "INTENSITY8";
-    static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY12         = "INTENSITY12";
-    static const char * TEXTURE_INTERNAL_FORMAT_INTENSITY16         = "INTENSITY16";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB                 = "RGB";
-    static const char * TEXTURE_INTERNAL_FORMAT_BGR                 = "BGR";
-    static const char * TEXTURE_INTERNAL_FORMAT_R3_G3_B2            = "R3_G3_B2";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB4                = "RGB4";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB5                = "RGB5";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB8                = "RGB8";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB10               = "RGB10";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB12               = "RGB12";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB16               = "RGB16";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA                = "RGBA";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA2               = "RGBA2";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA4               = "RGBA4";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB5_A1             = "RGB5_A1";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA8               = "RGBA8";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB10_A2            = "RGB10_A2";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA12              = "RGBA12";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA16              = "RGBA16";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA_HALF           = "RGBA_HALF";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB_HALF            = "RGB_HALF";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGBA_FLOAT          = "RGBA_FLOAT";
-    static const char * TEXTURE_INTERNAL_FORMAT_RGB_FLOAT           = "RGB_FLOAT";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGB_ARB  = "COMPRESSED_RGB_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_ARB             = "COMPRESSED_RGBA_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_ALPHA_ARB            = "COMPRESSED_ALPHA_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_LUMINANCE_ARB        = "COMPRESSED_LUMINANCE_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_LUMINANCE_ALPHA_ARB  = "COMPRESSED_LUMINANCE_ALPHA_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_INTENSITY_ARB        = "COMPRESSED_INTENSITY_ARB";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGB_S3TC_DXT1_EXT    = "COMPRESSED_RGB_S3TC_DXT1_EXT";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT1_EXT   = "COMPRESSED_RGBA_S3TC_DXT1_EXT";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT3_EXT   = "COMPRESSED_RGBA_S3TC_DXT3_EXT";
-    static const char * TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT5_EXT   = "COMPRESSED_RGBA_S3TC_DXT5_EXT";
-    static const char * TEXTURE_INTERNAL_FORMAT_YUV420              = "YUV420";
-    static const char * TEXTURE_INTERNAL_FORMAT_YUV422              = "YUV422";
-    static const char * TEXTURE_INTERNAL_FORMAT_YUV444              = "YUV444";
+    const char * const TEXTURE_INTERNAL_FORMAT_DEPTH               = "DEPTH";
+    const char * const TEXTURE_INTERNAL_FORMAT_ALPHA               = "ALPHA";
+    const char * const TEXTURE_INTERNAL_FORMAT_ALPHA4              = "ALPHA4";
+    const char * const TEXTURE_INTERNAL_FORMAT_ALPHA8              = "ALPHA8";
+    const char * const TEXTURE_INTERNAL_FORMAT_ALPHA12             = "ALPHA12";
+    const char * const TEXTURE_INTERNAL_FORMAT_ALPHA16             = "ALPHA16";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE           = "LUMINANCE";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE4          = "LUMINANCE4";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE8          = "LUMINANCE8";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE12         = "LUMINANCE12";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE16         = "LUMINANCE16";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE_ALPHA     = "LUMINANCE_ALPHA";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE4_ALPHA4   = "LUMINANCE4_ALPHA4";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE6_ALPHA2   = "LUMINANCE6_ALPHA2";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE8_ALPHA8   = "LUMINANCE8_ALPHA8";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE12_ALPHA4  = "LUMINANCE12_ALPHA4";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE12_ALPHA12 = "LUMINANCE12_ALPHA12";
+    const char * const TEXTURE_INTERNAL_FORMAT_LUMINANCE16_ALPHA16 = "LUMINANCE16_ALPHA16";
+    const char * const TEXTURE_INTERNAL_FORMAT_INTENSITY           = "INTENSITY";
+    const char * const TEXTURE_INTERNAL_FORMAT_INTENSITY4          = "INTENSITY4";
+    const char * const TEXTURE_INTERNAL_FORMAT_INTENSITY8          = "INTENSITY8";
+    const char * const TEXTURE_INTERNAL_FORMAT_INTENSITY12         = "INTENSITY12";
+    const char * const TEXTURE_INTERNAL_FORMAT_INTENSITY16         = "INTENSITY16";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB                 = "RGB";
+    const char * const TEXTURE_INTERNAL_FORMAT_BGR                 = "BGR";
+    const char * const TEXTURE_INTERNAL_FORMAT_R3_G3_B2            = "R3_G3_B2";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB4                = "RGB4";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB5                = "RGB5";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB8                = "RGB8";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB10               = "RGB10";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB12               = "RGB12";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB16               = "RGB16";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA                = "RGBA";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA2               = "RGBA2";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA4               = "RGBA4";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB5_A1             = "RGB5_A1";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA8               = "RGBA8";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB10_A2            = "RGB10_A2";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA12              = "RGBA12";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA16              = "RGBA16";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA_HALF           = "RGBA_HALF";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB_HALF            = "RGB_HALF";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGBA_FLOAT          = "RGBA_FLOAT";
+    const char * const TEXTURE_INTERNAL_FORMAT_RGB_FLOAT           = "RGB_FLOAT";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGB_ARB  = "COMPRESSED_RGB_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_ARB             = "COMPRESSED_RGBA_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_ALPHA_ARB            = "COMPRESSED_ALPHA_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_LUMINANCE_ARB        = "COMPRESSED_LUMINANCE_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_LUMINANCE_ALPHA_ARB  = "COMPRESSED_LUMINANCE_ALPHA_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_INTENSITY_ARB        = "COMPRESSED_INTENSITY_ARB";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGB_S3TC_DXT1_EXT    = "COMPRESSED_RGB_S3TC_DXT1_EXT";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT1_EXT   = "COMPRESSED_RGBA_S3TC_DXT1_EXT";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT3_EXT   = "COMPRESSED_RGBA_S3TC_DXT3_EXT";
+    const char * const TEXTURE_INTERNAL_FORMAT_COMPRESSED_RGBA_S3TC_DXT5_EXT   = "COMPRESSED_RGBA_S3TC_DXT5_EXT";
+    const char * const TEXTURE_INTERNAL_FORMAT_YUV420              = "YUV420";
+    const char * const TEXTURE_INTERNAL_FORMAT_YUV422              = "YUV422";
+    const char * const TEXTURE_INTERNAL_FORMAT_YUV444              = "YUV444";
 
     enum TextureInternalFormat {
         TEXTURE_IFMT_DEPTH,
@@ -302,7 +296,7 @@ namespace y60 {
         TEXTURE_IFMT_YUV444
     };
 
-    static const char * TextureInternalFormatStrings[] = {
+    const char * const TextureInternalFormatStrings[] = {
         TEXTURE_INTERNAL_FORMAT_DEPTH,
         TEXTURE_INTERNAL_FORMAT_ALPHA,
         TEXTURE_INTERNAL_FORMAT_ALPHA4,
@@ -364,16 +358,16 @@ namespace y60 {
     };
 
     //=== Automatic Texture Coord Generation Modes NEW ============================
-    static const char * TEXCOORD_PLANAR          = "planar_projection";
-    static const char * TEXCOORD_CUBE            = "cube_projection";
-    static const char * TEXCOORD_FRONTAL         = "frontal_projection";
-    static const char * TEXCOORD_PERSPECTIVE     = "perspective_projection";
-    static const char * TEXCOORD_SPHERICAL       = "spherical_projection";
-    static const char * TEXCOORD_CYLINDRICAL     = "cylindrical_projection";
-    static const char * TEXCOORD_UV_MAP          = "uv_map";
-    static const char * TEXCOORD_REFLECTIVE      = "reflective";
-    static const char * TEXCOORD_SPATIAL         = "spatial_projection"; // cinemax modes, do not
-    static const char * TEXCOORD_SHRINKMAP       = "shrinkmap_projection"; // know how to map in opengl
+    const char * const TEXCOORD_PLANAR          = "planar_projection";
+    const char * const TEXCOORD_CUBE            = "cube_projection";
+    const char * const TEXCOORD_FRONTAL         = "frontal_projection";
+    const char * const TEXCOORD_PERSPECTIVE     = "perspective_projection";
+    const char * const TEXCOORD_SPHERICAL       = "spherical_projection";
+    const char * const TEXCOORD_CYLINDRICAL     = "cylindrical_projection";
+    const char * const TEXCOORD_UV_MAP          = "uv_map";
+    const char * const TEXCOORD_REFLECTIVE      = "reflective";
+    const char * const TEXCOORD_SPATIAL         = "spatial_projection"; // cinemax modes, do not
+    const char * const TEXCOORD_SHRINKMAP       = "shrinkmap_projection"; // know how to map in opengl
 
     enum TexCoordMapping {
         SPHERICAL_PROJECTION,
@@ -388,7 +382,7 @@ namespace y60 {
         PERSPECTIVE_PROJECTION
     };
 
-    static const char * TexCoordMappingStrings[] = {
+    const char * const TexCoordMappingStrings[] = {
         TEXCOORD_SPHERICAL,
         TEXCOORD_CYLINDRICAL,
         TEXCOORD_PLANAR,
@@ -411,14 +405,14 @@ namespace y60 {
     };
 
     //=== Image Resize Modes ==================================================
-    static const char * IMAGE_RESIZE_NONE  = "none";
-    static const char * IMAGE_RESIZE_SCALE = "scale";
-    static const char * IMAGE_RESIZE_PAD   = "pad";
+    const char * const IMAGE_RESIZE_NONE  = "none";
+    const char * const IMAGE_RESIZE_SCALE = "scale";
+    const char * const IMAGE_RESIZE_PAD   = "pad";
  
     //=== Image Types =========================================================
-    static const char * IMAGE_TYPE_SINGLE  = "single";
-    static const char * IMAGE_TYPE_VOXEL   = "voxel";
-    static const char * IMAGE_TYPE_CUBEMAP = "cubemap";
+    const char * const IMAGE_TYPE_SINGLE  = "single";
+    const char * const IMAGE_TYPE_VOXEL   = "voxel";
+    const char * const IMAGE_TYPE_CUBEMAP = "cubemap";
 
     enum ImageTypeEnum {
         SINGLE,
@@ -427,7 +421,7 @@ namespace y60 {
         ImageTypeEnum_MAX
     };
 
-    static const char * ImageTypeStrings[] = {
+    const char * const ImageTypeStrings[] = {
         IMAGE_TYPE_SINGLE,
         IMAGE_TYPE_VOXEL,
         IMAGE_TYPE_CUBEMAP,
@@ -436,19 +430,19 @@ namespace y60 {
     DEFINE_ENUM(ImageType, ImageTypeEnum, Y60_BASE_EXPORT);
 
     //=== Texture usage =====================================================
-    static const char * TEXTURE_USAGE_PAINT        = "paint";
-    static const char * TEXTURE_USAGE_HDR_PAINT    = "hdr_paint";
-    static const char * TEXTURE_USAGE_BUMP         = "bump";
-    static const char * TEXTURE_USAGE_SKYBOX       = "skybox";
-    static const char * TEXTURE_USAGE_ENVIRONMENT  = "environment";
-    static const char * TEXTURE_USAGE_DISPLACEMENT = "displacement";
-    static const char * TEXTURE_USAGE_EMISSIVE     = "emissive";
-    static const char * TEXTURE_USAGE_OCCLUSION    = "occlusion";
-    static const char * TEXTURE_USAGE_GLOW         = "glow";
-    static const char * TEXTURE_USAGE_FLOW         = "flow";
-    static const char * TEXTURE_USAGE_SPLAT        = "splat";
-    static const char * TEXTURE_USAGE_BLUR         = "blur";
-    static const char * TEXTURE_USAGE_FADE         = "fade";
+    const char * const TEXTURE_USAGE_PAINT        = "paint";
+    const char * const TEXTURE_USAGE_HDR_PAINT    = "hdr_paint";
+    const char * const TEXTURE_USAGE_BUMP         = "bump";
+    const char * const TEXTURE_USAGE_SKYBOX       = "skybox";
+    const char * const TEXTURE_USAGE_ENVIRONMENT  = "environment";
+    const char * const TEXTURE_USAGE_DISPLACEMENT = "displacement";
+    const char * const TEXTURE_USAGE_EMISSIVE     = "emissive";
+    const char * const TEXTURE_USAGE_OCCLUSION    = "occlusion";
+    const char * const TEXTURE_USAGE_GLOW         = "glow";
+    const char * const TEXTURE_USAGE_FLOW         = "flow";
+    const char * const TEXTURE_USAGE_SPLAT        = "splat";
+    const char * const TEXTURE_USAGE_BLUR         = "blur";
+    const char * const TEXTURE_USAGE_FADE         = "fade";
 
     enum TextureUsageEnum {
         PAINT,
@@ -467,7 +461,7 @@ namespace y60 {
         TextureUsageEnum_MAX
     };
 
-    static const char * TextureUsageStrings[] = {
+    const char * const TextureUsageStrings[] = {
         TEXTURE_USAGE_PAINT,
         TEXTURE_USAGE_HDR_PAINT,
         TEXTURE_USAGE_BUMP,
@@ -487,25 +481,25 @@ namespace y60 {
     typedef std::vector<TextureUsageEnum> VectorOfTextureUsage;
 
     //=== Image filter =====================================================
-    static const char * IMAGE_FILTER_NONE                = "";
-    static const char * IMAGE_FILTER_HEIGHT_TO_NORMALMAP = "heightToNormal";
+    const char * const IMAGE_FILTER_NONE                = "";
+    const char * const IMAGE_FILTER_HEIGHT_TO_NORMALMAP = "heightToNormal";
 
     enum ImageFilter {
         NO_FILTER,
         HEIGHT_TO_NORMALMAP
     };
 
-    static const char * ImageFilterStrings[] = {
+    const char * const ImageFilterStrings[] = {
         IMAGE_FILTER_NONE,
         IMAGE_FILTER_HEIGHT_TO_NORMALMAP,
         0
     };
 
     //=== Texture type =====================================================
-    static const char * TEXTURE_TYPE_2D        = "texture_2d";
-    static const char * TEXTURE_TYPE_RECTANGLE = "texture_rectangle";
-    static const char * TEXTURE_TYPE_3D        = "texture_3d";
-    static const char * TEXTURE_TYPE_CUBEMAP   = "texture_cubemap";
+    const char * const TEXTURE_TYPE_2D        = "texture_2d";
+    const char * const TEXTURE_TYPE_RECTANGLE = "texture_rectangle";
+    const char * const TEXTURE_TYPE_3D        = "texture_3d";
+    const char * const TEXTURE_TYPE_CUBEMAP   = "texture_cubemap";
 
     enum TextureTypeEnum {
         TEXTURE_2D,
@@ -515,7 +509,7 @@ namespace y60 {
         TextureTypeEnum_MAX
     };
 
-    static const char * TextureTypeStrings[] = {
+    const char * const TextureTypeStrings[] = {
         TEXTURE_TYPE_2D,
         TEXTURE_TYPE_RECTANGLE,
         TEXTURE_TYPE_3D,
@@ -536,17 +530,17 @@ namespace y60 {
 
     //=== Light Souce types =====================================================
 
-    static const char * DIRECTIONAL_LIGHT = "directional";
-    static const char * POSITIONAL_LIGHT  = "positional";
-    static const char * SPOT_LIGHT        = "spot";
-    static const char * AMBIENT_LIGHT     = "ambient";
-    static const char * UNSUPPORTED_LIGHT = "unsupported";
+    const char * const DIRECTIONAL_LIGHT = "directional";
+    const char * const POSITIONAL_LIGHT  = "positional";
+    const char * const SPOT_LIGHT        = "spot";
+    const char * const AMBIENT_LIGHT     = "ambient";
+    const char * const UNSUPPORTED_LIGHT = "unsupported";
 
     enum LightSourceType {
         DIRECTIONAL, POSITIONAL, SPOT, AMBIENT, UNSUPPORTED, MAX_LIGHTSOURCE_TYPE
     };
 
-    static const char * LightSourceTypeString[] = {
+    const char * const LightSourceTypeString[] = {
         DIRECTIONAL_LIGHT,
         POSITIONAL_LIGHT,
         SPOT_LIGHT,
@@ -566,7 +560,7 @@ namespace y60 {
         RenderStyleEnum_MAX
     };
 
-    static const char * RenderStyleStrings[] = {
+    const char * const RenderStyleStrings[] = {
        "frontfacing",     
        "backfacing",      
        "bounding_volume",
@@ -596,7 +590,7 @@ namespace y60 {
         BlendFunctionEnum_MAX
     };
 
-    static const char * BlendFunctionStrings[] = {
+    const char * const BlendFunctionStrings[] = {
         "one",
         "zero",
         "dst_color",
@@ -631,18 +625,18 @@ namespace y60 {
         PrimitiveTypeEnum_MAX
     };
 
-    static const char * PRIMITIVE_TYPE_POINTS          = "points";
-    static const char * PRIMITIVE_TYPE_LINES           = "lines";
-    static const char * PRIMITIVE_TYPE_LINE_STRIP      = "linestrip";
-    static const char * PRIMITIVE_TYPE_LINE_LOOP       = "lineloop";
-    static const char * PRIMITIVE_TYPE_TRIANGLES       = "triangles";
-    static const char * PRIMITIVE_TYPE_TRIANGLE_STRIP  = "trianglestrip";
-    static const char * PRIMITIVE_TYPE_TRIANGLE_FAN    = "trianglefan";
-    static const char * PRIMITIVE_TYPE_QUADS           = "quads";
-    static const char * PRIMITIVE_TYPE_QUAD_STRIP      = "quadstrip";
-    static const char * PRIMITIVE_TYPE_POLYGON         = "polygon";
+    const char * const PRIMITIVE_TYPE_POINTS          = "points";
+    const char * const PRIMITIVE_TYPE_LINES           = "lines";
+    const char * const PRIMITIVE_TYPE_LINE_STRIP      = "linestrip";
+    const char * const PRIMITIVE_TYPE_LINE_LOOP       = "lineloop";
+    const char * const PRIMITIVE_TYPE_TRIANGLES       = "triangles";
+    const char * const PRIMITIVE_TYPE_TRIANGLE_STRIP  = "trianglestrip";
+    const char * const PRIMITIVE_TYPE_TRIANGLE_FAN    = "trianglefan";
+    const char * const PRIMITIVE_TYPE_QUADS           = "quads";
+    const char * const PRIMITIVE_TYPE_QUAD_STRIP      = "quadstrip";
+    const char * const PRIMITIVE_TYPE_POLYGON         = "polygon";
 
-    static const char * PrimitiveTypeStrings[] = {
+    const char * const PrimitiveTypeStrings[] = {
 		PRIMITIVE_TYPE_POINTS,
         PRIMITIVE_TYPE_LINES,
         PRIMITIVE_TYPE_LINE_LOOP,
@@ -666,7 +660,7 @@ namespace y60 {
         TargetBuffersEnum_MAX
     };
 
-    static const char * TargetBuffersStrings[] = {
+    const char * const TargetBuffersStrings[] = {
         "red",
         "green", 
         "blue", 
@@ -684,7 +678,7 @@ namespace y60 {
         BlendEquationEnum_MAX
     };
 
-    static const char * BlendEquationStrings[] = {
+    const char * const BlendEquationStrings[] = {
         "min",
         "max",
         "add",
@@ -701,7 +695,7 @@ namespace y60 {
         FORWARD, REVERSE, PONG
     };
 
-    static const char * AnimationDirectionString[] = {
+    const char * const AnimationDirectionString[] = {
         "forward",
         "reverse",
         "pong",
@@ -716,7 +710,7 @@ namespace y60 {
         FOG_EXP2
     };
 
-    static const char * FogModeStrings[] = {
+    const char * const FogModeStrings[] = {
         "off",
         "linear",
         "exp",
@@ -732,7 +726,7 @@ namespace y60 {
         PLAY_MODE_STOP             ///< Stopped. Play will start at beginnig of the movie
     };
 
-    static const char * MoviePlayModeStrings[] = {
+    const char * const MoviePlayModeStrings[] = {
         "nodisk",
         "play",
         "pause",
@@ -757,7 +751,7 @@ namespace y60 {
     };
 
     //Y60_VBO_USAGE env variable
-    static const char * VertexBufferUsageStrings[]= {
+    const char * const VertexBufferUsageStrings[]= {
             "undefined",
             "disabled",
             "stream_draw",

@@ -259,7 +259,7 @@ class Enum {
         }
     private:
         ENUM _myValue;
-        static const char ** _ourStrings ;
+        static const char * const * const _ourStrings ;
         static const char * _ourName ;
         static bool  _ourVerifiedFlag; 
 };
@@ -417,7 +417,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
  * @relates asl::Enum
  */
 #define IMPLEMENT_ENUM( THE_NAME, THE_STRINGS ) \
-    template <> const char ** THE_NAME ::_ourStrings = THE_STRINGS; \
+    template <> const char * const * const THE_NAME ::_ourStrings = THE_STRINGS; \
     template <> const char * THE_NAME ::_ourName = #THE_NAME; \
     template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
 

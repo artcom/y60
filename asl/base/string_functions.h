@@ -174,7 +174,7 @@ namespace asl {
     // Converts an enum into a string, given a string list with the same layout as the enum
     // and a zero at the end
     template<class ENUM>
-    const char * getStringFromEnum(const ENUM & theEnum, const char * theStringList[]) {
+    const char * getStringFromEnum(const ENUM & theEnum, const char * const theStringList[]) {
         int myCounter = -1;
         // Find number of strings in string list
         while (theStringList[++myCounter]) {
@@ -189,7 +189,7 @@ namespace asl {
 
     // Converts a string into an enum, given a string list with the same layout as the enum
     // and a zero at the end
-    ASL_BASE_EXPORT int getEnumFromString(const std::string & theString, const char * theStringList[]);
+    ASL_BASE_EXPORT int getEnumFromString(const std::string & theString, const char * const theStringList[]);
 
     ASL_BASE_EXPORT void findAndReplace(std::string & theString, const char * theSearchString, const char * theReplaceString);
     ASL_BASE_EXPORT std::string foundAndReplaced(const std::string & theSource,
