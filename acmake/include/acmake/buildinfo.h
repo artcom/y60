@@ -112,8 +112,8 @@ class svn_revision {
         const char * repository_id() const { return url_.c_str(); }
         const char * name() const { return "SVN"; }
     private:
-        const std::string url_;
-        const std::string revision_;
+        std::string url_;
+        std::string revision_;
 };
 
 struct no_scm_data {
