@@ -69,7 +69,7 @@
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-        <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
+        <!-- <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/> -->
 
         <macro-ref macro="${prepare_build}"/>
 
@@ -78,14 +78,26 @@
 
         <command name="build">
             <executable exe="cmd.exe" working-dir="${build.dir}">
-				<arg>/C</arg>
-				<arg>${env.VS90COMNTOOLS}\\vsvars32.bat</arg>
-				<arg>&amp;&amp;</arg>
-				<arg>${vcbuild.bin} /M${parallel.jobs} PRO60.sln \\&quot;${build.type}|Win32\\&quot;</arg>
+                <arg>vcbuild_wrapper.bat</arg>
+                <arg>/M${parallel.jobs}</arg>
+                <arg>PRO60.sln</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
         </command>
+
+        <!--
+        <command name="build">
+            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
+                <arg>/M${parallel.jobs}</arg>
+                <arg>PRO60.sln</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
+
+                <process processor="${msvc_build.pp}"/>
+            </executable>
+        </command>
+        -->
 
         <command name="test">
             <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
@@ -108,11 +120,12 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="cmd.exe" working-dir="${build.dir}">
-				<arg>/C</arg>
-				<arg>${env.VS90COMNTOOLS}\\vsvars32.bat</arg>
-				<arg>&amp;&amp;</arg>
-				<arg>${incredibuild.bin} PRO60.sln /CFG=&quot;${build.type}|Win32&quot; /SHOWCMD /SHOWAGENT</arg>
+            <executable exe="${incredibuild.bin}" working-dir="${build.dir}">
+                <arg>PRO60.sln</arg>
+                <arg>/CFG=&quot;${build.type}|Win32&quot;</arg>
+                <arg>/SHOWCMD</arg>
+                <arg>/SHOWAGENT</arg>
+
                 <process processor="${msvc_build.pp}"/>
             </executable>
         </command>
