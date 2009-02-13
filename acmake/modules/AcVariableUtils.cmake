@@ -23,6 +23,13 @@ macro(append_global NAME)
     set_property(GLOBAL APPEND PROPERTY ${NAME} ${ARGN})
 endmacro(append_global NAME)
 
+macro(append_global_unique NAME)
+    get_global(${NAME} _TMP)
+    list(APPEND _TMP ${ARGN})
+    list(REMOVE_DUPLICATES _TMP)
+    set_global(${NAME} ${_TMP})
+endmacro(append_global_unique NAME)
+
 macro(get_global NAME INTO)
     set(${INTO})
     get_property(${INTO} GLOBAL PROPERTY ${NAME})
