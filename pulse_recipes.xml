@@ -98,8 +98,8 @@
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-        <property name="incredibuild.bin" value="BuildConsole.exe"/>
         <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
+        <property name="incredibuild.bin" value="BuildConsole.exe"/>
 
         <macro-ref macro="${prepare_build}"/>
 
