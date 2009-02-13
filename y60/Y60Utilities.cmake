@@ -26,7 +26,7 @@ macro(y60_add_jstest NAME )
   collect_plugin_dirs(PLUGIN_DIRS) 
   set(TESTPATH ${CMAKE_CURRENT_BINARY_DIR})
   string(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" TESTPATH ${TESTPATH})
-  add_test(jstst_${NAME}
+  add_test(jstest_${NAME}
       ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I 
       "${TESTPATH};${CMAKE_BINARY_DIR}/lib/Release;${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;${PLUGIN_DIRS};."
   )
@@ -138,7 +138,7 @@ macro(y60_add_scenetest NAME DIRNAME)
     write_scenetest( ${NAME} ${CMAKEFILE} ${DIRNAME} 0)
         
     # register the created cmake-file as test
-    add_test(stst_${DIRNAME}_${NAME}
+    add_test(${DIRNAME}_${NAME}
       cmake -P ${CMAKEFILE}
     )
   endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
@@ -152,7 +152,7 @@ macro(y60_add_scenetest NAME DIRNAME)
     write_scenetest( ${NAME} ${CMAKEFILECG} ${DIRNAME} 1)
   
     # register the created cmake-file as test
-    add_test(stst_CG_${DIRNAME}_${NAME}
+    add_test(${DIRNAME}_CG_${NAME}
       cmake -P ${CMAKEFILECG}
     )
   endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
