@@ -158,6 +158,13 @@ namespace y60 {
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
     }
 
+    void
+    M60Decoder::startMovie(double theStartTime, bool theStartAudioFlag) {
+        _myLastDecodedFrame = UINT_MAX;
+        MovieDecoderBase::startMovie(theStartTime, theStartAudioFlag);
+        
+    }
+
     double
     M60Decoder::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
         DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame << ", theTime: " << theTime);

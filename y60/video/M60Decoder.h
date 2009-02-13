@@ -113,6 +113,7 @@ namespace y60 {
             double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
             void stopMovie(bool theStopAudioFlag = true);
+            void startMovie(double theStartTime = 0.0, bool theStartAudioFlag = true);
         private:
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
             MovieEncoding                   _myEncoding;
