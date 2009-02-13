@@ -1,12 +1,12 @@
-if exist %BUILD_DIR% goto build_dir_exists
+if exist %1 goto build_dir_exists
 
-mkdir %BUILD_DIR%
+mkdir %1
 
 :build_dir_exists
 
-if exist %BUILD_DIR%\%BUILD_TYPE% goto build_type_dir_exists
+if exist %1\%2 goto build_type_dir_exists
 
-mkdir %BUILD_DIR%\%BUILD_TYPE%
+mkdir %1\%2
 
 :build_type_dir_exists
 

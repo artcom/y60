@@ -1,19 +1,10 @@
 <?xml version="1.0"?>
 <project default-recipe="unix_make">
-    <property name="build.dir" value="_builds/${BUILD_TYPE}/"/>
+    <property name="build.dir" value="_builds/${build.type}/"/>
 
-    <macro name="prepare_windows_build">
+    <macro name="prepare_build">
         <command name="create build directory">
-            <executable exe="cmd.exe" args="/c mkbuilddir.bat">
-                <environment name="BUILD_DIR" value="_builds"/>
-                <environment name="BUILD_TYPE" value="${BUILD_TYPE}"/>
-            </executable>
-        </command>
-    </macro>
-
-    <macro name="prepare_unix_build">
-        <command name="create build directory">
-            <executable exe="mkdir" args="-p ${build.dir}"/>
+            <executable exe="cmake" args="-E make_directory ${build.dir}"/>
         </command>
     </macro>
 
@@ -21,7 +12,7 @@
         <command name="configure">
             <executable exe="cmake" working-dir="${build.dir}">
                 <arg>-G</arg><arg>${cmake.generator}</arg>
-                <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${BUILD_TYPE}</arg>
+                <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${build.type}</arg>
                 <arg>../../</arg>
             </executable>
         </command>
@@ -36,13 +27,13 @@
     </post-processor>
 
     <recipe name="unix_make">
-        <macro-ref macro="${prepare_unix_build}"/>
+        <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Unix Makefiles"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <make args="-j ${NUMCORES}" working-dir="${build.dir}">
+            <make args="-j ${parallel.jobs}" working-dir="${build.dir}">
                 <process processor="${gcc_build.pp}"/>
             </make>
         </command>
@@ -53,7 +44,7 @@
     </recipe>
 
     <recipe name="windows_nmake">
-        <macro-ref macro="${prepare_windows_build}"/>
+        <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="NMake Makefile"/>
         <macro-ref macro="${run_cmake}"/>
@@ -70,27 +61,35 @@
     </recipe>
 
     <recipe name="windows_vcbuild">
-        <macro-ref macro="${prepare_windows_build}"/>
+        <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="cmd.exe" working-dir="${build.dir}">
-                <arg>/c</arg><arg>..\\..\\vcbuild_wrapper.bat</arg>
-
-                <arg>/M${NUMCORES}</arg>
+            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
+                <arg>/M${parallel.jobs}</arg>
                 <arg>PRO60.sln</arg>
-                <arg>&quot;${BUILD_TYPE}|Win32&quot;</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
+            <!--
+            <executable exe="cmd.exe" working-dir="${build.dir}">
+                <arg>/c</arg><arg>..\\..\\vcbuild_wrapper.bat</arg>
+
+                <arg>/M${parallel.jobs}</arg>
+                <arg>PRO60.sln</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
+
+                <process processor="${msvc_build.pp}"/>
+            </executable>-->
         </command>
 
         <command name="test">
             <executable exe="vcbuild.exe" working-dir="${build.dir}">
                 <arg>RUN_TESTS.vcproj</arg>
-                <arg>&quot;${BUILD_TYPE}|Win32&quot;</arg>
+                <arg>&quot;${build.type}|Win32&quot;</arg>
             </executable>
         </command>
     </recipe>
