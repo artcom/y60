@@ -21,4 +21,4 @@ y60_add_component(
 )
 
 
-y60_add_jstest(Leak)
+y60_add_jstest(Leak ffmpeg1)

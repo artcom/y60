@@ -60,8 +60,11 @@
 includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
-const XMLDOC_1 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/output.xml");
-const XMLDOC_2 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/unicode.xml");
+//const XMLDOC_1 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/output.xml");
+//const XMLDOC_2 = expandEnvironment("${PRO}/src/y60/products/y60/testfiles/unicode.xml");
+
+const XMLDOC_1 = "testfiles/tmp_output.xml";
+const XMLDOC_2 = "testfiles/tmp_unicode.xml";
 
 function NodeUnitTest() {
     this.Constructor(this, "NodeUnitTest");

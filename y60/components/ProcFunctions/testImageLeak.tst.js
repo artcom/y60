@@ -68,10 +68,15 @@ const START_FRAMES = 10;
 const END_FRAMES   = 10;
 const IMAGE_COUNT  = 1000;
 
-const IMAGE_1 = expandEnvironment("${PRO}/src/y60/shader/shadertex/ac_logo.png");
-const IMAGE_2 = expandEnvironment("${PRO}/src/y60/shader/shadertex/hatch.jpg");
-var myShaderLibrary = "${PRO}/src/y60/shader/shaderlibrary.xml";
-GLResourceManager.prepareShaderLibrary(myShaderLibrary);
+//const IMAGE_1 = expandEnvironment("${PRO}/src/y60/shader/shadertex/ac_logo.png");
+//const IMAGE_2 = expandEnvironment("${PRO}/src/y60/shader/shadertex/hatch.jpg");
+//var myShaderLibrary = "${PRO}/src/y60/shader/shaderlibrary.xml";
+
+// assumes ${PRO}/src/y60/shader is in the path
+const IMAGE_1 = "shadertex/ac_logo.png";
+const IMAGE_2 = "shadertex/hatch.jpg";
+//var myShaderLibrary = "${PRO}/src/y60/shader/shaderlibrary.xml";
+//GLResourceManager.prepareShaderLibrary(myShaderLibrary);
 
 var window     = new RenderWindow();
 window.fixedFrameTime = 0.04;

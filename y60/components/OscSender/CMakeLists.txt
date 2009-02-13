@@ -16,5 +16,5 @@ y60_add_component(
     HEADERS ${HEADERS}
 )
 
-y60_add_jstest(OscSender)
+y60_add_jstest(OscSender OscSender)
 

@@ -18,4 +18,4 @@ y60_add_component(
     DEPENDS aslinet y60jslib
 )
 
-y60_add_jstest(Socket)
+y60_add_jstest(Socket net)
