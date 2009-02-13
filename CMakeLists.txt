@@ -41,6 +41,8 @@ add_subdirectory(y60)
 # XXX hack for testing the scenetests and tutorials
 if(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
   add_subdirectory(../testmodels ${CMAKE_CURRENT_BINARY_DIR}/testmodels)
-  add_subdirectory(../tutorials ${CMAKE_CURRENT_BINARY_DIR}/tutorials)
 endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
+if(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
+  add_subdirectory(../tutorials ${CMAKE_CURRENT_BINARY_DIR}/tutorials)
+endif(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
 
