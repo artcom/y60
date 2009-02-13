@@ -182,6 +182,7 @@ JSSignalProxy1.h
 JSSignalProxy2.h
 JSSignalProxyUtils.h
 JSSignals.h
+JSSignals.impl
 JSSpinButton.h
 JSStatusBar.h
 JSStockID.h

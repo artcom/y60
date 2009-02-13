@@ -31,10 +31,12 @@ PropertyValue.cpp
 
 set(HEADERS
 ArgumentHolder.h
+ArgumentHolder.impl
 ClassMapSingleton.h
 Documentation.h
 IFactoryPlugin.h
 IScriptablePlugin.h
+IScriptablePlugin.impl
 JSAccessibleVector.h
 JSBitset.h
 JSBlock.h
@@ -45,6 +47,7 @@ JSEnum.h
 JSFrustum.h
 JSGlobal.h
 JSLine.h
+JSLine.impl
 JSMatrix.h
 JSNamedNodeMap.h
 JSNode.h
@@ -57,9 +60,13 @@ JSScriptablePlugin.h
 JSSphere.h
 JSTriangle.h
 JSVector.h
+JSVector.impl
 JSWrapper.h
+JSWrapper.impl
 JScppUtils.h
+JScppUtils.impl
 PropertyValue.h
+PropertyValue.impl
 QuitFlagSingleton.h
 jssettings.h
 y60_jsbase_settings.h

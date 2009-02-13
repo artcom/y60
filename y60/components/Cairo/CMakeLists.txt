@@ -10,6 +10,7 @@ JSCairoSurface.cpp
 set(HEADERS
 CairoUtilities.h
 CairoWrapper.h
+CairoWrapper.impl
 JSCairo.h
 JSCairoPattern.h
 JSCairoSurface.h

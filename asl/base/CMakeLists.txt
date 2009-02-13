@@ -62,6 +62,7 @@ MappedBlock.h
 MemoryPool.h
 MultiThreadedUnitTest.h
 os_functions.h
+os_functions.impl
 Path.h
 PlugInBase.h
 PlugInManager.h

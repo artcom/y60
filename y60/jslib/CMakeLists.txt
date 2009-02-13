@@ -37,6 +37,7 @@ GLContextRegistry.h
 IJSExtension.h
 IRendererExtension.h
 JSAbstractRenderWindow.h
+JSAbstractRenderWindow.impl
 JSApp.h
 JSBSpline.h
 JSCoordSpline.h
