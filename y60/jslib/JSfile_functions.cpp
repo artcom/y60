@@ -616,6 +616,38 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     } HANDLE_CPP_EXCEPTION;
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+searchFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Searches thePath for theFile; if no path is given, the current path returned by getPath() is used.");
+    DOC_PARAM("theFile", "The file to search for.", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("thePath", "The path to search in.", DOC_TYPE_STRING,"getPath()");
+    DOC_RVAL("the absolute path as string, empty string if not found", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (argc > 2 ) {
+            JS_ReportError(cx, "searchFile(): expects at most two string arguments, (theFile, thePath)");
+            return JS_FALSE;
+        }
+        if (argc < 1 ) {
+            JS_ReportError(cx, "searchFile(): expects at least one string (theFile)");
+            return JS_FALSE;
+        }
+         string myPath = JSApp::getPackageManager()->getSearchPath();
+        string myFile = "";
+        if (argc > 0) {
+            convertFrom(cx, argv[0], myFile);
+        }
+        if (argc > 1) {
+            convertFrom(cx, argv[1], myPath);
+        }
+        std::string myFilePath = asl::searchFile(myFile, myPath);
+        if (myFilePath.size()) {
+            *rval = as_jsval(cx, myFilePath);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -642,6 +674,7 @@ JSFileFunctions::Functions() {
         {"getTempDirectory",    getTempDirectory,    0},
         {"createDirectory",     createDirectory,     1},
         {"createPath",          createPath,          1},
+        {"searchFile",          searchFile,          2},
         {0},
     };
     return myFunctions;

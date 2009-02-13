@@ -1044,14 +1044,12 @@ className(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
         if (myClass->flags & JSCLASS_HAS_PRIVATE) {
         }
-//cerr << "&" << (void*)myClass->name;
         if (!myClass->name) {
             *rval = JSVAL_NULL;
             return JS_TRUE;
         }
         
         std::string myClassName = myClass->name;
-//cerr << "§" << myClassName;
         *rval = as_jsval(cx, myClassName);
         return JS_TRUE;
     }
@@ -1407,14 +1405,7 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
         string myDecodedString = inet::Request::urlDecode(myString);
-#if 1
-        // KH,UH: the other code is not symmetric with urlEncode and results in non-UTF8 strings
         *rval = as_jsval(cx, myDecodedString);
-#else
-        // Here we cannot use the JS_NewUCStringCopyN function, because the result from urlDecode is encoded in Latin-1
-        JSString * myJsString = JS_NewStringCopyN(cx, myDecodedString.c_str(), myDecodedString.size());
-        *rval = STRING_TO_JSVAL(myJsString);
-#endif
         return JS_TRUE;
     }
     JS_ReportError(cx,"urlDecode: bad number of arguments - should be one, got %d", argc);
