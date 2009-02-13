@@ -4,6 +4,7 @@ dummy.cpp
 )
 
 set(HEADERS
+asl_raster_settings.h
 dummy.h
 contain.h
 fraction.h
