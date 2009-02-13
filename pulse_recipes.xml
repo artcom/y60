@@ -107,7 +107,7 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="${incredibuild..bin}" working-dir="${build.dir}">
+            <executable exe="${incredibuild.bin}" working-dir="${build.dir}">
                 <arg>PRO60.sln</arg>
                 <arg>/CFG=&quot;${build.type}|Win32&quot;</arg>
                 <arg>/SHOWCMD</arg>
