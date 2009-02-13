@@ -61,7 +61,11 @@
 
 #include "y60_jsbase_settings.h"
 
-#ifndef AC_BUILT_WITH_CMAKE
+#ifdef Y60_WITH_TRACEMONKEY
+
+#define USE_TRACEMONKEY
+
+#else
 
 #undef JS_THREADSAFE
 
@@ -83,8 +87,9 @@
     #endif
 #endif
 
-// undefine to use tracemonkey
-#define SPIDERMONK
+#define USE_LEGACY_SPIDERMONKEY
+// #define USE_OLD_JS_ERROR_HANDLING
+#define USE_SPIDERMONKEY_INCREMENTAL_GC
 
 #endif
 

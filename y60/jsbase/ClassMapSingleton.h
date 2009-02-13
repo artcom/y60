@@ -67,7 +67,7 @@
 
 #include "jssettings.h"
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
 #else
 #include <js/jsapi.h>

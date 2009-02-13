@@ -77,7 +77,7 @@ GCObserver::~GCObserver() {
 	*/
     AC_TRACE << "DTOR" << endl;
 }
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 JSBool JS_DLL_CALLBACK 
 #else
 JS_PUBLIC_API(JSBool)
@@ -93,7 +93,7 @@ GCObserver::attach(JSContext * cx) {
      _myPrevCallback = JS_SetGCCallback(_myContext, callbackHook);
 }
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 JSBool JS_DLL_CALLBACK 
 #else
 JS_PUBLIC_API(JSBool)

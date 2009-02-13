@@ -65,7 +65,7 @@
 
 #include <asl/base/error_functions.h>
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -527,7 +527,7 @@ NoisyFinalize(JSContext *cx, JSObject *obj) {
 // functions to allow report of uncaught exception messages when
 // calling js functions from c++
 
-#ifdef SPIDERMONK
+#ifdef USE_OLD_JS_ERROR_HANDLING
 
 typedef JSBool
 (* JS_DLL_CALLBACK JSDebugErrorHook)(JSContext *cx, const char *message,
@@ -678,7 +678,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int a
         JSBool ok = JS_CallFunctionName(cx, obj, theName, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
             AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
-#ifdef SPIDERMONK
+#ifdef USE_OLD_JS_ERROR_HANDLING
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
         }
@@ -692,7 +692,7 @@ JSA_CallFunction(JSContext * cx, JSObject * obj, JSFunction *fun, int argc, jsva
         JSBool ok = JS_CallFunction(cx, obj, fun, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
             AC_DEBUG << "Exception while calling js function" << endl;
-#ifdef SPIDERMONK
+#ifdef USE_OLD_JS_ERROR_HANDLING
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
         }
@@ -705,7 +705,7 @@ JSA_CallFunctionValue(JSContext * cx, JSObject * obj, jsval fval, int argc, jsva
         JSBool ok = JS_CallFunctionValue(cx, obj, fval, argc, argv, rval);
         if (!ok && !QuitFlagSingleton::get().getQuitFlag()) {
             AC_DEBUG << "Exception while calling js function " << endl;
-#ifdef SPIDERMONK
+#ifdef USE_OLD_JS_ERROR_HANDLING
             JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
         }
@@ -756,7 +756,7 @@ JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName) {
                 return JS_TRUE;
             } else {
                 AC_ERROR << "Property '" << theName << "' is not a function." << endl;
-#ifdef SPIDERMONK
+#ifdef USE_OLD_JS_ERROR_HANDLING
                 JSA_reportUncaughtException(cx, cx->errorReporter);
 #endif
             }

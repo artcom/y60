@@ -825,7 +825,7 @@ SDLWindow::mainLoop() {
             if (getForceFullGC()) {
                 JS_GC(_myJSContext);
             } else {
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
                 JS_AdaptiveGC(_myJSContext);
 #else
                 JS_GC(_myJSContext);

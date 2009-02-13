@@ -61,7 +61,7 @@
 #include <y60/jsbase/jssettings.h>
 #include <y60/jsbase/JSVector.h>
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -122,7 +122,7 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     }
 
     rt = cx->runtime;
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
     JS_IncrementalGC(cx, maxObjects);
 #endif
 
@@ -180,7 +180,7 @@ public:
             init();
             runTestScript(*fileName);
             cleanup(false);
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
             fprintf(outfile, "%s\t%d\n", *fileName, rt->gcObjects);
 #endif
         }
@@ -228,7 +228,7 @@ public:
         ENSURE(globalObject);
         ENSURE(JS_DefineFunctions(cx, globalObject, global_functions));
         ENSURE(JS_InitStandardClasses(cx, globalObject));
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
         AC_PRINT << "GC objects after initialization: " << rt->gcObjects;
 #endif
 
@@ -245,7 +245,7 @@ public:
 
 	if (incremental) {
         int j = 10000;
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
 	    while (!(JS_IncrementalGC(cx, 100)) && --j > 0);
 #endif
 	    ENSURE_MSG((j >= 0), "GC cycles < 1000");
@@ -268,13 +268,13 @@ public:
         fclose(js_DumpGCHeap);
         js_DumpGCHeap = NULL;
 #endif
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
         AC_PRINT << "GC Objects after execution of test: "
                  << rt->gcObjects << "; theFinalObjectCount = " << theFinalObjectCount;
         ENSURE(rt->gcObjects == theFinalObjectCount);
 #endif
         JS_DestroyContext(cx);
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
         ENSURE(rt->gcObjects == 0);
 #endif
         JS_DestroyRuntime(rt);
@@ -288,7 +288,7 @@ public:
         if (script) {
             (void)JS_ExecuteScript(cx, globalObject, script, &result);
             JS_DestroyScript(cx, script);
-#ifdef SPIDERMONK
+#ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
             AC_PRINT << "GC Objects after execution of script [" 
                      << theFileName << "]: " << cx->runtime->gcObjects;
 #endif

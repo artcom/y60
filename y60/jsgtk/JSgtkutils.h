@@ -64,7 +64,7 @@
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/jssettings.h>
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
 #else
 #include <js/jsapi.h>

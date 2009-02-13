@@ -12,6 +12,16 @@ if(NOT Y60_INTEGRATED_BUILD)
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
 endif(NOT Y60_INTEGRATED_BUILD)
 
+option(Y60_WITH_TRACEMONKEY "use latest experimental js interpreter" OFF)
+
+if (Y60_WITH_TRACEMONKEY)
+    set(JSDEPENDS "")
+    set(JSEXTERN MOZJS)
+else(Y60_WITH_TRACEMONKEY)
+    set(JSDEPENDS spidermonkey)
+    set(JSEXTERN "")
+endif(Y60_WITH_TRACEMONKEY)
+
 # Include ACMake
 include(AcMake)
 
@@ -30,6 +40,12 @@ ac_add_project(Y60
 
 # XXX: definition-propagation
 add_definitions(-DAC_BUILT_WITH_CMAKE)
+if (Y60_WITH_TRACEMONKEY)
+    add_definitions(-DY60_WITH_TRACEMONKEY)
+else(Y60_WITH_TRACEMONKEY)
+# XXX add stages spidermonkey include
+    include_directories(${CMAKE_BINARY_DIR}/netsrc/spidermonkey/include)
+endif(Y60_WITH_TRACEMONKEY)
 
 # Make sure we can access our includes without staging
 include_directories(../)

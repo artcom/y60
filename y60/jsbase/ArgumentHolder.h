@@ -65,7 +65,7 @@
 #include "Documentation.h"
 #include "JScppUtils.h"
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jspubtd.h>
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jscntxt.h>

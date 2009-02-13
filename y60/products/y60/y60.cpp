@@ -91,7 +91,7 @@ const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
     {"--no-jswarnings", "", "disable javascript warnings"},
     {"--pause-on-error", "", "if an exception occurs wait for input before quitting"},
     {"--std-logfile", "basename", "logfile basename for stdout/stderr"},
-#ifndef SPIDERMONK
+#ifdef USE_TRACEMONKEY
     {"--jit", "", "enable javascript just-in-time compiler"},
     {"--xml", "", ""}, // TODO: check was this does exactly
 #endif
@@ -137,7 +137,7 @@ main(int argc, char **argv) {
         if (ourArguments.haveOption("--jsversion")) {
             myApp.setJSVersion(asl::as<int>(ourArguments.getOptionArgument("--jsversion")));
         }
-#ifndef SPIDERMONK
+#ifdef USE_TRACEMONKEY
         if (ourArguments.haveOption("--jit")) {
             myApp.enableJIT(true);
         }

@@ -21,6 +21,6 @@ y60_add_component(
     Wiimote
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS y60jslib y60input
-    EXTERNS MOZJS GLEW OPENEXR
+    DEPENDS y60jslib y60input ${JSDEPENDS}
+    EXTERNS ${JSEXTERN} GLEW OPENEXR
 )

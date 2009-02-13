@@ -66,7 +66,7 @@
 
 #include "jssettings.h"
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jspubtd.h>
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jscntxt.h>
@@ -190,8 +190,9 @@ DEFINE_EXCEPTION(UnicodeException, asl::Exception);
 
 
 //=============================================================================
-#ifdef SPIDERMONK
-JSBool JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError);
+#ifdef USE_OLD_JS_ERROR_HANDLING
+Y60_JSBASE_EXPORT JSBool
+JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError);
 #endif
 
 Y60_JSBASE_EXPORT JSBool

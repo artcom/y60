@@ -1,4 +1,4 @@
-list( APPEND EXTERNALS MOZJS FREETYPE SDL OPENEXR NVIDIA_CG)
+list( APPEND EXTERNALS ${JSEXTERN} FREETYPE SDL OPENEXR NVIDIA_CG)
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
@@ -14,7 +14,7 @@ ac_add_executable(
   DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
           y60base y60scene y60image y60video y60input y60inet
           y60glrender y60glutil y60gltext y60jsbase y60jslib
-          y60modelling y60sdlengine
+          y60modelling y60sdlengine ${JSDEPENDS}
           aslzip acsdlttf
   EXTERNS ${EXTERNALS}
   ${Y60_APP_STYLE}

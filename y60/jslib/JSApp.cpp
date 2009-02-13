@@ -104,7 +104,7 @@
 #include <y60/jsbase/QuitFlagSingleton.h>
 #include <y60/jsbase/Documentation.h>
 
-#ifdef SPIDERMONK
+#ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
 #include <js/spidermonkey/jsprf.h>
 #include <js/spidermonkey/jsparse.h>
@@ -1634,14 +1634,14 @@ JSApp::processArguments(JSContext * theContext, JSObject * theGlobalObject,
         JS_ToggleOptions(theContext, JSOPTION_STRICT);
     }
     if (ourJITFlag) {
-#ifndef SPIDERMONK
+#ifdef USE_TRACEMONKEY
         JS_ToggleOptions(theContext, JSOPTION_JIT);
 #else
         AC_WARNING << "Javascript engine JIT not available";
 #endif
     }
     if (ourXMLFlag) {
-#ifndef SPIDERMONK
+#ifdef USE_TRACEMONKEY
         JS_ToggleOptions(theContext, JSOPTION_XML);
 #else
         AC_WARNING << "Javascript engine XML not available";
