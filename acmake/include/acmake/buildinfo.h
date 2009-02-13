@@ -166,7 +166,9 @@ class build_target_info {
                 case LIBRARY:    return "library";
                 case EXECUTABLE: return "executable";
                 case PLUGIN:     return "plugin";
+                default: break;
             }
+            return "unknown";
         }
         std::string const& build_date() const { return build_date_; }
         std::string const& build_time() const { return build_time_; }
