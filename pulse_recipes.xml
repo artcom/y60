@@ -2,15 +2,6 @@
 <project default-recipe="unix_make">
     <property name="build.dir" value="_builds/${build.type}/"/>
 
-    <!-- TODO: make these agent properties -->
-    <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
-    <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-    <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
-
-    <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
-    <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
-
-
     <macro name="prepare_build">
         <command name="create build directory">
             <executable exe="cmake" args="-E make_directory ${build.dir}"/>
@@ -53,6 +44,11 @@
     </recipe>
 
     <recipe name="windows_nmake">
+        <!-- TODO: make these agent properties -->
+        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+        <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
+        <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
+
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="NMake Makefile"/>
@@ -70,6 +66,11 @@
     </recipe>
 
     <recipe name="windows_vcbuild">
+        <!-- TODO: make these agent properties -->
+        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+        <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
+        <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
+
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
