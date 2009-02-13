@@ -107,12 +107,10 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="${incredibuild.bin}" working-dir="${build.dir}">
-                <arg>PRO60.sln</arg>
-                <arg>/CFG=&quot;${build.type}|Win32&quot;</arg>
-                <arg>/SHOWCMD</arg>
-                <arg>/SHOWAGENT</arg>
-
+            <executable exe="cmd.exe" working-dir="${build.dir}">
+				<arg>${env.VS90COMNTOOLS}\\vsvars32.bat</arg>
+				<arg>&amp;&amp;</arg>
+				<arg>${incredibuild.bin} PRO60.sln /CFG=&quot;${build.type}|Win32&quot; /SHOWCMD /SHOWAGENT</arg>
                 <process processor="${msvc_build.pp}"/>
             </executable>
         </command>
