@@ -70,7 +70,8 @@ class StationTest : public TemplateUnitTest {
                 get_environment_var_as("AC_TEST_PORT_START", myTestPort);
                 AC_PRINT << "Using port " << myTestPort << " for tests";
 
-                myStation.openStationDefault(Station::defaultBroadcastAddress(),
+                //myStation.openStationDefault(Station::defaultBroadcastAddress(),
+                myStation.openStationDefault(asl::hostaddress("127.255.255.255"),
                                       myTestPort,
                                       myTestPort,
 #ifdef IGNORE_OWN_PACKETS

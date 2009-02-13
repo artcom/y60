@@ -175,8 +175,8 @@ Station::defaultBroadcastAddress() {
     if (getenv("STATION_BROADCAST_ADDR")) {
         myAddress = asl::hostaddress(getenv("STATION_BROADCAST_ADDR"));
     } else {
-        //myAddress = defaultOwnIPAddress() | 0xff; // default class C broadcast address
-        myAddress = defaultOwnIPAddress() | 0x1ff; // HACK: ART+COM Subnet, TODO: add proper code, see example below
+        myAddress = defaultOwnIPAddress() | 0xff; // default class C broadcast address
+        // myAddress = defaultOwnIPAddress() | 0x1ff; // HACK: ART+COM Subnet, TODO: add proper code, see example below
     }
     return myAddress;
 }
