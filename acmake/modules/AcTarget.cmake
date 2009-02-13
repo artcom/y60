@@ -37,7 +37,7 @@ macro(debug_definitions)
 endmacro(debug_definitions)
 
 # attach libraries from DEPENDS and EXTERNS to TARGET
-macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
+macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
     debug_linkage("Collecting depends for ${TARGET}")
 
@@ -53,23 +53,6 @@ macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
             OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
     endforeach(DEPEND)
 
-    # collect implicit externs
-    set(IMPLICIT_EXTERNS)
-    foreach(DEPEND ${DEPENDS})
-        get_global(${DEPEND}_PROJECT _PROJECT)
-        if(${_PROJECT}_IS_IMPORTED)
-            get_global(${_PROJECT}_${DEPEND}_EXTERNS _EXTERNS)
-            list(APPEND IMPLICIT_EXTERNS ${_EXTERNS})
-            message("${DEPEND} gave us implicit externs ${_EXTERNS}")
-        endif(${_PROJECT}_IS_IMPORTED)
-    endforeach(DEPEND)
-
-    # merge externs
-    set(EXTERNS ${EXPLICIT_EXTERNS} ${IMPLICIT_EXTERNS})
-    if(EXTERNS)
-        list(REMOVE_DUPLICATES EXTERNS)
-    endif(EXTERNS)
-    
     # collect libraries from externs
     set(EXTERN_DEFINITIONS)
     set(EXTERN_LIBRARIES_GENERAL)

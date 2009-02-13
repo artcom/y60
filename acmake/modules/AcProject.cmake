@@ -12,93 +12,35 @@
 #
 # Project handling.
 #
-# This subsystem has the purpose of collecting targets into
-# a set for packaging. It resolves external dependencies and
-# generates a set of find-files for other projects to include.
-#
-# TODO:
-#  - rework dependency handling to be compatible
-#    with pkg-config version expressions and more
-#    advanced packages with arguments like FindBoost
-#  - implement cpack support
-#
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-option(ACMAKE_DEBUG_EXPORTS "Debug acmake project export mechanism" NO)
-macro(debug_exports)
-    if(ACMAKE_DEBUG_EXPORTS)
-        message("EXPORTS: ${ARGN}")
-    endif(ACMAKE_DEBUG_EXPORTS)
-endmacro(debug_exports)
-
-# Class declaration for projects.
-#
-# This will later be used with VariableUtils to
-# copy the object between the various namespaces
-# we have to put it in. (XXX: elaborate somewhere)
-#
+# XXX: document members
 set(_AC_PROJECT_VARIABLES
-    NAME           # project's name
-    FOUND          # find_package-like found marker
-    IS_PROJECT     # class tag (for "type checks")
-    IS_IMPORTED    # true if project was loaded
-    IS_INTEGRATED  # true if project is part of this build
-    BUILD_TYPE     # cmake build type the project was built with (XXX: not with the VS-build)
-    BINARY_DIR     # root of binary build tree
-    SOURCE_DIR     # root of source tree
-    INSTALL_PREFIX # install prefix the project was compiled for
-    RUNTIME_DIR    # absolute install location of binaries (and dlls on windows)
-    LIBRARY_DIR    # absolute install location of libraries
-    INCLUDE_DIR    # absolute install location of headers
-    LIBRARIES      # list of all libraries in the project
-    EXECUTABLES    # list of all executables in the project
-    PLUGIN_DIRS    # XXX: not implemented. should be involved in y60 in-tree PATH generation
-    PLUGINS        # list of all plugins in the project
-    EXTERNS        # list of all external packages 
-    CUSTOM_SCRIPTS # custom scripts to be included in the find-package
+    NAME FOUND IS_PROJECT
+    IS_IMPORTED IS_INTEGRATED
+    BUILD_TYPE
+    BINARY_DIR SOURCE_DIR INSTALL_PREFIX
+    RUNTIME_DIR LIBRARY_DIR INCLUDE_DIR
+    LIBRARIES EXECUTABLES
+    PLUGIN_DIRS PLUGINS
+    EXTERNS
 )
 
-# Class declaration for externs.
-#
-# Externs are an inner class of projects and
-# are used to track registration and loading of
-# external dependencies.
-#
+# XXX: document members
 set(_AC_EXTERN_VARIABLES
-    IS_PACKAGE   # true if this is for find_package
-    IS_PKGCONFIG # true if this is for pkg-config
-    IS_REQUIRED  # true if this pkg is required
-    PKGCONFIG    # name of pkg-config package if applicable
+    IS_PACKAGE IS_PKGCONFIG
+    PKGCONFIG
 )
 
-macro(ac_is_integrated PROJECT_NAME OUT)
-    get_global(${PROJECT_NAME}_IS_INTEGRATED _IS)
-    set(OUT ${_IS})
-    set(_IS)
-endmacro(ac_is_integrated)
-
-# Add a project to the current build.
-#
-# This takes a name and some keyword arguments declaring
-# external dependencies. (XXX: This mechanism sucks)
-#
 macro(ac_add_project PROJECT_NAME)
     parse_arguments(THIS_PROJECT
-        "REQUIRED_PACKAGES;OPTIONAL_PACKAGES;REQUIRED_PKGCONFIG;OPTIONAL_PKGCONFIG;CUSTOM_SCRIPTS"
+        "REQUIRED_PACKAGES;OPTIONAL_PACKAGES;REQUIRED_PKGCONFIG;OPTIONAL_PKGCONFIG"
         ";"
         ${ARGN})
 
-    # Check for nesting
-    if(ACMAKE_CURRENT_PROJECT)
-        message(FATAL_ERROR "Project ${PROJECT_NAME} nested in ${ACMAKE_CURRENT_PROJECT}")
-    endif(ACMAKE_CURRENT_PROJECT)
-
     # Enter project context
     set(ACMAKE_CURRENT_PROJECT ${PROJECT_NAME})
-
-    # Set the name of the object
-    set_global(${PROJECT_NAME}_NAME ${PROJECT_NAME})
 
     # Remember the binary and source dir of this project
     set_global(${PROJECT_NAME}_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
@@ -136,20 +78,15 @@ macro(ac_add_project PROJECT_NAME)
     # External dependencies
     set_global(${PROJECT_NAME}_EXTERNS     "")
 
-    # Remember custom scripts
-    set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS ${THIS_PROJECT_CUSTOM_SCRIPTS})
-
-    # Add required cmake-packaged externals
+    # Add required and optional cmake-packaged externals
     foreach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
         ac_project_add_extern_package(${PACKAGE} REQUIRED)
     endforeach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
-
-    # Add optional cmake-packaged externals
     foreach(PACKAGE ${THIS_PROJECT_OPTIONAL_PACKAGES})
         ac_project_add_extern_package(${PACKAGE})
     endforeach(PACKAGE ${THIS_PROJECT_OPTIONAL_PACKAGES})
 
-    # Add required pkgconfig packages
+    # Add required and optional pkgconfig packages
     if(THIS_PROJECT_REQUIRED_PKGCONFIG)
         set(LST ${THIS_PROJECT_REQUIRED_PKGCONFIG})
         while(LST)
@@ -161,8 +98,6 @@ macro(ac_add_project PROJECT_NAME)
             ac_project_add_extern_pkgconfig(${PKG_PREFIX} ${PKG_PACKAGE} REQUIRED)
         endwhile(LST)
     endif(THIS_PROJECT_REQUIRED_PKGCONFIG)
-
-    # Add optional pkgconfig packages
     if(THIS_PROJECT_OPTIONAL_PKGCONFIG)
         set(LST ${THIS_PROJECT_OPTIONAL_PKGCONFIG})
         while(LST)
@@ -177,131 +112,78 @@ macro(ac_add_project PROJECT_NAME)
 
 endmacro(ac_add_project PROJECT_NAME)
 
-# Internal method for adding targets into the current project.
-#
 macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
     parse_arguments(THIS_TARGET
         "EXTERNS;DEPENDS"
         ""
         ${ARGN}
     )
-
-    # if we are not in a project, we ignore the call
     if(ACMAKE_CURRENT_PROJECT)
-        debug_exports("Registering target ${TARGET_NAME} into ${TARGET_TYPE_PLURAL} of ${ACMAKE_CURRENT_PROJECT}")
-
-        # mark the target as coming from this project
-        set_global(${TARGET_NAME}_PROJECT ${ACMAKE_CURRENT_PROJECT})
-
-        # add the target to the projects list for the appropriate type
         append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_TYPE_PLURAL} ${TARGET_NAME})
 
-        # fill the target object
         set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARIES    ${TARGET_NAME})
         set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_DEFINITIONS  "")
         set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
         set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
 
-        # add externs to target object
         foreach(EXTERN ${THIS_TARGET_EXTERNS})
-            debug_exports("Target depends on extern ${EXTERN}")
-            append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS ${EXTERN})
+#            append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARIES ${${EXTERN}_LIBRARIES})
+#            append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_INCLUDE_DIRS ${${EXTERN}_INCLUDE_DIRS})
+#            append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARY_DIRS ${${EXTERN}_LIBRARY_DIRS})
+            append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS ${EXTERN})
         endforeach(EXTERN ${THIS_TARGET_EXTERNS})
-
-        # add externs to target object
         foreach(DEPEND ${THIS_TARGET_DEPENDS})
-            debug_exports("Target depends on depend ${DEPEND}")
-            append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_DEPENDS ${DEPEND})
-        endforeach(DEPEND ${THIS_TARGET_DEPENDS})
-
-        # for each depend, at the externs it pulls in
-        foreach(DEPEND ${THIS_TARGET_DEPENDS})
-            # we need to know from which project the depend comes
-            get_global(${DEPEND}_PROJECT _DEPEND_PROJECT )
-            # then we get its externs list
-            get_global(${_DEPEND_PROJECT}_${DEPEND}_EXTERNS _IMPLICIT_EXTERNS )
-            # and add it if there is anything to add
-            if(_IMPLICIT_EXTERNS)
-                debug_exports("Found ${DEPEND} to require ${_IMPLICIT_EXTERNS}")
-                append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS ${_IMPLICIT_EXTERNS})
-            endif(_IMPLICIT_EXTERNS)
+            append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_DEPENDS ${DEPEND})
         endforeach(DEPEND ${THIS_TARGET_DEPENDS})
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
 
-# Internal method for adding find_package-dependencies to the current project
-#
 macro(ac_project_add_extern_package PACKAGE_NAME)
     parse_arguments(THIS_PACKAGE
         ""
         "REQUIRED"
         ${ARGN}
     )
-
-    # if we are not in a project, we ignore the call
     if(ACMAKE_CURRENT_PROJECT)
-        # process REQUIRED argument
         set(PACKAGE_REQUIRED)
         if(THIS_PACKAGE_REQUIRED)
             set(PACKAGE_REQUIRED REQUIRED)
-            set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_REQUIRED YES)
         endif(THIS_PACKAGE_REQUIRED)
-        
-        # load the package description (XXX: wart)
         find_package(${PACKAGE_NAME} ${PACKAGE_REQUIRED})
-        
-        # register the dependency (XXX: no found check, relevant for optionals)
         append_global(${ACMAKE_CURRENT_PROJECT}_EXTERNS ${PACKAGE_NAME})
         set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_PACKAGE YES)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_extern_package PACKAGE_NAME)
 
-# Internal method for adding pkg-config-dependencies to the current project
-#
 macro(ac_project_add_extern_pkgconfig PACKAGE_NAME PKGCONFIG_NAME)
     parse_arguments(THIS_PKGCONFIG
         ""
         "REQUIRED"
         ${ARGN}
     )
-
-    # if we are not in a project, we ignore the call
     if(ACMAKE_CURRENT_PROJECT)
-        # process REQUIRED argument
         set(PACKAGE_REQUIRED)
         if(THIS_PKGCONFIG_REQUIRED)
             set(PACKAGE_REQUIRED REQUIRED)
-            set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_REQUIRED YES)
         endif(THIS_PKGCONFIG_REQUIRED)
-
-        # load the pkg-config module (XXX: wart)
         pkg_search_module(${PACKAGE_NAME} ${PKGCONFIG_REQUIRED} ${PKGCONFIG_NAME})
-
-        # register the dependency if we found it
         if(${PACKAGE_NAME}_FOUND)
             append_global(${ACMAKE_CURRENT_PROJECT}_EXTERNS ${PACKAGE_NAME})
             set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_PKGCONFIG YES)
-            set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_PKGCONFIG ${PKGCONFIG_NAME})
+            set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_PKGCONFIG    ${PKGCONFIG_NAME})
         endif(${PACKAGE_NAME}_FOUND)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_extern_pkgconfig PACKAGE_NAME)
 
-# End declaration of a project.
-#
-# This is where find-files are generated.
-#
-macro(ac_end_project PROJECT_NAME)
-    # Check if we are ending the right project
-    if(NOT "${PROJECT_NAME}" STREQUAL "${ACMAKE_CURRENT_PROJECT}")
-        message(FATAL_ERROR "Ending a project that is not the current project.")
-    endif(NOT "${PROJECT_NAME}" STREQUAL "${ACMAKE_CURRENT_PROJECT}")
-
-    # Bring object into local namespace
+macro(ac_export_project PROJECT_NAME)
     get_globals(
         ${PROJECT_NAME}
         THIS_PROJECT
         ${_AC_PROJECT_VARIABLES}
     )
+
+    # XXX: remove this line
+    set(THIS_PROJECT_NAME ${PROJECT_NAME})
 
     # Generate Find-file
     configure_file(
@@ -315,29 +197,20 @@ macro(ac_end_project PROJECT_NAME)
     file(WRITE ${EXT} "# This generated script resolves external dependencies for ${PROJECT_NAME}\n")
     file(WRITE ${EXT} "include(FindPkgConfig)\n")
     foreach(PACKAGE ${THIS_PROJECT_EXTERNS})
-        get_globals(${PROJECT_NAME}_EXTERN_${PACKAGE} THIS_PACKAGE ${_AC_EXTERN_VARIABLES})
+        get_globals(ASL_EXTERN_${PACKAGE} THIS_PACKAGE ${_AC_EXTERN_VARIABLES})
 
         if(THIS_PACKAGE_IS_PACKAGE)
-            if(THIS_PACKAGE_IS_REQUIRED)
-                file(APPEND ${EXT} "find_package(${PACKAGE} REQUIRED)\n")
-            else(THIS_PACKAGE_IS_REQUIRED)
-                file(APPEND ${EXT} "find_package(${PACKAGE})\n")
-            endif(THIS_PACKAGE_IS_REQUIRED)
+            file(APPEND ${EXT} "find_package(${PACKAGE} REQUIRED)\n")
         endif(THIS_PACKAGE_IS_PACKAGE)
 
         if(THIS_PACKAGE_IS_PKGCONFIG)
-            if(THIS_PACKAGE_IS_REQUIRED)
-                file(APPEND ${EXT} "pkg_search_module(${PACKAGE} REQUIRED ${THIS_PACKAGE_PKGCONFIG})\n")
-            else(THIS_PACKAGE_IS_REQUIRED)
-                file(APPEND ${EXT} "pkg_search_module(${PACKAGE} ${THIS_PACKAGE_PKGCONFIG})\n")
-            endif(THIS_PACKAGE_IS_REQUIRED)                
+            file(APPEND ${EXT} "pkg_search_module(${PACKAGE} REQUIRED ${THIS_PACKAGE_PKGCONFIG})\n")
         endif(THIS_PACKAGE_IS_PKGCONFIG)
 
         clear_locals(THIS_PACKAGE ${AC_EXTERN_VARIABLES})
     endforeach(PACKAGE ${THIS_PROJECT_EXTERNS})
 
-    # Generate target declaration script
-    # XXX: not implemented for plugins
+    # Generate target dependency script
     set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake")
     file(WRITE ${EXT} "# This generated script defines target dependencies for ${PROJECT_NAME}\n")
     foreach(LIBRARY ${THIS_PROJECT_LIBRARIES})
@@ -348,25 +221,18 @@ macro(ac_end_project PROJECT_NAME)
         file(APPEND ${EXT} "set(${LIBRARY}_EXTERNS ${THIS_LIBRARY_EXTERNS})\n")
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
-    # XXX: dirty hack
-    set(THIS_PROJECT_CUSTOM_SCRIPT_FILES)
-    foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
-        list(APPEND THIS_PROJECT_CUSTOM_SCRIPT_FILES ${SCRIPT}.cmake)
-    endforeach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
-
     # Install find fileset
     install(
         FILES
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}.cmake
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Dependencies.cmake
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake
-            ${THIS_PROJECT_CUSTOM_SCRIPT_FILES}
 	    DESTINATION share/cmake-2.6/Modules
     )
 
-    # Remove our local copy of the project
+    # Remove our THIS_ variables
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})
 
     # Leave the project context
     set(ACMAKE_CURRENT_PROJECT)
-endmacro(ac_end_project PROJECT_NAME)
+endmacro(ac_export_project PROJECT_NAME)
