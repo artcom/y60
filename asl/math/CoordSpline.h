@@ -71,27 +71,28 @@ namespace asl {
       public:
             // XXX don't know if here's actually ZYXRotating needed (gm)
     		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeStamp, float theSpeed ) 
-    		        : xyz(coord), t(theTimeStamp), speed(theSpeed) , rotation(orientation) 
+    		        : rotation(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
     		 {
                 _myOrientationMatrix.makeZYXRotating(rotation);
     		 }
 
-    		EulerKeyframe( const EulerKeyframe& theKeyframe) {
-                xyz = theKeyframe.xyz; t = theKeyframe.t; speed = theKeyframe.speed;
-                rotation = theKeyframe.rotation;
+    		EulerKeyframe( const EulerKeyframe& theKeyframe) 
+              : rotation(theKeyframe.rotation),
+                xyz(theKeyframe.xyz),
+                t(theKeyframe.t),
+                speed (theKeyframe.speed)
+            {
                 _myOrientationMatrix.makeZYXRotating(rotation);
 		    }
             EulerKeyframe & operator=(const EulerKeyframe & theKeyframe) { 
+                rotation = theKeyframe.rotation;
                 xyz = theKeyframe.xyz; 
                 t = theKeyframe.t; 
                 speed = theKeyframe.speed; 
-                rotation = theKeyframe.rotation;
                 return * this; 
             }
     		EulerKeyframe() {}
     		virtual ~EulerKeyframe() {}
-
-
 
     		const asl::Vector3f & getPosition() const { return xyz; }
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
@@ -122,21 +123,22 @@ namespace asl {
     {
       public:
     		QuaternionKeyframe( asl::Vector3f & coord, asl::Quaternionf & orientation, float theTimeStamp, float theSpeed ) 
-    		        : xyz(coord), t(theTimeStamp), speed(theSpeed), _myQuaternion(orientation) 
+    		        : _myQuaternion(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
             {
                 _myOrientationMatrix = asl::Matrix4f(_myQuaternion);                
             }
     		QuaternionKeyframe( const QuaternionKeyframe& theKeyframe) { 
-                xyz = theKeyframe.xyz; t = theKeyframe.t; speed = theKeyframe.speed;
                 _myQuaternion = theKeyframe._myQuaternion;
-                
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);                
+                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);   
+                xyz = theKeyframe.xyz; 
+                t = theKeyframe.t;
+                speed = theKeyframe.speed;
 		    }
             QuaternionKeyframe & operator=(const QuaternionKeyframe & theKeyframe) { 
+                _myQuaternion = theKeyframe._myQuaternion;
                 xyz = theKeyframe.xyz; 
                 t = theKeyframe.t; 
                 speed = theKeyframe.speed; 
-                _myQuaternion = theKeyframe._myQuaternion;
                 return * this; 
             }
     		QuaternionKeyframe() {}

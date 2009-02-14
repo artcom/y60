@@ -75,8 +75,8 @@ namespace asl {
 
 Frustum::Frustum() :
     _myLeft(0),
-    _myRight(0),
     _myTop(0),
+    _myRight(0),
     _myBottom(0),
     _myNear(0),
     _myFar(0),
@@ -88,8 +88,8 @@ Frustum::Frustum() :
 
 Frustum::Frustum( const Frustum & otherFrustum ) :
     _myLeft( otherFrustum._myLeft),
-    _myRight( otherFrustum._myRight),
     _myTop( otherFrustum._myTop),
+    _myRight( otherFrustum._myRight),
     _myBottom( otherFrustum._myBottom),
     _myNear( otherFrustum._myNear),
     _myFar( otherFrustum._myFar),
@@ -107,9 +107,9 @@ Frustum::Frustum(float theLeft, float theRight,
         float theBottom, float theTop,
         float theNear, float theFar, ProjectionType theProjectionType) :
     _myLeft(theLeft),
+    _myTop(theTop),
     _myRight(theRight),
     _myBottom(theBottom),
-    _myTop(theTop),
     _myNear(theNear),
     _myFar(theFar),
     _myProjectionType(theProjectionType)
@@ -130,9 +130,9 @@ Frustum::~Frustum() {
 const Frustum &
 Frustum::operator = (const Frustum & other) {
     _myLeft = other._myLeft;
+    _myTop = other._myTop;
     _myRight = other._myRight;
     _myBottom = other._myBottom;
-    _myTop = other._myTop;
     _myNear = other._myNear;
     _myFar = other._myFar;
     _myProjectionType = other._myProjectionType;

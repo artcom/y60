@@ -194,9 +194,9 @@ class ASL_MATH_EXPORT Frustum {
 
 
         float _myLeft;
+        float _myTop;
         float _myRight;
         float _myBottom;
-        float _myTop;
         float _myNear;
         float _myFar;
         ProjectionType _myProjectionType;

@@ -679,6 +679,9 @@ namespace asl {
             case RETURN_TO_ORIGIN:
                 close();
                 break;
+            case NONE:
+                // do nothing;
+                break;
         }
         _myPreviousCommand = * theCommand;
     }
