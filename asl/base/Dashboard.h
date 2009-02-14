@@ -285,16 +285,15 @@ namespace asl {
                 reset();
             };
             Timer(const Timer & theTimer)
-                :
+                : 
                 _myElapsed(theTimer._myElapsed),
                 _myStartTime(theTimer._myStartTime),
                 _myMinTime(theTimer._myMinTime),
                 _myMaxTime(theTimer._myMaxTime),
-				_myGroup(theTimer._myGroup),
-                _isRunning(false),
                 _myParent(theTimer._myParent),
-                _myCounter(theTimer._myCounter)
-
+				_myGroup(theTimer._myGroup),
+                _myCounter(theTimer._myCounter),
+                _isRunning(false)
             {
             }
             Timer & operator=(const Timer & theTimer) {
@@ -376,10 +375,11 @@ namespace asl {
             asl::NanoTime   _myStartTime;
             asl::NanoTime   _myMinTime;
             asl::NanoTime   _myMaxTime;
-            unsigned long _myGroup;
-            bool    _isRunning;
+
             TimerPtr _myParent;
+            unsigned long _myGroup;
             Counter _myCounter;
+            bool    _isRunning;
     };
 
     class ASL_BASE_EXPORT Dashboard : public Singleton<Dashboard> {

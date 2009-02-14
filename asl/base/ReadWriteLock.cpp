@@ -62,8 +62,9 @@ using namespace std;  // automatically added!
 
 namespace asl {
 
-ScopeLocker::ScopeLocker(ReadWriteLock & theLock, bool theLockWriteFlag) :
-    _myWriteLockFlag(theLockWriteFlag), _myLock(theLock) 
+ScopeLocker::ScopeLocker(ReadWriteLock & theLock, bool theLockWriteFlag) 
+    : _myLock(theLock),
+      _myWriteLockFlag(theLockWriteFlag)
     {
         if (_myWriteLockFlag) {
             _myLock.writelock();
@@ -129,9 +130,9 @@ ReadWriteLock::writeunlock() {
 
 ReadWriteLock::ReadWriteLock()
 :   _activeReaderCount(0),
+    _hasActiveWriter(0),
     _waitingReaderCount(0),
-    _waitingWriterCount(0),
-    _hasActiveWriter(0)
+    _waitingWriterCount(0)
 {
     int myStatus = pthread_mutex_init(&_myMutex,0);
     if (myStatus != 0) {

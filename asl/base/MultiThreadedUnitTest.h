@@ -60,6 +60,7 @@ namespace asl {
     struct ThreadInterface {
         virtual void fork() = 0;
         virtual void join() = 0;
+        virtual ~ThreadInterface() {}
     };
 
     template <class TEST>

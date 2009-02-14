@@ -131,38 +131,35 @@ testRetVal (int theRetVal, const char * theMsg) {
 }
 
 PosixThread::PosixThread(int mySchedPolicy, int myPriority)
-    : _mySchedPolicy (mySchedPolicy),
-      _myPriority (myPriority),
-      _myIsActive (false),
-      _myWorkFunc(0),
-      _myWorkArgs(0),
-      _myThread(0),
-      _myShouldTerminate(false)
-{
-}
+    : _myThread(0),
+    _mySchedPolicy (mySchedPolicy),
+    _myPriority (myPriority),
+    _myIsActive (false),
+    _myWorkFunc(0),
+    _myWorkArgs(0),
+    _myShouldTerminate(false)
+{}
 
 PosixThread::PosixThread (WorkFunc * workFunc, void * workArgs,
                           int mySchedPolicy, int myPriority)
-    : _mySchedPolicy (mySchedPolicy),
+    : _myThread(0),
+      _mySchedPolicy (mySchedPolicy),
       _myPriority (myPriority),
       _myIsActive (false),
       _myWorkFunc(workFunc),
       _myWorkArgs(workArgs),
-      _myThread(0),
       _myShouldTerminate(false)
-{
-}
+{}
 
 PosixThread::PosixThread ()
-    : _mySchedPolicy (SCHED_OTHER),
+    : _myThread(0),
+      _mySchedPolicy (SCHED_OTHER),
       _myPriority (0),
       _myIsActive (false),
       _myWorkFunc(0),
       _myWorkArgs(0),
-      _myThread(0),
       _myShouldTerminate(false)
-{
-}
+{}
 
 PosixThread::~PosixThread() {
     if (isActive()) {

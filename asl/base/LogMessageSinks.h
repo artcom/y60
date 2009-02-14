@@ -75,6 +75,9 @@ namespace asl {
                 case SEV_WARNING:
                     _myStream << TTYYELLOW;
                     break;
+                default:
+                    // normal black, do nothing
+                    break;
             }
             _myStream << theMessage << ENDCOLOR << std::endl;
             myLock.unlock();

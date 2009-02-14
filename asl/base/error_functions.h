@@ -116,7 +116,7 @@ std::string errorDescription(LAST_ERROR_TYPE err) {
 
 DEFINE_EXCEPTION(OSXError, asl::Exception);
 
-static void
+inline void
 checkOSXError(OSErr theErrorCode, const std::string & theWhere) {
     if (theErrorCode != noErr) {
         throw OSXError(std::string("An error occured. Error code: ") +
