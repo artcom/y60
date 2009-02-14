@@ -33,8 +33,7 @@ macro(y60_add_jstest NAME PREFIX)
 endmacro(y60_add_jstest )
 
 
-
-macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST )
+macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
   get_target_property(COMPAREIMAGE_EXECUTABLE ac-compare-image LOCATION_${CMAKE_BUILD_TYPE})
 
@@ -86,7 +85,7 @@ macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST )
     file(APPEND ${CMAKEFILE} "#compare image\n")
     file(APPEND ${CMAKEFILE} "if(rv EQUAL 0)\n")
     file(APPEND ${CMAKEFILE} "execute_process(\n")
-    file(APPEND ${CMAKEFILE} "  COMMAND ${COMPAREIMAGE_EXECUTABLE} --tolerance 0.12 --threshold 30 ${TESTIMG} ${BASELINEIMG}\n")
+    file(APPEND ${CMAKEFILE} "  COMMAND ${COMPAREIMAGE_EXECUTABLE} --tolerance ${TOLERANCE} --threshold ${THRESHOLD} ${TESTIMG} ${BASELINEIMG}\n")
     file(APPEND ${CMAKEFILE} "  WORKING_DIRECTORY ${TESTMODELDIR}\n")
     file(APPEND ${CMAKEFILE} "  RESULT_VARIABLE rv\n")
     file(APPEND ${CMAKEFILE} ")\n")
@@ -106,8 +105,9 @@ endmacro(write_scenetest )
 
 
 
-macro(y60_add_scenetest NAME DIRNAME) 
-  #generate  ${NAME}.tst.cmake (will include execute_process y60, ac-compare-image) 
+macro(y60_add_scenetest_custom NAME DIRNAME TOLERANCE THRESHOLD) 
+  #generate  ${NAME}.tst.cmake (will include execute_process y60, ac-compare-image)
+
   set(TESTMODELDIR ${CMAKE_SOURCE_DIR}/../${DIRNAME})
   set(SCRIPT ${TESTMODELDIR}/${NAME}.js)
   if(NOT EXISTS ${SCRIPT})
@@ -131,11 +131,10 @@ macro(y60_add_scenetest NAME DIRNAME)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages)
   endif(NOT EXISTS ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages)
   
-  
   # generate no cg test (if available)
   if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
     set(ONEVERSION 1)
-    write_scenetest( ${NAME} ${CMAKEFILE} ${DIRNAME} 0)
+    write_scenetest( ${NAME} ${CMAKEFILE} ${DIRNAME} 0 ${TOLERANCE} ${THRESHOLD})
         
     # register the created cmake-file as test
     add_test(${DIRNAME}_${NAME}
@@ -143,13 +142,12 @@ macro(y60_add_scenetest NAME DIRNAME)
     )
   endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
     
-  
   # generate no cg test (if available)
   set(SHADERLIB ${CMAKE_SOURCE_DIR}/y60/shader/shaderlibrary.xml)
   set(IMGSUFFIX .cg.png)
   if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
     set(ONEVERSION 1)
-    write_scenetest( ${NAME} ${CMAKEFILECG} ${DIRNAME} 1)
+    write_scenetest( ${NAME} ${CMAKEFILECG} ${DIRNAME} 1 ${TOLERANCE} ${THRESHOLD})
   
     # register the created cmake-file as test
     add_test(${DIRNAME}_CG_${NAME}
@@ -160,6 +158,9 @@ macro(y60_add_scenetest NAME DIRNAME)
   if(${ONEVERSION} EQUAL 0)  
     message("SKIPPED. (No BaselineImages found for scenetest ${NAME}.)")
   endif(${ONEVERSION} EQUAL 0)  
-   
   
-endmacro(y60_add_scenetest ) 
+endmacro(y60_add_scenetest_custom)
+
+macro(y60_add_scenetest NAME DIRNAME)
+    y60_add_scenetest_custom(${NAME} ${DIRNAME} "0.12" "30") 
+endmacro(y60_add_scenetest NAME DIRNAME)  

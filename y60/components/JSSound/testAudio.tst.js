@@ -61,11 +61,9 @@ use("UnitTest.js");
 plug("y60JSSound");
 plug("y60ProcFunctions");
 
-
-
 //const AUDIO_1 = expandEnvironment("${PRO}/src/y60/sound/testfiles/aussentuer.mp3");
 const AUDIO_1 = searchFile("../sound/testfiles/aussentuer.mp3");
-print(AUDIO_1);
+//print(AUDIO_1);
 
 function SoundUnitTest() {
     this.Constructor(this, "SoundUnitTest");

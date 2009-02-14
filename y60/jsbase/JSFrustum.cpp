@@ -352,7 +352,7 @@ JSFrustum::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             myNewObject = new JSFrustum( myNewValue );
         }
     } else {
-        JS_ReportError(cx,"Constructor for %s not yet implemented!",ClassName());
+        JS_ReportError(cx,"%s has only default and copy constructor.",ClassName());
     }
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
