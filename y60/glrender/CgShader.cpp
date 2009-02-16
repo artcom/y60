@@ -238,7 +238,7 @@ namespace y60 {
                 PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
                 PackageList::const_iterator it = myPackages.begin();
                 while( it != myPackages.end() ) {
-                    std::string myArg = "-I" + (*it++)->getPath();
+                    std::string myArg = " -I" + (*it++)->getPath();
                     myCompilerArgs[i].push_back( myArg );
                 }
             }

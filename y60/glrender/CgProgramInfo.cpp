@@ -126,7 +126,7 @@ namespace y60 {
 
             // create null terminated array of null terminated strings
             for (std::vector<std::string>::size_type i=0; i < _myShader._myCompilerArgs.size(); ++i) {
-                AC_DEBUG << "Using arg " << _myShader._myCompilerArgs[i].c_str() << endl;
+                AC_DEBUG << "Using arg '" << _myShader._myCompilerArgs[i].c_str() << "'" << endl;
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
             _myCachedCompilerArgs.push_back(0);
