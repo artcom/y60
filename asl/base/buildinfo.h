@@ -295,13 +295,19 @@ class target_info_initializer {
 #define ACMAKE_NO_SCM_DATA() \
     asl::no_scm_data()
 
-#define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)            \
-        namespace {                                                        \
-__declspec(dllexport) asl::target_info_initializer revision_info ## c_ident = \
-                    asl::target_info_initializer( name,                 \
-                            asl::build_target_info:: target_type,       \
-                            __DATE__, __TIME__,                            \
-                            scm_info);                                     \
+#ifdef WIN32
+#   define BUILDINFO_DLL_EXPORT __declspec(dllexport)
+#else
+#   define BUILDINFO_DLL_EXPORT
+#endif
+
+#define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)               \
+        namespace {                                                          \
+BUILDINFO_DLL_EXPORT asl::target_info_initializer revision_info ## c_ident = \
+                    asl::target_info_initializer( name,                      \
+                            asl::build_target_info:: target_type,            \
+                            __DATE__, __TIME__,                              \
+                            scm_info);                                       \
         }
 
 #endif // ASL_BASE_BUILD_INFORMATION_INCLUDED

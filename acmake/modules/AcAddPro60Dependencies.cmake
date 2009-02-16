@@ -34,7 +34,7 @@ if(OSX OR LINUX)
     endif(PRO60_DEPS)
 endif(OSX OR LINUX)
 
-if(NOT ACCL_FOUND)
+if(NOT ACCL_SEARCHED)
     find_package( ACCL )
     if(ACCL_FOUND)
         accl_register_searchpath()
@@ -42,7 +42,8 @@ if(NOT ACCL_FOUND)
     else(ACCL_FOUND)
         message("ART+COM companion libraries not found")
     endif(ACCL_FOUND)
-endif(NOT ACCL_FOUND)
+    set(ACCL_SEARCHED ON)
+endif(NOT ACCL_SEARCHED)
 
 
 

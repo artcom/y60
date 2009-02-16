@@ -7,7 +7,6 @@
 # also defined, but not for general use are
 #  JPEG_LIBRARY, where to find the JPEG library.
 
-
 FIND_PATH(JPEG_INCLUDE_DIR jpeglib.h)
 
 SET(JPEG_NAMES ${JPEG_NAMES} jpeg libjpeg) 

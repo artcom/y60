@@ -8,6 +8,8 @@
 # specific, prior written permission of ART+COM AG Berlin.
 #============================================================================
 
+set(ACMAKE_BUILDINFO OFF)
+
 add_subdirectory(paintlib)
 add_subdirectory(spidermonkey)
 add_subdirectory(SDL_ttf2)
