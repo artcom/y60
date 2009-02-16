@@ -18,6 +18,7 @@
 #
 
 include(CTest)
+mark_as_advanced(DART_TESTING_TIMEOUT)
 
 include(FindPkgConfig)
 

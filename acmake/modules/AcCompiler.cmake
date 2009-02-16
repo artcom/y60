@@ -16,14 +16,12 @@
 if(MSVC)
     # Full warnings
     add_definitions( /W4 )
-else(MSVC)
-    # TODO: check for gcc
+endif(MSVC)
 
+if(CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)
     # Compile faster: use pipes instead of intermediate files
     add_definitions( -pipe )
+
     # Full warnings
     add_definitions( -Wall )
-    # XXX: talk to hendrik again
-    #      better take a look annd leave it enabled for now
-    # add_definitions( -Wno-non-virtual-dtor )
-endif(MSVC)
+endif(CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)

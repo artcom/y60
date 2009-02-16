@@ -4,6 +4,8 @@ if(WIN32)
         string(TOUPPER ${SUBLIB} SUBLIB_UPPER) 
         find_path( ${SUBLIB_UPPER}_INCLUDE_DIRS ${SUBLIB}.h PATH_SUFFIXES lib${SUBLIB} ffmpeg)
         find_library( ${SUBLIB_UPPER}_LIBRARIES NAMES ${SUBLIB} lib${SUBLIB})
+        mark_as_advanced( ${SUBLIB_UPPER}_LIBRARIES
+                ${SUBLIB_UPPER}_INCLUDE_DIRS)
     endforeach(SUBLIB ${FFMPEG_SUBLIBS})
 else(WIN32)
     pkg_search_module(AVCODEC REQUIRED libavcodec)

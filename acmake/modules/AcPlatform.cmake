@@ -66,10 +66,19 @@ else(UNIX)
         add_definitions( -D_CRT_SECURE_NO_WARNINGS )
         add_definitions( -D_CRT_NONSTDC_NO_WARNINGS )
         add_definitions( -D_SCL_SECURE_NO_WARNINGS )
-        # Make CMake build all libs in a common directory. Since we build
-        # DLLs the tests need to find their libraries even while they are not
-        # installed in their final locations (during testrun that is). 
-        set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+        # XXX TODO per plugin stuff
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
     endif(WIN32)
-    
+
+    if (CMAKE_GENERATOR MATCHES "Visual Studio.*")
+        option(ACMAKE_VERBOSE_VCPROJECTS
+                "Print compiler and linker command lines (disable /nologo)?"
+                ON)
+        set(CMAKE_VERBOSE_MAKEFILE ${ACMAKE_VERBOSE_VCPROJECTS}
+                CACHE BOOL
+                "Print compiler and linker command lines (disable /nologo)?"
+                FORCE)
+    endif (CMAKE_GENERATOR MATCHES "Visual Studio.*")
 endif(UNIX)

@@ -12,10 +12,6 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/acmake/modules)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/asl)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/y60)
 
-if(WIN32)
-    list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
-endif(WIN32)
-
 # set some flags telling sub-packages that
 # they are being built as a subpackage
 set(ACMAKE_INTEGRATED_BUILD YES)
@@ -25,6 +21,14 @@ set(SPIDERMONKEY_INTEGRATED_BUILD YES)
 set(ASL_INTEGRATED_BUILD YES)
 set(Y60_INTEGRATED_BUILD YES)
 
+# look for ART+COM companion libraries
+find_package( ACCL )
+if(ACCL_FOUND)
+    accl_register_searchpath()
+endif(ACCL_FOUND)
+
+set(ACMAKE_BUILDINFO_TEMPLATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
 # add paths to our internal staged includes
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include

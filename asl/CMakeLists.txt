@@ -12,6 +12,9 @@ endif(NOT ASL_INTEGRATED_BUILD)
 # Include cmake libraries
 include(AcMake)
 
+set(ACMAKE_BUILDINFO_TEMPLATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/buildinfo.cpp.in)
+
 # XXX: definition handling
 add_definitions(-DAC_BUILT_WITH_CMAKE)
 

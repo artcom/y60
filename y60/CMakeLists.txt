@@ -14,6 +14,9 @@ endif(NOT Y60_INTEGRATED_BUILD)
 
 option(Y60_WITH_TRACEMONKEY "use latest experimental js interpreter" OFF)
 
+set(ACMAKE_BUILDINFO_TEMPLATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../asl/base/buildinfo.cpp.in)
+
 if (Y60_WITH_TRACEMONKEY)
     set(JSDEPENDS "")
     set(JSEXTERN MOZJS)

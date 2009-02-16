@@ -18,7 +18,7 @@
 #
 
 # Add win32 dependency folder
-if(WIN32 OR OSX OR LINUX)
+if(OSX OR LINUX)
     set(PRO60_DEPS $ENV{PRO60_DEPS})
     if(PRO60_DEPS)
         list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
@@ -32,5 +32,17 @@ if(WIN32 OR OSX OR LINUX)
             message(STATUS "PRO60_DEPS environment variable not set, dependencies must be in standard locations")
         endif(WIN32)
     endif(PRO60_DEPS)
-endif(WIN32 OR OSX OR LINUX)
+endif(OSX OR LINUX)
+
+if(NOT ACCL_FOUND)
+    find_package( ACCL )
+    if(ACCL_FOUND)
+        accl_register_searchpath()
+        message("ACCL dir: ${ACCL_ROOT_DIR}")
+    else(ACCL_FOUND)
+        message("ART+COM companion libraries not found")
+    endif(ACCL_FOUND)
+endif(NOT ACCL_FOUND)
+
+
 

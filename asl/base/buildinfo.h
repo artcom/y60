@@ -25,7 +25,9 @@
 #include <sstream>
 #include <algorithm>
 
-namespace acmake {
+#include "Singleton.h"
+
+namespace asl {
 
 template <unsigned Major, unsigned Minor, unsigned Patchlevel>
 class gcc_compiler {
@@ -201,7 +203,7 @@ operator<<(std::ostream & os, build_target_info const& info) {
     return info.print( os );
 }
 
-class build_information : //public Singleton<build_information>,
+class build_information : public Singleton<build_information>,
                          public std::map<std::string, build_target_info>
 {
     private:
@@ -221,10 +223,12 @@ class build_information : //public Singleton<build_information>,
             size_t type;
         };
     public:
+#if 0
         static build_information & get() {
             static build_information pool;
             return pool;
         }
+#endif
         std::ostream & print( std::ostream & os ) const {
             if ( empty() ) {
                 os << "Revision info disabled at compile time." << std::endl;
@@ -283,19 +287,19 @@ class target_info_initializer {
         }
 };
 
-} // end of namespace acmake
+} // end of namespace asl
 
 #define ACMAKE_SVN_REVISION(url, revision) \
-    acmake::svn_revision(url, revision)
+    asl::svn_revision(url, revision)
 
 #define ACMAKE_NO_SCM_DATA() \
-    acmake::no_scm_data()
+    asl::no_scm_data()
 
-#define ACMAKE_BUILDINFO(name, target_type, scm_info)                      \
+#define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)            \
         namespace {                                                        \
-            acmake::target_info_initializer revision_info =                \
-                    acmake::target_info_initializer( name,                 \
-                            acmake::build_target_info:: target_type,       \
+__declspec(dllexport) asl::target_info_initializer revision_info ## c_ident = \
+                    asl::target_info_initializer( name,                 \
+                            asl::build_target_info:: target_type,       \
                             __DATE__, __TIME__,                            \
                             scm_info);                                     \
         }

@@ -6,7 +6,8 @@
 #  CURL_FOUND        - True if curl found.
 
 # Look for the header file.
-FIND_PATH(CURL_INCLUDE_DIR NAMES curl/curl.h)
+FIND_PATH(CURL_INCLUDE_DIR NAMES curl/curl.h
+        PATH_SUFFIXES include )
 MARK_AS_ADVANCED(CURL_INCLUDE_DIR)
 
 # Look for the library.

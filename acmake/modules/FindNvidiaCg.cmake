@@ -19,4 +19,4 @@ endif(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
 
 find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
         ${NVIDIA_CG_PACKAGE_VARS})
-mark_as_advanced( NVIDIA_CG_LIBRARIES )
+mark_as_advanced( NVIDIA_CG_LIBRARIES NVIDIA_CG_INCLUDE_DIRS )

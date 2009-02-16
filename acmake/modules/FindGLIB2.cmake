@@ -15,6 +15,8 @@ if( WIN32 )
  
     get_filename_component( GLIB2_LIBRARY_DIR ${GLIB2_LIBRARIES} PATH)
 
+    mark_as_advanced(GLIB2_LIBRARY_DIR GLIB2_INCLUDE_DIR 
+            GLIB2_CONFIG_INCLUDE_DIR GLIB2_LIBRARIES)
 else( WIN32 )
     pkg_search_module( GLIB2 REQUIRED glib-2.0 )
 endif( WIN32 )

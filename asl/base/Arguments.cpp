@@ -42,7 +42,7 @@
 #include "Logger.h"
 #include "Revision.h"
 #ifdef AC_BUILT_WITH_CMAKE
-#   include <acmake/buildinfo.h>
+#   include <asl/base/buildinfo.h>
 #endif
 
 
@@ -214,7 +214,7 @@ void
 Arguments::printRevision() const {
 #ifdef AC_BUILT_WITH_CMAKE
     AC_PRINT << _programName << " revision "
-             << acmake::build_information::get().executable().history_id();
+             << asl::build_information::get().executable().history_id();
 #else
     AC_PRINT << "Revision: " << ourRevision;
 #endif
@@ -223,7 +223,7 @@ Arguments::printRevision() const {
 void
 Arguments::printVersion() const {
 #ifdef AC_BUILT_WITH_CMAKE
-    acmake::build_target_info const& executable = acmake::build_information::get().executable();
+    asl::build_target_info const& executable = asl::build_information::get().executable();
     AC_PRINT << "Build on " << executable.build_date() << " at "
              << executable.build_time()
              << " (Rev: " << executable.history_id() << ")";

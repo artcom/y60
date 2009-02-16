@@ -15,7 +15,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)
     set(AC_COVERAGE_FLAGS "-fprofile-arcs -ftest-coverage")
 
     set(CMAKE_C_FLAGS_COVERAGE
@@ -41,5 +41,5 @@ if (CMAKE_COMPILER_IS_GNUCXX)
         CMAKE_SHARED_LINKER_FLAGS_COVERAGE
         CMAKE_MODULE_LINKER_FLAGS_COVERAGE
     )
-endif (CMAKE_COMPILER_IS_GNUCXX)
+endif (CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)
 

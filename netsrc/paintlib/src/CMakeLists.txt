@@ -204,6 +204,12 @@ set_target_properties(
         INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
+if(WIN32)
+    set_target_properties( paintlib PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif(WIN32)
+
 # XXX: need to expose all libraries as transitive link deps
 set(OPTIMIZED_LIBRARIES
     ${PNG_LIBRARY}

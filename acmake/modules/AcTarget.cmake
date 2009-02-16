@@ -80,6 +80,7 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
                     list(APPEND EXTERN_LIBRARIES_GENERAL ${${EXTERN}_LIBRARY})
                 endif(${EXTERN}_LIBRARIES)
             endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+            
         endif(EXTERN MATCHES ".*\\.framework/?$")
         if ( ${EXTERN}_DEFINITIONS )
             list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
@@ -248,4 +249,3 @@ macro(_ac_attach_rpath TARGET)
         endif(ACMAKE_INSTALL_WITH_RPATH)
     endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
-

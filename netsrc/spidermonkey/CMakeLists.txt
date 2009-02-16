@@ -20,10 +20,7 @@ set(SOURCES
 )
 
 if (WIN32)
-    # Make CMake build all libs in a common directory. Since we build
-    # DLLs the tests need to find their libraries even while they are not
-    # installed in their final locations (during testrun that is).
-    set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+
     # XXX This is a separate library in the original spidermonkey build
     #     Lets keep things simple and just mix in the sources for now.
     list( APPEND SOURCES fdlibm/e_acos.c fdlibm/e_acosh.c fdlibm/e_asin.c
@@ -76,12 +73,12 @@ add_library(
 )
 
 if(SPIDERMONKEY_INTEGRATED_BUILD)
-foreach (H_FILE ${HEADERS})
-  configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
-      ${CMAKE_CURRENT_BINARY_DIR}/include/js/spidermonkey/${H_FILE}
-      COPYONLY)
-endforeach(H_FILE)
+    foreach (H_FILE ${HEADERS})
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/include/js/spidermonkey/${H_FILE}
+            COPYONLY)
+    endforeach(H_FILE)
 endif(SPIDERMONKEY_INTEGRATED_BUILD)
 
 
@@ -94,6 +91,12 @@ set_target_properties(
         INSTALL_RPATH_USE_LINK_PATH YES
         INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
+
+if(WIN32)
+    set_target_properties( spidermonkey PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif(WIN32)
 
 install(
     TARGETS spidermonkey

@@ -7,10 +7,6 @@ list(INSERT CMAKE_MODULE_PATH 0 ${ACSDLTTF_SOURCE_DIR})
 
 if(WIN32)
     list( INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
-    # Make CMake build all libs in a common directory. Since we build
-    # DLLs the tests need to find their libraries even while they are not
-    # installed in their final locations (during testrun that is).
-    set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 endif(WIN32)
 
 include(ACSDLTTFDefinitions)
@@ -45,6 +41,12 @@ set_target_properties(
         INSTALL_RPATH_USE_LINK_PATH YES
         INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
+
+if(WIN32)
+    set_target_properties( acsdlttf PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif(WIN32)
 
 # XXX: need to expose all libraries as transitive link deps
 set(OPTIMIZED_LIBRARIES ${FREETYPE_LIBRARIES} ${SDL_LIBRARY})

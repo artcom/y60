@@ -72,7 +72,7 @@
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
 #ifdef AC_BUILT_WITH_CMAKE
-#   include <acmake/buildinfo.h>
+#   include <asl/base/buildinfo.h>
 #endif
 
 #include <iostream>
@@ -153,7 +153,7 @@ main(int argc, char **argv) {
 
 #ifdef AC_BUILT_WITH_CMAKE
         if (ourArguments.haveOption("--buildinfo")) {
-            using acmake::build_information;
+            using asl::build_information;
             std::string component = ourArguments.getOptionArgument("--buildinfo");
             if (component == "all") {
                 std::cout << build_information::get();
