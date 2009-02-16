@@ -86,7 +86,7 @@ namespace y60 {
         INVALID_COMPRESSION_FORMAT
     };
 
-    static const char * MovieEncodingString[] = {
+    const char * const MovieEncodingString[] = {
         "RLE",
         "DIFF",
         "DRLE",

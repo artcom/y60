@@ -997,6 +997,8 @@ namespace asl {
                     if (_myType != IDENTITY) goto unknown;
                     assign(b);
                     return;
+                default: // ROTATING, ORTHOGONAL, LINEAR, AFFINE
+                    break;
             }
             switch(_myType) {
                 case IDENTITY:
@@ -1004,13 +1006,15 @@ namespace asl {
                     return;
                 case TRANSLATING:
                     if (b.getType() <= LINEAR) {
-                    multiplyTranslatingLinear(*this, b, *this);
-                    _myType = AFFINE;
-                    return;
+                        multiplyTranslatingLinear(*this, b, *this);
+                        _myType = AFFINE;
+                        return;
                     }
                     break;
                 case UNKNOWN:
                     goto unknown;
+                default: // *_ROTATING, ROTATING, SCALING, ORTHOGONAL, LINEAR, AFFINE
+                    break;
             }
             if ((_myType <= LINEAR) && (b.getType() == TRANSLATING)) {
                 multiplyLinearTranslating(*this, b, *this);

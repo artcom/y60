@@ -84,15 +84,18 @@ namespace y60 {
     MaterialBase::MaterialBase(dom::Node & theNode): 
         Facade(theNode),
         IdTag::Plug(theNode),
+        MaterialPropertiesTag::Plug(this),
+        MaterialRequirementTag::Plug(this),  
         NameTag::Plug(theNode),
         TransparencyTag::Plug(theNode),
-        MaterialPropertiesTag::Plug(this),
-        MaterialRequirementTag::Plug(this),   
         EnabledTag::Plug(theNode),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myShader(0),
         _myLightingModel(LAMBERT),
-        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0), /*_myIdTagVersion(0),*/ _ensuring(false)
+        _myMaterialVersion(0),
+        _myRequiresVersion(0),
+        _myTexGenFlag(false),
+        _ensuring(false)
     {}
 
     MaterialBase::~MaterialBase() {

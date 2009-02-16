@@ -94,8 +94,10 @@ using namespace asl;
 namespace y60 {
 
     MaterialBuilder::MaterialBuilder(const std::string & theName, bool theInlineTextureFlag)
-        : BuilderBase(MATERIAL_NODE_NAME), _myInlineTextureFlag(theInlineTextureFlag),
-          _myRequirementsAdded(false), _needTextureFallback(false)
+        : BuilderBase(MATERIAL_NODE_NAME),
+        _myRequirementsAdded(false),
+        _needTextureFallback(false),
+        _myInlineTextureFlag(theInlineTextureFlag)
     {
         dom::NodePtr myNode = getNode();
         myNode->appendAttribute(NAME_ATTRIB, theName);

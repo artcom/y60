@@ -1159,12 +1159,13 @@ namespace y60 {
 
     template <class PROBE>
     struct IntersectBodyVisitor {
-        IntersectionInfoVector & _myList;
         const PROBE & _myStick;
+        IntersectionInfoVector & _myList;
 
         IntersectBodyVisitor(const PROBE & theStick, IntersectionInfoVector & theList) :
             _myStick(theStick), _myList(theList) {
         }
+        virtual ~IntersectBodyVisitor() {}
 
         virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             return (!isInsensible && asl::intersection(_myStick, myBoundingBox));
@@ -1192,13 +1193,14 @@ namespace y60 {
     // By now we only check intersection on bb level (VS)
     // TODO extend the box intersection visit by getting real contact with the primitives
     template<>
-    struct IntersectBodyVisitor<class asl::Box3<float> >{
-        IntersectionInfoVector & _myList;
+    struct IntersectBodyVisitor<class asl::Box3<float> > {
         const asl::Box3<float> & _myBox;
+        IntersectionInfoVector & _myList;
 
         IntersectBodyVisitor(const asl::Box3<float> & theBox, IntersectionInfoVector & theList) :
-            _myBox(theBox), _myList(theList) {
-        }
+            _myBox(theBox), _myList(theList)
+        {}
+        virtual ~IntersectBodyVisitor() {}
 
         virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             return (!isInsensible && _myBox.touches(myBoundingBox));
@@ -1353,10 +1355,10 @@ namespace y60 {
     }
 
     struct SweepSphereAllContactsVisitor {
-        CollisionInfoVector & _myList;
         const asl::Sphere<float> & _mySphere;
         const Vector3<float> & _myMotion;
-
+        CollisionInfoVector & _myList;
+        
         SweepSphereAllContactsVisitor(const asl::Sphere<float> & theSphere, const Vector3f & theMotion,
             CollisionInfoVector & theList) :
             _mySphere(theSphere), _myMotion(theMotion), _myList(theList) {
@@ -1401,10 +1403,10 @@ namespace y60 {
     };
 
     struct SweepSphereFirstContactVisitor {
-        CollisionInfo & _myCollision;
-        asl::SweptSphereContact<float> _myFirstContact;
         const asl::Sphere<float> & _mySphere;
         const Vector3<float> & _myMotion;
+        CollisionInfo & _myCollision;
+        asl::SweptSphereContact<float> _myFirstContact;
 
         SweepSphereFirstContactVisitor(const asl::Sphere<float> & theSphere, const Vector3f & theMotion,
             CollisionInfo & theCollision) :

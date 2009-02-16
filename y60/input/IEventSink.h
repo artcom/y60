@@ -78,6 +78,7 @@ namespace y60 {
     class IEventSink {
         public:
             virtual void handle(EventPtr theEvent) = 0;
+            virtual ~IEventSink() {}
     };
 }
 #endif

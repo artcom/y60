@@ -103,7 +103,7 @@ namespace y60 {
         YUV444
     };
 
-    static const char * PixelEncodingString[] = {
+    const char * const PixelEncodingString[] = {
         "RGB",
         "BGR",
         "RGBA",
@@ -133,7 +133,7 @@ namespace y60 {
         "YUV444",
         0
     };
-    static const char * RasterEncodingString[] = {
+    const char * const RasterEncodingString[] = {
         "RasterOfRGB",
         "RasterOfBGR",
         "RasterOfRGBA",
@@ -160,7 +160,7 @@ namespace y60 {
         "RasterOfRGB_FLOAT",
         0
     };
-   static const char * RasterElementNames[] = {
+   const char * const RasterElementNames[] = {
         "rasterofrgb",
         "rasterofbgr",
         "rasterofrgba",

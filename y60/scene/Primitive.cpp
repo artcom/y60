@@ -693,13 +693,12 @@ namespace y60 {
     }
     template <class PROBE>
     struct IntersectTriangleDetector {
-
-        Primitive::IntersectionList & _myList;
         const PROBE & _myStick;
+        Primitive::IntersectionList & _myList;
 
         IntersectTriangleDetector(const PROBE & theStick, Primitive::IntersectionList & theList) :
-            _myStick(theStick), _myList(theList) {
-        }
+            _myStick(theStick), _myList(theList)
+        {}
 
         bool discards(const asl::Box3f & theBoundingBox) {
             return !intersection(theBoundingBox, _myStick);
@@ -804,15 +803,19 @@ namespace y60 {
     }
 
     struct SweptSphereAllContactsDetector {
-        Primitive::SphereContactsList & _myList;
         const asl::Sphere<float> & _mySphere;
         const asl::Vector3f & _myMotion;
+        Primitive::SphereContactsList & _myList;
         const asl::Matrix4f & _mySphereSpaceTransform;
 
-        SweptSphereAllContactsDetector(const asl::Sphere<float> & theSphere, const asl::Vector3f & theMotion,
-                           const asl::Matrix4f & theSphereSpaceTransform, Primitive::SphereContactsList & theList) :
-                _mySphere(theSphere), _myMotion(theMotion), _myList(theList),
-                _mySphereSpaceTransform(theSphereSpaceTransform)
+        SweptSphereAllContactsDetector(const asl::Sphere<float> & theSphere,
+                                       const asl::Vector3f & theMotion,
+                                       const asl::Matrix4f & theSphereSpaceTransform,
+                                        Primitive::SphereContactsList & theList)
+            : _mySphere(theSphere),
+            _myMotion(theMotion),
+            _myList(theList),
+            _mySphereSpaceTransform(theSphereSpaceTransform)
         { }
 
         bool operator()(Primitive * thePrimitive, int theElementIndex,

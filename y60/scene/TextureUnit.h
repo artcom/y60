@@ -77,42 +77,8 @@
 
 #include <string>
 
-//#define BAD_TX
-#ifdef BAD_TX
-namespace dom {
-    template <>
-    struct ValueWrapper<y60::TextureWeakPtr> {
-        typedef dom::SimpleValue<y60::TextureWeakPtr> Type;
-    };
-    inline
-    std::ostream& operator<<(std::ostream& os, const y60::TextureWeakPtr& i) {
-        return os << "[TextureWeakPtr]";
-    }
-    inline
-    std::istream& operator>>(std::istream& is, y60::TextureWeakPtr& i) {
-        return is;
-    }
-
-    template <>
-    struct ValueWrapper<y60::ICombinerWeakPtr> {
-        typedef dom::SimpleValue<y60::ICombinerWeakPtr> Type;
-    };
-}
-#endif
 
 namespace y60 {
-
-#ifdef BAD_TX
-    inline
-    std::ostream& operator<<(std::ostream& os, const y60::ICombinerWeakPtr& i) {
-        return os << "[ICombinerWeakPtr]";
-    }
-    inline
-    std::istream& operator>>(std::istream& is, y60::ICombinerWeakPtr& i) {
-        return is;
-    }
-#endif
-
     //                  theTagName                 theType           theAttributeName              theDefault
     DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "", Y60_SCENE_EXPORT);
     DEFINE_ATTRIBUT_TAG(TextureUnitApplyModeTag,   TextureApplyMode, TEXTUREUNIT_APPLYMODE_ATTRIB, MODULATE, Y60_SCENE_EXPORT);
@@ -121,10 +87,6 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false, Y60_SCENE_EXPORT);
     DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "", Y60_SCENE_EXPORT);
     DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
-#ifdef BAD_TX
-    DEFINE_ATTRIBUT_TAG(TextureUnitTexturePtrTag,  TextureWeakPtr,   "TextureUnitTexturePtrTag",   TexturePtr(0), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerPtrTag, ICombinerWeakPtr, "TextureUnitCombinerPtrTag",  ICombinerPtr(0), Y60_SCENE_EXPORT);
-#endif
     DEFINE_EXCEPTION(TextureUnitException, asl::Exception);
 
     class Y60_SCENE_EXPORT TextureUnit :
@@ -137,11 +99,6 @@ namespace y60 {
         public TextureUnitSpriteTag::Plug,
         public TextureUnitMatrixTag::Plug,
         public ResizePolicyTag::Plug
-#ifdef BAD_TX
-,
-        public dom::FacadeAttributePlug<TextureUnitTexturePtrTag>,
-        public dom::FacadeAttributePlug<TextureUnitCombinerPtrTag>
-#endif
     {
         public:
             TextureUnit(dom::Node & theNode);
@@ -156,10 +113,6 @@ namespace y60 {
             virtual void registerDependenciesRegistrators();
     
         protected:
-#ifdef BAD_TX
-            virtual void registerDependenciesForTextureTag();
-            virtual void registerDependenciesForCombinerTag();
-#endif
 
         private:
             TextureUnit();

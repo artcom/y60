@@ -110,16 +110,14 @@ namespace y60 {
         ImageTileTag::Plug(theNode),
         ImageDepthTag::Plug(theNode),
         TargetPixelFormatTag::Plug(theNode),
-        dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
+        dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<ImageWidthTag>(this),
         dom::FacadeAttributePlug<ImageHeightTag>(this),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this)
-    {
-    }
+    {}
 
-    Image::~Image() {
-    }
+    Image::~Image() {}
 
     void
     Image::unregisterRasterValue() {

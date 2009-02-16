@@ -68,11 +68,13 @@ using namespace std;
 
 namespace y60 {
 
-    Capture::Capture(dom::Node & theNode) : Image(theNode),
+    Capture::Capture(dom::Node & theNode) 
+        : Image(theNode),
+        DeviceTag::Plug(theNode),
+        NormTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlayModeTag::Plug(theNode),
-        DeviceTag::Plug(theNode),
-        NormTag::Plug(theNode), _myDevice(0),
+         _myDevice(0),
         _myPlayMode(PLAY_MODE_STOP)
     {
         AC_TRACE << "Capture::Capture " << theNode;
@@ -105,6 +107,10 @@ namespace y60 {
                     _myDevice->startCapture();
                 }
                 _myDevice->pauseCapture();
+                break;
+            case PLAY_MODE_NODISK:
+                //XXX check if we should do something else here
+                AC_INFO << "Capture Playmode set to PLAY_MODE_NODISK";
                 break;
         }
 

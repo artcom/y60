@@ -207,16 +207,15 @@ namespace y60 {
         public:
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, unsigned theAnimatedIndex, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
-                  _myValueSetter(theAnimatedAttribute, theAnimatedIndex),
-                  _myValuesNode(theValueList->childNode(0))
-            {
-            }
+                _myValuesNode(theValueList->childNode(0)),
+                _myValueSetter(theAnimatedAttribute, theAnimatedIndex)
+            {}
+            
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
-                  _myValueSetter(theAnimatedAttribute, 0),
-                  _myValuesNode(theValueList->childNode(0))
-            {
-            }
+                _myValuesNode(theValueList->childNode(0)),
+                _myValueSetter(theAnimatedAttribute, 0)
+            {}
 
             virtual ~Animation() {}
 

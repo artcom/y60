@@ -123,6 +123,7 @@ namespace y60 {
             }
             return myTextureLimit;
         }
+        virtual ~ITextureManager() {}
  
     };
 

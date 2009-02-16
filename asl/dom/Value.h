@@ -1726,16 +1726,21 @@ namespace dom {
         typedef ACCESS<ComplexValue,T,ELEMENT_VALUE> ACCESS_TYPE;
 
         ComplexValue(Node * theNode)
-            : Value<T>(theNode), ACCESS_TYPE(*this), _myValueVersion(1),  _myStringVersion(0), _myBlockVersion(0), _isValueWriteable(false)
+            : Value<T>(theNode),
+            ACCESS_TYPE(*this),
+            _myValueVersion(1),
+            _myBlockVersion(0),
+            _myStringVersion(0),
+            _isValueWriteable(false)
         {}
 
         ComplexValue(const T & theValue, Node * theNode)
             : Value<T>(theNode),
             ACCESS_TYPE(*this),
-            _myValueVersion(1),
-            _myStringVersion(0),
-            _myBlockVersion(0),
             _myValue(theValue),
+            _myValueVersion(1),
+            _myBlockVersion(0),
+            _myStringVersion(0),
             _isValueWriteable(false)
         {}
 
@@ -1744,15 +1749,18 @@ namespace dom {
             ACCESS_TYPE(*this),
             _myValue(Value<T>::asT(theStringValue)),
             _myValueVersion(1),
-            _myStringVersion(0),
             _myBlockVersion(0),
+            _myStringVersion(0),
             _isValueWriteable(false)
         {}
 
         ComplexValue(const asl::ReadableBlock & theSource, Node * theNode)
             : Value<T>(theNode),
             ACCESS_TYPE(*this),
-            _myValueVersion(1), _myStringVersion(0), _myBlockVersion(0), _isValueWriteable(false)
+            _myValueVersion(1),
+            _myBlockVersion(0),
+            _myStringVersion(0),
+            _isValueWriteable(false)
         {
             dom::debinarize(_myValue, theSource);
         }

@@ -69,6 +69,7 @@ class IFrameBuffer {
     public:
         virtual int getWidth() const = 0;
         virtual int getHeight() const = 0;
+        virtual ~IFrameBuffer() {}
 };
 
 typedef asl::Ptr<IFrameBuffer> IFrameBufferPtr;

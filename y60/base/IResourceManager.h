@@ -107,6 +107,7 @@ namespace y60 {
                                             float thePriority) = 0;
             virtual int getMaxTextureSize(int theDimensions) const = 0;
 			virtual bool imageMatchesGLTexture(TexturePtr theTexture) const  = 0;
+            virtual ~IResourceManager() {}
     };
 
     typedef asl::Ptr<IResourceManager,dom::ThreadingModel> IResourceManagerPtr;

@@ -117,31 +117,31 @@ namespace y60 {
         public ResizePolicyTag::Plug
     {
         public:
-            Viewport(dom::Node & theNode) :
-              dom::Facade(theNode),
+            Viewport(dom::Node & theNode)
+                : dom::Facade(theNode),
                   IdTag::Plug(theNode),
                   NameTag::Plug(theNode),
+		          CameraTag::Plug(theNode),
                   Position2DTag::Plug(theNode),
                   Size2DTag::Plug(theNode),
-		          CameraTag::Plug(theNode),
                   ViewportOrientationTag::Plug(theNode),
                   ViewportBackfaceCullingTag::Plug(theNode),
                   ViewportWireframeTag::Plug(theNode),
                   ViewportLightingTag::Plug(theNode),
-                  ViewportFlatshadingTag::Plug(theNode),
                   ViewportTexturingTag::Plug(theNode),
+                  ViewportFlatshadingTag::Plug(theNode),
                   ViewportCullingTag::Plug(theNode),
                   ViewportDebugCullingTag::Plug(theNode),
                   ViewportAlphaTestTag::Plug(theNode),
-                  ViewportDrawGlowTag::Plug(theNode),
                   ViewportDrawNormalsTag::Plug(theNode),
+                  ViewportDrawGlowTag::Plug(theNode),
                   dom::DynamicAttributePlug<ViewportTopTag, Viewport>(this, &Viewport::getTop),
                   dom::DynamicAttributePlug<ViewportLeftTag, Viewport>(this, &Viewport::getLeft),
                   dom::DynamicAttributePlug<ViewportHeightTag, Viewport>(this, &Viewport::getHeight),
                   dom::DynamicAttributePlug<ViewportWidthTag, Viewport>(this, &Viewport::getWidth),
                   ResizePolicyTag::Plug( theNode )
-              {
-              }
+            {}
+              
             IMPLEMENT_DYNAMIC_FACADE(Viewport);
             /// returns the distance between bottom of viewport and bottom of
             //  canvas. Suitable for glViewport.

@@ -103,10 +103,10 @@ namespace y60 {
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
         _myDecoder(0),
+        _myPlayMode(PLAY_MODE_STOP),
         _myLastDecodedFrame(std::numeric_limits<unsigned>::max()),
         _myLastCurrentTime(-1.0),
         _myCurrentLoopCount(0),
-        _myPlayMode(PLAY_MODE_STOP),
         _myNextUsedBuffer(PRIMARY_BUFFER),
         _myFirstBufferFrame(0),
         _mySecondBufferFrame(0)
@@ -199,8 +199,11 @@ namespace y60 {
                 }
                 _myDecoder->pauseMovie();
                 break;
+            case PLAY_MODE_NODISK:
+                //XXX check if we need to do something more here
+                AC_INFO << "Movie set to PLAY_MODE_NODISK";
+                break;
             }
-
             // Synchronize internal and external representation
             _myPlayMode = thePlayMode;
             set<PlayModeTag>(asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings));
@@ -382,7 +385,11 @@ namespace y60 {
             case PLAY_MODE_STOP:
                 myNextFrame = _myLastDecodedFrame;
                 return;
-            }
+            case PLAY_MODE_NODISK:
+                //XXX check if we need to do something more here
+                AC_INFO << "Movie has PLAY_MODE_NODISK";
+                break;
+            }                
 
             if (myNextFrame < 0) {
                 setPlayMode(PLAY_MODE_STOP);

@@ -1,23 +1,60 @@
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
-// unpublished proprietary information of ART+COM AG Berlin, and
-// are copy protected by law. They may not be disclosed to third parties
-// or copied or duplicated in any form, in whole or in part, without the
-// specific, prior written permission of ART+COM AG Berlin.
+// proprietary information of ART+COM AG Berlin, and are copy protected
+// by law. They may be used, modified and redistributed under the terms
+// of GNU General Public License referenced below. 
+//    
+// Alternative licensing without the obligations of the GPL is
+// available upon request.
+//
+// GPL v3 Licensing:
+//
+// This file is part of the ART+COM Y60 Platform.
+//
+// ART+COM Y60 is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// ART+COM Y60 is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: GLAlloc.h,v $
+// Description: TODO  
 //
-//   $Revision: 1.1 $
+// Last Review: NEVER, NOONE
 //
-// Description: Block Allocator
+//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
+//    usefullness            : unknown
+//    formatting             : unknown
+//    documentation          : unknown
+//    test coverage          : unknown
+//    names                  : unknown
+//    style guide conformance: unknown
+//    technical soundness    : unknown
+//    dead code              : unknown
+//    readability            : unknown
+//    understandabilty       : unknown
+//    interfaces             : unknown
+//    confidence             : unknown
+//    integration            : unknown
+//    dependencies           : unknown
+//    cheesyness             : unknown
 //
+//    overall review status  : unknown
 //
-//
+//    recommendations: 
+//       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+*/
 
 #ifndef _asl_included_asl_GLAlloc_h_
 #define _asl_included_asl_GLAlloc_h_
@@ -56,9 +93,11 @@ namespace asl {
             : _myMem(0),
             _mySize(0),
             _myCapacity(0),
-            _myFreeStoreBytes(0),
+            _myMemoryType(theMemoryType),
+            _myHint(_myFreeChunks.end()),
             _myTotalUsedBytes(0),
-            _myMemoryType(theMemoryType) {}
+            _myFreeStoreBytes(0)
+        {}
 
         operator const void*() const {
             return _myMem;
@@ -171,29 +210,22 @@ namespace asl {
         typedef T&        reference;
         typedef const T&  const_reference;
         typedef T         value_type;
-
         template<typename U> friend class GLAlloc;
-
     public:
         // Constructors
 
-        GLAlloc(GLMemory::MemoryType theMem = GLMemory::AGPMemoryType,
-        //GLAlloc(GLMemory::MemoryType theMem = GLMemory::GPUMemoryType,
-        //GLAlloc(GLMemory::MemoryType theMem = GLMemory::MainMemoryType,
-        asl::AC_SIZE_TYPE theCapacity = AGPVertexArray::getDefaultCapacity())
+        GLAlloc(GLMemory::MemoryType theMem = GLMemory::AGPMemoryType, //GLAlloc(GLMemory::MemoryType theMem = GLMemory::GPUMemoryType, GLAlloc(GLMemory::MemoryType theMem = GLMemory::MainMemoryType,
+                asl::AC_SIZE_TYPE theCapacity = AGPVertexArray::getDefaultCapacity())
 			: _myType(theMem),
-            _myGfxMemAllocatedBytes(0),
-            _myMem(VertexMemory(_myType,theCapacity))
-        {
-			;
-		}
+            _myMem(VertexMemory(_myType,theCapacity)),
+            _myGfxMemAllocatedBytes(0)
+        {}
 
         GLAlloc( const GLAlloc& theOther) throw()
-            : _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes),
-			_myType(theOther._myType),
+            : _myType(theOther._myType),
+            _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes),
             _myMem(theOther._myMem)
-        {
-        }
+        {}
 
 #if _MSC_VER >= 1400 // VC 7 can't handle template members
         template <typename U>
@@ -201,13 +233,10 @@ namespace asl {
             : _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes),
 			_myType(theOther._myType),
              _myMem(theOther._myMem)
-       {
-        }
+       {}
 #endif
 
-
-        GLAlloc & operator=(const GLAlloc & theOther)
-        {
+        GLAlloc & operator=(const GLAlloc & theOther) {
             _myType = theOther._myType;
             _myMem = theOther._myMem;
             _myGfxMemAllocatedBytes = theOther._myGfxMemAllocatedBytes;
@@ -215,59 +244,47 @@ namespace asl {
         }
 
         // Destructor
-        ~GLAlloc() throw()
-        {
-        }
+        ~GLAlloc() throw() {}
 
         // Utility functions
-        pointer address(reference r) const
-        {
+        pointer address(reference r) const {
             return &r;
         }
 
-        const_pointer address(const_reference c) const
-        {
+        const_pointer address(const_reference c) const {
             return &c;
         }
 
-        size_type max_size() const
-        {
+        size_type max_size() const {
             //return VertexMemory(_myType).capacity();
             return std::numeric_limits<size_t>::max() / sizeof(T);
         }
 
         // In-place construction
-        void construct(pointer p, const_reference c)
-        {
+        void construct(pointer p, const_reference c) {
             // placement new operator
             new(reinterpret_cast<void*>(p) ) T(c);
         }
 
         // In-place destruction
-        void destroy(pointer p )
-        {
+        void destroy(pointer p ) {
             // call destructor directly
             (p)->~T();
         }
 
         // Rebind to allocators of other types
         template <typename U>
-        struct rebind
-        {
+        struct rebind {
             typedef GLAlloc<U> other;
         };
 
         // Allocate a piece of raw memory from the block; if the block is exhausted,
         // no  resize attempt will be made and an exception will be thrown
-        pointer allocate( size_type n, const void* = NULL )
-        {
+        pointer allocate( size_type n, const void* = NULL ) {
 			DB2(std::cerr << "GLAlloc::allocate: allocate object count = " << n << std::endl);
             asl::AC_SIZE_TYPE myRequiredBytes = n * sizeof(T);
 			DB2(std::cerr << "GLAlloc::allocate: allocate byte size = " << myRequiredBytes << std::endl);
-/*
-            pointer myResult = reinterpret_cast<pointer>(
-				VertexMemory(_myType).allocateChunk(myRequiredBytes));
-*/
+
             pointer myResult = reinterpret_cast<pointer>(
 				_myMem->allocateChunk(myRequiredBytes));
 
@@ -275,25 +292,18 @@ namespace asl {
 
         }
 
-        void deallocate( pointer p, size_type n)
-        {
+        void deallocate( pointer p, size_type n) {
             if( p == NULL ) {
                 return;
             }
             DB2(std::cerr << "GLAlloc::deallocate: deallocating " << n * sizeof(T) << " bytes gfx memory @" << (void*)p<<std::endl);
-/*
-            VertexMemory(_myType).deallocateChunk(
-				reinterpret_cast<unsigned char*>(p));
-*/
-            _myMem->deallocateChunk(
-				reinterpret_cast<unsigned char*>(p));
+            _myMem->deallocateChunk(reinterpret_cast<unsigned char*>(p));
         }
 
         // Non-standard Dinkumware hack for Visual C++ 6.0 compiler.
         // VC 6 doesn't support template rebind.
-        char* _Charalloc( size_type n )
-        {
-            return reinterpret_cast<char*>( allocate( n, NULL ) );
+        char* _Charalloc( size_type n ) {
+            return reinterpret_cast<char*>(allocate(n, NULL));
         }
 
 		GLMemory::MemoryType getMemoryType() const {

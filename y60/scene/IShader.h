@@ -124,6 +124,7 @@ namespace y60 {
             virtual void enableTextureProjection(const MaterialBase & theMaterial,
                                          const Viewport & theViewport,
                                          const Camera & theCamera) = 0;
+            virtual ~IShader() {}
     };
     typedef asl::Ptr<IShader, dom::ThreadingModel> IShaderPtr;
 
@@ -131,6 +132,7 @@ namespace y60 {
     public:
         virtual bool setup(dom::NodePtr theNode) = 0;
         virtual void apply() = 0;
+        virtual ~ICombiner() {}
     };
     typedef asl::Ptr<ICombiner, dom::ThreadingModel> ICombinerPtr;
     typedef asl::WeakPtr<ICombiner, dom::ThreadingModel> ICombinerWeakPtr;
@@ -142,6 +144,7 @@ namespace y60 {
 
         virtual const std::string & getVertexProfileName() = 0;
         virtual const std::string & getFragmentProfileName() = 0;
+        virtual ~IShaderLibrary() {}
     };
     typedef asl::Ptr<IShaderLibrary> IShaderLibraryPtr;
 

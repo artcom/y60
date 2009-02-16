@@ -350,10 +350,10 @@ namespace y60 {
                 myBox.makeEmpty();
         }
         BoundingBoxTree(const asl::Box3<float> & theBox, int theIndex) : 
+            myBox(theBox),
             myMinIndex(theIndex),
             myMaxIndex(theIndex),
-            myTotalChildren(0),
-            myBox(theBox)
+            myTotalChildren(0)
         {}
 
         asl::Box3<float> myBox;

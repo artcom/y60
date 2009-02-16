@@ -68,34 +68,34 @@
 namespace y60 {
 
     //=== Standard property names =================================================
-    static const char * BONE_MATRIX_PROPERTY       = "BoneMatrix";
-    static const char * AMBIENT_PROPERTY           = "ambient";
-    static const char * SURFACE_COLOR_PROPERTY     = "surfacecolor";
-    static const char * DIFFUSE_PROPERTY           = "diffuse";
-    static const char * SPECULAR_PROPERTY          = "specular";
-    static const char * SHININESS_PROPERTY         = "shininess";
-    static const char * EMISSIVE_PROPERTY          = "emissive";
+    const char * const BONE_MATRIX_PROPERTY       = "BoneMatrix";
+    const char * const AMBIENT_PROPERTY           = "ambient";
+    const char * const SURFACE_COLOR_PROPERTY     = "surfacecolor";
+    const char * const DIFFUSE_PROPERTY           = "diffuse";
+    const char * const SPECULAR_PROPERTY          = "specular";
+    const char * const SHININESS_PROPERTY         = "shininess";
+    const char * const EMISSIVE_PROPERTY          = "emissive";
     // blinn parameters
-    static const char * ECCENTRICITY_PROPERTY      = "eccentricity";
-    static const char * SPECULAR_CUTOFF_PROPERTY   = "specularcutoff";
+    const char * const ECCENTRICITY_PROPERTY      = "eccentricity";
+    const char * const SPECULAR_CUTOFF_PROPERTY   = "specularcutoff";
 
-    static const char * ATTENUATION_PROPERTY       = "attenuation";
-    static const char * LINEWIDTH_PROPERTY         = "linewidth";
-    static const char * LINESTIPPLE_PROPERTY       = "linestipple";
-    static const char * LINESMOOTH_PROPERTY        = "linesmooth";
-    static const char * BLENDFUNCTION_PROPERTY     = "blendfunction";
-    static const char * BLENDEQUATION_PROPERTY     = "blendequation";
-    static const char * GLOW_PROPERTY              = "glow";
-    static const char * POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax 
+    const char * const ATTENUATION_PROPERTY       = "attenuation";
+    const char * const LINEWIDTH_PROPERTY         = "linewidth";
+    const char * const LINESTIPPLE_PROPERTY       = "linestipple";
+    const char * const LINESMOOTH_PROPERTY        = "linesmooth";
+    const char * const BLENDFUNCTION_PROPERTY     = "blendfunction";
+    const char * const BLENDEQUATION_PROPERTY     = "blendequation";
+    const char * const GLOW_PROPERTY              = "glow";
+    const char * const POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax 
                                                                   // (last two work with attenuation)
-    static const char * POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;
+    const char * const POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;
 
-    static const char * AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
+    const char * const AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
                                                                             // mode is one of OBJECT_LINEAR, EYE_LINEAR, SPHERE_MAP
-    static const char * AUTOTEXCOORDPARAMS_PROPERTY = "autotexcoordparams"; // [U_Params, V_Params, W_Params, Q_Params]
+    const char * const AUTOTEXCOORDPARAMS_PROPERTY = "autotexcoordparams"; // [U_Params, V_Params, W_Params, Q_Params]
                                                                             // Sphere mapped coords are not supported yet ... 
                                                                             // see also OGL Redbook p.413 ff
-    static const char * TARGETBUFFERS_PROPERTY     = "targetbuffers";
-    static const char * DEPTHTEST_PROPERTY         = "depthtest";
+    const char * const TARGETBUFFERS_PROPERTY     = "targetbuffers";
+    const char * const DEPTHTEST_PROPERTY         = "depthtest";
 } // namespace
 #endif

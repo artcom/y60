@@ -136,9 +136,9 @@ namespace y60 {
                 MaterialAmbientTag::Plug(this),
                 MaterialDiffuseTag::Plug(this),
                 MaterialSpecularTag::Plug(this),
+                MaterialEmissiveTag::Plug(this),
                 SurfaceColorTag::Plug(this),
                 ShininessTag::Plug(this),
-                MaterialEmissiveTag::Plug(this),
                 BlendFunctionTag::Plug(this),
                 GlowTag::Plug(this),
                 TargetBuffersTag::Plug(this),
@@ -251,21 +251,21 @@ namespace y60 {
             virtual void ensureProperties() const;
             void updateLock();
         private:
-            IShaderPtr                 _myShader;
             void addTextures(const dom::NodePtr theTextureListNode, asl::Ptr<TextureManager> theTextureMananger);
             void addTexture(dom::NodePtr theTextureUnitNode, asl::Ptr<TextureManager> theTextureManager);
+        private:
+            IShaderPtr                 _myShader;
 
             std::vector<TextureUnitPtr> _myTextureUnits;
             LightingModel               _myLightingModel;
 
             mutable asl::Unsigned64   _myMaterialVersion;
             asl::Unsigned64   _myRequiresVersion;
-            //asl::Unsigned64   _myIdTagVersion;
 
             bool              _myTexGenFlag;
             TexGenModeList    _myTexGenModes;
             TexGenParamsList  _myTexGenParams;
-            mutable bool       _ensuring;
+            mutable bool      _ensuring;
     };
 
     typedef std::vector<MaterialBasePtr> MaterialBasePtrVector;

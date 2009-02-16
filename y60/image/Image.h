@@ -244,8 +244,8 @@ namespace y60 {
         switch (theUsage) {
             case BUMP:
                 return HEIGHT_TO_NORMALMAP;
-            //default:
-            //    return NO_FILTER;
+            default:
+                break;
         }
         return NO_FILTER; // avoid gcc4.0 warning
     }

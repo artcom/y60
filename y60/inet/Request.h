@@ -158,8 +158,6 @@ namespace inet {
 
             static time_t getTimeFromHTTPDate(const std::string & theHTTPDate );
 
-
-
         protected:
             // callback hooks
             virtual void onStart();
@@ -169,8 +167,8 @@ namespace inet {
                 double theUploadTotal, double theCurrentUpload);  // return false to abort transfer
             virtual void onDone();
             virtual bool onResponseHeader(const std::string & theHeader);
+            
         private:
-
             // static callback hooks
             static size_t curlWriteCallback( void *theData, size_t theBlockCount,
                                     size_t theBlockSize, void *theRequestObject);
@@ -181,7 +179,9 @@ namespace inet {
                                     size_t theBlockSize, void *theRequestObject);
             //
             Request();
-            void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const ;
+            void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const;
+            
+        private:
             std::string         _myURL;
             std::string         _myProxy;
             std::string         _myUserAgent;

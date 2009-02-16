@@ -159,6 +159,7 @@ namespace y60 {
     private:
         void checkState();
         void setup();
+    private:
         bool _myRequirementsAdded;
         bool _needTextureFallback;
         bool _myInlineTextureFlag;

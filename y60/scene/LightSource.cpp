@@ -75,11 +75,11 @@
 namespace y60 {
 
     LightSource::LightSource(dom::Node & theNode) : 
+        Facade(theNode),
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
-		LightPropertiesTag::Plug(this),
         LightSourceTypeTag::Plug(theNode),
-        Facade(theNode)
+        LightPropertiesTag::Plug(this)
     {}
     
     const LightSourceType 

@@ -83,8 +83,8 @@ namespace y60 {
     ElementBuilder::ElementBuilder(const std::string & thePrimitiveType,
                                    const std::string & theMaterial)
         : BuilderBase(ELEMENTS_NODE_NAME),
-          _myMaterialId(theMaterial),
-          _myPrimitiveType(thePrimitiveType)
+        _myPrimitiveType(thePrimitiveType),
+        _myMaterialId(theMaterial)
     {
         getNode()->appendAttribute(PRIMITIVE_TYPE_ATTRIB, _myPrimitiveType);
         getNode()->appendAttribute(MATERIAL_REF_ATTRIB, theMaterial);

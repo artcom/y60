@@ -71,7 +71,7 @@ namespace y60 {
     {
         unsigned char * mySource = theSource;
         unsigned char * myDestination = theDestination;
-        for (int y=0; y<theHeight; y++) {
+        for (unsigned y=0; y<theHeight; y++) {
             memcpy(myDestination, mySource, theWidth);
             mySource      += theStride;
             myDestination += theWidth;

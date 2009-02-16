@@ -433,8 +433,6 @@ namespace asl {
         DEFINE_NESTED_EXCEPTION(MappedIO, MRemapFailed, Failure);
         DEFINE_NESTED_EXCEPTION(MappedIO, FileSizeMismatch, Failure);
         DEFINE_NESTED_EXCEPTION(MappedIO, GetFileSizeFailed, Failure);
-
-
 #ifdef _WIN32
 #if 0
         static bool setFileSize(FD_t fd, OFF_T theNewSize) {
@@ -617,7 +615,7 @@ namespace asl {
         const Path & name() const {
             return _myFileName;
         }
-        ~MappedIO() {
+        virtual ~MappedIO() {
             cleanup();
         };
         void cleanup() {

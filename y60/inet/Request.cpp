@@ -82,55 +82,61 @@ IMPLEMENT_ENUM(inet::AuthentType, inet::AuthentTypeStrings);
 
 namespace inet {
 
-    Request::Request(const string & theURL, const string & theUserAgent) :
-        _myErrorBuffer(CURL_ERROR_SIZE, '\0'), _myURL(theURL), _myUserAgent(theUserAgent),
-        _myHttpHeaderList(0)
-
-        {
-            CURLcode myStatus;
-            _myCurlHandle = curl_easy_init();
-            DB(AC_TRACE << "got new handle: " << _myCurlHandle << " for " << theURL << endl);
-
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_URL, _myURL.c_str());
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            curl_easy_setopt(_myCurlHandle, CURLOPT_ERRORBUFFER, &(*_myErrorBuffer.begin()));
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            setVerbose(CURL_VERBOSE);
-            verifyPeer(true); // default: check ssl cert
-
-            // curl handles can save a single user-data char *
-            // we abuse this to save a this backpointer
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PRIVATE, this);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            DB(AC_TRACE << "registering callbacks" << endl);
-            // register onData callback
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEFUNCTION, &Request::curlWriteCallback);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEDATA, this);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            // register onProgress callback
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROGRESSFUNCTION, &Request::curlProgressCallback);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROGRESSDATA, this);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_NOPROGRESS, false);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            // register onHeader callback
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HEADERFUNCTION, &Request::curlHeaderCallback);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEHEADER, this);
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-
-            // set User-Agent <g>
-            myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERAGENT, _myUserAgent.c_str());
-            checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        }
-
+    Request::Request(const string & theURL, const string & theUserAgent) 
+        : _myURL(theURL),
+        _myUserAgent(theUserAgent),
+        _myCurlHandle(0),
+        _myLowSpeedLimit(0),
+        _myLowSpeedTimeout(0),
+        _myHttpHeaderList(0),
+        _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
+        _myVerboseFlag(false),
+        _myVerifyPeerFlag(false)
+    {
+        CURLcode myStatus;
+        _myCurlHandle = curl_easy_init();
+        DB(AC_TRACE << "got new handle: " << _myCurlHandle << " for " << theURL << endl);
+        
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_URL, _myURL.c_str());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        curl_easy_setopt(_myCurlHandle, CURLOPT_ERRORBUFFER, &(*_myErrorBuffer.begin()));
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        setVerbose(CURL_VERBOSE);
+        verifyPeer(true); // default: check ssl cert
+        
+        // curl handles can save a single user-data char *
+        // we abuse this to save a this backpointer
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PRIVATE, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        DB(AC_TRACE << "registering callbacks" << endl);
+        // register onData callback
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEFUNCTION, &Request::curlWriteCallback);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEDATA, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        // register onProgress callback
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROGRESSFUNCTION, &Request::curlProgressCallback);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROGRESSDATA, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_NOPROGRESS, false);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        // register onHeader callback
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HEADERFUNCTION, &Request::curlHeaderCallback);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEHEADER, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        // set User-Agent <g>
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERAGENT, _myUserAgent.c_str());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+    
     Request::~Request() {
         DB(AC_TRACE << "cleaning up " << _myURL << endl);
         curl_slist_free_all (_myHttpHeaderList);

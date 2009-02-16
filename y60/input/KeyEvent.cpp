@@ -58,8 +58,6 @@
 
 // own header
 #include "KeyEvent.h"
-
-
 #include <asl/dom/Nodes.h>
 
 namespace y60 {
@@ -69,18 +67,20 @@ namespace y60 {
                KeyCode theKeyCode,
                const char * theKeyString,
                unsigned int theModifiers) 
-        : Event(theEventType), scanCode(theScanCode), keyString(theKeyString),
-          keyCode(theKeyCode), modifiers(theModifiers)
+        : Event(theEventType),
+        scanCode(theScanCode),
+        keyCode(theKeyCode),
+        keyString(theKeyString),
+        modifiers(theModifiers)
     {}
 
     KeyEvent::KeyEvent(const dom::NodePtr & theNode)
         : Event(getType(theNode->getAttributeValue<int>("state")), theNode),
         scanCode(theNode->getAttributeValue<unsigned char>("scancode")),
-        keyString(theNode->getAttributeValue<std::string>("keystring")),
         keyCode(KeyCode(theNode->getAttributeValue<int>("keycode"))),
+        keyString(theNode->getAttributeValue<std::string>("keystring")),
         modifiers(theNode->getAttributeValue<int>("modifiers"))
-    {
-    }
+    {}
 
     KeyEvent::~KeyEvent() {
     }

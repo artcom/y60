@@ -69,6 +69,7 @@ namespace y60 {
 class IProgressNotifier {
     public:
         virtual void onProgress(float theProgress, const std::string & theMessage="") = 0;
+        virtual ~IProgressNotifier() {}
 };
 
 typedef asl::Ptr<IProgressNotifier> IProgressNotifierPtr;

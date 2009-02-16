@@ -68,42 +68,27 @@ using namespace asl;
 
 namespace y60 {
 
-    TextureUnit::TextureUnit(dom::Node & theNode) : Facade(theNode),
+    TextureUnit::TextureUnit(dom::Node & theNode) 
+        : Facade(theNode),
         TextureUnitTextureIdTag::Plug(theNode),
+        TextureUnitProjectorIdTag::Plug(theNode),
         TextureUnitApplyModeTag::Plug(theNode),
         TextureUnitCombinerTag::Plug(theNode),
         TextureUnitEnvColorTag::Plug(theNode),
         TextureUnitSpriteTag::Plug(theNode),
 		TextureUnitMatrixTag::Plug(theNode),
-        TextureUnitProjectorIdTag::Plug(theNode),
         ResizePolicyTag::Plug(theNode)
-#ifdef BAD_TX
-,
-        dom::FacadeAttributePlug<TextureUnitTexturePtrTag>(this),
-        dom::FacadeAttributePlug<TextureUnitCombinerPtrTag>(this)
-#endif
     {
         AC_TRACE << "TextureUnit::TextureUnit " << (void*) this;
     }
 
     TextureUnit::~TextureUnit() {
         AC_TRACE << "TextureUnit::~TextureUnit " << (void*) this;
-#ifdef BAD_TX
-//TODO: unreference texture
-        TexturePtr myTexture = getTexture();
-        if (myTexture) {
-            myTexture->unrefTexture();
-        }
-#endif
     }
 
     void
     TextureUnit::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
-#ifdef BAD_TX
-        TextureUnitTexturePtrTag::Plug::setReconnectFunction(&TextureUnit::registerDependenciesForTextureTag);
-        TextureUnitCombinerPtrTag::Plug::setReconnectFunction(&TextureUnit::registerDependenciesForCombinerTag);
-#endif
     }
 
     void 
@@ -113,9 +98,6 @@ namespace y60 {
 
     TexturePtr
     TextureUnit::getTexture() const {
-#ifdef BAD_TX
-        return get<TextureUnitTexturePtrTag>().lock();
-#else
        const std::string & myTextureId = get<TextureUnitTextureIdTag>();
        TexturePtr myTexture = _myTextureManager->findTexture(myTextureId);
         if (!myTexture) {
@@ -123,30 +105,12 @@ namespace y60 {
             return TexturePtr(0);
         }
         return myTexture;
-#endif
     }
 
     ICombinerPtr
     TextureUnit::getCombiner() const {
-#ifdef BAD_TX
-        return get<TextureUnitCombinerPtrTag>().lock();
-#else
         return ICombinerPtr(0);
-#endif
     }
-#ifdef BAD_TX
-    void
-    TextureUnit::registerDependenciesForTextureTag() {
-        TextureUnitTexturePtrTag::Plug::dependsOn<TextureUnitTextureIdTag>(*this);  
-        TextureUnitTexturePtrTag::Plug::getValuePtr()->setCalculatorFunction(dynamic_cast_Ptr<TextureUnit>(getSelf()), &TextureUnit::updateTexture);
-    }
-
-    void
-    TextureUnit::registerDependenciesForCombinerTag() {        
-        TextureUnitCombinerPtrTag::Plug::dependsOn<TextureUnitCombinerTag>(*this);  
-        TextureUnitCombinerPtrTag::Plug::getValuePtr()->setCalculatorFunction(dynamic_cast_Ptr<TextureUnit>(getSelf()), &TextureUnit::updateCombiner);
-    }
-#endif
 
     void
     TextureUnit::updateTexture() {
@@ -163,9 +127,6 @@ namespace y60 {
             return;
         }
         myTexture->refTexture();
-#ifdef BAD_TX
-        set<TextureUnitTexturePtrTag>(TextureWeakPtr(myTexture));
-#endif
     }
 
     void

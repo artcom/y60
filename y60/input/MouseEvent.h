@@ -91,6 +91,12 @@ namespace y60 {
         MouseEvent(const dom::NodePtr & theNode);
         virtual ~MouseEvent();
 
+        virtual EventPtr copy() const {
+            return EventPtr(new MouseEvent(*this));
+        }
+        virtual dom::NodePtr asNode() const;
+        
+    public:
         const bool leftButtonState;
         const bool middleButtonState;
         const bool rightButtonState;
@@ -98,11 +104,7 @@ namespace y60 {
         const asl::Vector2i delta;
         const Button button; // only used in button events
 
-        virtual EventPtr copy() const {
-            return EventPtr(new MouseEvent(*this));
-        }
 
-        virtual dom::NodePtr asNode() const;
 
     private:
         Type getType(const dom::NodePtr & theNode) const;
