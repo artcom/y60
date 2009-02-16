@@ -50,11 +50,10 @@ AudioTimeSource::AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate)
     : _mySentFrames(0),
       _mySysTimeAtLastBuffer(0),
       _myInitialDelay(myInitialDelay),
-      _myRunning(false),
       _mySampleRate(mySampleRate),
-      _myGlobalTimeOffset(0)
-{
-}
+      _myGlobalTimeOffset(0),
+      _myRunning(false)
+{}
 
 AudioTimeSource::~AudioTimeSource() {
 }

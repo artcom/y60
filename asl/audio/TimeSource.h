@@ -52,6 +52,7 @@ namespace asl {
 class TimeSource {
     public:
         virtual Time getCurrentTime() = 0;
+        virtual ~TimeSource() {}
 };
 
 

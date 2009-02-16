@@ -160,13 +160,13 @@ namespace dom {
                      asl::Ptr<AC_PAYLOAD_TPL> thePayload = asl::Ptr<AC_PAYLOAD_TPL>(0))
                      : 
         _myType(theType),
+        _myEventPhase(CAPTURING_PHASE),
         _myBubblesFlag(canBubbleArg),
         _myCancelableFlag(cancelableArg),
+        _myTargetOnlyFlag(false),
         _myTimeStamp(theTimeStamp),
-        _myEventPhase(CAPTURING_PHASE),
         _myPropagationStopped(false),
         _myDefaultPrevented(false),
-        _myTargetOnlyFlag(false),
         _myPayload(thePayload)
         {}
         ~GenericEvent() {}

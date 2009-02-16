@@ -71,9 +71,7 @@ class ASL_AUDIO_EXPORT AudioTimeSource {
         asl::Time _mySysTimeAtLastBuffer;
         unsigned _myInitialDelay;
         unsigned _mySampleRate;
-    
         asl::Time _myGlobalTimeOffset;
-        
         bool _myRunning;
 };
 

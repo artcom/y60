@@ -173,6 +173,8 @@ Frustum::changeAspectRatio( ResizePolicy thePolicy, float theNewAspect) {
             break;
         case NO_ADAPTION:
             break;
+        default:
+            throw FrustumException("Illegal ResizePolicy.", PLUS_FILE_LINE );
     };
 }
 

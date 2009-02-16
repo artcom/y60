@@ -43,12 +43,10 @@
 namespace asl {
     
 ExternalTimeSource::ExternalTimeSource() 
-    : _myTimeOffset(0), _myStartTime(0), _myPauseFlag(false), _myPausedTime(0)
-{
-}
+    : _myStartTime(0), _myTimeOffset(0), _myPausedTime(0), _myPauseFlag(false)
+{}
 
-ExternalTimeSource::~ExternalTimeSource() {
-}
+ExternalTimeSource::~ExternalTimeSource() {}
 
 Time ExternalTimeSource::getCurrentTime() const {
     return Pump::get().getCurrentTime() - _myStartTime - _myTimeOffset;     

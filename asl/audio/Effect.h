@@ -54,6 +54,7 @@ class EffectFunctorBase {
     public:
         virtual void operator()(Effect * theEffect, AudioBufferBase & theBuffer, 
                 Unsigned64 theAbsoluteFrame) = 0;
+        virtual ~EffectFunctorBase() {}
 };
 
 /**

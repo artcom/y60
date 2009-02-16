@@ -52,6 +52,7 @@ namespace asl {
     struct Lockable {
         virtual void lock() = 0;
         virtual void unlock() = 0;
+        virtual ~Lockable() {}
     };
 
 #ifdef _NEEDS_TO_BE_TESTED_BEFORE_USE_
@@ -94,10 +95,12 @@ namespace asl {
     struct ReadLockable {
         virtual void readlock()=0;
         virtual void readunlock()=0;
+        virtual ~ReadLockable() {}
     };
     struct WriteLockable {
         virtual void writelock()=0;
         virtual void writeunlock()=0;
+        virtual ~WriteLockable() {}
     };
 
     struct ReadWriteLockable : public ReadLockable, public WriteLockable {
