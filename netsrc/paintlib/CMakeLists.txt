@@ -7,7 +7,7 @@ include(FindPkgConfig)
 
 list(INSERT CMAKE_MODULE_PATH 0 ${Paintlib_SOURCE_DIR})
 
-list(INSERT CMAKE_PREFIX_PATH 0 $ENV{PRO60_DEPS})
+list(INSERT CMAKE_PREFIX_PATH 0 "$ENV{PRO60_DEPS}")
 if(WIN32)
     # Make CMake build all libs in a common directory. Since we build
     # DLLs the tests need to find their libraries even while they are not

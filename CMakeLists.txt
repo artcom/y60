@@ -22,10 +22,10 @@ set(ASL_INTEGRATED_BUILD YES)
 set(Y60_INTEGRATED_BUILD YES)
 
 # look for ART+COM companion libraries
-find_package( ACCL )
-if(ACCL_FOUND)
-    accl_register_searchpath()
-endif(ACCL_FOUND)
+find_package( PRO60_DEPS )
+if(PRO60_DEPS_FOUND)
+    pro60_deps_register_searchpath()
+endif(PRO60_DEPS_FOUND)
 
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
