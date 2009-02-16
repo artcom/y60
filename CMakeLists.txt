@@ -22,7 +22,7 @@ set(ASL_INTEGRATED_BUILD YES)
 set(Y60_INTEGRATED_BUILD YES)
 
 # look for ART+COM companion libraries
-find_package( PRO60_DEPS )
+find_package( PRO60_DEPS NO_MODULE)
 if(PRO60_DEPS_FOUND)
     pro60_deps_register_searchpath()
 endif(PRO60_DEPS_FOUND)
