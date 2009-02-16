@@ -12,6 +12,7 @@
         <command name="configure">
             <executable exe="cmake" working-dir="${build.dir}">
                 <arg>-G</arg><arg>${cmake.generator}</arg>
+                <arg>-D</arg><arg>CMAKE_VERBOSE_MAKEFILE=1</arg>
                 <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${build.type}</arg>
                 <arg>../../</arg>
             </executable>
@@ -33,7 +34,7 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <make args="-j ${parallel.jobs}" working-dir="${build.dir}">
+            <make args="-j ${parallel.jobs} VERBOSE=1" working-dir="${build.dir}">
                 <process processor="${gcc_build.pp}"/>
             </make>
         </command>
