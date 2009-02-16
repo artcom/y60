@@ -194,9 +194,9 @@ JSConstIntPropertySpec *
 JSDomEvent::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-        "CAPTURING_PHASE", PROP_CAPTURING_PHASE,  dom::Event::CAPTURING_PHASE,
-        "AT_TARGET",       PROP_AT_TARGET,        dom::Event::AT_TARGET,
-        "BUBBLING_PHASE",  PROP_BUBBLING_PHASE,   dom::Event::BUBBLING_PHASE,
+        {"CAPTURING_PHASE", PROP_CAPTURING_PHASE,  dom::Event::CAPTURING_PHASE},
+        {"AT_TARGET",       PROP_AT_TARGET,        dom::Event::AT_TARGET},
+        {"BUBBLING_PHASE",  PROP_BUBBLING_PHASE,   dom::Event::BUBBLING_PHASE},
         {0}
     };
     return myProperties;

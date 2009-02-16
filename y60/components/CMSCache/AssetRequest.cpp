@@ -73,12 +73,12 @@ AssetRequest::AssetRequest(RequestThread * theParent,
                            const std::string & theRemoteURI,
                            const std::string & theBaseDir,
                            const inet::CookieJar & theCookies,
-                           const string & theUserAgent) :
+                           const string & theUserAgent)
+        : inet::Request(theRemoteURI, theUserAgent),
         _myParent(theParent),
-        inet::Request(theRemoteURI, theUserAgent),
-        _myIsDoneFlag( false ),
         _myTotalReceived (0),
-        _myLocalPath (theLocalPath)
+        _myLocalPath (theLocalPath),
+        _myIsDoneFlag( false )
 {
     if ( ! theCookies.empty() ) {
         setCookies( theCookies );
@@ -127,6 +127,8 @@ AssetRequest::onError(CURLcode theCode) {
     _myIsDoneFlag = true;
     Request::onError(theCode);
     switch (theCode) {
+        case CURLE_OK:
+            break;
         case CURLE_URL_MALFORMAT:
         case CURLE_COULDNT_RESOLVE_HOST:
         case CURLE_COULDNT_CONNECT:
@@ -141,6 +143,8 @@ AssetRequest::onError(CURLcode theCode) {
         case CURLE_FILESIZE_EXCEEDED:
             AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
             break;
+        default:
+            AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();        
     }
 }    
 

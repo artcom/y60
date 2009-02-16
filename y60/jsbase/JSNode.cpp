@@ -1377,8 +1377,8 @@ JSNode::StaticProperties() {
 class JS_FieldCalculator : public dom::CallBackBase {
 public:
     JS_FieldCalculator(JSContext * theContext, JSObject * theObject, jsval theFunction) :
-        _myContext(theContext),
         _myObject(theObject),
+        _myContext(theContext),
         _myFunction(theFunction)
     {
         JS_AddRoot(_myContext, &_myFunction);

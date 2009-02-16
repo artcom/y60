@@ -25,7 +25,7 @@ namespace y60 {
 #endif
     };
 
-    static const char * ShaderProfileStrings[] = {
+    const char * const ShaderProfileStrings[] = {
         "no-profile",
         "glslv",
         "glslf",

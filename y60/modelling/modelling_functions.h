@@ -341,10 +341,10 @@ struct NoisePlanePosition {
                        const asl::Vector2f & theXSampleVector,
                        const asl::Vector2f & theYSampleVector,
                        const float & theAmplitude) :
-        _myNoise(theNoiseFunction),
-        _myOrigin(theOrigin),
         _myXSampleVector(theXSampleVector),
         _myYSampleVector(theYSampleVector),
+        _myNoise(theNoiseFunction),
+        _myOrigin(theOrigin),
         _myXVector(theXVector),
         _myYVector(theYVector),
         _myAmplitude(theAmplitude)

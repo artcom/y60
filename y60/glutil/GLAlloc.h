@@ -221,10 +221,10 @@ namespace asl {
             _myGfxMemAllocatedBytes(0)
         {}
 
-        GLAlloc( const GLAlloc& theOther) throw()
+        GLAlloc(const GLAlloc& theOther) throw()
             : _myType(theOther._myType),
-            _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes),
-            _myMem(theOther._myMem)
+            _myMem(theOther._myMem),
+            _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes)
         {}
 
 #if _MSC_VER >= 1400 // VC 7 can't handle template members

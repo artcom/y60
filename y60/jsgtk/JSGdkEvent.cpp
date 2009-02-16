@@ -260,8 +260,8 @@ JSGdkEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
                         return JS_TRUE;
                 }
             }
-
-
+        default:
+            break;
     }
     JS_ReportError(cx,"JSGdkEvent::getProperty: index %d out of range", theID);
     return JS_FALSE;

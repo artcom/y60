@@ -155,7 +155,7 @@ std::string ourTopScriptFilename;
 
 std::string JSApp::_myProgramName;
 
-JSApp::JSApp() : ourStrictFlag(false), ourJITFlag(false),ourXMLFlag(false),ourJSVersion(0)
+JSApp::JSApp() : ourStrictFlag(false), ourXMLFlag(false), ourJITFlag(false), ourJSVersion(0)
 {}
 
 // ****************  runtime-options **********************

@@ -220,6 +220,7 @@ namespace y60 {
 
             void collectClippingPlanes(dom::NodePtr theNode, std::vector<asl::Planef> & theClippingPlanes);
             void collectScissorBox(dom::NodePtr theNode, asl::Box2f & theScissorBox);
+        private:
             // renderer members
             TextRendererManager     _myTextRendererManager;
             unsigned int            _myRenderingCaps;

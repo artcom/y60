@@ -330,7 +330,11 @@ namespace jslib {
         virtual void onGenericEvent(y60::Event & theEvent); // generic XML based event handler
 
         virtual y60::TTFTextRendererPtr createTTFRenderer() = 0;
-
+        
+        void setGLContext(y60::GLContextPtr theContext) {
+            _myGLContext = theContext;
+        }
+   protected:
         y60::ScenePtr    _myScene;
         dom::NodePtr     _myCanvas;
         y60::RendererPtr _myRenderer;
@@ -352,9 +356,6 @@ namespace jslib {
 
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
 
-        void setGLContext(y60::GLContextPtr theContext) {
-            _myGLContext = theContext;
-        }
 
     private:
         AbstractRenderWindow();

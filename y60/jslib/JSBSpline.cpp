@@ -360,6 +360,7 @@ namespace jslib {
             {"setupFromPoints", setupFromPoints, 2},
             {"calculate", calculate, 3},
             {"evaluate", evaluate, 3},
+            {"evaluateNormal", evaluateNormal, 3},
             {"getArcLength", getArcLength, 0},
             {"getPosition", getPosition, 1},
             {"getResult", getResult, 0},

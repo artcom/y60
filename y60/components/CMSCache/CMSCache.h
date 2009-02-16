@@ -79,7 +79,7 @@ enum BackendTypeEnum {
     BackendTypeEnum_MAX
 };
 
-static const char * BackendTypeStrings[] = {
+const char * const BackendTypeStrings[] = {
     "OCS",
     "SVN",
     ""
@@ -142,29 +142,24 @@ class CMSCache {
         void removeStalledAssets();
         void scanStalledEntries(const std::string & thePath);
 
-        std::string _mySessionCookie;
-
+        std::string _myLocalPath;
         dom::NodePtr _myPresentationDocument;
+        std::string _myUsername;
+        std::string _myPassword;
         dom::DocumentPtr _myStatusDocument;
+        bool _myVerboseFlag;
+        BackendType _myBackendType;
+        unsigned _myMaxRequestCount;
+        bool _myCleanupFlag;
+        std::string _mySessionCookie;
+        std::string _myProxy;
 
-        dom::NodePtr     _myReportNode;
         unsigned         _myReportNodeVersion;
-
+        dom::NodePtr     _myReportNode;
         dom::NodePtr     _myAssetReportNode;
         dom::NodePtr     _myStalledFilesNode;
         std::map<std::string, dom::NodePtr> _myAssets;
-
-        bool _myVerboseFlag;
-        bool _myCleanupFlag;
-        BackendType _myBackendType;
-        unsigned _myMaxRequestCount;
-
         std::string _myUserAgent;
-        std::string _myLocalPath;
-        std::string _myUsername;
-        std::string _myPassword;
-        std::string _myProxy;
-
 };
 
 }

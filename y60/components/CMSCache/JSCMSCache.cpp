@@ -120,6 +120,7 @@ JSCMSCache::Functions() {
         {"isSynchronized",     isSynchronized,            0},
         {"testConsistency",    testConsistency,           0},
         {"setProxy",           setProxy,                  1},
+        {"toString",           toString,                  0},
         {0}
     };
     return myFunctions;

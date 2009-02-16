@@ -92,19 +92,22 @@ using namespace y60;
 namespace jslib {
 
     AbstractRenderWindow::AbstractRenderWindow(const JSErrorReporter & theErrorReporter) :
-        _myScene(0), _myRenderer(0),
+        // _myScene(0),
+        // _myCanvas(0),
+        // _myRenderer(0),
         _myEventListener(0),
         _myJSContext(0),
+        _myErrorReporter(theErrorReporter),
         _myRenderingCaps(static_cast<unsigned int>(~0)), // enable all (~)
         _myMultisamples(0),
-        _myErrorReporter(theErrorReporter),
+        _myElapsedTime(0.0),
+        _myVisiblityFlag(true),
         _myFixedDeltaT(0.0),
-        _myStartTime(-1.0), _myElapsedTime(0.0),
-        _myPauseTime(0.0), _myPauseFlag(false),
-        _myForceFullGC(false),
-        _myVisiblityFlag(true)
-        {
-        }
+        _myStartTime(-1.0), 
+        _myPauseTime(0.0),
+        _myPauseFlag(false),
+        _myForceFullGC(false)
+    {}
 
     void
     AbstractRenderWindow::setSelf(asl::Ptr<AbstractRenderWindow> theSelfPtr) {

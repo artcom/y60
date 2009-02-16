@@ -76,6 +76,7 @@ namespace y60 {
 
 struct IPaintLibExtension {
 	virtual PLDecoderFactory * getDecoderFactory() const = 0;
+    virtual ~IPaintLibExtension() {}
 };
 
 typedef asl::Ptr<IPaintLibExtension> IPaintLibExtensionPtr;

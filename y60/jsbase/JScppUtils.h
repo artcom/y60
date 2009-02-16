@@ -271,9 +271,10 @@ NoisyConvert(JSContext *cx, JSObject *obj, JSType type, jsval *vp);
 #define JS_STATIC_DLL_CALLBACK(x) x
 #endif
 
+#ifdef NOISY_FINALIZE
 JS_STATIC_DLL_CALLBACK(void)
 NoisyFinalize(JSContext *cx, JSObject *obj);
-
+#endif
 
 template <class T>
 struct JValueTypeTraits {

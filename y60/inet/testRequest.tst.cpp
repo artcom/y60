@@ -75,10 +75,15 @@ using namespace std;
 
 class TestRequest : public Request {
     public:
-        TestRequest(const std::string & theURL, bool test=false) :
-            Request(theURL), _myDataReceivedFlag(false),
-        _myErrorCalledFlag(false), _myProgressCalledFlag(false),
-        _myDoneCalledFlag(false) {};
+        TestRequest(const std::string & theURL, bool test=false)
+        : Request(theURL),
+        _myDoneCalledFlag(false),
+        _myDataReceivedFlag(false),
+        _myErrorCalledFlag(false),
+        _myProgressCalledFlag(false),
+        _myTimeoutFlag(false),
+        _myErrorCode(0)
+    {}
 
     virtual size_t onData(const char * theData, size_t theReceivedByteCount) {
         _myDataReceivedFlag = true;
@@ -90,8 +95,7 @@ class TestRequest : public Request {
         _myErrorCode = theErrorCode;
     };
     bool onProgress(double theDownloadTotal, double theCurrentDownload,
-                double theUploadTotal, double theCurrentUpload) 
-    {
+                    double theUploadTotal, double theCurrentUpload) {
         _myProgressCalledFlag = true;
         return true;
     };

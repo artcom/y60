@@ -71,12 +71,13 @@ class ConduitAcceptor {
           * @param theMaxConnectionCount maximum simutaneous clients
           **/
         ConduitAcceptor(typename POLICY::Endpoint theLocalEndpoint, 
-                FACTORYPROC theFactoryMethod, 
-                unsigned theMaxConnectionCount=32) :
-            _myLocalEndpoint(theLocalEndpoint),
+                        FACTORYPROC theFactoryMethod, 
+                        unsigned theMaxConnectionCount=32)
+            :
+            _myThread(0),
             _myMaxConnectionCount(theMaxConnectionCount),
-            _createServerProc(theFactoryMethod),
-            _myThread(0)
+            _myLocalEndpoint(theLocalEndpoint),
+            _createServerProc(theFactoryMethod)
             {
                 _myListenHandle = POLICY::startListening(_myLocalEndpoint, _myMaxConnectionCount);
             };

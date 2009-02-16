@@ -156,11 +156,11 @@ JSConstIntPropertySpec *
 JSCellRenderer::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-            "TEXT",              PROP_CELL_RENDERER_TEXT,     PROP_CELL_RENDERER_TEXT,
-            "PIXBUF",            PROP_CELL_RENDERER_PIXBUF,   PROP_CELL_RENDERER_PIXBUF,
-            //"PROGRESS",          PROP_CELL_RENDERER_PROGRESS, PROP_CELL_RENDERER_PROGRESS,
-            "TOGGLE",            PROP_CELL_RENDERER_TOGGLE,   PROP_CELL_RENDERER_TOGGLE,
-            //"COMBO",             PROP_CELL_RENDERER_COMBO,    PROP_CELL_RENDERER_COMBO,
+        {"TEXT",              PROP_CELL_RENDERER_TEXT,     PROP_CELL_RENDERER_TEXT},
+        {"PIXBUF",            PROP_CELL_RENDERER_PIXBUF,   PROP_CELL_RENDERER_PIXBUF},
+        //{"PROGRESS",          PROP_CELL_RENDERER_PROGRESS, PROP_CELL_RENDERER_PROGRESS},
+        {"TOGGLE",            PROP_CELL_RENDERER_TOGGLE,   PROP_CELL_RENDERER_TOGGLE},
+        //{"COMBO",             PROP_CELL_RENDERER_COMBO,    PROP_CELL_RENDERER_COMBO},
         {0}
     };
     return myProperties;

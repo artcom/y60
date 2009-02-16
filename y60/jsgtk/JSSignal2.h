@@ -89,7 +89,7 @@ class JSSignalAdapter2 : public JSSignalAdapterBase {
             argv[1] = as_jsval(cx, theParam1);
             AC_TRACE << "calling signal2 " << theMethodName;
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 2, argv, &rval);
-
+            (void)(ok); //XXX check if caller will correctly propagete JS exception
             R myResult;
             convertFrom(cx, rval, myResult);
             return myResult;
@@ -106,6 +106,7 @@ class JSSignalAdapter2<void, P0, P1> : public JSSignalAdapterBase {
             argv[0] = as_jsval(cx, theParam0);
             argv[1] = as_jsval(cx, theParam1);
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 2, argv, &rval);
+            (void)(ok); //XXX check if caller will correctly propagete JS exception
         }
 };
 

@@ -91,7 +91,7 @@ namespace inet {
         AuthentTypeEnum_MAX
     };
     
-    static const char * AuthentTypeStrings[] = {
+    const char * const AuthentTypeStrings[] = {
         "BASIC",
         "DIGEST",
         "ANY",

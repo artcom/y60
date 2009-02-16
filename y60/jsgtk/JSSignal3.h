@@ -117,7 +117,8 @@ class JSSignalAdapter3<void, P0, P1, P2> : public JSSignalAdapterBase {
             argv[1] = as_jsval(cx, theParam1);
             argv[2] = as_jsval(cx, theParam2);
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 3, argv, &rval);
-        }
+            (void)(ok); //XXX check if caller will correctly propagete JS exception
+       }
 };
 
 template <class R, class P0, class P1, class P2>

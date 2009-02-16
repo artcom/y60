@@ -71,7 +71,7 @@ namespace jslib {
                 _myNative(theNative)
             {}
 
-            ~JSScriptablePlugin();
+            virtual ~JSScriptablePlugin();
 
             static JSFunctionSpec * Functions();
             static JSPropertySpec * Properties();

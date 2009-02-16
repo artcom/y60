@@ -673,6 +673,7 @@ JSFileFunctions::Functions() {
         {"getAppDataDirectory", getAppDataDirectory, 1},
         {"getTempDirectory",    getTempDirectory,    0},
         {"createDirectory",     createDirectory,     1},
+        {"removeDirectory",     removeDirectory,     1},
         {"createPath",          createPath,          1},
         {"searchFile",          searchFile,          2},
         {0},

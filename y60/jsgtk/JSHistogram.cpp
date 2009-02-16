@@ -276,8 +276,8 @@ JSConstIntPropertySpec *
 JSHistogram::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-        "MODE_CENTER_WIDTH",   PROP_MODE_CENTER_WIDTH, acgtk::Histogram::MODE_CENTER_WIDTH,
-        "MODE_LOWER_UPPER",    PROP_MODE_LOWER_UPPER, acgtk::Histogram::MODE_LOWER_UPPER,
+        {"MODE_CENTER_WIDTH",   PROP_MODE_CENTER_WIDTH, acgtk::Histogram::MODE_CENTER_WIDTH},
+        {"MODE_LOWER_UPPER",    PROP_MODE_LOWER_UPPER, acgtk::Histogram::MODE_LOWER_UPPER},
         {0}
     };
     return myProperties;

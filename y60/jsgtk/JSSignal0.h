@@ -85,6 +85,7 @@ class JSSignalAdapter0 : public JSSignalAdapterBase {
             jsval rval;
             AC_TRACE << "JSSignalAdapter0 calling JS event handler '" << theMethodName << "'";
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 0, 0, &rval);
+            (void)(ok); //XXX check if caller properly handles JS exception
             R myResult;
             convertFrom(cx, rval, myResult);
             return myResult;
@@ -98,7 +99,8 @@ class JSSignalAdapter0<void> : public JSSignalAdapterBase {
         {
             AC_TRACE << "JSSignalAdapter0 calling JS event handler '" << theMethodName << "'";
             jsval rval;
-            /*JSBool ok =*/ jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 0, 0, &rval);
+            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 0, 0, &rval);
+            (void)(ok); //XXX check if caller properly handles JS exception
         }
 };
 

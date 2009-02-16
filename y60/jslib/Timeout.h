@@ -77,8 +77,6 @@
 
 namespace jslib {
 
-static unsigned long ourNextTimeoutId = 0;
-
 class Timeout {
     public:
         Timeout();
@@ -116,6 +114,7 @@ class TimeoutQueue {
     private:
         TimeoutMap      _myTimeoutMap;
         TimeoutMultiMap _myTimeoutQueue;
+        static unsigned long ourNextTimeoutId;
 };
 
 }

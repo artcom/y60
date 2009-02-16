@@ -268,8 +268,8 @@ struct AdapterCall {
     ~AdapterCall() {
     }
 
-
 private:
+    CLASS & _myClass;
     METHOD _myMethod;
     ArgumentHolder<ARG0> _myArgHolder0;
     ArgumentHolder<ARG1> _myArgHolder1;
@@ -279,7 +279,6 @@ private:
     ArgumentHolder<ARG5> _myArgHolder5;
     ArgumentHolder<ARG6> _myArgHolder6;
     ArgumentHolder<ARG7> _myArgHolder7;
-    CLASS & _myClass;
 };
 
 template <class CLASS, class METHOD, class RESULT_TYPE=NoResult,
@@ -325,6 +324,7 @@ struct ConstAdapterCall {
 
 
 private:
+    const CLASS & _myClass;
     METHOD _myMethod;
     ArgumentHolder<ARG0> _myArgHolder0;
     ArgumentHolder<ARG1> _myArgHolder1;
@@ -334,7 +334,6 @@ private:
     ArgumentHolder<ARG5> _myArgHolder5;
     ArgumentHolder<ARG6> _myArgHolder6;
     ArgumentHolder<ARG7> _myArgHolder7;
-    const CLASS & _myClass;
 };
 
 template <class CLASS, class METHOD>

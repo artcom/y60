@@ -124,11 +124,13 @@ using namespace asl;
 namespace y60 {
 
     Renderer::Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps) :
+        _myRenderingCaps(theRenderingCaps),
         _myScene(0),
+        _myContext(theGLContext),
         _myBoundingVolumeMode(BV_NONE),
         _myPreviousMaterial(0),
-        _myRenderingCaps(theRenderingCaps),
-        _myContext(theGLContext),
+        _myPreviousBody(0),
+        _myRenderedUnderlays(true),
         _myFrameNumber(0)
     {
         _myState = _myContext->getStateCache();
@@ -1435,6 +1437,9 @@ namespace y60 {
                 return;
             case UNSUPPORTED:
                 return;
+            case MAX_LIGHTSOURCE_TYPE:
+                AC_ERROR << "internal error: MAX_LIGHTSOURCE_TYPE encountered as enumeration value";
+                break;
         }
 
         GLenum gl_lightid = asGLLightEnum(theActiveLightIndex);
@@ -1479,6 +1484,11 @@ namespace y60 {
                 DB(AC_TRACE << "enabled spotlight: " << theLight->getNode().getAttributeString("name"));
                 break;
             }
+            // avoid warnings
+            case AMBIENT:
+            case UNSUPPORTED:
+            case MAX_LIGHTSOURCE_TYPE:
+                break;
         }
 
         glLightf(gl_lightid, GL_SPOT_CUTOFF, mySpotCutoff); // 180

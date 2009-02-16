@@ -87,6 +87,7 @@ class JSSignalAdapter1 : public JSSignalAdapterBase {
             jsval argv[1], rval;
             argv[0] = as_jsval(cx, theParam0);
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 1, argv, &rval);
+            (void)(ok); //XXX check if caller will correctly propagate JS exceptions
 
             R myResult;
             convertFrom(cx, rval, myResult);
@@ -104,6 +105,7 @@ class JSSignalAdapter1<void, P0> : public JSSignalAdapterBase {
             jsval argv[1], rval;
             argv[0] = as_jsval(cx, theParam0);
             JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 1, argv, &rval);
+            (void)(ok); //XXX check if caller will correctly propagate JS exceptions
         }
 };
 

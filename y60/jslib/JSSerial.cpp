@@ -655,18 +655,18 @@ JSConstIntPropertySpec *
 JSSerial::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-        "NO_PARITY",         PROP_NO_PARITY,         SerialDevice::NO_PARITY,
-        "EVEN_PARITY",       PROP_EVEN_PARITY,       SerialDevice::EVEN_PARITY,
-        "ODD_PARITY",        PROP_ODD_PARITY,        SerialDevice::ODD_PARITY,
-        "NO_CHECKING",       PROP_NO_CHECKING,       uCCP::NO_CHECKING,
-        "CRC8_CHECKING",     PROP_CRC8_CHECKING,     uCCP::CRC8_CHECKING,
-        "CHECKSUM_CHECKING", PROP_CHECKSUM_CHECKING, uCCP::CHECKSUM_CHECKING,
-        "CTS",               PROP_STATUS_CTS,        SerialDevice::CTS,
-        "DSR",               PROP_STATUS_DSR,        SerialDevice::DSR,
-        "RI",                PROP_STATUS_RI,         SerialDevice::RI,
-        "CD",                PROP_STATUS_CD,         SerialDevice::CD,
-        "DTR",               PROP_STATUS_DTR,        SerialDevice::DTR,
-        "RTS",               PROP_STATUS_RTS,        SerialDevice::RTS,
+        {"NO_PARITY",         PROP_NO_PARITY,         SerialDevice::NO_PARITY},
+        {"EVEN_PARITY",       PROP_EVEN_PARITY,       SerialDevice::EVEN_PARITY},
+        {"ODD_PARITY",        PROP_ODD_PARITY,        SerialDevice::ODD_PARITY},
+        {"NO_CHECKING",       PROP_NO_CHECKING,       uCCP::NO_CHECKING},
+        {"CRC8_CHECKING",     PROP_CRC8_CHECKING,     uCCP::CRC8_CHECKING},
+        {"CHECKSUM_CHECKING", PROP_CHECKSUM_CHECKING, uCCP::CHECKSUM_CHECKING},
+        {"CTS",               PROP_STATUS_CTS,        SerialDevice::CTS},
+        {"DSR",               PROP_STATUS_DSR,        SerialDevice::DSR},
+        {"RI",                PROP_STATUS_RI,         SerialDevice::RI},
+        {"CD",                PROP_STATUS_CD,         SerialDevice::CD},
+        {"DTR",               PROP_STATUS_DTR,        SerialDevice::DTR},
+        {"RTS",               PROP_STATUS_RTS,        SerialDevice::RTS},
         {0}
     };
     return myProperties;

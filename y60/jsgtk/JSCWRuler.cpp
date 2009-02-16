@@ -275,9 +275,9 @@ JSConstIntPropertySpec *
 JSCWRuler::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-            "MODE_THRESHOLD",    PROP_MODE_THRESHOLD, acgtk::CWRuler::MODE_THRESHOLD,
-            "MODE_CENTER_WIDTH", PROP_MODE_CENTER_WIDTH, acgtk::CWRuler::MODE_CENTER_WIDTH,
-            "MODE_LOWER_UPPER",  PROP_MODE_LOWER_UPPER, acgtk::CWRuler::MODE_LOWER_UPPER,
+        {"MODE_THRESHOLD",    PROP_MODE_THRESHOLD, acgtk::CWRuler::MODE_THRESHOLD},
+        {"MODE_CENTER_WIDTH", PROP_MODE_CENTER_WIDTH, acgtk::CWRuler::MODE_CENTER_WIDTH},
+        {"MODE_LOWER_UPPER",  PROP_MODE_LOWER_UPPER, acgtk::CWRuler::MODE_LOWER_UPPER},
         {0}
     };
     return myProperties;

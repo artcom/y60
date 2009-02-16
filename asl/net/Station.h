@@ -38,6 +38,7 @@
 //    recommendations: move this to its own component, 
 //                     check interfaces, 
 //                     remove CVS log 
+*/
 
 /** The "Station" protokoll is a simple UDP-based broadcast protocol that basically performs
 fragmentation and defragmentation of messages that do not fit into a single UDP packet.

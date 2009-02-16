@@ -67,6 +67,7 @@ class IGLContextManager {
     public:
        virtual void activateGLContext() = 0;
        virtual void deactivateGLContext() = 0;
+       virtual ~IGLContextManager() {}
 };
 
 }

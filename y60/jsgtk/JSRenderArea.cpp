@@ -145,7 +145,7 @@ JSRenderArea::getPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case 0:
         default:
-            if (theID >= JSGTKBASE::PROP_BEGIN) {
+            if (theID >= static_cast<unsigned long>(JSGTKBASE::PROP_BEGIN)) {
                 return JSGTKBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
             } else {
                 return JSY60BASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
@@ -159,7 +159,7 @@ JSRenderArea::setPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case 0:
         default:
-            if (theID >= JSGTKBASE::PROP_BEGIN) {
+            if (theID >= static_cast<unsigned long>(JSGTKBASE::PROP_BEGIN)) {
                 return JSGTKBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
             } else {
                 return JSY60BASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);

@@ -64,15 +64,17 @@ namespace jslib {
 
     Timeout::Timeout() {}
 
-    Timeout::Timeout(const string & theCommand, double theDuration,
-            asl::Time theCurrentTime, bool theIsInterval, JSObject * theObjectToCall)
+    Timeout::Timeout(const string & theCommand,
+                     double theDuration,
+                     asl::Time theCurrentTime,
+                      bool theIsInterval,
+                      JSObject * theObjectToCall)
         : _myCommand(theCommand),
-          _myDuration(theDuration),
-          _isInterval(theIsInterval),
-          _myActivationTime(theCurrentTime + theDuration / 1000.0),
-          _myObjectToCall(theObjectToCall)
-        {
-        }
+        _myDuration(theDuration),
+        _myActivationTime(theCurrentTime + theDuration / 1000.0),
+        _isInterval(theIsInterval),
+        _myObjectToCall(theObjectToCall)
+    {}
 
     Timeout::~Timeout() {}
 
@@ -97,6 +99,8 @@ namespace jslib {
     }
 
     TimeoutQueue::TimeoutQueue() {}
+    
+    unsigned long TimeoutQueue::ourNextTimeoutId = 0;
 
     unsigned long TimeoutQueue::addTimeout(const string & theCommand,
             asl::Time theCurrentTime, double theDuration, bool isInterval, JSObject * theObjectToCall)

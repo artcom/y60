@@ -386,6 +386,7 @@ JSA_AddProperties(JSContext *cx, JSObject *theClassCtr, JSPropertySpec * theProp
 
 }
 
+
 std::string
 ValType(JSContext *cx, jsval theVal) {
     std::string result = "{";
@@ -517,10 +518,13 @@ NoisyConvert(JSContext *cx, JSObject *obj, JSType type, jsval *vp) {
     return JS_ConvertStub(cx,obj,type,vp);
 }
 
+//#define NOISY_FINALIZE
+#ifdef NOISY_FINALIZE
 JS_STATIC_DLL_CALLBACK(void)
 NoisyFinalize(JSContext *cx, JSObject *obj) {
     IF_NOISY(AC_TRACE << "finalize " << (void*)obj << endl);
 }
+#endif
 
 
 // all those following functions are slighly modified versions of private js engine

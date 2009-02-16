@@ -206,10 +206,10 @@ JSMessageDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
 }
 
 #define DEFINE_MESSAGE_TYPE_PROP( NAME ) \
-    "MESSAGE_" # NAME, PROP_MESSAGE_TYPE_ ## NAME, Gtk::MESSAGE_ ## NAME
+    {"MESSAGE_" # NAME, PROP_MESSAGE_TYPE_ ## NAME, Gtk::MESSAGE_ ## NAME}
 
 #define DEFINE_BUTTONS_TYPE_PROP( NAME ) \
-    "BUTTONS_" # NAME, PROP_BUTTONS_TYPE_ ## NAME, Gtk::BUTTONS_ ## NAME
+    {"BUTTONS_" # NAME, PROP_BUTTONS_TYPE_ ## NAME, Gtk::BUTTONS_ ## NAME}
 
 JSConstIntPropertySpec *
 JSMessageDialog::ConstIntProperties() {

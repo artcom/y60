@@ -74,34 +74,36 @@ namespace y60 {
     public:
     
         
-      Cursor() :
-          position(0.0, 0.0), 
-          major_direction(0.0, 0.0),
-          minor_direction(0.0, 0.0),
-          firstDerivative(0.0),
-          lastTouchTime(0.0),
-          intensity(0.0),
-          previousIntensity(0.0),
-          motion(0.0,0.0),
-          correlatedPosition(-1)
-          {
-              roi.makeEmpty();
-              previousRoi.makeEmpty();
-          }
-    
-        Cursor(const asl::Box2f & theBox) :
-            roi( theBox),
-            firstDerivative(0.0),
-            lastTouchTime(0.0),
+        Cursor() 
+            : position(0.0, 0.0), 
+            major_direction(0.0, 0.0),
+            minor_direction(0.0, 0.0),
             intensity(0.0),
             previousIntensity(0.0),
+            firstDerivative(0.0),
+            lastTouchTime(0.0),
             motion(0.0,0.0),
             correlatedPosition(-1)
-                {
-                    previousRoi.makeEmpty();
-                }
+        {
+            roi.makeEmpty();
+            previousRoi.makeEmpty();
+        }
+        
+        Cursor(const asl::Box2f & theBox)
+            : position(0.0, 0.0), 
+            major_direction(0.0, 0.0),
+            minor_direction(0.0, 0.0),
+            roi( theBox),
+            intensity(0.0),
+            previousIntensity(0.0),
+            firstDerivative(0.0),
+            lastTouchTime(0.0),
+            motion(0.0,0.0),
+            correlatedPosition(-1)
+        {
+            previousRoi.makeEmpty();
+        }
 
-    
         asl::Vector2f position;
         asl::Vector2f major_direction;
         asl::Vector2f minor_direction;
@@ -111,18 +113,16 @@ namespace y60 {
         float         previousIntensity;
         float         firstDerivative;
         double        lastTouchTime;
-
+        
         std::deque<float> intensityHistory;
         asl::Vector2f motion;
         int correlatedPosition;
-
     };
-
 
     class MomentCursor : public Cursor {
     public: 
-    MomentCursor( const asl::MomentResults & theMomentResult, const asl::Box2f & theBox ) : 
-        Cursor( theBox )
+        MomentCursor( const asl::MomentResults & theMomentResult, const asl::Box2f & theBox )
+            : Cursor( theBox )
         { 
             position =  theMomentResult.center; 
         }
@@ -130,17 +130,14 @@ namespace y60 {
 
     class MaximumCursor :public Cursor {
     public: 
-    MaximumCursor(const MaximumResults & theMaximumResult, const asl::Box2f & theBox) : 
-        Cursor( theBox ) 
+    MaximumCursor(const MaximumResults & theMaximumResult, const asl::Box2f & theBox)
+        : Cursor( theBox ) 
         {
             position = theMaximumResult.center;
         }
-         
     };
 
-
     typedef std::map<int, Cursor> CursorMap;
-
 }
 
 #endif // Y60_ASS_CURSOR

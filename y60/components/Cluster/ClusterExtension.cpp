@@ -219,9 +219,9 @@ ClusterExtension :: ClusterExtension(DLHandle theDLHandle) :
         _mySlaveFlag(false),
         _myEnableFlag(true),
         _myFileIOFlag(true),
+        _myRemoteServer(asl::localhostname()),
         _myFrame(0),
         _myRemoteDomVersion(0),
-        _myRemoteServer(asl::localhostname()),
         _updateRequested(false)
 {
     cerr << "ClusterExtension:: ClusterExtension() "  << endl;

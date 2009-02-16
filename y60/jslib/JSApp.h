@@ -95,6 +95,7 @@ namespace jslib {
     class Y60_JSLIB_EXPORT JSApp {
         public:
             JSApp();
+            virtual ~JSApp() {}
             static asl::PackageManagerPtr getPackageManager();
             static void setReportWarnings(bool theEnableFlag);
             static void setQuitFlag(bool theQuitFlag);

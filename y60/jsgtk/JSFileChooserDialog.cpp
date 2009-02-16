@@ -235,7 +235,7 @@ JSFileChooserDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval
 }
 
 #define DEFINE_FILE_CHOOSER_ACTION_PROP( NAME ) \
-    "ACTION_" # NAME, PROP_FILE_CHOOSER_ACTION_ ## NAME, Gtk::FILE_CHOOSER_ACTION_ ## NAME
+    {"ACTION_" # NAME, PROP_FILE_CHOOSER_ACTION_ ## NAME, Gtk::FILE_CHOOSER_ACTION_ ## NAME}
 
 JSConstIntPropertySpec *
 JSFileChooserDialog::ConstIntProperties() {
