@@ -29,6 +29,9 @@
 
 #include <iostream> 
 
+#ifdef HAVE_STDLIB_H // avoid redifinition warning in jpeglib.h
+    #undef HAVE_STDLIB_H
+#endif
 extern "C"
 {
 #include "jpeglib.h"
@@ -74,679 +77,749 @@ enum ExifType {etUint8 = 1, etAsciiStr, etUint16, etUint32, etUrat64,
 
 
 _PLExifTranslator OffOn[] = {
-    0, "Off",
-    1, "On",
-    0,  NULL
+    {0, "Off"},
+    {1, "On"},
+    {0,  NULL}
 };
 
 _PLExifTranslator OnOff[] = {
-    0, "On",
-    1, "Off",
-    0,  NULL
+    {0, "On"},
+    {1, "Off"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator DisableEnable[] = {
-    0, "Disable",
-    1, "Enable",
-    0,  NULL
+    {0, "Disable"},
+    {1, "Enable"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator EnableDisable[] = {
-    0, "Enable",
-    1, "Disable",
-    0,  NULL
+    {0, "Enable"},
+    {1, "Disable"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator ResUnit[] = {
-    1,  "no-unit",
-    2,  "inch",
-    3,  "cm",
-    0,  NULL
+    {1,  "no-unit"},
+    {2,  "inch"},
+    {3,  "cm"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FPResUnit[] = {
-    1,  "inch",
-    2,  "inch",     // should be meter, but broke on some cameras?
-    3,  "centimeter",
-    4,  "milimemeter",
-    5,  "micrometer",
-    0,  NULL
+    {1,  "inch"},
+    {2,  "inch"},     // should be meter, but broke on some cameras?
+    {3,  "centimeter"},
+    {4,  "milimemeter"},
+    {5,  "micrometer"},
+    {0,  NULL}
 };
 
 _PLExifTranslator ExpProg[] = {
-    1,  "Manual",
-    2,  "Program",
-    3,  "Aperture priority",
-    4,  "Shutter priority",
-    5,  "Slow",
-    6,  "Action",
-    7,  "Portrait",
-    8,  "Landscape",
-    0,  NULL
+    {1,  "Manual"},
+    {2,  "Program"},
+    {3,  "Aperture priority"},
+    {4,  "Shutter priority"},
+    {5,  "Slow"},
+    {6,  "Action"},
+    {7,  "Portrait"},
+    {8,  "Landscape"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator BpsCompress[] = {
-    1,  "Basic",
-    2,  "Normal",
-    3,  "Fine",
-    4,  "Fine",
-    0,  NULL
+    {1,  "Basic"},
+    {2,  "Normal"},
+    {3,  "Fine"},
+    {4,  "Fine"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator MeterMode[] = {
-    0,  "Unknown",
-    1,  "Average",
-    2,  "Center weighted",
-    3,  "Spot",
-    4,  "Multi-spot",
-    5,  "Multi-segment",
-    6,  "Partial",
-    255,"Other",
-    0,  NULL
+    {0,  "Unknown"},
+    {1,  "Average"},
+    {2,  "Center weighted"},
+    {3,  "Spot"},
+    {4,  "Multi-spot"},
+    {5,  "Multi-segment"},
+    {6,  "Partial"},
+    {255,"Other"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator LightSource[] = {
-    0,  "Unknown/cloudy",
-    1,  "Daylight",
-    2,  "Fluorescent",
-    3,  "Tungsten",
-    10, "Flash",
-    17, "Standard light A",
-    18, "Standard light B",
-    19, "Standard light C",
-    20, "D55",
-    21, "D65",
-    22, "D75",
-    0,  NULL
+    {0,  "Unknown/cloudy"},
+    {1,  "Daylight"},
+    {2,  "Fluorescent"},
+    {3,  "Tungsten"},
+    {10, "Flash"},
+    {17, "Standard light A"},
+    {18, "Standard light B"},
+    {19, "Standard light C"},
+    {20, "D55"},
+    {21, "D65"},
+    {22, "D75"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FlashUsed[] = {
-    0,  "No",
-    1,  "Yes",
-    5,  "Yes, no return detect",
-    7,  "Yes, return detected",
-    9,  "Yes",        // maybe should be more than just yes ?
-    16, "No forced",    // not sure about this one!
-    0,  NULL
+    {0,  "No"},
+    {1,  "Yes"},
+    {5,  "Yes, no return detect"},
+    {7,  "Yes, return detected"},
+    {9,  "Yes"},        // maybe should be more than just yes ?
+    {16, "No forced"},    // not sure about this one!
+    {0,  NULL}
 };
 
 
 _PLExifTranslator ColorSpace[] = {
-    1,  "sRGB",
-    65535, "Uncalibrated",
-    0,  NULL
+    {1,  "sRGB"},
+    {65535, "Uncalibrated"},
+    {0,  NULL}
+
 };
 
 
 _PLExifTranslator SenseMethod[] = {
-    2, "1 chip color area",
-    0,  NULL
+    {2, "1 chip color area"},
+    {0,  NULL}
+
 };
 
 
 _PLExifTranslator FileSource[] = {
-    3, "Digital still camera",
-    0,  NULL
+    {3, "Digital still camera"},
+    {0,  NULL}
+
 };
 
 
 _PLExifTranslator SceneType[] = {
-    1, "Directly photographed",
-    0,  NULL
+    {1, "Directly photographed"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2Quality[] = {
-    1, "VGA Basic",
-    2, "VGA Normal",
-    3, "VGA Fine",
-    4, "SXGA Basic",
-    5, "SXGA Normal",
-    6, "SXGA Fine",
-    12,"UXGA Fine",
-    20,"HI (Uncompressed)",
-    0,  NULL
+    {1, "VGA Basic"},
+    {2, "VGA Normal"},
+    {3, "VGA Fine"},
+    {4, "SXGA Basic"},
+    {5, "SXGA Normal"},
+    {6, "SXGA Fine"},
+    {12,"UXGA Fine"},
+    {20,"HI (Uncompressed)"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2Color[] = {
-    1, "Colour",
-    2, "Monochrome",
-    0,  NULL
+    {1, "Colour"},
+    {2, "Monochrome"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2ImgAdjust[] = {
-    0, "Normal",
-    1, "Bright+",
-    2, "Bright-",
-    3, "Contrast+",
-    4, "Contrast-",
-    0,  NULL
+    {0, "Normal"},
+    {1, "Bright+"},
+    {2, "Bright-"},
+    {3, "Contrast+"},
+    {4, "Contrast-"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2Iso[] = {
-    0, "80",
-    2, "160",
-    4, "320",
-    5, "100",
-    0,  NULL
+    {0, "80"},
+    {2, "160"},
+    {4, "320"},
+    {5, "100"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2WhiteBal[] = {
-    0, "Auto",
-    1, "Preset",
-    2, "Daylight",
-    3, "Incandescent",
-    4, "Flourescent",
-    5, "Cloudy",
-    6, "SpeedLight",
-    0,  NULL
+    {0, "Auto"},
+    {1, "Preset"},
+    {2, "Daylight"},
+    {3, "Incandescent"},
+    {4, "Flourescent"},
+    {5, "Cloudy"},
+    {6, "SpeedLight"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator N2Converter[] = {
-    0, "None",
-    1, "Fisheye",
-    0,  NULL
+    {0, "None"},
+    {1, "Fisheye"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator OlyJpegQ[] = {
-    1, "SQ",
-    2, "HQ",
-    3, "SHQ",
-    0,  NULL
+    {1, "SQ"},
+    {2, "HQ"},
+    {3, "SHQ"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator OlyMacro[] = {
-    0, "Normal",
-    1, "Macro",
-    0,  NULL
+    {0, "Normal"},
+    {1, "Macro"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator OlySharp[] = {
-    0, "Normal",
-    1, "Hard",
-    2, "Soft",
-    0,  NULL
+    {0, "Normal"},
+    {1, "Hard"},
+    {2, "Soft"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator OlyFlash[] = {
-    0, "On",
-    1, "Red-eye",
-    2, "Fill",
-    2, "Off",
-    0,  NULL
+    {0, "On"},
+    {1, "Red-eye"},
+    {2, "Fill"},
+    {2, "Off"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanMacro[] = {
-    1, "Macro",
-    2, "Off",
-    0,  NULL
+    {1, "Macro"},
+    {2, "Off"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanFlashMode[] = {
-    0,  "Off",
-    1,  "Auto",
-    2,  "On",
-    3,  "Red-eye",
-    4,  "Slow",
-    5,  "Auto + red-eye",
-    6,  "On + red-eye",
-    16, "External",
-    0,  NULL
+    {0,  "Off"},
+    {1,  "Auto"},
+    {2,  "On"},
+    {3,  "Red-eye"},
+    {4,  "Slow"},
+    {5,  "Auto + red-eye"},
+    {6,  "On + red-eye"},
+    {16, "External"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanDrvMode[] = {
-    0,  "Single/self timer",
-    1,  "Continuous",
-    0,  NULL
+    {0,  "Single/self timer"},
+    {1,  "Continuous"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanFocusMode[] = {
-    0,  "One-shot",
-    1,  "AI servo",
-    2,  "AI Focus",
-    3,  "Manual",
-    4,  "Single",
-    5,  "Continuous",
-    6,  "Manual",
-    0,  NULL
+    {0,  "One-shot"},
+    {1,  "AI servo"},
+    {2,  "AI Focus"},
+    {3,  "Manual"},
+    {4,  "Single"},
+    {5,  "Continuous"},
+    {6,  "Manual"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanImgSize[] = {
-    0,  "Large",
-    1,  "Medium",
-    2,  "Small",
-    0,  NULL
+    {0,  "Large"},
+    {1,  "Medium"},
+    {2,  "Small"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanShootMode[] = {
-    0,  "Full auto",
-    1,  "Manual",
-    2,  "Landscape",
-    3,  "Fast shutter",
-    4,  "Slow shutter",
-    5,  "Night",
-    6,  "B & W",
-    7,  "Sepia",
-    8,  "Portrait",
-    9,  "Sports",
-    10, "Macro",
-    11, "Pan Focus",
-    0,  NULL
+    {0,  "Full auto"},
+    {1,  "Manual"},
+    {2,  "Landscape"},
+    {3,  "Fast shutter"},
+    {4,  "Slow shutter"},
+    {5,  "Night"},
+    {6,  "B & W"},
+    {7,  "Sepia"},
+    {8,  "Portrait"},
+    {9,  "Sports"},
+    {10, "Macro"},
+    {11, "Pan Focus"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanLNH[] = {
-    0xFFFF, "Low",
-    0,      "Normal",
-    1,      "High",
-    0,  NULL
+    {0xFFFF, "Low"},
+    {0,  "Normal"},
+    {1,  "High"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanIso[] = {
-    0,   "Not supplied use EXIF tag",
-    15,  "Auto",
-    16,  "50",
-    17,  "100",
-    18,  "200",
-    19,  "400",
-    0,  NULL
+    {0,   "Not supplied use EXIF tag"},
+    {15,  "Auto"},
+    {16,  "50"},
+    {17,  "100"},
+    {18,  "200"},
+    {19,  "400"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanMeter[] = {
-    3,  "Evaluative",
-    4,  "Partial",
-    5,  "Center-weighted",
-    0,  NULL
+    {3,  "Evaluative"},
+    {4,  "Partial"},
+    {5,  "Center-weighted"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanWhiteBal[] = {
-    0,  "Auto",
-    1,  "Sunny",
-    2,  "Cloudy",
-    3,  "Tungsten",
-    4,  "Flourescent",
-    5,  "Flash",
-    6,  "Custom",
-    0,  NULL
+    {0,  "Auto"},
+    {1,  "Sunny"},
+    {2,  "Cloudy"},
+    {3,  "Tungsten"},
+    {4,  "Flourescent"},
+    {5,  "Flash"},
+    {6,  "Custom"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanFlashBias[] = {
-    0xFFC0,  "-2 EV",
-    0xFFCC,  "-1.67 EV",
-    0xFFD0,  "-1.50 EV",
-    0xFFD4,  "-1.33 EV",
-    0xFFE0,  "-1 EV",
-    0xFFEC,  "-0.67 EV",
-    0xFFF0,  "-0.50 EV",
-    0xFFF4,  "-0.33 EV",
-    0x0000,  "0 EV",
-    0x000C,  "0.33 EV",
-    0x0010,  "0.50 EV",
-    0x0014,  "0.67 EV",
-    0x0020,  "1 EV",
-    0x002C,  "1.33 EV",
-    0x0030,  "1.50 EV",
-    0x0034,  "1.67 EV",
-    0x0040,  "2 EV",
-    0,  NULL
+    {0xFFC0,  "-2 EV"},
+    {0xFFCC,  "-1.67 EV"},
+    {0xFFD0,  "-1.50 EV"},
+    {0xFFD4,  "-1.33 EV"},
+    {0xFFE0,  "-1 EV"},
+    {0xFFEC,  "-0.67 EV"},
+    {0xFFF0,  "-0.50 EV"},
+    {0xFFF4,  "-0.33 EV"},
+    {0x0000,  "0 EV"},
+    {0x000C,  "0.33 EV"},
+    {0x0010,  "0.50 EV"},
+    {0x0014,  "0.67 EV"},
+    {0x0020,  "1 EV"},
+    {0x002C,  "1.33 EV"},
+    {0x0030,  "1.50 EV"},
+    {0x0034,  "1.67 EV"},
+    {0x0040,  "2 EV"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CanAFPoint[] = {
-    0x3000, "MF",
-    0x3001, "Auto selected",
-    0x3002, "Right",
-    0x3003, "Center",
-    0x3004, "Left",
-    0,  NULL
+    {0x3000, "MF"},
+    {0x3001, "Auto selected"},
+    {0x3002, "Right"},
+    {0x3003, "Center"},
+    {0x3004, "Left"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnLock[] = {
-    0,  "AF/AE Lock",
-    1,  "AE Lock/AF",
-    2,  "AF/AF Lock",
-    3,  "AE+release/AE+AF",
-    0,  NULL
+    {0,  "AF/AE Lock"},
+    {1,  "AE Lock/AF"},
+    {2,  "AF/AF Lock"},
+    {3,  "AE+release/AE+AF"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnTVAV[] = {
-    0,  "1/2 stop",
-    1,  "1/3 stop",
-    0,  NULL
+    {0,  "1/2 stop"},
+    {1,  "1/3 stop"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnAFAssist[] = {
-    0, "On (auto)",
-    1, "Off",
-    2, "External only",
-    0,  NULL
+    {0, "On (auto)"},
+    {1, "Off"},
+    {2, "External only"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnShutAv[] = {
-    0,  "Auto",
-    1,  "1/200(fixed)",
-    0,  NULL
+    {0,  "Auto"},
+    {1,  "1/200(fixed)"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnAeb[] = {
-    0,  "0,-,+/Enabled",
-    1,  "0,-,+/Disabled",
-    2,  "-,0,+/Enabled",
-    3,  "-,0,+/Disabled",
-    0,  NULL
+    {0,  "0,-,+/Enabled"},
+    {1,  "0,-,+/Disabled"},
+    {2,  "-,0,+/Enabled"},
+    {3,  "-,0,+/Disabled"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnShutSync[] = {
-    0,  "1st-curtain sync",
-    1,  "2nd-curtain sync",
-    0,  NULL
+    {0,  "1st-curtain sync"},
+    {1,  "2nd-curtain sync"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnAFStop[] = {
-    0,  "AF Stop",
-    1,  "Operate AF",
-    2,  "Lock AE & start timer",
-    0,  NULL
+    {0,  "AF Stop"},
+    {1,  "Operate AF"},
+    {2,  "Lock AE & start timer"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnMenu[] = {
-    0,  "Top",
-    1,  "Previous(volatile)",
-    2,  "Previous",
-    0,  NULL
+    {0,  "Top"},
+    {1,  "Previous(volatile)"},
+    {2,  "Previous"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CFnSet[] = {
-    0,  "Not assigned",
-    1,  "Change quality",
-    2,  "Change ISO",
-    3,  "Select Params",
-    0,  NULL
+    {0,  "Not assigned"},
+    {1,  "Change quality"},
+    {2,  "Change ISO"},
+    {3,  "Select Params"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiSharp[] = {
-    1, "Soft",
-    2, "Soft",
-    3, "Normal",
-    4, "Hard",
-    5, "Hard",
-    0,  NULL
+    {1, "Soft"},
+    {2, "Soft"},
+    {3, "Normal"},
+    {4, "Hard"},
+    {5, "Hard"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiWBal[] = {
-    0x0000,  "Auto",
-    0x0100,  "Daylight",
-    0x0200,  "Cloudy",
-    0x0300,  "DaylightColor-fluorescent",
-    0x0301,  "DaywhiteColor-fluorescent",
-    0x0302,  "White-fluorescent",
-    0x0400,  "Incandescent",
-    0x0F00,  "Custom",
-    0,       NULL
+    {0x0000,  "Auto"},
+    {0x0100,  "Daylight"},
+    {0x0200,  "Cloudy"},
+    {0x0300,  "DaylightColor-fluorescent"},
+    {0x0301,  "DaywhiteColor-fluorescent"},
+    {0x0302,  "White-fluorescent"},
+    {0x0400,  "Incandescent"},
+    {0x0F00,  "Custom"},
+    {0,       NULL}
 };
 
 _PLExifTranslator FujiColor[] = {
-    0x0000,  "Normal",
-    0x0100,  "High",
-    0x0200,  "Low",
-    0x0300,  "Black & White",
-    0,    NULL
+    {0x0000,  "Normal"},
+    {0x0100,  "High"},
+    {0x0200,  "Low"},
+    {0x0300,  "Black & White"},
+    {0,    NULL}
 };
 
 _PLExifTranslator FujiTone[] = {
-    0x0000,  "Normal",
-    0x0100,  "High",
-    0x0200,  "Low",
-    0,    NULL
+    {0x0000,  "Normal"},
+    {0x0100,  "High"},
+    {0x0200,  "Low"},
+    {0,    NULL}
+
 };
 
 _PLExifTranslator FujiFlashMode[] = {
-    0, "Auto",
-    1, "On",
-    2, "Off",
-    3, "Red-eye",
-    0,  NULL
+    {0, "Auto"},
+    {1, "On"},
+    {2, "Off"},
+    {3, "Red-eye"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiFlashStrg[] = {
-    0, "Auto",
-    1, "On",
-    2, "Off",
-    3, "Red-eye",
-    0,  NULL
+    {0, "Auto"},
+    {1, "On"},
+    {2, "Off"},
+    {3, "Red-eye"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiMacro[] = {
-    0, "Off",
-    1, "Macro",
-    2, "Super Macro",
-    0,  NULL
+    {0, "Off"},
+    {1, "Macro"},
+    {2, "Super Macro"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiFocus[] = {
-    0, "Auto",
-    1, "Manual",
-    0,  NULL
+    {0, "Auto"},
+    {1, "Manual"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiPicture[] = {
-    0x0000,   "Auto",
-    0x0001,   "Portrait",
-    0x0002,   "Landscape",
-    0x0004,   "Sports",
-    0x0005,   "Night",
-    0x0006,   "Program AE",
-    0x0100,   "Aperture Prior AE",
-    0x0200,   "Shutter Prior AE",
-    0x0300,   "Manual exposure",
-    0,  NULL
+    {0x0000,   "Auto"},
+    {0x0001,   "Portrait"},
+    {0x0002,   "Landscape"},
+    {0x0004,   "Sports"},
+    {0x0005,   "Night"},
+    {0x0006,   "Program AE"},
+    {0x0100,   "Aperture Prior AE"},
+    {0x0200,   "Shutter Prior AE"},
+    {0x0300,   "Manual exposure"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiBlurFocus[] = {
-    0, "OK",
-    1, "Warning",
-    0,  NULL
+    {0, "OK"},
+    {1, "Warning"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator FujiAE[] = {
-    0, "OK",
-    1, "Over-exposed",
-    0,  NULL
+    {0, "OK"},
+    {1, "Over-exposed"},
+    {0,  NULL}
+
 };
 
 
 _PLExifTranslator CasioRecord[] = {
-    1,   "Single Shutter",
-    2,   "Panorama",
-    3,   "Night Scene",
-    4,   "Portrait",
-    5,   "Landscape",
-    7,   "Panorama",
-    10,  "Night Scene",
-    15,  "Portrait",
-    16,  "Landscape",
-    0,  NULL
+    {1,   "Single Shutter"},
+    {2,   "Panorama"},
+    {3,   "Night Scene"},
+    {4,   "Portrait"},
+    {5,   "Landscape"},
+    {7,   "Panorama"},
+    {10,  "Night Scene"},
+    {15,  "Portrait"},
+    {16,  "Landscape"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioQuality[] = {
-    1,   "Economy",
-    2,   "Normal",
-    3,   "Fine",
-    0,  NULL
+    {1,   "Economy"},
+    {2,   "Normal"},
+    {3,   "Fine"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioFocus[] = {
-    2,   "Macro",
-    3,   "Auto Focus",
-    4,   "Manual Focus",
-    5,   "Infinity",
-    0,  NULL
+    {2,   "Macro"},
+    {3,   "Auto Focus"},
+    {4,   "Manual Focus"},
+    {5,   "Infinity"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioFlashMode[] = {
-    1,   "Auto",
-    2,   "On",
-    3,   "Off",
-    4,   "Off",   // on QV2000 this is Red Eye Reduction must be fixed as a special case :(
-    5,   "Red Eye Reduction",
-    0,  NULL
+    {1,   "Auto"},
+    {2,   "On"},
+    {3,   "Off"},
+    {4,   "Off"},   // on QV2000 this is Red Eye Reduction must be fixed as a special case :(
+    {5,   "Red Eye Reduction"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioFlashInt[] = {
-    11,   "Weak",
-    13,   "Normal",
-    14,   "High",
-    15,   "Strong",
-    0,  NULL
+    {11,   "Weak"},
+    {13,   "Normal"},
+    {14,   "High"},
+    {15,   "Strong"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioWhite[] = {
-    1,   "Auto",
-    2,   "Tungsten",
-    3,   "Daylight",
-    4,   "Fluorescent",
-    5,   "Shade",
-    9,   "Manual",
-    0,  NULL
+    {1,   "Auto"},
+    {2,   "Tungsten"},
+    {3,   "Daylight"},
+    {4,   "Fluorescent"},
+    {5,   "Shade"},
+    {9,   "Manual"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioZoom[] = {
-    0x10000,   "Off",
-    0x10001,   "2X",    // QV2000
-    0x20000,   "2X",    // QV8000
-    0x40000,   "4X",    // QV8000
-    0,  NULL
+    {0x10000,   "Off"},
+    {0x10001,   "2X"},    // QV2000
+    {0x20000,   "2X"},    // QV8000
+    {0x40000,   "4X"},    // QV8000
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioSharp[] = {
-    0,   "Normal",
-    1,   "Soft",
-    2,   "Hard",
-    0,  NULL
+    {0,   "Normal"},
+    {1,   "Soft"},
+    {2,   "Hard"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioLowHi[] = {
-    0,   "Normal",
-    1,   "Low",
-    2,   "High",
-    0,  NULL
+    {0,   "Normal"},
+    {1,   "Low"},
+    {2,   "High"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioSens[] = {
-    64,   "Normal",   // QV3k
-    80,   "Normal",   // QV8k/2k
-    100,  "High",     // 8k/2k
-    125,  "+1.0",     // 3k
-    250,  "+2.0",     // 3k
-    244,  "+3.0",     // 3k
-    9,   "Manual",
-    0,  NULL
+    {64,   "Normal"},   // QV3k
+    {80,   "Normal"},   // QV8k/2k
+    {100,  "High"},     // 8k/2k
+    {125,  "+1.0"},     // 3k
+    {250,  "+2.0"},     // 3k
+    {244,  "+3.0"},     // 3k
+    {9,   "Manual"},
+    {0,  NULL}
 };
 
 
 _PLExifTranslator CasioEnhance[] = {
-    1,  "Off",
-    2,  "Red",
-    3,  "Green",
-    4,  "Blue",
-    5,  "Flesh Tones",
-    0,  NULL
+    {1,  "Off"},
+    {2,  "Red"},
+    {3,  "Green"},
+    {4,  "Blue"},
+    {5,  "Flesh Tones"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioFFrmLoc[] = {
-    1,  "Centre",
-    2,  "Scene S1",
-    3,  "Scene S2",
-    4,  "Scene S3",
-    5,  "Scene S4",
-    6,  "Scene S5",
-    7,  "Scene S8",
-    8,  "Scene S6",
-    9,  "Scene S7",
-    10, "Top Left",
-    11, "Top Middle",
-    12, "Top Right",
-    13, "Middle Left",
-    14, "Middle Right",
-    15, "Bottom Left",
-    16, "Bottom Middle",
-    17, "Bottom Right",
-    0,  NULL
+    {1,  "Centre"},
+    {2,  "Scene S1"},
+    {3,  "Scene S2"},
+    {4,  "Scene S3"},
+    {5,  "Scene S4"},
+    {6,  "Scene S5"},
+    {7,  "Scene S8"},
+    {8,  "Scene S6"},
+    {9,  "Scene S7"},
+    {10, "Top Left"},
+    {11, "Top Middle"},
+    {12, "Top Right"},
+    {13, "Middle Left"},
+    {14, "Middle Right"},
+    {15, "Bottom Left"},
+    {16, "Bottom Middle"},
+    {17, "Bottom Right"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioFilter[] = {
-    1,  "Off",
-    2,  "Black & White",
-    3,  "Sepia",
-    4,  "Red",
-    5,  "Green",
-    6,  "Blue",
-    7,  "Yellow",
-    8,  "Pink",
-    9,  "Purple",
-    0,  NULL
+    {1,  "Off"},
+    {2,  "Black & White"},
+    {3,  "Sepia"},
+    {4,  "Red"},
+    {5,  "Green"},
+    {6,  "Blue"},
+    {7,  "Yellow"},
+    {8,  "Pink"},
+    {9,  "Purple"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioMeter[] = {
-    2,   "Centre",
-    3,   "Spot",
-    5,   "Multi",
-    0,  NULL
+    {2,   "Centre"},
+    {3,   "Spot"},
+    {5,   "Multi"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioEVShift[] = {
-    -6,  "-2.0 EV",
-    -5,  "-1.67 EV",
-    -4,  "-1.33 EV",
-    -3,  "-1.0 EV",
-    -2,  "-0.67 EV",
-    -1,  "-0.33 EV",
-    0,   "0 EV",
-    1,   "+0.33 EV",
-    2,   "+0.67 EV",
-    3,   "+1.0 EV",
-    4,   "+1.33 EV",
-    5,   "+1.67 EV",
-    6,   "+2.0 EV",
-    0,  NULL
+    {-6,  "-2.0 EV"},
+    {-5,  "-1.67 EV"},
+    {-4,  "-1.33 EV"},
+    {-3,  "-1.0 EV"},
+    {-2,  "-0.67 EV"},
+    {-1,  "-0.33 EV"},
+    {0,   "0 EV"},
+    {1,   "+0.33 EV"},
+    {2,   "+0.67 EV"},
+    {3,   "+1.0 EV"},
+    {4,   "+1.33 EV"},
+    {5,   "+1.67 EV"},
+    {6,   "+2.0 EV"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioAperture[] = {
-    1,   "f2.0",
-    2,   "f2.3",
-    3,   "f2.8",
-    4,   "f4.0",
-    5,   "f5.6",
-    6,   "f8.0",
-    15,  "f8.0",
-    0,  NULL
+    {1,   "f2.0"},
+    {2,   "f2.3"},
+    {3,   "f2.8"},
+    {4,   "f4.0"},
+    {5,   "f5.6"},
+    {6,   "f8.0"},
+    {15,  "f8.0"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioRecord2[] = {
-    0,   "Normal",
-    1,   "Portrait",
-    2,   "Landscape",
-    3,   "Night Scene",
-    4,   "Slow Shutter",
-    0,  NULL
+    {0,   "Normal"},
+    {1,   "Portrait"},
+    {2,   "Landscape"},
+    {3,   "Night Scene"},
+    {4,   "Slow Shutter"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioComp[] = {
-    1,  "Off",
-    2,  "Scene S1",
-    3,  "Scene S2",
-    4,  "Scene S3",
-    5,  "Scene S4",
-    6,  "Scene S5",
-    7,  "Scene S8",
-    8,  "Scene S6",
-    9,  "Scene S7",
-    0,  NULL
+    {1,  "Off"},
+    {2,  "Scene S1"},
+    {3,  "Scene S2"},
+    {4,  "Scene S3"},
+    {5,  "Scene S4"},
+    {6,  "Scene S5"},
+    {7,  "Scene S8"},
+    {8,  "Scene S6"},
+    {9,  "Scene S7"},
+    {0,  NULL}
+
 };
 
 _PLExifTranslator CasioExp[] = {
-    1,  "Manual",
-    2,  "Program AE",
-    3,  "Aperture Priority",
-    4,  "Shutter Priority",
-    0,  NULL
+    {1,  "Manual"},
+    {2,  "Program AE"},
+    {3,  "Aperture Priority"},
+    {4,  "Shutter Priority"},
+    {0,  NULL}
+
 };
 
 
@@ -798,243 +871,254 @@ struct PLExifNoCompException : public PLExifException
 // to the private conversion functions declared in PLExifTag
 
 _PLExifTagValues   PLExifTag::MainTags[] = {          // Prefix Main
-    0x010E, "Desc",         NULL,       NULL,     "Image Description",
-    0x010F, "Make",         NULL,       NULL,     "Camera Make",
-    0x0110, "Model",        NULL,       NULL,     "Camera Model",
-    0x0112, "Ori",          NULL,       NULL,     "Orientation",
-    0x011A, "XRes",         NULL,       NULL,     "X Resolution",
-    0x011B, "YRes",         NULL,       NULL,     "Y Resolution",
-    0x0128, "ResUnit",      ResUnit,    NULL,     "Resolution Unit",
-    0x0131, "Software",     NULL,       NULL,     "Camera Software",
-    0x0132, "ModTime",      NULL,       NULL,     "Last Modification",
-    0x013E, "WPoint",       NULL,       NULL,     "White Point",
-    0x013F, "PrimChr",      NULL,       NULL,     "Primary Chromaticities",
-    0x0211, "YCbCrCoef",    NULL,       NULL,     "YCbCrCoefficients",
-    0x0213, "YCbCrPos",     NULL,       NULL,     "YCbCrPositioning",
-    0x0214, "RefBW",        NULL,       NULL,     "Reference Black/White point",
-    0x8298, "Copy",         NULL,       NULL,     "Copyright",
-    0x8769, "ExifOffset",   NULL,       NULL,     "Sub IFD Offset",
-    0, NULL, NULL, NULL, NULL
+    {0x010E, "Desc",         NULL,       NULL,     "Image Description"},
+    {0x010F, "Make",         NULL,       NULL,     "Camera Make"},
+    {0x0110, "Model",        NULL,       NULL,     "Camera Model"},
+    {0x0112, "Ori",          NULL,       NULL,     "Orientation"},
+    {0x011A, "XRes",         NULL,       NULL,     "X Resolution"},
+    {0x011B, "YRes",         NULL,       NULL,     "Y Resolution"},
+    {0x0128, "ResUnit",      ResUnit,    NULL,     "Resolution Unit"},
+    {0x0131, "Software",     NULL,       NULL,     "Camera Software"},
+    {0x0132, "ModTime",      NULL,       NULL,     "Last Modification"},
+    {0x013E, "WPoint",       NULL,       NULL,     "White Point"},
+    {0x013F, "PrimChr",      NULL,       NULL,     "Primary Chromaticities"},
+    {0x0211, "YCbCrCoef",    NULL,       NULL,     "YCbCrCoefficients"},
+    {0x0213, "YCbCrPos",     NULL,       NULL,     "YCbCrPositioning"},
+    {0x0214, "RefBW",        NULL,       NULL,     "Reference Black/White point"},
+    {0x8298, "Copy",         NULL,       NULL,     "Copyright"},
+    {0x8769, "ExifOffset",   NULL,       NULL,     "Sub IFD Offset"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 
 _PLExifTagValues   PLExifTag::SubTags[] = {        // Prefix Sub
-    0x829A, "Shutter",      UnitsSec,   &PLExifTag::CnvFrac,    "Exposure Time",
-    0x829D, "FStop",        NULL,       &PLExifTag::CnvRatAp,   "F-Stop",
-    0x8822, "Prog",         ExpProg,    NULL,                   "Program",
-    0x8827, "Iso",          NULL,       NULL,                   "Equivalent ISO speed",
-    0x9000, "ExifVer",      NULL,       NULL,                   "Exif Version",
-    0x9003, "OrigTime",     NULL,       NULL,                   "Original Time",
-    0x9004, "DigTime",      NULL,       NULL,                   "Digitized Time",
-    0x9101, "CompConfig",   NULL,       &PLExifTag::CnvCompCfg, "Components Configuration",
-    0x9102, "Bpp",          BpsCompress,NULL,                   "Average compression ratio",
-    0x9201, "Shuttera",     NULL,       &PLExifTag::CnvApexShutter, "Shutter Speed",
-    0x9202, "Aperturea",    NULL,       &PLExifTag::CnvApexAp,   "Aperture",
-    0x9203, "Brighta",      NULL,       &PLExifTag::CnvRat,      "Brightness APEX",
-    0x9204, "Expbiasa",     NULL,       &PLExifTag::CnvRat,      "Exposure Bias APEX",
-    0x9205, "Maxapa",       NULL,       &PLExifTag::CnvApexAp,   "Maximum Aperture APEX",
-    0x9206, "Dist",         UnitsM,     &PLExifTag::CnvRat,      "Subject Distance",
-    0x9207, "Meter",        MeterMode,  NULL,                    "Metering Mode",
-    0x9208, "Lights",       LightSource,NULL,                    "Light Source",
-    0x9209, "Flash",        FlashUsed,  NULL,                    "Flash Used",
-    0x920a, "Focal",        UnitsMM,    &PLExifTag::CnvRat,      "Focal Length",
-    0x927c, "Maker",        NULL,       NULL,                    "Maker Note",
-    0x9286, "User",         NULL,       NULL,                    "User Comment",
-    0x9290, "STime",        NULL,       NULL,                    "Subsecond Time",
-    0x9291, "SOrigTime",    NULL,       NULL,                    "Subsecond Original Time",
-    0x9292, "SDigTime",     NULL,       NULL,                    "Subsecond Digitized Time",
-    0xA000, "Flashpix",     NULL,       NULL,                    "Flash Pix Version",
-    0xA001, "ColorSpace",   ColorSpace, NULL,                    "Color Space",
-    0xA002, "Width",        NULL,       NULL,                    "Image Width",
-    0xA003, "Height",       NULL,       NULL,                    "Image Height",
-    0xA004, "SndFile",      NULL,       NULL,                    "Sound File",
-    0xA005, "ExifIntOff",   NULL,       NULL,                    "Exif Interoperability Offset",
-    0xA20E, "FPXRes",       NULL,       &PLExifTag::CnvRat,      "Focal Plane X Resolution",
-    0xA20F, "FPYRes",       NULL,       &PLExifTag::CnvRat,      "Focal Plane Y Resolution",
-    0xA210, "FPResUnit",    FPResUnit,  NULL,                    "Focal Plane Unit",
-    0xA215, "ExpIndex",     NULL,       &PLExifTag::CnvRat,      "Exposure Index",
-    0xA217, "SenseMethod",  SenseMethod,NULL,                    "Sensing Method",
-    0xA300, "FileSource",   FileSource, NULL,                    "File Source",
-    0xA301, "SceneType",    SceneType,  NULL,                    "Scene Type",
-    0xA302, "CFAPat",       NULL,       NULL,                    "CFA Pattern",
-    0, NULL, NULL, NULL, NULL
+    {0x829A, "Shutter",      UnitsSec,   &PLExifTag::CnvFrac,    "Exposure Time"},
+    {0x829D, "FStop",        NULL,       &PLExifTag::CnvRatAp,   "F-Stop"},
+    {0x8822, "Prog",         ExpProg,    NULL,                   "Program"},
+    {0x8827, "Iso",          NULL,       NULL,                   "Equivalent ISO speed"},
+    {0x9000, "ExifVer",      NULL,       NULL,                   "Exif Version"},
+    {0x9003, "OrigTime",     NULL,       NULL,                   "Original Time"},
+    {0x9004, "DigTime",      NULL,       NULL,                   "Digitized Time"},
+    {0x9101, "CompConfig",   NULL,       &PLExifTag::CnvCompCfg, "Components Configuration"},
+    {0x9102, "Bpp",          BpsCompress,NULL,                   "Average compression ratio"},
+    {0x9201, "Shuttera",     NULL,       &PLExifTag::CnvApexShutter, "Shutter Speed"},
+    {0x9202, "Aperturea",    NULL,       &PLExifTag::CnvApexAp,   "Aperture"},
+    {0x9203, "Brighta",      NULL,       &PLExifTag::CnvRat,      "Brightness APEX"},
+    {0x9204, "Expbiasa",     NULL,       &PLExifTag::CnvRat,      "Exposure Bias APEX"},
+    {0x9205, "Maxapa",       NULL,       &PLExifTag::CnvApexAp,   "Maximum Aperture APEX"},
+    {0x9206, "Dist",         UnitsM,     &PLExifTag::CnvRat,      "Subject Distance"},
+    {0x9207, "Meter",        MeterMode,  NULL,                    "Metering Mode"},
+    {0x9208, "Lights",       LightSource,NULL,                    "Light Source"},
+    {0x9209, "Flash",        FlashUsed,  NULL,                    "Flash Used"},
+    {0x920a, "Focal",        UnitsMM,    &PLExifTag::CnvRat,      "Focal Length"},
+    {0x927c, "Maker",        NULL,       NULL,                    "Maker Note"},
+    {0x9286, "User",         NULL,       NULL,                    "User Comment"},
+    {0x9290, "STime",        NULL,       NULL,                    "Subsecond Time"},
+    {0x9291, "SOrigTime",    NULL,       NULL,                    "Subsecond Original Time"},
+    {0x9292, "SDigTime",     NULL,       NULL,                    "Subsecond Digitized Time"},
+    {0xA000, "Flashpix",     NULL,       NULL,                    "Flash Pix Version"},
+    {0xA001, "ColorSpace",   ColorSpace, NULL,                    "Color Space"},
+    {0xA002, "Width",        NULL,       NULL,                    "Image Width"},
+    {0xA003, "Height",       NULL,       NULL,                    "Image Height"},
+    {0xA004, "SndFile",      NULL,       NULL,                    "Sound File"},
+    {0xA005, "ExifIntOff",   NULL,       NULL,                    "Exif Interoperability Offset"},
+    {0xA20E, "FPXRes",       NULL,       &PLExifTag::CnvRat,      "Focal Plane X Resolution"},
+    {0xA20F, "FPYRes",       NULL,       &PLExifTag::CnvRat,      "Focal Plane Y Resolution"},
+    {0xA210, "FPResUnit",    FPResUnit,  NULL,                    "Focal Plane Unit"},
+    {0xA215, "ExpIndex",     NULL,       &PLExifTag::CnvRat,      "Exposure Index"},
+    {0xA217, "SenseMethod",  SenseMethod,NULL,                    "Sensing Method"},
+    {0xA300, "FileSource",   FileSource, NULL,                    "File Source"},
+    {0xA301, "SceneType",    SceneType,  NULL,                    "Scene Type"},
+    {0xA302, "CFAPat",       NULL,       NULL,                    "CFA Pattern"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::NikonTags[] = {         // Prefix is Nikon
-    0x0002, "ISO",          NULL,       NULL,               "Nikon ISO Setting",
-    0x0003, "Color",        LowerStr,   NULL,               "Nikon Color Mode",
-    0x0004, "Quality",      LowerStr,   NULL,               "Nikon Quality",
-    0x0005, "WhiteBal",     LowerStr,   NULL,               "Nikon White Balance",
-    0x0006, "Sharp",        LowerStr,   NULL,               "Nikon Image Sharpening",
-    0x0007, "Focus",        LowerStr,   NULL,               "Nikon Focus Mode",
-    0x0008, "Flash",        LowerStr,   NULL,               "Nikon Flash",
-    0x0009, "FlashMode",    LowerStr,   NULL,               "Nikon Flash Mode",
-    0x000F, "ISOSel",       LowerStr,   NULL,               "Nikon ISO Selection",
-    0x0080, "ImgAdjust",    LowerStr,   NULL,               "Nikon Image Adjustment",
-    0x0082, "Adapter",      LowerStr,   NULL,               "Nikon Adapter Setting",
-    0x0084, "Lens",         LowerStr,   NULL,               "Nikon Lens",
-    0x0085, "ManFocus",     UnitsM,     &PLExifTag::CnvRat, "Nikon Manual Focus Distance",
-    0x0086, "DigZoom",      UnitsX,     &PLExifTag::CnvRat, "Nikon Digital Zoom",
-    0x0088, "AFPos",        NULL,       NULL,               "Nikon Auto Focus Position",
-    //0x0090, "FlashType?",   LowerStr,   "Nikon Flash Type",
-    0, NULL, NULL, NULL, NULL
+    {0x0002, "ISO",          NULL,       NULL,               "Nikon ISO Setting"},
+    {0x0003, "Color",        LowerStr,   NULL,               "Nikon Color Mode"},
+    {0x0004, "Quality",      LowerStr,   NULL,               "Nikon Quality"},
+    {0x0005, "WhiteBal",     LowerStr,   NULL,               "Nikon White Balance"},
+    {0x0006, "Sharp",        LowerStr,   NULL,               "Nikon Image Sharpening"},
+    {0x0007, "Focus",        LowerStr,   NULL,               "Nikon Focus Mode"},
+    {0x0008, "Flash",        LowerStr,   NULL,               "Nikon Flash"},
+    {0x0009, "FlashMode",    LowerStr,   NULL,               "Nikon Flash Mode"},
+    {0x000F, "ISOSel",       LowerStr,   NULL,               "Nikon ISO Selection"},
+    {0x0080, "ImgAdjust",    LowerStr,   NULL,               "Nikon Image Adjustment"},
+    {0x0082, "Adapter",      LowerStr,   NULL,               "Nikon Adapter Setting"},
+    {0x0084, "Lens",         LowerStr,   NULL,               "Nikon Lens"},
+    {0x0085, "ManFocus",     UnitsM,     &PLExifTag::CnvRat, "Nikon Manual Focus Distance"},
+    {0x0086, "DigZoom",      UnitsX,     &PLExifTag::CnvRat, "Nikon Digital Zoom"},
+    {0x0088, "AFPos",        NULL,       NULL,               "Nikon Auto Focus Position"},
+    //0x0090, "FlashType?",   LowerStr,   "Nikon Flash Type"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::Nikon2Tags[] = {        // Prefix is Nikon2
-    0x0002, "Unknown0002",  NULL,       NULL,               "Nikon Unknown (0002)",
-    0x0003, "Quality",      N2Quality,  NULL,               "Nikon Quality",
-    0x0004, "Color",        N2Color,    NULL,               "Nikon Color Mode",
-    0x0005, "ImgAdjust",    N2ImgAdjust,NULL,               "Nikon Image Adjustment",
-    0x0006, "CCDSens" ,     N2Iso,      NULL,               "Nikon ISO Setting",
-    0x0007, "WhiteBal",     N2WhiteBal, NULL,               "Nikon White Balance",
-    0x0008, "Focus",        NULL,       &PLExifTag::CnvRat, "Nikon Focus",
-    0x0009, "Unknown0009",  NULL,       NULL,               "Nikon Unknown (0009)",
-    0x000A, "DigZoom",      UnitsX,     &PLExifTag::CnvRat, "Nikon Digital Zoom",
-    0x000B, "Converter",    N2Converter,NULL,               "Nikon Converter",
-    0x0F00, "Unknown0F00",  NULL,       NULL,               "Nikon Unknown (0F00)",
-    0, NULL, NULL, NULL, NULL
+    {0x0002, "Unknown0002",  NULL,       NULL,               "Nikon Unknown (0002)"},
+    {0x0003, "Quality",      N2Quality,  NULL,               "Nikon Quality"},
+    {0x0004, "Color",        N2Color,    NULL,               "Nikon Color Mode"},
+    {0x0005, "ImgAdjust",    N2ImgAdjust,NULL,               "Nikon Image Adjustment"},
+    {0x0006, "CCDSens" ,     N2Iso,      NULL,               "Nikon ISO Setting"},
+    {0x0007, "WhiteBal",     N2WhiteBal, NULL,               "Nikon White Balance"},
+    {0x0008, "Focus",        NULL,       &PLExifTag::CnvRat, "Nikon Focus"},
+    {0x0009, "Unknown0009",  NULL,       NULL,               "Nikon Unknown (0009)"},
+    {0x000A, "DigZoom",      UnitsX,     &PLExifTag::CnvRat, "Nikon Digital Zoom"},
+    {0x000B, "Converter",    N2Converter,NULL,               "Nikon Converter"},
+    {0x0F00, "Unknown0F00",  NULL,       NULL,               "Nikon Unknown (0F00)"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 
 _PLExifTagValues   PLExifTag::OlympusTags[] = {       // Prefix is Oly
-    0x0200, "SpcMode",      NULL,       NULL,     "Olympus Special Mode",
-    0x0201, "Quality",      OlyJpegQ,   NULL,     "Olympus JPG Quality",
-    0x0202, "Macro",        OlyMacro,   NULL,     "Olympus Macro",
-    0x0204, "DigZoom",      UnitsX,     &PLExifTag::CnvRat,   "Olympus Digital Zoom",
-    0x0207, "Software",     NULL,       NULL,     "Olympus Software",
-    0x0209, "CameraID",     NULL,       NULL,     "Olympus Camera ID",
+    {0x0200, "SpcMode",      NULL,       NULL,     "Olympus Special Mode"},
+    {0x0201, "Quality",      OlyJpegQ,   NULL,     "Olympus JPG Quality"},
+    {0x0202, "Macro",        OlyMacro,   NULL,     "Olympus Macro"},
+    {0x0204, "DigZoom",      UnitsX,     &PLExifTag::CnvRat,   "Olympus Digital Zoom"},
+    {0x0207, "Software",     NULL,       NULL,     "Olympus Software"},
+    {0x0209, "CameraID",     NULL,       NULL,     "Olympus Camera ID"},
 
     // E-10 fields (from dougho@niceties.com)
-    0x1004, "Flash",        OlyFlash,   NULL,     "Olympus Flash Mode",
-    0x100F, "Sharp",        OlySharp,   NULL,     "Olympus Sharpness Mode",
-    0x102a, "SharpScale",   NULL,       NULL,     "Olympus Sharpness",
+    {0x1004, "Flash",        OlyFlash,   NULL,     "Olympus Flash Mode"},
+    {0x100F, "Sharp",        OlySharp,   NULL,     "Olympus Sharpness Mode"},
+    {0x102a, "SharpScale",   NULL,       NULL,     "Olympus Sharpness"},
 
-    0, NULL, NULL, NULL, NULL
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::CanonTags[] = {         // Prefix is Canon
-    0x0001, "CnSet1",       NULL,       NULL,                 "Canon Settings 1",
-    0x0004, "CnSet2",       NULL,       NULL,                 "Canon Settings 2",
-    0x0006, "ImageType",    NULL,       NULL,                 "Canon Image Type",
-    0x0007, "Software",     NULL,       NULL,                 "Canon Firmware Version",
-    0x0008, "ImageNo",      NULL,       &PLExifTag::CnvCanINo,"Canon Image Number",
-    0x0009, "Owner",        NULL,       NULL,                 "Canon Owner Name",
-    0x000C, "SerialNo",     NULL,       &PLExifTag::CnvCanSNo,"Canon Serial Number",
-    0x000F, "CustomFnc",    NULL,       NULL,                 "Canon Custom Functions",
-    0, NULL, NULL, NULL, NULL
+    {0x0001, "CnSet1",       NULL,       NULL,                 "Canon Settings 1"},
+    {0x0004, "CnSet2",       NULL,       NULL,                 "Canon Settings 2"},
+    {0x0006, "ImageType",    NULL,       NULL,                 "Canon Image Type"},
+    {0x0007, "Software",     NULL,       NULL,                 "Canon Firmware Version"},
+    {0x0008, "ImageNo",      NULL,       &PLExifTag::CnvCanINo,"Canon Image Number"},
+    {0x0009, "Owner",        NULL,       NULL,                 "Canon Owner Name"},
+    {0x000C, "SerialNo",     NULL,       &PLExifTag::CnvCanSNo,"Canon Serial Number"},
+    {0x000F, "CustomFnc",    NULL,       NULL,                 "Canon Custom Functions"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 
 _PLExifTagValues   PLExifTag::CanonSet1[] = {
-    1,      "Macro",        CanMacro,       NULL,                    "Canon Macro Mode",
-    4,      "Flash",        CanFlashMode,   NULL,                    "Canon Flash Mode",
-    5,      "Drive",        CanDrvMode,     NULL,                    "Canon Drive Mode",
-    7,      "Focus",        CanFocusMode,   NULL,                    "Canon Focus Mode",
-    10,     "ImgSize",      CanImgSize,     NULL,                    "Canon Image Size",
-    11,     "Shoot",        CanShootMode,   NULL,                    "Canon Easy Shooting Mode",
-    13,     "Contrast",     CanLNH,         NULL,                    "Canon Contrast Setting",
-    14,     "Saturation",   CanLNH,         NULL,                    "Canon Saturation Setting",
-    15,     "Sharpness",    CanLNH,         NULL,                    "Canon Sharpness Setting",
-    16,     "ISO",          CanIso,         NULL,                    "Canon ISO",
-    17,     "Metering",     CanMeter,       NULL,                    "Canon Metering mode",
-    19,     "AFPoint",      CanAFPoint,     NULL,                    "Canon AutoFocus Point",
-    20,     "ExpMode",      NULL,           NULL,                    "Canon Exposure Mode",
-    23,     "LongFocal",    NULL,           NULL,                    "Canon Long Focal Length",
-    24,     "ShortFocal",   NULL,           NULL,                    "Canon Short Focal Length",
-    25,     "FocalUnits",   NULL,           NULL,                    "Canon Focal Units per mm",
-    29,     "FlashDet",     NULL,           &PLExifTag::CnvCanFlash, "Canon Flash Details",
-    32,     "FocusMode",    NULL,           NULL,                    "Canon Focus Mode",
-    0, NULL, NULL, NULL, NULL
+    {1,      "Macro",        CanMacro,       NULL,                    "Canon Macro Mode"},
+    {4,      "Flash",        CanFlashMode,   NULL,                    "Canon Flash Mode"},
+    {5,      "Drive",        CanDrvMode,     NULL,                    "Canon Drive Mode"},
+    {7,      "Focus",        CanFocusMode,   NULL,                    "Canon Focus Mode"},
+    {10,     "ImgSize",      CanImgSize,     NULL,                    "Canon Image Size"},
+    {11,     "Shoot",        CanShootMode,   NULL,                    "Canon Easy Shooting Mode"},
+    {13,     "Contrast",     CanLNH,         NULL,                    "Canon Contrast Setting"},
+    {14,     "Saturation",   CanLNH,         NULL,                    "Canon Saturation Setting"},
+    {15,     "Sharpness",    CanLNH,         NULL,                    "Canon Sharpness Setting"},
+    {16,     "ISO",          CanIso,         NULL,                    "Canon ISO"},
+    {17,     "Metering",     CanMeter,       NULL,                    "Canon Metering mode"},
+    {19,     "AFPoint",      CanAFPoint,     NULL,                    "Canon AutoFocus Point"},
+    {20,     "ExpMode",      NULL,           NULL,                    "Canon Exposure Mode"},
+    {23,     "LongFocal",    NULL,           NULL,                    "Canon Long Focal Length"},
+    {24,     "ShortFocal",   NULL,           NULL,                    "Canon Short Focal Length"},
+    {25,     "FocalUnits",   NULL,           NULL,                    "Canon Focal Units per mm"},
+    {29,     "FlashDet",     NULL,           &PLExifTag::CnvCanFlash, "Canon Flash Details"},
+    {32,     "FocusMode",    NULL,           NULL,                    "Canon Focus Mode"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::CanonSet2[] = {
-    7,      "WhiteBal",     CanWhiteBal,    NULL,                    "Canon White Balance",
-    9,      "SeqNo",        NULL,           NULL,                    "Canon Continuous Frame",
-    14,     "AF Point",     NULL,           &PLExifTag::CnvCanAFPnt, "Canon Focus Point",
-    15,     "FlashBias",    CanFlashBias,   NULL,                    "Canon Flash Bias",
-    19,     "SubjectDist",  NULL,           NULL,                    "Canon Subject Distance (0.01m or 0.001m)",
-    0, NULL, NULL, NULL, NULL
+    {7,      "WhiteBal",     CanWhiteBal,    NULL,                    "Canon White Balance"},
+    {9,      "SeqNo",        NULL,           NULL,                    "Canon Continuous Frame"},
+    {14,     "AF Point",     NULL,           &PLExifTag::CnvCanAFPnt, "Canon Focus Point"},
+    {15,     "FlashBias",    CanFlashBias,   NULL,                    "Canon Flash Bias"},
+    {19,     "SubjectDist",  NULL,           NULL,                    "Canon Subject Distance (0.01m or 0.001m)"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::CanonCFn[] = {
-    0x01,     "NoiseRed",     OffOn,          NULL,     "Canon CFn 01 Long exp noise reduction",
-    0x02,     "Lock",         CFnLock,        NULL,     "Canon CFn 02 Shutter/AE lock buttons",
-    0x03,     "MirrorLock",   DisableEnable,  NULL,     "Canon CFn 03 Mirror lockup   ",
-    0x04,     "TVAVexp",      CFnTVAV,        NULL,     "Canon CFn 04 Tv/Av & exposure level",
-    0x05,     "AFassist",     CFnAFAssist,    NULL,     "Canon CFn 05 AF-assist light",
-    0x06,     "ShuttAv",      CFnShutAv,      NULL,     "Canon CFn 06 Shutter speed in Av mode",
-    0x07,     "AEBSeq",       CFnAeb,         NULL,     "Canon CFn 07 AEB Sequence/auto cancel",
-    0x08,     "ShuttSync",    CFnShutSync,    NULL,     "Canon CFn 08 Shutter curtain sync",
-    0x09,     "AFStop",       CFnAFStop,      NULL,     "Canon CFn 09 Lens AF stop button switch",
-    0x0A,     "FillReduce",   EnableDisable,  NULL,     "Canon CFn 10 Fill flash auto reduction",
-    0x0B,     "MenuButt",     CFnMenu,        NULL,     "Canon CFn 11 Menu button return pos",
-    0x0C,     "SetButt",      CFnSet,         NULL,     "Canon CFn 12 SET button when shooting",
-    0x0D,     "SensClean",    DisableEnable,  NULL,     "Canon CFn 13 Sensor cleaning   ",
-    0, NULL, NULL, NULL, NULL
+    {0x01,     "NoiseRed",     OffOn,          NULL,     "Canon CFn 01 Long exp noise reduction"},
+    {0x02,     "Lock",         CFnLock,        NULL,     "Canon CFn 02 Shutter/AE lock buttons"},
+    {0x03,     "MirrorLock",   DisableEnable,  NULL,     "Canon CFn 03 Mirror lockup   "},
+    {0x04,     "TVAVexp",      CFnTVAV,        NULL,     "Canon CFn 04 Tv/Av & exposure level"},
+    {0x05,     "AFassist",     CFnAFAssist,    NULL,     "Canon CFn 05 AF-assist light"},
+    {0x06,     "ShuttAv",      CFnShutAv,      NULL,     "Canon CFn 06 Shutter speed in Av mode"},
+    {0x07,     "AEBSeq",       CFnAeb,         NULL,     "Canon CFn 07 AEB Sequence/auto cancel"},
+    {0x08,     "ShuttSync",    CFnShutSync,    NULL,     "Canon CFn 08 Shutter curtain sync"},
+    {0x09,     "AFStop",       CFnAFStop,      NULL,     "Canon CFn 09 Lens AF stop button switch"},
+    {0x0A,     "FillReduce",   EnableDisable,  NULL,     "Canon CFn 10 Fill flash auto reduction"},
+    {0x0B,     "MenuButt",     CFnMenu,        NULL,     "Canon CFn 11 Menu button return pos"},
+    {0x0C,     "SetButt",      CFnSet,         NULL,     "Canon CFn 12 SET button when shooting"},
+    {0x0D,     "SensClean",    DisableEnable,  NULL,     "Canon CFn 13 Sensor cleaning   "},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 _PLExifTagValues   PLExifTag::FujifilmTags[] = {         // Prefix is Fuji
-    0x0000, "Version",      NULL,           NULL,               "Fuji Version",
-    0x1000, "Quality",      LowerStr,       NULL,               "Fuji Quality",
-    0x1001, "Sharpness",    FujiSharp,      NULL,               "Fuji Sharpness",
-    0x1002, "WhiteBal",     FujiWBal,       NULL,               "Fuji White Balance",
-    0x1003, "Color",        FujiColor,      NULL,               "Fuji Color",
-    0x1004, "Contrast",     FujiTone,       NULL,               "Fuji Tone",
-    0x1010, "FlashMode",    FujiFlashMode,  NULL,               "Fuji Flash Mode",
-    0x1011, "FlashStrg",    NULL,           &PLExifTag::CnvRat, "Fuji Flash Strength APEX",
-    0x1020, "Macro",        OffOn,          NULL,               "Fuji Macro Mode",
-    0x1021, "Focus",        FujiFocus,      NULL,               "Fuji Focus Mode",
-    0x1022, "Unknown1022",  NULL,           NULL,               "Fuji Unknown (1022)",
-    0x1023, "Unknown1023",  NULL,           NULL,               "Fuji Unknown (1023)",
-    0x1030, "SlowSnyc",     OffOn,          NULL,               "Fuji Slow Sync",
-    0x1031, "Picture",      FujiPicture,    NULL,               "Fuji Exposure Mode",
-    0x1032, "Unknown1032",  NULL,           NULL,               "Fuji Unknown (1032)",
-    0x1100, "Sequence",     OffOn,          NULL,               "Fuji Sequence Mode",
-    0x1101, "Unknown1101",  NULL,           NULL,               "Fuji Unknown (1101)",
-    0x1200, "Unknown1200",  NULL,           NULL,               "Fuji Unknown (1200)",
-    0x1300, "BlurWarn",     FujiBlurFocus,  NULL,               "Fuji Blur Warning",
-    0x1301, "FocusWarn",    FujiBlurFocus,  NULL,               "Fuji Focus Warning",
-    0x1302, "AEWarn",       FujiAE,         NULL,               "Fuji Exposure Warning",
-    0, NULL, NULL, NULL, NULL
+    {0x0000, "Version",      NULL,           NULL,               "Fuji Version"},
+    {0x1000, "Quality",      LowerStr,       NULL,               "Fuji Quality"},
+    {0x1001, "Sharpness",    FujiSharp,      NULL,               "Fuji Sharpness"},
+    {0x1002, "WhiteBal",     FujiWBal,       NULL,               "Fuji White Balance"},
+    {0x1003, "Color",        FujiColor,      NULL,               "Fuji Color"},
+    {0x1004, "Contrast",     FujiTone,       NULL,               "Fuji Tone"},
+    {0x1010, "FlashMode",    FujiFlashMode,  NULL,               "Fuji Flash Mode"},
+    {0x1011, "FlashStrg",    NULL,           &PLExifTag::CnvRat, "Fuji Flash Strength APEX"},
+    {0x1020, "Macro",        OffOn,          NULL,               "Fuji Macro Mode"},
+    {0x1021, "Focus",        FujiFocus,      NULL,               "Fuji Focus Mode"},
+    {0x1022, "Unknown1022",  NULL,           NULL,               "Fuji Unknown (1022)"},
+    {0x1023, "Unknown1023",  NULL,           NULL,               "Fuji Unknown (1023)"},
+    {0x1030, "SlowSnyc",     OffOn,          NULL,               "Fuji Slow Sync"},
+    {0x1031, "Picture",      FujiPicture,    NULL,               "Fuji Exposure Mode"},
+    {0x1032, "Unknown1032",  NULL,           NULL,               "Fuji Unknown (1032)"},
+    {0x1100, "Sequence",     OffOn,          NULL,               "Fuji Sequence Mode"},
+    {0x1101, "Unknown1101",  NULL,           NULL,               "Fuji Unknown (1101)"},
+    {0x1200, "Unknown1200",  NULL,           NULL,               "Fuji Unknown (1200)"},
+    {0x1300, "BlurWarn",     FujiBlurFocus,  NULL,               "Fuji Blur Warning"},
+    {0x1301, "FocusWarn",    FujiBlurFocus,  NULL,               "Fuji Focus Warning"},
+    {0x1302, "AEWarn",       FujiAE,         NULL,               "Fuji Exposure Warning"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 
 _PLExifTagValues   PLExifTag::CasioTags[] = {         // Prefix is Casio
-    0x0001, "RecordMode",   CasioRecord,    NULL,     "Casio Recording Mode",
-    0x0002, "Quality",      CasioQuality,   NULL,     "Casio Quality  ",
-    0x0003, "FocusMode",    CasioFocus,     NULL,     "Casio Focusing Mode",
-    0x0004, "FlashMode",    CasioFlashMode, NULL,     "Casio Flash Mode",
-    0x0005, "FlasIntense",  CasioFlashInt,  NULL,     "Casio Flash Intensity",
-    0x0006, "ObjDist",      UnitsMM,        NULL,     "Casio Object Distance",
-    0x0007, "WhiteBal",     CasioWhite,     NULL,     "Casio White Balance",
-    0x0008, "Unknown0008",  NULL,           NULL,     "Casio Unknown (0008)",
-    0x0009, "Unknown0009",  NULL,           NULL,     "Casio Unknown (0009)",
-    0x000A, "DigZoom",      CasioZoom,      NULL,     "Casio Digital Zoom",
-    0x000B, "Sharpness",    CasioSharp,     NULL,     "Casio Sharpness",
-    0x000C, "Contrast",     CasioLowHi,     NULL,     "Casio Contrast ",
-    0x000D, "Saturation",   CasioLowHi,     NULL,     "Casio Saturation",
-    0x000E, "Unknown000E",  NULL,           NULL,     "Casio Unknown (000E)",
-    0x000F, "Unknown000F",  NULL,           NULL,     "Casio Unknown (000F)",
-    0x0010, "Unknown0010",  NULL,           NULL,     "Casio Unknown (0010)",
-    0x0011, "Unknown0011",  NULL,           NULL,     "Casio Unknown (0011)",
-    0x0012, "Unknown0012",  NULL,           NULL,     "Casio Unknown (0012)",
-    0x0013, "Unknown0013",  NULL,           NULL,     "Casio Unknown (0013)",
-    0x0014, "CCDSense",     FujiAE,         NULL,     "Casio CCD Sensitivity",
-    0x0015, "Unknown0015",  NULL,           NULL,     "Casio Unknown (0015)",
-    0x0016, "Enhancement",  CasioEnhance,   NULL,     "Casio Enhancement",
-    0x0017, "Filter",       CasioFilter,    NULL,     "Casio Filter   ",
-    0x0018, "FocFrmLoc",    CasioFFrmLoc,   NULL,     "Casio Focus Frame Locator",
-    0x0019, "CCDSense",     CasioSens,      NULL,     "Casio CCD Sensitivity",
-    0x001A, "Unknown001A",  NULL,           NULL,     "Casio Unknown (001A)",
-    0x0100, "MeterMode",    CasioMeter,     NULL,     "Casio Metering Mode",
-    0x0101, "EVShift",      CasioEVShift,   NULL,     "Casio EV Shift",
-    0x0102, "Unknown0102",  NULL,           NULL,     "Casio Unknown (0102)",
-    0x0103, "Aperture",     CasioAperture,  NULL,     "Casio Apertue",
-    0x0104, "RecordMode2",  CasioRecord2,   NULL,     "Casio Recording Mode",
-    0x0105, "Composition",  CasioComp,      NULL,     "Casio Composition Frame",
-    0x0106, "ExpMode",      CasioExp,       NULL,     "Casio Exposure Mode",
-    0x0107, "Unknown0107",  NULL,           NULL,     "Casio Unknown (0107)",
-    0, NULL, NULL, NULL, NULL
+    {0x0001, "RecordMode",   CasioRecord,    NULL,     "Casio Recording Mode"},
+    {0x0002, "Quality",      CasioQuality,   NULL,     "Casio Quality  "},
+    {0x0003, "FocusMode",    CasioFocus,     NULL,     "Casio Focusing Mode"},
+    {0x0004, "FlashMode",    CasioFlashMode, NULL,     "Casio Flash Mode"},
+    {0x0005, "FlasIntense",  CasioFlashInt,  NULL,     "Casio Flash Intensity"},
+    {0x0006, "ObjDist",      UnitsMM,        NULL,     "Casio Object Distance"},
+    {0x0007, "WhiteBal",     CasioWhite,     NULL,     "Casio White Balance"},
+    {0x0008, "Unknown0008",  NULL,           NULL,     "Casio Unknown (0008)"},
+    {0x0009, "Unknown0009",  NULL,           NULL,     "Casio Unknown (0009)"},
+    {0x000A, "DigZoom",      CasioZoom,      NULL,     "Casio Digital Zoom"},
+    {0x000B, "Sharpness",    CasioSharp,     NULL,     "Casio Sharpness"},
+    {0x000C, "Contrast",     CasioLowHi,     NULL,     "Casio Contrast "},
+    {0x000D, "Saturation",   CasioLowHi,     NULL,     "Casio Saturation"},
+    {0x000E, "Unknown000E",  NULL,           NULL,     "Casio Unknown (000E)"},
+    {0x000F, "Unknown000F",  NULL,           NULL,     "Casio Unknown (000F)"},
+    {0x0010, "Unknown0010",  NULL,           NULL,     "Casio Unknown (0010)"},
+    {0x0011, "Unknown0011",  NULL,           NULL,     "Casio Unknown (0011)"},
+    {0x0012, "Unknown0012",  NULL,           NULL,     "Casio Unknown (0012)"},
+    {0x0013, "Unknown0013",  NULL,           NULL,     "Casio Unknown (0013)"},
+    {0x0014, "CCDSense",     FujiAE,         NULL,     "Casio CCD Sensitivity"},
+    {0x0015, "Unknown0015",  NULL,           NULL,     "Casio Unknown (0015)"},
+    {0x0016, "Enhancement",  CasioEnhance,   NULL,     "Casio Enhancement"},
+    {0x0017, "Filter",       CasioFilter,    NULL,     "Casio Filter   "},
+    {0x0018, "FocFrmLoc",    CasioFFrmLoc,   NULL,     "Casio Focus Frame Locator"},
+    {0x0019, "CCDSense",     CasioSens,      NULL,     "Casio CCD Sensitivity"},
+    {0x001A, "Unknown001A",  NULL,           NULL,     "Casio Unknown (001A)"},
+    {0x0100, "MeterMode",    CasioMeter,     NULL,     "Casio Metering Mode"},
+    {0x0101, "EVShift",      CasioEVShift,   NULL,     "Casio EV Shift"},
+    {0x0102, "Unknown0102",  NULL,           NULL,     "Casio Unknown (0102)"},
+    {0x0103, "Aperture",     CasioAperture,  NULL,     "Casio Apertue"},
+    {0x0104, "RecordMode2",  CasioRecord2,   NULL,     "Casio Recording Mode"},
+    {0x0105, "Composition",  CasioComp,      NULL,     "Casio Composition Frame"},
+    {0x0106, "ExpMode",      CasioExp,       NULL,     "Casio Exposure Mode"},
+    {0x0107, "Unknown0107",  NULL,           NULL,     "Casio Unknown (0107)"},
+    {0, NULL, NULL, NULL, NULL}
+
 };
 
 
@@ -1052,19 +1136,19 @@ static void SwizR64(PLBYTE *);
 
 
 _PLExifFormatter PLExifTag::rgExifFormat[] = {
-    1,  NULL,   &PLExifTag::RenUndef,  // 0. undefined
-    1,  NULL,   &PLExifTag::RenUDef,   // 1. unsigned byte
-    1,  NULL,   &PLExifTag::RenStr,    // 2. ascii string
-    2,  Swiz16, &PLExifTag::RenUDef,   // 3. unsigned short
-    4,  Swiz32, &PLExifTag::RenUDef,   // 4. unsigned long
-    8,  SwizR64,&PLExifTag::RenURat,   // 5. unsigned rational
-    1,  NULL,   &PLExifTag::RenDef,    // 6. signed byte
-    1,  NULL,   &PLExifTag::RenUndef,  // 7. undefined
-    2,  Swiz16, &PLExifTag::RenDef,    // 8. signed short
-    4,  Swiz32, &PLExifTag::RenDef,    // 9. signed long
-    8,  SwizR64,&PLExifTag::RenRat,    // 10. signed rational
-    4,  NULL,   &PLExifTag::RenUndef,  // 11. signed float (not used)
-    8,  NULL,   &PLExifTag::RenUndef,  // 12. signed double (not used)
+    {1,  NULL,   &PLExifTag::RenUndef},  // 0. undefined
+    {1,  NULL,   &PLExifTag::RenUDef},   // 1. unsigned byte
+    {1,  NULL,   &PLExifTag::RenStr},    // 2. ascii string
+    {2,  Swiz16, &PLExifTag::RenUDef},   // 3. unsigned short
+    {4,  Swiz32, &PLExifTag::RenUDef},   // 4. unsigned long
+    {8,  SwizR64,&PLExifTag::RenURat},   // 5. unsigned rational
+    {1,  NULL,   &PLExifTag::RenDef},    // 6. signed byte
+    {1,  NULL,   &PLExifTag::RenUndef},  // 7. undefined
+    {2,  Swiz16, &PLExifTag::RenDef},    // 8. signed short
+    {4,  Swiz32, &PLExifTag::RenDef},    // 9. signed long
+    {8,  SwizR64,&PLExifTag::RenRat},    // 10. signed rational
+    {4,  NULL,   &PLExifTag::RenUndef},  // 11. signed float (not used)
+    {8,  NULL,   &PLExifTag::RenUndef}  // 12. signed double (not used)
 };
 
 
@@ -1140,8 +1224,8 @@ static double round(double value, unsigned int precision)
 
 PLExif::PLExif()
   : m_Pos(0)
-  , m_Endian(false)
   , m_IdfOffset(0)
+  , m_Endian(false)
 {
 }
 
@@ -2181,16 +2265,17 @@ const string & PLExifTag::GetValueCommon() const
 PLExifTag::PLExifTag(PLUINT TagNo, PLUINT Format, PLUINT NoComp)
   : m_Tag(NULL)
   , m_Fmt(NULL)
-  , m_Buffer(NULL)
+  , m_TagNo(TagNo)
+  , m_Format(Format)
+  , m_NoComp(NoComp)
   , m_Size(0)
+  , m_Buffer(NULL)
   , m_Num(0)
   , m_Den(1)
   , m_Int(0)
   , m_UInt(0)
   , m_Double(0)
-  , m_TagNo(TagNo)
-  , m_Format(Format)
-  , m_NoComp(NoComp)
+
 {
     if (Format < 1 || Format > 12)
         throw PLExifException("EXIF Tag format field not understood");

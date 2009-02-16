@@ -18,9 +18,8 @@ class PLIProgressNotification
 {
 public:
   //! Called during decoding as progress gets made.
-  virtual void OnProgress 
-    ( double Part
-    ) = 0;
+  virtual void OnProgress ( double Part ) = 0;
+  virtual ~PLIProgressNotification() {}
 };
 
 #endif

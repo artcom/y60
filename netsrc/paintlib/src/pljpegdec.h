@@ -17,6 +17,10 @@
 
 #include <stdio.h>
 
+#ifdef HAVE_STDLIB_H
+    // avoid duplicate definition warning in jpeglib.h
+    #undef HAVE_STDLIB_H
+#endif
 extern "C"
 {
 #include "jpeglib.h"

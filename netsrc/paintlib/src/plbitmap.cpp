@@ -78,7 +78,9 @@ void PLBmp::CreateCopy (const PLBmpBase & rSrcBmp,
 
   PLASSERT (BPPWanted == 32 || BPPWanted == 24 || BPPWanted == 16 ||
           BPPWanted == 8 || BPPWanted == 1 || BPPWanted == 0);
+#ifdef DEBUG
   int BPPSrc = rSrcBmp.GetBitsPerPixel();
+#endif
   PLASSERT (BPPSrc == 64 || BPPSrc == 32 || BPPSrc == 24 || BPPSrc == 16 ||
           BPPSrc == 8 || BPPSrc == 1);
 
@@ -106,8 +108,10 @@ void PLBmp::CreateCopy (const PLBmpBase & rSrcBmp,
     // Can't copy to self while changing bit depth.
     PLASSERT (&rSrcBmp != this);
 
+#ifdef ADD_ORIGINAL_UNUSED_CODELINES
     bool bDestAlpha = rSrcBmp.HasAlpha() && BPPWanted == 32;
     bool bDestGreyscale = rSrcBmp.IsGreyscale() && BPPWanted == 8;
+#endif
     Create (rSrcBmp.GetWidth(), rSrcBmp.GetHeight(),
             pfWanted);
   }
