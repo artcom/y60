@@ -380,12 +380,13 @@ DomParseUnitTest.prototype.Constructor = function(obj, theName) {
     	obj.myDocument = Node.createDocument();
 
         // Test parsing of quoted characters
-    	obj.myDocument.parse('<hello myattr="&lt;p&gt;">world&lt;p&gt;</hello>');
+    	obj.myDocument.parse('<hello myattr="&lt;p&gt;">world&lt;p&gt;&amp;</hello>');
         print("myDoc="+obj.myDocument);
         ENSURE('obj.myDocument.firstChild.nodeName == "hello"');
         ENSURE('obj.myDocument.firstChild.myattr == "<p>"');
-        ENSURE('obj.myDocument.firstChild.firstChild.nodeValue == "world<p>"');
-
+        ENSURE('obj.myDocument.firstChild.firstChild.nodeValue == "world<p>&"');
+        ENSURE('obj.myDocument.firstChild.childNode("#text").nodeValue == "world<p>&"');
+        ENSURE('obj.myDocument.firstChild.childNode("#text") == "world&lt;p&gt;&amp;"');
         // Test file saving
         var myDate = new Date();
         obj.myDateString = myDate.toLocaleString();
