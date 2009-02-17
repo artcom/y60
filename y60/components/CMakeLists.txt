@@ -18,8 +18,8 @@ add_subdirectory(JSSound)
 add_subdirectory(Nagios)
 add_subdirectory(Net)
 add_subdirectory(OpenEXR)
-#add_subdirectory(OscReceiver) # XXX: ingo fix this later
-#add_subdirectory(OscSender)   # XXX: ingo fix this later
+add_subdirectory(OscReceiver)
+add_subdirectory(OscSender)
 add_subdirectory(ProcFunctions)
 add_subdirectory(StlImporter)
 add_subdirectory(SynergyServer)
