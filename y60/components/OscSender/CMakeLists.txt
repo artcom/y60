@@ -20,7 +20,7 @@ y60_add_component(
     OscSender
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS asldom aslnet y60jsbase
+    DEPENDS asldom aslnet y60jsbase oscpackip oscpackosc
     EXTERNS ${EXTERNALS}
 )
 

@@ -22,6 +22,6 @@ y60_add_component(
     OscReceiver
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS asldom y60jsbase y60input
+    DEPENDS asldom y60jsbase y60input oscpackip oscpackosc
     EXTERNS ${EXTERNALS}
 )
