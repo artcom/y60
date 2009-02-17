@@ -37,7 +37,7 @@ macro(debug_definitions)
 endmacro(debug_definitions)
 
 # attach libraries from DEPENDS and EXTERNS to TARGET
-macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
+macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
 
     debug_linkage("Collecting depends for ${TARGET}")
 
@@ -53,7 +53,24 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
             OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
     endforeach(DEPEND)
 
-    # collect libraries from externs
+    # collect implicit externs
+    set(IMPLICIT_EXTERNS)
+    foreach(DEPEND ${DEPENDS})
+        get_global(${DEPEND}_PROJECT _PROJECT)
+        if(${_PROJECT}_IS_IMPORTED)
+            get_global(${_PROJECT}_${DEPEND}_EXTERNS _EXTERNS)
+            list(APPEND IMPLICIT_EXTERNS ${_EXTERNS})
+            message("${DEPEND} gave us implicit externs ${_EXTERNS}")
+        endif(${_PROJECT}_IS_IMPORTED)
+    endforeach(DEPEND)
+
+    # merge externs
+    set(EXTERNS ${EXPLICIT_EXTERNS} ${IMPLICIT_EXTERNS})
+    if(EXTERNS)
+        list(REMOVE_DUPLICATES EXTERNS)
+    endif(EXTERNS)
+    
+    # collect libraries and definitions from externs
     set(EXTERN_DEFINITIONS)
     set(EXTERN_LIBRARIES_GENERAL)
     set(EXTERN_LIBRARIES_DEBUG)
@@ -82,9 +99,9 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
             endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
             
         endif(EXTERN MATCHES ".*\\.framework/?$")
-        if ( ${EXTERN}_DEFINITIONS )
+        if (${EXTERN}_DEFINITIONS)
             list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
-        endif ( ${EXTERN}_DEFINITIONS )
+        endif (${EXTERN}_DEFINITIONS)
     endforeach(EXTERN)
     
     # collect and clean definitions

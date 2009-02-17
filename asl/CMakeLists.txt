@@ -3,20 +3,11 @@ cmake_minimum_required(VERSION 2.6)
 
 project(ASL)
 
-# XXX: There is no way for adding this in the UI on WIN32.
-#      It's goddamn ugly though. Also note that we APPEND.
-if(NOT ASL_INTEGRATED_BUILD)
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
-endif(NOT ASL_INTEGRATED_BUILD)
-
 # Include cmake libraries
 include(AcMake)
 
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/buildinfo.cpp.in)
-
-# XXX: definition handling
-add_definitions(-DAC_BUILT_WITH_CMAKE)
 
 set(REQ_PACKAGES ZLIB GLIB2 CURL OpenEXR)
 if(WIN32)
@@ -36,12 +27,16 @@ if(OSX)
     mark_as_advanced( AUDIO_UNIT )
 endif(OSX)
 
+pro60_deps_install()
+
 ac_add_project(
     ASL
     REQUIRED_PACKAGES
         ${REQ_PACKAGES}
     REQUIRED_PKGCONFIG
         ${REQ_PKGCONFIG}
+    DEFINITIONS
+        -DAC_BUILT_WITH_CMAKE
 )
 
 # Make sure we can access our includes without staging
@@ -71,4 +66,4 @@ add_subdirectory(zip)
 
 ac_add_doxygen(ASL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 
-ac_export_project(ASL)
+ac_end_project(ASL)

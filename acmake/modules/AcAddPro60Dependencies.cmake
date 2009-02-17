@@ -17,22 +17,22 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-if(LINUX)
-    set(PRO60_DEPS $ENV{PRO60_DEPS})
-    if(PRO60_DEPS)
-        list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
-    else(PRO60_DEPS)
-        message(STATUS "PRO60_DEPS environment variable not set, dependencies must be in standard locations")
-    endif(PRO60_DEPS)
-endif(LINUX)
+set(PRO60_DEPS $ENV{PRO60_DEPS})
 
-find_package( PRO60_DEPS NO_MODULE)
-if(PRO60_DEPS_FOUND)
-    pro60_deps_register_searchpath()
-    message("PRO60_DEPS dir: ${PRO60_DEPS_ROOT_DIR}")
-else(PRO60_DEPS_FOUND)
-    message("ART+COM companion libraries not found")
-endif(PRO60_DEPS_FOUND)
+if(PRO60_DEPS)
 
+    list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
 
+    macro(pro60_deps_install)
+        get_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED _WILL_BE_INSTALLED)
+        if(NOT _WILL_BE_INSTALLED)
+            add_subdirectory(${PRO60_DEPS} pro60-deps)
+            set_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED YES)
+        endif(NOT _WILL_BE_INSTALLED)
+    endmacro(pro60_deps_install)
 
+else(PRO60_DEPS)
+    if(NOT LINUX)
+        message(FATAL_ERROR "PRO60_DEPS environment variable not set")
+    endif(NOT LINUX)
+endif(PRO60_DEPS)

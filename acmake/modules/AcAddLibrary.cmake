@@ -54,7 +54,7 @@
 macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS"
         "HEADER_ONLY;DONT_INSTALL;"
         ${ARGN})
     

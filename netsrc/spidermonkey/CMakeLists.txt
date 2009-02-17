@@ -3,12 +3,27 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Spidermonkey)
 
-list(INSERT CMAKE_MODULE_PATH 0 ${Spidermonkey_SOURCE_DIR})
+include(AcMake)
 
-include(SpidermonkeyDefinitions)
-include(SpidermonkeyDependencies)
+if(UNIX)
+    if(APPLE)
+        # Apple Mac OS X
+        set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX)
+    else(APPLE)
+        # Linux
+        set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DHAVE_VA_COPY -DVA_COPY=va_copy)
+    endif(APPLE)
+else(UNIX)
+    # Microsoft Windows
+    set(SPIDERMONKEY_DEFINITIONS -DXP_WIN -D_WINDOWS -D_X86_=1 -DJSFILE)
+endif(UNIX)
 
-add_definitions(${SPIDERMONKEY_DEFINITIONS})
+ac_add_project(
+    Spidermonkey
+    DEFINITIONS "${SPIDERMONKEY_DEFINITIONS}"
+)
+
+include_directories(.)
 
 set(SOURCES
     jsapi.c jsarena.c jsarray.c jsatom.c jsbool.c jscntxt.c jsdate.c
@@ -20,7 +35,6 @@ set(SOURCES
 )
 
 if (WIN32)
-
     # XXX This is a separate library in the original spidermonkey build
     #     Lets keep things simple and just mix in the sources for now.
     list( APPEND SOURCES fdlibm/e_acos.c fdlibm/e_acosh.c fdlibm/e_asin.c
@@ -46,9 +60,6 @@ if (WIN32)
             fdlibm/w_lgamma.c fdlibm/w_lgamma_r.c fdlibm/w_log.c
             fdlibm/w_log10.c fdlibm/w_pow.c fdlibm/w_remainder.c
             fdlibm/w_scalb.c fdlibm/w_sinh.c fdlibm/w_sqrt.c)
-
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS
-            -D_SCL_SECURE_NO_WARNINGS)
 endif (WIN32)
 
 # XXX: there are probably non-public headers in here
@@ -65,98 +76,31 @@ set(HEADERS
     jsautocfg_ilp32.h jsautocfg_lp64.h
 )
 
+# stage our headers
+foreach(HEADER ${HEADERS})
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
+        ${CMAKE_CURRENT_BINARY_DIR}/include/js/spidermonkey/${HEADER}
+        COPYONLY
+    )
+endforeach(HEADER ${HEADERS})
 
-include_directories(.)
-
-add_library(
-    spidermonkey SHARED ${SOURCES}
+ac_add_library(
+    spidermonkey js/spidermonkey
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
 )
-
-if(SPIDERMONKEY_INTEGRATED_BUILD)
-    foreach (H_FILE ${HEADERS})
-        configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
-            ${CMAKE_CURRENT_BINARY_DIR}/include/js/spidermonkey/${H_FILE}
-            COPYONLY)
-    endforeach(H_FILE)
-endif(SPIDERMONKEY_INTEGRATED_BUILD)
-
 
 set_target_properties(
     spidermonkey
     PROPERTIES
-        PUBLIC_HEADER "${HEADERS}"
-	    COMPILE_DEFINITIONS "EXPORT_JS_API"
-        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-        INSTALL_RPATH_USE_LINK_PATH YES
-        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+        COMPILE_DEFINITIONS "EXPORT_JS_API"
 )
 
-if(WIN32)
-    set_target_properties( spidermonkey PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-endif(WIN32)
-
-install(
-    TARGETS spidermonkey
-    EXPORT Spidermonkey
-        DESTINATION lib
-    PUBLIC_HEADER
-        DESTINATION include/js/spidermonkey
-)
-
-
-add_executable(
+ac_add_executable(
     smonkey
-    js.c
+    SOURCES js.c
+    DEPENDS spidermonkey
 )
 
-set_target_properties(
-    smonkey
-    PROPERTIES
-        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-        INSTALL_RPATH_USE_LINK_PATH YES
-)
-
-
-
-
-if (WIN32)
-    target_link_libraries(smonkey spidermonkey)
-else (WIN32)
-    target_link_libraries(smonkey spidermonkey m)
-endif (WIN32)
-
-install(
-    TARGETS smonkey
-    EXPORT Spidermonkey
-    RUNTIME
-        DESTINATION bin
-)
-
-if(NOT SPIDERMONKEY_INTEGRATED_BUILD)
-configure_file(
-    ${Spidermonkey_SOURCE_DIR}/FindSpidermonkey.cmake.in
-    ${Spidermonkey_BINARY_DIR}/FindSpidermonkey.cmake
-    @ONLY
-)
-
-install(
-    FILES ${Spidermonkey_BINARY_DIR}/FindSpidermonkey.cmake
-    DESTINATION share/cmake-2.6/Modules
-)
-
-
-install(
-    FILES SpidermonkeyDependencies.cmake SpidermonkeyDefinitions.cmake
-    DESTINATION share/cmake-2.6/Modules
-)
-
-
-install(
-    EXPORT Spidermonkey
-    DESTINATION share/cmake-2.6/Modules
-    FILE SpidermonkeyExport.cmake
-)
-endif(NOT SPIDERMONKEY_INTEGRATED_BUILD)
+ac_end_project(Spidermonkey)

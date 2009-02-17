@@ -1,9 +1,0 @@
-
-include(AcPlatform)
-
-include(ASLDefinitions)
-include(ASLDependencies)
-include(ASLExport)
-
-set(ASL_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
-set(ASL_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")

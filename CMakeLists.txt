@@ -11,30 +11,24 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/acmake/modules)
 # make build-integrated packages available
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/asl)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/y60)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/oscpack/osc)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/SDL_ttf2)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/paintlib)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/oscpack)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/spidermonkey) # XXX: tracemonkey?
 
-# set some flags telling sub-packages that
-# they are being built as a subpackage
+# tell acmake that it is being used in integrated mode
 set(ACMAKE_INTEGRATED_BUILD YES)
-set(ACSDLTTF_INTEGRATED_BUILD YES)
-set(PAINTLIB_INTEGRATED_BUILD YES)
-set(SPIDERMONKEY_INTEGRATED_BUILD YES)
-set(ASL_INTEGRATED_BUILD YES)
-set(Y60_INTEGRATED_BUILD YES)
 
-# look for ART+COM companion libraries
-find_package( PRO60_DEPS NO_MODULE)
-if(PRO60_DEPS_FOUND)
-    pro60_deps_register_searchpath()
-endif(PRO60_DEPS_FOUND)
-
+# set the global default buildinfo template
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
+
 # add paths to our internal staged includes
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/SDL_ttf2/include
-    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/oscpack/osc/include
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/spidermonkey/include # XXX: tracemonkey?
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/oscpack/include
 )
 
 # traverse our subdirectories
@@ -43,7 +37,6 @@ add_subdirectory(netsrc)
 add_subdirectory(asl)
 add_subdirectory(y60)
 
-
 # XXX hack for testing the scenetests and tutorials
 if(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
   add_subdirectory(../testmodels ${CMAKE_CURRENT_BINARY_DIR}/testmodels)
@@ -51,4 +44,3 @@ endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
 if(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
   add_subdirectory(../tutorials ${CMAKE_CURRENT_BINARY_DIR}/tutorials)
 endif(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
-

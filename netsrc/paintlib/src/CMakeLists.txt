@@ -174,115 +174,27 @@ Filter/plinplacefilter.h
 include_directories(.)
 include_directories(./Filter)
 
-if(OPENEXR_INCLUDE_DIR)
-    set(OPENEXR_INCLUDE_DIRS ${OPENEXR_INCLUDE_DIR})
-endif(OPENEXR_INCLUDE_DIR)
-if(OPENEXR_LIBRARY_DIR)
-    set(OPENEXR_LIBRARY_DIRS ${OPENEXR_LIBRARY_DIR})
-endif(OPENEXR_LIBRARY_DIR)
+# stage our headers
+foreach(HEADER ${HEADERS} ${FILTER_HEADERS})
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${HEADER}
+        COPYONLY
+    )
+endforeach(HEADER ${HEADERS})
 
-include_directories(${PNG_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${TIFF_INCLUDE_DIR}
-        ${JPEG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${OPENEXR_INCLUDE_DIRS})
-link_directories(${PNG_LIBRARY_DIR} ${GIF_LIBRARY_DIR} ${TIFF_LIBRARY_DIR}
-        ${JPEG_LIBRARY_DIR} ${CURL_LIBRARY_DIR} ${OPENEXR_LIBRARY_DIRS})
-
-        
-foreach( DEF ${OPENEXR_DEFINITIONS} )
-    add_definitions( -D${DEF} )
-endforeach( DEF ${OPENEXR_DEFINITIONS} )
-
-add_library(
-    paintlib SHARED ${SOURCES} ${HEADERS}
+ac_add_library(
+    paintlib paintlib
+    SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    EXTERNS GIF PNG TIFF JPEG OPENEXR CURL
 )
 
-set_target_properties(
-    paintlib
-    PROPERTIES
-        # Original paintlib codebase used _DEBUG
-        COMPILE_DEFINITIONS_DEBUG _DEBUG
-
-        PUBLIC_HEADER "${HEADERS}"
-        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-        INSTALL_RPATH_USE_LINK_PATH YES
-        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-)
-
-if(WIN32)
-    set_target_properties( paintlib PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-endif(WIN32)
-
-# XXX: need to expose all libraries as transitive link deps
-set(OPTIMIZED_LIBRARIES
-    ${PNG_LIBRARY}
-    ${GIF_LIBRARY}
-    ${TIFF_LIBRARY}
-    ${JPEG_LIBRARY}
-    ${CURL_LIBRARY}
-    ${OPENEXR_LIBRARIES}
-)
-
-
-set(DEBUG_LIBRARIES)
-if(PNG_LIBRARY_D)
-    list(APPEND DEBUG_LIBRARIES ${PNG_LIBRARY_D})
-endif(PNG_LIBRARY_D)
-if(GIF_LIBRARY_D)
-    list(APPEND DEBUG_LIBRARIES ${GIF_LIBRARY_D})
-endif(GIF_LIBRARY_D)
-if(TIFF_LIBRARY_D)
-    list(APPEND DEBUG_LIBRARIES ${TIFF_LIBRARY_D})
-endif(TIFF_LIBRARY_D)
-if(JPEG_LIBRARY_D)
-    list(APPEND DEBUG_LIBRARIES ${JPEG_LIBRARY_D})
-endif(JPEG_LIBRARY_D)
-if(CURL_LIBRARY_D)
-    list(APPEND DEBUG_LIBRARIES ${CURL_LIBRARY_D})
-endif(CURL_LIBRARY_D)
-if(OPENEXR_LIBRARIES_D)
-    list(APPEND DEBUG_LIBRARIES ${OPENEXR_LIBRARIES_D})
-endif(OPENEXR_LIBRARIES_D)
-
-if(DEBUG_LIBRARIES)
-    foreach( SUBLIB ${OPTIMIZED_LIBRARIES})
-        target_link_libraries(paintlib optimized ${SUBLIB})
-    endforeach( SUBLIB ${OPTIMIZED_LIBRARIES})
-    foreach( SUBLIB ${DEBUG_LIBRARIES})
-        target_link_libraries(paintlib debug ${SUBLIB})
-    endforeach( SUBLIB ${DEBUG_LIBRARIES})
-else(DEBUG_LIBRARIES)
-    target_link_libraries(paintlib ${OPTIMIZED_LIBRARIES})
-endif(DEBUG_LIBRARIES)
-
-if(PAINTLIB_INTEGRATED_BUILD)
-foreach (H_FILE ${HEADERS})
-  configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
-      ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${H_FILE}
-      COPYONLY)
-endforeach(H_FILE)
-foreach(H_FILE ${FILTER_HEADERS})
-  configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
-      ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${H_FILE}
-      COPYONLY)
-endforeach(H_FILE)
-endif(PAINTLIB_INTEGRATED_BUILD)
-
-# install additional headers from Filter/ directory to an appropriate destination
+# XXX: dirty hack to work around how we reference plfilter headers
 install(
     DIRECTORY Filter
     DESTINATION include/paintlib
-    FILES_MATCHING PATTERN "*.h"
-    PATTERN .svn EXCLUDE
-)
-
-
-install(
-    TARGETS paintlib
-    EXPORT paintlib
-        DESTINATION lib
-    PUBLIC_HEADER
-        DESTINATION include/paintlib
+    FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN ".svn" EXCLUDE
 )

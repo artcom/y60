@@ -3,14 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Y60)
 
-# Make our build definitions available
 list(INSERT CMAKE_MODULE_PATH 0 ${Y60_SOURCE_DIR})
-
-# XXX: There is no way for adding this in the UI on WIN32.
-#      It's goddamn ugly though. Also note that we APPEND.
-if(NOT Y60_INTEGRATED_BUILD)
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/share/cmake-2.6/Modules)
-endif(NOT Y60_INTEGRATED_BUILD)
 
 option(Y60_WITH_TRACEMONKEY "use latest experimental js interpreter" OFF)
 
@@ -32,6 +25,13 @@ include(AcMake)
 include(Y60Dependencies)
 include(Y60Utilities)
 
+set(Y60_EXTRA_DEFINITIONS)
+if(Y60_WITH_TRACEMONKEY)
+    set(Y60_EXTRA_DEFINITIONS -DY60_WITH_TRACEMONKEY)
+endif(Y60_WITH_TRACEMONKEY)
+
+pro60_deps_install()
+
 ac_add_project(Y60
     REQUIRED_PACKAGES
         ${REQ_PACKAGES}
@@ -39,20 +39,15 @@ ac_add_project(Y60
         ${OPT_PACKAGES}   
     REQUIRED_PKGCONFIG
         ${REQ_PKGCONFIG}
+    CUSTOM_SCRIPTS
+        Y60Utilities
+    DEFINITIONS
+        -DAC_BUILT_WITH_CMAKE
+        ${Y60_EXTRA_DEFINITIONS}
 )
-
-# XXX: definition-propagation
-add_definitions(-DAC_BUILT_WITH_CMAKE)
-if (Y60_WITH_TRACEMONKEY)
-    add_definitions(-DY60_WITH_TRACEMONKEY)
-else(Y60_WITH_TRACEMONKEY)
-# XXX add stages spidermonkey include
-    include_directories(${CMAKE_BINARY_DIR}/netsrc/spidermonkey/include)
-endif(Y60_WITH_TRACEMONKEY)
 
 # Make sure we can access our includes without staging
 include_directories(../)
-include_directories(../netsrc/paintlib/src)
 
 # XXX: Make headers from our netsrc dependencies available.
 #      This is needed because we do not handle paths for
@@ -60,6 +55,7 @@ include_directories(../netsrc/paintlib/src)
 #      It would work if the references in our libs would
 #      be EXTERNS, but since they are DEPENDS, we do not add 
 #      include paths anywhere and need this hack for now.
+# XXX: this should be completely obsolete by now
 if(NOT Y60_INTEGRATED_BUILD)
     include_directories(${CMAKE_INSTALL_PREFIX}/include)
 endif(NOT Y60_INTEGRATED_BUILD)
@@ -149,6 +145,4 @@ add_custom_target(
     VERBATIM
 )
 
-
-ac_export_project(Y60)
-
+ac_end_project(Y60)

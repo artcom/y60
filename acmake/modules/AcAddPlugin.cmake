@@ -17,7 +17,7 @@
 
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     parse_arguments(THIS_PLUGIN
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS"
         "DONT_INSTALL;"
         ${ARGN})
     
@@ -70,7 +70,11 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # XXX: tests?
     
     if(NOT THIS_PLUGIN_DONT_INSTALL)
-        ac_project_add_target(PLUGINS ${THIS_PLUGIN_NAME})
+        ac_project_add_target(
+            PLUGINS ${THIS_PLUGIN_NAME}
+            EXTERNS ${THIS_PLUGIN_EXTERNS}
+            DEPENDS ${THIS_PLUGIN_DEPENDS}
+        )
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
 
 endmacro(ac_add_plugin)

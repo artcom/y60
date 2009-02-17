@@ -2,6 +2,35 @@
 
 include(AcMake)
 
+macro(y60_maybe_install_directory LOCAL_NAME INSTALL_NAME)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIRECTORY}/${LOCAL_NAME})
+        install(
+            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIRECTORY}/${LOCAL_NAME}/
+            DESTINATION ${INSTALL_NAME}
+            FILES_MATCHING PATTERN ".svn" EXCLUDE
+        )
+    endif(EXISTS ${CMAKE_CURRENT_SOURCE_DIRECTORY}/${LOCAL_NAME})
+endmacro(y60_maybe_install_directory LOCAL_NAME INSTALL_NAME)
+
+macro(y60_add_application APPLICATION_NAME)
+    parse_arguments(
+        THIS_APPLICATION
+        ""
+        ""
+        ${ARGN}
+    )
+
+    y60_maybe_install_directory(CONFIG etc/${APPLICATION_NAME})
+
+    y60_maybe_install_directory(SCRIPTS lib/${APPLICATION_NAME}/js)
+    y60_maybe_install_directory(TEX     lib/${APPLICATION_NAME}/textures)
+    y60_maybe_install_directory(FONTS   lib/${APPLICATION_NAME}/fonts)
+    y60_maybe_install_directory(MODELS  lib/${APPLICATION_NAME}/models)
+    y60_maybe_install_directory(SOUNDS  lib/${APPLICATION_NAME}/sounds)
+    y60_maybe_install_directory(MOVIES  lib/${APPLICATION_NAME}/movies)
+
+endmacro(y60_add_application)
+
 macro(y60_add_component COMPONENT_NAME)
     ac_add_plugin(
         y60${COMPONENT_NAME} y60/components

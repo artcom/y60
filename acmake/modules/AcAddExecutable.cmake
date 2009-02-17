@@ -78,7 +78,11 @@ macro(ac_add_executable EXECUTABLE_NAME)
     
     # add our target to the current project
     if(NOT THIS_EXECUTABLE_DONT_INSTALL)
-        ac_project_add_target(EXECUTABLES ${THIS_EXECUTABLE_NAME})
+        ac_project_add_target(
+            EXECUTABLES ${THIS_EXECUTABLE_NAME}
+            EXTERNS     ${THIS_EXECUTABLE_EXTERNS}
+            DEPENDS     ${THIS_EXECUTABLE_DEPENDS}
+        )
     endif(NOT THIS_EXECUTABLE_DONT_INSTALL)
     
 endmacro(ac_add_executable)
