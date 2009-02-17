@@ -1,8 +1,0 @@
-
-include(Y60Definitions)
-include(Y60Dependencies)
-include(Y60Export)
-include(Y60Utilities)
-
-set(Y60_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib")
-set(Y60_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
