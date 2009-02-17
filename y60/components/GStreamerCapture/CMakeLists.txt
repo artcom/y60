@@ -11,5 +11,7 @@ y60_add_component(
     GStreamerCapture
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
+    DEPENDS y60video
+    EXTERNS GSTREAMER
 )
 

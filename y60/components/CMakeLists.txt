@@ -29,10 +29,13 @@ add_subdirectory(WindowCW)
 add_subdirectory(X3dImporter)
 
 
+if(GSTREAMER_FOUND)
+    add_subdirectory(GStreamerCapture)
+endif(GSTREAMER_FOUND)
+
 
 if(LINUX)
     add_subdirectory(DVB)
-    #add_subdirectory(GStreamerCapture)
     add_subdirectory(PowermateInputExtension)
     add_subdirectory(SimWater)
     #add_subdirectory(Wiimote)

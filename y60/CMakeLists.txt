@@ -39,6 +39,8 @@ ac_add_project(Y60
         ${OPT_PACKAGES}   
     REQUIRED_PKGCONFIG
         ${REQ_PKGCONFIG}
+    OPTIONAL_PKGCONFIG
+        ${OPT_PKGCONFIG}
     CUSTOM_SCRIPTS
         Y60Utilities
     DEFINITIONS
