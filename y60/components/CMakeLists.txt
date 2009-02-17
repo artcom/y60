@@ -26,8 +26,6 @@ add_subdirectory(SynergyServer)
 add_subdirectory(testRendererExtension)
 add_subdirectory(VideoProcessing)
 add_subdirectory(WindowCW)
-add_subdirectory(WMADecoder)
-add_subdirectory(WMVDecoder)
 add_subdirectory(X3dImporter)
 
 
@@ -41,6 +39,8 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
+    add_subdirectory(WMADecoder)
+    add_subdirectory(WMVDecoder)
 #    add_subdirectory(DInput)
 #    add_subdirectory(DInputFFB)
 endif(WIN32)
