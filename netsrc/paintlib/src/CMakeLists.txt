@@ -198,6 +198,9 @@ add_library(
 set_target_properties(
     paintlib
     PROPERTIES
+        # Original paintlib codebase used _DEBUG
+        COMPILE_DEFINITIONS_DEBUG _DEBUG
+
         PUBLIC_HEADER "${HEADERS}"
         INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
         INSTALL_RPATH_USE_LINK_PATH YES

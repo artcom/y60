@@ -34,14 +34,14 @@ PLBmpInfo::PLBmpInfo (const char * pszInfo)
   : m_Size(), m_Resolution(), m_pf(PLPixelFormat::DONTCARE)
 {
   vector<char> pf(128);
-#ifdef DEBUG
+#ifdef _DEBUG
   int NumFields = sscanf (pszInfo, szInfoFormatString,
           &m_Size.x, &m_Size.y, &m_Resolution.x, &m_Resolution.y,
            &pf[0]);
+  PLASSERT (NumFields == 5);
 #endif
   m_pf = PLPixelFormat::FromName(&pf[0]);
  
-  PLASSERT (NumFields == 5);
 }
 
 void PLBmpInfo::SetBmpInfo (const PLPoint& Size, const PLPoint& Resolution,
