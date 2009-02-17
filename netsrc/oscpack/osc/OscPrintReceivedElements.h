@@ -32,6 +32,7 @@
 
 #include <iosfwd>
 
+#include "oscpack_settings.h"
 #ifndef INCLUDED_OSCRECEIVEDELEMENTS_H
 #include "OscReceivedElements.h"
 #endif /* INCLUDED_OSCRECEIVEDELEMENTS_H */

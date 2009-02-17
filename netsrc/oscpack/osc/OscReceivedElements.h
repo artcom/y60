@@ -32,6 +32,7 @@
 
 #include "OscTypes.h"
 #include "OscException.h"
+#include "oscpack_settings.h"
 
 
 namespace osc{
@@ -68,7 +69,7 @@ public:
 };
 
 
-class ReceivedPacket{
+class NETSRC_OSCPACK_EXPORT ReceivedPacket{
 public:
     ReceivedPacket( const char *contents, int32 size )
         : contents_( contents )
@@ -86,7 +87,7 @@ private:
 };
 
 
-class ReceivedBundleElement{
+class NETSRC_OSCPACK_EXPORT ReceivedBundleElement{
 public:
     ReceivedBundleElement( const char *size )
         : size_( size ) {}
@@ -153,7 +154,7 @@ inline bool operator!=(const ReceivedBundleElementIterator& lhs,
 }
 
 
-class ReceivedMessageArgument{
+class NETSRC_OSCPACK_EXPORT ReceivedMessageArgument{
 public:
 	ReceivedMessageArgument( const char *typeTag, const char *argument )
 		: typeTag_( typeTag )
@@ -225,7 +226,7 @@ private:
 };
 
 
-class ReceivedMessageArgumentIterator{
+class NETSRC_OSCPACK_EXPORT ReceivedMessageArgumentIterator{
 public:
 	ReceivedMessageArgumentIterator( const char *typeTags, const char *arguments )
         : value_( typeTags, arguments ) {}
@@ -409,7 +410,7 @@ public:
 };
 
 
-class ReceivedMessage{
+class NETSRC_OSCPACK_EXPORT ReceivedMessage{
     void Init( const char *bundle, unsigned long size );
 public:
     explicit ReceivedMessage( const ReceivedPacket& packet );
@@ -451,7 +452,7 @@ private:
 };
 
 
-class ReceivedBundle{
+class NETSRC_OSCPACK_EXPORT ReceivedBundle{
     void Init( const char *message, unsigned long size );
 public:
     explicit ReceivedBundle( const ReceivedPacket& packet );

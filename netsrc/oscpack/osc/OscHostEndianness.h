@@ -30,6 +30,8 @@
 #ifndef OSC_HOSTENDIANNESS_H
 #define OSC_HOSTENDIANNESS_H
 
+#include "oscpack_settings.h"
+
 /*
     Make sure either OSC_HOST_LITTLE_ENDIAN or OSC_HOST_BIG_ENDIAN is defined
 

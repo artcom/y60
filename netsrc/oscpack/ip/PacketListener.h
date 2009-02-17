@@ -30,6 +30,7 @@
 #ifndef INCLUDED_PACKETLISTENER_H
 #define INCLUDED_PACKETLISTENER_H
 
+#include "../osc/oscpack_settings.h"
 
 class IpEndpointName;
 

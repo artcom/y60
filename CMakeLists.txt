@@ -11,6 +11,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/acmake/modules)
 # make build-integrated packages available
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/asl)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/y60)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/oscpack/osc)
 
 # set some flags telling sub-packages that
 # they are being built as a subpackage
@@ -33,6 +34,7 @@ set(ACMAKE_BUILDINFO_TEMPLATE
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/SDL_ttf2/include
+    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/oscpack/osc/include
 )
 
 # traverse our subdirectories

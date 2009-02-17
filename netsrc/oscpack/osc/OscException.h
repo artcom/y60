@@ -32,6 +32,8 @@
 
 #include <exception>
 
+#include "oscpack_settings.h"
+
 namespace osc{
 
 class Exception : public std::exception {

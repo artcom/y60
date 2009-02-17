@@ -34,6 +34,7 @@
 #include <map>
 
 #include "OscPacketListener.h"
+#include "oscpack_settings.h"
 
 
 

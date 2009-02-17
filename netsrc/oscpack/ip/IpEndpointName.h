@@ -30,8 +30,9 @@
 #ifndef INCLUDED_IPENDPOINTNAME_H
 #define INCLUDED_IPENDPOINTNAME_H
 
+#include "../osc/oscpack_settings.h"
 
-class IpEndpointName{
+class NETSRC_OSCPACK_EXPORT IpEndpointName{
     static unsigned long GetHostByName( const char *s );
 public:
     static const unsigned long ANY_ADDRESS = 0xFFFFFFFF;

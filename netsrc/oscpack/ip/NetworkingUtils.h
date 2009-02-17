@@ -30,6 +30,7 @@
 #ifndef INCLUDED_NETWORKINGUTILS_H
 #define INCLUDED_NETWORKINGUTILS_H
 
+#include "../osc/oscpack_settings.h"
 
 // in general NetworkInitializer is only used internally, but if you're 
 // application creates multiple sockets from different threads at runtime you

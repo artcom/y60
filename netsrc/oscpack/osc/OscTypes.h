@@ -30,6 +30,7 @@
 #ifndef INCLUDED_OSCTYPES_H
 #define INCLUDED_OSCTYPES_H
 
+#include "oscpack_settings.h"
 
 namespace osc{
 
@@ -101,7 +102,7 @@ inline BundleInitiator BeginBundle( uint64 timeTag=1 )
 struct BundleTerminator{
 };
 
-extern BundleTerminator EndBundle;
+extern NETSRC_OSCPACK_EXPORT BundleTerminator EndBundle;
 
 struct BeginMessage{
     explicit BeginMessage( const char *addressPattern_ ) : addressPattern( addressPattern_ ) {}
@@ -111,7 +112,7 @@ struct BeginMessage{
 struct MessageTerminator{
 };
 
-extern MessageTerminator EndMessage;
+extern NETSRC_OSCPACK_EXPORT MessageTerminator EndMessage;
 
 
 // osc specific types. they are defined as structs so they can be used

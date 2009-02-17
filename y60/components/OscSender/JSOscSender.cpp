@@ -176,7 +176,6 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         } else {
             return JS_FALSE;
         }
-        return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 

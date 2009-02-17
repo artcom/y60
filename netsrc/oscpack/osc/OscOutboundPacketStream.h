@@ -32,6 +32,7 @@
 
 #include "OscTypes.h"
 #include "OscException.h"
+#include "oscpack_settings.h"
 
 
 namespace osc{
@@ -64,7 +65,7 @@ public:
 };
 
 
-class OutboundPacketStream{
+class NETSRC_OSCPACK_EXPORT OutboundPacketStream{
 public:
 	OutboundPacketStream( char *buffer, unsigned long capacity );
 	~OutboundPacketStream();

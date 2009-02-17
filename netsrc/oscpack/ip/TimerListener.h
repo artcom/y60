@@ -30,6 +30,7 @@
 #ifndef INCLUDED_TIMERLISTENER_H
 #define INCLUDED_TIMERLISTENER_H
 
+#include "../osc/oscpack_settings.h"
 
 class TimerListener{
 public:

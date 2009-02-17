@@ -30,6 +30,8 @@
 #ifndef INCLUDED_UDPSOCKET_H
 #define INCLUDED_UDPSOCKET_H
 
+#include "../osc/oscpack_settings.h"
+
 #ifndef INCLUDED_NETWORKINGUTILITIES_H
 #include "NetworkingUtils.h"
 #endif /* INCLUDED_NETWORKINGUTILITIES_H */
@@ -44,7 +46,7 @@ class TimerListener;
 
 class UdpSocket;
 
-class SocketReceiveMultiplexer{
+class NETSRC_OSCPACK_EXPORT SocketReceiveMultiplexer{
     class Implementation;
     Implementation *impl_;
 
@@ -72,7 +74,7 @@ public:
 };
 
 
-class UdpSocket{
+class NETSRC_OSCPACK_EXPORT UdpSocket{
     class Implementation;
     Implementation *impl_;
     

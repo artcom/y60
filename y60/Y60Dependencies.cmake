@@ -42,6 +42,8 @@ endif(WIN32)
 
 list(APPEND REQ_PACKAGES FFMPEG )
 
+list(APPEND REQ_PACKAGES OSCPACK )
+
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)
     mark_as_advanced( COCOA_LIBRARIES )

@@ -30,8 +30,10 @@
 #ifndef INCLUDED_OSCPACKETLISTENER_H
 #define INCLUDED_OSCPACKETLISTENER_H
 
-#include "OscReceivedElements.h"
 #include "../ip/PacketListener.h"
+
+#include "OscReceivedElements.h"
+#include "oscpack_settings.h"
 
 
 namespace osc{

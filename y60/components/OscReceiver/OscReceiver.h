@@ -71,6 +71,9 @@
 #include <y60/input/IEventSource.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 
+
+extern std::string ourosceventxsd;
+
 namespace y60 {
 
     DEFINE_EXCEPTION( OscException, asl::Exception );
