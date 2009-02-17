@@ -10,7 +10,7 @@
 #   define AC_DLL_IMPORT
 #endif
 
-#ifdef oscpack_EXPORTS
+#if defined(oscpackosc_EXPORTS) || defined(oscpackip_EXPORTS)
 #   define NETSRC_OSCPACK_EXPORT AC_DLL_EXPORT
 #else
 #   define NETSRC_OSCPACK_EXPORT AC_DLL_IMPORT
