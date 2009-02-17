@@ -1,4 +1,6 @@
 
+if(WIN32)
+
 set(SOURCES
 AnimationExporter.cpp
 CurveExporter.cpp
@@ -34,3 +36,4 @@ ac_add_plugin(
     EXTERNS MAYA
 )
 
+endif(WIN32)
