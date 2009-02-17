@@ -1,5 +1,0 @@
-liblub_la_SOURCES +=    lub/heap/posix/heap_clean_stacks.c  \
-                        lub/heap/posix/heap_leak_mutex.c    \
-                        lub/heap/posix/heap_scan_bss.c      \
-                        lub/heap/posix/heap_scan_data.c     \
-                        lub/heap/posix/heap_symShow.c
