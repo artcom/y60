@@ -51,7 +51,7 @@
 #    define OSC_HOST_LITTLE_ENDIAN 1
 #    undef OSC_HOST_BIG_ENDIAN
 
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__GNUC__)
 
 #    if defined(__LITTLE_ENDIAN__)
 #    define OSC_HOST_LITTLE_ENDIAN 1
