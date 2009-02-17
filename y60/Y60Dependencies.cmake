@@ -36,7 +36,7 @@ endif(WIN32)
 
 list(APPEND REQ_PACKAGES FFMPEG )
 
-#list(APPEND REQ_PACKAGES OSCPACK ) # XXX: ingo, fix this. maybe make optional.
+list(APPEND REQ_PACKAGES OSCPACK )
 
 if( OSX )
     find_library( COCOA_LIBRARIES NAMES Cocoa)
