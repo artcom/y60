@@ -23,16 +23,19 @@ if(PRO60_DEPS)
 
     list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
 
-    macro(pro60_deps_install)
-        get_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED _WILL_BE_INSTALLED)
-        if(NOT _WILL_BE_INSTALLED)
-            add_subdirectory(${PRO60_DEPS} pro60-deps)
-            set_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED YES)
-        endif(NOT _WILL_BE_INSTALLED)
-    endmacro(pro60_deps_install)
-
 else(PRO60_DEPS)
     if(NOT LINUX)
         message(FATAL_ERROR "PRO60_DEPS environment variable not set")
     endif(NOT LINUX)
 endif(PRO60_DEPS)
+
+macro(pro60_deps_install)
+    if(PRO60_DEPS)
+        get_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED _WILL_BE_INSTALLED)
+        if(NOT _WILL_BE_INSTALLED)
+            add_subdirectory(${PRO60_DEPS} pro60-deps)
+            set_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED YES)
+        endif(NOT _WILL_BE_INSTALLED)
+    endif(PRO60_DEPS)
+endmacro(pro60_deps_install)
+
