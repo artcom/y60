@@ -198,10 +198,17 @@ namespace y60 {
             updateCubemap(theTexture, myImage);
             break;
         case TEXTURE_RECTANGLE:
-            AC_ERROR << "GLResourceManager::updateTextureData: internal error: encountered texture type TEXTURE_RECTANGLE, which should be neither used nor is supported";
+            {
+                AC_ERROR << "GLResourceManager::updateTextureData: internal error: "
+                         << "encountered texture type TEXTURE_RECTANGLE, which "
+                         << "should be neither used nor is supported";
+            }
             break;
         default:
-            AC_ERROR << "GLResourceManager::updateTextureData: internal error: illegal texture type:" << theTexture->getType();
+            {
+                AC_ERROR << "GLResourceManager::updateTextureData: internal error: "
+                         << "illegal texture type:" << theTexture->getType();
+            }
         }
         CHECK_OGL_ERROR;
 

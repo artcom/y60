@@ -141,10 +141,14 @@ AssetRequest::onError(CURLcode theCode) {
         case CURLE_RECV_ERROR:
         case CURLE_BAD_CONTENT_ENCODING:
         case CURLE_FILESIZE_EXCEEDED:
-            AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
+            {
+                AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
+            }
             break;
         default:
-            AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();        
+            {
+                AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();        
+            }
     }
 }    
 
