@@ -78,7 +78,7 @@ class ASSEventSource : public asl::PlugInBase,
 
 
         const char * ClassName() {
-            static const char * myClassName = "ASSEventSource";
+            static const char * myClassName = "y60ASSEventSource";
             return myClassName;
         }
 
