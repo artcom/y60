@@ -65,7 +65,7 @@
 
 namespace y60 {
    
-class IFrameBuffer {
+class Y60_SCENE_EXPORT IFrameBuffer {
     public:
         virtual int getWidth() const = 0;
         virtual int getHeight() const = 0;

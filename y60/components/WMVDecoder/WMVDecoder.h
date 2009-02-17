@@ -76,7 +76,11 @@
 #include <asl/base/Exception.h>
 
 #include <windows.h>
-#include <wmsdk/wmsdk.h>
+#if(AC_BUILT_WITH_CMAKE)
+#   include <wmsdk.h>
+#else
+#   include <wmsdk/wmsdk.h>
+#endif
 #include <deque>
 
 extern "C" {

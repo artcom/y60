@@ -23,7 +23,7 @@ PixelRaster
 Pixels
 )
 
-list( INSERT EXTERNALS 0 OPENEXR )
+list( APPEND EXTERNALS OPENEXR )
 
 ac_add_library(
     aslraster asl/raster

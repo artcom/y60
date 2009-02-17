@@ -111,7 +111,7 @@ namespace asl {
     }
 
 #ifdef _WIN32
-		bool hResultIsOk(HRESULT hr, std::string & theMessage);
+		ASL_BASE_EXPORT bool hResultIsOk(HRESULT hr, std::string & theMessage);
 #endif		
     /* @} */
 

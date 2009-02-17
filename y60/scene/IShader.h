@@ -137,7 +137,7 @@ namespace y60 {
     typedef asl::Ptr<ICombiner, dom::ThreadingModel> ICombinerPtr;
     typedef asl::WeakPtr<ICombiner, dom::ThreadingModel> ICombinerWeakPtr;
 
-    class IShaderLibrary {
+    class Y60_SCENE_EXPORT IShaderLibrary {
     public:
         virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
         virtual ICombinerPtr findCombiner(const std::string & theCombinerName) = 0;

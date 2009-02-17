@@ -65,7 +65,11 @@
 #include <asl/audio/ISampleSink.h>
 #include <asl/base/Block.h>
 
-#include <wmsdk/wmsdk.h>
+#ifdef AC_BUILT_WITH_CMAKE
+#   include <wmsdk.h>
+#else
+#   include <wmsdk/wmsdk.h>
+#endif
 
 #ifdef OSX
     extern "C" {
