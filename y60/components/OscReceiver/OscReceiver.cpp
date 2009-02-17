@@ -70,7 +70,7 @@
 using namespace std;
 using namespace asl;
 
-std::string ourosceventxsd;
+extern std::string ourosceventxsd;
 
 
 namespace y60 {

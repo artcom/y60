@@ -1,6 +1,7 @@
 
 set(SOURCES
 JSOscReceiver.cpp
+osceventxsd.cpp
 OscReceiver.cpp
 OscReceiverPlugin.cpp
 )

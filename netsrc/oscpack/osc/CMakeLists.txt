@@ -30,6 +30,10 @@ else(WIN32)
         )
 endif(WIN32)
 
+if(LINUX)
+    add_definitions(-DOSC_HOST_LITTLE_ENDIAN)
+endif(LINUX)
+
 
 set( HEADERS
 MessageMappingOscPacketListener.h
