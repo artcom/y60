@@ -1,5 +1,44 @@
 <?xml version="1.0"?>
 <project default-recipe="unix_make">
+    <!-- postprocessors for the configure phase -->
+    <post-processor name="cmake.pp">
+        <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
+            <pattern category="error" expression="^CMake Error"/>
+        </regex.pp>
+        <regex.pp name="cmake_warning.pp" trailing-context="10">
+            <pattern category="warning" expression="CMake Warning"/>
+        </regex.pp>
+        <regex.pp name="cmake_config_warning.pp">
+            <pattern category="warning" expression="^ -- Could NOT find"/>
+            <pattern category="warning" expression="- NOT found"/>
+        </regex.pp>
+    </post-processor>
+
+    <!-- postprocessors for the build phase -->
+    <post-processor name="gcc_build.pp">
+        <gcc.pp name="gcc.pp"/>
+    </post-processor>
+
+    <post-processor name="msvc_build.pp">
+        <msbuild.pp name="msbuild.pp"/>
+    </post-processor>
+
+    <!-- postprocessors for the test phase -->
+    <post-processor name="msvc_test_run.pp">
+        <msbuild.pp name="msbuild.pp"/>
+        <regex.pp name="ctest.pp">
+            <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
+        </regex.pp>
+    </post-processor>
+
+    <post-processor name="make_test_run.pp">
+        <make.pp name="make.pp"/>
+        <regex.pp name="ctest.pp">
+            <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
+        </regex.pp>
+    </post-processor>
+
+    <!-- macros -->
     <macro name="prepare_build">
         <command name="create build directory">
             <executable exe="cmake" args="-E make_directory ${build.dir}"/>
@@ -13,34 +52,13 @@
                 <arg>-D</arg><arg>CMAKE_VERBOSE_MAKEFILE=1</arg>
                 <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${build.type}</arg>
                 <arg>${cmake.source.dir}</arg>
+
+                <process processor="${cmake.pp}"/>
             </executable>
         </command>
     </macro>
 
 
-    <post-processor name="cmake.pp">
-        <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
-            <pattern category="error" expression="^CMake Error"/>
-        </regex.pp>
-        <regex.pp name="cmake_warning.pp" trailing-context="10">
-            <pattern category="warning" expression="CMake Warning"/>
-        </regex.pp>
-            <regex.pp name="cmake_config_warning.pp">
-        <pattern category="warning" expression="^ -- Could NOT find"/>
-        </regex.pp>
-    </post-processor>
-
-    <regex.pp name="ctest.pp">
-        <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
-    </regex.pp>
-
-    <post-processor name="gcc_build.pp">
-        <gcc.pp name="gcc.pp"/>
-    </post-processor>
-
-    <post-processor name="msvc_build.pp">
-        <msbuild.pp name="msbuild.pp"/>
-    </post-processor>
 
     <recipe name="unix_make">
         <property name="build.dir" value="_builds/${build.type}/"/>
@@ -58,7 +76,9 @@
         </command>
 
         <command name="test">
-            <make targets="test" working-dir="${build.dir}"/>
+            <make targets="test" working-dir="${build.dir}">
+                <process processor="${make_test_run.pp}"/>
+            </make>
         </command>
     </recipe>
 
@@ -83,6 +103,8 @@
 
         <command name="test">
             <executable exe="${nmake.bin}" args="test" working-dir="${build.dir}"/>
+                <process processor="${make_test_run.pp}"/>
+            </executable>
         </command>
     </recipe>
 
@@ -111,18 +133,6 @@
             </executable>
         </command>
 
-        <!--
-        <command name="build">
-            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
-                <arg>/M${parallel.jobs}</arg>
-                <arg>PRO60.sln</arg>
-                <arg>&quot;${build.type}|Win32&quot;</arg>
-
-                <process processor="${msvc_build.pp}"/>
-            </executable>
-        </command>
-        -->
-
         <command name="test">
             <executable exe="cmd.exe" working-dir="${build.dir}">
                 <arg>/C</arg>
@@ -130,7 +140,7 @@
                 <arg>RUN_TESTS.vcproj</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
 
-                <process processor="${msvc_build.pp}"/>
+                <process processor="${msvc_test_run.pp}"/>
             </executable>
         </command>
     </recipe>
@@ -164,6 +174,8 @@
             <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
                 <arg>RUN_TESTS.vcproj</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
+
+                <process processor="${msvc_test_run.pp}"/>
             </executable>
         </command>
     </recipe>
