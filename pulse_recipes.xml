@@ -12,7 +12,7 @@
                 <arg>-G</arg><arg>${cmake.generator}</arg>
                 <arg>-D</arg><arg>CMAKE_VERBOSE_MAKEFILE=1</arg>
                 <arg>-D</arg><arg>CMAKE_BUILD_TYPE=${build.type}</arg>
-                <arg>../../</arg>
+                <arg>${cmake.source.dir}</arg>
             </executable>
         </command>
     </macro>
@@ -48,6 +48,7 @@
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Unix Makefiles"/>
+        <property name="cmake.source.dir" value="../../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
@@ -71,6 +72,7 @@
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="NMake Makefile"/>
+        <property name="cmake.source.dir" value="../../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
@@ -94,6 +96,7 @@
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <property name="cmake.source.dir" value="../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
@@ -133,6 +136,7 @@
     </recipe>
 
     <recipe name="windows_incredibuild">
+        <property name="build.dir" value="_builds/"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
@@ -142,6 +146,7 @@
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <property name="cmake.source.dir" value="../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
