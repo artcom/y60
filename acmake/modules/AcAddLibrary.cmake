@@ -144,8 +144,8 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
     foreach(TEST ${THIS_LIBRARY_TESTS})
         set(TEST_EXE_NAME "${TEST_NAMESPACE}_test${TEST}")
-        set(TEST_EXE_PATH
-                "${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAMESPACE}_test${TEST}")
+        set(TEST_EXE_PATH "${CMAKE_BINARY_DIR}/bin/${TEST_NAMESPACE}_test${TEST}")
+               
         # define the executable
         ac_add_executable(
             ${TEST_EXE_NAME}
