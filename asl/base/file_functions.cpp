@@ -283,8 +283,9 @@ namespace asl {
     }
 
     std::string searchFile(const std::string & theFileName, const std::string & theSearchPath) {
-       if (fileExists(theFileName)) {
-             return theFileName;
+       std::string myLocalFileName("./" + theFileName);
+       if (fileExists(myLocalFileName)) {
+             return myLocalFileName;
        }
        std::vector<std::string> mySearchPaths;
        splitPaths(theSearchPath, mySearchPaths);
