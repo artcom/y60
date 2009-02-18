@@ -24,7 +24,7 @@ PLFilterLightness::~PLFilterLightness()
 
 void PLFilterLightness::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
 {
-  int total = 0;
+  // int total = 0;
 
   double lightness = 2.55 * (double) (m_lightness);
 

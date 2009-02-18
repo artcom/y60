@@ -370,7 +370,7 @@ new file:
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\VbOrder\\Products.Xml");
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\Stock_Sorter\\Stock-Sorter.Xml");
         */
-        for (int i = 0; i < file_name.size(); ++i) {
+        for (unsigned int i = 0; i < file_name.size(); ++i) {
 #ifdef single_test        
             std::cout << asl::readFile(file_name[i]) << std::endl;
 #endif
@@ -438,7 +438,7 @@ new file:
                         std::cerr << "#### ERROR: 1st and 2nd Representation differs! (tmpout.xml != tmpout2.xml)" << std::endl;
                         std::cerr << "file1.size() = " << file1.size()<< std::endl;
                         std::cerr << "file2.size() = " << file2.size() << std::endl;
-                        for (int j = 0; j < asl::minimum(file1.size(),file2.size());++j) {
+                        for (unsigned int j = 0; j < asl::minimum(file1.size(),file2.size());++j) {
                             if (file1[j] == file2[j]) std::cerr << file1[j];
                             else std::cerr << "{"<< file1[j] << "|" << file2[j] << "}";
                         }			
@@ -451,7 +451,7 @@ new file:
 							std::cerr << "#### ERROR: (Serializer): 3rd and 2nd Representation differs!" << std::endl;
 							std::cerr << "file3.size() = " << file3.size()<< std::endl;
 							std::cerr << "file2.size() = " << file2.size() << std::endl;
-							for (int j = 0; j < asl::minimum(file3.size(),file2.size());++j) {
+							for (unsigned int j = 0; j < asl::minimum(file3.size(),file2.size());++j) {
 								if (file3[j] == file2[j]) std::cerr << file3[j];
 								else std::cerr << "{"<< file3[j] << "|" << file2[j] << "}";
 							}			

@@ -162,7 +162,7 @@ JSLocale::ConstIntProperties() {
     return myProperties;
 };
 
-
+#ifdef WITH_UNUSED_FUNCTIONS
 static JSBool
 getStaticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
@@ -188,6 +188,7 @@ setStaticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     }
     return JS_TRUE;
 }
+#endif
 
 JSPropertySpec *
 JSLocale::StaticProperties() {

@@ -117,14 +117,36 @@ inline T convertFromString(const std::string& str)
 
 const std::string STARTUP_COUNT_ENV = "AC_STARTUP_COUNT";
 
-Application::Application(Logger & theLogger):
-    _myAllowMissingHeartbeats(3), _myHeartbeatFrequency(0), _myPerformECG(false),_myRestartedToday(false),
-    _myRestartMemoryThreshold(0),_myRestartTimeInSecondsToday(0), _myCheckMemoryTimeInSecondsToday(0),
-    _myAppStartTimeInSeconds(0), _myRecvRestart(false), _myRestartMode(UNSET),_myCheckedMemoryToday(false),
-    _myRestartCheck(false), _myMemoryThresholdTimed(0),_myStartTimeInSeconds(0),
-    _myMemoryIsFull(false), _myItIsTimeToRestart(false), _myHeartIsBroken(false),
-    _myDayChanged(false), _myLogger(theLogger), _myWindowTitle(""), _myApplicationPaused(false),
-    _myRestartDelay(10), _myStartDelay(0), _myStartupCount(0), _myWorkingDirectory("")
+Application::Application(Logger & theLogger)
+:
+_myFileName(""),
+_myWorkingDirectory(""),
+_myWindowTitle(""),
+_myAppStartTimeInSeconds(0),
+_myRecvRestart(false),
+_myAllowMissingHeartbeats(3),
+_myHeartbeatFrequency(0),
+_myPerformECG(false),
+_myRestartMemoryThreshold(0),
+_myRestartDay(""),
+_myRestartTimeInSecondsToday(0),
+_myCheckMemoryTimeInSecondsToday(0),
+_myMemoryThresholdTimed(0),
+_myRestartMode(UNSET),
+_myRestartCheck(false),
+_myApplicationPaused(false),
+_myCheckedMemoryToday(false),
+_myRestartedToday(false),
+_myMemoryIsFull(false),
+_myItIsTimeToRestart(false),
+_myHeartIsBroken(false),
+_myStartTimeInSeconds(0),
+_myDayChanged(false),
+_myLogger(theLogger),
+_myStartDelay(0),
+_myRestartDelay(10),
+_myStartupCount(0)
+
 {
 }
 
@@ -133,7 +155,7 @@ Application::~Application() {
 
 void 
 Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
-    for (int myEnvNr = 0; myEnvNr < theEnvironmentSettings->childNodesLength(); myEnvNr++) {
+    for (unsigned int myEnvNr = 0; myEnvNr < theEnvironmentSettings->childNodesLength(); myEnvNr++) {
         const dom::NodePtr & myEnvNode = theEnvironmentSettings->childNode(myEnvNr);
         if (myEnvNode->nodeType() == dom::Node::ELEMENT_NODE) {
             string myEnviromentVariable = myEnvNode->getAttributeString("name");
@@ -171,7 +193,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
     if (theAppNode->childNode("Arguments")) {
         const dom::NodePtr & myArguments = theAppNode->childNode("Arguments");
         AC_DEBUG << "arguments: " << myArguments;
-        for (int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
+        for (unsigned int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
             const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
             if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE && 
                 myArgumentNode->hasChildNodes() ) {

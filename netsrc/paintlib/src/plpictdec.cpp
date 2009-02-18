@@ -375,7 +375,7 @@ void PLPictDecoder::opcode9a
   MacRect TempRect;
   readRect (&TempRect, pDataSrc);
   readRect (&TempRect, pDataSrc);
-  PLWORD mode = ReadMWord(pDataSrc);
+  /*PLWORD mode = */ ReadMWord(pDataSrc);
 
   // Create empty DIB
   setBmpInfo (m_PixMap);
@@ -418,7 +418,7 @@ void PLPictDecoder::headerOp
     ( PLDataSource * pDataSrc
     )
 {
-  int Version = ReadMWord (pDataSrc);
+  /*int Version =*/ ReadMWord (pDataSrc);
   m_Resolution.x = ReadMLong(pDataSrc);
   m_Resolution.y = ReadMLong(pDataSrc);
   MacRect Dummy;
@@ -534,7 +534,7 @@ void PLPictDecoder::DecodeBitmap
       PLDataSource * pDataSrc
     )
 {
-  PLWORD mode = ReadMWord(pDataSrc);
+  /*PLWORD mode =*/ ReadMWord(pDataSrc);
 
   if (m_bIsRegion)
     skipPolyOrRegion (pDataSrc);
@@ -574,7 +574,7 @@ void PLPictDecoder::DecodePixmap
   MacRect TempRect;
   readRect (&TempRect, pDataSrc);
   readRect (&TempRect, pDataSrc);
-  PLWORD mode = ReadMWord(pDataSrc);
+  /* PLWORD mode =*/ ReadMWord(pDataSrc);
 
   if (m_bIsRegion)
     skipPolyOrRegion (pDataSrc);
@@ -1174,11 +1174,11 @@ void PLPictDecoder::tracePixMapHeader
   Trace (Level, sz);
   sprintf (sz, "  packType: %d\n", pPixMap->packType);
   Trace (Level, sz);
-  sprintf (sz, "  packSize: %ld\n", pPixMap->packSize);
+  sprintf (sz, "  packSize: %ld\n", static_cast<long int>(pPixMap->packSize));
   Trace (Level, sz);
-  sprintf (sz, "  hRes: %ld\n", pPixMap->hRes);
+  sprintf (sz, "  hRes: %ld\n", static_cast<long int>(pPixMap->hRes));
   Trace (Level, sz);
-  sprintf (sz, "  vRes: %ld\n", pPixMap->vRes);
+  sprintf (sz, "  vRes: %ld\n", static_cast<long int>(pPixMap->vRes));
   Trace (Level, sz);
   sprintf (sz, "  pixelSize: %d\n", pPixMap->pixelSize);
   Trace (Level, sz);
@@ -1186,7 +1186,7 @@ void PLPictDecoder::tracePixMapHeader
   Trace (Level, sz);
   sprintf (sz, "  cmpSize: %d.\n", pPixMap->cmpSize);
   Trace (Level, sz);
-  sprintf (sz, "  planeBytes: %ld.\n", pPixMap->planeBytes);
+  sprintf (sz, "  planeBytes: %ld.\n", static_cast<long int>(pPixMap->planeBytes));
   Trace (Level, sz);
 }
 

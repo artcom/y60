@@ -18,6 +18,10 @@
   #include <windows.h>
 #endif
 
+#ifdef EXTERN
+    // avoid redefinition warning in jpeglib.h
+    #undef EXTERN
+#endif
 extern "C"
 {
 #include "jpeglib.h"
@@ -27,6 +31,10 @@ extern "C"
 #include "jmemdest.h"
 
 // This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
+#ifdef EXTERN
+    // avoid redefinition warning in jpeglib.h
+    #undef EXTERN
+#endif
 #define JPEG_INTERNALS
 #include <jmorecfg.h>
 
@@ -149,8 +157,8 @@ void PLJPEGEncoder::DoEncode
 
 }
 
-// 　� RGB_PIXELSIZE constant from libjpeg !!!
-// 　� RGB_RED, RGB_GREEN, RGB_BLUE constants from libjpeg !!!
+// 째째째 RGB_PIXELSIZE constant from libjpeg !!!
+// 째째째 RGB_RED, RGB_GREEN, RGB_BLUE constants from libjpeg !!!
 void PLJPEGEncoder::encodeRGB
     ( PLBmpBase * pBmp,
       int iScanLines
@@ -164,9 +172,10 @@ void PLJPEGEncoder::encodeRGB
 
 #if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))
   pBuf = new PLBYTE [pBmp->GetWidth()*RGB_PIXELSIZE];
+#else
+  int written = 0;
 #endif
 
-  int written = 0;
   while (CurLine < iScanLines)
   {
 #if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))

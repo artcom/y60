@@ -75,7 +75,7 @@ class AtomicThreadSafetyTest: public UnitTest {
 public:    
     AtomicThreadSafetyTest()
         : UnitTest("AtomicThreadSafetyTest"),
-          _myThread(workFunction, this), I(0), D(_myArraySize)
+          I(0), D(_myArraySize), _myThread(workFunction, this)
     { 
     }
     

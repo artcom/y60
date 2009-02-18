@@ -246,14 +246,14 @@ public:
     rect_iterator() {}
     rect_iterator(const rect_iterator& x) 
         :   current(x.current), 
-            hiter(x.hiter),
-            viter(x.viter),
             begin_of_line(x.begin_of_line),
-            end_of_line(x.end_of_line)
+            end_of_line(x.end_of_line),
+            hiter(x.hiter),
+            viter(x.viter)
     { }
 
     rect_iterator(hiterator hbegin, viterator vbegin, Distance h_size)
-        : hiter(hbegin) , viter(vbegin) , current(hbegin) 
+        : current(hbegin), hiter(hbegin), viter(vbegin)  
         {
             //      assert(pointer(hbegin, ptr_T()) == pointer(vbegin, ptr_T()));
             // std::cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size <<  std::endl;
@@ -276,7 +276,7 @@ public:
     by another iterator typically returned by an raster's end(..) method.
     */
     rect_iterator(hiterator hbegin, viterator vbegin, Distance h_size, hiterator cur)
-        : hiter(hbegin) , viter(vbegin) , current(cur) {
+        : current(cur), hiter(hbegin) , viter(vbegin)  {
           /*        std::cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size << ", cur = " << (void*)&(*cur) <<")" << std::endl;
             */
             assert(&(*hbegin) == &(*vbegin));

@@ -105,8 +105,8 @@ Histogram::Histogram() :
     Gtk::DrawingArea(),
     _myMode(MODE_CENTER_WIDTH),
     _myLogarithmicScaleFlag(true),
-    _myDrawWindowFlag(false),
-    _myDrawCenterFlag(false)
+    _myDrawCenterFlag(false),
+    _myDrawWindowFlag(false)
 {
     set_size_request(100, 50);
     Gdk::EventMask myFlags = get_events();

@@ -130,6 +130,11 @@ void PLFileSink::Close ()
 #else
   int towrite = GetDataSize();
   int written = fwrite( m_pStartData, 1, towrite, m_pFile );
+#ifndef _DEBUG
+// avoid warnings
+    (void)(towrite);
+    (void)(written);
+#endif
   PLASSERT( written == towrite );
   fclose( m_pFile );
   m_pFile = 0;

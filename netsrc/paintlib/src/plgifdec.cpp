@@ -119,7 +119,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
         if (pGifFile->Image.Left + pGifFile->Image.Width > pGifFile->SWidth ||
             pGifFile->Image.Top + pGifFile->Image.Height > pGifFile->SHeight)
         {
-          fprintf(stderr, "Image %d is not confined to screen dimension, aborted.\n");
+          fprintf(stderr, "Image is not confined to screen dimension, aborted.\n");
           PLASSERT (false);
         }
         if (pGifFile->Image.Interlace)

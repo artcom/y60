@@ -164,11 +164,11 @@ public:
         }
         asl::deleteFile(testFileName);
 	}
-	void testResizePerformance(const string & testFileName, int chunkSize, int chunkCount) {
+	void testResizePerformance(const string & testFileName, unsigned int chunkSize, unsigned int chunkCount) {
 		DPRINT2("Resize Performance Test with content of size", chunkSize*chunkCount);
         Block myTestContent;
         {
-		    for (int i = 0; i< chunkSize; ++i) {
+		    for (unsigned int i = 0; i< chunkSize; ++i) {
                 unsigned char myNextContentByte = ' ' + i%(255-' ');
 			    myTestContent.appendUnsigned8(myNextContentByte);
 		    }
@@ -179,7 +179,7 @@ public:
             ofstream outFile(testFileName.c_str(), ios::binary);
             ENSURE(outFile);
             NoisyScopeTimer myTimer(string("write ") + as_string(chunkCount) + " chunks of size " + as_string(chunkSize), chunkSize*chunkCount);
-            for (int i = 0; i < chunkCount; ++i) {
+            for (unsigned int i = 0; i < chunkCount; ++i) {
                 outFile.write(myTestContent.strbegin(),myTestContent.size());
                 if (!outFile) {
                     FAILURE("i/o error");
@@ -203,7 +203,7 @@ public:
 		    MappedBlock mappedTestContent(testMapFileName, 0);
             ENSURE(mappedTestContent);
             NoisyScopeTimer myTimer(string("mapped write ") + as_string(chunkCount) + " chunks of size " + as_string(chunkSize), chunkSize*chunkCount);
-            for (int i = 0; i < chunkCount; ++i) {
+            for (unsigned int i = 0; i < chunkCount; ++i) {
                 mappedTestContent.append(myTestContent);
                 if (!mappedTestContent) {
                     FAILURE("i/o error");

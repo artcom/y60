@@ -68,12 +68,12 @@ using namespace std;
 namespace jslib {
 
 JSRequest::JSRequest(const std::string & theURL) :
-    Request(theURL), _myJSContext(0), _myJSListener(0)
+    Request(theURL), _myJSListener(0), _myJSContext(0)
 {
 }
 
 JSRequest::JSRequest(const std::string & theURL, const std::string & theUserAgent) :
-    Request(theURL, theUserAgent), _myJSContext(0), _myJSListener(0)
+    Request(theURL, theUserAgent), _myJSListener(0), _myJSContext(0)
 {
 }
 
@@ -81,8 +81,8 @@ JSRequest::~JSRequest() {
 }
 
 void JSRequest::setJSListener(JSContext * theContext, JSObject * theListener) {
-    _myJSContext = theContext;
     _myJSListener = theListener;
+    _myJSContext = theContext;
 }
 
 void

@@ -91,8 +91,11 @@ typedef std::vector<int> KernelVec;
 
 class PLFilterGaussianBlur : public PLFilter {
     public:
-        PLFilterGaussianBlur(double theRadius, unsigned theRealWidth, unsigned theRealHeight, double theSigma=1.0) :
-            _myRadius(theRadius), _myRealWidth(theRealWidth), _myRealHeight(theRealHeight), _mySigma(theSigma)
+        PLFilterGaussianBlur(double theRadius, unsigned theRealWidth, unsigned theRealHeight, double theSigma=1.0)
+            : _mySigma(theSigma),
+            _myRadius(theRadius),
+            _myRealWidth(theRealWidth),
+            _myRealHeight(theRealHeight)
         {
             calcKernel();
         }
@@ -106,8 +109,8 @@ class PLFilterGaussianBlur : public PLFilter {
     mutable double _myRadius;
     mutable int _myKernelWidth;
     mutable KernelVec _myKernel;
-		unsigned _myRealWidth;
-		unsigned _myRealHeight;
+    unsigned _myRealWidth;
+    unsigned _myRealHeight;
 };
 
 #endif

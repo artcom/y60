@@ -119,21 +119,23 @@ SDLWindow::create() {
 SDLWindow::SDLWindow() :
     AbstractRenderWindow(SDLApp::ShellErrorReporter),
     _myWindowTitle("Y60 Renderer"),
-    _myWindowPosX(100), _myWindowPosY(100),
+    _myWindowPosX(100),
+    _myWindowPosY(100),
+    _myStandardCursor(0),
+    _myUserDefinedCursor(0),
     _myWindowInitFlag(false),
     _myFullscreenFlag(false),
     _myWinDecoFlag(true),
-    _myShowMouseCursorFlag(true),
-    _myCaptureMouseCursorFlag(false),
-    _myScreen(0),
     _myInitialWidth(800),
     _myInitialHeight(600),
-    _myUserDefinedCursor(0),
-    _myStandardCursor(0),
+    _myShowMouseCursorFlag(true),
+    _myCaptureMouseCursorFlag(false),
+    _myAppQuitFlag(false),
     _myAutoPauseFlag(false),
+    _myHasVideoSync(false),
+    _myScreen(0),
     _mySwapInterval(0),
-    _myLastSwapCounter(0),
-    _myHasVideoSync(false)
+    _myLastSwapCounter(0)
 {
     setGLContext(GLContextPtr(new GLContext()));
 }

@@ -2396,7 +2396,7 @@ void PLExifTag::DoTranslation()
       // Lookup value's verbose name and use that
       for (size_t Index=0; Trans[Index].Desc; Index++)
       {
-        if (Trans[Index].Value == m_UInt)
+        if (Trans[Index].Value == static_cast<int>(m_UInt))
         {
           m_Value = Trans[Index].Desc;
           m_Common = Trans[Index].Desc;

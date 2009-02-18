@@ -110,7 +110,7 @@ namespace y60 {
             // Calculate the wraparaound for reverse playback
             if (_myMovieTime < 0) {
                 unsigned myFrameCount = getFrameCount();
-                if (myFrameCount == -1 || myFrameCount == 0) {
+                if (myFrameCount == static_cast<unsigned>(-1) || myFrameCount == 0) {
                     AC_WARNING << "Movie cannot play backwards, because its framecount is unknown (framecount=" 
                                << myFrameCount << ")";   
                     _myMovieTime = 0;                              

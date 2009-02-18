@@ -87,7 +87,7 @@ void PLSubBmp::Create
     m_pLineArray = new PLBYTE * [m_Size.y];
   }
 
-  PLBYTE * pCurLine = m_pLineArray[0];
+  //PLBYTE * pCurLine = m_pLineArray[0];
   for (int y=0; y<m_Size.y; y++) 
   {
     m_pLineArray[y] = pBits;

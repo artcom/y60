@@ -250,7 +250,7 @@ void PLTIFFDecoder::doHiColor (TIFF * tif, PLBmpBase * pBmp, uint16 SamplePerPix
     raiseError (PL_ERRWRONG_SIGNATURE, "TIFF subformat not supported.");
   }
 
-  bool bHasAlpha = pBmp->HasAlpha();
+  //bool bHasAlpha = pBmp->HasAlpha();
   PLASSERT (int(img.width) == pBmp->GetWidth());
   PLASSERT (int(img.height) == pBmp->GetHeight());
   PLASSERT (pBmp->GetBitsPerPixel() == 32);

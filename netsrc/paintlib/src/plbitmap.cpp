@@ -73,9 +73,9 @@ void PLBmp::CreateCopy (const PLBmpBase & rSrcBmp,
     const PLPixelFormat& pfWanted)
 {
   PLASSERT_VALID (&rSrcBmp);
-
+#ifdef _DEBUG
   int BPPWanted = pfWanted.GetBitsPerPixel();
-
+#endif
   PLASSERT (BPPWanted == 32 || BPPWanted == 24 || BPPWanted == 16 ||
           BPPWanted == 8 || BPPWanted == 1 || BPPWanted == 0);
 #ifdef _DEBUG

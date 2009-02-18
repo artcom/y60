@@ -41,13 +41,13 @@ class LinearAlgebraTestBase : public UnitTest {
 
 		template<class T, class Number>
         void testFixedVectorBase(T & theProband, Number theTypeHint,
-                                 int theSize, const string & theProbandName)
+                                 unsigned int theSize, const string & theProbandName)
         {
 			// size test
 			ENSURE_MSG(theProband.size() == theSize, string(theProbandName + "'s size.").c_str() );
 
 			// operator [] and == tests
-			for (int i = 0; i < theSize; i++ ) {
+			for (unsigned int i = 0; i < theSize; i++ ) {
 				Number myValue = Number(5);
 				theProband[i] = myValue;
 				ENSURE_MSG(theProband[i] == myValue, string(theProbandName + "'s [] access and equal operator.").c_str() );

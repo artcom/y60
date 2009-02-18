@@ -86,18 +86,22 @@ namespace jslib {
                 const asl::Vector3f & theFinalPosition,
                 const asl::Vector3f & theFinalPositionOffset
     ) :
-        _myState(SLEEPING),
+        _myCellSize(0.f, 0.f, 0.f),
+        _myCurrentPosition(theStartPosition),
+        _myCurrentAlpha(0),
+        _myPositionIsDirty(false),
+        _myColorIsDirty(false),
         _myStartPosition(theStartPosition),
         _myFinalPosition(theFinalPosition),
         _myFinalPositionOffset(theFinalPositionOffset),
-        _myStateDuration(0),
-        _myGoToRelevance(1.0f),
+        _myStateDuration(0),        
+        _myState(SLEEPING),
+        _myAim(0.f,0.f,0.f),
+        _myVelocity(0.f,0.f,0.f),
         _myMaxForce(0.0f),
         _myMaxSpeed(0.0f),
         _myMass(0.0f),
-        _myCellSize(0.f, 0.f, 0.f),
-        _myPositionIsDirty(false),
-        _myColorIsDirty(false)
+        _myGoToRelevance(1.0f)
     {
         setState(SLEEPING);
     }

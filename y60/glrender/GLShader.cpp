@@ -108,10 +108,10 @@ namespace y60 {
         GL_TEXTURE_GEN_S, GL_TEXTURE_GEN_T, GL_TEXTURE_GEN_R, GL_TEXTURE_GEN_Q
     };
 
-    GLShader::GLShader(const dom::NodePtr theNode) :
-        _myType(FIXED_FUNCTION_MATERIAL),
-        _myHasBlendMinMaxEXT(hasCap("GL_EXT_blend_minmax")),
-        _myHasPointParmatersEXT(hasCap("GL_ARB_point_parameters"))
+    GLShader::GLShader(const dom::NodePtr theNode) 
+    :   _myType(FIXED_FUNCTION_MATERIAL),
+        _myHasPointParmatersEXT(hasCap("GL_ARB_point_parameters")),
+        _myHasBlendMinMaxEXT(hasCap("GL_EXT_blend_minmax"))
     {
         _myId              = theNode->getAttributeString(ID_ATTRIB);
         _myName            = theNode->getAttributeString(NAME_ATTRIB);

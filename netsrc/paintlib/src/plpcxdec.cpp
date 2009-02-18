@@ -141,8 +141,8 @@ void PLPCXDecoder::GetImage (PLBmpBase & Bmp)
     }
     if (m_PcxHeader.BitsPerPixel == 8 && m_PcxHeader.ColorPlanes == 1)
     {
-      PLBYTE colsig = ReadByte(m_pDataSrc);
 /* It seems like valid PCXs exist with a bad color map signature...
+      PLBYTE colsig = ReadByte(m_pDataSrc);
       if (colsig != PCX_256_COLORS)
       {
         raiseError(PL_ERRINTERNAL, "bad color map signature.");

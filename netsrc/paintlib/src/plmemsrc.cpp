@@ -20,8 +20,8 @@
 PLMemSource::PLMemSource()
   : PLDataSource (NULL), // No progress notification nessesary when
                         // reading from memory.
-    m_pCurPos(NULL),
-    m_pStartPos(0)
+    m_pStartPos(0),
+    m_pCurPos(NULL)
 {
 }
 

@@ -60,6 +60,7 @@ int PLURLSource::Open (const char *pURL)
   } else {
     long HTTPCode;
     CURLcode res = curl_easy_getinfo(CurlHandle, CURLINFO_HTTP_CODE, &HTTPCode);
+    (void)(res); // avoid unused warning
     if (HTTPCode > 399) {
         m_ErrCode = HTTPCode;
         m_sErrStr = httpErr2Str(HTTPCode);

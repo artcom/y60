@@ -79,7 +79,7 @@ ZipReader::readDirectory() {
         DB(AC_TRACE << "found '" << filename_inzip << "'" << endl);
         // change all backslashes to forward slashes
         int myNameSize = strlen(filename_inzip);
-        for (int j=0; j < myNameSize && j < sizeof(filename_inzip); ++j) {
+        for (int j=0; j < myNameSize && j < static_cast<int>(sizeof(filename_inzip)); ++j) {
             if ( filename_inzip[j] == '\\' ) {
                 filename_inzip[j] = '/';
             }

@@ -73,11 +73,12 @@ namespace y60 {
                const asl::Vector4f & theTextColor,
                const string & theString,
                const string theFont)
-            : _myPos(thePos),_myRenderer(theRenderer),
-              _myString(theString), _myFont(theFont),
-              _myTextColor(theTextColor)
-    {
-    }
+            : _myPos(thePos),
+            _myString(theString),
+            _myTextColor(theTextColor),
+            _myFont(theFont),
+            _myRenderer(theRenderer)
+    {}
 
     Text::~Text() {
     }

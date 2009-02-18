@@ -360,6 +360,8 @@ namespace y60 {
                 return theSurfaceWidth-_myRightPadding-theLine.width;
             case CENTER_ALIGNMENT:
                 return (_myLeftPadding-_myRightPadding+theSurfaceWidth-theLine.width) / 2;
+            default:
+                break; // avoid unused enum value warning
         }
         return 0;
     }
@@ -373,6 +375,8 @@ namespace y60 {
                 return theSurfaceHeight-_myBottomPadding-theTextHeight;
             case CENTER_ALIGNMENT:
                 return (_myTopPadding-_myBottomPadding+theSurfaceHeight-theTextHeight) / 2;
+            default:
+                break; // avoid unused enum value warning
         }
         return 0;
     }

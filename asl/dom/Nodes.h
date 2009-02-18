@@ -553,14 +553,14 @@ namespace dom {
         /** parse the xml-data contained in is starting from pos; returns the position
             of the last parsed character; does not propagate parse exceptions
             */
-        int parseAll(const DOMString & is);
+        asl::Unsigned32 parseAll(const DOMString & is);
 
         void parseFile(const std::string & theFileName);
 
         /** parse the xml-data contained in is starting from pos; returns the number
             of characters in is or throws a ParseException
         */
-        //virtual int Parse(const string& is, int pos, const Node* parent);
+        //int Parse(const string& is, int pos, const Node* parent);
         //@}
 
         /**@name status information */
@@ -568,17 +568,17 @@ namespace dom {
         /** query parsing success returns true if everything was parsed,
             false if parsing was aborted due to malformed xml data
         */
-        /*virtual*/ operator const void*() const {
+        operator const void*() const {
             return ( (nodeType()!=X_NO_NODE) && (_myParseCompletionPos == _myDocSize)
                   && (nodeType()!=DOCUMENT_NODE || hasLazyChildren() || getChildren().size()) )
                   ? this : NULL;
         }
         /// returns the position past the last character processed Parse()
-        /*virtual*/ int parsedUntil() const {
+        asl::Unsigned32 parsedUntil() const {
             return _myParseCompletionPos;
         }
         /// returns the size of the last string passed to Parse()
-        /*virtual*/ int docSize() const {
+        asl::Unsigned32 docSize() const {
             return _myDocSize;
         }
         //@}

@@ -12,6 +12,10 @@
 \--------------------------------------------------------------------
 */
 
+#ifdef EXTERN
+    // avoid redefinition warning in jpeglib.h
+    #undef EXTERN
+#endif
 #include "pljpegdec.h"
 
 #include "plexcept.h"
@@ -20,6 +24,10 @@
 #include "jmemsrc.h"
 
 // This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
+#ifdef EXTERN
+    // avoid redefinition warning in jpeglib.h
+    #undef EXTERN
+#endif
 #define JPEG_INTERNALS
 #include <jmorecfg.h>
 
@@ -104,9 +112,10 @@ void PLJPEGDecoder::Open (PLDataSource * pDataSrc)
 			throw e;
 		}
 	}
-
+#ifdef DECLARE_SUPERFLOUS_UNUSED_VARIABLES
     int DestBPP = 32;
     bool bIsGreyscale = false;
+#endif
     if (cinfo.out_color_space == JCS_GRAYSCALE)
     {
       /*DestBPP = 8;
@@ -197,9 +206,10 @@ void PLJPEGDecoder::decodeRGB
   PLBYTE * pBuf;
   JSAMPARRAY ppBuf = &pBuf;
   pBuf = new PLBYTE[GetWidth()*sizeof (PLPixel32)];
+#else
+  int read = 0;
 #endif
 
-  int read = 0;
   while (CurLine < GetHeight())
   {
     // Correct pixel ordering if libjpeg is configured differently

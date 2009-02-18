@@ -124,6 +124,16 @@ void DebugEventSink::handle(EventPtr theEvent) {
         case Event::QUIT:
             cerr << "QUIT" << endl;
             break;
+        //XXX provide more output for the following events:
+        case Event::MOUSE_WHEEL:
+            cerr << "MOUSE_WHEEL" << endl;
+            break;
+        case Event::TOUCH:
+            cerr << "TOUCH" << endl;
+            break;       
+        case Event::GENERIC:
+            cerr << "GENERIC" << endl;
+            break;  
     }    
 }
 

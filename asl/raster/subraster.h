@@ -462,7 +462,7 @@ class const_subraster
 
     public:  // UTILITY: return column x and line y for a given pointer
 
-        D size() const { return _xsize*_ysize;}
+        size_type size() const { return _xsize*_ysize;}
         D x(const T * cur) const { return ( cur - dataptr()) % stride();}
         D y(const T * cur) const { return ( cur - dataptr()) / stride();}
 

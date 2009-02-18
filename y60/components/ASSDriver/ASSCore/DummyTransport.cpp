@@ -66,10 +66,10 @@ using namespace std;
 DummyTransport::DummyTransport( const dom::NodePtr & theSettings ) :
     TransportLayer( "dummy", theSettings),
     _myFrameCount(0),
+    _myGenCheckSum(0),
     _myGridWidth(15),
     _myGridHeight(5),
     _myGridSpacing(100),
-    _myGenCheckSum(0),
     _myDimFactor(248)
 {
     DB(AC_TRACE << "DummyTransport()";)

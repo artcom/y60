@@ -53,7 +53,7 @@ void PLFilterContrast::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
   // works quite differently now: We create a cut-off for the higher output 
   // value range (shift right), or the lower ones (shift left).
 
-  int total = 0;
+  // int total = 0;
   register int inc;
 
   double contrast = m_contrast;

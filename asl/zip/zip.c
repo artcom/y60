@@ -183,12 +183,14 @@ local void init_linkedlist(ll)
     ll->first_block = ll->last_block = NULL;
 }
 
+#ifdef WITH_UNUSED_FUNCTION
 local void free_linkedlist(ll)
     linkedlist_data* ll;
 {
     free_datablock(ll->first_block);
     ll->first_block = ll->last_block = NULL;
 }
+#endif
 
 
 local int add_data_in_datablock(ll,buf,len)

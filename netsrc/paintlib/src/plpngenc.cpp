@@ -336,7 +336,7 @@ void PLPNGEncoder::DoEncode (PLBmpBase * pBmp, PLDataSink* pDataSnk)
   //if (interlacing)
   //   number_passes = png_set_interlace_handling(png_ptr);
   //else
-  int number_passes = 1;
+  //int number_passes = 1;
 
   // iterate over data and write it out
   PLBYTE **pla = pBmp->GetLineArray();

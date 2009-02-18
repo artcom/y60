@@ -71,6 +71,8 @@ using namespace std;
 #undef DB
 #define DB(x) // x
 
+//XXX remove BAD_TX sections and check what parameters are actually required and if they are updated correctly
+
 namespace y60 {
 
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
@@ -85,8 +87,8 @@ namespace y60 {
         TextureMipmapTag::Plug(theNode),
         TextureAnisotropyTag::Plug(theNode),
         TextureMatrixTag::Plug(theNode),
-        TextureColorScaleTag::Plug(theNode),
         TextureColorBiasTag::Plug(theNode),
+        TextureColorScaleTag::Plug(theNode),
         TextureWrapModeTag::Plug(theNode),
         TextureMinFilterTag::Plug(theNode),
         TextureMagFilterTag::Plug(theNode),
@@ -100,8 +102,8 @@ namespace y60 {
 #ifdef BAD_TX
         dom::FacadeAttributePlug<TextureImageTag>(this),
 #endif
-        dom::FacadeAttributePlug<TextureParamChangedTag>(this),
         dom::FacadeAttributePlug<TextureNPOTMatrixTag>(this),
+        dom::FacadeAttributePlug<TextureParamChangedTag>(this),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myResourceManager(0),
         _myRefCount(0),

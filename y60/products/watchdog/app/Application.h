@@ -147,13 +147,13 @@ class Application {
         std::string      _myHeartbeatFile;
         bool             _myPerformECG;
 
-        int              _myRestartMemoryThreshold;
+        unsigned         _myRestartMemoryThreshold;
 
         std::string      _myRestartDay;
         long             _myRestartTimeInSecondsToday;
 
         long             _myCheckMemoryTimeInSecondsToday;
-        int              _myMemoryThresholdTimed;
+        unsigned int     _myMemoryThresholdTimed;
 
         // state
         int              _myRestartMode;

@@ -134,8 +134,8 @@ class ChildFacade :
         ChildFacade(Node & theNode) :
             IdFacade(theNode),
             BoolTag::Plug(theNode),
-            FloatTag::Plug(theNode),
             PropertiesTag::Plug(this),
+            FloatTag::Plug(theNode),
             FacadeAttributePlug<Float2Tag>(this),
             FacadeAttributePlug<HalfFloatTag>(this),
             FacadeAttributePlug<DoubleParentFloatTag>(this),

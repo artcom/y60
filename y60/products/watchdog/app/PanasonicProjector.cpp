@@ -75,8 +75,8 @@
 using namespace std;
 
 PanasonicProjector::PanasonicProjector(int thePortNum, int theBaud) : Projector(thePortNum, theBaud == -1 ? 9600 : theBaud),
-    _myFirstID(1),
     _myNumProjectors(2),
+    _myFirstID(1),
     _myPowerDelay(2000),
     _myReadTimeout(250)
 {
@@ -261,7 +261,7 @@ PanasonicProjector::sendCommandSingle(const string & theCommand, const string & 
 {
     // address
     char myAddress[] = "ZZ";
-    if (theAddress != ~0) {
+    if (theAddress != ~0u) {
         SNPRINTF(myAddress, sizeof(myAddress), "%02d", theAddress+_myFirstID);
     }
  

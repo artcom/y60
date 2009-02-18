@@ -88,7 +88,6 @@ namespace y60 {
         public NameTag::Plug,
         public TextureImageIdTag::Plug,
         public TexturePixelFormatTag::Plug,
-        //public TextureTypeTag::Plug,
         public TextureMipmapTag::Plug,
         public TextureAnisotropyTag::Plug,
         public TextureMatrixTag::Plug,
@@ -104,9 +103,6 @@ namespace y60 {
         public dom::FacadeAttributePlug<TextureWidthTag>,
         public dom::FacadeAttributePlug<TextureHeightTag>,
         public dom::FacadeAttributePlug<TextureDepthTag>,
-#ifdef BAD_TX
-        public dom::FacadeAttributePlug<TextureImageTag>,
-#endif
         public dom::FacadeAttributePlug<TextureNPOTMatrixTag>,
         public dom::FacadeAttributePlug<TextureParamChangedTag>,
         public dom::FacadeAttributePlug<LastActiveFrameTag>

@@ -86,17 +86,17 @@ inline bool isCommand(const std::string & theReceivedCommand, const std::string 
 UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theProjectors,
                                                    Application & theApplication,
                                                    const dom::NodePtr & theConfigNode,
-                                                   Logger & theLogger) :
-    _myProjectors(theProjectors),
+                                                   Logger & theLogger)
+:   _myProjectors(theProjectors),
+    _myUDPPort(2342),
     _myApplication(theApplication),
     _myLogger(theLogger),
-    _myUDPPort(2342),
     _myPowerDownProjectorsOnHalt(false),
     _myShutterCloseProjectorsOnStop(false),
     _myShutterCloseProjectorsOnReboot(false),
     _mySystemHaltCommand(""), 
-    _mySystemRebootCommand(""),
     _myRestartAppCommand(""), 
+    _mySystemRebootCommand(""),
     _myStopAppCommand(""), 
     _myStartAppCommand("")    
 {

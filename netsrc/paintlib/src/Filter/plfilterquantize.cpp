@@ -48,9 +48,9 @@ PLFilterQuantize::PLFilterQuantize (int DitherPaletteType, int DitherType)
   : PLFilter(),
     m_DitherPaletteType (DitherPaletteType),
     m_DitherType (DitherType),
+    m_pUserPal (NULL),
     m_ppHisto (NULL),
-    m_pQuBoxes (NULL),
-    m_pUserPal (NULL)
+    m_pQuBoxes (NULL)
 {
   initLUT();
 }
@@ -67,7 +67,7 @@ PLFilterQuantize::~PLFilterQuantize()
 
 void PLFilterQuantize::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
 {
-  PLBYTE ** pDstLines = pBmpDest->GetLineArray();
+  /*PLBYTE ** pDstLines = */ pBmpDest->GetLineArray();
 
   // Only works for 32 bpp bitmaps.
   PLASSERT (pBmpSource->GetBitsPerPixel() == 32);
@@ -256,7 +256,7 @@ void PLFilterQuantize::split (QUBOX * pBox0, QUBOX * pBox1, int ColComp) const
   // would be more readable.
   PLBYTE * pB0C0 = (PLBYTE *)&(pBox0->Corner0);  // Box0, Color 0
   PLBYTE * pB0C1 = (PLBYTE *)&(pBox0->Corner1);
-  PLBYTE * pB0Ave = (PLBYTE *)&(pBox0->Average);
+  // PLBYTE * pB0Ave = (PLBYTE *)&(pBox0->Average);
   PLBYTE * pB1C0 = (PLBYTE *)&(pBox1->Corner0);
   PLBYTE * pB1C1 = (PLBYTE *)&(pBox1->Corner1);
   PLBYTE * pB1Ave = (PLBYTE *)&(pBox1->Average);
@@ -930,7 +930,7 @@ void PLFilterQuantize::ditherPixelOrdered (int x, int y, PLPixel32 * pPixel) con
 
 void PLFilterQuantize::ditherCompOrdered (int x, int y, PLBYTE * pComp) const
 {
-  const int DitherLUT[4][4] = { -7, 1, -5, 3, 5, -3, 7, -1, -4, 4, -6, 2, 8, 0, 6, -2 };
+  const int DitherLUT[4][4] = { {-7, 1, -5, 3}, {5, -3, 7, -1}, {-4, 4, -6, 2}, {8, 0, 6, -2} };
 
   int Comp = *pComp;
   Comp += DitherLUT [x&3][y&3]<<1;

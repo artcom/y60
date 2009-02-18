@@ -21,6 +21,11 @@
     // avoid duplicate definition warning in jpeglib.h
     #undef HAVE_STDLIB_H
 #endif
+#ifdef EXTERN
+    // avoid duplicate definition warning in jpeglib.h
+    #undef EXTERN
+#endif
+
 extern "C"
 {
 #include "jpeglib.h"

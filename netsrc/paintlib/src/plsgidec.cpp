@@ -43,7 +43,7 @@ void PLSGIDecoder::Open (PLDataSource * pDataSrc)
   PLPixelFormat pf;
   readHeader (&m_Header, pDataSrc);
 
-  bool bGreyscale = (m_Header.ZSize == 1 && m_Header.Colormap == CMAP_NORMAL);
+  bool bGreyscale = (m_Header.ZSize == 1 && static_cast<int>(m_Header.Colormap) == CMAP_NORMAL);
 
   switch (m_Header.ZSize)
   {
@@ -162,7 +162,7 @@ void PLSGIDecoder::readRLE
     ( PLBmpBase & Bmp
     )
 {
-  int xsize = m_Header.XSize;
+  //int xsize = m_Header.XSize;
   int ysize = m_Header.YSize;
   int zsize = m_Header.ZSize;
 

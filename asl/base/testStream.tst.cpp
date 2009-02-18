@@ -115,21 +115,21 @@ public:
             Signed32 iil = 0;
             p = theInputStream.readSigned(iil, p);              // 1
             ENSURE(p == k + 5);
-            ENSURE(ii == i);
+            ENSURE(ii == static_cast<Signed32>(i));
 
             Unsigned32 iiul = 0;
             p = theInputStream.readUnsigned(iiul, p);             // 1
             ENSURE(p == k + 6);
-            ENSURE(iiul == i);
+            ENSURE(iiul == static_cast<Unsigned32>(i));
 
             Signed64 iill;
             p = theInputStream.readSigned64(iill, p);              // 8
-            ENSURE(iill == i);
+            ENSURE(iill == static_cast<Signed64>(i));
             ENSURE(p == k + 14);
 
             Unsigned64 iiull;
             p = theInputStream.readUnsigned64(iiull, p);           // 8
-            ENSURE(iiull == i);
+            ENSURE(iiull == static_cast<Unsigned64>(i));
             ENSURE(p == k + 22);
 
             double iid=0;
@@ -140,12 +140,12 @@ public:
             iiul=0;
             p = theInputStream.readSigned32(ii, p);              // 4
             ENSURE(p == k + 34);
-            ENSURE(ii == i);
+            ENSURE(ii == static_cast<Signed32>(i));
             
             Unsigned32 iiui=0;
             p = theInputStream.readUnsigned32(iiui, p);          // 4
             ENSURE(p == k + 38);
-            ENSURE(iiui == i);
+            ENSURE(iiui == static_cast<Unsigned32>(i));
 
             float iif=0;
             p = theInputStream.readFloat32(iif, p);               // 4

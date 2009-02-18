@@ -106,10 +106,10 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
 WatchDog::WatchDog()
     : _myWatchFrequency(30),
       _myAppToWatch(_myLogger),
+      _myUDPCommandListenerThread(0),
       _myPowerUpProjectorsOnStartup(true),
       _myRebootTimeInSecondsToday(-1),
-      _myHaltTimeInSecondsToday(-1),
-      _myUDPCommandListenerThread(0)
+      _myHaltTimeInSecondsToday(-1)
 {
     _mySplashScreen = SDLSplashScreen::getInstance();
 }

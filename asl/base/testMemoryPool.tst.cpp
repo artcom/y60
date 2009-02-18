@@ -79,12 +79,12 @@ public:
     MemoryPoolUnitTest(std::string theName) : TemplateUnitTest("MemoryPoolUnitTest-",std::string(theName+asl::as_string(N)).c_str()) {  }
     void run() {
 
-        const int myTestCount = 1000000;
+        const unsigned int myTestCount = 1000000;
         typedef TestClassBase<N,Allocator> TestClass;
         std::vector<TestClass *> myObjects(myTestCount);
         ENSURE(TestClass::_theInstanceCount_ == 0);
         asl::Time myAllocStart;
-        for (int i = 0; i < myTestCount; ++i) {
+        for (unsigned int i = 0; i < myTestCount; ++i) {
             myObjects[i] = new TestClass;
         }
         double myAllocTime = asl::Time() - myAllocStart;
@@ -93,7 +93,7 @@ public:
         ENSURE(TestClass::getFreedObjectsCount() == 0);
 
         asl::Time myFreeStart;
-        for (int i = 0; i < myTestCount; ++i) {
+        for (unsigned int i = 0; i < myTestCount; ++i) {
             delete myObjects[i];
         }
         double myFreeTime = asl::Time() - myFreeStart;
@@ -103,7 +103,7 @@ public:
 
         // second run
         asl::Time myReAllocStart;
-        for (int i = 0; i < myTestCount; ++i) {
+        for (unsigned int i = 0; i < myTestCount; ++i) {
             myObjects[i] = new TestClass;
         }
         double myReAllocTime = asl::Time() - myReAllocStart;
@@ -112,7 +112,7 @@ public:
         ENSURE(TestClass::getFreedObjectsCount() == myTestCount);
 
         asl::Time myReFreeStart;
-        for (int i = 0; i < myTestCount; ++i) {
+        for (unsigned int i = 0; i < myTestCount; ++i) {
             delete myObjects[i];
         }
         double myReFreeTime = asl::Time() - myReFreeStart;

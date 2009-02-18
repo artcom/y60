@@ -1044,7 +1044,7 @@ int TTF_HasGlyph(TTF_Font * theFont, const Uint16 theCharacter) {
 
 /* Get kerning between two glyphs by characters [ART+COM Patch] */
 double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter) {
-    double myKerning = 0.0;
+    //double myKerning = 0.0;
     FT_Error error;
     FT_UInt  myFirstIndex;
     FT_UInt  mySecondIndex;

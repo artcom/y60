@@ -78,13 +78,13 @@ void getLine(const string & myFile, int myPosInFile, string & myLine, int & myPo
 }
 
 bool shortForm = false;
-int maxResultLen = 0;
-int ourCounter = 0;
+unsigned int maxResultLen = 0;
+unsigned int ourCounter = 0;
 
 std::vector<string>
 findWordsStartingWithEndof(const vector<string> & theDictionary, const string & theWordEnd, const string & theFullWord, bool noPrinting=false) {
     std::vector<string> myResultList;
-    for (int i = 0; i < theDictionary.size(); ++i) {
+    for (unsigned int i = 0; i < theDictionary.size(); ++i) {
         //cout << "Look for *" << theWordEnd<< " at start of " << theDictionary[i] << endl;
         if (theDictionary[i].size() > theWordEnd.size()) {
             if (read_if_string(theDictionary[i], 0, theWordEnd)) {
@@ -110,7 +110,7 @@ findWordsStartingWithEndof(const vector<string> & theDictionary, const string & 
 std::vector<string>
 findWordsEndingWithStartOf(const vector<string> & theDictionary, const string & theWordBegin, const string & theFullWord) {
     std::vector<string> myResultList;
-    for (int i = 0; i < theDictionary.size(); ++i) {
+    for (unsigned int i = 0; i < theDictionary.size(); ++i) {
         //cout << "Look for " << theWordBegin<< "* at end of " << theDictionary[i] << endl;
         if (theDictionary[i].size() > theWordBegin.size()) {
             int myNewPos = read_if_string(theDictionary[i], theDictionary[i].size() - theWordBegin.size(), theWordBegin);
@@ -217,49 +217,49 @@ int main(int argc, char *argv[]) {
 
             if (myArguments.haveOption("-l")) {
                 cerr << "Converting dictionary and keywords to lower case" << endl;
-                for (int i = 0; i < myKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myKeyWordList.size();++i) {
                     myKeyWordList[i] = toLowerCase(myKeyWordList[i]);
                 }
-                for (int i = 0; i < myBeginKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myBeginKeyWordList.size();++i) {
                     myBeginKeyWordList[i] = toLowerCase(myBeginKeyWordList[i]);
                 }
-                for (int i = 0; i < myEndKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myEndKeyWordList.size();++i) {
                     myEndKeyWordList[i] = toLowerCase(myEndKeyWordList[i]);
                 }
-                for (int i = 0; i < myDictWordList.size();++i) {
+                for (unsigned int i = 0; i < myDictWordList.size();++i) {
                     myDictWordList[i] = toLowerCase(myDictWordList[i]);
                 }
             }
             if (myArguments.haveOption("-p")) {
                 cout << "Keywords:" << endl;
-                for (int i = 0; i < myKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myKeyWordList.size();++i) {
                     cout << "'"<<myKeyWordList[i]<<"'" << endl;
                 }
                 cout << "Begin Keywords:" << endl;
-                for (int i = 0; i < myBeginKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myBeginKeyWordList.size();++i) {
                     cout << "'"<<myBeginKeyWordList[i]<<"'" << endl;
                 }
                 cout << "End Keywords:" << endl;
-                for (int i = 0; i < myEndKeyWordList.size();++i) {
+                for (unsigned int i = 0; i < myEndKeyWordList.size();++i) {
                     cout << "'"<<myEndKeyWordList[i]<<"'" << endl;
                 }
             }
             if (myArguments.haveOption("-d")) {
                 cout << "Dictionary:" << endl;
-                for (int i = 0; i < myDictWordList.size();++i) {
+                for (unsigned int i = 0; i < myDictWordList.size();++i) {
                     cout << "'"<<myDictWordList[i]<<"'" << endl;
                 }
             }
             if (myArguments.haveOption("-x")) {
                 cout << "Begin Keywords:" << endl;
-                for (int i = 0; i < myBeginKeyWordList.size();++i) {
-                    for (int j = 0; j < myEndKeyWordList.size();++j) {
+                for (unsigned int i = 0; i < myBeginKeyWordList.size();++i) {
+                    for (unsigned int j = 0; j < myEndKeyWordList.size();++j) {
                         cout << myBeginKeyWordList[i]<<myEndKeyWordList[j] << endl;
                     }
                 }
                 return 0;
             }
-            for (int i = 0; i < myKeyWordList.size();++i) {
+            for (unsigned int i = 0; i < myKeyWordList.size();++i) {
                 const string & myKeyWord = myKeyWordList[i];
                 for (int l = asl::minimum(myKeyWord.size(), (size_t)maxOverlap); l>=minOverlap; --l) {
                     std::string myFront = myKeyWord.substr(0, l);
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
             }
             bool matchBeginAndEnd = myBeginKeyWordList.size() && myEndKeyWordList.size();
             std::vector<string> myBeginMatches;
-            for (int i = 0; i < myBeginKeyWordList.size();++i) {
+            for (unsigned int i = 0; i < myBeginKeyWordList.size();++i) {
                 const string & myKeyWord = myBeginKeyWordList[i];
                 for (int l = asl::minimum(myKeyWord.size(), (size_t)maxOverlap); l>=minOverlap; --l) {
                     std::string myBack = myKeyWord.substr(myKeyWord.size()-l);
@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
                 myDictWordList = myBeginMatches;
             }
             std::vector<string> myEndMatches;
-            for (int i = 0; i < myEndKeyWordList.size();++i) {
+            for (unsigned int i = 0; i < myEndKeyWordList.size();++i) {
                 const string & myKeyWord = myEndKeyWordList[i];
                 for (int l = asl::minimum(myKeyWord.size(), (size_t)maxOverlap); l>=minOverlap; --l) {
                     std::string myFront = myKeyWord.substr(0, l);

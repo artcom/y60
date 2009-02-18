@@ -1336,7 +1336,7 @@ dom::Node::print(std::ostream & os, const String& indent) const {
 
 // This function is called on an empty document node and starts to build a dom
 // with the current node as root element
-int
+asl::Unsigned32
 dom::Node::parseAll(const String& is) {
     int offset = 0;
     //JB: ignore UTF-8 byte order mark (0xEFBBBF)

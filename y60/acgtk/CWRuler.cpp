@@ -90,8 +90,8 @@ CWRuler::CWRuler(Mode theMode) :
     _myMode(theMode),
     _myState(IDLE),
     _myValueRange(0.0, 1.0),
-    _myWindowWidth(0.0),
     _myWindowCenter(0.0),
+    _myWindowWidth(0.0),
     _myLower(0.0),
     _myUpper(0.0)
 {
@@ -179,6 +179,9 @@ CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
                         _myUpperChangedSignal.emit(_myUpper);
                     }
                     break;
+                case IDLE:
+                case CHANGE_CENTER:
+                    break;
             }
         } else {
             switch (_myState) {
@@ -204,6 +207,8 @@ CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
                         _myWindowWidth = myValue;
                         _myWidthChangedSignal.emit(_myWindowWidth);
                     }
+                    break;
+                case IDLE:
                     break;
             }
         }

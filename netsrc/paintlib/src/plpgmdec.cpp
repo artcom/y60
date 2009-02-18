@@ -48,7 +48,7 @@ void PLPGMDecoder::readPgmHeader
     )
 {
   int current = 0;
-  bool HeaderComplete = false;
+ // bool HeaderComplete = false;
 
   // Read type
   m_LastByte = ReadByte (pDataSrc);

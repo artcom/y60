@@ -39,13 +39,13 @@ using namespace asl;
 
 bool ourPerformanceTest = true;
 #ifdef DEBUG_VARIANT
-    const int ourNumberOfMults = 2500;
-    const int ourNumberOfDecomps = 10000;
+    const unsigned ourNumberOfMults = 2500;
+    const unsigned ourNumberOfDecomps = 10000;
     const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 10000;
 #else
 //    const int ourNumberOfMults = 1000000;
-    const int ourNumberOfMults = 250000;
-    const int ourNumberOfDecomps = 1000000;
+    const unsigned ourNumberOfMults = 250000;
+    const unsigned ourNumberOfDecomps = 1000000;
     const unsigned RANDOM_DECOMPOSITION_TEST_COUNT = 1000000;
 #endif
 

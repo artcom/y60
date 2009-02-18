@@ -378,16 +378,16 @@ public:
     PtrUnitPerfTest() : TemplateUnitTest("PtrUnitPerfTest-",asl::as_string(N).c_str()) {  }
     void run() {
 #if DEBUG_VARIANT
-        const int repeatCount = 10000;
+        const unsigned int repeatCount = 10000;
 #else
-        const int repeatCount = 1000000;
+        const unsigned int repeatCount = 1000000;
 #endif
-       for (int f = 0; f < 4; ++f) {
+       for (unsigned int f = 0; f < 4; ++f) {
            {
                MAKE_SCOPE_TIMER(PtrUnitPerfTest);
                ENSURE(TestClassBase<N>::_theInstanceCount_ == 0);
                std::vector<Ptr<TestClassDerived<N>, ThreadingModel> > myVec;
-               for (int i = 0; i < repeatCount; ++i) {
+               for (unsigned int i = 0; i < repeatCount; ++i) {
                    myVec.push_back(Ptr<TestClassDerived<N>, ThreadingModel>(new TestClassDerived<N> ));
                }
                ENSURE(TestClassBase<N>::_theInstanceCount_ == repeatCount);

@@ -282,7 +282,7 @@ namespace y60 {
                 }
             }
 
-            for (int i = 0; i < myCompilerArgs.size(); i++) {
+            for (unsigned int i = 0; i < myCompilerArgs.size(); i++) {
                 PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
                 PackageList::const_iterator it = myPackages.begin();
                 while( it != myPackages.end() ) {

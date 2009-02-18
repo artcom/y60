@@ -139,53 +139,46 @@ namespace y60 {
     ASSDriver::ASSDriver() :
         IRendererExtension("ASSDriver"),
         _myGridSize(0,0),
+        _myPoTSize(1,1),
+        _myIDCounter(0),
         _myRawRaster(dom::ValuePtr(0)),
         _myDenoisedRaster(dom::ValuePtr(0)),
         _myMomentRaster(dom::ValuePtr(0)),
         _myResampledRaster(dom::ValuePtr(0)),
         _myScene(0),
-        _myNoiseThreshold( 15 ),
+        _myWindow( 0 ),
+        _myLastFrameTime( asl::Time() ),
+        _myRunTime(0.0),
         _myComponentThreshold( 5 ),
+        _myNoiseThreshold( 15 ),
         _myFirstDerivativeThreshold( 200 ),
         _myGainPower(2.0f),
         _myMinTouchInterval( 0.25 ),
         _myMinTouchThreshold( 9 ),
-        _myIDCounter( 0 ),
-        _myDebugTouchEventsFlag( 0 ),
-        _myLastFrameTime( asl::Time() ),
-        _myRunTime(0.0),
-        _myProbePosition( -1, -1),
         _myInterpolationMethod(0),
         _myCureBrokenElectrodesFlag(0),
         _myCaputureSensorDataFlag(0),
         _myCapturedFrameCounter(0),
-
+        _myClampToScreenFlag(false),
+        _myDebugTouchEventsFlag( 0 ),
+        _myProbePosition( -1, -1),
         _myGridColor(0.5, 0.5, 0, 1.0),
         _myCursorColor(0.5, 0.5, 0, 1.0),
         _myTouchColor(1.0, 1.0, 1.0, 1.0),
         _myTextColor(1.0, 1.0, 1.0, 1.0),
         _myProbeColor(0.0, 0.75, 0.0, 1.0),
         _myResampleColor(1.0, 0.0, 0.0, 1.0),
-        
-        _myTransformEventPosition(0.0f,0.0f),
-        _myTransformEventScale(1.0f,1.0f),
-        _myTransformEventOrientation(0.0f),
-
-        _myClampToScreenFlag(false),
-        _myWindow( 0 ),
         _mySettings(dom::NodePtr(0)),
-
-        // XXX: shearing hack
-        _myShearX(0.0),
-        _myShearY(0.0),
         _myUseCCRegionForMomentumFlag(0),
         _myUserDefinedMomentumBox(-1, -1, 1, 1),
-
         _myCureVLines(-1,-1,-1,-1),
         _myCureHLines(-1,-1,-1,-1),
-        _myCurePoints(0)
-
-
+        _myCurePoints(0),
+        _myShearX(0.0),
+        _myShearY(0.0),        
+        _myTransformEventOrientation(0.0f),
+        _myTransformEventScale(1.0f,1.0f),
+        _myTransformEventPosition(0.0f,0.0f)
     {
 #ifdef ASS_LATENCY_TEST
         _myLatencyTestPort = asl::getSerialDevice( 0 );
@@ -1549,28 +1542,31 @@ namespace y60 {
                 //AC_TRACE << "popped event " << myEvent;
 
                 switch (myEvent.type) {
-                case ASS_FRAME:
-                {
-                    if (myEvent.size != _myGridSize ) {
-                        allocateGridBuffers( myEvent.size );
-                    }
-                    copyFrame( myEvent.data );
-                    // TODO use smart pointers 
-                    delete [] myEvent.data;
-                    processSensorValues(myEvent);
+                    case ASS_FRAME:
+                    {
+                        if (myEvent.size != _myGridSize ) {
+                            allocateGridBuffers( myEvent.size );
+                        }
+                        copyFrame( myEvent.data );
+                        // TODO use smart pointers 
+                        delete [] myEvent.data;
+                        processSensorValues(myEvent);
 #ifdef ASS_LATENCY_TEST
-                    if (myEvent.frameno % 16 == 0) {
-                        toggleLatencyTestPin();
-                    }
+                        if (myEvent.frameno % 16 == 0) {
+                            toggleLatencyTestPin();
+                        }
 #endif
-                }
-                break;
-                case ASS_LOST_SYNC:
-                    createTransportLayerEvent("lost_sync");
-                    break;
-                case ASS_LOST_COM:
-                    createTransportLayerEvent("lost_communication");
-                    break;
+                    }
+                        break;
+                    case ASS_LOST_SYNC:
+                        createTransportLayerEvent("lost_sync");
+                        break;
+                    case ASS_LOST_COM:
+                        createTransportLayerEvent("lost_communication");
+                        break;
+                    case ASS_INVALID:
+                        AC_DEBUG << "assEvent: ASS_INVALID";
+                        break;
                 }
             }
             _myTransportLayer->unlockFrameQueue();
