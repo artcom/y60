@@ -17,25 +17,15 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-set(PRO60_DEPS $ENV{PRO60_DEPS})
+find_package(PRO60_DEPS NO_MODULE)
 
-if(PRO60_DEPS)
-
-    list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
-
-else(PRO60_DEPS)
-    if(NOT LINUX)
-        message(FATAL_ERROR "PRO60_DEPS environment variable not set")
-    endif(NOT LINUX)
-endif(PRO60_DEPS)
-
-macro(pro60_deps_install)
-    if(PRO60_DEPS)
-        get_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED _WILL_BE_INSTALLED)
-        if(NOT _WILL_BE_INSTALLED)
-            add_subdirectory(${PRO60_DEPS} pro60-deps)
-            set_global(PRO60_DEPENDENCIES_WILL_BE_INSTALLED YES)
-        endif(NOT _WILL_BE_INSTALLED)
-    endif(PRO60_DEPS)
-endmacro(pro60_deps_install)
-
+if(PRO60_DEPS_FOUND)
+    pro60_deps_register_searchpath()
+    message("PRO60_DEPS found in ${PRO60_DEPS_ROOT_DIR}")
+else(PRO60_DEPS_FOUND)
+    if(WIN32)
+        message(FATAL_ERROR "PRO60_DEPS could not be found")
+    else(WIN32)
+        message("PRO60_DEPS could not be found")
+    endif(WIN32)
+endif(PRO60_DEPS_FOUND)

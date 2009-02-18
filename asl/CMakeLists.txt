@@ -27,8 +27,6 @@ if(OSX)
     mark_as_advanced( AUDIO_UNIT )
 endif(OSX)
 
-pro60_deps_install()
-
 ac_add_project(
     ASL
     REQUIRED_PACKAGES
