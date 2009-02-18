@@ -143,21 +143,25 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     #      We need a new mechanism.
     set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
     foreach(TEST ${THIS_LIBRARY_TESTS})
-        set(TEST_EXE_NAME "${TEST_NAMESPACE}_test${TEST}")
-        set(TEST_EXE_PATH "${CMAKE_BINARY_DIR}/bin/${TEST_NAMESPACE}_test${TEST}")
+        set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")
                
         # define the executable
         ac_add_executable(
-            ${TEST_EXE_NAME}
+            ${TEST_NAME}
             SOURCES test${TEST}.tst.cpp
             DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME} # XXX: asl-specifics
             EXTERNS ${THIS_LIBRARY_EXTERNS}
             DONT_INSTALL
             NO_REVISION_INFO
         )
+
+        # XXX: multiple build types in VS
+        get_target_property(
+            TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}
+        )
 	
         # tell ctest about it
-        add_test(${THIS_LIBRARY_NAME}_${TEST} ${TEST_EXE_PATH})
+        add_test(${THIS_LIBRARY_NAME}_${TEST} ${TEST_LOCATION})
     endforeach(TEST)
 
     # add our target to the current project
