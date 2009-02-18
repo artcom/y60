@@ -64,12 +64,12 @@
         </command>
     </macro>
 
-    <recipe name="unix_make">
+    <recipe name="GNU Make">
+        <property name="cmake.generator" value="Unix Makefiles"/>
+        <property name="cmake.source.dir" value="../../"/>
 
         <macro-ref macro="${prepare_build}"/>
 
-        <property name="cmake.generator" value="Unix Makefiles"/>
-        <property name="cmake.source.dir" value="../../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
@@ -85,15 +85,16 @@
         </command>
     </recipe>
 
-    <recipe name="windows_nmake">
+    <recipe name="NMake">
+        <property name="cmake.generator" value="NMake Makefile"/>
+        <property name="cmake.source.dir" value="../../"/>
+        <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
         <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
 
         <macro-ref macro="${prepare_build}"/>
 
-        <property name="cmake.generator" value="NMake Makefile"/>
-        <property name="cmake.source.dir" value="../../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
@@ -109,8 +110,10 @@
         </command>
     </recipe>
 
-    <recipe name="windows_vcbuild">
+    <recipe name="MSVC">
         <property name="build.dir" value="_builds/"/>
+        <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <property name="cmake.source.dir" value="../"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
@@ -118,8 +121,6 @@
 
         <macro-ref macro="${prepare_build}"/>
 
-        <property name="cmake.generator" value="Visual Studio 9 2008"/>
-        <property name="cmake.source.dir" value="../"/>
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
