@@ -255,10 +255,10 @@ public:
             // this is bad if e.g. while downloading the program is interrupted
             // with CTRL-C since there will then be garbage behind the data.
             // reserve seems to be very expensive on win32 with large files
-            ENSURE(getFileSize(testFileName) == myData1.size());   
+            ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == myData1.size() );
         }
         // after closing the size is ok.
-        ENSURE(getFileSize(testFileName) == myData1.size());   
+        ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == myData1.size() );
         {
             MappedBlock myBlock(testFileName); // this should work
             // MappedBlock myBlock(testFileName, myData1.size()); // but we need this

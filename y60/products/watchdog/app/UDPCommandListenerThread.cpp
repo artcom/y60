@@ -235,7 +235,7 @@ UDPCommandListenerThread::run() {
     cout << "Application start  : " << _myStartAppCommand << endl;
 
     try {
-        UDPSocket myUDPServer(INADDR_ANY, _myUDPPort);
+        UDPSocket myUDPServer( INADDR_ANY, static_cast<asl::Unsigned16>(_myUDPPort) );
 
         for (;;) {
             char myInputBuffer[2048];
@@ -243,7 +243,7 @@ UDPCommandListenerThread::run() {
             myInputBuffer[myBytesRead] = 0;
             std::istringstream myIss(myInputBuffer);
             std::string myCommand;
-		    std::getline(myIss, myCommand);
+            std::getline(myIss, myCommand);
             cerr << "Received command: " << myCommand << "\nRestart App Command: " << _myRestartAppCommand << endl;
             if (isCommand(myCommand,_mySystemHaltCommand)) {
                 cerr << "Client received halt packet" << endl;

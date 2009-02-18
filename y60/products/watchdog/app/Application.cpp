@@ -155,7 +155,7 @@ Application::~Application() {
 
 void 
 Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
-    for (unsigned int myEnvNr = 0; myEnvNr < theEnvironmentSettings->childNodesLength(); myEnvNr++) {
+    for (NodeList::size_type myEnvNr = 0; myEnvNr < theEnvironmentSettings->childNodesLength(); myEnvNr++) {
         const dom::NodePtr & myEnvNode = theEnvironmentSettings->childNode(myEnvNr);
         if (myEnvNode->nodeType() == dom::Node::ELEMENT_NODE) {
             string myEnviromentVariable = myEnvNode->getAttributeString("name");
@@ -193,7 +193,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
     if (theAppNode->childNode("Arguments")) {
         const dom::NodePtr & myArguments = theAppNode->childNode("Arguments");
         AC_DEBUG << "arguments: " << myArguments;
-        for (unsigned int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
+        for (NodeList::size_type myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
             const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
             if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE && 
                 myArgumentNode->hasChildNodes() ) {
@@ -232,13 +232,13 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
     }
     if (theAppNode->childNode("CheckTimedMemoryThreshold")) {
         _myRestartCheck = true;
-        _myMemoryThresholdTimed = asl::as<int>((*theAppNode->childNode("CheckTimedMemoryThreshold"))("#text").nodeValue());
+        _myMemoryThresholdTimed = asl::as<unsigned int>((*theAppNode->childNode("CheckTimedMemoryThreshold"))("#text").nodeValue());
         _myRestartMode |= CHECKTIMEDMEMORYTHRESHOLD;
         AC_DEBUG <<"_myMemoryThresholdTimed : " << _myMemoryThresholdTimed;
     }
     if (theAppNode->childNode("Memory_Threshold")) {
         _myRestartCheck = true;
-        _myRestartMemoryThreshold = asl::as<int>((*theAppNode->childNode("Memory_Threshold"))("#text").nodeValue());
+        _myRestartMemoryThreshold = asl::as<unsigned int>((*theAppNode->childNode("Memory_Threshold"))("#text").nodeValue());
         _myRestartMode |= MEMTHRESHOLD;
         AC_DEBUG <<"_myRestartMemoryThreshold : " << _myRestartMemoryThreshold;
     }
@@ -374,8 +374,8 @@ Application::checkHeartbeat() {
         time_t myCurrentSecondsSince_1_1_1970;
         time( &myCurrentSecondsSince_1_1_1970 );
 
-        long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 
-                                   - convertFromString<long>(mySecondsSince1970Str);
+        time_t myLastHeartbeatAge = myCurrentSecondsSince_1_1_1970 
+                                - convertFromString<long>(mySecondsSince1970Str);
         AC_DEBUG <<" myCurrentSecondsSince_1_1_1970 : " << myCurrentSecondsSince_1_1_1970 ;
         AC_DEBUG <<" last heartbeat sec since 1.1.70: "
                  <<  convertFromString<long>(mySecondsSince1970Str) ;

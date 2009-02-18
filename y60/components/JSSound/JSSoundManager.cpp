@@ -168,7 +168,6 @@ namespace jslib {
             JSSoundManager * myNewObject = new JSSoundManager(myNewNative, &*myNewNative);
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
-                return JS_TRUE;
             } else  {
                 JS_ReportError(cx,"JSSoundManager::Constructor: bad parameters");
                 return JS_FALSE;

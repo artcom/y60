@@ -351,7 +351,7 @@ namespace {
                     "</testDoc>";
 
                 dom::NodePtr myDom( new dom::Document );
-                if( myDom->parseAll(myXML) != myXML.size() ) {
+                if( static_cast<std::string::size_type>(myDom->parseAll(myXML)) != myXML.size() ) {
                     std::cerr << "XML parse error.";
                     FAILURE("Cannot load test XML");
                     return;

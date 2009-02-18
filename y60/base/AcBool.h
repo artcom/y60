@@ -108,7 +108,7 @@ namespace y60 {
 
 namespace asl {
     inline
-    y60::AcBool & interpolate(y60::AcBool & a, y60::AcBool & b, const double & theAlpha) {
+    y60::AcBool interpolate(const y60::AcBool & a, const y60::AcBool & b, const double & theAlpha) {
         if (theAlpha <= 0.5) {
             return a;
         } else {

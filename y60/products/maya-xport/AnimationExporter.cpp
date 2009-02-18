@@ -675,7 +675,13 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
 
             // Retrieve hfov from camera
             float myValue = float(asl::degFromRad(myCamera.horizontalFieldOfView()));
+#           if defined(_MSC_VER)
+#               pragma warning(push, 1)
+#           endif //defined(_MSC_VER)
             myValues.push_back(myValue);
+#           if defined(_MSC_VER)
+#               pragma warning(pop)
+#           endif //defined(_MSC_VER)
         }
         myCamera.setFocalLength(myOriginalFocalLength);
     } else {
@@ -689,7 +695,9 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
             theConvertFunc(myValue);
             STOP_TIMER(exportAnimation_theConvertFunc);
             MAKE_SCOPE_TIMER(exportAnimation_loop_push_back);
+#           pragma warning(push, 1)
             myValues.push_back(static_cast<T>(myValue));
+#           pragma warning(pop)
         }
     }
     exportSampledData(theAnimBuilder, myValues, theAnimCurve.name().asChar(), 

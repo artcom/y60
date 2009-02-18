@@ -812,21 +812,21 @@ class XmlCatalogUnitTest : public UnitTest {
                     unsigned myPos = myDictionaries.debinarize(myCatalogFile, 0);
                     SUCCESS("debinarized dictionaries");
                     NodeOffsetCatalog myCatalog;
-                    ENSURE(myCatalog.debinarize(myCatalogFile, myPos)+8 == asl::getFileSize("cattest.c60"));
+                    ENSURE( myCatalog.debinarize(myCatalogFile, myPos)+8 == static_cast<unsigned long>(asl::getFileSize("cattest.c60")) );
                     SUCCESS("debinarized catalog");
                 }
                 {
                     Dictionaries myDictionaries;
                     NodeOffsetCatalog myCatalog;
                     asl::ReadableFile myCatalogFile("cattest.c60");
-                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, 0, myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
+                    ENSURE( dom::loadDictionariesAndCatalog(myCatalogFile, 0, myDictionaries, myCatalog) == static_cast<unsigned long>(asl::getFileSize("cattest.c60")) );
                     SUCCESS("debinarized dictionaries & catalog");
                 }
                 {
                     Dictionaries myDictionaries;
                     NodeOffsetCatalog myCatalog;
                     asl::ConstMappedBlock myCatalogFile("cattest.d60");
-                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, myDictionaries, myCatalog) == asl::getFileSize("cattest.d60")) ; 
+                    ENSURE( dom::loadDictionariesAndCatalog(myCatalogFile, myDictionaries, myCatalog) == static_cast<unsigned long>(asl::getFileSize("cattest.d60")) );
                     SUCCESS("debinarized dictionaries & catalog from end of file");
                 }
                 {
@@ -843,7 +843,7 @@ class XmlCatalogUnitTest : public UnitTest {
                     DictionariesPtr myDictionaries = DictionariesPtr(new Dictionaries) ;
                     NodeOffsetCatalog myCatalog;
                     asl::ConstMappedBlock myCatalogFile("cattest.c60");
-                    ENSURE(dom::loadDictionariesAndCatalog(myCatalogFile, *myDictionaries, myCatalog) == asl::getFileSize("cattest.c60")) ; 
+                    ENSURE( dom::loadDictionariesAndCatalog(myCatalogFile, *myDictionaries, myCatalog) == static_cast<unsigned long>(asl::getFileSize("cattest.c60")) );
                     SUCCESS("debinarized dictionaries & catalog from end of file");
                     ENSURE(myNewChild0->loadElementById("c0","id",myFile, 0, *myDictionaries, myCatalog));
                     DPRINT(myIdDocument);

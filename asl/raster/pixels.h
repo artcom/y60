@@ -282,7 +282,7 @@ VALUE getRedValue(const PIXEL<VALUE> & thePixel) {
 }
 template <template <class> class PIXEL, class VALUE, class SRC_VALUE>
 void setRedValue(PIXEL<VALUE> & thePixel, SRC_VALUE theValue) {
-    thePixel.get(red<VALUE>()).set(theValue);
+    thePixel.get(red<VALUE>()).set( static_cast<VALUE>(theValue) );
 }
 
 template <class VALUE>
@@ -298,7 +298,7 @@ VALUE getGreenValue(const PIXEL<VALUE> & thePixel) {
 }
 template <template <class> class PIXEL, class VALUE, class SRC_VALUE>
 void setGreenValue(PIXEL<VALUE> & thePixel, SRC_VALUE theValue) {
-    thePixel.get(green<VALUE>()).set(theValue);
+    thePixel.get(green<VALUE>()).set( static_cast<VALUE>(theValue) );
 }
 
 
@@ -315,7 +315,7 @@ VALUE getBlueValue(const PIXEL<VALUE> & thePixel) {
 }
 template <template <class> class PIXEL, class VALUE, class SRC_VALUE>
 void setBlueValue(PIXEL<VALUE> & thePixel, SRC_VALUE theValue) {
-    thePixel.get(blue<VALUE>()).set(theValue);
+    thePixel.get(blue<VALUE>()).set( static_cast<VALUE>(theValue) );
 }
 
 template <class VALUE>

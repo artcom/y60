@@ -400,7 +400,7 @@ public:
         return *this;
     }
 
-    ReceivedMessageArgumentStream& operator>>( MessageTerminator& rhs )
+    ReceivedMessageArgumentStream& operator>>( MessageTerminator& /*rhs*/ )
     {
         if( !Eos() )
             throw ExcessArgumentException();

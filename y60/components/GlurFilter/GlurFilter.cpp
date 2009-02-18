@@ -111,7 +111,7 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
     // a destination pixel value
     for(int r=0; r<_myRadius; ++r) {
         for(int i=0; i<256; ++i) {
-            unsigned int d = theParameters[4 + r] * i;
+            unsigned int d = static_cast<unsigned int>(theParameters[4 + r] * i);
             if (d>255) {
                 d=255;
             }

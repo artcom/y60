@@ -225,7 +225,7 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
         }
 
         OWNERPTR mySynergyServer = OWNERPTR(new SynergyServer( myHostAddress, 
-                                                               myPort ));
+                                                               static_cast<asl::Unsigned16>(myPort) ));
         myNewObject = new JSSynergyServer(mySynergyServer, &(*mySynergyServer));
 
         if (myNewObject) {

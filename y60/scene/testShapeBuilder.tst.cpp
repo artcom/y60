@@ -162,17 +162,17 @@ class ShapeBuilderUnitTest : public UnitTest {
                 dom::NodePtr myImage = myMaterialBuilder.createImageNode(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", PAINT);
                 dom::NodePtr myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture1", myImage->getAttributeString(ID_ATTRIB),
                         CLAMP, false, Matrix4f::Identity(), "", Vector4f(1.0f,1.0f,1.0f,0.5f), Vector4f(0.0f,0.0f,0.0f,0.0f));
-                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), MODULATE, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
+                myMaterialBuilder.createTextureUnitNode( myTexture->getAttributeString(ID_ATTRIB), MODULATE, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), false, 100, false, 60 );
 
                 myImage = myMaterialBuilder.createImageNode(mySceneBuilder, "testTexture2", "glossypattern.jpg", PAINT);
                 myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture2", myImage->getAttributeString(ID_ATTRIB),
                         CLAMP, false, Matrix4f::Identity(), "", Vector4f(1.0f,1.0f,1.0f,0.5f), Vector4f(0.0f,0.0f,0.0f,0.0f));
-                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), false, 60, false, 50);
 
                 myImage = myMaterialBuilder.createMovieNode(mySceneBuilder, "testTexture3", "mymovie.mpg", PAINT);
                 myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture3", myImage->getAttributeString(ID_ATTRIB),
                         CLAMP, false, Matrix4f::Identity(), "", Vector4f(1,1,1,1), Vector4f(0,0,0,0));
-                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), false, 60, false, 50);
             }
 
             //==============================================================================

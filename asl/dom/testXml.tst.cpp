@@ -65,15 +65,15 @@
 std::string
 file_as_string(const std::string& file_name)
 {
-	std::ifstream in_file(file_name.c_str());
-	
-	std::string result;
-	std::vector<char> data_vec(65536);
-	while (in_file) {
-		in_file.read(data_vec.begin(),data_vec.size());
-		result.append(data_vec.begin(),in_file.gcount());
-	}
-	return result;
+    std::ifstream in_file(file_name.c_str());
+
+    std::string result;
+    std::vector<char> data_vec(65536);
+    while (in_file) {
+        in_file.read(data_vec.begin(),data_vec.size());
+        result.append(data_vec.begin(),in_file.gcount());
+    }
+    return result;
 }
 */
 
@@ -109,7 +109,7 @@ int dom_test() {
     {
         dom::Node root2;
         std::ifstream f2("testdom.xml", std::ios::binary);
-	    f2 >> root2;
+        f2 >> root2;
         
         std::ofstream o2("testdom2.xml", std::ios::binary);
         o2 << root2;
@@ -135,12 +135,12 @@ int dom_test2() {
         root.appendChild(dom::ProcessingInstruction());
         root("#comment") = "This is a artcom model file";
 
-	std::cout << "DEBUG: dom_test2() adding content" << std::endl;
+        std::cout << "DEBUG: dom_test2() adding content" << std::endl;
 
         root("scene")["version"]="1.0";
         /*const char * dp =*/ root("scene")["version"].nodeValue().c_str();
 
-	std::cout << "DEBUG: dom_test2() YES!!!" << std::endl;
+        std::cout << "DEBUG: dom_test2() YES!!!" << std::endl;
 
         root("scene")("info")("title")("#text")="Über große und kleine µ-Prozessoren";
         root("scene")("info")("title")("#text")="Über große und kleine µ-Prozessoren";
@@ -254,24 +254,24 @@ int dom_test2() {
 }
 
 void testSerializer(const dom::Node & n, dom::Node & myRebinarizedDom) {
-	std::cerr << "Starting binarizer test" << std::endl;
-	asl::Block myBlock;
-	asl::Time myStart;
-	n.binarize(myBlock);
-	asl::Time myFinish;
-	double myDuration = myFinish-myStart;
-	std::cerr << "Serialized to " << myBlock.size() << " bytes in " 
-		<<  myDuration << "sec, MB/sec=" << myBlock.size()/myDuration/1024/1024<< std::endl;
+    std::cerr << "Starting binarizer test" << std::endl;
+    asl::Block myBlock;
+    asl::Time myStart;
+    n.binarize(myBlock);
+    asl::Time myFinish;
+    double myDuration = myFinish-myStart;
+    std::cerr << "Serialized to " << myBlock.size() << " bytes in " 
+        <<  myDuration << "sec, MB/sec=" << myBlock.size()/myDuration/1024/1024<< std::endl;
 
-	asl::Time myStart2;
-	unsigned long myPos = myRebinarizedDom.debinarize(myBlock);
-	if (myPos != myBlock.size()) {
-		throw asl::Exception("debinarizer did not finish","testSerializer");
-	}
-	asl::Time myFinish2;
-	double myDuration2 = myFinish2-myStart2;
-	std::cerr << "Debinarized to " << myBlock.size() << " bytes in " 
-		<<  myDuration2 << "sec, MB/sec=" << myBlock.size()/myDuration2/1024/1024<< std::endl;
+    asl::Time myStart2;
+    unsigned long myPos = myRebinarizedDom.debinarize(myBlock);
+    if (myPos != myBlock.size()) {
+        throw asl::Exception("debinarizer did not finish","testSerializer");
+    }
+    asl::Time myFinish2;
+    double myDuration2 = myFinish2-myStart2;
+    std::cerr << "Debinarized to " << myBlock.size() << " bytes in " 
+              <<  myDuration2 << "sec, MB/sec=" << myBlock.size()/myDuration2/1024/1024<< std::endl;
 
 }
 
@@ -370,7 +370,7 @@ new file:
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\VbOrder\\Products.Xml");
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\Stock_Sorter\\Stock-Sorter.Xml");
         */
-        for (unsigned int i = 0; i < file_name.size(); ++i) {
+        for (std::vector<char*>::size_type i = 0; i < file_name.size(); ++i) {
 #ifdef single_test        
             std::cout << asl::readFile(file_name[i]) << std::endl;
 #endif
@@ -438,28 +438,28 @@ new file:
                         std::cerr << "#### ERROR: 1st and 2nd Representation differs! (tmpout.xml != tmpout2.xml)" << std::endl;
                         std::cerr << "file1.size() = " << file1.size()<< std::endl;
                         std::cerr << "file2.size() = " << file2.size() << std::endl;
-                        for (unsigned int j = 0; j < asl::minimum(file1.size(),file2.size());++j) {
+                        for (std::string::size_type j = 0; j < asl::minimum(file1.size(),file2.size());++j) {
                             if (file1[j] == file2[j]) std::cerr << file1[j];
                             else std::cerr << "{"<< file1[j] << "|" << file2[j] << "}";
-                        }			
+                        }
                     } else {
                         std::cerr << "comparison succesful "<< std::endl;
-						dom::Node myRebinarizedNode;
-						testSerializer(dom2,myRebinarizedNode);
-						std::string file3 = asl::as_string(myRebinarizedNode);
-						if (file2 != file3) {
-							std::cerr << "#### ERROR: (Serializer): 3rd and 2nd Representation differs!" << std::endl;
-							std::cerr << "file3.size() = " << file3.size()<< std::endl;
-							std::cerr << "file2.size() = " << file2.size() << std::endl;
-							for (unsigned int j = 0; j < asl::minimum(file3.size(),file2.size());++j) {
-								if (file3[j] == file2[j]) std::cerr << file3[j];
-								else std::cerr << "{"<< file3[j] << "|" << file2[j] << "}";
-							}			
-						} else {
-							std::cerr << "reserializion succesful, file3 size= "<<file3.size()<< std::endl;
-						}
+                        dom::Node myRebinarizedNode;
+                        testSerializer(dom2,myRebinarizedNode);
+                        std::string file3 = asl::as_string(myRebinarizedNode);
+                        if (file2 != file3) {
+                            std::cerr << "#### ERROR: (Serializer): 3rd and 2nd Representation differs!" << std::endl;
+                            std::cerr << "file3.size() = " << file3.size()<< std::endl;
+                            std::cerr << "file2.size() = " << file2.size() << std::endl;
+                            for (std::string::size_type j = 0; j < asl::minimum(file3.size(),file2.size());++j) {
+                                if (file3[j] == file2[j]) std::cerr << file3[j];
+                                else std::cerr << "{"<< file3[j] << "|" << file2[j] << "}";
+                            }
+                        } else {
+                            std::cerr << "reserializion succesful, file3 size= "<<file3.size()<< std::endl;
+                        }
                     }
-                    
+
                 }
                 else {
                     std::cerr << "failed to reparse 'tmpout.xml' until char "<< dom2.parsedUntil() 

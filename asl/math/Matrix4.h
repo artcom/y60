@@ -710,7 +710,7 @@ namespace asl {
         // BEWARE: getRotation methods only work for non-scaling matrices
         // any other matrix type use matrix::decompose instead!!
         void getRotation(Quaternion<Number> & theOrientation) const {
-            float trace = this->val[0][0] + this->val[1][1] + this->val[2][2] + 1.0f;
+            float trace = static_cast<float>( this->val[0][0] + this->val[1][1] + this->val[2][2] + 1.0f );
             Number & qw = theOrientation[3];
             Number & qx = theOrientation[0];
             Number & qy = theOrientation[1];
@@ -724,20 +724,20 @@ namespace asl {
                 qz = ( this->val[1][0] - this->val[0][1] ) / s;
             } else {
                 if ( this->val[0][0] > this->val[1][1] && this->val[0][0] > this->val[2][2] ) {
-                    float s = 2.0f * sqrtf( 1.0f + this->val[0][0] - this->val[1][1] - this->val[2][2]);
+                    float s = 2.0f * sqrtf( 1.0f + static_cast<float>( this->val[0][0] - this->val[1][1] - this->val[2][2] ) );
                     qx = 0.25f * s;
                     qy = (this->val[0][1] + this->val[1][0] ) / s;
                     qz = (this->val[0][2] + this->val[2][0] ) / s;
                     qw = (this->val[2][1] - this->val[1][2] ) / s;
 
                 } else if (this->val[1][1] > this->val[2][2]) {
-                    float s = 2.0f * sqrtf( 1.0f + this->val[1][1] - this->val[0][0] - this->val[2][2]);
+                    float s = 2.0f * sqrtf( 1.0f + static_cast<float>( this->val[1][1] - this->val[0][0] - this->val[2][2] ) );
                     qx = (this->val[0][1] + this->val[1][0] ) / s;
                     qy = 0.25f * s;
                     qz = (this->val[1][2] + this->val[2][1] ) / s;
                     qw = (this->val[0][2] - this->val[2][0] ) / s;
                 } else {
-                    float s = 2.0f * sqrtf( 1.0f + this->val[2][2] - this->val[0][0] - this->val[1][1] );
+                    float s = 2.0f * sqrtf( 1.0f + static_cast<float>( this->val[2][2] - this->val[0][0] - this->val[1][1] ) );
                     qx = (this->val[0][2] + this->val[2][0] ) / s;
                     qy = (this->val[1][2] + this->val[2][1] ) / s;
                     qz = 0.25f * s;

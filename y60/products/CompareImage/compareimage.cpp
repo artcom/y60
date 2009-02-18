@@ -200,17 +200,14 @@ int main( int argc, char *argv[])  {
     }
     catch (asl::Exception & e) {
         cerr << "### ERROR: " << e << endl;
-        return 2;
     }
     catch (PLTextException & e) {
         cerr << "### ERROR: " << e << endl;
-        return 2;
     }
     catch (...) {
         cerr << "### ERROR: Unknown exception occured." << endl;
-        return 2;
     }
-    return 0;
+    return 2;
 }
 
 #ifdef WIN32

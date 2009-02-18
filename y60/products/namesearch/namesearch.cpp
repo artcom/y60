@@ -113,7 +113,7 @@ findWordsEndingWithStartOf(const vector<string> & theDictionary, const string & 
     for (unsigned int i = 0; i < theDictionary.size(); ++i) {
         //cout << "Look for " << theWordBegin<< "* at end of " << theDictionary[i] << endl;
         if (theDictionary[i].size() > theWordBegin.size()) {
-            int myNewPos = read_if_string(theDictionary[i], theDictionary[i].size() - theWordBegin.size(), theWordBegin);
+            const std::string::size_type myNewPos = read_if_string(theDictionary[i], theDictionary[i].size() - theWordBegin.size(), theWordBegin);
             if (myNewPos == theDictionary[i].size()) {
                 string theResult = theDictionary[i].substr(0, theDictionary[i].size() - theWordBegin.size()) + theFullWord;
                 if ((maxResultLen==0) || (theResult.size() <= maxResultLen)) {

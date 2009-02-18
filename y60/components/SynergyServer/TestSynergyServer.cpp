@@ -131,9 +131,9 @@ void TestSynergyServer::testHandshake() {
     char myDInfoMessage[22] = { 0x00, 0x00, 0x00, 0x12, // length
                                'D','I','N','F',         // message type 
                                 0x00, 0x00, 0x00, 0x00, 
-                                0x07, 0x80, 0x04, 0xb0,
+                                0x07, '\x80', 0x04, '\xb0',
                                 0x00, 0x00, 
-                                0x00, 0x00, 0x00, 0x00 };     
+                                0x00, 0x00, 0x00, 0x00 };
                                 
     _myTestSocket.send( myDInfoMessage, sizeof(myDInfoMessage) );
 

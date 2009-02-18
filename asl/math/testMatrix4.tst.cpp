@@ -1116,7 +1116,7 @@ class Matrix4UnitTest : public UnitTest {
             
             
             // test makeXYZRotating
-            myMatrix1.makeXYZRotating(Vector3<T>(1.234,1.234,1.234));
+            myMatrix1.makeXYZRotating(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
             
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
@@ -1140,7 +1140,7 @@ class Matrix4UnitTest : public UnitTest {
                         
             // test rotateXYZ
             myMatrix1.makeIdentity();
-            myMatrix1.rotateXYZ(Vector3<T>(1.234,1.234,1.234));
+            myMatrix1.rotateXYZ(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
             
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
@@ -1163,7 +1163,7 @@ class Matrix4UnitTest : public UnitTest {
                 (string("Matrix rotateXYZ() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
             
             // test Matrix  Quaternion ctor
-            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>(1.234,1.234,1.234)));
+            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) )));
             
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
@@ -1233,7 +1233,7 @@ class Matrix4UnitTest : public UnitTest {
             
             
             // test makeXYZRotating
-            myMatrix1.makeXYZRotating(Vector3<T>(1.234,1.234,1.234));
+            myMatrix1.makeXYZRotating(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
             
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
@@ -1257,7 +1257,7 @@ class Matrix4UnitTest : public UnitTest {
             
             // test rotateXYZ
             myMatrix1.makeIdentity();
-            myMatrix1.rotateXYZ(Vector3<T>(1.234,1.234,1.234));
+            myMatrix1.rotateXYZ(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
             
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
@@ -1280,7 +1280,7 @@ class Matrix4UnitTest : public UnitTest {
                 (string("Matrix rotateXYZ() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
             
             // test Matrix  Quaternion ctor
-            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>(1.234,1.234,1.234)));
+            Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) )));
             
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);

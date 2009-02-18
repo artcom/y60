@@ -615,7 +615,7 @@ void * aglGetProcAddress (char * pszProc)
 #endif
 
     bool hasCap(const string & theCapStr) {
-        bool myReturn = glewIsSupported(theCapStr.c_str());
+        bool myReturn = 0 != glewIsSupported(theCapStr.c_str());
         if (!myReturn) {
             AC_DEBUG << "OpenGL Extension not supported: " << theCapStr;
         }

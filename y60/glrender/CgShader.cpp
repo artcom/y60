@@ -282,7 +282,7 @@ namespace y60 {
                 }
             }
 
-            for (unsigned int i = 0; i < myCompilerArgs.size(); i++) {
+            for (VectorOfVectorOfString::size_type i = 0; i < myCompilerArgs.size(); i++) {
                 PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
                 PackageList::const_iterator it = myPackages.begin();
                 while( it != myPackages.end() ) {

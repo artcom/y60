@@ -545,7 +545,7 @@ namespace y60 {
     VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {
         AC_DEBUG << "FFMpegDecoder2::createFrame";
 
-        int myBufferSize = 0; 
+        //int myBufferSize = 0; 
         vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_RGBA32:
@@ -826,7 +826,7 @@ namespace y60 {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
             _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
-            unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myTimeUnitsPerSecond);
+            //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myTimeUnitsPerSecond);
             
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 || 
                    myVCodec->codec_id == CODEC_ID_WMV3)

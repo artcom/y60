@@ -599,7 +599,7 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
         // fix bug 476
         // the first (bottom-most) texture should be applied as modulate
         // otherwise we loose lighting effects
-        if ((i == myInputPlug.numElements() - 1) && myBlendMode == MAYA_BLEND_NONE) {
+        if ((i == static_cast<int>(myInputPlug.numElements() - 1)) && myBlendMode == MAYA_BLEND_NONE) {
             myBlendMode = MAYA_BLEND_MULTIPLY;
         }
 

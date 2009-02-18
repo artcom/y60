@@ -31,6 +31,10 @@ using namespace std;  // automatically added!
 class TestUnitTest : public UnitTest {
 public:
     explicit TestUnitTest() : UnitTest("TestUnitTest") {}
+#   if defined(_MSC_VER)
+#       pragma warning(push)
+#       pragma warning(disable: 4702)
+#   endif
     void run() {
         setAbortOnFailure(false);
         DTITLE("------------ This is a Title --------------"); 
@@ -58,7 +62,10 @@ public:
         ENSURE(true);
         setSilentSuccess(false);
         ENSURE_EXCEPTION(throw 1,int);
-    } 
+    }
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 };
 
 template <class T>

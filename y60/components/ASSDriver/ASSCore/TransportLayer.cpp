@@ -385,12 +385,12 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
                 AC_WARNING << "Sync error.";
                 exit( 1 );
-                _mySyncLostCounter++;
-                _myFrameQueueLock.lock();
-                _myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
-                _myFrameQueueLock.unlock();
-                setState( SYNCHRONIZING );
-                return;
+                //_mySyncLostCounter++;
+                //_myFrameQueueLock.lock();
+                //_myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
+                //_myFrameQueueLock.unlock();
+                //setState( SYNCHRONIZING );
+                //return;
             }
             int myRowIdx = _myTmpBuffer[1] - 1;
             //AC_PRINT << "Got row: " << myRowIdx;

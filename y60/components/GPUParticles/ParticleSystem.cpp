@@ -86,27 +86,27 @@ getRandomNumber(float min, float max) {
     return min + (rand() / float(RAND_MAX)) * (max-min);
 }
 
-static
-float
-getRandomNumber(const asl::Vector2f & theMinMax) {
-    return getRandomNumber(theMinMax[0], theMinMax[1]);
-}
+//static
+//float
+//getRandomNumber(const asl::Vector2f & theMinMax) {
+//    return getRandomNumber(theMinMax[0], theMinMax[1]);
+//}
 
-static
-asl::Vector3f
-getRandomVector(float min, float max) {
-     return asl::Vector3f(getRandomNumber(min, max),
-                          getRandomNumber(min, max),
-                          getRandomNumber(min, max));
-}
+//static
+//asl::Vector3f
+//getRandomVector(float min, float max) {
+//     return asl::Vector3f(getRandomNumber(min, max),
+//                          getRandomNumber(min, max),
+//                          getRandomNumber(min, max));
+//}
 
-static
-asl::Vector3f
-getRandomVector(const asl::Vector2f & theMinMaxX, const asl::Vector2f & theMinMaxY, const asl::Vector2f & theMinMaxZ) {
-    return asl::Vector3f(getRandomNumber(theMinMaxX[0], theMinMaxX[1]),
-                         getRandomNumber(theMinMaxY[0], theMinMaxY[1]),
-                         getRandomNumber(theMinMaxZ[0], theMinMaxZ[1]));
-}
+//static
+//asl::Vector3f
+//getRandomVector(const asl::Vector2f & theMinMaxX, const asl::Vector2f & theMinMaxY, const asl::Vector2f & theMinMaxZ) {
+//    return asl::Vector3f(getRandomNumber(theMinMaxX[0], theMinMaxX[1]),
+//                         getRandomNumber(theMinMaxY[0], theMinMaxY[1]),
+//                         getRandomNumber(theMinMaxZ[0], theMinMaxZ[1]));
+//}
 
 static
 asl::Vector3f

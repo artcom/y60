@@ -49,21 +49,23 @@
 namespace {
 
 #   if defined(_WIN32)
+#       ifdef DEBUG_VARIANT
         inline void setCrtReportModeToFile(int reportType)
         {
             _CrtSetReportMode( reportType, _CRTDBG_MODE_DEBUG
                                          | _CRTDBG_MODE_FILE );
             _CrtSetReportFile( reportType, _CRTDBG_FILE_STDERR );
         }
-
         inline void init_platform() {
-#           ifdef DEBUG_VARIANT
                 _CrtSetDbgFlag(0); // disable heap checking for debug builds by default
                 setCrtReportModeToFile(_CRT_WARN  );
                 setCrtReportModeToFile(_CRT_ERROR );
                 setCrtReportModeToFile(_CRT_ASSERT);
-#           endif
-	    }
+        }
+#       else
+        inline void init_platform() {
+        }
+#       endif
 #   elif defined(LINUX)
         inline void init_platform()
         {

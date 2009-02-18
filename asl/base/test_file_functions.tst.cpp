@@ -154,7 +154,7 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(fromFile == testContent);   
             ENSURE(readFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
-            ENSURE(getFileSize(testFileName) == testContent.size());
+            ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == testContent.size() );
         }
         void perform_putget_binary(const string & testFileName, int contentSize) {
             DPRINT2("Test with content of size", contentSize);
@@ -172,7 +172,7 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(fromFile == testContent);   
             //ENSURE(readFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
-            ENSURE(getFileSize(testFileName) == testContent.size());
+            ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == testContent.size() );
         }
 
         void perform_copy() {

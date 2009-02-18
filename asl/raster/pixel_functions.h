@@ -39,35 +39,83 @@ TO auto_cast(const FROM & mySrc) {
 
 template <class TO>
 TO auto_cast(int mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(unsigned int mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(long mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(unsigned long mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(char mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(unsigned char mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(float mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 template <class TO>
 TO auto_cast(double mySrc) {
+#   if defined(_MSC_VER)
+#       pragma warning(push, 1)
+#   endif
     return mySrc;
+#   if defined(_MSC_VER)
+#       pragma warning(pop)
+#   endif
 }
 
 template <class TO>
@@ -165,14 +213,14 @@ PIXEL expand(VALUE v) {
 template <class SRC, class DEST>
 struct invert : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
-	    return DEST(src ^ SRC(-1));
+        return static_cast<DEST>(src ^ SRC(-1));
     }
 };
 
 template <class SRC, class DEST, long long OFFSET>
 struct offset : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
-	    return DEST(src + SRC(OFFSET));
+        return DEST(src + SRC(OFFSET));
     }
 };
 
