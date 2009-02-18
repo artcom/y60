@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <project default-recipe="unix_make">
-    <property name="build.dir" value="_builds/${build.type}/"/>
-
     <macro name="prepare_build">
         <command name="create build directory">
             <executable exe="cmake" args="-E make_directory ${build.dir}"/>
@@ -19,6 +17,21 @@
         </command>
     </macro>
 
+
+    <post-processor name="cmake.pp">
+        <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
+            <pattern category="error" expression="^CMake Error"/>
+        </regex.pp>
+        <regex.pp name="cmake_warning.pp" trailing-context="10">
+            <pattern category="warning" expression="CMake Warning"/>
+        </regex.pp>
+            <regex.pp name="cmake_config_warning.pp">
+        <pattern category="warning" expression="^ -- Could NOT find"/>
+        </regex.pp>
+    </post-processor>
+
+
+
     <post-processor name="gcc_build.pp">
         <gcc.pp name="gcc.pp"/>
     </post-processor>
@@ -28,6 +41,8 @@
     </post-processor>
 
     <recipe name="unix_make">
+        <property name="build.dir" value="_builds/${build.type}/"/>
+
         <macro-ref macro="${prepare_build}"/>
 
         <property name="cmake.generator" value="Unix Makefiles"/>
@@ -45,6 +60,7 @@
     </recipe>
 
     <recipe name="windows_nmake">
+        <property name="build.dir" value="_builds/${build.type}/"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
@@ -67,6 +83,7 @@
     </recipe>
 
     <recipe name="windows_vcbuild">
+        <property name="build.dir" value="_builds/"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
