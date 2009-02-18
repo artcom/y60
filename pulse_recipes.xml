@@ -30,7 +30,9 @@
         </regex.pp>
     </post-processor>
 
-
+    <regex.pp name="ctest.pp">
+        <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
+    </regex.pp>
 
     <post-processor name="gcc_build.pp">
         <gcc.pp name="gcc.pp"/>
