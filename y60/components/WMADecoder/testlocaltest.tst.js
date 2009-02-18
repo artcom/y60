@@ -59,12 +59,14 @@
 
 use("UnitTest.js");
 plug("y60JSSound");
-plug("y60WMADecoder2");
+plug("y60WMADecoder");
 plug("y60ProcFunctions");
 
 function WMADecoder2UnitTest() {
     this.Constructor(this, "WMADecoder2UnitTest");
 }
+
+const SOUNDFILE = searchFile("../../../testmodels/tex/ramp.rgb");
 
 WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
@@ -77,8 +79,8 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.runWMADecoder2Test = function() {
-        obj.mySoundManager.preloadSound("../../testfiles/music_cut_wm9.wma");
-        obj.mySound = new Sound("../../testfiles/music_cut_wm9.wma");
+        obj.mySoundManager.preloadSound(SOUNDFILE);
+        obj.mySound = new Sound(SOUNDFILE);
 
         DTITLE("Playing sound...");
         obj.mySound.play();
@@ -154,7 +156,6 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.mySoundManager.volume == 1.0;
 
-//        const mySoundFile = "../../../../sound/testfiles/Plopp_2a.wav"
         const mySoundFile = "../../testfiles/music_cut_wm9.wma"
         var mySound = null;
 
