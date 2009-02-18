@@ -71,7 +71,6 @@
 #include "Logger.h"
 #include "Application.h"
 #include "UDPCommandListenerThread.h"
-#include "SDLSplashScreen.h"
 
 #include <vector>
 #include <string>
@@ -96,7 +95,6 @@ private:
     int                 _myWatchFrequency;
     
     Application         _myAppToWatch;
-    SDLSplashScreen *  _mySplashScreen;
 
     UDPCommandListenerThread * _myUDPCommandListenerThread;
     

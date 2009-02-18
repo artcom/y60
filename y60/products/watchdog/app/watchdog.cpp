@@ -111,14 +111,10 @@ WatchDog::WatchDog()
       _myRebootTimeInSecondsToday(-1),
       _myHaltTimeInSecondsToday(-1)
 {
-    _mySplashScreen = SDLSplashScreen::getInstance();
 }
 
 void
 WatchDog::arm() {
-    if (_mySplashScreen->isEnabled())
-            _mySplashScreen->show();
-        
 #ifdef WIN32
     // allow the foreground window to be set instead of blinking in the taskbar
     // see q97925
@@ -166,9 +162,6 @@ WatchDog::watch() {
             }
         }
         
-        //if (_mySplashScreen->isEnabled())
-        //    _mySplashScreen->hide();
-                
         // Main loop
         for (;;) {
             std::string myReturnString;
@@ -202,9 +195,6 @@ WatchDog::watch() {
                 
             }
             
-            if (_mySplashScreen->isEnabled())
-                    _mySplashScreen->show();
-                    
             _myAppToWatch.terminate(myRestartMessage, false);
 
             _myLogger.logToFile(_myAppToWatch.getFilename() + string(" exited: ") + myReturnString);
@@ -226,9 +216,6 @@ WatchDog::watch() {
                     asl::msleep(1000);
                 }
             }
-            
-            //if (_mySplashScreen->isEnabled())
-            //    _mySplashScreen->hide();
         }
     } catch (const asl::Exception & ex) {
         cerr << "### Exception: " << ex << endl;
@@ -364,9 +351,6 @@ WatchDog::init(dom::Document & theConfigDoc) {
                         int myValue = atoi(((*myApplicationNode->childNode("WaitingScreenPosY"))("#text").nodeValue()).c_str());
                         myWaitingScreenPosY = myValue;
                     }
-                    
-                    _mySplashScreen->enable(myWaitingScreenPath, myWaitingScreenPosX, myWaitingScreenPosY);
-                    
                 }
             } 
         }

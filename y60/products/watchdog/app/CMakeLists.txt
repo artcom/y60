@@ -7,7 +7,6 @@ NecProjector.cpp
 PanasonicProjector.cpp
 PdF1Projector.cpp
 Projector.cpp
-SDLSplashScreen.cpp
 UDPCommandListenerThread.cpp
 system_functions.cpp
 watchdog.cpp
@@ -22,7 +21,6 @@ NecProjector.h
 PanasonicProjector.h
 PdF1Projector.h
 Projector.h
-SDLSplashScreen.h
 UDPCommandListenerThread.h
 system_functions.h
 watchdog.h
@@ -41,5 +39,4 @@ ac_add_executable(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}  
     DEPENDS aslbase aslnet asldom aslserial paintlib
-    EXTERNS SDL
 )
