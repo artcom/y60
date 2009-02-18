@@ -98,6 +98,8 @@ macro(_ac_buildinfo_filename TARGET_NAME OUTPUT_VARIABLE)
     if( ACMAKE_BUILDINFO)
         set( ${OUTPUT_VARIABLE}
                 "${CMAKE_CURRENT_BINARY_DIR}/ACMakeFiles/${TARGET_NAME}${ACMAKE_BUILDINFO_FILE_SUFFIX}")
+    else( ACMAKE_BUILDINFO)
+        set(${OUTPUT_VARIABLE})
     endif( ACMAKE_BUILDINFO)
 endmacro(_ac_buildinfo_filename)
 
