@@ -5,12 +5,6 @@
          recipes that use a multi-configuration CMake generator, like the
          MSVC recipe.-->
     <property name="build.dir" value="_builds/${build.type}/"/>
-    <!-- TODO: make these agent properties -->
-    <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
-    <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-    <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
-    <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
-    <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
 
     <!-- postprocessors for the configure phase -->
     <post-processor name="cmake.pp">
@@ -92,6 +86,9 @@
     </recipe>
 
     <recipe name="windows_nmake">
+        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+        <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
+        <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
 
         <macro-ref macro="${prepare_build}"/>
 
@@ -114,6 +111,10 @@
 
     <recipe name="windows_vcbuild">
         <property name="build.dir" value="_builds/"/>
+        <!-- TODO: make these agent properties -->
+        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+        <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
+        <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
 
         <macro-ref macro="${prepare_build}"/>
 
