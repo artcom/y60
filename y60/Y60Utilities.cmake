@@ -55,9 +55,14 @@ macro(y60_add_jstest NAME PREFIX)
   collect_plugin_dirs(PLUGIN_DIRS) 
   set(TESTPATH ${CMAKE_CURRENT_BINARY_DIR})
   string(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" TESTPATH ${TESTPATH})
+
+  set(PLUGIN_SEARCH_PATH
+        "${TESTPATH};${CMAKE_BINARY_DIR}/bin;${CMAKE_SOURCE_DIR}/y60/products/y60/")
+  set(PLUGIN_SEARCH_PATH "${PLUGIN_SEARCH_PATH};${CMAKE_SOURCE_DIR}/y60/js/")
+  set(PLUGIN_SEARCH_PATH "${PLUGIN_SEARCH_PATH};${CMAKE_SOURCE_DIR}/y60/shader/;.;${PLUGIN_DIRS}")
+
   add_test(${PREFIX}_${NAME}
-      ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I 
-      "${TESTPATH};${CMAKE_BINARY_DIR}/lib/Release;${CMAKE_SOURCE_DIR}/y60/products/y60/;${CMAKE_SOURCE_DIR}/y60/js/;${CMAKE_SOURCE_DIR}/y60/shader/;${PLUGIN_DIRS};."
+      ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I "${PLUGIN_SEARCH_PATH}"
   )
 endmacro(y60_add_jstest )
 
