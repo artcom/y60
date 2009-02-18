@@ -39,39 +39,61 @@ macro(y60_add_component COMPONENT_NAME)
 endmacro(y60_add_component)
 
 
-macro(collect_plugin_dirs PLUGIN_DIRS) 
-  get_property(Y60_PLUGINS GLOBAL PROPERTY Y60_PLUGINS)
-  set(PLUGIN_DIRS "")
-  foreach(PLUGIN_NAME ${Y60_PLUGINS})
-    get_target_property(PLUGIN_FILE ${PLUGIN_NAME} LOCATION_${CMAKE_BUILD_TYPE}) 
-    get_filename_component(PLUGIN_DIR ${PLUGIN_FILE} PATH)
-    list(APPEND PLUGIN_DIRS ${PLUGIN_DIR})
-  endforeach(PLUGIN_NAME ${Y60_PLUGINS})
-  list(REMOVE_DUPLICATES PLUGIN_DIRS)
-endmacro(collect_plugin_dirs) 
+macro(collect_path INTO)
+    # collect paths for all plugins
+    collect_plugin_path(_PLUGIN_PATH)
+
+    # add some hard-coded defaults
+    set(_PATH
+        ${Y60_SOURCE_DIR}/js     # javascript library
+        ${Y60_SOURCE_DIR}/shader # shader library
+        ${_PLUGIN_PATH}          # plugin locations
+    )
+
+    # set the output variable
+    set(${INTO} ${_PATH})
+endmacro(collect_path)
+
+macro(collect_plugin_path INTO) 
+    # get list of all plugins in the Y60 project
+    get_global(Y60_PLUGINS PLUGINS)
+
+    # compile list of paths based on locations of plugins
+    set(PLUGIN_DIRS)
+    foreach(PLUGIN ${PLUGINS})
+        get_target_property(PLUGIN_FILE ${PLUGIN} LOCATION_${CMAKE_BUILD_TYPE}) 
+
+        get_filename_component(PLUGIN_PATH ${PLUGIN_FILE} PATH)
+
+        list(APPEND PLUGIN_DIRS ${PLUGIN_PATH})
+    endforeach(PLUGIN)
+
+    # set output variable
+    set(${INTO} ${PLUGIN_DIRS})
+endmacro(collect_plugin_path)
 
 macro(y60_add_jstest NAME PREFIX)
-  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
-  collect_plugin_dirs(PLUGIN_DIRS) 
-  set(TESTPATH ${CMAKE_CURRENT_BINARY_DIR})
-  string(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" TESTPATH ${TESTPATH})
+    # find y60 executable
+    get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE})
+    
+    # collect basic Y60_PATH
+    collect_path(_BASE_PATH)
 
-  set(PLUGIN_SEARCH_PATH
-        "${TESTPATH};${CMAKE_BINARY_DIR}/bin;${CMAKE_SOURCE_DIR}/y60/products/y60/")
-  set(PLUGIN_SEARCH_PATH "${PLUGIN_SEARCH_PATH};${CMAKE_SOURCE_DIR}/y60/js/")
-  set(PLUGIN_SEARCH_PATH "${PLUGIN_SEARCH_PATH};${CMAKE_SOURCE_DIR}/y60/shader/;.;${PLUGIN_DIRS}")
+    # extend the path with test-specifics
+    set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${_BASE_PATH})
 
-  add_test(${PREFIX}_${NAME}
-      ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I "${PLUGIN_SEARCH_PATH}"
-  )
-endmacro(y60_add_jstest )
+    # register the test
+    add_test(${PREFIX}_${NAME}
+        ${Y60_EXECUTABLE} test${NAME}.tst.js ${ARGN} shaderlibrary.xml -I "${_PATH}"
+    )
+endmacro(y60_add_jstest)
 
 
 macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
   get_target_property(COMPAREIMAGE_EXECUTABLE ac-compare-image LOCATION_${CMAKE_BUILD_TYPE})
 
-  collect_plugin_dirs(PLUGIN_DIRS) 
+  collect_path(PLUGIN_DIRS) 
   
   if(IS_CGTEST)
     file(WRITE ${CMAKEFILE} "# testscript for cg scenetest ${NAME}\n")
@@ -93,9 +115,9 @@ macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   file(APPEND ${CMAKEFILE} "#generate image\n")
   file(APPEND ${CMAKEFILE} "execute_process(\n")
   if( NOT ${DIRNAME} STREQUAL "tutorials" )
-    file(APPEND ${CMAKEFILE} "  COMMAND ${Y60_EXECUTABLE} -I \"${CMAKE_BINARY_DIR}/${DIRNAME};${CMAKE_SOURCE_DIR}/y60/js;${PLUGIN_DIRS};${CMAKE_SOURCE_DIR}/y60/shader\" ${SCRIPT} ${SCENE} ${SHADERLIB} rehearsal offscreen outputimage=${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME} outputsuffix=${IMGSUFFIX}\n")
+    file(APPEND ${CMAKEFILE} "  COMMAND ${Y60_EXECUTABLE} -I \"${PLUGIN_DIRS}\" ${SCRIPT} ${SCENE} ${SHADERLIB} rehearsal offscreen outputimage=${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME} outputsuffix=${IMGSUFFIX}\n")
   else( NOT ${DIRNAME} STREQUAL "tutorials" )
-    file(APPEND ${CMAKEFILE} "  COMMAND ${Y60_EXECUTABLE} -I \"${CMAKE_BINARY_DIR}/${DIRNAME};${CMAKE_SOURCE_DIR}/y60/js;${CMAKE_SOURCE_DIR}/../testmodels;${PLUGIN_DIRS};${CMAKE_SOURCE_DIR}/y60/shader\" createTutorialScreenshots.js ${SCRIPT} ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages\n")
+    file(APPEND ${CMAKEFILE} "  COMMAND ${Y60_EXECUTABLE} -I \"${PLUGIN_DIRS}\" createTutorialScreenshots.js ${SCRIPT} ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages\n")
   endif( NOT ${DIRNAME} STREQUAL "tutorials" )
   file(APPEND ${CMAKEFILE} "  WORKING_DIRECTORY ${TESTMODELDIR}\n")
   file(APPEND ${CMAKEFILE} "  RESULT_VARIABLE rv\n")
