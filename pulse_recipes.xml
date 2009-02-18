@@ -1,5 +1,17 @@
 <?xml version="1.0"?>
 <project default-recipe="unix_make">
+    <!-- this property specifies the binary output directory for the build
+         relative to the toplevel of the checkout. It is overridden by 
+         recipes that use a multi-configuration CMake generator, like the
+         MSVC recipe.-->
+    <property name="build.dir" value="_builds/${build.type}/"/>
+    <!-- TODO: make these agent properties -->
+    <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
+    <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
+    <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
+    <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
+    <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
+
     <!-- postprocessors for the configure phase -->
     <post-processor name="cmake.pp">
         <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
@@ -25,22 +37,22 @@
 
     <!-- postprocessors for the test phase -->
     <post-processor name="msvc_test_run.pp">
-        <msbuild.pp name="msbuild.pp"/>
         <regex.pp name="ctest.pp">
-            <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
+            <pattern category="error"
+                     expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
         </regex.pp>
     </post-processor>
 
     <post-processor name="make_test_run.pp">
-        <make.pp name="make.pp"/>
         <regex.pp name="ctest.pp">
-            <pattern category="error" expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
+            <pattern category="error"
+                     expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
         </regex.pp>
     </post-processor>
 
     <!-- macros -->
     <macro name="prepare_build">
-        <command name="create build directory">
+        <command name="prepare">
             <executable exe="cmake" args="-E make_directory ${build.dir}"/>
         </command>
     </macro>
@@ -58,10 +70,7 @@
         </command>
     </macro>
 
-
-
     <recipe name="unix_make">
-        <property name="build.dir" value="_builds/${build.type}/"/>
 
         <macro-ref macro="${prepare_build}"/>
 
@@ -83,11 +92,6 @@
     </recipe>
 
     <recipe name="windows_nmake">
-        <property name="build.dir" value="_builds/${build.type}/"/>
-        <!-- TODO: make these agent properties -->
-        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
-        <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
-        <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
 
         <macro-ref macro="${prepare_build}"/>
 
@@ -110,10 +114,6 @@
 
     <recipe name="windows_vcbuild">
         <property name="build.dir" value="_builds/"/>
-        <!-- TODO: make these agent properties -->
-        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
-        <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-        <!-- <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/> -->
 
         <macro-ref macro="${prepare_build}"/>
 
@@ -122,49 +122,10 @@
         <macro-ref macro="${run_cmake}"/>
 
         <command name="build">
-            <executable exe="cmd.exe" working-dir="${build.dir}">
-                <arg>/C</arg>
-                <arg>..\\vcbuild_wrapper.bat</arg>
+            <executable exe="${vcbuild.bin}" working-dir="${build.dir}">
                 <arg>/M${parallel.jobs}</arg>
                 <arg>PRO60.sln</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
-
-                <process processor="${msvc_build.pp}"/>
-            </executable>
-        </command>
-
-        <command name="test">
-            <executable exe="cmd.exe" working-dir="${build.dir}">
-                <arg>/C</arg>
-                <arg>..\\vcbuild_wrapper.bat</arg>
-                <arg>RUN_TESTS.vcproj</arg>
-                <arg>&quot;${build.type}|Win32&quot;</arg>
-
-                <process processor="${msvc_test_run.pp}"/>
-            </executable>
-        </command>
-    </recipe>
-
-    <recipe name="windows_incredibuild">
-        <property name="build.dir" value="_builds/"/>
-        <!-- TODO: make these agent properties -->
-        <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
-        <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
-        <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
-        <property name="incredibuild.bin" value="BuildConsole.exe"/>
-
-        <macro-ref macro="${prepare_build}"/>
-
-        <property name="cmake.generator" value="Visual Studio 9 2008"/>
-        <property name="cmake.source.dir" value="../"/>
-        <macro-ref macro="${run_cmake}"/>
-
-        <command name="build">
-            <executable exe="${incredibuild.bin}" working-dir="${build.dir}">
-                <arg>PRO60.sln</arg>
-                <arg>/CFG=&quot;${build.type}|Win32&quot;</arg>
-                <arg>/SHOWCMD</arg>
-                <arg>/SHOWAGENT</arg>
 
                 <process processor="${msvc_build.pp}"/>
             </executable>
