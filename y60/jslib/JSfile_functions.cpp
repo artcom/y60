@@ -632,7 +632,7 @@ searchFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "searchFile(): expects at least one string (theFile)");
             return JS_FALSE;
         }
-         string myPath = JSApp::getPackageManager()->getSearchPath();
+        string myPath = JSApp::getPackageManager()->getSearchPath();
         string myFile = "";
         if (argc > 0) {
             convertFrom(cx, argv[0], myFile);
