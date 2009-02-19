@@ -84,7 +84,7 @@ typedef asl::Ptr<RenderArea> RenderAreaPtr;
 
 class RenderArea : public Gtk::DrawingArea, public jslib::AbstractRenderWindow {
     public:
-        RenderArea(RenderAreaPtr theContext = RenderAreaPtr(0));
+        RenderArea(RenderAreaPtr theContext = RenderAreaPtr());
         virtual ~RenderArea();
         // Y60 AbstractWindowArea
         void initDisplay();

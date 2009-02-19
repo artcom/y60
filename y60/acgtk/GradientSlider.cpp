@@ -67,9 +67,9 @@ const static int MIN_WINDOW_WIDTH(10);
 
 GradientSlider::GradientSlider() :
     Gtk::DrawingArea(),
-    _myTransferFunction(0),
-    _mySelectedColor(0),
-    _mySelectionCandidate(0)
+    _myTransferFunction(),
+    _mySelectedColor(),
+    _mySelectionCandidate()
 {
     set_size_request(256, 10);
     Gdk::EventMask myFlags = get_events();
