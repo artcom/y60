@@ -31,8 +31,11 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/netsrc/oscpack/include
 )
 
-# traverse our subdirectories
+# add and load acmake
 add_subdirectory(acmake)
+include(AcMake)
+
+# add our packages
 add_subdirectory(netsrc)
 add_subdirectory(asl)
 add_subdirectory(y60)

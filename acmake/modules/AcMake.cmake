@@ -17,9 +17,26 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# include guard
+get_property(ACMAKE_PRESENT GLOBAL PROPERTY ACMAKE_PRESENT)
+set_property(GLOBAL PROPERTY ACMAKE_PRESENT TRUE)
+
+mark_as_advanced(ACMAKE_LOCKED_AND_LOADED ACMAKE_PRESENT)
+
+if(ACMAKE_LOCKED_AND_LOADED)
+    return()
+else(ACMAKE_LOCKED_AND_LOADED)
+    set(ACMAKE_LOCKED_AND_LOADED TRUE)
+    if(ACMAKE_PRESENT)
+        message("This build contains at least two projects using acmake. You should include it at toplevel.")
+    endif(ACMAKE_PRESENT)
+endif(ACMAKE_LOCKED_AND_LOADED)
+
+# load testing stuff
 include(CTest)
 mark_as_advanced(DART_TESTING_TIMEOUT)
 
+# load pkg-config
 include(FindPkgConfig)
 
 # Force default buildtype to Release.
