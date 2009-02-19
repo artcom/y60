@@ -129,7 +129,7 @@ public:
                  int sceneDisplayWidth, int sceneDisplayHeight,
                  int displayWidth, int displayHeight,
                  int displayOffsetX, int displayOffsetY,
-                 BufferAllocatorPtr bufferAllocator = BufferAllocatorPtr(0) );
+                 BufferAllocatorPtr bufferAllocator = BufferAllocatorPtr() );
     
     void setDataOffset(const asl::Vector2i & theOffset);
     void setDisplayOffset(const asl::Vector2i & theOffset);

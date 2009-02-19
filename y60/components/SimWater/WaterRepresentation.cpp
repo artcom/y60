@@ -124,8 +124,8 @@ WaterRepresentation::WaterRepresentation() :
     _displayHeight(100),
     _displayOffsetX(0),
     _displayOffsetY(0),
-    _bufferAllocator(0),
-    _waterSimulation(0),
+    _bufferAllocator(),
+    _waterSimulation(),
     _stripIndices(0),
     _drawWireFrame( false ),
     _drawCaustics(true),
@@ -165,13 +165,13 @@ WaterRepresentation::~WaterRepresentation() {
             _vertexBuffer = 0;
         } else {
             //free(_bufferAllocator);
-            _bufferAllocator = BufferAllocatorPtr(0);
+            _bufferAllocator = BufferAllocatorPtr();
             _vertexBuffer= 0;
         }
     }
     if (_bufferAllocator) {
         //delete _bufferAllocator;
-        _bufferAllocator = BufferAllocatorPtr(0);
+        _bufferAllocator = BufferAllocatorPtr();
     }
     if (_stripIndices) {
         delete[] _stripIndices;
