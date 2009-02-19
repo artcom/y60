@@ -33,7 +33,7 @@ void PLFilterIntensity::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
   double h, s, v;
   double intensityFactor;
   // int total = 0;
-  register int inc;
+  register int inc = 0;
   extern void fp_rgb_to_hsv(double* r, double* g, double *b);
   extern void fp_hsv_to_rgb(double* r, double* g, double *b);
 

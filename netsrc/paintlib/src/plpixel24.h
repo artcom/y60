@@ -137,9 +137,9 @@ inline PLPixel24 PLPixel24::Blend (int Factor, const PLPixel24 Pix1, const PLPix
 {
   PLASSERT (Factor >= 0 && Factor <= 256);
 
-  return PLPixel24 ((Pix1.GetR()*Factor+Pix2.GetR()*(256-Factor))>>8,
-                    (Pix1.GetG()*Factor+Pix2.GetG()*(256-Factor))>>8,
-                    (Pix1.GetB()*Factor+Pix2.GetB()*(256-Factor))>>8);
+  return PLPixel24( static_cast<PLBYTE>((Pix1.GetR()*Factor+Pix2.GetR()*(256-Factor))>>8),
+                    static_cast<PLBYTE>((Pix1.GetG()*Factor+Pix2.GetG()*(256-Factor))>>8),
+                    static_cast<PLBYTE>((Pix1.GetB()*Factor+Pix2.GetB()*(256-Factor))>>8) );
 }
 
 inline PLPixel24 PLPixel24::operator = (const PLPixel32& Pix)

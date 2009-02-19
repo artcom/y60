@@ -46,7 +46,7 @@ long PLAnyBmp::GetMemUsed
 {
   PLASSERT_VALID (this);
 
-  return GetMemNeeded (GetWidth(), GetHeight(), GetBitsPerPixel())+
+  return GetMemNeeded (GetWidth(), GetHeight(), static_cast<PLBYTE>(GetBitsPerPixel()))+
                                                 sizeof (*this);
 }
 
@@ -122,7 +122,7 @@ void PLAnyBmp::internalCreate
     throw PLTextException(PL_ERRDIB_TOO_LARGE, "Bitmap size too large.\n");
 #endif
 
-  m_pBits = new PLBYTE [GetBitsMemNeeded (Width, Height, pf.GetBitsPerPixel())];
+  m_pBits = new PLBYTE [GetBitsMemNeeded (Width, Height, static_cast<PLWORD>(pf.GetBitsPerPixel()))];
   if (pf.GetBitsPerPixel() <= 8)
     m_pClrTab = new PLPixel32 [1 << pf.GetBitsPerPixel()];
    else

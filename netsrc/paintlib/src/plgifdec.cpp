@@ -91,7 +91,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
   CurLine = 0;
   while (CurLine < pGifFile->SHeight)
   {
-    pLineArray[CurLine][0] = pGifFile->SBackGroundColor;
+    pLineArray[CurLine][0] = static_cast<PLBYTE>(pGifFile->SBackGroundColor);
     CurLine++;
   }
 
@@ -195,7 +195,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
   }
 
   PLBYTE* pb = (PLBYTE*)ColorMap->Colors;
-  for (i = 0; i < ColorMap->ColorCount; i++)
+  for (PLBYTE i = 0; i < ColorMap->ColorCount; i++)
   {
     Bmp.SetPaletteEntry(i, pb[0], pb[1], pb[2], i == iTransparentIndex ? 0:255);
     pb += 3;

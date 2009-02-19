@@ -107,7 +107,7 @@ void PLPicDecoder::MakeBmpFromURL
     ( const char * pszURL,
       PLBmp * pBmp,
       const PLPixelFormat& pfWanted,
-      PLIProgressNotification * pProgNot
+      PLIProgressNotification * /*pProgNot*/
     )
 {
 #ifdef PL_SUPPORT_CURL
@@ -161,7 +161,7 @@ void PLPicDecoder::MakeBmpFromResource
       PLBmp * pBmp,
       const PLPixelFormat& pfWanted,
       const char * ResType,
-      HMODULE hResModule
+      HMODULE /*hResModule*/
     )
     // Decodes a picture in a resource by creating a resource data
     // source and calling MakeBmp with this data source.
@@ -204,7 +204,7 @@ void PLPicDecoder::MakeBmpFromMemory
       int MemSrcSize,
       PLBmp * pBmp,
       const PLPixelFormat& pfWanted,
-      PLIProgressNotification * pProgNot
+      PLIProgressNotification * /*pProgNot*/
     )
     // Decodes a picture from memory directly resembling the image file by
     // creating a memory data source and calling MakeBmp with this data source.
@@ -449,7 +449,7 @@ void PLPicDecoder::Trace
 PLBYTE * PLPicDecoder::unpackPictRow
     ( PLBYTE * pLineBuf,
       PLDataSource * pDataSrc,
-      int Width,
+      int /*Width*/,
       int rowBytes,
       int SrcBytes
     )

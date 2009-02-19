@@ -197,8 +197,8 @@ PLBmpInfo* PLPSDDecoder::createBmpInfo
   {
     case Greyscale:
       {        
-        for (int i=0; i<256; i++)
-          m_pPal[i].Set (i, i, i, 0xFF);        
+        for (PLBYTE i=0; i<256; i++)
+          m_pPal[i].Set(i, i, i, static_cast<PLBYTE>(0xFF));
         pf = PLPixelFormat::L8;
       }
       break;
@@ -450,7 +450,7 @@ void PLPSDDecoder::traceCompressionMethod
 void PLPSDDecoder::readUncompressedImage 
     ( PLDataSource * pDataSrc,
       PLBmpBase * pBmp,
-      int Mode,
+      int /*Mode*/,
       int Height,
       int Width,
       int Channels 

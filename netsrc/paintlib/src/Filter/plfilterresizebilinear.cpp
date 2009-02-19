@@ -113,10 +113,11 @@ void PLFilterResizeBilinear::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) con
                 pBmpDest->GetWidth(),
                 pBmpDest->GetHeight());
     } else {
+        // non-supported pixel format
         throw PLTextException (PL_ERRFORMAT_NOT_SUPPORTED, 
                     string(pBmpSource->GetPixelFormat().GetName()+
                     " unsupported in FilterResizeBilinear").c_str());
-        PLASSERT(false); // non-supported pixel format
+        //PLASSERT(false);
     }
 }
 

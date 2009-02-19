@@ -149,7 +149,7 @@ void PLFilterQuantize::deleteLUT()
 
 
 void PLFilterQuantize::genMedianPalette 
-    (PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
+    (PLBmpBase * /*pBmpSource*/, PLBmp * pBmpDest) const
 {
   //--------------------------------------------------------------
   // build new palette with median cut algorithm
@@ -297,18 +297,17 @@ void PLFilterQuantize::squeeze(QUBOX * pBox) const
   pBox->Corner1 = PLPixel32 (0,0,0,0);
   pBox->Average = PLPixel32 (0,0,0,0);
 
-  int r,g,b;
   int rsum = 0;
   int gsum = 0;
   int bsum = 0;
   PLULONG count = 0;
-  for (r=Corner0.GetR (); r<=Corner1.GetR (); r++)
+  for (PLBYTE r=Corner0.GetR (); r<=Corner1.GetR (); r++)
   {
-    for (g=Corner0.GetG (); g<=Corner1.GetG (); g++)
+    for (PLBYTE g=Corner0.GetG (); g<=Corner1.GetG (); g++)
     {
-      for (b=Corner0.GetB (); b<=Corner1.GetB (); b++)
+      for (PLBYTE b=Corner0.GetB (); b<=Corner1.GetB (); b++)
       {
-        int index = getColorTableIndex (PLPixel32 (r,g,b,0));
+        int index = getColorTableIndex ( PLPixel32 (r,g,b,0));
         HISTONODE * pNode = m_ppHisto[index];
         if (pNode)
         {
@@ -356,7 +355,7 @@ void SwapLong (long* pa, long* pb)
 }
 
 void PLFilterQuantize::genPopularityPalette 
-        (PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
+        (PLBmpBase * /*pBmpSource*/, PLBmp * pBmpDest) const
 {
   PLULONG PalCount[256];
   memset (PalCount, 0, sizeof(PLULONG)*256);
@@ -382,17 +381,16 @@ void PLFilterQuantize::genPopularityPalette
   pPal[6] = PLPixel32 (31,0,31,0);
   pPal[7] = PLPixel32 (31,31,31,0);
 
-  int r,g,b;
   int IndexCache = -1;
   HISTONODE * pNode;
   HISTONODE * pNodeCache;
-  for (r=0; r<31; r++)
+  for (PLBYTE r=0; r<31; r++)
   {
-    for (g=0; g<31; g++)
+    for (PLBYTE g=0; g<31; g++)
     {
-      for (b=0; b<31; b++)
+      for (PLBYTE b=0; b<31; b++)
       {
-        int index = getColorTableIndex (PLPixel32 (r,g,b,0));
+        int index = getColorTableIndex (PLPixel32 (r,g,b,PLBYTE()));
         if (index == IndexCache)
           pNode = pNodeCache;
         else
@@ -778,13 +776,13 @@ void PLFilterQuantize::ditherDestBmp(PLBmpBase * pBmpSource, PLBmp * pBmpDest) c
   int h = pBmpSource->GetHeight();
 
   // FS error accumulators.
-  double * pOddErrors;
-  double * pEvenErrors;
-  double * pCurErrors;
-  double * pNextErrors;
+  double * pOddErrors = NULL;
+  double * pEvenErrors = NULL;
+  double * pCurErrors = NULL;
+  double * pNextErrors = NULL;
 
   // FS: current pixel as float values
-  double r,g,b;
+  double r = 0, g = 0, b = 0;
 
   if (m_DitherType == PLDTH_FS)
   {
@@ -915,7 +913,7 @@ void PLFilterQuantize::ditherDestBmp(PLBmpBase * pBmpSource, PLBmp * pBmpDest) c
 }
 
 
-void PLFilterQuantize::jitterPixel (int i, int y, PLPixel32 * pPixel) const
+void PLFilterQuantize::jitterPixel (int /*i*/, int /*y*/, PLPixel32 * /*pPixel*/) const
 {
 }
 
@@ -971,7 +969,7 @@ PLBYTE PLFilterQuantize::getNeighbor (PLPixel32 Color, PLPixel32 * pPal) const
     pNode->index = -1;
   }
 
-  int PalIndex = pNode->index;
+  PLBYTE PalIndex = static_cast<PLBYTE>(pNode->index);
   if( PalIndex == -1)
   {
     pNode->index = 0;
@@ -989,7 +987,7 @@ PLBYTE PLFilterQuantize::getNeighbor (PLPixel32 Color, PLPixel32 * pPal) const
         MinDist = Dist;
       }
     }
-    PalIndex = pNode->index;
+    PalIndex = static_cast<PLBYTE>(pNode->index);
   }
   return PalIndex;
 }

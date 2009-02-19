@@ -349,7 +349,7 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
        PhotometricInterpretation == PHOTOMETRIC_MINISBLACK)
       {
         int numColors = 1 << BitsPerSample;
-        PLBYTE step = 255 / (numColors-1);
+        PLBYTE step = static_cast<PLBYTE>(255 / (numColors-1));
         PLBYTE *pb = (PLBYTE *) (pPal);
         int offset = sizeof(PLPixel32);
         if (PhotometricInterpretation == PHOTOMETRIC_MINISWHITE)
@@ -358,7 +358,7 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
           offset = -offset;
         }
         // warning: the following ignores possible halftone hints
-        for (int i = 0; i < numColors; ++i, pb += offset)
+        for (PLBYTE i = 0; i < numColors; ++i, pb += offset)
         {
           pb[PL_RGBA_RED] = pb[PL_RGBA_GREEN] = pb[PL_RGBA_BLUE] = i * step;
           pb[PL_RGBA_ALPHA] = 255;
@@ -372,16 +372,16 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
       uint16* red;
       uint16* green;
       uint16* blue;
-      int16 i, Palette16Bits;
+      int16 Palette16Bits;
 
       // we get pointers to libtiff-owned colormaps
-      i = TIFFGetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue);
+      TIFFGetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue);
 
       //Is the palette 16 or 8 bits ?
       Palette16Bits = checkcmap(1<<BitsPerSample, red, green, blue) == 16;
 
       //load the palette in the DIB
-      for (i = 0; i < 1<<BitsPerSample; ++i)
+      for (PLBYTE i = 0; i < 1<<BitsPerSample; ++i)
       {
         PLBYTE *pb = (PLBYTE *) ((pPal)+i);
         pb[PL_RGBA_RED  ] = (PLBYTE) (Palette16Bits ? CVT(  red[i]) :   red[i]);
@@ -454,7 +454,7 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
 /////////////////////////////////////////////////////////////////////
 // Static functions used as Callbacks from the TIFF library
 
-void PLTIFFDecoder::Win32ErrorHandler (const char* module, const char* fmt, va_list ap)
+void PLTIFFDecoder::Win32ErrorHandler (const char* /*module*/, const char* fmt, va_list ap)
 {
   int k = vsprintf(m_szLastErr, fmt, ap);
   if (k >= 0) strcat( m_szLastErr + k, "\n" );

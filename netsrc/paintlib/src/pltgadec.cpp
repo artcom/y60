@@ -111,12 +111,10 @@ void PLTGADecoder::readPalette
     )
     // Reads the TGA palette and creates a windows palette.
 {
-  int   i;
-
-  for (i=StartIndex; i<StartIndex+Length; i++)
+  for (int i=StartIndex; i<StartIndex+Length; ++i)
   {
     PLPixel32 CurEntry = readPixel32 (EntrySize, pDataSrc);
-    pBmp->SetPaletteEntry (i, CurEntry);
+    pBmp->SetPaletteEntry (static_cast<PLBYTE>(i), CurEntry);
   }
 }
 
@@ -127,7 +125,7 @@ void PLTGADecoder::readImage
       PLDataSource * pDataSrc
     )
 {
-  bool bCompressed;
+  bool bCompressed = false;
 
   if (pTgaHead->ImageType == TGA_Mono ||
       pTgaHead->ImageType == TGA_RLEMono)
@@ -191,7 +189,7 @@ void PLTGADecoder::readData
 void PLTGADecoder::expandUncompressedLine
     ( PLBYTE * pDest,
       int Width,
-      bool bReversed,
+      bool /*bReversed*/,
       int bpp,
       PLDataSource * pDataSrc
     )
@@ -217,7 +215,7 @@ void PLTGADecoder::expandUncompressedLine
 void PLTGADecoder::expandCompressedLine
     ( PLBYTE * pDest,
       int Width,
-      bool bReversed,
+      bool /*bReversed*/,
       int bpp,
       PLDataSource * pDataSrc
     )

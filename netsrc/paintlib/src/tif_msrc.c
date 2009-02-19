@@ -132,12 +132,19 @@ _tiffSizeProc(thandle_t fd)
 static int
 _tiffDummyMapProc(thandle_t fd, tdata_t* pbase, toff_t* psize)
 {
+    (void)fd;
+    (void)pbase;
+    (void)psize;
 	return(0);
 }
 
 static void
 _tiffDummyUnmapProc(thandle_t fd, tdata_t base, toff_t size)
-{}
+{
+    (void)fd;
+    (void)base;
+    (void)size;
+}
 
 
 #ifndef LIBTIFF_MACOSX /* NON-MACOSX ONLY */
@@ -145,6 +152,9 @@ _tiffDummyUnmapProc(thandle_t fd, tdata_t base, toff_t size)
 TIFF*
 TIFFFdOpen(int ifd, const char* name, const char* mode)
 {
+    (void)ifd;
+    (void)name;
+    (void)mode;
 	TIFFError ("TIFFFdOpen", "Function disabled.");
 	return NULL;
 }
@@ -152,6 +162,8 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 TIFF*
 TIFFOpen(const char* name, const char* mode)
 {
+    (void)name;
+    (void)mode;
 	/* This version doesn't work with files */
 	TIFFError ("TIFFOpen", "Function disabled.");
 	return NULL;

@@ -470,7 +470,7 @@ void PLPictDecoder::jpegOp
 
 void PLPictDecoder::DecodeJPEG
     ( PLBmpBase * pBmp,
-      PLDataSource * pDataSrc
+      PLDataSource * /*pDataSrc*/
     )
 {
 #ifdef PL_SUPPORT_JPEG
@@ -619,10 +619,10 @@ void PLPictDecoder::unpack32bits
   int Height = pBounds->bottom - pBounds->top;
   int Width = pBounds->right - pBounds->left;
 
-  BytesPerRow = Width*NumBitPlanes;
+  BytesPerRow = static_cast<PLWORD>(Width*NumBitPlanes);
 
   if (rowBytes == 0)
-    rowBytes = Width*4;
+    rowBytes = static_cast<PLWORD>(Width*4);
 
   // Allocate temporary line buffer.
   pLinebuf = new PLBYTE [BytesPerRow];
@@ -696,7 +696,7 @@ void PLPictDecoder::unpack8bits
   PLBYTE ** pLineArray = pBmp->GetLineArray();
 
   int Height = pBounds->bottom - pBounds->top;
-  int Width = pBounds->right - pBounds->left;
+  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
 
   // High bit of rowBytes is flag.
   rowBytes &= 0x7fff;
@@ -750,12 +750,12 @@ void PLPictDecoder::unpackbits
   PLBYTE   FlagCounter;
   int    len;
   int    PixelPerRLEUnit;
-  PLBYTE * pLineBuf;
+  PLBYTE * pLineBuf = 0;
   PLBYTE * pBuf;
   PLBYTE ** pLineArray = pBmp->GetLineArray();
 
   int Height = pBounds->bottom - pBounds->top;
-  int Width = pBounds->right - pBounds->left;
+  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
 
   // High bit of rowBytes is flag.
   if (pixelSize <= 8)
@@ -916,7 +916,7 @@ void PLPictDecoder::skipBits
   int    linelen;            // length of source line in bytes.
 
   int Height = pBounds->bottom - pBounds->top;
-  int Width = pBounds->right - pBounds->left;
+  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
 
   // High bit of rowBytes is flag.
   if (pixelSize <= 8)
@@ -1103,7 +1103,6 @@ void PLPictDecoder::readColourTable
   PLLONG        ctSeed;
   PLWORD        ctFlags;
   PLWORD        val;
-  int         i;
 
   Trace (3, "Getting color table info.\n");
 
@@ -1116,11 +1115,11 @@ void PLPictDecoder::readColourTable
   Trace (2, sz);
   Trace (3, "Reading Palette.\n");
 
-  for (i = 0; i < *pNumColors; i++)
+  for (PLWORD i = 0; i < *pNumColors; i++)
   {
     val = ReadMWord(pDataSrc);
     if (ctFlags & 0x8000)
-      // The indicies in a device colour table are bogus and
+      // The indices in a device colour table are bogus and
       // usually == 0, so I assume we allocate up the list of
       // colours in order.
       val = i;

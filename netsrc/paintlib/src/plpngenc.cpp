@@ -43,7 +43,7 @@ PLDataSink * PLPNGEncoder::GetDataSink()
   return m_pDataSnk;
 }
 
-void raiseError (png_structp png_ptr, png_const_charp message)
+void raiseError (png_structp /*png_ptr*/, png_const_charp message)
 {
   char msg[256];  // TODO: check buffer size required for error string.
   // Note that raiseError has the same maximum!
@@ -53,12 +53,12 @@ void raiseError (png_structp png_ptr, png_const_charp message)
   PLPicEncoder::raiseError (PL_ERRFORMAT_NOT_SUPPORTED, msg);
 }
 
-void raiseWarning (png_structp png_ptr, png_const_charp message)
+void raiseWarning (png_structp /*png_ptr*/, png_const_charp /*message*/)
 {
 }
 
 
-void EncodeExtraInfo (png_structp png_ptr)
+void EncodeExtraInfo (png_structp /*png_ptr*/)
 {
   /* Optionally write comments into the image */
   /*
@@ -168,7 +168,7 @@ void EncodeData (png_structp png_ptr, png_bytep data, png_size_t length)
   return;
 }
 
-void FlushData (png_structp png_ptr)
+void FlushData (png_structp /*png_ptr*/)
 {
   // Do nothing for now.
 }
@@ -297,9 +297,9 @@ void PLPNGEncoder::DoEncode (PLBmpBase * pBmp, PLDataSink* pDataSnk)
   //sig_bit.gray = true_bit_depth;
 
   /* otherwise, if we are dealing with a color image then */
-  sig_bit.red   = bit_depth;
-  sig_bit.green = bit_depth;
-  sig_bit.blue  = bit_depth;
+  sig_bit.red   = static_cast<png_byte>(bit_depth);
+  sig_bit.green = static_cast<png_byte>(bit_depth);
+  sig_bit.blue  = static_cast<png_byte>(bit_depth);
 
   if (pBmp->HasAlpha())
     sig_bit.alpha = 8;

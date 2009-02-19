@@ -120,11 +120,10 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
 {
   if (m_color_type == PNG_COLOR_TYPE_GRAY)
   {
-    int i;
     int NumColors = 1<<(m_bit_depth);
-    for (i=0; i<NumColors; i++)
+    for (PLBYTE i=0; i<NumColors; i++)
     {
-      int CurColor = (i*255)/(NumColors-1);
+      PLBYTE CurColor = static_cast<PLBYTE>((i*255)/(NumColors-1));
       Bmp.SetPaletteEntry(i, CurColor, CurColor, CurColor, 0xFF);
     }
   }
@@ -133,12 +132,11 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
   {
     png_color* ppng_color_tab=NULL;
 
-    int   i;
     int   nbColor=0;
 
     png_get_PLTE(m_png_ptr, m_info_ptr, &ppng_color_tab, &nbColor);
 
-    for (i=0; i<nbColor; i++)
+    for (PLBYTE i=0; i<nbColor; i++)
     {
       Bmp.SetPaletteEntry(i,
                             (*(ppng_color_tab+i)).red,
@@ -165,7 +163,7 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
 
 
 void PLPNGDecoder::user_error_fn
-    ( png_structp png_ptr,
+    ( png_structp /*png_ptr*/,
       png_const_charp error_msg
     )
 {
@@ -173,7 +171,7 @@ void PLPNGDecoder::user_error_fn
 }
 
 void PLPNGDecoder::user_warning_fn
-    ( png_structp png_ptr,
+    ( png_structp /*png_ptr*/,
       png_const_charp warning_msg
     )
 {

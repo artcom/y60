@@ -44,8 +44,8 @@ rotate(PLBmpBase * pBmpSource, PLBmp * pBmpDest, const PLFilterRotate::AngleType
   {
     for (int newX = 0; newX < newWidth; ++newX)
     {
-      int oldX;
-      int oldY;
+      int oldX = 0;
+      int oldY = 0;
       switch(theAngleType)
       {
         case PLFilterRotate::ninety:

@@ -55,11 +55,11 @@ void PLFilterVideoInvert::Apply(PLBmpBase *pBmpSource, PLBmp *pBmpDest) const
       v3 = 255.0-v3;
       fp_hsv_to_rgb(&v1, &v2, &v3);
 
-      *pDstPixel = (int)v3;
+      *pDstPixel = static_cast<PLBYTE>(v3);
     pDstPixel++;
-      *pDstPixel = (int)v2;
+      *pDstPixel = static_cast<PLBYTE>(v2);
     pDstPixel++;
-      *pDstPixel = (int)v1;
+      *pDstPixel = static_cast<PLBYTE>(v1);
     pDstPixel++;
 
     pDstPixel++;

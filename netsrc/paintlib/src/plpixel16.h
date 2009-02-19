@@ -127,7 +127,7 @@ inline PLBYTE PLPixel16::GetR() const
 
 inline PLBYTE PLPixel16::GetG() const
 {
-  return (m_Data&0x07E0)>>3;
+  return static_cast<PLBYTE>((m_Data&0x07E0)>>3);
 }
 
 inline PLBYTE PLPixel16::GetB() const

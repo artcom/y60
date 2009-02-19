@@ -60,7 +60,7 @@ void PLBmpEncoder::DoEncode
     BFH.bfOffBits += (1 << BPP) * sizeof(WINRGBQUAD);
 
   BFH.bfSize = BFH.bfOffBits;
-  BFH.bfSize += pBmp->GetHeight()*GetLineMemNeeded(pBmp->GetWidth(), BPP);
+  BFH.bfSize += pBmp->GetHeight()*GetLineMemNeeded(pBmp->GetWidth(), static_cast<PLWORD>(BPP));
 
   pSink->WriteNBytes( sizeof (WINBITMAPFILEHEADER), (PLBYTE *) &BFH);
 
@@ -80,7 +80,7 @@ void PLBmpEncoder::DoEncode
   if (BPP <= 8)
   {
     PLBYTE * pCurLine;
-    FileBMI.biBitCount = BPP;  // not 32...
+    FileBMI.biBitCount = static_cast<PLWORD>(BPP);  // not 32...
     pSink->WriteNBytes (sizeof (WINBITMAPINFOHEADER), (PLBYTE *) &FileBMI);
 
     // Write Palette
@@ -98,8 +98,8 @@ void PLBmpEncoder::DoEncode
       pCurLine = pBmp->GetLineArray()[y];
       int BytesPerLine = pBmp->GetWidth()*pBmp->GetBitsPerPixel()/8;
       pSink->WriteNBytes (BytesPerLine, pCurLine);
-      int PadBytes = GetLineMemNeeded(pBmp->GetWidth(), BPP) 
-        - BytesPerLine;
+      int PadBytes = GetLineMemNeeded(pBmp->GetWidth(), static_cast<PLWORD>(BPP)) 
+                   - BytesPerLine;
 
       pSink->Skip(PadBytes);
     }

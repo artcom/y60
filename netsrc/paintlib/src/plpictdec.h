@@ -257,7 +257,7 @@ private:
   MacpixMap m_PixMap;
 
   // pixmap/bitmap stuff
-  int m_rowBytes;
+  PLWORD m_rowBytes;
   MacRect m_Bounds;
   bool m_bIsRegion;
 };

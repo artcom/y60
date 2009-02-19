@@ -26,7 +26,7 @@ extern "C"
  */
 
 METHODDEF(void)
-init_source (j_decompress_ptr cinfo)
+init_source (j_decompress_ptr /*cinfo*/)
 {
 }
 
@@ -82,7 +82,7 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
  */
 
 METHODDEF(void)
-term_source (j_decompress_ptr cinfo)
+term_source (j_decompress_ptr /*cinfo*/)
 {
   /* no work necessary here */
 }

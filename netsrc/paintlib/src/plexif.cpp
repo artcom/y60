@@ -1190,7 +1190,7 @@ static void SwizR64(PLBYTE *Buffer)
 static void MakeLower(string & s)
 {
   for (string::iterator iter = s.begin(); iter != s.end(); ++iter)
-    *iter = tolower(*iter);
+      *iter = static_cast<char>(tolower(*iter));
 }
 
 static void TrimRight(string & s, char c)
@@ -2387,9 +2387,9 @@ void PLExifTag::DoTranslation()
     else if (Trans[0].Value == VALUE_LOWER_STR)
     {
       MakeLower(m_Value);
-      m_Value[0] = toupper(m_Value[0]);
+      m_Value[0] = static_cast<char>(toupper(m_Value[0]));
       MakeLower(m_Common);
-      m_Common[0] = toupper(m_Common[0]);
+      m_Common[0] = static_cast<char>(toupper(m_Common[0]));
     }
     else
     {

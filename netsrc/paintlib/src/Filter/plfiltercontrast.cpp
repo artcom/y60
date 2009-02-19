@@ -54,7 +54,7 @@ void PLFilterContrast::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) const
   // value range (shift right), or the lower ones (shift left).
 
   // int total = 0;
-  register int inc;
+  register int inc = 0;
 
   double contrast = m_contrast;
  

@@ -29,7 +29,7 @@ PLMemSink::~PLMemSink ()
 
 int PLMemSink::Open (const char * pszFName, int MaxFileSize)
 {
-  if (m_pDataBuf = new PLBYTE [MaxFileSize])
+  if ( 0 != (m_pDataBuf = new PLBYTE [MaxFileSize]) )
   {
     PLDataSink::Open(pszFName, m_pDataBuf, MaxFileSize);
     return 0;
@@ -41,7 +41,7 @@ int PLMemSink::Open (const char * pszFName, int MaxFileSize)
 #ifdef _WIN32
 int PLMemSink::OpenW (const wchar_t * pszwFName, int MaxFileSize)
 {
-  if (m_pDataBuf = new PLBYTE [MaxFileSize])
+  if ( 0 != (m_pDataBuf = new PLBYTE [MaxFileSize]))
   {
     PLDataSink::OpenW(pszwFName, m_pDataBuf, MaxFileSize);
     return 0;

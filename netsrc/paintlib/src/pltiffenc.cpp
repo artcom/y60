@@ -162,10 +162,10 @@ int PLTIFFEncoder::SetBaseTags (TIFF* tif, PLBmpBase* pBmp)
   SetField( tif, TIFFTAG_IMAGELENGTH,     ui32 );
   // one strip = the whole image
   // SetField( tif, TIFFTAG_ROWSPERSTRIP,    ui32 );
-  ui16 = pBmp->GetBitsPerPixel();
+  ui16 = static_cast<uint16>(pBmp->GetBitsPerPixel());
   if (ui16 > 8) ui16 = 8;
   SetField( tif, TIFFTAG_BITSPERSAMPLE,   ui16 );
-  ui16 = pBmp->GetBitsPerPixel();
+  ui16 = static_cast<uint16>(pBmp->GetBitsPerPixel());
   ui16 = ui16 <= 8 ? 1 : (pBmp->HasAlpha() ? 4 : 3);
   SetField( tif, TIFFTAG_SAMPLESPERPIXEL, ui16 );
 

@@ -51,25 +51,26 @@
 
 //------------- ASSERT
 
-#ifdef _DEBUG
-  #ifdef _WIN32
-    #define PLASSERT(f)            \
-      if (!(f))                    \
-        {                          \
-          PLTRACE ("Assertion failed at %s, %i\n", __FILE__, __LINE__); \
-          __asm { int 3 }          \
-        }
-  #else
-    #define PLASSERT(f)            \
-      if (!(f))                    \
-        {                          \
-          PLTRACE ("Assertion failed at %s, %i\n", __FILE__, __LINE__); \
-          abort();                 \
-        }
-  #endif
-#else
-  #define PLASSERT(f) do{}while (0)
-#endif
+    template< typename TExpr >
+    inline const TExpr& plassert_impl(const TExpr& expr,const char* const file, unsigned int line)
+    {
+#       ifdef _DEBUG
+            if( !(expr) ) {
+                PLTRACE ("Assertion failed at %s, %i\n", file, line);
+#               ifdef _WIN32
+                    __asm { int 3 }
+#               else
+                    abort();
+#               endif
+            }
+#       else
+            (void)line;
+            (void)file;
+#       endif
+        return expr;
+    }
+
+#define PLASSERT(expr)            plassert_impl(expr, __FILE__, __LINE__)
 
 #ifdef _DEBUG
   inline void PLTrace(const char * pszFormat, ...)

@@ -108,7 +108,7 @@ void PLURLSource::Seek
 
 // Read but don't advance file pointer.
 PLBYTE * PLURLSource::GetBufferPtr
-    ( int MinBytesInBuffer
+    ( int /*MinBytesInBuffer*/
     )
 {
   return (PLBYTE*)(m_RawData.data()+m_CurPos);

@@ -113,7 +113,7 @@ void PLResourceSource::Seek
 
 // Read but don't advance file pointer.
 PLBYTE * PLResourceSource::GetBufferPtr
-    ( int MinBytesInBuffer
+    ( int /*MinBytesInBuffer*/
     )
 {
   return m_pCurPos;

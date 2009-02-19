@@ -116,9 +116,9 @@ void PLWinBmp::AlphaBlt (PLWinBmp * pSrPLBmp, int x, int y)
           BYTE * pPixel = (BYTE *)&(pPal[*pSrc]);
           alpha = pPixel[3];
           negalpha = 255-alpha;
-          pDest[0] = (pDest[0]*negalpha+pPixel[0]*alpha)>>8;
-          pDest[1] = (pDest[1]*negalpha+pPixel[1]*alpha)>>8;
-          pDest[2] = (pDest[2]*negalpha+pPixel[2]*alpha)>>8;
+          pDest[0] = static_cast<BYTE>((pDest[0]*negalpha+pPixel[0]*alpha)>>8);
+          pDest[1] = static_cast<BYTE>((pDest[1]*negalpha+pPixel[1]*alpha)>>8);
+          pDest[2] = static_cast<BYTE>((pDest[2]*negalpha+pPixel[2]*alpha)>>8);
 
           pSrc++;
         }
@@ -126,9 +126,9 @@ void PLWinBmp::AlphaBlt (PLWinBmp * pSrPLBmp, int x, int y)
         {
           alpha = pSrc[3];
           negalpha = 255-alpha;
-          pDest[0] = (pDest[0]*negalpha+pSrc[0]*alpha)>>8;
-          pDest[1] = (pDest[1]*negalpha+pSrc[1]*alpha)>>8;
-          pDest[2] = (pDest[2]*negalpha+pSrc[2]*alpha)>>8;
+          pDest[0] = static_cast<BYTE>((pDest[0]*negalpha+pSrc[0]*alpha)>>8);
+          pDest[1] = static_cast<BYTE>((pDest[1]*negalpha+pSrc[1]*alpha)>>8);
+          pDest[2] = static_cast<BYTE>((pDest[2]*negalpha+pSrc[2]*alpha)>>8);
           pSrc += 4;
         }
 
@@ -278,7 +278,7 @@ void PLWinBmp::CreateFromHDIBBitmap (BITMAPINFOHEADER* pBIH, HPALETTE hPal)
 			if(wEntries)
 			{
 				int rc;
-				for(int n = 0 ; n < wEntries; n++)
+				for(PLBYTE n = 0 ; n < wEntries; n++)
 				{
 					rc = GetPaletteEntries(hPal, n, 1, &pe);
 					PLASSERT(rc);
@@ -538,7 +538,7 @@ void PLWinBmp::internalCreate (PLLONG Width, PLLONG Height, const PLPixelFormat&
 // Assumes that no memory is allocated before the call.
 {
   // Allocate memory
-  int MemNeeded = GetMemNeeded (Width, Height, pf.GetBitsPerPixel());
+  int MemNeeded = GetMemNeeded (Width, Height, static_cast<WORD>(pf.GetBitsPerPixel()));
 
 #ifdef MAX_BITMAP_SIZE
   if (MemNeeded > MAX_BITMAP_SIZE)
@@ -554,7 +554,7 @@ void PLWinBmp::internalCreate (PLLONG Width, PLLONG Height, const PLPixelFormat&
   m_pBMI->biWidth = Width;
   m_pBMI->biHeight = Height;
   m_pBMI->biPlanes = 1;
-  m_pBMI->biBitCount = pf.GetBitsPerPixel();
+  m_pBMI->biBitCount = static_cast<WORD>(pf.GetBitsPerPixel());
   m_pBMI->biCompression = BI_RGB;   // No compression
   m_pBMI->biSizeImage = 0;
   m_pBMI->biXPelsPerMeter = 0;

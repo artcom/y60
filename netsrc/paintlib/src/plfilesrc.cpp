@@ -299,7 +299,8 @@ void PLFileSource::isBufferOk (int NumBytes)
   try 
   {
     PLBYTE byte = m_pCurPos[NumBytes-1];
-  } 
+    (void)byte;
+  }
   catch (...)
   {
     throw PLTextException(PL_ERREND_OF_FILE, "End of file reached while decoding.");

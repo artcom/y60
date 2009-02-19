@@ -86,7 +86,7 @@ void PLWEMFDecoder::Open (PLDataSource * pDataSrc)
 
 	SAPMFILEHEADER* pplaceablehdr = NULL;
 	bool isadobe = false;
-      bool isemf;
+      bool isemf = false;
 
 	// Get the type of the file (WMF or EMF) from the file name
       if (pDataSrc->NameIsWide()){
@@ -110,7 +110,7 @@ void PLWEMFDecoder::Open (PLDataSource * pDataSrc)
 		raiseError (PL_ERRNO_MEMORY,"Out of memory during strdup.");
 	}
 	strupr(strname);
-	bool isemf = strstr(strname,".EMF") != NULL;
+	isemf = strstr(strname,".EMF") != NULL;
 	free(strname);
       }
 
@@ -179,7 +179,7 @@ void PLWEMFDecoder::Open (PLDataSource * pDataSrc)
 	#endif
 	GetEnhMetaFileHeader(m_hemf,sizeneeded,m_phdr);
 
-	int bpp = GetDeviceCaps(m_dc,BITSPIXEL);
+	/*int bpp =*/ GetDeviceCaps(m_dc,BITSPIXEL);
 
 	// Calculate the dimensions of the final bitmap. If we have
 	// a placeable header in the WMF, we use the dimensions of
@@ -281,7 +281,7 @@ void PLWEMFDecoder::GetImage (PLBmpBase & Bmp)
 			pPal[i] = *(PLPixel32*)&plogpal->palPalEntry[i];
 		}
 
-		if ((hpal = CreatePalette((LPLOGPALETTE)plogpal))) {
+		if ( 0 != (hpal = CreatePalette((LPLOGPALETTE)plogpal)) ) {
 			m_holdpal = SelectPalette(m_memdc, hpal, false);
 			RealizePalette(m_memdc);
 		}
@@ -303,12 +303,12 @@ void PLWEMFDecoder::GetImage (PLBmpBase & Bmp)
 	FillRect(m_memdc,&rc,(HBRUSH)GetStockObject(WHITE_BRUSH));
 
 	// Heeere we go....
-	BOOL bres = PlayEnhMetaFile(m_memdc,m_hemf,&rc);
+	/*BOOL bres =*/ PlayEnhMetaFile(m_memdc,m_hemf,&rc);
 
 	// Finally, convert the Windows bitmap into a paintlib bitmap
 	PLWinBmp& winbmp = dynamic_cast<PLWinBmp&>(Bmp);
 	BITMAPINFO* pBMI = (BITMAPINFO*)winbmp.GetBMI();
-	PLBYTE* pBits = (PLBYTE*)winbmp.GetBits();
+	//PLBYTE* pBits = (PLBYTE*)winbmp.GetBits();
 	if (GetBitsPerPixel() == 8) {
 		GetDIBits(m_dc, m_bm, 0, GetHeight(), winbmp.GetBits(), pBMI, DIB_RGB_COLORS);
 	}

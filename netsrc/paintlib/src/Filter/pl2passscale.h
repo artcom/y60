@@ -295,7 +295,7 @@ public:
 
     virtual ~C2PassScale() {};
 
-   _RowType * Scale (
+    _RowType * Scale (
         _RowType   *pOrigImage,
         PLUINT        uOrigWidth,
         PLUINT        uOrigHeight,
@@ -304,6 +304,8 @@ public:
         PLUINT        uNewHeight);
 
 private:
+    C2PassScale(const C2PassScale&);
+    C2PassScale& operator=(const C2PassScale&);
 
     ProgressAndAbortCallBack    m_Callback;
     bool                        m_bCanceled;
@@ -448,7 +450,7 @@ C2PassScale<DataClass>::CalcContributions
 
 template <class DataClass>
 void
-C2PassScale<DataClass>::ScaleRow (_RowType *pSrc, PLUINT uSrcWidth,
+C2PassScale<DataClass>::ScaleRow (_RowType *pSrc, PLUINT /*uSrcWidth*/,
                                   _RowType *pRes, PLUINT uResWidth,
                                   PLUINT uRow, LineContribType *Contrib)
 {
@@ -470,7 +472,7 @@ C2PassScale<DataClass>::ScaleRow (_RowType *pSrc, PLUINT uSrcWidth,
 
 template <class DataClass>
 void
-C2PassScale<DataClass>::HorizScale (_RowType *pSrc, PLUINT uSrcWidth, PLUINT uSrcHeight,
+C2PassScale<DataClass>::HorizScale (_RowType *pSrc, PLUINT uSrcWidth, PLUINT /*uSrcHeight*/,
                                     _RowType *pDst, PLUINT uResWidth, PLUINT uResHeight)
 {
     if (uResWidth == uSrcWidth)

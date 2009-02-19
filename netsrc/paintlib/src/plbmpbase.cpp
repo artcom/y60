@@ -75,7 +75,7 @@ void PLBmpBase::SetQuantizationMode (int DitherType, int DitherPaletteType)
 // there, the function will only get instantiated once :-(.
 template<class DestPixelC>
 void createTrueColorCopy (PLBmpBase & DestBmp, const PLBmpBase & SrcBmp,
-                          DestPixelC Dummy)
+                          DestPixelC /*Dummy*/)
 {
   // Make sure we're using the right template.
   PLASSERT (DestBmp.GetBitsPerPixel() == sizeof (DestPixelC)*8);
@@ -228,12 +228,11 @@ void PLBmpBase::SetGrayPalette ()
 {
   PLASSERT (m_pClrTab); // Bitmap must contain a palette!
 
-  int i;
   int NumColors = GetNumColors();
   double ColFactor = 255/(NumColors-1);
 
-  for (i=0; i<NumColors; i++)
-    SetPaletteEntry (i, int(i*ColFactor), int(i*ColFactor), int(i*ColFactor), 0xFF);
+  for (PLBYTE i=0; i<NumColors; i++)
+    SetPaletteEntry (i, PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), 0xFF);
 }
 
 void PLBmpBase::SetPalette (PLPixel32 * pPal)
@@ -303,13 +302,11 @@ PLBYTE PLBmpBase::FindNearestColor (PLPixel32 col)
   PLPixel32 * pPalette = GetPalette();
   PLASSERT (pPalette);
 
-  int d1;
   int dMin = 100000;
-  int i;
-  int index;
-  for (i = 0; i<GetNumColors(); i++)
+  PLBYTE index = static_cast<PLBYTE>(-1);
+  for (PLBYTE i = 0; i<GetNumColors(); i++)
   {
-    d1 = col.BoxDist (pPalette[i]);
+    int d1 = col.BoxDist (pPalette[i]);
     if (d1 < dMin)
     {
       dMin = d1;

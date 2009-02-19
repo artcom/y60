@@ -251,9 +251,9 @@ void PLPPMDecoder::expandByteLine
   {
     if (MaxSampleValue != 255)
     {
-      r = ((int)pLine[x] * 255) / MaxSampleValue;
-      g = ((int)pLine[x+1] * 255) / MaxSampleValue;
-      b = ((int)pLine[x+2] * 255) / MaxSampleValue;
+      r = static_cast<PLBYTE>(((int)pLine[x  ] * 255) / MaxSampleValue);
+      g = static_cast<PLBYTE>(((int)pLine[x+1] * 255) / MaxSampleValue);
+      b = static_cast<PLBYTE>(((int)pLine[x+2] * 255) / MaxSampleValue);
       pDest->Set(r, g, b, 255);
     }
     else
@@ -272,19 +272,19 @@ PLPixel32 PLPPMDecoder::readASCIIPixel32
   PLBYTE r, g, b;
 
   skipPpmASCIISeparators(pDataSrc);
-  r = readASCIIDecimal(pDataSrc);
+  r = static_cast<PLBYTE>(readASCIIDecimal(pDataSrc));
 
   skipPpmASCIISeparators(pDataSrc);
-  g = readASCIIDecimal(pDataSrc);
+  g = static_cast<PLBYTE>(readASCIIDecimal(pDataSrc));
 
   skipPpmASCIISeparators(pDataSrc);
-  b = readASCIIDecimal(pDataSrc);
+  b = static_cast<PLBYTE>(readASCIIDecimal(pDataSrc));
 
   if (MaxSampleValue != 255)
   {
-    r = (r * 255) / MaxSampleValue;
-    g = (g * 255) / MaxSampleValue;
-    b = (b * 255) / MaxSampleValue;
+    r = static_cast<PLBYTE>((r * 255) / MaxSampleValue);
+    g = static_cast<PLBYTE>((g * 255) / MaxSampleValue);
+    b = static_cast<PLBYTE>((b * 255) / MaxSampleValue);
   }
 
   Dest.Set(r, g, b, 0);

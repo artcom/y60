@@ -114,8 +114,8 @@ void PLJPEGEncoder::DoEncode
 
     jpeg_set_defaults (m_pcinfo);
 
-    m_pcinfo->X_density = pBmp->GetResolution().x;
-    m_pcinfo->Y_density = pBmp->GetResolution().y;
+    m_pcinfo->X_density = static_cast<UINT16>(pBmp->GetResolution().x);
+    m_pcinfo->Y_density = static_cast<UINT16>(pBmp->GetResolution().y);
 
     // on good FPUs (e.g. Pentium) this is the fastest and "best" DCT method
     m_pcinfo->dct_method = JDCT_FLOAT;
@@ -129,8 +129,8 @@ void PLJPEGEncoder::DoEncode
     if (uiDensityX_ || uiDensityY_)
     {
         m_pcinfo->density_unit = 1;
-        m_pcinfo->X_density = uiDensityX_;
-        m_pcinfo->Y_density = uiDensityY_;
+        m_pcinfo->X_density = static_cast<UINT16>(uiDensityX_);
+        m_pcinfo->Y_density = static_cast<UINT16>(uiDensityY_);
     }
 
     jpeg_start_compress (m_pcinfo, true);

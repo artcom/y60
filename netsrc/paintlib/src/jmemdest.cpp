@@ -112,8 +112,8 @@ jpeg_mem_dest_term (j_compress_ptr cinfo)
 GLOBAL(void)
 jpeg_mem_dest(
   j_compress_ptr cinfo,
-  JOCTET * pData,
-  int FileSize,
+  JOCTET * /*pData*/,
+  int /*FileSize*/,
   PLDataSink * pDataSink
 )
 {
