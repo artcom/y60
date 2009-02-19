@@ -247,7 +247,7 @@ JSEmbeddedToggle::initClass(JSContext *cx, JSObject *theGlobalObject) {
 
 jsval as_jsval(JSContext *cx, JSEmbeddedToggle::NATIVE * theNative) {
     std::cerr << "======== as_jsval" << std::endl;
-    JSObject * myReturnObject = JSEmbeddedToggle::Construct(cx, JSEmbeddedToggle::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSEmbeddedToggle::Construct(cx, JSEmbeddedToggle::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

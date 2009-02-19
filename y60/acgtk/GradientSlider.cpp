@@ -177,7 +177,7 @@ GradientSlider::on_button_release_event(GdkEventButton * theEvent) {
             queue_draw();
         }
 
-        _mySelectionCandidate = dom::NodePtr(0);
+        _mySelectionCandidate = dom::NodePtr();
     }
     _myState = IDLE;
     return true;
@@ -255,7 +255,7 @@ GradientSlider::getSelectedColor() const {
 void 
 GradientSlider::setTransferFunction(dom::NodePtr theTransferFunction) {
     _myTransferFunction = theTransferFunction;
-    setSelectedColor(dom::NodePtr(0));
+    setSelectedColor(dom::NodePtr());
     queue_draw();
 }
 

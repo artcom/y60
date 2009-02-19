@@ -242,7 +242,7 @@ JSDragButton::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSDragButton::NATIVE * theNative) {
-    JSObject * myReturnObject = JSDragButton::Construct(cx, JSDragButton::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSDragButton::Construct(cx, JSDragButton::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

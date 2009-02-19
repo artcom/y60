@@ -202,7 +202,7 @@ JSGrayScale::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theNative) {
-    JSObject * myReturnObject = JSGrayScale::Construct(cx, JSGrayScale::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSGrayScale::Construct(cx, JSGrayScale::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

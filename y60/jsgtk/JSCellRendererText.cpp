@@ -217,7 +217,7 @@ JSCellRendererText::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSCellRendererText::NATIVE * theNative) {
-    JSObject * myReturnObject = JSCellRendererText::Construct(cx, JSCellRendererText::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSCellRendererText::Construct(cx, JSCellRendererText::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

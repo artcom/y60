@@ -255,7 +255,7 @@ JSEmbeddedButton::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSEmbeddedButton::NATIVE * theNative) {
-    JSObject * myReturnObject = JSEmbeddedButton::Construct(cx, JSEmbeddedButton::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSEmbeddedButton::Construct(cx, JSEmbeddedButton::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

@@ -291,7 +291,7 @@ JSStockID::addStockIdProps(JSContext * cx, JSObject * obj, JSStockIdPropertySpec
     JSBool myOkFlag;
     uintN flags = JSPROP_READONLY | JSPROP_PERMANENT;
     for (myOkFlag = JS_TRUE; cds->name; cds++) {
-        myOkFlag = JS_DefineProperty(cx, obj, cds->name, as_jsval(cx, asl::Ptr<NATIVE>(0),
+        myOkFlag = JS_DefineProperty(cx, obj, cds->name, as_jsval(cx, asl::Ptr<NATIVE>(),
                                      & cds->value), NULL, NULL, flags);
         if ( ! myOkFlag) {
             break;

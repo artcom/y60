@@ -140,7 +140,7 @@ JSColorSelectionDialog::getPropertySwitch(NATIVE & theNative, unsigned long theI
             *vp = as_jsval(cx, theNative.get_help_button());
             return JS_TRUE;
         case PROP_colorselection:
-            *vp = as_jsval(cx, JSColorSelection::OWNERPTR(0), theNative.get_colorsel());
+            *vp = as_jsval(cx, JSColorSelection::OWNERPTR(), theNative.get_colorsel());
             return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);

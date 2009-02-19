@@ -107,7 +107,7 @@ JSGdkCursor::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
 
     if(argc == 0) {
         newNative = new Gdk::Cursor;
-        myNewObject = new JSGdkCursor(OWNERPTR(0), newNative);
+        myNewObject = new JSGdkCursor(OWNERPTR(), newNative);
     } else if (argc == 1) {
         int myCursorId;
         if ( convertFrom(cx, argv[0], myCursorId)) {
@@ -319,7 +319,7 @@ JSGdkCursor::ConstIntProperties() {
 
 #define DISPATCH_CURSOR( theName ) \
     case PROP_ ## theName : \
-        *vp = as_jsval(cx, JSGdkCursor::OWNERPTR(0), & acgtk::CustomCursors::theName); \
+        *vp = as_jsval(cx, JSGdkCursor::OWNERPTR(), & acgtk::CustomCursors::theName); \
         return JS_TRUE;
 
 

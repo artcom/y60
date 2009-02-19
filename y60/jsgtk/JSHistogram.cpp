@@ -311,7 +311,7 @@ JSHistogram::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSHistogram::NATIVE * theNative) {
-    JSObject * myReturnObject = JSHistogram::Construct(cx, JSHistogram::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSHistogram::Construct(cx, JSHistogram::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

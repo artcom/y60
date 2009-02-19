@@ -287,7 +287,7 @@ jsval as_jsval(JSContext *cx, JSGdkEvent::OWNERPTR theOwner, JSGdkEvent::NATIVE 
 }
 
 jsval as_jsval(JSContext *cx, GdkEvent * theNative) {
-    JSObject * myReturnObject = JSGdkEvent::Construct(cx, JSGdkEvent::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSGdkEvent::Construct(cx, JSGdkEvent::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

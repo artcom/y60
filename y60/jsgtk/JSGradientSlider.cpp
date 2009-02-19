@@ -263,7 +263,7 @@ JSGradientSlider::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSGradientSlider::NATIVE * theNative) {
-    JSObject * myReturnObject = JSGradientSlider::Construct(cx, JSGradientSlider::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSGradientSlider::Construct(cx, JSGradientSlider::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

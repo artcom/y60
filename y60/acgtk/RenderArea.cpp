@@ -472,7 +472,7 @@ RenderArea::on_visibility_notify_event (GdkEventVisibility *event) {
 
 TTFTextRendererPtr
 RenderArea::createTTFRenderer() {
-    return TTFTextRendererPtr(0);
+    return TTFTextRendererPtr();
 }
 
 void

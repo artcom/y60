@@ -311,7 +311,7 @@ JSCWRuler::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSCWRuler::NATIVE * theNative) {
-    JSObject * myReturnObject = JSCWRuler::Construct(cx, JSCWRuler::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSCWRuler::Construct(cx, JSCWRuler::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
