@@ -16,31 +16,42 @@
 #
 
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
+    # put arguments into the THIS_PLUGIN namespace
     parse_arguments(THIS_PLUGIN
         "SOURCES;HEADERS;DEPENDS;EXTERNS"
-        "DONT_INSTALL;"
+        "DONT_INSTALL"
         ${ARGN})
     
+    # do the same manually for name and path
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
-    
+
+    # declare searchpath for external headers and libs
     _ac_declare_searchpath(
         ${THIS_PLUGIN_NAME}
         "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}"
     )
     
+    # figure out file name for build info
     _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
     # define the target
-    add_library(${THIS_PLUGIN_NAME} MODULE ${THIS_PLUGIN_SOURCES}
-            ${THIS_PLUGIN_HEADERS} ${THIS_PLUGIN_BUILDINFO_FILE})
+    add_library(
+        ${THIS_PLUGIN_NAME} MODULE
+            ${THIS_PLUGIN_SOURCES}
+            ${THIS_PLUGIN_HEADERS}
+            ${THIS_PLUGIN_BUILDINFO_FILE}
+    )
 
     # update repository and revision information
-    _ac_add_repository_info( ${THIS_PLUGIN_NAME} ${THIS_PLUGIN_BUILDINFO_FILE}
-                PLUGIN ${THIS_PLUGIN_SOURCES} ${THIS_PLUGIN_HEADERS})
+    _ac_add_repository_info(
+        ${THIS_PLUGIN_NAME} ${THIS_PLUGIN_BUILDINFO_FILE}
+        PLUGIN ${THIS_PLUGIN_SOURCES} ${THIS_PLUGIN_HEADERS}
+    )
 
     # link to aslbase because it contains asl::PluginBase
     #   XXX: acmake should not be asl-specific
+    #        also, this does not seem project-safe
     target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
     
     # attach headers to target
@@ -66,9 +77,8 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
                 DESTINATION include/${THIS_PLUGIN_PATH}
         )
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
-    
-    # XXX: tests?
-    
+
+    # register plugin with project
     if(NOT THIS_PLUGIN_DONT_INSTALL)
         ac_project_add_target(
             PLUGINS ${THIS_PLUGIN_NAME}

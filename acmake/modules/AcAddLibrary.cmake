@@ -55,7 +55,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
         "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS"
-        "HEADER_ONLY;DONT_INSTALL;"
+        "HEADER_ONLY;DONT_INSTALL"
         ${ARGN})
     
     # do the same manually for name and path
@@ -64,15 +64,13 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
 
     # generate a header describing our binary, source and install locations
     set(THIS_LIBRARY_PATHS_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/AcPaths.h.in)
-
     configure_file(
          ${THIS_LIBRARY_PATHS_TEMPLATE}
          ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/acmake/${THIS_LIBRARY_NAME}_paths.h
          @ONLY
     )
     
-    # XXX: why?    
-    # XXX: because we need the path header
+    # make paths header available by extending include path
     include_directories(${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR})
 
     if(THIS_LIBRARY_HEADER_ONLY)
@@ -81,7 +79,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         if(NOT THIS_LIBRARY_DONT_INSTALL)
             # if we should be installed
 
-            # define installation            
+            # define installation
             install(
                 FILES ${THIS_LIBRARY_HEADERS}
                     DESTINATION include/${THIS_LIBRARY_PATH}
@@ -91,23 +89,29 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     else(THIS_LIBRARY_HEADER_ONLY)
         # for a full library
         
-        # XXX: declare include and library searchpath
+        # declare include and library searchpath
         _ac_declare_searchpath(
             ${THIS_LIBRARY_NAME}
             "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
         )
 
+        # figure out file name for build info
         _ac_buildinfo_filename("${THIS_LIBRARY_NAME}" THIS_LIBRARY_BUILDINFO_FILE)
 
         # define the library target
-        add_library(${THIS_LIBRARY_NAME} SHARED ${THIS_LIBRARY_SOURCES}
-            ${THIS_LIBRARY_HEADERS} ${THIS_LIBRARY_BUILDINFO_FILE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries )
+        add_library(
+            ${THIS_LIBRARY_NAME} SHARED
+                ${THIS_LIBRARY_SOURCES}
+                ${THIS_LIBRARY_HEADERS}
+                ${THIS_LIBRARY_BUILDINFO_FILE}
+                ${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries # XXX: really needed? consistent for all target types?
+        )
 
         # update repository and revision information
-        _ac_add_repository_info( ${THIS_LIBRARY_NAME}
-                "${THIS_LIBRARY_BUILDINFO_FILE}"
-                LIBRARY ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS})
+        _ac_add_repository_info(
+                ${THIS_LIBRARY_NAME} "${THIS_LIBRARY_BUILDINFO_FILE}"
+                LIBRARY ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS}
+        )
 
         # attach headers to target
         set_target_properties(
@@ -137,10 +141,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     endif(THIS_LIBRARY_HEADER_ONLY)
 
     # create tests
-    # TODO: - clean up test naming stuff
-    #       - maybe add test-namespacing to linux, too?
-    # XXX: This is goddamn ugly and needs to go.
-    #      We need a new mechanism.
+    # TODO: clean up test naming
+    # XXX: This is goddamn ugly.
+    #      Maybe, we should replace it with a separate subsystem.
     set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
     foreach(TEST ${THIS_LIBRARY_TESTS})
         set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")

@@ -16,9 +16,10 @@
 #
 
 macro(ac_add_executable EXECUTABLE_NAME)
+    # put arguments into the THIS_EXECUTABLE namespace
     parse_arguments(THIS_EXECUTABLE
         "SOURCES;HEADERS;DEPENDS;EXTERNS;OSX_BUNDLE_RESOURCES"
-        "DONT_INSTALL;NO_REVISION_INFO;OSX_BUNDLE;"
+        "DONT_INSTALL;NO_REVISION_INFO;OSX_BUNDLE"
         ${ARGN})
 
     # bring name into our namespace
@@ -30,28 +31,37 @@ macro(ac_add_executable EXECUTABLE_NAME)
         "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}"
     )
 
+    # find out how the build info file will be called
     if(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
         _ac_buildinfo_filename(${THIS_EXECUTABLE_NAME} THIS_EXECUTABLE_BUILDINFO_FILE)
     endif(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
 
+    # gather bundle resources
     if(THIS_EXECUTABLE_OSX_BUNDLE)
         ac_get_all_resources(THIS_EXECUTABLE_RESOURCES
                 ${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
-    # define the target
-    add_executable(${THIS_EXECUTABLE_NAME}
-            ${THIS_EXECUTABLE_SOURCES} ${THIS_EXECUTABLE_HEADERS}
-            ${THIS_EXECUTABLE_RESOURCES}
-            ${THIS_EXECUTABLE_BUILDINFO_FILE})
 
+    # define the target
+    add_executable(
+        ${THIS_EXECUTABLE_NAME}
+            ${THIS_EXECUTABLE_SOURCES}
+            ${THIS_EXECUTABLE_HEADERS}
+            ${THIS_EXECUTABLE_RESOURCES}
+            ${THIS_EXECUTABLE_BUILDINFO_FILE}
+    )
+
+    # set up bundle resources
     if(THIS_EXECUTABLE_OSX_BUNDLE)
         _ac_attach_resources(${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
+    # update build information
     if(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
-        # update repository and revision information
-        _ac_add_repository_info( ${THIS_EXECUTABLE_NAME} ${THIS_EXECUTABLE_BUILDINFO_FILE}
-                EXECUTABLE ${THIS_EXECUTABLE_SOURCES} ${THIS_EXECUTABLE_HEADERS})
+        _ac_add_repository_info(
+            ${THIS_EXECUTABLE_NAME} "${THIS_EXECUTABLE_BUILDINFO_FILE}"
+            EXECUTABLE ${THIS_EXECUTABLE_SOURCES} ${THIS_EXECUTABLE_HEADERS}
+        )
     endif(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
 
     # attach rpath configuration
@@ -60,10 +70,13 @@ macro(ac_add_executable EXECUTABLE_NAME)
     # attach depends and externs
     _ac_attach_depends(${THIS_EXECUTABLE_NAME} "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}")
 
+    # configure target as bundle
     if(THIS_EXECUTABLE_OSX_BUNDLE)
-        set_target_properties( ${THIS_EXECUTABLE_NAME}
+        set_target_properties(
+            ${THIS_EXECUTABLE_NAME}
                 PROPERTIES
-                    MACOSX_BUNDLE ON )
+                    MACOSX_BUNDLE ON
+        )
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
     # define installation
