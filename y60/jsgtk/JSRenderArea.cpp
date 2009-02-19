@@ -179,12 +179,12 @@ JSRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     NATIVE * newNative = 0;
 
     JSRenderArea * myNewObject = 0;
-    acgtk::RenderAreaPtr myRenderArea(0);
+    acgtk::RenderAreaPtr myRenderArea;
     ensureParamCount(argc, 0);
 
     const GLContextRegistry::ContextSet & myContextSet = GLContextRegistry::get().getContextSet();
     for (GLContextRegistry::ContextSet::const_iterator i = myContextSet.begin(); i != myContextSet.end(); ++i) {
-        if (*i) {
+        if ( i->lock() ) {
             WeakPtr<AbstractRenderWindow> myWeaky = *i;
             asl::Ptr<AbstractRenderWindow> myContext = myWeaky.lock();
             myRenderArea = dynamic_cast_Ptr<acgtk::RenderArea>(myContext);
@@ -192,7 +192,7 @@ JSRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                 AC_INFO << "Realized Context found.";
                 break;
             } else {
-                myRenderArea = acgtk::RenderAreaPtr(0);
+                myRenderArea = acgtk::RenderAreaPtr();
                 AC_INFO << "Found unrealized Context";
             }
         }

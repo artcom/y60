@@ -84,7 +84,7 @@ static JSBool
 trigger(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    asl::Ptr<TestSubject> myNative(0);
+    asl::Ptr<TestSubject> myNative;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
     myNative->trigger();
     return JS_TRUE;
@@ -202,7 +202,7 @@ JSTestSubject::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSTestSubject::NATIVE * theNative) {
-    JSObject * myReturnObject = JSTestSubject::Construct(cx, JSTestSubject::OWNERPTR(0), theNative);
+    JSObject * myReturnObject = JSTestSubject::Construct(cx, JSTestSubject::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
