@@ -70,6 +70,20 @@ else(UNIX)
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
         # XXX TODO per plugin stuff
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+        #create cmake file which sets with VS-Studio Variables
+        set(VSCOMN "VS90COMNTOOLS")
+        string(LENGTH $ENV{${VSCOMN}} len)
+        if(${len} EQUAL 0)
+            set(VSCOMN "VS80COMNTOOLS")
+            string(LENGTH $ENV{${VSCOMN}} len)
+            if(${len} EQUAL 0)
+                set(VSCOMN "VS70COMNTOOLS")
+            endif(${len} EQUAL 0)
+        endif(${len} EQUAL 0)
+        execute_process(
+            COMMAND ${CMAKE_SOURCE_DIR}/acmake/tools/VSvars.bat  "$ENV{${VSCOMN}}" "${CMAKE_BINARY_DIR}/VSVars.cmake"
+            RESULT_VARIABLE rv
+        )
     endif(WIN32)
 
     if (CMAKE_GENERATOR MATCHES "Visual Studio.*")

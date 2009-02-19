@@ -40,6 +40,8 @@ if(WIN32)
 
     # cairo backend
     list(APPEND REQ_PKGCONFIG CAIRO cairo-win32)
+
+    list(APPEND REQ_PACKAGES Wmsdk)
     
 elseif(LINUX)
 

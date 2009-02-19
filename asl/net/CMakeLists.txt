@@ -47,9 +47,7 @@ Station
 list(APPEND EXTERNS CURL ZLIB) # Station uses zlib
 
 if(WIN32)
-    set(WS2_32_LIBRARIES Ws2_32) # XXX: write find package
-    set(IPHLPAPI_LIBRARIES Iphlpapi) # XXX: write find package
-    list(APPEND EXTERNS WS2_32 IPHLPAPI)
+    list(APPEND EXTERNS WINSOCK)
 endif(WIN32)
 
 ac_add_library(

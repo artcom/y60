@@ -148,7 +148,6 @@ endif(LINUX)
 if(WIN32)
     list(APPEND SOURCES Win32Backtrace.cpp)
     list(APPEND HEADERS Win32Backtrace.h)
-    set(PSAPI_LIBRARIES Psapi) # XXX: write find package
     list(APPEND EXTERNS PTHREADVC PSAPI)
 endif(WIN32)
 

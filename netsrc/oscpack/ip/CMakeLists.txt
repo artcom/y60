@@ -29,7 +29,7 @@ ac_add_library(
     oscpackip oscpack/ip
     SOURCES ${IP_SOURCES}
     HEADERS ${IP_HEADERS}
-    EXTERNS ${EXTERNS} # XXX: revisit when find-packages available
+    EXTERNS WINMM WINSOCK
 )
 
 

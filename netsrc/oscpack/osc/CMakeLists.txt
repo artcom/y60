@@ -23,7 +23,6 @@ ac_add_library(
     oscpackosc oscpack/osc/
     SOURCES ${OSC_SOURCES}
     HEADERS ${OSC_HEADERS}
-    EXTERNS ${EXTERNS} # XXX: revisit when find-packages available
 )
 
 # stage headers

@@ -10,8 +10,7 @@ y60_wmvdecoder_settings.h
 
 list( APPEND EXTERNALS OPENEXR FFMPEG)
 if(WIN32)
-    set(WMVCORE_LIBRARIES wmvcore) # XXX: write find package
-    list( APPEND EXTERNALS PTHREADVC WMVCORE )
+    list( APPEND EXTERNALS PTHREADVC WMSDK )
 endif(WIN32)
 
 y60_add_component(
