@@ -9,6 +9,7 @@ include(AcMake)
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/buildinfo.cpp.in)
 
+set( Boost_ADDITIONAL_VERSIONS 1.37 )
 set(REQ_PACKAGES ZLIB GLIB2 CURL OpenEXR Boost)
 if(WIN32)
     list(APPEND REQ_PACKAGES PTHREADVC DirectX WINSOCK Winmm Psapi)
