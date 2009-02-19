@@ -40,4 +40,24 @@ Linux*)
     cp -vf ${SOURCE}/*.mel "${DESTINATION}/scripts"
 
     ;;
+CYGWIN*)
+
+    mkdir -p $MAYA_SDK/plug-ins
+    mkdir -p $MAYA_SDK/scripts/others
+    # XXX is it ok that maya is located in lib while the others are in bin?
+    cp -vf ${BINARY}/lib/Release/maya-xport.dll "$MAYA_SDK/bin/plug-ins/mayaY60export.mll"
+    cp -vf ${BINARY}/bin/Release/aslbase.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/asldom.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/aslmath.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/aslzip.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/y60base.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/y60image.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/y60scene.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/y60video.dll "$MAYA_SDK/bin"
+    cp -vf ${BINARY}/bin/Release/paintlib.dll "$MAYA_SDK/bin"
+    cp -vf ${SOURCE}/*.mel "$MAYA_SDK/scripts/others"
+    ;;
 esac
+
+
+
