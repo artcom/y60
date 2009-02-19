@@ -131,7 +131,7 @@ namespace dom {
             }
             return newValue;
         }
-#ifdef DEBUG
+#ifdef DEBUG_VARIANT
         void debug() const {
             getValuePtr()->printPrecursorGraph();
             getValuePtr()->printDependendGraph();

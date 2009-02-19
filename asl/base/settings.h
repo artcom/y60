@@ -33,11 +33,11 @@
  */
 
 
-// set to supress warnings about #undef'ing colliding symbols from system headers
+// set to suppress warnings about #undef'ing colliding symbols from system headers
 #define _SETTING_NO_UNDEF_WARNING_ 1
 
 #define WITH_TRACE_LOG
-#if defined(DEBUG) || defined WITH_TRACE_LOG
+#if defined(DEBUG_VARIANT) || defined WITH_TRACE_LOG
 #define _SETTING_WITH_TRACE_LOG_
 #endif
 

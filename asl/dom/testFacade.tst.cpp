@@ -167,7 +167,7 @@ class ChildFacade :
                     DoubleParentFloatTag::Plug::dependsOn<FloatTag>(*this);
                     DoubleParentFloatTag::Plug::setCalculatorFunction(&ChildFacade::copyOwnFloat);
                 }
-#ifdef DEBUG
+#ifdef DEBUG_VARIANT
                 DoubleParentFloatTag::Plug::debug();
 #endif
             }

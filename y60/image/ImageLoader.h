@@ -73,14 +73,7 @@
 #if defined(_MSC_VER)
 #   pragma warning (push,1)
 #endif //defined(_MSC_VER)
-// Dumb hack since paintlib is installed as a non-debug variant
-#ifdef _DEBUG
-#undef _DEBUG
 #include <paintlib/plbitmap.h>
-#define _DEBUG
-#else
-#include <paintlib/plbitmap.h>
-#endif
 #if defined(_MSC_VER)
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)

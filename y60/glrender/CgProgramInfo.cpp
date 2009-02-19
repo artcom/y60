@@ -117,7 +117,7 @@ namespace y60 {
         }
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_VARIANT
 #define ASSERTCG(where, what) assertCg(where, what)
 #else
 #define ASSERTCG(where, what) 

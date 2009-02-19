@@ -407,7 +407,7 @@ Puts(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_VARIANT
 JS_STATIC_DLL_CALLBACK(JSBool)
 Trace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Enables/disables tracing of javascript execution.");
@@ -1519,7 +1519,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSFunctionSpec glob_functions[] = {
     {"print",             Print,          0},
     {"puts",              Puts,           0},
-#ifdef DEBUG
+#ifdef DEBUG_VARIANT
     {"trace",             Trace,          1},
 #endif
     {"readStdIn",         ReadStdIn,      1},

@@ -70,7 +70,7 @@ namespace asl {
     class ASL_BASE_EXPORT MessageSink {
     public:
         virtual void push(Severity theSeverity, const std::string & theMessage) = 0;
-		virtual ~MessageSink() {}
+        virtual ~MessageSink() {}
     };
     DEFINE_EXCEPTION(UnknownSinkExeption, Exception);
 
@@ -223,7 +223,7 @@ namespace asl {
 #define MAKEUNIQUE(x) myVar_##x
 #ifdef _WIN32
 #   define AC_LOG_CHECK(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
-#   if defined(DEBUG)
+#   if defined(DEBUG_VARIANT)
 #       define AC_LOG(SEVERITY,MODULE,MSGID) asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )
 #   else
 #       define AC_LOG(SEVERITY,MODULE,MSGID) static bool MAKEUNIQUE(MSGID) = asl::Logger::get().IfLog(SEVERITY,MODULE,MSGID) ; MAKEUNIQUE(MSGID) && const_cast<std::ostream&>( static_cast<const std::ostream&>(asl::MessagePort(SEVERITY,MODULE,MSGID).stream) )

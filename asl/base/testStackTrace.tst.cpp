@@ -60,22 +60,22 @@ public:
         StackTrace myStack;
         // if this fails because of optimization just change it to greater zero
 #ifdef LINUX
-		ENSURE( myStack.size() == 7 );
-#ifndef DEBUG
+        ENSURE( myStack.size() == 7 );
+#ifndef DEBUG_VARIANT
 #elif _WIN32
-		ENSURE( myStack.size() == 8 );
+        ENSURE( myStack.size() == 8 );
 #endif
 #endif
 
         DPRINT( myStack );
         ENSURE_EXCEPTION( throwAndTrace(), asl::Exception );
         
-		asl::Exception myException("Alles Ok!", PLUS_FILE_LINE);
+        asl::Exception myException("Alles Ok!", PLUS_FILE_LINE);
 #ifdef LINUX
-		ENSURE( myException.stack().size() == 8 );
-#ifndef DEBUG
+        ENSURE( myException.stack().size() == 8 );
+#ifndef DEBUG_VARIANT
 #elif _WIN32
-		ENSURE( myException.stack().size() == 9 );
+        ENSURE( myException.stack().size() == 9 );
 #endif
 #endif
         DPRINT( Exception::getDumpStackTraceFlag() );
