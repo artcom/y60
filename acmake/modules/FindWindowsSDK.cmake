@@ -1,7 +1,10 @@
 
 if(WIN32)
+    get_global(WINDOWSSDK_DIR WINDOWSSDK_DIR)
 
-    if(NOT WINDOWSSDK_DIR)
+    if(WINDOWSSDK_DIR)
+        set(WINDOWSSDK_FOUND TRUE)
+    else(WINDOWSSDK_DIR)
         set(WINDOWSSDK_BOUNCEFILE "${CMAKE_CURRENT_BINARY_DIR}/WindowsSDK.cmake")
 
         if(NOT EXISTS ${WINDOWSSDK_BOUNCEFILE})
@@ -30,12 +33,14 @@ if(WIN32)
         include("${WINDOWSSDK_BOUNCEFILE}")
 
         file(TO_CMAKE_PATH "${WINDOWSSDK_DIR}" WINDOWSSDK_DIR)
-    endif(NOT WINDOWSSDK_DIR)
 
-    include(FindPackageHandleStandardArgs)
-    find_package_handle_standard_args(
-        WINDOWSSDK DEFAULT_MSG
-        WINDOWSSDK_DIR
-    )
+        include(FindPackageHandleStandardArgs)
+        find_package_handle_standard_args(
+            WINDOWSSDK DEFAULT_MSG
+            WINDOWSSDK_DIR
+        )
+
+        set_global(WINDOWSSDK_DIR ${WINDOWWSDK_DIR})
+    endif(WINDOWSSDK_DIR)
 
 endif(WIN32)
