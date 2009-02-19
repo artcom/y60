@@ -95,6 +95,7 @@ set_target_properties(
     spidermonkey
     PROPERTIES
         COMPILE_DEFINITIONS "EXPORT_JS_API"
+        COMPILE_DEFINITIONS_DEBUG "DEBUG"
 )
 
 ac_add_executable(
