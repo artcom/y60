@@ -70,7 +70,9 @@ else(UNIX)
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
         # XXX TODO per plugin stuff
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-        #create cmake file which sets with VS-Studio Variables
+
+        # Generate a file containing some information captured from vsvars32.bat
+        # XXX: move this somewhere else, preferably a "FindWindowsSDK.cmake"
         set(VSCOMN "VS90COMNTOOLS")
         string(LENGTH $ENV{${VSCOMN}} len)
         if(${len} EQUAL 0)
@@ -81,9 +83,10 @@ else(UNIX)
             endif(${len} EQUAL 0)
         endif(${len} EQUAL 0)
         execute_process(
-            COMMAND ${CMAKE_SOURCE_DIR}/acmake/tools/VSvars.bat  "$ENV{${VSCOMN}}" "${CMAKE_BINARY_DIR}/VSVars.cmake"
+            COMMAND ${ACMAKE_TOOLS_DIR}/VSvars.bat  "$ENV{${VSCOMN}}" "${CMAKE_BINARY_DIR}/VSVars.cmake"
             RESULT_VARIABLE rv
         )
+    
     endif(WIN32)
 
     if (CMAKE_GENERATOR MATCHES "Visual Studio.*")
