@@ -82,7 +82,7 @@ namespace y60 {
         virtual asl::Ptr<CaptureDevice> instance() const;
         std::string canDecode(const std::string & theUrl, 
                               asl::Ptr<asl::ReadableStreamHandle> theStream = 
-                              asl::Ptr<asl::ReadableStreamHandle>(0));
+                              asl::Ptr<asl::ReadableStreamHandle>());
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
         DEFINE_EXCEPTION(Exception, asl::Exception);
