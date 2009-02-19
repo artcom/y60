@@ -71,6 +71,8 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         install(
             TARGETS ${THIS_PLUGIN_NAME}
             EXPORT ${CMAKE_PROJECT_NAME}
+            RUNTIME
+                DESTINATION lib/${THIS_PLUGIN_PATH}
             LIBRARY
                 DESTINATION lib/${THIS_PLUGIN_PATH}
             PUBLIC_HEADER

@@ -131,6 +131,8 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 TARGETS ${THIS_LIBRARY_NAME}
                     DESTINATION lib
                 EXPORT  ${CMAKE_PROJECT_NAME}
+                RUNTIME
+                    DESTINATION bin
                 LIBRARY
                     DESTINATION lib
                 PUBLIC_HEADER
