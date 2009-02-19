@@ -40,8 +40,6 @@ struct SomeStruct {
 	char x[99];
 };
 
-
-
 class StreamUnitTest : public UnitTest {
 public:
     StreamUnitTest() : UnitTest("StreamUnitTest") {  };
@@ -132,10 +130,10 @@ public:
             ENSURE(iiull == static_cast<Unsigned64>(i));
             ENSURE(p == k + 22);
 
-            double iid=0;
+            Float64 iid=0;
             p = theInputStream.readFloat64(iid, p);               // 8
             ENSURE(p == k + 30);
-            ENSURE(iid == double(i)); 
+            ENSURE(iid == static_cast<Float64>(i)); 
 
             iiul=0;
             p = theInputStream.readSigned32(ii, p);              // 4
@@ -147,10 +145,10 @@ public:
             ENSURE(p == k + 38);
             ENSURE(iiui == static_cast<Unsigned32>(i));
 
-            float iif=0;
+            Float32 iif=0;
             p = theInputStream.readFloat32(iif, p);               // 4
             ENSURE(p == k + 42);
-            ENSURE(iif == float(i)); 
+            ENSURE(iif == static_cast<Float32>(i)); 
 
             short iis=0;
             p = theInputStream.readSigned16(iis, p);               // 2
@@ -306,6 +304,19 @@ public:
     }
 
     void run() {
+
+	ENSURE(sizeof(Signed8) == 1);
+	ENSURE(sizeof(Unsigned8) == 1);
+	ENSURE(sizeof(Signed16) == 2);
+	ENSURE(sizeof(Unsigned16) == 2);
+	ENSURE(sizeof(Signed32) == 4);
+	ENSURE(sizeof(Unsigned32) == 4);
+	ENSURE(sizeof(Signed64) == 8);
+	ENSURE(sizeof(Unsigned64) == 8);
+	ENSURE(sizeof(Float32) == 4);
+	ENSURE(sizeof(Float64) == 8);
+	//ENSURE(sizeof(Float128) == 16);
+
         asl::Block myBlock;
         perform_put(myBlock);
         perform_get(myBlock);
