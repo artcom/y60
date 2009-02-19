@@ -11,8 +11,6 @@ ac_add_project(
     DEFINITIONS -DAC_BUILT_WITH_CMAKE
 )
 
-# XXX: re-implement _DEBUG handling
-
 add_subdirectory(src)
 
 ac_end_project(Paintlib)

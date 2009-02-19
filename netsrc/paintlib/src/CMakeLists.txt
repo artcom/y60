@@ -190,6 +190,12 @@ ac_add_library(
     EXTERNS GIF PNG TIFF JPEG OPENEXR CURL
 )
 
+# add debug definition
+set_property(
+    TARGET paintlib
+    PROPERTY COMPILE_DEFINITIONS_DEBUG _DEBUG
+)
+
 # XXX: dirty hack to work around how we reference plfilter headers
 install(
     DIRECTORY Filter
