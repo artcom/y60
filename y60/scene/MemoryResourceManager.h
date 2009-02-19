@@ -111,7 +111,7 @@ class MemoryResourceManager : public ResourceManager {
         void updateTextureParams(const TexturePtr & theTexture) {}
         bool imageMatchesGLTexture(TexturePtr theTexture) const { return true; }
         IShaderLibraryPtr getShaderLibrary() const {
-            return IShaderLibraryPtr(0);
+            return IShaderLibraryPtr();
         }
 
     private:

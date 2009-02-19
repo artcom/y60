@@ -160,7 +160,7 @@ namespace jslib {
             } else {
                 // Construct empty OscReceiver that will be filled by copy Construct()
                 AC_PRINT << "JSOscReceiver::Constructor: empty";
-                myNewNative = OWNERPTR(0);
+                myNewNative = OWNERPTR();
             }
 
             JSOscReceiver * myNewObject = new JSOscReceiver(myNewNative, &(*myNewNative));

@@ -102,7 +102,7 @@ namespace y60 {
         FrameBlendingTag::Plug(theNode),				
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
-        _myDecoder(0),
+        _myDecoder(),
         _myPlayMode(PLAY_MODE_STOP),
         _myLastDecodedFrame(std::numeric_limits<unsigned>::max()),
         _myLastCurrentTime(-1.0),

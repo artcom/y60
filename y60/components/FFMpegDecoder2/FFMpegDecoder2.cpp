@@ -106,7 +106,7 @@ namespace y60 {
         PlugInBase(theDLHandle),
         AsyncDecoder(),
         PosixThread(),
-        _myLastVideoFrame(0),
+        _myLastVideoFrame(),
         _myFormatContext(0),
         _myFrame(0),
         _myVStreamIndex(-1),
@@ -115,7 +115,7 @@ namespace y60 {
         _myTimeUnitsPerSecond(-1),
         _myAStreamIndex(-1),
         _myAStream(0),
-        _myDemux(0),
+        _myDemux(),
         _myDestinationPixelFormat(0),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
@@ -218,7 +218,7 @@ namespace y60 {
         } else {
             AC_DEBUG << "FFMpegDecoder2::load " << theFilename 
                     << " no audio stream found or disabled";
-            _myAudioSink = HWSampleSinkPtr(0);
+            _myAudioSink = HWSampleSinkPtr();
             _myAStream = 0;
             _myAStreamIndex = -1;
         }
@@ -582,7 +582,7 @@ namespace y60 {
             AC_DEBUG << "readFrame: not playing.";
             return theTime;
         }
-        VideoMsgPtr myVideoMsg(0);
+        VideoMsgPtr myVideoMsg;
         double myStreamTime = theTime;
         if (_myStartTimestamp != -1) {
             myStreamTime += _myStartTimestamp/_myTimeUnitsPerSecond;

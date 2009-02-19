@@ -81,7 +81,7 @@ namespace y60 {
      */
     class RelativeReadableStream {
         public:
-            RelativeReadableStream() : _mySource(0) {}
+            RelativeReadableStream() : _mySource() {}
             RelativeReadableStream( asl::Ptr<asl::ReadableStream> theSource) 
                 : _mySource(theSource), _myOffset(0) {}
 

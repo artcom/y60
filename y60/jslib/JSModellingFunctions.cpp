@@ -95,7 +95,7 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         
         ensureParamCount(argc, 1, 2);
 
-        dom::NodePtr  myParentNode(0);
+        dom::NodePtr  myParentNode;
         if (!convertFrom(cx, argv[0], myParentNode)) {
             JS_ReportError(cx,"CreateTransform: argument 1 is not a node");
             return JS_FALSE;
@@ -126,7 +126,7 @@ CreateCanvas(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rva
 
         ensureParamCount(argc, 2);
 
-        y60::ScenePtr mySceneNode(0);
+        y60::ScenePtr mySceneNode;
         convertFrom(cx, argv[0], mySceneNode);
         string myCanvasName;
         convertFrom(cx, argv[1], myCanvasName);
@@ -149,7 +149,7 @@ CreateBody(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
         ensureParamCount(argc, 2);
 
-        dom::NodePtr  myParentNode(0);
+        dom::NodePtr  myParentNode;
         convertFrom(cx, argv[0], myParentNode);
         string myShapeId;
         convertFrom(cx, argv[1], myShapeId);
@@ -175,7 +175,7 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
         ensureParamCount(argc, 4);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
         string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
@@ -207,7 +207,7 @@ CreatePlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval
 
         ensureParamCount(argc, 6);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
         string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
@@ -245,7 +245,7 @@ CreateSphericalPlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, js
 
         ensureParamCount(argc, 6);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
         string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
@@ -284,7 +284,7 @@ CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *ar
         ensureParamCount(argc, 4, 5);
         dom::NodePtr myResult;
         if (argc == 4 || argc == 5) {
-            y60::ScenePtr myScene(0);
+            y60::ScenePtr myScene;
             convertFrom(cx, argv[0], myScene);
             string myMaterialId;
             convertFrom(cx, argv[1], myMaterialId);
@@ -324,7 +324,7 @@ CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 
         ensureParamCount(argc, 5);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myMaterialId;
@@ -359,7 +359,7 @@ CreateDistanceMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, js
         DOC_END;
         ensureParamCount(argc, 3, 4);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myMaterialId;
@@ -406,7 +406,7 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
 
         ensureParamCount(argc, 6, 7);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myMaterialId;
@@ -464,7 +464,7 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
 
         ensureParamCount(argc, 6, 7);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myMaterialId;
@@ -508,7 +508,7 @@ static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject *
     try {
         ensureParamCount(argc, 3, 5);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myMaterialId;
@@ -590,7 +590,7 @@ CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
         DOC_END;
         ensureParamCount(argc, 4, 5);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         string myLineMaterialId;
@@ -637,7 +637,7 @@ CreateTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     try {
         ensureParamCount(argc, 1,2);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myImageNode;
@@ -679,7 +679,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     try {
         ensureParamCount(argc, 2, 4);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         if (argc == 2) {
@@ -740,7 +740,7 @@ CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     try {
         ensureParamCount(argc, 1, 2);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myResult;
@@ -770,7 +770,7 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     try {
       ensureParamCount(argc, 1, 3);
       
-      y60::ScenePtr myScene(0);
+      y60::ScenePtr myScene;
       convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myResult;
@@ -807,7 +807,7 @@ CreatePhongMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
 
         ensureParamCount(argc, 2, 5);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myResult;
@@ -886,7 +886,7 @@ CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
 
         ensureParamCount(argc, 3, 7);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myResult;
@@ -988,12 +988,12 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
 
         ensureParamCount(argc, 1, 7);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         dom::NodePtr myResult;
 
-        dom::NodePtr myImageNode(0);
+        dom::NodePtr myImageNode;
         string myTextureFilename;
         if (argc > 1) {
           if (!convertFrom(cx, argv[1], myImageNode)) {
@@ -1096,7 +1096,7 @@ CreateQuadStack(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         DOC_END;
         ensureParamCount(argc, 4, 5);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         asl::Vector3i myDimensions;
@@ -1139,7 +1139,7 @@ CreateVoxelProxyGeometry(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
         DOC_END;
         ensureParamCount(argc, 7);
 
-        y60::ScenePtr myScene(0);
+        y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
         asl::Box3f myVoxelBox;

@@ -84,7 +84,7 @@ Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCache
       _myCacheItem(myCacheItem)
 {
     AC_DEBUG << "Sound::Sound(" << myURI << ", loop: " << theLoop << ")";
-    _myLockedSelf = SoundPtr(0);
+    _myLockedSelf = SoundPtr();
     _mySampleSink = Pump::get().createSampleSink(myURI);
     _myDecoder->setSampleSink(this);
     AutoLocker<ThreadLock> myLocker(_mySoundsAllocatedLock);
@@ -103,7 +103,7 @@ Sound::~Sound()
 void Sound::setSelf(const SoundPtr& mySelf)
 {
     _mySelf = mySelf;
-    _myLockedSelf = SoundPtr(0);
+    _myLockedSelf = SoundPtr();
 }
 
 void Sound::play() {
@@ -121,7 +121,7 @@ void Sound::pause() {
     AC_TRACE << "Sound::pause (" << _myURI << ")";
     _myDecoder->pause();
     _mySampleSink->pause();
-    _myLockedSelf = SoundPtr(0);
+    _myLockedSelf = SoundPtr();
 }
 
 void Sound::stop() {
@@ -132,11 +132,11 @@ void Sound::stop() {
     if (_myCacheItem) {
         _myCacheItem->doneCaching();
         if (!_myCacheItem->isFull()) {
-            _myCacheItem = SoundCacheItemPtr(0);
+            _myCacheItem = SoundCacheItemPtr();
         }
     }
     close();
-    _myLockedSelf = SoundPtr(0);
+    _myLockedSelf = SoundPtr();
 }
 
 void Sound::setVolume(float theVolume) {
@@ -185,7 +185,7 @@ void Sound::seek (Time thePosition)
     // Throw away cache.
     if (_myCacheItem) {
         _myCacheItem->doneCaching();
-        _myCacheItem = SoundCacheItemPtr(0);
+        _myCacheItem = SoundCacheItemPtr();
     }
     
     _myDecoder->seek(thePosition);
@@ -247,7 +247,7 @@ void Sound::update(double theTimeSlice) {
     if (_myDecodingComplete && !isPlaying()) {
         AC_TRACE << "Sound::update: Playback complete";
         _myDecodingComplete = false;
-        _myLockedSelf = SoundPtr(0);
+        _myLockedSelf = SoundPtr();
     }
     if (!_myDecodingComplete) {
         bool myEOF = false;
@@ -293,7 +293,7 @@ bool Sound::queueSamples(AudioBufferPtr& theBuffer) {
     if (_myCacheItem && !_myCacheItem->isFull()) {
         bool myCacheItemIsFull = !_myCacheItem->queueSamples(theBuffer);
         if (myCacheItemIsFull) {
-            _myCacheItem = SoundCacheItemPtr(0);
+            _myCacheItem = SoundCacheItemPtr();
         }
     }
     _mySampleSink->queueSamples(theBuffer);

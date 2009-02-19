@@ -141,11 +141,11 @@ namespace y60 {
         _myGridSize(0,0),
         _myPoTSize(1,1),
         _myIDCounter(0),
-        _myRawRaster(dom::ValuePtr(0)),
-        _myDenoisedRaster(dom::ValuePtr(0)),
-        _myMomentRaster(dom::ValuePtr(0)),
-        _myResampledRaster(dom::ValuePtr(0)),
-        _myScene(0),
+        _myRawRaster(dom::ValuePtr()),
+        _myDenoisedRaster(dom::ValuePtr()),
+        _myMomentRaster(dom::ValuePtr()),
+        _myResampledRaster(dom::ValuePtr()),
+        _myScene(),
         _myWindow( 0 ),
         _myLastFrameTime( asl::Time() ),
         _myRunTime(0.0),
@@ -168,7 +168,7 @@ namespace y60 {
         _myTextColor(1.0, 1.0, 1.0, 1.0),
         _myProbeColor(0.0, 0.75, 0.0, 1.0),
         _myResampleColor(1.0, 0.0, 0.0, 1.0),
-        _mySettings(dom::NodePtr(0)),
+        _mySettings(dom::NodePtr()),
         _myUseCCRegionForMomentumFlag(0),
         _myUserDefinedMomentumBox(-1, -1, 1, 1),
         _myCureVLines(-1,-1,-1,-1),
@@ -1389,7 +1389,7 @@ namespace y60 {
                                PLUS_FILE_LINE);
         }
         if ( _myTransportLayer && _myTransportLayer->settingsChanged( theSettings ) ) {
-            _myTransportLayer = TransportLayerPtr( 0 );
+            _myTransportLayer = TransportLayerPtr();
         }
 
         AC_DEBUG << "driver setup: transport layer is '" << _myTransportLayer << "'";
@@ -1630,7 +1630,7 @@ namespace y60 {
     void
     ASSDriver::disconnect() {
         AC_PRINT << "ASSDriver::disconnect()";
-        _myTransportLayer = TransportLayerPtr( 0 );
+        _myTransportLayer = TransportLayerPtr();
     }
     void
     ASSDriver::connect() {

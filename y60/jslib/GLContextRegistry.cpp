@@ -86,14 +86,14 @@ asl::Ptr<AbstractRenderWindow>
 GLContextRegistry::getContext() {
     cleanup();
     for (ContextSet::iterator i = _myContexts.begin(); i != _myContexts.end(); ++i) {
-        if (*i) {
+        if (!i->expired()) {
             WeakPtr<AbstractRenderWindow> myWeaky = *i;
             return myWeaky.lock();
         } else {
             // TODO: We should remove it from the list for performance
         }
     }
-    return asl::Ptr<AbstractRenderWindow>(0);
+    return asl::Ptr<AbstractRenderWindow>();
 }
 
 void

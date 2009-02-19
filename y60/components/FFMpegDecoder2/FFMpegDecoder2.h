@@ -133,14 +133,14 @@ namespace y60 {
     {
         static const unsigned FRAME_CACHE_SIZE;  ///< Number of frames to cache in the Framecache.
         static const double AUDIO_BUFFER_SIZE;   ///< Audio cache size in seconds.
-        
+
     public:
         FFMpegDecoder2(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder2();
 
         virtual asl::Ptr<MovieDecoderBase> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
- 
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
+
         /**
          * loads a movie from the file given by theFilename
          * @param theFilename file to load into the decoder
@@ -166,23 +166,23 @@ namespace y60 {
          */
         void stopMovie(bool theStopAudioFlag = true);
         void closeMovie();
-        
+
         const char * getName() const { return "y60FFMpegDecoder2"; }
-        
+
     private:
         // Called from main thread
         void run();
 
         void startOverAgain();
-        
+
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void dumpCache();
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
         void doSeek(double theSeekTime);
-       
-        
+
+
         // Called from both threads
         /**
          *  updates the Framecache depending on the current position
@@ -204,10 +204,10 @@ namespace y60 {
         void addCacheFrame(AVFrame* theFrame, double theTime);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         VideoMsgPtr createFrame(double theTimestamp);
-        
+
         // Used in main thread
         VideoMsgPtr _myLastVideoFrame;
-        
+
         // Used in both threads
         AVFormatContext * _myFormatContext;
         int _myVStreamIndex;
@@ -220,7 +220,7 @@ namespace y60 {
         AVFrame * _myFrame;
 
         DemuxPtr _myDemux;
-       
+
         int64_t _myStartTimestamp;
         double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
         int _myDestinationPixelFormat;
@@ -232,18 +232,18 @@ namespace y60 {
         int _myNumFramesDecoded;
         int _myNumIFramesDecoded;
         int _myDecodedPacketsPerFrame;
-        
+
         //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
         //     calculating this per stream and not per file.
         double _myTimeUnitsPerSecond;
-       
+
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
         unsigned _myMaxCacheSize;
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
-        
+
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

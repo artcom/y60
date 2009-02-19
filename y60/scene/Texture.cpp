@@ -461,7 +461,7 @@ namespace y60 {
             // AC_ERROR << "Texture '" << get<NameTag>() << "' id=" << get<IdTag>() << " references invalid image id=" << myImageId;
             // afaik, this is not an error, because the image-texture separation implies that one can have a texture which doesn`t
             // have a representing image. hence one can create a texture from an image and throw away the image afterwards. [sh]
-            return ImagePtr(0);
+            return ImagePtr();
         }
         ImagePtr myImage = myImageNode->getFacade<Image>();
         return myImage;

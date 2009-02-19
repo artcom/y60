@@ -69,7 +69,7 @@ namespace y60 {
     Histogram::Histogram(const std::string theName) : 
         Algorithm(theName),
         _myResultNode("result"), 
-        _mySourceRaster(0)
+        _mySourceRaster()
     {
         _myResultNode.appendChild(Element("red"));
         _myResultNode.childNode("red")->appendChild(dom::Text(""));

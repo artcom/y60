@@ -208,7 +208,7 @@ namespace y60 {
             }
         } else {
             AC_WARNING << "No raster found in factory for type "<<RasterEncodingString[theEncoding];
-            return dom::ValuePtr(0);
+            return dom::ValuePtr();
         }
         return myReturnValue;
     };

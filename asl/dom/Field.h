@@ -52,7 +52,7 @@ namespace dom {
                 _myCallBackFunction(theCallBackFunction)
             {}
             void callback() {
-                if (_myCallBack && _myCallBackFunction) {
+                if (!_myCallBack.expired() && _myCallBackFunction) {
                     (*(_myCallBack.lock()).*_myCallBackFunction)();
                 }
             }
@@ -81,7 +81,7 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Field, InfiniteRecursion, Exception);
         DEFINE_NESTED_EXCEPTION(Field, InvalidNullPointerPassed, Exception);
 
-        Field() : _isDirty(true), _hasOutdatedDependencies(true), _isRecalculating(false), _isReconnecting(false), _myImmediateCB(0) {}        
+        Field() : _isDirty(true), _hasOutdatedDependencies(true), _isRecalculating(false), _isReconnecting(false), _myImmediateCB() {}
         virtual ~Field();
         
         // This should only be called by ValueFactory and FacadeAttributePlug, could be private, as soon as we have

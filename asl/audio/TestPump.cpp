@@ -130,7 +130,7 @@ void TestPump::playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration
     mySampleSink->play();
     msleep(theDuration);
     mySampleSink->stop();
-    mySampleSink = HWSampleSinkPtr(0);
+    mySampleSink = HWSampleSinkPtr();
     msleep(theDuration);
     ENSURE(myPump.getNumSinks() == 0);
 }
@@ -168,8 +168,8 @@ void TestPump::testMix() {
     msleep(100);
     mySampleSink2->stop();
     msleep(100);
-    mySampleSink1 = HWSampleSinkPtr(0);
-    mySampleSink2 = HWSampleSinkPtr(0);
+    mySampleSink1 = HWSampleSinkPtr();
+    mySampleSink2 = HWSampleSinkPtr();
     msleep(100);
     ENSURE(myPump.getNumSinks() == 0);
 }

@@ -509,9 +509,9 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
                                const std::string & theNodeId,
                                const std::string & theAttributeName)
 {
-    MFnAnimCurvePtr myAnimCurveX(0);
-    MFnAnimCurvePtr myAnimCurveY(0);
-    MFnAnimCurvePtr myAnimCurveZ(0);
+    MFnAnimCurvePtr myAnimCurveX;
+    MFnAnimCurvePtr myAnimCurveY;
+    MFnAnimCurvePtr myAnimCurveZ;
     MStatus myStatus;
 
     std::string myAnimCurveName;

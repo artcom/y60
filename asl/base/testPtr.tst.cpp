@@ -99,17 +99,17 @@ public:
             ENSURE(TestClassBase<N>::_theInstanceCount_ == 0);
             Ptr<TestClassBase<N>,ThreadingModel> emptyBasePtr;
             ENSURE(!emptyBasePtr);
-            ENSURE(emptyBasePtr.getNativePtr() == 0);
+            ENSURE(emptyBasePtr.get() == 0);
             //DPRINT(emptyBasePtr.getRefCount());
-            ENSURE(emptyBasePtr.getRefCount() == 0);
+            ENSURE(emptyBasePtr.use_count() == 0);
             //DPRINT(emptyBasePtr.getRefCount());
             // Test single non-empty pointer behaviour
             Ptr<TestClassBase<N>,ThreadingModel> myBasePtr(new TestClassBase<N> );
             ENSURE(myBasePtr);
             ENSURE(TestClassBase<N>::_theInstanceCount_ == 1);
             //DPRINT(TestClassBase<N>::_theInstanceCount_);
-            ENSURE(myBasePtr.getNativePtr() != 0);
-            ENSURE(myBasePtr.getRefCount() == 1);
+            ENSURE(myBasePtr.get() != 0);
+            ENSURE(myBasePtr.use_count() == 1);
 
             ENSURE(myBasePtr != emptyBasePtr);
 #ifdef perform_std_string_test
@@ -125,9 +125,9 @@ public:
                 ENSURE(anotherPtr);
                 ENSURE(TestClassBase<N>::_theInstanceCount_ == 1);
                 ENSURE(anotherPtr == myBasePtr);
-                ENSURE(myBasePtr.getRefCount() == 2);
-                ENSURE(anotherPtr.getRefCount() == 2);
-                ENSURE(anotherPtr.getNativePtr() == myBasePtr.getNativePtr());
+                ENSURE(myBasePtr.use_count() == 2);
+                ENSURE(anotherPtr.use_count() == 2);
+                ENSURE(anotherPtr.get() == myBasePtr.get());
 #ifdef perform_std_string_test
                 ENSURE(string("TestClassBase") == anotherPtr->getName());
                 ENSURE(string("TestClassBase") == (*anotherPtr).getName());
@@ -136,7 +136,7 @@ public:
                 ENSURE(strcmp("TestClassBase",(*anotherPtr).getName()) == 0);
 #endif
             }
-            ENSURE(myBasePtr.getRefCount() == 1);
+            ENSURE(myBasePtr.use_count() == 1);
             //DPRINT(myBasePtr.getRefCount());
 
             // Test polymorph behaviour
@@ -149,7 +149,7 @@ public:
 #else
             ENSURE(strcmp("TestClassDerived",(*derivedPtr).getName()) == 0);
 #endif
-            ENSURE(myBasePtr.getRefCount() == 1);
+            ENSURE(myBasePtr.use_count() == 1);
 
             Ptr<TestClassBase<N>,ThreadingModel> anotherBase = derivedPtr;
             ENSURE(anotherBase);
@@ -168,31 +168,31 @@ public:
 
         {
             WeakPtr<int, ThreadingModel> myEmptyPtr;
-            ENSURE( ! myEmptyPtr );
+            ENSURE( myEmptyPtr.expired() );
             ENSURE( ! myEmptyPtr.lock() );
 
             Ptr<int, ThreadingModel> mySmartPtr = Ptr<int, ThreadingModel>( new int(23));
             WeakPtr<int, ThreadingModel> myWeakPtr(mySmartPtr);
-            ENSURE(myWeakPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 2);
+            ENSURE(!myWeakPtr.expired());
+            //ENSURE( myWeakPtr.getWeakCount() == 2);  // cannot access weak count in boost's smart ptr
             ENSURE( myWeakPtr.lock());
             // test second weak pointer
             WeakPtr<int, ThreadingModel> myOtherWeakPtr(mySmartPtr);
-            ENSURE( myOtherWeakPtr );
-            ENSURE( myOtherWeakPtr.getWeakCount() == 3);
+            ENSURE( !myOtherWeakPtr.expired() );
+            //ENSURE( myOtherWeakPtr.getWeakCount() == 3);  // cannot access weak count in boost's smart ptr
             ENSURE( myOtherWeakPtr.lock());
             // test copy constructor
             WeakPtr<int, ThreadingModel> myCopyWeakPtr(myWeakPtr);
-            ENSURE( myCopyWeakPtr );
-            ENSURE( myCopyWeakPtr.getWeakCount() == 4);
+            ENSURE( !myCopyWeakPtr.expired() );
+            //ENSURE( myCopyWeakPtr.getWeakCount() == 4);  // cannot access weak count in boost's smart ptr
             ENSURE( myCopyWeakPtr.lock());
 
             WeakPtr<int, ThreadingModel> myAssignedPtr;
-            ENSURE( ! myAssignedPtr );
+            ENSURE( myAssignedPtr.expired() );
             ENSURE( ! myAssignedPtr.lock() );
             myAssignedPtr = myWeakPtr;
-            ENSURE( myAssignedPtr );
-            ENSURE( myCopyWeakPtr.getWeakCount() == 5);
+            ENSURE( !myAssignedPtr.expired() );
+            //ENSURE( myCopyWeakPtr.getWeakCount() == 5);  // cannot access weak count in boost's smart ptr
             ENSURE( myAssignedPtr.lock() );
 
             // test locking
@@ -209,57 +209,57 @@ public:
             }
 
             // dispose smart ptr, invalidating the weak pointers
-            mySmartPtr = Ptr<int, ThreadingModel>(0);
-            ENSURE( ! myWeakPtr);
+            mySmartPtr = Ptr<int, ThreadingModel>();
+            ENSURE( myWeakPtr.expired());
             ENSURE( ! myWeakPtr.lock());
 
-            ENSURE( ! myCopyWeakPtr);
+            ENSURE( myCopyWeakPtr.expired());
             ENSURE( ! myCopyWeakPtr.lock());
 
-            ENSURE( ! myOtherWeakPtr);
+            ENSURE( myOtherWeakPtr.expired());
             ENSURE( ! myOtherWeakPtr.lock());
 
             // check the weak refcount decreases (mySmartPtr is null)
             myAssignedPtr = WeakPtr<int, ThreadingModel>(mySmartPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 3);
+            //ENSURE( myWeakPtr.getWeakCount() == 3);  // cannot access weak count in boost's smart ptr
             myOtherWeakPtr = WeakPtr<int, ThreadingModel>(mySmartPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 2);
-            ENSURE( myCopyWeakPtr.getWeakCount() == 2);
+            //ENSURE( myWeakPtr.getWeakCount() == 2);  // cannot access weak count in boost's smart ptr
+            //ENSURE( myCopyWeakPtr.getWeakCount() == 2);  // cannot access weak count in boost's smart ptr
             myCopyWeakPtr = WeakPtr<int, ThreadingModel>(mySmartPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 1);
+            //ENSURE( myWeakPtr.getWeakCount() == 1);  // cannot access weak count in boost's smart ptr
         }
 
         // test equality operator
         {
             WeakPtr<int, ThreadingModel> myEmptyPtr;
-            ENSURE( ! myEmptyPtr );
+            ENSURE( myEmptyPtr.expired() );
             ENSURE( ! myEmptyPtr.lock() );
 
             Ptr<int, ThreadingModel> mySmartPtr = Ptr<int, ThreadingModel>( new int(23));
             Ptr<int, ThreadingModel> mySmartPtrClone = mySmartPtr;
             Ptr<int, ThreadingModel> mySmartPtr2 = Ptr<int, ThreadingModel>( new int(23));
             WeakPtr<int, ThreadingModel> myWeakPtr(mySmartPtr);
-            ENSURE(myWeakPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 2);
+            ENSURE(!myWeakPtr.expired());
+            //ENSURE( myWeakPtr.getWeakCount() == 2);  // cannot access weak count in boost's smart ptr
             ENSURE( myWeakPtr.lock());
 
             WeakPtr<int, ThreadingModel> myWeakPtr2(mySmartPtr2);
-            ENSURE(myWeakPtr2);
-            ENSURE(myWeakPtr2.getWeakCount() == 2);
+            ENSURE(!myWeakPtr2.expired());
+            //ENSURE(myWeakPtr2.getWeakCount() == 2);  // cannot access weak count in boost's smart ptr
             ENSURE(myWeakPtr2.lock());
 
             ENSURE( mySmartPtr != mySmartPtr2);
             ENSURE( mySmartPtr == myWeakPtr.lock());
             ENSURE( mySmartPtr == mySmartPtrClone);
             ENSURE( mySmartPtrClone == mySmartPtr);
-            ENSURE( mySmartPtr == myWeakPtr);
-            ENSURE( myWeakPtr == mySmartPtr);
-            ENSURE( myWeakPtr == mySmartPtrClone);
-            ENSURE( mySmartPtrClone == myWeakPtr);
-            ENSURE( myWeakPtr != myWeakPtr2);
-            ENSURE( myWeakPtr2 != myWeakPtr);
-            ENSURE( myWeakPtr != myEmptyPtr);
-            ENSURE(! (myWeakPtr == myEmptyPtr));
+            ENSURE( mySmartPtr == myWeakPtr.lock());
+            ENSURE( myWeakPtr.lock() == mySmartPtr);
+            ENSURE( myWeakPtr.lock() == mySmartPtrClone);
+            ENSURE( mySmartPtrClone == myWeakPtr.lock());
+            ENSURE( myWeakPtr.lock() != myWeakPtr2.lock());
+            ENSURE( myWeakPtr2.lock() != myWeakPtr.lock());
+            ENSURE( myWeakPtr.lock() != myEmptyPtr.lock());
+            ENSURE(! (myWeakPtr.lock() == myEmptyPtr.lock()));
         }
 #if 0  // TODO: NOT POSSIBLE?
         {

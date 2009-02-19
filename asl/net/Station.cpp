@@ -664,7 +664,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                 // We didnt get all previous packets, lets discard them all 
                 DB(AC_TRACE << "Not enough packets, discarding all,  stored = " << myStoredPackets.size() << endl);
                 myStoredPackets.resize(0);
-                myNewPacket = asl::Ptr<Packet>(0);
+                myNewPacket = asl::Ptr<Packet>();
             } else {
                 DB(AC_TRACE << "Final part received, stored = " << myStoredPackets.size() << endl);
                 // The number of packets is sufficient, so look if they belong to the same message 

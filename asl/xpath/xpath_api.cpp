@@ -67,7 +67,7 @@ namespace xpath {
     void find(const Path& path, const dom::NodePtr node, dom::NodePtr& result)
     {
         const detail::LocationStepList& steps = path.getStepList().steps;
-        detail::Context context(node.getNativePtr());
+        detail::Context context(node.get());
         detail::NodePtrVec temp;
         findNodes(context,steps.begin(),steps.end(),temp,true);
         if( !temp.empty() ) {
@@ -80,7 +80,7 @@ namespace xpath {
     void findAll(const Path& path, const dom::NodePtr node, NodeList& result)
     {
         const detail::LocationStepList& steps = path.getStepList().steps;
-        detail::Context context(node.getNativePtr());
+        detail::Context context(node.get());
         result.clear();
         detail::NodePtrVec temp;
         findNodes(context,steps.begin(),steps.end(),temp,false);

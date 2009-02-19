@@ -100,10 +100,10 @@ struct RotationContainer {
     MFnAnimCurvePtr myRotationY;
     MFnAnimCurvePtr myRotationZ;
     asl::Vector3f myInitialEuler;
-    RotationContainer(asl::Vector3f theInitialEuler) : myRotationX(0), myRotationY(0), myRotationZ(0),
+    RotationContainer(asl::Vector3f theInitialEuler) : myRotationX(), myRotationY(), myRotationZ(),
                           myInitialEuler(theInitialEuler) {}
                           
-    RotationContainer() : myRotationX(0), myRotationY(0), myRotationZ(0),
+    RotationContainer() : myRotationX(), myRotationY(), myRotationZ(),
                           myInitialEuler(asl::Vector3f(0,0,0)) {}
 };
 

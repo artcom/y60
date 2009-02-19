@@ -389,7 +389,7 @@ namespace y60 {
             }
         }
 
-        VideoFramePtr myVideoFrame(0);
+        VideoFramePtr myVideoFrame;
 
         AVPacket myPacket;
         memset(&myPacket, 0, sizeof(myPacket));

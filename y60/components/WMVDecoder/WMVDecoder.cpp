@@ -312,7 +312,7 @@ double ourLastAudioTimeStamp = 0.0;
         }*/
         // Find 'closest' frame in VideoFrameCache
         double myMinTimeDiff = 1000000.0;
-        VideoFramePtr myBestFrame(NULL);
+        VideoFramePtr myBestFrame;
         unsigned myCachePosition = 0;
         unsigned myFoundCachePosition = 0;
 

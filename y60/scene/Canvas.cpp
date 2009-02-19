@@ -95,7 +95,7 @@ Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
         } 
     } else {
         // unset framebuffer
-        _myFrameBuffer = asl::Ptr<IFrameBuffer>(0);
+        _myFrameBuffer = asl::Ptr<IFrameBuffer>();
         return true;
     }
 }
@@ -106,7 +106,7 @@ Canvas::getTarget(asl::Ptr<Scene,dom::ThreadingModel> theScene) {
     if (myTextureNode) {
         return myTextureNode->getFacade<Texture>();
     }
-    return TexturePtr(0);
+    return TexturePtr();
 }
 
 bool 

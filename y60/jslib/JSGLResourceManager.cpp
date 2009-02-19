@@ -224,7 +224,7 @@ JSGLResourceManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval
     // so only create a dummy object here - it will be reassigned
     // in the JSWrapper::Construct method anyway
     // TODO: is there a better way to do this?
-    OWNERPTR myNewPtr = OWNERPTR(0);
+    OWNERPTR myNewPtr = OWNERPTR();
     JSGLResourceManager * myNewObject=new JSGLResourceManager(myNewPtr, 0);
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);

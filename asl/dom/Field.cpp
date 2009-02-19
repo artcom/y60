@@ -84,8 +84,8 @@ namespace dom {
 
         _myCalculator = theField._myCalculator;
         _myConnector = theField._myConnector;
-        theField._myCalculator = CallBackPtr(0);
-        theField._myConnector = CallBackPtr(0);
+        theField._myCalculator = CallBackPtr();
+        theField._myConnector = CallBackPtr();
         _hasOutdatedDependencies = theField._hasOutdatedDependencies;
         
         _isRecalculating = true;
@@ -97,7 +97,7 @@ namespace dom {
     Field::clearPrecursorFields() {
         if (_myCalculator || _myPrecursorFields.size()) {
             DB(AC_TRACE << "clearPrecursorFields() on "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-            _myCalculator = CallBackPtr(0);
+            _myCalculator = CallBackPtr();
 
             for (std::vector<FieldWeakPtr>::size_type i = 0; i < _myPrecursorFields.size(); ++i)  {
                 FieldPtr myPrecursorField = _myPrecursorFields[i];
@@ -140,9 +140,9 @@ namespace dom {
             throw InvalidNullPointerPassed(JUST_FILE_LINE);
         }
         DB(AC_TRACE << "registerPrecursor() "<<filteredName(typeid(*theField).name())<< "@"
-            <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
+            <<(void*)theField.get()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         if (hasPrecursor(theField)) {
-            AC_ERROR << "Field::registerPrecursor: theField "<<(void*)theField.getNativePtr() << 
+            AC_ERROR << "Field::registerPrecursor: theField "<<(void*)theField.get() << 
                 " is already registered, ignored";
         } else {
             _myPrecursorFields.push_back(theField);
@@ -158,7 +158,7 @@ namespace dom {
             throw InvalidNullPointerPassed(JUST_FILE_LINE);
         }
         DB(AC_TRACE << "unregisterPrecursor() "<<filteredName(typeid(*theField).name())<< "@"
-            <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
+            <<(void*)theField.get()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         unsigned i = findPrecursor(theField);
         if (i < _myPrecursorFields.size()) {
             _myPrecursorFields[i]->eraseDependend(_mySelf);
@@ -166,7 +166,7 @@ namespace dom {
             return;
         }
         AC_ERROR << "unregisterPrecursor() "<<filteredName(typeid(*theField).name())<< "@"
-            <<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+            <<(void*)theField.get()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
     }
 
     void 
@@ -176,14 +176,14 @@ namespace dom {
             throw InvalidNullPointerPassed(JUST_FILE_LINE);
         }
         DB(AC_TRACE << "erasePrecursor() "<<filteredName(typeid(*theField).name())<< "@"
-            <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
+            <<(void*)theField.get()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         unsigned i = findPrecursor(theField);
         if (i < _myPrecursorFields.size()) {
             _myPrecursorFields.erase(_myPrecursorFields.begin() + i);
             return;
         }
         AC_ERROR << "erasePrecursor() "<<filteredName(typeid(*theField).name())<< "@"
-            <<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+            <<(void*)theField.get()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
     }
 
     void 
@@ -191,7 +191,7 @@ namespace dom {
         DB(
         if (theField) {
             AC_TRACE << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"
-                <<(void*)theField.lock().getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+                <<(void*)theField.lock().get()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
         } else {
             AC_TRACE << "eraseDependend() of zero weak ptr at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
         })
@@ -201,14 +201,14 @@ namespace dom {
             return;
         }
         AC_ERROR << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"
-            <<(void*)theField.lock().getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())
+            <<(void*)theField.lock().get()<<" not found at "<<filteredName(typeid(*this).name())
             << "@"<<(void*)this;
     }
 
     unsigned 
     Field::findDependend(FieldWeakPtr theField) const {
         for (unsigned i = 0; i < _myDependendFields.size(); ++i)  {
-            if (_myDependendFields[i] == theField) {
+            if (_myDependendFields[i].lock() == theField.lock()) {
                 return i;
             }
         }
@@ -229,10 +229,10 @@ namespace dom {
     Field::registerDependend(FieldPtr theField) {
         if (theField) {
             DB(AC_TRACE << "registerDependend() "<<filteredName(typeid(*theField).name())<< "@"
-                <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
+                <<(void*)theField.get()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
             if (hasDependend(theField)) {
                 AC_WARNING << "registerDependend():the field "<<filteredName(typeid(*theField).name())
-                    << "@"<<(void*)theField.getNativePtr()<<" is already registered at "
+                    << "@"<<(void*)theField.get()<<" is already registered at "
                     <<filteredName(typeid(*this).name())<< "@"<<(void*)this;
             } else {
                 _myDependendFields.push_back(theField);

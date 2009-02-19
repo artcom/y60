@@ -189,7 +189,7 @@ namespace y60 {
              * @param theRoot node to insert to files world below.
              */
             void import(const std::string & theFilename, asl::PackageManagerPtr thePackageManager,
-                dom::NodePtr theRoot = dom::NodePtr(0));
+                dom::NodePtr theRoot = dom::NodePtr());
 
             /**
              * Loads the file given in theFilename from the Stream theSource into the scene. It tries
@@ -248,7 +248,7 @@ namespace y60 {
             void update(unsigned short myUpdateFlags = MATERIALS+SHAPES);
 
             // Reduces the scene to one body with one shape
-            void optimize(dom::NodePtr theRootNode = dom::NodePtr(0));
+            void optimize(dom::NodePtr theRootNode = dom::NodePtr());
             void collectGarbage();
 
             /**
@@ -329,14 +329,14 @@ namespace y60 {
                 if (myShapeNode) {
                     return myShapeNode->getFacade<Shape>();
                 }
-                return ShapePtr(0);
+                return ShapePtr();
             }
             const ShapePtr getShape(const std::string & theId) const {
                 dom::NodePtr myShapeNode = _mySceneDom->getElementById(theId);
                 if (myShapeNode) {
                     return myShapeNode->getFacade<Shape>();
                 }
-                return ShapePtr(0);
+                return ShapePtr();
             }
 
             bool intersectWorld(const asl::LineSegment<float> & theStick,

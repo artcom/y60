@@ -242,7 +242,7 @@ namespace y60 {
                 if (_myFactoryMethod) {
                     return (*_myFactoryMethod)(theUsage);
                 } else {
-                    return asl::Ptr<VertexData<T> >(0);
+                    return asl::Ptr<VertexData<T> >();
                     //throw asl::Exception("No Data Factories added yet!", PLUS_FILE_LINE);
                 }
             }

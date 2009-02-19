@@ -153,7 +153,7 @@ namespace y60 {
         }
     
         virtual asl::Ptr<MovieDecoderBase> instance() const;
-        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
+        std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
 
         /**
          * Reads a frame.

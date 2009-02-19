@@ -43,7 +43,7 @@ EventFactory::createEvent(const DOMString & theType) const {
         return myPrototype->clone();
     }
     DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns 0"<<std::endl;)
-    return EventPtr(0);
+    return EventPtr();
 }
 
 void
@@ -58,7 +58,7 @@ EventFactory::findPrototype(const DOMString & theType) const {
     if (myPrototype != _myPrototypes.end()) {
         return myPrototype->second;
     }
-    return EventPtr(0);
+    return EventPtr();
 }
 
 void dom::registerStandardTypes(EventFactory & theFactory) {

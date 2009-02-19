@@ -109,16 +109,16 @@ namespace y60 {
     class Y60_IMAGE_EXPORT ImageLoader : public PLBmp {
     public:
         //! Creates an empty bitmap.
-        ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0));
+        ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr());
         //! Creates and loads a bitmap from a block.
         ImageLoader(asl::Ptr<asl::ReadableBlockHandle> theInputBlock, 
                     const std::string & theFileDescription="",
-                    const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0), 
+                    const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(), 
                     unsigned theDepth = 1);
         //! Creates and loads a bitmap, using an optional package manager to search for the file.
         ImageLoader(const std::string & theFilename, 
-               asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>(0), 
-               const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0), 
+               asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>(), 
+               const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(), 
                unsigned theDepth = 1);
 
         //! Destroys the bitmap.

@@ -703,7 +703,7 @@ dom::Node::getSchema() const {
     if (_mySchemaInfo) {
         return _mySchemaInfo->getSchema();
     }
-    return SchemaPtr(0);
+    return SchemaPtr();
 }
 
 void
@@ -859,7 +859,7 @@ dom::Node::childNodeByAttribute(const DOMString & theElementName,
             }
         }
     }
-    return dom::NodePtr(0);
+    return dom::NodePtr();
 }
 
 dom::NodePtr
@@ -886,7 +886,7 @@ dom::Node::childNodeByAttribute(const DOMString & theElementName,
             }
         }
     }
-    return dom::NodePtr(0);
+    return dom::NodePtr();
 }
 
 void
@@ -952,7 +952,7 @@ Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttrib
             }
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 NodePtr
@@ -973,7 +973,7 @@ Node::getChildElementById(const DOMString & theId, const DOMString & theIdAttrib
             }
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 NodePtr
@@ -1026,7 +1026,7 @@ AC_TRACE << "throwing OffsetNotFound";
             }
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
  
 const NodePtr
@@ -1172,12 +1172,12 @@ dom::Node::operator=(const Node & n) {
     _myName.resize(0);
     //_myParent = 0;
     //_mySelf = NodePtr(0);
-    _myIDRegistry = NodeIDRegistryPtr(0);
-    _myValue = ValuePtr(0);
+    _myIDRegistry = NodeIDRegistryPtr();
+    _myValue = ValuePtr();
     getChildren().resize(0);
     _myAttributes.resize(0);
-    _mySchemaInfo=SchemaInfoPtr(0);
-    _myFacade=FacadePtr(0);
+    _mySchemaInfo=SchemaInfoPtr();
+    _myFacade=FacadePtr();
     _myEventListeners=EventListenerMap();
     _myCapturingEventListeners=EventListenerMap();
     ::new(this) Node(n, _myParent);
@@ -1195,7 +1195,7 @@ dom::Node::cloneNode(CloneDepth depth, Node * theParent) const {
         //myResult->_myParent = theParent;
         return myResult;
     }
-    ValuePtr myCloneValue = _myValue ? _myValue->clone(0) : ValuePtr(0);
+    ValuePtr myCloneValue = _myValue ? _myValue->clone(0) : ValuePtr();
     NodePtr result(new Node(_myType,_myName,myCloneValue, theParent));
     result->_mySchemaInfo = _mySchemaInfo;
     //result->_myParent = theParent;
@@ -1437,10 +1437,10 @@ void Node::makeSchemaInfo(bool forceNew) {
 }
 
 Node::~Node() {
-   if (_myNameRegistry) {
+   if (!_myNameRegistry.expired()) {
         _myNameRegistry.lock()->unregisterNodeName(this);
-        _myNameRegistry = NodeIDRegistryPtr(0);
-    } 
+        _myNameRegistry = NodeIDRegistryPtr();
+    }
 }
 
 void
@@ -1585,12 +1585,12 @@ Node::checkSchemaForElement(const DOMString & theName, asl::AC_SIZE_TYPE thePars
     // first of all, don't try to create a SchemaInfo if our parent has none
     if (_myParent) {
         if (!_myParent->_mySchemaInfo) {
-            return NodePtr(0); // give up if no schema is present
+            return NodePtr(); // give up if no schema is present
         }
     }
     makeSchemaInfo(false);
     if (!_mySchemaInfo->_mySchema) {
-        return NodePtr(0); // give up if still no schema is present
+        return NodePtr(); // give up if still no schema is present
     }
 
     DB(AC_TRACE << "Node::checkSchemaForElement: theName = " << theName << endl;
@@ -1932,7 +1932,7 @@ NodePtr
 dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
     int myOldIndex = getChildren().findIndex(&(*theOldChild));
     if (myOldIndex < 0) {
-        return NodePtr(0);
+        return NodePtr();
     }
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
@@ -1941,7 +1941,7 @@ dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
             appendChild(theNewChild->childNode(i));
         }
         */
-        return NodePtr(0);
+        return NodePtr();
     }
     if (!allowedToHaveChild(theNewChild->nodeType())) {
         string errorMessage;
@@ -1971,7 +1971,7 @@ dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
 NodePtr
 dom::Node::appendChild(NodePtr theNewChild) {
     if ( ! theNewChild ) {
-       return NodePtr(0); 
+       return NodePtr(); 
     }
 
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
@@ -1990,7 +1990,7 @@ dom::Node::appendChild(NodePtr theNewChild) {
         for (std::vector<NodePtr>::size_type i = 0; i < myNewNodes.size(); ++i) {
             checkAndUpdateChildrenSchemaInfo(*myNewNodes[i], this);
         }
-        return NodePtr(0);
+        return NodePtr();
     }
     if (!allowedToHaveChild(theNewChild->nodeType())) {
         string errorMessage;
@@ -2017,7 +2017,7 @@ dom::Node::appendChild(NodePtr theNewChild) {
 int
 dom::Node::compareByDocumentOrder(const NodePtr theNode) const
 {
-    if( this == theNode.getNativePtr() ) {
+    if( this == theNode.get() ) {
         return 0;
     }
     if( getSavePosition() && theNode->getSavePosition() ) {
@@ -2031,7 +2031,7 @@ dom::Node::compareByDocumentOrder(const NodePtr theNode) const
     }
 
     const NodeParentList& lhsParents = findAncestors(this);
-    const NodeParentList& rhsParents = findAncestors(theNode.getNativePtr());
+    const NodeParentList& rhsParents = findAncestors(theNode.get());
 
     NodeParentList::const_reverse_iterator lhsIt = lhsParents.rbegin();
     NodeParentList::const_reverse_iterator rhsIt = rhsParents.rbegin();
@@ -2044,11 +2044,11 @@ dom::Node::compareByDocumentOrder(const NodePtr theNode) const
     }
 
     const dom::Node* const plhs = (lhsIt==lhsParents.rend()) ? this                   : *lhsIt;
-    const dom::Node* const prhs = (rhsIt==rhsParents.rend()) ? theNode.getNativePtr() : *rhsIt;
+    const dom::Node* const prhs = (rhsIt==rhsParents.rend()) ? theNode.get() : *rhsIt;
     const dom::Node* const commonParent = *(lhsIt-1);
 
     for( std::size_t idx=0; idx<commonParent->childNodesLength(); ++idx ) {
-        const dom::Node* const currentChild = commonParent->childNode(idx).getNativePtr();
+        const dom::Node* const currentChild = commonParent->childNode(idx).get();
         if( currentChild == plhs ) {
             return -1;
         }
@@ -2066,14 +2066,14 @@ NodePtr
 dom::Node::insertBefore(NodePtr theNewChild, NodePtr theRefChild) {
     int myRefIndex = getChildren().findIndex(&(*theRefChild));
     if (myRefIndex < 0) {
-        return NodePtr(0);
+        return NodePtr();
     }
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
         for (NodeList::size_type i = 0; i < theNewChild->childNodesLength();++i) {
             insertBefore(theNewChild->childNode(i), theRefChild);
         }
-        return NodePtr(0);
+        return NodePtr();
     }
     if (!allowedToHaveChild(theNewChild->nodeType())) {
         string errorMessage;
@@ -2226,7 +2226,7 @@ dom::Node::getAttributeDeclaration(const DOMString & theAttributeName) const {
     if (_mySchemaInfo && _mySchemaInfo->getSchema() && _mySchemaInfo->_myType) {
         return _mySchemaInfo->getSchema()->getAttributeDeclaration(_mySchemaInfo->_myType, theAttributeName);
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 int
@@ -2863,7 +2863,7 @@ dom::Node::nextSibling() {
             return _myParent->getChildren().nextSibling(this);
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 const dom::NodePtr
@@ -2875,7 +2875,7 @@ dom::Node::nextSibling() const {
             return _myParent->getChildren().nextSibling(this);
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 dom::NodePtr
@@ -2887,7 +2887,7 @@ dom::Node::previousSibling() {
             return _myParent->getChildren().previousSibling(this);
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 
 const dom::NodePtr
@@ -2899,7 +2899,7 @@ dom::Node::previousSibling() const {
             return _myParent->getChildren().previousSibling(this);
         }
     }
-    return NodePtr(0);
+    return NodePtr();
 }
 dom::NodePtr
 dom::Node::removeChild(dom::NodePtr theChild) {
@@ -3062,8 +3062,8 @@ Node::flushUnusedChildren() const {
         AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because nodeVersion() is " << nodeVersion(); 
         return false;
     }
-    if (self().getRefCount() !=1) {
-        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because refcount() is " << self().getRefCount(); 
+    if (self().use_count() !=1) {
+        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because refcount() is " << self().use_count(); 
         return false;
     }
     if (nodeType() == ATTRIBUTE_NODE) {
@@ -3088,9 +3088,9 @@ Node::flushUnusedChildren() const {
 
 void
 Node::unregisterName() {
-    if (_myNameRegistry) {
+    if (!_myNameRegistry.expired()) {
         _myNameRegistry.lock()->unregisterNodeName(this);
-        _myNameRegistry = NodeIDRegistryPtr(0);
+        _myNameRegistry = NodeIDRegistryPtr();
     }
 }
 

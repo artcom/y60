@@ -91,14 +91,14 @@ Ptr<LogMessageFormatter> createFormatter(const std::string theFormatterName, std
     }
     theTriedNames.push_back(VisualStudioLogMessageFormatter::name());
 
-    return Ptr<LogMessageFormatter>(0);
+    return Ptr<LogMessageFormatter>();
 }
 
 Ptr<LogMessageFormatter>
 createFormatter(const char * theFormatterNameVar, const char * theDefaultFormatterName, const char * theSinkName) {
     const char * myEnv = getenv(theFormatterNameVar);
     std::vector<std::string> myTriedNames;
-    Ptr<LogMessageFormatter> myFormatter(0);
+    Ptr<LogMessageFormatter> myFormatter;
     if (myEnv) {
         myFormatter = createFormatter(myEnv, myTriedNames);
     }

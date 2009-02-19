@@ -94,7 +94,7 @@ namespace xpath {
             const dom::NodeList& children = context.contextNode->childNodes();
             const std::size_t size = children.size();
             for( std::size_t idx=0; idx<size; ++idx ) {
-                const dom::Node* child = children.item(idx).getNativePtr();
+                const dom::Node* child = children.item(idx).get();
                 context.currentNodes.push_back(child);
             }
         }
@@ -104,7 +104,7 @@ namespace xpath {
             const dom::NodeList& attributes = context.contextNode->attributes();
             const std::size_t size = attributes.size();
             for( std::size_t idx=0; idx<size; ++idx ) {
-                const dom::Node* attribute = attributes.item(idx).getNativePtr();
+                const dom::Node* attribute = attributes.item(idx).get();
                 context.currentNodes.push_back(attribute);
             }
         }
@@ -114,7 +114,7 @@ namespace xpath {
             const dom::NodeList& children = context.contextNode->childNodes();
             const std::size_t size = children.size();
             for( std::size_t idx=0; idx<size; ++idx ) {
-                const dom::Node* child = children.item(idx).getNativePtr();
+                const dom::Node* child = children.item(idx).get();
                 context.currentNodes.push_back(child);
                 Context childcontext(child);
                 findChildNodesRecursivly(childcontext);
@@ -139,7 +139,7 @@ namespace xpath {
 
         inline void findFollowingSiblingNodes(Context& context)
         {
-            while( const dom::Node* const sibling = context.contextNode->nextSibling().getNativePtr() ) {
+            while( const dom::Node* const sibling = context.contextNode->nextSibling().get() ) {
                 context.currentNodes.push_back(sibling);
                 Context siblingcontext(sibling);
                 findChildNodesRecursivly(context);
@@ -164,7 +164,7 @@ namespace xpath {
 
         inline void findPrecedingSiblingNodes(Context& context)
         {
-            while( const dom::Node* const sibling = context.contextNode->previousSibling().getNativePtr() ) {
+            while( const dom::Node* const sibling = context.contextNode->previousSibling().get() ) {
                 context.currentNodes.push_back(sibling);
                 Context siblingcontext(sibling);
                 findChildNodesRecursivly(context);

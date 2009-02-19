@@ -172,7 +172,7 @@ namespace asl {
             if (theIndex >= 0 && theIndex < _myElements.size()) {
                 return _myElements[theIndex];
             }
-            return LineSegment3fPtr(0);
+            return LineSegment3fPtr();
         }
 
         unsigned getNumBezierSegments() const  {
@@ -183,7 +183,7 @@ namespace asl {
             if (theIndex >= 0 && theIndex < _myBezierSegments.size()) {
                 return _myBezierSegments[theIndex];
             }
-            return BSplinePtr(0);
+            return BSplinePtr();
         }
 
         /// Find point on path closest to position.

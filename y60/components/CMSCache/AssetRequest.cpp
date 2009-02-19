@@ -161,7 +161,7 @@ AssetRequest::onDone() {
         return;
     }
     if (_myOutputFile) {
-        _myOutputFile = asl::Ptr<ofstream>(0);
+        _myOutputFile = asl::Ptr<ofstream>();
         deleteFile(_myLocalFile);
         moveFile(_myPartialFile, _myLocalFile);
     }

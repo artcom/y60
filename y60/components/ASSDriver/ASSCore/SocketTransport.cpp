@@ -173,7 +173,7 @@ namespace y60 {
     void 
     SocketTransport::closeConnection() {
         _mySocket->close();
-        _mySocket = TCPClientSocketPtr(0);
+        _mySocket = TCPClientSocketPtr();
     }
 
 

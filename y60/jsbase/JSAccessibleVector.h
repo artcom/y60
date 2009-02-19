@@ -116,7 +116,7 @@ public:
         : Base(theVector, 0)
     {}
     JSAccessibleVector()
-        : Base(NativeValuePtr(0), 0)
+        : Base(NativeValuePtr(), 0)
     {}
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());

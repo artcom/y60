@@ -67,9 +67,9 @@ namespace y60 {
     DumbScale::DumbScale(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result"),
-        _mySourceRaster(0), 
+        _mySourceRaster(), 
         _myImageNodeVersion(0)
-    {   
+    {
     }
 
     void 

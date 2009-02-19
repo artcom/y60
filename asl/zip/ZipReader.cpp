@@ -123,7 +123,7 @@ ZipReader::getFile(const std::string & theFilePath) {
             return getFile(_myDirectory[i]);
         }
     }
-    return Ptr<ReadableBlockHandle>(0);
+    return Ptr<ReadableBlockHandle>();
 }
 
 Ptr<ReadableBlockHandle> 

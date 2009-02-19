@@ -163,7 +163,7 @@ namespace y60 {
             myNumFaceVertices = 4;
         } else {
             AC_ERROR << "Can't generate halfedges for other elements than triangles and quads";
-            return dom::NodePtr(0);
+            return dom::NodePtr();
         }
         dom::NodePtr myHalfEdgesNode = getNode()->appendChild(dom::Element(HALFEDGES_NODE_NAME));
 

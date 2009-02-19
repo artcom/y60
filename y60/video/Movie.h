@@ -109,12 +109,12 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN", Y60_VIDEO_EXPORT);
 
     /**
-     * @ingroup Y60video
-     * Facade for the dom movie node. A movie node is used to play a movie on
-     * a texture. A movie node has a decoder that is used to decode the video
-     * file given in the src attribute.
-     *
-     */
+    * @ingroup Y60video
+    * Facade for the dom movie node. A movie node is used to play a movie on
+    * a texture. A movie node has a decoder that is used to decode the video
+    * file given in the src attribute.
+    *
+    */
     class Y60_VIDEO_EXPORT Movie :
         public Image,
         public FrameCountTag::Plug,
@@ -129,103 +129,103 @@ namespace y60 {
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,
-		public FrameBlendFactorTag::Plug,
-		public FrameBlendingTag::Plug,
+        public FrameBlendFactorTag::Plug,
+        public FrameBlendingTag::Plug,
         public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
         public dom::DynamicAttributePlug<DecoderTag, Movie>
     {
-        public:
-			enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1,  THIRD_BUFFER = 2, MAX_BUFFER = 3};
+    public:
+        enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1,  THIRD_BUFFER = 2, MAX_BUFFER = 3};
 
-            Movie(dom::Node & theNode);
-            virtual ~Movie();
+        Movie(dom::Node & theNode);
+        virtual ~Movie();
 
-            IMPLEMENT_DYNAMIC_FACADE(Movie);
+        IMPLEMENT_DYNAMIC_FACADE(Movie);
 
-            /**
-             * reads the frame closest to theCurrentTime from the movie. Some
-             * decoders do not support random access on the movie, so non-
-             * increasing times may fail. Normal playback (increment theCurrentTime
-             * by 1/framerate always works).
-             *
-             * @param theCurrentTime time of the frame to retrieve
-             */
-            void readFrame();
-            void readFrame(double theCurrentTime, bool theIgnoreCurrentTime=false);
-            /**
-             * loads a movie from thePackageManager
-             * @param thePackageManager Package Manager to retrieve the movie from
-             * @see asl::PackageManager
-             */
-            virtual void load(asl::PackageManager & thePackageManager);
-            /**
-             * loads a movie from the file given in theTexturePath
-             * @param theTexturePath movie file to load
-             */
-            virtual void load(const std::string & theTexturePath);
-//            virtual void load(const std::string & theTexturePath = ".");
-            /**
-             * @retval true, if a reload of the movie is required
-             * (due to a change in the src attribute for example)
-             */
-            virtual bool reloadRequired();
+        /**
+        * reads the frame closest to theCurrentTime from the movie. Some
+        * decoders do not support random access on the movie, so non-
+        * increasing times may fail. Normal playback (increment theCurrentTime
+        * by 1/framerate always works).
+        *
+        * @param theCurrentTime time of the frame to retrieve
+        */
+        void readFrame();
+        void readFrame(double theCurrentTime, bool theIgnoreCurrentTime=false);
+        /**
+        * loads a movie from thePackageManager
+        * @param thePackageManager Package Manager to retrieve the movie from
+        * @see asl::PackageManager
+        */
+        virtual void load(asl::PackageManager & thePackageManager);
+        /**
+        * loads a movie from the file given in theTexturePath
+        * @param theTexturePath movie file to load
+        */
+        virtual void load(const std::string & theTexturePath);
+        //            virtual void load(const std::string & theTexturePath = ".");
+        /**
+        * @retval true, if a reload of the movie is required
+        * (due to a change in the src attribute for example)
+        */
+        virtual bool reloadRequired();
 
-            /**
-             * @ ensures that the movie has correct framecount
-             */
-            void ensureMovieFramecount();
-            
-            /**
-             * @return locally cached playmode. It is set in the dom setter and
-             * cached inside the object.
-             */
-            MoviePlayMode getPlayMode() const {
-                return _myPlayMode;
-            }
+        /**
+        * @ ensures that the movie has correct framecount
+        */
+        void ensureMovieFramecount();
 
-            bool getMovieTime(double & theTime) const;
-            bool getDecoderName(std::string & theName) const;
+        /**
+        * @return locally cached playmode. It is set in the dom setter and
+        * cached inside the object.
+        */
+        MoviePlayMode getPlayMode() const {
+            return _myPlayMode;
+        }
 
-            /**
-             * @add another raster to movie.
-             */
-            dom::ResizeableRasterPtr addRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth);
-        private:
-            Movie();
+        bool getMovieTime(double & theTime) const;
+        bool getDecoderName(std::string & theName) const;
 
-            // Overwrite the Image::load() method to avoid auto-loading mechanism
-            void load();
-            
-            void setup();
-            void stop();
-            void restart(double theCurrentTime);
-            void setPlayMode(MoviePlayMode thePlayMode);
+        /**
+        * @add another raster to movie.
+        */
+        dom::ResizeableRasterPtr addRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth);
+    private:
+        Movie();
 
-            double decodeFrame(double theTime, unsigned theFrame);
+        // Overwrite the Image::load() method to avoid auto-loading mechanism
+        void load();
 
-            double getTimeFromFrame(unsigned theFrame) const;
-            unsigned getFrameFromTime(double theTime);
-            void loadFile(const std::string & theSourceFile);
-            void loadStream(asl::Ptr<asl::ReadableStream> theSource,
-                            const std::string theName);
+        void setup();
+        void stop();
+        void restart(double theCurrentTime);
+        void setPlayMode(MoviePlayMode thePlayMode);
 
-            void postLoad();
+        double decodeFrame(double theTime, unsigned theFrame);
 
-            asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
+        double getTimeFromFrame(unsigned theFrame) const;
+        unsigned getFrameFromTime(double theTime);
+        void loadFile(const std::string & theSourceFile);
+        void loadStream(asl::Ptr<asl::ReadableStream> theSource,
+            const std::string theName);
 
-            asl::Ptr<MovieDecoderBase> _myDecoder;
-            std::string                _myLoadedFilename;
+        void postLoad();
 
-            MoviePlayMode         _myPlayMode;
-            unsigned                   _myLastDecodedFrame;
-            double                     _myLastCurrentTime;
-            unsigned                   _myCurrentLoopCount;
-            dom::ValuePtr _myStreamData;
+        asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
 
-			// Framemodulation member
-			MovieFrameBuffer           _myNextUsedBuffer;
-            unsigned                   _myFirstBufferFrame;
-            unsigned                   _mySecondBufferFrame;
+        asl::Ptr<MovieDecoderBase> _myDecoder;
+        std::string                _myLoadedFilename;
+
+        MoviePlayMode              _myPlayMode;
+        unsigned                   _myLastDecodedFrame;
+        double                     _myLastCurrentTime;
+        unsigned                   _myCurrentLoopCount;
+        dom::ValuePtr              _myStreamData;
+
+        // Framemodulation member
+        MovieFrameBuffer           _myNextUsedBuffer;
+        unsigned                   _myFirstBufferFrame;
+        unsigned                   _mySecondBufferFrame;
     };
 
     typedef asl::Ptr<Movie, dom::ThreadingModel> MoviePtr;

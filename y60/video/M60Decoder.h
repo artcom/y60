@@ -87,7 +87,7 @@ namespace y60 {
         public:
             M60Decoder();
             virtual ~M60Decoder();
-            std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
+            std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
  
             /**
              * loads a movie from the file given by theFilename

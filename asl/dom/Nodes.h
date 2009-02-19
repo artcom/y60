@@ -674,7 +674,7 @@ namespace dom {
             if (i<getChildren().size()) {
                 return getChildren().item(i);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         // using this wrapper instead of default argument to allow member function pointers
         const NodePtr childNode(const DOMString & name) const {
@@ -688,7 +688,7 @@ namespace dom {
             if (i<getChildren().size()) {
                 return getChildren().item(i);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         // using this wrapper instead of default argument to allow member function pointers
         NodePtr childNode(const DOMString & name) {
@@ -707,7 +707,7 @@ namespace dom {
             return _myParent;
         }
         NodeWeakPtr self() {
-            if (!_mySelf) {
+            if ( _mySelf.expired() ) {
                 if (_myParent) {
                     NodePtr myNode;
                     if (_myType == ATTRIBUTE_NODE) {
@@ -726,7 +726,7 @@ namespace dom {
             return _mySelf;
         }
         const NodeWeakPtr & self() const {
-            if (!_mySelf) {
+            if (_mySelf.expired()) {
                 const_cast<Node*>(this)->self();
             }
             return _mySelf;
@@ -745,25 +745,25 @@ namespace dom {
             if (getChildren().size()) {
                 return getChildren().item(0);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         const NodePtr firstChild() const {
             if (getChildren().size()) {
                 return getChildren().item(0);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         const NodePtr lastChild() const {
             if (getChildren().size()) {
                 return getChildren().item(getChildren().size()-1);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         NodePtr lastChild() {
             if (getChildren().size()) {
                 return getChildren().item(getChildren().size()-1);
             }
-            return NodePtr(0);
+            return NodePtr();
         }
         NodePtr removeChild(dom::NodePtr theChild);
         NodePtr replaceChild(NodePtr theNewChild, NodePtr theOldChild);
@@ -867,7 +867,7 @@ namespace dom {
             @see appendAttribute(NodePtr) for details on exceptions
         */
         NodePtr appendAttribute(const DOMString & name) {
-            return appendAttribute(NodePtr(new Node(ATTRIBUTE_NODE,name,dom::ValuePtr(0),this)));
+            return appendAttribute(NodePtr(new Node(ATTRIBUTE_NODE,name,dom::ValuePtr(),this)));
         }
 
         /// returns the number of attribute nodes in this node
@@ -903,7 +903,7 @@ namespace dom {
         const NodePtr getAttribute(const DOMString & name) const {
             NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
             if (i<_myAttributes.size()) return _myAttributes.item(i);
-            return NodePtr(0);
+            return NodePtr();
         }
 
         /** returns a pointer to the attribute node with this name
@@ -912,7 +912,7 @@ namespace dom {
         NodePtr getAttribute(const DOMString & name) {
             NodeList::size_type i = NamedNodeMap::findNthNodeNamed(name,0,_myAttributes);
             if (i<_myAttributes.size()) return _myAttributes.item(i);
-            return NodePtr(0);
+            return NodePtr();
         }
 
         /**
@@ -949,7 +949,7 @@ namespace dom {
             if (myAttribute) {
                 return myAttribute->nodeValueWrapperPtr();
             } else {
-                return ValuePtr(0);
+                return ValuePtr();
             }
         }
         /// returns a pointer typed value of the attribute node value with this name
@@ -958,7 +958,7 @@ namespace dom {
             if (myAttribute) {
                 return myAttribute->nodeValueWrapperPtr();
             } else {
-                return ValuePtr(0);
+                return ValuePtr();
             }
         }
 
@@ -1028,7 +1028,7 @@ namespace dom {
                debinarize(theDictionaries, theSource, thePos + asl::AC_SIZE_TYPE(myOffset));  
                return self().lock();
             }
-            return NodePtr(0); 
+            return NodePtr(); 
         }
           
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const;
@@ -1078,14 +1078,14 @@ namespace dom {
             if (_mySchemaInfo) {
                 return _mySchemaInfo->_myFacadeFactory;
             } else {
-                return FacadeFactoryPtr(0);
+                return FacadeFactoryPtr();
             }
         }
         const FacadeFactoryPtr getFacadeFactory() const {
             if (_mySchemaInfo) {
                 return _mySchemaInfo->_myFacadeFactory;
             } else {
-                return FacadeFactoryPtr(0);
+                return FacadeFactoryPtr();
             }
         }
 
@@ -1297,7 +1297,7 @@ Dependent on node type allowed children are:<p>
         void ensureValue() const;
         void assignValue(const asl::ReadableBlock & theValue, bool theNotifyChangedFlag = true);
         void trashValue() {
-            _myValue = ValuePtr(0);
+            _myValue = ValuePtr();
         }
         bool checkMyValueTypeFits() const;
         bool checkValueTypeFits(const ValueBase & theValue) const;

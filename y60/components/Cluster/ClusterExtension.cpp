@@ -172,7 +172,7 @@ protected:
         AcceptorPtr myAcceptor = AcceptorPtr(new asl::MessageAcceptor<POLICY>(myLocalServerEndPoint, asl::MessageServer<POLICY>::create));
         if (!myAcceptor->start()) {
             cerr <<"#ERROR: ClusterExtension::startServer(): could not start server."<<endl;
-            return AcceptorPtr(0);
+            return AcceptorPtr();
         }
         return myAcceptor;
     }
@@ -413,7 +413,7 @@ ClusterExtension::requestUpdate(AbstractRenderWindow * theWindow, ClientPtr & th
         catch (asl::Exception & ex) {
             cerr << "#ERROR: ClusterExtension::requestUpdate: send failed:" << ex << endl;
             msleep(100);
-            theClient = ClientPtr(0);
+            theClient = ClientPtr();
             theLastVersion = 0;
         }
     } while (!delivered);
@@ -500,7 +500,7 @@ ClusterExtension::updateRenderer(jslib::AbstractRenderWindow * theWindow,
             //printChangedNodes(mySceneElement, thePreviousDocumentVersion, 0);
 
             dom::NodePtr myWorldListElement = mySceneElement->childNode(y60::WORLD_LIST_NAME);
-            dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(y60::WORLD_NODE_NAME) : dom::NodePtr(0);
+            dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(y60::WORLD_NODE_NAME) : dom::NodePtr();
             dom::NodePtr myImagesElement = mySceneElement->childNode(y60::IMAGE_LIST_NAME);
             dom::NodePtr myShapesElement = mySceneElement->childNode(y60::SHAPE_LIST_NAME);
             dom::NodePtr myCanvasesElement = mySceneElement->childNode(y60::CANVAS_LIST_NAME);

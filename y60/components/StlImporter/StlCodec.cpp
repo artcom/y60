@@ -81,8 +81,8 @@ namespace y60 {
     }
 
     StlCodec::~StlCodec() {
-        _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >(0);
-        _myBigStream = asl::Ptr<WriteableArrangedFile<X86ByteOrder> >(0);
+        _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >();
+        _myBigStream = asl::Ptr<WriteableArrangedFile<X86ByteOrder> >();
         AC_DEBUG << "StlCodec destroyed.";
     }
 
@@ -273,8 +273,8 @@ namespace y60 {
 
     void
     StlCodec::close() {
-        _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >(0);
-        _myBigStream = asl::Ptr<WriteableArrangedFile<X86ByteOrder> >(0);
+        _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >();
+        _myBigStream = asl::Ptr<WriteableArrangedFile<X86ByteOrder> >();
     }
 }
 

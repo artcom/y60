@@ -99,7 +99,7 @@ class MessageServer : public ConduitServer<POLICY> {
         MessagePtr popIncomingMessage() {
             if (_myInputQueue.empty()) {
                 DB(AC_TRACE << "MessageServer nothing to pop" << endl);
-                return MessagePtr(0);
+                return MessagePtr();
             }
 
             MessagePtr myNextMessage = _myInputQueue.pop();

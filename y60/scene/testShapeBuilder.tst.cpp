@@ -429,7 +429,7 @@ class ShapeBuilderUnitTest : public UnitTest {
                     return myChild;
                 }
             }
-            return dom::NodePtr(0);
+            return dom::NodePtr();
         }
         dom::NodePtr getIndexDataNode(dom::NodePtr theParentNode, std::string theName) {
             for (unsigned i = 0; i < theParentNode->childNodesLength(); ++i) {
@@ -438,7 +438,7 @@ class ShapeBuilderUnitTest : public UnitTest {
                     return myChild;
                 }
             }
-            return dom::NodePtr(0);
+            return dom::NodePtr();
         }
 };
 

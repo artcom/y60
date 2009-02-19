@@ -84,15 +84,15 @@ namespace asl {
 namespace y60 {
 
     /**
-     * Exception
-     */
+    * Exception
+    */
     DEFINE_EXCEPTION(ImageException, asl::Exception);
     DEFINE_EXCEPTION(RasterValueDoesNotExist, ImageException);
 
     /**
-     * @ingroup y60image
-     * Facade for an image node in the dom.
-     */
+    * @ingroup y60image
+    * Facade for an image node in the dom.
+    */
     class Y60_IMAGE_EXPORT Image :
         public dom::Facade,
         public IdTag::Plug,
@@ -111,143 +111,143 @@ namespace y60 {
         public dom::FacadeAttributePlug<ImageHeightTag>,
         public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
-        public:
-            static bool allowInlineFlag;
+    public:
+        static bool allowInlineFlag;
 
-            Image(dom::Node & theNode);
-            IMPLEMENT_FACADE(Image);
+        Image(dom::Node & theNode);
+        IMPLEMENT_FACADE(Image);
 
-            virtual ~Image();
+        virtual ~Image();
 
-            void unbind();
+        void unbind();
 
-            virtual void load();
+        virtual void load();
 
-            /**
-             * Creates a new empty raster with the given properties
-             */
-            dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
-                                                  unsigned theDepth,
-                                                  PixelEncoding theEncoding); 
+        /**
+        * Creates a new empty raster with the given properties
+        */
+        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
+            unsigned theDepth,
+            PixelEncoding theEncoding); 
 
-            /**
-             * Creates a new raster with the given properties and pixels
-             */
-            dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
-                                                  unsigned theDepth,
-                                                  PixelEncoding theEncoding,
-                                                  const asl::ReadableBlock & thePixels); 
+        /**
+        * Creates a new raster with the given properties and pixels
+        */
+        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
+            unsigned theDepth,
+            PixelEncoding theEncoding,
+            const asl::ReadableBlock & thePixels); 
 
-            void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
-                           const asl::Vector2i & theTargetPos,
-                           const asl::Box2i * theSourceRect = 0);
+        void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
+            const asl::Vector2i & theTargetPos,
+            const asl::Box2i * theSourceRect = 0);
 
-            // Returns the pixel encoding of the raster image 
-            PixelEncoding getRasterEncoding() const;
+        // Returns the pixel encoding of the raster image 
+        PixelEncoding getRasterEncoding() const;
 
-            unsigned getMemUsed() const {
-                if (getRasterPtr()) {
-                    return getRasterPtr()->pixels().size();
+        unsigned getMemUsed() const {
+            if (getRasterPtr()) {
+                return getRasterPtr()->pixels().size();
+            }
+            return 0;
+        }
+
+        /** Saves the image to disk (png, tiff, or jpeg).
+        */
+        void saveToFile(const std::string & theImagePath,
+            const VectorOfString & theFilter = VectorOfString(),
+            const VectorOfVectorOfFloat & theFilterParams = VectorOfVectorOfFloat());
+
+        /** Apply filter to the image. 
+        */
+        void applyFilter(const std::string & theFilter, 
+            const VectorOfFloat & theFilterParam);
+
+        /// Get the node version number.
+        unsigned long long getValueVersion(unsigned theChildNodeNum = 0) const {
+            dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
+            if (myValueNode) {
+                return myValueNode->nodeVersion();
+            }
+            return 0;
+        }
+
+        dom::NodePtr getRasterValueNode(unsigned theChildNodeNum = 0) const {
+            if (getNode().hasChildNodes() ) {
+                dom::NodePtr myValueElement = getNode().childNode(theChildNodeNum);
+                if (myValueElement) {
+                    return myValueElement->firstChild();
                 }
-                return 0;
             }
+            return dom::NodePtr();
+        }
 
-            /** Saves the image to disk (png, tiff, or jpeg).
-             */
-            void saveToFile(const std::string & theImagePath,
-                    const VectorOfString & theFilter = VectorOfString(),
-                    const VectorOfVectorOfFloat & theFilterParams = VectorOfVectorOfFloat());
+        const dom::ValuePtr getRasterValue(unsigned theChildNodeNum = 0) const {
+            dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
+            if (myValueNode) {
+                dom::ValuePtr myValue = myValueNode->nodeValueWrapperPtr();
+                if (myValue->isDirty()) {
+                    // Trigger raster reload
+                    myValue->accessReadableBlock();
 
-            /** Apply filter to the image. 
-             */
-            void applyFilter(const std::string & theFilter, 
-                             const VectorOfFloat & theFilterParam);
-
-            /// Get the node version number.
-            unsigned long long getValueVersion(unsigned theChildNodeNum = 0) const {
-                dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
-                if (myValueNode) {
-                    return myValueNode->nodeVersion();
+                    // Get node again, because reload might have changed the raster
+                    // node in dom
+                    myValueNode = getRasterValueNode();
+                    if (myValueNode) {
+                        return myValueNode->nodeValueWrapperPtr();
+                    } 
+                } else {
+                    return myValue;
                 }
-                return 0;
             }
+            return dom::ValuePtr();
+        }
 
-            dom::NodePtr getRasterValueNode(unsigned theChildNodeNum = 0) const {
-				if (getNode().hasChildNodes() ) {
-					dom::NodePtr myValueElement = getNode().childNode(theChildNodeNum);
-					if (myValueElement) {
-						return myValueElement->firstChild();
-					}
-				}
-                return dom::NodePtr(0);
-            }
+        dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) {
+            return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
+        }
 
-            const dom::ValuePtr getRasterValue(unsigned theChildNodeNum = 0) const {
-                dom::NodePtr myValueNode = getRasterValueNode(theChildNodeNum);
-                if (myValueNode) {
-                    dom::ValuePtr myValue = myValueNode->nodeValueWrapperPtr();
-                    if (myValue->isDirty()) {
-                        // Trigger raster reload
-                        myValue->accessReadableBlock();
+        const dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) const {
+            return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
+        }
 
-                        // Get node again, because reload might have changed the raster
-                        // node in dom
-                        myValueNode = getRasterValueNode();
-                        if (myValueNode) {
-                            return myValueNode->nodeValueWrapperPtr();
-                        } 
-                    } else {
-                        return myValue;
-                    }
-                }
-                return dom::ValuePtr(0);
-            }
+        virtual void registerDependenciesRegistrators();
 
-            dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) {
-                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
-            }
+        void preload();
 
-            const dom::ResizeableRasterPtr getRasterPtr(unsigned theChildNodeNum = 0) const {
-                return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue(theChildNodeNum));
-            }
+    private:
+        Image();
 
-            virtual void registerDependenciesRegistrators();
+        void registerDependenciesForRasterValueUpdate();
+        void registerDependenciesForImageWidthUpdate();
+        void registerDependenciesForImageHeightUpdate();
 
-            void preload();
+        void unregisterRasterValue();
 
-        private:
-            Image();
+        void calculateWidth();
+        void calculateHeight();
 
-            void registerDependenciesForRasterValueUpdate();
-            void registerDependenciesForImageWidthUpdate();
-            void registerDependenciesForImageHeightUpdate();
+        dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
+            PixelEncoding theEncoding, unsigned theDepth);
 
-            void unregisterRasterValue();
+        void convertToPLBmp(PLAnyBmp & theBitmap);
+        void convertFromPLBmp(PLAnyBmp & theBitmap);
 
-            void calculateWidth();
-            void calculateHeight();
-
-            dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
-                PixelEncoding theEncoding, unsigned theDepth);
-
-            void convertToPLBmp(PLAnyBmp & theBitmap);
-            void convertFromPLBmp(PLAnyBmp & theBitmap);
-
-            asl::Ptr<asl::PackageManager> _myPackageManager;
+        asl::Ptr<asl::PackageManager> _myPackageManager;
     };
 
     typedef asl::Ptr<Image, dom::ThreadingModel> ImagePtr;
     typedef asl::WeakPtr<Image, dom::ThreadingModel> ImageWeakPtr;
 
     inline
-    ImageFilter lookupFilter(TextureUsage theUsage) {
-        switch (theUsage) {
+        ImageFilter lookupFilter(TextureUsage theUsage) {
+            switch (theUsage) {
             case BUMP:
                 return HEIGHT_TO_NORMALMAP;
             default:
                 break;
-        }
-        return NO_FILTER; // avoid gcc4.0 warning
+            }
+            return NO_FILTER; // avoid gcc4.0 warning
     }
 }
 

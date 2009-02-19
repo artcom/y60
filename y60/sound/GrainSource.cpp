@@ -126,7 +126,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, 
 		    	 std::min(_myOverlapBuffer->getNumFrames(),myNumFrames));
     // save remaining sample data to tmp buffer
-    AudioBufferPtr myTmpBuffer = AudioBufferPtr(0);
+    AudioBufferPtr myTmpBuffer = AudioBufferPtr();
     if (myNumFrames < _myOverlapBuffer->getNumFrames()) {
 	AC_TRACE << "GrainSource::deliverData(): creating temp buffer";
         myTmpBuffer = AudioBufferPtr(_myOverlapBuffer->partialClone(myNumFrames, _myOverlapBuffer->getNumFrames()-1));

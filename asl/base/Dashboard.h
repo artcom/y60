@@ -280,7 +280,7 @@ namespace asl {
 
     class Timer {
         public:
-            Timer(TimerPtr theParent=TimerPtr(0),unsigned int theGroup = 1)
+            Timer(TimerPtr theParent=TimerPtr(),unsigned int theGroup = 1)
                 : _myParent(theParent), _myGroup(theGroup) {
                 reset();
             };
@@ -291,7 +291,7 @@ namespace asl {
                 _myMinTime(theTimer._myMinTime),
                 _myMaxTime(theTimer._myMaxTime),
                 _myParent(theTimer._myParent),
-				_myGroup(theTimer._myGroup),
+                _myGroup(theTimer._myGroup),
                 _myCounter(theTimer._myCounter),
                 _isRunning(false)
             {
@@ -371,7 +371,7 @@ namespace asl {
 
 
         private:
-			asl::NanoTime	_myElapsed;
+            asl::NanoTime	_myElapsed;
             asl::NanoTime   _myStartTime;
             asl::NanoTime   _myMinTime;
             asl::NanoTime   _myMaxTime;
@@ -383,46 +383,46 @@ namespace asl {
     };
 
     class ASL_BASE_EXPORT Dashboard : public Singleton<Dashboard> {
-        public:
-            Dashboard() : _myLastFrameRateTime(0), _myFrameRate(0) {}
-            TimerPtr getTimer(const std::string & theName);
-            CounterPtr getCounter(const std::string & theName);
-            unsigned long getCounterValue(const std::string & theName);
-            void printTimers(Table & theTable, TimerPtr theParent = TimerPtr(0), const std::string & theIndent="");
-            std::ostream & print(std::ostream & os);
+    public:
+        Dashboard() : _myLastFrameRateTime(0), _myFrameRate(0) {}
+        TimerPtr getTimer(const std::string & theName);
+        CounterPtr getCounter(const std::string & theName);
+        unsigned long getCounterValue(const std::string & theName);
+        void printTimers(Table & theTable, TimerPtr theParent = TimerPtr(), const std::string & theIndent="");
+        std::ostream & print(std::ostream & os);
 
-            // reset all timers/counter with matching reset group ids
-            // calling with theGroup = 0 resets all timers/counters
-            // regardless of object group id
-			void reset(unsigned int theGroup = 1);
-            void cycle(unsigned int theGroup = 1, unsigned long theIncrement=1);
-            double getFrameRate();
-            TimerPtr findParent();
-        private:
-			std::map<std::string,TimerPtr> _myTimers;
-			std::map<std::string,CounterPtr> _myCounters;
-			std::map<unsigned long,Counter> _myGroupCounters;
-			std::map<std::string,Timer> _myCompleteCycleTimers;
-			std::map<std::string,Counter> _myCompleteCycleCounters;
-			std::vector<std::pair<std::string, TimerPtr> > _mySortedTimers;
+        // reset all timers/counter with matching reset group ids
+        // calling with theGroup = 0 resets all timers/counters
+        // regardless of object group id
+        void reset(unsigned int theGroup = 1);
+        void cycle(unsigned int theGroup = 1, unsigned long theIncrement=1);
+        double getFrameRate();
+        TimerPtr findParent();
+    private:
+        std::map<std::string,TimerPtr> _myTimers;
+        std::map<std::string,CounterPtr> _myCounters;
+        std::map<unsigned long,Counter> _myGroupCounters;
+        std::map<std::string,Timer> _myCompleteCycleTimers;
+        std::map<std::string,Counter> _myCompleteCycleCounters;
+        std::vector<std::pair<std::string, TimerPtr> > _mySortedTimers;
 
-            // All this for calculating the current framerate
-			std::deque<double> _myCycleTimes;
-            double _myLastFrameRateTime;
-            double _myFrameRate;
+        // All this for calculating the current framerate
+        std::deque<double> _myCycleTimes;
+        double _myLastFrameRateTime;
+        double _myFrameRate;
     };
 
     class ScopeTimer {
-	public:
-		ScopeTimer(TimerPtr theTimer) : _myTimer(theTimer) {
-			_myTimer->start();
-		}
-		~ScopeTimer() {
-			_myTimer->stop();
-		}
-	private:
-		TimerPtr _myTimer;
-	};
+    public:
+        ScopeTimer(TimerPtr theTimer) : _myTimer(theTimer) {
+            _myTimer->start();
+        }
+        ~ScopeTimer() {
+            _myTimer->stop();
+        }
+    private:
+        TimerPtr _myTimer;
+    };
 
     ASL_BASE_EXPORT extern Dashboard & getDashboard();
     inline TimerPtr getDashboardTimer(const std::string theName) {

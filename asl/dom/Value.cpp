@@ -24,12 +24,12 @@ using namespace dom;
 using namespace asl;
 
 namespace dom {
-asl::Unsigned32 dom::UniqueId::_myCounter(0);
+    asl::Unsigned32 dom::UniqueId::_myCounter(0);
 
-std::ostream & operator<<(std::ostream& os, const UniqueId & uid) {
-    os << uid._myCount << "@" << uid._ptrValue;
-    return os;
-}
+    std::ostream & operator<<(std::ostream& os, const UniqueId & uid) {
+        os << uid._myCount << "@" << uid._ptrValue;
+        return os;
+    }
 }
 void
 StringValue::bumpVersion() {
@@ -128,7 +128,7 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
         return myEntry->second->self().lock();
     }
 #endif
-    return NodePtr(0);
+    return NodePtr();
 }
 
 NodePtr
@@ -147,7 +147,7 @@ NodeIDRegistry::getElementById(const DOMString & theId, const DOMString & theIdA
         return myEntry->second->self().lock();
     }
 #endif
-    return NodePtr(0);
+    return NodePtr();
 }
 
 NodeOffsetCatalog &
@@ -176,20 +176,20 @@ NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
     const NodeIDRegistry & theRegistry = *theRootNode.getIDRegistry();
 #ifndef USE_SINGLE_ID_ATTRIB
     for (NodeIDRegistry::IDMaps::const_iterator it = theRegistry._myIDMaps.begin();
-            it != theRegistry._myIDMaps.end(); ++it) {
-        _myIDMaps[it->first] = IDMap();
-        IDMap & myCatalog =_myIDMaps[it->first]; 
-        for (NodeIDRegistry::IDMap::const_iterator mit = it->second.begin();
+        it != theRegistry._myIDMaps.end(); ++it) {
+            _myIDMaps[it->first] = IDMap();
+            IDMap & myCatalog =_myIDMaps[it->first]; 
+            for (NodeIDRegistry::IDMap::const_iterator mit = it->second.begin();
                 mit != it->second.end(); ++mit) 
-        {
-            myCatalog[mit->first] = mit->second->getSavePosition();
-        }
+            {
+                myCatalog[mit->first] = mit->second->getSavePosition();
+            }
     }
 #else
-        for (NodeIDRegistry::IDMap::const_iterator mit = theRegistry._myIDMap.begin(); mit != theRegistry._myIDMap.end(); ++mit) 
-        {
-            _myIDMap[mit->first] = mit->second->getSavePosition();
-        }
+    for (NodeIDRegistry::IDMap::const_iterator mit = theRegistry._myIDMap.begin(); mit != theRegistry._myIDMap.end(); ++mit) 
+    {
+        _myIDMap[mit->first] = mit->second->getSavePosition();
+    }
 #endif
     theRootNode.collectOffsets(*this);
 }
@@ -204,7 +204,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
         theDest.appendCountedString(it->first);
         theDest.appendUnsigned(it->second.size());
         for (IDMap::const_iterator mit = it->second.begin();
-                mit != it->second.end(); ++mit) 
+            mit != it->second.end(); ++mit) 
         {
             theDest.appendCountedString(mit->first);
             theDest.appendUnsigned(mit->second);
@@ -213,7 +213,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
 #else
     theDest.appendUnsigned(_myIDMap.size());
     for (IDMap::const_iterator mit = _myIDMap.begin();
-         mit != _myIDMap.end(); ++mit) 
+        mit != _myIDMap.end(); ++mit) 
     {
         theDest.appendCountedString(mit->first);
         theDest.appendUnsigned(mit->second);
@@ -232,7 +232,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
     }
 #endif
     theDest.appendUnsigned32(static_cast<asl::Unsigned32>(CatalogEndMagic));
- }
+}
 
 asl::AC_SIZE_TYPE
 NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
@@ -283,18 +283,18 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
         }
     }
 #else
-        asl::Unsigned64 myCatalogSize;
-        thePos = theSource.readUnsigned(myCatalogSize, thePos);
-        for (asl::Unsigned64 j = 0; j < myCatalogSize; ++j) {
-            DOMString myName;
-            thePos = theSource.readCountedString(myName, thePos);
-            if (myName.size() == 0) {
-                throw FormatCorrupted("empty catalog entry key",PLUS_FILE_LINE);
-            }
-            asl::Unsigned64 myOffset;
-            thePos = theSource.readUnsigned(myOffset, thePos);
-            _myIDMap[myName] = myOffset;
+    asl::Unsigned64 myCatalogSize;
+    thePos = theSource.readUnsigned(myCatalogSize, thePos);
+    for (asl::Unsigned64 j = 0; j < myCatalogSize; ++j) {
+        DOMString myName;
+        thePos = theSource.readCountedString(myName, thePos);
+        if (myName.size() == 0) {
+            throw FormatCorrupted("empty catalog entry key",PLUS_FILE_LINE);
         }
+        asl::Unsigned64 myOffset;
+        thePos = theSource.readUnsigned(myOffset, thePos);
+        _myIDMap[myName] = myOffset;
+    }
 #endif
     asl::Unsigned32 myUIDCatalogMagic = 0;
     thePos = theSource.readUnsigned32(myUIDCatalogMagic, thePos);
@@ -354,7 +354,7 @@ IDValue::update() const {
         if (_myOldValue != myCurrentValue) {
             unregisterID();
             registerID(myCurrentValue);
-       }
+        }
     }
 }
 
@@ -373,7 +373,7 @@ IDValue::reparent() const {
 
 void
 IDValue::setNodePtr(Node * theNode) {
-    if (_myRegistry && getNodePtr() != theNode) {
+    if (!_myRegistry.expired() && getNodePtr() != theNode) {
         unregisterID();
     }
     StringValue::setNodePtr(theNode);
@@ -400,13 +400,13 @@ IDValue::registerID(const DOMString & theCurrentValue) const {
 
 void
 IDValue::unregisterID() const {
-    if (_myRegistry && _myOldValue.size()) {
+    if (!_myRegistry.expired() && _myOldValue.size()) {
         Node * myNode = const_cast<IDValue*>(this)->getNodePtr();
         DB(AC_TRACE << "IDValue::unregister(): unregisterID node="<<(void*)myNode<<","<<myNode->nodeName()<<"='"<<_myOldValue<<"'"<<endl);
         _myRegistry.lock()->unregisterID(myNode->nodeName(), _myOldValue);
         _myOldValue.resize(0);
     }
-    _myRegistry = NodeIDRegistryPtr(0);
+    _myRegistry = NodeIDRegistryPtr();
 }
 
 IDValue::~IDValue() {
@@ -489,7 +489,7 @@ IDRefValue::update() const {
         if (_myOldValue != myCurrentValue) {
             unregisterIDRef();
             registerIDRef(myCurrentValue);
-       }
+        }
     }
 }
 
@@ -509,7 +509,7 @@ IDRefValue::reparent() const {
 // TODO: put in common base class of IDValue; duplicate code
 void
 IDRefValue::setNodePtr(Node * theNode) {
-    if (_myRegistry && getNodePtr() != theNode) {
+    if (!_myRegistry.expired() && getNodePtr() != theNode) {
         unregisterIDRef();
     }
     StringValue::setNodePtr(theNode);
@@ -534,7 +534,7 @@ IDRefValue::registerIDRef(const DOMString & theCurrentValue) const {
         Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
         if (myNode) {
             AC_DEBUG << "IDRefValue::registerIDRef(): could not register empty IDRef, attr= '"<<myNode->nodeName()
-                       <<"', element="<< (myNode->parentNode() ? myNode->parentNode()->nodeName() : std::string("Unknown-No Parent")) <<endl;
+                <<"', element="<< (myNode->parentNode() ? myNode->parentNode()->nodeName() : std::string("Unknown-No Parent")) <<endl;
         }else {
             AC_DEBUG << "IDRefValue::registerIDRef(): could not register IDRef, empty id and no node associated with value"<<endl;
         }
@@ -545,13 +545,13 @@ IDRefValue::registerIDRef(const DOMString & theCurrentValue) const {
 void
 IDRefValue::unregisterIDRef() const {
     Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
-    if (myNode && myNode->parentNode() && _myRegistry && _myOldValue.size()) {
+    if (myNode && myNode->parentNode() && !_myRegistry.expired() && _myOldValue.size()) {
         Node * myNode = const_cast<IDRefValue*>(this)->getNodePtr();
         DB(AC_TRACE << "IDRefValue::unregister(): unregisterIDRef node="<<(void*)myNode<<","<<myNode->nodeName()<<"='"<<_myOldValue<<"'"<<endl);
         _myRegistry.lock()->unregisterIDRef(myNode->nodeName(), _myOldValue, &(*(myNode->parentNode())));
         _myOldValue.resize(0);
     }
-    _myRegistry = NodeIDRefRegistryPtr(0);
+    _myRegistry = NodeIDRefRegistryPtr();
 }
 
 IDRefValue::~IDRefValue() {
@@ -567,7 +567,7 @@ IDRefValue::getReferencedElement() const {
         return myNode->getElementById(getString(), myNode->nodeName());
     }
     AC_WARNING << "IDRefValue::getReferencedElement: Value is not attached to a node.";
-    return NodePtr(0);
+    return NodePtr();
 }
 
 
@@ -576,100 +576,100 @@ ValueFactory::ValueFactory() {
 
 ValuePtr
 ValueFactory::createValue(const DOMString & theType, Node * theNode) const {
-	ValuePtr myPrototype = findPrototype(theType);
-	if (myPrototype) {
-		DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"')"<<" returns value"<<std::endl;)
-		ValuePtr myValue = myPrototype->clone(theNode);
+    ValuePtr myPrototype = findPrototype(theType);
+    if (myPrototype) {
+        DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"')"<<" returns value"<<std::endl;)
+            ValuePtr myValue = myPrototype->clone(theNode);
         myValue->setSelf(myValue);
         return myValue;
-	}
-	DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"')"<<" returns 0"<<std::endl;)
-	return ValuePtr(0);
+    }
+    DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"')"<<" returns 0"<<std::endl;)
+        return ValuePtr();
 }
 
 ValuePtr
 ValueFactory::createValue(const DOMString & theType, const DOMString & theValue, Node * theNode) const {
-	ValuePtr myPrototype = findPrototype(theType);
-	if (myPrototype) {
-		DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(String Value))"<<" returns value"<<std::endl;)
-		ValuePtr myValue = myPrototype->create(theValue, theNode);
+    ValuePtr myPrototype = findPrototype(theType);
+    if (myPrototype) {
+        DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(String Value))"<<" returns value"<<std::endl;)
+            ValuePtr myValue = myPrototype->create(theValue, theNode);
         myValue->setSelf(myValue);
         return myValue;
-	}
-	DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(String Value))"<<" returns 0"<<std::endl;)
-	return ValuePtr(0);
+    }
+    DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(String Value))"<<" returns 0"<<std::endl;)
+        return ValuePtr();
 }
 
 ValuePtr
 ValueFactory::createValue(const DOMString & theType, const asl::ReadableBlock & theValue, Node * theNode) const {
-	ValuePtr myPrototype = findPrototype(theType);
-	if (myPrototype) {
-		DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(Block Value))"<<" returns value"<<std::endl;)
-		ValuePtr myValue = myPrototype->create(theValue, theNode);
+    ValuePtr myPrototype = findPrototype(theType);
+    if (myPrototype) {
+        DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(Block Value))"<<" returns value"<<std::endl;)
+            ValuePtr myValue = myPrototype->create(theValue, theNode);
         myValue->setSelf(myValue);
         return myValue;
-	}
-	DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(Block Value))"<<" returns 0"<<std::endl;)
-	return ValuePtr(0);
+    }
+    DB(AC_TRACE << "ValueFactory::createValue('"<<theType<<"',(Block Value))"<<" returns 0"<<std::endl;)
+        return ValuePtr();
 }
 
 void
 ValueFactory::registerPrototype(const DOMString & theType, ValuePtr thePrototype) {
-	DB(AC_TRACE << "ValueFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
-	_myPrototypes[theType] = thePrototype->clone(0);
+    DB(AC_TRACE << "ValueFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
+        _myPrototypes[theType] = thePrototype->clone(0);
 }
 
 const ValuePtr
 ValueFactory::findPrototype(const DOMString & theType) const {
-	ProtoMap::const_iterator myPrototype = _myPrototypes.find(theType);
-	if (myPrototype != _myPrototypes.end()) {
-		return myPrototype->second;
-	}
-	return ValuePtr(0);
+    ProtoMap::const_iterator myPrototype = _myPrototypes.find(theType);
+    if (myPrototype != _myPrototypes.end()) {
+        return myPrototype->second;
+    }
+    return ValuePtr();
 }
 void
 ValueFactory::dump() const {
-	AC_PRINT << "$$$ Begin of Factory dump:" << std::endl;
-	for (ProtoMap::const_iterator it = _myPrototypes.begin(); it!=_myPrototypes.end();++it) {
-		AC_PRINT << it->first << " ";
-	}
-	AC_PRINT << "$$$ End of Factory dump:" << std::endl;
+    AC_PRINT << "$$$ Begin of Factory dump:" << std::endl;
+    for (ProtoMap::const_iterator it = _myPrototypes.begin(); it!=_myPrototypes.end();++it) {
+        AC_PRINT << it->first << " ";
+    }
+    AC_PRINT << "$$$ End of Factory dump:" << std::endl;
 }
 
 
 void dom::registerStandardTypes(ValueFactory & theFactory) {
-	theFactory.registerPrototype("boolean", ValuePtr(new SimpleValue<bool>(false, 0)));
+    theFactory.registerPrototype("boolean", ValuePtr(new SimpleValue<bool>(false, 0)));
 
-	theFactory.registerPrototype("float", ValuePtr(new SimpleValue<float>(0.0, 0)));
-	theFactory.registerPrototype("double", ValuePtr(new SimpleValue<double>(0.0, 0)));
+    theFactory.registerPrototype("float", ValuePtr(new SimpleValue<float>(0.0, 0)));
+    theFactory.registerPrototype("double", ValuePtr(new SimpleValue<double>(0.0, 0)));
 
-	theFactory.registerPrototype("decimal", ValuePtr(new SimpleValue<double>(0, 0))); // TODO: make special type for this
+    theFactory.registerPrototype("decimal", ValuePtr(new SimpleValue<double>(0, 0))); // TODO: make special type for this
 
-	theFactory.registerPrototype("long", ValuePtr(new SimpleValue<asl::Signed64>(0, 0))); // keep this arch independent
-	theFactory.registerPrototype("int", ValuePtr(new SimpleValue<int>(0, 0)));
-	theFactory.registerPrototype("short", ValuePtr(new SimpleValue<short>(0, 0)));
-	theFactory.registerPrototype("byte", ValuePtr(new SimpleValue<char>(0, 0)));
+    theFactory.registerPrototype("long", ValuePtr(new SimpleValue<asl::Signed64>(0, 0))); // keep this arch independent
+    theFactory.registerPrototype("int", ValuePtr(new SimpleValue<int>(0, 0)));
+    theFactory.registerPrototype("short", ValuePtr(new SimpleValue<short>(0, 0)));
+    theFactory.registerPrototype("byte", ValuePtr(new SimpleValue<char>(0, 0)));
 
-	theFactory.registerPrototype("unsignedLong", ValuePtr(new SimpleValue<asl::Unsigned64>(0, 0))); // keep this arch independent
-	theFactory.registerPrototype("unsignedInt", ValuePtr(new SimpleValue<unsigned int>(0, 0)));
-	theFactory.registerPrototype("unsignedShort", ValuePtr(new SimpleValue<unsigned short>(0, 0)));
-	theFactory.registerPrototype("unsignedByte", ValuePtr(new SimpleValue<unsigned char>(0, 0)));
+    theFactory.registerPrototype("unsignedLong", ValuePtr(new SimpleValue<asl::Unsigned64>(0, 0))); // keep this arch independent
+    theFactory.registerPrototype("unsignedInt", ValuePtr(new SimpleValue<unsigned int>(0, 0)));
+    theFactory.registerPrototype("unsignedShort", ValuePtr(new SimpleValue<unsigned short>(0, 0)));
+    theFactory.registerPrototype("unsignedByte", ValuePtr(new SimpleValue<unsigned char>(0, 0)));
 
-	theFactory.registerPrototype("hexBinary", ValuePtr(new VectorValue<asl::Block>(0)));
+    theFactory.registerPrototype("hexBinary", ValuePtr(new VectorValue<asl::Block>(0)));
 
-	theFactory.registerPrototype("ID", ValuePtr(new IDValue(0)));
+    theFactory.registerPrototype("ID", ValuePtr(new IDValue(0)));
 
     ValuePtr myStringValue(new StringValue(0));    
 
-	//theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
+    //theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
     theFactory.registerPrototype("IDREF", myStringValue);
-	theFactory.registerPrototype("string", myStringValue);
-	theFactory.registerPrototype("normalizedString", myStringValue);  // TODO: make special type for this
-	theFactory.registerPrototype("token", myStringValue);    // TODO: make special type for this
-	theFactory.registerPrototype("language", myStringValue); // TODO: make special type for this
-	theFactory.registerPrototype("Name", myStringValue);     // TODO: make special type for this
-	theFactory.registerPrototype("NCName", myStringValue);   // TODO: make special type for this
-	theFactory.registerPrototype("NMTOKEN", myStringValue);  // TODO: make special type for this
-	theFactory.registerPrototype("ENTITY", myStringValue);   // TODO: make special type for this
+    theFactory.registerPrototype("string", myStringValue);
+    theFactory.registerPrototype("normalizedString", myStringValue);  // TODO: make special type for this
+    theFactory.registerPrototype("token", myStringValue);    // TODO: make special type for this
+    theFactory.registerPrototype("language", myStringValue); // TODO: make special type for this
+    theFactory.registerPrototype("Name", myStringValue);     // TODO: make special type for this
+    theFactory.registerPrototype("NCName", myStringValue);   // TODO: make special type for this
+    theFactory.registerPrototype("NMTOKEN", myStringValue);  // TODO: make special type for this
+    theFactory.registerPrototype("ENTITY", myStringValue);   // TODO: make special type for this
 }
 

@@ -98,7 +98,7 @@ namespace y60 {
             myKey += std::string("_") + asl::as_string(theAdditionalKeyValue);
             
         }
-        PrimitiveCachePtr myPrimitiveCache(0);
+        PrimitiveCachePtr myPrimitiveCache;
         if (_myPrimitiveMap.find(myKey) == _myPrimitiveMap.end()) {
             dom::Element myPrimitive(ELEMENTS_NODE_NAME);
             myPrimitive.appendAttribute(PRIMITIVE_TYPE_ATTRIB, theType);
@@ -162,7 +162,7 @@ namespace y60 {
         }
 
         // Check whether the given root node is of the transform hierarchy
-        TransformHierarchyFacadePtr myFacade(0);
+        TransformHierarchyFacadePtr myFacade;
         try {
             myFacade =  _myRootNode->getFacade<TransformHierarchyFacade>();
         } catch (...) {
@@ -208,7 +208,7 @@ namespace y60 {
     void
     SceneOptimizer::runNode(dom::NodePtr & theRootNode) {
         // Reset the supershape
-        _mySuperShape = SuperShapePtr(0);
+        _mySuperShape = SuperShapePtr();
 
         // Merge all bodies into one superbody
         _myOptimizedBodyName = "Optimized Body: ";

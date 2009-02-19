@@ -112,11 +112,11 @@ class XmlDomUnitTest : public UnitTest {
                     dom::NodePtr myChild = myElement->childNode(1);
                     ENSURE(myChild->parentNode() == &(*myElement));
                     ENSURE(myElement->childNode(0)->nextSibling() == myChild);
-                    ENSURE(myElement->childNode(1)->nextSibling() == dom::NodePtr(0));
+                    ENSURE(myElement->childNode(1)->nextSibling() == dom::NodePtr());
                     ENSURE(myElement->removeChild(myChild) == myChild);
                     ENSURE(myElement->childNodes().length() == 1);
                     ENSURE(!myElement->removeChild(myChild));
-                    myParsedDocument = dom::NodePtr(0);
+                    myParsedDocument = dom::NodePtr();
                     ENSURE(myElement->parentNode() == 0);
                 }
 
@@ -243,7 +243,7 @@ class XmlDomUnitTest : public UnitTest {
                         dom::NodePtr myGrandChild = myIdDocument.getElementById("gc0");
                         ENSURE(myGrandChild->nodeName() == "grandchild0");
                         ENSURE(myGrandChild->getElementById("c0")->nodeName() == "child0");
-                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
                         dom::NodePtr myRoot = myIdDocument.getElementById("r0");
                         ENSURE(myRoot->getElementById("gc1")->nodeName() == "grandchild1");
 
@@ -256,7 +256,7 @@ class XmlDomUnitTest : public UnitTest {
                         const dom::NodePtr myGrandChild = myIdDocument.getElementById("gc0");
                         ENSURE(myGrandChild->nodeName() == "grandchild0");
                         ENSURE(myGrandChild->getElementById("c0")->nodeName() == "child0");
-                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
                         const dom::NodePtr myRoot = myIdDocument.getElementById("r0");
                         ENSURE(myRoot->getElementById("gc1")->nodeName() == "grandchild1");
                     }
@@ -278,7 +278,7 @@ class XmlDomUnitTest : public UnitTest {
                         ENSURE(myIdDocument.getElementById("c0")->nodeName() == "child0");
                         ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child1");
                         ENSURE(myIdDocument.getElementById("gc0")->nodeName() == "grandchild0");
-                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
                         dom::NodePtr myRoot = myIdDocument.getElementById("r0");
                         ENSURE(myRoot->getElementById("gc1")->nodeName() == "grandchild1");
                     }
@@ -288,7 +288,7 @@ class XmlDomUnitTest : public UnitTest {
                         ENSURE(myIdDocument.getElementById("c0")->nodeName() == "child0");
                         ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child1");
                         ENSURE(myIdDocument.getElementById("gc0")->nodeName() == "grandchild0");
-                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                        ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
                         const dom::NodePtr myRoot = myIdDocument.getElementById("r0");
                         ENSURE(myRoot->getElementById("gc1")->nodeName() == "grandchild1");
                     }
@@ -655,7 +655,7 @@ myDocument.getValueFactory()->dump();
                     ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child");
                     ENSURE(myIdDocument.getElementById("gc0")->nodeName() == "child");
                     ENSURE(myIdDocument.getElementById("gc0")->getElementById("r0")->nodeName() == "root");
-                    ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                    ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
 
                     ENSURE(myIdDocument.getElementById("xgc1", "id2")->getAttributeString("id") == "gc1");
                     {
@@ -665,11 +665,11 @@ myDocument.getValueFactory()->dump();
                         ENSURE(myCIDDocument.getElementById("c1")->nodeName() == "child");
                         ENSURE(myCIDDocument.getElementById("gc0")->nodeName() == "child");
                         ENSURE(myCIDDocument.getElementById("gc0")->getElementById("r0")->nodeName() == "root");
-                        ENSURE(myCIDDocument.getElementById("xxx") == dom::NodePtr(0));
+                        ENSURE(myCIDDocument.getElementById("xxx") == dom::NodePtr());
                     }
                     myIdDocument.getElementById("gc0")->getAttribute("id")->nodeValue("newid");
                     ENSURE(myIdDocument.getElementById("newid")->getAttributeString("id") == "newid");
-                    ENSURE(myIdDocument.getElementById("gc0") == dom::NodePtr(0));
+                    ENSURE(myIdDocument.getElementById("gc0") == dom::NodePtr());
 
                     DTITLE("Modified document");
                     cerr << myIdDocument << endl;
@@ -684,10 +684,10 @@ myDocument.getValueFactory()->dump();
                     ENSURE(myClone.getElementById("c1")->nodeName() == "child");
                     ENSURE(myClone.getElementById("newid")->nodeName() == "child");
                     ENSURE(myClone.getElementById("newid")->getElementById("r0")->nodeName() == "root");
-                    ENSURE(myClone.getElementById("xxx") == dom::NodePtr(0));
+                    ENSURE(myClone.getElementById("xxx") == dom::NodePtr());
                     myClone.getElementById("newid")->getAttribute("id")->nodeValue("newid2");
                     ENSURE(myClone.getElementById("newid2")->getAttributeString("id") == "newid2");
-                    ENSURE(myClone.getElementById("newid") == dom::NodePtr(0));
+                    ENSURE(myClone.getElementById("newid") == dom::NodePtr());
 
                     DTITLE("Replaced original document root element with cloned root element");
                     myIdDocument("root") = myClone("root");
@@ -698,7 +698,7 @@ myDocument.getValueFactory()->dump();
                     ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child");
                     ENSURE(myIdDocument.getElementById("newid2")->nodeName() == "child");
                     ENSURE(myIdDocument.getElementById("newid2")->getElementById("r0")->nodeName() == "root");
-                    ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                    ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
 
                     dom::NodePtr myNodeToRemove = myIdDocument.getElementById("c0");
                     ENSURE(myNodeToRemove);
@@ -795,7 +795,7 @@ class XmlCatalogUnitTest : public UnitTest {
                 ENSURE(myIdDocument.getElementById("c1")->nodeName() == "child");
                 ENSURE(myIdDocument.getElementById("gc0")->nodeName() == "child");
                 ENSURE(myIdDocument.getElementById("gc0")->getElementById("r0")->nodeName() == "root");
-                ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr(0));
+                ENSURE(myIdDocument.getElementById("xxx") == dom::NodePtr());
 
                 // write out the document with catalog
                 {
@@ -1054,7 +1054,7 @@ class XmlDomEventsUnitTest : public UnitTest {
                     // now we add even more listeners
                     DTITLE("testing with more listeners");
                     asl::Ptr<MyTestEventListener, ThreadingModel>
-                        myUniversalTestListener0(new MyTestEventListener(this,NodePtr(0),"test"));
+                        myUniversalTestListener0(new MyTestEventListener(this,NodePtr(),"test"));
 
                     // and now we try some canceling by the listener
                     DTITLE("testing canceling by the listener");

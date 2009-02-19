@@ -1203,15 +1203,15 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         myElementBuilder.copyIndexBin(POSITIONS, getTextureRole(0), "uvset");
 
         myVertexNode->nodeValuePtrClose<vector<Vector3f> >();
-        myVertexNode = dom::NodePtr(0);
+        myVertexNode = dom::NodePtr();
         myVertices = 0;
 
         myUVNode->nodeValuePtrClose<vector<Vector3f> >();
-        myUVNode = dom::NodePtr(0);
+        myUVNode = dom::NodePtr();
         myUVSet = 0;
 
         myIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
-        myIndexNode = dom::NodePtr(0);
+        myIndexNode = dom::NodePtr();
         myIndices = 0;
 
 

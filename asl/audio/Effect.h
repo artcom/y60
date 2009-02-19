@@ -106,7 +106,7 @@ asl::Ptr<EffectFunctorBase> createEffectFunctor(SampleFormat theSampleFormat) {
             return asl::Ptr<EffectFunctorBase>(new EFFECTFUNCTOR<float>());
         default:
             AC_FATAL << "Unsupported SampleFormat for Effectfunctor: " << theSampleFormat;
-            return asl::Ptr<EffectFunctorBase>(0);
+            return asl::Ptr<EffectFunctorBase>();
     }
 }
 

@@ -75,7 +75,7 @@ namespace y60 {
             SkinAndBonesShader(const dom::NodePtr theShaderLibrary,
                                const std::string & theVertexProfileName,
                                const std::string & theFragmentProfileName) 
-            : CgShader(theShaderLibrary, theVertexProfileName, theFragmentProfileName), _myBoundingBoxNode(0) {}
+            : CgShader(theShaderLibrary, theVertexProfileName, theFragmentProfileName), _myBoundingBoxNode() {}
 
             virtual ~SkinAndBonesShader() {}
 

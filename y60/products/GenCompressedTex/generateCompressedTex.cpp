@@ -262,10 +262,10 @@ updateNeeded(const string & theSourceFilename, const asl::Arguments & theArgumen
             }
         }
     } else {
-        string myTargetFileName = getTargetFilename(theArguments, dom::NodePtr(0), theSourceFilename);
+        string myTargetFileName = getTargetFilename(theArguments, dom::NodePtr(), theSourceFilename);
 
         unsigned myTargetSize = 0;
-        getParameter("target-size", theArguments, dom::NodePtr(0), myTargetSize);
+        getParameter("target-size", theArguments, dom::NodePtr(), myTargetSize);
 
         if (!fileExists(myTargetFileName)) {
             cout << "Target " << myTargetFileName << " does not exist" << endl;
@@ -506,7 +506,7 @@ convertFile(const string & theKeyFrameSourceFile, vector<string> &  theSourceFil
             }
         }
     } else {
-        writeI60(theKeyFrameSourceFile, mySourceBitmaps, theArguments, dom::NodePtr(0), myPixelEncoding);
+        writeI60(theKeyFrameSourceFile, mySourceBitmaps, theArguments, dom::NodePtr(), myPixelEncoding);
     }
 }
 
@@ -527,7 +527,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     dom::NodePtr myXmlConfigDocument(new dom::Document());
-    dom::NodePtr myXmlConfig(0);
+    dom::NodePtr myXmlConfig;
 
     vector<string> mySourceFiles;
     if ( myArguments.haveOption("--xml-config")) {

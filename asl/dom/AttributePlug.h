@@ -193,7 +193,7 @@ namespace dom {
 
         static NodePtr ensureAttribute(const Node & theNode) {
             if (!theNode) {
-                return NodePtr(0); // to allow factory nodes
+                return NodePtr(); // to allow factory nodes
             }
             NodePtr myAttribute = theNode.getAttribute(TAG::getName());
             if (!myAttribute) {

@@ -94,7 +94,7 @@ namespace y60 {
     typedef asl::Ptr<HalfEdgesValueType, dom::ThreadingModel> HalfEdgesValueTypePtr;
 
     struct VertexIndexBin {
-        VertexIndexBin() : indices(0) {}
+        VertexIndexBin() : indices() {}
 
         std::string           vertexdata;
         VertexDataRole   role;

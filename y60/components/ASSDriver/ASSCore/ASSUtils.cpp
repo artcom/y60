@@ -66,7 +66,7 @@ namespace y60 {
 
 dom::NodePtr
 getASSSettings(dom::NodePtr theSettings) {
-    dom::NodePtr mySettings(0);
+    dom::NodePtr mySettings;
     if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
         if (theSettings->childNode(0)->nodeName() == "settings") {
             mySettings = theSettings->childNode(0)->childNode("ASSDriver", 0);

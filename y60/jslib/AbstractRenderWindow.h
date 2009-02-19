@@ -113,7 +113,7 @@ namespace jslib {
          * @warn Currently, theScene may not be Ptr(0)!
          */
         bool setSceneAndCanvas(const y60::ScenePtr & theScene,
-                const dom::NodePtr & theCanvas = dom::NodePtr(0));
+                const dom::NodePtr & theCanvas = dom::NodePtr());
 
         /**
          * Sets a previously loaded scene to be rendered.

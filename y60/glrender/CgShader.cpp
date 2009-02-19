@@ -164,8 +164,8 @@ namespace y60 {
     }
 
     void CgShader::unload() {
-        _myFragmentProgram = CgProgramInfoPtr(0);
-        _myVertexProgram = CgProgramInfoPtr(0);
+        _myFragmentProgram = CgProgramInfoPtr();
+        _myVertexProgram = CgProgramInfoPtr();
     }
 
     const MaterialParameterVector &

@@ -206,7 +206,7 @@ asl::Ptr<PLFilter> PaintLibFilterFactory :: createFilter(
     if (iter != _myFactories.end()) {
         return (iter->second)->createFilter(theParameters);
     }
-    return asl::Ptr<PLFilter>(0);
+    return asl::Ptr<PLFilter>();
 }
 
 void PaintLibFilterFactory :: addFilterFactory(

@@ -382,7 +382,7 @@ namespace jslib {
         if (!myElement) {
             *rval = JSVAL_NULL;
         } else {
-            *rval = as_jsval(cx, *(myElement.getNativePtr()));
+            *rval = as_jsval(cx, *(myElement.get()));
         }
 
         return JS_TRUE;

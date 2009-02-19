@@ -65,37 +65,37 @@
 
 namespace y60 {
 
-	/**
-	* @ingroup Y60video
-	* a rudimentary shot-detection algorithm 
-	* based on color histogram differences between consecutive frames
-	*/
-	class ShotDetectionAlgorithm : public Algorithm {
-		public:
-			static std::string getName() { return "shot-detection"; }
+    /**
+    * @ingroup Y60video
+    * a rudimentary shot-detection algorithm 
+    * based on color histogram differences between consecutive frames
+    */
+    class ShotDetectionAlgorithm : public Algorithm {
+    public:
+        static std::string getName() { return "shot-detection"; }
 
-			ShotDetectionAlgorithm(const std::string & theName);
-				       
-		    virtual void onFrame(double t);
-			void configure(const dom::Node & theNode);
-			const dom::Node & result() const;
+        ShotDetectionAlgorithm(const std::string & theName);
 
-		private:
-			static const int BINS_PER_CHANNEL = 5;
-			static const int NBINS = BINS_PER_CHANNEL*BINS_PER_CHANNEL*BINS_PER_CHANNEL;
-			unsigned long _myHistogram[2][NBINS];
-			double _myThreshold;
-			double _myLastShotTime, _myMinimalShotLength;
-			dom::Element _myResultNode;
-            dom::ValuePtr _mySourceRaster;
+        virtual void onFrame(double t);
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const;
 
-			void clearHistogram(int theIndex);    	    
-		    unsigned long intersectHistograms();
-    	        
-		    //debug
-		    void printHistogram(int theIndex);
-		    void addHistogram(int theIndex, dom::Node & theNode);	    
-	};
+    private:
+        static const int BINS_PER_CHANNEL = 5;
+        static const int NBINS = BINS_PER_CHANNEL*BINS_PER_CHANNEL*BINS_PER_CHANNEL;
+        unsigned long _myHistogram[2][NBINS];
+        double _myThreshold;
+        double _myLastShotTime, _myMinimalShotLength;
+        dom::Element _myResultNode;
+        dom::ValuePtr _mySourceRaster;
+
+        void clearHistogram(int theIndex);
+        unsigned long intersectHistograms();
+
+        //debug
+        void printHistogram(int theIndex);
+        void addHistogram(int theIndex, dom::Node & theNode);
+    };
 }
 
 #endif

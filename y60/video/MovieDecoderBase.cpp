@@ -209,7 +209,7 @@ namespace y60 {
     void MovieDecoderBase::closeMovie() {}
 
     asl::Ptr<MovieDecoderBase> MovieDecoderBase::instance() const {
-        return asl::Ptr<MovieDecoderBase>(0);
+        return asl::Ptr<MovieDecoderBase>();
     }
 
     const Movie * MovieDecoderBase::getMovie() const {

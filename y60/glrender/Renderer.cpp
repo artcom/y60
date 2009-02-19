@@ -125,7 +125,7 @@ namespace y60 {
 
     Renderer::Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps) :
         _myRenderingCaps(theRenderingCaps),
-        _myScene(0),
+        _myScene(),
         _myContext(theGLContext),
         _myBoundingVolumeMode(BV_NONE),
         _myPreviousMaterial(0),
@@ -977,7 +977,7 @@ namespace y60 {
                 }
             }
         }
-        return dom::NodePtr(0);
+        return dom::NodePtr();
     }
 //#define DB(x) x
     void

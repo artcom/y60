@@ -434,7 +434,7 @@ JSNode::getNodePtr(JSContext *cx, JSObject *obj) {
     if (myJSNode) {
         return myJSNode->_myNode;
     } else {
-        return dom::NodePtr(0);
+        return dom::NodePtr();
     }
 }
 
@@ -443,7 +443,7 @@ JSNode::getNodePtr(JSContext *cx, jsval theJSValue) {
     JSObject * myArgument;
     if (!JS_ValueToObject(cx, theJSValue, &myArgument)) {
         AC_ERROR << "getNativeNode: bad argument type" << endl;
-        return dom::NodePtr(0);
+        return dom::NodePtr();
     }
     return getNodePtr(cx, myArgument);
 }
@@ -1440,7 +1440,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                 case PROP_parentNode:
                     {
                         dom::Node * myParent = myNode->parentNode();
-                        if (myParent && myParent->self()) {
+                        if (myParent && !myParent->self().expired()) {
                             *vp = as_jsval(cx, myParent->self().lock());
                             return JS_TRUE;
                         }
@@ -1449,7 +1449,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                 case PROP_rootNode:
                     {
                         dom::Node * myRoot = myNode->getRootNode();
-                        if (myRoot->self()) {
+                        if (!myRoot->self().expired()) {
                             *vp = as_jsval(cx, myRoot->self().lock());
                             return JS_TRUE;
                          }
@@ -1886,7 +1886,7 @@ JSNode::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myProtoObj;
 }
 
-jsval as_jsval(JSContext *cx, dom::NodePtr theNode) {
+jsval as_jsval(JSContext *cx, dom::NodePtr::ptr_type theNode) {
     if (theNode) {
         JSObject * myReturnObject = JSNode::Construct(cx, theNode);
         return OBJECT_TO_JSVAL(myReturnObject);
@@ -1897,7 +1897,7 @@ jsval as_jsval(JSContext *cx, dom::NodePtr theNode) {
 
 bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr) {
     if (JSVAL_IS_NULL(theValue)) {
-        thePtr = dom::NodePtr(0);
+        thePtr = dom::NodePtr();
         return true;
     }
     if ( JSVAL_IS_OBJECT(theValue)) {

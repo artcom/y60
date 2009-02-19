@@ -200,7 +200,7 @@ namespace y60 {
 
         for (NodeList::size_type i = 0; i < theNode->childNodesLength("shader"); i++) {
             const dom::NodePtr theShaderNode = theNode->childNode("shader", i);
-            GLShaderPtr myGLShader(0);
+            GLShaderPtr myGLShader;
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
             if (theShaderNode->childNode(FIXED_FUNCTION_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new FFShader(theShaderNode));
@@ -327,7 +327,7 @@ namespace y60 {
             }
         }
 
-        GLShaderPtr myLeadingShader(0);
+        GLShaderPtr myLeadingShader;
         float myMaxPoints = 0.0;
         for (vector<ShaderScore>::size_type i = 0; i < myScoreBoard.size(); i++ ) {
             const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
@@ -372,6 +372,6 @@ namespace y60 {
     ShaderLibrary::findCombiner(const std::string& theName) {
 
         AC_PRINT << "ShaderLibrary::findCombiner '" << theName << "'";
-        return ICombinerPtr(0); 
+        return ICombinerPtr(); 
     }
 }

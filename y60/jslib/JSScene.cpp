@@ -682,7 +682,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
-    asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR(0);;
+    asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR();;
 
     JSScene * myNewObject = 0;
 

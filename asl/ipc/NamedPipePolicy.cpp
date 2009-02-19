@@ -343,7 +343,7 @@ NamedPipePolicy::onWriteCompleted(DWORD theError, DWORD theBytesTransferred, LPO
         myHandle->outBuffer->erase(myHandle->outBuffer->begin(), 
                                    myHandle->outBuffer->begin() + theBytesTransferred);
     } else {
-        myHandle->outBuffer = asl::Ptr<CharBuffer>(0);
+        myHandle->outBuffer = asl::Ptr<CharBuffer>();
     }
     myHandle->isSending = false;
     //sendNextBuffer(*myHandle);

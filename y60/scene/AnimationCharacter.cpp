@@ -87,7 +87,7 @@ namespace y60 {
                                            dom::NodePtr theWorld) :
             _myNode(theNode)
     {
-        _myActiveClip = AnimationClipPtr(0);
+        _myActiveClip = AnimationClipPtr();
         load(theAnimationManager, theWorld);
     }
 
@@ -124,7 +124,7 @@ namespace y60 {
         if (_myActiveClip) {
             _myActiveClip->run(theTime);
             if (!_myActiveClip->isActive()) {
-                _myActiveClip = AnimationClipPtr(0);
+                _myActiveClip = AnimationClipPtr();
             }
         }
     }
@@ -150,7 +150,7 @@ namespace y60 {
     
     void
     AnimationCharacter::stop() {
-        _myActiveClip = AnimationClipPtr(0);
+        _myActiveClip = AnimationClipPtr();
     }
 
     void 

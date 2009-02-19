@@ -74,7 +74,7 @@ class MessageAcceptor : public ConduitAcceptor<POLICY> {
 
         Ptr<Message> popIncomingMessage() {
             typename ConduitAcceptor<POLICY>::ServerList::iterator myServer;
-            Ptr<Message> myMessage(0);
+            Ptr<Message> myMessage;
             for (myServer = this->_myServers.begin(); myServer != this->_myServers.end(); ++myServer) {
                 Ptr<ConduitServer<POLICY> > myConduitServer = *myServer;
                 Ptr<MessageServer<POLICY> > myMessageServer = 
@@ -88,7 +88,7 @@ class MessageAcceptor : public ConduitAcceptor<POLICY> {
                 }
             }
             if (_myInputQueue.empty()) {
-                return Ptr<Message>(0);
+                return Ptr<Message>();
             }
             myMessage = _myInputQueue.front();
             _myInputQueue.pop();

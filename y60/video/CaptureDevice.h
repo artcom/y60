@@ -113,7 +113,7 @@ namespace y60 {
         * @return new instance of the concrete CaptureDevice.
         */
         virtual asl::Ptr<CaptureDevice> instance() const {
-            return asl::Ptr<CaptureDevice>(0);
+            return asl::Ptr<CaptureDevice>();
         }
 
         void parseOptions(const std::string & theURL);

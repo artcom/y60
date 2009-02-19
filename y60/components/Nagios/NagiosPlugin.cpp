@@ -78,46 +78,46 @@ using namespace inet;
 using namespace dom;
 using namespace y60;
 
-    class NagiosPlugin :
-        public PlugInBase,
-        public y60::IRendererExtension,
-        public IScriptablePlugin
-    {
-    public:
-        NagiosPlugin(asl::DLHandle theDLHandle);
+class NagiosPlugin :
+    public PlugInBase,
+    public y60::IRendererExtension,
+    public IScriptablePlugin
+{
+public:
+    NagiosPlugin(asl::DLHandle theDLHandle);
 
-        void onStartup(jslib::AbstractRenderWindow * theWindow);
+    void onStartup(jslib::AbstractRenderWindow * theWindow);
 
-        bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow);
+    bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow);
 
-        void handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent);
-        void onFrame(AbstractRenderWindow * theWindow , double t);
+    void handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent);
+    void onFrame(AbstractRenderWindow * theWindow , double t);
 
-        void onPreRender(AbstractRenderWindow * theRenderer);
-        void onPostRender(AbstractRenderWindow * theRenderer);
+    void onPreRender(AbstractRenderWindow * theRenderer);
+    void onPostRender(AbstractRenderWindow * theRenderer);
 
-        void onGetProperty(const std::string & thePropertyName,
-                         PropertyValue & theReturnValue) const;
+    void onGetProperty(const std::string & thePropertyName,
+        PropertyValue & theReturnValue) const;
 
-        void onSetProperty(const std::string & thePropertyName,
-                         const PropertyValue & thePropertyValue);
-		const char * ClassName() {
-		    static const char * myClassName = "NagiosPlugin";
-		    return myClassName;
-		}
+    void onSetProperty(const std::string & thePropertyName,
+        const PropertyValue & thePropertyValue);
+    const char * ClassName() {
+        static const char * myClassName = "NagiosPlugin";
+        return myClassName;
+    }
 
-		void onUpdateSettings(dom::NodePtr theSettings) { }
+    void onUpdateSettings(dom::NodePtr theSettings) { }
 
-    private:
-        asl::Ptr<ConduitAcceptor<TCPPolicy> > _myStatusServer;
-        asl::Unsigned16 _myPort;
-    };
+private:
+    asl::Ptr<ConduitAcceptor<TCPPolicy> > _myStatusServer;
+    asl::Unsigned16 _myPort;
+};
 
 NagiosPlugin :: NagiosPlugin(DLHandle theDLHandle) :
-    PlugInBase(theDLHandle),
-    IRendererExtension("NagiosPlugin"),
-    _myPort(2346),
-    _myStatusServer(0)
+PlugInBase(theDLHandle),
+IRendererExtension("NagiosPlugin"),
+_myPort(2346),
+_myStatusServer()
 {
 }
 
@@ -125,8 +125,8 @@ void
 NagiosPlugin :: onStartup(jslib::AbstractRenderWindow * theWindow) {
     if ( ! _myStatusServer ) {
         _myStatusServer = asl::Ptr<ConduitAcceptor<TCPPolicy> >(
-                new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort),
-                                               StatusServer::create)); 
+            new ConduitAcceptor<TCPPolicy>(TCPPolicy::Endpoint("INADDR_ANY", _myPort),
+            StatusServer::create)); 
         _myStatusServer->start();
     } else {
         AC_INFO << "Nagios server allready running. Reusing instance.";
@@ -157,7 +157,7 @@ NagiosPlugin :: onPostRender(AbstractRenderWindow * theRenderer) {
 
 void
 NagiosPlugin::onGetProperty(const std::string & thePropertyName,
-                 PropertyValue & theReturnValue) const
+                            PropertyValue & theReturnValue) const
 {
     if (thePropertyName == "port") {
         theReturnValue.set<asl::Unsigned16>(_myPort);
@@ -172,7 +172,7 @@ NagiosPlugin::onGetProperty(const std::string & thePropertyName,
 
 void
 NagiosPlugin::onSetProperty(const std::string & thePropertyName,
-                 const PropertyValue & thePropertyValue)
+                            const PropertyValue & thePropertyValue)
 {
     if (thePropertyName == "port") {
         _myPort = thePropertyValue.get<asl::Unsigned16>();

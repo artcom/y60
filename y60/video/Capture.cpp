@@ -74,7 +74,7 @@ namespace y60 {
         NormTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlayModeTag::Plug(theNode),
-         _myDevice(0),
+         _myDevice(),
         _myPlayMode(PLAY_MODE_STOP)
     {
         AC_TRACE << "Capture::Capture " << theNode;
@@ -149,7 +149,7 @@ namespace y60 {
     void
     Capture::open(const std::string & theUrl) {
         if (_myDevice) {
-            _myDevice = CaptureDevicePtr(0);
+            _myDevice = CaptureDevicePtr();
         }
 
         AC_DEBUG << "Capture::open " << (void*)this << " url=" << theUrl;

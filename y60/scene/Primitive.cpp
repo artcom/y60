@@ -105,7 +105,7 @@ namespace y60 {
                 MaterialIdTag::Plug(theNode),
                 PrimitiveTypeTag::Plug(theNode),
                 RenderStylesTag::Plug(theNode),
-                _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr(0))
+                _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr())
     { }
 
     Primitive::~Primitive() {
@@ -201,7 +201,7 @@ namespace y60 {
                     _myVertexData[theRole] = theResourceManager->getVertexDataFactory2f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
-                    _myVertexData[theRole] = asl::Ptr<VertexData2f>(0);
+                    _myVertexData[theRole] = asl::Ptr<VertexData2f>();
                 }
                 break;
             case VECTOR_OF_VECTOR3F:
@@ -209,7 +209,7 @@ namespace y60 {
                     _myVertexData[theRole] = theResourceManager->getVertexDataFactory3f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
-                    _myVertexData[theRole] = asl::Ptr<VertexData3f>(0);
+                    _myVertexData[theRole] = asl::Ptr<VertexData3f>();
                 }
                 break;
             case VECTOR_OF_VECTOR4F:
@@ -217,7 +217,7 @@ namespace y60 {
                     _myVertexData[theRole] = theResourceManager->getVertexDataFactory4f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
-                    _myVertexData[theRole] = asl::Ptr<VertexData4f>(0);
+                    _myVertexData[theRole] = asl::Ptr<VertexData4f>();
                 }
                 break;
             case BOOL:
@@ -1100,16 +1100,17 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >();
     }
 
     asl::Ptr<ConstVertexDataAccessor<Vector3f> >
     Primitive::getConstLockingPositionsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(POSITIONS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>(); // read-only
+            const VertexDataBase& myVerticesRef = *myVertices;
+            return myVerticesRef.getVertexDataAccessor<asl::Vector3f>(); // read-only
         }
-        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >();
     }
 
     asl::Ptr<VertexDataAccessor<Vector3f> >
@@ -1118,16 +1119,17 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >();
     }
 
     asl::Ptr<ConstVertexDataAccessor<Vector3f> >
     Primitive::getConstLockingNormalsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(NORMALS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>();
+            const VertexDataBase& myVerticesRef = *myVertices;
+            return myVerticesRef.getVertexDataAccessor<asl::Vector3f>(); // read-only
         }
-        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >();
     }
 
     asl::Ptr<VertexDataAccessor<Vector4f> >
@@ -1136,16 +1138,17 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector4f>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<Vector4f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector4f> >();
     }
 
     asl::Ptr<ConstVertexDataAccessor<Vector4f> >
     Primitive::getConstLockingColorsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(COLORS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector4f>();
+            const VertexDataBase& myVerticesRef = *myVertices;
+            return myVerticesRef.getVertexDataAccessor<asl::Vector4f>(); // read only
         }
-        return asl::Ptr<ConstVertexDataAccessor<Vector4f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector4f> >();
     }
 
     asl::Ptr<VertexDataAccessor<float> >
@@ -1154,7 +1157,7 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<float>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<float> >(0);
+        return asl::Ptr<VertexDataAccessor<float> >();
     }
 
     asl::Ptr<VertexDataAccessor<Vector2f> >
@@ -1163,7 +1166,7 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector2f>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<Vector2f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector2f> >();
     }
 
     asl::Ptr<VertexDataAccessor<Vector3f> >
@@ -1172,7 +1175,7 @@ namespace y60 {
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
-        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >();
     }
 
     void

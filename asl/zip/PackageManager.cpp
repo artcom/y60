@@ -124,7 +124,7 @@ PackageManager::findPackage(const std::string & theRelativePath,
             return *iter;
         }
     }
-    return IPackagePtr(0);
+    return IPackagePtr();
 }
 
 Ptr<ReadableStreamHandle>
@@ -135,7 +135,7 @@ PackageManager::readStream(const std::string & theRelativePath,
     if (myPackage) {
         return myPackage->getStream(theRelativePath);
     }
-    return Ptr<ReadableStreamHandle>(0);
+    return Ptr<ReadableStreamHandle>();
 }
 Ptr<ReadableBlockHandle>
 PackageManager::readFile(const std::string & theRelativePath,
@@ -145,7 +145,7 @@ PackageManager::readFile(const std::string & theRelativePath,
     if (myPackage) {
         return myPackage->getFile(theRelativePath);
     }
-    return Ptr<ReadableBlockHandle>(0);
+    return Ptr<ReadableBlockHandle>();
 }
 
 std::string

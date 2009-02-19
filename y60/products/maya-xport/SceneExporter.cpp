@@ -519,7 +519,7 @@ SceneExporter::exportMesh(MFnDagNode & theDagNode,
         string myPathName = myPath.fullPathName().asChar();
         string::size_type myDelimiter = theParentPath.rfind("|");
         string myBodyName = theParentPath.substr(myDelimiter + 1);
-        BodyPtr myBody(0);
+        BodyPtr myBody;
 
         PathToIdMap::iterator myMapIt = _myIdMap.find(myPathName);
         if (myMapIt != _myIdMap.end()) {

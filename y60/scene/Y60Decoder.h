@@ -95,7 +95,7 @@ class Y60Decoder : public ISceneDecoder {
          * @retval MIME_TYPE_B60 This file is an binary b60 file and can be decoded
          * @return "" This file cannot be decoded.
          */
-        virtual std::string canDecode(const std::string & theUrl,asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
+        virtual std::string canDecode(const std::string & theUrl,asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier);
         virtual bool setLazy(bool theFlag);
         virtual bool addSource(asl::Ptr<asl::ReadableStreamHandle> theSource);

@@ -74,7 +74,7 @@
 
 namespace jslib {
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr theNode);
+Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr::ptr_type theNode);
 
 inline
 jsval as_jsval(JSContext *cx, dom::Node::NodeType theValue) {
@@ -121,7 +121,7 @@ public:
     dom::NodePtr getNodePtr(JSContext *cx, jsval theJSValue);
     
     virtual const void * getNativeAdress() const {
-        return _myNode.getNativePtr();
+        return _myNode.get();
     }
 
     static JSBool

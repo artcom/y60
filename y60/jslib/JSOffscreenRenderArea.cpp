@@ -176,7 +176,7 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-        dom::NodePtr myTextureNode(0);
+        dom::NodePtr myTextureNode;
         if( ! convertFrom(cx, argv[0], myTextureNode)) {
             JS_ReportError(cx, "OffscreenRenderArea::downloadFromViewport(): argument #0 must be a texture node.");
             return JS_FALSE;

@@ -62,7 +62,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
 {
     AC_DEBUG << "HWSampleSink::HWSampleSink (" << _myName << ")";
 
-    _myLockedSelf = HWSampleSinkPtr(0);
+    _myLockedSelf = HWSampleSinkPtr();
     _isUsingBackupBuffer = false;
     _myPosInInputBuffer = 0;
     _numUnderruns = 0;
@@ -80,7 +80,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
 }
 
 HWSampleSink::~HWSampleSink() {
-    AC_DEBUG << "~HWSampleSink (" << _myName << ", ref count=" << _mySelf.getRefCount() << ")";
+    AC_DEBUG << "~HWSampleSink (" << _myName << ", ref count=" << _mySelf.use_count() << ")";
     if (_myState != STOPPED) {
         AC_WARNING << "Deleting SampleSink that's still running!";
     }
@@ -93,7 +93,7 @@ HWSampleSink::~HWSampleSink() {
 void HWSampleSink::setSelf(const HWSampleSinkPtr& mySelf)
 {
     _mySelf = mySelf;
-    _myLockedSelf = HWSampleSinkPtr(0);
+    _myLockedSelf = HWSampleSinkPtr();
 }
 
 void HWSampleSink::play() {
@@ -354,13 +354,13 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
         AC_TRACE << "_myBufferQueue.clear();";
         _myBufferQueue.clear();
         _myPosInInputBuffer = 0;
-        _myLockedSelf = HWSampleSinkPtr(0);
-        _myPumpTimeSource->stop();                
+        _myLockedSelf = HWSampleSinkPtr();
+        _myPumpTimeSource->stop();
         
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
         changeState(PAUSED);
-        _myLockedSelf = HWSampleSinkPtr(0);
+        _myLockedSelf = HWSampleSinkPtr();
         AudioTimeSource::pause();
     }
     if (_isDelayingPlay && _myTimeToStart <= getCurrentTime()) {

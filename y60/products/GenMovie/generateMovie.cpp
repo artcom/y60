@@ -86,7 +86,7 @@ using namespace y60;
 //
 ////////////////////////////////////////////////////////////////////////
 
-asl::Ptr<ImageLoader> ourPreviousFrame(0);
+asl::Ptr<ImageLoader> ourPreviousFrame;
 float            ourFramesPerSecond = 25.0f;
 
 void printVersion();
@@ -242,7 +242,7 @@ int main( int argc, char *argv[])  {
     }
 
     dom::NodePtr myXmlConfigDocument(new dom::Document());
-    dom::NodePtr myXmlConfig(0);
+    dom::NodePtr myXmlConfig;
     set<string> mySourceFiles;
 
     try {
@@ -388,7 +388,7 @@ int main( int argc, char *argv[])  {
 
         // Force destruction of ourPreviousFrame before main exits, otherwise there is 
         // no logger left to log the imageloader destruction.
-        ourPreviousFrame = asl::Ptr<ImageLoader>(0);
+        ourPreviousFrame = asl::Ptr<ImageLoader>();
     }
     catch (asl::Exception & e) {
         cerr << "### ERROR: " << e << endl;

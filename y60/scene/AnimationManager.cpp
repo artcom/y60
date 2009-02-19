@@ -187,7 +187,7 @@ namespace y60 {
         }
         
         // Get type of animated values
-        dom::NodePtr myValueList(0);
+        dom::NodePtr myValueList;
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             dom::NodePtr myChild = theNode->childNode(i);
             if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {

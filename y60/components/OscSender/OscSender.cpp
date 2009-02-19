@@ -71,7 +71,7 @@ using namespace inet;
 namespace y60 {
     static long ourPacketCounter = 0;
     OscSender::OscSender() : 
-        _myReceiverAddress(""), _myReceiverPort(0), _myReceiverUDPConnection(0)
+        _myReceiverAddress(""), _myReceiverPort(0), _myReceiverUDPConnection()
     {
     }
 
@@ -132,7 +132,7 @@ namespace y60 {
                     } catch (const inet::SocketException & ex) {
                         AC_WARNING << "Failed to send to " << _myReceiverAddress << " at port "
                                    << _myReceiverPort << ": " << ex;
-                        _myReceiverUDPConnection = UDPConnectionPtr( 0 );
+                        _myReceiverUDPConnection = UDPConnectionPtr();
                     }
                     myBytesWitten = myOSCStream.Size();
                     AC_DEBUG << "Send event: " << *theOscEvent;

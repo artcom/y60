@@ -90,7 +90,7 @@ namespace y60 {
         TransparencyTag::Plug(theNode),
         EnabledTag::Plug(theNode),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
-        _myShader(0),
+        _myShader(),
         _myLightingModel(LAMBERT),
         _myMaterialVersion(0),
         _myRequiresVersion(0),

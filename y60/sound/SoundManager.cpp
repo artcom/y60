@@ -181,11 +181,11 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
             << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
     IAudioDecoder * myDecoder;
-    SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(0);
+    SoundCacheItemPtr myCacheItem = SoundCacheItemPtr();
     if (theUseCache) {
         checkCacheSize();
         myCacheItem = getCacheItem(theURI);
-        if (myCacheItem == SoundCacheItemPtr(0)) {
+        if (myCacheItem == SoundCacheItemPtr()) {
             AC_TRACE << "    --> Sound not cached yet.";
             // This sound hasn't been played before.
             myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
@@ -200,7 +200,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
                 // The sound is currently being cached. Ignore the cache.
                 AC_TRACE << "    --> Sound cache item exists, but isn't complete.";
                 myDecoder = createDecoder(theURI);
-                myCacheItem = SoundCacheItemPtr(0);
+                myCacheItem = SoundCacheItemPtr();
             }
         }
     } else {
@@ -360,7 +360,7 @@ SoundCacheItemPtr SoundManager::getCacheItem(const std::string & theURI) const {
     CacheMap::const_iterator it;
     it = _myCache.find(theURI);
     if (it == _myCache.end()) {
-        return SoundCacheItemPtr(0);
+        return SoundCacheItemPtr();
     } else {
         return it->second;
     }

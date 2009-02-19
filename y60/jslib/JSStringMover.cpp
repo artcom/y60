@@ -193,14 +193,14 @@ JSStringMover::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
             return JS_FALSE;
         }
 
-        dom::NodePtr myShapeNode = dom::NodePtr(0);
+        dom::NodePtr myShapeNode = dom::NodePtr();
         if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myShapeNode)) {
             JS_ReportError(cx, "JSStringMover::Constructor: argument #2 must be an node");
             return JS_FALSE;
         }
 
 
-        dom::NodePtr myBodyNode = dom::NodePtr(0);
+        dom::NodePtr myBodyNode = dom::NodePtr();
         if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myBodyNode)) {
             JS_ReportError(cx, "JSStringMover::Constructor: argument #3 must be an node");
             return JS_FALSE;

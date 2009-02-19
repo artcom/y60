@@ -1196,7 +1196,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
                 return JS_TRUE;
             }
         case PROP_scene: {
-            y60::ScenePtr myScene(0);
+            y60::ScenePtr myScene;
             if (*vp == JSVAL_NULL || !convertFrom(cx, *vp, myScene)) {
                 throw JSArgMismatch("Failed to convert argument to type y60::Scene", PLUS_FILE_LINE);
             }
@@ -1241,7 +1241,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
             }
         case PROP_canvas:
             {
-                dom::NodePtr myCanvasNode(0);
+                dom::NodePtr myCanvasNode;
                 if (convertFrom(cx, *vp, myCanvasNode)) {
                     theNative.setCanvas(myCanvasNode);
                     return JS_TRUE;

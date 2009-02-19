@@ -176,7 +176,7 @@ namespace asl {
 
         /** adds a new Message sink where all log message will be copied to;
             if theFormatter is 0 the global formatter will be used */
-        void addMessageSink(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> theFormatter = Ptr<LogMessageFormatter>(0), Severity theSeverityFilter=SEV_TRACE);
+        void addMessageSink(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> theFormatter = Ptr<LogMessageFormatter>(), Severity theSeverityFilter=SEV_TRACE);
 
         /** sets the global Message Formatter; the global formatter will be called just once and the result copied to all sinks
         that have no private formatter define */

@@ -157,7 +157,7 @@ namespace dom {
                      bool cancelableArg = true,
                      bool targetOnly = false,
                      DOMTimeStamp theTimeStamp = DOMTimeStamp(),
-                     asl::Ptr<AC_PAYLOAD_TPL> thePayload = asl::Ptr<AC_PAYLOAD_TPL>(0))
+                     asl::Ptr<AC_PAYLOAD_TPL> thePayload = asl::Ptr<AC_PAYLOAD_TPL>())
                      : 
         _myType(theType),
         _myEventPhase(CAPTURING_PHASE),

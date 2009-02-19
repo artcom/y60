@@ -79,7 +79,7 @@ class GLContextRegistry : public asl::Singleton<GLContextRegistry> {
         {
             bool operator()(asl::WeakPtr<AbstractRenderWindow> p1, asl::WeakPtr<AbstractRenderWindow> p2) const
             {                
-                return (p1.getRefCountPtr() < p2.getRefCountPtr());
+                return (p1.lock() < p2.lock());
             }
         };
         typedef std::set<asl::WeakPtr<AbstractRenderWindow>, ltweakptr> ContextSet;

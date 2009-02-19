@@ -102,14 +102,14 @@ namespace y60 {
        TexturePtr myTexture = _myTextureManager->findTexture(myTextureId);
         if (!myTexture) {
             AC_WARNING << "TextureUnit::updateTexture textureunit references invalid texture id=" << myTextureId;
-            return TexturePtr(0);
+            return TexturePtr();
         }
         return myTexture;
     }
 
     ICombinerPtr
     TextureUnit::getCombiner() const {
-        return ICombinerPtr(0);
+        return ICombinerPtr();
     }
 
     void

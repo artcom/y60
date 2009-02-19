@@ -65,23 +65,23 @@
 
 namespace y60 {
 
-	class ColorDetection : public Algorithm {
-		public:
-            ColorDetection(const std::string & theName);
+    class ColorDetection : public Algorithm {
+    public:
+        ColorDetection(const std::string & theName);
 
-			static std::string getName() { return "colordetection"; }
-		    void onFrame(double t);
+        static std::string getName() { return "colordetection"; }
+        void onFrame(double t);
 
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
-                
-		private:
-            dom::Element _myResultNode;
-            float        _myThreshold;
-            dom::ValuePtr _mySourceRaster;
-	};
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
+
+    private:
+        dom::Element _myResultNode;
+        float        _myThreshold;
+        dom::ValuePtr _mySourceRaster;
+    };
 
 
 }

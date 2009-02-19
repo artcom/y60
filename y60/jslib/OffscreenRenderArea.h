@@ -146,7 +146,7 @@ namespace jslib {
         protected:
             // AbstractRenderWindow
             virtual y60::TTFTextRendererPtr createTTFRenderer() {
-                return y60::TTFTextRendererPtr(0);
+                return y60::TTFTextRendererPtr();
             }
 
         private:

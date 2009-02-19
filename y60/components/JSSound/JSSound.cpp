@@ -243,7 +243,7 @@ namespace jslib {
             if (argc == 0) {
                 // Construct empty Sound that will be filled by copy Construct()
 //                AC_PRINT << "JSSound::Constructor: empty";
-                myNewNative = OWNERPTR(0);
+                myNewNative = OWNERPTR();
             } else {
 //                AC_PRINT << "JSSound::Constructor: " << myURI;
                 myNewNative = y60::SoundManager::get().createSound(myURI, myLoopFlag, myCacheFlag);

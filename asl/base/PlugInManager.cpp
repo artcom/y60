@@ -157,7 +157,7 @@ asl::Ptr<PlugInBase> PlugInManager :: loadPlugIn(const std::string & theName) {
 bool
 PlugInManager :: isLoaded(const std::string & theName) const {
     PlugInCache::const_iterator i = _myCache.find(theName);
-    return i != _myCache.end() && i->second;
+    return i != _myCache.end() && !i->second.expired();
 }
 
 string

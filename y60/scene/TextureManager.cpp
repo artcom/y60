@@ -86,7 +86,7 @@ namespace y60 {
         _myMaxTextureSize(TextureManager::getTextureSizeLimit()),
         _myMemoryResourceManager(new MemoryResourceManager())
     {
-        _myResourceManager = _myMemoryResourceManager.getNativePtr();
+        _myResourceManager = _myMemoryResourceManager.get();
     }
 
     TextureManager::~TextureManager() {
@@ -210,7 +210,7 @@ namespace y60 {
         if (myTextureNode) {
              return myTextureNode->getFacade<Texture>();
         }
-        return TexturePtr(0);
+        return TexturePtr();
     }
 
     /*
@@ -246,7 +246,7 @@ namespace y60 {
                 unbindTextures();
                 // XXX TODO: Copy vertices back into the Memory resource manager
                 // Set the Resourcemanager back to the Memory implementation
-                _myResourceManager = _myMemoryResourceManager.getNativePtr();
+                _myResourceManager = _myMemoryResourceManager.get();
             } else if (_myResourceManagerCount < 0) {
                 throw TextureManagerException("No Resourcemanager to set to NULL", PLUS_FILE_LINE);
             }

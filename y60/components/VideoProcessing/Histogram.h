@@ -65,22 +65,22 @@
 
 namespace y60 {
 
-	class Histogram : public Algorithm {
-		public:
+    class Histogram : public Algorithm {
+    public:
         Histogram(const std::string theName);
 
-			static std::string getName() { return "histogram"; }
-		    void onFrame(double t);
+        static std::string getName() { return "histogram"; }
+        void onFrame(double t);
 
-            void configure(const dom::Node & theNode);
-	        const dom::Node & result() const { 
-		        return _myResultNode;
-	        }
+        void configure(const dom::Node & theNode);
+        const dom::Node & result() const { 
+            return _myResultNode;
+        }
 
-		private:
-            dom::Element _myResultNode;
-            dom::ValuePtr _mySourceRaster;
-	};
+    private:
+        dom::Element _myResultNode;
+        dom::ValuePtr _mySourceRaster;
+    };
 
 }
 

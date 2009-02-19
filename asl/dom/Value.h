@@ -611,7 +611,7 @@ namespace dom {
         NodeOffsetCatalog & getOffsetCatalog();
         const NodeOffsetCatalog & getOffsetCatalog() const;
         void clearOffsetCatalog() {
-            _myOffsets = asl::Ptr<NodeOffsetCatalog>(0);
+            _myOffsets = asl::Ptr<NodeOffsetCatalog>();
         }
         void setOffsetCatalog(asl::Ptr<NodeOffsetCatalog> theOffsets) {
             _myOffsets = theOffsets;
@@ -1451,7 +1451,7 @@ namespace dom {
                     const_cast<VECTOR_VALUE &>(_myVectorValue).getNodePtr()));
                 return myElem;
             }
-            return ValuePtr(0);
+            return ValuePtr();
         }
         bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
             const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
@@ -1494,7 +1494,7 @@ namespace dom {
                                     const_cast<VECTOR_VALUE &>(_myVectorValue).getNodePtr()));
                 return myElem;
             }
-            return ValuePtr(0);
+            return ValuePtr();
         }
         bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
             const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);

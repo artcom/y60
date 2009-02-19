@@ -255,7 +255,7 @@ namespace y60 {
         AC_INFO << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
         ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
-            ITextureManagerPtr(0), myDepth);
+            ITextureManagerPtr(), myDepth);
 
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {

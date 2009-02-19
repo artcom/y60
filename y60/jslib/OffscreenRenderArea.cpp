@@ -258,7 +258,7 @@ OffscreenRenderArea::getTexture() const {
         return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
     }
     AC_WARNING << "No canvas.";
-    return TexturePtr(0);
+    return TexturePtr();
 }
 
 TexturePtr
@@ -267,7 +267,7 @@ OffscreenRenderArea::getTexture() {
         return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
     }
     AC_WARNING << "No canvas.";
-    return TexturePtr(0);
+    return TexturePtr();
 }
 
 } //namespace jslib

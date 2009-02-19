@@ -388,7 +388,7 @@ JSBool JSResizeableRaster::setPropertySwitch(unsigned long theID, JSContext *cx,
 JSBool JSResizeableRaster::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     dom::ValuePtr myArg;
     if (convertFrom(cx, *vp, myArg)) {
-        IF_NOISY_Y(AC_TRACE << "JSResizeableRaster::setPropertyIndex theIndex =" << theIndex << " myArg: " << (void*)myArg.getNativePtr() << endl);
+        IF_NOISY_Y(AC_TRACE << "JSResizeableRaster::setPropertyIndex theIndex =" << theIndex << " myArg: " << (void*)myArg.get() << endl);
         openNative().setElement(theIndex,*myArg);
         closeNative();
         return JS_TRUE;

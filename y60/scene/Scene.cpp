@@ -296,7 +296,7 @@ namespace y60 {
                 throw ex;
             }
         }
-        return load(asl::Ptr<asl::ReadableStreamHandle>(0), "empty scene", theNotifier, useSchema, loadLazy);
+        return load(asl::Ptr<asl::ReadableStreamHandle>(), "empty scene", theNotifier, useSchema, loadLazy);
     }
 
     ScenePtr
@@ -313,7 +313,7 @@ namespace y60 {
             setupEmptyDocument(*mySceneDom, "");
         }
        
-        if (!DecoderManager::get().findDecoder<ISceneDecoder>("dummy.x60", asl::Ptr<asl::ReadableStreamHandle>(0))) {
+        if (!DecoderManager::get().findDecoder<ISceneDecoder>("dummy.x60", asl::Ptr<asl::ReadableStreamHandle>())) {
             DecoderManager::get().addDecoder(IDecoderPtr(new Y60Decoder()));
         }
 
@@ -323,7 +323,7 @@ namespace y60 {
             myDecoder->setLazy(loadLazy);
             myDecoder->setProgressNotifier(theNotifier);
             myDecoder->decodeScene(theSource, mySceneDom);
-            myDecoder->setProgressNotifier(IProgressNotifierPtr(0));
+            myDecoder->setProgressNotifier(IProgressNotifierPtr());
         } else {
             throw SceneException(std::string("Could not determine file type of '") +theFilename + "' (bad magic number)", PLUS_FILE_LINE);
         }
@@ -371,7 +371,7 @@ namespace y60 {
         if (_myTextureManager->getResourceManager()) {
             return _myTextureManager->getResourceManager()->getShaderLibrary();
         }
-        return IShaderLibraryPtr(0);
+        return IShaderLibraryPtr();
     }
 
     void
@@ -819,7 +819,7 @@ namespace y60 {
         dom::Node & mySceneElement = getNode();
         //printChangedNodes(mySceneElement, _myPreviousDomVersion, 0);
         dom::NodePtr myWorldListElement = mySceneElement.childNode(WORLD_LIST_NAME);
-        dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(WORLD_NODE_NAME) : dom::NodePtr(0);
+        dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(WORLD_NODE_NAME) : dom::NodePtr();
         dom::NodePtr myLightsElement = mySceneElement.childNode(LIGHTSOURCE_LIST_NAME);
         dom::NodePtr myShapesElement = mySceneElement.childNode(SHAPE_LIST_NAME);
         dom::NodePtr myCanvasesElement = mySceneElement.childNode(CANVAS_LIST_NAME);

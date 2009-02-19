@@ -301,7 +301,7 @@ ShapeExporter::outputPrimitives(y60::ShapeBuilder & theShapeBuilder,
     MIntArray myNormalIndexArray;
 
     ElementBuilderMap myElementMap;
-    ElementBuilderPtr myElementBuilder(0);
+    ElementBuilderPtr myElementBuilder;
 
     SpecialFeatures mySpecialFeatures;
     if (theHasSkinAndBonesFlag) {

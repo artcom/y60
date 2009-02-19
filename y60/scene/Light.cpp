@@ -75,15 +75,15 @@ namespace y60 {
     Light::Light(dom::Node & theNode) : 
         TransformHierarchyFacade(theNode),
         LightSourceTag::Plug(theNode),
-        _myLightSource(0),
+        _myLightSource(),
         _myLightSourceVersion(0)
     {}
-                
+
     bool 
     Light::isHeadLight() const { 
         return (getNode().parentNode() && getNode().parentNode()->nodeName() == CAMERA_NODE_NAME); 
     }
-     
+
     const LightSourcePtr 
     Light::getLightSource() { 
         unsigned long long myCurrentVersion = getVersion<LightSourceTag>();
