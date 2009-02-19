@@ -81,8 +81,8 @@
         <command name="test">
             <make targets="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
-                <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
             </make>
+            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 
@@ -107,8 +107,8 @@
         <command name="test">
             <executable exe="${nmake.bin}" args="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
-                <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
             </executable>
+            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 
@@ -141,8 +141,8 @@
                 <arg>&quot;${build.type}|Win32&quot;</arg>
 
                 <process processor="${msvc_test_run.pp}"/>
-                <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
             </executable>
+            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 </project>
