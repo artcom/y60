@@ -106,8 +106,8 @@ struct MaterialExporter::Impl {
         : _mySceneBuilder(theSceneBuilder)
         , _myMaterialMap()
         , _myDefaultMaterialInfo()
-        , _myMaterialBuilder(0)
-        , _myDefaultMaterialBuilder(0)
+        , _myMaterialBuilder()
+        , _myDefaultMaterialBuilder()
         , _myMaterials()
         , _myDocumentPath(theDocumentPath)
         , _myInlineTextures(theInlineTextures)
@@ -231,7 +231,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     // Texture
     bool myCreateMipmapFlag = (theUsage == PAINT);
     
-    dom::NodePtr myImageNode(0);
+    dom::NodePtr myImageNode;
     
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
@@ -610,7 +610,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                 BaseChannel * myTransparencyChannel = myMaterial->GetChannel(CHANNEL_TRANSPARENCY);
                 if (myTransparencyChannel) {
                     BaseContainer myColorContainer = myTransparencyChannel->GetData();
-                    Real myMixStrength = myColorContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
+                    //Real myMixStrength = myColorContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
                     Real myBrightness = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
 
                     Vector4f myDiffuseColor(1, 1, 1, 1);
@@ -690,8 +690,8 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     myLightingType = y60::PHONG;
                     float mySpecularWidth      = mySpecularContainer->GetReal(MATERIAL_SPECULAR_WIDTH);
                     float mySpecularHeight     = mySpecularContainer->GetReal(MATERIAL_SPECULAR_HEIGHT);
-                    float mySpecularFallOff    = mySpecularContainer->GetReal(MATERIAL_SPECULAR_FALLOFF);
-                    float mySpecularInnerWidth = mySpecularContainer->GetReal(MATERIAL_SPECULAR_INNERWIDTH);
+                    //float mySpecularFallOff    = mySpecularContainer->GetReal(MATERIAL_SPECULAR_FALLOFF);
+                    //float mySpecularInnerWidth = mySpecularContainer->GetReal(MATERIAL_SPECULAR_INNERWIDTH);
 
                     // TODO: Find the best formula (use vrml exporter in cinema for reference results)
                     // Suggested formula: shininess = (specular_width + (1 - specular_height) * 128) / 2

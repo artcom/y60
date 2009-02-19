@@ -97,7 +97,7 @@ class AnimationExporter {
 
         void exportCharacter(BaseObject * theNode, const std::string & theNodeId);
         void exportGlobal(BaseObject * theNode, const std::string & theNodeId,
-                          y60::ClipBuilderPtr theClipBuilder = y60::ClipBuilderPtr(0));
+                          y60::ClipBuilderPtr theClipBuilder = y60::ClipBuilderPtr());
 
     private:
         bool WriteTrack(CTrack* theTrack, const std::string & theNodeId, 

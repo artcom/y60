@@ -377,7 +377,7 @@ SceneExporter::writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
     /*
      * Create hierarchy of bodies
      */
-    y60::BodyBuilderPtr myBodyBuilder(0);
+    y60::BodyBuilderPtr myBodyBuilder;
     if (_myExportedShapes.find(myNodeId) == _myExportedShapes.end()) {
         return myBodyBuilder;
     }
@@ -535,7 +535,7 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
     const String myTreeName =  getTreeName(theNode);
     std::string myName = getString(theNode->GetName());
     StatusSetText("Exporting '" + myTreeName + "'");
-    LONG myNodeId = theNode->GetNodeID();
+    //LONG myNodeId = theNode->GetNodeID();
     LONG myNodeType = theNode->GetType();
 
     switch (myNodeType) {
@@ -730,7 +730,7 @@ SceneExporter::Save(PluginSceneSaver * theNode,
         _myExportedShapes.clear();
         _myExportedLightSources.clear();
         _myExportedCameras.clear();
-        _mySceneBuilder = y60::SceneBuilderPtr(0);
+        _mySceneBuilder = y60::SceneBuilderPtr();
     } catch (const asl::Exception & ex) {
         displayMessage(std::string("Error in SceneExporter::Save(): ") + asl::as_string(ex));
     } catch (...) {
