@@ -41,11 +41,16 @@ install(
 )
 
 # install tools
+set(EXTRA_TOOLS)
+if(WIN32)
+    list(APPEND EXTRA_TOOLS PATTERN "*.bat")
+endif(WIN32)
 install(
     DIRECTORY tools/
     DESTINATION ${ACMAKE_TOOLS_SUB}
     FILES_MATCHING
         PATTERN "*.jar"
+        ${EXTRA_TOOLS}
 	PATTERN ".svn" EXCLUDE
 )
 

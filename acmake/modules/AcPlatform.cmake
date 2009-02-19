@@ -66,27 +66,13 @@ else(UNIX)
         add_definitions( -D_CRT_SECURE_NO_WARNINGS )
         add_definitions( -D_CRT_NONSTDC_NO_WARNINGS )
         add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+
+        # make sure all DLLs and EXEs go into a common directory
+        # so they can be run from within the binary directory
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-        # XXX TODO per plugin stuff
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
-        # Generate a file containing some information captured from vsvars32.bat
-        # XXX: move this somewhere else, preferably a "FindWindowsSDK.cmake"
-        set(VSCOMN "VS90COMNTOOLS")
-        string(LENGTH $ENV{${VSCOMN}} len)
-        if(${len} EQUAL 0)
-            set(VSCOMN "VS80COMNTOOLS")
-            string(LENGTH $ENV{${VSCOMN}} len)
-            if(${len} EQUAL 0)
-                set(VSCOMN "VS70COMNTOOLS")
-            endif(${len} EQUAL 0)
-        endif(${len} EQUAL 0)
-        execute_process(
-            COMMAND ${ACMAKE_TOOLS_DIR}/VSvars.bat  "$ENV{${VSCOMN}}" "${CMAKE_BINARY_DIR}/VSVars.cmake"
-            RESULT_VARIABLE rv
-        )
-    
     endif(WIN32)
 
     if (CMAKE_GENERATOR MATCHES "Visual Studio.*")
