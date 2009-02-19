@@ -1,7 +1,7 @@
 
 enable_testing()
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6.2)
 
 project(PRO60)
 

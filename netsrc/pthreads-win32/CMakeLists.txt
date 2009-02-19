@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6.2)
 
 set( HEADERS Pre-built/include/semaphore.h
              Pre-built/include/pthread.h
