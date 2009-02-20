@@ -3,7 +3,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_executable(
-    ac-greplace
+    asl-greplace
     SOURCES
        greplace.cpp
     DEPENDS aslbase       

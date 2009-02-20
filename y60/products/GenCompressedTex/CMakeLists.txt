@@ -5,7 +5,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_executable(
-    ac-gen-compressed-tex
+    y60-gen-compressed-tex
     SOURCES
        generateCompressedTex.cpp
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
@@ -13,6 +13,5 @@ ac_add_executable(
             y60input y60inet y60glrender y60glutil y60jsbase y60jslib
             y60gltext y60sdlengine
             sdlttf2 jsspidermonkey y60modelling aslzip paintlib
-       
     EXTERNS ${EXTERNALS}
 )

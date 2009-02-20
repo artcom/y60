@@ -62,6 +62,7 @@ add_subdirectory(serial)
 add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
+add_subdirectory(utilities)
 
 ac_add_doxygen(ASL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 

@@ -1,7 +1,7 @@
 
 
 ac_add_executable(
-    ac-check-schema
+    asl-check-schema
     SOURCES
        CheckSchema.cpp
     DEPENDS aslbase asldom

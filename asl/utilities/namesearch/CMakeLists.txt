@@ -3,7 +3,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_executable(
-    ac-namesearch
+    asl-namesearch
     SOURCES
        namesearch.cpp
     DEPENDS aslbase

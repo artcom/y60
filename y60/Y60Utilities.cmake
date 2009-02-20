@@ -98,7 +98,9 @@ endmacro(y60_add_jstest)
 
 macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
-  get_target_property(COMPAREIMAGE_EXECUTABLE ac-compare-image LOCATION_${CMAKE_BUILD_TYPE})
+  get_target_property(COMPAREIMAGE_EXECUTABLE y60-compare-image LOCATION_${CMAKE_BUILD_TYPE})
+  get_target_property(GENMOVIE_EXECUTABLE y60-gen-movie LOCATION_${CMAKE_BUILD_TYPE})
+  get_target_property(GENCOMPRESSEDTEX_EXECUTABLE y60-gen-compressed-tex LOCATION_${CMAKE_BUILD_TYPE})
 
   collect_path(PLUGIN_DIRS) 
   
@@ -116,7 +118,7 @@ macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
     
   if(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
     file(APPEND ${CMAKEFILE} "include(${TESTMODELDIR}/${NAME}.pre.cmake)\n")
-    file(APPEND ${CMAKEFILE} "${NAME}_pre(${CMAKE_BINARY_DIR} ${TESTMODELDIR}) \n\n")
+    file(APPEND ${CMAKEFILE} "${NAME}_pre(${CMAKE_BINARY_DIR} ${TESTMODELDIR} ${GENMOVIE_EXECUTABLE} ${GENCOMPRESSEDTEX_EXECUTABLE}) \n\n")
   endif(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
 
   file(APPEND ${CMAKEFILE} "#generate image\n")

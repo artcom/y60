@@ -1,6 +1,6 @@
 
 ac_add_executable(
-    ac-compare-image
+    y60-compare-image
     SOURCES
        compareimage.cpp
        plfilter3x3.cpp

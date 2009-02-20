@@ -5,7 +5,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_executable(
-    ac-gen-cubemap
+    y60-gen-cubemap
     SOURCES
        generateCubeMap.cpp
     DEPENDS aslbase aslmath aslzip asldom y60base y60image paintlib
