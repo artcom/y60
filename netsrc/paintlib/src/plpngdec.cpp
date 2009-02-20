@@ -121,10 +121,10 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
   if (m_color_type == PNG_COLOR_TYPE_GRAY)
   {
     int NumColors = 1<<(m_bit_depth);
-    for (PLBYTE i=0; i<NumColors; i++)
+    for (int i=0; i<NumColors; i++)
     {
       PLBYTE CurColor = static_cast<PLBYTE>((i*255)/(NumColors-1));
-      Bmp.SetPaletteEntry(i, CurColor, CurColor, CurColor, 0xFF);
+      Bmp.SetPaletteEntry(PLBYTE(i), CurColor, CurColor, CurColor, 0xFF);
     }
   }
 
