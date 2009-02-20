@@ -32,10 +32,6 @@ else(ACMAKE_LOCKED_AND_LOADED)
     endif(ACMAKE_PRESENT)
 endif(ACMAKE_LOCKED_AND_LOADED)
 
-# load testing stuff
-include(CTest)
-mark_as_advanced(DART_TESTING_TIMEOUT)
-
 # load pkg-config
 include(FindPkgConfig)
 
@@ -69,6 +65,7 @@ include(AcCompiler)
 include(AcBoostUtils)
 include(AcVariableUtils)
 
+include(AcTesting)
 include(AcTarget)
 include(AcProject)
 

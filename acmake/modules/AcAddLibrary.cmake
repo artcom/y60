@@ -146,28 +146,30 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # TODO: clean up test naming
     # XXX: This is goddamn ugly.
     #      Maybe, we should replace it with a separate subsystem.
-    set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
-    foreach(TEST ${THIS_LIBRARY_TESTS})
-        set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")
-               
-        # define the executable
-        ac_add_executable(
-            ${TEST_NAME}
-            SOURCES test${TEST}.tst.cpp
-            DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME} # XXX: asl-specifics
-            EXTERNS ${THIS_LIBRARY_EXTERNS}
-            DONT_INSTALL
-            NO_REVISION_INFO
-        )
-
-        # XXX: multiple build types in VS
-        get_target_property(
-            TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}
-        )
-	
-        # tell ctest about it
-        add_test(${THIS_LIBRARY_NAME}_${TEST} ${TEST_LOCATION})
-    endforeach(TEST)
+    if(ACMAKE_BUILD_TESTS)
+        set(TEST_NAMESPACE "${THIS_LIBRARY_NAME}")
+        foreach(TEST ${THIS_LIBRARY_TESTS})
+            set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")
+            
+            # define the executable
+            ac_add_executable(
+                ${TEST_NAME}
+                SOURCES test${TEST}.tst.cpp
+                DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME} # XXX: asl-specifics
+                EXTERNS ${THIS_LIBRARY_EXTERNS}
+                DONT_INSTALL
+                NO_REVISION_INFO
+            )
+            
+            # XXX: multiple build types in VS
+            get_target_property(
+                TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}
+            )
+	    
+            # tell ctest about it
+            add_test(${THIS_LIBRARY_NAME}_${TEST} ${TEST_LOCATION})
+        endforeach(TEST)
+    endif(ACMAKE_BUILD_TESTS)
 
     # add our target to the current project
     if(NOT THIS_LIBRARY_DONT_INSTALL)
