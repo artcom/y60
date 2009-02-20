@@ -130,10 +130,10 @@ public:
             ENSURE(iiull == static_cast<Unsigned64>(i));
             ENSURE(p == k + 22);
 
-            Float64 iid=0;
+            asl::Float64 iid=0;
             p = theInputStream.readFloat64(iid, p);               // 8
             ENSURE(p == k + 30);
-            ENSURE(iid == static_cast<Float64>(i)); 
+            ENSURE(iid == static_cast<asl::Float64>(i)); 
 
             iiul=0;
             p = theInputStream.readSigned32(ii, p);              // 4
@@ -145,10 +145,10 @@ public:
             ENSURE(p == k + 38);
             ENSURE(iiui == static_cast<Unsigned32>(i));
 
-            Float32 iif=0;
+            asl::Float32 iif=0;
             p = theInputStream.readFloat32(iif, p);               // 4
             ENSURE(p == k + 42);
-            ENSURE(iif == static_cast<Float32>(i)); 
+            ENSURE(iif == static_cast<asl::Float32>(i)); 
 
             short iis=0;
             p = theInputStream.readSigned16(iis, p);               // 2
@@ -313,8 +313,8 @@ public:
 	ENSURE(sizeof(Unsigned32) == 4);
 	ENSURE(sizeof(Signed64) == 8);
 	ENSURE(sizeof(Unsigned64) == 8);
-	ENSURE(sizeof(Float32) == 4);
-	ENSURE(sizeof(Float64) == 8);
+	ENSURE(sizeof(asl::Float32) == 4);
+	ENSURE(sizeof(asl::Float64) == 8);
 	//ENSURE(sizeof(Float128) == 16);
 
         asl::Block myBlock;
