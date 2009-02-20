@@ -97,7 +97,7 @@ namespace y60 {
         MAX_VERTEX_DATA_ROLE
     };
 
-    static const char * VertexDataRoleString[] = {
+    const char * const VertexDataRoleString[] = {
         POSITION_ROLE,
         NORMAL_ROLE,
         COLOR_ROLE,

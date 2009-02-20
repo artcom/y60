@@ -97,7 +97,7 @@ namespace y60 {
     };
 
     // Gl register use the same names as roles to enable default mapping from role to register
-    static const char * GLRegisterString[] = {
+    const char * const GLRegisterString[] = {
         POSITION_ROLE,
         NORMAL_ROLE,
         COLOR_ROLE,
