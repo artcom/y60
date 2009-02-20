@@ -7,13 +7,13 @@ if( WIN32 )
               PATH_SUFFIXES glib-2.0/include
               PATHS $ENV{GTKMM_BASEPATH}/lib )
 
-    list( APPEND GLIB2_INCLUDE_DIR ${GLIB2_CONFIG_INCLUDE_DIR})
+    list(APPEND GLIB2_INCLUDE_DIR ${GLIB2_CONFIG_INCLUDE_DIR})
 
     find_library(GLIB2_LIBRARIES 
                  NAMES glib-2.0
                  PATHS $ENV{GTKMM_BASEPATH}/lib )
  
-    get_filename_component( GLIB2_LIBRARY_DIR ${GLIB2_LIBRARIES} PATH)
+    get_filename_component(GLIB2_LIBRARY_DIR ${GLIB2_LIBRARIES} PATH)
 
     mark_as_advanced(GLIB2_LIBRARY_DIR GLIB2_INCLUDE_DIR 
             GLIB2_CONFIG_INCLUDE_DIR GLIB2_LIBRARIES)

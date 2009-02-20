@@ -11,18 +11,31 @@ if(MAYA_SDK AND MAYA_VERSION)
     )
 
     set(MAYA_INCLUDE_DIRS ${MAYA_INCLUDE_DIR})
+    mark_as_advanced(MAYA_INCLUDE_DIRS MAYA_INCLUDE_DIR)
 
     file(TO_CMAKE_PATH "${MAYA_SDK}/lib" MAYA_LIBRARY_DIR)
 
     set(MAYA_LIBRARIES)
     foreach(SUBLIB ${MAYA_SUBLIBS})
         string(TOUPPER ${SUBLIB} SUBLIB_UPPER)
-        find_library(${SUBLIB_UPPER}_LOCATION NAMES ${SUBLIB}
+
+        mark_as_advanced(MAYA_SUBLIB_${SUBLIB_UPPER})
+
+        find_library(MAYA_SUBLIB_${SUBLIB_UPPER} NAMES ${SUBLIB}
             PATHS ENV MAYA_SDK
             PATH_SUFFIXES lib
         )
+
+        if(MAYA_SUBLIB_${SUBLIB_UPPER}-NOTFOUND)
+            set(MAYA-NOTFOUND TRUE)
+            break()
+        else(MAYA_SUBLIB_${SUBLIB_UPPER}-NOTFOUND)
+            list(APPEND MAYA_LIBRARIES ${MAYA_SUBLIB_${SUBLIB_UPPER}})
+        endif(MAYA_SUBLIB_${SUBLIB_UPPER}-NOTFOUND)
+
         list(APPEND MAYA_LIBRARIES ${SUBLIB})
     endforeach(SUBLIB ${MAYA_SUBLIBS})
+    mark_as_advanced(MAYA_LIBRARIES)
 
     set(MAYA_DEFINITIONS -D_BOOL)
 

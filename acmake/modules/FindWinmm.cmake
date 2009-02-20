@@ -11,6 +11,9 @@ if(WIN32)
     set(WINMM_LIBRARIES ${WINMM_LIBRARY})
     
     find_package_handle_standard_args(WINMM DEFAULT_MSG WINMM_LIBRARIES)
-    mark_as_advanced(WINMM_LIBRARIES)
+
+    mark_as_advanced(WINMM_LIBRARIES WINMM_LIBRARY)
+
+    # XXX: includes!? we get them from other packages...
 
 endif(WIN32)
