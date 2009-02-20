@@ -117,7 +117,7 @@ void PLPicDecoder::MakeBmpFromURL
   sprintf (sz, "--- Decoding URL %s. ---\n", pszURL);
   Trace (1, sz);
 
-  PLURLSource * pSrc;
+  PLURLSource * pSrc = 0;
   try
   {
     pSrc = new PLURLSource ();
@@ -172,7 +172,7 @@ void PLPicDecoder::MakeBmpFromResource
   sprintf (sz, "--- Decoding resource ID %i. ---\n", ResourceID);
   Trace (1, sz);
 
-  PLResourceSource * pResSrc;
+  PLResourceSource * pResSrc = 0;
   try
   {
     pResSrc = new PLResourceSource ();

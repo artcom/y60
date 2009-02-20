@@ -30,11 +30,16 @@
 #endif
 
 //------------- PLASSERT_VALID
-#ifdef _DEBUG
-  #define PLASSERT_VALID(pOb) (pOb)->AssertValid()
-#else
-  #define PLASSERT_VALID(pOb) do{} while (0)
-#endif
+template< typename TObj >
+inline const TObj& plassert_valid_impl(const TObj& obj)
+{
+#   ifdef _DEBUG
+        obj->AssertValid();
+#   endif
+    return obj;
+}
+
+#define PLASSERT_VALID(pOb) plassert_valid_impl(pOb)
 
 //------------- TRACE
 #ifdef _DEBUG
@@ -52,7 +57,7 @@
 //------------- ASSERT
 
     template< typename TExpr >
-    inline const TExpr& plassert_impl(const TExpr& expr,const char* const file, unsigned int line)
+    inline const TExpr& plassert_impl(const TExpr& expr, const char* const file, unsigned int line)
     {
 #       ifdef _DEBUG
             if( !(expr) ) {

@@ -749,7 +749,7 @@ void PLPictDecoder::unpackbits
   PLBYTE * pDestLine;
   PLBYTE   FlagCounter;
   int    len;
-  int    PixelPerRLEUnit;
+  int    PixelPerRLEUnit = 0;
   PLBYTE * pLineBuf = 0;
   PLBYTE * pBuf;
   PLBYTE ** pLineArray = pBmp->GetLineArray();

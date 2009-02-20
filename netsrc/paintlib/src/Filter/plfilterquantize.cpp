@@ -383,7 +383,7 @@ void PLFilterQuantize::genPopularityPalette
 
   int IndexCache = -1;
   HISTONODE * pNode;
-  HISTONODE * pNodeCache;
+  HISTONODE * pNodeCache = 0;
   for (PLBYTE r=0; r<31; r++)
   {
     for (PLBYTE g=0; g<31; g++)
