@@ -39,6 +39,8 @@ PLBmpInfo::PLBmpInfo (const char *pszInfo)
           &m_Size.x, &m_Size.y, &m_Resolution.x, &m_Resolution.y,
            &pf[0]);
   PLASSERT (NumFields == 5);
+#else
+  (void)pszInfo;
 #endif
   m_pf = PLPixelFormat::FromName(&pf[0]);
  
