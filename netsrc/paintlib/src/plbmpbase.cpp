@@ -231,8 +231,8 @@ void PLBmpBase::SetGrayPalette ()
   int NumColors = GetNumColors();
   double ColFactor = 255/(NumColors-1);
 
-  for (PLBYTE i=0; i<NumColors; i++)
-    SetPaletteEntry (i, PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), 0xFF);
+  for (int i=0; i<NumColors; i++)
+    SetPaletteEntry (PLBYTE(i), PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), PLBYTE(i*ColFactor), 0xFF);
 }
 
 void PLBmpBase::SetPalette (PLPixel32 * pPal)
