@@ -355,11 +355,11 @@ namespace y60 {
         }
         switch(_myHorizontalAlignment) {
             case LEFT_ALIGNMENT:
-                return _myLeftPadding - theMinX + (theLine.indent);
+                return _myLeftPadding - theMinX + static_cast<int>(theLine.indent);
             case RIGHT_ALIGNMENT:
-                return theSurfaceWidth-_myRightPadding-theLine.width;
+                return static_cast<int>(theSurfaceWidth)-_myRightPadding-static_cast<int>(theLine.width);
             case CENTER_ALIGNMENT:
-                return (_myLeftPadding-_myRightPadding+theSurfaceWidth-theLine.width) / 2;
+                return (_myLeftPadding-_myRightPadding+static_cast<int>(theSurfaceWidth)-static_cast<int>(theLine.width)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -372,9 +372,9 @@ namespace y60 {
             case TOP_ALIGNMENT:
                 return _myTopPadding;
             case BOTTOM_ALIGNMENT:
-                return theSurfaceHeight-_myBottomPadding-theTextHeight;
+                return static_cast<int>(theSurfaceHeight)-_myBottomPadding-static_cast<int>(theTextHeight);
             case CENTER_ALIGNMENT:
-                return (_myTopPadding-_myBottomPadding+theSurfaceHeight-theTextHeight) / 2;
+                return (_myTopPadding-_myBottomPadding+static_cast<int>(theSurfaceHeight)-static_cast<int>(theTextHeight)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -733,11 +733,12 @@ namespace y60 {
     {
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
+        
         DB2(
-            AC_TRACE << "----------------------------------" << endl;
-            AC_TRACE << "Rendering text: " << theText << endl;
-            AC_TRACE << "Target size: " << theTargetWidth << "x" << theTargetHeight << endl;
-            AC_TRACE << "-----------  Splitter  -----------" << endl;
+            {AC_TRACE << "----------------------------------" << endl;}
+            {AC_TRACE << "Rendering text: " << theText << endl;}
+            {AC_TRACE << "Target size: " << theTargetWidth << "x" << theTargetHeight << endl;}
+            {AC_TRACE << "-----------  Splitter  -----------" << endl;}
         )
 
         vector<Word> myWords;
@@ -782,11 +783,11 @@ namespace y60 {
         createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(
-            AC_TRACE << "-------- Text puzzle ----------" << endl;
-            AC_TRACE << "Target surface size: " << mySurfaceWidth << " x " << mySurfaceHeight << endl;
-            AC_TRACE << "Number of words: " << myWords.size() << endl;
-            AC_TRACE << "Number of lines: " << myLines.size() << endl;
-            AC_TRACE << "Total line height: " << myTotalLineHeight << endl << endl;
+            {AC_TRACE << "-------- Text puzzle ----------" << endl;}
+            {AC_TRACE << "Target surface size: " << mySurfaceWidth << " x " << mySurfaceHeight << endl;}
+            {AC_TRACE << "Number of words: " << myWords.size() << endl;}
+            {AC_TRACE << "Number of lines: " << myLines.size() << endl;}
+            {AC_TRACE << "Total line height: " << myTotalLineHeight << endl << endl;}
         )
 
         // Render lines
@@ -795,18 +796,17 @@ namespace y60 {
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
             int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);
-
             DB2(AC_TRACE << "line: " << i << " wordcount: " << myLines[i].wordCount << endl;)
             for (unsigned j = 0; j < myLines[i].wordCount; ++j) {
                 const Word & myWord = myWords[myWordCount];
                 myWordCount++;
 
                 DB2(
-                    AC_TRACE << "  line:  " << i << endl;
-                    AC_TRACE << "  word:  " << j << endl;
-                    AC_TRACE << "  text:  " << myWord.text << endl;
-                    AC_TRACE << "  Size:  " << myWord.surface->w << " x " << myWord.surface->h << endl;
-                    AC_TRACE << "  Pos:   " << myXPos << " x " << myYPos << endl;
+                    {AC_TRACE << "  line:  " << i << endl;}
+                    {AC_TRACE << "  word:  " << j << endl;}
+                    {AC_TRACE << "  text:  " << myWord.text << endl;}
+                    {AC_TRACE << "  Size:  " << myWord.surface->w << " x " << myWord.surface->h << endl;}
+                    {AC_TRACE << "  Pos:   " << myXPos << " x " << myYPos << endl;}
                 )
 
                 unsigned mySrcHeight = myWord.surface->h;
