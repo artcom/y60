@@ -693,7 +693,7 @@ namespace asl {
                 }
 
                 bool expired() const {
-                    return isValid();
+                    return !isValid();
                 }
 
                 //operator const void*() const {
