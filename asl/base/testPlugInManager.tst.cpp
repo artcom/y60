@@ -128,6 +128,7 @@ public:
     setup() {
         UnitTestSuite::setup();
 
+        // XXX: this does not consider RelWithDebInfo, Profiling and Coverage
 #if defined(_DEBUG)
         PlugInManager::get().setSearchPath(".;../../lib;../../lib/Debug");
 #else //defined(DEBUG_VARIANT)
