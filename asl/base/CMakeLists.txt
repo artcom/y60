@@ -133,6 +133,8 @@ if(UNIX)
     list(APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
 endif(UNIX)
 
+set(EXTERNS Boost)
+
 if(OSX)
     list(APPEND SOURCES MachOBacktrace.cpp)
     list(APPEND HEADERS MachOBacktrace.h)
