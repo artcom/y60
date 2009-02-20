@@ -21,6 +21,7 @@ find_package(PRO60_DEPS NO_MODULE)
 
 if(PRO60_DEPS_FOUND)
     pro60_deps_register_searchpath()
+    mark_as_advanced(PRO60_DEPS_DIR PRO60_DEPS_ROOT_DIR)
     message("PRO60_DEPS found in ${PRO60_DEPS_ROOT_DIR}")
 else(PRO60_DEPS_FOUND)
     if(WIN32)
