@@ -30,7 +30,7 @@ PLBmpInfo::PLBmpInfo (const PLPoint& Size, const PLPoint& Resolution,
   SetBmpInfo (Size, Resolution, pf);
 }
 
-PLBmpInfo::PLBmpInfo (const char * /*pszInfo*/)
+PLBmpInfo::PLBmpInfo (const char *pszInfo)
   : m_Size(), m_Resolution(), m_pf(PLPixelFormat::DONTCARE)
 {
   vector<char> pf(128);
