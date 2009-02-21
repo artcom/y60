@@ -4,7 +4,11 @@
          relative to the toplevel of the checkout. It is overridden by 
          recipes that use a multi-configuration CMake generator, like the
          MSVC recipe.-->
-    <property name="build.dir" value="_builds/${build.type}/"/>
+    <property name="build.dir" value="${build.root}/${build.type}/"/>
+
+    <!-- this property specifies the relative path from the build.dir
+         to the toplevel of the source code -->
+    <property name="cmake.source.dir" value="../../"/>
 
     <!-- postprocessors for the configure phase -->
     <post-processor name="cmake.pp">
@@ -44,14 +48,11 @@
         </regex.pp>
     </post-processor>
 
-    <!-- macros -->
-    <macro name="prepare_build">
-        <command name="prepare">
-            <executable exe="cmake" args="-E make_directory ${build.dir}"/>
-        </command>
-    </macro>
 
     <macro name="run_cmake">
+        <executable exe="cmake" args="-E make_directory ${build.dir}"/>
+        <executable exe="cmake" working-dir="${build.dir}"
+                    args="-E remove CMakeCache.txt"/>
         <command name="configure">
             <executable exe="cmake" working-dir="${build.dir}">
                 <arg>-G</arg><arg>${cmake.generator}</arg>
@@ -66,9 +67,6 @@
 
     <recipe name="GNU Make">
         <property name="cmake.generator" value="Unix Makefiles"/>
-        <property name="cmake.source.dir" value="../../"/>
-
-        <macro-ref macro="${prepare_build}"/>
 
         <macro-ref macro="${run_cmake}"/>
 
@@ -82,19 +80,16 @@
             <make targets="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
             </make>
-            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 
     <recipe name="NMake">
         <property name="cmake.generator" value="NMake Makefile"/>
-        <property name="cmake.source.dir" value="../../"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="nmake.bin.dir" value="${vs.root.dir}/VC/bin/"/>
         <property name="nmake.bin" value="${nmake.bin.dir}/nmake.exe"/>
-
-        <macro-ref macro="${prepare_build}"/>
 
         <macro-ref macro="${run_cmake}"/>
 
@@ -108,20 +103,18 @@
             <executable exe="${nmake.bin}" args="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
             </executable>
-            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 
     <recipe name="MSVC">
-        <property name="build.dir" value="_builds/"/>
-        <property name="cmake.generator" value="Visual Studio 9 2008"/>
+        <property name="build.dir" value="${build.root}/"/>
         <property name="cmake.source.dir" value="../"/>
+        <property name="cmake.generator" value="Visual Studio 9 2008"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
         <property name="vcbuild.bin.dir" value="${vs.root.dir}/VC/vcpackages/"/>
         <property name="vcbuild.bin" value="${vcbuild.bin.dir}/vcbuild.exe"/>
-
-        <macro-ref macro="${prepare_build}"/>
 
         <macro-ref macro="${run_cmake}"/>
 
@@ -142,7 +135,7 @@
 
                 <process processor="${msvc_test_run.pp}"/>
             </executable>
-            <artifact name="LastTest.log" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
         </command>
     </recipe>
 </project>
