@@ -3,6 +3,7 @@
 #       regard to which tests will have
 #       paths available for what plugins
 
+add_subdirectory(ProcFunctions)
 add_subdirectory(ASSDriver)
 add_subdirectory(Cluster)
 add_subdirectory(CMSCache)
@@ -21,7 +22,6 @@ add_subdirectory(Net)
 add_subdirectory(OpenEXR)
 add_subdirectory(OscReceiver)
 add_subdirectory(OscSender)
-add_subdirectory(ProcFunctions)
 add_subdirectory(StlImporter)
 add_subdirectory(SynergyServer)
 add_subdirectory(testRendererExtension)
