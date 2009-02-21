@@ -10,6 +10,7 @@
          to the toplevel of the source code -->
     <property name="cmake.source.dir" value="../../"/>
 
+    <property name="test.log.file" file="${build.dir}/Testing/Temporary/LastTest.log"/>
     <!-- postprocessors for the configure phase -->
     <post-processor name="cmake.pp">
         <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
@@ -47,7 +48,21 @@
                      expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
         </regex.pp>
     </post-processor>
-
+    
+                   <!--
+                   pass-status="OK" failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)$]]></regex-test.pp>
+                   -->
+    <regex-test.pp name="acunittest.pp"
+            status-group="1"
+            name-group="2"
+            detail-group="3"
+            pass-status="OK"
+            failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)$]]></regex-test.pp>
+    <macro name="handle_testlog">
+        <artifact name="Test Output" file="${test.log.file}">
+            <process processor="${acunittest.pp}"/>
+        </artifact>
+    </macro>
 
     <macro name="run_cmake">
         <executable name="create build dir" exe="cmake" args="-E make_directory ${build.dir}"/>
@@ -80,7 +95,7 @@
             <make targets="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
             </make>
-            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <macro-ref macro="${handle_testlog}"/>
         </command>
     </recipe>
 
@@ -103,13 +118,15 @@
             <executable exe="${nmake.bin}" args="test" working-dir="${build.dir}">
                 <process processor="${make_test_run.pp}"/>
             </executable>
-            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <macro-ref macro="${handle_testlog}"/>
         </command>
     </recipe>
 
     <recipe name="MSVC">
         <property name="build.dir" value="${build.root}/"/>
         <property name="cmake.source.dir" value="../"/>
+        <property name="test.log.file" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+
         <property name="cmake.generator" value="Visual Studio 9 2008"/>
         <!-- TODO: make these agent properties -->
         <property name="vs.root.dir" value="${env.VS90COMNTOOLS}/../../"/>
@@ -135,7 +152,7 @@
 
                 <process processor="${msvc_test_run.pp}"/>
             </executable>
-            <artifact name="Test Output" file="${build.dir}/Testing/Temporary/LastTest.log"/>
+            <macro-ref macro="${handle_testlog}"/>
         </command>
     </recipe>
 </project>
