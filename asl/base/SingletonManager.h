@@ -176,7 +176,7 @@ public:
     SingletonDeleter() {}
     ~SingletonDeleter()
     {
-        asl::SingletonManager::get().destroyAllSingletons();
+        //asl::SingletonManager::get().destroyAllSingletons();
     }
 private:
     SingletonDeleter(const SingletonDeleter&);
