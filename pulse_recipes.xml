@@ -55,7 +55,7 @@
     <regex-test.pp name="acunittest.pp"
             status-group="1"
             name-group="2"
-            detail-group="3"
+            details-group="3"
             pass-status="OK"
             failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)$]]></regex-test.pp>
     <macro name="handle_testlog">
