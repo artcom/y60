@@ -50,8 +50,8 @@
 
 
     <macro name="run_cmake">
-        <executable exe="cmake" args="-E make_directory ${build.dir}"/>
-        <executable exe="cmake" working-dir="${build.dir}"
+        <executable name="create build dir" exe="cmake" args="-E make_directory ${build.dir}"/>
+        <executable name="flush CMakeCache.txt" exe="cmake" working-dir="${build.dir}"
                     args="-E remove CMakeCache.txt"/>
         <command name="configure">
             <executable exe="cmake" working-dir="${build.dir}">
