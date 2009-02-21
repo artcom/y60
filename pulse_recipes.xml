@@ -50,7 +50,7 @@
     </post-processor>
     
                    <!--
-                   pass-status="OK" failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)$]]></regex-test.pp>
+                   pass-status="OK" failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)\$]]></regex-test.pp>
                    -->
     <regex-test.pp name="acunittest.pp"
             status-group="1"
