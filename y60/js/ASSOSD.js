@@ -172,11 +172,12 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
     ////////////////////////////////////////
 
     function buildQuitOSD() {
-        var myFontPath = "FONTS/arial.ttf";
+        var myFontPath = "FONTS/acswissmed.ttf";
         if (!fileExists(myFontPath)) {
-            myFontPath = "${PRO}/testmodels/fonts/arial.ttf";
-            if (!fileExists(myFontPath) && operatingSystem() == "WIN32") {
+            if (operatingSystem() == "WIN32") {
                 myFontPath = "${SYSTEMROOT}/fonts/arial.ttf";
+            } else {
+	        Logger.error("Could not find a font for rendering");
             }
         }
         
