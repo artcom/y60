@@ -4,13 +4,13 @@
          relative to the toplevel of the checkout. It is overridden by 
          recipes that use a multi-configuration CMake generator, like the
          MSVC recipe.-->
-    <property name="build.dir" value="${build.root}/${build.type}/"/>
+    <property name="build.dir" value="${build.root}/${build.type}"/>
 
     <!-- this property specifies the relative path from the build.dir
          to the toplevel of the source code -->
     <property name="cmake.source.dir" value="../../"/>
 
-    <property name="test.log.file" value="Testing/Temporary/LastTest.log"/>
+    <property name="test.log.file" value="${build.dir}/Testing/Temporary/LastTest.log"/>
     <!-- postprocessors for the configure phase -->
     <post-processor name="cmake.pp">
         <regex.pp name="cmake_error.pp" trailing-context="10" fail-on-error="false">
@@ -123,7 +123,7 @@
     </recipe>
 
     <recipe name="MSVC">
-        <property name="build.dir" value="${build.root}/"/>
+        <property name="build.dir" value="${build.root}"/>
         <property name="cmake.source.dir" value="../"/>
         <property name="test.log.file" value="${build.dir}/Testing/Temporary/LastTest.log"/>
 
