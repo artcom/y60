@@ -87,6 +87,7 @@ class Y60_BASE_EXPORT IDecoder {
         * @return the Mimetype of the decoder, or an empty string, if it cannot decode the file.
         */
         virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>() ) = 0;
+        virtual void shutdown() {}
         virtual ~IDecoder() {}
 }; 
 

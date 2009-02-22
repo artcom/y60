@@ -85,6 +85,7 @@
 
 #define DB(x) //x 
 #define DB2(x) //x
+#define DBI(x) //x
 
 using namespace std;
 using namespace asl;
@@ -103,9 +104,9 @@ namespace y60 {
     asl::Block FFMpegDecoder2::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
     FFMpegDecoder2::FFMpegDecoder2(asl::DLHandle theDLHandle) :
-        PlugInBase(theDLHandle),
         AsyncDecoder(),
         PosixThread(),
+        PlugInBase(theDLHandle),
         _myLastVideoFrame(),
         _myFormatContext(0),
         _myFrame(0),
@@ -123,17 +124,23 @@ namespace y60 {
         _myDecodedPacketsPerFrame(0),
         _myBytesPerPixel(1),
         _myMaxCacheSize(8),
-        _myLastFrameTime(0)
+        _myLastFrameTime(0),
+        _hasShutDown(false)
     {}
 
     FFMpegDecoder2::~FFMpegDecoder2() {
-        closeMovie();
-        if (_myResampleContext) {
-            audio_resample_close(_myResampleContext);
-            _myResampleContext = 0;
-        }
+        shutdown();
     }
-
+    void FFMpegDecoder2::shutdown() {
+        if (!_hasShutDown) {
+            closeMovie();
+            if (_myResampleContext) {
+                audio_resample_close(_myResampleContext);
+                _myResampleContext = 0;
+            }
+        }
+        _hasShutDown = true;
+    }
     asl::Ptr<MovieDecoderBase> FFMpegDecoder2::instance() const {
         return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder2(getDLHandle()));
     }
@@ -281,10 +288,10 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::stopMovie";
+        DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
         
         if (getState() != STOP) {
-            AC_INFO << "Joining FFMpegDecoder Thread";
+            //AC_INFO << "Joining FFMpegDecoder Thread";
             join();
             
             _myDecodedPacketsPerFrame = 0; // reset counter    
@@ -296,7 +303,6 @@ namespace y60 {
             myMovie->set<CurrentFrameTag>(0);
             
             _myDemux->clearPacketCache();
-            setState(STOP);
             _myMsgQueue.clear();
             _myMsgQueue.reset();
             dumpCache();
@@ -306,7 +312,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::closeMovie() {
-        AC_INFO << "FFMpegDecoder2::closeMovie";
+        DBI(AC_INFO << "FFMpegDecoder2::closeMovie";)
         // stop thread
         stopMovie();
 
@@ -325,9 +331,10 @@ namespace y60 {
             _myAStreamIndex = -1;
             _myAStream = 0;
         }
-
-        av_close_input_file(_myFormatContext);
-        _myFormatContext = 0;
+        if (_myFormatContext) {
+            av_close_input_file(_myFormatContext);
+            _myFormatContext = 0;
+        }
         AsyncDecoder::closeMovie();
     }
 

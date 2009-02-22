@@ -137,6 +137,7 @@ namespace y60 {
     public:
         FFMpegDecoder1(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder1();
+        void shutdown();
 
         /**
          * loads a movie from the file given by theFilename
@@ -175,8 +176,7 @@ namespace y60 {
     
         // Convert frame from yuv to rgb
         void convertFrame(AVFrame* theFrame, dom::ResizeableRasterPtr theTargetRaster);
-
-
+    private:
         AVFormatContext * _myFormatContext;
         AVFrame *         _myFrame;
 
@@ -190,7 +190,7 @@ namespace y60 {
         double           _myLastVideoTimestamp;
         int               _myDestinationPixelFormat;
         unsigned          _myBytesPerPixel;
-
+        bool _hasShutDown;
     };
 
     typedef asl::Ptr<FFMpegDecoder1> FFMpegDecoder1Ptr;

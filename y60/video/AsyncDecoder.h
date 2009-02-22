@@ -169,23 +169,24 @@ namespace y60 {
                 }
             }
 
-            /**
-             * Stops the current playback. Future calls to play will start from the beginning of 
-             * the movie as if it was 
-             */
-            virtual void stopMovie(bool theStopAudioFlag = true) {
-                AC_DEBUG << "AsyncDecoder::stopMovie";
-                MovieDecoderBase::stopMovie();
-                if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
-                    _myAudioSink->stop();
-                } 
-            }
-
             enum DecoderState {
                 RUN,
                 PAUSE,
                 STOP
             };
+            
+            /**
+             * Stops the current playback. Future calls to play will start from the beginning of 
+             * the movie as if it was 
+             */
+            virtual void stopMovie(bool theStopAudioFlag = true) {
+                //AC_DEBUG << "AsyncDecoder::stopMovie";
+                MovieDecoderBase::stopMovie();
+                if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                    _myAudioSink->stop();
+                }
+                setState(STOP);
+            }
             
             static std::string getStateString(DecoderState theState) {
                 switch (theState) {
@@ -205,8 +206,8 @@ namespace y60 {
             }
 
             void setState(DecoderState theState) {
-                AC_DEBUG << "AsyncDecoder::setState State change: " << getStateString(_myState) << " --> " 
-                        << getStateString(theState);
+                //AC_DEBUG << "AsyncDecoder::setState State change: " << getStateString(_myState) << " --> " 
+                //        << getStateString(theState);
                 _myState = theState;
             }
             

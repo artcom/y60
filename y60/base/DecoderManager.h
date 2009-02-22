@@ -143,6 +143,12 @@ class Y60_BASE_EXPORT DecoderManager : public asl::Singleton<DecoderManager> {
             }
             return myCapableDecoders;
         }
+        void stop() {
+            // shutdown all decoders when singleton is about to be destroyed
+            for (unsigned i = 0; i < _myDecoders.size(); ++i) {
+                _myDecoders[i]->shutdown();
+            }
+        }
     private:
         std::vector<IDecoderPtr> _myDecoders;
 };

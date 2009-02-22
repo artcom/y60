@@ -106,16 +106,24 @@ namespace y60 {
         _myStartTimestamp(0),
         _myLastVideoTimestamp(0),
         _myDestinationPixelFormat(PIX_FMT_BGR24),
-        _myBytesPerPixel(0)
+        _myBytesPerPixel(0),
+        _hasShutDown(false)
     {
         DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");
     }
 
     FFMpegDecoder1::~FFMpegDecoder1() {
-        closeMovie();
-        DB(AC_DEBUG << "destructing an FFMpegDecoder1...");
+        shutdown();
+        DB(AC_DEBUG << "destroyed an FFMpegDecoder1...");
     }
-
+    
+    void FFMpegDecoder1::shutdown() {
+        if (!_hasShutDown) {
+            closeMovie();
+        }
+        _hasShutDown = true;
+   }
+    
     asl::Ptr<MovieDecoderBase> FFMpegDecoder1::instance() const {
         return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder1(getDLHandle()));
     }
@@ -147,8 +155,9 @@ namespace y60 {
             av_free(_myFrame);
             _myFrame = 0;
         }
-
-        av_close_input_file(_myFormatContext);
+        if (_myFormatContext) {
+            av_close_input_file(_myFormatContext);
+        }
         _myFormatContext = 0;
     }
 

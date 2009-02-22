@@ -168,6 +168,8 @@ namespace y60 {
         void closeMovie();
 
         const char * getName() const { return "y60FFMpegDecoder2"; }
+        
+        void shutdown();
 
     private:
         // Called from main thread
@@ -243,6 +245,7 @@ namespace y60 {
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
+        bool _hasShutDown;
 
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
