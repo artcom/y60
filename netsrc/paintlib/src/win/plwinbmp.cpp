@@ -278,7 +278,7 @@ void PLWinBmp::CreateFromHDIBBitmap (BITMAPINFOHEADER* pBIH, HPALETTE hPal)
 			if(wEntries)
 			{
 				int rc;
-				for(PLBYTE n = 0 ; n < wEntries; n++)
+				for(int n = 0 ; n < wEntries; n++)
 				{
 					rc = GetPaletteEntries(hPal, n, 1, &pe);
 					PLASSERT(rc);

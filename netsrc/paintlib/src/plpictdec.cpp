@@ -696,7 +696,7 @@ void PLPictDecoder::unpack8bits
   PLBYTE ** pLineArray = pBmp->GetLineArray();
 
   int Height = pBounds->bottom - pBounds->top;
-  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
+  int Width = pBounds->right - pBounds->left;
 
   // High bit of rowBytes is flag.
   rowBytes &= 0x7fff;
@@ -755,7 +755,7 @@ void PLPictDecoder::unpackbits
   PLBYTE ** pLineArray = pBmp->GetLineArray();
 
   int Height = pBounds->bottom - pBounds->top;
-  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
+  int Width = pBounds->right - pBounds->left;
 
   // High bit of rowBytes is flag.
   if (pixelSize <= 8)
@@ -916,7 +916,7 @@ void PLPictDecoder::skipBits
   int    linelen;            // length of source line in bytes.
 
   int Height = pBounds->bottom - pBounds->top;
-  PLWORD Width = static_cast<PLWORD>(pBounds->right - pBounds->left);
+  int Width = pBounds->right - pBounds->left;
 
   // High bit of rowBytes is flag.
   if (pixelSize <= 8)
@@ -1115,7 +1115,7 @@ void PLPictDecoder::readColourTable
   Trace (2, sz);
   Trace (3, "Reading Palette.\n");
 
-  for (PLWORD i = 0; i < *pNumColors; i++)
+  for (int i = 0; i < *pNumColors; i++)
   {
     val = ReadMWord(pDataSrc);
     if (ctFlags & 0x8000)

@@ -136,7 +136,7 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
 
     png_get_PLTE(m_png_ptr, m_info_ptr, &ppng_color_tab, &nbColor);
 
-    for (PLBYTE i=0; i<nbColor; i++)
+    for (int i=0; i<nbColor; i++)
     {
       Bmp.SetPaletteEntry(i,
                             (*(ppng_color_tab+i)).red,

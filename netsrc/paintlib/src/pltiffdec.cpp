@@ -381,7 +381,7 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
       Palette16Bits = checkcmap(1<<BitsPerSample, red, green, blue) == 16;
 
       //load the palette in the DIB
-      for (PLBYTE i = 0; i < 1<<BitsPerSample; ++i)
+      for (int i = 0; i < 1<<BitsPerSample; ++i)
       {
         PLBYTE *pb = (PLBYTE *) ((pPal)+i);
         pb[PL_RGBA_RED  ] = (PLBYTE) (Palette16Bits ? CVT(  red[i]) :   red[i]);

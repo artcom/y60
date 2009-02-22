@@ -195,7 +195,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
   }
 
   PLBYTE* pb = (PLBYTE*)ColorMap->Colors;
-  for (PLBYTE i = 0; i < ColorMap->ColorCount; i++)
+  for (int i = 0; i < ColorMap->ColorCount; i++)
   {
     Bmp.SetPaletteEntry(i, pb[0], pb[1], pb[2], i == iTransparentIndex ? 0:255);
     pb += 3;

@@ -301,11 +301,11 @@ void PLFilterQuantize::squeeze(QUBOX * pBox) const
   int gsum = 0;
   int bsum = 0;
   PLULONG count = 0;
-  for (PLBYTE r=Corner0.GetR (); r<=Corner1.GetR (); r++)
+  for (int r=Corner0.GetR (); r<=Corner1.GetR (); r++)
   {
-    for (PLBYTE g=Corner0.GetG (); g<=Corner1.GetG (); g++)
+    for (int g=Corner0.GetG (); g<=Corner1.GetG (); g++)
     {
-      for (PLBYTE b=Corner0.GetB (); b<=Corner1.GetB (); b++)
+      for (int b=Corner0.GetB (); b<=Corner1.GetB (); b++)
       {
         int index = getColorTableIndex ( PLPixel32 (r,g,b,0));
         HISTONODE * pNode = m_ppHisto[index];
@@ -384,13 +384,13 @@ void PLFilterQuantize::genPopularityPalette
   int IndexCache = -1;
   HISTONODE * pNode;
   HISTONODE * pNodeCache = 0;
-  for (PLBYTE r=0; r<31; r++)
+  for (int r=0; r<31; r++)
   {
-    for (PLBYTE g=0; g<31; g++)
+    for (int g=0; g<31; g++)
     {
-      for (PLBYTE b=0; b<31; b++)
+      for (int b=0; b<31; b++)
       {
-        int index = getColorTableIndex (PLPixel32 (r,g,b,PLBYTE()));
+        int index = getColorTableIndex (PLPixel32 (r,g,b,PLBYTE(0)));
         if (index == IndexCache)
           pNode = pNodeCache;
         else
