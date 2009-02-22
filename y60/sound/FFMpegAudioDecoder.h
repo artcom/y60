@@ -80,8 +80,10 @@ extern "C" {
 #   endif //defined(_MSC_VER)
 #ifndef AC_BUILT_WITH_CMAKE
 #       include <ffmpeg/avformat.h>
+#       include <ffmpeg/avcodec.h>
 #else
 #       include <avformat.h>
+#       include <avcodec.h>
 #endif
 #   if defined(_MSC_VER)
 #       pragma warning (pop)
