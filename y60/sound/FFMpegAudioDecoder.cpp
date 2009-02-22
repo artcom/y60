@@ -150,7 +150,7 @@ void FFMpegAudioDecoder::open() {
                 throw DecoderException(std::string("Can't decode ")+_myURI, PLUS_FILE_LINE);
             } else {
                 throw FileNotFoundException(std::string("Unable to open input file, errno=") + 
-                    asl::as_string(err) + "("+strerror(-err)+"): " + _myURI, PLUS_FILE_LINE);
+                    asl::as_string(err) + "("+strerror(AVERROR(err))+"): " + _myURI, PLUS_FILE_LINE);
             }
         }
         if ((err = av_find_stream_info(_myFormatContext)) < 0) {

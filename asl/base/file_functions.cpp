@@ -283,9 +283,18 @@ namespace asl {
     }
 
     std::string searchFile(const std::string & theFileName, const std::string & theSearchPath) {
-       std::string myLocalFileName("./" + theFileName);
-       if (fileExists(myLocalFileName)) {
-             return myLocalFileName;
+#ifdef LINUX
+        if (theFileName.find("/") == std::string::npos) {
+            // fix for shared library loading on linux which has a special
+            // treatment for filenames without slashes 
+            std::string myLocalFileName("./" + theFileName);
+            if (fileExists(myLocalFileName)) {
+                return myLocalFileName;
+            }
+        }
+#endif
+       if (fileExists(theFileName)) {
+             return theFileName;
        }
        std::vector<std::string> mySearchPaths;
        splitPaths(theSearchPath, mySearchPaths);
