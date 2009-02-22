@@ -56,6 +56,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
+DEFINE_EXCEPTION(FileOpenFailed, asl::Exception);
 DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
 DEFINE_EXCEPTION(CreateDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(RemoveDirectoryFailed, asl::Exception);
