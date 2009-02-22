@@ -142,7 +142,7 @@ void FFMpegAudioDecoder::seek (Time thePosition)
 
 void FFMpegAudioDecoder::open() {
     AC_DEBUG << "FFMpegAudioDecoder::open (" << _myURI << ")" << _myURI;
-    
+        
     try {
         int err;
         if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
@@ -185,9 +185,13 @@ void FFMpegAudioDecoder::open() {
             throw DecoderException(std::string("Unable to find decoder: ") + _myURI, 
                     PLUS_FILE_LINE);
         }
-        if (avcodec_open(myCodecContext, myCodec) < 0 ) {
-            throw DecoderException(std::string("Unable to open codec: ") + _myURI, 
-                    PLUS_FILE_LINE);
+        
+        {
+            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+            if (avcodec_open(myCodecContext, myCodec) < 0 ) {
+                throw DecoderException(std::string("Unable to open codec: ") + _myURI, 
+                        PLUS_FILE_LINE);
+            }
         }
 
         _mySampleRate = myCodecContext->sample_rate;
@@ -207,6 +211,7 @@ void FFMpegAudioDecoder::open() {
 
 void FFMpegAudioDecoder::close() {
     AC_DEBUG << "FFMpegAudioDecoder::close() (" << _myURI << ")";
+    
 
     if (_myFormatContext) {
         if (_myResampleContext) {
@@ -219,10 +224,13 @@ void FFMpegAudioDecoder::close() {
         AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
 #endif
         if (myCodecContext) {
+            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
             avcodec_close(myCodecContext);
         }
-        av_close_input_file(_myFormatContext);
-        _myFormatContext = 0;
+        if (_myFormatContext) {
+            av_close_input_file(_myFormatContext);
+            _myFormatContext = 0;
+        }
         _myStreamIndex = -1;
     }
 }

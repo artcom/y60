@@ -98,6 +98,15 @@ namespace y60 {
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const; 
         virtual unsigned getNumSounds() const;
+        virtual unsigned getNumOpenSounds() const {
+            return _mySounds.size();
+        }
+        virtual unsigned getMaxOpenSounds() const {
+            return Y60_MAX_OPEN_SOUNDS;
+        }
+        virtual void setMaxOpenSounds(unsigned theLimit) {
+            Y60_MAX_OPEN_SOUNDS = theLimit;
+        }
         virtual void stopAll();
         virtual bool isRunning() const;
 
@@ -130,6 +139,7 @@ namespace y60 {
         unsigned _myMaxCacheItemSize;
         typedef std::map<std::string, SoundCacheItemPtr> CacheMap; // Cached sounds indexed by uri.
         CacheMap _myCache;
+        unsigned Y60_MAX_OPEN_SOUNDS;
     };
 }
 

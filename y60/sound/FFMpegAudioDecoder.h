@@ -115,6 +115,9 @@ class Y60_SOUND_EXPORT FFMpegAudioDecoder: public IAudioDecoder
         void open();
         void close();
 
+         // avcodec open/close must be protected by locks
+        asl::ThreadLock _myAVCodecLock;
+        
         std::string _myURI;
         AVFormatContext * _myFormatContext;
 
@@ -127,6 +130,7 @@ class Y60_SOUND_EXPORT FFMpegAudioDecoder: public IAudioDecoder
         asl::ISampleSink* _mySampleSink;
         
         unsigned _myCurFrame;
+
 };
 
 class FFMpegAudioDecoderFactory: public IAudioDecoderFactory

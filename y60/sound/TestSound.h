@@ -622,12 +622,15 @@ class StressTest: public SoundTestBase {
     protected:
         void doIteration(int i) {
             // No caching.
-            SoundPtr mySound = getSoundManager().createSound
+            if (getSoundManager().getNumOpenSounds() < getSoundManager().getMaxOpenSounds()) {
+                SoundPtr mySound = getSoundManager().createSound
                 (TEST_FILES "/stereotest441.wav", false, false);
-            mySound->setVolume(0.02f);
-            mySound->play();
+                mySound->setVolume(0.02f);
+                mySound->play();
+                AC_INFO << "open sounds=" << getSoundManager().getNumOpenSounds();
+            }
             double r1 = rand()/double(RAND_MAX);
-            unsigned myTime = unsigned(3*r1);
+            unsigned myTime = unsigned(2*r1);
             msleep(myTime);
         }
         
@@ -691,7 +694,7 @@ class SoundTestSuite : public UnitTestSuite {
                 myNoisy = false;
                 mySoundManager.setVolume(0);
             }
-            
+#if 1            
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
             addTest(new TestCache(mySoundManager));
@@ -708,7 +711,7 @@ class SoundTestSuite : public UnitTestSuite {
           
             addTest(new TestLoop(mySoundManager));
             addTest(new TestVolume(mySoundManager, myNoisy));
-
+#endif
 #ifndef DEBUG_VARIANT
             // In debug mode, the program runs too slowly for this test.
             addTest(new StressTest(mySoundManager, 5));

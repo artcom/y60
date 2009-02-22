@@ -66,6 +66,7 @@
 #include <asl/audio/Pump.h>
 #include <asl/base/Auto.h>
 #include <asl/base/proc_functions.h>
+#include <asl/base/os_functions.h>
 
 using namespace std;
 using namespace asl;
@@ -73,7 +74,8 @@ using namespace asl;
 namespace y60 {
 
 const double myTimePerSlice = 0.05;
-    
+const unsigned DEFAULT_Y60_MAX_OPEN_SOUNDS = 200;
+
 SoundManager::SoundManager()
     : _myMaxCacheSize (128*1024*1024), // 128 MB Cache
       _myMaxCacheItemSize (60*2*sizeof(float)*48000) 
@@ -88,6 +90,8 @@ SoundManager::SoundManager()
     
     _myFFMpegAudioDecoderFactory = new FFMpegAudioDecoderFactory;
     registerDecoderFactory(_myFFMpegAudioDecoderFactory);
+    
+    Y60_MAX_OPEN_SOUNDS = asl::getenv("Y60_MAX_OPEN_SOUNDS", DEFAULT_Y60_MAX_OPEN_SOUNDS);
 
     // XXX: forking here is dangerous because virtuals are not yet
     //      initialized. this can lead to hard-to-catch bugs and
@@ -180,6 +184,12 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
     AC_TRACE << "SoundManager::createSound " << theURI << ", loop: " << theLoop 
             << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
+    if (getNumOpenSounds() >= getMaxOpenSounds()) {
+        AC_ERROR << "Maximum number of concurrent sounds ("<<getMaxOpenSounds()<<") reached,"
+                 << "fix your application or adjust the Y60_MAX_OPEN_SOUNDS environment variable"
+                 <<  "and the limits for maximum number of open files";
+        return SoundPtr();
+    }
     IAudioDecoder * myDecoder;
     SoundCacheItemPtr myCacheItem = SoundCacheItemPtr();
     if (theUseCache) {
