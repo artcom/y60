@@ -35,20 +35,16 @@
     </post-processor>
 
     <!-- postprocessors for the test phase -->
-    <post-processor name="msvc_test_run.pp">
-        <regex.pp name="ctest.pp">
-            <pattern category="error"
-                     expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
-        </regex.pp>
+    <post-processor name="test_run.pp">
+        <regex-test.pp name="ctest.pp"
+                       name-group="1"
+                       status-group="2"
+                       details-group="3"
+                       pass-status="Passed"
+                       failure-status="***"><![CDATA[^\\s*\\d+/\\d+ Testing (\\w+)\\s+(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
     </post-processor>
 
-    <post-processor name="make_test_run.pp">
-        <regex.pp name="ctest.pp">
-            <pattern category="error"
-                     expression=".*\\*\\*\\*(Failed|Exception|Timeout|Bad command)"/>
-        </regex.pp>
-    </post-processor>
-    
+    <!--- currently unused regex to parse the output of asl::UnitTest -->
     <regex-test.pp name="acunittest.pp"
             status-group="2"
             details-group="3"
@@ -58,7 +54,7 @@
 
     <macro name="handle_testlog">
         <artifact name="test output" file="${test.log.file}">
-            <process processor="${acunittest.pp}"/>
+<!-- way too much!!!            <process processor="${acunittest.pp}"/> -->
         </artifact>
     </macro>
 
@@ -91,7 +87,7 @@
 
         <command name="test">
             <make targets="test" working-dir="${build.dir}">
-                <process processor="${make_test_run.pp}"/>
+                <process processor="${test_run.pp}"/>
             </make>
             <macro-ref macro="${handle_testlog}"/>
         </command>
@@ -114,7 +110,7 @@
 
         <command name="test">
             <executable exe="${nmake.bin}" args="test" working-dir="${build.dir}">
-                <process processor="${make_test_run.pp}"/>
+                <process processor="${test_run.pp}"/>
             </executable>
             <macro-ref macro="${handle_testlog}"/>
         </command>
@@ -148,7 +144,7 @@
                 <arg>RUN_TESTS.vcproj</arg>
                 <arg>&quot;${build.type}|Win32&quot;</arg>
 
-                <process processor="${msvc_test_run.pp}"/>
+                <process processor="${test_run.pp}"/>
             </executable>
             <macro-ref macro="${handle_testlog}"/>
         </command>
