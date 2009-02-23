@@ -172,11 +172,6 @@ UnitTest::returnStatus() const {
     }
 }
 
-const char *
-UnitTest::getTracePrefix () {
-    return ">>>>>> ";
-}
-
 void
 UnitTest::setSilentSuccess(bool makeSilent) {
     _silentSuccess = makeSilent;
@@ -246,6 +241,11 @@ UnitTest::ensure(bool myExpressionResult,
         std::cerr << "UnitTest::ensure: Execution aborted" << std::endl;
         abort();
     }
+}
+
+const char *
+UnitTest::getTracePrefix () {
+    return ">>>>>>        ";
 }
 
 void

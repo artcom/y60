@@ -162,7 +162,7 @@ UnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {};
 
     obj.getTracePrefix = function() {
-        return ">>>>>> ";
+        return ">>>>>>        ";
     }
     obj.setup = function() {
         print(">>>> Launching Test Unit '" + _myName + "'");
