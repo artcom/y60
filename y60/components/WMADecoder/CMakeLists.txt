@@ -25,5 +25,5 @@ y60_add_component(
     EXTERNS ${EXTERNALS}
 )
 
-y60_add_jstest(localtest WMADecoder)
+y60_add_jstest(localtest mod_WMADecoder)
 

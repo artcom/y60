@@ -24,5 +24,5 @@ y60_add_component(
     EXTERNS ${EXTERNALS}
 )
 
-y60_add_jstest(OscSender OscSender)
+y60_add_jstest(OscSender mod_OscSender)
 

@@ -19,4 +19,4 @@ y60_add_component(
     DEPENDS y60jslib y60sound
 )
 
-y60_add_jstest(Audio JSSound)
+y60_add_jstest(Audio mod_JSSound)

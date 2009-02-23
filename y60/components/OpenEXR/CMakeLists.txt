@@ -18,4 +18,4 @@ y60_add_component(
     EXTERNS OPENEXR
 )
 
-y60_add_jstest(OpenEXR OpenEXR)
+y60_add_jstest(OpenEXR mod_OpenEXR)
