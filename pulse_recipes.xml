@@ -59,7 +59,7 @@
             pass-status="OK"
             failure-status="FAIL"><![CDATA[>>>>>> (.*)\s+\\((.*)\\), (Line .*)\$]]></regex-test.pp>
     <macro name="handle_testlog">
-        <artifact name="Test Output" file="${test.log.file}">
+        <artifact name="test output" file="${test.log.file}">
             <process processor="${acunittest.pp}"/>
         </artifact>
     </macro>
