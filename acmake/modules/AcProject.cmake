@@ -48,6 +48,8 @@ set(_AC_PROJECT_VARIABLES
     BINARY_DIR     # root of binary build tree
     SOURCE_DIR     # root of source tree
     INSTALL_PREFIX # install prefix the project was compiled for
+    SOURCE_DIR     # location of source tree (DO NOT TEMPLATE)
+    BINARY_DIR     # location of binary tree (DO NOT TEMPLATE)
     RUNTIME_DIR    # absolute install location of binaries (and dlls on windows)
     LIBRARY_DIR    # absolute install location of libraries
     INCLUDE_DIR    # absolute install location of headers

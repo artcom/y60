@@ -12,10 +12,7 @@ WMHelper.h
 y60_wmadecoder_settings.h
 )
 
-list( APPEND EXTERNALS FFMPEG)
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC DIRECTX WMSDK )
-endif(WIN32)
+set(EXTERNALS FFMPEG PTHREADVC DIRECTX WMSDK ATL)
 
 y60_add_component(
     WMADecoder
@@ -26,4 +23,3 @@ y60_add_component(
 )
 
 y60_add_jstest(localtest mod_WMADecoder)
-

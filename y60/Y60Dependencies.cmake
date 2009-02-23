@@ -38,6 +38,9 @@ if(WIN32)
     # pthread emulation library
     list(APPEND REQ_PACKAGES PthreadVC)
 
+    # we need some flavour of ATL for the WMV and WMA components
+    list(APPEND REQ_PACKAGES ATL)
+
     # cairo backend
     list(APPEND REQ_PKGCONFIG CAIRO cairo-win32)
 

@@ -8,10 +8,7 @@ WMVDecoder.h
 y60_wmvdecoder_settings.h
 )
 
-list( APPEND EXTERNALS OPENEXR FFMPEG)
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC WMSDK )
-endif(WIN32)
+set(EXTERNALS FFMPEG PTHREADVC WMSDK ATL)
 
 y60_add_component(
     WMVDecoder
@@ -20,5 +17,3 @@ y60_add_component(
     DEPENDS aslaudio y60video
     EXTERNS ${EXTERNALS}
 )
-
-

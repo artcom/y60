@@ -1,0 +1,7 @@
+
+if(FakeATL_IS_INTEGRATED)
+    set(FakeATL_INCLUDE_DIR ${FakeATL_SOURCE_DIR})
+else(FakeATL_IS_INTEGRATED)
+    set(FakeATL_INCLUDE_DIR ${FakeATL_INCLUDE_DIR}/fakeatl)
+endif(FakeATL_IS_INTEGRATED)
+
