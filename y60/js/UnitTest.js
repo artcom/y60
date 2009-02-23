@@ -143,7 +143,7 @@ UnitTest.prototype.Constructor = function(obj, theName) {
             /*string*/ myExpression,
             /*string*/ mySourceLine)
     {
-        var myPrefix = ">>>>>>  OK  ";
+        var myPrefix = ">>>>>> OK   ";
         if (myExpressionResult == true) {
             obj.incrementPassedCount();
             if (_silentSuccess) {
