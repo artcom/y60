@@ -59,6 +59,8 @@
 // own header
 #include "JSApp.h"
 
+#include "acmake/y60jslib_paths.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <vector>
@@ -1589,13 +1591,31 @@ void
 JSApp::setupPath(const std::string & theIncludePath) {
     asl::PackageManagerPtr myPacketManager = getPackageManager();
 
-    // Notice: Pathes are searched in reverse order as they are added!
+    // NOTE: Paths are searched in reverse-order and should therefore
+    //       be added in order of increasing locality.
 
-    // Add the current working directory
-    myPacketManager->add(asl::IPackagePtr(new asl::DirectoryPackage("")));
-
+#ifdef AC_BUILT_WITH_CMAKE
+    // Add standard paths dependent on whether we are in the build directory or installed
+    std::string myApplicationDirectory = asl::getAppDirectory();
+    if(asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/CMakeFiles", true))
+        || asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/../CMakeFiles", true))
+        || asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/../../CMakeFiles", true)))
+    {
+        AC_INFO << "Running from build directory, adding appropriate paths";
+        // XXX: find component directory / directories
+        myPacketManager->add(std::string(CMAKE_SOURCE_DIR) + "/y60/shader");
+        myPacketManager->add(std::string(CMAKE_SOURCE_DIR) + "/y60/js");
+    } else {
+        AC_INFO << "Running from installation directory, adding appropriate paths";
+        myPacketManager->add(myApplicationDirectory + "/../lib/y60/components");
+        myPacketManager->add(myApplicationDirectory + "/../lib/y60/shader");
+        myPacketManager->add(myApplicationDirectory + "/../lib/y60/js");
+    }
+#else
     // Add the application directory (the directoy y60.exe is located)
+    // XXX: this is a dirty hack for ANTish packaging and shall be removed soon.
     myPacketManager->add(asl::getAppDirectory());
+#endif
 
     // Add the Y60_PATH if set
     std::string myY60Path = asl::expandEnvironment("${Y60_PATH}");
@@ -1608,6 +1628,11 @@ JSApp::setupPath(const std::string & theIncludePath) {
         myPacketManager->add(theIncludePath);
     }
 
+    // Add the current working directory
+    myPacketManager->add(asl::IPackagePtr(new asl::DirectoryPackage("")));
+
+    // Make plugin manager use them same path we use
+    //  XXX: this probably does not handle zip archives, right?
     PlugInManager::get().setSearchPath(myPacketManager->getSearchPath());
 }
 
