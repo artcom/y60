@@ -71,7 +71,10 @@ class ASL_NET_EXPORT Socket {
         virtual void setRemoteAddr(asl::Unsigned32 thehost, 
                 asl::Unsigned16 theport);
 
-        virtual bool isValid() const { return (fd != -1); }
+        //XXX When the function is virtual there is a segfault
+        // at the end of testInet.tst under Linux64 in
+        // non-debug mode; reason is not fully understood
+        /*virtual*/ bool isValid() const { return (fd != -1); }
 
         virtual void close();
 
