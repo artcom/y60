@@ -76,24 +76,28 @@ PackageManager::add(const std::string & thePaths) {
     splitPaths(thePaths, myPathVector);
     AC_DEBUG << "adding " << myPathVector.size() << " packages";
     for (unsigned i = 0; i < myPathVector.size(); ++i) {
-        if (isDirectory(myPathVector[i])) {
-            AC_DEBUG << "adding Directory '" << myPathVector[i] << "'";
-            add(IPackagePtr(new DirectoryPackage(myPathVector[i])));
+        std::string normalizedPath = normalizeDirectory(myPathVector[i], true);
+
+        if (!fileExists(normalizedPath)) {
+            AC_WARNING << "PackageManager: Package '" << normalizedPath << "' does not exist";
             continue;
         }
-        if (!fileExists(myPathVector[i])) {
-            AC_WARNING << "PackageManager: File '" << myPathVector[i] << "' does not exist";
+
+        if (isDirectory(normalizedPath)) {
+            AC_DEBUG << "adding Directory '" << normalizedPath << "'";
+            add(IPackagePtr(new DirectoryPackage(normalizedPath)));
             continue;
-        }
-        ConstMappedBlock myBlock(myPathVector[i]);
-        // check zip file signature
-        if (myBlock[0] == 0x50 && myBlock[1] == 0x4b && myBlock[2] == 0x03 && myBlock[3] == 0x04) {
-            AC_DEBUG << "adding Zip '" << myPathVector[i] << "'";
-            add(IPackagePtr(new ZipPackage(myPathVector[i])));
         } else {
-            AC_WARNING << "PackageManager: can not open package '" << myPathVector[i] << "'"
-                        << ", not a directory and file type  unknown.";
-            AC_WARNING << "Sig is " << myBlock[0] << myBlock[1] << myBlock[2] << myBlock[3];
+            ConstMappedBlock myBlock(normalizedPath);
+            // check zip file signature
+            if (myBlock[0] == 0x50 && myBlock[1] == 0x4b && myBlock[2] == 0x03 && myBlock[3] == 0x04) {
+                AC_DEBUG << "adding Zip '" << normalizedPath << "'";
+                add(IPackagePtr(new ZipPackage(normalizedPath)));
+            } else {
+                AC_WARNING << "PackageManager: can not open package '" << normalizedPath << "'"
+                            << ", not a directory and file type unknown.";
+                AC_WARNING << "Sig is " << myBlock[0] << myBlock[1] << myBlock[2] << myBlock[3];
+            }
         }
     }
 }
