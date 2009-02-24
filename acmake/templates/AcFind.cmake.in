@@ -109,6 +109,9 @@ foreach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
     foreach(EXTERN ${${LIBRARY}_EXTERNS})
         list(APPEND ${LIBRARY}_LIBRARIES ${${EXTERN}_LIBRARIES})
     endforeach(EXTERN ${${LIBRARY}_EXTERNS})
+    if(${LIBRARY}_LIBRARIES)
+        list(REMOVE_DUPLICATES ${LIBRARY}_LIBRARIES)
+    endif(${LIBRARY}_LIBRARIES)
 endforeach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
 
 # Register libraries as imported
