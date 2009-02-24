@@ -1013,15 +1013,15 @@ namespace y60 {
         case ARBFP1 :
             myResult = CG_PROFILE_ARBFP1;
             break;
-#ifdef CG_PROFILE_GPU_VP
+#if (CG_VERSION_NUM >= 2000)
         case GP4VP:
             myResult = CG_PROFILE_GPU_VP;
             break;
-#endif
-#ifdef CG_PROFILE_GPU_FP
         case GP4FP:
             myResult = CG_PROFILE_GPU_FP;
             break;
+#else
+#warning "CG Version < 2, compiling without gp4 support" 
 #endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
@@ -1041,15 +1041,15 @@ namespace y60 {
         case  FP20:
             myResult = CG_PROFILE_FP20;
             break;
-#ifdef CG_PROFILE_GLSLV
+#if (CG_VERSION_NUM >= 2000)
         case GLSLV:
             myResult = CG_PROFILE_GLSLV;
             break;
-#endif
-#ifdef CG_PROFILE_GLSLF
         case GLSLF:
             myResult = CG_PROFILE_GLSLF;
             break;
+#else
+#warning "CG Version < 2, compiling without glsl support" 
 #endif
         default:
             throw RendererException(string("Unknown shaderprofile : ") +

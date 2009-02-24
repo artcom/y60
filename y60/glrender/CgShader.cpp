@@ -207,6 +207,8 @@ namespace y60 {
                                    const std::string & theProfileName)
     {
         MAKE_GL_SCOPE_TIMER(CgShader_loadShaderProperties);
+        ShaderProfile myRequestedProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
+        
         GLShader::loadShaderProperties(theShaderNode, theShader);
         
         theShader._myPossibleProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
@@ -218,16 +220,26 @@ namespace y60 {
             }
         }
         if ((myProfileIndex >= 0) && (myProfileIndex < theShader._myPossibleProfileNames.size())) {
+            // There is a profile entry in the shader definition that matches the requested profile
+            AC_DEBUG << "profile '" << theProfileName << "' has index "<< myProfileIndex << " in shader description"; 
+            theShader._myProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
         } else {
-            // throw ShaderException(std::string("Engine profile does not match any given profile in shader description, library node =")+
-            //                       asl::as_string(*theShaderNode), PLUS_FILE_LINE);
-            AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
-            theShader._myProfile = NO_PROFILE;
-            return;
+            // we have no profile match:
+            // before we give up, we check if the last profile in the shaders list is smaller than the
+            // engine profile, and in this case we just warn and use the shaders profile even when
+            // it does not match the engine profile
+            myProfileIndex = theShader._myPossibleProfileNames.size()-1; // last entry
+            const string myShadersBestProfileName = theShader._myPossibleProfileNames[myProfileIndex];
+            ShaderProfile myShadersBestProfile = ShaderProfile(asl::getEnumFromString(myShadersBestProfileName, ShaderProfileStrings));
+            if (myShadersBestProfile < myRequestedProfile) {
+                AC_INFO << "Shader description does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
+                theShader._myProfile = myShadersBestProfile;
+            } else {     
+                AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
+                theShader._myProfile = NO_PROFILE;
+                return;
+            }
         }
-        AC_DEBUG << "profile '" << theProfileName << "' has index "<< myProfileIndex << " in shader description"; 
-        theShader._myProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
-
         // now select matching file parameters; either one file for all profiles or exactly one per profile are allowed
         const VectorOfString myFilenames = theShaderNode->getAttributeValue<VectorOfString>(CG_FILES_PROPERTY);
         VectorOfString::size_type myFileIndex = 0;
@@ -235,7 +247,7 @@ namespace y60 {
             myFileIndex = myProfileIndex;
         } else  {
             if (myFilenames.size() != 1) {
-                throw ShaderException("bad number of program file names, must be one or match number of profiles", PLUS_FILE_LINE);
+                throw ShaderException(string("bad number of program file names, must be one or match number of profiles")+as_string(*theShaderNode), PLUS_FILE_LINE);
             }
         }
 
@@ -246,7 +258,7 @@ namespace y60 {
                                       AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
             }
         } else {
-            throw ShaderException("bad number of program file names", PLUS_FILE_LINE);
+            throw ShaderException(string("bad number of program file names")+as_string(*theShaderNode), PLUS_FILE_LINE);
         }    
         
         // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
