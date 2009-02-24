@@ -48,14 +48,20 @@ typedef unsigned long long uint64;
 
 #endif
 
-
+#ifdef __SIZEOF_LONG__
+    #if ( __SIZEOF_LONG__ == 8 )
+        #define x86_64
+    #endif
+#endif
 
 #ifdef x86_64
 
+//#warning "64 bit version"
 typedef signed int int32;
 typedef unsigned int uint32;
 
 #else
+//#warning "32 bit version"
 
 typedef signed long int32;
 typedef unsigned long uint32;
