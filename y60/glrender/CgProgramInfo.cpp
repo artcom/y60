@@ -1021,7 +1021,11 @@ namespace y60 {
             myResult = CG_PROFILE_GPU_FP;
             break;
 #else
+#ifdef WIN32
+#pragma warn "CG Version < 2, compiling without gp4 support" 
+#else
 #warning "CG Version < 2, compiling without gp4 support" 
+#endif
 #endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
