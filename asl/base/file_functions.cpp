@@ -301,17 +301,17 @@ namespace asl {
 
        for (std::vector<std::string>::size_type i = 0; i < mySearchPaths.size(); ++i) {
             std::string myPath = mySearchPaths[i];
-
-            if (myPath.at(myPath.size() - 1) != '/') {
-                myPath += "/";
-            }
-            std::string myFileWithPath = myPath + theFileName;
-            if (fileExists(myFileWithPath)) {
-                return myFileWithPath;
-            }
-        }
-
-        return "";
+            if (myPath.size()) {
+                if (myPath.at(myPath.size() - 1) != '/') {
+                    myPath += "/";
+                }
+                std::string myFileWithPath = myPath + theFileName;
+                if (fileExists(myFileWithPath)) {
+                    return myFileWithPath;
+                }
+            } 
+       }
+       return "";
     }
 
     /// read a complete file into a string
