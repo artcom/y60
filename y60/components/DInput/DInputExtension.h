@@ -65,40 +65,74 @@
 #include <y60/input/Event.h>
 #include <y60/input/IEventSource.h>
 
+#include <y60/jsbase/IScriptablePlugin.h>
+
+#include <asl/base/PlugInBase.h>
+#include <y60/base/DataTypes.h>
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 #include <vector>
 
-class DInputExtension :
-    public asl::PlugInBase,
-    public y60::IEventSource
-{
-    public:
-        DInputExtension(asl::DLHandle theDLHandle);
-		~DInputExtension();
-        virtual void init();
-        virtual y60::EventPtrList poll();
+namespace y60 {
 
-        void setBufferSize(unsigned theSize) {
-            _myBufferSize = theSize;
-        }
+    class DInputExtension :
+        public asl::PlugInBase,
+        public jslib::IScriptablePlugin,
+        public y60::IEventSource
+    {
+        public:
+            DInputExtension(asl::DLHandle theDLHandle);
+    		~DInputExtension();
+            virtual void init();
+            virtual y60::EventPtrList poll();
+    
+            const char * ClassName() {
+                static const char * myClassName = "y60DInput";
+                return myClassName;
+            }
 
-        unsigned getBufferSize() const {
-            return _myBufferSize;
-        }
-    private:			
-		static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
-                void* This);
+            void setBufferSize(unsigned theSize) {
+                _myBufferSize = theSize;
+            }
+    
+            unsigned getBufferSize() const {
+                return _myBufferSize;
+            }
 
-        void addJoystick(const DIDEVICEINSTANCE* pdidInstance);
-        HWND findSDLWindow();
+            // IScriptablePlugin
+            virtual void onGetProperty(const std::string & thePropertyName,
+                               y60::PropertyValue & theReturnValue) const {}
+            virtual void onSetProperty(const std::string & thePropertyName,
+                               const y60::PropertyValue & thePropertyValue) {}
+            virtual void onUpdateSettings(dom::NodePtr theSettings) {}
+            
+            JSFunctionSpec * Functions();                
+    
+            void applyForce(unsigned theJoystickIndex, int theXMagnitude, int theYMagnitude);
+            void stopForce(unsigned theJoystickIndex);
+            void setAutoCentering(unsigned theJoystickIndex, bool theFlag);
 
-        void printErrorState(const std::string & theCall, HRESULT hr);
+        private:			
+            void initJoysticks(DWORD theFlags, DWORD theCoopLevel);                
 
-        LPDIRECTINPUT8 _myDI;
-        std::vector<LPDIRECTINPUTDEVICE8> _myJoysticks;
-        unsigned                          _myBufferSize;
-
-};
+    		static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
+                    void* This);
+    
+            void createForceEffect(LPDIRECTINPUTDEVICE8 & theJoystick, LPDIRECTINPUTEFFECT & theEffect);
+            
+            void addJoystick(const DIDEVICEINSTANCE* pdidInstance);
+            HWND findSDLWindow();
+    
+            void printErrorState(const std::string & theCall, HRESULT hr);
+    
+            LPDIRECTINPUT8 _myDI;
+            std::vector<LPDIRECTINPUTDEVICE8> _myJoysticks;
+            unsigned                          _myBufferSize;
+            std::vector<LPDIRECTINPUTEFFECT>  _myForceEffects;      
+            bool                              _myForceFeedBackFlag;  
+    
+    };
+}
 #endif
