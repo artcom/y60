@@ -1049,7 +1049,11 @@ namespace y60 {
             myResult = CG_PROFILE_GLSLF;
             break;
 #else
+#ifdef WIN32
+#pragma warn "CG Version < 2, compiling without glsl support" 
+#else
 #warning "CG Version < 2, compiling without glsl support" 
+#endif
 #endif
         default:
             throw RendererException(string("Unknown shaderprofile : ") +
