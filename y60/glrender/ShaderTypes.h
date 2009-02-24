@@ -15,7 +15,7 @@
 #if (CG_VERSION_NUM >= 2000)
     #define AC_NV_CG_20
 #else
-#if WIN32
+#ifdef WIN32
 #    pragma warn "CG Version < 2, compiling without gp4 support"
 #else
 #    warning "CG Version < 2, compiling without gp4 support" 
