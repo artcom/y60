@@ -137,16 +137,17 @@ class RasterTest : public UnitTest {
                 PLAnyPicDecoder myDecoder;
                 PLAnyBmp myReferenceBmp;
                 myDecoder.MakeBmpFromFile(theFileName.c_str(), &myReferenceBmp);
-		myReferenceBmp.SetResolution(PLPoint(0,0)); // ignore dpi in file
+		        myReferenceBmp.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ImageLoader myImageLoader(theFileName);
                 ENSURE_EQUAL(myReferenceBmp.GetBitsPerPixel(), myImageLoader.GetBitsPerPixel());
+		        myImageLoader.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ENSURE(myReferenceBmp == myImageLoader);
 
                 ResizeableRasterPtr myRaster = myImageLoader.getRaster();
                 dom::ValuePtr myRasterValue = myImageLoader.getData();
                 string myRasterString = myRasterValue->getString();
 
-                cerr << myRasterString << endl;
+                //cerr << myRasterString << endl;
 
                 ValuePtr myNewRasterValue = createRasterValue(myImageLoader.getEncoding(), myImageLoader.GetWidth(), myImageLoader.GetHeight());
                 myNewRasterValue->setString(myRasterString);
