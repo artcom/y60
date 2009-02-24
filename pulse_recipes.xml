@@ -53,7 +53,7 @@
             failure-status="FAIL"><![CDATA[^(>>>>>>|######) (\\w+)\\s+(.*)\$]]></regex-test.pp>
 
     <macro name="handle_testlog">
-        <dir-artifact name="test output" file="${test.log.dir}"/>
+        <dir-artifact name="test output" base="${test.log.dir}"/>
     </macro>
 
     <macro name="run_cmake">
