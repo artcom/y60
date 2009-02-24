@@ -1,20 +1,18 @@
 
 #find_package( OpenGL )
-find_library( NVIDIA_CG_LIBRARIES NAMES Cg cg )
+find_library( NVIDIA_CG_LIBRARIES NAMES Cg cg PATHS ENV CG_LIB_PATH)
 if(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
     set( NVIDIA_CG_PACKAGE_VARS NVIDIA_CG_LIBRARIES )
     set( NVIDIA_CG ${NVIDIA_CG_LIBRARIES} )
     # TODO: handle non-framework versions on OSX?
 else(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
     set( NVIDIA_CG_PACKAGE_VARS NVIDIA_CG_LIBRARIES NVIDIA_CG_INCLUDE_DIRS )
-    find_path( NVIDIA_CG_INCLUDE_DIRS cg.h 
-               PATH_SUFFIXES Cg GL )
+    find_path( NVIDIA_CG_INCLUDE_DIRS Cg/cg.h 
+               PATHS ENV CG_INC_PATH)
     get_filename_component( NVIDIA_CG_LIBRARY_DIRS
             "${NVIDIA_CG_LIBRARIES}" PATH )
     set(NVIDIA_CG_LIBRARIES Cg CgGL ${OPENGL_LIBRARIES})
 
-    find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
-            NVIDIA_CG_LIBRARIES NVIDIA_CG_INCLUDE_DIRS)
 endif(APPLE AND UNIX AND NVIDIA_CG_LIBRARIES MATCHES ".*\\.framework/?$")
 
 find_package_handle_standard_args(NVIDIA_CG DEFAULT_MSG
