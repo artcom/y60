@@ -41,7 +41,7 @@
                        status-group="2"
                        details-group="3"
                        pass-status="Passed"
-                       failure-status="***"><![CDATA[^\\s*\\d+/\\d+ Testing (\\w+)\\s+(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
+                       failure-status="***"><![CDATA[^\\s*\\d+/\\d+ Testing (\\w+)\\s*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
     </post-processor>
 
     <!--- currently unused regex to parse the output of asl::UnitTest -->
