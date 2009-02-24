@@ -98,9 +98,9 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
             var myMem = getProcessMemoryUsage();
             if (_myFrameCount == START_FRAMES + 50) {
                 _myStartMemory = getProcessMemoryUsage();
-                print("**** startmemory =" + _myStartMemory);
+                //print("**** startmemory =" + _myStartMemory);
             } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + theVideoCount) {
-                print("---- memory = "+getProcessMemoryUsage());
+                //print("---- memory = "+getProcessMemoryUsage());
                 toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
                 window.renderText([500,100], myText, "Screen15");        
