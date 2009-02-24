@@ -249,7 +249,7 @@ namespace y60 {
         }
 
         void deleteBuffer() {
-            if (_myId) {
+            if (_myId != 0) {
                 AC_TRACE << "glDeleteBuffersARB deleting buffer " << _myId << std::endl;
                 glDeleteBuffersARB(1, &_myId);
                 _myId = 0;
