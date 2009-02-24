@@ -1595,7 +1595,7 @@ JSApp::setupPath(const std::string & theIncludePath) {
     //       be added in order of increasing locality.
 
 #ifdef AC_BUILT_WITH_CMAKE
-    // Add standard paths dependent on whether we are in the build directory or installed
+    // Add standard paths dependent on whether we are in the build directory or installed tree
     std::string myApplicationDirectory = asl::getAppDirectory();
     if(asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/CMakeFiles", true))
         || asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/../CMakeFiles", true))
