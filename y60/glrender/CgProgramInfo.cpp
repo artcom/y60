@@ -1021,11 +1021,7 @@ namespace y60 {
             myResult = CG_PROFILE_GPU_FP;
             break;
 #else
-#ifdef WIN32
-#pragma warn "CG Version < 2, compiling without gp4 support" 
-#else
-#warning "CG Version < 2, compiling without gp4 support" 
-#endif
+#   error "CG below 2.0 won't work!"
 #endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
@@ -1053,11 +1049,7 @@ namespace y60 {
             myResult = CG_PROFILE_GLSLF;
             break;
 #else
-#ifdef WIN32
-#pragma warn "CG Version < 2, compiling without glsl support" 
-#else
-#warning "CG Version < 2, compiling without glsl support" 
-#endif
+#   error "CG below 2.0 won't work!"
 #endif
         default:
             throw RendererException(string("Unknown shaderprofile : ") +

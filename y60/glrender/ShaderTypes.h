@@ -13,13 +13,18 @@
 // stay consistent.
 
 #if (CG_VERSION_NUM >= 2000)
-#    define AC_NV_CG_20
+#   define AC_NV_CG_20
 #else
-#    ifdef WIN32
-#        pragma warning("CG Version < 2, compiling without gp4 support")
-#    else
-#        warning "CG Version < 2, compiling without gp4 support" 
-#    endif
+#   error "CG below 2.0 won't work!"
+//#   ifdef WIN32
+//#       define AC_STRINGIFY( L )                          #L
+//#       define AC_MAKESTRING( M, L )                      M(L)
+//#       define AC_STRINGIZE(X)                            AC_MAKESTRING( AC_STRINGIFY, X )
+//#       define AC_SHOWWARNING                             __FILE__ "(" AC_STRINGIZE(__LINE__) "): warning: "
+//#       pragma message(AC_SHOWWARNING"CG Version < 2, compiling without gp4 support")
+//#   else
+//#        warning "CG Version < 2, compiling without gp4 support" 
+//#   endif
 #endif
 
 namespace y60 {
