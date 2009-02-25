@@ -114,10 +114,26 @@ namespace y60 {
                 myValidationMessage = "No type attribute found!";
                 myValidPacket = false;  
             }
+
             for (unsigned myChildIndex = 0 ; myChildIndex < theOscEvent->childNodesLength(); myChildIndex++) {
                 dom::NodePtr myChildNode = theOscEvent->childNode(myChildIndex);
                 //AC_DEBUG << "Child : " << myChildIndex << " -> " << *myChildNode;
-                myOSCStream << string(myChildNode->childNode("#text")->nodeValue()).c_str();
+                try {
+                    if (myChildNode->nodeName() == "float") {
+                        myOSCStream << as<float>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
+                    } else if (myChildNode->nodeName() == "int") {
+                        myOSCStream << as<int>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
+                    } else if (myChildNode->nodeName() == "double") {
+                        myOSCStream << as<double>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
+                    } else if (myChildNode->nodeName() == "bool") {
+                        myOSCStream << as<bool>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
+                    } else{
+                        myOSCStream << string(myChildNode->childNode("#text")->nodeValue()).c_str();
+                    }
+                } catch(ParseException theEx) {
+                    // conversion failed, send it as a string
+                    myOSCStream << string(myChildNode->childNode("#text")->nodeValue()).c_str();
+                }
             }
             
             
