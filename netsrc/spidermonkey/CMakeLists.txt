@@ -13,10 +13,18 @@ if(UNIX)
         # Linux
         set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DHAVE_VA_COPY -DVA_COPY=va_copy)
     endif(APPLE)
-else(UNIX)
+endif(UNIX)
+
+if(WIN32)
     # Microsoft Windows
     set(SPIDERMONKEY_DEFINITIONS -DXP_WIN -D_WINDOWS -D_X86_=1 -DJSFILE)
-endif(UNIX)
+
+    # prevent the linker from merging identical functions
+    # this breaks spidermonkey because it uses function pointer comparison
+    set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
+endif(WIN32)
 
 ac_add_project(
     Spidermonkey
