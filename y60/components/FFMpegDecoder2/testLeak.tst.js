@@ -74,16 +74,12 @@ const MOVIE_2 = "../../video/testmovies/1.4.mpg"
 var myTestName = "y60FFMpegDecoder2 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder2";
 var myVideoCount = 500;
-
-var myMovieLeak =  myVideoCount * 16 * 1024; // each mpeg2 movie leaks 16kb per movie (not per frame, tolerable)
-
-var myMovieBaseMemoryUsage = 15.5*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
-var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
+var myAllowedMemoryDiff = 10000;
 
 
 
 var mySuite = new UnitTestSuite(myTestName);
-mySuite.addTest(new MovieLeakUnitTest(myTestName, [MOVIE_1, MOVIE_2], myDecoderPlug, myVideoCount, myAllowedMemoryUsage));
+mySuite.addTest(new MovieLeakUnitTest(myTestName, [MOVIE_1, MOVIE_2], myDecoderPlug, myVideoCount, myAllowedMemoryDiff));
 mySuite.run();
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

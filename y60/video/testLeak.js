@@ -71,9 +71,7 @@ use("UnitTest.js");
 
 plug("y60ProcFunctions");
 
-//const START_FRAMES = 199;
-//const END_FRAMES   = 200;
-const START_FRAMES = 3;
+const START_FRAMES = 200;
 const END_FRAMES   = 4;
 
 var myShaderLibrary = "../../shader/shaderlibrary.xml";
@@ -91,52 +89,74 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
     var _myFrameCount = 0;
     var _myStartMemory = 0;
     var _myLastMemory = 0;
+    var _myTrendCounter = 0;
+    var _myTrend = 0;
+    var _myMaxMemory = 0;
+    var _myMaxFrame = 0;
+    var _myMinMemory = 0;
+    var _myMinFrame = 0;
+
     UnitTest.prototype.Constructor(obj, theName);
-    //while(true) {toggleMovie();}
     obj.run = function() {    
         window.onFrame = function(theTime) {
+            gc();
             var myMem = getProcessMemoryUsage();
-            if (_myFrameCount == START_FRAMES + 50) {
-                _myStartMemory = getProcessMemoryUsage();
+            if (_myFrameCount == START_FRAMES) {
+                _myStartMemory = myMem;
                 //print("**** startmemory =" + _myStartMemory);
-            } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + theVideoCount) {
+            } else if (_myFrameCount < START_FRAMES + theVideoCount) {
                 //print("---- memory = "+getProcessMemoryUsage());
-                if (_myFrameCount % 1 == 0) {
-                    toggleMovie();
-                }
+                toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
                 window.renderText([500,100], myText, "Screen15");        
-/*        
-            } else if (_myFrameCount == START_FRAMES + theVideoCount){
-                toggleMovie();
-            } else if (_myFrameCount == START_FRAMES + theVideoCount + 200) {
-                toggleMovie();
-*/
-            } else if (_myFrameCount == START_FRAMES + theVideoCount + END_FRAMES) {
-//                remove();
             } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 1) {
-                gc();
                 //window.scene.save("empty.xml", false);
-                var myUsedMemory = getProcessMemoryUsage();
-                obj.myMemoryDifff =  myUsedMemory - _myStartMemory;
+                var myUsedMemory = myMem;
+                obj.myMemoryDiff =  myUsedMemory - _myStartMemory;
                 obj.AllowedMemoryUsage = theAllowedMemoryDifference;
+                obj.myTrend = _myTrend;
+                obj.myMaxFrame = _myMaxFrame;
+                obj.myFrameCount = _myFrameCount;
 
                 print("-------------------------------------");
                 print("Decoder leak test: " + theName);
                 print("-------------------------------------");
-                print("Memory at first movie construction time : " + _myStartMemory);
+                print("Memory at frame " + START_FRAMES + " construction time : " + _myStartMemory);
                 print("Memory at app end                       : " + myUsedMemory);
-                print("Difference                              : " + obj.myMemoryDifff);
-                print("allowed difference                      : " + obj.AllowedMemoryUsage + " ,(due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)");
-                ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');                
+                print("Difference                              : " + obj.myMemoryDiff);
+                print("Max Memory Usage                        : " + _myMaxMemory);
+                print("Max Memory Usage in frame               : " + _myMaxFrame);
+                print("No new maximum for last n frames, n =   : " + (obj.myFrameCount - obj.myMaxFrame));
+                print("Avrg. Difference per Movie              : " + _myTrend.toFixed(0));
+                print("allowed difference per Movie            : " + obj.AllowedMemoryUsage);
+                ENSURE('obj.myTrend < obj.AllowedMemoryUsage || obj.myFrameCount - obj.myMaxFrame > 50');                
+
                 //window.scene.save("leaktest.x60");
                 window.stop();
             }
+            if (_myStartMemory) {
+                ++_myTrendCounter;
+                _myMinMemory = _myMaxMemory;
+                _myTrend = (myMem-_myStartMemory)/_myTrendCounter;
+            } else {
+                _myTrend = myMem-_myLastMemory;
+            }
+            if (myMem > _myMaxMemory) {
+                _myMaxMemory = myMem;
+                _myMaxFrame = _myFrameCount;
+            }
+            if (myMem < _myMinMemory) {
+                _myMinMemory = myMem;
+                _myMinFrame = _myFrameCount;
+            }
+                
             window.renderText([500,150], "Delta memory usage: " + (myMem-_myLastMemory), "Screen15");
-            window.renderText([500,200], "Total memory usage: " + myMem, "Screen15");                
+            window.renderText([500,175], "Total memory usage: " + myMem, "Screen15");
+            window.renderText([500,200], "Trend:              " + _myTrend.toFixed(0), "Screen15");
+            window.renderText([500,225], "Max. memory usage:  " + _myMaxMemory, "Screen15");
+            window.renderText([500,250], "Max. in Frame       " + _myMaxFrame, "Screen15");
             _myFrameCount++; 
             _myLastMemory = myMem;     
-            //if (_myFrameCount % 10 == 0) window.printStatistics();      
         }
         window.go();
     }
