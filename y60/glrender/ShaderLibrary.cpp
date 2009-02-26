@@ -90,30 +90,27 @@ using namespace dom;
 namespace y60 {
     bool ShaderLibrary::_myGLisReadyFlag = false;
 
-	ShaderLibrary::ShaderLibrary()
-#ifndef _AC_NO_CG_
-	: _myCgContext(0)
-    {
-        _myCgContext = cgCreateContext();
-        assertCg("ShaderLibrary::ShaderLibrary() - cgCreateContext()", _myCgContext);
+	ShaderLibrary::ShaderLibrary() {
+        // Cg Context created by CgContextHolder
     }
-#else
-	{ }
-#endif
 
     ShaderLibrary::~ShaderLibrary()  {
+        AC_DEBUG << "ShaderLibrary::~ShaderLibrary()";
         _myShaders.clear(); // destroy all shaders first
-#ifndef _AC_NO_CG_
-        cgDestroyContext(_myCgContext);
-        assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()", _myCgContext);
-#endif
     }
 
 #ifndef _AC_NO_CG_
     CGcontext
 	ShaderLibrary::getCgContext() {
-		return _myCgContext;
+		return _myCgContext.get();
 	}
+    
+    CgContextHolder::~CgContextHolder() {
+        if (_myCgContext) {
+            AC_DEBUG << "~CgContextHolder() - destroying cg context";
+            cgDestroyContext(_myCgContext);
+        }
+    }
 #endif
 
     void

@@ -101,7 +101,9 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 //print("**** startmemory =" + _myStartMemory);
             } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + theVideoCount) {
                 //print("---- memory = "+getProcessMemoryUsage());
-                toggleMovie();
+                if (_myFrameCount % 1 == 0) {
+                    toggleMovie();
+                }
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
                 window.renderText([500,100], myText, "Screen15");        
 /*        
@@ -127,7 +129,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 print("Difference                              : " + obj.myMemoryDifff);
                 print("allowed difference                      : " + obj.AllowedMemoryUsage + " ,(due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)");
                 ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');                
-                window.scene.save("leaktest.x60");
+                //window.scene.save("leaktest.x60");
                 window.stop();
             }
             window.renderText([500,150], "Delta memory usage: " + (myMem-_myLastMemory), "Screen15");

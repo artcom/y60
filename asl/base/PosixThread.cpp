@@ -62,7 +62,7 @@
 
 using namespace std;
 
-#define DB(x) // x
+#define DB(x)  // x
 
 namespace asl {
 
@@ -132,6 +132,7 @@ testRetVal (int theRetVal, const char * theMsg) {
 
 PosixThread::PosixThread(int mySchedPolicy, int myPriority)
     : _myThread(0),
+    _myCreator(0),
     _mySchedPolicy (mySchedPolicy),
     _myPriority (myPriority),
     _myIsActive (false),
@@ -143,6 +144,7 @@ PosixThread::PosixThread(int mySchedPolicy, int myPriority)
 PosixThread::PosixThread (WorkFunc * workFunc, void * workArgs,
                           int mySchedPolicy, int myPriority)
     : _myThread(0),
+      _myCreator(0),
       _mySchedPolicy (mySchedPolicy),
       _myPriority (myPriority),
       _myIsActive (false),
@@ -153,6 +155,7 @@ PosixThread::PosixThread (WorkFunc * workFunc, void * workArgs,
 
 PosixThread::PosixThread ()
     : _myThread(0),
+      _myCreator(0),
       _mySchedPolicy (SCHED_OTHER),
       _myPriority (0),
       _myIsActive (false),
@@ -163,10 +166,9 @@ PosixThread::PosixThread ()
 
 PosixThread::~PosixThread() {
     if (isActive()) {
-        AC_ERROR << "~PosixThread() : destruction of active thread" << endl;
+        AC_ERROR << "~PosixThread() : destruction of active thread, id =" << _myThread << endl;
     }
 }
-
 
 bool
 PosixThread::setPriority (int mySchedPolicy, int myPriority) {
@@ -244,8 +246,8 @@ void PosixThread::fork () {
     int myRetVal;
 
     DB(PosixThread * This = dynamic_cast<PosixThread*>(this);
-    AC_TRACE << "PosixThread::fork this = " << this << endl;
-    AC_TRACE << "PosixThread::fork This = " << This << endl);
+    {AC_INFO << "PosixThread::fork this = " << this << endl;};
+    {AC_INFO << "PosixThread::fork This = " << This << endl;});
 
     DB(pthread_attr_t   threadAttr;
        size_t           stackSize = 2;
@@ -277,33 +279,37 @@ void PosixThread::fork () {
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack size " << stackSize << " bytes" << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack addr " << stackAddr << "." << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has guard size " << guardSize << " bytes" << endl;)
-#if defined(MAKE_DEBUG_VARIANT)
-    //myRetVal = pthread_create (&_myThread, &threadAttr, threadFunc, this);
-    myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-#else
-    myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-#endif
 
-    DB(AC_TRACE << "#INFO : PosixThread::fork() : created thread id " <<getThreadID() << endl);
+    myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
+
+    DB(AC_INFO << "PosixThread::fork() : created thread id " <<getThreadID() << endl);
     testRetVal (myRetVal, "PosixThread:pthread_create");
     _myIsActive = true;
-    DB(AC_TRACE << "#INFO : PosixThread::fork() : has set active variable for thread id " <<getThreadID() << endl);
+    DB(AC_INFO << "PosixThread::fork() : has set active variable for thread id " <<getThreadID() << endl);
+    _myCreator = pthread_self();
 }
 
 void PosixThread::join () {
     if (!isActive()) {
         AC_DEBUG << "PosixThread::join() : thread not active" << endl;
     }
-    DB(AC_TRACE << "#INFO : PosixThread::join() called for thread id " <<getThreadID() << endl);
+    DB(AC_INFO << "PosixThread::join() called for thread id " <<getThreadID() << endl);
+    if (pthread_equal(pthread_self(), _myThread) != 0) {
+        AC_ERROR << "PosixThread::join(): thread must not join itself" << endl;
+    }
+    if (pthread_equal(pthread_self(), _myCreator) == 0) {
+        AC_ERROR << "PosixThread::join(): join() is called by creator, caller thread = "<<pthread_self()
+                 <<", creator thread="<<_myCreator<<", joining thread="<<_myThread;
+    }
     void * myThreadRetVal=0;
     int myRetVal;
     _myShouldTerminate = true;
     myRetVal = pthread_join (_myThread, &myThreadRetVal);
-    DB(AC_TRACE << "#INFO : PosixThread::joined() thread id " <<getThreadID() << endl);
+    DB(AC_INFO << " PosixThread::joined() thread id " <<getThreadID() << endl);
     testRetVal (myRetVal, "PosixThread:pthread_join");
     _myIsActive = false;
     _myShouldTerminate = false;
-    DB(AC_TRACE << "#INFO : PosixThread::join() : has cleared active variable" << endl);
+    DB(AC_INFO << "PosixThread::join() : has cleared active variable" << endl);
 }
 
 #ifndef _WIN32

@@ -106,6 +106,7 @@ class ASL_BASE_EXPORT PosixThread {
         virtual void run();
 
         pthread_t   _myThread;
+        pthread_t   _myCreator;
         int         _mySchedPolicy;
         int         _myPriority;
         bool        _myIsActive;

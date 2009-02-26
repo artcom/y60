@@ -57,42 +57,27 @@
 */
 
 
-#ifndef _IDECODER_INCLUDED
-#define _IDECODER_INCLUDED
+#include "IDecoder.h"
 
-#include "y60_base_settings.h"
-
-#include <asl/base/Ptr.h>
-#include <asl/base/Stream.h>
-
-#include <string>
 #include <set>
+
 
 namespace y60 {
 
-class IDecoder;
+std::set<IDecoder*> IDecoder::_myInstances;
 
-typedef asl::Ptr<IDecoder> IDecoderPtr;
+IDecoder::IDecoder() {
+    _myInstances.insert(this);
+}
 
-class Y60_BASE_EXPORT IDecoder {
-    public:
-        typedef asl::WeakPtr<IDecoder> WPtr;
+IDecoder::~IDecoder() {
+    _myInstances.erase(this);
+}
 
-        /**
-        * Tests if the file/stream can be decoded by this decoder.
-        * @param theUrl can be used to check for known file extensions.
-        * @param theStream should also be provided if possible, to check for magic numbers, etc.
-        * @return the Mimetype of the decoder, or an empty string, if it cannot decode the file.
-        */
-        virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>() ) = 0;
-        virtual void shutdown() {}
-        IDecoder();
-        virtual ~IDecoder();
-        static void shutdownAllInstances();
-    private:
-        static std::set<IDecoder*> _myInstances;
-}; 
-
+void IDecoder::shutdownAllInstances() {
+    for (std::set<IDecoder*>::iterator it = _myInstances.begin(); it != _myInstances.end();++it) {
+        (*it)->shutdown();
+    }
+}
 
 }
-#endif

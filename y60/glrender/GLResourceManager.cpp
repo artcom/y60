@@ -82,6 +82,10 @@ using namespace asl;
 namespace y60 {
     const unsigned int CUBEMAP_SIDES = 6;
 
+    GLResourceManager::~GLResourceManager() {
+        AC_DEBUG << "GLResourceManager::~GLResourceManager()" << endl;
+    }    
+
     void
     GLResourceManager::initCaps() {
         // workaround

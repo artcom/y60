@@ -86,7 +86,20 @@ namespace y60 {
         unsigned featurehits;
         float    points;
     };
-
+    
+#ifndef _AC_NO_CG_
+    struct CgContextHolder {
+        CgContextHolder() : _myCgContext(0) {
+            _myCgContext = cgCreateContext();
+        }
+        ~CgContextHolder();
+        CGcontext get() {
+            return _myCgContext;
+        }
+        CGcontext _myCgContext;
+    };
+#endif
+    
     class Y60_GLRENDER_EXPORT ShaderLibrary : public IShaderLibrary {
         public:
             DEFINE_EXCEPTION(ShaderLibraryException, asl::Exception);
@@ -137,10 +150,11 @@ namespace y60 {
             }
         private:
             void loadAllShaders();
+            CgContextHolder _myContextHolder; // This must be deleted last
             GLShaderVector  _myShaders;
             static bool _myGLisReadyFlag;
 #ifndef _AC_NO_CG_
-            CGcontext       _myCgContext;
+            CgContextHolder           _myCgContext;
             std::vector<std::string> _myShaderLibraryNames;
             std::vector<std::string> _myVertexProfileNames;
             std::vector<std::string> _myFragmentProfileNames;

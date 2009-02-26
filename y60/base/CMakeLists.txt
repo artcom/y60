@@ -5,6 +5,7 @@ DataTypes.cpp
 DecoderManager.cpp
 FrustumValue.cpp
 IScene.cpp
+IDecoder.cpp
 NodeNames.cpp
 NodeValueNames.cpp
 RankedFeature.cpp

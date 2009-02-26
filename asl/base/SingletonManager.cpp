@@ -81,6 +81,7 @@ SingletonManager::destroyAllSingletons() {
     // Call stop on all singletons to give them a chance to shut down correctly, while
     // all other singletons are still alive.
     for (SingletonList::iterator it = _mySingletonList.begin(); it != _mySingletonList.end(); ++it) {
+        AC_DEBUG << "SingletonManager: stopping "<< typeid(**it).name();
         (*it)->stop();
     }
 
@@ -89,8 +90,8 @@ SingletonManager::destroyAllSingletons() {
     for (SingletonList::iterator it = _mySingletonList.begin(); it != _mySingletonList.end(); ) {
         // Delete logger last, to allow other singletons to use the logger in their destructor
         if (dynamic_cast_Ptr<Logger>(*it) == 0) {
-//            cerr << "  destroying singleton " << typeid(**it).name() << " size: " 
-//                    << _mySingletonList.size() << endl;
+            AC_DEBUG << "  destroying singleton " << typeid(**it).name() << " size: " 
+                     << _mySingletonList.size() << endl;
             it = _mySingletonList.erase(it);
         } else {
             ++it;

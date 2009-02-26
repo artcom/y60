@@ -85,7 +85,7 @@
 
 #define DB(x) //x 
 #define DB2(x) //x
-#define DBI(x) //x
+#define DBI(x) // x
 
 using namespace std;
 using namespace asl;
@@ -133,7 +133,8 @@ namespace y60 {
     }
     void FFMpegDecoder2::shutdown() {
         if (!_hasShutDown) {
-            closeMovie();
+           DBI(AC_INFO << "FFMpegDecoder2::shutdown()");
+           closeMovie();
             if (_myResampleContext) {
                 audio_resample_close(_myResampleContext);
                 _myResampleContext = 0;
@@ -290,9 +291,12 @@ namespace y60 {
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
         DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
         
-        if (getState() != STOP) {
-            //AC_INFO << "Joining FFMpegDecoder Thread";
+        if (isActive()) {
+            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
             join();
+        }
+        if (getState() != STOP) {
+            DBI(AC_INFO << "Stopping Movie");
             
             _myDecodedPacketsPerFrame = 0; // reset counter    
             
@@ -316,6 +320,7 @@ namespace y60 {
         // stop thread
         stopMovie();
 
+        AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
         // codecs
         if (_myVStream) {
             avcodec_close(_myVStream->codec);
@@ -747,9 +752,13 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to find video codec: ")
                     + theFilename, PLUS_FILE_LINE);
         }
-        if (avcodec_open(myVCodec, myCodec) < 0 ) {
-            throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ")
-                    + theFilename, PLUS_FILE_LINE);
+        
+        {
+            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+            if (avcodec_open(myVCodec, myCodec) < 0 ) {
+                throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ")
+                                              + theFilename, PLUS_FILE_LINE);
+            }
         }
  
         Movie * myMovie = getMovie();
@@ -879,9 +888,13 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to find audio decoder: ")
                     + theFilename, PLUS_FILE_LINE);
         }
-        if (avcodec_open(myACodec, myCodec) < 0 ) {
-            throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: ")
-                    + theFilename, PLUS_FILE_LINE);
+        
+        {
+            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+            if (avcodec_open(myACodec, myCodec) < 0 ) {
+                throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: ")
+                                              + theFilename, PLUS_FILE_LINE);
+            }
         }
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);

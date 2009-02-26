@@ -211,6 +211,7 @@ namespace y60 {
         VideoMsgPtr _myLastVideoFrame;
 
         // Used in both threads
+        asl::ThreadLock _myAVCodecLock;
         AVFormatContext * _myFormatContext;
         int _myVStreamIndex;
         AVStream * _myVStream;

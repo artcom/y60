@@ -157,7 +157,8 @@ namespace y60 {
         {
             validateGLContext(true);
         }
-
+        ~GLResourceManager();        
+        
         void initVertexDataFactories() {
             _myVertexDataFactory1f.setFactoryMethod(& create<float> );
             _myVertexDataFactory2f.setFactoryMethod(& create<asl::Vector2f> );
