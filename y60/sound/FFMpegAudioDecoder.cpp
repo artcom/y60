@@ -218,11 +218,14 @@ void FFMpegAudioDecoder::close() {
             audio_resample_close(_myResampleContext);
             _myResampleContext = 0;
         }
-#if (LIBAVCODEC_BUILD >= 0x4910)
-        AVCodecContext * myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
-#else
-        AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-#endif
+        AVCodecContext * myCodecContext = NULL;
+        if(_myStreamIndex >= 0) {
+#           if (LIBAVCODEC_BUILD >= 0x4910)
+                myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
+#           else
+                myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
+#           endif
+        }
         if (myCodecContext) {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
             avcodec_close(myCodecContext);
