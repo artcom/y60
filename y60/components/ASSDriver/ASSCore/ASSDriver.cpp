@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: command line utility to replace strings in files
+// Description: THIS IS CERTAINLY NOT A command line utility to replace strings in files
 // The special "feature" is that greplace treats the whole file a one string
 // and does not use regular expressions, so you don't have to worry about
 // special characters. It is especially designated to be used with C/C++
