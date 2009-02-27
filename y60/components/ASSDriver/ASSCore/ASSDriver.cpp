@@ -224,6 +224,10 @@ namespace y60 {
         _myDenoisedRaster = allocateRaster(FILTERED_RASTER, _myPoTSize[0], _myPoTSize[1]);
         _myMomentRaster = allocateRaster(MOMENT_RASTER, _myPoTSize[0], _myPoTSize[1]);
 
+	std::fill(_myRawRaster.raster->pixels().begin(), _myRawRaster.raster->pixels().end(), 0);
+	std::fill(_myDenoisedRaster.raster->pixels().begin(), _myDenoisedRaster.raster->pixels().end(), 0);
+	std::fill(_myMomentRaster.raster->pixels().begin(), _myMomentRaster.raster->pixels().end(), 0);
+
         unsigned myWidth = nextPowerOfTwo(_myGridSize[0] * GRID_SCALE_X );
         unsigned myHeight = nextPowerOfTwo( _myGridSize[1] * GRID_SCALE_Y );
         AC_PRINT << "Allocating" << myWidth << " " << myHeight;
