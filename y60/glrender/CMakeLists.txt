@@ -42,3 +42,11 @@ ac_add_library(
     EXTERNS GLEW NVIDIA_CG
     TESTS   ${TESTS}
 )
+
+asl_add_schema(
+    ShaderLibrary.xsd
+    CXX_FILE      ShaderLibraryxsd.cpp
+    CXX_NAMESPACE y60
+    CXX_VARNAME   ourShaderLibraryxsd
+    CXX_INCLUDE   ShaderLibraryxsd.h
+)

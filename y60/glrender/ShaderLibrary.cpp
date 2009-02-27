@@ -136,7 +136,7 @@ namespace y60 {
         dom::registerStandardTypes(*myFactory);
         registerSomTypes(*myFactory);
         myShaderLibraryXml.setValueFactory(myFactory);
-        dom::Document mySchema(ourShaderLibraryxsd);
+        dom::Document mySchema(y60::ourShaderLibraryxsd);
 
         myShaderLibraryXml.addSchema(mySchema,"");
         myShaderLibraryXml.parse(myShaderLibraryStr);

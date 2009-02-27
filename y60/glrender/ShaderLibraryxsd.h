@@ -62,6 +62,11 @@
 #include "y60_glrender_settings.h"
 
 #include <string>
-extern std::string ourShaderLibraryxsd;
+
+namespace y60 {
+
+extern Y60_GLRENDER_EXPORT const std::string ourShaderLibraryxsd;
+
+}
 
 #endif
