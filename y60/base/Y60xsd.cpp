@@ -17,6 +17,8 @@
 
 #include <string>
 
+namespace y60 {
+
 std::string ourY60xsd = std::string(
 "<?xml version='1.0' encoding='utf-8' ?>\n"
 "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>\n"
@@ -3960,3 +3962,5 @@ std::string ourY60xsd = std::string(
 "    </xs:element>\n"
 "</xs:schema>\n"
 );
+
+}

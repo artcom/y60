@@ -95,7 +95,7 @@ namespace y60 {
         _myDocument(theDocument)
     {
         if (!_myDocument->getSchema()) {
-            dom::Document mySchema(ourY60xsd);
+            dom::Document mySchema(y60::ourY60xsd);
             _myDocument->addSchema(mySchema,"");
             _myDocument->setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
             dom::registerStandardTypes(*_myDocument->getValueFactory());

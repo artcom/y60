@@ -65,6 +65,11 @@
 #include "y60_base_settings.h"
 
 #include <string>
+
+namespace y60 {
+
 extern Y60_BASE_EXPORT std::string ourY60xsd;
+
+}
 
 #endif

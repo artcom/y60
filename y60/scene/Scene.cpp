@@ -273,7 +273,7 @@ namespace y60 {
             }
         }
         if (!theDocument.getSchema() || !theDocument.getSchema()->childNodes().length()) {
-            Document mySchema(ourY60xsd);
+            Document mySchema(y60::ourY60xsd);
             theDocument.addSchema(mySchema,"");
         }
     }

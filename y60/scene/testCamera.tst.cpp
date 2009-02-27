@@ -86,7 +86,7 @@ class CameraUnitTest : public UnitTest {
 
             dom::DocumentPtr myDocument(new dom::Document);
 
-            dom::Document mySchema(ourY60xsd);
+            dom::Document mySchema(y60::ourY60xsd);
             myDocument->addSchema(mySchema, "");
             myDocument->setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
             dom::registerStandardTypes(*myDocument->getValueFactory());

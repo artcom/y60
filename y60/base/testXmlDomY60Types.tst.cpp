@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 
     if (argc == 2 && string("dumpschema") == argv[1]) {
         cerr << "dumping y60 schema to file 'y60.xsd'"<<endl;
-        dom::Document mySchema(ourY60xsd);
+        dom::Document mySchema(y60::ourY60xsd);
         ofstream myFile("y60.xsd");
         myFile << mySchema;
     }
