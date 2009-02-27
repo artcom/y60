@@ -266,3 +266,26 @@ macro(_ac_attach_rpath TARGET)
         endif(ACMAKE_INSTALL_WITH_RPATH)
     endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
+
+
+
+if(NOT WIN32)
+    option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create source file symlinks in the buildtree?" NO)
+endif(NOT WIN32)
+
+macro(_ac_create_source_symlinks)
+    if( NOT WIN32 AND ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
+        foreach( SRC ${ARGN} )
+            if( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SRC})
+                file(RELATIVE_PATH REL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+                execute_process(COMMAND cmake -E create_symlink ${REL} ${SRC}
+                                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            endif( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SRC})
+        endforeach( SRC ${ARGN} )
+        file(RELATIVE_PATH REL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt)
+        execute_process(COMMAND cmake -E create_symlink ${REL} CMakeLists.txt
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif( NOT WIN32 AND ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
+endmacro(_ac_create_source_symlinks)
+
+

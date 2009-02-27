@@ -42,6 +42,8 @@ macro(ac_add_executable EXECUTABLE_NAME)
                 ${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
+    _ac_create_source_symlinks( ${THIS_EXECUTABLE_SOURCES} ${THIS_EXECUTABLE_HEADERS} )
+
     # define the target
     add_executable(
         ${THIS_EXECUTABLE_NAME}

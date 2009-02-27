@@ -61,7 +61,7 @@ if(SCM MATCHES "SVN")
             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if( SVNVERSION_EXITCODE )
-        message(SEND_ERROR "Failed to run the 'svnversion' utility.")
+        message("Failed to run the 'svnversion' utility.")
         set( ACMAKE_SVN_REVISION "unknown" )
     endif( SVNVERSION_EXITCODE )
 
@@ -71,7 +71,7 @@ if(SCM MATCHES "SVN")
             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if( SVN_INFO_EXITCODE )
-        message(SEND_ERROR "Failed to run 'svn info'.")
+        message("Failed to run 'svn info'.")
         set( ACMAKE_SVN_URL "unknwon" )
     else( SVN_INFO_EXITCODE )
         string( REGEX REPLACE "\r?\n" ";" SVN_INFO_LINES ${SVN_INFO})

@@ -73,6 +73,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # make paths header available by extending include path
     include_directories(${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR})
 
+
+    _ac_create_source_symlinks( ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS} )
+
     if(THIS_LIBRARY_HEADER_ONLY)
         # for a header-only library
         
