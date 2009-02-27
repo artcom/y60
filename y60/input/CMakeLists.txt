@@ -1,6 +1,5 @@
 
 set(SOURCES
-AssEventSchema.cpp
 AxisEvent.cpp
 ButtonEvent.cpp
 DebugEventSink.cpp
@@ -16,7 +15,6 @@ asseventxsd.cpp
 )
 
 set(HEADERS
-AssEventSchema.h
 AxisEvent.h
 ButtonEvent.h
 DebugEventSink.h
@@ -31,6 +29,7 @@ KeyEvent.h
 MouseEvent.h
 TouchEvent.h
 WindowEvent.h
+asseventxsd.h
 y60_input_settings.h
 )
 
@@ -44,4 +43,12 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom
     TESTS   ${TESTS}
+)
+
+asl_add_schema(
+    assevent.xsd
+    CXX_FILE      asseventxsd.cpp
+    CXX_NAMESPACE y60
+    CXX_VARNAME   ourasseventxsd
+    CXX_INCLUDE   asseventxsd.h
 )

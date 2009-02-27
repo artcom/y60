@@ -57,7 +57,7 @@
 */
 
 #include "ASSEventSource.h"
-#include <y60/input/AssEventSchema.h>
+#include <y60/input/asseventxsd.h>
 
 using namespace asl;
 using namespace y60;
@@ -71,7 +71,7 @@ namespace y60 {
 ASSEventSource::ASSEventSource(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     ASSDriver( /*theHandle */),
-    _myEventSchema( new dom::Document( getASSSchema() ) ),
+    _myEventSchema( new dom::Document( y60::ourasseventxsd ) ),
     _myValueFactory( new dom::ValueFactory() )
 
 {

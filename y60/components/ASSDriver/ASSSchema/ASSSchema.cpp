@@ -59,7 +59,7 @@
 #include <y60/jsbase/JSNode.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
-#include <y60/input/AssEventSchema.h>
+#include <y60/input/asseventxsd.h>
 
 namespace y60 {
 
@@ -84,7 +84,7 @@ class ASSSchemaPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin 
         try {
             DOC_BEGIN("");
             DOC_END;
-            dom::NodePtr myEventSchema( new dom::Document( getASSSchema() ) );
+            dom::NodePtr myEventSchema( new dom::Document( y60::ourasseventxsd ) );
             *rval = jslib::as_jsval(cx, myEventSchema);
             return JS_TRUE;    
         } HANDLE_CPP_EXCEPTION;

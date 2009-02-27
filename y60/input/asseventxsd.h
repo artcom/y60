@@ -1,3 +1,4 @@
+
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
@@ -54,16 +55,21 @@
 //    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+
 */
 
-// own header
-#include "AssEventSchema.h"
 
+#ifndef AC_ASSEVENT_XSD_INCLUDED
+#define AC_ASSEVENT_XSD_INCLUDED
 
-extern std::string ourasseventxsd;
+#include "y60_input_settings.h"
+
+#include <string>
 
 namespace y60 {
-    std::string getASSSchema() {
-        return ourasseventxsd;
-    }
+
+extern Y60_INPUT_EXPORT const std::string ourasseventxsd;
+
 }
+
+#endif
