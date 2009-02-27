@@ -70,7 +70,7 @@ using namespace y60;
 
 namespace y60 {
 
-static const unsigned NO_DATA_TIMEOUT = 30;
+static const unsigned NO_DATA_TIMEOUT = 3;
 
 class ASSDriver;
 
