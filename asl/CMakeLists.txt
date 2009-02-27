@@ -6,6 +6,8 @@ project(ASL)
 # Include cmake libraries
 include(AcMake)
 
+list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
+
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/buildinfo.cpp.in)
 
@@ -28,6 +30,8 @@ if(OSX)
     mark_as_advanced( AUDIO_UNIT )
 endif(OSX)
 
+include(ASLUtilities)
+
 ac_add_project(
     ASL
     REQUIRED_PACKAGES
@@ -36,6 +40,8 @@ ac_add_project(
         ${REQ_PKGCONFIG}
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
+    CUSTOM_SCRIPTS
+        ASLUtilities
 )
 
 # Make sure we can access our includes without staging

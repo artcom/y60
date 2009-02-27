@@ -50,3 +50,11 @@ ac_add_library(
     EXTERNS OPENEXR
     TESTS   ${TESTS}
 )
+
+asl_add_schema(
+    Y60.xsd
+    CXX_FILE      Y60xsd.cpp
+    CXX_NAMESPACE y60
+    CXX_VARNAME   ourY60xsd
+    CXX_INCLUDE   Y60xsd.h
+)
