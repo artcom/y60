@@ -62,9 +62,9 @@ use("UnitTest.js");
 
 plug("y60ProcFunctions");
 
-const ALLOWED_MEMORY_USAGE = 3*1024*1024;
+const ALLOWED_MEMORY_USAGE = 1000; // per frame
 
-const START_FRAMES = 10;
+const START_FRAMES = 100;
 const END_FRAMES   = 10;
 const IMAGE_COUNT  = 1000;
 
@@ -96,7 +96,10 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {
         window.onFrame = function(theTime) {
             if (_myFrameCount == START_FRAMES) {
+                gc();
                 _myStartMemory = getProcessMemoryUsage();
+            } else if (_myFrameCount < START_FRAMES) {
+                toggleImage();
             } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + IMAGE_COUNT) {
                 toggleImage();
             } else if (_myFrameCount == START_FRAMES + IMAGE_COUNT) {
@@ -106,15 +109,15 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
                 var myUsedMemory = getProcessMemoryUsage();
 
                 // must be attached to obj for ENSURE to work
-                obj.myMemoryDifff =  myUsedMemory - _myStartMemory;
+                obj.myMemoryDifff =  (myUsedMemory - _myStartMemory)/IMAGE_COUNT;
                 obj.myAllowedMemoryUsage = ALLOWED_MEMORY_USAGE;
 
                 print("Number of textures                      : " + window.scene.textures.childNodesLength());
                 print("Number of images                        : " + window.scene.images.childNodesLength());
                 print("Memory at first image construction time : " + _myStartMemory);
                 print("Memory at app end                       : " + myUsedMemory);
-                print("Difference                              : " + obj.myMemoryDifff);
-                print("allowed difference                      : " + obj.myAllowedMemoryUsage + " ,(due to some basic memory allocation, i.e. SomImageFactory)");
+                print("Difference per frame                    : " + obj.myMemoryDifff);
+                print("allowed difference                      : " + obj.myAllowedMemoryUsage);
                 ENSURE("obj.myMemoryDifff < obj.myAllowedMemoryUsage");
                 ENSURE("window.scene.textures.childNodesLength() == 0");
                 ENSURE("window.scene.images.childNodesLength() == 0");

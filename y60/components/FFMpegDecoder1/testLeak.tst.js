@@ -55,14 +55,7 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: testText.js,v $
-//   $Author: martin $
-//   $Revision: 1.5 $
-//   $Date: 2005/03/18 11:48:31 $
-//
-//
-//=============================================================================
+
 
 includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("../../video/testLeak.js");
@@ -73,17 +66,11 @@ const MOVIE_2 = "../../video/testmovies/1.4.mpg"
 var myTestName = "y60FFMpegDecoder1 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder1";
 var myVideoCount = 500;
-//var myVideoCount = 5;
 
-var myMovieLeak =  myVideoCount * 26 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
-
-var myMovieBaseMemoryUsage =  30000; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
-var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
-
-
+var myAllowedLeakage = 50000; // per movie
 
 var mySuite = new UnitTestSuite(myTestName);
-mySuite.addTest(new MovieLeakUnitTest(myTestName, [MOVIE_1, MOVIE_2], myDecoderPlug, myVideoCount, myAllowedMemoryUsage));
+mySuite.addTest(new MovieLeakUnitTest(myTestName, [MOVIE_1, MOVIE_2], myDecoderPlug, myVideoCount, myAllowedLeakage));
 mySuite.run();
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());
