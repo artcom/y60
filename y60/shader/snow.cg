@@ -38,14 +38,19 @@ v2f mainVertex(a2v IN,
                uniform float4 lightPosition, //in object space
                uniform float4 AC_DIRECTIONAL_LIGHTS[],
                uniform float4 texgenparam2[4],
-               uniform float3 AC_CAMERA_POSITION,
-               uniform float4x4 AC_TEXTURE_MATRICES[5]) //in object space 
+               uniform float3 AC_CAMERA_POSITION
+#if (AC_TEXTURE_MATRICES_LENGTH >= 2)
+               , uniform float4x4 AC_TEXTURE_MATRICES[]  //in object space 
+#endif
+)
 { 
     v2f OUT; // pass texture coordinates for
 
     OUT.Position = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+#if (AC_TEXTURE_MATRICES_LENGTH >= 2)
     OUT.TexCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.TexCoord0).xy;
     OUT.TexCoord1 = mul(AC_TEXTURE_MATRICES[1], IN.TexCoord1).xy;
+#endif
     OUT.LightDirection.xyz = normalize(lightPosition - IN.Position);
     float3 viewVector = normalize(AC_CAMERA_POSITION - IN.Position.xyz);
     //OUT.HalfAngleVector.xyz = normalize(OUT.LightDirection.xyz + viewVector); // blinntype shading

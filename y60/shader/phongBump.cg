@@ -40,7 +40,7 @@ vert2frag mainVertex(a2v IN,
     vert2frag OUT;
 
     OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position); // ftransform
-    OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0);
+    OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0).xyz;
     OUT.worldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
 
     float3 N = normalize(mul(AC_OBJECTWORLD_IT, IN.normal).xyz);

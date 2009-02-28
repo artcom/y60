@@ -55,16 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $Id: iostream_functions.h,v 1.1 2005/03/24 23:35:56 christian Exp $
-//   $RCSfile: iostream_functions.h,v $
-//   $Author: christian $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/24 23:35:56 $
-//
-//
-//
-//=============================================================================
 
 #ifndef _ac_y60_stream_functions_h_
 #define _ac_y60_stream_functions_h_

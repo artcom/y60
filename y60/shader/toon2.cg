@@ -11,10 +11,11 @@ vert2frag mainVertex(float4 position : POSITION,
                      float4 normal   : NORMAL,
                      float2 texcoord0 : TEXCOORD0,
 
-#ifdef DIRECTIONAL_LIGHT
-                  uniform float4 AC_DIRECTIONAL_LIGHTS[],         // Light Direction
-#else
-                  uniform float4 AC_POSITIONAL_LIGHTS[],         // Light Position
+#if (AC_DIRECTIONAL_LIGHTS_LENGTH > 0)
+                  uniform float3 AC_DIRECTIONAL_LIGHTS[],         // Light Direction
+#endif
+#if (AC_POSITIONAL_LIGHTS_LENGTH > 0)
+                  uniform float3 AC_POSITIONAL_LIGHTS[],         // Light Position
 #endif
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 GL_MODELVIEW,
@@ -27,12 +28,13 @@ vert2frag mainVertex(float4 position : POSITION,
   OUT.eyeSpaceNormal =  mul(GL_MODELVIEW_IT, normal).xyz;
   OUT.texCoord0 = texcoord0;
   OUT.texCoord1 = texcoord0;
-#ifdef DIRECTIONAL_LIGHT
+#if (AC_DIRECTIONAL_LIGHTS_LENGTH > 0)
   OUT.lightVec = normalize(AC_DIRECTIONAL_LIGHTS[0].xyz);
-#else
-  float4 lightPos;
+#endif
+#if (AC_POSITIONAL_LIGHTS_LENGTH > 0)
+  float3 lightPos;
   lightPos = AC_POSITIONAL_LIGHTS[0];
-  OUT.lightVec = normalize(lightPos.xyz - OUT.eyeSpacePosition.xyz);
+  OUT.lightVec = normalize(lightPos - OUT.eyeSpacePosition.xyz);
 #endif
   return OUT;
 }
