@@ -1,7 +1,7 @@
 #if ! defined( BOOST_PP_IS_ITERATING )
 
-#ifndef Y60_JAVASCRIPT_SIGNATURE_INCLUDED
-#   define Y60_JAVASCRIPT_SIGNATURE_INCLUDED
+#ifndef Y60_APE_SIGNATURE_INCLUDED
+#   define Y60_APE_SIGNATURE_INCLUDED
 
 #   include <boost/preprocessor/repeat.hpp>
 #   include <boost/preprocessor/enum.hpp>
@@ -22,7 +22,7 @@
 #   include "preprocessor.h"
 
 
-#   define Y60_JAVASCRIPT_LIST_INC(n)        \
+#   define Y60_APE_LIST_INC(n)        \
             BOOST_PP_CAT(boost::mpl::vector, BOOST_PP_INC(n))
 
 namespace y60 { namespace ape { namespace detail {
@@ -34,13 +34,13 @@ struct most_derived : public boost::mpl::if_< boost::is_convertible<C1*,C2*>, C1
                             
 
 #   define BOOST_PP_ITERATION_PARAMS_1                                   \
-            (3, (0, Y60_JAVASCRIPT_MAX_ARITY, <y60/components/yape/detail/signature.h>))
+            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/detail/signature.h>))
 #   include BOOST_PP_ITERATE()
-#   undef Y60_JAVASCRIPT_LIST_INC
+#   undef Y60_APE_LIST_INC
 
 }}} // end of namespace detail, ape, y60
 
-#endif // Y60_JAVASCRIPT_SIGNATURE_INCLUDED
+#endif // Y60_APE_SIGNATURE_INCLUDED
 
 #elif BOOST_PP_ITERATION_DEPTH() == 1
 
@@ -48,17 +48,16 @@ struct most_derived : public boost::mpl::if_< boost::is_convertible<C1*,C2*>, C1
 
 template <
 class RT BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, class T)>
-inline Y60_JAVASCRIPT_LIST_INC(N)<
+inline Y60_APE_LIST_INC(N)<
     RT BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)>
 get_signature(RT(*)(BOOST_PP_ENUM_PARAMS_Z(1, N, T)), void* = 0)
 {
-    return Y60_JAVASCRIPT_LIST_INC(N)<
+    return Y60_APE_LIST_INC(N)<
         RT BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)
         >();
 }
 
 #   undef N
-
 #   define BOOST_PP_ITERATION_PARAMS_2 \
             (3, (0, 3, <y60/components/yape/detail/signature.h>))
 #   include BOOST_PP_ITERATE()
@@ -66,16 +65,16 @@ get_signature(RT(*)(BOOST_PP_ENUM_PARAMS_Z(1, N, T)), void* = 0)
 #else 
 
 #   define N BOOST_PP_RELATIVE_ITERATION(1)
-#   define Q Y60_JAVASCRIPT_CV_QUALIFIER(BOOST_PP_ITERATION())
+#   define Q Y60_APE_CV_QUALIFIER(BOOST_PP_ITERATION())
 
 #if 0
 template <
 class RT, class ClassT BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, class T)>
-inline Y60_JAVASCRIPT_LIST_INC(BOOST_PP_INC(N))<
+inline Y60_APE_LIST_INC(BOOST_PP_INC(N))<
     RT, ClassT& BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)>
 get_signature(RT(ClassT::*)(BOOST_PP_ENUM_PARAMS_Z(1, N, T)) Q)
 {
-    return Y60_JAVASCRIPT_LIST_INC(BOOST_PP_INC(N))<
+    return Y60_APE_LIST_INC(BOOST_PP_INC(N))<
         RT, ClassT& BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)
         >();
 }
@@ -86,7 +85,7 @@ class Target
     , class ClassT
 BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, class T)
     >
-    inline Y60_JAVASCRIPT_LIST_INC(BOOST_PP_INC(N))<
+    inline Y60_APE_LIST_INC(BOOST_PP_INC(N))<
     RT
     , typename most_derived<Target, ClassT>::type&
 BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)
@@ -96,7 +95,7 @@ BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)
             , Target*
             )
 {
-    return Y60_JAVASCRIPT_LIST_INC(BOOST_PP_INC(N))<
+    return Y60_APE_LIST_INC(BOOST_PP_INC(N))<
         RT
         , BOOST_DEDUCED_TYPENAME most_derived<Target, ClassT>::type&
         BOOST_PP_ENUM_TRAILING_PARAMS_Z(1, N, T)

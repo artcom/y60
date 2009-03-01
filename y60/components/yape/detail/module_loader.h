@@ -1,5 +1,5 @@
-#ifndef Y60_JAVASCRIPT_MODULE_LOADER_INCLUDED
-#define Y60_JAVASCRIPT_MODULE_LOADER_INCLUDED
+#ifndef Y60_APE_MODULE_LOADER_INCLUDED
+#define Y60_APE_MODULE_LOADER_INCLUDED
 
 #include <js/spidermonkey/jscntxt.h>
 
@@ -24,4 +24,4 @@ class module_loader : public asl::PlugInBase,
 
 }}} // end of namespace detail, ape, y60
 
-#endif // Y60_JAVASCRIPT_MODULE_LOADER_INCLUDED
+#endif // Y60_APE_MODULE_LOADER_INCLUDED

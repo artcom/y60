@@ -23,12 +23,12 @@ struct foo {
 
 #define SIG(func) typeof(&func), & func
 
-Y60_JAVASCRIPT_MODULE( y60HelloWorld ) {
+Y60_APE_MODULE( y60HelloWorld ) {
     using namespace y60::ape;
 
     function<SIG(greet)>("greet");
     function<SIG(greet2)>("greet2");
-//    function<SIG(greet_n)>("greet_n");
+    function<SIG(greet_n)>("greet_n");
 
     class_<foo>("foo").
         function("bar", & foo::bar );

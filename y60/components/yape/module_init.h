@@ -1,5 +1,5 @@
-#ifndef Y60_JAVASCRIPT_INCLUDED
-#define Y60_JAVASCRIPT_INCLUDED
+#ifndef Y60_APE_INCLUDED
+#define Y60_APE_INCLUDED
 
 #include <vector>
 #include <typeinfo>
@@ -70,12 +70,12 @@ class module_initializer {
 }}
 
 #if defined(WIN32)
-#   define Y60_JAVASCRIPT_MODULE_DECL __declspec( dllexport )
+#   define Y60_APE_MODULE_DECL __declspec( dllexport )
 #else
-#   define Y60_JAVASCRIPT_MODULE_DECL 
+#   define Y60_APE_MODULE_DECL 
 #endif
 
-#define Y60_JAVASCRIPT_MODULE( name )                                       \
+#define Y60_APE_MODULE( name )                                       \
                                                                             \
 struct name ## _module_initializer :                                        \
         public y60::ape::module_initializer                          \
@@ -85,7 +85,7 @@ struct name ## _module_initializer :                                        \
     void init_module();                                                     \
 };                                                                          \
                                                                             \
-extern "C" Y60_JAVASCRIPT_MODULE_DECL                                       \
+extern "C" Y60_APE_MODULE_DECL                                       \
 asl::PlugInBase * name ## _instantiatePlugIn(asl::DLHandle theDLHandle) {   \
     using y60::ape::detail::module_loader;                           \
     return new module_loader<name ## _module_initializer>(theDLHandle);     \
@@ -93,4 +93,4 @@ asl::PlugInBase * name ## _instantiatePlugIn(asl::DLHandle theDLHandle) {   \
                                                                             \
 void name ## _module_initializer::init_module()
 
-#endif // Y60_JAVASCRIPT_INCLUDED
+#endif // Y60_APE_INCLUDED
