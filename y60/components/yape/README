@@ -1,0 +1,16 @@
+Q: yape? Yet another ... ?
+A: No, its pronounced y-ape 
+
+Q: Ok, y-ape ... ?
+A: Because I dont like monkeys.
+
+Q: Ok, wtf *is* this thing??
+A: It's an attempt to get c++ to spidermonkey language bindings with a syntax similar
+   to boost::python. It currently uses all kinds of practices, including dark ones, like
+   preprocessor metaprogramming and uses stuff from the future: typeof()
+
+Q: What does it look like?
+A: Take a look at hello_world_wrapper.cpp. The file contains a full blown plugin that
+   registers a couple of functions. The file test_wrapper.js loads the module and calls
+   the functions. It also demonstrates a namespace aware replacement for plug().
+

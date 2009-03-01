@@ -550,6 +550,27 @@ being handed input arguments and comparing them with a list of allowed arguments
 }
 
 
+/* TODO: Deprecate this mess and replace it with a nice, *generic* module loader. It should
+ *          - NOT dynamic_cast the plugin to thousand diffrent types
+ *          - NOT register any instances with the engine automatically
+ *          - NOT pass around whatever XML nodes as a work around for missing parameter control
+ *            on the automatically cerated instance
+ *          - probably NOT be called plug() (users plug, developers *load* ...)
+ *
+ *       It should:
+ *          - cast the resulting plugin to one and only one type (JSModule for example)
+ *          - call loadedModule->initClasses(cx, obj)
+ *          - support some form of namespace objects
+ *
+ *       Why the fuzz? This is a matter of separation of concerns. Currently whenever
+ *       someone wants to introduce a new plugin type she has to modify one of the two
+ *       *only* functions we really need inside the engine (the other one is use()).
+ *       Everything else could, and probably should come from modules.
+ *
+ *       See load() in y60/jsbase/JSGlobal.cpp and y60/compoents/yape.
+ *
+ * [DS]
+ */
 JS_STATIC_DLL_CALLBACK(JSBool)
 Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Plugs the component with the given name.");

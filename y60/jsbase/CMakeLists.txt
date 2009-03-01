@@ -35,6 +35,7 @@ ArgumentHolder.impl
 ClassMapSingleton.h
 Documentation.h
 IFactoryPlugin.h
+IJSModuleLoader.h
 IScriptablePlugin.h
 IScriptablePlugin.impl
 JSAccessibleVector.h

@@ -59,6 +59,12 @@
 // own header
 #include "JSGlobal.h"
 
+#include <asl/math/linearAlgebra.h>
+#include <asl/math/intersection.h>
+#include <asl/math/numeric_functions.h>
+
+#include <y60/inet/Request.h>
+
 #include "JScppUtils.h"
 #include "JSVector.h"
 #include "JSMatrix.h"
@@ -69,12 +75,7 @@
 #include "JSQuaternion.h"
 #include "JSBox.h"
 #include "JSFrustum.h"
-
-#include <asl/math/linearAlgebra.h>
-#include <asl/math/intersection.h>
-#include <asl/math/numeric_functions.h>
-
-#include <y60/inet/Request.h>
+#include "IJSModuleLoader.h"
 
 #define DB(x) // x
 
@@ -1207,13 +1208,50 @@ smoothStep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     // UH: the C++ implementation uses this (IMHO) more logical order...
     *rval = as_jsval(cx, asl::smoothStep(myValue, myIn, myOut));
     return JS_TRUE;
+}
 
+static JSBool
+Load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Load a native module");
+    DOC_PARAM("theModuleName",
+              "The name of the module without any library pre- or suffix",
+              DOC_TYPE_STRING);
+    DOC_PARAM("theNamespace",
+              "The object that serves as the container for the loaded functions and classes",
+              DOC_TYPE_OBJECT);
+    DOC_END;
+
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx,"load: bad number of arguments, expected 2 (modulename, namespace).");
+            return JS_FALSE;
+        }
+
+        std::string myModuleName;
+        convertFrom( cx, argv[0], myModuleName);
+
+        if ( ! JSVAL_IS_OBJECT( argv[1] )) {
+            JS_ReportError(cx,"load: bad arguments, argument 2 must be an object.");
+            return JS_FALSE;
+        }
+        JSObject * myNamespace = JSVAL_TO_OBJECT( argv[1] );
+
+        asl::PlugInBasePtr myPlugin = asl::PlugInManager::get().getPlugIn( myModuleName );
+        if ( IJSModuleLoaderPtr myModuleLoader =
+                dynamic_cast_Ptr<IJSModuleLoader>( myPlugin ))
+        {
+            myModuleLoader->initClasses( cx, myNamespace );
+        }
+    } HANDLE_CPP_EXCEPTION;
+
+    return JS_TRUE;
 }
 
 JSFunctionSpec *
 Global::Functions() {
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
+        {"load",        Load,              2},
         {"almostEqual", almostEqual,       2},
         {"dot",         dotProduct,        2},
         {"sum",         sum,               2},

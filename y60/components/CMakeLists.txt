@@ -32,6 +32,7 @@ add_subdirectory(X3dImporter)
 add_subdirectory(FFMpegDecoder1)
 add_subdirectory(FFMpegDecoder2)
 
+#add_subdirectory(yape)
 
 
 if(GSTREAMER_FOUND)
