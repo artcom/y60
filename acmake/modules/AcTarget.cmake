@@ -270,21 +270,16 @@ endmacro(_ac_attach_rpath)
 
 
 if(NOT WIN32)
-    option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create source file symlinks in the buildtree?" NO)
+    option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create symlinks <bindir>/src -> <srcdir>" NO)
 endif(NOT WIN32)
 
 macro(_ac_create_source_symlinks)
     if( NOT WIN32 AND ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
-        foreach( SRC ${ARGN} )
-            if( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SRC})
-                file(RELATIVE_PATH REL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-                execute_process(COMMAND cmake -E create_symlink ${REL} ${SRC}
+        if( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
+            file(RELATIVE_PATH REL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+                execute_process(COMMAND cmake -E create_symlink ${REL} src
                                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-            endif( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SRC})
-        endforeach( SRC ${ARGN} )
-        file(RELATIVE_PATH REL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt)
-        execute_process(COMMAND cmake -E create_symlink ${REL} CMakeLists.txt
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+        endif( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
     endif( NOT WIN32 AND ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
 endmacro(_ac_create_source_symlinks)
 

@@ -35,7 +35,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # figure out file name for build info
     _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
-    _ac_create_source_symlinks( ${THIS_PLUGIN_SOURCES} ${THIS_PLUGIN_HEADERS} )
+    _ac_create_source_symlinks()
 
     # define the target
     add_library(
