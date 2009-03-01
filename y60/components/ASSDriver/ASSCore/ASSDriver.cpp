@@ -28,16 +28,6 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: THIS IS CERTAINLY NOT A command line utility to replace strings in files
-// The special "feature" is that greplace treats the whole file a one string
-// and does not use regular expressions, so you don't have to worry about
-// special characters. It is especially designated to be used with C/C++
-// source code, and you can restrict replacment to strings inside or outside
-// of comments and string literals.
-// Another feature is that you can give two search strings (-2) and replace
-// everything between these two strings (including the search strings).
-// This is useful for replacing license headers or marked sections in code.
-//
 // Last Review: NEVER, NOONE
 //
 //  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
