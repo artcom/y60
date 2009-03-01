@@ -76,7 +76,6 @@ GlibcBacktrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
         
         if (myPos1 != string::npos) {
             myItem.name = mySymbol.substr( myPos1, myPos2 - myPos1);
-            // demangle ...
         } else {
             myPos1 = mySymbol.rfind('(');
             if (myPos1 != string::npos) {
