@@ -12,10 +12,11 @@
 
 #       include <js/spidermonkey/jsapi.h>
 
-#       include <asl/base/Exception.h>
+#       include <asl/base/TraceUtils.h>
 #       include <asl/base/logger.h>
 #       include <y60/jsbase/JScppUtils.h>
 
+#       include <y60/components/yape/detail/exception.h>
 #       include <y60/components/yape/detail/signature_utils.h>
 #       include <y60/components/yape/detail/preprocessor.h>
 
@@ -28,15 +29,22 @@ struct dispatch {
     typedef invoke_tag< returns_void<Sig>::value, arity<Sig>::value > type;
 };
 
-DEFINE_EXCEPTION( bad_arguments, asl::Exception );
-
 template <typename T>
 inline
 void
-from_jsval(JSContext * cx, jsval const& v, T & out) {
-    if ( ! jslib::convertFrom(cx, v, out )) {
+arg_from_jsval(JSContext * cx, jsval * const& argv, uintN i, T & out) {
+    if ( ! jslib::convertFrom(cx, argv[i], out )) {
+        JSString * js_string = JS_ValueToString(cx, argv[0]);
+        std::string js_string_rep;
+        if(js_string) {
+            js_string_rep = JS_GetStringBytes(js_string);
+        }
+        JS_RemoveRoot(cx, & js_string );
         std::ostringstream os;
-        throw bad_arguments("Kaputt.", PLUS_FILE_LINE);
+        os << "could not convert argument " << i << " with value '"
+           << js_string_rep << "' to native type '" 
+           << asl::demangled_name<T>() << "'";
+        throw bad_arguments(os.str(), PLUS_FILE_LINE);
     }
 }
 
@@ -53,12 +61,19 @@ struct invoker {
     }
 };
 
+template < typename FuncPtrT, FuncPtrT Func, typename Sig >
+JSNative
+get_invoker(Sig const& sig) {
+    return & detail::invoker<FuncPtrT,Func,Sig>::invoke; 
+}
+
+
 #       define Y60_APE_DECL_ARG(z, n, Sig )                       \
                 typename argument_storage<Sig,n>::type arg ## n = \
                         typename argument_storage<Sig,n>::type() ;
 
 #       define Y60_APE_INIT_ARG(z, n, Sig) \
-                from_jsval(cx, argv[n], arg ## n );
+                arg_from_jsval(cx, argv, n, arg ## n );
 
 #       define BOOST_PP_ITERATION_PARAMS_1 \
             (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/detail/invoke.h>))
@@ -86,6 +101,7 @@ struct invoker<FuncPtrT, Func, Sig, invoke_tag<false, N> > {
             typedef boost::function_traits<
                 typename boost::remove_pointer<FuncPtrT>::type > func_trait;
             BOOST_PP_REPEAT( N, Y60_APE_DECL_ARG, Sig )
+            BOOST_PP_REPEAT( N, Y60_APE_INIT_ARG, Sig );
             *rval = jslib::as_jsval(cx, Func( BOOST_PP_ENUM_PARAMS(N, arg) ));
         } HANDLE_CPP_EXCEPTION;
         return JS_TRUE;

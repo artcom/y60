@@ -1,10 +1,11 @@
 set( LIB_HEADERS
+    class_wrapper.h
     detail/invoke.h
-    detail/module_loader.h
     detail/preprocessor.h
     detail/signature.h
     detail/signature_utils.h
-    module_init.h
+    module.h
+    module_initializer.h
     yape.h
 )
 # XXX need spidermonkey defs

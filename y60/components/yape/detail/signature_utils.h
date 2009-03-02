@@ -40,7 +40,6 @@ struct return_type : boost::mpl::front<Sig> {};
 template <typename Sig>
 struct returns_void : boost::is_same< typename return_type<Sig>::type, void> {};
 
-
 }}} // end of namespace detail, ape, y60
 
 #endif // Y60_APE_SIGNATURE_UTILS_INCLUDED

@@ -10,7 +10,7 @@
 #define Y60_APE_APPLY_Y60_APE_NIL
 
 #ifndef Y60_APE_MAX_ARITY
-#   define Y60_APE_MAX_ARITY 1
+#   define Y60_APE_MAX_ARITY 15
 #endif
 
 #define Y60_APE_CV_QUALIFIER(i)                               \
