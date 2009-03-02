@@ -44,6 +44,11 @@
 #include "asl_base_settings.h"
 
 #include <string>
+#include <typeinfo>
+
+#ifdef __GNUC__
+#   include <cxxabi.h>
+#endif
 
 struct StackFrameBase {
     ptrdiff_t frame;
@@ -51,6 +56,30 @@ struct StackFrameBase {
 };
 
 std::string beautify(const std::string & theSymbol);
+
+// TODO: put the rest of this in namespace asl
+namespace asl {
+
+template <typename T>
+std::string
+demangled_name() {
+#   ifdef __GNUC__
+        const size_t name_buffer_size = 1024;
+        size_t size = name_buffer_size;
+        char buffer[name_buffer_size];
+        int status = 0;
+        abi::__cxa_demangle(typeid(T).name(), buffer, & size, & status);
+        if ( ! status ) {
+            return std::string( buffer );
+        }
+        return std::string( typeid(T).name() );
+#   else
+        //TODO: MSVC demangleing ... code should be in the win32 stack tracer
+        return std::string(typeid(T).name());
+#   endif
+}
+
+} // end of namespace asl
 
 #endif // TRACE_UTILS_INCLUDED
 
